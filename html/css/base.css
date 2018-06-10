@@ -39,3 +39,22 @@ HTML,BODY {
 .footer A {
     color: #cccccc;
 }
+
+
+
+@media (max-width: 767px) {
+
+    .container {
+        padding: 0px;
+    }
+
+    .card-body {
+        font-size: 6pt;
+    }
+
+    .lg_number {
+        font-size: 22pt;
+    }
+
+
+}
