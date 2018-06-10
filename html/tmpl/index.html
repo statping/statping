@@ -12,6 +12,7 @@
 </head>
 <body>
 
+<h1 class="text-center">{{.Project}}</h1>
 
 <div class="container">
 
@@ -19,12 +20,10 @@
         {{ range .Services }}
             <div class="col-12 mb-4">
                 <div class="card">
-                    <div class="card-body">
+                    <div class="card-body{{if .Online}}{{else}} offline_bg{{end}}">
                         <h3>{{ .Name }} <span class="badge badge-secondary float-right">{{if .Online}} ONLINE {{ else }} OFFLINE {{end}}</span></h3>
 
                         <div class="row stats_area mt-3 mb-3">
-
-                            {{.Online}}
 
                             <div class="col-4">
                                 <span class="lg_number">{{.Online24Hours}}%</span>
@@ -90,11 +89,17 @@ var chartdata = new Chart(ctx, {
             yAxes: [{
                 ticks: {
                     beginAtZero: true
+                },
+                gridLines: {
+                    display:false
                 }
             }],
             xAxes: [{
                 type: 'time',
-                distribution: 'series'
+                distribution: 'series',
+                gridLines: {
+                    display:false
+                }
             }]
         },
         elements: {

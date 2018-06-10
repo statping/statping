@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	services []Service
+	services []*Service
 )
 
 type Service struct {
@@ -45,8 +45,8 @@ func SelectService(id string) Service {
 	return tk
 }
 
-func SelectAllServices() []Service {
-	var tks []Service
+func SelectAllServices() []*Service {
+	var tks []*Service
 	rows, err := db.Query("SELECT * FROM services ORDER BY id ASC")
 	if err != nil {
 		panic(err)
@@ -58,7 +58,7 @@ func SelectAllServices() []Service {
 			panic(err)
 		}
 		tk.FormatData()
-		tks = append(tks, tk)
+		tks = append(tks, &tk)
 	}
 	return tks
 }
@@ -130,6 +130,7 @@ func (u *Service) Create() int {
 	if err != nil {
 		panic(err)
 	}
+	services = SelectAllServices()
 	return lastInsertId
 }
 

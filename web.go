@@ -8,7 +8,7 @@ import (
 )
 
 type dashboard struct {
-	Services []Service
+	Services []*Service
 	Users    []User
 	Core     *Core
 }
@@ -125,7 +125,8 @@ func SetupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type index struct {
-	Services []Service
+	Project  string
+	Services []*Service
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -144,7 +145,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 			return template.JS(html)
 		},
 	}).Parse(indexFile)
-	out := index{services}
+	out := index{core.Name, services}
 	indexTmpl.Execute(w, out)
 }
 
@@ -169,7 +170,7 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-		out := dashboard{SelectAllServices(), SelectAllUsers(), core}
+		out := dashboard{services, SelectAllUsers(), core}
 		dashboardTmpl.Execute(w, out)
 	}
 
@@ -189,7 +190,7 @@ func ServicesHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	tokensTmpl.Execute(w, SelectAllServices())
+	tokensTmpl.Execute(w, services)
 }
 
 func UsersHandler(w http.ResponseWriter, r *http.Request) {

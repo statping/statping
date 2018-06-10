@@ -26,3 +26,7 @@ HTML,BODY {
 .stats_area {
     text-align: center;
 }
+
+.offline_bg {
+    background-color: #c5c5c578 !important;
+}

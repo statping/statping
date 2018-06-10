@@ -11,7 +11,7 @@ type Hit struct {
 
 func SelectAllHits(id int64) []Hit {
 	var tks []Hit
-	rows, err := db.Query("SELECT * FROM hits WHERE service=$1 ORDER BY id ASC", id)
+	rows, err := db.Query("SELECT * FROM hits WHERE service=$1 ORDER BY id DESC LIMIT 256", id)
 	if err != nil {
 		panic(err)
 	}
