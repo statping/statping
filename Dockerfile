@@ -8,6 +8,7 @@ RUN go get github.com/GeertJohan/go.rice/rice
 RUN go get -d -v
 RUN rice embed-go
 RUN go install
+WORKDIR /app
 
 EXPOSE 8080
 
