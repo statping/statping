@@ -17,9 +17,9 @@ func CheckServices() {
 }
 
 func (s *Service) CheckQueue() {
-	time.Sleep(time.Duration(s.Interval) * time.Second)
 	s.Check()
-	fmt.Printf("Service: %v | Online: %v | Latency: %v\n", s.Name, s.Online, s.Latency)
+	fmt.Printf("   Service: %v | Online: %v | Latency: %v\n", s.Name, s.Online, s.Latency)
+	time.Sleep(time.Duration(s.Interval) * time.Second)
 	s.CheckQueue()
 }
 

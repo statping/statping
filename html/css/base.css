@@ -30,3 +30,12 @@ HTML,BODY {
 .offline_bg {
     background-color: #c5c5c578 !important;
 }
+
+.footer {
+    text-decoration: none;
+    margin-top: 20px;
+}
+
+.footer A {
+    color: #cccccc;
+}
