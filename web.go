@@ -91,7 +91,6 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/services", http.StatusSeeOther)
 }
 
-
 func SetupHandler(w http.ResponseWriter, r *http.Request) {
 	setupFile, err := tmplBox.String("setup.html")
 	if err != nil {
@@ -109,31 +108,23 @@ type index struct {
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	//session, _ := store.Get(r, "apizer_auth")
-	//if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-	//	http.Redirect(w, r, "/", http.StatusSeeOther)
-	//	return
-	//}
-
-	if setupMode {
+	if core == nil {
 		http.Redirect(w, r, "/setup", http.StatusSeeOther)
 		return
 	}
 
-	dashboardFile, err := tmplBox.String("index.html")
+	indexFile, err := tmplBox.String("index.html")
 	if err != nil {
 		panic(err)
 	}
 
-	dashboardTmpl, err := template.New("message").Funcs(template.FuncMap{
+	indexTmpl, err := template.New("message").Funcs(template.FuncMap{
 		"js": func(html string) template.JS {
 			return template.JS(html)
 		},
-	}).Parse(dashboardFile)
-
+	}).Parse(indexFile)
 	out := index{SelectAllServices()}
-
-	dashboardTmpl.Execute(w, out)
+	indexTmpl.Execute(w, out)
 }
 
 func DashboardHandler(w http.ResponseWriter, r *http.Request) {

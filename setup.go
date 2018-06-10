@@ -1,23 +1,23 @@
 package main
 
 import (
-	"net/http"
-	"strconv"
-	"os"
 	"github.com/go-yaml/yaml"
+	"net/http"
+	"os"
+	"strconv"
 	"time"
 )
 
 type DbConfig struct {
-	DbConn  string `yaml:"connection"`
-	DbHost  string `yaml:"host"`
-	DbUser  string `yaml:"user"`
-	DbPass  string `yaml:"password"`
-	DbData  string `yaml:"database"`
-	DbPort  int `yaml:"port"`
+	DbConn   string `yaml:"connection"`
+	DbHost   string `yaml:"host"`
+	DbUser   string `yaml:"user"`
+	DbPass   string `yaml:"password"`
+	DbData   string `yaml:"database"`
+	DbPort   int    `yaml:"port"`
 	Project  string `yaml:"-"`
-	Username  string `yaml:"-"`
-	Password  string `yaml:"-"`
+	Username string `yaml:"-"`
+	Password string `yaml:"-"`
 }
 
 func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +55,6 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	mainProcess()
 
 }
-
 
 func (c *DbConfig) Save() error {
 	var err error

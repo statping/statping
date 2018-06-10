@@ -1,14 +1,12 @@
 package main
 
-
 type Core struct {
-	Name  string
+	Name    string
 	Config  string
-	Key  string
+	Key     string
 	Secret  string
 	Version string
 }
-
 
 func SelectCore() (*Core, error) {
 	var core Core

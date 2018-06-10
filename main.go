@@ -2,25 +2,25 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/GeertJohan/go.rice"
 	"github.com/go-yaml/yaml"
 	"github.com/gorilla/sessions"
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
-	"fmt"
 )
 
 var (
-	db      *sql.DB
-	configs *Config
-	core *Core
-	store   *sessions.CookieStore
-	VERSION string
-	sqlBox  *rice.Box
-	cssBox  *rice.Box
-	jsBox   *rice.Box
-	tmplBox *rice.Box
+	db        *sql.DB
+	configs   *Config
+	core      *Core
+	store     *sessions.CookieStore
+	VERSION   string
+	sqlBox    *rice.Box
+	cssBox    *rice.Box
+	jsBox     *rice.Box
+	tmplBox   *rice.Box
 	setupMode bool
 )
 
@@ -46,7 +46,6 @@ func main() {
 	mainProcess()
 }
 
-
 func mainProcess() {
 	var err error
 	DbConnection()
@@ -59,8 +58,6 @@ func mainProcess() {
 		RunHTTPServer()
 	}
 }
-
-
 
 func RenderBoxes() {
 	sqlBox = rice.MustFindBox("sql")
