@@ -25,23 +25,27 @@ func (s *Service) CheckQueue() {
 
 func (s *Service) Check() {
 	t1 := time.Now()
-	response, err := http.Get(s.Domain)
+	client := http.Client{
+		Timeout: 30 * time.Second,
+	}
+	response, err := client.Get(s.Domain)
 	t2 := time.Now()
 	s.Latency = t2.Sub(t1).Seconds()
 	if err != nil {
-		s.Failure(response, fmt.Sprintf("HTTP Error %v", err))
+		s.Failure(fmt.Sprintf("HTTP Error %v", err))
 		return
 	}
+	defer response.Body.Close()
 	if s.Expected != "" {
 		contents, _ := ioutil.ReadAll(response.Body)
 		match, _ := regexp.MatchString(s.Expected, string(contents))
 		if !match {
-			s.Failure(response, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
+			s.Failure(fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
 			return
 		}
 	}
 	if s.ExpectedStatus != response.StatusCode {
-		s.Failure(response, fmt.Sprintf("HTTP Status Code %v did not match %v", response.StatusCode, s.ExpectedStatus))
+		s.Failure(fmt.Sprintf("HTTP Status Code %v did not match %v", response.StatusCode, s.ExpectedStatus))
 		return
 	}
 	s.Online = true
@@ -49,11 +53,9 @@ func (s *Service) Check() {
 }
 
 func (s *Service) Record(response *http.Response) {
-	defer response.Body.Close()
 	db.QueryRow("INSERT INTO hits(service,latency,created_at) VALUES($1,$2,NOW()) returning id;", s.Id, s.Latency).Scan()
 }
 
-func (s *Service) Failure(response *http.Response, issue string) {
+func (s *Service) Failure(issue string) {
 	db.QueryRow("INSERT INTO failures(issue,service,created_at) VALUES($1,$2,NOW()) returning id;", issue, s.Id).Scan()
-	s.Record(response)
 }
