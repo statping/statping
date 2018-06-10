@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/css/base.css">
     <script src="/js/Chart.bundle.min.js"></script>
 
-    <title>Fusioner | Dashboard</title>
+    <title>Statup | Dashboard</title>
 </head>
 <body>
 
@@ -23,6 +23,8 @@
                         <h3>{{ .Name }} <span class="badge badge-secondary float-right">{{if .Online}} ONLINE {{ else }} OFFLINE {{end}}</span></h3>
 
                         <div class="row stats_area mt-3 mb-3">
+
+                            {{.Online}}
 
                             <div class="col-4">
                                 <span class="lg_number">{{.Online24Hours}}%</span>

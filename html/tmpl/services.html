@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/base.css">
 
-    <title>Fusioner | Tokens</title>
+    <title>Statup | Services</title>
 </head>
 <body>
 
@@ -15,54 +15,58 @@
 <div class="container">
 
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">Fusioner</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarText">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link" href="/dashboard">Dashboard</a>
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link" href="/tokens">Tokens</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/users">Users</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/permissions">Permissions</a>
-      </li>
-    </ul>
-    <span class="navbar-text">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Statup</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard">Dashboard</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/services">Services</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/users">Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/plguins">Plugins</a>
+                </li>
+            </ul>
+            <span class="navbar-text">
       <a class="nav-link" href="/logout">Logout</a>
     </span>
-  </div>
-</nav>
+        </div>
+    </nav>
 
     <div class="row">
 
         <div class="col-12">
 
-        <h3>Tokens</h3>
-
-            <a href="/token/create" class="btn btn-primary">Create New Token</a>
+        <h3>Services</h3>
 
             <table class="table table-striped">
                 <thead>
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Key</th>
-                    <th scope="col">Secret</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 {{range .}}
                 <tr>
                     <th scope="row">{{.Id}}</th>
-                    <td>{{.Key}}</td>
-                    <td>{{.Secret}}</td>
+                    <td>{{.Name}}</td>
+                    <td>
+                        <div class="btn-group" data-toggle="buttons">
+                                <button class="btn btn-primary" type="submit">View</button>
+                                <button class="btn btn-primary" type="submit">Edit</button>
+                                <button class="btn btn-primary" type="submit">Delete</button>
+                        </div>
+                    </td>
                 </tr>
                 {{end}}
                 </tbody>
@@ -70,6 +74,56 @@
 
         </div>
 
+
+        <div class="col-12">
+
+            <h3>Create Service</h3>
+
+            <form action="/services/create" method="POST">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="name" class="form-control" id="inputEmail3" placeholder="Name">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputPassword3" class="col-sm-4 col-form-label">Application Endpoint (URL)</label>
+                    <div class="col-sm-8">
+                        <input type="text" name="domain" class="form-control" id="inputPassword3" placeholder="https://google.com">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputPassword3" class="col-sm-4 col-form-label">Expected Response (Regex)</label>
+                    <div class="col-sm-8">
+                        <input type="text" name="expected" class="form-control" id="inputPassword3" placeholder="string">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputPassword3" class="col-sm-4 col-form-label">Expected Status Code</label>
+                    <div class="col-sm-8">
+                        <input type="number" name="expected_status" class="form-control" id="inputPassword3" placeholder="200">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputPassword3" class="col-sm-4 col-form-label">HTTP Method</label>
+                    <div class="col-sm-8">
+                        <input type="text" name="method" class="form-control" id="inputPassword3" placeholder="GET">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputPassword3" class="col-sm-4 col-form-label">Check Interval</label>
+                    <div class="col-sm-8">
+                        <input type="number" name="interval" class="form-control" id="inputPassword3" placeholder="10">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-10">
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
 
 
     </div>

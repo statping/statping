@@ -12,7 +12,8 @@ HTML,BODY {
 
 .navbar {
     margin-left: -50px;
-    width: 720px;
+    margin-top: -50px;
+    width: 790px;
     margin-bottom: 30px;
 }
 

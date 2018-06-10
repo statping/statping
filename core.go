@@ -1,5 +1,7 @@
 package main
 
+import "github.com/gorilla/sessions"
+
 type Core struct {
 	Name    string
 	Config  string
@@ -20,5 +22,6 @@ func SelectCore() (*Core, error) {
 			return nil, err
 		}
 	}
+	store = sessions.NewCookieStore([]byte(core.Secret))
 	return &core, err
 }

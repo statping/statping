@@ -73,7 +73,6 @@ func LoadConfig() *Config {
 		return nil
 	}
 	yaml.Unmarshal(file, &config)
-	store = sessions.NewCookieStore([]byte(config.Secret))
 	return &config
 }
 

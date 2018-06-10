@@ -8,6 +8,10 @@ import (
 	"time"
 )
 
+var (
+	services []Service
+)
+
 type Service struct {
 	Id             int64
 	Name           string
@@ -62,6 +66,7 @@ func SelectAllServices() []Service {
 func (s *Service) FormatData() *Service {
 	s.GraphData()
 	s.AvgUptime()
+	s.Online24()
 	s.AvgTime()
 	return s
 }
@@ -71,6 +76,18 @@ func (s *Service) AvgTime() float64 {
 	sum := s.Sum()
 	avg := sum / float64(total) * 100
 	s.AvgResponse = fmt.Sprintf("%0.0f", avg*10)
+	return avg
+}
+
+func (s *Service) Online24() float64 {
+	total := s.TotalHits()
+	failed := s.TotalFailures24Hours()
+	if failed == 0 {
+		s.Online24Hours = 100.00
+		return s.Online24Hours
+	}
+	avg := float64(failed) / float64(total) * 100
+	s.Online24Hours = avg
 	return avg
 }
 
@@ -103,19 +120,19 @@ func (s *Service) AvgUptime() float64 {
 		return s.TotalUptime
 	}
 	percent := float64(failed) / float64(total) * 100
-	fmt.Println(failed, total, percent)
 	s.TotalUptime = percent
 	return percent
 }
 
 func (u *Service) Create() int {
 	var lastInsertId int
-	db.QueryRow("INSERT INTO services(name, domain, expected, expected_status, created_at) VALUES($1,$2,$3,$4,NOW()) returning id;", u.Name, u.Domain, u.Expected, u.ExpectedStatus).Scan(&lastInsertId)
+	err := db.QueryRow("INSERT INTO services(name, domain, method, port, expected, expected_status, interval, created_at) VALUES($1,$2,$3,$4,$5,$6,$7,NOW()) returning id;", u.Name, u.Domain, u.Method, u.Port, u.Expected, u.ExpectedStatus, u.Interval).Scan(&lastInsertId)
+	if err != nil {
+		panic(err)
+	}
 	return lastInsertId
 }
 
-// NewSHA1Hash generates a new SHA1 hash based on
-// a random number of characters.
 func NewSHA1Hash(n ...int) string {
 	noRandomCharacters := 32
 

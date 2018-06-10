@@ -9,7 +9,7 @@ import (
 )
 
 func CheckServices() {
-	services := SelectAllServices()
+	services = SelectAllServices()
 	for _, v := range services {
 		obj := v
 		go obj.CheckQueue()
@@ -32,7 +32,6 @@ func (s *Service) Check() {
 		s.Failure(response, fmt.Sprintf("HTTP Error %v", err))
 		return
 	}
-
 	if s.Expected != "" {
 		contents, _ := ioutil.ReadAll(response.Body)
 		match, _ := regexp.MatchString(s.Expected, string(contents))
@@ -45,12 +44,12 @@ func (s *Service) Check() {
 		s.Failure(response, fmt.Sprintf("HTTP Status Code %v did not match %v", response.StatusCode, s.ExpectedStatus))
 		return
 	}
+	s.Online = true
 	s.Record(response)
 }
 
 func (s *Service) Record(response *http.Response) {
 	defer response.Body.Close()
-	s.Online = true
 	db.QueryRow("INSERT INTO hits(service,latency,created_at) VALUES($1,$2,NOW()) returning id;", s.Id, s.Latency).Scan()
 }
 

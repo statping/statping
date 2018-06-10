@@ -31,3 +31,11 @@ func (s *Service) TotalFailures() int {
 	db.QueryRow("SELECT COUNT(id) FROM failures WHERE service=$1;", s.Id).Scan(&amount)
 	return amount
 }
+
+func (s *Service) TotalFailures24Hours() int {
+	var amount int
+	t := time.Now()
+	x := t.AddDate(0, 0, -1)
+	db.QueryRow("SELECT COUNT(id) FROM failures WHERE service=$1 AND created_at>=$2 AND created_at<$3;", s.Id, t, x).Scan(&amount)
+	return amount
+}

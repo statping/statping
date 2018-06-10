@@ -7,3 +7,7 @@ Use the [Statup Docker Image](https://hub.docker.com/r/hunterlong/statup) to cre
 docker run -it -p 8080:8080 hunterlong/statup
 ```
 
+### Install on Linux
+```
+bash <(curl -s https://statup.io/install.sh)
+```

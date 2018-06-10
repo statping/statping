@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strconv"
 )
 
 type dashboard struct {
@@ -25,9 +26,9 @@ func RunHTTPServer() {
 	http.Handle("/login", http.HandlerFunc(LoginHandler))
 	http.Handle("/logout", http.HandlerFunc(LogoutHandler))
 	//http.Handle("/auth", http.HandlerFunc(AuthenticateHandler))
-	http.Handle("/user/create", http.HandlerFunc(CreateUserHandler))
-	http.Handle("/token/create", http.HandlerFunc(CreateServiceHandler))
-	http.Handle("/tokens", http.HandlerFunc(ServicesHandler))
+	http.Handle("/users/create", http.HandlerFunc(CreateUserHandler))
+	http.Handle("/services/create", http.HandlerFunc(CreateServiceHandler))
+	http.Handle("/services", http.HandlerFunc(ServicesHandler))
 	http.Handle("/users", http.HandlerFunc(UsersHandler))
 	http.ListenAndServe(":8080", nil)
 }
@@ -44,7 +45,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	username := r.PostForm.Get("username")
 	password := r.PostForm.Get("password")
-	_, auth := AuthUser(username, password)
+	user, auth := AuthUser(username, password)
+	fmt.Println(user)
+	fmt.Println(auth)
 	if auth {
 		session.Values["authenticated"] = true
 		session.Save(r, w)
@@ -86,8 +89,26 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
-	token := &Service{}
-	token.Create()
+	r.ParseForm()
+	name := r.PostForm.Get("name")
+	domain := r.PostForm.Get("domain")
+	method := r.PostForm.Get("method")
+	expected := r.PostForm.Get("expected")
+	status, _ := strconv.Atoi(r.PostForm.Get("expected_status"))
+	interval, _ := strconv.Atoi(r.PostForm.Get("interval"))
+
+	service := &Service{
+		Name:           name,
+		Domain:         domain,
+		Method:         method,
+		Expected:       expected,
+		ExpectedStatus: status,
+		Interval:       interval,
+	}
+
+	fmt.Println(service)
+
+	service.Create()
 	http.Redirect(w, r, "/services", http.StatusSeeOther)
 }
 
@@ -123,29 +144,35 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 			return template.JS(html)
 		},
 	}).Parse(indexFile)
-	out := index{SelectAllServices()}
+	out := index{services}
 	indexTmpl.Execute(w, out)
 }
 
 func DashboardHandler(w http.ResponseWriter, r *http.Request) {
-	//session, _ := store.Get(r, "apizer_auth")
-	//if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-	//	http.Redirect(w, r, "/", http.StatusSeeOther)
-	//	return
-	//}
-
-	dashboardFile, err := tmplBox.String("dashboard.html")
-	if err != nil {
-		panic(err)
+	session, _ := store.Get(r, "apizer_auth")
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		loginFile, err := tmplBox.String("login.html")
+		if err != nil {
+			panic(err)
+		}
+		loginTmpl, err := template.New("message").Parse(loginFile)
+		if err != nil {
+			panic(err)
+		}
+		loginTmpl.Execute(w, nil)
+	} else {
+		dashboardFile, err := tmplBox.String("dashboard.html")
+		if err != nil {
+			panic(err)
+		}
+		dashboardTmpl, err := template.New("message").Parse(dashboardFile)
+		if err != nil {
+			panic(err)
+		}
+		out := dashboard{SelectAllServices(), SelectAllUsers(), core}
+		dashboardTmpl.Execute(w, out)
 	}
-	dashboardTmpl, err := template.New("message").Parse(dashboardFile)
-	if err != nil {
-		panic(err)
-	}
 
-	out := dashboard{SelectAllServices(), SelectAllUsers(), core}
-
-	dashboardTmpl.Execute(w, out)
 }
 
 func ServicesHandler(w http.ResponseWriter, r *http.Request) {

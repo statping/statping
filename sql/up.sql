@@ -46,7 +46,7 @@ CREATE INDEX idx_failures ON failures(service);
 
 INSERT INTO users (id, username, password, created_at) VALUES (1, 'admin', '$2a$14$sBO5VDKiGPNUa3IUSMRX.OJNIbw/VM5dXOzTjlsjvG6qA987Lfzga', NOW());
 
-INSERT INTO services (id, name, domain, method, port, expected, expected_status, interval, created_at) VALUES (1, 'Google', 'https://www.google.com', 'https', 0, '', 200, 5, NOW());
+INSERT INTO services (id, name, domain, method, port, expected, expected_status, interval, created_at) VALUES (1, 'Statup Demo', 'https://demo.statup.io', 'https', 0, '', 200, 5, NOW());
 
 INSERT INTO services (id, name, domain, method, port, expected, expected_status, interval, created_at) VALUES (2, 'Github', 'https://github.com', 'https', 0, '', 200, 10, NOW());
 
