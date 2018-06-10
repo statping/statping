@@ -9,6 +9,7 @@ RUN go get -d -v
 RUN rice embed-go
 RUN go install
 WORKDIR /app
+VOLUME /app
 
 EXPOSE 8080
 
