@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <script src="/js/Chart.bundle.min.js"></script>
+
+    <title>Fusioner | Dashboard</title>
+</head>
+<body>
+
+
+<div class="container">
+
+    <div class="row">
+        {{ range .Services }}
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>{{ .Name }} <span class="badge badge-secondary float-right">{{if .Online}} ONLINE {{ else }} OFFLINE {{end}}</span></h3>
+
+                        <div class="row stats_area mt-3 mb-3">
+
+                            <div class="col-4">
+                                <span class="lg_number">{{.Online24Hours}}%</span>
+                                Online last 24 Hours
+                            </div>
+
+                            <div class="col-4">
+                                <span class="lg_number">{{.AvgResponse}}ms</span>
+                                Average Response
+                            </div>
+
+                            <div class="col-4">
+                                <span class="lg_number">{{.TotalUptime}}%</span>
+                                Total Uptime
+                            </div>
+
+                        </div>
+
+                        <canvas id="service_{{ .Id }}" width="400" height="120"></canvas>
+                    </div>
+                </div>
+            </div>
+        {{ end }}
+    </div>
+
+
+</div>
+
+<script>
+{{ range .Services }}
+var ctx = document.getElementById("service_{{.Id}}").getContext('2d');
+
+var chartdata = new Chart(ctx, {
+    type: 'line',
+    data: {
+        datasets: [{
+            label: 'Response Time (Milliseconds)',
+            data: {{js .Data}},
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        legend: {
+            display: false
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }],
+            xAxes: [{
+                type: 'time',
+                distribution: 'series'
+            }]
+        },
+        elements: {
+            point: {
+                radius: 0
+            }
+        }
+    }
+});
+{{ end }}
+</script>
+    <script src="/js/jquery-3.3.1.slim.min.js"></script>
+</body>
+</html>

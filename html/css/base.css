@@ -1,0 +1,27 @@
+HTML,BODY {
+    background-color: #efefef;
+}
+
+.container {
+    max-width: 790px;
+    margin-top: 40px;
+    background-color: white;
+    padding: 50px;
+    border-radius: 7px;
+}
+
+.navbar {
+    margin-left: -50px;
+    width: 720px;
+    margin-bottom: 30px;
+}
+
+.lg_number {
+    font-size: 26pt;
+    font-weight: bold;
+    display: block;
+}
+
+.stats_area {
+    text-align: center;
+}

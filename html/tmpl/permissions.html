@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+
+    <title>Fusioner | Permissions</title>
+</head>
+<body>
+
+
+<div class="container">
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Fusioner</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="/dashboard">Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/services">Services</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="/users">Users</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/permissions">Permissions</a>
+      </li>
+    </ul>
+    <span class="navbar-text">
+      <a class="nav-link" href="/logout">Logout</a>
+    </span>
+  </div>
+</nav>
+
+    <div class="row">
+
+        <div class="col-12">
+
+        <h3>Users</h3>
+
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Username</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{range .}}
+                <tr>
+                    <th scope="row">{{.Id}}</th>
+                    <td>{{.Username}}</td>
+                </tr>
+                {{end}}
+                </tbody>
+            </table>
+
+                    <form action="/user/create" method="POST">
+                        <div class="form-group row">
+                            <label for="inputEmail3" class="col-sm-2 col-form-label">Username</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="username" class="form-control" id="inputEmail3" placeholder="Username">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inputPassword3" class="col-sm-2 col-form-label">Password</label>
+                            <div class="col-sm-10">
+                                <input type="password" name="password" class="form-control" id="inputPassword3" placeholder="Password">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-10">
+                                <button type="submit" class="btn btn-primary">Create User</button>
+                            </div>
+                        </div>
+                    </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="/js/jquery-3.3.1.slim.min.js"></script>
+
+</body>
+</html>

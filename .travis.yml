@@ -1,0 +1,60 @@
+os:
+  - linux
+
+language: go
+
+go:
+  - "1.10.x"
+
+install: true
+
+sudo: required
+
+services:
+  - docker
+
+env:
+  - VERSION=0.1
+
+matrix:
+  allow_failures:
+    - go: master
+  fast_finish: true
+
+before_deploy:
+  - git config --local user.name "hunterlong"
+  - git config --local user.email "info@socialeck.com"
+  - git tag "v$VERSION" --force
+deploy:
+  - provider: releases
+    api_key: $GH_TOKEN
+    file:
+      - "build/fusioner-osx-x64"
+      - "build/fusioner-osx-x32"
+      - "build/fusioner-linux-x64"
+      - "build/fusioner-linux-x32"
+      - "build/fusioner-windows-x64.exe"
+      - "build/fusioner-windows-x32.exe"
+    skip_cleanup: true
+
+services:
+  - postgresql
+
+notifications:
+  email: false
+
+before_install:
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then travis_wait 30 docker pull karalabe/xgo-latest; fi
+
+before_script:
+  - go get github.com/stretchr/testify/assert
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/rendon/testcli
+  - go get github.com/karalabe/xgo
+  - go get github.com/GeertJohan/go.rice
+  - go get github.com/GeertJohan/go.rice/rice
+  - go get -u golang.org/x/vgo
+  - vgo get -u
+
+script:
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then /bin/bash -c ./build.sh; fi
