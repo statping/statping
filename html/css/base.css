@@ -1,10 +1,10 @@
 HTML,BODY {
     background-color: #efefef;
+    margin: 40px 0;
 }
 
 .container {
     max-width: 790px;
-    margin-top: 40px;
     background-color: white;
     padding: 50px;
     border-radius: 7px;
