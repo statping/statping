@@ -86,6 +86,10 @@ func (s *Service) Online24() float64 {
 		s.Online24Hours = 100.00
 		return s.Online24Hours
 	}
+	if total == 0 {
+		s.Online24Hours = 0
+		return s.Online24Hours
+	}
 	avg := float64(failed) / float64(total) * 100
 	s.Online24Hours = avg
 	return avg
@@ -117,6 +121,10 @@ func (s *Service) AvgUptime() float64 {
 	total := s.TotalHits()
 	if failed == 0 {
 		s.TotalUptime = 100.00
+		return s.TotalUptime
+	}
+	if total == 0 {
+		s.TotalUptime = 0
 		return s.TotalUptime
 	}
 	percent := float64(failed) / float64(total) * 100
