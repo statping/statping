@@ -139,6 +139,7 @@ func (u *Service) Create() int {
 		panic(err)
 	}
 	services = SelectAllServices()
+	go u.CheckQueue()
 	return lastInsertId
 }
 
