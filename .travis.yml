@@ -29,12 +29,12 @@ deploy:
   - provider: releases
     api_key: $GH_TOKEN
     file:
-      - "build/fusioner-osx-x64"
-      - "build/fusioner-osx-x32"
-      - "build/fusioner-linux-x64"
-      - "build/fusioner-linux-x32"
-      - "build/fusioner-windows-x64.exe"
-      - "build/fusioner-windows-x32.exe"
+      - "build/statup-osx-x64"
+      - "build/statup-osx-x32"
+      - "build/statup-linux-x64"
+      - "build/statup-linux-x32"
+      - "build/statup-windows-x64.exe"
+      - "build/statup-windows-x32.exe"
     skip_cleanup: true
 
 services:
@@ -53,8 +53,7 @@ before_script:
   - go get github.com/karalabe/xgo
   - go get github.com/GeertJohan/go.rice
   - go get github.com/GeertJohan/go.rice/rice
-  - go get -u golang.org/x/vgo
-  - vgo get -u
+  - go get
 
 script:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then /bin/bash -c ./build.sh; fi

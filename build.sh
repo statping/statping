@@ -2,7 +2,7 @@
 
 mkdir build
 
-APP="fusioner"
+APP="statup"
 
 rice embed-go
 

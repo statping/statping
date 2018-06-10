@@ -13,7 +13,7 @@ type dashboard struct {
 }
 
 func RunHTTPServer() {
-	fmt.Println("Fusioner HTTP Server running on http://localhost:9595")
+	fmt.Println("Fusioner HTTP Server running on http://localhost:8080")
 	css := http.StripPrefix("/css/", http.FileServer(cssBox.HTTPBox()))
 	js := http.StripPrefix("/js/", http.FileServer(jsBox.HTTPBox()))
 	http.Handle("/", http.HandlerFunc(IndexHandler))
@@ -29,7 +29,7 @@ func RunHTTPServer() {
 	http.Handle("/token/create", http.HandlerFunc(CreateServiceHandler))
 	http.Handle("/tokens", http.HandlerFunc(ServicesHandler))
 	http.Handle("/users", http.HandlerFunc(UsersHandler))
-	http.ListenAndServe(":9595", nil)
+	http.ListenAndServe(":8080", nil)
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
