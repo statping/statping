@@ -6,7 +6,7 @@ import (
 
 var (
 	pluginRoutes []*plugins.Routing
-	allPlugins []*plugins.Plugin
+	allPlugins   []*plugins.Plugin
 )
 
 func InitPluginsDatabase() {
@@ -17,6 +17,22 @@ func SetAuthorized() {
 
 }
 
+func AfterInstall() {
+
+}
+
+func AfterUninstall() {
+
+}
+
+func AfterSave() {
+
+}
+
 func Routes() []*plugins.Routing {
 	return plugins.PluginRoutes
+}
+
+func AllPlugins() []*plugins.Plugin {
+	return plugins.Plugins
 }

@@ -39,9 +39,11 @@ func RunHTTPServer() {
 	r.Handle("/plugins", http.HandlerFunc(PluginsHandler))
 	r.Handle("/help", http.HandlerFunc(HelpHandler))
 
-	for _, route := range Routes() {
-		fmt.Printf("Adding plugin route: /plugins/%v\n", route.URL)
-		r.Handle("/plugins/"+route.URL, http.HandlerFunc(route.Handler)).Methods(route.Method)
+	for _, plugin := range AllPlugins() {
+		fmt.Printf("Adding plugin: %v\n", plugin.Name)
+		r.Handle("/plugins/install_"+plugin.Name, http.HandlerFunc(plugin.InstallPlugin)).Methods("GET")
+		r.Handle("/plugins/uninstall_"+plugin.Name, http.HandlerFunc(plugin.UninstallPlugin)).Methods("GET")
+		r.Handle("/plugins/save_"+plugin.Name, http.HandlerFunc(plugin.SavePlugin)).Methods("POST")
 	}
 
 	srv := &http.Server{
