@@ -25,7 +25,7 @@ var (
 	jsBox     *rice.Box
 	tmplBox   *rice.Box
 	setupMode bool
-	allPlugins []*plugin.PluginInfo
+	allPlugins []plg.Plugin
 )
 
 type Config struct {
@@ -110,9 +110,8 @@ func LoadPlugins() {
 
 		plugActions.OnLoad()
 
-		//allPlugins = append(allPlugins, plugActions.Plugin())
+		allPlugins = append(allPlugins, *plug)
 	}
-	core.Plugins = allPlugins
 	fmt.Printf("Loaded %v Plugins\n", len(allPlugins))
 
 	ForEachPlugin()

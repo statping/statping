@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 	"github.com/gorilla/sessions"
+	"github.com/hunterlong/statup/plugin"
 )
 
 var (
@@ -43,15 +44,22 @@ func RunHTTPServer() {
 	r.Handle("/plugins", http.HandlerFunc(PluginsHandler))
 	r.Handle("/help", http.HandlerFunc(HelpHandler))
 
-	for _, plugin := range allPlugins {
-		for _, route := range plugin.Routes {
-			path := fmt.Sprintf("/plugins/%v/%v", plugin.Name, route.URL)
-			r.Handle(path, http.HandlerFunc(route.Handler)).Methods(route.Method)
-			fmt.Printf("Added Route %v for plugin %v\n", path, plugin.Name)
+	for _, p := range allPlugins {
+		symPlugin, _ := p.Lookup("Plugin")
+		var plugActions plugin.PluginActions
+		plugActions, ok := symPlugin.(plugin.PluginActions)
+		if !ok {
+			fmt.Printf("Plugin '%v' could not load correctly, error: %v\n", plugActions.Name(), "unexpected type from module symbol")
+			continue
 		}
-		r.Handle("/plugins/install_"+plugin.Name, http.HandlerFunc(plugin.InstallPlugin)).Methods("GET")
-		r.Handle("/plugins/uninstall_"+plugin.Name, http.HandlerFunc(plugin.UninstallPlugin)).Methods("GET")
-		r.Handle("/plugins/save_"+plugin.Name, http.HandlerFunc(plugin.SavePlugin)).Methods("POST")
+		fmt.Println(plugActions.Name())
+		fmt.Println(plugActions.Routines())
+		//routes := plugActions.Routines()
+		//for _, route := range routes {
+		//	path := fmt.Sprintf("/plugins/%v/%v", plugActions.Name(), route.URL)
+		//	r.Handle(path, http.HandlerFunc(route.Handler)).Methods(route.Method)
+		//	fmt.Printf("Added Route %v for plugin %v\n", path, plugActions.Name())
+		//}
 	}
 
 	srv := &http.Server{

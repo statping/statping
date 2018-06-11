@@ -11,12 +11,10 @@ var (
 
 type PluginInfo struct {
 	PluginActions
-	Name          string
 	Creator 	  string
 	Version       string
 	InstallSQL    string
 	Form          string
-	Routes		  []*Routing
 }
 
 type Routing struct {
@@ -26,7 +24,8 @@ type Routing struct {
 }
 
 type PluginActions interface {
-	//Plugin() *PluginInfo
+	Name() string
+	Routines() Routing
 	SaveForm()
 	OnInstall()
 	OnUninstall()
