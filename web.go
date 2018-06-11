@@ -7,10 +7,14 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"github.com/gorilla/sessions"
+)
+
+var (
+	session *sessions.CookieStore
 )
 
 func RunHTTPServer() {
-
 	r := mux.NewRouter()
 
 	fmt.Println("Statup HTTP Server running on http://localhost:8080")
@@ -39,8 +43,12 @@ func RunHTTPServer() {
 	r.Handle("/plugins", http.HandlerFunc(PluginsHandler))
 	r.Handle("/help", http.HandlerFunc(HelpHandler))
 
-	for _, plugin := range AllPlugins() {
-		fmt.Printf("Adding plugin: %v\n", plugin.Name)
+	for _, plugin := range allPlugins {
+		for _, route := range plugin.Routes {
+			path := fmt.Sprintf("/plugins/%v/%v", plugin.Name, route.URL)
+			r.Handle(path, http.HandlerFunc(route.Handler)).Methods(route.Method)
+			fmt.Printf("Added Route %v for plugin %v\n", path, plugin.Name)
+		}
 		r.Handle("/plugins/install_"+plugin.Name, http.HandlerFunc(plugin.InstallPlugin)).Methods("GET")
 		r.Handle("/plugins/uninstall_"+plugin.Name, http.HandlerFunc(plugin.UninstallPlugin)).Methods("GET")
 		r.Handle("/plugins/save_"+plugin.Name, http.HandlerFunc(plugin.SavePlugin)).Methods("POST")
@@ -247,7 +255,6 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	//
 	//vars := mux.Vars(r)
 	//service := SelectService(vars["id"])
-
 }
 
 func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {

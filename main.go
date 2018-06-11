@@ -9,6 +9,9 @@ import (
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
+	"github.com/hunterlong/statup/plugin"
+	plg "plugin"
+	"strings"
 )
 
 var (
@@ -22,6 +25,7 @@ var (
 	jsBox     *rice.Box
 	tmplBox   *rice.Box
 	setupMode bool
+	allPlugins []*plugin.Plugin
 )
 
 type Config struct {
@@ -46,6 +50,12 @@ func main() {
 	mainProcess()
 }
 
+
+type Greeter interface {
+	Greet()
+}
+
+
 func mainProcess() {
 	var err error
 	DbConnection()
@@ -55,8 +65,58 @@ func mainProcess() {
 	}
 	go CheckServices()
 	if !setupMode {
+		LoadPlugins()
 		RunHTTPServer()
 	}
+}
+
+
+func LoadPlugins() {
+	files, err := ioutil.ReadDir("./plugins")
+	if err != nil {
+		fmt.Printf("Plugins directory was not found. Error: %v\n", err)
+		return
+	}
+
+	for _, f := range files {
+
+		ext := strings.Split(f.Name(), ".")
+		if len(ext) != 2 {
+			continue
+		}
+
+		if ext[1] == "so" {
+
+			plug, err := plg.Open("plugins/"+f.Name())
+			if err != nil {
+				fmt.Printf("Plugin '%v' could not load correctly.\n", f.Name())
+				continue
+			}
+
+			symPlugin, err := plug.Lookup("Plugin")
+			var plugActions plugin.PluginActions
+
+			plugActions, ok := symPlugin.(plugin.PluginActions)
+			if !ok {
+				fmt.Printf("Plugin '%v' could not load correctly, error: %v\n", f.Name(), "unexpected type from module symbol")
+				continue
+			}
+			plugin := plugActions.Plugin()
+
+			fmt.Printf("Plugin Loaded '%v' created by: %v\n", plugin.Name, plugin.Creator)
+			plugActions.OnLoad()
+
+			fmt.Println(plugActions.Form())
+
+			allPlugins = append(allPlugins, plugin)
+
+		}
+
+	}
+
+	core.Plugins = allPlugins
+
+	fmt.Printf("Loaded %v Plugins\n", len(allPlugins))
 }
 
 func RenderBoxes() {

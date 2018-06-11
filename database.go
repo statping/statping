@@ -6,6 +6,7 @@ import (
 	_ "github.com/lib/pq"
 	"math/rand"
 	"time"
+	"github.com/hunterlong/statup/plugin"
 )
 
 func DbConnection() {
@@ -15,7 +16,7 @@ func DbConnection() {
 	if err != nil {
 		panic(err)
 	}
-	InitPluginsDatabase()
+	plugin.SetDatabase(db)
 }
 
 func UpgradeDatabase() {
