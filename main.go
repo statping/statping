@@ -25,7 +25,7 @@ var (
 	jsBox     *rice.Box
 	tmplBox   *rice.Box
 	setupMode bool
-	allPlugins []*plugin.Plugin
+	allPlugins []*plugin.PluginInfo
 )
 
 type Config struct {
@@ -40,6 +40,7 @@ type Config struct {
 
 func main() {
 	VERSION = "1.1.1"
+	fmt.Printf("Starting Statup v%v\n", VERSION)
 	RenderBoxes()
 	configs = LoadConfig()
 	if configs == nil {
@@ -48,11 +49,6 @@ func main() {
 		RunHTTPServer()
 	}
 	mainProcess()
-}
-
-
-type Greeter interface {
-	Greet()
 }
 
 
@@ -71,52 +67,54 @@ func mainProcess() {
 }
 
 
+func ForEachPlugin() {
+	if len(core.Plugins) > 0 {
+		//for _, p := range core.Plugins {
+		//	p.OnShutdown()
+		//}
+	}
+}
+
+
 func LoadPlugins() {
+	ForEachPlugin()
+
 	files, err := ioutil.ReadDir("./plugins")
 	if err != nil {
 		fmt.Printf("Plugins directory was not found. Error: %v\n", err)
 		return
 	}
-
 	for _, f := range files {
-
 		ext := strings.Split(f.Name(), ".")
 		if len(ext) != 2 {
 			continue
 		}
-
 		if ext[1] == "so" {
-
 			plug, err := plg.Open("plugins/"+f.Name())
 			if err != nil {
 				fmt.Printf("Plugin '%v' could not load correctly.\n", f.Name())
 				continue
 			}
-
 			symPlugin, err := plug.Lookup("Plugin")
 			var plugActions plugin.PluginActions
-
 			plugActions, ok := symPlugin.(plugin.PluginActions)
 			if !ok {
 				fmt.Printf("Plugin '%v' could not load correctly, error: %v\n", f.Name(), "unexpected type from module symbol")
 				continue
 			}
-			plugin := plugActions.Plugin()
+			//plugin := plugActions.Plugin()
+			//
+			//fmt.Println(plugin.OnLoad)
 
-			fmt.Printf("Plugin Loaded '%v' created by: %v\n", plugin.Name, plugin.Creator)
 			plugActions.OnLoad()
 
-			fmt.Println(plugActions.Form())
-
-			allPlugins = append(allPlugins, plugin)
-
+			allPlugins = append(allPlugins, plugActions.Plugin())
 		}
-
 	}
-
 	core.Plugins = allPlugins
-
 	fmt.Printf("Loaded %v Plugins\n", len(allPlugins))
+
+	ForEachPlugin()
 }
 
 func RenderBoxes() {

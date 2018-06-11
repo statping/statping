@@ -280,6 +280,9 @@ func Parse(file string) *template.Template {
 		"js": func(html string) template.JS {
 			return template.JS(html)
 		},
+		"safe": func(html string) template.HTML {
+			return template.HTML(html)
+		},
 	})
 	t, _ = t.Parse(nav)
 	t.Parse(render)
@@ -297,6 +300,9 @@ func ParsePlugins(file string) *template.Template {
 	t.Funcs(template.FuncMap{
 		"js": func(html string) template.JS {
 			return template.JS(html)
+		},
+		"safe": func(html string) template.HTML {
+			return template.HTML(html)
 		},
 	})
 	t, _ = t.Parse(nav)
