@@ -15,6 +15,7 @@ func DbConnection() {
 	if err != nil {
 		panic(err)
 	}
+	InitPluginsDatabase()
 }
 
 func UpgradeDatabase() {

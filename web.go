@@ -2,29 +2,57 @@ package main
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
 	"html/template"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func RunHTTPServer() {
-	fmt.Println("Fusioner HTTP Server running on http://localhost:8080")
-	css := http.StripPrefix("/css/", http.FileServer(cssBox.HTTPBox()))
-	js := http.StripPrefix("/js/", http.FileServer(jsBox.HTTPBox()))
-	http.Handle("/", http.HandlerFunc(IndexHandler))
-	http.Handle("/css/", css)
-	http.Handle("/js/", js)
-	http.Handle("/setup", http.HandlerFunc(SetupHandler))
-	http.Handle("/setup/save", http.HandlerFunc(ProcessSetupHandler))
-	http.Handle("/dashboard", http.HandlerFunc(DashboardHandler))
-	http.Handle("/login", http.HandlerFunc(LoginHandler))
-	http.Handle("/logout", http.HandlerFunc(LogoutHandler))
-	//http.Handle("/auth", http.HandlerFunc(AuthenticateHandler))
-	http.Handle("/users/create", http.HandlerFunc(CreateUserHandler))
-	http.Handle("/services/create", http.HandlerFunc(CreateServiceHandler))
-	http.Handle("/services", http.HandlerFunc(ServicesHandler))
-	http.Handle("/users", http.HandlerFunc(UsersHandler))
-	http.ListenAndServe(":8080", nil)
+
+	r := mux.NewRouter()
+
+	fmt.Println("Statup HTTP Server running on http://localhost:8080")
+	r.Handle("/", http.HandlerFunc(IndexHandler))
+
+	r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(cssBox.HTTPBox())))
+	r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(jsBox.HTTPBox())))
+
+	r.Handle("/setup", http.HandlerFunc(SetupHandler))
+	r.Handle("/setup/save", http.HandlerFunc(ProcessSetupHandler))
+	r.Handle("/dashboard", http.HandlerFunc(DashboardHandler))
+	r.Handle("/login", http.HandlerFunc(LoginHandler))
+	r.Handle("/logout", http.HandlerFunc(LogoutHandler))
+
+	r.Handle("/services", http.HandlerFunc(ServicesHandler))
+	r.Handle("/services", http.HandlerFunc(CreateServiceHandler)).Methods("POST")
+	r.Handle("/service/{id}", http.HandlerFunc(ServicesViewHandler))
+	r.Handle("/service/{id}", http.HandlerFunc(ServicesUpdateHandler)).Methods("POST")
+	r.Handle("/service/{id}/edit", http.HandlerFunc(ServicesViewHandler))
+	r.Handle("/service/{id}/delete", http.HandlerFunc(ServicesDeleteHandler))
+
+	r.Handle("/users", http.HandlerFunc(UsersHandler))
+	r.Handle("/users", http.HandlerFunc(CreateUserHandler)).Methods("POST")
+
+	r.Handle("/settings", http.HandlerFunc(SettingsHandler))
+	r.Handle("/plugins", http.HandlerFunc(PluginsHandler))
+	r.Handle("/help", http.HandlerFunc(HelpHandler))
+
+	for _, route := range Routes() {
+		fmt.Printf("Adding plugin route: /plugins/%v\n", route.URL)
+		r.Handle("/plugins/"+route.URL, http.HandlerFunc(route.Handler)).Methods(route.Method)
+	}
+
+	srv := &http.Server{
+		Addr:         "0.0.0.0:8080",
+		WriteTimeout: time.Second * 15,
+		ReadTimeout:  time.Second * 15,
+		IdleTimeout:  time.Second * 60,
+		Handler:      r,
+	}
+
+	srv.ListenAndServe()
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
@@ -107,15 +135,8 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SetupHandler(w http.ResponseWriter, r *http.Request) {
-	setupFile, err := tmplBox.String("setup.html")
-	if err != nil {
-		panic(err)
-	}
-	setupTmpl, err := template.New("message").Parse(setupFile)
-	if err != nil {
-		panic(err)
-	}
-	setupTmpl.Execute(w, nil)
+	tmpl := Parse("setup.html")
+	tmpl.Execute(w, nil)
 }
 
 type index struct {
@@ -129,18 +150,9 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	indexFile, err := tmplBox.String("index.html")
-	if err != nil {
-		panic(err)
-	}
-
-	indexTmpl, err := template.New("message").Funcs(template.FuncMap{
-		"js": func(html string) template.JS {
-			return template.JS(html)
-		},
-	}).Parse(indexFile)
+	tmpl := Parse("index.html")
 	out := index{core.Name, services}
-	indexTmpl.Execute(w, out)
+	tmpl.Execute(w, out)
 }
 
 type dashboard struct {
@@ -154,28 +166,19 @@ type dashboard struct {
 func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "apizer_auth")
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		loginFile, err := tmplBox.String("login.html")
-		if err != nil {
-			panic(err)
-		}
-		loginTmpl, err := template.New("message").Parse(loginFile)
-		if err != nil {
-			panic(err)
-		}
-		loginTmpl.Execute(w, nil)
+		tmpl := Parse("login.html")
+		tmpl.Execute(w, nil)
 	} else {
-		dashboardFile, err := tmplBox.String("dashboard.html")
-		if err != nil {
-			panic(err)
-		}
-		dashboardTmpl, err := template.New("message").Parse(dashboardFile)
-		if err != nil {
-			panic(err)
-		}
+		tmpl := Parse("dashboard.html")
 		out := dashboard{services, core, CountOnline(), len(services), CountFailures()}
-		dashboardTmpl.Execute(w, out)
+		tmpl.Execute(w, out)
 	}
 
+}
+
+type serviceHandler struct {
+	Service *Service
+	Auth    bool
 }
 
 func ServicesHandler(w http.ResponseWriter, r *http.Request) {
@@ -184,15 +187,113 @@ func ServicesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	tokensFile, err := tmplBox.String("services.html")
+	tmpl := Parse("services.html")
+	tmpl.Execute(w, services)
+}
+
+func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "apizer_auth")
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	vars := mux.Vars(r)
+	service := SelectService(vars["id"])
+
+	service.Delete()
+	services = SelectAllServices()
+	http.Redirect(w, r, "/services", http.StatusSeeOther)
+}
+
+func IsAuthenticated(r *http.Request) bool {
+	session, _ := store.Get(r, "apizer_auth")
+	return session.Values["authenticated"].(bool)
+}
+
+func SettingsHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	tmpl := Parse("settings.html")
+	tmpl.Execute(w, core)
+}
+
+func PluginsHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	tmpl := ParsePlugins("plugins.html")
+	tmpl.Execute(w, core)
+}
+
+func HelpHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	tmpl := Parse("help.html")
+	tmpl.Execute(w, nil)
+}
+
+func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	//auth := IsAuthenticated(r)
+	//
+	//vars := mux.Vars(r)
+	//service := SelectService(vars["id"])
+
+}
+
+func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	vars := mux.Vars(r)
+	service := SelectService(vars["id"])
+
+	tmpl := Parse("service.html")
+
+	serve := &serviceHandler{service, auth}
+
+	tmpl.Execute(w, serve)
+}
+
+func Parse(file string) *template.Template {
+	nav, _ := tmplBox.String("nav.html")
+	render, err := tmplBox.String(file)
 	if err != nil {
 		panic(err)
 	}
-	tokensTmpl, err := template.New("message").Parse(tokensFile)
+	t := template.New("message")
+	t.Funcs(template.FuncMap{
+		"js": func(html string) template.JS {
+			return template.JS(html)
+		},
+	})
+	t, _ = t.Parse(nav)
+	t.Parse(render)
+	return t
+}
+
+func ParsePlugins(file string) *template.Template {
+	nav, _ := tmplBox.String("nav.html")
+	slack, _ := tmplBox.String("plugins/slack.html")
+	render, err := tmplBox.String(file)
 	if err != nil {
 		panic(err)
 	}
-	tokensTmpl.Execute(w, services)
+	t := template.New("message")
+	t.Funcs(template.FuncMap{
+		"js": func(html string) template.JS {
+			return template.JS(html)
+		},
+	})
+	t, _ = t.Parse(nav)
+	t.Parse(slack)
+	t.Parse(render)
+	return t
 }
 
 func UsersHandler(w http.ResponseWriter, r *http.Request) {
@@ -201,15 +302,8 @@ func UsersHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	usersFile, err := tmplBox.String("users.html")
-	if err != nil {
-		panic(err)
-	}
-	usersTmpl, err := template.New("message").Parse(usersFile)
-	if err != nil {
-		panic(err)
-	}
-	usersTmpl.Execute(w, SelectAllUsers())
+	tmpl := Parse("users.html")
+	tmpl.Execute(w, SelectAllUsers())
 }
 
 func PermissionsHandler(w http.ResponseWriter, r *http.Request) {

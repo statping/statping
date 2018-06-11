@@ -14,33 +14,9 @@
 
 <div class="container">
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">Statup</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarText">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="/dashboard">Dashboard</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/services">Services</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/users">Users</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/plguins">Plugins</a>
-      </li>
-    </ul>
-    <span class="navbar-text">
-      <a class="nav-link" href="/logout">Logout</a>
-    </span>
-  </div>
-</nav>
+{{template "nav"}}
 
-    <div class="row stats_area">
+    <div class="row stats_area mb-4">
 
         <div class="col-4">
             <span class="lg_number">{{ .CountServices }}</span>
@@ -56,10 +32,33 @@
             <span class="lg_number">{{ .CountOnline }}</span>
             Online Services
         </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-12">
+
+            <h3>Latest Failures</h3>
+
+        {{ range .Services }}
+
+                {{$name := .Name}}
+
+                {{ range .Failures }}
+                    <blockquote class="blockquote text-left mt-3">
+                        <p class="mb-0">{{$name}}</p>
+                        <p class="mb-0">{{.ParseError}}</p>
+                        <footer class="blockquote-footer">Reported <cite title="Source Title">{{.Ago}}</cite></footer>
+                    </blockquote>
+                {{ end }}
 
 
+        {{ end }}
 
-</div>
+
+        </div>
+
+    </div>
 
 <script src="/js/jquery-3.3.1.slim.min.js"></script>
 

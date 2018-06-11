@@ -32,19 +32,13 @@ type Service struct {
 	Failures       []*Failure
 }
 
-func SelectService(id string) Service {
-	var tk Service
-	rows, err := db.Query("SELECT * FROM services WHERE id=$1", id)
-	if err != nil {
-		panic(err)
-	}
-	for rows.Next() {
-		err = rows.Scan(&tk.Id, &tk.Name, &tk.Domain, &tk.Method, &tk.Port, &tk.Expected, &tk.ExpectedStatus, &tk.Interval, &tk.CreatedAt)
-		if err != nil {
-			panic(err)
+func SelectService(id string) *Service {
+	for _, s := range services {
+		if id == strconv.Itoa(int(s.Id)) {
+			return s
 		}
 	}
-	return tk
+	return nil
 }
 
 func SelectAllServices() []*Service {
@@ -109,9 +103,8 @@ type GraphJson struct {
 }
 
 func (s *Service) GraphData() string {
-	hits := SelectAllHits(s.Id)
 	var d []*GraphJson
-	for _, h := range hits {
+	for _, h := range s.Hits() {
 		val := h.CreatedAt
 		o := &GraphJson{
 			X: val.String(),
@@ -142,6 +135,18 @@ func (s *Service) AvgUptime() string {
 	}
 	s.TotalUptime = fmt.Sprintf("%0.2f", percent)
 	return s.TotalUptime
+}
+
+func (u *Service) Delete() {
+	stmt, err := db.Prepare("DELETE FROM services WHERE id=$1")
+	if err != nil {
+		panic(err)
+	}
+	stmt.Exec(u.Id)
+}
+
+func (u *Service) Update() {
+
 }
 
 func (u *Service) Create() int {

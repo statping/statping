@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <script src="/js/Chart.bundle.min.js"></script>
+
+    <title>Statup | Services</title>
+</head>
+<body>
+
+
+<div class="container">
+
+{{if .Auth}}
+    {{template "nav"}}
+{{end}}
+    <div class="row">
+
+        <div class="col-12">
+
+            <div class="col-12 mb-4">
+
+                        <h3 class="mt-2">{{ .Service.Name }}
+                        {{if .Service.Online}}
+                            <span class="badge online_badge float-right">ONLINE</span>
+                        {{ else }}
+                            <span class="badge offline_badge float-right">OFFLINE</span>
+                        {{end}}</h3>
+
+                        <div class="row stats_area mt-5 mb-5">
+
+                            <div class="col-4">
+                                <span class="lg_number">{{.Service.Online24Hours}}%</span>
+                                Online last 24 Hours
+                            </div>
+
+                            <div class="col-4">
+                                <span class="lg_number">{{.Service.AvgResponse}}ms</span>
+                                Average Response
+                            </div>
+
+                            <div class="col-4">
+                                <span class="lg_number">{{.Service.TotalUptime}}%</span>
+                                Total Uptime
+                            </div>
+                        </div>
+
+                        <canvas id="service" width="400" height="120"></canvas>
+
+                    {{ range .Service.Failures }}
+                        <blockquote class="blockquote text-right mt-3">
+                            <p class="mb-0">{{.ParseError}}</p>
+                            <footer class="blockquote-footer">Reported <cite title="Source Title">{{.Ago}}</cite></footer>
+                        </blockquote>
+                    {{ end }}
+
+                    </div>
+
+        </div>
+
+
+{{if .Auth}}
+        <div class="col-12">
+
+            <h3>Edit Service</h3>
+
+            <form action="/service/{{.Service.Id}}" method="POST">
+                <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm-4 col-form-label">Service Name</label>
+                    <div class="col-sm-8">
+                        <input type="text" name="name" class="form-control" value="{{.Service.Name}}" id="inputEmail3">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputPassword3" class="col-sm-4 col-form-label">Application Endpoint (URL)</label>
+                    <div class="col-sm-8">
+                        <input type="text" name="domain" class="form-control" value="{{.Service.Domain}}" id="inputPassword3">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputPassword3" class="col-sm-4 col-form-label">Expected Response (Regex)</label>
+                    <div class="col-sm-8">
+                        <input type="text" name="expected" class="form-control" value="{{.Service.Expected}}" id="inputPassword3">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputPassword3" class="col-sm-4 col-form-label">Expected Status Code</label>
+                    <div class="col-sm-8">
+                        <input type="number" name="expected_status" class="form-control" value="{{.Service.ExpectedStatus}}" id="inputPassword3">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputPassword3" class="col-sm-4 col-form-label">HTTP Method</label>
+                    <div class="col-sm-8">
+                        <input type="text" name="method" class="form-control" value="{{.Service.Method}}" id="inputPassword3">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputPassword3" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
+                    <div class="col-sm-8">
+                        <input type="number" name="interval" class="form-control" value="{{.Service.Interval}}" id="inputPassword3">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-10">
+                        <a class="btn btn-primary">Test</a>
+                        <button type="submit" class="btn btn-success">Update Service</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+{{end}}
+
+
+    </div>
+
+
+<script>
+    var ctx = document.getElementById("service").getContext('2d');
+
+    var chartdata = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [{
+                label: 'Response Time (Milliseconds)',
+                data: {{js .Service.Data}},
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            legend: {
+                display: false
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    },
+                    gridLines: {
+                        display:false
+                    }
+                }],
+                xAxes: [{
+                    type: 'time',
+                    distribution: 'series',
+                    gridLines: {
+                        display:false
+                    }
+                }]
+            },
+            elements: {
+                point: {
+                    radius: 0
+                }
+            }
+        }
+    });
+</script>
+
+<script src="/js/jquery-3.3.1.slim.min.js"></script>
+
+</body>
+</html>

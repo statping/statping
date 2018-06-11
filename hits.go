@@ -9,9 +9,26 @@ type Hit struct {
 	CreatedAt time.Time
 }
 
-func SelectAllHits(id int64) []Hit {
+func (s *Service) Hits() []Hit {
 	var tks []Hit
-	rows, err := db.Query("SELECT * FROM hits WHERE service=$1 ORDER BY id DESC LIMIT 256", id)
+	rows, err := db.Query("SELECT * FROM hits WHERE service=$1 ORDER BY id DESC LIMIT 256", s.Id)
+	if err != nil {
+		panic(err)
+	}
+	for rows.Next() {
+		var tk Hit
+		err = rows.Scan(&tk.Id, &tk.Metric, &tk.Value, &tk.CreatedAt)
+		if err != nil {
+			panic(err)
+		}
+		tks = append(tks, tk)
+	}
+	return tks
+}
+
+func (s *Service) SelectHitsGroupBy(group string) []Hit {
+	var tks []Hit
+	rows, err := db.Query("SELECT date_trunc('$1', created_at), -- or hour, day, week, month, year count(1) FROM hits WHERE service=$2 group by 1", group, s.Id)
 	if err != nil {
 		panic(err)
 	}
