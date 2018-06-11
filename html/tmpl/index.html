@@ -8,22 +8,33 @@
     <link rel="stylesheet" href="/css/base.css">
     <script src="/js/Chart.bundle.min.js"></script>
 
-    <title>Statup | Dashboard</title>
+    <title>{{.Project}} Status</title>
 </head>
 <body>
 
-<h1 class="text-center">{{.Project}}</h1>
+<h1 class="text-center mb-4">{{.Project}}</h1>
 
 <div class="container">
 
     <div class="row">
+
         {{ range .Services }}
             <div class="col-12 mb-4">
                 <div class="card">
                     <div class="card-body{{if .Online}}{{else}} offline_bg{{end}}">
-                        <h3>{{ .Name }} <span class="badge badge-secondary float-right">{{if .Online}} ONLINE {{ else }} OFFLINE {{end}}</span></h3>
 
-                        <div class="row stats_area mt-3 mb-3">
+                        <div class="progress">
+                            <div class="progress-bar {{if .Online24Hours}} bg-success {{else}} bg-danger {{end}}" role="progressbar" style="width: {{.Online24Hours}}%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+
+                        <h3 class="mt-4">{{ .Name }}
+                    {{if .Online}}
+                        <span class="badge online_badge float-right">ONLINE</span>
+                    {{ else }}
+                        <span class="badge offline_badge float-right">OFFLINE</span>
+                    {{end}}</h3>
+
+                <div class="row stats_area mt-5 mb-5">
 
                             <div class="col-4">
                                 <span class="lg_number">{{.Online24Hours}}%</span>
@@ -39,10 +50,17 @@
                                 <span class="lg_number">{{.TotalUptime}}%</span>
                                 Total Uptime
                             </div>
-
                         </div>
 
                         <canvas id="service_{{ .Id }}" width="400" height="120"></canvas>
+
+                         {{ range .Failures }}
+                            <blockquote class="blockquote text-right mt-3">
+                                <p class="mb-0">{{.Issue}}</p>
+                                <footer class="blockquote-footer">Reported <cite title="Source Title">{{.Ago}}</cite></footer>
+                            </blockquote>
+                        {{ end }}
+
                     </div>
                 </div>
             </div>
@@ -53,7 +71,7 @@
 </div>
 
 <div class="footer text-center">
-    <a href="https://statup.io" target="_blank">Statup.io Opensource Status Page</a>
+    <a href="https://statup.io" target="_blank">Created with Statup.io</a> | <a href="/dashboard">Dashboard</a>
 </div>
 
 <script>

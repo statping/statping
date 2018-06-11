@@ -7,12 +7,6 @@ import (
 	"strconv"
 )
 
-type dashboard struct {
-	Services []*Service
-	Users    []User
-	Core     *Core
-}
-
 func RunHTTPServer() {
 	fmt.Println("Fusioner HTTP Server running on http://localhost:8080")
 	css := http.StripPrefix("/css/", http.FileServer(cssBox.HTTPBox()))
@@ -149,6 +143,14 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	indexTmpl.Execute(w, out)
 }
 
+type dashboard struct {
+	Services        []*Service
+	Core            *Core
+	CountOnline     int
+	CountServices   int
+	Count24Failures int
+}
+
 func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "apizer_auth")
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
@@ -170,7 +172,7 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-		out := dashboard{services, SelectAllUsers(), core}
+		out := dashboard{services, core, CountOnline(), len(services), CountFailures()}
 		dashboardTmpl.Execute(w, out)
 	}
 

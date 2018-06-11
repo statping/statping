@@ -21,14 +21,36 @@ HTML,BODY {
     font-size: 26pt;
     font-weight: bold;
     display: block;
+    color: #3e3e3e;
+}
+
+.text_perfect {
+    color: #33b418;
+    text-shadow: 0px 1px 0 #0e6702;
+}
+
+.text_good {
+    color: #33b418;
+    text-shadow: 0px 1px 0 #0e6702;
+}
+
+.text_ok {
+    color: #33b418;
+    text-shadow: 0px 1px 0 #0e6702;
+}
+
+.text_bad {
+    color: #33b418;
+    text-shadow: 0px 1px 0 #0e6702;
 }
 
 .stats_area {
     text-align: center;
+    color: #a5a5a5;
 }
 
 .offline_bg {
-    background-color: #c5c5c578 !important;
+    background-color: white !important;
 }
 
 .footer {
@@ -41,6 +63,28 @@ HTML,BODY {
 }
 
 
+.online_badge {
+    color: #fff;
+    background-color: #35b317;
+}
+
+.offline_badge {
+    color: #fff;
+    background-color: #c51919;
+}
+
+.progress {
+    margin-top: -20px;
+    margin-left: -20px;
+    margin-bottom: 15px;
+    width: calc(100% + 40px);
+    height: 3px;
+    border-radius: 0;
+}
+
+.card-body {
+    overflow: hidden;
+}
 
 @media (max-width: 767px) {
 

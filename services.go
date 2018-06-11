@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -25,9 +26,10 @@ type Service struct {
 	Data           string
 	Online         bool
 	Latency        float64
-	Online24Hours  float64
+	Online24Hours  float32
 	AvgResponse    string
-	TotalUptime    float64
+	TotalUptime    string
+	Failures       []*Failure
 }
 
 func SelectService(id string) Service {
@@ -57,6 +59,7 @@ func SelectAllServices() []*Service {
 		if err != nil {
 			panic(err)
 		}
+		tk.Failures = tk.SelectAllFailures()
 		tk.FormatData()
 		tks = append(tks, &tk)
 	}
@@ -79,7 +82,7 @@ func (s *Service) AvgTime() float64 {
 	return avg
 }
 
-func (s *Service) Online24() float64 {
+func (s *Service) Online24() float32 {
 	total := s.TotalHits()
 	failed := s.TotalFailures24Hours()
 	if failed == 0 {
@@ -91,8 +94,13 @@ func (s *Service) Online24() float64 {
 		return s.Online24Hours
 	}
 	avg := float64(failed) / float64(total) * 100
-	s.Online24Hours = avg
-	return avg
+	avg = 100 - avg
+	if avg < 0 {
+		avg = 0
+	}
+	amount, _ := strconv.ParseFloat(fmt.Sprintf("%0.2f", avg), 10)
+	s.Online24Hours = float32(amount)
+	return s.Online24Hours
 }
 
 type GraphJson struct {
@@ -116,20 +124,24 @@ func (s *Service) GraphData() string {
 	return s.Data
 }
 
-func (s *Service) AvgUptime() float64 {
+func (s *Service) AvgUptime() string {
 	failed := s.TotalFailures()
 	total := s.TotalHits()
 	if failed == 0 {
-		s.TotalUptime = 100.00
+		s.TotalUptime = "100.00"
 		return s.TotalUptime
 	}
 	if total == 0 {
-		s.TotalUptime = 0
+		s.TotalUptime = "0"
 		return s.TotalUptime
 	}
 	percent := float64(failed) / float64(total) * 100
-	s.TotalUptime = percent
-	return percent
+	percent = 100 - percent
+	if percent < 0 {
+		percent = 0
+	}
+	s.TotalUptime = fmt.Sprintf("%0.2f", percent)
+	return s.TotalUptime
 }
 
 func (u *Service) Create() int {
@@ -141,6 +153,16 @@ func (u *Service) Create() int {
 	services = SelectAllServices()
 	go u.CheckQueue()
 	return lastInsertId
+}
+
+func CountOnline() int {
+	amount := 0
+	for _, v := range services {
+		if v.Online {
+			amount++
+		}
+	}
+	return amount
 }
 
 func NewSHA1Hash(n ...int) string {

@@ -52,7 +52,8 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Name</th>
-                    <th scope="col">Actions</th>
+                    <th scope="col">Status</th>
+                    <th scope="col"></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -60,11 +61,12 @@
                 <tr>
                     <th scope="row">{{.Id}}</th>
                     <td>{{.Name}}</td>
-                    <td>
+                    <td>{{.Online}} <span class="badge badge-danger">OFFLINE</span> </td>
+                    <td class="text-right">
                         <div class="btn-group" data-toggle="buttons">
-                                <button class="btn btn-primary" type="submit">View</button>
-                                <button class="btn btn-primary" type="submit">Edit</button>
-                                <button class="btn btn-primary" type="submit">Delete</button>
+                                <a href="/services/{{.Id}}" class="btn btn-primary">View</a>
+                                <a href="/services/{{.Id}}/edit" class="btn btn-primary">Edit</a>
+                                <a href="/services/{{.Id}}/delete" class="btn btn-danger">Delete</a>
                         </div>
                     </td>
                 </tr>
@@ -81,8 +83,8 @@
 
             <form action="/services/create" method="POST">
                 <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
-                    <div class="col-sm-10">
+                    <label for="inputEmail3" class="col-sm-4 col-form-label">Service Name</label>
+                    <div class="col-sm-8">
                         <input type="text" name="name" class="form-control" id="inputEmail3" placeholder="Name">
                     </div>
                 </div>
@@ -118,7 +120,8 @@
                 </div>
                 <div class="form-group row">
                     <div class="col-sm-10">
-                        <button type="submit" class="btn btn-primary">Create</button>
+                        <a class="btn btn-primary">Test</a>
+                        <button type="submit" class="btn btn-success">Create Service</button>
                     </div>
                 </div>
             </form>

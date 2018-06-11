@@ -1,8 +1,8 @@
 package main
 
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestMakeConfig(t *testing.T) {

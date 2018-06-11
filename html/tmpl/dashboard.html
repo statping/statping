@@ -43,18 +43,18 @@
     <div class="row stats_area">
 
         <div class="col-4">
-            <span class="lg_number">69</span>
-            24 Hour Hits
+            <span class="lg_number">{{ .CountServices }}</span>
+            Total Services
         </div>
 
         <div class="col-4">
-            <span class="lg_number">3921</span>
-            24 Hour Hits
+            <span class="lg_number">{{ .Count24Failures }}</span>
+            Failures last 24 Hours
         </div>
 
         <div class="col-4">
-            <span class="lg_number">453</span>
-            Total Tokens
+            <span class="lg_number">{{ .CountOnline }}</span>
+            Online Services
         </div>
 
 
