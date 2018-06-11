@@ -26,7 +26,7 @@ type Routing struct {
 }
 
 type PluginActions interface {
-	Plugin() *PluginInfo
+	//Plugin() *PluginInfo
 	SaveForm()
 	OnInstall()
 	OnUninstall()
@@ -34,8 +34,11 @@ type PluginActions interface {
 	OnHit()
 	OnSettingsSaved()
 	OnNewUser()
+	OnNewService()
 	OnShutdown()
 	OnLoad()
+	OnBeforeRequest()
+	OnAfterRequest()
 }
 
 func SetDatabase(db *sql.DB) {

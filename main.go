@@ -89,27 +89,28 @@ func LoadPlugins() {
 		if len(ext) != 2 {
 			continue
 		}
-		if ext[1] == "so" {
-			plug, err := plg.Open("plugins/"+f.Name())
-			if err != nil {
-				fmt.Printf("Plugin '%v' could not load correctly.\n", f.Name())
-				continue
-			}
-			symPlugin, err := plug.Lookup("Plugin")
-			var plugActions plugin.PluginActions
-			plugActions, ok := symPlugin.(plugin.PluginActions)
-			if !ok {
-				fmt.Printf("Plugin '%v' could not load correctly, error: %v\n", f.Name(), "unexpected type from module symbol")
-				continue
-			}
-			//plugin := plugActions.Plugin()
-			//
-			//fmt.Println(plugin.OnLoad)
-
-			plugActions.OnLoad()
-
-			allPlugins = append(allPlugins, plugActions.Plugin())
+		if ext[1] != "so" {
+			continue
 		}
+		plug, err := plg.Open("plugins/" + f.Name())
+		if err != nil {
+			fmt.Printf("Plugin '%v' could not load correctly.\n", f.Name())
+			continue
+		}
+		symPlugin, err := plug.Lookup("Plugin")
+		var plugActions plugin.PluginActions
+		plugActions, ok := symPlugin.(plugin.PluginActions)
+		if !ok {
+			fmt.Printf("Plugin '%v' could not load correctly, error: %v\n", f.Name(), "unexpected type from module symbol")
+			continue
+		}
+		//plugin := plugActions.Plugin()
+		//
+		//fmt.Println(plugin.OnLoad)
+
+		plugActions.OnLoad()
+
+		//allPlugins = append(allPlugins, plugActions.Plugin())
 	}
 	core.Plugins = allPlugins
 	fmt.Printf("Loaded %v Plugins\n", len(allPlugins))
