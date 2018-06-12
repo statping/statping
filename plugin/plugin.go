@@ -1,20 +1,20 @@
 package plugin
 
 import (
-	"net/http"
 	"database/sql"
+	"html/template"
+	"net/http"
 )
 
 var (
-	DB			 *sql.DB
+	DB         *sql.DB
+	AllPlugins []Info
 )
 
 type PluginInfo struct {
+	Info Info
 	PluginActions
-	Creator 	  string
-	Version       string
-	InstallSQL    string
-	Form          string
+	Add
 }
 
 type Routing struct {
@@ -23,9 +23,22 @@ type Routing struct {
 	Handler func(http.ResponseWriter, *http.Request)
 }
 
+type Info struct {
+	Name string
+	Form string
+}
+
+func (i Info) Template() *template.Template {
+	t := template.New("form")
+	temp, _ := t.Parse(i.Form)
+	return temp
+}
+
+type Add func(p PluginInfo)
+
 type PluginActions interface {
-	Name() string
-	Routines() Routing
+	GetInfo() Info
+	Routes() []Routing
 	SaveForm()
 	OnInstall()
 	OnUninstall()

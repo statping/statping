@@ -1,0 +1,7 @@
+[{
+  "name": "slack",
+  "description": "slack bot that send a message in a channel when server is down.",
+  "repo": "https://github.com/hunterlong/statup_slack",
+  "author": "Hunter Long",
+  "namespace": "slack"
+}]

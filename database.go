@@ -3,10 +3,10 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/hunterlong/statup/plugin"
 	_ "github.com/lib/pq"
 	"math/rand"
 	"time"
-	"github.com/hunterlong/statup/plugin"
 )
 
 func DbConnection() {

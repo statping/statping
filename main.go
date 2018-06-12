@@ -6,25 +6,25 @@ import (
 	"github.com/GeertJohan/go.rice"
 	"github.com/go-yaml/yaml"
 	"github.com/gorilla/sessions"
+	"github.com/hunterlong/statup/plugin"
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
-	"github.com/hunterlong/statup/plugin"
 	plg "plugin"
 	"strings"
 )
 
 var (
-	db        *sql.DB
-	configs   *Config
-	core      *Core
-	store     *sessions.CookieStore
-	VERSION   string
-	sqlBox    *rice.Box
-	cssBox    *rice.Box
-	jsBox     *rice.Box
-	tmplBox   *rice.Box
-	setupMode bool
+	db         *sql.DB
+	configs    *Config
+	core       *Core
+	store      *sessions.CookieStore
+	VERSION    string
+	sqlBox     *rice.Box
+	cssBox     *rice.Box
+	jsBox      *rice.Box
+	tmplBox    *rice.Box
+	setupMode  bool
 	allPlugins []plg.Plugin
 )
 
@@ -51,7 +51,6 @@ func main() {
 	mainProcess()
 }
 
-
 func mainProcess() {
 	var err error
 	DbConnection()
@@ -66,7 +65,6 @@ func mainProcess() {
 	}
 }
 
-
 func ForEachPlugin() {
 	if len(core.Plugins) > 0 {
 		//for _, p := range core.Plugins {
@@ -74,7 +72,6 @@ func ForEachPlugin() {
 		//}
 	}
 }
-
 
 func LoadPlugins() {
 	ForEachPlugin()

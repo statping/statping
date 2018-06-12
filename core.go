@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gorilla/sessions"
-	plg "plugin"
+	"github.com/hunterlong/statup/plugin"
 )
 
 type Core struct {
@@ -11,7 +11,7 @@ type Core struct {
 	Key     string
 	Secret  string
 	Version string
-	Plugins []*plg.Plugin
+	Plugins []plugin.Info
 }
 
 func SelectCore() (*Core, error) {

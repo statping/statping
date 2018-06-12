@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
+	"github.com/hunterlong/statup/plugin"
 	"html/template"
 	"net/http"
 	"strconv"
 	"time"
-	"github.com/gorilla/sessions"
-	"github.com/hunterlong/statup/plugin"
 )
 
 var (
@@ -46,21 +46,27 @@ func RunHTTPServer() {
 
 	for _, p := range allPlugins {
 		symPlugin, _ := p.Lookup("Plugin")
-		var plugActions plugin.PluginActions
-		plugActions, ok := symPlugin.(plugin.PluginActions)
+		var pluginObject plugin.PluginActions
+		pluginObject, ok := symPlugin.(plugin.PluginActions)
+
+		info := pluginObject.GetInfo()
+
 		if !ok {
-			fmt.Printf("Plugin '%v' could not load correctly, error: %v\n", plugActions.Name(), "unexpected type from module symbol")
+			fmt.Printf("Plugin '%v' could not load correctly, error: %v\n", info.Name, "unexpected type from module symbol")
 			continue
 		}
-		fmt.Println(plugActions.Name())
-		fmt.Println(plugActions.Routines())
-		//routes := plugActions.Routines()
-		//for _, route := range routes {
-		//	path := fmt.Sprintf("/plugins/%v/%v", plugActions.Name(), route.URL)
-		//	r.Handle(path, http.HandlerFunc(route.Handler)).Methods(route.Method)
-		//	fmt.Printf("Added Route %v for plugin %v\n", path, plugActions.Name())
-		//}
+
+		plugin.AllPlugins = append(plugin.AllPlugins, info)
+
+		for _, route := range pluginObject.Routes() {
+			path := fmt.Sprintf("/plugins/%v/%v", info.Name, route.URL)
+			r.Handle(path, http.HandlerFunc(route.Handler)).Methods(route.Method)
+			fmt.Printf("Added Route %v for plugin %v\n", path, info.Name)
+		}
+
 	}
+
+	core.Plugins = plugin.AllPlugins
 
 	srv := &http.Server{
 		Addr:         "0.0.0.0:8080",

@@ -22,20 +22,24 @@
 
             <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                 <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Settings</a>
-        {{ range .Plugins }}
+            {{ range .Plugins }}
                 <a class="nav-link text-capitalize" id="v-pills-{{.Name}}-tab" data-toggle="pill" href="#v-pills-{{.Name}}" role="tab" aria-controls="v-pills-profile" aria-selected="false">{{.Name}}</a>
-        {{end}}
+            {{end}}
             </div>
         </div>
         <div class="col-8">
             <div class="tab-content" id="v-pills-tabContent">
                 <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">...</div>
 
-        {{ range .Plugins }}
+                {{ range .Plugins }}
+                    <div class="tab-pane fade" id="v-pills-{{.Name}}" role="tabpanel" aria-labelledby="v-pills-{{.Name}}-tab">
 
-                <div class="tab-pane fade" id="v-pills-{{.Name}}" role="tabpanel" aria-labelledby="v-pills-{{.Name}}-tab">{{safe .Form }}</div>
+                        <form action="/plugins/{{.Name}}/save" method="POST">
+                            {{safe .Form }}
+                        </form>
 
-        {{end}}
+                    </div>
+                {{end}}
 
             </div>
         </div>
