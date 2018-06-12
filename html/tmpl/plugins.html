@@ -14,6 +14,7 @@
 
 <div class="container">
 
+
 {{template "nav"}}
 
     <div class="row">
@@ -22,6 +23,7 @@
 
             <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                 <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Settings</a>
+                <a class="nav-link" id="v-pills-browse-tab" data-toggle="pill" href="#v-pills-browse" role="tab" aria-controls="v-pills-home" aria-selected="true">Browse Plugins</a>
             {{ range .Plugins }}
                 <a class="nav-link text-capitalize" id="v-pills-{{.Name}}-tab" data-toggle="pill" href="#v-pills-{{.Name}}" role="tab" aria-controls="v-pills-profile" aria-selected="false">{{.Name}}</a>
             {{end}}
@@ -29,15 +31,27 @@
         </div>
         <div class="col-8">
             <div class="tab-content" id="v-pills-tabContent">
-                <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">...</div>
+                <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+                    <h3>Settings</h3>
+                </div>
+
+                <div class="tab-pane fade" id="v-pills-browse" role="tabpanel" aria-labelledby="v-pills-browse-tab">
+                {{ range .Repos }}
+                        <div class="card col-6" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ .Name }}</h5>
+                                <p class="card-text">{{ .Description }}</p>
+                                <a href="/plugins/download/{{ .Name }}" class="card-link">Add</a>
+                            </div>
+                        </div>
+                 {{ end }}
+                </div>
 
                 {{ range .Plugins }}
                     <div class="tab-pane fade" id="v-pills-{{.Name}}" role="tabpanel" aria-labelledby="v-pills-{{.Name}}-tab">
-
                         <form action="/plugins/{{.Name}}/save" method="POST">
                             {{safe .Form }}
                         </form>
-
                     </div>
                 {{end}}
 

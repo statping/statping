@@ -3,7 +3,9 @@ package plugin
 import (
 	"database/sql"
 	"html/template"
+	"io"
 	"net/http"
+	"os"
 )
 
 var (
@@ -32,6 +34,27 @@ func (i Info) Template() *template.Template {
 	t := template.New("form")
 	temp, _ := t.Parse(i.Form)
 	return temp
+}
+
+func DownloadFile(filepath string, url string) error {
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 type Add func(p PluginInfo)

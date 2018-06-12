@@ -14,7 +14,7 @@ services:
   - docker
 
 env:
-  - VERSION=0.1
+  - VERSION=0.12
 
 matrix:
   allow_failures:

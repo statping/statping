@@ -42,6 +42,7 @@ func RunHTTPServer() {
 
 	r.Handle("/settings", http.HandlerFunc(SettingsHandler))
 	r.Handle("/plugins", http.HandlerFunc(PluginsHandler))
+	r.Handle("/plugins/download/{name}", http.HandlerFunc(PluginsDownloadHandler))
 	r.Handle("/help", http.HandlerFunc(HelpHandler))
 
 	for _, p := range allPlugins {
@@ -251,7 +252,23 @@ func PluginsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tmpl := ParsePlugins("plugins.html")
-	tmpl.Execute(w, core)
+	core.FetchPluginRepo()
+
+	fmt.Println(core.FetchPluginRepo())
+	tmpl.Execute(w, &core)
+}
+
+func PluginsDownloadHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	vars := mux.Vars(r)
+	name := vars["name"]
+	DownloadPlugin(name)
+	LoadConfig()
+	http.Redirect(w, r, "/plugins", http.StatusSeeOther)
 }
 
 func HelpHandler(w http.ResponseWriter, r *http.Request) {

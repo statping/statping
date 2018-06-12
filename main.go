@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"github.com/GeertJohan/go.rice"
 	"github.com/go-yaml/yaml"
@@ -10,6 +11,8 @@ import (
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
+	"net/http"
+	"os"
 	plg "plugin"
 	"strings"
 )
@@ -28,6 +31,10 @@ var (
 	allPlugins []plg.Plugin
 )
 
+const (
+	pluginsRepo = "https://raw.githubusercontent.com/hunterlong/statup/master/plugins.json"
+)
+
 type Config struct {
 	Connection string `yaml:"connection"`
 	Host       string `yaml:"host"`
@@ -36,6 +43,71 @@ type Config struct {
 	Password   string `yaml:"password"`
 	Port       string `yaml:"port"`
 	Secret     string `yaml:"secret"`
+}
+
+type PluginRepos struct {
+	Plugins []PluginJSON
+}
+
+type PluginJSON struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Repo        string `json:"repo"`
+	Author      string `json:"author"`
+	Namespace   string `json:"namespace"`
+}
+
+func (c *Core) FetchPluginRepo() []PluginJSON {
+	resp, err := http.Get(pluginsRepo)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	var pk []PluginJSON
+	json.Unmarshal(body, &pk)
+	c.Repos = pk
+	return pk
+}
+
+func SelectPlugin(name string) *PluginJSON {
+	for _, v := range core.FetchPluginRepo() {
+		if v.Namespace == name {
+			return &v
+		}
+	}
+	return nil
+}
+
+func DownloadPlugin(name string) {
+	plugin := SelectPlugin(name)
+	var _, err = os.Stat("plugins/" + plugin.Namespace)
+	if err != nil {
+	}
+	if os.IsNotExist(err) {
+		var file, _ = os.Create("plugins/" + plugin.Namespace)
+		defer file.Close()
+	}
+	resp, err := http.Get("https://raw.githubusercontent.com/hunterlong/statup/master/plugins.json")
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	file, err := os.OpenFile("plugins/"+plugin.Namespace, os.O_RDWR, 0644)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	_, err = file.Write(body)
+	if err != nil {
+		panic(err)
+	}
+	err = file.Sync()
 }
 
 func main() {
@@ -74,6 +146,10 @@ func ForEachPlugin() {
 }
 
 func LoadPlugins() {
+	if _, err := os.Stat("./plugins"); os.IsNotExist(err) {
+		os.Mkdir("./plugins", os.ModePerm)
+	}
+
 	ForEachPlugin()
 
 	files, err := ioutil.ReadDir("./plugins")

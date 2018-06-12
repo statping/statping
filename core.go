@@ -12,6 +12,7 @@ type Core struct {
 	Secret  string
 	Version string
 	Plugins []plugin.Info
+	Repos   []PluginJSON
 }
 
 func SelectCore() (*Core, error) {
