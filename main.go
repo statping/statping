@@ -28,7 +28,7 @@ var (
 	jsBox      *rice.Box
 	tmplBox    *rice.Box
 	setupMode  bool
-	allPlugins []plg.Plugin
+	allPlugins []plugin.PluginActions
 )
 
 const (
@@ -70,45 +70,36 @@ func (c *Core) FetchPluginRepo() []PluginJSON {
 	return pk
 }
 
-func SelectPlugin(name string) *PluginJSON {
-	for _, v := range core.FetchPluginRepo() {
-		if v.Namespace == name {
-			return &v
-		}
-	}
-	return nil
-}
-
-func DownloadPlugin(name string) {
-	plugin := SelectPlugin(name)
-	var _, err = os.Stat("plugins/" + plugin.Namespace)
-	if err != nil {
-	}
-	if os.IsNotExist(err) {
-		var file, _ = os.Create("plugins/" + plugin.Namespace)
-		defer file.Close()
-	}
-	resp, err := http.Get("https://raw.githubusercontent.com/hunterlong/statup/master/plugins.json")
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		panic(err)
-	}
-	file, err := os.OpenFile("plugins/"+plugin.Namespace, os.O_RDWR, 0644)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	_, err = file.Write(body)
-	if err != nil {
-		panic(err)
-	}
-	err = file.Sync()
-}
+//func DownloadPlugin(name string) {
+//	plugin := SelectPlugin(name)
+//	var _, err = os.Stat("plugins/" + plugin.Namespace)
+//	if err != nil {
+//	}
+//	if os.IsNotExist(err) {
+//		var file, _ = os.Create("plugins/" + plugin.Namespace)
+//		defer file.Close()
+//	}
+//	resp, err := http.Get("https://raw.githubusercontent.com/hunterlong/statup/master/plugins.json")
+//	if err != nil {
+//		panic(err)
+//	}
+//	defer resp.Body.Close()
+//	body, err := ioutil.ReadAll(resp.Body)
+//	if err != nil {
+//		panic(err)
+//	}
+//	file, err := os.OpenFile("plugins/"+plugin.Namespace, os.O_RDWR, 0644)
+//	if err != nil {
+//		panic(err)
+//	}
+//	defer file.Close()
+//
+//	_, err = file.Write(body)
+//	if err != nil {
+//		panic(err)
+//	}
+//	err = file.Sync()
+//}
 
 func main() {
 	VERSION = "1.1.1"
@@ -177,14 +168,13 @@ func LoadPlugins() {
 			fmt.Printf("Plugin '%v' could not load correctly, error: %v\n", f.Name(), "unexpected type from module symbol")
 			continue
 		}
-		//plugin := plugActions.Plugin()
-		//
-		//fmt.Println(plugin.OnLoad)
 
 		plugActions.OnLoad()
 
-		allPlugins = append(allPlugins, *plug)
+		allPlugins = append(allPlugins, plugActions)
+		core.Plugins = append(core.Plugins, plugActions.GetInfo())
 	}
+
 	fmt.Printf("Loaded %v Plugins\n", len(allPlugins))
 
 	ForEachPlugin()

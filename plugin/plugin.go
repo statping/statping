@@ -2,37 +2,126 @@ package plugin
 
 import (
 	"database/sql"
+	"fmt"
 	"html/template"
 	"io"
 	"net/http"
 	"os"
+	"strings"
 )
 
 var (
-	DB         *sql.DB
+	db         *sql.DB
 	AllPlugins []Info
 )
 
-type PluginInfo struct {
-	Info Info
-	PluginActions
-	Add
+func CreateSettingsTable(p Info) string {
+	var tableValues []string
+	for _, v := range p.Form {
+		tb := fmt.Sprintf("%v %v", v.SQLValue, v.SQLType)
+		tableValues = append(tableValues, tb)
+	}
+	vals := strings.Join(tableValues, ", ")
+	out := fmt.Sprintf("CREATE TABLE settings_%v (%v);", p.Name, vals)
+	smtp, _ := db.Prepare(out)
+	_, _ = smtp.Exec()
+	InitalSettings(p)
+	return out
 }
 
-type Routing struct {
-	URL     string
-	Method  string
-	Handler func(http.ResponseWriter, *http.Request)
+func InitalSettings(p Info) {
+	var tableValues []string
+	var tableInput []string
+	for _, v := range p.Form {
+		val := fmt.Sprintf("'%v'", "example data")
+		tableValues = append(tableValues, v.SQLValue)
+		tableInput = append(tableInput, val)
+	}
+	vals := strings.Join(tableValues, ",")
+	ins := strings.Join(tableInput, ",")
+	sql := fmt.Sprintf("INSERT INTO settings_%v(%v) VALUES(%v);", p.Name, vals, ins)
+	smtp, _ := db.Prepare(sql)
+	_, _ = smtp.Exec()
+
+	SelectSettings(p)
 }
 
-type Info struct {
-	Name string
-	Form string
+func (f FormElement) Val() string {
+	var v string
+	fmt.Println(f.Value)
+	b, ok := f.Value.([]byte)
+	if ok {
+		v = string(b)
+	}
+	return v
+}
+
+func SelectSettings(p Info) []*FormElement {
+
+	var newForm []*FormElement
+
+	sql := fmt.Sprintf("SELECT * FROM settings_%v LIMIT 1", p.Name)
+	rows, err := db.Query(sql)
+	if err != nil {
+		panic(err)
+	}
+
+	count := len(p.Form)
+	valuePtrs := make([]interface{}, count)
+	values := make([]interface{}, count)
+
+	for rows.Next() {
+
+		for i, _ := range p.Form {
+			valuePtrs[i] = &values[i]
+		}
+
+		err = rows.Scan(valuePtrs...)
+		if err != nil {
+			panic(err)
+		}
+
+		for i, col := range p.Form {
+
+			var v interface{}
+
+			val := values[i]
+
+			b, ok := val.([]byte)
+
+			if ok {
+				v = string(b)
+			} else {
+				v = val
+			}
+
+			ll := &FormElement{
+				Name:        col.Name,
+				Description: col.Description,
+				SQLValue:    col.SQLValue,
+				SQLType:     col.SQLType,
+				Value:       v,
+			}
+
+			newForm = append(newForm, ll)
+
+			fmt.Println(col.SQLValue, v)
+
+			col.Value = v
+		}
+
+	}
+	return newForm
+}
+
+func RunSQL(query string, args ...interface{}) (*sql.Rows, error) {
+	rows, err := db.Query(query, args)
+	return rows, err
 }
 
 func (i Info) Template() *template.Template {
 	t := template.New("form")
-	temp, _ := t.Parse(i.Form)
+	temp, _ := t.Parse("hello nworld")
 	return temp
 }
 
@@ -57,27 +146,8 @@ func DownloadFile(filepath string, url string) error {
 	return nil
 }
 
-type Add func(p PluginInfo)
-
-type PluginActions interface {
-	GetInfo() Info
-	Routes() []Routing
-	SaveForm()
-	OnInstall()
-	OnUninstall()
-	OnFailure()
-	OnHit()
-	OnSettingsSaved()
-	OnNewUser()
-	OnNewService()
-	OnShutdown()
-	OnLoad()
-	OnBeforeRequest()
-	OnAfterRequest()
-}
-
-func SetDatabase(db *sql.DB) {
-	DB = db
+func SetDatabase(database *sql.DB) {
+	db = database
 }
 
 func (p *PluginInfo) InstallPlugin(w http.ResponseWriter, r *http.Request) {

@@ -54,8 +54,10 @@ func (s *Service) Check() {
 
 func (s *Service) Record(response *http.Response) {
 	db.QueryRow("INSERT INTO hits(service,latency,created_at) VALUES($1,$2,NOW()) returning id;", s.Id, s.Latency).Scan()
+	OnHit(s)
 }
 
 func (s *Service) Failure(issue string) {
 	db.QueryRow("INSERT INTO failures(issue,service,created_at) VALUES($1,$2,NOW()) returning id;", issue, s.Id).Scan()
+	OnFailure(s)
 }

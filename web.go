@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"github.com/hunterlong/statup/plugin"
 	"html/template"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -29,45 +29,27 @@ func RunHTTPServer() {
 	r.Handle("/dashboard", http.HandlerFunc(DashboardHandler))
 	r.Handle("/login", http.HandlerFunc(LoginHandler))
 	r.Handle("/logout", http.HandlerFunc(LogoutHandler))
-
 	r.Handle("/services", http.HandlerFunc(ServicesHandler))
 	r.Handle("/services", http.HandlerFunc(CreateServiceHandler)).Methods("POST")
 	r.Handle("/service/{id}", http.HandlerFunc(ServicesViewHandler))
 	r.Handle("/service/{id}", http.HandlerFunc(ServicesUpdateHandler)).Methods("POST")
 	r.Handle("/service/{id}/edit", http.HandlerFunc(ServicesViewHandler))
 	r.Handle("/service/{id}/delete", http.HandlerFunc(ServicesDeleteHandler))
-
 	r.Handle("/users", http.HandlerFunc(UsersHandler))
 	r.Handle("/users", http.HandlerFunc(CreateUserHandler)).Methods("POST")
-
-	r.Handle("/settings", http.HandlerFunc(SettingsHandler))
-	r.Handle("/plugins", http.HandlerFunc(PluginsHandler))
+	r.Handle("/settings", http.HandlerFunc(PluginsHandler))
 	r.Handle("/plugins/download/{name}", http.HandlerFunc(PluginsDownloadHandler))
+	r.Handle("/plugins/{name}/save", http.HandlerFunc(PluginSavedHandler)).Methods("POST")
 	r.Handle("/help", http.HandlerFunc(HelpHandler))
 
 	for _, p := range allPlugins {
-		symPlugin, _ := p.Lookup("Plugin")
-		var pluginObject plugin.PluginActions
-		pluginObject, ok := symPlugin.(plugin.PluginActions)
-
-		info := pluginObject.GetInfo()
-
-		if !ok {
-			fmt.Printf("Plugin '%v' could not load correctly, error: %v\n", info.Name, "unexpected type from module symbol")
-			continue
-		}
-
-		plugin.AllPlugins = append(plugin.AllPlugins, info)
-
-		for _, route := range pluginObject.Routes() {
+		info := p.GetInfo()
+		for _, route := range p.Routes() {
 			path := fmt.Sprintf("/plugins/%v/%v", info.Name, route.URL)
 			r.Handle(path, http.HandlerFunc(route.Handler)).Methods(route.Method)
 			fmt.Printf("Added Route %v for plugin %v\n", path, info.Name)
 		}
-
 	}
-
-	core.Plugins = plugin.AllPlugins
 
 	srv := &http.Server{
 		Addr:         "0.0.0.0:8080",
@@ -235,16 +217,6 @@ func IsAuthenticated(r *http.Request) bool {
 	return session.Values["authenticated"].(bool)
 }
 
-func SettingsHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-	tmpl := Parse("settings.html")
-	tmpl.Execute(w, core)
-}
-
 func PluginsHandler(w http.ResponseWriter, r *http.Request) {
 	auth := IsAuthenticated(r)
 	if !auth {
@@ -254,8 +226,32 @@ func PluginsHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl := ParsePlugins("plugins.html")
 	core.FetchPluginRepo()
 
-	fmt.Println(core.FetchPluginRepo())
-	tmpl.Execute(w, &core)
+	for _, p := range allPlugins {
+		for _, f := range p.GetInfo().Form {
+
+			f.Val()
+
+		}
+	}
+
+	tmpl.Execute(w, core)
+}
+
+func PluginSavedHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	r.ParseForm()
+	vars := mux.Vars(r)
+	plugin := SelectPlugin(vars["name"])
+	data := make(map[string]string)
+	for k, v := range r.PostForm {
+		data[k] = strings.Join(v, "")
+	}
+	plugin.OnSave(data)
+	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
 
 func PluginsDownloadHandler(w http.ResponseWriter, r *http.Request) {
@@ -264,9 +260,9 @@ func PluginsDownloadHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	vars := mux.Vars(r)
-	name := vars["name"]
-	DownloadPlugin(name)
+	//vars := mux.Vars(r)
+	//name := vars["name"]
+	//DownloadPlugin(name)
 	LoadConfig()
 	http.Redirect(w, r, "/plugins", http.StatusSeeOther)
 }
