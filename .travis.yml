@@ -54,6 +54,8 @@ before_script:
   - go get github.com/GeertJohan/go.rice
   - go get github.com/GeertJohan/go.rice/rice
   - go get
+  - go install
 
 script:
+  - go test -v
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then /bin/bash -c ./build.sh; fi

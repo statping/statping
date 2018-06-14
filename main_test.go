@@ -38,7 +38,7 @@ func TestSetConfig(t *testing.T) {
 }
 
 func TestRun(t *testing.T) {
-	mainProcess()
+	go mainProcess()
 	time.Sleep(15 * time.Second)
 }
 
