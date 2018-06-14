@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"encoding/json"
 	"fmt"
+	"github.com/hunterlong/statup/plugin"
 	"math/rand"
 	"strconv"
 	"time"
@@ -30,6 +31,7 @@ type Service struct {
 	AvgResponse    string
 	TotalUptime    string
 	Failures       []*Failure
+	plugin.Service
 }
 
 func SelectService(id string) *Service {

@@ -2,9 +2,9 @@ package main
 
 import "github.com/hunterlong/statup/plugin"
 
-func OnHit(s *Service) {
+func OnSuccess(s *Service) {
 	for _, p := range allPlugins {
-		p.OnHit(s.ToP())
+		p.OnSuccess(s.ToP())
 	}
 }
 

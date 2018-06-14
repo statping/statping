@@ -15,15 +15,11 @@ var (
 	session *sessions.CookieStore
 )
 
-func RunHTTPServer() {
+func Router() *mux.Router {
 	r := mux.NewRouter()
-
-	fmt.Println("Statup HTTP Server running on http://localhost:8080")
 	r.Handle("/", http.HandlerFunc(IndexHandler))
-
 	r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(cssBox.HTTPBox())))
 	r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(jsBox.HTTPBox())))
-
 	r.Handle("/setup", http.HandlerFunc(SetupHandler))
 	r.Handle("/setup/save", http.HandlerFunc(ProcessSetupHandler))
 	r.Handle("/dashboard", http.HandlerFunc(DashboardHandler))
@@ -41,7 +37,12 @@ func RunHTTPServer() {
 	r.Handle("/plugins/download/{name}", http.HandlerFunc(PluginsDownloadHandler))
 	r.Handle("/plugins/{name}/save", http.HandlerFunc(PluginSavedHandler)).Methods("POST")
 	r.Handle("/help", http.HandlerFunc(HelpHandler))
+	return r
+}
 
+func RunHTTPServer() {
+	fmt.Println("Statup HTTP Server running on http://localhost:8080")
+	r := Router()
 	for _, p := range allPlugins {
 		info := p.GetInfo()
 		for _, route := range p.Routes() {
@@ -214,6 +215,9 @@ func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 func IsAuthenticated(r *http.Request) bool {
 	session, _ := store.Get(r, "apizer_auth")
+	if session.Values["authenticated"] == nil {
+		return false
+	}
 	return session.Values["authenticated"].(bool)
 }
 
@@ -226,15 +230,24 @@ func PluginsHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl := ParsePlugins("plugins.html")
 	core.FetchPluginRepo()
 
+	var pluginFields []PluginSelect
+
 	for _, p := range allPlugins {
-		for _, f := range p.GetInfo().Form {
+		fields := SelectSettings(p.GetInfo())
 
-			f.Val()
-
-		}
+		pluginFields = append(pluginFields, PluginSelect{p.GetInfo().Name, fields})
 	}
 
+	core.PluginFields = pluginFields
+
+	fmt.Println(&core.PluginFields)
+
 	tmpl.Execute(w, core)
+}
+
+type PluginSelect struct {
+	Plugin string
+	Params map[string]string
 }
 
 func PluginSavedHandler(w http.ResponseWriter, r *http.Request) {
@@ -245,12 +258,13 @@ func PluginSavedHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	r.ParseForm()
 	vars := mux.Vars(r)
-	plugin := SelectPlugin(vars["name"])
+	plug := SelectPlugin(vars["name"])
 	data := make(map[string]string)
 	for k, v := range r.PostForm {
 		data[k] = strings.Join(v, "")
 	}
-	plugin.OnSave(data)
+	UpdateSettings(plug.GetInfo(), data)
+	plug.OnSave(data)
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
 

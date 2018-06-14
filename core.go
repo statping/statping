@@ -6,13 +6,14 @@ import (
 )
 
 type Core struct {
-	Name    string
-	Config  string
-	Key     string
-	Secret  string
-	Version string
-	Plugins []plugin.Info
-	Repos   []PluginJSON
+	Name         string
+	Config       string
+	Key          string
+	Secret       string
+	Version      string
+	Plugins      []plugin.Info
+	Repos        []PluginJSON
+	PluginFields []PluginSelect
 }
 
 func SelectCore() (*Core, error) {
