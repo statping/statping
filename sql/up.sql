@@ -4,7 +4,6 @@ CREATE TABLE core (
     api_key text,
     api_secret text,
     version text,
-    plugins_enabled text,
 );
 
 CREATE TABLE users (

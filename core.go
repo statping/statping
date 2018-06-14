@@ -16,6 +16,7 @@ type Core struct {
 	PluginFields []PluginSelect
 }
 
+
 func SelectCore() (*Core, error) {
 	var core Core
 	rows, err := db.Query("SELECT * FROM core")

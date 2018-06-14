@@ -232,11 +232,12 @@ func UpdateSettings(p plugin.Info, data map[string]string) {
 //}
 
 func main() {
+	var err error
 	VERSION = "1.1.1"
 	fmt.Printf("Starting Statup v%v\n", VERSION)
 	RenderBoxes()
-	configs = LoadConfig()
-	if configs == nil {
+	configs, err = LoadConfig()
+	if err != nil {
 		fmt.Println("config.yml file not found - starting in setup mode")
 		setupMode = true
 		RunHTTPServer()
@@ -246,7 +247,10 @@ func main() {
 
 func mainProcess() {
 	var err error
-	DbConnection()
+	err = DbConnection()
+	if err != nil {
+		throw(err)
+	}
 	core, err = SelectCore()
 	if err != nil {
 		throw(err)
@@ -323,14 +327,14 @@ func RenderBoxes() {
 	tmplBox = rice.MustFindBox("html/tmpl")
 }
 
-func LoadConfig() *Config {
+func LoadConfig() (*Config, error) {
 	var config Config
 	file, err := ioutil.ReadFile("config.yml")
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	yaml.Unmarshal(file, &config)
-	return &config
+	err = yaml.Unmarshal(file, &config)
+	return &config, err
 }
 
 func HashPassword(password string) string {

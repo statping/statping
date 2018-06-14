@@ -69,9 +69,14 @@ func (c *DbConfig) Save() error {
 	config.WriteString(string(data))
 	config.Close()
 
-	configs = LoadConfig()
-
-	DbConnection()
+	configs, err = LoadConfig()
+	if err != nil {
+		return err
+	}
+	err = DbConnection()
+	if err != nil {
+		return err
+	}
 	DropDatabase()
 	CreateDatabase()
 	db.QueryRow("INSERT INTO core (name, config, api_key, api_secret, version) VALUES($1,$2,$3,$4,$5);", c.Project, "config.yml", NewSHA1Hash(5), NewSHA1Hash(10), VERSION).Scan()

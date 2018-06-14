@@ -31,12 +31,14 @@ func TestMakeConfig(t *testing.T) {
 }
 
 func TestSetConfig(t *testing.T) {
-	configs = LoadConfig()
+	var err error
+	configs, err = LoadConfig()
+	assert.Nil(t, err)
+	time.Sleep(2 * time.Second)
 }
 
 func TestRun(t *testing.T) {
-	configs = LoadConfig()
-	go mainProcess()
+	mainProcess()
 	time.Sleep(15 * time.Second)
 }
 

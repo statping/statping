@@ -9,14 +9,15 @@ import (
 	"time"
 )
 
-func DbConnection() {
+func DbConnection() error {
 	var err error
 	dbinfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", configs.Host, configs.Port, configs.User, configs.Password, configs.Database)
 	db, err = sql.Open("postgres", dbinfo)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	plugin.SetDatabase(db)
+	return err
 }
 
 func UpgradeDatabase() {
