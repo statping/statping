@@ -73,7 +73,7 @@ func (c *DbConfig) Save() error {
 	if err != nil {
 		return err
 	}
-	err = DbConnection()
+	err = DbConnection(configs.Connection)
 	if err != nil {
 		return err
 	}

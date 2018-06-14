@@ -5,17 +5,33 @@ import (
 	"fmt"
 	"github.com/hunterlong/statup/plugin"
 	_ "github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/go-sql-driver/mysql"
 	"math/rand"
 	"time"
 )
 
-func DbConnection() error {
+func DbConnection(dbType string) error {
 	var err error
-	dbinfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", configs.Host, configs.Port, configs.User, configs.Password, configs.Database)
-	db, err = sql.Open("postgres", dbinfo)
+	var dbInfo string
+	if dbType=="sqlite3" {
+		dbInfo = "./statup.db"
+	} else if dbType=="mysql" {
+		dbInfo = fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?charset=utf8", configs.User, configs.Password, configs.Host, configs.Port, configs.Database)
+	} else {
+		dbInfo = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", configs.Host, configs.Port, configs.User, configs.Password, configs.Database)
+	}
+	db, err = sql.Open(dbType, dbInfo)
 	if err != nil {
 		return err
 	}
+
+	//stmt, err := db.Prepare("CREATE database statup;")
+	//if err != nil {
+	//	panic(err)
+	//}
+	//stmt.Exec()
+
 	plugin.SetDatabase(db)
 	return err
 }

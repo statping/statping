@@ -247,7 +247,7 @@ func main() {
 
 func mainProcess() {
 	var err error
-	err = DbConnection()
+	err = DbConnection(configs.Connection)
 	if err != nil {
 		throw(err)
 	}
