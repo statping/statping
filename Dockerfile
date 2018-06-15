@@ -10,4 +10,6 @@ RUN chmod +x statup-linux-x64 && mv statup-linux-x64 /usr/local/bin/statup
 
 EXPOSE 8080
 
+VOLUME /app
+
 ENTRYPOINT statup
