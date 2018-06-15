@@ -45,10 +45,10 @@ notifications:
 
 before_install:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then travis_wait 30 docker pull karalabe/xgo-latest; fi
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
 
 before_script:
-  - psql -c 'create database travis_ci_test;' -U postgres
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
+  - psql -c 'create database test;' -U postgres
   - go get github.com/stretchr/testify/assert
   - go get golang.org/x/tools/cmd/cover
   - go get github.com/rendon/testcli
