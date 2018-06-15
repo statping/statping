@@ -12,6 +12,9 @@ sudo: required
 
 services:
   - docker
+  - postgresql
+  - mysql
+  - mongodb
 
 env:
   - VERSION=0.12
@@ -37,14 +40,12 @@ deploy:
       - "build/statup-windows-x32.exe"
     skip_cleanup: true
 
-services:
-  - postgresql
-
 notifications:
   email: false
 
 before_install:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then travis_wait 30 docker pull karalabe/xgo-latest; fi
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
 
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres

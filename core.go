@@ -6,29 +6,23 @@ import (
 )
 
 type Core struct {
-	Name         string
-	Config       string
-	Key          string
-	Secret       string
-	Version      string
+	Name         string `db:"name"`
+	Description  string `db:"description"`
+	Config       string `db:"config"`
+	ApiKey       string `db:"api_key"`
+	ApiSecret    string `db:"api_secret"`
+	Version      string `db:"version"`
 	Plugins      []plugin.Info
 	Repos        []PluginJSON
 	PluginFields []PluginSelect
 }
 
-
 func SelectCore() (*Core, error) {
 	var core Core
-	rows, err := db.Query("SELECT * FROM core")
+	err := dbSession.Collection("core").Find().One(&core)
 	if err != nil {
 		return nil, err
 	}
-	for rows.Next() {
-		err = rows.Scan(&core.Name, &core.Config, &core.Key, &core.Secret, &core.Version)
-		if err != nil {
-			return nil, err
-		}
-	}
-	store = sessions.NewCookieStore([]byte(core.Secret))
+	store = sessions.NewCookieStore([]byte(core.ApiSecret))
 	return &core, err
 }

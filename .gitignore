@@ -1,3 +1,5 @@
 .idea
 rice-box.go
 config.yml
+statup.db
+plugins/*.so

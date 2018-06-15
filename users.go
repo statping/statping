@@ -2,58 +2,62 @@ package main
 
 import (
 	"golang.org/x/crypto/bcrypt"
+	"time"
 )
 
 type User struct {
-	Id       int64
-	Username string
-	Password string
-	Email    string
+	Id        int64     `db:"id,omitempty" json:"id"`
+	Username  string    `db:"username" json:"username"`
+	Password  string    `db:"password" json:"-"`
+	Email     string    `db:"email" json:"-"`
+	ApiKey    string    `db:"api_key" json:"api_key"`
+	ApiSecret string    `db:"api_secret" json:"-"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
 }
 
-func SelectUser(username string) User {
+func SelectUser(id int64) (*User, error) {
 	var user User
-	rows, err := db.Query("SELECT id, username, password FROM users WHERE username=$1", username)
-	if err != nil {
-		panic(err)
-	}
-	for rows.Next() {
-		err = rows.Scan(&user.Id, &user.Username, &user.Password)
-		if err != nil {
-			panic(err)
-		}
-	}
-	return user
+	col := dbSession.Collection("users")
+	res := col.Find("id", id)
+	err := res.One(&user)
+	return &user, err
 }
 
-func (u *User) Create() int {
+func SelectUsername(username string) (*User, error) {
+	var user User
+	col := dbSession.Collection("users")
+	res := col.Find("username", username)
+	err := res.One(&user)
+	return &user, err
+}
+
+func (u *User) Create() (int64, error) {
+	u.CreatedAt = time.Now()
 	password := HashPassword(u.Password)
-	var lastInsertId int
-	db.QueryRow("INSERT INTO users(username,password,created_at) VALUES($1,$2,NOW()) returning id;", u.Username, password).Scan(&lastInsertId)
-	return lastInsertId
+	u.Password = password
+	u.ApiKey = NewSHA1Hash(5)
+	u.ApiSecret = NewSHA1Hash(10)
+	col := dbSession.Collection("users")
+	uuid, err := col.Insert(u)
+	if uuid == nil {
+		return 0, err
+	}
+	return uuid.(int64), err
 }
 
-func SelectAllUsers() []User {
+func SelectAllUsers() ([]User, error) {
 	var users []User
-	rows, err := db.Query("SELECT id, username, password FROM users ORDER BY id ASC")
-	if err != nil {
-		panic(err)
-	}
-	for rows.Next() {
-		var user User
-		err = rows.Scan(&user.Id, &user.Username, &user.Password)
-		if err != nil {
-			panic(err)
-		}
-		users = append(users, user)
-	}
-	return users
+	col := dbSession.Collection("users").Find()
+	err := col.All(&users)
+	return users, err
 }
 
-func AuthUser(username, password string) (User, bool) {
-	var user User
+func AuthUser(username, password string) (*User, bool) {
 	var auth bool
-	user = SelectUser(username)
+	user, err := SelectUsername(username)
+	if err != nil {
+		return nil, false
+	}
 	if CheckHash(password, user.Password) {
 		auth = true
 	}

@@ -15,35 +15,36 @@
 
 <div class="container">
 
-    <form method="POST" action="/setup/save">
+    <form method="POST" action="/setup">
 
     <div class="row">
 
     <div class="col-6">
-
         <div class="form-group">
             <label for="inputState">Database Connection</label>
-            <select id="inputState" name="db_connection" class="form-control">
+            <select id="database_type" name="db_connection" class="form-control">
                 <option selected value="postgres">Postgres</option>
+                <option value="sqlite">Sqlite</option>
+                <option value="mysql">MySQL</option>
             </select>
         </div>
-        <div class="form-group">
+        <div class="form-group" id="db_host">
             <label for="formGroupExampleInput">Host</label>
-            <input type="text" name="db_host" class="form-control" id="formGroupExampleInput" value="localhost" placeholder="localhost">
+            <input type="text" name="db_host" class="form-control" value="localhost" placeholder="localhost">
         </div>
-        <div class="form-group">
+        <div class="form-group" id="db_port">
             <label for="formGroupExampleInput">Database Port</label>
-            <input type="text" name="db_port" class="form-control" id="formGroupExampleInput" value="5555" placeholder="localhost">
+            <input type="text" name="db_port" class="form-control" value="5555" placeholder="localhost">
         </div>
-        <div class="form-group">
+        <div class="form-group" id="db_user">
             <label for="formGroupExampleInput2">Username</label>
-            <input type="text" name="db_user" class="form-control" id="formGroupExampleInput2" value="root" placeholder="root">
+            <input type="text" name="db_user" class="form-control" value="root" placeholder="root">
         </div>
-        <div class="form-group">
+        <div class="form-group" id="db_password">
             <label for="formGroupExampleInput2">Password</label>
             <input type="password" name="db_password" class="form-control" id="formGroupExampleInput2" value="223352hunter" placeholder="password123">
         </div>
-        <div class="form-group">
+        <div class="form-group" id="db_database">
             <label for="formGroupExampleInput2">Database</label>
             <input type="text" name="db_database" class="form-control" id="formGroupExampleInput2" value="uptime" placeholder="uptimeapi">
         </div>
@@ -55,6 +56,11 @@
         <div class="form-group">
             <label for="formGroupExampleInput">Project Name</label>
             <input type="text" name="project" class="form-control" id="formGroupExampleInput" placeholder="Great Uptime">
+        </div>
+
+        <div class="form-group">
+            <label for="formGroupExampleInput">Project Description</label>
+            <input type="text" name="description" class="form-control" id="formGroupExampleInput" placeholder="Great Uptime">
         </div>
 
         <div class="form-group">
@@ -91,5 +97,7 @@
 </div>
 
 <script src="/js/jquery-3.3.1.slim.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/setup.js"></script>
 </body>
 </html>

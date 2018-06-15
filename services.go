@@ -15,51 +15,38 @@ var (
 )
 
 type Service struct {
-	Id             int64
-	Name           string
-	Domain         string
-	Expected       string
-	ExpectedStatus int
-	Interval       int
-	Method         string
-	Port           int
-	CreatedAt      time.Time
-	Data           string
-	Online         bool
-	Latency        float64
-	Online24Hours  float32
-	AvgResponse    string
-	TotalUptime    string
-	Failures       []*Failure
+	Id             int64     `db:"id,omitempty" json:"id"`
+	Name           string    `db:"name" json:"name"`
+	Domain         string    `db:"domain" json:"domain"`
+	Expected       string    `db:"expected" json:"expected"`
+	ExpectedStatus int       `db:"expected_status" json:"expected_status"`
+	Interval       int       `db:"check_interval" json:"check_interval"`
+	Type           string    `db:"check_type" json:"type"`
+	Method         string    `db:"method" json:"method"`
+	Port           int       `db:"port" json:"port"`
+	CreatedAt      time.Time `db:"created_at" json:"created_at"`
+	Online         bool       `json:"online"`
+	Latency        float64    `json:"latency"`
+	Online24Hours  float32    `json:"24_hours_online"`
+	AvgResponse    string     `json:"avg_response"`
+	TotalUptime    string     `json:"uptime"`
+	Failures       []*Failure `json:"failures"`
 	plugin.Service
 }
 
-func SelectService(id string) *Service {
-	for _, s := range services {
-		if id == strconv.Itoa(int(s.Id)) {
-			return s
-		}
-	}
-	return nil
+func SelectService(id int64) (Service, error) {
+	var service Service
+	col := dbSession.Collection("services")
+	res := col.Find("id", id)
+	err := res.One(&service)
+	return service, err
 }
 
-func SelectAllServices() []*Service {
-	var tks []*Service
-	rows, err := db.Query("SELECT * FROM services ORDER BY id ASC")
-	if err != nil {
-		panic(err)
-	}
-	for rows.Next() {
-		var tk Service
-		err = rows.Scan(&tk.Id, &tk.Name, &tk.Domain, &tk.Method, &tk.Port, &tk.Expected, &tk.ExpectedStatus, &tk.Interval, &tk.CreatedAt)
-		if err != nil {
-			panic(err)
-		}
-		tk.Failures = tk.SelectAllFailures()
-		tk.FormatData()
-		tks = append(tks, &tk)
-	}
-	return tks
+func SelectAllServices() ([]*Service, error) {
+	var services []*Service
+	col := dbSession.Collection("services").Find()
+	err := col.All(&services)
+	return services, err
 }
 
 func (s *Service) FormatData() *Service {
@@ -71,16 +58,20 @@ func (s *Service) FormatData() *Service {
 }
 
 func (s *Service) AvgTime() float64 {
-	total := s.TotalHits()
-	sum := s.Sum()
+	total, _ := s.TotalHits()
+	if total == 0 {
+		return float64(0)
+	}
+	sum, _ := s.Sum()
 	avg := sum / float64(total) * 100
-	s.AvgResponse = fmt.Sprintf("%0.0f", avg*10)
-	return avg
+	amount := fmt.Sprintf("%0.0f", avg*10)
+	val, _ := strconv.ParseFloat(amount, 10)
+	return val
 }
 
 func (s *Service) Online24() float32 {
-	total := s.TotalHits()
-	failed := s.TotalFailures24Hours()
+	total, _ := s.TotalHits()
+	failed, _ := s.TotalFailures24Hours()
 	if failed == 0 {
 		s.Online24Hours = 100.00
 		return s.Online24Hours
@@ -105,12 +96,13 @@ type GraphJson struct {
 }
 
 func (s *Service) GraphData() string {
-	var d []*GraphJson
-	for _, h := range s.Hits() {
+	var d []GraphJson
+	hits, _ := s.Hits()
+	for _, h := range hits {
 		val := h.CreatedAt
-		o := &GraphJson{
+		o := GraphJson{
 			X: val.String(),
-			Y: h.Value * 1000,
+			Y: h.Latency * 1000,
 		}
 		d = append(d, o)
 	}
@@ -120,8 +112,8 @@ func (s *Service) GraphData() string {
 }
 
 func (s *Service) AvgUptime() string {
-	failed := s.TotalFailures()
-	total := s.TotalHits()
+	failed, _ := s.TotalFailures()
+	total, _ := s.TotalHits()
 	if failed == 0 {
 		s.TotalUptime = "100.00"
 		return s.TotalUptime
@@ -139,27 +131,26 @@ func (s *Service) AvgUptime() string {
 	return s.TotalUptime
 }
 
-func (u *Service) Delete() {
-	stmt, err := db.Prepare("DELETE FROM services WHERE id=$1")
-	if err != nil {
-		panic(err)
-	}
-	stmt.Exec(u.Id)
+func (u *Service) Delete() error {
+	col := dbSession.Collection("services")
+	res := col.Find("id", u.Id)
+	err := res.Delete()
+	return err
 }
 
 func (u *Service) Update() {
 
 }
 
-func (u *Service) Create() int {
-	var lastInsertId int
-	err := db.QueryRow("INSERT INTO services(name, domain, method, port, expected, expected_status, interval, created_at) VALUES($1,$2,$3,$4,$5,$6,$7,NOW()) returning id;", u.Name, u.Domain, u.Method, u.Port, u.Expected, u.ExpectedStatus, u.Interval).Scan(&lastInsertId)
-	if err != nil {
-		panic(err)
+func (u *Service) Create() (int64, error) {
+	u.CreatedAt = time.Now()
+	col := dbSession.Collection("services")
+	uuid, err := col.Insert(u)
+	services, _ = SelectAllServices()
+	if uuid == nil {
+		return 0, err
 	}
-	services = SelectAllServices()
-	go u.CheckQueue()
-	return lastInsertId
+	return uuid.(int64), err
 }
 
 func CountOnline() int {
@@ -174,17 +165,13 @@ func CountOnline() int {
 
 func NewSHA1Hash(n ...int) string {
 	noRandomCharacters := 32
-
 	if len(n) > 0 {
 		noRandomCharacters = n[0]
 	}
-
 	randString := RandomString(noRandomCharacters)
-
 	hash := sha1.New()
 	hash.Write([]byte(randString))
 	bs := hash.Sum(nil)
-
 	return fmt.Sprintf("%x", bs)
 }
 

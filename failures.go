@@ -1,54 +1,53 @@
 package main
 
 import (
-	"github.com/ararog/timeago"
 	"time"
 )
 
 type Failure struct {
-	Id        int
-	Issue     string
-	Service   int
-	CreatedAt time.Time
+	Id        int       `db:"id,omitempty"`
+	Issue     string    `db:"issue"`
+	Service   int64     `db:"service"`
+	CreatedAt time.Time `db:"created_at"`
 	Ago       string
 }
 
-func (s *Service) SelectAllFailures() []*Failure {
-	var tks []*Failure
-	rows, err := db.Query("SELECT * FROM failures WHERE service=$1 ORDER BY id DESC LIMIT 10", s.Id)
-	if err != nil {
-		panic(err)
+func (s *Service) CreateFailure(data FailureData) (int64, error) {
+	fail := &Failure{
+		Issue:     data.Issue,
+		Service:   s.Id,
+		CreatedAt: time.Now(),
 	}
-	for rows.Next() {
-		var tk Failure
-		err = rows.Scan(&tk.Id, &tk.Issue, &tk.Service, &tk.CreatedAt)
-		if err != nil {
-			panic(err)
-		}
-
-		tk.Ago, _ = timeago.TimeAgoWithTime(time.Now(), tk.CreatedAt)
-
-		tks = append(tks, &tk)
+	s.Failures = append(s.Failures, fail)
+	col := dbSession.Collection("failures")
+	uuid, err := col.Insert(fail)
+	if uuid == nil {
+		return 0, err
 	}
-	return tks
+	return uuid.(int64), err
 }
 
-func CountFailures() int {
-	var amount int
-	db.QueryRow("SELECT COUNT(id) FROM failures;").Scan(&amount)
-	return amount
+func (s *Service) SelectAllFailures() ([]*Failure, error) {
+	var fails []*Failure
+	col := dbSession.Collection("failures").Find("session", s.Id)
+	err := col.All(&fails)
+	return fails, err
 }
 
-func (s *Service) TotalFailures() int {
-	var amount int
-	db.QueryRow("SELECT COUNT(id) FROM failures WHERE service=$1;", s.Id).Scan(&amount)
-	return amount
+func CountFailures() (uint64, error) {
+	col := dbSession.Collection("failures").Find()
+	amount, err := col.Count()
+	return amount, err
 }
 
-func (s *Service) TotalFailures24Hours() int {
-	var amount int
-	t := time.Now()
-	x := t.AddDate(0, 0, -1)
-	db.QueryRow("SELECT COUNT(id) FROM failures WHERE service=$1 AND created_at>=$2 AND created_at<$3;", s.Id, x, t).Scan(&amount)
-	return amount
+func (s *Service) TotalFailures() (uint64, error) {
+	col := dbSession.Collection("failures").Find("service", s.Id)
+	amount, err := col.Count()
+	return amount, err
+}
+
+func (s *Service) TotalFailures24Hours() (uint64, error) {
+	col := dbSession.Collection("failures").Find("service", s.Id)
+	amount, err := col.Count()
+	return amount, err
 }
