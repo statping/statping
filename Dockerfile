@@ -2,7 +2,7 @@ FROM alpine
 
 RUN apk add --no-cache libc6-compat
 
-ENV VERSION="v0.12"
+ENV VERSION="v0.13"
 
 WORKDIR /app
 RUN wget -q https://github.com/hunterlong/statup/releases/download/$VERSION/statup-linux-x64
