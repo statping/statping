@@ -12,14 +12,32 @@
 </head>
 <body>
 
-<h1 class="text-center mb-4">{{.Project}}</h1>
+<h1 class="text-center mb-4 mt-sm-3">{{.Project}}</h1>
 
 <div class="container">
+
+
+    <div class="col-12 mb-5">
+
+        <div class="list-group online_list">
+            {{ range .Services }}
+                <a href="#" class="list-group-item list-group-item-action {{if .Online}}{{ end }}">
+                    {{ .Name }}
+                    {{if .Online}}
+                        <span class="badge online_badge float-right">ONLINE</span>
+                    {{ else }}
+                        <span class="badge offline_badge float-right">OFFLINE</span>
+                    {{end}}
+                </a>
+            {{ end }}
+        </div>
+
+    </div>
 
     <div class="col-12">
 
         {{ range .Services }}
-            <div class="col-12 mb-4">
+            <div class="mb-4">
                 <div class="card">
                     <div class="card-body{{if .Online}}{{else}} offline_bg{{end}}">
 
@@ -37,17 +55,17 @@
                 <div class="row stats_area mt-5 mb-5">
 
                             <div class="col-4">
-                                <span class="lg_number">{{.Online24Hours}}%</span>
+                                <span class="lg_number">{{.Online24}}%</span>
                                 Online last 24 Hours
                             </div>
 
                             <div class="col-4">
-                                <span class="lg_number">{{.AvgResponse}}ms</span>
+                                <span class="lg_number">{{.AvgTime}}ms</span>
                                 Average Response
                             </div>
 
                             <div class="col-4">
-                                <span class="lg_number">{{.TotalUptime}}%</span>
+                                <span class="lg_number">{{.AvgUptime}}%</span>
                                 Total Uptime
                             </div>
                         </div>
@@ -83,7 +101,7 @@ var chartdata = new Chart(ctx, {
     data: {
         datasets: [{
             label: 'Response Time (Milliseconds)',
-            data: {{js .Data}},
+            data: {{js .GraphData}},
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)',
@@ -134,5 +152,6 @@ var chartdata = new Chart(ctx, {
 {{ end }}
 </script>
     <script src="/js/jquery-3.3.1.slim.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
 </body>
 </html>

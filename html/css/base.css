@@ -53,6 +53,10 @@ HTML,BODY {
     background-color: white !important;
 }
 
+.online_list {
+    font-size: 1.5rem;
+}
+
 .footer {
     text-decoration: none;
     margin-top: 20px;
@@ -86,10 +90,26 @@ HTML,BODY {
     overflow: hidden;
 }
 
+.card-body H3 A {
+    color: #424242;
+}
+
 @media (max-width: 767px) {
+
+    HTML,BODY {
+        background-color: #efefef;
+        margin: 0px 0;
+    }
 
     .container {
         padding: 0px;
+    }
+
+    .navbar {
+        margin-left: 0px;
+        margin-top: 0px;
+        width: 100%;
+        margin-bottom: 0;
     }
 
     .card-body {

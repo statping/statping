@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/go-yaml/yaml"
+	"github.com/hunterlong/statup/plugin"
 	"net/http"
 	"os"
 	"strconv"
@@ -9,15 +10,16 @@ import (
 )
 
 type DbConfig struct {
-	DbConn   string `yaml:"connection"`
-	DbHost   string `yaml:"host"`
-	DbUser   string `yaml:"user"`
-	DbPass   string `yaml:"password"`
-	DbData   string `yaml:"database"`
-	DbPort   int    `yaml:"port"`
-	Project  string `yaml:"-"`
-	Username string `yaml:"-"`
-	Password string `yaml:"-"`
+	DbConn      string `yaml:"connection"`
+	DbHost      string `yaml:"host"`
+	DbUser      string `yaml:"user"`
+	DbPass      string `yaml:"password"`
+	DbData      string `yaml:"database"`
+	DbPort      int    `yaml:"port"`
+	Project     string `yaml:"-"`
+	Description string `yaml:"-"`
+	Username    string `yaml:"-"`
+	Password    string `yaml:"-"`
 }
 
 func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
@@ -31,6 +33,8 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	project := r.PostForm.Get("project")
 	username := r.PostForm.Get("username")
 	password := r.PostForm.Get("password")
+	sample := r.PostForm.Get("sample_data")
+	description := r.PostForm.Get("description")
 
 	config := &DbConfig{
 		dbConn,
@@ -40,20 +44,32 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		dbDatabase,
 		dbPort,
 		project,
+		description,
 		username,
 		password,
 	}
-
 	err := config.Save()
 	if err != nil {
-		panic(err)
+		throw(err)
+	}
+
+	configs, err = LoadConfig()
+	if err != nil {
+		throw(err)
+	}
+
+	err = DbConnection(configs.Connection)
+	if err != nil {
+		throw(err)
+	}
+
+	if sample == "on" {
+		LoadSampleData()
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	time.Sleep(2 * time.Second)
-
 	mainProcess()
-
 }
 
 func (c *DbConfig) Save() error {
@@ -79,6 +95,21 @@ func (c *DbConfig) Save() error {
 	}
 	DropDatabase()
 	CreateDatabase()
-	db.QueryRow("INSERT INTO core (name, config, api_key, api_secret, version) VALUES($1,$2,$3,$4,$5);", c.Project, "config.yml", NewSHA1Hash(5), NewSHA1Hash(10), VERSION).Scan()
+
+	newCore := Core{
+		c.Project,
+		c.Description,
+		"config.yml",
+		NewSHA1Hash(5),
+		NewSHA1Hash(10),
+		VERSION,
+		[]plugin.Info{},
+		[]PluginJSON{},
+		[]PluginSelect{},
+	}
+
+	col := dbSession.Collection("core")
+	_, err = col.Insert(newCore)
+
 	return err
 }

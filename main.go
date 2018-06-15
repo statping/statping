@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"os"
 	plg "plugin"
+	"strconv"
 	"strings"
 )
 
@@ -245,6 +246,11 @@ func main() {
 	mainProcess()
 }
 
+func StringInt(s string) int64 {
+	num, _ := strconv.Atoi(s)
+	return int64(num)
+}
+
 func mainProcess() {
 	var err error
 	err = DbConnection(configs.Connection)
@@ -253,7 +259,8 @@ func mainProcess() {
 	}
 	core, err = SelectCore()
 	if err != nil {
-		throw(err)
+		fmt.Println("Core database was not found, Statup is not setup yet.")
+		RunHTTPServer()
 	}
 	go CheckServices()
 	if !setupMode {
@@ -263,6 +270,7 @@ func mainProcess() {
 }
 
 func throw(err error) {
+	panic(err)
 	fmt.Println(err)
 	os.Exit(1)
 }
@@ -334,6 +342,7 @@ func LoadConfig() (*Config, error) {
 		return nil, err
 	}
 	err = yaml.Unmarshal(file, &config)
+	configs = &config
 	return &config, err
 }
 

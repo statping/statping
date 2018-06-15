@@ -1,10 +1,10 @@
 package plugin
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
+	"upper.io/db.v3/lib/sqlbuilder"
 )
 
 //
@@ -16,10 +16,10 @@ import (
 //
 
 var (
-	DB *sql.DB
+	DB sqlbuilder.Database
 )
 
-func SetDatabase(database *sql.DB) {
+func SetDatabase(database sqlbuilder.Database) {
 	DB = database
 }
 
@@ -81,7 +81,7 @@ type Service struct {
 type Failure struct {
 	Id        int
 	Issue     string
-	Service   int
+	Service   int64
 	CreatedAt time.Time
 	Ago       string
 }

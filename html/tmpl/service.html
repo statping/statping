@@ -34,17 +34,17 @@
                         <div class="row stats_area mt-5 mb-5">
 
                             <div class="col-4">
-                                <span class="lg_number">{{.Service.Online24Hours}}%</span>
+                                <span class="lg_number">{{.Service.Online24}}%</span>
                                 Online last 24 Hours
                             </div>
 
                             <div class="col-4">
-                                <span class="lg_number">{{.Service.AvgResponse}}ms</span>
+                                <span class="lg_number">{{.Service.AvgTime}}ms</span>
                                 Average Response
                             </div>
 
                             <div class="col-4">
-                                <span class="lg_number">{{.Service.TotalUptime}}%</span>
+                                <span class="lg_number">{{.Service.AvgUptime}}%</span>
                                 Total Uptime
                             </div>
                         </div>
@@ -118,6 +118,7 @@
 
 
     </div>
+</div>
 
 
 <script>
@@ -128,7 +129,7 @@
         data: {
             datasets: [{
                 label: 'Response Time (Milliseconds)',
-                data: {{js .Service.Data}},
+                data: {{js .Service.GraphData}},
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -179,6 +180,6 @@
 </script>
 
 <script src="/js/jquery-3.3.1.slim.min.js"></script>
-
+    <script src="/js/bootstrap.min.js"></script>
 </body>
 </html>

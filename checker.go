@@ -9,7 +9,7 @@ import (
 )
 
 func CheckServices() {
-	services = SelectAllServices()
+	services, _ = SelectAllServices()
 	for _, v := range services {
 		obj := v
 		go obj.CheckQueue()
@@ -18,12 +18,15 @@ func CheckServices() {
 
 func (s *Service) CheckQueue() {
 	s.Check()
+	if s.Interval < 1 {
+		s.Interval = 1
+	}
 	fmt.Printf("   Service: %v | Online: %v | Latency: %v\n", s.Name, s.Online, s.Latency)
 	time.Sleep(time.Duration(s.Interval) * time.Second)
 	s.CheckQueue()
 }
 
-func (s *Service) Check() {
+func (s *Service) Check() *Service {
 	t1 := time.Now()
 	client := http.Client{
 		Timeout: 30 * time.Second,
@@ -33,7 +36,7 @@ func (s *Service) Check() {
 	s.Latency = t2.Sub(t1).Seconds()
 	if err != nil {
 		s.Failure(fmt.Sprintf("HTTP Error %v", err))
-		return
+		return s
 	}
 	defer response.Body.Close()
 	if s.Expected != "" {
@@ -41,23 +44,40 @@ func (s *Service) Check() {
 		match, _ := regexp.MatchString(s.Expected, string(contents))
 		if !match {
 			s.Failure(fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
-			return
+			return s
 		}
 	}
 	if s.ExpectedStatus != response.StatusCode {
 		s.Failure(fmt.Sprintf("HTTP Status Code %v did not match %v", response.StatusCode, s.ExpectedStatus))
-		return
+		return s
 	}
 	s.Online = true
 	s.Record(response)
+	return s
+}
+
+type HitData struct {
+	Latency float64
 }
 
 func (s *Service) Record(response *http.Response) {
-	db.QueryRow("INSERT INTO hits(service,latency,created_at) VALUES($1,$2,NOW()) returning id;", s.Id, s.Latency).Scan()
+	s.Online = true
+	data := HitData{
+		Latency: s.Latency,
+	}
+	s.CreateHit(data)
 	OnSuccess(s)
 }
 
+type FailureData struct {
+	Issue string
+}
+
 func (s *Service) Failure(issue string) {
-	db.QueryRow("INSERT INTO failures(issue,service,created_at) VALUES($1,$2,NOW()) returning id;", issue, s.Id).Scan()
+	s.Online = false
+	data := FailureData{
+		Issue: issue,
+	}
+	s.CreateFailure(data)
 	OnFailure(s)
 }
