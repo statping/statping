@@ -308,9 +308,9 @@ func ServicesBadgeHandler(w http.ResponseWriter, r *http.Request) {
 
 	var badge []byte
 	if service.Online {
-		badge = []byte(`<svg xmlns="http://www.w3.org/2000/svg" width="104" height="20"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><mask id="a"><rect width="104" height="20" rx="3" fill="#fff"/></mask><g mask="url(#a)"><path fill="#555" d="M0 0h54v20H0z"/><path fill="#4c1" d="M54 0h50v20H54z"/><path fill="url(#b)" d="M0 0h104v20H0z"/></g><g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11"><text x="28" y="15" fill="#010101" fill-opacity=".3">`+service.Name+`</text><text x="28" y="14">`+service.Name+`</text><text x="78" y="15" fill="#010101" fill-opacity=".3">online</text><text x="78" y="14">online</text></g></svg>`)
+		badge = []byte(`<svg xmlns="http://www.w3.org/2000/svg" width="104" height="20"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><mask id="a"><rect width="104" height="20" rx="3" fill="#fff"/></mask><g mask="url(#a)"><path fill="#555" d="M0 0h54v20H0z"/><path fill="#4c1" d="M54 0h50v20H54z"/><path fill="url(#b)" d="M0 0h104v20H0z"/></g><g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11"><text x="28" y="15" fill="#010101" fill-opacity=".3">` + service.Name + `</text><text x="28" y="14">` + service.Name + `</text><text x="78" y="15" fill="#010101" fill-opacity=".3">online</text><text x="78" y="14">online</text></g></svg>`)
 	} else {
-		badge = []byte(`<svg xmlns="http://www.w3.org/2000/svg" width="99" height="20"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><mask id="a"><rect width="99" height="20" rx="3" fill="#fff"/></mask><g mask="url(#a)"><path fill="#555" d="M0 0h54v20H0z"/><path fill="#e05d44" d="M54 0h45v20H54z"/><path fill="url(#b)" d="M0 0h99v20H0z"/></g><g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11"><text x="28" y="15" fill="#010101" fill-opacity=".3">`+service.Name+`</text><text x="28" y="14">`+service.Name+`</text><text x="75.5" y="15" fill="#010101" fill-opacity=".3">offline</text><text x="75.5" y="14">offline</text></g></svg>`)
+		badge = []byte(`<svg xmlns="http://www.w3.org/2000/svg" width="99" height="20"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><mask id="a"><rect width="99" height="20" rx="3" fill="#fff"/></mask><g mask="url(#a)"><path fill="#555" d="M0 0h54v20H0z"/><path fill="#e05d44" d="M54 0h45v20H54z"/><path fill="url(#b)" d="M0 0h99v20H0z"/></g><g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11"><text x="28" y="15" fill="#010101" fill-opacity=".3">` + service.Name + `</text><text x="28" y="14">` + service.Name + `</text><text x="75.5" y="15" fill="#010101" fill-opacity=".3">offline</text><text x="75.5" y="14">offline</text></g></svg>`)
 	}
 
 	w.Header().Set("Content-Type", "image/svg+xml")
@@ -319,7 +319,6 @@ func ServicesBadgeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(badge)
 
 }
-
 
 func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	auth := IsAuthenticated(r)

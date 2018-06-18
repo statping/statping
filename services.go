@@ -15,16 +15,16 @@ var (
 )
 
 type Service struct {
-	Id             int64     `db:"id,omitempty" json:"id"`
-	Name           string    `db:"name" json:"name"`
-	Domain         string    `db:"domain" json:"domain"`
-	Expected       string    `db:"expected" json:"expected"`
-	ExpectedStatus int       `db:"expected_status" json:"expected_status"`
-	Interval       int       `db:"check_interval" json:"check_interval"`
-	Type           string    `db:"check_type" json:"type"`
-	Method         string    `db:"method" json:"method"`
-	Port           int       `db:"port" json:"port"`
-	CreatedAt      time.Time `db:"created_at" json:"created_at"`
+	Id             int64      `db:"id,omitempty" json:"id"`
+	Name           string     `db:"name" json:"name"`
+	Domain         string     `db:"domain" json:"domain"`
+	Expected       string     `db:"expected" json:"expected"`
+	ExpectedStatus int        `db:"expected_status" json:"expected_status"`
+	Interval       int        `db:"check_interval" json:"check_interval"`
+	Type           string     `db:"check_type" json:"type"`
+	Method         string     `db:"method" json:"method"`
+	Port           int        `db:"port" json:"port"`
+	CreatedAt      time.Time  `db:"created_at" json:"created_at"`
 	Online         bool       `json:"online"`
 	Latency        float64    `json:"latency"`
 	Online24Hours  float32    `json:"24_hours_online"`
