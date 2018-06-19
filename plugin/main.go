@@ -35,8 +35,13 @@ type PluginInfo struct {
 	PluginActions
 }
 
+func (p *PluginInfo) Form() string {
+	return "okkokokkok"
+}
+
 type PluginActions interface {
 	GetInfo() Info
+	GetForm() string
 	SetInfo(map[string]interface{}) Info
 	Routes() []Routing
 	OnSave(map[string]interface{})
@@ -64,4 +69,5 @@ type Routing struct {
 type Info struct {
 	Name        string
 	Description string
+	Form 		string
 }

@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"regexp"
 )
 
 var (
@@ -284,7 +285,7 @@ func PluginsHandler(w http.ResponseWriter, r *http.Request) {
 	for _, p := range allPlugins {
 		fields := structs.Map(p.GetInfo())
 
-		pluginFields = append(pluginFields, PluginSelect{p.GetInfo().Name, fields})
+		pluginFields = append(pluginFields, PluginSelect{p.GetInfo().Name, p.GetForm(),fields})
 	}
 
 	core.PluginFields = pluginFields
@@ -293,6 +294,7 @@ func PluginsHandler(w http.ResponseWriter, r *http.Request) {
 
 type PluginSelect struct {
 	Plugin string
+	Form string
 	Params map[string]interface{}
 }
 
@@ -391,6 +393,9 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		"VERSION": func() string {
 			return VERSION
 		},
+		"underscore": func(html string) string {
+			return UnderScoreString(html)
+		},
 	})
 	t, _ = t.Parse(nav)
 	t.Parse(render)
@@ -424,4 +429,29 @@ func UsersDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	user.Delete()
 	http.Redirect(w, r, "/users", http.StatusSeeOther)
+}
+
+
+
+func UnderScoreString(str string) string {
+
+	// convert every letter to lower case
+	newStr := strings.ToLower(str)
+
+	// convert all spaces/tab to underscore
+	regExp := regexp.MustCompile("[[:space:][:blank:]]")
+	newStrByte := regExp.ReplaceAll([]byte(newStr), []byte("_"))
+
+	regExp = regexp.MustCompile("`[^a-z0-9]`i")
+	newStrByte = regExp.ReplaceAll(newStrByte, []byte("_"))
+
+	regExp = regexp.MustCompile("[!/']")
+	newStrByte = regExp.ReplaceAll(newStrByte, []byte("_"))
+
+	// and remove underscore from beginning and ending
+
+	newStr = strings.TrimPrefix(string(newStrByte), "_")
+	newStr = strings.TrimSuffix(newStr, "_")
+
+	return newStr
 }
