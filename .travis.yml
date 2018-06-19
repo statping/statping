@@ -17,7 +17,7 @@ services:
   - mongodb
 
 env:
-  - VERSION=0.15
+  - VERSION=0.151
 
 matrix:
   allow_failures:

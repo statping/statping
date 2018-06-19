@@ -14,8 +14,6 @@ xgo --targets=linux/386 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
 
 xgo --targets=windows/amd64 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
 
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo -ldflags '-X main.VERSION=$VERSION -w -extldflags "-static"' -o build/statup-linux-static .
-
 cd build
 ls
 cd ../
