@@ -38,7 +38,8 @@ func Router() *mux.Router {
 	r.Handle("/service/{id}/badge.svg", http.HandlerFunc(ServicesBadgeHandler))
 	r.Handle("/users", http.HandlerFunc(UsersHandler)).Methods("GET")
 	r.Handle("/users", http.HandlerFunc(CreateUserHandler)).Methods("POST")
-	r.Handle("/settings", http.HandlerFunc(PluginsHandler))
+	r.Handle("/settings", http.HandlerFunc(PluginsHandler)).Methods("GET")
+	r.Handle("/settings", http.HandlerFunc(SaveSettingsHandler)).Methods("POST")
 	r.Handle("/plugins/download/{name}", http.HandlerFunc(PluginsDownloadHandler))
 	r.Handle("/plugins/{name}/save", http.HandlerFunc(PluginSavedHandler)).Methods("POST")
 	r.Handle("/help", http.HandlerFunc(HelpHandler))
@@ -223,6 +224,21 @@ func IsAuthenticated(r *http.Request) bool {
 		return false
 	}
 	return session.Values["authenticated"].(bool)
+}
+
+func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	r.ParseForm()
+	name := r.PostForm.Get("name")
+	description := r.PostForm.Get("description")
+	core.Name = name
+	core.Description = description
+	core.Update()
+	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
 
 func PluginsHandler(w http.ResponseWriter, r *http.Request) {

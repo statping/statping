@@ -34,6 +34,13 @@ func (s *Service) SelectAllFailures() ([]*Failure, error) {
 	return fails, err
 }
 
+func (s *Service) LimitedFailures() ([]*Failure, error) {
+	var fails []*Failure
+	col := dbSession.Collection("failures").Find("session", s.Id).Limit(10)
+	err := col.All(&fails)
+	return fails, err
+}
+
 func CountFailures() (uint64, error) {
 	col := dbSession.Collection("failures").Find()
 	amount, err := col.Count()

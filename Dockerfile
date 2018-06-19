@@ -1,13 +1,17 @@
-FROM alpine
+FROM golang:alpine
 
-#RUN apk add --no-cache libc6-compat
+RUN apk update && apk add git g++
 
-ENV VERSION="v0.14"
-RUN wget -q https://github.com/hunterlong/statup/releases/download/$VERSION/statup-linux-static
-RUN chmod +x statup-linux-static && mv statup-linux-static /usr/local/bin/statup
+WORKDIR $GOPATH/src/github.com/hunterlong/statup/
+
+COPY . $GOPATH/src/github.com/hunterlong/statup/
+RUN go get github.com/GeertJohan/go.rice/rice
+RUN go get -d -v
+RUN rice embed-go
+RUN go install
+WORKDIR /app
+VOLUME /app
 
 EXPOSE 8080
-
-VOLUME /app
 
 ENTRYPOINT statup

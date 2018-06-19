@@ -17,6 +17,13 @@ type Core struct {
 	PluginFields []PluginSelect
 }
 
+func (c *Core) Update() (*Core, error) {
+	res := dbSession.Collection("core").Find().Limit(1)
+	res.Update(c)
+	core = c
+	return c, nil
+}
+
 func SelectCore() (*Core, error) {
 	var core Core
 	err := dbSession.Collection("core").Find().One(&core)
