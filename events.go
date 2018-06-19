@@ -1,16 +1,56 @@
 package main
 
-import "github.com/hunterlong/statup/plugin"
+import (
+	"github.com/fatih/structs"
+	"github.com/hunterlong/statup/plugin"
+	"upper.io/db.v3/lib/sqlbuilder"
+)
+
+func OnLoad(db sqlbuilder.Database) {
+	for _, p := range allPlugins {
+		p.OnLoad(db)
+	}
+}
 
 func OnSuccess(s *Service) {
 	for _, p := range allPlugins {
-		p.OnSuccess(s.ToP())
+		p.OnSuccess(structs.Map(s))
 	}
 }
 
 func OnFailure(s *Service) {
 	for _, p := range allPlugins {
-		p.OnFailure(s.ToP())
+		p.OnFailure(structs.Map(s))
+	}
+}
+
+func OnSettingsSaved(c *Core) {
+	for _, p := range allPlugins {
+		p.OnSettingsSaved(structs.Map(c))
+	}
+}
+
+func OnNewUser(u *User) {
+	for _, p := range allPlugins {
+		p.OnNewUser(structs.Map(u))
+	}
+}
+
+func OnNewService(s *Service) {
+	for _, p := range allPlugins {
+		p.OnNewService(structs.Map(s))
+	}
+}
+
+func OnDeletedService(s *Service) {
+	for _, p := range allPlugins {
+		p.OnDeletedService(structs.Map(s))
+	}
+}
+
+func OnUpdateService(s *Service) {
+	for _, p := range allPlugins {
+		p.OnUpdatedService(structs.Map(s))
 	}
 }
 
@@ -21,41 +61,4 @@ func SelectPlugin(name string) plugin.PluginActions {
 		}
 	}
 	return plugin.PluginInfo{}
-}
-
-func (s *Service) PluginFailures() []*plugin.Failure {
-	var failed []*plugin.Failure
-	for _, f := range s.Failures {
-		fail := &plugin.Failure{
-			f.Id,
-			f.Issue,
-			f.Service,
-			f.CreatedAt,
-			f.Ago,
-		}
-		failed = append(failed, fail)
-	}
-	return failed
-}
-
-func (s *Service) ToP() *plugin.Service {
-	out := &plugin.Service{
-		s.Id,
-		s.Name,
-		s.Domain,
-		s.Expected,
-		s.ExpectedStatus,
-		s.Interval,
-		s.Method,
-		s.Port,
-		s.CreatedAt,
-		s.Data,
-		s.Online,
-		s.Latency,
-		s.Online24Hours,
-		s.AvgResponse,
-		s.TotalUptime,
-		s.PluginFailures(),
-	}
-	return out
 }

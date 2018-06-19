@@ -4,6 +4,8 @@ CREATE TABLE core (
     config text,
     api_key text,
     api_secret text,
+    style text,
+    footer text,
     version text
 );
 

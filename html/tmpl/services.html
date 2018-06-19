@@ -38,7 +38,7 @@
                     <td>{{.Name}}</td>
                     <td>{{if .Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}} </td>
                     <td class="text-right">
-                        <div class="btn-group" data-toggle="buttons">
+                        <div class="btn-group">
                                 <a href="/service/{{.Id}}" class="btn btn-primary">View</a>
                                 <a href="/service/{{.Id}}/delete" class="btn btn-danger">Delete</a>
                         </div>

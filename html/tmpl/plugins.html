@@ -23,7 +23,8 @@
 
             <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                 <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Settings</a>
-                <a class="nav-link" id="v-pills-browse-tab" data-toggle="pill" href="#v-pills-browse" role="tab" aria-controls="v-pills-home" aria-selected="true">Browse Plugins</a>
+                <a class="nav-link" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false">Styling</a>
+                <a class="nav-link" id="v-pills-browse-tab" data-toggle="pill" href="#v-pills-browse" role="tab" aria-controls="v-pills-home" aria-selected="false">Browse Plugins</a>
             {{ range .Plugins }}
                 <a class="nav-link text-capitalize" id="v-pills-{{.Name}}-tab" data-toggle="pill" href="#v-pills-{{.Name}}" role="tab" aria-controls="v-pills-profile" aria-selected="false">{{.Name}}</a>
             {{end}}
@@ -46,10 +47,29 @@
                             <input type="text" name="description" class="form-control" value="{{ .Description }}" id="formGroupExampleInput" placeholder="Great Uptime">
                         </div>
 
+                        <div class="form-group">
+                            <label for="formGroupExampleInput">Custom Footer</label>
+                            <textarea rows="4" name="footer" class="form-control" id="formGroupExampleInput">{{ .Footer }}</textarea>
+                        </div>
+
                         <button type="submit" class="btn btn-primary btn-block">Save Settings</button>
 
                     </form>
 
+                </div>
+
+
+                <div class="tab-pane fade" id="v-pills-style" role="tabpanel" aria-labelledby="v-pills-style-tab">
+                    <h3>Custom Style</h3>
+                    <form method="POST" action="/settings">
+
+                        <div class="form-group">
+                            <textarea rows="15" name="style" class="form-control" id="formGroupExampleInput">{{ .Style }}</textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">Save Settings</button>
+
+                    </form>
                 </div>
 
                 <div class="tab-pane fade" id="v-pills-browse" role="tabpanel" aria-labelledby="v-pills-browse-tab">
@@ -97,6 +117,7 @@
 
 <script src="/js/jquery-3.3.1.slim.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
+
 
 </body>
 </html>

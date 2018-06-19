@@ -27,6 +27,7 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Username</th>
+                    <th scope="col"></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -34,6 +35,11 @@
                 <tr>
                     <th scope="row">{{.Id}}</th>
                     <td>{{.Username}}</td>
+                    <td class="text-right">
+                        <div class="btn-group">
+                            <a href="/users/{{.Id}}/delete" class="btn btn-danger">Delete</a>
+                        </div>
+                    </td>
                 </tr>
                 {{end}}
                 </tbody>

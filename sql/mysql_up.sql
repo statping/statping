@@ -4,6 +4,8 @@ CREATE TABLE core (
     config VARCHAR(50),
     api_key VARCHAR(50),
     api_secret VARCHAR(50),
+    style text,
+    footer text,
     version VARCHAR(50)
 );
 CREATE TABLE users (

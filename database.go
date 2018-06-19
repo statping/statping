@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/hunterlong/statup/plugin"
 	"strings"
+	"time"
 	"upper.io/db.v3/lib/sqlbuilder"
 	"upper.io/db.v3/mysql"
 	"upper.io/db.v3/postgresql"
@@ -29,6 +29,9 @@ func DbConnection(dbType string) error {
 			return err
 		}
 	} else if dbType == "mysql" {
+		if configs.Port == "" {
+			configs.Port = "3306"
+		}
 		mysqlSettings = mysql.ConnectionURL{
 			Database: configs.Database,
 			Host:     configs.Host,
@@ -40,9 +43,13 @@ func DbConnection(dbType string) error {
 			return err
 		}
 	} else {
+		if configs.Port == "" {
+			configs.Port = "5432"
+		}
+		host := fmt.Sprintf("%v:%v", configs.Host, configs.Port)
 		postgresSettings = postgresql.ConnectionURL{
 			Database: configs.Database,
-			Host:     configs.Host,
+			Host:     host,
 			User:     configs.User,
 			Password: configs.Password,
 		}
@@ -53,26 +60,8 @@ func DbConnection(dbType string) error {
 	}
 	//dbSession.SetLogging(true)
 	dbServer = dbType
-	plugin.SetDatabase(dbSession)
+	OnLoad(dbSession)
 	return err
-}
-
-func UpgradeDatabase() {
-	fmt.Println("New Version:     ", core.Version)
-	fmt.Println("Current Version: ", VERSION)
-	if VERSION == core.Version {
-		fmt.Println("Database already up to date")
-		return
-	}
-	fmt.Println("Upgrading Database...")
-	upgrade, _ := sqlBox.String("upgrade.sql")
-	requests := strings.Split(upgrade, ";")
-	for _, request := range requests {
-		_, err := db.Exec(request)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
 }
 
 func DropDatabase() {
@@ -124,22 +113,17 @@ func LoadSampleData() error {
 		Type:           "https",
 		Method:         "GET",
 	}
-	admin := &User{
-		Username: "admin",
-		Password: "admin",
-		Email:    "admin@admin.com",
-	}
 	s1.Create()
 	s2.Create()
 	s3.Create()
 	s4.Create()
-	admin.Create()
 
-	for i := 0; i < 20; i++ {
+	for i := 0; i < 100; i++ {
 		s1.Check()
 		s2.Check()
 		s3.Check()
 		s4.Check()
+		time.Sleep(250 * time.Millisecond)
 	}
 
 	return nil
@@ -147,7 +131,6 @@ func LoadSampleData() error {
 
 func CreateDatabase() {
 	fmt.Println("Creating Tables...")
-	VERSION = "1.1.1"
 	sql := "postgres_up.sql"
 	if dbServer == "mysql" {
 		sql = "mysql_up.sql"

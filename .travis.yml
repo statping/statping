@@ -17,7 +17,7 @@ services:
   - mongodb
 
 env:
-  - VERSION=0.151
+  - VERSION=0.16
 
 matrix:
   allow_failures:
@@ -37,7 +37,6 @@ deploy:
       - "build/statup-linux-x64"
       - "build/statup-linux-x32"
       - "build/statup-windows-x64.exe"
-      - "build/statup-linux-static"
     skip_cleanup: true
 
 notifications:

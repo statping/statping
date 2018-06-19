@@ -31,6 +31,12 @@ func SelectUsername(username string) (*User, error) {
 	return &user, err
 }
 
+func (u *User) Delete() error {
+	col := dbSession.Collection("users")
+	user := col.Find("id", u.Id)
+	return user.Delete()
+}
+
 func (u *User) Create() (int64, error) {
 	u.CreatedAt = time.Now()
 	password := HashPassword(u.Password)
@@ -42,6 +48,7 @@ func (u *User) Create() (int64, error) {
 	if uuid == nil {
 		return 0, err
 	}
+	OnNewUser(u)
 	return uuid.(int64), err
 }
 

@@ -20,6 +20,7 @@ type DbConfig struct {
 	Description string `yaml:"-"`
 	Username    string `yaml:"-"`
 	Password    string `yaml:"-"`
+	Error       error
 }
 
 func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
@@ -47,29 +48,58 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		description,
 		username,
 		password,
+		nil,
 	}
 	err := config.Save()
 	if err != nil {
-		throw(err)
+		config.Error = err
+		SetupResponseError(w, r, config)
+		return
 	}
 
 	configs, err = LoadConfig()
 	if err != nil {
-		throw(err)
+		config.Error = err
+		SetupResponseError(w, r, config)
+		return
 	}
 
 	err = DbConnection(configs.Connection)
 	if err != nil {
-		throw(err)
+		DeleteConfig()
+		config.Error = err
+		SetupResponseError(w, r, config)
+		return
 	}
 
+	admin := &User{
+		Username: config.Username,
+		Password: config.Password,
+	}
+	admin.Create()
+
 	if sample == "on" {
-		LoadSampleData()
+		go LoadSampleData()
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	time.Sleep(2 * time.Second)
 	mainProcess()
+}
+
+func DeleteConfig() {
+	err := os.Remove("./config.yml")
+	if err != nil {
+		throw(err)
+	}
+}
+
+type ErrorResponse struct {
+	Error string
+}
+
+func SetupResponseError(w http.ResponseWriter, r *http.Request, a interface{}) {
+	ExecuteResponse(w, r, "setup.html", a)
 }
 
 func (c *DbConfig) Save() error {
@@ -102,6 +132,8 @@ func (c *DbConfig) Save() error {
 		"config.yml",
 		NewSHA1Hash(5),
 		NewSHA1Hash(10),
+		"",
+		"",
 		VERSION,
 		[]plugin.Info{},
 		[]PluginJSON{},

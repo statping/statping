@@ -29,16 +29,21 @@ func (s *Service) CreateFailure(data FailureData) (int64, error) {
 
 func (s *Service) SelectAllFailures() ([]*Failure, error) {
 	var fails []*Failure
-	col := dbSession.Collection("failures").Find("session", s.Id)
+	col := dbSession.Collection("failures").Find("service", s.Id)
 	err := col.All(&fails)
 	return fails, err
 }
 
-func (s *Service) LimitedFailures() ([]*Failure, error) {
+func (s *Service) LimitedFailures() []*Failure {
 	var fails []*Failure
-	col := dbSession.Collection("failures").Find("session", s.Id).Limit(10)
-	err := col.All(&fails)
-	return fails, err
+	col := dbSession.Collection("failures").Find("service", s.Id).Limit(10)
+	col.All(&fails)
+	return fails
+}
+
+func (f *Failure) Delete() error {
+	col := dbSession.Collection("failures").Find("id", f.Id)
+	return col.Delete()
 }
 
 func CountFailures() (uint64, error) {

@@ -6,13 +6,13 @@ APP="statup"
 
 rice embed-go
 
-xgo --targets=darwin/amd64 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
-xgo --targets=darwin/386 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
+xgo -go 1.10.x --targets=darwin/amd64 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
+xgo -go 1.10.x --targets=darwin/386 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
 
-xgo --targets=linux/amd64 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
-xgo --targets=linux/386 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
+xgo -go 1.10.x --targets=linux/amd64 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
+xgo -go 1.10.x --targets=linux/386 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
 
-xgo --targets=windows/amd64 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
+xgo -go 1.10.x --targets=windows/amd64 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
 
 cd build
 ls

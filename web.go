@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/fatih/structs"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"html/template"
@@ -16,7 +17,7 @@ var (
 )
 
 const (
-	cookieKey = "apizer_auth"
+	cookieKey = "statup_auth"
 )
 
 func Router() *mux.Router {
@@ -31,13 +32,15 @@ func Router() *mux.Router {
 	r.Handle("/logout", http.HandlerFunc(LogoutHandler))
 	r.Handle("/services", http.HandlerFunc(ServicesHandler)).Methods("GET")
 	r.Handle("/services", http.HandlerFunc(CreateServiceHandler)).Methods("POST")
-	r.Handle("/service/{id}", http.HandlerFunc(ServicesViewHandler))
+	r.Handle("/service/{id}", http.HandlerFunc(ServicesViewHandler)).Methods("GET")
 	r.Handle("/service/{id}", http.HandlerFunc(ServicesUpdateHandler)).Methods("POST")
 	r.Handle("/service/{id}/edit", http.HandlerFunc(ServicesViewHandler))
 	r.Handle("/service/{id}/delete", http.HandlerFunc(ServicesDeleteHandler))
 	r.Handle("/service/{id}/badge.svg", http.HandlerFunc(ServicesBadgeHandler))
+	r.Handle("/service/{id}/delete_failures", http.HandlerFunc(ServicesDeleteFailuresHandler)).Methods("GET")
 	r.Handle("/users", http.HandlerFunc(UsersHandler)).Methods("GET")
 	r.Handle("/users", http.HandlerFunc(CreateUserHandler)).Methods("POST")
+	r.Handle("/users/{id}/delete", http.HandlerFunc(UsersDeleteHandler)).Methods("GET")
 	r.Handle("/settings", http.HandlerFunc(PluginsHandler)).Methods("GET")
 	r.Handle("/settings", http.HandlerFunc(SaveSettingsHandler)).Methods("POST")
 	r.Handle("/plugins/download/{name}", http.HandlerFunc(PluginsDownloadHandler))
@@ -147,12 +150,11 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SetupHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl := Parse("setup.html")
-	tmpl.Execute(w, nil)
+	ExecuteResponse(w, r, "setup.html", nil)
 }
 
 type index struct {
-	Project  string
+	Core     Core
 	Services []*Service
 }
 
@@ -161,10 +163,8 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/setup", http.StatusSeeOther)
 		return
 	}
-
-	tmpl := Parse("index.html")
-	out := index{core.Name, services}
-	tmpl.Execute(w, out)
+	out := index{*core, services}
+	ExecuteResponse(w, r, "index.html", out)
 }
 
 type dashboard struct {
@@ -178,13 +178,11 @@ type dashboard struct {
 func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, cookieKey)
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		tmpl := Parse("login.html")
-		tmpl.Execute(w, nil)
+		ExecuteResponse(w, r, "login.html", nil)
 	} else {
-		tmpl := Parse("dashboard.html")
 		fails, _ := CountFailures()
 		out := dashboard{services, core, CountOnline(), len(services), fails}
-		tmpl.Execute(w, out)
+		ExecuteResponse(w, r, "dashboard.html", out)
 	}
 
 }
@@ -195,18 +193,17 @@ type serviceHandler struct {
 }
 
 func ServicesHandler(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, cookieKey)
-	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+	auth := IsAuthenticated(r)
+	if !auth {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	tmpl := Parse("services.html")
-	tmpl.Execute(w, services)
+	ExecuteResponse(w, r, "services.html", services)
 }
 
 func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, cookieKey)
-	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+	auth := IsAuthenticated(r)
+	if !auth {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -218,8 +215,28 @@ func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/services", http.StatusSeeOther)
 }
 
+func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	vars := mux.Vars(r)
+	service, _ := SelectService(StringInt(vars["id"]))
+
+	service.DeleteFailures()
+	services, _ = SelectAllServices()
+	http.Redirect(w, r, "/services", http.StatusSeeOther)
+}
+
 func IsAuthenticated(r *http.Request) bool {
-	session, _ := store.Get(r, cookieKey)
+	if store == nil {
+		return false
+	}
+	session, err := store.Get(r, cookieKey)
+	if err != nil {
+		return false
+	}
 	if session.Values["authenticated"] == nil {
 		return false
 	}
@@ -233,11 +250,24 @@ func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	r.ParseForm()
-	name := r.PostForm.Get("name")
+	name := r.PostForm.Get("project")
+	if name != "" {
+		core.Name = name
+	}
 	description := r.PostForm.Get("description")
-	core.Name = name
-	core.Description = description
+	if description != core.Description {
+		core.Description = description
+	}
+	style := r.PostForm.Get("style")
+	if style != core.Style {
+		core.Style = style
+	}
+	footer := r.PostForm.Get("footer")
+	if footer != core.Footer {
+		core.Footer = footer
+	}
 	core.Update()
+	OnSettingsSaved(core)
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
 
@@ -247,27 +277,23 @@ func PluginsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	tmpl := ParsePlugins("plugins.html")
 	core.FetchPluginRepo()
 
 	var pluginFields []PluginSelect
 
 	for _, p := range allPlugins {
-		fields := SelectSettings(p.GetInfo())
+		fields := structs.Map(p.GetInfo())
 
 		pluginFields = append(pluginFields, PluginSelect{p.GetInfo().Name, fields})
 	}
 
 	core.PluginFields = pluginFields
-
-	fmt.Println(&core.PluginFields)
-
-	tmpl.Execute(w, core)
+	ExecuteResponse(w, r, "plugins.html", core)
 }
 
 type PluginSelect struct {
 	Plugin string
-	Params map[string]string
+	Params map[string]interface{}
 }
 
 func PluginSavedHandler(w http.ResponseWriter, r *http.Request) {
@@ -283,8 +309,7 @@ func PluginSavedHandler(w http.ResponseWriter, r *http.Request) {
 	for k, v := range r.PostForm {
 		data[k] = strings.Join(v, "")
 	}
-	UpdateSettings(plug.GetInfo(), data)
-	plug.OnSave(data)
+	plug.OnSave(structs.Map(data))
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
 
@@ -307,8 +332,7 @@ func HelpHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	tmpl := Parse("help.html")
-	tmpl.Execute(w, nil)
+	ExecuteResponse(w, r, "help.html", nil)
 }
 
 func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -338,63 +362,66 @@ func ServicesBadgeHandler(w http.ResponseWriter, r *http.Request) {
 
 func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	auth := IsAuthenticated(r)
-	vars := mux.Vars(r)
-	service, _ := SelectService(StringInt(vars["id"]))
-	tmpl := Parse("service.html")
-	serve := &serviceHandler{service, auth}
-	tmpl.Execute(w, serve)
-}
-
-func Parse(file string) *template.Template {
-	nav, _ := tmplBox.String("nav.html")
-	render, err := tmplBox.String(file)
-	if err != nil {
-		panic(err)
-	}
-	t := template.New("message")
-	t.Funcs(template.FuncMap{
-		"js": func(html string) template.JS {
-			return template.JS(html)
-		},
-		"safe": func(html string) template.HTML {
-			return template.HTML(html)
-		},
-	})
-	t, _ = t.Parse(nav)
-	t.Parse(render)
-	return t
-}
-
-func ParsePlugins(file string) *template.Template {
-	nav, _ := tmplBox.String("nav.html")
-	slack, _ := tmplBox.String("plugins/slack.html")
-	render, err := tmplBox.String(file)
-	if err != nil {
-		panic(err)
-	}
-	t := template.New("message")
-	t.Funcs(template.FuncMap{
-		"js": func(html string) template.JS {
-			return template.JS(html)
-		},
-		"safe": func(html string) template.HTML {
-			return template.HTML(html)
-		},
-	})
-	t, _ = t.Parse(nav)
-	t.Parse(slack)
-	t.Parse(render)
-	return t
-}
-
-func UsersHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("viewing user")
-	session, _ := store.Get(r, cookieKey)
-	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+	if !auth {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	tmpl := Parse("users.html")
+	vars := mux.Vars(r)
+	service, _ := SelectService(StringInt(vars["id"]))
+	ExecuteResponse(w, r, "service.html", service)
+}
+
+func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}) {
+	nav, _ := tmplBox.String("nav.html")
+	render, err := tmplBox.String(file)
+	if err != nil {
+		panic(err)
+	}
+	t := template.New("message")
+	t.Funcs(template.FuncMap{
+		"js": func(html string) template.JS {
+			return template.JS(html)
+		},
+		"safe": func(html string) template.HTML {
+			return template.HTML(html)
+		},
+		"Auth": func() bool {
+			return IsAuthenticated(r)
+		},
+		"VERSION": func() string {
+			return VERSION
+		},
+	})
+	t, _ = t.Parse(nav)
+	t.Parse(render)
+	t.Execute(w, data)
+}
+
+func UsersHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 	users, _ := SelectAllUsers()
-	tmpl.Execute(w, users)
+	ExecuteResponse(w, r, "users.html", users)
+}
+
+func UsersDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	vars := mux.Vars(r)
+	id, _ := strconv.Atoi(vars["id"])
+	user, _ := SelectUser(int64(id))
+
+	users, _ := SelectAllUsers()
+	if len(users) == 1 {
+		http.Redirect(w, r, "/users", http.StatusSeeOther)
+		return
+	}
+	user.Delete()
+	http.Redirect(w, r, "/users", http.StatusSeeOther)
 }

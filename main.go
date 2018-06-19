@@ -1,14 +1,12 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/GeertJohan/go.rice"
 	"github.com/go-yaml/yaml"
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/plugin"
-	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 	"io"
 	"io/ioutil"
@@ -20,7 +18,6 @@ import (
 )
 
 var (
-	db         *sql.DB
 	configs    *Config
 	core       *Core
 	store      *sessions.CookieStore
@@ -93,114 +90,6 @@ func DownloadFile(filepath string, url string) error {
 	return nil
 }
 
-func SelectSettings(p plugin.Info) map[string]string {
-
-	data := make(map[string]string)
-	var tableInput []string
-
-	for _, v := range p.Form {
-		val := fmt.Sprintf("%v", v.InputName)
-		tableInput = append(tableInput, val)
-	}
-
-	ins := strings.Join(tableInput, ", ")
-
-	sql := fmt.Sprintf("SELECT %v FROM settings_%v LIMIT 1", ins, p.Name)
-	rows, err := db.Query(sql)
-	if err != nil {
-		fmt.Println("SQL ERROR: ", err)
-		return map[string]string{}
-	}
-
-	count := len(p.Form)
-	valuePtrs := make([]interface{}, count)
-	values := make([]interface{}, count)
-
-	for rows.Next() {
-
-		for i, _ := range p.Form {
-			valuePtrs[i] = &values[i]
-		}
-
-		err = rows.Scan(valuePtrs...)
-		if err != nil {
-			panic(err)
-		}
-
-		for i, col := range p.Form {
-
-			val := values[i]
-
-			b, _ := val.([]byte)
-
-			realVal := string(b)
-
-			//col.ChangeVal(realVal)
-
-			fmt.Println(col.Value, realVal)
-
-			data[col.InputName] = realVal
-		}
-
-	}
-
-	return data
-}
-
-func CreateSettingsTable(p plugin.Info) string {
-	var tableValues []string
-	tableValues = append(tableValues, "plugin text")
-	tableValues = append(tableValues, "enabled bool")
-	for _, v := range p.Form {
-		tb := fmt.Sprintf("%v %v", v.InputName, v.InputType)
-		tableValues = append(tableValues, tb)
-	}
-	vals := strings.Join(tableValues, ", ")
-	out := fmt.Sprintf("CREATE TABLE settings_%v (%v);", p.Name, vals)
-	smtp, _ := db.Prepare(out)
-	_, _ = smtp.Exec()
-	InitalSettings(p)
-	return out
-}
-
-func InitalSettings(p plugin.Info) {
-	var tableValues []string
-	var tableInput []string
-
-	tableValues = append(tableValues, "plugin")
-	tableInput = append(tableInput, fmt.Sprintf("'%v'", p.Name))
-
-	tableValues = append(tableValues, "enabled")
-	tableInput = append(tableInput, "false")
-
-	for _, v := range p.Form {
-		val := fmt.Sprintf("'%v'", v.Value)
-		tableValues = append(tableValues, v.InputName)
-		tableInput = append(tableInput, val)
-	}
-
-	vals := strings.Join(tableValues, ",")
-	ins := strings.Join(tableInput, ",")
-	sql := fmt.Sprintf("INSERT INTO settings_%v(%v) VALUES(%v);", p.Name, vals, ins)
-	smtp, _ := db.Prepare(sql)
-	_, _ = smtp.Exec()
-}
-
-func UpdateSettings(p plugin.Info, data map[string]string) {
-	var tableInput []string
-
-	for _, v := range p.Form {
-		newValue := data[v.InputName]
-		val := fmt.Sprintf("%v='%v'", v.InputName, newValue)
-		tableInput = append(tableInput, val)
-	}
-
-	ins := strings.Join(tableInput, ", ")
-	sql := fmt.Sprintf("UPDATE settings_%v SET %v WHERE plugin='%v';", p.Name, ins, p.Name)
-	smtp, _ := db.Prepare(sql)
-	_, _ = smtp.Exec()
-}
-
 //func DownloadPlugin(name string) {
 //	plugin := SelectPlugin(name)
 //	var _, err = os.Stat("plugins/" + plugin.Namespace)
@@ -234,7 +123,6 @@ func UpdateSettings(p plugin.Info, data map[string]string) {
 
 func main() {
 	var err error
-	VERSION = "1.1.1"
 	fmt.Printf("Starting Statup v%v\n", VERSION)
 	RenderBoxes()
 	configs, err = LoadConfig()
@@ -270,8 +158,7 @@ func mainProcess() {
 }
 
 func throw(err error) {
-	panic(err)
-	fmt.Println(err)
+	fmt.Println("ERROR: ", err)
 	os.Exit(1)
 }
 
@@ -317,11 +204,11 @@ func LoadPlugins() {
 			continue
 		}
 
-		plugActions.OnLoad()
-
 		allPlugins = append(allPlugins, plugActions)
 		core.Plugins = append(core.Plugins, plugActions.GetInfo())
 	}
+
+	OnLoad(dbSession)
 
 	fmt.Printf("Loaded %v Plugins\n", len(allPlugins))
 

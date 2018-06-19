@@ -8,14 +8,19 @@
     <link rel="stylesheet" href="/css/base.css">
     <script src="/js/Chart.bundle.min.js"></script>
 
-    <title>{{.Project}} Status</title>
+    <title>{{.Core.Name}} Status</title>
 </head>
 <body>
 
-<h1 class="text-center mb-4 mt-sm-3">{{.Project}}</h1>
+
+<h1 class="text-center mb-4 mt-sm-3">{{.Core.Name}}</h1>
+
+
+    {{ if .Core.Description }}
+        <h5 class="text-center mb-1 mt-sm-2">{{ .Core.Description }}</h5>
+    {{ end }}
 
 <div class="container">
-
 
     <div class="col-12 mb-5">
 
@@ -72,7 +77,7 @@
 
                         <canvas id="service_{{ .Id }}" width="400" height="120"></canvas>
 
-                         {{ range .Failures }}
+                         {{ range .LimitedFailures }}
                             <blockquote class="blockquote text-right mt-3">
                                 <p class="mb-0">{{.ParseError}}</p>
                                 <footer class="blockquote-footer">Reported <cite title="Source Title">{{.Ago}}</cite></footer>
@@ -89,7 +94,10 @@
 </div>
 
 <div class="footer text-center">
-    <a href="https://statup.io" target="_blank">Created with Statup.io</a> | <a href="/dashboard">Dashboard</a>
+     {{ if .Core.Footer }}
+        {{ safe .Core.Footer }}
+     {{ end }}
+    <a href="https://statup.io" target="_blank">Statup made with ❤️</a> | <a href="/dashboard">Dashboard</a>
 </div>
 
 <script>
@@ -151,6 +159,14 @@ var chartdata = new Chart(ctx, {
 });
 {{ end }}
 </script>
+
+
+    {{ if .Core.Style }}
+        <style>
+         {{ safe .Core.Style }}
+        </style>
+     {{ end }}
+
     <script src="/js/jquery-3.3.1.slim.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
 </body>

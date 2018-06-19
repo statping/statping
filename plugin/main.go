@@ -3,7 +3,6 @@ package plugin
 import (
 	"fmt"
 	"net/http"
-	"time"
 	"upper.io/db.v3/lib/sqlbuilder"
 )
 
@@ -13,6 +12,10 @@ import (
 //            v0.1
 //
 //       https://statup.io
+//
+//
+// An expandable plugin framework that will still
+// work even if there's an update or addition.
 //
 
 var (
@@ -34,56 +37,22 @@ type PluginInfo struct {
 
 type PluginActions interface {
 	GetInfo() Info
-	SetInfo(map[string]string) Info
+	SetInfo(map[string]interface{}) Info
 	Routes() []Routing
-	OnSave(map[string]string)
-	OnFailure(*Service)
-	OnSuccess(*Service)
-	OnSettingsSaved(map[string]string)
-	OnNewUser(*User)
-	OnNewService(*Service)
-	OnUpdatedService(*Service)
-	OnDeletedService(*Service)
-	OnInstall()
-	OnUninstall()
+	OnSave(map[string]interface{})
+	OnFailure(map[string]interface{})
+	OnSuccess(map[string]interface{})
+	OnSettingsSaved(map[string]interface{})
+	OnNewUser(map[string]interface{})
+	OnNewService(map[string]interface{})
+	OnUpdatedService(map[string]interface{})
+	OnDeletedService(map[string]interface{})
+	OnInstall(map[string]interface{})
+	OnUninstall(map[string]interface{})
+	OnBeforeRequest(map[string]interface{})
+	OnAfterRequest(map[string]interface{})
 	OnShutdown()
-	OnLoad()
-	OnBeforeRequest()
-	OnAfterRequest()
-}
-
-type User struct {
-	Id       int64
-	Username string
-	Password string
-	Email    string
-}
-
-type Service struct {
-	Id             int64
-	Name           string
-	Domain         string
-	Expected       string
-	ExpectedStatus int
-	Interval       int
-	Method         string
-	Port           int
-	CreatedAt      time.Time
-	Data           string
-	Online         bool
-	Latency        float64
-	Online24Hours  float32
-	AvgResponse    string
-	TotalUptime    string
-	Failures       []*Failure
-}
-
-type Failure struct {
-	Id        int
-	Issue     string
-	Service   int64
-	CreatedAt time.Time
-	Ago       string
+	OnLoad(sqlbuilder.Database)
 }
 
 type Routing struct {
@@ -95,13 +64,4 @@ type Routing struct {
 type Info struct {
 	Name        string
 	Description string
-	Form        []*FormElement
-}
-
-type FormElement struct {
-	Name        string
-	Description string
-	InputName   string
-	InputType   string
-	Value       string
 }

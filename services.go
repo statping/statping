@@ -4,7 +4,6 @@ import (
 	"crypto/sha1"
 	"encoding/json"
 	"fmt"
-	"github.com/hunterlong/statup/plugin"
 	"math/rand"
 	"strconv"
 	"time"
@@ -31,11 +30,10 @@ type Service struct {
 	AvgResponse    string     `json:"avg_response"`
 	TotalUptime    string     `json:"uptime"`
 	Failures       []*Failure `json:"failures"`
-	plugin.Service
 }
 
-func SelectService(id int64) (Service, error) {
-	var service Service
+func SelectService(id int64) (*Service, error) {
+	var service *Service
 	col := dbSession.Collection("services")
 	res := col.Find("id", id)
 	err := res.One(&service)
@@ -107,8 +105,7 @@ func (s *Service) GraphData() string {
 		d = append(d, o)
 	}
 	data, _ := json.Marshal(d)
-	s.Data = string(data)
-	return s.Data
+	return string(data)
 }
 
 func (s *Service) AvgUptime() string {
@@ -135,11 +132,22 @@ func (u *Service) Delete() error {
 	col := dbSession.Collection("services")
 	res := col.Find("id", u.Id)
 	err := res.Delete()
+	OnDeletedService(u)
 	return err
+}
+
+func (u *Service) DeleteFailures() {
+	var fails []*Failure
+	col := dbSession.Collection("failures")
+	col.Find("service", u.Id).All(&fails)
+	for _, fail := range fails {
+		fail.Delete()
+	}
 }
 
 func (u *Service) Update() {
 
+	OnUpdateService(u)
 }
 
 func (u *Service) Create() (int64, error) {
@@ -150,6 +158,7 @@ func (u *Service) Create() (int64, error) {
 	if uuid == nil {
 		return 0, err
 	}
+	OnNewService(u)
 	return uuid.(int64), err
 }
 

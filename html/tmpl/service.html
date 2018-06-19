@@ -12,10 +12,9 @@
 </head>
 <body>
 
-
 <div class="container">
 
-{{if .Auth}}
+{{if Auth}}
     {{template "nav"}}
 {{end}}
     <div class="row">
@@ -24,8 +23,8 @@
 
             <div class="col-12 mb-4">
 
-                        <h3 class="mt-2">{{ .Service.Name }}
-                        {{if .Service.Online}}
+                        <h3 class="mt-2">{{ .Name }}
+                        {{if .Online }}
                             <span class="badge online_badge float-right">ONLINE</span>
                         {{ else }}
                             <span class="badge offline_badge float-right">OFFLINE</span>
@@ -34,24 +33,24 @@
                         <div class="row stats_area mt-5 mb-5">
 
                             <div class="col-4">
-                                <span class="lg_number">{{.Service.Online24}}%</span>
+                                <span class="lg_number">{{.Online24}}%</span>
                                 Online last 24 Hours
                             </div>
 
                             <div class="col-4">
-                                <span class="lg_number">{{.Service.AvgTime}}ms</span>
+                                <span class="lg_number">{{.AvgTime}}ms</span>
                                 Average Response
                             </div>
 
                             <div class="col-4">
-                                <span class="lg_number">{{.Service.AvgUptime}}%</span>
+                                <span class="lg_number">{{.AvgUptime}}%</span>
                                 Total Uptime
                             </div>
                         </div>
 
                         <canvas id="service" width="400" height="120"></canvas>
 
-                    {{ range .Service.Failures }}
+                    {{ range .Failures }}
                         <blockquote class="blockquote text-right mt-3">
                             <p class="mb-0">{{.ParseError}}</p>
                             <footer class="blockquote-footer">Reported <cite title="Source Title">{{.Ago}}</cite></footer>
@@ -63,52 +62,53 @@
         </div>
 
 
-{{if .Auth}}
+{{if Auth}}
         <div class="col-12">
 
             <h3>Edit Service</h3>
 
-            <form action="/service/{{.Service.Id}}" method="POST">
+            <form action="/service/{{.Id}}" method="POST">
                 <div class="form-group row">
                     <label for="inputEmail3" class="col-sm-4 col-form-label">Service Name</label>
                     <div class="col-sm-8">
-                        <input type="text" name="name" class="form-control" value="{{.Service.Name}}" id="inputEmail3">
+                        <input type="text" name="name" class="form-control" value="{{.Name}}" id="inputEmail3">
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="inputPassword3" class="col-sm-4 col-form-label">Application Endpoint (URL)</label>
                     <div class="col-sm-8">
-                        <input type="text" name="domain" class="form-control" value="{{.Service.Domain}}" id="inputPassword3">
+                        <input type="text" name="domain" class="form-control" value="{{.Domain}}" id="inputPassword3">
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="inputPassword3" class="col-sm-4 col-form-label">Expected Response (Regex)</label>
                     <div class="col-sm-8">
-                        <input type="text" name="expected" class="form-control" value="{{.Service.Expected}}" id="inputPassword3">
+                        <input type="text" name="expected" class="form-control" value="{{.Expected}}" id="inputPassword3">
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="inputPassword3" class="col-sm-4 col-form-label">Expected Status Code</label>
                     <div class="col-sm-8">
-                        <input type="number" name="expected_status" class="form-control" value="{{.Service.ExpectedStatus}}" id="inputPassword3">
+                        <input type="number" name="expected_status" class="form-control" value="{{.ExpectedStatus}}" id="inputPassword3">
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="inputPassword3" class="col-sm-4 col-form-label">HTTP Method</label>
                     <div class="col-sm-8">
-                        <input type="text" name="method" class="form-control" value="{{.Service.Method}}" id="inputPassword3">
+                        <input type="text" name="method" class="form-control" value="{{.Method}}" id="inputPassword3">
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="inputPassword3" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
                     <div class="col-sm-8">
-                        <input type="number" name="interval" class="form-control" value="{{.Service.Interval}}" id="inputPassword3">
+                        <input type="number" name="interval" class="form-control" value="{{.Interval}}" id="inputPassword3">
                     </div>
                 </div>
                 <div class="form-group row">
                     <div class="col-sm-10">
                         <a class="btn btn-primary">Test</a>
                         <button type="submit" class="btn btn-success">Update Service</button>
+                        <a href="/service/{{ .Id }}/delete_failures" class="btn btn-danger">Delete All Failures</a>
                     </div>
                 </div>
             </form>
@@ -116,6 +116,13 @@
         </div>
 {{end}}
 
+
+    {{ range .Failures }}
+        <blockquote class="blockquote text-right mt-3">
+            <p class="mb-0">{{.ParseError}}</p>
+            <footer class="blockquote-footer">Reported <cite title="Source Title">{{.Ago}}</cite></footer>
+        </blockquote>
+    {{ end }}
 
     </div>
 </div>
@@ -129,7 +136,7 @@
         data: {
             datasets: [{
                 label: 'Response Time (Milliseconds)',
-                data: {{js .Service.GraphData}},
+                data: {{js .GraphData}},
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',

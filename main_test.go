@@ -8,7 +8,6 @@ import (
 )
 
 func TestInit(t *testing.T) {
-	VERSION = "1.1.1"
 	RenderBoxes()
 	os.Remove("./statup.db")
 	Router()
@@ -26,6 +25,7 @@ func TestMySQLMakeConfig(t *testing.T) {
 		"This is a test of Statup.io!",
 		"admin",
 		"admin",
+		nil,
 	}
 	err := config.Save()
 	assert.Nil(t, err)
@@ -64,6 +64,7 @@ func TestSqliteMakeConfig(t *testing.T) {
 		"This is a test of Statup.io!",
 		"admin",
 		"admin",
+		nil,
 	}
 	err := config.Save()
 	assert.Nil(t, err)
@@ -93,6 +94,7 @@ func TestPostgresMakeConfig(t *testing.T) {
 		"This is a test of Statup.io!",
 		"admin",
 		"admin",
+		nil,
 	}
 	err := config.Save()
 	assert.Nil(t, err)

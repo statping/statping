@@ -11,6 +11,8 @@ type Core struct {
 	Config       string `db:"config"`
 	ApiKey       string `db:"api_key"`
 	ApiSecret    string `db:"api_secret"`
+	Style        string `db:"style"`
+	Footer       string `db:"footer"`
 	Version      string `db:"version"`
 	Plugins      []plugin.Info
 	Repos        []PluginJSON
