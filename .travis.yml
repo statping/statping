@@ -46,13 +46,7 @@ before_install:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then travis_wait 30 docker pull karalabe/xgo-latest; fi
 
 after_success:
-  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-  - export REPO=hunterlong/statup
-  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
-  - docker build -f Dockerfile -t $REPO:$TAG .
-  - docker tag $REPO:$COMMIT $REPO:$TAG
-  - docker tag $REPO:$COMMIT $REPO:$VERSION
-  - docker push $REPO
+  - curl -H "Content-Type: application/json" --data '{"source_type": "Tag", "source_name": "v'+$VERSION+'"}' -X POST $DOCKER
 
 before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
