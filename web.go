@@ -132,7 +132,7 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	port, _ := strconv.Atoi(r.PostForm.Get("port"))
 	checkType := r.PostForm.Get("check_type")
 
-	service := Service{
+	service := &Service{
 		Name:           name,
 		Domain:         domain,
 		Method:         method,

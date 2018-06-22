@@ -146,10 +146,11 @@ func (u *Service) Update() {
 func (u *Service) Create() (int64, error) {
 	u.CreatedAt = time.Now()
 	uuid, err := serviceCol().Insert(u)
-	services, _ = SelectAllServices()
 	if uuid == nil {
 		return 0, err
 	}
+	u.Id = uuid.(int64)
+	services = append(services, u)
 	OnNewService(u)
 	return uuid.(int64), err
 }
