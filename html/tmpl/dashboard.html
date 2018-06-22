@@ -44,14 +44,18 @@
 
         {{ range .Services }}
 
-                {{$name := .Name}}
-
-                {{ range .Failures }}
-                    <blockquote class="blockquote text-left mt-3">
-                        <p class="mb-0">{{$name}}</p>
-                        <p class="mb-0">{{.ParseError}}</p>
-                        <footer class="blockquote-footer">Reported <cite title="Source Title">{{.Ago}}</cite></footer>
-                    </blockquote>
+                {{ if .Failures }}
+                    <div class="list-group mt-5">
+                    {{ range .Failures }}
+                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{.ParseError}}</h5>
+                                <small>Reported {{.Ago}}</small>
+                            </div>
+                            <p class="mb-1">{{.Issue}}</p>
+                        </a>
+                    {{ end }}
+                    </div>
                 {{ end }}
 
 

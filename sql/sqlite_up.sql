@@ -46,5 +46,14 @@ CREATE TABLE failures (
     created_at TIMESTAMP
 );
 
+CREATE TABLE checkins (
+    id SERIAL PRIMARY KEY,
+    service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    check_interval integer,
+    api text,
+    created_at TIMESTAMP
+);
+
 CREATE INDEX idx_hits ON hits(service);
 CREATE INDEX idx_failures ON failures(service);
+CREATE INDEX idx_checkins ON checkins(service);

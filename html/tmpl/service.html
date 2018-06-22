@@ -18,16 +18,14 @@
     {{template "nav"}}
 {{end}}
 
-    <div class="col-12">
-
             <div class="col-12 mb-4">
 
-                        <h3 class="mt-2">{{ .Name }}
+                        <h4 class="mt-2">{{ .Name }}
                         {{if .Online }}
                             <span class="badge online_badge float-right">ONLINE</span>
                         {{ else }}
                             <span class="badge offline_badge float-right">OFFLINE</span>
-                        {{end}}</h3>
+                        {{end}}</h4>
 
                         <div class="row stats_area mt-5 mb-5">
 
@@ -59,6 +57,42 @@
             </div>
 
 
+        <div class="col-12">
+
+            <h3>Service Checkins</h3>
+
+            {{ range .Checkins }}
+
+                    <div class="col-12 mt-3">
+
+                        <h5>Check #{{.Id}} <span class="badge online_badge float-right">Checked in {{.Ago}}</span></h5>
+
+                        <input type="text" class="form-control" value="https://domainhere.com/api/checkin/{{.Api}}">
+
+
+                    </div>
+
+            {{ end }}
+
+            <form action="/service/{{.Id}}/checkin" method="POST">
+            <div class="form-group row">
+                <label for="service_name" class="col-sm-4 col-form-label">Check Interval (in seconds)</label>
+                <div class="col-sm-8">
+                    <input type="number" name="name" class="form-control" id="checkin_interval" value="30" placeholder="Name">
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-success">Save Checkin</button>
+                </div>
+            </div>
+            </form>
+
+
+        </div>
+
+
+
 
 {{if Auth}}
         <div class="col-12">
@@ -82,8 +116,8 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="service_url" class="col-sm-4 col-form-label">Application Endpoint (URL)</label>
-                    <div class="col-8">
+                    <label for="service_url" class="col-sm-12 col-form-label">Application Endpoint (URL)</label>
+                    <div class="col-12">
                         <input type="text" name="domain" class="form-control" id="service_url" value="{{.Domain}}" placeholder="https://google.com">
                     </div>
                 </div>
@@ -132,15 +166,21 @@
 {{end}}
 
 
-    {{ range .Failures }}
-        <blockquote class="blockquote text-right mt-3">
-            <p class="mb-0">{{.ParseError}}</p>
-            <footer class="blockquote-footer">Reported <cite title="Source Title">{{.Ago}}</cite></footer>
-        </blockquote>
+    {{ if .LimitedFailures }}
+        <div class="list-group mt-5">
+        {{ range .LimitedFailures }}
+            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{.ParseError}}</h5>
+                    <small>Reported {{.Ago}}</small>
+                </div>
+                <p class="mb-1">{{.Issue}}</p>
+            </a>
+        {{ end }}
+        </div>
     {{ end }}
 
     </div>
-</div>
 
 {{template "footer"}}
 

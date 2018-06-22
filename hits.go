@@ -38,7 +38,7 @@ func (s *Service) Hits() ([]Hit, error) {
 
 func (s *Service) LimitedHits() ([]Hit, error) {
 	var hits []Hit
-	col := hitCol().Find("service", s.Id).Limit(256).OrderBy("-id")
+	col := hitCol().Find("service", s.Id).Limit(1056).OrderBy("-id")
 	err := col.All(&hits)
 	return hits, err
 }

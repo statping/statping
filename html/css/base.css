@@ -1,15 +1,14 @@
 HTML,BODY {
     background-color: #efefef;
-    margin: 40px 0;
 }
 
 .container {
     padding-top: 20px;
     padding-bottom: 20px;
+    max-width: 860px;
 }
 
 .navbar {
-    margin-top: -50px;
     margin-bottom: 30px;
 }
 
@@ -94,7 +93,8 @@ HTML,BODY {
 @media (max-width: 767px) {
 
     .container {
-        padding: 0px;
+        margin-top: 0 !important;
+        padding: 0 !important;
     }
 
     .navbar {

@@ -23,29 +23,18 @@
 
 <div class="col-12 mb-5">
 
-    {{ if .Core.AllOnline }}
-        <div class="alert alert-success mt-2 mb-2" role="alert">
-            All services are online and operational!
-        </div>
-    {{ else }}
-        <div class="alert alert-danger mt-2 mb-2" role="alert">
-            There is an offline service!
-        </div>
-    {{ end }}
-
     <div class="list-group online_list">
     {{ range .Services }}
-        <a href="#" class="list-group-item list-group-item-action {{if .Online}}{{ end }}">
+        <a href="#" class="list-group-item list-group-item-action {{if not .Online}}bg-danger text-white{{ end }}">
         {{ .Name }}
         {{if .Online}}
             <span class="badge online_badge float-right">ONLINE</span>
         {{ else }}
-            <span class="badge offline_badge float-right">OFFLINE</span>
+            <span class="badge bg-white text-black-50 float-right">OFFLINE</span>
         {{end}}
         </a>
     {{ end }}
     </div>
-
 </div>
 
 
@@ -69,17 +58,17 @@
 
                 <div class="row stats_area mt-5 mb-5">
 
-                            <div class="col-md-4 col-sm-12">
+                            <div class="col-4">
                                 <span class="lg_number">{{.Online24}}%</span>
                                 Online last 24 Hours
                             </div>
 
-                            <div class="col-md-4 col-sm-6">
+                            <div class="col-4">
                                 <span class="lg_number">{{.AvgTime}}ms</span>
                                 Average Response
                             </div>
 
-                            <div class="col-md-4 col-sm-6">
+                            <div class="col-4">
                                 <span class="lg_number">{{.AvgUptime}}%</span>
                                 Total Uptime
                             </div>
@@ -98,6 +87,9 @@
                                 <p class="mb-1">{{.Issue}}</p>
                             </a>
                          {{ end }}
+
+                            <span class="text-right">{{ .TotalFailures }} Total Failures</span>
+
                         </div>
                     {{ end }}
 
@@ -124,20 +116,10 @@ var chartdata = new Chart(ctx, {
             label: 'Response Time (Milliseconds)',
             data: {{js .GraphData}},
             backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
+                'rgba(47, 206, 30, 0.92)'
             ],
             borderColor: [
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
+                'rgb(47, 171, 34)'
             ],
             borderWidth: 1
         }]

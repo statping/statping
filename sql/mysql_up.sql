@@ -47,3 +47,12 @@ CREATE TABLE failures (
     INDEX (id, service),
     FOREIGN KEY (service) REFERENCES services(id)
 );
+CREATE TABLE checkins (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    service INTEGER NOT NULL,
+    check_interval integer,
+    api text,
+    created_at TIMESTAMP,
+    INDEX (id, service),
+    FOREIGN KEY (service) REFERENCES services(id)
+);

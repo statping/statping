@@ -39,6 +39,7 @@ func Router() *mux.Router {
 	r.Handle("/service/{id}/delete", http.HandlerFunc(ServicesDeleteHandler))
 	r.Handle("/service/{id}/badge.svg", http.HandlerFunc(ServicesBadgeHandler))
 	r.Handle("/service/{id}/delete_failures", http.HandlerFunc(ServicesDeleteFailuresHandler)).Methods("GET")
+	r.Handle("/service/{id}/checkin", http.HandlerFunc(CheckinCreateUpdateHandler)).Methods("POST")
 	r.Handle("/users", http.HandlerFunc(UsersHandler)).Methods("GET")
 	r.Handle("/users", http.HandlerFunc(CreateUserHandler)).Methods("POST")
 	r.Handle("/users/{id}/delete", http.HandlerFunc(UsersDeleteHandler)).Methods("GET")
@@ -49,6 +50,7 @@ func Router() *mux.Router {
 	r.Handle("/help", http.HandlerFunc(HelpHandler))
 
 	r.Handle("/api", http.HandlerFunc(ApiIndexHandler))
+	r.Handle("/api/checkin/{api}", http.HandlerFunc(ApiCheckinHandler))
 	r.Handle("/api/services", http.HandlerFunc(ApiAllServicesHandler))
 	r.Handle("/api/services/{id}", http.HandlerFunc(ApiServiceHandler)).Methods("GET")
 	r.Handle("/api/services/{id}", http.HandlerFunc(ApiServiceUpdateHandler)).Methods("POST")
@@ -333,6 +335,25 @@ func HelpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ExecuteResponse(w, r, "help.html", nil)
+}
+
+func CheckinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	vars := mux.Vars(r)
+	interval := StringInt(r.PostForm.Get("interval"))
+	service, _ := SelectService(StringInt(vars["id"]))
+	checkin := &Checkin{
+		Service:  service.Id,
+		Interval: interval,
+		Api:      NewSHA1Hash(18),
+	}
+	checkin.Create()
+	fmt.Println(checkin.Create())
+	ExecuteResponse(w, r, "service.html", service)
 }
 
 func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {

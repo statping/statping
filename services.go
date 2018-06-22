@@ -31,6 +31,7 @@ type Service struct {
 	AvgResponse    string     `json:"avg_response"`
 	TotalUptime    string     `json:"uptime"`
 	Failures       []*Failure `json:"failures"`
+	Checkins       []*Checkin `json:"checkins"`
 }
 
 func serviceCol() db.Collection {
@@ -41,6 +42,7 @@ func SelectService(id int64) (*Service, error) {
 	var service *Service
 	res := serviceCol().Find("id", id)
 	err := res.One(&service)
+	service.Checkins = service.SelectAllCheckins()
 	return service, err
 }
 
@@ -48,15 +50,10 @@ func SelectAllServices() ([]*Service, error) {
 	var services []*Service
 	col := serviceCol().Find()
 	err := col.All(&services)
+	for _, s := range services {
+		s.Checkins = s.SelectAllCheckins()
+	}
 	return services, err
-}
-
-func (s *Service) FormatData() *Service {
-	s.GraphData()
-	s.AvgUptime()
-	s.Online24()
-	s.AvgTime()
-	return s
 }
 
 func (s *Service) AvgTime() float64 {

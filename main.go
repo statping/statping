@@ -150,7 +150,7 @@ func mainProcess() {
 		fmt.Println("Core database was not found, Statup is not setup yet.")
 		RunHTTPServer()
 	}
-	go CheckServices()
+	CheckServices()
 	if !setupMode {
 		LoadPlugins()
 		RunHTTPServer()

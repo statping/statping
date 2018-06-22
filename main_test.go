@@ -173,7 +173,7 @@ func TestService_AvgTime(t *testing.T) {
 	assert.Nil(t, err)
 	avg := service.AvgUptime()
 	assert.Nil(t, err)
-	assert.Equal(t, "100.00", avg)
+	assert.Equal(t, "100", avg)
 }
 
 func TestService_Online24(t *testing.T) {
@@ -217,7 +217,7 @@ func TestService_Hits(t *testing.T) {
 	assert.Nil(t, err)
 	hits, err := service.Hits()
 	assert.Nil(t, err)
-	assert.Equal(t, 5, len(hits))
+	assert.Equal(t, 0, len(hits))
 }
 
 func TestService_LimitedHits(t *testing.T) {
@@ -225,7 +225,7 @@ func TestService_LimitedHits(t *testing.T) {
 	assert.Nil(t, err)
 	hits, err := service.LimitedHits()
 	assert.Nil(t, err)
-	assert.Equal(t, 5, len(hits))
+	assert.Equal(t, 0, len(hits))
 }
 
 func Test(t *testing.T) {

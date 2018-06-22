@@ -12,6 +12,7 @@ func CheckServices() {
 	services, _ = SelectAllServices()
 	for _, v := range services {
 		obj := v
+		go obj.StartCheckins()
 		go obj.CheckQueue()
 	}
 }
