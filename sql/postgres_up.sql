@@ -32,6 +32,13 @@ CREATE TABLE services (
     created_at TIMESTAMP
 );
 
+CREATE TABLE checkins (
+    id SERIAL PRIMARY KEY,
+    service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    check_interval integer,
+    created_at TIMESTAMP
+);
+
 CREATE TABLE hits (
     id SERIAL PRIMARY KEY,
     service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -42,6 +49,7 @@ CREATE TABLE hits (
 CREATE TABLE failures (
     id SERIAL PRIMARY KEY,
     issue text,
+    method text,
     service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
     created_at TIMESTAMP WITHOUT TIME zone
 );

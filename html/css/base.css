@@ -4,16 +4,12 @@ HTML,BODY {
 }
 
 .container {
-    max-width: 790px;
-    background-color: white;
-    padding: 50px;
-    border-radius: 7px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 .navbar {
-    margin-left: -50px;
     margin-top: -50px;
-    width: 790px;
     margin-bottom: 30px;
 }
 
@@ -54,7 +50,7 @@ HTML,BODY {
 }
 
 .online_list {
-    font-size: 1.5rem;
+
 }
 
 .footer {
@@ -90,16 +86,12 @@ HTML,BODY {
     overflow: hidden;
 }
 
-.card-body H3 A {
-    color: #424242;
+.card-body H4 A {
+    color: #239e07;
+    text-decoration: none;
 }
 
 @media (max-width: 767px) {
-
-    HTML,BODY {
-        background-color: #efefef;
-        margin: 0px 0;
-    }
 
     .container {
         padding: 0px;
@@ -117,7 +109,7 @@ HTML,BODY {
     }
 
     .lg_number {
-        font-size: 22pt;
+        font-size: 1.2rem;
     }
 
 

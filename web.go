@@ -7,10 +7,10 @@ import (
 	"github.com/gorilla/sessions"
 	"html/template"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
-	"regexp"
 )
 
 var (
@@ -98,9 +98,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		session.Save(r, w)
 		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 	} else {
-		w.WriteHeader(502)
-		w.Header().Set("Content-Type", "plain/text")
-		fmt.Fprintln(w, "bad")
+		ExecuteResponse(w, r, "login.html", auth)
 	}
 }
 
@@ -129,8 +127,8 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	expected := r.PostForm.Get("expected")
 	status, _ := strconv.Atoi(r.PostForm.Get("expected_status"))
 	interval, _ := strconv.Atoi(r.PostForm.Get("interval"))
-
-	fmt.Println(r.PostForm)
+	port, _ := strconv.Atoi(r.PostForm.Get("port"))
+	checkType := r.PostForm.Get("check_type")
 
 	service := Service{
 		Name:           name,
@@ -139,9 +137,9 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 		Expected:       expected,
 		ExpectedStatus: status,
 		Interval:       interval,
+		Type:           checkType,
+		Port:           port,
 	}
-
-	fmt.Println(service)
 
 	_, err := service.Create()
 	if err != nil {
@@ -285,7 +283,7 @@ func PluginsHandler(w http.ResponseWriter, r *http.Request) {
 	for _, p := range allPlugins {
 		fields := structs.Map(p.GetInfo())
 
-		pluginFields = append(pluginFields, PluginSelect{p.GetInfo().Name, p.GetForm(),fields})
+		pluginFields = append(pluginFields, PluginSelect{p.GetInfo().Name, p.GetForm(), fields})
 	}
 
 	core.PluginFields = pluginFields
@@ -294,7 +292,7 @@ func PluginsHandler(w http.ResponseWriter, r *http.Request) {
 
 type PluginSelect struct {
 	Plugin string
-	Form string
+	Form   string
 	Params map[string]interface{}
 }
 
@@ -375,6 +373,7 @@ func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
 
 func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}) {
 	nav, _ := tmplBox.String("nav.html")
+	footer, _ := tmplBox.String("footer.html")
 	render, err := tmplBox.String(file)
 	if err != nil {
 		panic(err)
@@ -398,6 +397,7 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		},
 	})
 	t, _ = t.Parse(nav)
+	t, _ = t.Parse(footer)
 	t.Parse(render)
 	t.Execute(w, data)
 }
@@ -430,8 +430,6 @@ func UsersDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	user.Delete()
 	http.Redirect(w, r, "/users", http.StatusSeeOther)
 }
-
-
 
 func UnderScoreString(str string) string {
 

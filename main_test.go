@@ -168,14 +168,6 @@ func TestService_Check(t *testing.T) {
 	assert.Equal(t, true, out.Online)
 }
 
-func TestService_Hits(t *testing.T) {
-	service, err := SelectService(1)
-	assert.Nil(t, err)
-	hits, err := service.Hits()
-	assert.Nil(t, err)
-	assert.Equal(t, 0, len(hits))
-}
-
 func TestService_AvgTime(t *testing.T) {
 	service, err := SelectService(1)
 	assert.Nil(t, err)
@@ -193,7 +185,6 @@ func TestService_Online24(t *testing.T) {
 }
 
 func TestService_GraphData(t *testing.T) {
-	t.SkipNow()
 	service, err := SelectService(1)
 	assert.Nil(t, err)
 	data := service.GraphData()
@@ -219,6 +210,22 @@ func TestBadService_Check(t *testing.T) {
 	service, err := SelectService(4)
 	assert.Nil(t, err)
 	assert.Equal(t, "Github Failing Check", service.Name)
+}
+
+func TestService_Hits(t *testing.T) {
+	service, err := SelectService(1)
+	assert.Nil(t, err)
+	hits, err := service.Hits()
+	assert.Nil(t, err)
+	assert.Equal(t, 5, len(hits))
+}
+
+func TestService_LimitedHits(t *testing.T) {
+	service, err := SelectService(1)
+	assert.Nil(t, err)
+	hits, err := service.LimitedHits()
+	assert.Nil(t, err)
+	assert.Equal(t, 5, len(hits))
 }
 
 func Test(t *testing.T) {

@@ -26,6 +26,15 @@ func (c *Core) Update() (*Core, error) {
 	return c, nil
 }
 
+func (c Core) AllOnline() bool {
+	for _, s := range services {
+		if !s.Online {
+			return false
+		}
+	}
+	return true
+}
+
 func SelectCore() (*Core, error) {
 	var core Core
 	err := dbSession.Collection("core").Find().One(&core)

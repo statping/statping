@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"strconv"
 	"time"
+	"upper.io/db.v3"
 )
 
 var (
@@ -32,17 +33,20 @@ type Service struct {
 	Failures       []*Failure `json:"failures"`
 }
 
+func serviceCol() db.Collection {
+	return dbSession.Collection("services")
+}
+
 func SelectService(id int64) (*Service, error) {
 	var service *Service
-	col := dbSession.Collection("services")
-	res := col.Find("id", id)
+	res := serviceCol().Find("id", id)
 	err := res.One(&service)
 	return service, err
 }
 
 func SelectAllServices() ([]*Service, error) {
 	var services []*Service
-	col := dbSession.Collection("services").Find()
+	col := serviceCol().Find()
 	err := col.All(&services)
 	return services, err
 }
@@ -95,7 +99,7 @@ type GraphJson struct {
 
 func (s *Service) GraphData() string {
 	var d []GraphJson
-	hits, _ := s.Hits()
+	hits, _ := s.LimitedHits()
 	for _, h := range hits {
 		val := h.CreatedAt
 		o := GraphJson{
@@ -112,7 +116,7 @@ func (s *Service) AvgUptime() string {
 	failed, _ := s.TotalFailures()
 	total, _ := s.TotalHits()
 	if failed == 0 {
-		s.TotalUptime = "100.00"
+		s.TotalUptime = "100"
 		return s.TotalUptime
 	}
 	if total == 0 {
@@ -125,35 +129,26 @@ func (s *Service) AvgUptime() string {
 		percent = 0
 	}
 	s.TotalUptime = fmt.Sprintf("%0.2f", percent)
+	if s.TotalUptime == "100.00" {
+		s.TotalUptime = "100"
+	}
 	return s.TotalUptime
 }
 
 func (u *Service) Delete() error {
-	col := dbSession.Collection("services")
-	res := col.Find("id", u.Id)
+	res := serviceCol().Find("id", u.Id)
 	err := res.Delete()
 	OnDeletedService(u)
 	return err
 }
 
-func (u *Service) DeleteFailures() {
-	var fails []*Failure
-	col := dbSession.Collection("failures")
-	col.Find("service", u.Id).All(&fails)
-	for _, fail := range fails {
-		fail.Delete()
-	}
-}
-
 func (u *Service) Update() {
-
 	OnUpdateService(u)
 }
 
 func (u *Service) Create() (int64, error) {
 	u.CreatedAt = time.Now()
-	col := dbSession.Collection("services")
-	uuid, err := col.Insert(u)
+	uuid, err := serviceCol().Insert(u)
 	services, _ = SelectAllServices()
 	if uuid == nil {
 		return 0, err

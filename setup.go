@@ -102,6 +102,15 @@ func SetupResponseError(w http.ResponseWriter, r *http.Request, a interface{}) {
 	ExecuteResponse(w, r, "setup.html", a)
 }
 
+func (c *DbConfig) Clean() *DbConfig {
+	if os.Getenv("DB_PORT") != "" {
+		if c.DbConn == "postgres" {
+			c.DbHost = c.DbHost + ":" + os.Getenv("DB_PORT")
+		}
+	}
+	return c
+}
+
 func (c *DbConfig) Save() error {
 	var err error
 	config, err := os.Create("config.yml")

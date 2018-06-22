@@ -13,31 +13,41 @@
 <body>
 
 
+<div class="container col-md-7 col-sm-12 mt-2">
+
 <h1 class="text-center mb-4 mt-sm-3">{{.Core.Name}}</h1>
 
-
     {{ if .Core.Description }}
-        <h5 class="text-center mb-1 mt-sm-2">{{ .Core.Description }}</h5>
+        <h5 class="text-center mb-5 text-muted">{{ .Core.Description }}</h5>
     {{ end }}
 
-<div class="container">
+<div class="col-12 mb-5">
 
-    <div class="col-12 mb-5">
-
-        <div class="list-group online_list">
-            {{ range .Services }}
-                <a href="#" class="list-group-item list-group-item-action {{if .Online}}{{ end }}">
-                    {{ .Name }}
-                    {{if .Online}}
-                        <span class="badge online_badge float-right">ONLINE</span>
-                    {{ else }}
-                        <span class="badge offline_badge float-right">OFFLINE</span>
-                    {{end}}
-                </a>
-            {{ end }}
+    {{ if .Core.AllOnline }}
+        <div class="alert alert-success mt-2 mb-2" role="alert">
+            All services are online and operational!
         </div>
+    {{ else }}
+        <div class="alert alert-danger mt-2 mb-2" role="alert">
+            There is an offline service!
+        </div>
+    {{ end }}
 
+    <div class="list-group online_list">
+    {{ range .Services }}
+        <a href="#" class="list-group-item list-group-item-action {{if .Online}}{{ end }}">
+        {{ .Name }}
+        {{if .Online}}
+            <span class="badge online_badge float-right">ONLINE</span>
+        {{ else }}
+            <span class="badge offline_badge float-right">OFFLINE</span>
+        {{end}}
+        </a>
+    {{ end }}
     </div>
+
+</div>
+
 
     <div class="col-12">
 
@@ -50,26 +60,26 @@
                             <div class="progress-bar {{if .Online24Hours}} bg-success {{else}} bg-danger {{end}}" role="progressbar" style="width: {{.Online24Hours}}%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
 
-                        <h3 class="mt-4"><a href="/service/{{.Id}}">{{ .Name }}</a>
+                        <h4 class="mt-4"><a href="/service/{{.Id}}">{{ .Name }}</a>
                     {{if .Online}}
                         <span class="badge online_badge float-right">ONLINE</span>
                     {{ else }}
                         <span class="badge offline_badge float-right">OFFLINE</span>
-                    {{end}}</h3>
+                    {{end}}</h4>
 
                 <div class="row stats_area mt-5 mb-5">
 
-                            <div class="col-4">
+                            <div class="col-md-4 col-sm-12">
                                 <span class="lg_number">{{.Online24}}%</span>
                                 Online last 24 Hours
                             </div>
 
-                            <div class="col-4">
+                            <div class="col-md-4 col-sm-6">
                                 <span class="lg_number">{{.AvgTime}}ms</span>
                                 Average Response
                             </div>
 
-                            <div class="col-4">
+                            <div class="col-md-4 col-sm-6">
                                 <span class="lg_number">{{.AvgUptime}}%</span>
                                 Total Uptime
                             </div>
@@ -77,12 +87,19 @@
 
                         <canvas id="service_{{ .Id }}" width="400" height="120"></canvas>
 
+                    {{ if .LimitedFailures }}
+                        <div class="list-group mt-5">
                          {{ range .LimitedFailures }}
-                            <blockquote class="blockquote text-right mt-3">
-                                <p class="mb-0">{{.ParseError}}</p>
-                                <footer class="blockquote-footer">Reported <cite title="Source Title">{{.Ago}}</cite></footer>
-                            </blockquote>
-                        {{ end }}
+                            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{{.ParseError}}</h5>
+                                    <small>Reported {{.Ago}}</small>
+                                </div>
+                                <p class="mb-1">{{.Issue}}</p>
+                            </a>
+                         {{ end }}
+                        </div>
+                    {{ end }}
 
                     </div>
                 </div>
@@ -93,15 +110,11 @@
 
 </div>
 
-<div class="footer text-center">
-     {{ if .Core.Footer }}
-        {{ safe .Core.Footer }}
-     {{ end }}
-    <a href="https://statup.io" target="_blank">Statup made with ❤️</a> | <a href="/dashboard">Dashboard</a>
-</div>
+{{template "footer"}}
 
 <script>
 {{ range .Services }}
+{{if .GraphData}}
 var ctx = document.getElementById("service_{{.Id}}").getContext('2d');
 
 var chartdata = new Chart(ctx, {
@@ -157,6 +170,7 @@ var chartdata = new Chart(ctx, {
         }
     }
 });
+{{ end }}
 {{ end }}
 </script>
 

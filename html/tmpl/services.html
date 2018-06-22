@@ -12,13 +12,11 @@
 <body>
 
 
-<div class="container">
+<div class="container col-md-7 col-sm-12 mt-2 bg-light">
 
 {{template "nav"}}
 
-    <div class="row">
-
-        <div class="col-12">
+    <div class="col-12">
 
         <h3>Services</h3>
 
@@ -48,53 +46,66 @@
                 </tbody>
             </table>
 
-        </div>
-
-
-        <div class="col-12">
 
             <h3>Create Service</h3>
 
             <form action="/services" method="POST">
                 <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm-4 col-form-label">Service Name</label>
+                    <label for="service_name" class="col-sm-4 col-form-label">Service Name</label>
                     <div class="col-sm-8">
-                        <input type="text" name="name" class="form-control" id="inputEmail3" placeholder="Name">
+                        <input type="text" name="name" class="form-control" id="service_name" placeholder="Name">
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="inputPassword3" class="col-sm-4 col-form-label">Application Endpoint (URL)</label>
+                    <label for="service_type" class="col-sm-4 col-form-label">Service Check Type</label>
                     <div class="col-sm-8">
-                        <input type="text" name="domain" class="form-control" id="inputPassword3" placeholder="https://google.com">
+                        <select name="check_type" class="form-control" id="service_type">
+                            <option value="http" selected>HTTP Service</option>
+                            <option value="tcp">TCP Service</option>
+                        </select>
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="inputPassword3" class="col-sm-4 col-form-label">Expected Response (Regex)</label>
-                    <div class="col-sm-8">
-                        <input type="text" name="expected" class="form-control" id="inputPassword3" placeholder="string">
+                    <label for="service_url" class="col-sm-4 col-form-label">Application Endpoint (URL)</label>
+                    <div class="col-8">
+                        <input type="text" name="domain" class="form-control" id="service_url" placeholder="https://google.com">
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="inputPassword3" class="col-sm-4 col-form-label">Expected Status Code</label>
+                    <label for="service_check_type" class="col-sm-4 col-form-label">Service Check Type</label>
                     <div class="col-sm-8">
-                        <input type="number" name="expected_status" class="form-control" id="inputPassword3" placeholder="200">
+                        <select name="method" class="form-control" id="service_check_type">
+                            <option value="GET" selected>GET</option>
+                            <option value="POST">POST</option>
+                        </select>
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="inputPassword3" class="col-sm-4 col-form-label">HTTP Method</label>
+                    <label for="service_response" class="col-sm-4 col-form-label">Expected Response (Regex)</label>
                     <div class="col-sm-8">
-                        <input type="text" name="method" class="form-control" id="inputPassword3" placeholder="GET">
+                        <textarea name="expected" class="form-control" id="service_response" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="inputPassword3" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
+                    <label for="service_response_code" class="col-sm-4 col-form-label">Expected Status Code</label>
                     <div class="col-sm-8">
-                        <input type="number" name="interval" class="form-control" id="inputPassword3" placeholder="10">
+                        <input type="number" name="expected_status" class="form-control" id="service_response_code" value="200">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="service_port" class="col-sm-4 col-form-label">TCP Port</label>
+                    <div class="col-sm-8">
+                        <input type="number" name="port" class="form-control" id="service_port" placeholder="8080">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="service_interval" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
+                    <div class="col-sm-8">
+                        <input type="number" name="interval" class="form-control" id="service_interval" placeholder="10">
                     </div>
                 </div>
                 <div class="form-group row">
                     <div class="col-sm-10">
-                        <a class="btn btn-primary">Test</a>
                         <button type="submit" class="btn btn-success">Create Service</button>
                     </div>
                 </div>
@@ -104,8 +115,7 @@
 
     </div>
 
-
-</div>
+{{template "footer"}}
 
 <script src="/js/jquery-3.3.1.slim.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>

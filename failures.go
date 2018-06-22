@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/ararog/timeago"
 	"time"
 )
 
@@ -9,7 +10,6 @@ type Failure struct {
 	Issue     string    `db:"issue"`
 	Service   int64     `db:"service"`
 	CreatedAt time.Time `db:"created_at"`
-	Ago       string
 }
 
 func (s *Service) CreateFailure(data FailureData) (int64, error) {
@@ -29,16 +29,30 @@ func (s *Service) CreateFailure(data FailureData) (int64, error) {
 
 func (s *Service) SelectAllFailures() ([]*Failure, error) {
 	var fails []*Failure
-	col := dbSession.Collection("failures").Find("service", s.Id)
+	col := dbSession.Collection("failures").Find("service", s.Id).OrderBy("-id")
 	err := col.All(&fails)
 	return fails, err
 }
 
+func (u *Service) DeleteFailures() {
+	var fails []*Failure
+	col := dbSession.Collection("failures")
+	col.Find("service", u.Id).All(&fails)
+	for _, fail := range fails {
+		fail.Delete()
+	}
+}
+
 func (s *Service) LimitedFailures() []*Failure {
 	var fails []*Failure
-	col := dbSession.Collection("failures").Find("service", s.Id).Limit(10)
-	col.All(&fails)
+	col := dbSession.Collection("failures").Find("service", s.Id)
+	col.OrderBy("-id").Limit(10).All(&fails)
 	return fails
+}
+
+func (f *Failure) Ago() string {
+	got, _ := timeago.TimeAgoWithTime(time.Now(), f.CreatedAt)
+	return got
 }
 
 func (f *Failure) Delete() error {

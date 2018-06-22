@@ -1,0 +1,8 @@
+{{ define "footer"}}
+    <div class="footer text-center">
+    {{ if .Core.Footer }}
+            {{ safe .Core.Footer }}
+         {{ end }}
+        <a href="https://statup.io" target="_blank">Statup made with ❤️</a> | <a href="/dashboard">Dashboard</a>
+    </div>
+{{ end }}

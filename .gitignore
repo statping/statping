@@ -4,3 +4,5 @@ config.yml
 statup.db
 plugins/*.so
 data
+build
+vendor

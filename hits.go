@@ -1,6 +1,9 @@
 package main
 
-import "time"
+import (
+	"time"
+	"upper.io/db.v3"
+)
 
 type Hit struct {
 	Id        int       `db:"id,omitempty"`
@@ -9,14 +12,17 @@ type Hit struct {
 	CreatedAt time.Time `db:"created_at"`
 }
 
+func hitCol() db.Collection {
+	return dbSession.Collection("hits")
+}
+
 func (s *Service) CreateHit(d HitData) (int64, error) {
 	h := Hit{
 		Service:   s.Id,
 		Latency:   d.Latency,
 		CreatedAt: time.Now(),
 	}
-	col := dbSession.Collection("hits")
-	uuid, err := col.Insert(h)
+	uuid, err := hitCol().Insert(h)
 	if uuid == nil {
 		return 0, err
 	}
@@ -25,20 +31,27 @@ func (s *Service) CreateHit(d HitData) (int64, error) {
 
 func (s *Service) Hits() ([]Hit, error) {
 	var hits []Hit
-	col := dbSession.Collection("hits").Find("service", s.Id)
+	col := hitCol().Find("service", s.Id).OrderBy("-id")
+	err := col.All(&hits)
+	return hits, err
+}
+
+func (s *Service) LimitedHits() ([]Hit, error) {
+	var hits []Hit
+	col := hitCol().Find("service", s.Id).Limit(256).OrderBy("-id")
 	err := col.All(&hits)
 	return hits, err
 }
 
 func (s *Service) SelectHitsGroupBy(group string) ([]Hit, error) {
 	var hits []Hit
-	col := dbSession.Collection("hits").Find("service", s.Id)
+	col := hitCol().Find("service", s.Id)
 	err := col.All(&hits)
 	return hits, err
 }
 
 func (s *Service) TotalHits() (uint64, error) {
-	col := dbSession.Collection("hits").Find("service", s.Id)
+	col := hitCol().Find("service", s.Id)
 	amount, err := col.Count()
 	return amount, err
 }

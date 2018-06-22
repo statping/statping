@@ -69,5 +69,5 @@ type Routing struct {
 type Info struct {
 	Name        string
 	Description string
-	Form 		string
+	Form        string
 }

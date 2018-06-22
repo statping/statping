@@ -12,11 +12,15 @@
 <body>
 
 
-<div class="container">
-
-    <div class="row">
+<div class="container col-md-7 col-sm-12 mt-2 bg-light">
 
         <div class="col-12">
+
+        {{ if not . }}
+            <div class="alert alert-danger" role="alert">
+                Incorrect login information submitted, try again.
+            </div>
+        {{ end }}
 
             <form action="/dashboard" method="POST">
                 <div class="form-group row">
@@ -51,10 +55,9 @@
 
         </div>
 
-    </div>
-
-
 </div>
+
+{{template "footer"}}
 
 <script src="/js/jquery-3.3.1.slim.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
