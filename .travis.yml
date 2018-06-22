@@ -17,7 +17,7 @@ services:
   - mongodb
 
 env:
-  - VERSION=0.161
+  - VERSION=0.17
 
 matrix:
   allow_failures:
@@ -46,7 +46,13 @@ before_install:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then travis_wait 30 docker pull karalabe/xgo-latest; fi
 
 after_success:
-  - curl -s -X POST $DOCKER > /dev/null
+  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+  - export REPO=sebestblog/travis-demo
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - docker build -f Dockerfile -t $REPO:$VERSION .
+  - docker tag $REPO:$COMMIT $REPO:$TAG
+  - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $REPO
 
 before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
