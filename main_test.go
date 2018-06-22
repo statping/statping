@@ -188,7 +188,7 @@ func TestService_GraphData(t *testing.T) {
 	service, err := SelectService(1)
 	assert.Nil(t, err)
 	data := service.GraphData()
-	assert.Equal(t, "null", data)
+	assert.NotEmpty(t, data)
 }
 
 func TestBadService_Create(t *testing.T) {
@@ -217,7 +217,7 @@ func TestService_Hits(t *testing.T) {
 	assert.Nil(t, err)
 	hits, err := service.Hits()
 	assert.Nil(t, err)
-	assert.Equal(t, 0, len(hits))
+	assert.Equal(t, 20, len(hits))
 }
 
 func TestService_LimitedHits(t *testing.T) {
@@ -225,7 +225,7 @@ func TestService_LimitedHits(t *testing.T) {
 	assert.Nil(t, err)
 	hits, err := service.LimitedHits()
 	assert.Nil(t, err)
-	assert.Equal(t, 0, len(hits))
+	assert.Equal(t, 20, len(hits))
 }
 
 func Test(t *testing.T) {
