@@ -46,7 +46,7 @@ before_install:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then travis_wait 30 docker pull karalabe/xgo-latest; fi
 
 after_success:
-  - curl -H "Content-Type: application/json" --data '{"source_type": "Tag", "source_name": "v'+$VERSION+'"}' -X POST $DOCKER
+  - "curl -H 'Content-Type: application/json' --data '{\"source_type\": \"Tag\", \"source_name\": \"v1\"}' -X POST $DOCKER"
 
 before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
