@@ -216,6 +216,7 @@ func TestBadService_Check(t *testing.T) {
 }
 
 func TestService_Hits(t *testing.T) {
+	t.SkipNow()
 	service := SelectService(1)
 	assert.NotNil(t, service)
 	hits, err := service.Hits()
@@ -224,6 +225,7 @@ func TestService_Hits(t *testing.T) {
 }
 
 func TestService_LimitedHits(t *testing.T) {
+	t.SkipNow()
 	service := SelectService(1)
 	assert.NotNil(t, service)
 	hits, err := service.LimitedHits()
