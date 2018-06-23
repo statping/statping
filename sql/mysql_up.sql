@@ -46,6 +46,7 @@ CREATE TABLE hits (
 CREATE TABLE failures (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     issue text,
+    method text,
     service INTEGER NOT NULL,
     created_at TIMESTAMP,
     INDEX (id, service),
@@ -65,7 +66,7 @@ CREATE TABLE communication (
     method text,
     host text,
     port integer,
-    user text,
+    username text,
     password text,
     var1 text,
     var2 text,

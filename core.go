@@ -3,21 +3,23 @@ package main
 import (
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/plugin"
+	"github.com/hunterlong/statup/types"
 )
 
 type Core struct {
-	Name         string `db:"name"`
-	Description  string `db:"description"`
-	Config       string `db:"config"`
-	ApiKey       string `db:"api_key"`
-	ApiSecret    string `db:"api_secret"`
-	Style        string `db:"style"`
-	Footer       string `db:"footer"`
-	Domain       string `db:"domain"`
-	Version      string `db:"version"`
-	Plugins      []plugin.Info
-	Repos        []PluginJSON
-	PluginFields []PluginSelect
+	Name           string `db:"name"`
+	Description    string `db:"description"`
+	Config         string `db:"config"`
+	ApiKey         string `db:"api_key"`
+	ApiSecret      string `db:"api_secret"`
+	Style          string `db:"style"`
+	Footer         string `db:"footer"`
+	Domain         string `db:"domain"`
+	Version        string `db:"version"`
+	Plugins        []plugin.Info
+	Repos          []PluginJSON
+	PluginFields   []PluginSelect
+	Communications []*types.Communication
 }
 
 func (c *Core) Update() (*Core, error) {

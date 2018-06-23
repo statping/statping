@@ -8,6 +8,7 @@ import (
 type Failure struct {
 	Id        int       `db:"id,omitempty"`
 	Issue     string    `db:"issue"`
+	Method    string    `db:"method"`
 	Service   int64     `db:"service"`
 	CreatedAt time.Time `db:"created_at"`
 }

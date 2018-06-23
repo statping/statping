@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/go-yaml/yaml"
 	"github.com/hunterlong/statup/plugin"
+	"github.com/hunterlong/statup/types"
 	"net/http"
 	"os"
 	"strconv"
@@ -20,13 +21,14 @@ type DbConfig struct {
 	DbPort      int    `yaml:"port"`
 	Project     string `yaml:"-"`
 	Description string `yaml:"-"`
+	Domain      string `yaml:"-"`
 	Username    string `yaml:"-"`
 	Password    string `yaml:"-"`
-	Error       error
+	Error       error  `yaml:"-"`
 }
 
 func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
-	if core.ApiKey != "" {
+	if core != nil {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -42,6 +44,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	password := r.PostForm.Get("password")
 	sample := r.PostForm.Get("sample_data")
 	description := r.PostForm.Get("description")
+	domain := r.PostForm.Get("domain")
 
 	config := &DbConfig{
 		dbConn,
@@ -52,6 +55,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		dbPort,
 		project,
 		description,
+		domain,
 		username,
 		password,
 		nil,
@@ -97,12 +101,12 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func InsertDefaultComms() {
-	emailer := &Communication{
+	emailer := &types.Communication{
 		Method:    "email",
 		Removable: false,
 		Enabled:   false,
 	}
-	emailer.Create()
+	Create(emailer)
 }
 
 func DeleteConfig() {
@@ -166,6 +170,7 @@ func (c *DbConfig) Save() error {
 		[]plugin.Info{},
 		[]PluginJSON{},
 		[]PluginSelect{},
+		nil,
 	}
 
 	col := dbSession.Collection("core")

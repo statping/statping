@@ -23,6 +23,7 @@ func TestMySQLMakeConfig(t *testing.T) {
 		3306,
 		"Testing MYSQL",
 		"This is a test of Statup.io!",
+		"",
 		"admin",
 		"admin",
 		nil,
@@ -36,7 +37,7 @@ func TestMySQLMakeConfig(t *testing.T) {
 
 	err = DbConnection(configs.Connection)
 	assert.Nil(t, err)
-
+	InsertDefaultComms()
 }
 
 func TestInsertMysqlSample(t *testing.T) {
@@ -62,6 +63,7 @@ func TestSqliteMakeConfig(t *testing.T) {
 		5432,
 		"Testing SQLITE",
 		"This is a test of Statup.io!",
+		"",
 		"admin",
 		"admin",
 		nil,
@@ -75,6 +77,7 @@ func TestSqliteMakeConfig(t *testing.T) {
 
 	err = DbConnection(configs.Connection)
 	assert.Nil(t, err)
+	InsertDefaultComms()
 }
 
 func TestInsertSqliteSample(t *testing.T) {
@@ -92,6 +95,7 @@ func TestPostgresMakeConfig(t *testing.T) {
 		5432,
 		"Testing POSTGRES",
 		"This is a test of Statup.io!",
+		"",
 		"admin",
 		"admin",
 		nil,
@@ -105,6 +109,7 @@ func TestPostgresMakeConfig(t *testing.T) {
 
 	err = DbConnection(configs.Connection)
 	assert.Nil(t, err)
+	InsertDefaultComms()
 }
 
 func TestInsertPostgresSample(t *testing.T) {
@@ -130,8 +135,8 @@ func TestSelectCore(t *testing.T) {
 
 func TestUser_Create(t *testing.T) {
 	user := &User{
-		Username: "testuserhere",
-		Password: "password123",
+		Username: "admin",
+		Password: "admin",
 		Email:    "info@testuser.com",
 	}
 	id, err := user.Create()
@@ -215,7 +220,7 @@ func TestService_Hits(t *testing.T) {
 	assert.NotNil(t, service)
 	hits, err := service.Hits()
 	assert.Nil(t, err)
-	assert.Equal(t, 20, len(hits))
+	assert.Equal(t, 26, len(hits))
 }
 
 func TestService_LimitedHits(t *testing.T) {
@@ -223,7 +228,7 @@ func TestService_LimitedHits(t *testing.T) {
 	assert.NotNil(t, service)
 	hits, err := service.LimitedHits()
 	assert.Nil(t, err)
-	assert.Equal(t, 20, len(hits))
+	assert.Equal(t, 26, len(hits))
 }
 
 func Test(t *testing.T) {

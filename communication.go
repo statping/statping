@@ -1,77 +1,75 @@
 package main
 
-import "time"
-
-var (
-	Communications []*Communication
+import (
+	"github.com/hunterlong/statup/comms"
+	"github.com/hunterlong/statup/types"
+	"time"
 )
 
-type Communication struct {
-	Id        int64     `db:"id,omitempty" json:"id"`
-	Method    string    `db:"method" json:"method"`
-	Host      string    `db:"host" json:"host"`
-	Port      int64     `db:"port" json:"port"`
-	User      string    `db:"user" json:"user"`
-	Password  string    `db:"password" json:"-"`
-	Var1      string    `db:"var1" json:"var1"`
-	Var2      string    `db:"var2" json:"var2"`
-	ApiKey    string    `db:"api_key" json:"api_key"`
-	ApiSecret string    `db:"api_secret" json:"api_secret"`
-	Enabled   bool      `db:"enabled" json:"enabled"`
-	Limits    int64     `db:"limits" json:"limits"`
-	Removable bool      `db:"removable" json:"removable"`
-	CreatedAt time.Time `db:"created_at" json:"created_at"`
+func LoadDefaultCommunications() {
+	emailer := SelectCommunication(1)
+	comms.LoadMailer(emailer)
+	go comms.EmailerQueue()
 }
 
-func OnCommunicate() {
-	for _, c := range Communications {
+func LoadComms() {
+	for _, c := range core.Communications {
 		if c.Enabled {
-			c.Run()
+
 		}
 	}
 }
 
-func (c *Communication) Run() {
+func Run(c *types.Communication) {
 
+	sample := &types.Email{
+		To:      "info@socialeck.com",
+		Subject: "Test Email from Statup",
+	}
+
+	comms.AddEmail(sample)
 }
 
-func SelectAllCommunications() ([]*Communication, error) {
-	var c []*Communication
+func SelectAllCommunications() ([]*types.Communication, error) {
+	var c []*types.Communication
 	col := dbSession.Collection("communication").Find()
 	err := col.All(&c)
-	Communications = c
+	core.Communications = c
 	return c, err
 }
 
-func (c *Communication) Create() (int64, error) {
+func Create(c *types.Communication) (int64, error) {
 	c.CreatedAt = time.Now()
 	uuid, err := dbSession.Collection("communication").Insert(c)
+	if err != nil {
+		panic(err)
+	}
 	if uuid == nil {
 		return 0, err
 	}
 	c.Id = uuid.(int64)
-	Communications = append(Communications, c)
+	core.Communications = append(core.Communications, c)
 	return uuid.(int64), err
 }
 
-func (c *Communication) Disable() {
+func Disable(c *types.Communication) {
 	c.Enabled = false
-	c.Update()
+	Update(c)
 }
 
-func (c *Communication) Enable() {
+func Enable(c *types.Communication) {
 	c.Enabled = true
-	c.Update()
+	Update(c)
 }
 
-func (c *Communication) Update() *Communication {
+func Update(c *types.Communication) *types.Communication {
 	col := dbSession.Collection("communication").Find("id", c.Id)
 	col.Update(c)
 	return c
 }
 
-func SelectCommunication(id int64) *Communication {
-	for _, c := range Communications {
+func SelectCommunication(id int64) *types.Communication {
+	for _, c := range core.Communications {
 		if c.Id == id {
 			return c
 		}

@@ -23,7 +23,10 @@
 
             <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                 <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Settings</a>
-                <a class="nav-link" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false">Styling</a>
+                <a class="nav-link" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false">Styling</a>
+                {{ range .Communications }}
+                    <a class="nav-link text-uppercase" id="v-pills-{{ .Method }}-tab" data-toggle="pill" href="#v-pills-{{ .Method }}" role="tab" aria-controls="v-pills-{{ .Method }}" aria-selected="false">{{ .Method }}</a>
+                {{ end }}
                 <a class="nav-link" id="v-pills-browse-tab" data-toggle="pill" href="#v-pills-browse" role="tab" aria-controls="v-pills-home" aria-selected="false">Browse Plugins</a>
             {{ range .Plugins }}
                 <a class="nav-link text-capitalize" id="v-pills-{{underscore .Name}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Name}}" role="tab" aria-controls="v-pills-profile" aria-selected="false">{{.Name}}</a>
@@ -71,6 +74,48 @@
 
                     </form>
                 </div>
+
+            {{ range .Communications }}
+                <div class="tab-pane fade" id="v-pills-{{ .Method }}" role="tabpanel" aria-labelledby="v-pills-{{ .Method }}-tab">
+
+                    <form method="POST" action="/settings/{{ .Method }}">
+
+                        <div class="form-group">
+                            <label for="formGroupExampleInput">SMTP Host</label>
+                            <input type="text" name="host" class="form-control" value="{{ .Host }}" id="formGroupExampleInput" placeholder="Great Uptime">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="formGroupExampleInput">SMTP Username</label>
+                            <input type="text" name="username" class="form-control" value="{{ .Username }}" id="formGroupExampleInput" placeholder="Great Uptime">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="formGroupExampleInput">SMTP Password</label>
+                            <input type="password" name="password" class="form-control" value="{{ .Password }}" id="formGroupExampleInput">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="formGroupExampleInput">SMTP Port</label>
+                            <input type="number" name="port" class="form-control" value="{{ .Port }}" id="formGroupExampleInput" placeholder="587">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="formGroupExampleInput">Outgoing Email Address</label>
+                            <input type="text" name="address" class="form-control" value="{{ .Var1 }}" id="formGroupExampleInput" placeholder="noreply@domain.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="formGroupExampleInput">Limit Emails per Hour</label>
+                            <input type="number" name="limit" class="form-control" value="30" id="formGroupExampleInput" placeholder="noreply@domain.com">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">Save Email Settings</button>
+
+                    </form>
+
+                </div>
+                    {{ end }}
 
                 <div class="tab-pane fade" id="v-pills-browse" role="tabpanel" aria-labelledby="v-pills-browse-tab">
                 {{ range .Repos }}

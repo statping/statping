@@ -61,3 +61,7 @@ func DbConnection(dbType string) error {
 	OnLoad(dbSession)
 	return err
 }
+
+func Backup() {
+
+}

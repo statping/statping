@@ -46,6 +46,7 @@ CREATE TABLE hits (
 CREATE TABLE failures (
     id SERIAL PRIMARY KEY,
     issue text,
+    method text,
     service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
     created_at TIMESTAMP
 );
@@ -63,7 +64,7 @@ CREATE TABLE communication (
     method text,
     host text,
     port integer,
-    user text,
+    username text,
     password text,
     var1 text,
     var2 text,

@@ -64,7 +64,7 @@ CREATE TABLE communication (
     method text,
     host text,
     port integer,
-    user text,
+    username text,
     password text,
     var1 text,
     var2 text,
@@ -75,7 +75,6 @@ CREATE TABLE communication (
     limits integer,
     created_at TIMESTAMP
 );
-
 
 CREATE INDEX idx_hits ON hits(service);
 CREATE INDEX idx_failures ON failures(service);

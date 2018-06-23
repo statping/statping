@@ -5,6 +5,8 @@ import (
 	"github.com/fatih/structs"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/hunterlong/statup/comms"
+	"github.com/hunterlong/statup/types"
 	"html/template"
 	"net/http"
 	"regexp"
@@ -45,6 +47,7 @@ func Router() *mux.Router {
 	r.Handle("/users/{id}/delete", http.HandlerFunc(UsersDeleteHandler)).Methods("GET")
 	r.Handle("/settings", http.HandlerFunc(PluginsHandler)).Methods("GET")
 	r.Handle("/settings", http.HandlerFunc(SaveSettingsHandler)).Methods("POST")
+	r.Handle("/settings/email", http.HandlerFunc(SaveEmailSettingsHandler)).Methods("POST")
 	r.Handle("/plugins/download/{name}", http.HandlerFunc(PluginsDownloadHandler))
 	r.Handle("/plugins/{name}/save", http.HandlerFunc(PluginSavedHandler)).Methods("POST")
 	r.Handle("/help", http.HandlerFunc(HelpHandler))
@@ -150,7 +153,7 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SetupHandler(w http.ResponseWriter, r *http.Request) {
-	if core.ApiKey != "" {
+	if core != nil {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -245,6 +248,34 @@ func IsAuthenticated(r *http.Request) bool {
 	return session.Values["authenticated"].(bool)
 }
 
+func SaveEmailSettingsHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	emailer := SelectCommunication(1)
+
+	r.ParseForm()
+	emailer.Host = r.PostForm.Get("host")
+	emailer.Username = r.PostForm.Get("username")
+	emailer.Password = r.PostForm.Get("password")
+	emailer.Port = int(StringInt(r.PostForm.Get("port")))
+	emailer.Var1 = r.PostForm.Get("address")
+	Update(emailer)
+
+	sample := &types.Email{
+		To:       "info@socialeck.com",
+		Subject:  "Sample Email",
+		Template: "templates/error.html",
+		Body:     "okkokkok",
+	}
+
+	comms.AddEmail(sample)
+
+	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+}
+
 func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	auth := IsAuthenticated(r)
 	if !auth {
@@ -290,6 +321,8 @@ func PluginsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	core.PluginFields = pluginFields
+	fmt.Println(core.Communications)
+
 	ExecuteResponse(w, r, "plugins.html", core)
 }
 

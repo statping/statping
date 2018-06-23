@@ -10,6 +10,8 @@ import (
 
 func CheckServices() {
 	services, _ = SelectAllServices()
+	core.Communications, _ = SelectAllCommunications()
+	LoadDefaultCommunications()
 	for _, v := range services {
 		obj := v
 		go obj.StartCheckins()
