@@ -1,4 +1,4 @@
-FROM golang:alpine
+FROM golang:1.10.3-alpine
 
 RUN apk update && apk add git g++
 
