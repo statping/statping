@@ -10,7 +10,7 @@ RUN go get -d -v
 RUN rice embed-go
 RUN go install
 
-RUN cp -r $GOPATH/src/github.com/hunterlong/statup/comm /app/
+RUN cp -r $GOPATH/src/github.com/hunterlong/statup/comms /app/
 WORKDIR /app
 VOLUME /app
 
