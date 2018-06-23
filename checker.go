@@ -18,13 +18,13 @@ func CheckServices() {
 }
 
 func (s *Service) CheckQueue() {
+	defer s.CheckQueue()
 	s.Check()
 	if s.Interval < 1 {
 		s.Interval = 1
 	}
 	fmt.Printf("   Service: %v | Online: %v | Latency: %v\n", s.Name, s.Online, s.Latency)
 	time.Sleep(time.Duration(s.Interval) * time.Second)
-	s.CheckQueue()
 }
 
 func (s *Service) Check() *Service {
