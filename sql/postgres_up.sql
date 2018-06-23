@@ -17,7 +17,7 @@ CREATE TABLE users (
     email text,
     api_key text,
     api_secret text,
-    admin bool,
+    administrator bool,
     created_at TIMESTAMP
 );
 

@@ -16,7 +16,7 @@ CREATE TABLE users (
     email text,
     api_key VARCHAR(50),
     api_secret VARCHAR(50),
-    admin bool,
+    administrator BOOL NOT NULL DEFAULT '0',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX (id)
 );
@@ -72,8 +72,8 @@ CREATE TABLE communication (
     var2 text,
     api_key text,
     api_secret text,
-    enabled boolean,
-    removable boolean,
+    enabled BOOL NOT NULL DEFAULT '0',
+    removable BOOL NOT NULL DEFAULT '0',
     limits integer,
     created_at TIMESTAMP
 );

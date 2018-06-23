@@ -220,7 +220,7 @@ func TestService_Hits(t *testing.T) {
 	assert.NotNil(t, service)
 	hits, err := service.Hits()
 	assert.Nil(t, err)
-	assert.Equal(t, 26, len(hits))
+	assert.Equal(t, 23, len(hits))
 }
 
 func TestService_LimitedHits(t *testing.T) {
@@ -228,7 +228,7 @@ func TestService_LimitedHits(t *testing.T) {
 	assert.NotNil(t, service)
 	hits, err := service.LimitedHits()
 	assert.Nil(t, err)
-	assert.Equal(t, 26, len(hits))
+	assert.Equal(t, 23, len(hits))
 }
 
 func Test(t *testing.T) {

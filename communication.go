@@ -48,7 +48,9 @@ func Create(c *types.Communication) (int64, error) {
 		return 0, err
 	}
 	c.Id = uuid.(int64)
-	core.Communications = append(core.Communications, c)
+	if core != nil {
+		core.Communications = append(core.Communications, c)
+	}
 	return uuid.(int64), err
 }
 

@@ -39,11 +39,12 @@ func (c Core) AllOnline() bool {
 }
 
 func SelectCore() (*Core, error) {
-	var core Core
-	err := dbSession.Collection("core").Find().One(&core)
+	var c *Core
+	err := dbSession.Collection("core").Find().One(&c)
 	if err != nil {
 		return nil, err
 	}
+	core = c
 	store = sessions.NewCookieStore([]byte(core.ApiSecret))
-	return &core, err
+	return core, err
 }
