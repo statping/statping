@@ -20,13 +20,13 @@ func ApiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 
 func ApiServiceHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	service, _ := SelectService(StringInt(vars["id"]))
+	service := SelectService(StringInt(vars["id"]))
 	json.NewEncoder(w).Encode(service)
 }
 
 func ApiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	service, _ := SelectService(StringInt(vars["id"]))
+	service := SelectService(StringInt(vars["id"]))
 
 	var s Service
 	decoder := json.NewDecoder(r.Body)

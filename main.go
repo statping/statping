@@ -6,6 +6,7 @@ import (
 	"github.com/GeertJohan/go.rice"
 	"github.com/go-yaml/yaml"
 	"github.com/gorilla/sessions"
+	"github.com/hunterlong/statup/comms"
 	"github.com/hunterlong/statup/plugin"
 	"golang.org/x/crypto/bcrypt"
 	"io"
@@ -124,6 +125,9 @@ func DownloadFile(filepath string, url string) error {
 func main() {
 	var err error
 	fmt.Printf("Starting Statup v%v\n", VERSION)
+
+	comms.NewMailer()
+
 	RenderBoxes()
 	configs, err = LoadConfig()
 	if err != nil {

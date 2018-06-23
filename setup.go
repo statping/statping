@@ -26,6 +26,10 @@ type DbConfig struct {
 }
 
 func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
+	if core.ApiKey != "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 	r.ParseForm()
 	dbHost := r.PostForm.Get("db_host")
 	dbUser := r.PostForm.Get("db_user")
@@ -77,8 +81,11 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	admin := &User{
 		Username: config.Username,
 		Password: config.Password,
+		Admin:    true,
 	}
 	admin.Create()
+
+	InsertDefaultComms()
 
 	if sample == "on" {
 		go LoadSampleData()
@@ -87,6 +94,15 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	time.Sleep(2 * time.Second)
 	mainProcess()
+}
+
+func InsertDefaultComms() {
+	emailer := &Communication{
+		Method:    "email",
+		Removable: false,
+		Enabled:   false,
+	}
+	emailer.Create()
 }
 
 func DeleteConfig() {
@@ -143,6 +159,7 @@ func (c *DbConfig) Save() error {
 		"config.yml",
 		NewSHA1Hash(5),
 		NewSHA1Hash(10),
+		"",
 		"",
 		"",
 		VERSION,

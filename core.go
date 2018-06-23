@@ -13,6 +13,7 @@ type Core struct {
 	ApiSecret    string `db:"api_secret"`
 	Style        string `db:"style"`
 	Footer       string `db:"footer"`
+	Domain       string `db:"domain"`
 	Version      string `db:"version"`
 	Plugins      []plugin.Info
 	Repos        []PluginJSON

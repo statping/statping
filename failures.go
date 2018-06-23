@@ -27,11 +27,11 @@ func (s *Service) CreateFailure(data FailureData) (int64, error) {
 	return uuid.(int64), err
 }
 
-func (s *Service) SelectAllFailures() ([]*Failure, error) {
+func (s *Service) SelectAllFailures() []*Failure {
 	var fails []*Failure
 	col := dbSession.Collection("failures").Find("service", s.Id).OrderBy("-id")
-	err := col.All(&fails)
-	return fails, err
+	col.All(&fails)
+	return fails
 }
 
 func (u *Service) DeleteFailures() {

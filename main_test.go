@@ -140,8 +140,8 @@ func TestUser_Create(t *testing.T) {
 }
 
 func TestOneService_Check(t *testing.T) {
-	service, err := SelectService(1)
-	assert.Nil(t, err)
+	service := SelectService(1)
+	assert.NotNil(t, service)
 	assert.Equal(t, "Google", service.Name)
 }
 
@@ -161,32 +161,30 @@ func TestService_Create(t *testing.T) {
 }
 
 func TestService_Check(t *testing.T) {
-	service, err := SelectService(2)
-	assert.Nil(t, err)
+	service := SelectService(2)
+	assert.NotNil(t, service)
 	assert.Equal(t, "Statup.io", service.Name)
 	out := service.Check()
 	assert.Equal(t, true, out.Online)
 }
 
 func TestService_AvgTime(t *testing.T) {
-	service, err := SelectService(1)
-	assert.Nil(t, err)
+	service := SelectService(1)
+	assert.NotNil(t, service)
 	avg := service.AvgUptime()
-	assert.Nil(t, err)
 	assert.Equal(t, "100", avg)
 }
 
 func TestService_Online24(t *testing.T) {
-	service, err := SelectService(1)
-	assert.Nil(t, err)
+	service := SelectService(1)
+	assert.NotNil(t, service)
 	online := service.Online24()
-	assert.Nil(t, err)
 	assert.Equal(t, float32(100), online)
 }
 
 func TestService_GraphData(t *testing.T) {
-	service, err := SelectService(1)
-	assert.Nil(t, err)
+	service := SelectService(1)
+	assert.NotNil(t, service)
 	data := service.GraphData()
 	assert.NotEmpty(t, data)
 }
@@ -207,22 +205,22 @@ func TestBadService_Create(t *testing.T) {
 }
 
 func TestBadService_Check(t *testing.T) {
-	service, err := SelectService(4)
-	assert.Nil(t, err)
+	service := SelectService(4)
+	assert.NotNil(t, service)
 	assert.Equal(t, "Github Failing Check", service.Name)
 }
 
 func TestService_Hits(t *testing.T) {
-	service, err := SelectService(1)
-	assert.Nil(t, err)
+	service := SelectService(1)
+	assert.NotNil(t, service)
 	hits, err := service.Hits()
 	assert.Nil(t, err)
 	assert.Equal(t, 20, len(hits))
 }
 
 func TestService_LimitedHits(t *testing.T) {
-	service, err := SelectService(1)
-	assert.Nil(t, err)
+	service := SelectService(1)
+	assert.NotNil(t, service)
 	hits, err := service.LimitedHits()
 	assert.Nil(t, err)
 	assert.Equal(t, 20, len(hits))

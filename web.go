@@ -48,7 +48,6 @@ func Router() *mux.Router {
 	r.Handle("/plugins/download/{name}", http.HandlerFunc(PluginsDownloadHandler))
 	r.Handle("/plugins/{name}/save", http.HandlerFunc(PluginSavedHandler)).Methods("POST")
 	r.Handle("/help", http.HandlerFunc(HelpHandler))
-
 	r.Handle("/api", http.HandlerFunc(ApiIndexHandler))
 	r.Handle("/api/checkin/{api}", http.HandlerFunc(ApiCheckinHandler))
 	r.Handle("/api/services", http.HandlerFunc(ApiAllServicesHandler))
@@ -151,6 +150,10 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SetupHandler(w http.ResponseWriter, r *http.Request) {
+	if core.ApiKey != "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 	ExecuteResponse(w, r, "setup.html", nil)
 }
 
@@ -209,10 +212,8 @@ func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	service, _ := SelectService(StringInt(vars["id"]))
-
+	service := SelectService(StringInt(vars["id"]))
 	service.Delete()
-	services, _ = SelectAllServices()
 	http.Redirect(w, r, "/services", http.StatusSeeOther)
 }
 
@@ -223,7 +224,7 @@ func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	service, _ := SelectService(StringInt(vars["id"]))
+	service := SelectService(StringInt(vars["id"]))
 
 	service.DeleteFailures()
 	services, _ = SelectAllServices()
@@ -345,7 +346,7 @@ func CheckinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	vars := mux.Vars(r)
 	interval := StringInt(r.PostForm.Get("interval"))
-	service, _ := SelectService(StringInt(vars["id"]))
+	service := SelectService(StringInt(vars["id"]))
 	checkin := &Checkin{
 		Service:  service.Id,
 		Interval: interval,
@@ -365,7 +366,7 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 func ServicesBadgeHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	service, _ := SelectService(StringInt(vars["id"]))
+	service := SelectService(StringInt(vars["id"]))
 
 	var badge []byte
 	if service.Online {
@@ -388,7 +389,7 @@ func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	service, _ := SelectService(StringInt(vars["id"]))
+	service := SelectService(StringInt(vars["id"]))
 	ExecuteResponse(w, r, "service.html", service)
 }
 

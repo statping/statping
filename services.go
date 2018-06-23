@@ -23,6 +23,7 @@ type Service struct {
 	Interval       int        `db:"check_interval" json:"check_interval"`
 	Type           string     `db:"check_type" json:"type"`
 	Method         string     `db:"method" json:"method"`
+	PostData       string     `db:"post_data" json:"post_data"`
 	Port           int        `db:"port" json:"port"`
 	CreatedAt      time.Time  `db:"created_at" json:"created_at"`
 	Online         bool       `json:"online"`
@@ -30,30 +31,34 @@ type Service struct {
 	Online24Hours  float32    `json:"24_hours_online"`
 	AvgResponse    string     `json:"avg_response"`
 	TotalUptime    string     `json:"uptime"`
+	OrderId        int64      `json:"order_id"`
 	Failures       []*Failure `json:"failures"`
 	Checkins       []*Checkin `json:"checkins"`
+	runRoutine     bool
 }
 
 func serviceCol() db.Collection {
 	return dbSession.Collection("services")
 }
 
-func SelectService(id int64) (*Service, error) {
-	var service *Service
-	res := serviceCol().Find("id", id)
-	err := res.One(&service)
-	service.Checkins = service.SelectAllCheckins()
-	return service, err
+func SelectService(id int64) *Service {
+	for _, s := range services {
+		if s.Id == id {
+			return s
+		}
+	}
+	return nil
 }
 
 func SelectAllServices() ([]*Service, error) {
-	var services []*Service
+	var srvcs []*Service
 	col := serviceCol().Find()
-	err := col.All(&services)
-	for _, s := range services {
+	err := col.All(&srvcs)
+	for _, s := range srvcs {
 		s.Checkins = s.SelectAllCheckins()
+		s.Failures = s.SelectAllFailures()
 	}
-	return services, err
+	return srvcs, err
 }
 
 func (s *Service) AvgTime() float64 {
@@ -132,9 +137,21 @@ func (s *Service) AvgUptime() string {
 	return s.TotalUptime
 }
 
+func (u *Service) RemoveArray() []*Service {
+	var srvcs []*Service
+	for _, s := range services {
+		if s.Id != u.Id {
+			srvcs = append(srvcs, s)
+		}
+	}
+	services = srvcs
+	return srvcs
+}
+
 func (u *Service) Delete() error {
 	res := serviceCol().Find("id", u.Id)
 	err := res.Delete()
+	u.RemoveArray()
 	OnDeletedService(u)
 	return err
 }
@@ -151,6 +168,7 @@ func (u *Service) Create() (int64, error) {
 	}
 	u.Id = uuid.(int64)
 	services = append(services, u)
+	go u.CheckQueue()
 	OnNewService(u)
 	return uuid.(int64), err
 }

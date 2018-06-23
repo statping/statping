@@ -6,6 +6,7 @@ CREATE TABLE core (
     api_secret text,
     style text,
     footer text,
+    domain text,
     version text
 );
 
@@ -16,6 +17,7 @@ CREATE TABLE users (
     email text,
     api_key text,
     api_secret text,
+    admin bool,
     created_at TIMESTAMP
 );
 
@@ -29,6 +31,8 @@ CREATE TABLE services (
     expected text,
     expected_status integer,
     check_interval integer,
+    post_data text,
+    order_id integer,
     created_at TIMESTAMP
 );
 
@@ -52,6 +56,23 @@ CREATE TABLE checkins (
     service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
     check_interval integer,
     api text,
+    created_at TIMESTAMP
+);
+
+CREATE TABLE communication (
+    id SERIAL PRIMARY KEY,
+    method text,
+    host text,
+    port integer,
+    user text,
+    password text,
+    var1 text,
+    var2 text,
+    api_key text,
+    api_secret text,
+    enabled boolean,
+    removable boolean,
+    limits integer,
     created_at TIMESTAMP
 );
 

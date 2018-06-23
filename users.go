@@ -12,6 +12,7 @@ type User struct {
 	Email     string    `db:"email" json:"-"`
 	ApiKey    string    `db:"api_key" json:"api_key"`
 	ApiSecret string    `db:"api_secret" json:"-"`
+	Admin     bool      `db:"admin" json:"admin"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 }
 
