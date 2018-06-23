@@ -23,6 +23,9 @@ type Que struct {
 }
 
 func AddEmail(email *types.Email) {
+	if emailQue == nil {
+		return
+	}
 	emailQue.Outgoing = append(emailQue.Outgoing, email)
 }
 
