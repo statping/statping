@@ -26,6 +26,7 @@ var (
 	cssBox     *rice.Box
 	jsBox      *rice.Box
 	tmplBox    *rice.Box
+	emailBox   *rice.Box
 	setupMode  bool
 	allPlugins []plugin.PluginActions
 )
@@ -152,6 +153,8 @@ func mainProcess() {
 		RunHTTPServer()
 	}
 	CheckServices()
+	core.Communications, _ = SelectAllCommunications()
+	LoadDefaultCommunications()
 	if !setupMode {
 		LoadPlugins()
 		RunHTTPServer()
@@ -221,6 +224,7 @@ func RenderBoxes() {
 	cssBox = rice.MustFindBox("html/css")
 	jsBox = rice.MustFindBox("html/js")
 	tmplBox = rice.MustFindBox("html/tmpl")
+	emailBox = rice.MustFindBox("html/emails")
 }
 
 func LoadConfig() (*Config, error) {

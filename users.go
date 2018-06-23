@@ -2,6 +2,7 @@ package main
 
 import (
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
 	"time"
 )
 
@@ -14,6 +15,19 @@ type User struct {
 	ApiSecret string    `db:"api_secret" json:"-"`
 	Admin     bool      `db:"administrator" json:"admin"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
+}
+
+func SessionUser(r *http.Request) *User {
+	session, _ := store.Get(r, cookieKey)
+	if session == nil {
+		return nil
+	}
+	uuid := session.Values["user_id"]
+	var user *User
+	col := dbSession.Collection("users")
+	res := col.Find("id", uuid)
+	res.One(&user)
+	return user
 }
 
 func SelectUser(id int64) (*User, error) {
@@ -40,8 +54,7 @@ func (u *User) Delete() error {
 
 func (u *User) Create() (int64, error) {
 	u.CreatedAt = time.Now()
-	password := HashPassword(u.Password)
-	u.Password = password
+	u.Password = HashPassword(u.Password)
 	u.ApiKey = NewSHA1Hash(5)
 	u.ApiSecret = NewSHA1Hash(10)
 	col := dbSession.Collection("users")

@@ -35,6 +35,9 @@ type Service struct {
 	Failures       []*Failure `json:"failures"`
 	Checkins       []*Checkin `json:"checkins"`
 	runRoutine     bool
+	LastResponse   string
+	LastStatusCode int
+	LastOnline     time.Time
 }
 
 func serviceCol() db.Collection {

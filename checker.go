@@ -10,8 +10,6 @@ import (
 
 func CheckServices() {
 	services, _ = SelectAllServices()
-	core.Communications, _ = SelectAllCommunications()
-	LoadDefaultCommunications()
 	for _, v := range services {
 		obj := v
 		go obj.StartCheckins()
@@ -42,18 +40,24 @@ func (s *Service) Check() *Service {
 		return s
 	}
 	defer response.Body.Close()
+	contents, _ := ioutil.ReadAll(response.Body)
 	if s.Expected != "" {
-		contents, _ := ioutil.ReadAll(response.Body)
 		match, _ := regexp.MatchString(s.Expected, string(contents))
 		if !match {
+			s.LastResponse = string(contents)
+			s.LastStatusCode = response.StatusCode
 			s.Failure(fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
 			return s
 		}
 	}
 	if s.ExpectedStatus != response.StatusCode {
+		s.LastResponse = string(contents)
+		s.LastStatusCode = response.StatusCode
 		s.Failure(fmt.Sprintf("HTTP Status Code %v did not match %v", response.StatusCode, s.ExpectedStatus))
 		return s
 	}
+	s.LastResponse = string(contents)
+	s.LastStatusCode = response.StatusCode
 	s.Online = true
 	s.Record(response)
 	return s
@@ -65,6 +69,7 @@ type HitData struct {
 
 func (s *Service) Record(response *http.Response) {
 	s.Online = true
+	s.LastOnline = time.Now()
 	data := HitData{
 		Latency: s.Latency,
 	}
@@ -82,5 +87,8 @@ func (s *Service) Failure(issue string) {
 		Issue: issue,
 	}
 	s.CreateFailure(data)
+
+	SendFailureEmail(s)
+
 	OnFailure(s)
 }

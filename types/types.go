@@ -24,5 +24,4 @@ type Email struct {
 	Subject  string
 	Template string
 	Data     interface{}
-	Body     string
 }

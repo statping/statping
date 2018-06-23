@@ -163,6 +163,20 @@
             </form>
 
         </div>
+
+<div class="col-12">
+    <h3>Last Response</h3>
+
+    <textarea class="form-control" readonly>{{ .LastResponse }}</textarea>
+
+    <div class="form-group row mt-2">
+        <label for="last_status_code" class="col-sm-3 col-form-label">Status Code</label>
+        <div class="col-sm-9">
+            <input type="text" id="last_status_code" class="form-control" value="{{ .LastStatusCode }}">
+        </div>
+    </div>
+
+</div>
 {{end}}
 
 

@@ -45,6 +45,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	sample := r.PostForm.Get("sample_data")
 	description := r.PostForm.Get("description")
 	domain := r.PostForm.Get("domain")
+	email := r.PostForm.Get("email")
 
 	config := &DbConfig{
 		dbConn,
@@ -85,6 +86,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	admin := &User{
 		Username: config.Username,
 		Password: config.Password,
+		Email:    email,
 		Admin:    true,
 	}
 	admin.Create()

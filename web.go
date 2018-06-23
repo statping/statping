@@ -5,7 +5,6 @@ import (
 	"github.com/fatih/structs"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"github.com/hunterlong/statup/comms"
 	"github.com/hunterlong/statup/types"
 	"html/template"
 	"net/http"
@@ -96,9 +95,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	username := r.PostForm.Get("username")
 	password := r.PostForm.Get("password")
-	_, auth := AuthUser(username, password)
+	user, auth := AuthUser(username, password)
 	if auth {
 		session.Values["authenticated"] = true
+		session.Values["user_id"] = user.Id
 		session.Save(r, w)
 		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 	} else {
@@ -265,13 +265,11 @@ func SaveEmailSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	Update(emailer)
 
 	sample := &types.Email{
-		To:       "info@socialeck.com",
+		To:       SessionUser(r).Email,
 		Subject:  "Sample Email",
-		Template: "templates/error.html",
-		Body:     "okkokkok",
+		Template: "error.html",
 	}
-
-	comms.AddEmail(sample)
+	AddEmail(sample)
 
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
@@ -416,11 +414,6 @@ func ServicesBadgeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	vars := mux.Vars(r)
 	service := SelectService(StringInt(vars["id"]))
 	ExecuteResponse(w, r, "service.html", service)
@@ -449,6 +442,9 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		},
 		"underscore": func(html string) string {
 			return UnderScoreString(html)
+		},
+		"User": func() *User {
+			return SessionUser(r)
 		},
 	})
 	t, _ = t.Parse(nav)

@@ -1,15 +1,16 @@
 package main
 
 import (
-	"github.com/hunterlong/statup/comms"
+	"fmt"
 	"github.com/hunterlong/statup/types"
 	"time"
 )
 
 func LoadDefaultCommunications() {
 	emailer := SelectCommunication(1)
-	comms.LoadMailer(emailer)
-	go comms.EmailerQueue()
+	fmt.Println(emailer)
+	LoadMailer(emailer)
+	go EmailerQueue()
 }
 
 func LoadComms() {
@@ -27,7 +28,7 @@ func Run(c *types.Communication) {
 		Subject: "Test Email from Statup",
 	}
 
-	comms.AddEmail(sample)
+	AddEmail(sample)
 }
 
 func SelectAllCommunications() ([]*types.Communication, error) {
