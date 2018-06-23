@@ -14,4 +14,4 @@ VOLUME /app
 
 EXPOSE 8080
 
-ENTRYPOINT statup
+CMD ["/go/bin/statup"]
