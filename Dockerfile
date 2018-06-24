@@ -1,17 +1,12 @@
-FROM golang:1.10.3-alpine
+FROM golang:1.10.3 as builder
+WORKDIR /go/src/github.com/hunterlong/statup
+COPY . .
+RUN go get -d -v
+RUN CGO_ENABLED=0 GOOS=linux go build -a -o statup .
 
-RUN apk update && apk add git g++
-
-WORKDIR $GOPATH/src/github.com/hunterlong/statup/
-RUN go get github.com/GeertJohan/go.rice/rice
-COPY . $GOPATH/src/github.com/hunterlong/statup/
-RUN go get
-RUN rice embed-go
-RUN go install
-
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
 WORKDIR /app
-VOLUME /app
-
-EXPOSE 8080
-
-CMD ["/go/bin/statup"]
+COPY --from=builder /go/src/github.com/hunterlong/statup /app/
+RUN chmod +x /app/statup
+CMD ["./statup", "version"]
