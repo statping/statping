@@ -18,7 +18,7 @@ services:
 
 env:
   global:
-     - VERSION=0.19
+     - VERSION=0.2
 
 matrix:
   allow_failures:
