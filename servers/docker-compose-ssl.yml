@@ -57,7 +57,7 @@ services:
       DB_PASS: password123
       DB_DATABASE: statup
       NAME: SSL Example
-      DESCRIPTION: This Status Status Page should be running ${DOMAIN} with SSL.
+      DESCRIPTION: This Status Status Page should be running ${LETSENCRYPT_HOST} with SSL.
 
   postgres:
     container_name: postgres
