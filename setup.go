@@ -189,6 +189,7 @@ func (c *DbConfig) Save() error {
 		[]PluginJSON{},
 		[]PluginSelect{},
 		nil,
+		false,
 	}
 
 	col := dbSession.Collection("core")

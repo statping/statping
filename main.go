@@ -15,6 +15,7 @@ import (
 	plg "plugin"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var (
@@ -91,41 +92,25 @@ func DownloadFile(filepath string, url string) error {
 	return nil
 }
 
-//func DownloadPlugin(name string) {
-//	plugin := SelectPlugin(name)
-//	var _, err = os.Stat("plugins/" + plugin.Namespace)
-//	if err != nil {
-//	}
-//	if os.IsNotExist(err) {
-//		var file, _ = os.Create("plugins/" + plugin.Namespace)
-//		defer file.Close()
-//	}
-//	resp, err := http.Get("https://raw.githubusercontent.com/hunterlong/statup/master/plugins.json")
-//	if err != nil {
-//		panic(err)
-//	}
-//	defer resp.Body.Close()
-//	body, err := ioutil.ReadAll(resp.Body)
-//	if err != nil {
-//		panic(err)
-//	}
-//	file, err := os.OpenFile("plugins/"+plugin.Namespace, os.O_RDWR, 0644)
-//	if err != nil {
-//		panic(err)
-//	}
-//	defer file.Close()
-//
-//	_, err = file.Write(body)
-//	if err != nil {
-//		panic(err)
-//	}
-//	err = file.Sync()
-//}
-
 func main() {
 	if len(os.Args) >= 2 {
 		if os.Args[1] == "version" {
 			fmt.Printf("Statup v%v\n", VERSION)
+		}
+		if os.Args[1] == "export" {
+			fmt.Printf("Statup v%v Exporting Static 'index.html' page...\n", VERSION)
+
+			RenderBoxes()
+			configs, _ = LoadConfig()
+			setupMode = true
+			mainProcess()
+			time.Sleep(10 * time.Second)
+			indexSource := ExportIndexHTML()
+
+			SaveFile("./index.html", []byte(indexSource))
+
+			fmt.Println("Exported Statup index page: 'index.html'")
+
 		}
 		os.Exit(0)
 	}

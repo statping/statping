@@ -4,10 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/base.css">
-    <script src="/js/Chart.bundle.min.js"></script>
-
+    {{if .Core.OfflineAssets}}
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://statup.io/base.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+    {{ else }}
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/css/base.css">
+        <script src="/js/Chart.bundle.min.js"></script>
+    {{end}}
     <title>{{.Core.Name}} Status</title>
 </head>
 <body>
@@ -163,7 +168,14 @@ var chartdata = new Chart(ctx, {
         </style>
      {{ end }}
 
-    <script src="/js/jquery-3.3.1.slim.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
+
+{{if .Core.OfflineAssets}}
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+{{ else }}
+<script src="/js/jquery-3.3.1.slim.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+{{end}}
+
 </body>
 </html>

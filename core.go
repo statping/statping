@@ -20,6 +20,7 @@ type Core struct {
 	Repos          []PluginJSON
 	PluginFields   []PluginSelect
 	Communications []*types.Communication
+	OfflineAssets  bool
 }
 
 func (c *Core) Update() (*Core, error) {

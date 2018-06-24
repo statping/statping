@@ -6,6 +6,14 @@ for you to build an even better status page.
 Statup strives to remain future-proof and remain intact if a failure is created. Your Statup service should not be running on the same instance you're trying to monitor. 
 If your server crashes your Status Page should still remaining online to notify your users of downtime. 
 
+## Exporting Static HTML
+If you want to use Statup as a CLI application without running a server, you can export your status page to a static HTML. 
+This export tool is very useful for people who want to export their HTML and upload/commit it to Github Pages or an FTP server.
+```dash
+statup export
+```
+###### `index.html` will be created in the current directory with CDN URL's for assets.
+
 ## Run on Docker
 Use the [Statup Docker Image](https://hub.docker.com/r/hunterlong/statup) to create a status page in seconds.
 ```bash

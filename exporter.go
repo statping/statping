@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 )
 
 var httpFunctions template.FuncMap
 
 func ExportIndexHTML() string {
+	core.OfflineAssets = true
 	out := index{*core, services}
 	nav, _ := tmplBox.String("nav.html")
 	footer, _ := tmplBox.String("footer.html")
@@ -44,4 +46,9 @@ func ExportIndexHTML() string {
 
 	fmt.Println(result)
 	return result
+}
+
+func SaveFile(filename string, data []byte) error {
+	err := ioutil.WriteFile(filename, data, 0644)
+	return err
 }
