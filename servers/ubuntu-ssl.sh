@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-DOMAIN="status.balancebadge.io"
-EMAIL="info@socialeck.com"
-
+export DOMAIN="status.balancebadge.io"
+export EMAIL="info@socialeck.com"
 
 sudo apt-get update
 sudo apt-get install \

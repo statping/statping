@@ -20,7 +20,7 @@ services:
       - ./statup/nginx/html:/usr/share/nginx/html
       - ./statup/nginx/dhparam:/etc/nginx/dhparam
     environment:
-      DEFAULT_HOST: $DOMAIN
+      DEFAULT_HOST: ${DOMAIN}
 
   letsencrypt:
     container_name: letsencrypt
@@ -47,9 +47,9 @@ services:
     volumes:
       - ./statup/app:/app
     environment:
-      VIRTUAL_HOST: $DOMAIN
+      VIRTUAL_HOST: ${DOMAIN}
       VIRTUAL_PORT: 8080
-      LETSENCRYPT_HOST: $DOMAIN
+      LETSENCRYPT_HOST: ${DOMAIN}
       LETSENCRYPT_EMAIL: info@socialeck.com
       DB_CONN: postgres
       DB_HOST: postgres
@@ -57,7 +57,7 @@ services:
       DB_PASS: password123
       DB_DATABASE: statup
       NAME: SSL Example
-      DESCRIPTION: This Status Status Page should be running $DOMAIN with SSL.
+      DESCRIPTION: This Status Status Page should be running ${DOMAIN} with SSL.
 
   postgres:
     container_name: postgres
