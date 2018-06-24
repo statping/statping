@@ -37,6 +37,8 @@ deploy:
       - "build/statup-osx-x32"
       - "build/statup-linux-x64"
       - "build/statup-linux-x32"
+      - "build/statup-linux-arm64"
+      - "build/statup-linux-arm7"
       - "build/statup-windows-x64.exe"
     skip_cleanup: true
 
@@ -48,7 +50,6 @@ before_install:
 
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then /bin/bash -c ./build.sh; fi
-  - curl -X POST $DOCKER > /dev/null
 
 before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
