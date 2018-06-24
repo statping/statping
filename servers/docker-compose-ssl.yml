@@ -17,7 +17,7 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./statup/nginx/certs:/etc/nginx/certs:ro
       - ./statup/nginx/vhost:/etc/nginx/vhost.d
-      - ./statup/nginx/html:/usr/share/nginx/html
+      - ./statup/nginx/html:/usr/share/nginx/html:ro
       - ./statup/nginx/dhparam:/etc/nginx/dhparam
     environment:
       DEFAULT_HOST: ${LETSENCRYPT_HOST}
