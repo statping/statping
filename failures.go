@@ -61,10 +61,13 @@ func (f *Failure) Delete() error {
 	return col.Delete()
 }
 
-func CountFailures() (uint64, error) {
+func CountFailures() uint64 {
 	col := dbSession.Collection("failures").Find()
 	amount, err := col.Count()
-	return amount, err
+	if err != nil {
+		return 0
+	}
+	return amount
 }
 
 func (s *Service) TotalFailures() (uint64, error) {

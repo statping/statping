@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"time"
+	"upper.io/db.v3"
 	"upper.io/db.v3/lib/sqlbuilder"
 	"upper.io/db.v3/mysql"
 	"upper.io/db.v3/postgresql"
@@ -60,6 +62,22 @@ func DbConnection(dbType string) error {
 	dbServer = dbType
 	OnLoad(dbSession)
 	return err
+}
+
+func DatabaseMaintence() {
+	defer DatabaseMaintence()
+	since := time.Now().AddDate(0, 0, -7)
+	DeleteAllSince("failures", since)
+	DeleteAllSince("hits", since)
+	time.Sleep(60 * time.Minute)
+}
+
+func DeleteAllSince(table string, date time.Time) {
+	sql := fmt.Sprintf("DELETE FROM %v WHERE created_at < '%v';", table, date.Format("2006-01-02"))
+	_, err := dbSession.Exec(db.Raw(sql))
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func Backup() {

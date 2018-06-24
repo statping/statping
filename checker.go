@@ -23,7 +23,7 @@ func (s *Service) CheckQueue() {
 	if s.Interval < 1 {
 		s.Interval = 1
 	}
-	fmt.Printf("   Service: %v | Online: %v | Latency: %v\n", s.Name, s.Online, s.Latency)
+	fmt.Printf("   Service: %v | Online: %v | Latency: %0.0fms\n", s.Name, s.Online, (s.Latency * 100))
 	time.Sleep(time.Duration(s.Interval) * time.Second)
 }
 

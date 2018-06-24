@@ -123,6 +123,13 @@ func DownloadFile(filepath string, url string) error {
 //}
 
 func main() {
+	if len(os.Args) >= 2 {
+		if os.Args[1] == "version" {
+			fmt.Printf("Statup v%v\n", VERSION)
+		}
+		os.Exit(0)
+	}
+
 	var err error
 	fmt.Printf("Starting Statup v%v\n", VERSION)
 
@@ -153,9 +160,13 @@ func mainProcess() {
 		fmt.Println("Core database was not found, Statup is not setup yet.")
 		RunHTTPServer()
 	}
+
 	CheckServices()
 	core.Communications, _ = SelectAllCommunications()
 	LoadDefaultCommunications()
+
+	go DatabaseMaintence()
+
 	if !setupMode {
 		LoadPlugins()
 		RunHTTPServer()

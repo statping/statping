@@ -58,6 +58,7 @@ func Router() *mux.Router {
 	r.Handle("/api/services/{id}", http.HandlerFunc(ApiServiceUpdateHandler)).Methods("POST")
 	r.Handle("/api/users", http.HandlerFunc(ApiAllUsersHandler))
 	r.Handle("/api/users/{id}", http.HandlerFunc(ApiUserHandler))
+	r.Handle("/metrics", http.HandlerFunc(PrometheusHandler)).Methods("GET")
 	return r
 }
 
@@ -146,12 +147,35 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 		Type:           checkType,
 		Port:           port,
 	}
-
 	_, err := service.Create()
 	if err != nil {
 		go service.CheckQueue()
 	}
 	http.Redirect(w, r, "/services", http.StatusSeeOther)
+}
+
+func PrometheusHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("Prometheus /metrics Request From IP: %v\n", r.RemoteAddr)
+	metrics := []string{}
+	system := fmt.Sprintf("statup_total_failures %v\n", CountFailures())
+	system += fmt.Sprintf("statup_total_services %v", len(services))
+	metrics = append(metrics, system)
+
+	for _, v := range services {
+		online := 1
+		if !v.Online {
+			online = 0
+		}
+		met := fmt.Sprintf("statup_service_failures{id=\"%v\" name=\"%v\"} %v\n", v.Id, v.Name, len(v.Failures))
+		met += fmt.Sprintf("statup_service_latency{id=\"%v\" name=\"%v\"} %0.0f\n", v.Id, v.Name, (v.Latency * 100))
+		met += fmt.Sprintf("statup_service_online{id=\"%v\" name=\"%v\"} %v\n", v.Id, v.Name, online)
+		met += fmt.Sprintf("statup_service_status_code{id=\"%v\" name=\"%v\"} %v\n", v.Id, v.Name, v.LastStatusCode)
+		met += fmt.Sprintf("statup_service_response_length{id=\"%v\" name=\"%v\"} %v", v.Id, v.Name, len([]byte(v.LastResponse)))
+		metrics = append(metrics, met)
+	}
+	output := strings.Join(metrics, "\n")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(output))
 }
 
 func SetupHandler(w http.ResponseWriter, r *http.Request) {
@@ -210,7 +234,7 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 		err := ErrorResponse{}
 		ExecuteResponse(w, r, "login.html", err)
 	} else {
-		fails, _ := CountFailures()
+		fails := CountFailures()
 		out := dashboard{services, core, CountOnline(), len(services), fails}
 		ExecuteResponse(w, r, "dashboard.html", out)
 	}
@@ -257,6 +281,9 @@ func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func IsAuthenticated(r *http.Request) bool {
+	if core == nil {
+		return false
+	}
 	if store == nil {
 		return false
 	}
