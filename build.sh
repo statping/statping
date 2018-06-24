@@ -5,12 +5,6 @@ REPO="hunterlong/statup"
 
 rice embed-go
 
-docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-docker build -f Dockerfile -t $REPO:$VERSION .
-docker tag $REPO:$VERSION $REPO:latest
-docker tag $REPO:$VERSION $REPO:$VERSION
-docker push $REPO
-
 mkdir build
 xgo -go 1.10.x --targets=darwin/amd64 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
 xgo -go 1.10.x --targets=darwin/386 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
