@@ -2,7 +2,12 @@ FROM golang:1.10.3-alpine
 
 RUN apk update && apk add git g++
 
-RUN curl -o /usr/local/bin/statup https://github.com/hunterlong/statup/releases/download/v0.18/statup-linux-x64
+WORKDIR $GOPATH/src/github.com/hunterlong/statup/
+RUN go get github.com/GeertJohan/go.rice/rice
+COPY . $GOPATH/src/github.com/hunterlong/statup/
+RUN go get
+RUN rice embed-go
+RUN go install
 
 WORKDIR /app
 VOLUME /app
