@@ -29,7 +29,7 @@ services:
       - internet
     restart: always
     volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./statup/nginx/certs:/etc/nginx/certs:ro
       - ./statup/nginx/vhost:/etc/nginx/vhost.d
       - ./statup/nginx/html:/usr/share/nginx/html:ro
