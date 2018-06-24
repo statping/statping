@@ -1,12 +1,13 @@
-FROM golang:1.10.3 as builder
-WORKDIR /go/src/github.com/hunterlong/statup
-COPY . .
-RUN go get -d -v
-RUN CGO_ENABLED=0 GOOS=linux go build -a -o statup .
-
 FROM alpine:latest
+
+ENV VERSION=v0.21
+
 RUN apk --no-cache add ca-certificates
+RUN wget https://github.com/hunterlong/statup/releases/download/$VERSION/statup-alpine && \
+      chmod +x statup-alpine && \
+      mv statup-alpine /usr/local/bin/statup
 WORKDIR /app
-COPY --from=builder /go/src/github.com/hunterlong/statup /app/
-RUN chmod +x /app/statup
-CMD ["./statup", "version"]
+VOLUME /app
+RUN statup version
+EXPOSE 8080
+ENTRYPOINT statup
