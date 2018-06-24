@@ -46,8 +46,8 @@ func (u *Service) DeleteFailures() {
 
 func (s *Service) LimitedFailures() []*Failure {
 	var fails []*Failure
-	col := dbSession.Collection("failures").Find("service", s.Id)
-	col.OrderBy("create_at").All(&fails)
+	col := dbSession.Collection("failures").Find("service", s.Id).OrderBy("-id").Limit(10)
+	col.All(&fails)
 	return fails
 }
 

@@ -40,7 +40,7 @@ deploy:
       - "build/statup-linux-arm64"
       - "build/statup-linux-arm7"
       - "build/statup-windows-x64.exe"
-      - "build/statup-alpine"
+      - "build/statup-linux-alpine"
     skip_cleanup: true
 
 notifications:
