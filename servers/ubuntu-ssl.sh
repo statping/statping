@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-export DOMAIN="status.balancebadge.io"
-export EMAIL="info@socialeck.com"
+export LETSENCRYPT_HOST="status.balancebadge.io"
+export LETSENCRYPT_EMAIL="info@socialeck.com"
 
 sudo apt-get update
 sudo apt-get install \
@@ -24,4 +24,4 @@ mkdir statup
 cd statup
 wget https://raw.githubusercontent.com/hunterlong/statup/master/servers/docker-compose-ssl.yml
 sudo service docker start
-sudo docker-compose up -d
+sudo LETSENCRYPT_HOST=$LETSENCRYPT_HOST LETSENCRYPT_EMAIL=$LETSENCRYPT_EMAIL docker-compose up -d
