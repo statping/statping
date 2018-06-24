@@ -8,6 +8,8 @@ services:
     ports:
       - 0.0.0.0:80:80
       - 0.0.0.0:443:443
+    labels:
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"
     networks:
       - internet
     restart: always
@@ -25,7 +27,6 @@ services:
     image: jrcs/letsencrypt-nginx-proxy-companion
     networks:
       - internet
-      - database
     restart: always
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
@@ -36,7 +37,7 @@ services:
 
   statup:
     container_name: statup
-    build: https://github.com/hunterlong/statup.git
+    image: hunterlong/statup:latest
     restart: always
     networks:
       - internet
@@ -48,16 +49,15 @@ services:
     environment:
       VIRTUAL_HOST: $DOMAIN
       VIRTUAL_PORT: 8080
-      LETSENCRYPT_EMAIL: info@mydomains.com
       LETSENCRYPT_HOST: $DOMAIN
+      LETSENCRYPT_EMAIL: info@socialeck.com
       DB_CONN: postgres
       DB_HOST: postgres
       DB_USER: statup
       DB_PASS: password123
       DB_DATABASE: statup
-      NAME: EC2 Example
-      DESCRIPTION: This is a Statup Docker Compose instance
-
+      NAME: SSL Example
+      DESCRIPTION: This Status Status Page should be running $DOMAIN with SSL.
 
   postgres:
     container_name: postgres
