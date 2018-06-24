@@ -11,7 +11,6 @@ Use the [Statup Docker Image](https://hub.docker.com/r/hunterlong/statup) to cre
 ```
 docker run -it -p 8080:8080 hunterlong/statup
 ```
-
 There are multiple way to startup a Statup server. You want to make sure Statup is on it's own instance that is not on the same server as the applications you wish to monitor. 
 It doesn't look good when your Status Page goes down, I recommend a small EC2 instance so you can set it, and forget it.
 
@@ -24,9 +23,11 @@ docker-compose up -d
 ## Docker Compose with Automatic SSL
 You can automatically start a Statup server with automatic SSL encryption using this docker-compose file. First point your domain's DNS to the Statup server, and then run this docker-compose command with DOMAIN and EMAIL. Email is for letsencrypt services.
 ```
-DOMAIN=mydomain.com EMAIL=info@mydomain.com \
+LETSENCRYPT_HOST=mydomain.com \ 
+    LETSENCRYPT_EMAIL=info@mydomain.com \ 
     docker-compose -f docker-compose-ssl.yml up -d
 ```
+Once your instance has started, it will take a moment to get your SSL certificate. Make sure you have a A or CNAME record on your domain that points to the IP/DNS of your server running Statup.
 
 ## Run on AWS EC2
 Running Statup on the smallest EC2 server is very quick using the AWS AMI Image: `ami-1f7c3567`.
@@ -41,6 +42,9 @@ aws ec2 run-instances \
     --subnet-id <your subnet id here> \ 
     --region <your region here>
 ```
+
+## Email Nofitications
+Statup includes email notification via SMTP if your services go offline. 
 
 ## User Created Plugins
 Statup isn't just another Status Page for your applications, it's a framework that allows you to create your own plugins to interact with every element of your status page.

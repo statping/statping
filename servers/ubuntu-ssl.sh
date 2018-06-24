@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-export LETSENCRYPT_HOST="status.balancebadge.io"
-export LETSENCRYPT_EMAIL="info@socialeck.com"
+LETSENCRYPT_HOST="status.balancebadge.io"
+LETSENCRYPT_EMAIL="info@socialeck.com"
 
 sudo apt-get update
 sudo apt-get install \
@@ -22,6 +22,9 @@ sudo docker-compose --version
 sudo systemctl enable docker
 mkdir statup
 cd statup
-wget https://raw.githubusercontent.com/hunterlong/statup/master/servers/docker-compose-ssl.yml
+rm -f docker-compose.yml
+curl -o docker-compose.yml -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/hunterlong/statup/master/servers/docker-compose-ssl.yml
 sudo service docker start
+sudo docker system prune -af
+sudo LETSENCRYPT_HOST=$LETSENCRYPT_HOST LETSENCRYPT_EMAIL=$LETSENCRYPT_EMAIL docker-compose pull
 sudo LETSENCRYPT_HOST=$LETSENCRYPT_HOST LETSENCRYPT_EMAIL=$LETSENCRYPT_EMAIL docker-compose up -d
