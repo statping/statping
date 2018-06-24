@@ -13,27 +13,28 @@ services:
     restart: always
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      - /home/ubuntu/nginx/certs:/etc/nginx/certs:ro
-      - /home/ubuntu/nginx/vhost:/etc/nginx/vhost.d
-      - /home/ubuntu/nginx/html:/usr/share/nginx/html:ro
-      - /home/ubuntu/nginx/dhparam:/etc/nginx/dhparam
+      - ./statup/nginx/certs:/etc/nginx/certs:ro
+      - ./statup/nginx/vhost:/etc/nginx/vhost.d
+      - ./statup/nginx/html:/usr/share/nginx/html:ro
+      - ./statup/nginx/dhparam:/etc/nginx/dhparam
     environment:
       DEFAULT_HOST: localhost
 
   statup:
     container_name: statup
     build: https://github.com/hunterlong/statup.git
+    restart: always
     networks:
       - internet
       - database
     depends_on:
       - postgres
     volumes:
-      - /home/ubuntu/statup:/app
+      - ./statup/app:/app
     environment:
       VIRTUAL_HOST: localhost
       VIRTUAL_PORT: 8080
-      DOMAIN: statup.cjx.io
+      DB_CONN: postgres
       DB_HOST: postgres
       DB_USER: statup
       DB_PASS: password123
@@ -48,7 +49,7 @@ services:
     networks:
       - database
     volumes:
-      - /home/ubuntu/postgres:/var/lib/postgresql/data
+      - ./statup/postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: password123
       POSTGRES_USER: statup
