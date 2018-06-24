@@ -17,20 +17,21 @@ services:
       - /home/ubuntu/nginx/vhost:/etc/nginx/vhost.d
       - /home/ubuntu/nginx/html:/usr/share/nginx/html:ro
       - /home/ubuntu/nginx/dhparam:/etc/nginx/dhparam
+    environment:
+      DEFAULT_HOST: localhost
 
   statup:
     container_name: statup
-    image: hunterlong/statup
+    build: https://github.com/hunterlong/statup.git
     networks:
       - internet
       - database
     depends_on:
-      - nginx
       - postgres
     volumes:
       - /home/ubuntu/statup:/app
     environment:
-      VIRTUAL_HOST: statup.cjx.io
+      VIRTUAL_HOST: localhost
       VIRTUAL_PORT: 8080
       DOMAIN: statup.cjx.io
       DB_HOST: postgres

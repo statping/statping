@@ -30,7 +30,7 @@ func (u *Checkin) Create() (int64, error) {
 	if uuid == nil {
 		return 0, err
 	}
-	fmt.Println(uuid)
+	fmt.Println("new checkin: ",uuid)
 	return uuid.(int64), err
 }
 

@@ -30,7 +30,9 @@ func AddEmail(email *types.Email) {
 }
 
 func EmailerQueue() {
-	defer EmailerQueue()
+	if emailQue == nil {
+		return
+	}
 	uniques := []*types.Email{}
 	for _, out := range emailQue.Outgoing {
 		if isUnique(uniques, out) {
@@ -42,6 +44,7 @@ func EmailerQueue() {
 	emailQue.Outgoing = nil
 	fmt.Println("running emailer queue")
 	time.Sleep(60 * time.Second)
+	EmailerQueue()
 }
 
 func isUnique(arr []*types.Email, obj *types.Email) bool {
@@ -78,7 +81,10 @@ func SendFailureEmail(service *Service) {
 }
 
 func LoadMailer(config *types.Communication) *gomail.Dialer {
-	emailQue = &Que{}
+	if config.Host == "" || config.Username == "" || config.Password == "" {
+		return nil
+	}
+	emailQue = new(Que)
 	emailQue.Outgoing = []*types.Email{}
 	emailQue.Mailer = gomail.NewDialer(config.Host, config.Port, config.Username, config.Password)
 	emailQue.Mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}

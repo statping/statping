@@ -24,6 +24,7 @@ type DbConfig struct {
 	Domain      string `yaml:"-"`
 	Username    string `yaml:"-"`
 	Password    string `yaml:"-"`
+	Email       string `yaml:"-"`
 	Error       error  `yaml:"-"`
 }
 
@@ -59,6 +60,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		domain,
 		username,
 		password,
+		email,
 		nil,
 	}
 	err := config.Save()

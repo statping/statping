@@ -8,6 +8,7 @@ import (
 	"github.com/hunterlong/statup/types"
 	"html/template"
 	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -102,7 +103,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		session.Save(r, w)
 		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 	} else {
-		ExecuteResponse(w, r, "login.html", auth)
+		err := ErrorResponse{Error: "Incorrect login information submitted, try again."}
+		ExecuteResponse(w, r, "login.html", err)
 	}
 }
 
@@ -157,7 +159,27 @@ func SetupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "setup.html", nil)
+	port := 5432
+	if os.Getenv("DB_CONN") == "mysql" {
+		port = 3306
+	}
+	var data interface{}
+	if os.Getenv("DB_CONN") != "" {
+		data = &DbConfig{
+			DbConn:      os.Getenv("DB_CONN"),
+			DbHost:      os.Getenv("DB_HOST"),
+			DbUser:      os.Getenv("DB_USER"),
+			DbPass:      os.Getenv("DB_PASS"),
+			DbData:      os.Getenv("DB_DATABASE"),
+			DbPort:      port,
+			Project:     os.Getenv("NAME"),
+			Description: os.Getenv("DESCRIPTION"),
+			Email:       "",
+			Username:    "admin",
+			Password:    "",
+		}
+	}
+	ExecuteResponse(w, r, "setup.html", data)
 }
 
 type index struct {
@@ -185,13 +207,13 @@ type dashboard struct {
 func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, cookieKey)
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		ExecuteResponse(w, r, "login.html", nil)
+		err := ErrorResponse{}
+		ExecuteResponse(w, r, "login.html", err)
 	} else {
 		fails, _ := CountFailures()
 		out := dashboard{services, core, CountOnline(), len(services), fails}
 		ExecuteResponse(w, r, "dashboard.html", out)
 	}
-
 }
 
 type serviceHandler struct {
