@@ -47,7 +47,7 @@ before_install:
 
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then /bin/bash -c ./build.sh; fi
-  - "curl -H 'Content-Type: application/json' --data '{\"source_type\": \"Tag\", \"source_name\": \"$VERSION\"}' -X POST $DOCKER > /dev/null"
+  - curl -X POST $DOCKER > /dev/null
 
 before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'

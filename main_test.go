@@ -26,6 +26,7 @@ func TestMySQLMakeConfig(t *testing.T) {
 		"",
 		"admin",
 		"admin",
+		"",
 		nil,
 	}
 	err := config.Save()
@@ -66,6 +67,7 @@ func TestSqliteMakeConfig(t *testing.T) {
 		"",
 		"admin",
 		"admin",
+		"",
 		nil,
 	}
 	err := config.Save()
@@ -98,6 +100,7 @@ func TestPostgresMakeConfig(t *testing.T) {
 		"",
 		"admin",
 		"admin",
+		"",
 		nil,
 	}
 	err := config.Save()
