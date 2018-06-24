@@ -102,17 +102,15 @@ type GraphJson struct {
 	Y float64 `json:"y"`
 }
 
-
 type DateScan struct {
 	CreatedAt time.Time `json:"x"`
-	Value int64 `json:"y"`
+	Value     int64     `json:"y"`
 }
-
 
 func (s *Service) GraphData() string {
 	var d []DateScan
 
-	since := time.Now().Add(time.Hour * -12 + time.Minute * 0 + time.Second * 0)
+	since := time.Now().Add(time.Hour*-12 + time.Minute*0 + time.Second*0)
 
 	sql := fmt.Sprintf("SELECT date_trunc('minute', created_at), AVG(latency)*1000 AS value FROM hits WHERE service=%v AND created_at > '%v' GROUP BY 1 ORDER BY date_trunc ASC;", s.Id, since.Format(time.RFC3339))
 
@@ -136,7 +134,6 @@ func (s *Service) GraphData() string {
 
 	}
 
-
 	if err != nil {
 		panic(err)
 	}
@@ -153,7 +150,6 @@ func (s *Service) GraphData() string {
 	data, _ := json.Marshal(d)
 	return string(data)
 }
-
 
 //func (s *Service) GraphData() string {
 //	var d []GraphJson

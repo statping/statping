@@ -28,3 +28,10 @@ You can automatically start a Statup server with automatic SSL encryption using 
 DOMAIN=mydomain.com EMAIL=info@mydomain.com \
     docker-compose -f docker-compose-ssl.yml up -d
 ```
+
+## Systemd
+```$xslt
+/etc/systemd/system/statup.service
+
+
+```

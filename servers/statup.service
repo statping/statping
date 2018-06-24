@@ -1,0 +1,12 @@
+[Unit]
+Description=Statup Docker Startup
+After=network.target
+After=systemd-user-sessions.service
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/ubuntu/startup.sh
+
+[Install]
+WantedBy=multi-user.target
