@@ -36,11 +36,18 @@ func (s *Service) Hits() ([]Hit, error) {
 	return hits, err
 }
 
-func (s *Service) LimitedHits() ([]Hit, error) {
-	var hits []Hit
-	col := hitCol().Find("service", s.Id).Limit(1056).OrderBy("-id")
+func (s *Service) LimitedHits() ([]*Hit, error) {
+	var hits []*Hit
+	col := hitCol().Find("service", s.Id).OrderBy("-id").Limit(1024)
 	err := col.All(&hits)
-	return hits, err
+	return reverseHits(hits), err
+}
+
+func reverseHits(input []*Hit) []*Hit {
+	if len(input) == 0 {
+		return input
+	}
+	return append(reverseHits(input[1:]), input[0])
 }
 
 func (s *Service) SelectHitsGroupBy(group string) ([]Hit, error) {

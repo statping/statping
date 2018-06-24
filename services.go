@@ -102,20 +102,73 @@ type GraphJson struct {
 	Y float64 `json:"y"`
 }
 
+
+type DateScan struct {
+	CreatedAt time.Time `json:"x"`
+	Value int64 `json:"y"`
+}
+
+
 func (s *Service) GraphData() string {
-	var d []GraphJson
-	hits, _ := s.LimitedHits()
-	for _, h := range hits {
-		val := h.CreatedAt
-		o := GraphJson{
-			X: val.String(),
-			Y: h.Latency * 1000,
-		}
-		d = append(d, o)
+	var d []DateScan
+
+	since := time.Now().Add(time.Hour * -12 + time.Minute * 0 + time.Second * 0)
+
+	sql := fmt.Sprintf("SELECT date_trunc('minute', created_at), AVG(latency)*1000 AS value FROM hits WHERE service=%v AND created_at > '%v' GROUP BY 1 ORDER BY date_trunc ASC;", s.Id, since.Format(time.RFC3339))
+
+	fmt.Println(sql)
+
+	dated, err := dbSession.Query(db.Raw(sql))
+	if err != nil {
+		panic(err)
 	}
+
+	for dated.Next() {
+
+		var gd DateScan
+
+		var ff float64
+
+		dated.Scan(&gd.CreatedAt, &ff)
+		gd.Value = int64(ff)
+
+		d = append(d, gd)
+
+	}
+
+
+	if err != nil {
+		panic(err)
+	}
+	//
+	//hits, _ := s.LimitedHits()
+	//for _, h := range hits {
+	//	val := h.CreatedAt
+	//	o := GraphJson{
+	//		X: val.String(),
+	//		Y: h.Latency * 1000,
+	//	}
+	//	d = append(d, o)
+	//}
 	data, _ := json.Marshal(d)
 	return string(data)
 }
+
+
+//func (s *Service) GraphData() string {
+//	var d []GraphJson
+//	hits, _ := s.LimitedHits()
+//	for _, h := range hits {
+//		val := h.CreatedAt
+//		o := GraphJson{
+//			X: val.String(),
+//			Y: h.Latency * 1000,
+//		}
+//		d = append(d, o)
+//	}
+//	data, _ := json.Marshal(d)
+//	return string(data)
+//}
 
 func (s *Service) AvgUptime() string {
 	failed, _ := s.TotalFailures()

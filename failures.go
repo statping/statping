@@ -47,8 +47,15 @@ func (u *Service) DeleteFailures() {
 func (s *Service) LimitedFailures() []*Failure {
 	var fails []*Failure
 	col := dbSession.Collection("failures").Find("service", s.Id)
-	col.OrderBy("-id").Limit(10).All(&fails)
+	col.OrderBy("create_at").All(&fails)
 	return fails
+}
+
+func reverseFailures(input []*Failure) []*Failure {
+	if len(input) == 0 {
+		return input
+	}
+	return append(reverseFailures(input[1:]), input[0])
 }
 
 func (f *Failure) Ago() string {

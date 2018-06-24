@@ -217,6 +217,11 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	out := index{*core, services}
+
+	first, _ := out.Services[0].LimitedHits()
+
+	fmt.Println(out.Services[0].Name, "start:", first[0].Id, "last:", first[len(first)-1].Id)
+
 	ExecuteResponse(w, r, "index.html", out)
 }
 

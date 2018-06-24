@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-ENV VERSION=v0.21
+ENV VERSION=v0.22
 
 RUN apk --no-cache add ca-certificates
 RUN wget https://github.com/hunterlong/statup/releases/download/$VERSION/statup-alpine && \

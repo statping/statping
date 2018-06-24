@@ -10,10 +10,12 @@ import (
 
 func CheckServices() {
 	services, _ = SelectAllServices()
+	time.Sleep(3 * time.Second)
 	for _, v := range services {
 		obj := v
 		go obj.StartCheckins()
 		go obj.CheckQueue()
+		time.Sleep(1 * time.Second)
 	}
 }
 
@@ -23,7 +25,7 @@ func (s *Service) CheckQueue() {
 	if s.Interval < 1 {
 		s.Interval = 1
 	}
-	fmt.Printf("   Service: %v | Online: %v | Latency: %0.0fms\n", s.Name, s.Online, (s.Latency * 100))
+	fmt.Printf("   Service: %v | Online: %v | Latency: %0.0fms\n", s.Name, s.Online, (s.Latency * 1000))
 	time.Sleep(time.Duration(s.Interval) * time.Second)
 }
 

@@ -90,10 +90,30 @@ HTML,BODY {
     text-decoration: none;
 }
 
+.chart-container {
+    position: relative;
+    height: 20vh;
+    width: 60vh;
+}
+
 @media (max-width: 767px) {
 
+    .sm-container {
+        margin-top: 40px !important;
+        padding: 0 !important;
+    }
+
+    .list-group-item H5 {
+        font-size: 0.9rem;
+    }
+
+    .chart-container {
+        position: relative;
+        height:17vh;
+        width:80vw;
+    }
+
     .container {
-        margin-top: 0 !important;
         padding: 0 !important;
     }
 

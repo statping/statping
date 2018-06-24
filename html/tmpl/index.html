@@ -18,7 +18,7 @@
 <body>
 
 
-<div class="container col-md-7 col-sm-12 mt-2">
+<div class="container col-md-7 col-sm-12 mt-2 sm-container">
 
 <h1 class="text-center mb-4 mt-sm-3">{{.Core.Name}}</h1>
 
@@ -46,7 +46,7 @@
     <div class="col-12">
 
         {{ range .Services }}
-            <div class="mb-4">
+            <div class="mt-4">
                 <div class="card">
                     <div class="card-body{{if .Online}}{{else}} offline_bg{{end}}">
 
@@ -79,7 +79,9 @@
                             </div>
                         </div>
 
-                        <canvas id="service_{{ .Id }}" width="400" height="120"></canvas>
+                        <div class="chart-container">
+                            <canvas id="service_{{ .Id }}"></canvas>
+                        </div>
 
                     {{ if .LimitedFailures }}
                         <div class="list-group mt-5">
@@ -130,6 +132,7 @@ var chartdata = new Chart(ctx, {
         }]
     },
     options: {
+        maintainAspectRatio: false,
         legend: {
             display: false
         },
