@@ -22,7 +22,7 @@ services:
 
   statup:
     container_name: statup
-    build: https://github.com/hunterlong/statup.git
+    image: hunterlong/statup:latest
     restart: always
     networks:
       - internet
