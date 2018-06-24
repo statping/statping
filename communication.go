@@ -1,16 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"github.com/hunterlong/statup/types"
 	"time"
 )
 
 func LoadDefaultCommunications() {
 	emailer := SelectCommunication(1)
-	fmt.Println(emailer)
-	LoadMailer(emailer)
-	go EmailerQueue()
+	if emailer.Enabled {
+		LoadMailer(emailer)
+		go EmailerQueue()
+	}
 }
 
 func LoadComms() {

@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"upper.io/db.v3"
 )
 
 type DbConfig struct {
@@ -26,6 +27,19 @@ type DbConfig struct {
 	Password    string `yaml:"-"`
 	Email       string `yaml:"-"`
 	Error       error  `yaml:"-"`
+}
+
+func RunDatabaseUpgrades() {
+	fmt.Println("Upgrading Tables...")
+	upgrade, _ := sqlBox.String("upgrade.sql")
+	requests := strings.Split(upgrade, ";")
+	for _, request := range requests {
+		_, err := dbSession.Exec(db.Raw(request + ";"))
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+	fmt.Println("Database Upgraded")
 }
 
 func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {

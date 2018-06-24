@@ -147,6 +147,7 @@ func mainProcess() {
 	if err != nil {
 		throw(err)
 	}
+	RunDatabaseUpgrades()
 	core, err = SelectCore()
 	if err != nil {
 		fmt.Println("Core database was not found, Statup is not setup yet.")
