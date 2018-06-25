@@ -1,10 +1,8 @@
 package main
 
 import (
-	"crypto/sha1"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"strconv"
 	"time"
 	"upper.io/db.v3"
@@ -109,62 +107,27 @@ type DateScan struct {
 
 func (s *Service) GraphData() string {
 	var d []DateScan
-
 	since := time.Now().Add(time.Hour*-12 + time.Minute*0 + time.Second*0)
-
 	sql := fmt.Sprintf("SELECT date_trunc('minute', created_at), AVG(latency)*1000 AS value FROM hits WHERE service=%v AND created_at > '%v' GROUP BY 1 ORDER BY date_trunc ASC;", s.Id, since.Format(time.RFC3339))
-
-	fmt.Println(sql)
-
 	dated, err := dbSession.Query(db.Raw(sql))
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return ""
 	}
-
 	for dated.Next() {
-
 		var gd DateScan
-
 		var ff float64
-
 		dated.Scan(&gd.CreatedAt, &ff)
 		gd.Value = int64(ff)
-
 		d = append(d, gd)
-
 	}
-
+	data, err := json.Marshal(d)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return ""
 	}
-	//
-	//hits, _ := s.LimitedHits()
-	//for _, h := range hits {
-	//	val := h.CreatedAt
-	//	o := GraphJson{
-	//		X: val.String(),
-	//		Y: h.Latency * 1000,
-	//	}
-	//	d = append(d, o)
-	//}
-	data, _ := json.Marshal(d)
 	return string(data)
 }
-
-//func (s *Service) GraphData() string {
-//	var d []GraphJson
-//	hits, _ := s.LimitedHits()
-//	for _, h := range hits {
-//		val := h.CreatedAt
-//		o := GraphJson{
-//			X: val.String(),
-//			Y: h.Latency * 1000,
-//		}
-//		d = append(d, o)
-//	}
-//	data, _ := json.Marshal(d)
-//	return string(data)
-//}
 
 func (s *Service) AvgUptime() string {
 	failed, _ := s.TotalFailures()
@@ -233,27 +196,4 @@ func CountOnline() int {
 		}
 	}
 	return amount
-}
-
-func NewSHA1Hash(n ...int) string {
-	noRandomCharacters := 32
-	if len(n) > 0 {
-		noRandomCharacters = n[0]
-	}
-	randString := RandomString(noRandomCharacters)
-	hash := sha1.New()
-	hash.Write([]byte(randString))
-	bs := hash.Sum(nil)
-	return fmt.Sprintf("%x", bs)
-}
-
-var characterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-
-// RandomString generates a random string of n length
-func RandomString(n int) string {
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = characterRunes[rand.Intn(len(characterRunes))]
-	}
-	return string(b)
 }

@@ -78,7 +78,7 @@
 
         <div class="form-group">
             <label for="formGroupExampleInput">Admin Username</label>
-            <input type="text" name="username" class="form-control" value="{{.Username}}" id="formGroupExampleInput" value="admin" placeholder="admin" required>
+            <input type="text" name="username" class="form-control" value="{{.Username}}" id="formGroupExampleInput" value="admin" placeholder="admin" onkeyup="return forceLower(this);" required>
         </div>
 
         <div class="form-group">

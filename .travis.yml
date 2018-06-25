@@ -18,7 +18,7 @@ services:
 
 env:
   global:
-     - VERSION=0.22
+     - VERSION=0.23
 
 matrix:
   allow_failures:
@@ -33,14 +33,14 @@ deploy:
   - provider: releases
     api_key: $GH_TOKEN
     file:
-      - "build/statup-osx-x64"
-      - "build/statup-osx-x32"
-      - "build/statup-linux-x64"
-      - "build/statup-linux-x32"
-      - "build/statup-linux-arm64"
-      - "build/statup-linux-arm7"
-      - "build/statup-windows-x64.exe"
-      - "build/statup-linux-alpine"
+      - "build/statup-osx-x64.tar.gz"
+      - "build/statup-osx-x32.tar.gz"
+      - "build/statup-linux-x64.tar.gz"
+      - "build/statup-linux-x32.tar.gz"
+      - "build/statup-linux-arm64.tar.gz"
+      - "build/statup-linux-arm7.tar.gz"
+      - "build/statup-linux-alpine.tar.gz"
+      - "build/statup-windows-x64.zip"
     skip_cleanup: true
 
 notifications:

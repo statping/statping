@@ -22,9 +22,26 @@ cd build
 ls
 cd ../
 
-mv build/$APP-darwin-10.6-amd64 build/$APP-osx-x64
-mv build/$APP-darwin-10.6-386 build/$APP-osx-x32
-mv build/$APP-linux-amd64 build/$APP-linux-x64
-mv build/$APP-linux-386 build/$APP-linux-x32
-mv build/$APP-windows-6.0-amd64.exe build/$APP-windows-x64.exe
-mv build/$APP-linux-arm-7 build/$APP-linux-arm7
+mv build/$APP-darwin-10.6-amd64 build/$APP
+tar -czvf build/$APP-osx-x64.tar.gz build/$APP
+
+mv build/$APP-darwin-10.6-386 build/$APP
+tar -czvf build/$APP-osx-x32.tar.gz build/$APP
+
+mv build/$APP-linux-amd64 build/$APP
+tar -czvf build/$APP-linux-x64.tar.gz build/$APP
+
+mv build/$APP-linux-386 build/$APP
+tar -czvf build/$APP-linux-x32.tar.gz build/$APP
+
+mv build/$APP-windows-6.0-amd64.exe build/$APP.exe
+zip $APP-windows-x64.zip build/$APP.exe
+
+mv build/$APP-linux-arm-7 build/$APP
+tar -czvf build/$APP-linux-arm7.tar.gz build/$APP
+
+mv build/$APP-linux-arm64 build/$APP
+tar -czvf build/$APP-linux-arm64.tar.gz build/$APP
+
+mv build/$APP-linux-alpine build/$APP
+tar -czvf build/$APP-linux-alpine.tar.gz build/$APP

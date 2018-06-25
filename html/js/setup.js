@@ -1,6 +1,11 @@
 var currentLocation = window.location;
 $("#domain_input").val(currentLocation.origin);
 
+function forceLower(strInput)
+{
+    strInput.value=strInput.value.toLowerCase();
+}​
+
 $('select#database_type').on('change', function(){
     var selected = $('#database_type option:selected').val();
     if (selected=="sqlite") {
