@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
 ## Domain for new SSL certificate
 LETSENCRYPT_HOST="status.balancebadge.io"
@@ -11,6 +10,7 @@ LETSENCRYPT_EMAIL="info@socialeck.com"
 ############# Leave this part alone ###############
 ###################################################
 
+exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 printf "Statup will try to create an SSL for domain: $LETSENCRYPT_HOST\n"
 printf "\nexport LETSENCRYPT_HOST=$LETSENCRYPT_HOST\n" >> /home/ubuntu/.profile
 printf "export LETSENCRYPT_EMAIL=$LETSENCRYPT_EMAIL\n" >> /home/ubuntu/.profile

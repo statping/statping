@@ -46,10 +46,13 @@ fi
 sudo docker system prune -af
 
 logger "Status Process complete. IP: $EC_IP | DNS: $EC2_ENDPOINT\n"
+printf "Status Process complete. IP: $EC_IP | DNS: $EC2_ENDPOINT\n"
 
+# commands to reverse installation and only leave init.sh
 #sudo docker rm -f $(sudo docker ps -a -q)
 #sudo docker rmi $(sudo docker images -q)
 #rm -rf docker-compose.yml
 #sudo rm -rf statup
 #sudo rm startup.sh
+#sudo docker system prune -af
 #sudo service docker stop
