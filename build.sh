@@ -20,31 +20,30 @@ CGO_ENABLED=0 GOOS=linux go build -ldflags="-X main.VERSION=$VERSION" -a -o buil
 
 cd build
 ls
-cd ../
 
-mv build/$APP-darwin-10.6-amd64 build/$APP
-tar -czvf build/$APP-osx-x64.tar.gz build/$APP && rm -f build/$APP
+mv $APP-darwin-10.6-amd64 $APP
+tar -czvf $APP-osx-x64.tar.gz $APP && rm -f $APP
 
-mv build/$APP-darwin-10.6-386 build/$APP
-tar -czvf build/$APP-osx-x32.tar.gz build/$APP && rm -f build/$APP
+mv $APP-darwin-10.6-386 $APP
+tar -czvf $APP-osx-x32.tar.gz $APP && rm -f $APP
 
-mv build/$APP-linux-amd64 build/$APP
-tar -czvf build/$APP-linux-x64.tar.gz build/$APP && rm -f build/$APP
+mv $APP-linux-amd64 $APP
+tar -czvf $APP-linux-x64.tar.gz $APP && rm -f $APP
 
-mv build/$APP-linux-386 build/$APP
-tar -czvf build/$APP-linux-x32.tar.gz build/$APP && rm -f build/$APP
+mv $APP-linux-386 $APP
+tar -czvf $APP-linux-x32.tar.gz $APP && rm -f $APP
 
-mv build/$APP-windows-6.0-amd64.exe build/$APP.exe
-zip $APP-windows-x64.zip build/$APP.exe  && rm -f build/$APP.exe
+mv $APP-windows-6.0-amd64.exe $APP.exe
+zip $APP-windows-x64.zip $APP.exe  && rm -f $APP.exe
 
-mv build/$APP-linux-arm-7 build/$APP
-tar -czvf build/$APP-linux-arm7.tar.gz build/$APP && rm -f build/$APP
+mv $APP-linux-arm-7 $APP
+tar -czvf $APP-linux-arm7.tar.gz $APP && rm -f $APP
 
-mv build/$APP-linux-arm64 build/$APP
-tar -czvf build/$APP-linux-arm64.tar.gz build/$APP && rm -f build/$APP
+mv $APP-linux-arm64 $APP
+tar -czvf $APP-linux-arm64.tar.gz $APP && rm -f $APP
 
-mv build/$APP-linux-alpine build/$APP
-tar -czvf build/$APP-linux-alpine.tar.gz build/$APP && rm -f build/$APP
+mv $APP-linux-alpine build/$APP
+tar -czvf $APP-linux-alpine.tar.gz $APP && rm -f $APP
 
 body='{
  "request": {
@@ -52,7 +51,7 @@ body='{
  "branch":"master",
  "config": {
    "env": {
-     ["VERSION='"$VERSION"'"]
+     VERSION: "'"$VERSION"'"
    }
   }
 }}'
