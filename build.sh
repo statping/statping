@@ -46,20 +46,20 @@ mv $APP-linux-arm64 $APP
 tar -czvf $APP-linux-arm64.tar.gz $APP && rm -f $APP
 
 body='{
- "request": {
- "message": "Updating Homebrew Formula to v'"$VERSION"'",
- "branch":"master",
- "config": {
-   "env": {
-     VERSION: "'"$VERSION"'"
-   }
+  "request": {
+    "config": {
+      "merge_mode": "replace",
+      "env": {
+        "VERSION": "'"$VERSION"'"
+      }
+    }
   }
-}}'
+}'
 
 curl -s -X POST \
  -H "Content-Type: application/json" \
  -H "Accept: application/json" \
  -H "Travis-API-Version: 3" \
- -H "Authorization: $TRAVIS_API" \
+ -H "Authorization: token $TRAVIS_API" \
  -d "$body" \
  https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statup/requests
