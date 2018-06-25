@@ -351,6 +351,10 @@ func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	if footer != core.Footer {
 		core.Footer = footer
 	}
+	domain := r.PostForm.Get("domain")
+	if domain != core.Domain {
+		core.Domain = domain
+	}
 	core.Update()
 	OnSettingsSaved(core)
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)

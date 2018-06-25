@@ -183,7 +183,7 @@ func (c *DbConfig) Save() error {
 		NewSHA1Hash(10),
 		"",
 		"",
-		"",
+		c.Domain,
 		VERSION,
 		[]plugin.Info{},
 		[]PluginJSON{},

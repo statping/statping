@@ -15,6 +15,8 @@
 
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
 
+    <div class="col-12">
+
         {{ if .Error }}
             <div class="alert alert-danger" role="alert">
                 {{ .Error }}
@@ -36,23 +38,23 @@
         </div>
         <div class="form-group" id="db_host">
             <label for="formGroupExampleInput">Host</label>
-            <input type="text" name="db_host" class="form-control" value="{{.DbHost}}" placeholder="localhost">
+            <input type="text" name="db_host" class="form-control" value="{{.DbHost}}" placeholder="localhost" required>
         </div>
         <div class="form-group" id="db_port">
             <label for="formGroupExampleInput">Database Port</label>
-            <input type="text" name="db_port" class="form-control" value="{{.DbPort}}" placeholder="localhost">
+            <input type="text" name="db_port" class="form-control" value="{{.DbPort}}" placeholder="localhost" required>
         </div>
         <div class="form-group" id="db_user">
             <label for="formGroupExampleInput2">Username</label>
-            <input type="text" name="db_user" class="form-control" value="{{.DbUser}}" placeholder="root">
+            <input type="text" name="db_user" class="form-control" value="{{.DbUser}}" placeholder="root" required>
         </div>
         <div class="form-group" id="db_password">
             <label for="formGroupExampleInput2">Password</label>
-            <input type="password" name="db_password" class="form-control" value="{{.DbPass}}" id="formGroupExampleInput2" value="" placeholder="password123">
+            <input type="password" name="db_password" class="form-control" value="{{.DbPass}}" id="formGroupExampleInput2" value="" placeholder="password123" required>
         </div>
         <div class="form-group" id="db_database">
             <label for="formGroupExampleInput2">Database</label>
-            <input type="text" name="db_database" class="form-control" value="{{.DbData}}" id="formGroupExampleInput2" value="statup" placeholder="Database name">
+            <input type="text" name="db_database" class="form-control" value="{{.DbData}}" id="formGroupExampleInput2" value="statup" placeholder="Database name" required>
         </div>
 
     </div>
@@ -61,7 +63,7 @@
 
         <div class="form-group">
             <label for="formGroupExampleInput">Project Name</label>
-            <input type="text" name="project" class="form-control" value="{{.Project}}" id="formGroupExampleInput" placeholder="Great Uptime">
+            <input type="text" name="project" class="form-control" value="{{.Project}}" id="formGroupExampleInput" placeholder="Great Uptime" required>
         </div>
 
         <div class="form-group">
@@ -70,23 +72,23 @@
         </div>
 
         <div class="form-group">
+            <label for="domain_input">Domain URL</label>
+            <input type="text" name="domain" class="form-control" value="{{.Domain}}" id="domain_input" required>
+        </div>
+
+        <div class="form-group">
             <label for="formGroupExampleInput">Admin Username</label>
-            <input type="text" name="username" class="form-control" value="{{.Username}}" id="formGroupExampleInput" value="admin" placeholder="admin">
+            <input type="text" name="username" class="form-control" value="{{.Username}}" id="formGroupExampleInput" value="admin" placeholder="admin" required>
         </div>
 
         <div class="form-group">
             <label for="formGroupExampleInput">Admin Email Address</label>
-            <input type="email" name="email" class="form-control" value="{{.Email}}" id="formGroupExampleInput" placeholder="info@admin.com">
+            <input type="email" name="email" class="form-control" value="{{.Email}}" id="formGroupExampleInput" placeholder="info@admin.com" required>
         </div>
 
         <div class="form-group">
             <label for="formGroupExampleInput">Admin Password</label>
-            <input type="password" name="password" class="form-control" value="{{.Password}}" id="formGroupExampleInput" value="admin" placeholder="admin">
-        </div>
-
-        <div class="form-group">
-            <label for="formGroupExampleInput">Confirm Password</label>
-            <input type="password" name="confirm_password" class="form-control" value="{{.Password}}" id="formGroupExampleInput" value="admin" placeholder="admin">
+            <input type="password" name="password" class="form-control" value="{{.Password}}" id="formGroupExampleInput" placeholder="password" required>
         </div>
 
         <div class="form-group">
@@ -105,6 +107,8 @@
 
     </form>
 
+    </div>
+
 </div>
 
 {{template "footer"}}
@@ -112,5 +116,6 @@
 <script src="/js/jquery-3.3.1.slim.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/setup.js"></script>
+
 </body>
 </html>

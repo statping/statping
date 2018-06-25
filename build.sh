@@ -3,6 +3,8 @@
 APP="statup"
 REPO="hunterlong/statup"
 
+printf "UPDATE core SET version='$VERSION';\n" >> sql/upgrade.sql
+
 rice embed-go
 
 mkdir build

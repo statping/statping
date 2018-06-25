@@ -6,7 +6,7 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/home/ubuntu/startup.sh
+ExecStart=/home/ubuntu/init.sh
 
 [Install]
 WantedBy=multi-user.target

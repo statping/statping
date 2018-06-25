@@ -10,12 +10,10 @@ import (
 
 func CheckServices() {
 	services, _ = SelectAllServices()
-	time.Sleep(3 * time.Second)
 	for _, v := range services {
 		obj := v
 		go obj.StartCheckins()
 		go obj.CheckQueue()
-		time.Sleep(1 * time.Second)
 	}
 }
 
@@ -89,8 +87,6 @@ func (s *Service) Failure(issue string) {
 		Issue: issue,
 	}
 	s.CreateFailure(data)
-
 	SendFailureEmail(s)
-
 	OnFailure(s)
 }

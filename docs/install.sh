@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+VERSION=v0.22
 OS=osx
 ARCH=x64
 if [ `getconf LONG_BIT` = "64" ]
@@ -15,9 +16,8 @@ case "${unameOut}" in
     MINGW*)     OS=windows;;
     *)          OS="UNKNOWN:${unameOut}"
 esac
-echo "   Installing for $OS $ARCH..."
-FILE="https://repo.com/tag/statup-$OS-$ARCH"
+FILE="https://github.com/hunterlong/statup/releases/download/$VERSION/statup-$OS-$ARCH"
 curl -sS $FILE -o statup
 chmod +x statup
 mv statup /usr/local/bin/
-echo "   statup has been successfully installed!"
+statup version

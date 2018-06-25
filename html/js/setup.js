@@ -1,3 +1,6 @@
+var currentLocation = window.location;
+$("#domain_input").val(currentLocation.origin);
+
 $('select#database_type').on('change', function(){
     var selected = $('#database_type option:selected').val();
     if (selected=="sqlite") {
@@ -14,3 +17,4 @@ $('select#database_type').on('change', function(){
         $("#db_database").show();
     }
 });
+

@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
+#
+#   Steps for Automatic SSL with Statup
+#
+# 1. Create EC2 Instance while including this file has "--data-file"
+# 2. Once EC2 is created, view System Logs in EC2 instance.
+# 3. In System logs, scroll all the way down and you'll see useful DNS records to use
+# 4. Edit your domains DNS to point to the EC2 server.
+#
+## Domain for new SSL certificate and email for Lets Encrypt SSL recovery
 
-## Domain for new SSL certificate
-LETSENCRYPT_HOST="status.balancebadge.io"
-
-## An email address that can recover SSL certificate from Lets Encrypt
-LETSENCRYPT_EMAIL="info@socialeck.com"
+LETSENCRYPT_HOST="status.MYDOMAIN.com"
+LETSENCRYPT_EMAIL="noreply@MYEMAIL.com"
 
 ###################################################
 ############# Leave this part alone ###############

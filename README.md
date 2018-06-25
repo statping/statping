@@ -38,20 +38,17 @@ LETSENCRYPT_HOST=mydomain.com \
 Once your instance has started, it will take a moment to get your SSL certificate. Make sure you have a A or CNAME record on your domain that points to the IP/DNS of your server running Statup.
 
 ## Run on EC2 Server
-Running Statup on the smallest EC2 server is very quick using the AWS AMI Image: `ami-84da93fc`.
+Running Statup on the smallest EC2 server is very quick using the AWS AMI Image: `ami-7be8a103`.
 ```bash
-ec2-run-instances --key KEYPAIR ami-7ad39a02
+ec2-run-instances --key KEYPAIR ami-7be8a103
 ```
 
 # EC2 with Automatic SSL Certificate
 ```bash
 wget https://raw.githubusercontent.com/hunterlong/statup/master/servers/ec2-ssl.sh
-#
-#  Edit ec2-ssl.sh and add LETSENCRYPT_HOST and LETSENCRYPT_EMAIL
-#
+#  Edit ec2-ssl.sh and change LETSENCRYPT_HOST and LETSENCRYPT_EMAIL
 #  nano ec2-ssl.sh
-#
-ec2-run-instances --key KEYPAIR --user-data-file ec2-ssl.sh ami-7ad39a02
+ec2-run-instances --key KEYPAIR --user-data-file ec2-ssl.sh ami-7be8a103
 ```
 
 ## Email Nofitications

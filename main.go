@@ -15,7 +15,6 @@ import (
 	plg "plugin"
 	"strconv"
 	"strings"
-	"time"
 )
 
 var (
@@ -94,24 +93,7 @@ func DownloadFile(filepath string, url string) error {
 
 func main() {
 	if len(os.Args) >= 2 {
-		if os.Args[1] == "version" {
-			fmt.Printf("Statup v%v\n", VERSION)
-		}
-		if os.Args[1] == "export" {
-			fmt.Printf("Statup v%v Exporting Static 'index.html' page...\n", VERSION)
-
-			RenderBoxes()
-			configs, _ = LoadConfig()
-			setupMode = true
-			mainProcess()
-			time.Sleep(10 * time.Second)
-			indexSource := ExportIndexHTML()
-
-			SaveFile("./index.html", []byte(indexSource))
-
-			fmt.Println("Exported Statup index page: 'index.html'")
-
-		}
+		CatchCLI(os.Args)
 		os.Exit(0)
 	}
 
