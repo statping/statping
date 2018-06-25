@@ -19,6 +19,10 @@ services:
 env:
   global:
      - VERSION=0.242
+     - DB_HOST=localhost
+     - DB_USER=travis
+     - DB_PASS=
+     - DB_DATABASE=test
 
 matrix:
   allow_failures:
