@@ -47,6 +47,7 @@ tar -czvf $APP-linux-arm64.tar.gz $APP && rm -f $APP
 
 body='{
   "request": {
+    "branch":"master",
     "config": {
       "merge_mode": "replace",
       "env": {
