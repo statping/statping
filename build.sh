@@ -49,7 +49,7 @@ body='{
   "request": {
     "branch":"master",
     "config": {
-      "merge_mode": "replace",
+      "merge_mode": "merge",
       "env": {
         "VERSION": "'"$VERSION"'"
       }
