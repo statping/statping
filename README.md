@@ -2,9 +2,32 @@
 An easy to use Status Page for your websites and applications. Statup will automatically fetch the application and render a beautiful status page with tons of features 
 for you to build an even better status page. 
 
-# A Future-Proof Status Page
+## A Future-Proof Status Page
 Statup strives to remain future-proof and remain intact if a failure is created. Your Statup service should not be running on the same instance you're trying to monitor. 
 If your server crashes your Status Page should still remaining online to notify your users of downtime. 
+
+## Lightweight and Fast
+Statup is a very lightweight application and is available for Linux, Mac, and Windows. The Docker image is only ~16Mb so you know that this application won't be filling up your hard drive space. 
+The Status binary for all other OS's is ~17Mb at most. 
+
+## 3 Different Databases
+This Status Page generator allows you to use MySQL, Postgres, or SQLite. 
+
+## No Requirements
+Statup is built in Go Language so all you need is the precompile binary based on your operating system. You won't need to install anything extra once you have the Statup binary installed. 
+
+## Run on Any Server
+Whether you're a Docker fan-boy or a AWS EC2 master, Statup gives you multiple options to simply get running. Our Amazon AMI image (`ami-7be8a103`) is only 8Gb and will automatically update to the most stable version of Statup. 
+Running on an EC2 server might be the most cost effective way to host your own Statup Status Page. The server runs on the smallest EC2 instance (t2.nano) AWS has to offer, which only costs around $4.60 USD a month for your dedicated Status Page.
+Want to run it on your own Docker server? Awesome! Statup has multiple docker-compose.yml files to work with. Statup can automatically create a SSL Certification for your status page.
+
+## Email Nofitications
+Statup includes email notification via SMTP if your services go offline. 
+
+## User Created Plugins
+Statup isn't just another Status Page for your applications, it's a framework that allows you to create your own plugins to interact with every element of your status page.
+Plugin are created in Golang using the [statup/plugin](https://github.com/hunterlong/statup/tree/master/plugin) golang package. The plugin package has a list of 
+interfaces/events to accept into your own plugin application. 
 
 ## Exporting Static HTML
 If you want to use Statup as a CLI application without running a server, you can export your status page to a static HTML. 
@@ -39,25 +62,34 @@ Once your instance has started, it will take a moment to get your SSL certificat
 
 ## Run on EC2 Server
 Running Statup on the smallest EC2 server is very quick using the AWS AMI Image: `ami-7be8a103`.
-```bash
-ec2-run-instances --key KEYPAIR ami-7be8a103
-```
 
-# EC2 with Automatic SSL Certificate
+##### Create Security Groups
+```bash
+aws ec2 create-security-group --group-name StatupPublicHTTP --description "Statup HTTP Server on port 80 and 443"
+# will response back a Group ID. Copy ID and use it for --group-id below.
+aws ec2 authorize-security-group-ingress --group-id sg-7e8b830f --protocol tcp --port 80 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress --group-id sg-7e8b830f --protocol tcp --port 443 --cidr 0.0.0.0/0
+```
+##### Create EC2 without SSL
+```bash
+aws ec2 run-instances \ 
+    --image-id ami-7be8a103 \ 
+    --count 1 --instance-type t2.nano \ 
+    --key-name MYKEYHERE \ 
+    --security-group-ids sg-7e8b830f
+```
+##### Create EC2 with Automatic SSL Certification
 ```bash
 wget https://raw.githubusercontent.com/hunterlong/statup/master/servers/ec2-ssl.sh
-#  Edit ec2-ssl.sh and change LETSENCRYPT_HOST and LETSENCRYPT_EMAIL
-#  nano ec2-ssl.sh
-ec2-run-instances --key KEYPAIR --user-data-file ec2-ssl.sh ami-7be8a103
+# Edit ec2-ssl.sh and insert your domain you want to use, then run command below.
+# Use the Security Group ID that you used above for --security-group-ids
+aws ec2 run-instances \ 
+    --user-data file://ec2-ssl.sh \ 
+    --image-id ami-7be8a103 \ 
+    --count 1 --instance-type t2.nano \ 
+    --key-name MYKEYHERE \ 
+    --security-group-ids sg-7e8b830f
 ```
-
-## Email Nofitications
-Statup includes email notification via SMTP if your services go offline. 
-
-## User Created Plugins
-Statup isn't just another Status Page for your applications, it's a framework that allows you to create your own plugins to interact with every element of your status page.
-Plugin are created in Golang using the [statup/plugin](https://github.com/hunterlong/statup/tree/master/plugin) golang package. The plugin package has a list of 
-interfaces/events to accept into your own plugin application. 
 
 ## Prometheus Exporter
 Statup includes a prometheus exporter so you can have even more monitoring power with your services. The prometheus exporter can be seen on `/metrics`, simply create another exporter in your prometheus config.
