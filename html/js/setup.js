@@ -1,8 +1,7 @@
 var currentLocation = window.location;
 $("#domain_input").val(currentLocation.origin);
 
-function forceLower(strInput)
-{
+function forceLower(strInput) {
     strInput.value=strInput.value.toLowerCase();
 }​
 

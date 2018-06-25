@@ -1,12 +1,12 @@
 package main
 
 import (
-	"encoding/json"
-	"github.com/gorilla/mux"
-	"net/http"
 	"crypto/sha1"
+	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"math/rand"
+	"net/http"
 )
 
 func ApiIndexHandler(w http.ResponseWriter, r *http.Request) {
