@@ -8,8 +8,18 @@ HTML,BODY {
     max-width: 860px;
 }
 
+.online_list .badge {
+    margin-top: 0.2rem;
+}
+
 .navbar {
     margin-bottom: 30px;
+}
+
+
+.failing_bg {
+    background-color: #ff4e4e !important;
+    font-weight: bold;
 }
 
 .lg_number {
@@ -58,9 +68,13 @@ HTML,BODY {
 }
 
 .footer A {
-    color: #cccccc;
+    color: #aaaaaa;
+    text-decoration: none;
 }
 
+.footer A:HOVER {
+    color: #6d6d6d;
+}
 
 .online_badge {
     color: #fff;
@@ -93,7 +107,26 @@ HTML,BODY {
 .chart-container {
     position: relative;
     height: 20vh;
-    width: 60vh;
+    width: 67vh;
+    margin-left: -52px;
+    margin-bottom: -30px;
+}
+
+
+.btn-primary {
+    background-color: white;
+    border: 1px solid #b9b9b9;
+    color: #353535;
+    height: 35px;
+    padding: 5px 15px;
+}
+
+.btn-danger {
+    background-color: #dd3545;
+    border: 1px solid #b70000;
+    color: #fffcfc;
+    height: 35px;
+    padding: 5px 15px;
 }
 
 @media (max-width: 767px) {
@@ -109,8 +142,8 @@ HTML,BODY {
 
     .chart-container {
         position: relative;
-        height:17vh;
-        width:80vw;
+        height: 20vh;
+        width: 100vw;
     }
 
     .container {

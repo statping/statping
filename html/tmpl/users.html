@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/base.css">
 
@@ -23,7 +22,6 @@
             <table class="table table-striped">
                 <thead>
                 <tr>
-                    <th scope="col">#</th>
                     <th scope="col">Username</th>
                     <th scope="col"></th>
                 </tr>
@@ -31,7 +29,6 @@
                 <tbody>
                 {{range .}}
                 <tr>
-                    <th scope="row">{{.Id}}</th>
                     <td>{{.Username}}</td>
                     <td class="text-right">
                         <div class="btn-group">
@@ -52,6 +49,12 @@
                         </div>
                     </div>
                     <div class="form-group row">
+                        <label for="inputEmail3" class="col-sm-4 col-form-label">Email Address</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="email" class="form-control" id="inputEmail3" placeholder="user@domain.com">
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <label for="inputPassword3" class="col-sm-4 col-form-label">Password</label>
                         <div class="col-sm-8">
                             <input type="password" name="password" class="form-control" id="inputPassword3" placeholder="Password">
@@ -60,7 +63,7 @@
                     <div class="form-group row">
                         <label for="inputPassword3" class="col-sm-4 col-form-label">Confirm Password</label>
                         <div class="col-sm-8">
-                            <input type="password" name="password_confirm" class="form-control" id="inputPassword3" placeholder="ConfirmPassword">
+                            <input type="password" name="password_confirm" class="form-control" id="inputPassword3" placeholder="Confirm Password">
                         </div>
                     </div>
                     <div class="form-group row">

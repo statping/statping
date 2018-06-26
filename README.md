@@ -3,7 +3,7 @@ An easy to use Status Page for your websites and applications. Statup will autom
 for you to build an even better status page. 
 
 <p align="center">
-<a href="https://github.com/hunterlong/statup/wiki">View Wiki</a> <br> <a href="https://github.com/hunterlong/statup/wiki/Docker">Docker</a> | <a href="https://github.com/hunterlong/statup/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/hunterlong/statup/wiki/Heroku">Heroku</a> | <a href="https://github.com/hunterlong/statup/wiki/Mac">Mac</a> | <a href="https://github.com/hunterlong/statup/wiki/Linux">Linux</a> | <a href="https://github.com/hunterlong/statup/wiki/Windows">Windows</a>
+<a href="https://github.com/hunterlong/statup/wiki">View Wiki</a> | <a href="https://demo.statup.io">Demo</a> <br> <a href="https://github.com/hunterlong/statup/wiki/Docker">Docker</a> | <a href="https://github.com/hunterlong/statup/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/hunterlong/statup/wiki/Heroku">Heroku</a> | <a href="https://github.com/hunterlong/statup/wiki/Mac">Mac</a> | <a href="https://github.com/hunterlong/statup/wiki/Linux">Linux</a> | <a href="https://github.com/hunterlong/statup/wiki/Windows">Windows</a>
 </p>
 
 ## A Future-Proof Status Page

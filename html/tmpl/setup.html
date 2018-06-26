@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/base.css">
     <script src="/js/Chart.bundle.min.js"></script>
@@ -23,7 +22,7 @@
             </div>
         {{ end }}
 
-    <form method="POST" action="/setup">
+    <form method="POST" id="setup_form" action="/setup">
 
     <div class="row">
 
@@ -100,8 +99,7 @@
 
     </div>
 
-            <button type="submit" class="btn btn-primary btn-block">Save Settings</button>
-
+            <button id="setup_button" type="submit" class="btn btn-primary btn-block">Save Settings</button>
 
     </div>
 

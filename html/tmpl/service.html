@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/base.css">
     <script src="/js/Chart.bundle.min.js"></script>
@@ -57,24 +56,26 @@
             </div>
 
 
-        <div class="col-12">
+{{if Auth}}
 
-            <h3>Service Checkins</h3>
+    <div class="col-12mt-4">
 
-            {{ range .Checkins }}
+        <h3>Service Checkins</h3>
 
-                    <div class="col-12 mt-3">
+    {{ range .Checkins }}
 
-                        <h5>Check #{{.Id}} <span class="badge online_badge float-right">Checked in {{.Ago}}</span></h5>
+        <div class="col-12 mt-3">
 
-                        <input type="text" class="form-control" value="https://domainhere.com/api/checkin/{{.Api}}">
+            <h5>Check #{{.Id}} <span class="badge online_badge float-right">Checked in {{.Ago}}</span></h5>
+
+            <input type="text" class="form-control" value="https://domainhere.com/api/checkin/{{.Api}}">
 
 
-                    </div>
+        </div>
 
-            {{ end }}
+    {{ end }}
 
-            <form action="/service/{{.Id}}/checkin" method="POST">
+        <form action="/service/{{.Id}}/checkin" method="POST">
             <div class="form-group row">
                 <label for="service_name" class="col-sm-4 col-form-label">Check Interval (in seconds)</label>
                 <div class="col-sm-8">
@@ -86,16 +87,13 @@
                     <button type="submit" class="btn btn-success">Save Checkin</button>
                 </div>
             </div>
-            </form>
+        </form>
 
 
-        </div>
+    </div>
 
 
-
-
-{{if Auth}}
-        <div class="col-12">
+        <div class="col-12 mt-4">
 
             <h3>Edit Service</h3>
 
@@ -166,15 +164,15 @@
 
         </div>
 
-<div class="col-12">
+<div class="col-12 mt-4">
     <h3>Last Response</h3>
 
     <textarea rows="8" class="form-control" readonly>{{ .LastResponse }}</textarea>
 
     <div class="form-group row mt-2">
         <label for="last_status_code" class="col-sm-3 col-form-label">Status Code</label>
-        <div class="col-sm-9">
-            <input type="text" id="last_status_code" class="form-control" value="{{ .LastStatusCode }}">
+        <div class="col-sm-2">
+            <input type="text" id="last_status_code" class="form-control" value="{{ .LastStatusCode }}" readonly>
         </div>
     </div>
 

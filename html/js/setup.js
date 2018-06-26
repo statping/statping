@@ -22,3 +22,9 @@ $('select#database_type').on('change', function(){
     }
 });
 
+
+$("#setup_form").submit(function() {
+    $("#setup_button").prop("disabled", true);
+    $("#setup_button").text("Creating Statup...");
+    return true;
+});

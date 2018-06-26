@@ -114,13 +114,15 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	username := r.PostForm.Get("username")
 	password := r.PostForm.Get("password")
+	email := r.PostForm.Get("email")
 	user := &User{
 		Username: username,
 		Password: password,
+		Email:    email,
 	}
 	_, err := user.Create()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 	http.Redirect(w, r, "/users", http.StatusSeeOther)
 }

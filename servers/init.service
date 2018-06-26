@@ -1,12 +1,13 @@
 [Unit]
-Description=Statup Docker Startup
+Description=Statup Server
 After=network.target
 After=systemd-user-sessions.service
 After=network-online.target
 
 [Service]
-Type=oneshot
-ExecStart=/home/ubuntu/init.sh
+Type=simple
+Restart=always
+ExecStart=/usr/local/bin/statup
 
 [Install]
 WantedBy=multi-user.target

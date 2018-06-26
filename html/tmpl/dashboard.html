@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/base.css">
 
@@ -16,9 +15,9 @@
 
 {{template "nav"}}
 
-    <div class="col-12">
+    <div class="col-12 mt-5">
 
-    <div class="row stats_area mb-4">
+    <div class="row stats_area mb-5">
 
         <div class="col-4">
             <span class="lg_number">{{ .CountServices }}</span>
@@ -36,16 +35,31 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row mt-4">
 
         <div class="col-12">
+
+            <h3>Services</h3>
+
+            <div class="list-group mb-5 mt-3">
+            {{ range .Services }}
+                <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{.Name}}</h5>
+                    <small>{{if .Online}} <span class="badge badge-success">ONLINE</span> {{else}} <span class="badge badge-danger">OFFLINE</span> {{end}}</small>
+                    </div>
+                    <p class="mb-1">Created {{.CreatedAt}}</p>
+                </a>
+            {{ end }}
+            </div>
+
 
             <h3>Latest Failures</h3>
 
         {{ range .Services }}
 
                 {{ if .LimitedFailures }}
-                    <div class="list-group mt-5">
+                    <div class="list-group mt-3">
                     {{ range .LimitedFailures }}
                         <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                             <div class="d-flex w-100 justify-content-between">
