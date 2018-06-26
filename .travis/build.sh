@@ -44,23 +44,3 @@ tar -czvf $APP-linux-arm7.tar.gz $APP && rm -f $APP
 
 mv $APP-linux-arm64 $APP
 tar -czvf $APP-linux-arm64.tar.gz $APP && rm -f $APP
-
-body='{
-  "request": {
-    "branch":"master",
-    "config": {
-      "merge_mode": "merge",
-      "env": {
-        "VERSION": "'"$VERSION"'"
-      }
-    }
-  }
-}'
-
-curl -s -X POST \
- -H "Content-Type: application/json" \
- -H "Accept: application/json" \
- -H "Travis-API-Version: 3" \
- -H "Authorization: token $TRAVIS_API" \
- -d "$body" \
- https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statup/requests

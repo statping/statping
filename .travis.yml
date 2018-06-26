@@ -18,7 +18,7 @@ services:
 
 env:
   global:
-     - VERSION=0.242
+     - VERSION=0.243
      - DB_HOST=localhost
      - DB_USER=travis
      - DB_PASS=
@@ -69,4 +69,7 @@ script:
   - go test -v
 
 after_success:
-  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then /bin/bash -c ./build.sh; fi
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then /bin/bash -c .travis/build.sh; fi
+
+after_deploy:
+  - /bin/bash -c .travis/deploy.sh
