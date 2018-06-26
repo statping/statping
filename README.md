@@ -1,6 +1,10 @@
-# Statup - Status Page [![Build Status](https://travis-ci.org/hunterlong/statup.svg?branch=master)](https://travis-ci.org/hunterlong/statup)
+# Statup - Status Page & Monitoring Server [![Build Status](https://travis-ci.org/hunterlong/statup.svg?branch=master)](https://travis-ci.org/hunterlong/statup)
 An easy to use Status Page for your websites and applications. Statup will automatically fetch the application and render a beautiful status page with tons of features 
 for you to build an even better status page. 
+
+<p align="center">
+<a href="https://github.com/hunterlong/statup/wiki">View Wiki</a> <br> <a href="https://github.com/hunterlong/statup/wiki/Docker">Docker</a> | <a href="https://github.com/hunterlong/statup/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/hunterlong/statup/wiki/Heroku">Heroku</a> | <a href="https://github.com/hunterlong/statup/wiki/Mac">Mac</a> | <a href="https://github.com/hunterlong/statup/wiki/Linux">Linux</a> | <a href="https://github.com/hunterlong/statup/wiki/Windows">Windows</a>
+</p>
 
 ## A Future-Proof Status Page
 Statup strives to remain future-proof and remain intact if a failure is created. Your Statup service should not be running on the same instance you're trying to monitor. 
@@ -14,7 +18,7 @@ The Status binary for all other OS's is ~17Mb at most.
 This Status Page generator allows you to use MySQL, Postgres, or SQLite. 
 
 ## No Requirements
-Statup is built in Go Language so all you need is the precompile binary based on your operating system. You won't need to install anything extra once you have the Statup binary installed. 
+Statup is built in Go Language so all you need is the precompile binary based on your operating system. You won't need to install anything extra once you have the Statup binary installed. You can even run Statup on a Raspberry Pi.
 
 ## Run on Any Server
 Whether you're a Docker fan-boy or a AWS EC2 master, Statup gives you multiple options to simply get running. Our Amazon AMI image (`ami-7be8a103`) is only 8Gb and will automatically update to the most stable version of Statup. 
