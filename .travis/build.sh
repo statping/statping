@@ -4,12 +4,6 @@ APP="statup"
 REPO="hunterlong/statup"
 SASS=1.7.1
 
-# INSTALLING SASS
-curl -OL https://github.com/sass/dart-sass/releases/download/$SASS/dart-sass-$SASS-linux-x64.tar.gz
-tar -xvzf dart-sass-$SASS-linux-x64.tar.gz
-sudo chmod +x dart-sass/sass
-sudo mv dart-sass/sass /usr/local/bin/sass
-
 # RENDERING CSS
 sass html/scss/base.scss:html/css/base.css
 
