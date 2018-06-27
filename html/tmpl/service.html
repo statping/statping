@@ -19,11 +19,17 @@
 
             <div class="col-12 mb-4">
 
+            {{if .Online }}
+                <span class="text-white d-md-none btn bg-success d-block">ONLINE</span>
+            {{ else }}
+                <span class="text-white d-md-none btn bg-danger d-block">OFFLINE</span>
+            {{end}}
+
                         <h4 class="mt-2">{{ .Name }}
                         {{if .Online }}
-                            <span class="badge online_badge float-right">ONLINE</span>
+                            <span class="badge online_badge float-right hidden-sm-up">ONLINE</span>
                         {{ else }}
-                            <span class="badge offline_badge float-right">OFFLINE</span>
+                            <span class="badge offline_badge float-right hidden-sm-up">OFFLINE</span>
                         {{end}}</h4>
 
                         <div class="row stats_area mt-5 mb-5">

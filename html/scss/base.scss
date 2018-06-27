@@ -1,7 +1,4 @@
-$background-color: #262626;
-$max-width: 860px;
-$card-background: #121212;
-$card-stats-color: #dfdfdf;
+@import 'variables';
 
 
 HTML,BODY {
@@ -41,50 +38,16 @@ HTML,BODY {
     font-size: 0.85rem;
 }
 
-.failing_bg {
-    background-color: #ff4e4e !important;
-    font-weight: bold;
-}
-
 .lg_number {
-    font-size: 26pt;
+    font-size: $card-stats-size;
     font-weight: bold;
     display: block;
     color: $card-stats-color;
 }
 
-.text_perfect {
-    color: #33b418;
-    text-shadow: 0px 1px 0 #0e6702;
-}
-
-.text_good {
-    color: #33b418;
-    text-shadow: 0px 1px 0 #0e6702;
-}
-
-.text_ok {
-    color: #33b418;
-    text-shadow: 0px 1px 0 #0e6702;
-}
-
-.text_bad {
-    color: #33b418;
-    text-shadow: 0px 1px 0 #0e6702;
-}
-
 .stats_area {
     text-align: center;
     color: #a5a5a5;
-}
-
-.offline_bg {
-    background-color: white !important;
-    padding-bottom: 70px !important;
-}
-
-.online_list {
-
 }
 
 .lower_canvas {
@@ -96,25 +59,6 @@ HTML,BODY {
 
 .lower_canvas SPAN {
     font-size: 1rem;
-}
-
-.offline_lower_canvas {
-    position: absolute;
-    bottom: -120px;
-    height: 60px;
-    left: -25px;
-    width: 805px;
-    padding: 17px 10px;
-}
-
-.offline_lower_canvas SPAN {
-    font-weight: bold;
-    font-size: 0.85rem;
-}
-
-.offline_lower_canvas A {
-    background-color: #c51b1a;
-    border: 1px solid #bb1727;
 }
 
 .footer {

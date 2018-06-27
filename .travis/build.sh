@@ -3,6 +3,16 @@
 APP="statup"
 REPO="hunterlong/statup"
 
+
+# INSTALLING SASS
+SASS=1.7.1
+curl -OL https://github.com/sass/dart-sass/releases/download/$SASS/dart-sass-$SASS-linux-x64.tar.gz
+tar -xvzf dart-sass-$SASS-linux-x64.tar.gz
+chmod +x dart-sass/sass
+mv dart-sass/sass /usr/local/bin/sass
+# RENDERING CSS
+sass html/scss/base.scss:html/css/base.css
+
 printf "UPDATE core SET version='$VERSION';\n" >> sql/upgrade.sql
 
 rice embed-go
