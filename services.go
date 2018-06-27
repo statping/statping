@@ -107,8 +107,9 @@ type DateScan struct {
 
 func (s *Service) GraphData() string {
 	var d []DateScan
-	since := time.Now().Add(time.Hour*-24 + time.Minute*0 + time.Second*0)
-	sql := fmt.Sprintf("SELECT date_trunc('minute', created_at), AVG(latency)*1000 AS value FROM hits WHERE service=%v AND created_at > '%v' GROUP BY 1 ORDER BY date_trunc ASC;", s.Id, since.Format(time.RFC3339))
+	increment := "minute"
+	since := time.Now().Add(time.Hour*-12 + time.Minute*0 + time.Second*0)
+	sql := fmt.Sprintf("SELECT date_trunc('%v', created_at), AVG(latency)*1000 AS value FROM hits WHERE service=%v AND created_at > '%v' GROUP BY 1 ORDER BY date_trunc ASC;", increment, s.Id, since.Format(time.RFC3339))
 	dated, err := dbSession.Query(db.Raw(sql))
 	if err != nil {
 		fmt.Println(err)

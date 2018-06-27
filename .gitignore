@@ -6,3 +6,4 @@ plugins/*.so
 data
 build
 vendor
+html/scss/.sass-cache

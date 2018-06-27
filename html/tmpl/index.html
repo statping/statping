@@ -26,10 +26,10 @@
         <h5 class="col-12 text-center mb-5 text-muted">{{ .Core.Description }}</h5>
     {{ end }}
 
-<div class="col-12 mb-5">
+<div class="col-12 full-col-12 mb-5">
     <div class="list-group online_list">
     {{ range .Services }}
-        <a href="#" class="service_li list-group-item list-group-item-action {{if not .Online}}failing_bg text-white{{ end }}" data-id="{{.Id}}">
+        <a href="#" class="service_li list-group-item list-group-item-action {{if not .Online}}bg-danger text-white{{ end }}" data-id="{{.Id}}">
         {{ .Name }}
         {{if .Online}}
             <span class="badge online_badge float-right">ONLINE</span>
@@ -42,12 +42,11 @@
 </div>
 
 
-    <div class="col-12">
-
+    <div class="col-12 full-col-12">
         {{ range .Services }}
             <div class="mt-4" id="service_id_{{.Id}}">
                 <div class="card">
-                    <div class="card-body{{if not .Online}} offline_bg{{end}}">
+                    <div class="card-body">
 
                         <div class="col-12">
 
@@ -58,54 +57,42 @@
                         <span class="badge offline_badge float-right">OFFLINE</span>
                     {{end}}</h4>
 
-                <div class="row stats_area mt-5 mb-5">
-
+                        <div class="row stats_area mt-5 mb-5">
                             <div class="col-4">
                                 <span class="lg_number">{{.Online24}}%</span>
                                 Online last 24 Hours
                             </div>
-
                             <div class="col-4">
                                 <span class="lg_number">{{.AvgTime}}ms</span>
                                 Average Response
                             </div>
-
                             <div class="col-4">
                                 <span class="lg_number">{{.AvgUptime}}%</span>
                                 Total Uptime
                             </div>
                         </div>
 
-                        {{ if .AvgTime }}
-                        <div class="chart-container">
-                            <canvas id="service_{{ .Id }}"></canvas>
-                            <div class="lower_canvas text-white">
-                                <div class="col-12">
-                                <span>No failures within the last 25 days</span>
-                                <a href="/service/{{ .Id }}" class="btn btn-success btn-sm float-right">View Service</a>
-                                </div>
-                            </div>
-                        </div>
-                        {{ else }}
-                            <div class="offline_lower_canvas bg-danger">
-                                <div class="col-12">
-                                <span class="text-white">383 failures in the last 24 hours</span>
-                                <a href="/service/{{ .Id }}" class="btn btn-danger btn-sm float-right">View Failures</a>
-                                </div>
-                            </div>
-                        {{ end }}
-
                     {{ if .LimitedFailures }}
 
                     {{ end }}
                         </div>
                     </div>
+                {{ if .AvgTime }}
+                    <div class="chart-container">
+                        <canvas id="service_{{ .Id }}"></canvas>
+                    </div>
+                {{ end }}
+                    <div class="lower_canvas full-col-12 text-white{{if not .Online}} bg-danger{{end}}">
+                        <div class="col-12">
+                            <span>No failures within the last 25 days</span>
+                            <a href="/service/{{ .Id }}" class="btn {{if .Online}}btn-success{{else}}btn-danger{{end}} btn-sm float-right">View Service</a>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         {{ end }}
     </div>
-
-
 </div>
 
 {{template "footer"}}
@@ -146,8 +133,8 @@ var chartdata = new Chart(ctx, {
         },
         responsiveAnimationDuration: 0,
         animation: {
-            "duration": 0,
-            "onComplete": function() {
+            duration: 3500,
+            onComplete: function() {
                 var chartInstance = this.chart,
                         ctx = chartInstance.ctx;
 
@@ -208,8 +195,11 @@ var chartdata = new Chart(ctx, {
 
                     ctx.fillStyle = '#ffa7a2';
                     ctx.fillText(highestNum+"ms", hxH - 40, hyH + 15);
-                    ctx.fillStyle = '#54944b';
-                    ctx.fillText(lowestnum+"ms", hxL, hyL - 5);
+                    ctx.fillStyle = '#45d642';
+                    ctx.fillText(lowestnum+"ms", hxL, hyL + 10);
+
+                    console.log("done service_id_{{.Id}}")
+
                 });
             }
         },
@@ -225,7 +215,7 @@ var chartdata = new Chart(ctx, {
                 ticks: {
                     fontSize: 20,
                     display: false,
-                    beginAtZero: true
+                    beginAtZero: false
                 },
                 gridLines: {
                     display:false
