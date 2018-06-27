@@ -50,12 +50,12 @@
 
                         <div class="col-12">
 
-                        <h4 class="mt-3"><a href="/service/{{.Id}}"{{if not .Online}} class="text-danger"{{end}}>{{ .Name }}</a>
-                    {{if .Online}}
-                        <span class="badge online_badge float-right">ONLINE</span>
-                    {{ else }}
-                        <span class="badge offline_badge float-right">OFFLINE</span>
-                    {{end}}</h4>
+                            <h4 class="mt-3"><a href="/service/{{.Id}}"{{if not .Online}} class="text-danger"{{end}}>{{ .Name }}</a>
+                        {{if .Online}}
+                            <span class="badge online_badge float-right">ONLINE</span>
+                        {{ else }}
+                            <span class="badge offline_badge float-right">OFFLINE</span>
+                        {{end}}</h4>
 
                         <div class="row stats_area mt-5 mb-5">
                             <div class="col-4">
