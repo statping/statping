@@ -79,8 +79,20 @@
                         {{ if .AvgTime }}
                         <div class="chart-container">
                             <canvas id="service_{{ .Id }}"></canvas>
-                            <div class="lower_canvas"></div>
+                            <div class="lower_canvas text-white">
+                                <div class="col-12">
+                                <span>No failures within the last 25 days</span>
+                                <a href="/service/{{ .Id }}" class="btn btn-success btn-sm float-right">View Service</a>
+                                </div>
+                            </div>
                         </div>
+                        {{ else }}
+                            <div class="offline_lower_canvas bg-danger">
+                                <div class="col-12">
+                                <span class="text-white">383 failures in the last 24 hours</span>
+                                <a href="/service/{{ .Id }}" class="btn btn-danger btn-sm float-right">View Failures</a>
+                                </div>
+                            </div>
                         {{ end }}
 
                     {{ if .LimitedFailures }}
