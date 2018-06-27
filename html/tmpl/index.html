@@ -29,7 +29,7 @@
 <div class="col-12 mb-5">
     <div class="list-group online_list">
     {{ range .Services }}
-        <a href="#" class="list-group-item list-group-item-action {{if not .Online}}failing_bg text-white{{ end }}">
+        <a href="#" class="service_li list-group-item list-group-item-action {{if not .Online}}failing_bg text-white{{ end }}" data-id="{{.Id}}">
         {{ .Name }}
         {{if .Online}}
             <span class="badge online_badge float-right">ONLINE</span>
@@ -45,7 +45,7 @@
     <div class="col-12">
 
         {{ range .Services }}
-            <div class="mt-4">
+            <div class="mt-4" id="service_id_{{.Id}}">
                 <div class="card">
                     <div class="card-body{{if not .Online}} offline_bg{{end}}">
 
@@ -79,24 +79,12 @@
                         {{ if .AvgTime }}
                         <div class="chart-container">
                             <canvas id="service_{{ .Id }}"></canvas>
+                            <div class="lower_canvas"></div>
                         </div>
                         {{ end }}
 
                     {{ if .LimitedFailures }}
-                        <div class="list-group mt-5">
-                         {{ range .LimitedFailures }}
-                            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h5 class="mb-1">{{.ParseError}}</h5>
-                                    <small>Reported {{.Ago}}</small>
-                                </div>
-                                <p class="mb-1">{{.Issue}}</p>
-                            </a>
-                         {{ end }}
 
-                            <span class="mt-2 text-right">{{ .TotalFailures }} Total Failures</span>
-
-                        </div>
                     {{ end }}
                         </div>
                     </div>
@@ -133,21 +121,32 @@ var chartdata = new Chart(ctx, {
     options: {
         maintainAspectRatio: false,
         scaleShowValues: true,
-        hover: {
-            "animationDuration": 0
+        layout: {
+            padding: {
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: -10
+            }
         },
+        hover: {
+            animationDuration: 0,
+        },
+        responsiveAnimationDuration: 0,
         animation: {
             "duration": 0,
             "onComplete": function() {
                 var chartInstance = this.chart,
                         ctx = chartInstance.ctx;
 
+                var controller = this.chart.controller;
+                var xAxis = controller.scales['x-axis-0'];
+                var yAxis = controller.scales['y-axis-0'];
+
                 ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
 
-                var controller = this.chart.controller;
-                var xAxis = controller.scales['x-axis-0'];
                 var	numTicks = xAxis.ticks.length;
                 var yOffsetStart = xAxis.width / numTicks;
                 var halfBarWidth = (xAxis.width / (numTicks * 2));
@@ -161,20 +160,44 @@ var chartdata = new Chart(ctx, {
 
                 this.data.datasets.forEach(function(dataset, i) {
                     var meta = chartInstance.controller.getDatasetMeta(i);
-                    var hx = 0;
-                    var hy = 0;
+                    var hxH = 0;
+                    var hyH = 0;
+                    var hxL = 0;
+                    var hyL = 0;
                     var highestNum = 0;
+                    var lowestnum = 999999999999;
                     meta.data.forEach(function(bar, index) {
                         var data = dataset.data[index];
+
+                        if (data.y < lowestnum) {
+                            lowestnum = data.y;
+                            hxL = bar._model.x;
+                            hyL = bar._model.y;
+                        }
+
                         if (data.y > highestNum) {
                             highestNum = data.y;
-                            highest = bar;
-                            hx = bar._model.x;
-                            hy = bar._model.y;
+                            hxH = bar._model.x;
+                            hyH = bar._model.y;
                         }
                     });
-                    ctx.fillStyle = '#0d7809';
-                    ctx.fillText(highestNum+"ms", hx - 40, hy + 15);
+
+                    if (hxH >= 820) {
+                        hxH = 820;
+                    } else if (hxH <= 50) {
+                        hxH = 50;
+                    }
+
+                    if (hxL >= 820) {
+                        hxL = 820;
+                    } else if (hxL <= 70) {
+                        hxL = 70;
+                    }
+
+                    ctx.fillStyle = '#ffa7a2';
+                    ctx.fillText(highestNum+"ms", hxH - 40, hyH + 15);
+                    ctx.fillStyle = '#54944b';
+                    ctx.fillText(lowestnum+"ms", hxL, hyL - 5);
                 });
             }
         },
@@ -189,7 +212,8 @@ var chartdata = new Chart(ctx, {
                 display: false,
                 ticks: {
                     fontSize: 20,
-                    display: false
+                    display: false,
+                    beginAtZero: true
                 },
                 gridLines: {
                     display:false
@@ -203,6 +227,8 @@ var chartdata = new Chart(ctx, {
                     display:false
                 },
                 ticks: {
+                    stepSize: 1,
+                    min: 0,
                     fontColor: "white",
                     fontSize: 20,
                     display: false,
@@ -234,6 +260,7 @@ var chartdata = new Chart(ctx, {
 {{ else }}
 <script src="/js/jquery-3.3.1.slim.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
 {{end}}
 
 </body>

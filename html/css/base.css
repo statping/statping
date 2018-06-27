@@ -107,7 +107,7 @@ HTML,BODY {
 .chart-container {
     position: relative;
     height: 20vh;
-    width: 67vh;
+    width: 93vh;
     margin-left: -52px;
     margin-bottom: -30px;
 }
@@ -127,6 +127,16 @@ HTML,BODY {
     color: #fffcfc;
     height: 35px;
     padding: 5px 15px;
+}
+
+.lower_canvas {
+    width: 100%;
+    height: 100%;
+    background-color: #48d338;
+}
+
+.card-body {
+    padding-bottom: 85px;
 }
 
 @media (max-width: 767px) {
@@ -159,10 +169,22 @@ HTML,BODY {
 
     .card-body {
         font-size: 6pt;
+        padding: 5px 10px;
+        height: 330px;
     }
 
     .lg_number {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
+    }
+
+    .stats_area {
+        margin-top: 25px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .stats_area .col-4 {
+        padding-left: 0;
+        padding-right: 0;
     }
 
 
