@@ -4,17 +4,20 @@ APP="statup"
 REPO="hunterlong/statup"
 SASS=1.7.1
 
-
+# COMPILE BOOTSTRAP
 git clone https://github.com/twbs/bootstrap.git
 cd bootstrap
 npm install
 rm -f scss/_variables.scss
-mv html/scss/bootstrap.scss scss/_variables.scss
+cp ../html/scss/_variables.scss scss/_variables.scss
 npm run dist
-mv dist/css/bootstrap.min.cs html/css/bootstrap.min.css
+mv dist/css/bootstrap.min.css ../html/css/bootstrap.min.css
+cd ../
+rm -rf bootstrap
 
 # RENDERING CSS
-sass html/scss/base.scss:html/css/base.css
+gem install sass
+sass html/scss/base.scss html/css/base.css
 
 # MIGRATION SQL FILE FOR CURRENT VERSION
 printf "UPDATE core SET version='$VERSION';\n" >> sql/upgrade.sql
@@ -22,6 +25,7 @@ printf "UPDATE core SET version='$VERSION';\n" >> sql/upgrade.sql
 # COMPILE SRC INTO BIN
 rice embed-go
 
+# BUILD STATUP GOLANG BINS
 mkdir build
 xgo -go 1.10.x --targets=darwin/amd64 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
 xgo -go 1.10.x --targets=darwin/386 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
@@ -30,7 +34,6 @@ xgo -go 1.10.x --targets=linux/386 --dest=build -ldflags="-X main.VERSION=$VERSI
 xgo -go 1.10.x --targets=windows-6.0/amd64 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
 xgo -go 1.10.x --targets=linux/arm-7 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
 xgo -go 1.10.x --targets=linux/arm64 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
-
 CGO_ENABLED=0 GOOS=linux go build -ldflags="-X main.VERSION=$VERSION" -a -o build/$APP-linux-alpine .
 
 cd build

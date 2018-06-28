@@ -51,7 +51,6 @@ notifications:
   email: false
 
 before_install:
-  - gem install sass
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then travis_wait 30 docker pull karalabe/xgo-latest; fi
 
 before_script:
