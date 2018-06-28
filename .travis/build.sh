@@ -4,6 +4,15 @@ APP="statup"
 REPO="hunterlong/statup"
 SASS=1.7.1
 
+
+git clone https://github.com/twbs/bootstrap.git
+cd bootstrap
+npm install
+rm -f scss/_variables.scss
+mv html/scss/bootstrap.scss scss/_variables.scss
+npm run dist
+mv dist/css/bootstrap.min.cs html/css/bootstrap.min.css
+
 # RENDERING CSS
 sass html/scss/base.scss:html/css/base.css
 

@@ -10,6 +10,11 @@ func CatchCLI(args []string) {
 	switch args[1] {
 	case "version":
 		fmt.Printf("Statup v%v\n", VERSION)
+	case "assets":
+		RenderBoxes()
+		CreateAllAssets()
+	case "sass":
+		CompileSASS()
 	case "export":
 		fmt.Printf("Statup v%v Exporting Static 'index.html' page...\n", VERSION)
 		RenderBoxes()

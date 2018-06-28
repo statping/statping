@@ -9,3 +9,6 @@ vendor
 html/scss/.sass-cache
 dart-sass
 .sass-cache
+public
+assets
+cmd.sh

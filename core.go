@@ -30,6 +30,24 @@ func (c *Core) Update() (*Core, error) {
 	return c, nil
 }
 
+func (c Core) UsingAssets() bool {
+	return useAssets
+}
+
+func (c Core) SassVars() string {
+	if !useAssets {
+		return ""
+	}
+	return OpenAsset("scss/variables.scss")
+}
+
+func (c Core) BaseSASS() string {
+	if !useAssets {
+		return ""
+	}
+	return OpenAsset("scss/base.scss")
+}
+
 func (c Core) AllOnline() bool {
 	for _, s := range services {
 		if !s.Online {

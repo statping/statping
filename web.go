@@ -26,8 +26,18 @@ const (
 func Router() *mux.Router {
 	r := mux.NewRouter()
 	r.Handle("/", http.HandlerFunc(IndexHandler))
-	r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(cssBox.HTTPBox())))
-	r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(jsBox.HTTPBox())))
+
+	if useAssets {
+		cssHandler := http.FileServer(http.Dir("./assets/css"))
+		jsHandler := http.FileServer(http.Dir("./assets/js"))
+		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", cssHandler))
+		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", jsHandler))
+	} else {
+		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(cssBox.HTTPBox())))
+		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(jsBox.HTTPBox())))
+	}
+
+	r.Handle("/robots.txt", http.HandlerFunc(RobotsTxtHandler)).Methods("GET")
 	r.Handle("/setup", http.HandlerFunc(SetupHandler)).Methods("GET")
 	r.Handle("/setup", http.HandlerFunc(ProcessSetupHandler)).Methods("POST")
 	r.Handle("/dashboard", http.HandlerFunc(DashboardHandler)).Methods("GET")
@@ -47,6 +57,8 @@ func Router() *mux.Router {
 	r.Handle("/users/{id}/delete", http.HandlerFunc(UsersDeleteHandler)).Methods("GET")
 	r.Handle("/settings", http.HandlerFunc(PluginsHandler)).Methods("GET")
 	r.Handle("/settings", http.HandlerFunc(SaveSettingsHandler)).Methods("POST")
+	r.Handle("/settings/css", http.HandlerFunc(SaveSASSHandler)).Methods("POST")
+	r.Handle("/settings/build", http.HandlerFunc(SaveAssetsHandler)).Methods("GET")
 	r.Handle("/settings/email", http.HandlerFunc(SaveEmailSettingsHandler)).Methods("POST")
 	r.Handle("/plugins/download/{name}", http.HandlerFunc(PluginsDownloadHandler))
 	r.Handle("/plugins/{name}/save", http.HandlerFunc(PluginSavedHandler)).Methods("POST")
@@ -178,6 +190,17 @@ func PrometheusHandler(w http.ResponseWriter, r *http.Request) {
 	output := strings.Join(metrics, "\n")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(output))
+}
+
+func RobotsTxtHandler(w http.ResponseWriter, r *http.Request) {
+	robots := []byte(`User-agent: *
+Disallow: /login
+Disallow: /dashboard
+
+Host: ` + core.Domain)
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(robots))
 }
 
 func SetupHandler(w http.ResponseWriter, r *http.Request) {
@@ -330,6 +353,32 @@ func SaveEmailSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
 
+func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	CreateAllAssets()
+	useAssets = true
+	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+}
+
+func SaveSASSHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	r.ParseForm()
+	theme := r.PostForm.Get("theme")
+	variables := r.PostForm.Get("variables")
+	SaveAsset(theme, "scss/base.scss")
+	SaveAsset(variables, "scss/variables.scss")
+	CompileSASS()
+	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+}
+
 func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	auth := IsAuthenticated(r)
 	if !auth {
@@ -449,10 +498,34 @@ func CheckinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	//auth := IsAuthenticated(r)
-	//
-	//vars := mux.Vars(r)
-	//service := SelectService(vars["id"])
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	vars := mux.Vars(r)
+	service := SelectService(StringInt(vars["id"]))
+	r.ParseForm()
+	name := r.PostForm.Get("name")
+	domain := r.PostForm.Get("domain")
+	method := r.PostForm.Get("method")
+	expected := r.PostForm.Get("expected")
+	status, _ := strconv.Atoi(r.PostForm.Get("expected_status"))
+	interval, _ := strconv.Atoi(r.PostForm.Get("interval"))
+	port, _ := strconv.Atoi(r.PostForm.Get("port"))
+	checkType := r.PostForm.Get("check_type")
+	service = &Service{
+		Name:           name,
+		Domain:         domain,
+		Method:         method,
+		Expected:       expected,
+		ExpectedStatus: status,
+		Interval:       interval,
+		Type:           checkType,
+		Port:           port,
+	}
+	service.Update()
+	ExecuteResponse(w, r, "service.html", service)
 }
 
 func ServicesBadgeHandler(w http.ResponseWriter, r *http.Request) {

@@ -3,10 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://assets.statup.io/bootstrap.min.css">
+    <link rel="stylesheet" href="https://assets.statup.io/codemirror.css">
+    <link rel="stylesheet" href="https://assets.statup.io/codemirror-colorpicker.css"/>
     <link rel="stylesheet" href="/css/base.css">
 
-    <title>Statup | Plugins</title>
+    <title>Statup | Settings</title>
 </head>
 <body>
 
@@ -18,11 +20,11 @@
 
     <div class="row">
 
-        <div class="col-md-4 col-sm-12">
+        <div class="col-md-3 col-sm-12">
 
             <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                 <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Settings</a>
-                <a class="nav-link" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false">Styling</a>
+                <a class="nav-link" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false">Theme Editor</a>
                 <a class="nav-link" id="v-pills-email-tab" data-toggle="pill" href="#v-pills-email" role="tab" aria-controls="v-pills-email" aria-selected="true">Email Settings</a>
                 {{ range .Communications }}
 
@@ -66,18 +68,31 @@
 
                 </div>
 
+                <div class="tab-pane" id="v-pills-style" role="tabpanel" aria-labelledby="v-pills-style-tab">
 
-                <div class="tab-pane fade" id="v-pills-style" role="tabpanel" aria-labelledby="v-pills-style-tab">
-                    <h3>Custom Style</h3>
-                    <form method="POST" action="/settings">
-
-                        <div class="form-group">
-                            <textarea rows="15" name="style" class="form-control" id="formGroupExampleInput">{{ .Style }}</textarea>
+        {{if not .UsingAssets }}
+            <a href="/settings/build" class="btn btn-success btn-block">Enable Local Assets</a>
+        {{ else }}
+                    <form method="POST" action="/settings/css">
+                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                            <li class="nav-item col text-center">
+                                <a class="nav-link active" id="pills-vars-tab" data-toggle="pill" href="#pills-vars" role="tab" aria-controls="pills-vars" aria-selected="true">Variables</a>
+                            </li>
+                            <li class="nav-item col text-center">
+                                <a class="nav-link" id="pills-theme-tab" data-toggle="pill" href="#pills-theme" role="tab" aria-controls="pills-theme" aria-selected="false">Base Theme</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="pills-tabContent">
+                            <div class="tab-pane show active" id="pills-vars" role="tabpanel" aria-labelledby="pills-vars-tab">
+                                <textarea name="variables" id="sass_vars">{{ .SassVars }}</textarea>
+                            </div>
+                            <div class="tab-pane" id="pills-theme" role="tabpanel" aria-labelledby="pills-theme-tab">
+                                <textarea name="theme" id="theme_css">{{ .BaseSASS }}</textarea>
+                            </div>
                         </div>
-
-                        <button type="submit" class="btn btn-primary btn-block">Save Settings</button>
-
+                        <button type="submit" class="btn btn-primary btn-block mt-2">Save Style</button>
                     </form>
+        {{end}}
                 </div>
 
             {{ range .Communications }}
@@ -155,9 +170,13 @@
 </div>
 {{template "footer"}}
 
-<script src="/js/jquery-3.3.1.slim.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
 
+<script src="https://assets.statup.io/jquery-3.3.1.slim.min.js"></script>
+<script src="https://assets.statup.io/bootstrap.min.js"></script>
+<script src="https://assets.statup.io/codemirror.js"></script>
+<script src="https://assets.statup.io/css.js"></script>
+<script src="https://assets.statup.io/codemirror-colorpicker.min.js"></script>
+<script src="/js/main.js"></script>
 
 </body>
 </html>

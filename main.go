@@ -24,6 +24,7 @@ var (
 	VERSION    string
 	sqlBox     *rice.Box
 	cssBox     *rice.Box
+	scssBox    *rice.Box
 	jsBox      *rice.Box
 	tmplBox    *rice.Box
 	emailBox   *rice.Box
@@ -99,8 +100,9 @@ func main() {
 
 	var err error
 	fmt.Printf("Starting Statup v%v\n", VERSION)
-
 	RenderBoxes()
+	hasAssets()
+
 	configs, err = LoadConfig()
 	if err != nil {
 		fmt.Println("config.yml file not found - starting in setup mode")
@@ -201,6 +203,7 @@ func LoadPlugins() {
 func RenderBoxes() {
 	sqlBox = rice.MustFindBox("sql")
 	cssBox = rice.MustFindBox("html/css")
+	scssBox = rice.MustFindBox("html/scss")
 	jsBox = rice.MustFindBox("html/js")
 	tmplBox = rice.MustFindBox("html/tmpl")
 	emailBox = rice.MustFindBox("html/emails")
