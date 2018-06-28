@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	"os"
 	"time"
 )
@@ -29,6 +30,39 @@ func CatchCLI(args []string) {
 		HelpEcho()
 	case "update":
 		fmt.Println("Sorry updating isn't available yet!")
+	case "run":
+		fmt.Println("Running 1 time and saving to database...")
+
+		var err error
+		configs, err = LoadConfig()
+		if err != nil {
+			fmt.Println("config.yml file not found")
+			os.Exit(1)
+		}
+		err = DbConnection(configs.Connection)
+		if err != nil {
+			throw(err)
+		}
+		core, err = SelectCore()
+		if err != nil {
+			fmt.Println("Core database was not found, Statup is not setup yet.")
+		}
+		services, _ = SelectAllServices()
+		for _, s := range services {
+			out := s.Check()
+			fmt.Printf("    Service %v | URL: %v | Latency: %0.0fms | Online: %v\n", out.Name, out.Domain, (out.Latency * 1000), out.Online)
+		}
+		fmt.Println("Check is complete.")
+	case "env":
+		fmt.Println("Statup Environment Variables")
+		envs, err := godotenv.Read(".env")
+		if err != nil {
+			fmt.Println("No .env file found in current directory.")
+			os.Exit(1)
+		}
+		for k, e := range envs {
+			fmt.Printf("%v=%v\n", k, e)
+		}
 	default:
 		fmt.Println("Statup does not have the command you entered.")
 		os.Exit(1)

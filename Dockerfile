@@ -15,6 +15,7 @@ RUN wget https://assets.statup.io/sass && \
       chmod +x sass && \
       mv sass /usr/local/bin/sass
 
+ENV SASS=/usr/local/bin/sass
 ENV CMD_FILE=/usr/bin/cmd
 RUN printf "#!/usr/bin/env sh\n\$1\n" > $CMD_FILE && \
       chmod +x $CMD_FILE

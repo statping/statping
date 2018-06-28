@@ -30,9 +30,11 @@ func MakePublicFolder(folder string) {
 }
 
 func CompileSASS() {
-	cmdBin := os.Getenv("CMD_FILE")
+	cmdBin := os.Getenv("SASS")
+	shell := os.Getenv("BASH_ENV")
 	fmt.Println("Compiling SASS into /css/base.css...")
-	testCmd := exec.Command(cmdBin, "sass assets/scss/base.scss assets/css/base.css")
+	command := fmt.Sprintf("%v %v %v", cmdBin, "assets/scss/base.scss", "assets/css/base.css")
+	testCmd := exec.Command(shell, command)
 	_, err := testCmd.Output()
 	if err != nil {
 		fmt.Println(err)

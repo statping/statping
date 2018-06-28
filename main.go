@@ -7,6 +7,7 @@ import (
 	"github.com/go-yaml/yaml"
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/plugin"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 	"io"
 	"io/ioutil"
@@ -90,6 +91,13 @@ func DownloadFile(filepath string, url string) error {
 	}
 
 	return nil
+}
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
 }
 
 func main() {

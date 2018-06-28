@@ -95,11 +95,6 @@ func (s *Service) Online24() float32 {
 	return s.Online24Hours
 }
 
-type GraphJson struct {
-	X string  `json:"x"`
-	Y float64 `json:"y"`
-}
-
 type DateScan struct {
 	CreatedAt time.Time `json:"x"`
 	Value     int64     `json:"y"`

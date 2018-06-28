@@ -2,9 +2,9 @@
 
 APP="statup"
 REPO="hunterlong/statup"
-SASS=1.7.1
 
 # COMPILE BOOTSTRAP
+rm -rf bootstrap
 git clone https://github.com/twbs/bootstrap.git
 cd bootstrap
 npm install
@@ -16,7 +16,7 @@ cd ../
 rm -rf bootstrap
 
 # RENDERING CSS
-gem install sass
+#gem install sass
 sass html/scss/base.scss html/css/base.css
 
 # MIGRATION SQL FILE FOR CURRENT VERSION
