@@ -34,6 +34,7 @@ func init() {
 }
 
 func Panic(err interface{}) {
+	lg.Printf("PANIC: %v\n", err)
 	panic(err)
 }
 

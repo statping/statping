@@ -8,6 +8,7 @@ import (
 	"upper.io/db.v3/mysql"
 	"upper.io/db.v3/postgresql"
 	"upper.io/db.v3/sqlite"
+	"github.com/hunterlong/statup/log"
 )
 
 var (
@@ -26,6 +27,7 @@ func DbConnection(dbType string) error {
 		}
 		dbSession, err = sqlite.Open(sqliteSettings)
 		if err != nil {
+			log.Send(3, err)
 			return err
 		}
 	} else if dbType == "mysql" {
@@ -40,6 +42,7 @@ func DbConnection(dbType string) error {
 		}
 		dbSession, err = mysql.Open(mysqlSettings)
 		if err != nil {
+			log.Send(3, err)
 			return err
 		}
 	} else {
@@ -55,6 +58,7 @@ func DbConnection(dbType string) error {
 		}
 		dbSession, err = postgresql.Open(postgresSettings)
 		if err != nil {
+			log.Send(3, err)
 			return err
 		}
 	}
@@ -76,7 +80,7 @@ func DeleteAllSince(table string, date time.Time) {
 	sql := fmt.Sprintf("DELETE FROM %v WHERE created_at < '%v';", table, date.Format("2006-01-02"))
 	_, err := dbSession.Exec(db.Raw(sql))
 	if err != nil {
-		fmt.Println(err)
+		log.Send(2, err)
 	}
 }
 

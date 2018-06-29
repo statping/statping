@@ -51,7 +51,6 @@ notifications:
   email: false
 
 before_install:
-  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then travis_wait 30 docker pull karalabe/xgo-latest; fi
 
 before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
@@ -71,6 +70,7 @@ script:
   - go test -v -covermode=count -coverprofile=coverage.out && $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $COVERALLS
 
 after_success:
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then travis_wait 30 docker pull karalabe/xgo-latest; fi
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then /bin/bash -c .travis/build.sh; fi
 
 after_deploy:

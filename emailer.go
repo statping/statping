@@ -36,8 +36,9 @@ func EmailerQueue() {
 	uniques := []*types.Email{}
 	for _, out := range emailQue.Outgoing {
 		if isUnique(uniques, out) {
-			fmt.Printf("sending email to: %v \n", out.To)
+			msg := fmt.Sprintf("sending email to: %v \n", out.To)
 			Send(out)
+			log.Send(0, msg)
 			uniques = append(uniques, out)
 		}
 	}
@@ -65,7 +66,6 @@ func Send(em *types.Email) {
 	m.SetBody("text/html", source)
 	if err := emailQue.Mailer.DialAndSend(m); err != nil {
 		log.Send(2, err)
-		fmt.Println(err)
 	}
 	emailQue.LastSent++
 	emailQue.LastSentTime = time.Now()
@@ -95,12 +95,12 @@ func LoadMailer(config *types.Communication) *gomail.Dialer {
 func EmailTemplate(tmpl string, data interface{}) string {
 	emailTpl, err := emailBox.String(tmpl)
 	if err != nil {
-		panic(err)
+		log.Send(3, err)
 	}
 	t := template.New("email")
 	t, err = t.Parse(emailTpl)
 	if err != nil {
-		panic(err)
+		log.Send(3, err)
 	}
 	var tpl bytes.Buffer
 	if err := t.Execute(&tpl, data); err != nil {
