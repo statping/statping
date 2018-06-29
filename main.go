@@ -16,6 +16,7 @@ import (
 	plg "plugin"
 	"strconv"
 	"strings"
+	"github.com/fatih/color"
 )
 
 var (
@@ -94,11 +95,33 @@ func DownloadFile(filepath string, url string) error {
 }
 
 func init() {
+	LoadDotEnvs()
+}
+
+func LoadDotEnvs() {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Error loading .env file")
 	}
 }
+
+
+
+
+func logger(level int, err interface{}) {
+	switch level {
+	case 3:
+		color.Red("ERROR: %v\n", err)
+		os.Exit(2)
+	case 2:
+		color.Yellow("WARNING: %v\n", err)
+	case 1:
+		color.Blue("INFO: %v\n", err)
+	case 0:
+		color.White("%v\n", err)
+	}
+}
+
 
 func main() {
 	if len(os.Args) >= 2 {
@@ -113,7 +136,7 @@ func main() {
 
 	configs, err = LoadConfig()
 	if err != nil {
-		fmt.Println("config.yml file not found - starting in setup mode")
+		logger(1, "config.yml file not found - starting in setup mode")
 		setupMode = true
 		RunHTTPServer()
 	}
@@ -134,7 +157,7 @@ func mainProcess() {
 	RunDatabaseUpgrades()
 	core, err = SelectCore()
 	if err != nil {
-		fmt.Println("Core database was not found, Statup is not setup yet.")
+		logger(1, "Core database was not found, Statup is not setup yet.")
 		RunHTTPServer()
 	}
 

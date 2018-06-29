@@ -65,9 +65,9 @@ before_script:
   - go get github.com/GeertJohan/go.rice
   - go get github.com/GeertJohan/go.rice/rice
   - go get
-  - go install
 
 script:
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then /bin/bash -c .travis/compile.sh; fi
   - go test -v -covermode=count -coverprofile=coverage.out && $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $COVERALLS
 
 after_success:

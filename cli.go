@@ -17,9 +17,13 @@ func CatchCLI(args []string) {
 	case "sass":
 		CompileSASS()
 	case "export":
+		var err error
 		fmt.Printf("Statup v%v Exporting Static 'index.html' page...\n", VERSION)
 		RenderBoxes()
-		configs, _ = LoadConfig()
+		configs, err = LoadConfig()
+		if err != nil {
+			logger(3, "config.yml file not found")
+		}
 		setupMode = true
 		mainProcess()
 		time.Sleep(10 * time.Second)
@@ -32,12 +36,10 @@ func CatchCLI(args []string) {
 		fmt.Println("Sorry updating isn't available yet!")
 	case "run":
 		fmt.Println("Running 1 time and saving to database...")
-
 		var err error
 		configs, err = LoadConfig()
 		if err != nil {
-			fmt.Println("config.yml file not found")
-			os.Exit(1)
+			logger(3, "config.yml file not found")
 		}
 		err = DbConnection(configs.Connection)
 		if err != nil {

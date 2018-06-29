@@ -8,18 +8,17 @@ RUN wget https://github.com/hunterlong/statup/releases/download/$VERSION/statup-
       chmod +x statup && \
       mv statup /usr/local/bin/statup
 
-#COPY build/statup /usr/local/bin/statup
-#RUN chmod +x /usr/local/bin/statup
-
 RUN wget https://assets.statup.io/sass && \
       chmod +x sass && \
       mv sass /usr/local/bin/sass
 
+ENV IS_DOCKER=true
 ENV SASS=/usr/local/bin/sass
 ENV CMD_FILE=/usr/bin/cmd
+ENV USE_ASSETS=true
+
 RUN printf "#!/usr/bin/env sh\n\$1\n" > $CMD_FILE && \
       chmod +x $CMD_FILE
-ENV USE_ASSETS=true
 
 WORKDIR /app
 VOLUME /app

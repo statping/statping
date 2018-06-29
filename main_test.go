@@ -4,13 +4,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
-	"time"
+	"github.com/rendon/testcli"
 )
 
 func TestInit(t *testing.T) {
 	RenderBoxes()
 	os.Remove("./statup.db")
 	Router()
+	LoadDotEnvs()
 }
 
 func TestMySQLMakeConfig(t *testing.T) {
@@ -236,9 +237,9 @@ func TestService_LimitedHits(t *testing.T) {
 	assert.Equal(t, 23, len(hits))
 }
 
-func Test(t *testing.T) {
-	var err error
-	configs, err = LoadConfig()
-	assert.Nil(t, err)
-	time.Sleep(2 * time.Second)
+func TestLitecoinWalletsCommand(t *testing.T) {
+	c := testcli.Command("statup", "version")
+	c.Run()
+	t.Log(c.Stdout())
+	assert.True(t, c.StdoutContains("0 | Address: LS1QwoS72uYBHfCVmyD1oT75BAsh2iCqgP"))
 }
