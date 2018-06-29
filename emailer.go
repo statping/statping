@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"github.com/hunterlong/statup/log"
 	"github.com/hunterlong/statup/types"
 	"gopkg.in/gomail.v2"
 	"html/template"
-	"log"
 	"time"
 )
 
@@ -64,6 +64,7 @@ func Send(em *types.Email) {
 	m.SetHeader("Subject", em.Subject)
 	m.SetBody("text/html", source)
 	if err := emailQue.Mailer.DialAndSend(m); err != nil {
+		log.Send(2, err)
 		fmt.Println(err)
 	}
 	emailQue.LastSent++
@@ -103,7 +104,7 @@ func EmailTemplate(tmpl string, data interface{}) string {
 	}
 	var tpl bytes.Buffer
 	if err := t.Execute(&tpl, data); err != nil {
-		log.Println(err)
+		log.Send(2, err)
 	}
 	result := tpl.String()
 	return result

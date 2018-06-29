@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/hunterlong/statup/log"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
@@ -60,6 +61,7 @@ func (u *User) Create() (int64, error) {
 	col := dbSession.Collection("users")
 	uuid, err := col.Insert(u)
 	if uuid == nil {
+		log.Send(2, err)
 		return 0, err
 	}
 	OnNewUser(u)
@@ -77,6 +79,7 @@ func AuthUser(username, password string) (*User, bool) {
 	var auth bool
 	user, err := SelectUsername(username)
 	if err != nil {
+		log.Send(2, err)
 		return nil, false
 	}
 	if CheckHash(password, user.Password) {

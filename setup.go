@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/go-yaml/yaml"
+	"github.com/hunterlong/statup/log"
 	"github.com/hunterlong/statup/plugin"
 	"github.com/hunterlong/statup/types"
 	"net/http"
@@ -36,7 +37,7 @@ func RunDatabaseUpgrades() {
 	for _, request := range requests {
 		_, err := dbSession.Exec(db.Raw(request + ";"))
 		if err != nil {
-			fmt.Println(err)
+			log.Send(2, err)
 		}
 	}
 	fmt.Println("Database Upgraded")
@@ -79,6 +80,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err := config.Save()
 	if err != nil {
+		log.Send(2, err)
 		config.Error = err
 		SetupResponseError(w, r, config)
 		return
@@ -86,6 +88,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	configs, err = LoadConfig()
 	if err != nil {
+		log.Send(2, err)
 		config.Error = err
 		SetupResponseError(w, r, config)
 		return
@@ -93,6 +96,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = DbConnection(configs.Connection)
 	if err != nil {
+		log.Send(2, err)
 		DeleteConfig()
 		config.Error = err
 		SetupResponseError(w, r, config)
@@ -130,7 +134,7 @@ func InsertDefaultComms() {
 func DeleteConfig() {
 	err := os.Remove("./config.yml")
 	if err != nil {
-		throw(err)
+		log.Send(3, err)
 	}
 }
 
@@ -155,10 +159,12 @@ func (c *DbConfig) Save() error {
 	var err error
 	config, err := os.Create("config.yml")
 	if err != nil {
+		log.Send(2, err)
 		return err
 	}
 	data, err := yaml.Marshal(c)
 	if err != nil {
+		log.Send(2, err)
 		return err
 	}
 	config.WriteString(string(data))
@@ -166,10 +172,12 @@ func (c *DbConfig) Save() error {
 
 	configs, err = LoadConfig()
 	if err != nil {
+		log.Send(2, err)
 		return err
 	}
 	err = DbConnection(configs.Connection)
 	if err != nil {
+		log.Send(2, err)
 		return err
 	}
 	DropDatabase()
@@ -205,7 +213,7 @@ func DropDatabase() {
 	for _, request := range requests {
 		_, err := dbSession.Exec(request)
 		if err != nil {
-			fmt.Println(err)
+			log.Send(2, err)
 		}
 	}
 }
@@ -223,7 +231,7 @@ func CreateDatabase() {
 	for _, request := range requests {
 		_, err := dbSession.Exec(request)
 		if err != nil {
-			fmt.Println(err)
+			log.Send(2, err)
 		}
 	}
 	//secret := NewSHA1Hash()

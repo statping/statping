@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/hunterlong/statup/log"
 	"time"
 	"upper.io/db.v3"
 )
@@ -24,6 +25,7 @@ func (s *Service) CreateHit(d HitData) (int64, error) {
 	}
 	uuid, err := hitCol().Insert(h)
 	if uuid == nil {
+		log.Send(2, err)
 		return 0, err
 	}
 	return uuid.(int64), err

@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"github.com/hunterlong/statup/log"
 )
 
 var (
@@ -134,7 +135,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	_, err := user.Create()
 	if err != nil {
-		fmt.Println(err)
+		log.Send(2, err)
 	}
 	http.Redirect(w, r, "/users", http.StatusSeeOther)
 }

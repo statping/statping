@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/ararog/timeago"
+	"github.com/hunterlong/statup/log"
 	"time"
 )
 
@@ -28,6 +29,7 @@ func (u *Checkin) Create() (int64, error) {
 	u.CreatedAt = time.Now()
 	uuid, err := dbSession.Collection("checkins").Insert(u)
 	if uuid == nil {
+		log.Send(2, err)
 		return 0, err
 	}
 	fmt.Println("new checkin: ", uuid)

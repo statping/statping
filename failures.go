@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/ararog/timeago"
+	"github.com/hunterlong/statup/log"
 	"time"
 )
 
@@ -72,6 +73,7 @@ func CountFailures() uint64 {
 	col := dbSession.Collection("failures").Find()
 	amount, err := col.Count()
 	if err != nil {
+		log.Send(2, err)
 		return 0
 	}
 	return amount

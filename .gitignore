@@ -12,3 +12,4 @@ dart-sass
 public
 assets
 cmd.sh
+*.log

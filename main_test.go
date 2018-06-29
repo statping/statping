@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/rendon/testcli"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
-	"github.com/rendon/testcli"
 )
 
 func TestInit(t *testing.T) {

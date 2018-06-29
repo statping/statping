@@ -6,6 +6,7 @@ import (
 	"github.com/GeertJohan/go.rice"
 	"github.com/go-yaml/yaml"
 	"github.com/gorilla/sessions"
+	"github.com/hunterlong/statup/log"
 	"github.com/hunterlong/statup/plugin"
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
@@ -16,7 +17,6 @@ import (
 	plg "plugin"
 	"strconv"
 	"strings"
-	"github.com/fatih/color"
 )
 
 var (
@@ -32,6 +32,7 @@ var (
 	emailBox   *rice.Box
 	setupMode  bool
 	allPlugins []plugin.PluginActions
+	logFile    *os.File
 )
 
 const (
@@ -105,25 +106,8 @@ func LoadDotEnvs() {
 	}
 }
 
-
-
-
-func logger(level int, err interface{}) {
-	switch level {
-	case 3:
-		color.Red("ERROR: %v\n", err)
-		os.Exit(2)
-	case 2:
-		color.Yellow("WARNING: %v\n", err)
-	case 1:
-		color.Blue("INFO: %v\n", err)
-	case 0:
-		color.White("%v\n", err)
-	}
-}
-
-
 func main() {
+	defer logFile.Close()
 	if len(os.Args) >= 2 {
 		CatchCLI(os.Args)
 		os.Exit(0)
@@ -136,7 +120,7 @@ func main() {
 
 	configs, err = LoadConfig()
 	if err != nil {
-		logger(1, "config.yml file not found - starting in setup mode")
+		log.Send(1, "config.yml file not found - starting in setup mode")
 		setupMode = true
 		RunHTTPServer()
 	}
@@ -157,7 +141,7 @@ func mainProcess() {
 	RunDatabaseUpgrades()
 	core, err = SelectCore()
 	if err != nil {
-		logger(1, "Core database was not found, Statup is not setup yet.")
+		log.Send(1, "Core database was not found, Statup is not setup yet.")
 		RunHTTPServer()
 	}
 
@@ -195,7 +179,7 @@ func LoadPlugins() {
 
 	files, err := ioutil.ReadDir("./plugins")
 	if err != nil {
-		fmt.Printf("Plugins directory was not found. Error: %v\n", err)
+		log.Send(1, fmt.Sprintf("Plugins directory was not found. Error: %v\n", err))
 		return
 	}
 	for _, f := range files {
@@ -208,7 +192,7 @@ func LoadPlugins() {
 		}
 		plug, err := plg.Open("plugins/" + f.Name())
 		if err != nil {
-			fmt.Printf("Plugin '%v' could not load correctly.\n", f.Name())
+			log.Send(2, fmt.Sprintf("Plugin '%v' could not load correctly.\n", f.Name()))
 			continue
 		}
 		symPlugin, err := plug.Lookup("Plugin")
@@ -216,7 +200,7 @@ func LoadPlugins() {
 		var plugActions plugin.PluginActions
 		plugActions, ok := symPlugin.(plugin.PluginActions)
 		if !ok {
-			fmt.Printf("Plugin '%v' could not load correctly, error: %v\n", f.Name(), "unexpected type from module symbol")
+			log.Send(2, fmt.Sprintf("Plugin '%v' could not load correctly, error: %v\n", f.Name(), "unexpected type from module symbol"))
 			continue
 		}
 

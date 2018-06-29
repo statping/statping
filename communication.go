@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/hunterlong/statup/log"
 	"github.com/hunterlong/statup/types"
 	"time"
 )
@@ -43,9 +44,10 @@ func Create(c *types.Communication) (int64, error) {
 	c.CreatedAt = time.Now()
 	uuid, err := dbSession.Collection("communication").Insert(c)
 	if err != nil {
-		panic(err)
+		log.Send(3, err)
 	}
 	if uuid == nil {
+		log.Send(2, err)
 		return 0, err
 	}
 	c.Id = uuid.(int64)

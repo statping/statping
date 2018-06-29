@@ -3,9 +3,9 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/hunterlong/statup/log"
 	"html/template"
 	"io/ioutil"
-	"log"
 	"strings"
 )
 
@@ -32,7 +32,7 @@ func ExportIndexHTML() string {
 	footer, _ := tmplBox.String("footer.html")
 	render, err := tmplBox.String("index.html")
 	if err != nil {
-		panic(err)
+		log.Send(3, err)
 	}
 	t := template.New("message")
 	t.Funcs(template.FuncMap{
@@ -55,7 +55,7 @@ func ExportIndexHTML() string {
 
 	var tpl bytes.Buffer
 	if err := t.Execute(&tpl, out); err != nil {
-		log.Println(err)
+		log.Send(3, err)
 	}
 	result := tpl.String()
 

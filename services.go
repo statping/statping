@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/hunterlong/statup/log"
 	"strconv"
 	"time"
 	"upper.io/db.v3"
@@ -107,7 +108,7 @@ func (s *Service) GraphData() string {
 	sql := fmt.Sprintf("SELECT date_trunc('%v', created_at), AVG(latency)*1000 AS value FROM hits WHERE service=%v AND created_at > '%v' GROUP BY 1 ORDER BY date_trunc ASC;", increment, s.Id, since.Format(time.RFC3339))
 	dated, err := dbSession.Query(db.Raw(sql))
 	if err != nil {
-		fmt.Println(err)
+		log.Send(2, err)
 		return ""
 	}
 	for dated.Next() {
@@ -119,7 +120,7 @@ func (s *Service) GraphData() string {
 	}
 	data, err := json.Marshal(d)
 	if err != nil {
-		fmt.Println(err)
+		log.Send(2, err)
 		return ""
 	}
 	return string(data)

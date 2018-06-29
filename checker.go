@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/hunterlong/statup/log"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -10,6 +11,7 @@ import (
 
 func CheckServices() {
 	services, _ = SelectAllServices()
+	log.Send(1, fmt.Sprintf("Loaded %v Services", len(services)))
 	for _, v := range services {
 		obj := v
 		go obj.StartCheckins()
@@ -23,7 +25,8 @@ func (s *Service) CheckQueue() {
 	if s.Interval < 1 {
 		s.Interval = 1
 	}
-	fmt.Printf("   Service: %v | Online: %v | Latency: %0.0fms\n", s.Name, s.Online, (s.Latency * 1000))
+	msg := fmt.Sprintf("Service: %v | Online: %v | Latency: %0.0fms", s.Name, s.Online, (s.Latency * 1000))
+	log.Send(0, msg)
 	time.Sleep(time.Duration(s.Interval) * time.Second)
 }
 
@@ -86,6 +89,7 @@ func (s *Service) Failure(issue string) {
 	data := FailureData{
 		Issue: issue,
 	}
+	log.Send(1, fmt.Sprintf("Service %v Failing: %v", s.Name, issue))
 	s.CreateFailure(data)
 	SendFailureEmail(s)
 	OnFailure(s)
