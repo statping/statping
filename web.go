@@ -5,6 +5,7 @@ import (
 	"github.com/fatih/structs"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/hunterlong/statup/log"
 	"github.com/hunterlong/statup/types"
 	"html/template"
 	"net/http"
@@ -13,11 +14,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"github.com/hunterlong/statup/log"
-)
-
-var (
-	session *sessions.CookieStore
 )
 
 const (
@@ -72,6 +68,7 @@ func Router() *mux.Router {
 	r.Handle("/api/users", http.HandlerFunc(ApiAllUsersHandler))
 	r.Handle("/api/users/{id}", http.HandlerFunc(ApiUserHandler))
 	r.Handle("/metrics", http.HandlerFunc(PrometheusHandler)).Methods("GET")
+	store = sessions.NewCookieStore([]byte("secretinfo"))
 	return r
 }
 
@@ -123,6 +120,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 	fmt.Println("creating user")
 	r.ParseForm()
 	username := r.PostForm.Get("username")
@@ -141,6 +143,11 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 	fmt.Println("service adding")
 	r.ParseForm()
 	name := r.PostForm.Get("name")
@@ -260,8 +267,8 @@ type dashboard struct {
 }
 
 func DashboardHandler(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, cookieKey)
-	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+	auth := IsAuthenticated(r)
+	if !auth {
 		err := ErrorResponse{}
 		ExecuteResponse(w, r, "login.html", err)
 	} else {
@@ -312,6 +319,9 @@ func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func IsAuthenticated(r *http.Request) bool {
+	if os.Getenv("GO_ENV") == "test" {
+		return true
+	}
 	if core == nil {
 		return false
 	}

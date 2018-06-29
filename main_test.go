@@ -1,17 +1,33 @@
 package main
 
 import (
+	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	"github.com/rendon/testcli"
 	"github.com/stretchr/testify/assert"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"os"
+	"strings"
 	"testing"
 )
+
+var (
+	route       *mux.Router
+	testSession *sessions.Session
+)
+
+func init() {
+	route = Router()
+}
 
 func TestInit(t *testing.T) {
 	RenderBoxes()
 	os.Remove("./statup.db")
 	Router()
 	LoadDotEnvs()
+
 }
 
 func TestMySQLMakeConfig(t *testing.T) {
@@ -220,26 +236,115 @@ func TestBadService_Check(t *testing.T) {
 }
 
 func TestService_Hits(t *testing.T) {
-	t.SkipNow()
 	service := SelectService(1)
 	assert.NotNil(t, service)
 	hits, err := service.Hits()
 	assert.Nil(t, err)
-	assert.Equal(t, 23, len(hits))
+	assert.NotZero(t, len(hits))
 }
 
 func TestService_LimitedHits(t *testing.T) {
-	t.SkipNow()
 	service := SelectService(1)
 	assert.NotNil(t, service)
 	hits, err := service.LimitedHits()
 	assert.Nil(t, err)
-	assert.Equal(t, 23, len(hits))
+	assert.NotZero(t, len(hits))
 }
 
-func TestLitecoinWalletsCommand(t *testing.T) {
+func TestIndexHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	route.ServeHTTP(rr, req)
+	assert.True(t, strings.Contains(rr.Body.String(), "This is a test of Statup.io!"))
+}
+
+func TestServiceHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/service/1", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	route.ServeHTTP(rr, req)
+	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Services</title>"))
+}
+
+func TestPrometheusHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/metrics", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	route.ServeHTTP(rr, req)
+	t.Log(rr.Body.String())
+	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 14"))
+}
+
+func TestLoginHandler(t *testing.T) {
+	form := url.Values{}
+	form.Add("username", "admin")
+	form.Add("password", "admin")
+	req, err := http.NewRequest("POST", "/dashboard", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	route.ServeHTTP(rr, req)
+	assert.Equal(t, 303, rr.Result().StatusCode)
+}
+
+func TestDashboardHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/dashboard", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	route.ServeHTTP(rr, req)
+	t.Log(rr.Body.String())
+	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Dashboard</title>"))
+}
+
+func TestUsersHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/users", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	route.ServeHTTP(rr, req)
+	t.Log(rr.Body.String())
+	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Users</title>"))
+}
+
+func TestServicesHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/services", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	route.ServeHTTP(rr, req)
+	t.Log(rr.Body.String())
+	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Services</title>"))
+}
+
+func TestHelpHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/help", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	route.ServeHTTP(rr, req)
+	t.Log(rr.Body.String())
+	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Help</title>"))
+}
+
+func TestSettingsHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/settings", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	route.ServeHTTP(rr, req)
+	t.Log(rr.Body.String())
+	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Settings</title>"))
+	assert.True(t, strings.Contains(rr.Body.String(), "Theme Editor"))
+	assert.True(t, strings.Contains(rr.Body.String(), "Email Settings"))
+}
+
+func TestVersionCommand(t *testing.T) {
 	c := testcli.Command("statup", "version")
 	c.Run()
 	t.Log(c.Stdout())
-	assert.True(t, c.StdoutContains("0 | Address: LS1QwoS72uYBHfCVmyD1oT75BAsh2iCqgP"))
+	assert.True(t, c.StdoutContains("Statup v"))
+}
+
+func TestHelpCommand(t *testing.T) {
+	c := testcli.Command("statup", "help")
+	c.Run()
+	t.Log(c.Stdout())
+	assert.True(t, c.StdoutContains("statup help               - Shows the user basic information about Statup"))
 }

@@ -6,8 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
-	"strings"
 	"testing"
 )
 
@@ -74,26 +72,4 @@ func TestApiAllUsersUrl(t *testing.T) {
 	var data []User
 	json.Unmarshal(rr.Body.Bytes(), &data)
 	assert.Equal(t, "testuserhere", data[0].Username, "should be balance")
-}
-
-func TestDashboardHandler(t *testing.T) {
-	t.SkipNow()
-	req, err := http.NewRequest("GET", "/dashboard", nil)
-	assert.Nil(t, err)
-	rr := httptest.NewRecorder()
-	Router().ServeHTTP(rr, req)
-	assert.Equal(t, 2095, len(rr.Body.Bytes()), "should be balance")
-}
-
-func TestLoginHandler(t *testing.T) {
-	t.SkipNow()
-	form := url.Values{}
-	form.Add("username", "admin")
-	form.Add("password", "admin")
-	req, err := http.NewRequest("POST", "/dashboard", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	assert.Nil(t, err)
-	rr := httptest.NewRecorder()
-	Router().ServeHTTP(rr, req)
-	assert.Equal(t, 303, rr.Result().StatusCode, "should be balance")
 }

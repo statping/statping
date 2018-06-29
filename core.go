@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/plugin"
 	"github.com/hunterlong/statup/types"
 )
@@ -64,6 +63,6 @@ func SelectCore() (*Core, error) {
 		return nil, err
 	}
 	core = c
-	store = sessions.NewCookieStore([]byte(core.ApiSecret))
+	//store = sessions.NewCookieStore([]byte(core.ApiSecret))
 	return core, err
 }
