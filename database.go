@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
+	"github.com/hunterlong/statup/log"
 	"time"
 	"upper.io/db.v3"
 	"upper.io/db.v3/lib/sqlbuilder"
 	"upper.io/db.v3/mysql"
 	"upper.io/db.v3/postgresql"
 	"upper.io/db.v3/sqlite"
-	"github.com/hunterlong/statup/log"
 )
 
 var (

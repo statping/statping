@@ -1,14 +1,14 @@
 FROM alpine:latest
 
-ENV VERSION=v0.27
+ENV VERSION=v0.27.3
 
 RUN apk --no-cache add libstdc++ ca-certificates
-RUN wget https://github.com/hunterlong/statup/releases/download/$VERSION/statup-linux-alpine.tar.gz && \
+RUN wget -q https://github.com/hunterlong/statup/releases/download/$VERSION/statup-linux-alpine.tar.gz && \
       tar -xvzf statup-linux-alpine.tar.gz && \
       chmod +x statup && \
       mv statup /usr/local/bin/statup
 
-RUN wget https://assets.statup.io/sass && \
+RUN wget -q https://assets.statup.io/sass && \
       chmod +x sass && \
       mv sass /usr/local/bin/sass
 
