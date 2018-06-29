@@ -18,11 +18,12 @@ services:
 
 env:
   global:
-     - VERSION=0.27.1
+     - VERSION=0.27.2
      - DB_HOST=localhost
      - DB_USER=travis
      - DB_PASS=
      - DB_DATABASE=test
+     - GO_ENV=test
 
 matrix:
   allow_failures:
