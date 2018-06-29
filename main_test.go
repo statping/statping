@@ -293,7 +293,6 @@ func TestDashboardHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
-	t.Log(rr.Body.String())
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Dashboard</title>"))
 }
 
@@ -302,7 +301,6 @@ func TestUsersHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
-	t.Log(rr.Body.String())
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Users</title>"))
 }
 
@@ -311,7 +309,6 @@ func TestServicesHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
-	t.Log(rr.Body.String())
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Services</title>"))
 }
 
@@ -320,7 +317,6 @@ func TestHelpHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
-	t.Log(rr.Body.String())
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Help</title>"))
 }
 
@@ -329,7 +325,6 @@ func TestSettingsHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
-	t.Log(rr.Body.String())
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Settings</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "Theme Editor"))
 	assert.True(t, strings.Contains(rr.Body.String(), "Email Settings"))
@@ -347,4 +342,19 @@ func TestHelpCommand(t *testing.T) {
 	c.Run()
 	t.Log(c.Stdout())
 	assert.True(t, c.StdoutContains("statup help               - Shows the user basic information about Statup"))
+}
+
+func TestExportCommand(t *testing.T) {
+	c := testcli.Command("statup", "export")
+	c.Run()
+	t.Log(c.Stdout())
+	assert.True(t, c.StdoutContains("Exported Statup index page"))
+}
+
+func TestAssetsCommand(t *testing.T) {
+	t.SkipNow()
+	c := testcli.Command("statup", "assets")
+	c.Run()
+	t.Log(c.Stdout())
+	assert.True(t, c.StdoutContains("Statup v"))
 }

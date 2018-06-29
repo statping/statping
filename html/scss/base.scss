@@ -1,4 +1,4 @@
-@import '_variables';
+@import 'variables';
 
 
 HTML,BODY {
@@ -228,5 +228,9 @@ HTML,BODY {
     .list-group-item:last-child {
         border-bottom-right-radius: 0;
         border-bottom-left-radius: 0;
+    }
+
+    .list-group-item P {
+        font-size: 0.7rem;
     }
 }

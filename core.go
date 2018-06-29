@@ -37,7 +37,7 @@ func (c Core) SassVars() string {
 	if !useAssets {
 		return ""
 	}
-	return OpenAsset("scss/_variables.scss")
+	return OpenAsset("scss/variables.scss")
 }
 
 func (c Core) BaseSASS() string {
