@@ -12,12 +12,12 @@ xgo -go 1.10.x --targets=linux/386 --dest=build -ldflags="-X main.VERSION=$VERSI
 xgo -go 1.10.x --targets=windows-6.0/amd64 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
 xgo -go 1.10.x --targets=linux/arm-7 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
 xgo -go 1.10.x --targets=linux/arm64 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
-CGO_ENABLED=0 GOOS=linux go build -ldflags="-X main.VERSION=$VERSION" -a -o build/$APP-linux-alpine .
+xgo -go 1.10.x --targets=linux/amd64 --dest=build -ldflags="-X main.VERSION=$VERSION -linkmode external -extldflags -static" -out alpine ./
 
 cd build
 ls
 
-mv $APP-linux-alpine $APP
+mv alpine-linux-amd64 $APP
 tar -czvf $APP-linux-alpine.tar.gz $APP && rm -f $APP
 
 mv $APP-darwin-10.6-amd64 $APP
