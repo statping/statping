@@ -25,6 +25,11 @@ This Status Page generator allows you to use MySQL, Postgres, or SQLite.
 Statup is built in Go Language so all you need is the precompile binary based on your operating system. You won't need to install anything extra once you have the Statup binary installed. You can even run Statup on a Raspberry Pi.
 
 <p align="center">
+<img width="40%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsm1.jpg">
+    <img width="24%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsm2.jpg">
+</p>
+
+<p align="center">
 <img width="100%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsc2.png">
 </p>
 
