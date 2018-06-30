@@ -108,7 +108,11 @@ func (s *Service) SmallText() string {
 	last := s.LimitedFailures()
 	hits, _ := s.LimitedHits()
 	if !s.Online {
-		return fmt.Sprintf("%v at %v", last[0].ParseError(), last[0].CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
+		if len(last) > 0 {
+			return fmt.Sprintf("%v at %v", last[0].ParseError(), last[0].CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
+		} else {
+			return fmt.Sprintf("%v is currently offline", s.Name)
+		}
 	} else {
 		if len(last) == 0 {
 			return fmt.Sprintf("Online since %v", s.CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
