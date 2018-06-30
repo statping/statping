@@ -8,6 +8,10 @@ import (
 
 type Config types.Config
 
+var (
+	VERSION string
+)
+
 func LoadConfig() (*Config, error) {
 	var config Config
 	file, err := ioutil.ReadFile("config.yml")

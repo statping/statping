@@ -25,7 +25,7 @@ func ExportIndexHTML() string {
 			return template.HTML(html)
 		},
 		"VERSION": func() string {
-			return "version here"
+			return VERSION
 		},
 		"underscore": func(html string) string {
 			return utils.UnderScoreString(html)

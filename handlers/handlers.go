@@ -83,7 +83,7 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 			return IsAuthenticated(r)
 		},
 		"VERSION": func() string {
-			return "Version here"
+			return core.VERSION
 		},
 		"underscore": func(html string) string {
 			return utils.UnderScoreString(html)

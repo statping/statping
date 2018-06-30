@@ -20,6 +20,7 @@ var (
 
 func init() {
 	LoadDotEnvs()
+	core.VERSION = VERSION
 }
 
 func main() {
