@@ -7,10 +7,10 @@ HTML, BODY {
   max-width: 860px; }
 
 H1 {
-  color: #000; }
+  color: #464646; }
 
 H5 {
-  color: #000; }
+  color: #939393; }
 
 .online_list .badge {
   margin-top: 0.2rem; }
@@ -35,7 +35,7 @@ H5 {
   font-size: 0.85rem; }
 
 .lg_number {
-  font-size: 12pt;
+  font-size: 2.3rem;
   font-weight: bold;
   display: block;
   color: #47d337; }
@@ -58,7 +58,7 @@ H5 {
   margin-top: 20px; }
 
 .footer A {
-  color: #000;
+  color: #8d8d8d;
   text-decoration: none; }
 
 .footer A:HOVER {
@@ -81,14 +81,14 @@ H5 {
   border-radius: 0; }
 
 .card {
-  background-color: #bababa;
+  background-color: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.125); }
 
 .card-body {
   overflow: hidden; }
 
 .card-body H4 A {
-  color: #bababa;
+  color: #444444;
   text-decoration: none; }
 
 .chart-container {
