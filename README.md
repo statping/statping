@@ -1,10 +1,14 @@
+<p align="center">
+<img width="25%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statup-logo.png">
+</p>
+<p align="center">
+    <b>Statup - Web and App Status Monitoring for Any Type of Project</b><br>
+<a href="https://github.com/hunterlong/statup/wiki">View Wiki</a> | <a href="https://demo.statup.io">Demo</a> <br> <a href="https://github.com/hunterlong/statup/wiki/Docker">Docker</a> | <a href="https://github.com/hunterlong/statup/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/hunterlong/statup/wiki/Heroku">Heroku</a> | <a href="https://github.com/hunterlong/statup/wiki/Mac">Mac</a> | <a href="https://github.com/hunterlong/statup/wiki/Linux">Linux</a> | <a href="https://github.com/hunterlong/statup/wiki/Windows">Windows</a><br>
+</p>
+
 # Statup - Status Page & Monitoring Server [![Build Status](https://travis-ci.org/hunterlong/statup.svg?branch=master)](https://travis-ci.org/hunterlong/statup)
 An easy to use Status Page for your websites and applications. Statup will automatically fetch the application and render a beautiful status page with tons of features 
 for you to build an even better status page. 
-
-<p align="center">
-<a href="https://github.com/hunterlong/statup/wiki">View Wiki</a> | <a href="https://demo.statup.io">Demo</a> <br> <a href="https://github.com/hunterlong/statup/wiki/Docker">Docker</a> | <a href="https://github.com/hunterlong/statup/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/hunterlong/statup/wiki/Heroku">Heroku</a> | <a href="https://github.com/hunterlong/statup/wiki/Mac">Mac</a> | <a href="https://github.com/hunterlong/statup/wiki/Linux">Linux</a> | <a href="https://github.com/hunterlong/statup/wiki/Windows">Windows</a>
-</p>
 
 ## A Future-Proof Status Page
 Statup strives to remain future-proof and remain intact if a failure is created. Your Statup service should not be running on the same instance you're trying to monitor. 
