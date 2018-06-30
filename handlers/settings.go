@@ -27,7 +27,7 @@ func PluginsHandler(w http.ResponseWriter, r *http.Request) {
 	//CoreApp.PluginFields = pluginFields
 	fmt.Println(core.CoreApp.Communications)
 
-	ExecuteResponse(w, r, "plugins.html", core.CoreApp)
+	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }
 
 func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {

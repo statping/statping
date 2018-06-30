@@ -18,7 +18,9 @@
 
 {{template "nav"}}
 
-    <div class="row">
+    <div class="col-12">
+
+        <div class="row">
 
         <div class="col-md-3 col-sm-12">
 
@@ -43,36 +45,35 @@
                     <form method="POST" action="/settings">
 
                         <div class="form-group">
-                            <label for="formGroupExampleInput">Project Name</label>
-                            <input type="text" name="project" class="form-control" value="{{ .Name }}" id="formGroupExampleInput" placeholder="Great Uptime">
+                            <label for="project">Project Name</label>
+                            <input type="text" name="project" class="form-control" value="{{ .Name }}" id="project" placeholder="Great Uptime">
                         </div>
 
                         <div class="form-group">
-                            <label for="formGroupExampleInput">Project Description</label>
-                            <input type="text" name="description" class="form-control" value="{{ .Description }}" id="formGroupExampleInput" placeholder="Great Uptime">
+                            <label for="description">Project Description</label>
+                            <input type="text" name="description" class="form-control" value="{{ .Description }}" id="description" placeholder="Great Uptime">
                         </div>
 
                         <div class="form-group">
-                            <label for="formGroupExampleInput">Domain</label>
-                            <input type="text" name="domain" class="form-control" value="{{ .Domain }}" id="formGroupExampleInput">
+                            <label for="domain">Domain</label>
+                            <input type="text" name="domain" class="form-control" value="{{ .Domain }}" id="domain">
                         </div>
 
                         <div class="form-group">
-                            <label for="formGroupExampleInput">Custom Footer</label>
-                            <textarea rows="4" name="footer" class="form-control" id="formGroupExampleInput">{{ .Footer }}</textarea>
+                            <label for="footer">Custom Footer</label>
+                            <textarea rows="4" name="footer" class="form-control" id="footer">{{ .Footer }}</textarea>
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-block">Save Settings</button>
 
-
-                        <div class="form-group">
-                            <label for="formGroupExampleInput">API Key</label>
-                            <input type="text" name="description" class="form-control" value="{{ .ApiKey }}" id="formGroupExampleInput" readonly>
+                        <div class="form-group mt-3">
+                            <label for="api_key">API Key</label>
+                            <input type="text" class="form-control" value="{{ .ApiKey }}" id="api_key" readonly>
                         </div>
 
                         <div class="form-group">
-                            <label for="formGroupExampleInput">API Secret</label>
-                            <input type="text" name="description" class="form-control" value="{{ .ApiSecret }}" id="formGroupExampleInput" readonly>
+                            <label for="api_secret">API Secret</label>
+                            <input type="text" class="form-control" value="{{ .ApiSecret }}" id="api_secret" readonly>
                         </div>
 
                     </form>
@@ -112,33 +113,33 @@
                     <form method="POST" action="/settings/{{ .Method }}">
 
                         <div class="form-group">
-                            <label for="formGroupExampleInput">SMTP Host</label>
-                            <input type="text" name="host" class="form-control" value="{{ .Host }}" id="formGroupExampleInput" placeholder="Great Uptime">
+                            <label for="host">SMTP Host</label>
+                            <input type="text" name="host" class="form-control" value="{{ .Host }}" id="host" placeholder="Great Uptime">
                         </div>
 
                         <div class="form-group">
-                            <label for="formGroupExampleInput">SMTP Username</label>
-                            <input type="text" name="username" class="form-control" value="{{ .Username }}" id="formGroupExampleInput" placeholder="Great Uptime">
+                            <label for="username">SMTP Username</label>
+                            <input type="text" name="username" class="form-control" value="{{ .Username }}" id="username" placeholder="Great Uptime">
                         </div>
 
                         <div class="form-group">
-                            <label for="formGroupExampleInput">SMTP Password</label>
-                            <input type="password" name="password" class="form-control" value="{{ .Password }}" id="formGroupExampleInput">
+                            <label for="password">SMTP Password</label>
+                            <input type="password" name="password" class="form-control" value="{{ .Password }}" id="password">
                         </div>
 
                         <div class="form-group">
-                            <label for="formGroupExampleInput">SMTP Port</label>
-                            <input type="number" name="port" class="form-control" value="{{ .Port }}" id="formGroupExampleInput" placeholder="587">
+                            <label for="port">SMTP Port</label>
+                            <input type="number" name="port" class="form-control" value="{{ .Port }}" id="port" placeholder="587">
                         </div>
 
                         <div class="form-group">
-                            <label for="formGroupExampleInput">Outgoing Email Address</label>
-                            <input type="text" name="address" class="form-control" value="{{ .Var1 }}" id="formGroupExampleInput" placeholder="noreply@domain.com">
+                            <label for="address">Outgoing Email Address</label>
+                            <input type="text" name="address" class="form-control" value="{{ .Var1 }}" id="address" placeholder="noreply@domain.com">
                         </div>
 
                         <div class="form-group">
-                            <label for="formGroupExampleInput">Limit Emails per Hour</label>
-                            <input type="number" name="limit" class="form-control" value="30" id="formGroupExampleInput" placeholder="noreply@domain.com">
+                            <label for="limit">Limit Emails per Hour</label>
+                            <input type="number" name="limit" class="form-control" value="30" id="limit" placeholder="noreply@domain.com">
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-block">Save Email Settings</button>
@@ -179,8 +180,8 @@
 
     </div>
 </div>
+</div>
 {{template "footer"}}
-
 
 <script src="https://assets.statup.io/jquery-3.3.1.slim.min.js"></script>
 <script src="https://assets.statup.io/bootstrap.min.js"></script>

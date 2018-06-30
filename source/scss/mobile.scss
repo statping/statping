@@ -1,0 +1,83 @@
+
+@media (max-width: 767px) {
+
+    HTML,BODY {
+        background-color: $sm-background-color;
+    }
+
+    .sm-container {
+        margin-top: 40px !important;
+        padding: 0 !important;
+    }
+
+    .list-group-item H5 {
+        font-size: 0.9rem;
+    }
+
+    .container {
+        padding: 0 !important;
+    }
+
+    .navbar {
+        margin-left: 0px;
+        margin-top: 0px;
+        width: 100%;
+        margin-bottom: 0;
+    }
+
+    .btn-sm {
+        line-height: 0.9rem;
+        font-size: 0.65rem;
+    }
+
+    .full-col-12 {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+    .card {
+        border: 0;
+        border-radius: $sm-border-radius;
+        padding: $sm-padding;
+        background-color: $sm-service-background;
+    }
+
+    .card-body {
+        font-size: 6pt;
+        padding: 5px 5px;
+    }
+
+    .lg_number {
+        font-size: $sm-service-stats-size;
+    }
+
+    .stats_area {
+        margin-top: 1.5rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .stats_area .col-4 {
+        padding-left: 0;
+        padding-right: 0;
+        font-size: 0.6rem;
+    }
+
+    .list-group-item {
+        border-top: 1px solid #e4e4e4;
+        border: 0px;
+    }
+
+    .list-group-item:first-child {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+
+    .list-group-item:last-child {
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .list-group-item P {
+        font-size: 0.7rem;
+    }
+}

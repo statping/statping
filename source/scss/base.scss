@@ -11,12 +11,17 @@ HTML,BODY {
     max-width: $max-width;
 }
 
-H1 {
+.header-title {
     color: $title-color;
 }
 
-H5 {
+.header-desc {
     color: $description-color;
+}
+
+
+.btn {
+    border-radius: $global-border-radius;
 }
 
 .online_list .badge {
@@ -67,6 +72,7 @@ H5 {
 
 .lower_canvas SPAN {
     font-size: 1rem;
+    color: $service-description-color
 }
 
 .footer {
@@ -83,23 +89,30 @@ H5 {
     color: #6d6d6d;
 }
 
-.online_badge {
-    color: #fff;
-    background-color: #35b317;
+.badge {
+    color: white;
+    border-radius: $global-border-radius;
 }
 
-.offline_badge {
-    color: #fff;
-    background-color: #c51919;
+.btn-group {
+    height: 25px;
+
+    & A {
+        padding: 0.1rem .75rem;
+        font-size: 0.8rem;
+    }
 }
 
-.progress {
-    margin-top: -20px;
-    margin-left: -20px;
-    margin-bottom: 15px;
-    width: calc(100% + 40px);
-    height: 3px;
-    border-radius: 0;
+.card-body .badge {
+    color: #fff;
+}
+
+.nav-pills .nav-link {
+    border-radius: $global-border-radius;
+}
+
+.form-control {
+    border-radius: $global-border-radius;
 }
 
 .card {
@@ -122,18 +135,68 @@ H5 {
     width: 100%;
 }
 
+@mixin dynamic-color-hov($color) {
+    &.dyn-dark {
+        background-color: darken($color, 12%) !important;
+        border-color: darken($color, 17%) !important;
+    }
+    &.dyn-dark:HOVER {
+        background-color: darken($color, 17%) !important;
+        border-color: darken($color, 20%) !important;
+    }
+    &.dyn-light {
+        background-color: lighten($color, 12%) !important;
+        border-color: lighten($color, 17%) !important;
+    }
+    &.dyn-light:HOVER {
+        background-color: lighten($color, 17%) !important;
+        border-color: lighten($color, 20%) !important;
+    }
+}
+
+@mixin dynamic-color($color) {
+    &.dyn-dark {
+        background-color: darken($color, 12%) !important;
+        border-color: darken($color, 17%) !important;
+    }
+    &.dyn-light {
+        background-color: lighten($color, 12%) !important;
+        border-color: lighten($color, 17%) !important;
+    }
+}
+
+
 .btn-primary {
-    background-color: $button-background-color;
-    border-color: $button-border-color;
-    color: $button-color;
+    background-color: $primary-color;
+    border-color: darken($primary-color, 17%);
+    color: white;
+    @include dynamic-color($success-color);
 }
 
 .btn-success {
     background-color: $success-color;
+    @include dynamic-color($success-color);
 }
 
 .btn-danger {
     background-color: $danger-color;
+    @include dynamic-color($danger-color);
+}
+
+.bg-success {
+    background-color: $success-color !important;
+}
+
+.bg-danger {
+    background-color: $danger-color !important;
+}
+
+.bg-success .dyn-dark {
+    background-color: darken($success-color, 10%) !important;
+}
+
+.bg-danger .dyn-dark {
+    background-color: darken($danger-color, 10%) !important;
 }
 
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
@@ -179,85 +242,59 @@ H5 {
   transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
 
-
-@media (max-width: 767px) {
-
-    .sm-container {
-        margin-top: 40px !important;
-        padding: 0 !important;
-    }
-
-    .list-group-item H5 {
-        font-size: 0.9rem;
-    }
-
-    .container {
-        padding: 0 !important;
-    }
-
-    .navbar {
-        margin-left: 0px;
-        margin-top: 0px;
-        width: 100%;
-        margin-bottom: 0;
-    }
-
-    .card-body {
-        font-size: 6pt;
-        padding: 5px 5px;
-    }
-
-    .lg_number {
-        font-size: 1.5rem;
-    }
-
-    .stats_area {
-        margin-top: 35px !important;
-        margin-bottom: 35px !important;
-    }
-
-    .stats_area .col-4 {
-        padding-left: 0;
-        padding-right: 0;
-    }
-
-    .lower_canvas SPAN {
-        font-size: 0.9rem;
-        float: left;
-        color: $service-description-color;
-    }
-
-    .btn-sm {
-        line-height: 0.9rem;
-        font-size: 0.65rem;
-    }
-
-    .full-col-12 {
-        padding-left: 0px;
-        padding-right: 0px;
-    }
-
-    .card {
-        border: 0;
-        border-radius: 0;
-    }
-
-    .list-group-item {
-        border-top: 1px solid #e4e4e4;
-        border: 0px;
-    }
-
-    .list-group-item:first-child {
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-    }
-
-    .list-group-item:last-child {
-        border-bottom-right-radius: 0;
-        border-bottom-left-radius: 0;
-    }
-
-    .list-group-item P {
-        font-size: 0.7rem;
-    }
+@keyframes pulse_animation {
+    0% { transform: scale(1); }
+    30% { transform: scale(1); }
+    40% { transform: scale(1.02); }
+    50% { transform: scale(1); }
+    60% { transform: scale(1); }
+    70% { transform: scale(1.05); }
+    80% { transform: scale(1); }
+    100% { transform: scale(1); }
 }
+
+.pulse {
+    animation-name: pulse_animation;
+    animation-duration: 1500ms;
+    transform-origin:70% 70%;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+
+@keyframes glow-grow {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+.pulse-glow {
+    animation-name: glow-grown;
+    animation-duration: 100ms;
+    transform-origin: 70% 30%;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+.pulse-glow:before,
+.pulse-glow:after {
+    position: absolute;
+    content: '';
+    height: 0.5rem;
+    width: 1.75rem;
+    top: 1.2rem;
+    right: 2.15rem;
+    border-radius: 0;
+    box-shadow: 0 0 7px #47d337;
+    animation: glow-grow 2s ease-out infinite;
+}
+
+
+@import 'mobile';

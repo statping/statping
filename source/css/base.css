@@ -1,3 +1,10 @@
+/*    Index Page      */
+/*    Status Container   */
+/*    Button Colors      */
+/*   Footer Settings   */
+/*   Global Settings */
+/*   Mobile Settings   */
+/*   Mobile Service Container   */
 HTML, BODY {
   background-color: #fcfcfc; }
 
@@ -6,11 +13,14 @@ HTML, BODY {
   padding-bottom: 20px;
   max-width: 860px; }
 
-H1 {
+.header-title {
   color: #464646; }
 
-H5 {
+.header-desc {
   color: #939393; }
+
+.btn {
+  border-radius: 0.2rem; }
 
 .online_list .badge {
   margin-top: 0.2rem; }
@@ -51,7 +61,8 @@ H5 {
   padding: 17px 10px; }
 
 .lower_canvas SPAN {
-  font-size: 1rem; }
+  font-size: 1rem;
+  color: #fff; }
 
 .footer {
   text-decoration: none;
@@ -64,21 +75,24 @@ H5 {
 .footer A:HOVER {
   color: #6d6d6d; }
 
-.online_badge {
-  color: #fff;
-  background-color: #35b317; }
+.badge {
+  color: white;
+  border-radius: 0.2rem; }
 
-.offline_badge {
-  color: #fff;
-  background-color: #c51919; }
+.btn-group {
+  height: 25px; }
+  .btn-group A {
+    padding: 0.1rem .75rem;
+    font-size: 0.8rem; }
 
-.progress {
-  margin-top: -20px;
-  margin-left: -20px;
-  margin-bottom: 15px;
-  width: calc(100% + 40px);
-  height: 3px;
-  border-radius: 0; }
+.card-body .badge {
+  color: #fff; }
+
+.nav-pills .nav-link {
+  border-radius: 0.2rem; }
+
+.form-control {
+  border-radius: 0.2rem; }
 
 .card {
   background-color: #ffffff;
@@ -98,14 +112,44 @@ H5 {
 
 .btn-primary {
   background-color: #3e9bff;
-  border-color: #007bff;
-  color: #ffffff; }
+  border-color: #006fe6;
+  color: white; }
+  .btn-primary.dyn-dark {
+    background-color: #32a825 !important;
+    border-color: #2c9320 !important; }
+  .btn-primary.dyn-light {
+    background-color: #75de69 !important;
+    border-color: #88e37e !important; }
 
 .btn-success {
   background-color: #47d337; }
+  .btn-success.dyn-dark {
+    background-color: #32a825 !important;
+    border-color: #2c9320 !important; }
+  .btn-success.dyn-light {
+    background-color: #75de69 !important;
+    border-color: #88e37e !important; }
 
 .btn-danger {
   background-color: #dd3545; }
+  .btn-danger.dyn-dark {
+    background-color: #b61f2d !important;
+    border-color: #a01b28 !important; }
+  .btn-danger.dyn-light {
+    background-color: #e66975 !important;
+    border-color: #e97f89 !important; }
+
+.bg-success {
+  background-color: #47d337 !important; }
+
+.bg-danger {
+  background-color: #dd3545 !important; }
+
+.bg-success .dyn-dark {
+  background-color: #35b027 !important; }
+
+.bg-danger .dyn-dark {
+  background-color: #bf202f !important; }
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
   background-color: #13a00d; }
@@ -145,7 +189,62 @@ H5 {
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
   transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s; }
 
+@keyframes pulse_animation {
+  0% {
+    transform: scale(1); }
+  30% {
+    transform: scale(1); }
+  40% {
+    transform: scale(1.02); }
+  50% {
+    transform: scale(1); }
+  60% {
+    transform: scale(1); }
+  70% {
+    transform: scale(1.05); }
+  80% {
+    transform: scale(1); }
+  100% {
+    transform: scale(1); } }
+.pulse {
+  animation-name: pulse_animation;
+  animation-duration: 1500ms;
+  transform-origin: 70% 70%;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear; }
+
+@keyframes glow-grow {
+  0% {
+    opacity: 0;
+    transform: scale(1); }
+  80% {
+    opacity: 1; }
+  100% {
+    transform: scale(2);
+    opacity: 0; } }
+.pulse-glow {
+  animation-name: glow-grown;
+  animation-duration: 100ms;
+  transform-origin: 70% 30%;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear; }
+
+.pulse-glow:before,
+.pulse-glow:after {
+  position: absolute;
+  content: '';
+  height: 0.5rem;
+  width: 1.75rem;
+  top: 1.2rem;
+  right: 2.15rem;
+  border-radius: 0;
+  box-shadow: 0 0 7px #47d337;
+  animation: glow-grow 2s ease-out infinite; }
+
 @media (max-width: 767px) {
+  HTML, BODY {
+    background-color: #fcfcfc; }
+
   .sm-container {
     margin-top: 40px !important;
     padding: 0 !important; }
@@ -162,26 +261,6 @@ H5 {
     width: 100%;
     margin-bottom: 0; }
 
-  .card-body {
-    font-size: 6pt;
-    padding: 5px 5px; }
-
-  .lg_number {
-    font-size: 1.5rem; }
-
-  .stats_area {
-    margin-top: 35px !important;
-    margin-bottom: 35px !important; }
-
-  .stats_area .col-4 {
-    padding-left: 0;
-    padding-right: 0; }
-
-  .lower_canvas SPAN {
-    font-size: 0.9rem;
-    float: left;
-    color: #47d337; }
-
   .btn-sm {
     line-height: 0.9rem;
     font-size: 0.65rem; }
@@ -192,7 +271,25 @@ H5 {
 
   .card {
     border: 0;
-    border-radius: 0; }
+    border-radius: 0rem;
+    padding: 0;
+    background-color: #ffffff; }
+
+  .card-body {
+    font-size: 6pt;
+    padding: 5px 5px; }
+
+  .lg_number {
+    font-size: 1.5rem; }
+
+  .stats_area {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important; }
+
+  .stats_area .col-4 {
+    padding-left: 0;
+    padding-right: 0;
+    font-size: 0.6rem; }
 
   .list-group-item {
     border-top: 1px solid #e4e4e4;
