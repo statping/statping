@@ -6,11 +6,10 @@ $(".service_li").on('click', function() {
 });
 
 
-$(".disable_click").on('click', function() {
-    $(this).prop("disabled", true);
-    $(this).text("Loading...");
-    return true;
+$('form').submit(function() {
+    $(this).find("button[type='submit']").prop('disabled',true);
 });
+
 
 
 var ranVar = false;

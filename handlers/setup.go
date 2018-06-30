@@ -11,7 +11,7 @@ import (
 )
 
 func SetupHandler(w http.ResponseWriter, r *http.Request) {
-	if core.CoreApp != nil {
+	if core.CoreApp.Services != nil {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -39,7 +39,7 @@ func SetupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
-	if core.CoreApp != nil {
+	if core.CoreApp.Services != nil {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}

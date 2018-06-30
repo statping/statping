@@ -23,3 +23,9 @@ $("#setup_form").submit(function() {
     $("#setup_button").text("Creating Statup...");
     return true;
 });
+
+
+$('form').submit(function() {
+    $(this).find("button[type='submit']").prop('disabled',true);
+    $(this).find("button[type='submit']").text('Loading...');
+});
