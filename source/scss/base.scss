@@ -11,6 +11,14 @@ HTML,BODY {
     max-width: $max-width;
 }
 
+H1 {
+    color: $title-color;
+}
+
+H5 {
+    color: $description-color;
+}
+
 .online_list .badge {
     margin-top: 0.2rem;
 }
@@ -67,7 +75,7 @@ HTML,BODY {
 }
 
 .footer A {
-    color: #aaaaaa;
+    color: $footer-text-color;
     text-decoration: none;
 }
 
@@ -95,7 +103,8 @@ HTML,BODY {
 }
 
 .card {
-    background-color: $card-background;
+    background-color: $service-background;
+    border: $service-border;
 }
 
 .card-body {
@@ -103,7 +112,7 @@ HTML,BODY {
 }
 
 .card-body H4 A {
-    color: #239e07;
+    color: $service-title;
     text-decoration: none;
 }
 
@@ -117,6 +126,15 @@ HTML,BODY {
 
 }
 
+
+
+.btn-success {
+    background-color: $success-color;
+}
+
+.btn-danger {
+    background-color: $danger-color;
+}
 
 
 .CodeMirror {
@@ -198,6 +216,7 @@ HTML,BODY {
     .lower_canvas SPAN {
         font-size: 0.9rem;
         float: left;
+        color: $service-description-color;
     }
 
     .btn-sm {

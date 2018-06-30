@@ -20,6 +20,7 @@ func Router() *mux.Router {
 		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(core.JsBox.HTTPBox())))
 	}
 	r.Handle("/robots.txt", http.HandlerFunc(RobotsTxtHandler)).Methods("GET")
+	r.Handle("/favicon.ico", http.HandlerFunc(FavIconHandler)).Methods("GET")
 	r.Handle("/setup", http.HandlerFunc(SetupHandler)).Methods("GET")
 	r.Handle("/setup", http.HandlerFunc(ProcessSetupHandler)).Methods("POST")
 	r.Handle("/dashboard", http.HandlerFunc(DashboardHandler)).Methods("GET")

@@ -98,7 +98,10 @@ func CreateAllAssets() {
 	CopyToPublic(JsBox, "js", "setup.js")
 	utils.Log(1, "Compiling CSS from SCSS style...")
 	err := CompileSASS()
-	if err == nil {
-		utils.Log(1, "Statup assets have been inserted")
+	if err != nil {
+		CopyToPublic(CssBox, "css", "base.css")
+		utils.Log(2, "Default 'base.css' was insert because SASS did not work.")
+		return
 	}
+	utils.Log(1, "Statup assets have been inserted")
 }

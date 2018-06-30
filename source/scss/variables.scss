@@ -1,8 +1,17 @@
 $background-color: #fcfcfc;
 $max-width: 860px;
-$online-color: #47d337;
-$offline-color: #dd3545;
 
-$card-background: #fff;
-$card-stats-color: #474747;
-$card-stats-size: 26pt;
+$title-color: #000;
+$description-color: #000;
+
+$service-background: #bababa;
+$service-border: 1px solid rgba(0,0,0,.125);
+$service-title: #bababa;
+$success-color: #47d337;
+$danger-color: #dd3545;
+
+$footer-text-color: #000;
+
+$service-stats-color: #47d337;
+$service-description-color: #47d337;
+$service-stats-size: 12pt;

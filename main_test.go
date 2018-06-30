@@ -279,11 +279,20 @@ func TestServiceHandler(t *testing.T) {
 
 func TestPrometheusHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/metrics", nil)
+	req.Header.Set("Authorization", core.CoreApp.ApiSecret)
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
 	t.Log(rr.Body.String())
 	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 6"))
+}
+
+func TestFailingPrometheusHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/metrics", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	route.ServeHTTP(rr, req)
+	assert.Equal(t, 55, rr.Result().StatusCode)
 }
 
 func TestLoginHandler(t *testing.T) {
