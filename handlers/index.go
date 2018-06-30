@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/hunterlong/statup/core"
 	"net/http"
 )
@@ -17,7 +16,5 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	out := index{*core.CoreApp, core.CoreApp.Services}
-	first, _ := out.Services[0].LimitedHits()
-	fmt.Println(out.Services[0].Name, "start:", first[0].Id, "last:", first[len(first)-1].Id)
 	ExecuteResponse(w, r, "index.html", out)
 }
