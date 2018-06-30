@@ -3,12 +3,24 @@ package handlers
 import (
 	"fmt"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/utils"
 	"net/http"
 	"strings"
 )
 
 func PrometheusHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("Prometheus /metrics Request From IP: %v\n", r.RemoteAddr)
+	utils.Log(1, fmt.Sprintf("Prometheus /metrics Request From IP: %v\n", r.RemoteAddr))
+	var token string
+	tokens, ok := r.Header["Authorization"]
+	if ok && len(tokens) >= 1 {
+		token = tokens[0]
+		token = strings.TrimPrefix(token, "Bearer ")
+	}
+	if token != core.CoreApp.ApiSecret {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+
 	metrics := []string{}
 	system := fmt.Sprintf("statup_total_failures %v\n", core.CountFailures())
 	system += fmt.Sprintf("statup_total_services %v", len(core.CoreApp.Services))

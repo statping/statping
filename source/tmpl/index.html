@@ -82,7 +82,7 @@
                 {{ end }}
                     <div class="lower_canvas full-col-12 text-white{{if not .Online}} bg-danger{{end}}">
                         <div class="col-12">
-                            <span>No failures within the last 25 days</span>
+                            <span>{{.SmallText}}</span>
                             <a href="/service/{{ .Id }}" class="btn {{if .Online}}btn-success{{else}}btn-danger{{end}} btn-sm float-right">View Service</a>
                         </div>
                     </div>

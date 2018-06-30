@@ -96,10 +96,11 @@ aws ec2 run-instances \
 ```
 
 ## Prometheus Exporter
-Statup includes a prometheus exporter so you can have even more monitoring power with your services. The prometheus exporter can be seen on `/metrics`, simply create another exporter in your prometheus config.
+Statup includes a prometheus exporter so you can have even more monitoring power with your services. The prometheus exporter can be seen on `/metrics`, simply create another exporter in your prometheus config. Use your Statup API Secret for the Authorization Bearer header, the `/metrics` URL is dedicated for Prometheus and requires the correct API Secret has `Authorization` header.
 ```yaml
 scrape_configs:
   - job_name: 'statup'
+    bearer_token: MY API SECRET HERE
     static_configs:
       - targets: ['statup:8080']
 ```

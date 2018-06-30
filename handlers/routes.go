@@ -52,7 +52,7 @@ func Router() *mux.Router {
 	r.Handle("/api/services/{id}", http.HandlerFunc(ApiServiceUpdateHandler)).Methods("POST")
 	r.Handle("/api/users", http.HandlerFunc(ApiAllUsersHandler))
 	r.Handle("/api/users/{id}", http.HandlerFunc(ApiUserHandler))
-	r.Handle("/metrics", http.HandlerFunc(PrometheusHandler)).Methods("GET")
+	r.Handle("/metrics", http.HandlerFunc(PrometheusHandler))
 	Store = sessions.NewCookieStore([]byte("secretinfo"))
 	return r
 }

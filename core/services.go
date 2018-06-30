@@ -104,6 +104,21 @@ type DateScan struct {
 	Value     int64     `json:"y"`
 }
 
+func (s *Service) SmallText() string {
+	last := s.LimitedFailures()
+	hits, _ := s.LimitedHits()
+	if !s.Online {
+		return fmt.Sprintf("%v at %v", last[0].ParseError(), last[0].CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
+	} else {
+		if len(last) == 0 {
+			return fmt.Sprintf("Online since %v", s.CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
+		} else {
+			return fmt.Sprintf("Online, last failure was %v", hits[0].CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
+		}
+	}
+	return fmt.Sprintf("No Failures in the last 24 hours! %v", hits[0])
+}
+
 func (s *Service) GraphData() string {
 	var d []DateScan
 	increment := "minute"

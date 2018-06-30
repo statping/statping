@@ -64,6 +64,17 @@
 
                         <button type="submit" class="btn btn-primary btn-block">Save Settings</button>
 
+
+                        <div class="form-group">
+                            <label for="formGroupExampleInput">API Key</label>
+                            <input type="text" name="description" class="form-control" value="{{ .ApiKey }}" id="formGroupExampleInput" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="formGroupExampleInput">API Secret</label>
+                            <input type="text" name="description" class="form-control" value="{{ .ApiSecret }}" id="formGroupExampleInput" readonly>
+                        </div>
+
                     </form>
 
                 </div>

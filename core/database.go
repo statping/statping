@@ -116,18 +116,17 @@ func (c *DbConfig) Save() error {
 	DropDatabase()
 	CreateDatabase()
 
-	newCore := Core{
+	newCore := &Core{
 		Name:        c.Project,
 		Description: c.Description,
 		Config:      "config.yml",
-		ApiKey:      utils.NewSHA1Hash(5),
-		ApiSecret:   utils.NewSHA1Hash(10),
+		ApiKey:      utils.NewSHA1Hash(9),
+		ApiSecret:   utils.NewSHA1Hash(16),
 		Domain:      c.Domain,
 	}
 
 	col := DbSession.Collection("core")
 	_, err = col.Insert(newCore)
-
 	return err
 }
 
