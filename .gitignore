@@ -13,3 +13,4 @@ public
 assets
 cmd.sh
 *.log
+.env

@@ -200,7 +200,7 @@ func TestService_Check(t *testing.T) {
 	assert.NotNil(t, service)
 	assert.Equal(t, "Statup.io", service.Name)
 	out := service.Check()
-	assert.Equal(t, true, out.Online)
+	assert.Equal(t, false, out.Online)
 }
 
 func TestService_AvgTime(t *testing.T) {

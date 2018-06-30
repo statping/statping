@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-ENV VERSION=v0.27.6
+ENV VERSION=v0.27.7
 
 RUN apk --no-cache add libstdc++ ca-certificates
 RUN wget -q https://github.com/hunterlong/statup/releases/download/$VERSION/statup-linux-alpine.tar.gz && \
@@ -15,12 +15,14 @@ RUN wget -q https://assets.statup.io/sass && \
 ENV IS_DOCKER=true
 ENV SASS=/usr/local/bin/sass
 ENV CMD_FILE=/usr/bin/cmd
-ENV USE_ASSETS=true
 
 RUN printf "#!/usr/bin/env sh\n\$1\n" > $CMD_FILE && \
       chmod +x $CMD_FILE
 
 WORKDIR /app
+#COPY build/statup-linux-alpine /usr/local/bin/statup
+
 VOLUME /app
+
 EXPOSE 8080
 ENTRYPOINT statup
