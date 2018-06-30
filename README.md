@@ -10,6 +10,10 @@ for you to build an even better status page.
 Statup strives to remain future-proof and remain intact if a failure is created. Your Statup service should not be running on the same instance you're trying to monitor. 
 If your server crashes your Status Page should still remaining online to notify your users of downtime. 
 
+<p align="center">
+<img width="70%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsc1.png">
+</p>
+
 ## Lightweight and Fast
 Statup is a very lightweight application and is available for Linux, Mac, and Windows. The Docker image is only ~16Mb so you know that this application won't be filling up your hard drive space. 
 The Status binary for all other OS's is ~17Mb at most. 
@@ -19,6 +23,10 @@ This Status Page generator allows you to use MySQL, Postgres, or SQLite.
 
 ## No Requirements
 Statup is built in Go Language so all you need is the precompile binary based on your operating system. You won't need to install anything extra once you have the Statup binary installed. You can even run Statup on a Raspberry Pi.
+
+<p align="center">
+<img width="100%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsc2.png">
+</p>
 
 ## Run on Any Server
 Whether you're a Docker fan-boy or a AWS EC2 master, Statup gives you multiple options to simply get running. Our Amazon AMI image (`ami-7be8a103`) is only 8Gb and will automatically update to the most stable version of Statup. 
