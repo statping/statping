@@ -292,7 +292,7 @@ func TestFailingPrometheusHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
-	assert.Equal(t, 55, rr.Result().StatusCode)
+	assert.Equal(t, 401, rr.Result().StatusCode)
 }
 
 func TestLoginHandler(t *testing.T) {

@@ -39,6 +39,7 @@ func (s *Service) Check() *Service {
 		Timeout: 30 * time.Second,
 	}
 	response, err := client.Get(s.Domain)
+	response.Header.Set("User-Agent", "StatupMonitor")
 	t2 := time.Now()
 	s.Latency = t2.Sub(t1).Seconds()
 	if err != nil {
