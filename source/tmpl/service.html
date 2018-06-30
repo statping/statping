@@ -20,16 +20,16 @@
             <div class="col-12 mb-4">
 
             {{if .Online }}
-                <span class="text-white d-md-none btn bg-success d-block">ONLINE</span>
+                <span class="mt-2 mb-3 text-white d-md-none btn bg-success d-block d-md-none">ONLINE</span>
             {{ else }}
-                <span class="text-white d-md-none btn bg-danger d-block">OFFLINE</span>
+                <span class="mt-2 mb-3 text-white d-md-none btn bg-danger d-block d-md-none">OFFLINE</span>
             {{end}}
 
                         <h4 class="mt-2">{{ .Name }}
                         {{if .Online }}
-                            <span class="badge online_badge float-right d-sm-block">ONLINE</span>
+                            <span class="badge online_badge float-right d-none d-md-block">ONLINE</span>
                         {{ else }}
-                            <span class="badge offline_badge float-right d-sm-block">OFFLINE</span>
+                            <span class="badge offline_badge float-right d-none d-md-block">OFFLINE</span>
                         {{end}}</h4>
 
                         <div class="row stats_area mt-5 mb-5">
@@ -131,10 +131,10 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <div class="col-sm-6">
+                    <div class="col-6">
                         <button type="submit" class="btn btn-success btn-block">Update Service</button>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-6">
                         <a href="/service/{{ .Id }}/delete_failures" class="btn btn-danger btn-block">Delete All Failures</a>
                     </div>
                 </div>
@@ -155,20 +155,19 @@
     </div>
 
 </div>
-{{end}}
 
 
-    <div class="col-12 mt-4">
+<div class="col-12 mt-4">
     <h3>Service Checkins</h3>
 
 {{ range .Checkins }}
 
-        <h5>Check #{{.Id}} <span class="badge online_badge float-right">Checked in {{.Ago}}</span></h5>
+    <h5>Check #{{.Id}} <span class="badge online_badge float-right">Checked in {{.Ago}}</span></h5>
 
-        <input type="text" class="form-control" value="https://domainhere.com/api/checkin/{{.Api}}">
+    <input type="text" class="form-control" value="https://domainhere.com/api/checkin/{{.Api}}">
 
 
-    </div>
+</div>
 
 {{ end }}
 
@@ -186,6 +185,9 @@
             </div>
         </div>
     </form>
+
+
+{{end}}
 
 
 </div>

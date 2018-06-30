@@ -96,11 +96,22 @@ H5 {
   height: 170px;
   width: 100%; }
 
+.btn-primary {
+  background-color: #3e9bff;
+  border-color: #007bff;
+  color: #ffffff; }
+
 .btn-success {
   background-color: #47d337; }
 
 .btn-danger {
   background-color: #dd3545; }
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+  background-color: #13a00d; }
+
+.nav-pills A {
+  color: #424242; }
 
 .CodeMirror {
   /* Bootstrap Settings */

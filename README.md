@@ -18,20 +18,26 @@ If your server crashes your Status Page should still remaining online to notify 
 Statup is a very lightweight application and is available for Linux, Mac, and Windows. The Docker image is only ~16Mb so you know that this application won't be filling up your hard drive space. 
 The Status binary for all other OS's is ~17Mb at most. 
 
-## 3 Different Databases
-This Status Page generator allows you to use MySQL, Postgres, or SQLite. 
-
 ## No Requirements
 Statup is built in Go Language so all you need is the precompile binary based on your operating system. You won't need to install anything extra once you have the Statup binary installed. You can even run Statup on a Raspberry Pi.
 
-<p align="center">
-<img width="40%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsm1.jpg">
-    <img width="24%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsm2.jpg">
-</p>
+## Custom SASS Styling
+Statup will allow you to completely customize your Status Page using SASS styling with easy to use variables. The Docker image actually contains a prebuilt SASS binary so you won't even need to setup anything!
 
 <p align="center">
-<img width="100%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsc2.png">
+<img width="100%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupstyler.png">
 </p>
+
+## Mobile View is Gorgeous
+Your status page will be optimized for mobile and desktop viewers. Statup has a full width edge to edge view, which you can also edit to meet your requirements.
+
+<p align="center">
+<img width="40%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsm1.jpg">
+<img width="24%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsm2.jpg">
+</p>
+
+## 3 Different Databases
+This Status Page generator allows you to use MySQL, Postgres, or SQLite. 
 
 ## Run on Any Server
 Whether you're a Docker fan-boy or a AWS EC2 master, Statup gives you multiple options to simply get running. Our Amazon AMI image (`ami-7be8a103`) is only 8Gb and will automatically update to the most stable version of Statup. 
@@ -45,6 +51,10 @@ Statup includes email notification via SMTP if your services go offline.
 Statup isn't just another Status Page for your applications, it's a framework that allows you to create your own plugins to interact with every element of your status page.
 Plugin are created in Golang using the [statup/plugin](https://github.com/hunterlong/statup/tree/master/plugin) golang package. The plugin package has a list of 
 interfaces/events to accept into your own plugin application. 
+
+<p align="center">
+<img width="100%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsc2.png">
+</p>
 
 ## Exporting Static HTML
 If you want to use Statup as a CLI application without running a server, you can export your status page to a static HTML. 
