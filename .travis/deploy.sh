@@ -20,6 +20,10 @@ curl -s -X POST \
  -d "$body" \
  https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statup/requests
 
+docker login -u $DOCKER_USER -p $DOCKER_PASS $DOCKER_URL
+docker build -t $DOCKER_URL/hunterlong/statup .
+docker push $DOCKER_URL/hunterlong/statup
+
 #if [ "$TRAVIS_BRANCH" == "master" ]
 #then
 #    curl -X POST $DOCKER > /dev/null
