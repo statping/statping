@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/handlers"
 	"github.com/rendon/testcli"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -19,19 +21,19 @@ var (
 )
 
 func init() {
-	route = Router()
+	route = handlers.Router()
 }
 
 func TestInit(t *testing.T) {
 	RenderBoxes()
 	os.Remove("./statup.db")
-	Router()
+	handlers.Router()
 	LoadDotEnvs()
 
 }
 
 func TestMySQLMakeConfig(t *testing.T) {
-	config := &DbConfig{
+	config := &core.DbConfig{
 		"mysql",
 		os.Getenv("DB_HOST"),
 		os.Getenv("DB_USER"),
@@ -49,30 +51,30 @@ func TestMySQLMakeConfig(t *testing.T) {
 	err := config.Save()
 	assert.Nil(t, err)
 
-	_, err = LoadConfig()
+	_, err = core.LoadConfig()
 	assert.Nil(t, err)
-	assert.Equal(t, "mysql", configs.Connection)
+	assert.Equal(t, "mysql", core.Configs.Connection)
 
-	err = DbConnection(configs.Connection)
+	err = core.DbConnection(core.Configs.Connection)
 	assert.Nil(t, err)
-	InsertDefaultComms()
+	core.InsertDefaultComms()
 }
 
 func TestInsertMysqlSample(t *testing.T) {
-	err := LoadSampleData()
+	err := core.LoadSampleData()
 	assert.Nil(t, err)
 }
 
 func TestSelectCoreMYQL(t *testing.T) {
 	var err error
-	core, err = SelectCore()
+	core.CoreApp, err = core.SelectCore()
 	assert.Nil(t, err)
-	assert.Equal(t, "Testing MYSQL", core.Name)
-	assert.Equal(t, VERSION, core.Version)
+	assert.Equal(t, "Testing MYSQL", core.CoreApp.Name)
+	assert.Equal(t, VERSION, core.CoreApp.Version)
 }
 
 func TestSqliteMakeConfig(t *testing.T) {
-	config := &DbConfig{
+	config := &core.DbConfig{
 		"sqlite",
 		os.Getenv("DB_HOST"),
 		os.Getenv("DB_USER"),
@@ -90,22 +92,22 @@ func TestSqliteMakeConfig(t *testing.T) {
 	err := config.Save()
 	assert.Nil(t, err)
 
-	_, err = LoadConfig()
+	_, err = core.LoadConfig()
 	assert.Nil(t, err)
-	assert.Equal(t, "sqlite", configs.Connection)
+	assert.Equal(t, "sqlite", core.Configs.Connection)
 
-	err = DbConnection(configs.Connection)
+	err = core.DbConnection(core.Configs.Connection)
 	assert.Nil(t, err)
-	InsertDefaultComms()
+	core.InsertDefaultComms()
 }
 
 func TestInsertSqliteSample(t *testing.T) {
-	err := LoadSampleData()
+	err := core.LoadSampleData()
 	assert.Nil(t, err)
 }
 
 func TestPostgresMakeConfig(t *testing.T) {
-	config := &DbConfig{
+	config := &core.DbConfig{
 		"postgres",
 		os.Getenv("DB_HOST"),
 		os.Getenv("DB_USER"),
@@ -123,38 +125,38 @@ func TestPostgresMakeConfig(t *testing.T) {
 	err := config.Save()
 	assert.Nil(t, err)
 
-	_, err = LoadConfig()
+	_, err = core.LoadConfig()
 	assert.Nil(t, err)
-	assert.Equal(t, "postgres", configs.Connection)
+	assert.Equal(t, "postgres", core.Configs.Connection)
 
-	err = DbConnection(configs.Connection)
+	err = core.DbConnection(core.Configs.Connection)
 	assert.Nil(t, err)
-	InsertDefaultComms()
+	core.InsertDefaultComms()
 }
 
 func TestInsertPostgresSample(t *testing.T) {
-	err := LoadSampleData()
+	err := core.LoadSampleData()
 	assert.Nil(t, err)
 }
 
 func TestSelectCorePostgres(t *testing.T) {
 	var err error
-	core, err = SelectCore()
+	core.CoreApp, err = core.SelectCore()
 	assert.Nil(t, err)
-	assert.Equal(t, "Testing POSTGRES", core.Name)
-	assert.Equal(t, VERSION, core.Version)
+	assert.Equal(t, "Testing POSTGRES", core.CoreApp.Name)
+	assert.Equal(t, VERSION, core.CoreApp.Version)
 }
 
 func TestSelectCore(t *testing.T) {
 	var err error
-	core, err = SelectCore()
+	core.CoreApp, err = core.SelectCore()
 	assert.Nil(t, err)
-	assert.Equal(t, "Testing POSTGRES", core.Name)
-	assert.Equal(t, VERSION, core.Version)
+	assert.Equal(t, "Testing POSTGRES", core.CoreApp.Name)
+	assert.Equal(t, VERSION, core.CoreApp.Version)
 }
 
 func TestUser_Create(t *testing.T) {
-	user := &User{
+	user := &core.User{
 		Username: "admin",
 		Password: "admin",
 		Email:    "info@testuser.com",
@@ -164,14 +166,22 @@ func TestUser_Create(t *testing.T) {
 	assert.NotZero(t, id)
 }
 
+func TestSelectAllServices(t *testing.T) {
+	var err error
+	services, err := core.SelectAllServices()
+	assert.Nil(t, err)
+	assert.Equal(t, 4, len(services))
+}
+
 func TestOneService_Check(t *testing.T) {
-	service := SelectService(1)
+	service := core.SelectService(1)
 	assert.NotNil(t, service)
+	t.Log(service)
 	assert.Equal(t, "Google", service.Name)
 }
 
 func TestService_Create(t *testing.T) {
-	service := &Service{
+	service := &core.Service{
 		Name:           "test service",
 		Domain:         "https://google.com",
 		ExpectedStatus: 200,
@@ -186,7 +196,7 @@ func TestService_Create(t *testing.T) {
 }
 
 func TestService_Check(t *testing.T) {
-	service := SelectService(2)
+	service := core.SelectService(2)
 	assert.NotNil(t, service)
 	assert.Equal(t, "Statup.io", service.Name)
 	out := service.Check()
@@ -194,28 +204,28 @@ func TestService_Check(t *testing.T) {
 }
 
 func TestService_AvgTime(t *testing.T) {
-	service := SelectService(1)
+	service := core.SelectService(1)
 	assert.NotNil(t, service)
 	avg := service.AvgUptime()
 	assert.Equal(t, "100", avg)
 }
 
 func TestService_Online24(t *testing.T) {
-	service := SelectService(1)
+	service := core.SelectService(1)
 	assert.NotNil(t, service)
 	online := service.Online24()
 	assert.Equal(t, float32(100), online)
 }
 
 func TestService_GraphData(t *testing.T) {
-	service := SelectService(1)
+	service := core.SelectService(1)
 	assert.NotNil(t, service)
 	data := service.GraphData()
 	assert.NotEmpty(t, data)
 }
 
 func TestBadService_Create(t *testing.T) {
-	service := &Service{
+	service := &core.Service{
 		Name:           "bad service",
 		Domain:         "https://9839f83h72gey2g29278hd2od2d.com",
 		ExpectedStatus: 200,
@@ -230,13 +240,13 @@ func TestBadService_Create(t *testing.T) {
 }
 
 func TestBadService_Check(t *testing.T) {
-	service := SelectService(4)
+	service := core.SelectService(4)
 	assert.NotNil(t, service)
 	assert.Equal(t, "Github Failing Check", service.Name)
 }
 
 func TestService_Hits(t *testing.T) {
-	service := SelectService(1)
+	service := core.SelectService(1)
 	assert.NotNil(t, service)
 	hits, err := service.Hits()
 	assert.Nil(t, err)
@@ -244,7 +254,7 @@ func TestService_Hits(t *testing.T) {
 }
 
 func TestService_LimitedHits(t *testing.T) {
-	service := SelectService(1)
+	service := core.SelectService(1)
 	assert.NotNil(t, service)
 	hits, err := service.LimitedHits()
 	assert.Nil(t, err)
@@ -273,7 +283,7 @@ func TestPrometheusHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
 	t.Log(rr.Body.String())
-	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 14"))
+	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 6"))
 }
 
 func TestLoginHandler(t *testing.T) {
@@ -348,7 +358,7 @@ func TestExportCommand(t *testing.T) {
 	c := testcli.Command("statup", "export")
 	c.Run()
 	t.Log(c.Stdout())
-	assert.True(t, c.StdoutContains("Exported Statup index page"))
+	assert.True(t, c.StdoutContains("Exporting Static 'index.html' page"))
 }
 
 func TestAssetsCommand(t *testing.T) {

@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
-	"github.com/hunterlong/statup/log"
+	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statup/utils"
 	"gopkg.in/gomail.v2"
 	"html/template"
 	"time"
@@ -15,14 +16,16 @@ var (
 	emailQue *Que
 )
 
+type Email types.Email
+
 type Que struct {
 	Mailer       *gomail.Dialer
-	Outgoing     []*types.Email
+	Outgoing     []*Email
 	LastSent     int
 	LastSentTime time.Time
 }
 
-func AddEmail(email *types.Email) {
+func AddEmail(email *Email) {
 	if emailQue == nil {
 		return
 	}
@@ -33,12 +36,12 @@ func EmailerQueue() {
 	if emailQue == nil {
 		return
 	}
-	uniques := []*types.Email{}
+	uniques := []*Email{}
 	for _, out := range emailQue.Outgoing {
 		if isUnique(uniques, out) {
 			msg := fmt.Sprintf("sending email to: %v \n", out.To)
 			Send(out)
-			log.Send(0, msg)
+			utils.Log(0, msg)
 			uniques = append(uniques, out)
 		}
 	}
@@ -48,7 +51,7 @@ func EmailerQueue() {
 	EmailerQueue()
 }
 
-func isUnique(arr []*types.Email, obj *types.Email) bool {
+func isUnique(arr []*Email, obj *Email) bool {
 	for _, v := range arr {
 		if v.To == obj.To && v.Subject == obj.Subject {
 			return false
@@ -57,7 +60,7 @@ func isUnique(arr []*types.Email, obj *types.Email) bool {
 	return true
 }
 
-func Send(em *types.Email) {
+func Send(em *Email) {
 	source := EmailTemplate(em.Template, em.Data)
 	m := gomail.NewMessage()
 	m.SetHeader("From", "info@betatude.com")
@@ -65,14 +68,14 @@ func Send(em *types.Email) {
 	m.SetHeader("Subject", em.Subject)
 	m.SetBody("text/html", source)
 	if err := emailQue.Mailer.DialAndSend(m); err != nil {
-		log.Send(2, err)
+		utils.Log(2, err)
 	}
 	emailQue.LastSent++
 	emailQue.LastSentTime = time.Now()
 }
 
-func SendFailureEmail(service *Service) {
-	email := &types.Email{
+func SendFailureEmail(service *core.Service) {
+	email := &Email{
 		To:       "info@socialeck.com",
 		Subject:  fmt.Sprintf("Service %v is Failing", service.Name),
 		Template: "failure.html",
@@ -81,30 +84,30 @@ func SendFailureEmail(service *Service) {
 	AddEmail(email)
 }
 
-func LoadMailer(config *types.Communication) *gomail.Dialer {
+func LoadMailer(config *core.Communication) *gomail.Dialer {
 	if config.Host == "" || config.Username == "" || config.Password == "" {
 		return nil
 	}
 	emailQue = new(Que)
-	emailQue.Outgoing = []*types.Email{}
+	emailQue.Outgoing = []*Email{}
 	emailQue.Mailer = gomail.NewDialer(config.Host, config.Port, config.Username, config.Password)
 	emailQue.Mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	return emailQue.Mailer
 }
 
 func EmailTemplate(tmpl string, data interface{}) string {
-	emailTpl, err := emailBox.String(tmpl)
+	emailTpl, err := core.EmailBox.String(tmpl)
 	if err != nil {
-		log.Send(3, err)
+		utils.Log(3, err)
 	}
 	t := template.New("email")
 	t, err = t.Parse(emailTpl)
 	if err != nil {
-		log.Send(3, err)
+		utils.Log(3, err)
 	}
 	var tpl bytes.Buffer
 	if err := t.Execute(&tpl, data); err != nil {
-		log.Send(2, err)
+		utils.Log(2, err)
 	}
 	result := tpl.String()
 	return result

@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-ENV VERSION=v0.27.4
+ENV VERSION=v0.27.6
 
 RUN apk --no-cache add libstdc++ ca-certificates
 RUN wget -q https://github.com/hunterlong/statup/releases/download/$VERSION/statup-linux-alpine.tar.gz && \

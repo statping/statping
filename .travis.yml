@@ -18,7 +18,7 @@ services:
 
 env:
   global:
-     - VERSION=0.27.4
+     - VERSION=0.27.6
      - DB_HOST=localhost
      - DB_USER=travis
      - DB_PASS=
@@ -50,8 +50,6 @@ deploy:
 
 notifications:
   email: false
-
-before_install:
 
 before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'

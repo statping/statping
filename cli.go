@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/hunterlong/statup/log"
+	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
-	"time"
 )
 
 func CatchCLI(args []string) {
@@ -13,65 +13,67 @@ func CatchCLI(args []string) {
 		fmt.Printf("Statup v%v\n", VERSION)
 	case "assets":
 		RenderBoxes()
-		CreateAllAssets()
+		core.CreateAllAssets()
 	case "sass":
-		CompileSASS()
+		core.CompileSASS()
 	case "export":
 		var err error
 		fmt.Printf("Statup v%v Exporting Static 'index.html' page...\n", VERSION)
 		RenderBoxes()
-		configs, err = LoadConfig()
+		core.Configs, err = core.LoadConfig()
 		if err != nil {
-			log.Send(3, "config.yml file not found")
+			utils.Log(4, "config.yml file not found")
 		}
-		setupMode = true
-		mainProcess()
-		time.Sleep(10 * time.Second)
-		indexSource := ExportIndexHTML()
-		err = SaveFile("./index.html", []byte(indexSource))
+		RunOnce()
+		indexSource := core.ExportIndexHTML()
+		err = core.SaveFile("./index.html", []byte(indexSource))
 		if err != nil {
-			log.Send(2, err)
+			utils.Log(4, err)
 		}
-		log.Send(1, "Exported Statup index page: 'index.html'")
+		utils.Log(1, "Exported Statup index page: 'index.html'")
 	case "help":
 		HelpEcho()
 	case "update":
 		fmt.Println("Sorry updating isn't available yet!")
 	case "run":
-		log.Send(1, "Running 1 time and saving to database...")
-		var err error
-		configs, err = LoadConfig()
-		if err != nil {
-			log.Send(3, "config.yml file not found")
-		}
-		err = DbConnection(configs.Connection)
-		if err != nil {
-			log.Send(3, err)
-		}
-		core, err = SelectCore()
-		if err != nil {
-			fmt.Println("Core database was not found, Statup is not setup yet.")
-		}
-		services, err = SelectAllServices()
-		if err != nil {
-			log.Send(3, err)
-		}
-		for _, s := range services {
-			out := s.Check()
-			fmt.Printf("    Service %v | URL: %v | Latency: %0.0fms | Online: %v\n", out.Name, out.Domain, (out.Latency * 1000), out.Online)
-		}
+		utils.Log(1, "Running 1 time and saving to database...")
+		RunOnce()
 		fmt.Println("Check is complete.")
 	case "env":
 		fmt.Println("Statup Environment Variables")
 		envs, err := godotenv.Read(".env")
 		if err != nil {
-			log.Send(3, "No .env file found in current directory.")
+			utils.Log(4, "No .env file found in current directory.")
 		}
 		for k, e := range envs {
 			fmt.Printf("%v=%v\n", k, e)
 		}
 	default:
-		log.Send(3, "Statup does not have the command you entered.")
+		utils.Log(3, "Statup does not have the command you entered.")
+	}
+}
+
+func RunOnce() {
+	var err error
+	core.Configs, err = core.LoadConfig()
+	if err != nil {
+		utils.Log(4, "config.yml file not found")
+	}
+	err = core.DbConnection(core.Configs.Connection)
+	if err != nil {
+		utils.Log(4, err)
+	}
+	core.CoreApp, err = core.SelectCore()
+	if err != nil {
+		fmt.Println("Core database was not found, Statup is not setup yet.")
+	}
+	core.CoreApp.Services, err = core.SelectAllServices()
+	if err != nil {
+		utils.Log(4, err)
+	}
+	for _, s := range core.CoreApp.Services {
+		out := s.Check()
+		fmt.Printf("    Service %v | URL: %v | Latency: %0.0fms | Online: %v\n", out.Name, out.Domain, (out.Latency * 1000), out.Online)
 	}
 }
 

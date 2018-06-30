@@ -20,7 +20,6 @@ curl -s -X POST \
  -d "$body" \
  https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statup/requests
 
-
 if [ "$TRAVIS_BRANCH" == "master" ]
 then
     curl -X POST $DOCKER > /dev/null

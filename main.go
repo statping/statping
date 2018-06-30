@@ -1,169 +1,92 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/GeertJohan/go.rice"
-	"github.com/go-yaml/yaml"
-	"github.com/gorilla/sessions"
-	"github.com/hunterlong/statup/log"
+	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/handlers"
 	"github.com/hunterlong/statup/plugin"
+	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
-	"golang.org/x/crypto/bcrypt"
-	"io"
 	"io/ioutil"
-	"net/http"
 	"os"
 	plg "plugin"
-	"strconv"
 	"strings"
 )
 
 var (
-	configs    *Config
-	core       *Core
-	store      *sessions.CookieStore
-	VERSION    string
-	sqlBox     *rice.Box
-	cssBox     *rice.Box
-	scssBox    *rice.Box
-	jsBox      *rice.Box
-	tmplBox    *rice.Box
-	emailBox   *rice.Box
-	setupMode  bool
-	allPlugins []plugin.PluginActions
-	logFile    *os.File
+	VERSION string
 )
-
-const (
-	pluginsRepo = "https://raw.githubusercontent.com/hunterlong/statup/master/plugins.json"
-)
-
-type Config struct {
-	Connection string `yaml:"connection"`
-	Host       string `yaml:"host"`
-	Database   string `yaml:"database"`
-	User       string `yaml:"user"`
-	Password   string `yaml:"password"`
-	Port       string `yaml:"port"`
-	Secret     string `yaml:"secret"`
-}
-
-type PluginRepos struct {
-	Plugins []PluginJSON
-}
-
-type PluginJSON struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Repo        string `json:"repo"`
-	Author      string `json:"author"`
-	Namespace   string `json:"namespace"`
-}
-
-func (c *Core) FetchPluginRepo() []PluginJSON {
-	resp, err := http.Get(pluginsRepo)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-	var pk []PluginJSON
-	json.Unmarshal(body, &pk)
-	c.Repos = pk
-	return pk
-}
-
-func DownloadFile(filepath string, url string) error {
-	out, err := os.Create(filepath)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
 
 func init() {
 	LoadDotEnvs()
 }
 
-func LoadDotEnvs() {
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Error loading .env file")
-	}
-}
-
 func main() {
-	defer logFile.Close()
+	var err error
 	if len(os.Args) >= 2 {
 		CatchCLI(os.Args)
 		os.Exit(0)
 	}
-
-	var err error
-	fmt.Printf("Starting Statup v%v\n", VERSION)
+	utils.Log(1, fmt.Sprintf("Starting Statup v%v\n", VERSION))
 	RenderBoxes()
-	hasAssets()
+	core.HasAssets()
 
-	configs, err = LoadConfig()
+	core.Configs, err = core.LoadConfig()
 	if err != nil {
-		log.Send(1, "config.yml file not found - starting in setup mode")
-		setupMode = true
-		RunHTTPServer()
+		utils.Log(2, "config.yml file not found - starting in setup mode")
+		core.SetupMode = true
+		handlers.RunHTTPServer()
 	}
 	mainProcess()
 }
 
-func StringInt(s string) int64 {
-	num, _ := strconv.Atoi(s)
-	return int64(num)
+func RenderBoxes() {
+	core.SqlBox = rice.MustFindBox("source/sql")
+	core.CssBox = rice.MustFindBox("source/css")
+	core.ScssBox = rice.MustFindBox("source/scss")
+	core.JsBox = rice.MustFindBox("source/js")
+	core.TmplBox = rice.MustFindBox("source/tmpl")
+	core.EmailBox = rice.MustFindBox("source/emails")
+}
+
+func LoadDotEnvs() {
+	err := godotenv.Load()
+	if err == nil {
+		utils.Log(1, "Environment file '.env' Loaded")
+	}
 }
 
 func mainProcess() {
 	var err error
-	err = DbConnection(configs.Connection)
+	err = core.DbConnection(core.Configs.Connection)
 	if err != nil {
-		throw(err)
+		utils.Log(3, err)
 	}
-	RunDatabaseUpgrades()
-	core, err = SelectCore()
+	core.RunDatabaseUpgrades()
+	core.CoreApp, err = core.SelectCore()
 	if err != nil {
-		log.Send(1, "Core database was not found, Statup is not setup yet.")
-		RunHTTPServer()
+		utils.Log(2, "Core database was not found, Statup is not setup yet.")
+		handlers.RunHTTPServer()
 	}
 
-	CheckServices()
-	core.Communications, _ = SelectAllCommunications()
-	LoadDefaultCommunications()
+	core.CheckServices()
+	core.CoreApp.Communications, err = core.SelectAllCommunications()
+	if err != nil {
+		utils.Log(2, err)
+	}
+	core.LoadDefaultCommunications()
 
-	go DatabaseMaintence()
+	go core.DatabaseMaintence()
 
-	if !setupMode {
+	if !core.SetupMode {
 		LoadPlugins()
-		RunHTTPServer()
+		handlers.RunHTTPServer()
 	}
-}
-
-func throw(err error) {
-	fmt.Println("ERROR: ", err)
-	os.Exit(1)
 }
 
 func ForEachPlugin() {
-	if len(core.Plugins) > 0 {
+	if len(core.CoreApp.Plugins) > 0 {
 		//for _, p := range core.Plugins {
 		//	p.OnShutdown()
 		//}
@@ -179,7 +102,7 @@ func LoadPlugins() {
 
 	files, err := ioutil.ReadDir("./plugins")
 	if err != nil {
-		log.Send(1, fmt.Sprintf("Plugins directory was not found. Error: %v\n", err))
+		utils.Log(2, fmt.Sprintf("Plugins directory was not found. Error: %v\n", err))
 		return
 	}
 	for _, f := range files {
@@ -192,7 +115,7 @@ func LoadPlugins() {
 		}
 		plug, err := plg.Open("plugins/" + f.Name())
 		if err != nil {
-			log.Send(2, fmt.Sprintf("Plugin '%v' could not load correctly.\n", f.Name()))
+			utils.Log(2, fmt.Sprintf("Plugin '%v' could not load correctly.\n", f.Name()))
 			continue
 		}
 		symPlugin, err := plug.Lookup("Plugin")
@@ -200,42 +123,16 @@ func LoadPlugins() {
 		var plugActions plugin.PluginActions
 		plugActions, ok := symPlugin.(plugin.PluginActions)
 		if !ok {
-			log.Send(2, fmt.Sprintf("Plugin '%v' could not load correctly, error: %v\n", f.Name(), "unexpected type from module symbol"))
+			utils.Log(2, fmt.Sprintf("Plugin '%v' could not load correctly, error: %v\n", f.Name(), "unexpected type from module symbol"))
 			continue
 		}
 
-		allPlugins = append(allPlugins, plugActions)
-		core.Plugins = append(core.Plugins, plugActions.GetInfo())
+		//allPlugins = append(allPlugins, plugActions)
+		core.CoreApp.Plugins = append(core.CoreApp.Plugins, plugActions.GetInfo())
 	}
 
-	OnLoad(dbSession)
+	core.OnLoad(core.DbSession)
 
-	fmt.Printf("Loaded %v Plugins\n", len(allPlugins))
-
+	//utils.Log(1, fmt.Sprintf("Loaded %v Plugins\n", len(allPlugins)))
 	ForEachPlugin()
-}
-
-func RenderBoxes() {
-	sqlBox = rice.MustFindBox("sql")
-	cssBox = rice.MustFindBox("html/css")
-	scssBox = rice.MustFindBox("html/scss")
-	jsBox = rice.MustFindBox("html/js")
-	tmplBox = rice.MustFindBox("html/tmpl")
-	emailBox = rice.MustFindBox("html/emails")
-}
-
-func LoadConfig() (*Config, error) {
-	var config Config
-	file, err := ioutil.ReadFile("config.yml")
-	if err != nil {
-		return nil, err
-	}
-	err = yaml.Unmarshal(file, &config)
-	configs = &config
-	return &config, err
-}
-
-func HashPassword(password string) string {
-	bytes, _ := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes)
 }
