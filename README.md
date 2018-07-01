@@ -6,7 +6,7 @@
 <a href="https://github.com/hunterlong/statup/wiki">View Wiki</a> | <a href="https://demo.statup.io">Demo</a> <br> <a href="https://github.com/hunterlong/statup/wiki/Docker">Docker</a> | <a href="https://github.com/hunterlong/statup/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/hunterlong/statup/wiki/Heroku">Heroku</a> | <a href="https://github.com/hunterlong/statup/wiki/Mac">Mac</a> | <a href="https://github.com/hunterlong/statup/wiki/Linux">Linux</a> | <a href="https://github.com/hunterlong/statup/wiki/Windows">Windows</a><br>
 </p>
 
-# Statup - Status Page & Monitoring Server [![Build Status](https://travis-ci.org/hunterlong/statup.svg?branch=master)](https://travis-ci.org/hunterlong/statup)
+# Statup - Status Page & Monitoring Server
 An easy to use Status Page for your websites and applications. Statup will automatically fetch the application and render a beautiful status page with tons of features 
 for you to build an even better status page. 
 
@@ -136,5 +136,6 @@ scrape_configs:
       - targets: ['statup:8080']
 ```
 
+[![Build Status](https://travis-ci.org/hunterlong/statup.svg?branch=master)](https://travis-ci.org/hunterlong/statup)
 
 
