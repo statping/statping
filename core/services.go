@@ -110,7 +110,7 @@ func (s *Service) SmallText() string {
 	hits, _ := s.LimitedHits()
 	if !s.Online {
 		if len(last) > 0 {
-			return fmt.Sprintf("%v at %v", last[0].ParseError(), last[0].CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
+			return fmt.Sprintf("%v on %v", last[0].ParseError(), last[0].CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
 		} else {
 			return fmt.Sprintf("%v is currently offline", s.Name)
 		}
