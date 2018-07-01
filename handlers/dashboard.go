@@ -14,8 +14,7 @@ type dashboard struct {
 }
 
 func DashboardHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		err := core.ErrorResponse{}
 		ExecuteResponse(w, r, "login.html", err)
 	} else {

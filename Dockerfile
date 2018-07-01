@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-ENV VERSION=v0.28.3
+ENV VERSION=v0.28.4
 
 RUN apk --no-cache add libstdc++ ca-certificates
 RUN wget -q https://github.com/hunterlong/statup/releases/download/$VERSION/statup-linux-alpine.tar.gz && \
@@ -20,9 +20,6 @@ RUN printf "#!/usr/bin/env sh\n\$1\n" > $CMD_FILE && \
       chmod +x $CMD_FILE
 
 WORKDIR /app
-#COPY build/statup-linux-alpine /usr/local/bin/statup
-
 VOLUME /app
-
 EXPOSE 8080
 ENTRYPOINT statup

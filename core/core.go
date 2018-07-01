@@ -10,16 +10,16 @@ type PluginJSON types.PluginJSON
 type PluginRepos types.PluginRepos
 
 type Core struct {
-	Name        string `db:"name"`
-	Description string `db:"description"`
-	Config      string `db:"config"`
-	ApiKey      string `db:"api_key"`
-	ApiSecret   string `db:"api_secret"`
-	Style       string `db:"style"`
-	Footer      string `db:"footer"`
-	Domain      string `db:"domain"`
-	Version     string `db:"version"`
-	Services    []*Service
+	Name        string     `db:"name" json:"name"`
+	Description string     `db:"description" json:"name"`
+	Config      string     `db:"config" json:"-"`
+	ApiKey      string     `db:"api_key" json:"-"`
+	ApiSecret   string     `db:"api_secret" json:"-"`
+	Style       string     `db:"style" json:"-"`
+	Footer      string     `db:"footer" json:"-"`
+	Domain      string     `db:"domain" json:"domain,omitempty"`
+	Version     string     `db:"version" json:"version,omitempty"`
+	Services    []*Service `json:"services,omitempty"`
 	Plugins     []plugin.Info
 	Repos       []PluginJSON
 	//PluginFields   []PluginSelect

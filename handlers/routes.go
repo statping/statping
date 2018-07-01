@@ -10,17 +10,7 @@ import (
 func Router() *mux.Router {
 	r := mux.NewRouter()
 	r.Handle("/", http.HandlerFunc(IndexHandler))
-	if core.UsingAssets {
-		cssHandler := http.FileServer(http.Dir("./assets/css"))
-		jsHandler := http.FileServer(http.Dir("./assets/js"))
-		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", cssHandler))
-		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", jsHandler))
-	} else {
-		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(core.CssBox.HTTPBox())))
-		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(core.JsBox.HTTPBox())))
-	}
-	r.Handle("/robots.txt", http.HandlerFunc(RobotsTxtHandler)).Methods("GET")
-	r.Handle("/favicon.ico", http.HandlerFunc(FavIconHandler)).Methods("GET")
+	LocalizedAssets(r)
 	r.Handle("/setup", http.HandlerFunc(SetupHandler)).Methods("GET")
 	r.Handle("/setup", http.HandlerFunc(ProcessSetupHandler)).Methods("POST")
 	r.Handle("/dashboard", http.HandlerFunc(DashboardHandler)).Methods("GET")
@@ -54,6 +44,25 @@ func Router() *mux.Router {
 	r.Handle("/api/users", http.HandlerFunc(ApiAllUsersHandler))
 	r.Handle("/api/users/{id}", http.HandlerFunc(ApiUserHandler))
 	r.Handle("/metrics", http.HandlerFunc(PrometheusHandler))
+	r.NotFoundHandler = http.HandlerFunc(Error404Handler)
 	Store = sessions.NewCookieStore([]byte("secretinfo"))
+	return r
+}
+
+func LocalizedAssets(r *mux.Router) *mux.Router {
+	if core.UsingAssets {
+		cssHandler := http.FileServer(http.Dir("./assets/css"))
+		jsHandler := http.FileServer(http.Dir("./assets/js"))
+		indexHandler := http.FileServer(http.Dir("./assets/"))
+		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", cssHandler))
+		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", jsHandler))
+		r.PathPrefix("/robots.txt").Handler(indexHandler)
+		r.PathPrefix("/favicon.ico").Handler(indexHandler)
+	} else {
+		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(core.CssBox.HTTPBox())))
+		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(core.JsBox.HTTPBox())))
+		r.PathPrefix("/robots.txt").Handler(http.FileServer(core.TmplBox.HTTPBox()))
+		r.PathPrefix("/favicon.ico").Handler(http.FileServer(core.TmplBox.HTTPBox()))
+	}
 	return r
 }

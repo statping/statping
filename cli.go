@@ -16,6 +16,8 @@ func CatchCLI(args []string) {
 		core.CreateAllAssets()
 	case "sass":
 		core.CompileSASS()
+	case "api":
+		HelpEcho()
 	case "export":
 		var err error
 		fmt.Printf("Statup v%v Exporting Static 'index.html' page...\n", VERSION)
@@ -84,6 +86,7 @@ func HelpEcho() {
 	fmt.Println("     statup                    - Main command to run Statup server")
 	fmt.Println("     statup version            - Returns the current version of Statup")
 	fmt.Println("     statup run                - Check all service 1 time and then quit")
+	fmt.Println("     statup assets             - Export all assets used locally to be edited.")
 	fmt.Println("     statup env                - Show all environment variables being used for Statup")
 	fmt.Println("     statup export             - Exports the index page as a static HTML for pushing")
 	fmt.Println("                                 to Github Pages or your own FTP server. Export will")

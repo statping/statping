@@ -23,11 +23,11 @@ type Hit struct {
 }
 
 type Failure struct {
-	Id        int       `db:"id,omitempty"`
-	Issue     string    `db:"issue"`
-	Method    string    `db:"method"`
-	Service   int64     `db:"service"`
-	CreatedAt time.Time `db:"created_at"`
+	Id        int       `db:"id,omitempty" json:"id"`
+	Issue     string    `db:"issue" json:"issue"`
+	Method    string    `db:"method" json:"method,omitempty"`
+	Service   int64     `db:"service" json:"service_id"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
 }
 
 type Checkin struct {
@@ -43,17 +43,17 @@ type Checkin struct {
 type Communication struct {
 	Id        int64     `db:"id,omitempty" json:"id"`
 	Method    string    `db:"method" json:"method"`
-	Host      string    `db:"host" json:"host"`
-	Port      int       `db:"port" json:"port"`
-	Username  string    `db:"username" json:"user"`
+	Host      string    `db:"host" json:"-"`
+	Port      int       `db:"port" json:"-"`
+	Username  string    `db:"username" json:"-"`
 	Password  string    `db:"password" json:"-"`
-	Var1      string    `db:"var1" json:"var1"`
-	Var2      string    `db:"var2" json:"var2"`
-	ApiKey    string    `db:"api_key" json:"api_key"`
-	ApiSecret string    `db:"api_secret" json:"api_secret"`
+	Var1      string    `db:"var1" json:"-"`
+	Var2      string    `db:"var2" json:"-"`
+	ApiKey    string    `db:"api_key" json:"-"`
+	ApiSecret string    `db:"api_secret" json:"-"`
 	Enabled   bool      `db:"enabled" json:"enabled"`
-	Limits    int64     `db:"limits" json:"limits"`
-	Removable bool      `db:"removable" json:"removable"`
+	Limits    int64     `db:"limits" json:"-"`
+	Removable bool      `db:"removable" json:"-"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 }
 

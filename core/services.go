@@ -36,6 +36,7 @@ type Service struct {
 	LastResponse   string
 	LastStatusCode int
 	LastOnline     time.Time
+	dnsLookup      float64 `json:"dns_lookup_time"`
 }
 
 func serviceCol() db.Collection {
@@ -194,7 +195,12 @@ func (u *Service) Delete() error {
 	return err
 }
 
-func (u *Service) Update() {
+func (u *Service) Update(s *Service) {
+	res := serviceCol().Find("id", u.Id)
+	err := res.Update(s)
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", u.Name, err))
+	}
 	OnUpdateService(u)
 }
 

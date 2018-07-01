@@ -5,7 +5,9 @@ import (
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"net/url"
 	"regexp"
 	"time"
 )
@@ -33,7 +35,28 @@ func (s *Service) CheckQueue() {
 	time.Sleep(time.Duration(s.Interval) * time.Second)
 }
 
+func (s *Service) DNSCheck() (float64, error) {
+	t1 := time.Now()
+	url, err := url.Parse(s.Domain)
+	if err != nil {
+		return 0, err
+	}
+	_, err = net.LookupIP(url.Host)
+	if err != nil {
+		return 0, err
+	}
+	t2 := time.Now()
+	subTime := t2.Sub(t1).Seconds()
+	return subTime, err
+}
+
 func (s *Service) Check() *Service {
+	dnsLookup, err := s.DNSCheck()
+	if err != nil {
+		s.Failure(fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
+		return s
+	}
+	s.dnsLookup = dnsLookup
 	t1 := time.Now()
 	client := http.Client{
 		Timeout: 30 * time.Second,

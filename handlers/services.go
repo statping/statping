@@ -105,7 +105,7 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	interval, _ := strconv.Atoi(r.PostForm.Get("interval"))
 	port, _ := strconv.Atoi(r.PostForm.Get("port"))
 	checkType := r.PostForm.Get("check_type")
-	service = &core.Service{
+	serviceUpdate := &core.Service{
 		Name:           name,
 		Domain:         domain,
 		Method:         method,
@@ -115,7 +115,7 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		Type:           checkType,
 		Port:           port,
 	}
-	service.Update()
+	service.Update(serviceUpdate)
 	ExecuteResponse(w, r, "service.html", service)
 }
 

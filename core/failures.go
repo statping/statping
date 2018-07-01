@@ -94,6 +94,10 @@ func (f *Failure) ParseError() string {
 	if err {
 		return fmt.Sprintf("SSL Certificate invalid")
 	}
+	err = strings.Contains(f.Issue, "Client.Timeout exceeded while awaiting headers")
+	if err {
+		return fmt.Sprintf("Connection Timed Out")
+	}
 	err = strings.Contains(f.Issue, "no such host")
 	if err {
 		return fmt.Sprintf("Domain is offline or not found")
@@ -105,6 +109,14 @@ func (f *Failure) ParseError() string {
 	err = strings.Contains(f.Issue, "connection refused")
 	if err {
 		return fmt.Sprintf("Connection Failed")
+	}
+	err = strings.Contains(f.Issue, "can't assign requested address")
+	if err {
+		return fmt.Sprintf("Unable to Request Address")
+	}
+	err = strings.Contains(f.Issue, "no route to host")
+	if err {
+		return fmt.Sprintf("Domain is offline or not found")
 	}
 	return f.Issue
 }

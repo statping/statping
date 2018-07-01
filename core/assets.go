@@ -96,6 +96,10 @@ func CreateAllAssets() {
 	CopyToPublic(JsBox, "js", "jquery-3.3.1.slim.min.js")
 	CopyToPublic(JsBox, "js", "main.js")
 	CopyToPublic(JsBox, "js", "setup.js")
+	CopyToPublic(JsBox, "js", "setup.js")
+	CopyToPublic(TmplBox, "", "robots.txt")
+	CopyToPublic(TmplBox, "", "favicon.ico")
+
 	utils.Log(1, "Compiling CSS from SCSS style...")
 	err := CompileSASS()
 	if err != nil {
