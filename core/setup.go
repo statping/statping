@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"github.com/hunterlong/statup/utils"
 	"os"
 )
@@ -13,6 +12,12 @@ func InsertDefaultComms() {
 		Enabled:   false,
 	}
 	Create(emailer)
+	slack := &Communication{
+		Method:    "slack",
+		Removable: false,
+		Enabled:   false,
+	}
+	Create(slack)
 }
 
 func DeleteConfig() {
@@ -27,41 +32,43 @@ type ErrorResponse struct {
 }
 
 func LoadSampleData() error {
-	fmt.Println("Inserting Sample Data...")
+	utils.Log(1, "Inserting Sample Data...")
 	s1 := &Service{
 		Name:           "Google",
 		Domain:         "https://google.com",
 		ExpectedStatus: 200,
 		Interval:       10,
 		Port:           0,
-		Type:           "https",
+		Type:           "http",
 		Method:         "GET",
 	}
 	s2 := &Service{
-		Name:           "Statup.io",
-		Domain:         "https://statup.io",
+		Name:           "Statup Github",
+		Domain:         "https://github.com/hunterlong/statup",
 		ExpectedStatus: 200,
-		Interval:       15,
+		Interval:       30,
 		Port:           0,
-		Type:           "https",
+		Type:           "http",
 		Method:         "GET",
 	}
 	s3 := &Service{
-		Name:           "Statup.io SSL Check",
-		Domain:         "https://statup.io",
+		Name:           "JSON Users Test",
+		Domain:         "https://jsonplaceholder.typicode.com/users",
 		ExpectedStatus: 200,
-		Interval:       15,
+		Interval:       60,
 		Port:           443,
-		Type:           "tcp",
+		Type:           "http",
+		Method:         "GET",
 	}
 	s4 := &Service{
-		Name:           "Github Failing Check",
-		Domain:         "https://github.com/thisisnotausernamemaybeitis",
-		ExpectedStatus: 200,
-		Interval:       15,
-		Port:           0,
-		Type:           "https",
-		Method:         "GET",
+		Name:           "JSON API Tester",
+		Domain:         "https://jsonplaceholder.typicode.com/posts",
+		ExpectedStatus: 201,
+		Expected:       `(title)": "((\\"|[statup])*)"`,
+		Interval:       30,
+		Type:           "http",
+		Method:         "POST",
+		PostData:       `{ "title": "statup", "body": "bar", "userId": 19999 }`,
 	}
 	s1.Create()
 	s2.Create()

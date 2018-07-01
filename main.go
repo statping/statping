@@ -29,7 +29,7 @@ func main() {
 		CatchCLI(os.Args)
 		os.Exit(0)
 	}
-	utils.Log(1, fmt.Sprintf("Starting Statup v%v\n", VERSION))
+	utils.Log(1, fmt.Sprintf("Starting Statup v%v", VERSION))
 	RenderBoxes()
 	core.HasAssets()
 

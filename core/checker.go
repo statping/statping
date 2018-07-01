@@ -1,6 +1,7 @@
 package core
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -61,7 +62,13 @@ func (s *Service) Check() *Service {
 	client := http.Client{
 		Timeout: 30 * time.Second,
 	}
-	response, err := client.Get(s.Domain)
+
+	var response *http.Response
+	if s.Method == "POST" {
+		response, err = client.Post(s.Domain, "application/json", bytes.NewBuffer([]byte(s.PostData)))
+	} else {
+		response, err = client.Get(s.Domain)
+	}
 	if err != nil {
 		s.Failure(fmt.Sprintf("HTTP Error %v", err))
 		return s
@@ -74,9 +81,15 @@ func (s *Service) Check() *Service {
 		return s
 	}
 	defer response.Body.Close()
-	contents, _ := ioutil.ReadAll(response.Body)
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		utils.Log(2, err)
+	}
 	if s.Expected != "" {
-		match, _ := regexp.MatchString(s.Expected, string(contents))
+		match, err := regexp.MatchString(s.Expected, string(contents))
+		if err != nil {
+			utils.Log(2, err)
+		}
 		if !match {
 			s.LastResponse = string(contents)
 			s.LastStatusCode = response.StatusCode
@@ -119,5 +132,5 @@ func (s *Service) Failure(issue string) {
 	utils.Log(2, fmt.Sprintf("Service %v Failing: %v", s.Name, issue))
 	s.CreateFailure(data)
 	//SendFailureEmail(s)
-	OnFailure(s)
+	OnFailure(s, data)
 }

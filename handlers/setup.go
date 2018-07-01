@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 )
 
 func SetupHandler(w http.ResponseWriter, r *http.Request) {
@@ -75,7 +74,11 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err := config.Save()
 	if err != nil {
-		utils.Log(2, err)
+		utils.Log(4, err)
+	}
+
+	if err != nil {
+		utils.Log(3, err)
 		config.Error = err
 		SetupResponseError(w, r, config)
 		return
@@ -83,7 +86,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	core.Configs, err = core.LoadConfig()
 	if err != nil {
-		utils.Log(2, err)
+		utils.Log(3, err)
 		config.Error = err
 		SetupResponseError(w, r, config)
 		return
@@ -91,7 +94,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = core.DbConnection(core.Configs.Connection)
 	if err != nil {
-		utils.Log(2, err)
+		utils.Log(3, err)
 		core.DeleteConfig()
 		config.Error = err
 		SetupResponseError(w, r, config)
@@ -112,8 +115,8 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		go core.LoadSampleData()
 	}
 
+	core.SelectCore()
 	http.Redirect(w, r, "/", http.StatusSeeOther)
-	time.Sleep(2 * time.Second)
 	//mainProcess()
 }
 

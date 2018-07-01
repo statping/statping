@@ -113,3 +113,21 @@ func SaveEmailSettingsHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
+
+func SaveSlackSettingsHandler(w http.ResponseWriter, r *http.Request) {
+	auth := IsAuthenticated(r)
+	if !auth {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	slack := core.SelectCommunication(2)
+	r.ParseForm()
+	slack.Host = r.PostForm.Get("host")
+	slack.Enabled = true
+	if slack.Host == "" {
+		slack.Enabled = false
+	}
+	core.Update(slack)
+	core.SendSlackMessage("This is a test from Statup!")
+	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+}

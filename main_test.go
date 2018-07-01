@@ -196,11 +196,11 @@ func TestService_Create(t *testing.T) {
 }
 
 func TestService_Check(t *testing.T) {
-	service := core.SelectService(2)
+	service := core.SelectService(1)
 	assert.NotNil(t, service)
-	assert.Equal(t, "Statup.io", service.Name)
+	assert.Equal(t, "Google", service.Name)
 	out := service.Check()
-	assert.Equal(t, false, out.Online)
+	assert.Equal(t, true, out.Online)
 }
 
 func TestService_AvgTime(t *testing.T) {
@@ -226,12 +226,12 @@ func TestService_GraphData(t *testing.T) {
 
 func TestBadService_Create(t *testing.T) {
 	service := &core.Service{
-		Name:           "bad service",
+		Name:           "Bad Service",
 		Domain:         "https://9839f83h72gey2g29278hd2od2d.com",
 		ExpectedStatus: 200,
 		Interval:       10,
 		Port:           0,
-		Type:           "https",
+		Type:           "http",
 		Method:         "GET",
 	}
 	id, err := service.Create()
@@ -242,7 +242,7 @@ func TestBadService_Create(t *testing.T) {
 func TestBadService_Check(t *testing.T) {
 	service := core.SelectService(4)
 	assert.NotNil(t, service)
-	assert.Equal(t, "Github Failing Check", service.Name)
+	assert.Equal(t, "JSON API Tester", service.Name)
 }
 
 func TestService_Hits(t *testing.T) {

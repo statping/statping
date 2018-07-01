@@ -49,8 +49,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func HelpHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}

@@ -10,12 +10,19 @@ import (
 )
 
 func CopyToPublic(box *rice.Box, folder, file string) {
-	utils.Log(1, fmt.Sprintf("Copying %v to %v...", file, folder))
+	assetFolder := fmt.Sprintf("assets/%v/%v", folder, file)
+	if folder == "" {
+		assetFolder = fmt.Sprintf("assets/%v", file)
+	}
+	utils.Log(1, fmt.Sprintf("Copying %v to %v", file, assetFolder))
 	base, err := box.String(file)
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("Failed to copy %v to %v, %v.", file, folder, err))
+		utils.Log(3, fmt.Sprintf("Failed to copy %v to %v, %v.", file, assetFolder, err))
 	}
-	ioutil.WriteFile("assets/"+folder+"/"+file, []byte(base), 0644)
+	err = ioutil.WriteFile(assetFolder, []byte(base), 0644)
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("Failed to write file %v to %v, %v.", file, assetFolder, err))
+	}
 }
 
 func MakePublicFolder(folder string) {

@@ -195,13 +195,16 @@ func (u *Service) Delete() error {
 	return err
 }
 
-func (u *Service) Update(s *Service) {
+func (u *Service) Update(s *Service) *Service {
+	s.CreatedAt = time.Now()
 	res := serviceCol().Find("id", u.Id)
 	err := res.Update(s)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", u.Name, err))
 	}
+	*u = *s
 	OnUpdateService(u)
+	return u
 }
 
 func (u *Service) Create() (int64, error) {
@@ -213,7 +216,7 @@ func (u *Service) Create() (int64, error) {
 	}
 	u.Id = uuid.(int64)
 	CoreApp.Services = append(CoreApp.Services, u)
-	go u.CheckQueue()
+	//go u.CheckQueue()
 	OnNewService(u)
 	return uuid.(int64), err
 }

@@ -33,6 +33,7 @@ func Router() *mux.Router {
 	r.Handle("/settings/css", http.HandlerFunc(SaveSASSHandler)).Methods("POST")
 	r.Handle("/settings/build", http.HandlerFunc(SaveAssetsHandler)).Methods("GET")
 	r.Handle("/settings/email", http.HandlerFunc(SaveEmailSettingsHandler)).Methods("POST")
+	r.Handle("/settings/slack", http.HandlerFunc(SaveSlackSettingsHandler)).Methods("POST")
 	r.Handle("/plugins/download/{name}", http.HandlerFunc(PluginsDownloadHandler))
 	r.Handle("/plugins/{name}/save", http.HandlerFunc(PluginSavedHandler)).Methods("POST")
 	r.Handle("/help", http.HandlerFunc(HelpHandler))

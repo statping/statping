@@ -101,9 +101,15 @@
                     <label for="service_check_type" class="col-sm-4 col-form-label">Service Check Type</label>
                     <div class="col-sm-8">
                         <select name="method" class="form-control" id="service_check_type" value="{{.Method}}">
-                            <option value="GET" selected>GET</option>
-                            <option value="POST">POST</option>
+                            <option value="GET" {{if eq .Method "GET"}}selected{{end}}>GET</option>
+                            <option value="POST" {{if eq .Method "POST"}}selected{{end}}>POST</option>
                         </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="post_data" class="col-sm-4 col-form-label">Post Data (JSON)</label>
+                    <div class="col-sm-8">
+                        <textarea name="post_data" class="form-control" id="post_data" rows="3">{{.PostData}}</textarea>
                     </div>
                 </div>
                 <div class="form-group row">

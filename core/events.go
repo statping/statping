@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"github.com/fatih/structs"
 	"github.com/hunterlong/statup/plugin"
 	"upper.io/db.v3/lib/sqlbuilder"
@@ -18,9 +19,17 @@ func OnSuccess(s *Service) {
 	}
 }
 
-func OnFailure(s *Service) {
+func OnFailure(s *Service, f FailureData) {
 	for _, p := range AllPlugins {
 		p.OnFailure(structs.Map(s))
+	}
+	slack := SelectCommunication(2)
+	if slack == nil {
+		return
+	}
+	if slack.Enabled {
+		msg := fmt.Sprintf("Service %v is currently offline! Issue: %v", s.Name, f.Issue)
+		SendSlackMessage(msg)
 	}
 }
 

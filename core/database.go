@@ -92,12 +92,12 @@ func (c *DbConfig) Save() error {
 	var err error
 	config, err := os.Create("config.yml")
 	if err != nil {
-		utils.Log(2, err)
+		utils.Log(4, err)
 		return err
 	}
 	data, err := yaml.Marshal(c)
 	if err != nil {
-		utils.Log(2, err)
+		utils.Log(3, err)
 		return err
 	}
 	config.WriteString(string(data))
@@ -105,12 +105,12 @@ func (c *DbConfig) Save() error {
 
 	Configs, err = LoadConfig()
 	if err != nil {
-		utils.Log(2, err)
+		utils.Log(3, err)
 		return err
 	}
 	err = DbConnection(Configs.Connection)
 	if err != nil {
-		utils.Log(2, err)
+		utils.Log(4, err)
 		return err
 	}
 	DropDatabase()
@@ -124,9 +124,11 @@ func (c *DbConfig) Save() error {
 		ApiSecret:   utils.NewSHA1Hash(16),
 		Domain:      c.Domain,
 	}
-
 	col := DbSession.Collection("core")
 	_, err = col.Insert(newCore)
+	if err == nil {
+		CoreApp = newCore
+	}
 	return err
 }
 

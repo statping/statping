@@ -70,6 +70,13 @@ func (c Core) BaseSASS() string {
 	return OpenAsset("scss/base.scss")
 }
 
+func (c Core) MobileSASS() string {
+	if !UsingAssets {
+		return ""
+	}
+	return OpenAsset("scss/mobile.scss")
+}
+
 func (c Core) AllOnline() bool {
 	for _, s := range CoreApp.Services {
 		if !s.Online {

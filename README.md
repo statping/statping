@@ -48,6 +48,10 @@ Whether you're a Docker fan-boy or a AWS EC2 master, Statup gives you multiple o
 Running on an EC2 server might be the most cost effective way to host your own Statup Status Page. The server runs on the smallest EC2 instance (t2.nano) AWS has to offer, which only costs around $4.60 USD a month for your dedicated Status Page.
 Want to run it on your own Docker server? Awesome! Statup has multiple docker-compose.yml files to work with. Statup can automatically create a SSL Certification for your status page.
 
+## Slack Integration
+Everyone uses Slack and Statup should also. You can create an [Incoming Webhook](https://api.slack.com/incoming-webhooks) in Slack and insert the URL into the Settings page in Statup. Anytime a service fails, you're channel that you specified on Slack will receive a message. 
+This is a brand new feature, right now it is sending basic text. With Slack Messaging format, I plan on creating a more detailed message for a cleaner look. 
+
 ## Email Nofitications
 Statup includes email notification via SMTP if your services go offline. 
 

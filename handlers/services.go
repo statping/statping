@@ -10,8 +10,7 @@ import (
 )
 
 func ServicesHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -19,8 +18,7 @@ func ServicesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -34,6 +32,7 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	interval, _ := strconv.Atoi(r.PostForm.Get("interval"))
 	port, _ := strconv.Atoi(r.PostForm.Get("port"))
 	checkType := r.PostForm.Get("check_type")
+	postData := r.PostForm.Get("post_data")
 
 	service := &core.Service{
 		Name:           name,
@@ -44,17 +43,18 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 		Interval:       interval,
 		Type:           checkType,
 		Port:           port,
+		PostData:       postData,
 	}
 	_, err := service.Create()
 	if err != nil {
-		go service.CheckQueue()
+		utils.Log(3, fmt.Sprintf("Error starting %v check routine. %v", service.Name, err))
 	}
+	go service.CheckQueue()
 	http.Redirect(w, r, "/services", http.StatusSeeOther)
 }
 
 func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -89,8 +89,7 @@ func ServicesBadgeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -105,7 +104,9 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	interval, _ := strconv.Atoi(r.PostForm.Get("interval"))
 	port, _ := strconv.Atoi(r.PostForm.Get("port"))
 	checkType := r.PostForm.Get("check_type")
+	postData := r.PostForm.Get("post_data")
 	serviceUpdate := &core.Service{
+		Id:             service.Id,
 		Name:           name,
 		Domain:         domain,
 		Method:         method,
@@ -114,14 +115,14 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		Interval:       interval,
 		Type:           checkType,
 		Port:           port,
+		PostData:       postData,
 	}
-	service.Update(serviceUpdate)
+	service = service.Update(serviceUpdate)
 	ExecuteResponse(w, r, "service.html", service)
 }
 
 func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -134,8 +135,7 @@ func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CheckinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}

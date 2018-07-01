@@ -1,8 +1,11 @@
 package core
 
 import (
+	"bytes"
+	"fmt"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
+	"net/http"
 	"time"
 )
 
@@ -82,4 +85,22 @@ func SelectCommunication(id int64) *Communication {
 		}
 	}
 	return nil
+}
+
+func SendSlackMessage(msg string) error {
+	fullMessage := fmt.Sprintf("{\"text\":\"%v\"}", msg)
+	utils.Log(1, fmt.Sprintf("Sending JSON to Slack Webhook: %v", fullMessage))
+	slack := SelectCommunication(2)
+	if slack == nil {
+		utils.Log(3, fmt.Sprintf("Slack communication database entry was not found."))
+		return nil
+	}
+	client := http.Client{
+		Timeout: 15 * time.Second,
+	}
+	_, err := client.Post(slack.Host, "application/json", bytes.NewBuffer([]byte(fullMessage)))
+	if err != nil {
+		utils.Log(3, err)
+	}
+	return err
 }
