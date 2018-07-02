@@ -79,22 +79,22 @@
                 <div class="form-group row">
                     <label for="service_name" class="col-sm-4 col-form-label">Service Name</label>
                     <div class="col-sm-8">
-                        <input type="text" name="name" class="form-control" id="service_name" value="{{.Name}}" placeholder="Name">
+                        <input type="text" name="name" class="form-control" id="service_name" value="{{.Name}}" placeholder="Name" required>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="service_type" class="col-sm-4 col-form-label">Service Check Type</label>
                     <div class="col-sm-8">
                         <select name="check_type" class="form-control" id="service_type" value="{{.Type}}">
-                            <option value="http" selected>HTTP Service</option>
-                            <option value="tcp">TCP Service</option>
+                            <option value="http" {{if eq .Type "http"}}selected{{end}}>HTTP Service</option>
+                            <option value="tcp" {{if eq .Type "tcp"}}selected{{end}}>TCP Service</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="service_url" class="col-sm-4 col-form-label">Application Endpoint (URL)</label>
                     <div class="col-sm-8">
-                        <input type="text" name="domain" class="form-control" id="service_url" value="{{.Domain}}" placeholder="https://google.com">
+                        <input type="text" name="domain" class="form-control" id="service_url" value="{{.Domain}}" placeholder="https://google.com" required>
                     </div>
                 </div>
                 <div class="form-group row">
@@ -121,7 +121,7 @@
                 <div class="form-group row">
                     <label for="service_response_code" class="col-sm-4 col-form-label">Expected Status Code</label>
                     <div class="col-sm-8">
-                        <input type="number" name="expected_status" class="form-control" value="{{.ExpectedStatus}}" id="service_response_code" value="200">
+                        <input type="number" name="expected_status" class="form-control" value="{{.ExpectedStatus}}" id="service_response_code">
                     </div>
                 </div>
                 <div class="form-group row">
@@ -133,7 +133,7 @@
                 <div class="form-group row">
                     <label for="service_interval" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
                     <div class="col-sm-8">
-                        <input type="number" name="interval" class="form-control" value="{{.Interval}}" id="service_interval" placeholder="10">
+                        <input type="number" name="interval" class="form-control" value="{{.Interval}}" id="service_interval" required>
                     </div>
                 </div>
                 <div class="form-group row">

@@ -105,7 +105,7 @@
                         </div>
                         <button type="submit" class="btn btn-primary btn-block mt-2">Save Style</button>
                     </form>
-        {{end}}
+            {{end}}
                 </div>
 
             {{ with $c := index .Communications 0 }}
@@ -125,7 +125,7 @@
 
                         <div class="form-group">
                             <label for="password">SMTP Password</label>
-                            <input type="password" name="password" class="form-control" value="{{ $c.Password }}" id="password">
+                            <input type="password" name="password" class="form-control" value="{{ if $c.Password }}#######################{{end}}" id="password">
                         </div>
 
                         <div class="form-group">
@@ -143,7 +143,19 @@
                             <input type="number" name="limit" class="form-control" value="30" id="limit" placeholder="noreply@domain.com">
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-block">Save Email Settings</button>
+                        <div class="form-group row">
+                            <div class="col-sm-6">
+                          <span class="switch">
+                            <input type="checkbox" name="enable_{{ $c.Method }}" class="switch" id="switch-{{ $c.Method }}" {{if .Enabled}}checked{{end}}>
+                            <label for="switch-{{ $c.Method }}">Enable Emails</label>
+                          </span>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <button type="submit" class="btn btn-primary btn-block">Save Email Settings</button>
+                            </div>
+                        </div>
+
 
                     </form>
 
@@ -151,22 +163,34 @@
                     {{ end }}
 
 
-{{ with $c := index .Communications 1 }}
-    <div class="tab-pane fade" id="v-pills-{{ $c.Method }}" role="tabpanel" aria-labelledby="v-pills-{{ $c.Method }}-tab">
+            {{ with $c := index .Communications 1 }}
+                <div class="tab-pane fade" id="v-pills-{{ $c.Method }}" role="tabpanel" aria-labelledby="v-pills-{{ $c.Method }}-tab">
 
-        <form method="POST" action="/settings/{{ $c.Method }}">
+                    <form method="POST" action="/settings/{{ $c.Method }}">
 
-            <div class="form-group">
-                <label for="host">Slack Webhook URL</label>
-                <input type="text" name="host" class="form-control" value="{{ $c.Host }}" id="host" placeholder="https://hooks.slack.com/services/TJIIDSJIFJ/729FJSDF/hua463asda9af79">
-            </div>
+                        <div class="form-group">
+                            <label for="slack_url">Slack Webhook URL</label>
+                            <input type="text" name="slack_url" class="form-control" value="{{ $c.Host }}" id="slack_url" placeholder="https://hooks.slack.com/services/TJIIDSJIFJ/729FJSDF/hua463asda9af79">
+                        </div>
 
-            <button type="submit" class="btn btn-primary btn-block">Save Slack Settings</button>
+                        <div class="form-group row">
+                            <div class="col-sm-6">
+                          <span class="switch">
+                            <input type="checkbox" name="enable_{{ $c.Method }}" class="switch" id="switch-{{ $c.Method }}" {{if .Enabled}}checked{{end}}>
+                            <label for="switch-{{ $c.Method }}">Enable Slack</label>
+                          </span>
+                            </div>
 
-        </form>
+                            <div class="col-sm-6">
+                                <button type="submit" class="btn btn-primary btn-block">Save Slack Settings</button>
+                            </div>
+                        </div>
 
-    </div>
-{{ end }}
+
+                    </form>
+
+                </div>
+            {{ end }}
 
                 <div class="tab-pane fade" id="v-pills-browse" role="tabpanel" aria-labelledby="v-pills-browse-tab">
                 {{ range .Repos }}

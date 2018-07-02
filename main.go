@@ -65,20 +65,7 @@ func mainProcess() {
 		utils.Log(3, err)
 	}
 	core.RunDatabaseUpgrades()
-	core.CoreApp, err = core.SelectCore()
-	if err != nil {
-		utils.Log(2, "Core database was not found, Statup is not setup yet.")
-		handlers.RunHTTPServer()
-	}
-
-	core.CheckServices()
-	core.CoreApp.Communications, err = core.SelectAllCommunications()
-	if err != nil {
-		utils.Log(2, err)
-	}
-	core.LoadDefaultCommunications()
-
-	go core.DatabaseMaintence()
+	core.InitApp()
 
 	if !core.SetupMode {
 		LoadPlugins()

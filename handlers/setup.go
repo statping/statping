@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
 
 func SetupHandler(w http.ResponseWriter, r *http.Request) {
@@ -14,6 +15,7 @@ func SetupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
 	port := 5432
 	if os.Getenv("DB_CONN") == "mysql" {
 		port = 3306
@@ -109,15 +111,13 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	admin.Create()
 
-	core.InsertDefaultComms()
-
 	if sample == "on" {
-		go core.LoadSampleData()
+		core.LoadSampleData()
 	}
 
-	core.SelectCore()
+	core.InitApp()
+	time.Sleep(2 * time.Second)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
-	//mainProcess()
 }
 
 func SetupResponseError(w http.ResponseWriter, r *http.Request, a interface{}) {

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
@@ -39,15 +38,17 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	fmt.Println("creating user")
 	r.ParseForm()
 	username := r.PostForm.Get("username")
 	password := r.PostForm.Get("password")
 	email := r.PostForm.Get("email")
+	admin := r.PostForm.Get("admin")
+
 	user := &core.User{
 		Username: username,
 		Password: password,
 		Email:    email,
+		Admin:    (admin == "on"),
 	}
 	_, err := user.Create()
 	if err != nil {

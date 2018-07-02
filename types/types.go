@@ -61,7 +61,10 @@ type Email struct {
 	To       string
 	Subject  string
 	Template string
+	From     string
 	Data     interface{}
+	Source   string
+	Sent     bool
 }
 
 type Config struct {

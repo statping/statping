@@ -1,21 +1,36 @@
 package core
 
 import (
-	"bytes"
 	"fmt"
+	"github.com/hunterlong/statup/notifications"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
-	"net/http"
 	"time"
 )
 
-type Communication types.Communication
-
 func LoadDefaultCommunications() {
-	emailer := SelectCommunication(1)
+	notifications.EmailComm = SelectCommunication(1)
+	emailer := notifications.EmailComm
 	if emailer.Enabled {
-		//LoadMailer(emailer)
-		//go EmailerQueue()
+		admin, _ := SelectUser(1)
+		notifications.LoadEmailer(emailer)
+		email := &types.Email{
+			To:       admin.Email,
+			Subject:  "Test Email",
+			Template: "message.html",
+			Data:     nil,
+			From:     emailer.Var1,
+		}
+		notifications.SendEmail(EmailBox, email)
+		go notifications.EmailRoutine()
+	}
+	notifications.SlackComm = SelectCommunication(2)
+	slack := notifications.SlackComm
+	if slack.Enabled {
+		notifications.LoadSlack(slack.Host)
+		msg := fmt.Sprintf("Slack loaded on your Statup Status Page!")
+		notifications.SendSlack(msg)
+		go notifications.SlackRoutine()
 	}
 }
 
@@ -27,25 +42,15 @@ func LoadComms() {
 	}
 }
 
-func Run(c *Communication) {
-
-	//sample := &Email{
-	//	To:      "info@socialeck.com",
-	//	Subject: "Test Email from Statup",
-	//}
-
-	//AddEmail(sample)
-}
-
-func SelectAllCommunications() ([]*Communication, error) {
-	var c []*Communication
+func SelectAllCommunications() ([]*types.Communication, error) {
+	var c []*types.Communication
 	col := DbSession.Collection("communication").Find()
-	err := col.All(&c)
+	err := col.OrderBy("id").All(&c)
 	CoreApp.Communications = c
 	return c, err
 }
 
-func Create(c *Communication) (int64, error) {
+func Create(c *types.Communication) (int64, error) {
 	c.CreatedAt = time.Now()
 	uuid, err := DbSession.Collection("communication").Insert(c)
 	if err != nil {
@@ -62,45 +67,30 @@ func Create(c *Communication) (int64, error) {
 	return uuid.(int64), err
 }
 
-func Disable(c *Communication) {
+func Disable(c *types.Communication) {
 	c.Enabled = false
 	Update(c)
 }
 
-func Enable(c *Communication) {
+func Enable(c *types.Communication) {
 	c.Enabled = true
 	Update(c)
 }
 
-func Update(c *Communication) *Communication {
+func Update(c *types.Communication) *types.Communication {
 	col := DbSession.Collection("communication").Find("id", c.Id)
 	col.Update(c)
+	SelectAllCommunications()
 	return c
 }
 
-func SelectCommunication(id int64) *Communication {
-	for _, c := range CoreApp.Communications {
-		if c.Id == id {
-			return c
-		}
-	}
-	return nil
-}
-
-func SendSlackMessage(msg string) error {
-	fullMessage := fmt.Sprintf("{\"text\":\"%v\"}", msg)
-	utils.Log(1, fmt.Sprintf("Sending JSON to Slack Webhook: %v", fullMessage))
-	slack := SelectCommunication(2)
-	if slack == nil {
-		utils.Log(3, fmt.Sprintf("Slack communication database entry was not found."))
+func SelectCommunication(id int64) *types.Communication {
+	var comm *types.Communication
+	col := DbSession.Collection("communication").Find("id", id)
+	err := col.One(&comm)
+	if err != nil {
+		utils.Log(2, err)
 		return nil
 	}
-	client := http.Client{
-		Timeout: 15 * time.Second,
-	}
-	_, err := client.Post(slack.Host, "application/json", bytes.NewBuffer([]byte(fullMessage)))
-	if err != nil {
-		utils.Log(3, err)
-	}
-	return err
+	return comm
 }

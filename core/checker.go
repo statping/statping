@@ -17,10 +17,10 @@ type FailureData types.FailureData
 
 func CheckServices() {
 	CoreApp.Services, _ = SelectAllServices()
-	utils.Log(1, fmt.Sprintf("Loaded %v Services", len(CoreApp.Services)))
+	utils.Log(1, fmt.Sprintf("Starting monitoring process for %v Services", len(CoreApp.Services)))
 	for _, v := range CoreApp.Services {
 		obj := v
-		go obj.StartCheckins()
+		//go obj.StartCheckins()
 		go obj.CheckQueue()
 	}
 }

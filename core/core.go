@@ -23,7 +23,7 @@ type Core struct {
 	Plugins     []plugin.Info
 	Repos       []PluginJSON
 	//PluginFields   []PluginSelect
-	Communications []*Communication
+	Communications []*types.Communication
 	OfflineAssets  bool
 }
 
@@ -43,6 +43,16 @@ var (
 
 func init() {
 	CoreApp = new(Core)
+}
+
+func InitApp() {
+	SelectCore()
+	SelectAllCommunications()
+	InsertDefaultComms()
+	LoadDefaultCommunications()
+	SelectAllServices()
+	CheckServices()
+	go DatabaseMaintence()
 }
 
 func (c *Core) Update() (*Core, error) {

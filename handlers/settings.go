@@ -3,17 +3,17 @@ package handlers
 import (
 	"fmt"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/notifications"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 )
 
 func PluginsHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-
 	//CoreApp.FetchPluginRepo()
 
 	//var pluginFields []PluginSelect
@@ -31,8 +31,7 @@ func PluginsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -63,8 +62,7 @@ func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SaveSASSHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -78,8 +76,7 @@ func SaveSASSHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -89,45 +86,64 @@ func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SaveEmailSettingsHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 	emailer := core.SelectCommunication(1)
-
 	r.ParseForm()
-	emailer.Host = r.PostForm.Get("host")
-	emailer.Username = r.PostForm.Get("username")
-	emailer.Password = r.PostForm.Get("password")
-	emailer.Port = int(utils.StringInt(r.PostForm.Get("port")))
-	emailer.Var1 = r.PostForm.Get("address")
+	smtpHost := r.PostForm.Get("host")
+	smtpUser := r.PostForm.Get("username")
+	smtpPass := r.PostForm.Get("password")
+	smtpPort := int(utils.StringInt(r.PostForm.Get("port")))
+	smtpOutgoing := r.PostForm.Get("address")
+	enabled := r.PostForm.Get("enable_email")
+
+	emailer.Host = smtpHost
+	emailer.Username = smtpUser
+	if smtpPass != "#######################" {
+		emailer.Password = smtpPass
+	}
+	emailer.Port = smtpPort
+	emailer.Var1 = smtpOutgoing
+	emailer.Enabled = false
+	if enabled == "on" {
+		emailer.Enabled = true
+	}
 	core.Update(emailer)
 
-	//sample := &Email{
-	//	To:       SessionUser(r).Email,
-	//	Subject:  "Sample Email",
-	//	Template: "error.html",
-	//}
-	//AddEmail(sample)
+	sample := &types.Email{
+		To:       SessionUser(r).Email,
+		Subject:  "Test Email",
+		Template: "message.html",
+		From:     emailer.Var1,
+	}
+	notifications.LoadEmailer(emailer)
+	notifications.SendEmail(core.EmailBox, sample)
+	notifications.EmailComm = emailer
+	if emailer.Enabled {
+		utils.Log(1, "Starting Email Routine, 1 unique email per 60 seconds")
+		go notifications.EmailRoutine()
+	}
 
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
 
 func SaveSlackSettingsHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 	slack := core.SelectCommunication(2)
 	r.ParseForm()
-	slack.Host = r.PostForm.Get("host")
-	slack.Enabled = true
-	if slack.Host == "" {
-		slack.Enabled = false
+	slackWebhook := r.PostForm.Get("slack_url")
+	enable := r.PostForm.Get("enable_slack")
+	slack.Enabled = false
+	if enable == "on" && slackWebhook != "" {
+		slack.Enabled = true
+		go notifications.SlackRoutine()
 	}
+	slack.Host = slackWebhook
 	core.Update(slack)
-	core.SendSlackMessage("This is a test from Statup!")
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }

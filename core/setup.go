@@ -1,23 +1,30 @@
 package core
 
 import (
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"os"
 )
 
 func InsertDefaultComms() {
-	emailer := &Communication{
-		Method:    "email",
-		Removable: false,
-		Enabled:   false,
+	emailer := SelectCommunication(1)
+	if emailer == nil {
+		emailer := &types.Communication{
+			Method:    "email",
+			Removable: false,
+			Enabled:   false,
+		}
+		Create(emailer)
 	}
-	Create(emailer)
-	slack := &Communication{
-		Method:    "slack",
-		Removable: false,
-		Enabled:   false,
+	slack := SelectCommunication(2)
+	if slack == nil {
+		slack := &types.Communication{
+			Method:    "slack",
+			Removable: false,
+			Enabled:   false,
+		}
+		Create(slack)
 	}
-	Create(slack)
 }
 
 func DeleteConfig() {
@@ -82,12 +89,14 @@ func LoadSampleData() error {
 	}
 	checkin.Create()
 
-	for i := 0; i < 20; i++ {
-		s1.Check()
-		s2.Check()
-		s3.Check()
-		s4.Check()
-	}
+	//for i := 0; i < 3; i++ {
+	//	s1.Check()
+	//	s2.Check()
+	//	s3.Check()
+	//	s4.Check()
+	//}
+
+	utils.Log(1, "Sample data has finished importing")
 
 	return nil
 }

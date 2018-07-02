@@ -50,7 +50,7 @@
                 <div class="form-group row">
                     <label for="service_name" class="col-sm-4 col-form-label">Service Name</label>
                     <div class="col-sm-8">
-                        <input type="text" name="name" class="form-control" id="service_name" placeholder="Name">
+                        <input type="text" name="name" class="form-control" id="service_name" placeholder="Name" required>
                     </div>
                 </div>
                 <div class="form-group row">
@@ -65,7 +65,7 @@
                 <div class="form-group row">
                     <label for="service_url" class="col-sm-4 col-form-label">Application Endpoint (URL)</label>
                     <div class="col-sm-8">
-                        <input type="text" name="domain" class="form-control" id="service_url" placeholder="https://google.com">
+                        <input type="text" name="domain" class="form-control" id="service_url" placeholder="https://google.com" required>
                     </div>
                 </div>
                 <div class="form-group row">
@@ -104,7 +104,7 @@
                 <div class="form-group row">
                     <label for="service_interval" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
                     <div class="col-sm-8">
-                        <input type="number" name="interval" class="form-control" id="service_interval" placeholder="10">
+                        <input type="number" name="interval" class="form-control" id="service_interval" value="60" required>
                     </div>
                 </div>
                 <div class="form-group row">

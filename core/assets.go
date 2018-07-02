@@ -95,7 +95,7 @@ func CreateAllAssets() {
 	utils.Log(1, "Inserting scss, css, emails, and javascript files into assets..")
 	CopyToPublic(ScssBox, "scss", "base.scss")
 	CopyToPublic(ScssBox, "scss", "variables.scss")
-	CopyToPublic(EmailBox, "emails", "error.html")
+	CopyToPublic(EmailBox, "emails", "message.html")
 	CopyToPublic(EmailBox, "emails", "failure.html")
 	CopyToPublic(CssBox, "css", "bootstrap.min.css")
 	CopyToPublic(JsBox, "js", "bootstrap.min.js")
@@ -106,7 +106,6 @@ func CreateAllAssets() {
 	CopyToPublic(JsBox, "js", "setup.js")
 	CopyToPublic(TmplBox, "", "robots.txt")
 	CopyToPublic(TmplBox, "", "favicon.ico")
-
 	utils.Log(1, "Compiling CSS from SCSS style...")
 	err := CompileSASS()
 	if err != nil {
