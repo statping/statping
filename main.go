@@ -82,11 +82,12 @@ func ForEachPlugin() {
 }
 
 func LoadPlugins() {
+	utils.Log(1, fmt.Sprintf("Loading any available Plugins from /plugins directory"))
 	if _, err := os.Stat("./plugins"); os.IsNotExist(err) {
 		os.Mkdir("./plugins", os.ModePerm)
 	}
 
-	ForEachPlugin()
+	//ForEachPlugin()
 
 	files, err := ioutil.ReadDir("./plugins")
 	if err != nil {
@@ -94,33 +95,39 @@ func LoadPlugins() {
 		return
 	}
 	for _, f := range files {
+		utils.Log(1, fmt.Sprintf("Attempting to load plugin '%v'", f.Name()))
 		ext := strings.Split(f.Name(), ".")
 		if len(ext) != 2 {
+			utils.Log(3, fmt.Sprintf("Plugin '%v' must end in .so extension", f.Name()))
 			continue
 		}
 		if ext[1] != "so" {
+			utils.Log(3, fmt.Sprintf("Plugin '%v' must end in .so extension", f.Name()))
 			continue
 		}
 		plug, err := plg.Open("plugins/" + f.Name())
 		if err != nil {
-			utils.Log(2, fmt.Sprintf("Plugin '%v' could not load correctly.\n", f.Name()))
+			utils.Log(3, fmt.Sprintf("Plugin '%v' could not load correctly. %v", f.Name(), err))
 			continue
 		}
 		symPlugin, err := plug.Lookup("Plugin")
+		if err != nil {
+			utils.Log(3, fmt.Sprintf("Plugin '%v' could not load correctly. %v", f.Name(), err))
+			continue
+		}
 
 		var plugActions plugin.PluginActions
 		plugActions, ok := symPlugin.(plugin.PluginActions)
 		if !ok {
-			utils.Log(2, fmt.Sprintf("Plugin '%v' could not load correctly, error: %v\n", f.Name(), "unexpected type from module symbol"))
+			utils.Log(3, fmt.Sprintf("Plugin '%v' could not load correctly, error: %v", f.Name(), err))
 			continue
 		}
 
-		//allPlugins = append(allPlugins, plugActions)
+		plugActions.OnLoad(core.DbSession)
+
 		core.CoreApp.Plugins = append(core.CoreApp.Plugins, plugActions.GetInfo())
+		core.CoreApp.AllPlugins = append(core.CoreApp.AllPlugins, plugActions)
 	}
 
-	core.OnLoad(core.DbSession)
-
-	//utils.Log(1, fmt.Sprintf("Loaded %v Plugins\n", len(allPlugins)))
-	ForEachPlugin()
+	utils.Log(1, fmt.Sprintf("Loaded %v Plugins\n", len(core.CoreApp.Plugins)))
 }

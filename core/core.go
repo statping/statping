@@ -10,19 +10,19 @@ type PluginJSON types.PluginJSON
 type PluginRepos types.PluginRepos
 
 type Core struct {
-	Name        string     `db:"name" json:"name"`
-	Description string     `db:"description" json:"name"`
-	Config      string     `db:"config" json:"-"`
-	ApiKey      string     `db:"api_key" json:"-"`
-	ApiSecret   string     `db:"api_secret" json:"-"`
-	Style       string     `db:"style" json:"-"`
-	Footer      string     `db:"footer" json:"-"`
-	Domain      string     `db:"domain" json:"domain,omitempty"`
-	Version     string     `db:"version" json:"version,omitempty"`
-	Services    []*Service `json:"services,omitempty"`
-	Plugins     []plugin.Info
-	Repos       []PluginJSON
-	//PluginFields   []PluginSelect
+	Name           string     `db:"name" json:"name"`
+	Description    string     `db:"description" json:"name"`
+	Config         string     `db:"config" json:"-"`
+	ApiKey         string     `db:"api_key" json:"-"`
+	ApiSecret      string     `db:"api_secret" json:"-"`
+	Style          string     `db:"style" json:"-"`
+	Footer         string     `db:"footer" json:"-"`
+	Domain         string     `db:"domain" json:"domain,omitempty"`
+	Version        string     `db:"version" json:"version,omitempty"`
+	Services       []*Service `json:"services,omitempty"`
+	Plugins        []plugin.Info
+	Repos          []PluginJSON
+	AllPlugins     []plugin.PluginActions
 	Communications []*types.Communication
 	OfflineAssets  bool
 }
@@ -37,7 +37,6 @@ var (
 	TmplBox     *rice.Box
 	EmailBox    *rice.Box
 	SetupMode   bool
-	AllPlugins  []plugin.PluginActions
 	UsingAssets bool
 )
 

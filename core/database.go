@@ -39,11 +39,13 @@ func DbConnection(dbType string) error {
 		if Configs.Port == "" {
 			Configs.Port = "3306"
 		}
+
 		mysqlSettings = mysql.ConnectionURL{
 			Database: Configs.Database,
 			Host:     Configs.Host,
 			User:     Configs.User,
 			Password: Configs.Password,
+			Options:  map[string]string{"parseTime": "true", "charset": "utf8"},
 		}
 		DbSession, err = mysql.Open(mysqlSettings)
 		if err != nil {
@@ -67,7 +69,6 @@ func DbConnection(dbType string) error {
 	}
 	//dbSession.SetLogging(true)
 	dbServer = dbType
-	OnLoad(DbSession)
 	return err
 }
 

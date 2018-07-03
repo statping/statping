@@ -18,7 +18,7 @@ CREATE TABLE users (
     api_key text,
     api_secret text,
     administrator bool,
-    created_at TIMESTAMP
+    created_at DATETIME
 );
 
 CREATE TABLE services (
@@ -33,14 +33,14 @@ CREATE TABLE services (
     check_interval integer,
     post_data text,
     order_id integer,
-    created_at TIMESTAMP
+    created_at DATETIME
 );
 
 CREATE TABLE hits (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
     latency float,
-    created_at TIMESTAMP
+    created_at DATETIME
 );
 
 CREATE TABLE failures (
@@ -48,7 +48,7 @@ CREATE TABLE failures (
     issue text,
     method text,
     service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    created_at TIMESTAMP
+    created_at DATETIME
 );
 
 CREATE TABLE checkins (
@@ -56,7 +56,7 @@ CREATE TABLE checkins (
     service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
     check_interval integer,
     api text,
-    created_at TIMESTAMP
+    created_at DATETIME
 );
 
 CREATE TABLE communication (
@@ -73,7 +73,7 @@ CREATE TABLE communication (
     enabled boolean,
     removable boolean,
     limits integer,
-    created_at TIMESTAMP
+    created_at DATETIME
 );
 
 

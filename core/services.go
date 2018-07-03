@@ -125,28 +125,33 @@ func (s *Service) SmallText() string {
 }
 
 func (s *Service) GraphData() string {
-	var d []DateScan
+	var d []*DateScan
 	increment := "minute"
-	since := time.Now().Add(time.Hour*-12 + time.Minute*0 + time.Second*0)
-
+	since := time.Now().Add(time.Hour*-24 + time.Minute*0 + time.Second*0)
 	// group by interval sql query for postgres, mysql and sqlite
 	sql := fmt.Sprintf("SELECT date_trunc('%v', created_at), AVG(latency)*1000 AS value FROM hits WHERE service=%v AND created_at > '%v' GROUP BY 1 ORDER BY date_trunc ASC;", increment, s.Id, since.Format(time.RFC3339))
 	if dbServer == "mysql" {
-		sql = fmt.Sprintf("SELECT CONCAT(DATE(created_at), ' ', %v(created_at)) AS created_at, AVG(latency)*1000 AS value FROM hits WHERE service=%v AND DATE_FORMAT(created_at, 'Y-m-d H:i:s') BETWEEN DATE_FORMAT(NOW() - INTERVAL 12 HOUR, 'Y-m-d H:i:s') AND DATE_FORMAT(NOW(), 'Y-m-d H:i:s') GROUP BY created_at", increment, s.Id)
+		sql = fmt.Sprintf("SELECT CONCAT(date_format(created_at, '%%Y-%%m-%%dT%%TZ')) AS created_at, AVG(latency)*1000 AS value FROM hits WHERE service=%v AND DATE_FORMAT(created_at, '%%Y-%%m-%%dT%%TZ') BETWEEN DATE_FORMAT(NOW() - INTERVAL 12 HOUR, '%%Y-%%m-%%dT%%TZ') AND DATE_FORMAT(NOW(), '%%Y-%%m-%%dT%%TZ') GROUP BY created_at", s.Id)
 	} else if dbServer == "sqlite" {
-		sql = fmt.Sprintf("SELECT created_at, AVG(latency)*1000 as value FROM hits WHERE service=%v AND created_at >= '%v' GROUP BY strftime('%%m', created_at)", s.Id, since.Format(time.RFC3339))
-		fmt.Println(sql)
+		sql = fmt.Sprintf("SELECT strftime('%%Y-%%m-%%dT%%H:%%M:%%SZ', created_at), AVG(latency)*1000 as value FROM hits WHERE service=%v AND created_at >= '%v' GROUP BY strftime('%%m', created_at)", s.Id, since.Format(time.RFC3339))
 	}
-
 	dated, err := DbSession.Query(db.Raw(sql))
 	if err != nil {
 		utils.Log(2, err)
 		return ""
 	}
 	for dated.Next() {
-		var gd DateScan
+		gd := new(DateScan)
+		var tt string
 		var ff float64
-		dated.Scan(&gd.CreatedAt, &ff)
+		err := dated.Scan(&tt, &ff)
+		if err != nil {
+			utils.Log(2, fmt.Sprintf("Issue loading chart data for service %v, %v", s.Name, err))
+		}
+		gd.CreatedAt, err = time.Parse(time.RFC3339, tt)
+		if err != nil {
+			utils.Log(2, fmt.Sprintf("Issue parsing time %v", err))
+		}
 		gd.Value = int64(ff)
 		d = append(d, gd)
 	}

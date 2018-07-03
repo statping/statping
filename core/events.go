@@ -10,19 +10,19 @@ import (
 )
 
 func OnLoad(db sqlbuilder.Database) {
-	for _, p := range AllPlugins {
+	for _, p := range CoreApp.AllPlugins {
 		p.OnLoad(db)
 	}
 }
 
 func OnSuccess(s *Service) {
-	for _, p := range AllPlugins {
+	for _, p := range CoreApp.AllPlugins {
 		p.OnSuccess(structs.Map(s))
 	}
 }
 
 func OnFailure(s *Service, f FailureData) {
-	for _, p := range AllPlugins {
+	for _, p := range CoreApp.AllPlugins {
 		p.OnFailure(structs.Map(s))
 	}
 
@@ -61,37 +61,37 @@ func onFailureEmail(s *Service, f FailureData) {
 }
 
 func OnSettingsSaved(c *Core) {
-	for _, p := range AllPlugins {
+	for _, p := range CoreApp.AllPlugins {
 		p.OnSettingsSaved(structs.Map(c))
 	}
 }
 
 func OnNewUser(u *User) {
-	for _, p := range AllPlugins {
+	for _, p := range CoreApp.AllPlugins {
 		p.OnNewUser(structs.Map(u))
 	}
 }
 
 func OnNewService(s *Service) {
-	for _, p := range AllPlugins {
+	for _, p := range CoreApp.AllPlugins {
 		p.OnNewService(structs.Map(s))
 	}
 }
 
 func OnDeletedService(s *Service) {
-	for _, p := range AllPlugins {
+	for _, p := range CoreApp.AllPlugins {
 		p.OnDeletedService(structs.Map(s))
 	}
 }
 
 func OnUpdateService(s *Service) {
-	for _, p := range AllPlugins {
+	for _, p := range CoreApp.AllPlugins {
 		p.OnUpdatedService(structs.Map(s))
 	}
 }
 
 func SelectPlugin(name string) plugin.PluginActions {
-	for _, p := range AllPlugins {
+	for _, p := range CoreApp.AllPlugins {
 		if p.GetInfo().Name == name {
 			return p
 		}

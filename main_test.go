@@ -13,6 +13,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 )
 
 var (
@@ -24,18 +25,12 @@ func RunInit(t *testing.T) {
 	RenderBoxes()
 	os.Remove("./statup.db")
 	os.Remove("./config.yml")
+	os.Remove("./index.html")
 	route = handlers.Router()
 	LoadDotEnvs()
 }
 
 var forceSequential chan bool = make(chan bool, 1)
-
-type databaseTest struct {
-	in  string
-	out string
-}
-
-var dbTests []databaseTest
 
 func TestRunAll(t *testing.T) {
 
@@ -63,8 +58,11 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" Select Comms", func(t *testing.T) {
 			RunSelectAllMysqlCommunications(t)
 		})
-		t.Run(dbt+" Create User", func(t *testing.T) {
+		t.Run(dbt+" Create Users", func(t *testing.T) {
 			RunUser_Create(t)
+		})
+		t.Run(dbt+" Select Users", func(t *testing.T) {
+			RunUser_SelectAll(t)
 		})
 		t.Run(dbt+" Select Services", func(t *testing.T) {
 			RunSelectAllServices(t)
@@ -87,7 +85,7 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" Chart Data", func(t *testing.T) {
 			RunService_GraphData(t)
 		})
-		t.Run(dbt+" Create Service", func(t *testing.T) {
+		t.Run(dbt+" Create Failing Service", func(t *testing.T) {
 			RunBadService_Create(t)
 		})
 		t.Run(dbt+" Check Service", func(t *testing.T) {
@@ -96,8 +94,17 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" Select Hits", func(t *testing.T) {
 			RunService_Hits(t)
 		})
+		t.Run(dbt+" Select Failures", func(t *testing.T) {
+			RunService_Failures(t)
+		})
 		t.Run(dbt+" Select Limited Hits", func(t *testing.T) {
 			RunService_LimitedHits(t)
+		})
+		t.Run(dbt+" Delete Service", func(t *testing.T) {
+			RunDeleteService(t)
+		})
+		t.Run(dbt+" Delete User", func(t *testing.T) {
+			RunUser_Delete(t)
 		})
 		t.Run(dbt+" HTTP /", func(t *testing.T) {
 			RunIndexHandler(t)
@@ -211,6 +218,8 @@ func RunSelectCoreMYQL(t *testing.T, db string) {
 	core.CoreApp, err = core.SelectCore()
 	assert.Nil(t, err)
 	assert.Equal(t, "Testing "+db, core.CoreApp.Name)
+	assert.NotEmpty(t, core.CoreApp.ApiKey)
+	assert.NotEmpty(t, core.CoreApp.ApiSecret)
 	assert.Equal(t, VERSION, core.CoreApp.Version)
 }
 
@@ -228,6 +237,12 @@ func RunSelectAllMysqlCommunications(t *testing.T) {
 	assert.Equal(t, 2, len(comms))
 }
 
+func RunUser_SelectAll(t *testing.T) {
+	users, err := core.SelectAllUsers()
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(users))
+}
+
 func RunUser_Create(t *testing.T) {
 	user := &core.User{
 		Username: "admin",
@@ -236,7 +251,24 @@ func RunUser_Create(t *testing.T) {
 	}
 	id, err := user.Create()
 	assert.Nil(t, err)
-	assert.NotZero(t, id)
+	assert.Equal(t, int64(1), id)
+	user2 := &core.User{
+		Username: "superadmin",
+		Password: "admin",
+		Email:    "info@adminer.com",
+		Admin:    true,
+	}
+	id, err = user2.Create()
+	assert.Nil(t, err)
+	assert.Equal(t, int64(2), id)
+}
+
+func RunUser_Delete(t *testing.T) {
+	user, err := core.SelectUser(2)
+	assert.Nil(t, err)
+	assert.NotNil(t, user)
+	err = user.Delete()
+	assert.Nil(t, err)
 }
 
 func RunSelectAllServices(t *testing.T) {
@@ -266,6 +298,7 @@ func RunService_Create(t *testing.T) {
 	id, err := service.Create()
 	assert.Nil(t, err)
 	assert.Equal(t, int64(5), id)
+	t.Log(service)
 }
 
 func RunService_AvgTime(t *testing.T) {
@@ -286,6 +319,9 @@ func RunService_GraphData(t *testing.T) {
 	service := core.SelectService(1)
 	assert.NotNil(t, service)
 	data := service.GraphData()
+	t.Log(data)
+	assert.NotEqual(t, "null", data)
+	assert.False(t, strings.Contains(data, "0001-01-01T00:00:00Z"))
 	assert.NotEmpty(t, data)
 }
 
@@ -310,15 +346,24 @@ func RunBadService_Check(t *testing.T) {
 	assert.Equal(t, "JSON API Tester", service.Name)
 }
 
+func RunDeleteService(t *testing.T) {
+	service := core.SelectService(4)
+	assert.NotNil(t, service)
+	assert.Equal(t, "JSON API Tester", service.Name)
+	err := service.Delete()
+	assert.Nil(t, err)
+}
+
 func RunCreateService_Hits(t *testing.T) {
 	services, err := core.SelectAllServices()
 	assert.Nil(t, err)
 	assert.NotNil(t, services)
-	for i := 0; i <= 2; i++ {
+	for i := 0; i <= 10; i++ {
 		for _, s := range services {
 			service := s.Check()
 			assert.NotNil(t, service)
 		}
+		time.Sleep(1 * time.Second)
 	}
 }
 
@@ -328,6 +373,13 @@ func RunService_Hits(t *testing.T) {
 	hits, err := service.Hits()
 	assert.Nil(t, err)
 	assert.NotZero(t, len(hits))
+}
+
+func RunService_Failures(t *testing.T) {
+	t.SkipNow()
+	service := core.SelectService(6)
+	assert.NotNil(t, service)
+	assert.NotEmpty(t, service.Failures)
 }
 
 func RunService_LimitedHits(t *testing.T) {
@@ -363,7 +415,7 @@ func RunPrometheusHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
 	t.Log(rr.Body.String())
-	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 6"))
+	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 5"))
 }
 
 func RunFailingPrometheusHandler(t *testing.T) {

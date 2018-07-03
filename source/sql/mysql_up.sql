@@ -17,7 +17,7 @@ CREATE TABLE users (
     api_key VARCHAR(50),
     api_secret VARCHAR(50),
     administrator BOOL NOT NULL DEFAULT '0',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX (id)
 );
 CREATE TABLE services (
@@ -32,34 +32,34 @@ CREATE TABLE services (
     check_interval int(11),
     post_data text,
     order_id integer,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX (id)
 );
 CREATE TABLE hits (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     service INTEGER NOT NULL,
     latency float,
-    created_at TIMESTAMP,
+    created_at DATETIME,
     INDEX (id, service),
-    FOREIGN KEY (service) REFERENCES services(id)
+    FOREIGN KEY (service) REFERENCES services(id) ON DELETE CASCADE
 );
 CREATE TABLE failures (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     issue text,
     method text,
     service INTEGER NOT NULL,
-    created_at TIMESTAMP,
+    created_at DATETIME,
     INDEX (id, service),
-    FOREIGN KEY (service) REFERENCES services(id)
+    FOREIGN KEY (service) REFERENCES services(id) ON DELETE CASCADE
 );
 CREATE TABLE checkins (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     service INTEGER NOT NULL,
     check_interval integer,
     api text,
-    created_at TIMESTAMP,
+    created_at DATETIME,
     INDEX (id, service),
-    FOREIGN KEY (service) REFERENCES services(id)
+    FOREIGN KEY (service) REFERENCES services(id) ON DELETE CASCADE
 );
 CREATE TABLE communication (
     id SERIAL PRIMARY KEY,
@@ -75,5 +75,5 @@ CREATE TABLE communication (
     enabled BOOL NOT NULL DEFAULT '0',
     removable BOOL NOT NULL DEFAULT '0',
     limits integer,
-    created_at TIMESTAMP
+    created_at DATETIME
 );

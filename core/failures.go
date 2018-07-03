@@ -17,6 +17,9 @@ func (s *Service) CreateFailure(data FailureData) (int64, error) {
 	s.Failures = append(s.Failures, fail)
 	col := DbSession.Collection("failures")
 	uuid, err := col.Insert(fail)
+	if err != nil {
+		utils.Log(3, err)
+	}
 	if uuid == nil {
 		return 0, err
 	}
@@ -26,7 +29,10 @@ func (s *Service) CreateFailure(data FailureData) (int64, error) {
 func (s *Service) SelectAllFailures() []*Failure {
 	var fails []*Failure
 	col := DbSession.Collection("failures").Find("service", s.Id).OrderBy("-id")
-	col.All(&fails)
+	err := col.All(&fails)
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("Issue getting failures for service %v, %v", s.Name, err))
+	}
 	return fails
 }
 
