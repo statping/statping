@@ -7,15 +7,13 @@
 </p>
 
 # Statup - Status Page & Monitoring Server
-An easy to use Status Page for your websites and applications. Statup will automatically fetch the application and render a beautiful status page with tons of features 
-for you to build an even better status page. 
+An easy to use Status Page for your websites and applications. Statup will automatically fetch the application and render a beautiful status page with tons of features for you to build an even better status page. This Status Page generator allows you to use MySQL, Postgres, or SQLite on multiple operating systems.
 
 ## A Future-Proof Status Page
-Statup strives to remain future-proof and remain intact if a failure is created. Your Statup service should not be running on the same instance you're trying to monitor. 
-If your server crashes your Status Page should still remaining online to notify your users of downtime. 
+Statup strives to remain future-proof and remain intact if a failure is created. Your Statup service should not be running on the same instance you're trying to monitor. If your server crashes your Status Page should still remaining online to notify your users of downtime. 
 
 <p align="center">
-<img width="70%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsc1.png">
+<img width="80%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statuphead1.png">
 </p>
 
 ## Lightweight and Fast
@@ -36,32 +34,30 @@ Statup will allow you to completely customize your Status Page using SASS stylin
 Your status page will be optimized for mobile and desktop viewers. Statup has a full width edge to edge view, which you can also edit to meet your requirements.
 
 <p align="center">
-<img width="40%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsm1.jpg">
-<img width="24%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsm2.jpg">
+<img width="40%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupmob1.jpg">
 </p>
-
-## 3 Different Databases
-This Status Page generator allows you to use MySQL, Postgres, or SQLite. 
 
 ## Run on Any Server
 Whether you're a Docker fan-boy or a AWS EC2 master, Statup gives you multiple options to simply get running. Our Amazon AMI image (`ami-7be8a103`) is only 8Gb and will automatically update to the most stable version of Statup. 
 Running on an EC2 server might be the most cost effective way to host your own Statup Status Page. The server runs on the smallest EC2 instance (t2.nano) AWS has to offer, which only costs around $4.60 USD a month for your dedicated Status Page.
 Want to run it on your own Docker server? Awesome! Statup has multiple docker-compose.yml files to work with. Statup can automatically create a SSL Certification for your status page.
 
-## Slack Integration
-Everyone uses Slack and Statup should also. You can create an [Incoming Webhook](https://api.slack.com/incoming-webhooks) in Slack and insert the URL into the Settings page in Statup. Anytime a service fails, you're channel that you specified on Slack will receive a message. 
+## Slack and Email Integration
+Statup includes email notification via SMTP and Slack integration using [Incoming Webhook](https://api.slack.com/incoming-webhooks) Insert the webhook URL into the Settings page in Statup and enable the Slack integration. Anytime a service fails, you're channel that you specified on Slack will receive a message. 
 This is a brand new feature, right now it is sending basic text. With Slack Messaging format, I plan on creating a more detailed message for a cleaner look. 
 
-## Email Nofitications
-Statup includes email notification via SMTP if your services go offline. 
-
 ## User Created Plugins
-Statup isn't just another Status Page for your applications, it's a framework that allows you to create your own plugins to interact with every element of your status page.
-Plugin are created in Golang using the [statup/plugin](https://github.com/hunterlong/statup/tree/master/plugin) golang package. The plugin package has a list of 
-interfaces/events to accept into your own plugin application. 
+View the [Plugin Wiki](https://github.com/hunterlong/statup/wiki/Statup-Plugins) to see detailed information about Golang Plugins. Statup isn't just another Status Page for your applications, it's a framework that allows you to create your own plugins to interact with every element of your status page.
+Plugin are created in Golang using the [statup/plugin](https://github.com/hunterlong/statup/tree/master/plugin) golang package. The plugin package has a list of interfaces/events to accept into your own plugin application. 
 
 <p align="center">
 <img width="100%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsc2.png">
+</p>
+
+## Easy to use Dashboard
+Having a straight forward dashboard makes Statup that much better. Monitor your websites and applications with a basic HTTP GET request, or add a POST request with your own JSON to post to the endpoint. 
+<p align="center">
+<img width="80%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupcreat.png">
 </p>
 
 ## Exporting Static HTML
@@ -136,6 +132,8 @@ scrape_configs:
       - targets: ['statup:8080']
 ```
 
-[![Build Status](https://travis-ci.org/hunterlong/statup.svg?branch=master)](https://travis-ci.org/hunterlong/statup)
+[![Build Status](https://travis-ci.org/hunterlong/statup.svg?branch=master)](https://travis-ci.org/hunterlong/statup) [![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://dashboard.cypress.io/#/projects/bi8mhr/runs) 
+[![Docker Pulls](https://img.shields.io/docker/pulls/hunterlong/statup.svg)](https://hub.docker.com/r/hunterlong/statup/builds/)
+
 
 
