@@ -162,7 +162,7 @@ func CreateDatabase() {
 	sql := "postgres_up.sql"
 	if dbServer == "mysql" {
 		sql = "mysql_up.sql"
-	} else if dbServer == "sqlite3" {
+	} else if dbServer == "sqlite" {
 		sql = "sqlite_up.sql"
 	}
 	up, _ := SqlBox.String(sql)

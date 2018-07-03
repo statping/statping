@@ -16,6 +16,12 @@ $('select#database_type').on('change', function(){
         $("#db_user").show();
         $("#db_database").show();
     }
+    if (selected=="mysql") {
+        $("#db_port_in").val('3306');
+    } else if (selected=="postgres") {
+        $("#db_port_in").val('5432');
+    }
+
 });
 
 $("#setup_form").submit(function() {

@@ -11,7 +11,7 @@ CREATE TABLE core (
 );
 
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     username text,
     password text,
     email text,
@@ -22,7 +22,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE services (
-    id SERIAL PRIMARY KEY,
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     name text,
     domain text,
     check_type text,
@@ -37,14 +37,14 @@ CREATE TABLE services (
 );
 
 CREATE TABLE hits (
-    id SERIAL PRIMARY KEY,
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
     latency float,
     created_at TIMESTAMP
 );
 
 CREATE TABLE failures (
-    id SERIAL PRIMARY KEY,
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     issue text,
     method text,
     service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -52,7 +52,7 @@ CREATE TABLE failures (
 );
 
 CREATE TABLE checkins (
-    id SERIAL PRIMARY KEY,
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
     check_interval integer,
     api text,
@@ -60,7 +60,7 @@ CREATE TABLE checkins (
 );
 
 CREATE TABLE communication (
-    id SERIAL PRIMARY KEY,
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     method text,
     host text,
     port integer,

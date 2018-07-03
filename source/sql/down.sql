@@ -1,7 +1,7 @@
-DROP table core;
-DROP table hits;
-DROP table failures;
-DROP table users;
-DROP table checkins;
-DROP table services;
-DROP table communication;
+DROP TABLE IF EXISTS core;
+DROP TABLE IF EXISTS hits;
+DROP TABLE IF EXISTS failures;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS checkins;
+DROP TABLE IF EXISTS services;
+DROP TABLE IF EXISTS communication;

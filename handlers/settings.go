@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/notifications"
 	"github.com/hunterlong/statup/types"
@@ -25,7 +24,6 @@ func PluginsHandler(w http.ResponseWriter, r *http.Request) {
 	//}
 
 	//CoreApp.PluginFields = pluginFields
-	fmt.Println(core.CoreApp.Communications)
 
 	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }

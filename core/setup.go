@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"os"
@@ -77,17 +78,32 @@ func LoadSampleData() error {
 		Method:         "POST",
 		PostData:       `{ "title": "statup", "body": "bar", "userId": 19999 }`,
 	}
-	s1.Create()
-	s2.Create()
-	s3.Create()
-	s4.Create()
+	id, err := s1.Create()
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("Error creating Service %v: %v", id, err))
+	}
+	id, err = s2.Create()
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("Error creating Service %v: %v", id, err))
+	}
+	id, err = s3.Create()
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("Error creating Service %v: %v", id, err))
+	}
+	id, err = s4.Create()
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("Error creating Service %v: %v", id, err))
+	}
 
 	checkin := &Checkin{
 		Service:  s2.Id,
 		Interval: 30,
 		Api:      utils.NewSHA1Hash(18),
 	}
-	checkin.Create()
+	id, err = checkin.Create()
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("Error creating Checkin %v: %v", id, err))
+	}
 
 	//for i := 0; i < 3; i++ {
 	//	s1.Check()

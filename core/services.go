@@ -128,7 +128,15 @@ func (s *Service) GraphData() string {
 	var d []DateScan
 	increment := "minute"
 	since := time.Now().Add(time.Hour*-12 + time.Minute*0 + time.Second*0)
+
+	// this function needs some work, asap
 	sql := fmt.Sprintf("SELECT date_trunc('%v', created_at), AVG(latency)*1000 AS value FROM hits WHERE service=%v AND created_at > '%v' GROUP BY 1 ORDER BY date_trunc ASC;", increment, s.Id, since.Format(time.RFC3339))
+	if dbServer == "mysql" {
+		sql = fmt.Sprintf("SELECT created_at, AVG(latency)*1000 AS VALUE FROM hits WHERE service=%v GROUP BY 1 ORDER BY created_at ASC;", s.Id)
+	} else if dbServer == "sqlite" {
+		sql = fmt.Sprintf("SELECT created_at, AVG(latency)*1000 AS VALUE FROM hits WHERE service=%v GROUP BY 1 ORDER BY created_at ASC;", s.Id)
+	}
+
 	dated, err := DbSession.Query(db.Raw(sql))
 	if err != nil {
 		utils.Log(2, err)
