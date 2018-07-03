@@ -155,23 +155,25 @@ func TestExportCommand(t *testing.T) {
 	c.Run()
 	t.Log(c.Stdout())
 	assert.True(t, c.StdoutContains("Exporting Static 'index.html' page"))
+	assert.True(t, fileExists("index.html"))
 }
 
 func TestAssetsCommand(t *testing.T) {
-	t.SkipNow()
 	c := testcli.Command("statup", "assets")
 	c.Run()
 	t.Log(c.Stdout())
-	assert.True(t, c.StdoutContains("Statup v"))
+	assert.True(t, fileExists("assets/robots.txt"))
+	assert.True(t, fileExists("assets/js/main.js"))
+	assert.True(t, fileExists("assets/css/base.css"))
+	assert.True(t, fileExists("assets/scss/base.scss"))
+	assert.True(t, fileExists("assets/emails/failure.html"))
 }
 
 func RunMySQLMakeConfig(t *testing.T, db string) {
-
 	port := 5432
 	if db == "mysql" {
 		port = 3306
 	}
-
 	config := &core.DbConfig{
 		db,
 		os.Getenv("DB_HOST"),
@@ -435,3 +437,10 @@ func RunSettingsHandler(t *testing.T) {
 //	//os.Remove("./statup.db")
 //	os.Remove("./config.yml")
 //}
+
+func fileExists(file string) bool {
+	if _, err := os.Stat(file); os.IsNotExist(err) {
+		return false
+	}
+	return true
+}

@@ -22,7 +22,7 @@ func init() {
 	var err error
 	logFile, err = os.OpenFile("./statup.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
-		lg.Fatalf("error opening file: %v", err)
+		lg.Printf("ERROR opening file: %v", err)
 	}
 	ljLogger = &lumberjack.Logger{
 		Filename:   "./statup.log",
