@@ -133,7 +133,7 @@ func (s *Service) GraphData() string {
 	if dbServer == "mysql" {
 		sql = fmt.Sprintf("SELECT CONCAT(date_format(created_at, '%%Y-%%m-%%dT%%TZ')) AS created_at, AVG(latency)*1000 AS value FROM hits WHERE service=%v AND DATE_FORMAT(created_at, '%%Y-%%m-%%dT%%TZ') BETWEEN DATE_FORMAT(NOW() - INTERVAL 12 HOUR, '%%Y-%%m-%%dT%%TZ') AND DATE_FORMAT(NOW(), '%%Y-%%m-%%dT%%TZ') GROUP BY created_at", s.Id)
 	} else if dbServer == "sqlite" {
-		sql = fmt.Sprintf("SELECT strftime('%%Y-%%m-%%dT%%H:%%M:%%SZ', created_at), AVG(latency)*1000 as value FROM hits WHERE service=%v AND created_at >= '%v' GROUP BY strftime('%%m', created_at)", s.Id, since.Format(time.RFC3339))
+		sql = fmt.Sprintf("SELECT strftime('%%Y-%%m-%%dT%%H:%%M:%%SZ', created_at), AVG(latency)*1000 as value FROM hits WHERE service=%v AND created_at >= '%v' GROUP BY strftime('%%M', created_at)", s.Id, since.Format(time.RFC3339))
 	}
 	dated, err := DbSession.Query(db.Raw(sql))
 	if err != nil {
