@@ -61,6 +61,7 @@ func Create(c *types.Communication) (int64, error) {
 		return 0, err
 	}
 	c.Id = uuid.(int64)
+	c.Routine = make(chan struct{})
 	if CoreApp != nil {
 		CoreApp.Communications = append(CoreApp.Communications, c)
 	}

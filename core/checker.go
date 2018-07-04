@@ -21,19 +21,26 @@ func CheckServices() {
 	for _, v := range CoreApp.Services {
 		obj := v
 		//go obj.StartCheckins()
+		obj.stopRoutine = make(chan struct{})
 		go obj.CheckQueue()
 	}
 }
 
 func (s *Service) CheckQueue() {
-	defer s.CheckQueue()
-	s.Check()
-	if s.Interval < 1 {
-		s.Interval = 1
+	for {
+		select {
+		case <-s.stopRoutine:
+			return
+		default:
+			s.Check()
+			if s.Interval < 1 {
+				s.Interval = 1
+			}
+			msg := fmt.Sprintf("Service: %v | Online: %v | Latency: %0.0fms", s.Name, s.Online, (s.Latency * 1000))
+			utils.Log(1, msg)
+			time.Sleep(time.Duration(s.Interval) * time.Second)
+		}
 	}
-	msg := fmt.Sprintf("Service: %v | Online: %v | Latency: %0.0fms", s.Name, s.Online, (s.Latency * 1000))
-	utils.Log(1, msg)
-	time.Sleep(time.Duration(s.Interval) * time.Second)
 }
 
 func (s *Service) DNSCheck() (float64, error) {

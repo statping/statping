@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -32,4 +33,13 @@ func UnderScoreString(str string) string {
 	newStr = strings.TrimSuffix(newStr, "_")
 
 	return newStr
+}
+
+func DeleteFile(file string) bool {
+	err := os.Remove(file)
+	if err != nil {
+		Log(3, err)
+		return false
+	}
+	return true
 }

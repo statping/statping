@@ -55,6 +55,7 @@ type Communication struct {
 	Limits    int64     `db:"limits" json:"-"`
 	Removable bool      `db:"removable" json:"-"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	Routine   chan struct{}
 }
 
 type Email struct {

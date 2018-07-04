@@ -26,9 +26,9 @@ func RunHTTPServer() {
 	for _, p := range core.CoreApp.AllPlugins {
 		info := p.GetInfo()
 		for _, route := range p.Routes() {
-			path := fmt.Sprintf("/plugins/%v/%v", info.Name, route.URL)
+			path := fmt.Sprintf("%v", route.URL)
 			r.Handle(path, http.HandlerFunc(route.Handler)).Methods(route.Method)
-			fmt.Printf("Added Route %v for plugin %v\n", path, info.Name)
+			utils.Log(1, fmt.Sprintf("Added Route %v for plugin %v\n", path, info.Name))
 		}
 	}
 	srv := &http.Server{

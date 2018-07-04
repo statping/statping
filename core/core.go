@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"github.com/GeertJohan/go.rice"
 	"github.com/hunterlong/statup/plugin"
 	"github.com/hunterlong/statup/types"
@@ -67,10 +66,6 @@ func InitApp() {
 func (c *Core) Update() (*Core, error) {
 	res := DbSession.Collection("core").Find().Limit(1)
 	err := res.Update(c)
-	CoreApp.Services, err = SelectAllServices()
-
-	fmt.Println(CoreApp.Name, CoreApp.Description)
-
 	return c, err
 }
 

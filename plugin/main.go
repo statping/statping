@@ -37,6 +37,7 @@ func (p *PluginInfo) Form() string {
 type PluginActions interface {
 	GetInfo() Info
 	GetForm() string
+	OnLoad(sqlbuilder.Database)
 	SetInfo(map[string]interface{}) Info
 	Routes() []Routing
 	OnSave(map[string]interface{})
@@ -52,7 +53,6 @@ type PluginActions interface {
 	OnBeforeRequest(map[string]interface{})
 	OnAfterRequest(map[string]interface{})
 	OnShutdown()
-	OnLoad(sqlbuilder.Database)
 }
 
 type Routing struct {

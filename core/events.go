@@ -25,9 +25,12 @@ func OnFailure(s *Service, f FailureData) {
 	for _, p := range CoreApp.AllPlugins {
 		p.OnFailure(structs.Map(s))
 	}
-
-	onFailureEmail(s, f)
-	onFailureSlack(s, f)
+	if notifications.SlackComm != nil {
+		onFailureSlack(s, f)
+	}
+	if notifications.EmailComm != nil {
+		onFailureEmail(s, f)
+	}
 }
 
 func onFailureSlack(s *Service, f FailureData) {

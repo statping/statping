@@ -11,7 +11,7 @@ type index struct {
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	if core.CoreApp.Services == nil {
+	if core.CoreApp == nil {
 		http.Redirect(w, r, "/setup", http.StatusSeeOther)
 		return
 	}

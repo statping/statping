@@ -32,7 +32,7 @@ type Service struct {
 	OrderId        int64      `json:"order_id"`
 	Failures       []*Failure `json:"failures"`
 	Checkins       []*Checkin `json:"checkins"`
-	runRoutine     bool
+	stopRoutine    chan struct{}
 	LastResponse   string
 	LastStatusCode int
 	LastOnline     time.Time
@@ -212,6 +212,11 @@ func (u *Service) Delete() error {
 		utils.Log(3, fmt.Sprintf("Failed to delete service %v. %v", u.Name, err))
 		return err
 	}
+	utils.Log(1, fmt.Sprintf("Stopping %v Monitoring...", u.Name))
+	if u.stopRoutine != nil {
+		close(u.stopRoutine)
+	}
+	utils.Log(1, fmt.Sprintf("Stopped %v Monitoring Service", u.Name))
 	u.RemoveArray()
 	OnDeletedService(u)
 	return err
@@ -237,8 +242,9 @@ func (u *Service) Create() (int64, error) {
 		return 0, err
 	}
 	u.Id = uuid.(int64)
+	u.stopRoutine = make(chan struct{})
 	CoreApp.Services = append(CoreApp.Services, u)
-	//go u.CheckQueue()
+	go u.CheckQueue()
 	OnNewService(u)
 	return uuid.(int64), err
 }

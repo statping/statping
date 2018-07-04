@@ -41,6 +41,14 @@
 
 
     <div class="col-12 full-col-12">
+{{ if not .Services }}
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">No Services to Monitor!</h4>
+        <p>Your Statup Status Page is working correctly, but you don't have any services to monitor. Go to the <b>Dashboard</b> and add a website to begin really using your status page!</p>
+        <hr>
+        <p class="mb-0">If this is a bug, please make an issue in the Statup Github Repo. <a href="https://github.com/hunterlong/statup" class="btn btn-sm btn-outline-danger float-right">Statup Github Repo</a></p>
+    </div>
+{{end}}
         {{ range .Services }}
             <div class="mt-4" id="service_id_{{.Id}}">
                 <div class="card">

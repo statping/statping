@@ -3,8 +3,12 @@ package main
 import (
 	"fmt"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/plugin"
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
+	"strings"
+	"time"
+	"upper.io/db.v3/sqlite"
 )
 
 func CatchCLI(args []string) {
@@ -18,6 +22,12 @@ func CatchCLI(args []string) {
 		core.CompileSASS()
 	case "api":
 		HelpEcho()
+	case "test":
+		cmd := args[2]
+		switch cmd {
+		case "plugins":
+			LoadPlugins(true)
+		}
 	case "export":
 		var err error
 		fmt.Printf("Statup v%v Exporting Static 'index.html' page...\n", VERSION)
@@ -86,6 +96,7 @@ func HelpEcho() {
 	fmt.Println("     statup                    - Main command to run Statup server")
 	fmt.Println("     statup version            - Returns the current version of Statup")
 	fmt.Println("     statup run                - Check all service 1 time and then quit")
+	fmt.Println("     statup test plugins       - Test all plugins for required information")
 	fmt.Println("     statup assets             - Export all assets used locally to be edited.")
 	fmt.Println("     statup env                - Show all environment variables being used for Statup")
 	fmt.Println("     statup export             - Exports the index page as a static HTML for pushing")
@@ -94,4 +105,81 @@ func HelpEcho() {
 	fmt.Println("     statup update             - Attempts to update to the latest version")
 	fmt.Println("     statup help               - Shows the user basic information about Statup")
 	fmt.Println("Give Statup a Star at https://github.com/hunterlong/statup")
+}
+
+func TestPlugin(plug plugin.PluginActions) {
+	RenderBoxes()
+	defer utils.DeleteFile("./.plugin_test.db")
+	core.CoreApp.AllPlugins = []plugin.PluginActions{plug}
+	info := plug.GetInfo()
+	utils.Log(1, "=======================================================================")
+	utils.Log(1, fmt.Sprintf("    Plugin Name:          %v", info.Name))
+	utils.Log(1, fmt.Sprintf("    Plugin Description:   %v", info.Description))
+	utils.Log(1, fmt.Sprintf("    Plugin Routes:        %v", len(plug.Routes())))
+	for k, r := range plug.Routes() {
+		utils.Log(1, fmt.Sprintf("      - Route %v      - (%v) /%v", k+1, r.Method, r.URL))
+	}
+
+	fakeSrv := &core.Service{
+		Id:     56,
+		Name:   "Test Plugin Service",
+		Domain: "https://google.com",
+	}
+
+	fakeFailD := core.FailureData{
+		Issue: "No issue, just testing this plugin.",
+	}
+
+	fakeCore := &core.Core{
+		Name:        "Plugin Test",
+		Description: "This is a fake Core for testing your plugin",
+		ApiSecret:   "0x0x0x0x0",
+		ApiKey:      "abcdefg12345",
+		Services:    []*core.Service{fakeSrv},
+	}
+
+	fakeUser := &core.User{
+		Id:        6334,
+		Username:  "Bulbasaur",
+		Password:  "$2a$14$NzT/fLdE3f9iB1Eux2C84O6ZoPhI4NfY0Ke32qllCFo8pMTkUPZzy",
+		Email:     "info@testdomain.com",
+		Admin:     true,
+		CreatedAt: time.Now(),
+	}
+
+	utils.Log(1, fmt.Sprintf("Creating a SQLite database for testing, will be deleted automatically..."))
+	sqlFake := sqlite.ConnectionURL{
+		Database: "./.plugin_test.db",
+	}
+	fakeDb, err := sqlite.Open(sqlFake)
+	if err != nil {
+		utils.Log(3, err)
+	}
+	up, _ := core.SqlBox.String("sqlite_up.sql")
+	requests := strings.Split(up, ";")
+	for _, request := range requests {
+		_, err := fakeDb.Exec(request)
+		if err != nil {
+			utils.Log(2, err)
+		}
+	}
+	utils.Log(1, fmt.Sprintf("Finished creating Test SQLite database, sending events."))
+
+	utils.Log(1, "======> Sending 'OnLoad(sqlbuilder.Database)'")
+	core.OnLoad(fakeDb)
+	utils.Log(1, "======> Sending 'OnSuccess(Service)'")
+	core.OnSuccess(fakeSrv)
+	utils.Log(1, "======> Sending 'OnFailure(Service, FailureData)'")
+	core.OnFailure(fakeSrv, fakeFailD)
+	utils.Log(1, "======> Sending 'OnSettingsSaved(Core)'")
+	core.OnSettingsSaved(fakeCore)
+	utils.Log(1, "======> Sending 'OnNewService(Service)'")
+	core.OnNewService(fakeSrv)
+	utils.Log(1, "======> Sending 'OnNewUser(User)'")
+	core.OnNewUser(fakeUser)
+	utils.Log(1, "======> Sending 'OnUpdateService(Service)'")
+	core.OnUpdateService(fakeSrv)
+	utils.Log(1, "======> Sending 'OnDeletedService(Service)'")
+	core.OnDeletedService(fakeSrv)
+
 }
