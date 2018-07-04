@@ -13,7 +13,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"time"
 )
 
 var (
@@ -28,6 +27,7 @@ func RunInit(t *testing.T) {
 	os.Remove("./index.html")
 	route = handlers.Router()
 	LoadDotEnvs()
+	core.CoreApp = core.NewCore()
 }
 
 var forceSequential chan bool = make(chan bool, 1)
@@ -48,6 +48,9 @@ func TestRunAll(t *testing.T) {
 		})
 		t.Run(dbt+" Sample Data", func(t *testing.T) {
 			RunInsertMysqlSample(t)
+		})
+		t.Run(dbt+" Load Configs", func(t *testing.T) {
+			RunLoadConfig(t)
 		})
 		t.Run(dbt+" Select Core", func(t *testing.T) {
 			RunSelectCoreMYQL(t, dbt)
@@ -213,11 +216,20 @@ func RunInsertMysqlSample(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func RunLoadConfig(t *testing.T) {
+	var err error
+	core.Configs, err = core.LoadConfig()
+	assert.Nil(t, err)
+	assert.NotNil(t, core.Configs)
+}
+
 func RunSelectCoreMYQL(t *testing.T, db string) {
 	var err error
 	core.CoreApp, err = core.SelectCore()
 	assert.Nil(t, err)
+	t.Log(core.CoreApp)
 	assert.Equal(t, "Testing "+db, core.CoreApp.Name)
+	assert.Equal(t, db, core.CoreApp.DbConnection)
 	assert.NotEmpty(t, core.CoreApp.ApiKey)
 	assert.NotEmpty(t, core.CoreApp.ApiSecret)
 	assert.Equal(t, VERSION, core.CoreApp.Version)
@@ -363,7 +375,6 @@ func RunCreateService_Hits(t *testing.T) {
 			service := s.Check()
 			assert.NotNil(t, service)
 		}
-		time.Sleep(1 * time.Second)
 	}
 }
 

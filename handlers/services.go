@@ -11,8 +11,8 @@ import (
 
 func RenderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
 	services := core.CoreApp.Services
-	//w.Header().Set("Content-Type", "text/javascript")
-	//w.Header().Set("Cache-Control", "no-cache, private, max-age=0")
+	w.Header().Set("Content-Type", "text/javascript")
+	w.Header().Set("Cache-Control", "max-age=60")
 	ExecuteJSResponse(w, r, "charts.js", services)
 }
 
@@ -29,7 +29,6 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	fmt.Println("service adding")
 	r.ParseForm()
 	name := r.PostForm.Get("name")
 	domain := r.PostForm.Get("domain")

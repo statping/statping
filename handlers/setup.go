@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -106,7 +107,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	admin := &core.User{
 		Username: config.Username,
 		Password: config.Password,
-		Email:    email,
+		Email:    config.Email,
 		Admin:    true,
 	}
 	admin.Create()
@@ -116,6 +117,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	core.InitApp()
+	Store = sessions.NewCookieStore([]byte(core.CoreApp.ApiSecret))
 	time.Sleep(2 * time.Second)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

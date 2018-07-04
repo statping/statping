@@ -16,7 +16,6 @@ import (
 )
 
 var (
-	dbServer         string
 	sqliteSettings   sqlite.ConnectionURL
 	postgresSettings postgresql.ConnectionURL
 	mysqlSettings    mysql.ConnectionURL
@@ -68,7 +67,6 @@ func DbConnection(dbType string) error {
 		}
 	}
 	//dbSession.SetLogging(true)
-	dbServer = dbType
 	return err
 }
 
@@ -130,20 +128,87 @@ func (c *DbConfig) Save() error {
 	if err == nil {
 		CoreApp = newCore
 	}
+
+	CoreApp, err = SelectCore()
+	CoreApp.DbConnection = c.DbConn
+
 	return err
 }
 
-func RunDatabaseUpgrades() {
-	utils.Log(1, "Running Database Upgrade from 'upgrade.sql'...")
-	upgrade, _ := SqlBox.String("upgrade.sql")
-	requests := strings.Split(upgrade, ";")
-	for _, request := range requests {
-		_, err := DbSession.Exec(db.Raw(request + ";"))
-		if err != nil {
-			utils.Log(2, err)
+func versionSplit(v string) (int64, int64, int64) {
+	currSplit := strings.Split(v, ".")
+	if len(currSplit) < 2 {
+		return 9999, 9999, 9999
+	}
+	var major, mid, minor string
+	if len(currSplit) == 3 {
+		major = currSplit[0]
+		mid = currSplit[1]
+		minor = currSplit[2]
+		return utils.StringInt(major), utils.StringInt(mid), utils.StringInt(minor)
+	}
+	major = currSplit[0]
+	mid = currSplit[1]
+	return utils.StringInt(major), utils.StringInt(mid), 0
+}
+
+func versionHigher(migrate string) bool {
+	cM, cMi, cMn := versionSplit(CoreApp.Version)
+	mM, mMi, mMn := versionSplit(migrate)
+	if mM > cM {
+		return true
+	}
+	if mMi > cMi {
+		return true
+	}
+	if mMn > cMn {
+		return true
+	}
+	return false
+}
+
+func RunDatabaseUpgrades() error {
+	var err error
+	utils.Log(1, fmt.Sprintf("Checking Database Upgrades from v%v in '%v_upgrade.sql'...", CoreApp.Version, CoreApp.DbConnection))
+	upgrade, _ := SqlBox.String(CoreApp.DbConnection + "_upgrade.sql")
+	// parse db version and upgrade file
+	ups := strings.Split(upgrade, "=========================================== ")
+	var ran int
+	for _, v := range ups {
+		if len(v) == 0 {
+			continue
+		}
+		vers := strings.Split(v, "\n")
+		version := vers[0]
+		data := vers[1:]
+		//fmt.Printf("Checking Migration from v%v to v%v - %v\n", CoreApp.Version, version, versionHigher(version))
+		if !versionHigher(version) {
+			//fmt.Printf("Already up-to-date with v%v\n", version)
+			continue
+		}
+		fmt.Printf("Migration Database from v%v to v%v\n", CoreApp.Version, version)
+		for _, m := range data {
+			if m == "" {
+				continue
+			}
+			fmt.Printf("Running Migration: %v\n", m)
+			_, err := DbSession.Exec(db.Raw(m + ";"))
+			if err != nil {
+				utils.Log(2, err)
+				continue
+			}
+			ran++
+			CoreApp.Version = m
 		}
 	}
-	utils.Log(1, "Database Upgraded")
+	CoreApp.Update()
+	CoreApp, err = SelectCore()
+	if ran > 0 {
+		utils.Log(1, fmt.Sprintf("Database Upgraded, %v query ran", ran))
+	} else {
+		utils.Log(1, fmt.Sprintf("Database is already up-to-date, latest v%v", CoreApp.Version))
+	}
+	return err
 }
 
 func DropDatabase() {
@@ -161,9 +226,9 @@ func DropDatabase() {
 func CreateDatabase() {
 	fmt.Println("Creating Tables...")
 	sql := "postgres_up.sql"
-	if dbServer == "mysql" {
+	if CoreApp.DbConnection == "mysql" {
 		sql = "mysql_up.sql"
-	} else if dbServer == "sqlite" {
+	} else if CoreApp.DbConnection == "sqlite" {
 		sql = "sqlite_up.sql"
 	}
 	up, _ := SqlBox.String(sql)

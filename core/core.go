@@ -4,6 +4,7 @@ import (
 	"github.com/GeertJohan/go.rice"
 	"github.com/hunterlong/statup/plugin"
 	"github.com/hunterlong/statup/types"
+	"time"
 )
 
 type PluginJSON types.PluginJSON
@@ -25,6 +26,8 @@ type Core struct {
 	AllPlugins     []plugin.PluginActions
 	Communications []*types.Communication
 	OfflineAssets  bool
+	DbConnection   string
+	started        time.Time
 }
 
 var (
@@ -41,7 +44,13 @@ var (
 )
 
 func init() {
+	CoreApp = NewCore()
+}
+
+func NewCore() *Core {
 	CoreApp = new(Core)
+	CoreApp.started = time.Now()
+	return CoreApp
 }
 
 func InitApp() {
@@ -56,9 +65,10 @@ func InitApp() {
 
 func (c *Core) Update() (*Core, error) {
 	res := DbSession.Collection("core").Find().Limit(1)
-	res.Update(c)
+	err := res.Update(c)
 	CoreApp = c
-	return c, nil
+	CoreApp.Services, err = SelectAllServices()
+	return c, err
 }
 
 func (c Core) UsingAssets() bool {
@@ -102,6 +112,10 @@ func SelectCore() (*Core, error) {
 		return nil, err
 	}
 	CoreApp = c
+	CoreApp.DbConnection = Configs.Connection
+	CoreApp.Version = VERSION
+	CoreApp.Services, _ = SelectAllServices()
+	CoreApp.Update()
 	//store = sessions.NewCookieStore([]byte(core.ApiSecret))
 	return CoreApp, err
 }

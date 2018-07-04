@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
@@ -22,14 +23,14 @@ var (
 func RunHTTPServer() {
 	utils.Log(1, "Statup HTTP Server running on http://localhost:8080")
 	r := Router()
-	//for _, p := range allPlugins {
-	//	info := p.GetInfo()
-	//	for _, route := range p.Routes() {
-	//		path := fmt.Sprintf("/plugins/%v/%v", info.Name, route.URL)
-	//		r.Handle(path, http.HandlerFunc(route.Handler)).Methods(route.Method)
-	//		fmt.Printf("Added Route %v for plugin %v\n", path, info.Name)
-	//	}
-	//}
+	for _, p := range core.CoreApp.AllPlugins {
+		info := p.GetInfo()
+		for _, route := range p.Routes() {
+			path := fmt.Sprintf("/plugins/%v/%v", info.Name, route.URL)
+			r.Handle(path, http.HandlerFunc(route.Handler)).Methods(route.Method)
+			fmt.Printf("Added Route %v for plugin %v\n", path, info.Name)
+		}
+	}
 	srv := &http.Server{
 		Addr:         "0.0.0.0:8080",
 		WriteTimeout: time.Second * 15,

@@ -1,7 +1,7 @@
 [{
-  "name": "slack",
-  "description": "slack bot that send a message in a channel when server is down.",
-  "repo": "https://github.com/hunterlong/statup_slack",
+  "name": "Example Plugin",
+  "description": "An example of a plugin for Statup",
+  "repo": "https://github.com/hunterlong/statup_plugin",
   "author": "Hunter Long",
-  "namespace": "slack"
+  "namespace": "example"
 }]

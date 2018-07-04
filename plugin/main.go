@@ -1,7 +1,6 @@
 package plugin
 
 import (
-	"fmt"
 	"net/http"
 	"upper.io/db.v3/lib/sqlbuilder"
 )
@@ -24,10 +23,6 @@ var (
 
 func SetDatabase(database sqlbuilder.Database) {
 	DB = database
-}
-
-func Throw(err error) {
-	fmt.Println(err)
 }
 
 type PluginInfo struct {

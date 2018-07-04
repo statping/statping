@@ -1,19 +1,19 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/core"
-	"github.com/tdewolff/minify"
 	"net/http"
+	"time"
 )
 
 func Router() *mux.Router {
 	r := mux.NewRouter()
 	r.Handle("/", http.HandlerFunc(IndexHandler))
 	LocalizedAssets(r)
-	m := minify.New()
-	r.Handle("/charts.js", m.Middleware(http.HandlerFunc(RenderServiceChartsHandler)))
+	r.Handle("/charts.js", http.HandlerFunc(RenderServiceChartsHandler))
 	r.Handle("/setup", http.HandlerFunc(SetupHandler)).Methods("GET")
 	r.Handle("/setup", http.HandlerFunc(ProcessSetupHandler)).Methods("POST")
 	r.Handle("/dashboard", http.HandlerFunc(DashboardHandler)).Methods("GET")
@@ -49,7 +49,12 @@ func Router() *mux.Router {
 	r.Handle("/api/users/{id}", http.HandlerFunc(ApiUserHandler))
 	r.Handle("/metrics", http.HandlerFunc(PrometheusHandler))
 	r.NotFoundHandler = http.HandlerFunc(Error404Handler)
-	Store = sessions.NewCookieStore([]byte("secretinfo"))
+	if core.CoreApp != nil {
+		cookie := fmt.Sprintf("%v_%v", core.CoreApp.ApiSecret, time.Now().Nanosecond())
+		Store = sessions.NewCookieStore([]byte(cookie))
+	} else {
+		Store = sessions.NewCookieStore([]byte("secretinfo"))
+	}
 	return r
 }
 

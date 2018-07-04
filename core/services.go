@@ -124,17 +124,27 @@ func (s *Service) SmallText() string {
 	return fmt.Sprintf("No Failures in the last 24 hours! %v", hits[0])
 }
 
+func GroupDataBy(column string, id int64, tm time.Time, increment string) string {
+	var sql string
+	fmt.Println("gropu by", column, CoreApp.DbConnection)
+	switch CoreApp.DbConnection {
+	case "mysql":
+		sql = fmt.Sprintf("SELECT CONCAT(date_format(created_at, '%%Y-%%m-%%dT%%H:%%i:00Z')) AS created_at, AVG(latency)*1000 AS value FROM %v WHERE service=%v AND DATE_FORMAT(created_at, '%%Y-%%m-%%dT%%TZ') BETWEEN DATE_FORMAT('%v', '%%Y-%%m-%%dT%%TZ') AND DATE_FORMAT(NOW(), '%%Y-%%m-%%dT%%TZ') GROUP BY 1 ORDER BY created_at ASC;", column, id, tm.Format(time.RFC3339))
+	case "sqlite":
+		sql = fmt.Sprintf("SELECT strftime('%%Y-%%m-%%dT%%H:%%M:00Z', created_at), AVG(latency)*1000 as value FROM %v WHERE service=%v AND created_at >= '%v' GROUP BY strftime('%%M:00', created_at) ORDER BY created_at ASC;", column, id, tm.Format(time.RFC3339))
+	case "postgres":
+		sql = fmt.Sprintf("SELECT date_trunc('%v', created_at), AVG(latency)*1000 AS value FROM %v WHERE service=%v AND created_at >= '%v' GROUP BY 1 ORDER BY date_trunc ASC;", increment, column, id, tm.Format(time.RFC3339))
+	}
+	fmt.Println(sql)
+	return sql
+}
+
 func (s *Service) GraphData() string {
 	var d []*DateScan
-	increment := "minute"
 	since := time.Now().Add(time.Hour*-24 + time.Minute*0 + time.Second*0)
-	// group by interval sql query for postgres, mysql and sqlite
-	sql := fmt.Sprintf("SELECT date_trunc('%v', created_at), AVG(latency)*1000 AS value FROM hits WHERE service=%v AND created_at > '%v' GROUP BY 1 ORDER BY date_trunc ASC;", increment, s.Id, since.Format(time.RFC3339))
-	if dbServer == "mysql" {
-		sql = fmt.Sprintf("SELECT CONCAT(date_format(created_at, '%%Y-%%m-%%dT%%TZ')) AS created_at, AVG(latency)*1000 AS value FROM hits WHERE service=%v AND DATE_FORMAT(created_at, '%%Y-%%m-%%dT%%TZ') BETWEEN DATE_FORMAT(NOW() - INTERVAL 12 HOUR, '%%Y-%%m-%%dT%%TZ') AND DATE_FORMAT(NOW(), '%%Y-%%m-%%dT%%TZ') GROUP BY created_at ORDER BY created_at ASC;", s.Id)
-	} else if dbServer == "sqlite" {
-		sql = fmt.Sprintf("SELECT strftime('%%Y-%%m-%%dT%%H:%%M:%%SZ', created_at), AVG(latency)*1000 as value FROM hits WHERE service=%v AND created_at >= '%v' GROUP BY strftime('%%M', created_at) ORDER BY created_at ASC;", s.Id, since.Format(time.RFC3339))
-	}
+
+	sql := GroupDataBy("hits", s.Id, since, "minute")
+
 	dated, err := DbSession.Query(db.Raw(sql))
 	if err != nil {
 		utils.Log(2, err)
