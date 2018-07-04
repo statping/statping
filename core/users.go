@@ -43,7 +43,6 @@ func (u *User) Create() (int64, error) {
 		utils.Log(3, fmt.Sprintf("Failed to create user %v. %v", u.Username, err))
 		return 0, err
 	}
-	OnNewUser(u)
 	return uuid.(int64), err
 }
 

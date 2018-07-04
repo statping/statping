@@ -54,6 +54,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.Log(2, err)
 	}
+	core.OnNewUser(user)
 	http.Redirect(w, r, "/users", http.StatusSeeOther)
 }
 

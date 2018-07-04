@@ -55,7 +55,10 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error starting %v check routine. %v", service.Name, err))
 	}
+
 	go service.CheckQueue()
+	core.OnNewService(service)
+
 	http.Redirect(w, r, "/services", http.StatusSeeOther)
 }
 
