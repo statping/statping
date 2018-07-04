@@ -131,9 +131,9 @@ func (s *Service) GraphData() string {
 	// group by interval sql query for postgres, mysql and sqlite
 	sql := fmt.Sprintf("SELECT date_trunc('%v', created_at), AVG(latency)*1000 AS value FROM hits WHERE service=%v AND created_at > '%v' GROUP BY 1 ORDER BY date_trunc ASC;", increment, s.Id, since.Format(time.RFC3339))
 	if dbServer == "mysql" {
-		sql = fmt.Sprintf("SELECT CONCAT(date_format(created_at, '%%Y-%%m-%%dT%%TZ')) AS created_at, AVG(latency)*1000 AS value FROM hits WHERE service=%v AND DATE_FORMAT(created_at, '%%Y-%%m-%%dT%%TZ') BETWEEN DATE_FORMAT(NOW() - INTERVAL 12 HOUR, '%%Y-%%m-%%dT%%TZ') AND DATE_FORMAT(NOW(), '%%Y-%%m-%%dT%%TZ') GROUP BY created_at", s.Id)
+		sql = fmt.Sprintf("SELECT CONCAT(date_format(created_at, '%%Y-%%m-%%dT%%TZ')) AS created_at, AVG(latency)*1000 AS value FROM hits WHERE service=%v AND DATE_FORMAT(created_at, '%%Y-%%m-%%dT%%TZ') BETWEEN DATE_FORMAT(NOW() - INTERVAL 12 HOUR, '%%Y-%%m-%%dT%%TZ') AND DATE_FORMAT(NOW(), '%%Y-%%m-%%dT%%TZ') GROUP BY created_at ORDER BY created_at ASC;", s.Id)
 	} else if dbServer == "sqlite" {
-		sql = fmt.Sprintf("SELECT strftime('%%Y-%%m-%%dT%%H:%%M:%%SZ', created_at), AVG(latency)*1000 as value FROM hits WHERE service=%v AND created_at >= '%v' GROUP BY strftime('%%M', created_at)", s.Id, since.Format(time.RFC3339))
+		sql = fmt.Sprintf("SELECT strftime('%%Y-%%m-%%dT%%H:%%M:%%SZ', created_at), AVG(latency)*1000 as value FROM hits WHERE service=%v AND created_at >= '%v' GROUP BY strftime('%%M', created_at) ORDER BY created_at ASC;", s.Id, since.Format(time.RFC3339))
 	}
 	dated, err := DbSession.Query(db.Raw(sql))
 	if err != nil {

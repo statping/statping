@@ -9,6 +9,13 @@ import (
 	"strconv"
 )
 
+func RenderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
+	services := core.CoreApp.Services
+	//w.Header().Set("Content-Type", "text/javascript")
+	//w.Header().Set("Cache-Control", "no-cache, private, max-age=0")
+	ExecuteJSResponse(w, r, "charts.js", services)
+}
+
 func ServicesHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)

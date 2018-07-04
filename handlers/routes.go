@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/core"
+	"github.com/tdewolff/minify"
 	"net/http"
 )
 
@@ -11,6 +12,8 @@ func Router() *mux.Router {
 	r := mux.NewRouter()
 	r.Handle("/", http.HandlerFunc(IndexHandler))
 	LocalizedAssets(r)
+	m := minify.New()
+	r.Handle("/charts.js", m.Middleware(http.HandlerFunc(RenderServiceChartsHandler)))
 	r.Handle("/setup", http.HandlerFunc(SetupHandler)).Methods("GET")
 	r.Handle("/setup", http.HandlerFunc(ProcessSetupHandler)).Methods("POST")
 	r.Handle("/dashboard", http.HandlerFunc(DashboardHandler)).Methods("GET")

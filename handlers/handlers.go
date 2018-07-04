@@ -98,4 +98,19 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 	t.Execute(w, data)
 }
 
+func ExecuteJSResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}) {
+	render, err := core.JsBox.String(file)
+	if err != nil {
+		utils.Log(4, err)
+	}
+	t := template.New("charts")
+	t.Funcs(template.FuncMap{
+		"safe": func(html string) template.HTML {
+			return template.HTML(html)
+		},
+	})
+	t.Parse(render)
+	t.Execute(w, data)
+}
+
 type DbConfig types.DbConfig
