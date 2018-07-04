@@ -135,7 +135,6 @@ func GroupDataBy(column string, id int64, tm time.Time, increment string) string
 	case "postgres":
 		sql = fmt.Sprintf("SELECT date_trunc('%v', created_at), AVG(latency)*1000 AS value FROM %v WHERE service=%v AND created_at >= '%v' GROUP BY 1 ORDER BY date_trunc ASC;", increment, column, id, tm.Format(time.RFC3339))
 	}
-	fmt.Println(sql)
 	return sql
 }
 
