@@ -126,7 +126,6 @@ func (s *Service) SmallText() string {
 
 func GroupDataBy(column string, id int64, tm time.Time, increment string) string {
 	var sql string
-	fmt.Println("gropu by", column, CoreApp.DbConnection)
 	switch CoreApp.DbConnection {
 	case "mysql":
 		sql = fmt.Sprintf("SELECT CONCAT(date_format(created_at, '%%Y-%%m-%%dT%%H:%%i:00Z')) AS created_at, AVG(latency)*1000 AS value FROM %v WHERE service=%v AND DATE_FORMAT(created_at, '%%Y-%%m-%%dT%%TZ') BETWEEN DATE_FORMAT('%v', '%%Y-%%m-%%dT%%TZ') AND DATE_FORMAT(NOW(), '%%Y-%%m-%%dT%%TZ') GROUP BY 1 ORDER BY created_at ASC;", column, id, tm.Format(time.RFC3339))

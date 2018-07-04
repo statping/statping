@@ -201,10 +201,10 @@ func RunDatabaseUpgrades() error {
 			CoreApp.Version = m
 		}
 	}
-	CoreApp.Update()
-	CoreApp, err = SelectCore()
 	if ran > 0 {
 		utils.Log(1, fmt.Sprintf("Database Upgraded, %v query ran", ran))
+		CoreApp.Update()
+		CoreApp, err = SelectCore()
 	} else {
 		utils.Log(1, fmt.Sprintf("Database is already up-to-date, latest v%v", CoreApp.Version))
 	}
