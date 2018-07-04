@@ -11,6 +11,11 @@ import (
 	"upper.io/db.v3/sqlite"
 )
 
+const (
+	BRAKER = "=============================================================================="
+	POINT  = "                     "
+)
+
 func CatchCLI(args []string) {
 	switch args[1] {
 	case "version":
@@ -95,13 +100,11 @@ func HelpEcho() {
 	fmt.Printf("Commands:\n")
 	fmt.Println("     statup                    - Main command to run Statup server")
 	fmt.Println("     statup version            - Returns the current version of Statup")
-	fmt.Println("     statup run                - Check all service 1 time and then quit")
+	fmt.Println("     statup run                - Check all services 1 time and then quit")
 	fmt.Println("     statup test plugins       - Test all plugins for required information")
-	fmt.Println("     statup assets             - Export all assets used locally to be edited.")
+	fmt.Println("     statup assets             - Dump all assets used locally to be edited.")
 	fmt.Println("     statup env                - Show all environment variables being used for Statup")
 	fmt.Println("     statup export             - Exports the index page as a static HTML for pushing")
-	fmt.Println("                                 to Github Pages or your own FTP server. Export will")
-	fmt.Println("                                 create 'index.html' in the current directory.")
 	fmt.Println("     statup update             - Attempts to update to the latest version")
 	fmt.Println("     statup help               - Shows the user basic information about Statup")
 	fmt.Println("Give Statup a Star at https://github.com/hunterlong/statup")
@@ -112,13 +115,15 @@ func TestPlugin(plug plugin.PluginActions) {
 	defer utils.DeleteFile("./.plugin_test.db")
 	core.CoreApp.AllPlugins = []plugin.PluginActions{plug}
 	info := plug.GetInfo()
-	utils.Log(1, "=======================================================================")
-	utils.Log(1, fmt.Sprintf("    Plugin Name:          %v", info.Name))
-	utils.Log(1, fmt.Sprintf("    Plugin Description:   %v", info.Description))
-	utils.Log(1, fmt.Sprintf("    Plugin Routes:        %v", len(plug.Routes())))
+	fmt.Printf("\n" + BRAKER + "\n")
+	fmt.Printf("    Plugin Name:          %v\n", info.Name)
+	fmt.Printf("    Plugin Description:   %v\n", info.Description)
+	fmt.Printf("    Plugin Routes:        %v\n", len(plug.Routes()))
 	for k, r := range plug.Routes() {
-		utils.Log(1, fmt.Sprintf("      - Route %v      - (%v) /%v", k+1, r.Method, r.URL))
+		fmt.Printf("      - Route %v      - (%v) /%v \n", k+1, r.Method, r.URL)
 	}
+
+	fmt.Printf("\n" + BRAKER)
 
 	fakeSrv := &core.Service{
 		Id:     56,
@@ -147,7 +152,7 @@ func TestPlugin(plug plugin.PluginActions) {
 		CreatedAt: time.Now(),
 	}
 
-	utils.Log(1, fmt.Sprintf("Creating a SQLite database for testing, will be deleted automatically..."))
+	fmt.Println("\nCreating a SQLite database for testing, will be deleted automatically...")
 	sqlFake := sqlite.ConnectionURL{
 		Database: "./.plugin_test.db",
 	}
@@ -163,23 +168,37 @@ func TestPlugin(plug plugin.PluginActions) {
 			utils.Log(2, err)
 		}
 	}
-	utils.Log(1, fmt.Sprintf("Finished creating Test SQLite database, sending events."))
+	fmt.Println("Finished creating Test SQLite database, sending events.")
 
-	utils.Log(1, "======> Sending 'OnLoad(sqlbuilder.Database)'")
+	fmt.Println("\n" + BRAKER)
+	fmt.Println(POINT + "Sending 'OnLoad(sqlbuilder.Database)'")
 	core.OnLoad(fakeDb)
-	utils.Log(1, "======> Sending 'OnSuccess(Service)'")
+	fmt.Println("\n" + BRAKER)
+	fmt.Println(POINT + "Sending 'OnSuccess(Service)'")
 	core.OnSuccess(fakeSrv)
-	utils.Log(1, "======> Sending 'OnFailure(Service, FailureData)'")
+	fmt.Println("\n" + BRAKER)
+	fmt.Println(POINT + "Sending 'OnFailure(Service, FailureData)'")
 	core.OnFailure(fakeSrv, fakeFailD)
-	utils.Log(1, "======> Sending 'OnSettingsSaved(Core)'")
+	fmt.Println("\n" + BRAKER)
+	fmt.Println(POINT + "Sending 'OnSettingsSaved(Core)'")
+	fmt.Println(BRAKER)
 	core.OnSettingsSaved(fakeCore)
-	utils.Log(1, "======> Sending 'OnNewService(Service)'")
+	fmt.Println("\n" + BRAKER)
+	fmt.Println(POINT + "Sending 'OnNewService(Service)'")
 	core.OnNewService(fakeSrv)
-	utils.Log(1, "======> Sending 'OnNewUser(User)'")
+	fmt.Println("\n" + BRAKER)
+	fmt.Println(POINT + "Sending 'OnNewUser(User)'")
 	core.OnNewUser(fakeUser)
-	utils.Log(1, "======> Sending 'OnUpdateService(Service)'")
+	fmt.Println("\n" + BRAKER)
+	fmt.Println(POINT + "Sending 'OnUpdateService(Service)'")
 	core.OnUpdateService(fakeSrv)
-	utils.Log(1, "======> Sending 'OnDeletedService(Service)'")
+	fmt.Println("\n" + BRAKER)
+	fmt.Println(POINT + "Sending 'OnDeletedService(Service)'")
 	core.OnDeletedService(fakeSrv)
+	fmt.Println("\n" + BRAKER)
+
+}
+
+func FakeSeed() {
 
 }
