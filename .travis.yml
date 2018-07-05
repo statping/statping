@@ -37,7 +37,6 @@ before_deploy:
 deploy:
   - provider: releases
     api_key: $GH_TOKEN
-    if: branch = master
     file:
       - "build/statup-osx-x64.tar.gz"
       - "build/statup-osx-x32.tar.gz"
