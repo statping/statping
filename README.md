@@ -34,7 +34,8 @@ Statup will allow you to completely customize your Status Page using SASS stylin
 Your status page will be optimized for mobile and desktop viewers. Statup has a full width edge to edge view, which you can also edit to meet your requirements.
 
 <p align="center">
-<img width="40%" src="https://s3-us-west-2.amazonaws.com/gitimgs/mobileview.gif">
+<img width="30%" src="https://s3-us-west-2.amazonaws.com/gitimgs/mobileview.gif">
+<img width="30%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupmobile2.gif">
 </p>
 
 ## Run on Any Server
