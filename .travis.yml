@@ -18,7 +18,7 @@ services:
 
 env:
   global:
-     - VERSION=0.29.4
+     - VERSION=0.29.5
      - DB_HOST=localhost
      - DB_USER=travis
      - DB_PASS=
@@ -37,6 +37,7 @@ before_deploy:
 deploy:
   - provider: releases
     api_key: $GH_TOKEN
+    if: branch = master
     file:
       - "build/statup-osx-x64.tar.gz"
       - "build/statup-osx-x32.tar.gz"

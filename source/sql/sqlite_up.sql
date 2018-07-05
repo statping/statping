@@ -18,7 +18,8 @@ CREATE TABLE users (
     api_key text,
     api_secret text,
     administrator bool,
-    created_at DATETIME
+    created_at DATETIME,
+    UNIQUE (username, email)
 );
 
 CREATE TABLE services (

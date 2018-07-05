@@ -12,9 +12,9 @@ CREATE TABLE core (
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    username text,
+    username VARCHAR (50) UNIQUE,
     password text,
-    email text,
+    email VARCHAR (50) UNIQUE,
     api_key text,
     api_secret text,
     administrator bool,

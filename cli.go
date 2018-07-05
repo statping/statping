@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/plugin"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
+	"math/rand"
 	"strings"
 	"time"
 	"upper.io/db.v3/sqlite"
@@ -111,9 +113,9 @@ func HelpEcho() {
 }
 
 func TestPlugin(plug plugin.PluginActions) {
-	RenderBoxes()
 	defer utils.DeleteFile("./.plugin_test.db")
-	core.CoreApp.AllPlugins = []plugin.PluginActions{plug}
+	RenderBoxes()
+
 	info := plug.GetInfo()
 	fmt.Printf("\n" + BRAKER + "\n")
 	fmt.Printf("    Plugin Name:          %v\n", info.Name)
@@ -123,25 +125,91 @@ func TestPlugin(plug plugin.PluginActions) {
 		fmt.Printf("      - Route %v      - (%v) /%v \n", k+1, r.Method, r.URL)
 	}
 
+	// Function to create a new Core with example services, hits, failures, users, and default communications
+	FakeSeed(plug)
+
+	fmt.Println("\n" + BRAKER)
+	fmt.Println(POINT + "Sending 'OnLoad(sqlbuilder.Database)'")
+	core.OnLoad(core.DbSession)
+	fmt.Println("\n" + BRAKER)
+	fmt.Println(POINT + "Sending 'OnSuccess(Service)'")
+	core.OnSuccess(core.SelectService(1))
+	fmt.Println("\n" + BRAKER)
+	fmt.Println(POINT + "Sending 'OnFailure(Service, FailureData)'")
+	fakeFailD := core.FailureData{
+		Issue: "No issue, just testing this plugin. This would include HTTP failure information though",
+	}
+	core.OnFailure(core.SelectService(1), fakeFailD)
+	fmt.Println("\n" + BRAKER)
+	fmt.Println(POINT + "Sending 'OnSettingsSaved(Core)'")
+	fmt.Println(BRAKER)
+	core.OnSettingsSaved(core.CoreApp)
+	fmt.Println("\n" + BRAKER)
+	fmt.Println(POINT + "Sending 'OnNewService(Service)'")
+	core.OnNewService(core.SelectService(2))
+	fmt.Println("\n" + BRAKER)
+	fmt.Println(POINT + "Sending 'OnNewUser(User)'")
+	user, _ := core.SelectUser(1)
+	core.OnNewUser(user)
+	fmt.Println("\n" + BRAKER)
+	fmt.Println(POINT + "Sending 'OnUpdateService(Service)'")
+	srv := core.SelectService(2)
+	srv.Type = "http"
+	srv.Domain = "https://yahoo.com"
+	core.OnUpdateService(srv)
+	fmt.Println("\n" + BRAKER)
+	fmt.Println(POINT + "Sending 'OnDeletedService(Service)'")
+	core.OnDeletedService(core.SelectService(1))
+	fmt.Println("\n" + BRAKER)
+}
+
+func FakeSeed(plug plugin.PluginActions) {
+	var err error
+	core.CoreApp = core.NewCore()
+
+	core.CoreApp.AllPlugins = []plugin.PluginActions{plug}
+
 	fmt.Printf("\n" + BRAKER)
 
+	fmt.Println("\nCreating a SQLite database for testing, will be deleted automatically...")
+	sqlFake := sqlite.ConnectionURL{
+		Database: "./.plugin_test.db",
+	}
+	core.DbSession, err = sqlite.Open(sqlFake)
+	if err != nil {
+		utils.Log(3, err)
+	}
+	up, _ := core.SqlBox.String("sqlite_up.sql")
+	requests := strings.Split(up, ";")
+	for _, request := range requests {
+		_, err := core.DbSession.Exec(request)
+		if err != nil {
+			utils.Log(2, err)
+		}
+	}
+
+	fmt.Println("Finished creating Test SQLite database")
+	fmt.Println("Inserting example services into test database...")
+
+	core.CoreApp.Name = "Plugin Test"
+	core.CoreApp.Description = "This is a fake Core for testing your plugin"
+	core.CoreApp.Domain = "http://localhost:8080"
+	core.CoreApp.ApiSecret = "0x0x0x0x0"
+	core.CoreApp.ApiKey = "abcdefg12345"
+
 	fakeSrv := &core.Service{
-		Id:     56,
 		Name:   "Test Plugin Service",
 		Domain: "https://google.com",
+		Method: "GET",
 	}
+	fakeSrv.Create()
 
-	fakeFailD := core.FailureData{
-		Issue: "No issue, just testing this plugin.",
+	fakeSrv2 := &core.Service{
+		Name:   "Awesome Plugin Service",
+		Domain: "https://netflix.com",
+		Method: "GET",
 	}
-
-	fakeCore := &core.Core{
-		Name:        "Plugin Test",
-		Description: "This is a fake Core for testing your plugin",
-		ApiSecret:   "0x0x0x0x0",
-		ApiKey:      "abcdefg12345",
-		Services:    []*core.Service{fakeSrv},
-	}
+	fakeSrv2.Create()
 
 	fakeUser := &core.User{
 		Id:        6334,
@@ -151,54 +219,49 @@ func TestPlugin(plug plugin.PluginActions) {
 		Admin:     true,
 		CreatedAt: time.Now(),
 	}
+	fakeUser.Create()
 
-	fmt.Println("\nCreating a SQLite database for testing, will be deleted automatically...")
-	sqlFake := sqlite.ConnectionURL{
-		Database: "./.plugin_test.db",
+	fakeUser = &core.User{
+		Id:        6335,
+		Username:  "Billy",
+		Password:  "$2a$14$NzT/fLdE3f9iB1Eux2C84O6ZoPhI4NfY0Ke32qllCFo8pMTkUPZzy",
+		Email:     "info@awesome.com",
+		CreatedAt: time.Now(),
 	}
-	fakeDb, err := sqlite.Open(sqlFake)
-	if err != nil {
-		utils.Log(3, err)
+	fakeUser.Create()
+
+	comm := &types.Communication{
+		Id:     1,
+		Method: "email",
 	}
-	up, _ := core.SqlBox.String("sqlite_up.sql")
-	requests := strings.Split(up, ";")
-	for _, request := range requests {
-		_, err := fakeDb.Exec(request)
-		if err != nil {
-			utils.Log(2, err)
+	core.Create(comm)
+
+	comm2 := &types.Communication{
+		Id:     2,
+		Method: "slack",
+	}
+	core.Create(comm2)
+
+	for i := 0; i <= 50; i++ {
+		dd := core.HitData{
+			Latency: rand.Float64(),
 		}
+		fakeSrv.CreateHit(dd)
+		dd = core.HitData{
+			Latency: rand.Float64(),
+		}
+		fakeSrv2.CreateHit(dd)
+		fail := core.FailureData{
+			Issue: "This is not an issue, but it would container HTTP response errors.",
+		}
+		fakeSrv.CreateFailure(fail)
+
+		fail = core.FailureData{
+			Issue: "HTTP Status Code 521 did not match 200",
+		}
+		fakeSrv2.CreateFailure(fail)
 	}
-	fmt.Println("Finished creating Test SQLite database, sending events.")
 
-	fmt.Println("\n" + BRAKER)
-	fmt.Println(POINT + "Sending 'OnLoad(sqlbuilder.Database)'")
-	core.OnLoad(fakeDb)
-	fmt.Println("\n" + BRAKER)
-	fmt.Println(POINT + "Sending 'OnSuccess(Service)'")
-	core.OnSuccess(fakeSrv)
-	fmt.Println("\n" + BRAKER)
-	fmt.Println(POINT + "Sending 'OnFailure(Service, FailureData)'")
-	core.OnFailure(fakeSrv, fakeFailD)
-	fmt.Println("\n" + BRAKER)
-	fmt.Println(POINT + "Sending 'OnSettingsSaved(Core)'")
-	fmt.Println(BRAKER)
-	core.OnSettingsSaved(fakeCore)
-	fmt.Println("\n" + BRAKER)
-	fmt.Println(POINT + "Sending 'OnNewService(Service)'")
-	core.OnNewService(fakeSrv)
-	fmt.Println("\n" + BRAKER)
-	fmt.Println(POINT + "Sending 'OnNewUser(User)'")
-	core.OnNewUser(fakeUser)
-	fmt.Println("\n" + BRAKER)
-	fmt.Println(POINT + "Sending 'OnUpdateService(Service)'")
-	core.OnUpdateService(fakeSrv)
-	fmt.Println("\n" + BRAKER)
-	fmt.Println(POINT + "Sending 'OnDeletedService(Service)'")
-	core.OnDeletedService(fakeSrv)
-	fmt.Println("\n" + BRAKER)
-
-}
-
-func FakeSeed() {
+	fmt.Println("Seeding example data is complete, running Plugin Tests")
 
 }

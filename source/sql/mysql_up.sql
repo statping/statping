@@ -13,12 +13,13 @@ CREATE TABLE users (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50),
     password text,
-    email text,
+    email VARCHAR (50),
     api_key VARCHAR(50),
     api_secret VARCHAR(50),
     administrator BOOL NOT NULL DEFAULT '0',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    INDEX (id)
+    INDEX (id),
+    UNIQUE (username, email)
 );
 CREATE TABLE services (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,

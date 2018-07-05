@@ -244,8 +244,6 @@ func (u *Service) Create() (int64, error) {
 	u.Id = uuid.(int64)
 	u.stopRoutine = make(chan struct{})
 	CoreApp.Services = append(CoreApp.Services, u)
-	go u.CheckQueue()
-	OnNewService(u)
 	return uuid.(int64), err
 }
 

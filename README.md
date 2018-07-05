@@ -13,7 +13,7 @@ An easy to use Status Page for your websites and applications. Statup will autom
 Statup strives to remain future-proof and remain intact if a failure is created. Your Statup service should not be running on the same instance you're trying to monitor. If your server crashes your Status Page should still remaining online to notify your users of downtime. 
 
 <p align="center">
-<img width="80%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statuphead1.png">
+<img width="80%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsiterun.gif">
 </p>
 
 ## Lightweight and Fast
@@ -27,14 +27,15 @@ Statup is built in Go Language so all you need is the precompile binary based on
 Statup will allow you to completely customize your Status Page using SASS styling with easy to use variables. The Docker image actually contains a prebuilt SASS binary so you won't even need to setup anything!
 
 <p align="center">
-<img width="100%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupstyler.png">
+<img width="100%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupthempicker.gif">
 </p>
 
 ## Mobile View is Gorgeous
 Your status page will be optimized for mobile and desktop viewers. Statup has a full width edge to edge view, which you can also edit to meet your requirements.
 
 <p align="center">
-<img width="40%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupmob1.jpg">
+<img width="30%" src="https://s3-us-west-2.amazonaws.com/gitimgs/mobileview.gif">
+<img width="30%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupmobile2.gif">
 </p>
 
 ## Run on Any Server
@@ -57,7 +58,7 @@ Plugin are created in Golang using the [statup/plugin](https://github.com/hunter
 ## Easy to use Dashboard
 Having a straight forward dashboard makes Statup that much better. Monitor your websites and applications with a basic HTTP GET request, or add a POST request with your own JSON to post to the endpoint. 
 <p align="center">
-<img width="80%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupcreat.png">
+<img width="80%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statupsettingsview.gif">
 </p>
 
 ## Exporting Static HTML
