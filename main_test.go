@@ -64,6 +64,10 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" Create Users", func(t *testing.T) {
 			RunUser_Create(t)
 		})
+		t.Run(dbt+" Create Non Unique Users", func(t *testing.T) {
+			t.SkipNow()
+			RunUser_NonUniqueCreate(t)
+		})
 		t.Run(dbt+" Select Users", func(t *testing.T) {
 			RunUser_SelectAll(t)
 		})
@@ -273,6 +277,16 @@ func RunUser_Create(t *testing.T) {
 	id, err = user2.Create()
 	assert.Nil(t, err)
 	assert.Equal(t, int64(2), id)
+}
+
+func RunUser_NonUniqueCreate(t *testing.T) {
+	user := &core.User{
+		Username: "admin",
+		Password: "admin",
+		Email:    "info@testuser.com",
+	}
+	_, err := user.Create()
+	assert.NotNil(t, err)
 }
 
 func RunUser_Delete(t *testing.T) {
