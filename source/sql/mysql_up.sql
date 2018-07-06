@@ -7,7 +7,9 @@ CREATE TABLE core (
     style text,
     footer text,
     domain text,
-    version VARCHAR(50)
+    version VARCHAR(50),
+    migration_id INT(6) NOT NULL DEFAULT 0,
+    use_cdn BOOL NOT NULL DEFAULT '0'
 );
 CREATE TABLE users (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
