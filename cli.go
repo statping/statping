@@ -1,13 +1,17 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/plugin"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
+	"io/ioutil"
 	"math/rand"
+	"net/http"
+	"os"
 	"strings"
 	"time"
 	"upper.io/db.v3/sqlite"
@@ -27,8 +31,18 @@ func CatchCLI(args []string) {
 		core.CreateAllAssets()
 	case "sass":
 		core.CompileSASS()
-	case "api":
-		HelpEcho()
+	case "update":
+		gitCurrent, err := CheckGithubUpdates()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(2)
+		}
+		fmt.Printf("Statup Version: v%v\nLatest Version: %v\n", VERSION, gitCurrent.TagName)
+		if VERSION != gitCurrent.TagName[1:] {
+			fmt.Printf("You don't have the latest version v%v!\nDownload the latest release at: https://github.com/hunterlong/statup\n", gitCurrent.TagName[1:])
+		} else {
+			fmt.Printf("You have the latest version of Statup!\n")
+		}
 	case "test":
 		cmd := args[2]
 		switch cmd {
@@ -52,8 +66,6 @@ func CatchCLI(args []string) {
 		utils.Log(1, "Exported Statup index page: 'index.html'")
 	case "help":
 		HelpEcho()
-	case "update":
-		fmt.Println("Sorry updating isn't available yet!")
 	case "run":
 		utils.Log(1, "Running 1 time and saving to database...")
 		RunOnce()
@@ -70,6 +82,10 @@ func CatchCLI(args []string) {
 	default:
 		utils.Log(3, "Statup does not have the command you entered.")
 	}
+}
+
+func CheckUpdates() {
+
 }
 
 func RunOnce() {
@@ -264,4 +280,100 @@ func FakeSeed(plug plugin.PluginActions) {
 
 	fmt.Println("Seeding example data is complete, running Plugin Tests")
 
+}
+
+func CheckGithubUpdates() (GithubResponse, error) {
+	var gitResp GithubResponse
+	response, err := http.Get("https://api.github.com/repos/hunterlong/statup/releases/latest")
+	if err != nil {
+		return GithubResponse{}, err
+	} else {
+		defer response.Body.Close()
+		contents, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			return GithubResponse{}, err
+		}
+		err = json.Unmarshal(contents, &gitResp)
+		return gitResp, err
+	}
+	return gitResp, err
+}
+
+type GithubResponse struct {
+	URL             string      `json:"url"`
+	AssetsURL       string      `json:"assets_url"`
+	UploadURL       string      `json:"upload_url"`
+	HTMLURL         string      `json:"html_url"`
+	ID              int         `json:"id"`
+	NodeID          string      `json:"node_id"`
+	TagName         string      `json:"tag_name"`
+	TargetCommitish string      `json:"target_commitish"`
+	Name            string      `json:"name"`
+	Draft           bool        `json:"draft"`
+	Author          GitAuthor   `json:"author"`
+	Prerelease      bool        `json:"prerelease"`
+	CreatedAt       time.Time   `json:"created_at"`
+	PublishedAt     time.Time   `json:"published_at"`
+	Assets          []GitAssets `json:"assets"`
+	TarballURL      string      `json:"tarball_url"`
+	ZipballURL      string      `json:"zipball_url"`
+	Body            string      `json:"body"`
+}
+
+type GitAuthor struct {
+	Login             string `json:"login"`
+	ID                int    `json:"id"`
+	NodeID            string `json:"node_id"`
+	AvatarURL         string `json:"avatar_url"`
+	GravatarID        string `json:"gravatar_id"`
+	URL               string `json:"url"`
+	HTMLURL           string `json:"html_url"`
+	FollowersURL      string `json:"followers_url"`
+	FollowingURL      string `json:"following_url"`
+	GistsURL          string `json:"gists_url"`
+	StarredURL        string `json:"starred_url"`
+	SubscriptionsURL  string `json:"subscriptions_url"`
+	OrganizationsURL  string `json:"organizations_url"`
+	ReposURL          string `json:"repos_url"`
+	EventsURL         string `json:"events_url"`
+	ReceivedEventsURL string `json:"received_events_url"`
+	Type              string `json:"type"`
+	SiteAdmin         bool   `json:"site_admin"`
+}
+
+type GitAssets struct {
+	URL                string      `json:"url"`
+	ID                 int         `json:"id"`
+	NodeID             string      `json:"node_id"`
+	Name               string      `json:"name"`
+	Label              string      `json:"label"`
+	Uploader           GitUploader `json:"uploader"`
+	ContentType        string      `json:"content_type"`
+	State              string      `json:"state"`
+	Size               int         `json:"size"`
+	DownloadCount      int         `json:"download_count"`
+	CreatedAt          time.Time   `json:"created_at"`
+	UpdatedAt          time.Time   `json:"updated_at"`
+	BrowserDownloadURL string      `json:"browser_download_url"`
+}
+
+type GitUploader struct {
+	Login             string `json:"login"`
+	ID                int    `json:"id"`
+	NodeID            string `json:"node_id"`
+	AvatarURL         string `json:"avatar_url"`
+	GravatarID        string `json:"gravatar_id"`
+	URL               string `json:"url"`
+	HTMLURL           string `json:"html_url"`
+	FollowersURL      string `json:"followers_url"`
+	FollowingURL      string `json:"following_url"`
+	GistsURL          string `json:"gists_url"`
+	StarredURL        string `json:"starred_url"`
+	SubscriptionsURL  string `json:"subscriptions_url"`
+	OrganizationsURL  string `json:"organizations_url"`
+	ReposURL          string `json:"repos_url"`
+	EventsURL         string `json:"events_url"`
+	ReceivedEventsURL string `json:"received_events_url"`
+	Type              string `json:"type"`
+	SiteAdmin         bool   `json:"site_admin"`
 }

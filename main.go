@@ -65,6 +65,7 @@ func mainProcess() {
 	if err != nil {
 		utils.Log(3, err)
 	}
+
 	core.RunDatabaseUpgrades()
 	core.InitApp()
 

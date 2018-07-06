@@ -20,6 +20,8 @@ type Core struct {
 	Footer         string     `db:"footer" json:"-"`
 	Domain         string     `db:"domain" json:"domain,omitempty"`
 	Version        string     `db:"version" json:"version,omitempty"`
+	MigrationId    int64      `db:"migration_id" json:"-"`
+	UseCdn         bool       `db:"use_cdn" json:"-"`
 	Services       []*Service `json:"services,omitempty"`
 	Plugins        []plugin.Info
 	Repos          []PluginJSON
@@ -101,6 +103,15 @@ func (c Core) AllOnline() bool {
 		}
 	}
 	return true
+}
+
+func SelectLastMigration() (int64, error) {
+	var c *Core
+	err := DbSession.Collection("core").Find().One(&c)
+	if err != nil {
+		return 0, err
+	}
+	return c.MigrationId, err
 }
 
 func SelectCore() (*Core, error) {

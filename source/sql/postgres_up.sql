@@ -7,7 +7,9 @@ CREATE TABLE core (
     style text,
     footer text,
     domain text,
-    version text
+    version text,
+    migration_id integer default 0,
+    use_cdn bool default false
 );
 
 CREATE TABLE users (

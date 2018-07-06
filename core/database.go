@@ -20,6 +20,7 @@ var (
 	postgresSettings postgresql.ConnectionURL
 	mysqlSettings    mysql.ConnectionURL
 	DbSession        sqlbuilder.Database
+	currentMigration int64
 )
 
 type DbConfig types.DbConfig
@@ -66,7 +67,10 @@ func DbConnection(dbType string) error {
 			return err
 		}
 	}
-	//dbSession.SetLogging(true)
+	err = DbSession.Ping()
+	if err == nil {
+		utils.Log(1, fmt.Sprintf("Database connection to '%v' was successful.", DbSession.Name()))
+	}
 	return err
 }
 
@@ -122,6 +126,7 @@ func (c *DbConfig) Save() error {
 		ApiKey:      utils.NewSHA1Hash(9),
 		ApiSecret:   utils.NewSHA1Hash(16),
 		Domain:      c.Domain,
+		MigrationId: time.Now().Unix(),
 	}
 	col := DbSession.Collection("core")
 	_, err = col.Insert(newCore)
@@ -135,78 +140,65 @@ func (c *DbConfig) Save() error {
 	return err
 }
 
-func versionSplit(v string) (int64, int64, int64) {
-	currSplit := strings.Split(v, ".")
-	if len(currSplit) < 2 {
-		return 9999, 9999, 9999
-	}
-	var major, mid, minor string
-	if len(currSplit) == 3 {
-		major = currSplit[0]
-		mid = currSplit[1]
-		minor = currSplit[2]
-		return utils.StringInt(major), utils.StringInt(mid), utils.StringInt(minor)
-	}
-	major = currSplit[0]
-	mid = currSplit[1]
-	return utils.StringInt(major), utils.StringInt(mid), 0
-}
-
-func versionHigher(migrate string) bool {
-	cM, cMi, cMn := versionSplit(CoreApp.Version)
-	mM, mMi, mMn := versionSplit(migrate)
-	if mM > cM {
-		return true
-	}
-	if mMi > cMi {
-		return true
-	}
-	if mMn > cMn {
+func versionHigher(migrate int64) bool {
+	if CoreApp.MigrationId < migrate {
 		return true
 	}
 	return false
 }
 
+func reverseSlice(s []string) []string {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
+	return s
+}
+
 func RunDatabaseUpgrades() error {
 	var err error
-	utils.Log(1, fmt.Sprintf("Checking Database Upgrades from v%v in '%v_upgrade.sql'...", CoreApp.Version, CoreApp.DbConnection))
+	currentMigration, err = SelectLastMigration()
+	utils.Log(1, fmt.Sprintf("Checking for Database Upgrades since #%v", currentMigration))
 	upgrade, _ := SqlBox.String(CoreApp.DbConnection + "_upgrade.sql")
 	// parse db version and upgrade file
 	ups := strings.Split(upgrade, "=========================================== ")
+	ups = reverseSlice(ups)
 	var ran int
+	var lastMigration int64
 	for _, v := range ups {
 		if len(v) == 0 {
 			continue
 		}
 		vers := strings.Split(v, "\n")
-		version := vers[0]
+		lastMigration = utils.StringInt(vers[0])
 		data := vers[1:]
+
 		//fmt.Printf("Checking Migration from v%v to v%v - %v\n", CoreApp.Version, version, versionHigher(version))
-		if !versionHigher(version) {
-			//fmt.Printf("Already up-to-date with v%v\n", version)
+		if currentMigration >= lastMigration {
 			continue
 		}
-		fmt.Printf("Migration Database from v%v to v%v\n", CoreApp.Version, version)
+		utils.Log(1, fmt.Sprintf("Migrating Database from #%v to #%v", currentMigration, lastMigration))
 		for _, m := range data {
 			if m == "" {
 				continue
 			}
-			fmt.Printf("Running Migration: %v\n", m)
+			utils.Log(1, fmt.Sprintf("Running Query: %v", m))
 			_, err := DbSession.Exec(db.Raw(m + ";"))
+			ran++
 			if err != nil {
 				utils.Log(2, err)
 				continue
 			}
-			ran++
-			CoreApp.Version = m
 		}
+		currentMigration = lastMigration
 	}
 	if ran > 0 {
-		utils.Log(1, fmt.Sprintf("Database Upgraded, %v query ran", ran))
-		CoreApp.Update()
+		utils.Log(1, fmt.Sprintf("Database Upgraded %v queries ran, current #%v", ran, currentMigration))
 		CoreApp, err = SelectCore()
-	} else {
-		utils.Log(1, fmt.Sprintf("Database is already up-to-date, latest v%v", CoreApp.Version))
+		if err != nil {
+			panic(err)
+		}
+		CoreApp.MigrationId = currentMigration
+		CoreApp.Update()
 	}
 	return err
 }
