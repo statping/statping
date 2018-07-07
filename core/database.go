@@ -157,6 +157,9 @@ func reverseSlice(s []string) []string {
 func RunDatabaseUpgrades() error {
 	var err error
 	currentMigration, err = SelectLastMigration()
+	if err != nil {
+		return err
+	}
 	utils.Log(1, fmt.Sprintf("Checking for Database Upgrades since #%v", currentMigration))
 	upgrade, _ := SqlBox.String(CoreApp.DbConnection + "_upgrade.sql")
 	// parse db version and upgrade file

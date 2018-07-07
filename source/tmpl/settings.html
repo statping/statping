@@ -3,10 +3,15 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
-    <link rel="stylesheet" href="https://assets.statup.io/bootstrap.min.css">
+{{if USE_CDN}}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://assets.statup.io/base.css">
+{{ else }}
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+{{end}}
     <link rel="stylesheet" href="https://assets.statup.io/codemirror.css">
     <link rel="stylesheet" href="https://assets.statup.io/codemirror-colorpicker.css"/>
-    <link rel="stylesheet" href="/css/base.css">
 
     <title>Statup | Settings</title>
 </head>
@@ -55,9 +60,18 @@
                             <input type="text" name="description" class="form-control" value="{{ .Description }}" id="description" placeholder="Great Uptime">
                         </div>
 
-                        <div class="form-group">
-                            <label for="domain">Domain</label>
-                            <input type="text" name="domain" class="form-control" value="{{ .Domain }}" id="domain">
+                        <div class="form-group row">
+                            <div class="col-sm-7">
+                                <label for="domain">Domain</label>
+                                <input type="text" name="domain" class="form-control" value="{{ .Domain }}" id="domain">
+                            </div>
+                            <div class="col-sm-5 mt-4">
+                              <span class="switch">
+                                <input type="checkbox" name="enable_cdn" class="switch" id="switch-normal" {{if USE_CDN}}checked{{end}}>
+                                <label for="switch-normal">Enable CDN</label>
+                              </span>
+                            </div>
+
                         </div>
 
                         <div class="form-group">
@@ -226,12 +240,24 @@
 </div>
 {{template "footer"}}
 
-<script src="https://assets.statup.io/jquery-3.3.1.slim.min.js"></script>
-<script src="https://assets.statup.io/bootstrap.min.js"></script>
+{{if USE_CDN}}
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+{{ else }}
+<script src="/js/jquery-3.3.1.slim.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+{{end}}
+
 <script src="https://assets.statup.io/codemirror.js"></script>
 <script src="https://assets.statup.io/css.js"></script>
 <script src="https://assets.statup.io/codemirror-colorpicker.min.js"></script>
+
+{{if USE_CDN}}
+<script src="https://assets.statup.io/main.js"></script>
+{{else}}
 <script src="/js/main.js"></script>
+{{end}}
+
 
 </body>
 </html>

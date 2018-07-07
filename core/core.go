@@ -4,6 +4,8 @@ import (
 	"github.com/GeertJohan/go.rice"
 	"github.com/hunterlong/statup/plugin"
 	"github.com/hunterlong/statup/types"
+	"github.com/pkg/errors"
+	"os"
 	"time"
 )
 
@@ -27,13 +29,12 @@ type Core struct {
 	Repos          []PluginJSON
 	AllPlugins     []plugin.PluginActions
 	Communications []*types.Communication
-	OfflineAssets  bool
 	DbConnection   string
 	started        time.Time
 }
 
 var (
-	Configs     *Config
+	Configs     *types.Config
 	CoreApp     *Core
 	SqlBox      *rice.Box
 	CssBox      *rice.Box
@@ -43,6 +44,7 @@ var (
 	EmailBox    *rice.Box
 	SetupMode   bool
 	UsingAssets bool
+	VERSION     string
 )
 
 func init() {
@@ -107,6 +109,9 @@ func (c Core) AllOnline() bool {
 
 func SelectLastMigration() (int64, error) {
 	var c *Core
+	if DbSession == nil {
+		return 0, errors.New("Database connection has not been created yet")
+	}
 	err := DbSession.Collection("core").Find().One(&c)
 	if err != nil {
 		return 0, err
@@ -124,6 +129,9 @@ func SelectCore() (*Core, error) {
 	CoreApp.DbConnection = Configs.Connection
 	CoreApp.Version = VERSION
 	CoreApp.Services, _ = SelectAllServices()
+	if os.Getenv("USE_CDN") == "true" {
+		CoreApp.UseCdn = true
+	}
 	//store = sessions.NewCookieStore([]byte(core.ApiSecret))
 	return CoreApp, err
 }

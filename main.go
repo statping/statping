@@ -16,7 +16,8 @@ import (
 )
 
 var (
-	VERSION string
+	VERSION  string
+	usingEnv bool
 )
 
 func init() {
@@ -36,7 +37,7 @@ func main() {
 
 	core.Configs, err = core.LoadConfig()
 	if err != nil {
-		utils.Log(2, "config.yml file not found - starting in setup mode")
+		utils.Log(3, err)
 		core.SetupMode = true
 		handlers.RunHTTPServer()
 	}
@@ -56,6 +57,7 @@ func LoadDotEnvs() {
 	err := godotenv.Load()
 	if err == nil {
 		utils.Log(1, "Environment file '.env' Loaded")
+		usingEnv = true
 	}
 }
 
