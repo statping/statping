@@ -8,7 +8,7 @@ import (
 )
 
 func ExportIndexHTML() string {
-	CoreApp.OfflineAssets = true
+	CoreApp.UseCdn = true
 	//out := index{*CoreApp, CoreApp.Services}
 	nav, _ := TmplBox.String("nav.html")
 	footer, _ := TmplBox.String("footer.html")

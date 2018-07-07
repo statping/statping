@@ -54,6 +54,7 @@ func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	if domain != core.CoreApp.Domain {
 		core.CoreApp.Domain = domain
 	}
+	core.CoreApp.UseCdn = (r.PostForm.Get("enable_cdn") == "on")
 	core.CoreApp.Update()
 	core.OnSettingsSaved(core.CoreApp)
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)

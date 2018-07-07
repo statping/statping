@@ -86,6 +86,9 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		"VERSION": func() string {
 			return core.VERSION
 		},
+		"USE_CDN": func() bool {
+			return core.CoreApp.UseCdn
+		},
 		"underscore": func(html string) string {
 			return utils.UnderScoreString(html)
 		},
