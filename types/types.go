@@ -5,14 +5,15 @@ import (
 )
 
 type User struct {
-	Id        int64     `db:"id,omitempty" json:"id"`
-	Username  string    `db:"username" json:"username"`
-	Password  string    `db:"password" json:"-"`
-	Email     string    `db:"email" json:"-"`
-	ApiKey    string    `db:"api_key" json:"api_key"`
-	ApiSecret string    `db:"api_secret" json:"-"`
-	Admin     bool      `db:"administrator" json:"admin"`
-	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	Id              int64     `db:"id,omitempty" json:"id"`
+	Username        string    `db:"username" json:"username"`
+	Password        string    `db:"password" json:"-"`
+	Email           string    `db:"email" json:"-"`
+	ApiKey          string    `db:"api_key" json:"api_key"`
+	ApiSecret       string    `db:"api_secret" json:"-"`
+	Admin           bool      `db:"administrator" json:"admin"`
+	CreatedAt       time.Time `db:"created_at" json:"created_at"`
+	PushoverUserKey string    `db:"pushover_key" json:"pushover_key"`
 }
 
 type Hit struct {
@@ -68,6 +69,11 @@ type Email struct {
 	Sent     bool
 }
 
+type PushoverNotification struct {
+	To      string
+	Message string
+}
+
 type Config struct {
 	Connection string `yaml:"connection"`
 	Host       string `yaml:"host"`
@@ -91,6 +97,7 @@ type DbConfig struct {
 	Username    string `yaml:"-"`
 	Password    string `yaml:"-"`
 	Email       string `yaml:"-"`
+	Pushover    string `yaml:"-"`
 	Error       error  `yaml:"-"`
 }
 

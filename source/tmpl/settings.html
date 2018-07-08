@@ -34,6 +34,7 @@
                 <a class="nav-link" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false">Theme Editor</a>
                 <a class="nav-link" id="v-pills-email-tab" data-toggle="pill" href="#v-pills-email" role="tab" aria-controls="v-pills-email" aria-selected="true">Email Settings</a>
                 <a class="nav-link" id="v-pills-slack-tab" data-toggle="pill" href="#v-pills-slack" role="tab" aria-controls="v-pills-slack" aria-selected="true">Slack Updates</a>
+                <a class="nav-link" id="v-pills-pushover-tab" data-toggle="pill" href="#v-pills-pushover" role="tab" aria-controls="v-pills-pushover" aria-selected="true">Pushover Updates</a>
                 {{ range .Communications }}
 
                 {{ end }}
@@ -200,6 +201,34 @@
                             </div>
                         </div>
 
+
+                    </form>
+
+                </div>
+            {{ end }}
+
+            {{ with $c := index .Communications 2 }}
+                <div class="tab-pane fade" id="v-pills-{{ $c.Method }}" role="tabpanel" aria-labelledby="v-pills-{{ $c.Method }}-tab">
+
+                    <form method="POST" action="/settings/{{ $c.Method }}">
+
+                        <div class="form-group">
+                            <label for="pushover_token">Pushover Token</label>
+                            <input type="text" name="pushover_token" class="form-control" value="{{ $c.Host }}" id="pushover_token" placeholder="">
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-6">
+                          <span class="switch">
+                            <input type="checkbox" name="enable_{{ $c.Method }}" class="switch" id="switch-{{ $c.Method }}" {{if .Enabled}}checked{{end}}>
+                            <label for="switch-{{ $c.Method }}">Enable Pushover</label>
+                          </span>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <button type="submit" class="btn btn-primary btn-block">Save Pushover Settings</button>
+                            </div>
+                        </div>
 
                     </form>
 

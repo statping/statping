@@ -21,6 +21,7 @@ CREATE TABLE users (
     api_secret text,
     administrator bool,
     created_at DATETIME,
+    pushover_key text NOT NULL DEFAULT '',
     UNIQUE (username, email)
 );
 

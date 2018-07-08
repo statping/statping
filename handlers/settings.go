@@ -1,11 +1,12 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/notifications"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
-	"net/http"
 )
 
 func PluginsHandler(w http.ResponseWriter, r *http.Request) {
@@ -144,5 +145,24 @@ func SaveSlackSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	slack.Host = slackWebhook
 	core.Update(slack)
+	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+}
+
+func SavePushoverSettingsHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	pushover := core.SelectCommunication(3)
+	r.ParseForm()
+	pushoverToken := r.PostForm.Get("pushover_token")
+	enable := r.PostForm.Get("enable_pushover")
+	pushover.Enabled = false
+	if enable == "on" && pushoverToken != "" {
+		pushover.Enabled = true
+		go notifications.PushoverRoutine()
+	}
+	pushover.Host = pushoverToken
+	core.Update(pushover)
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }

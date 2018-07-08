@@ -2,6 +2,8 @@ package core
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/fatih/structs"
 	"github.com/hunterlong/statup/notifications"
 	"github.com/hunterlong/statup/plugin"
@@ -31,6 +33,9 @@ func OnFailure(s *Service, f FailureData) {
 	if notifications.EmailComm != nil {
 		onFailureEmail(s, f)
 	}
+	if notifications.PushoverComm != nil {
+		onFailurePushover(s, f)
+	}
 }
 
 func onFailureSlack(s *Service, f FailureData) {
@@ -38,6 +43,23 @@ func onFailureSlack(s *Service, f FailureData) {
 	if slack.Enabled {
 		msg := fmt.Sprintf("Service %v is currently offline! Issue: %v", s.Name, f.Issue)
 		notifications.SendSlack(msg)
+	}
+}
+
+func onFailurePushover(s *Service, f FailureData) {
+	pushover := SelectCommunication(3)
+	if pushover.Enabled {
+		// Trick to send only one notification when service is down
+		if time.Now().Sub(s.LastOnline).Seconds() < float64(2*s.Interval) {
+			admin, _ := SelectUser(1)
+			if admin.PushoverUserKey != "" {
+				notification := &types.PushoverNotification{
+					To:      admin.PushoverUserKey,
+					Message: fmt.Sprintf("Service %v is currently offline! Issue: %v", s.Name, f.Issue),
+				}
+				notifications.SendPushover(notification)
+			}
+		}
 	}
 }
 

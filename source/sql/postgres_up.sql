@@ -20,7 +20,8 @@ CREATE TABLE users (
     api_key text,
     api_secret text,
     administrator bool,
-    created_at TIMESTAMP
+    created_at TIMESTAMP,
+    pushover_key text default ''
 );
 
 CREATE TABLE services (
