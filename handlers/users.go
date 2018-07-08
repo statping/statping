@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
@@ -18,13 +19,16 @@ func SessionUser(r *http.Request) *types.User {
 	var user *types.User
 	col := core.DbSession.Collection("users")
 	res := col.Find("id", uuid)
-	res.One(&user)
+	err := res.One(&user)
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("cannot fetch user %v", uuid))
+		return nil
+	}
 	return user
 }
 
 func UsersHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -32,9 +36,41 @@ func UsersHandler(w http.ResponseWriter, r *http.Request) {
 	ExecuteResponse(w, r, "users.html", users)
 }
 
+func UsersEditHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	vars := mux.Vars(r)
+	id, _ := strconv.Atoi(vars["id"])
+	user, _ := core.SelectUser(int64(id))
+	ExecuteResponse(w, r, "user.html", user)
+}
+
+func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	r.ParseForm()
+	vars := mux.Vars(r)
+	id, _ := strconv.Atoi(vars["id"])
+	user, _ := core.SelectUser(int64(id))
+
+	user.Username = r.PostForm.Get("username")
+	user.Email = r.PostForm.Get("email")
+	user.Admin = (r.PostForm.Get("admin") == "on")
+	password := r.PostForm.Get("password")
+	if password != "##########" {
+		user.Password = utils.HashPassword(password)
+	}
+	user.Update()
+	users, _ := core.SelectAllUsers()
+	ExecuteResponse(w, r, "users.html", users)
+}
+
 func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -59,8 +95,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UsersDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}

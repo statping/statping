@@ -35,9 +35,10 @@
                 {{range .}}
                 <tr>
                     <td>{{.Username}}</td>
-                    <td class="text-right">
+                    <td class="text-right" id="user_{{.Id}}">
                         <div class="btn-group">
-                            <a href="/users/{{.Id}}/delete" class="btn btn-danger">Delete</a>
+                            <a href="/user/{{.Id}}" class="btn btn-primary">Edit</a>
+                            <a href="/user/{{.Id}}/delete" class="btn btn-danger confirm-btn" data-id="user_{{.Id}}">Delete</a>
                         </div>
                     </td>
                 </tr>

@@ -32,6 +32,13 @@ func (u *User) Delete() error {
 	return user.Delete()
 }
 
+func (u *User) Update() error {
+	u.CreatedAt = time.Now()
+	col := DbSession.Collection("users")
+	user := col.Find("id", u.Id)
+	return user.Update(u)
+}
+
 func (u *User) Create() (int64, error) {
 	u.CreatedAt = time.Now()
 	u.Password = utils.HashPassword(u.Password)

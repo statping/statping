@@ -18,7 +18,7 @@ services:
 
 env:
   global:
-     - VERSION=0.29.7
+     - VERSION=0.29.8
      - DB_HOST=localhost
      - DB_USER=travis
      - DB_PASS=
@@ -65,8 +65,9 @@ before_script:
   - go get
 
 script:
-  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then /bin/bash -c .travis/compile.sh; fi
-  - go test -v -covermode=count -coverprofile=coverage.out && $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $COVERALLS
+  - /bin/bash -c .travis/compile.sh
+  - go test -v -covermode=count -coverprofile=coverage.out
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $COVERALLS; fi
 
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then travis_wait 30 docker pull karalabe/xgo-latest; fi
