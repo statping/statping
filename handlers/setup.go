@@ -1,14 +1,15 @@
 package handlers
 
 import (
-	"github.com/gorilla/sessions"
-	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/gorilla/sessions"
+	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statup/utils"
 )
 
 func SetupHandler(w http.ResponseWriter, r *http.Request) {
@@ -59,6 +60,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	description := r.PostForm.Get("description")
 	domain := r.PostForm.Get("domain")
 	email := r.PostForm.Get("email")
+	pushover := r.PostForm.Get("pushover")
 
 	config := &core.DbConfig{
 		dbConn,
@@ -73,6 +75,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		username,
 		password,
 		email,
+		pushover,
 		nil,
 	}
 	err := config.Save()
@@ -105,10 +108,11 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	admin := &core.User{
-		Username: config.Username,
-		Password: config.Password,
-		Email:    config.Email,
-		Admin:    true,
+		Username:        config.Username,
+		Password:        config.Password,
+		Email:           config.Email,
+		Admin:           true,
+		PushoverUserKey: config.Pushover,
 	}
 	admin.Create()
 

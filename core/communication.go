@@ -2,10 +2,11 @@ package core
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/hunterlong/statup/notifications"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
-	"time"
 )
 
 func LoadDefaultCommunications() {
@@ -31,6 +32,12 @@ func LoadDefaultCommunications() {
 		msg := fmt.Sprintf("Slack loaded on your Statup Status Page!")
 		notifications.SendSlack(msg)
 		go notifications.SlackRoutine()
+	}
+	notifications.PushoverComm = SelectCommunication(3)
+	pushover := notifications.PushoverComm
+	if pushover.Enabled {
+		//		notifications.LoadSlack(slack.Host)
+		go notifications.PushoverRoutine()
 	}
 }
 

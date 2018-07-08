@@ -2,11 +2,12 @@ package handlers
 
 import (
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/core"
-	"net/http"
-	"time"
 )
 
 func Router() *mux.Router {
@@ -38,6 +39,7 @@ func Router() *mux.Router {
 	r.Handle("/settings/build", http.HandlerFunc(SaveAssetsHandler)).Methods("GET")
 	r.Handle("/settings/email", http.HandlerFunc(SaveEmailSettingsHandler)).Methods("POST")
 	r.Handle("/settings/slack", http.HandlerFunc(SaveSlackSettingsHandler)).Methods("POST")
+	r.Handle("/settings/pushover", http.HandlerFunc(SavePushoverSettingsHandler)).Methods("POST")
 	r.Handle("/plugins/download/{name}", http.HandlerFunc(PluginsDownloadHandler))
 	r.Handle("/plugins/{name}/save", http.HandlerFunc(PluginSavedHandler)).Methods("POST")
 	r.Handle("/help", http.HandlerFunc(HelpHandler))

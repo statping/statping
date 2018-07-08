@@ -1,12 +1,13 @@
 package handlers
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
-	"net/http"
-	"strconv"
 )
 
 func SessionUser(r *http.Request) *types.User {
@@ -43,12 +44,14 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	password := r.PostForm.Get("password")
 	email := r.PostForm.Get("email")
 	admin := r.PostForm.Get("admin")
+	pushover_key := r.PostForm.Get("pushover")
 
 	user := &core.User{
-		Username: username,
-		Password: password,
-		Email:    email,
-		Admin:    (admin == "on"),
+		Username:        username,
+		Password:        password,
+		Email:           email,
+		Admin:           (admin == "on"),
+		PushoverUserKey: pushover_key,
 	}
 	_, err := user.Create()
 	if err != nil {

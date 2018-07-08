@@ -2,9 +2,10 @@ package core
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
-	"os"
 )
 
 func InsertDefaultComms() {
@@ -25,6 +26,15 @@ func InsertDefaultComms() {
 			Enabled:   false,
 		}
 		Create(slack)
+	}
+	pushover := SelectCommunication(3)
+	if pushover == nil {
+		pushover := &types.Communication{
+			Method:    "pushover",
+			Removable: false,
+			Enabled:   false,
+		}
+		Create(pushover)
 	}
 }
 

@@ -20,6 +20,7 @@ CREATE TABLE users (
     api_secret VARCHAR(50),
     administrator BOOL NOT NULL DEFAULT '0',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    pushover_key VARCHAR (32) NOT NULL DEFAULT '',
     INDEX (id),
     UNIQUE (username, email)
 );
