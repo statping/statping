@@ -64,6 +64,9 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" Create Users", func(t *testing.T) {
 			RunUser_Create(t)
 		})
+		t.Run(dbt+" Update User", func(t *testing.T) {
+			RunUser_Update(t)
+		})
 		t.Run(dbt+" Create Non Unique Users", func(t *testing.T) {
 			t.SkipNow()
 			RunUser_NonUniqueCreate(t)
@@ -133,6 +136,9 @@ func TestRunAll(t *testing.T) {
 		})
 		t.Run(dbt+" HTTP /users", func(t *testing.T) {
 			RunUsersHandler(t)
+		})
+		t.Run(dbt+" HTTP /user/1", func(t *testing.T) {
+			RunUserViewHandler(t)
 		})
 		t.Run(dbt+" HTTP /services", func(t *testing.T) {
 			RunServicesHandler(t)
@@ -264,6 +270,7 @@ func RunUser_Create(t *testing.T) {
 		Username: "admin",
 		Password: "admin",
 		Email:    "info@testuser.com",
+		Admin:    true,
 	}
 	id, err := user.Create()
 	assert.Nil(t, err)
@@ -277,6 +284,17 @@ func RunUser_Create(t *testing.T) {
 	id, err = user2.Create()
 	assert.Nil(t, err)
 	assert.Equal(t, int64(2), id)
+}
+
+func RunUser_Update(t *testing.T) {
+	user, err := core.SelectUser(1)
+	user.Email = "info@updatedemail.com"
+	assert.Nil(t, err)
+	err = user.Update()
+	assert.Nil(t, err)
+	updatedUser, err := core.SelectUser(1)
+	assert.Nil(t, err)
+	assert.Equal(t, "info@updatedemail.com", updatedUser.Email)
 }
 
 func RunUser_NonUniqueCreate(t *testing.T) {
@@ -474,6 +492,15 @@ func RunDashboardHandler(t *testing.T) {
 
 func RunUsersHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/users", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	route.ServeHTTP(rr, req)
+	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Users</title>"))
+	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
+}
+
+func RunUserViewHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/user/1", nil)
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)

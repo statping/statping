@@ -11,6 +11,15 @@ $('form').submit(function() {
 });
 
 
+$(".confirm-btn").on('click', function() {
+    var r = confirm("Are you sure you want to delete?");
+    if (r == true) {
+        return true;
+    } else {
+        return false;
+    }
+});
+
 
 var ranVar = false;
 var ranTheme = false;
