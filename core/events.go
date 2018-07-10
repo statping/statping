@@ -3,7 +3,7 @@ package core
 import (
 	"fmt"
 	"github.com/fatih/structs"
-	"github.com/hunterlong/statup/notifications"
+	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/plugin"
 	"github.com/hunterlong/statup/types"
 	"upper.io/db.v3/lib/sqlbuilder"
@@ -25,10 +25,10 @@ func OnFailure(s *Service, f FailureData) {
 	for _, p := range CoreApp.AllPlugins {
 		p.OnFailure(structs.Map(s))
 	}
-	if notifications.SlackComm != nil {
+	if notifiers.SendSlack("im failing") != nil {
 		onFailureSlack(s, f)
 	}
-	if notifications.EmailComm != nil {
+	if notifiers.EmailComm != nil {
 		onFailureEmail(s, f)
 	}
 }
@@ -36,8 +36,8 @@ func OnFailure(s *Service, f FailureData) {
 func onFailureSlack(s *Service, f FailureData) {
 	slack := SelectCommunication(2)
 	if slack.Enabled {
-		msg := fmt.Sprintf("Service %v is currently offline! Issue: %v", s.Name, f.Issue)
-		notifications.SendSlack(msg)
+		//msg := fmt.Sprintf("Service %v is currently offline! Issue: %v", s.Name, f.Issue)
+		//communications.SendSlack(msg)
 	}
 }
 
@@ -59,7 +59,7 @@ func onFailureEmail(s *Service, f FailureData) {
 			Data:     data,
 			From:     email.Var1,
 		}
-		notifications.SendEmail(EmailBox, email)
+		notifiers.SendEmail(EmailBox, email)
 	}
 }
 

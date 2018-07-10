@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/notifications"
+	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
@@ -117,12 +117,12 @@ func SaveEmailSettingsHandler(w http.ResponseWriter, r *http.Request) {
 		Template: "message.html",
 		From:     emailer.Var1,
 	}
-	notifications.LoadEmailer(emailer)
-	notifications.SendEmail(core.EmailBox, sample)
-	notifications.EmailComm = emailer
+	notifiers.LoadEmailer(emailer)
+	notifiers.SendEmail(core.EmailBox, sample)
+	notifiers.EmailComm = emailer
 	if emailer.Enabled {
 		utils.Log(1, "Starting Email Routine, 1 unique email per 60 seconds")
-		go notifications.EmailRoutine()
+		go notifiers.EmailRoutine()
 	}
 
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
@@ -140,7 +140,7 @@ func SaveSlackSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	slack.Enabled = false
 	if enable == "on" && slackWebhook != "" {
 		slack.Enabled = true
-		go notifications.SlackRoutine()
+		//go communications.SlackRoutine()
 	}
 	slack.Host = slackWebhook
 	core.Update(slack)

@@ -2,7 +2,7 @@ package core
 
 import (
 	"fmt"
-	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/utils"
 	"os"
 )
@@ -10,7 +10,7 @@ import (
 func InsertDefaultComms() {
 	emailer := SelectCommunication(1)
 	if emailer == nil {
-		emailer := &types.Communication{
+		emailer := &notifiers.Notification{
 			Method:    "email",
 			Removable: false,
 			Enabled:   false,
@@ -19,7 +19,7 @@ func InsertDefaultComms() {
 	}
 	slack := SelectCommunication(2)
 	if slack == nil {
-		slack := &types.Communication{
+		slack := &notifiers.Notification{
 			Method:    "slack",
 			Removable: false,
 			Enabled:   false,

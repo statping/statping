@@ -33,10 +33,11 @@
                 <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Settings</a>
                 <a class="nav-link" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false">Theme Editor</a>
                 <a class="nav-link" id="v-pills-email-tab" data-toggle="pill" href="#v-pills-email" role="tab" aria-controls="v-pills-email" aria-selected="true">Email Settings</a>
-                <a class="nav-link" id="v-pills-slack-tab" data-toggle="pill" href="#v-pills-slack" role="tab" aria-controls="v-pills-slack" aria-selected="true">Slack Updates</a>
-                {{ range .Communications }}
 
+                {{ range .Communications }}
+                    <a class="nav-link text-capitalize" id="v-pills-{{underscore .Method}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Method}}" role="tab" aria-controls="v-pills-{{underscore .Method}}" aria-selected="false">{{.Method}}</a>
                 {{ end }}
+
                 <a class="nav-link" id="v-pills-browse-tab" data-toggle="pill" href="#v-pills-browse" role="tab" aria-controls="v-pills-home" aria-selected="false">Browse Plugins</a>
             {{ range .Plugins }}
                 <a class="nav-link text-capitalize" id="v-pills-{{underscore .Name}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Name}}" role="tab" aria-controls="v-pills-profile" aria-selected="false">{{.Name}}</a>
@@ -122,6 +123,33 @@
             {{end}}
                 </div>
 
+
+            {{ range .Communications }}
+            <div class="tab-pane fade" id="v-pills-{{underscore .Method}}" role="tabpanel" aria-labelledby="v-pills-{{underscore .Method }}-tab">
+                <form method="POST" action="/settings/{{ .Method }}">
+                    {{range .Form}}
+                        <div class="form-group">
+                            <label class="text-capitalize" for="{{underscore .Title}}">{{.Title}}</label>
+                            <input type="{{.Type}}" name="{{underscore .Title}}" class="form-control" value="" id="{{underscore .Title}}" placeholder="{{.Placeholder}}">
+                        </div>
+                    {{end}}
+                    <div class="form-group row">
+                        <div class="col-sm-6">
+                          <span class="switch">
+                            <input type="checkbox" name="enable_{{ .Method }}" class="switch" id="switch-{{ .Method }}" {{if .Enabled}}checked{{end}}>
+                            <label for="switch-{{ .Method }}">Enable {{ .Method }}</label>
+                          </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <button type="submit" class="btn btn-primary btn-block text-capitalize">Save {{ .Method }} Settings</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            {{ end }}
+
+
             {{ with $c := index .Communications 0 }}
                 <div class="tab-pane fade" id="v-pills-{{ $c.Method }}" role="tabpanel" aria-labelledby="v-pills-{{ $c.Method }}-tab">
 
@@ -177,34 +205,6 @@
                     {{ end }}
 
 
-            {{ with $c := index .Communications 1 }}
-                <div class="tab-pane fade" id="v-pills-{{ $c.Method }}" role="tabpanel" aria-labelledby="v-pills-{{ $c.Method }}-tab">
-
-                    <form method="POST" action="/settings/{{ $c.Method }}">
-
-                        <div class="form-group">
-                            <label for="slack_url">Slack Webhook URL</label>
-                            <input type="text" name="slack_url" class="form-control" value="{{ $c.Host }}" id="slack_url" placeholder="https://hooks.slack.com/services/TJIIDSJIFJ/729FJSDF/hua463asda9af79">
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-sm-6">
-                          <span class="switch">
-                            <input type="checkbox" name="enable_{{ $c.Method }}" class="switch" id="switch-{{ $c.Method }}" {{if .Enabled}}checked{{end}}>
-                            <label for="switch-{{ $c.Method }}">Enable Slack</label>
-                          </span>
-                            </div>
-
-                            <div class="col-sm-6">
-                                <button type="submit" class="btn btn-primary btn-block">Save Slack Settings</button>
-                            </div>
-                        </div>
-
-
-                    </form>
-
-                </div>
-            {{ end }}
 
                 <div class="tab-pane fade" id="v-pills-browse" role="tabpanel" aria-labelledby="v-pills-browse-tab">
                 {{ range .Repos }}

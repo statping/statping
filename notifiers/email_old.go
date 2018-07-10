@@ -1,4 +1,4 @@
-package notifications
+package notifiers
 
 import (
 	"bytes"
@@ -15,7 +15,7 @@ import (
 var (
 	mailer     *gomail.Dialer
 	emailQueue []*types.Email
-	EmailComm  *types.Communication
+	EmailComm  *Notification
 )
 
 func EmailRoutine() {
@@ -55,7 +55,7 @@ func dialSend(email *types.Email) error {
 	return nil
 }
 
-func LoadEmailer(mail *types.Communication) {
+func LoadEmailer(mail *Notification) {
 	utils.Log(1, fmt.Sprintf("Loading SMTP Emailer using host: %v:%v", mail.Host, mail.Port))
 	mailer = gomail.NewDialer(mail.Host, mail.Port, mail.Username, mail.Password)
 	mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}

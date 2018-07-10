@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/GeertJohan/go.rice"
+	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/plugin"
 	"github.com/hunterlong/statup/types"
 	"github.com/pkg/errors"
@@ -28,7 +29,7 @@ type Core struct {
 	Plugins        []plugin.Info
 	Repos          []PluginJSON
 	AllPlugins     []plugin.PluginActions
-	Communications []*types.Communication
+	Communications []*notifiers.Notification
 	DbConnection   string
 	started        time.Time
 }
@@ -59,11 +60,19 @@ func NewCore() *Core {
 
 func InitApp() {
 	SelectCore()
+
+	notifiers.Collections = DbSession.Collection("communication")
+
 	SelectAllCommunications()
 	InsertDefaultComms()
 	LoadDefaultCommunications()
 	SelectAllServices()
 	CheckServices()
+
+	notifiers.Load()
+
+	CoreApp.Communications = notifiers.AllCommunications
+
 	go DatabaseMaintence()
 }
 

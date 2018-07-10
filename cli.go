@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/plugin"
-	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
 	"io/ioutil"
@@ -246,13 +246,13 @@ func FakeSeed(plug plugin.PluginActions) {
 	}
 	fakeUser.Create()
 
-	comm := &types.Communication{
+	comm := &notifiers.Notification{
 		Id:     1,
 		Method: "email",
 	}
 	core.Create(comm)
 
-	comm2 := &types.Communication{
+	comm2 := &notifiers.Notification{
 		Id:     2,
 		Method: "slack",
 	}
