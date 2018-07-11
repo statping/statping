@@ -534,7 +534,6 @@ func RunSettingsHandler(t *testing.T) {
 	route.ServeHTTP(rr, req)
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Settings</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "Theme Editor"))
-	assert.True(t, strings.Contains(rr.Body.String(), "Email Settings"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
 }
 
