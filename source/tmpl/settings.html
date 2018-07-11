@@ -32,12 +32,9 @@
             <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                 <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Settings</a>
                 <a class="nav-link" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false">Theme Editor</a>
-                <a class="nav-link" id="v-pills-email-tab" data-toggle="pill" href="#v-pills-email" role="tab" aria-controls="v-pills-email" aria-selected="true">Email Settings</a>
-
-                {{ range .Communications }}
-                    <a class="nav-link text-capitalize" id="v-pills-{{underscore .Method}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Method}}" role="tab" aria-controls="v-pills-{{underscore .Method}}" aria-selected="false">{{.Method}}</a>
-                {{ end }}
-
+            {{ range .Communications }}
+                <a class="nav-link text-capitalize" id="v-pills-{{underscore .Method}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Method}}" role="tab" aria-controls="v-pills-{{underscore .Method}}" aria-selected="false">{{.Method}}</a>
+            {{ end }}
                 <a class="nav-link" id="v-pills-browse-tab" data-toggle="pill" href="#v-pills-browse" role="tab" aria-controls="v-pills-home" aria-selected="false">Browse Plugins</a>
             {{ range .Plugins }}
                 <a class="nav-link text-capitalize" id="v-pills-{{underscore .Name}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Name}}" role="tab" aria-controls="v-pills-profile" aria-selected="false">{{.Name}}</a>
@@ -126,17 +123,17 @@
 
             {{ range .Communications }}
             <div class="tab-pane fade" id="v-pills-{{underscore .Method}}" role="tabpanel" aria-labelledby="v-pills-{{underscore .Method }}-tab">
-                <form method="POST" action="/settings/{{ .Method }}">
+                <form method="POST" action="/settings/notifier_{{ .Id }}">
                     {{range .Form}}
                         <div class="form-group">
                             <label class="text-capitalize" for="{{underscore .Title}}">{{.Title}}</label>
-                            <input type="{{.Type}}" name="{{underscore .Title}}" class="form-control" value="" id="{{underscore .Title}}" placeholder="{{.Placeholder}}">
+                            <input type="{{.Type}}" name="{{underscore .DbField}}" class="form-control" value="{{ .Value }}" id="{{underscore .Title}}" placeholder="{{.Placeholder}}">
                         </div>
                     {{end}}
                     <div class="form-group row">
                         <div class="col-sm-6">
                           <span class="switch">
-                            <input type="checkbox" name="enable_{{ .Method }}" class="switch" id="switch-{{ .Method }}" {{if .Enabled}}checked{{end}}>
+                            <input type="checkbox" name="enable" class="switch" id="switch-{{ .Method }}" {{if .Enabled}}checked{{end}}>
                             <label for="switch-{{ .Method }}">Enable {{ .Method }}</label>
                           </span>
                         </div>
@@ -148,63 +145,6 @@
                 </form>
             </div>
             {{ end }}
-
-
-            {{ with $c := index .Communications 0 }}
-                <div class="tab-pane fade" id="v-pills-{{ $c.Method }}" role="tabpanel" aria-labelledby="v-pills-{{ $c.Method }}-tab">
-
-                    <form method="POST" action="/settings/{{ $c.Method }}">
-
-                        <div class="form-group">
-                            <label for="host">SMTP Host</label>
-                            <input type="text" name="host" class="form-control" value="{{ $c.Host }}" id="host" placeholder="Great Uptime">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="username">SMTP Username</label>
-                            <input type="text" name="username" class="form-control" value="{{ $c.Username }}" id="username" placeholder="Great Uptime">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="password">SMTP Password</label>
-                            <input type="password" name="password" class="form-control" value="{{ if $c.Password }}#######################{{end}}" id="password">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="port">SMTP Port</label>
-                            <input type="number" name="port" class="form-control" value="{{ $c.Port }}" id="port" placeholder="587">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="address">Outgoing Email Address</label>
-                            <input type="text" name="address" class="form-control" value="{{ $c.Var1 }}" id="address" placeholder="noreply@domain.com">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="limit">Limit Emails per Hour</label>
-                            <input type="number" name="limit" class="form-control" value="30" id="limit" placeholder="noreply@domain.com">
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-sm-6">
-                          <span class="switch">
-                            <input type="checkbox" name="enable_{{ $c.Method }}" class="switch" id="switch-{{ $c.Method }}" {{if .Enabled}}checked{{end}}>
-                            <label for="switch-{{ $c.Method }}">Enable Emails</label>
-                          </span>
-                            </div>
-
-                            <div class="col-sm-6">
-                                <button type="submit" class="btn btn-primary btn-block">Save Email Settings</button>
-                            </div>
-                        </div>
-
-
-                    </form>
-
-                </div>
-                    {{ end }}
-
-
 
                 <div class="tab-pane fade" id="v-pills-browse" role="tabpanel" aria-labelledby="v-pills-browse-tab">
                 {{ range .Repos }}

@@ -29,7 +29,7 @@ type Core struct {
 	Plugins        []plugin.Info
 	Repos          []PluginJSON
 	AllPlugins     []plugin.PluginActions
-	Communications []*notifiers.Notification
+	Communications []notifiers.AllNotifiers
 	DbConnection   string
 	started        time.Time
 }
@@ -60,19 +60,10 @@ func NewCore() *Core {
 
 func InitApp() {
 	SelectCore()
-
 	notifiers.Collections = DbSession.Collection("communication")
-
-	SelectAllCommunications()
-	InsertDefaultComms()
-	LoadDefaultCommunications()
 	SelectAllServices()
 	CheckServices()
-
-	notifiers.Load()
-
-	CoreApp.Communications = notifiers.AllCommunications
-
+	CoreApp.Communications = notifiers.Load()
 	go DatabaseMaintence()
 }
 

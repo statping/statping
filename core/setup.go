@@ -2,31 +2,9 @@ package core
 
 import (
 	"fmt"
-	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/utils"
 	"os"
 )
-
-func InsertDefaultComms() {
-	emailer := SelectCommunication(1)
-	if emailer == nil {
-		emailer := &notifiers.Notification{
-			Method:    "email",
-			Removable: false,
-			Enabled:   false,
-		}
-		Create(emailer)
-	}
-	slack := SelectCommunication(2)
-	if slack == nil {
-		slack := &notifiers.Notification{
-			Method:    "slack",
-			Removable: false,
-			Enabled:   false,
-		}
-		Create(slack)
-	}
-}
 
 func DeleteConfig() {
 	err := os.Remove("./config.yml")

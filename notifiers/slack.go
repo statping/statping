@@ -9,39 +9,53 @@ import (
 )
 
 const (
-	SLACK_ID     int64 = 2
-	SLACK_METHOD       = "slack"
+	SLACK_ID     = 2
+	SLACK_METHOD = "slack"
 )
 
 var (
-	slacker       *Notification
+	slacker       *Slack
 	slackMessages []string
 )
 
+type Slack struct {
+	*Notification
+}
+
 // DEFINE YOUR NOTIFICATION HERE.
 func init() {
-	slacker = &Notification{
+	slacker = &Slack{&Notification{
 		Id:     SLACK_ID,
 		Method: SLACK_METHOD,
 		Host:   "https://webhooksurl.slack.com/***",
 		Form: []NotificationForm{{
+			id:          2,
 			Type:        "text",
 			Title:       "Incoming Webhook Url",
 			Placeholder: "Insert your Slack webhook URL here.",
-		}},
+			DbField:     "Host",
+		}}},
 	}
 	add(slacker)
 }
 
+// Select Obj
+func (u *Slack) Select() *Notification {
+	return u.Notification
+}
+
 // WHEN NOTIFIER LOADS
-func (u *Notification) Init() error {
+func (u *Slack) Init() error {
 	err := SendSlack("its online")
-	go u.Run()
+
+	u.Install()
+
+	//go u.Run()
 	return err
 }
 
 // AFTER NOTIFIER LOADS, IF ENABLED, START A QUEUE PROCESS
-func (u *Notification) Run() error {
+func (u *Slack) Run() error {
 	for _, msg := range slackMessages {
 		utils.Log(1, fmt.Sprintf("Sending JSON to Slack Webhook: %v", msg))
 		client := http.Client{Timeout: 15 * time.Second}
@@ -69,7 +83,7 @@ func SendSlack(msg string) error {
 }
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
-func (u *Notification) OnFailure() error {
+func (u *Slack) OnFailure() error {
 	utils.Log(1, fmt.Sprintf("Notification %v is receiving a failure notification.", u.Method))
 
 	// Do failing stuff here!
@@ -78,7 +92,7 @@ func (u *Notification) OnFailure() error {
 }
 
 // ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
-func (u *Notification) OnSuccess() error {
+func (u *Slack) OnSuccess() error {
 	utils.Log(1, fmt.Sprintf("Notification %v is receiving a successful notification.", u.Method))
 
 	// Do checking or any successful things here
@@ -87,10 +101,24 @@ func (u *Notification) OnSuccess() error {
 }
 
 // ON SAVE OR UPDATE OF THE NOTIFIER FORM
-func (u *Notification) OnSave() error {
+func (u *Slack) OnSave() error {
 	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
 
 	// Do updating stuff here
 
 	return nil
+}
+
+// ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
+func (u *Slack) Install() error {
+	inDb, err := slacker.Notification.isInDatabase()
+	if !inDb {
+		newNotifer, err := InsertDatabase(u.Notification)
+		if err != nil {
+			utils.Log(3, err)
+			return err
+		}
+		utils.Log(1, fmt.Sprintf("new notifier #%v installed: %v", newNotifer, u.Method))
+	}
+	return err
 }
