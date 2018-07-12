@@ -73,15 +73,15 @@ func LoadSampleData() error {
 		utils.Log(3, fmt.Sprintf("Error creating Service %v: %v", id, err))
 	}
 
-	checkin := &Checkin{
-		Service:  s2.Id,
-		Interval: 30,
-		Api:      utils.NewSHA1Hash(18),
-	}
-	id, err = checkin.Create()
-	if err != nil {
-		utils.Log(3, fmt.Sprintf("Error creating Checkin %v: %v", id, err))
-	}
+	//checkin := &Checkin{
+	//	Service:  s2.Id,
+	//	Interval: 30,
+	//	Api:      utils.NewSHA1Hash(18),
+	//}
+	//id, err = checkin.Create()
+	//if err != nil {
+	//	utils.Log(3, fmt.Sprintf("Error creating Checkin %v: %v", id, err))
+	//}
 
 	//for i := 0; i < 3; i++ {
 	//	s1.Check()

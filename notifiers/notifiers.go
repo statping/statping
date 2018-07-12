@@ -70,6 +70,12 @@ func (n *Notification) isInDatabase() (bool, error) {
 	return Collections.Find("id", n.Id).Exists()
 }
 
+func SelectNotification(id int64) (*Notification, error) {
+	var notifier *Notification
+	err := Collections.Find("id", id).One(&notifier)
+	return notifier, err
+}
+
 func (n *Notification) Update() (*Notification, error) {
 	n.CreatedAt = time.Now()
 	err := Collections.Find("id", n.Id).Update(n)
@@ -93,6 +99,15 @@ func Select(id int64) *Notification {
 		if notifier.Id == id {
 			return notifier
 		}
+	}
+	return notifier
+}
+
+func SelectNotifier(id int64) Notifier {
+	var notifier Notifier
+	for _, n := range AllCommunications {
+		notif := n.(Notifier)
+		return notif
 	}
 	return notifier
 }

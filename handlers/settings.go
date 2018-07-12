@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/utils"
@@ -140,6 +139,11 @@ func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.Log(3, err)
 	}
-	msg := fmt.Sprintf("%v - %v - %v", notifierId, notifer, enabled)
-	w.Write([]byte(msg))
+
+	if notifer.Enabled {
+		notify := notifiers.SelectNotifier(notifer.Id)
+		go notify.Run()
+	}
+
+	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }

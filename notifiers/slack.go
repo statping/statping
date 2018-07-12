@@ -46,11 +46,19 @@ func (u *Slack) Select() *Notification {
 
 // WHEN NOTIFIER LOADS
 func (u *Slack) Init() error {
-	err := SendSlack("its online")
 
-	u.Install()
+	err := u.Install()
 
-	//go u.Run()
+	if err == nil {
+		notifier, _ := SelectNotification(u.Id)
+		forms := u.Form
+		u.Notification = notifier
+		u.Form = forms
+		if u.Enabled {
+			go u.Run()
+		}
+	}
+
 	return err
 }
 
@@ -84,19 +92,19 @@ func SendSlack(msg string) error {
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *Slack) OnFailure() error {
-	utils.Log(1, fmt.Sprintf("Notification %v is receiving a failure notification.", u.Method))
-
-	// Do failing stuff here!
-
+	if u.Enabled {
+		utils.Log(1, fmt.Sprintf("Notification %v is receiving a failure notification.", u.Method))
+		// Do failing stuff here!
+	}
 	return nil
 }
 
 // ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
 func (u *Slack) OnSuccess() error {
-	utils.Log(1, fmt.Sprintf("Notification %v is receiving a successful notification.", u.Method))
-
-	// Do checking or any successful things here
-
+	if u.Enabled {
+		utils.Log(1, fmt.Sprintf("Notification %v is receiving a successful notification.", u.Method))
+		// Do checking or any successful things here
+	}
 	return nil
 }
 

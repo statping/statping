@@ -65,7 +65,7 @@ func mainProcess() {
 	var err error
 	err = core.DbConnection(core.Configs.Connection)
 	if err != nil {
-		utils.Log(3, err)
+		utils.Log(4, fmt.Sprintf("could not connect to database: %v", err))
 	}
 
 	core.RunDatabaseUpgrades()

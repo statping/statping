@@ -58,6 +58,12 @@ func NewCore() *Core {
 	return CoreApp
 }
 
+func (c *Core) Insert() error {
+	col := DbSession.Collection("core")
+	_, err := col.Insert(c)
+	return err
+}
+
 func InitApp() {
 	SelectCore()
 	notifiers.Collections = DbSession.Collection("communication")
@@ -121,6 +127,11 @@ func SelectLastMigration() (int64, error) {
 
 func SelectCore() (*Core, error) {
 	var c *Core
+	exists := DbSession.Collection("core").Exists()
+	if !exists {
+		return nil, errors.New("core database has not been setup yet.")
+	}
+
 	err := DbSession.Collection("core").Find().One(&c)
 	if err != nil {
 		return nil, err

@@ -2,14 +2,19 @@ package core
 
 import (
 	"errors"
+	"fmt"
 	"github.com/go-yaml/yaml"
 	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statup/utils"
 	"io/ioutil"
 	"os"
+	"time"
 )
 
 func LoadConfig() (*types.Config, error) {
 	if os.Getenv("DB_CONN") != "" {
+		utils.Log(1, "DB_CONN environment variable was found")
+		//time.Sleep(20 * time.Second)
 		return LoadUsingEnv()
 	}
 	Configs = new(types.Config)
@@ -51,12 +56,65 @@ func LoadUsingEnv() (*types.Config, error) {
 	if os.Getenv("USE_CDN") == "true" {
 		CoreApp.UseCdn = true
 	}
-	return Configs, nil
-}
 
-func ifOr(val, def string) string {
-	if val == "" {
-		return def
+	dbConfig := &DbConfig{
+		DbConn:      os.Getenv("DB_CONN"),
+		DbHost:      os.Getenv("DB_HOST"),
+		DbUser:      os.Getenv("DB_USER"),
+		DbPass:      os.Getenv("DB_PASS"),
+		DbData:      os.Getenv("DB_DATABASE"),
+		DbPort:      5432,
+		Project:     "Statup - " + os.Getenv("NAME"),
+		Description: "New Statup Installation",
+		Domain:      os.Getenv("DOMAIN"),
+		Username:    "admin",
+		Password:    "admin",
+		Email:       "info@localhost.com",
 	}
-	return val
+
+	err := DbConnection(dbConfig.DbConn)
+	if err != nil {
+		utils.Log(4, err)
+		return nil, err
+	}
+
+	exists, err := DbSession.Collection("core").Find().Exists()
+	if !exists {
+
+		utils.Log(1, fmt.Sprintf("Core database does not exist, creating now!"))
+		DropDatabase()
+		CreateDatabase()
+
+		CoreApp = &Core{
+			Name:        dbConfig.Project,
+			Description: dbConfig.Description,
+			Config:      "config.yml",
+			ApiKey:      utils.NewSHA1Hash(9),
+			ApiSecret:   utils.NewSHA1Hash(16),
+			Domain:      dbConfig.Domain,
+			MigrationId: time.Now().Unix(),
+		}
+
+		CoreApp.DbConnection = dbConfig.DbConn
+
+		err := CoreApp.Insert()
+		if err != nil {
+			utils.Log(3, err)
+		}
+
+		admin := &User{
+			Username: "admin",
+			Password: "admin",
+			Email:    "info@admin.com",
+			Admin:    true,
+		}
+		admin.Create()
+
+		LoadSampleData()
+
+		return Configs, err
+
+	}
+
+	return Configs, nil
 }

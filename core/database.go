@@ -135,6 +135,9 @@ func (c *DbConfig) Save() error {
 	}
 
 	CoreApp, err = SelectCore()
+	if err != nil {
+		utils.Log(4, err)
+	}
 	CoreApp.DbConnection = c.DbConn
 
 	return err
@@ -207,7 +210,7 @@ func RunDatabaseUpgrades() error {
 }
 
 func DropDatabase() {
-	fmt.Println("Dropping Tables...")
+	utils.Log(1, "Dropping Database Tables...")
 	down, _ := SqlBox.String("down.sql")
 	requests := strings.Split(down, ";")
 	for _, request := range requests {
@@ -219,7 +222,7 @@ func DropDatabase() {
 }
 
 func CreateDatabase() {
-	fmt.Println("Creating Tables...")
+	utils.Log(1, "Creating Database Tables...")
 	sql := "postgres_up.sql"
 	if CoreApp.DbConnection == "mysql" {
 		sql = "mysql_up.sql"
@@ -236,7 +239,7 @@ func CreateDatabase() {
 	}
 	//secret := NewSHA1Hash()
 	//db.QueryRow("INSERT INTO core (secret, version) VALUES ($1, $2);", secret, VERSION).Scan()
-	fmt.Println("Database Created")
+	utils.Log(1, "Database Created")
 	//SampleData()
 }
 

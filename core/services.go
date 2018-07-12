@@ -58,6 +58,7 @@ func SelectAllServices() ([]*Service, error) {
 	err := col.All(&srvcs)
 	if err != nil {
 		utils.Log(3, err)
+		return nil, err
 	}
 	for _, s := range srvcs {
 		s.Checkins = s.SelectAllCheckins()

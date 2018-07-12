@@ -111,19 +111,19 @@ func (u *Email) Run() error {
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *Email) OnFailure() error {
-	utils.Log(1, fmt.Sprintf("Notification %v is receiving a failure notification.", u.Method))
-
-	// Do failing stuff here!
-
+	if u.Enabled {
+		utils.Log(1, fmt.Sprintf("Notification %v is receiving a failure notification.", u.Method))
+		// Do failing stuff here!
+	}
 	return nil
 }
 
 // ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
 func (u *Email) OnSuccess() error {
-	utils.Log(1, fmt.Sprintf("Notification %v is receiving a successful notification.", u.Method))
-
-	// Do checking or any successful things here
-
+	if u.Enabled {
+		utils.Log(1, fmt.Sprintf("Notification %v is receiving a failure notification.", u.Method))
+		// Do failing stuff here!
+	}
 	return nil
 }
 
