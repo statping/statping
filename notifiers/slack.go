@@ -72,7 +72,7 @@ func (u *Slack) Run() error {
 	for _, msg := range slackMessages {
 		utils.Log(1, fmt.Sprintf("Sending JSON to Slack Webhook: %v", msg))
 		client := http.Client{Timeout: 15 * time.Second}
-		_, err := client.Post("https://hooks.slack.com/services/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", "application/json", bytes.NewBuffer([]byte(msg)))
+		_, err := client.Post(u.Host, "application/json", bytes.NewBuffer([]byte(msg)))
 		if err != nil {
 			utils.Log(3, fmt.Sprintf("Issue sending Slack notification: %v", err))
 		}
