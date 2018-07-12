@@ -18,7 +18,7 @@ services:
 
 env:
   global:
-     - VERSION=0.29.8
+     - VERSION=0.29.9
      - DB_HOST=localhost
      - DB_USER=travis
      - DB_PASS=

@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/utils"
@@ -84,13 +86,15 @@ func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
+	var err error
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
+	vars := mux.Vars(r)
 	r.ParseForm()
 
-	notifierId := r.PostForm.Get("id")
+	notifierId := vars["id"]
 	enabled := r.PostForm.Get("enable")
 
 	host := r.PostForm.Get("host")
@@ -103,6 +107,7 @@ func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	apiSecret := r.PostForm.Get("api_secret")
 	limits := int64(utils.StringInt(r.PostForm.Get("limits")))
 	notifer := notifiers.Select(utils.StringInt(notifierId))
+
 	if host != "" {
 		notifer.Host = host
 	}
@@ -135,7 +140,7 @@ func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		notifer.Enabled = false
 	}
-	notifer, err := notifer.Update()
+	notifer, err = notifer.Update()
 	if err != nil {
 		utils.Log(3, err)
 	}
@@ -144,6 +149,8 @@ func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		notify := notifiers.SelectNotifier(notifer.Id)
 		go notify.Run()
 	}
+
+	utils.Log(1, fmt.Sprintf("Notifier saved: %v", notifer))
 
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }

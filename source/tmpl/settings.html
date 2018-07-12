@@ -123,7 +123,7 @@
 
             {{ range .Communications }}
             <div class="tab-pane fade" id="v-pills-{{underscore .Method}}" role="tabpanel" aria-labelledby="v-pills-{{underscore .Method }}-tab">
-                <form method="POST" action="/settings/notifier_{{ .Id }}">
+                <form method="POST" action="/settings/notifier/{{ .Id }}">
                     {{range .Form}}
                         <div class="form-group">
                             <label class="text-capitalize" for="{{underscore .Title}}">{{.Title}}</label>

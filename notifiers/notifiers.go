@@ -26,6 +26,7 @@ func Load() []AllNotifiers {
 		n := comm.(Notifier)
 		n.Init()
 		notifiers = append(notifiers, n)
+		n.Test()
 	}
 	return notifiers
 }
@@ -56,6 +57,7 @@ type Notifier interface {
 	OnFailure() error
 	OnSuccess() error
 	Select() *Notification
+	Test() error
 }
 
 type NotificationForm struct {
@@ -79,6 +81,7 @@ func SelectNotification(id int64) (*Notification, error) {
 func (n *Notification) Update() (*Notification, error) {
 	n.CreatedAt = time.Now()
 	err := Collections.Find("id", n.Id).Update(n)
+
 	return n, err
 }
 
@@ -107,7 +110,10 @@ func SelectNotifier(id int64) Notifier {
 	var notifier Notifier
 	for _, n := range AllCommunications {
 		notif := n.(Notifier)
-		return notif
+		n := notif.Select()
+		if n.Id == id {
+			return notif
+		}
 	}
 	return notifier
 }

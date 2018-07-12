@@ -62,6 +62,11 @@ func (u *Slack) Init() error {
 	return err
 }
 
+func (u *Slack) Test() error {
+	SendSlack("Slack notifications on your Statup server is working!")
+	return nil
+}
+
 // AFTER NOTIFIER LOADS, IF ENABLED, START A QUEUE PROCESS
 func (u *Slack) Run() error {
 	for _, msg := range slackMessages {
