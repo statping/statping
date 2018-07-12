@@ -2,31 +2,9 @@ package core
 
 import (
 	"fmt"
-	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"os"
 )
-
-func InsertDefaultComms() {
-	emailer := SelectCommunication(1)
-	if emailer == nil {
-		emailer := &types.Communication{
-			Method:    "email",
-			Removable: false,
-			Enabled:   false,
-		}
-		Create(emailer)
-	}
-	slack := SelectCommunication(2)
-	if slack == nil {
-		slack := &types.Communication{
-			Method:    "slack",
-			Removable: false,
-			Enabled:   false,
-		}
-		Create(slack)
-	}
-}
 
 func DeleteConfig() {
 	err := os.Remove("./config.yml")
@@ -95,15 +73,15 @@ func LoadSampleData() error {
 		utils.Log(3, fmt.Sprintf("Error creating Service %v: %v", id, err))
 	}
 
-	checkin := &Checkin{
-		Service:  s2.Id,
-		Interval: 30,
-		Api:      utils.NewSHA1Hash(18),
-	}
-	id, err = checkin.Create()
-	if err != nil {
-		utils.Log(3, fmt.Sprintf("Error creating Checkin %v: %v", id, err))
-	}
+	//checkin := &Checkin{
+	//	Service:  s2.Id,
+	//	Interval: 30,
+	//	Api:      utils.NewSHA1Hash(18),
+	//}
+	//id, err = checkin.Create()
+	//if err != nil {
+	//	utils.Log(3, fmt.Sprintf("Error creating Checkin %v: %v", id, err))
+	//}
 
 	//for i := 0; i < 3; i++ {
 	//	s1.Check()

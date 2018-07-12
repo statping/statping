@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/handlers"
+	"github.com/hunterlong/statup/notifiers"
 	"github.com/rendon/testcli"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -218,7 +219,6 @@ func RunMySQLMakeConfig(t *testing.T, db string) {
 
 	err = core.DbConnection(core.Configs.Connection)
 	assert.Nil(t, err)
-	core.InsertDefaultComms()
 }
 
 func RunInsertMysqlSample(t *testing.T) {
@@ -254,7 +254,8 @@ func RunSelectAllMysqlServices(t *testing.T) {
 
 func RunSelectAllMysqlCommunications(t *testing.T) {
 	var err error
-	comms, err := core.SelectAllCommunications()
+	notifiers.Collections = core.DbSession.Collection("communication")
+	comms := notifiers.Load()
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(comms))
 }
@@ -533,7 +534,6 @@ func RunSettingsHandler(t *testing.T) {
 	route.ServeHTTP(rr, req)
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Settings</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "Theme Editor"))
-	assert.True(t, strings.Contains(rr.Body.String(), "Email Settings"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
 }
 

@@ -1,9 +1,10 @@
 package handlers
 
 import (
+	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/notifications"
-	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 )
@@ -84,65 +85,72 @@ func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
 
-func SaveEmailSettingsHandler(w http.ResponseWriter, r *http.Request) {
+func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
+	var err error
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	emailer := core.SelectCommunication(1)
+	vars := mux.Vars(r)
 	r.ParseForm()
-	smtpHost := r.PostForm.Get("host")
-	smtpUser := r.PostForm.Get("username")
-	smtpPass := r.PostForm.Get("password")
-	smtpPort := int(utils.StringInt(r.PostForm.Get("port")))
-	smtpOutgoing := r.PostForm.Get("address")
-	enabled := r.PostForm.Get("enable_email")
 
-	emailer.Host = smtpHost
-	emailer.Username = smtpUser
-	if smtpPass != "#######################" {
-		emailer.Password = smtpPass
+	notifierId := vars["id"]
+	enabled := r.PostForm.Get("enable")
+
+	host := r.PostForm.Get("host")
+	port := int(utils.StringInt(r.PostForm.Get("port")))
+	username := r.PostForm.Get("username")
+	password := r.PostForm.Get("password")
+	var1 := r.PostForm.Get("var1")
+	var2 := r.PostForm.Get("var2")
+	apiKey := r.PostForm.Get("api_key")
+	apiSecret := r.PostForm.Get("api_secret")
+	limits := int64(utils.StringInt(r.PostForm.Get("limits")))
+	notifer := notifiers.Select(utils.StringInt(notifierId))
+
+	if host != "" {
+		notifer.Host = host
 	}
-	emailer.Port = smtpPort
-	emailer.Var1 = smtpOutgoing
-	emailer.Enabled = false
+	if port != 0 {
+		notifer.Port = port
+	}
+	if username != "" {
+		notifer.Username = username
+	}
+	if password != "" && password != "##########" {
+		notifer.Password = password
+	}
+	if var1 != "" {
+		notifer.Var1 = var1
+	}
+	if var2 != "" {
+		notifer.Var2 = var2
+	}
+	if apiKey != "" {
+		notifer.ApiKey = apiKey
+	}
+	if apiSecret != "" {
+		notifer.ApiSecret = apiSecret
+	}
+	if limits != 0 {
+		notifer.Limits = limits
+	}
 	if enabled == "on" {
-		emailer.Enabled = true
+		notifer.Enabled = true
+	} else {
+		notifer.Enabled = false
 	}
-	core.Update(emailer)
-
-	sample := &types.Email{
-		To:       SessionUser(r).Email,
-		Subject:  "Test Email",
-		Template: "message.html",
-		From:     emailer.Var1,
-	}
-	notifications.LoadEmailer(emailer)
-	notifications.SendEmail(core.EmailBox, sample)
-	notifications.EmailComm = emailer
-	if emailer.Enabled {
-		utils.Log(1, "Starting Email Routine, 1 unique email per 60 seconds")
-		go notifications.EmailRoutine()
+	notifer, err = notifer.Update()
+	if err != nil {
+		utils.Log(3, err)
 	}
 
-	http.Redirect(w, r, "/settings", http.StatusSeeOther)
-}
+	if notifer.Enabled {
+		notify := notifiers.SelectNotifier(notifer.Id)
+		go notify.Run()
+	}
 
-func SaveSlackSettingsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-	slack := core.SelectCommunication(2)
-	r.ParseForm()
-	slackWebhook := r.PostForm.Get("slack_url")
-	enable := r.PostForm.Get("enable_slack")
-	slack.Enabled = false
-	if enable == "on" && slackWebhook != "" {
-		slack.Enabled = true
-		go notifications.SlackRoutine()
-	}
-	slack.Host = slackWebhook
-	core.Update(slack)
+	utils.Log(1, fmt.Sprintf("Notifier saved: %v", notifer))
+
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }

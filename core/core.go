@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/GeertJohan/go.rice"
+	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/plugin"
 	"github.com/hunterlong/statup/types"
 	"github.com/pkg/errors"
@@ -28,7 +29,7 @@ type Core struct {
 	Plugins        []plugin.Info
 	Repos          []PluginJSON
 	AllPlugins     []plugin.PluginActions
-	Communications []*types.Communication
+	Communications []notifiers.AllNotifiers
 	DbConnection   string
 	started        time.Time
 }
@@ -57,13 +58,18 @@ func NewCore() *Core {
 	return CoreApp
 }
 
+func (c *Core) Insert() error {
+	col := DbSession.Collection("core")
+	_, err := col.Insert(c)
+	return err
+}
+
 func InitApp() {
 	SelectCore()
-	SelectAllCommunications()
-	InsertDefaultComms()
-	LoadDefaultCommunications()
+	notifiers.Collections = DbSession.Collection("communication")
 	SelectAllServices()
 	CheckServices()
+	CoreApp.Communications = notifiers.Load()
 	go DatabaseMaintence()
 }
 
@@ -121,6 +127,11 @@ func SelectLastMigration() (int64, error) {
 
 func SelectCore() (*Core, error) {
 	var c *Core
+	exists := DbSession.Collection("core").Exists()
+	if !exists {
+		return nil, errors.New("core database has not been setup yet.")
+	}
+
 	err := DbSession.Collection("core").Find().One(&c)
 	if err != nil {
 		return nil, err

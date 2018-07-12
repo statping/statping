@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/plugin"
-	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
 	"io/ioutil"
@@ -245,18 +244,6 @@ func FakeSeed(plug plugin.PluginActions) {
 		CreatedAt: time.Now(),
 	}
 	fakeUser.Create()
-
-	comm := &types.Communication{
-		Id:     1,
-		Method: "email",
-	}
-	core.Create(comm)
-
-	comm2 := &types.Communication{
-		Id:     2,
-		Method: "slack",
-	}
-	core.Create(comm2)
 
 	for i := 0; i <= 50; i++ {
 		dd := core.HitData{

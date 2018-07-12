@@ -40,24 +40,6 @@ type Checkin struct {
 	Last      time.Time `json:"last"`
 }
 
-type Communication struct {
-	Id        int64     `db:"id,omitempty" json:"id"`
-	Method    string    `db:"method" json:"method"`
-	Host      string    `db:"host" json:"-"`
-	Port      int       `db:"port" json:"-"`
-	Username  string    `db:"username" json:"-"`
-	Password  string    `db:"password" json:"-"`
-	Var1      string    `db:"var1" json:"-"`
-	Var2      string    `db:"var2" json:"-"`
-	ApiKey    string    `db:"api_key" json:"-"`
-	ApiSecret string    `db:"api_secret" json:"-"`
-	Enabled   bool      `db:"enabled" json:"enabled"`
-	Limits    int64     `db:"limits" json:"-"`
-	Removable bool      `db:"removable" json:"-"`
-	CreatedAt time.Time `db:"created_at" json:"created_at"`
-	Routine   chan struct{}
-}
-
 type Email struct {
 	To       string
 	Subject  string
