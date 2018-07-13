@@ -54,8 +54,8 @@ type Notifier interface {
 	Init() error
 	Install() error
 	Run() error
-	OnFailure() error
-	OnSuccess() error
+	OnFailure(map[string]interface{}) error
+	OnSuccess(map[string]interface{}) error
 	Select() *Notification
 	Test() error
 }
@@ -148,17 +148,17 @@ func (n *Notification) GetValue(dbField string) string {
 	return ""
 }
 
-func OnFailure() {
+func OnFailure(data map[string]interface{}) {
 	for _, comm := range AllCommunications {
 		n := comm.(Notifier)
-		n.OnFailure()
+		n.OnFailure(data)
 	}
 }
 
-func OnSuccess() {
+func OnSuccess(data map[string]interface{}) {
 	for _, comm := range AllCommunications {
 		n := comm.(Notifier)
-		n.OnSuccess()
+		n.OnSuccess(data)
 	}
 }
 

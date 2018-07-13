@@ -6,11 +6,14 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 	"time"
+	"text/template"
 )
 
 const (
 	SLACK_ID     = 2
 	SLACK_METHOD = "slack"
+	SERVICE_TEMPLATE = `{ "attachments": [ { "fallback": "ReferenceError - UI is not defined: https://honeybadger.io/path/to/event/", "text": "<https://honeybadger.io/path/to/event/|Google> - Your Statup service 'Google' has just received a Failure notification.", "fields": [ { "title": "Issue", "value": "Awesome Project", "short": true }, { "title": "Response", "value": "production", "short": true } ], "color": "#FF0000", "thumb_url": "http://example.com/path/to/thumb.png", "footer": "Statup", "footer_icon": "https://img.cjx.io/statuplogo32.png", "ts": 123456789 } ] }`
+	TEST_TEMPLATE = `{"text":"%{{.Message}}"}`
 )
 
 var (
@@ -63,7 +66,7 @@ func (u *Slack) Init() error {
 }
 
 func (u *Slack) Test() error {
-	SendSlack("Slack notifications on your Statup server is working!")
+	SendSlack(TEST_TEMPLATE, nil)
 	return nil
 }
 
@@ -86,17 +89,16 @@ func (u *Slack) Run() error {
 }
 
 // CUSTOM FUNCTION FO SENDING SLACK MESSAGES
-func SendSlack(msg string) error {
-	//if slackUrl == "" {
-	//	return errors.New("Slack Webhook URL has not been set in settings")
-	//}
-	fullMessage := fmt.Sprintf("{\"text\":\"%v\"}", msg)
-	slackMessages = append(slackMessages, fullMessage)
+func SendSlack(temp string, data ...interface{}) error {
+	buf := new(bytes.Buffer)
+	slackTemp, _ := template.New("slack").Parse(temp)
+	slackTemp.Execute(buf, data)
+	slackMessages = append(slackMessages, buf.String())
 	return nil
 }
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
-func (u *Slack) OnFailure() error {
+func (u *Slack) OnFailure(data map[string]interface{}) error {
 	if u.Enabled {
 		utils.Log(1, fmt.Sprintf("Notification %v is receiving a failure notification.", u.Method))
 		// Do failing stuff here!
@@ -105,9 +107,19 @@ func (u *Slack) OnFailure() error {
 }
 
 // ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
-func (u *Slack) OnSuccess() error {
+func (u *Slack) OnSuccess(data map[string]interface{}) error {
 	if u.Enabled {
-		utils.Log(1, fmt.Sprintf("Notification %v is receiving a successful notification.", u.Method))
+		utils.Log(1, fmt.Sprintf("Notification %v is receiving a successful notification. %v", u.Method, data))
+
+		//domain := data["Domain"]
+		//expected := data["Expected"]
+		//expectedStatus := data["ExpectedStatus"]
+		failures := data["Failures"]
+		response := data["LastResponse"]
+
+		fullMessage := fmt.Sprintf(`{ "attachments": [ { "fallback": "Service is currently offline", "text": "Service is currently offline", "fields": [ { "title": "Issue", "value": "%v", "short": true }, { "title": "Response", "value": "%v", "short": true } ], "color": "#FF0000", "thumb_url": "http://example.com/path/to/thumb.png", "footer": "Statup", "footer_icon": "https://img.cjx.io/statuplogo32.png", "ts": %v } ] }`, failures, response, time.Now().Unix())
+		slackMessages = append(slackMessages, fullMessage)
+
 		// Do checking or any successful things here
 	}
 	return nil

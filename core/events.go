@@ -17,14 +17,14 @@ func OnSuccess(s *Service) {
 	for _, p := range CoreApp.AllPlugins {
 		p.OnSuccess(structs.Map(s))
 	}
-	notifiers.OnSuccess()
+	notifiers.OnSuccess(structs.Map(s))
 }
 
 func OnFailure(s *Service, f FailureData) {
 	for _, p := range CoreApp.AllPlugins {
 		p.OnFailure(structs.Map(s))
 	}
-	notifiers.OnFailure()
+	notifiers.OnFailure(structs.Map(s))
 }
 
 func OnSettingsSaved(c *Core) {
