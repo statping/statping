@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 )
@@ -23,7 +24,7 @@ func ApiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	vars := mux.Vars(r)
 	checkin := core.FindCheckin(vars["api"])
-	checkin.Receivehit()
+	//checkin.Receivehit()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(checkin)
 }
@@ -44,11 +45,12 @@ func ApiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
-	var s core.Service
+	serv := core.SelectService(utils.StringInt(vars["id"]))
+	var s *types.Service
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&s)
-	service.Update(&s)
+	service := serv.ToService()
+	core.UpdateService(service)
 	json.NewEncoder(w).Encode(s)
 }
 

@@ -13,7 +13,7 @@ func hitCol() db.Collection {
 	return DbSession.Collection("hits")
 }
 
-func (s *Service) CreateHit(d HitData) (int64, error) {
+func CreateServiceHit(s *types.Service, d HitData) (int64, error) {
 	h := Hit{
 		Service:   s.Id,
 		Latency:   d.Latency,
@@ -27,14 +27,16 @@ func (s *Service) CreateHit(d HitData) (int64, error) {
 	return uuid.(int64), err
 }
 
-func (s *Service) Hits() ([]Hit, error) {
+func (ser *Service) Hits() ([]Hit, error) {
+	s := ser.ToService()
 	var hits []Hit
 	col := hitCol().Find("service", s.Id).OrderBy("-id")
 	err := col.All(&hits)
 	return hits, err
 }
 
-func (s *Service) LimitedHits() ([]*Hit, error) {
+func (ser *Service) LimitedHits() ([]*Hit, error) {
+	s := ser.ToService()
 	var hits []*Hit
 	col := hitCol().Find("service", s.Id).OrderBy("-id").Limit(1024)
 	err := col.All(&hits)
@@ -48,14 +50,16 @@ func reverseHits(input []*Hit) []*Hit {
 	return append(reverseHits(input[1:]), input[0])
 }
 
-func (s *Service) SelectHitsGroupBy(group string) ([]Hit, error) {
+func (ser *Service) SelectHitsGroupBy(group string) ([]Hit, error) {
+	s := ser.ToService()
 	var hits []Hit
 	col := hitCol().Find("service", s.Id)
 	err := col.All(&hits)
 	return hits, err
 }
 
-func (s *Service) TotalHits() (uint64, error) {
+func (ser *Service) TotalHits() (uint64, error) {
+	s := ser.ToService()
 	col := hitCol().Find("service", s.Id)
 	amount, err := col.Count()
 	return amount, err

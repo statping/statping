@@ -144,7 +144,7 @@ func (u *Email) Run() error {
 }
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
-func (u *Email) OnFailure(data map[string]interface{}) error {
+func (u *Email) OnFailure(s *types.Service) error {
 	if u.Enabled {
 		utils.Log(1, fmt.Sprintf("Notification %v is receiving a failure notification.", u.Method))
 		// Do failing stuff here!
@@ -153,7 +153,7 @@ func (u *Email) OnFailure(data map[string]interface{}) error {
 }
 
 // ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
-func (u *Email) OnSuccess(data map[string]interface{}) error {
+func (u *Email) OnSuccess(s *types.Service) error {
 	if u.Enabled {
 		utils.Log(1, fmt.Sprintf("Notification %v is receiving a failure notification.", u.Method))
 		// Do failing stuff here!

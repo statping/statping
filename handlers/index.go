@@ -6,8 +6,7 @@ import (
 )
 
 type index struct {
-	Core     core.Core
-	Services []*core.Service
+	Core *core.Core
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -15,6 +14,5 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/setup", http.StatusSeeOther)
 		return
 	}
-	out := index{*core.CoreApp, core.CoreApp.Services}
-	ExecuteResponse(w, r, "index.html", out)
+	ExecuteResponse(w, r, "index.html", core.CoreApp)
 }

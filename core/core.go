@@ -105,7 +105,8 @@ func (c Core) MobileSASS() string {
 }
 
 func (c Core) AllOnline() bool {
-	for _, s := range CoreApp.Services {
+	for _, ser := range CoreApp.Services {
+		s := ser.ToService()
 		if !s.Online {
 			return false
 		}

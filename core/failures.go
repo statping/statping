@@ -3,13 +3,14 @@ package core
 import (
 	"fmt"
 	"github.com/ararog/timeago"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"strings"
 	"time"
 )
 
-func (s *Service) CreateFailure(data FailureData) (int64, error) {
-	fail := &Failure{
+func CreateServiceFailure(s *types.Service, data FailureData) (int64, error) {
+	fail := &types.Failure{
 		Issue:     data.Issue,
 		Service:   s.Id,
 		CreatedAt: time.Now(),
@@ -26,8 +27,8 @@ func (s *Service) CreateFailure(data FailureData) (int64, error) {
 	return uuid.(int64), err
 }
 
-func (s *Service) SelectAllFailures() []*Failure {
-	var fails []*Failure
+func SelectAllFailures(s *types.Service) []*types.Failure {
+	var fails []*types.Failure
 	col := DbSession.Collection("failures").Find("service", s.Id).OrderBy("-id")
 	err := col.All(&fails)
 	if err != nil {
@@ -36,7 +37,7 @@ func (s *Service) SelectAllFailures() []*Failure {
 	return fails
 }
 
-func (u *Service) DeleteFailures() {
+func DeleteFailures(u *types.Service) {
 	var fails []*Failure
 	col := DbSession.Collection("failures")
 	col.Find("service", u.Id).All(&fails)
@@ -45,26 +46,29 @@ func (u *Service) DeleteFailures() {
 	}
 }
 
-func (s *Service) LimitedFailures() []*Failure {
-	var fails []*Failure
+func (ser *Service) LimitedFailures() []*types.Failure {
+	s := ser.ToService()
+	var fails []*types.Failure
 	col := DbSession.Collection("failures").Find("service", s.Id).OrderBy("-id").Limit(10)
 	col.All(&fails)
 	return fails
 }
 
-func reverseFailures(input []*Failure) []*Failure {
+func reverseFailures(input []*types.Failure) []*types.Failure {
 	if len(input) == 0 {
 		return input
 	}
 	return append(reverseFailures(input[1:]), input[0])
 }
 
-func (f *Failure) Ago() string {
+func (fail *Failure) Ago() string {
+	f := fail.ToFailure()
 	got, _ := timeago.TimeAgoWithTime(time.Now(), f.CreatedAt)
 	return got
 }
 
-func (f *Failure) Delete() error {
+func (fail *Failure) Delete() error {
+	f := fail.ToFailure()
 	col := DbSession.Collection("failures").Find("id", f.Id)
 	return col.Delete()
 }
@@ -79,19 +83,31 @@ func CountFailures() uint64 {
 	return amount
 }
 
-func (s *Service) TotalFailures() (uint64, error) {
+func (ser *Service) TotalFailures() (uint64, error) {
+	s := ser.ToService()
 	col := DbSession.Collection("failures").Find("service", s.Id)
 	amount, err := col.Count()
 	return amount, err
 }
 
-func (s *Service) TotalFailures24Hours() (uint64, error) {
+func (ser *Service) TotalFailures24Hours() (uint64, error) {
+	s := ser.ToService()
 	col := DbSession.Collection("failures").Find("service", s.Id)
 	amount, err := col.Count()
 	return amount, err
 }
 
-func (f *Failure) ParseError() string {
+func (f *Failure) ToFailure() *types.Failure {
+	return f.F.(*types.Failure)
+}
+
+func MakeFailure(f *types.Failure) *Failure {
+	fail := &Failure{f}
+	return fail
+}
+
+func (fail *Failure) ParseError() string {
+	f := fail.ToFailure()
 	err := strings.Contains(f.Issue, "operation timed out")
 	if err {
 		return fmt.Sprintf("HTTP Request Timed Out")

@@ -2,6 +2,7 @@ package notifiers
 
 import (
 	"fmt"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"strings"
 	"time"
@@ -54,8 +55,8 @@ type Notifier interface {
 	Init() error
 	Install() error
 	Run() error
-	OnFailure(map[string]interface{}) error
-	OnSuccess(map[string]interface{}) error
+	OnFailure(*types.Service) error
+	OnSuccess(*types.Service) error
 	Select() *Notification
 	Test() error
 }
@@ -81,7 +82,6 @@ func SelectNotification(id int64) (*Notification, error) {
 func (n *Notification) Update() (*Notification, error) {
 	n.CreatedAt = time.Now()
 	err := Collections.Find("id", n.Id).Update(n)
-
 	return n, err
 }
 
@@ -148,26 +148,36 @@ func (n *Notification) GetValue(dbField string) string {
 	return ""
 }
 
-func OnFailure(data map[string]interface{}) {
+func OnFailure(s *types.Service) {
 	for _, comm := range AllCommunications {
 		n := comm.(Notifier)
-		n.OnFailure(data)
+		n.OnFailure(s)
 	}
 }
 
-func OnSuccess(data map[string]interface{}) {
+func OnSuccess(s *types.Service) {
 	for _, comm := range AllCommunications {
 		n := comm.(Notifier)
-		n.OnSuccess(data)
+		n.OnSuccess(s)
 	}
 }
 
-func uniqueMessages(arr []string, v string) []string {
-	var newArray []string
-	for _, i := range arr {
-		if i != v {
-			newArray = append(newArray, v)
+func uniqueStrings(elements []string) []string {
+	result := []string{}
+
+	for i := 0; i < len(elements); i++ {
+		// Scan slice for a previous element of the same value.
+		exists := false
+		for v := 0; v < i; v++ {
+			if elements[v][:10] == elements[i][:10] {
+				exists = true
+				break
+			}
+		}
+		// If no previous element exists, append this one.
+		if !exists {
+			result = append(result, elements[i])
 		}
 	}
-	return newArray
+	return result
 }

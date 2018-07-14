@@ -6,6 +6,7 @@ import (
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/handlers"
 	"github.com/hunterlong/statup/notifiers"
+	"github.com/hunterlong/statup/types"
 	"github.com/rendon/testcli"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -31,7 +32,7 @@ func RunInit(t *testing.T) {
 	core.CoreApp = core.NewCore()
 }
 
-var forceSequential chan bool = make(chan bool, 1)
+var forceSequential = make(chan bool, 1)
 
 func TestRunAll(t *testing.T) {
 
@@ -267,22 +268,22 @@ func RunUser_SelectAll(t *testing.T) {
 }
 
 func RunUser_Create(t *testing.T) {
-	user := &core.User{
+	user := &types.User{
 		Username: "admin",
 		Password: "admin",
 		Email:    "info@testuser.com",
 		Admin:    true,
 	}
-	id, err := user.Create()
+	id, err := core.CreateUser(user)
 	assert.Nil(t, err)
 	assert.Equal(t, int64(1), id)
-	user2 := &core.User{
+	user2 := &types.User{
 		Username: "superadmin",
 		Password: "admin",
 		Email:    "info@adminer.com",
 		Admin:    true,
 	}
-	id, err = user2.Create()
+	id, err = core.CreateUser(user2)
 	assert.Nil(t, err)
 	assert.Equal(t, int64(2), id)
 }
@@ -291,7 +292,7 @@ func RunUser_Update(t *testing.T) {
 	user, err := core.SelectUser(1)
 	user.Email = "info@updatedemail.com"
 	assert.Nil(t, err)
-	err = user.Update()
+	err = core.UpdateUser(user)
 	assert.Nil(t, err)
 	updatedUser, err := core.SelectUser(1)
 	assert.Nil(t, err)
@@ -299,12 +300,12 @@ func RunUser_Update(t *testing.T) {
 }
 
 func RunUser_NonUniqueCreate(t *testing.T) {
-	user := &core.User{
+	user := &types.User{
 		Username: "admin",
 		Password: "admin",
 		Email:    "info@testuser.com",
 	}
-	_, err := user.Create()
+	_, err := core.CreateUser(user)
 	assert.NotNil(t, err)
 }
 
@@ -312,7 +313,7 @@ func RunUser_Delete(t *testing.T) {
 	user, err := core.SelectUser(2)
 	assert.Nil(t, err)
 	assert.NotNil(t, user)
-	err = user.Delete()
+	err = core.DeleteUser(user)
 	assert.Nil(t, err)
 }
 
@@ -327,11 +328,11 @@ func RunOneService_Check(t *testing.T) {
 	service := core.SelectService(1)
 	assert.NotNil(t, service)
 	t.Log(service)
-	assert.Equal(t, "Google", service.Name)
+	assert.Equal(t, "Google", service.ToService().Name)
 }
 
 func RunService_Create(t *testing.T) {
-	service := &core.Service{
+	service := &types.Service{
 		Name:           "test service",
 		Domain:         "https://google.com",
 		ExpectedStatus: 200,
@@ -340,7 +341,7 @@ func RunService_Create(t *testing.T) {
 		Type:           "http",
 		Method:         "GET",
 	}
-	id, err := service.Create()
+	id, err := core.CreateService(service)
 	assert.Nil(t, err)
 	assert.Equal(t, int64(5), id)
 	t.Log(service)
@@ -371,7 +372,7 @@ func RunService_GraphData(t *testing.T) {
 }
 
 func RunBadService_Create(t *testing.T) {
-	service := &core.Service{
+	service := &types.Service{
 		Name:           "Bad Service",
 		Domain:         "https://9839f83h72gey2g29278hd2od2d.com",
 		ExpectedStatus: 200,
@@ -380,7 +381,7 @@ func RunBadService_Create(t *testing.T) {
 		Type:           "http",
 		Method:         "GET",
 	}
-	id, err := service.Create()
+	id, err := core.CreateService(service)
 	assert.Nil(t, err)
 	assert.Equal(t, int64(6), id)
 }
@@ -388,14 +389,14 @@ func RunBadService_Create(t *testing.T) {
 func RunBadService_Check(t *testing.T) {
 	service := core.SelectService(4)
 	assert.NotNil(t, service)
-	assert.Equal(t, "JSON API Tester", service.Name)
+	assert.Equal(t, "JSON API Tester", service.ToService().Name)
 }
 
 func RunDeleteService(t *testing.T) {
 	service := core.SelectService(4)
 	assert.NotNil(t, service)
-	assert.Equal(t, "JSON API Tester", service.Name)
-	err := service.Delete()
+	assert.Equal(t, "JSON API Tester", service.ToService().Name)
+	err := core.DeleteService(service.ToService())
 	assert.Nil(t, err)
 }
 
@@ -405,7 +406,7 @@ func RunCreateService_Hits(t *testing.T) {
 	assert.NotNil(t, services)
 	for i := 0; i <= 10; i++ {
 		for _, s := range services {
-			service := s.Check()
+			service := core.ServiceCheck(s.ToService())
 			assert.NotNil(t, service)
 		}
 	}
@@ -423,7 +424,7 @@ func RunService_Failures(t *testing.T) {
 	t.SkipNow()
 	service := core.SelectService(6)
 	assert.NotNil(t, service)
-	assert.NotEmpty(t, service.Failures)
+	assert.NotEmpty(t, service.ToService().Failures)
 }
 
 func RunService_LimitedHits(t *testing.T) {

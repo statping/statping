@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/plugin"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
 	"io/ioutil"
@@ -105,8 +106,9 @@ func RunOnce() {
 	if err != nil {
 		utils.Log(4, err)
 	}
-	for _, s := range core.CoreApp.Services {
-		out := s.Check()
+	for _, ser := range core.CoreApp.Services {
+		s := ser.ToService()
+		out := core.ServiceCheck(s)
 		fmt.Printf("    Service %v | URL: %v | Latency: %0.0fms | Online: %v\n", out.Name, out.Domain, (out.Latency * 1000), out.Online)
 	}
 }
@@ -148,33 +150,33 @@ func TestPlugin(plug plugin.PluginActions) {
 	core.OnLoad(core.DbSession)
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnSuccess(Service)'")
-	core.OnSuccess(core.SelectService(1))
+	core.OnSuccess(core.SelectService(1).ToService())
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnFailure(Service, FailureData)'")
 	fakeFailD := core.FailureData{
 		Issue: "No issue, just testing this plugin. This would include HTTP failure information though",
 	}
-	core.OnFailure(core.SelectService(1), fakeFailD)
+	core.OnFailure(core.SelectService(1).ToService(), fakeFailD)
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnSettingsSaved(Core)'")
 	fmt.Println(BRAKER)
 	core.OnSettingsSaved(core.CoreApp)
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnNewService(Service)'")
-	core.OnNewService(core.SelectService(2))
+	core.OnNewService(core.SelectService(2).ToService())
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnNewUser(User)'")
 	user, _ := core.SelectUser(1)
 	core.OnNewUser(user)
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnUpdateService(Service)'")
-	srv := core.SelectService(2)
+	srv := core.SelectService(2).ToService()
 	srv.Type = "http"
 	srv.Domain = "https://yahoo.com"
 	core.OnUpdateService(srv)
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnDeletedService(Service)'")
-	core.OnDeletedService(core.SelectService(1))
+	core.OnDeletedService(core.SelectService(1).ToService())
 	fmt.Println("\n" + BRAKER)
 }
 
@@ -212,21 +214,21 @@ func FakeSeed(plug plugin.PluginActions) {
 	core.CoreApp.ApiSecret = "0x0x0x0x0"
 	core.CoreApp.ApiKey = "abcdefg12345"
 
-	fakeSrv := &core.Service{
+	fakeSrv := &types.Service{
 		Name:   "Test Plugin Service",
 		Domain: "https://google.com",
 		Method: "GET",
 	}
-	fakeSrv.Create()
+	core.CreateService(fakeSrv)
 
-	fakeSrv2 := &core.Service{
+	fakeSrv2 := &types.Service{
 		Name:   "Awesome Plugin Service",
 		Domain: "https://netflix.com",
 		Method: "GET",
 	}
-	fakeSrv2.Create()
+	core.CreateService(fakeSrv2)
 
-	fakeUser := &core.User{
+	fakeUser := &types.User{
 		Id:        6334,
 		Username:  "Bulbasaur",
 		Password:  "$2a$14$NzT/fLdE3f9iB1Eux2C84O6ZoPhI4NfY0Ke32qllCFo8pMTkUPZzy",
@@ -234,35 +236,37 @@ func FakeSeed(plug plugin.PluginActions) {
 		Admin:     true,
 		CreatedAt: time.Now(),
 	}
-	fakeUser.Create()
+	core.CreateUser(fakeUser)
 
-	fakeUser = &core.User{
+	fakeUser = &types.User{
 		Id:        6335,
 		Username:  "Billy",
 		Password:  "$2a$14$NzT/fLdE3f9iB1Eux2C84O6ZoPhI4NfY0Ke32qllCFo8pMTkUPZzy",
 		Email:     "info@awesome.com",
 		CreatedAt: time.Now(),
 	}
-	fakeUser.Create()
+	core.CreateUser(fakeUser)
 
 	for i := 0; i <= 50; i++ {
 		dd := core.HitData{
 			Latency: rand.Float64(),
 		}
-		fakeSrv.CreateHit(dd)
+		core.CreateServiceHit(fakeSrv, dd)
+
 		dd = core.HitData{
 			Latency: rand.Float64(),
 		}
-		fakeSrv2.CreateHit(dd)
+		core.CreateServiceHit(fakeSrv2, dd)
+
 		fail := core.FailureData{
 			Issue: "This is not an issue, but it would container HTTP response errors.",
 		}
-		fakeSrv.CreateFailure(fail)
+		core.CreateServiceFailure(fakeSrv, fail)
 
 		fail = core.FailureData{
 			Issue: "HTTP Status Code 521 did not match 200",
 		}
-		fakeSrv2.CreateFailure(fail)
+		core.CreateServiceFailure(fakeSrv, fail)
 	}
 
 	fmt.Println("Seeding example data is complete, running Plugin Tests")

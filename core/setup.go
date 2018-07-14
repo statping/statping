@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"os"
 )
@@ -19,7 +20,7 @@ type ErrorResponse struct {
 
 func LoadSampleData() error {
 	utils.Log(1, "Inserting Sample Data...")
-	s1 := &Service{
+	s1 := &types.Service{
 		Name:           "Google",
 		Domain:         "https://google.com",
 		ExpectedStatus: 200,
@@ -28,7 +29,7 @@ func LoadSampleData() error {
 		Type:           "http",
 		Method:         "GET",
 	}
-	s2 := &Service{
+	s2 := &types.Service{
 		Name:           "Statup Github",
 		Domain:         "https://github.com/hunterlong/statup",
 		ExpectedStatus: 200,
@@ -37,7 +38,7 @@ func LoadSampleData() error {
 		Type:           "http",
 		Method:         "GET",
 	}
-	s3 := &Service{
+	s3 := &types.Service{
 		Name:           "JSON Users Test",
 		Domain:         "https://jsonplaceholder.typicode.com/users",
 		ExpectedStatus: 200,
@@ -46,7 +47,7 @@ func LoadSampleData() error {
 		Type:           "http",
 		Method:         "GET",
 	}
-	s4 := &Service{
+	s4 := &types.Service{
 		Name:           "JSON API Tester",
 		Domain:         "https://jsonplaceholder.typicode.com/posts",
 		ExpectedStatus: 201,
@@ -56,19 +57,19 @@ func LoadSampleData() error {
 		Method:         "POST",
 		PostData:       `{ "title": "statup", "body": "bar", "userId": 19999 }`,
 	}
-	id, err := s1.Create()
+	id, err := CreateService(s1)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error creating Service %v: %v", id, err))
 	}
-	id, err = s2.Create()
+	id, err = CreateService(s2)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error creating Service %v: %v", id, err))
 	}
-	id, err = s3.Create()
+	id, err = CreateService(s3)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error creating Service %v: %v", id, err))
 	}
-	id, err = s4.Create()
+	id, err = CreateService(s4)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error creating Service %v: %v", id, err))
 	}
