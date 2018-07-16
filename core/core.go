@@ -42,7 +42,6 @@ var (
 	ScssBox     *rice.Box
 	JsBox       *rice.Box
 	TmplBox     *rice.Box
-	EmailBox    *rice.Box
 	SetupMode   bool
 	UsingAssets bool
 	VERSION     string

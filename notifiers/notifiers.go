@@ -169,7 +169,7 @@ func uniqueStrings(elements []string) []string {
 		// Scan slice for a previous element of the same value.
 		exists := false
 		for v := 0; v < i; v++ {
-			if elements[v][:10] == elements[i][:10] {
+			if elements[v] == elements[i] {
 				exists = true
 				break
 			}

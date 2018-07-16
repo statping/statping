@@ -50,7 +50,6 @@ func RenderBoxes() {
 	core.ScssBox = rice.MustFindBox("source/scss")
 	core.JsBox = rice.MustFindBox("source/js")
 	core.TmplBox = rice.MustFindBox("source/tmpl")
-	core.EmailBox = rice.MustFindBox("source/emails")
 }
 
 func LoadDotEnvs() {

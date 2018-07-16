@@ -21,11 +21,12 @@ var (
 	emailer    *Email
 	emailArray []string
 	emailQueue []*types.Email
+	emailBox   *rice.Box
+	mailer     *gomail.Dialer
 )
 
 type Email struct {
 	*Notification
-	mailer *gomail.Dialer
 }
 
 // DEFINE YOUR NOTIFICATION HERE.
@@ -84,7 +85,9 @@ func (u *Email) Select() *Notification {
 
 // WHEN NOTIFIER LOADS
 func (u *Email) Init() error {
+	emailBox = rice.MustFindBox("emails")
 	err := u.Install()
+	utils.Log(1, fmt.Sprintf("Creating Mailer: %v:%v", u.Notification.Host, u.Notification.Port))
 
 	if err == nil {
 		notifier, _ := SelectNotification(u.Id)
@@ -94,27 +97,31 @@ func (u *Email) Init() error {
 		if u.Enabled {
 
 			utils.Log(1, fmt.Sprintf("Loading SMTP Emailer using host: %v:%v", u.Notification.Host, u.Notification.Port))
-			u.mailer = gomail.NewDialer(u.Notification.Host, u.Notification.Port, u.Notification.Username, u.Notification.Password)
-			u.mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+			mailer = gomail.NewDialer(u.Notification.Host, u.Notification.Port, u.Notification.Username, u.Notification.Password)
+			mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 			go u.Run()
 		}
 	}
-
-	//go u.Run()
 	return nil
 }
 
 func (u *Email) Test() error {
-	//email := &types.Email{
-	//	To:       "info@socialeck.com",
-	//	Subject:  "Test Email",
-	//	Template: "message.html",
-	//	Data:     nil,
-	//	From:     emailer.Var1,
-	//}
-	//SendEmail(core.EmailBox, email)
+	if u.Enabled {
+		email := &types.Email{
+			To:       "info@socialeck.com",
+			Subject:  "Test Email",
+			Template: "message.html",
+			Data:     nil,
+			From:     emailer.Var1,
+		}
+		SendEmail(emailBox, email)
+	}
 	return nil
+}
+
+type emailMessage struct {
+	Service *types.Service
 }
 
 // AFTER NOTIFIER LOADS, IF ENABLED, START A QUEUE PROCESS
@@ -146,8 +153,20 @@ func (u *Email) Run() error {
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *Email) OnFailure(s *types.Service) error {
 	if u.Enabled {
-		utils.Log(1, fmt.Sprintf("Notification %v is receiving a failure notification.", u.Method))
-		// Do failing stuff here!
+
+		msg := emailMessage{
+			Service: s,
+		}
+
+		email := &types.Email{
+			To:       "info@socialeck.com",
+			Subject:  fmt.Sprintf("Service %v is Failing", s.Name),
+			Template: "failure.html",
+			Data:     msg,
+			From:     emailer.Var1,
+		}
+		SendEmail(emailBox, email)
+
 	}
 	return nil
 }
@@ -155,8 +174,7 @@ func (u *Email) OnFailure(s *types.Service) error {
 // ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
 func (u *Email) OnSuccess(s *types.Service) error {
 	if u.Enabled {
-		utils.Log(1, fmt.Sprintf("Notification %v is receiving a failure notification.", u.Method))
-		// Do failing stuff here!
+
 	}
 	return nil
 }
@@ -172,6 +190,9 @@ func (u *Email) OnSave() error {
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *Email) Install() error {
+
+	fmt.Println("installing emailer")
+
 	inDb, err := emailer.Notification.isInDatabase()
 	if !inDb {
 		newNotifer, err := InsertDatabase(u.Notification)
@@ -185,12 +206,13 @@ func (u *Email) Install() error {
 }
 
 func (u *Email) dialSend(email *types.Email) error {
+	fmt.Println("sending dailsend to emailer")
 	m := gomail.NewMessage()
 	m.SetHeader("From", email.From)
 	m.SetHeader("To", email.To)
 	m.SetHeader("Subject", email.Subject)
 	m.SetBody("text/html", email.Source)
-	if err := u.mailer.DialAndSend(m); err != nil {
+	if err := mailer.DialAndSend(m); err != nil {
 		utils.Log(3, fmt.Sprintf("Email '%v' sent to: %v using the %v template (size: %v) %v", email.Subject, email.To, email.Template, len([]byte(email.Source)), err))
 		return err
 	}

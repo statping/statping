@@ -14,8 +14,8 @@ import (
 const (
 	SLACK_ID         = 2
 	SLACK_METHOD     = "slack"
-	FAILING_TEMPLATE = `{ "attachments": [ { "fallback": "Service {{.Service.Name}} - is currently failing", "text": "<{{.Service.Domain}}|{{.Service.Name}}> - Your Statup service '{{.Service.Name}}' has just received a Failure notification with a HTTP Status code of {{.Service.LastStatusCode}}.", "fields": [ { "title": "Expected", "value": "{{.Service.Expected}}", "short": true }, { "title": "Status Code", "value": "{{.Service.LastStatusCode}}", "short": true } ], "color": "#FF0000", "thumb_url": "https://statup.io", "footer": "Statup", "footer_icon": "https://img.cjx.io/statuplogo32.png", "ts": {{.Time}} } ] }`
-	SUCCESS_TEMPLATE = `{ "attachments": [ { "fallback": "Service {{.Service.Name}} - is now back online", "text": "<{{.Service.Domain}}|{{.Service.Name}}> - Your Statup service '{{.Service.Name}}' has just received a Failure notification.", "fields": [ { "title": "Issue", "value": "Awesome Project", "short": true }, { "title": "Status Code", "value": "{{.Service.LastStatusCode}}", "short": true } ], "color": "#00FF00", "thumb_url": "https://statup.io", "footer": "Statup", "footer_icon": "https://img.cjx.io/statuplogo32.png", "ts": {{.Time}} } ] }`
+	FAILING_TEMPLATE = `{ "attachments": [ { "fallback": "Service {{.Service.Name}} - is currently failing", "text": "<{{.Service.Domain}}|{{.Service.Name}}> - Your Statup service '{{.Service.Name}}' has just received a Failure notification with a HTTP Status code of {{.Service.LastStatusCode}}.", "fields": [ { "title": "Expected", "value": "{{.Service.Expected}}", "short": true }, { "title": "Status Code", "value": "{{.Service.LastStatusCode}}", "short": true } ], "color": "#FF0000", "thumb_url": "https://statup.io", "footer": "Statup", "footer_icon": "https://img.cjx.io/statuplogo32.png" } ] }`
+	SUCCESS_TEMPLATE = `{ "attachments": [ { "fallback": "Service {{.Service.Name}} - is now back online", "text": "<{{.Service.Domain}}|{{.Service.Name}}> - Your Statup service '{{.Service.Name}}' has just received a Failure notification.", "fields": [ { "title": "Issue", "value": "Awesome Project", "short": true }, { "title": "Status Code", "value": "{{.Service.LastStatusCode}}", "short": true } ], "color": "#00FF00", "thumb_url": "https://statup.io", "footer": "Statup", "footer_icon": "https://img.cjx.io/statuplogo32.png" } ] }`
 	TEST_TEMPLATE    = `{"text":"{{.}}"}`
 )
 
@@ -90,9 +90,8 @@ func (u *Slack) Run() error {
 		if err != nil {
 			utils.Log(3, fmt.Sprintf("Issue sending Slack notification: %v", err))
 		}
-
-		fmt.Println(msg)
 	}
+	slackMessages = []string{}
 	messageLock.Unlock()
 	time.Sleep(60 * time.Second)
 	if u.Enabled {
@@ -115,13 +114,10 @@ func SendSlack(temp string, data interface{}) error {
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *Slack) OnFailure(s *types.Service) error {
 	if u.Enabled {
-		// Do failing stuff here!
-
 		message := slackMessage{
 			Service: s,
 			Time:    time.Now().Unix(),
 		}
-
 		SendSlack(FAILING_TEMPLATE, message)
 	}
 	return nil
@@ -130,8 +126,11 @@ func (u *Slack) OnFailure(s *types.Service) error {
 // ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
 func (u *Slack) OnSuccess(s *types.Service) error {
 	if u.Enabled {
-		SendSlack(SUCCESS_TEMPLATE, s)
-		// Do checking or any successful things here
+		//message := slackMessage{
+		//	Service: s,
+		//	Time:    time.Now().Unix(),
+		//}
+		//SendSlack(SUCCESS_TEMPLATE, message)
 	}
 	return nil
 }
