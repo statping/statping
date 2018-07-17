@@ -188,7 +188,6 @@ func TestAssetsCommand(t *testing.T) {
 	assert.True(t, fileExists("assets/js/main.js"))
 	assert.True(t, fileExists("assets/css/base.css"))
 	assert.True(t, fileExists("assets/scss/base.scss"))
-	assert.True(t, fileExists("assets/emails/failure.html"))
 }
 
 func RunMySQLMakeConfig(t *testing.T, db string) {
