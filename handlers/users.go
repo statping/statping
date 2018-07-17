@@ -64,7 +64,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 	if password != "##########" {
 		user.Password = utils.HashPassword(password)
 	}
-	user.Update()
+	core.UpdateUser(user)
 	users, _ := core.SelectAllUsers()
 	ExecuteResponse(w, r, "users.html", users)
 }
@@ -80,13 +80,13 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	email := r.PostForm.Get("email")
 	admin := r.PostForm.Get("admin")
 
-	user := &core.User{
+	user := &types.User{
 		Username: username,
 		Password: password,
 		Email:    email,
 		Admin:    (admin == "on"),
 	}
-	_, err := user.Create()
+	_, err := core.CreateUser(user)
 	if err != nil {
 		utils.Log(2, err)
 	}
@@ -108,6 +108,6 @@ func UsersDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/users", http.StatusSeeOther)
 		return
 	}
-	user.Delete()
+	core.DeleteUser(user)
 	http.Redirect(w, r, "/users", http.StatusSeeOther)
 }

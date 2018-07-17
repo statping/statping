@@ -21,6 +21,11 @@ $(".confirm-btn").on('click', function() {
 });
 
 
+$(".select-input").on("click", function () {
+    $(this).select();
+});
+
+
 var ranVar = false;
 var ranTheme = false;
 $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {

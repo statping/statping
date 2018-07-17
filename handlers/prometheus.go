@@ -28,7 +28,8 @@ func PrometheusHandler(w http.ResponseWriter, r *http.Request) {
 	system := fmt.Sprintf("statup_total_failures %v\n", core.CountFailures())
 	system += fmt.Sprintf("statup_total_services %v", len(core.CoreApp.Services))
 	metrics = append(metrics, system)
-	for _, v := range core.CoreApp.Services {
+	for _, ser := range core.CoreApp.Services {
+		v := ser.ToService()
 		online := 1
 		if !v.Online {
 			online = 0

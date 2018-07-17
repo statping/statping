@@ -10,36 +10,36 @@ import (
 
 type User types.User
 
-func SelectUser(id int64) (*User, error) {
-	var user User
+func SelectUser(id int64) (*types.User, error) {
+	var user *types.User
 	col := DbSession.Collection("users")
 	res := col.Find("id", id)
 	err := res.One(&user)
-	return &user, err
+	return user, err
 }
 
-func SelectUsername(username string) (*User, error) {
-	var user User
+func SelectUsername(username string) (*types.User, error) {
+	var user *types.User
 	col := DbSession.Collection("users")
 	res := col.Find("username", username)
 	err := res.One(&user)
-	return &user, err
+	return user, err
 }
 
-func (u *User) Delete() error {
+func DeleteUser(u *types.User) error {
 	col := DbSession.Collection("users")
 	user := col.Find("id", u.Id)
 	return user.Delete()
 }
 
-func (u *User) Update() error {
+func UpdateUser(u *types.User) error {
 	u.CreatedAt = time.Now()
 	col := DbSession.Collection("users")
 	user := col.Find("id", u.Id)
 	return user.Update(u)
 }
 
-func (u *User) Create() (int64, error) {
+func CreateUser(u *types.User) (int64, error) {
 	u.CreatedAt = time.Now()
 	u.Password = utils.HashPassword(u.Password)
 	u.ApiKey = utils.NewSHA1Hash(5)
@@ -63,7 +63,7 @@ func SelectAllUsers() ([]User, error) {
 	return users, err
 }
 
-func AuthUser(username, password string) (*User, bool) {
+func AuthUser(username, password string) (*types.User, bool) {
 	var auth bool
 	user, err := SelectUsername(username)
 	if err != nil {

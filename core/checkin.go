@@ -14,9 +14,9 @@ func (c *Checkin) String() string {
 	return c.Api
 }
 
-func FindCheckin(api string) *Checkin {
-	for _, s := range CoreApp.Services {
-		for _, c := range s.Checkins {
+func FindCheckin(api string) *types.Checkin {
+	for _, ser := range CoreApp.Services {
+		for _, c := range ser.ToService().Checkins {
 			if c.Api == api {
 				return c
 			}
@@ -25,8 +25,8 @@ func FindCheckin(api string) *Checkin {
 	return nil
 }
 
-func (s *Service) SelectAllCheckins() []*Checkin {
-	var checkins []*Checkin
+func SelectAllCheckins(s *types.Service) []*types.Checkin {
+	var checkins []*types.Checkin
 	col := DbSession.Collection("checkins").Find("service", s.Id).OrderBy("-id")
 	col.All(&checkins)
 	s.Checkins = checkins
@@ -78,33 +78,33 @@ func (f *Checkin) Ago() string {
 	return got
 }
 
-func (c *Checkin) Run() {
-	if c.Interval == 0 {
-		return
-	}
-	fmt.Println("checking: ", c.Api)
-	between := time.Now().Sub(c.Last).Seconds()
-	if between > float64(c.Interval) {
-		guard := make(chan struct{})
-		c.RecheckCheckinFailure(guard)
-		<-guard
-	}
-	time.Sleep(1 * time.Second)
-	c.Run()
-}
-
-func (s *Service) StartCheckins() {
-	for _, c := range s.Checkins {
-		checkin := c
-		go checkin.Run()
-	}
-}
-
-func CheckinProcess() {
-	for _, s := range CoreApp.Services {
-		for _, c := range s.Checkins {
-			checkin := c
-			go checkin.Run()
-		}
-	}
-}
+//func (c *Checkin) Run() {
+//	if c.Interval == 0 {
+//		return
+//	}
+//	fmt.Println("checking: ", c.Api)
+//	between := time.Now().Sub(c.Last).Seconds()
+//	if between > float64(c.Interval) {
+//		guard := make(chan struct{})
+//		c.RecheckCheckinFailure(guard)
+//		<-guard
+//	}
+//	time.Sleep(1 * time.Second)
+//	c.Run()
+//}
+//
+//func (s *Service) StartCheckins() {
+//	for _, c := range s.Checkins {
+//		checkin := c.(*Checkin)
+//		go checkin.Run()
+//	}
+//}
+//
+//func CheckinProcess() {
+//	for _, s := range CoreApp.Services {
+//		for _, c := range s.Checkins {
+//			checkin := c
+//			go checkin.Run()
+//		}
+//	}
+//}
