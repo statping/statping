@@ -83,11 +83,16 @@ func (s *Service) CheckHTTP() *Service {
 		Timeout: 30 * time.Second,
 	}
 
+	domain := s.Domain
+	if s.Port != 0 {
+		domain += fmt.Sprintf(":%d", s.Port)
+	}
+
 	var response *http.Response
 	if s.Method == "POST" {
-		response, err = client.Post(s.Domain, "application/json", bytes.NewBuffer([]byte(s.PostData)))
+		response, err = client.Post(domain, "application/json", bytes.NewBuffer([]byte(s.PostData)))
 	} else {
-		response, err = client.Get(s.Domain)
+		response, err = client.Get(domain)
 	}
 	if err != nil {
 		s.Failure(fmt.Sprintf("HTTP Error %v", err))
