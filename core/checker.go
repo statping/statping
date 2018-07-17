@@ -3,14 +3,15 @@ package core
 import (
 	"bytes"
 	"fmt"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
 	"regexp"
 	"time"
+
+	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statup/utils"
 )
 
 type FailureData types.FailureData
@@ -59,6 +60,18 @@ func (s *Service) DNSCheck() (float64, error) {
 }
 
 func (s *Service) Check() *Service {
+	switch s.Type {
+	case "http":
+		return s.CheckHTTP()
+	case "tcp":
+		return s.CheckTCP()
+	}
+
+	s.Failure(fmt.Sprintf("Unknown service type %s", s.Type))
+	return s
+}
+
+func (s *Service) CheckHTTP() *Service {
 	dnsLookup, err := s.DNSCheck()
 	if err != nil {
 		s.Failure(fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
@@ -83,10 +96,7 @@ func (s *Service) Check() *Service {
 	response.Header.Set("User-Agent", "StatupMonitor")
 	t2 := time.Now()
 	s.Latency = t2.Sub(t1).Seconds()
-	if err != nil {
-		s.Failure(fmt.Sprintf("HTTP Error %v", err))
-		return s
-	}
+
 	defer response.Body.Close()
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
@@ -113,7 +123,28 @@ func (s *Service) Check() *Service {
 	s.LastResponse = string(contents)
 	s.LastStatusCode = response.StatusCode
 	s.Online = true
-	s.Record(response)
+	s.Record()
+	return s
+}
+
+func (s *Service) CheckTCP() *Service {
+	t1 := time.Now()
+
+	conn, err := net.Dial("tcp", s.Domain)
+	if err != nil {
+		s.Failure(fmt.Sprintf("TCP Dial Error %v", err))
+		return s
+	}
+	if err := conn.Close(); err != nil {
+		s.Failure(fmt.Sprintf("TCP Socket Close Error %v", err))
+		return s
+	}
+	t2 := time.Now()
+	s.Latency = t2.Sub(t1).Seconds()
+	s.LastResponse = ""
+	s.LastStatusCode = 200
+	s.Online = true
+	s.Record()
 	return s
 }
 
@@ -121,7 +152,7 @@ type HitData struct {
 	Latency float64
 }
 
-func (s *Service) Record(response *http.Response) {
+func (s *Service) Record() {
 	s.Online = true
 	s.LastOnline = time.Now()
 	data := HitData{
