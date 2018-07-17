@@ -119,7 +119,7 @@ func (c *DbConfig) Save() error {
 	DropDatabase()
 	CreateDatabase()
 
-	newCore := &Core{
+	newCore := &types.Core{
 		Name:        c.Project,
 		Description: c.Description,
 		Config:      "config.yml",
@@ -131,7 +131,7 @@ func (c *DbConfig) Save() error {
 	col := DbSession.Collection("core")
 	_, err = col.Insert(newCore)
 	if err == nil {
-		CoreApp = newCore
+		CoreApp = &Core{Core: newCore}
 	}
 
 	CoreApp, err = SelectCore()
@@ -204,7 +204,7 @@ func RunDatabaseUpgrades() error {
 			panic(err)
 		}
 		CoreApp.MigrationId = currentMigration
-		CoreApp.Update()
+		UpdateCore(CoreApp)
 	}
 	return err
 }

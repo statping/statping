@@ -3,7 +3,6 @@ package core
 import (
 	"github.com/fatih/structs"
 	"github.com/hunterlong/statup/notifiers"
-	"github.com/hunterlong/statup/plugin"
 	"github.com/hunterlong/statup/types"
 	"upper.io/db.v3/lib/sqlbuilder"
 )
@@ -28,7 +27,7 @@ func OnFailure(s *types.Service, f FailureData) {
 	notifiers.OnFailure(s)
 }
 
-func OnSettingsSaved(c *Core) {
+func OnSettingsSaved(c *types.Core) {
 	for _, p := range CoreApp.AllPlugins {
 		p.OnSettingsSaved(structs.Map(c))
 	}
@@ -58,11 +57,11 @@ func OnUpdateService(s *types.Service) {
 	}
 }
 
-func SelectPlugin(name string) plugin.PluginActions {
+func SelectPlugin(name string) types.PluginActions {
 	for _, p := range CoreApp.AllPlugins {
 		if p.GetInfo().Name == name {
 			return p
 		}
 	}
-	return plugin.PluginInfo{}
+	return types.PluginInfo{}
 }

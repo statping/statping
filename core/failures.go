@@ -46,12 +46,16 @@ func DeleteFailures(u *types.Service) {
 	}
 }
 
-func (ser *Service) LimitedFailures() []*types.Failure {
+func (ser *Service) LimitedFailures() []*Failure {
 	s := ser.ToService()
 	var fails []*types.Failure
+	var failArr []*Failure
 	col := DbSession.Collection("failures").Find("service", s.Id).OrderBy("-id").Limit(10)
 	col.All(&fails)
-	return fails
+	for _, f := range fails {
+		failArr = append(failArr, MakeFailure(f))
+	}
+	return failArr
 }
 
 func reverseFailures(input []*types.Failure) []*types.Failure {

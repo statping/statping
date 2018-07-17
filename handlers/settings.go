@@ -9,23 +9,11 @@ import (
 	"net/http"
 )
 
-func PluginsHandler(w http.ResponseWriter, r *http.Request) {
+func SettingsHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	//CoreApp.FetchPluginRepo()
-
-	//var pluginFields []PluginSelect
-	//
-	//for _, p := range allPlugins {
-	//	fields := structs.Map(p.GetInfo())
-	//
-	//	pluginFields = append(pluginFields, PluginSelect{p.GetInfo().Name, p.GetForm(), fields})
-	//}
-
-	//CoreApp.PluginFields = pluginFields
-
 	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }
 
@@ -56,8 +44,8 @@ func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 		core.CoreApp.Domain = domain
 	}
 	core.CoreApp.UseCdn = (r.PostForm.Get("enable_cdn") == "on")
-	core.CoreApp.Update()
-	core.OnSettingsSaved(core.CoreApp)
+	core.CoreApp, _ = core.UpdateCore(core.CoreApp)
+	core.OnSettingsSaved(core.CoreApp.ToCore())
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
 
@@ -105,8 +93,8 @@ func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	var2 := r.PostForm.Get("var2")
 	apiKey := r.PostForm.Get("api_key")
 	apiSecret := r.PostForm.Get("api_secret")
-	limits := int64(utils.StringInt(r.PostForm.Get("limits")))
-	notifer := notifiers.Select(utils.StringInt(notifierId))
+	limits := int(utils.StringInt(r.PostForm.Get("limits")))
+	notifer := notifiers.SelectNotifier(utils.StringInt(notifierId)).Select()
 
 	if host != "" {
 		notifer.Host = host

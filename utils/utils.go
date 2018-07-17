@@ -1,15 +1,32 @@
 package utils
 
 import (
+	"github.com/ararog/timeago"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func StringInt(s string) int64 {
 	num, _ := strconv.Atoi(s)
 	return int64(num)
+}
+
+func IntString(s int) string {
+	return strconv.Itoa(s)
+}
+
+type Timestamp time.Time
+
+type Timestamper interface {
+	Ago() string
+}
+
+func (t Timestamp) Ago() string {
+	got, _ := timeago.TimeAgoWithTime(time.Now(), time.Time(t))
+	return got
 }
 
 func UnderScoreString(str string) string {

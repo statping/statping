@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/plugin"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
@@ -106,9 +105,8 @@ func RunOnce() {
 	if err != nil {
 		utils.Log(4, err)
 	}
-	for _, ser := range core.CoreApp.Services {
-		s := ser.ToService()
-		out := core.ServiceCheck(s)
+	for _, s := range core.CoreApp.Services {
+		out := core.ServiceCheck(s.ToService())
 		fmt.Printf("    Service %v | URL: %v | Latency: %0.0fms | Online: %v\n", out.Name, out.Domain, (out.Latency * 1000), out.Online)
 	}
 }
@@ -129,7 +127,7 @@ func HelpEcho() {
 	fmt.Println("Give Statup a Star at https://github.com/hunterlong/statup")
 }
 
-func TestPlugin(plug plugin.PluginActions) {
+func TestPlugin(plug types.PluginActions) {
 	defer utils.DeleteFile("./.plugin_test.db")
 	RenderBoxes()
 
@@ -160,7 +158,7 @@ func TestPlugin(plug plugin.PluginActions) {
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnSettingsSaved(Core)'")
 	fmt.Println(BRAKER)
-	core.OnSettingsSaved(core.CoreApp)
+	core.OnSettingsSaved(core.CoreApp.ToCore())
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnNewService(Service)'")
 	core.OnNewService(core.SelectService(2).ToService())
@@ -180,11 +178,11 @@ func TestPlugin(plug plugin.PluginActions) {
 	fmt.Println("\n" + BRAKER)
 }
 
-func FakeSeed(plug plugin.PluginActions) {
+func FakeSeed(plug types.PluginActions) {
 	var err error
 	core.CoreApp = core.NewCore()
 
-	core.CoreApp.AllPlugins = []plugin.PluginActions{plug}
+	core.CoreApp.AllPlugins = []types.PluginActions{plug}
 
 	fmt.Printf("\n" + BRAKER)
 

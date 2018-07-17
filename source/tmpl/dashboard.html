@@ -59,26 +59,23 @@
             {{ end }}
             </div>
 
-
-            <h3>Latest Failures</h3>
-
         {{ range .Services }}
         {{ $s := .ToService }}
                 {{ if .LimitedFailures }}
-                    <div class="list-group mt-3">
+                    <h4>{{$s.Name}} Failures</h4>
+                    <div class="list-group mt-3 mb-4">
                     {{ range .LimitedFailures }}
+                    {{ $f := .ToFailure }}
                         <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                             <div class="d-flex w-100 justify-content-between">
                                 <h5 class="mb-1">{{.ParseError}}</h5>
                                 <small>Reported {{.Ago}}</small>
                             </div>
-                            <p class="mb-1">{{.Issue}}</p>
+                            <p class="mb-1">{{$f.Issue}}</p>
                         </a>
                     {{ end }}
                     </div>
                 {{ end }}
-
-
         {{ end }}
 
 

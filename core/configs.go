@@ -85,7 +85,7 @@ func LoadUsingEnv() (*types.Config, error) {
 		DropDatabase()
 		CreateDatabase()
 
-		CoreApp = &Core{
+		CoreApp = &Core{Core: &types.Core{
 			Name:        dbConfig.Project,
 			Description: dbConfig.Description,
 			Config:      "config.yml",
@@ -93,11 +93,11 @@ func LoadUsingEnv() (*types.Config, error) {
 			ApiSecret:   utils.NewSHA1Hash(16),
 			Domain:      dbConfig.Domain,
 			MigrationId: time.Now().Unix(),
-		}
+		}}
 
 		CoreApp.DbConnection = dbConfig.DbConn
 
-		err := CoreApp.Insert()
+		err := InsertCore(CoreApp)
 		if err != nil {
 			utils.Log(3, err)
 		}

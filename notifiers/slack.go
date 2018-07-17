@@ -41,7 +41,7 @@ func init() {
 		Method: SLACK_METHOD,
 		Host:   "https://webhooksurl.slack.com/***",
 		Form: []NotificationForm{{
-			id:          2,
+			Id:          2,
 			Type:        "text",
 			Title:       "Incoming Webhook Url",
 			Placeholder: "Insert your Slack webhook URL here.",
@@ -84,11 +84,15 @@ func (u *Slack) Run() error {
 	messageLock.Lock()
 	slackMessages = uniqueStrings(slackMessages)
 	for _, msg := range slackMessages {
-		utils.Log(1, fmt.Sprintf("Sending JSON to Slack Webhook"))
-		client := http.Client{Timeout: 15 * time.Second}
-		_, err := client.Post(u.Host, "application/json", bytes.NewBuffer([]byte(msg)))
-		if err != nil {
-			utils.Log(3, fmt.Sprintf("Issue sending Slack notification: %v", err))
+
+		if u.CanSend() {
+			utils.Log(1, fmt.Sprintf("Sending JSON to Slack Webhook"))
+			client := http.Client{Timeout: 15 * time.Second}
+			_, err := client.Post(u.Host, "application/json", bytes.NewBuffer([]byte(msg)))
+			if err != nil {
+				utils.Log(3, fmt.Sprintf("Issue sending Slack notification: %v", err))
+			}
+			u.Log(msg)
 		}
 	}
 	slackMessages = []string{}
@@ -146,7 +150,7 @@ func (u *Slack) OnSave() error {
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *Slack) Install() error {
-	inDb, err := slacker.Notification.isInDatabase()
+	inDb, err := slacker.Notification.IsInDatabase()
 	if !inDb {
 		newNotifer, err := InsertDatabase(u.Notification)
 		if err != nil {

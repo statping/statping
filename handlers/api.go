@@ -17,6 +17,21 @@ func ApiIndexHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(core.CoreApp)
 }
 
+func ApiRenewHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	var err error
+	core.CoreApp.ApiKey = utils.NewSHA1Hash(40)
+	core.CoreApp.ApiSecret = utils.NewSHA1Hash(40)
+	core.CoreApp, err = core.UpdateCore(core.CoreApp)
+	if err != nil {
+		utils.Log(3, err)
+	}
+	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+}
+
 func ApiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)

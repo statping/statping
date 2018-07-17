@@ -20,10 +20,9 @@ func CheckServices() {
 	utils.Log(1, fmt.Sprintf("Starting monitoring process for %v Services", len(CoreApp.Services)))
 	for _, ser := range CoreApp.Services {
 		s := ser.ToService()
-		obj := s
 		//go obj.StartCheckins()
-		obj.StopRoutine = make(chan struct{})
-		go CheckQueue(obj)
+		s.StopRoutine = make(chan struct{})
+		go CheckQueue(s)
 	}
 }
 

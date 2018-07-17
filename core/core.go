@@ -3,7 +3,6 @@ package core
 import (
 	"github.com/GeertJohan/go.rice"
 	"github.com/hunterlong/statup/notifiers"
-	"github.com/hunterlong/statup/plugin"
 	"github.com/hunterlong/statup/types"
 	"github.com/pkg/errors"
 	"os"
@@ -14,24 +13,8 @@ type PluginJSON types.PluginJSON
 type PluginRepos types.PluginRepos
 
 type Core struct {
-	Name           string     `db:"name" json:"name"`
-	Description    string     `db:"description" json:"name"`
-	Config         string     `db:"config" json:"-"`
-	ApiKey         string     `db:"api_key" json:"-"`
-	ApiSecret      string     `db:"api_secret" json:"-"`
-	Style          string     `db:"style" json:"-"`
-	Footer         string     `db:"footer" json:"-"`
-	Domain         string     `db:"domain" json:"domain,omitempty"`
-	Version        string     `db:"version" json:"version,omitempty"`
-	MigrationId    int64      `db:"migration_id" json:"-"`
-	UseCdn         bool       `db:"use_cdn" json:"-"`
-	Services       []*Service `json:"services,omitempty"`
-	Plugins        []plugin.Info
-	Repos          []PluginJSON
-	AllPlugins     []plugin.PluginActions
-	Communications []notifiers.AllNotifiers
-	DbConnection   string
-	started        time.Time
+	*types.Core
+	Services []*Service
 }
 
 var (
@@ -53,14 +36,19 @@ func init() {
 
 func NewCore() *Core {
 	CoreApp = new(Core)
-	CoreApp.started = time.Now()
+	CoreApp.Core = new(types.Core)
+	CoreApp.Started = time.Now()
 	return CoreApp
 }
 
-func (c *Core) Insert() error {
+func InsertCore(c *Core) error {
 	col := DbSession.Collection("core")
-	_, err := col.Insert(c)
+	_, err := col.Insert(c.Core)
 	return err
+}
+
+func (c *Core) ToCore() *types.Core {
+	return c.Core
 }
 
 func InitApp() {
@@ -72,9 +60,9 @@ func InitApp() {
 	go DatabaseMaintence()
 }
 
-func (c *Core) Update() (*Core, error) {
+func UpdateCore(c *Core) (*Core, error) {
 	res := DbSession.Collection("core").Find().Limit(1)
-	err := res.Update(c)
+	err := res.Update(c.Core)
 	return c, err
 }
 
@@ -114,7 +102,7 @@ func (c Core) AllOnline() bool {
 }
 
 func SelectLastMigration() (int64, error) {
-	var c *Core
+	var c *types.Core
 	if DbSession == nil {
 		return 0, errors.New("Database connection has not been created yet")
 	}
@@ -126,17 +114,16 @@ func SelectLastMigration() (int64, error) {
 }
 
 func SelectCore() (*Core, error) {
-	var c *Core
+	var c *types.Core
 	exists := DbSession.Collection("core").Exists()
 	if !exists {
 		return nil, errors.New("core database has not been setup yet.")
 	}
-
 	err := DbSession.Collection("core").Find().One(&c)
 	if err != nil {
 		return nil, err
 	}
-	CoreApp = c
+	CoreApp.Core = c
 	CoreApp.DbConnection = Configs.Connection
 	CoreApp.Version = VERSION
 	CoreApp.Services, _ = SelectAllServices()

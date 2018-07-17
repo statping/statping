@@ -59,14 +59,15 @@
                         <canvas id="service" width="400" height="120"></canvas>
 
             {{ if .LimitedFailures }}
-                <div class="list-group mt-5">
+                <div class="list-group mt-3 mb-4">
                 {{ range .LimitedFailures }}
+                {{ $f := .ToFailure }}
                     <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                         <div class="d-flex w-100 justify-content-between">
                             <h5 class="mb-1">{{.ParseError}}</h5>
                             <small>Reported {{.Ago}}</small>
                         </div>
-                        <p class="mb-1">{{.Issue}}</p>
+                        <p class="mb-1">{{$f.Issue}}</p>
                     </a>
                 {{ end }}
                 </div>
@@ -147,7 +148,7 @@
                         <button type="submit" class="btn btn-success btn-block">Update Service</button>
                     </div>
                     <div class="col-6">
-                        <a href="/service/{{ $s.Id }}/delete_failures" class="btn btn-danger btn-block">Delete All Failures</a>
+                        <a href="/service/{{ $s.Id }}/delete_failures" class="btn btn-danger btn-block confirm-btn">Delete All Failures</a>
                     </div>
                 </div>
             </form>
@@ -156,9 +157,7 @@
 
 <div class="col-12 mt-4">
     <h3>Last Response</h3>
-
     <textarea rows="8" class="form-control" readonly>{{ $s.LastResponse }}</textarea>
-
     <div class="form-group row mt-2">
         <label for="last_status_code" class="col-sm-3 col-form-label">Status Code</label>
         <div class="col-sm-2">

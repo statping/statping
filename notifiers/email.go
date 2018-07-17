@@ -20,7 +20,7 @@ const (
 var (
 	emailer    *Email
 	emailArray []string
-	emailQueue []*types.Email
+	emailQueue []*EmailOutgoing
 	emailBox   *rice.Box
 	mailer     *gomail.Dialer
 )
@@ -37,41 +37,35 @@ func init() {
 			Id:     EMAIL_ID,
 			Method: EMAIL_METHOD,
 			Form: []NotificationForm{{
-				id:          1,
+				Id:          1,
 				Type:        "text",
 				Title:       "SMTP Host",
 				Placeholder: "Insert your SMTP Host here.",
 				DbField:     "Host",
 			}, {
-				id:          1,
+				Id:          1,
 				Type:        "text",
 				Title:       "SMTP Username",
 				Placeholder: "Insert your SMTP Username here.",
 				DbField:     "Username",
 			}, {
-				id:          1,
+				Id:          1,
 				Type:        "password",
 				Title:       "SMTP Password",
 				Placeholder: "Insert your SMTP Password here.",
 				DbField:     "Password",
 			}, {
-				id:          1,
+				Id:          1,
 				Type:        "number",
 				Title:       "SMTP Port",
 				Placeholder: "Insert your SMTP Port here.",
 				DbField:     "Port",
 			}, {
-				id:          1,
+				Id:          1,
 				Type:        "text",
 				Title:       "Outgoing Email Address",
 				Placeholder: "Insert your Outgoing Email Address",
 				DbField:     "Var1",
-			}, {
-				id:          1,
-				Type:        "number",
-				Title:       "Limits per Hour",
-				Placeholder: "How many emails can it send per hour",
-				DbField:     "Limits",
 			}},
 		}}
 
@@ -108,7 +102,7 @@ func (u *Email) Init() error {
 
 func (u *Email) Test() error {
 	if u.Enabled {
-		email := &types.Email{
+		email := &EmailOutgoing{
 			To:       "info@socialeck.com",
 			Subject:  "Test Email",
 			Template: "message.html",
@@ -124,6 +118,16 @@ type emailMessage struct {
 	Service *types.Service
 }
 
+type EmailOutgoing struct {
+	To       string
+	Subject  string
+	Template string
+	From     string
+	Data     interface{}
+	Source   string
+	Sent     bool
+}
+
 // AFTER NOTIFIER LOADS, IF ENABLED, START A QUEUE PROCESS
 func (u *Email) Run() error {
 	var sentAddresses []string
@@ -132,16 +136,18 @@ func (u *Email) Run() error {
 			emailQueue = removeEmail(emailQueue, email)
 			continue
 		}
-		e := email
-		go func(email *types.Email) {
+		if u.CanSend() {
 			err := u.dialSend(email)
 			if err == nil {
 				email.Sent = true
 				sentAddresses = append(sentAddresses, email.To)
 				utils.Log(1, fmt.Sprintf("Email '%v' sent to: %v using the %v template (size: %v)", email.Subject, email.To, email.Template, len([]byte(email.Source))))
 				emailQueue = removeEmail(emailQueue, email)
+				u.Log(fmt.Sprintf("Subject: %v to %v", email.Subject, email.To))
+			} else {
+				utils.Log(3, fmt.Sprintf("Email Notifier could not send email: %v", err))
 			}
-		}(e)
+		}
 	}
 	time.Sleep(60 * time.Second)
 	if u.Enabled {
@@ -158,7 +164,7 @@ func (u *Email) OnFailure(s *types.Service) error {
 			Service: s,
 		}
 
-		email := &types.Email{
+		email := &EmailOutgoing{
 			To:       "info@socialeck.com",
 			Subject:  fmt.Sprintf("Service %v is Failing", s.Name),
 			Template: "failure.html",
@@ -190,10 +196,7 @@ func (u *Email) OnSave() error {
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *Email) Install() error {
-
-	fmt.Println("installing emailer")
-
-	inDb, err := emailer.Notification.isInDatabase()
+	inDb, err := emailer.Notification.IsInDatabase()
 	if !inDb {
 		newNotifer, err := InsertDatabase(u.Notification)
 		if err != nil {
@@ -205,7 +208,7 @@ func (u *Email) Install() error {
 	return err
 }
 
-func (u *Email) dialSend(email *types.Email) error {
+func (u *Email) dialSend(email *EmailOutgoing) error {
 	fmt.Println("sending dailsend to emailer")
 	m := gomail.NewMessage()
 	m.SetHeader("From", email.From)
@@ -219,7 +222,7 @@ func (u *Email) dialSend(email *types.Email) error {
 	return nil
 }
 
-func SendEmail(box *rice.Box, email *types.Email) {
+func SendEmail(box *rice.Box, email *EmailOutgoing) {
 	source := EmailTemplate(box, email.Template, email.Data)
 	email.Source = source
 	emailQueue = append(emailQueue, email)
@@ -243,8 +246,8 @@ func EmailTemplate(box *rice.Box, tmpl string, data interface{}) string {
 	return result
 }
 
-func removeEmail(emails []*types.Email, em *types.Email) []*types.Email {
-	var newArr []*types.Email
+func removeEmail(emails []*EmailOutgoing, em *EmailOutgoing) []*EmailOutgoing {
+	var newArr []*EmailOutgoing
 	for _, e := range emails {
 		if e != em {
 			newArr = append(newArr, e)

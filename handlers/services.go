@@ -78,6 +78,9 @@ func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	serv := core.SelectService(utils.StringInt(vars["id"]))
+
+	fmt.Println(serv.ToService())
+
 	ExecuteResponse(w, r, "service.html", serv)
 }
 
@@ -94,9 +97,7 @@ func ServicesBadgeHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "image/svg+xml")
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-
 	w.Write(badge)
-
 }
 
 func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {

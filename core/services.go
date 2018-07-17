@@ -11,7 +11,7 @@ import (
 )
 
 type Service struct {
-	S interface{}
+	s *types.Service
 }
 
 type Failure struct {
@@ -23,10 +23,10 @@ func serviceCol() db.Collection {
 }
 
 func SelectService(id int64) *Service {
-	for _, ser := range CoreApp.Services {
-		s := ser.ToService()
-		if s.Id == id {
-			return ser
+	for _, s := range CoreApp.Services {
+		ser := s.ToService()
+		if ser.Id == id {
+			return &Service{ser}
 		}
 	}
 	return nil
@@ -64,7 +64,7 @@ func (s *Service) AvgTime() float64 {
 }
 
 func (ser *Service) Online24() float32 {
-	s := ser.S.(*types.Service)
+	s := ser.ToService()
 	total, _ := ser.TotalHits()
 	failed, _ := ser.TotalFailures24Hours()
 	if failed == 0 {
@@ -91,12 +91,11 @@ type DateScan struct {
 }
 
 func (s *Service) ToService() *types.Service {
-	return s.S.(*types.Service)
+	return s.s
 }
 
 func NewService(s *types.Service) *Service {
-	ser := &Service{s}
-	return ser
+	return &Service{s}
 }
 
 func (ser *Service) SmallText() string {
@@ -105,8 +104,8 @@ func (ser *Service) SmallText() string {
 	hits, _ := ser.LimitedHits()
 	if !s.Online {
 		if len(last) > 0 {
-			lastFailure := MakeFailure(last[0])
-			return fmt.Sprintf("%v on %v", lastFailure.ParseError(), last[0].CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
+			lastFailure := MakeFailure(last[0].ToFailure())
+			return fmt.Sprintf("%v on %v", lastFailure.ParseError(), last[0].ToFailure().CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
 		} else {
 			return fmt.Sprintf("%v is currently offline", s.Name)
 		}
@@ -194,10 +193,10 @@ func (ser *Service) AvgUptime() string {
 
 func RemoveArray(u *types.Service) []*Service {
 	var srvcs []*Service
-	for _, ser := range CoreApp.Services {
-		s := ser.ToService()
-		if s.Id != u.Id {
-			srvcs = append(srvcs, ser)
+	for _, s := range CoreApp.Services {
+		ser := s.ToService()
+		if ser.Id != u.Id {
+			srvcs = append(srvcs, s)
 		}
 	}
 	CoreApp.Services = srvcs
@@ -241,16 +240,15 @@ func CreateService(u *types.Service) (int64, error) {
 	}
 	u.Id = uuid.(int64)
 	u.StopRoutine = make(chan struct{})
-	nn := &Service{u}
-	CoreApp.Services = append(CoreApp.Services, nn)
+	CoreApp.Services = append(CoreApp.Services, &Service{u})
 	return uuid.(int64), err
 }
 
 func CountOnline() int {
 	amount := 0
-	for _, ser := range CoreApp.Services {
-		s := ser.ToService()
-		if s.Online {
+	for _, s := range CoreApp.Services {
+		ser := s.ToService()
+		if ser.Online {
 			amount++
 		}
 	}
