@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 	"strconv"
@@ -40,7 +41,7 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	checkType := r.PostForm.Get("check_type")
 	postData := r.PostForm.Get("post_data")
 
-	service := &core.Service{
+	service := &types.Service{
 		Name:           name,
 		Domain:         domain,
 		Method:         method,
@@ -51,12 +52,12 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 		Port:           port,
 		PostData:       postData,
 	}
-	_, err := service.Create()
+	_, err := core.CreateService(service)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error starting %v check routine. %v", service.Name, err))
 	}
 
-	go service.CheckQueue()
+	go core.CheckQueue(service)
 	core.OnNewService(service)
 
 	http.Redirect(w, r, "/services", http.StatusSeeOther)
@@ -68,21 +69,25 @@ func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
-	service.Delete()
+	serv := core.SelectService(utils.StringInt(vars["id"]))
+	service := serv.ToService()
+	core.DeleteService(service)
 	http.Redirect(w, r, "/services", http.StatusSeeOther)
 }
 
 func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
-	ExecuteResponse(w, r, "service.html", service)
+	serv := core.SelectService(utils.StringInt(vars["id"]))
+
+	fmt.Println(serv.ToService())
+
+	ExecuteResponse(w, r, "service.html", serv)
 }
 
 func ServicesBadgeHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
-
+	serv := core.SelectService(utils.StringInt(vars["id"]))
+	service := serv.ToService()
 	var badge []byte
 	if service.Online {
 		badge = []byte(`<svg xmlns="http://www.w3.org/2000/svg" width="104" height="20"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><mask id="a"><rect width="104" height="20" rx="3" fill="#fff"/></mask><g mask="url(#a)"><path fill="#555" d="M0 0h54v20H0z"/><path fill="#4c1" d="M54 0h50v20H54z"/><path fill="url(#b)" d="M0 0h104v20H0z"/></g><g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11"><text x="28" y="15" fill="#010101" fill-opacity=".3">` + service.Name + `</text><text x="28" y="14">` + service.Name + `</text><text x="78" y="15" fill="#010101" fill-opacity=".3">online</text><text x="78" y="14">online</text></g></svg>`)
@@ -92,9 +97,7 @@ func ServicesBadgeHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "image/svg+xml")
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-
 	w.Write(badge)
-
 }
 
 func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -103,7 +106,8 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
+	serv := core.SelectService(utils.StringInt(vars["id"]))
+	service := serv.ToService()
 	r.ParseForm()
 	name := r.PostForm.Get("name")
 	domain := r.PostForm.Get("domain")
@@ -114,7 +118,7 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	port, _ := strconv.Atoi(r.PostForm.Get("port"))
 	checkType := r.PostForm.Get("check_type")
 	postData := r.PostForm.Get("post_data")
-	serviceUpdate := &core.Service{
+	serviceUpdate := &types.Service{
 		Id:             service.Id,
 		Name:           name,
 		Domain:         domain,
@@ -126,7 +130,7 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		Port:           port,
 		PostData:       postData,
 	}
-	service = service.Update(serviceUpdate)
+	service = core.UpdateService(serviceUpdate)
 	ExecuteResponse(w, r, "service.html", service)
 }
 
@@ -136,9 +140,9 @@ func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
-
-	service.DeleteFailures()
+	serv := core.SelectService(utils.StringInt(vars["id"]))
+	service := serv.ToService()
+	core.DeleteFailures(service)
 	core.CoreApp.Services, _ = core.SelectAllServices()
 	http.Redirect(w, r, "/services", http.StatusSeeOther)
 }
@@ -150,7 +154,8 @@ func CheckinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	vars := mux.Vars(r)
 	interval := utils.StringInt(r.PostForm.Get("interval"))
-	service := core.SelectService(utils.StringInt(vars["id"]))
+	serv := core.SelectService(utils.StringInt(vars["id"]))
+	service := serv.ToService()
 	checkin := &core.Checkin{
 		Service:  service.Id,
 		Interval: interval,

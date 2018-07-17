@@ -2,6 +2,7 @@ package notifiers
 
 import (
 	"fmt"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"strings"
 	"time"
@@ -9,27 +10,10 @@ import (
 )
 
 var (
-	AllCommunications []AllNotifiers
+	AllCommunications []types.AllNotifiers
 	Collections       db.Collection
+	Logs              []*NotificationLog
 )
-
-type AllNotifiers interface{}
-
-func add(c interface{}) {
-	AllCommunications = append(AllCommunications, c)
-}
-
-func Load() []AllNotifiers {
-	utils.Log(1, "Loading notifiers")
-	var notifiers []AllNotifiers
-	for _, comm := range AllCommunications {
-		n := comm.(Notifier)
-		n.Init()
-		notifiers = append(notifiers, n)
-		n.Test()
-	}
-	return notifiers
-}
 
 type Notification struct {
 	Id        int64     `db:"id,omitempty" json:"id"`
@@ -43,7 +27,7 @@ type Notification struct {
 	ApiKey    string    `db:"api_key" json:"-"`
 	ApiSecret string    `db:"api_secret" json:"-"`
 	Enabled   bool      `db:"enabled" json:"enabled"`
-	Limits    int64     `db:"limits" json:"-"`
+	Limits    int       `db:"limits" json:"-"`
 	Removable bool      `db:"removable" json:"-"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	Form      []NotificationForm
@@ -54,21 +38,69 @@ type Notifier interface {
 	Init() error
 	Install() error
 	Run() error
-	OnFailure() error
-	OnSuccess() error
+	OnFailure(*types.Service) error
+	OnSuccess(*types.Service) error
 	Select() *Notification
 	Test() error
 }
 
 type NotificationForm struct {
-	id          int64
+	Id          int64
 	Type        string
 	Title       string
 	Placeholder string
 	DbField     string
 }
 
-func (n *Notification) isInDatabase() (bool, error) {
+type NotificationLog struct {
+	Notifier *Notification
+	Message  string
+	Time     utils.Timestamp
+}
+
+func add(c interface{}) {
+	AllCommunications = append(AllCommunications, c)
+}
+
+func Load() []types.AllNotifiers {
+	utils.Log(1, "Loading notifiers")
+	var notifiers []types.AllNotifiers
+	for _, comm := range AllCommunications {
+		n := comm.(Notifier)
+		n.Init()
+		notifiers = append(notifiers, n)
+		n.Test()
+	}
+	return notifiers
+}
+
+func (n *Notification) Log(msg string) {
+	log := &NotificationLog{
+		Notifier: n,
+		Message:  msg,
+		Time:     utils.Timestamp(time.Now()),
+	}
+	Logs = append(Logs, log)
+}
+
+func (n *Notification) Logs() []*NotificationLog {
+	var logs []*NotificationLog
+	for _, v := range Logs {
+		if v.Notifier.Id == n.Id {
+			logs = append(logs, v)
+		}
+	}
+	return reverseLogs(logs)
+}
+
+func reverseLogs(input []*NotificationLog) []*NotificationLog {
+	if len(input) == 0 {
+		return input
+	}
+	return append(reverseLogs(input[1:]), input[0])
+}
+
+func (n *Notification) IsInDatabase() (bool, error) {
 	return Collections.Find("id", n.Id).Exists()
 }
 
@@ -81,29 +113,17 @@ func SelectNotification(id int64) (*Notification, error) {
 func (n *Notification) Update() (*Notification, error) {
 	n.CreatedAt = time.Now()
 	err := Collections.Find("id", n.Id).Update(n)
-
 	return n, err
 }
 
 func InsertDatabase(n *Notification) (int64, error) {
 	n.CreatedAt = time.Now()
+	n.Limits = 3
 	newId, err := Collections.Insert(n)
 	if err != nil {
 		return 0, err
 	}
 	return newId.(int64), err
-}
-
-func Select(id int64) *Notification {
-	var notifier *Notification
-	for _, n := range AllCommunications {
-		notif := n.(Notifier)
-		notifier = notif.Select()
-		if notifier.Id == id {
-			return notifier
-		}
-	}
-	return notifier
 }
 
 func SelectNotifier(id int64) Notifier {
@@ -118,9 +138,33 @@ func SelectNotifier(id int64) Notifier {
 	return notifier
 }
 
+func (f Notification) CanSend() bool {
+	if f.SentLastHour() >= f.Limits {
+		return false
+	}
+	return true
+}
+
+func (f Notification) SentLastHour() int {
+	sent := 0
+	hourAgo := time.Now().Add(-1 * time.Hour)
+	for _, v := range f.Logs() {
+		lastTime := time.Time(v.Time)
+		if lastTime.After(hourAgo) {
+			sent++
+		}
+	}
+	return sent
+}
+
 func (f NotificationForm) Value() string {
-	notifier := Select(f.id)
-	return notifier.GetValue(f.DbField)
+	noti := SelectNotifier(f.Id)
+	return noti.Select().GetValue(f.DbField)
+}
+
+func (f Notification) LimitValue() int64 {
+	notifier, _ := SelectNotification(f.Id)
+	return utils.StringInt(notifier.GetValue("limits"))
 }
 
 func (n *Notification) GetValue(dbField string) string {
@@ -144,30 +188,42 @@ func (n *Notification) GetValue(dbField string) string {
 		return n.ApiKey
 	case "api_secret":
 		return n.ApiSecret
+	case "limits":
+		return utils.IntString(int(n.Limits))
 	}
 	return ""
 }
 
-func OnFailure() {
+func OnFailure(s *types.Service) {
 	for _, comm := range AllCommunications {
 		n := comm.(Notifier)
-		n.OnFailure()
+		n.OnFailure(s)
 	}
 }
 
-func OnSuccess() {
+func OnSuccess(s *types.Service) {
 	for _, comm := range AllCommunications {
 		n := comm.(Notifier)
-		n.OnSuccess()
+		n.OnSuccess(s)
 	}
 }
 
-func uniqueMessages(arr []string, v string) []string {
-	var newArray []string
-	for _, i := range arr {
-		if i != v {
-			newArray = append(newArray, v)
+func uniqueStrings(elements []string) []string {
+	result := []string{}
+
+	for i := 0; i < len(elements); i++ {
+		// Scan slice for a previous element of the same value.
+		exists := false
+		for v := 0; v < i; v++ {
+			if elements[v] == elements[i] {
+				exists = true
+				break
+			}
+		}
+		// If no previous element exists, append this one.
+		if !exists {
+			result = append(result, elements[i])
 		}
 	}
-	return newArray
+	return result
 }

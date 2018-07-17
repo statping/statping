@@ -14,7 +14,7 @@ import (
 func LoadConfig() (*types.Config, error) {
 	if os.Getenv("DB_CONN") != "" {
 		utils.Log(1, "DB_CONN environment variable was found, sleeping for 30 seconds")
-		time.Sleep(30 * time.Second)
+		//time.Sleep(30 * time.Second)
 		return LoadUsingEnv()
 	}
 	Configs = new(types.Config)
@@ -85,7 +85,7 @@ func LoadUsingEnv() (*types.Config, error) {
 		DropDatabase()
 		CreateDatabase()
 
-		CoreApp = &Core{
+		CoreApp = &Core{Core: &types.Core{
 			Name:        dbConfig.Project,
 			Description: dbConfig.Description,
 			Config:      "config.yml",
@@ -93,22 +93,22 @@ func LoadUsingEnv() (*types.Config, error) {
 			ApiSecret:   utils.NewSHA1Hash(16),
 			Domain:      dbConfig.Domain,
 			MigrationId: time.Now().Unix(),
-		}
+		}}
 
 		CoreApp.DbConnection = dbConfig.DbConn
 
-		err := CoreApp.Insert()
+		err := InsertCore(CoreApp)
 		if err != nil {
 			utils.Log(3, err)
 		}
 
-		admin := &User{
+		admin := &types.User{
 			Username: "admin",
 			Password: "admin",
 			Email:    "info@admin.com",
 			Admin:    true,
 		}
-		admin.Create()
+		CreateUser(admin)
 
 		LoadSampleData()
 

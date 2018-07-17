@@ -104,13 +104,13 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	admin := &core.User{
+	admin := &types.User{
 		Username: config.Username,
 		Password: config.Password,
 		Email:    config.Email,
 		Admin:    true,
 	}
-	admin.Create()
+	core.CreateUser(admin)
 
 	if sample == "on" {
 		core.LoadSampleData()

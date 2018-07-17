@@ -18,21 +18,21 @@ type FailureData types.FailureData
 func CheckServices() {
 	CoreApp.Services, _ = SelectAllServices()
 	utils.Log(1, fmt.Sprintf("Starting monitoring process for %v Services", len(CoreApp.Services)))
-	for _, v := range CoreApp.Services {
-		obj := v
+	for _, ser := range CoreApp.Services {
+		s := ser.ToService()
 		//go obj.StartCheckins()
-		obj.stopRoutine = make(chan struct{})
-		go obj.CheckQueue()
+		s.StopRoutine = make(chan struct{})
+		go CheckQueue(s)
 	}
 }
 
-func (s *Service) CheckQueue() {
+func CheckQueue(s *types.Service) {
 	for {
 		select {
-		case <-s.stopRoutine:
+		case <-s.StopRoutine:
 			return
 		default:
-			s.Check()
+			ServiceCheck(s)
 			if s.Interval < 1 {
 				s.Interval = 1
 			}
@@ -43,7 +43,7 @@ func (s *Service) CheckQueue() {
 	}
 }
 
-func (s *Service) DNSCheck() (float64, error) {
+func DNSCheck(s *types.Service) (float64, error) {
 	t1 := time.Now()
 	url, err := url.Parse(s.Domain)
 	if err != nil {
@@ -58,13 +58,13 @@ func (s *Service) DNSCheck() (float64, error) {
 	return subTime, err
 }
 
-func (s *Service) Check() *Service {
-	dnsLookup, err := s.DNSCheck()
+func ServiceCheck(s *types.Service) *types.Service {
+	dnsLookup, err := DNSCheck(s)
 	if err != nil {
-		s.Failure(fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
+		RecordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
 		return s
 	}
-	s.dnsLookup = dnsLookup
+	s.DnsLookup = dnsLookup
 	t1 := time.Now()
 	client := http.Client{
 		Timeout: 30 * time.Second,
@@ -77,14 +77,14 @@ func (s *Service) Check() *Service {
 		response, err = client.Get(s.Domain)
 	}
 	if err != nil {
-		s.Failure(fmt.Sprintf("HTTP Error %v", err))
+		RecordFailure(s, fmt.Sprintf("HTTP Error %v", err))
 		return s
 	}
 	response.Header.Set("User-Agent", "StatupMonitor")
 	t2 := time.Now()
 	s.Latency = t2.Sub(t1).Seconds()
 	if err != nil {
-		s.Failure(fmt.Sprintf("HTTP Error %v", err))
+		RecordFailure(s, fmt.Sprintf("HTTP Error %v", err))
 		return s
 	}
 	defer response.Body.Close()
@@ -100,20 +100,20 @@ func (s *Service) Check() *Service {
 		if !match {
 			s.LastResponse = string(contents)
 			s.LastStatusCode = response.StatusCode
-			s.Failure(fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
+			RecordFailure(s, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
 			return s
 		}
 	}
 	if s.ExpectedStatus != response.StatusCode {
 		s.LastResponse = string(contents)
 		s.LastStatusCode = response.StatusCode
-		s.Failure(fmt.Sprintf("HTTP Status Code %v did not match %v", response.StatusCode, s.ExpectedStatus))
+		RecordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", response.StatusCode, s.ExpectedStatus))
 		return s
 	}
 	s.LastResponse = string(contents)
 	s.LastStatusCode = response.StatusCode
 	s.Online = true
-	s.Record(response)
+	RecordSuccess(s, response)
 	return s
 }
 
@@ -121,23 +121,23 @@ type HitData struct {
 	Latency float64
 }
 
-func (s *Service) Record(response *http.Response) {
+func RecordSuccess(s *types.Service, response *http.Response) {
 	s.Online = true
 	s.LastOnline = time.Now()
 	data := HitData{
 		Latency: s.Latency,
 	}
-	s.CreateHit(data)
+	CreateServiceHit(s, data)
 	OnSuccess(s)
 }
 
-func (s *Service) Failure(issue string) {
+func RecordFailure(s *types.Service, issue string) {
 	s.Online = false
 	data := FailureData{
 		Issue: issue,
 	}
 	utils.Log(2, fmt.Sprintf("Service %v Failing: %v", s.Name, issue))
-	s.CreateFailure(data)
+	CreateServiceFailure(s, data)
 	//SendFailureEmail(s)
 	OnFailure(s, data)
 }

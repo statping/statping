@@ -6,7 +6,7 @@ import (
 	"github.com/fatih/structs"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/handlers"
-	"github.com/hunterlong/statup/plugin"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
 	"io/ioutil"
@@ -50,7 +50,6 @@ func RenderBoxes() {
 	core.ScssBox = rice.MustFindBox("source/scss")
 	core.JsBox = rice.MustFindBox("source/js")
 	core.TmplBox = rice.MustFindBox("source/tmpl")
-	core.EmailBox = rice.MustFindBox("source/emails")
 }
 
 func LoadDotEnvs() {
@@ -124,8 +123,8 @@ func LoadPlugins(debug bool) {
 			utils.Log(1, structs.Map(symPlugin))
 		}
 
-		var plugActions plugin.PluginActions
-		plugActions, ok := symPlugin.(plugin.PluginActions)
+		var plugActions types.PluginActions
+		plugActions, ok := symPlugin.(types.PluginActions)
 		if !ok {
 			utils.Log(3, fmt.Sprintf("Plugin '%v' could not load correctly, error: %v", f.Name(), err))
 			if debug {

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 )
@@ -16,6 +17,21 @@ func ApiIndexHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(core.CoreApp)
 }
 
+func ApiRenewHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	var err error
+	core.CoreApp.ApiKey = utils.NewSHA1Hash(40)
+	core.CoreApp.ApiSecret = utils.NewSHA1Hash(40)
+	core.CoreApp, err = core.UpdateCore(core.CoreApp)
+	if err != nil {
+		utils.Log(3, err)
+	}
+	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+}
+
 func ApiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
@@ -23,7 +39,7 @@ func ApiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	vars := mux.Vars(r)
 	checkin := core.FindCheckin(vars["api"])
-	checkin.Receivehit()
+	//checkin.Receivehit()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(checkin)
 }
@@ -44,11 +60,12 @@ func ApiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
-	var s core.Service
+	serv := core.SelectService(utils.StringInt(vars["id"]))
+	var s *types.Service
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&s)
-	service.Update(&s)
+	service := serv.ToService()
+	core.UpdateService(service)
 	json.NewEncoder(w).Encode(s)
 }
 
