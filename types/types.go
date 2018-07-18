@@ -79,6 +79,8 @@ type Service struct {
 	PostData       string     `db:"post_data" json:"post_data"`
 	Port           int        `db:"port" json:"port"`
 	CreatedAt      time.Time  `db:"created_at" json:"created_at"`
+	Timeout        int        `db:"timeout" json:"timeout"`
+	Order          int        `db:"order_id" json:"order_id"`
 	Online         bool       `json:"online"`
 	Latency        float64    `json:"latency"`
 	Online24Hours  float32    `json:"24_hours_online"`

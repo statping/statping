@@ -59,7 +59,7 @@ func ServiceTCPCheck(s *types.Service) *types.Service {
 	if s.Port != 0 {
 		domain = fmt.Sprintf("%v:%v", s.Domain, s.Port)
 	}
-	conn, err := net.Dial("tcp", domain)
+	conn, err := net.DialTimeout("tcp", domain, time.Duration(s.Timeout)*time.Second)
 	if err != nil {
 		RecordFailure(s, fmt.Sprintf("TCP Dial Error %v", err))
 		return s
@@ -93,8 +93,9 @@ func ServiceHTTPCheck(s *types.Service) *types.Service {
 	}
 	s.DnsLookup = dnsLookup
 	t1 := time.Now()
+	timeout := time.Duration(s.Timeout)
 	client := http.Client{
-		Timeout: 30 * time.Second,
+		Timeout: timeout * time.Second,
 	}
 
 	var response *http.Response
@@ -154,6 +155,7 @@ func RecordSuccess(s *types.Service) {
 	data := HitData{
 		Latency: s.Latency,
 	}
+	utils.Log(1, fmt.Sprintf("Service %v Successful: %0.2f ms", s.Name, data.Latency*1000))
 	CreateServiceHit(s, data)
 	OnSuccess(s)
 }

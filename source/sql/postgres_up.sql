@@ -34,7 +34,8 @@ CREATE TABLE services (
     expected_status integer,
     check_interval integer,
     post_data text,
-    order_id integer,
+    order_id integer default 0,
+    timeout integer default 30,
     created_at TIMESTAMP
 );
 

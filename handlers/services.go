@@ -38,6 +38,7 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	status, _ := strconv.Atoi(r.PostForm.Get("expected_status"))
 	interval, _ := strconv.Atoi(r.PostForm.Get("interval"))
 	port, _ := strconv.Atoi(r.PostForm.Get("port"))
+	timeout, _ := strconv.Atoi(r.PostForm.Get("timeout"))
 	checkType := r.PostForm.Get("check_type")
 	postData := r.PostForm.Get("post_data")
 
@@ -51,6 +52,7 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 		Type:           checkType,
 		Port:           port,
 		PostData:       postData,
+		Timeout:        timeout,
 	}
 	_, err := core.CreateService(service)
 	if err != nil {
@@ -78,9 +80,6 @@ func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	serv := core.SelectService(utils.StringInt(vars["id"]))
-
-	fmt.Println(serv.ToService())
-
 	ExecuteResponse(w, r, "service.html", serv)
 }
 
@@ -116,6 +115,7 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	status, _ := strconv.Atoi(r.PostForm.Get("expected_status"))
 	interval, _ := strconv.Atoi(r.PostForm.Get("interval"))
 	port, _ := strconv.Atoi(r.PostForm.Get("port"))
+	timeout, _ := strconv.Atoi(r.PostForm.Get("timeout"))
 	checkType := r.PostForm.Get("check_type")
 	postData := r.PostForm.Get("post_data")
 	serviceUpdate := &types.Service{
@@ -129,6 +129,7 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		Type:           checkType,
 		Port:           port,
 		PostData:       postData,
+		Timeout:        timeout,
 	}
 	service = core.UpdateService(serviceUpdate)
 	ExecuteResponse(w, r, "service.html", service)
