@@ -249,7 +249,7 @@ func RunSelectAllMysqlServices(t *testing.T) {
 	var err error
 	services, err := core.SelectAllServices()
 	assert.Nil(t, err)
-	assert.Equal(t, 4, len(services))
+	assert.Equal(t, 5, len(services))
 }
 
 func RunSelectAllMysqlCommunications(t *testing.T) {
@@ -320,7 +320,7 @@ func RunSelectAllServices(t *testing.T) {
 	var err error
 	services, err := core.SelectAllServices()
 	assert.Nil(t, err)
-	assert.Equal(t, 4, len(services))
+	assert.Equal(t, 5, len(services))
 }
 
 func RunOneService_Check(t *testing.T) {
@@ -339,10 +339,11 @@ func RunService_Create(t *testing.T) {
 		Port:           0,
 		Type:           "http",
 		Method:         "GET",
+		Timeout:        30,
 	}
 	id, err := core.CreateService(service)
 	assert.Nil(t, err)
-	assert.Equal(t, int64(5), id)
+	assert.Equal(t, int64(6), id)
 	t.Log(service)
 }
 
@@ -379,10 +380,11 @@ func RunBadService_Create(t *testing.T) {
 		Port:           0,
 		Type:           "http",
 		Method:         "GET",
+		Timeout:        30,
 	}
 	id, err := core.CreateService(service)
 	assert.Nil(t, err)
-	assert.Equal(t, int64(6), id)
+	assert.Equal(t, int64(7), id)
 }
 
 func RunBadService_Check(t *testing.T) {
@@ -405,7 +407,12 @@ func RunCreateService_Hits(t *testing.T) {
 	assert.NotNil(t, services)
 	for i := 0; i <= 10; i++ {
 		for _, s := range services {
-			service := core.ServiceCheck(s.ToService())
+			var service *types.Service
+			if s.ToService().Type == "http" {
+				service = core.ServiceHTTPCheck(s.ToService())
+			} else {
+				service = core.ServiceTCPCheck(s.ToService())
+			}
 			assert.NotNil(t, service)
 		}
 	}
@@ -459,7 +466,7 @@ func RunPrometheusHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
 	t.Log(rr.Body.String())
-	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 5"))
+	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 6"))
 }
 
 func RunFailingPrometheusHandler(t *testing.T) {

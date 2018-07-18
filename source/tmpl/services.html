@@ -97,10 +97,10 @@
                 <div class="form-group row">
                     <label for="service_response_code" class="col-sm-4 col-form-label">Expected Status Code</label>
                     <div class="col-sm-8">
-                        <input type="number" name="expected_status" class="form-control" id="service_response_code" value="200">
+                        <input type="number" name="expected_status" class="form-control" id="service_response_code" placeholder="200">
                     </div>
                 </div>
-                <div class="form-group row">
+                <div class="form-group row d-none">
                     <label for="service_port" class="col-sm-4 col-form-label">TCP Port</label>
                     <div class="col-sm-8">
                         <input type="number" name="port" class="form-control" id="service_port" placeholder="8080">
@@ -110,6 +110,12 @@
                     <label for="service_interval" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
                     <div class="col-sm-8">
                         <input type="number" name="interval" class="form-control" id="service_interval" value="60" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="service_timeout" class="col-sm-4 col-form-label">Timeout in Seconds</label>
+                    <div class="col-sm-8">
+                        <input type="number" name="timeout" class="form-control" id="service_timeout" placeholder="30">
                     </div>
                 </div>
                 <div class="form-group row">

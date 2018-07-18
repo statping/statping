@@ -34,8 +34,9 @@ CREATE TABLE services (
     expected_status INT(6),
     check_interval int(11),
     post_data text,
-    order_id integer,
+    order_id integer default 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    timeout INT(6) DEFAULT 30,
     INDEX (id)
 );
 CREATE TABLE hits (

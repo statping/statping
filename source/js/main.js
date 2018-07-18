@@ -10,6 +10,26 @@ $('form').submit(function() {
     $(this).find("button[type='submit']").prop('disabled',true);
 });
 
+$('select#service_type').on('change', function() {
+    var selected = $('#service_type option:selected').val();
+    if (selected == "tcp") {
+        $("#service_port").parent().parent().removeClass("d-none");
+        $("#service_check_type").parent().parent().addClass("d-none");
+
+        $("#post_data").parent().parent().addClass("d-none");
+        $("#service_response").parent().parent().addClass("d-none");
+        $("#service_response_code").parent().parent().addClass("d-none");
+    } else {
+        $("#post_data").parent().parent().removeClass("d-none");
+        $("#service_response").parent().parent().removeClass("d-none");
+        $("#service_response_code").parent().parent().removeClass("d-none");
+        $("#service_check_type").parent().parent().removeClass("d-none");
+
+        $("#service_port").parent().parent().addClass("d-none");
+    }
+
+});
+
 
 $(".confirm-btn").on('click', function() {
     var r = confirm("Are you sure you want to delete?");
