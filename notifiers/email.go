@@ -66,6 +66,12 @@ func init() {
 				Title:       "Outgoing Email Address",
 				Placeholder: "Insert your Outgoing Email Address",
 				DbField:     "Var1",
+			}, {
+				Id:          1,
+				Type:        "email",
+				Title:       "Send Alerts To",
+				Placeholder: "Email Address",
+				DbField:     "Var2",
 			}},
 		}}
 
@@ -103,7 +109,7 @@ func (u *Email) Init() error {
 func (u *Email) Test() error {
 	if u.Enabled {
 		email := &EmailOutgoing{
-			To:       "info@socialeck.com",
+			To:       emailer.Var2,
 			Subject:  "Test Email",
 			Template: "message.html",
 			Data:     nil,
@@ -159,13 +165,11 @@ func (u *Email) Run() error {
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *Email) OnFailure(s *types.Service) error {
 	if u.Enabled {
-
 		msg := emailMessage{
 			Service: s,
 		}
-
 		email := &EmailOutgoing{
-			To:       "info@socialeck.com",
+			To:       emailer.Var2,
 			Subject:  fmt.Sprintf("Service %v is Failing", s.Name),
 			Template: "failure.html",
 			Data:     msg,
