@@ -2,6 +2,7 @@ package utils
 
 import (
 	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"math/rand"
@@ -33,4 +34,11 @@ func RandomString(n int) string {
 		b[i] = characterRunes[rand.Intn(len(characterRunes))]
 	}
 	return string(b)
+}
+
+func Sha256(data []byte) string {
+	h := sha1.New()
+	h.Write(data)
+	sha1_hash := hex.EncodeToString(h.Sum(nil))
+	return sha1_hash
 }

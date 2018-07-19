@@ -15,6 +15,7 @@ $('select#service_type').on('change', function() {
     if (selected == "tcp") {
         $("#service_port").parent().parent().removeClass("d-none");
         $("#service_check_type").parent().parent().addClass("d-none");
+        $("#service_url").attr("placeholder", "localhost");
 
         $("#post_data").parent().parent().addClass("d-none");
         $("#service_response").parent().parent().addClass("d-none");
@@ -24,6 +25,7 @@ $('select#service_type').on('change', function() {
         $("#service_response").parent().parent().removeClass("d-none");
         $("#service_response_code").parent().parent().removeClass("d-none");
         $("#service_check_type").parent().parent().removeClass("d-none");
+        $("#service_url").attr("placeholder", "https://google.com");
 
         $("#service_port").parent().parent().addClass("d-none");
     }
