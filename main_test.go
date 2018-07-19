@@ -257,7 +257,7 @@ func RunSelectAllMysqlCommunications(t *testing.T) {
 	notifiers.Collections = core.DbSession.Collection("communication")
 	comms := notifiers.Load()
 	assert.Nil(t, err)
-	assert.Equal(t, 2, len(comms))
+	assert.Equal(t, 3, len(comms))
 }
 
 func RunUser_SelectAll(t *testing.T) {
