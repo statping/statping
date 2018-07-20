@@ -217,7 +217,7 @@ func RunMySQLMakeConfig(t *testing.T, db string) {
 	assert.Nil(t, err)
 	assert.Equal(t, db, core.Configs.Connection)
 
-	err = core.DbConnection(core.Configs.Connection)
+	err = core.DbConnection(core.Configs.Connection, false)
 	assert.Nil(t, err)
 }
 
