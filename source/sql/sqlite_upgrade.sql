@@ -1,5 +1,5 @@
-=========================================== 1531891670
-ALTER TABLE services ALTER COLUMN order_id SET DEFAULT 0;
+=========================================== 1532068515
+ALTER TABLE services ALTER COLUMN order_id integer DEFAULT 0;
 ALTER TABLE services ADD COLUMN timeout integer DEFAULT 30;
 =========================================== 1530841150
 ALTER TABLE core ADD COLUMN use_cdn bool DEFAULT FALSE;
