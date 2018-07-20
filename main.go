@@ -21,6 +21,7 @@ var (
 )
 
 func init() {
+	utils.InitLogs()
 	LoadDotEnvs()
 	core.VERSION = VERSION
 }
@@ -62,7 +63,7 @@ func LoadDotEnvs() {
 
 func mainProcess() {
 	var err error
-	err = core.DbConnection(core.Configs.Connection)
+	err = core.DbConnection(core.Configs.Connection, false)
 	if err != nil {
 		utils.Log(4, fmt.Sprintf("could not connect to database: %v", err))
 	}

@@ -93,7 +93,7 @@ func RunOnce() {
 	if err != nil {
 		utils.Log(4, "config.yml file not found")
 	}
-	err = core.DbConnection(core.Configs.Connection)
+	err = core.DbConnection(core.Configs.Connection, false)
 	if err != nil {
 		utils.Log(4, err)
 	}

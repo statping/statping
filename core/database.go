@@ -25,7 +25,7 @@ var (
 
 type DbConfig types.DbConfig
 
-func DbConnection(dbType string) error {
+func DbConnection(dbType string, retry bool) error {
 	var err error
 	if dbType == "sqlite" {
 		sqliteSettings = sqlite.ConnectionURL{
@@ -39,17 +39,22 @@ func DbConnection(dbType string) error {
 		if Configs.Port == "" {
 			Configs.Port = "3306"
 		}
-
+		host := fmt.Sprintf("%v:%v", Configs.Host, Configs.Port)
 		mysqlSettings = mysql.ConnectionURL{
 			Database: Configs.Database,
-			Host:     Configs.Host,
+			Host:     host,
 			User:     Configs.User,
 			Password: Configs.Password,
 			Options:  map[string]string{"parseTime": "true", "charset": "utf8"},
 		}
 		DbSession, err = mysql.Open(mysqlSettings)
 		if err != nil {
-			return err
+			if retry {
+				utils.Log(1, fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", host))
+				return waitForDb(dbType)
+			} else {
+				return err
+			}
 		}
 	} else {
 		if Configs.Port == "" {
@@ -64,7 +69,12 @@ func DbConnection(dbType string) error {
 		}
 		DbSession, err = postgresql.Open(postgresSettings)
 		if err != nil {
-			return err
+			if retry {
+				utils.Log(1, fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", host))
+				return waitForDb(dbType)
+			} else {
+				return err
+			}
 		}
 	}
 	err = DbSession.Ping()
@@ -72,6 +82,11 @@ func DbConnection(dbType string) error {
 		utils.Log(1, fmt.Sprintf("Database connection to '%v' was successful.", DbSession.Name()))
 	}
 	return err
+}
+
+func waitForDb(dbType string) error {
+	time.Sleep(5 * time.Second)
+	return DbConnection(dbType, true)
 }
 
 func DatabaseMaintence() {
@@ -111,7 +126,7 @@ func (c *DbConfig) Save() error {
 		utils.Log(3, err)
 		return err
 	}
-	err = DbConnection(Configs.Connection)
+	err = DbConnection(Configs.Connection, false)
 	if err != nil {
 		utils.Log(4, err)
 		return err

@@ -13,8 +13,7 @@ import (
 
 func LoadConfig() (*types.Config, error) {
 	if os.Getenv("DB_CONN") != "" {
-		utils.Log(1, "DB_CONN environment variable was found, sleeping for 30 seconds")
-		time.Sleep(30 * time.Second)
+		utils.Log(1, "DB_CONN environment variable was found, waiting for database...")
 		return LoadUsingEnv()
 	}
 	Configs = new(types.Config)
@@ -72,7 +71,7 @@ func LoadUsingEnv() (*types.Config, error) {
 		Email:       "info@localhost.com",
 	}
 
-	err := DbConnection(dbConfig.DbConn)
+	err := DbConnection(dbConfig.DbConn, true)
 	if err != nil {
 		utils.Log(4, err)
 		return nil, err

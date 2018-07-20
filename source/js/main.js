@@ -33,6 +33,30 @@ $('select#service_type').on('change', function() {
 });
 
 
+$(function() {
+    var pathname = window.location.pathname;
+    if (pathname=="/logs") {
+        var lastline;
+        setInterval(function() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/logs/line');
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    if (lastline != xhr.responseText) {
+                        var curr = $.trim($("#live_logs").text());
+                        var line = xhr.responseText.replace(/(\r\n|\n|\r)/gm," ");
+                        line = line+"\n";
+                        $("#live_logs").text(line+curr);
+                        lastline = xhr.responseText;
+                    }
+                }
+            };
+            xhr.send();
+        }, 200);
+    }
+});
+
+
 $(".confirm-btn").on('click', function() {
     var r = confirm("Are you sure you want to delete?");
     if (r == true) {

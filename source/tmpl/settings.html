@@ -35,6 +35,7 @@
                 <a class="nav-link text-capitalize" id="v-pills-{{underscore .Method}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Method}}" role="tab" aria-controls="v-pills-{{underscore .Method}}" aria-selected="false">{{.Method}}</a>
             {{ end }}
                 <a class="nav-link" id="v-pills-browse-tab" data-toggle="pill" href="#v-pills-browse" role="tab" aria-controls="v-pills-home" aria-selected="false">Browse Plugins</a>
+                <a class="nav-link d-none" id="v-pills-backups-tab" data-toggle="pill" href="#v-pills-backups" role="tab" aria-controls="v-pills-backups" aria-selected="false">Backups</a>
             {{ range .Plugins }}
                 <a class="nav-link text-capitalize" id="v-pills-{{underscore .Name}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Name}}" role="tab" aria-controls="v-pills-profile" aria-selected="false">{{.Name}}</a>
             {{end}}
@@ -178,6 +179,13 @@
                             </div>
                         </div>
                  {{ end }}
+                </div>
+
+
+                <div class="tab-pane fade" id="v-pills-backups" role="tabpanel" aria-labelledby="v-pills-backups-tab">
+
+                    <a href="/backups/create" class="btn btn-primary btn-block">Backup Database</a>
+
                 </div>
 
                 {{ range .Plugins }}

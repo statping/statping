@@ -213,7 +213,6 @@ func (u *Email) Install() error {
 }
 
 func (u *Email) dialSend(email *EmailOutgoing) error {
-	fmt.Println("sending dailsend to emailer")
 	m := gomail.NewMessage()
 	m.SetHeader("From", email.From)
 	m.SetHeader("To", email.To)

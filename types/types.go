@@ -48,10 +48,10 @@ type AllNotifiers interface{}
 
 type Core struct {
 	Name           string     `db:"name" json:"name"`
-	Description    string     `db:"description" json:"name"`
+	Description    string     `db:"description" json:"description"`
 	Config         string     `db:"config" json:"-"`
-	ApiKey         string     `db:"api_key" json:"-"`
-	ApiSecret      string     `db:"api_secret" json:"-"`
+	ApiKey         string     `db:"api_key" json:"api_key"`
+	ApiSecret      string     `db:"api_secret" json:"api_secret"`
 	Style          string     `db:"style" json:"-"`
 	Footer         string     `db:"footer" json:"-"`
 	Domain         string     `db:"domain" json:"domain,omitempty"`
@@ -68,28 +68,28 @@ type Core struct {
 }
 
 type Service struct {
-	Id             int64      `db:"id,omitempty" json:"id"`
-	Name           string     `db:"name" json:"name"`
-	Domain         string     `db:"domain" json:"domain"`
-	Expected       string     `db:"expected" json:"expected"`
-	ExpectedStatus int        `db:"expected_status" json:"expected_status"`
-	Interval       int        `db:"check_interval" json:"check_interval"`
-	Type           string     `db:"check_type" json:"type"`
-	Method         string     `db:"method" json:"method"`
-	PostData       string     `db:"post_data" json:"post_data"`
-	Port           int        `db:"port" json:"port"`
-	CreatedAt      time.Time  `db:"created_at" json:"created_at"`
-	Timeout        int        `db:"timeout" json:"timeout"`
-	Order          int        `db:"order_id" json:"order_id"`
-	Online         bool       `json:"online"`
-	Latency        float64    `json:"latency"`
-	Online24Hours  float32    `json:"24_hours_online"`
-	AvgResponse    string     `json:"avg_response"`
-	TotalUptime    string     `json:"uptime"`
-	OrderId        int64      `json:"order_id"`
-	Failures       []*Failure `json:"failures"`
-	Checkins       []*Checkin `json:"checkins"`
-	StopRoutine    chan struct{}
+	Id             int64         `db:"id,omitempty" json:"id"`
+	Name           string        `db:"name" json:"name"`
+	Domain         string        `db:"domain" json:"domain"`
+	Expected       string        `db:"expected" json:"expected"`
+	ExpectedStatus int           `db:"expected_status" json:"expected_status"`
+	Interval       int           `db:"check_interval" json:"check_interval"`
+	Type           string        `db:"check_type" json:"type"`
+	Method         string        `db:"method" json:"method"`
+	PostData       string        `db:"post_data" json:"post_data"`
+	Port           int           `db:"port" json:"port"`
+	CreatedAt      time.Time     `db:"created_at" json:"created_at"`
+	Timeout        int           `db:"timeout" json:"timeout"`
+	Order          int           `db:"order_id" json:"order_id"`
+	Online         bool          `json:"online"`
+	Latency        float64       `json:"latency"`
+	Online24Hours  float32       `json:"24_hours_online"`
+	AvgResponse    string        `json:"avg_response"`
+	TotalUptime    string        `json:"uptime"`
+	OrderId        int64         `json:"order_id"`
+	Failures       []*Failure    `json:"failures"`
+	Checkins       []*Checkin    `json:"checkins"`
+	StopRoutine    chan struct{} `json:"-"`
 	LastResponse   string
 	LastStatusCode int
 	LastOnline     time.Time

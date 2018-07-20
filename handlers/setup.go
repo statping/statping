@@ -95,7 +95,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = core.DbConnection(core.Configs.Connection)
+	err = core.DbConnection(core.Configs.Connection, false)
 	if err != nil {
 		utils.Log(3, err)
 		core.DeleteConfig()

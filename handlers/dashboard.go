@@ -1,8 +1,13 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statup/utils"
 	"net/http"
+	"os"
 )
 
 type dashboard struct {
@@ -54,4 +59,61 @@ func HelpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ExecuteResponse(w, r, "help.html", nil)
+}
+
+func LogsHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	file, err := os.Open("./statup.log")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	buf := make([]byte, 62)
+	stat, err := os.Stat("./statup.log")
+	start := stat.Size() - 62
+	_, err = file.ReadAt(buf, start)
+	if err == nil {
+		fmt.Printf("%s\n", buf)
+	}
+
+	ExecuteResponse(w, r, "logs.html", nil)
+}
+
+func LogsLineHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Write([]byte(utils.LastLine))
+
+}
+
+type backups struct {
+	Core types.Core `json:"core"`
+}
+
+func BackupCreateHandler(w http.ResponseWriter, r *http.Request) {
+	//if !IsAuthenticated(r) {
+	//	http.Redirect(w, r, "/", http.StatusSeeOther)
+	//	return
+	//}
+
+	backup := backups{
+		Core: *core.CoreApp.ToCore(),
+	}
+
+	out, err := json.Marshal(backup)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(out)
+
+	json.NewEncoder(w).Encode(backup)
+
 }
