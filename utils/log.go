@@ -16,7 +16,7 @@ var (
 	logLevel int
 	fmtLogs  *log.Logger
 	ljLogger *lumberjack.Logger
-	LastLine string
+	LastLine interface{}
 )
 
 func InitLogs() {
@@ -67,7 +67,7 @@ func Panic(err interface{}) {
 }
 
 func Log(level int, err interface{}) {
-	LastLine = err.(string)
+	LastLine = err
 	switch level {
 	case 5:
 		fmt.Printf("PANIC: %v\n", err)
