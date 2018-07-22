@@ -1,5 +1,5 @@
 <p align="center">
-<img width="25%" src="https://img.cjx.io/statup-logo.png">
+<img width="60%" src="https://assets.statup.io/statup-words.png">
 </p>
 <p align="center">
     <b>Statup - Web and App Status Monitoring for Any Type of Project</b><br>
