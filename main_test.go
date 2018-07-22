@@ -48,6 +48,9 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" load database config", func(t *testing.T) {
 			RunMySQLMakeConfig(t, dbt)
 		})
+		t.Run(dbt+" run database migrations", func(t *testing.T) {
+			RunDatabaseMigrations(t, dbt)
+		})
 		t.Run(dbt+" Sample Data", func(t *testing.T) {
 			RunInsertMysqlSample(t)
 		})
@@ -218,6 +221,11 @@ func RunMySQLMakeConfig(t *testing.T, db string) {
 	assert.Equal(t, db, core.Configs.Connection)
 
 	err = core.DbConnection(core.Configs.Connection, false)
+	assert.Nil(t, err)
+}
+
+func RunDatabaseMigrations(t *testing.T, db string) {
+	err := core.RunDatabaseUpgrades()
 	assert.Nil(t, err)
 }
 

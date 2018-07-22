@@ -9,8 +9,12 @@ import (
 	"time"
 )
 
+var (
+	r *mux.Router
+)
+
 func Router() *mux.Router {
-	r := mux.NewRouter()
+	r = mux.NewRouter()
 	r.Handle("/", http.HandlerFunc(IndexHandler))
 	LocalizedAssets(r)
 	r.Handle("/charts.js", http.HandlerFunc(RenderServiceChartsHandler))
@@ -38,6 +42,7 @@ func Router() *mux.Router {
 	r.Handle("/settings", http.HandlerFunc(SaveSettingsHandler)).Methods("POST")
 	r.Handle("/settings/css", http.HandlerFunc(SaveSASSHandler)).Methods("POST")
 	r.Handle("/settings/build", http.HandlerFunc(SaveAssetsHandler)).Methods("GET")
+	r.Handle("/settings/delete_assets", http.HandlerFunc(DeleteAssetsHandler)).Methods("GET")
 	r.Handle("/settings/notifier/{id}", http.HandlerFunc(SaveNotificationHandler)).Methods("POST")
 	r.Handle("/plugins/download/{name}", http.HandlerFunc(PluginsDownloadHandler))
 	r.Handle("/plugins/{name}/save", http.HandlerFunc(PluginSavedHandler)).Methods("POST")

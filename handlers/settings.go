@@ -73,6 +73,17 @@ func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
 
+func DeleteAssetsHandler(w http.ResponseWriter, req *http.Request) {
+	if !IsAuthenticated(req) {
+		http.Redirect(w, req, "/", http.StatusSeeOther)
+		return
+	}
+	core.DeleteAllAssets()
+	core.UsingAssets = false
+	LocalizedAssets(r)
+	http.Redirect(w, req, "/settings", http.StatusSeeOther)
+}
+
 func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 	if !IsAuthenticated(r) {

@@ -54,7 +54,7 @@
                 <div class="form-group row">
                     <label for="service_name" class="col-sm-4 col-form-label">Service Name</label>
                     <div class="col-sm-8">
-                        <input type="text" name="name" class="form-control" id="service_name" placeholder="Name" required>
+                        <input type="text" name="name" class="form-control" id="service_name" placeholder="Name" required spellcheck="false">
                     </div>
                 </div>
                 <div class="form-group row">
@@ -69,7 +69,7 @@
                 <div class="form-group row">
                     <label for="service_url" class="col-sm-4 col-form-label">Application Endpoint (URL)</label>
                     <div class="col-sm-8">
-                        <input type="text" name="domain" class="form-control" id="service_url" placeholder="https://google.com" required>
+                        <input type="text" name="domain" class="form-control" id="service_url" placeholder="https://google.com" required autocapitalize="false" spellcheck="false">
                     </div>
                 </div>
                 <div class="form-group row">
@@ -81,16 +81,16 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-group row">
+                <div class="form-group row d-none">
                     <label for="post_data" class="col-sm-4 col-form-label">Post Data (JSON)</label>
                     <div class="col-sm-8">
-                        <textarea name="post_data" class="form-control" id="post_data" rows="3"></textarea>
+                        <textarea name="post_data" class="form-control" id="post_data" rows="3" autocapitalize="false" spellcheck="false"></textarea>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="service_response" class="col-sm-4 col-form-label">Expected Response (Regex)</label>
                     <div class="col-sm-8">
-                        <textarea name="expected" class="form-control" id="service_response" rows="3"></textarea>
+                        <textarea name="expected" class="form-control" id="service_response" rows="3" autocapitalize="false" spellcheck="false"></textarea>
                         <small id="emailHelp" class="form-text text-muted">You can insert <a target="_blank" href="https://regex101.com/r/I5bbj9/1">Regex</a> to validate the response</small>
                     </div>
                 </div>
@@ -115,7 +115,7 @@
                 <div class="form-group row">
                     <label for="service_timeout" class="col-sm-4 col-form-label">Timeout in Seconds</label>
                     <div class="col-sm-8">
-                        <input type="number" name="timeout" class="form-control" id="service_timeout" placeholder="30">
+                        <input type="number" name="timeout" class="form-control" id="service_timeout" min="1" placeholder="30">
                     </div>
                 </div>
                 <div class="form-group row">

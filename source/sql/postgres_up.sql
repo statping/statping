@@ -43,7 +43,7 @@ CREATE TABLE hits (
     id SERIAL PRIMARY KEY,
     service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
     latency float,
-    created_at TIMESTAMP WITHOUT TIME zone
+    created_at TIMESTAMP
 );
 
 CREATE TABLE failures (
@@ -51,7 +51,7 @@ CREATE TABLE failures (
     issue text,
     method text,
     service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    created_at TIMESTAMP WITHOUT TIME zone
+    created_at TIMESTAMP
 );
 
 CREATE TABLE checkins (

@@ -86,7 +86,7 @@
                 <div class="form-group row">
                     <label for="service_name" class="col-sm-4 col-form-label">Service Name</label>
                     <div class="col-sm-8">
-                        <input type="text" name="name" class="form-control" id="service_name" value="{{$s.Name}}" placeholder="Name" required>
+                        <input type="text" name="name" class="form-control" id="service_name" value="{{$s.Name}}" placeholder="Name" required spellcheck="false">
                     </div>
                 </div>
                 <div class="form-group row">
@@ -101,7 +101,7 @@
                 <div class="form-group row">
                     <label for="service_url" class="col-sm-4 col-form-label">Application Endpoint (URL)</label>
                     <div class="col-sm-8">
-                        <input type="text" name="domain" class="form-control" id="service_url" value="{{$s.Domain}}" placeholder="https://google.com" required>
+                        <input type="text" name="domain" class="form-control" id="service_url" value="{{$s.Domain}}" placeholder="https://google.com" required autocapitalize="false" spellcheck="false">
                     </div>
                 </div>
                 <div class="form-group row{{if eq $s.Type "tcp"}} d-none{{end}}">
@@ -116,13 +116,13 @@
                 <div class="form-group row{{if eq $s.Type "tcp"}} d-none{{end}}">
                     <label for="post_data" class="col-sm-4 col-form-label">Optional Post Data (JSON)</label>
                     <div class="col-sm-8">
-                        <textarea name="post_data" class="form-control" id="post_data" rows="3">{{$s.PostData}}</textarea>
+                        <textarea name="post_data" class="form-control" id="post_data" rows="3" autocapitalize="false" spellcheck="false">{{$s.PostData}}</textarea>
                     </div>
                 </div>
                 <div class="form-group row{{if eq $s.Type "tcp"}} d-none{{end}}">
                     <label for="service_response" class="col-sm-4 col-form-label">Expected Response (Regex)</label>
                     <div class="col-sm-8">
-                        <textarea name="expected" class="form-control" id="service_response" rows="3">{{$s.Expected}}</textarea>
+                        <textarea name="expected" class="form-control" id="service_response" rows="3" autocapitalize="false" spellcheck="false">{{$s.Expected}}</textarea>
                     </div>
                 </div>
                 <div class="form-group row{{if eq $s.Type "tcp"}} d-none{{end}}">
@@ -146,7 +146,7 @@
                 <div class="form-group row">
                     <label for="service_timeout" class="col-sm-4 col-form-label">Timeout in Seconds</label>
                     <div class="col-sm-8">
-                        <input type="number" name="timeout" class="form-control" value="{{$s.Timeout}}" id="service_timeout" placeholder="30">
+                        <input type="number" name="timeout" class="form-control" value="{{$s.Timeout}}" id="service_timeout" min="1" placeholder="30">
                     </div>
                 </div>
                 <div class="form-group row">
@@ -165,7 +165,7 @@
     <h3>Last Response</h3>
     <textarea rows="8" class="form-control" readonly>{{ $s.LastResponse }}</textarea>
     <div class="form-group row mt-2">
-        <label for="last_status_code" class="col-sm-3 col-form-label">Status Code</label>
+        <label for="last_status_code" class="col-sm-3 col-form-label">HTTP Status Code</label>
         <div class="col-sm-2">
             <input type="text" id="last_status_code" class="form-control" value="{{ $s.LastStatusCode }}" readonly>
         </div>

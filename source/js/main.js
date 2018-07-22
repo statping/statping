@@ -32,6 +32,15 @@ $('select#service_type').on('change', function() {
 
 });
 
+$('select#service_check_type').on('change', function() {
+    var selected = $('#service_check_type option:selected').val();
+    if (selected == "POST") {
+        $("#post_data").parent().parent().removeClass("d-none");
+    } else {
+        $("#post_data").parent().parent().addClass("d-none");
+    }
+});
+
 
 $(function() {
     var pathname = window.location.pathname;

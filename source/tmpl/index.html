@@ -90,10 +90,12 @@
                         <canvas id="service_{{ $s.Id }}"></canvas>
                     </div>
                 {{ end }}
-                    <div class="lower_canvas full-col-12 text-white{{if not $s.Online}} bg-danger{{end}}">
-                        <div class="col-12">
-                            <span class="col-10 d-none d-md-inline">{{.SmallText}}</span>
-                            <a href="/service/{{ $s.Id }}" class="btn {{if $s.Online}}btn-success{{else}}btn-danger{{end}} btn-sm float-right col-sm-4 col-md-2 dyn-dark">View Service</a>
+                    <div class="row lower_canvas full-col-12 text-white{{if not $s.Online}} bg-danger{{end}}">
+                        <div class="col-10 text-truncate">
+                            <span class="d-none d-md-inline">{{.SmallText}}</span>
+                        </div>
+                        <div class="col-sm-12 col-md-2">
+                            <a href="/service/{{ $s.Id }}" class="btn {{if $s.Online}}btn-success{{else}}btn-danger{{end}} btn-sm float-right dyn-dark btn-block">View Service</a>
                         </div>
                     </div>
                 </div>

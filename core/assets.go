@@ -115,3 +115,12 @@ func CreateAllAssets() {
 	}
 	utils.Log(1, "Statup assets have been inserted")
 }
+
+func DeleteAllAssets() {
+	err := os.RemoveAll("assets")
+	if err != nil {
+		utils.Log(1, fmt.Sprintf("There was an issue deleting Statup Assets, %v", err))
+		return
+	}
+	utils.Log(1, "Statup assets have been deleted")
+}

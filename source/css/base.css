@@ -55,10 +55,12 @@ HTML, BODY {
   color: #a5a5a5; }
 
 .lower_canvas {
-  height: 55px;
+  height: 3.4rem;
   width: 100%;
   background-color: #48d338;
-  padding: 17px 10px; }
+  padding: 15px 10px;
+  margin-left: 0 !important;
+  margin-right: 0 !important; }
 
 .lower_canvas SPAN {
   font-size: 1rem;
