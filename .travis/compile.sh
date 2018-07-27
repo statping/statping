@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd $GOPATH/src/github.com/hunterlong/statup/cmd
+cd $GOPATH/src/github.com/hunterlong/statup/core
 
 # RENDERING CSS
 gem install sass
@@ -11,6 +11,8 @@ sass ../source/scss/base.scss ../source/css/base.css
 
 # COMPILE SRC INTO BIN
 rice embed-go
+
+cd $GOPATH/src/github.com/hunterlong/statup/cmd
 
 go install
 
