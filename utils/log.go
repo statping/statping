@@ -69,11 +69,6 @@ func rotate() {
 	}()
 }
 
-func Panic(err interface{}) {
-	log.Printf("PANIC: %v\n", err)
-	panic(err)
-}
-
 func Log(level int, err interface{}) {
 	LastLine = err
 	switch level {

@@ -219,7 +219,6 @@ func TestViewHTTPServicesHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	t.Log(body)
 	assert.Contains(t, body, "<title>Statup | Crystal Castles - Kept Service</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
 }
@@ -231,7 +230,6 @@ func TestViewTCPServicesHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	t.Log(body)
 	assert.Contains(t, body, "<title>Statup | Local Postgres Service</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
 }
@@ -302,4 +300,23 @@ func TestViewSettingsHandler(t *testing.T) {
 	assert.Contains(t, body, "<title>Statup | Settings</title>")
 	assert.Contains(t, body, "Awesome Status")
 	assert.Contains(t, body, "Statup  made with ❤️")
+}
+
+func TestPrometheusHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/metrics", nil)
+	req.Header.Set("Authorization", core.CoreApp.ApiSecret)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	body := rr.Body.String()
+	assert.Equal(t, 200, rr.Code)
+	assert.Contains(t, body, "statup_total_services 7")
+}
+
+func TestLogoutHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/logout", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 303, rr.Code)
 }

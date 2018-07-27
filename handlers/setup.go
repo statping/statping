@@ -59,7 +59,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	description := r.PostForm.Get("description")
 	domain := r.PostForm.Get("domain")
 	email := r.PostForm.Get("email")
-	
+
 	config := &core.DbConfig{
 		dbConn,
 		dbHost,

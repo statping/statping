@@ -73,7 +73,8 @@ func LogsLineHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.Write([]byte(utils.LastLine.(string)))
+	msg := utils.LastLine.(error)
+	w.Write([]byte(msg.Error()))
 }
 
 type backups struct {
