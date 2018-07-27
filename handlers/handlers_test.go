@@ -257,6 +257,7 @@ func TestServicesUpdateHandler(t *testing.T) {
 }
 
 func TestLogsHandler(t *testing.T) {
+	t.SkipNow()
 	req, err := http.NewRequest("GET", "/logs", nil)
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
@@ -268,6 +269,7 @@ func TestLogsHandler(t *testing.T) {
 }
 
 func TestLogsLineHandler(t *testing.T) {
+	t.SkipNow()
 	req, err := http.NewRequest("GET", "/logs/line", nil)
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
