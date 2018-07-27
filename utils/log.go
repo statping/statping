@@ -26,7 +26,7 @@ func InitLogs() error {
 		os.Mkdir("./logs", 0777)
 	}
 
-	logFile, err = os.OpenFile("./logs/statup.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	logFile, err = os.OpenFile("./logs/statup.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0755)
 	if err != nil {
 		log.Printf("ERROR opening file: %v", err)
 		return err
