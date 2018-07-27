@@ -46,11 +46,11 @@ func main() {
 }
 
 func RenderBoxes() {
-	core.SqlBox = rice.MustFindBox("source/sql")
-	core.CssBox = rice.MustFindBox("source/css")
-	core.ScssBox = rice.MustFindBox("source/scss")
-	core.JsBox = rice.MustFindBox("source/js")
-	core.TmplBox = rice.MustFindBox("source/tmpl")
+	core.SqlBox = rice.MustFindBox("../source/sql")
+	core.CssBox = rice.MustFindBox("../source/css")
+	core.ScssBox = rice.MustFindBox("../source/scss")
+	core.JsBox = rice.MustFindBox("../source/js")
+	core.TmplBox = rice.MustFindBox("../source/tmpl")
 }
 
 func LoadDotEnvs() {

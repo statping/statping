@@ -24,9 +24,9 @@ var (
 
 func RunInit(t *testing.T) {
 	RenderBoxes()
-	os.Remove("./statup.db")
-	os.Remove("./config.yml")
-	os.Remove("./index.html")
+	os.Remove("cmd/statup.db")
+	os.Remove("cmd/config.yml")
+	os.Remove("cmd/index.html")
 	route = handlers.Router()
 	LoadDotEnvs()
 	core.CoreApp = core.NewCore()
@@ -46,7 +46,7 @@ func TestRunAll(t *testing.T) {
 			RunInit(t)
 		})
 		t.Run(dbt+" load database config", func(t *testing.T) {
-			RunMySQLMakeConfig(t, dbt)
+			RunMakeDatabaseConfig(t, dbt)
 		})
 		t.Run(dbt+" run database migrations", func(t *testing.T) {
 			RunDatabaseMigrations(t, dbt)
@@ -154,6 +154,9 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" HTTP /settings", func(t *testing.T) {
 			RunSettingsHandler(t)
 		})
+		t.Run(dbt+" Cleanup", func(t *testing.T) {
+			Cleanup(t)
+		})
 
 		<-forceSequential
 
@@ -193,7 +196,7 @@ func TestAssetsCommand(t *testing.T) {
 	assert.True(t, fileExists("assets/scss/base.scss"))
 }
 
-func RunMySQLMakeConfig(t *testing.T, db string) {
+func RunMakeDatabaseConfig(t *testing.T, db string) {
 	port := 5432
 	if db == "mysql" {
 		port = 3306
@@ -552,10 +555,12 @@ func RunSettingsHandler(t *testing.T) {
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
 }
 
-//func RunComplete(t *testing.T) {
-//	//os.Remove("./statup.db")
-//	os.Remove("./config.yml")
-//}
+func Cleanup(t *testing.T) {
+	os.Remove("./cmd/statup.db")
+	os.Remove("./cmd/config.yml")
+	os.RemoveAll("./cmd/assets")
+	os.RemoveAll("./cmd/logs")
+}
 
 func fileExists(file string) bool {
 	if _, err := os.Stat(file); os.IsNotExist(err) {

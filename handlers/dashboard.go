@@ -7,7 +7,6 @@ import (
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
-	"os"
 )
 
 type dashboard struct {
@@ -66,21 +65,6 @@ func LogsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-
-	file, err := os.Open("./statup.log")
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	buf := make([]byte, 62)
-	stat, err := os.Stat("./statup.log")
-	start := stat.Size() - 62
-	_, err = file.ReadAt(buf, start)
-	if err == nil {
-		fmt.Printf("%s\n", buf)
-	}
-
 	ExecuteResponse(w, r, "logs.html", nil)
 }
 

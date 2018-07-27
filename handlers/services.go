@@ -132,7 +132,8 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		Timeout:        timeout,
 	}
 	service = core.UpdateService(serviceUpdate)
-	ExecuteResponse(w, r, "service.html", service)
+	serv = core.SelectService(service.Id)
+	ExecuteResponse(w, r, "service.html", serv)
 }
 
 func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {

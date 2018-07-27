@@ -3,6 +3,8 @@
 APP="statup"
 REPO="hunterlong/statup"
 
+cd $GOPATH/src/github.com/hunterlong/statup/cmd
+
 # BUILD STATUP GOLANG BINS
 mkdir build
 xgo -go 1.10.x --targets=darwin/amd64 --dest=build -ldflags="-X main.VERSION=$VERSION" ./
@@ -20,23 +22,25 @@ ls
 mv alpine-linux-amd64 $APP
 tar -czvf $APP-linux-alpine.tar.gz $APP && rm -f $APP
 
-mv $APP-darwin-10.6-amd64 $APP
+mv cmd-darwin-10.6-amd64 $APP
 tar -czvf $APP-osx-x64.tar.gz $APP && rm -f $APP
 
-mv $APP-darwin-10.6-386 $APP
+mv cmd-darwin-10.6-386 $APP
 tar -czvf $APP-osx-x32.tar.gz $APP && rm -f $APP
 
-mv $APP-linux-amd64 $APP
+mv cmd-linux-amd64 $APP
 tar -czvf $APP-linux-x64.tar.gz $APP && rm -f $APP
 
-mv $APP-linux-386 $APP
+mv cmd-linux-386 $APP
 tar -czvf $APP-linux-x32.tar.gz $APP && rm -f $APP
 
-mv $APP-windows-6.0-amd64.exe $APP.exe
+mv cmd-windows-6.0-amd64.exe $APP.exe
 zip $APP-windows-x64.zip $APP.exe  && rm -f $APP.exe
 
-mv $APP-linux-arm-7 $APP
+mv cmd-linux-arm-7 $APP
 tar -czvf $APP-linux-arm7.tar.gz $APP && rm -f $APP
 
-mv $APP-linux-arm64 $APP
+mv cmd-linux-arm64 $APP
 tar -czvf $APP-linux-arm64.tar.gz $APP && rm -f $APP
+
+cd $GOPATH/src/github.com/hunterlong/statup

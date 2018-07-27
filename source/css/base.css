@@ -59,8 +59,8 @@ HTML, BODY {
   width: 100%;
   background-color: #48d338;
   padding: 15px 10px;
-  margin-left: 0 !important;
-  margin-right: 0 !important; }
+  margin-left: 0px !important;
+  margin-right: 0px !important; }
 
 .lower_canvas SPAN {
   font-size: 1rem;

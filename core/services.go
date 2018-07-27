@@ -227,8 +227,20 @@ func UpdateService(u *types.Service) *types.Service {
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", u.Name, err))
 	}
+	updateService(u)
 	OnUpdateService(u)
 	return u
+}
+
+func updateService(u *types.Service) {
+	var services []*Service
+	for _, s := range CoreApp.Services {
+		if s.s.Id == u.Id {
+			s.s = u
+		}
+		services = append(services, s)
+	}
+	CoreApp.Services = services
 }
 
 func CreateService(u *types.Service) (int64, error) {

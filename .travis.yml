@@ -18,7 +18,7 @@ services:
 
 env:
   global:
-     - VERSION=0.35
+     - VERSION=0.36
      - DB_HOST=localhost
      - DB_USER=travis
      - DB_PASS=
@@ -38,14 +38,14 @@ deploy:
   - provider: releases
     api_key: $GH_TOKEN
     file:
-      - "build/statup-osx-x64.tar.gz"
-      - "build/statup-osx-x32.tar.gz"
-      - "build/statup-linux-x64.tar.gz"
-      - "build/statup-linux-x32.tar.gz"
-      - "build/statup-linux-arm64.tar.gz"
-      - "build/statup-linux-arm7.tar.gz"
-      - "build/statup-linux-alpine.tar.gz"
-      - "build/statup-windows-x64.zip"
+      - "cmd/build/statup-osx-x64.tar.gz"
+      - "cmd/build/statup-osx-x32.tar.gz"
+      - "cmd/build/statup-linux-x64.tar.gz"
+      - "cmd/build/statup-linux-x32.tar.gz"
+      - "cmd/build/statup-linux-arm64.tar.gz"
+      - "cmd/build/statup-linux-arm7.tar.gz"
+      - "cmd/build/statup-linux-alpine.tar.gz"
+      - "cmd/build/statup-windows-x64.zip"
     skip_cleanup: true
 
 notifications:
@@ -62,11 +62,11 @@ before_script:
   - go get github.com/karalabe/xgo
   - go get github.com/GeertJohan/go.rice
   - go get github.com/GeertJohan/go.rice/rice
-  - go get
+  - cd cmd && go get && cd $GOPATH/src/github.com/hunterlong/statup
 
 script:
   - /bin/bash -c .travis/compile.sh
-  - go test -v -covermode=count -coverprofile=coverage.out
+  - go test -v ./... -covermode=count -coverprofile=coverage.out
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $COVERALLS; fi
 
 after_success:
