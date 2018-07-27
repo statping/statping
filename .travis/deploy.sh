@@ -22,7 +22,7 @@ then
      -d "$body" \
      https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statup/requests
 
-    curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $DOCKER
+    curl -H "Content-Type: application/json" --data '{"docker_tag": "dev"}' -X POST $DOCKER
 else
     curl -H "Content-Type: application/json" --data '{"source_type": "Branch", "source_name": "'"$TRAVIS_BRANCH"'"}' -X POST $DOCKER > /dev/null
 fi

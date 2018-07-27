@@ -25,11 +25,11 @@ var (
 
 type DbConfig types.DbConfig
 
-func DbConnection(dbType string, retry bool) error {
+func DbConnection(dbType string, retry bool, location string) error {
 	var err error
 	if dbType == "sqlite" {
 		sqliteSettings = sqlite.ConnectionURL{
-			Database: "statup.db",
+			Database: location + "statup.db",
 		}
 		DbSession, err = sqlite.Open(sqliteSettings)
 		if err != nil {
@@ -86,7 +86,7 @@ func DbConnection(dbType string, retry bool) error {
 
 func waitForDb(dbType string) error {
 	time.Sleep(5 * time.Second)
-	return DbConnection(dbType, true)
+	return DbConnection(dbType, true, "")
 }
 
 func DatabaseMaintence() {
@@ -126,7 +126,7 @@ func (c *DbConfig) Save() error {
 		utils.Log(3, err)
 		return err
 	}
-	err = DbConnection(Configs.Connection, false)
+	err = DbConnection(Configs.Connection, false, c.Location)
 	if err != nil {
 		utils.Log(4, err)
 		return err
@@ -224,9 +224,12 @@ func RunDatabaseUpgrades() error {
 	return err
 }
 
-func DropDatabase() {
+func DropDatabase() error {
 	utils.Log(1, "Dropping Database Tables...")
-	down, _ := SqlBox.String("down.sql")
+	down, err := SqlBox.String("down.sql")
+	if err != nil {
+		return err
+	}
 	requests := strings.Split(down, ";")
 	for _, request := range requests {
 		_, err := DbSession.Exec(request)
@@ -234,9 +237,10 @@ func DropDatabase() {
 			utils.Log(2, err)
 		}
 	}
+	return err
 }
 
-func CreateDatabase() {
+func CreateDatabase() error {
 	utils.Log(1, "Creating Database Tables...")
 	sql := "postgres_up.sql"
 	if CoreApp.DbConnection == "mysql" {
@@ -244,7 +248,7 @@ func CreateDatabase() {
 	} else if CoreApp.DbConnection == "sqlite" {
 		sql = "sqlite_up.sql"
 	}
-	up, _ := SqlBox.String(sql)
+	up, err := SqlBox.String(sql)
 	requests := strings.Split(up, ";")
 	for _, request := range requests {
 		_, err := DbSession.Exec(request)
@@ -256,6 +260,7 @@ func CreateDatabase() {
 	//db.QueryRow("INSERT INTO core (secret, version) VALUES ($1, $2);", secret, VERSION).Scan()
 	utils.Log(1, "Database Created")
 	//SampleData()
+	return err
 }
 
 func (c *DbConfig) Clean() *DbConfig {

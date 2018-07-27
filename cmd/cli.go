@@ -26,7 +26,7 @@ func CatchCLI(args []string) {
 	case "version":
 		fmt.Printf("Statup v%v\n", VERSION)
 	case "assets":
-		RenderBoxes()
+		core.RenderBoxes()
 		core.CreateAllAssets()
 	case "sass":
 		core.CompileSASS()
@@ -51,7 +51,7 @@ func CatchCLI(args []string) {
 	case "export":
 		var err error
 		fmt.Printf("Statup v%v Exporting Static 'index.html' page...\n", VERSION)
-		RenderBoxes()
+		core.RenderBoxes()
 		core.Configs, err = core.LoadConfig()
 		if err != nil {
 			utils.Log(4, "config.yml file not found")
@@ -93,7 +93,7 @@ func RunOnce() {
 	if err != nil {
 		utils.Log(4, "config.yml file not found")
 	}
-	err = core.DbConnection(core.Configs.Connection, false)
+	err = core.DbConnection(core.Configs.Connection, false, "")
 	if err != nil {
 		utils.Log(4, err)
 	}
@@ -129,7 +129,7 @@ func HelpEcho() {
 
 func TestPlugin(plug types.PluginActions) {
 	defer utils.DeleteFile("./.plugin_test.db")
-	RenderBoxes()
+	core.RenderBoxes()
 
 	info := plug.GetInfo()
 	fmt.Printf("\n" + BRAKER + "\n")

@@ -9,6 +9,14 @@ import (
 	"os/exec"
 )
 
+func RenderBoxes() {
+	SqlBox = rice.MustFindBox("../source/sql")
+	CssBox = rice.MustFindBox("../source/css")
+	ScssBox = rice.MustFindBox("../source/scss")
+	JsBox = rice.MustFindBox("../source/js")
+	TmplBox = rice.MustFindBox("../source/tmpl")
+}
+
 func CopyToPublic(box *rice.Box, folder, file string) {
 	assetFolder := fmt.Sprintf("assets/%v/%v", folder, file)
 	if folder == "" {
@@ -85,7 +93,7 @@ func OpenAsset(file string) string {
 	return string(dat)
 }
 
-func CreateAllAssets() {
+func CreateAllAssets() error {
 	utils.Log(1, "Dump Statup assets into current directory...")
 	MakePublicFolder("assets")
 	MakePublicFolder("assets/js")
@@ -108,16 +116,18 @@ func CreateAllAssets() {
 	if err != nil {
 		CopyToPublic(CssBox, "css", "base.css")
 		utils.Log(2, "Default 'base.css' was insert because SASS did not work.")
-		return
+		return err
 	}
 	utils.Log(1, "Statup assets have been inserted")
+	return err
 }
 
-func DeleteAllAssets() {
+func DeleteAllAssets() error {
 	err := os.RemoveAll("assets")
 	if err != nil {
 		utils.Log(1, fmt.Sprintf("There was an issue deleting Statup Assets, %v", err))
-		return
+		return err
 	}
 	utils.Log(1, "Statup assets have been deleted")
+	return err
 }

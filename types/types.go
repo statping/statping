@@ -156,6 +156,7 @@ type DbConfig struct {
 	Password    string `yaml:"-"`
 	Email       string `yaml:"-"`
 	Error       error  `yaml:"-"`
+	Location    string `yaml:"location"`
 }
 
 type PluginRepos struct {

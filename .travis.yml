@@ -66,7 +66,7 @@ before_script:
 
 script:
   - /bin/bash -c .travis/compile.sh
-  - go test -v ./... -covermode=count -coverprofile=coverage.out
+  - go test -v ./... -p 1 -ldflags="-X main.VERSION=$VERSION" -covermode=count -coverprofile=coverage.out
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $COVERALLS; fi
 
 after_success:

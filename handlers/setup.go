@@ -74,6 +74,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		password,
 		email,
 		nil,
+		"",
 	}
 	err := config.Save()
 	if err != nil {
@@ -95,7 +96,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = core.DbConnection(core.Configs.Connection, false)
+	err = core.DbConnection(core.Configs.Connection, false, "")
 	if err != nil {
 		utils.Log(3, err)
 		core.DeleteConfig()

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/GeertJohan/go.rice"
 	"github.com/fatih/structs"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/handlers"
@@ -33,7 +32,7 @@ func main() {
 		os.Exit(0)
 	}
 	utils.Log(1, fmt.Sprintf("Starting Statup v%v", VERSION))
-	RenderBoxes()
+	core.RenderBoxes()
 	core.HasAssets()
 
 	core.Configs, err = core.LoadConfig()
@@ -45,25 +44,18 @@ func main() {
 	mainProcess()
 }
 
-func RenderBoxes() {
-	core.SqlBox = rice.MustFindBox("../source/sql")
-	core.CssBox = rice.MustFindBox("../source/css")
-	core.ScssBox = rice.MustFindBox("../source/scss")
-	core.JsBox = rice.MustFindBox("../source/js")
-	core.TmplBox = rice.MustFindBox("../source/tmpl")
-}
-
-func LoadDotEnvs() {
+func LoadDotEnvs() error {
 	err := godotenv.Load()
 	if err == nil {
 		utils.Log(1, "Environment file '.env' Loaded")
 		usingEnv = true
 	}
+	return err
 }
 
 func mainProcess() {
 	var err error
-	err = core.DbConnection(core.Configs.Connection, false)
+	err = core.DbConnection(core.Configs.Connection, false, "")
 	if err != nil {
 		utils.Log(4, fmt.Sprintf("could not connect to database: %v", err))
 	}

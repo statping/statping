@@ -19,7 +19,7 @@ var (
 	LastLine interface{}
 )
 
-func InitLogs() {
+func InitLogs() error {
 	var err error
 
 	if _, err := os.Stat("./logs"); os.IsNotExist(err) {
@@ -29,6 +29,7 @@ func InitLogs() {
 	logFile, err = os.OpenFile("./logs/statup.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Printf("ERROR opening file: %v", err)
+		return err
 	}
 	ljLogger = &lumberjack.Logger{
 		Filename:   "./logs/statup.log",
@@ -53,6 +54,8 @@ func InitLogs() {
 	}
 
 	rotate()
+
+	return err
 }
 
 func rotate() {
@@ -106,8 +109,4 @@ func Http(r *http.Request) {
 	fmtLogs.Printf("WEB: %v\n", msg)
 	fmt.Printf("WEB: %v\n", msg)
 	LastLine = msg
-}
-
-func ReportLog() {
-
 }

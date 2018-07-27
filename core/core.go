@@ -53,11 +53,22 @@ func (c *Core) ToCore() *types.Core {
 
 func InitApp() {
 	SelectCore()
-	notifiers.Collections = DbSession.Collection("communication")
+	InsertNotifierDB()
 	SelectAllServices()
 	CheckServices()
 	CoreApp.Communications = notifiers.Load()
 	go DatabaseMaintence()
+}
+
+func InsertNotifierDB() error {
+	if DbSession == nil {
+		err := DbConnection(CoreApp.DbConnection, false, "")
+		if err != nil {
+			return errors.New("database connection has not been created")
+		}
+	}
+	notifiers.Collections = DbSession.Collection("communication")
+	return nil
 }
 
 func UpdateCore(c *Core) (*Core, error) {
