@@ -22,14 +22,15 @@ const (
 )
 
 func CatchCLI(args []string) {
+	dir := utils.Dir()
 	switch args[1] {
 	case "version":
 		fmt.Printf("Statup v%v\n", VERSION)
 	case "assets":
 		core.RenderBoxes()
-		core.CreateAllAssets(".")
+		core.CreateAllAssets(dir)
 	case "sass":
-		core.CompileSASS(".")
+		core.CompileSASS(dir)
 	case "update":
 		gitCurrent, err := CheckGithubUpdates()
 		if err != nil {
@@ -81,10 +82,6 @@ func CatchCLI(args []string) {
 	default:
 		utils.Log(3, "Statup does not have the command you entered.")
 	}
-}
-
-func CheckUpdates() {
-
 }
 
 func RunOnce() {

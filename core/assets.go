@@ -31,7 +31,7 @@ func CopyToPublic(box *rice.Box, folder, file string) {
 }
 
 func MakePublicFolder(folder string) {
-	utils.Log(1, fmt.Sprintf("Creating folder '%v' in current directory...", folder))
+	utils.Log(1, fmt.Sprintf("Creating folder '%v'", folder))
 	if _, err := os.Stat(folder); os.IsNotExist(err) {
 		err = os.MkdirAll(folder, 0755)
 		if err != nil {
@@ -106,18 +106,18 @@ func CreateAllAssets(folder string) error {
 	MakePublicFolder(folder + "/assets/js")
 	MakePublicFolder(folder + "/assets/css")
 	MakePublicFolder(folder + "/assets/scss")
-	MakePublicFolder(folder + "/assets/emails")
-	utils.Log(1, "Inserting scss, css, emails, and javascript files into assets..")
+	utils.Log(1, "Inserting scss, css, and javascript files into assets folder")
 	CopyToPublic(ScssBox, folder+"/assets/scss", "base.scss")
 	CopyToPublic(ScssBox, folder+"/assets/scss", "variables.scss")
 	CopyToPublic(CssBox, folder+"/assets/css", "bootstrap.min.css")
+	CopyToPublic(CssBox, folder+"/assets/css", "base.css")
 	CopyToPublic(JsBox, folder+"/assets/js", "bootstrap.min.js")
 	CopyToPublic(JsBox, folder+"/assets/js", "Chart.bundle.min.js")
 	CopyToPublic(JsBox, folder+"/assets/js", "jquery-3.3.1.slim.min.js")
 	CopyToPublic(JsBox, folder+"/assets/js", "main.js")
 	CopyToPublic(JsBox, folder+"/assets/js", "setup.js")
-	CopyToPublic(TmplBox, folder+"/assets/", "robots.txt")
-	CopyToPublic(TmplBox, folder+"/assets/", "favicon.ico")
+	CopyToPublic(TmplBox, folder+"/assets", "robots.txt")
+	CopyToPublic(TmplBox, folder+"/assets", "favicon.ico")
 	utils.Log(1, "Compiling CSS from SCSS style...")
 	err := utils.Log(1, "Statup assets have been inserted")
 	return err
