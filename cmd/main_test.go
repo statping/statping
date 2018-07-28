@@ -193,10 +193,11 @@ func TestAssetsCommand(t *testing.T) {
 	c := testcli.Command("statup", "assets")
 	c.Run()
 	t.Log(c.Stdout())
-	assert.True(t, fileExists("assets/robots.txt"))
-	assert.True(t, fileExists("assets/js/main.js"))
-	assert.True(t, fileExists("assets/css/base.css"))
-	assert.True(t, fileExists("assets/scss/base.scss"))
+	dir := utils.Dir()
+	assert.True(t, fileExists(dir+"/assets/robots.txt"))
+	assert.True(t, fileExists(dir+"/assets/js/main.js"))
+	assert.True(t, fileExists(dir+"/assets/css/base.css"))
+	assert.True(t, fileExists(dir+"/assets/scss/base.scss"))
 }
 
 func RunMakeDatabaseConfig(t *testing.T, db string) {
