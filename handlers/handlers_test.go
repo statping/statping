@@ -57,6 +57,14 @@ func TestProcessSetupHandler(t *testing.T) {
 	assert.Equal(t, 303, rr.Code)
 }
 
+func TestCheckSetupHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/setup", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 303, rr.Code)
+}
+
 func TestCheckIndexHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/", nil)
 	assert.Nil(t, err)
@@ -74,6 +82,19 @@ func TestServicesViewHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Google Service</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
+}
+
+func TestServiceChartHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/charts.js", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	body := rr.Body.String()
+	assert.Equal(t, 200, rr.Code)
+	assert.Contains(t, body, "var ctx_1")
+	assert.Contains(t, body, "var ctx_2")
+	assert.Contains(t, body, "var ctx_3")
+	assert.Contains(t, body, "var ctx_4")
 }
 
 func TestDashboardHandler(t *testing.T) {
@@ -97,6 +118,20 @@ func TestLoginHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
+}
+
+func TestBadLoginHandler(t *testing.T) {
+	form := url.Values{}
+	form.Add("username", "admin")
+	form.Add("password", "wrongpassword")
+	req, err := http.NewRequest("POST", "/dashboard", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	body := rr.Body.String()
+	assert.Contains(t, body, "Incorrect login information submitted, try again.")
+	assert.Equal(t, 200, rr.Code)
 }
 
 func TestServicesHandler(t *testing.T) {
@@ -124,6 +159,31 @@ func TestCreateUserHandler(t *testing.T) {
 	assert.Equal(t, 303, rr.Code)
 }
 
+func TestEditUserHandler(t *testing.T) {
+	form := url.Values{}
+	form.Add("username", "changedusername")
+	form.Add("password", "##########")
+	form.Add("email", "info@okokk.com")
+	form.Add("admin", "on")
+	req, err := http.NewRequest("POST", "/user/2", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	body := rr.Body.String()
+	assert.Contains(t, body, "<td>admin</td>")
+	assert.Contains(t, body, "<td>changedusername</td>")
+	assert.Equal(t, 200, rr.Code)
+}
+
+func TestDeleteUserHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/user/2/delete", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 303, rr.Code)
+}
+
 func TestUsersHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/users", nil)
 	assert.Nil(t, err)
@@ -133,7 +193,21 @@ func TestUsersHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Users</title>")
 	assert.Contains(t, body, "<td>admin</td>")
-	assert.Contains(t, body, "<td>newuser</td>")
+	assert.NotContains(t, body, "<td>changedusername</td>")
+	assert.Contains(t, body, "Statup  made with ❤️")
+}
+
+func TestUsersEditHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/user/1", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	body := rr.Body.String()
+	assert.Equal(t, 200, rr.Code)
+	assert.Contains(t, body, "<title>Statup | Users</title>")
+	assert.Contains(t, body, "<h3>User admin</h3>")
+	assert.Contains(t, body, "value=\"info@statup.io\"")
+	assert.Contains(t, body, "value=\"##########\"")
 	assert.Contains(t, body, "Statup  made with ❤️")
 }
 
@@ -256,6 +330,14 @@ func TestServicesUpdateHandler(t *testing.T) {
 	assert.Contains(t, body, "Statup  made with ❤️")
 }
 
+func TestDeleteServiceHandler(t *testing.T) {
+	req, err := http.NewRequest("POST", "/service/7/delete", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 303, rr.Code)
+}
+
 func TestLogsHandler(t *testing.T) {
 	t.SkipNow()
 	req, err := http.NewRequest("GET", "/logs", nil)
@@ -312,7 +394,7 @@ func TestPrometheusHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "statup_total_services 7")
+	assert.Contains(t, body, "statup_total_services 6")
 }
 
 func TestLogoutHandler(t *testing.T) {

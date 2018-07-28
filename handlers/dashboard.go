@@ -1,10 +1,7 @@
 package handlers
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 )
@@ -81,28 +78,4 @@ func LogsLineHandler(w http.ResponseWriter, r *http.Request) {
 	case []byte:
 		w.Write(v)
 	}
-}
-
-type backups struct {
-	Core types.Core `json:"core"`
-}
-
-func BackupCreateHandler(w http.ResponseWriter, r *http.Request) {
-	//if !IsAuthenticated(r) {
-	//	http.Redirect(w, r, "/", http.StatusSeeOther)
-	//	return
-	//}
-
-	backup := backups{
-		Core: *core.CoreApp.ToCore(),
-	}
-
-	out, err := json.Marshal(backup)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(out)
-
-	json.NewEncoder(w).Encode(backup)
-
 }

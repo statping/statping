@@ -22,6 +22,9 @@ func LoadConfig() (*types.Config, error) {
 		return nil, errors.New("config.yml file not found - starting in setup mode")
 	}
 	err = yaml.Unmarshal(file, &Configs)
+	if err != nil {
+		return nil, err
+	}
 	CoreApp.DbConnection = Configs.Connection
 	return Configs, err
 }
@@ -71,7 +74,7 @@ func LoadUsingEnv() (*types.Config, error) {
 		Email:       "info@localhost.com",
 	}
 
-	err := DbConnection(dbConfig.DbConn, true, "")
+	err := DbConnection(dbConfig.DbConn, true, ".")
 	if err != nil {
 		utils.Log(4, err)
 		return nil, err

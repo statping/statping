@@ -1,13 +1,34 @@
 package utils
 
 import (
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"net/http"
 	"testing"
 	"time"
 )
 
 func TestInitLogs(t *testing.T) {
 	assert.Nil(t, InitLogs())
+}
+
+func TestDir(t *testing.T) {
+	assert.Contains(t, Dir(), "github.com/hunterlong/statup")
+}
+
+func TestLog(t *testing.T) {
+	assert.Nil(t, Log(0, errors.New("this is a 0 level error")))
+	assert.Nil(t, Log(1, errors.New("this is a 1 level error")))
+	assert.Nil(t, Log(2, errors.New("this is a 2 level error")))
+	assert.Nil(t, Log(3, errors.New("this is a 3 level error")))
+	assert.Nil(t, Log(4, errors.New("this is a 4 level error")))
+	assert.Nil(t, Log(5, errors.New("this is a 5 level error")))
+}
+
+func TestLogHTTP(t *testing.T) {
+	req, err := http.NewRequest("GET", "/", nil)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, Http(req))
 }
 
 func TestIntString(t *testing.T) {

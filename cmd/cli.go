@@ -27,9 +27,9 @@ func CatchCLI(args []string) {
 		fmt.Printf("Statup v%v\n", VERSION)
 	case "assets":
 		core.RenderBoxes()
-		core.CreateAllAssets()
+		core.CreateAllAssets(".")
 	case "sass":
-		core.CompileSASS()
+		core.CompileSASS(".")
 	case "update":
 		gitCurrent, err := CheckGithubUpdates()
 		if err != nil {
@@ -93,7 +93,7 @@ func RunOnce() {
 	if err != nil {
 		utils.Log(4, "config.yml file not found")
 	}
-	err = core.DbConnection(core.Configs.Connection, false, "")
+	err = core.DbConnection(core.Configs.Connection, false, ".")
 	if err != nil {
 		utils.Log(4, err)
 	}

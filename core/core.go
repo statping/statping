@@ -62,7 +62,7 @@ func InitApp() {
 
 func InsertNotifierDB() error {
 	if DbSession == nil {
-		err := DbConnection(CoreApp.DbConnection, false, "")
+		err := DbConnection(CoreApp.DbConnection, false, ".")
 		if err != nil {
 			return errors.New("database connection has not been created")
 		}
@@ -85,21 +85,21 @@ func (c Core) SassVars() string {
 	if !UsingAssets {
 		return ""
 	}
-	return OpenAsset("scss/variables.scss")
+	return OpenAsset(".", "scss/variables.scss")
 }
 
 func (c Core) BaseSASS() string {
 	if !UsingAssets {
 		return ""
 	}
-	return OpenAsset("scss/base.scss")
+	return OpenAsset(".", "scss/base.scss")
 }
 
 func (c Core) MobileSASS() string {
 	if !UsingAssets {
 		return ""
 	}
-	return OpenAsset("scss/mobile.scss")
+	return OpenAsset(".", "scss/mobile.scss")
 }
 
 func (c Core) AllOnline() bool {

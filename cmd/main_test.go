@@ -7,6 +7,7 @@ import (
 	"github.com/hunterlong/statup/handlers"
 	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statup/utils"
 	"github.com/rendon/testcli"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -25,14 +26,14 @@ var (
 
 func init() {
 	gopath := os.Getenv("GOPATH")
-	gopath += "/src/github.com/hunterlong/statup/"
+	gopath += "/src/github.com/hunterlong/statup"
 }
 
 func RunInit(t *testing.T) {
 	core.RenderBoxes()
-	os.Remove(gopath + "statup.db")
-	os.Remove(gopath + "cmd/config.yml")
-	os.Remove(gopath + "cmd/index.html")
+	os.Remove(gopath + "/statup.db")
+	os.Remove(gopath + "/cmd/config.yml")
+	os.Remove(gopath + "/cmd/index.html")
 	route = handlers.Router()
 	LoadDotEnvs()
 	core.CoreApp = core.NewCore()
@@ -157,9 +158,9 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" HTTP /settings", func(t *testing.T) {
 			RunSettingsHandler(t)
 		})
-		t.Run(dbt+" Cleanup", func(t *testing.T) {
-			Cleanup(t)
-		})
+		//t.Run(dbt+" Cleanup", func(t *testing.T) {
+		//	Cleanup(t)
+		//})
 
 	}
 
@@ -185,7 +186,7 @@ func TestExportCommand(t *testing.T) {
 	c.Run()
 	t.Log(c.Stdout())
 	assert.True(t, c.StdoutContains("Exporting Static 'index.html' page"))
-	assert.True(t, fileExists(gopath+"cmd/index.html"))
+	assert.True(t, fileExists(gopath+"/cmd/index.html"))
 }
 
 func TestAssetsCommand(t *testing.T) {
@@ -199,6 +200,7 @@ func TestAssetsCommand(t *testing.T) {
 }
 
 func RunMakeDatabaseConfig(t *testing.T, db string) {
+	dir := utils.Dir()
 	port := 5432
 	if db == "mysql" {
 		port = 3306
@@ -217,7 +219,7 @@ func RunMakeDatabaseConfig(t *testing.T, db string) {
 		"admin",
 		"",
 		nil,
-		gopath,
+		dir,
 	}
 	err := config.Save()
 	assert.Nil(t, err)
@@ -226,7 +228,7 @@ func RunMakeDatabaseConfig(t *testing.T, db string) {
 	assert.Nil(t, err)
 	assert.Equal(t, db, core.Configs.Connection)
 
-	err = core.DbConnection(core.Configs.Connection, false, "")
+	err = core.DbConnection(core.Configs.Connection, false, dir)
 	assert.Nil(t, err)
 }
 
@@ -559,10 +561,10 @@ func RunSettingsHandler(t *testing.T) {
 }
 
 func Cleanup(t *testing.T) {
-	os.Remove(gopath + "cmd/statup.db")
-	//os.Remove(gopath+"cmd/config.yml")
-	os.RemoveAll(gopath + "cmd/assets")
-	os.RemoveAll(gopath + "cmd/logs")
+	os.Remove(gopath + "/cmd/statup.db")
+	//os.Remove(gopath+"/cmd/config.yml")
+	os.RemoveAll(gopath + "/cmd/assets")
+	os.RemoveAll(gopath + "/cmd/logs")
 }
 
 func fileExists(file string) bool {

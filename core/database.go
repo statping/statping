@@ -29,7 +29,7 @@ func DbConnection(dbType string, retry bool, location string) error {
 	var err error
 	if dbType == "sqlite" {
 		sqliteSettings = sqlite.ConnectionURL{
-			Database: location + "statup.db",
+			Database: location + "/statup.db",
 		}
 		DbSession, err = sqlite.Open(sqliteSettings)
 		if err != nil {
@@ -86,7 +86,7 @@ func DbConnection(dbType string, retry bool, location string) error {
 
 func waitForDb(dbType string) error {
 	time.Sleep(5 * time.Second)
-	return DbConnection(dbType, true, "")
+	return DbConnection(dbType, true, ".")
 }
 
 func DatabaseMaintence() {

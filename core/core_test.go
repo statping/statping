@@ -8,14 +8,14 @@ import (
 )
 
 var (
-	testCore     *Core
-	testConfig   *DbConfig
-	testDatabase string
+	testCore   *Core
+	testConfig *DbConfig
+	gopath     string
 )
 
 func init() {
-	testDatabase = os.Getenv("GOPATH")
-	testDatabase += "/src/github.com/hunterlong/statup/"
+	gopath = os.Getenv("GOPATH")
+	gopath += "/src/github.com/hunterlong/statup"
 
 	utils.InitLogs()
 	RenderBoxes()
@@ -31,14 +31,14 @@ func TestDbConfig_Save(t *testing.T) {
 	testConfig = &DbConfig{
 		DbConn:   "sqlite",
 		Project:  "Tester",
-		Location: testDatabase,
+		Location: gopath,
 	}
 	err := testConfig.Save()
 	assert.Nil(t, err)
 }
 
 func TestDbConnection(t *testing.T) {
-	err := DbConnection(testConfig.DbConn, false, testDatabase)
+	err := DbConnection(testConfig.DbConn, false, gopath)
 	assert.Nil(t, err)
 }
 
@@ -74,7 +74,25 @@ func TestCore_UsingAssets(t *testing.T) {
 }
 
 func TestHasAssets(t *testing.T) {
-	assert.False(t, HasAssets())
+	assert.False(t, HasAssets(gopath))
+}
+
+func TestCreateAssets(t *testing.T) {
+	assert.Nil(t, CreateAllAssets(gopath))
+	assert.True(t, HasAssets(gopath))
+}
+
+func TestCompileSASS(t *testing.T) {
+	t.SkipNow()
+	os.Setenv("SASS", "sass")
+	os.Setenv("CMD_FILE", gopath+"/cmd.sh")
+	assert.Nil(t, CompileSASS(gopath))
+	assert.True(t, HasAssets(gopath))
+}
+
+func TestDeleteAssets(t *testing.T) {
+	assert.Nil(t, DeleteAllAssets(gopath))
+	assert.False(t, HasAssets(gopath))
 }
 
 func TestInsertNotifierDB(t *testing.T) {

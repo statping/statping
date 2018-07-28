@@ -18,6 +18,14 @@ func IntString(s int) string {
 	return strconv.Itoa(s)
 }
 
+func Dir() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "."
+	}
+	return dir
+}
+
 type Timestamp time.Time
 
 type Timestamper interface {

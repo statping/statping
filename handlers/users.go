@@ -105,6 +105,7 @@ func UsersDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	users, _ := core.SelectAllUsers()
 	if len(users) == 1 {
+		utils.Log(2, "cannot delete the only user in the system")
 		http.Redirect(w, r, "/users", http.StatusSeeOther)
 		return
 	}

@@ -30,7 +30,6 @@ func Router() *mux.Router {
 	r.Handle("/service/{id}", http.HandlerFunc(ServicesUpdateHandler)).Methods("POST")
 	r.Handle("/service/{id}/edit", http.HandlerFunc(ServicesViewHandler))
 	r.Handle("/service/{id}/delete", http.HandlerFunc(ServicesDeleteHandler))
-	r.Handle("/service/{id}/badge.svg", http.HandlerFunc(ServicesBadgeHandler))
 	r.Handle("/service/{id}/delete_failures", http.HandlerFunc(ServicesDeleteFailuresHandler)).Methods("GET")
 	r.Handle("/service/{id}/checkin", http.HandlerFunc(CheckinCreateUpdateHandler)).Methods("POST")
 	r.Handle("/users", http.HandlerFunc(UsersHandler)).Methods("GET")

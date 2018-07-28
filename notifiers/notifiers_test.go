@@ -49,14 +49,14 @@ func (n *Tester) Test() error {
 
 func init() {
 	testDatabase = os.Getenv("GOPATH")
-	testDatabase += "/src/github.com/hunterlong/statup/"
+	testDatabase += "/src/github.com/hunterlong/statup"
 
 	utils.InitLogs()
 }
 
 func injectDatabase() {
 	sqliteDb := sqlite.ConnectionURL{
-		Database: testDatabase + "statup.db",
+		Database: testDatabase + "/statup.db",
 	}
 	dbSession, _ := sqlite.Open(sqliteDb)
 	Collections = dbSession.Collection("communication")

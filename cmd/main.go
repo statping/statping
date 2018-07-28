@@ -15,8 +15,9 @@ import (
 )
 
 var (
-	VERSION  string
-	usingEnv bool
+	VERSION   string
+	usingEnv  bool
+	directory string
 )
 
 func init() {
@@ -33,7 +34,7 @@ func main() {
 	}
 	utils.Log(1, fmt.Sprintf("Starting Statup v%v", VERSION))
 	core.RenderBoxes()
-	core.HasAssets()
+	core.HasAssets(directory)
 
 	core.Configs, err = core.LoadConfig()
 	if err != nil {
@@ -55,7 +56,7 @@ func LoadDotEnvs() error {
 
 func mainProcess() {
 	var err error
-	err = core.DbConnection(core.Configs.Connection, false, "")
+	err = core.DbConnection(core.Configs.Connection, false, ".")
 	if err != nil {
 		utils.Log(4, fmt.Sprintf("could not connect to database: %v", err))
 	}
