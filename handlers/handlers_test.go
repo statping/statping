@@ -308,6 +308,14 @@ func TestViewTCPServicesHandler(t *testing.T) {
 	assert.Contains(t, body, "Statup  made with ❤️")
 }
 
+func TestServicesDeleteFailuresHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/service/7/delete_failures", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 303, rr.Code)
+}
+
 func TestServicesUpdateHandler(t *testing.T) {
 	form := url.Values{}
 	form.Add("name", "The Bravery - An Honest Mistake")
@@ -386,6 +394,27 @@ func TestViewSettingsHandler(t *testing.T) {
 	assert.Contains(t, body, "Statup  made with ❤️")
 }
 
+func TestSaveAssetsHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/settings/build", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 303, rr.Code)
+	assert.FileExists(t, utils.Directory+"/assets/css/base.css")
+	assert.FileExists(t, utils.Directory+"/assets/js/main.js")
+	assert.DirExists(t, utils.Directory+"/assets")
+	assert.True(t, core.UsingAssets)
+}
+
+func TestDeleteAssetsHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/settings/delete_assets", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 303, rr.Code)
+	assert.False(t, core.UsingAssets)
+}
+
 func TestPrometheusHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/metrics", nil)
 	req.Header.Set("Authorization", core.CoreApp.ApiSecret)
@@ -395,6 +424,52 @@ func TestPrometheusHandler(t *testing.T) {
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "statup_total_services 6")
+}
+
+func TestSaveNotificationHandler(t *testing.T) {
+	form := url.Values{}
+	form.Add("enable", "on")
+	form.Add("host", "smtp.emailer.com")
+	form.Add("port", "587")
+	form.Add("username", "exampleuser")
+	form.Add("password", "password123")
+	form.Add("var1", "info@betatude.com")
+	form.Add("var2", "sendto@gmail.com")
+	form.Add("api_key", "")
+	form.Add("api_secret", "")
+	form.Add("limits", "7")
+	req, err := http.NewRequest("POST", "/settings/notifier/1", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 303, rr.Code)
+}
+
+func TestViewNotificationSettingsHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/settings", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	body := rr.Body.String()
+	assert.Equal(t, 200, rr.Code)
+	assert.Contains(t, body, "<title>Statup | Settings</title>")
+	assert.Contains(t, body, `value="exampleuser" id="smtp_username"`)
+	assert.Contains(t, body, `value="##########" id="smtp_password"`)
+	assert.Contains(t, body, `value="587" id="smtp_port"`)
+	assert.Contains(t, body, `value="info@betatude.com" id="outgoing_email_address"`)
+	assert.Contains(t, body, `value="sendto@gmail.com" id="send_alerts_to"`)
+	assert.Contains(t, body, `value="7" id="limits_per_hour_email"`)
+	assert.Contains(t, body, `id="switch-email" checked`)
+	assert.Contains(t, body, "Statup  made with ❤️")
+}
+
+func TestError404Handler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/404me", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 404, rr.Code)
 }
 
 func TestLogoutHandler(t *testing.T) {

@@ -21,19 +21,18 @@ import (
 var (
 	route       *mux.Router
 	testSession *sessions.Session
-	gopath      string
+	dir         string
 )
 
 func init() {
-	gopath := os.Getenv("GOPATH")
-	gopath += "/src/github.com/hunterlong/statup"
+	dir = utils.Directory
 }
 
 func RunInit(t *testing.T) {
 	core.RenderBoxes()
-	os.Remove(gopath + "/statup.db")
-	os.Remove(gopath + "/cmd/config.yml")
-	os.Remove(gopath + "/cmd/index.html")
+	os.Remove(dir + "/statup.db")
+	os.Remove(dir + "/cmd/config.yml")
+	os.Remove(dir + "/cmd/index.html")
 	route = handlers.Router()
 	LoadDotEnvs()
 	core.CoreApp = core.NewCore()
@@ -186,14 +185,13 @@ func TestExportCommand(t *testing.T) {
 	c.Run()
 	t.Log(c.Stdout())
 	assert.True(t, c.StdoutContains("Exporting Static 'index.html' page"))
-	assert.True(t, fileExists(gopath+"/cmd/index.html"))
+	assert.True(t, fileExists(dir+"/cmd/index.html"))
 }
 
 func TestAssetsCommand(t *testing.T) {
 	c := testcli.Command("statup", "assets")
 	c.Run()
 	t.Log(c.Stdout())
-	dir := utils.Dir()
 	assert.True(t, fileExists(dir+"/assets/robots.txt"))
 	assert.True(t, fileExists(dir+"/assets/js/main.js"))
 	assert.True(t, fileExists(dir+"/assets/css/base.css"))
@@ -201,7 +199,6 @@ func TestAssetsCommand(t *testing.T) {
 }
 
 func RunMakeDatabaseConfig(t *testing.T, db string) {
-	dir := utils.Dir()
 	port := 5432
 	if db == "mysql" {
 		port = 3306
@@ -562,10 +559,10 @@ func RunSettingsHandler(t *testing.T) {
 }
 
 func Cleanup(t *testing.T) {
-	os.Remove(gopath + "/cmd/statup.db")
+	os.Remove(dir + "/statup.db")
 	//os.Remove(gopath+"/cmd/config.yml")
-	os.RemoveAll(gopath + "/cmd/assets")
-	os.RemoveAll(gopath + "/cmd/logs")
+	os.RemoveAll(dir + "/assets")
+	os.RemoveAll(dir + "/logs")
 }
 
 func fileExists(file string) bool {

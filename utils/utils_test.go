@@ -13,7 +13,7 @@ func TestInitLogs(t *testing.T) {
 }
 
 func TestDir(t *testing.T) {
-	assert.Contains(t, Dir(), "github.com/hunterlong/statup")
+	assert.Contains(t, Directory, "github.com/hunterlong/statup")
 }
 
 func TestLog(t *testing.T) {
@@ -23,6 +23,10 @@ func TestLog(t *testing.T) {
 	assert.Nil(t, Log(3, errors.New("this is a 3 level error")))
 	assert.Nil(t, Log(4, errors.New("this is a 4 level error")))
 	assert.Nil(t, Log(5, errors.New("this is a 5 level error")))
+}
+
+func TestDeleteFile(t *testing.T) {
+	assert.True(t, DeleteFile(Directory+"/logs/statup.log"))
 }
 
 func TestLogHTTP(t *testing.T) {

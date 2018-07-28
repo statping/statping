@@ -92,9 +92,6 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		"underscore": func(html string) string {
 			return utils.UnderScoreString(html)
 		},
-		"User": func() *types.User {
-			return SessionUser(r)
-		},
 	})
 	t, _ = t.Parse(nav)
 	t, _ = t.Parse(footer)

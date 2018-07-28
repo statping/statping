@@ -9,6 +9,14 @@ import (
 	"time"
 )
 
+var (
+	Directory string
+)
+
+func init() {
+	Directory = dir()
+}
+
 func StringInt(s string) int64 {
 	num, _ := strconv.Atoi(s)
 	return int64(num)
@@ -18,7 +26,7 @@ func IntString(s int) string {
 	return strconv.Itoa(s)
 }
 
-func Dir() string {
+func dir() string {
 	dir, err := os.Getwd()
 	if err != nil {
 		return "."

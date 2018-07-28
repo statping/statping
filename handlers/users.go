@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
@@ -9,23 +8,6 @@ import (
 	"net/http"
 	"strconv"
 )
-
-func SessionUser(r *http.Request) *types.User {
-	session, _ := Store.Get(r, COOKIE_KEY)
-	if session == nil {
-		return nil
-	}
-	uuid := session.Values["user_id"]
-	var user *types.User
-	col := core.DbSession.Collection("users")
-	res := col.Find("id", uuid)
-	err := res.One(&user)
-	if err != nil {
-		utils.Log(3, fmt.Sprintf("cannot fetch user %v", uuid))
-		return nil
-	}
-	return user
-}
 
 func UsersHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {

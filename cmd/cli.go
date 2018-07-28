@@ -22,7 +22,7 @@ const (
 )
 
 func CatchCLI(args []string) {
-	dir := utils.Dir()
+	dir := utils.Directory
 	switch args[1] {
 	case "version":
 		fmt.Printf("Statup v%v\n", VERSION)

@@ -20,23 +20,23 @@ var (
 func InitLogs() error {
 	var err error
 
-	if _, err := os.Stat("./logs"); os.IsNotExist(err) {
-		os.Mkdir("./logs", 0777)
+	if _, err := os.Stat(Directory + "/logs"); os.IsNotExist(err) {
+		os.Mkdir(Directory+"/logs", 0777)
 	}
 
-	file, err := os.Create("./logs/statup.log")
+	file, err := os.Create(Directory + "/logs/statup.log")
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	logFile, err = os.OpenFile("./logs/statup.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0755)
+	logFile, err = os.OpenFile(Directory+"/logs/statup.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0755)
 	if err != nil {
 		log.Printf("ERROR opening file: %v", err)
 		return err
 	}
 	ljLogger = &lumberjack.Logger{
-		Filename:   "./logs/statup.log",
+		Filename:   Directory + "/logs/statup.log",
 		MaxSize:    16,
 		MaxBackups: 3,
 		MaxAge:     28,

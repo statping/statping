@@ -68,10 +68,11 @@ func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	core.CreateAllAssets(".")
-	err := core.CompileSASS(".")
+	dir := utils.Directory
+	core.CreateAllAssets(dir)
+	err := core.CompileSASS(dir)
 	if err != nil {
-		core.CopyToPublic(core.CssBox, "css", "base.css")
+		core.CopyToPublic(core.CssBox, dir+"/assets/css", "base.css")
 		utils.Log(2, "Default 'base.css' was insert because SASS did not work.")
 	}
 	core.UsingAssets = true
