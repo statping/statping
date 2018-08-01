@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"time"
 	"github.com/go-yaml/yaml"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -180,14 +179,10 @@ type migration struct {
 	version    int64
 }
 
-func (m migration) exec(db sqlbuilder.Database) error {
-	for s := range m.statements {
-		_, err := db.Exec(s)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+func (m migration) exec(database sqlbuilder.Database) error {
+	utils.Log(1, fmt.Sprintf("Running Query: %v", m.statements))
+	_, err := database.Exec(db.Raw(m.statements))
+	return err
 }
 
 type migrator struct {
@@ -204,7 +199,7 @@ func newMigrator(db sqlbuilder.Database, migrationContent string) *migrator {
 
 var migrationBlockPattern = regexp.MustCompile("(?s)(\\d+)\\s*(.+;)")
 
-func (m *migrator) getMigrations() ([]*migration,error) {
+func (m *migrator) getMigrations() ([]*migration, error) {
 	blocks := strings.Split(m.migrationContent, "=========================================== ")
 	count := len(blocks) - 1
 	migrations := make([]*migration, count)
@@ -215,7 +210,7 @@ func (m *migrator) getMigrations() ([]*migration,error) {
 		if err != nil {
 			return nil, err
 		}
-		migrations[count - i - 1] = &migration{
+		migrations[count-i-1] = &migration{
 			statements: matches[2],
 			version:    version,
 		}
@@ -254,8 +249,9 @@ func (m *migrator) applyMigrations() (ran int, lastVersion int64, err error) {
 			ran++
 		}
 	}
-	return migrations,nil
+	return
 }
+
 func RunDatabaseUpgrades() error {
 	var err error
 	currentMigration, err = SelectLastMigration()
@@ -264,39 +260,13 @@ func RunDatabaseUpgrades() error {
 	}
 	utils.Log(1, fmt.Sprintf("Checking for Database Upgrades since #%v", currentMigration))
 	upgrade, _ := SqlBox.String(CoreApp.DbConnection + "_upgrade.sql")
-	// parse db version and upgrade file
-	ups := strings.Split(upgrade, "=========================================== ")
-	ups = reverseSlice(ups)
-	var ran int
-	var lastMigration int64
-	for _, v := range ups {
-		if len(v) == 0 {
-			continue
-		}
-		vers := strings.Split(v, "\n")
-		lastMigration = utils.StringInt(vers[0])
-		data := vers[1:]
-
-		//fmt.Printf("Checking Migration from v%v to v%v - %v\n", CoreApp.Version, version, versionHigher(version))
-		if currentMigration >= lastMigration {
-			continue
-		}
-		utils.Log(1, fmt.Sprintf("Migrating Database from #%v to #%v", currentMigration, lastMigration))
-		for _, m := range data {
-			if m == "" {
-				continue
-			}
-			utils.Log(1, fmt.Sprintf("Running Query: %v", m))
-			_, err := DbSession.Exec(db.Raw(m + ";"))
-			ran++
-			if err != nil {
-				utils.Log(2, err)
-				continue
-			}
-		}
-		currentMigration = lastMigration
+	m := newMigrator(DbSession, upgrade)
+	ran, lastVersion, err := m.applyMigrations()
+	if err != nil {
+		utils.Log(2, err)
 	}
 	if ran > 0 {
+		currentMigration = lastVersion
 		utils.Log(1, fmt.Sprintf("Database Upgraded %v queries ran, current #%v", ran, currentMigration))
 		CoreApp, err = SelectCore()
 		if err != nil {
