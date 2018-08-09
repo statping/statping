@@ -149,5 +149,5 @@ func CheckinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	checkin.Create()
 	fmt.Println(checkin.Create())
-	ExecuteResponse(w, r, "service.html", service)
+	ExecuteResponse(w, r, "service.html", serv)
 }
