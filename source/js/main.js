@@ -54,7 +54,7 @@ $(function() {
                     if (lastline != xhr.responseText) {
                         var curr = $.trim($("#live_logs").text());
                         var line = xhr.responseText.replace(/(\r\n|\n|\r)/gm," ");
-                        line = line+"\n";
+                        line = "<p>"+line+"</p>"+"\n";
                         $("#live_logs").text(line+curr);
                         lastline = xhr.responseText;
                     }

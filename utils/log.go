@@ -10,11 +10,14 @@ import (
 	"syscall"
 )
 
+const MAX_LAST_LINES = 200
+
 var (
 	logFile  *os.File
 	fmtLogs  *log.Logger
 	ljLogger *lumberjack.Logger
 	LastLine interface{}
+	LastLines []interface{}	// Could be some cache queue in future.
 )
 
 func InitLogs() error {
@@ -59,7 +62,8 @@ func rotate() {
 }
 
 func Log(level int, err interface{}) error {
-	LastLine = err
+	setLasLine(err)
+
 	var outErr error
 	switch level {
 	case 5:
@@ -94,6 +98,14 @@ func Http(r *http.Request) string {
 	msg := fmt.Sprintf("%v (%v) | IP: %v", r.RequestURI, r.Method, r.Host)
 	fmtLogs.Printf("WEB: %v\n", msg)
 	fmt.Printf("WEB: %v\n", msg)
-	LastLine = msg
+	setLasLine(msg)
 	return msg
+}
+
+func setLasLine(line interface{}) {
+	LastLine = line
+	LastLines = append(LastLines, LastLine)
+	if len(LastLines) > MAX_LAST_LINES {
+		LastLines = LastLines[1:]
+	}
 }

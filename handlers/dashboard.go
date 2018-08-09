@@ -62,7 +62,15 @@ func LogsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "logs.html", nil)
+	logs := make([]string, 0)
+	if len(utils.LastLines) > 0 {
+		for _, line := range utils.LastLines {
+			logs = append([]string{string(compileLogLine(line, ""))}, logs...)
+		}
+	} else {
+		logs = append(logs, "No log lines.")
+	}
+	ExecuteResponse(w, r, "logs.html", logs)
 }
 
 func LogsLineHandler(w http.ResponseWriter, r *http.Request) {
@@ -70,12 +78,22 @@ func LogsLineHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	switch v := utils.LastLine.(type) {
+	w.Write(compileLogLine(utils.LastLine, ""))
+}
+
+func compileLogLine(line interface{}, suffix string) (res []byte) {
+	switch v := line.(type) {
 	case string:
-		w.Write([]byte(v))
+		res = []byte(v)
 	case error:
-		w.Write([]byte(v.Error()))
+		res = []byte(v.Error())
 	case []byte:
-		w.Write(v)
+		res = v
+	default:
+		res = []byte("")
 	}
+	if suffix != "" {
+		res = []byte(string(res)+suffix)
+	}
+	return
 }
