@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -13,7 +14,7 @@ import (
 
 func init() {
 	utils.InitLogs()
-	core.RenderBoxes()
+	source.Assets()
 }
 
 func TestIndexHandler(t *testing.T) {
@@ -82,6 +83,14 @@ func TestServicesViewHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Google Service</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
+}
+
+func TestMissingServiceViewHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/service/99999999", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 404, rr.Code)
 }
 
 func TestServiceChartHandler(t *testing.T) {

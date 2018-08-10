@@ -2,6 +2,7 @@ package core
 
 import (
 	"bytes"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"html/template"
 	"io/ioutil"
@@ -10,9 +11,9 @@ import (
 func ExportIndexHTML() string {
 	CoreApp.UseCdn = true
 	//out := index{*CoreApp, CoreApp.Services}
-	nav, _ := TmplBox.String("nav.html")
-	footer, _ := TmplBox.String("footer.html")
-	render, err := TmplBox.String("index.html")
+	nav, _ := source.TmplBox.String("nav.html")
+	footer, _ := source.TmplBox.String("footer.html")
+	render, err := source.TmplBox.String("index.html")
 	if err != nil {
 		utils.Log(3, err)
 	}

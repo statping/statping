@@ -5,6 +5,7 @@ import (
 	"github.com/fatih/structs"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/handlers"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
@@ -33,7 +34,7 @@ func main() {
 		os.Exit(0)
 	}
 	utils.Log(1, fmt.Sprintf("Starting Statup v%v", VERSION))
-	core.RenderBoxes()
+	source.Assets()
 	core.HasAssets(directory)
 
 	core.Configs, err = core.LoadConfig()

@@ -3,19 +3,12 @@ package core
 import (
 	"fmt"
 	"github.com/GeertJohan/go.rice"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"io/ioutil"
 	"os"
 	"os/exec"
 )
-
-func RenderBoxes() {
-	SqlBox = rice.MustFindBox("../source/sql")
-	CssBox = rice.MustFindBox("../source/css")
-	ScssBox = rice.MustFindBox("../source/scss")
-	JsBox = rice.MustFindBox("../source/js")
-	TmplBox = rice.MustFindBox("../source/tmpl")
-}
 
 func CopyToPublic(box *rice.Box, folder, file string) {
 	assetFolder := fmt.Sprintf("%v/%v", folder, file)
@@ -72,7 +65,7 @@ func HasAssets(folder string) bool {
 			CreateAllAssets(folder)
 			err := CompileSASS(folder)
 			if err != nil {
-				CopyToPublic(CssBox, folder+"/css", "base.css")
+				CopyToPublic(source.CssBox, folder+"/css", "base.css")
 				utils.Log(2, "Default 'base.css' was insert because SASS did not work.")
 				return true
 			}
@@ -107,17 +100,17 @@ func CreateAllAssets(folder string) error {
 	MakePublicFolder(folder + "/assets/css")
 	MakePublicFolder(folder + "/assets/scss")
 	utils.Log(1, "Inserting scss, css, and javascript files into assets folder")
-	CopyToPublic(ScssBox, folder+"/assets/scss", "base.scss")
-	CopyToPublic(ScssBox, folder+"/assets/scss", "variables.scss")
-	CopyToPublic(CssBox, folder+"/assets/css", "bootstrap.min.css")
-	CopyToPublic(CssBox, folder+"/assets/css", "base.css")
-	CopyToPublic(JsBox, folder+"/assets/js", "bootstrap.min.js")
-	CopyToPublic(JsBox, folder+"/assets/js", "Chart.bundle.min.js")
-	CopyToPublic(JsBox, folder+"/assets/js", "jquery-3.3.1.slim.min.js")
-	CopyToPublic(JsBox, folder+"/assets/js", "main.js")
-	CopyToPublic(JsBox, folder+"/assets/js", "setup.js")
-	CopyToPublic(TmplBox, folder+"/assets", "robots.txt")
-	CopyToPublic(TmplBox, folder+"/assets", "favicon.ico")
+	CopyToPublic(source.ScssBox, folder+"/assets/scss", "base.scss")
+	CopyToPublic(source.ScssBox, folder+"/assets/scss", "variables.scss")
+	CopyToPublic(source.CssBox, folder+"/assets/css", "bootstrap.min.css")
+	CopyToPublic(source.CssBox, folder+"/assets/css", "base.css")
+	CopyToPublic(source.JsBox, folder+"/assets/js", "bootstrap.min.js")
+	CopyToPublic(source.JsBox, folder+"/assets/js", "Chart.bundle.min.js")
+	CopyToPublic(source.JsBox, folder+"/assets/js", "jquery-3.3.1.slim.min.js")
+	CopyToPublic(source.JsBox, folder+"/assets/js", "main.js")
+	CopyToPublic(source.JsBox, folder+"/assets/js", "setup.js")
+	CopyToPublic(source.TmplBox, folder+"/assets", "robots.txt")
+	CopyToPublic(source.TmplBox, folder+"/assets", "statup.png")
 	utils.Log(1, "Compiling CSS from SCSS style...")
 	err := utils.Log(1, "Statup assets have been inserted")
 	return err

@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"github.com/go-yaml/yaml"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"os"
@@ -179,7 +180,7 @@ func RunDatabaseUpgrades() error {
 		return err
 	}
 	utils.Log(1, fmt.Sprintf("Checking for Database Upgrades since #%v", currentMigration))
-	upgrade, _ := SqlBox.String(CoreApp.DbConnection + "_upgrade.sql")
+	upgrade, _ := source.SqlBox.String(CoreApp.DbConnection + "_upgrade.sql")
 	// parse db version and upgrade file
 	ups := strings.Split(upgrade, "=========================================== ")
 	ups = reverseSlice(ups)
@@ -226,7 +227,7 @@ func RunDatabaseUpgrades() error {
 
 func DropDatabase() error {
 	utils.Log(1, "Dropping Database Tables...")
-	down, err := SqlBox.String("down.sql")
+	down, err := source.SqlBox.String("down.sql")
 	if err != nil {
 		return err
 	}
@@ -248,7 +249,7 @@ func CreateDatabase() error {
 	} else if CoreApp.DbConnection == "sqlite" {
 		sql = "sqlite_up.sql"
 	}
-	up, err := SqlBox.String(sql)
+	up, err := source.SqlBox.String(sql)
 	requests := strings.Split(up, ";")
 	for _, request := range requests {
 		_, err := DbSession.Exec(request)

@@ -6,6 +6,7 @@ import (
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/handlers"
 	"github.com/hunterlong/statup/notifiers"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/rendon/testcli"
@@ -29,7 +30,7 @@ func init() {
 }
 
 func RunInit(t *testing.T) {
-	core.RenderBoxes()
+	source.Assets()
 	os.Remove(dir + "/statup.db")
 	os.Remove(dir + "/cmd/config.yml")
 	os.Remove(dir + "/cmd/index.html")
@@ -39,9 +40,9 @@ func RunInit(t *testing.T) {
 }
 
 func TestRunAll(t *testing.T) {
-	t.Parallel()
+	//t.Parallel()
 
-	databases := []string{"mysql", "sqlite", "postgres"}
+	databases := []string{"sqlite", "postgres", "mysql"}
 
 	for _, dbt := range databases {
 
@@ -192,10 +193,10 @@ func TestAssetsCommand(t *testing.T) {
 	c := testcli.Command("statup", "assets")
 	c.Run()
 	t.Log(c.Stdout())
-	assert.True(t, fileExists(dir+"/assets/robots.txt"))
-	assert.True(t, fileExists(dir+"/assets/js/main.js"))
-	assert.True(t, fileExists(dir+"/assets/css/base.css"))
-	assert.True(t, fileExists(dir+"/assets/scss/base.scss"))
+	t.Log("Directory for Assets: ", dir)
+	assert.True(t, fileExists("../assets/robots.txt"))
+	assert.True(t, fileExists("../assets/js/main.js"))
+	assert.True(t, fileExists("../assets/scss/base.scss"))
 }
 
 func RunMakeDatabaseConfig(t *testing.T, db string) {

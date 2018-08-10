@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"html/template"
@@ -66,9 +67,9 @@ func IsAuthenticated(r *http.Request) bool {
 
 func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}) {
 	utils.Http(r)
-	nav, _ := core.TmplBox.String("nav.html")
-	footer, _ := core.TmplBox.String("footer.html")
-	render, err := core.TmplBox.String(file)
+	nav, _ := source.TmplBox.String("nav.html")
+	footer, _ := source.TmplBox.String("footer.html")
+	render, err := source.TmplBox.String(file)
 	if err != nil {
 		utils.Log(4, err)
 	}
@@ -100,7 +101,7 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 }
 
 func ExecuteJSResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}) {
-	render, err := core.JsBox.String(file)
+	render, err := source.JsBox.String(file)
 	if err != nil {
 		utils.Log(4, err)
 	}

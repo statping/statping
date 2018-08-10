@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/notifiers"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 )
@@ -72,7 +73,7 @@ func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 	core.CreateAllAssets(dir)
 	err := core.CompileSASS(dir)
 	if err != nil {
-		core.CopyToPublic(core.CssBox, dir+"/assets/css", "base.css")
+		core.CopyToPublic(source.CssBox, dir+"/assets/css", "base.css")
 		utils.Log(2, "Default 'base.css' was insert because SASS did not work.")
 	}
 	core.UsingAssets = true

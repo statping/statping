@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"github.com/stretchr/testify/assert"
 	"os"
@@ -10,15 +11,13 @@ import (
 var (
 	testCore   *Core
 	testConfig *DbConfig
-	gopath     string
+	dir        string
 )
 
 func init() {
-	gopath = os.Getenv("GOPATH")
-	gopath += "/src/github.com/hunterlong/statup"
-
+	dir = utils.Directory
 	utils.InitLogs()
-	RenderBoxes()
+	source.Assets()
 }
 
 func TestNewCore(t *testing.T) {
@@ -31,14 +30,14 @@ func TestDbConfig_Save(t *testing.T) {
 	testConfig = &DbConfig{
 		DbConn:   "sqlite",
 		Project:  "Tester",
-		Location: gopath,
+		Location: dir,
 	}
 	err := testConfig.Save()
 	assert.Nil(t, err)
 }
 
 func TestDbConnection(t *testing.T) {
-	err := DbConnection(testConfig.DbConn, false, gopath)
+	err := DbConnection(testConfig.DbConn, false, dir)
 	assert.Nil(t, err)
 }
 
@@ -74,25 +73,25 @@ func TestCore_UsingAssets(t *testing.T) {
 }
 
 func TestHasAssets(t *testing.T) {
-	assert.False(t, HasAssets(gopath))
+	assert.False(t, HasAssets(dir))
 }
 
 func TestCreateAssets(t *testing.T) {
-	assert.Nil(t, CreateAllAssets(gopath))
-	assert.True(t, HasAssets(gopath))
+	assert.Nil(t, CreateAllAssets(dir))
+	assert.True(t, HasAssets(dir))
 }
 
 func TestCompileSASS(t *testing.T) {
 	t.SkipNow()
 	os.Setenv("SASS", "sass")
-	os.Setenv("CMD_FILE", gopath+"/cmd.sh")
-	assert.Nil(t, CompileSASS(gopath))
-	assert.True(t, HasAssets(gopath))
+	os.Setenv("CMD_FILE", dir+"/cmd.sh")
+	assert.Nil(t, CompileSASS(dir))
+	assert.True(t, HasAssets(dir))
 }
 
 func TestDeleteAssets(t *testing.T) {
-	assert.Nil(t, DeleteAllAssets(gopath))
-	assert.False(t, HasAssets(gopath))
+	assert.Nil(t, DeleteAllAssets(dir))
+	assert.False(t, HasAssets(dir))
 }
 
 func TestInsertNotifierDB(t *testing.T) {

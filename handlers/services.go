@@ -80,6 +80,10 @@ func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	serv := core.SelectService(utils.StringInt(vars["id"]))
+	if serv == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 	ExecuteResponse(w, r, "service.html", serv)
 }
 
