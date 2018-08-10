@@ -121,7 +121,8 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	service = core.UpdateService(serviceUpdate)
 	serv = core.SelectService(service.Id)
-	ExecuteResponse(w, r, "service.html", serv)
+	//ExecuteResponse(w, r, "service.html", serv)
+	http.Redirect(w, r, "/service/"+strconv.FormatInt(service.Id, 10), http.StatusSeeOther)
 }
 
 func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
@@ -153,5 +154,6 @@ func CheckinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	checkin.Create()
 	fmt.Println(checkin.Create())
-	ExecuteResponse(w, r, "service.html", service)
+	//ExecuteResponse(w, r, "service.html", serv)
+	http.Redirect(w, r, "/service/"+strconv.FormatInt(service.Id, 10), http.StatusSeeOther)
 }
