@@ -52,10 +52,10 @@ $(function() {
             xhr.onload = function () {
                 if (xhr.status === 200) {
                     if (lastline != xhr.responseText) {
-                        var curr = $.trim($("#live_logs").text());
-                        var line = xhr.responseText.replace(/(\r\n|\n|\r)/gm," ");
+                        var curr = $("#live_logs").html();
+                        var line = $.trim(xhr.responseText.replace(/(\r\n|\n|\r)/gm," "));
                         line = "<p>"+line+"</p>"+"\n";
-                        $("#live_logs").text(line+curr);
+                        $("#live_logs").html(line+curr);
                         lastline = xhr.responseText;
                     }
                 }

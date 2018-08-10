@@ -4,7 +4,8 @@ import (
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
-)
+	"time"
+	)
 
 type dashboard struct {
 	Services        []*core.Service
@@ -65,7 +66,7 @@ func LogsHandler(w http.ResponseWriter, r *http.Request) {
 	logs := make([]string, 0)
 	if len(utils.LastLines) > 0 {
 		for _, line := range utils.LastLines {
-			logs = append([]string{string(compileLogLine(line, ""))}, logs...)
+			logs = append([]string{compileLogLine(line.Log, &line.Date, "")}, logs...)
 		}
 	} else {
 		logs = append(logs, "No log lines.")
@@ -78,22 +79,29 @@ func LogsLineHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.Write(compileLogLine(utils.LastLine, ""))
+	line := compileLogLine(utils.LastLine.Log, &utils.LastLine.Date, "")
+	w.Write([]byte(line))
 }
 
-func compileLogLine(line interface{}, suffix string) (res []byte) {
+func compileLogLine(line interface{}, date *time.Time, suffix string) (res string) {
 	switch v := line.(type) {
 	case string:
-		res = []byte(v)
+		res = string(v)
 	case error:
-		res = []byte(v.Error())
+		res = v.Error()
 	case []byte:
-		res = v
+		res = string(v)
 	default:
-		res = []byte("")
+		res = ""
 	}
+
+	if date != nil {
+		res = date.Format(time.RFC3339)+" - "+res
+	}
+
 	if suffix != "" {
-		res = []byte(string(res)+suffix)
+		res = (res)+suffix
 	}
+
 	return
 }
