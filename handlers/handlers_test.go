@@ -412,7 +412,7 @@ func TestSaveAssetsHandler(t *testing.T) {
 	assert.FileExists(t, utils.Directory+"/assets/css/base.css")
 	assert.FileExists(t, utils.Directory+"/assets/js/main.js")
 	assert.DirExists(t, utils.Directory+"/assets")
-	assert.True(t, core.UsingAssets)
+	assert.True(t, source.UsingAssets)
 }
 
 func TestDeleteAssetsHandler(t *testing.T) {
@@ -421,7 +421,7 @@ func TestDeleteAssetsHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
-	assert.False(t, core.UsingAssets)
+	assert.False(t, source.UsingAssets)
 }
 
 func TestPrometheusHandler(t *testing.T) {

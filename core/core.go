@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/hunterlong/statup/notifiers"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/pkg/errors"
 	"os"
@@ -17,11 +18,10 @@ type Core struct {
 }
 
 var (
-	Configs     *types.Config
-	CoreApp     *Core
-	SetupMode   bool
-	UsingAssets bool
-	VERSION     string
+	Configs   *types.Config
+	CoreApp   *Core
+	SetupMode bool
+	VERSION   string
 )
 
 func init() {
@@ -72,28 +72,28 @@ func UpdateCore(c *Core) (*Core, error) {
 }
 
 func (c Core) UsingAssets() bool {
-	return UsingAssets
+	return source.UsingAssets
 }
 
 func (c Core) SassVars() string {
-	if !UsingAssets {
+	if !source.UsingAssets {
 		return ""
 	}
-	return OpenAsset(".", "scss/variables.scss")
+	return source.OpenAsset(".", "scss/variables.scss")
 }
 
 func (c Core) BaseSASS() string {
-	if !UsingAssets {
+	if !source.UsingAssets {
 		return ""
 	}
-	return OpenAsset(".", "scss/base.scss")
+	return source.OpenAsset(".", "scss/base.scss")
 }
 
 func (c Core) MobileSASS() string {
-	if !UsingAssets {
+	if !source.UsingAssets {
 		return ""
 	}
-	return OpenAsset(".", "scss/mobile.scss")
+	return source.OpenAsset(".", "scss/mobile.scss")
 }
 
 func (c Core) AllOnline() bool {

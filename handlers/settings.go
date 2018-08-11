@@ -58,9 +58,9 @@ func SaveSASSHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	theme := r.PostForm.Get("theme")
 	variables := r.PostForm.Get("variables")
-	core.SaveAsset(theme, ".", "scss/base.scss")
-	core.SaveAsset(variables, ".", "scss/variables.scss")
-	core.CompileSASS(".")
+	source.SaveAsset(theme, ".", "scss/base.scss")
+	source.SaveAsset(variables, ".", "scss/variables.scss")
+	source.CompileSASS(".")
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
 
@@ -70,13 +70,13 @@ func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	dir := utils.Directory
-	core.CreateAllAssets(dir)
-	err := core.CompileSASS(dir)
+	source.CreateAllAssets(dir)
+	err := source.CompileSASS(dir)
 	if err != nil {
-		core.CopyToPublic(source.CssBox, dir+"/assets/css", "base.css")
+		source.CopyToPublic(source.CssBox, dir+"/assets/css", "base.css")
 		utils.Log(2, "Default 'base.css' was insert because SASS did not work.")
 	}
-	core.UsingAssets = true
+	source.UsingAssets = true
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
 
@@ -85,8 +85,8 @@ func DeleteAssetsHandler(w http.ResponseWriter, req *http.Request) {
 		http.Redirect(w, req, "/", http.StatusSeeOther)
 		return
 	}
-	core.DeleteAllAssets(".")
-	core.UsingAssets = false
+	source.DeleteAllAssets(".")
+	source.UsingAssets = false
 	LocalizedAssets(r)
 	http.Redirect(w, req, "/settings", http.StatusSeeOther)
 }

@@ -42,7 +42,8 @@ func RunInit(t *testing.T) {
 func TestRunAll(t *testing.T) {
 	//t.Parallel()
 
-	databases := []string{"sqlite", "postgres", "mysql"}
+	//databases := []string{"sqlite", "postgres", "mysql"}
+	databases := []string{"sqlite"}
 
 	for _, dbt := range databases {
 

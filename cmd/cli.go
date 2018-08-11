@@ -29,9 +29,9 @@ func CatchCLI(args []string) {
 		fmt.Printf("Statup v%v\n", VERSION)
 	case "assets":
 		source.Assets()
-		core.CreateAllAssets(dir)
+		source.CreateAllAssets(dir)
 	case "sass":
-		core.CompileSASS(dir)
+		source.CompileSASS(dir)
 	case "update":
 		gitCurrent, err := CheckGithubUpdates()
 		if err != nil {

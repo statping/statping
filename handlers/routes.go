@@ -69,7 +69,7 @@ func Router() *mux.Router {
 }
 
 func LocalizedAssets(r *mux.Router) *mux.Router {
-	if core.UsingAssets {
+	if source.UsingAssets {
 		cssHandler := http.FileServer(http.Dir("./assets/css"))
 		jsHandler := http.FileServer(http.Dir("./assets/js"))
 		indexHandler := http.FileServer(http.Dir("./assets/"))
