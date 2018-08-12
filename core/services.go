@@ -220,16 +220,17 @@ func DeleteService(u *types.Service) error {
 	return err
 }
 
-func UpdateService(u *types.Service) *types.Service {
-	u.CreatedAt = time.Now()
-	res := serviceCol().Find("id", u.Id)
-	err := res.Update(u)
+func UpdateService(service *types.Service) *types.Service {
+	service.CreatedAt = time.Now()
+	res := serviceCol().Find("id", service.Id)
+	err := res.Update(service)
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", u.Name, err))
+		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", service.Name, err))
+		return service
 	}
-	updateService(u)
-	OnUpdateService(u)
-	return u
+	CoreApp.Services, _ = SelectAllServices()
+	OnUpdateService(service)
+	return service
 }
 
 func updateService(u *types.Service) {
@@ -251,7 +252,7 @@ func CreateService(u *types.Service) (int64, error) {
 		return 0, err
 	}
 	u.Id = uuid.(int64)
-	u.StopRoutine = make(chan struct{})
+	u.StopRoutine = make(chan bool)
 	CoreApp.Services = append(CoreApp.Services, &Service{u})
 	return uuid.(int64), err
 }

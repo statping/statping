@@ -21,7 +21,7 @@ func CheckServices() {
 	for _, ser := range CoreApp.Services {
 		s := ser.ToService()
 		//go obj.StartCheckins()
-		s.StopRoutine = make(chan struct{})
+		s.Start()
 		go CheckQueue(s)
 	}
 }
@@ -32,6 +32,7 @@ func CheckQueue(s *types.Service) {
 		case <-s.StopRoutine:
 			return
 		default:
+			s = SelectService(s.Id).ToService()
 			ServiceCheck(s)
 		}
 		time.Sleep(time.Duration(s.Interval) * time.Second)

@@ -47,7 +47,7 @@ func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	core.CoreApp.UseCdn = (r.PostForm.Get("enable_cdn") == "on")
 	core.CoreApp, _ = core.UpdateCore(core.CoreApp)
 	core.OnSettingsSaved(core.CoreApp.ToCore())
-	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }
 
 func SaveSASSHandler(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +61,7 @@ func SaveSASSHandler(w http.ResponseWriter, r *http.Request) {
 	source.SaveAsset(theme, ".", "scss/base.scss")
 	source.SaveAsset(variables, ".", "scss/variables.scss")
 	source.CompileSASS(".")
-	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }
 
 func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
@@ -77,18 +77,18 @@ func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		utils.Log(2, "Default 'base.css' was insert because SASS did not work.")
 	}
 	source.UsingAssets = true
-	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }
 
-func DeleteAssetsHandler(w http.ResponseWriter, req *http.Request) {
-	if !IsAuthenticated(req) {
-		http.Redirect(w, req, "/", http.StatusSeeOther)
+func DeleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 	source.DeleteAllAssets(".")
 	source.UsingAssets = false
-	LocalizedAssets(r)
-	http.Redirect(w, req, "/settings", http.StatusSeeOther)
+	LocalizedAssets(Router())
+	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }
 
 func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
@@ -158,5 +158,5 @@ func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 
 	utils.Log(1, fmt.Sprintf("Notifier saved: %v", notifer))
 
-	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }

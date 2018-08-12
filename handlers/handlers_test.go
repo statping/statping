@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
@@ -8,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"strings"
 	"testing"
 )
@@ -15,6 +17,25 @@ import (
 func init() {
 	utils.InitLogs()
 	source.Assets()
+}
+
+func IsRouteAuthenticated(req *http.Request) bool {
+	os.Setenv("GO_ENV", "production")
+	req, err := http.NewRequest(req.Method, req.URL.String(), req.Body)
+	if err != nil {
+		os.Setenv("GO_ENV", "test")
+		return false
+	}
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	fmt.Println(req.URL.String(), rr.Code)
+	code := rr.Code
+	if code != 303 {
+		os.Setenv("GO_ENV", "test")
+		return false
+	}
+	os.Setenv("GO_ENV", "test")
+	return true
 }
 
 func TestIndexHandler(t *testing.T) {
@@ -152,6 +173,7 @@ func TestServicesHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Services</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestCreateUserHandler(t *testing.T) {
@@ -166,6 +188,7 @@ func TestCreateUserHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestEditUserHandler(t *testing.T) {
@@ -183,6 +206,7 @@ func TestEditUserHandler(t *testing.T) {
 	assert.Contains(t, body, "<td>admin</td>")
 	assert.Contains(t, body, "<td>changedusername</td>")
 	assert.Equal(t, 200, rr.Code)
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestDeleteUserHandler(t *testing.T) {
@@ -191,6 +215,7 @@ func TestDeleteUserHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestUsersHandler(t *testing.T) {
@@ -204,6 +229,7 @@ func TestUsersHandler(t *testing.T) {
 	assert.Contains(t, body, "<td>admin</td>")
 	assert.NotContains(t, body, "<td>changedusername</td>")
 	assert.Contains(t, body, "Statup  made with ❤️")
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestUsersEditHandler(t *testing.T) {
@@ -218,6 +244,7 @@ func TestUsersEditHandler(t *testing.T) {
 	assert.Contains(t, body, "value=\"info@statup.io\"")
 	assert.Contains(t, body, "value=\"##########\"")
 	assert.Contains(t, body, "Statup  made with ❤️")
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestSettingsHandler(t *testing.T) {
@@ -229,6 +256,7 @@ func TestSettingsHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Settings</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestHelpHandler(t *testing.T) {
@@ -240,6 +268,7 @@ func TestHelpHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Help</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestCreateHTTPServiceHandler(t *testing.T) {
@@ -259,7 +288,8 @@ func TestCreateHTTPServiceHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
-	assert.Equal(t, 303, rr.Code)
+	assert.Equal(t, 200, rr.Code)
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestCreateTCPerviceHandler(t *testing.T) {
@@ -279,7 +309,8 @@ func TestCreateTCPerviceHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
-	assert.Equal(t, 303, rr.Code)
+	assert.Equal(t, 200, rr.Code)
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestServicesHandler2(t *testing.T) {
@@ -293,6 +324,7 @@ func TestServicesHandler2(t *testing.T) {
 	assert.Contains(t, body, "Crystal Castles - Kept")
 	assert.Contains(t, body, "Local Postgres")
 	assert.Contains(t, body, "Statup  made with ❤️")
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestViewHTTPServicesHandler(t *testing.T) {
@@ -322,7 +354,7 @@ func TestServicesDeleteFailuresHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
-	assert.Equal(t, 303, rr.Code)
+	assert.Equal(t, 200, rr.Code)
 }
 
 func TestServicesUpdateHandler(t *testing.T) {
@@ -352,7 +384,7 @@ func TestDeleteServiceHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
-	assert.Equal(t, 303, rr.Code)
+	assert.Equal(t, 200, rr.Code)
 }
 
 func TestLogsHandler(t *testing.T) {
@@ -388,7 +420,7 @@ func TestSaveSettingsHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
-	assert.Equal(t, 303, rr.Code)
+	assert.Equal(t, 200, rr.Code)
 }
 
 func TestViewSettingsHandler(t *testing.T) {
@@ -401,6 +433,7 @@ func TestViewSettingsHandler(t *testing.T) {
 	assert.Contains(t, body, "<title>Statup | Settings</title>")
 	assert.Contains(t, body, "Awesome Status")
 	assert.Contains(t, body, "Statup  made with ❤️")
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestSaveAssetsHandler(t *testing.T) {
@@ -408,7 +441,7 @@ func TestSaveAssetsHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
-	assert.Equal(t, 303, rr.Code)
+	assert.Equal(t, 200, rr.Code)
 	assert.FileExists(t, utils.Directory+"/assets/css/base.css")
 	assert.FileExists(t, utils.Directory+"/assets/js/main.js")
 	assert.DirExists(t, utils.Directory+"/assets")
@@ -420,7 +453,7 @@ func TestDeleteAssetsHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
-	assert.Equal(t, 303, rr.Code)
+	assert.Equal(t, 200, rr.Code)
 	assert.False(t, source.UsingAssets)
 }
 
@@ -452,7 +485,7 @@ func TestSaveNotificationHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
-	assert.Equal(t, 303, rr.Code)
+	assert.Equal(t, 200, rr.Code)
 }
 
 func TestViewNotificationSettingsHandler(t *testing.T) {
@@ -471,6 +504,7 @@ func TestViewNotificationSettingsHandler(t *testing.T) {
 	assert.Contains(t, body, `value="7" id="limits_per_hour_email"`)
 	assert.Contains(t, body, `id="switch-email" checked`)
 	assert.Contains(t, body, "Statup  made with ❤️")
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestError404Handler(t *testing.T) {

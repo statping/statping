@@ -62,7 +62,7 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	go core.CheckQueue(service)
 	core.OnNewService(service)
 
-	http.Redirect(w, r, "/services", http.StatusSeeOther)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
 }
 
 func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +74,7 @@ func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	serv := core.SelectService(utils.StringInt(vars["id"]))
 	service := serv.ToService()
 	core.DeleteService(service)
-	http.Redirect(w, r, "/services", http.StatusSeeOther)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
 }
 
 func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
@@ -120,6 +120,8 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		Timeout:        timeout,
 	}
 	service = core.UpdateService(serviceUpdate)
+	core.CoreApp.Services, _ = core.SelectAllServices()
+
 	serv = core.SelectService(service.Id)
 	ExecuteResponse(w, r, "service.html", serv)
 }
@@ -134,7 +136,7 @@ func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 	service := serv.ToService()
 	core.DeleteFailures(service)
 	core.CoreApp.Services, _ = core.SelectAllServices()
-	http.Redirect(w, r, "/services", http.StatusSeeOther)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
 }
 
 func CheckinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
