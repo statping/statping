@@ -27,6 +27,10 @@ var (
 
 func init() {
 	dir = utils.Directory
+	os.Remove(dir + "/statup.db")
+	//os.Remove(gopath+"/cmd/config.yml")
+	os.RemoveAll(dir + "/cmd/assets")
+	os.RemoveAll(dir + "/logs")
 }
 
 func RunInit(t *testing.T) {
@@ -42,8 +46,8 @@ func RunInit(t *testing.T) {
 func TestRunAll(t *testing.T) {
 	//t.Parallel()
 
-	//databases := []string{"sqlite", "postgres", "mysql"}
-	databases := []string{"sqlite"}
+	databases := []string{"sqlite", "postgres", "mysql"}
+	//databases := []string{"sqlite"}
 
 	for _, dbt := range databases {
 
@@ -195,9 +199,9 @@ func TestAssetsCommand(t *testing.T) {
 	c.Run()
 	t.Log(c.Stdout())
 	t.Log("Directory for Assets: ", dir)
-	assert.True(t, fileExists("../assets/robots.txt"))
-	assert.True(t, fileExists("../assets/js/main.js"))
-	assert.True(t, fileExists("../assets/scss/base.scss"))
+	assert.FileExists(t, dir+"/cmd/assets/robots.txt")
+	assert.FileExists(t, dir+"/cmd/assets/js/main.js")
+	assert.FileExists(t, dir+"/cmd/assets/scss/base.scss")
 }
 
 func RunMakeDatabaseConfig(t *testing.T, db string) {
@@ -558,13 +562,6 @@ func RunSettingsHandler(t *testing.T) {
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Settings</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "Theme Editor"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
-}
-
-func Cleanup(t *testing.T) {
-	os.Remove(dir + "/statup.db")
-	//os.Remove(gopath+"/cmd/config.yml")
-	os.RemoveAll(dir + "/assets")
-	os.RemoveAll(dir + "/logs")
 }
 
 func fileExists(file string) bool {

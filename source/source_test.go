@@ -15,14 +15,11 @@ func init() {
 	dir = utils.Directory
 	utils.InitLogs()
 	Assets()
+	os.RemoveAll(dir + "/cmd/assets")
 }
 
 func TestCore_UsingAssets(t *testing.T) {
 	assert.False(t, UsingAssets)
-}
-
-func TestHasAssets(t *testing.T) {
-	assert.False(t, HasAssets(dir))
 }
 
 func TestCreateAssets(t *testing.T) {

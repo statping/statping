@@ -14,7 +14,11 @@ var (
 )
 
 func init() {
-	Directory = dir()
+	if os.Getenv("STATUP_DIR") != "" {
+		Directory = os.Getenv("STATUP_DIR")
+	} else {
+		Directory = dir()
+	}
 }
 
 func StringInt(s string) int64 {
