@@ -199,9 +199,9 @@ func TestAssetsCommand(t *testing.T) {
 	c.Run()
 	t.Log(c.Stdout())
 	t.Log("Directory for Assets: ", dir)
-	assert.FileExists(t, dir+"/cmd/assets/robots.txt")
-	assert.FileExists(t, dir+"/cmd/assets/js/main.js")
-	assert.FileExists(t, dir+"/cmd/assets/scss/base.scss")
+	assert.FileExists(t, dir+"/assets/robots.txt")
+	assert.FileExists(t, dir+"/assets/js/main.js")
+	assert.FileExists(t, dir+"/assets/scss/base.scss")
 }
 
 func RunMakeDatabaseConfig(t *testing.T, db string) {
