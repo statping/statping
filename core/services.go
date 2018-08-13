@@ -38,7 +38,7 @@ func SelectAllServices() ([]*Service, error) {
 	col := serviceCol().Find()
 	err := col.All(&services)
 	if err != nil {
-		utils.Log(3, err)
+		utils.Log(3, fmt.Sprintf("service error: %v", err))
 		return nil, err
 	}
 	for _, s := range services {
