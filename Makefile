@@ -8,7 +8,7 @@ GOINSTALL=$(GOCMD) install
 XGO=GOPATH=$(GOPATH) $(GOPATH)/bin/xgo -go 1.10.x --dest=build
 BUILDVERSION=-ldflags="-X main.VERSION=$(VERSION)"
 BINARY_NAME=statup
-DOCKER=/usr/local/bin/docker
+DOCKER=`which docker`
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 
 all: deps compile install clean
@@ -76,6 +76,12 @@ deps:
 	$(GOGET) github.com/karalabe/xgo
 	$(GOGET) github.com/GeertJohan/go.rice
 	$(GOGET) github.com/GeertJohan/go.rice/rice
+	cd cmd && $(GOGET)
+	cd notifiers && $(GOGET)
+	cd handlers && $(GOGET)
+	cd core && $(GOGET)
+	cd types && $(GOGET)
+	cd utils && $(GOGET)
 
 clean:
 	rm -rf build
