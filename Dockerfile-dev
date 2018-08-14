@@ -2,13 +2,13 @@ FROM golang:1.10.3-alpine
 
 RUN apk update && apk add git g++ libstdc++ ca-certificates
 
-WORKDIR $GOPATH/src/github.com/hunterlong/statup/
+WORKDIR $GOPATH/src/github.com/hunterlong/statup
 
 COPY . .
 RUN go get github.com/GeertJohan/go.rice/rice
 RUN cd cmd && go get -d -v
 RUN cd source && rice embed-go
-RUN cd cmd && go install
+RUN cd cmd && go install && mv $GOPATH/bin/cmd /usr/local/bin/statup
 
 RUN wget -q https://assets.statup.io/sass && \
       chmod +x sass && \
@@ -24,4 +24,4 @@ RUN printf "#!/usr/bin/env sh\n\$1\n" > $CMD_FILE && \
 WORKDIR /app
 VOLUME /app
 EXPOSE 8080
-CMD ["/go/bin/statup"]
+ENTRYPOINT statup

@@ -1,4 +1,4 @@
-VERSION=0.37
+VERSION=0.38
 GOPATH:=$(GOPATH)
 GOCMD=`which go`
 GOBUILD=$(GOCMD) build
@@ -11,6 +11,7 @@ BUILDVERSION=-ldflags="-X main.VERSION=$(VERSION)"
 BINARY_NAME=statup
 RICE=$(GOPATH)/bin/rice
 DOCKER=`which docker`
+DOCKER_COMP=`which docker-compose`
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 
 all: deps compile install clean
@@ -62,6 +63,9 @@ docker-run: docker
 
 docker-dev-run: docker-dev
 	$(DOCKER) run -t -p 8080:8080 hunterlong/statup:dev
+
+docker-test: docker-dev
+	$(DOCKER_COMP) -f servers/docker-compose-test.yml up
 
 databases:
 	$(DOCKER) run --name statup_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password123 -e POSTGRES_USER=root -e POSTGRES_DB=root -d postgres
