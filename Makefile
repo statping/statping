@@ -1,4 +1,5 @@
 VERSION=0.37
+GOPATH:=$(GOPATH)
 GOCMD=`which go`
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
@@ -8,6 +9,7 @@ GOINSTALL=$(GOCMD) install
 XGO=GOPATH=$(GOPATH) $(GOPATH)/bin/xgo -go 1.10.x --dest=build
 BUILDVERSION=-ldflags="-X main.VERSION=$(VERSION)"
 BINARY_NAME=statup
+RICE=$(GOPATH)/bin/rice
 DOCKER=`which docker`
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 
@@ -76,12 +78,8 @@ deps:
 	$(GOGET) github.com/karalabe/xgo
 	$(GOGET) github.com/GeertJohan/go.rice
 	$(GOGET) github.com/GeertJohan/go.rice/rice
-	cd cmd && $(GOGET)
-	cd notifiers && $(GOGET)
-	cd handlers && $(GOGET)
-	cd core && $(GOGET)
-	cd types && $(GOGET)
-	cd utils && $(GOGET)
+	$(GOINSTALL) github.com/GeertJohan/go.rice/rice
+	$(GOGET) -d ./...
 
 clean:
 	rm -rf build
