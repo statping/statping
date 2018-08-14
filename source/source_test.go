@@ -29,7 +29,7 @@ func TestCreateAssets(t *testing.T) {
 
 func TestCompileSASS(t *testing.T) {
 	t.SkipNow()
-	os.Setenv("SASS", "sass")
+	//os.Setenv("SASS", "sass")
 	os.Setenv("CMD_FILE", dir+"/cmd.sh")
 	assert.Nil(t, CompileSASS(dir))
 	assert.True(t, HasAssets(dir))

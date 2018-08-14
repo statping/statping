@@ -19,9 +19,13 @@ var (
 
 func InitLogs() error {
 	var err error
-
-	if _, err := os.Stat(Directory + "/logs"); os.IsNotExist(err) {
-		os.Mkdir(Directory+"/logs", 0777)
+	_, err = os.Stat(Directory + "/logs")
+	if err != nil {
+		if os.IsNotExist(err) {
+			os.Mkdir(Directory+"/logs", 0777)
+		} else {
+			fmt.Println(err)
+		}
 	}
 
 	file, err := os.Create(Directory + "/logs/statup.log")

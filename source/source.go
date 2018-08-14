@@ -28,20 +28,20 @@ func Assets() {
 
 func CompileSASS(folder string) error {
 	sassBin := os.Getenv("SASS")
-	shell := os.Getenv("CMD_FILE")
 
 	scssFile := fmt.Sprintf("%v/%v", folder, "assets/scss/base.scss")
 	baseFile := fmt.Sprintf("%v/%v", folder, "assets/css/base.css")
 
 	utils.Log(1, fmt.Sprintf("Compiling SASS %v into %v", scssFile, baseFile))
 	command := fmt.Sprintf("%v %v %v", sassBin, scssFile, baseFile)
-	testCmd := exec.Command(shell, command)
-	_, err := testCmd.Output()
+	testCmd := exec.Command("bash", "-c", command)
+	out, err := testCmd.Output()
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Failed to compile assets with SASS %v", err))
 		utils.Log(3, fmt.Sprintf("%v %v %v", sassBin, scssFile, baseFile))
 		return err
 	}
+	utils.Log(1, string(out))
 	utils.Log(1, "SASS Compiling is complete!")
 	return err
 }

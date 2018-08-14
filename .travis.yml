@@ -34,19 +34,19 @@ matrix:
 before_deploy:
   - git config --local user.name "hunterlong"
   - git config --local user.email "info@socialeck.com"
-  - git tag "v$VERSION" --force
+  - make tag
 deploy:
   - provider: releases
     api_key: $GH_TOKEN
     file:
-      - "cmd/build/statup-osx-x64.tar.gz"
-      - "cmd/build/statup-osx-x32.tar.gz"
-      - "cmd/build/statup-linux-x64.tar.gz"
-      - "cmd/build/statup-linux-x32.tar.gz"
-      - "cmd/build/statup-linux-arm64.tar.gz"
-      - "cmd/build/statup-linux-arm7.tar.gz"
-      - "cmd/build/statup-linux-alpine.tar.gz"
-      - "cmd/build/statup-windows-x64.zip"
+      - "build/statup-osx-x64.tar.gz"
+      - "build/statup-osx-x32.tar.gz"
+      - "build/statup-linux-x64.tar.gz"
+      - "build/statup-linux-x32.tar.gz"
+      - "build/statup-linux-arm64.tar.gz"
+      - "build/statup-linux-arm7.tar.gz"
+      - "build/statup-linux-alpine.tar.gz"
+      - "build/statup-windows-x64.zip"
     skip_cleanup: true
 
 notifications:
@@ -55,24 +55,15 @@ notifications:
 before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
   - psql -c 'create database test;' -U postgres
-  - go get github.com/stretchr/testify/assert
-  - go get golang.org/x/tools/cmd/cover
-  - go get github.com/mattn/goveralls
-  - go install github.com/mattn/goveralls
-  - go get github.com/rendon/testcli
-  - go get github.com/karalabe/xgo
-  - go get github.com/GeertJohan/go.rice
-  - go get github.com/GeertJohan/go.rice/rice
-  - cd cmd && go get && cd $GOPATH/src/github.com/hunterlong/statup
+  - make deps
 
 script:
-  - /bin/bash -c .travis/compile.sh
-  - go test -v ./... -p 1 -ldflags="-X main.VERSION=$VERSION" -covermode=count -coverprofile=coverage.out
-  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $COVERALLS; fi
+  - make test
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make coverage; fi
 
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then travis_wait 30 docker pull karalabe/xgo-latest; fi
-  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then /bin/bash -c .travis/build.sh; fi
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make release; fi
 
 after_deploy:
   - /bin/bash -c .travis/deploy.sh

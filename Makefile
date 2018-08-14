@@ -1,5 +1,4 @@
 VERSION=0.37
-GOPATH=$(HOME)/go
 GOCMD=/usr/local/bin/go
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
@@ -14,7 +13,7 @@ PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 
 all: deps compile install clean
 
-release: build-all compress
+release: deps build-all compress
 
 install: build
 	mv $(BINARY_NAME) $(GOPATH)/bin/$(BINARY_NAME)
@@ -30,13 +29,14 @@ compile:
 	cd source && $(GOPATH)/bin/rice embed-go
 	$(GOPATH)/bin/wt compile source/scss/base.scss -b source/css
 
-test: test-env
+test: compile test-env
 	$(GOTEST) ./... -p 1 -ldflags="-X main.VERSION=$(VERSION)" -coverprofile=coverage.out -v
 
-test-all: test-env
-	docker run --name statup_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password123 -e POSTGRES_USER=root -e POSTGRES_DB=root -d postgres
-	docker run --name statup_mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password123 -e MYSQL_DATABASE=root -d mysql
+test-all: compile test-env databases
 	$(GOTEST) ./... -p 1 -ldflags="-X main.VERSION=$(VERSION)" -coverprofile=coverage.out -v
+
+coverage:
+	$(GOPATH)/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $(COVERALLS)
 
 build-all: clean compile
 	mkdir build
@@ -56,10 +56,15 @@ docker-dev:
 	$(DOCKER) build -t hunterlong/statup:dev -f Dockerfile-dev .
 
 docker-run: docker
-	$(DOCKER) run -it -p 8080:8080 hunterlong/statup:latest
+	$(DOCKER) run -t -p 8080:8080 hunterlong/statup:latest
 
 docker-dev-run: docker-dev
-	$(DOCKER) run -it -p 8080:8080 hunterlong/statup:dev
+	$(DOCKER) run -t -p 8080:8080 hunterlong/statup:dev
+
+databases:
+	$(DOCKER) run --name statup_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password123 -e POSTGRES_USER=root -e POSTGRES_DB=root -d postgres
+	$(DOCKER) run --name statup_mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password123 -e MYSQL_DATABASE=root -d mysql
+	sleep 30
 
 deps:
 	$(GOGET) github.com/wellington/wellington/wt
@@ -122,5 +127,3 @@ compress:
 	tar -czvf build/$(BINARY_NAME)-linux-arm7.tar.gz build/$(BINARY_NAME) && rm -f build/$(BINARY_NAME)
 	mv build/cmd-linux-arm64 build/$(BINARY_NAME)
 	tar -czvf build/$(BINARY_NAME)-linux-arm64.tar.gz build/$(BINARY_NAME) && rm -f build/$(BINARY_NAME)
-
-.PHONY: deps compile build-all
