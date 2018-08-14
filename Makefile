@@ -1,5 +1,5 @@
 VERSION=0.37
-GOCMD=/usr/local/bin/go
+GOCMD=`which go`
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
