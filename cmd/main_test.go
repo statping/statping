@@ -47,6 +47,9 @@ func TestRunAll(t *testing.T) {
 	//t.Parallel()
 
 	databases := []string{"sqlite", "postgres", "mysql"}
+	if os.Getenv("ONLY_DB") != "" {
+		databases = []string{os.Getenv("ONLY_DB")}
+	}
 	//databases := []string{"sqlite"}
 
 	for _, dbt := range databases {

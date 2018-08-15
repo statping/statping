@@ -24,7 +24,7 @@ func TestSelectHTTPService(t *testing.T) {
 
 func TestSelectTCPService(t *testing.T) {
 	service := SelectService(5)
-	assert.Equal(t, "Postgres TCP Check", service.ToService().Name)
+	assert.Equal(t, "Google DNS", service.ToService().Name)
 	assert.Equal(t, "tcp", service.ToService().Type)
 }
 
@@ -55,13 +55,13 @@ func TestCheckHTTPService(t *testing.T) {
 func TestServiceTCPCheck(t *testing.T) {
 	service := SelectService(5)
 	checked := ServiceCheck(service.ToService())
-	assert.Equal(t, "Postgres TCP Check", checked.Name)
+	assert.Equal(t, "Google DNS", checked.Name)
 	assert.True(t, checked.Online)
 }
 
 func TestCheckTCPService(t *testing.T) {
 	service := SelectService(5).ToService()
-	assert.Equal(t, "Postgres TCP Check", service.Name)
+	assert.Equal(t, "Google DNS", service.Name)
 	assert.True(t, service.Online)
 	assert.NotZero(t, service.Latency)
 }

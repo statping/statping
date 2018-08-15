@@ -59,11 +59,11 @@ func LoadSampleData() error {
 		Timeout:        30,
 	}
 	s5 := &types.Service{
-		Name:     "Postgres TCP Check",
-		Domain:   "0.0.0.0",
+		Name:     "Google DNS",
+		Domain:   "8.8.8.8",
 		Interval: 20,
 		Type:     "tcp",
-		Port:     5432,
+		Port:     53,
 		Timeout:  120,
 	}
 	id, err := CreateService(s1)

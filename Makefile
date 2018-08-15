@@ -13,6 +13,8 @@ RICE=$(GOPATH)/bin/rice
 DOCKER=docker
 DOCKER_COMP=`which docker-compose`
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
+PUBLISH_BODY='{ "request": { "branch": "master", "config": { "env": { "VERSION": "$(VERSION)" } } } }'
+
 
 all: deps compile install clean
 
@@ -64,8 +66,8 @@ docker-run: docker
 docker-dev-run: docker-dev
 	$(DOCKER) run -t -p 8080:8080 hunterlong/statup:dev
 
-docker-test: docker-dev
-	$(DOCKER) run -t --entrypoint="go test -v ./..." hunterlong/statup:dev
+docker-test: docker-dev test-env
+	$(DOCKER) run hunterlong/statup:dev
 
 databases:
 	$(DOCKER) run --name statup_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password123 -e POSTGRES_USER=root -e POSTGRES_DB=root -d postgres
@@ -135,3 +137,21 @@ compress:
 	cd build && tar -czvf $(BINARY_NAME)-linux-arm7.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
 	cd build && mv cmd-linux-arm64 $(BINARY_NAME)
 	cd build && tar -czvf $(BINARY_NAME)-linux-arm64.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
+
+publish:
+	curl -s -X POST \
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		-H "Travis-API-Version: 3" \
+		-H "Authorization: token $(TRAVIS_API)" \
+		-d "$(PUBLISH_BODY)" \
+		https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statup/requests
+	curl -s -X POST \
+	 	-H "Content-Type: application/json" \
+	 	-H "Accept: application/json" \
+	 	-H "Travis-API-Version: 3" \
+		-H "Authorization: token $(TRAVIS_API)" \
+		-d "$(PUBLISH_BODY)" \
+		https://api.travis-ci.com/repo/hunterlong%2Fstatup-testing/requests
+	curl -H "Content-Type: application/json" \
+		--data '{"docker_tag": "dev"}' -X POST $(DOCKER)

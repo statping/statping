@@ -60,10 +60,11 @@ script:
   - make install
   - make test
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make coverage; fi
+  - make docker-test
 
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then travis_wait 30 docker pull karalabe/xgo-latest; fi
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make release; fi
 
 after_deploy:
-  - /bin/bash -c .travis/deploy.sh
+  - make publish

@@ -2,10 +2,10 @@
 .gitignore
 Dockerfile
 Dockerfile-dev
-Makefile
 .travis.yml
 .travis
 servers
 build
 logs
 coverage.out
+*.db

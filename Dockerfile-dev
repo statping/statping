@@ -1,25 +1,30 @@
 FROM golang:1.10.3
 
-RUN apk update && apk add git g++ libstdc++ ca-certificates
-
 WORKDIR $GOPATH/src/github.com/hunterlong/statup
 
 COPY . .
-RUN go get github.com/GeertJohan/go.rice/rice
-RUN cd cmd && go get -d -v
-RUN cd source && rice embed-go
-RUN cd cmd && go install && mv $GOPATH/bin/cmd /usr/local/bin/statup
+ADD ./Makefile ./Makefile
+RUN make deps
+RUN make compile
+RUN make install
+
+RUN apt update && \
+    apt install -y postgresql apg
 
 RUN wget -q https://assets.statup.io/sass && \
       chmod +x sass && \
       mv sass /usr/local/bin/sass
 
+ENV VERSION=$(VERSION)
 ENV IS_DOCKER=true
 ENV SASS=/usr/local/bin/sass
 ENV CMD_FILE=/usr/bin/cmd
+ENV ONLY_DB=sqlite
+ENV STATUP_DIR=/go/src/github.com/hunterlong/statup
+ENV GO_ENV=test
 
 RUN printf "#!/usr/bin/env sh\n\$1\n" > $CMD_FILE && \
       chmod +x $CMD_FILE
 
 EXPOSE 8080
-ENTRYPOINT statup
+ENTRYPOINT go test ./... -p 1 -ldflags="-X main.VERSION=$(VERSION)" -coverprofile=coverage.out -v
