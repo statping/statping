@@ -1,6 +1,6 @@
 VERSION=0.38
 GOPATH:=$(GOPATH)
-GOCMD=`which go`
+GOCMD=go
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
@@ -10,7 +10,7 @@ XGO=GOPATH=$(GOPATH) $(GOPATH)/bin/xgo -go 1.10.x --dest=build
 BUILDVERSION=-ldflags="-X main.VERSION=$(VERSION)"
 BINARY_NAME=statup
 RICE=$(GOPATH)/bin/rice
-DOCKER=`which docker`
+DOCKER=docker
 DOCKER_COMP=`which docker-compose`
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 
@@ -119,19 +119,20 @@ test-env:
 	export STATUP_DIR=$(GOPATH)/src/github.com/hunterlong/statup
 
 compress:
-	mv build/alpine-linux-amd64 build/$(BINARY_NAME)
-	tar -czvf build/$(BINARY_NAME)-linux-alpine.tar.gz build/$(BINARY_NAME) && rm -f build/$(BINARY_NAME)
-	mv build/cmd-darwin-10.6-amd64 build/$(BINARY_NAME)
-	tar -czvf build/$(BINARY_NAME)-osx-x64.tar.gz build/$(BINARY_NAME) && rm -f build/$(BINARY_NAME)
-	mv build/cmd-darwin-10.6-386 build/$(BINARY_NAME)
-	tar -czvf build/$(BINARY_NAME)-osx-x32.tar.gz build/$(BINARY_NAME) && rm -f build/$(BINARY_NAME)
-	mv build/cmd-linux-amd64 build/$(BINARY_NAME)
-	tar -czvf build/$(BINARY_NAME)-linux-x64.tar.gz build/$(BINARY_NAME) && rm -f build/$(BINARY_NAME)
-	mv build/cmd-linux-386 build/$(BINARY_NAME)
-	tar -czvf build/$(BINARY_NAME)-linux-x32.tar.gz build/$(BINARY_NAME) && rm -f build/$(BINARY_NAME)
-	mv build/cmd-windows-6.0-amd64.exe build/$(BINARY_NAME).exe
-	zip build/$(BINARY_NAME)-windows-x64.zip build/$(BINARY_NAME).exe  && rm -f build/$(BINARY_NAME).exe
-	mv build/cmd-linux-arm-7 build/$(BINARY_NAME)
-	tar -czvf build/$(BINARY_NAME)-linux-arm7.tar.gz build/$(BINARY_NAME) && rm -f build/$(BINARY_NAME)
-	mv build/cmd-linux-arm64 build/$(BINARY_NAME)
-	tar -czvf build/$(BINARY_NAME)-linux-arm64.tar.gz build/$(BINARY_NAME) && rm -f build/$(BINARY_NAME)
+	cd build
+	mv alpine-linux-amd64 $(BINARY_NAME)
+	tar -czvf $(BINARY_NAME)-linux-alpine.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
+	mv cmd-darwin-10.6-amd64 $(BINARY_NAME)
+	tar -czvf $(BINARY_NAME)-osx-x64.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
+	mv cmd-darwin-10.6-386 $(BINARY_NAME)
+	tar -czvf $(BINARY_NAME)-osx-x32.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
+	mv cmd-linux-amd64 $(BINARY_NAME)
+	tar -czvf $(BINARY_NAME)-linux-x64.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
+	mv cmd-linux-386 $(BINARY_NAME)
+	tar -czvf $(BINARY_NAME)-linux-x32.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
+	mv cmd-windows-6.0-amd64.exe $(BINARY_NAME).exe
+	zip $(BINARY_NAME)-windows-x64.zip $(BINARY_NAME).exe  && rm -f $(BINARY_NAME).exe
+	mv cmd-linux-arm-7 $(BINARY_NAME)
+	tar -czvf $(BINARY_NAME)-linux-arm7.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
+	mv cmd-linux-arm64 $(BINARY_NAME)
+	tar -czvf $(BINARY_NAME)-linux-arm64.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
