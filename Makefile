@@ -1,4 +1,4 @@
-VERSION=0.39
+VERSION=0.4
 GOPATH:=$(GOPATH)
 GOCMD=go
 GOBUILD=$(GOCMD) build
@@ -65,7 +65,7 @@ docker-dev-run: docker-dev
 	$(DOCKER) run -t -p 8080:8080 hunterlong/statup:dev
 
 docker-test: docker-dev
-	$(DOCKER_COMP) -f servers/docker-compose-test.yml up
+	$(DOCKER) run -t --entrypoint="go test -v ./..." hunterlong/statup:dev
 
 databases:
 	$(DOCKER) run --name statup_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password123 -e POSTGRES_USER=root -e POSTGRES_DB=root -d postgres

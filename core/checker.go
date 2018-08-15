@@ -109,6 +109,7 @@ func ServiceHTTPCheck(s *types.Service) *types.Service {
 		RecordFailure(s, fmt.Sprintf("HTTP Error %v", err))
 		return s
 	}
+	response.Header.Set("Connection", "close")
 	response.Header.Set("User-Agent", "StatupMonitor")
 	t2 := time.Now()
 	s.Latency = t2.Sub(t1).Seconds()
