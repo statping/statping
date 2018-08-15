@@ -1,4 +1,4 @@
-VERSION=0.38
+VERSION=0.39
 GOPATH:=$(GOPATH)
 GOCMD=go
 GOBUILD=$(GOCMD) build
@@ -119,20 +119,19 @@ test-env:
 	export STATUP_DIR=$(GOPATH)/src/github.com/hunterlong/statup
 
 compress:
-	cd build
-	mv alpine-linux-amd64 $(BINARY_NAME)
-	tar -czvf $(BINARY_NAME)-linux-alpine.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
-	mv cmd-darwin-10.6-amd64 $(BINARY_NAME)
-	tar -czvf $(BINARY_NAME)-osx-x64.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
-	mv cmd-darwin-10.6-386 $(BINARY_NAME)
-	tar -czvf $(BINARY_NAME)-osx-x32.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
-	mv cmd-linux-amd64 $(BINARY_NAME)
-	tar -czvf $(BINARY_NAME)-linux-x64.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
-	mv cmd-linux-386 $(BINARY_NAME)
-	tar -czvf $(BINARY_NAME)-linux-x32.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
-	mv cmd-windows-6.0-amd64.exe $(BINARY_NAME).exe
-	zip $(BINARY_NAME)-windows-x64.zip $(BINARY_NAME).exe  && rm -f $(BINARY_NAME).exe
-	mv cmd-linux-arm-7 $(BINARY_NAME)
-	tar -czvf $(BINARY_NAME)-linux-arm7.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
-	mv cmd-linux-arm64 $(BINARY_NAME)
-	tar -czvf $(BINARY_NAME)-linux-arm64.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
+	cd build && mv alpine-linux-amd64 $(BINARY_NAME)
+	cd build && tar -czvf $(BINARY_NAME)-linux-alpine.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
+	cd build && mv cmd-darwin-10.6-amd64 $(BINARY_NAME)
+	cd build && tar -czvf $(BINARY_NAME)-osx-x64.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
+	cd build && mv cmd-darwin-10.6-386 $(BINARY_NAME)
+	cd build && tar -czvf $(BINARY_NAME)-osx-x32.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
+	cd build && mv cmd-linux-amd64 $(BINARY_NAME)
+	cd build && tar -czvf $(BINARY_NAME)-linux-x64.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
+	cd build && mv cmd-linux-386 $(BINARY_NAME)
+	cd build && tar -czvf $(BINARY_NAME)-linux-x32.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
+	cd build && mv cmd-windows-6.0-amd64.exe $(BINARY_NAME).exe
+	cd build && zip $(BINARY_NAME)-windows-x64.zip $(BINARY_NAME).exe  && rm -f $(BINARY_NAME).exe
+	cd build && mv cmd-linux-arm-7 $(BINARY_NAME)
+	cd build && tar -czvf $(BINARY_NAME)-linux-arm7.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
+	cd build && mv cmd-linux-arm64 $(BINARY_NAME)
+	cd build && tar -czvf $(BINARY_NAME)-linux-arm64.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)

@@ -54,7 +54,6 @@ notifications:
 before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
   - psql -c 'create database test;' -U postgres
-  - which go
   - make deps
 
 script:
