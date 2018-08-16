@@ -1,9 +1,25 @@
+// Statup
+// Copyright (C) 2018.  Hunter Long and the project contributors
+// Written by Hunter Long <info@socialeck.com> and the project contributors
+//
+// https://github.com/hunterlong/statup
+//
+// The licenses for most software and other practical works are designed
+// to take away your freedom to share and change the works.  By contrast,
+// the GNU General Public License is intended to guarantee your freedom to
+// share and change all versions of a program--to make sure it remains free
+// software for all its users.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package handlers
 
 import (
 	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"html/template"
@@ -20,28 +36,25 @@ var (
 	Store *sessions.CookieStore
 )
 
-func RunHTTPServer() {
-	utils.Log(1, "Statup HTTP Server running on http://localhost:8080")
-	r := Router()
-	for _, p := range core.CoreApp.AllPlugins {
-		info := p.GetInfo()
-		for _, route := range p.Routes() {
-			path := fmt.Sprintf("%v", route.URL)
-			r.Handle(path, http.HandlerFunc(route.Handler)).Methods(route.Method)
-			utils.Log(1, fmt.Sprintf("Added Route %v for plugin %v\n", path, info.Name))
-		}
-	}
+func RunHTTPServer(ip string, port int) error {
+	host := fmt.Sprintf("%v:%v", ip, port)
+	utils.Log(1, "Statup HTTP Server running on http://"+host)
+	//for _, p := range core.CoreApp.AllPlugins {
+	//	info := p.GetInfo()
+	//	for _, route := range p.Routes() {
+	//		path := fmt.Sprintf("%v", route.URL)
+	//		r.Handle(path, http.HandlerFunc(route.Handler)).Methods(route.Method)
+	//		utils.Log(1, fmt.Sprintf("Added Route %v for plugin %v\n", path, info.Name))
+	//	}
+	//}
 	srv := &http.Server{
-		Addr:         "0.0.0.0:8080",
+		Addr:         host,
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
-		Handler:      r,
+		Handler:      Router(),
 	}
-	err := srv.ListenAndServe()
-	if err != nil {
-		utils.Log(4, err)
-	}
+	return srv.ListenAndServe()
 }
 
 func IsAuthenticated(r *http.Request) bool {
@@ -66,9 +79,9 @@ func IsAuthenticated(r *http.Request) bool {
 
 func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}) {
 	utils.Http(r)
-	nav, _ := core.TmplBox.String("nav.html")
-	footer, _ := core.TmplBox.String("footer.html")
-	render, err := core.TmplBox.String(file)
+	nav, _ := source.TmplBox.String("nav.html")
+	footer, _ := source.TmplBox.String("footer.html")
+	render, err := source.TmplBox.String(file)
 	if err != nil {
 		utils.Log(4, err)
 	}
@@ -86,6 +99,9 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		"VERSION": func() string {
 			return core.VERSION
 		},
+		"CoreApp": func() *core.Core {
+			return core.CoreApp
+		},
 		"USE_CDN": func() bool {
 			return core.CoreApp.UseCdn
 		},
@@ -100,7 +116,7 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 }
 
 func ExecuteJSResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}) {
-	render, err := core.JsBox.String(file)
+	render, err := source.JsBox.String(file)
 	if err != nil {
 		utils.Log(4, err)
 	}
@@ -112,6 +128,11 @@ func ExecuteJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 	})
 	t.Parse(render)
 	t.Execute(w, data)
+}
+
+func Error404Handler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+	ExecuteResponse(w, r, "error_404.html", nil)
 }
 
 type DbConfig types.DbConfig

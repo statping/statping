@@ -1,3 +1,18 @@
+// Statup
+// Copyright (C) 2018.  Hunter Long and the project contributors
+// Written by Hunter Long <info@socialeck.com> and the project contributors
+//
+// https://github.com/hunterlong/statup
+//
+// The licenses for most software and other practical works are designed
+// to take away your freedom to share and change the works.  By contrast,
+// the GNU General Public License is intended to guarantee your freedom to
+// share and change all versions of a program--to make sure it remains free
+// software for all its users.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package core
 
 import (
@@ -38,7 +53,7 @@ func SelectAllServices() ([]*Service, error) {
 	col := serviceCol().Find()
 	err := col.All(&services)
 	if err != nil {
-		utils.Log(3, err)
+		utils.Log(3, fmt.Sprintf("service error: %v", err))
 		return nil, err
 	}
 	for _, s := range services {
@@ -220,16 +235,17 @@ func DeleteService(u *types.Service) error {
 	return err
 }
 
-func UpdateService(u *types.Service) *types.Service {
-	u.CreatedAt = time.Now()
-	res := serviceCol().Find("id", u.Id)
-	err := res.Update(u)
+func UpdateService(service *types.Service) *types.Service {
+	service.CreatedAt = time.Now()
+	res := serviceCol().Find("id", service.Id)
+	err := res.Update(service)
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", u.Name, err))
+		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", service.Name, err))
+		return service
 	}
-	updateService(u)
-	OnUpdateService(u)
-	return u
+	CoreApp.Services, _ = SelectAllServices()
+	OnUpdateService(service)
+	return service
 }
 
 func updateService(u *types.Service) {
@@ -251,7 +267,7 @@ func CreateService(u *types.Service) (int64, error) {
 		return 0, err
 	}
 	u.Id = uuid.(int64)
-	u.StopRoutine = make(chan struct{})
+	u.StopRoutine = make(chan bool)
 	CoreApp.Services = append(CoreApp.Services, &Service{u})
 	return uuid.(int64), err
 }

@@ -1,9 +1,25 @@
+// Statup
+// Copyright (C) 2018.  Hunter Long and the project contributors
+// Written by Hunter Long <info@socialeck.com> and the project contributors
+//
+// https://github.com/hunterlong/statup
+//
+// The licenses for most software and other practical works are designed
+// to take away your freedom to share and change the works.  By contrast,
+// the GNU General Public License is intended to guarantee your freedom to
+// share and change all versions of a program--to make sure it remains free
+// software for all its users.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package core
 
 import (
-	"github.com/GeertJohan/go.rice"
 	"github.com/hunterlong/statup/notifiers"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statup/utils"
 	"github.com/pkg/errors"
 	"os"
 	"time"
@@ -18,16 +34,10 @@ type Core struct {
 }
 
 var (
-	Configs     *types.Config
-	CoreApp     *Core
-	SqlBox      *rice.Box
-	CssBox      *rice.Box
-	ScssBox     *rice.Box
-	JsBox       *rice.Box
-	TmplBox     *rice.Box
-	SetupMode   bool
-	UsingAssets bool
-	VERSION     string
+	Configs   *types.Config
+	CoreApp   *Core
+	SetupMode bool
+	VERSION   string
 )
 
 func init() {
@@ -78,28 +88,28 @@ func UpdateCore(c *Core) (*Core, error) {
 }
 
 func (c Core) UsingAssets() bool {
-	return UsingAssets
+	return source.UsingAssets
 }
 
 func (c Core) SassVars() string {
-	if !UsingAssets {
+	if !source.UsingAssets {
 		return ""
 	}
-	return OpenAsset(".", "scss/variables.scss")
+	return source.OpenAsset(utils.Directory, "scss/variables.scss")
 }
 
 func (c Core) BaseSASS() string {
-	if !UsingAssets {
+	if !source.UsingAssets {
 		return ""
 	}
-	return OpenAsset(".", "scss/base.scss")
+	return source.OpenAsset(utils.Directory, "scss/base.scss")
 }
 
 func (c Core) MobileSASS() string {
-	if !UsingAssets {
+	if !source.UsingAssets {
 		return ""
 	}
-	return OpenAsset(".", "scss/mobile.scss")
+	return source.OpenAsset(utils.Directory, "scss/mobile.scss")
 }
 
 func (c Core) AllOnline() bool {

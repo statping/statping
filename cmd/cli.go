@@ -1,16 +1,32 @@
+// Statup
+// Copyright (C) 2018.  Hunter Long and the project contributors
+// Written by Hunter Long <info@socialeck.com> and the project contributors
+//
+// https://github.com/hunterlong/statup
+//
+// The licenses for most software and other practical works are designed
+// to take away your freedom to share and change the works.  By contrast,
+// the GNU General Public License is intended to guarantee your freedom to
+// share and change all versions of a program--to make sure it remains free
+// software for all its users.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 	"upper.io/db.v3/sqlite"
@@ -21,21 +37,37 @@ const (
 	POINT  = "                     "
 )
 
-func CatchCLI(args []string) {
+func CatchCLI(args []string) error {
+	utils.InitLogs()
 	dir := utils.Directory
+	source.Assets()
+	LoadDotEnvs()
+
 	switch args[1] {
 	case "version":
-		fmt.Printf("Statup v%v\n", VERSION)
+		if COMMIT != "" {
+			fmt.Printf("Statup v%v (%v)\n", VERSION, COMMIT)
+		} else {
+			fmt.Printf("Statup v%v\n", VERSION)
+		}
+		return errors.New("end")
 	case "assets":
-		core.RenderBoxes()
-		core.CreateAllAssets(dir)
+		err := source.CreateAllAssets(dir)
+		if err != nil {
+			return err
+		} else {
+			return errors.New("end")
+		}
 	case "sass":
-		core.CompileSASS(dir)
+		err := source.CompileSASS(dir)
+		if err == nil {
+			return errors.New("end")
+		}
+		return err
 	case "update":
 		gitCurrent, err := CheckGithubUpdates()
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(2)
+			return nil
 		}
 		fmt.Printf("Statup Version: v%v\nLatest Version: %v\n", VERSION, gitCurrent.TagName)
 		if VERSION != gitCurrent.TagName[1:] {
@@ -43,45 +75,55 @@ func CatchCLI(args []string) {
 		} else {
 			fmt.Printf("You have the latest version of Statup!\n")
 		}
+		if err == nil {
+			return errors.New("end")
+		}
+		return nil
 	case "test":
 		cmd := args[2]
 		switch cmd {
 		case "plugins":
 			LoadPlugins(true)
 		}
+		return errors.New("end")
 	case "export":
 		var err error
 		fmt.Printf("Statup v%v Exporting Static 'index.html' page...\n", VERSION)
-		core.RenderBoxes()
 		core.Configs, err = core.LoadConfig()
 		if err != nil {
 			utils.Log(4, "config.yml file not found")
+			return err
 		}
 		RunOnce()
 		indexSource := core.ExportIndexHTML()
 		err = core.SaveFile("./index.html", []byte(indexSource))
 		if err != nil {
 			utils.Log(4, err)
+			return err
 		}
 		utils.Log(1, "Exported Statup index page: 'index.html'")
 	case "help":
 		HelpEcho()
+		return errors.New("end")
 	case "run":
 		utils.Log(1, "Running 1 time and saving to database...")
 		RunOnce()
 		fmt.Println("Check is complete.")
+		return errors.New("end")
 	case "env":
 		fmt.Println("Statup Environment Variables")
 		envs, err := godotenv.Read(".env")
 		if err != nil {
 			utils.Log(4, "No .env file found in current directory.")
+			return err
 		}
 		for k, e := range envs {
 			fmt.Printf("%v=%v\n", k, e)
 		}
 	default:
-		utils.Log(3, "Statup does not have the command you entered.")
+		return nil
 	}
+	return errors.New("end")
 }
 
 func RunOnce() {
@@ -117,16 +159,20 @@ func HelpEcho() {
 	fmt.Println("     statup run                - Check all services 1 time and then quit")
 	fmt.Println("     statup test plugins       - Test all plugins for required information")
 	fmt.Println("     statup assets             - Dump all assets used locally to be edited.")
+	fmt.Println("     statup sass               - Compile .scss files into the css directory")
 	fmt.Println("     statup env                - Show all environment variables being used for Statup")
 	fmt.Println("     statup export             - Exports the index page as a static HTML for pushing")
 	fmt.Println("     statup update             - Attempts to update to the latest version")
 	fmt.Println("     statup help               - Shows the user basic information about Statup")
+	fmt.Printf("Flags:\n")
+	fmt.Println("     -ip 127.0.0.1             - Run HTTP server on specific IP address (default: localhost)")
+	fmt.Println("     -port 8080                - Run HTTP server on Port (default: 8080)")
 	fmt.Println("Give Statup a Star at https://github.com/hunterlong/statup")
 }
 
 func TestPlugin(plug types.PluginActions) {
 	defer utils.DeleteFile("./.plugin_test.db")
-	core.RenderBoxes()
+	source.Assets()
 
 	info := plug.GetInfo()
 	fmt.Printf("\n" + BRAKER + "\n")
@@ -191,7 +237,7 @@ func FakeSeed(plug types.PluginActions) {
 	if err != nil {
 		utils.Log(3, err)
 	}
-	up, _ := core.SqlBox.String("sqlite_up.sql")
+	up, _ := source.SqlBox.String("sqlite_up.sql")
 	requests := strings.Split(up, ";")
 	for _, request := range requests {
 		_, err := core.DbSession.Exec(request)

@@ -1,3 +1,18 @@
+// Statup
+// Copyright (C) 2018.  Hunter Long and the project contributors
+// Written by Hunter Long <info@socialeck.com> and the project contributors
+//
+// https://github.com/hunterlong/statup
+//
+// The licenses for most software and other practical works are designed
+// to take away your freedom to share and change the works.  By contrast,
+// the GNU General Public License is intended to guarantee your freedom to
+// share and change all versions of a program--to make sure it remains free
+// software for all its users.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package handlers
 
 import (
@@ -5,6 +20,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/notifiers"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 )
@@ -46,7 +62,7 @@ func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	core.CoreApp.UseCdn = (r.PostForm.Get("enable_cdn") == "on")
 	core.CoreApp, _ = core.UpdateCore(core.CoreApp)
 	core.OnSettingsSaved(core.CoreApp.ToCore())
-	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }
 
 func SaveSASSHandler(w http.ResponseWriter, r *http.Request) {
@@ -57,10 +73,10 @@ func SaveSASSHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	theme := r.PostForm.Get("theme")
 	variables := r.PostForm.Get("variables")
-	core.SaveAsset(theme, ".", "scss/base.scss")
-	core.SaveAsset(variables, ".", "scss/variables.scss")
-	core.CompileSASS(".")
-	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+	source.SaveAsset([]byte(theme), utils.Directory, "scss/base.scss")
+	source.SaveAsset([]byte(variables), utils.Directory, "scss/variables.scss")
+	source.CompileSASS(utils.Directory)
+	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }
 
 func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
@@ -69,25 +85,29 @@ func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	dir := utils.Directory
-	core.CreateAllAssets(dir)
-	err := core.CompileSASS(dir)
+	err := source.CreateAllAssets(dir)
 	if err != nil {
-		core.CopyToPublic(core.CssBox, dir+"/assets/css", "base.css")
-		utils.Log(2, "Default 'base.css' was insert because SASS did not work.")
-	}
-	core.UsingAssets = true
-	http.Redirect(w, r, "/settings", http.StatusSeeOther)
-}
-
-func DeleteAssetsHandler(w http.ResponseWriter, req *http.Request) {
-	if !IsAuthenticated(req) {
-		http.Redirect(w, req, "/", http.StatusSeeOther)
+		utils.Log(3, err)
 		return
 	}
-	core.DeleteAllAssets(".")
-	core.UsingAssets = false
-	LocalizedAssets(r)
-	http.Redirect(w, req, "/settings", http.StatusSeeOther)
+	err = source.CompileSASS(dir)
+	if err != nil {
+		source.CopyToPublic(source.CssBox, dir+"/assets/css", "base.css")
+		utils.Log(2, "Default 'base.css' was insert because SASS did not work.")
+	}
+	source.UsingAssets = true
+	ExecuteResponse(w, r, "settings.html", core.CoreApp)
+}
+
+func DeleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	source.DeleteAllAssets(".")
+	source.UsingAssets = false
+	LocalizedAssets(Router())
+	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }
 
 func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
@@ -157,5 +177,5 @@ func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 
 	utils.Log(1, fmt.Sprintf("Notifier saved: %v", notifer))
 
-	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }

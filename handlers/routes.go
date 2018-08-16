@@ -1,3 +1,18 @@
+// Statup
+// Copyright (C) 2018.  Hunter Long and the project contributors
+// Written by Hunter Long <info@socialeck.com> and the project contributors
+//
+// https://github.com/hunterlong/statup
+//
+// The licenses for most software and other practical works are designed
+// to take away your freedom to share and change the works.  By contrast,
+// the GNU General Public License is intended to guarantee your freedom to
+// share and change all versions of a program--to make sure it remains free
+// software for all its users.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package handlers
 
 import (
@@ -5,6 +20,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/source"
 	"net/http"
 	"time"
 )
@@ -68,7 +84,7 @@ func Router() *mux.Router {
 }
 
 func LocalizedAssets(r *mux.Router) *mux.Router {
-	if core.UsingAssets {
+	if source.UsingAssets {
 		cssHandler := http.FileServer(http.Dir("./assets/css"))
 		jsHandler := http.FileServer(http.Dir("./assets/js"))
 		indexHandler := http.FileServer(http.Dir("./assets/"))
@@ -76,11 +92,13 @@ func LocalizedAssets(r *mux.Router) *mux.Router {
 		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", jsHandler))
 		r.PathPrefix("/robots.txt").Handler(indexHandler)
 		r.PathPrefix("/favicon.ico").Handler(indexHandler)
+		r.PathPrefix("/statup.png").Handler(indexHandler)
 	} else {
-		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(core.CssBox.HTTPBox())))
-		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(core.JsBox.HTTPBox())))
-		r.PathPrefix("/robots.txt").Handler(http.FileServer(core.TmplBox.HTTPBox()))
-		r.PathPrefix("/favicon.ico").Handler(http.FileServer(core.TmplBox.HTTPBox()))
+		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(source.CssBox.HTTPBox())))
+		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(source.JsBox.HTTPBox())))
+		r.PathPrefix("/robots.txt").Handler(http.FileServer(source.TmplBox.HTTPBox()))
+		r.PathPrefix("/favicon.ico").Handler(http.FileServer(source.TmplBox.HTTPBox()))
+		r.PathPrefix("/statup.png").Handler(http.FileServer(source.TmplBox.HTTPBox()))
 	}
 	return r
 }

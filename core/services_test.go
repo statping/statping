@@ -1,3 +1,18 @@
+// Statup
+// Copyright (C) 2018.  Hunter Long and the project contributors
+// Written by Hunter Long <info@socialeck.com> and the project contributors
+//
+// https://github.com/hunterlong/statup
+//
+// The licenses for most software and other practical works are designed
+// to take away your freedom to share and change the works.  By contrast,
+// the GNU General Public License is intended to guarantee your freedom to
+// share and change all versions of a program--to make sure it remains free
+// software for all its users.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package core
 
 import (
@@ -24,7 +39,7 @@ func TestSelectHTTPService(t *testing.T) {
 
 func TestSelectTCPService(t *testing.T) {
 	service := SelectService(5)
-	assert.Equal(t, "Postgres TCP Check", service.ToService().Name)
+	assert.Equal(t, "Google DNS", service.ToService().Name)
 	assert.Equal(t, "tcp", service.ToService().Type)
 }
 
@@ -55,15 +70,66 @@ func TestCheckHTTPService(t *testing.T) {
 func TestServiceTCPCheck(t *testing.T) {
 	service := SelectService(5)
 	checked := ServiceCheck(service.ToService())
-	assert.Equal(t, "Postgres TCP Check", checked.Name)
+	assert.Equal(t, "Google DNS", checked.Name)
 	assert.True(t, checked.Online)
 }
 
 func TestCheckTCPService(t *testing.T) {
 	service := SelectService(5).ToService()
-	assert.Equal(t, "Postgres TCP Check", service.Name)
+	assert.Equal(t, "Google DNS", service.Name)
 	assert.True(t, service.Online)
 	assert.NotZero(t, service.Latency)
+}
+
+func TestServiceOnline24Hours(t *testing.T) {
+	service := SelectService(5)
+	amount := service.Online24()
+	assert.Equal(t, float32(100), amount)
+}
+
+func TestServiceSmallText(t *testing.T) {
+	service := SelectService(5)
+	text := service.SmallText()
+	assert.Contains(t, text, "Online since")
+}
+
+func TestServiceAvgUptime(t *testing.T) {
+	service := SelectService(5)
+	uptime := service.AvgUptime()
+	assert.Equal(t, "100", uptime)
+}
+
+func TestServiceHits(t *testing.T) {
+	service := SelectService(5)
+	hits, err := service.Hits()
+	assert.Nil(t, err)
+	assert.Equal(t, int(1), len(hits))
+}
+
+func TestServiceLimitedHits(t *testing.T) {
+	service := SelectService(5)
+	hits, err := service.LimitedHits()
+	assert.Nil(t, err)
+	assert.Equal(t, int(1), len(hits))
+}
+
+func TestServiceTotalHits(t *testing.T) {
+	service := SelectService(5)
+	hits, err := service.TotalHits()
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(0x1), hits)
+}
+
+func TestServiceSum(t *testing.T) {
+	service := SelectService(5)
+	sum, err := service.Sum()
+	assert.Nil(t, err)
+	assert.NotZero(t, sum)
+}
+
+func TestCountOnline(t *testing.T) {
+	amount := CountOnline()
+	assert.Equal(t, 2, amount)
 }
 
 func TestCreateService(t *testing.T) {

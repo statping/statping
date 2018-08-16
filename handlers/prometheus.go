@@ -1,3 +1,18 @@
+// Statup
+// Copyright (C) 2018.  Hunter Long and the project contributors
+// Written by Hunter Long <info@socialeck.com> and the project contributors
+//
+// https://github.com/hunterlong/statup
+//
+// The licenses for most software and other practical works are designed
+// to take away your freedom to share and change the works.  By contrast,
+// the GNU General Public License is intended to guarantee your freedom to
+// share and change all versions of a program--to make sure it remains free
+// software for all its users.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package handlers
 
 import (
@@ -21,7 +36,7 @@ import (
 func PrometheusHandler(w http.ResponseWriter, r *http.Request) {
 	utils.Log(1, fmt.Sprintf("Prometheus /metrics Request From IP: %v\n", r.RemoteAddr))
 	if !isAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 	metrics := []string{}

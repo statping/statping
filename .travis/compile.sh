@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-cd $GOPATH/src/github.com/hunterlong/statup/core
+cd $GOPATH/src/github.com/hunterlong/statup/source
 
 # RENDERING CSS
 gem install sass
-sass ../source/scss/base.scss ../source/css/base.css
+sass scss/base.scss css/base.css
 
 # MIGRATION SQL FILE FOR CURRENT VERSION
 #printf "UPDATE core SET version='$VERSION';\n" >> source/sql/upgrade.sql

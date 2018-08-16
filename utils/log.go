@@ -1,3 +1,18 @@
+// Statup
+// Copyright (C) 2018.  Hunter Long and the project contributors
+// Written by Hunter Long <info@socialeck.com> and the project contributors
+//
+// https://github.com/hunterlong/statup
+//
+// The licenses for most software and other practical works are designed
+// to take away your freedom to share and change the works.  By contrast,
+// the GNU General Public License is intended to guarantee your freedom to
+// share and change all versions of a program--to make sure it remains free
+// software for all its users.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package utils
 
 import (
@@ -17,19 +32,29 @@ var (
 	LastLine interface{}
 )
 
-func InitLogs() error {
+func createLog(dir string) error {
 	var err error
-
-	if _, err := os.Stat(Directory + "/logs"); os.IsNotExist(err) {
-		os.Mkdir(Directory+"/logs", 0777)
+	_, err = os.Stat(dir + "/logs")
+	if err != nil {
+		if os.IsNotExist(err) {
+			os.Mkdir(dir+"/logs", 0777)
+		} else {
+			return err
+		}
 	}
-
-	file, err := os.Create(Directory + "/logs/statup.log")
+	file, err := os.Create(dir + "/logs/statup.log")
 	if err != nil {
 		return err
 	}
 	defer file.Close()
+	return err
+}
 
+func InitLogs() error {
+	err := createLog(Directory)
+	if err != nil {
+		return err
+	}
 	logFile, err = os.OpenFile(Directory+"/logs/statup.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0755)
 	if err != nil {
 		log.Printf("ERROR opening file: %v", err)

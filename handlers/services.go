@@ -1,3 +1,18 @@
+// Statup
+// Copyright (C) 2018.  Hunter Long and the project contributors
+// Written by Hunter Long <info@socialeck.com> and the project contributors
+//
+// https://github.com/hunterlong/statup
+//
+// The licenses for most software and other practical works are designed
+// to take away your freedom to share and change the works.  By contrast,
+// the GNU General Public License is intended to guarantee your freedom to
+// share and change all versions of a program--to make sure it remains free
+// software for all its users.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package handlers
 
 import (
@@ -62,7 +77,7 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	go core.CheckQueue(service)
 	core.OnNewService(service)
 
-	http.Redirect(w, r, "/services", http.StatusSeeOther)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
 }
 
 func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
@@ -74,12 +89,16 @@ func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	serv := core.SelectService(utils.StringInt(vars["id"]))
 	service := serv.ToService()
 	core.DeleteService(service)
-	http.Redirect(w, r, "/services", http.StatusSeeOther)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
 }
 
 func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	serv := core.SelectService(utils.StringInt(vars["id"]))
+	if serv == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 	ExecuteResponse(w, r, "service.html", serv)
 }
 
@@ -116,6 +135,8 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		Timeout:        timeout,
 	}
 	service = core.UpdateService(serviceUpdate)
+	core.CoreApp.Services, _ = core.SelectAllServices()
+
 	serv = core.SelectService(service.Id)
 	ExecuteResponse(w, r, "service.html", serv)
 }
@@ -130,7 +151,7 @@ func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 	service := serv.ToService()
 	core.DeleteFailures(service)
 	core.CoreApp.Services, _ = core.SelectAllServices()
-	http.Redirect(w, r, "/services", http.StatusSeeOther)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
 }
 
 func CheckinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {

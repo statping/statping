@@ -1,3 +1,18 @@
+// Statup
+// Copyright (C) 2018.  Hunter Long and the project contributors
+// Written by Hunter Long <info@socialeck.com> and the project contributors
+//
+// https://github.com/hunterlong/statup
+//
+// The licenses for most software and other practical works are designed
+// to take away your freedom to share and change the works.  By contrast,
+// the GNU General Public License is intended to guarantee your freedom to
+// share and change all versions of a program--to make sure it remains free
+// software for all its users.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package utils
 
 import (
@@ -8,8 +23,14 @@ import (
 	"time"
 )
 
+func TestCreateLog(t *testing.T) {
+	err := createLog(Directory)
+	assert.Nil(t, err)
+}
+
 func TestInitLogs(t *testing.T) {
 	assert.Nil(t, InitLogs())
+	assert.FileExists(t, "../logs/statup.log")
 }
 
 func TestDir(t *testing.T) {
@@ -26,7 +47,11 @@ func TestLog(t *testing.T) {
 }
 
 func TestDeleteFile(t *testing.T) {
-	assert.True(t, DeleteFile(Directory+"/logs/statup.log"))
+	assert.Nil(t, DeleteFile(Directory+"/logs/statup.log"))
+}
+
+func TestFailedDeleteFile(t *testing.T) {
+	assert.Error(t, DeleteFile(Directory+"/missingfilehere.txt"))
 }
 
 func TestLogHTTP(t *testing.T) {
@@ -66,4 +91,8 @@ func TestRandomString(t *testing.T) {
 
 func TestSha256(t *testing.T) {
 	assert.Equal(t, "dc724af18fbdd4e59189f5fe768a5f8311527050", Sha256([]byte("testing")))
+}
+
+func TestDeleteDirectory(t *testing.T) {
+	assert.Nil(t, DeleteDirectory(Directory+"/logs"))
 }

@@ -1,3 +1,18 @@
+// Statup
+// Copyright (C) 2018.  Hunter Long and the project contributors
+// Written by Hunter Long <info@socialeck.com> and the project contributors
+//
+// https://github.com/hunterlong/statup
+//
+// The licenses for most software and other practical works are designed
+// to take away your freedom to share and change the works.  By contrast,
+// the GNU General Public License is intended to guarantee your freedom to
+// share and change all versions of a program--to make sure it remains free
+// software for all its users.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package main
 
 import (
@@ -6,9 +21,9 @@ import (
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/handlers"
 	"github.com/hunterlong/statup/notifiers"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
-	"github.com/rendon/testcli"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -26,10 +41,14 @@ var (
 
 func init() {
 	dir = utils.Directory
+	os.Remove(dir + "/statup.db")
+	//os.Remove(gopath+"/cmd/config.yml")
+	os.RemoveAll(dir + "/cmd/assets")
+	os.RemoveAll(dir + "/logs")
 }
 
 func RunInit(t *testing.T) {
-	core.RenderBoxes()
+	source.Assets()
 	os.Remove(dir + "/statup.db")
 	os.Remove(dir + "/cmd/config.yml")
 	os.Remove(dir + "/cmd/index.html")
@@ -39,9 +58,12 @@ func RunInit(t *testing.T) {
 }
 
 func TestRunAll(t *testing.T) {
-	t.Parallel()
+	//t.Parallel()
 
-	databases := []string{"mysql", "sqlite", "postgres"}
+	databases := []string{"sqlite", "postgres", "mysql"}
+	if os.Getenv("ONLY_DB") != "" {
+		databases = []string{os.Getenv("ONLY_DB")}
+	}
 
 	for _, dbt := range databases {
 
@@ -157,45 +179,18 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" HTTP /settings", func(t *testing.T) {
 			RunSettingsHandler(t)
 		})
-		//t.Run(dbt+" Cleanup", func(t *testing.T) {
-		//	Cleanup(t)
-		//})
+		t.Run(dbt+" Cleanup", func(t *testing.T) {
+			Cleanup(t)
+		})
 
 	}
 
 }
 
-func TestVersionCommand(t *testing.T) {
-	c := testcli.Command("statup", "version")
-	c.Run()
-	t.Log(c.Stdout())
-	assert.True(t, c.StdoutContains("Statup v"))
-}
-
-func TestHelpCommand(t *testing.T) {
-	c := testcli.Command("statup", "help")
-	c.Run()
-	t.Log(c.Stdout())
-	assert.True(t, c.StdoutContains("statup help               - Shows the user basic information about Statup"))
-}
-
-func TestExportCommand(t *testing.T) {
-	t.SkipNow()
-	c := testcli.Command("statup", "export")
-	c.Run()
-	t.Log(c.Stdout())
-	assert.True(t, c.StdoutContains("Exporting Static 'index.html' page"))
-	assert.True(t, fileExists(dir+"/cmd/index.html"))
-}
-
-func TestAssetsCommand(t *testing.T) {
-	c := testcli.Command("statup", "assets")
-	c.Run()
-	t.Log(c.Stdout())
-	assert.True(t, fileExists(dir+"/assets/robots.txt"))
-	assert.True(t, fileExists(dir+"/assets/js/main.js"))
-	assert.True(t, fileExists(dir+"/assets/css/base.css"))
-	assert.True(t, fileExists(dir+"/assets/scss/base.scss"))
+func Cleanup(t *testing.T) {
+	core.DbSession.ClearCache()
+	err := core.DbSession.Close()
+	assert.Nil(t, err)
 }
 
 func RunMakeDatabaseConfig(t *testing.T, db string) {
@@ -251,7 +246,6 @@ func RunSelectCoreMYQL(t *testing.T, db string) {
 	var err error
 	core.CoreApp, err = core.SelectCore()
 	assert.Nil(t, err)
-	t.Log(core.CoreApp)
 	assert.Equal(t, "Testing "+db, core.CoreApp.Name)
 	assert.Equal(t, db, core.CoreApp.DbConnection)
 	assert.NotEmpty(t, core.CoreApp.ApiKey)
@@ -481,6 +475,7 @@ func RunPrometheusHandler(t *testing.T) {
 	route.ServeHTTP(rr, req)
 	t.Log(rr.Body.String())
 	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 6"))
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func RunFailingPrometheusHandler(t *testing.T) {
@@ -488,7 +483,8 @@ func RunFailingPrometheusHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
-	assert.Equal(t, 401, rr.Result().StatusCode)
+	assert.Equal(t, 303, rr.Result().StatusCode)
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func RunLoginHandler(t *testing.T) {
@@ -501,6 +497,7 @@ func RunLoginHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Result().StatusCode)
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func RunDashboardHandler(t *testing.T) {
@@ -510,6 +507,7 @@ func RunDashboardHandler(t *testing.T) {
 	route.ServeHTTP(rr, req)
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Dashboard</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func RunUsersHandler(t *testing.T) {
@@ -519,6 +517,7 @@ func RunUsersHandler(t *testing.T) {
 	route.ServeHTTP(rr, req)
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Users</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func RunUserViewHandler(t *testing.T) {
@@ -528,6 +527,7 @@ func RunUserViewHandler(t *testing.T) {
 	route.ServeHTTP(rr, req)
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Users</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func RunServicesHandler(t *testing.T) {
@@ -537,6 +537,7 @@ func RunServicesHandler(t *testing.T) {
 	route.ServeHTTP(rr, req)
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Services</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func RunHelpHandler(t *testing.T) {
@@ -546,6 +547,7 @@ func RunHelpHandler(t *testing.T) {
 	route.ServeHTTP(rr, req)
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Help</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func RunSettingsHandler(t *testing.T) {
@@ -556,13 +558,7 @@ func RunSettingsHandler(t *testing.T) {
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Settings</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "Theme Editor"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
-}
-
-func Cleanup(t *testing.T) {
-	os.Remove(dir + "/statup.db")
-	//os.Remove(gopath+"/cmd/config.yml")
-	os.RemoveAll(dir + "/assets")
-	os.RemoveAll(dir + "/logs")
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func fileExists(file string) bool {
