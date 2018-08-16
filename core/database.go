@@ -106,12 +106,12 @@ func waitForDb(dbType string) error {
 }
 
 func DatabaseMaintence() {
-	defer DatabaseMaintence()
-	utils.Log(1, "Checking for database records older than 7 days...")
-	since := time.Now().AddDate(0, 0, -7)
-	DeleteAllSince("failures", since)
-	DeleteAllSince("hits", since)
-	time.Sleep(60 * time.Minute)
+	for range time.Tick(60 * time.Minute) {
+		utils.Log(1, "Checking for database records older than 7 days...")
+		since := time.Now().AddDate(0, 0, -7)
+		DeleteAllSince("failures", since)
+		DeleteAllSince("hits", since)
+	}
 }
 
 func DeleteAllSince(table string, date time.Time) {
