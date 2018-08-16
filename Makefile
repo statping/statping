@@ -9,7 +9,6 @@ GOINSTALL=$(GOCMD) install
 XGO=GOPATH=$(GOPATH) $(GOPATH)/bin/xgo -go 1.10.x --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT)"
 RICE=$(GOPATH)/bin/rice
-DOCKER=docker
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 PUBLISH_BODY='{ "request": { "branch": "master", "config": { "env": { "VERSION": "$(VERSION)" } } } }'
 
@@ -55,33 +54,33 @@ build-all: clean compile
 	$(XGO) $(BUILDVERSION) --targets=windows-6.0/amd64 ./cmd
 	$(XGO) $(BUILDVERSION) --targets=linux/arm-7 ./cmd
 	$(XGO) $(BUILDVERSION) --targets=linux/arm64 ./cmd
-	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -linkmode external -extldflags -static" -out alpine ./cmd
+	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT) -linkmode external -extldflags -static" -out alpine ./cmd
 
 build-alpine: clean compile
 	mkdir build
-	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -linkmode external -extldflags -static" -out alpine ./cmd
+	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT) -linkmode external -extldflags -static" -out alpine ./cmd
 
 docker:
-	$(DOCKER) build -t hunterlong/statup:latest .
+	docker build -t hunterlong/statup:latest .
 
 docker-dev:
-	$(DOCKER) build -t hunterlong/statup:dev -f ./cmd/Dockerfile .
+	docker build -t hunterlong/statup:dev -f ./cmd/Dockerfile .
 
 docker-test:
-	$(DOCKER) build -t hunterlong/statup:test -f ./.travis/Dockerfile .
+	docker build -t hunterlong/statup:test -f ./.travis/Dockerfile .
 
 docker-run: docker
-	$(DOCKER) run -t -p 8080:8080 hunterlong/statup:latest
+	docker run -t -p 8080:8080 hunterlong/statup:latest
 
 docker-run-dev: docker-dev
-	$(DOCKER) run -t -p 8080:8080 hunterlong/statup:dev
+	docker run -t -p 8080:8080 hunterlong/statup:dev
 
 docker-run-test: docker-test
-	$(DOCKER) run -t -p 8080:8080 hunterlong/statup:test
+	docker run -t -p 8080:8080 hunterlong/statup:test
 
 databases:
-	$(DOCKER) run --name statup_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password123 -e POSTGRES_USER=root -e POSTGRES_DB=root -d postgres
-	$(DOCKER) run --name statup_mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password123 -e MYSQL_DATABASE=root -d mysql
+	docker run --name statup_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password123 -e POSTGRES_USER=root -e POSTGRES_DB=root -d postgres
+	docker run --name statup_mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password123 -e MYSQL_DATABASE=root -d mysql
 	sleep 30
 
 deps:
@@ -163,9 +162,9 @@ publish-latest:
 	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
 
 publish-homebrew:
-	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d "$(PUBLISH_BODY)" https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statup/requests
+	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(PUBLISH_BODY) https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statup/requests
 
 publish-crypress:
-	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d "$(PUBLISH_BODY)" https://api.travis-ci.com/repo/hunterlong%2Fstatup-testing/requests
+	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(PUBLISH_BODY) https://api.travis-ci.com/repo/hunterlong%2Fstatup-testing/requests
 
 .PHONY: build build-all build-alpine

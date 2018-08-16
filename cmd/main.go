@@ -45,7 +45,7 @@ func init() {
 }
 
 func parseFlags() {
-	ip := flag.String("ip", "localhost", "IP address to run the Statup HTTP server")
+	ip := flag.String("ip", "0.0.0.0", "IP address to run the Statup HTTP server")
 	p := flag.Int("port", 8080, "Port to run the HTTP server")
 	flag.Parse()
 	ipAddress = *ip
