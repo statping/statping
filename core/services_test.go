@@ -66,6 +66,57 @@ func TestCheckTCPService(t *testing.T) {
 	assert.NotZero(t, service.Latency)
 }
 
+func TestServiceOnline24Hours(t *testing.T) {
+	service := SelectService(5)
+	amount := service.Online24()
+	assert.Equal(t, float32(100), amount)
+}
+
+func TestServiceSmallText(t *testing.T) {
+	service := SelectService(5)
+	text := service.SmallText()
+	assert.Contains(t, text, "Online since")
+}
+
+func TestServiceAvgUptime(t *testing.T) {
+	service := SelectService(5)
+	uptime := service.AvgUptime()
+	assert.Equal(t, "100", uptime)
+}
+
+func TestServiceHits(t *testing.T) {
+	service := SelectService(5)
+	hits, err := service.Hits()
+	assert.Nil(t, err)
+	assert.Equal(t, int(1), len(hits))
+}
+
+func TestServiceLimitedHits(t *testing.T) {
+	service := SelectService(5)
+	hits, err := service.LimitedHits()
+	assert.Nil(t, err)
+	assert.Equal(t, int(1), len(hits))
+}
+
+func TestServiceTotalHits(t *testing.T) {
+	service := SelectService(5)
+	hits, err := service.TotalHits()
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(0x1), hits)
+}
+
+func TestServiceSum(t *testing.T) {
+	service := SelectService(5)
+	sum, err := service.Sum()
+	assert.Nil(t, err)
+	assert.NotZero(t, sum)
+}
+
+func TestCountOnline(t *testing.T) {
+	amount := CountOnline()
+	assert.Equal(t, 2, amount)
+}
+
 func TestCreateService(t *testing.T) {
 	s := &types.Service{
 		Name:           "Interpol - All The Rage Back Home",

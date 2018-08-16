@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/source"
@@ -11,7 +12,6 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 	"upper.io/db.v3/sqlite"
@@ -22,21 +22,23 @@ const (
 	POINT  = "                     "
 )
 
-func CatchCLI(args []string) {
+func CatchCLI(args []string) error {
 	dir := utils.Directory
+	source.Assets()
 	switch args[1] {
 	case "version":
 		fmt.Printf("Statup v%v\n", VERSION)
+		return nil
 	case "assets":
-		source.Assets()
-		source.CreateAllAssets(dir)
+		err := source.CreateAllAssets(dir)
+		return err
 	case "sass":
-		source.CompileSASS(dir)
+		err := source.CompileSASS(dir)
+		return err
 	case "update":
 		gitCurrent, err := CheckGithubUpdates()
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(2)
+			return nil
 		}
 		fmt.Printf("Statup Version: v%v\nLatest Version: %v\n", VERSION, gitCurrent.TagName)
 		if VERSION != gitCurrent.TagName[1:] {
@@ -44,19 +46,21 @@ func CatchCLI(args []string) {
 		} else {
 			fmt.Printf("You have the latest version of Statup!\n")
 		}
+		return nil
 	case "test":
 		cmd := args[2]
 		switch cmd {
 		case "plugins":
 			LoadPlugins(true)
 		}
+		return nil
 	case "export":
 		var err error
 		fmt.Printf("Statup v%v Exporting Static 'index.html' page...\n", VERSION)
-		source.Assets()
 		core.Configs, err = core.LoadConfig()
 		if err != nil {
 			utils.Log(4, "config.yml file not found")
+			return err
 		}
 		RunOnce()
 		indexSource := core.ExportIndexHTML()
@@ -67,22 +71,27 @@ func CatchCLI(args []string) {
 		utils.Log(1, "Exported Statup index page: 'index.html'")
 	case "help":
 		HelpEcho()
+		return nil
 	case "run":
 		utils.Log(1, "Running 1 time and saving to database...")
 		RunOnce()
 		fmt.Println("Check is complete.")
+		return nil
 	case "env":
 		fmt.Println("Statup Environment Variables")
 		envs, err := godotenv.Read(".env")
 		if err != nil {
 			utils.Log(4, "No .env file found in current directory.")
+			return err
 		}
 		for k, e := range envs {
 			fmt.Printf("%v=%v\n", k, e)
 		}
 	default:
 		utils.Log(3, "Statup does not have the command you entered.")
+		return errors.New("statup does not have the command you entered")
 	}
+	return nil
 }
 
 func RunOnce() {
@@ -118,6 +127,7 @@ func HelpEcho() {
 	fmt.Println("     statup run                - Check all services 1 time and then quit")
 	fmt.Println("     statup test plugins       - Test all plugins for required information")
 	fmt.Println("     statup assets             - Dump all assets used locally to be edited.")
+	fmt.Println("     statup sass               - Compile .scss files into the css directory")
 	fmt.Println("     statup env                - Show all environment variables being used for Statup")
 	fmt.Println("     statup export             - Exports the index page as a static HTML for pushing")
 	fmt.Println("     statup update             - Attempts to update to the latest version")

@@ -25,6 +25,10 @@ func TestLog(t *testing.T) {
 	assert.Nil(t, Log(5, errors.New("this is a 5 level error")))
 }
 
+func TestLogFileCreation(t *testing.T) {
+	assert.FileExists(t, "../logs/statup.log")
+}
+
 func TestDeleteFile(t *testing.T) {
 	assert.True(t, DeleteFile(Directory+"/logs/statup.log"))
 }
@@ -66,4 +70,8 @@ func TestRandomString(t *testing.T) {
 
 func TestSha256(t *testing.T) {
 	assert.Equal(t, "dc724af18fbdd4e59189f5fe768a5f8311527050", Sha256([]byte("testing")))
+}
+
+func TestDeleteDirectory(t *testing.T) {
+	assert.True(t, DeleteDirectory(Directory+"/logs"))
 }

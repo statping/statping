@@ -30,7 +30,11 @@ func init() {
 func main() {
 	var err error
 	if len(os.Args) >= 2 {
-		CatchCLI(os.Args)
+		err := CatchCLI(os.Args)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 		os.Exit(0)
 	}
 	utils.Log(1, fmt.Sprintf("Starting Statup v%v", VERSION))

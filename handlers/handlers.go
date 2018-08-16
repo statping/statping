@@ -87,6 +87,9 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		"VERSION": func() string {
 			return core.VERSION
 		},
+		"CoreApp": func() *core.Core {
+			return core.CoreApp
+		},
 		"USE_CDN": func() bool {
 			return core.CoreApp.UseCdn
 		},

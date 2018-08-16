@@ -55,12 +55,11 @@ before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
   - psql -c 'create database test;' -U postgres
   - make deps
+  - make install
 
 script:
-  - make install
   - make test
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make coverage; fi
-  - make docker-test
 
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then travis_wait 30 docker pull karalabe/xgo-latest; fi

@@ -1,4 +1,4 @@
-VERSION=0.4
+VERSION=0.41
 GOPATH:=$(GOPATH)
 GOCMD=go
 GOBUILD=$(GOCMD) build
@@ -20,11 +20,11 @@ all: deps compile install clean
 
 release: deps build-all compress
 
-install: build
+install: clean build
 	mv $(BINARY_NAME) $(GOPATH)/bin/$(BINARY_NAME)
 	$(GOPATH)/bin/$(BINARY_NAME) version
 
-build:
+build: compile
 	$(GOBUILD) -ldflags="-X main.VERSION=$(VERSION)" -o $(BINARY_NAME) -v ./cmd
 
 run: build
@@ -34,14 +34,19 @@ compile:
 	cd source && $(GOPATH)/bin/rice embed-go
 	$(GOPATH)/bin/wt compile source/scss/base.scss -b source/css
 
-test: compile test-env
-	$(GOTEST) ./... -p 1 -ldflags="-X main.VERSION=$(VERSION)" -coverprofile=coverage.out -v
+test: clean compile test-env
+	gocov test -v ./... -p 1 -ldflags="-X main.VERSION=$(VERSION)" -covermode=count > coverage.json
 
 test-all: compile test-env databases
 	$(GOTEST) ./... -p 1 -ldflags="-X main.VERSION=$(VERSION)" -coverprofile=coverage.out -v
 
 coverage:
 	$(GOPATH)/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $(COVERALLS)
+
+docs:
+	godoc2md github.com/hunterlong/statup > servers/docs/README.md
+	gocov-html coverage.json > servers/docs/COVERAGE.html
+	revive -formatter stylish > servers/docs/LINT.md
 
 build-all: clean compile
 	mkdir build
@@ -55,10 +60,10 @@ build-all: clean compile
 	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$VERSION -linkmode external -extldflags -static" -out alpine ./cmd
 
 docker:
-	$(DOCKER) build -t hunterlong/statup:latest .
+	$(DOCKER) build -t hunterlong/statup:latest -f ./cmd/Dockerfile .
 
 docker-dev:
-	$(DOCKER) build -t hunterlong/statup:dev -f Dockerfile-dev .
+	$(DOCKER) build -t hunterlong/statup:dev -f ./.travis/Dockerfile .
 
 docker-run: docker
 	$(DOCKER) run -t -p 8080:8080 hunterlong/statup:latest
@@ -85,6 +90,12 @@ deps:
 	$(GOGET) github.com/GeertJohan/go.rice
 	$(GOGET) github.com/GeertJohan/go.rice/rice
 	$(GOINSTALL) github.com/GeertJohan/go.rice/rice
+	$(GOCMD) get github.com/davecheney/godoc2md
+	$(GOCMD) install github.com/davecheney/godoc2md
+	$(GOCMD) get github.com/axw/gocov/gocov
+	$(GOCMD) get -u gopkg.in/matm/v1/gocov-html
+	$(GOCMD) install gopkg.in/matm/v1/gocov-html
+	$(GOCMD) get -u github.com/mgechev/revive
 	$(GOGET) -d ./...
 
 clean:
@@ -117,7 +128,6 @@ test-env:
 	export DB_PASS=password123
 	export DB_DATABASE=root
 	export NAME=Demo
-	export CMD_FILE=$(GOPATH)/src/github.com/hunterlong/statup/cmd.sh
 	export STATUP_DIR=$(GOPATH)/src/github.com/hunterlong/statup
 
 compress:
@@ -155,3 +165,5 @@ publish:
 		https://api.travis-ci.com/repo/hunterlong%2Fstatup-testing/requests
 	curl -H "Content-Type: application/json" \
 		--data '{"docker_tag": "dev"}' -X POST $(DOCKER)
+
+.PHONY: build build-all

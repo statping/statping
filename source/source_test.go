@@ -25,12 +25,14 @@ func TestCore_UsingAssets(t *testing.T) {
 func TestCreateAssets(t *testing.T) {
 	assert.Nil(t, CreateAllAssets(dir))
 	assert.True(t, HasAssets(dir))
+	assert.FileExists(t, "../assets/css/base.css")
+	assert.FileExists(t, "../assets/scss/base.scss")
 }
 
 func TestCompileSASS(t *testing.T) {
-	t.SkipNow()
-	//os.Setenv("SASS", "sass")
-	os.Setenv("CMD_FILE", dir+"/cmd.sh")
+	if os.Getenv("IS_DOCKER") == "true" {
+		os.Setenv("SASS", "/usr/local/bin/sass")
+	}
 	assert.Nil(t, CompileSASS(dir))
 	assert.True(t, HasAssets(dir))
 }

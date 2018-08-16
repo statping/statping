@@ -141,8 +141,7 @@ Statup accepts Push Requests! Feel free to add your own features and notifiers. 
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/hunterlong/statup)](https://goreportcard.com/report/github.com/hunterlong/statup)
 [![Build Status](https://travis-ci.org/hunterlong/statup.svg?branch=master)](https://travis-ci.org/hunterlong/statup) [![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://dashboard.cypress.io/#/projects/bi8mhr/runs) 
-[![Docker Pulls](https://img.shields.io/docker/pulls/hunterlong/statup.svg)](https://hub.docker.com/r/hunterlong/statup/builds/)
-[![Godoc](https://godoc.org/github.com/hunterlong/statup?status.svg)](https://godoc.org/github.com/hunterlong/statup)
+[![Docker Pulls](https://img.shields.io/docker/pulls/hunterlong/statup.svg)](https://hub.docker.com/r/hunterlong/statup/builds/) [![Godoc](https://godoc.org/github.com/hunterlong/statup?status.svg)](https://godoc.org/github.com/hunterlong/statup)[![Coverage Status](https://coveralls.io/repos/github/hunterlong/statup/badge.svg?branch=master)](https://coveralls.io/github/hunterlong/statup?branch=master)
 
 
 

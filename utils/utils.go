@@ -80,3 +80,12 @@ func DeleteFile(file string) bool {
 	}
 	return true
 }
+
+func DeleteDirectory(directory string) bool {
+	err := os.RemoveAll(directory)
+	if err != nil {
+		Log(3, err)
+		return false
+	}
+	return true
+}

@@ -9,6 +9,7 @@ import (
 )
 
 func ExportIndexHTML() string {
+	source.Assets()
 	CoreApp.UseCdn = true
 	//out := index{*CoreApp, CoreApp.Services}
 	nav, _ := source.TmplBox.String("nav.html")
@@ -27,6 +28,12 @@ func ExportIndexHTML() string {
 		},
 		"VERSION": func() string {
 			return VERSION
+		},
+		"CoreApp": func() *Core {
+			return CoreApp
+		},
+		"USE_CDN": func() bool {
+			return CoreApp.UseCdn
 		},
 		"underscore": func(html string) string {
 			return utils.UnderScoreString(html)

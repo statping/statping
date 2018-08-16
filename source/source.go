@@ -1,9 +1,11 @@
 package source
 
 import (
+	"errors"
 	"fmt"
 	"github.com/GeertJohan/go.rice"
 	"github.com/hunterlong/statup/utils"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -28,20 +30,53 @@ func Assets() {
 
 func CompileSASS(folder string) error {
 	sassBin := os.Getenv("SASS")
+	if sassBin == "" {
+		return errors.New("missing the SASS executable environment variable")
+	}
 
 	scssFile := fmt.Sprintf("%v/%v", folder, "assets/scss/base.scss")
 	baseFile := fmt.Sprintf("%v/%v", folder, "assets/css/base.css")
 
 	utils.Log(1, fmt.Sprintf("Compiling SASS %v into %v", scssFile, baseFile))
 	command := fmt.Sprintf("%v %v %v", sassBin, scssFile, baseFile)
-	testCmd := exec.Command("bash", "-c", command)
-	out, err := testCmd.Output()
+
+	utils.Log(1, fmt.Sprintf("Command: sh -c %v", command))
+
+	testCmd := exec.Command("sh", "-c", command)
+
+	var stdout, stderr []byte
+	var errStdout, errStderr error
+	stdoutIn, _ := testCmd.StdoutPipe()
+	stderrIn, _ := testCmd.StderrPipe()
+	testCmd.Start()
+
+	go func() {
+		stdout, errStdout = copyAndCapture(os.Stdout, stdoutIn)
+	}()
+
+	go func() {
+		stderr, errStderr = copyAndCapture(os.Stderr, stderrIn)
+	}()
+
+	err := testCmd.Wait()
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("Failed to compile assets with SASS %v", err))
-		utils.Log(3, fmt.Sprintf("%v %v %v", sassBin, scssFile, baseFile))
+		utils.Log(3, err)
 		return err
 	}
-	utils.Log(1, string(out))
+
+	if errStdout != nil || errStderr != nil {
+		utils.Log(3, fmt.Sprintf("Failed to compile assets with SASS %v", err))
+		return errors.New("failed to capture stdout or stderr")
+	}
+
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("Failed to compile assets with SASS %v", err))
+		utils.Log(3, fmt.Sprintf("bash -c %v %v %v", sassBin, scssFile, baseFile))
+		return err
+	}
+
+	outStr, errStr := string(stdout), string(stderr)
+	utils.Log(1, fmt.Sprintf("out: %v | error: %v", outStr, errStr))
 	utils.Log(1, "SASS Compiling is complete!")
 	return err
 }
@@ -95,6 +130,7 @@ func CreateAllAssets(folder string) error {
 	utils.Log(1, "Inserting scss, css, and javascript files into assets folder")
 	CopyToPublic(ScssBox, folder+"/assets/scss", "base.scss")
 	CopyToPublic(ScssBox, folder+"/assets/scss", "variables.scss")
+	CopyToPublic(ScssBox, folder+"/assets/scss", "mobile.scss")
 	CopyToPublic(CssBox, folder+"/assets/css", "bootstrap.min.css")
 	CopyToPublic(CssBox, folder+"/assets/css", "base.css")
 	CopyToPublic(JsBox, folder+"/assets/js", "bootstrap.min.js")
@@ -140,4 +176,30 @@ func MakePublicFolder(folder string) {
 			utils.Log(3, fmt.Sprintf("Failed to created %v directory, %v", folder, err))
 		}
 	}
+}
+
+func copyAndCapture(w io.Writer, r io.Reader) ([]byte, error) {
+	var out []byte
+	buf := make([]byte, 1024, 1024)
+	for {
+		n, err := r.Read(buf[:])
+		if n > 0 {
+			d := buf[:n]
+			out = append(out, d...)
+			_, err := w.Write(d)
+			if err != nil {
+				return out, err
+			}
+		}
+		if err != nil {
+			// Read returns io.EOF at the end of file, which is not an error for us
+			if err == io.EOF {
+				err = nil
+			}
+			return out, err
+		}
+	}
+	// never reached
+	panic(true)
+	return nil, nil
 }

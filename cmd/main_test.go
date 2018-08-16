@@ -9,7 +9,6 @@ import (
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
-	"github.com/rendon/testcli"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -50,7 +49,6 @@ func TestRunAll(t *testing.T) {
 	if os.Getenv("ONLY_DB") != "" {
 		databases = []string{os.Getenv("ONLY_DB")}
 	}
-	//databases := []string{"sqlite"}
 
 	for _, dbt := range databases {
 
@@ -174,39 +172,6 @@ func TestRunAll(t *testing.T) {
 
 }
 
-func TestVersionCommand(t *testing.T) {
-	c := testcli.Command("statup", "version")
-	c.Run()
-	t.Log(c.Stdout())
-	assert.True(t, c.StdoutContains("Statup v"))
-}
-
-func TestHelpCommand(t *testing.T) {
-	c := testcli.Command("statup", "help")
-	c.Run()
-	t.Log(c.Stdout())
-	assert.True(t, c.StdoutContains("statup help               - Shows the user basic information about Statup"))
-}
-
-func TestExportCommand(t *testing.T) {
-	t.SkipNow()
-	c := testcli.Command("statup", "export")
-	c.Run()
-	t.Log(c.Stdout())
-	assert.True(t, c.StdoutContains("Exporting Static 'index.html' page"))
-	assert.True(t, fileExists(dir+"/cmd/index.html"))
-}
-
-func TestAssetsCommand(t *testing.T) {
-	c := testcli.Command("statup", "assets")
-	c.Run()
-	t.Log(c.Stdout())
-	t.Log("Directory for Assets: ", dir)
-	assert.FileExists(t, dir+"/assets/robots.txt")
-	assert.FileExists(t, dir+"/assets/js/main.js")
-	assert.FileExists(t, dir+"/assets/scss/base.scss")
-}
-
 func RunMakeDatabaseConfig(t *testing.T, db string) {
 	port := 5432
 	if db == "mysql" {
@@ -260,7 +225,6 @@ func RunSelectCoreMYQL(t *testing.T, db string) {
 	var err error
 	core.CoreApp, err = core.SelectCore()
 	assert.Nil(t, err)
-	t.Log(core.CoreApp)
 	assert.Equal(t, "Testing "+db, core.CoreApp.Name)
 	assert.Equal(t, db, core.CoreApp.DbConnection)
 	assert.NotEmpty(t, core.CoreApp.ApiKey)

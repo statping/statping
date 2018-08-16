@@ -123,8 +123,6 @@ func TestServiceChartHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "var ctx_1")
 	assert.Contains(t, body, "var ctx_2")
-	assert.Contains(t, body, "var ctx_3")
-	assert.Contains(t, body, "var ctx_4")
 }
 
 func TestDashboardHandler(t *testing.T) {
@@ -339,7 +337,6 @@ func TestViewHTTPServicesHandler(t *testing.T) {
 }
 
 func TestViewTCPServicesHandler(t *testing.T) {
-	t.SkipNow()
 	req, err := http.NewRequest("GET", "/service/7", nil)
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
@@ -357,6 +354,7 @@ func TestServicesDeleteFailuresHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 200, rr.Code)
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestServicesUpdateHandler(t *testing.T) {
@@ -379,6 +377,7 @@ func TestServicesUpdateHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | The Bravery - An Honest Mistake Service</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestDeleteServiceHandler(t *testing.T) {
@@ -390,7 +389,6 @@ func TestDeleteServiceHandler(t *testing.T) {
 }
 
 func TestLogsHandler(t *testing.T) {
-	t.SkipNow()
 	req, err := http.NewRequest("GET", "/logs", nil)
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
@@ -402,7 +400,6 @@ func TestLogsHandler(t *testing.T) {
 }
 
 func TestLogsLineHandler(t *testing.T) {
-	t.SkipNow()
 	req, err := http.NewRequest("GET", "/logs/line", nil)
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
@@ -507,6 +504,25 @@ func TestViewNotificationSettingsHandler(t *testing.T) {
 	assert.Contains(t, body, `id="switch-email" checked`)
 	assert.Contains(t, body, "Statup  made with ❤️")
 	assert.True(t, IsRouteAuthenticated(req))
+}
+
+func TestSaveFooterHandler(t *testing.T) {
+	form := url.Values{}
+	form.Add("footer", "Created by Hunter Long")
+	req, err := http.NewRequest("POST", "/settings", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 200, rr.Code)
+
+	req, err = http.NewRequest("GET", "/", nil)
+	assert.Nil(t, err)
+	rr = httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	body := rr.Body.String()
+	assert.Equal(t, 200, rr.Code)
+	assert.Contains(t, body, "Created by Hunter Long")
 }
 
 func TestError404Handler(t *testing.T) {

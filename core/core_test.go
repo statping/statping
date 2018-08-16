@@ -71,3 +71,10 @@ func TestInsertNotifierDB(t *testing.T) {
 	err := InsertNotifierDB()
 	assert.Nil(t, err)
 }
+
+func TestExportStaticHTML(t *testing.T) {
+	data := ExportIndexHTML()
+	assert.Contains(t, data, "Statup  made with ❤️")
+	assert.Contains(t, data, "</body>")
+	assert.Contains(t, data, "</html>")
+}
