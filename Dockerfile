@@ -2,7 +2,7 @@ FROM alpine:latest
 LABEL MAINTAINER = 'Hunter Long (https://github.com/hunterlong)'
 
 # Locked version of Statup for 'latest' Docker tag
-ENV VERSION=v0.42
+ENV VERSION=v0.43
 
 RUN apk --no-cache add libstdc++ ca-certificates
 RUN wget -q https://github.com/hunterlong/statup/releases/download/$VERSION/statup-linux-alpine.tar.gz && \
