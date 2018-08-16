@@ -34,10 +34,11 @@ compile:
 	cd source && $(GOPATH)/bin/rice embed-go
 	$(GOPATH)/bin/wt compile source/scss/base.scss -b source/css
 
-test: clean compile test-env
-	gocov test -v ./... -p 1 -ldflags="-X main.VERSION=$(VERSION)" -covermode=count > coverage.json
+test: clean compile
+	go test -v ./... -p 1 -ldflags="-X main.VERSION=$(VERSION)" -coverprofile=coverage.out
+	gocov convert coverage.out > coverage.json
 
-test-all: compile test-env databases
+test-all: compile databases
 	$(GOTEST) ./... -p 1 -ldflags="-X main.VERSION=$(VERSION)" -coverprofile=coverage.out -v
 
 coverage:

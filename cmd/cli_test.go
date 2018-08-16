@@ -47,8 +47,8 @@ func TestVersionCLI(t *testing.T) {
 func TestAssetsCLI(t *testing.T) {
 	run := CatchCLI([]string{"statup", "assets"})
 	assert.Nil(t, run)
-	assert.FileExists(t, "../assets/css/base.css")
-	assert.FileExists(t, "../assets/scss/base.scss")
+	assert.FileExists(t, dir+"/assets/css/base.css")
+	assert.FileExists(t, dir+"/assets/scss/base.scss")
 }
 
 func TestSassCLI(t *testing.T) {
@@ -57,7 +57,7 @@ func TestSassCLI(t *testing.T) {
 	}
 	run := CatchCLI([]string{"statup", "sass"})
 	assert.Nil(t, run)
-	assert.FileExists(t, "../assets/css/base.css")
+	assert.FileExists(t, dir+"/assets/css/base.css")
 }
 
 func TestUpdateCLI(t *testing.T) {

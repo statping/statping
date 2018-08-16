@@ -31,7 +31,7 @@ func Assets() {
 func CompileSASS(folder string) error {
 	sassBin := os.Getenv("SASS")
 	if sassBin == "" {
-		return errors.New("missing the SASS executable environment variable")
+		sassBin = "sass"
 	}
 
 	scssFile := fmt.Sprintf("%v/%v", folder, "assets/scss/base.scss")
