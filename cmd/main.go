@@ -1,6 +1,22 @@
+// Statup
+// Copyright (C) 2018.  Hunter Long and the project contributors
+// Written by Hunter Long <info@socialeck.com> and the project contributors
+//
+// https://github.com/hunterlong/statup
+//
+// The licenses for most software and other practical works are designed
+// to take away your freedom to share and change the works.  By contrast,
+// the GNU General Public License is intended to guarantee your freedom to
+// share and change all versions of a program--to make sure it remains free
+// software for all its users.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/fatih/structs"
 	"github.com/hunterlong/statup/core"
@@ -17,35 +33,53 @@ import (
 
 var (
 	VERSION   string
+	COMMIT    string
 	usingEnv  bool
 	directory string
+	ipAddress string
+	port      int
 )
 
 func init() {
-	utils.InitLogs()
-	LoadDotEnvs()
 	core.VERSION = VERSION
+}
+
+func parseFlags() {
+	ip := flag.String("ip", "localhost", "IP address to run the Statup HTTP server")
+	p := flag.Int("port", 8080, "Port to run the HTTP server")
+	flag.Parse()
+	ipAddress = *ip
+	port = *p
 }
 
 func main() {
 	var err error
+	parseFlags()
+
 	if len(os.Args) >= 2 {
 		err := CatchCLI(os.Args)
 		if err != nil {
+			if err.Error() == "end" {
+				os.Exit(0)
+			}
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		os.Exit(0)
 	}
-	utils.Log(1, fmt.Sprintf("Starting Statup v%v", VERSION))
+
+	utils.InitLogs()
 	source.Assets()
+	LoadDotEnvs()
+
+	utils.Log(1, fmt.Sprintf("Starting Statup v%v", VERSION))
 	source.HasAssets(directory)
 
 	core.Configs, err = core.LoadConfig()
 	if err != nil {
 		utils.Log(3, err)
 		core.SetupMode = true
-		handlers.RunHTTPServer("localhost", 8080)
+		fmt.Println(handlers.RunHTTPServer(ipAddress, port))
+		os.Exit(1)
 	}
 	mainProcess()
 }
@@ -71,7 +105,8 @@ func mainProcess() {
 
 	if !core.SetupMode {
 		LoadPlugins(false)
-		handlers.RunHTTPServer("localhost", 8080)
+		fmt.Println(handlers.RunHTTPServer(ipAddress, port))
+		os.Exit(1)
 	}
 }
 

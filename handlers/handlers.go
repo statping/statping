@@ -1,3 +1,18 @@
+// Statup
+// Copyright (C) 2018.  Hunter Long and the project contributors
+// Written by Hunter Long <info@socialeck.com> and the project contributors
+//
+// https://github.com/hunterlong/statup
+//
+// The licenses for most software and other practical works are designed
+// to take away your freedom to share and change the works.  By contrast,
+// the GNU General Public License is intended to guarantee your freedom to
+// share and change all versions of a program--to make sure it remains free
+// software for all its users.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package handlers
 
 import (
@@ -24,14 +39,14 @@ var (
 func RunHTTPServer(ip string, port int) error {
 	host := fmt.Sprintf("%v:%v", ip, port)
 	utils.Log(1, "Statup HTTP Server running on http://"+host)
-	for _, p := range core.CoreApp.AllPlugins {
-		info := p.GetInfo()
-		for _, route := range p.Routes() {
-			path := fmt.Sprintf("%v", route.URL)
-			r.Handle(path, http.HandlerFunc(route.Handler)).Methods(route.Method)
-			utils.Log(1, fmt.Sprintf("Added Route %v for plugin %v\n", path, info.Name))
-		}
-	}
+	//for _, p := range core.CoreApp.AllPlugins {
+	//	info := p.GetInfo()
+	//	for _, route := range p.Routes() {
+	//		path := fmt.Sprintf("%v", route.URL)
+	//		r.Handle(path, http.HandlerFunc(route.Handler)).Methods(route.Method)
+	//		utils.Log(1, fmt.Sprintf("Added Route %v for plugin %v\n", path, info.Name))
+	//	}
+	//}
 	srv := &http.Server{
 		Addr:         host,
 		WriteTimeout: time.Second * 15,

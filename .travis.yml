@@ -6,6 +6,8 @@ language: go
 go:
   - "1.10.x"
 
+go_import_path: github.com/hunterlong/statup
+
 install: true
 
 sudo: required
@@ -67,4 +69,4 @@ after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make release; fi
 
 after_deploy:
-  - make publish
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make publish-dev; fi

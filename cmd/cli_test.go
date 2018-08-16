@@ -1,3 +1,18 @@
+// Statup
+// Copyright (C) 2018.  Hunter Long and the project contributors
+// Written by Hunter Long <info@socialeck.com> and the project contributors
+//
+// https://github.com/hunterlong/statup
+//
+// The licenses for most software and other practical works are designed
+// to take away your freedom to share and change the works.  By contrast,
+// the GNU General Public License is intended to guarantee your freedom to
+// share and change all versions of a program--to make sure it remains free
+// software for all its users.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package main
 
 import (
@@ -5,6 +20,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
+
+func TestConfirmVersion(t *testing.T) {
+	t.SkipNow()
+	assert.NotEmpty(t, VERSION)
+}
 
 func TestVersionCommand(t *testing.T) {
 	c := testcli.Command("statup", "version")
@@ -40,35 +60,35 @@ func TestAssetsCommand(t *testing.T) {
 
 func TestVersionCLI(t *testing.T) {
 	run := CatchCLI([]string{"statup", "version"})
-	assert.Nil(t, run)
+	assert.EqualError(t, run, "end")
 }
 
 func TestAssetsCLI(t *testing.T) {
 	run := CatchCLI([]string{"statup", "assets"})
-	assert.Nil(t, run)
+	assert.EqualError(t, run, "end")
 	assert.FileExists(t, dir+"/assets/css/base.css")
 	assert.FileExists(t, dir+"/assets/scss/base.scss")
 }
 
 func TestSassCLI(t *testing.T) {
 	run := CatchCLI([]string{"statup", "sass"})
-	assert.Nil(t, run)
+	assert.EqualError(t, run, "end")
 	assert.FileExists(t, dir+"/assets/css/base.css")
 }
 
 func TestUpdateCLI(t *testing.T) {
 	run := CatchCLI([]string{"statup", "update"})
-	assert.Nil(t, run)
+	assert.EqualError(t, run, "end")
 }
 
 func TestTestPackageCLI(t *testing.T) {
 	run := CatchCLI([]string{"statup", "test", "plugins"})
-	assert.Nil(t, run)
+	assert.EqualError(t, run, "end")
 }
 
 func TestHelpCLI(t *testing.T) {
 	run := CatchCLI([]string{"statup", "help"})
-	assert.Nil(t, run)
+	assert.EqualError(t, run, "end")
 }
 
 func TestRunOnceCLI(t *testing.T) {

@@ -1,4 +1,7 @@
 FROM golang:1.10.3-alpine
+LABEL MAINTAINER = 'Hunter Long (https://github.com/hunterlong)'
+
+# Statup 'test' image for running a full test using the production environment
 
 RUN apk add --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers
 

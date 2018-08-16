@@ -319,7 +319,6 @@ HTML, BODY {
     transform: scale(1); }
   100% {
     transform: scale(1); } }
-
 .pulse {
   animation-name: pulse_animation;
   animation-duration: 1500ms;
@@ -336,7 +335,6 @@ HTML, BODY {
   100% {
     transform: scale(2);
     opacity: 0; } }
-
 .pulse-glow {
   animation-name: glow-grown;
   animation-duration: 100ms;
@@ -359,49 +357,66 @@ HTML, BODY {
 @media (max-width: 767px) {
   HTML, BODY {
     background-color: #fcfcfc; }
+
   .sm-container {
     margin-top: 40px !important;
     padding: 0 !important; }
+
   .list-group-item H5 {
     font-size: 0.9rem; }
+
   .container {
     padding: 0 !important; }
+
   .navbar {
     margin-left: 0px;
     margin-top: 0px;
     width: 100%;
     margin-bottom: 0; }
+
   .btn-sm {
     line-height: 0.9rem;
     font-size: 0.65rem; }
+
   .full-col-12 {
     padding-left: 0px;
     padding-right: 0px; }
+
   .card {
     border: 0;
     border-radius: 0rem;
     padding: 0;
     background-color: #ffffff; }
+
   .card-body {
     font-size: 6pt;
     padding: 5px 5px; }
+
   .lg_number {
     font-size: 1.5rem; }
+
   .stats_area {
     margin-top: 1.5rem !important;
     margin-bottom: 1.5rem !important; }
+
   .stats_area .col-4 {
     padding-left: 0;
     padding-right: 0;
     font-size: 0.6rem; }
+
   .list-group-item {
     border-top: 1px solid #e4e4e4;
     border: 0px; }
+
   .list-group-item:first-child {
     border-top-left-radius: 0;
     border-top-right-radius: 0; }
+
   .list-group-item:last-child {
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0; }
+
   .list-group-item P {
     font-size: 0.7rem; } }
+
+/*# sourceMappingURL=base.css.map */

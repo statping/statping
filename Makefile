@@ -1,20 +1,17 @@
-VERSION=0.41
+VERSION=0.42
+BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
 GOBUILD=$(GOCMD) build
-GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 GOINSTALL=$(GOCMD) install
 XGO=GOPATH=$(GOPATH) $(GOPATH)/bin/xgo -go 1.10.x --dest=build
-BUILDVERSION=-ldflags="-X main.VERSION=$(VERSION)"
-BINARY_NAME=statup
+BUILDVERSION=-ldflags "-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT)"
 RICE=$(GOPATH)/bin/rice
 DOCKER=docker
-DOCKER_COMP=`which docker-compose`
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 PUBLISH_BODY='{ "request": { "branch": "master", "config": { "env": { "VERSION": "$(VERSION)" } } } }'
-
 
 all: deps compile install clean
 
@@ -25,21 +22,21 @@ install: clean build
 	$(GOPATH)/bin/$(BINARY_NAME) version
 
 build: compile
-	$(GOBUILD) -ldflags="-X main.VERSION=$(VERSION)" -o $(BINARY_NAME) -v ./cmd
+	$(GOBUILD) $(BUILDVERSION) -o $(BINARY_NAME) -v ./cmd
 
 run: build
-	./$(BINARY_NAME)
+	./$(BINARY_NAME) --ip localhost --port 8080
 
 compile:
 	cd source && $(GOPATH)/bin/rice embed-go
-	$(GOPATH)/bin/wt compile source/scss/base.scss -b source/css
+	sass source/scss/base.scss source/css/base.css
 
-test: clean compile
-	go test -v ./... -p 1 -ldflags="-X main.VERSION=$(VERSION)" -coverprofile=coverage.out
+test: clean compile install
+	go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./...
 	gocov convert coverage.out > coverage.json
 
 test-all: compile databases
-	$(GOTEST) ./... -p 1 -ldflags="-X main.VERSION=$(VERSION)" -coverprofile=coverage.out -v
+	$(GOTEST) ./... -p=1 $(BUILDVERSION) -coverprofile=coverage.out -v
 
 coverage:
 	$(GOPATH)/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $(COVERALLS)
@@ -58,22 +55,29 @@ build-all: clean compile
 	$(XGO) $(BUILDVERSION) --targets=windows-6.0/amd64 ./cmd
 	$(XGO) $(BUILDVERSION) --targets=linux/arm-7 ./cmd
 	$(XGO) $(BUILDVERSION) --targets=linux/arm64 ./cmd
-	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$VERSION -linkmode external -extldflags -static" -out alpine ./cmd
+	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -linkmode external -extldflags -static" -out alpine ./cmd
+
+build-alpine: clean compile
+	mkdir build
+	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -linkmode external -extldflags -static" -out alpine ./cmd
 
 docker:
-	$(DOCKER) build -t hunterlong/statup:latest -f ./cmd/Dockerfile .
+	$(DOCKER) build -t hunterlong/statup:latest .
 
 docker-dev:
-	$(DOCKER) build -t hunterlong/statup:dev -f ./.travis/Dockerfile .
+	$(DOCKER) build -t hunterlong/statup:dev -f ./cmd/Dockerfile .
+
+docker-test:
+	$(DOCKER) build -t hunterlong/statup:test -f ./.travis/Dockerfile .
 
 docker-run: docker
 	$(DOCKER) run -t -p 8080:8080 hunterlong/statup:latest
 
-docker-dev-run: docker-dev
+docker-run-dev: docker-dev
 	$(DOCKER) run -t -p 8080:8080 hunterlong/statup:dev
 
-docker-test: docker-dev test-env
-	$(DOCKER) run hunterlong/statup:dev
+docker-run-test: docker-test
+	$(DOCKER) run -t -p 8080:8080 hunterlong/statup:test
 
 databases:
 	$(DOCKER) run --name statup_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password123 -e POSTGRES_USER=root -e POSTGRES_DB=root -d postgres
@@ -149,22 +153,19 @@ compress:
 	cd build && mv cmd-linux-arm64 $(BINARY_NAME)
 	cd build && tar -czvf $(BINARY_NAME)-linux-arm64.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
 
-publish:
-	curl -s -X POST \
-		-H "Content-Type: application/json" \
-		-H "Accept: application/json" \
-		-H "Travis-API-Version: 3" \
-		-H "Authorization: token $(TRAVIS_API)" \
-		-d "$(PUBLISH_BODY)" \
-		https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statup/requests
-	curl -s -X POST \
-	 	-H "Content-Type: application/json" \
-	 	-H "Accept: application/json" \
-	 	-H "Travis-API-Version: 3" \
-		-H "Authorization: token $(TRAVIS_API)" \
-		-d "$(PUBLISH_BODY)" \
-		https://api.travis-ci.com/repo/hunterlong%2Fstatup-testing/requests
-	curl -H "Content-Type: application/json" \
-		--data '{"docker_tag": "dev"}' -X POST $(DOCKER)
+publish-dev:
+	curl -H "Content-Type: application/json" --data '{"docker_tag": "dev"}' -X POST $(DOCKER)
 
-.PHONY: build build-all
+publish-test:
+	curl -H "Content-Type: application/json" --data '{"docker_tag": "test"}' -X POST $(DOCKER)
+
+publish-latest:
+	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
+
+publish-homebrew:
+	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d "$(PUBLISH_BODY)" https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statup/requests
+
+publish-crypress:
+	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d "$(PUBLISH_BODY)" https://api.travis-ci.com/repo/hunterlong%2Fstatup-testing/requests
+
+.PHONY: build build-all build-alpine
