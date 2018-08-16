@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/rendon/testcli"
 	"github.com/stretchr/testify/assert"
-	"os"
 	"testing"
 )
 
@@ -52,9 +51,6 @@ func TestAssetsCLI(t *testing.T) {
 }
 
 func TestSassCLI(t *testing.T) {
-	if os.Getenv("IS_DOCKER") == "true" {
-		os.Setenv("SASS", "/usr/local/bin/sass")
-	}
 	run := CatchCLI([]string{"statup", "sass"})
 	assert.Nil(t, run)
 	assert.FileExists(t, dir+"/assets/css/base.css")

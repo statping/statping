@@ -17,23 +17,29 @@ var (
 	LastLine interface{}
 )
 
-func InitLogs() error {
+func createLog(dir string) error {
 	var err error
-	_, err = os.Stat(Directory + "/logs")
+	_, err = os.Stat(dir + "/logs")
 	if err != nil {
 		if os.IsNotExist(err) {
-			os.Mkdir(Directory+"/logs", 0777)
+			os.Mkdir(dir+"/logs", 0777)
 		} else {
-			fmt.Println(err)
+			return err
 		}
 	}
-
-	file, err := os.Create(Directory + "/logs/statup.log")
+	file, err := os.Create(dir + "/logs/statup.log")
 	if err != nil {
 		return err
 	}
 	defer file.Close()
+	return err
+}
 
+func InitLogs() error {
+	err := createLog(Directory)
+	if err != nil {
+		return err
+	}
 	logFile, err = os.OpenFile(Directory+"/logs/statup.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0755)
 	if err != nil {
 		log.Printf("ERROR opening file: %v", err)

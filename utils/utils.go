@@ -72,20 +72,14 @@ func UnderScoreString(str string) string {
 	return newStr
 }
 
-func DeleteFile(file string) bool {
+func DeleteFile(file string) error {
 	err := os.Remove(file)
 	if err != nil {
-		Log(3, err)
-		return false
+		return err
 	}
-	return true
+	return nil
 }
 
-func DeleteDirectory(directory string) bool {
-	err := os.RemoveAll(directory)
-	if err != nil {
-		Log(3, err)
-		return false
-	}
-	return true
+func DeleteDirectory(directory string) error {
+	return os.RemoveAll(directory)
 }

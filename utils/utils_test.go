@@ -8,8 +8,14 @@ import (
 	"time"
 )
 
+func TestCreateLog(t *testing.T) {
+	err := createLog(Directory)
+	assert.Nil(t, err)
+}
+
 func TestInitLogs(t *testing.T) {
 	assert.Nil(t, InitLogs())
+	assert.FileExists(t, "../logs/statup.log")
 }
 
 func TestDir(t *testing.T) {
@@ -25,12 +31,12 @@ func TestLog(t *testing.T) {
 	assert.Nil(t, Log(5, errors.New("this is a 5 level error")))
 }
 
-func TestLogFileCreation(t *testing.T) {
-	assert.FileExists(t, "../logs/statup.log")
+func TestDeleteFile(t *testing.T) {
+	assert.Nil(t, DeleteFile(Directory+"/logs/statup.log"))
 }
 
-func TestDeleteFile(t *testing.T) {
-	assert.True(t, DeleteFile(Directory+"/logs/statup.log"))
+func TestFailedDeleteFile(t *testing.T) {
+	assert.Error(t, DeleteFile(Directory+"/missingfilehere.txt"))
 }
 
 func TestLogHTTP(t *testing.T) {
@@ -73,5 +79,5 @@ func TestSha256(t *testing.T) {
 }
 
 func TestDeleteDirectory(t *testing.T) {
-	assert.True(t, DeleteDirectory(Directory+"/logs"))
+	assert.Nil(t, DeleteDirectory(Directory+"/logs"))
 }

@@ -30,14 +30,29 @@ func TestCreateAssets(t *testing.T) {
 }
 
 func TestCompileSASS(t *testing.T) {
-	if os.Getenv("IS_DOCKER") == "true" {
-		os.Setenv("SASS", "/usr/local/bin/sass")
-	}
 	assert.Nil(t, CompileSASS(dir))
 	assert.True(t, HasAssets(dir))
 }
 
+func TestSaveAsset(t *testing.T) {
+	data := []byte("BODY { color: black; }")
+	asset := SaveAsset(data, dir, "scss/theme.scss")
+	assert.Nil(t, asset)
+	assert.FileExists(t, dir+"/assets/scss/theme.scss")
+}
+
+func TestOpenAsset(t *testing.T) {
+	asset := OpenAsset(dir, "scss/theme.scss")
+	assert.NotEmpty(t, asset)
+}
+
 func TestDeleteAssets(t *testing.T) {
+	assert.Nil(t, DeleteAllAssets(dir))
+	assert.False(t, HasAssets(dir))
+}
+
+func TestCopyToPluginFailed(t *testing.T) {
+
 	assert.Nil(t, DeleteAllAssets(dir))
 	assert.False(t, HasAssets(dir))
 }

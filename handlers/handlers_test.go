@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
@@ -21,21 +20,21 @@ func init() {
 
 func IsRouteAuthenticated(req *http.Request) bool {
 	os.Setenv("GO_ENV", "production")
-	req, err := http.NewRequest(req.Method, req.URL.String(), req.Body)
-	if err != nil {
-		os.Setenv("GO_ENV", "test")
-		return false
-	}
 	rr := httptest.NewRecorder()
+	req.Header.Set("Authorization", "badkey")
 	Router().ServeHTTP(rr, req)
-	fmt.Println(req.URL.String(), rr.Code)
 	code := rr.Code
-	if code != 303 {
+	if code == 200 {
 		os.Setenv("GO_ENV", "test")
 		return false
 	}
 	os.Setenv("GO_ENV", "test")
 	return true
+}
+
+func TestFailedHTTPServer(t *testing.T) {
+	err := RunHTTPServer("missinghost", 0)
+	assert.Error(t, err)
 }
 
 func TestIndexHandler(t *testing.T) {
@@ -386,6 +385,7 @@ func TestDeleteServiceHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 200, rr.Code)
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestLogsHandler(t *testing.T) {
@@ -397,6 +397,7 @@ func TestLogsHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Logs</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestLogsLineHandler(t *testing.T) {
@@ -408,6 +409,7 @@ func TestLogsLineHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	t.Log(body)
 	assert.NotEmpty(t, body)
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestSaveSettingsHandler(t *testing.T) {
@@ -420,6 +422,7 @@ func TestSaveSettingsHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 200, rr.Code)
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestViewSettingsHandler(t *testing.T) {
@@ -445,6 +448,7 @@ func TestSaveAssetsHandler(t *testing.T) {
 	assert.FileExists(t, utils.Directory+"/assets/js/main.js")
 	assert.DirExists(t, utils.Directory+"/assets")
 	assert.True(t, source.UsingAssets)
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestDeleteAssetsHandler(t *testing.T) {
@@ -454,6 +458,7 @@ func TestDeleteAssetsHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 200, rr.Code)
 	assert.False(t, source.UsingAssets)
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestPrometheusHandler(t *testing.T) {
@@ -465,6 +470,7 @@ func TestPrometheusHandler(t *testing.T) {
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "statup_total_services 6")
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestSaveNotificationHandler(t *testing.T) {
@@ -485,6 +491,7 @@ func TestSaveNotificationHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 200, rr.Code)
+	assert.True(t, IsRouteAuthenticated(req))
 }
 
 func TestViewNotificationSettingsHandler(t *testing.T) {
@@ -515,6 +522,7 @@ func TestSaveFooterHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 200, rr.Code)
+	assert.True(t, IsRouteAuthenticated(req))
 
 	req, err = http.NewRequest("GET", "/", nil)
 	assert.Nil(t, err)
@@ -539,4 +547,33 @@ func TestLogoutHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
+}
+
+func TestBuildAssetsHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/settings/build", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 200, rr.Code)
+	assert.True(t, IsRouteAuthenticated(req))
+	assert.FileExists(t, "../assets/scss/base.scss")
+}
+
+func TestSaveSassHandler(t *testing.T) {
+	base := source.OpenAsset(utils.Directory, "scss/base.scss")
+	vars := source.OpenAsset(utils.Directory, "scss/variables.scss")
+
+	form := url.Values{}
+	form.Add("theme", base+"\n .test_design { color: $test-design; }")
+	form.Add("variables", vars+"\n $test-design: #ffffff; ")
+	req, err := http.NewRequest("POST", "/settings/css", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 200, rr.Code)
+	assert.True(t, IsRouteAuthenticated(req))
+
+	newBase := source.OpenAsset(utils.Directory, "css/base.css")
+	assert.Contains(t, newBase, ".test_design {")
 }

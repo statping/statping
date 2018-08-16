@@ -4,6 +4,7 @@ import (
 	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statup/utils"
 	"github.com/pkg/errors"
 	"os"
 	"time"
@@ -79,21 +80,21 @@ func (c Core) SassVars() string {
 	if !source.UsingAssets {
 		return ""
 	}
-	return source.OpenAsset(".", "scss/variables.scss")
+	return source.OpenAsset(utils.Directory, "scss/variables.scss")
 }
 
 func (c Core) BaseSASS() string {
 	if !source.UsingAssets {
 		return ""
 	}
-	return source.OpenAsset(".", "scss/base.scss")
+	return source.OpenAsset(utils.Directory, "scss/base.scss")
 }
 
 func (c Core) MobileSASS() string {
 	if !source.UsingAssets {
 		return ""
 	}
-	return source.OpenAsset(".", "scss/mobile.scss")
+	return source.OpenAsset(utils.Directory, "scss/mobile.scss")
 }
 
 func (c Core) AllOnline() bool {

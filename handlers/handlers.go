@@ -21,9 +21,9 @@ var (
 	Store *sessions.CookieStore
 )
 
-func RunHTTPServer() {
-	utils.Log(1, "Statup HTTP Server running on http://localhost:8080")
-	r := Router()
+func RunHTTPServer(ip string, port int) error {
+	host := fmt.Sprintf("%v:%v", ip, port)
+	utils.Log(1, "Statup HTTP Server running on http://"+host)
 	for _, p := range core.CoreApp.AllPlugins {
 		info := p.GetInfo()
 		for _, route := range p.Routes() {
@@ -33,16 +33,13 @@ func RunHTTPServer() {
 		}
 	}
 	srv := &http.Server{
-		Addr:         "0.0.0.0:8080",
+		Addr:         host,
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
-		Handler:      r,
+		Handler:      Router(),
 	}
-	err := srv.ListenAndServe()
-	if err != nil {
-		utils.Log(4, err)
-	}
+	return srv.ListenAndServe()
 }
 
 func IsAuthenticated(r *http.Request) bool {
@@ -116,6 +113,11 @@ func ExecuteJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 	})
 	t.Parse(render)
 	t.Execute(w, data)
+}
+
+func Error404Handler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+	ExecuteResponse(w, r, "error_404.html", nil)
 }
 
 type DbConfig types.DbConfig

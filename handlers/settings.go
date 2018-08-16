@@ -58,9 +58,9 @@ func SaveSASSHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	theme := r.PostForm.Get("theme")
 	variables := r.PostForm.Get("variables")
-	source.SaveAsset(theme, ".", "scss/base.scss")
-	source.SaveAsset(variables, ".", "scss/variables.scss")
-	source.CompileSASS(".")
+	source.SaveAsset([]byte(theme), utils.Directory, "scss/base.scss")
+	source.SaveAsset([]byte(variables), utils.Directory, "scss/variables.scss")
+	source.CompileSASS(utils.Directory)
 	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }
 
@@ -70,8 +70,12 @@ func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	dir := utils.Directory
-	source.CreateAllAssets(dir)
-	err := source.CompileSASS(dir)
+	err := source.CreateAllAssets(dir)
+	if err != nil {
+		utils.Log(3, err)
+		return
+	}
+	err = source.CompileSASS(dir)
 	if err != nil {
 		source.CopyToPublic(source.CssBox, dir+"/assets/css", "base.css")
 		utils.Log(2, "Default 'base.css' was insert because SASS did not work.")

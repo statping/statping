@@ -454,6 +454,7 @@ func RunPrometheusHandler(t *testing.T) {
 	route.ServeHTTP(rr, req)
 	t.Log(rr.Body.String())
 	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 6"))
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func RunFailingPrometheusHandler(t *testing.T) {
@@ -461,7 +462,8 @@ func RunFailingPrometheusHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
-	assert.Equal(t, 401, rr.Result().StatusCode)
+	assert.Equal(t, 303, rr.Result().StatusCode)
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func RunLoginHandler(t *testing.T) {
@@ -474,6 +476,7 @@ func RunLoginHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Result().StatusCode)
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func RunDashboardHandler(t *testing.T) {
@@ -483,6 +486,7 @@ func RunDashboardHandler(t *testing.T) {
 	route.ServeHTTP(rr, req)
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Dashboard</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func RunUsersHandler(t *testing.T) {
@@ -492,6 +496,7 @@ func RunUsersHandler(t *testing.T) {
 	route.ServeHTTP(rr, req)
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Users</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func RunUserViewHandler(t *testing.T) {
@@ -501,6 +506,7 @@ func RunUserViewHandler(t *testing.T) {
 	route.ServeHTTP(rr, req)
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Users</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func RunServicesHandler(t *testing.T) {
@@ -510,6 +516,7 @@ func RunServicesHandler(t *testing.T) {
 	route.ServeHTTP(rr, req)
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Services</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func RunHelpHandler(t *testing.T) {
@@ -519,6 +526,7 @@ func RunHelpHandler(t *testing.T) {
 	route.ServeHTTP(rr, req)
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Help</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func RunSettingsHandler(t *testing.T) {
@@ -529,6 +537,7 @@ func RunSettingsHandler(t *testing.T) {
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Settings</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "Theme Editor"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
+	assert.True(t, handlers.IsAuthenticated(req))
 }
 
 func fileExists(file string) bool {

@@ -21,7 +21,7 @@ import (
 func PrometheusHandler(w http.ResponseWriter, r *http.Request) {
 	utils.Log(1, fmt.Sprintf("Prometheus /metrics Request From IP: %v\n", r.RemoteAddr))
 	if !isAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 	metrics := []string{}

@@ -45,7 +45,7 @@ func main() {
 	if err != nil {
 		utils.Log(3, err)
 		core.SetupMode = true
-		handlers.RunHTTPServer()
+		handlers.RunHTTPServer("localhost", 8080)
 	}
 	mainProcess()
 }
@@ -71,7 +71,7 @@ func mainProcess() {
 
 	if !core.SetupMode {
 		LoadPlugins(false)
-		handlers.RunHTTPServer()
+		handlers.RunHTTPServer("localhost", 8080)
 	}
 }
 
