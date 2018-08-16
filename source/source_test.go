@@ -30,23 +30,23 @@ func init() {
 	dir = utils.Directory
 	utils.InitLogs()
 	Assets()
-	os.RemoveAll(dir + "/cmd/assets")
+	os.RemoveAll(dir + "/assets")
 }
 
 func TestCore_UsingAssets(t *testing.T) {
-	assert.False(t, UsingAssets)
+	assert.False(t, UsingAssets(dir))
 }
 
 func TestCreateAssets(t *testing.T) {
 	assert.Nil(t, CreateAllAssets(dir))
-	assert.True(t, HasAssets(dir))
+	assert.True(t, UsingAssets(dir))
 	assert.FileExists(t, "../assets/css/base.css")
 	assert.FileExists(t, "../assets/scss/base.scss")
 }
 
 func TestCompileSASS(t *testing.T) {
 	assert.Nil(t, CompileSASS(dir))
-	assert.True(t, HasAssets(dir))
+	assert.True(t, UsingAssets(dir))
 }
 
 func TestSaveAsset(t *testing.T) {
@@ -63,11 +63,10 @@ func TestOpenAsset(t *testing.T) {
 
 func TestDeleteAssets(t *testing.T) {
 	assert.Nil(t, DeleteAllAssets(dir))
-	assert.False(t, HasAssets(dir))
+	assert.False(t, UsingAssets(dir))
 }
 
 func TestCopyToPluginFailed(t *testing.T) {
-
 	assert.Nil(t, DeleteAllAssets(dir))
-	assert.False(t, HasAssets(dir))
+	assert.False(t, UsingAssets(dir))
 }

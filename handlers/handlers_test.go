@@ -28,9 +28,14 @@ import (
 	"testing"
 )
 
+var (
+	dir string
+)
+
 func init() {
 	utils.InitLogs()
 	source.Assets()
+	dir = utils.Directory
 }
 
 func IsRouteAuthenticated(req *http.Request) bool {
@@ -462,7 +467,7 @@ func TestSaveAssetsHandler(t *testing.T) {
 	assert.FileExists(t, utils.Directory+"/assets/css/base.css")
 	assert.FileExists(t, utils.Directory+"/assets/js/main.js")
 	assert.DirExists(t, utils.Directory+"/assets")
-	assert.True(t, source.UsingAssets)
+	assert.True(t, source.UsingAssets(dir))
 	assert.True(t, IsRouteAuthenticated(req))
 }
 
@@ -472,7 +477,7 @@ func TestDeleteAssetsHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 200, rr.Code)
-	assert.False(t, source.UsingAssets)
+	assert.False(t, source.UsingAssets(dir))
 	assert.True(t, IsRouteAuthenticated(req))
 }
 

@@ -1,4 +1,4 @@
-VERSION=0.43
+VERSION=0.44
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -11,6 +11,7 @@ BUILDVERSION=-ldflags "-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT
 RICE=$(GOPATH)/bin/rice
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 PUBLISH_BODY='{ "request": { "branch": "master", "config": { "env": { "VERSION": "$(VERSION)" } } } }'
+TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statup
 
 all: deps compile install clean
 
@@ -31,7 +32,7 @@ compile:
 	sass source/scss/base.scss source/css/base.css
 
 test: clean compile install
-	go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./...
+	STATUP_DIR=$(TEST_DIR) GO_ENV=test go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./...
 	gocov convert coverage.out > coverage.json
 
 test-all: compile databases
@@ -84,7 +85,6 @@ databases:
 	sleep 30
 
 deps:
-	$(GOGET) github.com/wellington/wellington/wt
 	$(GOGET) github.com/stretchr/testify/assert
 	$(GOGET) golang.org/x/tools/cmd/cover
 	$(GOGET) github.com/mattn/goveralls
@@ -103,24 +103,17 @@ deps:
 	$(GOGET) -d ./...
 
 clean:
-	rm -rf build
-	rm -f statup
-	rm -rf logs
-	rm -rf cmd/logs
-	rm -rf cmd/plugins
-	rm -rf cmd/statup.db
-	rm -rf cmd/config.yml
-	rm -rf cmd/.sass-cache
-	rm -rf core/logs
-	rm -rf core/.sass-cache
-	rm -rf core/config.yml
-	rm -f core/statup.db
-	rm -rf handlers/config.yml
-	rm -rf handlers/statup.db
-	rm -rf source/logs
-	rm -rf utils/logs
+	rm -rf ./{logs,assets,plugins,statup.db,config.yml,.sass-cache,config.yml,statup,build}
+	rm -rf cmd/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
+	rm -rf core/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
+	rm -rf handlers/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
+	rm -rf notifiers/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
+	rm -rf source/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
+	rm -rf types/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
+	rm -rf utils/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
 	rm -rf .sass-cache
 	rm -f coverage.out
+	rm -f coverage.json
 
 tag:
 	git tag "v$(VERSION)" --force

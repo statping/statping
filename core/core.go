@@ -88,25 +88,25 @@ func UpdateCore(c *Core) (*Core, error) {
 }
 
 func (c Core) UsingAssets() bool {
-	return source.UsingAssets
+	return source.UsingAssets(utils.Directory)
 }
 
 func (c Core) SassVars() string {
-	if !source.UsingAssets {
+	if !source.UsingAssets(utils.Directory) {
 		return ""
 	}
 	return source.OpenAsset(utils.Directory, "scss/variables.scss")
 }
 
 func (c Core) BaseSASS() string {
-	if !source.UsingAssets {
+	if !source.UsingAssets(utils.Directory) {
 		return ""
 	}
 	return source.OpenAsset(utils.Directory, "scss/base.scss")
 }
 
 func (c Core) MobileSASS() string {
-	if !source.UsingAssets {
+	if !source.UsingAssets(utils.Directory) {
 		return ""
 	}
 	return source.OpenAsset(utils.Directory, "scss/mobile.scss")

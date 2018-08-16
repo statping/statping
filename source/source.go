@@ -27,12 +27,11 @@ import (
 )
 
 var (
-	SqlBox      *rice.Box
-	CssBox      *rice.Box
-	ScssBox     *rice.Box
-	JsBox       *rice.Box
-	TmplBox     *rice.Box
-	UsingAssets bool
+	SqlBox  *rice.Box
+	CssBox  *rice.Box
+	ScssBox *rice.Box
+	JsBox   *rice.Box
+	TmplBox *rice.Box
 )
 
 func Assets() {
@@ -96,14 +95,12 @@ func CompileSASS(folder string) error {
 	return err
 }
 
-func HasAssets(folder string) bool {
+func UsingAssets(folder string) bool {
 	if _, err := os.Stat(folder + "/assets"); err == nil {
 		utils.Log(1, "Assets folder was found!")
-		UsingAssets = true
 		return true
 	} else {
-		assetEnv := os.Getenv("USE_ASSETS")
-		if assetEnv == "true" {
+		if os.Getenv("USE_ASSETS") == "true" {
 			utils.Log(1, "Environment variable USE_ASSETS was found.")
 			CreateAllAssets(folder)
 			err := CompileSASS(folder)
@@ -112,9 +109,9 @@ func HasAssets(folder string) bool {
 				utils.Log(2, "Default 'base.css' was insert because SASS did not work.")
 				return true
 			}
-			UsingAssets = true
 			return true
 		}
+		utils.Log(1, "Not using local assets in: "+folder+"/assets")
 	}
 	return false
 }

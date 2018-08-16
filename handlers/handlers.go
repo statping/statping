@@ -33,7 +33,8 @@ const (
 )
 
 var (
-	Store *sessions.CookieStore
+	Store      *sessions.CookieStore
+	httpServer *http.Server
 )
 
 func RunHTTPServer(ip string, port int) error {
@@ -43,18 +44,20 @@ func RunHTTPServer(ip string, port int) error {
 	//	info := p.GetInfo()
 	//	for _, route := range p.Routes() {
 	//		path := fmt.Sprintf("%v", route.URL)
-	//		r.Handle(path, http.HandlerFunc(route.Handler)).Methods(route.Method)
+	//		router.Handle(path, http.HandlerFunc(route.Handler)).Methods(route.Method)
 	//		utils.Log(1, fmt.Sprintf("Added Route %v for plugin %v\n", path, info.Name))
 	//	}
 	//}
-	srv := &http.Server{
+	router = Router()
+	httpServer = &http.Server{
 		Addr:         host,
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
-		Handler:      Router(),
+		Handler:      router,
 	}
-	return srv.ListenAndServe()
+	resetCookies()
+	return httpServer.ListenAndServe()
 }
 
 func IsAuthenticated(r *http.Request) bool {

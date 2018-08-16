@@ -41,6 +41,9 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	if Store == nil {
+		resetCookies()
+	}
 	session, _ := Store.Get(r, COOKIE_KEY)
 	r.ParseForm()
 	username := r.PostForm.Get("username")

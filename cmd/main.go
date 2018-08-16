@@ -72,7 +72,6 @@ func main() {
 	LoadDotEnvs()
 
 	utils.Log(1, fmt.Sprintf("Starting Statup v%v", VERSION))
-	source.HasAssets(directory)
 
 	core.Configs, err = core.LoadConfig()
 	if err != nil {

@@ -77,7 +77,7 @@ func TestRunAll(t *testing.T) {
 			RunDatabaseMigrations(t, dbt)
 		})
 		t.Run(dbt+" Sample Data", func(t *testing.T) {
-			RunInsertMysqlSample(t)
+			RunInsertSampleData(t)
 		})
 		t.Run(dbt+" Load Configs", func(t *testing.T) {
 			RunLoadConfig(t)
@@ -180,7 +180,7 @@ func TestRunAll(t *testing.T) {
 			RunSettingsHandler(t)
 		})
 		t.Run(dbt+" Cleanup", func(t *testing.T) {
-			Cleanup(t)
+			//Cleanup(t)
 		})
 
 	}
@@ -230,7 +230,7 @@ func RunDatabaseMigrations(t *testing.T, db string) {
 	assert.Nil(t, err)
 }
 
-func RunInsertMysqlSample(t *testing.T) {
+func RunInsertSampleData(t *testing.T) {
 	err := core.LoadSampleData()
 	assert.Nil(t, err)
 }

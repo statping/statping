@@ -34,7 +34,7 @@ func PluginSavedHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	r.ParseForm()
-	//vars := mux.Vars(r)
+	//vars := mux.Vars(router)
 	//plug := SelectPlugin(vars["name"])
 	data := make(map[string]string)
 	for k, v := range r.PostForm {
@@ -50,7 +50,7 @@ func PluginsDownloadHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	//vars := mux.Vars(r)
+	//vars := mux.Vars(router)
 	//name := vars["name"]
 	//DownloadPlugin(name)
 	core.LoadConfig()

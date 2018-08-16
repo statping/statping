@@ -21,18 +21,33 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/source"
+	"github.com/hunterlong/statup/utils"
 	"net/http"
 	"time"
 )
 
 var (
-	r *mux.Router
+	router *mux.Router
 )
 
 func Router() *mux.Router {
-	r = mux.NewRouter()
+	dir := utils.Directory
+	r := mux.NewRouter()
 	r.Handle("/", http.HandlerFunc(IndexHandler))
-	LocalizedAssets(r)
+	if source.UsingAssets(dir) {
+		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
+		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(dir+"/assets/css"))))
+		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir(dir+"/assets/js"))))
+		r.PathPrefix("/robots.txt").Handler(indexHandler)
+		r.PathPrefix("/favicon.ico").Handler(indexHandler)
+		r.PathPrefix("/statup.png").Handler(indexHandler)
+	} else {
+		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(source.CssBox.HTTPBox())))
+		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(source.JsBox.HTTPBox())))
+		r.PathPrefix("/robots.txt").Handler(http.FileServer(source.TmplBox.HTTPBox()))
+		r.PathPrefix("/favicon.ico").Handler(http.FileServer(source.TmplBox.HTTPBox()))
+		r.PathPrefix("/statup.png").Handler(http.FileServer(source.TmplBox.HTTPBox()))
+	}
 	r.Handle("/charts.js", http.HandlerFunc(RenderServiceChartsHandler))
 	r.Handle("/setup", http.HandlerFunc(SetupHandler)).Methods("GET")
 	r.Handle("/setup", http.HandlerFunc(ProcessSetupHandler)).Methods("POST")
@@ -74,31 +89,19 @@ func Router() *mux.Router {
 	r.Handle("/api/users/{id}", http.HandlerFunc(ApiUserHandler))
 	r.Handle("/metrics", http.HandlerFunc(PrometheusHandler))
 	r.NotFoundHandler = http.HandlerFunc(Error404Handler)
+	return r
+}
+
+func resetRouter() {
+	router = Router()
+	httpServer.Handler = router
+}
+
+func resetCookies() {
 	if core.CoreApp != nil {
 		cookie := fmt.Sprintf("%v_%v", core.CoreApp.ApiSecret, time.Now().Nanosecond())
 		Store = sessions.NewCookieStore([]byte(cookie))
 	} else {
 		Store = sessions.NewCookieStore([]byte("secretinfo"))
 	}
-	return r
-}
-
-func LocalizedAssets(r *mux.Router) *mux.Router {
-	if source.UsingAssets {
-		cssHandler := http.FileServer(http.Dir("./assets/css"))
-		jsHandler := http.FileServer(http.Dir("./assets/js"))
-		indexHandler := http.FileServer(http.Dir("./assets/"))
-		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", cssHandler))
-		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", jsHandler))
-		r.PathPrefix("/robots.txt").Handler(indexHandler)
-		r.PathPrefix("/favicon.ico").Handler(indexHandler)
-		r.PathPrefix("/statup.png").Handler(indexHandler)
-	} else {
-		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(source.CssBox.HTTPBox())))
-		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(source.JsBox.HTTPBox())))
-		r.PathPrefix("/robots.txt").Handler(http.FileServer(source.TmplBox.HTTPBox()))
-		r.PathPrefix("/favicon.ico").Handler(http.FileServer(source.TmplBox.HTTPBox()))
-		r.PathPrefix("/statup.png").Handler(http.FileServer(source.TmplBox.HTTPBox()))
-	}
-	return r
 }
