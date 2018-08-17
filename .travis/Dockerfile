@@ -25,4 +25,4 @@ ENV STATUP_DIR=/go/src/github.com/hunterlong/statup
 ENV GO_ENV=test
 
 EXPOSE 8080
-ENTRYPOINT SASS=$(SASS) VERSION=$(VERSION) make test
+ENTRYPOINT make test

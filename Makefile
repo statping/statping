@@ -10,7 +10,8 @@ XGO=GOPATH=$(GOPATH) $(GOPATH)/bin/xgo -go 1.10.x --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT)"
 RICE=$(GOPATH)/bin/rice
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
-PUBLISH_BODY='{ "request": { "branch": "master", "config": { "env": { "VERSION": "$(VERSION)" } } } }'
+PUBLISH_BODY='{ "request": { "branch": "master", "config": { "env": { "VERSION": "$(VERSION)", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
+DOCKER_TEST='{ "request": { "branch": "master", "config": { "script": "make docker-run-test", "services": ["docker"], "before_script": [], "after_deploy": [], "after_success": ["make publish-dev", "sleep 240", "make travis-crypress"], "deploy": [], "before_deploy": [], "env": { "VERSION": "$(VERSION)" } } } }'
 TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statup
 
 all: deps compile install clean
@@ -157,7 +158,10 @@ publish-latest:
 publish-homebrew:
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(PUBLISH_BODY) https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statup/requests
 
-publish-crypress:
+travis-crypress:
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(PUBLISH_BODY) https://api.travis-ci.com/repo/hunterlong%2Fstatup-testing/requests
+
+travis-docker-test:
+	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(DOCKER_TEST) https://api.travis-ci.com/repo/hunterlong%2Fstatup/requests
 
 .PHONY: build build-all build-alpine

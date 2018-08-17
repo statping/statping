@@ -65,8 +65,10 @@ script:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make coverage; fi
 
 after_success:
+  - make travis-crypress
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then travis_wait 30 docker pull karalabe/xgo-latest; fi
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make release; fi
 
 after_deploy:
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make travis-docker-test; fi
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make publish-dev; fi
