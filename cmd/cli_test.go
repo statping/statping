@@ -49,6 +49,7 @@ func TestExportCommand(t *testing.T) {
 }
 
 func TestAssetsCommand(t *testing.T) {
+	t.SkipNow()
 	c := testcli.Command("statup", "assets")
 	c.Run()
 	t.Log(c.Stdout())

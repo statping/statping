@@ -1,6 +1,5 @@
 FROM alpine:latest
-LABEL MAINTAINER = 'Hunter Long (https://github.com/hunterlong)'
-
+MAINTAINER 'Hunter Long (https://github.com/hunterlong)'
 # Statup 'dev' image that will download the latest version of Statup from github
 
 RUN apk --no-cache add libstdc++ ca-certificates curl grep sed
@@ -21,8 +20,6 @@ RUN wget -q https://assets.statup.io/sass && \
       mv sass /usr/local/bin/sass
 
 ENV IS_DOCKER=true
-ENV SASS=/usr/local/bin/sass
-ENV STATUP_DIR=/app
 
 WORKDIR /app
 VOLUME /app

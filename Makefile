@@ -14,9 +14,13 @@ PUBLISH_BODY='{ "request": { "branch": "master", "config": { "env": { "VERSION":
 DOCKER_TEST='{ "request": { "branch": "master", "config": { "script": "make docker-run-test", "services": ["docker"], "before_script": [], "after_deploy": [], "after_success": ["make publish-dev", "sleep 240", "make travis-crypress"], "deploy": [], "before_deploy": [], "env": { "VERSION": "$(VERSION)" } } } }'
 TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statup
 
-all: deps compile install clean
+all: dev-deps compile install test-all
 
-release: deps build-all compress
+release: dev-deps build-all compress
+
+test-all: dev-deps test docker-test docker-test cypress-test coverage
+
+travis-test: dev-deps cypress-install test docker-test cypress-test coverage
 
 install: clean build
 	mv $(BINARY_NAME) $(GOPATH)/bin/$(BINARY_NAME)
@@ -33,11 +37,8 @@ compile:
 	sass source/scss/base.scss source/css/base.css
 
 test: clean compile install
-	STATUP_DIR=$(TEST_DIR) GO_ENV=test go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./...
+	STATUP_DIR=`pwd` GO_ENV=test && go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./...
 	gocov convert coverage.out > coverage.json
-
-test-all: compile databases
-	$(GOTEST) ./... -p=1 $(BUILDVERSION) -coverprofile=coverage.out -v
 
 coverage:
 	$(GOPATH)/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $(COVERALLS)
@@ -65,27 +66,27 @@ build-alpine: clean compile
 docker:
 	docker build -t hunterlong/statup:latest .
 
-docker-dev:
-	docker build -t hunterlong/statup:dev -f ./cmd/Dockerfile .
-
-docker-test:
-	docker build -t hunterlong/statup:test -f ./.travis/Dockerfile .
-
 docker-run: docker
 	docker run -t -p 8080:8080 hunterlong/statup:latest
+
+docker-dev:
+	docker build -t hunterlong/statup:dev -f ./.dev/Dockerfile .
 
 docker-run-dev: docker-dev
 	docker run -t -p 8080:8080 hunterlong/statup:dev
 
-docker-run-test: docker-test
-	docker run -t -p 8080:8080 hunterlong/statup:test
+docker-test: docker-dev
+	docker run -t -p 8080:8080 --entrypoint="STATUP_DIR=`pwd` GO_ENV=test go test -v -p=1 $(BUILDVERSION)  ./..." hunterlong/statup:dev
 
 databases:
 	docker run --name statup_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password123 -e POSTGRES_USER=root -e POSTGRES_DB=root -d postgres
 	docker run --name statup_mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password123 -e MYSQL_DATABASE=root -d mysql
 	sleep 30
 
-deps:
+dep:
+	dep ensure
+
+dev-deps:
 	$(GOGET) github.com/stretchr/testify/assert
 	$(GOGET) golang.org/x/tools/cmd/cover
 	$(GOGET) github.com/mattn/goveralls
@@ -100,8 +101,7 @@ deps:
 	$(GOCMD) get github.com/axw/gocov/gocov
 	$(GOCMD) get -u gopkg.in/matm/v1/gocov-html
 	$(GOCMD) install gopkg.in/matm/v1/gocov-html
-	$(GOCMD) get -u github.com/mgechev/revive
-	$(GOGET) -d ./...
+	$(GOCMD) get github.com/mgechev/revive
 
 clean:
 	rm -rf ./{logs,assets,plugins,statup.db,config.yml,.sass-cache,config.yml,statup,build}
@@ -118,15 +118,6 @@ clean:
 
 tag:
 	git tag "v$(VERSION)" --force
-
-test-env:
-	export GO_ENV=test
-	export DB_HOST=localhost
-	export DB_USER=root
-	export DB_PASS=password123
-	export DB_DATABASE=root
-	export NAME=Demo
-	export STATUP_DIR=$(GOPATH)/src/github.com/hunterlong/statup
 
 compress:
 	cd build && mv alpine-linux-amd64 $(BINARY_NAME)
@@ -149,19 +140,16 @@ compress:
 publish-dev:
 	curl -H "Content-Type: application/json" --data '{"docker_tag": "dev"}' -X POST $(DOCKER)
 
-publish-test:
-	curl -H "Content-Type: application/json" --data '{"docker_tag": "test"}' -X POST $(DOCKER)
-
 publish-latest:
 	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
 
 publish-homebrew:
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(PUBLISH_BODY) https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statup/requests
 
-travis-crypress:
-	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(PUBLISH_BODY) https://api.travis-ci.com/repo/hunterlong%2Fstatup-testing/requests
+cypress-install:
+	cd .dev/test && npm install
 
-travis-docker-test:
-	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(DOCKER_TEST) https://api.travis-ci.com/repo/hunterlong%2Fstatup/requests
+cypress-test: clean
+	cd .dev/test && npm test
 
 .PHONY: build build-all build-alpine

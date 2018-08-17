@@ -11,3 +11,5 @@
 !/Makefile
 !/README.md
 !/LICENSE
+!/Gopkg.lock
+!/Gopkg.toml
