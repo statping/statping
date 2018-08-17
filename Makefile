@@ -11,23 +11,23 @@ BUILDVERSION=-ldflags "-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT
 RICE=$(GOPATH)/bin/rice
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 PUBLISH_BODY='{ "request": { "branch": "master", "config": { "env": { "VERSION": "$(VERSION)", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
-DOCKER_TEST='{ "request": { "branch": "master", "config": { "script": "make docker-run-test", "services": ["docker"], "before_script": [], "after_deploy": [], "after_success": ["make publish-dev", "sleep 240", "make travis-crypress"], "deploy": [], "before_deploy": [], "env": { "VERSION": "$(VERSION)" } } } }'
+TRAVIS_BUILD_CMD='{ "os": [ "linux" ], "language": "go", "go": [ "1.10.x" ], "go_import_path": "github.com/hunterlong/statup", "install": true, "sudo": "required", "services": [ "docker" ], "env": { "global": [ "DB_HOST=localhost", "DB_USER=travis", "DB_PASS=", "DB_DATABASE=test", "GO_ENV=test", "STATUP_DIR=$GOPATH/src/github.com/hunterlong/statup" ] }, "matrix": { "allow_failures": [ { "go": "master" } ], "fast_finish": true }, "before_deploy": [ "git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "make tag" ], "deploy": [ { "provider": "releases", "api_key": "$GH_TOKEN", "file": [ "build/statup-osx-x64.tar.gz", "build/statup-osx-x32.tar.gz", "build/statup-linux-x64.tar.gz", "build/statup-linux-x32.tar.gz", "build/statup-linux-arm64.tar.gz", "build/statup-linux-arm7.tar.gz", "build/statup-linux-alpine.tar.gz", "build/statup-windows-x64.zip" ], "skip_cleanup": true } ], "notifications": { "email": false }, "before_script": [], "script": [ "if [[ \"$TRAVIS_BRANCH\" == \"master\" ]]; then travis_wait 30 docker pull karalabe/xgo-latest; fi", "if [[ \"$TRAVIS_BRANCH\" == \"master\" ]]; then make release; fi" ], "after_success": [], "after_deploy": [ "if [[ \"$TRAVIS_BRANCH\" == \"master\" ]]; then make publish-dev; fi" ] }'
 TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statup
 
 all: dev-deps compile install test-all
 
 release: dev-deps build-all compress
 
-test-all: dev-deps test cypress-test coverage
+test-all: dev-deps test cypress-test
 
 travis-test: dev-deps cypress-install test docker-test cypress-test coverage
+
+build: compile
+	$(GOBUILD) $(BUILDVERSION) -o $(BINARY_NAME) -v ./cmd
 
 install: clean build
 	mv $(BINARY_NAME) $(GOPATH)/bin/$(BINARY_NAME)
 	$(GOPATH)/bin/$(BINARY_NAME) version
-
-build: compile
-	$(GOBUILD) $(BUILDVERSION) -o $(BINARY_NAME) -v ./cmd
 
 run: build
 	./$(BINARY_NAME) --ip 0.0.0.0 --port 8080
@@ -151,5 +151,8 @@ cypress-install:
 
 cypress-test: clean cypress-install
 	cd .dev/test && npm test
+
+travis-build:
+	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(TRAVIS_BUILD_CMD) https://api.travis-ci.com/repo/hunterlong%2Fstatup/requests
 
 .PHONY: build build-all build-alpine test-all test
