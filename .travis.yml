@@ -8,7 +8,9 @@ go:
 
 go_import_path: github.com/hunterlong/statup
 
-install: true
+cache:
+  directories:
+  - $GOPATH/pkg/dep
 
 sudo: required
 
@@ -33,18 +35,25 @@ matrix:
   fast_finish: true
 
 notifications:
-  email: false
+  email: true
+
+branches:
+  except:
+  - /^v\d/
+
+before_install:
+  - curl -L -s https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64 -o $GOPATH/bin/dep
+  - chmod +x $GOPATH/bin/dep
+  - gem install sass
+
+install:
+  - make dev-deps
+  - make dep
+  - make install
 
 before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
   - psql -c 'create database test;' -U postgres
-  - gem install sass
-  - wget -q https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64
-  - chmod +x dep-linux-amd64
-  - sudo mv dep-linux-amd64 /usr/local/bin/dep
-  - make dev-deps
-  - make dep
-  - make install
 
 script:
   - make test-all
