@@ -84,9 +84,6 @@ databases:
 	sleep 30
 
 dep:
-	wget -q https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64
-	chmod +x dep-linux-amd64
-	sudo mv dep-linux-amd64 /usr/local/bin/dep
 	dep ensure
 
 dev-deps:
