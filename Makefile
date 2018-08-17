@@ -112,6 +112,7 @@ clean:
 	rm -rf source/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
 	rm -rf types/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
 	rm -rf utils/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
+	rm -rf .dev/test/cypress/videos
 	rm -rf .sass-cache
 	rm -f coverage.out
 	rm -f coverage.json
