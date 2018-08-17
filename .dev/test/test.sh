@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 DIR=`pwd`
-DOCKER=/usr/local/bin/docker
+DOCKER=`which docker`
 
 $DOCKER build -t hunterlong/statup:dev -f ../Dockerfile ../../
 $DOCKER run -it -d -p 8080:8080 -v $DIR/app:/app --name statup_dev hunterlong/statup:dev
