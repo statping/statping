@@ -4,11 +4,10 @@ LABEL maintainer "Hunter Long (https://github.com/hunterlong)"
 # Statup 'test' image for running a full test using the production environment
 ENV VERSION=$(VERSION)
 
-RUN apk add --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers wget
+RUN apk add --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers wget curl
 
-RUN wget -q https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64 && \
-    chmod +x dep-linux-amd64 && \
-    mv dep-linux-amd64 /usr/local/bin/dep
+RUN curl -L -s https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64 -o $GOPATH/bin/dep && \
+    chmod +x $GOPATH/bin/dep
 
 WORKDIR $GOPATH/src/github.com/hunterlong/statup
 
