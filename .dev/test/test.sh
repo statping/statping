@@ -10,4 +10,4 @@ $DOCKER run -it -d -p 8080:8080 -v $DIR/app:/app --name statup_dev hunterlong/st
 
 $DOCKER stop statup_dev || true && $DOCKER rm -f statup_dev || true
 
-rm -rf $DIR/app
+sudo rm -rf $DIR/app
