@@ -1,4 +1,4 @@
-VERSION=0.44
+VERSION=0.45
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -26,7 +26,7 @@ build: compile
 	$(GOBUILD) $(BUILDVERSION) -o $(BINARY_NAME) -v ./cmd
 
 run: build
-	./$(BINARY_NAME) --ip localhost --port 8080
+	./$(BINARY_NAME) --ip 0.0.0.0 --port 8080
 
 compile:
 	cd source && $(GOPATH)/bin/rice embed-go

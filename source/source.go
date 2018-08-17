@@ -118,7 +118,7 @@ func UsingAssets(folder string) bool {
 
 func SaveAsset(data []byte, folder, file string) error {
 	utils.Log(1, fmt.Sprintf("Saving %v/%v into assets folder", folder, file))
-	err := ioutil.WriteFile(folder+"/assets/"+file, data, 0644)
+	err := ioutil.WriteFile(folder+"/assets/"+file, data, 0744)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Failed to save %v/%v, %v", folder, file, err))
 		return err
@@ -177,7 +177,7 @@ func CopyToPublic(box *rice.Box, folder, file string) error {
 		utils.Log(3, fmt.Sprintf("Failed to copy %v to %v, %v.", file, assetFolder, err))
 		return err
 	}
-	err = ioutil.WriteFile(assetFolder, []byte(base), 0644)
+	err = ioutil.WriteFile(assetFolder, []byte(base), 0744)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Failed to write file %v to %v, %v.", file, assetFolder, err))
 		return err
@@ -188,7 +188,7 @@ func CopyToPublic(box *rice.Box, folder, file string) error {
 func MakePublicFolder(folder string) error {
 	utils.Log(1, fmt.Sprintf("Creating folder '%v'", folder))
 	if _, err := os.Stat(folder); os.IsNotExist(err) {
-		err = os.MkdirAll(folder, 0755)
+		err = os.MkdirAll(folder, 0777)
 		if err != nil {
 			utils.Log(3, fmt.Sprintf("Failed to created %v directory, %v", folder, err))
 			return err
