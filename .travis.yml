@@ -57,7 +57,7 @@ before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
   - psql -c 'create database test;' -U postgres
   - gem install sass
-  - make deps
+  - make dep
   - make install
 
 script:
