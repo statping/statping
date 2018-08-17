@@ -65,7 +65,7 @@ before_script:
   - make install
 
 script:
-  - make test
+  - make test-all
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make coverage; fi
 
 after_success:
@@ -74,6 +74,4 @@ after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make release; fi
 
 after_deploy:
-  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make travis-crypress; fi
-  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make travis-docker-test; fi
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make publish-dev; fi

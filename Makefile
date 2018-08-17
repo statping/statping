@@ -18,7 +18,7 @@ all: dev-deps compile install test-all
 
 release: dev-deps build-all compress
 
-test-all: dev-deps test docker-test docker-test cypress-test coverage
+test-all: dev-deps test docker-test cypress-test coverage
 
 travis-test: dev-deps cypress-install test docker-test cypress-test coverage
 
@@ -149,7 +149,7 @@ publish-homebrew:
 cypress-install:
 	cd .dev/test && npm install
 
-cypress-test: clean
+cypress-test: clean cypress-install
 	cd .dev/test && npm test
 
 .PHONY: build build-all build-alpine
