@@ -49,7 +49,6 @@ func TestExportCommand(t *testing.T) {
 }
 
 func TestAssetsCommand(t *testing.T) {
-	t.SkipNow()
 	c := testcli.Command("statup", "assets")
 	c.Run()
 	t.Log(c.Stdout())
@@ -65,6 +64,7 @@ func TestVersionCLI(t *testing.T) {
 }
 
 func TestAssetsCLI(t *testing.T) {
+	t.SkipNow()
 	run := CatchCLI([]string{"statup", "assets"})
 	assert.EqualError(t, run, "end")
 	assert.FileExists(t, dir+"/assets/css/base.css")

@@ -97,7 +97,6 @@ func CompileSASS(folder string) error {
 
 func UsingAssets(folder string) bool {
 	if _, err := os.Stat(folder + "/assets"); err == nil {
-		utils.Log(1, "Assets folder was found!")
 		return true
 	} else {
 		if os.Getenv("USE_ASSETS") == "true" {
@@ -111,7 +110,6 @@ func UsingAssets(folder string) bool {
 			}
 			return true
 		}
-		utils.Log(1, "Not using local assets in: "+folder+"/assets")
 	}
 	return false
 }

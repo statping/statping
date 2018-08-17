@@ -18,7 +18,7 @@ all: dev-deps compile install test-all
 
 release: dev-deps build-all compress
 
-test-all: dev-deps test docker-test cypress-test coverage
+test-all: dev-deps test cypress-test coverage
 
 travis-test: dev-deps cypress-install test docker-test cypress-test coverage
 
@@ -37,7 +37,7 @@ compile:
 	sass source/scss/base.scss source/css/base.css
 
 test: clean compile install
-	STATUP_DIR=`pwd` GO_ENV=test && go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./...
+	STATUP_DIR=$(TEST_DIR) go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./...
 	gocov convert coverage.out > coverage.json
 
 coverage:
@@ -72,7 +72,7 @@ docker-run: docker
 docker-dev:
 	docker build -t hunterlong/statup:dev -f ./.dev/Dockerfile .
 
-docker-run-dev: docker-dev
+docker-run-dev: clean docker-dev
 	docker run -t -p 8080:8080 hunterlong/statup:dev
 
 docker-test: docker-dev
@@ -99,7 +99,7 @@ dev-deps:
 	$(GOCMD) get github.com/davecheney/godoc2md
 	$(GOCMD) install github.com/davecheney/godoc2md
 	$(GOCMD) get github.com/axw/gocov/gocov
-	$(GOCMD) get -u gopkg.in/matm/v1/gocov-html
+	$(GOCMD) get gopkg.in/matm/v1/gocov-html
 	$(GOCMD) install gopkg.in/matm/v1/gocov-html
 	$(GOCMD) get github.com/mgechev/revive
 
@@ -152,4 +152,4 @@ cypress-install:
 cypress-test: clean cypress-install
 	cd .dev/test && npm test
 
-.PHONY: build build-all build-alpine
+.PHONY: build build-all build-alpine test-all test

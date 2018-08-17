@@ -55,6 +55,7 @@ func parseFlags() {
 func main() {
 	var err error
 	parseFlags()
+	utils.InitLogs()
 
 	if len(os.Args) >= 2 {
 		err := CatchCLI(os.Args)
