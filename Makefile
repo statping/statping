@@ -76,7 +76,7 @@ docker-run-dev: clean docker-dev
 	docker run -t -p 8080:8080 hunterlong/statup:dev
 
 docker-test: docker-dev
-	docker run -t -p 8080:8080 --entrypoint="STATUP_DIR=`pwd` GO_ENV=test go test -v -p=1 $(BUILDVERSION)  ./..." hunterlong/statup:dev
+	docker run -t -p 8080:8080 -e STATUP_DIR='/go/src/github.com/hunterlong/statup' --entrypoint "go test -v -p=1 $(BUILDVERSION)  ./..." hunterlong/statup:dev
 
 databases:
 	docker run --name statup_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password123 -e POSTGRES_USER=root -e POSTGRES_DB=root -d postgres

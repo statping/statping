@@ -1,5 +1,5 @@
 FROM golang:1.10.3-alpine
-LABEL maintainer "Hunter Long (https://github.com/hunterlong)"
+MAINTAINER "Hunter Long (https://github.com/hunterlong)"
 
 # Statup 'test' image for running a full test using the production environment
 ENV VERSION=$(VERSION)
