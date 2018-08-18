@@ -13,6 +13,7 @@ ENV IS_DOCKER=true
 
 WORKDIR $GOPATH/src/github.com/hunterlong/statup
 COPY . .
+RUN ls
 
 RUN make dev-deps && make install
 EXPOSE 8080
