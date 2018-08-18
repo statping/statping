@@ -70,7 +70,7 @@ docker-run: docker
 	docker run -t -p 8080:8080 hunterlong/statup:latest
 
 docker-dev:
-	docker build -t hunterlong/statup:dev -f ./.dev/Dockerfile .
+	docker build -t hunterlong/statup:dev -f Dockerfile-dev .
 
 docker-run-dev: clean docker-dev
 	docker run -t -p 8080:8080 hunterlong/statup:dev
