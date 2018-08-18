@@ -1,5 +1,5 @@
 FROM alpine:latest
-LABEL maintainer "Hunter Long (https://github.com/hunterlong)"
+MAINTAINER "Hunter Long (https://github.com/hunterlong)"
 
 # Locked version of Statup for 'latest' Docker tag
 ENV VERSION=v0.45

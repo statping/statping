@@ -4,16 +4,17 @@ MAINTAINER "Hunter Long (https://github.com/hunterlong)"
 
 RUN apk add --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers wget curl
 
-RUN curl -L -s https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64 -o $GOPATH/bin/dep && \
-    chmod +x $GOPATH/bin/dep && \
-    curl -L -s https://assets.statup.io/sass -o /usr/local/bin/sass && \
+RUN curl -L -s https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64 -o /go/bin/dep && \
+    chmod +x /go/bin/dep
+
+RUN curl -L -s https://assets.statup.io/sass -o /usr/local/bin/sass && \
     chmod +x /usr/local/bin/sass
+
+WORKDIR /go/src/github.com/hunterlong/statup
+ADD . /go/src/github.com/hunterlong/statup
 
 ENV VERSION=$(VERSION)
 ENV IS_DOCKER=true
-
-WORKDIR $GOPATH/src/github.com/hunterlong/statup
-COPY . .
 
 RUN make dev-deps && make install
 EXPOSE 8080
