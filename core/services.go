@@ -26,7 +26,7 @@ import (
 )
 
 type Service struct {
-	s *types.Service
+	*types.Service
 }
 
 type Failure struct {
@@ -39,9 +39,8 @@ func serviceCol() db.Collection {
 
 func SelectService(id int64) *Service {
 	for _, s := range CoreApp.Services {
-		ser := s.ToService()
-		if ser.Id == id {
-			return &Service{ser}
+		if s.Id == id {
+			return s
 		}
 	}
 	return nil
@@ -58,9 +57,10 @@ func SelectAllServices() ([]*Service, error) {
 	}
 	for _, s := range services {
 		ser := NewService(s)
+		ser.Start()
+		ser.Checkins = SelectAllCheckins(s)
+		ser.Failures = SelectAllFailures(s)
 		sers = append(sers, ser)
-		s.Checkins = SelectAllCheckins(s)
-		s.Failures = SelectAllFailures(s)
 	}
 	CoreApp.Services = sers
 	return sers, err
@@ -78,10 +78,9 @@ func (s *Service) AvgTime() float64 {
 	return val
 }
 
-func (ser *Service) Online24() float32 {
-	s := ser.ToService()
-	total, _ := ser.TotalHits()
-	failed, _ := ser.TotalFailures24Hours()
+func (s *Service) Online24() float32 {
+	total, _ := s.TotalHits()
+	failed, _ := s.TotalFailures24Hours()
 	if failed == 0 {
 		s.Online24Hours = 100.00
 		return s.Online24Hours
@@ -105,18 +104,13 @@ type DateScan struct {
 	Value     int64     `json:"y"`
 }
 
-func (s *Service) ToService() *types.Service {
-	return s.s
-}
-
 func NewService(s *types.Service) *Service {
 	return &Service{s}
 }
 
-func (ser *Service) SmallText() string {
-	s := ser.ToService()
-	last := ser.LimitedFailures()
-	hits, _ := ser.LimitedHits()
+func (s *Service) SmallText() string {
+	last := s.LimitedFailures()
+	hits, _ := s.LimitedHits()
 	if !s.Online {
 		if len(last) > 0 {
 			lastFailure := MakeFailure(last[0].ToFailure())
@@ -147,8 +141,7 @@ func GroupDataBy(column string, id int64, tm time.Time, increment string) string
 	return sql
 }
 
-func (ser *Service) GraphData() string {
-	s := ser.ToService()
+func (s *Service) GraphData() string {
 	var d []*DateScan
 	since := time.Now().Add(time.Hour*-24 + time.Minute*0 + time.Second*0)
 
@@ -182,10 +175,9 @@ func (ser *Service) GraphData() string {
 	return string(data)
 }
 
-func (ser *Service) AvgUptime() string {
-	s := ser.ToService()
-	failed, _ := ser.TotalFailures()
-	total, _ := ser.TotalHits()
+func (s *Service) AvgUptime() string {
+	failed, _ := s.TotalFailures()
+	total, _ := s.TotalHits()
 	if failed == 0 {
 		s.TotalUptime = "100"
 		return s.TotalUptime
@@ -206,11 +198,10 @@ func (ser *Service) AvgUptime() string {
 	return s.TotalUptime
 }
 
-func RemoveArray(u *types.Service) []*Service {
+func RemoveArray(u *Service) []*Service {
 	var srvcs []*Service
 	for _, s := range CoreApp.Services {
-		ser := s.ToService()
-		if ser.Id != u.Id {
+		if s.Id != u.Id {
 			srvcs = append(srvcs, s)
 		}
 	}
@@ -218,24 +209,20 @@ func RemoveArray(u *types.Service) []*Service {
 	return srvcs
 }
 
-func DeleteService(u *types.Service) error {
+func DeleteService(u *Service) error {
 	res := serviceCol().Find("id", u.Id)
 	err := res.Delete()
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Failed to delete service %v. %v", u.Name, err))
 		return err
 	}
-	utils.Log(1, fmt.Sprintf("Stopping %v Monitoring...", u.Name))
-	if u.StopRoutine != nil {
-		close(u.StopRoutine)
-	}
-	utils.Log(1, fmt.Sprintf("Stopped %v Monitoring Service", u.Name))
+	u.Close()
 	RemoveArray(u)
 	OnDeletedService(u)
 	return err
 }
 
-func UpdateService(service *types.Service) *types.Service {
+func UpdateService(service *Service) *Service {
 	service.CreatedAt = time.Now()
 	res := serviceCol().Find("id", service.Id)
 	err := res.Update(service)
@@ -243,23 +230,28 @@ func UpdateService(service *types.Service) *types.Service {
 		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", service.Name, err))
 		return service
 	}
-	CoreApp.Services, _ = SelectAllServices()
+	updateService(service)
+	CoreApp.Services, err = SelectAllServices()
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("error selecting all services: %v", err))
+		return service
+	}
 	OnUpdateService(service)
 	return service
 }
 
-func updateService(u *types.Service) {
+func updateService(new *Service) {
 	var services []*Service
 	for _, s := range CoreApp.Services {
-		if s.s.Id == u.Id {
-			s.s = u
+		if s.Id == new.Id {
+			s = new
 		}
 		services = append(services, s)
 	}
 	CoreApp.Services = services
 }
 
-func CreateService(u *types.Service) (int64, error) {
+func CreateService(u *Service) (int64, error) {
 	u.CreatedAt = time.Now()
 	uuid, err := serviceCol().Insert(u)
 	if uuid == nil {
@@ -267,16 +259,15 @@ func CreateService(u *types.Service) (int64, error) {
 		return 0, err
 	}
 	u.Id = uuid.(int64)
-	u.StopRoutine = make(chan bool)
-	CoreApp.Services = append(CoreApp.Services, &Service{u})
+	u.Start()
+	CoreApp.Services = append(CoreApp.Services, u)
 	return uuid.(int64), err
 }
 
 func CountOnline() int {
 	amount := 0
 	for _, s := range CoreApp.Services {
-		ser := s.ToService()
-		if ser.Online {
+		if s.Online {
 			amount++
 		}
 	}

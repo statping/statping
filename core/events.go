@@ -17,7 +17,6 @@ package core
 
 import (
 	"github.com/fatih/structs"
-	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/types"
 	"upper.io/db.v3/lib/sqlbuilder"
 )
@@ -28,18 +27,20 @@ func OnLoad(db sqlbuilder.Database) {
 	}
 }
 
-func OnSuccess(s *types.Service) {
+func OnSuccess(s *Service) {
 	for _, p := range CoreApp.AllPlugins {
 		p.OnSuccess(structs.Map(s))
 	}
-	notifiers.OnSuccess(s)
+	//notifiers.OnSuccess(s)
+	// TODO convert notifiers to correct type
 }
 
-func OnFailure(s *types.Service, f FailureData) {
+func OnFailure(s *Service, f FailureData) {
 	for _, p := range CoreApp.AllPlugins {
 		p.OnFailure(structs.Map(s))
 	}
-	notifiers.OnFailure(s)
+	//notifiers.OnFailure(s)
+	// TODO convert notifiers to correct type
 }
 
 func OnSettingsSaved(c *types.Core) {
@@ -54,19 +55,19 @@ func OnNewUser(u *types.User) {
 	}
 }
 
-func OnNewService(s *types.Service) {
+func OnNewService(s *Service) {
 	for _, p := range CoreApp.AllPlugins {
 		p.OnNewService(structs.Map(s))
 	}
 }
 
-func OnDeletedService(s *types.Service) {
+func OnDeletedService(s *Service) {
 	for _, p := range CoreApp.AllPlugins {
 		p.OnDeletedService(structs.Map(s))
 	}
 }
 
-func OnUpdateService(s *types.Service) {
+func OnUpdateService(s *Service) {
 	for _, p := range CoreApp.AllPlugins {
 		p.OnUpdatedService(structs.Map(s))
 	}

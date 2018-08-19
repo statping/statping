@@ -44,7 +44,7 @@ func PrometheusHandler(w http.ResponseWriter, r *http.Request) {
 	system += fmt.Sprintf("statup_total_services %v", len(core.CoreApp.Services))
 	metrics = append(metrics, system)
 	for _, ser := range core.CoreApp.Services {
-		v := ser.ToService()
+		v := ser
 		online := 1
 		if !v.Online {
 			online = 0
@@ -59,6 +59,13 @@ func PrometheusHandler(w http.ResponseWriter, r *http.Request) {
 	output := strings.Join(metrics, "\n")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(output))
+}
+
+func ResetDbHandler(w http.ResponseWriter, r *http.Request) {
+	utils.Log(1, fmt.Sprintf("Prometheus /metrics Request From IP: %v\n", r.RemoteAddr))
+	core.DropDatabase()
+	core.CoreApp = nil
+	w.WriteHeader(http.StatusOK)
 }
 
 func isAuthorized(r *http.Request) bool {

@@ -21,5 +21,11 @@ context('Settings Forms', () => {
         cy.get('.footer').should('contain', 'This is a custom footer')
     })
 
+    // it('should check index page for changes', () => {
+    //     cy.visit('http://localhost:8080/')
+    //     cy.title().should('eq', 'Project Updated Status')
+    //     cy.get('.header-title').should('contain', 'Project Updated')
+    //     cy.get('.header-desc').should('contain', 'This is an awesome page')
+    // })
 
 });

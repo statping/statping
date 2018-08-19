@@ -15,7 +15,9 @@
 
 package types
 
-import "time"
+import (
+	"time"
+)
 
 type Service struct {
 	Id             int64      `db:"id,omitempty" json:"id"`
@@ -39,7 +41,7 @@ type Service struct {
 	OrderId        int64      `json:"order_id"`
 	Failures       []*Failure `json:"failures"`
 	Checkins       []*Checkin `json:"checkins"`
-	StopRoutine    chan bool  `json:"-"`
+	Running        chan bool  `json:"-"`
 	LastResponse   string
 	LastStatusCode int
 	LastOnline     time.Time
@@ -47,9 +49,26 @@ type Service struct {
 }
 
 func (s *Service) Start() {
-	s.StopRoutine = make(chan bool)
+	if s.Running == nil {
+		s.Running = make(chan bool)
+	}
 }
 
 func (s *Service) Close() {
-	s.StopRoutine <- true
+	if s.IsRunning() {
+		close(s.Running)
+	}
+}
+
+func (s *Service) IsRunning() bool {
+	if s.Running == nil {
+		return false
+	}
+	select {
+	case <-s.Running:
+		return false
+	default:
+		return true
+	}
+	return false
 }

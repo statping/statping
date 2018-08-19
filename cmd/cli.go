@@ -145,7 +145,7 @@ func RunOnce() {
 		utils.Log(4, err)
 	}
 	for _, s := range core.CoreApp.Services {
-		out := core.ServiceCheck(s.ToService())
+		out := core.ServiceCheck(s, true)
 		fmt.Printf("    Service %v | URL: %v | Latency: %0.0fms | Online: %v\n", out.Name, out.Domain, (out.Latency * 1000), out.Online)
 	}
 }
@@ -191,33 +191,33 @@ func TestPlugin(plug types.PluginActions) {
 	core.OnLoad(core.DbSession)
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnSuccess(Service)'")
-	core.OnSuccess(core.SelectService(1).ToService())
+	core.OnSuccess(core.SelectService(1))
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnFailure(Service, FailureData)'")
 	fakeFailD := core.FailureData{
 		Issue: "No issue, just testing this plugin. This would include HTTP failure information though",
 	}
-	core.OnFailure(core.SelectService(1).ToService(), fakeFailD)
+	core.OnFailure(core.SelectService(1), fakeFailD)
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnSettingsSaved(Core)'")
 	fmt.Println(BRAKER)
 	core.OnSettingsSaved(core.CoreApp.ToCore())
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnNewService(Service)'")
-	core.OnNewService(core.SelectService(2).ToService())
+	core.OnNewService(core.SelectService(2))
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnNewUser(User)'")
 	user, _ := core.SelectUser(1)
 	core.OnNewUser(user)
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnUpdateService(Service)'")
-	srv := core.SelectService(2).ToService()
+	srv := core.SelectService(2)
 	srv.Type = "http"
 	srv.Domain = "https://yahoo.com"
 	core.OnUpdateService(srv)
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnDeletedService(Service)'")
-	core.OnDeletedService(core.SelectService(1).ToService())
+	core.OnDeletedService(core.SelectService(1))
 	fmt.Println("\n" + BRAKER)
 }
 
@@ -255,18 +255,18 @@ func FakeSeed(plug types.PluginActions) {
 	core.CoreApp.ApiSecret = "0x0x0x0x0"
 	core.CoreApp.ApiKey = "abcdefg12345"
 
-	fakeSrv := &types.Service{
+	fakeSrv := &core.Service{Service: &types.Service{
 		Name:   "Test Plugin Service",
 		Domain: "https://google.com",
 		Method: "GET",
-	}
+	}}
 	core.CreateService(fakeSrv)
 
-	fakeSrv2 := &types.Service{
+	fakeSrv2 := &core.Service{Service: &types.Service{
 		Name:   "Awesome Plugin Service",
 		Domain: "https://netflix.com",
 		Method: "GET",
-	}
+	}}
 	core.CreateService(fakeSrv2)
 
 	fakeUser := &types.User{

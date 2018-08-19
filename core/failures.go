@@ -24,7 +24,7 @@ import (
 	"time"
 )
 
-func CreateServiceFailure(s *types.Service, data FailureData) (int64, error) {
+func CreateServiceFailure(s *Service, data FailureData) (int64, error) {
 	fail := &types.Failure{
 		Issue:     data.Issue,
 		Service:   s.Id,
@@ -52,7 +52,7 @@ func SelectAllFailures(s *types.Service) []*types.Failure {
 	return fails
 }
 
-func DeleteFailures(u *types.Service) {
+func DeleteFailures(u *Service) {
 	var fails []*Failure
 	col := DbSession.Collection("failures")
 	col.Find("service", u.Id).All(&fails)
@@ -61,8 +61,7 @@ func DeleteFailures(u *types.Service) {
 	}
 }
 
-func (ser *Service) LimitedFailures() []*Failure {
-	s := ser.ToService()
+func (s *Service) LimitedFailures() []*Failure {
 	var fails []*types.Failure
 	var failArr []*Failure
 	col := DbSession.Collection("failures").Find("service", s.Id).OrderBy("-id").Limit(10)
@@ -102,15 +101,13 @@ func CountFailures() uint64 {
 	return amount
 }
 
-func (ser *Service) TotalFailures() (uint64, error) {
-	s := ser.ToService()
+func (s *Service) TotalFailures() (uint64, error) {
 	col := DbSession.Collection("failures").Find("service", s.Id)
 	amount, err := col.Count()
 	return amount, err
 }
 
-func (ser *Service) TotalFailures24Hours() (uint64, error) {
-	s := ser.ToService()
+func (s *Service) TotalFailures24Hours() (uint64, error) {
 	col := DbSession.Collection("failures").Find("service", s.Id)
 	amount, err := col.Count()
 	return amount, err

@@ -48,7 +48,7 @@
 
             <div class="list-group mb-5 mt-3">
             {{ range .Services }}
-            {{ $s := .ToService }}
+            {{ $s := . }}
                 <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">{{$s.Name}}</h5>
@@ -60,7 +60,7 @@
             </div>
 
         {{ range .Services }}
-        {{ $s := .ToService }}
+        {{ $s := . }}
                 {{ if .LimitedFailures }}
                     <h4>{{$s.Name}} Failures</h4>
                     <div class="list-group mt-3 mb-4">

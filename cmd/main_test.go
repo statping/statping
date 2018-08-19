@@ -335,11 +335,11 @@ func RunOneService_Check(t *testing.T) {
 	service := core.SelectService(1)
 	assert.NotNil(t, service)
 	t.Log(service)
-	assert.Equal(t, "Google", service.ToService().Name)
+	assert.Equal(t, "Google", service.Name)
 }
 
 func RunService_Create(t *testing.T) {
-	service := &types.Service{
+	service := &core.Service{Service: &types.Service{
 		Name:           "test service",
 		Domain:         "https://google.com",
 		ExpectedStatus: 200,
@@ -348,7 +348,7 @@ func RunService_Create(t *testing.T) {
 		Type:           "http",
 		Method:         "GET",
 		Timeout:        30,
-	}
+	}}
 	id, err := core.CreateService(service)
 	assert.Nil(t, err)
 	assert.Equal(t, int64(6), id)
@@ -380,7 +380,7 @@ func RunService_GraphData(t *testing.T) {
 }
 
 func RunBadService_Create(t *testing.T) {
-	service := &types.Service{
+	service := &core.Service{Service: &types.Service{
 		Name:           "Bad Service",
 		Domain:         "https://9839f83h72gey2g29278hd2od2d.com",
 		ExpectedStatus: 200,
@@ -389,7 +389,7 @@ func RunBadService_Create(t *testing.T) {
 		Type:           "http",
 		Method:         "GET",
 		Timeout:        30,
-	}
+	}}
 	id, err := core.CreateService(service)
 	assert.Nil(t, err)
 	assert.Equal(t, int64(7), id)
@@ -398,14 +398,19 @@ func RunBadService_Create(t *testing.T) {
 func RunBadService_Check(t *testing.T) {
 	service := core.SelectService(4)
 	assert.NotNil(t, service)
-	assert.Equal(t, "JSON API Tester", service.ToService().Name)
+	assert.Equal(t, "JSON API Tester", service.Name)
+	assert.True(t, service.IsRunning())
 }
 
 func RunDeleteService(t *testing.T) {
 	service := core.SelectService(4)
 	assert.NotNil(t, service)
-	assert.Equal(t, "JSON API Tester", service.ToService().Name)
-	err := core.DeleteService(service.ToService())
+	assert.Equal(t, "JSON API Tester", service.Name)
+	assert.True(t, service.IsRunning())
+	t.Log(service.Running)
+	err := core.DeleteService(service)
+	t.Log(service.Running)
+	assert.False(t, service.IsRunning())
 	assert.Nil(t, err)
 }
 
@@ -415,11 +420,11 @@ func RunCreateService_Hits(t *testing.T) {
 	assert.NotNil(t, services)
 	for i := 0; i <= 10; i++ {
 		for _, s := range services {
-			var service *types.Service
-			if s.ToService().Type == "http" {
-				service = core.ServiceHTTPCheck(s.ToService())
+			var service *core.Service
+			if s.Type == "http" {
+				service = core.ServiceHTTPCheck(s, true)
 			} else {
-				service = core.ServiceTCPCheck(s.ToService())
+				service = core.ServiceTCPCheck(s, true)
 			}
 			assert.NotNil(t, service)
 		}
@@ -438,7 +443,7 @@ func RunService_Failures(t *testing.T) {
 	t.SkipNow()
 	service := core.SelectService(6)
 	assert.NotNil(t, service)
-	assert.NotEmpty(t, service.ToService().Failures)
+	assert.NotEmpty(t, service.Failures)
 }
 
 func RunService_LimitedHits(t *testing.T) {

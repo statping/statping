@@ -8,5 +8,8 @@
     "DB_PASS": "password123",
     "GO_ENV": "production"
   },
-  "chromeWebSecurity": false
+  "chromeWebSecurity": false,
+  "defaultCommandTimeout": 5000,
+  "requestTimeout": 5000,
+  "watchForFileChanges": false
 }

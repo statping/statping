@@ -37,7 +37,7 @@ context('Setup Process', () => {
         cy.get('input[name="email"]').clear().type('info@domain.com')
         cy.get('input[name="password"]').clear().type('admin')
         cy.scrollTo('bottom')
-        cy.get('#setup_button').click().wait(10000)
+        cy.get('#setup_button').click()
         cy.get('.header-title').should('contain', 'Demo Tester')
         cy.get('.header-desc').should('contain', 'This is a test from Crypress!')
         cy.scrollTo('bottom')

@@ -79,7 +79,7 @@ func ApiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	var s *types.Service
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&s)
-	service := serv.ToService()
+	service := serv
 	core.UpdateService(service)
 	json.NewEncoder(w).Encode(s)
 }

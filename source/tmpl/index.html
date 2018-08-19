@@ -28,7 +28,7 @@
 <div class="col-12 full-col-12 mb-5">
     <div class="list-group online_list">
     {{ range .Services }}
-        {{ $s := .ToService }}
+        {{ $s := . }}
 
         <a href="#" class="service_li list-group-item list-group-item-action {{if not $s.Online}}bg-danger text-white{{ end }}" data-id="{{$s.Id}}">
         {{ $s.Name }}
@@ -53,7 +53,7 @@
     </div>
 {{end}}
         {{ range .Services }}
-        {{ $s := .ToService }}
+        {{ $s := . }}
             <div class="mt-4" id="service_id_{{$s.Id}}">
                 <div class="card">
                     <div class="card-body">

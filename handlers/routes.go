@@ -23,6 +23,7 @@ import (
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -88,6 +89,9 @@ func Router() *mux.Router {
 	r.Handle("/api/users", http.HandlerFunc(ApiAllUsersHandler))
 	r.Handle("/api/users/{id}", http.HandlerFunc(ApiUserHandler))
 	r.Handle("/metrics", http.HandlerFunc(PrometheusHandler))
+	if os.Getenv("GO_ENV") == "test" {
+		r.Handle("/reset", http.HandlerFunc(ResetDbHandler))
+	}
 	r.NotFoundHandler = http.HandlerFunc(Error404Handler)
 	return r
 }

@@ -33,28 +33,29 @@ type FailureData types.FailureData
 func CheckServices() {
 	CoreApp.Services, _ = SelectAllServices()
 	utils.Log(1, fmt.Sprintf("Starting monitoring process for %v Services", len(CoreApp.Services)))
-	for _, ser := range CoreApp.Services {
-		s := ser.ToService()
+	for _, s := range CoreApp.Services {
 		//go obj.StartCheckins()
-		s.Start()
-		go CheckQueue(s)
+		go CheckQueue(s, true)
 	}
 }
 
-func CheckQueue(s *types.Service) {
+func CheckQueue(s *Service, record bool) {
+CheckLoop:
 	for {
 		select {
-		case <-s.StopRoutine:
-			return
+		case <-s.Running:
+			utils.Log(1, fmt.Sprintf("Stopping service: %v", s.Name))
+			break CheckLoop
 		default:
-			s = SelectService(s.Id).ToService()
-			ServiceCheck(s)
+			utils.Log(1, fmt.Sprintf("Checking service: %v", s.Name))
+			ServiceCheck(s, record)
+			time.Sleep(time.Duration(s.Interval) * time.Second)
+			continue
 		}
-		time.Sleep(time.Duration(s.Interval) * time.Second)
 	}
 }
 
-func DNSCheck(s *types.Service) (float64, error) {
+func DNSCheck(s *Service) (float64, error) {
 	t1 := time.Now()
 	url, err := url.Parse(s.Domain)
 	if err != nil {
@@ -69,7 +70,7 @@ func DNSCheck(s *types.Service) (float64, error) {
 	return subTime, err
 }
 
-func ServiceTCPCheck(s *types.Service) *types.Service {
+func ServiceTCPCheck(s *Service, record bool) *Service {
 	t1 := time.Now()
 	domain := fmt.Sprintf("%v", s.Domain)
 	if s.Port != 0 {
@@ -77,34 +78,42 @@ func ServiceTCPCheck(s *types.Service) *types.Service {
 	}
 	conn, err := net.DialTimeout("tcp", domain, time.Duration(s.Timeout)*time.Second)
 	if err != nil {
-		RecordFailure(s, fmt.Sprintf("TCP Dial Error %v", err))
+		if record {
+			RecordFailure(s, fmt.Sprintf("TCP Dial Error %v", err))
+		}
 		return s
 	}
 	if err := conn.Close(); err != nil {
-		RecordFailure(s, fmt.Sprintf("TCP Socket Close Error %v", err))
+		if record {
+			RecordFailure(s, fmt.Sprintf("TCP Socket Close Error %v", err))
+		}
 		return s
 	}
 	t2 := time.Now()
 	s.Latency = t2.Sub(t1).Seconds()
 	s.LastResponse = ""
-	RecordSuccess(s)
-	return s
-}
-
-func ServiceCheck(s *types.Service) *types.Service {
-	switch s.Type {
-	case "http":
-		ServiceHTTPCheck(s)
-	case "tcp":
-		ServiceTCPCheck(s)
+	if record {
+		RecordSuccess(s)
 	}
 	return s
 }
 
-func ServiceHTTPCheck(s *types.Service) *types.Service {
+func ServiceCheck(s *Service, record bool) *Service {
+	switch s.Type {
+	case "http":
+		ServiceHTTPCheck(s, record)
+	case "tcp":
+		ServiceTCPCheck(s, record)
+	}
+	return s
+}
+
+func ServiceHTTPCheck(s *Service, record bool) *Service {
 	dnsLookup, err := DNSCheck(s)
 	if err != nil {
-		RecordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
+		if record {
+			RecordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
+		}
 		return s
 	}
 	s.DnsLookup = dnsLookup
@@ -121,7 +130,9 @@ func ServiceHTTPCheck(s *types.Service) *types.Service {
 		response, err = client.Get(s.Domain)
 	}
 	if err != nil {
-		RecordFailure(s, fmt.Sprintf("HTTP Error %v", err))
+		if record {
+			RecordFailure(s, fmt.Sprintf("HTTP Error %v", err))
+		}
 		return s
 	}
 	response.Header.Set("Connection", "close")
@@ -129,7 +140,9 @@ func ServiceHTTPCheck(s *types.Service) *types.Service {
 	t2 := time.Now()
 	s.Latency = t2.Sub(t1).Seconds()
 	if err != nil {
-		RecordFailure(s, fmt.Sprintf("HTTP Error %v", err))
+		if record {
+			RecordFailure(s, fmt.Sprintf("HTTP Error %v", err))
+		}
 		return s
 	}
 	defer response.Body.Close()
@@ -145,20 +158,26 @@ func ServiceHTTPCheck(s *types.Service) *types.Service {
 		if !match {
 			s.LastResponse = string(contents)
 			s.LastStatusCode = response.StatusCode
-			RecordFailure(s, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
+			if record {
+				RecordFailure(s, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
+			}
 			return s
 		}
 	}
 	if s.ExpectedStatus != response.StatusCode {
 		s.LastResponse = string(contents)
 		s.LastStatusCode = response.StatusCode
-		RecordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", response.StatusCode, s.ExpectedStatus))
+		if record {
+			RecordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", response.StatusCode, s.ExpectedStatus))
+		}
 		return s
 	}
 	s.LastResponse = string(contents)
 	s.LastStatusCode = response.StatusCode
 	s.Online = true
-	RecordSuccess(s)
+	if record {
+		RecordSuccess(s)
+	}
 	return s
 }
 
@@ -166,7 +185,7 @@ type HitData struct {
 	Latency float64
 }
 
-func RecordSuccess(s *types.Service) {
+func RecordSuccess(s *Service) {
 	s.Online = true
 	s.LastOnline = time.Now()
 	data := HitData{
@@ -177,7 +196,7 @@ func RecordSuccess(s *types.Service) {
 	OnSuccess(s)
 }
 
-func RecordFailure(s *types.Service, issue string) {
+func RecordFailure(s *Service, issue string) {
 	s.Online = false
 	data := FailureData{
 		Issue: issue,

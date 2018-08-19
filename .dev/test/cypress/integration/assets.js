@@ -21,7 +21,7 @@ context('Asset Tests', () => {
         }})
     })
 
-    it('should check css file', () => {
+    it('should confirm sass variable in css', () => {
         cy.request('http://localhost:8080/css/base.css').its('body').should('contain', '.test-var')
     })
 

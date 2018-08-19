@@ -25,6 +25,10 @@ import (
 	"strconv"
 )
 
+type Service struct {
+	*types.Service
+}
+
 func RenderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
 	services := core.CoreApp.Services
 	w.Header().Set("Content-Type", "text/javascript")
@@ -57,7 +61,7 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	checkType := r.PostForm.Get("check_type")
 	postData := r.PostForm.Get("post_data")
 
-	service := &types.Service{
+	service := &core.Service{Service: &types.Service{
 		Name:           name,
 		Domain:         domain,
 		Method:         method,
@@ -68,13 +72,13 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 		Port:           port,
 		PostData:       postData,
 		Timeout:        timeout,
-	}
+	}}
 	_, err := core.CreateService(service)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error starting %v check routine. %v", service.Name, err))
 	}
 
-	go core.CheckQueue(service)
+	go core.CheckQueue(service, true)
 	core.OnNewService(service)
 
 	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
@@ -87,7 +91,11 @@ func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	vars := mux.Vars(r)
 	serv := core.SelectService(utils.StringInt(vars["id"]))
-	service := serv.ToService()
+	if serv == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	service := serv
 	core.DeleteService(service)
 	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
 }
@@ -109,7 +117,7 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	vars := mux.Vars(r)
 	serv := core.SelectService(utils.StringInt(vars["id"]))
-	service := serv.ToService()
+	service := serv
 	r.ParseForm()
 	name := r.PostForm.Get("name")
 	domain := r.PostForm.Get("domain")
@@ -121,7 +129,7 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	timeout, _ := strconv.Atoi(r.PostForm.Get("timeout"))
 	checkType := r.PostForm.Get("check_type")
 	postData := r.PostForm.Get("post_data")
-	serviceUpdate := &types.Service{
+	serviceUpdate := &core.Service{Service: &types.Service{
 		Id:             service.Id,
 		Name:           name,
 		Domain:         domain,
@@ -133,7 +141,7 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		Port:           port,
 		PostData:       postData,
 		Timeout:        timeout,
-	}
+	}}
 	service = core.UpdateService(serviceUpdate)
 	core.CoreApp.Services, _ = core.SelectAllServices()
 
@@ -148,7 +156,7 @@ func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	vars := mux.Vars(r)
 	serv := core.SelectService(utils.StringInt(vars["id"]))
-	service := serv.ToService()
+	service := serv
 	core.DeleteFailures(service)
 	core.CoreApp.Services, _ = core.SelectAllServices()
 	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
@@ -162,7 +170,7 @@ func CheckinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	interval := utils.StringInt(r.PostForm.Get("interval"))
 	serv := core.SelectService(utils.StringInt(vars["id"]))
-	service := serv.ToService()
+	service := serv
 	checkin := &core.Checkin{
 		Service:  service.Id,
 		Interval: interval,

@@ -33,7 +33,7 @@
                 </thead>
                 <tbody>
                 {{range .}}
-                {{ $s := .ToService }}
+                {{ $s := . }}
                 <tr>
                     <td>{{$s.Name}}</td>
                     <td>{{if $s.Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}} </td>
