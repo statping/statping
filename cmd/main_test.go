@@ -198,22 +198,32 @@ func RunMakeDatabaseConfig(t *testing.T, db string) {
 	if db == "mysql" {
 		port = 3306
 	}
-	config := &core.DbConfig{
-		db,
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASS"),
-		os.Getenv("DB_DATABASE"),
-		port,
-		"Testing " + db,
-		"This is a test of Statup.io!",
-		"",
-		"admin",
-		"admin",
-		"",
-		nil,
-		dir,
-	}
+
+	//Project     string `yaml:"-"`
+	//Description string `yaml:"-"`
+	//Domain      string `yaml:"-"`
+	//Username    string `yaml:"-"`
+	//Password    string `yaml:"-"`
+	//Email       string `yaml:"-"`
+	//Error       error  `yaml:"-"`
+	//Location    string `yaml:"location"`
+
+	config := &core.DbConfig{DbConfig: &types.DbConfig{
+		DbConn:      db,
+		DbHost:      os.Getenv("DB_HOST"),
+		DbUser:      os.Getenv("DB_USER"),
+		DbPass:      os.Getenv("DB_PASS"),
+		DbData:      os.Getenv("DB_DATABASE"),
+		DbPort:      port,
+		Project:     "Testing " + db,
+		Description: "This is a test of Statup.io!",
+		Domain:      "",
+		Username:    "admin",
+		Password:    "admin",
+		Email:       "",
+		Error:       nil,
+		Location:    dir,
+	}}
 	err := config.Save()
 	assert.Nil(t, err)
 

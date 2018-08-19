@@ -216,5 +216,4 @@ func copyAndCapture(w io.Writer, r io.Reader) ([]byte, error) {
 			return out, err
 		}
 	}
-	return nil, nil
 }

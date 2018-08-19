@@ -38,7 +38,6 @@ type Service struct {
 	Online24Hours  float32    `json:"24_hours_online"`
 	AvgResponse    string     `json:"avg_response"`
 	TotalUptime    string     `json:"uptime"`
-	OrderId        int64      `json:"order_id"`
 	Failures       []*Failure `json:"failures"`
 	Checkins       []*Checkin `json:"checkins"`
 	Running        chan bool  `json:"-"`
@@ -70,5 +69,4 @@ func (s *Service) IsRunning() bool {
 	default:
 		return true
 	}
-	return false
 }

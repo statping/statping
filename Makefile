@@ -6,7 +6,7 @@ GOBUILD=$(GOCMD) build
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 GOINSTALL=$(GOCMD) install
-XGO=GOPATH=$(GOPATH) $(GOPATH)/bin/xgo -go 1.10.x --dest=build
+XGO=GOPATH=$(GOPATH) xgo -go 1.10.x --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT)"
 RICE=$(GOPATH)/bin/rice
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
@@ -67,19 +67,35 @@ docker:
 	docker build -t hunterlong/statup:latest .
 
 docker-run: docker
-	docker run -t -p 8080:8080 hunterlong/statup:latest
+	docker run -it -p 8080:8080 hunterlong/statup:latest
 
 docker-dev: clean
-	docker build -t hunterlong/statup:dev -f .dev/Dockerfile .
+	docker build -t hunterlong/statup:dev -f dev/Dockerfile-dev .
 
-docker-push-dev: docker-dev
+docker-push-dev: docker-base docker-dev docker-test
 	docker push hunterlong/statup:dev
+	docker push hunterlong/statup:base
+	docker push hunterlong/statup:test
 
 docker-run-dev: docker-dev
 	docker run -t -p 8080:8080 hunterlong/statup:dev
 
-docker-test: docker-dev
-	docker run -t -p 8080:8080 -e STATUP_DIR='/go/src/github.com/hunterlong/statup' --entrypoint "go test -v -p=1 $(BUILDVERSION)  ./..." hunterlong/statup:dev
+docker-test: docker-dev clean
+	docker build -t hunterlong/statup:test -f dev/Dockerfile-test .
+
+docker-run-test: docker-test
+	docker run -t -p 8080:8080 --entrypoint "go test -v -p=1 $(BUILDVERSION) ./..." hunterlong/statup:test
+
+docker-base: clean
+	wget -q https://assets.statup.io/sass && chmod +x sass
+	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT) -linkmode external -extldflags -static" -out alpine ./cmd
+	docker build -t hunterlong/statup:base -f dev/Dockerfile-base .
+
+docker-build-base:
+	docker build -t hunterlong/statup:base -f dev/Dockerfile-base .
+
+docker-base-run: clean
+		docker run -t -p 8080:8080 hunterlong/statup:base
 
 databases:
 	docker run --name statup_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password123 -e POSTGRES_USER=root -e POSTGRES_DB=root -d postgres
@@ -87,7 +103,7 @@ databases:
 	sleep 30
 
 dep:
-	dep ensure
+	dep ensure -vendor-only
 
 dev-deps: dep
 	$(GOGET) github.com/stretchr/testify/assert
@@ -115,7 +131,7 @@ clean:
 	rm -rf source/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
 	rm -rf types/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
 	rm -rf utils/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
-	rm -rf .dev/test/cypress/videos
+	rm -rf dev/test/cypress/videos
 	rm -rf .sass-cache
 	rm -f coverage.out
 	rm -f coverage.json
@@ -151,12 +167,16 @@ publish-homebrew:
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(PUBLISH_BODY) https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statup/requests
 
 cypress-install:
-	cd .dev/test && npm install
+	cd /test && npm install
 
 cypress-test: clean cypress-install
-	cd .dev/test && npm test
+	cd dev/test && npm test
 
 travis-build:
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(TRAVIS_BUILD_CMD) https://api.travis-ci.com/repo/hunterlong%2Fstatup/requests
+
+xgo-install: clean
+	go get github.com/karalabe/xgo
+	docker pull karalabe/xgo-latest
 
 .PHONY: build build-all build-alpine test-all test

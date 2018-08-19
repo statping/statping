@@ -319,15 +319,13 @@ func CheckGithubUpdates() (GithubResponse, error) {
 	response, err := http.Get("https://api.github.com/repos/hunterlong/statup/releases/latest")
 	if err != nil {
 		return GithubResponse{}, err
-	} else {
-		defer response.Body.Close()
-		contents, err := ioutil.ReadAll(response.Body)
-		if err != nil {
-			return GithubResponse{}, err
-		}
-		err = json.Unmarshal(contents, &gitResp)
-		return gitResp, err
 	}
+	defer response.Body.Close()
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return GithubResponse{}, err
+	}
+	err = json.Unmarshal(contents, &gitResp)
 	return gitResp, err
 }
 

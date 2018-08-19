@@ -111,21 +111,19 @@ func NewService(s *types.Service) *Service {
 func (s *Service) SmallText() string {
 	last := s.LimitedFailures()
 	hits, _ := s.LimitedHits()
-	if !s.Online {
-		if len(last) > 0 {
-			lastFailure := MakeFailure(last[0].ToFailure())
-			return fmt.Sprintf("%v on %v", lastFailure.ParseError(), last[0].ToFailure().CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
-		} else {
-			return fmt.Sprintf("%v is currently offline", s.Name)
-		}
-	} else {
+	if s.Online {
 		if len(last) == 0 {
 			return fmt.Sprintf("Online since %v", s.CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
 		} else {
 			return fmt.Sprintf("Online, last failure was %v", hits[0].CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
 		}
 	}
-	return fmt.Sprintf("No Failures in the last 24 hours! %v", hits[0])
+	if len(last) > 0 {
+		lastFailure := MakeFailure(last[0].ToFailure())
+		return fmt.Sprintf("%v on %v", lastFailure.ParseError(), last[0].ToFailure().CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
+	} else {
+		return fmt.Sprintf("%v is currently offline", s.Name)
+	}
 }
 
 func GroupDataBy(column string, id int64, tm time.Time, increment string) string {

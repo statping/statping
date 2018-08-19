@@ -17,5 +17,7 @@ ENV VERSION=$(VERSION)
 ENV IS_DOCKER=true
 
 RUN make dev-deps
+RUN make install
+
 EXPOSE 8080
 ENTRYPOINT make run

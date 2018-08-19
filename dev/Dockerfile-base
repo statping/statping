@@ -1,0 +1,5 @@
+FROM scratch
+MAINTAINER "Hunter Long (https://github.com/hunterlong)"
+WORKDIR /app
+ADD sass /usr/local/bin/
+ADD ./build/alpine-linux-amd64 /usr/local/bin/statup

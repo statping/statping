@@ -74,22 +74,23 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	domain := r.PostForm.Get("domain")
 	email := r.PostForm.Get("email")
 
-	config := &core.DbConfig{
-		dbConn,
-		dbHost,
-		dbUser,
-		dbPass,
-		dbDatabase,
-		dbPort,
-		project,
-		description,
-		domain,
-		username,
-		password,
-		email,
-		nil,
-		".",
-	}
+	config := &core.DbConfig{DbConfig: &types.DbConfig{
+		DbConn:      dbConn,
+		DbHost:      dbHost,
+		DbUser:      dbUser,
+		DbPass:      dbPass,
+		DbData:      dbDatabase,
+		DbPort:      dbPort,
+		Project:     project,
+		Description: description,
+		Domain:      domain,
+		Username:    username,
+		Password:    password,
+		Email:       email,
+		Error:       nil,
+		Location:    ".",
+	}}
+
 	err := config.Save()
 	if err != nil {
 		utils.Log(4, err)

@@ -39,7 +39,9 @@ var (
 	currentMigration int64
 )
 
-type DbConfig types.DbConfig
+type DbConfig struct {
+	*types.DbConfig
+}
 
 func DbConnection(dbType string, retry bool, location string) error {
 	var err error

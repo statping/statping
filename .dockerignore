@@ -1,15 +1,11 @@
-**
+.git
+.idea
+*.log
+build
+source/rice-box.go
+.env
+.DS_Store
+*/**/node_modules
+vendor
 
-!/source
-!/types
-!/utils
-!/plugin
-!/notifiers
-!/handlers
-!/core
-!/cmd
-!/Makefile
-!/README.md
-!/LICENSE
-!/Gopkg.lock
-!/Gopkg.toml
+!build/alpine-linux-amd64
