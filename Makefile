@@ -167,7 +167,7 @@ publish-homebrew:
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(PUBLISH_BODY) https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statup/requests
 
 cypress-install:
-	cd /test && npm install
+	cd dev/test && npm install
 
 cypress-test: clean cypress-install
 	cd dev/test && npm test
