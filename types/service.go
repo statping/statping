@@ -41,6 +41,7 @@ type Service struct {
 	Failures       []*Failure `json:"failures"`
 	Checkins       []*Checkin `json:"checkins"`
 	Running        chan bool  `json:"-"`
+	Checkpoint     time.Time  `json:"-"`
 	LastResponse   string
 	LastStatusCode int
 	LastOnline     time.Time

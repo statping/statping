@@ -40,6 +40,8 @@ func CheckServices() {
 }
 
 func CheckQueue(s *Service, record bool) {
+	s.Checkpoint = time.Now()
+
 CheckLoop:
 	for {
 		select {
@@ -49,7 +51,11 @@ CheckLoop:
 		default:
 			utils.Log(1, fmt.Sprintf("Checking service: %v", s.Name))
 			ServiceCheck(s, record)
-			time.Sleep(time.Duration(s.Interval) * time.Second)
+			// Set next time checkpoint and maybe sleep.
+			s.Checkpoint = s.Checkpoint.Add(time.Duration(s.Interval) * time.Second)
+			if sleepDuration := s.Checkpoint.Sub(time.Now()); sleepDuration > 0 {
+				time.Sleep(sleepDuration)
+			}
 			continue
 		}
 	}
