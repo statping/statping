@@ -74,7 +74,7 @@ func LoadUsingEnv() (*types.Config, error) {
 		CoreApp.UseCdn = true
 	}
 
-	dbConfig := &DbConfig{DbConfig: &types.DbConfig{
+	dbConfig := &DbConfig{&types.DbConfig{
 		DbConn:      os.Getenv("DB_CONN"),
 		DbHost:      os.Getenv("DB_HOST"),
 		DbUser:      os.Getenv("DB_USER"),
@@ -89,7 +89,7 @@ func LoadUsingEnv() (*types.Config, error) {
 		Email:       "info@localhost.com",
 	}}
 
-	err := DbConnection(dbConfig.DbConn, true, ".")
+	err := DbConnection(dbConfig.DbConn, true, utils.Directory)
 	if err != nil {
 		utils.Log(4, err)
 		return nil, err

@@ -208,7 +208,7 @@ func RunMakeDatabaseConfig(t *testing.T, db string) {
 	//Error       error  `yaml:"-"`
 	//Location    string `yaml:"location"`
 
-	config := &core.DbConfig{DbConfig: &types.DbConfig{
+	config := &core.DbConfig{&types.DbConfig{
 		DbConn:      db,
 		DbHost:      os.Getenv("DB_HOST"),
 		DbUser:      os.Getenv("DB_USER"),

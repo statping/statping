@@ -131,7 +131,7 @@ func (c *DbConfig) Save() error {
 		utils.Log(4, err)
 		return err
 	}
-	data, err := yaml.Marshal(c)
+	data, err := yaml.Marshal(c.DbConfig)
 	if err != nil {
 		utils.Log(3, err)
 		return err

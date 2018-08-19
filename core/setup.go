@@ -35,7 +35,7 @@ type ErrorResponse struct {
 
 func LoadSampleData() error {
 	utils.Log(1, "Inserting Sample Data...")
-	s1 := &Service{Service: &types.Service{
+	s1 := &Service{&types.Service{
 		Name:           "Google",
 		Domain:         "https://google.com",
 		ExpectedStatus: 200,
@@ -44,7 +44,7 @@ func LoadSampleData() error {
 		Method:         "GET",
 		Timeout:        10,
 	}}
-	s2 := &Service{Service: &types.Service{
+	s2 := &Service{&types.Service{
 		Name:           "Statup Github",
 		Domain:         "https://github.com/hunterlong/statup",
 		ExpectedStatus: 200,
@@ -53,7 +53,7 @@ func LoadSampleData() error {
 		Method:         "GET",
 		Timeout:        20,
 	}}
-	s3 := &Service{Service: &types.Service{
+	s3 := &Service{&types.Service{
 		Name:           "JSON Users Test",
 		Domain:         "https://jsonplaceholder.typicode.com/users",
 		ExpectedStatus: 200,
@@ -62,7 +62,7 @@ func LoadSampleData() error {
 		Method:         "GET",
 		Timeout:        30,
 	}}
-	s4 := &Service{Service: &types.Service{
+	s4 := &Service{&types.Service{
 		Name:           "JSON API Tester",
 		Domain:         "https://jsonplaceholder.typicode.com/posts",
 		ExpectedStatus: 201,
@@ -73,7 +73,7 @@ func LoadSampleData() error {
 		PostData:       `{ "title": "statup", "body": "bar", "userId": 19999 }`,
 		Timeout:        30,
 	}}
-	s5 := &Service{Service: &types.Service{
+	s5 := &Service{&types.Service{
 		Name:     "Google DNS",
 		Domain:   "8.8.8.8",
 		Interval: 20,
