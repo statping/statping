@@ -83,10 +83,10 @@ docker-push-latest: docker
 docker-run-dev: docker-dev
 	docker run -t -p 8080:8080 hunterlong/statup:dev
 
-docker-test: docker-dev clean
-	docker build -t hunterlong/statup:test -f dev/Dockerfile-test .
+docker-cypress: clean
+	docker build -t hunterlong/statup:test -f dev/Dockerfile-cypress .
 
-docker-run-test: docker-test
+docker-run-cypress: docker-cypress
 	docker run -t -p 8080:8080 --entrypoint "go test -v -p=1 $(BUILDVERSION) ./..." hunterlong/statup:test
 
 docker-base: clean
@@ -124,13 +124,13 @@ dev-deps: dep
 
 clean:
 	rm -rf ./{logs,assets,plugins,statup.db,config.yml,.sass-cache,config.yml,statup,build}
-	rm -rf cmd/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
-	rm -rf core/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
-	rm -rf handlers/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
-	rm -rf notifiers/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
-	rm -rf source/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
-	rm -rf types/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
-	rm -rf utils/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
+	rm -rf cmd/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf core/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf handlers/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf notifiers/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf source/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf types/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf utils/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf dev/test/cypress/videos
 	rm -rf .sass-cache
 	rm -f coverage.out

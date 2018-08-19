@@ -16,6 +16,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -88,8 +89,10 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		Password:    password,
 		Email:       email,
 		Error:       nil,
-		Location:    ".",
+		Location:    utils.Directory,
 	}}
+
+	fmt.Println(config)
 
 	err := config.Save()
 	if err != nil {

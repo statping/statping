@@ -14,9 +14,11 @@ assets
 *.log
 .env
 logs
-dev/test/node_modules
+/dev/test/node_modules
 dev/test/cypress/videos
 dev/test/cypress/screenshots
 dev/test/app
 source/rice-box.go
 sass
+.DS_Store
+source/css/base.css.map

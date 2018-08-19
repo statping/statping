@@ -146,7 +146,7 @@ func TestCountOnline(t *testing.T) {
 }
 
 func TestCreateService(t *testing.T) {
-	s := &Service{Service: &types.Service{
+	s := &Service{&types.Service{
 		Name:           "That'll do 🐢",
 		Domain:         "https://www.youtube.com/watch?v=rjQtzV9IZ0Q",
 		ExpectedStatus: 200,
@@ -170,7 +170,7 @@ func TestViewNewService(t *testing.T) {
 }
 
 func TestCreateFailingHTTPService(t *testing.T) {
-	s := &Service{Service: &types.Service{
+	s := &Service{&types.Service{
 		Name:           "Bad URL",
 		Domain:         "http://localhost/iamnothere",
 		ExpectedStatus: 200,
@@ -195,7 +195,7 @@ func TestServiceFailedCheck(t *testing.T) {
 }
 
 func TestCreateFailingTCPService(t *testing.T) {
-	s := &Service{Service: &types.Service{
+	s := &Service{&types.Service{
 		Name:     "Bad TCP",
 		Domain:   "localhost",
 		Port:     5050,
