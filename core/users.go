@@ -61,6 +61,9 @@ func CreateUser(u *types.User) (int64, error) {
 	u.ApiSecret = utils.NewSHA1Hash(10)
 	col := DbSession.Collection("users")
 	uuid, err := col.Insert(u)
+	if err != nil {
+		return 0, err
+	}
 	if uuid == nil {
 		utils.Log(3, fmt.Sprintf("Failed to create user %v. %v", u.Username, err))
 		return 0, err

@@ -14,7 +14,7 @@ CREATE TABLE core (
 
 CREATE TABLE users (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    username text,
+    username text NOT NULL UNIQUE,
     password text,
     email text,
     api_key text,

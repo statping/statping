@@ -368,8 +368,16 @@ func TestViewTCPServicesHandler(t *testing.T) {
 }
 
 func TestServicesDeleteFailuresHandler(t *testing.T) {
-	t.SkipNow()
 	req, err := http.NewRequest("GET", "/service/7/delete_failures", nil)
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 200, rr.Code)
+	assert.True(t, IsRouteAuthenticated(req))
+}
+
+func TestFailingServicesDeleteFailuresHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/service/1/delete_failures", nil)
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)

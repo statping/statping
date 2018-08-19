@@ -312,8 +312,9 @@ func RunUser_NonUniqueCreate(t *testing.T) {
 		Password: "admin",
 		Email:    "info@testuser.com",
 	}
-	_, err := core.CreateUser(user)
-	assert.NotNil(t, err)
+	admin, err := core.CreateUser(user)
+	assert.Error(t, err)
+	assert.Nil(t, admin)
 }
 
 func RunUser_Delete(t *testing.T) {
@@ -396,9 +397,12 @@ func RunBadService_Create(t *testing.T) {
 }
 
 func RunBadService_Check(t *testing.T) {
-	service := core.SelectService(4)
+	service := core.SelectService(7)
 	assert.NotNil(t, service)
-	assert.Equal(t, "JSON API Tester", service.Name)
+	assert.Equal(t, "Bad Service", service.Name)
+	for i := 0; i <= 10; i++ {
+		core.ServiceHTTPCheck(service, true)
+	}
 	assert.True(t, service.IsRunning())
 }
 
@@ -418,7 +422,8 @@ func RunCreateService_Hits(t *testing.T) {
 	services, err := core.SelectAllServices()
 	assert.Nil(t, err)
 	assert.NotNil(t, services)
-	for i := 0; i <= 10; i++ {
+	assert.Equal(t, 6, len(services))
+	for i := 0; i <= 15; i++ {
 		for _, s := range services {
 			var service *core.Service
 			if s.Type == "http" {
@@ -440,9 +445,9 @@ func RunService_Hits(t *testing.T) {
 }
 
 func RunService_Failures(t *testing.T) {
-	t.SkipNow()
-	service := core.SelectService(6)
+	service := core.SelectService(7)
 	assert.NotNil(t, service)
+	assert.Equal(t, "Bad Service", service.Name)
 	assert.NotEmpty(t, service.Failures)
 }
 

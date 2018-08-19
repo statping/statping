@@ -13,7 +13,7 @@ CREATE TABLE core (
 );
 CREATE TABLE users (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50),
+    username VARCHAR(50) NOT NULL UNIQUE,
     password text,
     email VARCHAR (50),
     api_key VARCHAR(50),

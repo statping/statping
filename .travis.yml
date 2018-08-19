@@ -10,7 +10,7 @@ go_import_path: github.com/hunterlong/statup
 
 cache:
   directories:
-  - $GOPATH/pkg/dep
+    - $GOPATH/pkg/dep
 
 sudo: required
 
@@ -48,7 +48,6 @@ before_install:
 
 install:
   - make dev-deps
-  - make dep
   - make install
 
 before_script:
@@ -61,4 +60,3 @@ script:
 
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make travis-build; fi
-  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make publish-dev; fi
