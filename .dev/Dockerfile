@@ -16,6 +16,6 @@ ADD . /go/src/github.com/hunterlong/statup
 ENV VERSION=$(VERSION)
 ENV IS_DOCKER=true
 
-RUN pwd && ls && go get ./...
+RUN make dev-deps
 EXPOSE 8080
 ENTRYPOINT make run
