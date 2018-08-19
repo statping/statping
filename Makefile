@@ -77,6 +77,9 @@ docker-push-dev: docker-base docker-dev docker-test
 	docker push hunterlong/statup:base
 	docker push hunterlong/statup:test
 
+docker-push-latest: docker
+	docker push hunterlong/statup:latest
+
 docker-run-dev: docker-dev
 	docker run -t -p 8080:8080 hunterlong/statup:dev
 
@@ -93,9 +96,6 @@ docker-base: clean
 
 docker-build-base:
 	docker build -t hunterlong/statup:base -f dev/Dockerfile-base .
-
-docker-base-run: clean
-		docker run -t -p 8080:8080 hunterlong/statup:base
 
 databases:
 	docker run --name statup_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password123 -e POSTGRES_USER=root -e POSTGRES_DB=root -d postgres

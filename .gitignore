@@ -19,3 +19,4 @@ dev/test/cypress/videos
 dev/test/cypress/screenshots
 dev/test/app
 source/rice-box.go
+sass

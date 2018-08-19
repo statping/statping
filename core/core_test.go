@@ -17,6 +17,7 @@ package core
 
 import (
 	"github.com/hunterlong/statup/source"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -41,11 +42,11 @@ func TestNewCore(t *testing.T) {
 }
 
 func TestDbConfig_Save(t *testing.T) {
-	testConfig = &DbConfig{
+	testConfig = &DbConfig{DbConfig: &types.DbConfig{
 		DbConn:   "sqlite",
 		Project:  "Tester",
 		Location: dir,
-	}
+	}}
 	err := testConfig.Save()
 	assert.Nil(t, err)
 }
