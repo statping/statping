@@ -23,13 +23,15 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"sync"
 )
 
 var (
-	logFile  *os.File
-	fmtLogs  *log.Logger
-	ljLogger *lumberjack.Logger
-	LastLine interface{}
+	logFile   *os.File
+	fmtLogs   *log.Logger
+	ljLogger  *lumberjack.Logger
+	LastLines []*LogRow
+	LockLines sync.Mutex
 )
 
 func createLog(dir string) error {
@@ -69,6 +71,7 @@ func InitLogs() error {
 	fmtLogs = log.New(logFile, "", log.Ldate|log.Ltime)
 	log.SetOutput(ljLogger)
 	rotate()
+	LastLines = make([]*LogRow, 0)
 	return err
 }
 
@@ -84,7 +87,7 @@ func rotate() {
 }
 
 func Log(level int, err interface{}) error {
-	LastLine = err
+	pushLastLine(err)
 	var outErr error
 	switch level {
 	case 5:
@@ -119,6 +122,25 @@ func Http(r *http.Request) string {
 	msg := fmt.Sprintf("%v (%v) | IP: %v", r.RequestURI, r.Method, r.Host)
 	fmtLogs.Printf("WEB: %v\n", msg)
 	fmt.Printf("WEB: %v\n", msg)
-	LastLine = msg
+	pushLastLine(msg)
 	return msg
+}
+
+func pushLastLine(line interface{}) {
+	LockLines.Lock()
+	defer LockLines.Unlock()
+	LastLines = append(LastLines, NewLogRow(line))
+	// We want to store max 1000 lines in memory (for /logs page).
+	for len(LastLines) > 1000 {
+		LastLines = LastLines[1:]
+	}
+}
+
+func GetLastLine() *LogRow {
+	LockLines.Lock()
+	defer LockLines.Unlock()
+	if len(LastLines) > 0 {
+		return LastLines[len(LastLines) - 1]
+	}
+	return nil
 }

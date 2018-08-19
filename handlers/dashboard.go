@@ -80,7 +80,15 @@ func LogsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "logs.html", nil)
+	utils.LockLines.Lock()
+	logs := make([]string, 0)
+	len := len(utils.LastLines)
+	// We need string log lines from end to start.
+	for i := len - 1; i >= 0; i-- {
+		logs = append(logs, utils.LastLines[i].FormatForHtml()+"\r\n")
+	}
+	utils.LockLines.Unlock()
+	ExecuteResponse(w, r, "logs.html", logs)
 }
 
 func LogsLineHandler(w http.ResponseWriter, r *http.Request) {
@@ -88,12 +96,7 @@ func LogsLineHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	switch v := utils.LastLine.(type) {
-	case string:
-		w.Write([]byte(v))
-	case error:
-		w.Write([]byte(v.Error()))
-	case []byte:
-		w.Write(v)
+	if lastLine := utils.GetLastLine(); lastLine != nil {
+		w.Write([]byte(lastLine.FormatForHtml()))
 	}
 }
