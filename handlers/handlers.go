@@ -112,10 +112,22 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 			return utils.UnderScoreString(html)
 		},
 	})
-	t, _ = t.Parse(nav)
-	t, _ = t.Parse(footer)
-	t.Parse(render)
-	t.Execute(w, data)
+	t, err = t.Parse(nav)
+	if err != nil {
+		utils.Log(4, err)
+	}
+	t, err = t.Parse(footer)
+	if err != nil {
+		utils.Log(4, err)
+	}
+	_, err = t.Parse(render)
+	if err != nil {
+		utils.Log(4, err)
+	}
+	err = t.Execute(w, data)
+	if err != nil {
+		utils.Log(4, err)
+	}
 }
 
 func ExecuteJSResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}) {

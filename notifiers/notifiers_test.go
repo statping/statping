@@ -20,14 +20,13 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"os"
 	"testing"
 	"upper.io/db.v3/sqlite"
 )
 
 var (
 	testNotifier *Tester
-	testDatabase string
+	dir          string
 )
 
 //
@@ -63,15 +62,13 @@ func (n *Tester) Test() error {
 }
 
 func init() {
-	testDatabase = os.Getenv("GOPATH")
-	testDatabase += "/src/github.com/hunterlong/statup"
-
+	dir = utils.Directory
 	utils.InitLogs()
 }
 
 func injectDatabase() {
 	sqliteDb := sqlite.ConnectionURL{
-		Database: testDatabase + "/statup.db",
+		Database: dir + "/statup.db",
 	}
 	dbSession, _ := sqlite.Open(sqliteDb)
 	Collections = dbSession.Collection("communication")
@@ -87,11 +84,11 @@ func TestInit(t *testing.T) {
 
 func TestAdd(t *testing.T) {
 	testNotifier = &Tester{&Notification{
-		Id:     1,
+		Id:     999999,
 		Method: "tester",
 		Host:   "0.0.0.0",
 		Form: []NotificationForm{{
-			Id:          1,
+			Id:          999999,
 			Type:        "text",
 			Title:       "Incoming Webhook Url",
 			Placeholder: "Insert your Slack webhook URL here.",
@@ -119,14 +116,14 @@ func TestInsertDatabase(t *testing.T) {
 }
 
 func TestSelectNotification(t *testing.T) {
-	notifier, err := SelectNotification(1)
+	notifier, err := SelectNotification(999999)
 	assert.Nil(t, err)
 	assert.Equal(t, "tester", notifier.Method)
 	assert.False(t, notifier.Enabled)
 }
 
 func TestNotification_Update(t *testing.T) {
-	notifier, err := SelectNotification(1)
+	notifier, err := SelectNotification(999999)
 	assert.Nil(t, err)
 	notifier.Method = "updatedName"
 	notifier.Enabled = true
@@ -139,7 +136,7 @@ func TestNotification_Update(t *testing.T) {
 }
 
 func TestNotification_GetValue(t *testing.T) {
-	notifier, err := SelectNotification(1)
+	notifier, err := SelectNotification(999999)
 	assert.Nil(t, err)
 	val := notifier.GetValue("Host")
 	assert.Equal(t, "0.0.0.0", val)

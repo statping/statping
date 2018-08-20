@@ -23,38 +23,44 @@ import (
 	"time"
 )
 
-type User types.User
+type User struct {
+	*types.User
+}
 
-func SelectUser(id int64) (*types.User, error) {
-	var user *types.User
+func ReturnUser(u *types.User) *User {
+	return &User{User: u}
+}
+
+func SelectUser(id int64) (*User, error) {
+	var user *User
 	col := DbSession.Collection("users")
 	res := col.Find("id", id)
 	err := res.One(&user)
 	return user, err
 }
 
-func SelectUsername(username string) (*types.User, error) {
-	var user *types.User
+func SelectUsername(username string) (*User, error) {
+	var user *User
 	col := DbSession.Collection("users")
 	res := col.Find("username", username)
 	err := res.One(&user)
 	return user, err
 }
 
-func DeleteUser(u *types.User) error {
+func (u *User) Delete() error {
 	col := DbSession.Collection("users")
 	user := col.Find("id", u.Id)
 	return user.Delete()
 }
 
-func UpdateUser(u *types.User) error {
+func (u *User) Update() error {
 	u.CreatedAt = time.Now()
 	col := DbSession.Collection("users")
 	user := col.Find("id", u.Id)
 	return user.Update(u)
 }
 
-func CreateUser(u *types.User) (int64, error) {
+func (u *User) Create() (int64, error) {
 	u.CreatedAt = time.Now()
 	u.Password = utils.HashPassword(u.Password)
 	u.ApiKey = utils.NewSHA1Hash(5)
@@ -71,8 +77,8 @@ func CreateUser(u *types.User) (int64, error) {
 	return uuid.(int64), err
 }
 
-func SelectAllUsers() ([]User, error) {
-	var users []User
+func SelectAllUsers() ([]*User, error) {
+	var users []*User
 	col := DbSession.Collection("users").Find()
 	err := col.All(&users)
 	if err != nil {
@@ -81,7 +87,7 @@ func SelectAllUsers() ([]User, error) {
 	return users, err
 }
 
-func AuthUser(username, password string) (*types.User, bool) {
+func AuthUser(username, password string) (*User, bool) {
 	var auth bool
 	user, err := SelectUsername(username)
 	if err != nil {

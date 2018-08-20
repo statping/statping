@@ -31,17 +31,16 @@ import (
 type FailureData types.FailureData
 
 func CheckServices() {
-	CoreApp.Services, _ = SelectAllServices()
-	utils.Log(1, fmt.Sprintf("Starting monitoring process for %v Services", len(CoreApp.Services)))
-	for _, s := range CoreApp.Services {
+	CoreApp.SelectAllServices()
+	utils.Log(1, fmt.Sprintf("Starting monitoring process for %v DbServices", len(CoreApp.DbServices)))
+	for _, ser := range CoreApp.DbServices {
 		//go obj.StartCheckins()
-		go CheckQueue(s, true)
+		s := ReturnService(ser)
+		go s.CheckQueue(true)
 	}
 }
 
-func CheckQueue(s *Service, record bool) {
-	s.Checkpoint = time.Now()
-
+func (s *Service) CheckQueue(record bool) {
 CheckLoop:
 	for {
 		select {
@@ -194,21 +193,21 @@ type HitData struct {
 func RecordSuccess(s *Service) {
 	s.Online = true
 	s.LastOnline = time.Now()
-	data := HitData{
+	data := &types.Hit{
 		Latency: s.Latency,
 	}
 	utils.Log(1, fmt.Sprintf("Service %v Successful: %0.2f ms", s.Name, data.Latency*1000))
-	CreateServiceHit(s, data)
+	s.CreateHit(data)
 	OnSuccess(s)
 }
 
 func RecordFailure(s *Service, issue string) {
 	s.Online = false
-	data := FailureData{
+	data := &types.Failure{
 		Issue: issue,
 	}
 	utils.Log(2, fmt.Sprintf("Service %v Failing: %v", s.Name, issue))
-	CreateServiceFailure(s, data)
+	s.CreateFailure(data)
 	//SendFailureEmail(s)
 	OnFailure(s, data)
 }

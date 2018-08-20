@@ -26,7 +26,7 @@ import (
 func ExportIndexHTML() string {
 	source.Assets()
 	CoreApp.UseCdn = true
-	//out := index{*CoreApp, CoreApp.Services}
+	//out := index{*CoreApp, CoreApp.DbServices}
 	nav, _ := source.TmplBox.String("nav.html")
 	footer, _ := source.TmplBox.String("footer.html")
 	render, err := source.TmplBox.String("index.html")

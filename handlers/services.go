@@ -30,7 +30,7 @@ type Service struct {
 }
 
 func RenderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
-	services := core.CoreApp.Services
+	services := core.CoreApp.Services()
 	w.Header().Set("Content-Type", "text/javascript")
 	w.Header().Set("Cache-Control", "max-age=60")
 	ExecuteJSResponse(w, r, "charts.js", services)
@@ -41,7 +41,7 @@ func ServicesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.DbServices)
 }
 
 func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -73,15 +73,15 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 		PostData:       postData,
 		Timeout:        timeout,
 	}}
-	_, err := core.CreateService(service)
+	_, err := service.Create()
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error starting %v check routine. %v", service.Name, err))
 	}
 
-	go core.CheckQueue(service, true)
+	go service.CheckQueue(true)
 	core.OnNewService(service)
 
-	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.DbServices)
 }
 
 func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
@@ -96,8 +96,8 @@ func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	service := serv
-	core.DeleteService(service)
-	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
+	service.Delete()
+	ExecuteResponse(w, r, "services.html", core.CoreApp.DbServices)
 }
 
 func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
@@ -142,10 +142,10 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		PostData:       postData,
 		Timeout:        timeout,
 	}}
-	service = core.UpdateService(serviceUpdate)
-	core.CoreApp.Services, _ = core.SelectAllServices()
+	serviceUpdate.Update()
+	core.CoreApp.SelectAllServices()
 
-	serv = core.SelectService(service.Id)
+	serv = core.SelectService(serviceUpdate.Id)
 	ExecuteResponse(w, r, "service.html", serv)
 }
 
@@ -158,8 +158,8 @@ func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 	serv := core.SelectService(utils.StringInt(vars["id"]))
 	service := serv
 	core.DeleteFailures(service)
-	core.CoreApp.Services, _ = core.SelectAllServices()
-	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
+	core.CoreApp.SelectAllServices()
+	ExecuteResponse(w, r, "services.html", core.CoreApp.DbServices)
 }
 
 func CheckinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -171,7 +171,7 @@ func CheckinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	interval := utils.StringInt(r.PostForm.Get("interval"))
 	serv := core.SelectService(utils.StringInt(vars["id"]))
 	service := serv
-	checkin := &core.Checkin{
+	checkin := &types.Checkin{
 		Service:  service.Id,
 		Interval: interval,
 		Api:      utils.NewSHA1Hash(18),

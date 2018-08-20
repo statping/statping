@@ -85,7 +85,7 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" Select Core", func(t *testing.T) {
 			RunSelectCoreMYQL(t, dbt)
 		})
-		t.Run(dbt+" Select Services", func(t *testing.T) {
+		t.Run(dbt+" Select DbServices", func(t *testing.T) {
 			RunSelectAllMysqlServices(t)
 		})
 		t.Run(dbt+" Select Comms", func(t *testing.T) {
@@ -104,7 +104,7 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" Select Users", func(t *testing.T) {
 			RunUser_SelectAll(t)
 		})
-		t.Run(dbt+" Select Services", func(t *testing.T) {
+		t.Run(dbt+" Select DbServices", func(t *testing.T) {
 			RunSelectAllServices(t)
 		})
 		t.Run(dbt+" Select One Service", func(t *testing.T) {
@@ -115,6 +115,9 @@ func TestRunAll(t *testing.T) {
 		})
 		t.Run(dbt+" Create Hits", func(t *testing.T) {
 			RunCreateService_Hits(t)
+		})
+		t.Run(dbt+" Service ToJSON()", func(t *testing.T) {
+			RunService_ToJSON(t)
 		})
 		t.Run(dbt+" Avg Time", func(t *testing.T) {
 			RunService_AvgTime(t)
@@ -208,7 +211,7 @@ func RunMakeDatabaseConfig(t *testing.T, db string) {
 	//Error       error  `yaml:"-"`
 	//Location    string `yaml:"location"`
 
-	config := &core.DbConfig{DbConfig: &types.DbConfig{
+	config := &core.DbConfig{&types.DbConfig{
 		DbConn:      db,
 		DbHost:      os.Getenv("DB_HOST"),
 		DbUser:      os.Getenv("DB_USER"),
@@ -265,7 +268,7 @@ func RunSelectCoreMYQL(t *testing.T, db string) {
 
 func RunSelectAllMysqlServices(t *testing.T) {
 	var err error
-	services, err := core.SelectAllServices()
+	services, err := core.CoreApp.SelectAllServices()
 	assert.Nil(t, err)
 	assert.Equal(t, 5, len(services))
 }
@@ -285,22 +288,22 @@ func RunUser_SelectAll(t *testing.T) {
 }
 
 func RunUser_Create(t *testing.T) {
-	user := &types.User{
+	user := core.ReturnUser(&types.User{
 		Username: "admin",
 		Password: "admin",
 		Email:    "info@testuser.com",
 		Admin:    true,
-	}
-	id, err := core.CreateUser(user)
+	})
+	id, err := user.Create()
 	assert.Nil(t, err)
 	assert.Equal(t, int64(1), id)
-	user2 := &types.User{
+	user2 := core.ReturnUser(&types.User{
 		Username: "superadmin",
 		Password: "admin",
 		Email:    "info@adminer.com",
 		Admin:    true,
-	}
-	id, err = core.CreateUser(user2)
+	})
+	id, err = user2.Create()
 	assert.Nil(t, err)
 	assert.Equal(t, int64(2), id)
 }
@@ -309,7 +312,7 @@ func RunUser_Update(t *testing.T) {
 	user, err := core.SelectUser(1)
 	user.Email = "info@updatedemail.com"
 	assert.Nil(t, err)
-	err = core.UpdateUser(user)
+	err = user.Update()
 	assert.Nil(t, err)
 	updatedUser, err := core.SelectUser(1)
 	assert.Nil(t, err)
@@ -317,12 +320,12 @@ func RunUser_Update(t *testing.T) {
 }
 
 func RunUser_NonUniqueCreate(t *testing.T) {
-	user := &types.User{
+	user := core.ReturnUser(&types.User{
 		Username: "admin",
 		Password: "admin",
 		Email:    "info@testuser.com",
-	}
-	admin, err := core.CreateUser(user)
+	})
+	admin, err := user.Create()
 	assert.Error(t, err)
 	assert.Nil(t, admin)
 }
@@ -331,13 +334,13 @@ func RunUser_Delete(t *testing.T) {
 	user, err := core.SelectUser(2)
 	assert.Nil(t, err)
 	assert.NotNil(t, user)
-	err = core.DeleteUser(user)
+	err = user.Delete()
 	assert.Nil(t, err)
 }
 
 func RunSelectAllServices(t *testing.T) {
 	var err error
-	services, err := core.SelectAllServices()
+	services, err := core.CoreApp.SelectAllServices()
 	assert.Nil(t, err)
 	assert.Equal(t, 5, len(services))
 }
@@ -360,10 +363,17 @@ func RunService_Create(t *testing.T) {
 		Method:         "GET",
 		Timeout:        30,
 	}}
-	id, err := core.CreateService(service)
+	id, err := service.Create()
 	assert.Nil(t, err)
 	assert.Equal(t, int64(6), id)
 	t.Log(service)
+}
+
+func RunService_ToJSON(t *testing.T) {
+	service := core.SelectService(1)
+	assert.NotNil(t, service)
+	jsoned := service.ToJSON()
+	assert.NotEmpty(t, jsoned)
 }
 
 func RunService_AvgTime(t *testing.T) {
@@ -401,7 +411,7 @@ func RunBadService_Create(t *testing.T) {
 		Method:         "GET",
 		Timeout:        30,
 	}}
-	id, err := core.CreateService(service)
+	id, err := service.Create()
 	assert.Nil(t, err)
 	assert.Equal(t, int64(7), id)
 }
@@ -422,14 +432,14 @@ func RunDeleteService(t *testing.T) {
 	assert.Equal(t, "JSON API Tester", service.Name)
 	assert.True(t, service.IsRunning())
 	t.Log(service.Running)
-	err := core.DeleteService(service)
+	err := service.Delete()
 	t.Log(service.Running)
 	assert.False(t, service.IsRunning())
 	assert.Nil(t, err)
 }
 
 func RunCreateService_Hits(t *testing.T) {
-	services, err := core.SelectAllServices()
+	services, err := core.CoreApp.SelectAllServices()
 	assert.Nil(t, err)
 	assert.NotNil(t, services)
 	assert.Equal(t, 6, len(services))
@@ -437,9 +447,9 @@ func RunCreateService_Hits(t *testing.T) {
 		for _, s := range services {
 			var service *core.Service
 			if s.Type == "http" {
-				service = core.ServiceHTTPCheck(s, true)
+				service = core.ServiceHTTPCheck(core.ReturnService(s), true)
 			} else {
-				service = core.ServiceTCPCheck(s, true)
+				service = core.ServiceTCPCheck(core.ReturnService(s), true)
 			}
 			assert.NotNil(t, service)
 		}

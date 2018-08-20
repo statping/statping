@@ -14,6 +14,7 @@
     "cy:run-video": "cypress run --record --key $CYPRESS_KEY",
     "cy:run": "cypress run",
     "test": "bash -c \"./test.sh\"",
+    "test-docker": "bash -c \"./test-docker.sh\"",
     "testnovid": "cypress run",
     "open": "cypress open"
   },

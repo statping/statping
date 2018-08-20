@@ -35,7 +35,7 @@ func OnSuccess(s *Service) {
 	// TODO convert notifiers to correct type
 }
 
-func OnFailure(s *Service, f FailureData) {
+func OnFailure(s *Service, f *types.Failure) {
 	for _, p := range CoreApp.AllPlugins {
 		p.OnFailure(structs.Map(s))
 	}
@@ -49,7 +49,7 @@ func OnSettingsSaved(c *types.Core) {
 	}
 }
 
-func OnNewUser(u *types.User) {
+func OnNewUser(u *User) {
 	for _, p := range CoreApp.AllPlugins {
 		p.OnNewUser(structs.Map(u))
 	}

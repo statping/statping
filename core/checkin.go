@@ -23,14 +23,20 @@ import (
 	"time"
 )
 
-type Checkin types.Checkin
+type Checkin struct {
+	*types.Checkin
+}
 
 func (c *Checkin) String() string {
 	return c.Api
 }
 
+func ReturnCheckin(s *types.Checkin) *Checkin {
+	return &Checkin{Checkin: s}
+}
+
 func FindCheckin(api string) *types.Checkin {
-	for _, ser := range CoreApp.Services {
+	for _, ser := range CoreApp.DbServices {
 		for _, c := range ser.Checkins {
 			if c.Api == api {
 				return c
@@ -40,7 +46,7 @@ func FindCheckin(api string) *types.Checkin {
 	return nil
 }
 
-func SelectAllCheckins(s *types.Service) []*types.Checkin {
+func (s *Service) AllCheckins() []*types.Checkin {
 	var checkins []*types.Checkin
 	col := DbSession.Collection("checkins").Find("service", s.Id).OrderBy("-id")
 	col.All(&checkins)
@@ -116,7 +122,7 @@ func (f *Checkin) Ago() string {
 //}
 //
 //func CheckinProcess() {
-//	for _, s := range CoreApp.Services {
+//	for _, s := range CoreApp.DbServices {
 //		for _, c := range s.Checkins {
 //			checkin := c
 //			go checkin.Run()

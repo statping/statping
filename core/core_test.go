@@ -42,7 +42,7 @@ func TestNewCore(t *testing.T) {
 }
 
 func TestDbConfig_Save(t *testing.T) {
-	testConfig = &DbConfig{DbConfig: &types.DbConfig{
+	testConfig = &DbConfig{&types.DbConfig{
 		DbConn:   "sqlite",
 		Project:  "Tester",
 		Location: dir,

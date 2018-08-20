@@ -1,0 +1,15 @@
+FROM cypress/browsers:chrome67
+MAINTAINER "Hunter Long (https://github.com/hunterlong)"
+# Statup 'test' image for running a full test using the production environment
+
+WORKDIR $HOME/statup
+ADD dev/test .
+
+RUN npm install node-sass
+ENV SASS=node-sass
+RUN npm install
+
+ADD ./statup-linux-amd64 /usr/local/bin/statup
+RUN statup version
+
+RUN npm run test-docker

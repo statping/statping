@@ -16,6 +16,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -26,7 +27,7 @@ import (
 )
 
 func SetupHandler(w http.ResponseWriter, r *http.Request) {
-	if core.CoreApp.Services != nil {
+	if core.CoreApp.DbServices != nil {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -55,7 +56,7 @@ func SetupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
-	if core.CoreApp.Services != nil {
+	if core.CoreApp.DbServices != nil {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -74,7 +75,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	domain := r.PostForm.Get("domain")
 	email := r.PostForm.Get("email")
 
-	config := &core.DbConfig{DbConfig: &types.DbConfig{
+	config := &core.DbConfig{&types.DbConfig{
 		DbConn:      dbConn,
 		DbHost:      dbHost,
 		DbUser:      dbUser,
@@ -88,8 +89,10 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		Password:    password,
 		Email:       email,
 		Error:       nil,
-		Location:    ".",
+		Location:    utils.Directory,
 	}}
+
+	fmt.Println(config)
 
 	err := config.Save()
 	if err != nil {
@@ -111,7 +114,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = core.DbConnection(core.Configs.Connection, false, ".")
+	err = core.DbConnection(core.Configs.Connection, false, utils.Directory)
 	if err != nil {
 		utils.Log(3, err)
 		core.DeleteConfig()
@@ -120,13 +123,13 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	admin := &types.User{
+	admin := core.ReturnUser(&types.User{
 		Username: config.Username,
 		Password: config.Password,
 		Email:    config.Email,
 		Admin:    true,
-	}
-	core.CreateUser(admin)
+	})
+	admin.Create()
 
 	if sample == "on" {
 		core.LoadSampleData()

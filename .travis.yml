@@ -56,7 +56,7 @@ before_script:
 
 script:
   - make test-all
-  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make coverage; fi
+  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make coverage; fi
 
 after_success:
-  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then make travis-build; fi
+  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make travis-build; fi
