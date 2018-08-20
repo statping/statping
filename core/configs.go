@@ -32,7 +32,7 @@ func LoadConfig() (*types.Config, error) {
 		return LoadUsingEnv()
 	}
 	Configs = new(types.Config)
-	file, err := ioutil.ReadFile("config.yml")
+	file, err := ioutil.ReadFile(utils.Directory + "/config.yml")
 	if err != nil {
 		return nil, errors.New("config.yml file not found - starting in setup mode")
 	}

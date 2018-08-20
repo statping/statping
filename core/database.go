@@ -104,7 +104,7 @@ func DbConnection(dbType string, retry bool, location string) error {
 
 func waitForDb(dbType string) error {
 	time.Sleep(5 * time.Second)
-	return DbConnection(dbType, true, ".")
+	return DbConnection(dbType, true, utils.Directory)
 }
 
 func DatabaseMaintence() {
@@ -126,7 +126,7 @@ func DeleteAllSince(table string, date time.Time) {
 
 func (c *DbConfig) Save() error {
 	var err error
-	config, err := os.Create("config.yml")
+	config, err := os.Create(utils.Directory + "/config.yml")
 	if err != nil {
 		utils.Log(4, err)
 		return err

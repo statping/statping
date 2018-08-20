@@ -72,7 +72,7 @@ func InitApp() {
 
 func InsertNotifierDB() error {
 	if DbSession == nil {
-		err := DbConnection(CoreApp.DbConnection, false, ".")
+		err := DbConnection(CoreApp.DbConnection, false, utils.Directory)
 		if err != nil {
 			return errors.New("database connection has not been created")
 		}
