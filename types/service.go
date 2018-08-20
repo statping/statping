@@ -45,6 +45,38 @@ type Service struct {
 	LastStatusCode int
 	LastOnline     time.Time
 	DnsLookup      float64 `json:"dns_lookup_time"`
+	ServiceInterface
+}
+
+type ServiceInterface interface {
+	// Database functions
+	Create() (int64, error)
+	Update() error
+	Delete() error
+	// Basic Method functions
+	AvgTime() float64
+	Online24() float32
+	SmallText() string
+	GraphData() string
+	AvgUptime() string
+	ToJSON() string
+	// Failure functions
+	CreateFailure(*Failure) (int64, error)
+	LimitedFailures() []*Failure
+	AllFailures() []*Failure
+	TotalFailures() (uint64, error)
+	TotalFailures24Hours() (uint64, error)
+	// Hits functions (successful responses)
+	CreateHit(*Hit) (int64, error)
+	Hits() ([]*Hit, error)
+	TotalHits() (uint64, error)
+	Sum() (float64, error)
+	LimitedHits() ([]*Hit, error)
+	SelectHitsGroupBy(string) ([]*Hit, error)
+	// Go Routines
+	CheckQueue(bool)
+	// Checkin functions
+	AllCheckins() []*Checkin
 }
 
 func (s *Service) Start() {

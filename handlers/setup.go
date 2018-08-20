@@ -27,7 +27,7 @@ import (
 )
 
 func SetupHandler(w http.ResponseWriter, r *http.Request) {
-	if core.CoreApp.Services != nil {
+	if core.CoreApp.DbServices != nil {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -56,7 +56,7 @@ func SetupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
-	if core.CoreApp.Services != nil {
+	if core.CoreApp.DbServices != nil {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -123,13 +123,13 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	admin := &types.User{
+	admin := core.ReturnUser(&types.User{
 		Username: config.Username,
 		Password: config.Password,
 		Email:    config.Email,
 		Admin:    true,
-	}
-	core.CreateUser(admin)
+	})
+	admin.Create()
 
 	if sample == "on" {
 		core.LoadSampleData()

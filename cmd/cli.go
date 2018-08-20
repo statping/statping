@@ -140,12 +140,12 @@ func RunOnce() {
 	if err != nil {
 		fmt.Println("Core database was not found, Statup is not setup yet.")
 	}
-	core.CoreApp.Services, err = core.SelectAllServices()
+	core.CoreApp.SelectAllServices()
 	if err != nil {
 		utils.Log(4, err)
 	}
-	for _, s := range core.CoreApp.Services {
-		out := core.ServiceCheck(s, true)
+	for _, s := range core.CoreApp.DbServices {
+		out := core.ServiceCheck(core.ReturnService(s), true)
 		fmt.Printf("    Service %v | URL: %v | Latency: %0.0fms | Online: %v\n", out.Name, out.Domain, (out.Latency * 1000), out.Online)
 	}
 }
@@ -194,7 +194,7 @@ func TestPlugin(plug types.PluginActions) {
 	core.OnSuccess(core.SelectService(1))
 	fmt.Println("\n" + BRAKER)
 	fmt.Println(POINT + "Sending 'OnFailure(Service, FailureData)'")
-	fakeFailD := core.FailureData{
+	fakeFailD := &types.Failure{
 		Issue: "No issue, just testing this plugin. This would include HTTP failure information though",
 	}
 	core.OnFailure(core.SelectService(1), fakeFailD)
@@ -260,14 +260,14 @@ func FakeSeed(plug types.PluginActions) {
 		Domain: "https://google.com",
 		Method: "GET",
 	}}
-	core.CreateService(fakeSrv)
+	fakeSrv.Create()
 
 	fakeSrv2 := &core.Service{Service: &types.Service{
 		Name:   "Awesome Plugin Service",
 		Domain: "https://netflix.com",
 		Method: "GET",
 	}}
-	core.CreateService(fakeSrv2)
+	fakeSrv2.Create()
 
 	fakeUser := &types.User{
 		Id:        6334,
@@ -277,7 +277,7 @@ func FakeSeed(plug types.PluginActions) {
 		Admin:     true,
 		CreatedAt: time.Now(),
 	}
-	core.CreateUser(fakeUser)
+	fakeUser.Create()
 
 	fakeUser = &types.User{
 		Id:        6335,
@@ -286,28 +286,28 @@ func FakeSeed(plug types.PluginActions) {
 		Email:     "info@awesome.com",
 		CreatedAt: time.Now(),
 	}
-	core.CreateUser(fakeUser)
+	fakeUser.Create()
 
 	for i := 0; i <= 50; i++ {
-		dd := core.HitData{
+		dd := &types.Hit{
 			Latency: rand.Float64(),
 		}
-		core.CreateServiceHit(fakeSrv, dd)
+		fakeSrv.CreateHit(dd)
 
-		dd = core.HitData{
+		dd = &types.Hit{
 			Latency: rand.Float64(),
 		}
-		core.CreateServiceHit(fakeSrv2, dd)
+		fakeSrv2.CreateHit(dd)
 
-		fail := core.FailureData{
+		fail := &types.Failure{
 			Issue: "This is not an issue, but it would container HTTP response errors.",
 		}
-		core.CreateServiceFailure(fakeSrv, fail)
+		fakeSrv.CreateFailure(fail)
 
-		fail = core.FailureData{
+		fail = &types.Failure{
 			Issue: "HTTP Status Code 521 did not match 200",
 		}
-		core.CreateServiceFailure(fakeSrv, fail)
+		fakeSrv.CreateFailure(fail)
 	}
 
 	fmt.Println("Seeding example data is complete, running Plugin Tests")

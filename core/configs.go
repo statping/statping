@@ -125,7 +125,7 @@ func LoadUsingEnv() (*types.Config, error) {
 			Email:    "info@admin.com",
 			Admin:    true,
 		}
-		CreateUser(admin)
+		admin.Create()
 
 		LoadSampleData()
 

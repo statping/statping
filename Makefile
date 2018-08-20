@@ -1,4 +1,4 @@
-VERSION=0.46
+VERSION=0.47
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -72,10 +72,10 @@ docker-run: docker
 docker-dev: clean
 	docker build -t hunterlong/statup:dev -f dev/Dockerfile-dev .
 
-docker-push-dev: docker-base docker-dev docker-test
+docker-push-dev: docker-base docker-dev docker-cypress
 	docker push hunterlong/statup:dev
 	docker push hunterlong/statup:base
-	docker push hunterlong/statup:test
+	docker push hunterlong/statup:cypress
 
 docker-push-latest: docker
 	docker push hunterlong/statup:latest
@@ -84,14 +84,16 @@ docker-run-dev: docker-dev
 	docker run -t -p 8080:8080 hunterlong/statup:dev
 
 docker-cypress: clean
-	docker build -t hunterlong/statup:test -f dev/Dockerfile-cypress .
+	GOPATH=$(GOPATH) xgo -out statup -go 1.10.x -ldflags "-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT)" --targets=linux/amd64 ./cmd
+	docker build -t hunterlong/statup:cypress -f dev/Dockerfile-cypress .
+	rm -f statup
 
 docker-run-cypress: docker-cypress
-	docker run -t -p 8080:8080 --entrypoint "go test -v -p=1 $(BUILDVERSION) ./..." hunterlong/statup:test
+	docker run -t hunterlong/statup:cypress
 
 docker-base: clean
 	wget -q https://assets.statup.io/sass && chmod +x sass
-	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT) -linkmode external -extldflags -static" -out alpine ./cmd
+	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -linkmode external -extldflags -static" -out alpine ./cmd
 	docker build -t hunterlong/statup:base -f dev/Dockerfile-base .
 
 docker-build-base:

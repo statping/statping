@@ -30,7 +30,6 @@ type PluginRepos types.PluginRepos
 
 type Core struct {
 	*types.Core
-	Services []*Service
 }
 
 var (
@@ -64,7 +63,7 @@ func (c *Core) ToCore() *types.Core {
 func InitApp() {
 	SelectCore()
 	InsertNotifierDB()
-	SelectAllServices()
+	CoreApp.SelectAllServices()
 	CheckServices()
 	CoreApp.Communications = notifiers.Load()
 	go DatabaseMaintence()
@@ -113,7 +112,7 @@ func (c Core) MobileSASS() string {
 }
 
 func (c Core) AllOnline() bool {
-	for _, s := range CoreApp.Services {
+	for _, s := range CoreApp.DbServices {
 		if !s.Online {
 			return false
 		}
@@ -146,10 +145,18 @@ func SelectCore() (*Core, error) {
 	CoreApp.Core = c
 	CoreApp.DbConnection = Configs.Connection
 	CoreApp.Version = VERSION
-	CoreApp.Services, _ = SelectAllServices()
+	CoreApp.SelectAllServices()
 	if os.Getenv("USE_CDN") == "true" {
 		CoreApp.UseCdn = true
 	}
 	//store = sessions.NewCookieStore([]byte(core.ApiSecret))
 	return CoreApp, err
+}
+
+func (c *Core) Services() []*Service {
+	var services []*Service
+	for _, ser := range CoreApp.DbServices {
+		services = append(services, ReturnService(ser))
+	}
+	return services
 }

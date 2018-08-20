@@ -23,7 +23,7 @@ import (
 )
 
 func DeleteConfig() {
-	err := os.Remove("./config.yml")
+	err := os.Remove(utils.Directory + "/config.yml")
 	if err != nil {
 		utils.Log(3, err)
 	}
@@ -35,7 +35,7 @@ type ErrorResponse struct {
 
 func LoadSampleData() error {
 	utils.Log(1, "Inserting Sample Data...")
-	s1 := &Service{&types.Service{
+	s1 := ReturnService(&types.Service{
 		Name:           "Google",
 		Domain:         "https://google.com",
 		ExpectedStatus: 200,
@@ -43,8 +43,8 @@ func LoadSampleData() error {
 		Type:           "http",
 		Method:         "GET",
 		Timeout:        10,
-	}}
-	s2 := &Service{&types.Service{
+	})
+	s2 := ReturnService(&types.Service{
 		Name:           "Statup Github",
 		Domain:         "https://github.com/hunterlong/statup",
 		ExpectedStatus: 200,
@@ -52,8 +52,8 @@ func LoadSampleData() error {
 		Type:           "http",
 		Method:         "GET",
 		Timeout:        20,
-	}}
-	s3 := &Service{&types.Service{
+	})
+	s3 := ReturnService(&types.Service{
 		Name:           "JSON Users Test",
 		Domain:         "https://jsonplaceholder.typicode.com/users",
 		ExpectedStatus: 200,
@@ -61,8 +61,8 @@ func LoadSampleData() error {
 		Type:           "http",
 		Method:         "GET",
 		Timeout:        30,
-	}}
-	s4 := &Service{&types.Service{
+	})
+	s4 := ReturnService(&types.Service{
 		Name:           "JSON API Tester",
 		Domain:         "https://jsonplaceholder.typicode.com/posts",
 		ExpectedStatus: 201,
@@ -72,32 +72,32 @@ func LoadSampleData() error {
 		Method:         "POST",
 		PostData:       `{ "title": "statup", "body": "bar", "userId": 19999 }`,
 		Timeout:        30,
-	}}
-	s5 := &Service{&types.Service{
+	})
+	s5 := ReturnService(&types.Service{
 		Name:     "Google DNS",
 		Domain:   "8.8.8.8",
 		Interval: 20,
 		Type:     "tcp",
 		Port:     53,
 		Timeout:  120,
-	}}
-	id, err := CreateService(s1)
+	})
+	id, err := s1.Create()
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error creating Service %v: %v", id, err))
 	}
-	id, err = CreateService(s2)
+	id, err = s2.Create()
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error creating Service %v: %v", id, err))
 	}
-	id, err = CreateService(s3)
+	id, err = s3.Create()
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error creating Service %v: %v", id, err))
 	}
-	id, err = CreateService(s4)
+	id, err = s4.Create()
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error creating Service %v: %v", id, err))
 	}
-	id, err = CreateService(s5)
+	id, err = s5.Create()
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error creating TCP Service %v: %v", id, err))
 	}

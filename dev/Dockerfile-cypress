@@ -5,14 +5,11 @@ MAINTAINER "Hunter Long (https://github.com/hunterlong)"
 WORKDIR $HOME/statup
 ADD dev/test .
 
-ENV VERSION=v0.46
-
-RUN wget -q https://github.com/hunterlong/statup/releases/download/$VERSION/statup-linux-alpine.tar.gz && \
-    tar -xvzf statup-linux-alpine.tar.gz && \
-    chmod +x statup && \
-    mv statup /usr/local/bin/statup
-
 RUN npm install node-sass
 ENV SASS=node-sass
 RUN npm install
+
+ADD ./statup /usr/local/bin/statup
+RUN statup version
+
 RUN npm run test-docker

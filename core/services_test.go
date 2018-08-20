@@ -27,7 +27,7 @@ var (
 )
 
 func TestSelectAllServices(t *testing.T) {
-	services, err := SelectAllServices()
+	services, err := CoreApp.SelectAllServices()
 	assert.Nil(t, err)
 	assert.Equal(t, 5, len(services))
 }
@@ -49,19 +49,19 @@ func TestUpdateService(t *testing.T) {
 	assert.Equal(t, "Google", service.Name)
 	srv := service
 	srv.Name = "Updated Google"
-	newService := UpdateService(srv)
-	assert.Equal(t, "Updated Google", newService.Name)
+	err := srv.Update()
+	assert.Nil(t, err)
 }
 
 func TestUpdateAllServices(t *testing.T) {
-	services, err := SelectAllServices()
+	services, err := CoreApp.SelectAllServices()
 	assert.Nil(t, err)
 	for k, s := range services {
-		srv := s
+		srv := ReturnService(s)
 		srv.Name = "Changed " + srv.Name
 		srv.Interval = k + 3
-		newService := UpdateService(srv)
-		assert.Contains(t, newService.Name, "Changed")
+		err := srv.Update()
+		assert.Nil(t, err)
 	}
 }
 
@@ -146,7 +146,7 @@ func TestCountOnline(t *testing.T) {
 }
 
 func TestCreateService(t *testing.T) {
-	s := &Service{&types.Service{
+	s := ReturnService(&types.Service{
 		Name:           "That'll do 🐢",
 		Domain:         "https://www.youtube.com/watch?v=rjQtzV9IZ0Q",
 		ExpectedStatus: 200,
@@ -154,9 +154,9 @@ func TestCreateService(t *testing.T) {
 		Type:           "http",
 		Method:         "GET",
 		Timeout:        20,
-	}}
+	})
 	var err error
-	newServiceId, err = CreateService(s)
+	newServiceId, err = s.Create()
 	assert.Nil(t, err)
 	assert.NotZero(t, newServiceId)
 	newService := SelectService(newServiceId)
@@ -170,7 +170,7 @@ func TestViewNewService(t *testing.T) {
 }
 
 func TestCreateFailingHTTPService(t *testing.T) {
-	s := &Service{&types.Service{
+	s := ReturnService(&types.Service{
 		Name:           "Bad URL",
 		Domain:         "http://localhost/iamnothere",
 		ExpectedStatus: 200,
@@ -178,9 +178,9 @@ func TestCreateFailingHTTPService(t *testing.T) {
 		Type:           "http",
 		Method:         "GET",
 		Timeout:        5,
-	}}
+	})
 	var err error
-	newServiceId, err = CreateService(s)
+	newServiceId, err = s.Create()
 	assert.Nil(t, err)
 	assert.NotZero(t, newServiceId)
 	newService := SelectService(newServiceId)
@@ -195,16 +195,16 @@ func TestServiceFailedCheck(t *testing.T) {
 }
 
 func TestCreateFailingTCPService(t *testing.T) {
-	s := &Service{&types.Service{
+	s := ReturnService(&types.Service{
 		Name:     "Bad TCP",
 		Domain:   "localhost",
 		Port:     5050,
 		Interval: 30,
 		Type:     "tcp",
 		Timeout:  5,
-	}}
+	})
 	var err error
-	newServiceId, err = CreateService(s)
+	newServiceId, err = s.Create()
 	assert.Nil(t, err)
 	assert.NotZero(t, newServiceId)
 	newService := SelectService(newServiceId)
@@ -219,13 +219,12 @@ func TestServiceFailedTCPCheck(t *testing.T) {
 }
 
 func TestCreateServiceFailure(t *testing.T) {
-
-	fail := FailureData{
-		Issue: "This is not an issue, but it would container HTTP response errors.",
+	fail := &types.Failure{
+		Issue:  "This is not an issue, but it would container HTTP response errors.",
+		Method: "http",
 	}
 	service := SelectService(8)
-
-	id, err := CreateServiceFailure(service, fail)
+	id, err := service.CreateFailure(fail)
 	assert.Nil(t, err)
 	assert.NotZero(t, id)
 }
@@ -233,34 +232,33 @@ func TestCreateServiceFailure(t *testing.T) {
 func TestDeleteService(t *testing.T) {
 	service := SelectService(newServiceId)
 
-	count, err := SelectAllServices()
+	count, err := CoreApp.SelectAllServices()
 	assert.Nil(t, err)
 	assert.Equal(t, 8, len(count))
 
-	err = DeleteService(service)
+	err = service.Delete()
 	assert.Nil(t, err)
 
-	count, err = SelectAllServices()
+	count, err = CoreApp.SelectAllServices()
 	assert.Nil(t, err)
 	assert.Equal(t, 7, len(count))
 }
 
 func TestServiceCloseRoutine(t *testing.T) {
-	s := new(types.Service)
+	s := ReturnService(new(types.Service))
 	s.Name = "example"
 	s.Domain = "https://google.com"
 	s.Type = "http"
 	s.Method = "GET"
 	s.ExpectedStatus = 200
 	s.Interval = 1
-	service := NewService(s)
-	service.Start()
-	assert.True(t, service.IsRunning())
-	go CheckQueue(service, false)
+	s.Start()
+	assert.True(t, s.IsRunning())
+	go s.CheckQueue(false)
 	time.Sleep(5 * time.Second)
-	assert.True(t, service.IsRunning())
-	service.Close()
-	assert.False(t, service.IsRunning())
-	service.Close()
-	assert.False(t, service.IsRunning())
+	assert.True(t, s.IsRunning())
+	s.Close()
+	assert.False(t, s.IsRunning())
+	s.Close()
+	assert.False(t, s.IsRunning())
 }
