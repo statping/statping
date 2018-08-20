@@ -22,13 +22,13 @@ import (
 )
 
 func TestCreateUser(t *testing.T) {
-	user := &types.User{
+	user := ReturnUser(&types.User{
 		Username: "hunter",
 		Password: "password123",
 		Email:    "test@email.com",
 		Admin:    true,
-	}
-	userId, err := CreateUser(user)
+	})
+	userId, err := user.Create()
 	assert.Nil(t, err)
 	assert.NotZero(t, userId)
 }
@@ -58,7 +58,7 @@ func TestUpdateUser(t *testing.T) {
 	user, err := SelectUser(1)
 	assert.Nil(t, err)
 	user.Username = "updated"
-	err = UpdateUser(user)
+	err = user.Update()
 	assert.Nil(t, err)
 	updatedUser, err := SelectUser(1)
 	assert.Nil(t, err)
@@ -66,13 +66,13 @@ func TestUpdateUser(t *testing.T) {
 }
 
 func TestCreateUser2(t *testing.T) {
-	user := &types.User{
+	user := ReturnUser(&types.User{
 		Username: "hunterlong",
 		Password: "password123",
 		Email:    "user@email.com",
 		Admin:    true,
-	}
-	userId, err := CreateUser(user)
+	})
+	userId, err := user.Create()
 	assert.Nil(t, err)
 	assert.NotZero(t, userId)
 }
@@ -108,6 +108,6 @@ func TestCheckPassword(t *testing.T) {
 func TestDeleteUser(t *testing.T) {
 	user, err := SelectUser(2)
 	assert.Nil(t, err)
-	err = DeleteUser(user)
+	err = user.Delete()
 	assert.Nil(t, err)
 }

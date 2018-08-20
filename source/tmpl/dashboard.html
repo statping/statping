@@ -47,31 +47,28 @@
             <h3>Services</h3>
 
             <div class="list-group mb-5 mt-3">
-            {{ range .Services }}
-            {{ $s := . }}
+            {{ range .Core.Services }}
                 <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                     <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{{$s.Name}}</h5>
-                    <small>{{if $s.Online}} <span class="badge badge-success">ONLINE</span> {{else}} <span class="badge badge-danger">OFFLINE</span> {{end}}</small>
+                        <h5 class="mb-1">{{.Name}}</h5>
+                    <small>{{if .Online}} <span class="badge badge-success">ONLINE</span> {{else}} <span class="badge badge-danger">OFFLINE</span> {{end}}</small>
                     </div>
                     <p class="mb-1">{{.SmallText}}</p>
                 </a>
             {{ end }}
             </div>
 
-        {{ range .Services }}
-        {{ $s := . }}
+        {{ range .Core.Services }}
                 {{ if .LimitedFailures }}
-                    <h4>{{$s.Name}} Failures</h4>
+                    <h4>{{.Name}} Failures</h4>
                     <div class="list-group mt-3 mb-4">
                     {{ range .LimitedFailures }}
-                    {{ $f := .ToFailure }}
                         <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                             <div class="d-flex w-100 justify-content-between">
                                 <h5 class="mb-1">{{.ParseError}}</h5>
                                 <small>Reported {{.Ago}}</small>
                             </div>
-                            <p class="mb-1">{{$f.Issue}}</p>
+                            <p class="mb-1">{{.Issue}}</p>
                         </a>
                     {{ end }}
                     </div>

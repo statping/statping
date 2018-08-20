@@ -29,8 +29,8 @@ type Service struct {
 	*types.Service
 }
 
-type Failure struct {
-	F interface{}
+func ReturnService(s *types.Service) *Service {
+	return &Service{Service: s}
 }
 
 func serviceCol() db.Collection {
@@ -38,32 +38,37 @@ func serviceCol() db.Collection {
 }
 
 func SelectService(id int64) *Service {
-	for _, s := range CoreApp.Services {
+	for _, s := range CoreApp.DbServices {
 		if s.Id == id {
-			return s
+			return ReturnService(s)
 		}
 	}
 	return nil
 }
 
-func SelectAllServices() ([]*Service, error) {
+func (c *Core) SelectAllServices() ([]*types.Service, error) {
 	var services []*types.Service
-	var sers []*Service
+	var servs []*types.Service
 	col := serviceCol().Find()
 	err := col.All(&services)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("service error: %v", err))
 		return nil, err
 	}
-	for _, s := range services {
-		ser := NewService(s)
-		ser.Start()
-		ser.Checkins = SelectAllCheckins(s)
-		ser.Failures = SelectAllFailures(s)
-		sers = append(sers, ser)
+	for _, ser := range services {
+		single := ReturnService(ser)
+		single.Start()
+		single.AllCheckins()
+		single.AllFailures()
+		servs = append(servs, single.Service)
 	}
-	CoreApp.Services = sers
-	return sers, err
+	CoreApp.DbServices = servs
+	return services, err
+}
+
+func (s *Service) ToJSON() string {
+	data, _ := json.Marshal(s)
+	return string(data)
 }
 
 func (s *Service) AvgTime() float64 {
@@ -104,8 +109,10 @@ type DateScan struct {
 	Value     int64     `json:"y"`
 }
 
-func NewService(s *types.Service) *Service {
-	return &Service{s}
+func (s *Service) lastFailure() *Failure {
+	limited := s.LimitedFailures()
+	last := limited[len(limited)-1]
+	return last
 }
 
 func (s *Service) SmallText() string {
@@ -119,8 +126,8 @@ func (s *Service) SmallText() string {
 		}
 	}
 	if len(last) > 0 {
-		lastFailure := MakeFailure(last[0].ToFailure())
-		return fmt.Sprintf("%v on %v", lastFailure.ParseError(), last[0].ToFailure().CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
+		lastFailure := s.lastFailure()
+		return fmt.Sprintf("%v on %v", lastFailure.ParseError(), last[0].CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
 	} else {
 		return fmt.Sprintf("%v is currently offline", s.Name)
 	}
@@ -142,9 +149,7 @@ func GroupDataBy(column string, id int64, tm time.Time, increment string) string
 func (s *Service) GraphData() string {
 	var d []*DateScan
 	since := time.Now().Add(time.Hour*-24 + time.Minute*0 + time.Second*0)
-
 	sql := GroupDataBy("hits", s.Id, since, "minute")
-
 	dated, err := DbSession.Query(db.Raw(sql))
 	if err != nil {
 		utils.Log(2, err)
@@ -196,18 +201,29 @@ func (s *Service) AvgUptime() string {
 	return s.TotalUptime
 }
 
-func RemoveArray(u *Service) []*Service {
-	var srvcs []*Service
-	for _, s := range CoreApp.Services {
+func RemoveArray(u *Service) []*types.Service {
+	var srvcs []*types.Service
+	for _, s := range CoreApp.DbServices {
 		if s.Id != u.Id {
 			srvcs = append(srvcs, s)
 		}
 	}
-	CoreApp.Services = srvcs
+	CoreApp.DbServices = srvcs
 	return srvcs
 }
 
-func DeleteService(u *Service) error {
+func updateService(new *Service) {
+	var services []*types.Service
+	for _, s := range CoreApp.DbServices {
+		if s.Id == new.Id {
+			s = new.Service
+		}
+		services = append(services, s)
+	}
+	CoreApp.DbServices = services
+}
+
+func (u *Service) Delete() error {
 	res := serviceCol().Find("id", u.Id)
 	err := res.Delete()
 	if err != nil {
@@ -220,36 +236,25 @@ func DeleteService(u *Service) error {
 	return err
 }
 
-func UpdateService(service *Service) *Service {
-	service.CreatedAt = time.Now()
-	res := serviceCol().Find("id", service.Id)
-	err := res.Update(service)
+func (u *Service) Update() error {
+	u.CreatedAt = time.Now()
+	res := serviceCol().Find("id", u.Id)
+	err := res.Update(u)
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", service.Name, err))
-		return service
+		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", u.Name, err))
+		return err
 	}
-	updateService(service)
-	CoreApp.Services, err = SelectAllServices()
+	updateService(u)
+	CoreApp.SelectAllServices()
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("error selecting all services: %v", err))
-		return service
+		return err
 	}
-	OnUpdateService(service)
-	return service
+	OnUpdateService(u)
+	return err
 }
 
-func updateService(new *Service) {
-	var services []*Service
-	for _, s := range CoreApp.Services {
-		if s.Id == new.Id {
-			s = new
-		}
-		services = append(services, s)
-	}
-	CoreApp.Services = services
-}
-
-func CreateService(u *Service) (int64, error) {
+func (u *Service) Create() (int64, error) {
 	u.CreatedAt = time.Now()
 	uuid, err := serviceCol().Insert(u)
 	if uuid == nil {
@@ -258,13 +263,13 @@ func CreateService(u *Service) (int64, error) {
 	}
 	u.Id = uuid.(int64)
 	u.Start()
-	CoreApp.Services = append(CoreApp.Services, u)
+	CoreApp.DbServices = append(CoreApp.DbServices, u.Service)
 	return uuid.(int64), err
 }
 
 func CountOnline() int {
 	amount := 0
-	for _, s := range CoreApp.Services {
+	for _, s := range CoreApp.DbServices {
 		if s.Online {
 			amount++
 		}

@@ -32,7 +32,7 @@ func LoadConfig() (*types.Config, error) {
 		return LoadUsingEnv()
 	}
 	Configs = new(types.Config)
-	file, err := ioutil.ReadFile("config.yml")
+	file, err := ioutil.ReadFile(utils.Directory + "/config.yml")
 	if err != nil {
 		return nil, errors.New("config.yml file not found - starting in setup mode")
 	}
@@ -74,7 +74,7 @@ func LoadUsingEnv() (*types.Config, error) {
 		CoreApp.UseCdn = true
 	}
 
-	dbConfig := &DbConfig{DbConfig: &types.DbConfig{
+	dbConfig := &DbConfig{&types.DbConfig{
 		DbConn:      os.Getenv("DB_CONN"),
 		DbHost:      os.Getenv("DB_HOST"),
 		DbUser:      os.Getenv("DB_USER"),
@@ -89,7 +89,7 @@ func LoadUsingEnv() (*types.Config, error) {
 		Email:       "info@localhost.com",
 	}}
 
-	err := DbConnection(dbConfig.DbConn, true, ".")
+	err := DbConnection(dbConfig.DbConn, true, utils.Directory)
 	if err != nil {
 		utils.Log(4, err)
 		return nil, err
@@ -125,7 +125,7 @@ func LoadUsingEnv() (*types.Config, error) {
 			Email:    "info@admin.com",
 			Admin:    true,
 		}
-		CreateUser(admin)
+		admin.Create()
 
 		LoadSampleData()
 

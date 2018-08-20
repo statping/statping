@@ -16,6 +16,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
@@ -52,7 +53,12 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
-	user, _ := core.SelectUser(int64(id))
+	user, err := core.SelectUser(int64(id))
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("user error: %v", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	user.Username = r.PostForm.Get("username")
 	user.Email = r.PostForm.Get("email")
@@ -61,7 +67,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 	if password != "##########" {
 		user.Password = utils.HashPassword(password)
 	}
-	core.UpdateUser(user)
+	user.Update()
 	users, _ := core.SelectAllUsers()
 	ExecuteResponse(w, r, "users.html", users)
 }
@@ -77,15 +83,15 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	email := r.PostForm.Get("email")
 	admin := r.PostForm.Get("admin")
 
-	user := &types.User{
+	user := core.ReturnUser(&types.User{
 		Username: username,
 		Password: password,
 		Email:    email,
 		Admin:    (admin == "on"),
-	}
-	_, err := core.CreateUser(user)
+	})
+	_, err := user.Create()
 	if err != nil {
-		utils.Log(2, err)
+		utils.Log(3, err)
 	}
 	core.OnNewUser(user)
 	http.Redirect(w, r, "/users", http.StatusSeeOther)
@@ -106,6 +112,6 @@ func UsersDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/users", http.StatusSeeOther)
 		return
 	}
-	core.DeleteUser(user)
+	user.Delete()
 	http.Redirect(w, r, "/users", http.StatusSeeOther)
 }

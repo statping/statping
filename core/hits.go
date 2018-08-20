@@ -22,18 +22,17 @@ import (
 	"upper.io/db.v3"
 )
 
-type Hit types.Hit
+type Hit struct {
+	*types.Hit
+}
 
 func hitCol() db.Collection {
 	return DbSession.Collection("hits")
 }
 
-func CreateServiceHit(s *Service, d HitData) (int64, error) {
-	h := Hit{
-		Service:   s.Id,
-		Latency:   d.Latency,
-		CreatedAt: time.Now(),
-	}
+func (s *Service) CreateHit(h *types.Hit) (int64, error) {
+	h.CreatedAt = time.Now()
+	h.Service = s.Id
 	uuid, err := hitCol().Insert(h)
 	if uuid == nil {
 		utils.Log(2, err)
@@ -42,8 +41,8 @@ func CreateServiceHit(s *Service, d HitData) (int64, error) {
 	return uuid.(int64), err
 }
 
-func (s *Service) Hits() ([]Hit, error) {
-	var hits []Hit
+func (s *Service) Hits() ([]*Hit, error) {
+	var hits []*Hit
 	col := hitCol().Find("service", s.Id).OrderBy("-id")
 	err := col.All(&hits)
 	return hits, err
@@ -63,8 +62,8 @@ func reverseHits(input []*Hit) []*Hit {
 	return append(reverseHits(input[1:]), input[0])
 }
 
-func (s *Service) SelectHitsGroupBy(group string) ([]Hit, error) {
-	var hits []Hit
+func (s *Service) SelectHitsGroupBy(group string) ([]*Hit, error) {
+	var hits []*Hit
 	col := hitCol().Find("service", s.Id)
 	err := col.All(&hits)
 	return hits, err

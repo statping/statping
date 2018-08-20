@@ -22,7 +22,6 @@ import (
 )
 
 type dashboard struct {
-	Services        []*core.Service
 	Core            *core.Core
 	CountOnline     int
 	CountServices   int
@@ -35,7 +34,7 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 		ExecuteResponse(w, r, "login.html", err)
 	} else {
 		fails := core.CountFailures()
-		out := dashboard{core.CoreApp.Services, core.CoreApp, core.CountOnline(), len(core.CoreApp.Services), fails}
+		out := dashboard{core.CoreApp, core.CountOnline(), len(core.CoreApp.Services()), fails}
 		ExecuteResponse(w, r, "dashboard.html", out)
 	}
 }

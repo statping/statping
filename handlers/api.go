@@ -79,8 +79,7 @@ func ApiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	var s *types.Service
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&s)
-	service := serv
-	core.UpdateService(service)
+	serv.Update()
 	json.NewEncoder(w).Encode(s)
 }
 
@@ -89,7 +88,7 @@ func ApiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
-	services, _ := core.SelectAllServices()
+	services, _ := core.CoreApp.SelectAllServices()
 	json.NewEncoder(w).Encode(services)
 }
 

@@ -1,4 +1,4 @@
-VERSION=0.46
+VERSION=0.47
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -72,10 +72,10 @@ docker-run: docker
 docker-dev: clean
 	docker build -t hunterlong/statup:dev -f dev/Dockerfile-dev .
 
-docker-push-dev: docker-base docker-dev docker-test
+docker-push-dev: docker-base docker-dev docker-cypress
 	docker push hunterlong/statup:dev
 	docker push hunterlong/statup:base
-	docker push hunterlong/statup:test
+	docker push hunterlong/statup:cypress
 
 docker-push-latest: docker
 	docker push hunterlong/statup:latest
@@ -83,15 +83,17 @@ docker-push-latest: docker
 docker-run-dev: docker-dev
 	docker run -t -p 8080:8080 hunterlong/statup:dev
 
-docker-test: docker-dev clean
-	docker build -t hunterlong/statup:test -f dev/Dockerfile-test .
+docker-cypress: clean
+	GOPATH=$(GOPATH) xgo -out statup -go 1.10.x -ldflags "-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT)" --targets=linux/amd64 ./cmd
+	docker build -t hunterlong/statup:cypress -f dev/Dockerfile-cypress .
+	rm -f statup
 
-docker-run-test: docker-test
-	docker run -t -p 8080:8080 --entrypoint "go test -v -p=1 $(BUILDVERSION) ./..." hunterlong/statup:test
+docker-run-cypress: docker-cypress
+	docker run -t hunterlong/statup:cypress
 
 docker-base: clean
 	wget -q https://assets.statup.io/sass && chmod +x sass
-	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT) -linkmode external -extldflags -static" -out alpine ./cmd
+	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -linkmode external -extldflags -static" -out alpine ./cmd
 	docker build -t hunterlong/statup:base -f dev/Dockerfile-base .
 
 docker-build-base:
@@ -124,13 +126,13 @@ dev-deps: dep
 
 clean:
 	rm -rf ./{logs,assets,plugins,statup.db,config.yml,.sass-cache,config.yml,statup,build}
-	rm -rf cmd/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
-	rm -rf core/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
-	rm -rf handlers/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
-	rm -rf notifiers/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
-	rm -rf source/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
-	rm -rf types/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
-	rm -rf utils/{logs,assets,plugins,statup.db,config.yml,.sass-cache}
+	rm -rf cmd/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf core/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf handlers/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf notifiers/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf source/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf types/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf utils/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf dev/test/cypress/videos
 	rm -rf .sass-cache
 	rm -f coverage.out
@@ -167,7 +169,7 @@ publish-homebrew:
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(PUBLISH_BODY) https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statup/requests
 
 cypress-install:
-	cd /test && npm install
+	cd dev/test && npm install
 
 cypress-test: clean cypress-install
 	cd dev/test && npm test
