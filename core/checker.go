@@ -41,6 +41,8 @@ func CheckServices() {
 }
 
 func (s *Service) CheckQueue(record bool) {
+	s.Checkpoint = time.Now()
+
 CheckLoop:
 	for {
 		select {
