@@ -9,7 +9,7 @@ RUN npm install node-sass
 ENV SASS=node-sass
 RUN npm install
 
-ADD ./statup /usr/local/bin/statup
+ADD ./statup-linux-amd64 /usr/local/bin/statup
 RUN statup version
 
 RUN npm run test-docker
