@@ -1,4 +1,4 @@
-VERSION=0.47
+VERSION=0.48
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -69,13 +69,19 @@ docker:
 docker-run: docker
 	docker run -it -p 8080:8080 hunterlong/statup:latest
 
-docker-dev: clean
+docker-dev: clean docker-base
 	docker build -t hunterlong/statup:dev -f dev/Dockerfile-dev .
 
 docker-push-dev: docker-base docker-dev docker-cypress
 	docker push hunterlong/statup:dev
+	docker tag hunterlong/statup:base hunterlong/statup:base-v$(VERSION)
 	docker push hunterlong/statup:base
 	docker push hunterlong/statup:cypress
+
+docker-push-base:
+	docker tag hunterlong/statup:base hunterlong/statup:base-v$(VERSION)
+	docker push hunterlong/statup:base
+	docker push hunterlong/statup:base-v$(VERSION)
 
 docker-push-latest: docker
 	docker push hunterlong/statup:latest
@@ -97,7 +103,11 @@ docker-base: clean
 	docker build -t hunterlong/statup:base -f dev/Dockerfile-base .
 
 docker-build-base:
-	docker build -t hunterlong/statup:base -f dev/Dockerfile-base .
+	docker build -t hunterlong/statup:base --no-cache -f dev/Dockerfile-base .
+	docker tag hunterlong/statup:base hunterlong/statup:base-v$(VERSION)
+
+docker-build-latest:
+	docker build -t hunterlong/statup:latest --no-cache -f Dockerfile .
 
 databases:
 	docker run --name statup_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password123 -e POSTGRES_USER=root -e POSTGRES_DB=root -d postgres
