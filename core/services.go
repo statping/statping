@@ -49,7 +49,7 @@ func SelectService(id int64) *Service {
 func (c *Core) SelectAllServices() ([]*types.Service, error) {
 	var services []*types.Service
 	var servs []*types.Service
-	col := serviceCol().Find().OrderBy("order")
+	col := serviceCol().Find().OrderBy("order_id")
 	err := col.All(&services)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("service error: %v", err))

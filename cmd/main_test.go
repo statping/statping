@@ -85,7 +85,7 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" Select Core", func(t *testing.T) {
 			RunSelectCoreMYQL(t, dbt)
 		})
-		t.Run(dbt+" Select DbServices", func(t *testing.T) {
+		t.Run(dbt+" Select Services", func(t *testing.T) {
 			RunSelectAllMysqlServices(t)
 		})
 		t.Run(dbt+" Select Comms", func(t *testing.T) {
