@@ -35,6 +35,7 @@ run: build
 compile:
 	cd source && $(GOPATH)/bin/rice embed-go
 	sass source/scss/base.scss source/css/base.css
+	rm -rf .sass-cache
 
 test: clean compile install
 	STATUP_DIR=$(TEST_DIR) go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./...
@@ -102,7 +103,7 @@ docker-base: clean
 	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -linkmode external -extldflags -static" -out alpine ./cmd
 	docker build -t hunterlong/statup:base -f dev/Dockerfile-base .
 
-docker-build-base:
+docker-build-base: docker-base
 	docker build -t hunterlong/statup:base --no-cache -f dev/Dockerfile-base .
 	docker tag hunterlong/statup:base hunterlong/statup:base-v$(VERSION)
 
@@ -135,7 +136,7 @@ dev-deps: dep
 	$(GOCMD) get github.com/mgechev/revive
 
 clean:
-	rm -rf ./{logs,assets,plugins,statup.db,config.yml,.sass-cache,config.yml,statup,build}
+	rm -rf ./{logs,assets,plugins,statup.db,config.yml,.sass-cache,config.yml,statup,build,.sass-cache,statup.db}
 	rm -rf cmd/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf core/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf handlers/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
@@ -144,7 +145,6 @@ clean:
 	rm -rf types/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf utils/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf dev/test/cypress/videos
-	rm -rf .sass-cache
 	rm -f coverage.out
 	rm -f coverage.json
 

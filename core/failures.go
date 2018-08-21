@@ -55,13 +55,14 @@ func (s *Service) AllFailures() []*types.Failure {
 	return fails
 }
 
-func DeleteFailures(u *Service) {
+func (u *Service) DeleteFailures() {
 	var fails []*Failure
 	col := DbSession.Collection("failures")
 	col.Find("service", u.Id).All(&fails)
 	for _, fail := range fails {
 		fail.Delete()
 	}
+	u.Failures = nil
 }
 
 func (s *Service) LimitedFailures() []*Failure {

@@ -116,6 +116,7 @@
                     <label for="post_data" class="col-sm-4 col-form-label">Optional Post Data (JSON)</label>
                     <div class="col-sm-8">
                         <textarea name="post_data" class="form-control" id="post_data" rows="3" autocapitalize="false" spellcheck="false">{{.PostData}}</textarea>
+                        <small id="emailHelp" class="form-text text-muted">You can insert <a target="_blank" href="https://regex101.com/r/I5bbj9/1">Regex</a> to validate the response</small>
                     </div>
                 </div>
                 <div class="form-group row{{if eq .Type "tcp"}} d-none{{end}}">
@@ -140,12 +141,19 @@
                     <label for="service_interval" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
                     <div class="col-sm-8">
                         <input type="number" name="interval" class="form-control" value="{{.Interval}}" id="service_interval" required>
+                        <small id="emailHelp" class="form-text text-muted">10,000+ will be checked in Microseconds (1 millisecond = 1000 microseconds).</small>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="service_timeout" class="col-sm-4 col-form-label">Timeout in Seconds</label>
                     <div class="col-sm-8">
                         <input type="number" name="timeout" class="form-control" value="{{.Timeout}}" id="service_timeout" min="1" placeholder="30">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="order" class="col-sm-4 col-form-label">List Order</label>
+                    <div class="col-sm-8">
+                        <input type="number" name="order" class="form-control" min="0" value="{{.Order}}" id="order">
                     </div>
                 </div>
                 <div class="form-group row">

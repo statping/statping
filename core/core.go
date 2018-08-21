@@ -112,7 +112,7 @@ func (c Core) MobileSASS() string {
 }
 
 func (c Core) AllOnline() bool {
-	for _, s := range CoreApp.DbServices {
+	for _, s := range CoreApp.Services() {
 		if !s.Online {
 			return false
 		}
@@ -155,7 +155,7 @@ func SelectCore() (*Core, error) {
 
 func (c *Core) Services() []*Service {
 	var services []*Service
-	for _, ser := range CoreApp.DbServices {
+	for _, ser := range CoreApp.GetServices() {
 		services = append(services, ReturnService(ser))
 	}
 	return services

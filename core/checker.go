@@ -30,7 +30,7 @@ import (
 
 func CheckServices() {
 	CoreApp.SelectAllServices()
-	utils.Log(1, fmt.Sprintf("Starting monitoring process for %v DbServices", len(CoreApp.DbServices)))
+	utils.Log(1, fmt.Sprintf("Starting monitoring process for %v DbServices", len(CoreApp.Services())))
 	for _, ser := range CoreApp.Services() {
 		//go obj.StartCheckins()
 		go ser.CheckQueue(true)
@@ -50,13 +50,23 @@ CheckLoop:
 			utils.Log(1, fmt.Sprintf("Checking service: %v", s.Name))
 			s.Check(record)
 			// Set next time checkpoint and maybe sleep.
-			s.Checkpoint = s.Checkpoint.Add(time.Duration(s.Interval) * time.Second)
+			s.Checkpoint = s.Checkpoint.Add(s.duration())
 			if sleepDuration := s.Checkpoint.Sub(time.Now()); sleepDuration > 0 {
 				time.Sleep(sleepDuration)
 			}
 			continue
 		}
 	}
+}
+
+func (s *Service) duration() time.Duration {
+	var amount time.Duration
+	if s.Interval >= 10000 {
+		amount = time.Duration(s.Interval) * time.Microsecond
+	} else {
+		amount = time.Duration(s.Interval) * time.Second
+	}
+	return amount
 }
 
 func (s *Service) dnsCheck() (float64, error) {

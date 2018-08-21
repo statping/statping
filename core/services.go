@@ -38,9 +38,9 @@ func serviceCol() db.Collection {
 }
 
 func SelectService(id int64) *Service {
-	for _, s := range CoreApp.DbServices {
+	for _, s := range CoreApp.Services() {
 		if s.Id == id {
-			return ReturnService(s)
+			return s
 		}
 	}
 	return nil
@@ -49,7 +49,7 @@ func SelectService(id int64) *Service {
 func (c *Core) SelectAllServices() ([]*types.Service, error) {
 	var services []*types.Service
 	var servs []*types.Service
-	col := serviceCol().Find()
+	col := serviceCol().Find().OrderBy("order")
 	err := col.All(&services)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("service error: %v", err))
@@ -62,7 +62,7 @@ func (c *Core) SelectAllServices() ([]*types.Service, error) {
 		single.AllFailures()
 		servs = append(servs, single.Service)
 	}
-	CoreApp.DbServices = servs
+	CoreApp.SetServices(servs)
 	return services, err
 }
 
@@ -201,13 +201,8 @@ func (s *Service) AvgUptime() string {
 	return s.TotalUptime
 }
 
-func removeService(s int) []*types.Service {
-	slice := CoreApp.DbServices
-	return append(slice[:s], slice[s+1:]...)
-}
-
 func (s *Service) index() int {
-	for k, service := range CoreApp.DbServices {
+	for k, service := range CoreApp.Services() {
 		if s.Id == service.Id {
 			return k
 		}
@@ -216,11 +211,10 @@ func (s *Service) index() int {
 }
 
 func updateService(service *Service) {
-	service.Close()
 	service.Start()
 	go service.CheckQueue(true)
 	index := service.index()
-	CoreApp.DbServices[index] = service.Service
+	CoreApp.UpdateService(index, service.Service)
 }
 
 func (u *Service) Delete() error {
@@ -231,7 +225,7 @@ func (u *Service) Delete() error {
 		return err
 	}
 	u.Close()
-	CoreApp.DbServices = removeService(u.index())
+	CoreApp.RemoveService(u.index())
 	OnDeletedService(u)
 	return err
 }
@@ -244,6 +238,7 @@ func (u *Service) Update() error {
 		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", u.Name, err))
 		return err
 	}
+	u.Close()
 	updateService(u)
 	OnUpdateService(u)
 	return err
@@ -258,13 +253,13 @@ func (u *Service) Create() (int64, error) {
 	}
 	u.Id = uuid.(int64)
 	u.Start()
-	CoreApp.DbServices = append(CoreApp.DbServices, u.Service)
+	CoreApp.AddService(u.Service)
 	return uuid.(int64), err
 }
 
 func CountOnline() int {
 	amount := 0
-	for _, s := range CoreApp.DbServices {
+	for _, s := range CoreApp.Services() {
 		if s.Online {
 			amount++
 		}

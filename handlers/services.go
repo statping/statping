@@ -41,7 +41,7 @@ func ServicesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "services.html", core.CoreApp.DbServices)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services())
 }
 
 func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -60,6 +60,11 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	timeout, _ := strconv.Atoi(r.PostForm.Get("timeout"))
 	checkType := r.PostForm.Get("check_type")
 	postData := r.PostForm.Get("post_data")
+	order, _ := strconv.Atoi(r.PostForm.Get("order"))
+
+	if checkType == "http" && status == 0 {
+		status = 200
+	}
 
 	service := core.ReturnService(&types.Service{
 		Name:           name,
@@ -72,6 +77,7 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 		Port:           port,
 		PostData:       postData,
 		Timeout:        timeout,
+		Order:          order,
 	})
 	_, err := service.Create()
 	if err != nil {
@@ -81,7 +87,7 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	go service.CheckQueue(true)
 	core.OnNewService(service)
 
-	ExecuteResponse(w, r, "services.html", core.CoreApp.DbServices)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services())
 }
 
 func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
@@ -97,7 +103,7 @@ func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	service := serv
 	service.Delete()
-	ExecuteResponse(w, r, "services.html", core.CoreApp.DbServices)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services())
 }
 
 func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
@@ -129,6 +135,8 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	timeout, _ := strconv.Atoi(r.PostForm.Get("timeout"))
 	checkType := r.PostForm.Get("check_type")
 	postData := r.PostForm.Get("post_data")
+	order, _ := strconv.Atoi(r.PostForm.Get("order"))
+
 	serviceUpdate := core.ReturnService(&types.Service{
 		Id:             service.Id,
 		Name:           name,
@@ -141,8 +149,10 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		Port:           port,
 		PostData:       postData,
 		Timeout:        timeout,
+		Order:          order,
 	})
 	serviceUpdate.Update()
+	serviceUpdate = serviceUpdate.Check(true)
 	ExecuteResponse(w, r, "service.html", serviceUpdate)
 }
 
@@ -152,11 +162,9 @@ func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	serv := core.SelectService(utils.StringInt(vars["id"]))
-	service := serv
-	core.DeleteFailures(service)
-	core.CoreApp.SelectAllServices()
-	ExecuteResponse(w, r, "services.html", core.CoreApp.DbServices)
+	service := core.SelectService(utils.StringInt(vars["id"]))
+	service.DeleteFailures()
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services())
 }
 
 func CheckinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {

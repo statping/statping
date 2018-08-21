@@ -67,6 +67,7 @@ type ServiceInterface interface {
 	AllFailures() []*Failure
 	TotalFailures() (uint64, error)
 	TotalFailures24Hours() (uint64, error)
+	DeleteFailures()
 	// Hits functions (successful responses)
 	CreateHit(*Hit) (int64, error)
 	Hits() ([]*Hit, error)
