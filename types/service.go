@@ -20,33 +20,33 @@ import (
 )
 
 type Service struct {
-	Id             int64      `db:"id,omitempty" json:"id"`
-	Name           string     `db:"name" json:"name"`
-	Domain         string     `db:"domain" json:"domain"`
-	Expected       string     `db:"expected" json:"expected"`
-	ExpectedStatus int        `db:"expected_status" json:"expected_status"`
-	Interval       int        `db:"check_interval" json:"check_interval"`
-	Type           string     `db:"check_type" json:"type"`
-	Method         string     `db:"method" json:"method"`
-	PostData       string     `db:"post_data" json:"post_data"`
-	Port           int        `db:"port" json:"port"`
-	CreatedAt      time.Time  `db:"created_at" json:"created_at"`
-	Timeout        int        `db:"timeout" json:"timeout"`
-	Order          int        `db:"order_id" json:"order_id"`
-	Online         bool       `json:"online"`
-	Latency        float64    `json:"latency"`
-	Online24Hours  float32    `json:"24_hours_online"`
-	AvgResponse    string     `json:"avg_response"`
-	TotalUptime    string     `json:"uptime"`
-	Failures       []*Failure `json:"failures"`
-	Checkins       []*Checkin `json:"checkins"`
-	Running        chan bool  `json:"-"`
-	Checkpoint     time.Time  `json:"-"`
-	LastResponse   string
-	LastStatusCode int
-	LastOnline     time.Time
-	DnsLookup      float64 `json:"dns_lookup_time"`
-	ServiceInterface
+	Id               int64      `db:"id,omitempty" json:"id"`
+	Name             string     `db:"name" json:"name"`
+	Domain           string     `db:"domain" json:"domain"`
+	Expected         string     `db:"expected" json:"expected"`
+	ExpectedStatus   int        `db:"expected_status" json:"expected_status"`
+	Interval         int        `db:"check_interval" json:"check_interval"`
+	Type             string     `db:"check_type" json:"type"`
+	Method           string     `db:"method" json:"method"`
+	PostData         string     `db:"post_data" json:"post_data"`
+	Port             int        `db:"port" json:"port"`
+	CreatedAt        time.Time  `db:"created_at" json:"created_at"`
+	Timeout          int        `db:"timeout" json:"timeout"`
+	Order            int        `db:"order_id" json:"order_id"`
+	Online           bool       `json:"online"`
+	Latency          float64    `json:"latency"`
+	Online24Hours    float32    `json:"24_hours_online"`
+	AvgResponse      string     `json:"avg_response"`
+	TotalUptime      string     `json:"uptime"`
+	Failures         []*Failure `json:"failures"`
+	Checkins         []*Checkin `json:"checkins"`
+	Running          chan bool  `json:"-"`
+	Checkpoint       time.Time  `json:"-"`
+	LastResponse     string     `json:"-"`
+	LastStatusCode   int        `json:"status_code"`
+	LastOnline       time.Time  `json:"last_online"`
+	DnsLookup        float64    `json:"dns_lookup_time"`
+	ServiceInterface `json:"-"`
 }
 
 type ServiceInterface interface {

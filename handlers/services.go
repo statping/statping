@@ -61,7 +61,7 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	checkType := r.PostForm.Get("check_type")
 	postData := r.PostForm.Get("post_data")
 
-	service := &core.Service{Service: &types.Service{
+	service := core.ReturnService(&types.Service{
 		Name:           name,
 		Domain:         domain,
 		Method:         method,
@@ -72,7 +72,7 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 		Port:           port,
 		PostData:       postData,
 		Timeout:        timeout,
-	}}
+	})
 	_, err := service.Create()
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error starting %v check routine. %v", service.Name, err))
@@ -129,7 +129,7 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	timeout, _ := strconv.Atoi(r.PostForm.Get("timeout"))
 	checkType := r.PostForm.Get("check_type")
 	postData := r.PostForm.Get("post_data")
-	serviceUpdate := &core.Service{Service: &types.Service{
+	serviceUpdate := core.ReturnService(&types.Service{
 		Id:             service.Id,
 		Name:           name,
 		Domain:         domain,
@@ -141,12 +141,9 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		Port:           port,
 		PostData:       postData,
 		Timeout:        timeout,
-	}}
+	})
 	serviceUpdate.Update()
-	core.CoreApp.SelectAllServices()
-
-	serv = core.SelectService(serviceUpdate.Id)
-	ExecuteResponse(w, r, "service.html", serv)
+	ExecuteResponse(w, r, "service.html", serviceUpdate)
 }
 
 func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {

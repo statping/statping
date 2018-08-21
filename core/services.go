@@ -201,26 +201,26 @@ func (s *Service) AvgUptime() string {
 	return s.TotalUptime
 }
 
-func RemoveArray(u *Service) []*types.Service {
-	var srvcs []*types.Service
-	for _, s := range CoreApp.DbServices {
-		if s.Id != u.Id {
-			srvcs = append(srvcs, s)
-		}
-	}
-	CoreApp.DbServices = srvcs
-	return srvcs
+func removeService(s int) []*types.Service {
+	slice := CoreApp.DbServices
+	return append(slice[:s], slice[s+1:]...)
 }
 
-func updateService(new *Service) {
-	var services []*types.Service
-	for _, s := range CoreApp.DbServices {
-		if s.Id == new.Id {
-			s = new.Service
+func (s *Service) index() int {
+	for k, service := range CoreApp.DbServices {
+		if s.Id == service.Id {
+			return k
 		}
-		services = append(services, s)
 	}
-	CoreApp.DbServices = services
+	return 0
+}
+
+func updateService(service *Service) {
+	service.Close()
+	service.Start()
+	go service.CheckQueue(true)
+	index := service.index()
+	CoreApp.DbServices[index] = service.Service
 }
 
 func (u *Service) Delete() error {
@@ -231,7 +231,7 @@ func (u *Service) Delete() error {
 		return err
 	}
 	u.Close()
-	RemoveArray(u)
+	CoreApp.DbServices = removeService(u.index())
 	OnDeletedService(u)
 	return err
 }
@@ -245,11 +245,6 @@ func (u *Service) Update() error {
 		return err
 	}
 	updateService(u)
-	CoreApp.SelectAllServices()
-	if err != nil {
-		utils.Log(3, fmt.Sprintf("error selecting all services: %v", err))
-		return err
-	}
 	OnUpdateService(u)
 	return err
 }

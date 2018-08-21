@@ -1,4 +1,4 @@
-VERSION=0.48
+VERSION=0.49
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -72,7 +72,7 @@ docker-run: docker
 docker-dev: clean docker-base
 	docker build -t hunterlong/statup:dev -f dev/Dockerfile-dev .
 
-docker-push-dev: docker-base docker-dev docker-cypress
+docker-push-dev:
 	docker push hunterlong/statup:dev
 	docker tag hunterlong/statup:base hunterlong/statup:base-v$(VERSION)
 	docker push hunterlong/statup:base

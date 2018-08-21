@@ -111,6 +111,9 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		"underscore": func(html string) string {
 			return utils.UnderScoreString(html)
 		},
+		"URL": func() string {
+			return r.URL.String()
+		},
 	})
 	t, err = t.Parse(nav)
 	if err != nil {

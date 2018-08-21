@@ -79,14 +79,25 @@ func Router() *mux.Router {
 	r.Handle("/help", http.HandlerFunc(HelpHandler))
 	r.Handle("/logs", http.HandlerFunc(LogsHandler))
 	r.Handle("/logs/line", http.HandlerFunc(LogsLineHandler))
+
+	// SERVICE API Routes
+	r.Handle("/api/services", http.HandlerFunc(ApiAllServicesHandler)).Methods("GET")
+	r.Handle("/api/services", http.HandlerFunc(ApiCreateServiceHandler)).Methods("POST")
+	r.Handle("/api/services/{id}", http.HandlerFunc(ApiServiceHandler)).Methods("GET")
+	r.Handle("/api/services/{id}", http.HandlerFunc(ApiServiceUpdateHandler)).Methods("POST")
+	r.Handle("/api/services/{id}", http.HandlerFunc(ApiServiceDeleteHandler)).Methods("DELETE")
+
+	// USER API Routes
+	r.Handle("/api/users", http.HandlerFunc(ApiAllUsersHandler)).Methods("GET")
+	r.Handle("/api/users", http.HandlerFunc(ApiCreateUsersHandler)).Methods("POST")
+	r.Handle("/api/users/{id}", http.HandlerFunc(ApiUserHandler)).Methods("GET")
+	r.Handle("/api/users/{id}", http.HandlerFunc(ApiUserUpdateHandler)).Methods("POST")
+	r.Handle("/api/users/{id}", http.HandlerFunc(ApiUserDeleteHandler)).Methods("DELETE")
+
+	// Generic API Routes
 	r.Handle("/api", http.HandlerFunc(ApiIndexHandler))
 	r.Handle("/api/renew", http.HandlerFunc(ApiRenewHandler))
 	r.Handle("/api/checkin/{api}", http.HandlerFunc(ApiCheckinHandler))
-	r.Handle("/api/services", http.HandlerFunc(ApiAllServicesHandler))
-	r.Handle("/api/services/{id}", http.HandlerFunc(ApiServiceHandler)).Methods("GET")
-	r.Handle("/api/services/{id}", http.HandlerFunc(ApiServiceUpdateHandler)).Methods("POST")
-	r.Handle("/api/users", http.HandlerFunc(ApiAllUsersHandler))
-	r.Handle("/api/users/{id}", http.HandlerFunc(ApiUserHandler))
 	r.Handle("/metrics", http.HandlerFunc(PrometheusHandler))
 	r.NotFoundHandler = http.HandlerFunc(Error404Handler)
 	return r

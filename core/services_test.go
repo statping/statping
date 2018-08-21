@@ -27,8 +27,11 @@ var (
 )
 
 func TestSelectAllServices(t *testing.T) {
-	services, err := CoreApp.SelectAllServices()
-	assert.Nil(t, err)
+	services := CoreApp.Services()
+	for _, s := range services {
+		service := s.Check(true)
+		assert.True(t, service.Online)
+	}
 	assert.Equal(t, 5, len(services))
 }
 
@@ -46,11 +49,18 @@ func TestSelectTCPService(t *testing.T) {
 
 func TestUpdateService(t *testing.T) {
 	service := SelectService(1)
+	service2 := SelectService(2)
 	assert.Equal(t, "Google", service.Name)
-	srv := service
-	srv.Name = "Updated Google"
-	err := srv.Update()
+	assert.Equal(t, "Statup Github", service2.Name)
+	assert.True(t, service.Online)
+	assert.True(t, service2.Online)
+	service.Name = "Updated Google"
+	service.Interval = 5
+	err := service.Update()
 	assert.Nil(t, err)
+	// check if updating pointer array shutdown any other service
+	service2 = SelectService(2)
+	assert.True(t, service2.Online)
 }
 
 func TestUpdateAllServices(t *testing.T) {
@@ -116,21 +126,21 @@ func TestServiceHits(t *testing.T) {
 	service := SelectService(5)
 	hits, err := service.Hits()
 	assert.Nil(t, err)
-	assert.Equal(t, int(1), len(hits))
+	assert.Equal(t, int(2), len(hits))
 }
 
 func TestServiceLimitedHits(t *testing.T) {
 	service := SelectService(5)
 	hits, err := service.LimitedHits()
 	assert.Nil(t, err)
-	assert.Equal(t, int(1), len(hits))
+	assert.Equal(t, int(2), len(hits))
 }
 
 func TestServiceTotalHits(t *testing.T) {
 	service := SelectService(5)
 	hits, err := service.TotalHits()
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(0x1), hits)
+	assert.Equal(t, uint64(0x2), hits)
 }
 
 func TestServiceSum(t *testing.T) {
