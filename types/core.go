@@ -38,7 +38,8 @@ func (c *Core) AddService(s *Service) {
 
 func (c *Core) RemoveService(s int) []*Service {
 	slice := c.dbServices
-	return append(slice[:s], slice[s+1:]...)
+	c.dbServices = append(slice[:s], slice[s+1:]...)
+	return c.dbServices
 }
 
 func (c *Core) GetServices() []*Service {

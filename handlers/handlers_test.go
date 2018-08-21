@@ -500,7 +500,7 @@ func TestPrometheusHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "statup_total_services 7")
+	assert.Contains(t, body, "statup_total_services 6")
 	assert.True(t, IsRouteAuthenticated(req))
 }
 

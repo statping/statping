@@ -499,7 +499,7 @@ func RunPrometheusHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
 	t.Log(rr.Body.String())
-	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 7"))
+	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 6"))
 	assert.True(t, handlers.IsAuthenticated(req))
 }
 

@@ -249,9 +249,8 @@ func TestDeleteService(t *testing.T) {
 	err = service.Delete()
 	assert.Nil(t, err)
 
-	count, err = CoreApp.SelectAllServices()
-	assert.Nil(t, err)
-	assert.Equal(t, 7, len(count))
+	services := CoreApp.Services()
+	assert.Equal(t, 7, len(services))
 }
 
 func TestServiceCloseRoutine(t *testing.T) {

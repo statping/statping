@@ -22,6 +22,8 @@ test-all: dev-deps test cypress-test
 
 travis-test: dev-deps cypress-install test docker-test cypress-test coverage
 
+docker-publish-all: docker-build-base docker-dev docker docker-push-base docker-push-dev docker-push-latest
+
 build: compile
 	$(GOBUILD) $(BUILDVERSION) -o $(BINARY_NAME) -v ./cmd
 
@@ -75,14 +77,7 @@ docker-dev: clean docker-base
 
 docker-push-dev:
 	docker push hunterlong/statup:dev
-	docker tag hunterlong/statup:base hunterlong/statup:base-v$(VERSION)
-	docker push hunterlong/statup:base
 	docker push hunterlong/statup:cypress
-
-docker-push-base:
-	docker tag hunterlong/statup:base hunterlong/statup:base-v$(VERSION)
-	docker push hunterlong/statup:base
-	docker push hunterlong/statup:base-v$(VERSION)
 
 docker-push-latest: docker
 	docker push hunterlong/statup:latest
@@ -98,13 +93,15 @@ docker-cypress: clean
 docker-run-cypress: docker-cypress
 	docker run -t hunterlong/statup:cypress
 
-docker-base: clean
+docker-push-base:
+	docker tag hunterlong/statup:base hunterlong/statup:base-v$(VERSION)
+	docker push hunterlong/statup:base
+	docker push hunterlong/statup:base-v$(VERSION)
+
+docker-build-base: clean
 	wget -q https://assets.statup.io/sass && chmod +x sass
 	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -linkmode external -extldflags -static" -out alpine ./cmd
 	docker build -t hunterlong/statup:base -f dev/Dockerfile-base .
-
-docker-build-base: docker-base
-	docker build -t hunterlong/statup:base --no-cache -f dev/Dockerfile-base .
 	docker tag hunterlong/statup:base hunterlong/statup:base-v$(VERSION)
 
 docker-build-latest:
