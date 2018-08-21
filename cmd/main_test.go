@@ -104,7 +104,7 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" Select Users", func(t *testing.T) {
 			RunUser_SelectAll(t)
 		})
-		t.Run(dbt+" Select DbServices", func(t *testing.T) {
+		t.Run(dbt+" Select Services", func(t *testing.T) {
 			RunSelectAllServices(t)
 		})
 		t.Run(dbt+" Select One Service", func(t *testing.T) {
@@ -353,7 +353,7 @@ func RunOneService_Check(t *testing.T) {
 }
 
 func RunService_Create(t *testing.T) {
-	service := &core.Service{Service: &types.Service{
+	service := core.ReturnService(&types.Service{
 		Name:           "test service",
 		Domain:         "https://google.com",
 		ExpectedStatus: 200,
@@ -362,7 +362,7 @@ func RunService_Create(t *testing.T) {
 		Type:           "http",
 		Method:         "GET",
 		Timeout:        30,
-	}}
+	})
 	id, err := service.Create()
 	assert.Nil(t, err)
 	assert.Equal(t, int64(6), id)
@@ -401,7 +401,7 @@ func RunService_GraphData(t *testing.T) {
 }
 
 func RunBadService_Create(t *testing.T) {
-	service := &core.Service{Service: &types.Service{
+	service := core.ReturnService(&types.Service{
 		Name:           "Bad Service",
 		Domain:         "https://9839f83h72gey2g29278hd2od2d.com",
 		ExpectedStatus: 200,
@@ -410,7 +410,7 @@ func RunBadService_Create(t *testing.T) {
 		Type:           "http",
 		Method:         "GET",
 		Timeout:        30,
-	}}
+	})
 	id, err := service.Create()
 	assert.Nil(t, err)
 	assert.Equal(t, int64(7), id)
@@ -421,7 +421,7 @@ func RunBadService_Check(t *testing.T) {
 	assert.NotNil(t, service)
 	assert.Equal(t, "Bad Service", service.Name)
 	for i := 0; i <= 10; i++ {
-		core.ServiceHTTPCheck(service, true)
+		service.Check(true)
 	}
 	assert.True(t, service.IsRunning())
 }
@@ -439,18 +439,13 @@ func RunDeleteService(t *testing.T) {
 }
 
 func RunCreateService_Hits(t *testing.T) {
-	services, err := core.CoreApp.SelectAllServices()
-	assert.Nil(t, err)
+	services := core.CoreApp.Services()
 	assert.NotNil(t, services)
 	assert.Equal(t, 6, len(services))
 	for i := 0; i <= 15; i++ {
 		for _, s := range services {
 			var service *core.Service
-			if s.Type == "http" {
-				service = core.ServiceHTTPCheck(core.ReturnService(s), true)
-			} else {
-				service = core.ServiceTCPCheck(core.ReturnService(s), true)
-			}
+			service = s.Check(true)
 			assert.NotNil(t, service)
 		}
 	}

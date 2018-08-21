@@ -28,15 +28,12 @@ import (
 	"time"
 )
 
-type FailureData types.FailureData
-
 func CheckServices() {
 	CoreApp.SelectAllServices()
 	utils.Log(1, fmt.Sprintf("Starting monitoring process for %v DbServices", len(CoreApp.DbServices)))
-	for _, ser := range CoreApp.DbServices {
+	for _, ser := range CoreApp.Services() {
 		//go obj.StartCheckins()
-		s := ReturnService(ser)
-		go s.CheckQueue(true)
+		go ser.CheckQueue(true)
 	}
 }
 
@@ -51,7 +48,7 @@ CheckLoop:
 			break CheckLoop
 		default:
 			utils.Log(1, fmt.Sprintf("Checking service: %v", s.Name))
-			ServiceCheck(s, record)
+			s.Check(record)
 			// Set next time checkpoint and maybe sleep.
 			s.Checkpoint = s.Checkpoint.Add(time.Duration(s.Interval) * time.Second)
 			if sleepDuration := s.Checkpoint.Sub(time.Now()); sleepDuration > 0 {
@@ -62,7 +59,7 @@ CheckLoop:
 	}
 }
 
-func DNSCheck(s *Service) (float64, error) {
+func (s *Service) dnsCheck() (float64, error) {
 	t1 := time.Now()
 	url, err := url.Parse(s.Domain)
 	if err != nil {
@@ -77,7 +74,7 @@ func DNSCheck(s *Service) (float64, error) {
 	return subTime, err
 }
 
-func ServiceTCPCheck(s *Service, record bool) *Service {
+func (s *Service) checkTcp(record bool) *Service {
 	t1 := time.Now()
 	domain := fmt.Sprintf("%v", s.Domain)
 	if s.Port != 0 {
@@ -105,18 +102,18 @@ func ServiceTCPCheck(s *Service, record bool) *Service {
 	return s
 }
 
-func ServiceCheck(s *Service, record bool) *Service {
+func (s *Service) Check(record bool) *Service {
 	switch s.Type {
 	case "http":
-		ServiceHTTPCheck(s, record)
+		s.checkHttp(record)
 	case "tcp":
-		ServiceTCPCheck(s, record)
+		s.checkTcp(record)
 	}
 	return s
 }
 
-func ServiceHTTPCheck(s *Service, record bool) *Service {
-	dnsLookup, err := DNSCheck(s)
+func (s *Service) checkHttp(record bool) *Service {
+	dnsLookup, err := s.dnsCheck()
 	if err != nil {
 		if record {
 			RecordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))

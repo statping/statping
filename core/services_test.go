@@ -67,7 +67,7 @@ func TestUpdateAllServices(t *testing.T) {
 
 func TestServiceHTTPCheck(t *testing.T) {
 	service := SelectService(1)
-	checked := ServiceCheck(service, true)
+	checked := service.Check(true)
 	assert.Equal(t, "Changed Updated Google", checked.Name)
 	assert.True(t, checked.Online)
 }
@@ -82,7 +82,7 @@ func TestCheckHTTPService(t *testing.T) {
 
 func TestServiceTCPCheck(t *testing.T) {
 	service := SelectService(5)
-	checked := ServiceCheck(service, true)
+	checked := service.Check(true)
 	assert.Equal(t, "Changed Google DNS", checked.Name)
 	assert.True(t, checked.Online)
 }
@@ -189,7 +189,7 @@ func TestCreateFailingHTTPService(t *testing.T) {
 
 func TestServiceFailedCheck(t *testing.T) {
 	service := SelectService(7)
-	checked := ServiceCheck(service, true)
+	checked := service.Check(true)
 	assert.Equal(t, "Bad URL", checked.Name)
 	assert.False(t, checked.Online)
 }
@@ -213,7 +213,7 @@ func TestCreateFailingTCPService(t *testing.T) {
 
 func TestServiceFailedTCPCheck(t *testing.T) {
 	service := SelectService(8)
-	checked := ServiceCheck(service, true)
+	checked := service.Check(true)
 	assert.Equal(t, "Bad TCP", checked.Name)
 	assert.False(t, checked.Online)
 }
@@ -254,7 +254,36 @@ func TestServiceCloseRoutine(t *testing.T) {
 	s.Interval = 1
 	s.Start()
 	assert.True(t, s.IsRunning())
+	t.Log(s.Checkpoint)
 	go s.CheckQueue(false)
+	t.Log(s.Checkpoint)
+	time.Sleep(5 * time.Second)
+	t.Log(s.Checkpoint)
+	assert.True(t, s.IsRunning())
+	s.Close()
+	assert.False(t, s.IsRunning())
+	s.Close()
+	assert.False(t, s.IsRunning())
+}
+
+func TestServiceCheckQueue(t *testing.T) {
+	s := ReturnService(new(types.Service))
+	s.Name = "example"
+	s.Domain = "https://google.com"
+	s.Type = "http"
+	s.Method = "GET"
+	s.ExpectedStatus = 200
+	s.Interval = 1
+	s.Start()
+	assert.True(t, s.IsRunning())
+	go s.CheckQueue(false)
+
+	go func() {
+		time.Sleep(5 * time.Second)
+		t.Log(s.Checkpoint)
+		time.Sleep(6 * time.Second)
+	}()
+
 	time.Sleep(5 * time.Second)
 	assert.True(t, s.IsRunning())
 	s.Close()

@@ -19,5 +19,7 @@ ENV IS_DOCKER=true
 RUN make dev-deps
 RUN make install
 
+WORKDIR /app
+VOLUME /app
 EXPOSE 8080
-ENTRYPOINT make run
+ENTRYPOINT statup

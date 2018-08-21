@@ -76,6 +76,9 @@ type ServiceInterface interface {
 	SelectHitsGroupBy(string) ([]*Hit, error)
 	// Go Routines
 	CheckQueue(bool)
+	Check(bool) *Service
+	checkHttp(bool) *Service
+	checkTcp(bool) *Service
 	// Checkin functions
 	AllCheckins() []*Checkin
 }

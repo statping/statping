@@ -22,3 +22,4 @@ source/rice-box.go
 sass
 .DS_Store
 source/css/base.css.map
+/dev/test/node_modules/

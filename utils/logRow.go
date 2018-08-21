@@ -16,13 +16,13 @@
 package utils
 
 import (
-	"time"
 	"fmt"
+	"time"
 )
 
 type LogRow struct {
-	Date	time.Time
-	Line	interface{}
+	Date time.Time
+	Line interface{}
 }
 
 func NewLogRow(line interface{}) (logRow *LogRow) {

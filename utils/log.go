@@ -22,8 +22,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"syscall"
 	"sync"
+	"syscall"
 )
 
 var (
@@ -140,7 +140,7 @@ func GetLastLine() *LogRow {
 	LockLines.Lock()
 	defer LockLines.Unlock()
 	if len(LastLines) > 0 {
-		return LastLines[len(LastLines) - 1]
+		return LastLines[len(LastLines)-1]
 	}
 	return nil
 }

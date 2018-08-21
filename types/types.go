@@ -106,7 +106,3 @@ type PluginJSON struct {
 	Author      string `json:"author"`
 	Namespace   string `json:"namespace"`
 }
-
-type FailureData struct {
-	Issue string
-}

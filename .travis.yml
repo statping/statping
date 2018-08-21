@@ -11,6 +11,8 @@ go_import_path: github.com/hunterlong/statup
 cache:
   directories:
     - $GOPATH/pkg/dep
+    - ~/.npm
+    - ~/.cache
 
 sudo: required
 

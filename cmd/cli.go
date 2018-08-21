@@ -144,8 +144,8 @@ func RunOnce() {
 	if err != nil {
 		utils.Log(4, err)
 	}
-	for _, s := range core.CoreApp.DbServices {
-		out := core.ServiceCheck(core.ReturnService(s), true)
+	for _, s := range core.CoreApp.Services() {
+		out := s.Check(true)
 		fmt.Printf("    Service %v | URL: %v | Latency: %0.0fms | Online: %v\n", out.Name, out.Domain, (out.Latency * 1000), out.Online)
 	}
 }
