@@ -22,7 +22,9 @@ test-all: dev-deps test cypress-test
 
 travis-test: dev-deps cypress-install test docker-test cypress-test coverage
 
-docker-publish-all: docker-build-base docker-dev docker docker-push-base docker-push-dev docker-push-latest
+docker-build-all: docker-build-base docker-dev docker
+
+docker-publish-all: docker-push-base docker-push-dev docker-push-latest
 
 build: compile
 	$(GOBUILD) $(BUILDVERSION) -o $(BINARY_NAME) -v ./cmd
