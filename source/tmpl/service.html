@@ -140,14 +140,14 @@
                 <div class="form-group row">
                     <label for="service_interval" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
                     <div class="col-sm-8">
-                        <input type="number" name="interval" class="form-control" value="{{.Interval}}" id="service_interval" required>
+                        <input type="number" name="interval" class="form-control" value="{{.Interval}}" min="1" id="service_interval" required>
                         <small id="emailHelp" class="form-text text-muted">10,000+ will be checked in Microseconds (1 millisecond = 1000 microseconds).</small>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="service_timeout" class="col-sm-4 col-form-label">Timeout in Seconds</label>
                     <div class="col-sm-8">
-                        <input type="number" name="timeout" class="form-control" value="{{.Timeout}}" id="service_timeout" min="1" placeholder="30">
+                        <input type="number" name="timeout" class="form-control" value="{{.Timeout}}" id="service_timeout" min="1">
                     </div>
                 </div>
                 <div class="form-group row">
