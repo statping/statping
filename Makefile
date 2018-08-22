@@ -69,13 +69,13 @@ build-alpine: clean compile
 	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT) -linkmode external -extldflags -static" -out alpine ./cmd
 
 docker:
-	docker build -t hunterlong/statup:latest .
+	docker build --no-cache -t hunterlong/statup:latest .
 
 docker-run: docker
 	docker run -it -p 8080:8080 hunterlong/statup:latest
 
-docker-dev: clean docker-base
-	docker build -t hunterlong/statup:dev -f dev/Dockerfile-dev .
+docker-dev: clean docker-build-base
+	docker build -t hunterlong/statup:dev --no-cache -f dev/Dockerfile-dev .
 
 docker-push-dev:
 	docker push hunterlong/statup:dev
@@ -103,7 +103,7 @@ docker-push-base:
 docker-build-base: clean
 	wget -q https://assets.statup.io/sass && chmod +x sass
 	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -linkmode external -extldflags -static" -out alpine ./cmd
-	docker build -t hunterlong/statup:base -f dev/Dockerfile-base .
+	docker build -t hunterlong/statup:base --no-cache -f dev/Dockerfile-base .
 	docker tag hunterlong/statup:base hunterlong/statup:base-v$(VERSION)
 
 docker-build-latest:
