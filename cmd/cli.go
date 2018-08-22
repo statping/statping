@@ -94,7 +94,6 @@ func CatchCLI(args []string) error {
 			utils.Log(4, "config.yml file not found")
 			return err
 		}
-		RunOnce()
 		indexSource := core.ExportIndexHTML()
 		err = core.SaveFile("./index.html", []byte(indexSource))
 		if err != nil {

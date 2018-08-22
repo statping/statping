@@ -29,7 +29,7 @@ $('form').submit(function() {
 
 $('select#service_type').on('change', function() {
     var selected = $('#service_type option:selected').val();
-    if (selected == "tcp") {
+    if (selected === "tcp") {
         $("#service_port").parent().parent().removeClass("d-none");
         $("#service_check_type").parent().parent().addClass("d-none");
         $("#service_url").attr("placeholder", "localhost");
@@ -51,7 +51,7 @@ $('select#service_type').on('change', function() {
 
 $('select#service_check_type').on('change', function() {
     var selected = $('#service_check_type option:selected').val();
-    if (selected == "POST") {
+    if (selected === "POST") {
         $("#post_data").parent().parent().removeClass("d-none");
     } else {
         $("#post_data").parent().parent().addClass("d-none");
@@ -61,23 +61,19 @@ $('select#service_check_type').on('change', function() {
 
 $(function() {
     var pathname = window.location.pathname;
-    if (pathname=="/logs") {
+    if (pathname==="/logs") {
         var lastline;
+        var logArea = $("#live_logs");
         setInterval(function() {
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', '/logs/line');
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    if (lastline != xhr.responseText) {
-                        var curr = $.trim($("#live_logs").text());
-                        var line = xhr.responseText.replace(/(\r\n|\n|\r)/gm," ");
-                        line = line+"\n";
-                        $("#live_logs").text(line+curr);
-                        lastline = xhr.responseText;
-                    }
+            $.get("/logs/line", function(data, status){
+                if (lastline !== data) {
+                    var curr = $.trim(logArea.text());
+                    var line = data.replace(/(\r\n|\n|\r)/gm, " ");
+                    line = line + "\n";
+                    logArea.text(line + curr);
+                    lastline = data;
                 }
-            };
-            xhr.send();
+            });
         }, 200);
     }
 });
@@ -102,7 +98,7 @@ var ranVar = false;
 var ranTheme = false;
 $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
     var target = $(e.target).attr("href");
-    if (target=="#v-pills-style" && !ranVar) {
+    if (target==="#v-pills-style" && !ranVar) {
         var sass_vars = CodeMirror.fromTextArea(document.getElementById("sass_vars"), {
             lineNumbers: true,
             matchBrackets: true,
@@ -110,7 +106,7 @@ $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
             colorpicker : true
         });
         ranVar = true;
-    } else if (target=="#pills-theme" && !ranTheme) {
+    } else if (target==="#pills-theme" && !ranTheme) {
         var theme_css = CodeMirror.fromTextArea(document.getElementById("theme_css"), {
             lineNumbers: true,
             matchBrackets: true,

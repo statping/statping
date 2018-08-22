@@ -114,6 +114,9 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		"URL": func() string {
 			return r.URL.String()
 		},
+		"CHART_DATA": func() string {
+			return ""
+		},
 	})
 	t, err = t.Parse(nav)
 	if err != nil {

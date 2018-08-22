@@ -212,7 +212,6 @@ func (s *Service) index() int {
 
 func updateService(service *Service) {
 	service.Start()
-	go service.CheckQueue(true)
 	index := service.index()
 	CoreApp.UpdateService(index, service.Service)
 }
@@ -230,7 +229,7 @@ func (u *Service) Delete() error {
 	return err
 }
 
-func (u *Service) Update() error {
+func (u *Service) Update(restart bool) error {
 	u.CreatedAt = time.Now()
 	res := serviceCol().Find("id", u.Id)
 	err := res.Update(u)
@@ -238,8 +237,13 @@ func (u *Service) Update() error {
 		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", u.Name, err))
 		return err
 	}
-	u.Close()
+	if restart {
+		u.Close()
+	}
 	updateService(u)
+	if restart {
+		go u.CheckQueue(true)
+	}
 	OnUpdateService(u)
 	return err
 }

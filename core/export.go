@@ -17,22 +17,33 @@ package core
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"html/template"
 	"io/ioutil"
 )
 
+func injectDatabase() {
+	DbConnection(Configs.Connection, false, utils.Directory)
+}
+
 func ExportIndexHTML() string {
 	source.Assets()
+	injectDatabase()
+	CoreApp.SelectAllServices()
 	CoreApp.UseCdn = true
-	//out := index{*CoreApp, CoreApp.DbServices}
+	for _, service := range CoreApp.Services() {
+		service = service.Check(true)
+		fmt.Println(service.Name, service.Online, service.Latency)
+	}
 	nav, _ := source.TmplBox.String("nav.html")
 	footer, _ := source.TmplBox.String("footer.html")
 	render, err := source.TmplBox.String("index.html")
 	if err != nil {
 		utils.Log(3, err)
 	}
+
 	t := template.New("message")
 	t.Funcs(template.FuncMap{
 		"js": func(html string) template.JS {
@@ -53,12 +64,38 @@ func ExportIndexHTML() string {
 		"underscore": func(html string) string {
 			return utils.UnderScoreString(html)
 		},
+		"URL": func() string {
+			return "/"
+		},
+		"CHART_DATA": func() string {
+			return ExportChartsJs()
+		},
 	})
 	t, _ = t.Parse(nav)
 	t, _ = t.Parse(footer)
 	t.Parse(render)
 	var tpl bytes.Buffer
-	if err := t.Execute(&tpl, nil); err != nil {
+	if err := t.Execute(&tpl, CoreApp); err != nil {
+		utils.Log(3, err)
+	}
+	result := tpl.String()
+	return result
+}
+
+func ExportChartsJs() string {
+	render, err := source.JsBox.String("charts.js")
+	if err != nil {
+		utils.Log(4, err)
+	}
+	t := template.New("charts")
+	t.Funcs(template.FuncMap{
+		"safe": func(html string) template.HTML {
+			return template.HTML(html)
+		},
+	})
+	t.Parse(render)
+	var tpl bytes.Buffer
+	if err := t.Execute(&tpl, CoreApp.Services()); err != nil {
 		utils.Log(3, err)
 	}
 	result := tpl.String()

@@ -16,6 +16,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
@@ -42,6 +43,27 @@ func ServicesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ExecuteResponse(w, r, "services.html", core.CoreApp.Services())
+}
+
+type serviceOrder struct {
+	Id    int64 `json:"service"`
+	Order int   `json:"order"`
+}
+
+func ReorderServiceHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	var newOrder []*serviceOrder
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&newOrder)
+	for _, s := range newOrder {
+		service := core.SelectService(s.Id)
+		service.Order = s.Order
+		service.Update(false)
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -150,7 +172,7 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		Timeout:        timeout,
 		Order:          order,
 	})
-	serviceUpdate.Update()
+	serviceUpdate.Update(true)
 	serviceUpdate = serviceUpdate.Check(true)
 	ExecuteResponse(w, r, "service.html", serviceUpdate)
 }

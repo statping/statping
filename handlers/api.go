@@ -118,7 +118,7 @@ func ApiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&updatedService)
 	service = core.ReturnService(updatedService)
-	err := service.Update()
+	err := service.Update(true)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

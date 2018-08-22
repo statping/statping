@@ -19,7 +19,6 @@ HTML,BODY {
     color: $description-color;
 }
 
-
 .btn {
     border-radius: $global-border-radius;
 }
@@ -411,5 +410,22 @@ HTML,BODY {
     animation: glow-grow 2s ease-out infinite;
 }
 
+.sortable {
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+
+/* (Optional) Apply a "closed-hand" cursor during drag operation. */
+.sortable:active {
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}
+
+.sortable_drag {
+  background-color: #0000000f;
+}
 
 @import 'mobile';

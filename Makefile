@@ -1,4 +1,4 @@
-VERSION=0.49
+VERSION=0.5
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -27,7 +27,7 @@ docker-publish-all: docker-build-base docker-dev docker docker-push-base docker-
 build: compile
 	$(GOBUILD) $(BUILDVERSION) -o $(BINARY_NAME) -v ./cmd
 
-install: clean build
+install: build
 	mv $(BINARY_NAME) $(GOPATH)/bin/$(BINARY_NAME)
 	$(GOPATH)/bin/$(BINARY_NAME) version
 
@@ -133,7 +133,7 @@ dev-deps: dep
 	$(GOCMD) get github.com/mgechev/revive
 
 clean:
-	rm -rf ./{logs,assets,plugins,statup.db,config.yml,.sass-cache,config.yml,statup,build,.sass-cache,statup.db}
+	rm -rf ./{logs,assets,plugins,statup.db,config.yml,.sass-cache,config.yml,statup,build,.sass-cache,statup.db,index.html}
 	rm -rf cmd/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf core/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf handlers/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}

@@ -40,12 +40,11 @@ func TestHelpCommand(t *testing.T) {
 }
 
 func TestExportCommand(t *testing.T) {
-	t.SkipNow()
 	c := testcli.Command("statup", "export")
 	c.Run()
 	t.Log(c.Stdout())
 	assert.True(t, c.StdoutContains("Exporting Static 'index.html' page"))
-	assert.True(t, fileExists(dir+"/cmd/index.html"))
+	assert.True(t, fileExists(dir+"/index.html"))
 }
 
 func TestAssetsCommand(t *testing.T) {

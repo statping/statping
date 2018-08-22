@@ -20,7 +20,7 @@
 
 {{template "nav" }}
 
-    <div class="col-12 mt-5">
+    <div class="col-12 mt-3">
 
     <div class="row stats_area mb-5">
 
@@ -60,7 +60,7 @@
 
         {{ range .Core.Services }}
                 {{ if .LimitedFailures }}
-                    <h4>{{.Name}} Failures</h4>
+                    <h4 class="text-truncate">{{.Name}} Failures</h4>
                     <div class="list-group mt-3 mb-4">
                     {{ range .LimitedFailures }}
                         <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
@@ -84,15 +84,14 @@
 {{template "footer"}}
 
 {{if USE_CDN}}
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
 <script src="https://assets.statup.io/main.js"></script>
 {{ else }}
-<script src="/js/jquery-3.3.1.slim.min.js"></script>
+<script src="/js/jquery-3.3.1.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/main.js"></script>
 {{end}}
-
 
 </body>
 </html>

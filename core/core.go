@@ -22,6 +22,7 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"github.com/pkg/errors"
 	"os"
+	"sort"
 	"time"
 )
 
@@ -153,9 +154,17 @@ func SelectCore() (*Core, error) {
 	return CoreApp, err
 }
 
+type ServiceOrder []*types.Service
+
+func (c ServiceOrder) Len() int           { return len(c) }
+func (c ServiceOrder) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
+func (c ServiceOrder) Less(i, j int) bool { return c[i].Order < c[j].Order }
+
 func (c *Core) Services() []*Service {
 	var services []*Service
-	for _, ser := range CoreApp.GetServices() {
+	servs := CoreApp.GetServices()
+	sort.Sort(ServiceOrder(servs))
+	for _, ser := range servs {
 		services = append(services, ReturnService(ser))
 	}
 	return services

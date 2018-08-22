@@ -57,6 +57,7 @@ func Router() *mux.Router {
 	r.Handle("/logout", http.HandlerFunc(LogoutHandler))
 	r.Handle("/services", http.HandlerFunc(ServicesHandler)).Methods("GET")
 	r.Handle("/services", http.HandlerFunc(CreateServiceHandler)).Methods("POST")
+	r.Handle("/services/reorder", http.HandlerFunc(ReorderServiceHandler)).Methods("POST")
 	r.Handle("/service/{id}", http.HandlerFunc(ServicesViewHandler)).Methods("GET")
 	r.Handle("/service/{id}", http.HandlerFunc(ServicesUpdateHandler)).Methods("POST")
 	r.Handle("/service/{id}/edit", http.HandlerFunc(ServicesViewHandler))

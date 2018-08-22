@@ -56,7 +56,7 @@ func TestUpdateService(t *testing.T) {
 	assert.True(t, service2.Online)
 	service.Name = "Updated Google"
 	service.Interval = 5
-	err := service.Update()
+	err := service.Update(true)
 	assert.Nil(t, err)
 	// check if updating pointer array shutdown any other service
 	service2 = SelectService(2)
@@ -70,7 +70,7 @@ func TestUpdateAllServices(t *testing.T) {
 		srv := ReturnService(s)
 		srv.Name = "Changed " + srv.Name
 		srv.Interval = k + 3
-		err := srv.Update()
+		err := srv.Update(true)
 		assert.Nil(t, err)
 	}
 }
@@ -299,4 +299,17 @@ func TestServiceCheckQueue(t *testing.T) {
 	assert.False(t, s.IsRunning())
 	s.Close()
 	assert.False(t, s.IsRunning())
+}
+
+func TestDNScheckService(t *testing.T) {
+	s := ReturnService(new(types.Service))
+	s.Name = "example"
+	s.Domain = "http://localhost:9000"
+	s.Type = "http"
+	s.Method = "GET"
+	s.ExpectedStatus = 200
+	s.Interval = 1
+	amount, err := s.dnsCheck()
+	assert.Nil(t, err)
+	assert.NotZero(t, amount)
 }

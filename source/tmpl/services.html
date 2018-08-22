@@ -23,24 +23,23 @@
 
         <h3>Services</h3>
 
-            <table class="table table-striped">
+            <table class="table">
                 <thead>
                 <tr>
                     <th scope="col">Name</th>
-                    <th scope="col">Status</th>
+                    <th scope="col" class="d-none d-md-table-cell">Status</th>
                     <th scope="col"></th>
                 </tr>
                 </thead>
-                <tbody>
+                <tbody class="sortable">
                 {{range .}}
-                {{ $s := . }}
-                <tr draggable="true">
-                    <td>{{$s.Name}}</td>
-                    <td>{{if $s.Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}} </td>
+                <tr id="{{.Id}}">
+                    <td>{{.Name}}</td>
+                    <td class="d-none d-md-table-cell">{{if .Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}} </td>
                     <td class="text-right">
                         <div class="btn-group">
-                                <a href="/service/{{$s.Id}}" class="btn btn-primary">View</a>
-                                <a href="/service/{{$s.Id}}/delete" class="btn btn-danger confirm-btn">Delete</a>
+                                <a href="/service/{{.Id}}" class="btn btn-primary">View</a>
+                                <a href="/service/{{.Id}}/delete" class="btn btn-danger confirm-btn">Delete</a>
                         </div>
                     </td>
                 </tr>
@@ -139,14 +138,38 @@
 {{template "footer"}}
 
 {{if USE_CDN}}
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
 <script src="https://assets.statup.io/main.js"></script>
 {{ else }}
-<script src="/js/jquery-3.3.1.slim.min.js"></script>
+<script src="/js/jquery-3.3.1.min.js"></script>
+<script src="/js/sortable.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/main.js"></script>
 {{end}}
+
+<script>
+    sortable('.sortable', {
+        forcePlaceholderSize: true,
+        hoverClass: 'sortable_drag'
+    });
+
+    sortable('.sortable')[0].addEventListener('sortupdate', function(e) {
+        var i = 0;
+        var newOrder = [];
+        var dest = e.detail.destination.items;
+        dest.forEach(function(d) {
+            i++;
+            var o = {service: parseInt(d.id), order: i}
+            newOrder.push(o);
+        });
+
+        $.post("/services/reorder", JSON.stringify(newOrder), function(data, status){
+           console.log("Data: " + data + "\nStatus: " + status);
+        });
+        console.log(newOrder);
+    });
+</script>
 
 </body>
 </html>

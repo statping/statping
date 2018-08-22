@@ -17,9 +17,9 @@
 
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
 
-        <div class="col-8 offset-2 mt-3">
+        <div class="col-10 offset-1 col-md-8 offset-md-2 mt-md-2">
 
-            <div class="col-md-6 col-sm-12 offset-md-3 mb-4"><img width="100%" src="/statup.png"></div>
+            <div class="col-12 col-md-6 offset-md-3 mb-4"><img class="col-12 mt-5 mt-md-0" src="/statup.png"></div>
 
         {{ if .Error }}
             <div class="alert alert-danger" role="alert">
@@ -54,11 +54,11 @@
 {{template "footer"}}
 
 {{if USE_CDN}}
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
 <script src="https://assets.statup.io/main.js"></script>
 {{ else }}
-<script src="/js/jquery-3.3.1.slim.min.js"></script>
+<script src="/js/jquery-3.3.1.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/main.js"></script>
 {{end}}

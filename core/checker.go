@@ -25,6 +25,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -71,7 +72,13 @@ func (s *Service) duration() time.Duration {
 
 func (s *Service) dnsCheck() (float64, error) {
 	t1 := time.Now()
-	url, err := url.Parse(s.Domain)
+	domain := s.Domain
+	hasPort, _ := regexp.MatchString(`\:([0-9]+)`, domain)
+	if hasPort {
+		splitDomain := strings.Split(s.Domain, ":")
+		domain = splitDomain[len(splitDomain)-2]
+	}
+	url, err := url.Parse(domain)
 	if err != nil {
 		return 0, err
 	}
