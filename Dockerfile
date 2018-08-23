@@ -8,4 +8,5 @@ ENV STATUP_DIR=/app
 WORKDIR /app
 VOLUME /app
 EXPOSE 8080
+USER 1001
 CMD ["statup"]
