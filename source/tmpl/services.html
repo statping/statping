@@ -34,7 +34,7 @@
                 <tbody class="sortable">
                 {{range .}}
                 <tr id="{{.Id}}">
-                    <td>{{.Name}}</td>
+                    <td><span class="drag_icon d-none d-md-inline">&#9776;</span> {{.Name}}</td>
                     <td class="d-none d-md-table-cell">{{if .Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}} </td>
                     <td class="text-right">
                         <div class="btn-group">
@@ -77,6 +77,9 @@
                         <select name="method" class="form-control" id="service_check_type">
                             <option value="GET" selected>GET</option>
                             <option value="POST">POST</option>
+                            <option value="DELETE">DELETE</option>
+                            <option value="PATCH">PATCH</option>
+                            <option value="PUT">PUT</option>
                         </select>
                     </div>
                 </div>
@@ -152,7 +155,8 @@
 <script>
     sortable('.sortable', {
         forcePlaceholderSize: true,
-        hoverClass: 'sortable_drag'
+        hoverClass: 'sortable_drag',
+        handle: '.drag_icon'
     });
     sortable('.sortable')[0].addEventListener('sortupdate', function(e) {
         var i = 0;

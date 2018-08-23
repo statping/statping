@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-355, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
+{{if USE_CDN}}
+    <link rel="shortcut icon" type="image/x-icon" href="https://assets.statup.io/favicon.ico">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://assets.statup.io/base.css">
+{{ else }}
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+{{end}}
+
+    <title>{{.Name}} Status</title>
+
+    <style>
+        BODY::-webkit-scrollbar { width: 0 !important }
+    </style>
+
+</head>
+<body>
+
+
+<div class="container col-12 sm-container" style="margin-top: 0 !important;">
+
+    <div class="col-12 full-col-12">
+        <div class="list-group online_list">
+        {{ range .Services }}
+            <a href="#" class="service_li list-group-item list-group-item-action text-truncate {{if not .Online}}bg-danger text-white{{ end }}" data-id="{{.Id}}">
+            {{ .Name }}
+            {{if .Online}}
+                <span class="badge bg-success float-right pulse-glow">ONLINE</span>
+            {{ else }}
+                <span class="badge bg-white text-black-50 float-right pulse">OFFLINE</span>
+            {{end}}
+            </a>
+        {{ end }}
+        </div>
+    </div>
+
+    <div class="col-12 full-col-12">
+    {{ range .Services }}
+        <div class="mt-4" id="service_id_{{.Id}}">
+            <div class="card">
+                <div class="card-body">
+                    <div class="col-12">
+                        <h4 class="mt-3"><a href="/service/{{.Id}}"{{if not .Online}} class="text-danger"{{end}}>{{ .Name }}</a>
+                        {{if .Online}}
+                            <span class="badge bg-success float-right">ONLINE</span>
+                        {{ else }}
+                            <span class="badge bg-danger float-right pulse">OFFLINE</span>
+                        {{end}}</h4>
+
+                        <div class="row stats_area mt-5 mb-5">
+                            <div class="col-4">
+                                <span class="lg_number">{{.Online24}}%</span>
+                                Online last 24 Hours
+                            </div>
+                            <div class="col-4">
+                                <span class="lg_number">{{.AvgTime}}ms</span>
+                                Average Response
+                            </div>
+                            <div class="col-4">
+                                <span class="lg_number">{{.AvgUptime}}%</span>
+                                Total Uptime
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            {{ if .AvgTime }}
+                <div class="chart-container">
+                    <canvas id="service_{{ .Id }}"></canvas>
+                </div>
+            {{ end }}
+                <div class="row lower_canvas full-col-12 text-white{{if not .Online}} bg-danger{{end}}">
+                    <div class="col-10 text-truncate">
+                        <span class="d-none d-md-inline">{{.SmallText}}</span>
+                    </div>
+                    <div class="col-sm-12 col-md-2">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{ end }}
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+<script src="https://assets.statup.io/main.js"></script>
+
+<script src="/charts.js"></script>
+
+</body>
+</html>

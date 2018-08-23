@@ -410,22 +410,29 @@ HTML,BODY {
     animation: glow-grow 2s ease-out infinite;
 }
 
-.sortable {
+.sortable_drag {
+  background-color: #0000000f;
+}
+
+.drag_icon {
   cursor: move; /* fallback if grab cursor is unsupported */
   cursor: grab;
   cursor: -moz-grab;
   cursor: -webkit-grab;
+  width: 25px;
+  height: 25px;
+  display: inline-block;
+  margin-right: 5px;
+  margin-left: -10px;
+  text-align: center;
+  color: #b1b1b1;
 }
 
 /* (Optional) Apply a "closed-hand" cursor during drag operation. */
-.sortable:active {
+.drag_icon:active {
   cursor: grabbing;
   cursor: -moz-grabbing;
   cursor: -webkit-grabbing;
-}
-
-.sortable_drag {
-  background-color: #0000000f;
 }
 
 @import 'mobile';

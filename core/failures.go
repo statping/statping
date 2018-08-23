@@ -56,11 +56,9 @@ func (s *Service) AllFailures() []*types.Failure {
 }
 
 func (u *Service) DeleteFailures() {
-	var fails []*Failure
-	col := DbSession.Collection("failures")
-	col.Find("service", u.Id).All(&fails)
-	for _, fail := range fails {
-		fail.Delete()
+	_, err := DbSession.Exec(`DELETE FROM failures WHERE service = ?`, u.Id)
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("failed to delete all failures: %v", err))
 	}
 	u.Failures = nil
 }

@@ -26,7 +26,7 @@
 
         <div class="row">
 
-        <div class="col-md-3 col-sm-12">
+        <div class="col-md-3 col-sm-12 mb-4 mb-md-0">
 
             <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                 <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Settings</a>
@@ -65,7 +65,7 @@
                             </div>
                             <div class="col-sm-5 mt-4">
                               <span class="switch">
-                                <input type="checkbox" name="enable_cdn" class="switch" id="switch-normal" {{if USE_CDN}}checked{{end}}>
+                                <input type="checkbox" name="enable_cdn" class="switch" id="switch-normal" {{if USE_CDN}}checked{{end}}{{if .UsingAssets}} disabled{{end}}>
                                 <label for="switch-normal">Enable CDN</label>
                               </span>
                             </div>
@@ -101,7 +101,7 @@
                 <div class="tab-pane" id="v-pills-style" role="tabpanel" aria-labelledby="v-pills-style-tab">
 
         {{if not .UsingAssets }}
-            <a href="/settings/build" class="btn btn-primary btn-block">Enable Local Assets</a>
+            <a href="/settings/build" class="btn btn-primary btn-block"{{if USE_CDN}} disabled{{end}}>Enable Local Assets</a>
         {{ else }}
                     <form method="POST" action="/settings/css">
                         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
@@ -111,6 +111,9 @@
                             <li class="nav-item col text-center">
                                 <a class="nav-link" id="pills-theme-tab" data-toggle="pill" href="#pills-theme" role="tab" aria-controls="pills-theme" aria-selected="false">Base Theme</a>
                             </li>
+                            <li class="nav-item col text-center">
+                                <a class="nav-link" id="pills-mobile-tab" data-toggle="pill" href="#pills-mobile" role="tab" aria-controls="pills-mobile" aria-selected="false">Mobile</a>
+                            </li>
                         </ul>
                         <div class="tab-content" id="pills-tabContent">
                             <div class="tab-pane show active" id="pills-vars" role="tabpanel" aria-labelledby="pills-vars-tab">
@@ -118,6 +121,9 @@
                             </div>
                             <div class="tab-pane" id="pills-theme" role="tabpanel" aria-labelledby="pills-theme-tab">
                                 <textarea name="theme" id="theme_css">{{ .BaseSASS }}</textarea>
+                            </div>
+                            <div class="tab-pane" id="pills-mobile" role="tabpanel" aria-labelledby="pills-mobile-tab">
+                                <textarea name="mobile" id="mobile_css">{{ .MobileSASS }}</textarea>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary btn-block mt-2">Save Style</button>

@@ -64,7 +64,7 @@
                     <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                         <div class="d-flex w-100 justify-content-between">
                             <h5 class="mb-1">{{.ParseError}}</h5>
-                            <small>Reported {{.Ago}}</small>
+                            <small>{{.Ago}}</small>
                         </div>
                         <p class="mb-1">{{.Issue}}</p>
                     </a>
@@ -109,10 +109,13 @@
                         <select name="method" class="form-control" id="service_check_type" value="{{.Method}}">
                             <option value="GET" {{if eq .Method "GET"}}selected{{end}}>GET</option>
                             <option value="POST" {{if eq .Method "POST"}}selected{{end}}>POST</option>
+                            <option value="DELETE" {{if eq .Method "DELETE"}}selected{{end}}>DELETE</option>
+                            <option value="PATCH" {{if eq .Method "PATCH"}}selected{{end}}>PATCH</option>
+                            <option value="PUT" {{if eq .Method "PUT"}}selected{{end}}>PUT</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-group row{{if eq .Type "tcp"}} d-none{{end}}">
+                <div class="form-group row{{if ne .Method "POST"}} d-none{{end}}">
                     <label for="post_data" class="col-sm-4 col-form-label">Optional Post Data (JSON)</label>
                     <div class="col-sm-8">
                         <textarea name="post_data" class="form-control" id="post_data" rows="3" autocapitalize="false" spellcheck="false">{{.PostData}}</textarea>

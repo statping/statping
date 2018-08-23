@@ -73,10 +73,12 @@ func SaveSASSHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	theme := r.PostForm.Get("theme")
 	variables := r.PostForm.Get("variables")
+	mobile := r.PostForm.Get("mobile")
 	source.SaveAsset([]byte(theme), utils.Directory, "scss/base.scss")
 	source.SaveAsset([]byte(variables), utils.Directory, "scss/variables.scss")
+	source.SaveAsset([]byte(mobile), utils.Directory, "scss/mobile.scss")
 	source.CompileSASS(utils.Directory)
-	resetRouter()
+	ResetRouter()
 	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }
 
@@ -96,7 +98,7 @@ func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		source.CopyToPublic(source.CssBox, dir+"/assets/css", "base.css")
 		utils.Log(2, "Default 'base.css' was insert because SASS did not work.")
 	}
-	resetRouter()
+	ResetRouter()
 	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }
 
@@ -106,7 +108,7 @@ func DeleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	source.DeleteAllAssets(utils.Directory)
-	resetRouter()
+	ResetRouter()
 	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }
 

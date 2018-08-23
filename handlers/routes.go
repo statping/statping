@@ -101,10 +101,11 @@ func Router() *mux.Router {
 	r.Handle("/api/checkin/{api}", http.HandlerFunc(ApiCheckinHandler))
 	r.Handle("/metrics", http.HandlerFunc(PrometheusHandler))
 	r.NotFoundHandler = http.HandlerFunc(Error404Handler)
+	r.Handle("/tray", http.HandlerFunc(TrayHandler))
 	return r
 }
 
-func resetRouter() {
+func ResetRouter() {
 	router = Router()
 	httpServer.Handler = router
 }

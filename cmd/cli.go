@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/handlers"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -44,6 +45,8 @@ func CatchCLI(args []string) error {
 	LoadDotEnvs()
 
 	switch args[1] {
+	case "app":
+		handlers.DesktopInit(ipAddress, port)
 	case "version":
 		if COMMIT != "" {
 			fmt.Printf("Statup v%v (%v)\n", VERSION, COMMIT)
