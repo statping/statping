@@ -16,7 +16,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -40,6 +39,23 @@ func TrayHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DesktopInit(ip string, port int) {
+	var err error
+	exists := utils.FileExists(utils.Directory + "/statup.db")
+	if exists {
+		core.Configs, err = core.LoadConfig()
+		if err != nil {
+			utils.Log(3, err)
+			return
+		}
+		err = core.DbConnection(core.Configs.Connection, false, utils.Directory)
+		if err != nil {
+			utils.Log(3, err)
+			return
+		}
+		core.InitApp()
+		RunHTTPServer(ip, port)
+	}
+
 	config := &core.DbConfig{DbConfig: &types.DbConfig{
 		DbConn:      "sqlite",
 		Project:     "Statup",
@@ -52,9 +68,7 @@ func DesktopInit(ip string, port int) {
 		Location:    utils.Directory,
 	}}
 
-	fmt.Println(config)
-
-	err := config.Save()
+	err = config.Save()
 	if err != nil {
 		utils.Log(4, err)
 	}

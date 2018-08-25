@@ -100,7 +100,7 @@ docker-push-base:
 	docker push hunterlong/statup:base
 	docker push hunterlong/statup:base-v$(VERSION)
 
-docker-build-base: clean
+docker-build-base:
 	wget -q https://assets.statup.io/sass && chmod +x sass
 	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -linkmode external -extldflags -static" -out alpine ./cmd
 	docker build -t hunterlong/statup:base --no-cache -f dev/Dockerfile-base .
@@ -135,7 +135,7 @@ dev-deps: dep
 	$(GOCMD) get github.com/mgechev/revive
 
 clean:
-	rm -rf ./{logs,assets,plugins,statup.db,config.yml,.sass-cache,config.yml,statup,build,.sass-cache,statup.db,index.html}
+	rm -rf ./{logs,assets,plugins,statup.db,config.yml,.sass-cache,config.yml,statup,build,.sass-cache,statup.db,index.html,vendor}
 	rm -rf cmd/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf core/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf handlers/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
@@ -144,8 +144,7 @@ clean:
 	rm -rf types/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf utils/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf dev/test/cypress/videos
-	rm -f coverage.out
-	rm -f coverage.json
+	rm -f coverage.* sass
 
 tag:
 	git tag "v$(VERSION)" --force
