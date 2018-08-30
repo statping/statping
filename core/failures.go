@@ -110,7 +110,11 @@ func (s *Service) TotalFailures24Hours() (uint64, error) {
 }
 
 func (f *Failure) ParseError() string {
-	err := strings.Contains(f.Issue, "operation timed out")
+	err := strings.Contains(f.Issue, "connection reset by peer")
+	if err {
+		return fmt.Sprintf("Connection Reset")
+	}
+	err = strings.Contains(f.Issue, "operation timed out")
 	if err {
 		return fmt.Sprintf("HTTP Request Timed Out")
 	}

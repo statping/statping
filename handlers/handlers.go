@@ -51,8 +51,8 @@ func RunHTTPServer(ip string, port int) error {
 	router = Router()
 	httpServer = &http.Server{
 		Addr:         host,
-		WriteTimeout: time.Second * 15,
-		ReadTimeout:  time.Second * 15,
+		WriteTimeout: time.Second * 60,
+		ReadTimeout:  time.Second * 60,
 		IdleTimeout:  time.Second * 60,
 		Handler:      router,
 	}

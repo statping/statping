@@ -56,9 +56,10 @@ func main() {
 	var err error
 	parseFlags()
 	utils.InitLogs()
+	args := flag.Args()
 
-	if len(os.Args) >= 2 {
-		err := CatchCLI(os.Args)
+	if len(args) >= 1 {
+		err := CatchCLI(args)
 		if err != nil {
 			if err.Error() == "end" {
 				os.Exit(0)
@@ -68,7 +69,6 @@ func main() {
 		}
 	}
 
-	utils.InitLogs()
 	source.Assets()
 	LoadDotEnvs()
 

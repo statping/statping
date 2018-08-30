@@ -124,6 +124,23 @@ func DeleteAllSince(table string, date time.Time) {
 	}
 }
 
+func (c *DbConfig) Update() error {
+	var err error
+	config, err := os.Create(utils.Directory + "/config.yml")
+	if err != nil {
+		utils.Log(4, err)
+		return err
+	}
+	data, err := yaml.Marshal(c.DbConfig)
+	if err != nil {
+		utils.Log(3, err)
+		return err
+	}
+	config.WriteString(string(data))
+	config.Close()
+	return err
+}
+
 func (c *DbConfig) Save() error {
 	var err error
 	config, err := os.Create(utils.Directory + "/config.yml")
@@ -172,7 +189,8 @@ func (c *DbConfig) Save() error {
 		utils.Log(4, err)
 	}
 	CoreApp.DbConnection = c.DbConn
-
+	c.ApiKey = CoreApp.ApiKey
+	c.ApiSecret = CoreApp.ApiSecret
 	return err
 }
 

@@ -16,6 +16,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
@@ -143,7 +144,6 @@ func TestServiceChartHandler(t *testing.T) {
 	t.Log(body)
 	assert.Contains(t, body, "var ctx_1")
 	assert.Contains(t, body, "var ctx_3")
-	assert.Contains(t, body, "var ctx_4")
 	assert.Contains(t, body, "var ctx_5")
 }
 
@@ -476,7 +476,6 @@ func TestSaveAssetsHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 200, rr.Code)
 	assert.FileExists(t, utils.Directory+"/assets/css/base.css")
-	assert.FileExists(t, utils.Directory+"/assets/js/main.js")
 	assert.DirExists(t, utils.Directory+"/assets")
 	assert.True(t, source.UsingAssets(dir))
 	assert.True(t, IsRouteAuthenticated(req))
@@ -607,4 +606,51 @@ func TestSaveSassHandler(t *testing.T) {
 
 	newBase := source.OpenAsset(utils.Directory, "css/base.css")
 	assert.Contains(t, newBase, ".test_design {")
+}
+
+func TestReorderServiceHandler(t *testing.T) {
+	data := `[{id: 1, order: 3},{id: 2, order: 2},{id: 3, order: 1}]"`
+	req, err := http.NewRequest("POST", "/services/reorder", strings.NewReader(data))
+	req.Header.Set("Content-Type", "application/json")
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 200, rr.Code)
+	assert.True(t, IsRouteAuthenticated(req))
+}
+
+func TestCreateBulkServices(t *testing.T) {
+	domains := []string{
+		"https://status.coinapp.io",
+		"https://demo.statup.io",
+		"https://golang.org",
+		"https://github.com/hunterlong",
+		"https://www.santamonica.com",
+		"https://www.oeschs-die-dritten.ch/en/",
+		"https://etherscan.io",
+		"https://www.youtube.com/watch?v=ipvEIZMMILA",
+		"https://www.youtube.com/watch?v=UdaYVxYF1Ok",
+		"https://www.youtube.com/watch?v=yydZbVoCbn0&t=870s",
+		"http://failingdomainsarenofunatall.com",
+	}
+	for k, d := range domains {
+		form := url.Values{}
+		form.Add("name", fmt.Sprintf("Test Service %v", k))
+		form.Add("domain", d)
+		form.Add("method", "GET")
+		form.Add("expected_status", "200")
+		form.Add("interval", fmt.Sprintf("%v", k+1))
+		form.Add("port", "")
+		form.Add("timeout", "30")
+		form.Add("check_type", "http")
+		form.Add("post_data", "")
+
+		req, err := http.NewRequest("POST", "/services", strings.NewReader(form.Encode()))
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		assert.Nil(t, err)
+		rr := httptest.NewRecorder()
+		Router().ServeHTTP(rr, req)
+		assert.Equal(t, 200, rr.Code)
+		assert.True(t, IsRouteAuthenticated(req))
+	}
 }

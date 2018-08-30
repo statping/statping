@@ -37,17 +37,16 @@ func Router() *mux.Router {
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
 		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(dir+"/assets/css"))))
-		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir(dir+"/assets/js"))))
 		r.PathPrefix("/robots.txt").Handler(indexHandler)
 		r.PathPrefix("/favicon.ico").Handler(indexHandler)
 		r.PathPrefix("/statup.png").Handler(indexHandler)
 	} else {
 		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(source.CssBox.HTTPBox())))
-		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(source.JsBox.HTTPBox())))
 		r.PathPrefix("/robots.txt").Handler(http.FileServer(source.TmplBox.HTTPBox()))
 		r.PathPrefix("/favicon.ico").Handler(http.FileServer(source.TmplBox.HTTPBox()))
 		r.PathPrefix("/statup.png").Handler(http.FileServer(source.TmplBox.HTTPBox()))
 	}
+	r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(source.JsBox.HTTPBox())))
 	r.Handle("/charts.js", http.HandlerFunc(RenderServiceChartsHandler))
 	r.Handle("/setup", http.HandlerFunc(SetupHandler)).Methods("GET")
 	r.Handle("/setup", http.HandlerFunc(ProcessSetupHandler)).Methods("POST")
@@ -103,6 +102,15 @@ func Router() *mux.Router {
 	r.NotFoundHandler = http.HandlerFunc(Error404Handler)
 	r.Handle("/tray", http.HandlerFunc(TrayHandler))
 	return r
+}
+
+func ReturnRouter() *mux.Router {
+	return router
+}
+
+func UpdateRouter(routes *mux.Router) {
+	router = routes
+	httpServer.Handler = router
 }
 
 func ResetRouter() {

@@ -39,12 +39,12 @@ const (
 )
 
 func CatchCLI(args []string) error {
-	utils.InitLogs()
 	dir := utils.Directory
+	utils.InitLogs()
 	source.Assets()
 	LoadDotEnvs()
 
-	switch args[1] {
+	switch args[0] {
 	case "app":
 		handlers.DesktopInit(ipAddress, port)
 	case "version":
@@ -62,6 +62,8 @@ func CatchCLI(args []string) error {
 			return errors.New("end")
 		}
 	case "sass":
+		utils.InitLogs()
+		source.Assets()
 		err := source.CompileSASS(dir)
 		if err == nil {
 			return errors.New("end")
@@ -83,7 +85,7 @@ func CatchCLI(args []string) error {
 		}
 		return nil
 	case "test":
-		cmd := args[2]
+		cmd := args[1]
 		switch cmd {
 		case "plugins":
 			LoadPlugins(true)

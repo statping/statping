@@ -103,6 +103,10 @@ func DesktopInit(ip string, port int) {
 
 	core.LoadSampleData()
 
+	config.ApiKey = core.CoreApp.ApiKey
+	config.ApiSecret = core.CoreApp.ApiSecret
+	config.Update()
+
 	core.InitApp()
 	RunHTTPServer(ip, port)
 }

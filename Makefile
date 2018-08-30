@@ -1,4 +1,4 @@
-VERSION=0.51
+VERSION=0.52
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -29,6 +29,9 @@ docker-publish-all: docker-push-base docker-push-dev docker-push-latest
 build: compile
 	$(GOBUILD) $(BUILDVERSION) -o $(BINARY_NAME) -v ./cmd
 
+build-debug: compile
+	$(GOBUILD) $(BUILDVERSION) -tags debug -o $(BINARY_NAME) -v ./cmd
+
 install: build
 	mv $(BINARY_NAME) $(GOPATH)/bin/$(BINARY_NAME)
 	$(GOPATH)/bin/$(BINARY_NAME) version
@@ -40,6 +43,12 @@ compile:
 	cd source && $(GOPATH)/bin/rice embed-go
 	sass source/scss/base.scss source/css/base.css
 	rm -rf .sass-cache
+
+benchmark:
+	cd handlers && go test -v -run=^$ -bench=. -benchtime=5s -memprofile=prof.mem -cpuprofile=prof.cpu
+
+benchmark-view:
+	go tool pprof handlers/handlers.test handlers/prof.cpu > top20
 
 test: clean compile install
 	STATUP_DIR=$(TEST_DIR) go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./...
@@ -145,6 +154,10 @@ clean:
 	rm -rf utils/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf dev/test/cypress/videos
 	rm -f coverage.* sass
+	find . -name "*.out" -type f -delete
+	find . -name "*.cpu" -type f -delete
+	find . -name "*.mem" -type f -delete
+	find . -name "*.test" -type f -delete
 
 tag:
 	git tag "v$(VERSION)" --force

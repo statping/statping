@@ -85,6 +85,8 @@ type DbConfig struct {
 	DbPass      string `yaml:"password"`
 	DbData      string `yaml:"database"`
 	DbPort      int    `yaml:"port"`
+	ApiKey      string `yaml:"api_key"`
+	ApiSecret   string `yaml:"api_secret"`
 	Project     string `yaml:"-"`
 	Description string `yaml:"-"`
 	Domain      string `yaml:"-"`

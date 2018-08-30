@@ -17,6 +17,7 @@ package core
 
 import (
 	"github.com/fatih/structs"
+	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/types"
 	"upper.io/db.v3/lib/sqlbuilder"
 )
@@ -31,16 +32,14 @@ func OnSuccess(s *Service) {
 	for _, p := range CoreApp.AllPlugins {
 		p.OnSuccess(structs.Map(s))
 	}
-	//notifiers.OnSuccess(s)
-	// TODO convert notifiers to correct type
+	notifiers.OnSuccess(s.Service)
 }
 
 func OnFailure(s *Service, f *types.Failure) {
 	for _, p := range CoreApp.AllPlugins {
 		p.OnFailure(structs.Map(s))
 	}
-	//notifiers.OnFailure(s)
-	// TODO convert notifiers to correct type
+	notifiers.OnFailure(s.Service)
 }
 
 func OnSettingsSaved(c *types.Core) {

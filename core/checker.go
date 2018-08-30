@@ -167,11 +167,12 @@ func (s *Service) checkHttp(record bool) *Service {
 		return s
 	}
 	defer response.Body.Close()
-	contents, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		utils.Log(2, err)
-	}
+
 	if s.Expected != "" {
+		contents, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			utils.Log(2, err)
+		}
 		match, err := regexp.MatchString(s.Expected, string(contents))
 		if err != nil {
 			utils.Log(2, err)
@@ -186,14 +187,13 @@ func (s *Service) checkHttp(record bool) *Service {
 		}
 	}
 	if s.ExpectedStatus != response.StatusCode {
-		s.LastResponse = string(contents)
+		//s.LastResponse = string(contents)
 		s.LastStatusCode = response.StatusCode
 		if record {
 			RecordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", response.StatusCode, s.ExpectedStatus))
 		}
 		return s
 	}
-	s.LastResponse = string(contents)
 	s.LastStatusCode = response.StatusCode
 	s.Online = true
 	if record {
