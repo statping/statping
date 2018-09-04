@@ -104,7 +104,7 @@ func (s *Service) TotalFailures() (uint64, error) {
 }
 
 func (s *Service) TotalFailures24Hours() (uint64, error) {
-	col := DbSession.Collection("failures").Find("service", s.Id)
+	col := DbSession.Collection("failures").Find("service = ? AND created_at > ? ", s.Id, time.Now().Add(time.Hour * -24).Format("2006-01-02 15:04:05"))
 	amount, err := col.Count()
 	return amount, err
 }
