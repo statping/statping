@@ -117,12 +117,12 @@ func (s *Service) lastFailure() *Failure {
 
 func (s *Service) SmallText() string {
 	last := s.LimitedFailures()
-	hits, _ := s.LimitedHits()
+
 	if s.Online {
 		if len(last) == 0 {
 			return fmt.Sprintf("Online since %v", s.CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
 		} else {
-			return fmt.Sprintf("Online, last failure was %v", hits[0].CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
+			return fmt.Sprintf("Online, last failure was %v", last[0].CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
 		}
 	}
 	if len(last) > 0 {
