@@ -1,27 +1,29 @@
 package types
 
-import "time"
+import (
+	"time"
+)
 
 type Core struct {
-	Name           string          `db:"name" json:"name"`
-	Description    string          `db:"description" json:"description,omitempty"`
-	Config         string          `db:"config" json:"-"`
-	ApiKey         string          `db:"api_key" json:"-"`
-	ApiSecret      string          `db:"api_secret" json:"-"`
-	Style          string          `db:"style" json:"style,omitempty"`
-	Footer         string          `db:"footer" json:"footer,omitempty"`
-	Domain         string          `db:"domain" json:"domain,omitempty"`
-	Version        string          `db:"version" json:"version"`
-	MigrationId    int64           `db:"migration_id" json:"migration_id,omitempty"`
-	UseCdn         bool            `db:"use_cdn" json:"using_cdn,omitempty"`
-	DbConnection   string          `json:"database"`
-	Started        time.Time       `json:"started_on"`
-	dbServices     []*Service      `json:"services,omitempty"`
-	Plugins        []Info          `json:"-"`
-	Repos          []PluginJSON    `json:"-"`
-	AllPlugins     []PluginActions `json:"-"`
-	Communications []AllNotifiers  `json:"-"`
-	CoreInterface  `json:"-"`
+	Name           string          `gorm:"column:name" json:"name"`
+	Description    string          `gorm:"column:description" json:"description,omitempty"`
+	Config         string          `gorm:"column:config" json:"-"`
+	ApiKey         string          `gorm:"column:api_key" json:"-"`
+	ApiSecret      string          `gorm:"column:api_secret" json:"-"`
+	Style          string          `gorm:"column:style" json:"style,omitempty"`
+	Footer         string          `gorm:"column:footer" json:"footer,omitempty"`
+	Domain         string          `gorm:"column:domain" json:"domain,omitempty"`
+	Version        string          `gorm:"column:version" json:"version"`
+	MigrationId    int64           `gorm:"column:migration_id" json:"migration_id,omitempty"`
+	UseCdn         bool            `gorm:"column:use_cdn" json:"using_cdn,omitempty"`
+	DbConnection   string          `gorm:"-" json:database"`
+	Started        time.Time       `gorm:"-" json:started_on"`
+	dbServices     []*Service      `gorm:"-" json:services,omitempty"`
+	Plugins        []Info          `gorm:"-" json:-"`
+	Repos          []PluginJSON    `gorm:"-" json:-"`
+	AllPlugins     []PluginActions `gorm:"-" json:-"`
+	Communications []AllNotifiers  `gorm:"-" json:-"`
+	CoreInterface  `gorm:"-" json:-"`
 }
 
 func (c *Core) SetServices(s []*Service) {

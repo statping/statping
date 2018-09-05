@@ -11,21 +11,19 @@ CREATE TABLE core (
     migration_id integer default 0,
     use_cdn bool default false
 );
-
 CREATE TABLE users (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     username text NOT NULL UNIQUE,
     password text,
     email text,
     api_key text,
     api_secret text,
     administrator bool,
-    created_at DATETIME,
+    created_at TIMESTAMP,
     UNIQUE (username, email)
 );
-
 CREATE TABLE services (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     name text,
     domain text,
     check_type text,
@@ -37,34 +35,34 @@ CREATE TABLE services (
     post_data text,
     order_id integer default 0,
     timeout integer default 30,
-    created_at DATETIME
+    created_at TIMESTAMP
 );
 
 CREATE TABLE hits (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
     latency float,
-    created_at DATETIME
+    created_at TIMESTAMP
 );
 
 CREATE TABLE failures (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     issue text,
     method text,
     service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    created_at DATETIME
+    created_at TIMESTAMP
 );
 
 CREATE TABLE checkins (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     service INTEGER NOT NULL REFERENCES services(id) ON DELETE CASCADE ON UPDATE CASCADE,
     check_interval integer,
     api text,
-    created_at DATETIME
+    created_at TIMESTAMP
 );
 
 CREATE TABLE communication (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     method text,
     host text,
     port integer,
@@ -77,7 +75,7 @@ CREATE TABLE communication (
     enabled boolean,
     removable boolean,
     limits integer,
-    created_at DATETIME
+    created_at TIMESTAMP
 );
 
 

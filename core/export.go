@@ -25,7 +25,11 @@ import (
 )
 
 func injectDatabase() {
-	DbConnection(Configs.Connection, false, utils.Directory)
+	Configs.Connect(false, utils.Directory)
+}
+
+func GenerateSeed() {
+
 }
 
 func ExportIndexHTML() string {

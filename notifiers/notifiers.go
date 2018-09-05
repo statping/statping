@@ -19,34 +19,34 @@ import (
 	"fmt"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
+	"github.com/jinzhu/gorm"
 	"strings"
 	"time"
-	"upper.io/db.v3"
 )
 
 var (
 	AllCommunications []types.AllNotifiers
-	Collections       db.Collection
+	Collections       *gorm.DB
 	Logs              []*NotificationLog
 )
 
 type Notification struct {
-	Id        int64     `db:"id,omitempty" json:"id"`
-	Method    string    `db:"method" json:"method"`
-	Host      string    `db:"host" json:"-"`
-	Port      int       `db:"port" json:"-"`
-	Username  string    `db:"username" json:"-"`
-	Password  string    `db:"password" json:"-"`
-	Var1      string    `db:"var1" json:"-"`
-	Var2      string    `db:"var2" json:"-"`
-	ApiKey    string    `db:"api_key" json:"-"`
-	ApiSecret string    `db:"api_secret" json:"-"`
-	Enabled   bool      `db:"enabled" json:"enabled"`
-	Limits    int       `db:"limits" json:"-"`
-	Removable bool      `db:"removable" json:"-"`
-	CreatedAt time.Time `db:"created_at" json:"created_at"`
-	Form      []NotificationForm
-	Routine   chan struct{}
+	Id        int64              `gorm:"primary_key column:id" json:"id"`
+	Method    string             `gorm:"column:method" json:"method"`
+	Host      string             `gorm:"column:host" json:"-"`
+	Port      int                `gorm:"column:port" json:"-"`
+	Username  string             `gorm:"column:username" json:"-"`
+	Password  string             `gorm:"column:password" json:"-"`
+	Var1      string             `gorm:"column:var1" json:"-"`
+	Var2      string             `gorm:"column:var2" json:"-"`
+	ApiKey    string             `gorm:"column:api_key" json:"-"`
+	ApiSecret string             `gorm:"column:api_secret" json:"-"`
+	Enabled   bool               `gorm:"column:enabled" json:"enabled"`
+	Limits    int                `gorm:"column:limits" json:"-"`
+	Removable bool               `gorm:"column:removable" json:"-"`
+	CreatedAt time.Time          `gorm:"column:created_at" json:"created_at"`
+	Form      []NotificationForm `gorm:"-" json:"-"`
+	Routine   chan struct{}      `gorm:"-" json:"-"`
 }
 
 type Notifier interface {
@@ -115,30 +115,30 @@ func reverseLogs(input []*NotificationLog) []*NotificationLog {
 	return append(reverseLogs(input[1:]), input[0])
 }
 
-func (n *Notification) IsInDatabase() (bool, error) {
-	return Collections.Find("id", n.Id).Exists()
+func (n *Notification) IsInDatabase() bool {
+	return !Collections.Find(n).RecordNotFound()
 }
 
 func SelectNotification(id int64) (*Notification, error) {
-	var notifier *Notification
-	err := Collections.Find("id", id).One(&notifier)
-	return notifier, err
+	var notifier Notification
+	err := Collections.Find(&notifier, id)
+	return &notifier, err.Error
 }
 
 func (n *Notification) Update() (*Notification, error) {
 	n.CreatedAt = time.Now()
-	err := Collections.Find("id", n.Id).Update(n)
-	return n, err
+	err := Collections.Update(n)
+	return n, err.Error
 }
 
 func InsertDatabase(n *Notification) (int64, error) {
 	n.CreatedAt = time.Now()
 	n.Limits = 3
-	newId, err := Collections.Insert(n)
-	if err != nil {
-		return 0, err
+	db := Collections.Create(n)
+	if db.Error != nil {
+		return 0, db.Error
 	}
-	return newId.(int64), err
+	return n.Id, db.Error
 }
 
 func SelectNotifier(id int64) Notifier {

@@ -16,7 +16,6 @@
 package handlers
 
 import (
-	"github.com/hunterlong/statup/core"
 	"net/http"
 	"strings"
 )
@@ -53,6 +52,6 @@ func PluginsDownloadHandler(w http.ResponseWriter, r *http.Request) {
 	//vars := mux.Vars(router)
 	//name := vars["name"]
 	//DownloadPlugin(name)
-	core.LoadConfig()
+	//core.LoadConfig(utils.Directory)
 	http.Redirect(w, r, "/plugins", http.StatusSeeOther)
 }

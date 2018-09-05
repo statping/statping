@@ -23,29 +23,28 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"io/ioutil"
 	"os"
-	"time"
 )
 
-func LoadConfig() (*types.Config, error) {
+func LoadConfig(directory string) (*DbConfig, error) {
+	var configs *types.DbConfig
 	if os.Getenv("DB_CONN") != "" {
 		utils.Log(1, "DB_CONN environment variable was found, waiting for database...")
 		return LoadUsingEnv()
 	}
-	Configs = new(types.Config)
-	file, err := ioutil.ReadFile(utils.Directory + "/config.yml")
+	file, err := ioutil.ReadFile(directory + "/config.yml")
 	if err != nil {
-		return nil, errors.New("config.yml file not found - starting in setup mode")
+		return nil, errors.New("config.yml file not found at " + directory + "/config.yml - starting in setup mode")
 	}
-	err = yaml.Unmarshal(file, &Configs)
+	err = yaml.Unmarshal(file, &configs)
 	if err != nil {
 		return nil, err
 	}
-	CoreApp.DbConnection = Configs.Connection
+	Configs = &DbConfig{configs}
 	return Configs, err
 }
 
-func LoadUsingEnv() (*types.Config, error) {
-	Configs = new(types.Config)
+func LoadUsingEnv() (*DbConfig, error) {
+	Configs = new(DbConfig)
 	if os.Getenv("DB_CONN") == "" {
 		return nil, errors.New("Missing DB_CONN environment variable")
 	}
@@ -61,12 +60,12 @@ func LoadUsingEnv() (*types.Config, error) {
 	if os.Getenv("DB_DATABASE") == "" {
 		return nil, errors.New("Missing DB_DATABASE environment variable")
 	}
-	Configs.Connection = os.Getenv("DB_CONN")
-	Configs.Host = os.Getenv("DB_HOST")
-	Configs.Port = os.Getenv("DB_PORT")
-	Configs.User = os.Getenv("DB_USER")
+	Configs.DbConn = os.Getenv("DB_CONN")
+	Configs.DbHost = os.Getenv("DB_HOST")
+	Configs.DbPort = int(utils.StringInt(os.Getenv("DB_PORT")))
+	Configs.DbUser = os.Getenv("DB_USER")
 	Configs.Password = os.Getenv("DB_PASS")
-	Configs.Database = os.Getenv("DB_DATABASE")
+	Configs.DbData = os.Getenv("DB_DATABASE")
 	CoreApp.DbConnection = os.Getenv("DB_CONN")
 	CoreApp.Name = os.Getenv("NAME")
 	CoreApp.Domain = os.Getenv("DOMAIN")
@@ -89,32 +88,19 @@ func LoadUsingEnv() (*types.Config, error) {
 		Email:       "info@localhost.com",
 	}}
 
-	err := DbConnection(dbConfig.DbConn, true, utils.Directory)
+	err := dbConfig.Connect(true, utils.Directory)
 	if err != nil {
 		utils.Log(4, err)
 		return nil, err
 	}
 
-	exists, err := DbSession.Collection("core").Find().Exists()
+	exists := DbSession.HasTable("core")
 	if !exists {
-
 		utils.Log(1, fmt.Sprintf("Core database does not exist, creating now!"))
-		DropDatabase()
-		CreateDatabase()
+		dbConfig.DropDatabase()
+		dbConfig.CreateDatabase()
 
-		CoreApp = &Core{Core: &types.Core{
-			Name:        dbConfig.Project,
-			Description: dbConfig.Description,
-			Config:      "config.yml",
-			ApiKey:      utils.NewSHA1Hash(9),
-			ApiSecret:   utils.NewSHA1Hash(16),
-			Domain:      dbConfig.Domain,
-			MigrationId: time.Now().Unix(),
-		}}
-
-		CoreApp.DbConnection = dbConfig.DbConn
-
-		err := InsertCore(CoreApp)
+		CoreApp, err = dbConfig.InsertCore()
 		if err != nil {
 			utils.Log(3, err)
 		}

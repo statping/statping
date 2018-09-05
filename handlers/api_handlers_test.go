@@ -36,17 +36,23 @@ const (
 
 func injectDatabase() {
 	core.NewCore()
-	core.Configs = new(types.Config)
-	core.Configs.Connection = "sqlite"
+	core.Configs = new(core.DbConfig)
+	core.Configs.DbConn = "sqlite"
 	core.CoreApp.DbConnection = "sqlite"
 	core.CoreApp.Version = "DEV"
-	core.DbConnection("sqlite", false, utils.Directory)
+	core.Configs.Connect(false, utils.Directory)
 	core.InitApp()
 }
 
+func Clean() {
+	utils.DeleteFile(dir + "/config.yml")
+	utils.DeleteFile(dir + "/statup.db")
+	utils.DeleteDirectory(dir + "/assets")
+	utils.DeleteDirectory(dir + "/logs")
+}
+
 func TestInit(t *testing.T) {
-	t.SkipNow()
-	injectDatabase()
+	Clean()
 }
 
 func formatJSON(res string, out interface{}) {

@@ -97,6 +97,8 @@ func TestProcessSetupHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
+	assert.FileExists(t, dir+"/config.yml")
+	assert.FileExists(t, dir+"/statup.db")
 }
 
 func TestCheckSetupHandler(t *testing.T) {
@@ -143,7 +145,9 @@ func TestServiceChartHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	t.Log(body)
 	assert.Contains(t, body, "var ctx_1")
+	assert.Contains(t, body, "var ctx_2")
 	assert.Contains(t, body, "var ctx_3")
+	assert.Contains(t, body, "var ctx_4")
 	assert.Contains(t, body, "var ctx_5")
 }
 

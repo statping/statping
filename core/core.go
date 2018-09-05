@@ -22,7 +22,6 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"github.com/pkg/errors"
 	"os"
-	"sort"
 	"time"
 )
 
@@ -34,7 +33,7 @@ type Core struct {
 }
 
 var (
-	Configs   *types.Config
+	Configs   *DbConfig
 	CoreApp   *Core
 	SetupMode bool
 	VERSION   string
@@ -49,12 +48,6 @@ func NewCore() *Core {
 	CoreApp.Core = new(types.Core)
 	CoreApp.Started = time.Now()
 	return CoreApp
-}
-
-func InsertCore(c *Core) error {
-	col := DbSession.Collection("core")
-	_, err := col.Insert(c.Core)
-	return err
 }
 
 func (c *Core) ToCore() *types.Core {
@@ -72,19 +65,18 @@ func InitApp() {
 
 func InsertNotifierDB() error {
 	if DbSession == nil {
-		err := DbConnection(CoreApp.DbConnection, false, utils.Directory)
+		err := Configs.Connect(false, utils.Directory)
 		if err != nil {
 			return errors.New("database connection has not been created")
 		}
 	}
-	notifiers.Collections = DbSession.Collection("communication")
+	notifiers.Collections = commDB()
 	return nil
 }
 
 func UpdateCore(c *Core) (*Core, error) {
-	res := DbSession.Collection("core").Find().Limit(1)
-	err := res.Update(c.Core)
-	return c, err
+	db := coreDB().Update(c)
+	return c, db.Error
 }
 
 func (c Core) UsingAssets() bool {
@@ -122,36 +114,33 @@ func (c Core) AllOnline() bool {
 }
 
 func SelectLastMigration() (int64, error) {
-	var c *types.Core
 	if DbSession == nil {
 		return 0, errors.New("Database connection has not been created yet")
 	}
-	err := DbSession.Collection("core").Find().One(&c)
-	if err != nil {
-		return 0, err
-	}
-	return c.MigrationId, err
+	row := coreDB().Take(&CoreApp)
+	return CoreApp.MigrationId, row.Error
 }
 
 func SelectCore() (*Core, error) {
-	var c *types.Core
-	exists := DbSession.Collection("core").Exists()
+	if DbSession == nil {
+		return nil, errors.New("database has not been initiated yet.")
+	}
+	exists := DbSession.HasTable("core")
 	if !exists {
 		return nil, errors.New("core database has not been setup yet.")
 	}
-	err := DbSession.Collection("core").Find().One(&c)
-	if err != nil {
-		return nil, err
+	db := coreDB().Take(&CoreApp)
+	if db.Error != nil {
+		return nil, db.Error
 	}
-	CoreApp.Core = c
-	CoreApp.DbConnection = Configs.Connection
+	CoreApp.DbConnection = Configs.DbConn
 	CoreApp.Version = VERSION
 	CoreApp.SelectAllServices()
 	if os.Getenv("USE_CDN") == "true" {
 		CoreApp.UseCdn = true
 	}
 	//store = sessions.NewCookieStore([]byte(core.ApiSecret))
-	return CoreApp, err
+	return CoreApp, db.Error
 }
 
 type ServiceOrder []*types.Service
@@ -163,7 +152,7 @@ func (c ServiceOrder) Less(i, j int) bool { return c[i].Order < c[j].Order }
 func (c *Core) Services() []*Service {
 	var services []*Service
 	servs := CoreApp.GetServices()
-	sort.Sort(ServiceOrder(servs))
+	//sort.Sort(ServiceOrder(servs))
 	for _, ser := range servs {
 		services = append(services, ReturnService(ser))
 	}

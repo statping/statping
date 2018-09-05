@@ -19,12 +19,12 @@ import (
 	"github.com/fatih/structs"
 	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/types"
-	"upper.io/db.v3/lib/sqlbuilder"
+	"github.com/jinzhu/gorm"
 )
 
-func OnLoad(db sqlbuilder.Database) {
+func OnLoad(db *gorm.DB) {
 	for _, p := range CoreApp.AllPlugins {
-		p.OnLoad(db)
+		p.OnLoad(*db)
 	}
 }
 

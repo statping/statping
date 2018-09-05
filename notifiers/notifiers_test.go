@@ -18,10 +18,12 @@ package notifiers
 import (
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"upper.io/db.v3/sqlite"
 )
 
 var (
@@ -67,11 +69,8 @@ func init() {
 }
 
 func injectDatabase() {
-	sqliteDb := sqlite.ConnectionURL{
-		Database: dir + "/statup.db",
-	}
-	dbSession, _ := sqlite.Open(sqliteDb)
-	Collections = dbSession.Collection("communication")
+	dbSession, _ := gorm.Open("sqlite3", dir+"/statup.db")
+	Collections = dbSession.Table("communication").Model(&Notification{})
 }
 
 type Tester struct {
@@ -100,8 +99,7 @@ func TestAdd(t *testing.T) {
 }
 
 func TestIsInDatabase(t *testing.T) {
-	in, err := testNotifier.IsInDatabase()
-	assert.Nil(t, err)
+	in := testNotifier.IsInDatabase()
 	assert.False(t, in)
 }
 
@@ -110,8 +108,7 @@ func TestInsertDatabase(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotZero(t, newId)
 
-	in, err := testNotifier.IsInDatabase()
-	assert.Nil(t, err)
+	in := testNotifier.IsInDatabase()
 	assert.True(t, in)
 }
 

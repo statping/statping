@@ -16,8 +16,11 @@
 package utils
 
 import (
+	"errors"
 	"github.com/ararog/timeago"
+	"io"
 	"os"
+	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
@@ -97,6 +100,7 @@ func FileExists(name string) bool {
 }
 
 func DeleteFile(file string) error {
+	Log(1, "deleting file: "+file)
 	err := os.Remove(file)
 	if err != nil {
 		return err
@@ -106,4 +110,57 @@ func DeleteFile(file string) error {
 
 func DeleteDirectory(directory string) error {
 	return os.RemoveAll(directory)
+}
+
+func Command(cmd string) (string, string, error) {
+	Log(1, "running command: "+cmd)
+	testCmd := exec.Command("sh", "-c", cmd)
+	var stdout, stderr []byte
+	var errStdout, errStderr error
+	stdoutIn, _ := testCmd.StdoutPipe()
+	stderrIn, _ := testCmd.StderrPipe()
+	testCmd.Start()
+
+	go func() {
+		stdout, errStdout = copyAndCapture(os.Stdout, stdoutIn)
+	}()
+
+	go func() {
+		stderr, errStderr = copyAndCapture(os.Stderr, stderrIn)
+	}()
+
+	err := testCmd.Wait()
+	if err != nil {
+		return "", "", err
+	}
+
+	if errStdout != nil || errStderr != nil {
+		return "", "", errors.New("failed to capture stdout or stderr")
+	}
+
+	outStr, errStr := string(stdout), string(stderr)
+	return outStr, errStr, err
+}
+
+func copyAndCapture(w io.Writer, r io.Reader) ([]byte, error) {
+	var out []byte
+	buf := make([]byte, 1024, 1024)
+	for {
+		n, err := r.Read(buf[:])
+		if n > 0 {
+			d := buf[:n]
+			out = append(out, d...)
+			_, err := w.Write(d)
+			if err != nil {
+				return out, err
+			}
+		}
+		if err != nil {
+			// Read returns io.EOF at the end of file, which is not an error for us
+			if err == io.EOF {
+				err = nil
+			}
+			return out, err
+		}
+	}
 }

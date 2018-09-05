@@ -19,40 +19,33 @@ import (
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"time"
-	"upper.io/db.v3"
 )
 
 type Hit struct {
 	*types.Hit
 }
 
-func hitCol() db.Collection {
-	return DbSession.Collection("hits")
-}
-
 func (s *Service) CreateHit(h *types.Hit) (int64, error) {
-	h.CreatedAt = time.Now()
-	h.Service = s.Id
-	uuid, err := hitCol().Insert(h)
-	if uuid == nil {
-		utils.Log(2, err)
-		return 0, err
+	db := hitsDB().Create(&h)
+	if db.Error != nil {
+		utils.Log(2, db.Error)
+		return 0, db.Error
 	}
-	return uuid.(int64), err
+	return h.Id, db.Error
 }
 
 func (s *Service) Hits() ([]*Hit, error) {
 	var hits []*Hit
-	col := hitCol().Find("service", s.Id).OrderBy("-id")
-	err := col.All(&hits)
-	return hits, err
+	col := hitsDB().Where("service = ?", s.Id).Order("id desc")
+	err := col.Find(&hits)
+	return hits, err.Error
 }
 
 func (s *Service) LimitedHits() ([]*Hit, error) {
 	var hits []*Hit
-	col := hitCol().Find("service", s.Id).OrderBy("-id").Limit(1024)
-	err := col.All(&hits)
-	return reverseHits(hits), err
+	col := hitsDB().Where("service = ?", s.Id).Order("id desc").Limit(1024)
+	err := col.Find(&hits)
+	return reverseHits(hits), err.Error
 }
 
 func reverseHits(input []*Hit) []*Hit {
@@ -64,15 +57,27 @@ func reverseHits(input []*Hit) []*Hit {
 
 func (s *Service) SelectHitsGroupBy(group string) ([]*Hit, error) {
 	var hits []*Hit
-	col := hitCol().Find("service", s.Id)
-	err := col.All(&hits)
-	return hits, err
+	col := hitsDB().Where("service = ?", s.Id)
+	err := col.Find(&hits)
+	return hits, err.Error
+}
+
+func (s *Service) hits() {
+
 }
 
 func (s *Service) TotalHits() (uint64, error) {
-	col := hitCol().Find("service", s.Id)
-	amount, err := col.Count()
-	return amount, err
+	var count uint64
+	col := hitsDB().Where("service = ?", s.Id)
+	err := col.Count(&count)
+	return count, err.Error
+}
+
+func (s *Service) TotalHitsSince(ago time.Time) (uint64, error) {
+	var count uint64
+	rows := hitsDB().Where("service = ? AND created_at > ?", s.Id, ago.Format("2006-01-02 15:04:05"))
+	err := rows.Count(&count)
+	return count, err.Error
 }
 
 func (s *Service) Sum() (float64, error) {

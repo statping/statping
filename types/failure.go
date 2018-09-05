@@ -1,14 +1,16 @@
 package types
 
-import "time"
+import (
+	"time"
+)
 
 type Failure struct {
-	Id               int       `db:"id,omitempty" json:"id"`
-	Issue            string    `db:"issue" json:"issue"`
-	Method           string    `db:"method" json:"method,omitempty"`
-	Service          int64     `db:"service" json:"service_id"`
-	CreatedAt        time.Time `db:"created_at" json:"created_at"`
-	FailureInterface `json:"-"`
+	Id               int64     `gorm:"primary_key;column:id" json:"id"`
+	Issue            string    `gorm:"column:issue" json:"issue"`
+	Method           string    `gorm:"column:method" json:"method,omitempty"`
+	Service          int64     `gorm:"index;column:service" json:"service_id"`
+	CreatedAt        time.Time `gorm:"column:created_at" json:"created_at"`
+	FailureInterface `gorm:"-" json:"-"`
 }
 
 type FailureInterface interface {

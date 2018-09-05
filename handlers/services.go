@@ -60,8 +60,7 @@ func ReorderServiceHandler(w http.ResponseWriter, r *http.Request) {
 	decoder.Decode(&newOrder)
 	for _, s := range newOrder {
 		service := core.SelectService(s.Id)
-		service.Order = s.Order
-		service.Update(false)
+		service.UpdateSingle("order_id", s.Order)
 	}
 	w.WriteHeader(http.StatusOK)
 }

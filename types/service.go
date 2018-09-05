@@ -20,33 +20,33 @@ import (
 )
 
 type Service struct {
-	Id               int64      `db:"id,omitempty" json:"id"`
-	Name             string     `db:"name" json:"name"`
-	Domain           string     `db:"domain" json:"domain"`
-	Expected         string     `db:"expected" json:"expected"`
-	ExpectedStatus   int        `db:"expected_status" json:"expected_status"`
-	Interval         int        `db:"check_interval" json:"check_interval"`
-	Type             string     `db:"check_type" json:"type"`
-	Method           string     `db:"method" json:"method"`
-	PostData         string     `db:"post_data" json:"post_data"`
-	Port             int        `db:"port" json:"port"`
-	CreatedAt        time.Time  `db:"created_at" json:"created_at"`
-	Timeout          int        `db:"timeout" json:"timeout"`
-	Order            int        `db:"order_id" json:"order_id"`
-	Online           bool       `json:"online"`
-	Latency          float64    `json:"latency"`
-	Online24Hours    float32    `json:"24_hours_online"`
-	AvgResponse      string     `json:"avg_response"`
-	TotalUptime      string     `json:"uptime"`
-	Failures         []*Failure `json:"failures"`
-	Checkins         []*Checkin `json:"checkins"`
-	Running          chan bool  `json:"-"`
-	Checkpoint       time.Time  `json:"-"`
-	LastResponse     string     `json:"-"`
-	LastStatusCode   int        `json:"status_code"`
-	LastOnline       time.Time  `json:"last_online"`
-	DnsLookup        float64    `json:"dns_lookup_time"`
-	ServiceInterface `json:"-"`
+	Id               int64      `gorm:"primary_key;column:id" json:"id"`
+	Name             string     `gorm:"column:name" json:"name"`
+	Domain           string     `gorm:"column:domain" json:"domain"`
+	Expected         string     `gorm:"column:expected" json:"expected"`
+	ExpectedStatus   int        `gorm:"column:expected_status" json:"expected_status"`
+	Interval         int        `gorm:"column:check_interval" json:"check_interval"`
+	Type             string     `gorm:"column:check_type" json:"type"`
+	Method           string     `gorm:"column:method" json:"method"`
+	PostData         string     `gorm:"column:post_data" json:"post_data"`
+	Port             int        `gorm:"column:port" json:"port"`
+	CreatedAt        time.Time  `gorm:"column:created_at" json:"created_at"`
+	Timeout          int        `gorm:"column:timeout" json:"timeout"`
+	Order            int        `gorm:"column:order_id" json:"order_id"`
+	Online           bool       `gorm:"-" json:"online"`
+	Latency          float64    `gorm:"-" json:"latency"`
+	Online24Hours    float32    `gorm:"-" json:"24_hours_online"`
+	AvgResponse      string     `gorm:"-" json:"avg_response"`
+	TotalUptime      string     `gorm:"-" json:"uptime"`
+	Failures         []*Failure `gorm:"-" json:"failures"`
+	Checkins         []*Checkin `gorm:"-" json:"checkins"`
+	Running          chan bool  `gorm:"-" json:"-"`
+	Checkpoint       time.Time  `gorm:"-" json:"-"`
+	LastResponse     string     `gorm:"-" json:"-"`
+	LastStatusCode   int        `gorm:"-" json:"status_code"`
+	LastOnline       time.Time  `gorm:"-" json:"last_online"`
+	DnsLookup        float64    `gorm:"-" json:"dns_lookup_time"`
+	ServiceInterface `gorm:"-" json:"-"`
 }
 
 type ServiceInterface interface {
@@ -56,6 +56,7 @@ type ServiceInterface interface {
 	Delete() error
 	// Basic Method functions
 	AvgTime() float64
+	OnlineSince(time.Time) float32
 	Online24() float32
 	SmallText() string
 	GraphData() string
@@ -65,13 +66,15 @@ type ServiceInterface interface {
 	CreateFailure(*Failure) (int64, error)
 	LimitedFailures() []*Failure
 	AllFailures() []*Failure
+	TotalFailuresSince(time.Time) (uint64, error)
+	TotalFailures24() (uint64, error)
 	TotalFailures() (uint64, error)
-	TotalFailures24Hours() (uint64, error)
 	DeleteFailures()
 	// Hits functions (successful responses)
 	CreateHit(*Hit) (int64, error)
 	Hits() ([]*Hit, error)
 	TotalHits() (uint64, error)
+	TotalHitsSince(time.Time) (uint64, error)
 	Sum() (float64, error)
 	LimitedHits() ([]*Hit, error)
 	SelectHitsGroupBy(string) ([]*Hit, error)

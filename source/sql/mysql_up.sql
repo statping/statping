@@ -10,21 +10,20 @@ CREATE TABLE core (
     version VARCHAR(50),
     migration_id INT(6) NOT NULL DEFAULT 0,
     use_cdn BOOL NOT NULL DEFAULT '0'
-);
+) ENGINE=INNODB;
 CREATE TABLE users (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY(id),
     username VARCHAR(50) NOT NULL UNIQUE,
     password text,
     email VARCHAR (50),
     api_key VARCHAR(50),
     api_secret VARCHAR(50),
     administrator BOOL NOT NULL DEFAULT '0',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    INDEX (id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (username, email)
-);
+) ENGINE=INNODB;
 CREATE TABLE services (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY(id),
     name VARCHAR(50),
     domain text,
     check_type text,
@@ -35,38 +34,34 @@ CREATE TABLE services (
     check_interval int(11),
     post_data text,
     order_id integer default 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    timeout INT(6) DEFAULT 30,
-    INDEX (id)
-);
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    timeout INT(6) DEFAULT 30
+) ENGINE=INNODB;
 CREATE TABLE hits (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    service INTEGER NOT NULL,
+    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY(id),
+    service BIGINT(20) UNSIGNED NOT NULL,
     latency float,
-    created_at DATETIME,
-    INDEX (id, service),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (service) REFERENCES services(id) ON DELETE CASCADE
-);
+) ENGINE=INNODB;
 CREATE TABLE failures (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY(id),
     issue text,
     method text,
-    service INTEGER NOT NULL,
-    created_at DATETIME,
-    INDEX (id, service),
+    service BIGINT(20) UNSIGNED NOT NULL,
+    created_at TIMESTAMP,
     FOREIGN KEY (service) REFERENCES services(id) ON DELETE CASCADE
-);
+) ENGINE=INNODB;
 CREATE TABLE checkins (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    service INTEGER NOT NULL,
+    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY(id),
+    service BIGINT(20) UNSIGNED NOT NULL,
     check_interval integer,
     api text,
-    created_at DATETIME,
-    INDEX (id, service),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (service) REFERENCES services(id) ON DELETE CASCADE
-);
+) ENGINE=INNODB;
 CREATE TABLE communication (
-    id SERIAL PRIMARY KEY,
+    id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY(id),
     method text,
     host text,
     port integer,
@@ -79,5 +74,5 @@ CREATE TABLE communication (
     enabled BOOL NOT NULL DEFAULT '0',
     removable BOOL NOT NULL DEFAULT '0',
     limits integer,
-    created_at DATETIME
-);
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=INNODB;
