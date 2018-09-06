@@ -33,18 +33,19 @@ var (
 type Notification struct {
 	Id        int64              `gorm:"primary_key column:id" json:"id"`
 	Method    string             `gorm:"column:method" json:"method"`
-	Host      string             `gorm:"column:host" json:"-"`
-	Port      int                `gorm:"column:port" json:"-"`
-	Username  string             `gorm:"column:username" json:"-"`
-	Password  string             `gorm:"column:password" json:"-"`
-	Var1      string             `gorm:"column:var1" json:"-"`
-	Var2      string             `gorm:"column:var2" json:"-"`
-	ApiKey    string             `gorm:"column:api_key" json:"-"`
-	ApiSecret string             `gorm:"column:api_secret" json:"-"`
-	Enabled   bool               `gorm:"column:enabled" json:"enabled"`
-	Limits    int                `gorm:"column:limits" json:"-"`
+	Host      string             `gorm:"not null;column:host" json:"-"`
+	Port      int                `gorm:"not null;column:port" json:"-"`
+	Username  string             `gorm:"not null;column:username" json:"-"`
+	Password  string             `gorm:"not null;column:password" json:"-"`
+	Var1      string             `gorm:"not null;column:var1" json:"-"`
+	Var2      string             `gorm:"not null;column:var2" json:"-"`
+	ApiKey    string             `gorm:"not null;column:api_key" json:"-"`
+	ApiSecret string             `gorm:"not null;column:api_secret" json:"-"`
+	Enabled   bool               `gorm:"column:enabled;type:boolean;default:false" json:"enabled"`
+	Limits    int                `gorm:"not null;column:limits" json:"-"`
 	Removable bool               `gorm:"column:removable" json:"-"`
 	CreatedAt time.Time          `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt time.Time          `gorm:"column:updated_at" json:"updated_at"`
 	Form      []NotificationForm `gorm:"-" json:"-"`
 	Routine   chan struct{}      `gorm:"-" json:"-"`
 }

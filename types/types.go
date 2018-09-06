@@ -61,6 +61,7 @@ type PluginActions interface {
 
 type AllNotifiers interface{}
 
+// Hit struct is a 'successful' ping or web response entry for a service.
 type Hit struct {
 	Id        int64     `gorm:"primary_key;column:id"`
 	Service   int64     `gorm:"index;column:service"`
@@ -68,6 +69,7 @@ type Hit struct {
 	CreatedAt time.Time `gorm:"column:created_at"`
 }
 
+// DbConfig struct is used for the database connection and creates the 'config.yml' file
 type DbConfig struct {
 	DbConn      string `yaml:"connection"`
 	DbHost      string `yaml:"host"`

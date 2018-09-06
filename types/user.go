@@ -13,6 +13,7 @@ type User struct {
 	ApiSecret     string    `gorm:"column:api_secret" json:"-"`
 	Admin         bool      `gorm:"column:administrator" json:"admin"`
 	CreatedAt     time.Time `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt     time.Time `gorm:"column:updated_at" json:"updated_at"`
 	UserInterface `gorm:"-" json:"-"`
 }
 

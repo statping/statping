@@ -70,8 +70,18 @@ func TestDbConnection(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestDropDatabase(t *testing.T) {
+	err := Configs.DropDatabase()
+	assert.Nil(t, err)
+}
+
 func TestSeedSchemaDatabase(t *testing.T) {
-	_, _, err := Configs.SeedSchema()
+	err := Configs.CreateDatabase()
+	assert.Nil(t, err)
+}
+
+func TestMigrateDatabase(t *testing.T) {
+	err := Configs.MigrateDatabase()
 	assert.Nil(t, err)
 }
 
@@ -90,13 +100,6 @@ func TestSelectCore(t *testing.T) {
 	core, err := SelectCore()
 	assert.Nil(t, err)
 	assert.Equal(t, "Awesome Status", core.Name)
-}
-
-func TestSelectLastMigration(t *testing.T) {
-	id, err := SelectLastMigration()
-	assert.Nil(t, err)
-	//assert.NotZero(t, id)
-	t.Log("Last migration id: ", id)
 }
 
 func TestInsertNotifierDB(t *testing.T) {

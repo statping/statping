@@ -23,21 +23,21 @@ type Service struct {
 	Id               int64      `gorm:"primary_key;column:id" json:"id"`
 	Name             string     `gorm:"column:name" json:"name"`
 	Domain           string     `gorm:"column:domain" json:"domain"`
-	Expected         string     `gorm:"column:expected" json:"expected"`
-	ExpectedStatus   int        `gorm:"column:expected_status" json:"expected_status"`
-	Interval         int        `gorm:"column:check_interval" json:"check_interval"`
+	Expected         string     `gorm:"not null;column:expected" json:"expected"`
+	ExpectedStatus   int        `gorm:"default:200;column:expected_status" json:"expected_status"`
+	Interval         int        `gorm:"default:30;column:check_interval" json:"check_interval"`
 	Type             string     `gorm:"column:check_type" json:"type"`
 	Method           string     `gorm:"column:method" json:"method"`
-	PostData         string     `gorm:"column:post_data" json:"post_data"`
-	Port             int        `gorm:"column:port" json:"port"`
+	PostData         string     `gorm:"not null;column:post_data" json:"post_data"`
+	Port             int        `gorm:"not null;column:port" json:"port"`
+	Timeout          int        `gorm:"default:30;column:timeout" json:"timeout"`
+	Order            int        `gorm:"default:0;column:order_id" json:"order_id"`
 	CreatedAt        time.Time  `gorm:"column:created_at" json:"created_at"`
-	Timeout          int        `gorm:"column:timeout" json:"timeout"`
-	Order            int        `gorm:"column:order_id" json:"order_id"`
+	UpdatedAt        time.Time  `gorm:"column:updated_at" json:"updated_at"`
 	Online           bool       `gorm:"-" json:"online"`
 	Latency          float64    `gorm:"-" json:"latency"`
 	Online24Hours    float32    `gorm:"-" json:"24_hours_online"`
 	AvgResponse      string     `gorm:"-" json:"avg_response"`
-	TotalUptime      string     `gorm:"-" json:"uptime"`
 	Failures         []*Failure `gorm:"-" json:"failures"`
 	Checkins         []*Checkin `gorm:"-" json:"checkins"`
 	Running          chan bool  `gorm:"-" json:"-"`

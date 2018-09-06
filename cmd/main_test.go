@@ -101,7 +101,6 @@ func TestRunAll(t *testing.T) {
 			assert.Nil(t, err)
 		})
 		t.Run(dbt+" Run Database Migrations", func(t *testing.T) {
-			t.SkipNow()
 			RunDatabaseMigrations(t, dbt)
 		})
 		t.Run(dbt+" Select Core", func(t *testing.T) {
@@ -251,13 +250,8 @@ func RunCreateSchema(t *testing.T, db string) {
 	assert.Nil(t, err)
 }
 
-func RunConnectDatabase(t *testing.T) {
-	err := core.Configs.Connect(false, dir)
-	assert.Nil(t, err)
-}
-
 func RunDatabaseMigrations(t *testing.T, db string) {
-	err := core.RunDatabaseUpgrades()
+	err := core.Configs.MigrateDatabase()
 	assert.Nil(t, err)
 }
 
@@ -493,7 +487,7 @@ func RunService_Failures(t *testing.T) {
 	service := core.SelectService(18)
 	assert.NotNil(t, service)
 	assert.Equal(t, "Failing URL", service.Name)
-	assert.NotEmpty(t, service.Failures)
+	assert.NotEmpty(t, service.AllFailures())
 }
 
 func RunService_LimitedHits(t *testing.T) {

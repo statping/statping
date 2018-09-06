@@ -59,8 +59,10 @@ func ReorderServiceHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&newOrder)
 	for _, s := range newOrder {
+		fmt.Println("updating: ", s.Id, " to be order_id: ", s.Order)
 		service := core.SelectService(s.Id)
-		service.UpdateSingle("order_id", s.Order)
+		service.Order = s.Order
+		service.Update(false)
 	}
 	w.WriteHeader(http.StatusOK)
 }

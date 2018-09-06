@@ -48,15 +48,15 @@ func FindCheckin(api string) *types.Checkin {
 
 func (s *Service) AllCheckins() []*types.Checkin {
 	var checkins []*types.Checkin
-	col := checkinDB().Where("service = ?", s.Id).Order("-id")
-	col.Scan(&checkins)
+	col := checkinDB().Where("service = ?", s.Id).Order("id desc")
+	col.Find(&checkins)
 	s.Checkins = checkins
 	return checkins
 }
 
 func (u *Checkin) Create() (int64, error) {
 	u.CreatedAt = time.Now()
-	row := checkinDB().Create(&u)
+	row := checkinDB().Create(u)
 	if row.Error == nil {
 		utils.Log(2, row.Error)
 		return 0, row.Error

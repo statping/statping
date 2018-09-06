@@ -17,10 +17,8 @@ package core
 
 import (
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-yaml/yaml"
 	"github.com/hunterlong/statup/notifiers"
-	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/jinzhu/gorm"
@@ -28,23 +26,20 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	_ "github.com/lib/pq"
-	_ "github.com/mattn/go-sqlite3"
 	"os"
-	"strings"
 	"time"
 )
 
 var (
-	DbSession        *gorm.DB
-	currentMigration int64
+	DbSession *gorm.DB
 )
 
 func failuresDB() *gorm.DB {
-	if os.Getenv("GO_ENV") == "TEST" {
-		return DbSession.Model(&types.Failure{}).Debug()
+	db := DbSession.Model(&types.Failure{})
+	if os.Getenv("GO_ENV") == "test" {
+		return db.Debug()
 	}
-	return DbSession.Model(&types.Failure{})
+	return db
 }
 
 func (s *Service) allHits() *gorm.DB {
@@ -53,42 +48,47 @@ func (s *Service) allHits() *gorm.DB {
 }
 
 func hitsDB() *gorm.DB {
-	if os.Getenv("GO_ENV") == "TEST" {
-		return DbSession.Model(&types.Hit{}).Debug()
+	db := DbSession.Model(&types.Hit{})
+	if os.Getenv("GO_ENV") == "test" {
+		return db.Debug()
 	}
-	return DbSession.Model(&types.Hit{})
+	return db
 }
 
 func servicesDB() *gorm.DB {
-	if os.Getenv("GO_ENV") == "TEST" {
-		return DbSession.Model(&types.Service{}).Debug()
+	db := DbSession.Model(&types.Service{})
+	if os.Getenv("GO_ENV") == "test" {
+		return db.Debug()
 	}
-	return DbSession.Model(&types.Service{})
+	return db
 }
 
 func coreDB() *gorm.DB {
-	if os.Getenv("GO_ENV") == "TEST" {
-		return DbSession.Table("core").Debug()
+	db := DbSession.Table("core").Model(&CoreApp)
+	if os.Getenv("GO_ENV") == "test" {
+		return db.Debug()
 	}
-	return DbSession.Table("core")
+	return db
 }
 
 func usersDB() *gorm.DB {
-	if os.Getenv("GO_ENV") == "TEST" {
-		return DbSession.Model(&types.User{}).Debug()
+	db := DbSession.Model(&types.User{})
+	if os.Getenv("GO_ENV") == "test" {
+		return db.Debug()
 	}
-	return DbSession.Model(&types.User{})
+	return db
 }
 
 func commDB() *gorm.DB {
-	if os.Getenv("GO_ENV") == "TEST" {
-		return DbSession.Table("communication").Model(&notifiers.Notification{}).Debug()
+	db := DbSession.Table("communication").Model(&notifiers.Notification{})
+	if os.Getenv("GO_ENV") == "test" {
+		return db.Debug()
 	}
-	return DbSession.Table("communication").Model(&notifiers.Notification{})
+	return db
 }
 
 func checkinDB() *gorm.DB {
-	if os.Getenv("GO_ENV") == "TEST" {
+	if os.Getenv("GO_ENV") == "test" {
 		return DbSession.Model(&types.Checkin{}).Debug()
 	}
 	return DbSession.Model(&types.Checkin{})
@@ -98,10 +98,12 @@ type DbConfig struct {
 	*types.DbConfig
 }
 
+// Close shutsdown the database connection
 func (db *DbConfig) Close() error {
-	return DbSession.Close()
+	return DbSession.DB().Close()
 }
 
+// InsertCore create the single row for the Core settings in Statup
 func (db *DbConfig) InsertCore() (*Core, error) {
 	CoreApp = &Core{Core: &types.Core{
 		Name:        db.Project,
@@ -117,64 +119,44 @@ func (db *DbConfig) InsertCore() (*Core, error) {
 	return CoreApp, query.Error
 }
 
+// Connect will attempt to connect to the sqlite, postgres, or mysql database
 func (db *DbConfig) Connect(retry bool, location string) error {
 	var err error
 	if DbSession != nil {
 		DbSession = nil
 	}
-	switch Configs.DbConn {
+	var conn, dbType string
+	dbType = Configs.DbConn
+	switch dbType {
 	case "sqlite":
-		DbSession, err = gorm.Open("sqlite3", utils.Directory+"/statup.db")
-		if err != nil {
-			return err
-		}
+		conn = utils.Directory + "/statup.db"
+		dbType = "sqlite3"
 	case "mysql":
 		if Configs.DbPort == 0 {
 			Configs.DbPort = 3306
 		}
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
-		conn := fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=Local", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
-		DbSession, err = gorm.Open("mysql", conn)
-		DbSession.DB().SetConnMaxLifetime(time.Minute * 5)
-		DbSession.DB().SetMaxIdleConns(0)
-		DbSession.DB().SetMaxOpenConns(5)
-		if err != nil {
-			if retry {
-				utils.Log(1, fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", host))
-				return db.waitForDb()
-			} else {
-				return err
-			}
-		}
+		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=Local", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
 	case "postgres":
 		if Configs.DbPort == 0 {
 			Configs.DbPort = 5432
 		}
-		conn := fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v sslmode=disable", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass)
-		DbSession, err = gorm.Open("postgres", conn)
-		if err != nil {
-			if retry {
-				utils.Log(1, fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", Configs.DbHost))
-				return db.waitForDb()
-			} else {
-				fmt.Println("ERROR:", err)
-				return err
-			}
-		}
+		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v sslmode=disable", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass)
 	case "mssql":
 		if Configs.DbPort == 0 {
 			Configs.DbPort = 1433
 		}
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
-		conn := fmt.Sprintf("sqlserver://%v:%v@%v?database=%v", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
-		DbSession, err = gorm.Open("mssql", conn)
-		if err != nil {
-			if retry {
-				utils.Log(1, fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", host))
-				return db.waitForDb()
-			} else {
-				return err
-			}
+		conn = fmt.Sprintf("sqlserver://%v:%v@%v?database=%v", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
+	}
+	DbSession, err = gorm.Open(dbType, conn)
+	if err != nil {
+		if retry {
+			utils.Log(1, fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", Configs.DbHost))
+			return db.waitForDb()
+		} else {
+			fmt.Println("ERROR:", err)
+			return err
 		}
 	}
 	err = DbSession.DB().Ping()
@@ -189,6 +171,8 @@ func (db *DbConfig) waitForDb() error {
 	return db.Connect(true, utils.Directory)
 }
 
+// DatabaseMaintence will automatically delete old records from 'failures' and 'hits'
+// this function is currently set to delete records 7+ days old every 60 minutes
 func DatabaseMaintence() {
 	for range time.Tick(60 * time.Minute) {
 		utils.Log(1, "Checking for database records older than 7 days...")
@@ -198,6 +182,7 @@ func DatabaseMaintence() {
 	}
 }
 
+// DeleteAllSince will delete a specific table's records based on a time.
 func DeleteAllSince(table string, date time.Time) {
 	sql := fmt.Sprintf("DELETE FROM %v WHERE created_at < '%v';", table, date.Format("2006-01-02"))
 	db := DbSession.Raw(sql)
@@ -207,6 +192,7 @@ func DeleteAllSince(table string, date time.Time) {
 	}
 }
 
+// Update will save the config.yml file
 func (c *DbConfig) Update() error {
 	var err error
 	config, err := os.Create(utils.Directory + "/config.yml")
@@ -224,6 +210,7 @@ func (c *DbConfig) Update() error {
 	return err
 }
 
+// Save will initially create the config.yml file
 func (c *DbConfig) Save() (*DbConfig, error) {
 	var err error
 	config, err := os.Create(utils.Directory + "/config.yml")
@@ -243,6 +230,7 @@ func (c *DbConfig) Save() (*DbConfig, error) {
 	return c, err
 }
 
+// CreateCore will initialize the global variable 'CoreApp". This global variable contains most of Statup app.
 func (c *DbConfig) CreateCore() *Core {
 	newCore := &types.Core{
 		Name:        c.Project,
@@ -264,91 +252,7 @@ func (c *DbConfig) CreateCore() *Core {
 	return CoreApp
 }
 
-func versionHigher(migrate int64) bool {
-	if CoreApp.MigrationId < migrate {
-		return true
-	}
-	return false
-}
-
-func reverseSlice(s []string) []string {
-	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
-		s[i], s[j] = s[j], s[i]
-	}
-	return s
-}
-
-func RunDatabaseUpgrades() error {
-	var err error
-	currentMigration, err = SelectLastMigration()
-	if err != nil {
-		return err
-	}
-	utils.Log(1, fmt.Sprintf("Checking for Database Upgrades since #%v", currentMigration))
-	upgrade, _ := source.SqlBox.String(CoreApp.DbConnection + "_upgrade.sql")
-	// parse db version and upgrade file
-	ups := strings.Split(upgrade, "=========================================== ")
-	ups = reverseSlice(ups)
-	var ran int
-	var lastMigration int64
-	for _, v := range ups {
-		if len(v) == 0 {
-			continue
-		}
-		vers := strings.Split(v, "\n")
-		lastMigration = utils.StringInt(vers[0])
-		data := vers[1:]
-
-		//fmt.Printf("Checking Migration from v%v to v%v - %v\n", CoreApp.Version, version, versionHigher(version))
-		if currentMigration >= lastMigration {
-			continue
-		}
-		utils.Log(1, fmt.Sprintf("Migrating Database from #%v to #%v", currentMigration, lastMigration))
-		for _, m := range data {
-			if m == "" {
-				continue
-			}
-			utils.Log(1, fmt.Sprintf("Running Query: %v", m))
-			db := DbSession.Raw(m)
-			ran++
-			if db.Error != nil {
-				utils.Log(2, db.Error)
-				continue
-			}
-		}
-		currentMigration = lastMigration
-	}
-	if ran > 0 {
-		utils.Log(1, fmt.Sprintf("Database Upgraded %v queries ran, current #%v", ran, currentMigration))
-		CoreApp, err = SelectCore()
-		if err != nil {
-			return err
-		}
-		CoreApp.MigrationId = currentMigration
-		UpdateCore(CoreApp)
-	}
-	return err
-}
-
-func (db *DbConfig) SeedSchema() (string, string, error) {
-	utils.Log(1, "Seeding Schema Database with Dummy Data...")
-	dir := utils.Directory
-	var cmd string
-	switch db.DbConn {
-	case "sqlite":
-		cmd = fmt.Sprintf("cat %v/source/sql/sqlite_up.sql | sqlite3 %v/statup.db", dir, dir)
-	case "mysql":
-		cmd = fmt.Sprintf("mysql -h %v -P %v -u %v --password=%v %v < %v/source/sql/mysql_up.sql", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbPass, Configs.DbData, dir)
-	case "postgres":
-		cmd = fmt.Sprintf("PGPASSWORD=%v psql -U %v -h %v -d %v -1 -f %v/source/sql/postgres_up.sql", db.DbPass, db.DbUser, db.DbHost, db.DbData, dir)
-	}
-	out, outErr, err := utils.Command(cmd)
-	if err != nil {
-		return out, outErr, err
-	}
-	return out, outErr, err
-}
-
+// SeedDatabase will insert many elements into the database. This is only ran in Dev/Test move
 func (db *DbConfig) SeedDatabase() (string, string, error) {
 	utils.Log(1, "Seeding Database with Dummy Data...")
 	dir := utils.Directory
@@ -365,6 +269,7 @@ func (db *DbConfig) SeedDatabase() (string, string, error) {
 	return out, outErr, err
 }
 
+// DropDatabase will DROP each table Statup created
 func (db *DbConfig) DropDatabase() error {
 	utils.Log(1, "Dropping Database Tables...")
 	err := DbSession.DropTableIfExists("checkins")
@@ -377,6 +282,7 @@ func (db *DbConfig) DropDatabase() error {
 	return err.Error
 }
 
+// CreateDatabase will CREATE TABLES for each of the Statup elements
 func (db *DbConfig) CreateDatabase() error {
 	utils.Log(1, "Creating Database Tables...")
 	err := DbSession.CreateTable(&types.Checkin{})
@@ -390,17 +296,29 @@ func (db *DbConfig) CreateDatabase() error {
 	return err.Error
 }
 
+// MigrateDatabase will migrate the database structure to current version.
+// This function will NOT remove previous records, tables or columns from the database.
+// If this function has an issue, it will ROLLBACK to the previous state.
 func (db *DbConfig) MigrateDatabase() error {
 	utils.Log(1, "Migrating Database Tables...")
-	err := DbSession.AutoMigrate(&types.Checkin{})
-	err = DbSession.Table("communication").AutoMigrate(&notifiers.Notification{})
-	err = DbSession.Table("core").AutoMigrate(&types.Core{})
-	err = DbSession.AutoMigrate(&types.Failure{})
-	err = DbSession.AutoMigrate(&types.Hit{})
-	err = DbSession.AutoMigrate(&types.Service{})
-	err = DbSession.AutoMigrate(&types.User{})
+
+	tx := DbSession.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	if tx.Error != nil {
+		return tx.Error
+	}
+	tx = tx.AutoMigrate(&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Checkin{}).Table("core").AutoMigrate(&types.Core{}).Table("communication").AutoMigrate(&notifiers.Notification{})
+	if tx.Error != nil {
+		tx.Rollback()
+		utils.Log(3, fmt.Sprintf("Statup Database could not be migrated: %v", tx.Error))
+		return tx.Error
+	}
 	utils.Log(1, "Statup Database Migrated")
-	return err.Error
+	return tx.Commit().Error
 }
 
 func (c *DbConfig) Clean() *DbConfig {

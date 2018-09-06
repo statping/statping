@@ -101,7 +101,7 @@ func mainProcess() {
 	if err != nil {
 		utils.Log(4, fmt.Sprintf("could not connect to database: %v", err))
 	}
-	core.RunDatabaseUpgrades()
+	core.Configs.MigrateDatabase()
 	core.InitApp()
 	if !core.SetupMode {
 		LoadPlugins(false)

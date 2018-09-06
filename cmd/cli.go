@@ -29,7 +29,6 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -239,14 +238,6 @@ func FakeSeed(plug types.PluginActions) {
 	core.DbSession, err = gorm.Open("sqlite", "./.plugin_test.db")
 	if err != nil {
 		utils.Log(3, err)
-	}
-	up, _ := source.SqlBox.String("sqlite_up.sql")
-	requests := strings.Split(up, ";")
-	for _, request := range requests {
-		db := core.DbSession.Exec(request)
-		if db.Error != nil {
-			utils.Log(2, db.Error)
-		}
 	}
 
 	fmt.Println("Finished creating Test SQLite database")

@@ -66,13 +66,6 @@ func (s *Service) LimitedFailures() []*Failure {
 	return failArr
 }
 
-func reverseFailures(input []*Failure) []*Failure {
-	if len(input) == 0 {
-		return input
-	}
-	return append(reverseFailures(input[1:]), input[0])
-}
-
 func (f *Failure) Ago() string {
 	got, _ := timeago.TimeAgoWithTime(time.Now(), f.CreatedAt)
 	return got
@@ -101,7 +94,7 @@ func (s *Service) TotalFailures24() (uint64, error) {
 func (s *Service) TotalFailures() (uint64, error) {
 	var count uint64
 	rows := failuresDB().Where("service = ?", s.Id)
-	err := rows.Count(count)
+	err := rows.Count(&count)
 	return count, err.Error
 }
 

@@ -26,7 +26,7 @@ type Hit struct {
 }
 
 func (s *Service) CreateHit(h *types.Hit) (int64, error) {
-	db := hitsDB().Create(&h)
+	db := hitsDB().Create(h)
 	if db.Error != nil {
 		utils.Log(2, db.Error)
 		return 0, db.Error
@@ -60,10 +60,6 @@ func (s *Service) SelectHitsGroupBy(group string) ([]*Hit, error) {
 	col := hitsDB().Where("service = ?", s.Id)
 	err := col.Find(&hits)
 	return hits, err.Error
-}
-
-func (s *Service) hits() {
-
 }
 
 func (s *Service) TotalHits() (uint64, error) {

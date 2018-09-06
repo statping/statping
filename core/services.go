@@ -44,7 +44,7 @@ func SelectService(id int64) *Service {
 func (c *Core) SelectAllServices() ([]*types.Service, error) {
 	var services []*types.Service
 	var servs []*types.Service
-	db := servicesDB().Find(&services)
+	db := servicesDB().Find(&services).Order("order_id desc")
 	if db.Error != nil {
 		utils.Log(3, fmt.Sprintf("service error: %v", db.Error))
 		return nil, db.Error
@@ -186,24 +186,37 @@ func (s *Service) AvgUptime24() string {
 func (s *Service) AvgUptime(ago time.Time) string {
 	failed, _ := s.TotalFailuresSince(ago)
 	if failed == 0 {
-		s.TotalUptime = "100"
-		return s.TotalUptime
+		return "100"
 	}
 	total, _ := s.TotalHitsSince(ago)
 	if total == 0 {
-		s.TotalUptime = "0"
-		return s.TotalUptime
+		return "0"
 	}
 	percent := float64(failed) / float64(total) * 100
 	percent = 100 - percent
 	if percent < 0 {
 		percent = 0
 	}
-	s.TotalUptime = fmt.Sprintf("%0.2f", percent)
-	if s.TotalUptime == "100.00" {
-		s.TotalUptime = "100"
+	amount := fmt.Sprintf("%0.2f", percent)
+	if amount == "100.00" {
+		amount = "100"
 	}
-	return s.TotalUptime
+	return amount
+}
+
+func (s *Service) TotalUptime() string {
+	hits, _ := s.TotalHits()
+	failures, _ := s.TotalFailures()
+	percent := float64(failures) / float64(hits) * 100
+	percent = 100 - percent
+	if percent < 0 {
+		percent = 0
+	}
+	amount := fmt.Sprintf("%0.2f", percent)
+	if amount == "100.00" {
+		amount = "100"
+	}
+	return amount
 }
 
 func (s *Service) index() int {

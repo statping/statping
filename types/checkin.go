@@ -9,7 +9,8 @@ type Checkin struct {
 	Service          int64     `gorm:"index;column:service"`
 	Interval         int64     `gorm:"column:check_interval"`
 	Api              string    `gorm:"column:api"`
-	CreatedAt        time.Time `gorm:"column:created_at"`
+	CreatedAt        time.Time `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt        time.Time `gorm:"column:updated_at" json:"updated_at"`
 	Hits             int64     `json:"hits"`
 	Last             time.Time `json:"last"`
 	CheckinInterface `json:"-"`
