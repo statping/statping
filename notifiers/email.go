@@ -112,7 +112,7 @@ func (u *Email) Init() error {
 		if u.Enabled {
 
 			utils.Log(1, fmt.Sprintf("Loading SMTP Emailer using host: %v:%v", u.Notification.Host, u.Notification.Port))
-			mailer = gomail.NewDialer(u.Notification.Host, u.Notification.Port, u.Notification.Username, u.Notification.Password)
+			mailer = gomail.NewPlainDialer(u.Notification.Host, u.Notification.Port, u.Notification.Username, u.Notification.Password)
 			mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 			go u.Run()
