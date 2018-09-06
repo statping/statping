@@ -34,10 +34,10 @@ type Core struct {
 }
 
 var (
-	Configs   *types.Config
-	CoreApp   *Core
-	SetupMode bool
-	VERSION   string
+	Configs   *DbConfig // Configs holds all of the config.yml and database info
+	CoreApp   *Core     // CoreApp is a global variable that contains many elements
+	SetupMode bool      // SetupMode will be true if Statup does not have a database connection
+	VERSION   string    // VERSION is set on build automatically by setting a -ldflag
 )
 
 func init() {
@@ -49,12 +49,6 @@ func NewCore() *Core {
 	CoreApp.Core = new(types.Core)
 	CoreApp.Started = time.Now()
 	return CoreApp
-}
-
-func InsertCore(c *Core) error {
-	col := DbSession.Collection("core")
-	_, err := col.Insert(c.Core)
-	return err
 }
 
 func (c *Core) ToCore() *types.Core {
@@ -72,25 +66,27 @@ func InitApp() {
 
 func InsertNotifierDB() error {
 	if DbSession == nil {
-		err := DbConnection(CoreApp.DbConnection, false, utils.Directory)
+		err := Configs.Connect(false, utils.Directory)
 		if err != nil {
 			return errors.New("database connection has not been created")
 		}
 	}
-	notifiers.Collections = DbSession.Collection("communication")
+	notifiers.Collections = commDB()
 	return nil
 }
 
+// UpdateCore will update the CoreApp variable inside of the 'core' table in database
 func UpdateCore(c *Core) (*Core, error) {
-	res := DbSession.Collection("core").Find().Limit(1)
-	err := res.Update(c.Core)
-	return c, err
+	db := coreDB().Update(&c)
+	return c, db.Error
 }
 
+// UsingAssets will return true if /assets folder is present
 func (c Core) UsingAssets() bool {
 	return source.UsingAssets(utils.Directory)
 }
 
+// SassVars opens the file /assets/scss/variables.scss to be edited in Theme
 func (c Core) SassVars() string {
 	if !source.UsingAssets(utils.Directory) {
 		return ""
@@ -98,6 +94,7 @@ func (c Core) SassVars() string {
 	return source.OpenAsset(utils.Directory, "scss/variables.scss")
 }
 
+// BaseSASS is the base design , this opens the file /assets/scss/base.scss to be edited in Theme
 func (c Core) BaseSASS() string {
 	if !source.UsingAssets(utils.Directory) {
 		return ""
@@ -105,6 +102,8 @@ func (c Core) BaseSASS() string {
 	return source.OpenAsset(utils.Directory, "scss/base.scss")
 }
 
+// MobileSASS is the -webkit responsive custom css designs. This opens the
+// file /assets/scss/mobile.scss to be edited in Theme
 func (c Core) MobileSASS() string {
 	if !source.UsingAssets(utils.Directory) {
 		return ""
@@ -112,6 +111,7 @@ func (c Core) MobileSASS() string {
 	return source.OpenAsset(utils.Directory, "scss/mobile.scss")
 }
 
+// AllOnline will be true if all services are online
 func (c Core) AllOnline() bool {
 	for _, s := range CoreApp.Services() {
 		if !s.Online {
@@ -121,49 +121,42 @@ func (c Core) AllOnline() bool {
 	return true
 }
 
-func SelectLastMigration() (int64, error) {
-	var c *types.Core
-	if DbSession == nil {
-		return 0, errors.New("Database connection has not been created yet")
-	}
-	err := DbSession.Collection("core").Find().One(&c)
-	if err != nil {
-		return 0, err
-	}
-	return c.MigrationId, err
-}
-
+// SelectCore will return the CoreApp global variable and the settings/configs for Statup
 func SelectCore() (*Core, error) {
-	var c *types.Core
-	exists := DbSession.Collection("core").Exists()
+	if DbSession == nil {
+		return nil, errors.New("database has not been initiated yet.")
+	}
+	exists := DbSession.HasTable("core")
 	if !exists {
 		return nil, errors.New("core database has not been setup yet.")
 	}
-	err := DbSession.Collection("core").Find().One(&c)
-	if err != nil {
-		return nil, err
+	db := coreDB().First(&CoreApp)
+	if db.Error != nil {
+		return nil, db.Error
 	}
-	CoreApp.Core = c
-	CoreApp.DbConnection = Configs.Connection
+	CoreApp.DbConnection = Configs.DbConn
 	CoreApp.Version = VERSION
 	CoreApp.SelectAllServices()
 	if os.Getenv("USE_CDN") == "true" {
 		CoreApp.UseCdn = true
 	}
 	//store = sessions.NewCookieStore([]byte(core.ApiSecret))
-	return CoreApp, err
+	return CoreApp, db.Error
 }
 
+// ServiceOrder will reorder the services based on 'order_id' (Order)
 type ServiceOrder []*types.Service
 
 func (c ServiceOrder) Len() int           { return len(c) }
 func (c ServiceOrder) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
 func (c ServiceOrder) Less(i, j int) bool { return c[i].Order < c[j].Order }
 
+// Services returns each Service that is attached to this instance
 func (c *Core) Services() []*Service {
 	var services []*Service
 	servs := CoreApp.GetServices()
 	sort.Sort(ServiceOrder(servs))
+	CoreApp.SetServices(servs)
 	for _, ser := range servs {
 		services = append(services, ReturnService(ser))
 	}

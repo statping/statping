@@ -24,13 +24,12 @@ import (
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
+	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
-	"strings"
 	"time"
-	"upper.io/db.v3/sqlite"
 )
 
 const (
@@ -45,6 +44,8 @@ func CatchCLI(args []string) error {
 	LoadDotEnvs()
 
 	switch args[0] {
+	case "seed":
+		handlers.DesktopInit(ipAddress, port)
 	case "app":
 		handlers.DesktopInit(ipAddress, port)
 	case "version":
@@ -94,7 +95,7 @@ func CatchCLI(args []string) error {
 	case "export":
 		var err error
 		fmt.Printf("Statup v%v Exporting Static 'index.html' page...\n", VERSION)
-		core.Configs, err = core.LoadConfig()
+		core.Configs, err = core.LoadConfig(dir)
 		if err != nil {
 			utils.Log(4, "config.yml file not found")
 			return err
@@ -132,11 +133,11 @@ func CatchCLI(args []string) error {
 
 func RunOnce() {
 	var err error
-	core.Configs, err = core.LoadConfig()
+	core.Configs, err = core.LoadConfig(utils.Directory)
 	if err != nil {
 		utils.Log(4, "config.yml file not found")
 	}
-	err = core.DbConnection(core.Configs.Connection, false, utils.Directory)
+	err = core.Configs.Connect(false, utils.Directory)
 	if err != nil {
 		utils.Log(4, err)
 	}
@@ -234,20 +235,9 @@ func FakeSeed(plug types.PluginActions) {
 	fmt.Printf("\n" + BRAKER)
 
 	fmt.Println("\nCreating a SQLite database for testing, will be deleted automatically...")
-	sqlFake := sqlite.ConnectionURL{
-		Database: "./.plugin_test.db",
-	}
-	core.DbSession, err = sqlite.Open(sqlFake)
+	core.DbSession, err = gorm.Open("sqlite", "./.plugin_test.db")
 	if err != nil {
 		utils.Log(3, err)
-	}
-	up, _ := source.SqlBox.String("sqlite_up.sql")
-	requests := strings.Split(up, ";")
-	for _, request := range requests {
-		_, err := core.DbSession.Exec(request)
-		if err != nil {
-			utils.Log(2, err)
-		}
 	}
 
 	fmt.Println("Finished creating Test SQLite database")

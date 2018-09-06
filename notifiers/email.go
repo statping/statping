@@ -112,7 +112,7 @@ func (u *Email) Init() error {
 		if u.Enabled {
 
 			utils.Log(1, fmt.Sprintf("Loading SMTP Emailer using host: %v:%v", u.Notification.Host, u.Notification.Port))
-			mailer = gomail.NewDialer(u.Notification.Host, u.Notification.Port, u.Notification.Username, u.Notification.Password)
+			mailer = gomail.NewPlainDialer(u.Notification.Host, u.Notification.Port, u.Notification.Username, u.Notification.Password)
 			mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 			go u.Run()
@@ -215,7 +215,7 @@ func (u *Email) OnSave() error {
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *Email) Install() error {
-	inDb, err := emailer.Notification.IsInDatabase()
+	inDb := emailer.Notification.IsInDatabase()
 	if !inDb {
 		newNotifer, err := InsertDatabase(u.Notification)
 		if err != nil {
@@ -224,7 +224,7 @@ func (u *Email) Install() error {
 		}
 		utils.Log(1, fmt.Sprintf("new notifier #%v installed: %v", newNotifer, u.Method))
 	}
-	return err
+	return nil
 }
 
 func (u *Email) dialSend(email *EmailOutgoing) error {

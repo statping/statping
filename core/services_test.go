@@ -26,23 +26,29 @@ var (
 	newServiceId int64
 )
 
+func TestSelectHTTPService(t *testing.T) {
+	services, err := CoreApp.SelectAllServices()
+	assert.Nil(t, err)
+	assert.Equal(t, 18, len(services))
+	assert.Equal(t, "Google", services[0].Name)
+	assert.Equal(t, "http", services[0].Type)
+}
+
 func TestSelectAllServices(t *testing.T) {
 	services := CoreApp.Services()
 	for _, s := range services {
 		service := s.Check(true)
-		assert.True(t, service.Online)
+		assert.True(t, service.IsRunning())
+		t.Logf("ID: %v %v\n", s.Id, s.Name)
 	}
-	assert.Equal(t, 5, len(services))
-}
-
-func TestSelectHTTPService(t *testing.T) {
-	service := SelectService(1)
-	assert.Equal(t, "Google", service.Name)
-	assert.Equal(t, "http", service.Type)
+	assert.Equal(t, 18, len(services))
 }
 
 func TestSelectTCPService(t *testing.T) {
+	services := CoreApp.Services()
+	assert.Equal(t, 18, len(services))
 	service := SelectService(5)
+	assert.NotNil(t, service)
 	assert.Equal(t, "Google DNS", service.Name)
 	assert.Equal(t, "tcp", service.Type)
 }
@@ -105,9 +111,14 @@ func TestCheckTCPService(t *testing.T) {
 }
 
 func TestServiceOnline24Hours(t *testing.T) {
-	service := SelectService(5)
-	amount := service.Online24()
-	assert.Equal(t, float32(100), amount)
+	since, err := time.Parse(time.RFC3339, SERVICE_SINCE)
+	assert.Nil(t, err)
+	service := SelectService(1)
+	assert.Equal(t, float32(83.33), service.OnlineSince(since))
+	service2 := SelectService(5)
+	assert.Equal(t, float32(100), service2.OnlineSince(since))
+	service3 := SelectService(18)
+	assert.Equal(t, float32(0), service3.OnlineSince(since))
 }
 
 func TestServiceSmallText(t *testing.T) {
@@ -117,30 +128,35 @@ func TestServiceSmallText(t *testing.T) {
 }
 
 func TestServiceAvgUptime(t *testing.T) {
-	service := SelectService(5)
-	uptime := service.AvgUptime()
-	assert.Equal(t, "100", uptime)
+	since, err := time.Parse(time.RFC3339, SERVICE_SINCE)
+	assert.Nil(t, err)
+	service := SelectService(1)
+	assert.Equal(t, "83.33", service.AvgUptime(since))
+	service2 := SelectService(5)
+	assert.Equal(t, "100", service2.AvgUptime(since))
+	service3 := SelectService(18)
+	assert.Equal(t, "0.00", service3.AvgUptime(since))
 }
 
 func TestServiceHits(t *testing.T) {
 	service := SelectService(5)
 	hits, err := service.Hits()
 	assert.Nil(t, err)
-	assert.Equal(t, int(2), len(hits))
+	assert.Equal(t, int(5), len(hits))
 }
 
 func TestServiceLimitedHits(t *testing.T) {
 	service := SelectService(5)
 	hits, err := service.LimitedHits()
 	assert.Nil(t, err)
-	assert.Equal(t, int(2), len(hits))
+	assert.Equal(t, int(5), len(hits))
 }
 
 func TestServiceTotalHits(t *testing.T) {
 	service := SelectService(5)
 	hits, err := service.TotalHits()
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(0x2), hits)
+	assert.Equal(t, uint64(0x5), hits)
 }
 
 func TestServiceSum(t *testing.T) {
@@ -176,7 +192,6 @@ func TestCreateService(t *testing.T) {
 func TestViewNewService(t *testing.T) {
 	newService := SelectService(newServiceId)
 	assert.Equal(t, "That'll do 🐢", newService.Name)
-
 }
 
 func TestCreateFailingHTTPService(t *testing.T) {
@@ -195,10 +210,12 @@ func TestCreateFailingHTTPService(t *testing.T) {
 	assert.NotZero(t, newServiceId)
 	newService := SelectService(newServiceId)
 	assert.Equal(t, "Bad URL", newService.Name)
+	t.Log("new service ID: ", newServiceId)
 }
 
 func TestServiceFailedCheck(t *testing.T) {
-	service := SelectService(7)
+	service := SelectService(20)
+	assert.Equal(t, "Bad URL", service.Name)
 	checked := service.Check(true)
 	assert.Equal(t, "Bad URL", checked.Name)
 	assert.False(t, checked.Online)
@@ -219,10 +236,11 @@ func TestCreateFailingTCPService(t *testing.T) {
 	assert.NotZero(t, newServiceId)
 	newService := SelectService(newServiceId)
 	assert.Equal(t, "Bad TCP", newService.Name)
+	t.Log("new failing tcp service ID: ", newServiceId)
 }
 
 func TestServiceFailedTCPCheck(t *testing.T) {
-	service := SelectService(8)
+	service := SelectService(21)
 	checked := service.Check(true)
 	assert.Equal(t, "Bad TCP", checked.Name)
 	assert.False(t, checked.Online)
@@ -244,13 +262,13 @@ func TestDeleteService(t *testing.T) {
 
 	count, err := CoreApp.SelectAllServices()
 	assert.Nil(t, err)
-	assert.Equal(t, 8, len(count))
+	assert.Equal(t, 21, len(count))
 
 	err = service.Delete()
 	assert.Nil(t, err)
 
 	services := CoreApp.Services()
-	assert.Equal(t, 7, len(services))
+	assert.Equal(t, 20, len(services))
 }
 
 func TestServiceCloseRoutine(t *testing.T) {

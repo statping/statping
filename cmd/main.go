@@ -55,6 +55,8 @@ func parseFlags() {
 func main() {
 	var err error
 	parseFlags()
+	LoadDotEnvs()
+	source.Assets()
 	utils.InitLogs()
 	args := flag.Args()
 
@@ -68,13 +70,8 @@ func main() {
 			os.Exit(1)
 		}
 	}
-
-	source.Assets()
-	LoadDotEnvs()
-
 	utils.Log(1, fmt.Sprintf("Starting Statup v%v", VERSION))
-
-	core.Configs, err = core.LoadConfig()
+	core.Configs, err = core.LoadConfig(utils.Directory)
 	if err != nil {
 		utils.Log(3, err)
 		core.SetupMode = true
@@ -94,15 +91,18 @@ func LoadDotEnvs() error {
 }
 
 func mainProcess() {
+	dir := utils.Directory
 	var err error
-	err = core.DbConnection(core.Configs.Connection, false, utils.Directory)
+	core.Configs, err = core.LoadConfig(dir)
+	if err != nil {
+		utils.Log(4, fmt.Sprintf("could not load config.yml %v", err))
+	}
+	err = core.Configs.Connect(false, dir)
 	if err != nil {
 		utils.Log(4, fmt.Sprintf("could not connect to database: %v", err))
 	}
-
-	core.RunDatabaseUpgrades()
+	core.Configs.MigrateDatabase()
 	core.InitApp()
-
 	if !core.SetupMode {
 		LoadPlugins(false)
 		fmt.Println(handlers.RunHTTPServer(ipAddress, port))
@@ -170,7 +170,7 @@ func LoadPlugins(debug bool) {
 		if debug {
 			TestPlugin(plugActions)
 		} else {
-			plugActions.OnLoad(core.DbSession)
+			plugActions.OnLoad(*core.DbSession)
 			core.CoreApp.Plugins = append(core.CoreApp.Plugins, plugActions.GetInfo())
 			core.CoreApp.AllPlugins = append(core.CoreApp.AllPlugins, plugActions)
 		}

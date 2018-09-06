@@ -61,13 +61,6 @@ func PrometheusHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(output))
 }
 
-func ResetDbHandler(w http.ResponseWriter, r *http.Request) {
-	utils.Log(1, fmt.Sprintf("Prometheus /metrics Request From IP: %v\n", r.RemoteAddr))
-	core.DropDatabase()
-	core.CoreApp = nil
-	w.WriteHeader(http.StatusOK)
-}
-
 func isAuthorized(r *http.Request) bool {
 	var token string
 	tokens, ok := r.Header["Authorization"]

@@ -32,23 +32,19 @@ func (s *Service) CreateFailure(f *types.Failure) (int64, error) {
 	f.CreatedAt = time.Now()
 	f.Service = s.Id
 	s.Failures = append(s.Failures, f)
-	col := DbSession.Collection("failures")
-	uuid, err := col.Insert(f)
-	if err != nil {
-		utils.Log(3, err)
-		return 0, err
+	row := failuresDB().Create(f)
+	if row.Error != nil {
+		utils.Log(3, row.Error)
+		return 0, row.Error
 	}
-	if uuid == nil {
-		return 0, err
-	}
-	return uuid.(int64), err
+	return f.Id, row.Error
 }
 
 func (s *Service) AllFailures() []*types.Failure {
 	var fails []*types.Failure
-	col := DbSession.Collection("failures").Find("service", s.Id).OrderBy("-id")
-	err := col.All(&fails)
-	if err != nil {
+	col := failuresDB().Where("service = ?", s.Id).Order("id desc")
+	err := col.Find(&fails)
+	if err.Error != nil {
 		utils.Log(3, fmt.Sprintf("Issue getting failures for service %v, %v", s.Name, err))
 		return nil
 	}
@@ -56,8 +52,8 @@ func (s *Service) AllFailures() []*types.Failure {
 }
 
 func (u *Service) DeleteFailures() {
-	_, err := DbSession.Exec(`DELETE FROM failures WHERE service = ?`, u.Id)
-	if err != nil {
+	err := DbSession.Exec(`DELETE FROM failures WHERE service = ?`, u.Id)
+	if err.Error != nil {
 		utils.Log(3, fmt.Sprintf("failed to delete all failures: %v", err))
 	}
 	u.Failures = nil
@@ -65,16 +61,9 @@ func (u *Service) DeleteFailures() {
 
 func (s *Service) LimitedFailures() []*Failure {
 	var failArr []*Failure
-	col := DbSession.Collection("failures").Find("service", s.Id).OrderBy("-id").Limit(10)
-	col.All(&failArr)
+	col := failuresDB().Where("service = ?", s.Id).Order("id desc").Limit(10)
+	col.Find(&failArr)
 	return failArr
-}
-
-func reverseFailures(input []*Failure) []*Failure {
-	if len(input) == 0 {
-		return input
-	}
-	return append(reverseFailures(input[1:]), input[0])
 }
 
 func (f *Failure) Ago() string {
@@ -83,30 +72,37 @@ func (f *Failure) Ago() string {
 }
 
 func (f *Failure) Delete() error {
-	col := DbSession.Collection("failures").Find("id", f.Id)
-	return col.Delete()
+	db := failuresDB().Delete(f)
+	return db.Error
 }
 
 func CountFailures() uint64 {
-	col := DbSession.Collection("failures").Find()
-	amount, err := col.Count()
-	if err != nil {
-		utils.Log(2, err)
+	var count uint64
+	err := failuresDB().Count(&count)
+	if err.Error != nil {
+		utils.Log(2, err.Error)
 		return 0
 	}
-	return amount
+	return count
+}
+
+func (s *Service) TotalFailures24() (uint64, error) {
+	ago := time.Now().Add(-24 * time.Hour)
+	return s.TotalFailuresSince(ago)
 }
 
 func (s *Service) TotalFailures() (uint64, error) {
-	col := DbSession.Collection("failures").Find("service", s.Id)
-	amount, err := col.Count()
-	return amount, err
+	var count uint64
+	rows := failuresDB().Where("service = ?", s.Id)
+	err := rows.Count(&count)
+	return count, err.Error
 }
 
-func (s *Service) TotalFailures24Hours() (uint64, error) {
-	col := DbSession.Collection("failures").Find("service", s.Id)
-	amount, err := col.Count()
-	return amount, err
+func (s *Service) TotalFailuresSince(ago time.Time) (uint64, error) {
+	var count uint64
+	rows := failuresDB().Where("service = ? AND created_at > ?", s.Id, ago.Format("2006-01-02 15:04:05"))
+	err := rows.Count(&count)
+	return count, err.Error
 }
 
 func (f *Failure) ParseError() string {

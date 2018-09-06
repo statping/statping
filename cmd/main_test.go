@@ -31,27 +31,30 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 )
 
 var (
-	route       *mux.Router
-	testSession *sessions.Session
-	dir         string
+	route            *mux.Router
+	testSession      *sessions.Session
+	dir              string
+	SERVICE_SINCE, _ = time.Parse(time.RFC3339, "2018-08-30T10:42:08-07:00")
 )
 
 func init() {
 	dir = utils.Directory
-	os.Remove(dir + "/statup.db")
-	//os.Remove(gopath+"/cmd/config.yml")
-	os.RemoveAll(dir + "/cmd/assets")
-	os.RemoveAll(dir + "/logs")
+}
+
+func Clean() {
+	utils.DeleteFile(dir + "/config.yml")
+	utils.DeleteFile(dir + "/statup.db")
+	utils.DeleteDirectory(dir + "/assets")
+	utils.DeleteDirectory(dir + "/logs")
 }
 
 func RunInit(t *testing.T) {
 	source.Assets()
-	os.Remove(dir + "/statup.db")
-	os.Remove(dir + "/cmd/config.yml")
-	os.Remove(dir + "/cmd/index.html")
+	Clean()
 	route = handlers.Router()
 	LoadDotEnvs()
 	core.CoreApp = core.NewCore()
@@ -60,35 +63,55 @@ func RunInit(t *testing.T) {
 func TestRunAll(t *testing.T) {
 	//t.Parallel()
 
-	databases := []string{"sqlite", "postgres", "mysql"}
+	databases := []string{"postgres", "sqlite", "mysql"}
 	if os.Getenv("ONLY_DB") != "" {
 		databases = []string{os.Getenv("ONLY_DB")}
 	}
 
 	for _, dbt := range databases {
-
 		t.Run(dbt+" init", func(t *testing.T) {
 			RunInit(t)
 		})
-		t.Run(dbt+" load database config", func(t *testing.T) {
-			RunMakeDatabaseConfig(t, dbt)
-		})
-		t.Run(dbt+" run database migrations", func(t *testing.T) {
-			RunDatabaseMigrations(t, dbt)
-		})
-		t.Run(dbt+" Sample Data", func(t *testing.T) {
-			RunInsertSampleData(t)
+		t.Run(dbt+" Save Config", func(t *testing.T) {
+			RunSaveConfig(t, dbt)
 		})
 		t.Run(dbt+" Load Configs", func(t *testing.T) {
 			RunLoadConfig(t)
+			t.Log(core.Configs)
+		})
+		t.Run(dbt+" Connect to Database", func(t *testing.T) {
+			err := core.Configs.Connect(false, dir)
+			assert.Nil(t, err)
+		})
+		t.Run(dbt+" Drop Database", func(t *testing.T) {
+			RunDropDatabase(t)
+		})
+		t.Run(dbt+" Connect to Database Again", func(t *testing.T) {
+			err := core.Configs.Connect(false, dir)
+			assert.Nil(t, err)
+		})
+		t.Run(dbt+" Inserting Database Structure", func(t *testing.T) {
+			RunCreateSchema(t, dbt)
+		})
+		t.Run(dbt+" Inserting Seed Data", func(t *testing.T) {
+			RunInsertSampleData(t)
+		})
+		t.Run(dbt+" Connect to Database Again", func(t *testing.T) {
+			err := core.Configs.Connect(false, dir)
+			assert.Nil(t, err)
+		})
+		t.Run(dbt+" Run Database Migrations", func(t *testing.T) {
+			RunDatabaseMigrations(t, dbt)
 		})
 		t.Run(dbt+" Select Core", func(t *testing.T) {
 			RunSelectCoreMYQL(t, dbt)
+			t.Log(core.CoreApp)
 		})
 		t.Run(dbt+" Select Services", func(t *testing.T) {
 			RunSelectAllMysqlServices(t)
 		})
 		t.Run(dbt+" Select Comms", func(t *testing.T) {
+			t.SkipNow()
 			RunSelectAllMysqlCommunications(t)
 		})
 		t.Run(dbt+" Create Users", func(t *testing.T) {
@@ -131,7 +154,7 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" Create Failing Service", func(t *testing.T) {
 			RunBadService_Create(t)
 		})
-		t.Run(dbt+" Check Service", func(t *testing.T) {
+		t.Run(dbt+" Check Bad Service", func(t *testing.T) {
 			RunBadService_Check(t)
 		})
 		t.Run(dbt+" Select Hits", func(t *testing.T) {
@@ -183,35 +206,24 @@ func TestRunAll(t *testing.T) {
 			RunSettingsHandler(t)
 		})
 		t.Run(dbt+" Cleanup", func(t *testing.T) {
-			//Cleanup(t)
+			core.Configs.Close()
+			core.DbSession = nil
+			//Clean()
 		})
+
+		//<-done
 
 	}
 
 }
 
-func Cleanup(t *testing.T) {
-	core.DbSession.ClearCache()
-	err := core.DbSession.Close()
-	assert.Nil(t, err)
-}
-
-func RunMakeDatabaseConfig(t *testing.T, db string) {
+func RunSaveConfig(t *testing.T, db string) {
+	var err error
 	port := 5432
 	if db == "mysql" {
 		port = 3306
 	}
-
-	//Project     string `yaml:"-"`
-	//Description string `yaml:"-"`
-	//Domain      string `yaml:"-"`
-	//Username    string `yaml:"-"`
-	//Password    string `yaml:"-"`
-	//Email       string `yaml:"-"`
-	//Error       error  `yaml:"-"`
-	//Location    string `yaml:"location"`
-
-	config := &core.DbConfig{&types.DbConfig{
+	core.Configs = &core.DbConfig{DbConfig: &types.DbConfig{
 		DbConn:      db,
 		DbHost:      os.Getenv("DB_HOST"),
 		DbUser:      os.Getenv("DB_USER"),
@@ -227,39 +239,49 @@ func RunMakeDatabaseConfig(t *testing.T, db string) {
 		Error:       nil,
 		Location:    dir,
 	}}
-	err := config.Save()
+	core.Configs, err = core.Configs.Save()
 	assert.Nil(t, err)
+}
 
-	_, err = core.LoadConfig()
+func RunCreateSchema(t *testing.T, db string) {
+	err := core.Configs.Connect(false, dir)
 	assert.Nil(t, err)
-	assert.Equal(t, db, core.Configs.Connection)
-
-	err = core.DbConnection(core.Configs.Connection, false, dir)
+	err = core.Configs.CreateDatabase()
 	assert.Nil(t, err)
 }
 
 func RunDatabaseMigrations(t *testing.T, db string) {
-	err := core.RunDatabaseUpgrades()
+	err := core.Configs.MigrateDatabase()
 	assert.Nil(t, err)
 }
 
 func RunInsertSampleData(t *testing.T) {
-	err := core.LoadSampleData()
-	assert.Nil(t, err)
+	core.Configs.SeedDatabase()
+	//assert.Nil(t, err)
 }
 
 func RunLoadConfig(t *testing.T) {
 	var err error
-	core.Configs, err = core.LoadConfig()
+	core.Configs, err = core.LoadConfig(dir)
+	t.Log(core.Configs)
 	assert.Nil(t, err)
 	assert.NotNil(t, core.Configs)
+}
+
+func RunDropDatabase(t *testing.T) {
+	err := core.Configs.DropDatabase()
+	assert.Nil(t, err)
 }
 
 func RunSelectCoreMYQL(t *testing.T, db string) {
 	var err error
 	core.CoreApp, err = core.SelectCore()
+	if err != nil {
+		t.FailNow()
+	}
 	assert.Nil(t, err)
-	assert.Equal(t, "Testing "+db, core.CoreApp.Name)
+	t.Log("core: ", core.CoreApp.Core)
+	assert.Equal(t, "Awesome Status", core.CoreApp.Name)
 	assert.Equal(t, db, core.CoreApp.DbConnection)
 	assert.NotEmpty(t, core.CoreApp.ApiKey)
 	assert.NotEmpty(t, core.CoreApp.ApiSecret)
@@ -270,12 +292,12 @@ func RunSelectAllMysqlServices(t *testing.T) {
 	var err error
 	services, err := core.CoreApp.SelectAllServices()
 	assert.Nil(t, err)
-	assert.Equal(t, 5, len(services))
+	assert.Equal(t, 18, len(services))
 }
 
 func RunSelectAllMysqlCommunications(t *testing.T) {
 	var err error
-	notifiers.Collections = core.DbSession.Collection("communication")
+	notifiers.Collections = core.DbSession.Table("communication").Model(&notifiers.Notification{})
 	comms := notifiers.Load()
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(comms))
@@ -284,19 +306,19 @@ func RunSelectAllMysqlCommunications(t *testing.T) {
 func RunUser_SelectAll(t *testing.T) {
 	users, err := core.SelectAllUsers()
 	assert.Nil(t, err)
-	assert.Equal(t, 2, len(users))
+	assert.Equal(t, 3, len(users))
 }
 
 func RunUser_Create(t *testing.T) {
 	user := core.ReturnUser(&types.User{
-		Username: "admin",
-		Password: "admin",
-		Email:    "info@testuser.com",
+		Username: "hunterlong",
+		Password: "password123",
+		Email:    "info@gmail.com",
 		Admin:    true,
 	})
 	id, err := user.Create()
 	assert.Nil(t, err)
-	assert.Equal(t, int64(1), id)
+	assert.Equal(t, int64(2), id)
 	user2 := core.ReturnUser(&types.User{
 		Username: "superadmin",
 		Password: "admin",
@@ -305,7 +327,7 @@ func RunUser_Create(t *testing.T) {
 	})
 	id, err = user2.Create()
 	assert.Nil(t, err)
-	assert.Equal(t, int64(2), id)
+	assert.Equal(t, int64(3), id)
 }
 
 func RunUser_Update(t *testing.T) {
@@ -342,7 +364,10 @@ func RunSelectAllServices(t *testing.T) {
 	var err error
 	services, err := core.CoreApp.SelectAllServices()
 	assert.Nil(t, err)
-	assert.Equal(t, 5, len(services))
+	assert.Equal(t, 18, len(services))
+	for _, s := range services {
+		assert.NotEmpty(t, s.CreatedAt)
+	}
 }
 
 func RunOneService_Check(t *testing.T) {
@@ -365,8 +390,7 @@ func RunService_Create(t *testing.T) {
 	})
 	id, err := service.Create()
 	assert.Nil(t, err)
-	assert.Equal(t, int64(6), id)
-	t.Log(service)
+	assert.Equal(t, int64(19), id)
 }
 
 func RunService_ToJSON(t *testing.T) {
@@ -379,15 +403,20 @@ func RunService_ToJSON(t *testing.T) {
 func RunService_AvgTime(t *testing.T) {
 	service := core.SelectService(1)
 	assert.NotNil(t, service)
-	avg := service.AvgUptime()
+	avg := service.AvgUptime24()
 	assert.Equal(t, "100", avg)
 }
 
 func RunService_Online24(t *testing.T) {
 	service := core.SelectService(1)
 	assert.NotNil(t, service)
-	online := service.Online24()
-	assert.Equal(t, float32(100), online)
+	online := service.OnlineSince(SERVICE_SINCE)
+	assert.Equal(t, float32(80), online)
+
+	service = core.SelectService(18)
+	assert.NotNil(t, service)
+	online = service.OnlineSince(SERVICE_SINCE)
+	assert.Equal(t, float32(0), online)
 }
 
 func RunService_GraphData(t *testing.T) {
@@ -413,13 +442,13 @@ func RunBadService_Create(t *testing.T) {
 	})
 	id, err := service.Create()
 	assert.Nil(t, err)
-	assert.Equal(t, int64(7), id)
+	assert.Equal(t, int64(20), id)
 }
 
 func RunBadService_Check(t *testing.T) {
-	service := core.SelectService(7)
+	service := core.SelectService(18)
 	assert.NotNil(t, service)
-	assert.Equal(t, "Bad Service", service.Name)
+	assert.Equal(t, "Failing URL", service.Name)
 	for i := 0; i <= 10; i++ {
 		service.Check(true)
 	}
@@ -431,9 +460,7 @@ func RunDeleteService(t *testing.T) {
 	assert.NotNil(t, service)
 	assert.Equal(t, "JSON API Tester", service.Name)
 	assert.True(t, service.IsRunning())
-	t.Log(service.Running)
 	err := service.Delete()
-	t.Log(service.Running)
 	assert.False(t, service.IsRunning())
 	assert.Nil(t, err)
 }
@@ -441,13 +468,10 @@ func RunDeleteService(t *testing.T) {
 func RunCreateService_Hits(t *testing.T) {
 	services := core.CoreApp.Services()
 	assert.NotNil(t, services)
-	assert.Equal(t, 6, len(services))
-	for i := 0; i <= 15; i++ {
-		for _, s := range services {
-			var service *core.Service
-			service = s.Check(true)
-			assert.NotNil(t, service)
-		}
+	assert.Equal(t, 19, len(services))
+	for _, s := range services {
+		service := s.Check(true)
+		assert.NotNil(t, service)
 	}
 }
 
@@ -460,10 +484,10 @@ func RunService_Hits(t *testing.T) {
 }
 
 func RunService_Failures(t *testing.T) {
-	service := core.SelectService(7)
+	service := core.SelectService(18)
 	assert.NotNil(t, service)
-	assert.Equal(t, "Bad Service", service.Name)
-	assert.NotEmpty(t, service.Failures)
+	assert.Equal(t, "Failing URL", service.Name)
+	assert.NotEmpty(t, service.AllFailures())
 }
 
 func RunService_LimitedHits(t *testing.T) {
@@ -479,7 +503,7 @@ func RunIndexHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
-	assert.True(t, strings.Contains(rr.Body.String(), "This is a test of Statup.io!"))
+	assert.True(t, strings.Contains(rr.Body.String(), "Awesome"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
 }
 
@@ -499,7 +523,7 @@ func RunPrometheusHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
 	t.Log(rr.Body.String())
-	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 6"))
+	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 19"))
 	assert.True(t, handlers.IsAuthenticated(req))
 }
 
@@ -515,7 +539,7 @@ func RunFailingPrometheusHandler(t *testing.T) {
 func RunLoginHandler(t *testing.T) {
 	form := url.Values{}
 	form.Add("username", "admin")
-	form.Add("password", "admin")
+	form.Add("password", "password123")
 	req, err := http.NewRequest("POST", "/dashboard", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	assert.Nil(t, err)

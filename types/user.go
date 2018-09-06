@@ -1,17 +1,20 @@
 package types
 
-import "time"
+import (
+	"time"
+)
 
 type User struct {
-	Id            int64     `db:"id,omitempty" json:"id"`
-	Username      string    `db:"username" json:"username"`
-	Password      string    `db:"password" json:"-"`
-	Email         string    `db:"email" json:"-"`
-	ApiKey        string    `db:"api_key" json:"api_key"`
-	ApiSecret     string    `db:"api_secret" json:"-"`
-	Admin         bool      `db:"administrator" json:"admin"`
-	CreatedAt     time.Time `db:"created_at" json:"created_at"`
-	UserInterface `json:"-"`
+	Id            int64     `gorm:"primary_key;column:id" json:"id"`
+	Username      string    `gorm:"type:varchar(100);unique;column:username;" json:"username"`
+	Password      string    `gorm:"column:password" json:"-"`
+	Email         string    `gorm:"type:varchar(100);unique;column:email" json:"-"`
+	ApiKey        string    `gorm:"column:api_key" json:"api_key"`
+	ApiSecret     string    `gorm:"column:api_secret" json:"-"`
+	Admin         bool      `gorm:"column:administrator" json:"admin"`
+	CreatedAt     time.Time `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt     time.Time `gorm:"column:updated_at" json:"updated_at"`
+	UserInterface `gorm:"-" json:"-"`
 }
 
 type UserInterface interface {

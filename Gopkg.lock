@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  digest = "1:b62a3c5b37db602bf1158e921da1a762315a4c37855fd418a14498aa87a342d5"
+  name = "cloud.google.com/go"
+  packages = ["civil"]
+  pruneopts = "UT"
+  revision = "c728a003b238b26cef9ab6753a5dc424b331c3ad"
+  version = "v0.27.0"
+
+[[projects]]
   branch = "master"
   digest = "1:65796e5fdb94d94bc0ee6bc422aa3541dbe69ed4da275cb5a27f8fa141f4e35c"
   name = "github.com/GeertJohan/go.rice"
@@ -13,12 +21,20 @@
   revision = "c02ca9a983da5807ddf7d796784928f5be4afd09"
 
 [[projects]]
-  branch = "master"
-  digest = "1:4b79025e1eaa5726b92e409a46571f1998b56f0a2d881d6271ca616095eae46e"
+  digest = "1:e92f5581902c345eb4ceffdcd4a854fb8f73cf436d47d837d1ec98ef1fe0a214"
+  name = "github.com/StackExchange/wmi"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "5d049714c4a64225c3c79a7cf7d02f7fb5b96338"
+  version = "1.0.0"
+
+[[projects]]
+  digest = "1:f1ec92a2b8473612547f6e13edbc8c8e6cda6c8be9c54b31958aad4a7ccaaa2b"
   name = "github.com/ararog/timeago"
   packages = ["."]
   pruneopts = "UT"
-  revision = "e9969cf18b8d5f04cc42f050e8b9968e152cd294"
+  revision = "518814407569bf983ea81e1bf8b550dd4e7b34f3"
+  version = "0.0.1"
 
 [[projects]]
   branch = "master"
@@ -29,28 +45,50 @@
   revision = "a5fe2436ffcb3236e175e5149162b41cd28bd27d"
 
 [[projects]]
-  digest = "1:a2c1d0e43bd3baaa071d1b9ed72c27d78169b2b269f71c105ac4ba34b1be4a39"
+  digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   pruneopts = "UT"
-  revision = "346938d642f2ec3594ed81d874461961cd0faa76"
-  version = "v1.1.0"
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
 
 [[projects]]
   branch = "master"
-  digest = "1:14f498fc55a89776c562fa3510aeb7687356944a560c561c0e617af5f9c5f2c7"
+  digest = "1:6f120164f62e62991d0f85562abe2002d438abb2ca80b7717a2f4ae2af1c6829"
+  name = "github.com/denisenkom/go-mssqldb"
+  packages = [
+    ".",
+    "internal/cp",
+  ]
+  pruneopts = "UT"
+  revision = "1eb28afdf9b6e56cf673badd47545f844fe81103"
+
+[[projects]]
+  digest = "1:ca82a3b99694824c627573c2a76d0e49719b4a9c02d1d85a2ac91f1c1f52ab9b"
   name = "github.com/fatih/structs"
   packages = ["."]
   pruneopts = "UT"
-  revision = "ebf56d35bba727c68ac77f56f2fcf90b181851aa"
+  revision = "a720dfa8df582c51dee1b36feabb906bde1588bd"
+  version = "v1.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:70a20b8adf085489a342d033b68b7fc27f4017c51e015b857387249493ee0561"
+  digest = "1:64a5a67c69b70c2420e607a8545d674a23778ed9c3e80607bfd17b77c6c87f6a"
+  name = "github.com/go-ole/go-ole"
+  packages = [
+    ".",
+    "oleutil",
+  ]
+  pruneopts = "UT"
+  revision = "a41e3c4b706f6ae8dfbff342b06e40fa4d2d0506"
+  version = "v1.2.1"
+
+[[projects]]
+  digest = "1:adea5a94903eb4384abef30f3d878dc9ff6b6b5b0722da25b82e5169216dfb61"
   name = "github.com/go-sql-driver/mysql"
   packages = ["."]
   pruneopts = "UT"
-  revision = "99ff426eb706cffe92ff3d058e168b278cabf7c7"
+  revision = "d523deb1b23d913de5bdada721a6071e71283618"
+  version = "v1.4.0"
 
 [[projects]]
   digest = "1:342378ac4dcb378a5448dd723f0784ae519383532f5e70ade24132c4c8693202"
@@ -69,35 +107,74 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:195b71563f8432dac9d9692aca2a9ae098bc35763999573eb1c7d52a02a47ce7"
+  digest = "1:664d37ea261f0fc73dd17f4a1f5f46d01fbb0b0d75f6375af064824424109b7d"
+  name = "github.com/gorilla/handlers"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "7e0847f9db758cdebd26c149d0ae9d5d0b9c98ce"
+  version = "v1.4.0"
+
+[[projects]]
+  digest = "1:e73f5b0152105f18bc131fba127d9949305c8693f8a762588a82a48f61756f5f"
   name = "github.com/gorilla/mux"
   packages = ["."]
   pruneopts = "UT"
-  revision = "cb4698366aa625048f3b815af6a0dea8aef9280a"
+  revision = "e3702bed27f0d39777b0b37b664b6280e8ef8fbf"
+  version = "v1.6.2"
 
 [[projects]]
-  branch = "master"
-  digest = "1:6e0af49591c81ae6d542fd0ba41ea7206f4242471b384bebd206283b9f38e091"
+  digest = "1:e72d1ebb8d395cf9f346fd9cbc652e5ae222dd85e0ac842dc57f175abed6d195"
   name = "github.com/gorilla/securecookie"
   packages = ["."]
   pruneopts = "UT"
-  revision = "78f3d318a8bf316cda921f25e96fd0b441c5173d"
-
-[[projects]]
-  digest = "1:0fe783ea0c04c7d13f7c55d8f74b01b17e18a8320e7deecf578b41ef99b27205"
-  name = "github.com/gorilla/sessions"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "03b6f63cc43ef9c7240a635a5e22b13180e822b8"
+  revision = "e59506cc896acb7f7bf732d4fdf5e25f7ccd8983"
   version = "v1.1.1"
 
 [[projects]]
+  digest = "1:0aa142ca3543fa3aca344c2fa2d52e01d706a3ce4e1fa893e0ef29b5349ddf7a"
+  name = "github.com/gorilla/sessions"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "81547393f870a35be888759a606ba7bf71dbe5c7"
+  version = "v1.1.2"
+
+[[projects]]
+  digest = "1:7b5c6e2eeaa9ae5907c391a91c132abfd5c9e8a784a341b5625e750c67e6825d"
+  name = "github.com/gorilla/websocket"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "66b9c49e59c6c48f0ffce28c2d8b8a5678502c6d"
+  version = "v1.4.0"
+
+[[projects]]
+  digest = "1:4d28d632da146ec6e632bdd29676a95e0874f1ad837fff06aef6610b3b6b4728"
+  name = "github.com/jinzhu/gorm"
+  packages = [
+    ".",
+    "dialects/mssql",
+    "dialects/mysql",
+    "dialects/postgres",
+    "dialects/sqlite",
+  ]
+  pruneopts = "UT"
+  revision = "6ed508ec6a4ecb3531899a69cbc746ccf65a4166"
+  version = "v1.9.1"
+
+[[projects]]
   branch = "master"
-  digest = "1:d166a4b3543a71d87e34767ace94e8b516e79ba45111730306f07c8d6f797f1f"
+  digest = "1:fd97437fbb6b7dce04132cf06775bd258cce305c44add58eb55ca86c6c325160"
+  name = "github.com/jinzhu/inflection"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "04140366298a54a039076d798123ffa108fff46c"
+
+[[projects]]
+  digest = "1:70e697d67ccaec45e16bac3a32380ebcd9e7e071079c60d0171d42cf1cf9748a"
   name = "github.com/joho/godotenv"
   packages = ["."]
   pruneopts = "UT"
-  revision = "1709ab122c988931ad53508747b3c061400c2984"
+  revision = "a79fa1e548e2c689c241d10173efd51e5d689d5b"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
@@ -108,31 +185,43 @@
   revision = "ae77be60afb1dcacde03767a8c37337fad28ac14"
 
 [[projects]]
-  branch = "master"
-  digest = "1:37ce7d7d80531b227023331002c0d42b4b4b291a96798c82a049d03a54ba79e4"
+  digest = "1:b18ffc558326ebaed3b4a175617f1e12ed4e3f53d6ebfe5ba372a3de16d22278"
   name = "github.com/lib/pq"
   packages = [
     ".",
+    "hstore",
     "oid",
   ]
   pruneopts = "UT"
-  revision = "90697d60dd844d5ef6ff15135d0203f65d2f53b8"
+  revision = "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
+  version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:05b7bf6e275fe5d56f479a944d1fd823437f6a2739610ae8359e137690d0a050"
+  digest = "1:3cafc6a5a1b8269605d9df4c6956d43d8011fc57f266ca6b9d04da6c09dee548"
   name = "github.com/mattn/go-sqlite3"
   packages = ["."]
   pruneopts = "UT"
-  revision = "b3511bfdd742af558b54eb6160aca9446d762a19"
+  revision = "25ecb14adfc7543176f7d85291ec7dba82c6f7e4"
+  version = "v1.9.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:3891cc78541df6e4596b3e73978eb062d32967084069270ec881b959be5155ae"
+  digest = "1:4f4fd75cbdd5ad0696f4d762328f094b9c86061323c9a9f8d0de157f06197e89"
+  name = "github.com/mkevac/debugcharts"
+  packages = [
+    ".",
+    "bindata",
+  ]
+  pruneopts = "UT"
+  revision = "d3203a8fa92649b82dc35c214979861de918874a"
+
+[[projects]]
+  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
   name = "github.com/pkg/errors"
   packages = ["."]
   pruneopts = "UT"
-  revision = "816c9085562cd7ee03e7f8188a1cfd942858cded"
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
 
 [[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
@@ -151,6 +240,29 @@
   revision = "6283090d169f51a2410b4e260341a01c9a4c0ca7"
 
 [[projects]]
+  digest = "1:7395b855a6078ad2e6c40311402a057a91125fb9f32cf228e1b32cdc57c33538"
+  name = "github.com/shirou/gopsutil"
+  packages = [
+    "cpu",
+    "host",
+    "internal/common",
+    "mem",
+    "net",
+    "process",
+  ]
+  pruneopts = "UT"
+  revision = "8048a2e9c5773235122027dd585cf821b2af1249"
+  version = "v2.18.07"
+
+[[projects]]
+  branch = "master"
+  digest = "1:99c6a6dab47067c9b898e8c8b13d130c6ab4ffbcc4b7cc6236c2cd0b1e344f5b"
+  name = "github.com/shirou/w32"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "bb4de0191aa41b5507caa14b0650cdbddcd9280b"
+
+[[projects]]
   digest = "1:18752d0b95816a1b777505a97f71c7467a8445b8ffb55631a7bf779f6ba4fa83"
   name = "github.com/stretchr/testify"
   packages = ["assert"]
@@ -159,14 +271,27 @@
   version = "v1.2.2"
 
 [[projects]]
-  digest = "1:1ecf2a49df33be51e757d0033d5d51d5f784f35f68e5a38f797b2d3f03357d71"
+  branch = "master"
+  digest = "1:68344dbfaa4179bb50a583eb8172ace3f1edaf3aebc24e68c03f549f6e6b60dc"
   name = "golang.org/x/crypto"
   packages = [
     "bcrypt",
     "blowfish",
+    "md4",
   ]
   pruneopts = "UT"
-  revision = "c126467f60eb25f8f27e5a981f32a87e3965053f"
+  revision = "0709b304e793a5edb4a2c0145f281ecdc20838a4"
+
+[[projects]]
+  branch = "master"
+  digest = "1:7f4a61b989d94774dc61016b660cf8347f59eb0bed91a10b2f23fc72a38d45d4"
+  name = "golang.org/x/sys"
+  packages = [
+    "unix",
+    "windows",
+  ]
+  pruneopts = "UT"
+  revision = "ebe1bf3edb3325c393447059974de898d5133eb8"
 
 [[projects]]
   digest = "1:c25289f43ac4a68d88b02245742347c94f1e108c534dda442188015ff80669b3"
@@ -185,12 +310,12 @@
   revision = "2caba252f4dc53eaf6b553000885530023f54623"
 
 [[projects]]
-  branch = "v2"
-  digest = "1:e096ada745e034a059752c202717baee0379b69db9473a90f59d103c973384cf"
+  digest = "1:eebd52aee67d9f1e0af1859a584e14b1817581dd5f90d4585418c27b6a93c966"
   name = "gopkg.in/gomail.v2"
   packages = ["."]
   pruneopts = "UT"
-  revision = "81ebce5c23dfd25c6c67194b37d3dd3f338c98b1"
+  revision = "41f3572897373c5538c50a2402db15db079fa4fd"
+  version = "2.0.0"
 
 [[projects]]
   digest = "1:c805e517269b0ba4c21ded5836019ed7d16953d4026cb7d00041d039c7906be9"
@@ -201,25 +326,21 @@
   version = "v2.1"
 
 [[projects]]
-  digest = "1:0d1f3aba6c5c26e67b090b4eed519582fba0dff24d3e486fcb011d84ca3e7806"
+  digest = "1:0a6ab450a46e158a97e3daf7da9df3bfd4f84420047fab6a65fb70b1337ce026"
   name = "upper.io/db.v3"
   packages = [
     ".",
     "internal/cache",
     "internal/cache/hashstructure",
     "internal/immutable",
-    "internal/sqladapter",
     "internal/sqladapter/compat",
     "internal/sqladapter/exql",
     "lib/reflectx",
     "lib/sqlbuilder",
-    "mysql",
-    "postgresql",
-    "sqlite",
   ]
   pruneopts = "UT"
-  revision = "d90922beee6de3f39c93ed677f6da82565d07154"
-  version = "v3.5.3"
+  revision = "199d13d76c7cfba05ea0327375056fdabc8bea80"
+  version = "v3.5.4"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -230,20 +351,23 @@
     "github.com/ararog/timeago",
     "github.com/fatih/structs",
     "github.com/go-yaml/yaml",
+    "github.com/gorilla/handlers",
     "github.com/gorilla/mux",
     "github.com/gorilla/sessions",
+    "github.com/jinzhu/gorm",
+    "github.com/jinzhu/gorm/dialects/mssql",
+    "github.com/jinzhu/gorm/dialects/mysql",
+    "github.com/jinzhu/gorm/dialects/postgres",
+    "github.com/jinzhu/gorm/dialects/sqlite",
     "github.com/joho/godotenv",
+    "github.com/mkevac/debugcharts",
     "github.com/pkg/errors",
     "github.com/rendon/testcli",
     "github.com/stretchr/testify/assert",
     "golang.org/x/crypto/bcrypt",
     "gopkg.in/gomail.v2",
     "gopkg.in/natefinch/lumberjack.v2",
-    "upper.io/db.v3",
     "upper.io/db.v3/lib/sqlbuilder",
-    "upper.io/db.v3/mysql",
-    "upper.io/db.v3/postgresql",
-    "upper.io/db.v3/sqlite",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

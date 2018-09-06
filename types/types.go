@@ -16,9 +16,9 @@
 package types
 
 import (
+	"github.com/jinzhu/gorm"
 	"net/http"
 	"time"
-	"upper.io/db.v3/lib/sqlbuilder"
 )
 
 type PluginInfo struct {
@@ -41,7 +41,7 @@ type Info struct {
 type PluginActions interface {
 	GetInfo() Info
 	GetForm() string
-	OnLoad(sqlbuilder.Database)
+	OnLoad(db gorm.DB)
 	SetInfo(map[string]interface{}) Info
 	Routes() []Routing
 	OnSave(map[string]interface{})
@@ -61,23 +61,15 @@ type PluginActions interface {
 
 type AllNotifiers interface{}
 
+// Hit struct is a 'successful' ping or web response entry for a service.
 type Hit struct {
-	Id        int       `db:"id,omitempty"`
-	Service   int64     `db:"service"`
-	Latency   float64   `db:"latency"`
-	CreatedAt time.Time `db:"created_at"`
+	Id        int64     `gorm:"primary_key;column:id"`
+	Service   int64     `gorm:"index;column:service"`
+	Latency   float64   `gorm:"column:latency"`
+	CreatedAt time.Time `gorm:"column:created_at"`
 }
 
-type Config struct {
-	Connection string `yaml:"connection"`
-	Host       string `yaml:"host"`
-	Database   string `yaml:"database"`
-	User       string `yaml:"user"`
-	Password   string `yaml:"password"`
-	Port       string `yaml:"port"`
-	Secret     string `yaml:"secret"`
-}
-
+// DbConfig struct is used for the database connection and creates the 'config.yml' file
 type DbConfig struct {
 	DbConn      string `yaml:"connection"`
 	DbHost      string `yaml:"host"`

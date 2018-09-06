@@ -36,13 +36,13 @@ func TestCreateUser(t *testing.T) {
 func TestSelectAllUsers(t *testing.T) {
 	users, err := SelectAllUsers()
 	assert.Nil(t, err)
-	assert.Equal(t, 1, len(users))
+	assert.Equal(t, 2, len(users))
 }
 
 func TestSelectUser(t *testing.T) {
 	user, err := SelectUser(1)
 	assert.Nil(t, err)
-	assert.Equal(t, "test@email.com", user.Email)
+	assert.Equal(t, "info@statup.io", user.Email)
 	assert.True(t, user.Admin)
 }
 
@@ -50,7 +50,7 @@ func TestSelectUsername(t *testing.T) {
 	user, err := SelectUsername("hunter")
 	assert.Nil(t, err)
 	assert.Equal(t, "test@email.com", user.Email)
-	assert.Equal(t, int64(1), user.Id)
+	assert.Equal(t, int64(2), user.Id)
 	assert.True(t, user.Admin)
 }
 
@@ -80,7 +80,7 @@ func TestCreateUser2(t *testing.T) {
 func TestSelectAllUsersAgain(t *testing.T) {
 	users, err := SelectAllUsers()
 	assert.Nil(t, err)
-	assert.Equal(t, 2, len(users))
+	assert.Equal(t, 3, len(users))
 }
 
 func TestAuthUser(t *testing.T) {
@@ -88,12 +88,12 @@ func TestAuthUser(t *testing.T) {
 	assert.True(t, auth)
 	assert.NotNil(t, user)
 	assert.Equal(t, "user@email.com", user.Email)
-	assert.Equal(t, int64(2), user.Id)
+	assert.Equal(t, int64(3), user.Id)
 	assert.True(t, user.Admin)
 }
 
 func TestFailedAuthUser(t *testing.T) {
-	user, auth := AuthUser("hunter", "wrongpassword")
+	user, auth := AuthUser("hunterlong", "wrongpassword")
 	assert.False(t, auth)
 	assert.Nil(t, user)
 }
@@ -109,5 +109,10 @@ func TestDeleteUser(t *testing.T) {
 	user, err := SelectUser(2)
 	assert.Nil(t, err)
 	err = user.Delete()
+	assert.Nil(t, err)
+}
+
+func TestDbConfig_Close(t *testing.T) {
+	err := Configs.Close()
 	assert.Nil(t, err)
 }

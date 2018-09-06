@@ -27,7 +27,6 @@ import (
 )
 
 var (
-	SqlBox  *rice.Box
 	CssBox  *rice.Box
 	ScssBox *rice.Box
 	JsBox   *rice.Box
@@ -35,7 +34,6 @@ var (
 )
 
 func Assets() {
-	SqlBox = rice.MustFindBox("sql")
 	CssBox = rice.MustFindBox("css")
 	ScssBox = rice.MustFindBox("scss")
 	JsBox = rice.MustFindBox("js")

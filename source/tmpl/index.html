@@ -73,14 +73,14 @@
                                 Average Response
                             </div>
                             <div class="col-4">
-                                <span class="lg_number">{{.AvgUptime}}%</span>
-                                Total Uptime
+                                <span class="lg_number">{{.AvgUptime24}}%</span>
+                                Uptime last 24 Hours
                             </div>
                         </div>
 
                         </div>
                     </div>
-                {{ if .AvgTime }}
+                {{ if .AvgUptime24 }}
                     <div class="chart-container">
                         <canvas id="service_{{ .Id }}"></canvas>
                     </div>

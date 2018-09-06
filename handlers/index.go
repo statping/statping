@@ -27,7 +27,7 @@ type index struct {
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	if core.CoreApp.DbConnection == "" {
+	if core.Configs == nil {
 		http.Redirect(w, r, "/setup", http.StatusSeeOther)
 		return
 	}
@@ -42,12 +42,12 @@ func DesktopInit(ip string, port int) {
 	var err error
 	exists := utils.FileExists(utils.Directory + "/statup.db")
 	if exists {
-		core.Configs, err = core.LoadConfig()
+		core.Configs, err = core.LoadConfig(utils.Directory)
 		if err != nil {
 			utils.Log(3, err)
 			return
 		}
-		err = core.DbConnection(core.Configs.Connection, false, utils.Directory)
+		err = core.Configs.Connect(false, utils.Directory)
 		if err != nil {
 			utils.Log(3, err)
 			return
@@ -68,24 +68,28 @@ func DesktopInit(ip string, port int) {
 		Location:    utils.Directory,
 	}}
 
-	err = config.Save()
+	config, err = config.Save()
 	if err != nil {
 		utils.Log(4, err)
 	}
+
+	config.DropDatabase()
+	config.CreateDatabase()
+	core.CoreApp = config.CreateCore()
 
 	if err != nil {
 		utils.Log(3, err)
 		return
 	}
 
-	core.Configs, err = core.LoadConfig()
+	core.Configs, err = core.LoadConfig(utils.Directory)
 	if err != nil {
 		utils.Log(3, err)
 		config.Error = err
 		return
 	}
 
-	err = core.DbConnection(core.Configs.Connection, false, utils.Directory)
+	err = core.Configs.Connect(false, utils.Directory)
 	if err != nil {
 		utils.Log(3, err)
 		core.DeleteConfig()

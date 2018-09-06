@@ -48,26 +48,25 @@ func FindCheckin(api string) *types.Checkin {
 
 func (s *Service) AllCheckins() []*types.Checkin {
 	var checkins []*types.Checkin
-	col := DbSession.Collection("checkins").Find("service", s.Id).OrderBy("-id")
-	col.All(&checkins)
+	col := checkinDB().Where("service = ?", s.Id).Order("id desc")
+	col.Find(&checkins)
 	s.Checkins = checkins
 	return checkins
 }
 
 func (u *Checkin) Create() (int64, error) {
 	u.CreatedAt = time.Now()
-	uuid, err := DbSession.Collection("checkins").Insert(u)
-	if uuid == nil {
-		utils.Log(2, err)
-		return 0, err
+	row := checkinDB().Create(u)
+	if row.Error == nil {
+		utils.Log(2, row.Error)
+		return 0, row.Error
 	}
-	fmt.Println("new checkin: ", uuid)
-	return uuid.(int64), err
+	return u.Id, row.Error
 }
 
 func SelectCheckinApi(api string) *Checkin {
 	var checkin *Checkin
-	DbSession.Collection("checkins").Find("api", api).One(&checkin)
+	checkinDB().Where("api = ?", api).Find(&checkin)
 	return checkin
 }
 

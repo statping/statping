@@ -165,7 +165,7 @@ func (u *Slack) OnSave() error {
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *Slack) Install() error {
-	inDb, err := slacker.Notification.IsInDatabase()
+	inDb := slacker.Notification.IsInDatabase()
 	if !inDb {
 		newNotifer, err := InsertDatabase(u.Notification)
 		if err != nil {
@@ -174,5 +174,5 @@ func (u *Slack) Install() error {
 		}
 		utils.Log(1, fmt.Sprintf("new notifier #%v installed: %v", newNotifer, u.Method))
 	}
-	return err
+	return nil
 }

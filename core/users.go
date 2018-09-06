@@ -28,36 +28,29 @@ type User struct {
 }
 
 func ReturnUser(u *types.User) *User {
-	return &User{User: u}
+	return &User{u}
 }
 
 func SelectUser(id int64) (*User, error) {
-	var user *User
-	col := DbSession.Collection("users")
-	res := col.Find("id", id)
-	err := res.One(&user)
-	return user, err
+	var user User
+	err := usersDB().First(&user, id)
+	return &user, err.Error
 }
 
 func SelectUsername(username string) (*User, error) {
-	var user *User
-	col := DbSession.Collection("users")
-	res := col.Find("username", username)
-	err := res.One(&user)
-	return user, err
+	var user User
+	res := usersDB().Where("username = ?", username)
+	err := res.First(&user)
+	return &user, err.Error
 }
 
 func (u *User) Delete() error {
-	col := DbSession.Collection("users")
-	user := col.Find("id", u.Id)
-	return user.Delete()
+	return usersDB().Delete(u).Error
 }
 
 func (u *User) Update() error {
 	u.CreatedAt = time.Now()
-	col := DbSession.Collection("users")
-	user := col.Find("id", u.Id)
-	return user.Update(u)
+	return usersDB().Update(u).Error
 }
 
 func (u *User) Create() (int64, error) {
@@ -65,39 +58,36 @@ func (u *User) Create() (int64, error) {
 	u.Password = utils.HashPassword(u.Password)
 	u.ApiKey = utils.NewSHA1Hash(5)
 	u.ApiSecret = utils.NewSHA1Hash(10)
-	col := DbSession.Collection("users")
-	uuid, err := col.Insert(u)
-	if err != nil {
-		return 0, err
+	db := usersDB().Create(u)
+	if db.Error != nil {
+		return 0, db.Error
 	}
-	if uuid == nil {
-		utils.Log(3, fmt.Sprintf("Failed to create user %v. %v", u.Username, err))
-		return 0, err
+	if u.Id == 0 {
+		utils.Log(3, fmt.Sprintf("Failed to create user %v. %v", u.Username, db.Error))
+		return 0, db.Error
 	}
-	return uuid.(int64), err
+	return u.Id, db.Error
 }
 
 func SelectAllUsers() ([]*User, error) {
 	var users []*User
-	col := DbSession.Collection("users").Find()
-	err := col.All(&users)
-	if err != nil {
-		utils.Log(3, fmt.Sprintf("Failed to load all users. %v", err))
+	db := usersDB().Find(&users)
+	if db.Error != nil {
+		utils.Log(3, fmt.Sprintf("Failed to load all users. %v", db.Error))
 	}
-	return users, err
+	return users, db.Error
 }
 
 func AuthUser(username, password string) (*User, bool) {
-	var auth bool
 	user, err := SelectUsername(username)
 	if err != nil {
 		utils.Log(2, err)
 		return nil, false
 	}
 	if CheckHash(password, user.Password) {
-		auth = true
+		return user, true
 	}
-	return user, auth
+	return nil, false
 }
 
 func CheckHash(password, hash string) bool {

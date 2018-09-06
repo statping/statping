@@ -34,6 +34,10 @@ var (
 	LockLines sync.Mutex
 )
 
+func Logger() *lumberjack.Logger {
+	return ljLogger
+}
+
 func createLog(dir string) error {
 	var err error
 	_, err = os.Stat(dir + "/logs")

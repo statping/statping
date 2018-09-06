@@ -179,7 +179,7 @@ func (u *Twilio) OnSave() error {
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *Twilio) Install() error {
-	inDb, err := twilio.Notification.IsInDatabase()
+	inDb := twilio.Notification.IsInDatabase()
 	if !inDb {
 		newNotifer, err := InsertDatabase(u.Notification)
 		if err != nil {
@@ -188,5 +188,5 @@ func (u *Twilio) Install() error {
 		}
 		utils.Log(1, fmt.Sprintf("new notifier #%v installed: %v", newNotifer, u.Method))
 	}
-	return err
+	return nil
 }

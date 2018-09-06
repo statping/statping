@@ -30,28 +30,44 @@
   name = "github.com/GeertJohan/go.rice"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/ararog/timeago"
+  version = "0.0.1"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/fatih/structs"
+  version = "1.0.0"
 
 [[constraint]]
   name = "github.com/go-yaml/yaml"
   version = "2.2.1"
 
 [[constraint]]
+  name = "github.com/gorilla/handlers"
+  version = "1.4.0"
+
+[[constraint]]
+  name = "github.com/gorilla/mux"
+  version = "1.6.2"
+
+[[constraint]]
   name = "github.com/gorilla/sessions"
-  version = "1.1.1"
+  version = "1.1.2"
 
 [[constraint]]
-  branch = "master"
+  name = "github.com/jinzhu/gorm"
+  version = "1.9.1"
+
+[[constraint]]
   name = "github.com/joho/godotenv"
+  version = "1.2.0"
 
 [[constraint]]
   branch = "master"
+  name = "github.com/mkevac/debugcharts"
+
+[[constraint]]
   name = "github.com/pkg/errors"
+  version = "0.8.0"
 
 [[constraint]]
   branch = "master"
@@ -62,8 +78,12 @@
   version = "1.2.2"
 
 [[constraint]]
-  branch = "v2"
+  branch = "master"
+  name = "golang.org/x/crypto"
+
+[[constraint]]
   name = "gopkg.in/gomail.v2"
+  version = "2.0.0"
 
 [[constraint]]
   name = "gopkg.in/natefinch/lumberjack.v2"
@@ -71,7 +91,7 @@
 
 [[constraint]]
   name = "upper.io/db.v3"
-  version = "3.5.3"
+  version = "3.5.4"
 
 [prune]
   go-tests = true

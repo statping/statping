@@ -16,7 +16,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -56,6 +55,7 @@ func SetupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
+	var err error
 	if core.CoreApp.Services() != nil {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
@@ -75,7 +75,9 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	domain := r.PostForm.Get("domain")
 	email := r.PostForm.Get("email")
 
-	config := &core.DbConfig{&types.DbConfig{
+	dir := utils.Directory
+
+	config := &core.DbConfig{DbConfig: &types.DbConfig{
 		DbConn:      dbConn,
 		DbHost:      dbHost,
 		DbUser:      dbUser,
@@ -92,13 +94,15 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		Location:    utils.Directory,
 	}}
 
-	fmt.Println(config)
-
-	err := config.Save()
+	core.Configs, err = config.Save()
 	if err != nil {
 		utils.Log(4, err)
+		config.Error = err
+		SetupResponseError(w, r, config)
+		return
 	}
 
+	core.Configs, err = core.LoadConfig(dir)
 	if err != nil {
 		utils.Log(3, err)
 		config.Error = err
@@ -106,18 +110,21 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	core.Configs, err = core.LoadConfig()
+	err = core.Configs.Connect(false, dir)
 	if err != nil {
-		utils.Log(3, err)
-		config.Error = err
-		SetupResponseError(w, r, config)
-		return
-	}
-
-	err = core.DbConnection(core.Configs.Connection, false, utils.Directory)
-	if err != nil {
-		utils.Log(3, err)
+		utils.Log(4, err)
 		core.DeleteConfig()
+		config.Error = err
+		SetupResponseError(w, r, config)
+		return
+	}
+
+	config.DropDatabase()
+	config.CreateDatabase()
+
+	core.CoreApp, err = config.InsertCore()
+	if err != nil {
+		utils.Log(4, err)
 		config.Error = err
 		SetupResponseError(w, r, config)
 		return

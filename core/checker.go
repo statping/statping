@@ -210,7 +210,9 @@ func RecordSuccess(s *Service) {
 	s.Online = true
 	s.LastOnline = time.Now()
 	data := &types.Hit{
-		Latency: s.Latency,
+		Service:   s.Id,
+		Latency:   s.Latency,
+		CreatedAt: time.Now(),
 	}
 	utils.Log(1, fmt.Sprintf("Service %v Successful: %0.2f ms", s.Name, data.Latency*1000))
 	s.CreateHit(data)

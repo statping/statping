@@ -1,4 +1,4 @@
-VERSION=0.52
+VERSION=0.54
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -25,6 +25,10 @@ travis-test: dev-deps cypress-install test docker-test cypress-test coverage
 docker-build-all: docker-build-base docker-dev docker
 
 docker-publish-all: docker-push-base docker-push-dev docker-push-latest
+
+seed:
+	rm -f statup.db
+	cat dev/seed.sql | sqlite3 statup.db
 
 build: compile
 	$(GOBUILD) $(BUILDVERSION) -o $(BINARY_NAME) -v ./cmd
@@ -127,6 +131,7 @@ dep:
 	dep ensure -vendor-only
 
 dev-deps: dep
+	$(GOGET) -u github.com/jinzhu/gorm/...
 	$(GOGET) github.com/stretchr/testify/assert
 	$(GOGET) golang.org/x/tools/cmd/cover
 	$(GOGET) github.com/mattn/goveralls

@@ -1,13 +1,16 @@
 package types
 
-import "time"
+import (
+	"time"
+)
 
 type Checkin struct {
-	Id               int       `db:"id,omitempty"`
-	Service          int64     `db:"service"`
-	Interval         int64     `db:"check_interval"`
-	Api              string    `db:"api"`
-	CreatedAt        time.Time `db:"created_at"`
+	Id               int64     `gorm:"primary_key;column:id"`
+	Service          int64     `gorm:"index;column:service"`
+	Interval         int64     `gorm:"column:check_interval"`
+	Api              string    `gorm:"column:api"`
+	CreatedAt        time.Time `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt        time.Time `gorm:"column:updated_at" json:"updated_at"`
 	Hits             int64     `json:"hits"`
 	Last             time.Time `json:"last"`
 	CheckinInterface `json:"-"`

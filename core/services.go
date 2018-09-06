@@ -22,7 +22,6 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"strconv"
 	"time"
-	"upper.io/db.v3"
 )
 
 type Service struct {
@@ -30,16 +29,12 @@ type Service struct {
 }
 
 func ReturnService(s *types.Service) *Service {
-	return &Service{Service: s}
-}
-
-func serviceCol() db.Collection {
-	return DbSession.Collection("services")
+	return &Service{s}
 }
 
 func SelectService(id int64) *Service {
 	for _, s := range CoreApp.Services() {
-		if s.Id == id {
+		if s.Service.Id == id {
 			return s
 		}
 	}
@@ -49,11 +44,10 @@ func SelectService(id int64) *Service {
 func (c *Core) SelectAllServices() ([]*types.Service, error) {
 	var services []*types.Service
 	var servs []*types.Service
-	col := serviceCol().Find().OrderBy("order_id")
-	err := col.All(&services)
-	if err != nil {
-		utils.Log(3, fmt.Sprintf("service error: %v", err))
-		return nil, err
+	db := servicesDB().Find(&services).Order("order_id desc")
+	if db.Error != nil {
+		utils.Log(3, fmt.Sprintf("service error: %v", db.Error))
+		return nil, db.Error
 	}
 	for _, ser := range services {
 		single := ReturnService(ser)
@@ -63,7 +57,7 @@ func (c *Core) SelectAllServices() ([]*types.Service, error) {
 		servs = append(servs, single.Service)
 	}
 	CoreApp.SetServices(servs)
-	return services, err
+	return services, db.Error
 }
 
 func (s *Service) ToJSON() string {
@@ -84,12 +78,17 @@ func (s *Service) AvgTime() float64 {
 }
 
 func (s *Service) Online24() float32 {
-	total, _ := s.TotalHits()
-	failed, _ := s.TotalFailures24Hours()
+	ago := time.Now().Add(-24 * time.Hour)
+	return s.OnlineSince(ago)
+}
+
+func (s *Service) OnlineSince(ago time.Time) float32 {
+	failed, _ := s.TotalFailuresSince(ago)
 	if failed == 0 {
 		s.Online24Hours = 100.00
 		return s.Online24Hours
 	}
+	total, _ := s.TotalHitsSince(ago)
 	if total == 0 {
 		s.Online24Hours = 0
 		return s.Online24Hours
@@ -150,16 +149,17 @@ func (s *Service) GraphData() string {
 	var d []*DateScan
 	since := time.Now().Add(time.Hour*-24 + time.Minute*0 + time.Second*0)
 	sql := GroupDataBy("hits", s.Id, since, "minute")
-	dated, err := DbSession.Query(db.Raw(sql))
+	rows, err := DbSession.Raw(sql).Rows()
+	defer rows.Close()
 	if err != nil {
 		utils.Log(2, err)
 		return ""
 	}
-	for dated.Next() {
+	for rows.Next() {
 		gd := new(DateScan)
 		var tt string
 		var ff float64
-		err := dated.Scan(&tt, &ff)
+		err := rows.Scan(&tt, &ff)
 		if err != nil {
 			utils.Log(2, fmt.Sprintf("Issue loading chart data for service %v, %v", s.Name, err))
 		}
@@ -178,27 +178,45 @@ func (s *Service) GraphData() string {
 	return string(data)
 }
 
-func (s *Service) AvgUptime() string {
-	failed, _ := s.TotalFailures()
-	total, _ := s.TotalHits()
+func (s *Service) AvgUptime24() string {
+	ago := time.Now().Add(-24 * time.Hour)
+	return s.AvgUptime(ago)
+}
+
+func (s *Service) AvgUptime(ago time.Time) string {
+	failed, _ := s.TotalFailuresSince(ago)
 	if failed == 0 {
-		s.TotalUptime = "100"
-		return s.TotalUptime
+		return "100"
 	}
+	total, _ := s.TotalHitsSince(ago)
 	if total == 0 {
-		s.TotalUptime = "0"
-		return s.TotalUptime
+		return "0"
 	}
 	percent := float64(failed) / float64(total) * 100
 	percent = 100 - percent
 	if percent < 0 {
 		percent = 0
 	}
-	s.TotalUptime = fmt.Sprintf("%0.2f", percent)
-	if s.TotalUptime == "100.00" {
-		s.TotalUptime = "100"
+	amount := fmt.Sprintf("%0.2f", percent)
+	if amount == "100.00" {
+		amount = "100"
 	}
-	return s.TotalUptime
+	return amount
+}
+
+func (s *Service) TotalUptime() string {
+	hits, _ := s.TotalHits()
+	failures, _ := s.TotalFailures()
+	percent := float64(failures) / float64(hits) * 100
+	percent = 100 - percent
+	if percent < 0 {
+		percent = 0
+	}
+	amount := fmt.Sprintf("%0.2f", percent)
+	if amount == "100.00" {
+		amount = "100"
+	}
+	return amount
 }
 
 func (s *Service) index() int {
@@ -217,25 +235,27 @@ func updateService(service *Service) {
 }
 
 func (u *Service) Delete() error {
-	res := serviceCol().Find("id", u.Id)
-	err := res.Delete()
-	if err != nil {
-		utils.Log(3, fmt.Sprintf("Failed to delete service %v. %v", u.Name, err))
-		return err
+	err := servicesDB().Delete(u)
+	if err.Error != nil {
+		utils.Log(3, fmt.Sprintf("Failed to delete service %v. %v", u.Name, err.Error))
+		return err.Error
 	}
 	u.Close()
 	CoreApp.RemoveService(u.index())
 	OnDeletedService(u)
-	return err
+	return err.Error
+}
+
+func (u *Service) UpdateSingle(attr ...interface{}) error {
+	return servicesDB().Model(u).Update(attr).Error
 }
 
 func (u *Service) Update(restart bool) error {
 	u.CreatedAt = time.Now()
-	res := serviceCol().Find("id", u.Id)
-	err := res.Update(u)
-	if err != nil {
+	err := servicesDB().Update(u)
+	if err.Error != nil {
 		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", u.Name, err))
-		return err
+		return err.Error
 	}
 	if restart {
 		u.Close()
@@ -245,20 +265,19 @@ func (u *Service) Update(restart bool) error {
 		go u.CheckQueue(true)
 	}
 	OnUpdateService(u)
-	return err
+	return err.Error
 }
 
 func (u *Service) Create() (int64, error) {
 	u.CreatedAt = time.Now()
-	uuid, err := serviceCol().Insert(u)
-	if uuid == nil {
-		utils.Log(3, fmt.Sprintf("Failed to create service %v. %v", u.Name, err))
-		return 0, err
+	db := servicesDB().Create(u)
+	if db.Error != nil {
+		utils.Log(3, fmt.Sprintf("Failed to create service %v #%v: %v", u.Name, u.Id, db.Error))
+		return 0, db.Error
 	}
-	u.Id = uuid.(int64)
 	u.Start()
 	CoreApp.AddService(u.Service)
-	return uuid.(int64), err
+	return u.Id, nil
 }
 
 func CountOnline() int {

@@ -24,9 +24,11 @@ import (
 )
 
 var (
-	testCore   *Core
-	testConfig *DbConfig
-	dir        string
+	dir string
+)
+
+const (
+	SERVICE_SINCE = "2018-08-30T10:42:08-07:00" // "2006-01-02T15:04:05Z07:00"
 )
 
 func init() {
@@ -36,51 +38,68 @@ func init() {
 }
 
 func TestNewCore(t *testing.T) {
-	testCore = NewCore()
-	assert.NotNil(t, testCore)
-	testCore.Name = "Tester"
+	utils.DeleteFile(dir + "/config.yml")
+	utils.DeleteFile(dir + "/statup.db")
+	CoreApp = NewCore()
+	assert.NotNil(t, CoreApp)
+	CoreApp.Name = "Tester"
 }
 
 func TestDbConfig_Save(t *testing.T) {
-	testConfig = &DbConfig{&types.DbConfig{
+	var err error
+	Configs = &DbConfig{&types.DbConfig{
 		DbConn:   "sqlite",
 		Project:  "Tester",
 		Location: dir,
 	}}
-	err := testConfig.Save()
+	Configs, err = Configs.Save()
 	assert.Nil(t, err)
+	assert.Equal(t, "sqlite", Configs.DbConn)
+	assert.NotEmpty(t, Configs.ApiKey)
+	assert.NotEmpty(t, Configs.ApiSecret)
+}
+
+func TestLoadDbConfig(t *testing.T) {
+	Configs, err := LoadConfig(dir)
+	assert.Nil(t, err)
+	assert.Equal(t, "sqlite", Configs.DbConn)
 }
 
 func TestDbConnection(t *testing.T) {
-	err := DbConnection(testConfig.DbConn, false, dir)
+	err := Configs.Connect(false, dir)
 	assert.Nil(t, err)
 }
 
-func TestCreateDatabase(t *testing.T) {
-	err := CreateDatabase()
+func TestDropDatabase(t *testing.T) {
+	err := Configs.DropDatabase()
 	assert.Nil(t, err)
 }
 
-func TestInsertCore(t *testing.T) {
-	err := InsertCore(testCore)
+func TestSeedSchemaDatabase(t *testing.T) {
+	err := Configs.CreateDatabase()
 	assert.Nil(t, err)
+}
+
+func TestMigrateDatabase(t *testing.T) {
+	err := Configs.MigrateDatabase()
+	assert.Nil(t, err)
+}
+
+func TestSeedDatabase(t *testing.T) {
+	_, _, err := Configs.SeedDatabase()
+	assert.Nil(t, err)
+}
+
+func TestReLoadDbConfig(t *testing.T) {
+	err := Configs.Connect(false, dir)
+	assert.Nil(t, err)
+	assert.Equal(t, "sqlite", Configs.DbConn)
 }
 
 func TestSelectCore(t *testing.T) {
 	core, err := SelectCore()
 	assert.Nil(t, err)
-	assert.Equal(t, "Tester", core.Name)
-}
-
-func TestSampleData(t *testing.T) {
-	err := LoadSampleData()
-	assert.Nil(t, err)
-}
-
-func TestSelectLastMigration(t *testing.T) {
-	id, err := SelectLastMigration()
-	assert.Nil(t, err)
-	assert.NotZero(t, id)
+	assert.Equal(t, "Awesome Status", core.Name)
 }
 
 func TestInsertNotifierDB(t *testing.T) {
