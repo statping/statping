@@ -131,7 +131,7 @@ dep:
 	dep ensure -vendor-only
 
 dev-deps: dep
-	$(GOGET) github.com/jinzhu/gorm/...
+	$(GOGET) -u github.com/jinzhu/gorm/...
 	$(GOGET) github.com/stretchr/testify/assert
 	$(GOGET) golang.org/x/tools/cmd/cover
 	$(GOGET) github.com/mattn/goveralls
