@@ -413,6 +413,11 @@ func RunService_Online24(t *testing.T) {
 	online := service.OnlineSince(SERVICE_SINCE)
 	assert.Equal(t, float32(80), online)
 
+	service = core.SelectService(6)
+	assert.NotNil(t, service)
+	online = service.OnlineSince(SERVICE_SINCE)
+	assert.Equal(t, float32(0), online)
+
 	service = core.SelectService(18)
 	assert.NotNil(t, service)
 	online = service.OnlineSince(SERVICE_SINCE)
