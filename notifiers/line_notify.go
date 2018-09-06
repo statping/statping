@@ -159,7 +159,8 @@ func (u *LineNotify) OnSave() error {
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *LineNotify) Install() error {
-	inDb, err := lineNotify.Notification.IsInDatabase()
+	var err error
+	inDb := lineNotify.Notification.IsInDatabase()
 	if !inDb {
 		newNotifer, err := InsertDatabase(u.Notification)
 		if err != nil {
