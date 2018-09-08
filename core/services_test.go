@@ -35,17 +35,18 @@ func TestSelectHTTPService(t *testing.T) {
 }
 
 func TestSelectAllServices(t *testing.T) {
-	services := CoreApp.Services()
+	services := CoreApp.Services
 	for _, s := range services {
-		service := s.Check(true)
+		service := s.(*Service)
+		service.Check(true)
 		assert.True(t, service.IsRunning())
-		t.Logf("ID: %v %v\n", s.Id, s.Name)
+		t.Logf("ID: %v %v\n", service.Id, service.Name)
 	}
 	assert.Equal(t, 18, len(services))
 }
 
 func TestSelectTCPService(t *testing.T) {
-	services := CoreApp.Services()
+	services := CoreApp.Services
 	assert.Equal(t, 18, len(services))
 	service := SelectService(5)
 	assert.NotNil(t, service)
@@ -72,8 +73,7 @@ func TestUpdateService(t *testing.T) {
 func TestUpdateAllServices(t *testing.T) {
 	services, err := CoreApp.SelectAllServices()
 	assert.Nil(t, err)
-	for k, s := range services {
-		srv := ReturnService(s)
+	for k, srv := range services {
 		srv.Name = "Changed " + srv.Name
 		srv.Interval = k + 3
 		err := srv.Update(true)
@@ -83,9 +83,9 @@ func TestUpdateAllServices(t *testing.T) {
 
 func TestServiceHTTPCheck(t *testing.T) {
 	service := SelectService(1)
-	checked := service.Check(true)
-	assert.Equal(t, "Changed Updated Google", checked.Name)
-	assert.True(t, checked.Online)
+	service.Check(true)
+	assert.Equal(t, "Changed Updated Google", service.Name)
+	assert.True(t, service.Online)
 }
 
 func TestCheckHTTPService(t *testing.T) {
@@ -98,9 +98,9 @@ func TestCheckHTTPService(t *testing.T) {
 
 func TestServiceTCPCheck(t *testing.T) {
 	service := SelectService(5)
-	checked := service.Check(true)
-	assert.Equal(t, "Changed Google DNS", checked.Name)
-	assert.True(t, checked.Online)
+	service.Check(true)
+	assert.Equal(t, "Changed Google DNS", service.Name)
+	assert.True(t, service.Online)
 }
 
 func TestCheckTCPService(t *testing.T) {
@@ -167,7 +167,7 @@ func TestServiceSum(t *testing.T) {
 }
 
 func TestCountOnline(t *testing.T) {
-	amount := CountOnline()
+	amount := CoreApp.CountOnline()
 	assert.Equal(t, 2, amount)
 }
 
@@ -216,9 +216,9 @@ func TestCreateFailingHTTPService(t *testing.T) {
 func TestServiceFailedCheck(t *testing.T) {
 	service := SelectService(20)
 	assert.Equal(t, "Bad URL", service.Name)
-	checked := service.Check(true)
-	assert.Equal(t, "Bad URL", checked.Name)
-	assert.False(t, checked.Online)
+	service.Check(true)
+	assert.Equal(t, "Bad URL", service.Name)
+	assert.False(t, service.Online)
 }
 
 func TestCreateFailingTCPService(t *testing.T) {
@@ -241,9 +241,9 @@ func TestCreateFailingTCPService(t *testing.T) {
 
 func TestServiceFailedTCPCheck(t *testing.T) {
 	service := SelectService(21)
-	checked := service.Check(true)
-	assert.Equal(t, "Bad TCP", checked.Name)
-	assert.False(t, checked.Online)
+	service.Check(true)
+	assert.Equal(t, "Bad TCP", service.Name)
+	assert.False(t, service.Online)
 }
 
 func TestCreateServiceFailure(t *testing.T) {
@@ -267,7 +267,7 @@ func TestDeleteService(t *testing.T) {
 	err = service.Delete()
 	assert.Nil(t, err)
 
-	services := CoreApp.Services()
+	services := CoreApp.Services
 	assert.Equal(t, 20, len(services))
 }
 
@@ -282,10 +282,13 @@ func TestServiceCloseRoutine(t *testing.T) {
 	s.Start()
 	assert.True(t, s.IsRunning())
 	t.Log(s.Checkpoint)
+	t.Log(s.SleepDuration)
 	go s.CheckQueue(false)
 	t.Log(s.Checkpoint)
+	t.Log(s.SleepDuration)
 	time.Sleep(5 * time.Second)
 	t.Log(s.Checkpoint)
+	t.Log(s.SleepDuration)
 	assert.True(t, s.IsRunning())
 	s.Close()
 	assert.False(t, s.IsRunning())

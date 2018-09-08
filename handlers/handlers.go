@@ -17,6 +17,7 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin/json"
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/source"
@@ -25,6 +26,7 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"reflect"
 	"time"
 )
 
@@ -105,8 +107,26 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		"CoreApp": func() *core.Core {
 			return core.CoreApp
 		},
+		"Services": func() []types.ServiceInterface {
+			return core.CoreApp.Services
+		},
 		"USE_CDN": func() bool {
 			return core.CoreApp.UseCdn
+		},
+		"Type": func(g interface{}) []string {
+			fooType := reflect.TypeOf(g)
+			var methods []string
+			methods = append(methods, fooType.String())
+			for i := 0; i < fooType.NumMethod(); i++ {
+				method := fooType.Method(i)
+				fmt.Println(method.Name)
+				methods = append(methods, method.Name)
+			}
+			return methods
+		},
+		"ToJSON": func(g interface{}) template.HTML {
+			data, _ := json.Marshal(g)
+			return template.HTML(string(data))
 		},
 		"underscore": func(html string) string {
 			return utils.UnderScoreString(html)

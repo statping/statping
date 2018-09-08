@@ -17,7 +17,6 @@
 </head>
 <body>
 
-
 <div class="container col-md-7 col-sm-12 mt-2 sm-container">
 
 <h1 class="col-12 text-center mb-4 mt-sm-3 header-title">{{.Name}}</h1>
@@ -28,7 +27,7 @@
 
 <div class="col-12 full-col-12 mb-5">
     <div class="list-group online_list">
-    {{ range .Services }}
+    {{ range Services }}
         <a href="#" class="service_li list-group-item list-group-item-action {{if not .Online}}bg-danger text-white{{ end }}" data-id="{{.Id}}">
         {{ .Name }}
         {{if .Online}}
@@ -43,7 +42,7 @@
 
 
     <div class="col-12 full-col-12">
-{{ if not .Services }}
+{{ if not Services }}
     <div class="alert alert-danger" role="alert">
         <h4 class="alert-heading">No Services to Monitor!</h4>
         <p>Your Statup Status Page is working correctly, but you don't have any services to monitor. Go to the <b>Dashboard</b> and add a website to begin really using your status page!</p>
@@ -51,7 +50,7 @@
         <p class="mb-0">If this is a bug, please make an issue in the Statup Github Repo. <a href="https://github.com/hunterlong/statup" class="btn btn-sm btn-outline-danger float-right">Statup Github Repo</a></p>
     </div>
 {{end}}
-        {{ range .Services }}
+        {{ range Services }}
             <div class="mt-4" id="service_id_{{.Id}}">
                 <div class="card">
                     <div class="card-body">

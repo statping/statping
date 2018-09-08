@@ -30,9 +30,8 @@ import (
 )
 
 func CheckServices() {
-	CoreApp.SelectAllServices()
-	utils.Log(1, fmt.Sprintf("Starting monitoring process for %v DbServices", len(CoreApp.Services())))
-	for _, ser := range CoreApp.Services() {
+	utils.Log(1, fmt.Sprintf("Starting monitoring process for %v Services", len(CoreApp.Services)))
+	for _, ser := range CoreApp.Services {
 		//go obj.StartCheckins()
 		go ser.CheckQueue(true)
 	}
@@ -40,23 +39,24 @@ func CheckServices() {
 
 func (s *Service) CheckQueue(record bool) {
 	s.Checkpoint = time.Now()
-
+	s.SleepDuration = time.Duration((time.Duration(s.Id) * 100) * time.Millisecond)
 CheckLoop:
 	for {
 		select {
 		case <-s.Running:
 			utils.Log(1, fmt.Sprintf("Stopping service: %v", s.Name))
 			break CheckLoop
-		default:
-			utils.Log(1, fmt.Sprintf("Checking service: %v", s.Name))
+		case <-time.After(s.SleepDuration):
 			s.Check(record)
-			// Set next time checkpoint and maybe sleep.
 			s.Checkpoint = s.Checkpoint.Add(s.duration())
-			if sleepDuration := s.Checkpoint.Sub(time.Now()); sleepDuration > 0 {
-				time.Sleep(sleepDuration)
+			sleep := s.Checkpoint.Sub(time.Now())
+			if !s.Online {
+				s.SleepDuration = s.duration()
+			} else {
+				s.SleepDuration = sleep
 			}
-			continue
 		}
+		continue
 	}
 }
 
@@ -119,14 +119,13 @@ func (s *Service) checkTcp(record bool) *Service {
 	return s
 }
 
-func (s *Service) Check(record bool) *Service {
+func (s *Service) Check(record bool) {
 	switch s.Type {
 	case "http":
 		s.checkHttp(record)
 	case "tcp":
 		s.checkTcp(record)
 	}
-	return s
 }
 
 func (s *Service) checkHttp(record bool) *Service {

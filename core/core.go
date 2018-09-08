@@ -22,7 +22,6 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"github.com/pkg/errors"
 	"os"
-	"sort"
 	"time"
 )
 
@@ -113,8 +112,8 @@ func (c Core) MobileSASS() string {
 
 // AllOnline will be true if all services are online
 func (c Core) AllOnline() bool {
-	for _, s := range CoreApp.Services() {
-		if !s.Online {
+	for _, s := range CoreApp.Services {
+		if !s.(*types.Service).Online {
 			return false
 		}
 	}
@@ -136,7 +135,6 @@ func SelectCore() (*Core, error) {
 	}
 	CoreApp.DbConnection = Configs.DbConn
 	CoreApp.Version = VERSION
-	CoreApp.SelectAllServices()
 	if os.Getenv("USE_CDN") == "true" {
 		CoreApp.UseCdn = true
 	}
@@ -152,13 +150,13 @@ func (c ServiceOrder) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
 func (c ServiceOrder) Less(i, j int) bool { return c[i].Order < c[j].Order }
 
 // Services returns each Service that is attached to this instance
-func (c *Core) Services() []*Service {
-	var services []*Service
-	servs := CoreApp.GetServices()
-	sort.Sort(ServiceOrder(servs))
-	CoreApp.SetServices(servs)
-	for _, ser := range servs {
-		services = append(services, ReturnService(ser))
-	}
-	return services
-}
+//func (c *Core) Services() []*Service {
+//	var services []*Service
+//	servs := CoreApp.GetServices()
+//	sort.Sort(ServiceOrder(servs))
+//	CoreApp.SetServices(servs)
+//	for _, ser := range servs {
+//		services = append(services, ReturnService(ser))
+//	}
+//	return services
+//}

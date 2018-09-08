@@ -471,11 +471,11 @@ func RunDeleteService(t *testing.T) {
 }
 
 func RunCreateService_Hits(t *testing.T) {
-	services := core.CoreApp.Services()
+	services := core.CoreApp.Services
 	assert.NotNil(t, services)
 	assert.Equal(t, 19, len(services))
-	for _, s := range services {
-		service := s.Check(true)
+	for _, service := range services {
+		service.Check(true)
 		assert.NotNil(t, service)
 	}
 }

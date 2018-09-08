@@ -33,30 +33,27 @@ func ReturnService(s *types.Service) *Service {
 }
 
 func SelectService(id int64) *Service {
-	for _, s := range CoreApp.Services() {
-		if s.Service.Id == id {
-			return s
+	for _, s := range CoreApp.Services {
+		if s.(*Service).Id == id {
+			return s.(*Service)
 		}
 	}
 	return nil
 }
 
-func (c *Core) SelectAllServices() ([]*types.Service, error) {
-	var services []*types.Service
-	var servs []*types.Service
+func (c *Core) SelectAllServices() ([]*Service, error) {
+	var services []*Service
 	db := servicesDB().Find(&services).Order("order_id desc")
 	if db.Error != nil {
 		utils.Log(3, fmt.Sprintf("service error: %v", db.Error))
 		return nil, db.Error
 	}
-	for _, ser := range services {
-		single := ReturnService(ser)
-		single.Start()
-		single.AllCheckins()
-		single.AllFailures()
-		servs = append(servs, single.Service)
+	for _, service := range services {
+		service.Start()
+		service.AllCheckins()
+		service.AllFailures()
+		CoreApp.Services = append(CoreApp.Services, service)
 	}
-	CoreApp.SetServices(servs)
 	return services, db.Error
 }
 
@@ -190,7 +187,7 @@ func (s *Service) AvgUptime(ago time.Time) string {
 	}
 	total, _ := s.TotalHitsSince(ago)
 	if total == 0 {
-		return "0"
+		return "0.00"
 	}
 	percent := float64(failed) / float64(total) * 100
 	percent = 100 - percent
@@ -220,8 +217,8 @@ func (s *Service) TotalUptime() string {
 }
 
 func (s *Service) index() int {
-	for k, service := range CoreApp.Services() {
-		if s.Id == service.Id {
+	for k, service := range CoreApp.Services {
+		if s.Id == service.(*Service).Id {
 			return k
 		}
 	}
@@ -229,19 +226,20 @@ func (s *Service) index() int {
 }
 
 func updateService(service *Service) {
-	service.Start()
 	index := service.index()
-	CoreApp.UpdateService(index, service.Service)
+	CoreApp.Services[index] = service
 }
 
 func (u *Service) Delete() error {
+	i := u.index()
 	err := servicesDB().Delete(u)
 	if err.Error != nil {
 		utils.Log(3, fmt.Sprintf("Failed to delete service %v. %v", u.Name, err.Error))
 		return err.Error
 	}
 	u.Close()
-	CoreApp.RemoveService(u.index())
+	slice := CoreApp.Services
+	CoreApp.Services = append(slice[:i], slice[i+1:]...)
 	OnDeletedService(u)
 	return err.Error
 }
@@ -251,7 +249,6 @@ func (u *Service) UpdateSingle(attr ...interface{}) error {
 }
 
 func (u *Service) Update(restart bool) error {
-	u.CreatedAt = time.Now()
 	err := servicesDB().Update(u)
 	if err.Error != nil {
 		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", u.Name, err))
@@ -259,11 +256,11 @@ func (u *Service) Update(restart bool) error {
 	}
 	if restart {
 		u.Close()
-	}
-	updateService(u)
-	if restart {
+		u.Start()
+		u.SleepDuration = time.Duration(u.Interval) * time.Second
 		go u.CheckQueue(true)
 	}
+	updateService(u)
 	OnUpdateService(u)
 	return err.Error
 }
@@ -276,14 +273,19 @@ func (u *Service) Create() (int64, error) {
 		return 0, db.Error
 	}
 	u.Start()
-	CoreApp.AddService(u.Service)
+	go u.CheckQueue(true)
+	CoreApp.Services = append(CoreApp.Services, u)
 	return u.Id, nil
 }
 
-func CountOnline() int {
+func (c *Core) ServicesCount() int {
+	return len(c.Services)
+}
+
+func (c *Core) CountOnline() int {
 	amount := 0
-	for _, s := range CoreApp.Services() {
-		if s.Online {
+	for _, s := range CoreApp.Services {
+		if s.(*Service).Online {
 			amount++
 		}
 	}

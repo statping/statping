@@ -16,26 +16,19 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 )
 
-type dashboard struct {
-	Core            *core.Core
-	CountOnline     int
-	CountServices   int
-	Count24Failures uint64
-}
-
 func DashboardHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println()
 	if !IsAuthenticated(r) {
 		err := core.ErrorResponse{}
 		ExecuteResponse(w, r, "login.html", err)
 	} else {
-		fails := core.CountFailures()
-		out := dashboard{core.CoreApp, core.CountOnline(), len(core.CoreApp.Services()), fails}
-		ExecuteResponse(w, r, "dashboard.html", out)
+		ExecuteResponse(w, r, "dashboard.html", core.CoreApp)
 	}
 }
 

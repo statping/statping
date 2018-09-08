@@ -14,8 +14,6 @@ type Failure struct {
 }
 
 type FailureInterface interface {
-	Delete() error
-	// method functions
 	Ago() string
 	ParseError() string
 }

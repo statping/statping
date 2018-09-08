@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/hunterlong/statup/source"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"html/template"
 	"io/ioutil"
@@ -37,8 +38,9 @@ func ExportIndexHTML() string {
 	injectDatabase()
 	CoreApp.SelectAllServices()
 	CoreApp.UseCdn = true
-	for _, service := range CoreApp.Services() {
-		service = service.Check(true)
+	for _, srv := range CoreApp.Services {
+		service := srv.(*types.Service)
+		service.Check(true)
 		fmt.Println(service.Name, service.Online, service.Latency)
 	}
 	nav, _ := source.TmplBox.String("nav.html")
@@ -99,7 +101,7 @@ func ExportChartsJs() string {
 	})
 	t.Parse(render)
 	var tpl bytes.Buffer
-	if err := t.Execute(&tpl, CoreApp.Services()); err != nil {
+	if err := t.Execute(&tpl, CoreApp.Services); err != nil {
 		utils.Log(3, err)
 	}
 	result := tpl.String()

@@ -36,8 +36,9 @@ func ReturnCheckin(s *types.Checkin) *Checkin {
 }
 
 func FindCheckin(api string) *types.Checkin {
-	for _, ser := range CoreApp.Services() {
-		for _, c := range ser.Checkins {
+	for _, ser := range CoreApp.Services {
+		service := ser.(*types.Service)
+		for _, c := range service.Checkins {
 			if c.Api == api {
 				return c
 			}

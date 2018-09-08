@@ -39,28 +39,29 @@ func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	r.ParseForm()
+	app := core.CoreApp
 	name := r.PostForm.Get("project")
 	if name != "" {
-		core.CoreApp.Name = name
+		app.Name = name
 	}
 	description := r.PostForm.Get("description")
-	if description != core.CoreApp.Description {
-		core.CoreApp.Description = description
+	if description != app.Description {
+		app.Description = description
 	}
 	style := r.PostForm.Get("style")
-	if style != core.CoreApp.Style {
-		core.CoreApp.Style = style
+	if style != app.Style {
+		app.Style = style
 	}
 	footer := r.PostForm.Get("footer")
-	if footer != core.CoreApp.Footer {
-		core.CoreApp.Footer = footer
+	if footer != app.Footer {
+		app.Footer = footer
 	}
 	domain := r.PostForm.Get("domain")
-	if domain != core.CoreApp.Domain {
-		core.CoreApp.Domain = domain
+	if domain != app.Domain {
+		app.Domain = domain
 	}
-	core.CoreApp.UseCdn = (r.PostForm.Get("enable_cdn") == "on")
-	core.CoreApp, _ = core.UpdateCore(core.CoreApp)
+	app.UseCdn = (r.PostForm.Get("enable_cdn") == "on")
+	core.CoreApp, _ = core.UpdateCore(app)
 	core.OnSettingsSaved(core.CoreApp.ToCore())
 	ExecuteResponse(w, r, "settings.html", core.CoreApp)
 }

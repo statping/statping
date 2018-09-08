@@ -31,7 +31,7 @@ type Service struct {
 }
 
 func RenderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
-	services := core.CoreApp.Services()
+	services := core.CoreApp.Services
 	w.Header().Set("Content-Type", "text/javascript")
 	w.Header().Set("Cache-Control", "max-age=60")
 	ExecuteJSResponse(w, r, "charts.js", services)
@@ -42,7 +42,7 @@ func ServicesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "services.html", core.CoreApp.Services())
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
 }
 
 type serviceOrder struct {
@@ -106,10 +106,8 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error starting %v check routine. %v", service.Name, err))
 	}
-	service = service.Check(true)
-	go service.CheckQueue(true)
-	core.OnNewService(service)
-	ExecuteResponse(w, r, "services.html", core.CoreApp.Services())
+	core.OnNewService(core.ReturnService(service.Service))
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
 }
 
 func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
@@ -118,14 +116,13 @@ func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	serv := core.SelectService(utils.StringInt(vars["id"]))
-	if serv == nil {
+	service := core.SelectService(utils.StringInt(vars["id"]))
+	if service == nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	service := serv
 	service.Delete()
-	ExecuteResponse(w, r, "services.html", core.CoreApp.Services())
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
 }
 
 func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
@@ -144,8 +141,7 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	serv := core.SelectService(utils.StringInt(vars["id"]))
-	service := serv
+	service := core.SelectService(utils.StringInt(vars["id"]))
 	r.ParseForm()
 	name := r.PostForm.Get("name")
 	domain := r.PostForm.Get("domain")
@@ -159,23 +155,21 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	postData := r.PostForm.Get("post_data")
 	order, _ := strconv.Atoi(r.PostForm.Get("order"))
 
-	serviceUpdate := core.ReturnService(&types.Service{
-		Id:             service.Id,
-		Name:           name,
-		Domain:         domain,
-		Method:         method,
-		Expected:       expected,
-		ExpectedStatus: status,
-		Interval:       interval,
-		Type:           checkType,
-		Port:           port,
-		PostData:       postData,
-		Timeout:        timeout,
-		Order:          order,
-	})
-	serviceUpdate.Update(true)
-	serviceUpdate = serviceUpdate.Check(true)
-	ExecuteResponse(w, r, "service.html", serviceUpdate)
+	service.Name = name
+	service.Domain = domain
+	service.Method = method
+	service.ExpectedStatus = status
+	service.Expected = expected
+	service.Interval = interval
+	service.Type = checkType
+	service.Port = port
+	service.PostData = postData
+	service.Timeout = timeout
+	service.Order = order
+
+	service.Update(true)
+	service.Check(true)
+	ExecuteResponse(w, r, "service.html", service)
 }
 
 func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
@@ -186,7 +180,7 @@ func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	service := core.SelectService(utils.StringInt(vars["id"]))
 	service.DeleteFailures()
-	ExecuteResponse(w, r, "services.html", core.CoreApp.Services())
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
 }
 
 func CheckinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {

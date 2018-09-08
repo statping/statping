@@ -25,12 +25,12 @@
     <div class="row stats_area mb-5">
 
         <div class="col-4">
-            <span class="lg_number">{{ .CountServices }}</span>
+            <span class="lg_number">{{ .ServicesCount }}</span>
             Total Services
         </div>
 
         <div class="col-4">
-            <span class="lg_number">{{ .Count24Failures }}</span>
+            <span class="lg_number">{{ .Count24HFailures }}</span>
             Failures last 24 Hours
         </div>
 
@@ -47,7 +47,7 @@
             <h3>Services</h3>
 
             <div class="list-group mb-5 mt-3">
-            {{ range .Core.Services }}
+            {{ range Services }}
                 <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">{{.Name}}</h5>
@@ -58,7 +58,7 @@
             {{ end }}
             </div>
 
-        {{ range .Core.Services }}
+        {{ range Services }}
                 {{ if .LimitedFailures }}
                     <h4 class="text-truncate">{{.Name}} Failures</h4>
                     <div class="list-group mt-3 mb-4">

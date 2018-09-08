@@ -156,7 +156,7 @@ func ApiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
-	services := core.CoreApp.Services()
+	services := core.CoreApp.Services
 	json.NewEncoder(w).Encode(services)
 }
 

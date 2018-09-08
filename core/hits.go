@@ -34,29 +34,29 @@ func (s *Service) CreateHit(h *types.Hit) (int64, error) {
 	return h.Id, db.Error
 }
 
-func (s *Service) Hits() ([]*Hit, error) {
-	var hits []*Hit
+func (s *Service) Hits() ([]*types.Hit, error) {
+	var hits []*types.Hit
 	col := hitsDB().Where("service = ?", s.Id).Order("id desc")
 	err := col.Find(&hits)
 	return hits, err.Error
 }
 
-func (s *Service) LimitedHits() ([]*Hit, error) {
-	var hits []*Hit
+func (s *Service) LimitedHits() ([]*types.Hit, error) {
+	var hits []*types.Hit
 	col := hitsDB().Where("service = ?", s.Id).Order("id desc").Limit(1024)
 	err := col.Find(&hits)
 	return reverseHits(hits), err.Error
 }
 
-func reverseHits(input []*Hit) []*Hit {
+func reverseHits(input []*types.Hit) []*types.Hit {
 	if len(input) == 0 {
 		return input
 	}
 	return append(reverseHits(input[1:]), input[0])
 }
 
-func (s *Service) SelectHitsGroupBy(group string) ([]*Hit, error) {
-	var hits []*Hit
+func (s *Service) SelectHitsGroupBy(group string) ([]*types.Hit, error) {
+	var hits []*types.Hit
 	col := hitsDB().Where("service = ?", s.Id)
 	err := col.Find(&hits)
 	return hits, err.Error

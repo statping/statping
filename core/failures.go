@@ -40,13 +40,16 @@ func (s *Service) CreateFailure(f *types.Failure) (int64, error) {
 	return f.Id, row.Error
 }
 
-func (s *Service) AllFailures() []*types.Failure {
-	var fails []*types.Failure
+func (s *Service) AllFailures() []*Failure {
+	var fails []*Failure
 	col := failuresDB().Where("service = ?", s.Id).Order("id desc")
 	err := col.Find(&fails)
 	if err.Error != nil {
 		utils.Log(3, fmt.Sprintf("Issue getting failures for service %v, %v", s.Name, err))
 		return nil
+	}
+	for _, f := range fails {
+		s.Failures = append(s.Failures, f)
 	}
 	return fails
 }
@@ -74,6 +77,16 @@ func (f *Failure) Ago() string {
 func (f *Failure) Delete() error {
 	db := failuresDB().Delete(f)
 	return db.Error
+}
+
+func (c *Core) Count24HFailures() uint64 {
+	var count uint64
+	for _, s := range CoreApp.Services {
+		service := s.(*Service)
+		fails, _ := service.TotalFailures24()
+		count += fails
+	}
+	return count
 }
 
 func CountFailures() uint64 {
