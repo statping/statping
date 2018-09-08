@@ -168,7 +168,7 @@ func TestServiceSum(t *testing.T) {
 
 func TestCountOnline(t *testing.T) {
 	amount := CoreApp.CountOnline()
-	assert.Equal(t, 2, amount)
+	assert.Equal(t, 4, amount)
 }
 
 func TestCreateService(t *testing.T) {
@@ -268,7 +268,7 @@ func TestDeleteService(t *testing.T) {
 	assert.Nil(t, err)
 
 	services := CoreApp.Services
-	assert.Equal(t, 20, len(services))
+	assert.Equal(t, 59, len(services))
 }
 
 func TestServiceCloseRoutine(t *testing.T) {

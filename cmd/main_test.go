@@ -411,7 +411,7 @@ func RunService_Online24(t *testing.T) {
 	service := core.SelectService(1)
 	assert.NotNil(t, service)
 	online := service.OnlineSince(SERVICE_SINCE)
-	assert.Equal(t, float32(80), online)
+	assert.Equal(t, float32(83.33), online)
 
 	service = core.SelectService(6)
 	assert.NotNil(t, service)
@@ -473,7 +473,7 @@ func RunDeleteService(t *testing.T) {
 func RunCreateService_Hits(t *testing.T) {
 	services := core.CoreApp.Services
 	assert.NotNil(t, services)
-	assert.Equal(t, 19, len(services))
+	assert.Equal(t, 37, len(services))
 	for _, service := range services {
 		service.Check(true)
 		assert.NotNil(t, service)
@@ -528,7 +528,7 @@ func RunPrometheusHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
 	t.Log(rr.Body.String())
-	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 19"))
+	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 37"))
 	assert.True(t, handlers.IsAuthenticated(req))
 }
 
