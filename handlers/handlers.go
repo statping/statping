@@ -16,8 +16,8 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin/json"
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/source"
