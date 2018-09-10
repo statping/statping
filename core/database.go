@@ -35,11 +35,7 @@ var (
 )
 
 func failuresDB() *gorm.DB {
-	db := DbSession.Model(&types.Failure{})
-	if os.Getenv("GO_ENV") == "test" {
-		return db.Debug()
-	}
-	return db
+	return DbSession.Model(&types.Failure{})
 }
 
 func (s *Service) allHits() *gorm.DB {
@@ -48,49 +44,26 @@ func (s *Service) allHits() *gorm.DB {
 }
 
 func hitsDB() *gorm.DB {
-	db := DbSession.Model(&types.Hit{})
-	if os.Getenv("GO_ENV") == "test" {
-		return db.Debug()
-	}
-	return db
+	return DbSession.Model(&types.Hit{})
 }
 
 func servicesDB() *gorm.DB {
-	db := DbSession.Model(&types.Service{})
-	if os.Getenv("GO_ENV") == "test" {
-		return db.Debug()
-	}
-	return db
+	return DbSession.Model(&types.Service{})
 }
 
 func coreDB() *gorm.DB {
-	db := DbSession.Table("core").Model(&CoreApp)
-	if os.Getenv("GO_ENV") == "test" {
-		return db.Debug()
-	}
-	return db
+	return DbSession.Table("core").Model(&CoreApp)
 }
 
 func usersDB() *gorm.DB {
-	db := DbSession.Model(&types.User{})
-	if os.Getenv("GO_ENV") == "test" {
-		return db.Debug()
-	}
-	return db
+	return DbSession.Model(&types.User{})
 }
 
 func commDB() *gorm.DB {
-	db := DbSession.Table("communication").Model(&notifiers.Notification{})
-	if os.Getenv("GO_ENV") == "test" {
-		return db.Debug()
-	}
-	return db
+	return DbSession.Table("communication").Model(&notifiers.Notification{})
 }
 
 func checkinDB() *gorm.DB {
-	if os.Getenv("GO_ENV") == "test" {
-		return DbSession.Model(&types.Checkin{}).Debug()
-	}
 	return DbSession.Model(&types.Checkin{})
 }
 

@@ -30,6 +30,18 @@ type Service struct {
 	*types.Service
 }
 
+func RenderServiceChartHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	vars := mux.Vars(r)
+	service := core.SelectService(utils.StringInt(vars["id"]))
+	w.Header().Set("Content-Type", "text/javascript")
+	w.Header().Set("Cache-Control", "max-age=60")
+	ExecuteJSResponse(w, r, "charts.js", []*core.Service{service})
+}
+
 func RenderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
 	services := core.CoreApp.Services
 	w.Header().Set("Content-Type", "text/javascript")
@@ -42,7 +54,7 @@ func ServicesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services, nil)
 }
 
 type serviceOrder struct {
@@ -106,8 +118,8 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error starting %v check routine. %v", service.Name, err))
 	}
-	core.OnNewService(core.ReturnService(service.Service))
-	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
+	//notifiers.OnNewService(core.ReturnService(service.Service))
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services, "/services")
 }
 
 func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +134,7 @@ func ServicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	service.Delete()
-	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services, "/services")
 }
 
 func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
@@ -132,7 +144,7 @@ func ServicesViewHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	ExecuteResponse(w, r, "service.html", serv)
+	ExecuteResponse(w, r, "service.html", serv, nil)
 }
 
 func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -169,7 +181,7 @@ func ServicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	service.Update(true)
 	service.Check(true)
-	ExecuteResponse(w, r, "service.html", service)
+	ExecuteResponse(w, r, "service.html", service, "/services")
 }
 
 func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
@@ -180,7 +192,7 @@ func ServicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	service := core.SelectService(utils.StringInt(vars["id"]))
 	service.DeleteFailures()
-	ExecuteResponse(w, r, "services.html", core.CoreApp.Services)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services, "/services")
 }
 
 func CheckinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -198,6 +210,5 @@ func CheckinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		Api:      utils.NewSHA1Hash(18),
 	}
 	checkin.Create()
-	fmt.Println(checkin.Create())
-	ExecuteResponse(w, r, "service.html", service)
+	ExecuteResponse(w, r, "service.html", service, "/services")
 }

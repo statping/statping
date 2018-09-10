@@ -51,7 +51,7 @@ func SetupHandler(w http.ResponseWriter, r *http.Request) {
 			Password:    "",
 		}
 	}
-	ExecuteResponse(w, r, "setup.html", data)
+	ExecuteResponse(w, r, "setup.html", data, nil)
 }
 
 func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
@@ -149,5 +149,5 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SetupResponseError(w http.ResponseWriter, r *http.Request, a interface{}) {
-	ExecuteResponse(w, r, "setup.html", a)
+	ExecuteResponse(w, r, "setup.html", a, nil)
 }

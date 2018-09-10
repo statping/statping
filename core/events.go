@@ -39,7 +39,7 @@ func OnFailure(s *Service, f *types.Failure) {
 	for _, p := range CoreApp.AllPlugins {
 		p.OnFailure(structs.Map(s))
 	}
-	notifiers.OnFailure(s.Service)
+	notifiers.OnFailure(s.Service, f)
 }
 
 func OnSettingsSaved(c *types.Core) {

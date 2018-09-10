@@ -1,4 +1,4 @@
-VERSION=0.55
+VERSION=0.56
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -32,6 +32,9 @@ seed:
 
 build: compile
 	$(GOBUILD) $(BUILDVERSION) -o $(BINARY_NAME) -v ./cmd
+
+build-plugin:
+	$(GOBUILD) $(BUILDVERSION) -buildmode=plugin -o $(BINARY_NAME) -v ./dev/plugin
 
 build-debug: compile
 	$(GOBUILD) $(BUILDVERSION) -tags debug -o $(BINARY_NAME) -v ./cmd

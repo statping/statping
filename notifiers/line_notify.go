@@ -39,30 +39,22 @@ type LineNotify struct {
 	*Notification
 }
 
-type lineNotifyMessage struct {
-	Service *types.Service
-	Time    int64
-}
-
 // DEFINE YOUR NOTIFICATION HERE.
 func init() {
 	lineNotify = &LineNotify{&Notification{
 		Id:     LINE_NOTIFY_ID,
 		Method: LINE_NOTIFY_METHOD,
 		Form: []NotificationForm{{
-			Id:          LINE_NOTIFY_ID,
 			Type:        "text",
 			Title:       "Access Token",
 			Placeholder: "Insert your Line Notify Access Token here.",
 			DbField:     "api_secret",
 		}}},
 	}
-	add(lineNotify)
-}
-
-// Select Obj
-func (u *LineNotify) Select() *Notification {
-	return u.Notification
+	err := AddNotifier(lineNotify)
+	if err != nil {
+		utils.Log(3, err)
+	}
 }
 
 func (u *LineNotify) postUrl() string {
@@ -132,28 +124,22 @@ func SendLineNotify(data string) error {
 }
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
-func (u *LineNotify) OnFailure(s *types.Service) error {
+func (u *LineNotify) OnFailure(s *types.Service, f *types.Failure) {
 	if u.Enabled {
 		msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
 		SendLineNotify(msg)
 	}
-	return nil
 }
 
 // ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
-func (u *LineNotify) OnSuccess(s *types.Service) error {
-	if u.Enabled {
+func (u *LineNotify) OnSuccess(s *types.Service) {
 
-	}
-	return nil
 }
 
 // ON SAVE OR UPDATE OF THE NOTIFIER FORM
 func (u *LineNotify) OnSave() error {
 	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
-
 	// Do updating stuff here
-
 	return nil
 }
 

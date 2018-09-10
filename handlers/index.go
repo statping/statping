@@ -31,11 +31,11 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/setup", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "index.html", core.CoreApp)
+	ExecuteResponse(w, r, "index.html", core.CoreApp, nil)
 }
 
 func TrayHandler(w http.ResponseWriter, r *http.Request) {
-	ExecuteResponse(w, r, "tray.html", core.CoreApp)
+	ExecuteResponse(w, r, "tray.html", core.CoreApp, nil)
 }
 
 func DesktopInit(ip string, port int) {

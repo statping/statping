@@ -26,9 +26,9 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println()
 	if !IsAuthenticated(r) {
 		err := core.ErrorResponse{}
-		ExecuteResponse(w, r, "login.html", err)
+		ExecuteResponse(w, r, "login.html", err, nil)
 	} else {
-		ExecuteResponse(w, r, "dashboard.html", core.CoreApp)
+		ExecuteResponse(w, r, "dashboard.html", core.CoreApp, nil)
 	}
 }
 
@@ -48,7 +48,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 	} else {
 		err := core.ErrorResponse{Error: "Incorrect login information submitted, try again."}
-		ExecuteResponse(w, r, "login.html", err)
+		ExecuteResponse(w, r, "login.html", err, nil)
 	}
 }
 
@@ -64,7 +64,7 @@ func HelpHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "help.html", nil)
+	ExecuteResponse(w, r, "help.html", nil, nil)
 }
 
 func LogsHandler(w http.ResponseWriter, r *http.Request) {
@@ -80,7 +80,7 @@ func LogsHandler(w http.ResponseWriter, r *http.Request) {
 		logs = append(logs, utils.LastLines[i].FormatForHtml()+"\r\n")
 	}
 	utils.LockLines.Unlock()
-	ExecuteResponse(w, r, "logs.html", logs)
+	ExecuteResponse(w, r, "logs.html", logs, nil)
 }
 
 func LogsLineHandler(w http.ResponseWriter, r *http.Request) {

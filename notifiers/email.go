@@ -52,37 +52,31 @@ func init() {
 			Id:     EMAIL_ID,
 			Method: EMAIL_METHOD,
 			Form: []NotificationForm{{
-				Id:          1,
 				Type:        "text",
 				Title:       "SMTP Host",
 				Placeholder: "Insert your SMTP Host here.",
 				DbField:     "Host",
 			}, {
-				Id:          1,
 				Type:        "text",
 				Title:       "SMTP Username",
 				Placeholder: "Insert your SMTP Username here.",
 				DbField:     "Username",
 			}, {
-				Id:          1,
 				Type:        "password",
 				Title:       "SMTP Password",
 				Placeholder: "Insert your SMTP Password here.",
 				DbField:     "Password",
 			}, {
-				Id:          1,
 				Type:        "number",
 				Title:       "SMTP Port",
 				Placeholder: "Insert your SMTP Port here.",
 				DbField:     "Port",
 			}, {
-				Id:          1,
 				Type:        "text",
 				Title:       "Outgoing Email Address",
 				Placeholder: "Insert your Outgoing Email Address",
 				DbField:     "Var1",
 			}, {
-				Id:          1,
 				Type:        "email",
 				Title:       "Send Alerts To",
 				Placeholder: "Email Address",
@@ -90,12 +84,10 @@ func init() {
 			}},
 		}}
 
-	add(emailer)
-}
-
-// Select Obj
-func (u *Email) Select() *Notification {
-	return u.Notification
+	err := AddNotifier(emailer)
+	if err != nil {
+		utils.Log(3, err)
+	}
 }
 
 // WHEN NOTIFIER LOADS
@@ -122,6 +114,7 @@ func (u *Email) Init() error {
 }
 
 func (u *Email) Test() error {
+	utils.Log(1, "Emailer notifier loaded")
 	if u.Enabled {
 		email := &EmailOutgoing{
 			To:       emailer.Var2,
@@ -178,7 +171,7 @@ func (u *Email) Run() error {
 }
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
-func (u *Email) OnFailure(s *types.Service) error {
+func (u *Email) OnFailure(s *types.Service, f *types.Failure) {
 	if u.Enabled {
 		msg := emailMessage{
 			Service: s,
@@ -193,23 +186,17 @@ func (u *Email) OnFailure(s *types.Service) error {
 		SendEmail(emailBox, email)
 
 	}
-	return nil
 }
 
 // ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
-func (u *Email) OnSuccess(s *types.Service) error {
-	if u.Enabled {
+func (u *Email) OnSuccess(s *types.Service) {
 
-	}
-	return nil
 }
 
 // ON SAVE OR UPDATE OF THE NOTIFIER FORM
 func (u *Email) OnSave() error {
 	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
-
 	// Do updating stuff here
-
 	return nil
 }
 

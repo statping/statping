@@ -48,6 +48,7 @@ func Router() *mux.Router {
 	}
 	r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(source.JsBox.HTTPBox())))
 	r.Handle("/charts.js", http.HandlerFunc(RenderServiceChartsHandler))
+	r.Handle("/charts/{id}.js", http.HandlerFunc(RenderServiceChartHandler))
 	r.Handle("/setup", http.HandlerFunc(SetupHandler)).Methods("GET")
 	r.Handle("/setup", http.HandlerFunc(ProcessSetupHandler)).Methods("POST")
 	r.Handle("/dashboard", http.HandlerFunc(DashboardHandler)).Methods("GET")
@@ -72,7 +73,7 @@ func Router() *mux.Router {
 	r.Handle("/settings/css", http.HandlerFunc(SaveSASSHandler)).Methods("POST")
 	r.Handle("/settings/build", http.HandlerFunc(SaveAssetsHandler)).Methods("GET")
 	r.Handle("/settings/delete_assets", http.HandlerFunc(DeleteAssetsHandler)).Methods("GET")
-	r.Handle("/settings/notifier/{id}", http.HandlerFunc(SaveNotificationHandler)).Methods("POST")
+	r.Handle("/settings/notifier/{method}", http.HandlerFunc(SaveNotificationHandler)).Methods("POST")
 	r.Handle("/plugins/download/{name}", http.HandlerFunc(PluginsDownloadHandler))
 	r.Handle("/plugins/{name}/save", http.HandlerFunc(PluginSavedHandler)).Methods("POST")
 	r.Handle("/help", http.HandlerFunc(HelpHandler))

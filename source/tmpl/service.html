@@ -56,7 +56,9 @@
                             </div>
                         </div>
 
-                        <canvas id="service" width="400" height="120"></canvas>
+                <div class="chart-container">
+                    <canvas id="service_{{ .Id }}"></canvas>
+                </div>
 
             {{ if .LimitedFailures }}
                 <div class="list-group mt-3 mb-4">
@@ -214,67 +216,21 @@
 
 </div>
 
-    </div>
-
 {{template "footer"}}
-
-<script>
-    var ctx = document.getElementById("service").getContext('2d');
-
-    var chartdata = new Chart(ctx, {
-        type: 'line',
-        data: {
-            datasets: [{
-                label: 'Response Time (Milliseconds)',
-                data: {{js .GraphData}},
-                backgroundColor: [
-                    'rgba(47, 206, 30, 0.92)'
-                ],
-                borderColor: [
-                    'rgb(47, 171, 34)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            legend: {
-                display: false
-            },
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    },
-                    gridLines: {
-                        display:false
-                    }
-                }],
-                xAxes: [{
-                    type: 'time',
-                    distribution: 'series',
-                    gridLines: {
-                        display:false
-                    }
-                }]
-            },
-            elements: {
-                point: {
-                    radius: 0
-                }
-            }
-        }
-    });
-</script>
 
 {{if USE_CDN}}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
 <script src="https://assets.statup.io/main.js"></script>
 {{ else }}
 <script src="/js/jquery-3.3.1.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
+<script src="/js/Chart.bundle.min.js"></script>
 <script src="/js/main.js"></script>
 {{end}}
+
+<script src="/charts/{{.Id}}.js"></script>
 
 </body>
 </html>

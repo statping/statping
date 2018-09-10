@@ -56,20 +56,17 @@ func init() {
 		Method: SLACK_METHOD,
 		Host:   "https://webhooksurl.slack.com/***",
 		Form: []NotificationForm{{
-			Id:          2,
 			Type:        "text",
 			Title:       "Incoming Webhook Url",
 			Placeholder: "Insert your Slack webhook URL here.",
 			DbField:     "Host",
 		}}},
 	}
-	add(slacker)
 	messageLock = new(sync.Mutex)
-}
-
-// Select Obj
-func (u *Slack) Select() *Notification {
-	return u.Notification
+	err := AddNotifier(slacker)
+	if err != nil {
+		utils.Log(3, err)
+	}
 }
 
 // WHEN NOTIFIER LOADS
@@ -89,6 +86,7 @@ func (u *Slack) Init() error {
 }
 
 func (u *Slack) Test() error {
+	utils.Log(1, "Slack notifier loaded")
 	msg := fmt.Sprintf("You're Statup Slack Notifier is working correctly!")
 	SendSlack(TEST_TEMPLATE, msg)
 	return nil
@@ -131,7 +129,7 @@ func SendSlack(temp string, data interface{}) error {
 }
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
-func (u *Slack) OnFailure(s *types.Service) error {
+func (u *Slack) OnFailure(s *types.Service, f *types.Failure) {
 	if u.Enabled {
 		message := slackMessage{
 			Service: s,
@@ -139,27 +137,18 @@ func (u *Slack) OnFailure(s *types.Service) error {
 		}
 		SendSlack(FAILING_TEMPLATE, message)
 	}
-	return nil
 }
 
 // ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
-func (u *Slack) OnSuccess(s *types.Service) error {
-	if u.Enabled {
-		//message := slackMessage{
-		//	Service: s,
-		//	Time:    time.Now().Unix(),
-		//}
-		//SendSlack(SUCCESS_TEMPLATE, message)
-	}
-	return nil
+func (u *Slack) OnSuccess(s *types.Service) {
+
 }
 
 // ON SAVE OR UPDATE OF THE NOTIFIER FORM
 func (u *Slack) OnSave() error {
 	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
-
 	// Do updating stuff here
-
+	u.Test()
 	return nil
 }
 

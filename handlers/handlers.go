@@ -82,8 +82,12 @@ func IsAuthenticated(r *http.Request) bool {
 	return session.Values["authenticated"].(bool)
 }
 
-func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}) {
+func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{}) {
 	utils.Http(r)
+	if url, ok := redirect.(string); ok {
+		http.Redirect(w, r, url, http.StatusSeeOther)
+		return
+	}
 	nav, _ := source.TmplBox.String("nav.html")
 	footer, _ := source.TmplBox.String("footer.html")
 	render, err := source.TmplBox.String(file)
@@ -173,7 +177,7 @@ func ExecuteJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 
 func Error404Handler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
-	ExecuteResponse(w, r, "error_404.html", nil)
+	ExecuteResponse(w, r, "error_404.html", nil, nil)
 }
 
 type DbConfig types.DbConfig

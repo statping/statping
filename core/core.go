@@ -80,6 +80,14 @@ func UpdateCore(c *Core) (*Core, error) {
 	return c, db.Error
 }
 
+func (c *Core) Notifiers() []notifiers.Notification {
+	var n []notifiers.Notification
+	for _, c := range c.Communications {
+		n = append(n, c.(notifiers.Notification))
+	}
+	return n
+}
+
 // UsingAssets will return true if /assets folder is present
 func (c Core) UsingAssets() bool {
 	return source.UsingAssets(utils.Directory)

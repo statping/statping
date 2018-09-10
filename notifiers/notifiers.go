@@ -16,10 +16,12 @@
 package notifiers
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/jinzhu/gorm"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -48,20 +50,10 @@ type Notification struct {
 	UpdatedAt time.Time          `gorm:"column:updated_at" json:"updated_at"`
 	Form      []NotificationForm `gorm:"-" json:"-"`
 	Routine   chan struct{}      `gorm:"-" json:"-"`
-}
-
-type Notifier interface {
-	Init() error
-	Install() error
-	Run() error
-	OnFailure(*types.Service) error
-	OnSuccess(*types.Service) error
-	Select() *Notification
-	Test() error
+	Notifier
 }
 
 type NotificationForm struct {
-	Id          int64
 	Type        string
 	Title       string
 	Placeholder string
@@ -74,12 +66,16 @@ type NotificationLog struct {
 	Time     utils.Timestamp
 }
 
-func add(c interface{}) {
-	AllCommunications = append(AllCommunications, c)
+func AddNotifier(c interface{}) error {
+	if _, ok := c.(Notifier); ok {
+		AllCommunications = append(AllCommunications, c)
+	} else {
+		return errors.New("notifier does not have the required methods")
+	}
+	return nil
 }
 
 func Load() []types.AllNotifiers {
-	utils.Log(1, "Loading notifiers")
 	var notifiers []types.AllNotifiers
 	for _, comm := range AllCommunications {
 		n := comm.(Notifier)
@@ -88,6 +84,10 @@ func Load() []types.AllNotifiers {
 		n.Test()
 	}
 	return notifiers
+}
+
+func (n *Notification) Select() *Notification {
+	return n
 }
 
 func (n *Notification) Log(msg string) {
@@ -127,7 +127,6 @@ func SelectNotification(id int64) (*Notification, error) {
 }
 
 func (n *Notification) Update() (*Notification, error) {
-	n.CreatedAt = time.Now()
 	err := Collections.Update(n)
 	return n, err.Error
 }
@@ -142,26 +141,28 @@ func InsertDatabase(n *Notification) (int64, error) {
 	return n.Id, db.Error
 }
 
-func SelectNotifier(id int64) Notifier {
-	var notifier Notifier
-	for _, n := range AllCommunications {
-		notif := n.(Notifier)
-		n := notif.Select()
-		if n.Id == id {
-			return notif
+func SelectNotifier(method string) (*Notification, error) {
+	for _, comm := range AllCommunications {
+		n, ok := comm.(Notifier)
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("incorrect notification type: %v", reflect.TypeOf(n).String()))
+		}
+		notifier := n.Select()
+		if notifier.Method == method {
+			return notifier, nil
 		}
 	}
-	return notifier
+	return nil, nil
 }
 
-func (f Notification) CanSend() bool {
+func (f *Notification) CanSend() bool {
 	if f.SentLastHour() >= f.Limits {
 		return false
 	}
 	return true
 }
 
-func (f Notification) SentLastHour() int {
+func (f *Notification) SentLastHour() int {
 	sent := 0
 	hourAgo := time.Now().Add(-1 * time.Hour)
 	for _, v := range f.Logs() {
@@ -173,14 +174,8 @@ func (f Notification) SentLastHour() int {
 	return sent
 }
 
-func (f NotificationForm) Value() string {
-	noti := SelectNotifier(f.Id)
-	return noti.Select().GetValue(f.DbField)
-}
-
-func (f Notification) LimitValue() int64 {
-	notifier, _ := SelectNotification(f.Id)
-	return utils.StringInt(notifier.GetValue("limits"))
+func (f *Notification) LimitValue() int64 {
+	return utils.StringInt(f.GetValue("limits"))
 }
 
 func (n *Notification) GetValue(dbField string) string {
@@ -210,18 +205,9 @@ func (n *Notification) GetValue(dbField string) string {
 	return ""
 }
 
-func OnFailure(s *types.Service) {
-	for _, comm := range AllCommunications {
-		n := comm.(Notifier)
-		n.OnFailure(s)
-	}
-}
-
-func OnSuccess(s *types.Service) {
-	for _, comm := range AllCommunications {
-		n := comm.(Notifier)
-		n.OnSuccess(s)
-	}
+func IsType(n interface{}, obj string) bool {
+	objOne := reflect.TypeOf(n)
+	return objOne.String() == obj
 }
 
 func uniqueStrings(elements []string) []string {

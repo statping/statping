@@ -32,7 +32,7 @@
                 <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Settings</a>
                 <a class="nav-link" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false">Theme Editor</a>
             {{ range .Communications }}
-                <a class="nav-link text-capitalize" id="v-pills-{{underscore .Method}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Method}}" role="tab" aria-controls="v-pills-{{underscore .Method}}" aria-selected="false">{{.Method}}</a>
+                <a class="nav-link text-capitalize" id="v-pills-{{underscore .Select.Method}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Select.Method}}" role="tab" aria-controls="v-pills-{{underscore .Select.Method}}" aria-selected="false">{{.Select.Method}}</a>
             {{ end }}
                 <a class="nav-link" id="v-pills-browse-tab" data-toggle="pill" href="#v-pills-browse" role="tab" aria-controls="v-pills-home" aria-selected="false">Browse Plugins</a>
                 <a class="nav-link d-none" id="v-pills-backups-tab" data-toggle="pill" href="#v-pills-backups" role="tab" aria-controls="v-pills-backups" aria-selected="false">Backups</a>
@@ -132,39 +132,39 @@
             {{end}}
                 </div>
 
-
             {{ range .Communications }}
-            <div class="tab-pane" id="v-pills-{{underscore .Method}}" role="tabpanel" aria-labelledby="v-pills-{{underscore .Method }}-tab">
-                <form method="POST" action="/settings/notifier/{{ .Id }}">
+            {{$n := .Select}}
+            <div class="tab-pane" id="v-pills-{{underscore $n.Method}}" role="tabpanel" aria-labelledby="v-pills-{{underscore $n.Method }}-tab">
+                <form method="POST" action="/settings/notifier/{{ $n.Method }}">
                     {{range .Form}}
                         <div class="form-group">
                             <label class="text-capitalize" for="{{underscore .Title}}">{{.Title}}</label>
-                            <input type="{{.Type}}" name="{{underscore .DbField}}" class="form-control" value="{{ .Value }}" id="{{underscore .Title}}" placeholder="{{.Placeholder}}">
+                            <input type="{{.Type}}" name="{{underscore .DbField}}" class="form-control" value="{{ $n.GetValue .DbField }}" id="{{underscore .Title}}" placeholder="{{.Placeholder}}">
                         </div>
                     {{end}}
 
                     <div class="form-group">
-                        <label class="text-capitalize" for="limits_per_hour_{{underscore .Method }}">Limits per Hour</label>
-                        <input type="number" name="limits" class="form-control" value="{{.LimitValue}}" id="limits_per_hour_{{underscore .Method }}" min="1" max="60" placeholder="How many messages can send per hour">
+                        <label class="text-capitalize" for="limits_per_hour_{{underscore $n.Method }}">Limits per Hour</label>
+                        <input type="number" name="limits" class="form-control" value="{{$n.LimitValue}}" id="limits_per_hour_{{underscore $n.Method }}" min="1" max="60" placeholder="How many messages can send per hour">
                     </div>
 
                     <div class="form-group row">
                         <div class="col-sm-6">
                           <span class="switch">
-                            <input type="checkbox" name="enable" class="switch" id="switch-{{ .Method }}" {{if .Enabled}}checked{{end}}>
-                            <label for="switch-{{ .Method }}">Enable {{ .Method }}</label>
+                            <input type="checkbox" name="enable" class="switch" id="switch-{{ $n.Method }}" {{if $n.Enabled}}checked{{end}}>
+                            <label for="switch-{{ $n.Method }}">Enable {{ $n.Method }}</label>
                           </span>
                         </div>
                         <div class="col-sm-6">
-                            <button type="submit" class="btn btn-primary btn-block text-capitalize">Save {{ .Method }} Settings</button>
+                            <button type="submit" class="btn btn-primary btn-block text-capitalize">Save {{ $n.Method }} Settings</button>
                         </div>
                     </div>
 
                 </form>
 
-                {{ if .Logs }}
-                Sent {{.SentLastHour}} out of {{.LimitValue}} in the last hour<br>
-                    {{ range .Logs }}
+                {{ if $n.Logs }}
+                Sent {{$n.SentLastHour}} out of {{$n.LimitValue}} in the last hour<br>
+                    {{ range $n.Logs }}
                         <div class="card mt-1">
                             <div class="card-body">
                                 {{.Message}}

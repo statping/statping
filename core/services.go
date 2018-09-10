@@ -240,7 +240,7 @@ func (u *Service) Delete() error {
 	u.Close()
 	slice := CoreApp.Services
 	CoreApp.Services = append(slice[:i], slice[i+1:]...)
-	OnDeletedService(u)
+	//OnDeletedService(u)
 	return err.Error
 }
 
@@ -261,7 +261,7 @@ func (u *Service) Update(restart bool) error {
 		go u.CheckQueue(true)
 	}
 	updateService(u)
-	OnUpdateService(u)
+	//OnUpdateService(u)
 	return err.Error
 }
 

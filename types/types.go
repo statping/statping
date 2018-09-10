@@ -21,44 +21,6 @@ import (
 	"time"
 )
 
-type PluginInfo struct {
-	Info Info
-	PluginActions
-}
-
-type Routing struct {
-	URL     string
-	Method  string
-	Handler func(http.ResponseWriter, *http.Request)
-}
-
-type Info struct {
-	Name        string
-	Description string
-	Form        string
-}
-
-type PluginActions interface {
-	GetInfo() Info
-	GetForm() string
-	OnLoad(db gorm.DB)
-	SetInfo(map[string]interface{}) Info
-	Routes() []Routing
-	OnSave(map[string]interface{})
-	OnFailure(map[string]interface{})
-	OnSuccess(map[string]interface{})
-	OnSettingsSaved(map[string]interface{})
-	OnNewUser(map[string]interface{})
-	OnNewService(map[string]interface{})
-	OnUpdatedService(map[string]interface{})
-	OnDeletedService(map[string]interface{})
-	OnInstall(map[string]interface{})
-	OnUninstall(map[string]interface{})
-	OnBeforeRequest(map[string]interface{})
-	OnAfterRequest(map[string]interface{})
-	OnShutdown()
-}
-
 type AllNotifiers interface{}
 
 // Hit struct is a 'successful' ping or web response entry for a service.
@@ -87,6 +49,44 @@ type DbConfig struct {
 	Email       string `yaml:"-"`
 	Error       error  `yaml:"-"`
 	Location    string `yaml:"location"`
+}
+
+type Info struct {
+	Name        string
+	Description string
+	Form        string
+}
+
+type PluginInfo struct {
+	Info Info
+	PluginActions
+}
+
+type Routing struct {
+	URL     string
+	Method  string
+	Handler func(http.ResponseWriter, *http.Request)
+}
+
+type PluginActions interface {
+	GetInfo() Info
+	GetForm() string
+	OnLoad(db gorm.DB)
+	SetInfo(map[string]interface{}) Info
+	Routes() []Routing
+	OnSave(map[string]interface{})
+	OnFailure(map[string]interface{})
+	OnSuccess(map[string]interface{})
+	OnSettingsSaved(map[string]interface{})
+	OnNewUser(map[string]interface{})
+	OnNewService(map[string]interface{})
+	OnUpdatedService(map[string]interface{})
+	OnDeletedService(map[string]interface{})
+	OnInstall(map[string]interface{})
+	OnUninstall(map[string]interface{})
+	OnBeforeRequest(map[string]interface{})
+	OnAfterRequest(map[string]interface{})
+	OnShutdown()
 }
 
 type PluginRepos struct {

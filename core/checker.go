@@ -18,6 +18,7 @@ package core
 import (
 	"bytes"
 	"fmt"
+	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"io/ioutil"
@@ -208,23 +209,24 @@ type HitData struct {
 func RecordSuccess(s *Service) {
 	s.Online = true
 	s.LastOnline = time.Now()
-	data := &types.Hit{
+	hit := &types.Hit{
 		Service:   s.Id,
 		Latency:   s.Latency,
 		CreatedAt: time.Now(),
 	}
-	utils.Log(1, fmt.Sprintf("Service %v Successful: %0.2f ms", s.Name, data.Latency*1000))
-	s.CreateHit(data)
-	OnSuccess(s)
+	utils.Log(1, fmt.Sprintf("Service %v Successful: %0.2f ms", s.Name, hit.Latency*1000))
+	s.CreateHit(hit)
+	notifiers.OnSuccess(s.Service)
 }
 
 func RecordFailure(s *Service, issue string) {
 	s.Online = false
-	data := &types.Failure{
-		Issue: issue,
+	fail := &types.Failure{
+		Service:   s.Id,
+		Issue:     issue,
+		CreatedAt: time.Now(),
 	}
 	utils.Log(2, fmt.Sprintf("Service %v Failing: %v", s.Name, issue))
-	s.CreateFailure(data)
-	//SendFailureEmail(s)
-	OnFailure(s, data)
+	s.CreateFailure(fail)
+	notifiers.OnFailure(s.Service, fail)
 }

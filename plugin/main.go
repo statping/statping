@@ -16,7 +16,8 @@
 package plugin
 
 import (
-	"github.com/hunterlong/statup/types"
+	"github.com/jinzhu/gorm"
+	"net/http"
 	"upper.io/db.v3/lib/sqlbuilder"
 )
 
@@ -36,8 +37,32 @@ var (
 	DB sqlbuilder.Database
 )
 
+type Routing struct {
+	URL     string
+	Method  string
+	Handler func(http.ResponseWriter, *http.Request)
+}
+
+type Info struct {
+	Name        string
+	Description string
+	Form        string
+}
+
+type Database *gorm.DB
+
+type Plugin struct {
+	Name        string
+	Description string
+}
+
+type PluginDatabase interface {
+	Database(gorm.DB)
+	Update() error
+}
+
 type PluginInfo struct {
-	i *types.Info
+	i *Info
 }
 
 func SetDatabase(database sqlbuilder.Database) {

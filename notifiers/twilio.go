@@ -50,37 +50,31 @@ func init() {
 		Id:     TWILIO_ID,
 		Method: TWILIO_METHOD,
 		Form: []NotificationForm{{
-			Id:          3,
 			Type:        "text",
 			Title:       "Account Sid",
 			Placeholder: "Insert your Twilio Account Sid",
 			DbField:     "api_key",
 		}, {
-			Id:          3,
 			Type:        "text",
 			Title:       "Account Token",
 			Placeholder: "Insert your Twilio Account Token",
 			DbField:     "api_secret",
 		}, {
-			Id:          3,
 			Type:        "text",
 			Title:       "SMS to Phone Number",
 			Placeholder: "+18555555555",
 			DbField:     "Var1",
 		}, {
-			Id:          3,
 			Type:        "text",
 			Title:       "From Phone Number",
 			Placeholder: "+18555555555",
 			DbField:     "Var2",
 		}}},
 	}
-	add(twilio)
-}
-
-// Select Obj
-func (u *Twilio) Select() *Notification {
-	return u.Notification
+	err := AddNotifier(twilio)
+	if err != nil {
+		utils.Log(3, err)
+	}
 }
 
 func (u *Twilio) postUrl() string {
@@ -104,6 +98,7 @@ func (u *Twilio) Init() error {
 }
 
 func (u *Twilio) Test() error {
+	utils.Log(1, "Twilio notifier loaded")
 	msg := fmt.Sprintf("You're Statup Twilio Notifier is working correctly!")
 	SendTwilio(msg)
 	return nil
@@ -152,20 +147,16 @@ func SendTwilio(data string) error {
 }
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
-func (u *Twilio) OnFailure(s *types.Service) error {
+func (u *Twilio) OnFailure(s *types.Service, f *types.Failure) {
 	if u.Enabled {
 		msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
 		SendTwilio(msg)
 	}
-	return nil
 }
 
 // ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
-func (u *Twilio) OnSuccess(s *types.Service) error {
-	if u.Enabled {
+func (u *Twilio) OnSuccess(s *types.Service) {
 
-	}
-	return nil
 }
 
 // ON SAVE OR UPDATE OF THE NOTIFIER FORM

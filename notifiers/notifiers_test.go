@@ -86,7 +86,6 @@ func TestAdd(t *testing.T) {
 		Method: "tester",
 		Host:   "0.0.0.0",
 		Form: []NotificationForm{{
-			Id:          999999,
 			Type:        "text",
 			Title:       "Incoming Webhook Url",
 			Placeholder: "Insert your Slack webhook URL here.",
@@ -94,7 +93,7 @@ func TestAdd(t *testing.T) {
 		}}},
 	}
 
-	add(testNotifier)
+	AddNotifier(testNotifier)
 }
 
 func TestIsInDatabase(t *testing.T) {
@@ -171,5 +170,8 @@ func TestOnFailure(t *testing.T) {
 		Method:         "GET",
 		Timeout:        20,
 	}
-	OnFailure(s)
+	f := &types.Failure{
+		Issue: "testing",
+	}
+	OnFailure(s, f)
 }

@@ -23,6 +23,7 @@ import (
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
+	"net/url"
 )
 
 func SettingsHandler(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +31,7 @@ func SettingsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "settings.html", core.CoreApp)
+	ExecuteResponse(w, r, "settings.html", core.CoreApp, nil)
 }
 
 func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
@@ -62,8 +63,8 @@ func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	app.UseCdn = (r.PostForm.Get("enable_cdn") == "on")
 	core.CoreApp, _ = core.UpdateCore(app)
-	core.OnSettingsSaved(core.CoreApp.ToCore())
-	ExecuteResponse(w, r, "settings.html", core.CoreApp)
+	//notifiers.OnSettingsSaved(core.CoreApp.ToCore())
+	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
 func SaveSASSHandler(w http.ResponseWriter, r *http.Request) {
@@ -80,7 +81,7 @@ func SaveSASSHandler(w http.ResponseWriter, r *http.Request) {
 	source.SaveAsset([]byte(mobile), utils.Directory, "scss/mobile.scss")
 	source.CompileSASS(utils.Directory)
 	ResetRouter()
-	ExecuteResponse(w, r, "settings.html", core.CoreApp)
+	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
 func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
@@ -100,7 +101,7 @@ func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		utils.Log(2, "Default 'base.css' was insert because SASS did not work.")
 	}
 	ResetRouter()
-	ExecuteResponse(w, r, "settings.html", core.CoreApp)
+	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
 func DeleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
@@ -110,7 +111,17 @@ func DeleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	source.DeleteAllAssets(utils.Directory)
 	ResetRouter()
-	ExecuteResponse(w, r, "settings.html", core.CoreApp)
+	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
+}
+
+func parseId(r *http.Request) int64 {
+	vars := mux.Vars(r)
+	return utils.StringInt(vars["id"])
+}
+
+func parseForm(r *http.Request) url.Values {
+	r.ParseForm()
+	return r.PostForm
 }
 
 func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
@@ -119,22 +130,29 @@ func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
+
+	form := parseForm(r)
+
 	vars := mux.Vars(r)
-	r.ParseForm()
+	method := vars["method"]
 
-	notifierId := vars["id"]
-	enabled := r.PostForm.Get("enable")
+	enabled := form.Get("enable")
+	host := form.Get("host")
+	port := int(utils.StringInt(form.Get("port")))
+	username := form.Get("username")
+	password := form.Get("password")
+	var1 := form.Get("var1")
+	var2 := form.Get("var2")
+	apiKey := form.Get("api_key")
+	apiSecret := form.Get("api_secret")
+	limits := int(utils.StringInt(form.Get("limits")))
 
-	host := r.PostForm.Get("host")
-	port := int(utils.StringInt(r.PostForm.Get("port")))
-	username := r.PostForm.Get("username")
-	password := r.PostForm.Get("password")
-	var1 := r.PostForm.Get("var1")
-	var2 := r.PostForm.Get("var2")
-	apiKey := r.PostForm.Get("api_key")
-	apiSecret := r.PostForm.Get("api_secret")
-	limits := int(utils.StringInt(r.PostForm.Get("limits")))
-	notifer := notifiers.SelectNotifier(utils.StringInt(notifierId)).Select()
+	notifer, err := notifiers.SelectNotifier(method)
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("issue saving notifier %v: %v", method, err))
+		ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
+		return
+	}
 
 	if host != "" {
 		notifer.Host = host
@@ -163,22 +181,11 @@ func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	if limits != 0 {
 		notifer.Limits = limits
 	}
-	if enabled == "on" {
-		notifer.Enabled = true
-	} else {
-		notifer.Enabled = false
-	}
-	notifer, err = notifer.Update()
+	notifer.Enabled = enabled == "on"
+	_, err = notifer.Update()
 	if err != nil {
-		utils.Log(3, err)
+		utils.Log(3, fmt.Sprintf("issue updating notifier: %v", err))
 	}
-
-	if notifer.Enabled {
-		notify := notifiers.SelectNotifier(notifer.Id)
-		go notify.Run()
-	}
-
-	utils.Log(1, fmt.Sprintf("Notifier saved: %v", notifer))
-
-	ExecuteResponse(w, r, "settings.html", core.CoreApp)
+	notifiers.OnSave(notifer.Method)
+	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }

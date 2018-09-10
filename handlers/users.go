@@ -31,7 +31,7 @@ func UsersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	users, _ := core.SelectAllUsers()
-	ExecuteResponse(w, r, "users.html", users)
+	ExecuteResponse(w, r, "users.html", users, nil)
 }
 
 func UsersEditHandler(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +42,7 @@ func UsersEditHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
 	user, _ := core.SelectUser(int64(id))
-	ExecuteResponse(w, r, "user.html", user)
+	ExecuteResponse(w, r, "user.html", user, nil)
 }
 
 func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -69,7 +69,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	user.Update()
 	users, _ := core.SelectAllUsers()
-	ExecuteResponse(w, r, "users.html", users)
+	ExecuteResponse(w, r, "users.html", users, "/users")
 }
 
 func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -93,8 +93,8 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.Log(3, err)
 	}
-	core.OnNewUser(user)
-	http.Redirect(w, r, "/users", http.StatusSeeOther)
+	//notifiers.OnNewUser(user)
+	ExecuteResponse(w, r, "users.html", user, "/users")
 }
 
 func UsersDeleteHandler(w http.ResponseWriter, r *http.Request) {
