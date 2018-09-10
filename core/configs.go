@@ -25,6 +25,7 @@ import (
 	"os"
 )
 
+// LoadConfig will attempt to load the 'config.yml' file in a specific directory
 func LoadConfig(directory string) (*DbConfig, error) {
 	var configs *types.DbConfig
 	if os.Getenv("DB_CONN") != "" {
@@ -43,6 +44,7 @@ func LoadConfig(directory string) (*DbConfig, error) {
 	return Configs, err
 }
 
+// LoadUsingEnv will attempt to load database configs based on environment variables. If DB_CONN is set if will force this function.
 func LoadUsingEnv() (*DbConfig, error) {
 	Configs = new(DbConfig)
 	if os.Getenv("DB_CONN") == "" {

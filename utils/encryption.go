@@ -23,11 +23,13 @@ import (
 	"math/rand"
 )
 
+// HashPassword returns the bcrypt hash of a password string
 func HashPassword(password string) string {
 	bytes, _ := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes)
 }
 
+// NewSHA1Hash returns a random SHA1 hash based on a specific length
 func NewSHA1Hash(n ...int) string {
 	noRandomCharacters := 32
 	if len(n) > 0 {
@@ -51,6 +53,7 @@ func RandomString(n int) string {
 	return string(b)
 }
 
+// Sha256 returns a SHA256 hash as string from []byte
 func Sha256(data []byte) string {
 	h := sha1.New()
 	h.Write(data)

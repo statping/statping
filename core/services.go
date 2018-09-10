@@ -18,8 +18,10 @@ package core
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
+	"sort"
 	"strconv"
 	"time"
 )
@@ -32,6 +34,7 @@ func ReturnService(s *types.Service) *Service {
 	return &Service{s}
 }
 
+// SelectService returns a *core.Service from in memory
 func SelectService(id int64) *Service {
 	for _, s := range CoreApp.Services {
 		if s.(*Service).Id == id {
@@ -41,6 +44,7 @@ func SelectService(id int64) *Service {
 	return nil
 }
 
+// SelectAllServices returns a slice of *core.Service to be store on []*core.Services, should only be called once on startup.
 func (c *Core) SelectAllServices() ([]*Service, error) {
 	var services []*Service
 	db := servicesDB().Find(&services).Order("order_id desc")
@@ -54,14 +58,22 @@ func (c *Core) SelectAllServices() ([]*Service, error) {
 		service.AllFailures()
 		CoreApp.Services = append(CoreApp.Services, service)
 	}
+	reorderServices()
 	return services, db.Error
 }
 
+// reorderServices will sort the services based on 'order_id'
+func reorderServices() {
+	sort.Sort(ServiceOrder(CoreApp.Services))
+}
+
+// ToJSON will convert a service to a JSON string
 func (s *Service) ToJSON() string {
 	data, _ := json.Marshal(s)
 	return string(data)
 }
 
+// AvgTime will return the average amount of time for a service to response back successfully
 func (s *Service) AvgTime() float64 {
 	total, _ := s.TotalHits()
 	if total == 0 {
@@ -74,11 +86,13 @@ func (s *Service) AvgTime() float64 {
 	return val
 }
 
+// Online24 returns the service's uptime percent within last 24 hours
 func (s *Service) Online24() float32 {
 	ago := time.Now().Add(-24 * time.Hour)
 	return s.OnlineSince(ago)
 }
 
+// OnlineSince accepts a time since parameter to return the percent of a service's uptime.
 func (s *Service) OnlineSince(ago time.Time) float32 {
 	failed, _ := s.TotalFailuresSince(ago)
 	if failed == 0 {
@@ -100,17 +114,20 @@ func (s *Service) OnlineSince(ago time.Time) float32 {
 	return s.Online24Hours
 }
 
+// DateScan struct is for creating the charts.js graph JSON array
 type DateScan struct {
 	CreatedAt time.Time `json:"x"`
 	Value     int64     `json:"y"`
 }
 
+// lastFailure returns the last failure a service had
 func (s *Service) lastFailure() *Failure {
 	limited := s.LimitedFailures()
 	last := limited[len(limited)-1]
 	return last
 }
 
+// SmallText returns a short description about a services status
 func (s *Service) SmallText() string {
 	last := s.LimitedFailures()
 	hits, _ := s.LimitedHits()
@@ -129,6 +146,7 @@ func (s *Service) SmallText() string {
 	}
 }
 
+// GroupDataBy returns a SQL query as a string to group a column by a time
 func GroupDataBy(column string, id int64, tm time.Time, increment string) string {
 	var sql string
 	switch CoreApp.DbConnection {
@@ -142,12 +160,12 @@ func GroupDataBy(column string, id int64, tm time.Time, increment string) string
 	return sql
 }
 
+// GraphData returns the JSON object used by Charts.js to render the chart
 func (s *Service) GraphData() string {
 	var d []*DateScan
 	since := time.Now().Add(time.Hour*-24 + time.Minute*0 + time.Second*0)
 	sql := GroupDataBy("hits", s.Id, since, "minute")
 	rows, err := DbSession.Raw(sql).Rows()
-	defer rows.Close()
 	if err != nil {
 		utils.Log(2, err)
 		return ""
@@ -175,11 +193,13 @@ func (s *Service) GraphData() string {
 	return string(data)
 }
 
+// AvgUptime24 returns a service's average online status for last 24 hours
 func (s *Service) AvgUptime24() string {
 	ago := time.Now().Add(-24 * time.Hour)
 	return s.AvgUptime(ago)
 }
 
+// AvgUptime returns average online status for last 24 hours
 func (s *Service) AvgUptime(ago time.Time) string {
 	failed, _ := s.TotalFailuresSince(ago)
 	if failed == 0 {
@@ -201,6 +221,7 @@ func (s *Service) AvgUptime(ago time.Time) string {
 	return amount
 }
 
+// TotalUptime returns the total uptime percent of a service
 func (s *Service) TotalUptime() string {
 	hits, _ := s.TotalHits()
 	failures, _ := s.TotalFailures()
@@ -216,6 +237,7 @@ func (s *Service) TotalUptime() string {
 	return amount
 }
 
+// index returns a services index int for updating the []*core.Services slice
 func (s *Service) index() int {
 	for k, service := range CoreApp.Services {
 		if s.Id == service.(*Service).Id {
@@ -225,11 +247,13 @@ func (s *Service) index() int {
 	return 0
 }
 
+// updateService will update a service in the []*core.Services slice
 func updateService(service *Service) {
 	index := service.index()
 	CoreApp.Services[index] = service
 }
 
+// Delete will remove a service from the database, it will also end the service checking go routine
 func (u *Service) Delete() error {
 	i := u.index()
 	err := servicesDB().Delete(u)
@@ -240,14 +264,17 @@ func (u *Service) Delete() error {
 	u.Close()
 	slice := CoreApp.Services
 	CoreApp.Services = append(slice[:i], slice[i+1:]...)
-	//OnDeletedService(u)
+	reorderServices()
+	notifiers.OnDeletedService(u.Service)
 	return err.Error
 }
 
+// UpdateSingle will update a single column for a service
 func (u *Service) UpdateSingle(attr ...interface{}) error {
 	return servicesDB().Model(u).Update(attr).Error
 }
 
+// Update will update a service in the database, the service's checking routine can be restarted by passing true
 func (u *Service) Update(restart bool) error {
 	err := servicesDB().Update(u)
 	if err.Error != nil {
@@ -260,11 +287,13 @@ func (u *Service) Update(restart bool) error {
 		u.SleepDuration = time.Duration(u.Interval) * time.Second
 		go u.CheckQueue(true)
 	}
+	reorderServices()
 	updateService(u)
-	//OnUpdateService(u)
+	notifiers.OnUpdatedService(u.Service)
 	return err.Error
 }
 
+// Create will create a service and insert it into the database
 func (u *Service) Create() (int64, error) {
 	u.CreatedAt = time.Now()
 	db := servicesDB().Create(u)
@@ -275,13 +304,17 @@ func (u *Service) Create() (int64, error) {
 	u.Start()
 	go u.CheckQueue(true)
 	CoreApp.Services = append(CoreApp.Services, u)
+	reorderServices()
+	notifiers.OnNewService(u.Service)
 	return u.Id, nil
 }
 
+// ServicesCount returns the amount of services inside the []*core.Services slice
 func (c *Core) ServicesCount() int {
 	return len(c.Services)
 }
 
+// CountOnline
 func (c *Core) CountOnline() int {
 	amount := 0
 	for _, s := range CoreApp.Services {

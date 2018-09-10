@@ -31,12 +31,6 @@ type Core struct {
 	CoreInterface  `gorm:"-" json:"-"`
 }
 
-type ServiceOrder []*Service
-
-func (c ServiceOrder) Len() int           { return len(c) }
-func (c ServiceOrder) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
-func (c ServiceOrder) Less(i, j int) bool { return c[i].Order < c[j].Order }
-
 type CoreInterface interface {
 	SelectAllServices() ([]*Service, error)
 	Count24HFailures() uint64

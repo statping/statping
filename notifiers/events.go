@@ -17,7 +17,7 @@ package notifiers
 
 import "github.com/hunterlong/statup/types"
 
-// Notifier interface
+// OnSave will trigger a notifier when it has been saved - Notifier interface
 func OnSave(method string) {
 	for _, comm := range AllCommunications {
 		if IsType(comm, "Notifier") {
@@ -29,7 +29,7 @@ func OnSave(method string) {
 	}
 }
 
-// BasicEvents interface
+// OnFailure will be triggered when a service is failing - BasicEvents interface
 func OnFailure(s *types.Service, f *types.Failure) {
 	for _, comm := range AllCommunications {
 		if IsType(comm, "BasicEvents") {
@@ -38,7 +38,7 @@ func OnFailure(s *types.Service, f *types.Failure) {
 	}
 }
 
-// BasicEvents interface
+// OnSuccess will be triggered when a service is successful - BasicEvents interface
 func OnSuccess(s *types.Service) {
 	for _, comm := range AllCommunications {
 		if IsType(comm, "BasicEvents") {
@@ -47,7 +47,7 @@ func OnSuccess(s *types.Service) {
 	}
 }
 
-// ServiceEvents interface
+// OnNewService is triggered when a new service is created - ServiceEvents interface
 func OnNewService(s *types.Service) {
 	for _, comm := range AllCommunications {
 		if IsType(comm, "ServiceEvents") {
@@ -56,7 +56,7 @@ func OnNewService(s *types.Service) {
 	}
 }
 
-// ServiceEvents interface
+// OnUpdatedService is triggered when a service is updated - ServiceEvents interface
 func OnUpdatedService(s *types.Service) {
 	for _, comm := range AllCommunications {
 		if IsType(comm, "ServiceEvents") {
@@ -65,7 +65,7 @@ func OnUpdatedService(s *types.Service) {
 	}
 }
 
-// ServiceEvents interface
+// OnDeletedService is triggered when a service is deleted - ServiceEvents interface
 func OnDeletedService(s *types.Service) {
 	for _, comm := range AllCommunications {
 		if IsType(comm, "ServiceEvents") {
@@ -74,7 +74,7 @@ func OnDeletedService(s *types.Service) {
 	}
 }
 
-// UserEvents interface
+// OnNewUser is triggered when a new user is created - UserEvents interface
 func OnNewUser(u *types.User) {
 	for _, comm := range AllCommunications {
 		if IsType(comm, "UserEvents") {
@@ -83,7 +83,7 @@ func OnNewUser(u *types.User) {
 	}
 }
 
-// UserEvents interface
+// OnUpdatedUser is triggered when a new user is updated - UserEvents interface
 func OnUpdatedUser(u *types.User) {
 	for _, comm := range AllCommunications {
 		if IsType(comm, "UserEvents") {
@@ -92,7 +92,7 @@ func OnUpdatedUser(u *types.User) {
 	}
 }
 
-// UserEvents interface
+// OnDeletedUser is triggered when a new user is deleted - UserEvents interface
 func OnDeletedUser(u *types.User) {
 	for _, comm := range AllCommunications {
 		if IsType(comm, "UserEvents") {
@@ -101,7 +101,7 @@ func OnDeletedUser(u *types.User) {
 	}
 }
 
-// CoreEvents interface
+// OnUpdatedCore is triggered when the CoreApp settings are saved - CoreEvents interface
 func OnUpdatedCore(c *types.Core) {
 	for _, comm := range AllCommunications {
 		if IsType(comm, "CoreEvents") {

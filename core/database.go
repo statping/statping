@@ -34,35 +34,42 @@ var (
 	DbSession *gorm.DB
 )
 
-func failuresDB() *gorm.DB {
-	return DbSession.Model(&types.Failure{})
-}
-
 func (s *Service) allHits() *gorm.DB {
 	var hits []*Hit
 	return servicesDB().Find(s).Related(&hits)
 }
 
+// failuresDB returns the 'failures' database column
+func failuresDB() *gorm.DB {
+	return DbSession.Model(&types.Failure{})
+}
+
+// hitsDB returns the 'hits' database column
 func hitsDB() *gorm.DB {
 	return DbSession.Model(&types.Hit{})
 }
 
+// servicesDB returns the 'services' database column
 func servicesDB() *gorm.DB {
 	return DbSession.Model(&types.Service{})
 }
 
+// coreDB returns the single column 'core'
 func coreDB() *gorm.DB {
 	return DbSession.Table("core").Model(&CoreApp)
 }
 
+// usersDB returns the 'users' database column
 func usersDB() *gorm.DB {
 	return DbSession.Model(&types.User{})
 }
 
+// commDB returns the 'communications' database column
 func commDB() *gorm.DB {
 	return DbSession.Table("communication").Model(&notifiers.Notification{})
 }
 
+// hitsDB returns the 'hits' database column
 func checkinDB() *gorm.DB {
 	return DbSession.Model(&types.Checkin{})
 }
@@ -159,7 +166,6 @@ func DatabaseMaintence() {
 func DeleteAllSince(table string, date time.Time) {
 	sql := fmt.Sprintf("DELETE FROM %v WHERE created_at < '%v';", table, date.Format("2006-01-02"))
 	db := DbSession.Raw(sql)
-	defer db.Close()
 	if db.Error != nil {
 		utils.Log(2, db.Error)
 	}

@@ -31,6 +31,7 @@ var (
 	Directory string
 )
 
+// init will set the utils.Directory to the current running directory, or STATUP_DIR if it is set
 func init() {
 	if os.Getenv("STATUP_DIR") != "" {
 		Directory = os.Getenv("STATUP_DIR")
@@ -39,15 +40,18 @@ func init() {
 	}
 }
 
+// StringInt converts a string to an int64
 func StringInt(s string) int64 {
 	num, _ := strconv.Atoi(s)
 	return int64(num)
 }
 
+// IntString converts a int to a string
 func IntString(s int) string {
 	return strconv.Itoa(s)
 }
 
+// dir returns the current working directory
 func dir() string {
 	dir, err := os.Getwd()
 	if err != nil {
@@ -57,16 +61,17 @@ func dir() string {
 }
 
 type Timestamp time.Time
-
 type Timestamper interface {
 	Ago() string
 }
 
+// Ago returns a human readable timestamp based on the Timestamp (time.Time) interface
 func (t Timestamp) Ago() string {
 	got, _ := timeago.TimeAgoWithTime(time.Now(), time.Time(t))
 	return got
 }
 
+// UnderScoreString will return a string that replaces spaces and other characters to underscores
 func UnderScoreString(str string) string {
 
 	// convert every letter to lower case
@@ -90,6 +95,7 @@ func UnderScoreString(str string) string {
 	return newStr
 }
 
+// FileExists returns true if a file exists
 func FileExists(name string) bool {
 	if _, err := os.Stat(name); err != nil {
 		if os.IsNotExist(err) {
@@ -99,6 +105,7 @@ func FileExists(name string) bool {
 	return true
 }
 
+// DeleteFile will attempt to delete a file
 func DeleteFile(file string) error {
 	Log(1, "deleting file: "+file)
 	err := os.Remove(file)
@@ -108,10 +115,12 @@ func DeleteFile(file string) error {
 	return nil
 }
 
+// DeleteDirectory will attempt to delete a directory and all contents inside
 func DeleteDirectory(directory string) error {
 	return os.RemoveAll(directory)
 }
 
+// Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings
 func Command(cmd string) (string, string, error) {
 	Log(1, "running command: "+cmd)
 	testCmd := exec.Command("sh", "-c", cmd)
@@ -142,6 +151,7 @@ func Command(cmd string) (string, string, error) {
 	return outStr, errStr, err
 }
 
+// copyAndCapture will read a terminal command into bytes
 func copyAndCapture(w io.Writer, r io.Reader) ([]byte, error) {
 	var out []byte
 	buf := make([]byte, 1024, 1024)

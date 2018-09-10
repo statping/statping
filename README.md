@@ -9,6 +9,8 @@
 # Statup - Status Page & Monitoring Server
 An easy to use Status Page for your websites and applications. Statup will automatically fetch the application and render a beautiful status page with tons of features for you to build an even better status page. This Status Page generator allows you to use MySQL, Postgres, or SQLite on multiple operating systems.
 
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/statup-app/general)
+
 ## A Future-Proof Status Page
 Statup strives to remain future-proof and remain intact if a failure is created. Your Statup service should not be running on the same instance you're trying to monitor. If your server crashes your Status Page should still remaining online to notify your users of downtime. 
 

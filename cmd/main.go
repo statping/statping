@@ -39,6 +39,9 @@ func init() {
 	core.VERSION = VERSION
 }
 
+// parseFlags will parse the application flags
+// -ip = 0.0.0.0 IP address for outgoing HTTP server
+// -port = 8080 Port number for outgoing HTTP server
 func parseFlags() {
 	ip := flag.String("ip", "0.0.0.0", "IP address to run the Statup HTTP server")
 	p := flag.Int("port", 8080, "Port to run the HTTP server")
@@ -47,6 +50,7 @@ func parseFlags() {
 	port = *p
 }
 
+// main will run the Statup application
 func main() {
 	var err error
 	parseFlags()
@@ -76,6 +80,7 @@ func main() {
 	mainProcess()
 }
 
+// LoadDotEnvs attempts to load database configs from a '.env' file in root directory
 func LoadDotEnvs() error {
 	err := godotenv.Load()
 	if err == nil {
@@ -85,6 +90,7 @@ func LoadDotEnvs() error {
 	return err
 }
 
+// mainProcess will initialize the Statup application and run the HTTP server
 func mainProcess() {
 	dir := utils.Directory
 	var err error

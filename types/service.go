@@ -89,16 +89,19 @@ type ServiceInterface interface {
 	AllCheckins() []*Checkin
 }
 
+// Start will create a channel for the service checking go routine
 func (s *Service) Start() {
 	s.Running = make(chan bool)
 }
 
+// Close will stop the go routine that is checking if service is online or not
 func (s *Service) Close() {
 	if s.IsRunning() {
 		close(s.Running)
 	}
 }
 
+// IsRunning returns true if the service go routine is running
 func (s *Service) IsRunning() bool {
 	if s.Running == nil {
 		return false

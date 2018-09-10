@@ -22,6 +22,7 @@ import (
 	"os"
 )
 
+// DeleteConfig will delete the 'config.yml' file
 func DeleteConfig() {
 	err := os.Remove(utils.Directory + "/config.yml")
 	if err != nil {
@@ -33,6 +34,7 @@ type ErrorResponse struct {
 	Error string
 }
 
+// LoadSampleData will create the example/dummy services for a brand new Statup installation
 func LoadSampleData() error {
 	utils.Log(1, "Inserting Sample Data...")
 	s1 := ReturnService(&types.Service{

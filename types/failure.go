@@ -14,6 +14,6 @@ type Failure struct {
 }
 
 type FailureInterface interface {
-	Ago() string
-	ParseError() string
+	Ago() string        // Ago returns a human readble timestamp
+	ParseError() string // ParseError returns a human readable error for a service failure
 }

@@ -27,12 +27,13 @@ import (
 )
 
 var (
-	CssBox  *rice.Box
-	ScssBox *rice.Box
-	JsBox   *rice.Box
-	TmplBox *rice.Box
+	CssBox  *rice.Box // CSS files from the 'source/css' directory, this will be loaded into '/assets/css'
+	ScssBox *rice.Box // SCSS files from the 'source/scss' directory, this will be loaded into '/assets/scss'
+	JsBox   *rice.Box // JS files from the 'source/js' directory, this will be loaded into '/assets/js'
+	TmplBox *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
 )
 
+// Assets will load the Rice boxes containing the CSS, SCSS, JS, and HTML files.
 func Assets() {
 	CssBox = rice.MustFindBox("css")
 	ScssBox = rice.MustFindBox("scss")
@@ -40,6 +41,7 @@ func Assets() {
 	TmplBox = rice.MustFindBox("tmpl")
 }
 
+// CompileSASS will attempt to compile the SASS files into CSS
 func CompileSASS(folder string) error {
 	sassBin := os.Getenv("SASS")
 	if sassBin == "" {
@@ -93,6 +95,7 @@ func CompileSASS(folder string) error {
 	return err
 }
 
+// UsingAssets returns true if the '/assets' folder is found in the directory
 func UsingAssets(folder string) bool {
 	if _, err := os.Stat(folder + "/assets"); err == nil {
 		return true
@@ -112,6 +115,7 @@ func UsingAssets(folder string) bool {
 	return false
 }
 
+// SaveAsset will save an asset to the '/assets/' folder.
 func SaveAsset(data []byte, folder, file string) error {
 	utils.Log(1, fmt.Sprintf("Saving %v/%v into assets folder", folder, file))
 	err := ioutil.WriteFile(folder+"/assets/"+file, data, 0744)
@@ -122,6 +126,7 @@ func SaveAsset(data []byte, folder, file string) error {
 	return nil
 }
 
+// OpenAsset returns a file's contents as a string
 func OpenAsset(folder, file string) string {
 	dat, err := ioutil.ReadFile(folder + "/assets/" + file)
 	if err != nil {
@@ -131,6 +136,7 @@ func OpenAsset(folder, file string) string {
 	return string(dat)
 }
 
+// CreateAllAssets will dump HTML, CSS, SCSS, and JS assets into the '/assets' directory
 func CreateAllAssets(folder string) error {
 	utils.Log(1, fmt.Sprintf("Dump Statup assets into %v/assets", folder))
 	MakePublicFolder(folder + "/assets")
@@ -156,6 +162,7 @@ func CreateAllAssets(folder string) error {
 	return err
 }
 
+// DeleteAllAssets will delete the '/assets' folder
 func DeleteAllAssets(folder string) error {
 	err := os.RemoveAll(folder + "/assets")
 	if err != nil {
@@ -166,6 +173,7 @@ func DeleteAllAssets(folder string) error {
 	return err
 }
 
+// CopyToPublic will create a file from a rice Box to the '/assets' directory
 func CopyToPublic(box *rice.Box, folder, file string) error {
 	assetFolder := fmt.Sprintf("%v/%v", folder, file)
 	utils.Log(1, fmt.Sprintf("Copying %v to %v", file, assetFolder))
@@ -182,6 +190,7 @@ func CopyToPublic(box *rice.Box, folder, file string) error {
 	return nil
 }
 
+// MakePublicFolder will create a new folder
 func MakePublicFolder(folder string) error {
 	utils.Log(1, fmt.Sprintf("Creating folder '%v'", folder))
 	if _, err := os.Stat(folder); os.IsNotExist(err) {
@@ -194,6 +203,7 @@ func MakePublicFolder(folder string) error {
 	return nil
 }
 
+// copyAndCapture captures the response from a terminal command
 func copyAndCapture(w io.Writer, r io.Reader) ([]byte, error) {
 	var out []byte
 	buf := make([]byte, 1024, 1024)

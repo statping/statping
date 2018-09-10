@@ -38,6 +38,7 @@ func Logger() *lumberjack.Logger {
 	return ljLogger
 }
 
+// createLog will create the '/logs' directory based on a directory
 func createLog(dir string) error {
 	var err error
 	_, err = os.Stat(dir + "/logs")
@@ -56,6 +57,7 @@ func createLog(dir string) error {
 	return err
 }
 
+// InitLogs will create the '/logs' directory and creates a file '/logs/statup.log' for application logging
 func InitLogs() error {
 	err := createLog(Directory)
 	if err != nil {
@@ -90,6 +92,7 @@ func rotate() {
 	}()
 }
 
+// Log creates a new entry in the Logger. Log has 1-5 levels depending on how critical the log/error is
 func Log(level int, err interface{}) error {
 	pushLastLine(err)
 	var outErr error
@@ -122,6 +125,7 @@ func Log(level int, err interface{}) error {
 	return outErr
 }
 
+// Http returns a log for a HTTP request
 func Http(r *http.Request) string {
 	msg := fmt.Sprintf("%v (%v) | IP: %v", r.RequestURI, r.Method, r.Host)
 	fmtLogs.Printf("WEB: %v\n", msg)
@@ -140,6 +144,7 @@ func pushLastLine(line interface{}) {
 	}
 }
 
+// GetLastLine returns 1 line for a recent log entry
 func GetLastLine() *LogRow {
 	LockLines.Lock()
 	defer LockLines.Unlock()

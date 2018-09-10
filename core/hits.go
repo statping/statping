@@ -25,6 +25,7 @@ type Hit struct {
 	*types.Hit
 }
 
+// CreateHit will create a new 'hit' record in the database for a successful/online service
 func (s *Service) CreateHit(h *types.Hit) (int64, error) {
 	db := hitsDB().Create(h)
 	if db.Error != nil {
@@ -34,6 +35,7 @@ func (s *Service) CreateHit(h *types.Hit) (int64, error) {
 	return h.Id, db.Error
 }
 
+// Hits returns all successful hits for a service
 func (s *Service) Hits() ([]*types.Hit, error) {
 	var hits []*types.Hit
 	col := hitsDB().Where("service = ?", s.Id).Order("id desc")
@@ -41,6 +43,7 @@ func (s *Service) Hits() ([]*types.Hit, error) {
 	return hits, err.Error
 }
 
+// LimitedHits returns the last 1024 successful/online 'hit' records for a service
 func (s *Service) LimitedHits() ([]*types.Hit, error) {
 	var hits []*types.Hit
 	col := hitsDB().Where("service = ?", s.Id).Order("id desc").Limit(1024)
@@ -48,6 +51,7 @@ func (s *Service) LimitedHits() ([]*types.Hit, error) {
 	return reverseHits(hits), err.Error
 }
 
+// reverseHits will reverse the service's hit slice
 func reverseHits(input []*types.Hit) []*types.Hit {
 	if len(input) == 0 {
 		return input
@@ -55,6 +59,7 @@ func reverseHits(input []*types.Hit) []*types.Hit {
 	return append(reverseHits(input[1:]), input[0])
 }
 
+// SelectHitsGroupBy returns all hits from the group by function
 func (s *Service) SelectHitsGroupBy(group string) ([]*types.Hit, error) {
 	var hits []*types.Hit
 	col := hitsDB().Where("service = ?", s.Id)
@@ -62,6 +67,7 @@ func (s *Service) SelectHitsGroupBy(group string) ([]*types.Hit, error) {
 	return hits, err.Error
 }
 
+// TotalHits returns the total amount of successfull hits a service has
 func (s *Service) TotalHits() (uint64, error) {
 	var count uint64
 	col := hitsDB().Where("service = ?", s.Id)
@@ -69,6 +75,7 @@ func (s *Service) TotalHits() (uint64, error) {
 	return count, err.Error
 }
 
+// TotalHitsSince returns the total amount of hits based on a specific time/date
 func (s *Service) TotalHitsSince(ago time.Time) (uint64, error) {
 	var count uint64
 	rows := hitsDB().Where("service = ? AND created_at > ?", s.Id, ago.Format("2006-01-02 15:04:05"))
@@ -76,6 +83,7 @@ func (s *Service) TotalHitsSince(ago time.Time) (uint64, error) {
 	return count, err.Error
 }
 
+// Sum returns the added value Latency for all of the services successful hits.
 func (s *Service) Sum() (float64, error) {
 	var amount float64
 	hits, err := s.Hits()

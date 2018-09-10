@@ -30,6 +30,7 @@ import (
 	"time"
 )
 
+// CheckServices will start the checking go routine for each service
 func CheckServices() {
 	utils.Log(1, fmt.Sprintf("Starting monitoring process for %v Services", len(CoreApp.Services)))
 	for _, ser := range CoreApp.Services {
@@ -38,6 +39,7 @@ func CheckServices() {
 	}
 }
 
+// CheckQueue is the main go routine for checking a service
 func (s *Service) CheckQueue(record bool) {
 	s.Checkpoint = time.Now()
 	s.SleepDuration = time.Duration((time.Duration(s.Id) * 100) * time.Millisecond)
@@ -61,6 +63,7 @@ CheckLoop:
 	}
 }
 
+// duration returns the amount of duration for a service to check its status
 func (s *Service) duration() time.Duration {
 	var amount time.Duration
 	if s.Interval >= 10000 {
@@ -71,6 +74,7 @@ func (s *Service) duration() time.Duration {
 	return amount
 }
 
+// dnsCheck will check the domain name and return a float64 for the amount of time the DNS check took
 func (s *Service) dnsCheck() (float64, error) {
 	t1 := time.Now()
 	domain := s.Domain
@@ -92,6 +96,7 @@ func (s *Service) dnsCheck() (float64, error) {
 	return subTime, err
 }
 
+// checkTcp will check a TCP service
 func (s *Service) checkTcp(record bool) *Service {
 	t1 := time.Now()
 	domain := fmt.Sprintf("%v", s.Domain)
@@ -120,15 +125,7 @@ func (s *Service) checkTcp(record bool) *Service {
 	return s
 }
 
-func (s *Service) Check(record bool) {
-	switch s.Type {
-	case "http":
-		s.checkHttp(record)
-	case "tcp":
-		s.checkTcp(record)
-	}
-}
-
+// checkHttp will check a HTTP service
 func (s *Service) checkHttp(record bool) *Service {
 	dnsLookup, err := s.dnsCheck()
 	if err != nil {
@@ -202,10 +199,21 @@ func (s *Service) checkHttp(record bool) *Service {
 	return s
 }
 
+// Check will run checkHttp for HTTP services and checkTcp for TCP services
+func (s *Service) Check(record bool) {
+	switch s.Type {
+	case "http":
+		s.checkHttp(record)
+	case "tcp":
+		s.checkTcp(record)
+	}
+}
+
 type HitData struct {
 	Latency float64
 }
 
+// RecordSuccess will create a new 'hit' record in the database for a successful/online service
 func RecordSuccess(s *Service) {
 	s.Online = true
 	s.LastOnline = time.Now()
@@ -219,6 +227,7 @@ func RecordSuccess(s *Service) {
 	notifiers.OnSuccess(s.Service)
 }
 
+// RecordFailure will create a new 'failure' record in the database for a offline service
 func RecordFailure(s *Service, issue string) {
 	s.Online = false
 	fail := &types.Failure{

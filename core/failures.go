@@ -28,8 +28,8 @@ type Failure struct {
 	*types.Failure
 }
 
+// CreateFailure will create a new failure record for a service
 func (s *Service) CreateFailure(f *types.Failure) (int64, error) {
-	f.CreatedAt = time.Now()
 	f.Service = s.Id
 	s.Failures = append(s.Failures, f)
 	row := failuresDB().Create(f)
@@ -40,6 +40,7 @@ func (s *Service) CreateFailure(f *types.Failure) (int64, error) {
 	return f.Id, row.Error
 }
 
+// AllFailures will return all failures attached to a service
 func (s *Service) AllFailures() []*Failure {
 	var fails []*Failure
 	col := failuresDB().Where("service = ?", s.Id).Order("id desc")
@@ -54,6 +55,7 @@ func (s *Service) AllFailures() []*Failure {
 	return fails
 }
 
+// DeleteFailures will delete all failures for a service
 func (u *Service) DeleteFailures() {
 	err := DbSession.Exec(`DELETE FROM failures WHERE service = ?`, u.Id)
 	if err.Error != nil {
@@ -62,6 +64,7 @@ func (u *Service) DeleteFailures() {
 	u.Failures = nil
 }
 
+// LimitedFailures will return the last 10 failures from a service
 func (s *Service) LimitedFailures() []*Failure {
 	var failArr []*Failure
 	col := failuresDB().Where("service = ?", s.Id).Order("id desc").Limit(10)
@@ -69,16 +72,19 @@ func (s *Service) LimitedFailures() []*Failure {
 	return failArr
 }
 
+// Ago returns a human readable timestamp for a failure
 func (f *Failure) Ago() string {
 	got, _ := timeago.TimeAgoWithTime(time.Now(), f.CreatedAt)
 	return got
 }
 
+// Delete will remove a failure record from the database
 func (f *Failure) Delete() error {
 	db := failuresDB().Delete(f)
 	return db.Error
 }
 
+// Count24HFailures returns the amount of failures for a service within the last 24 hours
 func (c *Core) Count24HFailures() uint64 {
 	var count uint64
 	for _, s := range CoreApp.Services {
@@ -89,6 +95,7 @@ func (c *Core) Count24HFailures() uint64 {
 	return count
 }
 
+// CountFailures returns the total count of failures for all services
 func CountFailures() uint64 {
 	var count uint64
 	err := failuresDB().Count(&count)
@@ -99,11 +106,13 @@ func CountFailures() uint64 {
 	return count
 }
 
+// TotalFailures24 returns the amount of failures for a service within the last 24 hours
 func (s *Service) TotalFailures24() (uint64, error) {
 	ago := time.Now().Add(-24 * time.Hour)
 	return s.TotalFailuresSince(ago)
 }
 
+// TotalFailures returns the total amount of failures for a service
 func (s *Service) TotalFailures() (uint64, error) {
 	var count uint64
 	rows := failuresDB().Where("service = ?", s.Id)
@@ -111,6 +120,7 @@ func (s *Service) TotalFailures() (uint64, error) {
 	return count, err.Error
 }
 
+// TotalFailuresSince returns the total amount of failures for a service since a specific time/date
 func (s *Service) TotalFailuresSince(ago time.Time) (uint64, error) {
 	var count uint64
 	rows := failuresDB().Where("service = ? AND created_at > ?", s.Id, ago.Format("2006-01-02 15:04:05"))
@@ -118,6 +128,7 @@ func (s *Service) TotalFailuresSince(ago time.Time) (uint64, error) {
 	return count, err.Error
 }
 
+// ParseError returns a human readable error for a failure
 func (f *Failure) ParseError() string {
 	err := strings.Contains(f.Issue, "connection reset by peer")
 	if err {

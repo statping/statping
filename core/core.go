@@ -54,6 +54,7 @@ func (c *Core) ToCore() *types.Core {
 	return c.Core
 }
 
+// InitApp will initialize Statup
 func InitApp() {
 	SelectCore()
 	InsertNotifierDB()
@@ -151,20 +152,8 @@ func SelectCore() (*Core, error) {
 }
 
 // ServiceOrder will reorder the services based on 'order_id' (Order)
-type ServiceOrder []*types.Service
+type ServiceOrder []types.ServiceInterface
 
 func (c ServiceOrder) Len() int           { return len(c) }
 func (c ServiceOrder) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
-func (c ServiceOrder) Less(i, j int) bool { return c[i].Order < c[j].Order }
-
-// Services returns each Service that is attached to this instance
-//func (c *Core) Services() []*Service {
-//	var services []*Service
-//	servs := CoreApp.GetServices()
-//	sort.Sort(ServiceOrder(servs))
-//	CoreApp.SetServices(servs)
-//	for _, ser := range servs {
-//		services = append(services, ReturnService(ser))
-//	}
-//	return services
-//}
+func (c ServiceOrder) Less(i, j int) bool { return c[i].(*Service).Order < c[j].(*Service).Order }

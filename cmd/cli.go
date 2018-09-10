@@ -35,6 +35,7 @@ const (
 	POINT  = "                     "
 )
 
+// CatchCLI will run functions based on the commands sent to Statup
 func CatchCLI(args []string) error {
 	dir := utils.Directory
 	utils.InitLogs()
@@ -129,6 +130,7 @@ func CatchCLI(args []string) error {
 	return errors.New("end")
 }
 
+// RunOnce will initialize the Statup application and check each service 1 time, will not run HTTP server
 func RunOnce() {
 	var err error
 	core.Configs, err = core.LoadConfig(utils.Directory)
@@ -154,6 +156,7 @@ func RunOnce() {
 	}
 }
 
+// HelpEcho prints out available commands and flags for Statup
 func HelpEcho() {
 	fmt.Printf("Statup v%v - Statup.io\n", VERSION)
 	fmt.Printf("A simple Application Status Monitor that is opensource and lightweight.\n")

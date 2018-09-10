@@ -27,16 +27,19 @@ type User struct {
 	*types.User
 }
 
+// ReturnUser returns *core.User based off a *types.User
 func ReturnUser(u *types.User) *User {
 	return &User{u}
 }
 
+// SelectUser returns the User based on the user's ID.
 func SelectUser(id int64) (*User, error) {
 	var user User
 	err := usersDB().First(&user, id)
 	return &user, err.Error
 }
 
+// SelectUser returns the User based on the user's username
 func SelectUsername(username string) (*User, error) {
 	var user User
 	res := usersDB().Where("username = ?", username)
@@ -44,15 +47,18 @@ func SelectUsername(username string) (*User, error) {
 	return &user, err.Error
 }
 
+// Delete will remove the user record from the database
 func (u *User) Delete() error {
 	return usersDB().Delete(u).Error
 }
 
+// Update will update the user's record in database
 func (u *User) Update() error {
 	u.CreatedAt = time.Now()
 	return usersDB().Update(u).Error
 }
 
+// Create will insert a new user into the database
 func (u *User) Create() (int64, error) {
 	u.CreatedAt = time.Now()
 	u.Password = utils.HashPassword(u.Password)
@@ -69,6 +75,7 @@ func (u *User) Create() (int64, error) {
 	return u.Id, db.Error
 }
 
+// SelectAllUsers returns all users
 func SelectAllUsers() ([]*User, error) {
 	var users []*User
 	db := usersDB().Find(&users)
@@ -78,6 +85,8 @@ func SelectAllUsers() ([]*User, error) {
 	return users, db.Error
 }
 
+// AuthUser will return the User and a boolean if authentication was correct.
+// AuthUser accepts username, and password as a string
 func AuthUser(username, password string) (*User, bool) {
 	user, err := SelectUsername(username)
 	if err != nil {
@@ -90,6 +99,7 @@ func AuthUser(username, password string) (*User, bool) {
 	return nil, false
 }
 
+// CheckHash returns true if the password matches with a hashed bcrypt password
 func CheckHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
