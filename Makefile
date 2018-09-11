@@ -18,7 +18,7 @@ TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statup
 all: dev-deps compile install test-all docker-build-all
 
 # build all arch's and release Statup
-release: dev-deps build-all compress
+release: dev-deps build-all
 
 # test all versions of Statup, golang testing and then cypress UI testing
 test-all: dev-deps test
@@ -36,7 +36,7 @@ build-all: build-mac build-linux build-windows build-alpine compress
 docker-build-all: docker-build-base docker-build-dev docker-build-latest
 
 # push all docker tags built
-docker-publish-all: docker-push-base docker-push-dev docker-push-latest docker-push-cypress
+docker-publish-all: docker-push-base docker-push-dev docker-push-latest
 
 # build Statup for local arch
 build: compile
@@ -100,7 +100,6 @@ build-mac: compile
 
 # build Statup for Linux 64, 32 bit, arm6/arm7
 build-linux: compile
-	mkdir build
 	$(XGO) $(BUILDVERSION) --targets=linux/amd64 ./cmd
 	$(XGO) $(BUILDVERSION) --targets=linux/386 ./cmd
 	$(XGO) $(BUILDVERSION) --targets=linux/arm-7 ./cmd
@@ -108,14 +107,11 @@ build-linux: compile
 
 # build for windows 64 bit only
 build-windows: compile
-	mkdir build
 	$(XGO) $(BUILDVERSION) --targets=windows-6.0/amd64 ./cmd
 
 # build Alpine linux binary (used in docker images)
 build-alpine: compile
-	mkdir build
 	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT) -linkmode external -extldflags -static" -out alpine ./cmd
-
 
 #
 #    Docker Makefile commands
