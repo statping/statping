@@ -54,7 +54,9 @@ func (u *User) Delete() error {
 
 // Update will update the user's record in database
 func (u *User) Update() error {
-	u.CreatedAt = time.Now()
+	u.Password = utils.HashPassword(u.Password)
+	u.ApiKey = utils.NewSHA1Hash(5)
+	u.ApiSecret = utils.NewSHA1Hash(10)
 	return usersDB().Update(u).Error
 }
 

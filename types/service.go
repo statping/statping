@@ -38,8 +38,6 @@ type Service struct {
 	Latency        float64       `gorm:"-" json:"latency"`
 	Online24Hours  float32       `gorm:"-" json:"24_hours_online"`
 	AvgResponse    string        `gorm:"-" json:"avg_response"`
-	Failures       []interface{} `gorm:"-" json:"failures"`
-	Checkins       []*Checkin    `gorm:"-" json:"checkins"`
 	Running        chan bool     `gorm:"-" json:"-"`
 	Checkpoint     time.Time     `gorm:"-" json:"-"`
 	SleepDuration  time.Duration `gorm:"-" json:"-"`
@@ -47,6 +45,8 @@ type Service struct {
 	LastStatusCode int           `gorm:"-" json:"status_code"`
 	LastOnline     time.Time     `gorm:"-" json:"last_online"`
 	DnsLookup      float64       `gorm:"-" json:"dns_lookup_time"`
+	Failures       []interface{} `gorm:"-" json:"failures,omitempty"`
+	Checkins       []*Checkin    `gorm:"-" json:"checkins,omitempty"`
 }
 
 type ServiceInterface interface {

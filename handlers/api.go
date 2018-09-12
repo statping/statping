@@ -26,10 +26,10 @@ import (
 )
 
 type ApiResponse struct {
-	Object string `json:"type"`
-	Method string `json:"method"`
-	Id     int64  `json:"id"`
 	Status string `json:"status"`
+	Object string `json:"type"`
+	Id     int64  `json:"id"`
+	Method string `json:"method"`
 }
 
 func ApiIndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +37,16 @@ func ApiIndexHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
-	out := core.CoreApp
+	var out core.Core
+	out = *core.CoreApp
+	var services []types.ServiceInterface
+	for _, s := range out.Services {
+		service := s.Select()
+		service.Failures = nil
+		services = append(services, core.ReturnService(service))
+	}
+	out.Services = services
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(out)
 }
 
@@ -79,6 +88,8 @@ func ApiServiceHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
+
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(service)
 }
 
@@ -100,6 +111,7 @@ func ApiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(service)
 }
 
@@ -117,12 +129,15 @@ func ApiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	var updatedService *types.Service
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&updatedService)
+	updatedService.Id = service.Id
 	service = core.ReturnService(updatedService)
 	err := service.Update(true)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+	service.Check(true)
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(service)
 }
 
@@ -148,6 +163,7 @@ func ApiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		Id:     service.Id,
 		Status: "success",
 	}
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(output)
 }
 
@@ -156,7 +172,14 @@ func ApiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
-	services := core.CoreApp.Services
+	allServices := core.CoreApp.Services
+	var services []types.ServiceInterface
+	for _, s := range allServices {
+		service := s.Select()
+		service.Failures = nil
+		services = append(services, core.ReturnService(service))
+	}
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(services)
 }
 
@@ -171,6 +194,7 @@ func ApiUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)
 }
 
@@ -188,12 +212,14 @@ func ApiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	var updateUser *types.User
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&updateUser)
+	updateUser.Id = user.Id
 	user = core.ReturnUser(updateUser)
 	err = user.Update()
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)
 }
 
@@ -219,6 +245,7 @@ func ApiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		Id:     user.Id,
 		Status: "success",
 	}
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(output)
 }
 
@@ -228,6 +255,7 @@ func ApiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	users, _ := core.SelectAllUsers()
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(users)
 }
 
@@ -255,6 +283,7 @@ func ApiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
 		Id:     uId,
 		Status: "success",
 	}
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(output)
 }
 
