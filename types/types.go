@@ -21,12 +21,10 @@ import (
 	"time"
 )
 
-type AllNotifiers interface{}
-
 // Hit struct is a 'successful' ping or web response entry for a service.
 type Hit struct {
 	Id        int64     `gorm:"primary_key;column:id"`
-	Service   int64     `gorm:"index;column:service"`
+	Service   int64     `gorm:"column:service"`
 	Latency   float64   `gorm:"column:latency"`
 	CreatedAt time.Time `gorm:"column:created_at"`
 }

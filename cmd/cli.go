@@ -22,7 +22,6 @@ import (
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/handlers"
 	"github.com/hunterlong/statup/source"
-	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
 	"io/ioutil"
@@ -149,10 +148,10 @@ func RunOnce() {
 	if err != nil {
 		utils.Log(4, err)
 	}
-	for _, s := range core.CoreApp.Services {
-		out := s.(*types.Service)
+	for _, out := range core.CoreApp.Services {
+		service := out.Select()
 		out.Check(true)
-		fmt.Printf("    Service %v | URL: %v | Latency: %0.0fms | Online: %v\n", out.Name, out.Domain, (out.Latency * 1000), out.Online)
+		fmt.Printf("    Service %v | URL: %v | Latency: %0.0fms | Online: %v\n", service.Name, service.Domain, (service.Latency * 1000), service.Online)
 	}
 }
 

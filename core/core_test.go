@@ -103,7 +103,7 @@ func TestSelectCore(t *testing.T) {
 }
 
 func TestInsertNotifierDB(t *testing.T) {
-	err := InsertNotifierDB()
+	err := insertNotifierDB()
 	assert.Nil(t, err)
 }
 

@@ -20,74 +20,82 @@ import (
 )
 
 type Service struct {
-	Id               int64         `gorm:"primary_key;column:id" json:"id"`
-	Name             string        `gorm:"column:name" json:"name"`
-	Domain           string        `gorm:"column:domain" json:"domain"`
-	Expected         string        `gorm:"not null;column:expected" json:"expected"`
-	ExpectedStatus   int           `gorm:"default:200;column:expected_status" json:"expected_status"`
-	Interval         int           `gorm:"default:30;column:check_interval" json:"check_interval"`
-	Type             string        `gorm:"column:check_type" json:"type"`
-	Method           string        `gorm:"column:method" json:"method"`
-	PostData         string        `gorm:"not null;column:post_data" json:"post_data"`
-	Port             int           `gorm:"not null;column:port" json:"port"`
-	Timeout          int           `gorm:"default:30;column:timeout" json:"timeout"`
-	Order            int           `gorm:"default:0;column:order_id" json:"order_id"`
-	CreatedAt        time.Time     `gorm:"column:created_at" json:"created_at"`
-	UpdatedAt        time.Time     `gorm:"column:updated_at" json:"updated_at"`
-	Online           bool          `gorm:"-" json:"online"`
-	Latency          float64       `gorm:"-" json:"latency"`
-	Online24Hours    float32       `gorm:"-" json:"24_hours_online"`
-	AvgResponse      string        `gorm:"-" json:"avg_response"`
-	Failures         []interface{} `gorm:"-" json:"failures"`
-	Checkins         []*Checkin    `gorm:"-" json:"checkins"`
-	Running          chan bool     `gorm:"-" json:"-"`
-	Checkpoint       time.Time     `gorm:"-" json:"-"`
-	SleepDuration    time.Duration `gorm:"-" json:"-"`
-	LastResponse     string        `gorm:"-" json:"-"`
-	LastStatusCode   int           `gorm:"-" json:"status_code"`
-	LastOnline       time.Time     `gorm:"-" json:"last_online"`
-	DnsLookup        float64       `gorm:"-" json:"dns_lookup_time"`
-	ServiceInterface `gorm:"-" json:"-"`
+	Id             int64         `gorm:"primary_key;column:id" json:"id"`
+	Name           string        `gorm:"column:name" json:"name"`
+	Domain         string        `gorm:"column:domain" json:"domain"`
+	Expected       string        `gorm:"not null;column:expected" json:"expected"`
+	ExpectedStatus int           `gorm:"default:200;column:expected_status" json:"expected_status"`
+	Interval       int           `gorm:"default:30;column:check_interval" json:"check_interval"`
+	Type           string        `gorm:"column:check_type" json:"type"`
+	Method         string        `gorm:"column:method" json:"method"`
+	PostData       string        `gorm:"not null;column:post_data" json:"post_data"`
+	Port           int           `gorm:"not null;column:port" json:"port"`
+	Timeout        int           `gorm:"default:30;column:timeout" json:"timeout"`
+	Order          int           `gorm:"default:0;column:order_id" json:"order_id"`
+	CreatedAt      time.Time     `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt      time.Time     `gorm:"column:updated_at" json:"updated_at"`
+	Online         bool          `gorm:"-" json:"online"`
+	Latency        float64       `gorm:"-" json:"latency"`
+	Online24Hours  float32       `gorm:"-" json:"24_hours_online"`
+	AvgResponse    string        `gorm:"-" json:"avg_response"`
+	Failures       []interface{} `gorm:"-" json:"failures"`
+	Checkins       []*Checkin    `gorm:"-" json:"checkins"`
+	Running        chan bool     `gorm:"-" json:"-"`
+	Checkpoint     time.Time     `gorm:"-" json:"-"`
+	SleepDuration  time.Duration `gorm:"-" json:"-"`
+	LastResponse   string        `gorm:"-" json:"-"`
+	LastStatusCode int           `gorm:"-" json:"status_code"`
+	LastOnline     time.Time     `gorm:"-" json:"last_online"`
+	DnsLookup      float64       `gorm:"-" json:"dns_lookup_time"`
 }
 
 type ServiceInterface interface {
-	// Database functions
+	Select() *Service
+	CheckQueue(bool)
+	Check(bool)
 	Create() (int64, error)
 	Update(bool) error
 	Delete() error
-	// Basic Method functions
-	AvgTime() float64
-	OnlineSince(time.Time) float32
-	Online24() float32
-	SmallText() string
-	GraphData() string
-	AvgUptime(time.Time) string
-	AvgUptime24() string
-	ToJSON() string
-	// Failure functions
-	CreateFailure(*Failure) (int64, error)
-	//LimitedFailures() []interface{}
-	//AllFailures() []*Failure
-	TotalFailuresSince(time.Time) (uint64, error)
-	TotalFailures24() (uint64, error)
-	TotalFailures() (uint64, error)
-	DeleteFailures()
-	// Hits functions (successful responses)
-	CreateHit(*Hit) (int64, error)
-	Hits() ([]*Hit, error)
-	TotalHits() (uint64, error)
-	TotalHitsSince(time.Time) (uint64, error)
-	Sum() (float64, error)
-	LimitedHits() ([]*Hit, error)
-	SelectHitsGroupBy(string) ([]*Hit, error)
-	// Go Routines
-	CheckQueue(bool)
-	Check(bool)
-	//checkHttp(bool) *Service
-	//checkTcp(bool) *Service
-	// Checkin functions
-	AllCheckins() []*Checkin
 }
+
+//type ServiceInterface interface {
+//	// Database functions
+//	Create() (int64, error)
+//	Update(bool) error
+//	Delete() error
+//	// Basic Method functions
+//	AvgTime() float64
+//	OnlineSince(time.Time) float32
+//	Online24() float32
+//	SmallText() string
+//	GraphData() string
+//	AvgUptime(time.Time) string
+//	AvgUptime24() string
+//	ToJSON() string
+//	// Failure functions
+//	CreateFailure(*Failure) (int64, error)
+//	//LimitedFailures() []interface{}
+//	//AllFailures() []*Failure
+//	TotalFailuresSince(time.Time) (uint64, error)
+//	TotalFailures24() (uint64, error)
+//	TotalFailures() (uint64, error)
+//	DeleteFailures()
+//	// Hits functions (successful responses)
+//	CreateHit(*Hit) (int64, error)
+//	Hits() ([]*Hit, error)
+//	TotalHits() (uint64, error)
+//	TotalHitsSince(time.Time) (uint64, error)
+//	Sum() (float64, error)
+//	LimitedHits() ([]*Hit, error)
+//	SelectHitsGroupBy(string) ([]*Hit, error)
+//	// Go Routines
+//	CheckQueue(bool)
+//	Check(bool)
+//	//checkHttp(bool) *Service
+//	//checkTcp(bool) *Service
+//	// Checkin functions
+//	//AllCheckins() []*Checkin
+//}
 
 // Start will create a channel for the service checking go routine
 func (s *Service) Start() {

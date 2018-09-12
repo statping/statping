@@ -19,7 +19,6 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/hunterlong/statup/source"
-	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"html/template"
 	"io/ioutil"
@@ -39,7 +38,7 @@ func ExportIndexHTML() string {
 	CoreApp.SelectAllServices()
 	CoreApp.UseCdn = true
 	for _, srv := range CoreApp.Services {
-		service := srv.(*types.Service)
+		service := srv.(*Service)
 		service.Check(true)
 		fmt.Println(service.Name, service.Online, service.Latency)
 	}

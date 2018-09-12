@@ -1,4 +1,4 @@
-VERSION=0.57
+VERSION=0.58
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -159,7 +159,7 @@ docker-push-cypress:
 	docker push hunterlong/statup:cypress
 
 # push the :latest tag to Docker hub
-docker-push-latest: docker
+docker-push-latest:
 	docker push hunterlong/statup:latest
 
 # push the :base and :base-v{VERSION} tag to Docker hub

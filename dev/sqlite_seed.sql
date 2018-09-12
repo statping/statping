@@ -133,7 +133,7 @@ INSERT INTO failures (issue,method,service,created_at) VALUES
  ('HTTP Status Code 200 did not match 0','',6,'2018-08-31 10:42:14.271162743-07:00'),
  ('HTTP Status Code 200 did not match 0','',6,'2018-08-31 10:42:14.272209564-07:00'),
  ('HTTP Status Code 200 did not match 0','',18,'2018-08-31 10:42:14.271162743-07:00');
-INSERT INTO communication (id,method,host,port,username,password,var1,var2,api_key,api_secret,enabled,removable,limits,created_at) VALUES
+INSERT INTO notifications (id,method,host,port,username,password,var1,var2,api_key,api_secret,enabled,removable,limits,created_at) VALUES
  (1,'email','smtp.emailer.com',587,'exampleuser','password123','info@betatude.com','sendto@gmail.com','','',1,0,7,'2018-08-31 10:42:15.000829706-07:00'),
  (2,'slack','https://webhooksurl.slack.com/***',0,'','','','','','',0,0,3,'2018-08-31 10:42:08.775366824-07:00'),
  (3,'twilio','',0,'','','','','','',0,0,3,'2018-08-31 10:42:08.776944923-07:00');

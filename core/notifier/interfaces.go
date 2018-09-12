@@ -13,32 +13,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package notifiers
+package notifier
 
 import "github.com/hunterlong/statup/types"
 
 // Notifier interface is required to create a new Notifier
 type Notifier interface {
-	// Init will load and install the notifier if needed
-	Init() error
-	// Install will install the notifier into the database
-	Install() error
-	// Run will trigger inside of the notifier when enabled
-	Run() error
-	// OnSave is triggered when the notifier is saved
-	OnSave() error
-	// Test will run a function inside the notifier to Test if it works
-	Test() error
-	// Select returns the *Notification for a notifier
-	Select() *Notification
+	Run() error            // Run will trigger inside of the notifier when enabled
+	OnSave() error         // OnSave is triggered when the notifier is saved
+	Test() error           // Test will run a function inside the notifier to Test if it works
+	Select() *Notification // Select returns the *Notification for a notifier
 }
 
 // BasicEvents includes the most minimal events, failing and successful service triggers
 type BasicEvents interface {
-	// OnSuccess is triggered when a service is successful
-	OnSuccess(*types.Service)
-	// OnFailure is triggered when a service is failing
-	OnFailure(*types.Service, *types.Failure)
+	OnSuccess(*types.Service)                 // OnSuccess is triggered when a service is successful
+	OnFailure(*types.Service, *types.Failure) // OnFailure is triggered when a service is failing
 }
 
 // ServiceEvents are events for Services

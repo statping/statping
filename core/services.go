@@ -18,7 +18,7 @@ package core
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hunterlong/statup/notifiers"
+	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"sort"
@@ -30,6 +30,10 @@ type Service struct {
 	*types.Service
 }
 
+func (s *Service) Select() *types.Service {
+	return s.Service
+}
+
 func ReturnService(s *types.Service) *Service {
 	return &Service{s}
 }
@@ -37,7 +41,7 @@ func ReturnService(s *types.Service) *Service {
 // SelectService returns a *core.Service from in memory
 func SelectService(id int64) *Service {
 	for _, s := range CoreApp.Services {
-		if s.(*Service).Id == id {
+		if s.Select().Id == id {
 			return s.(*Service)
 		}
 	}
@@ -58,7 +62,7 @@ func (c *Core) SelectAllServices() ([]*Service, error) {
 		service.AllFailures()
 		CoreApp.Services = append(CoreApp.Services, service)
 	}
-	reorderServices()
+	sort.Sort(ServiceOrder(CoreApp.Services))
 	return services, db.Error
 }
 
@@ -265,7 +269,7 @@ func (u *Service) Delete() error {
 	slice := CoreApp.Services
 	CoreApp.Services = append(slice[:i], slice[i+1:]...)
 	reorderServices()
-	notifiers.OnDeletedService(u.Service)
+	notifier.OnDeletedService(u.Service)
 	return err.Error
 }
 
@@ -289,7 +293,7 @@ func (u *Service) Update(restart bool) error {
 	}
 	reorderServices()
 	updateService(u)
-	notifiers.OnUpdatedService(u.Service)
+	notifier.OnUpdatedService(u.Service)
 	return err.Error
 }
 
@@ -305,7 +309,7 @@ func (u *Service) Create() (int64, error) {
 	go u.CheckQueue(true)
 	CoreApp.Services = append(CoreApp.Services, u)
 	reorderServices()
-	notifiers.OnNewService(u.Service)
+	notifier.OnNewService(u.Service)
 	return u.Id, nil
 }
 
@@ -318,7 +322,7 @@ func (c *Core) ServicesCount() int {
 func (c *Core) CountOnline() int {
 	amount := 0
 	for _, s := range CoreApp.Services {
-		if s.(*Service).Online {
+		if s.Select().Online {
 			amount++
 		}
 	}

@@ -18,7 +18,7 @@ package core
 import (
 	"bytes"
 	"fmt"
-	"github.com/hunterlong/statup/notifiers"
+	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"io/ioutil"
@@ -224,7 +224,7 @@ func RecordSuccess(s *Service) {
 	}
 	utils.Log(1, fmt.Sprintf("Service %v Successful: %0.2f ms", s.Name, hit.Latency*1000))
 	s.CreateHit(hit)
-	notifiers.OnSuccess(s.Service)
+	notifier.OnSuccess(s.Service)
 }
 
 // RecordFailure will create a new 'failure' record in the database for a offline service
@@ -237,5 +237,5 @@ func RecordFailure(s *Service, issue string) {
 	}
 	utils.Log(2, fmt.Sprintf("Service %v Failing: %v", s.Name, issue))
 	s.CreateFailure(fail)
-	notifiers.OnFailure(s.Service, fail)
+	notifier.OnFailure(s.Service, fail)
 }

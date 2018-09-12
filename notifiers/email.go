@@ -17,9 +17,9 @@ package notifiers
 
 import (
 	"bytes"
-	"crypto/tls"
 	"fmt"
 	"github.com/GeertJohan/go.rice"
+	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"gopkg.in/gomail.v2"
@@ -33,7 +33,6 @@ const (
 )
 
 var (
-	emailer    *Email
 	emailArray []string
 	emailQueue []*EmailOutgoing
 	emailBox   *rice.Box
@@ -41,76 +40,51 @@ var (
 )
 
 type Email struct {
-	*Notification
+	*notifier.Notification
 }
+
+var emailer = &Email{
+	Notification: &notifier.Notification{
+		Method: EMAIL_METHOD,
+		Form: []notifier.NotificationForm{{
+			Type:        "text",
+			Title:       "SMTP Host",
+			Placeholder: "Insert your SMTP Host here.",
+			DbField:     "Host",
+		}, {
+			Type:        "text",
+			Title:       "SMTP Username",
+			Placeholder: "Insert your SMTP Username here.",
+			DbField:     "Username",
+		}, {
+			Type:        "password",
+			Title:       "SMTP Password",
+			Placeholder: "Insert your SMTP Password here.",
+			DbField:     "Password",
+		}, {
+			Type:        "number",
+			Title:       "SMTP Port",
+			Placeholder: "Insert your SMTP Port here.",
+			DbField:     "Port",
+		}, {
+			Type:        "text",
+			Title:       "Outgoing Email Address",
+			Placeholder: "Insert your Outgoing Email Address",
+			DbField:     "Var1",
+		}, {
+			Type:        "email",
+			Title:       "Send Alerts To",
+			Placeholder: "Email Address",
+			DbField:     "Var2",
+		}},
+	}}
 
 // DEFINE YOUR NOTIFICATION HERE.
 func init() {
-
-	emailer = &Email{
-		Notification: &Notification{
-			Id:     EMAIL_ID,
-			Method: EMAIL_METHOD,
-			Form: []NotificationForm{{
-				Type:        "text",
-				Title:       "SMTP Host",
-				Placeholder: "Insert your SMTP Host here.",
-				DbField:     "Host",
-			}, {
-				Type:        "text",
-				Title:       "SMTP Username",
-				Placeholder: "Insert your SMTP Username here.",
-				DbField:     "Username",
-			}, {
-				Type:        "password",
-				Title:       "SMTP Password",
-				Placeholder: "Insert your SMTP Password here.",
-				DbField:     "Password",
-			}, {
-				Type:        "number",
-				Title:       "SMTP Port",
-				Placeholder: "Insert your SMTP Port here.",
-				DbField:     "Port",
-			}, {
-				Type:        "text",
-				Title:       "Outgoing Email Address",
-				Placeholder: "Insert your Outgoing Email Address",
-				DbField:     "Var1",
-			}, {
-				Type:        "email",
-				Title:       "Send Alerts To",
-				Placeholder: "Email Address",
-				DbField:     "Var2",
-			}},
-		}}
-
-	err := AddNotifier(emailer)
+	err := notifier.AddNotifier(emailer)
 	if err != nil {
-		utils.Log(3, err)
+		panic(err)
 	}
-}
-
-// WHEN NOTIFIER LOADS
-func (u *Email) Init() error {
-	emailBox = rice.MustFindBox("emails")
-	err := u.Install()
-	utils.Log(1, fmt.Sprintf("Creating Mailer: %v:%v", u.Notification.Host, u.Notification.Port))
-
-	if err == nil {
-		notifier, _ := SelectNotification(u.Id)
-		forms := u.Form
-		u.Notification = notifier
-		u.Form = forms
-		if u.Enabled {
-
-			utils.Log(1, fmt.Sprintf("Loading SMTP Emailer using host: %v:%v", u.Notification.Host, u.Notification.Port))
-			mailer = gomail.NewPlainDialer(u.Notification.Host, u.Notification.Port, u.Notification.Username, u.Notification.Password)
-			mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
-
-			go u.Run()
-		}
-	}
-	return nil
 }
 
 func (u *Email) Test() error {
@@ -197,20 +171,6 @@ func (u *Email) OnSuccess(s *types.Service) {
 func (u *Email) OnSave() error {
 	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
 	// Do updating stuff here
-	return nil
-}
-
-// ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
-func (u *Email) Install() error {
-	inDb := emailer.Notification.IsInDatabase()
-	if !inDb {
-		newNotifer, err := InsertDatabase(u.Notification)
-		if err != nil {
-			utils.Log(3, err)
-			return err
-		}
-		utils.Log(1, fmt.Sprintf("new notifier #%v installed: %v", newNotifer, u.Method))
-	}
 	return nil
 }
 

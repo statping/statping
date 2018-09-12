@@ -18,7 +18,7 @@ package core
 import (
 	"fmt"
 	"github.com/go-yaml/yaml"
-	"github.com/hunterlong/statup/notifiers"
+	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/jinzhu/gorm"
@@ -66,7 +66,7 @@ func usersDB() *gorm.DB {
 
 // commDB returns the 'communications' database column
 func commDB() *gorm.DB {
-	return DbSession.Table("communication").Model(&notifiers.Notification{})
+	return DbSession.Model(&notifier.Notification{})
 }
 
 // hitsDB returns the 'hits' database column
@@ -252,7 +252,7 @@ func (db *DbConfig) SeedDatabase() (string, string, error) {
 func (db *DbConfig) DropDatabase() error {
 	utils.Log(1, "Dropping Database Tables...")
 	err := DbSession.DropTableIfExists("checkins")
-	err = DbSession.DropTableIfExists("communication")
+	err = DbSession.DropTableIfExists("notifications")
 	err = DbSession.DropTableIfExists("core")
 	err = DbSession.DropTableIfExists("failures")
 	err = DbSession.DropTableIfExists("hits")
@@ -265,7 +265,7 @@ func (db *DbConfig) DropDatabase() error {
 func (db *DbConfig) CreateDatabase() error {
 	utils.Log(1, "Creating Database Tables...")
 	err := DbSession.CreateTable(&types.Checkin{})
-	err = DbSession.Table("communication").CreateTable(&notifiers.Notification{})
+	err = DbSession.CreateTable(&notifier.Notification{})
 	err = DbSession.Table("core").CreateTable(&types.Core{})
 	err = DbSession.CreateTable(&types.Failure{})
 	err = DbSession.CreateTable(&types.Hit{})
@@ -290,7 +290,7 @@ func (db *DbConfig) MigrateDatabase() error {
 	if tx.Error != nil {
 		return tx.Error
 	}
-	tx = tx.AutoMigrate(&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Checkin{}).Table("core").AutoMigrate(&types.Core{}).Table("communication").AutoMigrate(&notifiers.Notification{})
+	tx = tx.AutoMigrate(&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Checkin{}, &notifier.Notification{}).Table("core").AutoMigrate(&types.Core{})
 	if tx.Error != nil {
 		tx.Rollback()
 		utils.Log(3, fmt.Sprintf("Statup Database could not be migrated: %v", tx.Error))

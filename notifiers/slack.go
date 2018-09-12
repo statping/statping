@@ -18,6 +18,7 @@ package notifiers
 import (
 	"bytes"
 	"fmt"
+	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
@@ -35,13 +36,12 @@ const (
 )
 
 var (
-	slacker       *Slack
 	slackMessages []string
 	messageLock   *sync.Mutex
 )
 
 type Slack struct {
-	*Notification
+	*notifier.Notification
 }
 
 type slackMessage struct {
@@ -49,40 +49,24 @@ type slackMessage struct {
 	Time    int64
 }
 
-// DEFINE YOUR NOTIFICATION HERE.
-func init() {
-	slacker = &Slack{&Notification{
-		Id:     SLACK_ID,
-		Method: SLACK_METHOD,
-		Host:   "https://webhooksurl.slack.com/***",
-		Form: []NotificationForm{{
-			Type:        "text",
-			Title:       "Incoming Webhook Url",
-			Placeholder: "Insert your Slack webhook URL here.",
-			DbField:     "Host",
-		}}},
-	}
-	messageLock = new(sync.Mutex)
-	err := AddNotifier(slacker)
-	if err != nil {
-		utils.Log(3, err)
-	}
+var slacker = &Slack{&notifier.Notification{
+	Method: SLACK_METHOD,
+	Host:   "https://webhooksurl.slack.com/***",
+	Form: []notifier.NotificationForm{{
+		Type:        "text",
+		Title:       "Incoming Webhook Url",
+		Placeholder: "Insert your Slack webhook URL here.",
+		DbField:     "Host",
+	}}},
 }
 
-// WHEN NOTIFIER LOADS
-func (u *Slack) Init() error {
-	err := u.Install()
-	if err == nil {
-		notifier, _ := SelectNotification(u.Id)
-		forms := u.Form
-		u.Notification = notifier
-		u.Form = forms
-		if u.Enabled {
-			go u.Run()
-		}
+// DEFINE YOUR NOTIFICATION HERE.
+func init() {
+	err := notifier.AddNotifier(slacker)
+	messageLock = new(sync.Mutex)
+	if err != nil {
+		panic(err)
 	}
-
-	return err
 }
 
 func (u *Slack) Test() error {
@@ -95,7 +79,7 @@ func (u *Slack) Test() error {
 // AFTER NOTIFIER LOADS, IF ENABLED, START A QUEUE PROCESS
 func (u *Slack) Run() error {
 	messageLock.Lock()
-	slackMessages = uniqueStrings(slackMessages)
+	slackMessages = notifier.UniqueStrings(slackMessages)
 	for _, msg := range slackMessages {
 
 		if u.CanSend() {
@@ -125,6 +109,7 @@ func SendSlack(temp string, data interface{}) error {
 	slackTemp.Execute(buf, data)
 	slackMessages = append(slackMessages, buf.String())
 	messageLock.Unlock()
+	slacker.Log(buf.String())
 	return nil
 }
 
@@ -149,19 +134,5 @@ func (u *Slack) OnSave() error {
 	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
 	// Do updating stuff here
 	u.Test()
-	return nil
-}
-
-// ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
-func (u *Slack) Install() error {
-	inDb := slacker.Notification.IsInDatabase()
-	if !inDb {
-		newNotifer, err := InsertDatabase(u.Notification)
-		if err != nil {
-			utils.Log(3, err)
-			return err
-		}
-		utils.Log(1, fmt.Sprintf("new notifier #%v installed: %v", newNotifer, u.Method))
-	}
 	return nil
 }

@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/notifiers"
+	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
@@ -147,7 +147,7 @@ func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	apiSecret := form.Get("api_secret")
 	limits := int(utils.StringInt(form.Get("limits")))
 
-	notifer, err := notifiers.SelectNotifier(method)
+	notifer, err := notifier.SelectNotifier(method)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("issue saving notifier %v: %v", method, err))
 		ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
@@ -186,6 +186,6 @@ func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("issue updating notifier: %v", err))
 	}
-	notifiers.OnSave(notifer.Method)
+	notifier.OnSave(notifer.Method)
 	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }

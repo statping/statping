@@ -17,6 +17,7 @@ package notifiers
 
 import (
 	"fmt"
+	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
@@ -31,27 +32,26 @@ const (
 )
 
 var (
-	lineNotify         *LineNotify
 	lineNotifyMessages []string
 )
 
 type LineNotify struct {
-	*Notification
+	*notifier.Notification
+}
+
+var lineNotify = &LineNotify{&notifier.Notification{
+	Method: LINE_NOTIFY_METHOD,
+	Form: []notifier.NotificationForm{{
+		Type:        "text",
+		Title:       "Access Token",
+		Placeholder: "Insert your Line Notify Access Token here.",
+		DbField:     "api_secret",
+	}}},
 }
 
 // DEFINE YOUR NOTIFICATION HERE.
 func init() {
-	lineNotify = &LineNotify{&Notification{
-		Id:     LINE_NOTIFY_ID,
-		Method: LINE_NOTIFY_METHOD,
-		Form: []NotificationForm{{
-			Type:        "text",
-			Title:       "Access Token",
-			Placeholder: "Insert your Line Notify Access Token here.",
-			DbField:     "api_secret",
-		}}},
-	}
-	err := AddNotifier(lineNotify)
+	err := notifier.AddNotifier(lineNotify)
 	if err != nil {
 		utils.Log(3, err)
 	}
@@ -59,22 +59,6 @@ func init() {
 
 func (u *LineNotify) postUrl() string {
 	return fmt.Sprintf("https://notify-api.line.me/api/notify")
-}
-
-// WHEN NOTIFIER LOADS
-func (u *LineNotify) Init() error {
-	err := u.Install()
-	if err == nil {
-		notifier, _ := SelectNotification(u.Id)
-		forms := u.Form
-		u.Notification = notifier
-		u.Form = forms
-		if u.Enabled {
-			go u.Run()
-		}
-	}
-
-	return err
 }
 
 func (u *LineNotify) Test() error {
@@ -85,7 +69,7 @@ func (u *LineNotify) Test() error {
 
 // AFTER NOTIFIER LOADS, IF ENABLED, START A QUEUE PROCESS
 func (u *LineNotify) Run() error {
-	lineNotifyMessages = uniqueStrings(lineNotifyMessages)
+	lineNotifyMessages = notifier.UniqueStrings(lineNotifyMessages)
 	for _, msg := range lineNotifyMessages {
 
 		if u.CanSend() {
@@ -141,19 +125,4 @@ func (u *LineNotify) OnSave() error {
 	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
 	// Do updating stuff here
 	return nil
-}
-
-// ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
-func (u *LineNotify) Install() error {
-	var err error
-	inDb := lineNotify.Notification.IsInDatabase()
-	if !inDb {
-		newNotifer, err := InsertDatabase(u.Notification)
-		if err != nil {
-			utils.Log(3, err)
-			return err
-		}
-		utils.Log(1, fmt.Sprintf("new notifier #%v installed: %v", newNotifer, u.Method))
-	}
-	return err
 }

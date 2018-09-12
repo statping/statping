@@ -1,3 +1,5 @@
+// +build bypass
+
 // Statup
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
@@ -13,139 +15,89 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package notifiers
+package notifier
 
 import (
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 var (
-	testNotifier *Tester
-	dir          string
+	dir        string
+	EXAMPLE_ID = "example"
 )
-
-//
-//
-//
-
-func (n *Tester) Init() error {
-	return errors.New("im just testing")
-}
-
-func (n *Tester) Install() error {
-	return errors.New("installing")
-}
-
-func (n *Tester) Run() error {
-	return errors.New("running")
-}
-
-func (n *Tester) Select() *Notification {
-	return n.Notification
-}
-
-func (n *Tester) OnSuccess(s *types.Service) error {
-	return errors.New(s.Name)
-}
-
-func (n *Tester) OnFailure(s *types.Service) error {
-	return errors.New(s.Name)
-}
-
-func (n *Tester) Test() error {
-	return errors.New("testing")
-}
 
 func init() {
 	dir = utils.Directory
-	utils.InitLogs()
 }
 
 func injectDatabase() {
-	dbSession, _ := gorm.Open("sqlite3", dir+"/statup.db")
-	Collections = dbSession.Table("communication").Model(&Notification{})
+	db, _ = gorm.Open("sqlite3", dir+"/statup.db")
 }
 
-type Tester struct {
-	*Notification
-}
-
-func TestInit(t *testing.T) {
+func TestLoad(t *testing.T) {
+	source.Assets()
+	utils.InitLogs()
 	injectDatabase()
-}
-
-func TestAdd(t *testing.T) {
-	testNotifier = &Tester{&Notification{
-		Id:     999999,
-		Method: "tester",
-		Host:   "0.0.0.0",
-		Form: []NotificationForm{{
-			Type:        "text",
-			Title:       "Incoming Webhook Url",
-			Placeholder: "Insert your Slack webhook URL here.",
-			DbField:     "Host",
-		}}},
-	}
-
-	AddNotifier(testNotifier)
+	AllCommunications = Load()
+	assert.Len(t, AllCommunications, 1)
 }
 
 func TestIsInDatabase(t *testing.T) {
-	in := testNotifier.IsInDatabase()
-	assert.False(t, in)
+	in := example.isInDatabase()
+	assert.True(t, in)
 }
 
 func TestInsertDatabase(t *testing.T) {
-	newId, err := InsertDatabase(testNotifier.Notification)
+	_, err := insertDatabase(example.Notification)
 	assert.Nil(t, err)
-	assert.NotZero(t, newId)
+	assert.NotZero(t, example.Id)
 
-	in := testNotifier.IsInDatabase()
+	in := example.isInDatabase()
 	assert.True(t, in)
 }
 
 func TestSelectNotification(t *testing.T) {
-	notifier, err := SelectNotification(999999)
+	notifier, err := SelectNotification(EXAMPLE_ID)
 	assert.Nil(t, err)
-	assert.Equal(t, "tester", notifier.Method)
+	assert.Equal(t, "example", notifier.Method)
 	assert.False(t, notifier.Enabled)
 }
 
 func TestNotification_Update(t *testing.T) {
-	notifier, err := SelectNotification(999999)
+	notifier, err := SelectNotification(EXAMPLE_ID)
 	assert.Nil(t, err)
-	notifier.Method = "updatedName"
+	notifier.Host = "new host here"
 	notifier.Enabled = true
 	updated, err := notifier.Update()
 	assert.Nil(t, err)
-	selected, err := SelectNotification(updated.Id)
+	selected, err := SelectNotification(updated.Method)
 	assert.Nil(t, err)
-	assert.Equal(t, "updatedName", selected.Method)
+	assert.Equal(t, "new host here", selected.GetValue("host"))
 	assert.True(t, selected.Enabled)
 }
 
 func TestNotification_GetValue(t *testing.T) {
-	notifier, err := SelectNotification(999999)
+	notifier, err := SelectNotification(EXAMPLE_ID)
 	assert.Nil(t, err)
 	val := notifier.GetValue("Host")
-	assert.Equal(t, "0.0.0.0", val)
+	assert.Equal(t, "http://exmaplehost.com", val)
 }
 
-func TestRun(t *testing.T) {
-	err := testNotifier.Run()
-	assert.Equal(t, "running", err.Error())
-}
+//func TestRun(t *testing.T) {
+//	err := example.Run()
+//	assert.Equal(t, "running", err.Error())
+//}
 
-func TestTestIt(t *testing.T) {
-	err := testNotifier.Test()
-	assert.Equal(t, "testing", err.Error())
-}
+//func TestTestIt(t *testing.T) {
+//	err := example.Test()
+//	assert.Equal(t, "testing", err.Error())
+//}
 
 func TestOnSuccess(t *testing.T) {
 	s := &types.Service{

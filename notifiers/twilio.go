@@ -17,6 +17,7 @@ package notifiers
 
 import (
 	"fmt"
+	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
@@ -31,70 +32,48 @@ const (
 )
 
 var (
-	twilio         *Twilio
 	twilioMessages []string
 )
 
 type Twilio struct {
-	*Notification
+	*notifier.Notification
 }
 
-type twilioMessage struct {
-	Service *types.Service
-	Time    int64
+var twilio = &Twilio{&notifier.Notification{
+	Method: TWILIO_METHOD,
+	Form: []notifier.NotificationForm{{
+		Type:        "text",
+		Title:       "Account Sid",
+		Placeholder: "Insert your Twilio Account Sid",
+		DbField:     "api_key",
+	}, {
+		Type:        "text",
+		Title:       "Account Token",
+		Placeholder: "Insert your Twilio Account Token",
+		DbField:     "api_secret",
+	}, {
+		Type:        "text",
+		Title:       "SMS to Phone Number",
+		Placeholder: "+18555555555",
+		DbField:     "Var1",
+	}, {
+		Type:        "text",
+		Title:       "From Phone Number",
+		Placeholder: "+18555555555",
+		DbField:     "Var2",
+	}}},
 }
 
 // DEFINE YOUR NOTIFICATION HERE.
 func init() {
-	twilio = &Twilio{&Notification{
-		Id:     TWILIO_ID,
-		Method: TWILIO_METHOD,
-		Form: []NotificationForm{{
-			Type:        "text",
-			Title:       "Account Sid",
-			Placeholder: "Insert your Twilio Account Sid",
-			DbField:     "api_key",
-		}, {
-			Type:        "text",
-			Title:       "Account Token",
-			Placeholder: "Insert your Twilio Account Token",
-			DbField:     "api_secret",
-		}, {
-			Type:        "text",
-			Title:       "SMS to Phone Number",
-			Placeholder: "+18555555555",
-			DbField:     "Var1",
-		}, {
-			Type:        "text",
-			Title:       "From Phone Number",
-			Placeholder: "+18555555555",
-			DbField:     "Var2",
-		}}},
-	}
-	err := AddNotifier(twilio)
+	err := notifier.AddNotifier(twilio)
 	if err != nil {
-		utils.Log(3, err)
+		panic(err)
 	}
 }
 
 func (u *Twilio) postUrl() string {
 	return fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%v/Messages.json", u.ApiKey)
-}
-
-// WHEN NOTIFIER LOADS
-func (u *Twilio) Init() error {
-	err := u.Install()
-	if err == nil {
-		notifier, _ := SelectNotification(u.Id)
-		forms := u.Form
-		u.Notification = notifier
-		u.Form = forms
-		if u.Enabled {
-			go u.Run()
-		}
-	}
-
-	return err
 }
 
 func (u *Twilio) Test() error {
@@ -106,7 +85,7 @@ func (u *Twilio) Test() error {
 
 // AFTER NOTIFIER LOADS, IF ENABLED, START A QUEUE PROCESS
 func (u *Twilio) Run() error {
-	twilioMessages = uniqueStrings(twilioMessages)
+	twilioMessages = notifier.UniqueStrings(twilioMessages)
 	for _, msg := range twilioMessages {
 
 		if u.CanSend() {
@@ -165,19 +144,5 @@ func (u *Twilio) OnSave() error {
 
 	// Do updating stuff here
 
-	return nil
-}
-
-// ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
-func (u *Twilio) Install() error {
-	inDb := twilio.Notification.IsInDatabase()
-	if !inDb {
-		newNotifer, err := InsertDatabase(u.Notification)
-		if err != nil {
-			utils.Log(3, err)
-			return err
-		}
-		utils.Log(1, fmt.Sprintf("new notifier #%v installed: %v", newNotifer, u.Method))
-	}
 	return nil
 }

@@ -7,5 +7,6 @@ source/rice-box.go
 .DS_Store
 */**/node_modules
 vendor
-
+servers
+dev
 !build/alpine-linux-amd64

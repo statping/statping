@@ -16,7 +16,8 @@
 package core
 
 import (
-	"github.com/hunterlong/statup/notifiers"
+	"github.com/hunterlong/statup/core/notifier"
+	_ "github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -57,21 +58,21 @@ func (c *Core) ToCore() *types.Core {
 // InitApp will initialize Statup
 func InitApp() {
 	SelectCore()
-	InsertNotifierDB()
+	insertNotifierDB()
 	CoreApp.SelectAllServices()
 	CheckServices()
-	CoreApp.Communications = notifiers.Load()
+	CoreApp.Notifications = notifier.Load()
 	go DatabaseMaintence()
 }
 
-func InsertNotifierDB() error {
+func insertNotifierDB() error {
 	if DbSession == nil {
 		err := Configs.Connect(false, utils.Directory)
 		if err != nil {
 			return errors.New("database connection has not been created")
 		}
 	}
-	notifiers.Collections = commDB()
+	notifier.SetDB(DbSession)
 	return nil
 }
 
@@ -79,14 +80,6 @@ func InsertNotifierDB() error {
 func UpdateCore(c *Core) (*Core, error) {
 	db := coreDB().Update(&c)
 	return c, db.Error
-}
-
-func (c *Core) Notifiers() []notifiers.Notification {
-	var n []notifiers.Notification
-	for _, c := range c.Communications {
-		n = append(n, c.(notifiers.Notification))
-	}
-	return n
 }
 
 // UsingAssets will return true if /assets folder is present
@@ -122,7 +115,7 @@ func (c Core) MobileSASS() string {
 // AllOnline will be true if all services are online
 func (c Core) AllOnline() bool {
 	for _, s := range CoreApp.Services {
-		if !s.(*types.Service).Online {
+		if !s.Select().Online {
 			return false
 		}
 	}

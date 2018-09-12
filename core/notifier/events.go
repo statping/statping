@@ -13,14 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package notifiers
+package notifier
 
 import "github.com/hunterlong/statup/types"
 
 // OnSave will trigger a notifier when it has been saved - Notifier interface
 func OnSave(method string) {
 	for _, comm := range AllCommunications {
-		if IsType(comm, "Notifier") {
+		if isType(comm, new(Notifier)) {
 			notifier := comm.(Notifier).Select()
 			if notifier.Method == method {
 				comm.(Notifier).OnSave()
@@ -32,7 +32,7 @@ func OnSave(method string) {
 // OnFailure will be triggered when a service is failing - BasicEvents interface
 func OnFailure(s *types.Service, f *types.Failure) {
 	for _, comm := range AllCommunications {
-		if IsType(comm, "BasicEvents") {
+		if isType(comm, new(BasicEvents)) && isEnabled(comm) {
 			comm.(BasicEvents).OnFailure(s, f)
 		}
 	}
@@ -41,7 +41,7 @@ func OnFailure(s *types.Service, f *types.Failure) {
 // OnSuccess will be triggered when a service is successful - BasicEvents interface
 func OnSuccess(s *types.Service) {
 	for _, comm := range AllCommunications {
-		if IsType(comm, "BasicEvents") {
+		if isType(comm, new(BasicEvents)) && isEnabled(comm) {
 			comm.(BasicEvents).OnSuccess(s)
 		}
 	}
@@ -50,7 +50,7 @@ func OnSuccess(s *types.Service) {
 // OnNewService is triggered when a new service is created - ServiceEvents interface
 func OnNewService(s *types.Service) {
 	for _, comm := range AllCommunications {
-		if IsType(comm, "ServiceEvents") {
+		if isType(comm, new(ServiceEvents)) && isEnabled(comm) {
 			comm.(ServiceEvents).OnNewService(s)
 		}
 	}
@@ -59,7 +59,7 @@ func OnNewService(s *types.Service) {
 // OnUpdatedService is triggered when a service is updated - ServiceEvents interface
 func OnUpdatedService(s *types.Service) {
 	for _, comm := range AllCommunications {
-		if IsType(comm, "ServiceEvents") {
+		if isType(comm, new(ServiceEvents)) && isEnabled(comm) {
 			comm.(ServiceEvents).OnUpdatedService(s)
 		}
 	}
@@ -68,7 +68,7 @@ func OnUpdatedService(s *types.Service) {
 // OnDeletedService is triggered when a service is deleted - ServiceEvents interface
 func OnDeletedService(s *types.Service) {
 	for _, comm := range AllCommunications {
-		if IsType(comm, "ServiceEvents") {
+		if isType(comm, new(ServiceEvents)) && isEnabled(comm) {
 			comm.(ServiceEvents).OnDeletedService(s)
 		}
 	}
@@ -77,7 +77,7 @@ func OnDeletedService(s *types.Service) {
 // OnNewUser is triggered when a new user is created - UserEvents interface
 func OnNewUser(u *types.User) {
 	for _, comm := range AllCommunications {
-		if IsType(comm, "UserEvents") {
+		if isType(comm, new(UserEvents)) && isEnabled(comm) {
 			comm.(UserEvents).OnNewUser(u)
 		}
 	}
@@ -86,7 +86,7 @@ func OnNewUser(u *types.User) {
 // OnUpdatedUser is triggered when a new user is updated - UserEvents interface
 func OnUpdatedUser(u *types.User) {
 	for _, comm := range AllCommunications {
-		if IsType(comm, "UserEvents") {
+		if isType(comm, new(UserEvents)) && isEnabled(comm) {
 			comm.(UserEvents).OnUpdatedUser(u)
 		}
 	}
@@ -95,7 +95,7 @@ func OnUpdatedUser(u *types.User) {
 // OnDeletedUser is triggered when a new user is deleted - UserEvents interface
 func OnDeletedUser(u *types.User) {
 	for _, comm := range AllCommunications {
-		if IsType(comm, "UserEvents") {
+		if isType(comm, new(UserEvents)) && isEnabled(comm) {
 			comm.(UserEvents).OnDeletedUser(u)
 		}
 	}
@@ -104,7 +104,7 @@ func OnDeletedUser(u *types.User) {
 // OnUpdatedCore is triggered when the CoreApp settings are saved - CoreEvents interface
 func OnUpdatedCore(c *types.Core) {
 	for _, comm := range AllCommunications {
-		if IsType(comm, "CoreEvents") {
+		if isType(comm, new(CoreEvents)) && isEnabled(comm) {
 			comm.(CoreEvents).OnUpdatedCore(c)
 		}
 	}
@@ -113,7 +113,7 @@ func OnUpdatedCore(c *types.Core) {
 // NotifierEvents interface
 func OnNewNotifier(n *Notification) {
 	for _, comm := range AllCommunications {
-		if IsType(comm, "NotifierEvents") {
+		if isType(comm, new(NotifierEvents)) && isEnabled(comm) {
 			comm.(NotifierEvents).OnNewNotifier(n)
 		}
 	}
@@ -122,7 +122,7 @@ func OnNewNotifier(n *Notification) {
 // NotifierEvents interface
 func OnUpdatedNotifier(n *Notification) {
 	for _, comm := range AllCommunications {
-		if IsType(comm, "NotifierEvents") {
+		if isType(comm, new(NotifierEvents)) && isEnabled(comm) {
 			comm.(NotifierEvents).OnUpdatedNotifier(n)
 		}
 	}
