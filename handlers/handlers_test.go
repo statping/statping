@@ -29,28 +29,10 @@ import (
 	"testing"
 )
 
-var (
-	dir string
-)
-
-func init() {
-	utils.InitLogs()
-	source.Assets()
-	dir = utils.Directory
-}
-
-func IsRouteAuthenticated(req *http.Request) bool {
-	os.Setenv("GO_ENV", "production")
-	rr := httptest.NewRecorder()
-	req.Header.Set("Authorization", "badkey")
-	Router().ServeHTTP(rr, req)
-	code := rr.Code
-	if code == 200 {
-		os.Setenv("GO_ENV", "test")
-		return false
-	}
-	os.Setenv("GO_ENV", "test")
-	return true
+func TestResetHandlerDatabase(t *testing.T) {
+	Clean()
+	loadDatabase()
+	createDatabase()
 }
 
 func TestFailedHTTPServer(t *testing.T) {
@@ -63,7 +45,7 @@ func TestIndexHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
-	assert.Equal(t, 303, rr.Code)
+	assert.Equal(t, 200, rr.Code)
 }
 
 func TestSetupHandler(t *testing.T) {
@@ -197,7 +179,7 @@ func TestServicesHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Services</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestCreateUserHandler(t *testing.T) {
@@ -212,7 +194,7 @@ func TestCreateUserHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestEditUserHandler(t *testing.T) {
@@ -235,7 +217,7 @@ func TestEditUserHandler(t *testing.T) {
 	assert.Contains(t, body, "<td>admin</td>")
 	assert.Contains(t, body, "<td>changedusername</td>")
 	assert.Equal(t, 200, rr.Code)
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestDeleteUserHandler(t *testing.T) {
@@ -244,7 +226,7 @@ func TestDeleteUserHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestUsersHandler(t *testing.T) {
@@ -258,7 +240,7 @@ func TestUsersHandler(t *testing.T) {
 	assert.Contains(t, body, "<td>admin</td>")
 	assert.NotContains(t, body, "<td>changedusername</td>")
 	assert.Contains(t, body, "Statup  made with ❤️")
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestUsersEditHandler(t *testing.T) {
@@ -273,7 +255,7 @@ func TestUsersEditHandler(t *testing.T) {
 	assert.Contains(t, body, "value=\"info@statup.io\"")
 	assert.Contains(t, body, "value=\"##########\"")
 	assert.Contains(t, body, "Statup  made with ❤️")
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestSettingsHandler(t *testing.T) {
@@ -285,7 +267,7 @@ func TestSettingsHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Settings</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestHelpHandler(t *testing.T) {
@@ -297,7 +279,7 @@ func TestHelpHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Help</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestCreateHTTPServiceHandler(t *testing.T) {
@@ -318,7 +300,7 @@ func TestCreateHTTPServiceHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestCreateTCPerviceHandler(t *testing.T) {
@@ -339,7 +321,7 @@ func TestCreateTCPerviceHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestServicesHandler2(t *testing.T) {
@@ -353,7 +335,7 @@ func TestServicesHandler2(t *testing.T) {
 	assert.Contains(t, body, "Crystal Castles - Kept")
 	assert.Contains(t, body, "Local Postgres")
 	assert.Contains(t, body, "Statup  made with ❤️")
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestViewHTTPServicesHandler(t *testing.T) {
@@ -384,7 +366,7 @@ func TestServicesDeleteFailuresHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestFailingServicesDeleteFailuresHandler(t *testing.T) {
@@ -393,7 +375,7 @@ func TestFailingServicesDeleteFailuresHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestServicesUpdateHandler(t *testing.T) {
@@ -429,7 +411,7 @@ func TestDeleteServiceHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestLogsHandler(t *testing.T) {
@@ -441,7 +423,7 @@ func TestLogsHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Logs</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestLogsLineHandler(t *testing.T) {
@@ -453,7 +435,7 @@ func TestLogsLineHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	t.Log(body)
 	assert.NotEmpty(t, body)
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestSaveSettingsHandler(t *testing.T) {
@@ -466,7 +448,7 @@ func TestSaveSettingsHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestViewSettingsHandler(t *testing.T) {
@@ -479,7 +461,7 @@ func TestViewSettingsHandler(t *testing.T) {
 	assert.Contains(t, body, "<title>Statup | Settings</title>")
 	assert.Contains(t, body, "Awesome Status")
 	assert.Contains(t, body, "Statup  made with ❤️")
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestSaveAssetsHandler(t *testing.T) {
@@ -491,7 +473,7 @@ func TestSaveAssetsHandler(t *testing.T) {
 	assert.FileExists(t, utils.Directory+"/assets/css/base.css")
 	assert.DirExists(t, utils.Directory+"/assets")
 	assert.True(t, source.UsingAssets(dir))
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestDeleteAssetsHandler(t *testing.T) {
@@ -501,7 +483,7 @@ func TestDeleteAssetsHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
 	assert.False(t, source.UsingAssets(dir))
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestPrometheusHandler(t *testing.T) {
@@ -513,7 +495,7 @@ func TestPrometheusHandler(t *testing.T) {
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "statup_total_services 11")
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestSaveNotificationHandler(t *testing.T) {
@@ -535,7 +517,7 @@ func TestSaveNotificationHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 200, rr.Code)
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestViewNotificationSettingsHandler(t *testing.T) {
@@ -555,7 +537,7 @@ func TestViewNotificationSettingsHandler(t *testing.T) {
 	assert.Contains(t, body, `value="7" id="limits_per_hour_email"`)
 	assert.Contains(t, body, `id="switch-email" checked`)
 	assert.Contains(t, body, "Statup  made with ❤️")
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestSaveFooterHandler(t *testing.T) {
@@ -567,7 +549,7 @@ func TestSaveFooterHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 
 	req, err = http.NewRequest("GET", "/", nil)
 	assert.Nil(t, err)
@@ -600,7 +582,7 @@ func TestBuildAssetsHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 	assert.FileExists(t, "../assets/scss/base.scss")
 }
 
@@ -617,7 +599,7 @@ func TestSaveSassHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 
 	newBase := source.OpenAsset(utils.Directory, "css/base.css")
 	assert.Contains(t, newBase, ".test_design {")
@@ -631,7 +613,7 @@ func TestReorderServiceHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 200, rr.Code)
-	assert.True(t, IsRouteAuthenticated(req))
+	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestCreateBulkServices(t *testing.T) {
@@ -666,6 +648,20 @@ func TestCreateBulkServices(t *testing.T) {
 		rr := httptest.NewRecorder()
 		Router().ServeHTTP(rr, req)
 		assert.Equal(t, 303, rr.Code)
-		assert.True(t, IsRouteAuthenticated(req))
+		assert.True(t, isRouteAuthenticated(req))
 	}
+}
+
+func isRouteAuthenticated(req *http.Request) bool {
+	os.Setenv("GO_ENV", "production")
+	rr := httptest.NewRecorder()
+	req.Header.Set("Authorization", "badkey")
+	Router().ServeHTTP(rr, req)
+	code := rr.Code
+	if code == 200 {
+		os.Setenv("GO_ENV", "test")
+		return false
+	}
+	os.Setenv("GO_ENV", "test")
+	return true
 }

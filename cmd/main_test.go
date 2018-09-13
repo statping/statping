@@ -551,7 +551,7 @@ func RunLoginHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
-	assert.Equal(t, 303, rr.Result().StatusCode)
+	assert.Equal(t, 200, rr.Result().StatusCode)
 	assert.True(t, handlers.IsAuthenticated(req))
 }
 

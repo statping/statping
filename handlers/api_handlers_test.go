@@ -18,6 +18,7 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/stretchr/testify/assert"
@@ -34,13 +35,39 @@ const (
 	NEW_TCP_SERVICE      = `{"name": "Google DNS", "domain": "8.8.8.8", "expected": "", "check_interval": 5, "type": "tcp"}`
 )
 
-func injectDatabase() {
+var (
+	dir string
+)
+
+func init() {
+	dir = utils.Directory
+	utils.InitLogs()
+	source.Assets()
+}
+
+func loadDatabase() {
 	core.NewCore()
-	core.Configs = new(core.DbConfig)
-	core.Configs.DbConn = "sqlite"
+	core.LoadConfig(dir)
+	core.Configs = &core.DbConfig{DbConfig: &types.DbConfig{
+		DbConn:   "sqlite",
+		Location: dir,
+	}}
+	core.Configs.Connect(false, utils.Directory)
 	core.CoreApp.DbConnection = "sqlite"
 	core.CoreApp.Version = "DEV"
-	core.Configs.Connect(false, utils.Directory)
+	core.Configs.Save()
+}
+
+func createDatabase() {
+	core.Configs.DropDatabase()
+	core.Configs.CreateDatabase()
+	core.InitApp()
+}
+
+func resetDatabase() {
+	core.Configs.DropDatabase()
+	core.Configs.CreateDatabase()
+	core.Configs.SeedDatabase()
 	core.InitApp()
 }
 
@@ -53,6 +80,10 @@ func Clean() {
 
 func TestInit(t *testing.T) {
 	Clean()
+	loadDatabase()
+	resetDatabase()
+	loadDatabase()
+	core.InitApp()
 }
 
 func formatJSON(res string, out interface{}) {
@@ -60,7 +91,7 @@ func formatJSON(res string, out interface{}) {
 }
 
 func TestApiIndexHandler(t *testing.T) {
-	t.SkipNow()
+
 	rr, err := httpRequestAPI(t, "GET", "/api", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
@@ -68,12 +99,12 @@ func TestApiIndexHandler(t *testing.T) {
 	var obj types.Core
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
-	assert.Equal(t, "Tester", obj.Name)
+	assert.Equal(t, "Awesome Status", obj.Name)
 	assert.Equal(t, "sqlite", obj.DbConnection)
 }
 
 func TestApiAllServicesHandlerHandler(t *testing.T) {
-	t.SkipNow()
+
 	rr, err := httpRequestAPI(t, "GET", "/api/services", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
@@ -86,7 +117,7 @@ func TestApiAllServicesHandlerHandler(t *testing.T) {
 }
 
 func TestApiServiceHandler(t *testing.T) {
-	t.SkipNow()
+
 	rr, err := httpRequestAPI(t, "GET", "/api/services/1", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
@@ -99,7 +130,7 @@ func TestApiServiceHandler(t *testing.T) {
 }
 
 func TestApiCreateServiceHandler(t *testing.T) {
-	t.SkipNow()
+
 	rr, err := httpRequestAPI(t, "POST", "/api/services", strings.NewReader(NEW_HTTP_SERVICE))
 	assert.Nil(t, err)
 	body := rr.Body.String()
@@ -113,20 +144,30 @@ func TestApiCreateServiceHandler(t *testing.T) {
 }
 
 func TestApiUpdateServiceHandler(t *testing.T) {
-	t.SkipNow()
-	rr, err := httpRequestAPI(t, "POST", "/api/services/1", strings.NewReader(UPDATED_HTTP_SERVICE))
+	data := `{
+    "name": "Updated Service",
+    "domain": "https://google.com",
+    "expected": "",
+    "expected_status": 200,
+    "check_interval": 60,
+    "type": "http",
+    "method": "GET",
+    "post_data": "",
+    "port": 0,
+    "timeout": 10,
+    "order_id": 0}`
+	rr, err := httpRequestAPI(t, "POST", "/api/services/1", strings.NewReader(data))
 	assert.Nil(t, err)
 	body := rr.Body.String()
 	t.Log(body)
 	var obj types.Service
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
-	assert.Equal(t, "Google Website", obj.Name)
+	assert.Equal(t, "Updated Service", obj.Name)
 	assert.Equal(t, "https://google.com", obj.Domain)
 }
 
 func TestApiDeleteServiceHandler(t *testing.T) {
-	t.SkipNow()
 	rr, err := httpRequestAPI(t, "DELETE", "/api/services/1", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
@@ -134,12 +175,12 @@ func TestApiDeleteServiceHandler(t *testing.T) {
 	var obj ApiResponse
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
-	assert.Equal(t, "Google Website", obj.Method)
-	assert.Equal(t, "https://google.com", obj.Status)
+	assert.Equal(t, "delete", obj.Method)
+	assert.Equal(t, "success", obj.Status)
 }
 
 func TestApiAllUsersHandler(t *testing.T) {
-	t.SkipNow()
+
 	rr, err := httpRequestAPI(t, "GET", "/api/users", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
@@ -147,46 +188,62 @@ func TestApiAllUsersHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	var obj []types.User
 	formatJSON(body, &obj)
-	assert.Equal(t, "Google", obj[0].Admin)
-	assert.Equal(t, "https://google.com", obj[0].Username)
+	assert.Equal(t, true, obj[0].Admin)
+	assert.Equal(t, "admin", obj[0].Username)
 }
 
 func TestApiCreateUserHandler(t *testing.T) {
-	t.SkipNow()
-	rr, err := httpRequestAPI(t, "POST", "/api/users", nil)
+	data := `{
+    "username": "admin2",
+    "email": "info@email.com",
+    "password": "password123",
+    "admin": true}`
+	rr, err := httpRequestAPI(t, "POST", "/api/users", strings.NewReader(data))
 	assert.Nil(t, err)
 	body := rr.Body.String()
-	t.Log(body)
+	var obj ApiResponse
+	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "statup_total_services 6")
+	assert.Contains(t, "create", obj.Method)
+	assert.Contains(t, "success", obj.Status)
 }
 
 func TestApiViewUserHandler(t *testing.T) {
-	t.SkipNow()
-	rr, err := httpRequestAPI(t, "GET", "/api/users/1", nil)
+	rr, err := httpRequestAPI(t, "GET", "/api/users/2", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "statup_total_services 6")
+	var obj types.User
+	formatJSON(body, &obj)
+	assert.Equal(t, "admin2", obj.Username)
+	assert.Equal(t, true, obj.Admin)
 }
 
 func TestApiUpdateUserHandler(t *testing.T) {
-	t.SkipNow()
-	rr, err := httpRequestAPI(t, "POST", "/api/users/1", nil)
+	data := `{
+    "username": "adminupdated",
+    "email": "info@email.com",
+    "password": "password123",
+    "admin": true}`
+	rr, err := httpRequestAPI(t, "POST", "/api/users/1", strings.NewReader(data))
 	assert.Nil(t, err)
 	body := rr.Body.String()
-	t.Log(body)
+	var obj types.User
+	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "statup_total_services 6")
+	assert.Equal(t, "adminupdated", obj.Username)
+	assert.Equal(t, true, obj.Admin)
 }
 
 func TestApiDeleteUserHandler(t *testing.T) {
-	t.SkipNow()
 	rr, err := httpRequestAPI(t, "DELETE", "/api/users/1", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
+	var obj ApiResponse
+	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "statup_total_services 6")
+	assert.Equal(t, "delete", obj.Method)
+	assert.Equal(t, "success", obj.Status)
 }
 
 func httpRequestAPI(t *testing.T, method, url string, body io.Reader) (*httptest.ResponseRecorder, error) {
