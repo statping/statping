@@ -21,7 +21,6 @@ import (
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
-	"io/ioutil"
 	"net/http"
 	"text/template"
 	"time"
@@ -90,8 +89,8 @@ func (u *Slack) Send(msg interface{}) error {
 		return err
 	}
 	defer res.Body.Close()
-	contents, _ := ioutil.ReadAll(res.Body)
-	fmt.Println(string(contents))
+	//contents, _ := ioutil.ReadAll(res.Body)
+	//fmt.Println(string(contents))
 	return nil
 }
 
