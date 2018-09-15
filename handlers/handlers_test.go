@@ -541,7 +541,7 @@ func TestViewNotificationSettingsHandler(t *testing.T) {
 	assert.Contains(t, body, `value="587" id="smtp_port"`)
 	assert.Contains(t, body, `value="info@betatude.com" id="outgoing_email_address"`)
 	assert.Contains(t, body, `value="sendto@gmail.com" id="send_alerts_to"`)
-	assert.Contains(t, body, `value="7" id="limits_per_hour_email"`)
+	assert.Contains(t, body, `id="limits_per_hour_email" value="7"`)
 	assert.Contains(t, body, `id="switch-email" checked`)
 	assert.Contains(t, body, "Statup  made with ❤️")
 	assert.True(t, isRouteAuthenticated(req))
