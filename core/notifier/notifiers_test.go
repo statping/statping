@@ -74,6 +74,7 @@ func TestIsBasicType(t *testing.T) {
 	assert.True(t, isType(example, new(UserEvents)))
 	assert.True(t, isType(example, new(CoreEvents)))
 	assert.True(t, isType(example, new(NotifierEvents)))
+	assert.True(t, isType(example, new(Tester)))
 }
 
 func TestLoad(t *testing.T) {

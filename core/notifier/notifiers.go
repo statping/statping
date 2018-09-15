@@ -57,6 +57,7 @@ type Notification struct {
 	Delay       time.Duration      `gorm:"-" json:"-"`
 	Queue       []interface{}      `gorm:"-" json:"-"`
 	Running     chan bool          `gorm:"-" json:"-"`
+	CanTest     bool               `gorm:"-" json:"-"`
 }
 
 type NotificationForm struct {
@@ -65,6 +66,7 @@ type NotificationForm struct {
 	Placeholder string
 	DbField     string
 	SmallText   string
+	Required    bool
 }
 
 type NotificationLog struct {
@@ -299,13 +301,22 @@ func (f *Notification) LastSent() time.Duration {
 	return since
 }
 
-// SentLastHour returns the amount of sent notifications within the last hour
+func (f *Notification) SentLastHour() int {
+	since := time.Now().Add(-1 * time.Hour)
+	return f.SentLast(since)
+}
+
 func (f *Notification) SentLastMinute() int {
+	since := time.Now().Add(-1 * time.Minute)
+	return f.SentLast(since)
+}
+
+// SentLastHour returns the amount of sent notifications within the last hour
+func (f *Notification) SentLast(since time.Time) int {
 	sent := 0
-	hourAgo := time.Now().Add(-1 * time.Minute)
 	for _, v := range f.Logs() {
 		lastTime := time.Time(v.Time)
-		if lastTime.After(hourAgo) {
+		if lastTime.After(since) {
 			sent++
 		}
 	}
@@ -338,6 +349,11 @@ func (n *Notification) GetValue(dbField string) string {
 		return utils.IntString(int(n.Limits))
 	}
 	return ""
+}
+
+// Testable returns true if it includes the CoreEvents interface
+func (n *Notification) Testable() bool {
+	return isType(n, new(Tester))
 }
 
 // isType will return true if a variable can implement an interface

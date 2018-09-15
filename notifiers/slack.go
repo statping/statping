@@ -46,6 +46,7 @@ var slacker = &Slack{&notifier.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Delay:       time.Duration(10 * time.Second),
 	Host:        "https://webhooksurl.slack.com/***",
+	CanTest:     true,
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
 		Title:       "Incoming Webhook Url",
@@ -94,10 +95,11 @@ func (u *Slack) Select() *notifier.Notification {
 	return u.Notification
 }
 
-func (u *Slack) Test() error {
+func (u *Slack) OnTest(n notifier.Notification) (bool, error) {
 	utils.Log(1, "Slack notifier loaded")
 	msg := fmt.Sprintf("You're Statup Slack Notifier is working correctly!")
-	return sendSlack(TEST_TEMPLATE, msg)
+	err := sendSlack(TEST_TEMPLATE, msg)
+	return true, err
 }
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS

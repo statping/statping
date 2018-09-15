@@ -70,11 +70,6 @@ func (u *Discord) Send(msg interface{}) error {
 	return resp.Body.Close()
 }
 
-func (u *Discord) Test() error {
-	u.AddQueue([]byte(DISCORD_TEST))
-	return nil
-}
-
 func (u *Discord) Select() *notifier.Notification {
 	return u.Notification
 }

@@ -94,7 +94,7 @@ func (u *Email) Send(msg interface{}) error {
 	return nil
 }
 
-func (u *Email) Test() error {
+func (u *Email) OnTest(n notifier.Notification) (bool, error) {
 	email := &EmailOutgoing{
 		To:       emailer.GetValue("var2"),
 		Subject:  "Test Email",
@@ -103,7 +103,7 @@ func (u *Email) Test() error {
 		From:     emailer.GetValue("var1"),
 	}
 	u.AddQueue(email)
-	return nil
+	return true, nil
 }
 
 type EmailOutgoing struct {

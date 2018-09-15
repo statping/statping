@@ -122,6 +122,12 @@ func (n *Example) OnFailure(s *types.Service, f *types.Failure) {
 	n.AddQueue(msg)
 }
 
+// OPTIONAL Test function before user saves
+func (n *Example) OnTest(s Notification) (bool, error) {
+	fmt.Printf("received a test trigger with form data: %v\n", s.Host)
+	return true, nil
+}
+
 // OPTIONAL
 func (n *Example) OnNewService(s *types.Service) {
 	msg := fmt.Sprintf("received a new service trigger for service: %v\n", s.Name)
@@ -161,6 +167,12 @@ func (n *Example) OnDeletedUser(s *types.User) {
 // OPTIONAL
 func (n *Example) OnUpdatedCore(s *types.Core) {
 	msg := fmt.Sprintf("received a updated core trigger for core: %v\n", s.Name)
+	n.AddQueue(msg)
+}
+
+// OPTIONAL
+func (n *Example) OnStart(s *types.Core) {
+	msg := fmt.Sprintf("received a trigger on Statup boot: %v\n", s.Name)
 	n.AddQueue(msg)
 }
 

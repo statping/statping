@@ -77,13 +77,6 @@ func init() {
 	}
 }
 
-func (u *Twilio) Test() error {
-	utils.Log(1, "Twilio notifier loaded")
-	msg := fmt.Sprintf("You're Statup Twilio Notifier is working correctly!")
-	u.AddQueue(msg)
-	return nil
-}
-
 func (u *Twilio) Select() *notifier.Notification {
 	return u.Notification
 }

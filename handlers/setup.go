@@ -140,6 +140,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	if sample == "on" {
 		core.InsertSampleData()
+		core.InsertSampleHits()
 	}
 
 	core.InitApp()

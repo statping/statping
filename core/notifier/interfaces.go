@@ -21,7 +21,6 @@ import "github.com/hunterlong/statup/types"
 type Notifier interface {
 	OnSave() error          // OnSave is triggered when the notifier is saved
 	Send(interface{}) error // OnSave is triggered when the notifier is saved
-	Test() error            // Test will run a function inside the notifier to Test if it works
 	Select() *Notification  // Select returns the *Notification for a notifier
 }
 
@@ -29,6 +28,11 @@ type Notifier interface {
 type BasicEvents interface {
 	OnSuccess(*types.Service)                 // OnSuccess is triggered when a service is successful
 	OnFailure(*types.Service, *types.Failure) // OnFailure is triggered when a service is failing
+}
+
+// Tester interface will include a function to Test users settings before saving
+type Tester interface {
+	OnTest(Notification) (bool, error)
 }
 
 // ServiceEvents are events for Services
@@ -48,6 +52,7 @@ type UserEvents interface {
 // CoreEvents are events for the main Core app
 type CoreEvents interface {
 	OnUpdatedCore(*types.Core)
+	OnStart(*types.Core)
 }
 
 // NotifierEvents are events for other Notifiers

@@ -110,6 +110,15 @@ func OnUpdatedCore(c *types.Core) {
 	}
 }
 
+// OnUpdatedCore is triggered when the CoreApp settings are saved - CoreEvents interface
+func OnStart(c *types.Core) {
+	for _, comm := range AllCommunications {
+		if isType(comm, new(CoreEvents)) && isEnabled(comm) && inLimits(comm) {
+			comm.(CoreEvents).OnUpdatedCore(c)
+		}
+	}
+}
+
 // NotifierEvents interface
 func OnNewNotifier(n *Notification) {
 	for _, comm := range AllCommunications {

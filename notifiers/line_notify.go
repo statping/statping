@@ -75,12 +75,6 @@ func (u *LineNotify) Select() *notifier.Notification {
 	return u.Notification
 }
 
-func (u *LineNotify) Test() error {
-	msg := fmt.Sprintf("You're Statup Line Notify Notifier is working correctly!")
-	u.AddQueue(msg)
-	return nil
-}
-
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *LineNotify) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)

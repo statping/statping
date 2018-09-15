@@ -377,6 +377,11 @@ HTML, BODY {
   cursor: -moz-grabbing;
   cursor: -webkit-grabbing; }
 
+.switch_btn {
+  float: right;
+  margin: -1px 0px 0px 0px;
+  display: block; }
+
 @media (max-width: 767px) {
   HTML, BODY {
     background-color: #fcfcfc; }
