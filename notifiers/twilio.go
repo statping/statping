@@ -30,29 +30,29 @@ import (
 )
 
 const (
-	TWILIO_METHOD = "twilio"
+	twilioMethod = "twilioNotifier"
 )
 
-type Twilio struct {
+type twilio struct {
 	*notifier.Notification
 }
 
-var twilio = &Twilio{&notifier.Notification{
-	Method:      TWILIO_METHOD,
-	Title:       "Twilio",
-	Description: "Receive SMS text messages directly to your cellphone when a service is offline. You can use a Twilio test account with limits. This notifier uses the <a href=\"https://www.twilio.com/docs/usage/api\">Twilio API</a>.",
+var twilioNotifier = &twilio{&notifier.Notification{
+	Method:      twilioMethod,
+	Title:       "twilioNotifier",
+	Description: "Receive SMS text messages directly to your cellphone when a service is offline. You can use a twilioNotifier test account with limits. This notifier uses the <a href=\"https://www.twilioNotifier.com/docs/usage/api\">twilioNotifier API</a>.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
 	Delay:       time.Duration(10 * time.Second),
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
 		Title:       "Account Sid",
-		Placeholder: "Insert your Twilio Account Sid",
+		Placeholder: "Insert your twilioNotifier Account Sid",
 		DbField:     "api_key",
 	}, {
 		Type:        "text",
 		Title:       "Account Token",
-		Placeholder: "Insert your Twilio Account Token",
+		Placeholder: "Insert your twilioNotifier Account Token",
 		DbField:     "api_secret",
 	}, {
 		Type:        "text",
@@ -69,19 +69,20 @@ var twilio = &Twilio{&notifier.Notification{
 
 // DEFINE YOUR NOTIFICATION HERE.
 func init() {
-	err := notifier.AddNotifier(twilio)
+	err := notifier.AddNotifier(twilioNotifier)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (u *Twilio) Select() *notifier.Notification {
+func (u *twilio) Select() *notifier.Notification {
 	return u.Notification
 }
 
-func (u *Twilio) Send(msg interface{}) error {
+// Send will send a HTTP Post to the Twilio SMS API. It accepts type: string
+func (u *twilio) Send(msg interface{}) error {
 	message := msg.(string)
-	twilioUrl := fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%v/Messages.json", u.GetValue("api_key"))
+	twilioUrl := fmt.Sprintf("https://api.twilioNotifier.com/2010-04-01/Accounts/%v/Messages.json", u.GetValue("api_key"))
 	client := &http.Client{}
 	v := url.Values{}
 	v.Set("To", "+"+u.Var1)
@@ -100,24 +101,24 @@ func (u *Twilio) Send(msg interface{}) error {
 	contents, _ := ioutil.ReadAll(res.Body)
 	success, twilioRes := twilioSuccess(contents)
 	if !success {
-		return errors.New(fmt.Sprintf("twilio didn't receive the expected status of 'enque' from API got: %v", twilioRes))
+		return errors.New(fmt.Sprintf("twilioNotifier didn't receive the expected status of 'enque' from API got: %v", twilioRes))
 	}
 	return nil
 }
 
-// ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
-func (u *Twilio) OnFailure(s *types.Service, f *types.Failure) {
+// OnFailure will trigger failing service
+func (u *twilio) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
 	u.AddQueue(msg)
 }
 
-// ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
-func (u *Twilio) OnSuccess(s *types.Service) {
+// OnSuccess will trigger successful service
+func (u *twilio) OnSuccess(s *types.Service) {
 
 }
 
-// ON SAVE OR UPDATE OF THE NOTIFIER FORM
-func (u *Twilio) OnSave() error {
+// OnSave triggers when this notifier has been saved
+func (u *twilio) OnSave() error {
 	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
 
 	// Do updating stuff here

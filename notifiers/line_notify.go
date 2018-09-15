@@ -55,6 +55,7 @@ func init() {
 	}
 }
 
+// Send will send a HTTP Post with the Authorization to the notify-api.line.me server. It accepts type: string
 func (u *LineNotify) Send(msg interface{}) error {
 	message := msg.(string)
 	client := new(http.Client)
@@ -75,18 +76,18 @@ func (u *LineNotify) Select() *notifier.Notification {
 	return u.Notification
 }
 
-// ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
+// OnFailure will trigger failing service
 func (u *LineNotify) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
 	u.AddQueue(msg)
 }
 
-// ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
+// OnSuccess will trigger successful service
 func (u *LineNotify) OnSuccess(s *types.Service) {
 
 }
 
-// ON SAVE OR UPDATE OF THE NOTIFIER FORM
+// OnSave triggers when this notifier has been saved
 func (u *LineNotify) OnSave() error {
 	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
 	// Do updating stuff here

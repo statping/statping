@@ -57,6 +57,7 @@ func init() {
 	}
 }
 
+// Send will send a HTTP Post to the Discord API. It accepts type: []byte
 func (u *Discord) Send(msg interface{}) error {
 	message := msg.([]byte)
 	req, _ := http.NewRequest("POST", discorder.GetValue("host"), bytes.NewBuffer(message))
@@ -73,15 +74,18 @@ func (u *Discord) Select() *notifier.Notification {
 	return u.Notification
 }
 
+// OnFailure will trigger failing service
 func (u *Discord) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf(`{"content": "Your service '%v' is currently failing! Reason: %v"}`, s.Name, f.Issue)
 	u.AddQueue(msg)
 }
 
+// OnSuccess will trigger successful service
 func (u *Discord) OnSuccess(s *types.Service) {
 
 }
 
+// OnSave triggers when this notifier has been saved
 func (u *Discord) OnSave() error {
 	msg := fmt.Sprintf(`{"content": "The Discord notifier on Statup was just updated."}`)
 	u.AddQueue(msg)

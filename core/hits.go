@@ -67,7 +67,7 @@ func (s *Service) SelectHitsGroupBy(group string) ([]*types.Hit, error) {
 	return hits, err.Error
 }
 
-// TotalHits returns the total amount of successfull hits a service has
+// TotalHits returns the total amount of successful hits a service has
 func (s *Service) TotalHits() (uint64, error) {
 	var count uint64
 	col := hitsDB().Where("service = ?", s.Id)

@@ -85,6 +85,7 @@ func init() {
 	}
 }
 
+// Send will send the SMTP email with your authentication It accepts type: *EmailOutgoing
 func (u *Email) Send(msg interface{}) error {
 	email := msg.(*EmailOutgoing)
 	err := u.dialSend(email)
@@ -117,7 +118,7 @@ type EmailOutgoing struct {
 	Sent     bool
 }
 
-// ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
+// OnFailure will trigger failing service
 func (u *Email) OnFailure(s *types.Service, f *types.Failure) {
 	email := &EmailOutgoing{
 		To:       emailer.GetValue("var2"),
@@ -129,7 +130,7 @@ func (u *Email) OnFailure(s *types.Service, f *types.Failure) {
 	u.AddQueue(email)
 }
 
-// ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
+// OnSuccess will trigger successful service
 func (u *Email) OnSuccess(s *types.Service) {
 
 }
@@ -138,7 +139,7 @@ func (u *Email) Select() *notifier.Notification {
 	return u.Notification
 }
 
-// ON SAVE OR UPDATE OF THE NOTIFIER FORM
+// OnSave triggers when this notifier has been saved
 func (u *Email) OnSave() error {
 	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
 	// Do updating stuff here

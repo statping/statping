@@ -81,6 +81,7 @@ func init() {
 	}
 }
 
+// Send will send a HTTP Post to the Slack Webhook API. It accepts type: string
 func (u *Slack) Send(msg interface{}) error {
 	message := msg.(string)
 	client := new(http.Client)
@@ -105,7 +106,7 @@ func (u *Slack) OnTest(n notifier.Notification) (bool, error) {
 	return true, err
 }
 
-// ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
+// OnFailure will trigger failing service
 func (u *Slack) OnFailure(s *types.Service, f *types.Failure) {
 	message := SlackMessage{
 		Service:  s,
@@ -115,12 +116,12 @@ func (u *Slack) OnFailure(s *types.Service, f *types.Failure) {
 	parseSlackMessage(FAILING_TEMPLATE, message)
 }
 
-// ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
+// OnSuccess will trigger successful service
 func (u *Slack) OnSuccess(s *types.Service) {
 
 }
 
-// ON SAVE OR UPDATE OF THE NOTIFIER FORM
+// OnSave triggers when this notifier has been saved
 func (u *Slack) OnSave() error {
 	message := fmt.Sprintf("Notification %v is receiving updated information.", u.Method)
 	u.AddQueue(message)
