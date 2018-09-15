@@ -9,4 +9,6 @@ source/rice-box.go
 vendor
 servers
 dev
+*.lock
+*.toml
 !build/alpine-linux-amd64

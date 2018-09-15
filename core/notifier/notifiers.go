@@ -56,6 +56,7 @@ type Notification struct {
 	AuthorUrl   string             `gorm:"-" json:"-"`
 	Delay       time.Duration      `gorm:"-" json:"-"`
 	Queue       []interface{}      `gorm:"-" json:"-"`
+	Running     chan bool          `gorm:"-" json:"-"`
 }
 
 type NotificationForm struct {
@@ -79,10 +80,6 @@ func (n *Notification) AddQueue(msg interface{}) {
 // db will return the notifier database column/record
 func modelDb(n *Notification) *gorm.DB {
 	return db.Model(&Notification{}).Where("method = ?", n.Method).Find(n)
-}
-
-func toNotification(n Notifier) *Notification {
-	return n.Select()
 }
 
 // SetDB is called by core to inject the database for a notifier to use
@@ -156,7 +153,7 @@ func (n *Notification) removeQueue(msg interface{}) interface{} {
 }
 
 // Log will record a new notification into memory and will show the logs on the settings page
-func (n *Notification) Log(msg interface{}) {
+func (n *Notification) makeLog(msg interface{}) {
 	log := &NotificationLog{
 		Message:   normalizeType(msg),
 		Time:      utils.Timestamp(time.Now()),
@@ -192,9 +189,14 @@ func SelectNotification(n Notifier) (*Notification, error) {
 }
 
 // Update will update the notification into the database
-func (n *Notification) Update() (*Notification, error) {
-	err := db.Model(&Notification{}).Update(n)
-	return n, err.Error
+func Update(n Notifier, notif *Notification) (*Notification, error) {
+	err := db.Model(&Notification{}).Update(notif)
+	if notif.Enabled {
+		notif.close()
+		notif.start()
+		go Queue(n)
+	}
+	return notif, err.Error
 }
 
 // insertDatabase will create a new record into the database for the notifier
@@ -208,18 +210,18 @@ func insertDatabase(n *Notification) (int64, error) {
 }
 
 // SelectNotifier returns the Notification struct from the database
-func SelectNotifier(method string) (*Notification, error) {
+func SelectNotifier(method string) (*Notification, Notifier, error) {
 	for _, comm := range AllCommunications {
 		n, ok := comm.(Notifier)
 		if !ok {
-			return nil, errors.New(fmt.Sprintf("incorrect notification type: %v", reflect.TypeOf(n).String()))
+			return nil, nil, errors.New(fmt.Sprintf("incorrect notification type: %v", reflect.TypeOf(n).String()))
 		}
 		notifier := n.Select()
 		if notifier.Method == method {
-			return notifier, nil
+			return notifier, comm.(Notifier), nil
 		}
 	}
-	return nil, nil
+	return nil, nil, nil
 }
 
 // Init accepts the Notifier interface to initialize the notifier
@@ -228,7 +230,7 @@ func Init(n Notifier) (*Notification, error) {
 	var notify *Notification
 	if err == nil {
 		notify, _ = SelectNotification(n)
-		notify.Form = toNotification(n).Form
+		notify.Form = n.Select().Form
 	}
 	return notify, err
 }
@@ -236,48 +238,49 @@ func Init(n Notifier) (*Notification, error) {
 func startAllNotifiers() {
 	for _, comm := range AllCommunications {
 		if isType(comm, new(Notifier)) {
-			if toNotification(comm.(Notifier)).Enabled {
-				go runQue(comm.(Notifier))
+			notify := comm.(Notifier)
+			if notify.Select().Enabled {
+				notify.Select().close()
+				notify.Select().start()
+				go Queue(notify)
 			}
 		}
 	}
 }
 
-func runQue(n Notifier) {
+func Queue(n Notifier) {
+	notification := n.Select()
+	rateLimit := notification.Delay
+
+CheckNotifier:
 	for {
-		notification := n.Select()
-		if len(notification.Queue) > 0 {
-			for _, msg := range notification.Queue {
+		select {
+		case <-notification.Running:
+			break CheckNotifier
+		case <-time.After(rateLimit):
+			notification = n.Select()
+			if len(notification.Queue) > 0 {
 				if notification.WithinLimits() {
+					msg := notification.Queue[0]
 					err := n.Send(msg)
 					if err != nil {
 						utils.Log(2, fmt.Sprintf("notifier %v had an error: %v", notification.Method, err))
 					}
-					notification.Log(msg)
+					notification.makeLog(msg)
+					notification.Queue = notification.Queue[1:]
+					rateLimit = notification.Delay
 				}
 			}
 		}
-		time.Sleep(notification.Delay)
+		continue
 	}
-}
-
-func RunQue(n Notifier) error {
-	notifier := n.Select()
-	if len(notifier.Queue) == 0 {
-		return nil
-	}
-	queMsg := notifier.Queue[0]
-	err := n.Send(queMsg)
-	notifier.Log(queMsg)
-	notifier.Queue = notifier.Queue[1:]
-	return err
 }
 
 // install will check the database for the notification, if its not inserted it will insert a new record for it
 func install(n Notifier) error {
 	inDb := isInDatabase(n.Select())
 	if !inDb {
-		_, err := insertDatabase(toNotification(n))
+		_, err := insertDatabase(n.Select())
 		if err != nil {
 			utils.Log(3, err)
 			return err
@@ -297,9 +300,9 @@ func (f *Notification) LastSent() time.Duration {
 }
 
 // SentLastHour returns the amount of sent notifications within the last hour
-func (f *Notification) SentLastHour() int {
+func (f *Notification) SentLastMinute() int {
 	sent := 0
-	hourAgo := time.Now().Add(-1 * time.Hour)
+	hourAgo := time.Now().Add(-1 * time.Minute)
 	for _, v := range f.Logs() {
 		lastTime := time.Time(v.Time)
 		if lastTime.After(hourAgo) {
@@ -307,11 +310,6 @@ func (f *Notification) SentLastHour() int {
 		}
 	}
 	return sent
-}
-
-// Limit returns the limits on how many notifications can be sent in 1 hour
-func (f *Notification) Limit() int {
-	return f.Limits
 }
 
 // GetValue returns the database value of a accept DbField value.
@@ -356,19 +354,48 @@ func isEnabled(n interface{}) bool {
 }
 
 func inLimits(n interface{}) bool {
-	notifier := toNotification(n.(Notifier))
+	notifier := n.(Notifier).Select()
 	return notifier.WithinLimits()
 }
 
 func (notify *Notification) WithinLimits() bool {
-	if notify.SentLastHour() >= notify.Limit() {
+	if notify.SentLastMinute() >= notify.Limits {
 		return false
 	}
 	if notify.Delay.Seconds() == 0 {
-		notify.Delay = time.Duration(2 * time.Second)
+		notify.Delay = time.Duration(500 * time.Millisecond)
 	}
-	if notify.LastSent().Seconds() >= notify.Delay.Seconds() {
+	if notify.LastSent().Seconds() == 0 {
+		return true
+	}
+	if notify.Delay.Seconds() >= notify.LastSent().Seconds() {
 		return false
 	}
 	return true
+}
+
+func (n *Notification) ResetQueue() {
+	n.Queue = nil
+}
+
+func (n *Notification) start() {
+	n.Running = make(chan bool)
+}
+
+func (n *Notification) close() {
+	if n.IsRunning() {
+		close(n.Running)
+	}
+}
+
+func (n *Notification) IsRunning() bool {
+	if n.Running == nil {
+		return false
+	}
+	select {
+	case <-n.Running:
+		return false
+	default:
+		return true
+	}
 }

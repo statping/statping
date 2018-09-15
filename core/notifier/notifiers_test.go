@@ -91,6 +91,7 @@ func TestSelectNotification(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "example", notifier.Method)
 	assert.False(t, notifier.Enabled)
+	assert.False(t, notifier.IsRunning())
 }
 
 func TestAddQueue(t *testing.T) {
@@ -118,8 +119,8 @@ func TestNotification_Update(t *testing.T) {
 	notifier.Var2 = "var2_is_here"
 	notifier.ApiKey = "USBdu82HDiiuw9327yGYDGw"
 	notifier.ApiSecret = "PQopncow929hUIDHGwiud"
-	notifier.Limits = 15
-	_, err = notifier.Update()
+	notifier.Limits = 10
+	_, err = Update(example, notifier)
 	assert.Nil(t, err)
 
 	selected, err := SelectNotification(example)
@@ -130,18 +131,24 @@ func TestNotification_Update(t *testing.T) {
 	assert.Equal(t, "USBdu82HDiiuw9327yGYDGw", selected.GetValue("api_key"))
 	assert.Equal(t, "USBdu82HDiiuw9327yGYDGw", example.ApiKey)
 	assert.False(t, selected.Enabled)
+	assert.False(t, selected.IsRunning())
 }
 
 func TestEnableNotification(t *testing.T) {
 	notifier, err := SelectNotification(example)
 	notifier.Enabled = true
-	updated, err := notifier.Update()
+	updated, err := Update(example, notifier)
 	assert.Nil(t, err)
 	assert.True(t, updated.Enabled)
+	assert.True(t, updated.IsRunning())
 }
 
 func TestIsEnabled(t *testing.T) {
 	assert.True(t, isEnabled(example))
+}
+
+func TestIsRunning(t *testing.T) {
+	assert.True(t, example.IsRunning())
 }
 
 func TestLastSent(t *testing.T) {
@@ -153,8 +160,7 @@ func TestLastSent(t *testing.T) {
 func TestWithinLimits(t *testing.T) {
 	notifier, err := SelectNotification(example)
 	assert.Nil(t, err)
-	assert.Equal(t, 15, notifier.Limit())
-	assert.Equal(t, 15, notifier.Limits)
+	assert.Equal(t, 10, notifier.Limits)
 	assert.True(t, inLimits(example))
 }
 
@@ -165,25 +171,6 @@ func TestNotification_GetValue(t *testing.T) {
 	assert.Equal(t, "http://demo.statup.io/api", val)
 }
 
-func TestRunQue(t *testing.T) {
-	assert.Nil(t, RunQue(example))
-	assert.Equal(t, 4, len(example.Queue))
-	assert.Nil(t, RunQue(example))
-	assert.Equal(t, 3, len(example.Queue))
-	assert.Nil(t, RunQue(example))
-	assert.Equal(t, 2, len(example.Queue))
-
-	time.Sleep(2 * time.Second)
-	assert.True(t, example.LastSent().Seconds() >= float64(2))
-
-	assert.Nil(t, RunQue(example))
-	assert.Equal(t, 1, len(example.Queue))
-	assert.Nil(t, RunQue(example))
-	assert.Equal(t, 0, len(example.Queue))
-	assert.Nil(t, RunQue(example))
-	assert.Equal(t, 0, len(example.Queue))
-}
-
 func TestOnSave(t *testing.T) {
 	err := example.OnSave()
 	assert.Equal(t, "onsave triggered", err.Error())
@@ -191,54 +178,64 @@ func TestOnSave(t *testing.T) {
 
 func TestOnSuccess(t *testing.T) {
 	OnSuccess(service)
-	assert.Equal(t, 2, len(example.Queue))
+	assert.Equal(t, 7, len(example.Queue))
 }
 
 func TestOnFailure(t *testing.T) {
 	OnFailure(service, failure)
-	assert.Equal(t, 3, len(example.Queue))
+	assert.Equal(t, 8, len(example.Queue))
 }
 
 func TestOnNewService(t *testing.T) {
 	OnNewService(service)
-	assert.Equal(t, 4, len(example.Queue))
+	assert.Equal(t, 9, len(example.Queue))
 }
 
 func TestOnUpdatedService(t *testing.T) {
 	OnUpdatedService(service)
-	assert.Equal(t, 5, len(example.Queue))
+	assert.Equal(t, 10, len(example.Queue))
 }
 
 func TestOnDeletedService(t *testing.T) {
 	OnDeletedService(service)
-	assert.Equal(t, 6, len(example.Queue))
+	assert.Equal(t, 11, len(example.Queue))
 }
 
 func TestOnNewUser(t *testing.T) {
 	OnNewUser(user)
-	assert.Equal(t, 7, len(example.Queue))
+	assert.Equal(t, 12, len(example.Queue))
 }
 
 func TestOnUpdatedUser(t *testing.T) {
 	OnUpdatedUser(user)
-	assert.Equal(t, 8, len(example.Queue))
+	assert.Equal(t, 13, len(example.Queue))
 }
 
 func TestOnDeletedUser(t *testing.T) {
 	OnDeletedUser(user)
-	assert.Equal(t, 9, len(example.Queue))
+	assert.Equal(t, 14, len(example.Queue))
 }
 
 func TestOnUpdatedCore(t *testing.T) {
 	OnUpdatedCore(core)
-	assert.Equal(t, 10, len(example.Queue))
+	assert.Equal(t, 15, len(example.Queue))
 }
 
 func TestOnUpdatedNotifier(t *testing.T) {
 	OnUpdatedNotifier(example.Select())
-	assert.Equal(t, 11, len(example.Queue))
+	assert.Equal(t, 16, len(example.Queue))
 }
 
-func TestRunAllQueue(t *testing.T) {
-	//runQue(example)
+func TestRunAllQueueAndStop(t *testing.T) {
+	assert.True(t, example.IsRunning())
+	assert.Equal(t, 16, len(example.Queue))
+	go Queue(example)
+	assert.Equal(t, 16, len(example.Queue))
+	time.Sleep(15 * time.Second)
+	assert.Equal(t, 6, len(example.Queue))
+	time.Sleep(1 * time.Second)
+	assert.Equal(t, 6, len(example.Queue))
+	example.close()
+	assert.False(t, example.IsRunning())
+	assert.Equal(t, 6, len(example.Queue))
 }

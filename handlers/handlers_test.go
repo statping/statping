@@ -18,6 +18,7 @@ package handlers
 import (
 	"fmt"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/core/notifier"
 	_ "github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
@@ -500,6 +501,10 @@ func TestPrometheusHandler(t *testing.T) {
 }
 
 func TestSaveNotificationHandler(t *testing.T) {
+	notification, _, err := notifier.SelectNotifier("email")
+	assert.Nil(t, err)
+	assert.False(t, notification.IsRunning())
+
 	form := url.Values{}
 	form.Add("enable", "on")
 	form.Add("host", "smtp.emailer.com")
@@ -518,6 +523,9 @@ func TestSaveNotificationHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	assert.Equal(t, 303, rr.Code)
 	assert.True(t, isRouteAuthenticated(req))
+	notification, _, err = notifier.SelectNotifier("email")
+	assert.Nil(t, err)
+	assert.True(t, notification.IsRunning())
 }
 
 func TestViewNotificationSettingsHandler(t *testing.T) {

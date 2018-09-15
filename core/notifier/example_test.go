@@ -33,7 +33,8 @@ var example = &Example{&Notification{
 	Description: "Example Notifier",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
-	Delay:       time.Duration(5 * time.Second),
+	Delay:       time.Duration(1 * time.Second),
+	Limits:      7,
 	Form: []NotificationForm{{
 		Type:        "text",
 		Title:       "Host",

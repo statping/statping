@@ -165,9 +165,6 @@ func GroupDataBy(column string, id int64, tm time.Time, increment string) string
 	return sql
 }
 
-type graphObject struct {
-}
-
 func (s *Service) GraphDataRaw() []*DateScan {
 	var d []*DateScan
 	since := time.Now().Add(time.Hour*-24 + time.Minute*0 + time.Second*0)

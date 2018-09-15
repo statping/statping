@@ -119,11 +119,13 @@ build-alpine: compile
 
 # build :latest docker tag
 docker-build-latest: docker-build-base
-	docker build -t hunterlong/statup:latest --no-cache -f Dockerfile .
+	docker build --build-arg VERSION=$(VERSION) -t hunterlong/statup:latest --no-cache -f Dockerfile .
+	docker tag hunterlong/statup:latest hunterlong/statup:latest-v$(VERSION)
 
 # build :dev docker tag
 docker-build-dev: docker-build-base
-	docker build -t hunterlong/statup:dev --no-cache -f dev/Dockerfile-dev .
+	docker build --build-arg VERSION=$(VERSION) -t hunterlong/statup:dev --no-cache -f dev/Dockerfile-dev .
+	docker tag hunterlong/statup:dev hunterlong/statup:dev-v$(VERSION)
 
 # build :base and base-v{VERSION} docker tag
 docker-build-base: clean
@@ -150,9 +152,16 @@ docker-run-dev: docker-build-dev
 docker-run-cypress: docker-build-cypress
 	docker run -t hunterlong/statup:cypress
 
+# push the :base and :base-v{VERSION} tag to Docker hub
+docker-push-base:
+	docker tag hunterlong/statup:base hunterlong/statup:base-v$(VERSION)
+	docker push hunterlong/statup:base
+	docker push hunterlong/statup:base-v$(VERSION)
+
 # push the :dev tag to Docker hub
 docker-push-dev:
 	docker push hunterlong/statup:dev
+	docker push hunterlong/statup:dev-v$(VERSION)
 
 # push the :cypress tag to Docker hub
 docker-push-cypress:
@@ -161,12 +170,7 @@ docker-push-cypress:
 # push the :latest tag to Docker hub
 docker-push-latest:
 	docker push hunterlong/statup:latest
-
-# push the :base and :base-v{VERSION} tag to Docker hub
-docker-push-base: docker-build-base
-	docker tag hunterlong/statup:base hunterlong/statup:base-v$(VERSION)
-	docker push hunterlong/statup:base
-	docker push hunterlong/statup:base-v$(VERSION)
+	docker push hunterlong/statup:latest-v$(VERSION)
 
 # create Postgres, and MySQL instance using Docker (used for testing)
 databases:

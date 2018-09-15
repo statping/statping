@@ -144,7 +144,7 @@ func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	apiSecret := form.Get("api_secret")
 	limits := int(utils.StringInt(form.Get("limits")))
 
-	notifer, err := notifier.SelectNotifier(method)
+	notifer, notif, err := notifier.SelectNotifier(method)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("issue saving notifier %v: %v", method, err))
 		ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
@@ -179,7 +179,7 @@ func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		notifer.Limits = limits
 	}
 	notifer.Enabled = enabled == "on"
-	_, err = notifer.Update()
+	_, err = notifier.Update(notif, notifer)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("issue updating notifier: %v", err))
 	}

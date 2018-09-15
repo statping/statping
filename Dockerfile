@@ -1,4 +1,5 @@
-FROM hunterlong/statup:base-v0.59
+ARG VERSION
+FROM hunterlong/statup:base-v${VERSION}
 MAINTAINER "Hunter Long (https://github.com/hunterlong)"
 
 # Locked version of Statup for 'latest' Docker tag
