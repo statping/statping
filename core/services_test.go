@@ -133,7 +133,7 @@ func TestServiceAvgUptime(t *testing.T) {
 	service2 := SelectService(5)
 	assert.Equal(t, "100", service2.AvgUptime(since))
 	service3 := SelectService(13)
-	assert.Equal(t, "100", service3.AvgUptime(since))
+	assert.NotEqual(t, "0", service3.AvgUptime(since))
 	service4 := SelectService(15)
 	assert.NotEqual(t, "0", service4.AvgUptime(since))
 }
