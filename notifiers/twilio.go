@@ -16,10 +16,13 @@
 package notifiers
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -27,12 +30,7 @@ import (
 )
 
 const (
-	TWILIO_ID     = 3
 	TWILIO_METHOD = "twilio"
-)
-
-var (
-	twilioMessages []string
 )
 
 type Twilio struct {
@@ -59,12 +57,12 @@ var twilio = &Twilio{&notifier.Notification{
 	}, {
 		Type:        "text",
 		Title:       "SMS to Phone Number",
-		Placeholder: "+18555555555",
+		Placeholder: "18555555555",
 		DbField:     "Var1",
 	}, {
 		Type:        "text",
 		Title:       "From Phone Number",
-		Placeholder: "+18555555555",
+		Placeholder: "18555555555",
 		DbField:     "Var2",
 	}}},
 }
@@ -86,18 +84,23 @@ func (u *Twilio) Send(msg interface{}) error {
 	twilioUrl := fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%v/Messages.json", u.GetValue("api_key"))
 	client := &http.Client{}
 	v := url.Values{}
-	v.Set("To", u.Var1)
-	v.Set("From", u.Var2)
+	v.Set("To", "+"+u.Var1)
+	v.Set("From", "+"+u.Var2)
 	v.Set("Body", message)
 	rb := *strings.NewReader(v.Encode())
 	req, err := http.NewRequest("POST", twilioUrl, &rb)
 	req.SetBasicAuth(u.ApiKey, u.ApiSecret)
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	client.Do(req)
+	res, err := client.Do(req)
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("Issue sending Twilio notification: %v", err))
 		return err
+	}
+	defer res.Body.Close()
+	contents, _ := ioutil.ReadAll(res.Body)
+	success, twilioRes := twilioSuccess(contents)
+	if !success {
+		return errors.New(fmt.Sprintf("twilio didn't receive the expected status of 'enque' from API got: %v", twilioRes))
 	}
 	return nil
 }
@@ -120,4 +123,38 @@ func (u *Twilio) OnSave() error {
 	// Do updating stuff here
 
 	return nil
+}
+
+func twilioSuccess(res []byte) (bool, TwilioResponse) {
+	var obj TwilioResponse
+	json.Unmarshal(res, &obj)
+	if obj.Status == "queued" {
+		return true, obj
+	}
+	return false, obj
+}
+
+type TwilioResponse struct {
+	Sid                 string      `json:"sid"`
+	DateCreated         string      `json:"date_created"`
+	DateUpdated         string      `json:"date_updated"`
+	DateSent            interface{} `json:"date_sent"`
+	AccountSid          string      `json:"account_sid"`
+	To                  string      `json:"to"`
+	From                string      `json:"from"`
+	MessagingServiceSid interface{} `json:"messaging_service_sid"`
+	Body                string      `json:"body"`
+	Status              string      `json:"status"`
+	NumSegments         string      `json:"num_segments"`
+	NumMedia            string      `json:"num_media"`
+	Direction           string      `json:"direction"`
+	APIVersion          string      `json:"api_version"`
+	Price               interface{} `json:"price"`
+	PriceUnit           string      `json:"price_unit"`
+	ErrorCode           interface{} `json:"error_code"`
+	ErrorMessage        interface{} `json:"error_message"`
+	URI                 string      `json:"uri"`
+	SubresourceUris     struct {
+		Media string `json:"media"`
+	} `json:"subresource_uris"`
 }

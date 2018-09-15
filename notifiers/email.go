@@ -17,6 +17,7 @@ package notifiers
 
 import (
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
@@ -85,12 +86,12 @@ func init() {
 }
 
 func (u *Email) Send(msg interface{}) error {
-	//email := msg.(*EmailOutgoing)
-	//err := u.dialSend(email)
-	//if err != nil {
-	//	utils.Log(3, fmt.Sprintf("Email Notifier could not send email: %v", err))
-	//	return err
-	//}
+	email := msg.(*EmailOutgoing)
+	err := u.dialSend(email)
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("Email Notifier could not send email: %v", err))
+		return err
+	}
 	return nil
 }
 
@@ -145,6 +146,9 @@ func (u *Email) OnSave() error {
 }
 
 func (u *Email) dialSend(email *EmailOutgoing) error {
+	mailer = gomail.NewDialer(emailer.Host, emailer.Port, emailer.Username, emailer.Password)
+	mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+	emailSource(email)
 	m := gomail.NewMessage()
 	m.SetHeader("From", email.From)
 	m.SetHeader("To", email.To)
@@ -157,7 +161,7 @@ func (u *Email) dialSend(email *EmailOutgoing) error {
 	return nil
 }
 
-func SendEmail(email *EmailOutgoing) {
+func emailSource(email *EmailOutgoing) {
 	source := EmailTemplate(email.Template, email.Data)
 	email.Source = source
 }

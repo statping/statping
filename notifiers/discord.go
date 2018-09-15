@@ -59,7 +59,6 @@ func init() {
 
 func (u *Discord) Send(msg interface{}) error {
 	message := msg.([]byte)
-	fmt.Println("sending: ", message)
 	req, _ := http.NewRequest("POST", discorder.GetValue("host"), bytes.NewBuffer(message))
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
@@ -76,7 +75,6 @@ func (u *Discord) Select() *notifier.Notification {
 
 func (u *Discord) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf(`{"content": "Your service '%v' is currently failing! Reason: %v"}`, s.Name, f.Issue)
-	fmt.Println(msg)
 	u.AddQueue(msg)
 }
 

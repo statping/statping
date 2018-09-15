@@ -262,7 +262,8 @@ CheckNotifier:
 		case <-time.After(rateLimit):
 			notification = n.Select()
 			if len(notification.Queue) > 0 {
-				if notification.WithinLimits() {
+				ok, _ := notification.WithinLimits()
+				if ok {
 					msg := notification.Queue[0]
 					err := n.Send(msg)
 					if err != nil {
@@ -371,23 +372,27 @@ func isEnabled(n interface{}) bool {
 
 func inLimits(n interface{}) bool {
 	notifier := n.(Notifier).Select()
-	return notifier.WithinLimits()
+	ok, _ := notifier.WithinLimits()
+	return ok
 }
 
-func (notify *Notification) WithinLimits() bool {
+func (notify *Notification) WithinLimits() (bool, error) {
+	if notify.SentLastMinute() == 0 {
+		return true, nil
+	}
 	if notify.SentLastMinute() >= notify.Limits {
-		return false
+		return false, errors.New(fmt.Sprintf("notifier sent %v out of %v in last minute", notify.SentLastMinute(), notify.Limits))
 	}
 	if notify.Delay.Seconds() == 0 {
 		notify.Delay = time.Duration(500 * time.Millisecond)
 	}
 	if notify.LastSent().Seconds() == 0 {
-		return true
+		return true, nil
 	}
 	if notify.Delay.Seconds() >= notify.LastSent().Seconds() {
-		return false
+		return false, errors.New(fmt.Sprintf("notifiers delay (%v) is greater than last message sent (%v)", notify.Delay.Seconds(), notify.LastSent().Seconds()))
 	}
-	return true
+	return true, nil
 }
 
 func (n *Notification) ResetQueue() {

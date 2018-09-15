@@ -21,6 +21,7 @@ import (
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
+	"io/ioutil"
 	"net/http"
 	"text/template"
 	"time"
@@ -56,7 +57,7 @@ var slacker = &Slack{&notifier.Notification{
 	}}},
 }
 
-func sendSlack(temp string, data interface{}) error {
+func parseSlackMessage(temp string, data interface{}) error {
 	buf := new(bytes.Buffer)
 	slackTemp, _ := template.New("slack").Parse(temp)
 	err := slackTemp.Execute(buf, data)
@@ -67,7 +68,7 @@ func sendSlack(temp string, data interface{}) error {
 	return nil
 }
 
-type slackMessage struct {
+type SlackMessage struct {
 	Service  *types.Service
 	Template string
 	Time     int64
@@ -84,10 +85,13 @@ func init() {
 func (u *Slack) Send(msg interface{}) error {
 	message := msg.(string)
 	client := new(http.Client)
-	_, err := client.Post(u.Host, "application/json", bytes.NewBuffer([]byte(message)))
+	res, err := client.Post(u.Host, "application/json", bytes.NewBuffer([]byte(message)))
 	if err != nil {
 		return err
 	}
+	defer res.Body.Close()
+	contents, _ := ioutil.ReadAll(res.Body)
+	fmt.Println(string(contents))
 	return nil
 }
 
@@ -98,18 +102,18 @@ func (u *Slack) Select() *notifier.Notification {
 func (u *Slack) OnTest(n notifier.Notification) (bool, error) {
 	utils.Log(1, "Slack notifier loaded")
 	msg := fmt.Sprintf("You're Statup Slack Notifier is working correctly!")
-	err := sendSlack(TEST_TEMPLATE, msg)
+	err := parseSlackMessage(TEST_TEMPLATE, msg)
 	return true, err
 }
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *Slack) OnFailure(s *types.Service, f *types.Failure) {
-	message := slackMessage{
+	message := SlackMessage{
 		Service:  s,
 		Template: FAILURE,
 		Time:     time.Now().Unix(),
 	}
-	sendSlack(FAILING_TEMPLATE, message)
+	parseSlackMessage(FAILING_TEMPLATE, message)
 }
 
 // ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
