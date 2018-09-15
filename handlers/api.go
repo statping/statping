@@ -93,6 +93,22 @@ func ApiServiceHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(service)
 }
 
+func ApiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	vars := mux.Vars(r)
+	service := core.SelectService(utils.StringInt(vars["id"]))
+	if service == nil {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(service.GraphDataRaw())
+}
+
 func ApiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
@@ -106,7 +122,7 @@ func ApiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	newService := core.ReturnService(service)
-	_, err = newService.Create()
+	_, err = newService.Create(true)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

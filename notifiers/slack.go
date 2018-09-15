@@ -22,7 +22,6 @@ import (
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
-	"sync"
 	"text/template"
 	"time"
 )
@@ -35,93 +34,80 @@ const (
 	TEST_TEMPLATE    = `{"text":"{{.}}"}`
 )
 
-var (
-	slackMessages []string
-	messageLock   *sync.Mutex
-)
-
 type Slack struct {
 	*notifier.Notification
 }
 
-type slackMessage struct {
-	Service *types.Service
-	Time    int64
-}
-
 var slacker = &Slack{&notifier.Notification{
-	Method: SLACK_METHOD,
-	Host:   "https://webhooksurl.slack.com/***",
+	Method:      SLACK_METHOD,
+	Title:       "Slack",
+	Description: "Send notifications to your Slack channel when a service is offline. Insert your Incoming Webhook URL for your channel to receive notifications. Based on the <a href=\"https://api.slack.com/incoming-webhooks\">Slack API</a>.",
+	Author:      "Hunter Long",
+	AuthorUrl:   "https://github.com/hunterlong",
+	Delay:       time.Duration(10 * time.Second),
+	Host:        "https://webhooksurl.slack.com/***",
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
 		Title:       "Incoming Webhook Url",
 		Placeholder: "Insert your Slack webhook URL here.",
+		SmallText:   "Incoming Webhook URL from <a href=\"https://api.slack.com/apps\" target=\"_blank\">Slack Apps</a>",
 		DbField:     "Host",
 	}}},
+}
+
+func sendSlack(temp string, data interface{}) error {
+	buf := new(bytes.Buffer)
+	slackTemp, _ := template.New("slack").Parse(temp)
+	err := slackTemp.Execute(buf, data)
+	if err != nil {
+		return err
+	}
+	slacker.AddQueue(buf.String())
+	return nil
+}
+
+type slackMessage struct {
+	Service  *types.Service
+	Template string
+	Time     int64
 }
 
 // DEFINE YOUR NOTIFICATION HERE.
 func init() {
 	err := notifier.AddNotifier(slacker)
-	messageLock = new(sync.Mutex)
 	if err != nil {
 		panic(err)
 	}
 }
 
+func (u *Slack) Send(msg interface{}) error {
+	message := msg.(string)
+	client := new(http.Client)
+	_, err := client.Post(u.Host, "application/json", bytes.NewBuffer([]byte(message)))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *Slack) Select() *notifier.Notification {
+	return u.Notification
+}
+
 func (u *Slack) Test() error {
 	utils.Log(1, "Slack notifier loaded")
 	msg := fmt.Sprintf("You're Statup Slack Notifier is working correctly!")
-	SendSlack(TEST_TEMPLATE, msg)
-	return nil
-}
-
-// AFTER NOTIFIER LOADS, IF ENABLED, START A QUEUE PROCESS
-func (u *Slack) Run() error {
-	messageLock.Lock()
-	slackMessages = notifier.UniqueStrings(slackMessages)
-	for _, msg := range slackMessages {
-
-		if u.CanSend() {
-			utils.Log(1, fmt.Sprintf("Sending JSON to Slack Webhook"))
-			client := http.Client{Timeout: 15 * time.Second}
-			_, err := client.Post(u.Host, "application/json", bytes.NewBuffer([]byte(msg)))
-			if err != nil {
-				utils.Log(3, fmt.Sprintf("Issue sending Slack notification: %v", err))
-			}
-			u.Log(msg)
-		}
-	}
-	slackMessages = []string{}
-	messageLock.Unlock()
-	time.Sleep(60 * time.Second)
-	if u.Enabled {
-		u.Run()
-	}
-	return nil
-}
-
-// CUSTOM FUNCTION FO SENDING SLACK MESSAGES
-func SendSlack(temp string, data interface{}) error {
-	messageLock.Lock()
-	buf := new(bytes.Buffer)
-	slackTemp, _ := template.New("slack").Parse(temp)
-	slackTemp.Execute(buf, data)
-	slackMessages = append(slackMessages, buf.String())
-	messageLock.Unlock()
-	slacker.Log(buf.String())
-	return nil
+	return sendSlack(TEST_TEMPLATE, msg)
 }
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *Slack) OnFailure(s *types.Service, f *types.Failure) {
-	if u.Enabled {
-		message := slackMessage{
-			Service: s,
-			Time:    time.Now().Unix(),
-		}
-		SendSlack(FAILING_TEMPLATE, message)
+	message := slackMessage{
+		Service:  s,
+		Template: FAILURE,
+		Time:     time.Now().Unix(),
 	}
+	sendSlack(FAILING_TEMPLATE, message)
 }
 
 // ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
@@ -131,8 +117,7 @@ func (u *Slack) OnSuccess(s *types.Service) {
 
 // ON SAVE OR UPDATE OF THE NOTIFIER FORM
 func (u *Slack) OnSave() error {
-	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
-	// Do updating stuff here
-	u.Test()
+	message := fmt.Sprintf("Notification %v is receiving updated information.", u.Method)
+	u.AddQueue(message)
 	return nil
 }

@@ -130,12 +130,9 @@ func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-
 	form := parseForm(r)
-
 	vars := mux.Vars(r)
 	method := vars["method"]
-
 	enabled := form.Get("enable")
 	host := form.Get("host")
 	port := int(utils.StringInt(form.Get("port")))

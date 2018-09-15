@@ -56,6 +56,7 @@ func (c *Core) SelectAllServices() ([]*Service, error) {
 		utils.Log(3, fmt.Sprintf("service error: %v", db.Error))
 		return nil, db.Error
 	}
+	CoreApp.Services = nil
 	for _, service := range services {
 		service.Start()
 		service.AllCheckins()
@@ -164,15 +165,17 @@ func GroupDataBy(column string, id int64, tm time.Time, increment string) string
 	return sql
 }
 
-// GraphData returns the JSON object used by Charts.js to render the chart
-func (s *Service) GraphData() string {
+type graphObject struct {
+}
+
+func (s *Service) GraphDataRaw() []*DateScan {
 	var d []*DateScan
 	since := time.Now().Add(time.Hour*-24 + time.Minute*0 + time.Second*0)
 	sql := GroupDataBy("hits", s.Id, since, "minute")
 	rows, err := DbSession.Raw(sql).Rows()
 	if err != nil {
 		utils.Log(2, err)
-		return ""
+		return nil
 	}
 	for rows.Next() {
 		gd := new(DateScan)
@@ -189,7 +192,13 @@ func (s *Service) GraphData() string {
 		gd.Value = int64(ff)
 		d = append(d, gd)
 	}
-	data, err := json.Marshal(d)
+	return d
+}
+
+// GraphData returns the JSON object used by Charts.js to render the chart
+func (s *Service) GraphData() string {
+	obj := s.GraphDataRaw()
+	data, err := json.Marshal(obj)
 	if err != nil {
 		utils.Log(2, err)
 		return ""
@@ -298,7 +307,7 @@ func (u *Service) Update(restart bool) error {
 }
 
 // Create will create a service and insert it into the database
-func (u *Service) Create() (int64, error) {
+func (u *Service) Create(check bool) (int64, error) {
 	u.CreatedAt = time.Now()
 	db := servicesDB().Create(u)
 	if db.Error != nil {
@@ -306,7 +315,7 @@ func (u *Service) Create() (int64, error) {
 		return 0, db.Error
 	}
 	u.Start()
-	go u.CheckQueue(true)
+	go u.CheckQueue(check)
 	CoreApp.Services = append(CoreApp.Services, u)
 	reorderServices()
 	notifier.OnNewService(u.Service)

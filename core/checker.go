@@ -30,8 +30,8 @@ import (
 	"time"
 )
 
-// CheckServices will start the checking go routine for each service
-func CheckServices() {
+// checkServices will start the checking go routine for each service
+func checkServices() {
 	utils.Log(1, fmt.Sprintf("Starting monitoring process for %v Services", len(CoreApp.Services)))
 	for _, ser := range CoreApp.Services {
 		//go obj.StartCheckins()

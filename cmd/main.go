@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/handlers"
+	_ "github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"

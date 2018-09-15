@@ -64,14 +64,6 @@
   revision = "1eb28afdf9b6e56cf673badd47545f844fe81103"
 
 [[projects]]
-  digest = "1:ca82a3b99694824c627573c2a76d0e49719b4a9c02d1d85a2ac91f1c1f52ab9b"
-  name = "github.com/fatih/structs"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "a720dfa8df582c51dee1b36feabb906bde1588bd"
-  version = "v1.0"
-
-[[projects]]
   digest = "1:64a5a67c69b70c2420e607a8545d674a23778ed9c3e80607bfd17b77c6c87f6a"
   name = "github.com/go-ole/go-ole"
   packages = [
@@ -169,12 +161,12 @@
   revision = "04140366298a54a039076d798123ffa108fff46c"
 
 [[projects]]
-  digest = "1:70e697d67ccaec45e16bac3a32380ebcd9e7e071079c60d0171d42cf1cf9748a"
+  digest = "1:ecd9aa82687cf31d1585d4ac61d0ba180e42e8a6182b85bd785fcca8dfeefc1b"
   name = "github.com/joho/godotenv"
   packages = ["."]
   pruneopts = "UT"
-  revision = "a79fa1e548e2c689c241d10173efd51e5d689d5b"
-  version = "v1.2.0"
+  revision = "23d116af351c84513e1946b527c88823e476be13"
+  version = "v1.3.0"
 
 [[projects]]
   branch = "master"
@@ -263,6 +255,14 @@
   revision = "bb4de0191aa41b5507caa14b0650cdbddcd9280b"
 
 [[projects]]
+  branch = "master"
+  digest = "1:def689e73e9252f6f7fe66834a76751a41b767e03daab299e607e7226c58a855"
+  name = "github.com/shurcooL/sanitized_anchor_name"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "86672fcb3f950f35f2e675df2240550f2a50762f"
+
+[[projects]]
   digest = "1:18752d0b95816a1b777505a97f71c7467a8445b8ffb55631a7bf779f6ba4fa83"
   name = "github.com/stretchr/testify"
   packages = ["assert"]
@@ -280,7 +280,7 @@
     "md4",
   ]
   pruneopts = "UT"
-  revision = "0709b304e793a5edb4a2c0145f281ecdc20838a4"
+  revision = "0e37d006457bf46f9e6692014ba72ef82c33022c"
 
 [[projects]]
   branch = "master"
@@ -326,6 +326,14 @@
   version = "v2.1"
 
 [[projects]]
+  digest = "1:39c2113f3a89585666e6f973650cff186b2d06deb4aa202c88addb87b0a201db"
+  name = "gopkg.in/russross/blackfriday.v2"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "cadec560ec52d93835bf2f15bd794700d3a2473b"
+  version = "v2.0.0"
+
+[[projects]]
   digest = "1:0a6ab450a46e158a97e3daf7da9df3bfd4f84420047fab6a65fb70b1337ce026"
   name = "upper.io/db.v3"
   packages = [
@@ -349,7 +357,6 @@
     "github.com/GeertJohan/go.rice",
     "github.com/GeertJohan/go.rice/embedded",
     "github.com/ararog/timeago",
-    "github.com/fatih/structs",
     "github.com/go-yaml/yaml",
     "github.com/gorilla/handlers",
     "github.com/gorilla/mux",
@@ -367,6 +374,7 @@
     "golang.org/x/crypto/bcrypt",
     "gopkg.in/gomail.v2",
     "gopkg.in/natefinch/lumberjack.v2",
+    "gopkg.in/russross/blackfriday.v2",
     "upper.io/db.v3/lib/sqlbuilder",
   ]
   solver-name = "gps-cdcl"

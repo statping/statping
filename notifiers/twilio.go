@@ -40,7 +40,12 @@ type Twilio struct {
 }
 
 var twilio = &Twilio{&notifier.Notification{
-	Method: TWILIO_METHOD,
+	Method:      TWILIO_METHOD,
+	Title:       "Twilio",
+	Description: "Receive SMS text messages directly to your cellphone when a service is offline. You can use a Twilio test account with limits. This notifier uses the <a href=\"https://www.twilio.com/docs/usage/api\">Twilio API</a>.",
+	Author:      "Hunter Long",
+	AuthorUrl:   "https://github.com/hunterlong",
+	Delay:       time.Duration(10 * time.Second),
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
 		Title:       "Account Sid",
@@ -72,65 +77,42 @@ func init() {
 	}
 }
 
-func (u *Twilio) postUrl() string {
-	return fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%v/Messages.json", u.ApiKey)
-}
-
 func (u *Twilio) Test() error {
 	utils.Log(1, "Twilio notifier loaded")
 	msg := fmt.Sprintf("You're Statup Twilio Notifier is working correctly!")
-	SendTwilio(msg)
+	u.AddQueue(msg)
 	return nil
 }
 
-// AFTER NOTIFIER LOADS, IF ENABLED, START A QUEUE PROCESS
-func (u *Twilio) Run() error {
-	twilioMessages = notifier.UniqueStrings(twilioMessages)
-	for _, msg := range twilioMessages {
-
-		if u.CanSend() {
-			utils.Log(1, fmt.Sprintf("Sending Twilio Message"))
-
-			twilioUrl := u.postUrl()
-			client := &http.Client{}
-			v := url.Values{}
-			v.Set("To", u.Var1)
-			v.Set("From", u.Var2)
-			v.Set("Body", msg)
-			rb := *strings.NewReader(v.Encode())
-
-			req, err := http.NewRequest("POST", twilioUrl, &rb)
-			req.SetBasicAuth(u.ApiKey, u.ApiSecret)
-			req.Header.Add("Accept", "application/json")
-			req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-			client.Do(req)
-
-			if err != nil {
-				utils.Log(3, fmt.Sprintf("Issue sending Twilio notification: %v", err))
-			}
-			u.Log(msg)
-		}
-	}
-	twilioMessages = []string{}
-	time.Sleep(60 * time.Second)
-	if u.Enabled {
-		u.Run()
-	}
-	return nil
+func (u *Twilio) Select() *notifier.Notification {
+	return u.Notification
 }
 
-// CUSTOM FUNCTION FO SENDING TWILIO MESSAGES
-func SendTwilio(data string) error {
-	twilioMessages = append(twilioMessages, data)
+func (u *Twilio) Send(msg interface{}) error {
+	message := msg.(string)
+	twilioUrl := fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%v/Messages.json", u.GetValue("api_key"))
+	client := &http.Client{}
+	v := url.Values{}
+	v.Set("To", u.Var1)
+	v.Set("From", u.Var2)
+	v.Set("Body", message)
+	rb := *strings.NewReader(v.Encode())
+	req, err := http.NewRequest("POST", twilioUrl, &rb)
+	req.SetBasicAuth(u.ApiKey, u.ApiSecret)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	client.Do(req)
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("Issue sending Twilio notification: %v", err))
+		return err
+	}
 	return nil
 }
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *Twilio) OnFailure(s *types.Service, f *types.Failure) {
-	if u.Enabled {
-		msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
-		SendTwilio(msg)
-	}
+	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
+	u.AddQueue(msg)
 }
 
 // ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS

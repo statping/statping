@@ -115,11 +115,23 @@ func LoadUsingEnv() (*DbConfig, error) {
 		}
 		admin.Create()
 
-		LoadSampleData()
+		InsertSampleData()
 
 		return Configs, err
 
 	}
 
 	return Configs, nil
+}
+
+// DeleteConfig will delete the 'config.yml' file
+func DeleteConfig() {
+	err := os.Remove(utils.Directory + "/config.yml")
+	if err != nil {
+		utils.Log(3, err)
+	}
+}
+
+type ErrorResponse struct {
+	Error string
 }

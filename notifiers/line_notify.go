@@ -23,16 +23,10 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 )
 
 const (
-	LINE_NOTIFY_ID     = 4
 	LINE_NOTIFY_METHOD = "line notify"
-)
-
-var (
-	lineNotifyMessages []string
 )
 
 type LineNotify struct {
@@ -40,7 +34,11 @@ type LineNotify struct {
 }
 
 var lineNotify = &LineNotify{&notifier.Notification{
-	Method: LINE_NOTIFY_METHOD,
+	Method:      LINE_NOTIFY_METHOD,
+	Title:       "LINE Notify",
+	Description: "LINE Notify will send notifications to your LINE Notify account when services are offline or online. Baed on the <a href=\"https://notify-bot.line.me/doc/en/\">LINE Notify API</a>.",
+	Author:      "Kanin Peanviriyakulkit",
+	AuthorUrl:   "https://github.com/dogrocker",
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
 		Title:       "Access Token",
@@ -53,66 +51,40 @@ var lineNotify = &LineNotify{&notifier.Notification{
 func init() {
 	err := notifier.AddNotifier(lineNotify)
 	if err != nil {
-		utils.Log(3, err)
+		panic(err)
 	}
 }
 
-func (u *LineNotify) postUrl() string {
-	return fmt.Sprintf("https://notify-api.line.me/api/notify")
+func (u *LineNotify) Send(msg interface{}) error {
+	message := msg.(string)
+	client := new(http.Client)
+	v := url.Values{}
+	v.Set("message", message)
+	req, err := http.NewRequest("POST", "https://notify-api.line.me/api/notify", strings.NewReader(v.Encode()))
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %v", u.GetValue("api_secret")))
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	_, err = client.Do(req)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *LineNotify) Select() *notifier.Notification {
+	return u.Notification
 }
 
 func (u *LineNotify) Test() error {
 	msg := fmt.Sprintf("You're Statup Line Notify Notifier is working correctly!")
-	SendLineNotify(msg)
-	return nil
-}
-
-// AFTER NOTIFIER LOADS, IF ENABLED, START A QUEUE PROCESS
-func (u *LineNotify) Run() error {
-	lineNotifyMessages = notifier.UniqueStrings(lineNotifyMessages)
-	for _, msg := range lineNotifyMessages {
-
-		if u.CanSend() {
-			utils.Log(1, fmt.Sprintf("Sending Line Notify Message"))
-
-			lineNotifyUrl := u.postUrl()
-			client := &http.Client{}
-			v := url.Values{}
-			v.Set("message", msg)
-			rb := *strings.NewReader(v.Encode())
-
-			req, err := http.NewRequest("POST", lineNotifyUrl, &rb)
-			req.Header.Add("Authorization", fmt.Sprintf("Bearer %v", u.ApiSecret))
-			req.Header.Add("Accept", "application/json")
-			req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-			client.Do(req)
-
-			if err != nil {
-				utils.Log(3, fmt.Sprintf("Issue sending Line Notify notification: %v", err))
-			}
-			u.Log(msg)
-		}
-	}
-	lineNotifyMessages = []string{}
-	time.Sleep(60 * time.Second)
-	if u.Enabled {
-		u.Run()
-	}
-	return nil
-}
-
-// CUSTOM FUNCTION FO SENDING LINE NOTIFY MESSAGES
-func SendLineNotify(data string) error {
-	lineNotifyMessages = append(lineNotifyMessages, data)
+	u.AddQueue(msg)
 	return nil
 }
 
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *LineNotify) OnFailure(s *types.Service, f *types.Failure) {
-	if u.Enabled {
-		msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
-		SendLineNotify(msg)
-	}
+	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
+	u.AddQueue(msg)
 }
 
 // ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS

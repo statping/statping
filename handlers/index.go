@@ -105,7 +105,7 @@ func DesktopInit(ip string, port int) {
 	})
 	admin.Create()
 
-	core.LoadSampleData()
+	core.InsertSampleData()
 
 	config.ApiKey = core.CoreApp.ApiKey
 	config.ApiSecret = core.CoreApp.ApiSecret

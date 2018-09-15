@@ -18,68 +18,65 @@ package notifiers
 import (
 	"bytes"
 	"fmt"
-	"github.com/GeertJohan/go.rice"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"gopkg.in/gomail.v2"
 	"html/template"
-	"time"
 )
 
 const (
-	EMAIL_ID     int64 = 1
-	EMAIL_METHOD       = "email"
+	MESSAGE = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n    <title>Sample Email</title>\n\n\n</head>\n<body style=\"-webkit-text-size-adjust: none; box-sizing: border-box; color: #74787E; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; height: 100%; line-height: 1.4; margin: 0; width: 100% !important;\" bgcolor=\"#F2F4F6\"><style type=\"text/css\">\n    body {\n        width: 100% !important; height: 100%; margin: 0; line-height: 1.4; background-color: #F2F4F6; color: #74787E; -webkit-text-size-adjust: none;\n    }\n    @media only screen and (max-width: 600px) {\n        .email-body_inner {\n            width: 100% !important;\n        }\n        .email-footer {\n            width: 100% !important;\n        }\n    }\n    @media only screen and (max-width: 500px) {\n        .button {\n            width: 100% !important;\n        }\n    }\n</style>\n<table class=\"email-wrapper\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; margin: 0; padding: 0; width: 100%;\" bgcolor=\"#F2F4F6\">\n    <tr>\n        <td align=\"center\" style=\"box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; word-break: break-word;\">\n            <table class=\"email-content\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; margin: 0; padding: 0; width: 100%;\">\n\n                <tr>\n                    <td class=\"email-body\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"-premailer-cellpadding: 0; -premailer-cellspacing: 0; border-bottom-color: #EDEFF2; border-bottom-style: solid; border-bottom-width: 1px; border-top-color: #EDEFF2; border-top-style: solid; border-top-width: 1px; box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; margin: 0; padding: 0; width: 100%; word-break: break-word;\" bgcolor=\"#FFFFFF\">\n                        <table class=\"email-body_inner\" align=\"center\" width=\"570\" cellpadding=\"0\" cellspacing=\"0\" style=\"box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; margin: 0 auto; padding: 0; width: 570px;\" bgcolor=\"#FFFFFF\">\n\n                            <tr>\n                                <td class=\"content-cell\" style=\"box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; padding: 35px; word-break: break-word;\">\n                                    <h1 style=\"box-sizing: border-box; color: #2F3133; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 19px; font-weight: bold; margin-top: 0;\" align=\"left\">Looks Like Emails Work!</h1>\n                                    <p style=\"box-sizing: border-box; color: #74787E; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 16px; line-height: 1.5em; margin-top: 0;\" align=\"left\">\n                                        Since you got this email, it confirms that your Statup Status Page email system is working correctly.\n                                    </p>\n                                    </p>\n                                    <p style=\"box-sizing: border-box; color: #74787E; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 16px; line-height: 1.5em; margin-top: 0;\" align=\"left\">\n                                        Enjoy using Statup!\n                                        <br />Statup.io Team</p>\n\n                                    <table class=\"body-sub\" style=\"border-top-color: #EDEFF2; border-top-style: solid; border-top-width: 1px; box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; margin-top: 25px; padding-top: 25px;\">\n\n                                    </table>\n                                </td>\n                            </tr>\n                        </table>\n                    </td>\n                </tr>\n            </table>\n        </td>\n    </tr>\n</table>\n</body>\n</html>"
+	FAILURE = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n    <title>Sample Email</title>\n\n\n</head>\n<body style=\"-webkit-text-size-adjust: none; box-sizing: border-box; color: #74787E; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; height: 100%; line-height: 1.4; margin: 0; width: 100% !important;\" bgcolor=\"#F2F4F6\"><style type=\"text/css\">\n    body {\n        width: 100% !important; height: 100%; margin: 0; line-height: 1.4; background-color: #F2F4F6; color: #74787E; -webkit-text-size-adjust: none;\n    }\n    @media only screen and (max-width: 600px) {\n        .email-body_inner {\n            width: 100% !important;\n        }\n        .email-footer {\n            width: 100% !important;\n        }\n    }\n    @media only screen and (max-width: 500px) {\n        .button {\n            width: 100% !important;\n        }\n    }\n</style>\n<table class=\"email-wrapper\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; margin: 0; padding: 0; width: 100%;\" bgcolor=\"#F2F4F6\">\n    <tr>\n        <td align=\"center\" style=\"box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; word-break: break-word;\">\n            <table class=\"email-content\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; margin: 0; padding: 0; width: 100%;\">\n\n                <tr>\n                    <td class=\"email-body\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"-premailer-cellpadding: 0; -premailer-cellspacing: 0; border-bottom-color: #EDEFF2; border-bottom-style: solid; border-bottom-width: 1px; border-top-color: #EDEFF2; border-top-style: solid; border-top-width: 1px; box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; margin: 0; padding: 0; width: 100%; word-break: break-word;\" bgcolor=\"#FFFFFF\">\n                        <table class=\"email-body_inner\" align=\"center\" width=\"570\" cellpadding=\"0\" cellspacing=\"0\" style=\"box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; margin: 0 auto; padding: 0; width: 570px;\" bgcolor=\"#FFFFFF\">\n\n                            <tr>\n                                <td class=\"content-cell\" style=\"box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; padding: 35px; word-break: break-word;\">\n                                    <h1 style=\"box-sizing: border-box; color: #2F3133; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 19px; font-weight: bold; margin-top: 0;\" align=\"left\">{{ .Service.Name }} is Offline!</h1>\n                                    <p style=\"box-sizing: border-box; color: #74787E; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 16px; line-height: 1.5em; margin-top: 0;\" align=\"left\">\n                                        Your Statup service '<a target=\"_blank\" href=\"{{.Service.Domain}}\">{{.Service.Name}}</a>' has been triggered with a HTTP status code of '{{.Service.LastStatusCode}}' and is currently offline based on your requirements. This failure was created on {{.Service.CreatedAt}}.\n                                    </p>\n\n                                {{if .Service.LastResponse }}\n                                    <h1 style=\"box-sizing: border-box; color: #2F3133; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 19px; font-weight: bold; margin-top: 0;\" align=\"left\">Last Response</h1>\n                                    <p style=\"box-sizing: border-box; color: #74787E; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 16px; line-height: 1.5em; margin-top: 0;\" align=\"left\">\n                                        {{ .Service.LastResponse }}\n                                    </p>\n                                {{end}}\n\n                                    <table class=\"body-sub\" style=\"border-top-color: #EDEFF2; border-top-style: solid; border-top-width: 1px; box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; margin-top: 25px; padding-top: 25px;\">\n                                        <td style=\"box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; word-break: break-word;\">\n                                            <a href=\"/service/{{.Service.Id}}\" class=\"button button--blue\" target=\"_blank\" style=\"-webkit-text-size-adjust: none; background: #3869D4; border-color: #3869d4; border-radius: 3px; border-style: solid; border-width: 10px 18px; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16); box-sizing: border-box; color: #FFF; display: inline-block; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-decoration: none;\">View Service</a>\n                                        </td>\n                                        <td style=\"box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; word-break: break-word;\">\n                                            <a href=\"/dashboard\" class=\"button button--blue\" target=\"_blank\" style=\"-webkit-text-size-adjust: none; background: #3869D4; border-color: #3869d4; border-radius: 3px; border-style: solid; border-width: 10px 18px; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16); box-sizing: border-box; color: #FFF; display: inline-block; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-decoration: none;\">Statup Dashboard</a>\n                                        </td>\n                                    </table>\n                                </td>\n                            </tr>\n                        </table>\n                    </td>\n                </tr>\n            </table>\n        </td>\n    </tr>\n</table>\n</body>\n</html>"
 )
 
 var (
-	emailArray []string
-	emailQueue []*EmailOutgoing
-	emailBox   *rice.Box
-	mailer     *gomail.Dialer
+	mailer *gomail.Dialer
 )
 
 type Email struct {
 	*notifier.Notification
 }
 
-var emailer = &Email{
-	Notification: &notifier.Notification{
-		Method: EMAIL_METHOD,
-		Form: []notifier.NotificationForm{{
-			Type:        "text",
-			Title:       "SMTP Host",
-			Placeholder: "Insert your SMTP Host here.",
-			DbField:     "Host",
-		}, {
-			Type:        "text",
-			Title:       "SMTP Username",
-			Placeholder: "Insert your SMTP Username here.",
-			DbField:     "Username",
-		}, {
-			Type:        "password",
-			Title:       "SMTP Password",
-			Placeholder: "Insert your SMTP Password here.",
-			DbField:     "Password",
-		}, {
-			Type:        "number",
-			Title:       "SMTP Port",
-			Placeholder: "Insert your SMTP Port here.",
-			DbField:     "Port",
-		}, {
-			Type:        "text",
-			Title:       "Outgoing Email Address",
-			Placeholder: "Insert your Outgoing Email Address",
-			DbField:     "Var1",
-		}, {
-			Type:        "email",
-			Title:       "Send Alerts To",
-			Placeholder: "Email Address",
-			DbField:     "Var2",
-		}},
-	}}
+var emailer = &Email{&notifier.Notification{
+	Method:      "email",
+	Title:       "Email",
+	Description: "Send emails via SMTP when notification are online or offline.",
+	Author:      "Hunter Long",
+	AuthorUrl:   "https://github.com/hunterlong",
+	Form: []notifier.NotificationForm{{
+		Type:        "text",
+		Title:       "SMTP Host",
+		Placeholder: "Insert your SMTP Host here.",
+		DbField:     "Host",
+	}, {
+		Type:        "text",
+		Title:       "SMTP Username",
+		Placeholder: "Insert your SMTP Username here.",
+		DbField:     "Username",
+	}, {
+		Type:        "password",
+		Title:       "SMTP Password",
+		Placeholder: "Insert your SMTP Password here.",
+		DbField:     "Password",
+	}, {
+		Type:        "number",
+		Title:       "SMTP Port",
+		Placeholder: "Insert your SMTP Port here.",
+		DbField:     "Port",
+	}, {
+		Type:        "text",
+		Title:       "Outgoing Email Address",
+		Placeholder: "Insert your Outgoing Email Address",
+		DbField:     "Var1",
+	}, {
+		Type:        "email",
+		Title:       "Send Alerts To",
+		Placeholder: "Email Address",
+		DbField:     "Var2",
+	}},
+}}
 
-// DEFINE YOUR NOTIFICATION HERE.
 func init() {
 	err := notifier.AddNotifier(emailer)
 	if err != nil {
@@ -87,23 +84,26 @@ func init() {
 	}
 }
 
-func (u *Email) Test() error {
-	utils.Log(1, "Emailer notifier loaded")
-	if u.Enabled {
-		email := &EmailOutgoing{
-			To:       emailer.Var2,
-			Subject:  "Test Email",
-			Template: "message.html",
-			Data:     nil,
-			From:     emailer.Var1,
-		}
-		SendEmail(emailBox, email)
-	}
+func (u *Email) Send(msg interface{}) error {
+	//email := msg.(*EmailOutgoing)
+	//err := u.dialSend(email)
+	//if err != nil {
+	//	utils.Log(3, fmt.Sprintf("Email Notifier could not send email: %v", err))
+	//	return err
+	//}
 	return nil
 }
 
-type emailMessage struct {
-	Service *types.Service
+func (u *Email) Test() error {
+	email := &EmailOutgoing{
+		To:       emailer.GetValue("var2"),
+		Subject:  "Test Email",
+		Template: MESSAGE,
+		Data:     nil,
+		From:     emailer.GetValue("var1"),
+	}
+	u.AddQueue(email)
+	return nil
 }
 
 type EmailOutgoing struct {
@@ -116,55 +116,25 @@ type EmailOutgoing struct {
 	Sent     bool
 }
 
-// AFTER NOTIFIER LOADS, IF ENABLED, START A QUEUE PROCESS
-func (u *Email) Run() error {
-	var sentAddresses []string
-	for _, email := range emailQueue {
-		if inArray(sentAddresses, email.To) || email.Sent {
-			emailQueue = removeEmail(emailQueue, email)
-			continue
-		}
-		if u.CanSend() {
-			err := u.dialSend(email)
-			if err == nil {
-				email.Sent = true
-				sentAddresses = append(sentAddresses, email.To)
-				utils.Log(1, fmt.Sprintf("Email '%v' sent to: %v using the %v template (size: %v)", email.Subject, email.To, email.Template, len([]byte(email.Source))))
-				emailQueue = removeEmail(emailQueue, email)
-				u.Log(fmt.Sprintf("Subject: %v to %v", email.Subject, email.To))
-			} else {
-				utils.Log(3, fmt.Sprintf("Email Notifier could not send email: %v", err))
-			}
-		}
-	}
-	time.Sleep(60 * time.Second)
-	if u.Enabled {
-		return u.Run()
-	}
-	return nil
-}
-
 // ON SERVICE FAILURE, DO YOUR OWN FUNCTIONS
 func (u *Email) OnFailure(s *types.Service, f *types.Failure) {
-	if u.Enabled {
-		msg := emailMessage{
-			Service: s,
-		}
-		email := &EmailOutgoing{
-			To:       emailer.Var2,
-			Subject:  fmt.Sprintf("Service %v is Failing", s.Name),
-			Template: "failure.html",
-			Data:     msg,
-			From:     emailer.Var1,
-		}
-		SendEmail(emailBox, email)
-
+	email := &EmailOutgoing{
+		To:       emailer.GetValue("var2"),
+		Subject:  fmt.Sprintf("Service %v is Failing", s.Name),
+		Template: FAILURE,
+		Data:     interface{}(s),
+		From:     emailer.GetValue("var1"),
 	}
+	u.AddQueue(email)
 }
 
 // ON SERVICE SUCCESS, DO YOUR OWN FUNCTIONS
 func (u *Email) OnSuccess(s *types.Service) {
 
+}
+
+func (u *Email) Select() *notifier.Notification {
+	return u.Notification
 }
 
 // ON SAVE OR UPDATE OF THE NOTIFIER FORM
@@ -187,19 +157,14 @@ func (u *Email) dialSend(email *EmailOutgoing) error {
 	return nil
 }
 
-func SendEmail(box *rice.Box, email *EmailOutgoing) {
-	source := EmailTemplate(box, email.Template, email.Data)
+func SendEmail(email *EmailOutgoing) {
+	source := EmailTemplate(email.Template, email.Data)
 	email.Source = source
-	emailQueue = append(emailQueue, email)
 }
 
-func EmailTemplate(box *rice.Box, tmpl string, data interface{}) string {
-	emailTpl, err := box.String(tmpl)
-	if err != nil {
-		utils.Log(3, err)
-	}
+func EmailTemplate(contents string, data interface{}) string {
 	t := template.New("email")
-	t, err = t.Parse(emailTpl)
+	t, err := t.Parse(contents)
 	if err != nil {
 		utils.Log(3, err)
 	}
@@ -209,23 +174,4 @@ func EmailTemplate(box *rice.Box, tmpl string, data interface{}) string {
 	}
 	result := tpl.String()
 	return result
-}
-
-func removeEmail(emails []*EmailOutgoing, em *EmailOutgoing) []*EmailOutgoing {
-	var newArr []*EmailOutgoing
-	for _, e := range emails {
-		if e != em {
-			newArr = append(newArr, e)
-		}
-	}
-	return newArr
-}
-
-func inArray(a []string, v string) bool {
-	for _, i := range a {
-		if i == v {
-			return true
-		}
-	}
-	return false
 }

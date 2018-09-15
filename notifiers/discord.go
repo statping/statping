@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
 	"net/http"
+	"time"
 )
 
 const (
@@ -34,8 +34,13 @@ type Discord struct {
 }
 
 var discorder = &Discord{&notifier.Notification{
-	Method: DISCORD_METHOD,
-	Host:   "https://discordapp.com/api/webhooks/****/*****",
+	Method:      DISCORD_METHOD,
+	Title:       "Discord",
+	Description: "Send notifications to your discord channel using discord webhooks. Insert your Discord channel webhook URL to receive notifications. Based on the <a href=\"https://discordapp.com/developers/docs/resources/webhook\">Discord Webhook API</a>.",
+	Author:      "Hunter Long",
+	AuthorUrl:   "https://github.com/hunterlong",
+	Delay:       time.Duration(5 * time.Second),
+	Host:        "https://discordapp.com/api/webhooks/****/*****",
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
 		Title:       "Discord Webhook URL",
@@ -52,39 +57,32 @@ func init() {
 	}
 }
 
-func (u *Discord) Test() error {
-	utils.Log(1, "Discord notifier loaded")
-	discordPost([]byte(DISCORD_TEST))
-	return nil
-}
-
-// Discord won't be using the Run() process
-func (u *Discord) Run() error {
-	return nil
-}
-
-// Discord won't be using the Run() process
-func (u *Discord) Select() *notifier.Notification {
-	return u.Notification
-}
-
-// discordPost sends an HTTP POST to the webhook URL
-func discordPost(msg []byte) {
-	req, _ := http.NewRequest("POST", discorder.GetValue("host"), bytes.NewBuffer(msg))
+func (u *Discord) Send(msg interface{}) error {
+	message := msg.([]byte)
+	fmt.Println("sending: ", message)
+	req, _ := http.NewRequest("POST", discorder.GetValue("host"), bytes.NewBuffer(message))
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("issue sending Discord message to channel: %v", err))
-		return
+		return err
 	}
-	defer resp.Body.Close()
-	discorder.Log(string(msg))
+	return resp.Body.Close()
+}
+
+func (u *Discord) Test() error {
+	u.AddQueue([]byte(DISCORD_TEST))
+	return nil
+}
+
+func (u *Discord) Select() *notifier.Notification {
+	return u.Notification
 }
 
 func (u *Discord) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf(`{"content": "Your service '%v' is currently failing! Reason: %v"}`, s.Name, f.Issue)
-	discordPost([]byte(msg))
+	fmt.Println(msg)
+	u.AddQueue(msg)
 }
 
 func (u *Discord) OnSuccess(s *types.Service) {
@@ -93,6 +91,6 @@ func (u *Discord) OnSuccess(s *types.Service) {
 
 func (u *Discord) OnSave() error {
 	msg := fmt.Sprintf(`{"content": "The Discord notifier on Statup was just updated."}`)
-	discordPost([]byte(msg))
+	u.AddQueue(msg)
 	return nil
 }

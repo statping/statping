@@ -18,6 +18,7 @@ package handlers
 import (
 	"fmt"
 	"github.com/hunterlong/statup/core"
+	_ "github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"github.com/stretchr/testify/assert"
@@ -494,12 +495,11 @@ func TestPrometheusHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "statup_total_services 11")
+	assert.Contains(t, body, "statup_total_services 6")
 	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestSaveNotificationHandler(t *testing.T) {
-	t.SkipNow()
 	form := url.Values{}
 	form.Add("enable", "on")
 	form.Add("host", "smtp.emailer.com")
@@ -511,17 +511,16 @@ func TestSaveNotificationHandler(t *testing.T) {
 	form.Add("api_key", "")
 	form.Add("api_secret", "")
 	form.Add("limits", "7")
-	req, err := http.NewRequest("POST", "/settings/notifier/1", strings.NewReader(form.Encode()))
+	req, err := http.NewRequest("POST", "/settings/notifier/email", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
-	assert.Equal(t, 200, rr.Code)
+	assert.Equal(t, 303, rr.Code)
 	assert.True(t, isRouteAuthenticated(req))
 }
 
 func TestViewNotificationSettingsHandler(t *testing.T) {
-	t.SkipNow()
 	req, err := http.NewRequest("GET", "/settings", nil)
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()

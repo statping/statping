@@ -61,14 +61,12 @@ func loadDatabase() {
 func createDatabase() {
 	core.Configs.DropDatabase()
 	core.Configs.CreateDatabase()
-	core.InitApp()
 }
 
 func resetDatabase() {
 	core.Configs.DropDatabase()
 	core.Configs.CreateDatabase()
-	core.Configs.SeedDatabase()
-	core.InitApp()
+	core.InsertLargeSampleData()
 }
 
 func Clean() {
@@ -91,7 +89,6 @@ func formatJSON(res string, out interface{}) {
 }
 
 func TestApiIndexHandler(t *testing.T) {
-
 	rr, err := httpRequestAPI(t, "GET", "/api", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
@@ -99,12 +96,11 @@ func TestApiIndexHandler(t *testing.T) {
 	var obj types.Core
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
-	assert.Equal(t, "Awesome Status", obj.Name)
+	assert.Equal(t, "Statup Sample Data", obj.Name)
 	assert.Equal(t, "sqlite", obj.DbConnection)
 }
 
 func TestApiAllServicesHandlerHandler(t *testing.T) {
-
 	rr, err := httpRequestAPI(t, "GET", "/api/services", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
@@ -117,11 +113,9 @@ func TestApiAllServicesHandlerHandler(t *testing.T) {
 }
 
 func TestApiServiceHandler(t *testing.T) {
-
 	rr, err := httpRequestAPI(t, "GET", "/api/services/1", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
-	t.Log(body)
 	var obj types.Service
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
@@ -129,8 +123,17 @@ func TestApiServiceHandler(t *testing.T) {
 	assert.Equal(t, "https://google.com", obj.Domain)
 }
 
-func TestApiCreateServiceHandler(t *testing.T) {
+func TestApiServiceDataHandler(t *testing.T) {
+	rr, err := httpRequestAPI(t, "GET", "/api/services/1/data", nil)
+	assert.Nil(t, err)
+	body := rr.Body.String()
+	var obj []*core.DateScan
+	formatJSON(body, &obj)
+	assert.Equal(t, 200, rr.Code)
+	assert.Equal(t, 60, len(obj))
+}
 
+func TestApiCreateServiceHandler(t *testing.T) {
 	rr, err := httpRequestAPI(t, "POST", "/api/services", strings.NewReader(NEW_HTTP_SERVICE))
 	assert.Nil(t, err)
 	body := rr.Body.String()
@@ -189,7 +192,7 @@ func TestApiAllUsersHandler(t *testing.T) {
 	var obj []types.User
 	formatJSON(body, &obj)
 	assert.Equal(t, true, obj[0].Admin)
-	assert.Equal(t, "admin", obj[0].Username)
+	assert.Equal(t, "testadmin", obj[0].Username)
 }
 
 func TestApiCreateUserHandler(t *testing.T) {
@@ -215,7 +218,7 @@ func TestApiViewUserHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	var obj types.User
 	formatJSON(body, &obj)
-	assert.Equal(t, "admin2", obj.Username)
+	assert.Equal(t, "testadmin2", obj.Username)
 	assert.Equal(t, true, obj.Admin)
 }
 

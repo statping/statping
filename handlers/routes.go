@@ -84,6 +84,7 @@ func Router() *mux.Router {
 	r.Handle("/api/services", http.HandlerFunc(ApiAllServicesHandler)).Methods("GET")
 	r.Handle("/api/services", http.HandlerFunc(ApiCreateServiceHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(ApiServiceHandler)).Methods("GET")
+	r.Handle("/api/services/{id}/data", http.HandlerFunc(ApiServiceDataHandler)).Methods("GET")
 	r.Handle("/api/services/{id}", http.HandlerFunc(ApiServiceUpdateHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(ApiServiceDeleteHandler)).Methods("DELETE")
 

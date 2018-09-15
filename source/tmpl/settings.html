@@ -135,11 +135,14 @@
             {{ range .Notifications }}
             {{$n := .Select}}
             <div class="tab-pane" id="v-pills-{{underscore $n.Method}}" role="tabpanel" aria-labelledby="v-pills-{{underscore $n.Method }}-tab">
+                {{if $n.Title}}<h4>{{$n.Title}}</h4>{{end}}
+                {{if $n.Description}}<p class="text-muted">{{safe $n.Description}}</p>{{end}}
                 <form method="POST" action="/settings/notifier/{{ $n.Method }}">
                     {{range .Form}}
                         <div class="form-group">
                             <label class="text-capitalize" for="{{underscore .Title}}">{{.Title}}</label>
                             <input type="{{.Type}}" name="{{underscore .DbField}}" class="form-control" value="{{ $n.GetValue .DbField }}" id="{{underscore .Title}}" placeholder="{{.Placeholder}}">
+                            {{if .SmallText}}<small class="form-text text-muted">{{safe .SmallText}}</small>{{end}}
                         </div>
                     {{end}}
 
@@ -160,10 +163,15 @@
                         </div>
                     </div>
 
+                        {{if $n.Author}}
+                        <span class="d-block small text-center">
+                            {{$n.Title}} Notifier created by <a href="{{$n.AuthorUrl}}" target="_blank">{{$n.Author}}</a>
+                        </span>
+                        {{ end }}
                 </form>
 
                 {{ if $n.Logs }}
-                Sent {{$n.SentLastHour}} out of {{$n.LimitValue}} in the last hour<br>
+                Sent {{$n.SentLastHour}} out of {{$n.Limit}} in the last hour<br>
                     {{ range $n.Logs }}
                         <div class="card mt-1">
                             <div class="card-body">

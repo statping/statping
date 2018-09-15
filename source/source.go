@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"github.com/GeertJohan/go.rice"
 	"github.com/hunterlong/statup/utils"
+	"gopkg.in/russross/blackfriday.v2"
 	"io"
 	"io/ioutil"
 	"os"
@@ -39,6 +40,16 @@ func Assets() {
 	ScssBox = rice.MustFindBox("scss")
 	JsBox = rice.MustFindBox("js")
 	TmplBox = rice.MustFindBox("tmpl")
+}
+
+func HelpMarkdown() string {
+	helpSrc, err := TmplBox.Bytes("help.md")
+	if err != nil {
+		utils.Log(4, err)
+		return "error generating markdown"
+	}
+	output := blackfriday.Run(helpSrc)
+	return string(output)
 }
 
 // CompileSASS will attempt to compile the SASS files into CSS

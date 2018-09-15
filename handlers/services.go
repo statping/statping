@@ -114,7 +114,7 @@ func CreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 		Timeout:        timeout,
 		Order:          order,
 	})
-	_, err := service.Create()
+	_, err := service.Create(true)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Error starting %v check routine. %v", service.Name, err))
 	}

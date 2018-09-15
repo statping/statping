@@ -86,7 +86,7 @@ func TestMigrateDatabase(t *testing.T) {
 }
 
 func TestSeedDatabase(t *testing.T) {
-	_, _, err := Configs.SeedDatabase()
+	err := InsertLargeSampleData()
 	assert.Nil(t, err)
 }
 
@@ -99,7 +99,7 @@ func TestReLoadDbConfig(t *testing.T) {
 func TestSelectCore(t *testing.T) {
 	core, err := SelectCore()
 	assert.Nil(t, err)
-	assert.Equal(t, "Awesome Status", core.Name)
+	assert.Equal(t, "Statup Sample Data", core.Name)
 }
 
 func TestInsertNotifierDB(t *testing.T) {

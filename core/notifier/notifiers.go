@@ -16,6 +16,7 @@
 package notifier
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/hunterlong/statup/types"
@@ -32,24 +33,29 @@ var (
 )
 
 type Notification struct {
-	Id        int64              `gorm:"primary_key;column:id" json:"id"`
-	Method    string             `gorm:"column:method" json:"method"`
-	Host      string             `gorm:"not null;column:host" json:"-"`
-	Port      int                `gorm:"not null;column:port" json:"-"`
-	Username  string             `gorm:"not null;column:username" json:"-"`
-	Password  string             `gorm:"not null;column:password" json:"-"`
-	Var1      string             `gorm:"not null;column:var1" json:"-"`
-	Var2      string             `gorm:"not null;column:var2" json:"-"`
-	ApiKey    string             `gorm:"not null;column:api_key" json:"-"`
-	ApiSecret string             `gorm:"not null;column:api_secret" json:"-"`
-	Enabled   bool               `gorm:"column:enabled;type:boolean;default:false" json:"enabled"`
-	Limits    int                `gorm:"not null;column:limits" json:"-"`
-	Removable bool               `gorm:"column:removable" json:"-"`
-	CreatedAt time.Time          `gorm:"column:created_at" json:"created_at"`
-	UpdatedAt time.Time          `gorm:"column:updated_at" json:"updated_at"`
-	Form      []NotificationForm `gorm:"-" json:"-"`
-	Routine   chan struct{}      `gorm:"-" json:"-"`
-	logs      []*NotificationLog `gorm:"-" json:"-"`
+	Id          int64              `gorm:"primary_key;column:id" json:"id"`
+	Method      string             `gorm:"column:method" json:"method"`
+	Host        string             `gorm:"not null;column:host" json:"-"`
+	Port        int                `gorm:"not null;column:port" json:"-"`
+	Username    string             `gorm:"not null;column:username" json:"-"`
+	Password    string             `gorm:"not null;column:password" json:"-"`
+	Var1        string             `gorm:"not null;column:var1" json:"-"`
+	Var2        string             `gorm:"not null;column:var2" json:"-"`
+	ApiKey      string             `gorm:"not null;column:api_key" json:"-"`
+	ApiSecret   string             `gorm:"not null;column:api_secret" json:"-"`
+	Enabled     bool               `gorm:"column:enabled;type:boolean;default:false" json:"enabled"`
+	Limits      int                `gorm:"not null;column:limits" json:"-"`
+	Removable   bool               `gorm:"column:removable" json:"-"`
+	CreatedAt   time.Time          `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt   time.Time          `gorm:"column:updated_at" json:"updated_at"`
+	Form        []NotificationForm `gorm:"-" json:"-"`
+	logs        []*NotificationLog `gorm:"-" json:"-"`
+	Title       string             `gorm:"-" json:"-"`
+	Description string             `gorm:"-" json:"-"`
+	Author      string             `gorm:"-" json:"-"`
+	AuthorUrl   string             `gorm:"-" json:"-"`
+	Delay       time.Duration      `gorm:"-" json:"-"`
+	Queue       []interface{}      `gorm:"-" json:"-"`
 }
 
 type NotificationForm struct {
@@ -57,6 +63,7 @@ type NotificationForm struct {
 	Title       string
 	Placeholder string
 	DbField     string
+	SmallText   string
 }
 
 type NotificationLog struct {
@@ -65,9 +72,17 @@ type NotificationLog struct {
 	Timestamp time.Time
 }
 
+func (n *Notification) AddQueue(msg interface{}) {
+	n.Queue = append(n.Queue, msg)
+}
+
 // db will return the notifier database column/record
-func (n *Notification) db() *gorm.DB {
+func modelDb(n *Notification) *gorm.DB {
 	return db.Model(&Notification{}).Where("method = ?", n.Method).Find(n)
+}
+
+func toNotification(n Notifier) *Notification {
+	return n.Select()
 }
 
 // SetDB is called by core to inject the database for a notifier to use
@@ -75,14 +90,22 @@ func SetDB(d *gorm.DB) {
 	db = d
 }
 
+func asNotifier(n interface{}) Notifier {
+	return n.(Notifier)
+}
+
+func asNotification(n interface{}) *Notification {
+	return n.(Notifier).Select()
+}
+
 // AddNotifier accept a Notifier interface to be added into the array
-func AddNotifier(c Notifier) error {
-	if notifier, ok := c.(Notifier); ok {
-		err := checkNotifierForm(notifier)
+func AddNotifier(n interface{}) error {
+	if isType(n, new(Notifier)) {
+		err := checkNotifierForm(asNotifier(n))
 		if err != nil {
 			return err
 		}
-		AllCommunications = append(AllCommunications, notifier)
+		AllCommunications = append(AllCommunications, n)
 	} else {
 		return errors.New("notifier does not have the required methods")
 	}
@@ -96,19 +119,46 @@ func Load() []types.AllNotifiers {
 		n := comm.(Notifier)
 		Init(n)
 		notifiers = append(notifiers, n)
-		//n.Test()
 	}
+	startAllNotifiers()
 	return notifiers
 }
 
-func (n *Notification) Select() *Notification {
-	return n
+func normalizeType(ty interface{}) string {
+	switch v := ty.(type) {
+	case int, int32, int64:
+		return fmt.Sprintf("%v", v)
+	case float32, float64:
+		return fmt.Sprintf("%v", v)
+	case string:
+		return v
+	case []byte:
+		return string(v)
+	case []string:
+		return fmt.Sprintf("%v", v)
+	case interface{}, map[string]interface{}:
+		j, _ := json.Marshal(v)
+		return string(j)
+	default:
+		return fmt.Sprintf("%v", v)
+	}
+}
+
+func (n *Notification) removeQueue(msg interface{}) interface{} {
+	var newArr []interface{}
+	for _, q := range n.Queue {
+		if q != msg {
+			newArr = append(newArr, q)
+		}
+	}
+	n.Queue = newArr
+	return newArr
 }
 
 // Log will record a new notification into memory and will show the logs on the settings page
-func (n *Notification) Log(msg string) {
+func (n *Notification) Log(msg interface{}) {
 	log := &NotificationLog{
-		Message:   msg,
+		Message:   normalizeType(msg),
 		Time:      utils.Timestamp(time.Now()),
 		Timestamp: time.Now(),
 	}
@@ -129,21 +179,21 @@ func reverseLogs(input []*NotificationLog) []*NotificationLog {
 }
 
 // isInDatabase returns true if the notifier has already been installed
-func (n *Notification) isInDatabase() bool {
-	inDb := n.db().RecordNotFound()
+func isInDatabase(n *Notification) bool {
+	inDb := modelDb(n).RecordNotFound()
 	return !inDb
 }
 
 // SelectNotification returns the Notification struct from the database
-func SelectNotification(method string) (*Notification, error) {
-	var notifier Notification
-	err := db.Model(&Notification{}).Where("method = ?", method).Scan(&notifier)
-	return &notifier, err.Error
+func SelectNotification(n Notifier) (*Notification, error) {
+	notifier := n.Select()
+	err := db.Model(&Notification{}).Where("method = ?", notifier.Method).Scan(&notifier)
+	return notifier, err.Error
 }
 
 // Update will update the notification into the database
 func (n *Notification) Update() (*Notification, error) {
-	err := n.db().Update(n)
+	err := db.Model(&Notification{}).Update(n)
 	return n, err.Error
 }
 
@@ -172,30 +222,62 @@ func SelectNotifier(method string) (*Notification, error) {
 	return nil, nil
 }
 
-// CanSend will return true if notifier has not passed its Limits within the last hour
-func (f *Notification) CanSend() bool {
-	if f.SentLastHour() >= f.Limits {
-		return false
-	}
-	return true
-}
-
 // Init accepts the Notifier interface to initialize the notifier
 func Init(n Notifier) (*Notification, error) {
 	err := install(n)
 	var notify *Notification
 	if err == nil {
-		notify, _ = SelectNotification(n.Select().Method)
-		notify.Form = n.Select().Form
+		notify, _ = SelectNotification(n)
+		notify.Form = toNotification(n).Form
 	}
 	return notify, err
 }
 
+func startAllNotifiers() {
+	for _, comm := range AllCommunications {
+		if isType(comm, new(Notifier)) {
+			if toNotification(comm.(Notifier)).Enabled {
+				go runQue(comm.(Notifier))
+			}
+		}
+	}
+}
+
+func runQue(n Notifier) {
+	for {
+		notification := n.Select()
+		if len(notification.Queue) > 0 {
+			for _, msg := range notification.Queue {
+				if notification.WithinLimits() {
+					err := n.Send(msg)
+					if err != nil {
+						utils.Log(2, fmt.Sprintf("notifier %v had an error: %v", notification.Method, err))
+					}
+					notification.Log(msg)
+				}
+			}
+		}
+		time.Sleep(notification.Delay)
+	}
+}
+
+func RunQue(n Notifier) error {
+	notifier := n.Select()
+	if len(notifier.Queue) == 0 {
+		return nil
+	}
+	queMsg := notifier.Queue[0]
+	err := n.Send(queMsg)
+	notifier.Log(queMsg)
+	notifier.Queue = notifier.Queue[1:]
+	return err
+}
+
 // install will check the database for the notification, if its not inserted it will insert a new record for it
 func install(n Notifier) error {
-	inDb := n.Select().isInDatabase()
+	inDb := isInDatabase(n.Select())
 	if !inDb {
-		_, err := insertDatabase(n.Select())
+		_, err := insertDatabase(toNotification(n))
 		if err != nil {
 			utils.Log(3, err)
 			return err
@@ -228,8 +310,8 @@ func (f *Notification) SentLastHour() int {
 }
 
 // Limit returns the limits on how many notifications can be sent in 1 hour
-func (f *Notification) Limit() int64 {
-	return utils.StringInt(f.GetValue("limits"))
+func (f *Notification) Limit() int {
+	return f.Limits
 }
 
 // GetValue returns the database value of a accept DbField value.
@@ -262,33 +344,31 @@ func (n *Notification) GetValue(dbField string) string {
 
 // isType will return true if a variable can implement an interface
 func isType(n interface{}, obj interface{}) bool {
-	objOne := reflect.TypeOf(n)
-	obj2 := reflect.TypeOf(obj)
-	return objOne.String() == obj2.String()
+	one := reflect.TypeOf(n)
+	two := reflect.ValueOf(obj).Elem()
+	return one.Implements(two.Type())
 }
 
 // isEnabled returns true if the notifier is enabled
 func isEnabled(n interface{}) bool {
-	notify := n.(Notifier).Select()
-	return notify.Enabled
+	notifier, _ := SelectNotification(n.(Notifier))
+	return notifier.Enabled
 }
 
-func UniqueStrings(elements []string) []string {
-	result := []string{}
+func inLimits(n interface{}) bool {
+	notifier := toNotification(n.(Notifier))
+	return notifier.WithinLimits()
+}
 
-	for i := 0; i < len(elements); i++ {
-		// Scan slice for a previous element of the same value.
-		exists := false
-		for v := 0; v < i; v++ {
-			if elements[v] == elements[i] {
-				exists = true
-				break
-			}
-		}
-		// If no previous element exists, append this one.
-		if !exists {
-			result = append(result, elements[i])
-		}
+func (notify *Notification) WithinLimits() bool {
+	if notify.SentLastHour() >= notify.Limit() {
+		return false
 	}
-	return result
+	if notify.Delay.Seconds() == 0 {
+		notify.Delay = time.Duration(2 * time.Second)
+	}
+	if notify.LastSent().Seconds() >= notify.Delay.Seconds() {
+		return false
+	}
+	return true
 }

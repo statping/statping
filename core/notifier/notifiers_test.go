@@ -1,5 +1,3 @@
-// +build bypass
-
 // Statup
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
@@ -25,105 +23,222 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 var (
-	dir        string
-	EXAMPLE_ID = "example"
+	dir    string
+	METHOD = "example"
 )
+
+var service = &types.Service{
+	Name:           "Interpol - All The Rage Back Home",
+	Domain:         "https://www.youtube.com/watch?v=-u6DvRyyKGU",
+	ExpectedStatus: 200,
+	Interval:       30,
+	Type:           "http",
+	Method:         "GET",
+	Timeout:        20,
+}
+
+var failure = &types.Failure{
+	Issue: "testing",
+}
+
+var user = &types.User{
+	Username: "admin",
+	Email:    "info@email.com",
+}
+
+var core = &types.Core{
+	Name: "testing notifiers",
+}
 
 func init() {
 	dir = utils.Directory
-}
-
-func injectDatabase() {
-	db, _ = gorm.Open("sqlite3", dir+"/statup.db")
-}
-
-func TestLoad(t *testing.T) {
 	source.Assets()
 	utils.InitLogs()
 	injectDatabase()
-	AllCommunications = Load()
-	assert.Len(t, AllCommunications, 1)
+}
+
+func injectDatabase() {
+	utils.DeleteFile(dir + "/statup.db")
+	db, _ = gorm.Open("sqlite3", dir+"/statup.db")
+	db.CreateTable(&Notification{})
+}
+
+func TestIsBasicType(t *testing.T) {
+	assert.True(t, isType(example, new(Notifier)))
+	assert.True(t, isType(example, new(BasicEvents)))
+	assert.True(t, isType(example, new(ServiceEvents)))
+	assert.True(t, isType(example, new(UserEvents)))
+	assert.True(t, isType(example, new(CoreEvents)))
+	assert.True(t, isType(example, new(NotifierEvents)))
+}
+
+func TestLoad(t *testing.T) {
+	notifiers := Load()
+	assert.Equal(t, 1, len(notifiers))
 }
 
 func TestIsInDatabase(t *testing.T) {
-	in := example.isInDatabase()
-	assert.True(t, in)
-}
-
-func TestInsertDatabase(t *testing.T) {
-	_, err := insertDatabase(example.Notification)
-	assert.Nil(t, err)
-	assert.NotZero(t, example.Id)
-
-	in := example.isInDatabase()
+	in := isInDatabase(example.Notification)
 	assert.True(t, in)
 }
 
 func TestSelectNotification(t *testing.T) {
-	notifier, err := SelectNotification(EXAMPLE_ID)
+	notifier, err := SelectNotification(example)
 	assert.Nil(t, err)
 	assert.Equal(t, "example", notifier.Method)
 	assert.False(t, notifier.Enabled)
 }
 
+func TestAddQueue(t *testing.T) {
+	msg := "this is a test in the queue!"
+	example.AddQueue(msg)
+	assert.Equal(t, 1, len(example.Queue))
+	example.AddQueue(msg)
+	assert.Equal(t, 2, len(example.Queue))
+	example.AddQueue(msg)
+	assert.Equal(t, 3, len(example.Queue))
+	example.AddQueue(msg)
+	assert.Equal(t, 4, len(example.Queue))
+	example.AddQueue(msg)
+	assert.Equal(t, 5, len(example.Queue))
+}
+
 func TestNotification_Update(t *testing.T) {
-	notifier, err := SelectNotification(EXAMPLE_ID)
+	notifier, err := SelectNotification(example)
 	assert.Nil(t, err)
-	notifier.Host = "new host here"
+	notifier.Host = "http://demo.statup.io/api"
+	notifier.Port = 9090
+	notifier.Username = "admin"
+	notifier.Password = "password123"
+	notifier.Var1 = "var1_is_here"
+	notifier.Var2 = "var2_is_here"
+	notifier.ApiKey = "USBdu82HDiiuw9327yGYDGw"
+	notifier.ApiSecret = "PQopncow929hUIDHGwiud"
+	notifier.Limits = 15
+	_, err = notifier.Update()
+	assert.Nil(t, err)
+
+	selected, err := SelectNotification(example)
+	assert.Nil(t, err)
+	assert.Equal(t, "http://demo.statup.io/api", selected.GetValue("host"))
+	assert.Equal(t, "http://demo.statup.io/api", example.Notification.Host)
+	assert.Equal(t, "http://demo.statup.io/api", example.Host)
+	assert.Equal(t, "USBdu82HDiiuw9327yGYDGw", selected.GetValue("api_key"))
+	assert.Equal(t, "USBdu82HDiiuw9327yGYDGw", example.ApiKey)
+	assert.False(t, selected.Enabled)
+}
+
+func TestEnableNotification(t *testing.T) {
+	notifier, err := SelectNotification(example)
 	notifier.Enabled = true
 	updated, err := notifier.Update()
 	assert.Nil(t, err)
-	selected, err := SelectNotification(updated.Method)
+	assert.True(t, updated.Enabled)
+}
+
+func TestIsEnabled(t *testing.T) {
+	assert.True(t, isEnabled(example))
+}
+
+func TestLastSent(t *testing.T) {
+	notifier, err := SelectNotification(example)
 	assert.Nil(t, err)
-	assert.Equal(t, "new host here", selected.GetValue("host"))
-	assert.True(t, selected.Enabled)
+	assert.Equal(t, "0s", notifier.LastSent().String())
+}
+
+func TestWithinLimits(t *testing.T) {
+	notifier, err := SelectNotification(example)
+	assert.Nil(t, err)
+	assert.Equal(t, 15, notifier.Limit())
+	assert.Equal(t, 15, notifier.Limits)
+	assert.True(t, inLimits(example))
 }
 
 func TestNotification_GetValue(t *testing.T) {
-	notifier, err := SelectNotification(EXAMPLE_ID)
+	notifier, err := SelectNotification(example)
 	assert.Nil(t, err)
 	val := notifier.GetValue("Host")
-	assert.Equal(t, "http://exmaplehost.com", val)
+	assert.Equal(t, "http://demo.statup.io/api", val)
 }
 
-//func TestRun(t *testing.T) {
-//	err := example.Run()
-//	assert.Equal(t, "running", err.Error())
-//}
+func TestRunQue(t *testing.T) {
+	assert.Nil(t, RunQue(example))
+	assert.Equal(t, 4, len(example.Queue))
+	assert.Nil(t, RunQue(example))
+	assert.Equal(t, 3, len(example.Queue))
+	assert.Nil(t, RunQue(example))
+	assert.Equal(t, 2, len(example.Queue))
 
-//func TestTestIt(t *testing.T) {
-//	err := example.Test()
-//	assert.Equal(t, "testing", err.Error())
-//}
+	time.Sleep(2 * time.Second)
+	assert.True(t, example.LastSent().Seconds() >= float64(2))
+
+	assert.Nil(t, RunQue(example))
+	assert.Equal(t, 1, len(example.Queue))
+	assert.Nil(t, RunQue(example))
+	assert.Equal(t, 0, len(example.Queue))
+	assert.Nil(t, RunQue(example))
+	assert.Equal(t, 0, len(example.Queue))
+}
+
+func TestOnSave(t *testing.T) {
+	err := example.OnSave()
+	assert.Equal(t, "onsave triggered", err.Error())
+}
 
 func TestOnSuccess(t *testing.T) {
-	s := &types.Service{
-		Name:           "Interpol - All The Rage Back Home",
-		Domain:         "https://www.youtube.com/watch?v=-u6DvRyyKGU",
-		ExpectedStatus: 200,
-		Interval:       30,
-		Type:           "http",
-		Method:         "GET",
-		Timeout:        20,
-	}
-	OnSuccess(s)
+	OnSuccess(service)
+	assert.Equal(t, 2, len(example.Queue))
 }
 
 func TestOnFailure(t *testing.T) {
-	s := &types.Service{
-		Name:           "Interpol - All The Rage Back Home",
-		Domain:         "https://www.youtube.com/watch?v=-u6DvRyyKGU",
-		ExpectedStatus: 200,
-		Interval:       30,
-		Type:           "http",
-		Method:         "GET",
-		Timeout:        20,
-	}
-	f := &types.Failure{
-		Issue: "testing",
-	}
-	OnFailure(s, f)
+	OnFailure(service, failure)
+	assert.Equal(t, 3, len(example.Queue))
+}
+
+func TestOnNewService(t *testing.T) {
+	OnNewService(service)
+	assert.Equal(t, 4, len(example.Queue))
+}
+
+func TestOnUpdatedService(t *testing.T) {
+	OnUpdatedService(service)
+	assert.Equal(t, 5, len(example.Queue))
+}
+
+func TestOnDeletedService(t *testing.T) {
+	OnDeletedService(service)
+	assert.Equal(t, 6, len(example.Queue))
+}
+
+func TestOnNewUser(t *testing.T) {
+	OnNewUser(user)
+	assert.Equal(t, 7, len(example.Queue))
+}
+
+func TestOnUpdatedUser(t *testing.T) {
+	OnUpdatedUser(user)
+	assert.Equal(t, 8, len(example.Queue))
+}
+
+func TestOnDeletedUser(t *testing.T) {
+	OnDeletedUser(user)
+	assert.Equal(t, 9, len(example.Queue))
+}
+
+func TestOnUpdatedCore(t *testing.T) {
+	OnUpdatedCore(core)
+	assert.Equal(t, 10, len(example.Queue))
+}
+
+func TestOnUpdatedNotifier(t *testing.T) {
+	OnUpdatedNotifier(example.Select())
+	assert.Equal(t, 11, len(example.Queue))
+}
+
+func TestRunAllQueue(t *testing.T) {
+	//runQue(example)
 }

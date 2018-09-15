@@ -19,10 +19,10 @@ import "github.com/hunterlong/statup/types"
 
 // Notifier interface is required to create a new Notifier
 type Notifier interface {
-	Run() error            // Run will trigger inside of the notifier when enabled
-	OnSave() error         // OnSave is triggered when the notifier is saved
-	Test() error           // Test will run a function inside the notifier to Test if it works
-	Select() *Notification // Select returns the *Notification for a notifier
+	OnSave() error          // OnSave is triggered when the notifier is saved
+	Send(interface{}) error // OnSave is triggered when the notifier is saved
+	Test() error            // Test will run a function inside the notifier to Test if it works
+	Select() *Notification  // Select returns the *Notification for a notifier
 }
 
 // BasicEvents includes the most minimal events, failing and successful service triggers

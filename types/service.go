@@ -53,7 +53,7 @@ type ServiceInterface interface {
 	Select() *Service
 	CheckQueue(bool)
 	Check(bool)
-	Create() (int64, error)
+	Create(bool) (int64, error)
 	Update(bool) error
 	Delete() error
 }

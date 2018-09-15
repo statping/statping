@@ -139,7 +139,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	admin.Create()
 
 	if sample == "on" {
-		core.LoadSampleData()
+		core.InsertSampleData()
 	}
 
 	core.InitApp()

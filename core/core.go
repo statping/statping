@@ -17,7 +17,6 @@ package core
 
 import (
 	"github.com/hunterlong/statup/core/notifier"
-	_ "github.com/hunterlong/statup/notifiers"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -60,7 +59,7 @@ func InitApp() {
 	SelectCore()
 	insertNotifierDB()
 	CoreApp.SelectAllServices()
-	CheckServices()
+	checkServices()
 	CoreApp.Notifications = notifier.Load()
 	go DatabaseMaintence()
 }

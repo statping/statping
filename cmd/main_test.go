@@ -56,7 +56,6 @@ func RunInit(t *testing.T) {
 	source.Assets()
 	Clean()
 	route = handlers.Router()
-	LoadDotEnvs()
 	core.CoreApp = core.NewCore()
 }
 
@@ -111,7 +110,6 @@ func TestRunAll(t *testing.T) {
 			RunSelectAllMysqlServices(t)
 		})
 		t.Run(dbt+" Select Comms", func(t *testing.T) {
-			t.SkipNow()
 			RunSelectAllNotifiers(t)
 		})
 		t.Run(dbt+" Create Users", func(t *testing.T) {
@@ -256,8 +254,8 @@ func RunDatabaseMigrations(t *testing.T, db string) {
 }
 
 func RunInsertSampleData(t *testing.T) {
-	core.Configs.SeedDatabase()
-	//assert.Nil(t, err)
+	err := core.InsertLargeSampleData()
+	assert.Nil(t, err)
 }
 
 func RunLoadConfig(t *testing.T) {
@@ -281,7 +279,7 @@ func RunSelectCoreMYQL(t *testing.T, db string) {
 	}
 	assert.Nil(t, err)
 	t.Log("core: ", core.CoreApp.Core)
-	assert.Equal(t, "Awesome Status", core.CoreApp.Name)
+	assert.Equal(t, "Statup Sample Data", core.CoreApp.Name)
 	assert.Equal(t, db, core.CoreApp.DbConnection)
 	assert.NotEmpty(t, core.CoreApp.ApiKey)
 	assert.NotEmpty(t, core.CoreApp.ApiSecret)
@@ -290,24 +288,23 @@ func RunSelectCoreMYQL(t *testing.T, db string) {
 
 func RunSelectAllMysqlServices(t *testing.T) {
 	var err error
-	t.SkipNow()
 	services, err := core.CoreApp.SelectAllServices()
 	assert.Nil(t, err)
-	assert.Equal(t, 18, len(services))
+	assert.Equal(t, 15, len(services))
 }
 
 func RunSelectAllNotifiers(t *testing.T) {
 	var err error
 	notifier.SetDB(core.DbSession)
-	comms := notifier.Load()
+	core.CoreApp.Notifications = notifier.Load()
 	assert.Nil(t, err)
-	assert.Equal(t, 3, len(comms))
+	assert.Equal(t, 5, len(core.CoreApp.Notifications))
 }
 
 func RunUser_SelectAll(t *testing.T) {
 	users, err := core.SelectAllUsers()
 	assert.Nil(t, err)
-	assert.Equal(t, 3, len(users))
+	assert.Equal(t, 4, len(users))
 }
 
 func RunUser_Create(t *testing.T) {
@@ -319,7 +316,7 @@ func RunUser_Create(t *testing.T) {
 	})
 	id, err := user.Create()
 	assert.Nil(t, err)
-	assert.Equal(t, int64(2), id)
+	assert.Equal(t, int64(3), id)
 	user2 := core.ReturnUser(&types.User{
 		Username: "superadmin",
 		Password: "admin",
@@ -328,7 +325,7 @@ func RunUser_Create(t *testing.T) {
 	})
 	id, err = user2.Create()
 	assert.Nil(t, err)
-	assert.Equal(t, int64(3), id)
+	assert.Equal(t, int64(4), id)
 }
 
 func RunUser_Update(t *testing.T) {
@@ -365,7 +362,7 @@ func RunSelectAllServices(t *testing.T) {
 	var err error
 	services, err := core.CoreApp.SelectAllServices()
 	assert.Nil(t, err)
-	assert.Equal(t, 18, len(services))
+	assert.Equal(t, 15, len(services))
 	for _, s := range services {
 		assert.NotEmpty(t, s.CreatedAt)
 	}
@@ -374,7 +371,6 @@ func RunSelectAllServices(t *testing.T) {
 func RunOneService_Check(t *testing.T) {
 	service := core.SelectService(1)
 	assert.NotNil(t, service)
-	t.Log(service)
 	assert.Equal(t, "Google", service.Name)
 }
 
@@ -389,9 +385,9 @@ func RunService_Create(t *testing.T) {
 		Method:         "GET",
 		Timeout:        30,
 	})
-	id, err := service.Create()
+	id, err := service.Create(false)
 	assert.Nil(t, err)
-	assert.Equal(t, int64(19), id)
+	assert.Equal(t, int64(16), id)
 }
 
 func RunService_ToJSON(t *testing.T) {
@@ -409,20 +405,27 @@ func RunService_AvgTime(t *testing.T) {
 }
 
 func RunService_Online24(t *testing.T) {
+	var dayAgo = time.Now().Add(-24 * time.Hour).Add(-10 * time.Minute)
+
 	service := core.SelectService(1)
 	assert.NotNil(t, service)
-	online := service.OnlineSince(SERVICE_SINCE)
+	online := service.OnlineSince(dayAgo)
 	assert.NotEqual(t, float32(0), online)
 
 	service = core.SelectService(6)
 	assert.NotNil(t, service)
-	online = service.OnlineSince(SERVICE_SINCE)
-	assert.Equal(t, float32(0), online)
+	online = service.OnlineSince(dayAgo)
+	assert.Equal(t, float32(100), online)
 
-	//service = core.SelectService(18)
-	//assert.NotNil(t, service)
-	//online = service.OnlineSince(SERVICE_SINCE)
-	//assert.Equal(t, float32(0), online)
+	service = core.SelectService(13)
+	assert.NotNil(t, service)
+	online = service.OnlineSince(dayAgo)
+	assert.True(t, online > 99)
+
+	service = core.SelectService(14)
+	assert.NotNil(t, service)
+	online = service.OnlineSince(dayAgo)
+	assert.True(t, online > float32(49.00))
 }
 
 func RunService_GraphData(t *testing.T) {
@@ -446,15 +449,15 @@ func RunBadService_Create(t *testing.T) {
 		Method:         "GET",
 		Timeout:        30,
 	})
-	id, err := service.Create()
+	id, err := service.Create(false)
 	assert.Nil(t, err)
-	assert.Equal(t, int64(20), id)
+	assert.Equal(t, int64(17), id)
 }
 
 func RunBadService_Check(t *testing.T) {
-	service := core.SelectService(18)
+	service := core.SelectService(17)
 	assert.NotNil(t, service)
-	assert.Equal(t, "Failing URL", service.Name)
+	assert.Equal(t, "Bad Service", service.Name)
 	for i := 0; i <= 10; i++ {
 		service.Check(true)
 	}
@@ -474,7 +477,7 @@ func RunDeleteService(t *testing.T) {
 func RunCreateService_Hits(t *testing.T) {
 	services := core.CoreApp.Services
 	assert.NotNil(t, services)
-	assert.Equal(t, 19, len(services))
+	assert.Equal(t, 16, len(services))
 	for _, service := range services {
 		service.Check(true)
 		assert.NotNil(t, service)
@@ -490,9 +493,9 @@ func RunService_Hits(t *testing.T) {
 }
 
 func RunService_Failures(t *testing.T) {
-	service := core.SelectService(18)
+	service := core.SelectService(17)
 	assert.NotNil(t, service)
-	assert.Equal(t, "Failing URL", service.Name)
+	assert.Equal(t, "Bad Service", service.Name)
 	assert.NotEmpty(t, service.AllFailures())
 }
 
@@ -509,7 +512,7 @@ func RunIndexHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
-	assert.True(t, strings.Contains(rr.Body.String(), "Awesome"))
+	assert.True(t, strings.Contains(rr.Body.String(), "Statup"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
 }
 
@@ -529,7 +532,7 @@ func RunPrometheusHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
 	t.Log(rr.Body.String())
-	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 19"))
+	assert.True(t, strings.Contains(rr.Body.String(), "statup_total_services 16"))
 	assert.True(t, handlers.IsAuthenticated(req))
 }
 

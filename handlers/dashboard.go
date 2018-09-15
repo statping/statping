@@ -18,6 +18,7 @@ package handlers
 import (
 	"fmt"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 )
@@ -64,7 +65,8 @@ func HelpHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "help.html", nil, nil)
+	help := source.HelpMarkdown()
+	ExecuteResponse(w, r, "help.html", help, nil)
 }
 
 func LogsHandler(w http.ResponseWriter, r *http.Request) {

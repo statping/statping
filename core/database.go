@@ -232,21 +232,21 @@ func (c *DbConfig) CreateCore() *Core {
 }
 
 // SeedDatabase will insert many elements into the database. This is only ran in Dev/Test move
-func (db *DbConfig) SeedDatabase() (string, string, error) {
-	utils.Log(1, "Seeding Database with Dummy Data...")
-	dir := utils.Directory
-	var cmd string
-	switch db.DbConn {
-	case "sqlite":
-		cmd = fmt.Sprintf("cat %v/dev/sqlite_seed.sql | sqlite3 %v/statup.db", dir, dir)
-	case "mysql":
-		cmd = fmt.Sprintf("mysql -h %v -P %v -u %v --password=%v %v < %v/dev/mysql_seed.sql", Configs.DbHost, 3306, Configs.DbUser, Configs.DbPass, Configs.DbData, dir)
-	case "postgres":
-		cmd = fmt.Sprintf("PGPASSWORD=%v psql -U %v -h %v -d %v -1 -f %v/dev/postgres_seed.sql", db.DbPass, db.DbUser, db.DbHost, db.DbData, dir)
-	}
-	out, outErr, err := utils.Command(cmd)
-	return out, outErr, err
-}
+//func (db *DbConfig) SeedDatabase() (string, string, error) {
+//	utils.Log(1, "Seeding Database with Dummy Data...")
+//	dir := utils.Directory
+//	var cmd string
+//	switch db.DbConn {
+//	case "sqlite":
+//		cmd = fmt.Sprintf("cat %v/dev/sqlite_seed.sql | sqlite3 %v/statup.db", dir, dir)
+//	case "mysql":
+//		cmd = fmt.Sprintf("mysql -h %v -P %v -u %v --password=%v %v < %v/dev/mysql_seed.sql", Configs.DbHost, 3306, Configs.DbUser, Configs.DbPass, Configs.DbData, dir)
+//	case "postgres":
+//		cmd = fmt.Sprintf("PGPASSWORD=%v psql -U %v -h %v -d %v -1 -f %v/dev/postgres_seed.sql", db.DbPass, db.DbUser, db.DbHost, db.DbData, dir)
+//	}
+//	out, outErr, err := utils.Command(cmd)
+//	return out, outErr, err
+//}
 
 // DropDatabase will DROP each table Statup created
 func (db *DbConfig) DropDatabase() error {

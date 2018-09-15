@@ -13,34 +13,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package notifier
+package types
 
 import (
-	"errors"
-	"fmt"
-	"strings"
+	"time"
 )
 
 var (
-	allowed_vars = []string{"host", "username", "password", "port", "api_key", "api_secret", "var1", "var2"}
+	NOW         = func() time.Time { return time.Now() }()
+	HOUR_1_AGO  = time.Now().Add(-1 * time.Hour)
+	HOUR_24_AGO = time.Now().Add(-24 * time.Hour)
+	HOUR_72_AGO = time.Now().Add(-72 * time.Hour)
+	DAY_7_AGO   = NOW.AddDate(0, 0, -7)
+	MONTH_1_AGO = NOW.AddDate(0, -1, 0)
+	YEAR_1_AGO  = NOW.AddDate(-1, 0, 0)
 )
-
-func checkNotifierForm(n Notifier) error {
-	notifier := asNotification(n)
-	for _, f := range notifier.Form {
-		contains := contains(f.DbField, allowed_vars)
-		if !contains {
-			return errors.New(fmt.Sprintf("the DbField '%v' is not allowed, allowed vars: %v", f.DbField, allowed_vars))
-		}
-	}
-	return nil
-}
-
-func contains(s string, arr []string) bool {
-	for _, v := range arr {
-		if strings.ToLower(s) == v {
-			return true
-		}
-	}
-	return false
-}

@@ -16,26 +16,30 @@
 package notifier
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hunterlong/statup/types"
+	"time"
 )
 
 type Example struct {
 	*Notification
 }
 
-const (
-	EXAMPLE_METHOD = "example"
-)
-
 var example = &Example{&Notification{
-	Method: EXAMPLE_METHOD,
-	Host:   "http://exmaplehost.com",
+	Method:      METHOD,
+	Host:        "http://exmaplehost.com",
+	Title:       "Example",
+	Description: "Example Notifier",
+	Author:      "Hunter Long",
+	AuthorUrl:   "https://github.com/hunterlong",
+	Delay:       time.Duration(5 * time.Second),
 	Form: []NotificationForm{{
 		Type:        "text",
 		Title:       "Host",
 		Placeholder: "Insert your Host here.",
 		DbField:     "host",
+		SmallText:   "this is where you would put the host",
 	}, {
 		Type:        "text",
 		Title:       "Username",
@@ -71,8 +75,8 @@ var example = &Example{&Notification{
 		Title:       "Var2",
 		Placeholder: "Var2 goes here",
 		DbField:     "var2",
-	}}},
-}
+	}},
+}}
 
 // REQUIRED init() will install/load the notifier
 func init() {
@@ -80,17 +84,9 @@ func init() {
 }
 
 // REQUIRED
-func (n *Example) Run() error {
-	return nil
-}
-
-// REQUIRED
-func (n *Example) OnSave() error {
-	return nil
-}
-
-// REQUIRED
-func (n *Example) Test() error {
+func (n *Example) Send(msg interface{}) error {
+	message := msg.(string)
+	fmt.Printf("i received this string: %v\n", message)
 	return nil
 }
 
@@ -99,62 +95,82 @@ func (n *Example) Select() *Notification {
 	return n.Notification
 }
 
+// REQUIRED
+func (n *Example) OnSave() error {
+	msg := fmt.Sprintf("received on save trigger")
+	n.AddQueue(msg)
+	return errors.New("onsave triggered")
+}
+
+// REQUIRED
+func (n *Example) Test() error {
+	msg := fmt.Sprintf("received a test trigger\n")
+	n.AddQueue(msg)
+	return errors.New("test triggered")
+}
+
 // REQUIRED - BASIC EVENT
 func (n *Example) OnSuccess(s *types.Service) {
-	saySomething("service is is online!")
+	msg := fmt.Sprintf("received a count trigger for service: %v\n", s.Name)
+	n.AddQueue(msg)
 }
 
 // REQUIRED - BASIC EVENT
 func (n *Example) OnFailure(s *types.Service, f *types.Failure) {
-	saySomething("service is failing!")
-}
-
-// Example function to do something awesome or not...
-func saySomething(text ...interface{}) {
-	fmt.Println(text)
+	msg := fmt.Sprintf("received a failure trigger for service: %v\n", s.Name)
+	n.AddQueue(msg)
 }
 
 // OPTIONAL
 func (n *Example) OnNewService(s *types.Service) {
-
+	msg := fmt.Sprintf("received a new service trigger for service: %v\n", s.Name)
+	n.AddQueue(msg)
 }
 
 // OPTIONAL
 func (n *Example) OnUpdatedService(s *types.Service) {
-
+	msg := fmt.Sprintf("received a update service trigger for service: %v\n", s.Name)
+	n.AddQueue(msg)
 }
 
 // OPTIONAL
 func (n *Example) OnDeletedService(s *types.Service) {
-
+	msg := fmt.Sprintf("received a delete service trigger for service: %v\n", s.Name)
+	n.AddQueue(msg)
 }
 
 // OPTIONAL
 func (n *Example) OnNewUser(s *types.User) {
-
+	msg := fmt.Sprintf("received a new user trigger for user: %v\n", s.Username)
+	n.AddQueue(msg)
 }
 
 // OPTIONAL
 func (n *Example) OnUpdatedUser(s *types.User) {
-
+	msg := fmt.Sprintf("received a updated user trigger for user: %v\n", s.Username)
+	n.AddQueue(msg)
 }
 
 // OPTIONAL
 func (n *Example) OnDeletedUser(s *types.User) {
-
+	msg := fmt.Sprintf("received a deleted user trigger for user: %v\n", s.Username)
+	n.AddQueue(msg)
 }
 
 // OPTIONAL
 func (n *Example) OnUpdatedCore(s *types.Core) {
-
+	msg := fmt.Sprintf("received a updated core trigger for core: %v\n", s.Name)
+	n.AddQueue(msg)
 }
 
 // OPTIONAL
 func (n *Example) OnNewNotifier(s *Notification) {
-
+	msg := fmt.Sprintf("received a new notifier trigger for notifier: %v\n", s.Method)
+	n.AddQueue(msg)
 }
 
 // OPTIONAL
 func (n *Example) OnUpdatedNotifier(s *Notification) {
-
+	msg := fmt.Sprintf("received a update notifier trigger for notifier: %v\n", s.Method)
+	n.AddQueue(msg)
 }

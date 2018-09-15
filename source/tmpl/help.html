@@ -21,37 +21,22 @@
 {{end}}
 
         <div class="col-12">
-
-            <h2>Statup v{{ VERSION }} Help</h2>
-            Statup is an easy to use Status Page monitor for your websites and applications. Statup is developed in Go Language and you are able to create custom plugins with it!
-
-            <p>
-                <a href="https://github.com/hunterlong/statup"><img src="https://img.shields.io/github/stars/hunterlong/statup.svg?style=social&label=Stars"></a>
-                <a href="https://github.com/hunterlong/statup"><img src="https://img.shields.io/docker/build/hunterlong/statup.svg"></a>
-                <a href="https://github.com/hunterlong/statup"><img src="https://img.shields.io/github/release/hunterlong/statup.svg"></a>
-            </p>
-
-            <h2 class="mt-3">Services</h2>
-            For each website and application you want to add a new Service. Each Service will require a URL endpoint to test your applications status.
-            You can also add expected HTTP responses (regex allow), expected HTTP response codes, and other fields to make sure your service is online or offline.
-
-            <h2 class="mt-3">Users</h2>
-            Users can access the Statup Dashboard to add, remove, and view services.
-
-            <h2 class="mt-3">Plugins</h2>
-            Creating a plugin for Statup is not that difficult, if you know a little bit of Go Language you can create any type of application to be embedded into the Status framework.
-            Checkout the example plugin that includes all the interfaces, information, and custom HTTP routing at <a href="https://github.com/hunterlong/statup_plugin">https://github.com/hunterlong/statup_plugin</a>.
-            Anytime there is an action on your status page, all of your plugins will be notified of the change with the values that were changed or created.
-            <p></p>
-            Using the statup/plugin Golang package you can quickly implement the event listeners. Statup uses <a href="https://github.com/upper/db">upper.io/db.v3</a> for the database connection.
-            You can use the database inside of your plugin to create, update, and destroy tables/data. <b>Please only use respectable plugins!</b>
-
-            <h2 class="mt-3">Custom Stlying</h2>
-            On Statup Status Page server can you create your own custom stylesheet to be rendered on the index view of your status page. Go to <a href="/settings">Settings</a> and click on Custom Styling.
-
+            {{ safe . }}
         </div>
 
 </div>
+
+<style>
+    pre {
+        background-color: white;
+        padding: 10px 15px;
+        border: 1px solid #a2a2a233;
+        border-radius: 7px;
+    }
+    code {
+        color: #d87e1a;
+    }
+</style>
 
 {{template "footer"}}
 
