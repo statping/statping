@@ -147,7 +147,7 @@ func (u *Email) OnSave() error {
 }
 
 func (u *Email) dialSend(email *EmailOutgoing) error {
-	mailer = gomail.NewDialer(emailer.Host, emailer.Port, emailer.Username, emailer.Password)
+	mailer = gomail.NewPlainDialer(emailer.Host, emailer.Port, emailer.Username, emailer.Password)
 	mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	emailSource(email)
 	m := gomail.NewMessage()
