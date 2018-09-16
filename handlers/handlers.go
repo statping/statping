@@ -82,7 +82,7 @@ func IsAuthenticated(r *http.Request) bool {
 	return session.Values["authenticated"].(bool)
 }
 
-func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{}) {
+func executeResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{}) {
 	utils.Http(r)
 	if url, ok := redirect.(string); ok {
 		http.Redirect(w, r, url, http.StatusSeeOther)
@@ -144,6 +144,9 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		"Error": func() string {
 			return ""
 		},
+		"ToString": func(v interface{}) string {
+			return utils.ToString(v)
+		},
 	})
 	t, err = t.Parse(nav)
 	if err != nil {
@@ -163,7 +166,7 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 	}
 }
 
-func ExecuteJSResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}) {
+func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}) {
 	render, err := source.JsBox.String(file)
 	if err != nil {
 		utils.Log(4, err)
@@ -178,9 +181,9 @@ func ExecuteJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 	t.Execute(w, data)
 }
 
-func Error404Handler(w http.ResponseWriter, r *http.Request) {
+func error404Handler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
-	ExecuteResponse(w, r, "error_404.html", nil, nil)
+	executeResponse(w, r, "error_404.html", nil, nil)
 }
 
 type DbConfig types.DbConfig

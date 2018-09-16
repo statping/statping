@@ -61,11 +61,25 @@ func TestLogHTTP(t *testing.T) {
 }
 
 func TestIntString(t *testing.T) {
-	assert.Equal(t, "1", IntString(1))
+	assert.Equal(t, "1", ToString(1))
 }
 
 func TestStringInt(t *testing.T) {
 	assert.Equal(t, int64(1), StringInt("1"))
+}
+
+func TestDbTime(t *testing.T) {
+
+}
+
+func TestTimezone(t *testing.T) {
+	zone := -5
+	loc, _ := time.LoadLocation("America/Los_Angeles")
+	timestamp := time.Date(2018, 1, 1, 10, 0, 0, 0, loc).UTC()
+	correct := timestamp.Add(3 * time.Hour)
+	timezone := Timezoner(timestamp, zone)
+	assert.Equal(t, "2018-01-01 21:00:00 +0000 UTC", correct.String())
+	assert.Equal(t, "2018-01-01 13:00:00 -0500 -0500", timezone.String())
 }
 
 func TestTimestamp_Ago(t *testing.T) {

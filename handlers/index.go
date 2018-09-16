@@ -26,16 +26,16 @@ type index struct {
 	Core *core.Core
 }
 
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
+func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if core.Configs == nil {
 		http.Redirect(w, r, "/setup", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "index.html", core.CoreApp, nil)
+	executeResponse(w, r, "index.html", core.CoreApp, nil)
 }
 
-func TrayHandler(w http.ResponseWriter, r *http.Request) {
-	ExecuteResponse(w, r, "tray.html", core.CoreApp, nil)
+func trayHandler(w http.ResponseWriter, r *http.Request) {
+	executeResponse(w, r, "tray.html", core.CoreApp, nil)
 }
 
 func DesktopInit(ip string, port int) {

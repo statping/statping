@@ -31,6 +31,7 @@ func init() {
 }
 
 func TestEmailNotifier(t *testing.T) {
+	t.Parallel()
 	if EMAIL_HOST == "" || EMAIL_USER == "" || EMAIL_PASS == "" {
 		t.Log("Email notifier testing skipped, missing EMAIL_ environment variables")
 		t.SkipNow()
@@ -62,12 +63,10 @@ func TestEmailNotifier(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", emailer.Author)
 		assert.Equal(t, EMAIL_HOST, emailer.Host)
-		assert.Equal(t, currentCount+1, CountNotifiers())
 	})
 
 	t.Run("Emailer Load", func(t *testing.T) {
-		count := notifier.Load()
-		assert.Equal(t, currentCount+1, len(count))
+		notifier.Load()
 	})
 
 	t.Run("Email Within Limits", func(t *testing.T) {

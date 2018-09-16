@@ -113,7 +113,7 @@ func TestRunAll(t *testing.T) {
 			RunSelectAllNotifiers(t)
 		})
 		t.Run(dbt+" Create Users", func(t *testing.T) {
-			RunUser_Create(t)
+			RunUserCreate(t)
 		})
 		t.Run(dbt+" Update User", func(t *testing.T) {
 			RunUser_Update(t)
@@ -123,52 +123,52 @@ func TestRunAll(t *testing.T) {
 			RunUser_NonUniqueCreate(t)
 		})
 		t.Run(dbt+" Select Users", func(t *testing.T) {
-			RunUser_SelectAll(t)
+			RunUserSelectAll(t)
 		})
 		t.Run(dbt+" Select Services", func(t *testing.T) {
 			RunSelectAllServices(t)
 		})
 		t.Run(dbt+" Select One Service", func(t *testing.T) {
-			RunOneService_Check(t)
+			RunOneServiceCheck(t)
 		})
 		t.Run(dbt+" Create Service", func(t *testing.T) {
-			RunService_Create(t)
+			RunServiceCreate(t)
 		})
 		t.Run(dbt+" Create Hits", func(t *testing.T) {
-			RunCreateService_Hits(t)
+			RunCreateServiceHits(t)
 		})
 		t.Run(dbt+" Service ToJSON()", func(t *testing.T) {
-			RunService_ToJSON(t)
+			RunServiceToJSON(t)
 		})
 		t.Run(dbt+" Avg Time", func(t *testing.T) {
 			RunService_AvgTime(t)
 		})
 		t.Run(dbt+" Online 24h", func(t *testing.T) {
-			RunService_Online24(t)
+			RunServiceOnline24(t)
 		})
 		t.Run(dbt+" Chart Data", func(t *testing.T) {
-			RunService_GraphData(t)
+			RunServiceGraphData(t)
 		})
 		t.Run(dbt+" Create Failing Service", func(t *testing.T) {
-			RunBadService_Create(t)
+			RunBadServiceCreate(t)
 		})
 		t.Run(dbt+" Check Bad Service", func(t *testing.T) {
-			RunBadService_Check(t)
+			RunBadServiceCheck(t)
 		})
 		t.Run(dbt+" Select Hits", func(t *testing.T) {
-			RunService_Hits(t)
+			RunServiceHits(t)
 		})
 		t.Run(dbt+" Select Failures", func(t *testing.T) {
-			RunService_Failures(t)
+			RunServiceFailures(t)
 		})
 		t.Run(dbt+" Select Limited Hits", func(t *testing.T) {
-			RunService_LimitedHits(t)
+			RunServiceLimitedHits(t)
 		})
 		t.Run(dbt+" Delete Service", func(t *testing.T) {
 			RunDeleteService(t)
 		})
 		t.Run(dbt+" Delete User", func(t *testing.T) {
-			RunUser_Delete(t)
+			RunUserDelete(t)
 		})
 		t.Run(dbt+" HTTP /", func(t *testing.T) {
 			RunIndexHandler(t)
@@ -301,13 +301,13 @@ func RunSelectAllNotifiers(t *testing.T) {
 	assert.Equal(t, 5, len(core.CoreApp.Notifications))
 }
 
-func RunUser_SelectAll(t *testing.T) {
+func RunUserSelectAll(t *testing.T) {
 	users, err := core.SelectAllUsers()
 	assert.Nil(t, err)
 	assert.Equal(t, 4, len(users))
 }
 
-func RunUser_Create(t *testing.T) {
+func RunUserCreate(t *testing.T) {
 	user := core.ReturnUser(&types.User{
 		Username: "hunterlong",
 		Password: "password123",
@@ -350,7 +350,7 @@ func RunUser_NonUniqueCreate(t *testing.T) {
 	assert.Nil(t, admin)
 }
 
-func RunUser_Delete(t *testing.T) {
+func RunUserDelete(t *testing.T) {
 	user, err := core.SelectUser(2)
 	assert.Nil(t, err)
 	assert.NotNil(t, user)
@@ -368,13 +368,13 @@ func RunSelectAllServices(t *testing.T) {
 	}
 }
 
-func RunOneService_Check(t *testing.T) {
+func RunOneServiceCheck(t *testing.T) {
 	service := core.SelectService(1)
 	assert.NotNil(t, service)
 	assert.Equal(t, "Google", service.Name)
 }
 
-func RunService_Create(t *testing.T) {
+func RunServiceCreate(t *testing.T) {
 	service := core.ReturnService(&types.Service{
 		Name:           "test service",
 		Domain:         "https://google.com",
@@ -390,7 +390,7 @@ func RunService_Create(t *testing.T) {
 	assert.Equal(t, int64(16), id)
 }
 
-func RunService_ToJSON(t *testing.T) {
+func RunServiceToJSON(t *testing.T) {
 	service := core.SelectService(1)
 	assert.NotNil(t, service)
 	jsoned := service.ToJSON()
@@ -404,7 +404,7 @@ func RunService_AvgTime(t *testing.T) {
 	assert.Equal(t, "100", avg)
 }
 
-func RunService_Online24(t *testing.T) {
+func RunServiceOnline24(t *testing.T) {
 	var dayAgo = time.Now().Add(-24 * time.Hour).Add(-10 * time.Minute)
 
 	service := core.SelectService(1)
@@ -428,7 +428,7 @@ func RunService_Online24(t *testing.T) {
 	assert.True(t, online > float32(49.00))
 }
 
-func RunService_GraphData(t *testing.T) {
+func RunServiceGraphData(t *testing.T) {
 	service := core.SelectService(1)
 	assert.NotNil(t, service)
 	data := service.GraphData()
@@ -438,7 +438,7 @@ func RunService_GraphData(t *testing.T) {
 	assert.NotEmpty(t, data)
 }
 
-func RunBadService_Create(t *testing.T) {
+func RunBadServiceCreate(t *testing.T) {
 	service := core.ReturnService(&types.Service{
 		Name:           "Bad Service",
 		Domain:         "https://9839f83h72gey2g29278hd2od2d.com",
@@ -454,7 +454,7 @@ func RunBadService_Create(t *testing.T) {
 	assert.Equal(t, int64(17), id)
 }
 
-func RunBadService_Check(t *testing.T) {
+func RunBadServiceCheck(t *testing.T) {
 	service := core.SelectService(17)
 	assert.NotNil(t, service)
 	assert.Equal(t, "Bad Service", service.Name)
@@ -474,7 +474,7 @@ func RunDeleteService(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func RunCreateService_Hits(t *testing.T) {
+func RunCreateServiceHits(t *testing.T) {
 	services := core.CoreApp.Services
 	assert.NotNil(t, services)
 	assert.Equal(t, 16, len(services))
@@ -484,7 +484,7 @@ func RunCreateService_Hits(t *testing.T) {
 	}
 }
 
-func RunService_Hits(t *testing.T) {
+func RunServiceHits(t *testing.T) {
 	service := core.SelectService(1)
 	assert.NotNil(t, service)
 	hits, err := service.Hits()
@@ -492,14 +492,14 @@ func RunService_Hits(t *testing.T) {
 	assert.NotZero(t, len(hits))
 }
 
-func RunService_Failures(t *testing.T) {
+func RunServiceFailures(t *testing.T) {
 	service := core.SelectService(17)
 	assert.NotNil(t, service)
 	assert.Equal(t, "Bad Service", service.Name)
 	assert.NotEmpty(t, service.AllFailures())
 }
 
-func RunService_LimitedHits(t *testing.T) {
+func RunServiceLimitedHits(t *testing.T) {
 	service := core.SelectService(1)
 	assert.NotNil(t, service)
 	hits, err := service.LimitedHits()

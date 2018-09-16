@@ -26,7 +26,7 @@ type PluginSelect struct {
 	Params map[string]interface{}
 }
 
-func PluginSavedHandler(w http.ResponseWriter, r *http.Request) {
+func pluginSavedHandler(w http.ResponseWriter, r *http.Request) {
 	auth := IsAuthenticated(r)
 	if !auth {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -43,7 +43,7 @@ func PluginSavedHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
 
-func PluginsDownloadHandler(w http.ResponseWriter, r *http.Request) {
+func pluginsDownloadHandler(w http.ResponseWriter, r *http.Request) {
 	auth := IsAuthenticated(r)
 	if !auth {
 		http.Redirect(w, r, "/", http.StatusSeeOther)

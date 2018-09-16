@@ -24,17 +24,18 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
-func SettingsHandler(w http.ResponseWriter, r *http.Request) {
+func settingsHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "settings.html", core.CoreApp, nil)
+	executeResponse(w, r, "settings.html", core.CoreApp, nil)
 }
 
-func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
+func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
@@ -61,13 +62,17 @@ func SaveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	if domain != app.Domain {
 		app.Domain = domain
 	}
+	timezone := r.PostForm.Get("timezone")
+	timeFloat, _ := strconv.ParseFloat(timezone, 10)
+	app.Timezone = float32(timeFloat)
+
 	app.UseCdn = (r.PostForm.Get("enable_cdn") == "on")
 	core.CoreApp, _ = core.UpdateCore(app)
 	//notifiers.OnSettingsSaved(core.CoreApp.ToCore())
-	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
-func SaveSASSHandler(w http.ResponseWriter, r *http.Request) {
+func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
@@ -81,10 +86,10 @@ func SaveSASSHandler(w http.ResponseWriter, r *http.Request) {
 	source.SaveAsset([]byte(mobile), utils.Directory, "scss/mobile.scss")
 	source.CompileSASS(utils.Directory)
 	ResetRouter()
-	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
-func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
+func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
@@ -101,17 +106,17 @@ func SaveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		utils.Log(2, "Default 'base.css' was insert because SASS did not work.")
 	}
 	ResetRouter()
-	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
-func DeleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
+func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 	source.DeleteAllAssets(utils.Directory)
 	ResetRouter()
-	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
 func parseId(r *http.Request) int64 {
@@ -124,7 +129,7 @@ func parseForm(r *http.Request) url.Values {
 	return r.PostForm
 }
 
-func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
+func saveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -147,7 +152,7 @@ func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	notifer, notif, err := notifier.SelectNotifier(method)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("issue saving notifier %v: %v", method, err))
-		ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
+		executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
 		return
 	}
 
@@ -184,5 +189,5 @@ func SaveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		utils.Log(3, fmt.Sprintf("issue updating notifier: %v", err))
 	}
 	notifier.OnSave(notifer.Method)
-	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }

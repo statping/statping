@@ -17,6 +17,7 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"github.com/ararog/timeago"
 	"io"
 	"os"
@@ -46,9 +47,25 @@ func StringInt(s string) int64 {
 	return int64(num)
 }
 
-// IntString converts a int to a string
-func IntString(s int) string {
-	return strconv.Itoa(s)
+// ToString converts a int to a string
+func ToString(s interface{}) string {
+	switch v := s.(type) {
+	case int, int32, int64:
+		return fmt.Sprintf("%v", v)
+	case float32, float64:
+		return fmt.Sprintf("%v", v)
+	case []byte:
+		return string(v)
+	}
+	return ""
+}
+
+func Timezoner(t time.Time, zone float32) time.Time {
+	zoneInt := float32(3600) * (zone + 1)
+	fmt.Println(int(zoneInt))
+	loc := time.FixedZone("", int(zoneInt))
+	timez := t.In(loc)
+	return timez
 }
 
 // dir returns the current working directory

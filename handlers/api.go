@@ -32,7 +32,7 @@ type ApiResponse struct {
 	Method string `json:"method"`
 }
 
-func ApiIndexHandler(w http.ResponseWriter, r *http.Request) {
+func apiIndexHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
@@ -50,7 +50,7 @@ func ApiIndexHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(out)
 }
 
-func ApiRenewHandler(w http.ResponseWriter, r *http.Request) {
+func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
@@ -65,7 +65,7 @@ func ApiRenewHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
 
-func ApiCheckinHandler(w http.ResponseWriter, r *http.Request) {
+func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
@@ -77,7 +77,7 @@ func ApiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(checkin)
 }
 
-func ApiServiceHandler(w http.ResponseWriter, r *http.Request) {
+func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
@@ -93,7 +93,7 @@ func ApiServiceHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(service)
 }
 
-func ApiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
+func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
@@ -109,7 +109,7 @@ func ApiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(service.GraphDataRaw())
 }
 
-func ApiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
+func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
@@ -131,7 +131,7 @@ func ApiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(service)
 }
 
-func ApiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
+func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
@@ -157,7 +157,7 @@ func ApiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(service)
 }
 
-func ApiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
+func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
@@ -183,7 +183,7 @@ func ApiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(output)
 }
 
-func ApiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
+func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
@@ -199,7 +199,7 @@ func ApiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(services)
 }
 
-func ApiUserHandler(w http.ResponseWriter, r *http.Request) {
+func apiUserHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
@@ -214,7 +214,7 @@ func ApiUserHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
-func ApiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
+func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
@@ -239,7 +239,7 @@ func ApiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
-func ApiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
+func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
@@ -265,7 +265,7 @@ func ApiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(output)
 }
 
-func ApiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
+func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
@@ -275,7 +275,7 @@ func ApiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(users)
 }
 
-func ApiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
+func apiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return

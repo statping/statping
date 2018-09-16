@@ -116,7 +116,7 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 			Configs.DbPort = 3306
 		}
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
-		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=Local", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
+		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
 	case "postgres":
 		if Configs.DbPort == 0 {
 			Configs.DbPort = 5432

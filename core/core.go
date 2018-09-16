@@ -82,6 +82,14 @@ func UpdateCore(c *Core) (*Core, error) {
 }
 
 // UsingAssets will return true if /assets folder is present
+func (c Core) CurrentTime() string {
+	t := time.Now().UTC()
+	current := utils.Timezoner(t, c.Timezone)
+	ansic := "Monday 03:04:05 PM"
+	return current.Format(ansic)
+}
+
+// UsingAssets will return true if /assets folder is present
 func (c Core) UsingAssets() bool {
 	return source.UsingAssets(utils.Directory)
 }

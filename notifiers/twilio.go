@@ -29,30 +29,26 @@ import (
 	"time"
 )
 
-const (
-	twilioMethod = "twilioNotifier"
-)
-
 type twilio struct {
 	*notifier.Notification
 }
 
 var twilioNotifier = &twilio{&notifier.Notification{
-	Method:      twilioMethod,
-	Title:       "twilioNotifier",
-	Description: "Receive SMS text messages directly to your cellphone when a service is offline. You can use a twilioNotifier test account with limits. This notifier uses the <a href=\"https://www.twilioNotifier.com/docs/usage/api\">twilioNotifier API</a>.",
+	Method:      "twilio",
+	Title:       "Twilio",
+	Description: "Receive SMS text messages directly to your cellphone when a service is offline. You can use a Twilio test account with limits. This notifier uses the <a href=\"https://www.twilio.com/docs/usage/api\">Twilio API</a>.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
 	Delay:       time.Duration(10 * time.Second),
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
 		Title:       "Account Sid",
-		Placeholder: "Insert your twilioNotifier Account Sid",
+		Placeholder: "Insert your Twilio Account Sid",
 		DbField:     "api_key",
 	}, {
 		Type:        "text",
 		Title:       "Account Token",
-		Placeholder: "Insert your twilioNotifier Account Token",
+		Placeholder: "Insert your Twilio Account Token",
 		DbField:     "api_secret",
 	}, {
 		Type:        "text",
@@ -82,7 +78,7 @@ func (u *twilio) Select() *notifier.Notification {
 // Send will send a HTTP Post to the Twilio SMS API. It accepts type: string
 func (u *twilio) Send(msg interface{}) error {
 	message := msg.(string)
-	twilioUrl := fmt.Sprintf("https://api.twilioNotifier.com/2010-04-01/Accounts/%v/Messages.json", u.GetValue("api_key"))
+	twilioUrl := fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%v/Messages.json", u.GetValue("api_key"))
 	client := &http.Client{}
 	v := url.Values{}
 	v.Set("To", "+"+u.Var1)
@@ -101,7 +97,7 @@ func (u *twilio) Send(msg interface{}) error {
 	contents, _ := ioutil.ReadAll(res.Body)
 	success, twilioRes := twilioSuccess(contents)
 	if !success {
-		return errors.New(fmt.Sprintf("twilioNotifier didn't receive the expected status of 'enque' from API got: %v", twilioRes))
+		return errors.New(fmt.Sprintf("Twilio didn't receive the expected status of 'enque' from API got: %v", twilioRes))
 	}
 	return nil
 }

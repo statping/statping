@@ -23,17 +23,17 @@ import (
 	"net/http"
 )
 
-func DashboardHandler(w http.ResponseWriter, r *http.Request) {
+func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println()
 	if !IsAuthenticated(r) {
 		err := core.ErrorResponse{}
-		ExecuteResponse(w, r, "login.html", err, nil)
+		executeResponse(w, r, "login.html", err, nil)
 	} else {
-		ExecuteResponse(w, r, "dashboard.html", core.CoreApp, nil)
+		executeResponse(w, r, "dashboard.html", core.CoreApp, nil)
 	}
 }
 
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
+func loginHandler(w http.ResponseWriter, r *http.Request) {
 	if Store == nil {
 		resetCookies()
 	}
@@ -49,27 +49,27 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 	} else {
 		err := core.ErrorResponse{Error: "Incorrect login information submitted, try again."}
-		ExecuteResponse(w, r, "login.html", err, nil)
+		executeResponse(w, r, "login.html", err, nil)
 	}
 }
 
-func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := Store.Get(r, COOKIE_KEY)
 	session.Values["authenticated"] = false
 	session.Save(r, w)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func HelpHandler(w http.ResponseWriter, r *http.Request) {
+func helpHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 	help := source.HelpMarkdown()
-	ExecuteResponse(w, r, "help.html", help, nil)
+	executeResponse(w, r, "help.html", help, nil)
 }
 
-func LogsHandler(w http.ResponseWriter, r *http.Request) {
+func logsHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
@@ -82,10 +82,10 @@ func LogsHandler(w http.ResponseWriter, r *http.Request) {
 		logs = append(logs, utils.LastLines[i].FormatForHtml()+"\r\n")
 	}
 	utils.LockLines.Unlock()
-	ExecuteResponse(w, r, "logs.html", logs, nil)
+	executeResponse(w, r, "logs.html", logs, nil)
 }
 
-func LogsLineHandler(w http.ResponseWriter, r *http.Request) {
+func logsLineHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

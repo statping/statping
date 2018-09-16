@@ -18,6 +18,7 @@ func init() {
 }
 
 func TestDiscordNotifier(t *testing.T) {
+	t.Parallel()
 	if DISCORD_URL == "" {
 		t.Log("Discord notifier testing skipped, missing DISCORD_URL environment variable")
 		t.SkipNow()
@@ -31,12 +32,10 @@ func TestDiscordNotifier(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", discorder.Author)
 		assert.Equal(t, DISCORD_URL, discorder.Host)
-		assert.Equal(t, currentCount+1, CountNotifiers())
 	})
 
 	t.Run("Load Discord Notifier", func(t *testing.T) {
-		count := notifier.Load()
-		assert.Equal(t, currentCount+1, len(count))
+		notifier.Load()
 	})
 
 	t.Run("Discord Within Limits", func(t *testing.T) {

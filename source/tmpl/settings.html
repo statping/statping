@@ -82,6 +82,43 @@
                             <textarea rows="4" name="footer" class="form-control" id="footer">{{ .Footer }}</textarea>
                         </div>
 
+                        <div class="form-group">
+                            <label for="timezone">Timezone</label><span class="mt-1 small float-right">Current: {{.CurrentTime}}</span>
+                            <select class="form-control" name="timezone" id="timezone">
+                                <option value="-12.0" {{if eq (ToString .Timezone) "-12"}}selected{{end}}>(GMT -12:00) Eniwetok, Kwajalein</option>
+                                <option value="-11.0" {{if eq (ToString .Timezone) "-11"}}selected{{end}}>(GMT -11:00) Midway Island, Samoa</option>
+                                <option value="-10.0" {{if eq (ToString .Timezone) "-10"}}selected{{end}}>(GMT -10:00) Hawaii</option>
+                                <option value="-9.0" {{if eq (ToString .Timezone) "-9"}}selected{{end}}>(GMT -9:00) Alaska</option>
+                                <option value="-8.0" {{if eq (ToString .Timezone) "-8"}}selected{{end}}>(GMT -8:00) Pacific Time (US &amp; Canada)</option>
+                                <option value="-7.0" {{if eq (ToString .Timezone) "-7"}}selected{{end}}>(GMT -7:00) Mountain Time (US &amp; Canada)</option>
+                                <option value="-6.0" {{if eq (ToString .Timezone) "-6"}}selected{{end}}>(GMT -6:00) Central Time (US &amp; Canada), Mexico City</option>
+                                <option value="-5.0" {{if eq (ToString .Timezone) "-5"}}selected{{end}}>(GMT -5:00) Eastern Time (US &amp; Canada), Bogota, Lima</option>
+                                <option value="-4.0" {{if eq (ToString .Timezone) "-4"}}selected{{end}}>(GMT -4:00) Atlantic Time (Canada), Caracas, La Paz</option>
+                                <option value="-3.5" {{if eq (ToString .Timezone) "-3.5"}}selected{{end}}>(GMT -3:30) Newfoundland</option>
+                                <option value="-3.0" {{if eq (ToString .Timezone) "-3"}}selected{{end}}>(GMT -3:00) Brazil, Buenos Aires, Georgetown</option>
+                                <option value="-2.0" {{if eq (ToString .Timezone) "-2"}}selected{{end}}>(GMT -2:00) Mid-Atlantic</option>
+                                <option value="-1.0" {{if eq (ToString .Timezone) "-1"}}selected{{end}}>(GMT -1:00 hour) Azores, Cape Verde Islands</option>
+                                <option value="0.0" {{if eq (ToString .Timezone) "0"}}selected{{end}}>(GMT) Western Europe Time, London, Lisbon, Casablanca</option>
+                                <option value="1.0" {{if eq (ToString .Timezone) "1"}}selected{{end}}>(GMT +1:00 hour) Brussels, Copenhagen, Madrid, Paris</option>
+                                <option value="2.0" {{if eq (ToString .Timezone) "2"}}selected{{end}}>(GMT +2:00) Kaliningrad, South Africa</option>
+                                <option value="3.0" {{if eq (ToString .Timezone) "3"}}selected{{end}}>(GMT +3:00) Baghdad, Riyadh, Moscow, St. Petersburg</option>
+                                <option value="3.5" {{if eq (ToString .Timezone) "3.5"}}selected{{end}}>(GMT +3:30) Tehran</option>
+                                <option value="4.0" {{if eq (ToString .Timezone) "4"}}selected{{end}}>(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi</option>
+                                <option value="4.5" {{if eq (ToString .Timezone) "4.5"}}selected{{end}}>(GMT +4:30) Kabul</option>
+                                <option value="5.0" {{if eq (ToString .Timezone) "5"}}selected{{end}}>(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent</option>
+                                <option value="5.5" {{if eq (ToString .Timezone) "5.5"}}selected{{end}}>(GMT +5:30) Bombay, Calcutta, Madras, New Delhi</option>
+                                <option value="5.75" {{if eq (ToString .Timezone) "5.75"}}selected{{end}}>(GMT +5:45) Kathmandu</option>
+                                <option value="6.0" {{if eq (ToString .Timezone) "6"}}selected{{end}}>(GMT +6:00) Almaty, Dhaka, Colombo</option>
+                                <option value="7.0" {{if eq (ToString .Timezone) "7"}}selected{{end}}>(GMT +7:00) Bangkok, Hanoi, Jakarta</option>
+                                <option value="8.0" {{if eq (ToString .Timezone) "8"}}selected{{end}}>(GMT +8:00) Beijing, Perth, Singapore, Hong Kong</option>
+                                <option value="9.0" {{if eq (ToString .Timezone) "9"}}selected{{end}}>(GMT +9:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk</option>
+                                <option value="9.5" {{if eq (ToString .Timezone) "9.5"}}selected{{end}}>(GMT +9:30) Adelaide, Darwin</option>
+                                <option value="10.0" {{if eq (ToString .Timezone) "10.5"}}selected{{end}}>(GMT +10:00) Eastern Australia, Guam, Vladivostok</option>
+                                <option value="11.0" {{if eq (ToString .Timezone) "11"}}selected{{end}}>(GMT +11:00) Magadan, Solomon Islands, New Caledonia</option>
+                                <option value="12.0" {{if eq (ToString .Timezone) "12"}}selected{{end}}>(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka</option>
+                            </select>
+                        </div>
+
                         <button type="submit" class="btn btn-primary btn-block">Save Settings</button>
 
                         <div class="form-group row mt-3">

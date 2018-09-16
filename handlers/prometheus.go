@@ -33,7 +33,7 @@ import (
 //			  - targets: ['statup:8080']
 //
 
-func PrometheusHandler(w http.ResponseWriter, r *http.Request) {
+func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 	utils.Log(1, fmt.Sprintf("Prometheus /metrics Request From IP: %v\n", r.RemoteAddr))
 	if !isAuthorized(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)

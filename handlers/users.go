@@ -25,16 +25,16 @@ import (
 	"strconv"
 )
 
-func UsersHandler(w http.ResponseWriter, r *http.Request) {
+func usersHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 	users, _ := core.SelectAllUsers()
-	ExecuteResponse(w, r, "users.html", users, nil)
+	executeResponse(w, r, "users.html", users, nil)
 }
 
-func UsersEditHandler(w http.ResponseWriter, r *http.Request) {
+func usersEditHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
@@ -42,10 +42,10 @@ func UsersEditHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
 	user, _ := core.SelectUser(int64(id))
-	ExecuteResponse(w, r, "user.html", user, nil)
+	executeResponse(w, r, "user.html", user, nil)
 }
 
-func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
+func updateUserHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
@@ -69,10 +69,10 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	user.Update()
 	users, _ := core.SelectAllUsers()
-	ExecuteResponse(w, r, "users.html", users, "/users")
+	executeResponse(w, r, "users.html", users, "/users")
 }
 
-func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
+func createUserHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
@@ -94,10 +94,10 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		utils.Log(3, err)
 	}
 	//notifiers.OnNewUser(user)
-	ExecuteResponse(w, r, "users.html", user, "/users")
+	executeResponse(w, r, "users.html", user, "/users")
 }
 
-func UsersDeleteHandler(w http.ResponseWriter, r *http.Request) {
+func usersDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return

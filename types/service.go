@@ -58,45 +58,6 @@ type ServiceInterface interface {
 	Delete() error
 }
 
-//type ServiceInterface interface {
-//	// Database functions
-//	Create() (int64, error)
-//	Update(bool) error
-//	Delete() error
-//	// Basic Method functions
-//	AvgTime() float64
-//	OnlineSince(time.Time) float32
-//	Online24() float32
-//	SmallText() string
-//	GraphData() string
-//	AvgUptime(time.Time) string
-//	AvgUptime24() string
-//	ToJSON() string
-//	// Failure functions
-//	CreateFailure(*Failure) (int64, error)
-//	//LimitedFailures() []interface{}
-//	//AllFailures() []*Failure
-//	TotalFailuresSince(time.Time) (uint64, error)
-//	TotalFailures24() (uint64, error)
-//	TotalFailures() (uint64, error)
-//	DeleteFailures()
-//	// Hits functions (successful responses)
-//	CreateHit(*Hit) (int64, error)
-//	Hits() ([]*Hit, error)
-//	TotalHits() (uint64, error)
-//	TotalHitsSince(time.Time) (uint64, error)
-//	Sum() (float64, error)
-//	LimitedHits() ([]*Hit, error)
-//	SelectHitsGroupBy(string) ([]*Hit, error)
-//	// Go Routines
-//	CheckQueue(bool)
-//	Check(bool)
-//	//checkHttp(bool) *Service
-//	//checkTcp(bool) *Service
-//	// Checkin functions
-//	//AllCheckins() []*Checkin
-//}
-
 // Start will create a channel for the service checking go routine
 func (s *Service) Start() {
 	s.Running = make(chan bool)

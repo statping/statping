@@ -26,7 +26,7 @@ func BenchmarkHandleIndex(b *testing.B) {
 	r := request(b, "/")
 	for i := 0; i < b.N; i++ {
 		rw := httptest.NewRecorder()
-		IndexHandler(rw, r)
+		indexHandler(rw, r)
 	}
 }
 
@@ -34,7 +34,7 @@ func BenchmarkServicesHandlerIndex(b *testing.B) {
 	r := request(b, "/")
 	for i := 0; i < b.N; i++ {
 		rw := httptest.NewRecorder()
-		ServicesHandler(rw, r)
+		servicesHandler(rw, r)
 	}
 }
 

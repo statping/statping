@@ -24,17 +24,12 @@ import (
 	"time"
 )
 
-const (
-	DISCORD_METHOD = "discord"
-	DISCORD_TEST   = `{"content": "This is a notification from Statup!"}`
-)
-
 type Discord struct {
 	*notifier.Notification
 }
 
 var discorder = &Discord{&notifier.Notification{
-	Method:      DISCORD_METHOD,
+	Method:      "discord",
 	Title:       "Discord",
 	Description: "Send notifications to your discord channel using discord webhooks. Insert your Discord channel webhook URL to receive notifications. Based on the <a href=\"https://discordapp.com/developers/docs/resources/webhook\">Discord Webhook API</a>.",
 	Author:      "Hunter Long",

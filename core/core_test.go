@@ -27,10 +27,6 @@ var (
 	dir string
 )
 
-const (
-	SERVICE_SINCE = "2018-08-30T10:42:08-07:00" // "2006-01-02T15:04:05Z07:00"
-)
-
 func init() {
 	dir = utils.Directory
 	utils.InitLogs()

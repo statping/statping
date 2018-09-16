@@ -25,7 +25,7 @@ import (
 	"time"
 )
 
-func SetupHandler(w http.ResponseWriter, r *http.Request) {
+func setupHandler(w http.ResponseWriter, r *http.Request) {
 	if core.CoreApp.Services != nil {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
@@ -51,10 +51,10 @@ func SetupHandler(w http.ResponseWriter, r *http.Request) {
 			Password:    "",
 		}
 	}
-	ExecuteResponse(w, r, "setup.html", data, nil)
+	executeResponse(w, r, "setup.html", data, nil)
 }
 
-func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
+func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 	if core.CoreApp.Services != nil {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -98,7 +98,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.Log(4, err)
 		config.Error = err
-		SetupResponseError(w, r, config)
+		setupResponseError(w, r, config)
 		return
 	}
 
@@ -106,7 +106,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.Log(3, err)
 		config.Error = err
-		SetupResponseError(w, r, config)
+		setupResponseError(w, r, config)
 		return
 	}
 
@@ -115,7 +115,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 		utils.Log(4, err)
 		core.DeleteConfig()
 		config.Error = err
-		SetupResponseError(w, r, config)
+		setupResponseError(w, r, config)
 		return
 	}
 
@@ -126,7 +126,7 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.Log(4, err)
 		config.Error = err
-		SetupResponseError(w, r, config)
+		setupResponseError(w, r, config)
 		return
 	}
 
@@ -149,6 +149,6 @@ func ProcessSetupHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func SetupResponseError(w http.ResponseWriter, r *http.Request, a interface{}) {
-	ExecuteResponse(w, r, "setup.html", a, nil)
+func setupResponseError(w http.ResponseWriter, r *http.Request, a interface{}) {
+	executeResponse(w, r, "setup.html", a, nil)
 }

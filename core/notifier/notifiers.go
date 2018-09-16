@@ -347,7 +347,7 @@ func (n *Notification) GetValue(dbField string) string {
 	case "api_secret":
 		return n.ApiSecret
 	case "limits":
-		return utils.IntString(int(n.Limits))
+		return utils.ToString(int(n.Limits))
 	}
 	return ""
 }

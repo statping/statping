@@ -24,6 +24,7 @@ func init() {
 }
 
 func TestTwilioNotifier(t *testing.T) {
+	t.Parallel()
 	if TWILIO_SID == "" || TWILIO_SECRET == "" || TWILIO_FROM == "" {
 		t.Log("twilioNotifier notifier testing skipped, missing TWILIO_SID environment variable")
 		t.SkipNow()
@@ -37,12 +38,10 @@ func TestTwilioNotifier(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", twilioNotifier.Author)
 		assert.Equal(t, TWILIO_SID, twilioNotifier.ApiKey)
-		assert.Equal(t, currentCount+1, CountNotifiers())
 	})
 
 	t.Run("Load twilioNotifier Notifier", func(t *testing.T) {
-		count := notifier.Load()
-		assert.Equal(t, currentCount+1, len(count))
+		notifier.Load()
 	})
 
 	t.Run("twilioNotifier Within Limits", func(t *testing.T) {

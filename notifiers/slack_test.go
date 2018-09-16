@@ -23,6 +23,7 @@ func init() {
 }
 
 func TestSlackNotifier(t *testing.T) {
+	t.Parallel()
 	if SLACK_URL == "" {
 		t.Log("Slack notifier testing skipped, missing SLACK_URL environment variable")
 		t.SkipNow()
@@ -36,12 +37,10 @@ func TestSlackNotifier(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", slacker.Author)
 		assert.Equal(t, SLACK_URL, slacker.Host)
-		assert.Equal(t, currentCount+1, CountNotifiers())
 	})
 
 	t.Run("Load Slack Notifier", func(t *testing.T) {
-		count := notifier.Load()
-		assert.Equal(t, currentCount+1, len(count))
+		notifier.Load()
 	})
 
 	t.Run("Slack parse message", func(t *testing.T) {

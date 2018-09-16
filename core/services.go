@@ -136,16 +136,17 @@ func (s *Service) lastFailure() *Failure {
 func (s *Service) SmallText() string {
 	last := s.LimitedFailures()
 	hits, _ := s.LimitedHits()
+	zone := CoreApp.Timezone
 	if s.Online {
 		if len(last) == 0 {
-			return fmt.Sprintf("Online since %v", s.CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
+			return fmt.Sprintf("Online since %v", utils.Timezoner(s.CreatedAt, zone).Format("Monday 3:04:05PM, Jan _2 2006"))
 		} else {
-			return fmt.Sprintf("Online, last failure was %v", hits[0].CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
+			return fmt.Sprintf("Online, last failure was %v", utils.Timezoner(hits[0].CreatedAt, zone).Format("Monday 3:04:05PM, Jan _2 2006"))
 		}
 	}
 	if len(last) > 0 {
 		lastFailure := s.lastFailure()
-		return fmt.Sprintf("%v on %v", lastFailure.ParseError(), last[0].CreatedAt.Format("Monday 3:04PM, Jan _2 2006"))
+		return fmt.Sprintf("%v on %v", lastFailure.ParseError(), utils.Timezoner(last[0].CreatedAt, zone).Format("Monday 3:04:05PM, Jan _2 2006"))
 	} else {
 		return fmt.Sprintf("%v is currently offline", s.Name)
 	}
@@ -186,6 +187,7 @@ func (s *Service) GraphDataRaw() []*DateScan {
 		if err != nil {
 			utils.Log(2, fmt.Sprintf("Issue parsing time %v", err))
 		}
+		gd.CreatedAt = utils.Timezoner(gd.CreatedAt, CoreApp.Timezone)
 		gd.Value = int64(ff)
 		d = append(d, gd)
 	}

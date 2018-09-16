@@ -30,9 +30,7 @@ import (
 )
 
 const (
-	NEW_HTTP_SERVICE     = `{"name": "Google Website", "domain": "https://google.com", "expected_status": 200, "check_interval": 10, "type": "http", "method": "GET"}`
-	UPDATED_HTTP_SERVICE = `{"id": 1, name": "Google Website", "domain": "https://google.com", "expected_status": 200, "check_interval": 10, "type": "http", "method": "GET"}`
-	NEW_TCP_SERVICE      = `{"name": "Google DNS", "domain": "8.8.8.8", "expected": "", "check_interval": 5, "type": "tcp"}`
+	NEW_HTTP_SERVICE = `{"name": "Google Website", "domain": "https://google.com", "expected_status": 200, "check_interval": 10, "type": "http", "method": "GET"}`
 )
 
 var (
