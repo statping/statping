@@ -45,6 +45,12 @@ func TestSelectAllServices(t *testing.T) {
 	assert.Equal(t, 15, len(services))
 }
 
+func TestServiceDowntime(t *testing.T) {
+	service := SelectService(15)
+	downtime := service.Downtime()
+	assert.True(t, downtime.Minutes() > 9)
+}
+
 func TestSelectTCPService(t *testing.T) {
 	services := CoreApp.Services
 	assert.Equal(t, 15, len(services))

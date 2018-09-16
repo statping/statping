@@ -30,7 +30,6 @@ type Failure struct {
 
 // CreateFailure will create a new failure record for a service
 func (s *Service) CreateFailure(f *types.Failure) (int64, error) {
-	f.CreatedAt = time.Now().UTC()
 	f.Service = s.Id
 	s.Failures = append(s.Failures, f)
 	row := failuresDB().Create(f)
