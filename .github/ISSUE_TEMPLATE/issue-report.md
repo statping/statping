@@ -20,16 +20,4 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/statup-app/general) [![GitHub release](https://img.shields.io/github/release/hunterlong/statup.svg)](https://github.com/hunterlong/statup/releases/latest) [![Build Status](https://travis-ci.com/hunterlong/statup.svg?branch=master)](https://travis-ci.com/hunterlong/statup)
