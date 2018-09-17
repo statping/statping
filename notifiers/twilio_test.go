@@ -17,6 +17,11 @@ var (
 )
 
 func init() {
+	TWILIO_SID = os.Getenv("TWILIO_SID")
+	TWILIO_SECRET = os.Getenv("TWILIO_SECRET")
+	TWILIO_FROM = os.Getenv("TWILIO_FROM")
+	TWILIO_TO = os.Getenv("TWILIO_TO")
+
 	twilioNotifier.ApiKey = TWILIO_SID
 	twilioNotifier.ApiSecret = TWILIO_SECRET
 	twilioNotifier.Var1 = TWILIO_TO
@@ -26,12 +31,12 @@ func init() {
 func TestTwilioNotifier(t *testing.T) {
 	t.Parallel()
 	if TWILIO_SID == "" || TWILIO_SECRET == "" || TWILIO_FROM == "" {
-		t.Log("twilioNotifier notifier testing skipped, missing TWILIO_SID environment variable")
+		t.Log("twilio notifier testing skipped, missing TWILIO_SID environment variable")
 		t.SkipNow()
 	}
 	currentCount = CountNotifiers()
 
-	t.Run("Load twilioNotifier", func(t *testing.T) {
+	t.Run("Load Twilio", func(t *testing.T) {
 		twilioNotifier.ApiKey = TWILIO_SID
 		twilioNotifier.Delay = time.Duration(100 * time.Millisecond)
 		err := notifier.AddNotifier(twilioNotifier)
@@ -40,22 +45,22 @@ func TestTwilioNotifier(t *testing.T) {
 		assert.Equal(t, TWILIO_SID, twilioNotifier.ApiKey)
 	})
 
-	t.Run("Load twilioNotifier Notifier", func(t *testing.T) {
+	t.Run("Load Twilio Notifier", func(t *testing.T) {
 		notifier.Load()
 	})
 
-	t.Run("twilioNotifier Within Limits", func(t *testing.T) {
+	t.Run("Twilio Within Limits", func(t *testing.T) {
 		ok, err := twilioNotifier.WithinLimits()
 		assert.Nil(t, err)
 		assert.True(t, ok)
 	})
 
-	t.Run("twilioNotifier Send", func(t *testing.T) {
+	t.Run("Twilio Send", func(t *testing.T) {
 		err := twilioNotifier.Send(twilioMessage)
 		assert.Nil(t, err)
 	})
 
-	t.Run("twilioNotifier Queue", func(t *testing.T) {
+	t.Run("Twilio Queue", func(t *testing.T) {
 		go notifier.Queue(twilioNotifier)
 		time.Sleep(1 * time.Second)
 		assert.Equal(t, TWILIO_SID, twilioNotifier.ApiKey)

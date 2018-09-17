@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	SLACK_URL        = os.Getenv("SLACK_URL")
+	SLACK_URL        string
 	slackMessage     = `{"text":"this is a test from the Slack notifier!"}`
 	slackTestMessage = SlackMessage{
 		Service:  TestService,
@@ -19,6 +19,7 @@ var (
 )
 
 func init() {
+	SLACK_URL = os.Getenv("SLACK_URL")
 	slacker.Host = SLACK_URL
 }
 

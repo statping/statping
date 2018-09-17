@@ -14,6 +14,7 @@ var (
 )
 
 func init() {
+	DISCORD_URL = os.Getenv("DISCORD_URL")
 	discorder.Host = DISCORD_URL
 }
 

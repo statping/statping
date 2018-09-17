@@ -73,13 +73,12 @@ func TestDbTime(t *testing.T) {
 }
 
 func TestTimezone(t *testing.T) {
-	zone := -5
+	zone := float32(-4.0)
 	loc, _ := time.LoadLocation("America/Los_Angeles")
-	timestamp := time.Date(2018, 1, 1, 10, 0, 0, 0, loc).UTC()
-	correct := timestamp.Add(3 * time.Hour)
+	timestamp := time.Date(2018, 1, 1, 10, 0, 0, 0, loc)
 	timezone := Timezoner(timestamp, zone)
-	assert.Equal(t, "2018-01-01 21:00:00 +0000 UTC", correct.String())
-	assert.Equal(t, "2018-01-01 13:00:00 -0500 -0500", timezone.String())
+	assert.Equal(t, "2018-01-01 10:00:00 -0800 PST", timestamp.String())
+	assert.Equal(t, "2018-01-01 15:00:00 -0300 -0300", timezone.String())
 }
 
 func TestTimestamp_Ago(t *testing.T) {

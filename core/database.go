@@ -83,6 +83,46 @@ func (db *DbConfig) Close() error {
 	return DbSession.DB().Close()
 }
 
+func (s *Service) AfterFind() (err error) {
+	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
+	return
+}
+
+func (s *Hit) AfterFind() (err error) {
+	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
+	return
+}
+
+func (f *Failure) AfterFind() (err error) {
+	f.CreatedAt = utils.Timezoner(f.CreatedAt, CoreApp.Timezone)
+	return
+}
+
+func (u *User) AfterFind() (err error) {
+	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
+	return
+}
+
+func (u *Hit) BeforeCreate() (err error) {
+	u.CreatedAt = time.Now().UTC()
+	return
+}
+
+func (u *Failure) BeforeCreate() (err error) {
+	u.CreatedAt = time.Now().UTC()
+	return
+}
+
+func (u *User) BeforeCreate() (err error) {
+	u.CreatedAt = time.Now().UTC()
+	return
+}
+
+func (u *Service) BeforeCreate() (err error) {
+	u.CreatedAt = time.Now().UTC()
+	return
+}
+
 // InsertCore create the single row for the Core settings in Statup
 func (db *DbConfig) InsertCore() (*Core, error) {
 	CoreApp = &Core{Core: &types.Core{

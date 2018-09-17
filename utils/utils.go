@@ -62,7 +62,6 @@ func ToString(s interface{}) string {
 
 func Timezoner(t time.Time, zone float32) time.Time {
 	zoneInt := float32(3600) * (zone + 1)
-	fmt.Println(int(zoneInt))
 	loc := time.FixedZone("", int(zoneInt))
 	timez := t.In(loc)
 	return timez

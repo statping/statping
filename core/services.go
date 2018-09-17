@@ -166,46 +166,6 @@ func GroupDataBy(column string, id int64, tm time.Time, increment string) string
 	return sql
 }
 
-func (s *Service) AfterFind() (err error) {
-	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
-	return
-}
-
-func (s *Hit) AfterFind() (err error) {
-	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
-	return
-}
-
-func (s *Failure) AfterFind() (err error) {
-	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
-	return
-}
-
-func (s *User) AfterFind() (err error) {
-	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
-	return
-}
-
-func (u *Hit) BeforeCreate() (err error) {
-	u.CreatedAt = time.Now().UTC()
-	return
-}
-
-func (u *Failure) BeforeCreate() (err error) {
-	u.CreatedAt = time.Now().UTC()
-	return
-}
-
-func (u *User) BeforeCreate() (err error) {
-	u.CreatedAt = time.Now().UTC()
-	return
-}
-
-func (u *Service) BeforeCreate() (err error) {
-	u.CreatedAt = time.Now().UTC()
-	return
-}
-
 func (s *Service) Downtime() time.Duration {
 	hits, _ := s.Hits()
 	fails := s.LimitedFailures()
