@@ -24,6 +24,7 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type Service struct {
@@ -36,17 +37,56 @@ func renderServiceChartHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
+	fields := parseGet(r)
+
+	startField := fields.Get("start")
+	endField := fields.Get("end")
+	var start time.Time
+	var end time.Time
+	if startField == "" {
+		start = time.Now().Add(-24 * time.Hour)
+	} else {
+		start = time.Unix(utils.StringInt(startField), 0)
+	}
+	if endField == "" {
+		end = time.Now()
+	} else {
+		end = time.Unix(utils.StringInt(endField), 0)
+	}
+
 	service := core.SelectService(utils.StringInt(vars["id"]))
 	w.Header().Set("Content-Type", "text/javascript")
 	w.Header().Set("Cache-Control", "max-age=60")
-	executeJSResponse(w, r, "charts.js", []*core.Service{service})
+
+	data := core.GraphDataRaw(service, start, end).ToString()
+
+	out := struct {
+		Services []*core.Service
+		Data     []string
+	}{[]*core.Service{service}, []string{data}}
+
+	executeJSResponse(w, r, "charts.js", out)
 }
 
 func renderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
 	services := core.CoreApp.Services
 	w.Header().Set("Content-Type", "text/javascript")
 	w.Header().Set("Cache-Control", "max-age=60")
-	executeJSResponse(w, r, "charts.js", services)
+
+	var data []string
+	end := time.Now()
+	start := end.Add(-24 * time.Hour)
+	for _, s := range services {
+		d := core.GraphDataRaw(s, start, end).ToString()
+		data = append(data, d)
+	}
+
+	out := struct {
+		Services []types.ServiceInterface
+		Data     []string
+	}{services, data}
+
+	executeJSResponse(w, r, "charts.js", out)
 }
 
 func servicesHandler(w http.ResponseWriter, r *http.Request) {
@@ -139,12 +179,27 @@ func servicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	fields := parseGet(r)
+	startField := utils.StringInt(fields.Get("start"))
+	endField := utils.StringInt(fields.Get("end"))
 	serv := core.SelectService(utils.StringInt(vars["id"]))
 	if serv == nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	executeResponse(w, r, "service.html", serv, nil)
+
+	if startField == 0 || endField == 0 {
+		startField = time.Now().Add(-24 * time.Hour).UTC().Unix()
+		endField = time.Now().UTC().Unix()
+	}
+
+	out := struct {
+		Service *core.Service
+		Start   int64
+		End     int64
+	}{serv, startField, endField}
+
+	executeResponse(w, r, "service.html", out, nil)
 }
 
 func servicesUpdateHandler(w http.ResponseWriter, r *http.Request) {

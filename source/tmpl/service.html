@@ -1,3 +1,4 @@
+{{$s := .Service}}
 <!doctype html>
 <html lang="en">
 <head>
@@ -13,7 +14,7 @@
     <script src="/js/Chart.bundle.min.js"></script>
 {{end}}
 
-    <title>Statup | {{.Name}} Service</title>
+    <title>Statup | {{$s.Name}} Service</title>
 </head>
 <body>
 
@@ -25,14 +26,14 @@
 
             <div class="col-12 mb-4">
 
-            {{if .Online }}
+            {{if $s.Online }}
                 <span class="mt-3 mb-3 text-white d-md-none btn bg-success d-block d-md-none">ONLINE</span>
             {{ else }}
                 <span class="mt-3 mb-3 text-white d-md-none btn bg-danger d-block d-md-none">OFFLINE</span>
             {{end}}
 
-                        <h4 class="mt-2">{{ .Name }}
-                        {{if .Online }}
+                        <h4 class="mt-2">{{ $s.Name }}
+                        {{if $s.Online }}
                             <span class="badge bg-success float-right d-none d-md-block">ONLINE</span>
                         {{ else }}
                             <span class="badge bg-danger float-right d-none d-md-block">OFFLINE</span>
@@ -41,28 +42,42 @@
                         <div class="row stats_area mt-5 mb-5">
 
                             <div class="col-4">
-                                <span class="lg_number">{{.Online24}}%</span>
+                                <span class="lg_number">{{$s.Online24}}%</span>
                                 Online last 24 Hours
                             </div>
 
                             <div class="col-4">
-                                <span class="lg_number">{{.AvgTime}}ms</span>
+                                <span class="lg_number">{{$s.AvgTime}}ms</span>
                                 Average Response
                             </div>
 
                             <div class="col-4">
-                                <span class="lg_number">{{.TotalUptime}}%</span>
+                                <span class="lg_number">{{$s.TotalUptime}}%</span>
                                 Total Uptime
                             </div>
                         </div>
 
-                <div class="chart-container">
-                    <canvas id="service_{{ .Id }}"></canvas>
+                <div class="chart-container" style="height: 250px">
+                    <canvas id="service_{{ $s.Id }}"></canvas>
                 </div>
 
-            {{ if .LimitedFailures }}
+                <form id="service_date_form" class="row mt-2 mb-3">
+                    <span id="start_date" class="text-muted small float-left pointer">{{FromUnix .Start}}</span>
+                    <span id="end_date" class="text-muted small float-right pointer" style="position: absolute;right: 0;">{{FromUnix .End}}</span>
+                    <input type="hidden" name="start" class="form-control" id="service_start" spellcheck="false">
+                    <input type="hidden" name="end" class="form-control" id="service_end" spellcheck="false">
+                    <button type="submit" class="btn btn-light btn-block btn-sm mt-2">Set Timeframe</button>
+                    <div id="start_container"></div>
+                    <div id="end_container"></div>
+                </form>
+
+                {{if not $s.Online}}
+                    <div class="col-12 small text-center mt-3 text-muted">{{$s.DowntimeText}}</div>
+                {{end}}
+
+            {{ if $s.LimitedFailures }}
                 <div class="list-group mt-3 mb-4">
-                {{ range .LimitedFailures }}
+                {{ range $s.LimitedFailures }}
                     <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                         <div class="d-flex w-100 justify-content-between">
                             <h5 class="mb-1">{{.ParseError}}</h5>
@@ -83,82 +98,82 @@
 
             <h3>Edit Service</h3>
 
-            <form action="/service/{{.Id}}" method="POST">
+            <form action="/service/{{$s.Id}}" method="POST">
                 <div class="form-group row">
                     <label for="service_name" class="col-sm-4 col-form-label">Service Name</label>
                     <div class="col-sm-8">
-                        <input type="text" name="name" class="form-control" id="service_name" value="{{.Name}}" placeholder="Name" required spellcheck="false">
+                        <input type="text" name="name" class="form-control" id="service_name" value="{{$s.Name}}" placeholder="Name" required spellcheck="false">
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="service_type" class="col-sm-4 col-form-label">Service Check Type</label>
                     <div class="col-sm-8">
-                        <select name="check_type" class="form-control" id="service_type" value="{{.Type}}">
-                            <option value="http" {{if eq .Type "http"}}selected{{end}}>HTTP Service</option>
-                            <option value="tcp" {{if eq .Type "tcp"}}selected{{end}}>TCP Service</option>
+                        <select name="check_type" class="form-control" id="service_type" value="{{$s.Type}}">
+                            <option value="http" {{if eq $s.Type "http"}}selected{{end}}>HTTP Service</option>
+                            <option value="tcp" {{if eq $s.Type "tcp"}}selected{{end}}>TCP Service</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="service_url" class="col-sm-4 col-form-label">Application Endpoint (URL)</label>
                     <div class="col-sm-8">
-                        <input type="text" name="domain" class="form-control" id="service_url" value="{{.Domain}}" placeholder="https://google.com" required autocapitalize="false" spellcheck="false">
+                        <input type="text" name="domain" class="form-control" id="service_url" value="{{$s.Domain}}" placeholder="https://google.com" required autocapitalize="false" spellcheck="false">
                     </div>
                 </div>
-                <div class="form-group row{{if eq .Type "tcp"}} d-none{{end}}">
+                <div class="form-group row{{if eq $s.Type "tcp"}} d-none{{end}}">
                     <label for="service_check_type" class="col-sm-4 col-form-label">Service Check Type</label>
                     <div class="col-sm-8">
-                        <select name="method" class="form-control" id="service_check_type" value="{{.Method}}">
-                            <option value="GET" {{if eq .Method "GET"}}selected{{end}}>GET</option>
-                            <option value="POST" {{if eq .Method "POST"}}selected{{end}}>POST</option>
-                            <option value="DELETE" {{if eq .Method "DELETE"}}selected{{end}}>DELETE</option>
-                            <option value="PATCH" {{if eq .Method "PATCH"}}selected{{end}}>PATCH</option>
-                            <option value="PUT" {{if eq .Method "PUT"}}selected{{end}}>PUT</option>
+                        <select name="method" class="form-control" id="service_check_type" value="{{$s.Method}}">
+                            <option value="GET" {{if eq $s.Method "GET"}}selected{{end}}>GET</option>
+                            <option value="POST" {{if eq $s.Method "POST"}}selected{{end}}>POST</option>
+                            <option value="DELETE" {{if eq $s.Method "DELETE"}}selected{{end}}>DELETE</option>
+                            <option value="PATCH" {{if eq $s.Method "PATCH"}}selected{{end}}>PATCH</option>
+                            <option value="PUT" {{if eq $s.Method "PUT"}}selected{{end}}>PUT</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-group row{{if ne .Method "POST"}} d-none{{end}}">
+                <div class="form-group row{{if ne $s.Method "POST"}} d-none{{end}}">
                     <label for="post_data" class="col-sm-4 col-form-label">Optional Post Data (JSON)</label>
                     <div class="col-sm-8">
-                        <textarea name="post_data" class="form-control" id="post_data" rows="3" autocapitalize="false" spellcheck="false">{{.PostData}}</textarea>
+                        <textarea name="post_data" class="form-control" id="post_data" rows="3" autocapitalize="false" spellcheck="false">{{$s.PostData}}</textarea>
                         <small id="emailHelp" class="form-text text-muted">You can insert <a target="_blank" href="https://regex101.com/r/I5bbj9/1">Regex</a> to validate the response</small>
                     </div>
                 </div>
-                <div class="form-group row{{if eq .Type "tcp"}} d-none{{end}}">
+                <div class="form-group row{{if eq $s.Type "tcp"}} d-none{{end}}">
                     <label for="service_response" class="col-sm-4 col-form-label">Expected Response (Regex)</label>
                     <div class="col-sm-8">
-                        <textarea name="expected" class="form-control" id="service_response" rows="3" autocapitalize="false" spellcheck="false">{{.Expected}}</textarea>
+                        <textarea name="expected" class="form-control" id="service_response" rows="3" autocapitalize="false" spellcheck="false">{{$s.Expected}}</textarea>
                     </div>
                 </div>
-                <div class="form-group row{{if eq .Type "tcp"}} d-none{{end}}">
+                <div class="form-group row{{if eq $s.Type "tcp"}} d-none{{end}}">
                     <label for="service_response_code" class="col-sm-4 col-form-label">Expected Status Code</label>
                     <div class="col-sm-8">
-                        <input type="number" name="expected_status" class="form-control" value="{{.ExpectedStatus}}" id="service_response_code">
+                        <input type="number" name="expected_status" class="form-control" value="{{$s.ExpectedStatus}}" id="service_response_code">
                     </div>
                 </div>
-                <div class="form-group row{{if eq .Type "http"}} d-none{{end}}">
+                <div class="form-group row{{if eq $s.Type "http"}} d-none{{end}}">
                     <label for="service_port" class="col-sm-4 col-form-label">TCP Port</label>
                     <div class="col-sm-8">
-                        <input type="number" name="port" class="form-control" value="{{.Port}}" id="service_port" placeholder="8080">
+                        <input type="number" name="port" class="form-control" value="{{$s.Port}}" id="service_port" placeholder="8080">
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="service_interval" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
                     <div class="col-sm-8">
-                        <input type="number" name="interval" class="form-control" value="{{.Interval}}" min="1" id="service_interval" required>
+                        <input type="number" name="interval" class="form-control" value="{{$s.Interval}}" min="1" id="service_interval" required>
                         <small id="emailHelp" class="form-text text-muted">10,000+ will be checked in Microseconds (1 millisecond = 1000 microseconds).</small>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="service_timeout" class="col-sm-4 col-form-label">Timeout in Seconds</label>
                     <div class="col-sm-8">
-                        <input type="number" name="timeout" class="form-control" value="{{.Timeout}}" id="service_timeout" min="1">
+                        <input type="number" name="timeout" class="form-control" value="{{$s.Timeout}}" id="service_timeout" min="1">
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="order" class="col-sm-4 col-form-label">List Order</label>
                     <div class="col-sm-8">
-                        <input type="number" name="order" class="form-control" min="0" value="{{.Order}}" id="order">
+                        <input type="number" name="order" class="form-control" min="0" value="{{$s.Order}}" id="order">
                     </div>
                 </div>
                 <div class="form-group row">
@@ -166,34 +181,33 @@
                         <button type="submit" class="btn btn-success btn-block">Update Service</button>
                     </div>
                     <div class="col-6">
-                        <a href="/service/{{ .Id }}/delete_failures" class="btn btn-danger btn-block confirm-btn">Delete All Failures</a>
+                        <a href="/service/{{ $s.Id }}/delete_failures" class="btn btn-danger btn-block confirm-btn">Delete All Failures</a>
                     </div>
                 </div>
             </form>
 
         </div>
 
-<div class="col-12 mt-4{{if eq .Type "tcp"}} d-none{{end}}">
+<div class="col-12 mt-4{{if eq $s.Type "tcp"}} d-none{{end}}">
     <h3>Last Response</h3>
-    <textarea rows="8" class="form-control" readonly>{{ .LastResponse }}</textarea>
+    <textarea rows="8" class="form-control" readonly>{{ $s.LastResponse }}</textarea>
     <div class="form-group row mt-2">
         <label for="last_status_code" class="col-sm-3 col-form-label">HTTP Status Code</label>
         <div class="col-sm-2">
-            <input type="text" id="last_status_code" class="form-control" value="{{ .LastStatusCode }}" readonly>
+            <input type="text" id="last_status_code" class="form-control" value="{{ $s.LastStatusCode }}" readonly>
         </div>
     </div>
-
 </div>
 
 
-<div class="col-12 mt-4{{if eq .Type "tcp"}} d-none{{end}}">
+<div class="col-12 mt-4{{if eq $s.Type "tcp"}} d-none{{end}}">
     <h3>Service Checkins</h3>
-{{ range .Checkins }}
+{{ range $s.Checkins }}
     <h5>Check #{{.Id}} <span class="badge online_badge float-right">Checked in {{.Ago}}</span></h5>
     <input type="text" class="form-control" value="https://domainhere.com/api/checkin/{{.Api}}">
 {{ end }}
 
-    <form action="/service/{{.Id}}/checkin" method="POST">
+    <form action="/service/{{$s.Id}}/checkin" method="POST">
         <div class="form-group row">
             <label for="service_name" class="col-sm-4 col-form-label">Check Interval (in seconds)</label>
             <div class="col-md-6 col-sm-12">
@@ -222,15 +236,58 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+<script src="https://assets.statup.io/pikaday.js"></script>
 <script src="https://assets.statup.io/main.js"></script>
 {{ else }}
 <script src="/js/jquery-3.3.1.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/Chart.bundle.min.js"></script>
+<script src="/js/pikaday.js"></script>
 <script src="/js/main.js"></script>
 {{end}}
 
-<script src="/charts/{{.Id}}.js"></script>
+<script>
+    var startPick = new Pikaday({
+        field: $('#service_start')[0],
+        bound: false,
+        trigger: $("#start_date"),
+        container: $("#start_container")[0],
+        maxDate: new Date(),
+        onSelect: function(date) {
+          $('#service_start')[0].value = Math.round(date.getTime() / 1000);
+          this.hide();
+        }
+    });
+
+    var endPick = new Pikaday({
+        field: $('#service_end')[0],
+        bound: false,
+        trigger: $("#end_date"),
+        container: $("#end_container")[0],
+        maxDate: new Date(),
+        onSelect: function(date) {
+          $('#service_end')[0].value = Math.round(date.getTime() / 1000);
+          this.hide();
+        }
+    });
+
+    startPick.setDate(new Date({{.Start}}*1000));
+    endPick.setDate(new Date({{.End}}*1000));
+
+    startPick.hide()
+    endPick.hide()
+
+    $("#start_date").click(function(e) {
+        startPick.show()
+    })
+
+    $("#end_date").click(function(e) {
+        endPick.show()
+    })
+
+</script>
+
+<script src="/charts/{{$s.Id}}.js?start={{.Start}}&end={{.End}}"></script>
 
 </body>
 </html>

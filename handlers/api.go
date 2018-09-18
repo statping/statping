@@ -23,6 +23,7 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 	"os"
+	"time"
 )
 
 type ApiResponse struct {
@@ -99,6 +100,22 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
+	fields := parseGet(r)
+
+	startField := utils.StringInt(fields.Get("start"))
+	endField := utils.StringInt(fields.Get("end"))
+	var start time.Time
+	var end time.Time
+	if startField == 0 {
+		start = time.Now().Add(-24 * time.Hour).UTC()
+	} else {
+		start = time.Unix(startField, 0)
+	}
+	if endField == 0 {
+		end = time.Now().UTC()
+	} else {
+		end = time.Unix(endField, 0)
+	}
 	service := core.SelectService(utils.StringInt(vars["id"]))
 	if service == nil {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -106,7 +123,7 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(service.GraphDataRaw())
+	json.NewEncoder(w).Encode(core.GraphDataRaw(service, start, end).Array)
 }
 
 func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {

@@ -158,6 +158,7 @@ func CreateAllAssets(folder string) error {
 	CopyToPublic(ScssBox, folder+"/assets/scss", "base.scss")
 	CopyToPublic(ScssBox, folder+"/assets/scss", "variables.scss")
 	CopyToPublic(ScssBox, folder+"/assets/scss", "mobile.scss")
+	CopyToPublic(ScssBox, folder+"/assets/scss", "pikaday.scss")
 	CopyToPublic(CssBox, folder+"/assets/css", "bootstrap.min.css")
 	CopyToPublic(CssBox, folder+"/assets/css", "base.css")
 	//CopyToPublic(JsBox, folder+"/assets/js", "bootstrap.min.js")

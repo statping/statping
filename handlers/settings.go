@@ -129,6 +129,11 @@ func parseForm(r *http.Request) url.Values {
 	return r.PostForm
 }
 
+func parseGet(r *http.Request) url.Values {
+	r.ParseForm()
+	return r.Form
+}
+
 func saveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 	if !IsAuthenticated(r) {

@@ -1,4 +1,4 @@
-VERSION=0.63
+VERSION=0.64
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -61,8 +61,8 @@ run: build
 
 # compile assets using SASS and Rice. compiles scss -> css, and run rice embed-go
 compile:
-	cd source && $(GOPATH)/bin/rice embed-go
 	sass source/scss/base.scss source/css/base.css
+	cd source && $(GOPATH)/bin/rice embed-go
 	rm -rf .sass-cache
 
 # benchmark testing

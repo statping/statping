@@ -147,6 +147,12 @@ func executeResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		"ToString": func(v interface{}) string {
 			return utils.ToString(v)
 		},
+		"ToUnix": func(t time.Time) int64 {
+			return t.UTC().Unix()
+		},
+		"FromUnix": func(t int64) string {
+			return utils.Timezoner(time.Unix(t, 0), core.CoreApp.Timezone).Format("Monday, January 02")
+		},
 	})
 	t, err = t.Parse(nav)
 	if err != nil {

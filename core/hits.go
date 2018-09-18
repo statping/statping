@@ -78,7 +78,7 @@ func (s *Service) TotalHits() (uint64, error) {
 // TotalHitsSince returns the total amount of hits based on a specific time/date
 func (s *Service) TotalHitsSince(ago time.Time) (uint64, error) {
 	var count uint64
-	rows := hitsDB().Where("service = ? AND created_at > ?", s.Id, ago.Format("2006-01-02 15:04:05"))
+	rows := hitsDB().Where("service = ? AND created_at > ?", s.Id, ago.UTC().Format("2006-01-02 15:04:05"))
 	err := rows.Count(&count)
 	return count, err.Error
 }

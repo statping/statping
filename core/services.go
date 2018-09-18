@@ -18,6 +18,7 @@ package core
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ararog/timeago"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -125,9 +126,17 @@ type DateScan struct {
 	Value     int64     `json:"y"`
 }
 
+// DateScanObj struct is for creating the charts.js graph JSON array
+type DateScanObj struct {
+	Array []DateScan
+}
+
 // lastFailure returns the last failure a service had
 func (s *Service) lastFailure() *Failure {
 	limited := s.LimitedFailures()
+	if len(limited) == 0 {
+		return nil
+	}
 	last := limited[len(limited)-1]
 	return last
 }
@@ -146,47 +155,61 @@ func (s *Service) SmallText() string {
 	}
 	if len(last) > 0 {
 		lastFailure := s.lastFailure()
-		return fmt.Sprintf("%v on %v", lastFailure.ParseError(), utils.Timezoner(last[0].CreatedAt, zone).Format("Monday 3:04:05PM, Jan _2 2006"))
+		got, _ := timeago.TimeAgoWithTime(time.Now().Add(s.Downtime()), time.Now())
+		return fmt.Sprintf("Reported offline %v, %v", got, lastFailure.ParseError())
 	} else {
 		return fmt.Sprintf("%v is currently offline", s.Name)
 	}
 }
 
+func (s *Service) DowntimeText() string {
+	lastFailure := s.lastFailure()
+	if lastFailure == nil {
+		return ""
+	}
+	got, _ := timeago.TimeAgoWithTime(time.Now().UTC().Add(s.Downtime()), time.Now().UTC())
+	return fmt.Sprintf("Reported offline %v, %v", got, lastFailure.ParseError())
+}
+
 // GroupDataBy returns a SQL query as a string to group a column by a time
-func GroupDataBy(column string, id int64, tm time.Time, increment string) string {
+func GroupDataBy(column string, id int64, start, end time.Time, increment string) string {
 	var sql string
 	switch CoreApp.DbConnection {
 	case "mysql":
-		sql = fmt.Sprintf("SELECT CONCAT(date_format(created_at, '%%Y-%%m-%%dT%%H:%%i:00Z')) AS created_at, AVG(latency)*1000 AS value FROM %v WHERE service=%v AND DATE_FORMAT(created_at, '%%Y-%%m-%%dT%%TZ') BETWEEN DATE_FORMAT('%v', '%%Y-%%m-%%dT%%TZ') AND DATE_FORMAT(NOW(), '%%Y-%%m-%%dT%%TZ') GROUP BY 1 ORDER BY created_at ASC;", column, id, tm.Format(time.RFC3339))
+		sql = fmt.Sprintf("SELECT CONCAT(date_format(created_at, '%%Y-%%m-%%dT%%H:%%i:00Z')) AS created_at, AVG(latency)*1000 AS value FROM %v WHERE service=%v AND DATE_FORMAT(created_at, '%%Y-%%m-%%dT%%TZ') BETWEEN DATE_FORMAT('%v', '%%Y-%%m-%%dT%%TZ') AND DATE_FORMAT('%v', '%%Y-%%m-%%dT%%TZ') GROUP BY 1 ORDER BY created_at ASC;", column, id, start.UTC().Format(time.RFC3339), end.UTC().Format(time.RFC3339))
 	case "sqlite":
-		sql = fmt.Sprintf("SELECT strftime('%%Y-%%m-%%dT%%H:%%M:00Z', created_at), AVG(latency)*1000 as value FROM %v WHERE service=%v AND created_at >= '%v' GROUP BY strftime('%%M:00', created_at) ORDER BY created_at ASC;", column, id, tm.Format(time.RFC3339))
+		sql = fmt.Sprintf("SELECT strftime('%%Y-%%m-%%dT%%H:%%M:00Z', created_at), AVG(latency)*1000 as value FROM %v WHERE service=%v AND created_at >= '%v' AND created_at <= '%v' GROUP BY strftime('%%M:00', created_at) ORDER BY created_at ASC;", column, id, start.UTC().Format(time.RFC3339), end.UTC().Format(time.RFC3339))
 	case "postgres":
-		sql = fmt.Sprintf("SELECT date_trunc('%v', created_at), AVG(latency)*1000 AS value FROM %v WHERE service=%v AND created_at >= '%v' GROUP BY 1 ORDER BY date_trunc ASC;", increment, column, id, tm.Format(time.RFC3339))
+		sql = fmt.Sprintf("SELECT date_trunc('%v', created_at), AVG(latency)*1000 AS value FROM %v WHERE service=%v AND created_at >= '%v' AND created_at <= '%v' GROUP BY 1 ORDER BY date_trunc ASC;", increment, column, id, start.UTC().Format(time.RFC3339), end.UTC().Format(time.RFC3339))
 	}
 	return sql
 }
 
+// Downtime returns the amount of time of a offline service
 func (s *Service) Downtime() time.Duration {
 	hits, _ := s.Hits()
+	if len(hits) == 0 {
+		return time.Duration(0)
+	}
 	fails := s.LimitedFailures()
 	if len(fails) == 0 {
 		return time.Duration(0)
 	}
-	since := fails[0].CreatedAt.Sub(hits[0].CreatedAt)
+	since := fails[0].CreatedAt.UTC().Sub(hits[0].CreatedAt.UTC())
 	return since
 }
 
-func (s *Service) GraphDataRaw() []*DateScan {
-	var d []*DateScan
-	since := time.Now().Add(time.Hour*-24 + time.Minute*0 + time.Second*0)
-	sql := GroupDataBy("hits", s.Id, since, "minute")
+func GraphDataRaw(service types.ServiceInterface, start, end time.Time) *DateScanObj {
+	var d []DateScan
+	s := service.Select()
+	sql := GroupDataBy("hits", s.Id, start, end, "minute")
 	rows, err := DbSession.Raw(sql).Rows()
 	if err != nil {
 		utils.Log(2, err)
 		return nil
 	}
 	for rows.Next() {
-		gd := new(DateScan)
+		var gd DateScan
 		var tt string
 		var ff float64
 		err := rows.Scan(&tt, &ff)
@@ -201,12 +224,23 @@ func (s *Service) GraphDataRaw() []*DateScan {
 		gd.Value = int64(ff)
 		d = append(d, gd)
 	}
-	return d
+	return &DateScanObj{d}
+}
+
+func (d *DateScanObj) ToString() string {
+	data, err := json.Marshal(d.Array)
+	if err != nil {
+		utils.Log(2, err)
+		return "{}"
+	}
+	return string(data)
 }
 
 // GraphData returns the JSON object used by Charts.js to render the chart
 func (s *Service) GraphData() string {
-	obj := s.GraphDataRaw()
+	start := time.Now().Add(time.Hour*-24 + time.Minute*0 + time.Second*0)
+	end := time.Now()
+	obj := GraphDataRaw(s, start, end)
 	data, err := json.Marshal(obj)
 	if err != nil {
 		utils.Log(2, err)

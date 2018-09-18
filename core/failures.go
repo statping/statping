@@ -123,7 +123,7 @@ func (s *Service) TotalFailures() (uint64, error) {
 // TotalFailuresSince returns the total amount of failures for a service since a specific time/date
 func (s *Service) TotalFailuresSince(ago time.Time) (uint64, error) {
 	var count uint64
-	rows := failuresDB().Where("service = ? AND created_at > ?", s.Id, ago.Format("2006-01-02 15:04:05"))
+	rows := failuresDB().Where("service = ? AND created_at > ?", s.Id, ago.UTC().Format("2006-01-02 15:04:05"))
 	err := rows.Count(&count)
 	return count, err.Error
 }
