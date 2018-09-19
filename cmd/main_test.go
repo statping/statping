@@ -52,7 +52,13 @@ func Clean() {
 	utils.DeleteDirectory(dir + "/logs")
 }
 
-func RunInit(t *testing.T) {
+func RunInit(db string, t *testing.T) {
+	if db == "mssql" {
+		os.Setenv("DB_DATABASE", "tempdb")
+		os.Setenv("DB_PASS", "PaSsW0rD123")
+		os.Setenv("DB_PORT", "1433")
+		os.Setenv("DB_USER", "sa")
+	}
 	source.Assets()
 	Clean()
 	route = handlers.Router()
@@ -69,7 +75,7 @@ func TestRunAll(t *testing.T) {
 
 	for _, dbt := range databases {
 		t.Run(dbt+" init", func(t *testing.T) {
-			RunInit(t)
+			RunInit(dbt, t)
 		})
 		t.Run(dbt+" Save Config", func(t *testing.T) {
 			RunSaveConfig(t, dbt)
@@ -206,6 +212,11 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" Cleanup", func(t *testing.T) {
 			core.Configs.Close()
 			core.DbSession = nil
+			if dbt == "mssql" {
+				os.Setenv("DB_DATABASE", "root")
+				os.Setenv("DB_PASS", "password123")
+				os.Setenv("DB_PORT", "1433")
+			}
 			//Clean()
 		})
 
@@ -220,6 +231,8 @@ func RunSaveConfig(t *testing.T, db string) {
 	port := 5432
 	if db == "mysql" {
 		port = 3306
+	} else if db == "mssql" {
+		port = 1433
 	}
 	core.Configs = &core.DbConfig{DbConfig: &types.DbConfig{
 		DbConn:      db,

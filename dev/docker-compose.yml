@@ -1,0 +1,32 @@
+postgres:
+  container_name: postgres
+  image: postgres
+  restart: always
+  ports:
+    - 5432:5432
+  environment:
+    POSTGRES_PASSWORD: password123
+    POSTGRES_USER: root
+    POSTGRES_DB: root
+
+mysql:
+  container_name: mysql
+  image: mysql:5.6
+  restart: always
+  ports:
+    - 3306:3306
+  environment:
+    MYSQL_ROOT_PASSWORD: password123
+    MYSQL_DATABASE: root
+    MYSQL_USER: root
+    MYSQL_PASSWORD: password123
+
+mssql:
+  container_name: mssql
+  image: microsoft/mssql-server-linux
+  restart: always
+  ports:
+    - 1433:1433
+  environment:
+    SA_PASSWORD: PaSsW0rD123
+    ACCEPT_EULA: "Y"

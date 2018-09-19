@@ -163,12 +163,7 @@ func (s *Service) SmallText() string {
 }
 
 func (s *Service) DowntimeText() string {
-	lastFailure := s.lastFailure()
-	if lastFailure == nil {
-		return ""
-	}
-	got, _ := timeago.TimeAgoWithTime(time.Now().UTC().Add(s.Downtime()), time.Now().UTC())
-	return fmt.Sprintf("Reported offline %v, %v", got, lastFailure.ParseError())
+	return fmt.Sprintf("%v has been offline for %v", s.Name, utils.DurationReadable(s.Downtime()))
 }
 
 // GroupDataBy returns a SQL query as a string to group a column by a time
@@ -188,12 +183,12 @@ func GroupDataBy(column string, id int64, start, end time.Time, increment string
 // Downtime returns the amount of time of a offline service
 func (s *Service) Downtime() time.Duration {
 	hits, _ := s.Hits()
-	if len(hits) == 0 {
-		return time.Duration(0)
-	}
 	fails := s.LimitedFailures()
 	if len(fails) == 0 {
 		return time.Duration(0)
+	}
+	if len(hits) == 0 {
+		return time.Now().UTC().Sub(fails[len(fails)-1].CreatedAt.UTC())
 	}
 	since := fails[0].CreatedAt.UTC().Sub(hits[0].CreatedAt.UTC())
 	return since

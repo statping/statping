@@ -172,6 +172,9 @@ docker-push-latest:
 	docker push hunterlong/statup:latest
 	docker push hunterlong/statup:latest-v$(VERSION)
 
+docker-run-mssql:
+	docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=PaSsW0rD123' -p 1433:1433 -d microsoft/mssql-server-linux
+
 # create Postgres, and MySQL instance using Docker (used for testing)
 databases:
 	docker run --name statup_postgres -p 5432:5432 -e POSTGRES_PASSWORD=password123 -e POSTGRES_USER=root -e POSTGRES_DB=root -d postgres

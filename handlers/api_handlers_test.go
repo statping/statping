@@ -121,16 +121,6 @@ func TestApiServiceHandler(t *testing.T) {
 	assert.Equal(t, "https://google.com", obj.Domain)
 }
 
-func TestApiServiceDataHandler(t *testing.T) {
-	rr, err := httpRequestAPI(t, "GET", "/api/services/1/data", nil)
-	assert.Nil(t, err)
-	body := rr.Body.String()
-	var obj []*core.DateScan
-	formatJSON(body, &obj)
-	assert.Equal(t, 200, rr.Code)
-	assert.Equal(t, 60, len(obj))
-}
-
 func TestApiCreateServiceHandler(t *testing.T) {
 	rr, err := httpRequestAPI(t, "POST", "/api/services", strings.NewReader(NEW_HTTP_SERVICE))
 	assert.Nil(t, err)
