@@ -27,11 +27,10 @@ import (
 )
 
 const (
-	SLACK_ID         = 2
 	SLACK_METHOD     = "slack"
 	FAILING_TEMPLATE = `{ "attachments": [ { "fallback": "Service {{.Service.Name}} - is currently failing", "text": "<{{.Service.Domain}}|{{.Service.Name}}> - Your Statup service '{{.Service.Name}}' has just received a Failure notification with a HTTP Status code of {{.Service.LastStatusCode}}.", "fields": [ { "title": "Expected", "value": "{{.Service.Expected}}", "short": true }, { "title": "Status Code", "value": "{{.Service.LastStatusCode}}", "short": true } ], "color": "#FF0000", "thumb_url": "https://statup.io", "footer": "Statup", "footer_icon": "https://img.cjx.io/statuplogo32.png" } ] }`
 	SUCCESS_TEMPLATE = `{ "attachments": [ { "fallback": "Service {{.Service.Name}} - is now back online", "text": "<{{.Service.Domain}}|{{.Service.Name}}> - Your Statup service '{{.Service.Name}}' has just received a Failure notification.", "fields": [ { "title": "Issue", "value": "Awesome Project", "short": true }, { "title": "Status Code", "value": "{{.Service.LastStatusCode}}", "short": true } ], "color": "#00FF00", "thumb_url": "https://statup.io", "footer": "Statup", "footer_icon": "https://img.cjx.io/statuplogo32.png" } ] }`
-	TEST_TEMPLATE    = `{"text":"{{.}}"}`
+	SLACK_TEXT       = `{"text":"{{.}}"}`
 )
 
 type Slack struct {
@@ -91,7 +90,6 @@ func (u *Slack) Send(msg interface{}) error {
 	}
 	defer res.Body.Close()
 	//contents, _ := ioutil.ReadAll(res.Body)
-	//fmt.Println(string(contents))
 	return nil
 }
 
@@ -102,7 +100,7 @@ func (u *Slack) Select() *notifier.Notification {
 func (u *Slack) OnTest(n notifier.Notification) (bool, error) {
 	utils.Log(1, "Slack notifier loaded")
 	msg := fmt.Sprintf("You're Statup Slack Notifier is working correctly!")
-	err := parseSlackMessage(TEST_TEMPLATE, msg)
+	err := parseSlackMessage(SLACK_TEXT, msg)
 	return true, err
 }
 
@@ -110,15 +108,24 @@ func (u *Slack) OnTest(n notifier.Notification) (bool, error) {
 func (u *Slack) OnFailure(s *types.Service, f *types.Failure) {
 	message := SlackMessage{
 		Service:  s,
-		Template: FAILURE,
+		Template: FAILING_TEMPLATE,
 		Time:     time.Now().Unix(),
 	}
 	parseSlackMessage(FAILING_TEMPLATE, message)
+	u.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (u *Slack) OnSuccess(s *types.Service) {
-
+	if !u.Online {
+		message := SlackMessage{
+			Service:  s,
+			Template: SUCCESS_TEMPLATE,
+			Time:     time.Now().Unix(),
+		}
+		parseSlackMessage(SUCCESS_TEMPLATE, message)
+	}
+	u.Online = true
 }
 
 // OnSave triggers when this notifier has been saved

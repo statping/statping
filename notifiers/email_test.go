@@ -97,9 +97,32 @@ func TestEmailNotifier(t *testing.T) {
 		assert.True(t, ok)
 	})
 
-	t.Run("Emailer Test Source", func(t *testing.T) {
+	t.Run("Email Test Source", func(t *testing.T) {
 		emailSource(testEmail)
 		assert.NotEmpty(t, testEmail.Source)
+	})
+
+	t.Run("Email OnFailure", func(t *testing.T) {
+		emailer.OnFailure(TestService, TestFailure)
+		assert.Len(t, emailer.Queue, 1)
+	})
+
+	t.Run("Email Check Offline", func(t *testing.T) {
+		assert.False(t, emailer.Online)
+	})
+
+	t.Run("Email OnSuccess", func(t *testing.T) {
+		emailer.OnSuccess(TestService)
+		assert.Len(t, emailer.Queue, 2)
+	})
+
+	t.Run("Email Check Back Online", func(t *testing.T) {
+		assert.True(t, emailer.Online)
+	})
+
+	t.Run("Email OnSuccess Again", func(t *testing.T) {
+		emailer.OnSuccess(TestService)
+		assert.Len(t, emailer.Queue, 2)
 	})
 
 	t.Run("Email Send", func(t *testing.T) {

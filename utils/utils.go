@@ -193,7 +193,7 @@ func copyAndCapture(w io.Writer, r io.Reader) ([]byte, error) {
 
 func DurationReadable(d time.Duration) string {
 	if d.Hours() >= 1 {
-		return fmt.Sprintf("%0.0f hours and %0.0f minutes", d.Hours(), d.Minutes())
+		return fmt.Sprintf("%0.0f hours", d.Hours())
 	} else if d.Minutes() >= 1 {
 		return fmt.Sprintf("%0.0f minutes", d.Minutes())
 	} else if d.Seconds() >= 1 {

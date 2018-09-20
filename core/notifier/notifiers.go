@@ -58,6 +58,7 @@ type Notification struct {
 	Queue       []interface{}      `gorm:"-" json:"-"`
 	Running     chan bool          `gorm:"-" json:"-"`
 	CanTest     bool               `gorm:"-" json:"-"`
+	Online      bool               `gorm:"-" json:"-"`
 }
 
 type NotificationForm struct {

@@ -40,6 +40,8 @@ func init() {
 
 func TestSlackNotifier(t *testing.T) {
 	t.Parallel()
+	SLACK_URL = os.Getenv("SLACK_URL")
+	slacker.Host = SLACK_URL
 	if SLACK_URL == "" {
 		t.Log("Slack notifier testing skipped, missing SLACK_URL environment variable")
 		t.SkipNow()
@@ -60,7 +62,7 @@ func TestSlackNotifier(t *testing.T) {
 	})
 
 	t.Run("Slack parse message", func(t *testing.T) {
-		err := parseSlackMessage("this is a test message!", slackTestMessage)
+		err := parseSlackMessage(SLACK_TEXT, "this is a test!")
 		assert.Nil(t, err)
 		assert.Equal(t, 1, len(slacker.Queue))
 	})
@@ -71,14 +73,38 @@ func TestSlackNotifier(t *testing.T) {
 		assert.True(t, ok)
 	})
 
+	t.Run("Slack OnFailure", func(t *testing.T) {
+		slacker.OnFailure(TestService, TestFailure)
+		assert.Len(t, slacker.Queue, 2)
+	})
+
+	t.Run("Slack Check Offline", func(t *testing.T) {
+		assert.False(t, slacker.Online)
+	})
+
+	t.Run("Slack OnSuccess", func(t *testing.T) {
+		slacker.OnSuccess(TestService)
+		assert.Len(t, slacker.Queue, 3)
+	})
+
+	t.Run("Slack Check Back Online", func(t *testing.T) {
+		assert.True(t, slacker.Online)
+	})
+
+	t.Run("Slack OnSuccess Again", func(t *testing.T) {
+		slacker.OnSuccess(TestService)
+		assert.Len(t, slacker.Queue, 3)
+	})
+
 	t.Run("Slack Send", func(t *testing.T) {
 		err := slacker.Send(slackMessage)
 		assert.Nil(t, err)
+		assert.Len(t, slacker.Queue, 3)
 	})
 
 	t.Run("Slack Queue", func(t *testing.T) {
 		go notifier.Queue(slacker)
-		time.Sleep(1 * time.Second)
+		time.Sleep(2 * time.Second)
 		assert.Equal(t, SLACK_URL, slacker.Host)
 		assert.Equal(t, 0, len(slacker.Queue))
 	})

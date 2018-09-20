@@ -80,11 +80,16 @@ func (u *LineNotify) Select() *notifier.Notification {
 func (u *LineNotify) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
 	u.AddQueue(msg)
+	u.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (u *LineNotify) OnSuccess(s *types.Service) {
-
+	if !u.Online {
+		msg := fmt.Sprintf("Your service '%v' is back online!", s.Name)
+		u.AddQueue(msg)
+	}
+	u.Online = true
 }
 
 // OnSave triggers when this notifier has been saved

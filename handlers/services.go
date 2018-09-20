@@ -32,32 +32,27 @@ type Service struct {
 }
 
 func renderServiceChartHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	vars := mux.Vars(r)
 	fields := parseGet(r)
+	w.Header().Set("Content-Type", "text/javascript")
+	w.Header().Set("Cache-Control", "max-age=30")
 
 	startField := fields.Get("start")
 	endField := fields.Get("end")
 	var start time.Time
 	var end time.Time
 	if startField == "" {
-		start = time.Now().Add(-24 * time.Hour)
+		start = time.Now().Add(-24 * time.Hour).UTC()
 	} else {
-		start = time.Unix(utils.StringInt(startField), 0)
+		start = time.Unix(utils.StringInt(startField), 0).UTC()
 	}
 	if endField == "" {
-		end = time.Now()
+		end = time.Now().UTC()
 	} else {
-		end = time.Unix(utils.StringInt(endField), 0)
+		end = time.Unix(utils.StringInt(endField), 0).UTC()
 	}
 
 	service := core.SelectService(utils.StringInt(vars["id"]))
-	w.Header().Set("Content-Type", "text/javascript")
-	w.Header().Set("Cache-Control", "max-age=60")
-
 	data := core.GraphDataRaw(service, start, end).ToString()
 
 	out := struct {

@@ -28,7 +28,7 @@ var (
 	TWILIO_SECRET = os.Getenv("TWILIO_SECRET")
 	TWILIO_FROM   = os.Getenv("TWILIO_FROM")
 	TWILIO_TO     = os.Getenv("TWILIO_TO")
-	twilioMessage = "The twilioNotifier notifier on Statup has been tested!"
+	twilioMessage = "The Twilio notifier on Statup has been tested!"
 )
 
 func init() {
@@ -68,6 +68,29 @@ func TestTwilioNotifier(t *testing.T) {
 		ok, err := twilioNotifier.WithinLimits()
 		assert.Nil(t, err)
 		assert.True(t, ok)
+	})
+
+	t.Run("Twilio OnFailure", func(t *testing.T) {
+		twilioNotifier.OnFailure(TestService, TestFailure)
+		assert.Len(t, twilioNotifier.Queue, 2)
+	})
+
+	t.Run("Twilio Check Offline", func(t *testing.T) {
+		assert.False(t, twilioNotifier.Online)
+	})
+
+	t.Run("Twilio OnSuccess", func(t *testing.T) {
+		twilioNotifier.OnSuccess(TestService)
+		assert.Len(t, twilioNotifier.Queue, 3)
+	})
+
+	t.Run("Twilio Check Back Online", func(t *testing.T) {
+		assert.True(t, twilioNotifier.Online)
+	})
+
+	t.Run("Twilio OnSuccess Again", func(t *testing.T) {
+		twilioNotifier.OnSuccess(TestService)
+		assert.Len(t, twilioNotifier.Queue, 3)
 	})
 
 	t.Run("Twilio Send", func(t *testing.T) {
