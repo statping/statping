@@ -18,7 +18,6 @@ package plugin
 import (
 	"github.com/jinzhu/gorm"
 	"net/http"
-	"upper.io/db.v3/lib/sqlbuilder"
 )
 
 //
@@ -34,7 +33,7 @@ import (
 //
 
 var (
-	DB sqlbuilder.Database
+	DB *gorm.DB
 )
 
 type Routing struct {
@@ -65,7 +64,7 @@ type PluginInfo struct {
 	i *Info
 }
 
-func SetDatabase(database sqlbuilder.Database) {
+func SetDatabase(database *gorm.DB) {
 	DB = database
 }
 

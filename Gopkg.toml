@@ -89,10 +89,6 @@
   name = "gopkg.in/russross/blackfriday.v2"
   version = "2.0.0"
 
-[[constraint]]
-  name = "upper.io/db.v3"
-  version = "3.5.4"
-
 [prune]
   go-tests = true
   unused-packages = true

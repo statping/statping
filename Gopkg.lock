@@ -6,8 +6,8 @@
   name = "cloud.google.com/go"
   packages = ["civil"]
   pruneopts = "UT"
-  revision = "c728a003b238b26cef9ab6753a5dc424b331c3ad"
-  version = "v0.27.0"
+  revision = "97efc2c9ffd9fe8ef47f7f3203dc60bbca547374"
+  version = "v0.28.0"
 
 [[projects]]
   branch = "master"
@@ -284,22 +284,22 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:374fc90fcb026e9a367e3fad29e988e5dd944b68ca3f24a184d77abc5307dda4"
+  digest = "1:3bb4674103eef9bf860b88e59048c67ad646de4274ea7de8d71d16e9f8209bff"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "d0be0721c37eeb5299f245a996a483160fc36940"
+  revision = "d641721ec2dead6fe5ca284096fe4b1fcd49e427"
 
 [[projects]]
   digest = "1:c25289f43ac4a68d88b02245742347c94f1e108c534dda442188015ff80669b3"
   name = "google.golang.org/appengine"
   packages = ["cloudsql"]
   pruneopts = "UT"
-  revision = "b1f26356af11148e710935ed1ac8a7f5702c7612"
-  version = "v1.1.0"
+  revision = "ae0ab99deb4dc413a2b4bd6c8bdd0eb67f1e4d06"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "v3"
@@ -333,23 +333,6 @@
   revision = "cadec560ec52d93835bf2f15bd794700d3a2473b"
   version = "v2.0.0"
 
-[[projects]]
-  digest = "1:0a6ab450a46e158a97e3daf7da9df3bfd4f84420047fab6a65fb70b1337ce026"
-  name = "upper.io/db.v3"
-  packages = [
-    ".",
-    "internal/cache",
-    "internal/cache/hashstructure",
-    "internal/immutable",
-    "internal/sqladapter/compat",
-    "internal/sqladapter/exql",
-    "lib/reflectx",
-    "lib/sqlbuilder",
-  ]
-  pruneopts = "UT"
-  revision = "199d13d76c7cfba05ea0327375056fdabc8bea80"
-  version = "v3.5.4"
-
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
@@ -375,7 +358,6 @@
     "gopkg.in/gomail.v2",
     "gopkg.in/natefinch/lumberjack.v2",
     "gopkg.in/russross/blackfriday.v2",
-    "upper.io/db.v3/lib/sqlbuilder",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
