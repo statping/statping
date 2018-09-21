@@ -91,16 +91,16 @@ func InsertSampleData() error {
 
 // InsertSampleHits will create a couple new hits for the sample services
 func InsertSampleHits() error {
-	since := time.Now().Add(-24 * time.Hour)
+	since := time.Now().Add((-24 * 7) * time.Hour)
 	for i := int64(1); i <= 5; i++ {
 		service := SelectService(i)
 		utils.Log(1, fmt.Sprintf("Adding %v sample hit records to service %v", 360, service.Name))
 		createdAt := since
 
-		for hi := int64(1); hi <= 360; hi++ {
+		for hi := int64(1); hi <= 860; hi++ {
 			rand.Seed(time.Now().UnixNano())
 			latency := rand.Float64()
-			createdAt = createdAt.Add(2 * time.Minute)
+			createdAt = createdAt.Add(15 * time.Minute)
 			hit := &types.Hit{
 				Service:   service.Id,
 				CreatedAt: createdAt,

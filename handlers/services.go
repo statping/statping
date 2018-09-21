@@ -42,7 +42,7 @@ func renderServiceChartHandler(w http.ResponseWriter, r *http.Request) {
 	var start time.Time
 	var end time.Time
 	if startField == "" {
-		start = time.Now().Add(-24 * time.Hour).UTC()
+		start = time.Now().Add((-24 * 7) * time.Hour).UTC()
 	} else {
 		start = time.Unix(utils.StringInt(startField), 0).UTC()
 	}
@@ -70,7 +70,7 @@ func renderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
 
 	var data []string
 	end := time.Now()
-	start := end.Add(-24 * time.Hour)
+	start := end.Add(-(24 * 7) * time.Hour)
 	for _, s := range services {
 		d := core.GraphDataRaw(s, start, end).ToString()
 		data = append(data, d)
@@ -184,7 +184,7 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if startField == 0 || endField == 0 {
-		startField = time.Now().Add(-24 * time.Hour).UTC().Unix()
+		startField = time.Now().Add((-24 * 7) * time.Hour).UTC().Unix()
 		endField = time.Now().UTC().Unix()
 	}
 

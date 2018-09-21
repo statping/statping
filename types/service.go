@@ -47,7 +47,6 @@ type Service struct {
 	DnsLookup      float64       `gorm:"-" json:"dns_lookup_time"`
 	Failures       []interface{} `gorm:"-" json:"failures,omitempty"`
 	Checkins       []*Checkin    `gorm:"-" json:"checkins,omitempty"`
-	Range          [2]time.Time  `gorm:"-" json:"-"`
 }
 
 type ServiceInterface interface {

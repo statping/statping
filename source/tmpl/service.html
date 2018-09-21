@@ -58,7 +58,7 @@
                         </div>
 
                 <div class="chart-container" style="height: 250px">
-                    <canvas id="service_{{ $s.Id }}"></canvas>
+                    <canvas id="service"></canvas>
                 </div>
 
                 <form id="service_date_form" class="row mt-2 mb-3">
@@ -247,6 +247,54 @@
 {{end}}
 
 <script>
+
+    var ctx = document.getElementById("service").getContext('2d');
+
+    var chartdata = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [{
+                label: 'Response Time (Milliseconds)',
+                data: {{js .GraphData}},
+                backgroundColor: [
+                    'rgba(47, 206, 30, 0.92)'
+                ],
+                borderColor: [
+                    'rgb(47, 171, 34)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            legend: {
+                display: false
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    },
+                    gridLines: {
+                        display:false
+                    }
+                }],
+                xAxes: [{
+                    type: 'time',
+                    distribution: 'series',
+                    gridLines: {
+                        display:false
+                    }
+                }]
+            },
+            elements: {
+                point: {
+                    radius: 0
+                }
+            }
+        }
+    });
+
+
     var startPick = new Pikaday({
         field: $('#service_start')[0],
         bound: false,
@@ -286,8 +334,6 @@
     })
 
 </script>
-
-<script src="/charts/{{$s.Id}}.js?start={{.Start}}&end={{.End}}"></script>
 
 </body>
 </html>

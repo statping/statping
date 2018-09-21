@@ -106,11 +106,16 @@ func (u *twilio) Send(msg interface{}) error {
 func (u *twilio) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
 	u.AddQueue(msg)
+	u.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (u *twilio) OnSuccess(s *types.Service) {
-
+	if !u.Online {
+		msg := fmt.Sprintf("Your service '%v' is back online!", s.Name)
+		u.AddQueue(msg)
+	}
+	u.Online = true
 }
 
 // OnSave triggers when this notifier has been saved
