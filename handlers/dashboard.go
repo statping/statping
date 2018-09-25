@@ -16,6 +16,7 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/hunterlong/statup/core"
@@ -24,6 +25,8 @@ import (
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 func dashboardHandler(w http.ResponseWriter, r *http.Request) {
@@ -117,11 +120,18 @@ func exportHandler(w http.ResponseWriter, r *http.Request) {
 
 	data := exportData{core.CoreApp, notifiers}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(data)
+	export, _ := json.Marshal(data)
 
-	w.Header().Set("Content-Disposition", "attachment; filename=Wiki.png")
-	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
-	w.Header().Set("Content-Length", r.Header.Get("Content-Length"))
+	mime := http.DetectContentType(export)
+	fileSize := len(string(export))
+
+	w.Header().Set("Content-Type", mime)
+	w.Header().Set("Content-Disposition", "attachment; filename=export.json")
+	w.Header().Set("Expires", "0")
+	w.Header().Set("Content-Transfer-Encoding", "binary")
+	w.Header().Set("Content-Length", strconv.Itoa(fileSize))
+	w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
+
+	http.ServeContent(w, r, "export.json", time.Now(), bytes.NewReader(export))
 
 }

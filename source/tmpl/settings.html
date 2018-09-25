@@ -132,8 +132,12 @@
                             <label for="api_secret" class="col-sm-3 col-form-label">API Secret</label>
                             <div class="col-sm-9">
                                 <input type="text" class="form-control select-input" value="{{ .ApiSecret }}" id="api_secret" readonly>
-                                <small id="emailHelp" class="form-text text-muted">You can <a href="/api/renew">Regenerate API Keys</a> if you need to.</small>
+                                <small class="form-text text-muted">You can <a href="/api/renew">Regenerate API Keys</a> if you need to.</small>
                             </div>
+                        </div>
+
+                        <div class="row">
+                            <a href="/settings/export" class="btn btn-sm btn-secondary float-right">Export Settings</a>
                         </div>
 
                     </form>
@@ -256,9 +260,7 @@
 
 
                 <div class="tab-pane fade" id="v-pills-backups" role="tabpanel" aria-labelledby="v-pills-backups-tab">
-
                     <a href="/backups/create" class="btn btn-primary btn-block">Backup Database</a>
-
                 </div>
 
                 {{ range .Plugins }}

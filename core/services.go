@@ -222,18 +222,13 @@ func (s *Service) Downtime() time.Duration {
 
 func GraphDataRaw(service types.ServiceInterface, start, end time.Time) *DateScanObj {
 	var d []DateScan
-	//s := service.Select()
-
 	model := service.(*Service).HitsBetween(start, end)
 	rows, _ := model.Rows()
-
-	//sql := GroupDataBy("hits", s.Id, start, end, 3600)
 	for rows.Next() {
 		var gd DateScan
 		var createdAt string
 		var value float64
 		rows.Scan(&createdAt, &value)
-
 		createdTime, _ := time.Parse(types.TIME, createdAt)
 		gd.CreatedAt = utils.Timezoner(createdTime, CoreApp.Timezone).Format(types.TIME)
 		gd.Value = int64(value * 1000)
