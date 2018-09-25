@@ -22,6 +22,7 @@ import (
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
+	"github.com/jinzhu/now"
 	"net/http"
 	"strconv"
 	"time"
@@ -39,18 +40,20 @@ func renderServiceChartHandler(w http.ResponseWriter, r *http.Request) {
 
 	startField := fields.Get("start")
 	endField := fields.Get("end")
-	var start time.Time
-	var end time.Time
-	if startField == "" {
-		start = time.Now().Add((-24 * 7) * time.Hour).UTC()
-	} else {
-		start = time.Unix(utils.StringInt(startField), 0).UTC()
+
+	end := now.EndOfDay().UTC()
+	start := now.BeginningOfDay().UTC()
+
+	if startField != "" {
+		start = time.Unix(utils.StringInt(startField), 0)
+		start = now.New(start).BeginningOfDay().UTC()
 	}
-	if endField == "" {
-		end = time.Now().UTC()
-	} else {
-		end = time.Unix(utils.StringInt(endField), 0).UTC()
+	if endField != "" {
+		end = time.Unix(utils.StringInt(endField), 0)
+		end = now.New(end).EndOfDay().UTC()
 	}
+
+	fmt.Println("start: ", start.String(), "end: ", end.String())
 
 	service := core.SelectService(utils.StringInt(vars["id"]))
 	data := core.GraphDataRaw(service, start, end).ToString()
@@ -69,8 +72,9 @@ func renderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "max-age=60")
 
 	var data []string
-	end := time.Now()
-	start := end.Add(-(24 * 7) * time.Hour)
+	end := now.EndOfDay().UTC()
+	start := now.BeginningOfDay().UTC()
+
 	for _, s := range services {
 		d := core.GraphDataRaw(s, start, end).ToString()
 		data = append(data, d)
@@ -106,7 +110,6 @@ func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&newOrder)
 	for _, s := range newOrder {
-		fmt.Println("updating: ", s.Id, " to be order_id: ", s.Order)
 		service := core.SelectService(s.Id)
 		service.Order = s.Order
 		service.Update(false)
@@ -183,16 +186,24 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if startField == 0 || endField == 0 {
-		startField = time.Now().Add((-24 * 7) * time.Hour).UTC().Unix()
-		endField = time.Now().UTC().Unix()
+	end := time.Now()
+	start := end.Add((-24 * 7) * time.Hour)
+
+	if startField != 0 {
+		start = time.Unix(startField, 0)
 	}
+	if endField != 0 {
+		end = time.Unix(endField, 0)
+	}
+
+	data := core.GraphDataRaw(serv, start, end)
 
 	out := struct {
 		Service *core.Service
 		Start   int64
 		End     int64
-	}{serv, startField, endField}
+		Data    string
+	}{serv, start.Unix(), end.Unix(), data.ToString()}
 
 	executeResponse(w, r, "service.html", out, nil)
 }

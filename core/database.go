@@ -78,6 +78,17 @@ type DbConfig struct {
 	*types.DbConfig
 }
 
+func (s *Service) HitsBetween(t1, t2 time.Time) *gorm.DB {
+	selector := Dbtimestamp(3600)
+	return DbSession.Debug().Model(&types.Hit{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME), t2.UTC().Format(types.TIME)).Group("timeframe")
+}
+
+func CloseDB() {
+	if DbSession != nil {
+		DbSession.DB().Close()
+	}
+}
+
 // Close shutsdown the database connection
 func (db *DbConfig) Close() error {
 	return DbSession.DB().Close()
@@ -104,7 +115,9 @@ func (u *User) AfterFind() (err error) {
 }
 
 func (u *Hit) BeforeCreate() (err error) {
-	u.CreatedAt = time.Now().UTC()
+	if u.CreatedAt.IsZero() {
+		u.CreatedAt = time.Now().UTC()
+	}
 	return
 }
 

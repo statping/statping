@@ -122,8 +122,8 @@ func (s *Service) OnlineSince(ago time.Time) float32 {
 
 // DateScan struct is for creating the charts.js graph JSON array
 type DateScan struct {
-	CreatedAt time.Time `json:"x"`
-	Value     int64     `json:"y"`
+	CreatedAt string `json:"x"`
+	Value     int64  `json:"y"`
 }
 
 // DateScanObj struct is for creating the charts.js graph JSON array
@@ -167,17 +167,43 @@ func (s *Service) DowntimeText() string {
 }
 
 // GroupDataBy returns a SQL query as a string to group a column by a time
-func GroupDataBy(column string, id int64, start, end time.Time, increment string) string {
+func GroupDataBy(column string, id int64, start, end time.Time, seconds int64) string {
+	incrementTime := "second"
+	if seconds == 60 {
+		incrementTime = "minute"
+	} else if seconds == 3600 {
+		incrementTime = "hour"
+	}
 	var sql string
 	switch CoreApp.DbConnection {
 	case "mysql":
 		sql = fmt.Sprintf("SELECT CONCAT(date_format(created_at, '%%Y-%%m-%%dT%%H:%%i:00Z')) AS created_at, AVG(latency)*1000 AS value FROM %v WHERE service=%v AND DATE_FORMAT(created_at, '%%Y-%%m-%%dT%%TZ') BETWEEN DATE_FORMAT('%v', '%%Y-%%m-%%dT%%TZ') AND DATE_FORMAT('%v', '%%Y-%%m-%%dT%%TZ') GROUP BY 1 ORDER BY created_at ASC;", column, id, start.UTC().Format(time.RFC3339), end.UTC().Format(time.RFC3339))
 	case "sqlite":
-		sql = fmt.Sprintf("SELECT strftime('%%Y-%%m-%%dT%%H:%%M:00Z', created_at), AVG(latency)*1000 as value FROM %v WHERE service=%v AND created_at >= '%v' AND created_at <= '%v' GROUP BY strftime('%%M:00', created_at) ORDER BY created_at ASC;", column, id, start.UTC().Format(time.RFC3339), end.UTC().Format(time.RFC3339))
+		sql = fmt.Sprintf("SELECT datetime((strftime('%%s', created_at) / %v) * %v, 'unixepoch'), AVG(latency)*1000 as value FROM %v WHERE service=%v AND created_at BETWEEN '%v' AND '%v' GROUP BY 1 ORDER BY created_at ASC;", seconds, seconds, column, id, start.UTC().Format(time.RFC3339), end.UTC().Format(time.RFC3339))
 	case "postgres":
-		sql = fmt.Sprintf("SELECT date_trunc('%v', created_at), AVG(latency)*1000 AS value FROM %v WHERE service=%v AND created_at >= '%v' AND created_at <= '%v' GROUP BY 1 ORDER BY date_trunc ASC;", increment, column, id, start.UTC().Format(time.RFC3339), end.UTC().Format(time.RFC3339))
+		sql = fmt.Sprintf("SELECT date_trunc('%v', created_at), AVG(latency)*1000 AS value FROM %v WHERE service=%v AND created_at >= '%v' AND created_at <= '%v' GROUP BY 1 ORDER BY date_trunc ASC;", incrementTime, column, id, start.UTC().Format(time.RFC3339), end.UTC().Format(time.RFC3339))
 	}
+	fmt.Println(sql)
 	return sql
+}
+
+func Dbtimestamp(seconds int64) string {
+	incrementTime := "second"
+	if seconds == 60 {
+		incrementTime = "minute"
+	} else if seconds == 3600 {
+		incrementTime = "hour"
+	}
+	switch CoreApp.DbConnection {
+	case "mysql":
+		return fmt.Sprintf("CONCAT(date_format(created_at, '%%Y-%%m-%%d %%H:00:00')) AS timeframe, AVG(latency) AS value")
+	case "sqlite":
+		return fmt.Sprintf("datetime((strftime('%%s', created_at) / %v) * %v, 'unixepoch') AS timeframe, AVG(latency) as value", seconds, seconds)
+	case "postgres":
+		return fmt.Sprintf("date_trunc('%v', created_at) AS timeframe, AVG(latency) AS value", incrementTime)
+	default:
+		return ""
+	}
 }
 
 // Downtime returns the amount of time of a offline service
@@ -196,27 +222,21 @@ func (s *Service) Downtime() time.Duration {
 
 func GraphDataRaw(service types.ServiceInterface, start, end time.Time) *DateScanObj {
 	var d []DateScan
-	s := service.Select()
-	sql := GroupDataBy("hits", s.Id, start, end, "minute")
-	rows, err := DbSession.Raw(sql).Rows()
-	if err != nil {
-		utils.Log(2, err)
-		return nil
-	}
+	//s := service.Select()
+
+	model := service.(*Service).HitsBetween(start, end)
+	rows, _ := model.Rows()
+
+	//sql := GroupDataBy("hits", s.Id, start, end, 3600)
 	for rows.Next() {
 		var gd DateScan
-		var tt string
-		var ff float64
-		err := rows.Scan(&tt, &ff)
-		if err != nil {
-			utils.Log(2, fmt.Sprintf("Issue loading chart data for service %v, %v", s.Name, err))
-		}
-		gd.CreatedAt, err = time.Parse(time.RFC3339, tt)
-		if err != nil {
-			utils.Log(2, fmt.Sprintf("Issue parsing time %v", err))
-		}
-		gd.CreatedAt = utils.Timezoner(gd.CreatedAt, CoreApp.Timezone)
-		gd.Value = int64(ff)
+		var createdAt string
+		var value float64
+		rows.Scan(&createdAt, &value)
+
+		createdTime, _ := time.Parse(types.TIME, createdAt)
+		gd.CreatedAt = utils.Timezoner(createdTime, CoreApp.Timezone).Format(types.TIME)
+		gd.Value = int64(value * 1000)
 		d = append(d, gd)
 	}
 	return &DateScanObj{d}
@@ -233,7 +253,7 @@ func (d *DateScanObj) ToString() string {
 
 // GraphData returns the JSON object used by Charts.js to render the chart
 func (s *Service) GraphData() string {
-	start := time.Now().Add(time.Hour*-24 + time.Minute*0 + time.Second*0)
+	start := time.Now().Add(-24 * time.Hour)
 	end := time.Now()
 	obj := GraphDataRaw(s, start, end)
 	data, err := json.Marshal(obj)

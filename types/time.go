@@ -19,6 +19,12 @@ import (
 	"time"
 )
 
+const (
+	TIME_NANOZ = "2006-01-02 15:04:05.999999-0700 MST"
+	TIME_NANO  = "2006-01-02T15:04:05Z"
+	TIME       = "2006-01-02 15:04:05"
+)
+
 var (
 	NOW         = func() time.Time { return time.Now() }()
 	HOUR_1_AGO  = time.Now().Add(-1 * time.Hour)

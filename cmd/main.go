@@ -59,6 +59,7 @@ func main() {
 	source.Assets()
 	utils.InitLogs()
 	args := flag.Args()
+	defer core.CloseDB()
 
 	if len(args) >= 1 {
 		err := CatchCLI(args)

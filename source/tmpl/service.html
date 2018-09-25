@@ -57,7 +57,7 @@
                             </div>
                         </div>
 
-                <div class="chart-container" style="height: 250px">
+                <div class="chart-container" style="height: 400px">
                     <canvas id="service"></canvas>
                 </div>
 
@@ -255,7 +255,7 @@
         data: {
             datasets: [{
                 label: 'Response Time (Milliseconds)',
-                data: {{js .GraphData}},
+                data: {{js .Data}},
                 backgroundColor: [
                     'rgba(47, 206, 30, 0.92)'
                 ],
@@ -275,14 +275,13 @@
                         beginAtZero: true
                     },
                     gridLines: {
-                        display:false
+                        display: true
                     }
                 }],
                 xAxes: [{
                     type: 'time',
-                    distribution: 'series',
                     gridLines: {
-                        display:false
+                        display:true
                     }
                 }]
             },

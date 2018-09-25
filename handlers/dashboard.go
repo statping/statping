@@ -16,9 +16,11 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/source"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 )
@@ -93,4 +95,20 @@ func logsLineHandler(w http.ResponseWriter, r *http.Request) {
 	if lastLine := utils.GetLastLine(); lastLine != nil {
 		w.Write([]byte(lastLine.FormatForHtml()))
 	}
+}
+
+type exportData struct {
+	Services []types.ServiceInterface
+}
+
+func exportHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	data := exportData{core.CoreApp.Services}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(data)
 }

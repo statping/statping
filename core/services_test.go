@@ -340,25 +340,3 @@ func TestDNScheckService(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotZero(t, amount)
 }
-
-func TestGroupGraphData(t *testing.T) {
-	service := SelectService(1)
-	CoreApp.DbConnection = "mysql"
-	lastWeek := time.Now().Add(time.Hour*-(24*7) + time.Minute*0 + time.Second*0)
-	out := GroupDataBy("services", service.Id, lastWeek, time.Now(), "hour")
-	t.Log(out)
-	assert.Contains(t, out, "SELECT CONCAT(date_format(created_at, '%Y-%m-%dT%H:%i:00Z'))")
-
-	CoreApp.DbConnection = "postgres"
-	lastWeek = time.Now().Add(time.Hour*-(24*7) + time.Minute*0 + time.Second*0)
-	out = GroupDataBy("services", service.Id, lastWeek, time.Now(), "hour")
-	t.Log(out)
-	assert.Contains(t, out, "SELECT date_trunc('hour', created_at)")
-
-	CoreApp.DbConnection = "sqlite"
-	lastWeek = time.Now().Add(time.Hour*-(24*7) + time.Minute*0 + time.Second*0)
-	out = GroupDataBy("services", service.Id, lastWeek, time.Now(), "hour")
-	t.Log(out)
-	assert.Contains(t, out, "SELECT strftime('%Y-%m-%dT%H:%M:00Z'")
-
-}
