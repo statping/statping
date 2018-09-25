@@ -59,14 +59,6 @@ func reverseHits(input []*types.Hit) []*types.Hit {
 	return append(reverseHits(input[1:]), input[0])
 }
 
-// SelectHitsGroupBy returns all hits from the group by function
-func (s *Service) SelectHitsGroupBy(group string) ([]*types.Hit, error) {
-	var hits []*types.Hit
-	col := hitsDB().Where("service = ?", s.Id)
-	err := col.Find(&hits)
-	return hits, err.Error
-}
-
 // TotalHits returns the total amount of successful hits a service has
 func (s *Service) TotalHits() (uint64, error) {
 	var count uint64

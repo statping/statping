@@ -112,7 +112,7 @@ func InsertSampleHits() error {
 	return nil
 }
 
-func InsertSampleCore() error {
+func insertSampleCore() error {
 	core := &types.Core{
 		Name:        "Statup Sample Data",
 		Description: "This data is only used to testing",
@@ -148,7 +148,7 @@ func insertSampleUsers() {
 
 // InsertSampleData will create the example/dummy services for a brand new Statup installation
 func InsertLargeSampleData() error {
-	InsertSampleCore()
+	insertSampleCore()
 	InsertSampleData()
 	insertSampleUsers()
 	s6 := ReturnService(&types.Service{

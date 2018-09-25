@@ -34,9 +34,8 @@ var (
 	DbSession *gorm.DB
 )
 
-func (s *Service) allHits() *gorm.DB {
-	var hits []*Hit
-	return servicesDB().Find(s).Related(&hits)
+type DbConfig struct {
+	*types.DbConfig
 }
 
 // failuresDB returns the 'failures' database column
@@ -64,20 +63,12 @@ func usersDB() *gorm.DB {
 	return DbSession.Model(&types.User{})
 }
 
-// commDB returns the 'communications' database column
-func commDB() *gorm.DB {
-	return DbSession.Model(&notifier.Notification{})
-}
-
 // hitsDB returns the 'hits' database column
 func checkinDB() *gorm.DB {
 	return DbSession.Model(&types.Checkin{})
 }
 
-type DbConfig struct {
-	*types.DbConfig
-}
-
+// HitsBetween returns the gorm database query for a collection of service hits between a time range
 func (s *Service) HitsBetween(t1, t2 time.Time) *gorm.DB {
 	selector := Dbtimestamp(3600)
 	return DbSession.Debug().Model(&types.Hit{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME), t2.UTC().Format(types.TIME)).Group("timeframe")

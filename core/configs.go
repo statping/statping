@@ -25,6 +25,10 @@ import (
 	"os"
 )
 
+type ErrorResponse struct {
+	Error string
+}
+
 // LoadConfig will attempt to load the 'config.yml' file in a specific directory
 func LoadConfig(directory string) (*DbConfig, error) {
 	var configs *types.DbConfig
@@ -130,8 +134,4 @@ func DeleteConfig() {
 	if err != nil {
 		utils.Log(3, err)
 	}
-}
-
-type ErrorResponse struct {
-	Error string
 }

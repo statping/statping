@@ -106,13 +106,13 @@ func (s *Service) checkTcp(record bool) *Service {
 	conn, err := net.DialTimeout("tcp", domain, time.Duration(s.Timeout)*time.Second)
 	if err != nil {
 		if record {
-			RecordFailure(s, fmt.Sprintf("TCP Dial Error %v", err))
+			recordFailure(s, fmt.Sprintf("TCP Dial Error %v", err))
 		}
 		return s
 	}
 	if err := conn.Close(); err != nil {
 		if record {
-			RecordFailure(s, fmt.Sprintf("TCP Socket Close Error %v", err))
+			recordFailure(s, fmt.Sprintf("TCP Socket Close Error %v", err))
 		}
 		return s
 	}
@@ -120,7 +120,7 @@ func (s *Service) checkTcp(record bool) *Service {
 	s.Latency = t2.Sub(t1).Seconds()
 	s.LastResponse = ""
 	if record {
-		RecordSuccess(s)
+		recordSuccess(s)
 	}
 	return s
 }
@@ -130,7 +130,7 @@ func (s *Service) checkHttp(record bool) *Service {
 	dnsLookup, err := s.dnsCheck()
 	if err != nil {
 		if record {
-			RecordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
+			recordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
 		}
 		return s
 	}
@@ -149,7 +149,7 @@ func (s *Service) checkHttp(record bool) *Service {
 	}
 	if err != nil {
 		if record {
-			RecordFailure(s, fmt.Sprintf("HTTP Error %v", err))
+			recordFailure(s, fmt.Sprintf("HTTP Error %v", err))
 		}
 		return s
 	}
@@ -159,7 +159,7 @@ func (s *Service) checkHttp(record bool) *Service {
 	s.Latency = t2.Sub(t1).Seconds()
 	if err != nil {
 		if record {
-			RecordFailure(s, fmt.Sprintf("HTTP Error %v", err))
+			recordFailure(s, fmt.Sprintf("HTTP Error %v", err))
 		}
 		return s
 	}
@@ -178,7 +178,7 @@ func (s *Service) checkHttp(record bool) *Service {
 			s.LastResponse = string(contents)
 			s.LastStatusCode = response.StatusCode
 			if record {
-				RecordFailure(s, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
+				recordFailure(s, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
 			}
 			return s
 		}
@@ -187,14 +187,14 @@ func (s *Service) checkHttp(record bool) *Service {
 		//s.LastResponse = string(contents)
 		s.LastStatusCode = response.StatusCode
 		if record {
-			RecordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", response.StatusCode, s.ExpectedStatus))
+			recordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", response.StatusCode, s.ExpectedStatus))
 		}
 		return s
 	}
 	s.LastStatusCode = response.StatusCode
 	s.Online = true
 	if record {
-		RecordSuccess(s)
+		recordSuccess(s)
 	}
 	return s
 }
@@ -209,12 +209,8 @@ func (s *Service) Check(record bool) {
 	}
 }
 
-type HitData struct {
-	Latency float64
-}
-
-// RecordSuccess will create a new 'hit' record in the database for a successful/online service
-func RecordSuccess(s *Service) {
+// recordSuccess will create a new 'hit' record in the database for a successful/online service
+func recordSuccess(s *Service) {
 	s.Online = true
 	s.LastOnline = time.Now()
 	hit := &types.Hit{
@@ -227,8 +223,8 @@ func RecordSuccess(s *Service) {
 	notifier.OnSuccess(s.Service)
 }
 
-// RecordFailure will create a new 'failure' record in the database for a offline service
-func RecordFailure(s *Service, issue string) {
+// recordFailure will create a new 'failure' record in the database for a offline service
+func recordFailure(s *Service, issue string) {
 	s.Online = false
 	fail := &types.Failure{
 		Service:   s.Id,

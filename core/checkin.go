@@ -98,34 +98,3 @@ func (f *Checkin) Ago() string {
 	got, _ := timeago.TimeAgoWithTime(time.Now(), f.Last)
 	return got
 }
-
-//func (c *Checkin) Run() {
-//	if c.Interval == 0 {
-//		return
-//	}
-//	fmt.Println("checking: ", c.Api)
-//	between := time.Now().Sub(c.Last).Seconds()
-//	if between > float64(c.Interval) {
-//		guard := make(chan struct{})
-//		c.RecheckCheckinFailure(guard)
-//		<-guard
-//	}
-//	time.Sleep(1 * time.Second)
-//	c.Run()
-//}
-//
-//func (s *Service) StartCheckins() {
-//	for _, c := range s.Checkins {
-//		checkin := c.(*Checkin)
-//		go checkin.Run()
-//	}
-//}
-//
-//func CheckinProcess() {
-//	for _, s := range CoreApp.DbServices {
-//		for _, c := range s.Checkins {
-//			checkin := c
-//			go checkin.Run()
-//		}
-//	}
-//}

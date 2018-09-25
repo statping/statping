@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -98,7 +99,8 @@ func logsLineHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type exportData struct {
-	Services []types.ServiceInterface
+	Core      *core.Core         `json:"core"`
+	Notifiers types.AllNotifiers `json:"notifiers"`
 }
 
 func exportHandler(w http.ResponseWriter, r *http.Request) {
@@ -107,8 +109,19 @@ func exportHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := exportData{core.CoreApp.Services}
+	var notifiers []*notifier.Notification
+	for _, v := range core.CoreApp.Notifications {
+		notifier := v.(notifier.Notifier)
+		notifiers = append(notifiers, notifier.Select())
+	}
+
+	data := exportData{core.CoreApp, notifiers}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(data)
+
+	w.Header().Set("Content-Disposition", "attachment; filename=Wiki.png")
+	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
+	w.Header().Set("Content-Length", r.Header.Get("Content-Length"))
+
 }

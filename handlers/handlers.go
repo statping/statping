@@ -39,6 +39,7 @@ var (
 	httpServer *http.Server
 )
 
+// RunHTTPServer will start a HTTP server on a specific IP and port
 func RunHTTPServer(ip string, port int) error {
 	host := fmt.Sprintf("%v:%v", ip, port)
 	utils.Log(1, "Statup HTTP Server running on http://"+host)
@@ -62,6 +63,7 @@ func RunHTTPServer(ip string, port int) error {
 	return httpServer.ListenAndServe()
 }
 
+// IsAuthenticated returns true if the HTTP request is authenticated
 func IsAuthenticated(r *http.Request) bool {
 	if os.Getenv("GO_ENV") == "test" {
 		return true
@@ -82,6 +84,7 @@ func IsAuthenticated(r *http.Request) bool {
 	return session.Values["authenticated"].(bool)
 }
 
+// executeResponse will render a HTTP response for the front end user
 func executeResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{}) {
 	utils.Http(r)
 	if url, ok := redirect.(string); ok {
@@ -172,6 +175,7 @@ func executeResponse(w http.ResponseWriter, r *http.Request, file string, data i
 	}
 }
 
+// executeJSResponse will render a Javascript response
 func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}) {
 	render, err := source.JsBox.String(file)
 	if err != nil {
@@ -187,9 +191,8 @@ func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 	t.Execute(w, data)
 }
 
+// error404Handler is a HTTP handler for 404 error pages
 func error404Handler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 	executeResponse(w, r, "error_404.html", nil, nil)
 }
-
-type DbConfig types.DbConfig
