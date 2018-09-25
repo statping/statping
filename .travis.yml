@@ -13,6 +13,7 @@ cache:
     - $GOPATH/pkg/dep
     - ~/.npm
     - ~/.cache
+    - $GOPATH/src/github.com/hunterlong/statup/vendor
 
 sudo: required
 
