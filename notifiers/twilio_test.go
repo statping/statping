@@ -44,6 +44,7 @@ func init() {
 }
 
 func TestTwilioNotifier(t *testing.T) {
+	t.SkipNow()
 	t.Parallel()
 	if TWILIO_SID == "" || TWILIO_SECRET == "" || TWILIO_FROM == "" {
 		t.Log("twilio notifier testing skipped, missing TWILIO_SID environment variable")
