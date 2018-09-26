@@ -23,6 +23,23 @@ $('.service_li').on('click', function() {
     return false;
 });
 
+$('.test_notifier').on('click', function(e) {
+    var form = $(this).parents('form:first');
+    var values = form.serialize();
+
+    console.log(form);
+
+    $.ajax({
+        url: form.attr("action")+"/test",
+        type: 'POST',
+        data: values,
+        success: function(data) {
+          alert(data);
+        }
+    });
+
+    e.preventDefault();
+});
 
 $('form').submit(function() {
     console.log(this);

@@ -196,3 +196,68 @@ func saveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	notifier.OnSave(notifer.Method)
 	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
+
+func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
+	var err error
+	if !IsAuthenticated(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	form := parseForm(r)
+	vars := mux.Vars(r)
+	method := vars["method"]
+	enabled := form.Get("enable")
+	host := form.Get("host")
+	port := int(utils.StringInt(form.Get("port")))
+	username := form.Get("username")
+	password := form.Get("password")
+	var1 := form.Get("var1")
+	var2 := form.Get("var2")
+	apiKey := form.Get("api_key")
+	apiSecret := form.Get("api_secret")
+	limits := int(utils.StringInt(form.Get("limits")))
+
+	notifer, notif, err := notifier.SelectNotifier(method)
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("issue saving notifier %v: %v", method, err))
+		executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
+		return
+	}
+
+	if host != "" {
+		notifer.Host = host
+	}
+	if port != 0 {
+		notifer.Port = port
+	}
+	if username != "" {
+		notifer.Username = username
+	}
+	if password != "" && password != "##########" {
+		notifer.Password = password
+	}
+	if var1 != "" {
+		notifer.Var1 = var1
+	}
+	if var2 != "" {
+		notifer.Var2 = var2
+	}
+	if apiKey != "" {
+		notifer.ApiKey = apiKey
+	}
+	if apiSecret != "" {
+		notifer.ApiSecret = apiSecret
+	}
+	if limits != 0 {
+		notifer.Limits = limits
+	}
+	notifer.Enabled = enabled == "on"
+
+	ok, err := notif.(notifier.Tester).OnTest(*notifer)
+
+	if ok {
+		w.Write([]byte("ok"))
+	} else {
+		w.Write([]byte(err.Error()))
+	}
+}

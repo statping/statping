@@ -181,9 +181,8 @@
             {{ range .Notifications }}
             {{$n := .Select}}
             <div class="tab-pane" id="v-pills-{{underscore $n.Method}}" role="tabpanel" aria-labelledby="v-pills-{{underscore $n.Method }}-tab">
-                <form method="POST" action="/settings/notifier/{{ $n.Method }}">
-                {{if $n.Title}}<h4>{{$n.Title}}
-                </h4>{{end}}
+                <form method="POST" class="{{underscore $n.Method }}" action="/settings/notifier/{{ $n.Method }}">
+                {{if $n.Title}}<h4>{{$n.Title}}</h4>{{end}}
                 {{if $n.Description}}<p class="small text-muted">{{safe $n.Description}}</p>{{end}}
                     {{range .Form}}
                         <div class="form-group">
@@ -206,20 +205,20 @@
                         </div>
                     </div>
 
-                        <div class="col-3 col-sm-2 mt-1">
+                    <div class="col-3 col-sm-2 mt-1">
                         <span class="switch">
                             <input type="checkbox" name="enable" class="switch" id="switch-{{ $n.Method }}" {{if $n.Enabled}}checked{{end}}>
                             <label for="switch-{{ $n.Method }}"></label>
                         </span>
-                        </div>
+                    </div>
 
                     <div class="col-12 col-sm-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
                         <button type="submit" class="btn btn-primary btn-block text-capitalize">Save</button>
                     </div>
 
                     {{if $n.CanTest}}
-                        <div class="col-12 col-sm-4 float-right text-right">
-                            <button class="btn btn-secondary btn-block text-capitalize">Test</button>
+                        <div class="col-12 col-sm-12">
+                            <button class="test_notifier btn btn-secondary btn-block text-capitalize col-12 float-right">Test</button>
                         </div>
                     {{end}}
 

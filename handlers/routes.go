@@ -74,6 +74,7 @@ func Router() *mux.Router {
 	r.Handle("/settings/build", http.HandlerFunc(saveAssetsHandler)).Methods("GET")
 	r.Handle("/settings/delete_assets", http.HandlerFunc(deleteAssetsHandler)).Methods("GET")
 	r.Handle("/settings/notifier/{method}", http.HandlerFunc(saveNotificationHandler)).Methods("POST")
+	r.Handle("/settings/notifier/{method}/test", http.HandlerFunc(testNotificationHandler)).Methods("POST")
 	r.Handle("/settings/export", http.HandlerFunc(exportHandler)).Methods("GET")
 	r.Handle("/plugins/download/{name}", http.HandlerFunc(pluginsDownloadHandler))
 	r.Handle("/plugins/{name}/save", http.HandlerFunc(pluginSavedHandler)).Methods("POST")
