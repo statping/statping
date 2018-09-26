@@ -26,18 +26,20 @@ $('.service_li').on('click', function() {
 $('.test_notifier').on('click', function(e) {
     var form = $(this).parents('form:first');
     var values = form.serialize();
-
-    console.log(form);
-
+    var notifier = form.find('input[name=notifier]').val();
     $.ajax({
         url: form.attr("action")+"/test",
         type: 'POST',
         data: values,
         success: function(data) {
-          alert(data);
+          if (data === 'ok') {
+              $('#'+notifier+'-success').removeClass('d-none');
+          } else {
+              $('#'+notifier+'-error').removeClass('d-none');
+              $('#'+notifier+'-error').html(data);
+          }
         }
     });
-
     e.preventDefault();
 });
 

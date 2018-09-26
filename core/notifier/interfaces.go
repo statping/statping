@@ -32,7 +32,7 @@ type BasicEvents interface {
 
 // Tester interface will include a function to Test users settings before saving
 type Tester interface {
-	OnTest(Notification) (bool, error)
+	OnTest() error
 }
 
 // ServiceEvents are events for Services

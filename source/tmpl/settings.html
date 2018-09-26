@@ -184,6 +184,7 @@
                 <form method="POST" class="{{underscore $n.Method }}" action="/settings/notifier/{{ $n.Method }}">
                 {{if $n.Title}}<h4>{{$n.Title}}</h4>{{end}}
                 {{if $n.Description}}<p class="small text-muted">{{safe $n.Description}}</p>{{end}}
+
                     {{range .Form}}
                         <div class="form-group">
                             <label class="text-capitalize" for="{{underscore .Title}}">{{.Title}}</label>
@@ -212,13 +213,27 @@
                         </span>
                     </div>
 
-                    <div class="col-12 col-sm-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
+                        <input type="hidden" name="notifier" value="{{underscore $n.Method }}">
+
+                        <div class="col-12 col-sm-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
                         <button type="submit" class="btn btn-primary btn-block text-capitalize">Save</button>
                     </div>
 
                     {{if $n.CanTest}}
                         <div class="col-12 col-sm-12">
                             <button class="test_notifier btn btn-secondary btn-block text-capitalize col-12 float-right">Test</button>
+                        </div>
+
+                        <div class="col-12 col-sm-12 mt-2">
+                            <div class="alert alert-danger d-none" id="{{underscore $n.Method}}-error" role="alert">
+                                {{$n.Method}} has an error!
+                            </div>
+
+                            <div class="alert alert-success d-none" id="{{underscore $n.Method}}-success" role="alert">
+                                The {{$n.Method}} notifier is working correctly!
+                            </div>
+                        </div>
+
                         </div>
                     {{end}}
 

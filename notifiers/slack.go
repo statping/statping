@@ -17,10 +17,11 @@ package notifiers
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"io/ioutil"
 	"net/http"
 	"text/template"
 	"time"
@@ -97,11 +98,18 @@ func (u *Slack) Select() *notifier.Notification {
 	return u.Notification
 }
 
-func (u *Slack) OnTest(n notifier.Notification) (bool, error) {
-	utils.Log(1, "Slack notifier loaded")
-	msg := fmt.Sprintf("You're Statup Slack Notifier is working correctly!")
-	err := parseSlackMessage(SLACK_TEXT, msg)
-	return true, err
+func (u *Slack) OnTest() error {
+	client := new(http.Client)
+	res, err := client.Post(u.Host, "application/json", bytes.NewBuffer([]byte(`{"text":"testing message"}`)))
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+	contents, _ := ioutil.ReadAll(res.Body)
+	if string(contents) != "ok" {
+		return errors.New("incorrect url")
+	}
+	return err
 }
 
 // OnFailure will trigger failing service

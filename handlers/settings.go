@@ -253,9 +253,9 @@ func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	notifer.Enabled = enabled == "on"
 
-	ok, err := notif.(notifier.Tester).OnTest(*notifer)
+	err = notif.(notifier.Tester).OnTest()
 
-	if ok {
+	if err == nil {
 		w.Write([]byte("ok"))
 	} else {
 		w.Write([]byte(err.Error()))
