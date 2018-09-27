@@ -17,9 +17,12 @@ package notifiers
 
 import (
 	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
+	"io/ioutil"
 	"net/http"
 	"time"
 )
@@ -90,4 +93,37 @@ func (u *Discord) OnSave() error {
 	msg := fmt.Sprintf(`{"content": "The Discord notifier on Statup was just updated."}`)
 	u.AddQueue(msg)
 	return nil
+}
+
+// OnSave triggers when this notifier has been saved
+func (u *Discord) OnTest() error {
+	outError := errors.New("Incorrect Discord URL, please confirm URL is correct")
+	message := `{"content": "Testing the Discord notifier"}`
+	req, _ := http.NewRequest("POST", discorder.Host, bytes.NewBuffer([]byte(message)))
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	contents, _ := ioutil.ReadAll(resp.Body)
+	if string(contents) == "" {
+		return nil
+	}
+	var d discordTestJson
+	err = json.Unmarshal(contents, &d)
+	if err != nil {
+		return outError
+	}
+	if d.Code == 0 {
+		return outError
+	}
+	fmt.Println("discord: ", string(contents))
+	return nil
+}
+
+type discordTestJson struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }

@@ -57,8 +57,8 @@ type Notification struct {
 	Delay       time.Duration      `gorm:"-" json:"-"`
 	Queue       []interface{}      `gorm:"-" json:"-"`
 	Running     chan bool          `gorm:"-" json:"-"`
-	CanTest     bool               `gorm:"-" json:"-"`
 	Online      bool               `gorm:"-" json:"-"`
+	testable    bool
 }
 
 type NotificationForm struct {
@@ -78,6 +78,10 @@ type NotificationLog struct {
 
 func (n *Notification) AddQueue(msg interface{}) {
 	n.Queue = append(n.Queue, msg)
+}
+
+func (n *Notification) CanTest() bool {
+	return n.testable
 }
 
 // db will return the notifier database column/record
@@ -233,6 +237,7 @@ func Init(n Notifier) (*Notification, error) {
 	var notify *Notification
 	if err == nil {
 		notify, _ = SelectNotification(n)
+		notify.testable = isType(n, new(Tester))
 		notify.Form = n.Select().Form
 	}
 	return notify, err

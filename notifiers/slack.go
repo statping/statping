@@ -46,7 +46,6 @@ var slacker = &Slack{&notifier.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Delay:       time.Duration(10 * time.Second),
 	Host:        "https://webhooksurl.slack.com/***",
-	CanTest:     true,
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
 		Title:       "Incoming Webhook Url",
@@ -107,7 +106,7 @@ func (u *Slack) OnTest() error {
 	defer res.Body.Close()
 	contents, _ := ioutil.ReadAll(res.Body)
 	if string(contents) != "ok" {
-		return errors.New("incorrect url")
+		return errors.New("The Slack response was incorrect, check the URL")
 	}
 	return err
 }

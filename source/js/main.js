@@ -24,20 +24,31 @@ $('.service_li').on('click', function() {
 });
 
 $('.test_notifier').on('click', function(e) {
+    var btn = $(this);
     var form = $(this).parents('form:first');
     var values = form.serialize();
     var notifier = form.find('input[name=notifier]').val();
+    var success = $('#'+notifier+'-success');
+    var error = $('#'+notifier+'-error');
+    btn.prop("disabled", true);
     $.ajax({
         url: form.attr("action")+"/test",
         type: 'POST',
         data: values,
         success: function(data) {
           if (data === 'ok') {
-              $('#'+notifier+'-success').removeClass('d-none');
+              success.removeClass('d-none');
+              setTimeout(function() {
+                  success.addClass('d-none');
+              }, 5000)
           } else {
-              $('#'+notifier+'-error').removeClass('d-none');
-              $('#'+notifier+'-error').html(data);
+              error.removeClass('d-none');
+              error.html(data);
+              setTimeout(function() {
+                  error.addClass('d-none');
+              }, 8000)
           }
+            btn.prop("disabled", false);
         }
     });
     e.preventDefault();

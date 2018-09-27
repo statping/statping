@@ -103,13 +103,6 @@ func (n *Example) OnSave() error {
 	return errors.New("onsave triggered")
 }
 
-// REQUIRED
-func (n *Example) Test() error {
-	msg := fmt.Sprintf("received a test trigger\n")
-	n.AddQueue(msg)
-	return errors.New("test triggered")
-}
-
 // REQUIRED - BASIC EVENT
 func (n *Example) OnSuccess(s *types.Service) {
 	msg := fmt.Sprintf("received a count trigger for service: %v\n", s.Name)
@@ -123,9 +116,9 @@ func (n *Example) OnFailure(s *types.Service, f *types.Failure) {
 }
 
 // OPTIONAL Test function before user saves
-func (n *Example) OnTest(s Notification) (bool, error) {
-	fmt.Printf("received a test trigger with form data: %v\n", s.Host)
-	return true, nil
+func (n *Example) OnTest() error {
+	fmt.Printf("received a test trigger with form data: %v\n", n.Host)
+	return nil
 }
 
 // OPTIONAL

@@ -61,6 +61,10 @@ func TestSlackNotifier(t *testing.T) {
 		notifier.Load()
 	})
 
+	t.Run("Slack Notifier Tester", func(t *testing.T) {
+		assert.True(t, slacker.CanTest())
+	})
+
 	t.Run("Slack parse message", func(t *testing.T) {
 		err := parseSlackMessage(SLACK_TEXT, "this is a test!")
 		assert.Nil(t, err)

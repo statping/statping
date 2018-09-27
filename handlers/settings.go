@@ -217,12 +217,14 @@ func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	apiSecret := form.Get("api_secret")
 	limits := int(utils.StringInt(form.Get("limits")))
 
-	notifer, notif, err := notifier.SelectNotifier(method)
+	fakeNotifer, notif, err := notifier.SelectNotifier(method)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("issue saving notifier %v: %v", method, err))
 		executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
 		return
 	}
+
+	notifer := *fakeNotifer
 
 	if host != "" {
 		notifer.Host = host
@@ -254,7 +256,6 @@ func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	notifer.Enabled = enabled == "on"
 
 	err = notif.(notifier.Tester).OnTest()
-
 	if err == nil {
 		w.Write([]byte("ok"))
 	} else {

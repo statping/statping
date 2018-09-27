@@ -54,6 +54,10 @@ func TestDiscordNotifier(t *testing.T) {
 		notifier.Load()
 	})
 
+	t.Run("Discord Notifier Tester", func(t *testing.T) {
+		assert.True(t, discorder.CanTest())
+	})
+
 	t.Run("Discord Within Limits", func(t *testing.T) {
 		ok, err := discorder.WithinLimits()
 		assert.Nil(t, err)
