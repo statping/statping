@@ -46,10 +46,10 @@ func init() {
 func loadDatabase() {
 	core.NewCore()
 	core.LoadConfig(dir)
-	core.Configs = &core.DbConfig{DbConfig: &types.DbConfig{
+	core.Configs = &core.DbConfig{
 		DbConn:   "sqlite",
 		Location: dir,
-	}}
+	}
 	core.Configs.Connect(false, utils.Directory)
 	core.CoreApp.DbConnection = "sqlite"
 	core.CoreApp.Version = "DEV"

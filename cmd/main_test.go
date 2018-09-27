@@ -234,7 +234,7 @@ func RunSaveConfig(t *testing.T, db string) {
 	} else if db == "mssql" {
 		port = 1433
 	}
-	core.Configs = &core.DbConfig{DbConfig: &types.DbConfig{
+	core.Configs = &core.DbConfig{
 		DbConn:      db,
 		DbHost:      os.Getenv("DB_HOST"),
 		DbUser:      os.Getenv("DB_USER"),
@@ -249,7 +249,7 @@ func RunSaveConfig(t *testing.T, db string) {
 		Email:       "",
 		Error:       nil,
 		Location:    dir,
-	}}
+	}
 	core.Configs, err = core.Configs.Save()
 	assert.Nil(t, err)
 }
