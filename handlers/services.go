@@ -53,8 +53,6 @@ func renderServiceChartHandler(w http.ResponseWriter, r *http.Request) {
 		end = now.New(end).EndOfDay().UTC()
 	}
 
-	fmt.Println("start: ", start.String(), "end: ", end.String())
-
 	service := core.SelectService(utils.StringInt(vars["id"]))
 	data := core.GraphDataRaw(service, start, end).ToString()
 
@@ -186,8 +184,8 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	end := time.Now()
-	start := end.Add((-24 * 7) * time.Hour)
+	end := time.Now().UTC()
+	start := end.Add((-24 * 7) * time.Hour).UTC()
 
 	if startField != 0 {
 		start = time.Unix(startField, 0)

@@ -31,7 +31,7 @@ type ErrorResponse struct {
 
 // LoadConfig will attempt to load the 'config.yml' file in a specific directory
 func LoadConfig(directory string) (*DbConfig, error) {
-	var configs *types.DbConfig
+	var configs *DbConfig
 	if os.Getenv("DB_CONN") != "" {
 		utils.Log(1, "DB_CONN environment variable was found, waiting for database...")
 		return LoadUsingEnv()
@@ -44,7 +44,7 @@ func LoadConfig(directory string) (*DbConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	Configs = &DbConfig{configs}
+	Configs = configs
 	return Configs, err
 }
 
@@ -79,7 +79,7 @@ func LoadUsingEnv() (*DbConfig, error) {
 		CoreApp.UseCdn = true
 	}
 
-	dbConfig := &DbConfig{&types.DbConfig{
+	dbConfig := &DbConfig{
 		DbConn:      os.Getenv("DB_CONN"),
 		DbHost:      os.Getenv("DB_HOST"),
 		DbUser:      os.Getenv("DB_USER"),
@@ -92,7 +92,7 @@ func LoadUsingEnv() (*DbConfig, error) {
 		Username:    "admin",
 		Password:    "admin",
 		Email:       "info@localhost.com",
-	}}
+	}
 
 	err := dbConfig.Connect(true, utils.Directory)
 	if err != nil {

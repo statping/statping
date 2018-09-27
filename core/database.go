@@ -34,9 +34,7 @@ var (
 	DbSession *gorm.DB
 )
 
-type DbConfig struct {
-	*types.DbConfig
-}
+type DbConfig types.DbConfig
 
 // failuresDB returns the 'failures' database column
 func failuresDB() *gorm.DB {
@@ -199,8 +197,8 @@ func (db *DbConfig) waitForDb() error {
 // this function is currently set to delete records 7+ days old every 60 minutes
 func DatabaseMaintence() {
 	for range time.Tick(60 * time.Minute) {
-		utils.Log(1, "Checking for database records older than 7 days...")
-		since := time.Now().AddDate(0, 0, -7)
+		utils.Log(1, "Checking for database records older than 3 months...")
+		since := time.Now().AddDate(0, -3, 0).UTC()
 		DeleteAllSince("failures", since)
 		DeleteAllSince("hits", since)
 	}
@@ -223,7 +221,7 @@ func (c *DbConfig) Update() error {
 		utils.Log(4, err)
 		return err
 	}
-	data, err := yaml.Marshal(c.DbConfig)
+	data, err := yaml.Marshal(c)
 	if err != nil {
 		utils.Log(3, err)
 		return err
@@ -243,7 +241,7 @@ func (c *DbConfig) Save() (*DbConfig, error) {
 	}
 	c.ApiKey = utils.NewSHA1Hash(16)
 	c.ApiSecret = utils.NewSHA1Hash(16)
-	data, err := yaml.Marshal(c.DbConfig)
+	data, err := yaml.Marshal(c)
 	if err != nil {
 		utils.Log(3, err)
 		return nil, err
@@ -274,23 +272,6 @@ func (c *DbConfig) CreateCore() *Core {
 	}
 	return CoreApp
 }
-
-// SeedDatabase will insert many elements into the database. This is only ran in Dev/Test move
-//func (db *DbConfig) SeedDatabase() (string, string, error) {
-//	utils.Log(1, "Seeding Database with Dummy Data...")
-//	dir := utils.Directory
-//	var cmd string
-//	switch db.DbConn {
-//	case "sqlite":
-//		cmd = fmt.Sprintf("cat %v/dev/sqlite_seed.sql | sqlite3 %v/statup.db", dir, dir)
-//	case "mysql":
-//		cmd = fmt.Sprintf("mysql -h %v -P %v -u %v --password=%v %v < %v/dev/mysql_seed.sql", Configs.DbHost, 3306, Configs.DbUser, Configs.DbPass, Configs.DbData, dir)
-//	case "postgres":
-//		cmd = fmt.Sprintf("PGPASSWORD=%v psql -U %v -h %v -d %v -1 -f %v/dev/postgres_seed.sql", db.DbPass, db.DbUser, db.DbHost, db.DbData, dir)
-//	}
-//	out, outErr, err := utils.Command(cmd)
-//	return out, outErr, err
-//}
 
 // DropDatabase will DROP each table Statup created
 func (db *DbConfig) DropDatabase() error {

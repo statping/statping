@@ -166,27 +166,6 @@ func (s *Service) DowntimeText() string {
 	return fmt.Sprintf("%v has been offline for %v", s.Name, utils.DurationReadable(s.Downtime()))
 }
 
-// GroupDataBy returns a SQL query as a string to group a column by a time
-func GroupDataBy(column string, id int64, start, end time.Time, seconds int64) string {
-	incrementTime := "second"
-	if seconds == 60 {
-		incrementTime = "minute"
-	} else if seconds == 3600 {
-		incrementTime = "hour"
-	}
-	var sql string
-	switch CoreApp.DbConnection {
-	case "mysql":
-		sql = fmt.Sprintf("SELECT CONCAT(date_format(created_at, '%%Y-%%m-%%dT%%H:%%i:00Z')) AS created_at, AVG(latency)*1000 AS value FROM %v WHERE service=%v AND DATE_FORMAT(created_at, '%%Y-%%m-%%dT%%TZ') BETWEEN DATE_FORMAT('%v', '%%Y-%%m-%%dT%%TZ') AND DATE_FORMAT('%v', '%%Y-%%m-%%dT%%TZ') GROUP BY 1 ORDER BY created_at ASC;", column, id, start.UTC().Format(time.RFC3339), end.UTC().Format(time.RFC3339))
-	case "sqlite":
-		sql = fmt.Sprintf("SELECT datetime((strftime('%%s', created_at) / %v) * %v, 'unixepoch'), AVG(latency)*1000 as value FROM %v WHERE service=%v AND created_at BETWEEN '%v' AND '%v' GROUP BY 1 ORDER BY created_at ASC;", seconds, seconds, column, id, start.UTC().Format(time.RFC3339), end.UTC().Format(time.RFC3339))
-	case "postgres":
-		sql = fmt.Sprintf("SELECT date_trunc('%v', created_at), AVG(latency)*1000 AS value FROM %v WHERE service=%v AND created_at >= '%v' AND created_at <= '%v' GROUP BY 1 ORDER BY date_trunc ASC;", incrementTime, column, id, start.UTC().Format(time.RFC3339), end.UTC().Format(time.RFC3339))
-	}
-	fmt.Println(sql)
-	return sql
-}
-
 func Dbtimestamp(seconds int64) string {
 	incrementTime := "second"
 	if seconds == 60 {

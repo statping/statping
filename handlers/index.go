@@ -56,7 +56,7 @@ func DesktopInit(ip string, port int) {
 		RunHTTPServer(ip, port)
 	}
 
-	config := &core.DbConfig{DbConfig: &types.DbConfig{
+	config := &core.DbConfig{
 		DbConn:      "sqlite",
 		Project:     "Statup",
 		Description: "Statup running as an App!",
@@ -66,7 +66,7 @@ func DesktopInit(ip string, port int) {
 		Email:       "user@email.com",
 		Error:       nil,
 		Location:    utils.Directory,
-	}}
+	}
 
 	config, err = config.Save()
 	if err != nil {

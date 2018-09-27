@@ -19,11 +19,12 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"github.com/go-mail/mail"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
-	"gopkg.in/gomail.v2"
 	"html/template"
+	"net/smtp"
 )
 
 const (
@@ -33,7 +34,7 @@ const (
 )
 
 var (
-	mailer *gomail.Dialer
+	mailer *mail.Dialer
 )
 
 type Email struct {
@@ -97,18 +98,6 @@ func (u *Email) Send(msg interface{}) error {
 	return nil
 }
 
-func (u *Email) OnTest(n notifier.Notification) (bool, error) {
-	email := &EmailOutgoing{
-		To:       emailer.GetValue("var2"),
-		Subject:  "Test Email",
-		Template: MESSAGE,
-		Data:     nil,
-		From:     emailer.GetValue("var1"),
-	}
-	u.AddQueue(email)
-	return true, nil
-}
-
 type EmailOutgoing struct {
 	To       string
 	Subject  string
@@ -158,11 +147,23 @@ func (u *Email) OnSave() error {
 	return nil
 }
 
+// OnTest triggers when this notifier has been saved
+func (u *Email) OnTest() error {
+	host := fmt.Sprintf("%v:%v", u.Host, u.Port)
+	dial, err := smtp.Dial(host)
+	if err != nil {
+		utils.Log(3, err)
+		return err
+	}
+	auth := smtp.PlainAuth("", u.Username, u.Password, host)
+	return dial.Auth(auth)
+}
+
 func (u *Email) dialSend(email *EmailOutgoing) error {
-	mailer = gomail.NewPlainDialer(emailer.Host, emailer.Port, emailer.Username, emailer.Password)
+	mailer = mail.NewDialer(emailer.Host, emailer.Port, emailer.Username, emailer.Password)
 	mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	emailSource(email)
-	m := gomail.NewMessage()
+	m := mail.NewMessage()
 	m.SetHeader("From", email.From)
 	m.SetHeader("To", email.To)
 	m.SetHeader("Subject", email.Subject)

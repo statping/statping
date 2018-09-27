@@ -91,16 +91,18 @@ func InsertSampleData() error {
 
 // InsertSampleHits will create a couple new hits for the sample services
 func InsertSampleHits() error {
-	since := time.Now().Add((-24 * 7) * time.Hour)
+	since := time.Now().Add((-24 * 7) * time.Hour).UTC()
 	for i := int64(1); i <= 5; i++ {
 		service := SelectService(i)
 		utils.Log(1, fmt.Sprintf("Adding %v sample hit records to service %v", 360, service.Name))
 		createdAt := since
+		alpha := float64(1.05)
 
-		for hi := int64(1); hi <= 1860; hi++ {
+		for hi := int64(1); hi <= 168; hi++ {
+			alpha += 0.01
 			rand.Seed(time.Now().UnixNano())
-			latency := rand.Float64()
-			createdAt = createdAt.Add(3 * time.Minute).UTC()
+			latency := rand.Float64() * alpha
+			createdAt = createdAt.Add(1 * time.Hour)
 			hit := &types.Hit{
 				Service:   service.Id,
 				CreatedAt: createdAt,
@@ -110,6 +112,39 @@ func InsertSampleHits() error {
 		}
 	}
 	return nil
+}
+
+func sampleGraphData(i float64, upward *bool) float64 {
+	alpha := 0.0003
+	if *upward {
+		i += 0.3
+		if i >= 6500 {
+			i += 0.1
+			*upward = false
+		} else if i >= 4500 {
+			i += 3
+		} else if i >= 2300 {
+			i += 1
+		} else if i >= 1150 {
+			i += 2
+		} else if i >= 500 {
+			i += 1
+		}
+	} else {
+		i -= 0.3
+		if i <= 6500 {
+			i -= 0.1
+		} else if i <= 4500 {
+			i -= 3
+		} else if i <= 2300 {
+			i -= 1
+		} else if i <= 1150 {
+			i -= 2
+		} else if i <= 500 {
+			i -= 1
+		}
+	}
+	return i * alpha
 }
 
 func insertSampleCore() error {

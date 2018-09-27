@@ -77,7 +77,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	dir := utils.Directory
 
-	config := &core.DbConfig{DbConfig: &types.DbConfig{
+	config := &core.DbConfig{
 		DbConn:      dbConn,
 		DbHost:      dbHost,
 		DbUser:      dbUser,
@@ -92,7 +92,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		Email:       email,
 		Error:       nil,
 		Location:    utils.Directory,
-	}}
+	}
 
 	core.Configs, err = config.Save()
 	if err != nil {
