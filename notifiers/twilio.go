@@ -45,21 +45,25 @@ var twilioNotifier = &twilio{&notifier.Notification{
 		Title:       "Account Sid",
 		Placeholder: "Insert your Twilio Account Sid",
 		DbField:     "api_key",
+		Required:    true,
 	}, {
 		Type:        "text",
 		Title:       "Account Token",
 		Placeholder: "Insert your Twilio Account Token",
 		DbField:     "api_secret",
+		Required:    true,
 	}, {
 		Type:        "text",
 		Title:       "SMS to Phone Number",
 		Placeholder: "18555555555",
 		DbField:     "Var1",
+		Required:    true,
 	}, {
 		Type:        "text",
 		Title:       "From Phone Number",
 		Placeholder: "18555555555",
 		DbField:     "Var2",
+		Required:    true,
 	}}},
 }
 
@@ -95,9 +99,11 @@ func (u *twilio) Send(msg interface{}) error {
 	}
 	defer res.Body.Close()
 	contents, _ := ioutil.ReadAll(res.Body)
-	success, twilioRes := twilioSuccess(contents)
+	success, _ := twilioSuccess(contents)
 	if !success {
-		return errors.New(fmt.Sprintf("Twilio didn't receive the expected status of 'enque' from API got: %v", twilioRes))
+		errorOut := twilioError(contents)
+		out := fmt.Sprintf("Error code %v - %v", errorOut.Code, errorOut.Message)
+		return errors.New(out)
 	}
 	return nil
 }
@@ -127,6 +133,12 @@ func (u *twilio) OnSave() error {
 	return nil
 }
 
+// OnTest will test the Twilio SMS messaging
+func (u *twilio) OnTest() error {
+	msg := fmt.Sprintf("Testing the Twilio SMS Notifier")
+	return u.Send(msg)
+}
+
 func twilioSuccess(res []byte) (bool, TwilioResponse) {
 	var obj TwilioResponse
 	json.Unmarshal(res, &obj)
@@ -134,6 +146,19 @@ func twilioSuccess(res []byte) (bool, TwilioResponse) {
 		return true, obj
 	}
 	return false, obj
+}
+
+func twilioError(res []byte) TwilioError {
+	var obj TwilioError
+	json.Unmarshal(res, &obj)
+	return obj
+}
+
+type TwilioError struct {
+	Code     int    `json:"code"`
+	Message  string `json:"message"`
+	MoreInfo string `json:"more_info"`
+	Status   int    `json:"status"`
 }
 
 type TwilioResponse struct {

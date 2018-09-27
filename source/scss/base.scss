@@ -148,9 +148,15 @@ HTML,BODY {
 }
 
 .chart-container {
-    position: relative;
-    height: 170px;
-    width: 100%;
+  position: relative;
+  height: 170px;
+  width: 100%;
+}
+
+.service-chart-container {
+  position: relative;
+  height: 400px;
+  width: 100%;
 }
 
 @mixin dynamic-color-hov($color) {

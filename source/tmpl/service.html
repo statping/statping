@@ -57,11 +57,11 @@
                             </div>
                         </div>
 
-                <div class="chart-container" style="height: 400px">
+                <div class="service-chart-container">
                     <canvas id="service"></canvas>
                 </div>
 
-                <form id="service_date_form" class="row mt-2 mb-3">
+                <form id="service_date_form" class="col-12 mt-2 mb-3">
                     <span id="start_date" class="text-muted small float-left pointer">{{FromUnix .Start}}</span>
                     <span id="end_date" class="text-muted small float-right pointer" style="position: absolute;right: 0;">{{FromUnix .End}}</span>
                     <input type="hidden" name="start" class="form-control" id="service_start" spellcheck="false">

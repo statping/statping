@@ -52,6 +52,7 @@ var slacker = &Slack{&notifier.Notification{
 		Placeholder: "Insert your Slack webhook URL here.",
 		SmallText:   "Incoming Webhook URL from <a href=\"https://api.slack.com/apps\" target=\"_blank\">Slack Apps</a>",
 		DbField:     "Host",
+		Required:    true,
 	}}},
 }
 

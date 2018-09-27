@@ -358,11 +358,6 @@ func (n *Notification) GetValue(dbField string) string {
 	return ""
 }
 
-// Testable returns true if it includes the CoreEvents interface
-func (n *Notification) Testable() bool {
-	return isType(n, new(Tester))
-}
-
 // isType will return true if a variable can implement an interface
 func isType(n interface{}, obj interface{}) bool {
 	one := reflect.TypeOf(n)

@@ -145,6 +145,11 @@ HTML, BODY {
   height: 170px;
   width: 100%; }
 
+.service-chart-container {
+  position: relative;
+  height: 400px;
+  width: 100%; }
+
 .btn-primary {
   background-color: #3e9bff;
   border-color: #006fe6;
@@ -688,6 +693,9 @@ HTML, BODY {
     border-bottom-left-radius: 0; }
 
   .list-group-item P {
-    font-size: 0.7rem; } }
+    font-size: 0.7rem; }
+
+  .service-chart-container {
+    height: 200px; } }
 
 /*# sourceMappingURL=base.css.map */

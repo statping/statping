@@ -108,7 +108,7 @@ func TestSlackNotifier(t *testing.T) {
 
 	t.Run("Slack Queue", func(t *testing.T) {
 		go notifier.Queue(slacker)
-		time.Sleep(2 * time.Second)
+		time.Sleep(4 * time.Second)
 		assert.Equal(t, SLACK_URL, slacker.Host)
 		assert.Equal(t, 0, len(slacker.Queue))
 	})

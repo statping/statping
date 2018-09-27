@@ -44,7 +44,6 @@ func init() {
 }
 
 func TestTwilioNotifier(t *testing.T) {
-	t.SkipNow()
 	t.Parallel()
 	if TWILIO_SID == "" || TWILIO_SECRET == "" || TWILIO_FROM == "" {
 		t.Log("twilio notifier testing skipped, missing TWILIO_SID environment variable")
@@ -73,7 +72,7 @@ func TestTwilioNotifier(t *testing.T) {
 
 	t.Run("Twilio OnFailure", func(t *testing.T) {
 		twilioNotifier.OnFailure(TestService, TestFailure)
-		assert.Len(t, twilioNotifier.Queue, 2)
+		assert.Len(t, twilioNotifier.Queue, 1)
 	})
 
 	t.Run("Twilio Check Offline", func(t *testing.T) {
@@ -82,7 +81,7 @@ func TestTwilioNotifier(t *testing.T) {
 
 	t.Run("Twilio OnSuccess", func(t *testing.T) {
 		twilioNotifier.OnSuccess(TestService)
-		assert.Len(t, twilioNotifier.Queue, 3)
+		assert.Len(t, twilioNotifier.Queue, 2)
 	})
 
 	t.Run("Twilio Check Back Online", func(t *testing.T) {
@@ -91,7 +90,7 @@ func TestTwilioNotifier(t *testing.T) {
 
 	t.Run("Twilio OnSuccess Again", func(t *testing.T) {
 		twilioNotifier.OnSuccess(TestService)
-		assert.Len(t, twilioNotifier.Queue, 3)
+		assert.Len(t, twilioNotifier.Queue, 2)
 	})
 
 	t.Run("Twilio Send", func(t *testing.T) {
