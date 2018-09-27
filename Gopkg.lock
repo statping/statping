@@ -64,6 +64,14 @@
   revision = "1eb28afdf9b6e56cf673badd47545f844fe81103"
 
 [[projects]]
+  digest = "1:e37eb23cfd852df9c65b5dee28456595d7b12479421221a088b6ea7ad95a3570"
+  name = "github.com/go-mail/mail"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "63235f23494bf20d713a585bce40b2a0675c2f77"
+  version = "2.2.0"
+
+[[projects]]
   digest = "1:64a5a67c69b70c2420e607a8545d674a23778ed9c3e80607bfd17b77c6c87f6a"
   name = "github.com/go-ole/go-ole"
   packages = [
@@ -292,14 +300,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:75cb7164c3c9e028922e69b10842159549ab96ffc4800ea189c4a6865dc3bc08"
+  digest = "1:6fb1dd382722f93fcf7c52ff631f7b899d8c5d54314d88d42dd1f4e5ac404a30"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "90868a75fefd03942536221d7c0e2f84ec62a668"
+  revision = "c2ed4eda69e7f62900806e4cd6e45f0429f859fa"
 
 [[projects]]
   digest = "1:c25289f43ac4a68d88b02245742347c94f1e108c534dda442188015ff80669b3"
@@ -316,14 +324,6 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "2caba252f4dc53eaf6b553000885530023f54623"
-
-[[projects]]
-  digest = "1:eebd52aee67d9f1e0af1859a584e14b1817581dd5f90d4585418c27b6a93c966"
-  name = "gopkg.in/gomail.v2"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "41f3572897373c5538c50a2402db15db079fa4fd"
-  version = "2.0.0"
 
 [[projects]]
   digest = "1:c805e517269b0ba4c21ded5836019ed7d16953d4026cb7d00041d039c7906be9"
@@ -348,6 +348,7 @@
     "github.com/GeertJohan/go.rice",
     "github.com/GeertJohan/go.rice/embedded",
     "github.com/ararog/timeago",
+    "github.com/go-mail/mail",
     "github.com/go-yaml/yaml",
     "github.com/gorilla/handlers",
     "github.com/gorilla/mux",
@@ -364,7 +365,6 @@
     "github.com/rendon/testcli",
     "github.com/stretchr/testify/assert",
     "golang.org/x/crypto/bcrypt",
-    "gopkg.in/gomail.v2",
     "gopkg.in/natefinch/lumberjack.v2",
     "gopkg.in/russross/blackfriday.v2",
   ]

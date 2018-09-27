@@ -34,6 +34,10 @@
   version = "0.0.1"
 
 [[constraint]]
+  name = "github.com/go-mail/mail"
+  version = "2.2.0"
+
+[[constraint]]
   name = "github.com/go-yaml/yaml"
   version = "2.2.1"
 
@@ -80,10 +84,6 @@
 [[constraint]]
   branch = "master"
   name = "golang.org/x/crypto"
-
-[[constraint]]
-  name = "gopkg.in/gomail.v2"
-  version = "2.0.0"
 
 [[constraint]]
   name = "gopkg.in/natefinch/lumberjack.v2"
