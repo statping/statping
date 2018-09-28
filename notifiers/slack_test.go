@@ -24,13 +24,8 @@ import (
 )
 
 var (
-	SLACK_URL        string
-	slackMessage     = `{"text":"this is a test from the Slack notifier!"}`
-	slackTestMessage = SlackMessage{
-		Service:  TestService,
-		Template: FAILURE,
-		Time:     time.Now().Unix(),
-	}
+	SLACK_URL    string
+	slackMessage = `{"text":"this is a test from the Slack notifier!"}`
 )
 
 func init() {

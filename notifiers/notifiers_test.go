@@ -22,6 +22,7 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"time"
 )
 
 var (
@@ -31,6 +32,7 @@ var (
 )
 
 var TestService = &types.Service{
+	Id:             1,
 	Name:           "Interpol - All The Rage Back Home",
 	Domain:         "https://www.youtube.com/watch?v=-u6DvRyyKGU",
 	ExpectedStatus: 200,
@@ -38,10 +40,16 @@ var TestService = &types.Service{
 	Type:           "http",
 	Method:         "GET",
 	Timeout:        20,
+	LastStatusCode: 404,
+	Expected:       "test example",
+	LastResponse:   "<html>this is an example response</html>",
+	CreatedAt:      time.Now().Add(-24 * time.Hour),
 }
 
 var TestFailure = &types.Failure{
-	Issue: "testing",
+	Issue:     "testing",
+	Service:   1,
+	CreatedAt: time.Now().Add(-12 * time.Hour),
 }
 
 var TestUser = &types.User{

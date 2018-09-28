@@ -69,13 +69,11 @@ func TestEmailNotifier(t *testing.T) {
 		emailer.Port = int(EMAIL_PORT)
 		emailer.Delay = time.Duration(100 * time.Millisecond)
 
-		message := "this is a test email!"
-
 		testEmail = &EmailOutgoing{
 			To:       emailer.GetValue("var2"),
 			Subject:  fmt.Sprintf("Service %v is Failing", TestService.Name),
-			Template: MESSAGE,
-			Data:     interface{}(message),
+			Template: TEMPLATE,
+			Data:     TestService,
 			From:     emailer.GetValue("var1"),
 		}
 	})
