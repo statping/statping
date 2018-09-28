@@ -16,6 +16,7 @@
 package plugin
 
 import (
+	"github.com/hunterlong/statup/core/notifier"
 	"github.com/jinzhu/gorm"
 	"net/http"
 )
@@ -31,6 +32,45 @@ import (
 // An expandable plugin framework that will still
 // work even if there's an update or addition.
 //
+
+type PluginObject struct{}
+
+var (
+	AllPlugins []*PluginObject
+)
+
+func Add(p Pluginer) *PluginObject {
+	return &PluginObject{}
+}
+
+func (p *PluginObject) AddRoute(s string, i string, f http.HandlerFunc) {
+
+}
+
+type Pluginer interface {
+	Select() *PluginObject
+}
+
+type Databaser interface {
+	StatupDatabase(*gorm.DB)
+}
+
+type Router interface {
+	AddRoute(string, string, http.HandlerFunc) error
+}
+
+type Notifier interface {
+	notifier.Notifier
+	notifier.BasicEvents
+}
+
+type AdvancedNotifier interface {
+	notifier.Notifier
+	notifier.BasicEvents
+	notifier.UserEvents
+	notifier.CoreEvents
+	notifier.NotifierEvents
+}
 
 var (
 	DB *gorm.DB
