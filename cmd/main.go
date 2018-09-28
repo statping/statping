@@ -59,7 +59,6 @@ func main() {
 	source.Assets()
 	utils.InitLogs()
 	args := flag.Args()
-	defer core.CloseDB()
 
 	if len(args) >= 1 {
 		err := CatchCLI(args)
@@ -79,6 +78,7 @@ func main() {
 		fmt.Println(handlers.RunHTTPServer(ipAddress, port))
 		os.Exit(1)
 	}
+	defer core.CloseDB()
 	mainProcess()
 }
 

@@ -70,7 +70,7 @@ func LoadUsingEnv() (*DbConfig, error) {
 	Configs.DbHost = os.Getenv("DB_HOST")
 	Configs.DbPort = int(utils.StringInt(os.Getenv("DB_PORT")))
 	Configs.DbUser = os.Getenv("DB_USER")
-	Configs.Password = os.Getenv("DB_PASS")
+	Configs.DbPass = os.Getenv("DB_PASS")
 	Configs.DbData = os.Getenv("DB_DATABASE")
 	CoreApp.DbConnection = os.Getenv("DB_CONN")
 	CoreApp.Name = os.Getenv("NAME")
