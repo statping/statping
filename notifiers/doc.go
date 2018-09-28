@@ -5,5 +5,5 @@
 // To see a full example of a notifier with all events, visit Statup's
 // notifier example code: https://github.com/hunterlong/statup/wiki/Notifier-Example
 //
-// by Hunter Long
+// More info on: https://github.com/hunterlong/statup
 package notifiers

@@ -1,5 +1,5 @@
 // Package handlers holds all the HTTP requests and routes. All HTTP related
 // functions are in this package.
 //
-// by Hunter Long
+// More info on: https://github.com/hunterlong/statup
 package handlers

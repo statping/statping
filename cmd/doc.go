@@ -8,5 +8,5 @@
 // Remember that you'll need to compile the static assets using Rice:
 // // cd source && rice embed-go
 //
-// by Hunter Long
+// More info on: https://github.com/hunterlong/statup
 package main

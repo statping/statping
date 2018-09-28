@@ -22,11 +22,11 @@ import (
 	"time"
 )
 
-type Example struct {
+type ExampleNotifier struct {
 	*Notification
 }
 
-var example = &Example{&Notification{
+var example = &ExampleNotifier{&Notification{
 	Method:      METHOD,
 	Host:        "http://exmaplehost.com",
 	Title:       "Example",
@@ -85,98 +85,142 @@ func init() {
 }
 
 // REQUIRED
-func (n *Example) Send(msg interface{}) error {
+func (n *ExampleNotifier) Send(msg interface{}) error {
 	message := msg.(string)
 	fmt.Printf("i received this string: %v\n", message)
 	return nil
 }
 
 // REQUIRED
-func (n *Example) Select() *Notification {
+func (n *ExampleNotifier) Select() *Notification {
 	return n.Notification
 }
 
 // REQUIRED
-func (n *Example) OnSave() error {
+func (n *ExampleNotifier) OnSave() error {
 	msg := fmt.Sprintf("received on save trigger")
 	n.AddQueue(msg)
 	return errors.New("onsave triggered")
 }
 
 // REQUIRED - BASIC EVENT
-func (n *Example) OnSuccess(s *types.Service) {
+func (n *ExampleNotifier) OnSuccess(s *types.Service) {
 	msg := fmt.Sprintf("received a count trigger for service: %v\n", s.Name)
 	n.AddQueue(msg)
 }
 
 // REQUIRED - BASIC EVENT
-func (n *Example) OnFailure(s *types.Service, f *types.Failure) {
+func (n *ExampleNotifier) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf("received a failure trigger for service: %v\n", s.Name)
 	n.AddQueue(msg)
 }
 
 // OPTIONAL Test function before user saves
-func (n *Example) OnTest() error {
+func (n *ExampleNotifier) OnTest() error {
 	fmt.Printf("received a test trigger with form data: %v\n", n.Host)
 	return nil
 }
 
 // OPTIONAL
-func (n *Example) OnNewService(s *types.Service) {
+func (n *ExampleNotifier) OnNewService(s *types.Service) {
 	msg := fmt.Sprintf("received a new service trigger for service: %v\n", s.Name)
 	n.AddQueue(msg)
 }
 
 // OPTIONAL
-func (n *Example) OnUpdatedService(s *types.Service) {
+func (n *ExampleNotifier) OnUpdatedService(s *types.Service) {
 	msg := fmt.Sprintf("received a update service trigger for service: %v\n", s.Name)
 	n.AddQueue(msg)
 }
 
 // OPTIONAL
-func (n *Example) OnDeletedService(s *types.Service) {
+func (n *ExampleNotifier) OnDeletedService(s *types.Service) {
 	msg := fmt.Sprintf("received a delete service trigger for service: %v\n", s.Name)
 	n.AddQueue(msg)
 }
 
 // OPTIONAL
-func (n *Example) OnNewUser(s *types.User) {
+func (n *ExampleNotifier) OnNewUser(s *types.User) {
 	msg := fmt.Sprintf("received a new user trigger for user: %v\n", s.Username)
 	n.AddQueue(msg)
 }
 
 // OPTIONAL
-func (n *Example) OnUpdatedUser(s *types.User) {
+func (n *ExampleNotifier) OnUpdatedUser(s *types.User) {
 	msg := fmt.Sprintf("received a updated user trigger for user: %v\n", s.Username)
 	n.AddQueue(msg)
 }
 
 // OPTIONAL
-func (n *Example) OnDeletedUser(s *types.User) {
+func (n *ExampleNotifier) OnDeletedUser(s *types.User) {
 	msg := fmt.Sprintf("received a deleted user trigger for user: %v\n", s.Username)
 	n.AddQueue(msg)
 }
 
 // OPTIONAL
-func (n *Example) OnUpdatedCore(s *types.Core) {
+func (n *ExampleNotifier) OnUpdatedCore(s *types.Core) {
 	msg := fmt.Sprintf("received a updated core trigger for core: %v\n", s.Name)
 	n.AddQueue(msg)
 }
 
 // OPTIONAL
-func (n *Example) OnStart(s *types.Core) {
+func (n *ExampleNotifier) OnStart(s *types.Core) {
 	msg := fmt.Sprintf("received a trigger on Statup boot: %v\n", s.Name)
 	n.AddQueue(msg)
 }
 
 // OPTIONAL
-func (n *Example) OnNewNotifier(s *Notification) {
+func (n *ExampleNotifier) OnNewNotifier(s *Notification) {
 	msg := fmt.Sprintf("received a new notifier trigger for notifier: %v\n", s.Method)
 	n.AddQueue(msg)
 }
 
 // OPTIONAL
-func (n *Example) OnUpdatedNotifier(s *Notification) {
+func (n *ExampleNotifier) OnUpdatedNotifier(s *Notification) {
 	msg := fmt.Sprintf("received a update notifier trigger for notifier: %v\n", s.Method)
 	n.AddQueue(msg)
+}
+
+// Create a new notifier that includes a form for the end user to insert their own values
+func Example() {
+	// Create a new variable for your Notifier
+	example = &ExampleNotifier{&Notification{
+		Method:      "Example",
+		Title:       "Example Notifier",
+		Description: "Example Notifier can hold many different types of fields for a customized look.",
+		Author:      "Hunter Long",
+		AuthorUrl:   "https://github.com/hunterlong",
+		Delay:       time.Duration(1500 * time.Millisecond),
+		Limits:      7,
+		Form: []NotificationForm{{
+			Type:        "text",
+			Title:       "Host",
+			Placeholder: "Insert your Host here.",
+			DbField:     "host",
+			SmallText:   "you can also use SmallText to insert some helpful hints under this input",
+		}},
+	}}
+
+	// AddNotifier accepts a notifier to load into the Statup Notification system
+	AddNotifier(example)
+}
+
+// Add any type of interface to the AddQueue function when a service is successful
+func Example_onSuccess() {
+	msg := fmt.Sprintf("this is a successful message as a string passing into AddQueue function")
+	example.AddQueue(msg)
+}
+
+// Add any type of interface to the AddQueue function when a service is successful
+func Example_onFailure() {
+	msg := fmt.Sprintf("this is a failing message as a string passing into AddQueue function")
+	example.AddQueue(msg)
+}
+
+// The Send method will run the main functionality of your notifier
+func Example_send() {
+	// example.Send(msg interface{})
+	for i := 0; i <= 10; i++ {
+		fmt.Printf("do something awesome rather than a loop %v\n", i)
+	}
 }

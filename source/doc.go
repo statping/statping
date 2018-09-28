@@ -4,5 +4,5 @@
 //
 // To compile all the assets run `rice embed-go` in the source directory.
 //
-// by Hunter Long
+// More info on: https://github.com/hunterlong/statup
 package source
