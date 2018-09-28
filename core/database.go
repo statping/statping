@@ -174,7 +174,7 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 	DbSession, err = gorm.Open(dbType, conn)
 	if err != nil {
 		if retry {
-			utils.Log(1, fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", Configs.DbHost))
+			utils.Log(1, fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", conn))
 			return db.waitForDb()
 		} else {
 			fmt.Println("ERROR:", err)
