@@ -23,6 +23,7 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 	"os"
+	"time"
 )
 
 type ApiResponse struct {
@@ -75,6 +76,23 @@ func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 	//checkin.Receivehit()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(checkin)
+}
+
+func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	service := core.SelectService(utils.StringInt(vars["id"]))
+	if service == nil {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+	fields := parseGet(r)
+	grouping := fields.Get("group")
+	startField := utils.StringInt(fields.Get("start"))
+	endField := utils.StringInt(fields.Get("end"))
+	obj := core.GraphDataRaw(service, time.Unix(startField, 0), time.Unix(endField, 0), grouping)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(obj)
 }
 
 func apiServiceHandler(w http.ResponseWriter, r *http.Request) {

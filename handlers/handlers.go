@@ -84,26 +84,13 @@ func IsAuthenticated(r *http.Request) bool {
 	return session.Values["authenticated"].(bool)
 }
 
-// executeResponse will render a HTTP response for the front end user
-func executeResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{}) {
-	utils.Http(r)
-	if url, ok := redirect.(string); ok {
-		http.Redirect(w, r, url, http.StatusSeeOther)
-		return
-	}
-	nav, _ := source.TmplBox.String("nav.html")
-	footer, _ := source.TmplBox.String("footer.html")
-	render, err := source.TmplBox.String(file)
-	if err != nil {
-		utils.Log(4, err)
-	}
-	t := template.New("message")
-	t.Funcs(template.FuncMap{
-		"js": func(html string) template.JS {
-			return template.JS(html)
+var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap {
+	return template.FuncMap{
+		"js": func(html interface{}) template.JS {
+			return template.JS(utils.ToString(html))
 		},
-		"safe": func(html string) template.HTML {
-			return template.HTML(html)
+		"safe": func(html interface{}) template.HTML {
+			return template.HTML(utils.ToString(html))
 		},
 		"Auth": func() bool {
 			return IsAuthenticated(r)
@@ -156,7 +143,25 @@ func executeResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		"FromUnix": func(t int64) string {
 			return utils.Timezoner(time.Unix(t, 0), core.CoreApp.Timezone).Format("Monday, January 02")
 		},
-	})
+	}
+}
+
+// executeResponse will render a HTTP response for the front end user
+func executeResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{}) {
+	utils.Http(r)
+	if url, ok := redirect.(string); ok {
+		http.Redirect(w, r, url, http.StatusSeeOther)
+		return
+	}
+	nav, _ := source.TmplBox.String("nav.html")
+	footer, _ := source.TmplBox.String("footer.html")
+	chartIndex, _ := source.JsBox.String("chart_index.js")
+	render, err := source.TmplBox.String(file)
+	if err != nil {
+		utils.Log(4, err)
+	}
+	t := template.New("message")
+	t.Funcs(handlerFuncs(w, r))
 	t, err = t.Parse(nav)
 	if err != nil {
 		utils.Log(4, err)
@@ -169,6 +174,15 @@ func executeResponse(w http.ResponseWriter, r *http.Request, file string, data i
 	if err != nil {
 		utils.Log(4, err)
 	}
+	_, err = t.Parse(chartIndex)
+	if err != nil {
+		utils.Log(4, err)
+	}
+	fmt.Println(t.Templates())
+	fmt.Println(t.DefinedTemplates())
+
+	t.Lookup("chartIndex").Funcs(handlerFuncs(w, r))
+
 	err = t.Execute(w, data)
 	if err != nil {
 		utils.Log(4, err)

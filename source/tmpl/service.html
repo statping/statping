@@ -255,7 +255,7 @@
         data: {
             datasets: [{
                 label: 'Response Time (Milliseconds)',
-                data: {{js .Data}},
+                data: [],
                 backgroundColor: [
                     'rgba(47, 206, 30, 0.92)'
                 ],
@@ -280,10 +280,27 @@
                 }],
                 xAxes: [{
                     type: 'time',
+                    distribution: 'series',
+                    time: {
+                        displayFormats: {
+                            'millisecond': 'MMM DD',
+                            'second': 'MMM DD',
+                            'minute': 'MMM DD',
+                            'hour': 'MMM DD hA',
+                            'day': 'MMM DD',
+                            'week': 'MMM DD',
+                            'month': 'MMM DD',
+                            'quarter': 'MMM DD',
+                            'year': 'MMM DD',
+                        }
+                    },
                     gridLines: {
                         display: true
+                    },
+                    ticks: {
+                        source: 'auto'
                     }
-                }]
+                }],
             },
             elements: {
                 point: {
@@ -331,6 +348,8 @@
     $("#end_date").click(function(e) {
         endPick.show()
     })
+
+    AjaxChart(chartdata,{{$s.Id}},{{.Start}},{{.End}},"hour");
 
 </script>
 

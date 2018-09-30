@@ -237,6 +237,20 @@ func TestApiDeleteUserHandler(t *testing.T) {
 	assert.Equal(t, "success", obj.Status)
 }
 
+func TestApiServiceDataHandler(t *testing.T) {
+	grouping := []string{"minute", "hour", "day"}
+	for _, g := range grouping {
+		params := "?start=0&end=999999999999&group=" + g
+		rr, err := httpRequestAPI(t, "GET", "/api/services/1/data"+params, nil)
+		assert.Nil(t, err)
+		body := rr.Body.String()
+		var obj core.DateScanObj
+		formatJSON(body, &obj)
+		assert.Equal(t, 200, rr.Code)
+		assert.NotZero(t, len(obj.Array))
+	}
+}
+
 func httpRequestAPI(t *testing.T, method, url string, body io.Reader) (*httptest.ResponseRecorder, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {

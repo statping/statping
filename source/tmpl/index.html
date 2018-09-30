@@ -112,18 +112,17 @@
 <script src="/js/main.js"></script>
 {{end}}
 
-{{if CHART_DATA}}
-<script>{{ js CHART_DATA }}</script>
-{{ else }}
-<script src="/charts.js"></script>
+{{ if .Style }}
+<style>
+ {{ safe .Style }}
+</style>
 {{ end }}
 
-{{ if .Style }}
-    <style>
-     {{ safe .Style }}
-    </style>
- {{ end }}
-
+<script>
+{{ range Services }}
+    {{template "chartIndex" .}}
+{{end}}
+</script>
 
 </body>
 </html>

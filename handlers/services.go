@@ -54,7 +54,7 @@ func renderServiceChartHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	service := core.SelectService(utils.StringInt(vars["id"]))
-	data := core.GraphDataRaw(service, start, end).ToString()
+	data := core.GraphDataRaw(service, start, end, "hour").ToString()
 
 	out := struct {
 		Services []*core.Service
@@ -74,7 +74,7 @@ func renderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
 	start := now.BeginningOfDay().UTC()
 
 	for _, s := range services {
-		d := core.GraphDataRaw(s, start, end).ToString()
+		d := core.GraphDataRaw(s, start, end, "hour").ToString()
 		data = append(data, d)
 	}
 
@@ -194,7 +194,7 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 		end = time.Unix(endField, 0)
 	}
 
-	data := core.GraphDataRaw(serv, start, end)
+	data := core.GraphDataRaw(serv, start, end, "hour")
 
 	out := struct {
 		Service *core.Service

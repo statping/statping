@@ -128,7 +128,7 @@ type DateScan struct {
 
 // DateScanObj struct is for creating the charts.js graph JSON array
 type DateScanObj struct {
-	Array []DateScan
+	Array []DateScan `json:"data"`
 }
 
 // lastFailure returns the last failure a service had
@@ -166,12 +166,14 @@ func (s *Service) DowntimeText() string {
 	return fmt.Sprintf("%v has been offline for %v", s.Name, utils.DurationReadable(s.Downtime()))
 }
 
-func Dbtimestamp(seconds int64) string {
-	incrementTime := "second"
-	if seconds == 60 {
-		incrementTime = "minute"
-	} else if seconds == 3600 {
-		incrementTime = "hour"
+func Dbtimestamp(group string) string {
+	seconds := 60
+	if group == "second" {
+		seconds = 60
+	} else if group == "hour" {
+		seconds = 3600
+	} else if group == "day" {
+		seconds = 86400
 	}
 	switch CoreApp.DbConnection {
 	case "mysql":
@@ -179,7 +181,7 @@ func Dbtimestamp(seconds int64) string {
 	case "sqlite":
 		return fmt.Sprintf("datetime((strftime('%%s', created_at) / %v) * %v, 'unixepoch') AS timeframe, AVG(latency) as value", seconds, seconds)
 	case "postgres":
-		return fmt.Sprintf("date_trunc('%v', created_at) AS timeframe, AVG(latency) AS value", incrementTime)
+		return fmt.Sprintf("date_trunc('%v', created_at) AS timeframe, AVG(latency) AS value", group)
 	default:
 		return ""
 	}
@@ -199,16 +201,20 @@ func (s *Service) Downtime() time.Duration {
 	return since
 }
 
-func GraphDataRaw(service types.ServiceInterface, start, end time.Time) *DateScanObj {
+func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group string) *DateScanObj {
 	var d []DateScan
-	model := service.(*Service).HitsBetween(start, end)
+	model := service.(*Service).HitsBetween(start, end, group)
 	rows, _ := model.Rows()
 	for rows.Next() {
 		var gd DateScan
 		var createdAt string
 		var value float64
+		var createdTime time.Time
 		rows.Scan(&createdAt, &value)
-		createdTime, _ := time.Parse(types.TIME, createdAt)
+		createdTime, _ = time.Parse(types.TIME, createdAt)
+		if CoreApp.DbConnection == "postgres" {
+			createdTime, _ = time.Parse(types.TIME_NANO, createdAt)
+		}
 		gd.CreatedAt = utils.Timezoner(createdTime, CoreApp.Timezone).Format(types.TIME)
 		gd.Value = int64(value * 1000)
 		d = append(d, gd)
@@ -227,9 +233,9 @@ func (d *DateScanObj) ToString() string {
 
 // GraphData returns the JSON object used by Charts.js to render the chart
 func (s *Service) GraphData() string {
-	start := time.Now().Add(-24 * time.Hour)
+	start := time.Now().Add((-24 * 7) * time.Hour)
 	end := time.Now()
-	obj := GraphDataRaw(s, start, end)
+	obj := GraphDataRaw(s, start, end, "hour")
 	data, err := json.Marshal(obj)
 	if err != nil {
 		utils.Log(2, err)
