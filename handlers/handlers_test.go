@@ -42,14 +42,6 @@ func TestFailedHTTPServer(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestIndexHandler(t *testing.T) {
-	req, err := http.NewRequest("GET", "/", nil)
-	assert.Nil(t, err)
-	rr := httptest.NewRecorder()
-	Router().ServeHTTP(rr, req)
-	assert.Equal(t, 200, rr.Code)
-}
-
 func TestSetupHandler(t *testing.T) {
 	req, err := http.NewRequest("GET", "/setup", nil)
 	assert.Nil(t, err)
