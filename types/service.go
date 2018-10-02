@@ -56,6 +56,7 @@ type ServiceInterface interface {
 	Create(bool) (int64, error)
 	Update(bool) error
 	Delete() error
+	Checkins() []*Checkin
 }
 
 // Start will create a channel for the service checking go routine

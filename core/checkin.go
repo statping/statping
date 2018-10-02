@@ -47,14 +47,6 @@ func FindCheckin(api string) *types.Checkin {
 	return nil
 }
 
-func (s *Service) AllCheckins() []*types.Checkin {
-	var checkins []*types.Checkin
-	col := checkinDB().Where("service = ?", s.Id).Order("id desc")
-	col.Find(&checkins)
-	s.Checkins = checkins
-	return checkins
-}
-
 func (u *Checkin) Create() (int64, error) {
 	u.CreatedAt = time.Now()
 	row := checkinDB().Create(u)

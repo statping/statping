@@ -296,18 +296,18 @@
     "md4",
   ]
   pruneopts = "UT"
-  revision = "0e37d006457bf46f9e6692014ba72ef82c33022c"
+  revision = "e3636079e1a4c1f337f212cc5cd2aca108f6c900"
 
 [[projects]]
   branch = "master"
-  digest = "1:6fb1dd382722f93fcf7c52ff631f7b899d8c5d54314d88d42dd1f4e5ac404a30"
+  digest = "1:6f82ed211591ecb407897ca46ff6149d618223088aecad72675804f106033629"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "c2ed4eda69e7f62900806e4cd6e45f0429f859fa"
+  revision = "e4b3c5e9061176387e7cea65e4dc5853801f3fb7"
 
 [[projects]]
   digest = "1:c25289f43ac4a68d88b02245742347c94f1e108c534dda442188015ff80669b3"

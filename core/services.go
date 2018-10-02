@@ -49,6 +49,12 @@ func SelectService(id int64) *Service {
 	return nil
 }
 
+func (s *Service) Checkins() []*types.Checkin {
+	var hits []*types.Checkin
+	servicesDB().Where("service = ?", s.Id).Scan(&hits)
+	return hits
+}
+
 // SelectAllServices returns a slice of *core.Service to be store on []*core.Services, should only be called once on startup.
 func (c *Core) SelectAllServices() ([]*Service, error) {
 	var services []*Service
@@ -60,7 +66,7 @@ func (c *Core) SelectAllServices() ([]*Service, error) {
 	CoreApp.Services = nil
 	for _, service := range services {
 		service.Start()
-		service.AllCheckins()
+		service.Checkins()
 		service.AllFailures()
 		CoreApp.Services = append(CoreApp.Services, service)
 	}

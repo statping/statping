@@ -69,7 +69,7 @@ func checkinDB() *gorm.DB {
 // HitsBetween returns the gorm database query for a collection of service hits between a time range
 func (s *Service) HitsBetween(t1, t2 time.Time, group string) *gorm.DB {
 	selector := Dbtimestamp(group)
-	return DbSession.Debug().Model(&types.Hit{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.Format(types.TIME_DAY), t2.Format(types.TIME_DAY)).Order("timeframe asc", false).Group("timeframe")
+	return DbSession.Model(&types.Hit{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.Format(types.TIME_DAY), t2.Format(types.TIME_DAY)).Order("timeframe asc", false).Group("timeframe")
 }
 
 func CloseDB() {
