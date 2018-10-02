@@ -1,157 +1,49 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
-{{if USE_CDN}}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://assets.statup.io/base.css">
-{{ else }}
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/base.css">
-{{end}}
-    <title>Statup | Services</title>
-</head>
-<body>
-
-
+{{define "title"}}Statup | Services{{end}}
+{{define "content"}}
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
-
 {{template "nav"}}
 
     <div class="col-12">
 
         <h3>Services</h3>
 
-            <table class="table">
-                <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col" class="d-none d-md-table-cell">Status</th>
-                    <th scope="col"></th>
-                </tr>
-                </thead>
-                <tbody class="sortable">
-                {{range .}}
-                <tr id="{{.Id}}">
-                    <td><span class="drag_icon d-none d-md-inline">&#9776;</span> {{.Name}}</td>
-                    <td class="d-none d-md-table-cell">{{if .Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}} </td>
-                    <td class="text-right">
-                        <div class="btn-group">
-                                <a href="/service/{{.Id}}" class="btn btn-primary">View</a>
-                                <a href="/service/{{.Id}}/delete" class="btn btn-danger confirm-btn">Delete</a>
-                        </div>
-                    </td>
-                </tr>
-                {{end}}
-                </tbody>
-            </table>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col" class="d-none d-md-table-cell">Status</th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody class="sortable">
+            {{range .}}
+            <tr id="{{.Id}}">
+                <td><span class="drag_icon d-none d-md-inline">&#9776;</span> {{.Name}}</td>
+                <td class="d-none d-md-table-cell">{{if .Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}} </td>
+                <td class="text-right">
+                    <div class="btn-group">
+                        <a href="/service/{{.Id}}" class="btn btn-primary">View</a>
+                        <a href="/service/{{.Id}}/delete" class="btn btn-danger confirm-btn">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+            </tbody>
+        </table>
 
-            <h3>Create Service</h3>
+        <h3>Create Service</h3>
 
-            <form action="/services" method="POST">
-                <div class="form-group row">
-                    <label for="service_name" class="col-sm-4 col-form-label">Service Name</label>
-                    <div class="col-sm-8">
-                        <input type="text" name="name" class="form-control" id="service_name" placeholder="Name" required spellcheck="false">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="service_type" class="col-sm-4 col-form-label">Service Check Type</label>
-                    <div class="col-sm-8">
-                        <select name="check_type" class="form-control" id="service_type">
-                            <option value="http" selected>HTTP Service</option>
-                            <option value="tcp">TCP Service</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="service_url" class="col-sm-4 col-form-label">Application Endpoint (URL)</label>
-                    <div class="col-sm-8">
-                        <input type="text" name="domain" class="form-control" id="service_url" placeholder="https://google.com" required autocapitalize="false" spellcheck="false">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="service_check_type" class="col-sm-4 col-form-label">Service Check Type</label>
-                    <div class="col-sm-8">
-                        <select name="method" class="form-control" id="service_check_type">
-                            <option value="GET" selected>GET</option>
-                            <option value="POST">POST</option>
-                            <option value="DELETE">DELETE</option>
-                            <option value="PATCH">PATCH</option>
-                            <option value="PUT">PUT</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group row d-none">
-                    <label for="post_data" class="col-sm-4 col-form-label">Post Data (JSON)</label>
-                    <div class="col-sm-8">
-                        <textarea name="post_data" class="form-control" id="post_data" rows="3" autocapitalize="false" spellcheck="false"></textarea>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="service_response" class="col-sm-4 col-form-label">Expected Response (Regex)</label>
-                    <div class="col-sm-8">
-                        <textarea name="expected" class="form-control" id="service_response" rows="3" autocapitalize="false" spellcheck="false"></textarea>
-                        <small id="emailHelp" class="form-text text-muted">You can insert <a target="_blank" href="https://regex101.com/r/I5bbj9/1">Regex</a> to validate the response</small>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="service_response_code" class="col-sm-4 col-form-label">Expected Status Code</label>
-                    <div class="col-sm-8">
-                        <input type="number" name="expected_status" class="form-control" id="service_response_code" value="200">
-                    </div>
-                </div>
-                <div class="form-group row d-none">
-                    <label for="service_port" class="col-sm-4 col-form-label">TCP Port</label>
-                    <div class="col-sm-8">
-                        <input type="number" name="port" class="form-control" id="service_port" placeholder="8080">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="service_interval" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
-                    <div class="col-sm-8">
-                        <input type="number" name="interval" class="form-control" id="service_interval" min="1" value="60" required>
-                        <small id="emailHelp" class="form-text text-muted">10,000+ will be checked in Microseconds (1 millisecond = 1000 microseconds).</small>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="service_timeout" class="col-sm-4 col-form-label">Timeout in Seconds</label>
-                    <div class="col-sm-8">
-                        <input type="number" name="timeout" class="form-control" id="service_timeout" min="1" value="30">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="order" class="col-sm-4 col-form-label">List Order</label>
-                    <div class="col-sm-8">
-                        <input type="number" name="order" class="form-control" min="0" value="0" id="order">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-sm-12">
-                        <button type="submit" class="btn btn-success btn-block">Create Service</button>
-                    </div>
-                </div>
-            </form>
-
-        </div>
+        {{template "form_service" NewService}}
 
     </div>
-
-{{template "footer"}}
-
-{{if USE_CDN}}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://assets.statup.io/sortable.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-<script src="https://assets.statup.io/main.js"></script>
-{{ else }}
-<script src="/js/jquery-3.3.1.min.js"></script>
-<script src="/js/sortable.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/main.js"></script>
+</div>
 {{end}}
-
+{{define "extra_scripts"}}
+{{if USE_CDN}}
+<script src="https://assets.statup.io/sortable.min.js"></script>
+{{ else }}
+<script src="/js/sortable.min.js"></script>
+{{end}}
 <script>
     sortable('.sortable', {
         forcePlaceholderSize: true,
@@ -171,6 +63,4 @@
         });
     });
 </script>
-
-</body>
-</html>
+{{end}}

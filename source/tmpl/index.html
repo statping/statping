@@ -1,29 +1,11 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
-    {{if USE_CDN}}
-        <link rel="shortcut icon" type="image/x-icon" href="https://assets.statup.io/favicon.ico">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://assets.statup.io/base.css">
-    {{ else }}
-        <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
-        <link rel="stylesheet" href="/css/bootstrap.min.css">
-        <link rel="stylesheet" href="/css/base.css">
-    {{end}}
-
-    <title>{{.Name}} Status</title>
-</head>
-<body>
-
+{{define "title"}}{{CoreApp.Name}} Status{{end}}
+{{define "content"}}
 <div class="container col-md-7 col-sm-12 mt-2 sm-container">
-
 <h1 class="col-12 text-center mb-4 mt-sm-3 header-title">{{.Name}}</h1>
 
-    {{ if .Description }}
-        <h5 class="col-12 text-center mb-5 header-desc">{{ .Description }}</h5>
-    {{ end }}
+{{ if .Description }}
+<h5 class="col-12 text-center mb-5 header-desc">{{ .Description }}</h5>
+{{ end }}
 
 <div class="col-12 full-col-12 mb-5">
     <div class="list-group online_list">
@@ -40,8 +22,7 @@
     </div>
 </div>
 
-
-    <div class="col-12 full-col-12">
+<div class="col-12 full-col-12">
 {{ if not Services }}
     <div class="alert alert-danger" role="alert">
         <h4 class="alert-heading">No Services to Monitor!</h4>
@@ -50,79 +31,58 @@
         <p class="mb-0">If this is a bug, please make an issue in the Statup Github Repo. <a href="https://github.com/hunterlong/statup" class="btn btn-sm btn-outline-danger float-right">Statup Github Repo</a></p>
     </div>
 {{end}}
-        {{ range Services }}
-            <div class="mt-4" id="service_id_{{.Id}}">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="col-12">
-                            <h4 class="mt-3"><a href="/service/{{.Id}}"{{if not .Online}} class="text-danger"{{end}}>{{ .Name }}</a>
-                        {{if .Online}}
-                            <span class="badge bg-success float-right">ONLINE</span>
-                        {{ else }}
-                            <span class="badge bg-danger float-right pulse">OFFLINE</span>
-                        {{end}}</h4>
+{{ range Services }}
+    <div class="mt-4" id="service_id_{{.Id}}">
+        <div class="card">
+            <div class="card-body">
+                <div class="col-12">
+                    <h4 class="mt-3"><a href="/service/{{.Id}}"{{if not .Online}} class="text-danger"{{end}}>{{ .Name }}</a>
+                    {{if .Online}}
+                        <span class="badge bg-success float-right">ONLINE</span>
+                    {{ else }}
+                        <span class="badge bg-danger float-right pulse">OFFLINE</span>
+                    {{end}}</h4>
 
-                        <div class="row stats_area mt-5 mb-5">
-                            <div class="col-4">
-                                <span class="lg_number">{{.Online24}}%</span>
-                                Online last 24 Hours
-                            </div>
-                            <div class="col-4">
-                                <span class="lg_number">{{.AvgTime}}ms</span>
-                                Average Response
-                            </div>
-                            <div class="col-4">
-                                <span class="lg_number">{{.AvgUptime24}}%</span>
-                                Uptime last 24 Hours
-                            </div>
+                    <div class="row stats_area mt-5 mb-5">
+                        <div class="col-4">
+                            <span class="lg_number">{{.Online24}}%</span>
+                            Online last 24 Hours
                         </div>
+                        <div class="col-4">
+                            <span class="lg_number">{{.AvgTime}}ms</span>
+                            Average Response
+                        </div>
+                        <div class="col-4">
+                            <span class="lg_number">{{.AvgUptime24}}%</span>
+                            Uptime last 24 Hours
+                        </div>
+                    </div>
 
-                        </div>
-                    </div>
-                {{ if .AvgUptime24 }}
-                    <div class="chart-container">
-                        <canvas id="service_{{ .Id }}"></canvas>
-                    </div>
-                {{ end }}
-                    <div class="row lower_canvas full-col-12 text-white{{if not .Online}} bg-danger{{end}}">
-                        <div class="col-10 text-truncate">
-                            <span class="d-none d-md-inline">{{.SmallText}}</span>
-                        </div>
-                        <div class="col-sm-12 col-md-2">
-                            <a href="/service/{{ .Id }}" class="btn {{if .Online}}btn-success{{else}}btn-danger{{end}} btn-sm float-right dyn-dark btn-block">View Service</a>
-                        </div>
-                    </div>
                 </div>
             </div>
+        {{ if .AvgUptime24 }}
+            <div class="chart-container">
+                <canvas id="service_{{ .Id }}"></canvas>
+            </div>
         {{ end }}
+            <div class="row lower_canvas full-col-12 text-white{{if not .Online}} bg-danger{{end}}">
+                <div class="col-10 text-truncate">
+                    <span class="d-none d-md-inline">{{.SmallText}}</span>
+                </div>
+                <div class="col-sm-12 col-md-2">
+                    <a href="/service/{{ .Id }}" class="btn {{if .Online}}btn-success{{else}}btn-danger{{end}} btn-sm float-right dyn-dark btn-block">View Service</a>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-
-{{template "footer"}}
-
-{{if USE_CDN}}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
-<script src="https://assets.statup.io/main.js"></script>
-{{ else }}
-<script src="/js/jquery-3.3.1.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/Chart.bundle.min.js"></script>
-<script src="/js/main.js"></script>
-{{end}}
-
-{{ if .Style }}
-<style>
- {{ safe .Style }}
-</style>
 {{ end }}
-
+</div>
+</div>
+{{end}}
+{{define "extra_scripts"}}
 <script>
 {{ range Services }}
     {{template "chartIndex" .}}
 {{end}}
 </script>
-
-</body>
-</html>
+{{end}}

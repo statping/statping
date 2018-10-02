@@ -1,105 +1,35 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
-{{if USE_CDN}}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://assets.statup.io/base.css">
-{{ else }}
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/base.css">
-{{end}}
-
-    <title>Statup | Users</title>
-</head>
-<body>
-
-
+{{define "title"}}Statup | Users{{end}}
+{{define "content"}}
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
-
 {{template "nav"}}
-
-        <div class="col-12">
-
+    <div class="col-12">
         <h3>Users</h3>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">Username</th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {{range .}}
+            <tr>
+                <td>{{.Username}}</td>
+                <td class="text-right" id="user_{{.Id}}">
+                    <div class="btn-group">
+                        <a href="/user/{{.Id}}" class="btn btn-primary">Edit</a>
+                        <a href="/user/{{.Id}}/delete" class="btn btn-danger confirm-btn" data-id="user_{{.Id}}">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+            </tbody>
+        </table>
 
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th scope="col">Username</th>
-                    <th scope="col"></th>
-                </tr>
-                </thead>
-                <tbody>
-                {{range .}}
-                <tr>
-                    <td>{{.Username}}</td>
-                    <td class="text-right" id="user_{{.Id}}">
-                        <div class="btn-group">
-                            <a href="/user/{{.Id}}" class="btn btn-primary">Edit</a>
-                            <a href="/user/{{.Id}}/delete" class="btn btn-danger confirm-btn" data-id="user_{{.Id}}">Delete</a>
-                        </div>
-                    </td>
-                </tr>
-                {{end}}
-                </tbody>
-            </table>
+        <h3>Create User</h3>
 
-            <h3>Create User</h3>
-                <form action="/users" method="POST">
-                    <div class="form-group row">
-                        <label for="username" class="col-sm-4 col-form-label">Username</label>
-                        <div class="col-6 col-md-4">
-                            <input type="text" name="username" class="form-control" id="username" placeholder="Username" required autocapitalize="false" spellcheck="false">
-                        </div>
-                        <div class="col-6 col-md-4">
-                          <span class="switch">
-                            <input type="checkbox" name="admin" class="switch" id="switch-normal">
-                            <label for="switch-normal">Administrator</label>
-                          </span>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="email" class="col-sm-4 col-form-label">Email Address</label>
-                        <div class="col-sm-8">
-                            <input type="email" name="email" class="form-control" id="email" placeholder="user@domain.com" required autocapitalize="false" spellcheck="false">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="password" class="col-sm-4 col-form-label">Password</label>
-                        <div class="col-sm-8">
-                            <input type="password" name="password" class="form-control" id="password" placeholder="Password" required>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="password_confirm" class="col-sm-4 col-form-label">Confirm Password</label>
-                        <div class="col-sm-8">
-                            <input type="password" name="password_confirm" class="form-control" id="password_confirm" placeholder="Confirm Password" required>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-sm-12">
-                            <button type="submit" class="btn btn-primary btn-block">Create User</button>
-                        </div>
-                    </div>
-                </form>
+        {{template "form_user" NewUser}}
 
-        </div>
-
+    </div>
 </div>
-
-{{template "footer"}}
-
-{{if USE_CDN}}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-<script src="https://assets.statup.io/main.js"></script>
-{{ else }}
-<script src="/js/jquery-3.3.1.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/main.js"></script>
 {{end}}
-
-</body>
-</html>

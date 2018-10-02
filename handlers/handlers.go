@@ -143,8 +143,16 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"FromUnix": func(t int64) string {
 			return utils.Timezoner(time.Unix(t, 0), core.CoreApp.Timezone).Format("Monday, January 02")
 		},
+		"NewService": func() *types.Service {
+			return new(types.Service)
+		},
+		"NewUser": func() *types.User {
+			return new(types.User)
+		},
 	}
 }
+
+var mainTmpl = `{{define "main" }} {{ template "base" . }} {{ end }}`
 
 // executeResponse will render a HTTP response for the front end user
 func executeResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{}) {
@@ -153,36 +161,49 @@ func executeResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		http.Redirect(w, r, url, http.StatusSeeOther)
 		return
 	}
-	nav, _ := source.TmplBox.String("nav.html")
-	footer, _ := source.TmplBox.String("footer.html")
-	chartIndex, _ := source.JsBox.String("chart_index.js")
+
+	templates := []string{"base.html", "head.html", "nav.html", "footer.html", "scripts.html", "form_service.html", "form_notifier.html", "form_user.html"}
+
+	javascripts := []string{"chart_index.js"}
+
 	render, err := source.TmplBox.String(file)
 	if err != nil {
 		utils.Log(4, err)
 	}
-	t := template.New("message")
+
+	// setup the main template and handler funcs
+	t := template.New("main")
 	t.Funcs(handlerFuncs(w, r))
-	t, err = t.Parse(nav)
+	t, err = t.Parse(mainTmpl)
 	if err != nil {
 		utils.Log(4, err)
 	}
-	t, err = t.Parse(footer)
-	if err != nil {
-		utils.Log(4, err)
+
+	// render all templates
+	for _, temp := range templates {
+		tmp, _ := source.TmplBox.String(temp)
+		t, err = t.Parse(tmp)
+		if err != nil {
+			utils.Log(4, err)
+		}
 	}
+
+	// render all javascript files
+	for _, temp := range javascripts {
+		tmp, _ := source.JsBox.String(temp)
+		t, err = t.Parse(tmp)
+		if err != nil {
+			utils.Log(4, err)
+		}
+	}
+
+	// render the page requested
 	_, err = t.Parse(render)
 	if err != nil {
 		utils.Log(4, err)
 	}
-	_, err = t.Parse(chartIndex)
-	if err != nil {
-		utils.Log(4, err)
-	}
-	fmt.Println(t.Templates())
-	fmt.Println(t.DefinedTemplates())
 
-	t.Lookup("chartIndex").Funcs(handlerFuncs(w, r))
-
+	// execute the template
 	err = t.Execute(w, data)
 	if err != nil {
 		utils.Log(4, err)

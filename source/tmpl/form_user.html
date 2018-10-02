@@ -1,0 +1,43 @@
+{{define "form_user"}}
+{{$url := "/user"}}
+{{if .}}
+     {{$url = "/user/{{.Id}}"}}
+{{end}}
+<form action="{{$url}}" method="POST">
+    <div class="form-group row">
+        <label for="username" class="col-sm-4 col-form-label">Username</label>
+        <div class="col-6 col-md-4">
+            <input type="text" name="username" class="form-control" value="{{.Username}}" id="username" placeholder="Username" required>
+        </div>
+        <div class="col-6 col-md-4">
+          <span class="switch">
+            <input type="checkbox" name="admin" class="switch" id="switch-normal"{{if .Admin}} checked{{end}}>
+            <label for="switch-normal">Administrator</label>
+          </span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="email" class="col-sm-4 col-form-label">Email Address</label>
+        <div class="col-sm-8">
+            <input type="email" name="email" class="form-control" id="email" value="{{.Email}}" placeholder="user@domain.com" required autocapitalize="false" spellcheck="false">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="password" class="col-sm-4 col-form-label">Password</label>
+        <div class="col-sm-8">
+            <input type="password" name="password" class="form-control" id="password" value="##########" placeholder="Password" required>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="password_confirm" class="col-sm-4 col-form-label">Confirm Password</label>
+        <div class="col-sm-8">
+            <input type="password" name="password_confirm" class="form-control" id="password_confirm" value="##########" placeholder="Confirm Password" required>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-sm-12">
+            <button type="submit" class="btn btn-primary btn-block">Update User</button>
+        </div>
+    </div>
+</form>
+{{end}}

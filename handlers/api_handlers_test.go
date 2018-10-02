@@ -241,7 +241,7 @@ func TestApiServiceDataHandler(t *testing.T) {
 	grouping := []string{"minute", "hour", "day"}
 	for _, g := range grouping {
 		params := "?start=0&end=999999999999&group=" + g
-		rr, err := httpRequestAPI(t, "GET", "/api/services/1/data"+params, nil)
+		rr, err := httpRequestAPI(t, "GET", "/api/services/5/data"+params, nil)
 		assert.Nil(t, err)
 		body := rr.Body.String()
 		var obj core.DateScanObj

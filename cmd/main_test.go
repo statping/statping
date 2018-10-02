@@ -534,7 +534,7 @@ func RunServiceHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
-	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Google Service</title>"))
+	assert.True(t, strings.Contains(rr.Body.String(), "<title>Google Status</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
 }
 
@@ -596,7 +596,7 @@ func RunUserViewHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
-	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Users</title>"))
+	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | testadmin</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
 	assert.True(t, handlers.IsAuthenticated(req))
 }

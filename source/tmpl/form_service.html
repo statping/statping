@@ -1,0 +1,93 @@
+{{define "form_service"}}
+{{$url := "/service"}}
+{{if .}}
+     {{$url = "/service/{{.Id}}"}}
+{{end}}
+<form action="{{$url}}" method="POST">
+    <div class="form-group row">
+        <label for="service_name" class="col-sm-4 col-form-label">Service Name</label>
+        <div class="col-sm-8">
+            <input type="text" name="name" class="form-control" id="service_name" value="{{.Name}}" placeholder="Name" required spellcheck="false">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="service_type" class="col-sm-4 col-form-label">Service Check Type</label>
+        <div class="col-sm-8">
+            <select name="check_type" class="form-control" id="service_type" value="{{.Type}}">
+                <option value="http" {{if eq .Type "http"}}selected{{end}}>HTTP Service</option>
+                <option value="tcp" {{if eq .Type "tcp"}}selected{{end}}>TCP Service</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="service_url" class="col-sm-4 col-form-label">Application Endpoint (URL)</label>
+        <div class="col-sm-8">
+            <input type="text" name="domain" class="form-control" id="service_url" value="{{.Domain}}" placeholder="https://google.com" required autocapitalize="false" spellcheck="false">
+        </div>
+    </div>
+    <div class="form-group row{{if eq .Type "tcp"}} d-none{{end}}">
+        <label for="service_check_type" class="col-sm-4 col-form-label">Service Check Type</label>
+        <div class="col-sm-8">
+            <select name="method" class="form-control" id="service_check_type" value="{{.Method}}">
+                <option value="GET" {{if eq .Method "GET"}}selected{{end}}>GET</option>
+                <option value="POST" {{if eq .Method "POST"}}selected{{end}}>POST</option>
+                <option value="DELETE" {{if eq .Method "DELETE"}}selected{{end}}>DELETE</option>
+                <option value="PATCH" {{if eq .Method "PATCH"}}selected{{end}}>PATCH</option>
+                <option value="PUT" {{if eq .Method "PUT"}}selected{{end}}>PUT</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group row{{if ne .Method "POST"}} d-none{{end}}">
+        <label for="post_data" class="col-sm-4 col-form-label">Optional Post Data (JSON)</label>
+        <div class="col-sm-8">
+            <textarea name="post_data" class="form-control" id="post_data" rows="3" autocapitalize="false" spellcheck="false">{{.PostData}}</textarea>
+            <small id="emailHelp" class="form-text text-muted">You can insert <a target="_blank" href="https://regex101.com/r/I5bbj9/1">Regex</a> to validate the response</small>
+        </div>
+    </div>
+    <div class="form-group row{{if eq .Type "tcp"}} d-none{{end}}">
+        <label for="service_response" class="col-sm-4 col-form-label">Expected Response (Regex)</label>
+        <div class="col-sm-8">
+            <textarea name="expected" class="form-control" id="service_response" rows="3" autocapitalize="false" spellcheck="false">{{.Expected}}</textarea>
+        </div>
+    </div>
+    <div class="form-group row{{if eq .Type "tcp"}} d-none{{end}}">
+        <label for="service_response_code" class="col-sm-4 col-form-label">Expected Status Code</label>
+        <div class="col-sm-8">
+            <input type="number" name="expected_status" class="form-control" value="{{.ExpectedStatus}}" id="service_response_code">
+        </div>
+    </div>
+    <div class="form-group row{{if eq .Type "http"}} d-none{{end}}">
+        <label for="service_port" class="col-sm-4 col-form-label">TCP Port</label>
+        <div class="col-sm-8">
+            <input type="number" name="port" class="form-control" value="{{.Port}}" id="service_port" placeholder="8080">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="service_interval" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
+        <div class="col-sm-8">
+            <input type="number" name="interval" class="form-control" value="{{.Interval}}" min="1" id="service_interval" required>
+            <small id="emailHelp" class="form-text text-muted">10,000+ will be checked in Microseconds (1 millisecond = 1000 microseconds).</small>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="service_timeout" class="col-sm-4 col-form-label">Timeout in Seconds</label>
+        <div class="col-sm-8">
+            <input type="number" name="timeout" class="form-control" value="{{.Timeout}}" id="service_timeout" min="1">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="order" class="col-sm-4 col-form-label">List Order</label>
+        <div class="col-sm-8">
+            <input type="number" name="order" class="form-control" min="0" value="{{.Order}}" id="order">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-6">
+            <button type="submit" class="btn btn-success btn-block">Update Service</button>
+        </div>
+        <div class="col-6">
+            <a href="/service/{{ .Id }}/delete_failures" class="btn btn-danger btn-block confirm-btn">Delete All Failures</a>
+        </div>
+    </div>
+</form>
+{{end}}

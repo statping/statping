@@ -1,69 +1,34 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
-{{if USE_CDN}}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://assets.statup.io/base.css">
-{{ else }}
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/base.css">
-{{end}}
-    <title>Statup | Login</title>
-</head>
-<body>
-
-
+{{define "title"}}Statup Login{{end}}
+{{define "content"}}
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
-
-        <div class="col-10 offset-1 col-md-8 offset-md-2 mt-md-2">
-
-            <div class="col-12 col-md-8 offset-md-2 mb-4">
-                <img class="col-12 mt-5 mt-md-0" src="/statup.png">
-            </div>
-
-        {{ if .Error }}
-            <div class="alert alert-danger" role="alert">
-                Incorrect login information submitted, try again.
-            </div>
-        {{ end }}
-
-            <form action="/dashboard" method="POST">
-                <div class="form-group row">
-                    <label for="username" class="col-sm-2 col-form-label">Username</label>
-                    <div class="col-sm-10">
-                        <input type="text" name="username" class="form-control" id="username" placeholder="Username" autocapitalize="false" spellcheck="false">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="password" class="col-sm-2 col-form-label">Password</label>
-                    <div class="col-sm-10">
-                        <input type="password" name="password" class="form-control" id="password" placeholder="Password">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-sm-12">
-                        <button type="submit" class="btn btn-primary btn-block">Sign in</button>
-                    </div>
-                </div>
-            </form>
-
+    <div class="col-10 offset-1 col-md-8 offset-md-2 mt-md-2">
+        <div class="col-12 col-md-8 offset-md-2 mb-4">
+            <img class="col-12 mt-5 mt-md-0" src="/statup.png">
         </div>
-
+    {{ if .Error }}
+        <div class="alert alert-danger" role="alert">
+            Incorrect login information submitted, try again.
+        </div>
+    {{ end }}
+        <form action="/dashboard" method="POST">
+            <div class="form-group row">
+                <label for="username" class="col-sm-2 col-form-label">Username</label>
+                <div class="col-sm-10">
+                    <input type="text" name="username" class="form-control" id="username" placeholder="Username" autocapitalize="false" spellcheck="false">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="password" class="col-sm-2 col-form-label">Password</label>
+                <div class="col-sm-10">
+                    <input type="password" name="password" class="form-control" id="password" placeholder="Password">
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
-
-{{template "footer"}}
-
-{{if USE_CDN}}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-<script src="https://assets.statup.io/main.js"></script>
-{{ else }}
-<script src="/js/jquery-3.3.1.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/main.js"></script>
 {{end}}
-
-</body>
-</html>

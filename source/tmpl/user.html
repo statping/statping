@@ -1,81 +1,10 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
-{{if USE_CDN}}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://assets.statup.io/base.css">
-{{ else }}
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/base.css">
-{{end}}
-
-    <title>Statup | Users</title>
-</head>
-<body>
-
-
+{{define "title"}}Statup | {{.Username}}{{end}}
+{{define "content"}}
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
-
 {{template "nav"}}
-
     <div class="col-12">
-
         <h3>User {{.Username}}</h3>
-        <form action="/user/{{.Id}}" method="POST">
-            <div class="form-group row">
-                <label for="username" class="col-sm-4 col-form-label">Username</label>
-                <div class="col-6 col-md-4">
-                    <input type="text" name="username" class="form-control" value="{{.Username}}" id="username" placeholder="Username" required>
-                </div>
-                <div class="col-6 col-md-4">
-                      <span class="switch">
-                        <input type="checkbox" name="admin" class="switch" id="switch-normal"{{if .Admin}} checked{{end}}>
-                        <label for="switch-normal">Administrator</label>
-                      </span>
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="email" class="col-sm-4 col-form-label">Email Address</label>
-                <div class="col-sm-8">
-                    <input type="email" name="email" class="form-control" id="email" value="{{.Email}}" placeholder="user@domain.com" required autocapitalize="false" spellcheck="false">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="password" class="col-sm-4 col-form-label">Password</label>
-                <div class="col-sm-8">
-                    <input type="password" name="password" class="form-control" id="password" value="##########" placeholder="Password" required>
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="password_confirm" class="col-sm-4 col-form-label">Confirm Password</label>
-                <div class="col-sm-8">
-                    <input type="password" name="password_confirm" class="form-control" id="password_confirm" value="##########" placeholder="Confirm Password" required>
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-sm-12">
-                    <button type="submit" class="btn btn-primary btn-block">Update User</button>
-                </div>
-            </div>
-        </form>
-
+        {{template "form_user" .}}
     </div>
-
 </div>
-
-{{template "footer"}}
-
-{{if USE_CDN}}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-<script src="https://assets.statup.io/main.js"></script>
-{{ else }}
-<script src="/js/jquery-3.3.1.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/main.js"></script>
 {{end}}
-
-</body>
-</html>

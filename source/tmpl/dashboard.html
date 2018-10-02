@@ -1,97 +1,57 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
-{{if USE_CDN}}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://assets.statup.io/base.css">
-{{ else }}
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/base.css">
-{{end}}
-
-    <title>Statup | Dashboard</title>
-</head>
-<body>
-
-
+{{define "title"}}Statup | Dashboard{{end}}
+{{define "content"}}
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
-
 {{template "nav" }}
-
     <div class="col-12 mt-3">
-
-    <div class="row stats_area mb-5">
-
-        <div class="col-4">
-            <span class="lg_number">{{ CoreApp.ServicesCount }}</span>
-            Total Services
-        </div>
-
-        <div class="col-4">
-            <span class="lg_number">{{ CoreApp.Count24HFailures }}</span>
-            Failures last 24 Hours
-        </div>
-
-        <div class="col-4">
-            <span class="lg_number">{{ CoreApp.CountOnline }}</span>
-            Online Services
-        </div>
-    </div>
-
-    <div class="row mt-4">
-
-        <div class="col-12">
-
-            <h3>Services</h3>
-
-            <div class="list-group mb-5 mt-3">
-            {{ range Services }}
-                <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                    <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{{.Name}}</h5>
-                    <small>{{if .Online}} <span class="badge badge-success">ONLINE</span> {{else}} <span class="badge badge-danger">OFFLINE</span> {{end}}</small>
-                    </div>
-                    <p class="mb-1">{{.SmallText}}</p>
-                </a>
-            {{ end }}
+        <div class="row stats_area mb-5">
+            <div class="col-4">
+                <span class="lg_number">{{ CoreApp.ServicesCount }}</span>
+                Total Services
             </div>
-
-        {{ range Services }}
-                {{ if .LimitedFailures }}
-                    <h4 class="text-truncate">{{.Name}} Failures</h4>
-                    <div class="list-group mt-3 mb-4">
-                    {{ range .LimitedFailures }}
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">{{.ParseError}}</h5>
-                                <small>{{.Ago}}</small>
-                            </div>
-                            <p class="mb-1">{{.Issue}}</p>
-                        </a>
-                    {{ end }}
-                    </div>
-                {{ end }}
-        {{ end }}
-
-
+            <div class="col-4">
+                <span class="lg_number">{{ CoreApp.Count24HFailures }}</span>
+                Failures last 24 Hours
+            </div>
+            <div class="col-4">
+                <span class="lg_number">{{ CoreApp.CountOnline }}</span>
+                Online Services
+            </div>
         </div>
-    </div>
+        <div class="row mt-4">
+            <div class="col-12">
+                <h3>Services</h3>
+                <div class="list-group mb-5 mt-3">
+                {{ range Services }}
+                    <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{.Name}}</h5>
+                            <small>{{if .Online}} <span class="badge badge-success">ONLINE</span> {{else}} <span class="badge badge-danger">OFFLINE</span> {{end}}</small>
+                        </div>
+                        <p class="mb-1">{{.SmallText}}</p>
+                    </a>
+                {{ end }}
+                </div>
+
+            {{ range Services }}
+            {{ if .LimitedFailures }}
+                <h4 class="text-truncate">{{.Name}} Failures</h4>
+                <div class="list-group mt-3 mb-4">
+                {{ range .LimitedFailures }}
+                    <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{.ParseError}}</h5>
+                            <small>{{.Ago}}</small>
+                        </div>
+                        <p class="mb-1">{{.Issue}}</p>
+                    </a>
+                {{ end }}
+                </div>
+            {{ end }}
+            {{ end }}
+
+
+            </div>
+        </div>
     </div>
 </div>
-
-{{template "footer"}}
-
-{{if USE_CDN}}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-<script src="https://assets.statup.io/main.js"></script>
-{{ else }}
-<script src="/js/jquery-3.3.1.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/main.js"></script>
 {{end}}
-
-</body>
-</html>

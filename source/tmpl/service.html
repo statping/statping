@@ -1,22 +1,6 @@
+{{define "title"}}{{.Service.Name}} Status{{end}}
+{{ define "content" }}
 {{$s := .Service}}
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
-{{if USE_CDN}}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://assets.statup.io/base.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
-{{ else }}
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/base.css">
-    <script src="/js/Chart.bundle.min.js"></script>
-{{end}}
-
-    <title>Statup | {{$s.Name}} Service</title>
-</head>
-<body>
 
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
 
@@ -24,228 +8,130 @@
     {{template "nav"}}
 {{end}}
 
-            <div class="col-12 mb-4">
+    <div class="col-12 mb-4">
 
-            {{if $s.Online }}
-                <span class="mt-3 mb-3 text-white d-md-none btn bg-success d-block d-md-none">ONLINE</span>
-            {{ else }}
-                <span class="mt-3 mb-3 text-white d-md-none btn bg-danger d-block d-md-none">OFFLINE</span>
-            {{end}}
+    {{if $s.Online }}
+        <span class="mt-3 mb-3 text-white d-md-none btn bg-success d-block d-md-none">ONLINE</span>
+    {{ else }}
+        <span class="mt-3 mb-3 text-white d-md-none btn bg-danger d-block d-md-none">OFFLINE</span>
+    {{end}}
 
-                        <h4 class="mt-2">{{ $s.Name }}
-                        {{if $s.Online }}
-                            <span class="badge bg-success float-right d-none d-md-block">ONLINE</span>
-                        {{ else }}
-                            <span class="badge bg-danger float-right d-none d-md-block">OFFLINE</span>
-                        {{end}}</h4>
+        <h4 class="mt-2">{{ $s.Name }}
+        {{if $s.Online }}
+            <span class="badge bg-success float-right d-none d-md-block">ONLINE</span>
+        {{ else }}
+            <span class="badge bg-danger float-right d-none d-md-block">OFFLINE</span>
+        {{end}}</h4>
 
-                        <div class="row stats_area mt-5 mb-5">
+        <div class="row stats_area mt-5 mb-5">
 
-                            <div class="col-4">
-                                <span class="lg_number">{{$s.Online24}}%</span>
-                                Online last 24 Hours
-                            </div>
-
-                            <div class="col-4">
-                                <span class="lg_number">{{$s.AvgTime}}ms</span>
-                                Average Response
-                            </div>
-
-                            <div class="col-4">
-                                <span class="lg_number">{{$s.TotalUptime}}%</span>
-                                Total Uptime
-                            </div>
-                        </div>
-
-                <div class="service-chart-container">
-                    <canvas id="service"></canvas>
-                </div>
-
-                <form id="service_date_form" class="col-12 mt-2 mb-3">
-                    <span id="start_date" class="text-muted small float-left pointer">{{FromUnix .Start}}</span>
-                    <span id="end_date" class="text-muted small float-right pointer" style="position: absolute;right: 0;">{{FromUnix .End}}</span>
-                    <input type="hidden" name="start" class="form-control" id="service_start" spellcheck="false">
-                    <input type="hidden" name="end" class="form-control" id="service_end" spellcheck="false">
-                    <button type="submit" class="btn btn-light btn-block btn-sm mt-2">Set Timeframe</button>
-                    <div id="start_container"></div>
-                    <div id="end_container"></div>
-                </form>
-
-                {{if not $s.Online}}
-                    <div class="col-12 small text-center mt-3 text-muted">{{$s.DowntimeText}}</div>
-                {{end}}
-
-            {{ if $s.LimitedFailures }}
-                <div class="list-group mt-3 mb-4">
-                {{ range $s.LimitedFailures }}
-                    <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">{{.ParseError}}</h5>
-                            <small>{{.Ago}}</small>
-                        </div>
-                        <p class="mb-1">{{.Issue}}</p>
-                    </a>
-                {{ end }}
-                </div>
-            {{ end }}
-
+            <div class="col-4">
+                <span class="lg_number">{{$s.Online24}}%</span>
+                Online last 24 Hours
             </div>
 
+            <div class="col-4">
+                <span class="lg_number">{{$s.AvgTime}}ms</span>
+                Average Response
+            </div>
+
+            <div class="col-4">
+                <span class="lg_number">{{$s.TotalUptime}}%</span>
+                Total Uptime
+            </div>
+        </div>
+
+        <div class="service-chart-container">
+            <canvas id="service"></canvas>
+        </div>
+
+        <form id="service_date_form" class="col-12 mt-2 mb-3">
+            <span id="start_date" class="text-muted small float-left pointer">{{FromUnix .Start}}</span>
+            <span id="end_date" class="text-muted small float-right pointer" style="position: absolute;right: 0;">{{FromUnix .End}}</span>
+            <input type="hidden" name="start" class="form-control" id="service_start" spellcheck="false">
+            <input type="hidden" name="end" class="form-control" id="service_end" spellcheck="false">
+            <button type="submit" class="btn btn-light btn-block btn-sm mt-2">Set Timeframe</button>
+            <div id="start_container"></div>
+            <div id="end_container"></div>
+        </form>
+
+    {{if not $s.Online}}
+        <div class="col-12 small text-center mt-3 text-muted">{{$s.DowntimeText}}</div>
+    {{end}}
+
+    {{ if $s.LimitedFailures }}
+        <div class="list-group mt-3 mb-4">
+        {{ range $s.LimitedFailures }}
+            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{.ParseError}}</h5>
+                    <small>{{.Ago}}</small>
+                </div>
+                <p class="mb-1">{{.Issue}}</p>
+            </a>
+        {{ end }}
+        </div>
+    {{ end }}
+
+    </div>
 
 {{if Auth}}
 
-        <div class="col-12 mt-4">
+    <div class="col-12 mt-4">
 
-            <h3>Edit Service</h3>
+        <h3>Edit Service</h3>
 
-            <form action="/service/{{$s.Id}}" method="POST">
-                <div class="form-group row">
-                    <label for="service_name" class="col-sm-4 col-form-label">Service Name</label>
-                    <div class="col-sm-8">
-                        <input type="text" name="name" class="form-control" id="service_name" value="{{$s.Name}}" placeholder="Name" required spellcheck="false">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="service_type" class="col-sm-4 col-form-label">Service Check Type</label>
-                    <div class="col-sm-8">
-                        <select name="check_type" class="form-control" id="service_type" value="{{$s.Type}}">
-                            <option value="http" {{if eq $s.Type "http"}}selected{{end}}>HTTP Service</option>
-                            <option value="tcp" {{if eq $s.Type "tcp"}}selected{{end}}>TCP Service</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="service_url" class="col-sm-4 col-form-label">Application Endpoint (URL)</label>
-                    <div class="col-sm-8">
-                        <input type="text" name="domain" class="form-control" id="service_url" value="{{$s.Domain}}" placeholder="https://google.com" required autocapitalize="false" spellcheck="false">
-                    </div>
-                </div>
-                <div class="form-group row{{if eq $s.Type "tcp"}} d-none{{end}}">
-                    <label for="service_check_type" class="col-sm-4 col-form-label">Service Check Type</label>
-                    <div class="col-sm-8">
-                        <select name="method" class="form-control" id="service_check_type" value="{{$s.Method}}">
-                            <option value="GET" {{if eq $s.Method "GET"}}selected{{end}}>GET</option>
-                            <option value="POST" {{if eq $s.Method "POST"}}selected{{end}}>POST</option>
-                            <option value="DELETE" {{if eq $s.Method "DELETE"}}selected{{end}}>DELETE</option>
-                            <option value="PATCH" {{if eq $s.Method "PATCH"}}selected{{end}}>PATCH</option>
-                            <option value="PUT" {{if eq $s.Method "PUT"}}selected{{end}}>PUT</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group row{{if ne $s.Method "POST"}} d-none{{end}}">
-                    <label for="post_data" class="col-sm-4 col-form-label">Optional Post Data (JSON)</label>
-                    <div class="col-sm-8">
-                        <textarea name="post_data" class="form-control" id="post_data" rows="3" autocapitalize="false" spellcheck="false">{{$s.PostData}}</textarea>
-                        <small id="emailHelp" class="form-text text-muted">You can insert <a target="_blank" href="https://regex101.com/r/I5bbj9/1">Regex</a> to validate the response</small>
-                    </div>
-                </div>
-                <div class="form-group row{{if eq $s.Type "tcp"}} d-none{{end}}">
-                    <label for="service_response" class="col-sm-4 col-form-label">Expected Response (Regex)</label>
-                    <div class="col-sm-8">
-                        <textarea name="expected" class="form-control" id="service_response" rows="3" autocapitalize="false" spellcheck="false">{{$s.Expected}}</textarea>
-                    </div>
-                </div>
-                <div class="form-group row{{if eq $s.Type "tcp"}} d-none{{end}}">
-                    <label for="service_response_code" class="col-sm-4 col-form-label">Expected Status Code</label>
-                    <div class="col-sm-8">
-                        <input type="number" name="expected_status" class="form-control" value="{{$s.ExpectedStatus}}" id="service_response_code">
-                    </div>
-                </div>
-                <div class="form-group row{{if eq $s.Type "http"}} d-none{{end}}">
-                    <label for="service_port" class="col-sm-4 col-form-label">TCP Port</label>
-                    <div class="col-sm-8">
-                        <input type="number" name="port" class="form-control" value="{{$s.Port}}" id="service_port" placeholder="8080">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="service_interval" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
-                    <div class="col-sm-8">
-                        <input type="number" name="interval" class="form-control" value="{{$s.Interval}}" min="1" id="service_interval" required>
-                        <small id="emailHelp" class="form-text text-muted">10,000+ will be checked in Microseconds (1 millisecond = 1000 microseconds).</small>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="service_timeout" class="col-sm-4 col-form-label">Timeout in Seconds</label>
-                    <div class="col-sm-8">
-                        <input type="number" name="timeout" class="form-control" value="{{$s.Timeout}}" id="service_timeout" min="1">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="order" class="col-sm-4 col-form-label">List Order</label>
-                    <div class="col-sm-8">
-                        <input type="number" name="order" class="form-control" min="0" value="{{$s.Order}}" id="order">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-6">
-                        <button type="submit" class="btn btn-success btn-block">Update Service</button>
-                    </div>
-                    <div class="col-6">
-                        <a href="/service/{{ $s.Id }}/delete_failures" class="btn btn-danger btn-block confirm-btn">Delete All Failures</a>
-                    </div>
-                </div>
-            </form>
+        {{template "form_service" $s}}
 
-        </div>
+    </div>
 
-<div class="col-12 mt-4{{if eq $s.Type "tcp"}} d-none{{end}}">
-    <h3>Last Response</h3>
-    <textarea rows="8" class="form-control" readonly>{{ $s.LastResponse }}</textarea>
-    <div class="form-group row mt-2">
-        <label for="last_status_code" class="col-sm-3 col-form-label">HTTP Status Code</label>
-        <div class="col-sm-2">
-            <input type="text" id="last_status_code" class="form-control" value="{{ $s.LastStatusCode }}" readonly>
+    <div class="col-12 mt-4{{if eq $s.Type "tcp"}} d-none{{end}}">
+        <h3>Last Response</h3>
+        <textarea rows="8" class="form-control" readonly>{{ $s.LastResponse }}</textarea>
+        <div class="form-group row mt-2">
+            <label for="last_status_code" class="col-sm-3 col-form-label">HTTP Status Code</label>
+            <div class="col-sm-2">
+                <input type="text" id="last_status_code" class="form-control" value="{{ $s.LastStatusCode }}" readonly>
+            </div>
         </div>
     </div>
-</div>
 
 
-<div class="col-12 mt-4{{if eq $s.Type "tcp"}} d-none{{end}}">
-    <h3>Service Checkins</h3>
-{{ range $s.Checkins }}
-    <h5>Check #{{.Id}} <span class="badge online_badge float-right">Checked in {{.Ago}}</span></h5>
-    <input type="text" class="form-control" value="https://domainhere.com/api/checkin/{{.Api}}">
-{{ end }}
+    <div class="col-12 mt-4{{if eq $s.Type "tcp"}} d-none{{end}}">
+        <h3>Service Checkins</h3>
+    {{ range $s.Checkins }}
+        <h5>Check #{{.Id}} <span class="badge online_badge float-right">Checked in {{.Ago}}</span></h5>
+        <input type="text" class="form-control" value="https://domainhere.com/api/checkin/{{.Api}}">
+    {{ end }}
 
-    <form action="/service/{{$s.Id}}/checkin" method="POST">
-        <div class="form-group row">
-            <label for="service_name" class="col-sm-4 col-form-label">Check Interval (in seconds)</label>
-            <div class="col-md-6 col-sm-12">
-                <input type="number" name="name" class="form-control" id="checkin_interval" value="30" placeholder="Name">
+        <form action="/service/{{$s.Id}}/checkin" method="POST">
+            <div class="form-group row">
+                <label for="service_name" class="col-sm-4 col-form-label">Check Interval (in seconds)</label>
+                <div class="col-md-6 col-sm-12">
+                    <input type="number" name="name" class="form-control" id="checkin_interval" value="30" placeholder="Name">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success d-none d-md-block float-right">Save Checkin</button>
+                </div>
             </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-success d-none d-md-block float-right">Save Checkin</button>
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-success d-block d-md-none btn-block">Save Checkin</button>
+                </div>
             </div>
-        </div>
-        <div class="form-group row">
-            <div class="col-sm-10">
-                <button type="submit" class="btn btn-success d-block d-md-none btn-block">Save Checkin</button>
-            </div>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
 
 {{end}}
-
-
 </div>
-
-{{template "footer"}}
-
+{{end}}
+{{define "extra_scripts"}}
 {{if USE_CDN}}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
 <script src="https://assets.statup.io/pikaday.js"></script>
-<script src="https://assets.statup.io/main.js"></script>
 {{ else }}
-<script src="/js/jquery-3.3.1.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/Chart.bundle.min.js"></script>
 <script src="/js/pikaday.js"></script>
-<script src="/js/main.js"></script>
 {{end}}
-
+{{$s := .Service}}
 <script>
 
     var ctx = document.getElementById("service").getContext('2d');
@@ -318,8 +204,8 @@
         container: $("#start_container")[0],
         maxDate: new Date(),
         onSelect: function(date) {
-          $('#service_start')[0].value = Math.round(date.getTime() / 1000);
-          this.hide();
+            $('#service_start')[0].value = Math.round(date.getTime() / 1000);
+            this.hide();
         }
     });
 
@@ -330,8 +216,8 @@
         container: $("#end_container")[0],
         maxDate: new Date(),
         onSelect: function(date) {
-          $('#service_end')[0].value = Math.round(date.getTime() / 1000);
-          this.hide();
+            $('#service_end')[0].value = Math.round(date.getTime() / 1000);
+            this.hide();
         }
     });
 
@@ -352,6 +238,4 @@
     AjaxChart(chartdata,{{$s.Id}},{{.Start}},{{.End}},"hour");
 
 </script>
-
-</body>
-</html>
+{{end}}

@@ -108,7 +108,7 @@ func TestServicesViewHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "<title>Statup | Google Service</title>")
+	assert.Contains(t, body, "<title>Google Status</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
 }
 
@@ -252,7 +252,7 @@ func TestUsersEditHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "<title>Statup | Users</title>")
+	assert.Contains(t, body, "<title>Statup | admin</title>")
 	assert.Contains(t, body, "<h3>User admin</h3>")
 	assert.Contains(t, body, "value=\"info@statup.io\"")
 	assert.Contains(t, body, "value=\"##########\"")
@@ -347,7 +347,7 @@ func TestViewHTTPServicesHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "<title>Statup | Crystal Castles - Kept Service</title>")
+	assert.Contains(t, body, "<title>Crystal Castles - Kept Status</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
 }
 
@@ -358,7 +358,7 @@ func TestViewTCPServicesHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "<title>Statup | Local Postgres Service</title>")
+	assert.Contains(t, body, "<title>Local Postgres Status</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
 }
 
@@ -403,7 +403,7 @@ func TestServicesUpdateHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "<title>Statup | The Bravery - An Honest Mistake Service</title>")
+	assert.Contains(t, body, "<title>The Bravery - An Honest Mistake Status</title>")
 	assert.Contains(t, body, "Statup  made with ❤️")
 }
 

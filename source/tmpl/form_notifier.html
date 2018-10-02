@@ -1,0 +1,65 @@
+{{define "form_notifier"}}
+{{$n := .Select}}
+<form method="POST" class="{{underscore $n.Method }}" action="/settings/notifier/{{ $n.Method }}">
+{{if $n.Title}}<h4>{{$n.Title}}</h4>{{end}}
+{{if $n.Description}}<p class="small text-muted">{{safe $n.Description}}</p>{{end}}
+
+{{range .Form}}
+    <div class="form-group">
+        <label class="text-capitalize" for="{{underscore .Title}}">{{.Title}}</label>
+        <input type="{{.Type}}" name="{{underscore .DbField}}" class="form-control" value="{{ $n.GetValue .DbField }}" id="{{underscore .Title}}" placeholder="{{.Placeholder}}" {{if .Required}}required{{end}}>
+    {{if .SmallText}}<small class="form-text text-muted">{{safe .SmallText}}</small>{{end}}
+    </div>
+{{end}}
+
+    <div class="row">
+        <div class="col-9 col-sm-6">
+            <div class="input-group mb-2">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">Limit</div>
+                </div>
+                <input type="text" class="form-control" name="limits" min="1" max="60" id="limits_per_hour_{{underscore $n.Method }}" value="{{$n.Limits}}" placeholder="7">
+                <div class="input-group-append">
+                    <div class="input-group-text">Per Minute</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-3 col-sm-2 mt-1">
+                        <span class="switch">
+                            <input type="checkbox" name="enable" class="switch" id="switch-{{ $n.Method }}" {{if $n.Enabled}}checked{{end}}>
+                            <label for="switch-{{ $n.Method }}"></label>
+                        </span>
+        </div>
+
+        <input type="hidden" name="notifier" value="{{underscore $n.Method }}">
+
+        <div class="col-12 col-sm-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
+            <button type="submit" class="btn btn-primary btn-block text-capitalize">Save</button>
+        </div>
+
+    {{if $n.CanTest}}
+        <div class="col-12 col-sm-12">
+            <button class="test_notifier btn btn-secondary btn-block text-capitalize col-12 float-right">Test</button>
+        </div>
+
+        <div class="col-12 col-sm-12 mt-2">
+            <div class="alert alert-danger d-none" id="{{underscore $n.Method}}-error" role="alert">
+            {{$n.Method}} has an error!
+            </div>
+
+            <div class="alert alert-success d-none" id="{{underscore $n.Method}}-success" role="alert">
+                The {{$n.Method}} notifier is working correctly!
+            </div>
+        </div>
+    {{end}}
+
+    </div>
+
+{{if $n.Author}}
+    <span class="d-block small text-center mt-3 mb-5">
+                            {{$n.Title}} Notifier created by <a href="{{$n.AuthorUrl}}" target="_blank">{{$n.Author}}</a>
+                        </span>
+{{ end }}
+</form>
+{{end}}

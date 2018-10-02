@@ -1,265 +1,182 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
-{{if USE_CDN}}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://assets.statup.io/base.css">
-{{ else }}
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/base.css">
-{{end}}
-    <link rel="stylesheet" href="https://assets.statup.io/codemirror.css">
-    <link rel="stylesheet" href="https://assets.statup.io/codemirror-colorpicker.css"/>
-
-    <title>Statup | Settings</title>
-</head>
-<body>
-
-
+{{define "title"}}Statup | Settings{{end}}
+{{define "content"}}
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
-
 {{template "nav"}}
-
     <div class="col-12">
-
         <div class="row">
-
-        <div class="col-md-3 col-sm-12 mb-4 mb-md-0">
-
-            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Settings</a>
-                <a class="nav-link" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false">Theme Editor</a>
-            {{ range .Notifications }}
-                <a class="nav-link text-capitalize" id="v-pills-{{underscore .Select.Method}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Select.Method}}" role="tab" aria-controls="v-pills-{{underscore .Select.Method}}" aria-selected="false">{{.Select.Method}} <span class="badge badge-pill badge-secondary"></span></a>
-            {{ end }}
-                <a class="nav-link" id="v-pills-browse-tab" data-toggle="pill" href="#v-pills-browse" role="tab" aria-controls="v-pills-home" aria-selected="false">Browse Plugins</a>
-                <a class="nav-link d-none" id="v-pills-backups-tab" data-toggle="pill" href="#v-pills-backups" role="tab" aria-controls="v-pills-backups" aria-selected="false">Backups</a>
-            {{ range .Plugins }}
-                <a class="nav-link text-capitalize" id="v-pills-{{underscore .Name}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Name}}" role="tab" aria-controls="v-pills-profile" aria-selected="false">{{.Name}}</a>
-            {{end}}
+            <div class="col-md-3 col-sm-12 mb-4 mb-md-0">
+                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Settings</a>
+                    <a class="nav-link" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false">Theme Editor</a>
+                {{ range .Notifications }}
+                    <a class="nav-link text-capitalize" id="v-pills-{{underscore .Select.Method}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Select.Method}}" role="tab" aria-controls="v-pills-{{underscore .Select.Method}}" aria-selected="false">{{.Select.Method}} <span class="badge badge-pill badge-secondary"></span></a>
+                {{ end }}
+                    <a class="nav-link" id="v-pills-browse-tab" data-toggle="pill" href="#v-pills-browse" role="tab" aria-controls="v-pills-home" aria-selected="false">Browse Plugins</a>
+                    <a class="nav-link d-none" id="v-pills-backups-tab" data-toggle="pill" href="#v-pills-backups" role="tab" aria-controls="v-pills-backups" aria-selected="false">Backups</a>
+                {{ range .Plugins }}
+                    <a class="nav-link text-capitalize" id="v-pills-{{underscore .Name}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Name}}" role="tab" aria-controls="v-pills-profile" aria-selected="false">{{.Name}}</a>
+                {{end}}
+                </div>
             </div>
-        </div>
-        <div class="col-md-8 col-sm-12">
+            <div class="col-md-8 col-sm-12">
             {{if Error}}
                 <div class="alert alert-danger" role="alert">{{Error}}</div>
             {{end}}
-            <div class="tab-content" id="v-pills-tabContent">
-                <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
-                    <h3>Settings</h3>
+                <div class="tab-content" id="v-pills-tabContent">
+                    <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+                        <h3>Settings</h3>
 
-                    <form method="POST" action="/settings">
+                        <form method="POST" action="/settings">
 
-                        <div class="form-group">
-                            <label for="project">Project Name</label>
-                            <input type="text" name="project" class="form-control" value="{{ .Name }}" id="project" placeholder="Great Uptime">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="description">Project Description</label>
-                            <input type="text" name="description" class="form-control" value="{{ .Description }}" id="description" placeholder="Great Uptime">
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-8 col-sm-9">
-                                <label for="domain">Domain</label>
-                                <input type="text" name="domain" class="form-control" value="{{ .Domain }}" id="domain">
+                            <div class="form-group">
+                                <label for="project">Project Name</label>
+                                <input type="text" name="project" class="form-control" value="{{ .Name }}" id="project" placeholder="Great Uptime">
                             </div>
-                            <div class="col-4 col-sm-3 mt-sm-1 mt-0">
-                                <label for="enable_cdn" class="d-inline d-sm-none">Enable CDN</label>
-                                <label for="enable_cdn" class="d-none d-sm-block">Enable CDN</label>
-                              <span class="switch">
+
+                            <div class="form-group">
+                                <label for="description">Project Description</label>
+                                <input type="text" name="description" class="form-control" value="{{ .Description }}" id="description" placeholder="Great Uptime">
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-8 col-sm-9">
+                                    <label for="domain">Domain</label>
+                                    <input type="text" name="domain" class="form-control" value="{{ .Domain }}" id="domain">
+                                </div>
+                                <div class="col-4 col-sm-3 mt-sm-1 mt-0">
+                                    <label for="enable_cdn" class="d-inline d-sm-none">Enable CDN</label>
+                                    <label for="enable_cdn" class="d-none d-sm-block">Enable CDN</label>
+                                    <span class="switch">
                                 <input type="checkbox" name="enable_cdn" class="switch" id="switch-normal" {{if USE_CDN}}checked{{end}}{{if .UsingAssets}} disabled{{end}}>
                                 <label for="switch-normal" class="mt-2 mt-sm-0"></label>
                               </span>
+                                </div>
+
                             </div>
 
-                        </div>
-
-                        <div class="form-group">
-                            <label for="footer">Custom Footer</label>
-                            <textarea rows="4" name="footer" class="form-control" id="footer">{{ .Footer }}</textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="timezone">Timezone</label><span class="mt-1 small float-right">Current: {{.CurrentTime}}</span>
-                            <select class="form-control" name="timezone" id="timezone">
-                                <option value="-12.0" {{if eq (ToString .Timezone) "-12"}}selected{{end}}>(GMT -12:00) Eniwetok, Kwajalein</option>
-                                <option value="-11.0" {{if eq (ToString .Timezone) "-11"}}selected{{end}}>(GMT -11:00) Midway Island, Samoa</option>
-                                <option value="-10.0" {{if eq (ToString .Timezone) "-10"}}selected{{end}}>(GMT -10:00) Hawaii</option>
-                                <option value="-9.0" {{if eq (ToString .Timezone) "-9"}}selected{{end}}>(GMT -9:00) Alaska</option>
-                                <option value="-8.0" {{if eq (ToString .Timezone) "-8"}}selected{{end}}>(GMT -8:00) Pacific Time (US &amp; Canada)</option>
-                                <option value="-7.0" {{if eq (ToString .Timezone) "-7"}}selected{{end}}>(GMT -7:00) Mountain Time (US &amp; Canada)</option>
-                                <option value="-6.0" {{if eq (ToString .Timezone) "-6"}}selected{{end}}>(GMT -6:00) Central Time (US &amp; Canada), Mexico City</option>
-                                <option value="-5.0" {{if eq (ToString .Timezone) "-5"}}selected{{end}}>(GMT -5:00) Eastern Time (US &amp; Canada), Bogota, Lima</option>
-                                <option value="-4.0" {{if eq (ToString .Timezone) "-4"}}selected{{end}}>(GMT -4:00) Atlantic Time (Canada), Caracas, La Paz</option>
-                                <option value="-3.5" {{if eq (ToString .Timezone) "-3.5"}}selected{{end}}>(GMT -3:30) Newfoundland</option>
-                                <option value="-3.0" {{if eq (ToString .Timezone) "-3"}}selected{{end}}>(GMT -3:00) Brazil, Buenos Aires, Georgetown</option>
-                                <option value="-2.0" {{if eq (ToString .Timezone) "-2"}}selected{{end}}>(GMT -2:00) Mid-Atlantic</option>
-                                <option value="-1.0" {{if eq (ToString .Timezone) "-1"}}selected{{end}}>(GMT -1:00 hour) Azores, Cape Verde Islands</option>
-                                <option value="0.0" {{if eq (ToString .Timezone) "0"}}selected{{end}}>(GMT) Western Europe Time, London, Lisbon, Casablanca</option>
-                                <option value="1.0" {{if eq (ToString .Timezone) "1"}}selected{{end}}>(GMT +1:00 hour) Brussels, Copenhagen, Madrid, Paris</option>
-                                <option value="2.0" {{if eq (ToString .Timezone) "2"}}selected{{end}}>(GMT +2:00) Kaliningrad, South Africa</option>
-                                <option value="3.0" {{if eq (ToString .Timezone) "3"}}selected{{end}}>(GMT +3:00) Baghdad, Riyadh, Moscow, St. Petersburg</option>
-                                <option value="3.5" {{if eq (ToString .Timezone) "3.5"}}selected{{end}}>(GMT +3:30) Tehran</option>
-                                <option value="4.0" {{if eq (ToString .Timezone) "4"}}selected{{end}}>(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi</option>
-                                <option value="4.5" {{if eq (ToString .Timezone) "4.5"}}selected{{end}}>(GMT +4:30) Kabul</option>
-                                <option value="5.0" {{if eq (ToString .Timezone) "5"}}selected{{end}}>(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent</option>
-                                <option value="5.5" {{if eq (ToString .Timezone) "5.5"}}selected{{end}}>(GMT +5:30) Bombay, Calcutta, Madras, New Delhi</option>
-                                <option value="5.75" {{if eq (ToString .Timezone) "5.75"}}selected{{end}}>(GMT +5:45) Kathmandu</option>
-                                <option value="6.0" {{if eq (ToString .Timezone) "6"}}selected{{end}}>(GMT +6:00) Almaty, Dhaka, Colombo</option>
-                                <option value="7.0" {{if eq (ToString .Timezone) "7"}}selected{{end}}>(GMT +7:00) Bangkok, Hanoi, Jakarta</option>
-                                <option value="8.0" {{if eq (ToString .Timezone) "8"}}selected{{end}}>(GMT +8:00) Beijing, Perth, Singapore, Hong Kong</option>
-                                <option value="9.0" {{if eq (ToString .Timezone) "9"}}selected{{end}}>(GMT +9:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk</option>
-                                <option value="9.5" {{if eq (ToString .Timezone) "9.5"}}selected{{end}}>(GMT +9:30) Adelaide, Darwin</option>
-                                <option value="10.0" {{if eq (ToString .Timezone) "10.5"}}selected{{end}}>(GMT +10:00) Eastern Australia, Guam, Vladivostok</option>
-                                <option value="11.0" {{if eq (ToString .Timezone) "11"}}selected{{end}}>(GMT +11:00) Magadan, Solomon Islands, New Caledonia</option>
-                                <option value="12.0" {{if eq (ToString .Timezone) "12"}}selected{{end}}>(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka</option>
-                            </select>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary btn-block">Save Settings</button>
-
-                        <div class="form-group row mt-3">
-                            <label for="api_key" class="col-sm-3 col-form-label">API Key</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control select-input" value="{{ .ApiKey }}" id="api_key" readonly>
+                            <div class="form-group">
+                                <label for="footer">Custom Footer</label>
+                                <textarea rows="4" name="footer" class="form-control" id="footer">{{ .Footer }}</textarea>
                             </div>
-                        </div>
 
-                        <div class="form-group row">
-                            <label for="api_secret" class="col-sm-3 col-form-label">API Secret</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control select-input" value="{{ .ApiSecret }}" id="api_secret" readonly>
-                                <small class="form-text text-muted">You can <a href="/api/renew">Regenerate API Keys</a> if you need to.</small>
+                            <div class="form-group">
+                                <label for="timezone">Timezone</label><span class="mt-1 small float-right">Current: {{.CurrentTime}}</span>
+                                <select class="form-control" name="timezone" id="timezone">
+                                    <option value="-12.0" {{if eq (ToString .Timezone) "-12"}}selected{{end}}>(GMT -12:00) Eniwetok, Kwajalein</option>
+                                    <option value="-11.0" {{if eq (ToString .Timezone) "-11"}}selected{{end}}>(GMT -11:00) Midway Island, Samoa</option>
+                                    <option value="-10.0" {{if eq (ToString .Timezone) "-10"}}selected{{end}}>(GMT -10:00) Hawaii</option>
+                                    <option value="-9.0" {{if eq (ToString .Timezone) "-9"}}selected{{end}}>(GMT -9:00) Alaska</option>
+                                    <option value="-8.0" {{if eq (ToString .Timezone) "-8"}}selected{{end}}>(GMT -8:00) Pacific Time (US &amp; Canada)</option>
+                                    <option value="-7.0" {{if eq (ToString .Timezone) "-7"}}selected{{end}}>(GMT -7:00) Mountain Time (US &amp; Canada)</option>
+                                    <option value="-6.0" {{if eq (ToString .Timezone) "-6"}}selected{{end}}>(GMT -6:00) Central Time (US &amp; Canada), Mexico City</option>
+                                    <option value="-5.0" {{if eq (ToString .Timezone) "-5"}}selected{{end}}>(GMT -5:00) Eastern Time (US &amp; Canada), Bogota, Lima</option>
+                                    <option value="-4.0" {{if eq (ToString .Timezone) "-4"}}selected{{end}}>(GMT -4:00) Atlantic Time (Canada), Caracas, La Paz</option>
+                                    <option value="-3.5" {{if eq (ToString .Timezone) "-3.5"}}selected{{end}}>(GMT -3:30) Newfoundland</option>
+                                    <option value="-3.0" {{if eq (ToString .Timezone) "-3"}}selected{{end}}>(GMT -3:00) Brazil, Buenos Aires, Georgetown</option>
+                                    <option value="-2.0" {{if eq (ToString .Timezone) "-2"}}selected{{end}}>(GMT -2:00) Mid-Atlantic</option>
+                                    <option value="-1.0" {{if eq (ToString .Timezone) "-1"}}selected{{end}}>(GMT -1:00 hour) Azores, Cape Verde Islands</option>
+                                    <option value="0.0" {{if eq (ToString .Timezone) "0"}}selected{{end}}>(GMT) Western Europe Time, London, Lisbon, Casablanca</option>
+                                    <option value="1.0" {{if eq (ToString .Timezone) "1"}}selected{{end}}>(GMT +1:00 hour) Brussels, Copenhagen, Madrid, Paris</option>
+                                    <option value="2.0" {{if eq (ToString .Timezone) "2"}}selected{{end}}>(GMT +2:00) Kaliningrad, South Africa</option>
+                                    <option value="3.0" {{if eq (ToString .Timezone) "3"}}selected{{end}}>(GMT +3:00) Baghdad, Riyadh, Moscow, St. Petersburg</option>
+                                    <option value="3.5" {{if eq (ToString .Timezone) "3.5"}}selected{{end}}>(GMT +3:30) Tehran</option>
+                                    <option value="4.0" {{if eq (ToString .Timezone) "4"}}selected{{end}}>(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi</option>
+                                    <option value="4.5" {{if eq (ToString .Timezone) "4.5"}}selected{{end}}>(GMT +4:30) Kabul</option>
+                                    <option value="5.0" {{if eq (ToString .Timezone) "5"}}selected{{end}}>(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent</option>
+                                    <option value="5.5" {{if eq (ToString .Timezone) "5.5"}}selected{{end}}>(GMT +5:30) Bombay, Calcutta, Madras, New Delhi</option>
+                                    <option value="5.75" {{if eq (ToString .Timezone) "5.75"}}selected{{end}}>(GMT +5:45) Kathmandu</option>
+                                    <option value="6.0" {{if eq (ToString .Timezone) "6"}}selected{{end}}>(GMT +6:00) Almaty, Dhaka, Colombo</option>
+                                    <option value="7.0" {{if eq (ToString .Timezone) "7"}}selected{{end}}>(GMT +7:00) Bangkok, Hanoi, Jakarta</option>
+                                    <option value="8.0" {{if eq (ToString .Timezone) "8"}}selected{{end}}>(GMT +8:00) Beijing, Perth, Singapore, Hong Kong</option>
+                                    <option value="9.0" {{if eq (ToString .Timezone) "9"}}selected{{end}}>(GMT +9:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk</option>
+                                    <option value="9.5" {{if eq (ToString .Timezone) "9.5"}}selected{{end}}>(GMT +9:30) Adelaide, Darwin</option>
+                                    <option value="10.0" {{if eq (ToString .Timezone) "10.5"}}selected{{end}}>(GMT +10:00) Eastern Australia, Guam, Vladivostok</option>
+                                    <option value="11.0" {{if eq (ToString .Timezone) "11"}}selected{{end}}>(GMT +11:00) Magadan, Solomon Islands, New Caledonia</option>
+                                    <option value="12.0" {{if eq (ToString .Timezone) "12"}}selected{{end}}>(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka</option>
+                                </select>
                             </div>
-                        </div>
 
-                        <div class="row">
-                            <a href="/settings/export" class="btn btn-sm btn-secondary float-right">Export Settings</a>
-                        </div>
+                            <button type="submit" class="btn btn-primary btn-block">Save Settings</button>
 
-                    </form>
-
-                </div>
-
-                <div class="tab-pane" id="v-pills-style" role="tabpanel" aria-labelledby="v-pills-style-tab">
-
-        {{if not .UsingAssets }}
-            <a href="/settings/build" class="btn btn-primary btn-block"{{if USE_CDN}} disabled{{end}}>Enable Local Assets</a>
-        {{ else }}
-                    <form method="POST" action="/settings/css">
-                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-                            <li class="nav-item col text-center">
-                                <a class="nav-link active" id="pills-vars-tab" data-toggle="pill" href="#pills-vars" role="tab" aria-controls="pills-vars" aria-selected="true">Variables</a>
-                            </li>
-                            <li class="nav-item col text-center">
-                                <a class="nav-link" id="pills-theme-tab" data-toggle="pill" href="#pills-theme" role="tab" aria-controls="pills-theme" aria-selected="false">Base Theme</a>
-                            </li>
-                            <li class="nav-item col text-center">
-                                <a class="nav-link" id="pills-mobile-tab" data-toggle="pill" href="#pills-mobile" role="tab" aria-controls="pills-mobile" aria-selected="false">Mobile</a>
-                            </li>
-                        </ul>
-                        <div class="tab-content" id="pills-tabContent">
-                            <div class="tab-pane show active" id="pills-vars" role="tabpanel" aria-labelledby="pills-vars-tab">
-                                <textarea name="variables" id="sass_vars">{{ .SassVars }}</textarea>
+                            <div class="form-group row mt-3">
+                                <label for="api_key" class="col-sm-3 col-form-label">API Key</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control select-input" value="{{ .ApiKey }}" id="api_key" readonly>
+                                </div>
                             </div>
-                            <div class="tab-pane" id="pills-theme" role="tabpanel" aria-labelledby="pills-theme-tab">
-                                <textarea name="theme" id="theme_css">{{ .BaseSASS }}</textarea>
-                            </div>
-                            <div class="tab-pane" id="pills-mobile" role="tabpanel" aria-labelledby="pills-mobile-tab">
-                                <textarea name="mobile" id="mobile_css">{{ .MobileSASS }}</textarea>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block mt-2">Save Style</button>
-                        <a href="/settings/delete_assets" class="btn btn-danger btn-block confirm-btn">Delete All Assets</a>
-                    </form>
-            {{end}}
-                </div>
 
-            {{ range .Notifications }}
-            {{$n := .Select}}
-            <div class="tab-pane" id="v-pills-{{underscore $n.Method}}" role="tabpanel" aria-labelledby="v-pills-{{underscore $n.Method }}-tab">
-                <form method="POST" class="{{underscore $n.Method }}" action="/settings/notifier/{{ $n.Method }}">
-                {{if $n.Title}}<h4>{{$n.Title}}</h4>{{end}}
-                {{if $n.Description}}<p class="small text-muted">{{safe $n.Description}}</p>{{end}}
+                            <div class="form-group row">
+                                <label for="api_secret" class="col-sm-3 col-form-label">API Secret</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control select-input" value="{{ .ApiSecret }}" id="api_secret" readonly>
+                                    <small class="form-text text-muted">You can <a href="/api/renew">Regenerate API Keys</a> if you need to.</small>
+                                </div>
+                            </div>
 
-                    {{range .Form}}
-                        <div class="form-group">
-                            <label class="text-capitalize" for="{{underscore .Title}}">{{.Title}}</label>
-                            <input type="{{.Type}}" name="{{underscore .DbField}}" class="form-control" value="{{ $n.GetValue .DbField }}" id="{{underscore .Title}}" placeholder="{{.Placeholder}}" {{if .Required}}required{{end}}>
-                            {{if .SmallText}}<small class="form-text text-muted">{{safe .SmallText}}</small>{{end}}
-                        </div>
+                            <div class="row">
+                                <a href="/settings/export" class="btn btn-sm btn-secondary float-right">Export Settings</a>
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                    <div class="tab-pane" id="v-pills-style" role="tabpanel" aria-labelledby="v-pills-style-tab">
+
+                    {{if not .UsingAssets }}
+                        <a href="/settings/build" class="btn btn-primary btn-block"{{if USE_CDN}} disabled{{end}}>Enable Local Assets</a>
+                    {{ else }}
+                        <form method="POST" action="/settings/css">
+                            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                <li class="nav-item col text-center">
+                                    <a class="nav-link active" id="pills-vars-tab" data-toggle="pill" href="#pills-vars" role="tab" aria-controls="pills-vars" aria-selected="true">Variables</a>
+                                </li>
+                                <li class="nav-item col text-center">
+                                    <a class="nav-link" id="pills-theme-tab" data-toggle="pill" href="#pills-theme" role="tab" aria-controls="pills-theme" aria-selected="false">Base Theme</a>
+                                </li>
+                                <li class="nav-item col text-center">
+                                    <a class="nav-link" id="pills-mobile-tab" data-toggle="pill" href="#pills-mobile" role="tab" aria-controls="pills-mobile" aria-selected="false">Mobile</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="pills-tabContent">
+                                <div class="tab-pane show active" id="pills-vars" role="tabpanel" aria-labelledby="pills-vars-tab">
+                                    <textarea name="variables" id="sass_vars">{{ .SassVars }}</textarea>
+                                </div>
+                                <div class="tab-pane" id="pills-theme" role="tabpanel" aria-labelledby="pills-theme-tab">
+                                    <textarea name="theme" id="theme_css">{{ .BaseSASS }}</textarea>
+                                </div>
+                                <div class="tab-pane" id="pills-mobile" role="tabpanel" aria-labelledby="pills-mobile-tab">
+                                    <textarea name="mobile" id="mobile_css">{{ .MobileSASS }}</textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block mt-2">Save Style</button>
+                            <a href="/settings/delete_assets" class="btn btn-danger btn-block confirm-btn">Delete All Assets</a>
+                        </form>
                     {{end}}
-
-                    <div class="row">
-                    <div class="col-9 col-sm-6">
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text">Limit</div>
-                            </div>
-                            <input type="text" class="form-control" name="limits" min="1" max="60" id="limits_per_hour_{{underscore $n.Method }}" value="{{$n.Limits}}" placeholder="7">
-                            <div class="input-group-append">
-                                <div class="input-group-text">Per Minute</div>
-                            </div>
-                        </div>
                     </div>
 
-                    <div class="col-3 col-sm-2 mt-1">
-                        <span class="switch">
-                            <input type="checkbox" name="enable" class="switch" id="switch-{{ $n.Method }}" {{if $n.Enabled}}checked{{end}}>
-                            <label for="switch-{{ $n.Method }}"></label>
-                        </span>
-                    </div>
+                {{ range .Notifications }}
+                {{$n := .Select}}
+                    <div class="tab-pane" id="v-pills-{{underscore $n.Method}}" role="tabpanel" aria-labelledby="v-pills-{{underscore $n.Method }}-tab">
 
-                        <input type="hidden" name="notifier" value="{{underscore $n.Method }}">
+                    {{template "form_notifier" .}}
 
-                        <div class="col-12 col-sm-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
-                        <button type="submit" class="btn btn-primary btn-block text-capitalize">Save</button>
-                    </div>
-
-                    {{if $n.CanTest}}
-                        <div class="col-12 col-sm-12">
-                            <button class="test_notifier btn btn-secondary btn-block text-capitalize col-12 float-right">Test</button>
-                        </div>
-
-                        <div class="col-12 col-sm-12 mt-2">
-                            <div class="alert alert-danger d-none" id="{{underscore $n.Method}}-error" role="alert">
-                                {{$n.Method}} has an error!
-                            </div>
-
-                            <div class="alert alert-success d-none" id="{{underscore $n.Method}}-success" role="alert">
-                                The {{$n.Method}} notifier is working correctly!
-                            </div>
-                        </div>
-                    {{end}}
-
-                        </div>
-
-                        {{if $n.Author}}
-                        <span class="d-block small text-center mt-3 mb-5">
-                            {{$n.Title}} Notifier created by <a href="{{$n.AuthorUrl}}" target="_blank">{{$n.Author}}</a>
-                        </span>
-                        {{ end }}
-                </form>
-
-                {{ if $n.Logs }}
-                Sent {{$n.SentLastHour}} in the last hour<br>
+                    {{ if $n.Logs }}
+                        Sent {{$n.SentLastHour}} in the last hour<br>
                     {{ range $n.Logs }}
                         <div class="card mt-1">
                             <div class="card-body">
-                                {{.Message}}
-                                    <p class="card-text"><small class="text-muted">Sent {{.Time.Ago}}</small></p>
+                            {{.Message}}
+                                <p class="card-text"><small class="text-muted">Sent {{.Time.Ago}}</small></p>
                             </div>
                         </div>
                     {{ end }}
+                    {{ end }}
+                    </div>
                 {{ end }}
-            </div>
-            {{ end }}
 
-                <div class="tab-pane fade" id="v-pills-browse" role="tabpanel" aria-labelledby="v-pills-browse-tab">
-                {{ range .Repos }}
+                    <div class="tab-pane fade" id="v-pills-browse" role="tabpanel" aria-labelledby="v-pills-browse-tab">
+                    {{ range .Repos }}
                         <div class="card col-6" style="width: 18rem;">
                             <div class="card-body">
                                 <h5 class="card-title">{{ .Name }}</h5>
@@ -267,13 +184,13 @@
                                 <a href="/plugins/download/{{ .Name }}" class="card-link">Add</a>
                             </div>
                         </div>
-                 {{ end }}
-                </div>
+                    {{ end }}
+                    </div>
 
 
-                <div class="tab-pane fade" id="v-pills-backups" role="tabpanel" aria-labelledby="v-pills-backups-tab">
-                    <a href="/backups/create" class="btn btn-primary btn-block">Backup Database</a>
-                </div>
+                    <div class="tab-pane fade" id="v-pills-backups" role="tabpanel" aria-labelledby="v-pills-backups-tab">
+                        <a href="/backups/create" class="btn btn-primary btn-block">Backup Database</a>
+                    </div>
 
                 {{ range .Plugins }}
 
@@ -289,32 +206,19 @@
                     </div>
                 {{end}}
 
+                </div>
             </div>
-        </div>
 
+        </div>
     </div>
 </div>
-</div>
-{{template "footer"}}
-
-{{if USE_CDN}}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-{{ else }}
-<script src="/js/jquery-3.3.1.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
 {{end}}
-
+{{define "extra_css"}}
+<link rel="stylesheet" href="https://assets.statup.io/codemirror.css">
+<link rel="stylesheet" href="https://assets.statup.io/codemirror-colorpicker.css"/>
+{{end}}
+{{define "extra_scripts"}}
 <script src="https://assets.statup.io/codemirror.js"></script>
 <script src="https://assets.statup.io/css.js"></script>
 <script src="https://assets.statup.io/codemirror-colorpicker.min.js"></script>
-
-{{if USE_CDN}}
-<script src="https://assets.statup.io/main.js"></script>
-{{else}}
-<script src="/js/main.js"></script>
 {{end}}
-
-
-</body>
-</html>
