@@ -1,9 +1,5 @@
 {{define "form_user"}}
-{{$url := "/user"}}
-{{if .}}
-     {{$url = "/user/{{.Id}}"}}
-{{end}}
-<form action="{{$url}}" method="POST">
+<form action="{{if .}}/user/{{.Id}}{{else}}/user{{end}}" method="POST">
     <div class="form-group row">
         <label for="username" class="col-sm-4 col-form-label">Username</label>
         <div class="col-6 col-md-4">

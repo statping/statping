@@ -1,9 +1,5 @@
 {{define "form_service"}}
-{{$url := "/service"}}
-{{if .}}
-     {{$url = "/service/{{.Id}}"}}
-{{end}}
-<form action="{{$url}}" method="POST">
+<form action="{{if .}}/service/{{.Id}}{{else}}/service{{end}}" method="POST">
     <div class="form-group row">
         <label for="service_name" class="col-sm-4 col-form-label">Service Name</label>
         <div class="col-sm-8">
