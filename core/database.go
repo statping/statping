@@ -277,6 +277,7 @@ func (c *DbConfig) CreateCore() *Core {
 func (db *DbConfig) DropDatabase() error {
 	utils.Log(1, "Dropping Database Tables...")
 	err := DbSession.DropTableIfExists("checkins")
+	err = DbSession.DropTableIfExists("checkins_hits")
 	err = DbSession.DropTableIfExists("notifications")
 	err = DbSession.DropTableIfExists("core")
 	err = DbSession.DropTableIfExists("failures")
@@ -290,6 +291,7 @@ func (db *DbConfig) DropDatabase() error {
 func (db *DbConfig) CreateDatabase() error {
 	utils.Log(1, "Creating Database Tables...")
 	err := DbSession.CreateTable(&types.Checkin{})
+	err = DbSession.CreateTable(&types.CheckinHit{})
 	err = DbSession.CreateTable(&notifier.Notification{})
 	err = DbSession.Table("core").CreateTable(&types.Core{})
 	err = DbSession.CreateTable(&types.Failure{})
@@ -315,7 +317,7 @@ func (db *DbConfig) MigrateDatabase() error {
 	if tx.Error != nil {
 		return tx.Error
 	}
-	tx = tx.AutoMigrate(&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Checkin{}, &notifier.Notification{}).Table("core").AutoMigrate(&types.Core{})
+	tx = tx.AutoMigrate(&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Checkin{}, &types.CheckinHit{}, &notifier.Notification{}).Table("core").AutoMigrate(&types.Core{})
 	if tx.Error != nil {
 		tx.Rollback()
 		utils.Log(3, fmt.Sprintf("Statup Database could not be migrated: %v", tx.Error))

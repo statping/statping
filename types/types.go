@@ -26,6 +26,7 @@ type Hit struct {
 	Id        int64     `gorm:"primary_key;column:id"`
 	Service   int64     `gorm:"column:service"`
 	Latency   float64   `gorm:"column:latency"`
+	PingTime  float64   `gorm:"column:ping_time"`
 	CreatedAt time.Time `gorm:"column:created_at"`
 }
 

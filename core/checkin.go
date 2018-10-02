@@ -28,7 +28,7 @@ type Checkin struct {
 }
 
 func (c *Checkin) String() string {
-	return c.Api
+	return c.ApiKey
 }
 
 func ReturnCheckin(s *types.Checkin) *Checkin {
@@ -39,7 +39,7 @@ func FindCheckin(api string) *types.Checkin {
 	for _, ser := range CoreApp.Services {
 		service := ser.Select()
 		for _, c := range service.Checkins {
-			if c.Api == api {
+			if c.ApiKey == api {
 				return c
 			}
 		}
@@ -71,13 +71,18 @@ func SelectCheckinApi(api string) *Checkin {
 	return checkin
 }
 
-func (c *Checkin) Receivehit() {
-	c.Hits++
-	c.Last = time.Now()
+func (c *Checkin) CreateHit() (int64, error) {
+	c.CreatedAt = time.Now()
+	row := checkinDB().Create(c)
+	if row.Error == nil {
+		utils.Log(2, row.Error)
+		return 0, row.Error
+	}
+	return c.Id, row.Error
 }
 
 func (c *Checkin) RecheckCheckinFailure(guard chan struct{}) {
-	between := time.Now().Sub(c.Last).Seconds()
+	between := time.Now().Sub(time.Now()).Seconds()
 	if between > float64(c.Interval) {
 		fmt.Println("rechecking every 15 seconds!")
 		c.CreateFailure()
@@ -95,6 +100,6 @@ func (f *Checkin) CreateFailure() {
 }
 
 func (f *Checkin) Ago() string {
-	got, _ := timeago.TimeAgoWithTime(time.Now(), f.Last)
+	got, _ := timeago.TimeAgoWithTime(time.Now(), time.Now())
 	return got
 }

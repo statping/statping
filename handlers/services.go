@@ -266,7 +266,7 @@ func checkinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	checkin := &types.Checkin{
 		Service:  service.Id,
 		Interval: interval,
-		Api:      utils.NewSHA1Hash(18),
+		ApiKey:   utils.NewSHA1Hash(18),
 	}
 	checkin.Create()
 	executeResponse(w, r, "service.html", service, "/services")
