@@ -164,7 +164,7 @@ func executeResponse(w http.ResponseWriter, r *http.Request, file string, data i
 
 	templates := []string{"base.html", "head.html", "nav.html", "footer.html", "scripts.html", "form_service.html", "form_notifier.html", "form_user.html"}
 
-	javascripts := []string{"chart_index.js"}
+	javascripts := []string{"charts.js", "chart_index.js"}
 
 	render, err := source.TmplBox.String(file)
 	if err != nil {
@@ -221,9 +221,19 @@ func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 		"safe": func(html string) template.HTML {
 			return template.HTML(html)
 		},
+		"Services": func() []types.ServiceInterface {
+			return core.CoreApp.Services
+		},
 	})
-	t.Parse(render)
-	t.Execute(w, data)
+	_, err = t.Parse(render)
+	if err != nil {
+		utils.Log(4, err)
+	}
+
+	err = t.Execute(w, data)
+	if err != nil {
+		utils.Log(4, err)
+	}
 }
 
 // error404Handler is a HTTP handler for 404 error pages

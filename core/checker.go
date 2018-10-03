@@ -74,20 +74,34 @@ func (s *Service) duration() time.Duration {
 	return amount
 }
 
+func (s *Service) parseHost() string {
+	if s.Type == "tcp" {
+		return s.Domain
+	} else {
+		domain := s.Domain
+		hasPort, _ := regexp.MatchString(`\:([0-9]+)`, domain)
+		if hasPort {
+			splitDomain := strings.Split(s.Domain, ":")
+			domain = splitDomain[len(splitDomain)-2]
+		}
+		host, err := url.Parse(domain)
+		if err != nil {
+			return s.Domain
+		}
+		return host.Host
+	}
+}
+
 // dnsCheck will check the domain name and return a float64 for the amount of time the DNS check took
 func (s *Service) dnsCheck() (float64, error) {
+	var err error
 	t1 := time.Now()
-	domain := s.Domain
-	hasPort, _ := regexp.MatchString(`\:([0-9]+)`, domain)
-	if hasPort {
-		splitDomain := strings.Split(s.Domain, ":")
-		domain = splitDomain[len(splitDomain)-2]
+	host := s.parseHost()
+	if s.Type == "tcp" {
+		_, err = net.LookupHost(host)
+	} else {
+		_, err = net.LookupIP(host)
 	}
-	url, err := url.Parse(domain)
-	if err != nil {
-		return 0, err
-	}
-	_, err = net.LookupIP(url.Host)
 	if err != nil {
 		return 0, err
 	}
@@ -98,6 +112,14 @@ func (s *Service) dnsCheck() (float64, error) {
 
 // checkTcp will check a TCP service
 func (s *Service) checkTcp(record bool) *Service {
+	dnsLookup, err := s.dnsCheck()
+	if err != nil {
+		if record {
+			recordFailure(s, fmt.Sprintf("Could not get IP address for TCP service %v, %v", s.Domain, err))
+		}
+		return s
+	}
+	s.PingTime = dnsLookup
 	t1 := time.Now()
 	domain := fmt.Sprintf("%v", s.Domain)
 	if s.Port != 0 {
@@ -134,7 +156,7 @@ func (s *Service) checkHttp(record bool) *Service {
 		}
 		return s
 	}
-	s.DnsLookup = dnsLookup
+	s.PingTime = dnsLookup
 	t1 := time.Now()
 	timeout := time.Duration(s.Timeout)
 	client := http.Client{
@@ -213,9 +235,10 @@ func recordSuccess(s *Service) {
 	hit := &types.Hit{
 		Service:   s.Id,
 		Latency:   s.Latency,
+		PingTime:  s.PingTime,
 		CreatedAt: time.Now(),
 	}
-	utils.Log(1, fmt.Sprintf("Service %v Successful: %0.2f ms", s.Name, hit.Latency*1000))
+	utils.Log(1, fmt.Sprintf("Service %v Successful Response: %0.2f ms | Lookup in: %0.2f ms", s.Name, hit.Latency*1000, hit.PingTime*1000))
 	s.CreateHit(hit)
 	notifier.OnSuccess(s.Service)
 }
@@ -226,9 +249,10 @@ func recordFailure(s *Service, issue string) {
 	fail := &types.Failure{
 		Service:   s.Id,
 		Issue:     issue,
+		PingTime:  s.PingTime,
 		CreatedAt: time.Now(),
 	}
-	utils.Log(2, fmt.Sprintf("Service %v Failing: %v", s.Name, issue))
+	utils.Log(2, fmt.Sprintf("Service %v Failing: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
 	s.CreateFailure(fail)
 	notifier.OnFailure(s.Service, fail)
 }

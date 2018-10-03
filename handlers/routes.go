@@ -47,7 +47,7 @@ func Router() *mux.Router {
 		r.PathPrefix("/statup.png").Handler(http.FileServer(source.TmplBox.HTTPBox()))
 	}
 	r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(source.JsBox.HTTPBox())))
-	r.Handle("/charts/{id}.js", http.HandlerFunc(renderServiceChartHandler))
+	//r.Handle("/charts/{id}.js", http.HandlerFunc(renderServiceChartHandler))
 	r.Handle("/charts.js", http.HandlerFunc(renderServiceChartsHandler))
 	r.Handle("/setup", http.HandlerFunc(setupHandler)).Methods("GET")
 	r.Handle("/setup", http.HandlerFunc(processSetupHandler)).Methods("POST")
@@ -87,6 +87,7 @@ func Router() *mux.Router {
 	r.Handle("/api/services", http.HandlerFunc(apiCreateServiceHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceHandler)).Methods("GET")
 	r.Handle("/api/services/{id}/data", http.HandlerFunc(apiServiceDataHandler)).Methods("GET")
+	r.Handle("/api/services/{id}/ping", http.HandlerFunc(apiServicePingDataHandler)).Methods("GET")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceUpdateHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceDeleteHandler)).Methods("DELETE")
 

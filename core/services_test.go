@@ -100,6 +100,7 @@ func TestCheckHTTPService(t *testing.T) {
 	assert.True(t, service.Online)
 	assert.Equal(t, 200, service.LastStatusCode)
 	assert.NotZero(t, service.Latency)
+	assert.NotZero(t, service.PingTime)
 }
 
 func TestServiceTCPCheck(t *testing.T) {
@@ -114,6 +115,7 @@ func TestCheckTCPService(t *testing.T) {
 	assert.Equal(t, "Changed Google DNS", service.Name)
 	assert.True(t, service.Online)
 	assert.NotZero(t, service.Latency)
+	assert.NotZero(t, service.PingTime)
 }
 
 func TestServiceOnline24Hours(t *testing.T) {

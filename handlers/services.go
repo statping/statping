@@ -54,14 +54,14 @@ func renderServiceChartHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	service := core.SelectService(utils.StringInt(vars["id"]))
-	data := core.GraphDataRaw(service, start, end, "hour").ToString()
+	data := core.GraphDataRaw(service, start, end, "hour", "latency").ToString()
 
 	out := struct {
 		Services []*core.Service
 		Data     []string
 	}{[]*core.Service{service}, []string{data}}
 
-	executeJSResponse(w, r, "charts.js", out)
+	executeResponse(w, r, "charts.js", out, nil)
 }
 
 func renderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
@@ -69,19 +69,16 @@ func renderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/javascript")
 	w.Header().Set("Cache-Control", "max-age=60")
 
-	var data []string
-	end := now.EndOfDay().UTC()
-	start := now.BeginningOfDay().UTC()
-
+	//var data []string
+	//end := now.EndOfDay().UTC()
+	//start := now.BeginningOfDay().UTC()
+	var srvs []*core.Service
 	for _, s := range services {
-		d := core.GraphDataRaw(s, start, end, "hour").ToString()
-		data = append(data, d)
+		srvs = append(srvs, s.(*core.Service))
 	}
-
 	out := struct {
-		Services []types.ServiceInterface
-		Data     []string
-	}{services, data}
+		Services []*core.Service
+	}{srvs}
 
 	executeJSResponse(w, r, "charts.js", out)
 }
@@ -194,7 +191,7 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 		end = time.Unix(endField, 0)
 	}
 
-	data := core.GraphDataRaw(serv, start, end, "hour")
+	data := core.GraphDataRaw(serv, start, end, "hour", "latency")
 
 	out := struct {
 		Service *core.Service

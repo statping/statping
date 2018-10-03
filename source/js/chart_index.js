@@ -6,8 +6,8 @@ var chartdata_{{js .Id}} = new Chart(ctx_{{js .Id}}, {
     datasets: [{
       label: 'Response Time (Milliseconds)',
       data: [],
-      backgroundColor: ['rgba(47, 206, 30, 0.92)'],
-      borderColor: ['rgb(47, 171, 34)'],
+      backgroundColor: ['{{if .Online}}rgba(47, 206, 30, 0.92){{else}}rgb(221, 53, 69){{end}}'],
+      borderColor: ['{{if .Online}}rgb(47, 171, 34){{else}}rgb(183, 32, 47){{end}}'],
       borderWidth: 1
     }]
   },
@@ -88,7 +88,7 @@ var chartdata_{{js .Id}} = new Chart(ctx_{{js .Id}}, {
       display: !1
     },
     tooltips: {
-      "enabled": !1
+      enabled: !1
     },
     scales: {
       yAxes: [{

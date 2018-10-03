@@ -80,9 +80,5 @@
 </div>
 {{end}}
 {{define "extra_scripts"}}
-<script>
-{{ range Services }}
-    {{template "chartIndex" .}}
-{{end}}
-</script>
+<script src="/charts.js"></script>
 {{end}}

@@ -36,6 +36,7 @@ type Service struct {
 	UpdatedAt      time.Time     `gorm:"column:updated_at" json:"updated_at"`
 	Online         bool          `gorm:"-" json:"online"`
 	Latency        float64       `gorm:"-" json:"latency"`
+	PingTime       float64       `gorm:"-" json:"ping_time"`
 	Online24Hours  float32       `gorm:"-" json:"24_hours_online"`
 	AvgResponse    string        `gorm:"-" json:"avg_response"`
 	Running        chan bool     `gorm:"-" json:"-"`
@@ -44,7 +45,6 @@ type Service struct {
 	LastResponse   string        `gorm:"-" json:"-"`
 	LastStatusCode int           `gorm:"-" json:"status_code"`
 	LastOnline     time.Time     `gorm:"-" json:"last_online"`
-	DnsLookup      float64       `gorm:"-" json:"dns_lookup_time"`
 	Failures       []interface{} `gorm:"-" json:"failures,omitempty"`
 	Checkins       []*Checkin    `gorm:"-" json:"checkins,omitempty"`
 }

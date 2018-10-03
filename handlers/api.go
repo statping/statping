@@ -89,7 +89,24 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 	grouping := fields.Get("group")
 	startField := utils.StringInt(fields.Get("start"))
 	endField := utils.StringInt(fields.Get("end"))
-	obj := core.GraphDataRaw(service, time.Unix(startField, 0), time.Unix(endField, 0), grouping)
+	obj := core.GraphDataRaw(service, time.Unix(startField, 0), time.Unix(endField, 0), grouping, "latency")
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(obj)
+}
+
+func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	service := core.SelectService(utils.StringInt(vars["id"]))
+	if service == nil {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+	fields := parseGet(r)
+	grouping := fields.Get("group")
+	startField := utils.StringInt(fields.Get("start"))
+	endField := utils.StringInt(fields.Get("end"))
+	obj := core.GraphDataRaw(service, time.Unix(startField, 0), time.Unix(endField, 0), grouping, "ping_time")
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(obj)

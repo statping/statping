@@ -95,6 +95,25 @@ function AjaxChart(chart, service, start=0, end=9999999999, group="hour") {
   });
 }
 
+function PingAjaxChart(chart, service, start=0, end=9999999999, group="hour") {
+  $.ajax({
+    url: "/api/services/"+service+"/ping?start="+start+"&end="+end+"&group="+group,
+    type: 'GET',
+    success: function(data) {
+      chart.data.labels.pop();
+      chart.data.datasets.push({
+        label: "Ping Time",
+        backgroundColor: "#bababa"
+      });
+      chart.update();
+      data.data.forEach(function(d) {
+        chart.data.datasets[1].data.push(d);
+      });
+      chart.update();
+    }
+  });
+}
+
 $('select#service_check_type').on('change', function() {
     var selected = $('#service_check_type option:selected').val();
     if (selected === 'POST') {

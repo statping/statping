@@ -172,7 +172,7 @@ func (s *Service) DowntimeText() string {
 	return fmt.Sprintf("%v has been offline for %v", s.Name, utils.DurationReadable(s.Downtime()))
 }
 
-func Dbtimestamp(group string) string {
+func Dbtimestamp(group string, column string) string {
 	seconds := 60
 	if group == "second" {
 		seconds = 60
@@ -183,11 +183,11 @@ func Dbtimestamp(group string) string {
 	}
 	switch CoreApp.DbConnection {
 	case "mysql":
-		return fmt.Sprintf("CONCAT(date_format(created_at, '%%Y-%%m-%%d %%H:00:00')) AS timeframe, AVG(latency) AS value")
+		return fmt.Sprintf("CONCAT(date_format(created_at, '%%Y-%%m-%%d %%H:00:00')) AS timeframe, AVG(%v) AS value", column)
 	case "sqlite":
-		return fmt.Sprintf("datetime((strftime('%%s', created_at) / %v) * %v, 'unixepoch') AS timeframe, AVG(latency) as value", seconds, seconds)
+		return fmt.Sprintf("datetime((strftime('%%s', created_at) / %v) * %v, 'unixepoch') AS timeframe, AVG(%v) as value", seconds, seconds, column)
 	case "postgres":
-		return fmt.Sprintf("date_trunc('%v', created_at) AS timeframe, AVG(latency) AS value", group)
+		return fmt.Sprintf("date_trunc('%v', created_at) AS timeframe, AVG(%v) AS value", group, column)
 	default:
 		return ""
 	}
@@ -207,9 +207,9 @@ func (s *Service) Downtime() time.Duration {
 	return since
 }
 
-func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group string) *DateScanObj {
+func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group string, column string) *DateScanObj {
 	var d []DateScan
-	model := service.(*Service).HitsBetween(start, end, group)
+	model := service.(*Service).HitsBetween(start, end, group, column)
 	rows, _ := model.Rows()
 	for rows.Next() {
 		var gd DateScan
@@ -241,7 +241,7 @@ func (d *DateScanObj) ToString() string {
 func (s *Service) GraphData() string {
 	start := time.Now().Add((-24 * 7) * time.Hour)
 	end := time.Now()
-	obj := GraphDataRaw(s, start, end, "hour")
+	obj := GraphDataRaw(s, start, end, "hour", "latency")
 	data, err := json.Marshal(obj)
 	if err != nil {
 		utils.Log(2, err)
