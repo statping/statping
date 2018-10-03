@@ -90,7 +90,6 @@ func TestApiIndexHandler(t *testing.T) {
 	rr, err := httpRequestAPI(t, "GET", "/api", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
-	t.Log(body)
 	var obj types.Core
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
@@ -102,7 +101,6 @@ func TestApiAllServicesHandlerHandler(t *testing.T) {
 	rr, err := httpRequestAPI(t, "GET", "/api/services", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
-	t.Log(body)
 	var obj []types.Service
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
@@ -126,7 +124,6 @@ func TestApiCreateServiceHandler(t *testing.T) {
 	assert.Nil(t, err)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	t.Log(body)
 	var obj types.Service
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
@@ -162,7 +159,6 @@ func TestApiDeleteServiceHandler(t *testing.T) {
 	rr, err := httpRequestAPI(t, "DELETE", "/api/services/1", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
-	t.Log(body)
 	var obj ApiResponse
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
@@ -171,11 +167,9 @@ func TestApiDeleteServiceHandler(t *testing.T) {
 }
 
 func TestApiAllUsersHandler(t *testing.T) {
-
 	rr, err := httpRequestAPI(t, "GET", "/api/users", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
-	t.Log(body)
 	assert.Equal(t, 200, rr.Code)
 	var obj []types.User
 	formatJSON(body, &obj)

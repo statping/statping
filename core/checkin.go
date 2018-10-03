@@ -27,12 +27,26 @@ type Checkin struct {
 	*types.Checkin
 }
 
+type CheckinHit struct {
+	*types.CheckinHit
+}
+
 func (c *Checkin) String() string {
 	return c.ApiKey
 }
 
 func ReturnCheckin(s *types.Checkin) *Checkin {
 	return &Checkin{Checkin: s}
+}
+
+func ReturnCheckinHit(h *types.CheckinHit) *CheckinHit {
+	return &CheckinHit{CheckinHit: h}
+}
+
+func SelectCheckin(api string) *Checkin {
+	var checkin Checkin
+	checkinDB().Where("api_key = ?", api).First(&checkin)
+	return &checkin
 }
 
 func FindCheckin(api string) *types.Checkin {
@@ -47,9 +61,25 @@ func FindCheckin(api string) *types.Checkin {
 	return nil
 }
 
+func (u *Checkin) Hits() []CheckinHit {
+	var checkins []CheckinHit
+	checkinDB().Where("checkin = ?", u.Id).Order("id DESC").Find(&checkins)
+	return checkins
+}
+
 func (u *Checkin) Create() (int64, error) {
 	u.CreatedAt = time.Now()
 	row := checkinDB().Create(u)
+	if row.Error == nil {
+		utils.Log(2, row.Error)
+		return 0, row.Error
+	}
+	return u.Id, row.Error
+}
+
+func (u *CheckinHit) Create() (int64, error) {
+	u.CreatedAt = time.Now()
+	row := checkinHitsDB().Create(u)
 	if row.Error == nil {
 		utils.Log(2, row.Error)
 		return 0, row.Error
@@ -92,6 +122,11 @@ func (f *Checkin) CreateFailure() {
 }
 
 func (f *Checkin) Ago() string {
+	got, _ := timeago.TimeAgoWithTime(time.Now(), time.Now())
+	return got
+}
+
+func (f *CheckinHit) Ago() string {
 	got, _ := timeago.TimeAgoWithTime(time.Now(), time.Now())
 	return got
 }

@@ -24,7 +24,7 @@ import (
 
 var (
 	WEBHOOK_URL    = "https://jsonplaceholder.typicode.com/posts"
-	webhookMessage = `{ "title": "%service.Id", "body": "%service.Name", "userId": 19999 }`
+	webhookMessage = `{ "title": "%service.Id", "body": "%service.Name", "online": %service.Online, "userId": 19999 }`
 	fullMsg        string
 )
 
@@ -56,7 +56,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 	t.Run("Webhook Replace Body Text", func(t *testing.T) {
 		fullMsg = replaceBodyText(webhookMessage, TestService, TestFailure)
-		assert.Equal(t, 78, len(fullMsg))
+		assert.Equal(t, "{ \"title\": \"1\", \"body\": \"Interpol - All The Rage Back Home\", \"online\": false, \"userId\": 19999 }", fullMsg)
 	})
 
 	t.Run("Webhook Within Limits", func(t *testing.T) {
@@ -96,7 +96,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 	t.Run("Webhook Queue", func(t *testing.T) {
 		go notifier.Queue(webhook)
-		time.Sleep(5 * time.Second)
+		time.Sleep(8 * time.Second)
 		assert.Equal(t, WEBHOOK_URL, webhook.Host)
 		assert.Equal(t, 1, len(webhook.Queue))
 	})

@@ -62,6 +62,7 @@ func Router() *mux.Router {
 	r.Handle("/service/{id}/delete", http.HandlerFunc(servicesDeleteHandler))
 	r.Handle("/service/{id}/delete_failures", http.HandlerFunc(servicesDeleteFailuresHandler)).Methods("GET")
 	r.Handle("/service/{id}/checkin", http.HandlerFunc(checkinCreateUpdateHandler)).Methods("POST")
+	r.Handle("/checkin/{id}", http.HandlerFunc(checkinUpdateHandler))
 	r.Handle("/users", http.HandlerFunc(usersHandler)).Methods("GET")
 	r.Handle("/users", http.HandlerFunc(createUserHandler)).Methods("POST")
 	r.Handle("/user/{id}", http.HandlerFunc(usersEditHandler)).Methods("GET")

@@ -96,30 +96,20 @@
         </div>
     </div>
 
-
     <div class="col-12 mt-4{{if eq $s.Type "tcp"}} d-none{{end}}">
         <h3>Service Checkins</h3>
     {{ range $s.Checkins }}
-        <h5>Check #{{.Id}} <span class="badge online_badge float-right">Checked in {{.Ago}}</span></h5>
-        <input type="text" class="form-control" value="https://domainhere.com/api/checkin/{{.Api}}">
+        <h5>Check #{{.Id}} <span class="badge online_badge float-right">Checked in</span></h5>
+        <input type="text" class="form-control" value="{{CoreApp.Domain}}/checkin/{{.ApiKey}}">
+        <ul class="list-group">
+        {{ range .Hits }}
+            <li class="list-group-item">Received Checkin at {{.CreatedAt}}</li>
+        {{end}}
+        </ul>
     {{ end }}
 
-        <form action="/service/{{$s.Id}}/checkin" method="POST">
-            <div class="form-group row">
-                <label for="service_name" class="col-sm-4 col-form-label">Check Interval (in seconds)</label>
-                <div class="col-md-6 col-sm-12">
-                    <input type="number" name="name" class="form-control" id="checkin_interval" value="30" placeholder="Name">
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-success d-none d-md-block float-right">Save Checkin</button>
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-sm-10">
-                    <button type="submit" class="btn btn-success d-block d-md-none btn-block">Save Checkin</button>
-                </div>
-            </div>
-        </form>
+    {{template "form_checkin" $s}}
+
     </div>
 
 {{end}}

@@ -23,6 +23,7 @@ import (
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/jinzhu/now"
+	"net"
 	"net/http"
 	"strconv"
 	"time"
@@ -257,14 +258,30 @@ func checkinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
+	service := core.SelectService(utils.StringInt(vars["id"]))
+
 	interval := utils.StringInt(r.PostForm.Get("interval"))
-	serv := core.SelectService(utils.StringInt(vars["id"]))
-	service := serv
-	checkin := &types.Checkin{
-		Service:  service.Id,
-		Interval: interval,
-		ApiKey:   utils.NewSHA1Hash(18),
-	}
+	grace := utils.StringInt(r.PostForm.Get("grace"))
+	checkin := core.ReturnCheckin(&types.Checkin{
+		Service:     service.Id,
+		Interval:    interval,
+		GracePeriod: grace,
+		ApiKey:      utils.NewSHA1Hash(18),
+	})
 	checkin.Create()
-	executeResponse(w, r, "service.html", service, "/services")
+	executeResponse(w, r, "service.html", service, fmt.Sprintf("/service/%v", service.Id))
+}
+
+func checkinUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	checkin := core.SelectCheckin(vars["id"])
+	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+	checkinHit := core.ReturnCheckinHit(&types.CheckinHit{
+		Checkin:   checkin.Id,
+		From:      ip,
+		CreatedAt: time.Now().UTC(),
+	})
+	checkinHit.Create()
+	w.Write([]byte("ok"))
+	w.WriteHeader(http.StatusOK)
 }

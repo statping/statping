@@ -56,8 +56,14 @@ func ToString(s interface{}) string {
 		return fmt.Sprintf("%v", v)
 	case []byte:
 		return string(v)
+	case bool:
+		if v {
+			return "true"
+		}
+		return "false"
+	default:
+		return fmt.Sprintf("%v", v)
 	}
-	return ""
 }
 
 func Timezoner(t time.Time, zone float32) time.Time {

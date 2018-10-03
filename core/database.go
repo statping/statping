@@ -61,9 +61,14 @@ func usersDB() *gorm.DB {
 	return DbSession.Model(&types.User{})
 }
 
-// hitsDB returns the 'hits' database column
+// checkinDB returns the Checkin records for a service
 func checkinDB() *gorm.DB {
 	return DbSession.Model(&types.Checkin{})
+}
+
+// checkinHitsDB returns the 'hits' from the Checkin record
+func checkinHitsDB() *gorm.DB {
+	return DbSession.Model(&types.CheckinHit{})
 }
 
 // HitsBetween returns the gorm database query for a collection of service hits between a time range

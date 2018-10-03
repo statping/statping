@@ -60,7 +60,7 @@ var webhook = &Webhook{&notifier.Notification{
 		Type:        "textarea",
 		Title:       "HTTP Body",
 		Placeholder: `{"service_id": "%s.Id", "service_name": "%s.Name"}`,
-		SmallText:   "Optional HTTP body for a POST request. You can insert variables into your body request.<br>%service.Id, %service.Name<br>%failure.Issue",
+		SmallText:   "Optional HTTP body for a POST request. You can insert variables into your body request.<br>%service.Id, %service.Name, %service.Online<br>%failure.Issue",
 		DbField:     "Var2",
 	}, {
 		Type:        "text",
@@ -87,8 +87,10 @@ func init() {
 
 // Send will send a HTTP Post to the Webhook API. It accepts type: string
 func (w *Webhook) Send(msg interface{}) error {
-	message := msg.(string)
-	_, err := w.run(message)
+	resp, err := w.run(msg.(string))
+	if err == nil {
+		resp.Body.Close()
+	}
 	return err
 }
 
@@ -100,6 +102,7 @@ func replaceBodyText(body string, s *types.Service, f *types.Failure) string {
 	if s != nil {
 		body = strings.Replace(body, "%service.Name", s.Name, -1)
 		body = strings.Replace(body, "%service.Id", utils.ToString(s.Id), -1)
+		body = strings.Replace(body, "%service.Online", utils.ToString(s.Online), -1)
 	}
 	if f != nil {
 		body = strings.Replace(body, "%failure.Issue", f.Issue, -1)

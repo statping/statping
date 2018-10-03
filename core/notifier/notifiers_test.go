@@ -232,7 +232,7 @@ func TestRunAllQueueAndStop(t *testing.T) {
 	assert.Equal(t, 16, len(example.Queue))
 	go Queue(example)
 	assert.Equal(t, 16, len(example.Queue))
-	time.Sleep(10 * time.Second)
+	time.Sleep(12 * time.Second)
 	assert.Equal(t, 6, len(example.Queue))
 	example.close()
 	assert.False(t, example.IsRunning())

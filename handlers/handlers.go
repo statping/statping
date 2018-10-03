@@ -162,7 +162,7 @@ func executeResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		return
 	}
 
-	templates := []string{"base.html", "head.html", "nav.html", "footer.html", "scripts.html", "form_service.html", "form_notifier.html", "form_user.html"}
+	templates := []string{"base.html", "head.html", "nav.html", "footer.html", "scripts.html", "form_service.html", "form_notifier.html", "form_user.html", "form_checkin.html"}
 
 	javascripts := []string{"charts.js", "chart_index.js"}
 
