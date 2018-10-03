@@ -51,7 +51,7 @@ func SelectService(id int64) *Service {
 
 func (s *Service) Checkins() []*types.Checkin {
 	var hits []*types.Checkin
-	servicesDB().Where("service = ?", s.Id).Scan(&hits)
+	servicesDB().Where("service = ?", s.Id).Find(&hits)
 	return hits
 }
 

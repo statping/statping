@@ -89,8 +89,8 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"js": func(html interface{}) template.JS {
 			return template.JS(utils.ToString(html))
 		},
-		"safe": func(html interface{}) template.HTML {
-			return template.HTML(utils.ToString(html))
+		"safe": func(html string) template.HTML {
+			return template.HTML(html)
 		},
 		"Auth": func() bool {
 			return IsAuthenticated(r)
