@@ -71,15 +71,17 @@ func renderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "max-age=60")
 
 	//var data []string
-	//end := now.EndOfDay().UTC()
-	//start := now.BeginningOfDay().UTC()
+	end := time.Now().UTC()
+	start := time.Now().Add((-24 * 7) * time.Hour).UTC()
 	var srvs []*core.Service
 	for _, s := range services {
 		srvs = append(srvs, s.(*core.Service))
 	}
 	out := struct {
 		Services []*core.Service
-	}{srvs}
+		Start    int64
+		End      int64
+	}{srvs, start.Unix(), end.Unix()}
 
 	executeJSResponse(w, r, "charts.js", out)
 }

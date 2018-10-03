@@ -1,4 +1,7 @@
-{{define "charts"}}{{ range Services }}
+{{define "charts"}}
+{{$start := .Start}}
+{{$end := .End}}
+{{ range .Services }}
 var ctx_{{js .Id}} = document.getElementById("service_{{js .Id}}").getContext('2d');
 var chartdata_{{js .Id}} = new Chart(ctx_{{js .Id}}, {
   type: 'line',
@@ -133,5 +136,5 @@ var chartdata_{{js .Id}} = new Chart(ctx_{{js .Id}}, {
   }
 });
 
-AjaxChart(chartdata_{{js .Id}},{{js .Id}},0,99999999999,"hour");
+AjaxChart(chartdata_{{js .Id}},{{js .Id}},{{$start}},{{$end}},"hour");
 {{end}}{{end}}
