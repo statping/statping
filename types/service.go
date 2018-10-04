@@ -46,7 +46,7 @@ type Service struct {
 	LastStatusCode int           `gorm:"-" json:"status_code"`
 	LastOnline     time.Time     `gorm:"-" json:"last_online"`
 	Failures       []interface{} `gorm:"-" json:"failures,omitempty"`
-	Checkins       []*Checkin    `gorm:"-" json:"checkins,omitempty"`
+	//Checkins       []*Checkin    `gorm:"-" json:"checkins,omitempty"`
 }
 
 type ServiceInterface interface {

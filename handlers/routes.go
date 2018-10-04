@@ -53,6 +53,31 @@ func Router() *mux.Router {
 	r.Handle("/dashboard", http.HandlerFunc(dashboardHandler)).Methods("GET")
 	r.Handle("/dashboard", http.HandlerFunc(loginHandler)).Methods("POST")
 	r.Handle("/logout", http.HandlerFunc(logoutHandler))
+	r.Handle("/checkin/{id}", http.HandlerFunc(checkinUpdateHandler))
+	r.Handle("/plugins/download/{name}", http.HandlerFunc(pluginsDownloadHandler))
+	r.Handle("/plugins/{name}/save", http.HandlerFunc(pluginSavedHandler)).Methods("POST")
+	r.Handle("/help", http.HandlerFunc(helpHandler))
+	r.Handle("/logs", http.HandlerFunc(logsHandler))
+	r.Handle("/logs/line", http.HandlerFunc(logsLineHandler))
+
+	// USER Routes
+	r.Handle("/users", http.HandlerFunc(usersHandler)).Methods("GET")
+	r.Handle("/users", http.HandlerFunc(createUserHandler)).Methods("POST")
+	r.Handle("/user/{id}", http.HandlerFunc(usersEditHandler)).Methods("GET")
+	r.Handle("/user/{id}", http.HandlerFunc(updateUserHandler)).Methods("POST")
+	r.Handle("/user/{id}/delete", http.HandlerFunc(usersDeleteHandler)).Methods("GET")
+
+	// SETTINGS Routes
+	r.Handle("/settings", http.HandlerFunc(settingsHandler)).Methods("GET")
+	r.Handle("/settings", http.HandlerFunc(saveSettingsHandler)).Methods("POST")
+	r.Handle("/settings/css", http.HandlerFunc(saveSASSHandler)).Methods("POST")
+	r.Handle("/settings/build", http.HandlerFunc(saveAssetsHandler)).Methods("GET")
+	r.Handle("/settings/delete_assets", http.HandlerFunc(deleteAssetsHandler)).Methods("GET")
+	r.Handle("/settings/notifier/{method}", http.HandlerFunc(saveNotificationHandler)).Methods("POST")
+	r.Handle("/settings/notifier/{method}/test", http.HandlerFunc(testNotificationHandler)).Methods("POST")
+	r.Handle("/settings/export", http.HandlerFunc(exportHandler)).Methods("GET")
+
+	// SERVICE Routes
 	r.Handle("/services", http.HandlerFunc(servicesHandler)).Methods("GET")
 	r.Handle("/services", http.HandlerFunc(createServiceHandler)).Methods("POST")
 	r.Handle("/services/reorder", http.HandlerFunc(reorderServiceHandler)).Methods("POST")
@@ -62,27 +87,8 @@ func Router() *mux.Router {
 	r.Handle("/service/{id}/delete", http.HandlerFunc(servicesDeleteHandler))
 	r.Handle("/service/{id}/delete_failures", http.HandlerFunc(servicesDeleteFailuresHandler)).Methods("GET")
 	r.Handle("/service/{id}/checkin", http.HandlerFunc(checkinCreateUpdateHandler)).Methods("POST")
-	r.Handle("/checkin/{id}", http.HandlerFunc(checkinUpdateHandler))
-	r.Handle("/users", http.HandlerFunc(usersHandler)).Methods("GET")
-	r.Handle("/users", http.HandlerFunc(createUserHandler)).Methods("POST")
-	r.Handle("/user/{id}", http.HandlerFunc(usersEditHandler)).Methods("GET")
-	r.Handle("/user/{id}", http.HandlerFunc(updateUserHandler)).Methods("POST")
-	r.Handle("/user/{id}/delete", http.HandlerFunc(usersDeleteHandler)).Methods("GET")
-	r.Handle("/settings", http.HandlerFunc(settingsHandler)).Methods("GET")
-	r.Handle("/settings", http.HandlerFunc(saveSettingsHandler)).Methods("POST")
-	r.Handle("/settings/css", http.HandlerFunc(saveSASSHandler)).Methods("POST")
-	r.Handle("/settings/build", http.HandlerFunc(saveAssetsHandler)).Methods("GET")
-	r.Handle("/settings/delete_assets", http.HandlerFunc(deleteAssetsHandler)).Methods("GET")
-	r.Handle("/settings/notifier/{method}", http.HandlerFunc(saveNotificationHandler)).Methods("POST")
-	r.Handle("/settings/notifier/{method}/test", http.HandlerFunc(testNotificationHandler)).Methods("POST")
-	r.Handle("/settings/export", http.HandlerFunc(exportHandler)).Methods("GET")
-	r.Handle("/plugins/download/{name}", http.HandlerFunc(pluginsDownloadHandler))
-	r.Handle("/plugins/{name}/save", http.HandlerFunc(pluginSavedHandler)).Methods("POST")
-	r.Handle("/help", http.HandlerFunc(helpHandler))
-	r.Handle("/logs", http.HandlerFunc(logsHandler))
-	r.Handle("/logs/line", http.HandlerFunc(logsLineHandler))
 
-	// SERVICE API Routes
+	// API SERVICE Routes
 	r.Handle("/api/services", http.HandlerFunc(apiAllServicesHandler)).Methods("GET")
 	r.Handle("/api/services", http.HandlerFunc(apiCreateServiceHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceHandler)).Methods("GET")
@@ -91,7 +97,7 @@ func Router() *mux.Router {
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceUpdateHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceDeleteHandler)).Methods("DELETE")
 
-	// USER API Routes
+	// API USER Routes
 	r.Handle("/api/users", http.HandlerFunc(apiAllUsersHandler)).Methods("GET")
 	r.Handle("/api/users", http.HandlerFunc(apiCreateUsersHandler)).Methods("POST")
 	r.Handle("/api/users/{id}", http.HandlerFunc(apiUserHandler)).Methods("GET")
@@ -103,8 +109,8 @@ func Router() *mux.Router {
 	r.Handle("/api/renew", http.HandlerFunc(apiRenewHandler))
 	r.Handle("/api/checkin/{api}", http.HandlerFunc(apiCheckinHandler))
 	r.Handle("/metrics", http.HandlerFunc(prometheusHandler))
-	r.NotFoundHandler = http.HandlerFunc(error404Handler)
 	r.Handle("/tray", http.HandlerFunc(trayHandler))
+	r.NotFoundHandler = http.HandlerFunc(error404Handler)
 	return r
 }
 

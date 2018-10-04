@@ -20,14 +20,13 @@ import (
 )
 
 type Checkin struct {
-	Id          int64        `gorm:"primary_key;column:id"`
-	Service     int64        `gorm:"index;column:service"`
-	Interval    int64        `gorm:"column:check_interval"`
-	GracePeriod int64        `gorm:"column:grace_period"`
-	ApiKey      string       `gorm:"column:api_key"`
-	CreatedAt   time.Time    `gorm:"column:created_at" json:"created_at"`
-	UpdatedAt   time.Time    `gorm:"column:updated_at" json:"updated_at"`
-	Hits        []CheckinHit `json:"hits"`
+	Id          int64     `gorm:"primary_key;column:id"`
+	Service     int64     `gorm:"index;column:service"`
+	Interval    int64     `gorm:"column:check_interval"`
+	GracePeriod int64     `gorm:"column:grace_period"`
+	ApiKey      string    `gorm:"column:api_key"`
+	CreatedAt   time.Time `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt   time.Time `gorm:"column:updated_at" json:"updated_at"`
 }
 
 type CheckinHit struct {

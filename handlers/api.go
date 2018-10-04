@@ -72,7 +72,7 @@ func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	checkin := core.FindCheckin(vars["api"])
+	checkin := core.SelectCheckin(vars["api"])
 	//checkin.Receivehit()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(checkin)

@@ -268,7 +268,6 @@ func checkinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		Service:     service.Id,
 		Interval:    interval,
 		GracePeriod: grace,
-		ApiKey:      utils.NewSHA1Hash(18),
 	})
 	checkin.Create()
 	executeResponse(w, r, "service.html", service, fmt.Sprintf("/service/%v", service.Id))

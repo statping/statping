@@ -96,18 +96,27 @@
         </div>
     </div>
 
-    <div class="col-12 mt-4{{if eq $s.Type "tcp"}} d-none{{end}}">
-        <h3>Service Checkins</h3>
-    {{ range $s.Checkins }}
-        <h5>Check #{{.Id}} <span class="badge online_badge float-right">Checked in</span></h5>
-        <input type="text" class="form-control" value="{{CoreApp.Domain}}/checkin/{{.ApiKey}}">
-        <ul class="list-group">
-        {{ range .Hits }}
-            <li class="list-group-item">Received Checkin at {{.CreatedAt}}</li>
-        {{end}}
-        </ul>
-    {{ end }}
-
+    <div class="col-12 mt-4">
+        <h3>Service Checkin</h3>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Checkin</th>
+                <th scope="col">Report Period<br>Grace Period</th>
+                <th scope="col">Last Seen</th>
+                <th scope="col">Expected</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{$ch := $s.Checkin}}
+            <tr>
+                <td>{{CoreApp.Domain}}/checkin/{{$ch.ApiKey}}</td>
+                <td>every {{Duration $ch.Period}}<br>{{Duration $ch.Grace}} grace period</td>
+                <td>{{Ago $ch.Last.CreatedAt}}</td>
+                <td>{{ if lt $ch.Expected 0}}{{Duration $ch.Expected}} ago{{else}}in {{Duration $ch.Expected}}{{end}}</td>
+            </tr>
+            </tbody>
+        </table>
     {{template "form_checkin" $s}}
 
     </div>

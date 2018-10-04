@@ -49,9 +49,9 @@ func SelectService(id int64) *Service {
 	return nil
 }
 
-func (s *Service) Checkins() []*Checkin {
-	var hits []*Checkin
-	servicesDB().Where("service = ?", s.Id).Find(&hits)
+func (s *Service) Checkin() Checkin {
+	var hits Checkin
+	servicesDB().Where("service = ?", s.Id).First(&hits)
 	return hits
 }
 
@@ -66,7 +66,7 @@ func (c *Core) SelectAllServices() ([]*Service, error) {
 	CoreApp.Services = nil
 	for _, service := range services {
 		service.Start()
-		service.Checkins()
+		service.Checkin()
 		service.AllFailures()
 		CoreApp.Services = append(CoreApp.Services, service)
 	}

@@ -84,6 +84,31 @@ func InsertSampleData() error {
 	s4.Create(false)
 	s5.Create(false)
 
+	checkin1 := ReturnCheckin(&types.Checkin{
+		Service:     s1.Id,
+		Interval:    300,
+		GracePeriod: 300,
+	})
+	checkin1.Create()
+
+	checkin2 := ReturnCheckin(&types.Checkin{
+		Service:     s2.Id,
+		Interval:    900,
+		GracePeriod: 300,
+	})
+	checkin2.Create()
+
+	checkTime := time.Now().Add(-24 * time.Hour)
+	for i := 0; i <= 60; i++ {
+		checkHit := ReturnCheckinHit(&types.CheckinHit{
+			Checkin:   checkin1.Id,
+			From:      "192.168.0.1",
+			CreatedAt: checkTime.UTC(),
+		})
+		checkHit.Create()
+		checkTime = checkTime.Add(10 * time.Minute)
+	}
+
 	utils.Log(1, "Sample data has finished importing")
 
 	return nil
@@ -112,39 +137,6 @@ func InsertSampleHits() error {
 		}
 	}
 	return nil
-}
-
-func sampleGraphData(i float64, upward *bool) float64 {
-	alpha := 0.0003
-	if *upward {
-		i += 0.3
-		if i >= 6500 {
-			i += 0.1
-			*upward = false
-		} else if i >= 4500 {
-			i += 3
-		} else if i >= 2300 {
-			i += 1
-		} else if i >= 1150 {
-			i += 2
-		} else if i >= 500 {
-			i += 1
-		}
-	} else {
-		i -= 0.3
-		if i <= 6500 {
-			i -= 0.1
-		} else if i <= 4500 {
-			i -= 3
-		} else if i <= 2300 {
-			i -= 1
-		} else if i <= 1150 {
-			i -= 2
-		} else if i <= 500 {
-			i -= 1
-		}
-	}
-	return i * alpha
 }
 
 func insertSampleCore() error {

@@ -108,6 +108,16 @@ func (u *User) AfterFind() (err error) {
 	return
 }
 
+func (s *Checkin) AfterFind() (err error) {
+	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
+	return
+}
+
+func (s *CheckinHit) AfterFind() (err error) {
+	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
+	return
+}
+
 func (u *Hit) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
@@ -126,6 +136,16 @@ func (u *User) BeforeCreate() (err error) {
 }
 
 func (u *Service) BeforeCreate() (err error) {
+	u.CreatedAt = time.Now().UTC()
+	return
+}
+
+func (u *Checkin) BeforeCreate() (err error) {
+	u.CreatedAt = time.Now().UTC()
+	return
+}
+
+func (u *CheckinHit) BeforeCreate() (err error) {
 	u.CreatedAt = time.Now().UTC()
 	return
 }

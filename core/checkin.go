@@ -49,26 +49,41 @@ func SelectCheckin(api string) *Checkin {
 	return &checkin
 }
 
-func FindCheckin(api string) *types.Checkin {
-	for _, ser := range CoreApp.Services {
-		service := ser.Select()
-		for _, c := range service.Checkins {
-			if c.ApiKey == api {
-				return c
-			}
-		}
-	}
-	return nil
+func (u Checkin) Period() time.Duration {
+	duration, _ := time.ParseDuration(fmt.Sprintf("%vs", u.Interval))
+	return duration
+}
+
+func (u Checkin) Grace() time.Duration {
+	duration, _ := time.ParseDuration(fmt.Sprintf("%vs", u.GracePeriod))
+	return duration
+}
+
+func (u Checkin) Expected() time.Duration {
+	last := u.Last().CreatedAt
+	now := time.Now()
+	lastDir := now.Sub(last)
+	sub := time.Duration(u.Period() - lastDir)
+	return sub
+}
+
+func (u Checkin) Last() CheckinHit {
+	var hit CheckinHit
+	checkinHitsDB().Where("checkin = ?", u.Id).Last(&hit)
+	return hit
 }
 
 func (u *Checkin) Hits() []CheckinHit {
 	var checkins []CheckinHit
-	checkinDB().Where("checkin = ?", u.Id).Order("id DESC").Find(&checkins)
+	checkinHitsDB().Where("checkin = ?", u.Id).Order("id DESC").Find(&checkins)
 	return checkins
 }
 
 func (u *Checkin) Create() (int64, error) {
-	u.CreatedAt = time.Now()
+	if u.CreatedAt.IsZero() {
+		u.CreatedAt = time.Now()
+	}
+	u.ApiKey = utils.NewSHA1Hash(7)
 	row := checkinDB().Create(u)
 	if row.Error == nil {
 		utils.Log(2, row.Error)
@@ -78,7 +93,9 @@ func (u *Checkin) Create() (int64, error) {
 }
 
 func (u *CheckinHit) Create() (int64, error) {
-	u.CreatedAt = time.Now()
+	if u.CreatedAt.IsZero() {
+		u.CreatedAt = time.Now()
+	}
 	row := checkinHitsDB().Create(u)
 	if row.Error == nil {
 		utils.Log(2, row.Error)
