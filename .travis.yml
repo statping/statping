@@ -33,7 +33,7 @@ env:
     - STATUP_DIR=$GOPATH/src/github.com/hunterlong/statup
 
 before_deploy:
-  - mv statuper build/statuper
+  - mv $GOPATH/src/github.com/hunterlong/statup/statuper $GOPATH/src/github.com/hunterlong/statup/build/statuper
   - git config --local user.name "hunterlong"
   - git config --local user.email "info@socialeck.com"
   - make tag
