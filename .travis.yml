@@ -32,6 +32,24 @@ env:
     - GO_ENV=test
     - STATUP_DIR=$GOPATH/src/github.com/hunterlong/statup
 
+before_deploy:
+  - mv statuper build/statuper
+  - git config --local user.name "hunterlong"
+  - git config --local user.email "info@socialeck.com"
+  - make tag
+
+deploy:
+  - provider: releases
+    api_key: $GH_TOKEN
+    skip_cleanup: true
+  - provider: s3
+    access_key_id: $AWS_KEY
+    secret_access_key: $AWS_SECRET
+    bucket: "assets.statup.io"
+    local_dir: build
+    region: us-west-2
+    skip_cleanup: true
+
 matrix:
   allow_failures:
     - go: master
@@ -42,7 +60,7 @@ notifications:
 
 branches:
   except:
-  - /^v\d/
+    - /^v\d/
 
 before_install:
   - curl -L -s https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64 -o $GOPATH/bin/dep

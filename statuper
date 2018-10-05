@@ -8,7 +8,10 @@ US_W_2="ami-7be8a103"
 US_E_1="ami-7be8a103"
 US_E_2="ami-7be8a103"
 AWS_CLI=$(which aws)
+DOCKER_CLI=$(which docker)
+DOCKER_IMG="hunterlong/statup"
 AWS_ECS="$AWS_CLI --output json"
+DOCKER_PORT=8080
 
 function usage() {
 cat <<EOM
@@ -154,11 +157,8 @@ function localTask {
 }
 
 function dockerTask {
-     echo "installing docker"
-}
-
-function dockerComposeTask {
-     echo "installing docker compose"
+     echo "Starting Statup Docker container on port $DOCKER_PORT"
+     $DOCKER_CLI run -d -p $DOCKER_PORT:8080 $DOCKER_IMG
 }
 
 if [ "$BASH_SOURCE" == "$0" ]; then
@@ -175,7 +175,6 @@ if [ "$BASH_SOURCE" == "$0" ]; then
     while [[ $# -gt 0 ]]
     do
         key="$1"
-
         case $key in
             -k|--aws-access-key)
                 AWS_ACCESS_KEY_ID="$2"
@@ -189,12 +188,15 @@ if [ "$BASH_SOURCE" == "$0" ]; then
                 AWS_DEFAULT_REGION="$2"
                 shift # past argument
                 ;;
+            -p|--port)
+                DOCKER_PORT="$2"
+                shift # past argument
+                ;;
             -x|--verbose)
                 VERBOSE=true
                 ;;
             -v|--version)
                 echo ${VERSION}
-                echo "$2"
                 usage
                 exit 2
                 exit 0
