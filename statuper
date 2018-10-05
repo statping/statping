@@ -36,9 +36,16 @@ EOM
 
 # Check requirements
 function require() {
+    getOS
     command -v "$1" > /dev/null 2>&1 || {
         echo "Some of the required software is not installed:"
-        echo "    please install $1" >&2;
+        APP="$1" >&2;
+        echo "    Required application: $APP"
+        if [ $OS == "osx" ]; then
+            echo "    You can run 'brew install $APP'"
+        elif [ $OS == "linux" ]; then
+            echo "    You can run 'apt install $APP'"
+        fi
         exit 4;
     }
 }
@@ -64,6 +71,10 @@ function awsAskRegion {
     fi
 }
 
+get_latest_release() {
+  STATUP_VERSION=$(curl --silent "https://api.github.com/repos/$DOCKER_IMG/releases/latest" | jq -r .tag_name)
+}
+
 function askEC2Name {
     read -p "Enter the Name for EC2 Instance: "  SERVERNAME
 }
@@ -86,6 +97,14 @@ function askEC2KeyName {
 
 function askSecurityName {
     read -p "Enter a name for the new Security Group: "  EC2SECGROUP
+}
+
+function askInstallGlobal {
+    read -p "Do you want to move Statup to the bin folder? (y/N): "  MOVEBIN
+}
+
+function askInstallSystemCTL {
+    read -p "Do you want to auto start Statup on boot? (y/N): "  SYSTEMCTL
 }
 
 function awsSecurityGroup {
@@ -129,12 +148,6 @@ function checkEC2Instance {
   fi
 }
 
-function awsTest {
-  INSTANCE_ID="i-0768e3d5ba00897af"
-  checkEC2Instance
-  ec2TaskComplete
-}
-
 function awsTask {
     setAWSPresets
     askEC2Name
@@ -152,13 +165,95 @@ function awsTask {
     ec2TaskComplete
 }
 
+function moveToBin {
+    mv statup /usr/local/bin/statup
+}
+
+function installSystemCTL {
+FILE=statup.service
+cat > $FILE <<- EOM
+[Unit]
+Description=Statup Server
+After=network.target
+After=systemd-user-sessions.service
+After=network-online.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/local/bin/statup
+
+[Install]
+WantedBy=multi-user.target
+EOM
+echo "Installing systemctl service file to: /etc/systemd/system/$FILE"
+mv $FILE /etc/systemd/system/$FILE
+systemctl daemon-reload
+systemctl enable statup.service
+systemctl start statup
+echo "Statup has been installed to SystemCTL and will start on boot"
+}
+
 function localTask {
-     echo "installing locally"
+     getOS
+     getArch
+     get_latest_release
+     GIT_DOWNLOAD="https://github.com/$DOCKER_IMG/releases/download/$STATUP_VERSION/statup-$OS-$ARCH.tar.gz"
+     echo "Downloading Statup $STATUP_VERSION from $GIT_DOWNLOAD"
+     curl -L --silent $GIT_DOWNLOAD | tar xz
+     echo "Download complete"
+     echo "Try Statup by running 'statup version'!"
+     askInstallGlobal
+     if [ $MOVEBIN == "y" ]; then
+        moveToBin
+        echo "Statup can now be ran anywhere with command 'statup'"
+        echo "Install location: /usr/local/bin/statup"
+        if [ $OS == "linux" ]; then
+          askInstallSystemCTL
+          if [ $SYSTEMCTL == "y" ]; then
+            installSystemCTL
+          fi
+        fi
+    fi
 }
 
 function dockerTask {
      echo "Starting Statup Docker container on port $DOCKER_PORT"
      $DOCKER_CLI run -d -p $DOCKER_PORT:8080 $DOCKER_IMG
+}
+
+function getArch {
+    MACHINE_TYPE=`uname -m`
+    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+      ARCH="x64"
+    else
+      ARCH="x32"
+    fi
+}
+
+function getOS {
+    OS="`uname`"
+    case $OS in
+      'Linux')
+        OS='linux'
+        alias ls='ls --color=auto'
+        ;;
+      'FreeBSD')
+        OS='freebsd'
+        alias ls='ls -G'
+        ;;
+      'WindowsNT')
+        OS='windows'
+        ;;
+      'Darwin')
+        OS='osx'
+        ;;
+      'SunOS')
+        OS='solaris'
+        ;;
+      'AIX') ;;
+      *) ;;
+    esac
 }
 
 if [ "$BASH_SOURCE" == "$0" ]; then
@@ -196,9 +291,12 @@ if [ "$BASH_SOURCE" == "$0" ]; then
                 VERBOSE=true
                 ;;
             -v|--version)
-                echo ${VERSION}
-                usage
-                exit 2
+                require jq
+                get_latest_release
+                echo "Statup Latest: $STATUP_VERSION"
+                echo "Statuper Tool: v$VERSION"
+                getOS
+                echo $OS
                 exit 0
                 ;;
             *)
@@ -218,12 +316,6 @@ if [ "$BASH_SOURCE" == "$0" ]; then
                 awsTask
                 exit 0
                 ;;
-            awstest)
-                require aws
-                require jq
-                awsTest
-                exit 0
-                ;;
             docker)
                 require docker
                 dockerTask
@@ -234,7 +326,10 @@ if [ "$BASH_SOURCE" == "$0" ]; then
                 dockerComposeTask
                 exit 0
                 ;;
-            local)
+            install)
+                require jq
+                require curl
+                require tar
                 localTask
                 shift # past argument
                 ;;
