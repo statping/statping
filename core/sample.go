@@ -89,14 +89,14 @@ func InsertSampleData() error {
 		Interval:    300,
 		GracePeriod: 300,
 	})
-	checkin1.Create()
+	checkin1.Update()
 
 	checkin2 := ReturnCheckin(&types.Checkin{
 		Service:     s2.Id,
 		Interval:    900,
 		GracePeriod: 300,
 	})
-	checkin2.Create()
+	checkin2.Update()
 
 	checkTime := time.Now().Add(-24 * time.Hour)
 	for i := 0; i <= 60; i++ {

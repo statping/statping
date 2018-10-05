@@ -53,7 +53,6 @@ func Router() *mux.Router {
 	r.Handle("/dashboard", http.HandlerFunc(dashboardHandler)).Methods("GET")
 	r.Handle("/dashboard", http.HandlerFunc(loginHandler)).Methods("POST")
 	r.Handle("/logout", http.HandlerFunc(logoutHandler))
-	r.Handle("/checkin/{id}", http.HandlerFunc(checkinUpdateHandler))
 	r.Handle("/plugins/download/{name}", http.HandlerFunc(pluginsDownloadHandler))
 	r.Handle("/plugins/{name}/save", http.HandlerFunc(pluginSavedHandler)).Methods("POST")
 	r.Handle("/help", http.HandlerFunc(helpHandler))
@@ -87,6 +86,7 @@ func Router() *mux.Router {
 	r.Handle("/service/{id}/delete", http.HandlerFunc(servicesDeleteHandler))
 	r.Handle("/service/{id}/delete_failures", http.HandlerFunc(servicesDeleteFailuresHandler)).Methods("GET")
 	r.Handle("/service/{id}/checkin", http.HandlerFunc(checkinCreateUpdateHandler)).Methods("POST")
+	r.Handle("/checkin/{id}", http.HandlerFunc(checkinUpdateHandler))
 
 	// API SERVICE Routes
 	r.Handle("/api/services", http.HandlerFunc(apiAllServicesHandler)).Methods("GET")

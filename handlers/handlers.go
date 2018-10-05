@@ -141,20 +141,8 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 			return utils.Timestamp(t).Ago()
 		},
 		"Duration": func(t time.Duration) string {
-			var out string
 			duration, _ := time.ParseDuration(fmt.Sprintf("%vs", t.Seconds()))
-			if duration.Minutes() < 1 {
-				out = fmt.Sprintf("%0.0f second", duration.Seconds())
-				if duration.Seconds() >= 2 {
-					out += "s"
-				}
-			} else {
-				out = fmt.Sprintf("%0.0f minute", duration.Minutes())
-				if duration.Minutes() >= 2 {
-					out += "s"
-				}
-			}
-			return out
+			return utils.FormatDuration(duration)
 		},
 		"ToUnix": func(t time.Time) int64 {
 			return t.UTC().Unix()

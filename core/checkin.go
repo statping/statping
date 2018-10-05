@@ -20,6 +20,7 @@ import (
 	"github.com/ararog/timeago"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
+	"github.com/jinzhu/gorm"
 	"time"
 )
 
@@ -49,17 +50,17 @@ func SelectCheckin(api string) *Checkin {
 	return &checkin
 }
 
-func (u Checkin) Period() time.Duration {
+func (u *Checkin) Period() time.Duration {
 	duration, _ := time.ParseDuration(fmt.Sprintf("%vs", u.Interval))
 	return duration
 }
 
-func (u Checkin) Grace() time.Duration {
+func (u *Checkin) Grace() time.Duration {
 	duration, _ := time.ParseDuration(fmt.Sprintf("%vs", u.GracePeriod))
 	return duration
 }
 
-func (u Checkin) Expected() time.Duration {
+func (u *Checkin) Expected() time.Duration {
 	last := u.Last().CreatedAt
 	now := time.Now()
 	lastDir := now.Sub(last)
@@ -67,7 +68,7 @@ func (u Checkin) Expected() time.Duration {
 	return sub
 }
 
-func (u Checkin) Last() CheckinHit {
+func (u *Checkin) Last() CheckinHit {
 	var hit CheckinHit
 	checkinHitsDB().Where("checkin = ?", u.Id).Last(&hit)
 	return hit
@@ -79,13 +80,18 @@ func (u *Checkin) Hits() []CheckinHit {
 	return checkins
 }
 
-func (u *Checkin) Create() (int64, error) {
-	if u.CreatedAt.IsZero() {
-		u.CreatedAt = time.Now()
+func (u *Checkin) Update() (int64, error) {
+	fmt.Println("updating: ", u.Id, u.ApiKey)
+	exists := checkinDB().Find(&u).RecordNotFound()
+	var row *gorm.DB
+	if !exists {
+		row = checkinDB().Update(&u)
+	} else {
+		u.ApiKey = utils.RandomString(7)
+		row = checkinDB().Create(&u)
 	}
-	u.ApiKey = utils.NewSHA1Hash(7)
-	row := checkinDB().Create(u)
-	if row.Error == nil {
+	fmt.Println("found: ", exists, u.Id, u.Service, u.Interval, u.GracePeriod, u.ApiKey)
+	if row.Error != nil {
 		utils.Log(2, row.Error)
 		return 0, row.Error
 	}

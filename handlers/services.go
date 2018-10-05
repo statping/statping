@@ -261,15 +261,12 @@ func checkinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	vars := mux.Vars(r)
 	service := core.SelectService(utils.StringInt(vars["id"]))
-
+	checkin := service.Checkin()
 	interval := utils.StringInt(r.PostForm.Get("interval"))
 	grace := utils.StringInt(r.PostForm.Get("grace"))
-	checkin := core.ReturnCheckin(&types.Checkin{
-		Service:     service.Id,
-		Interval:    interval,
-		GracePeriod: grace,
-	})
-	checkin.Create()
+	checkin.Interval = interval
+	checkin.GracePeriod = grace
+	checkin.Update()
 	executeResponse(w, r, "service.html", service, fmt.Sprintf("/service/%v", service.Id))
 }
 

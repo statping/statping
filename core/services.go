@@ -49,10 +49,10 @@ func SelectService(id int64) *Service {
 	return nil
 }
 
-func (s *Service) Checkin() Checkin {
-	var hits Checkin
-	servicesDB().Where("service = ?", s.Id).First(&hits)
-	return hits
+func (s *Service) Checkin() *Checkin {
+	var checkin types.Checkin
+	checkinDB().Find(&checkin, "service = ?", s.Id)
+	return &Checkin{&checkin}
 }
 
 // SelectAllServices returns a slice of *core.Service to be store on []*core.Services, should only be called once on startup.

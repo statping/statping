@@ -126,27 +126,37 @@ func (u *Hit) BeforeCreate() (err error) {
 }
 
 func (u *Failure) BeforeCreate() (err error) {
-	u.CreatedAt = time.Now().UTC()
+	if u.CreatedAt.IsZero() {
+		u.CreatedAt = time.Now().UTC()
+	}
 	return
 }
 
 func (u *User) BeforeCreate() (err error) {
-	u.CreatedAt = time.Now().UTC()
+	if u.CreatedAt.IsZero() {
+		u.CreatedAt = time.Now().UTC()
+	}
 	return
 }
 
 func (u *Service) BeforeCreate() (err error) {
-	u.CreatedAt = time.Now().UTC()
+	if u.CreatedAt.IsZero() {
+		u.CreatedAt = time.Now().UTC()
+	}
 	return
 }
 
 func (u *Checkin) BeforeCreate() (err error) {
-	u.CreatedAt = time.Now().UTC()
+	if u.CreatedAt.IsZero() {
+		u.CreatedAt = time.Now().UTC()
+	}
 	return
 }
 
 func (u *CheckinHit) BeforeCreate() (err error) {
-	u.CreatedAt = time.Now().UTC()
+	if u.CreatedAt.IsZero() {
+		u.CreatedAt = time.Now().UTC()
+	}
 	return
 }
 
