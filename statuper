@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-VERSION="3.4.0"
+VERSION="0.1"
 VERBOSE=false
 SSLOPTION=false
 AWSREGION="us-west-2"
-US_W_1="ami-7be8a103"
+US_W_1="ami-6d1ffd0e"
 US_W_2="ami-7be8a103"
-US_E_1="ami-7be8a103"
-US_E_2="ami-7be8a103"
+US_E_1="ami-b3be85cc"
+US_E_2="ami-cc7a40a9"
+AMI_IMAGE=$US_W_2
 AWS_CLI=$(which aws)
 DOCKER_CLI=$(which docker)
 DOCKER_IMG="hunterlong/statup"
@@ -19,16 +20,18 @@ cat <<EOM
 A simple shell script that will help you install Statup on your local machine, AWS, or Docker.
 
 Commands:
+    install             Install statup to your local system
     aws                 Create a new EC2 instance running Statup
     docker              Start the latest Statup Docker image
     docker-compose      Create Statup with a Postgres database
+    version             Return the latest version of Statup
 
 Available Flags:
     -k | --aws-access-key        AWS Access Key ID. May also be set as environment variable AWS_ACCESS_KEY_ID
     -s | --aws-secret-key        AWS Secret Access Key. May also be set as environment variable AWS_SECRET_ACCESS_KEY
     -r | --region                AWS Region Name. May also be set as environment variable AWS_DEFAULT_REGION
-    -v | --version               Print out the current version of this tool
     -x | --verbose               Verbose output
+
 Visit the github repo at: https://github.com/hunterlong/statup
 EOM
     exit 3
@@ -241,6 +244,10 @@ function localTask {
     fi
 }
 
+function uninstallTask {
+    rm -f /usr/local/bin/statup
+}
+
 # start the Statup docker image
 function dockerTask {
      echo "Starting Statup Docker container on port $DOCKER_PORT"
@@ -283,6 +290,13 @@ function getOS {
     esac
 }
 
+function echoVersion {
+    require jq
+    get_latest_release
+    echo "Statup Latest: $STATUP_VERSION"
+    echo "Statuper Tool: v$VERSION"
+}
+
 # main CLI entrypoint
 if [ "$BASH_SOURCE" == "$0" ]; then
     set -o errexit
@@ -318,15 +332,6 @@ if [ "$BASH_SOURCE" == "$0" ]; then
             -x|--verbose)
                 VERBOSE=true
                 ;;
-            -v|--version)
-                require jq
-                get_latest_release
-                echo "Statup Latest: $STATUP_VERSION"
-                echo "Statuper Tool: v$VERSION"
-                getOS
-                echo $OS
-                exit 0
-                ;;
             *)
             ;;
         esac
@@ -360,6 +365,14 @@ if [ "$BASH_SOURCE" == "$0" ]; then
                 require tar
                 localTask
                 shift # past argument
+                ;;
+            uninstall)
+                uninstallTask
+                shift # past argument
+                ;;
+            version|v)
+                echoVersion
+                exit 0
                 ;;
                 *)
             ;;

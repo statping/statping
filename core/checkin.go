@@ -103,7 +103,7 @@ func (u *CheckinHit) Create() (int64, error) {
 		u.CreatedAt = time.Now()
 	}
 	row := checkinHitsDB().Create(u)
-	if row.Error == nil {
+	if row.Error != nil {
 		utils.Log(2, row.Error)
 		return 0, row.Error
 	}
@@ -119,7 +119,7 @@ func SelectCheckinApi(api string) *Checkin {
 func (c *Checkin) CreateHit() (int64, error) {
 	c.CreatedAt = time.Now()
 	row := checkinDB().Create(c)
-	if row.Error == nil {
+	if row.Error != nil {
 		utils.Log(2, row.Error)
 		return 0, row.Error
 	}
