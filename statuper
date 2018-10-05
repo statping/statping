@@ -50,6 +50,12 @@ function require() {
     }
 }
 
+# Get the latest release from github
+get_latest_release() {
+  STATUP_VERSION=$(curl --silent "https://api.github.com/repos/$DOCKER_IMG/releases/latest" | jq -r .tag_name)
+}
+
+# auto set AWS environment variables
 function setAWSPresets {
     if [ -z ${AWS_DEFAULT_REGION+x} ];
       then unset AWS_DEFAULT_REGION
@@ -63,6 +69,7 @@ function setAWSPresets {
     fi
 }
 
+# ask the user to inser their AWS region
 function awsAskRegion {
     if [ -z ${AWS_DEFAULT_REGION+x} ]; then
       read -p "Enter the AWS Region: "  AWSREGION
@@ -71,42 +78,47 @@ function awsAskRegion {
     fi
 }
 
-get_latest_release() {
-  STATUP_VERSION=$(curl --silent "https://api.github.com/repos/$DOCKER_IMG/releases/latest" | jq -r .tag_name)
-}
-
+# ask for the EC2 instance name
 function askEC2Name {
     read -p "Enter the Name for EC2 Instance: "  SERVERNAME
 }
 
+# ask user if they want to use SSL
 function askSSLOption {
     read -p "Do you want to install a SSL certificate? (y/N):"  SSLOPTION
 }
 
+# ask user for domain for SSL
 function askSSLDomain {
     read -p "Enter the Domain to attach the SSL certificate on: "  SSLDOMAIN
 }
 
+# ask user for email for Letencrypt
 function askSSLEmail {
     read -p "Enter the Email for Lets Encrypt: "  SSLEMAIL
 }
 
+# ask user for their EC2 Keypair for instance
 function askEC2KeyName {
     read -p "Enter the Keypair for EC2 Instance: "  EC2KEYNAME
 }
 
+# ask user to create a new AWS security group namne
 function askSecurityName {
     read -p "Enter a name for the new Security Group: "  EC2SECGROUP
 }
 
+# ask user if they want to install statup to the bin folder
 function askInstallGlobal {
     read -p "Do you want to move Statup to the bin folder? (y/N): "  MOVEBIN
 }
 
+# ask user if they want statup to start on boot
 function askInstallSystemCTL {
     read -p "Do you want to auto start Statup on boot? (y/N): "  SYSTEMCTL
 }
 
+# Task to create a new AWS security group
 function awsSecurityGroup {
   echo "Running task: Creating Security Group";
   GROUPID=`$AWS_ECS ec2 create-security-group --group-name "$EC2SECGROUP" --description "Statup HTTP Server on port 80 and 443" | jq -r .GroupId`
@@ -114,6 +126,7 @@ function awsSecurityGroup {
   awsAuthSecurityGroup
 }
 
+# Task to open ports 80 and 443 for the security group
 function awsAuthSecurityGroup {
   $AWS_ECS ec2 authorize-security-group-ingress --group-id $GROUPID --protocol tcp --port 80 --cidr 0.0.0.0/0
   $AWS_ECS ec2 authorize-security-group-ingress --group-id $GROUPID --protocol tcp --port 443 --cidr 0.0.0.0/0
@@ -122,11 +135,12 @@ function awsAuthSecurityGroup {
 
 function awsCreateEC2 {
   NEW_SRV=`$AWS_ECS ec2 run-instances --image-id $US_W_2 --count 1 --instance-type t2.nano --key-name $EC2KEYNAME --security-group-ids $GROUPID`
-  INSTANCE_ID=`echo $NEW_SRV | jq .Instances[0].InstanceId`
-  EC2_STATUS=`echo $NEW_SRV | .Instances[0].StateReason.Message`
+  INSTANCE_ID=$(echo "${NEW_SRV}" | jq -r .Instances[0].InstanceId)
+  EC2_STATUS=$(echo "${NEW_SRV}" | jq -r .Instances[0].StateReason.Message)
   echo "New EC2 instance created: $INSTANCE_ID with status $EC2_STATUS";
 }
 
+# task to created a new EC2 instance with statup image
 function ec2TaskComplete {
   echo "New EC2 instance is ready! $INSTANCE_ID with status $EC2_STATUS";
   echo "Instance ID: $INSTANCE_ID with status $EC2_STATUS";
@@ -136,18 +150,20 @@ function ec2TaskComplete {
   fi
 }
 
+# function to check the EC2 instance
 function checkEC2Instance {
   SRV_INFO=`$AWS_ECS ec2 describe-instances --instance-ids $INSTANCE_ID`
-  EC2_STATUS=$(echo "${SRV_INFO}" | jq .Reservations[0].Instances[0].State.Name)
-  EC2_DNS=$(echo "${SRV_INFO}" | jq .Reservations[0].Instances[0].PublicDnsName)
-  EC2_STATUS=$(echo "${SRV_INFO}" | jq .Reservations[0].Instances[0].State.Name)
+  EC2_STATUS=$(echo "${SRV_INFO}" | jq -r .Reservations[0].Instances[0].State.Name)
+  EC2_DNS=$(echo "${SRV_INFO}" | jq -r .Reservations[0].Instances[0].PublicDnsName)
+  EC2_STATUS=$(echo "${SRV_INFO}" | jq -r .Reservations[0].Instances[0].State.Name)
   if [ $EC2_STATUS == '"pending"' ]; then
     echo "EC2 instance is still being created: $INSTANCE_ID";
-    sleep 3
+    sleep 2
     checkEC2Instance
   fi
 }
 
+# function to create the Statup EC2 instance
 function awsTask {
     setAWSPresets
     askEC2Name
@@ -165,10 +181,12 @@ function awsTask {
     ec2TaskComplete
 }
 
+# function to move the statup binary to the bin folder
 function moveToBin {
     mv statup /usr/local/bin/statup
 }
 
+# function to install a systemctl service to the local system
 function installSystemCTL {
 FILE=statup.service
 cat > $FILE <<- EOM
@@ -194,7 +212,8 @@ systemctl start statup
 echo "Statup has been installed to SystemCTL and will start on boot"
 }
 
-function localTask {
+
+function downloadBin {
      getOS
      getArch
      get_latest_release
@@ -202,6 +221,11 @@ function localTask {
      echo "Downloading Statup $STATUP_VERSION from $GIT_DOWNLOAD"
      curl -L --silent $GIT_DOWNLOAD | tar xz
      echo "Download complete"
+}
+
+# install statup locally from github
+function localTask {
+     downloadBin
      echo "Try Statup by running 'statup version'!"
      askInstallGlobal
      if [ $MOVEBIN == "y" ]; then
@@ -217,11 +241,13 @@ function localTask {
     fi
 }
 
+# start the Statup docker image
 function dockerTask {
      echo "Starting Statup Docker container on port $DOCKER_PORT"
      $DOCKER_CLI run -d -p $DOCKER_PORT:8080 $DOCKER_IMG
 }
 
+# get 64x or 32 machine arch
 function getArch {
     MACHINE_TYPE=`uname -m`
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
@@ -231,6 +257,7 @@ function getArch {
     fi
 }
 
+# get the users operating system
 function getOS {
     OS="`uname`"
     case $OS in
@@ -256,6 +283,7 @@ function getOS {
     esac
 }
 
+# main CLI entrypoint
 if [ "$BASH_SOURCE" == "$0" ]; then
     set -o errexit
     set -o pipefail
