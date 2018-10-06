@@ -33,8 +33,25 @@ func TestInitLogs(t *testing.T) {
 	assert.FileExists(t, "../logs/statup.log")
 }
 
+func TestFileExists(t *testing.T) {
+	assert.True(t, FileExists("../logs/statup.log"))
+}
+
 func TestDir(t *testing.T) {
 	assert.Contains(t, Directory, "github.com/hunterlong/statup")
+}
+
+func TestCommand(t *testing.T) {
+	in, out, err := Command("pwd")
+	assert.Nil(t, err)
+	assert.Contains(t, in, "statup")
+	assert.Empty(t, out)
+}
+
+func TestDurationReadable(t *testing.T) {
+	dur, _ := time.ParseDuration("1505s")
+	readable := DurationReadable(dur)
+	assert.Equal(t, "25 minutes", readable)
 }
 
 func TestLog(t *testing.T) {
@@ -44,6 +61,15 @@ func TestLog(t *testing.T) {
 	assert.Nil(t, Log(3, errors.New("this is a 3 level error")))
 	assert.Nil(t, Log(4, errors.New("this is a 4 level error")))
 	assert.Nil(t, Log(5, errors.New("this is a 5 level error")))
+}
+
+func TestFormatDuration(t *testing.T) {
+	dur, _ := time.ParseDuration("158s")
+	formatted := FormatDuration(dur)
+	assert.Equal(t, "3 minutes", formatted)
+	dur, _ = time.ParseDuration("-65s")
+	formatted = FormatDuration(dur)
+	assert.Equal(t, "1 minute", formatted)
 }
 
 func TestDeleteFile(t *testing.T) {
@@ -100,10 +126,6 @@ func TestNewSHA1Hash(t *testing.T) {
 
 func TestRandomString(t *testing.T) {
 	assert.NotEmpty(t, RandomString(5))
-}
-
-func TestSha256(t *testing.T) {
-	assert.Equal(t, "dc724af18fbdd4e59189f5fe768a5f8311527050", Sha256([]byte("testing")))
 }
 
 func TestDeleteDirectory(t *testing.T) {

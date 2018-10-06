@@ -42,6 +42,7 @@ func Assets() {
 	TmplBox = rice.MustFindBox("tmpl")
 }
 
+// HelpMarkdown will return the Markdown of help.md into HTML
 func HelpMarkdown() string {
 	helpSrc, err := TmplBox.Bytes("help.md")
 	if err != nil {

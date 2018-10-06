@@ -380,8 +380,8 @@ func isEnabled(n interface{}) bool {
 }
 
 // inLimits will return true if the notifier is within sending limits
-func inLimits(n Notifier) bool {
-	notifier := n.Select()
+func inLimits(n interface{}) bool {
+	notifier := n.(Notifier).Select()
 	ok, _ := notifier.WithinLimits()
 	return ok
 }
