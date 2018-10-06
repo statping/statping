@@ -25,7 +25,7 @@ import (
 
 var (
 	DISCORD_URL    = os.Getenv("DISCORD_URL")
-	discordMessage = `{"content": "The Discord notifier on Statup has been tested!"}`
+	discordMessage = `{"content": "The discord notifier on Statup has been tested!"}`
 )
 
 func init() {
@@ -36,12 +36,12 @@ func init() {
 func TestDiscordNotifier(t *testing.T) {
 	t.Parallel()
 	if DISCORD_URL == "" {
-		t.Log("Discord notifier testing skipped, missing DISCORD_URL environment variable")
+		t.Log("discord notifier testing skipped, missing DISCORD_URL environment variable")
 		t.SkipNow()
 	}
 	currentCount = CountNotifiers()
 
-	t.Run("Load Discord", func(t *testing.T) {
+	t.Run("Load discord", func(t *testing.T) {
 		discorder.Host = DISCORD_URL
 		discorder.Delay = time.Duration(100 * time.Millisecond)
 		err := notifier.AddNotifier(discorder)
@@ -50,49 +50,49 @@ func TestDiscordNotifier(t *testing.T) {
 		assert.Equal(t, DISCORD_URL, discorder.Host)
 	})
 
-	t.Run("Load Discord Notifier", func(t *testing.T) {
+	t.Run("Load discord Notifier", func(t *testing.T) {
 		notifier.Load()
 	})
 
-	t.Run("Discord Notifier Tester", func(t *testing.T) {
+	t.Run("discord Notifier Tester", func(t *testing.T) {
 		assert.True(t, discorder.CanTest())
 	})
 
-	t.Run("Discord Within Limits", func(t *testing.T) {
+	t.Run("discord Within Limits", func(t *testing.T) {
 		ok, err := discorder.WithinLimits()
 		assert.Nil(t, err)
 		assert.True(t, ok)
 	})
 
-	t.Run("Discord OnFailure", func(t *testing.T) {
+	t.Run("discord OnFailure", func(t *testing.T) {
 		discorder.OnFailure(TestService, TestFailure)
 		assert.Len(t, discorder.Queue, 1)
 	})
 
-	t.Run("Discord Check Offline", func(t *testing.T) {
+	t.Run("discord Check Offline", func(t *testing.T) {
 		assert.False(t, discorder.Online)
 	})
 
-	t.Run("Discord OnSuccess", func(t *testing.T) {
+	t.Run("discord OnSuccess", func(t *testing.T) {
 		discorder.OnSuccess(TestService)
 		assert.Len(t, discorder.Queue, 2)
 	})
 
-	t.Run("Discord Check Back Online", func(t *testing.T) {
+	t.Run("discord Check Back Online", func(t *testing.T) {
 		assert.True(t, discorder.Online)
 	})
 
-	t.Run("Discord OnSuccess Again", func(t *testing.T) {
+	t.Run("discord OnSuccess Again", func(t *testing.T) {
 		discorder.OnSuccess(TestService)
 		assert.Len(t, discorder.Queue, 2)
 	})
 
-	t.Run("Discord Send", func(t *testing.T) {
+	t.Run("discord Send", func(t *testing.T) {
 		err := discorder.Send(discordMessage)
 		assert.Nil(t, err)
 	})
 
-	t.Run("Discord Queue", func(t *testing.T) {
+	t.Run("discord Queue", func(t *testing.T) {
 		go notifier.Queue(discorder)
 		time.Sleep(1 * time.Second)
 		assert.Equal(t, DISCORD_URL, discorder.Host)

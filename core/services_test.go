@@ -394,6 +394,6 @@ func TestSelectCheckinMethods(t *testing.T) {
 	lastHit := first.Last()
 	assert.Equal(t, float64(10), first.Period().Seconds())
 	assert.Equal(t, float64(5), first.Grace().Seconds())
-	assert.Equal(t, time.Now().UTC().Day(), lastHit.CreatedAt.Day())
+	assert.Equal(t, time.Now().UTC().Day(), lastHit.CreatedAt.UTC().Day())
 	assert.Equal(t, "Just now", lastHit.Ago())
 }

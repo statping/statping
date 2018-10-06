@@ -33,7 +33,7 @@ const (
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Statup Email</title>
+    <title>Statup email</title>
 </head>
 <body style="-webkit-text-size-adjust: none; box-sizing: border-box; color: #74787E; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; height: 100%; line-height: 1.4; margin: 0; width: 100% !important;" bgcolor="#F2F4F6">
     <style type="text/css">
@@ -107,13 +107,13 @@ var (
 	mailer *mail.Dialer
 )
 
-type Email struct {
+type email struct {
 	*notifier.Notification
 }
 
-var emailer = &Email{&notifier.Notification{
+var emailer = &email{&notifier.Notification{
 	Method:      "email",
-	Title:       "Email",
+	Title:       "email",
 	Description: "Send emails via SMTP when services are online or offline.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
@@ -139,13 +139,13 @@ var emailer = &Email{&notifier.Notification{
 		DbField:     "Port",
 	}, {
 		Type:        "text",
-		Title:       "Outgoing Email Address",
-		Placeholder: "Insert your Outgoing Email Address",
+		Title:       "Outgoing email Address",
+		Placeholder: "Insert your Outgoing email Address",
 		DbField:     "Var1",
 	}, {
 		Type:        "email",
 		Title:       "Send Alerts To",
-		Placeholder: "Email Address",
+		Placeholder: "email Address",
 		DbField:     "Var2",
 	}},
 }}
@@ -158,11 +158,11 @@ func init() {
 }
 
 // Send will send the SMTP email with your authentication It accepts type: *EmailOutgoing
-func (u *Email) Send(msg interface{}) error {
+func (u *email) Send(msg interface{}) error {
 	email := msg.(*EmailOutgoing)
 	err := u.dialSend(email)
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("Email Notifier could not send email: %v", err))
+		utils.Log(3, fmt.Sprintf("email Notifier could not send email: %v", err))
 		return err
 	}
 	return nil
@@ -179,7 +179,7 @@ type EmailOutgoing struct {
 }
 
 // OnFailure will trigger failing service
-func (u *Email) OnFailure(s *types.Service, f *types.Failure) {
+func (u *email) OnFailure(s *types.Service, f *types.Failure) {
 	email := &EmailOutgoing{
 		To:       emailer.GetValue("var2"),
 		Subject:  fmt.Sprintf("Service %v is Failing", s.Name),
@@ -192,7 +192,7 @@ func (u *Email) OnFailure(s *types.Service, f *types.Failure) {
 }
 
 // OnSuccess will trigger successful service
-func (u *Email) OnSuccess(s *types.Service) {
+func (u *email) OnSuccess(s *types.Service) {
 	if !u.Online {
 		email := &EmailOutgoing{
 			To:       emailer.GetValue("var2"),
@@ -206,19 +206,19 @@ func (u *Email) OnSuccess(s *types.Service) {
 	u.Online = true
 }
 
-func (u *Email) Select() *notifier.Notification {
+func (u *email) Select() *notifier.Notification {
 	return u.Notification
 }
 
 // OnSave triggers when this notifier has been saved
-func (u *Email) OnSave() error {
+func (u *email) OnSave() error {
 	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
 	// Do updating stuff here
 	return nil
 }
 
 // OnTest triggers when this notifier has been saved
-func (u *Email) OnTest() error {
+func (u *email) OnTest() error {
 	host := fmt.Sprintf("%v:%v", u.Host, u.Port)
 	dial, err := smtp.Dial(host)
 	if err != nil {
@@ -229,7 +229,7 @@ func (u *Email) OnTest() error {
 	return dial.Auth(auth)
 }
 
-func (u *Email) dialSend(email *EmailOutgoing) error {
+func (u *email) dialSend(email *EmailOutgoing) error {
 	mailer = mail.NewDialer(emailer.Host, emailer.Port, emailer.Username, emailer.Password)
 	mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	emailSource(email)
@@ -239,7 +239,7 @@ func (u *Email) dialSend(email *EmailOutgoing) error {
 	m.SetHeader("Subject", email.Subject)
 	m.SetBody("text/html", email.Source)
 	if err := mailer.DialAndSend(m); err != nil {
-		utils.Log(3, fmt.Sprintf("Email '%v' sent to: %v using the %v template (size: %v) %v", email.Subject, email.To, email.Template, len([]byte(email.Source)), err))
+		utils.Log(3, fmt.Sprintf("email '%v' sent to: %v using the %v template (size: %v) %v", email.Subject, email.To, email.Template, len([]byte(email.Source)), err))
 		return err
 	}
 	return nil

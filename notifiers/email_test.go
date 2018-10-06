@@ -55,7 +55,7 @@ func init() {
 func TestEmailNotifier(t *testing.T) {
 	t.Parallel()
 	if EMAIL_HOST == "" || EMAIL_USER == "" || EMAIL_PASS == "" {
-		t.Log("Email notifier testing skipped, missing EMAIL_ environment variables")
+		t.Log("email notifier testing skipped, missing EMAIL_ environment variables")
 		t.SkipNow()
 	}
 	currentCount = CountNotifiers()
@@ -78,7 +78,7 @@ func TestEmailNotifier(t *testing.T) {
 		}
 	})
 
-	t.Run("Add Email Notifier", func(t *testing.T) {
+	t.Run("Add email Notifier", func(t *testing.T) {
 		err := notifier.AddNotifier(emailer)
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", emailer.Author)
@@ -89,46 +89,46 @@ func TestEmailNotifier(t *testing.T) {
 		notifier.Load()
 	})
 
-	t.Run("Email Within Limits", func(t *testing.T) {
+	t.Run("email Within Limits", func(t *testing.T) {
 		ok, err := emailer.WithinLimits()
 		assert.Nil(t, err)
 		assert.True(t, ok)
 	})
 
-	t.Run("Email Test Source", func(t *testing.T) {
+	t.Run("email Test Source", func(t *testing.T) {
 		emailSource(testEmail)
 		assert.NotEmpty(t, testEmail.Source)
 	})
 
-	t.Run("Email OnFailure", func(t *testing.T) {
+	t.Run("email OnFailure", func(t *testing.T) {
 		emailer.OnFailure(TestService, TestFailure)
 		assert.Len(t, emailer.Queue, 1)
 	})
 
-	t.Run("Email Check Offline", func(t *testing.T) {
+	t.Run("email Check Offline", func(t *testing.T) {
 		assert.False(t, emailer.Online)
 	})
 
-	t.Run("Email OnSuccess", func(t *testing.T) {
+	t.Run("email OnSuccess", func(t *testing.T) {
 		emailer.OnSuccess(TestService)
 		assert.Len(t, emailer.Queue, 2)
 	})
 
-	t.Run("Email Check Back Online", func(t *testing.T) {
+	t.Run("email Check Back Online", func(t *testing.T) {
 		assert.True(t, emailer.Online)
 	})
 
-	t.Run("Email OnSuccess Again", func(t *testing.T) {
+	t.Run("email OnSuccess Again", func(t *testing.T) {
 		emailer.OnSuccess(TestService)
 		assert.Len(t, emailer.Queue, 2)
 	})
 
-	t.Run("Email Send", func(t *testing.T) {
+	t.Run("email Send", func(t *testing.T) {
 		err := emailer.Send(testEmail)
 		assert.Nil(t, err)
 	})
 
-	t.Run("Email Run Queue", func(t *testing.T) {
+	t.Run("email Run Queue", func(t *testing.T) {
 		go notifier.Queue(emailer)
 		time.Sleep(5 * time.Second)
 		assert.Equal(t, EMAIL_HOST, emailer.Host)

@@ -84,9 +84,9 @@ coverage:
 
 # generate documentation for Statup functions
 docs:
-	godoc2md github.com/hunterlong/statup > servers/docs/README.md
-	gocov-html coverage.json > servers/docs/COVERAGE.html
-	revive -formatter stylish > servers/docs/LINT.md
+	godoc2md github.com/hunterlong/statup > dev/README.md
+	gocov-html coverage.json > dev/COVERAGE.html
+	revive -formatter stylish > dev/LINT.md
 
 #
 #    Build binary for Statup
@@ -191,7 +191,7 @@ dep:
 	dep ensure -vendor-only
 
 # install all required golang dependecies
-dev-deps: dep
+dev-deps:
 	$(GOGET) -u github.com/jinzhu/gorm/...
 	$(GOGET) github.com/stretchr/testify/assert
 	$(GOGET) golang.org/x/tools/cmd/cover
