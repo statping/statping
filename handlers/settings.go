@@ -85,7 +85,7 @@ func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
 	source.SaveAsset([]byte(variables), utils.Directory, "scss/variables.scss")
 	source.SaveAsset([]byte(mobile), utils.Directory, "scss/mobile.scss")
 	source.CompileSASS(utils.Directory)
-	ResetRouter()
+	resetRouter()
 	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
@@ -105,7 +105,7 @@ func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		source.CopyToPublic(source.CssBox, dir+"/assets/css", "base.css")
 		utils.Log(2, "Default 'base.css' was insert because SASS did not work.")
 	}
-	ResetRouter()
+	resetRouter()
 	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
@@ -115,7 +115,7 @@ func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	source.DeleteAllAssets(utils.Directory)
-	ResetRouter()
+	resetRouter()
 	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 

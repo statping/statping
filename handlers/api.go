@@ -26,7 +26,7 @@ import (
 	"time"
 )
 
-type ApiResponse struct {
+type apiResponse struct {
 	Status string `json:"status"`
 	Object string `json:"type"`
 	Id     int64  `json:"id"`
@@ -192,7 +192,7 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	output := ApiResponse{
+	output := apiResponse{
 		Object: "service",
 		Method: "delete",
 		Id:     service.Id,
@@ -274,7 +274,7 @@ func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	output := ApiResponse{
+	output := apiResponse{
 		Object: "user",
 		Method: "delete",
 		Id:     user.Id,
@@ -312,7 +312,7 @@ func apiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	output := ApiResponse{
+	output := apiResponse{
 		Object: "user",
 		Method: "create",
 		Id:     uId,

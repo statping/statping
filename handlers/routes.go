@@ -114,16 +114,7 @@ func Router() *mux.Router {
 	return r
 }
 
-func ReturnRouter() *mux.Router {
-	return router
-}
-
-func UpdateRouter(routes *mux.Router) {
-	router = routes
-	httpServer.Handler = router
-}
-
-func ResetRouter() {
+func resetRouter() {
 	router = Router()
 	httpServer.Handler = router
 }
@@ -131,8 +122,8 @@ func ResetRouter() {
 func resetCookies() {
 	if core.CoreApp != nil {
 		cookie := fmt.Sprintf("%v_%v", core.CoreApp.ApiSecret, time.Now().Nanosecond())
-		Store = sessions.NewCookieStore([]byte(cookie))
+		sessionStore = sessions.NewCookieStore([]byte(cookie))
 	} else {
-		Store = sessions.NewCookieStore([]byte("secretinfo"))
+		sessionStore = sessions.NewCookieStore([]byte("secretinfo"))
 	}
 }

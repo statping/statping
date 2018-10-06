@@ -31,12 +31,12 @@ import (
 )
 
 const (
-	COOKIE_KEY = "statup_auth"
+	cookieKey = "statup_auth"
 )
 
 var (
-	Store      *sessions.CookieStore
-	httpServer *http.Server
+	sessionStore *sessions.CookieStore
+	httpServer   *http.Server
 )
 
 // RunHTTPServer will start a HTTP server on a specific IP and port
@@ -71,10 +71,10 @@ func IsAuthenticated(r *http.Request) bool {
 	if core.CoreApp == nil {
 		return false
 	}
-	if Store == nil {
+	if sessionStore == nil {
 		return false
 	}
-	session, err := Store.Get(r, COOKIE_KEY)
+	session, err := sessionStore.Get(r, cookieKey)
 	if err != nil {
 		return false
 	}

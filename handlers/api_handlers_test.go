@@ -159,7 +159,7 @@ func TestApiDeleteServiceHandler(t *testing.T) {
 	rr, err := httpRequestAPI(t, "DELETE", "/api/services/1", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
-	var obj ApiResponse
+	var obj apiResponse
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
 	assert.Equal(t, "delete", obj.Method)
@@ -186,7 +186,7 @@ func TestApiCreateUserHandler(t *testing.T) {
 	rr, err := httpRequestAPI(t, "POST", "/api/users", strings.NewReader(data))
 	assert.Nil(t, err)
 	body := rr.Body.String()
-	var obj ApiResponse
+	var obj apiResponse
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, "create", obj.Method)
@@ -224,7 +224,7 @@ func TestApiDeleteUserHandler(t *testing.T) {
 	rr, err := httpRequestAPI(t, "DELETE", "/api/users/1", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
-	var obj ApiResponse
+	var obj apiResponse
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
 	assert.Equal(t, "delete", obj.Method)
