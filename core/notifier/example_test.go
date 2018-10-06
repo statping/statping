@@ -227,6 +227,32 @@ func ExampleNotification_OnSuccess() {
 	// Output: 1
 }
 
+// Add a new message into the queue OnSuccess
+func ExampleOnSuccess() {
+	msg := fmt.Sprintf("received a count trigger for service: %v\n", service.Name)
+	example.AddQueue(msg)
+}
+
+// Add a new message into the queue OnFailure
+func ExampleOnFailure() {
+	msg := fmt.Sprintf("received a failing service: %v\n", service.Name)
+	example.AddQueue(msg)
+}
+
+// OnTest allows your notifier to be testable
+func ExampleOnTest() {
+	err := example.OnTest()
+	fmt.Print(err)
+	// Output <nil>
+}
+
+// Implement the Test interface to give your notifier testing abilities
+func ExampleNotification_CanTest() {
+	testable := example.CanTest()
+	fmt.Print(testable)
+	// Output: false
+}
+
 // Add any type of interface to the AddQueue function to be ran in the queue
 func ExampleNotification_AddQueue() {
 	msg := fmt.Sprintf("this is a failing message as a string passing into AddQueue function")
