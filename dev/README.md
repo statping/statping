@@ -1391,26 +1391,6 @@ Update will update the user's record in database
 
 
 
-> cmd
-Package main for building the Statup CLI binary application. This package
-connects to all the other packages to make a runnable binary for multiple
-operating system.
-
-To build Statup from source, run the follow command in the root directory:
-// go build -o statup ./cmd
-
-Remember that you'll need to compile the static assets using Rice:
-// cd source && rice embed-go
-
-More info on: <a href="https://github.com/hunterlong/statup">https://github.com/hunterlong/statup</a>
-
-
-
-
-
-
-
-
 # handlers
 `import "github.com/hunterlong/statup/handlers"`
 
@@ -1533,11 +1513,286 @@ and learn how to create your own custom notifier.
 
 
 
+# plugin
+`import "github.com/hunterlong/statup/plugin"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
+Package plugin contains the interfaces to build your own Golang Plugin that will receive triggers on Statup events.
+
+
+
+
+## <a name="pkg-index">Index</a>
+* [Variables](#pkg-variables)
+* [func SetDatabase(database *gorm.DB)](#SetDatabase)
+* [type AdvancedNotifier](#AdvancedNotifier)
+* [type Database](#Database)
+* [type Databaser](#Databaser)
+* [type Info](#Info)
+* [type Notifier](#Notifier)
+* [type Plugin](#Plugin)
+* [type PluginDatabase](#PluginDatabase)
+* [type PluginInfo](#PluginInfo)
+  * [func (p *PluginInfo) Form() string](#PluginInfo.Form)
+* [type PluginObject](#PluginObject)
+  * [func Add(p Pluginer) *PluginObject](#Add)
+  * [func (p *PluginObject) AddRoute(s string, i string, f http.HandlerFunc)](#PluginObject.AddRoute)
+* [type Pluginer](#Pluginer)
+* [type Router](#Router)
+* [type Routing](#Routing)
+
+
+#### <a name="pkg-files">Package files</a>
+[doc.go](https://github.com/hunterlong/statup/tree/master/plugin/doc.go) [main.go](https://github.com/hunterlong/statup/tree/master/plugin/main.go) 
+
+
+
+## <a name="pkg-variables">Variables</a>
+``` go
+var (
+    AllPlugins []*PluginObject
+)
+```
+``` go
+var (
+    DB *gorm.DB
+)
+```
+
+
+## <a name="SetDatabase">func</a> [SetDatabase](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1991:2026#L107)
+``` go
+func SetDatabase(database *gorm.DB)
+```
+
+
+
+## <a name="AdvancedNotifier">type</a> [AdvancedNotifier](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1440:1583#L67)
+``` go
+type AdvancedNotifier interface {
+    notifier.Notifier
+    notifier.BasicEvents
+    notifier.UserEvents
+    notifier.CoreEvents
+    notifier.NotifierEvents
+}
+```
+
+
+
+
+
+
+
+
+
+## <a name="Database">type</a> [Database](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1796:1818#L91)
+``` go
+type Database *gorm.DB
+```
+
+
+
+
+
+
+
+
+
+## <a name="Databaser">type</a> [Databaser](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1237:1291#L54)
+``` go
+type Databaser interface {
+    StatupDatabase(*gorm.DB)
+}
+```
+
+
+
+
+
+
+
+
+
+## <a name="Info">type</a> [Info](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1714:1794#L85)
+``` go
+type Info struct {
+    Name        string
+    Description string
+    Form        string
+}
+
+```
+
+
+
+
+
+
+
+
+
+## <a name="Notifier">type</a> [Notifier](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1370:1438#L62)
+``` go
+type Notifier interface {
+    notifier.Notifier
+    notifier.BasicEvents
+}
+```
+
+
+
+
+
+
+
+
+
+## <a name="Plugin">type</a> [Plugin](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1820:1882#L93)
+``` go
+type Plugin struct {
+    Name        string
+    Description string
+}
+
+```
+
+
+
+
+
+
+
+
+
+## <a name="PluginDatabase">type</a> [PluginDatabase](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1884:1952#L98)
+``` go
+type PluginDatabase interface {
+    Database(gorm.DB)
+    Update() error
+}
+```
+
+
+
+
+
+
+
+
+
+## <a name="PluginInfo">type</a> [PluginInfo](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1954:1989#L103)
+``` go
+type PluginInfo struct {
+    // contains filtered or unexported fields
+}
+
+```
+
+
+
+
+
+
+
+
+
+### <a name="PluginInfo.Form">func</a> (\*PluginInfo) [Form](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=2047:2081#L111)
+``` go
+func (p *PluginInfo) Form() string
+```
+
+
+
+## <a name="PluginObject">type</a> [PluginObject](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=977:1003#L36)
+``` go
+type PluginObject struct{}
+
+```
+
+
+
+
+
+
+### <a name="Add">func</a> [Add](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1042:1076#L42)
+``` go
+func Add(p Pluginer) *PluginObject
+```
+
+
+
+
+### <a name="PluginObject.AddRoute">func</a> (\*PluginObject) [AddRoute](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1106:1177#L46)
+``` go
+func (p *PluginObject) AddRoute(s string, i string, f http.HandlerFunc)
+```
+
+
+
+## <a name="Pluginer">type</a> [Pluginer](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1184:1235#L50)
+``` go
+type Pluginer interface {
+    Select() *PluginObject
+}
+```
+
+
+
+
+
+
+
+
+
+## <a name="Router">type</a> [Router](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1293:1368#L58)
+``` go
+type Router interface {
+    AddRoute(string, string, http.HandlerFunc) error
+}
+```
+
+
+
+
+
+
+
+
+
+## <a name="Routing">type</a> [Routing](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1607:1712#L79)
+``` go
+type Routing struct {
+    URL     string
+    Method  string
+    Handler func(http.ResponseWriter, *http.Request)
+}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # source
 `import "github.com/hunterlong/statup/source"`
 
 * [Overview](#pkg-overview)
 * [Index](#pkg-index)
+* [Examples](#pkg-examples)
 
 ## <a name="pkg-overview">Overview</a>
 Package source holds all the assets for Statup. This includes
@@ -1564,6 +1819,9 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
 * [func SaveAsset(data []byte, folder, file string) error](#SaveAsset)
 * [func UsingAssets(folder string) bool](#UsingAssets)
 
+#### <a name="pkg-examples">Examples</a>
+* [OpenAsset](#example_OpenAsset)
+* [SaveAsset](#example_SaveAsset)
 
 #### <a name="pkg-files">Package files</a>
 [doc.go](https://github.com/hunterlong/statup/tree/master/source/doc.go) [rice-box.go](https://github.com/hunterlong/statup/tree/master/source/rice-box.go) [source.go](https://github.com/hunterlong/statup/tree/master/source/source.go) 
@@ -1645,6 +1903,13 @@ OpenAsset returns a file's contents as a string
 
 
 
+#### <a name="example_OpenAsset">Example</a>
+
+Code:
+``` go
+OpenAsset("js", "main.js")
+```
+
 ## <a name="SaveAsset">func</a> [SaveAsset](https://github.com/hunterlong/statup/tree/master/source/source.go?s=3910:3964#L131)
 ``` go
 func SaveAsset(data []byte, folder, file string) error
@@ -1652,6 +1917,14 @@ func SaveAsset(data []byte, folder, file string) error
 SaveAsset will save an asset to the '/assets/' folder.
 
 
+
+#### <a name="example_SaveAsset">Example</a>
+
+Code:
+``` go
+data := []byte("alert('helloooo')")
+SaveAsset(data, "js", "test.js")
+```
 
 ## <a name="UsingAssets">func</a> [UsingAssets](https://github.com/hunterlong/statup/tree/master/source/source.go?s=3365:3401#L111)
 ``` go
