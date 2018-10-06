@@ -85,6 +85,12 @@ coverage:
 # generate documentation for Statup functions
 docs:
 	godoc2md github.com/hunterlong/statup/core > dev/README.md
+	godoc2md github.com/hunterlong/statup/cmd >> dev/README.md
+	godoc2md github.com/hunterlong/statup/handlers >> dev/README.md
+	godoc2md github.com/hunterlong/statup/notifiers >> dev/README.md
+	godoc2md github.com/hunterlong/statup/source >> dev/README.md
+	godoc2md github.com/hunterlong/statup/types >> dev/README.md
+	godoc2md github.com/hunterlong/statup/utils >> dev/README.md
 	gocov-html coverage.json > dev/COVERAGE.html
 	revive -formatter stylish > dev/LINT.md
 
