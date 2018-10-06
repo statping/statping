@@ -29,11 +29,6 @@ import (
 	"time"
 )
 
-const (
-	BRAKER = "=============================================================================="
-	POINT  = "                     "
-)
-
 // CatchCLI will run functions based on the commands sent to Statup
 func CatchCLI(args []string) error {
 	dir := utils.Directory
@@ -42,8 +37,6 @@ func CatchCLI(args []string) error {
 	LoadDotEnvs()
 
 	switch args[0] {
-	case "seed":
-		handlers.DesktopInit(ipAddress, port)
 	case "app":
 		handlers.DesktopInit(ipAddress, port)
 	case "version":

@@ -24,8 +24,8 @@ import (
 )
 
 var (
-	SLACK_URL    string
-	slackMessage = `{"text":"this is a test from the slack notifier!"}`
+	SLACK_URL        string
+	slackTestMessage = `{"text":"this is a test from the slack notifier!"}`
 )
 
 func init() {
@@ -96,7 +96,7 @@ func TestSlackNotifier(t *testing.T) {
 	})
 
 	t.Run("slack Send", func(t *testing.T) {
-		err := slacker.Send(slackMessage)
+		err := slacker.Send(slackTestMessage)
 		assert.Nil(t, err)
 		assert.Len(t, slacker.Queue, 3)
 	})

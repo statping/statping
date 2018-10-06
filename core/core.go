@@ -43,6 +43,7 @@ func init() {
 	CoreApp = NewCore()
 }
 
+// NewCore return a new *core.Core struct
 func NewCore() *Core {
 	CoreApp = new(Core)
 	CoreApp.Core = new(types.Core)
@@ -50,6 +51,7 @@ func NewCore() *Core {
 	return CoreApp
 }
 
+// ToCore will convert *core.Core to *types.Core
 func (c *Core) ToCore() *types.Core {
 	return c.Core
 }
@@ -64,6 +66,7 @@ func InitApp() {
 	go DatabaseMaintence()
 }
 
+// insertNotifierDB inject the Statup database instance to the Notifier package
 func insertNotifierDB() error {
 	if DbSession == nil {
 		err := Configs.Connect(false, utils.Directory)

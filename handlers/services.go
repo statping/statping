@@ -29,10 +29,6 @@ import (
 	"time"
 )
 
-type Service struct {
-	*types.Service
-}
-
 func renderServiceChartHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	fields := parseGet(r)

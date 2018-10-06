@@ -30,6 +30,7 @@ var (
 	router *mux.Router
 )
 
+// Router returns all of the routes used in Statup
 func Router() *mux.Router {
 	dir := utils.Directory
 	r := mux.NewRouter()

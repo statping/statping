@@ -77,6 +77,7 @@ func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) *go
 	return DbSession.Model(&types.Hit{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.Format(types.TIME_DAY), t2.Format(types.TIME_DAY)).Order("timeframe asc", false).Group("timeframe")
 }
 
+// CloseDB will close the database connection if available
 func CloseDB() {
 	if DbSession != nil {
 		DbSession.DB().Close()
@@ -88,36 +89,43 @@ func (db *DbConfig) Close() error {
 	return DbSession.DB().Close()
 }
 
+// AfterFind for Service will set the timezone
 func (s *Service) AfterFind() (err error) {
 	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
 	return
 }
 
+// AfterFind for Hit will set the timezone
 func (s *Hit) AfterFind() (err error) {
 	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
 	return
 }
 
+// AfterFind for Failure will set the timezone
 func (f *Failure) AfterFind() (err error) {
 	f.CreatedAt = utils.Timezoner(f.CreatedAt, CoreApp.Timezone)
 	return
 }
 
+// AfterFind for USer will set the timezone
 func (u *User) AfterFind() (err error) {
 	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
 	return
 }
 
+// AfterFind for Checkin will set the timezone
 func (s *Checkin) AfterFind() (err error) {
 	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
 	return
 }
 
+// AfterFind for CheckinHit will set the timezone
 func (s *CheckinHit) AfterFind() (err error) {
 	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
 	return
 }
 
+// BeforeCreate for Hit will set CreatedAt to UTC
 func (u *Hit) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
@@ -125,6 +133,7 @@ func (u *Hit) BeforeCreate() (err error) {
 	return
 }
 
+// BeforeCreate for Failure will set CreatedAt to UTC
 func (u *Failure) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
@@ -132,6 +141,7 @@ func (u *Failure) BeforeCreate() (err error) {
 	return
 }
 
+// BeforeCreate for User will set CreatedAt to UTC
 func (u *User) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
@@ -139,6 +149,7 @@ func (u *User) BeforeCreate() (err error) {
 	return
 }
 
+// BeforeCreate for Service will set CreatedAt to UTC
 func (u *Service) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
@@ -146,6 +157,7 @@ func (u *Service) BeforeCreate() (err error) {
 	return
 }
 
+// BeforeCreate for Checkin will set CreatedAt to UTC
 func (u *Checkin) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
@@ -153,6 +165,7 @@ func (u *Checkin) BeforeCreate() (err error) {
 	return
 }
 
+// BeforeCreate for CheckinHit will set CreatedAt to UTC
 func (u *CheckinHit) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
@@ -223,6 +236,7 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 	return err
 }
 
+// waitForDb will sleep for 5 seconds and try to connect to the database again
 func (db *DbConfig) waitForDb() error {
 	time.Sleep(5 * time.Second)
 	return db.Connect(true, utils.Directory)
@@ -360,13 +374,4 @@ func (db *DbConfig) MigrateDatabase() error {
 	}
 	utils.Log(1, "Statup Database Migrated")
 	return tx.Commit().Error
-}
-
-func (c *DbConfig) Clean() *DbConfig {
-	if os.Getenv("DB_PORT") != "" {
-		if c.DbConn == "postgres" {
-			c.DbHost = c.DbHost + ":" + os.Getenv("DB_PORT")
-		}
-	}
-	return c
 }

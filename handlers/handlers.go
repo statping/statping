@@ -63,7 +63,8 @@ func RunHTTPServer(ip string, port int) error {
 	return httpServer.ListenAndServe()
 }
 
-// IsAuthenticated returns true if the HTTP request is authenticated
+// IsAuthenticated returns true if the HTTP request is authenticated. You can set the environment variable GO_ENV=test
+// to bypass the admin authenticate to the dashboard features.
 func IsAuthenticated(r *http.Request) bool {
 	if os.Getenv("GO_ENV") == "test" {
 		return true

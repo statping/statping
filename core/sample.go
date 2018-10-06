@@ -139,6 +139,7 @@ func InsertSampleHits() error {
 	return nil
 }
 
+// insertSampleCore will create a new Core for the seed
 func insertSampleCore() error {
 	core := &types.Core{
 		Name:        "Statup Sample Data",
@@ -154,6 +155,7 @@ func insertSampleCore() error {
 	return query.Error
 }
 
+// insertSampleUsers will create 2 admin users for a seed database
 func insertSampleUsers() {
 	u2 := ReturnUser(&types.User{
 		Username: "testadmin",
@@ -308,6 +310,7 @@ func InsertLargeSampleData() error {
 	return nil
 }
 
+// insertFailureRecords will create failures for 15 services from seed
 func insertFailureRecords(since time.Time, amount int64) {
 	for i := int64(14); i <= 15; i++ {
 		service := SelectService(i)
@@ -328,6 +331,7 @@ func insertFailureRecords(since time.Time, amount int64) {
 	}
 }
 
+// insertHitRecords will create successful Hit records for 15 services
 func insertHitRecords(since time.Time, amount int64) {
 	for i := int64(1); i <= 15; i++ {
 		service := SelectService(i)

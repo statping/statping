@@ -28,10 +28,6 @@ func injectDatabase() {
 	Configs.Connect(false, utils.Directory)
 }
 
-func GenerateSeed() {
-
-}
-
 func ExportIndexHTML() string {
 	source.Assets()
 	injectDatabase()

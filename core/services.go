@@ -31,10 +31,12 @@ type Service struct {
 	*types.Service
 }
 
+// Select will return the *types.Service struct for Service
 func (s *Service) Select() *types.Service {
 	return s.Service
 }
 
+// ReturnService will convert *types.Service to *core.Service
 func ReturnService(s *types.Service) *Service {
 	return &Service{s}
 }
@@ -49,6 +51,7 @@ func SelectService(id int64) *Service {
 	return nil
 }
 
+// Checkins will return a slice of Checkins for a Service
 func (s *Service) Checkins() []*Checkin {
 	var checkin []*Checkin
 	checkinDB().Where("service = ?", s.Id).Find(&checkin)
@@ -168,10 +171,12 @@ func (s *Service) SmallText() string {
 	}
 }
 
+// DowntimeText will return the amount of downtime for a service based on the duration
 func (s *Service) DowntimeText() string {
 	return fmt.Sprintf("%v has been offline for %v", s.Name, utils.DurationReadable(s.Downtime()))
 }
 
+// Dbtimestamp will return a SQL query for grouping by date
 func Dbtimestamp(group string, column string) string {
 	seconds := 60
 	if group == "second" {
@@ -207,6 +212,7 @@ func (s *Service) Downtime() time.Duration {
 	return since
 }
 
+// GraphDataRaw will return all the hits between 2 times for a Service
 func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group string, column string) *DateScanObj {
 	var d []DateScan
 	model := service.(*Service).HitsBetween(start, end, group, column)
@@ -228,6 +234,7 @@ func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group st
 	return &DateScanObj{d}
 }
 
+// ToString will convert the DateScanObj into a JSON string for the charts to render
 func (d *DateScanObj) ToString() string {
 	data, err := json.Marshal(d.Array)
 	if err != nil {

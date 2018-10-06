@@ -119,7 +119,6 @@ func TestServiceChartHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	t.Log(body)
 	assert.Contains(t, body, "var ctx_1")
 	assert.Contains(t, body, "var ctx_2")
 	assert.Contains(t, body, "var ctx_3")
