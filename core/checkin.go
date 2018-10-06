@@ -20,7 +20,6 @@ import (
 	"github.com/ararog/timeago"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
-	"github.com/jinzhu/gorm"
 	"time"
 )
 
@@ -80,17 +79,18 @@ func (u *Checkin) Hits() []CheckinHit {
 	return checkins
 }
 
-func (u *Checkin) Update() (int64, error) {
-	fmt.Println("updating: ", u.Id, u.ApiKey)
-	exists := checkinDB().Find(&u).RecordNotFound()
-	var row *gorm.DB
-	if !exists {
-		row = checkinDB().Update(&u)
-	} else {
-		u.ApiKey = utils.RandomString(7)
-		row = checkinDB().Create(&u)
+func (u *Checkin) Create() (int64, error) {
+	u.ApiKey = utils.RandomString(7)
+	row := checkinDB().Create(&u)
+	if row.Error != nil {
+		utils.Log(2, row.Error)
+		return 0, row.Error
 	}
-	fmt.Println("found: ", exists, u.Id, u.Service, u.Interval, u.GracePeriod, u.ApiKey)
+	return u.Id, row.Error
+}
+
+func (u *Checkin) Update() (int64, error) {
+	row := checkinDB().Update(&u)
 	if row.Error != nil {
 		utils.Log(2, row.Error)
 		return 0, row.Error

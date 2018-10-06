@@ -94,18 +94,14 @@ func SetDB(d *gorm.DB) {
 	db = d
 }
 
-func asNotifier(n interface{}) Notifier {
-	return n.(Notifier)
-}
-
-func asNotification(n interface{}) *Notification {
-	return n.(Notifier).Select()
+func asNotification(n Notifier) *Notification {
+	return n.Select()
 }
 
 // AddNotifier accept a Notifier interface to be added into the array
-func AddNotifier(n interface{}) error {
+func AddNotifier(n Notifier) error {
 	if isType(n, new(Notifier)) {
-		err := checkNotifierForm(asNotifier(n))
+		err := checkNotifierForm(n)
 		if err != nil {
 			return err
 		}

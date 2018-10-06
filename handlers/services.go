@@ -261,7 +261,9 @@ func checkinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	vars := mux.Vars(r)
 	service := core.SelectService(utils.StringInt(vars["id"]))
-	checkin := service.Checkin()
+	api := r.PostForm.Get("api")
+	checkin := core.SelectCheckin(api)
+
 	interval := utils.StringInt(r.PostForm.Get("interval"))
 	grace := utils.StringInt(r.PostForm.Get("grace"))
 	checkin.Interval = interval

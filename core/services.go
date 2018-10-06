@@ -49,10 +49,10 @@ func SelectService(id int64) *Service {
 	return nil
 }
 
-func (s *Service) Checkin() *Checkin {
-	var checkin types.Checkin
-	checkinDB().Find(&checkin, "service = ?", s.Id)
-	return &Checkin{&checkin}
+func (s *Service) Checkins() []*Checkin {
+	var checkin []*Checkin
+	checkinDB().Where("service = ?", s.Id).Find(&checkin)
+	return checkin
 }
 
 // SelectAllServices returns a slice of *core.Service to be store on []*core.Services, should only be called once on startup.
@@ -66,7 +66,7 @@ func (c *Core) SelectAllServices() ([]*Service, error) {
 	CoreApp.Services = nil
 	for _, service := range services {
 		service.Start()
-		service.Checkin()
+		service.Checkins()
 		service.AllFailures()
 		CoreApp.Services = append(CoreApp.Services, service)
 	}

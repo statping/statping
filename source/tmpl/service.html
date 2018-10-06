@@ -105,16 +105,18 @@
                 </tr>
             </thead>
             <tbody>
-            {{$ch := $s.Checkin}}
+            {{range $s.Checkins}}
+            {{ $ch := . }}
             <tr class="{{ if lt $ch.Expected 0}}bg-danger text-white{{else}}bg-light{{end}}">
                 <td>{{CoreApp.Domain}}/checkin/{{$ch.ApiKey}}</td>
                 <td>every {{Duration $ch.Period}}<br>after {{Duration $ch.Grace}}</td>
                 <td>{{Ago $ch.Last.CreatedAt}}</td>
                 <td>{{ if lt $ch.Expected 0}}{{Duration $ch.Expected}} ago{{else}}in {{Duration $ch.Expected}}{{end}}</td>
             </tr>
+            {{template "form_checkin" $ch}}
+            {{end}}
             </tbody>
         </table>
-    {{template "form_checkin" $ch}}
 
     </div>
 

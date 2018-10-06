@@ -17,6 +17,7 @@ package core
 
 import (
 	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statup/utils"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -224,7 +225,7 @@ func TestCreateFailingHTTPService(t *testing.T) {
 func TestServiceFailedCheck(t *testing.T) {
 	service := SelectService(17)
 	assert.Equal(t, "Bad URL", service.Name)
-	service.Check(true)
+	service.Check(false)
 	assert.Equal(t, "Bad URL", service.Name)
 	assert.False(t, service.Online)
 }
@@ -249,7 +250,7 @@ func TestCreateFailingTCPService(t *testing.T) {
 
 func TestServiceFailedTCPCheck(t *testing.T) {
 	service := SelectService(newServiceId)
-	service.Check(true)
+	service.Check(false)
 	assert.Equal(t, "Bad TCP", service.Name)
 	assert.False(t, service.Online)
 }
@@ -341,4 +342,58 @@ func TestDNScheckService(t *testing.T) {
 	amount, err := s.dnsCheck()
 	assert.Nil(t, err)
 	assert.NotZero(t, amount)
+}
+
+func TestCreateCheckin(t *testing.T) {
+	checkin := ReturnCheckin(&types.Checkin{
+		Service:     1,
+		Interval:    10,
+		GracePeriod: 5,
+		ApiKey:      utils.RandomString(7),
+	})
+	id, err := checkin.Create()
+	assert.Nil(t, err)
+	assert.NotZero(t, id)
+}
+
+func TestSelectCheckin(t *testing.T) {
+	service := SelectService(1)
+	checkins := service.Checkins()
+	assert.NotNil(t, checkins)
+	assert.Equal(t, 1, len(checkins))
+	first := checkins[0]
+	assert.Equal(t, int64(10), first.Interval)
+	assert.Equal(t, 7, len(first.ApiKey))
+	assert.Equal(t, int64(5), first.GracePeriod)
+}
+
+func TestCreateCheckinHits(t *testing.T) {
+	service := SelectService(1)
+	checkins := service.Checkins()
+	first := checkins[0]
+	created := time.Now().Add(-2 * time.Hour)
+	for i := 0; i <= 20; i++ {
+		hit := ReturnCheckinHit(&types.CheckinHit{
+			Checkin:   first.Id,
+			From:      "192.168.1.1",
+			CreatedAt: created,
+		})
+		hit.Create()
+		created = created.Add(10 * time.Second)
+	}
+	hits := first.Hits()
+	assert.Equal(t, 21, len(hits))
+}
+
+func TestSelectCheckinMethods(t *testing.T) {
+	time.Sleep(5 * time.Second)
+	service := SelectService(1)
+	checkins := service.Checkins()
+	assert.NotNil(t, checkins)
+	first := checkins[0]
+	lastHit := first.Last()
+	assert.Equal(t, float64(10), first.Period().Seconds())
+	assert.Equal(t, float64(5), first.Grace().Seconds())
+	assert.Equal(t, time.Now().Day(), lastHit.CreatedAt.Day())
+	assert.Equal(t, "Just now", lastHit.Ago())
 }
