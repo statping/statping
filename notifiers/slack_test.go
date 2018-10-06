@@ -61,7 +61,7 @@ func TestSlackNotifier(t *testing.T) {
 	})
 
 	t.Run("slack parse message", func(t *testing.T) {
-		err := parseSlackMessage(SLACK_TEXT, "this is a test!")
+		err := parseSlackMessage(slackText, "this is a test!")
 		assert.Nil(t, err)
 		assert.Equal(t, 1, len(slacker.Queue))
 	})

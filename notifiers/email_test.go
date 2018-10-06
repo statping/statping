@@ -72,7 +72,7 @@ func TestEmailNotifier(t *testing.T) {
 		testEmail = &emailOutgoing{
 			To:       emailer.GetValue("var2"),
 			Subject:  fmt.Sprintf("Service %v is Failing", TestService.Name),
-			Template: TEMPLATE,
+			Template: mainEmailTemplate,
 			Data:     TestService,
 			From:     emailer.GetValue("var1"),
 		}

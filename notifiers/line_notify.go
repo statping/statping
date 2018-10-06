@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	LINE_NOTIFY_METHOD = "line notify"
+	lineNotifyMethod = "line notify"
 )
 
 type lineNotifier struct {
@@ -34,7 +34,7 @@ type lineNotifier struct {
 }
 
 var lineNotify = &lineNotifier{&notifier.Notification{
-	Method:      LINE_NOTIFY_METHOD,
+	Method:      lineNotifyMethod,
 	Title:       "LINE Notify",
 	Description: "LINE Notify will send notifications to your LINE Notify account when services are offline or online. Baed on the <a href=\"https://notify-bot.line.me/doc/en/\">LINE Notify API</a>.",
 	Author:      "Kanin Peanviriyakulkit",

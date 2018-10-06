@@ -28,7 +28,7 @@ import (
 )
 
 const (
-	WEBHOOK_METHOD = "webhook"
+	webhookMethod = "webhook"
 )
 
 type webhooker struct {
@@ -36,7 +36,7 @@ type webhooker struct {
 }
 
 var webhook = &webhooker{&notifier.Notification{
-	Method:      WEBHOOK_METHOD,
+	Method:      webhookMethod,
 	Title:       "HTTP webhooker",
 	Description: "Send a custom HTTP request to a specific URL with your own body, headers, and parameters",
 	Author:      "Hunter Long",

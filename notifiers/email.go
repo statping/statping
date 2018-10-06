@@ -28,7 +28,7 @@ import (
 )
 
 const (
-	TEMPLATE = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	mainEmailTemplate = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -183,7 +183,7 @@ func (u *email) OnFailure(s *types.Service, f *types.Failure) {
 	email := &emailOutgoing{
 		To:       emailer.GetValue("var2"),
 		Subject:  fmt.Sprintf("Service %v is Failing", s.Name),
-		Template: TEMPLATE,
+		Template: mainEmailTemplate,
 		Data:     interface{}(s),
 		From:     emailer.GetValue("var1"),
 	}
@@ -197,7 +197,7 @@ func (u *email) OnSuccess(s *types.Service) {
 		email := &emailOutgoing{
 			To:       emailer.GetValue("var2"),
 			Subject:  fmt.Sprintf("Service %v is Back Online", s.Name),
-			Template: TEMPLATE,
+			Template: mainEmailTemplate,
 			Data:     interface{}(s),
 			From:     emailer.GetValue("var1"),
 		}

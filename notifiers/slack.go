@@ -28,10 +28,10 @@ import (
 )
 
 const (
-	SLACK_METHOD     = "slack"
-	FAILING_TEMPLATE = `{ "attachments": [ { "fallback": "Service {{.Service.Name}} - is currently failing", "text": "<{{.Service.Domain}}|{{.Service.Name}}> - Your Statup service '{{.Service.Name}}' has just received a Failure notification with a HTTP Status code of {{.Service.LastStatusCode}}.", "fields": [ { "title": "Expected", "value": "{{.Service.Expected}}", "short": true }, { "title": "Status Code", "value": "{{.Service.LastStatusCode}}", "short": true } ], "color": "#FF0000", "thumb_url": "https://statup.io", "footer": "Statup", "footer_icon": "https://img.cjx.io/statuplogo32.png" } ] }`
-	SUCCESS_TEMPLATE = `{ "attachments": [ { "fallback": "Service {{.Service.Name}} - is now back online", "text": "<{{.Service.Domain}}|{{.Service.Name}}> - Your Statup service '{{.Service.Name}}' has just received a Failure notification.", "fields": [ { "title": "Issue", "value": "Awesome Project", "short": true }, { "title": "Status Code", "value": "{{.Service.LastStatusCode}}", "short": true } ], "color": "#00FF00", "thumb_url": "https://statup.io", "footer": "Statup", "footer_icon": "https://img.cjx.io/statuplogo32.png" } ] }`
-	SLACK_TEXT       = `{"text":"{{.}}"}`
+	slackMethod     = "slack"
+	failingTemplate = `{ "attachments": [ { "fallback": "Service {{.Service.Name}} - is currently failing", "text": "<{{.Service.Domain}}|{{.Service.Name}}> - Your Statup service '{{.Service.Name}}' has just received a Failure notification with a HTTP Status code of {{.Service.LastStatusCode}}.", "fields": [ { "title": "Expected", "value": "{{.Service.Expected}}", "short": true }, { "title": "Status Code", "value": "{{.Service.LastStatusCode}}", "short": true } ], "color": "#FF0000", "thumb_url": "https://statup.io", "footer": "Statup", "footer_icon": "https://img.cjx.io/statuplogo32.png" } ] }`
+	successTemplate = `{ "attachments": [ { "fallback": "Service {{.Service.Name}} - is now back online", "text": "<{{.Service.Domain}}|{{.Service.Name}}> - Your Statup service '{{.Service.Name}}' has just received a Failure notification.", "fields": [ { "title": "Issue", "value": "Awesome Project", "short": true }, { "title": "Status Code", "value": "{{.Service.LastStatusCode}}", "short": true } ], "color": "#00FF00", "thumb_url": "https://statup.io", "footer": "Statup", "footer_icon": "https://img.cjx.io/statuplogo32.png" } ] }`
+	slackText       = `{"text":"{{.}}"}`
 )
 
 type slack struct {
@@ -39,7 +39,7 @@ type slack struct {
 }
 
 var slacker = &slack{&notifier.Notification{
-	Method:      SLACK_METHOD,
+	Method:      slackMethod,
 	Title:       "slack",
 	Description: "Send notifications to your slack channel when a service is offline. Insert your Incoming webhooker URL for your channel to receive notifications. Based on the <a href=\"https://api.slack.com/incoming-webhooks\">slack API</a>.",
 	Author:      "Hunter Long",
@@ -116,10 +116,10 @@ func (u *slack) OnTest() error {
 func (u *slack) OnFailure(s *types.Service, f *types.Failure) {
 	message := slackMessage{
 		Service:  s,
-		Template: FAILING_TEMPLATE,
+		Template: failingTemplate,
 		Time:     time.Now().Unix(),
 	}
-	parseSlackMessage(FAILING_TEMPLATE, message)
+	parseSlackMessage(failingTemplate, message)
 	u.Online = false
 }
 
@@ -128,10 +128,10 @@ func (u *slack) OnSuccess(s *types.Service) {
 	if !u.Online {
 		message := slackMessage{
 			Service:  s,
-			Template: SUCCESS_TEMPLATE,
+			Template: successTemplate,
 			Time:     time.Now().Unix(),
 		}
-		parseSlackMessage(SUCCESS_TEMPLATE, message)
+		parseSlackMessage(successTemplate, message)
 	}
 	u.Online = true
 }
