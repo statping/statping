@@ -426,7 +426,6 @@ func TestLogsLineHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	t.Log(body)
 	assert.NotEmpty(t, body)
 	assert.True(t, isRouteAuthenticated(req))
 }

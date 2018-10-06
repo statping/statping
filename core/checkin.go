@@ -17,6 +17,7 @@ package core
 
 import (
 	"fmt"
+	"github.com/ararog/timeago"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"time"
@@ -119,6 +120,12 @@ func (u *CheckinHit) Create() (int64, error) {
 		return 0, row.Error
 	}
 	return u.Id, row.Error
+}
+
+// Ago returns the duration of time between now and the last successful CheckinHit
+func (f *CheckinHit) Ago() string {
+	got, _ := timeago.TimeAgoWithTime(time.Now(), f.CreatedAt)
+	return got
 }
 
 // RecheckCheckinFailure will check if a Service Checkin has been reported yet
