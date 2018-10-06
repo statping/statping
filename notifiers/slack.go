@@ -67,7 +67,7 @@ func parseSlackMessage(temp string, data interface{}) error {
 	return nil
 }
 
-type SlackMessage struct {
+type slackMessage struct {
 	Service  *types.Service
 	Template string
 	Time     int64
@@ -114,7 +114,7 @@ func (u *slack) OnTest() error {
 
 // OnFailure will trigger failing service
 func (u *slack) OnFailure(s *types.Service, f *types.Failure) {
-	message := SlackMessage{
+	message := slackMessage{
 		Service:  s,
 		Template: FAILING_TEMPLATE,
 		Time:     time.Now().Unix(),
@@ -126,7 +126,7 @@ func (u *slack) OnFailure(s *types.Service, f *types.Failure) {
 // OnSuccess will trigger successful service
 func (u *slack) OnSuccess(s *types.Service) {
 	if !u.Online {
-		message := SlackMessage{
+		message := slackMessage{
 			Service:  s,
 			Template: SUCCESS_TEMPLATE,
 			Time:     time.Now().Unix(),

@@ -157,9 +157,9 @@ func init() {
 	}
 }
 
-// Send will send the SMTP email with your authentication It accepts type: *EmailOutgoing
+// Send will send the SMTP email with your authentication It accepts type: *emailOutgoing
 func (u *email) Send(msg interface{}) error {
-	email := msg.(*EmailOutgoing)
+	email := msg.(*emailOutgoing)
 	err := u.dialSend(email)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("email Notifier could not send email: %v", err))
@@ -168,7 +168,7 @@ func (u *email) Send(msg interface{}) error {
 	return nil
 }
 
-type EmailOutgoing struct {
+type emailOutgoing struct {
 	To       string
 	Subject  string
 	Template string
@@ -180,7 +180,7 @@ type EmailOutgoing struct {
 
 // OnFailure will trigger failing service
 func (u *email) OnFailure(s *types.Service, f *types.Failure) {
-	email := &EmailOutgoing{
+	email := &emailOutgoing{
 		To:       emailer.GetValue("var2"),
 		Subject:  fmt.Sprintf("Service %v is Failing", s.Name),
 		Template: TEMPLATE,
@@ -194,7 +194,7 @@ func (u *email) OnFailure(s *types.Service, f *types.Failure) {
 // OnSuccess will trigger successful service
 func (u *email) OnSuccess(s *types.Service) {
 	if !u.Online {
-		email := &EmailOutgoing{
+		email := &emailOutgoing{
 			To:       emailer.GetValue("var2"),
 			Subject:  fmt.Sprintf("Service %v is Back Online", s.Name),
 			Template: TEMPLATE,
@@ -229,7 +229,7 @@ func (u *email) OnTest() error {
 	return dial.Auth(auth)
 }
 
-func (u *email) dialSend(email *EmailOutgoing) error {
+func (u *email) dialSend(email *emailOutgoing) error {
 	mailer = mail.NewDialer(emailer.Host, emailer.Port, emailer.Username, emailer.Password)
 	mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	emailSource(email)
@@ -245,12 +245,12 @@ func (u *email) dialSend(email *EmailOutgoing) error {
 	return nil
 }
 
-func emailSource(email *EmailOutgoing) {
-	source := EmailTemplate(email.Template, email.Data)
+func emailSource(email *emailOutgoing) {
+	source := emailTemplate(email.Template, email.Data)
 	email.Source = source
 }
 
-func EmailTemplate(contents string, data interface{}) string {
+func emailTemplate(contents string, data interface{}) string {
 	t := template.New("email")
 	t, err := t.Parse(contents)
 	if err != nil {

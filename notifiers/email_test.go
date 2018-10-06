@@ -34,7 +34,7 @@ var (
 	EMAIL_PORT     = utils.StringInt(os.Getenv("EMAIL_PORT"))
 )
 
-var testEmail *EmailOutgoing
+var testEmail *emailOutgoing
 
 func init() {
 	EMAIL_HOST = os.Getenv("EMAIL_HOST")
@@ -69,7 +69,7 @@ func TestEmailNotifier(t *testing.T) {
 		emailer.Port = int(EMAIL_PORT)
 		emailer.Delay = time.Duration(100 * time.Millisecond)
 
-		testEmail = &EmailOutgoing{
+		testEmail = &emailOutgoing{
 			To:       emailer.GetValue("var2"),
 			Subject:  fmt.Sprintf("Service %v is Failing", TestService.Name),
 			Template: TEMPLATE,
