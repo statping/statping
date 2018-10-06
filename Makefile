@@ -36,7 +36,7 @@ build-all: build-mac build-linux build-windows build-alpine compress
 docker-build-all: docker-build-base docker-build-dev docker-build-latest
 
 # push all docker tags built
-docker-publish-all: docker-push-base docker-push-dev docker-push-latest
+docker-publish-all: docker-push-base docker-push-dev
 
 # build Statup for local arch
 build: compile
@@ -199,7 +199,6 @@ dep:
 
 # install all required golang dependecies
 dev-deps:
-	$(GOGET) -u github.com/jinzhu/gorm/...
 	$(GOGET) github.com/stretchr/testify/assert
 	$(GOGET) golang.org/x/tools/cmd/cover
 	$(GOGET) github.com/mattn/goveralls

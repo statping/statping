@@ -16,11 +16,11 @@
 package core
 
 import (
+	"errors"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
-	"github.com/pkg/errors"
 	"os"
 	"time"
 )

@@ -6,8 +6,8 @@
   name = "cloud.google.com/go"
   packages = ["civil"]
   pruneopts = "UT"
-  revision = "97efc2c9ffd9fe8ef47f7f3203dc60bbca547374"
-  version = "v0.28.0"
+  revision = "6cb29e61d96723a38dcac44d4c15c36744d96d07"
+  version = "v0.29.0"
 
 [[projects]]
   branch = "master"
@@ -19,14 +19,6 @@
   ]
   pruneopts = "UT"
   revision = "c02ca9a983da5807ddf7d796784928f5be4afd09"
-
-[[projects]]
-  digest = "1:e92f5581902c345eb4ceffdcd4a854fb8f73cf436d47d837d1ec98ef1fe0a214"
-  name = "github.com/StackExchange/wmi"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "5d049714c4a64225c3c79a7cf7d02f7fb5b96338"
-  version = "1.0.0"
 
 [[projects]]
   digest = "1:f1ec92a2b8473612547f6e13edbc8c8e6cda6c8be9c54b31958aad4a7ccaaa2b"
@@ -72,17 +64,6 @@
   version = "2.2.0"
 
 [[projects]]
-  digest = "1:64a5a67c69b70c2420e607a8545d674a23778ed9c3e80607bfd17b77c6c87f6a"
-  name = "github.com/go-ole/go-ole"
-  packages = [
-    ".",
-    "oleutil",
-  ]
-  pruneopts = "UT"
-  revision = "a41e3c4b706f6ae8dfbff342b06e40fa4d2d0506"
-  version = "v1.2.1"
-
-[[projects]]
   digest = "1:adea5a94903eb4384abef30f3d878dc9ff6b6b5b0722da25b82e5169216dfb61"
   name = "github.com/go-sql-driver/mysql"
   packages = ["."]
@@ -107,14 +88,6 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:664d37ea261f0fc73dd17f4a1f5f46d01fbb0b0d75f6375af064824424109b7d"
-  name = "github.com/gorilla/handlers"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "7e0847f9db758cdebd26c149d0ae9d5d0b9c98ce"
-  version = "v1.4.0"
-
-[[projects]]
   digest = "1:e73f5b0152105f18bc131fba127d9949305c8693f8a762588a82a48f61756f5f"
   name = "github.com/gorilla/mux"
   packages = ["."]
@@ -131,20 +104,12 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:0aa142ca3543fa3aca344c2fa2d52e01d706a3ce4e1fa893e0ef29b5349ddf7a"
+  digest = "1:e5bf52fd66a2e984b57b4c0f2c4ee024ed749a19886246240629998dc0cf31ce"
   name = "github.com/gorilla/sessions"
   packages = ["."]
   pruneopts = "UT"
-  revision = "81547393f870a35be888759a606ba7bf71dbe5c7"
-  version = "v1.1.2"
-
-[[projects]]
-  digest = "1:7b5c6e2eeaa9ae5907c391a91c132abfd5c9e8a784a341b5625e750c67e6825d"
-  name = "github.com/gorilla/websocket"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "66b9c49e59c6c48f0ffce28c2d8b8a5678502c6d"
-  version = "v1.4.0"
+  revision = "f57b7e2d29c6211d16ffa52a0998272f75799030"
+  version = "v1.1.3"
 
 [[projects]]
   digest = "1:4d28d632da146ec6e632bdd29676a95e0874f1ad837fff06aef6610b3b6b4728"
@@ -213,25 +178,6 @@
   version = "v1.9.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:4f4fd75cbdd5ad0696f4d762328f094b9c86061323c9a9f8d0de157f06197e89"
-  name = "github.com/mkevac/debugcharts"
-  packages = [
-    ".",
-    "bindata",
-  ]
-  pruneopts = "UT"
-  revision = "d3203a8fa92649b82dc35c214979861de918874a"
-
-[[projects]]
-  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
-  name = "github.com/pkg/errors"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
-  version = "v0.8.0"
-
-[[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
@@ -246,29 +192,6 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "6283090d169f51a2410b4e260341a01c9a4c0ca7"
-
-[[projects]]
-  digest = "1:7395b855a6078ad2e6c40311402a057a91125fb9f32cf228e1b32cdc57c33538"
-  name = "github.com/shirou/gopsutil"
-  packages = [
-    "cpu",
-    "host",
-    "internal/common",
-    "mem",
-    "net",
-    "process",
-  ]
-  pruneopts = "UT"
-  revision = "8048a2e9c5773235122027dd585cf821b2af1249"
-  version = "v2.18.07"
-
-[[projects]]
-  branch = "master"
-  digest = "1:99c6a6dab47067c9b898e8c8b13d130c6ab4ffbcc4b7cc6236c2cd0b1e344f5b"
-  name = "github.com/shirou/w32"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "bb4de0191aa41b5507caa14b0650cdbddcd9280b"
 
 [[projects]]
   branch = "master"
@@ -297,17 +220,6 @@
   ]
   pruneopts = "UT"
   revision = "e3636079e1a4c1f337f212cc5cd2aca108f6c900"
-
-[[projects]]
-  branch = "master"
-  digest = "1:6f82ed211591ecb407897ca46ff6149d618223088aecad72675804f106033629"
-  name = "golang.org/x/sys"
-  packages = [
-    "unix",
-    "windows",
-  ]
-  pruneopts = "UT"
-  revision = "e4b3c5e9061176387e7cea65e4dc5853801f3fb7"
 
 [[projects]]
   digest = "1:c25289f43ac4a68d88b02245742347c94f1e108c534dda442188015ff80669b3"
@@ -350,7 +262,6 @@
     "github.com/ararog/timeago",
     "github.com/go-mail/mail",
     "github.com/go-yaml/yaml",
-    "github.com/gorilla/handlers",
     "github.com/gorilla/mux",
     "github.com/gorilla/sessions",
     "github.com/jinzhu/gorm",
@@ -360,8 +271,6 @@
     "github.com/jinzhu/gorm/dialects/sqlite",
     "github.com/jinzhu/now",
     "github.com/joho/godotenv",
-    "github.com/mkevac/debugcharts",
-    "github.com/pkg/errors",
     "github.com/rendon/testcli",
     "github.com/stretchr/testify/assert",
     "golang.org/x/crypto/bcrypt",
