@@ -221,6 +221,7 @@ func (u *email) OnSave() error {
 func (u *email) OnTest() error {
 	host := fmt.Sprintf("%v:%v", u.Host, u.Port)
 	dial, err := smtp.Dial(host)
+	dial.StartTLS(&tls.Config{InsecureSkipVerify: true})
 	if err != nil {
 		utils.Log(3, err)
 		return err
