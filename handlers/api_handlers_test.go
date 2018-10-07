@@ -245,6 +245,31 @@ func TestApiServiceDataHandler(t *testing.T) {
 	}
 }
 
+func TestApiRenewHandler(t *testing.T) {
+	api := core.CoreApp.ApiKey
+	secret := core.CoreApp.ApiSecret
+	rr, err := httpRequestAPI(t, "GET", "/api/renew", nil)
+	assert.Nil(t, err)
+	body := rr.Body.String()
+	var obj apiResponse
+	formatJSON(body, &obj)
+	assert.Equal(t, 303, rr.Code)
+	assert.NotEqual(t, api, core.CoreApp.ApiKey)
+	assert.NotEqual(t, secret, core.CoreApp.ApiSecret)
+}
+
+func TestApiCheckinHandler(t *testing.T) {
+	t.SkipNow()
+	service := core.SelectService(1)
+	checkin := service.Checkins()
+	rr, err := httpRequestAPI(t, "GET", "/api/checkin/"+checkin[0].ApiKey, nil)
+	assert.Nil(t, err)
+	body := rr.Body.String()
+	var obj apiResponse
+	formatJSON(body, &obj)
+	assert.Equal(t, 200, rr.Code)
+}
+
 func httpRequestAPI(t *testing.T, method, url string, body io.Reader) (*httptest.ResponseRecorder, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {

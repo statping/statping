@@ -65,6 +65,10 @@ func RunInit(db string, t *testing.T) {
 	core.CoreApp = core.NewCore()
 }
 
+func TestMain(m *testing.M) {
+	m.Run()
+}
+
 func TestRunAll(t *testing.T) {
 	//t.Parallel()
 

@@ -244,7 +244,7 @@ func TestUsersEditHandler(t *testing.T) {
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | admin</title>")
-	assert.Contains(t, body, "<h3>user admin</h3>")
+	assert.Contains(t, body, "<h3>User admin</h3>")
 	assert.Contains(t, body, "value=\"info@statup.io\"")
 	assert.Contains(t, body, "value=\"##########\"")
 	assert.Contains(t, body, "Statup  made with ❤️")
@@ -606,6 +606,15 @@ func TestReorderServiceHandler(t *testing.T) {
 	data := `[{id: 1, order: 3},{id: 2, order: 2},{id: 3, order: 1}]"`
 	req, err := http.NewRequest("POST", "/services/reorder", strings.NewReader(data))
 	req.Header.Set("Content-Type", "application/json")
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 200, rr.Code)
+	assert.True(t, isRouteAuthenticated(req))
+}
+
+func TestExportHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/settings/export", nil)
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)

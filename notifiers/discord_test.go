@@ -92,6 +92,11 @@ func TestDiscordNotifier(t *testing.T) {
 		assert.Nil(t, err)
 	})
 
+	t.Run("discord Test", func(t *testing.T) {
+		err := discorder.OnTest()
+		assert.Nil(t, err)
+	})
+
 	t.Run("discord Queue", func(t *testing.T) {
 		go notifier.Queue(discorder)
 		time.Sleep(1 * time.Second)

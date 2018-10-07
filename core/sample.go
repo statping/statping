@@ -84,6 +84,14 @@ func InsertSampleData() error {
 	s4.Create(false)
 	s5.Create(false)
 
+	utils.Log(1, "Sample data has finished importing")
+
+	return nil
+}
+
+// insertSampleCheckins will create 2 checkins with 60 successful hits per checkin
+func insertSampleCheckins() error {
+	s1 := SelectService(1)
 	checkin1 := ReturnCheckin(&types.Checkin{
 		Service:     s1.Id,
 		Interval:    300,
@@ -91,6 +99,7 @@ func InsertSampleData() error {
 	})
 	checkin1.Update()
 
+	s2 := SelectService(1)
 	checkin2 := ReturnCheckin(&types.Checkin{
 		Service:     s2.Id,
 		Interval:    900,
@@ -108,9 +117,6 @@ func InsertSampleData() error {
 		checkHit.Create()
 		checkTime = checkTime.Add(10 * time.Minute)
 	}
-
-	utils.Log(1, "Sample data has finished importing")
-
 	return nil
 }
 
@@ -180,6 +186,7 @@ func InsertLargeSampleData() error {
 	insertSampleCore()
 	InsertSampleData()
 	insertSampleUsers()
+	insertSampleCheckins()
 	s6 := ReturnService(&types.Service{
 		Name:           "JSON Lint",
 		Domain:         "https://jsonlint.com",

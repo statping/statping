@@ -128,6 +128,11 @@ func TestEmailNotifier(t *testing.T) {
 		assert.Nil(t, err)
 	})
 
+	t.Run("emailer Test", func(t *testing.T) {
+		err := emailer.OnTest()
+		assert.Nil(t, err)
+	})
+
 	t.Run("email Run Queue", func(t *testing.T) {
 		go notifier.Queue(emailer)
 		time.Sleep(5 * time.Second)

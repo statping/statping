@@ -101,6 +101,11 @@ func TestSlackNotifier(t *testing.T) {
 		assert.Len(t, slacker.Queue, 3)
 	})
 
+	t.Run("slack Test", func(t *testing.T) {
+		err := slacker.OnTest()
+		assert.Nil(t, err)
+	})
+
 	t.Run("slack Queue", func(t *testing.T) {
 		go notifier.Queue(slacker)
 		time.Sleep(4 * time.Second)

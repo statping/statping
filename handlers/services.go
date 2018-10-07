@@ -22,44 +22,11 @@ import (
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
-	"github.com/jinzhu/now"
 	"net"
 	"net/http"
 	"strconv"
 	"time"
 )
-
-func renderServiceChartHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	fields := parseGet(r)
-	w.Header().Set("Content-Type", "text/javascript")
-	w.Header().Set("Cache-Control", "max-age=30")
-
-	startField := fields.Get("start")
-	endField := fields.Get("end")
-
-	end := now.EndOfDay().UTC()
-	start := now.BeginningOfDay().UTC()
-
-	if startField != "" {
-		start = time.Unix(utils.StringInt(startField), 0)
-		start = now.New(start).BeginningOfDay().UTC()
-	}
-	if endField != "" {
-		end = time.Unix(utils.StringInt(endField), 0)
-		end = now.New(end).EndOfDay().UTC()
-	}
-
-	service := core.SelectService(utils.StringInt(vars["id"]))
-	data := core.GraphDataRaw(service, start, end, "hour", "latency").ToString()
-
-	out := struct {
-		Services []*core.Service
-		Data     []string
-	}{[]*core.Service{service}, []string{data}}
-
-	executeResponse(w, r, "charts.js", out, nil)
-}
 
 func renderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
 	services := core.CoreApp.Services
