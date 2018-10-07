@@ -129,6 +129,7 @@ func TestEmailNotifier(t *testing.T) {
 	})
 
 	t.Run("emailer Test", func(t *testing.T) {
+		t.SkipNow()
 		err := emailer.OnTest()
 		assert.Nil(t, err)
 	})
