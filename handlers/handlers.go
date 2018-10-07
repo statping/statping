@@ -157,6 +157,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"NewUser": func() *types.User {
 			return new(types.User)
 		},
+		"NewCheckin": func() *types.Checkin {
+			return new(types.Checkin)
+		},
 	}
 }
 

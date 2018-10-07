@@ -217,25 +217,42 @@ func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 	executeResponse(w, r, "services.html", core.CoreApp.Services, "/services")
 }
 
-func checkinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
+func checkinDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
-	api := r.PostForm.Get("api")
-	checkin := core.SelectCheckin(api)
-
-	interval := utils.StringInt(r.PostForm.Get("interval"))
-	grace := utils.StringInt(r.PostForm.Get("grace"))
-	checkin.Interval = interval
-	checkin.GracePeriod = grace
-	checkin.Update()
+	checkin := core.SelectCheckinId(utils.StringInt(vars["id"]))
+	service := core.SelectService(checkin.ServiceId)
+	fmt.Println(checkin, service)
+	checkin.Delete()
 	executeResponse(w, r, "service.html", service, fmt.Sprintf("/service/%v", service.Id))
 }
 
-func checkinUpdateHandler(w http.ResponseWriter, r *http.Request) {
+func checkinCreateHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	vars := mux.Vars(r)
+	r.ParseForm()
+	service := core.SelectService(utils.StringInt(vars["id"]))
+	fmt.Println(service.Name)
+	name := r.PostForm.Get("name")
+	interval := utils.StringInt(r.PostForm.Get("interval"))
+	grace := utils.StringInt(r.PostForm.Get("grace"))
+	checkin := core.ReturnCheckin(&types.Checkin{
+		Name:        name,
+		ServiceId:   service.Id,
+		Interval:    interval,
+		GracePeriod: grace,
+	})
+	checkin.Create()
+	executeResponse(w, r, "service.html", service, fmt.Sprintf("/service/%v", service.Id))
+}
+
+func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	checkin := core.SelectCheckin(vars["id"])
 	ip, _, _ := net.SplitHostPort(r.RemoteAddr)

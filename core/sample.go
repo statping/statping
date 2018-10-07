@@ -89,11 +89,11 @@ func InsertSampleData() error {
 	return nil
 }
 
-// insertSampleCheckins will create 2 checkins with 60 successful hits per checkin
+// insertSampleCheckins will create 2 checkins with 60 successful hits per Checkin
 func insertSampleCheckins() error {
 	s1 := SelectService(1)
 	checkin1 := ReturnCheckin(&types.Checkin{
-		Service:     s1.Id,
+		ServiceId:   s1.Id,
 		Interval:    300,
 		GracePeriod: 300,
 	})
@@ -101,7 +101,7 @@ func insertSampleCheckins() error {
 
 	s2 := SelectService(1)
 	checkin2 := ReturnCheckin(&types.Checkin{
-		Service:     s2.Id,
+		ServiceId:   s2.Id,
 		Interval:    900,
 		GracePeriod: 300,
 	})

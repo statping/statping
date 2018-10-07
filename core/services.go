@@ -51,10 +51,26 @@ func SelectService(id int64) *Service {
 	return nil
 }
 
+// CheckinProcess runs the checkin routine for each checkin attached to service
+func (s *Service) CheckinProcess() {
+	checkins := s.Checkins()
+	for _, c := range checkins {
+		c.Start()
+		go c.Routine()
+	}
+}
+
 // Checkins will return a slice of Checkins for a Service
-func (s *Service) Checkins() []*checkin {
-	var checkin []*checkin
+func (s *Service) Checkins() []*Checkin {
+	var checkin []*Checkin
 	checkinDB().Where("service = ?", s.Id).Find(&checkin)
+	return checkin
+}
+
+// LimitedCheckins will return a slice of Checkins for a Service
+func (s *Service) LimitedCheckins() []*Checkin {
+	var checkin []*Checkin
+	checkinDB().Where("service = ?", s.Id).Limit(10).Find(&checkin)
 	return checkin
 }
 
@@ -69,7 +85,7 @@ func (c *Core) SelectAllServices() ([]*Service, error) {
 	CoreApp.Services = nil
 	for _, service := range services {
 		service.Start()
-		service.Checkins()
+		service.CheckinProcess()
 		service.AllFailures()
 		CoreApp.Services = append(CoreApp.Services, service)
 	}

@@ -63,12 +63,12 @@ func usersDB() *gorm.DB {
 	return DbSession.Model(&types.User{})
 }
 
-// checkinDB returns the checkin records for a service
+// checkinDB returns the Checkin records for a service
 func checkinDB() *gorm.DB {
 	return DbSession.Model(&types.Checkin{})
 }
 
-// checkinHitsDB returns the 'hits' from the checkin record
+// checkinHitsDB returns the 'hits' from the Checkin record
 func checkinHitsDB() *gorm.DB {
 	return DbSession.Model(&types.CheckinHit{})
 }
@@ -115,8 +115,8 @@ func (u *user) AfterFind() (err error) {
 	return
 }
 
-// AfterFind for checkin will set the timezone
-func (c *checkin) AfterFind() (err error) {
+// AfterFind for Checkin will set the timezone
+func (c *Checkin) AfterFind() (err error) {
 	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
 	return
 }
@@ -159,8 +159,8 @@ func (s *Service) BeforeCreate() (err error) {
 	return
 }
 
-// BeforeCreate for checkin will set CreatedAt to UTC
-func (c *checkin) BeforeCreate() (err error) {
+// BeforeCreate for Checkin will set CreatedAt to UTC
+func (c *Checkin) BeforeCreate() (err error) {
 	if c.CreatedAt.IsZero() {
 		c.CreatedAt = time.Now().UTC()
 	}

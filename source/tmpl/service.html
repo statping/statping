@@ -95,6 +95,7 @@
 
     <div class="col-12 mt-4">
         <h3>Service Checkin</h3>
+        {{if $s.LimitedCheckins}}
         <table class="table">
             <thead>
                 <tr>
@@ -102,22 +103,35 @@
                     <th scope="col">Report Period<br>Grace Period</th>
                     <th scope="col">Last Seen</th>
                     <th scope="col">Expected</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
-            {{range $s.Checkins}}
+            {{range $s.LimitedCheckins}}
             {{ $ch := . }}
-            <tr class="{{ if lt $ch.Expected 0}}bg-danger text-white{{else}}bg-light{{end}}">
-                <td>{{CoreApp.Domain}}/checkin/{{$ch.ApiKey}}</td>
+            <tr class="{{ if lt $ch.Expected 0}}bg-warning text-black{{else}}bg-light{{end}}">
+                <td>{{$ch.Name}}<br><a href="{{$ch.Link}}" target="_blank">{{$ch.Link}}</a></td>
                 <td>every {{Duration $ch.Period}}<br>after {{Duration $ch.Grace}}</td>
-                <td>{{Ago $ch.Last.CreatedAt}}</td>
-                <td>{{ if lt $ch.Expected 0}}{{Duration $ch.Expected}} ago{{else}}in {{Duration $ch.Expected}}{{end}}</td>
+                <td>{{ if $ch.Last.CreatedAt.IsZero}}
+                        Never
+                    {{else}}
+                        {{Ago $ch.Last.CreatedAt}}
+                    {{end}}
+                </td>
+                <td>
+                    {{ if $ch.Last.CreatedAt.IsZero}}
+                        -
+                    {{else}}
+                        {{ if lt $ch.Expected 0}}{{Duration $ch.Expected}} ago{{else}}in {{Duration $ch.Expected}}{{end}}
+                    {{end}}
+                </td>
+                <td><a href="/checkin/{{$ch.Id}}/delete" class="btn btn-sm btn-danger">Delete</a></td>
             </tr>
-            {{template "form_checkin" $ch}}
             {{end}}
             </tbody>
         </table>
-
+        {{end}}
+        {{template "form_checkin" $s}}
     </div>
 
 {{end}}
@@ -219,19 +233,20 @@
         }
     });
 
-    startPick.setDate(new Date({{.Start}}*1000));
-    endPick.setDate(new Date({{.End}}*1000));
-
-    startPick.hide()
-    endPick.hide()
+    startPick.setDate(new Date({{.Start}}* 1000);
+    )
+    endPick.setDate(new Date({{.End}}* 1000);
+    )
+    startPick.hide();
+    endPick.hide();
 
     $("#start_date").click(function(e) {
         startPick.show()
-    })
+    });
 
     $("#end_date").click(function(e) {
         endPick.show()
-    })
+    });
 
     AjaxChart(chartdata,{{$s.Id}},{{.Start}},{{.End}},"hour");
 

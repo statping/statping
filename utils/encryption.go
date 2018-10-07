@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"math/rand"
+	"time"
 )
 
 // HashPassword returns the bcrypt hash of a password string
@@ -46,6 +47,7 @@ var characterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY
 // RandomString generates a random string of n length
 func RandomString(n int) string {
 	b := make([]rune, n)
+	rand.Seed(time.Now().UnixNano())
 	for i := range b {
 		b[i] = characterRunes[rand.Intn(len(characterRunes))]
 	}

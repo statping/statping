@@ -1,4 +1,4 @@
-VERSION=0.73
+VERSION=0.74
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -37,7 +37,7 @@ build-all: build-mac build-linux build-windows build-alpine compress
 docker-build-all: docker-build-base docker-build-dev docker-build-latest
 
 # push all docker tags built
-docker-publish-all: docker-push-base docker-push-dev
+docker-publish-all: docker-push-base docker-push-dev docker-push-latest
 
 # build Statup for local arch
 build: compile

@@ -24,7 +24,7 @@ import (
 )
 
 var (
-	testCheckin *checkin
+	testCheckin *Checkin
 )
 
 func TestCreateCheckin(t *testing.T) {
