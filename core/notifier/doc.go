@@ -10,10 +10,9 @@
 //		}
 //
 //		var example = &ExampleNotifier{&Notification{
-//			Method:      METHOD,
-//			Host:        "http://exmaplehost.com",
-//			Title:       "Example",
-//			Description: "Example Notifier",
+//			Method:      "example",
+//			Title:       "Example Notifier",
+//			Description: "This is an example of a notifier for Statup!",
 //			Author:      "Hunter Long",
 //			AuthorUrl:   "https://github.com/hunterlong",
 //			Delay:       time.Duration(3 * time.Second),
