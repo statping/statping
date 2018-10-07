@@ -61,12 +61,12 @@ func usersDB() *gorm.DB {
 	return DbSession.Model(&types.User{})
 }
 
-// checkinDB returns the Checkin records for a service
+// checkinDB returns the checkin records for a service
 func checkinDB() *gorm.DB {
 	return DbSession.Model(&types.Checkin{})
 }
 
-// checkinHitsDB returns the 'hits' from the Checkin record
+// checkinHitsDB returns the 'hits' from the checkin record
 func checkinHitsDB() *gorm.DB {
 	return DbSession.Model(&types.CheckinHit{})
 }
@@ -101,26 +101,26 @@ func (s *Hit) AfterFind() (err error) {
 	return
 }
 
-// AfterFind for Failure will set the timezone
-func (f *Failure) AfterFind() (err error) {
+// AfterFind for failure will set the timezone
+func (f *failure) AfterFind() (err error) {
 	f.CreatedAt = utils.Timezoner(f.CreatedAt, CoreApp.Timezone)
 	return
 }
 
 // AfterFind for USer will set the timezone
-func (u *User) AfterFind() (err error) {
+func (u *user) AfterFind() (err error) {
 	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
 	return
 }
 
-// AfterFind for Checkin will set the timezone
-func (s *Checkin) AfterFind() (err error) {
+// AfterFind for checkin will set the timezone
+func (s *checkin) AfterFind() (err error) {
 	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
 	return
 }
 
-// AfterFind for CheckinHit will set the timezone
-func (s *CheckinHit) AfterFind() (err error) {
+// AfterFind for checkinHit will set the timezone
+func (s *checkinHit) AfterFind() (err error) {
 	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
 	return
 }
@@ -133,16 +133,16 @@ func (u *Hit) BeforeCreate() (err error) {
 	return
 }
 
-// BeforeCreate for Failure will set CreatedAt to UTC
-func (u *Failure) BeforeCreate() (err error) {
+// BeforeCreate for failure will set CreatedAt to UTC
+func (u *failure) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
 	}
 	return
 }
 
-// BeforeCreate for User will set CreatedAt to UTC
-func (u *User) BeforeCreate() (err error) {
+// BeforeCreate for user will set CreatedAt to UTC
+func (u *user) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
 	}
@@ -157,16 +157,16 @@ func (u *Service) BeforeCreate() (err error) {
 	return
 }
 
-// BeforeCreate for Checkin will set CreatedAt to UTC
-func (u *Checkin) BeforeCreate() (err error) {
+// BeforeCreate for checkin will set CreatedAt to UTC
+func (u *checkin) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
 	}
 	return
 }
 
-// BeforeCreate for CheckinHit will set CreatedAt to UTC
-func (u *CheckinHit) BeforeCreate() (err error) {
+// BeforeCreate for checkinHit will set CreatedAt to UTC
+func (u *checkinHit) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
 	}

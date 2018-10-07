@@ -20,6 +20,7 @@ import (
 	"time"
 )
 
+// FormatDuration converts a time.Duration into a string
 func FormatDuration(d time.Duration) string {
 	var out string
 	if d.Hours() >= 24 {

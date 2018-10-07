@@ -28,10 +28,10 @@ import (
 )
 
 var (
-	VERSION   string
+	// VERSION stores the current version of Statup
+	VERSION string
+	// COMMIT stores the git commit hash for this version of Statup
 	COMMIT    string
-	usingEnv  bool
-	directory string
 	ipAddress string
 	port      int
 )

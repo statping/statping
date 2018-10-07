@@ -24,7 +24,7 @@ import (
 	"time"
 )
 
-type Failure struct {
+type failure struct {
 	*types.Failure
 }
 
@@ -41,8 +41,8 @@ func (s *Service) CreateFailure(f *types.Failure) (int64, error) {
 }
 
 // AllFailures will return all failures attached to a service
-func (s *Service) AllFailures() []*Failure {
-	var fails []*Failure
+func (s *Service) AllFailures() []*failure {
+	var fails []*failure
 	col := failuresDB().Where("service = ?", s.Id).Order("id desc")
 	err := col.Find(&fails)
 	if err.Error != nil {
@@ -56,30 +56,30 @@ func (s *Service) AllFailures() []*Failure {
 }
 
 // DeleteFailures will delete all failures for a service
-func (u *Service) DeleteFailures() {
-	err := DbSession.Exec(`DELETE FROM failures WHERE service = ?`, u.Id)
+func (s *Service) DeleteFailures() {
+	err := DbSession.Exec(`DELETE FROM failures WHERE service = ?`, s.Id)
 	if err.Error != nil {
 		utils.Log(3, fmt.Sprintf("failed to delete all failures: %v", err))
 	}
-	u.Failures = nil
+	s.Failures = nil
 }
 
 // LimitedFailures will return the last 10 failures from a service
-func (s *Service) LimitedFailures() []*Failure {
-	var failArr []*Failure
+func (s *Service) LimitedFailures() []*failure {
+	var failArr []*failure
 	col := failuresDB().Where("service = ?", s.Id).Order("id desc").Limit(10)
 	col.Find(&failArr)
 	return failArr
 }
 
 // Ago returns a human readable timestamp for a failure
-func (f *Failure) Ago() string {
+func (f *failure) Ago() string {
 	got, _ := timeago.TimeAgoWithTime(time.Now(), f.CreatedAt)
 	return got
 }
 
 // Delete will remove a failure record from the database
-func (f *Failure) Delete() error {
+func (f *failure) Delete() error {
 	db := failuresDB().Delete(f)
 	return db.Error
 }
@@ -129,7 +129,7 @@ func (s *Service) TotalFailuresSince(ago time.Time) (uint64, error) {
 }
 
 // ParseError returns a human readable error for a failure
-func (f *Failure) ParseError() string {
+func (f *failure) ParseError() string {
 	err := strings.Contains(f.Issue, "connection reset by peer")
 	if err {
 		return fmt.Sprintf("Connection Reset")

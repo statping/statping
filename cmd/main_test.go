@@ -121,12 +121,12 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" Create Users", func(t *testing.T) {
 			RunUserCreate(t)
 		})
-		t.Run(dbt+" Update User", func(t *testing.T) {
-			RunUser_Update(t)
+		t.Run(dbt+" Update user", func(t *testing.T) {
+			runUserUpdate(t)
 		})
 		t.Run(dbt+" Create Non Unique Users", func(t *testing.T) {
 			t.SkipNow()
-			RunUser_NonUniqueCreate(t)
+			runUserNonUniqueCreate(t)
 		})
 		t.Run(dbt+" Select Users", func(t *testing.T) {
 			RunUserSelectAll(t)
@@ -147,7 +147,7 @@ func TestRunAll(t *testing.T) {
 			RunServiceToJSON(t)
 		})
 		t.Run(dbt+" Avg Time", func(t *testing.T) {
-			RunService_AvgTime(t)
+			runServiceAvgTime(t)
 		})
 		t.Run(dbt+" Online 24h", func(t *testing.T) {
 			RunServiceOnline24(t)
@@ -173,7 +173,7 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" Delete Service", func(t *testing.T) {
 			RunDeleteService(t)
 		})
-		t.Run(dbt+" Delete User", func(t *testing.T) {
+		t.Run(dbt+" Delete user", func(t *testing.T) {
 			RunUserDelete(t)
 		})
 		t.Run(dbt+" HTTP /", func(t *testing.T) {
@@ -341,7 +341,7 @@ func RunUserCreate(t *testing.T) {
 	assert.Equal(t, int64(4), id)
 }
 
-func RunUser_Update(t *testing.T) {
+func runUserUpdate(t *testing.T) {
 	user, err := core.SelectUser(1)
 	user.Email = "info@updatedemail.com"
 	assert.Nil(t, err)
@@ -352,7 +352,7 @@ func RunUser_Update(t *testing.T) {
 	assert.Equal(t, "info@updatedemail.com", updatedUser.Email)
 }
 
-func RunUser_NonUniqueCreate(t *testing.T) {
+func runUserNonUniqueCreate(t *testing.T) {
 	user := core.ReturnUser(&types.User{
 		Username: "admin",
 		Password: "admin",
@@ -410,7 +410,7 @@ func RunServiceToJSON(t *testing.T) {
 	assert.NotEmpty(t, jsoned)
 }
 
-func RunService_AvgTime(t *testing.T) {
+func runServiceAvgTime(t *testing.T) {
 	service := core.SelectService(1)
 	assert.NotNil(t, service)
 	avg := service.AvgUptime24()

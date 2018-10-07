@@ -244,7 +244,7 @@ func TestUsersEditHandler(t *testing.T) {
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | admin</title>")
-	assert.Contains(t, body, "<h3>User admin</h3>")
+	assert.Contains(t, body, "<h3>user admin</h3>")
 	assert.Contains(t, body, "value=\"info@statup.io\"")
 	assert.Contains(t, body, "value=\"##########\"")
 	assert.Contains(t, body, "Statup  made with ❤️")

@@ -110,7 +110,7 @@ func OnUpdatedCore(c *types.Core) {
 	}
 }
 
-// OnUpdatedCore is triggered when the CoreApp settings are saved - CoreEvents interface
+// OnStart is triggered when the Statup service has started
 func OnStart(c *types.Core) {
 	for _, comm := range AllCommunications {
 		if isType(comm, new(CoreEvents)) && isEnabled(comm) && inLimits(comm) {
@@ -128,7 +128,7 @@ func OnNewNotifier(n *Notification) {
 	}
 }
 
-// NotifierEvents interface
+// OnUpdatedNotifier is triggered when a notifier has been updated
 func OnUpdatedNotifier(n *Notification) {
 	for _, comm := range AllCommunications {
 		if isType(comm, new(NotifierEvents)) && isEnabled(comm) && inLimits(comm) {

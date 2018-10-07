@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"github.com/ararog/timeago"
 	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"regexp"
@@ -29,6 +30,7 @@ import (
 )
 
 var (
+	// Directory returns the current path or the STATUP_DIR environment variable
 	Directory string
 )
 
@@ -206,4 +208,10 @@ func DurationReadable(d time.Duration) string {
 		return fmt.Sprintf("%0.0f seconds", d.Seconds())
 	}
 	return d.String()
+}
+
+// SaveFile
+func SaveFile(filename string, data []byte) error {
+	err := ioutil.WriteFile(filename, data, 0644)
+	return err
 }

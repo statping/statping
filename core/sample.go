@@ -175,7 +175,7 @@ func insertSampleUsers() {
 	u3.Create()
 }
 
-// InsertSampleData will create the example/dummy services for a brand new Statup installation
+// InsertLargeSampleData will create the example/dummy services for testing the Statup server
 func InsertLargeSampleData() error {
 	insertSampleCore()
 	InsertSampleData()

@@ -28,8 +28,10 @@ import (
 )
 
 var (
-	AllCommunications []types.AllNotifiers // AllCommunications holds all the loaded notifiers
-	db                *gorm.DB             // db holds the Statup database connection
+	// AllCommunications holds all the loaded notifiers
+	AllCommunications []types.AllNotifiers
+	// db holds the Statup database connection
+	db *gorm.DB
 )
 
 // Notification contains all the fields for a Statup Notifier.
@@ -225,7 +227,7 @@ func SelectNotifier(method string) (*Notification, Notifier, error) {
 	for _, comm := range AllCommunications {
 		n, ok := comm.(Notifier)
 		if !ok {
-			return nil, nil, errors.New(fmt.Sprintf("incorrect notification type: %v", reflect.TypeOf(n).String()))
+			return nil, nil, fmt.Errorf("incorrect notification type: %v", reflect.TypeOf(n).String())
 		}
 		notifier := n.Select()
 		if notifier.Method == method {
@@ -305,31 +307,31 @@ func install(n Notifier) error {
 }
 
 // LastSent returns a time.Duration of the last sent notification for the notifier
-func (f *Notification) LastSent() time.Duration {
-	if len(f.logs) == 0 {
+func (n *Notification) LastSent() time.Duration {
+	if len(n.logs) == 0 {
 		return time.Duration(0)
 	}
-	last := f.Logs()[0]
+	last := n.Logs()[0]
 	since := time.Since(last.Timestamp)
 	return since
 }
 
 // SentLastHour returns the total amount of notifications sent in last 1 hour
-func (f *Notification) SentLastHour() int {
+func (n *Notification) SentLastHour() int {
 	since := time.Now().Add(-1 * time.Hour)
-	return f.SentLast(since)
+	return n.SentLast(since)
 }
 
 // SentLastMinute returns the total amount of notifications sent in last 1 minute
-func (f *Notification) SentLastMinute() int {
+func (n *Notification) SentLastMinute() int {
 	since := time.Now().Add(-1 * time.Minute)
-	return f.SentLast(since)
+	return n.SentLast(since)
 }
 
 // SentLast accept a time.Time and returns the amount of sent notifications within your time to current
-func (f *Notification) SentLast(since time.Time) int {
+func (n *Notification) SentLast(since time.Time) int {
 	sent := 0
-	for _, v := range f.Logs() {
+	for _, v := range n.Logs() {
 		lastTime := time.Time(v.Time)
 		if lastTime.After(since) {
 			sent++
@@ -387,21 +389,21 @@ func inLimits(n interface{}) bool {
 }
 
 // WithinLimits returns true if the notifier is within its sending limits
-func (notify *Notification) WithinLimits() (bool, error) {
-	if notify.SentLastMinute() == 0 {
+func (n *Notification) WithinLimits() (bool, error) {
+	if n.SentLastMinute() == 0 {
 		return true, nil
 	}
-	if notify.SentLastMinute() >= notify.Limits {
-		return false, errors.New(fmt.Sprintf("notifier sent %v out of %v in last minute", notify.SentLastMinute(), notify.Limits))
+	if n.SentLastMinute() >= n.Limits {
+		return false, fmt.Errorf("notifier sent %v out of %v in last minute", n.SentLastMinute(), n.Limits)
 	}
-	if notify.Delay.Seconds() == 0 {
-		notify.Delay = time.Duration(500 * time.Millisecond)
+	if n.Delay.Seconds() == 0 {
+		n.Delay = time.Duration(500 * time.Millisecond)
 	}
-	if notify.LastSent().Seconds() == 0 {
+	if n.LastSent().Seconds() == 0 {
 		return true, nil
 	}
-	if notify.Delay.Seconds() >= notify.LastSent().Seconds() {
-		return false, errors.New(fmt.Sprintf("notifiers delay (%v) is greater than last message sent (%v)", notify.Delay.Seconds(), notify.LastSent().Seconds()))
+	if n.Delay.Seconds() >= n.LastSent().Seconds() {
+		return false, fmt.Errorf("notifiers delay (%v) is greater than last message sent (%v)", n.Delay.Seconds(), n.LastSent().Seconds())
 	}
 	return true, nil
 }

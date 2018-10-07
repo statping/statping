@@ -61,11 +61,16 @@ $('form').submit(function() {
 
 $('select#service_type').on('change', function() {
     var selected = $('#service_type option:selected').val();
+    var typeLabel = $('#service_type_label');
     if (selected === 'tcp' || selected === 'udp') {
+        if (selected === 'tcp') {
+            typeLabel.html('TCP Port')
+        } else {
+            typeLabel.html('UDP Port')
+        }
         $('#service_port').parent().parent().removeClass('d-none');
         $('#service_check_type').parent().parent().addClass('d-none');
         $('#service_url').attr('placeholder', 'localhost');
-
         $('#post_data').parent().parent().addClass('d-none');
         $('#service_response').parent().parent().addClass('d-none');
         $('#service_response_code').parent().parent().addClass('d-none');
@@ -75,10 +80,8 @@ $('select#service_type').on('change', function() {
         $('#service_response_code').parent().parent().removeClass('d-none');
         $('#service_check_type').parent().parent().removeClass('d-none');
         $('#service_url').attr('placeholder', 'https://google.com');
-
         $('#service_port').parent().parent().addClass('d-none');
     }
-
 });
 
 function AjaxChart(chart, service, start=0, end=9999999999, group="hour") {

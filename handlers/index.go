@@ -22,10 +22,6 @@ import (
 	"net/http"
 )
 
-type index struct {
-	Core *core.Core
-}
-
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if core.Configs == nil {
 		http.Redirect(w, r, "/setup", http.StatusSeeOther)
@@ -38,6 +34,7 @@ func trayHandler(w http.ResponseWriter, r *http.Request) {
 	executeResponse(w, r, "tray.html", core.CoreApp, nil)
 }
 
+// DesktopInit will run the Statup server on a specific IP and port using SQLite database
 func DesktopInit(ip string, port int) {
 	var err error
 	exists := utils.FileExists(utils.Directory + "/statup.db")

@@ -92,7 +92,7 @@ func CatchCLI(args []string) error {
 			return err
 		}
 		indexSource := core.ExportIndexHTML()
-		err = core.SaveFile("./index.html", []byte(indexSource))
+		err = utils.SaveFile("./index.html", []byte(indexSource))
 		if err != nil {
 			utils.Log(4, err)
 			return err
@@ -194,7 +194,7 @@ func HelpEcho() {
 //	core.OnSuccess(core.SelectService(1))
 //	fmt.Println("\n" + BRAKER)
 //	fmt.Println(POINT + "Sending 'OnFailure(Service, FailureData)'")
-//	fakeFailD := &types.Failure{
+//	fakeFailD := &types.failure{
 //		Issue: "No issue, just testing this plugin. This would include HTTP failure information though",
 //	}
 //	core.OnFailure(core.SelectService(1), fakeFailD)
@@ -206,7 +206,7 @@ func HelpEcho() {
 //	fmt.Println(POINT + "Sending 'OnNewService(Service)'")
 //	core.OnNewService(core.SelectService(2))
 //	fmt.Println("\n" + BRAKER)
-//	fmt.Println(POINT + "Sending 'OnNewUser(User)'")
+//	fmt.Println(POINT + "Sending 'OnNewUser(user)'")
 //	user, _ := core.SelectUser(1)
 //	core.OnNewUser(user)
 //	fmt.Println("\n" + BRAKER)
@@ -258,7 +258,7 @@ func HelpEcho() {
 //	}}
 //	fakeSrv2.Create()
 //
-//	fakeUser := &types.User{
+//	fakeUser := &types.user{
 //		Id:        6334,
 //		Username:  "Bulbasaur",
 //		Password:  "$2a$14$NzT/fLdE3f9iB1Eux2C84O6ZoPhI4NfY0Ke32qllCFo8pMTkUPZzy",
@@ -268,7 +268,7 @@ func HelpEcho() {
 //	}
 //	fakeUser.Create()
 //
-//	fakeUser = &types.User{
+//	fakeUser = &types.user{
 //		Id:        6335,
 //		Username:  "Billy",
 //		Password:  "$2a$14$NzT/fLdE3f9iB1Eux2C84O6ZoPhI4NfY0Ke32qllCFo8pMTkUPZzy",
@@ -288,12 +288,12 @@ func HelpEcho() {
 //		}
 //		fakeSrv2.CreateHit(dd)
 //
-//		fail := &types.Failure{
+//		fail := &types.failure{
 //			Issue: "This is not an issue, but it would container HTTP response errors.",
 //		}
 //		fakeSrv.CreateFailure(fail)
 //
-//		fail = &types.Failure{
+//		fail = &types.failure{
 //			Issue: "HTTP Status Code 521 did not match 200",
 //		}
 //		fakeSrv.CreateFailure(fail)

@@ -52,8 +52,8 @@ func SelectService(id int64) *Service {
 }
 
 // Checkins will return a slice of Checkins for a Service
-func (s *Service) Checkins() []*Checkin {
-	var checkin []*Checkin
+func (s *Service) Checkins() []*checkin {
+	var checkin []*checkin
 	checkinDB().Where("service = ?", s.Id).Find(&checkin)
 	return checkin
 }
@@ -141,7 +141,7 @@ type DateScanObj struct {
 }
 
 // lastFailure returns the last failure a service had
-func (s *Service) lastFailure() *Failure {
+func (s *Service) lastFailure() *failure {
 	limited := s.LimitedFailures()
 	if len(limited) == 0 {
 		return nil
