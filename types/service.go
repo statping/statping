@@ -19,6 +19,7 @@ import (
 	"time"
 )
 
+// Service is the main struct for Services
 type Service struct {
 	Id             int64         `gorm:"primary_key;column:id" json:"id"`
 	Name           string        `gorm:"column:name" json:"name"`

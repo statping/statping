@@ -75,7 +75,7 @@ func (s *Service) duration() time.Duration {
 }
 
 func (s *Service) parseHost() string {
-	if s.Type == "tcp" {
+	if s.Type == "tcp" || s.Type == "udp" {
 		return s.Domain
 	} else {
 		domain := s.Domain
@@ -125,10 +125,10 @@ func (s *Service) checkTcp(record bool) *Service {
 	if s.Port != 0 {
 		domain = fmt.Sprintf("%v:%v", s.Domain, s.Port)
 	}
-	conn, err := net.DialTimeout("tcp", domain, time.Duration(s.Timeout)*time.Second)
+	conn, err := net.DialTimeout(s.Type, domain, time.Duration(s.Timeout)*time.Second)
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("TCP Dial Error %v", err))
+			recordFailure(s, fmt.Sprintf("%v Dial Error %v", s.Type, err))
 		}
 		return s
 	}
@@ -223,7 +223,7 @@ func (s *Service) Check(record bool) {
 	switch s.Type {
 	case "http":
 		s.checkHttp(record)
-	case "tcp":
+	case "tcp", "udp":
 		s.checkTcp(record)
 	}
 }

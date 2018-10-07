@@ -241,7 +241,7 @@ func ExportIndexHTML() string
 ```
 
 
-## <a name="InitApp">func</a> [InitApp](https://github.com/hunterlong/statup/tree/master/core/core.go?s=1690:1704#L60)
+## <a name="InitApp">func</a> [InitApp](https://github.com/hunterlong/statup/tree/master/core/core.go?s=1675:1689#L60)
 ``` go
 func InitApp()
 ```
@@ -468,7 +468,7 @@ Create will create a new successful CheckinHit
 
 
 
-## <a name="Core">type</a> [Core](https://github.com/hunterlong/statup/tree/master/core/core.go?s=967:1000#L31)
+## <a name="Core">type</a> [Core](https://github.com/hunterlong/statup/tree/master/core/core.go?s=952:985#L31)
 ``` go
 type Core struct {
     *types.Core
@@ -481,21 +481,21 @@ type Core struct {
 
 
 
-### <a name="NewCore">func</a> [NewCore](https://github.com/hunterlong/statup/tree/master/core/core.go?s=1426:1446#L47)
+### <a name="NewCore">func</a> [NewCore](https://github.com/hunterlong/statup/tree/master/core/core.go?s=1411:1431#L47)
 ``` go
 func NewCore() *Core
 ```
 NewCore return a new *core.Core struct
 
 
-### <a name="SelectCore">func</a> [SelectCore](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3778:3810#L136)
+### <a name="SelectCore">func</a> [SelectCore](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3763:3795#L136)
 ``` go
 func SelectCore() (*Core, error)
 ```
 SelectCore will return the CoreApp global variable and the settings/configs for Statup
 
 
-### <a name="UpdateCore">func</a> [UpdateCore](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2257:2296#L82)
+### <a name="UpdateCore">func</a> [UpdateCore](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2242:2281#L82)
 ``` go
 func UpdateCore(c *Core) (*Core, error)
 ```
@@ -505,7 +505,7 @@ UpdateCore will update the CoreApp variable inside of the 'core' table in databa
 
 
 
-### <a name="Core.AllOnline">func</a> (Core) [AllOnline](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3552:3582#L126)
+### <a name="Core.AllOnline">func</a> (Core) [AllOnline](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3537:3567#L126)
 ``` go
 func (c Core) AllOnline() bool
 ```
@@ -514,7 +514,7 @@ AllOnline will be true if all services are online
 
 
 
-### <a name="Core.BaseSASS">func</a> (Core) [BaseSASS](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3055:3086#L109)
+### <a name="Core.BaseSASS">func</a> (Core) [BaseSASS](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3040:3071#L109)
 ``` go
 func (c Core) BaseSASS() string
 ```
@@ -541,7 +541,7 @@ CountOnline
 
 
 
-### <a name="Core.CurrentTime">func</a> (Core) [CurrentTime](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2410:2444#L88)
+### <a name="Core.CurrentTime">func</a> (Core) [CurrentTime](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2395:2429#L88)
 ``` go
 func (c Core) CurrentTime() string
 ```
@@ -550,7 +550,7 @@ UsingAssets will return true if /assets folder is present
 
 
 
-### <a name="Core.MobileSASS">func</a> (Core) [MobileSASS](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3340:3373#L118)
+### <a name="Core.MobileSASS">func</a> (Core) [MobileSASS](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3325:3358#L118)
 ``` go
 func (c Core) MobileSASS() string
 ```
@@ -560,7 +560,7 @@ file /assets/scss/mobile.scss to be edited in Theme
 
 
 
-### <a name="Core.SassVars">func</a> (Core) [SassVars](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2797:2828#L101)
+### <a name="Core.SassVars">func</a> (Core) [SassVars](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2782:2813#L101)
 ``` go
 func (c Core) SassVars() string
 ```
@@ -587,7 +587,7 @@ ServicesCount returns the amount of services inside the []*core.Services slice
 
 
 
-### <a name="Core.ToCore">func</a> (\*Core) [ToCore](https://github.com/hunterlong/statup/tree/master/core/core.go?s=1600:1635#L55)
+### <a name="Core.ToCore">func</a> (\*Core) [ToCore](https://github.com/hunterlong/statup/tree/master/core/core.go?s=1585:1620#L55)
 ``` go
 func (c *Core) ToCore() *types.Core
 ```
@@ -596,7 +596,7 @@ ToCore will convert *core.Core to *types.Core
 
 
 
-### <a name="Core.UsingAssets">func</a> (Core) [UsingAssets](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2638:2670#L96)
+### <a name="Core.UsingAssets">func</a> (Core) [UsingAssets](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2623:2655#L96)
 ``` go
 func (c Core) UsingAssets() bool
 ```
@@ -881,7 +881,7 @@ BeforeCreate for Hit will set CreatedAt to UTC
 
 
 
-## <a name="PluginJSON">type</a> [PluginJSON](https://github.com/hunterlong/statup/tree/master/core/core.go?s=898:930#L28)
+## <a name="PluginJSON">type</a> [PluginJSON](https://github.com/hunterlong/statup/tree/master/core/core.go?s=883:915#L28)
 ``` go
 type PluginJSON types.PluginJSON
 ```
@@ -894,7 +894,7 @@ type PluginJSON types.PluginJSON
 
 
 
-## <a name="PluginRepos">type</a> [PluginRepos](https://github.com/hunterlong/statup/tree/master/core/core.go?s=931:965#L29)
+## <a name="PluginRepos">type</a> [PluginRepos](https://github.com/hunterlong/statup/tree/master/core/core.go?s=916:950#L29)
 ``` go
 type PluginRepos types.PluginRepos
 ```
@@ -991,7 +991,7 @@ BeforeCreate for Service will set CreatedAt to UTC
 
 
 
-### <a name="Service.Check">func</a> (\*Service) [Check](https://github.com/hunterlong/statup/tree/master/core/checker.go?s=5538:5574#L222)
+### <a name="Service.Check">func</a> (\*Service) [Check](https://github.com/hunterlong/statup/tree/master/core/checker.go?s=5565:5601#L222)
 ``` go
 func (s *Service) Check(record bool)
 ```
@@ -1252,7 +1252,7 @@ UpdateSingle will update a single column for a service
 
 
 
-## <a name="ServiceOrder">type</a> [ServiceOrder](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4393:4435#L158)
+## <a name="ServiceOrder">type</a> [ServiceOrder](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4378:4420#L158)
 ``` go
 type ServiceOrder []types.ServiceInterface
 ```
@@ -1267,21 +1267,21 @@ ServiceOrder will reorder the services based on 'order_id' (Order)
 
 
 
-### <a name="ServiceOrder.Len">func</a> (ServiceOrder) [Len](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4437:4468#L160)
+### <a name="ServiceOrder.Len">func</a> (ServiceOrder) [Len](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4422:4453#L160)
 ``` go
 func (c ServiceOrder) Len() int
 ```
 
 
 
-### <a name="ServiceOrder.Less">func</a> (ServiceOrder) [Less](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4567:4608#L162)
+### <a name="ServiceOrder.Less">func</a> (ServiceOrder) [Less](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4552:4593#L162)
 ``` go
 func (c ServiceOrder) Less(i, j int) bool
 ```
 
 
 
-### <a name="ServiceOrder.Swap">func</a> (ServiceOrder) [Swap](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4497:4533#L161)
+### <a name="ServiceOrder.Swap">func</a> (ServiceOrder) [Swap](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4482:4518#L161)
 ``` go
 func (c ServiceOrder) Swap(i, j int)
 ```
@@ -2341,7 +2341,7 @@ type Routing struct {
 
 
 
-## <a name="Service">type</a> [Service](https://github.com/hunterlong/statup/tree/master/types/service.go?s=707:2484#L22)
+## <a name="Service">type</a> [Service](https://github.com/hunterlong/statup/tree/master/types/service.go?s=750:2527#L23)
 ``` go
 type Service struct {
     Id             int64         `gorm:"primary_key;column:id" json:"id"`
@@ -2373,6 +2373,7 @@ type Service struct {
 }
 
 ```
+Service is the main struct for Services
 
 
 
@@ -2382,7 +2383,8 @@ type Service struct {
 
 
 
-### <a name="Service.Close">func</a> (\*Service) [Close](https://github.com/hunterlong/statup/tree/master/types/service.go?s=2844:2869#L66)
+
+### <a name="Service.Close">func</a> (\*Service) [Close](https://github.com/hunterlong/statup/tree/master/types/service.go?s=2887:2912#L67)
 ``` go
 func (s *Service) Close()
 ```
@@ -2391,7 +2393,7 @@ Close will stop the go routine that is checking if service is online or not
 
 
 
-### <a name="Service.IsRunning">func</a> (\*Service) [IsRunning](https://github.com/hunterlong/statup/tree/master/types/service.go?s=2980:3014#L73)
+### <a name="Service.IsRunning">func</a> (\*Service) [IsRunning](https://github.com/hunterlong/statup/tree/master/types/service.go?s=3023:3057#L74)
 ``` go
 func (s *Service) IsRunning() bool
 ```
@@ -2400,7 +2402,7 @@ IsRunning returns true if the service go routine is running
 
 
 
-### <a name="Service.Start">func</a> (\*Service) [Start](https://github.com/hunterlong/statup/tree/master/types/service.go?s=2705:2730#L61)
+### <a name="Service.Start">func</a> (\*Service) [Start](https://github.com/hunterlong/statup/tree/master/types/service.go?s=2748:2773#L62)
 ``` go
 func (s *Service) Start()
 ```
@@ -2409,7 +2411,7 @@ Start will create a channel for the service checking go routine
 
 
 
-## <a name="ServiceInterface">type</a> [ServiceInterface](https://github.com/hunterlong/statup/tree/master/types/service.go?s=2486:2636#L51)
+## <a name="ServiceInterface">type</a> [ServiceInterface](https://github.com/hunterlong/statup/tree/master/types/service.go?s=2529:2679#L52)
 ``` go
 type ServiceInterface interface {
     Select() *Service

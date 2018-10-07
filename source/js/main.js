@@ -61,7 +61,7 @@ $('form').submit(function() {
 
 $('select#service_type').on('change', function() {
     var selected = $('#service_type option:selected').val();
-    if (selected === 'tcp') {
+    if (selected === 'tcp' || selected === 'udp') {
         $('#service_port').parent().parent().removeClass('d-none');
         $('#service_check_type').parent().parent().addClass('d-none');
         $('#service_url').attr('placeholder', 'localhost');

@@ -12,6 +12,7 @@
             <select name="check_type" class="form-control" id="service_type" value="{{.Type}}">
                 <option value="http" {{if eq .Type "http"}}selected{{end}}>HTTP Service</option>
                 <option value="tcp" {{if eq .Type "tcp"}}selected{{end}}>TCP Service</option>
+                <option value="udp" {{if eq .Type "udp"}}selected{{end}}>UDP Service</option>
             </select>
         </div>
     </div>
