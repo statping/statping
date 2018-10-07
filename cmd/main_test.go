@@ -17,7 +17,6 @@ package main
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/handlers"
@@ -35,10 +34,8 @@ import (
 )
 
 var (
-	route            *mux.Router
-	testSession      *sessions.Session
-	dir              string
-	SERVICE_SINCE, _ = time.Parse(time.RFC3339, "2018-08-30T10:42:08-07:00")
+	route *mux.Router
+	dir   string
 )
 
 func init() {

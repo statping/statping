@@ -119,7 +119,7 @@ func OnStart(c *types.Core) {
 	}
 }
 
-// NotifierEvents interface
+// OnNewNotifier is triggered when a new notifier is loaded
 func OnNewNotifier(n *Notification) {
 	for _, comm := range AllCommunications {
 		if isType(comm, new(NotifierEvents)) && isEnabled(comm) && inLimits(comm) {

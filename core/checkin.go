@@ -101,7 +101,7 @@ func (c *checkin) Create() (int64, error) {
 
 // Update will update a checkin
 func (c *checkin) Update() (int64, error) {
-	row := checkinDB().Update(&c)
+	row := checkinDB().Update(c)
 	if row.Error != nil {
 		utils.Log(2, row.Error)
 		return 0, row.Error

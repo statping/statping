@@ -23,16 +23,21 @@ import (
 )
 
 var (
-	dir string
+	dir       string
+	skipNewDb bool
 )
 
 func init() {
 	dir = utils.Directory
 	utils.InitLogs()
 	source.Assets()
+	skipNewDb = false
 }
 
 func TestNewCore(t *testing.T) {
+	if skipNewDb {
+		t.SkipNow()
+	}
 	utils.DeleteFile(dir + "/config.yml")
 	utils.DeleteFile(dir + "/statup.db")
 	CoreApp = NewCore()
@@ -41,6 +46,9 @@ func TestNewCore(t *testing.T) {
 }
 
 func TestDbConfig_Save(t *testing.T) {
+	if skipNewDb {
+		t.SkipNow()
+	}
 	var err error
 	Configs = &DbConfig{
 		DbConn:   "sqlite",
@@ -66,11 +74,17 @@ func TestDbConnection(t *testing.T) {
 }
 
 func TestDropDatabase(t *testing.T) {
+	if skipNewDb {
+		t.SkipNow()
+	}
 	err := Configs.DropDatabase()
 	assert.Nil(t, err)
 }
 
 func TestSeedSchemaDatabase(t *testing.T) {
+	if skipNewDb {
+		t.SkipNow()
+	}
 	err := Configs.CreateDatabase()
 	assert.Nil(t, err)
 }
@@ -81,6 +95,9 @@ func TestMigrateDatabase(t *testing.T) {
 }
 
 func TestSeedDatabase(t *testing.T) {
+	if skipNewDb {
+		t.SkipNow()
+	}
 	err := InsertLargeSampleData()
 	assert.Nil(t, err)
 }
@@ -98,6 +115,9 @@ func TestSelectCore(t *testing.T) {
 }
 
 func TestInsertNotifierDB(t *testing.T) {
+	if skipNewDb {
+		t.SkipNow()
+	}
 	err := insertNotifierDB()
 	assert.Nil(t, err)
 }
