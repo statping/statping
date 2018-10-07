@@ -37,13 +37,13 @@ func (c *checkin) String() string {
 }
 
 // ReturnCheckin converts *types.Checking to *core.checkin
-func ReturnCheckin(s *types.Checkin) *checkin {
-	return &checkin{Checkin: s}
+func ReturnCheckin(c *types.Checkin) *checkin {
+	return &checkin{Checkin: c}
 }
 
 // ReturnCheckinHit converts *types.checkinHit to *core.checkinHit
-func ReturnCheckinHit(h *types.CheckinHit) *checkinHit {
-	return &checkinHit{CheckinHit: h}
+func ReturnCheckinHit(c *types.CheckinHit) *checkinHit {
+	return &checkinHit{CheckinHit: c}
 }
 
 // SelectCheckin will find a checkin based on the API supplied
@@ -100,31 +100,31 @@ func (c *checkin) Create() (int64, error) {
 }
 
 // Update will update a checkin
-func (u *checkin) Update() (int64, error) {
-	row := checkinDB().Update(&u)
+func (c *checkin) Update() (int64, error) {
+	row := checkinDB().Update(&c)
 	if row.Error != nil {
 		utils.Log(2, row.Error)
 		return 0, row.Error
 	}
-	return u.Id, row.Error
+	return c.Id, row.Error
 }
 
 // Create will create a new successful checkinHit
-func (u *checkinHit) Create() (int64, error) {
-	if u.CreatedAt.IsZero() {
-		u.CreatedAt = time.Now()
+func (c *checkinHit) Create() (int64, error) {
+	if c.CreatedAt.IsZero() {
+		c.CreatedAt = time.Now()
 	}
-	row := checkinHitsDB().Create(u)
+	row := checkinHitsDB().Create(c)
 	if row.Error != nil {
 		utils.Log(2, row.Error)
 		return 0, row.Error
 	}
-	return u.Id, row.Error
+	return c.Id, row.Error
 }
 
 // Ago returns the duration of time between now and the last successful checkinHit
-func (f *checkinHit) Ago() string {
-	got, _ := timeago.TimeAgoWithTime(time.Now(), f.CreatedAt)
+func (c *checkinHit) Ago() string {
+	got, _ := timeago.TimeAgoWithTime(time.Now(), c.CreatedAt)
 	return got
 }
 

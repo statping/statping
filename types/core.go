@@ -19,6 +19,7 @@ import (
 	"time"
 )
 
+// AllNotifiers contains all the Notifiers loaded
 type AllNotifiers interface{}
 
 // Core struct contains all the required fields for Statup. All application settings
@@ -46,12 +47,11 @@ type Core struct {
 	Repos         []PluginJSON       `gorm:"-" json:"-"`
 	AllPlugins    []PluginActions    `gorm:"-" json:"-"`
 	Notifications []AllNotifiers     `gorm:"-" json:"-"`
-	CoreInterface `gorm:"-" json:"-"`
 }
 
-type CoreInterface interface {
-	SelectAllServices() ([]*Service, error)
-	Count24HFailures() uint64
-	ServicesCount() int
-	CountOnline() int
-}
+//type CoreInterface interface {
+//	SelectAllServices() ([]*Service, error)
+//	Count24HFailures() uint64
+//	ServicesCount() int
+//	CountOnline() int
+//}

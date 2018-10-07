@@ -31,9 +31,10 @@ var (
 	// VERSION stores the current version of Statup
 	VERSION string
 	// COMMIT stores the git commit hash for this version of Statup
-	COMMIT    string
-	ipAddress string
-	port      int
+	COMMIT      string
+	ipAddress   string
+	UsingDotEnv bool
+	port        int
 )
 
 func init() {
@@ -87,7 +88,7 @@ func LoadDotEnvs() error {
 	err := godotenv.Load()
 	if err == nil {
 		utils.Log(1, "Environment file '.env' Loaded")
-		usingEnv = true
+		UsingDotEnv = true
 	}
 	return err
 }

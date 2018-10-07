@@ -16,7 +16,6 @@
 package notifier
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 )
@@ -30,7 +29,7 @@ func checkNotifierForm(n Notifier) error {
 	for _, f := range notifier.Form {
 		contains := contains(f.DbField, allowedVars)
 		if !contains {
-			return errors.New(fmt.Sprintf("the DbField '%v' is not allowed, allowed vars: %v", f.DbField, allowedVars))
+			return fmt.Errorf("the DbField '%v' is not allowed, allowed vars: %v", f.DbField, allowedVars)
 		}
 	}
 	return nil

@@ -20,18 +20,17 @@ import (
 )
 
 const (
-	TIME_NANOZ = "2006-01-02 15:04:05.999999-0700 MST"
-	TIME_NANO  = "2006-01-02T15:04:05Z"
-	TIME       = "2006-01-02 15:04:05"
-	TIME_DAY   = "2006-01-02"
+	TIME_NANO = "2006-01-02T15:04:05Z"
+	TIME      = "2006-01-02 15:04:05"
+	TIME_DAY  = "2006-01-02"
 )
 
 var (
-	NOW         = func() time.Time { return time.Now() }()
-	HOUR_1_AGO  = time.Now().Add(-1 * time.Hour)
-	HOUR_24_AGO = time.Now().Add(-24 * time.Hour)
-	HOUR_72_AGO = time.Now().Add(-72 * time.Hour)
-	DAY_7_AGO   = NOW.AddDate(0, 0, -7)
-	MONTH_1_AGO = NOW.AddDate(0, -1, 0)
-	YEAR_1_AGO  = NOW.AddDate(-1, 0, 0)
+	NOW = func() time.Time { return time.Now() }()
+	//HOUR_1_AGO  = time.Now().Add(-1 * time.Hour)
+	//HOUR_24_AGO = time.Now().Add(-24 * time.Hour)
+	//HOUR_72_AGO = time.Now().Add(-72 * time.Hour)
+	//DAY_7_AGO   = NOW.AddDate(0, 0, -7)
+	//MONTH_1_AGO = NOW.AddDate(0, -1, 0)
+	//YEAR_1_AGO  = NOW.AddDate(-1, 0, 0)
 )

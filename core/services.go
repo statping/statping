@@ -318,59 +318,59 @@ func updateService(service *Service) {
 }
 
 // Delete will remove a service from the database, it will also end the service checking go routine
-func (u *Service) Delete() error {
-	i := u.index()
-	err := servicesDB().Delete(u)
+func (s *Service) Delete() error {
+	i := s.index()
+	err := servicesDB().Delete(s)
 	if err.Error != nil {
-		utils.Log(3, fmt.Sprintf("Failed to delete service %v. %v", u.Name, err.Error))
+		utils.Log(3, fmt.Sprintf("Failed to delete service %v. %v", s.Name, err.Error))
 		return err.Error
 	}
-	u.Close()
+	s.Close()
 	slice := CoreApp.Services
 	CoreApp.Services = append(slice[:i], slice[i+1:]...)
 	reorderServices()
-	notifier.OnDeletedService(u.Service)
+	notifier.OnDeletedService(s.Service)
 	return err.Error
 }
 
 // UpdateSingle will update a single column for a service
-func (u *Service) UpdateSingle(attr ...interface{}) error {
-	return servicesDB().Model(u).Update(attr).Error
+func (s *Service) UpdateSingle(attr ...interface{}) error {
+	return servicesDB().Model(s).Update(attr).Error
 }
 
 // Update will update a service in the database, the service's checking routine can be restarted by passing true
-func (u *Service) Update(restart bool) error {
-	err := servicesDB().Update(u)
+func (s *Service) Update(restart bool) error {
+	err := servicesDB().Update(s)
 	if err.Error != nil {
-		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", u.Name, err))
+		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", s.Name, err))
 		return err.Error
 	}
 	if restart {
-		u.Close()
-		u.Start()
-		u.SleepDuration = time.Duration(u.Interval) * time.Second
-		go u.CheckQueue(true)
+		s.Close()
+		s.Start()
+		s.SleepDuration = time.Duration(s.Interval) * time.Second
+		go s.CheckQueue(true)
 	}
 	reorderServices()
-	updateService(u)
-	notifier.OnUpdatedService(u.Service)
+	updateService(s)
+	notifier.OnUpdatedService(s.Service)
 	return err.Error
 }
 
 // Create will create a service and insert it into the database
-func (u *Service) Create(check bool) (int64, error) {
-	u.CreatedAt = time.Now()
-	db := servicesDB().Create(u)
+func (s *Service) Create(check bool) (int64, error) {
+	s.CreatedAt = time.Now()
+	db := servicesDB().Create(s)
 	if db.Error != nil {
-		utils.Log(3, fmt.Sprintf("Failed to create service %v #%v: %v", u.Name, u.Id, db.Error))
+		utils.Log(3, fmt.Sprintf("Failed to create service %v #%v: %v", s.Name, s.Id, db.Error))
 		return 0, db.Error
 	}
-	u.Start()
-	go u.CheckQueue(check)
-	CoreApp.Services = append(CoreApp.Services, u)
+	s.Start()
+	go s.CheckQueue(check)
+	CoreApp.Services = append(CoreApp.Services, s)
 	reorderServices()
-	notifier.OnNewService(u.Service)
-	return u.Id, nil
+	notifier.OnNewService(s.Service)
+	return s.Id, nil
 }
 
 // ServicesCount returns the amount of services inside the []*core.Services slice

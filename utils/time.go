@@ -70,8 +70,8 @@ func FormatDuration(d time.Duration) string {
 		if rev(d.Seconds()) >= 2 {
 			out += "s"
 		}
-		return out
 	}
+	return out
 }
 
 func rev(f float64) float64 {
