@@ -90,6 +90,9 @@ func (u *twilio) Send(msg interface{}) error {
 	v.Set("Body", message)
 	rb := *strings.NewReader(v.Encode())
 	req, err := http.NewRequest("POST", twilioUrl, &rb)
+	if err != nil {
+		return err
+	}
 	req.SetBasicAuth(u.ApiKey, u.ApiSecret)
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")

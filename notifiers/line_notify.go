@@ -62,6 +62,9 @@ func (u *lineNotifier) Send(msg interface{}) error {
 	v := url.Values{}
 	v.Set("message", message)
 	req, err := http.NewRequest("POST", "https://notify-api.line.me/api/notify", strings.NewReader(v.Encode()))
+	if err != nil {
+		return err
+	}
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %v", u.GetValue("api_secret")))
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")

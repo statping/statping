@@ -137,6 +137,7 @@ func TestNotification_Update(t *testing.T) {
 
 func TestEnableNotification(t *testing.T) {
 	notifier, err := SelectNotification(example)
+	assert.Nil(t, err)
 	notifier.Enabled = true
 	updated, err := Update(example, notifier)
 	assert.Nil(t, err)
