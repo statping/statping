@@ -16,6 +16,8 @@
 package plugin
 
 import (
+	"github.com/hunterlong/statup/source"
+	"github.com/hunterlong/statup/utils"
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -27,6 +29,11 @@ var (
 	example  *PluginObject
 )
 
+func init() {
+	utils.InitLogs()
+	source.Assets()
+}
+
 func (p *PluginObject) StatupDatabase(db *gorm.DB) {
 	database = db
 }
@@ -35,8 +42,16 @@ func (p *PluginObject) Select() *PluginObject {
 	return p
 }
 
+func (p *PluginObject) Info() *PluginObject {
+	return p
+}
+
 func setupHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("ok"))
+}
+
+func TestLoadPlugins(t *testing.T) {
+	LoadPlugins(false)
 }
 
 func TestAdd(t *testing.T) {

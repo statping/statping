@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/handlers"
+	"github.com/hunterlong/statup/plugin"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
@@ -80,7 +81,7 @@ func CatchCLI(args []string) error {
 		cmd := args[1]
 		switch cmd {
 		case "plugins":
-			LoadPlugins(true)
+			plugin.LoadPlugins(true)
 		}
 		return errors.New("end")
 	case "export":

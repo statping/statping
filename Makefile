@@ -45,7 +45,7 @@ build: compile
 
 # build Statup plugins
 build-plugin:
-	$(GOBUILD) $(BUILDVERSION) -buildmode=plugin -o $(BINARY_NAME) -v ./dev/plugin
+	$(GOBUILD) $(BUILDVERSION) -buildmode=plugin -o ./dev/plugin/example.so -v ./dev/plugin
 
 # build Statup debug app
 build-debug: compile
