@@ -34,6 +34,10 @@
   version = "0.0.1"
 
 [[constraint]]
+  name = "github.com/fatih/structs"
+  version = "1.0.0"
+
+[[constraint]]
   name = "github.com/go-mail/mail"
   version = "2.2.0"
 
@@ -52,10 +56,6 @@
 [[constraint]]
   name = "github.com/jinzhu/gorm"
   version = "1.9.1"
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/jinzhu/now"
 
 [[constraint]]
   name = "github.com/joho/godotenv"

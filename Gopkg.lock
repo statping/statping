@@ -56,6 +56,14 @@
   revision = "1eb28afdf9b6e56cf673badd47545f844fe81103"
 
 [[projects]]
+  digest = "1:ca82a3b99694824c627573c2a76d0e49719b4a9c02d1d85a2ac91f1c1f52ab9b"
+  name = "github.com/fatih/structs"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a720dfa8df582c51dee1b36feabb906bde1588bd"
+  version = "v1.0"
+
+[[projects]]
   digest = "1:e37eb23cfd852df9c65b5dee28456595d7b12479421221a088b6ea7ad95a3570"
   name = "github.com/go-mail/mail"
   packages = ["."]
@@ -132,14 +140,6 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "04140366298a54a039076d798123ffa108fff46c"
-
-[[projects]]
-  branch = "master"
-  digest = "1:55011902fbefd825fd286f47e1783e2f5e0316eac7be414d28f8f5dd82156b0f"
-  name = "github.com/jinzhu/now"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "ed742868f2aebdb1c0c437bf4f7257f88834b66f"
 
 [[projects]]
   digest = "1:ecd9aa82687cf31d1585d4ac61d0ba180e42e8a6182b85bd785fcca8dfeefc1b"
@@ -260,6 +260,7 @@
     "github.com/GeertJohan/go.rice",
     "github.com/GeertJohan/go.rice/embedded",
     "github.com/ararog/timeago",
+    "github.com/fatih/structs",
     "github.com/go-mail/mail",
     "github.com/go-yaml/yaml",
     "github.com/gorilla/mux",
@@ -269,7 +270,6 @@
     "github.com/jinzhu/gorm/dialects/mysql",
     "github.com/jinzhu/gorm/dialects/postgres",
     "github.com/jinzhu/gorm/dialects/sqlite",
-    "github.com/jinzhu/now",
     "github.com/joho/godotenv",
     "github.com/rendon/testcli",
     "github.com/stretchr/testify/assert",

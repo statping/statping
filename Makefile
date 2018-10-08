@@ -47,6 +47,12 @@ build: compile
 build-plugin:
 	$(GOBUILD) $(BUILDVERSION) -buildmode=plugin -o ./dev/plugin/example.so -v ./dev/plugin
 
+test-plugin: clean
+	mkdir plugins
+	$(GOBUILD) $(BUILDVERSION) -buildmode=plugin -o ./dev/plugin/example.so -v ./dev/plugin
+	mv ./dev/plugin/example.so ./plugins/example.so
+	STATUP_DIR=$(TEST_DIR) go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./plugin
+
 # build Statup debug app
 build-debug: compile
 	$(GOBUILD) $(BUILDVERSION) -tags debug -o $(BINARY_NAME) -v ./cmd
@@ -75,7 +81,7 @@ benchmark-view:
 	go tool pprof handlers/handlers.test handlers/prof.cpu > top20
 
 # test Statup golang tetsing files
-test: clean compile install
+test: clean compile install build-plugin
 	STATUP_DIR=$(TEST_DIR) go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./...
 	gocov convert coverage.out > coverage.json
 

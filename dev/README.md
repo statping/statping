@@ -33,13 +33,31 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
 * [func InsertLargeSampleData() error](#InsertLargeSampleData)
 * [func InsertSampleData() error](#InsertSampleData)
 * [func InsertSampleHits() error](#InsertSampleHits)
-* [func ReturnCheckin(c *types.Checkin) *checkin](#ReturnCheckin)
 * [func ReturnCheckinHit(c *types.CheckinHit) *checkinHit](#ReturnCheckinHit)
 * [func ReturnUser(u *types.User) *user](#ReturnUser)
 * [func SelectAllUsers() ([]*user, error)](#SelectAllUsers)
-* [func SelectCheckin(api string) *checkin](#SelectCheckin)
 * [func SelectUser(id int64) (*user, error)](#SelectUser)
 * [func SelectUsername(username string) (*user, error)](#SelectUsername)
+* [type Checkin](#Checkin)
+  * [func ReturnCheckin(c *types.Checkin) *Checkin](#ReturnCheckin)
+  * [func SelectCheckin(api string) *Checkin](#SelectCheckin)
+  * [func SelectCheckinId(id int64) *Checkin](#SelectCheckinId)
+  * [func (c *Checkin) AfterFind() (err error)](#Checkin.AfterFind)
+  * [func (c *Checkin) BeforeCreate() (err error)](#Checkin.BeforeCreate)
+  * [func (c *Checkin) Create() (int64, error)](#Checkin.Create)
+  * [func (c *Checkin) CreateFailure() (int64, error)](#Checkin.CreateFailure)
+  * [func (c *Checkin) Delete() error](#Checkin.Delete)
+  * [func (c *Checkin) Expected() time.Duration](#Checkin.Expected)
+  * [func (c *Checkin) Grace() time.Duration](#Checkin.Grace)
+  * [func (c *Checkin) Hits() []*checkinHit](#Checkin.Hits)
+  * [func (c *Checkin) Last() *checkinHit](#Checkin.Last)
+  * [func (c *Checkin) Link() string](#Checkin.Link)
+  * [func (c *Checkin) Period() time.Duration](#Checkin.Period)
+  * [func (c *Checkin) RecheckCheckinFailure(guard chan struct{})](#Checkin.RecheckCheckinFailure)
+  * [func (c *Checkin) Routine()](#Checkin.Routine)
+  * [func (c *Checkin) Service() *Service](#Checkin.Service)
+  * [func (c *Checkin) String() string](#Checkin.String)
+  * [func (c *Checkin) Update() (int64, error)](#Checkin.Update)
 * [type Core](#Core)
   * [func NewCore() *Core](#NewCore)
   * [func SelectCore() (*Core, error)](#SelectCore)
@@ -88,7 +106,8 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
   * [func (s *Service) BeforeCreate() (err error)](#Service.BeforeCreate)
   * [func (s *Service) Check(record bool)](#Service.Check)
   * [func (s *Service) CheckQueue(record bool)](#Service.CheckQueue)
-  * [func (s *Service) Checkins() []*checkin](#Service.Checkins)
+  * [func (s *Service) CheckinProcess()](#Service.CheckinProcess)
+  * [func (s *Service) Checkins() []*Checkin](#Service.Checkins)
   * [func (s *Service) Create(check bool) (int64, error)](#Service.Create)
   * [func (s *Service) CreateFailure(f *types.Failure) (int64, error)](#Service.CreateFailure)
   * [func (s *Service) CreateHit(h *types.Hit) (int64, error)](#Service.CreateHit)
@@ -99,6 +118,7 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
   * [func (s *Service) GraphData() string](#Service.GraphData)
   * [func (s *Service) Hits() ([]*types.Hit, error)](#Service.Hits)
   * [func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) *gorm.DB](#Service.HitsBetween)
+  * [func (s *Service) LimitedCheckins() []*Checkin](#Service.LimitedCheckins)
   * [func (s *Service) LimitedFailures() []*failure](#Service.LimitedFailures)
   * [func (s *Service) LimitedHits() ([]*types.Hit, error)](#Service.LimitedHits)
   * [func (s *Service) Online24() float32](#Service.Online24)
@@ -168,7 +188,7 @@ CloseDB will close the database connection if available
 
 
 
-## <a name="CountFailures">func</a> [CountFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=2819:2846#L99)
+## <a name="CountFailures">func</a> [CountFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=2845:2872#L99)
 ``` go
 func CountFailures() uint64
 ```
@@ -185,7 +205,7 @@ this function is currently set to delete records 7+ days old every 60 minutes
 
 
 
-## <a name="Dbtimestamp">func</a> [Dbtimestamp](https://github.com/hunterlong/statup/tree/master/core/services.go?s=5171:5223#L180)
+## <a name="Dbtimestamp">func</a> [Dbtimestamp](https://github.com/hunterlong/statup/tree/master/core/services.go?s=5755:5807#L200)
 ``` go
 func Dbtimestamp(group string, column string) string
 ```
@@ -257,15 +277,7 @@ InsertSampleHits will create a couple new hits for the sample services
 
 
 
-## <a name="ReturnCheckin">func</a> [ReturnCheckin](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=1064:1109#L40)
-``` go
-func ReturnCheckin(c *types.Checkin) *checkin
-```
-ReturnCheckin converts *types.Checking to *core.checkin
-
-
-
-## <a name="ReturnCheckinHit">func</a> [ReturnCheckinHit](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=1211:1265#L45)
+## <a name="ReturnCheckinHit">func</a> [ReturnCheckinHit](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=1942:1996#L71)
 ``` go
 func ReturnCheckinHit(c *types.CheckinHit) *checkinHit
 ```
@@ -289,14 +301,6 @@ SelectAllUsers returns all users
 
 
 
-## <a name="SelectCheckin">func</a> [SelectCheckin](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=1369:1408#L50)
-``` go
-func SelectCheckin(api string) *checkin
-```
-SelectCheckin will find a checkin based on the API supplied
-
-
-
 ## <a name="SelectUser">func</a> [SelectUser](https://github.com/hunterlong/statup/tree/master/core/users.go?s=1025:1065#L36)
 ``` go
 func SelectUser(id int64) (*user, error)
@@ -310,6 +314,181 @@ SelectUser returns the user based on the user's ID.
 func SelectUsername(username string) (*user, error)
 ```
 SelectUsername returns the user based on the user's username
+
+
+
+
+## <a name="Checkin">type</a> [Checkin](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=818:857#L26)
+``` go
+type Checkin struct {
+    *types.Checkin
+}
+
+```
+
+
+
+
+
+
+### <a name="ReturnCheckin">func</a> [ReturnCheckin](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=1795:1840#L66)
+``` go
+func ReturnCheckin(c *types.Checkin) *Checkin
+```
+ReturnCheckin converts *types.Checking to *core.Checkin
+
+
+### <a name="SelectCheckin">func</a> [SelectCheckin](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=2646:2685#L94)
+``` go
+func SelectCheckin(api string) *Checkin
+```
+SelectCheckin will find a Checkin based on the API supplied
+
+
+### <a name="SelectCheckinId">func</a> [SelectCheckinId](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=2847:2886#L101)
+``` go
+func SelectCheckinId(id int64) *Checkin
+```
+SelectCheckin will find a Checkin based on the API supplied
+
+
+
+
+
+### <a name="Checkin.AfterFind">func</a> (\*Checkin) [AfterFind](https://github.com/hunterlong/statup/tree/master/core/database.go?s=3493:3534#L119)
+``` go
+func (c *Checkin) AfterFind() (err error)
+```
+AfterFind for Checkin will set the timezone
+
+
+
+
+### <a name="Checkin.BeforeCreate">func</a> (\*Checkin) [BeforeCreate](https://github.com/hunterlong/statup/tree/master/core/database.go?s=4520:4564#L163)
+``` go
+func (c *Checkin) BeforeCreate() (err error)
+```
+BeforeCreate for Checkin will set CreatedAt to UTC
+
+
+
+
+### <a name="Checkin.Create">func</a> (\*Checkin) [Create](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=4352:4393#L154)
+``` go
+func (c *Checkin) Create() (int64, error)
+```
+Create will create a new Checkin
+
+
+
+
+### <a name="Checkin.CreateFailure">func</a> (\*Checkin) [CreateFailure](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=2134:2182#L80)
+``` go
+func (c *Checkin) CreateFailure() (int64, error)
+```
+
+
+
+### <a name="Checkin.Delete">func</a> (\*Checkin) [Delete](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=4218:4250#L147)
+``` go
+func (c *Checkin) Delete() error
+```
+Create will create a new Checkin
+
+
+
+
+### <a name="Checkin.Expected">func</a> (\*Checkin) [Expected](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=3500:3542#L120)
+``` go
+func (c *Checkin) Expected() time.Duration
+```
+Expected returns the duration of when the serviec should receive a Checkin
+
+
+
+
+### <a name="Checkin.Grace">func</a> (\*Checkin) [Grace](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=3290:3329#L114)
+``` go
+func (c *Checkin) Grace() time.Duration
+```
+Grace will return the duration of the Checkin Grace Period (after service hasn't responded, wait a bit for a response)
+
+
+
+
+### <a name="Checkin.Hits">func</a> (\*Checkin) [Hits](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=4016:4054#L140)
+``` go
+func (c *Checkin) Hits() []*checkinHit
+```
+Hits returns all of the CheckinHits for a given Checkin
+
+
+
+
+### <a name="Checkin.Last">func</a> (\*Checkin) [Last](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=3727:3763#L129)
+``` go
+func (c *Checkin) Last() *checkinHit
+```
+Last returns the last checkinHit for a Checkin
+
+
+
+
+### <a name="Checkin.Link">func</a> (\*Checkin) [Link](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=3857:3888#L135)
+``` go
+func (c *Checkin) Link() string
+```
+
+
+
+### <a name="Checkin.Period">func</a> (\*Checkin) [Period](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=3038:3078#L108)
+``` go
+func (c *Checkin) Period() time.Duration
+```
+Period will return the duration of the Checkin interval
+
+
+
+
+### <a name="Checkin.RecheckCheckinFailure">func</a> (\*Checkin) [RecheckCheckinFailure](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=5358:5418#L196)
+``` go
+func (c *Checkin) RecheckCheckinFailure(guard chan struct{})
+```
+RecheckCheckinFailure will check if a Service Checkin has been reported yet
+
+
+
+
+### <a name="Checkin.Routine">func</a> (\*Checkin) [Routine](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=974:1001#L35)
+``` go
+func (c *Checkin) Routine()
+```
+Routine for checking if the last Checkin was within its interval
+
+
+
+
+### <a name="Checkin.Service">func</a> (\*Checkin) [Service](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=2037:2073#L75)
+``` go
+func (c *Checkin) Service() *Service
+```
+
+
+
+### <a name="Checkin.String">func</a> (\*Checkin) [String](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=1680:1713#L61)
+``` go
+func (c *Checkin) String() string
+```
+String will return a Checkin API string
+
+
+
+
+### <a name="Checkin.Update">func</a> (\*Checkin) [Update](https://github.com/hunterlong/statup/tree/master/core/checkin.go?s=4621:4662#L167)
+``` go
+func (c *Checkin) Update() (int64, error)
+```
+Update will update a Checkin
 
 
 
@@ -334,7 +513,7 @@ func NewCore() *Core
 NewCore return a new *core.Core struct
 
 
-### <a name="SelectCore">func</a> [SelectCore](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3763:3795#L136)
+### <a name="SelectCore">func</a> [SelectCore](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3752:3784#L136)
 ``` go
 func SelectCore() (*Core, error)
 ```
@@ -351,7 +530,7 @@ UpdateCore will update the CoreApp variable inside of the 'core' table in databa
 
 
 
-### <a name="Core.AllOnline">func</a> (Core) [AllOnline](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3537:3567#L126)
+### <a name="Core.AllOnline">func</a> (Core) [AllOnline](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3526:3556#L126)
 ``` go
 func (c Core) AllOnline() bool
 ```
@@ -360,7 +539,7 @@ AllOnline will be true if all services are online
 
 
 
-### <a name="Core.BaseSASS">func</a> (Core) [BaseSASS](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3040:3071#L109)
+### <a name="Core.BaseSASS">func</a> (Core) [BaseSASS](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3029:3060#L109)
 ``` go
 func (c Core) BaseSASS() string
 ```
@@ -369,7 +548,7 @@ BaseSASS is the base design , this opens the file /assets/scss/base.scss to be e
 
 
 
-### <a name="Core.Count24HFailures">func</a> (\*Core) [Count24HFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=2547:2587#L88)
+### <a name="Core.Count24HFailures">func</a> (\*Core) [Count24HFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=2573:2613#L88)
 ``` go
 func (c *Core) Count24HFailures() uint64
 ```
@@ -378,7 +557,7 @@ Count24HFailures returns the amount of failures for a service within the last 24
 
 
 
-### <a name="Core.CountOnline">func</a> (\*Core) [CountOnline](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10815:10847#L382)
+### <a name="Core.CountOnline">func</a> (\*Core) [CountOnline](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11399:11431#L402)
 ``` go
 func (c *Core) CountOnline() int
 ```
@@ -387,16 +566,16 @@ CountOnline
 
 
 
-### <a name="Core.CurrentTime">func</a> (Core) [CurrentTime](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2395:2429#L88)
+### <a name="Core.CurrentTime">func</a> (Core) [CurrentTime](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2384:2418#L88)
 ``` go
 func (c Core) CurrentTime() string
 ```
-UsingAssets will return true if /assets folder is present
+CurrentTime will return the current local time
 
 
 
 
-### <a name="Core.MobileSASS">func</a> (Core) [MobileSASS](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3325:3358#L118)
+### <a name="Core.MobileSASS">func</a> (Core) [MobileSASS](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3314:3347#L118)
 ``` go
 func (c Core) MobileSASS() string
 ```
@@ -406,7 +585,7 @@ file /assets/scss/mobile.scss to be edited in Theme
 
 
 
-### <a name="Core.SassVars">func</a> (Core) [SassVars](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2782:2813#L101)
+### <a name="Core.SassVars">func</a> (Core) [SassVars](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2771:2802#L101)
 ``` go
 func (c Core) SassVars() string
 ```
@@ -415,7 +594,7 @@ SassVars opens the file /assets/scss/variables.scss to be edited in Theme
 
 
 
-### <a name="Core.SelectAllServices">func</a> (\*Core) [SelectAllServices](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1729:1783#L62)
+### <a name="Core.SelectAllServices">func</a> (\*Core) [SelectAllServices](https://github.com/hunterlong/statup/tree/master/core/services.go?s=2159:2213#L78)
 ``` go
 func (c *Core) SelectAllServices() ([]*Service, error)
 ```
@@ -424,7 +603,7 @@ SelectAllServices returns a slice of *core.Service to be store on []*core.Servic
 
 
 
-### <a name="Core.ServicesCount">func</a> (\*Core) [ServicesCount](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10736:10770#L377)
+### <a name="Core.ServicesCount">func</a> (\*Core) [ServicesCount](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11320:11354#L397)
 ``` go
 func (c *Core) ServicesCount() int
 ```
@@ -442,7 +621,7 @@ ToCore will convert *core.Core to *types.Core
 
 
 
-### <a name="Core.UsingAssets">func</a> (Core) [UsingAssets](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2623:2655#L96)
+### <a name="Core.UsingAssets">func</a> (Core) [UsingAssets](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2612:2644#L96)
 ``` go
 func (c Core) UsingAssets() bool
 ```
@@ -451,7 +630,7 @@ UsingAssets will return true if /assets folder is present
 
 
 
-## <a name="DateScan">type</a> [DateScan](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3675:3757#L133)
+## <a name="DateScan">type</a> [DateScan](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4111:4193#L149)
 ``` go
 type DateScan struct {
     CreatedAt string `json:"x"`
@@ -470,7 +649,7 @@ DateScan struct is for creating the charts.js graph JSON array
 
 
 
-## <a name="DateScanObj">type</a> [DateScanObj](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3828:3887#L139)
+## <a name="DateScanObj">type</a> [DateScanObj](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4264:4323#L155)
 ``` go
 type DateScanObj struct {
     Array []DateScan `json:"data"`
@@ -485,7 +664,7 @@ DateScanObj struct is for creating the charts.js graph JSON array
 
 
 
-### <a name="GraphDataRaw">func</a> [GraphDataRaw](https://github.com/hunterlong/statup/tree/master/core/services.go?s=6296:6409#L216)
+### <a name="GraphDataRaw">func</a> [GraphDataRaw](https://github.com/hunterlong/statup/tree/master/core/services.go?s=6880:6993#L236)
 ``` go
 func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group string, column string) *DateScanObj
 ```
@@ -495,7 +674,7 @@ GraphDataRaw will return all the hits between 2 times for a Service
 
 
 
-### <a name="DateScanObj.ToString">func</a> (\*DateScanObj) [ToString](https://github.com/hunterlong/statup/tree/master/core/services.go?s=7072:7111#L238)
+### <a name="DateScanObj.ToString">func</a> (\*DateScanObj) [ToString](https://github.com/hunterlong/statup/tree/master/core/services.go?s=7656:7695#L258)
 ``` go
 func (d *DateScanObj) ToString() string
 ```
@@ -742,7 +921,7 @@ AllFailures will return all failures attached to a service
 
 
 
-### <a name="Service.AvgTime">func</a> (\*Service) [AvgTime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=2596:2631#L92)
+### <a name="Service.AvgTime">func</a> (\*Service) [AvgTime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3032:3067#L108)
 ``` go
 func (s *Service) AvgTime() float64
 ```
@@ -751,7 +930,7 @@ AvgTime will return the average amount of time for a service to response back su
 
 
 
-### <a name="Service.AvgUptime">func</a> (\*Service) [AvgUptime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=7817:7866#L267)
+### <a name="Service.AvgUptime">func</a> (\*Service) [AvgUptime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=8401:8450#L287)
 ``` go
 func (s *Service) AvgUptime(ago time.Time) string
 ```
@@ -760,7 +939,7 @@ AvgUptime returns average online status for last 24 hours
 
 
 
-### <a name="Service.AvgUptime24">func</a> (\*Service) [AvgUptime24](https://github.com/hunterlong/statup/tree/master/core/services.go?s=7647:7685#L261)
+### <a name="Service.AvgUptime24">func</a> (\*Service) [AvgUptime24](https://github.com/hunterlong/statup/tree/master/core/services.go?s=8231:8269#L281)
 ``` go
 func (s *Service) AvgUptime24() string
 ```
@@ -796,16 +975,25 @@ CheckQueue is the main go routine for checking a service
 
 
 
-### <a name="Service.Checkins">func</a> (\*Service) [Checkins](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1463:1502#L55)
+### <a name="Service.CheckinProcess">func</a> (\*Service) [CheckinProcess](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1485:1519#L55)
 ``` go
-func (s *Service) Checkins() []*checkin
+func (s *Service) CheckinProcess()
+```
+CheckinProcess runs the checkin routine for each checkin attached to service
+
+
+
+
+### <a name="Service.Checkins">func</a> (\*Service) [Checkins](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1671:1710#L64)
+``` go
+func (s *Service) Checkins() []*Checkin
 ```
 Checkins will return a slice of Checkins for a Service
 
 
 
 
-### <a name="Service.Create">func</a> (\*Service) [Create](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10250:10301#L361)
+### <a name="Service.Create">func</a> (\*Service) [Create](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10834:10885#L381)
 ``` go
 func (s *Service) Create(check bool) (int64, error)
 ```
@@ -832,7 +1020,7 @@ CreateHit will create a new 'hit' record in the database for a successful/online
 
 
 
-### <a name="Service.Delete">func</a> (\*Service) [Delete](https://github.com/hunterlong/statup/tree/master/core/services.go?s=9104:9136#L321)
+### <a name="Service.Delete">func</a> (\*Service) [Delete](https://github.com/hunterlong/statup/tree/master/core/services.go?s=9688:9720#L341)
 ``` go
 func (s *Service) Delete() error
 ```
@@ -841,7 +1029,7 @@ Delete will remove a service from the database, it will also end the service che
 
 
 
-### <a name="Service.DeleteFailures">func</a> (\*Service) [DeleteFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=1672:1706#L59)
+### <a name="Service.DeleteFailures">func</a> (\*Service) [DeleteFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=1698:1732#L59)
 ``` go
 func (s *Service) DeleteFailures()
 ```
@@ -850,7 +1038,7 @@ DeleteFailures will delete all failures for a service
 
 
 
-### <a name="Service.Downtime">func</a> (\*Service) [Downtime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=5906:5948#L202)
+### <a name="Service.Downtime">func</a> (\*Service) [Downtime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=6490:6532#L222)
 ``` go
 func (s *Service) Downtime() time.Duration
 ```
@@ -859,16 +1047,20 @@ Downtime returns the amount of time of a offline service
 
 
 
-### <a name="Service.DowntimeText">func</a> (\*Service) [DowntimeText](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4970:5009#L175)
+### <a name="Service.DowntimeText">func</a> (\*Service) [DowntimeText](https://github.com/hunterlong/statup/tree/master/core/services.go?s=5554:5593#L195)
 ``` go
 func (s *Service) DowntimeText() string
 ```
 DowntimeText will return the amount of downtime for a service based on the duration
 
 
+	service.DowntimeText()
+	// Service has been offline for 15 minutes
 
 
-### <a name="Service.GraphData">func</a> (\*Service) [GraphData](https://github.com/hunterlong/statup/tree/master/core/services.go?s=7303:7339#L248)
+
+
+### <a name="Service.GraphData">func</a> (\*Service) [GraphData](https://github.com/hunterlong/statup/tree/master/core/services.go?s=7887:7923#L268)
 ``` go
 func (s *Service) GraphData() string
 ```
@@ -877,7 +1069,7 @@ GraphData returns the JSON object used by Charts.js to render the chart
 
 
 
-### <a name="Service.Hits">func</a> (\*Service) [Hits](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=1139:1185#L39)
+### <a name="Service.Hits">func</a> (\*Service) [Hits](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=1140:1186#L39)
 ``` go
 func (s *Service) Hits() ([]*types.Hit, error)
 ```
@@ -895,7 +1087,16 @@ HitsBetween returns the gorm database query for a collection of service hits bet
 
 
 
-### <a name="Service.LimitedFailures">func</a> (\*Service) [LimitedFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=1964:2010#L68)
+### <a name="Service.LimitedCheckins">func</a> (\*Service) [LimitedCheckins](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1876:1922#L71)
+``` go
+func (s *Service) LimitedCheckins() []*Checkin
+```
+LimitedCheckins will return a slice of Checkins for a Service
+
+
+
+
+### <a name="Service.LimitedFailures">func</a> (\*Service) [LimitedFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=1990:2036#L68)
 ``` go
 func (s *Service) LimitedFailures() []*failure
 ```
@@ -904,7 +1105,7 @@ LimitedFailures will return the last 10 failures from a service
 
 
 
-### <a name="Service.LimitedHits">func</a> (\*Service) [LimitedHits](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=1406:1459#L47)
+### <a name="Service.LimitedHits">func</a> (\*Service) [LimitedHits](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=1407:1460#L47)
 ``` go
 func (s *Service) LimitedHits() ([]*types.Hit, error)
 ```
@@ -913,7 +1114,7 @@ LimitedHits returns the last 1024 successful/online 'hit' records for a service
 
 
 
-### <a name="Service.Online24">func</a> (\*Service) [Online24](https://github.com/hunterlong/statup/tree/master/core/services.go?s=2922:2958#L105)
+### <a name="Service.Online24">func</a> (\*Service) [Online24](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3358:3394#L121)
 ``` go
 func (s *Service) Online24() float32
 ```
@@ -922,7 +1123,7 @@ Online24 returns the service's uptime percent within last 24 hours
 
 
 
-### <a name="Service.OnlineSince">func</a> (\*Service) [OnlineSince](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3122:3174#L111)
+### <a name="Service.OnlineSince">func</a> (\*Service) [OnlineSince](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3558:3610#L127)
 ``` go
 func (s *Service) OnlineSince(ago time.Time) float32
 ```
@@ -940,16 +1141,20 @@ Select will return the *types.Service struct for Service
 
 
 
-### <a name="Service.SmallText">func</a> (\*Service) [SmallText](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4172:4208#L154)
+### <a name="Service.SmallText">func</a> (\*Service) [SmallText](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4682:4718#L172)
 ``` go
 func (s *Service) SmallText() string
 ```
 SmallText returns a short description about a services status
 
 
+	service.SmallText()
+	// Online since Monday 3:04:05PM, Jan _2 2006
 
 
-### <a name="Service.Sum">func</a> (\*Service) [Sum](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=2458:2498#L79)
+
+
+### <a name="Service.Sum">func</a> (\*Service) [Sum](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=2459:2499#L79)
 ``` go
 func (s *Service) Sum() (float64, error)
 ```
@@ -958,7 +1163,7 @@ Sum returns the added value Latency for all of the services successful hits.
 
 
 
-### <a name="Service.ToJSON">func</a> (\*Service) [ToJSON](https://github.com/hunterlong/statup/tree/master/core/services.go?s=2414:2447#L86)
+### <a name="Service.ToJSON">func</a> (\*Service) [ToJSON](https://github.com/hunterlong/statup/tree/master/core/services.go?s=2850:2883#L102)
 ``` go
 func (s *Service) ToJSON() string
 ```
@@ -967,7 +1172,7 @@ ToJSON will convert a service to a JSON string
 
 
 
-### <a name="Service.TotalFailures">func</a> (\*Service) [TotalFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=3270:3319#L116)
+### <a name="Service.TotalFailures">func</a> (\*Service) [TotalFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=3296:3345#L116)
 ``` go
 func (s *Service) TotalFailures() (uint64, error)
 ```
@@ -976,7 +1181,7 @@ TotalFailures returns the total amount of failures for a service
 
 
 
-### <a name="Service.TotalFailures24">func</a> (\*Service) [TotalFailures24](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=3071:3122#L110)
+### <a name="Service.TotalFailures24">func</a> (\*Service) [TotalFailures24](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=3097:3148#L110)
 ``` go
 func (s *Service) TotalFailures24() (uint64, error)
 ```
@@ -985,7 +1190,7 @@ TotalFailures24 returns the amount of failures for a service within the last 24 
 
 
 
-### <a name="Service.TotalFailuresSince">func</a> (\*Service) [TotalFailuresSince](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=3544:3611#L124)
+### <a name="Service.TotalFailuresSince">func</a> (\*Service) [TotalFailuresSince](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=3570:3637#L124)
 ``` go
 func (s *Service) TotalFailuresSince(ago time.Time) (uint64, error)
 ```
@@ -994,7 +1199,7 @@ TotalFailuresSince returns the total amount of failures for a service since a sp
 
 
 
-### <a name="Service.TotalHits">func</a> (\*Service) [TotalHits](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=1889:1934#L63)
+### <a name="Service.TotalHits">func</a> (\*Service) [TotalHits](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=1890:1935#L63)
 ``` go
 func (s *Service) TotalHits() (uint64, error)
 ```
@@ -1003,7 +1208,7 @@ TotalHits returns the total amount of successful hits a service has
 
 
 
-### <a name="Service.TotalHitsSince">func</a> (\*Service) [TotalHitsSince](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=2134:2197#L71)
+### <a name="Service.TotalHitsSince">func</a> (\*Service) [TotalHitsSince](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=2135:2198#L71)
 ``` go
 func (s *Service) TotalHitsSince(ago time.Time) (uint64, error)
 ```
@@ -1012,7 +1217,7 @@ TotalHitsSince returns the total amount of hits based on a specific time/date
 
 
 
-### <a name="Service.TotalUptime">func</a> (\*Service) [TotalUptime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=8292:8330#L289)
+### <a name="Service.TotalUptime">func</a> (\*Service) [TotalUptime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=8876:8914#L309)
 ``` go
 func (s *Service) TotalUptime() string
 ```
@@ -1021,7 +1226,7 @@ TotalUptime returns the total uptime percent of a service
 
 
 
-### <a name="Service.Update">func</a> (\*Service) [Update](https://github.com/hunterlong/statup/tree/master/core/services.go?s=9766:9810#L342)
+### <a name="Service.Update">func</a> (\*Service) [Update](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10350:10394#L362)
 ``` go
 func (s *Service) Update(restart bool) error
 ```
@@ -1030,7 +1235,7 @@ Update will update a service in the database, the service's checking routine can
 
 
 
-### <a name="Service.UpdateSingle">func</a> (\*Service) [UpdateSingle](https://github.com/hunterlong/statup/tree/master/core/services.go?s=9541:9598#L337)
+### <a name="Service.UpdateSingle">func</a> (\*Service) [UpdateSingle](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10125:10182#L357)
 ``` go
 func (s *Service) UpdateSingle(attr ...interface{}) error
 ```
@@ -1039,7 +1244,7 @@ UpdateSingle will update a single column for a service
 
 
 
-## <a name="ServiceOrder">type</a> [ServiceOrder](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4378:4420#L158)
+## <a name="ServiceOrder">type</a> [ServiceOrder](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4308:4350#L157)
 ``` go
 type ServiceOrder []types.ServiceInterface
 ```
@@ -1054,21 +1259,23 @@ ServiceOrder will reorder the services based on 'order_id' (Order)
 
 
 
-### <a name="ServiceOrder.Len">func</a> (ServiceOrder) [Len](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4422:4453#L160)
+### <a name="ServiceOrder.Len">func</a> (ServiceOrder) [Len](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4406:4437#L160)
 ``` go
 func (c ServiceOrder) Len() int
 ```
+Sort interface for resroting the Services in order
 
 
 
-### <a name="ServiceOrder.Less">func</a> (ServiceOrder) [Less](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4552:4593#L162)
+
+### <a name="ServiceOrder.Less">func</a> (ServiceOrder) [Less](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4536:4577#L162)
 ``` go
 func (c ServiceOrder) Less(i, j int) bool
 ```
 
 
 
-### <a name="ServiceOrder.Swap">func</a> (ServiceOrder) [Swap](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4482:4518#L161)
+### <a name="ServiceOrder.Swap">func</a> (ServiceOrder) [Swap](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4466:4502#L161)
 ``` go
 func (c ServiceOrder) Swap(i, j int)
 ```
@@ -1219,8 +1426,9 @@ Package plugin contains the interfaces to build your own Golang Plugin that will
 
 ## <a name="pkg-index">Index</a>
 * [Variables](#pkg-variables)
-* [func SetDatabase(database *gorm.DB)](#SetDatabase)
+* [func LoadPlugins(debug bool)](#LoadPlugins)
 * [type AdvancedNotifier](#AdvancedNotifier)
+* [type Asseter](#Asseter)
 * [type Database](#Database)
 * [type Databaser](#Databaser)
 * [type Info](#Info)
@@ -1238,7 +1446,7 @@ Package plugin contains the interfaces to build your own Golang Plugin that will
 
 
 #### <a name="pkg-files">Package files</a>
-[doc.go](https://github.com/hunterlong/statup/tree/master/plugin/doc.go) [main.go](https://github.com/hunterlong/statup/tree/master/plugin/main.go) 
+[doc.go](https://github.com/hunterlong/statup/tree/master/plugin/doc.go) [interfaces.go](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go) [main.go](https://github.com/hunterlong/statup/tree/master/plugin/main.go) 
 
 
 
@@ -1248,21 +1456,16 @@ var (
     AllPlugins []*PluginObject
 )
 ```
-``` go
-var (
-    DB *gorm.DB
-)
-```
 
 
-## <a name="SetDatabase">func</a> [SetDatabase](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1991:2026#L107)
+## <a name="LoadPlugins">func</a> [LoadPlugins](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1410:1438#L65)
 ``` go
-func SetDatabase(database *gorm.DB)
+func LoadPlugins(debug bool)
 ```
 
 
 
-## <a name="AdvancedNotifier">type</a> [AdvancedNotifier](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1440:1583#L67)
+## <a name="AdvancedNotifier">type</a> [AdvancedNotifier](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=493:636#L35)
 ``` go
 type AdvancedNotifier interface {
     notifier.Notifier
@@ -1281,7 +1484,22 @@ type AdvancedNotifier interface {
 
 
 
-## <a name="Database">type</a> [Database](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1796:1818#L91)
+## <a name="Asseter">type</a> [Asseter](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=364:421#L26)
+``` go
+type Asseter interface {
+    Asset(string) ([]byte, error)
+}
+```
+
+
+
+
+
+
+
+
+
+## <a name="Database">type</a> [Database](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=827:849#L55)
 ``` go
 type Database *gorm.DB
 ```
@@ -1294,7 +1512,7 @@ type Database *gorm.DB
 
 
 
-## <a name="Databaser">type</a> [Databaser](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1237:1291#L54)
+## <a name="Databaser">type</a> [Databaser](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=207:261#L17)
 ``` go
 type Databaser interface {
     StatupDatabase(*gorm.DB)
@@ -1309,7 +1527,7 @@ type Databaser interface {
 
 
 
-## <a name="Info">type</a> [Info](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1714:1794#L85)
+## <a name="Info">type</a> [Info](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=745:825#L49)
 ``` go
 type Info struct {
     Name        string
@@ -1327,7 +1545,7 @@ type Info struct {
 
 
 
-## <a name="Notifier">type</a> [Notifier](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1370:1438#L62)
+## <a name="Notifier">type</a> [Notifier](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=423:491#L30)
 ``` go
 type Notifier interface {
     notifier.Notifier
@@ -1343,7 +1561,7 @@ type Notifier interface {
 
 
 
-## <a name="Plugin">type</a> [Plugin](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1820:1882#L93)
+## <a name="Plugin">type</a> [Plugin](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=851:913#L57)
 ``` go
 type Plugin struct {
     Name        string
@@ -1360,7 +1578,7 @@ type Plugin struct {
 
 
 
-## <a name="PluginDatabase">type</a> [PluginDatabase](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1884:1952#L98)
+## <a name="PluginDatabase">type</a> [PluginDatabase](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=915:983#L62)
 ``` go
 type PluginDatabase interface {
     Database(gorm.DB)
@@ -1376,7 +1594,7 @@ type PluginDatabase interface {
 
 
 
-## <a name="PluginInfo">type</a> [PluginInfo](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1954:1989#L103)
+## <a name="PluginInfo">type</a> [PluginInfo](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=985:1020#L67)
 ``` go
 type PluginInfo struct {
     // contains filtered or unexported fields
@@ -1392,16 +1610,18 @@ type PluginInfo struct {
 
 
 
-### <a name="PluginInfo.Form">func</a> (\*PluginInfo) [Form](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=2047:2081#L111)
+### <a name="PluginInfo.Form">func</a> (\*PluginInfo) [Form](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1349:1383#L61)
 ``` go
 func (p *PluginInfo) Form() string
 ```
 
 
 
-## <a name="PluginObject">type</a> [PluginObject](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=977:1003#L36)
+## <a name="PluginObject">type</a> [PluginObject](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=112:152#L9)
 ``` go
-type PluginObject struct{}
+type PluginObject struct {
+    PluginInfo
+}
 
 ```
 
@@ -1410,7 +1630,7 @@ type PluginObject struct{}
 
 
 
-### <a name="Add">func</a> [Add](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1042:1076#L42)
+### <a name="Add">func</a> [Add](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1207:1241#L53)
 ``` go
 func Add(p Pluginer) *PluginObject
 ```
@@ -1418,14 +1638,14 @@ func Add(p Pluginer) *PluginObject
 
 
 
-### <a name="PluginObject.AddRoute">func</a> (\*PluginObject) [AddRoute](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1106:1177#L46)
+### <a name="PluginObject.AddRoute">func</a> (\*PluginObject) [AddRoute](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1271:1342#L57)
 ``` go
 func (p *PluginObject) AddRoute(s string, i string, f http.HandlerFunc)
 ```
 
 
 
-## <a name="Pluginer">type</a> [Pluginer](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1184:1235#L50)
+## <a name="Pluginer">type</a> [Pluginer](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=154:205#L13)
 ``` go
 type Pluginer interface {
     Select() *PluginObject
@@ -1440,9 +1660,10 @@ type Pluginer interface {
 
 
 
-## <a name="Router">type</a> [Router](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1293:1368#L58)
+## <a name="Router">type</a> [Router](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=263:362#L21)
 ``` go
 type Router interface {
+    Routes() []interface{}
     AddRoute(string, string, http.HandlerFunc) error
 }
 ```
@@ -1455,7 +1676,7 @@ type Router interface {
 
 
 
-## <a name="Routing">type</a> [Routing](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1607:1712#L79)
+## <a name="Routing">type</a> [Routing](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=638:743#L43)
 ``` go
 type Routing struct {
     URL     string
@@ -1491,7 +1712,16 @@ Package source holds all the assets for Statup. This includes
 CSS, JS, SCSS, HTML and other website related content.
 This package uses Rice to compile all assets into a single 'rice-box.go' file.
 
-To compile all the assets run `rice embed-go` in the source directory.
+### Required Dependencies
+- rice -> <a href="https://github.com/GeertJohan/go.rice">https://github.com/GeertJohan/go.rice</a>
+- sass -> <a href="https://sass-lang.com/install">https://sass-lang.com/install</a>
+
+### Compile Assets
+To compile all the HTML, JS, SCSS, CSS and image assets you'll need to have rice and sass installed on your local system.
+
+
+	sass source/scss/base.scss source/css/base.css
+	cd source && rice embed-go
 
 More info on: <a href="https://github.com/hunterlong/statup">https://github.com/hunterlong/statup</a>
 
@@ -1652,6 +1882,9 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
 * [Variables](#pkg-variables)
 * [type AllNotifiers](#AllNotifiers)
 * [type Checkin](#Checkin)
+  * [func (s *Checkin) Close()](#Checkin.Close)
+  * [func (s *Checkin) IsRunning() bool](#Checkin.IsRunning)
+  * [func (s *Checkin) Start()](#Checkin.Start)
 * [type CheckinHit](#CheckinHit)
 * [type Core](#Core)
 * [type DbConfig](#DbConfig)
@@ -1710,16 +1943,18 @@ AllNotifiers contains all the Notifiers loaded
 
 
 
-## <a name="Checkin">type</a> [Checkin](https://github.com/hunterlong/statup/tree/master/types/checkin.go?s=811:1230#L23)
+## <a name="Checkin">type</a> [Checkin](https://github.com/hunterlong/statup/tree/master/types/checkin.go?s=811:1317#L23)
 ``` go
 type Checkin struct {
     Id          int64     `gorm:"primary_key;column:id"`
-    Service     int64     `gorm:"index;column:service"`
+    ServiceId   int64     `gorm:"index;column:service"`
+    Name        string    `gorm:"column:name"`
     Interval    int64     `gorm:"column:check_interval"`
     GracePeriod int64     `gorm:"column:grace_period"`
     ApiKey      string    `gorm:"column:api_key"`
     CreatedAt   time.Time `gorm:"column:created_at" json:"created_at"`
     UpdatedAt   time.Time `gorm:"column:updated_at" json:"updated_at"`
+    Running     chan bool `gorm:"-" json:"-"`
 }
 
 ```
@@ -1734,7 +1969,34 @@ Checkin struct will allow an application to send a recurring HTTP GET to confirm
 
 
 
-## <a name="CheckinHit">type</a> [CheckinHit](https://github.com/hunterlong/statup/tree/master/types/checkin.go?s=1286:1532#L34)
+### <a name="Checkin.Close">func</a> (\*Checkin) [Close](https://github.com/hunterlong/statup/tree/master/types/checkin.go?s=1787:1812#L49)
+``` go
+func (s *Checkin) Close()
+```
+Close will stop the checkin routine
+
+
+
+
+### <a name="Checkin.IsRunning">func</a> (\*Checkin) [IsRunning](https://github.com/hunterlong/statup/tree/master/types/checkin.go?s=1923:1957#L56)
+``` go
+func (s *Checkin) IsRunning() bool
+```
+IsRunning returns true if the checkin go routine is running
+
+
+
+
+### <a name="Checkin.Start">func</a> (\*Checkin) [Start](https://github.com/hunterlong/statup/tree/master/types/checkin.go?s=1688:1713#L44)
+``` go
+func (s *Checkin) Start()
+```
+Start will create a channel for the checkin checking go routine
+
+
+
+
+## <a name="CheckinHit">type</a> [CheckinHit](https://github.com/hunterlong/statup/tree/master/types/checkin.go?s=1373:1619#L36)
 ``` go
 type CheckinHit struct {
     Id        int64     `gorm:"primary_key;column:id"`
@@ -1828,12 +2090,13 @@ DbConfig struct is used for the database connection and creates the 'config.yml'
 
 
 
-## <a name="Failure">type</a> [Failure](https://github.com/hunterlong/statup/tree/master/types/failure.go?s=862:1324#L24)
+## <a name="Failure">type</a> [Failure](https://github.com/hunterlong/statup/tree/master/types/failure.go?s=862:1405#L24)
 ``` go
 type Failure struct {
     Id               int64     `gorm:"primary_key;column:id" json:"id"`
     Issue            string    `gorm:"column:issue" json:"issue"`
     Method           string    `gorm:"column:method" json:"method,omitempty"`
+    MethodId         int64     `gorm:"column:method_id" json:"method_id,omitempty"`
     Service          int64     `gorm:"index;column:service" json:"-"`
     PingTime         float64   `gorm:"column:ping_time"`
     CreatedAt        time.Time `gorm:"column:created_at" json:"created_at"`
@@ -1853,7 +2116,7 @@ a new Failure will be inserted into database.
 
 
 
-## <a name="FailureInterface">type</a> [FailureInterface](https://github.com/hunterlong/statup/tree/master/types/failure.go?s=1326:1511#L34)
+## <a name="FailureInterface">type</a> [FailureInterface](https://github.com/hunterlong/statup/tree/master/types/failure.go?s=1407:1592#L35)
 ``` go
 type FailureInterface interface {
     Ago() string        // Ago returns a human readble timestamp
@@ -2102,7 +2365,7 @@ type ServiceInterface interface {
 
 
 
-## <a name="User">type</a> [User](https://github.com/hunterlong/statup/tree/master/types/user.go?s=707:1393#L22)
+## <a name="User">type</a> [User](https://github.com/hunterlong/statup/tree/master/types/user.go?s=744:1430#L23)
 ``` go
 type User struct {
     Id            int64     `gorm:"primary_key;column:id" json:"id"`
@@ -2118,6 +2381,7 @@ type User struct {
 }
 
 ```
+User is the main struct for Users
 
 
 
@@ -2127,15 +2391,17 @@ type User struct {
 
 
 
-## <a name="UserInterface">type</a> [UserInterface](https://github.com/hunterlong/statup/tree/master/types/user.go?s=1395:1507#L35)
+
+## <a name="UserInterface">type</a> [UserInterface](https://github.com/hunterlong/statup/tree/master/types/user.go?s=1483:1572#L37)
 ``` go
 type UserInterface interface {
-    // Database functions
     Create() (int64, error)
     Update() error
     Delete() error
 }
 ```
+UserInterface interfaces the database functions
+
 
 
 
@@ -2156,12 +2422,13 @@ type UserInterface interface {
 
 * [Overview](#pkg-overview)
 * [Index](#pkg-index)
+* [Examples](#pkg-examples)
 
 ## <a name="pkg-overview">Overview</a>
 Package utils contains common methods used in most packages in Statup.
 This package contains multiple function like:
 Logging, encryption, type conversions, setting utils.Directory as the current directory,
-running local CMD commands, and creaing/deleting files/folder.
+running local CMD commands, and creating/deleting files/folder.
 
 You can overwrite the utils.Directory global variable by including
 STATUP_DIR environment variable to be an absolute path.
@@ -2197,6 +2464,10 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
   * [func (t Timestamp) Ago() string](#Timestamp.Ago)
 * [type Timestamper](#Timestamper)
 
+#### <a name="pkg-examples">Examples</a>
+* [DurationReadable](#example_DurationReadable)
+* [StringInt](#example_StringInt)
+* [ToString](#example_ToString)
 
 #### <a name="pkg-files">Package files</a>
 [doc.go](https://github.com/hunterlong/statup/tree/master/utils/doc.go) [encryption.go](https://github.com/hunterlong/statup/tree/master/utils/encryption.go) [log.go](https://github.com/hunterlong/statup/tree/master/utils/log.go) [time.go](https://github.com/hunterlong/statup/tree/master/utils/time.go) [utils.go](https://github.com/hunterlong/statup/tree/master/utils/utils.go) 
@@ -2218,41 +2489,74 @@ var (
 ```
 
 
-## <a name="Command">func</a> [Command](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=3568:3616#L148)
+## <a name="Command">func</a> [Command](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=3868:3916#L155)
 ``` go
 func Command(cmd string) (string, string, error)
 ```
 Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings
 
 
+	in, out, err := Command("sass assets/scss assets/css/base.css")
 
-## <a name="DeleteDirectory">func</a> [DeleteDirectory](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=3386:3430#L143)
+
+
+## <a name="DeleteDirectory">func</a> [DeleteDirectory](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=3618:3662#L149)
 ``` go
 func DeleteDirectory(directory string) error
 ```
 DeleteDirectory will attempt to delete a directory and all contents inside
 
 
+	DeleteDirectory("assets")
 
-## <a name="DeleteFile">func</a> [DeleteFile](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=3167:3201#L133)
+
+
+## <a name="DeleteFile">func</a> [DeleteFile](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=3369:3403#L138)
 ``` go
 func DeleteFile(file string) error
 ```
 DeleteFile will attempt to delete a file
 
 
+	DeleteFile("newfile.json")
 
-## <a name="DurationReadable">func</a> [DurationReadable](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=4754:4799#L202)
+
+
+## <a name="DurationReadable">func</a> [DurationReadable](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=5212:5257#L213)
 ``` go
 func DurationReadable(d time.Duration) string
 ```
+DurationReadable will return a time.Duration into a human readable string
 
 
-## <a name="FileExists">func</a> [FileExists](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=2980:3013#L123)
+	t := time.Duration(5 * time.Minute)
+	DurationReadable(t)
+	// 5 minutes
+
+
+
+#### <a name="example_DurationReadable">Example</a>
+
+Code:
+``` go
+dur, _ := time.ParseDuration("25m")
+readable := DurationReadable(dur)
+fmt.Print(readable)
+```
+Output:
+
+    25 minutes
+    
+
+
+## <a name="FileExists">func</a> [FileExists](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=3151:3184#L127)
 ``` go
 func FileExists(name string) bool
 ```
 FileExists returns true if a file exists
+
+
+	exists := FileExists("assets/css/base.css")
 
 
 
@@ -2264,7 +2568,7 @@ FormatDuration converts a time.Duration into a string
 
 
 
-## <a name="HashPassword">func</a> [HashPassword](https://github.com/hunterlong/statup/tree/master/utils/encryption.go?s=825:866#L26)
+## <a name="HashPassword">func</a> [HashPassword](https://github.com/hunterlong/statup/tree/master/utils/encryption.go?s=833:874#L27)
 ``` go
 func HashPassword(password string) string
 ```
@@ -2296,7 +2600,7 @@ Log creates a new entry in the Logger. Log has 1-5 levels depending on how criti
 
 
 
-## <a name="NewSHA1Hash">func</a> [NewSHA1Hash](https://github.com/hunterlong/statup/tree/master/utils/encryption.go?s=1026:1059#L32)
+## <a name="NewSHA1Hash">func</a> [NewSHA1Hash](https://github.com/hunterlong/statup/tree/master/utils/encryption.go?s=1034:1067#L33)
 ``` go
 func NewSHA1Hash(n ...int) string
 ```
@@ -2304,7 +2608,7 @@ NewSHA1Hash returns a random SHA1 hash based on a specific length
 
 
 
-## <a name="RandomString">func</a> [RandomString](https://github.com/hunterlong/statup/tree/master/utils/encryption.go?s=1439:1470#L47)
+## <a name="RandomString">func</a> [RandomString](https://github.com/hunterlong/statup/tree/master/utils/encryption.go?s=1447:1478#L48)
 ``` go
 func RandomString(n int) string
 ```
@@ -2312,11 +2616,14 @@ RandomString generates a random string of n length
 
 
 
-## <a name="SaveFile">func</a> [SaveFile](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=5069:5118#L214)
+## <a name="SaveFile">func</a> [SaveFile](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=5629:5678#L226)
 ``` go
 func SaveFile(filename string, data []byte) error
 ```
-SaveFile
+SaveFile will create a new file with data inside it
+
+
+	SaveFile("newfile.json", []byte('{"data": "success"}')
 
 
 
@@ -2328,10 +2635,25 @@ StringInt converts a string to an int64
 
 
 
-## <a name="Timezoner">func</a> [Timezoner](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=1621:1672#L71)
+#### <a name="example_StringInt">Example</a>
+
+Code:
+``` go
+amount := "42"
+fmt.Print(StringInt(amount))
+```
+Output:
+
+    42
+    
+
+
+## <a name="Timezoner">func</a> [Timezoner](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=1683:1734#L72)
 ``` go
 func Timezoner(t time.Time, zone float32) time.Time
 ```
+Timezoner returns the time.Time with the user set timezone
+
 
 
 ## <a name="ToString">func</a> [ToString](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=1312:1347#L53)
@@ -2342,11 +2664,28 @@ ToString converts a int to a string
 
 
 
-## <a name="UnderScoreString">func</a> [UnderScoreString](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=2295:2335#L99)
+#### <a name="example_ToString">Example</a>
+
+Code:
+``` go
+amount := 42
+fmt.Print(ToString(amount))
+```
+Output:
+
+    42
+    
+
+
+## <a name="UnderScoreString">func</a> [UnderScoreString](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=2418:2458#L102)
 ``` go
 func UnderScoreString(str string) string
 ```
 UnderScoreString will return a string that replaces spaces and other characters to underscores
+
+
+	UnderScoreString("Example String")
+	// example_string
 
 
 
@@ -2382,7 +2721,7 @@ func (o *LogRow) FormatForHtml() string
 
 
 
-## <a name="Timestamp">type</a> [Timestamp](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=1929:1953#L87)
+## <a name="Timestamp">type</a> [Timestamp](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=1991:2015#L88)
 ``` go
 type Timestamp time.Time
 ```
@@ -2395,7 +2734,7 @@ type Timestamp time.Time
 
 
 
-### <a name="Timestamp.Ago">func</a> (Timestamp) [Ago](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=2087:2118#L93)
+### <a name="Timestamp.Ago">func</a> (Timestamp) [Ago](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=2149:2180#L94)
 ``` go
 func (t Timestamp) Ago() string
 ```
@@ -2404,7 +2743,7 @@ Ago returns a human readable timestamp based on the Timestamp (time.Time) interf
 
 
 
-## <a name="Timestamper">type</a> [Timestamper](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=1954:1998#L88)
+## <a name="Timestamper">type</a> [Timestamper](https://github.com/hunterlong/statup/tree/master/utils/utils.go?s=2016:2060#L89)
 ``` go
 type Timestamper interface {
     Ago() string
