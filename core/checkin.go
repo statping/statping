@@ -41,12 +41,12 @@ CheckinLoop:
 	for {
 		select {
 		case <-c.Running:
-			utils.Log(1, fmt.Sprintf("Stopping checkin routing: %v", c.Name))
+			utils.Log(1, fmt.Sprintf("Stopping checkin routine: %v", c.Name))
 			break CheckinLoop
 		case <-time.After(reCheck):
-			utils.Log(1, fmt.Sprintf("checking %v is expected at %v, checking every %v", c.Name, c.Expected(), c.Period()))
+			utils.Log(1, fmt.Sprintf("Checkin %v is expected at %v, checking every %v", c.Name, utils.FormatDuration(c.Expected()), utils.FormatDuration(c.Period())))
 			if c.Expected().Seconds() <= 0 {
-				issue := fmt.Sprintf("checkin is failing, no request since %v", c.Last().CreatedAt)
+				issue := fmt.Sprintf("Checkin %v is failing, no request since %v", c.Name, c.Last().CreatedAt)
 				utils.Log(3, issue)
 				c.Service()
 				c.CreateFailure()

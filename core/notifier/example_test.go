@@ -22,10 +22,12 @@ import (
 	"time"
 )
 
+// ExampleNotifier is an example on how to use the Statup notifier struct
 type ExampleNotifier struct {
 	*Notification
 }
 
+// example is a example variable for a example notifier
 var example = &ExampleNotifier{&Notification{
 	Method:      METHOD,
 	Host:        "http://exmaplehost.com",
@@ -79,103 +81,103 @@ var example = &ExampleNotifier{&Notification{
 	}},
 }}
 
-// REQUIRED init() will install/load the notifier
+// init will be ran when Statup is loaded, AddNotifier will add the notifier instance to the system
 func init() {
 	AddNotifier(example)
 }
 
-// REQUIRED
+// Send is the main function to hold your notifier functionality
 func (n *ExampleNotifier) Send(msg interface{}) error {
 	message := msg.(string)
 	fmt.Printf("i received this string: %v\n", message)
 	return nil
 }
 
-// REQUIRED
+// Select is a required basic event for the Notifier interface
 func (n *ExampleNotifier) Select() *Notification {
 	return n.Notification
 }
 
-// REQUIRED
+// OnSave is a required basic event for the Notifier interface
 func (n *ExampleNotifier) OnSave() error {
 	msg := fmt.Sprintf("received on save trigger")
 	n.AddQueue(msg)
 	return errors.New("onsave triggered")
 }
 
-// REQUIRED - BASIC EVENT
+// OnSuccess is a required basic event for the Notifier interface
 func (n *ExampleNotifier) OnSuccess(s *types.Service) {
 	msg := fmt.Sprintf("received a count trigger for service: %v\n", s.Name)
 	n.AddQueue(msg)
 }
 
-// REQUIRED - BASIC EVENT
+// OnFailure is a required basic event for the Notifier interface
 func (n *ExampleNotifier) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf("received a failure trigger for service: %v\n", s.Name)
 	n.AddQueue(msg)
 }
 
-// OPTIONAL Test function before user saves
+// OnTest is a option testing event for the Notifier interface
 func (n *ExampleNotifier) OnTest() error {
 	fmt.Printf("received a test trigger with form data: %v\n", n.Host)
 	return nil
 }
 
-// OPTIONAL
+// OnNewService is a option event for new services
 func (n *ExampleNotifier) OnNewService(s *types.Service) {
 	msg := fmt.Sprintf("received a new service trigger for service: %v\n", s.Name)
 	n.AddQueue(msg)
 }
 
-// OPTIONAL
+// OnUpdatedService is a option event for updated services
 func (n *ExampleNotifier) OnUpdatedService(s *types.Service) {
 	msg := fmt.Sprintf("received a update service trigger for service: %v\n", s.Name)
 	n.AddQueue(msg)
 }
 
-// OPTIONAL
+// OnDeletedService is a option event for deleted services
 func (n *ExampleNotifier) OnDeletedService(s *types.Service) {
 	msg := fmt.Sprintf("received a delete service trigger for service: %v\n", s.Name)
 	n.AddQueue(msg)
 }
 
-// OPTIONAL
+// OnNewUser is a option event for new users
 func (n *ExampleNotifier) OnNewUser(s *types.User) {
 	msg := fmt.Sprintf("received a new user trigger for user: %v\n", s.Username)
 	n.AddQueue(msg)
 }
 
-// OPTIONAL
+// OnUpdatedUser is a option event for updated users
 func (n *ExampleNotifier) OnUpdatedUser(s *types.User) {
 	msg := fmt.Sprintf("received a updated user trigger for user: %v\n", s.Username)
 	n.AddQueue(msg)
 }
 
-// OPTIONAL
+// OnDeletedUser is a option event for deleted users
 func (n *ExampleNotifier) OnDeletedUser(s *types.User) {
 	msg := fmt.Sprintf("received a deleted user trigger for user: %v\n", s.Username)
 	n.AddQueue(msg)
 }
 
-// OPTIONAL
+// OnUpdatedCore is a option event when the settings are updated
 func (n *ExampleNotifier) OnUpdatedCore(s *types.Core) {
 	msg := fmt.Sprintf("received a updated core trigger for core: %v\n", s.Name)
 	n.AddQueue(msg)
 }
 
-// OPTIONAL
+// OnStart is triggered when statup has been started
 func (n *ExampleNotifier) OnStart(s *types.Core) {
 	msg := fmt.Sprintf("received a trigger on Statup boot: %v\n", s.Name)
 	n.AddQueue(msg)
 }
 
-// OPTIONAL
+// OnNewNotifier is triggered when a new notifier has initialized
 func (n *ExampleNotifier) OnNewNotifier(s *Notification) {
 	msg := fmt.Sprintf("received a new notifier trigger for notifier: %v\n", s.Method)
 	n.AddQueue(msg)
 }
 
-// OPTIONAL
+// OnUpdatedNotifier is triggered when a notifier has been updated
 func (n *ExampleNotifier) OnUpdatedNotifier(s *Notification) {
 	msg := fmt.Sprintf("received a update notifier trigger for notifier: %v\n", s.Method)
 	n.AddQueue(msg)

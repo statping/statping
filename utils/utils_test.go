@@ -17,6 +17,7 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -55,6 +56,13 @@ func TestDurationReadable(t *testing.T) {
 	assert.Equal(t, "25 minutes", readable)
 }
 
+func ExampleDurationReadable() {
+	dur, _ := time.ParseDuration("25m")
+	readable := DurationReadable(dur)
+	fmt.Print(readable)
+	// Output: 25 minutes
+}
+
 func TestLog(t *testing.T) {
 	assert.Nil(t, Log(0, errors.New("this is a 0 level error")))
 	assert.Nil(t, Log(1, errors.New("this is a 1 level error")))
@@ -87,12 +95,24 @@ func TestLogHTTP(t *testing.T) {
 	assert.NotEmpty(t, Http(req))
 }
 
-func TestIntString(t *testing.T) {
+func TestToString(t *testing.T) {
 	assert.Equal(t, "1", ToString(1))
+}
+
+func ExampleToString() {
+	amount := 42
+	fmt.Print(ToString(amount))
+	// Output: 42
 }
 
 func TestStringInt(t *testing.T) {
 	assert.Equal(t, int64(1), StringInt("1"))
+}
+
+func ExampleStringInt() {
+	amount := "42"
+	fmt.Print(StringInt(amount))
+	// Output: 42
 }
 
 func TestDbTime(t *testing.T) {

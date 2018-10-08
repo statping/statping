@@ -261,6 +261,10 @@ func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
 		From:      ip,
 		CreatedAt: time.Now().UTC(),
 	})
+	if checkin.Last() == nil {
+		checkin.Start()
+		go checkin.Routine()
+	}
 	checkinHit.Create()
 	w.Write([]byte("ok"))
 	w.WriteHeader(http.StatusOK)
