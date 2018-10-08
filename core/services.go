@@ -167,6 +167,8 @@ func (s *Service) lastFailure() *failure {
 }
 
 // SmallText returns a short description about a services status
+//		service.SmallText()
+//		// Online since Monday 3:04:05PM, Jan _2 2006
 func (s *Service) SmallText() string {
 	last := s.LimitedFailures()
 	hits, _ := s.LimitedHits()
@@ -188,6 +190,8 @@ func (s *Service) SmallText() string {
 }
 
 // DowntimeText will return the amount of downtime for a service based on the duration
+//		service.DowntimeText()
+//		// Service has been offline for 15 minutes
 func (s *Service) DowntimeText() string {
 	return fmt.Sprintf("%v has been offline for %v", s.Name, utils.DurationReadable(s.Downtime()))
 }

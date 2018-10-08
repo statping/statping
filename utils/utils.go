@@ -68,6 +68,7 @@ func ToString(s interface{}) string {
 	}
 }
 
+// Timezoner returns the time.Time with the user set timezone
 func Timezoner(t time.Time, zone float32) time.Time {
 	zoneInt := float32(3600) * (zone + 1)
 	loc := time.FixedZone("", int(zoneInt))
@@ -96,6 +97,8 @@ func (t Timestamp) Ago() string {
 }
 
 // UnderScoreString will return a string that replaces spaces and other characters to underscores
+//		UnderScoreString("Example String")
+//		// example_string
 func UnderScoreString(str string) string {
 
 	// convert every letter to lower case
@@ -120,6 +123,7 @@ func UnderScoreString(str string) string {
 }
 
 // FileExists returns true if a file exists
+//		exists := FileExists("assets/css/base.css")
 func FileExists(name string) bool {
 	if _, err := os.Stat(name); err != nil {
 		if os.IsNotExist(err) {
@@ -130,6 +134,7 @@ func FileExists(name string) bool {
 }
 
 // DeleteFile will attempt to delete a file
+//		DeleteFile("newfile.json")
 func DeleteFile(file string) error {
 	Log(1, "deleting file: "+file)
 	err := os.Remove(file)
@@ -140,11 +145,13 @@ func DeleteFile(file string) error {
 }
 
 // DeleteDirectory will attempt to delete a directory and all contents inside
+//		DeleteDirectory("assets")
 func DeleteDirectory(directory string) error {
 	return os.RemoveAll(directory)
 }
 
 // Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings
+//		in, out, err := Command("sass assets/scss assets/css/base.css")
 func Command(cmd string) (string, string, error) {
 	Log(1, "running command: "+cmd)
 	testCmd := exec.Command("sh", "-c", cmd)
@@ -199,6 +206,10 @@ func copyAndCapture(w io.Writer, r io.Reader) ([]byte, error) {
 	}
 }
 
+// DurationReadable will return a time.Duration into a human readable string
+//		t := time.Duration(5 * time.Minute)
+//		DurationReadable(t)
+//		// 5 minutes
 func DurationReadable(d time.Duration) string {
 	if d.Hours() >= 1 {
 		return fmt.Sprintf("%0.0f hours", d.Hours())
@@ -210,7 +221,8 @@ func DurationReadable(d time.Duration) string {
 	return d.String()
 }
 
-// SaveFile
+// SaveFile will create a new file with data inside it
+//		SaveFile("newfile.json", []byte('{"data": "success"}')
 func SaveFile(filename string, data []byte) error {
 	err := ioutil.WriteFile(filename, data, 0644)
 	return err

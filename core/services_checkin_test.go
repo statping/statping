@@ -30,7 +30,7 @@ var (
 func TestCreateCheckin(t *testing.T) {
 	service := SelectService(1)
 	testCheckin = ReturnCheckin(&types.Checkin{
-		Service:     service.Id,
+		ServiceId:   service.Id,
 		Interval:    10,
 		GracePeriod: 5,
 		ApiKey:      utils.RandomString(7),
