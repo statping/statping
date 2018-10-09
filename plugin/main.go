@@ -17,7 +17,6 @@ package plugin
 
 import (
 	"fmt"
-	"github.com/fatih/structs"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -99,7 +98,7 @@ func LoadPlugins(debug bool) {
 
 		if debug {
 			utils.Log(1, fmt.Sprintf("Plugin '%v' struct:", f.Name()))
-			utils.Log(1, structs.Map(symPlugin))
+			//utils.Log(1, structs.Map(symPlugin))
 		}
 
 		var plugActions types.PluginActions
