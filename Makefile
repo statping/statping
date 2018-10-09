@@ -221,6 +221,7 @@ dev-deps:
 	$(GOCMD) get gopkg.in/matm/v1/gocov-html
 	$(GOCMD) install gopkg.in/matm/v1/gocov-html
 	$(GOCMD) get github.com/mgechev/revive
+	$(GOCMD) get github.com/fatih/structs
 
 # remove files for a clean compile/build
 clean:
