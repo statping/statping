@@ -27,6 +27,9 @@ type Service struct {
 	ExpectedStatus int           `gorm:"default:200;column:expected_status" json:"expected_status"`
 	Interval       int           `gorm:"default:30;column:check_interval" json:"check_interval"`
 	Type           string        `gorm:"column:check_type" json:"type"`
+	AuthType       string        `gorm:"not null;column:auth_type" json:"auth_type"`
+	AuthName       string        `gorm:"column:auth_name" json:"auth_name"`
+	AuthPassword   string        `gorm:"column:auth_password" json:"auth_password"`
 	Method         string        `gorm:"column:method" json:"method"`
 	PostData       string        `gorm:"not null;column:post_data" json:"post_data"`
 	Port           int           `gorm:"not null;column:port" json:"port"`

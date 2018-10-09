@@ -164,11 +164,21 @@ func (s *Service) checkHttp(record bool) *Service {
 	}
 
 	var response *http.Response
+	var req *http.Request
 	if s.Method == "POST" {
-		response, err = client.Post(s.Domain, "application/json", bytes.NewBuffer([]byte(s.PostData)))
+		req, _ = http.NewRequest(s.Method, s.Domain, bytes.NewBuffer([]byte(s.PostData)))
+		req.Header.Set("Content-Type", "application/json")
 	} else {
-		response, err = client.Get(s.Domain)
+		req, _ = http.NewRequest(s.Method, s.Domain,nil)
 	}
+
+	if s.AuthType ==  "basic" {
+		req.SetBasicAuth(s.AuthName, s.AuthPassword)
+
+	}
+
+	response, err = client.Do(req)
+
 	if err != nil {
 		if record {
 			recordFailure(s, fmt.Sprintf("HTTP Error %v", err))

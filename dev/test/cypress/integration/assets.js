@@ -28,7 +28,7 @@ context('Asset Tests', () => {
         cy.visit('http://localhost:8080/settings/build')
         cy.get('#v-pills-style-tab').click()
         cy.wait(500)
-        cy.get(':nth-child(2) > .CodeMirror-line').should('contain', '$background-color')
+        cy.get('.CodeMirror-line:nth-child(2)').contains('$background-color')
     })
 
     it('should save assets form', () => {

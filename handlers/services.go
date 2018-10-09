@@ -132,9 +132,17 @@ func createServiceHandler(w http.ResponseWriter, r *http.Request) {
 	checkType := r.PostForm.Get("check_type")
 	postData := r.PostForm.Get("post_data")
 	order, _ := strconv.Atoi(r.PostForm.Get("order"))
+	authType := r.PostForm.Get("check_auth_type")
+	authName := ""
+	authPassword := ""
 
 	if checkType == "http" && status == 0 {
 		status = 200
+	}
+
+	if authType == "basic" {
+		authName = r.PostForm.Get("auth_name")
+		authPassword = r.PostForm.Get("auth_password")
 	}
 
 	service := core.ReturnService(&types.Service{
@@ -145,6 +153,9 @@ func createServiceHandler(w http.ResponseWriter, r *http.Request) {
 		ExpectedStatus: status,
 		Interval:       interval,
 		Type:           checkType,
+		AuthType:	authType,
+		AuthName:	authName,
+		AuthPassword:	authPassword,
 		Port:           port,
 		PostData:       postData,
 		Timeout:        timeout,
@@ -225,6 +236,14 @@ func servicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	checkType := r.PostForm.Get("check_type")
 	postData := r.PostForm.Get("post_data")
 	order, _ := strconv.Atoi(r.PostForm.Get("order"))
+	authType := r.PostForm.Get("check_auth_type")
+	authName := ""
+	authPassword := ""
+
+	if authType == "basic" {
+		authName = r.PostForm.Get("auth_name")
+		authPassword = r.PostForm.Get("auth_password")
+	}
 
 	service.Name = name
 	service.Domain = domain
@@ -233,6 +252,9 @@ func servicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	service.Expected = expected
 	service.Interval = interval
 	service.Type = checkType
+	service.AuthType = authType
+	service.AuthName = authName
+	service.AuthPassword =authPassword
 	service.Port = port
 	service.PostData = postData
 	service.Timeout = timeout

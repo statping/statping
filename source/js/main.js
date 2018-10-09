@@ -62,6 +62,11 @@ $('form').submit(function() {
 $('select#service_type').on('change', function() {
     var selected = $('#service_type option:selected').val();
     if (selected === 'tcp') {
+        var selected = $('#check_auth_type option:selected').val();
+        if (selected !== 'none') {
+                $('#check_auth_type').val('none');
+                $('select#check_auth_type').trigger('change');
+        }
         $('#service_port').parent().parent().removeClass('d-none');
         $('#service_check_type').parent().parent().addClass('d-none');
         $('#service_url').attr('placeholder', 'localhost');
@@ -69,17 +74,33 @@ $('select#service_type').on('change', function() {
         $('#post_data').parent().parent().addClass('d-none');
         $('#service_response').parent().parent().addClass('d-none');
         $('#service_response_code').parent().parent().addClass('d-none');
+        $('#auth_type').parent().parent().addClass('d-none');
     } else {
         $('#post_data').parent().parent().removeClass('d-none');
         $('#service_response').parent().parent().removeClass('d-none');
         $('#service_response_code').parent().parent().removeClass('d-none');
         $('#service_check_type').parent().parent().removeClass('d-none');
         $('#service_url').attr('placeholder', 'https://google.com');
+        $('#auth_type').parent().parent().removeClass('d-none');
 
         $('#service_port').parent().parent().addClass('d-none');
     }
 
 });
+
+$('select#check_auth_type').on('change', function() {
+    var selected = $('#check_auth_type option:selected').val();
+    if (selected === 'none') {
+        $('#user_name').parent().parent().addClass('d-none');
+        $('#user_password').parent().parent().addClass('d-none');
+    } else {
+        $('#user_name').parent().parent().removeClass('d-none');
+        $('#user_password').parent().parent().removeClass('d-none');
+    }
+
+});
+
+
 
 function AjaxChart(chart, service, start=0, end=9999999999, group="hour") {
   $.ajax({
@@ -87,9 +108,16 @@ function AjaxChart(chart, service, start=0, end=9999999999, group="hour") {
     type: 'GET',
     success: function(data) {
       chart.data.labels.pop();
-      data.data.forEach(function(d) {
-        chart.data.datasets[0].data.push(d);
-      });
+      if ( ( typeof(data) !== "undefined" ) &&
+	   ( 'data' in data ) &&
+	   ( typeof(data.data) !== "undefined" ) &&
+	   ( data.data !== null ) &&
+	   ( 'length' in data.data) &&
+	   (data.data.length > 0 ) ) {
+        data.data.forEach(function(d) {
+          chart.data.datasets[0].data.push(d);
+        });
+      }
       chart.update();
     }
   });

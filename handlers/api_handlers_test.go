@@ -30,7 +30,7 @@ import (
 )
 
 const (
-	NEW_HTTP_SERVICE = `{"name": "Google Website", "domain": "https://google.com", "expected_status": 200, "check_interval": 10, "type": "http", "method": "GET"}`
+	NEW_HTTP_SERVICE = `{"name": "Google Website", "domain": "https://google.com", "expected_status": 200, "check_interval": 10, "type": "http", "method": "GET", "auth_type": "none", "auth_name": "", "auth_password": "" }`
 )
 
 var (
@@ -143,7 +143,11 @@ func TestApiUpdateServiceHandler(t *testing.T) {
     "post_data": "",
     "port": 0,
     "timeout": 10,
-    "order_id": 0}`
+    "order_id": 0,
+    "auth_type": "none",
+    "auth_name": "",
+    "auth_password": ""
+    }`
 	rr, err := httpRequestAPI(t, "POST", "/api/services/1", strings.NewReader(data))
 	assert.Nil(t, err)
 	body := rr.Body.String()

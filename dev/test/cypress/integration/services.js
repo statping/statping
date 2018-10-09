@@ -74,32 +74,31 @@ context('Service Tests', () => {
 
     it('should view HTTP GET service', () => {
         cy.visit('http://localhost:8080/service/6')
-        cy.title().should('eq', 'Statup | Google.com Service')
+        cy.title().should('eq', 'Google.com Status')
     })
 
     it('should view HTTP POST service', () => {
         cy.visit('http://localhost:8080/service/7')
-        cy.title().should('eq', 'Statup | JSON Regex Test Service')
+        cy.title().should('eq', 'JSON Regex Test Status')
     })
 
     it('should view TCP service', () => {
         cy.visit('http://localhost:8080/service/8')
-        cy.title().should('eq', 'Statup | Google DNS Service')
+        cy.title().should('eq', 'Google DNS Status')
     })
 
     it('should update HTTP service', () => {
         cy.visit('http://localhost:8080/service/6')
-        cy.title().should('eq', 'Statup | Google.com Service')
+        cy.title().should('eq', 'Google.com Status')
         cy.get('#service_name').clear().type('Google Updated')
         cy.get('#service_interval').clear().type('60')
-        cy.get(':nth-child(3) > form').submit()
-        cy.title().should('eq', 'Statup | Google Updated Service')
-        cy.get('#service_name').should('have.value', 'Google Updated')
+	cy.get(':nth-child(3) > form').submit()
+        cy.wait(500)
     });
 
     it('should check the updated service', () => {
         cy.visit('http://localhost:8080/service/6')
-        cy.title().should('eq', 'Statup | Google Updated Service')
+        cy.title().should('eq', 'Google Updated Status')
         cy.get('#service_name').should('have.value', 'Google Updated')
         cy.get('#service_interval').should('have.value', '60')
     })
