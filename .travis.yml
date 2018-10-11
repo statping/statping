@@ -37,6 +37,9 @@ before_deploy:
   - git config --local user.email "info@socialeck.com"
   - make tag
 
+after_deploy:
+  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make publish-homebrew; fi
+
 deploy:
   - provider: releases
     api_key: $GH_TOKEN
