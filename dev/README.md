@@ -739,7 +739,7 @@ CreateCore will initialize the global variable 'CoreApp". This global variable c
 
 
 
-### <a name="DbConfig.CreateDatabase">func</a> (\*DbConfig) [CreateDatabase](https://github.com/hunterlong/statup/tree/master/core/database.go?s=9733:9775#L342)
+### <a name="DbConfig.CreateDatabase">func</a> (\*DbConfig) [CreateDatabase](https://github.com/hunterlong/statup/tree/master/core/database.go?s=9732:9774#L342)
 ``` go
 func (db *DbConfig) CreateDatabase() error
 ```
@@ -766,7 +766,7 @@ InsertCore create the single row for the Core settings in Statup
 
 
 
-### <a name="DbConfig.MigrateDatabase">func</a> (\*DbConfig) [MigrateDatabase](https://github.com/hunterlong/statup/tree/master/core/database.go?s=10514:10557#L359)
+### <a name="DbConfig.MigrateDatabase">func</a> (\*DbConfig) [MigrateDatabase](https://github.com/hunterlong/statup/tree/master/core/database.go?s=10513:10556#L359)
 ``` go
 func (db *DbConfig) MigrateDatabase() error
 ```
@@ -1426,271 +1426,33 @@ Package plugin contains the interfaces to build your own Golang Plugin that will
 
 ## <a name="pkg-index">Index</a>
 * [Variables](#pkg-variables)
-* [func LoadPlugins(debug bool)](#LoadPlugins)
-* [type AdvancedNotifier](#AdvancedNotifier)
-* [type Asseter](#Asseter)
-* [type Database](#Database)
-* [type Databaser](#Databaser)
-* [type Info](#Info)
-* [type Notifier](#Notifier)
-* [type Plugin](#Plugin)
-* [type PluginDatabase](#PluginDatabase)
-* [type PluginInfo](#PluginInfo)
-  * [func (p *PluginInfo) Form() string](#PluginInfo.Form)
-* [type PluginObject](#PluginObject)
-  * [func Add(p Pluginer) *PluginObject](#Add)
-  * [func (p *PluginObject) AddRoute(s string, i string, f http.HandlerFunc)](#PluginObject.AddRoute)
-* [type Pluginer](#Pluginer)
-* [type Router](#Router)
-* [type Routing](#Routing)
+* [func LoadPlugin(file string) error](#LoadPlugin)
+* [func LoadPlugins()](#LoadPlugins)
 
 
 #### <a name="pkg-files">Package files</a>
-[doc.go](https://github.com/hunterlong/statup/tree/master/plugin/doc.go) [interfaces.go](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go) [main.go](https://github.com/hunterlong/statup/tree/master/plugin/main.go) 
+[doc.go](https://github.com/hunterlong/statup/tree/master/plugin/doc.go) [plugin.go](https://github.com/hunterlong/statup/tree/master/plugin/plugin.go) 
 
 
 
 ## <a name="pkg-variables">Variables</a>
 ``` go
 var (
-    AllPlugins []*PluginObject
+    AllPlugins []*types.PluginObject
 )
 ```
 
 
-## <a name="LoadPlugins">func</a> [LoadPlugins](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1410:1438#L65)
+## <a name="LoadPlugin">func</a> [LoadPlugin](https://github.com/hunterlong/statup/tree/master/plugin/plugin.go?s=1173:1207#L51)
 ``` go
-func LoadPlugins(debug bool)
+func LoadPlugin(file string) error
 ```
 
 
-
-## <a name="AdvancedNotifier">type</a> [AdvancedNotifier](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=493:636#L35)
+## <a name="LoadPlugins">func</a> [LoadPlugins](https://github.com/hunterlong/statup/tree/master/plugin/plugin.go?s=2708:2726#L97)
 ``` go
-type AdvancedNotifier interface {
-    notifier.Notifier
-    notifier.BasicEvents
-    notifier.UserEvents
-    notifier.CoreEvents
-    notifier.NotifierEvents
-}
+func LoadPlugins()
 ```
-
-
-
-
-
-
-
-
-
-## <a name="Asseter">type</a> [Asseter](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=364:421#L26)
-``` go
-type Asseter interface {
-    Asset(string) ([]byte, error)
-}
-```
-
-
-
-
-
-
-
-
-
-## <a name="Database">type</a> [Database](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=827:849#L55)
-``` go
-type Database *gorm.DB
-```
-
-
-
-
-
-
-
-
-
-## <a name="Databaser">type</a> [Databaser](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=207:261#L17)
-``` go
-type Databaser interface {
-    StatupDatabase(*gorm.DB)
-}
-```
-
-
-
-
-
-
-
-
-
-## <a name="Info">type</a> [Info](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=745:825#L49)
-``` go
-type Info struct {
-    Name        string
-    Description string
-    Form        string
-}
-
-```
-
-
-
-
-
-
-
-
-
-## <a name="Notifier">type</a> [Notifier](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=423:491#L30)
-``` go
-type Notifier interface {
-    notifier.Notifier
-    notifier.BasicEvents
-}
-```
-
-
-
-
-
-
-
-
-
-## <a name="Plugin">type</a> [Plugin](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=851:913#L57)
-``` go
-type Plugin struct {
-    Name        string
-    Description string
-}
-
-```
-
-
-
-
-
-
-
-
-
-## <a name="PluginDatabase">type</a> [PluginDatabase](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=915:983#L62)
-``` go
-type PluginDatabase interface {
-    Database(gorm.DB)
-    Update() error
-}
-```
-
-
-
-
-
-
-
-
-
-## <a name="PluginInfo">type</a> [PluginInfo](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=985:1020#L67)
-``` go
-type PluginInfo struct {
-    // contains filtered or unexported fields
-}
-
-```
-
-
-
-
-
-
-
-
-
-### <a name="PluginInfo.Form">func</a> (\*PluginInfo) [Form](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1349:1383#L61)
-``` go
-func (p *PluginInfo) Form() string
-```
-
-
-
-## <a name="PluginObject">type</a> [PluginObject](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=112:152#L9)
-``` go
-type PluginObject struct {
-    PluginInfo
-}
-
-```
-
-
-
-
-
-
-### <a name="Add">func</a> [Add](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1207:1241#L53)
-``` go
-func Add(p Pluginer) *PluginObject
-```
-
-
-
-
-### <a name="PluginObject.AddRoute">func</a> (\*PluginObject) [AddRoute](https://github.com/hunterlong/statup/tree/master/plugin/main.go?s=1271:1342#L57)
-``` go
-func (p *PluginObject) AddRoute(s string, i string, f http.HandlerFunc)
-```
-
-
-
-## <a name="Pluginer">type</a> [Pluginer](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=154:205#L13)
-``` go
-type Pluginer interface {
-    Select() *PluginObject
-}
-```
-
-
-
-
-
-
-
-
-
-## <a name="Router">type</a> [Router](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=263:362#L21)
-``` go
-type Router interface {
-    Routes() []interface{}
-    AddRoute(string, string, http.HandlerFunc) error
-}
-```
-
-
-
-
-
-
-
-
-
-## <a name="Routing">type</a> [Routing](https://github.com/hunterlong/statup/tree/master/plugin/interfaces.go?s=638:743#L43)
-``` go
-type Routing struct {
-    URL     string
-    Method  string
-    Handler func(http.ResponseWriter, *http.Request)
-}
-
-```
-
-
-
-
-
-
 
 
 
@@ -1881,22 +1643,29 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
 * [Constants](#pkg-constants)
 * [Variables](#pkg-variables)
 * [type AllNotifiers](#AllNotifiers)
+* [type Asseter](#Asseter)
 * [type Checkin](#Checkin)
   * [func (s *Checkin) Close()](#Checkin.Close)
   * [func (s *Checkin) IsRunning() bool](#Checkin.IsRunning)
   * [func (s *Checkin) Start()](#Checkin.Start)
 * [type CheckinHit](#CheckinHit)
 * [type Core](#Core)
+* [type Databaser](#Databaser)
 * [type DbConfig](#DbConfig)
 * [type Failure](#Failure)
 * [type FailureInterface](#FailureInterface)
 * [type Hit](#Hit)
 * [type Info](#Info)
+* [type Plugin](#Plugin)
 * [type PluginActions](#PluginActions)
 * [type PluginInfo](#PluginInfo)
 * [type PluginJSON](#PluginJSON)
+* [type PluginObject](#PluginObject)
 * [type PluginRepos](#PluginRepos)
-* [type Routing](#Routing)
+* [type PluginRoute](#PluginRoute)
+* [type PluginRouting](#PluginRouting)
+* [type Pluginer](#Pluginer)
+* [type Router](#Router)
 * [type Service](#Service)
   * [func (s *Service) Close()](#Service.Close)
   * [func (s *Service) IsRunning() bool](#Service.IsRunning)
@@ -1907,7 +1676,7 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
 
 
 #### <a name="pkg-files">Package files</a>
-[checkin.go](https://github.com/hunterlong/statup/tree/master/types/checkin.go) [core.go](https://github.com/hunterlong/statup/tree/master/types/core.go) [doc.go](https://github.com/hunterlong/statup/tree/master/types/doc.go) [failure.go](https://github.com/hunterlong/statup/tree/master/types/failure.go) [service.go](https://github.com/hunterlong/statup/tree/master/types/service.go) [time.go](https://github.com/hunterlong/statup/tree/master/types/time.go) [types.go](https://github.com/hunterlong/statup/tree/master/types/types.go) [user.go](https://github.com/hunterlong/statup/tree/master/types/user.go) 
+[checkin.go](https://github.com/hunterlong/statup/tree/master/types/checkin.go) [core.go](https://github.com/hunterlong/statup/tree/master/types/core.go) [doc.go](https://github.com/hunterlong/statup/tree/master/types/doc.go) [failure.go](https://github.com/hunterlong/statup/tree/master/types/failure.go) [plugin.go](https://github.com/hunterlong/statup/tree/master/types/plugin.go) [service.go](https://github.com/hunterlong/statup/tree/master/types/service.go) [time.go](https://github.com/hunterlong/statup/tree/master/types/time.go) [types.go](https://github.com/hunterlong/statup/tree/master/types/types.go) [user.go](https://github.com/hunterlong/statup/tree/master/types/user.go) 
 
 
 ## <a name="pkg-constants">Constants</a>
@@ -1934,6 +1703,21 @@ type AllNotifiers interface{}
 ```
 AllNotifiers contains all the Notifiers loaded
 
+
+
+
+
+
+
+
+
+
+## <a name="Asseter">type</a> [Asseter](https://github.com/hunterlong/statup/tree/master/types/plugin.go?s=964:1021#L64)
+``` go
+type Asseter interface {
+    Asset(string) ([]byte, error)
+}
+```
 
 
 
@@ -2037,7 +1821,7 @@ type Core struct {
     DbConnection  string             `gorm:"-" json:"database"`
     Started       time.Time          `gorm:"-" json:"started_on"`
     Services      []ServiceInterface `gorm:"-" json:"services,omitempty"`
-    Plugins       []Info             `gorm:"-" json:"-"`
+    Plugins       []*Info            `gorm:"-" json:"-"`
     Repos         []PluginJSON       `gorm:"-" json:"-"`
     AllPlugins    []PluginActions    `gorm:"-" json:"-"`
     Notifications []AllNotifiers     `gorm:"-" json:"-"`
@@ -2057,7 +1841,22 @@ global variable to interact with the attributes to the application, such as serv
 
 
 
-## <a name="DbConfig">type</a> [DbConfig](https://github.com/hunterlong/statup/tree/master/types/types.go?s=1166:1740#L34)
+## <a name="Databaser">type</a> [Databaser](https://github.com/hunterlong/statup/tree/master/types/plugin.go?s=806:860#L55)
+``` go
+type Databaser interface {
+    StatupDatabase(*gorm.DB)
+}
+```
+
+
+
+
+
+
+
+
+
+## <a name="DbConfig">type</a> [DbConfig](https://github.com/hunterlong/statup/tree/master/types/types.go?s=1128:1702#L32)
 ``` go
 type DbConfig struct {
     DbConn      string `yaml:"connection"`
@@ -2132,7 +1931,7 @@ type FailureInterface interface {
 
 
 
-## <a name="Hit">type</a> [Hit](https://github.com/hunterlong/statup/tree/master/types/types.go?s=819:1075#L25)
+## <a name="Hit">type</a> [Hit](https://github.com/hunterlong/statup/tree/master/types/types.go?s=781:1037#L23)
 ``` go
 type Hit struct {
     Id        int64     `gorm:"primary_key;column:id"`
@@ -2154,7 +1953,7 @@ Hit struct is a 'successful' ping or web response entry for a service.
 
 
 
-## <a name="Info">type</a> [Info](https://github.com/hunterlong/statup/tree/master/types/types.go?s=1742:1822#L53)
+## <a name="Info">type</a> [Info](https://github.com/hunterlong/statup/tree/master/types/plugin.go?s=499:579#L34)
 ``` go
 type Info struct {
     Name        string
@@ -2172,27 +1971,28 @@ type Info struct {
 
 
 
-## <a name="PluginActions">type</a> [PluginActions](https://github.com/hunterlong/statup/tree/master/types/types.go?s=1985:2596#L70)
+## <a name="Plugin">type</a> [Plugin](https://github.com/hunterlong/statup/tree/master/types/plugin.go?s=65:127#L8)
+``` go
+type Plugin struct {
+    Name        string
+    Description string
+}
+
+```
+
+
+
+
+
+
+
+
+
+## <a name="PluginActions">type</a> [PluginActions](https://github.com/hunterlong/statup/tree/master/types/plugin.go?s=169:234#L17)
 ``` go
 type PluginActions interface {
-    GetInfo() Info
-    GetForm() string
-    OnLoad(db gorm.DB)
-    SetInfo(map[string]interface{}) Info
-    Routes() []Routing
-    OnSave(map[string]interface{})
-    OnFailure(map[string]interface{})
-    OnSuccess(map[string]interface{})
-    OnSettingsSaved(map[string]interface{})
-    OnNewUser(map[string]interface{})
-    OnNewService(map[string]interface{})
-    OnUpdatedService(map[string]interface{})
-    OnDeletedService(map[string]interface{})
-    OnInstall(map[string]interface{})
-    OnUninstall(map[string]interface{})
-    OnBeforeRequest(map[string]interface{})
-    OnAfterRequest(map[string]interface{})
-    OnShutdown()
+    GetInfo() *Info
+    OnLoad() error
 }
 ```
 
@@ -2204,11 +2004,11 @@ type PluginActions interface {
 
 
 
-## <a name="PluginInfo">type</a> [PluginInfo](https://github.com/hunterlong/statup/tree/master/types/types.go?s=1824:1876#L59)
+## <a name="PluginInfo">type</a> [PluginInfo](https://github.com/hunterlong/statup/tree/master/types/plugin.go?s=581:644#L40)
 ``` go
 type PluginInfo struct {
-    Info Info
-    PluginActions
+    Info   *Info
+    Routes []*PluginRoute
 }
 
 ```
@@ -2221,7 +2021,7 @@ type PluginInfo struct {
 
 
 
-## <a name="PluginJSON">type</a> [PluginJSON](https://github.com/hunterlong/statup/tree/master/types/types.go?s=2649:2859#L95)
+## <a name="PluginJSON">type</a> [PluginJSON](https://github.com/hunterlong/statup/tree/master/types/plugin.go?s=287:497#L26)
 ``` go
 type PluginJSON struct {
     Name        string `json:"name"`
@@ -2241,7 +2041,23 @@ type PluginJSON struct {
 
 
 
-## <a name="PluginRepos">type</a> [PluginRepos](https://github.com/hunterlong/statup/tree/master/types/types.go?s=2598:2647#L91)
+## <a name="PluginObject">type</a> [PluginObject](https://github.com/hunterlong/statup/tree/master/types/plugin.go?s=129:167#L13)
+``` go
+type PluginObject struct {
+    Pluginer
+}
+
+```
+
+
+
+
+
+
+
+
+
+## <a name="PluginRepos">type</a> [PluginRepos](https://github.com/hunterlong/statup/tree/master/types/plugin.go?s=236:285#L22)
 ``` go
 type PluginRepos struct {
     Plugins []PluginJSON
@@ -2257,14 +2073,63 @@ type PluginRepos struct {
 
 
 
-## <a name="Routing">type</a> [Routing](https://github.com/hunterlong/statup/tree/master/types/types.go?s=1878:1983#L64)
+## <a name="PluginRoute">type</a> [PluginRoute](https://github.com/hunterlong/statup/tree/master/types/plugin.go?s=1023:1105#L68)
 ``` go
-type Routing struct {
+type PluginRoute struct {
+    Url    string
+    Method string
+    Func   http.HandlerFunc
+}
+
+```
+
+
+
+
+
+
+
+
+
+## <a name="PluginRouting">type</a> [PluginRouting](https://github.com/hunterlong/statup/tree/master/types/plugin.go?s=646:757#L45)
+``` go
+type PluginRouting struct {
     URL     string
     Method  string
     Handler func(http.ResponseWriter, *http.Request)
 }
 
+```
+
+
+
+
+
+
+
+
+
+## <a name="Pluginer">type</a> [Pluginer](https://github.com/hunterlong/statup/tree/master/types/plugin.go?s=759:804#L51)
+``` go
+type Pluginer interface {
+    Select() *Plugin
+}
+```
+
+
+
+
+
+
+
+
+
+## <a name="Router">type</a> [Router](https://github.com/hunterlong/statup/tree/master/types/plugin.go?s=862:962#L59)
+``` go
+type Router interface {
+    Routes() []*PluginRoute
+    AddRoute(string, string, http.HandlerFunc) error
+}
 ```
 
 

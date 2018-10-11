@@ -1,4 +1,4 @@
-VERSION=0.74
+VERSION=0.75
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -215,8 +215,6 @@ dev-deps:
 	$(GOGET) github.com/GeertJohan/go.rice
 	$(GOGET) github.com/GeertJohan/go.rice/rice
 	$(GOINSTALL) github.com/GeertJohan/go.rice/rice
-	$(GOCMD) get github.com/frioux/godoc2md
-	$(GOCMD) install github.com/frioux/godoc2md
 	$(GOCMD) get github.com/axw/gocov/gocov
 	$(GOCMD) get gopkg.in/matm/v1/gocov-html
 	$(GOCMD) install gopkg.in/matm/v1/gocov-html
