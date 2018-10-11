@@ -328,7 +328,7 @@ func (c *DbConfig) CreateCore() *Core {
 func (db *DbConfig) DropDatabase() error {
 	utils.Log(1, "Dropping Database Tables...")
 	err := DbSession.DropTableIfExists("checkins")
-	err = DbSession.DropTableIfExists("checkins_hits")
+	err = DbSession.DropTableIfExists("checkin_hits")
 	err = DbSession.DropTableIfExists("notifications")
 	err = DbSession.DropTableIfExists("core")
 	err = DbSession.DropTableIfExists("failures")
