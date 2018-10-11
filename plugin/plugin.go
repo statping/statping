@@ -78,11 +78,10 @@ func LoadPlugin(file string) error {
 		utils.Log(3, fmt.Sprintf("Plugin '%v' could not locate Plugin variable. %v", fileBin, err))
 		return err
 	}
-	var plugActions types.PluginActions
 	plugActions, ok := symPlugin.(types.PluginActions)
 	if !ok {
 		utils.Log(3, fmt.Sprintf("Plugin %v was not type PluginObject", f.Name()))
-		return fmt.Errorf("Plugin %v was not type PluginActions, %v", f.Name(), plugActions.GetInfo())
+		return fmt.Errorf("Plugin %v was not type PluginActions %v", f.Name(), plugActions.GetInfo())
 	}
 	info := plugActions.GetInfo()
 	err = plugActions.OnLoad()
@@ -102,7 +101,7 @@ func LoadPlugins() {
 	}
 	files, err := ioutil.ReadDir(pluginDir)
 	if err != nil {
-		utils.Log(2, fmt.Sprintf("Plugins directory was not found. Error: %v\n", err))
+		utils.Log(2, fmt.Sprintf("Plugins directory was not found. Error: %v", err))
 		return
 	}
 	for _, f := range files {
@@ -112,5 +111,5 @@ func LoadPlugins() {
 			continue
 		}
 	}
-	utils.Log(1, fmt.Sprintf("Loaded %v Plugins\n", len(core.CoreApp.Plugins)))
+	utils.Log(1, fmt.Sprintf("Loaded %v Plugins", len(core.CoreApp.Plugins)))
 }

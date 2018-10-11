@@ -39,7 +39,7 @@ func DesktopInit(ip string, port int) {
 	var err error
 	exists := utils.FileExists(utils.Directory + "/statup.db")
 	if exists {
-		core.Configs, err = core.LoadConfig(utils.Directory)
+		core.Configs, err = core.LoadConfigFile(utils.Directory)
 		if err != nil {
 			utils.Log(3, err)
 			return
@@ -79,7 +79,7 @@ func DesktopInit(ip string, port int) {
 		return
 	}
 
-	core.Configs, err = core.LoadConfig(utils.Directory)
+	core.Configs, err = core.LoadConfigFile(utils.Directory)
 	if err != nil {
 		utils.Log(3, err)
 		config.Error = err

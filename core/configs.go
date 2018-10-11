@@ -30,8 +30,8 @@ type ErrorResponse struct {
 	Error string
 }
 
-// LoadConfig will attempt to load the 'config.yml' file in a specific directory
-func LoadConfig(directory string) (*DbConfig, error) {
+// LoadConfigFile will attempt to load the 'config.yml' file in a specific directory
+func LoadConfigFile(directory string) (*DbConfig, error) {
 	var configs *DbConfig
 	if os.Getenv("DB_CONN") != "" {
 		utils.Log(1, "DB_CONN environment variable was found, waiting for database...")
@@ -67,72 +67,104 @@ func LoadUsingEnv() (*DbConfig, error) {
 	if os.Getenv("DB_DATABASE") == "" {
 		return nil, errors.New("Missing DB_DATABASE environment variable")
 	}
-	Configs.DbConn = os.Getenv("DB_CONN")
-	Configs.DbHost = os.Getenv("DB_HOST")
-	Configs.DbPort = int(utils.StringInt(os.Getenv("DB_PORT")))
-	Configs.DbUser = os.Getenv("DB_USER")
-	Configs.DbPass = os.Getenv("DB_PASS")
-	Configs.DbData = os.Getenv("DB_DATABASE")
-	CoreApp.DbConnection = os.Getenv("DB_CONN")
+	Configs = EnvToConfig()
 	CoreApp.Name = os.Getenv("NAME")
 	CoreApp.Domain = os.Getenv("DOMAIN")
+	CoreApp.DbConnection = Configs.DbConn
 	if os.Getenv("USE_CDN") == "true" {
 		CoreApp.UseCdn = true
 	}
+	err := Configs.Connect(true, utils.Directory)
+	if err != nil {
+		utils.Log(4, err)
+		return nil, err
+	}
+	Configs.Save()
+	exists := DbSession.HasTable("core")
+	if !exists {
+		utils.Log(1, fmt.Sprintf("Core database does not exist, creating now!"))
+		Configs.DropDatabase()
+		Configs.CreateDatabase()
+		CoreApp, err = Configs.InsertCore()
+		if err != nil {
+			utils.Log(3, err)
+		}
 
-	dbConfig := &DbConfig{
+		admin := ReturnUser(&types.User{
+			Username: "admin",
+			Password: "admin",
+			Email:    "info@admin.com",
+			Admin:    true,
+		})
+		_, err := admin.Create()
+
+		SampleData()
+		return Configs, err
+	}
+	return Configs, nil
+}
+
+// DefaultPort accepts a database type and returns its default port
+func DefaultPort(db string) int64 {
+	switch db {
+	case "mysql":
+		return 3306
+	case "postgres":
+		return 5432
+	case "mssql":
+		return 1433
+	default:
+		return 0
+	}
+}
+
+// EnvToConfig converts environment variables to a DbConfig variable
+func EnvToConfig() *DbConfig {
+	port := DefaultPort(os.Getenv("DB_PORT"))
+	name := os.Getenv("NAME")
+	if name == "" {
+		name = "Statup"
+	}
+	description := os.Getenv("DESCRIPTION")
+	if description == "" {
+		description = "Statup Monitoring Sample Data"
+	}
+	data := &DbConfig{
 		DbConn:      os.Getenv("DB_CONN"),
 		DbHost:      os.Getenv("DB_HOST"),
 		DbUser:      os.Getenv("DB_USER"),
 		DbPass:      os.Getenv("DB_PASS"),
 		DbData:      os.Getenv("DB_DATABASE"),
-		DbPort:      5432,
-		Project:     "Statup - " + os.Getenv("NAME"),
-		Description: "New Statup Installation",
+		DbPort:      port,
+		Project:     name,
+		Description: description,
 		Domain:      os.Getenv("DOMAIN"),
+		Email:       "",
 		Username:    "admin",
 		Password:    "admin",
-		Email:       "info@localhost.com",
+		Error:       nil,
+		Location:    utils.Directory,
 	}
+	return data
+}
 
-	err := dbConfig.Connect(true, utils.Directory)
-	if err != nil {
-		utils.Log(4, err)
-		return nil, err
+// SampleData runs all the sample data for a new Statup installation
+func SampleData() error {
+	if err := InsertSampleData(); err != nil {
+		return err
 	}
-
-	exists := DbSession.HasTable("core")
-	if !exists {
-		utils.Log(1, fmt.Sprintf("Core database does not exist, creating now!"))
-		dbConfig.DropDatabase()
-		dbConfig.CreateDatabase()
-
-		CoreApp, err = dbConfig.InsertCore()
-		if err != nil {
-			utils.Log(3, err)
-		}
-
-		admin := &types.User{
-			Username: "admin",
-			Password: "admin",
-			Email:    "info@admin.com",
-			Admin:    true,
-		}
-		admin.Create()
-
-		InsertSampleData()
-
-		return Configs, err
-
+	if err := InsertSampleHits(); err != nil {
+		return err
 	}
-
-	return Configs, nil
+	return nil
 }
 
 // DeleteConfig will delete the 'config.yml' file
-func DeleteConfig() {
+func DeleteConfig() error {
 	err := os.Remove(utils.Directory + "/config.yml")
 	if err != nil {
 		utils.Log(3, err)
+		return err
 	}
+	return nil
 }

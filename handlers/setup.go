@@ -21,7 +21,6 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -31,32 +30,16 @@ func setupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	port := 5432
-	if os.Getenv("DB_CONN") == "mysql" {
-		port = 3306
-	}
 	var data interface{}
 	if os.Getenv("DB_CONN") != "" {
-		data = &types.DbConfig{
-			DbConn:      os.Getenv("DB_CONN"),
-			DbHost:      os.Getenv("DB_HOST"),
-			DbUser:      os.Getenv("DB_USER"),
-			DbPass:      os.Getenv("DB_PASS"),
-			DbData:      os.Getenv("DB_DATABASE"),
-			DbPort:      port,
-			Project:     os.Getenv("NAME"),
-			Description: os.Getenv("DESCRIPTION"),
-			Email:       "",
-			Username:    "admin",
-			Password:    "",
-		}
+		data, _ = core.LoadUsingEnv()
 	}
 	executeResponse(w, r, "setup.html", data, nil)
 }
 
 func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
-	if core.CoreApp.Services != nil {
+	if core.Services() != nil {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -66,15 +49,14 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	dbPass := r.PostForm.Get("db_password")
 	dbDatabase := r.PostForm.Get("db_database")
 	dbConn := r.PostForm.Get("db_connection")
-	dbPort, _ := strconv.Atoi(r.PostForm.Get("db_port"))
+	dbPort := utils.StringInt(r.PostForm.Get("db_port"))
 	project := r.PostForm.Get("project")
 	username := r.PostForm.Get("username")
 	password := r.PostForm.Get("password")
-	sample := r.PostForm.Get("sample_data")
+	//sample := r.PostForm.Get("sample_data")
 	description := r.PostForm.Get("description")
 	domain := r.PostForm.Get("domain")
 	email := r.PostForm.Get("email")
-
 	dir := utils.Directory
 
 	config := &core.DbConfig{
@@ -94,24 +76,21 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		Location:    utils.Directory,
 	}
 
-	core.Configs, err = config.Save()
-	if err != nil {
+	if core.Configs, err = config.Save(); err != nil {
 		utils.Log(4, err)
 		config.Error = err
 		setupResponseError(w, r, config)
 		return
 	}
 
-	core.Configs, err = core.LoadConfig(dir)
-	if err != nil {
+	if core.Configs, err = core.LoadConfigFile(dir); err != nil {
 		utils.Log(3, err)
 		config.Error = err
 		setupResponseError(w, r, config)
 		return
 	}
 
-	err = core.Configs.Connect(false, dir)
-	if err != nil {
+	if err = core.Configs.Connect(false, dir); err != nil {
 		utils.Log(4, err)
 		core.DeleteConfig()
 		config.Error = err
@@ -138,11 +117,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	admin.Create()
 
-	if sample == "on" {
-		core.InsertSampleData()
-		core.InsertSampleHits()
-	}
-
+	core.SampleData()
 	core.InitApp()
 	resetCookies()
 	time.Sleep(2 * time.Second)

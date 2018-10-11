@@ -83,7 +83,6 @@ func TestRunAll(t *testing.T) {
 		})
 		t.Run(dbt+" Load Configs", func(t *testing.T) {
 			RunLoadConfig(t)
-			t.Log(core.Configs)
 		})
 		t.Run(dbt+" Connect to Database", func(t *testing.T) {
 			err := core.Configs.Connect(false, dir)
@@ -229,28 +228,8 @@ func TestRunAll(t *testing.T) {
 
 func RunSaveConfig(t *testing.T, db string) {
 	var err error
-	port := 5432
-	if db == "mysql" {
-		port = 3306
-	} else if db == "mssql" {
-		port = 1433
-	}
-	core.Configs = &core.DbConfig{
-		DbConn:      db,
-		DbHost:      os.Getenv("DB_HOST"),
-		DbUser:      os.Getenv("DB_USER"),
-		DbPass:      os.Getenv("DB_PASS"),
-		DbData:      os.Getenv("DB_DATABASE"),
-		DbPort:      port,
-		Project:     "Testing " + db,
-		Description: "This is a test of Statup.io!",
-		Domain:      "",
-		Username:    "admin",
-		Password:    "admin",
-		Email:       "",
-		Error:       nil,
-		Location:    dir,
-	}
+	core.Configs = core.EnvToConfig()
+	core.Configs.DbConn = db
 	core.Configs, err = core.Configs.Save()
 	assert.Nil(t, err)
 }
@@ -274,7 +253,7 @@ func RunInsertSampleData(t *testing.T) {
 
 func RunLoadConfig(t *testing.T) {
 	var err error
-	core.Configs, err = core.LoadConfig(dir)
+	core.Configs, err = core.LoadConfigFile(dir)
 	t.Log(core.Configs)
 	assert.Nil(t, err)
 	assert.NotNil(t, core.Configs)
@@ -302,7 +281,7 @@ func RunSelectCoreMYQL(t *testing.T, db string) {
 
 func RunSelectAllMysqlServices(t *testing.T) {
 	var err error
-	services, err := core.CoreApp.SelectAllServices()
+	services, err := core.CoreApp.SelectAllServices(false)
 	assert.Nil(t, err)
 	assert.Equal(t, 15, len(services))
 }
@@ -374,7 +353,7 @@ func RunUserDelete(t *testing.T) {
 
 func RunSelectAllServices(t *testing.T) {
 	var err error
-	services, err := core.CoreApp.SelectAllServices()
+	services, err := core.CoreApp.SelectAllServices(false)
 	assert.Nil(t, err)
 	assert.Equal(t, 15, len(services))
 	for _, s := range services {
@@ -482,7 +461,7 @@ func RunDeleteService(t *testing.T) {
 	service := core.SelectService(4)
 	assert.NotNil(t, service)
 	assert.Equal(t, "JSON API Tester", service.Name)
-	assert.True(t, service.IsRunning())
+	assert.False(t, service.IsRunning())
 	err := service.Delete()
 	assert.False(t, service.IsRunning())
 	assert.Nil(t, err)
