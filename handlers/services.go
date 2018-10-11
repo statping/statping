@@ -22,48 +22,11 @@ import (
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
-	"github.com/jinzhu/now"
 	"net"
 	"net/http"
 	"strconv"
 	"time"
 )
-
-type Service struct {
-	*types.Service
-}
-
-func renderServiceChartHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	fields := parseGet(r)
-	w.Header().Set("Content-Type", "text/javascript")
-	w.Header().Set("Cache-Control", "max-age=30")
-
-	startField := fields.Get("start")
-	endField := fields.Get("end")
-
-	end := now.EndOfDay().UTC()
-	start := now.BeginningOfDay().UTC()
-
-	if startField != "" {
-		start = time.Unix(utils.StringInt(startField), 0)
-		start = now.New(start).BeginningOfDay().UTC()
-	}
-	if endField != "" {
-		end = time.Unix(utils.StringInt(endField), 0)
-		end = now.New(end).EndOfDay().UTC()
-	}
-
-	service := core.SelectService(utils.StringInt(vars["id"]))
-	data := core.GraphDataRaw(service, start, end, "hour", "latency").ToString()
-
-	out := struct {
-		Services []*core.Service
-		Data     []string
-	}{[]*core.Service{service}, []string{data}}
-
-	executeResponse(w, r, "charts.js", out, nil)
-}
 
 func renderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
 	services := core.CoreApp.Services
@@ -276,18 +239,34 @@ func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 	executeResponse(w, r, "services.html", core.CoreApp.Services, "/services")
 }
 
-func checkinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
+func checkinDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
+	checkin := core.SelectCheckinId(utils.StringInt(vars["id"]))
+	service := core.SelectService(checkin.ServiceId)
+	fmt.Println(checkin, service)
+	checkin.Delete()
+	executeResponse(w, r, "service.html", service, fmt.Sprintf("/service/%v", service.Id))
+}
 
+func checkinCreateHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	vars := mux.Vars(r)
+	r.ParseForm()
+	service := core.SelectService(utils.StringInt(vars["id"]))
+	fmt.Println(service.Name)
+	name := r.PostForm.Get("name")
 	interval := utils.StringInt(r.PostForm.Get("interval"))
 	grace := utils.StringInt(r.PostForm.Get("grace"))
 	checkin := core.ReturnCheckin(&types.Checkin{
-		Service:     service.Id,
+		Name:        name,
+		ServiceId:   service.Id,
 		Interval:    interval,
 		GracePeriod: grace,
 	})
@@ -295,7 +274,7 @@ func checkinCreateUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	executeResponse(w, r, "service.html", service, fmt.Sprintf("/service/%v", service.Id))
 }
 
-func checkinUpdateHandler(w http.ResponseWriter, r *http.Request) {
+func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	checkin := core.SelectCheckin(vars["id"])
 	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
@@ -304,6 +283,10 @@ func checkinUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		From:      ip,
 		CreatedAt: time.Now().UTC(),
 	})
+	if checkin.Last() == nil {
+		checkin.Start()
+		go checkin.Routine()
+	}
 	checkinHit.Create()
 	w.Write([]byte("ok"))
 	w.WriteHeader(http.StatusOK)

@@ -13,37 +13,39 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package utils
+package plugin
 
 import (
-	"fmt"
-	"time"
+	"github.com/hunterlong/statup/source"
+	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statup/utils"
+	"testing"
 )
 
-type LogRow struct {
-	Date time.Time
-	Line interface{}
+var (
+	example types.PluginActions
+)
+
+func init() {
+	utils.InitLogs()
+	source.Assets()
 }
 
-func NewLogRow(line interface{}) (logRow *LogRow) {
-	logRow = new(LogRow)
-	logRow.Date = time.Now()
-	logRow.Line = line
-	return
+func TestLoadPlugin(t *testing.T) {
+	//err := LoadPlugin(dir+"/plugins/example.so")
+	//assert.Nil(t, err)
 }
 
-func (o *LogRow) LineAsString() string {
-	switch v := o.Line.(type) {
-	case string:
-		return v
-	case error:
-		return v.Error()
-	case []byte:
-		return string(v)
-	}
-	return ""
+func TestAdd(t *testing.T) {
+	//err := Add(example)
+	//assert.NotNil(t, err)
 }
 
-func (o *LogRow) FormatForHtml() string {
-	return fmt.Sprintf("%s: %s", o.Date.Format("2006-01-02 15:04:05"), o.LineAsString())
+func TestSelect(t *testing.T) {
+	//err := example.GetInfo()
+	//assert.Equal(t, "", err.Name)
 }
+
+//func TestAddRoute(t *testing.T) {
+//	example.AddRoute("/plugin_example", "GET", setupHandler)
+//}

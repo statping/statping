@@ -26,15 +26,15 @@ import (
 )
 
 const (
-	LINE_NOTIFY_METHOD = "line notify"
+	lineNotifyMethod = "line notify"
 )
 
-type LineNotify struct {
+type lineNotifier struct {
 	*notifier.Notification
 }
 
-var lineNotify = &LineNotify{&notifier.Notification{
-	Method:      LINE_NOTIFY_METHOD,
+var lineNotify = &lineNotifier{&notifier.Notification{
+	Method:      lineNotifyMethod,
 	Title:       "LINE Notify",
 	Description: "LINE Notify will send notifications to your LINE Notify account when services are offline or online. Baed on the <a href=\"https://notify-bot.line.me/doc/en/\">LINE Notify API</a>.",
 	Author:      "Kanin Peanviriyakulkit",
@@ -56,12 +56,15 @@ func init() {
 }
 
 // Send will send a HTTP Post with the Authorization to the notify-api.line.me server. It accepts type: string
-func (u *LineNotify) Send(msg interface{}) error {
+func (u *lineNotifier) Send(msg interface{}) error {
 	message := msg.(string)
 	client := new(http.Client)
 	v := url.Values{}
 	v.Set("message", message)
 	req, err := http.NewRequest("POST", "https://notify-api.line.me/api/notify", strings.NewReader(v.Encode()))
+	if err != nil {
+		return err
+	}
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %v", u.GetValue("api_secret")))
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
@@ -72,19 +75,19 @@ func (u *LineNotify) Send(msg interface{}) error {
 	return nil
 }
 
-func (u *LineNotify) Select() *notifier.Notification {
+func (u *lineNotifier) Select() *notifier.Notification {
 	return u.Notification
 }
 
 // OnFailure will trigger failing service
-func (u *LineNotify) OnFailure(s *types.Service, f *types.Failure) {
+func (u *lineNotifier) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
 	u.AddQueue(msg)
 	u.Online = false
 }
 
 // OnSuccess will trigger successful service
-func (u *LineNotify) OnSuccess(s *types.Service) {
+func (u *lineNotifier) OnSuccess(s *types.Service) {
 	if !u.Online {
 		msg := fmt.Sprintf("Your service '%v' is back online!", s.Name)
 		u.AddQueue(msg)
@@ -93,7 +96,7 @@ func (u *LineNotify) OnSuccess(s *types.Service) {
 }
 
 // OnSave triggers when this notifier has been saved
-func (u *LineNotify) OnSave() error {
+func (u *lineNotifier) OnSave() error {
 	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
 	// Do updating stuff here
 	return nil

@@ -90,6 +90,9 @@ func (u *twilio) Send(msg interface{}) error {
 	v.Set("Body", message)
 	rb := *strings.NewReader(v.Encode())
 	req, err := http.NewRequest("POST", twilioUrl, &rb)
+	if err != nil {
+		return err
+	}
 	req.SetBasicAuth(u.ApiKey, u.ApiSecret)
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
@@ -139,8 +142,8 @@ func (u *twilio) OnTest() error {
 	return u.Send(msg)
 }
 
-func twilioSuccess(res []byte) (bool, TwilioResponse) {
-	var obj TwilioResponse
+func twilioSuccess(res []byte) (bool, twilioResponse) {
+	var obj twilioResponse
 	json.Unmarshal(res, &obj)
 	if obj.Status == "queued" {
 		return true, obj
@@ -148,20 +151,20 @@ func twilioSuccess(res []byte) (bool, TwilioResponse) {
 	return false, obj
 }
 
-func twilioError(res []byte) TwilioError {
-	var obj TwilioError
+func twilioError(res []byte) twilioErrorObj {
+	var obj twilioErrorObj
 	json.Unmarshal(res, &obj)
 	return obj
 }
 
-type TwilioError struct {
+type twilioErrorObj struct {
 	Code     int    `json:"code"`
 	Message  string `json:"message"`
 	MoreInfo string `json:"more_info"`
 	Status   int    `json:"status"`
 }
 
-type TwilioResponse struct {
+type twilioResponse struct {
 	Sid                 string      `json:"sid"`
 	DateCreated         string      `json:"date_created"`
 	DateUpdated         string      `json:"date_updated"`

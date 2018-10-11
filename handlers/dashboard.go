@@ -40,10 +40,10 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	if Store == nil {
+	if sessionStore == nil {
 		resetCookies()
 	}
-	session, _ := Store.Get(r, COOKIE_KEY)
+	session, _ := sessionStore.Get(r, cookieKey)
 	r.ParseForm()
 	username := r.PostForm.Get("username")
 	password := r.PostForm.Get("password")
@@ -60,7 +60,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
-	session, _ := Store.Get(r, COOKIE_KEY)
+	session, _ := sessionStore.Get(r, cookieKey)
 	session.Values["authenticated"] = false
 	session.Save(r, w)
 	http.Redirect(w, r, "/", http.StatusSeeOther)

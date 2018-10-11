@@ -137,6 +137,7 @@ func TestNotification_Update(t *testing.T) {
 
 func TestEnableNotification(t *testing.T) {
 	notifier, err := SelectNotification(example)
+	assert.Nil(t, err)
 	notifier.Enabled = true
 	updated, err := Update(example, notifier)
 	assert.Nil(t, err)
@@ -231,10 +232,9 @@ func TestRunAllQueueAndStop(t *testing.T) {
 	assert.True(t, example.IsRunning())
 	assert.Equal(t, 16, len(example.Queue))
 	go Queue(example)
-	assert.Equal(t, 16, len(example.Queue))
-	time.Sleep(12 * time.Second)
-	assert.Equal(t, 6, len(example.Queue))
+	time.Sleep(13 * time.Second)
+	assert.NotZero(t, len(example.Queue))
 	example.close()
 	assert.False(t, example.IsRunning())
-	assert.Equal(t, 6, len(example.Queue))
+	assert.NotZero(t, len(example.Queue))
 }

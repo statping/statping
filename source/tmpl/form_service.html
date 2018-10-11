@@ -12,6 +12,7 @@
             <select name="check_type" class="form-control" id="service_type" value="{{.Type}}">
                 <option value="http" {{if eq .Type "http"}}selected{{end}}>HTTP Service</option>
                 <option value="tcp" {{if eq .Type "tcp"}}selected{{end}}>TCP Service</option>
+                <option value="udp" {{if eq .Type "udp"}}selected{{end}}>UDP Service</option>
             </select>
         </div>
     </div>
@@ -60,20 +61,20 @@
             <small id="emailHelp" class="form-text text-muted">You can insert <a target="_blank" href="https://regex101.com/r/I5bbj9/1">Regex</a> to validate the response</small>
         </div>
     </div>
-    <div class="form-group row{{if eq .Type "tcp"}} d-none{{end}}">
+    <div class="form-group row{{if ne .Type "http"}} d-none{{end}}">
         <label for="service_response" class="col-sm-4 col-form-label">Expected Response (Regex)</label>
         <div class="col-sm-8">
             <textarea name="expected" class="form-control" id="service_response" rows="3" autocapitalize="false" spellcheck="false">{{.Expected}}</textarea>
         </div>
     </div>
-    <div class="form-group row{{if eq .Type "tcp"}} d-none{{end}}">
+    <div class="form-group row{{if ne .Type "http"}} d-none{{end}}">
         <label for="service_response_code" class="col-sm-4 col-form-label">Expected Status Code</label>
         <div class="col-sm-8">
             <input type="number" name="expected_status" class="form-control" value="{{if ne .ExpectedStatus 0}}{{.ExpectedStatus}}{{end}}" placeholder="200" id="service_response_code">
         </div>
     </div>
     <div class="form-group row{{if eq .Type ""}} d-none{{else if eq .Type "http"}} d-none{{end}}">
-        <label for="service_port" class="col-sm-4 col-form-label">TCP Port</label>
+        <label id="service_type_label" for="service_port" class="col-sm-4 col-form-label">TCP Port</label>
         <div class="col-sm-8">
             <input type="number" name="port" class="form-control" value="{{if ne .Port 0}}{{.Port}}{{end}}" id="service_port" placeholder="8080">
         </div>

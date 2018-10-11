@@ -21,17 +21,13 @@ import (
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"html/template"
-	"io/ioutil"
 )
 
 func injectDatabase() {
 	Configs.Connect(false, utils.Directory)
 }
 
-func GenerateSeed() {
-
-}
-
+// ExportIndexHTML returns the HTML of the index page as a string
 func ExportIndexHTML() string {
 	source.Assets()
 	injectDatabase()
@@ -87,6 +83,7 @@ func ExportIndexHTML() string {
 	return result
 }
 
+// ExportChartsJs renders the charts for the index page
 func ExportChartsJs() string {
 	render, err := source.JsBox.String("charts.js")
 	if err != nil {
@@ -105,9 +102,4 @@ func ExportChartsJs() string {
 	}
 	result := tpl.String()
 	return result
-}
-
-func SaveFile(filename string, data []byte) error {
-	err := ioutil.WriteFile(filename, data, 0644)
-	return err
 }

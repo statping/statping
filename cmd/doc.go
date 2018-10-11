@@ -2,11 +2,26 @@
 // connects to all the other packages to make a runnable binary for multiple
 // operating system.
 //
-// To build Statup from source, run the follow command in the root directory:
-// // go build -o statup ./cmd
+// Compile Assets
 //
-// Remember that you'll need to compile the static assets using Rice:
-// // cd source && rice embed-go
+// Before building, you must compile the Statup Assets with Rice, to install rice run the command below:
+//		go get github.com/GeertJohan/go.rice
+//		go get github.com/GeertJohan/go.rice/rice
+//
+// Once you have rice install, you can run the following command to build all assets inside the source directory.
+//		cd source && rice embed-go
+//
+// Build Statup Binary
+//
+// To build the statup binary for your local environment, run the command below:
+//		go build -o statup ./cmd
+//
+// Build All Binary Arch's
+//
+// To build Statup for Mac, Windows, Linux, and ARM devices, you can run xgo to build for all. xgo is an awesome
+// golang package that requires Docker. https://github.com/karalabe/xgo
+//		docker pull karalabe/xgo-latest
+//		build-all
 //
 // More info on: https://github.com/hunterlong/statup
 package main

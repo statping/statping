@@ -19,6 +19,7 @@ import (
 	"time"
 )
 
+// User is the main struct for Users
 type User struct {
 	Id            int64     `gorm:"primary_key;column:id" json:"id"`
 	Username      string    `gorm:"type:varchar(100);unique;column:username;" json:"username"`
@@ -32,8 +33,8 @@ type User struct {
 	UserInterface `gorm:"-" json:"-"`
 }
 
+// UserInterface interfaces the database functions
 type UserInterface interface {
-	// Database functions
 	Create() (int64, error)
 	Update() error
 	Delete() error

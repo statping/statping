@@ -24,6 +24,7 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 )
 
 var (
@@ -33,10 +34,6 @@ var (
 	LastLines []*LogRow
 	LockLines sync.Mutex
 )
-
-func Logger() *lumberjack.Logger {
-	return ljLogger
-}
 
 // createLog will create the '/logs' directory based on a directory
 func createLog(dir string) error {
@@ -137,7 +134,7 @@ func Http(r *http.Request) string {
 func pushLastLine(line interface{}) {
 	LockLines.Lock()
 	defer LockLines.Unlock()
-	LastLines = append(LastLines, NewLogRow(line))
+	LastLines = append(LastLines, newLogRow(line))
 	// We want to store max 1000 lines in memory (for /logs page).
 	for len(LastLines) > 1000 {
 		LastLines = LastLines[1:]
@@ -152,4 +149,32 @@ func GetLastLine() *LogRow {
 		return LastLines[len(LastLines)-1]
 	}
 	return nil
+}
+
+type LogRow struct {
+	Date time.Time
+	Line interface{}
+}
+
+func newLogRow(line interface{}) (logRow *LogRow) {
+	logRow = new(LogRow)
+	logRow.Date = time.Now()
+	logRow.Line = line
+	return
+}
+
+func (o *LogRow) lineAsString() string {
+	switch v := o.Line.(type) {
+	case string:
+		return v
+	case error:
+		return v.Error()
+	case []byte:
+		return string(v)
+	}
+	return ""
+}
+
+func (o *LogRow) FormatForHtml() string {
+	return fmt.Sprintf("%s: %s", o.Date.Format("2006-01-02 15:04:05"), o.lineAsString())
 }

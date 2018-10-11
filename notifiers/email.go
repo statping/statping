@@ -28,12 +28,12 @@ import (
 )
 
 const (
-	TEMPLATE = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	mainEmailTemplate = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Statup Email</title>
+    <title>Statup email</title>
 </head>
 <body style="-webkit-text-size-adjust: none; box-sizing: border-box; color: #74787E; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; height: 100%; line-height: 1.4; margin: 0; width: 100% !important;" bgcolor="#F2F4F6">
     <style type="text/css">
@@ -107,13 +107,13 @@ var (
 	mailer *mail.Dialer
 )
 
-type Email struct {
+type email struct {
 	*notifier.Notification
 }
 
-var emailer = &Email{&notifier.Notification{
+var emailer = &email{&notifier.Notification{
 	Method:      "email",
-	Title:       "Email",
+	Title:       "email",
 	Description: "Send emails via SMTP when services are online or offline.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
@@ -139,13 +139,13 @@ var emailer = &Email{&notifier.Notification{
 		DbField:     "Port",
 	}, {
 		Type:        "text",
-		Title:       "Outgoing Email Address",
-		Placeholder: "Insert your Outgoing Email Address",
+		Title:       "Outgoing email Address",
+		Placeholder: "Insert your Outgoing email Address",
 		DbField:     "Var1",
 	}, {
 		Type:        "email",
 		Title:       "Send Alerts To",
-		Placeholder: "Email Address",
+		Placeholder: "email Address",
 		DbField:     "Var2",
 	}},
 }}
@@ -157,18 +157,18 @@ func init() {
 	}
 }
 
-// Send will send the SMTP email with your authentication It accepts type: *EmailOutgoing
-func (u *Email) Send(msg interface{}) error {
-	email := msg.(*EmailOutgoing)
+// Send will send the SMTP email with your authentication It accepts type: *emailOutgoing
+func (u *email) Send(msg interface{}) error {
+	email := msg.(*emailOutgoing)
 	err := u.dialSend(email)
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("Email Notifier could not send email: %v", err))
+		utils.Log(3, fmt.Sprintf("email Notifier could not send email: %v", err))
 		return err
 	}
 	return nil
 }
 
-type EmailOutgoing struct {
+type emailOutgoing struct {
 	To       string
 	Subject  string
 	Template string
@@ -179,11 +179,11 @@ type EmailOutgoing struct {
 }
 
 // OnFailure will trigger failing service
-func (u *Email) OnFailure(s *types.Service, f *types.Failure) {
-	email := &EmailOutgoing{
+func (u *email) OnFailure(s *types.Service, f *types.Failure) {
+	email := &emailOutgoing{
 		To:       emailer.GetValue("var2"),
 		Subject:  fmt.Sprintf("Service %v is Failing", s.Name),
-		Template: TEMPLATE,
+		Template: mainEmailTemplate,
 		Data:     interface{}(s),
 		From:     emailer.GetValue("var1"),
 	}
@@ -192,12 +192,12 @@ func (u *Email) OnFailure(s *types.Service, f *types.Failure) {
 }
 
 // OnSuccess will trigger successful service
-func (u *Email) OnSuccess(s *types.Service) {
+func (u *email) OnSuccess(s *types.Service) {
 	if !u.Online {
-		email := &EmailOutgoing{
+		email := &emailOutgoing{
 			To:       emailer.GetValue("var2"),
 			Subject:  fmt.Sprintf("Service %v is Back Online", s.Name),
-			Template: TEMPLATE,
+			Template: mainEmailTemplate,
 			Data:     interface{}(s),
 			From:     emailer.GetValue("var1"),
 		}
@@ -206,21 +206,22 @@ func (u *Email) OnSuccess(s *types.Service) {
 	u.Online = true
 }
 
-func (u *Email) Select() *notifier.Notification {
+func (u *email) Select() *notifier.Notification {
 	return u.Notification
 }
 
 // OnSave triggers when this notifier has been saved
-func (u *Email) OnSave() error {
+func (u *email) OnSave() error {
 	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
 	// Do updating stuff here
 	return nil
 }
 
 // OnTest triggers when this notifier has been saved
-func (u *Email) OnTest() error {
+func (u *email) OnTest() error {
 	host := fmt.Sprintf("%v:%v", u.Host, u.Port)
 	dial, err := smtp.Dial(host)
+	dial.StartTLS(&tls.Config{InsecureSkipVerify: true})
 	if err != nil {
 		utils.Log(3, err)
 		return err
@@ -229,7 +230,7 @@ func (u *Email) OnTest() error {
 	return dial.Auth(auth)
 }
 
-func (u *Email) dialSend(email *EmailOutgoing) error {
+func (u *email) dialSend(email *emailOutgoing) error {
 	mailer = mail.NewDialer(emailer.Host, emailer.Port, emailer.Username, emailer.Password)
 	mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	emailSource(email)
@@ -239,18 +240,18 @@ func (u *Email) dialSend(email *EmailOutgoing) error {
 	m.SetHeader("Subject", email.Subject)
 	m.SetBody("text/html", email.Source)
 	if err := mailer.DialAndSend(m); err != nil {
-		utils.Log(3, fmt.Sprintf("Email '%v' sent to: %v using the %v template (size: %v) %v", email.Subject, email.To, email.Template, len([]byte(email.Source)), err))
+		utils.Log(3, fmt.Sprintf("email '%v' sent to: %v using the %v template (size: %v) %v", email.Subject, email.To, email.Template, len([]byte(email.Source)), err))
 		return err
 	}
 	return nil
 }
 
-func emailSource(email *EmailOutgoing) {
-	source := EmailTemplate(email.Template, email.Data)
+func emailSource(email *emailOutgoing) {
+	source := emailTemplate(email.Template, email.Data)
 	email.Source = source
 }
 
-func EmailTemplate(contents string, data interface{}) string {
+func emailTemplate(contents string, data interface{}) string {
 	t := template.New("email")
 	t, err := t.Parse(contents)
 	if err != nil {

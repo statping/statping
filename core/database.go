@@ -31,9 +31,11 @@ import (
 )
 
 var (
+	// DbSession stores the Statup database session
 	DbSession *gorm.DB
 )
 
+// DbConfig stores the config.yml file for the statup configuration
 type DbConfig types.DbConfig
 
 // failuresDB returns the 'failures' database column
@@ -77,6 +79,7 @@ func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) *go
 	return DbSession.Model(&types.Hit{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.Format(types.TIME_DAY), t2.Format(types.TIME_DAY)).Order("timeframe asc", false).Group("timeframe")
 }
 
+// CloseDB will close the database connection if available
 func CloseDB() {
 	if DbSession != nil {
 		DbSession.DB().Close()
@@ -88,65 +91,87 @@ func (db *DbConfig) Close() error {
 	return DbSession.DB().Close()
 }
 
+// AfterFind for Service will set the timezone
 func (s *Service) AfterFind() (err error) {
 	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
 	return
 }
 
-func (s *Hit) AfterFind() (err error) {
-	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
+// AfterFind for Hit will set the timezone
+func (h *Hit) AfterFind() (err error) {
+	h.CreatedAt = utils.Timezoner(h.CreatedAt, CoreApp.Timezone)
 	return
 }
 
-func (f *Failure) AfterFind() (err error) {
+// AfterFind for failure will set the timezone
+func (f *failure) AfterFind() (err error) {
 	f.CreatedAt = utils.Timezoner(f.CreatedAt, CoreApp.Timezone)
 	return
 }
 
-func (u *User) AfterFind() (err error) {
+// AfterFind for USer will set the timezone
+func (u *user) AfterFind() (err error) {
 	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
 	return
 }
 
-func (s *Checkin) AfterFind() (err error) {
-	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
+// AfterFind for Checkin will set the timezone
+func (c *Checkin) AfterFind() (err error) {
+	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
 	return
 }
 
-func (s *CheckinHit) AfterFind() (err error) {
-	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
+// AfterFind for checkinHit will set the timezone
+func (c *checkinHit) AfterFind() (err error) {
+	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
 	return
 }
 
-func (u *Hit) BeforeCreate() (err error) {
+// BeforeCreate for Hit will set CreatedAt to UTC
+func (h *Hit) BeforeCreate() (err error) {
+	if h.CreatedAt.IsZero() {
+		h.CreatedAt = time.Now().UTC()
+	}
+	return
+}
+
+// BeforeCreate for failure will set CreatedAt to UTC
+func (f *failure) BeforeCreate() (err error) {
+	if f.CreatedAt.IsZero() {
+		f.CreatedAt = time.Now().UTC()
+	}
+	return
+}
+
+// BeforeCreate for user will set CreatedAt to UTC
+func (u *user) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
 	}
 	return
 }
 
-func (u *Failure) BeforeCreate() (err error) {
-	u.CreatedAt = time.Now().UTC()
+// BeforeCreate for Service will set CreatedAt to UTC
+func (s *Service) BeforeCreate() (err error) {
+	if s.CreatedAt.IsZero() {
+		s.CreatedAt = time.Now().UTC()
+	}
 	return
 }
 
-func (u *User) BeforeCreate() (err error) {
-	u.CreatedAt = time.Now().UTC()
+// BeforeCreate for Checkin will set CreatedAt to UTC
+func (c *Checkin) BeforeCreate() (err error) {
+	if c.CreatedAt.IsZero() {
+		c.CreatedAt = time.Now().UTC()
+	}
 	return
 }
 
-func (u *Service) BeforeCreate() (err error) {
-	u.CreatedAt = time.Now().UTC()
-	return
-}
-
-func (u *Checkin) BeforeCreate() (err error) {
-	u.CreatedAt = time.Now().UTC()
-	return
-}
-
-func (u *CheckinHit) BeforeCreate() (err error) {
-	u.CreatedAt = time.Now().UTC()
+// BeforeCreate for checkinHit will set CreatedAt to UTC
+func (c *checkinHit) BeforeCreate() (err error) {
+	if c.CreatedAt.IsZero() {
+		c.CreatedAt = time.Now().UTC()
+	}
 	return
 }
 
@@ -213,6 +238,7 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 	return err
 }
 
+// waitForDb will sleep for 5 seconds and try to connect to the database again
 func (db *DbConfig) waitForDb() error {
 	time.Sleep(5 * time.Second)
 	return db.Connect(true, utils.Directory)
@@ -239,14 +265,14 @@ func DeleteAllSince(table string, date time.Time) {
 }
 
 // Update will save the config.yml file
-func (c *DbConfig) Update() error {
+func (db *DbConfig) Update() error {
 	var err error
 	config, err := os.Create(utils.Directory + "/config.yml")
 	if err != nil {
 		utils.Log(4, err)
 		return err
 	}
-	data, err := yaml.Marshal(c)
+	data, err := yaml.Marshal(db)
 	if err != nil {
 		utils.Log(3, err)
 		return err
@@ -257,23 +283,23 @@ func (c *DbConfig) Update() error {
 }
 
 // Save will initially create the config.yml file
-func (c *DbConfig) Save() (*DbConfig, error) {
+func (db *DbConfig) Save() (*DbConfig, error) {
 	var err error
 	config, err := os.Create(utils.Directory + "/config.yml")
 	if err != nil {
 		utils.Log(4, err)
 		return nil, err
 	}
-	c.ApiKey = utils.NewSHA1Hash(16)
-	c.ApiSecret = utils.NewSHA1Hash(16)
-	data, err := yaml.Marshal(c)
+	db.ApiKey = utils.NewSHA1Hash(16)
+	db.ApiSecret = utils.NewSHA1Hash(16)
+	data, err := yaml.Marshal(db)
 	if err != nil {
 		utils.Log(3, err)
 		return nil, err
 	}
 	config.WriteString(string(data))
 	defer config.Close()
-	return c, err
+	return db, err
 }
 
 // CreateCore will initialize the global variable 'CoreApp". This global variable contains most of Statup app.
@@ -350,13 +376,4 @@ func (db *DbConfig) MigrateDatabase() error {
 	}
 	utils.Log(1, "Statup Database Migrated")
 	return tx.Commit().Error
-}
-
-func (c *DbConfig) Clean() *DbConfig {
-	if os.Getenv("DB_PORT") != "" {
-		if c.DbConn == "postgres" {
-			c.DbHost = c.DbHost + ":" + os.Getenv("DB_PORT")
-		}
-	}
-	return c
 }

@@ -31,12 +31,12 @@ import (
 )
 
 const (
-	COOKIE_KEY = "statup_auth"
+	cookieKey = "statup_auth"
 )
 
 var (
-	Store      *sessions.CookieStore
-	httpServer *http.Server
+	sessionStore *sessions.CookieStore
+	httpServer   *http.Server
 )
 
 // RunHTTPServer will start a HTTP server on a specific IP and port
@@ -63,7 +63,8 @@ func RunHTTPServer(ip string, port int) error {
 	return httpServer.ListenAndServe()
 }
 
-// IsAuthenticated returns true if the HTTP request is authenticated
+// IsAuthenticated returns true if the HTTP request is authenticated. You can set the environment variable GO_ENV=test
+// to bypass the admin authenticate to the dashboard features.
 func IsAuthenticated(r *http.Request) bool {
 	if os.Getenv("GO_ENV") == "test" {
 		return true
@@ -71,10 +72,10 @@ func IsAuthenticated(r *http.Request) bool {
 	if core.CoreApp == nil {
 		return false
 	}
-	if Store == nil {
+	if sessionStore == nil {
 		return false
 	}
-	session, err := Store.Get(r, COOKIE_KEY)
+	session, err := sessionStore.Get(r, cookieKey)
 	if err != nil {
 		return false
 	}
@@ -141,20 +142,8 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 			return utils.Timestamp(t).Ago()
 		},
 		"Duration": func(t time.Duration) string {
-			var out string
 			duration, _ := time.ParseDuration(fmt.Sprintf("%vs", t.Seconds()))
-			if duration.Minutes() < 1 {
-				out = fmt.Sprintf("%0.0f second", duration.Seconds())
-				if duration.Seconds() >= 2 {
-					out += "s"
-				}
-			} else {
-				out = fmt.Sprintf("%0.0f minute", duration.Minutes())
-				if duration.Minutes() >= 2 {
-					out += "s"
-				}
-			}
-			return out
+			return utils.FormatDuration(duration)
 		},
 		"ToUnix": func(t time.Time) int64 {
 			return t.UTC().Unix()
@@ -167,6 +156,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		},
 		"NewUser": func() *types.User {
 			return new(types.User)
+		},
+		"NewCheckin": func() *types.Checkin {
+			return new(types.Checkin)
 		},
 	}
 }

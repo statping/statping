@@ -16,21 +16,20 @@
 package notifier
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 )
 
 var (
-	allowed_vars = []string{"host", "username", "password", "port", "api_key", "api_secret", "var1", "var2"}
+	allowedVars = []string{"host", "username", "password", "port", "api_key", "api_secret", "var1", "var2"}
 )
 
 func checkNotifierForm(n Notifier) error {
 	notifier := asNotification(n)
 	for _, f := range notifier.Form {
-		contains := contains(f.DbField, allowed_vars)
+		contains := contains(f.DbField, allowedVars)
 		if !contains {
-			return errors.New(fmt.Sprintf("the DbField '%v' is not allowed, allowed vars: %v", f.DbField, allowed_vars))
+			return fmt.Errorf("the DbField '%v' is not allowed, allowed vars: %v", f.DbField, allowedVars)
 		}
 	}
 	return nil

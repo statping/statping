@@ -44,7 +44,7 @@ func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 	system += fmt.Sprintf("statup_total_services %v", len(core.CoreApp.Services))
 	metrics = append(metrics, system)
 	for _, ser := range core.CoreApp.Services {
-		v := ser.(*core.Service)
+		v := ser.Select()
 		online := 1
 		if !v.Online {
 			online = 0

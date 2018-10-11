@@ -99,6 +99,11 @@ func TestTwilioNotifier(t *testing.T) {
 		assert.Nil(t, err)
 	})
 
+	t.Run("Twilio Test", func(t *testing.T) {
+		err := twilioNotifier.OnTest()
+		assert.Nil(t, err)
+	})
+
 	t.Run("Twilio Queue", func(t *testing.T) {
 		go notifier.Queue(twilioNotifier)
 		time.Sleep(1 * time.Second)

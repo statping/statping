@@ -23,37 +23,37 @@ import (
 	"time"
 )
 
-type User struct {
+type user struct {
 	*types.User
 }
 
-// ReturnUser returns *core.User based off a *types.User
-func ReturnUser(u *types.User) *User {
-	return &User{u}
+// ReturnUser returns *core.user based off a *types.user
+func ReturnUser(u *types.User) *user {
+	return &user{u}
 }
 
-// SelectUser returns the User based on the user's ID.
-func SelectUser(id int64) (*User, error) {
-	var user User
+// SelectUser returns the user based on the user's ID.
+func SelectUser(id int64) (*user, error) {
+	var user user
 	err := usersDB().First(&user, id)
 	return &user, err.Error
 }
 
-// SelectUser returns the User based on the user's username
-func SelectUsername(username string) (*User, error) {
-	var user User
+// SelectUsername returns the user based on the user's username
+func SelectUsername(username string) (*user, error) {
+	var user user
 	res := usersDB().Where("username = ?", username)
 	err := res.First(&user)
 	return &user, err.Error
 }
 
 // Delete will remove the user record from the database
-func (u *User) Delete() error {
+func (u *user) Delete() error {
 	return usersDB().Delete(u).Error
 }
 
 // Update will update the user's record in database
-func (u *User) Update() error {
+func (u *user) Update() error {
 	u.Password = utils.HashPassword(u.Password)
 	u.ApiKey = utils.NewSHA1Hash(5)
 	u.ApiSecret = utils.NewSHA1Hash(10)
@@ -61,7 +61,7 @@ func (u *User) Update() error {
 }
 
 // Create will insert a new user into the database
-func (u *User) Create() (int64, error) {
+func (u *user) Create() (int64, error) {
 	u.CreatedAt = time.Now()
 	u.Password = utils.HashPassword(u.Password)
 	u.ApiKey = utils.NewSHA1Hash(5)
@@ -78,8 +78,8 @@ func (u *User) Create() (int64, error) {
 }
 
 // SelectAllUsers returns all users
-func SelectAllUsers() ([]*User, error) {
-	var users []*User
+func SelectAllUsers() ([]*user, error) {
+	var users []*user
 	db := usersDB().Find(&users)
 	if db.Error != nil {
 		utils.Log(3, fmt.Sprintf("Failed to load all users. %v", db.Error))
@@ -87,9 +87,9 @@ func SelectAllUsers() ([]*User, error) {
 	return users, db.Error
 }
 
-// AuthUser will return the User and a boolean if authentication was correct.
+// AuthUser will return the user and a boolean if authentication was correct.
 // AuthUser accepts username, and password as a string
-func AuthUser(username, password string) (*User, bool) {
+func AuthUser(username, password string) (*user, bool) {
 	user, err := SelectUsername(username)
 	if err != nil {
 		utils.Log(2, err)

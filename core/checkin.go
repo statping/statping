@@ -27,104 +27,176 @@ type Checkin struct {
 	*types.Checkin
 }
 
-type CheckinHit struct {
+type checkinHit struct {
 	*types.CheckinHit
 }
 
+// Routine for checking if the last Checkin was within its interval
+func (c *Checkin) Routine() {
+	if c.Last() == nil {
+		return
+	}
+	reCheck := c.Period()
+CheckinLoop:
+	for {
+		select {
+		case <-c.Running:
+			utils.Log(1, fmt.Sprintf("Stopping checkin routine: %v", c.Name))
+			break CheckinLoop
+		case <-time.After(reCheck):
+			utils.Log(1, fmt.Sprintf("Checkin %v is expected at %v, checking every %v", c.Name, utils.FormatDuration(c.Expected()), utils.FormatDuration(c.Period())))
+			if c.Expected().Seconds() <= 0 {
+				issue := fmt.Sprintf("Checkin %v is failing, no request since %v", c.Name, c.Last().CreatedAt)
+				utils.Log(3, issue)
+				c.Service()
+				c.CreateFailure()
+			}
+			reCheck = c.Period()
+		}
+		continue
+	}
+}
+
+// String will return a Checkin API string
 func (c *Checkin) String() string {
 	return c.ApiKey
 }
 
-func ReturnCheckin(s *types.Checkin) *Checkin {
-	return &Checkin{Checkin: s}
+// ReturnCheckin converts *types.Checking to *core.Checkin
+func ReturnCheckin(c *types.Checkin) *Checkin {
+	return &Checkin{Checkin: c}
 }
 
-func ReturnCheckinHit(h *types.CheckinHit) *CheckinHit {
-	return &CheckinHit{CheckinHit: h}
+// ReturnCheckinHit converts *types.checkinHit to *core.checkinHit
+func ReturnCheckinHit(c *types.CheckinHit) *checkinHit {
+	return &checkinHit{CheckinHit: c}
 }
 
+func (c *Checkin) Service() *Service {
+	service := SelectService(c.ServiceId)
+	return service
+}
+
+func (c *Checkin) CreateFailure() (int64, error) {
+	service := c.Service()
+	fail := &types.Failure{
+		Issue:    fmt.Sprintf("Checkin %v was not reported %v ago, it expects a request every %v", c.Name, utils.FormatDuration(c.Expected()), utils.FormatDuration(c.Period())),
+		Method:   "checkin",
+		MethodId: c.Id,
+		Service:  service.Id,
+		PingTime: c.Expected().Seconds() * 0.001,
+	}
+	row := failuresDB().Create(&fail)
+	return fail.Id, row.Error
+}
+
+// SelectCheckin will find a Checkin based on the API supplied
 func SelectCheckin(api string) *Checkin {
 	var checkin Checkin
 	checkinDB().Where("api_key = ?", api).First(&checkin)
 	return &checkin
 }
 
-func (u Checkin) Period() time.Duration {
-	duration, _ := time.ParseDuration(fmt.Sprintf("%vs", u.Interval))
+// SelectCheckin will find a Checkin based on the API supplied
+func SelectCheckinId(id int64) *Checkin {
+	var checkin Checkin
+	checkinDB().Where("id = ?", id).First(&checkin)
+	return &checkin
+}
+
+// Period will return the duration of the Checkin interval
+func (c *Checkin) Period() time.Duration {
+	duration, _ := time.ParseDuration(fmt.Sprintf("%vs", c.Interval))
 	return duration
 }
 
-func (u Checkin) Grace() time.Duration {
-	duration, _ := time.ParseDuration(fmt.Sprintf("%vs", u.GracePeriod))
+// Grace will return the duration of the Checkin Grace Period (after service hasn't responded, wait a bit for a response)
+func (c *Checkin) Grace() time.Duration {
+	duration, _ := time.ParseDuration(fmt.Sprintf("%vs", c.GracePeriod))
 	return duration
 }
 
-func (u Checkin) Expected() time.Duration {
-	last := u.Last().CreatedAt
+// Expected returns the duration of when the serviec should receive a Checkin
+func (c *Checkin) Expected() time.Duration {
+	last := c.Last().CreatedAt
 	now := time.Now()
 	lastDir := now.Sub(last)
-	sub := time.Duration(u.Period() - lastDir)
+	sub := time.Duration(c.Period() - lastDir)
 	return sub
 }
 
-func (u Checkin) Last() CheckinHit {
-	var hit CheckinHit
-	checkinHitsDB().Where("checkin = ?", u.Id).Last(&hit)
-	return hit
+// Last returns the last checkinHit for a Checkin
+func (c *Checkin) Last() *checkinHit {
+	var hit checkinHit
+	checkinHitsDB().Where("checkin = ?", c.Id).Last(&hit)
+	return &hit
 }
 
-func (u *Checkin) Hits() []CheckinHit {
-	var checkins []CheckinHit
-	checkinHitsDB().Where("checkin = ?", u.Id).Order("id DESC").Find(&checkins)
+func (c *Checkin) Link() string {
+	return fmt.Sprintf("%v/checkin/%v", CoreApp.Domain, c.ApiKey)
+}
+
+// Hits returns all of the CheckinHits for a given Checkin
+func (c *Checkin) Hits() []*checkinHit {
+	var checkins []*checkinHit
+	checkinHitsDB().Where("checkin = ?", c.Id).Order("id DESC").Find(&checkins)
 	return checkins
 }
 
-func (u *Checkin) Create() (int64, error) {
-	if u.CreatedAt.IsZero() {
-		u.CreatedAt = time.Now()
-	}
-	u.ApiKey = utils.NewSHA1Hash(7)
-	row := checkinDB().Create(u)
-	if row.Error == nil {
-		utils.Log(2, row.Error)
-		return 0, row.Error
-	}
-	return u.Id, row.Error
+// Create will create a new Checkin
+func (c *Checkin) Delete() error {
+	c.Close()
+	row := checkinDB().Delete(&c)
+	return row.Error
 }
 
-func (u *CheckinHit) Create() (int64, error) {
-	if u.CreatedAt.IsZero() {
-		u.CreatedAt = time.Now()
-	}
-	row := checkinHitsDB().Create(u)
-	if row.Error == nil {
-		utils.Log(2, row.Error)
-		return 0, row.Error
-	}
-	return u.Id, row.Error
-}
-
-func SelectCheckinApi(api string) *Checkin {
-	var checkin *Checkin
-	checkinDB().Where("api = ?", api).Find(&checkin)
-	return checkin
-}
-
-func (c *Checkin) CreateHit() (int64, error) {
-	c.CreatedAt = time.Now()
-	row := checkinDB().Create(c)
-	if row.Error == nil {
+// Create will create a new Checkin
+func (c *Checkin) Create() (int64, error) {
+	c.ApiKey = utils.RandomString(7)
+	row := checkinDB().Create(&c)
+	c.Start()
+	go c.Routine()
+	if row.Error != nil {
 		utils.Log(2, row.Error)
 		return 0, row.Error
 	}
 	return c.Id, row.Error
 }
 
+// Update will update a Checkin
+func (c *Checkin) Update() (int64, error) {
+	row := checkinDB().Update(c)
+	if row.Error != nil {
+		utils.Log(2, row.Error)
+		return 0, row.Error
+	}
+	return c.Id, row.Error
+}
+
+// Create will create a new successful checkinHit
+func (c *checkinHit) Create() (int64, error) {
+	if c.CreatedAt.IsZero() {
+		c.CreatedAt = time.Now()
+	}
+	row := checkinHitsDB().Create(c)
+	if row.Error != nil {
+		utils.Log(2, row.Error)
+		return 0, row.Error
+	}
+	return c.Id, row.Error
+}
+
+// Ago returns the duration of time between now and the last successful checkinHit
+func (c *checkinHit) Ago() string {
+	got, _ := timeago.TimeAgoWithTime(time.Now(), c.CreatedAt)
+	return got
+}
+
+// RecheckCheckinFailure will check if a Service Checkin has been reported yet
 func (c *Checkin) RecheckCheckinFailure(guard chan struct{}) {
 	between := time.Now().Sub(time.Now()).Seconds()
 	if between > float64(c.Interval) {
 		fmt.Println("rechecking every 15 seconds!")
-		c.CreateFailure()
 		time.Sleep(15 * time.Second)
 		guard <- struct{}{}
 		c.RecheckCheckinFailure(guard)
@@ -132,18 +204,4 @@ func (c *Checkin) RecheckCheckinFailure(guard chan struct{}) {
 		fmt.Println("i recovered!!")
 	}
 	<-guard
-}
-
-func (f *Checkin) CreateFailure() {
-
-}
-
-func (f *Checkin) Ago() string {
-	got, _ := timeago.TimeAgoWithTime(time.Now(), time.Now())
-	return got
-}
-
-func (f *CheckinHit) Ago() string {
-	got, _ := timeago.TimeAgoWithTime(time.Now(), time.Now())
-	return got
 }

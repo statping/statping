@@ -119,7 +119,6 @@ func TestServiceChartHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	t.Log(body)
 	assert.Contains(t, body, "var ctx_1")
 	assert.Contains(t, body, "var ctx_2")
 	assert.Contains(t, body, "var ctx_3")
@@ -427,7 +426,6 @@ func TestLogsLineHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	t.Log(body)
 	assert.NotEmpty(t, body)
 	assert.True(t, isRouteAuthenticated(req))
 }
@@ -608,6 +606,15 @@ func TestReorderServiceHandler(t *testing.T) {
 	data := `[{id: 1, order: 3},{id: 2, order: 2},{id: 3, order: 1}]"`
 	req, err := http.NewRequest("POST", "/services/reorder", strings.NewReader(data))
 	req.Header.Set("Content-Type", "application/json")
+	assert.Nil(t, err)
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	assert.Equal(t, 200, rr.Code)
+	assert.True(t, isRouteAuthenticated(req))
+}
+
+func TestExportHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/settings/export", nil)
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)

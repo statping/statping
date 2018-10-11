@@ -77,15 +77,7 @@
 
 {{if Auth}}
 
-    <div class="col-12 mt-4">
-
-        <h3>Edit Service</h3>
-
-        {{template "form_service" $s}}
-
-    </div>
-
-    <div class="col-12 mt-4{{if eq $s.Type "tcp"}} d-none{{end}}">
+    <div class="col-12 mt-4{{if ne $s.Type "http"}} d-none{{end}}">
         <h3>Last Response</h3>
         <textarea rows="8" class="form-control" readonly>{{ $s.LastResponse }}</textarea>
         <div class="form-group row mt-2">
@@ -97,28 +89,49 @@
     </div>
 
     <div class="col-12 mt-4">
+        <h3>Edit Service</h3>
+        {{template "form_service" $s}}
+    </div>
+
+    <div class="col-12 mt-4">
         <h3>Service Checkin</h3>
+        {{if $s.LimitedCheckins}}
         <table class="table">
             <thead>
-            <tr>
-                <th scope="col">Checkin</th>
-                <th scope="col">Report Period<br>Grace Period</th>
-                <th scope="col">Last Seen</th>
-                <th scope="col">Expected</th>
-            </tr>
+                <tr>
+                    <th scope="col">Checkin</th>
+                    <th scope="col">Report Period<br>Grace Period</th>
+                    <th scope="col">Last Seen</th>
+                    <th scope="col">Expected</th>
+                    <th scope="col"></th>
+                </tr>
             </thead>
             <tbody>
-            {{$ch := $s.Checkin}}
-            <tr>
-                <td>{{CoreApp.Domain}}/checkin/{{$ch.ApiKey}}</td>
-                <td>every {{Duration $ch.Period}}<br>{{Duration $ch.Grace}} grace period</td>
-                <td>{{Ago $ch.Last.CreatedAt}}</td>
-                <td>{{ if lt $ch.Expected 0}}{{Duration $ch.Expected}} ago{{else}}in {{Duration $ch.Expected}}{{end}}</td>
+            {{range $s.LimitedCheckins}}
+            {{ $ch := . }}
+            <tr class="{{ if lt $ch.Expected 0}}bg-warning text-black{{else}}bg-light{{end}}">
+                <td>{{$ch.Name}}<br><a href="{{$ch.Link}}" target="_blank">{{$ch.Link}}</a></td>
+                <td>every {{Duration $ch.Period}}<br>after {{Duration $ch.Grace}}</td>
+                <td>{{ if $ch.Last.CreatedAt.IsZero}}
+                        Never
+                    {{else}}
+                        {{Ago $ch.Last.CreatedAt}}
+                    {{end}}
+                </td>
+                <td>
+                    {{ if $ch.Last.CreatedAt.IsZero}}
+                        -
+                    {{else}}
+                        {{ if lt $ch.Expected 0}}{{Duration $ch.Expected}} ago{{else}}in {{Duration $ch.Expected}}{{end}}
+                    {{end}}
+                </td>
+                <td><a href="/checkin/{{$ch.Id}}/delete" class="btn btn-sm btn-danger">Delete</a></td>
             </tr>
+            {{end}}
             </tbody>
         </table>
-    {{template "form_checkin" $s}}
-
+        {{end}}
+        {{template "form_checkin" $s}}
     </div>
 
 {{end}}
@@ -220,19 +233,20 @@
         }
     });
 
-    startPick.setDate(new Date({{.Start}}*1000));
-    endPick.setDate(new Date({{.End}}*1000));
-
-    startPick.hide()
-    endPick.hide()
+    startPick.setDate(new Date({{.Start}}* 1000);
+    )
+    endPick.setDate(new Date({{.End}}* 1000);
+    )
+    startPick.hide();
+    endPick.hide();
 
     $("#start_date").click(function(e) {
         startPick.show()
-    })
+    });
 
     $("#end_date").click(function(e) {
         endPick.show()
-    })
+    });
 
     AjaxChart(chartdata,{{$s.Id}},{{.Start}},{{.End}},"hour");
 

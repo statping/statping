@@ -16,11 +16,11 @@
 package core
 
 import (
+	"errors"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
-	"github.com/pkg/errors"
 	"os"
 	"time"
 )
@@ -43,6 +43,7 @@ func init() {
 	CoreApp = NewCore()
 }
 
+// NewCore return a new *core.Core struct
 func NewCore() *Core {
 	CoreApp = new(Core)
 	CoreApp.Core = new(types.Core)
@@ -50,6 +51,7 @@ func NewCore() *Core {
 	return CoreApp
 }
 
+// ToCore will convert *core.Core to *types.Core
 func (c *Core) ToCore() *types.Core {
 	return c.Core
 }
@@ -64,6 +66,7 @@ func InitApp() {
 	go DatabaseMaintence()
 }
 
+// insertNotifierDB inject the Statup database instance to the Notifier package
 func insertNotifierDB() error {
 	if DbSession == nil {
 		err := Configs.Connect(false, utils.Directory)
@@ -81,7 +84,7 @@ func UpdateCore(c *Core) (*Core, error) {
 	return c, db.Error
 }
 
-// UsingAssets will return true if /assets folder is present
+// CurrentTime will return the current local time
 func (c Core) CurrentTime() string {
 	t := time.Now().UTC()
 	current := utils.Timezoner(t, c.Timezone)
@@ -147,13 +150,13 @@ func SelectCore() (*Core, error) {
 	if os.Getenv("USE_CDN") == "true" {
 		CoreApp.UseCdn = true
 	}
-	//store = sessions.NewCookieStore([]byte(core.ApiSecret))
 	return CoreApp, db.Error
 }
 
 // ServiceOrder will reorder the services based on 'order_id' (Order)
 type ServiceOrder []types.ServiceInterface
 
+// Sort interface for resroting the Services in order
 func (c ServiceOrder) Len() int           { return len(c) }
 func (c ServiceOrder) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
 func (c ServiceOrder) Less(i, j int) bool { return c[i].(*Service).Order < c[j].(*Service).Order }

@@ -19,6 +19,7 @@ import (
 	"time"
 )
 
+// Service is the main struct for Services
 type Service struct {
 	Id             int64         `gorm:"primary_key;column:id" json:"id"`
 	Name           string        `gorm:"column:name" json:"name"`
@@ -49,7 +50,6 @@ type Service struct {
 	LastStatusCode int           `gorm:"-" json:"status_code"`
 	LastOnline     time.Time     `gorm:"-" json:"last_online"`
 	Failures       []interface{} `gorm:"-" json:"failures,omitempty"`
-	//Checkins       []*Checkin    `gorm:"-" json:"checkins,omitempty"`
 }
 
 type ServiceInterface interface {

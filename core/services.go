@@ -31,10 +31,12 @@ type Service struct {
 	*types.Service
 }
 
+// Select will return the *types.Service struct for Service
 func (s *Service) Select() *types.Service {
 	return s.Service
 }
 
+// ReturnService will convert *types.Service to *core.Service
 func ReturnService(s *types.Service) *Service {
 	return &Service{s}
 }
@@ -49,10 +51,27 @@ func SelectService(id int64) *Service {
 	return nil
 }
 
-func (s *Service) Checkin() Checkin {
-	var hits Checkin
-	servicesDB().Where("service = ?", s.Id).First(&hits)
-	return hits
+// CheckinProcess runs the checkin routine for each checkin attached to service
+func (s *Service) CheckinProcess() {
+	checkins := s.Checkins()
+	for _, c := range checkins {
+		c.Start()
+		go c.Routine()
+	}
+}
+
+// Checkins will return a slice of Checkins for a Service
+func (s *Service) Checkins() []*Checkin {
+	var checkin []*Checkin
+	checkinDB().Where("service = ?", s.Id).Find(&checkin)
+	return checkin
+}
+
+// LimitedCheckins will return a slice of Checkins for a Service
+func (s *Service) LimitedCheckins() []*Checkin {
+	var checkin []*Checkin
+	checkinDB().Where("service = ?", s.Id).Limit(10).Find(&checkin)
+	return checkin
 }
 
 // SelectAllServices returns a slice of *core.Service to be store on []*core.Services, should only be called once on startup.
@@ -66,7 +85,7 @@ func (c *Core) SelectAllServices() ([]*Service, error) {
 	CoreApp.Services = nil
 	for _, service := range services {
 		service.Start()
-		service.Checkin()
+		service.CheckinProcess()
 		service.AllFailures()
 		CoreApp.Services = append(CoreApp.Services, service)
 	}
@@ -138,7 +157,7 @@ type DateScanObj struct {
 }
 
 // lastFailure returns the last failure a service had
-func (s *Service) lastFailure() *Failure {
+func (s *Service) lastFailure() *failure {
 	limited := s.LimitedFailures()
 	if len(limited) == 0 {
 		return nil
@@ -148,6 +167,8 @@ func (s *Service) lastFailure() *Failure {
 }
 
 // SmallText returns a short description about a services status
+//		service.SmallText()
+//		// Online since Monday 3:04:05PM, Jan _2 2006
 func (s *Service) SmallText() string {
 	last := s.LimitedFailures()
 	hits, _ := s.LimitedHits()
@@ -168,10 +189,14 @@ func (s *Service) SmallText() string {
 	}
 }
 
+// DowntimeText will return the amount of downtime for a service based on the duration
+//		service.DowntimeText()
+//		// Service has been offline for 15 minutes
 func (s *Service) DowntimeText() string {
 	return fmt.Sprintf("%v has been offline for %v", s.Name, utils.DurationReadable(s.Downtime()))
 }
 
+// Dbtimestamp will return a SQL query for grouping by date
 func Dbtimestamp(group string, column string) string {
 	seconds := 60
 	if group == "second" {
@@ -207,6 +232,7 @@ func (s *Service) Downtime() time.Duration {
 	return since
 }
 
+// GraphDataRaw will return all the hits between 2 times for a Service
 func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group string, column string) *DateScanObj {
 	var d []DateScan
 	model := service.(*Service).HitsBetween(start, end, group, column)
@@ -228,6 +254,7 @@ func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group st
 	return &DateScanObj{d}
 }
 
+// ToString will convert the DateScanObj into a JSON string for the charts to render
 func (d *DateScanObj) ToString() string {
 	data, err := json.Marshal(d.Array)
 	if err != nil {
@@ -311,59 +338,59 @@ func updateService(service *Service) {
 }
 
 // Delete will remove a service from the database, it will also end the service checking go routine
-func (u *Service) Delete() error {
-	i := u.index()
-	err := servicesDB().Delete(u)
+func (s *Service) Delete() error {
+	i := s.index()
+	err := servicesDB().Delete(s)
 	if err.Error != nil {
-		utils.Log(3, fmt.Sprintf("Failed to delete service %v. %v", u.Name, err.Error))
+		utils.Log(3, fmt.Sprintf("Failed to delete service %v. %v", s.Name, err.Error))
 		return err.Error
 	}
-	u.Close()
+	s.Close()
 	slice := CoreApp.Services
 	CoreApp.Services = append(slice[:i], slice[i+1:]...)
 	reorderServices()
-	notifier.OnDeletedService(u.Service)
+	notifier.OnDeletedService(s.Service)
 	return err.Error
 }
 
 // UpdateSingle will update a single column for a service
-func (u *Service) UpdateSingle(attr ...interface{}) error {
-	return servicesDB().Model(u).Update(attr).Error
+func (s *Service) UpdateSingle(attr ...interface{}) error {
+	return servicesDB().Model(s).Update(attr).Error
 }
 
 // Update will update a service in the database, the service's checking routine can be restarted by passing true
-func (u *Service) Update(restart bool) error {
-	err := servicesDB().Update(u)
+func (s *Service) Update(restart bool) error {
+	err := servicesDB().Update(s)
 	if err.Error != nil {
-		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", u.Name, err))
+		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", s.Name, err))
 		return err.Error
 	}
 	if restart {
-		u.Close()
-		u.Start()
-		u.SleepDuration = time.Duration(u.Interval) * time.Second
-		go u.CheckQueue(true)
+		s.Close()
+		s.Start()
+		s.SleepDuration = time.Duration(s.Interval) * time.Second
+		go s.CheckQueue(true)
 	}
 	reorderServices()
-	updateService(u)
-	notifier.OnUpdatedService(u.Service)
+	updateService(s)
+	notifier.OnUpdatedService(s.Service)
 	return err.Error
 }
 
 // Create will create a service and insert it into the database
-func (u *Service) Create(check bool) (int64, error) {
-	u.CreatedAt = time.Now()
-	db := servicesDB().Create(u)
+func (s *Service) Create(check bool) (int64, error) {
+	s.CreatedAt = time.Now()
+	db := servicesDB().Create(s)
 	if db.Error != nil {
-		utils.Log(3, fmt.Sprintf("Failed to create service %v #%v: %v", u.Name, u.Id, db.Error))
+		utils.Log(3, fmt.Sprintf("Failed to create service %v #%v: %v", s.Name, s.Id, db.Error))
 		return 0, db.Error
 	}
-	u.Start()
-	go u.CheckQueue(check)
-	CoreApp.Services = append(CoreApp.Services, u)
+	s.Start()
+	go s.CheckQueue(check)
+	CoreApp.Services = append(CoreApp.Services, s)
 	reorderServices()
-	notifier.OnNewService(u.Service)
-	return u.Id, nil
+	notifier.OnNewService(s.Service)
+	return s.Id, nil
 }
 
 // ServicesCount returns the amount of services inside the []*core.Services slice

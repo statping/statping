@@ -3,5 +3,7 @@
 // to see a full example of a notifier with all events, visit Statup's
 // notifier example code: https://github.com/hunterlong/statup/wiki/Notifier-Example
 //
-// More info on: https://github.com/hunterlong/statup
+// This package shouldn't contain any exports, to see how notifiers work
+// visit the core/notifier package at: https://godoc.org/github.com/hunterlong/statup/core/notifier
+// and learn how to create your own custom notifier.
 package notifiers

@@ -30,6 +30,7 @@ var (
 	router *mux.Router
 )
 
+// Router returns all of the routes used in Statup
 func Router() *mux.Router {
 	dir := utils.Directory
 	r := mux.NewRouter()
@@ -53,7 +54,6 @@ func Router() *mux.Router {
 	r.Handle("/dashboard", http.HandlerFunc(dashboardHandler)).Methods("GET")
 	r.Handle("/dashboard", http.HandlerFunc(loginHandler)).Methods("POST")
 	r.Handle("/logout", http.HandlerFunc(logoutHandler))
-	r.Handle("/checkin/{id}", http.HandlerFunc(checkinUpdateHandler))
 	r.Handle("/plugins/download/{name}", http.HandlerFunc(pluginsDownloadHandler))
 	r.Handle("/plugins/{name}/save", http.HandlerFunc(pluginSavedHandler)).Methods("POST")
 	r.Handle("/help", http.HandlerFunc(helpHandler))
@@ -86,7 +86,9 @@ func Router() *mux.Router {
 	r.Handle("/service/{id}/edit", http.HandlerFunc(servicesViewHandler))
 	r.Handle("/service/{id}/delete", http.HandlerFunc(servicesDeleteHandler))
 	r.Handle("/service/{id}/delete_failures", http.HandlerFunc(servicesDeleteFailuresHandler)).Methods("GET")
-	r.Handle("/service/{id}/checkin", http.HandlerFunc(checkinCreateUpdateHandler)).Methods("POST")
+	r.Handle("/service/{id}/checkin", http.HandlerFunc(checkinCreateHandler)).Methods("POST")
+	r.Handle("/checkin/{id}/delete", http.HandlerFunc(checkinDeleteHandler)).Methods("GET")
+	r.Handle("/checkin/{id}", http.HandlerFunc(checkinHitHandler))
 
 	// API SERVICE Routes
 	r.Handle("/api/services", http.HandlerFunc(apiAllServicesHandler)).Methods("GET")
@@ -114,16 +116,7 @@ func Router() *mux.Router {
 	return r
 }
 
-func ReturnRouter() *mux.Router {
-	return router
-}
-
-func UpdateRouter(routes *mux.Router) {
-	router = routes
-	httpServer.Handler = router
-}
-
-func ResetRouter() {
+func resetRouter() {
 	router = Router()
 	httpServer.Handler = router
 }
@@ -131,8 +124,8 @@ func ResetRouter() {
 func resetCookies() {
 	if core.CoreApp != nil {
 		cookie := fmt.Sprintf("%v_%v", core.CoreApp.ApiSecret, time.Now().Nanosecond())
-		Store = sessions.NewCookieStore([]byte(cookie))
+		sessionStore = sessions.NewCookieStore([]byte(cookie))
 	} else {
-		Store = sessions.NewCookieStore([]byte("secretinfo"))
+		sessionStore = sessions.NewCookieStore([]byte("secretinfo"))
 	}
 }

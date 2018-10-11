@@ -36,18 +36,18 @@ $('.test_notifier').on('click', function(e) {
         type: 'POST',
         data: values,
         success: function(data) {
-          if (data === 'ok') {
-              success.removeClass('d-none');
-              setTimeout(function() {
-                  success.addClass('d-none');
-              }, 5000)
-          } else {
-              error.removeClass('d-none');
-              error.html(data);
-              setTimeout(function() {
-                  error.addClass('d-none');
-              }, 8000)
-          }
+            if (data === 'ok') {
+                success.removeClass('d-none');
+                setTimeout(function() {
+                    success.addClass('d-none');
+                }, 5000)
+            } else {
+                error.removeClass('d-none');
+                error.html(data);
+                setTimeout(function() {
+                    error.addClass('d-none');
+                }, 8000)
+            }
             btn.prop("disabled", false);
         }
     });
@@ -61,31 +61,33 @@ $('form').submit(function() {
 
 $('select#service_type').on('change', function() {
     var selected = $('#service_type option:selected').val();
-    if (selected === 'tcp') {
-        var selected = $('#check_auth_type option:selected').val();
         if (selected !== 'none') {
-                $('#check_auth_type').val('none');
-                $('select#check_auth_type').trigger('change');
+            $('#check_auth_type').val('none');
+            $('select#check_auth_type').trigger('change');
+            var typeLabel = $('#service_type_label');
+            if (selected === 'tcp' || selected === 'udp') {
+                if (selected === 'tcp') {
+                    typeLabel.html('TCP Port')
+                } else {
+                    typeLabel.html('UDP Port')
+                }
+                $('#service_port').parent().parent().removeClass('d-none');
+                $('#service_check_type').parent().parent().addClass('d-none');
+                $('#service_url').attr('placeholder', 'localhost');
+                $('#post_data').parent().parent().addClass('d-none');
+                $('#service_response').parent().parent().addClass('d-none');
+                $('#service_response_code').parent().parent().addClass('d-none');
+                $('#auth_type').parent().parent().addClass('d-none');
+            } else {
+                $('#post_data').parent().parent().removeClass('d-none');
+                $('#service_response').parent().parent().removeClass('d-none');
+                $('#service_response_code').parent().parent().removeClass('d-none');
+                $('#service_check_type').parent().parent().removeClass('d-none');
+                $('#service_url').attr('placeholder', 'https://google.com');
+                $('#auth_type').parent().parent().removeClass('d-none');
+                $('#service_port').parent().parent().addClass('d-none');
+            }
         }
-        $('#service_port').parent().parent().removeClass('d-none');
-        $('#service_check_type').parent().parent().addClass('d-none');
-        $('#service_url').attr('placeholder', 'localhost');
-
-        $('#post_data').parent().parent().addClass('d-none');
-        $('#service_response').parent().parent().addClass('d-none');
-        $('#service_response_code').parent().parent().addClass('d-none');
-        $('#auth_type').parent().parent().addClass('d-none');
-    } else {
-        $('#post_data').parent().parent().removeClass('d-none');
-        $('#service_response').parent().parent().removeClass('d-none');
-        $('#service_response_code').parent().parent().removeClass('d-none');
-        $('#service_check_type').parent().parent().removeClass('d-none');
-        $('#service_url').attr('placeholder', 'https://google.com');
-        $('#auth_type').parent().parent().removeClass('d-none');
-
-        $('#service_port').parent().parent().addClass('d-none');
-    }
-
 });
 
 $('select#check_auth_type').on('change', function() {
@@ -103,43 +105,43 @@ $('select#check_auth_type').on('change', function() {
 
 
 function AjaxChart(chart, service, start=0, end=9999999999, group="hour") {
-  $.ajax({
-    url: "/api/services/"+service+"/data?start="+start+"&end="+end+"&group="+group,
-    type: 'GET',
-    success: function(data) {
-      chart.data.labels.pop();
-      if ( ( typeof(data) !== "undefined" ) &&
-	   ( 'data' in data ) &&
-	   ( typeof(data.data) !== "undefined" ) &&
-	   ( data.data !== null ) &&
-	   ( 'length' in data.data) &&
-	   (data.data.length > 0 ) ) {
-        data.data.forEach(function(d) {
-          chart.data.datasets[0].data.push(d);
-        });
-      }
-      chart.update();
-    }
-  });
+    $.ajax({
+        url: "/api/services/"+service+"/data?start="+start+"&end="+end+"&group="+group,
+        type: 'GET',
+        success: function(data) {
+            chart.data.labels.pop();
+            if ( ( typeof(data) !== "undefined" ) &&
+                ( 'data' in data ) &&
+                ( typeof(data.data) !== "undefined" ) &&
+                ( data.data !== null ) &&
+                ( 'length' in data.data) &&
+                (data.data.length > 0 ) ) {
+                data.data.forEach(function(d) {
+                    chart.data.datasets[0].data.push(d);
+                });
+            }
+            chart.update();
+        }
+    });
 }
 
 function PingAjaxChart(chart, service, start=0, end=9999999999, group="hour") {
-  $.ajax({
-    url: "/api/services/"+service+"/ping?start="+start+"&end="+end+"&group="+group,
-    type: 'GET',
-    success: function(data) {
-      chart.data.labels.pop();
-      chart.data.datasets.push({
-        label: "Ping Time",
-        backgroundColor: "#bababa"
-      });
-      chart.update();
-      data.data.forEach(function(d) {
-        chart.data.datasets[1].data.push(d);
-      });
-      chart.update();
-    }
-  });
+    $.ajax({
+        url: "/api/services/"+service+"/ping?start="+start+"&end="+end+"&group="+group,
+        type: 'GET',
+        success: function(data) {
+            chart.data.labels.pop();
+            chart.data.datasets.push({
+                label: "Ping Time",
+                backgroundColor: "#bababa"
+            });
+            chart.update();
+            data.data.forEach(function(d) {
+                chart.data.datasets[1].data.push(d);
+            });
+            chart.update();
+        }
+    });
 }
 
 $('select#service_check_type').on('change', function() {

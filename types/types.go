@@ -16,8 +16,6 @@
 package types
 
 import (
-	"github.com/jinzhu/gorm"
-	"net/http"
 	"time"
 )
 
@@ -48,54 +46,4 @@ type DbConfig struct {
 	Email       string `yaml:"-"`
 	Error       error  `yaml:"-"`
 	Location    string `yaml:"location"`
-}
-
-type Info struct {
-	Name        string
-	Description string
-	Form        string
-}
-
-type PluginInfo struct {
-	Info Info
-	PluginActions
-}
-
-type Routing struct {
-	URL     string
-	Method  string
-	Handler func(http.ResponseWriter, *http.Request)
-}
-
-type PluginActions interface {
-	GetInfo() Info
-	GetForm() string
-	OnLoad(db gorm.DB)
-	SetInfo(map[string]interface{}) Info
-	Routes() []Routing
-	OnSave(map[string]interface{})
-	OnFailure(map[string]interface{})
-	OnSuccess(map[string]interface{})
-	OnSettingsSaved(map[string]interface{})
-	OnNewUser(map[string]interface{})
-	OnNewService(map[string]interface{})
-	OnUpdatedService(map[string]interface{})
-	OnDeletedService(map[string]interface{})
-	OnInstall(map[string]interface{})
-	OnUninstall(map[string]interface{})
-	OnBeforeRequest(map[string]interface{})
-	OnAfterRequest(map[string]interface{})
-	OnShutdown()
-}
-
-type PluginRepos struct {
-	Plugins []PluginJSON
-}
-
-type PluginJSON struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Repo        string `json:"repo"`
-	Author      string `json:"author"`
-	Namespace   string `json:"namespace"`
 }

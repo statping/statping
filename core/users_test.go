@@ -113,6 +113,6 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestDbConfig_Close(t *testing.T) {
-	err := Configs.Close()
+	err := DbSession.Close()
 	assert.Nil(t, err)
 }

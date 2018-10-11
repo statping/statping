@@ -38,7 +38,7 @@ func TestSelectAllServices(t *testing.T) {
 	services := CoreApp.Services
 	for _, s := range services {
 		service := s.(*Service)
-		service.Check(true)
+		service.Check(false)
 		assert.True(t, service.IsRunning())
 		t.Logf("ID: %v %v\n", service.Id, service.Name)
 	}
@@ -150,7 +150,7 @@ func TestServiceHits(t *testing.T) {
 	service := SelectService(5)
 	hits, err := service.Hits()
 	assert.Nil(t, err)
-	assert.Equal(t, int(1452), len(hits))
+	assert.True(t, len(hits) > 1400)
 }
 
 func TestServiceLimitedHits(t *testing.T) {
@@ -224,7 +224,7 @@ func TestCreateFailingHTTPService(t *testing.T) {
 func TestServiceFailedCheck(t *testing.T) {
 	service := SelectService(17)
 	assert.Equal(t, "Bad URL", service.Name)
-	service.Check(true)
+	service.Check(false)
 	assert.Equal(t, "Bad URL", service.Name)
 	assert.False(t, service.Online)
 }
@@ -249,7 +249,7 @@ func TestCreateFailingTCPService(t *testing.T) {
 
 func TestServiceFailedTCPCheck(t *testing.T) {
 	service := SelectService(newServiceId)
-	service.Check(true)
+	service.Check(false)
 	assert.Equal(t, "Bad TCP", service.Name)
 	assert.False(t, service.Online)
 }

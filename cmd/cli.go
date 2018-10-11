@@ -21,17 +21,13 @@ import (
 	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/handlers"
+	"github.com/hunterlong/statup/plugin"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
 	"io/ioutil"
 	"net/http"
 	"time"
-)
-
-const (
-	BRAKER = "=============================================================================="
-	POINT  = "                     "
 )
 
 // CatchCLI will run functions based on the commands sent to Statup
@@ -42,8 +38,6 @@ func CatchCLI(args []string) error {
 	LoadDotEnvs()
 
 	switch args[0] {
-	case "seed":
-		handlers.DesktopInit(ipAddress, port)
 	case "app":
 		handlers.DesktopInit(ipAddress, port)
 	case "version":
@@ -87,7 +81,7 @@ func CatchCLI(args []string) error {
 		cmd := args[1]
 		switch cmd {
 		case "plugins":
-			LoadPlugins(true)
+			plugin.LoadPlugins()
 		}
 		return errors.New("end")
 	case "export":
@@ -99,7 +93,7 @@ func CatchCLI(args []string) error {
 			return err
 		}
 		indexSource := core.ExportIndexHTML()
-		err = core.SaveFile("./index.html", []byte(indexSource))
+		err = utils.SaveFile("./index.html", []byte(indexSource))
 		if err != nil {
 			utils.Log(4, err)
 			return err
@@ -114,7 +108,7 @@ func CatchCLI(args []string) error {
 		fmt.Println("Check is complete.")
 		return errors.New("end")
 	case "env":
-		fmt.Println("Statup Environment Variables")
+		fmt.Println("Statup Environment Variable")
 		envs, err := godotenv.Read(".env")
 		if err != nil {
 			utils.Log(4, "No .env file found in current directory.")
@@ -201,7 +195,7 @@ func HelpEcho() {
 //	core.OnSuccess(core.SelectService(1))
 //	fmt.Println("\n" + BRAKER)
 //	fmt.Println(POINT + "Sending 'OnFailure(Service, FailureData)'")
-//	fakeFailD := &types.Failure{
+//	fakeFailD := &types.failure{
 //		Issue: "No issue, just testing this plugin. This would include HTTP failure information though",
 //	}
 //	core.OnFailure(core.SelectService(1), fakeFailD)
@@ -213,7 +207,7 @@ func HelpEcho() {
 //	fmt.Println(POINT + "Sending 'OnNewService(Service)'")
 //	core.OnNewService(core.SelectService(2))
 //	fmt.Println("\n" + BRAKER)
-//	fmt.Println(POINT + "Sending 'OnNewUser(User)'")
+//	fmt.Println(POINT + "Sending 'OnNewUser(user)'")
 //	user, _ := core.SelectUser(1)
 //	core.OnNewUser(user)
 //	fmt.Println("\n" + BRAKER)
@@ -265,7 +259,7 @@ func HelpEcho() {
 //	}}
 //	fakeSrv2.Create()
 //
-//	fakeUser := &types.User{
+//	fakeUser := &types.user{
 //		Id:        6334,
 //		Username:  "Bulbasaur",
 //		Password:  "$2a$14$NzT/fLdE3f9iB1Eux2C84O6ZoPhI4NfY0Ke32qllCFo8pMTkUPZzy",
@@ -275,7 +269,7 @@ func HelpEcho() {
 //	}
 //	fakeUser.Create()
 //
-//	fakeUser = &types.User{
+//	fakeUser = &types.user{
 //		Id:        6335,
 //		Username:  "Billy",
 //		Password:  "$2a$14$NzT/fLdE3f9iB1Eux2C84O6ZoPhI4NfY0Ke32qllCFo8pMTkUPZzy",
@@ -295,12 +289,12 @@ func HelpEcho() {
 //		}
 //		fakeSrv2.CreateHit(dd)
 //
-//		fail := &types.Failure{
+//		fail := &types.failure{
 //			Issue: "This is not an issue, but it would container HTTP response errors.",
 //		}
 //		fakeSrv.CreateFailure(fail)
 //
-//		fail = &types.Failure{
+//		fail = &types.failure{
 //			Issue: "HTTP Status Code 521 did not match 200",
 //		}
 //		fakeSrv.CreateFailure(fail)

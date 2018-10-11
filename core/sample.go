@@ -84,19 +84,28 @@ func InsertSampleData() error {
 	s4.Create(false)
 	s5.Create(false)
 
+	utils.Log(1, "Sample data has finished importing")
+
+	return nil
+}
+
+// insertSampleCheckins will create 2 checkins with 60 successful hits per Checkin
+func insertSampleCheckins() error {
+	s1 := SelectService(1)
 	checkin1 := ReturnCheckin(&types.Checkin{
-		Service:     s1.Id,
+		ServiceId:   s1.Id,
 		Interval:    300,
 		GracePeriod: 300,
 	})
-	checkin1.Create()
+	checkin1.Update()
 
+	s2 := SelectService(1)
 	checkin2 := ReturnCheckin(&types.Checkin{
-		Service:     s2.Id,
+		ServiceId:   s2.Id,
 		Interval:    900,
 		GracePeriod: 300,
 	})
-	checkin2.Create()
+	checkin2.Update()
 
 	checkTime := time.Now().Add(-24 * time.Hour)
 	for i := 0; i <= 60; i++ {
@@ -108,9 +117,6 @@ func InsertSampleData() error {
 		checkHit.Create()
 		checkTime = checkTime.Add(10 * time.Minute)
 	}
-
-	utils.Log(1, "Sample data has finished importing")
-
 	return nil
 }
 
@@ -139,6 +145,7 @@ func InsertSampleHits() error {
 	return nil
 }
 
+// insertSampleCore will create a new Core for the seed
 func insertSampleCore() error {
 	core := &types.Core{
 		Name:        "Statup Sample Data",
@@ -154,6 +161,7 @@ func insertSampleCore() error {
 	return query.Error
 }
 
+// insertSampleUsers will create 2 admin users for a seed database
 func insertSampleUsers() {
 	u2 := ReturnUser(&types.User{
 		Username: "testadmin",
@@ -173,11 +181,12 @@ func insertSampleUsers() {
 	u3.Create()
 }
 
-// InsertSampleData will create the example/dummy services for a brand new Statup installation
+// InsertLargeSampleData will create the example/dummy services for testing the Statup server
 func InsertLargeSampleData() error {
 	insertSampleCore()
 	InsertSampleData()
 	insertSampleUsers()
+	insertSampleCheckins()
 	s6 := ReturnService(&types.Service{
 		Name:           "JSON Lint",
 		Domain:         "https://jsonlint.com",
@@ -308,6 +317,7 @@ func InsertLargeSampleData() error {
 	return nil
 }
 
+// insertFailureRecords will create failures for 15 services from seed
 func insertFailureRecords(since time.Time, amount int64) {
 	for i := int64(14); i <= 15; i++ {
 		service := SelectService(i)
@@ -328,6 +338,7 @@ func insertFailureRecords(since time.Time, amount int64) {
 	}
 }
 
+// insertHitRecords will create successful Hit records for 15 services
 func insertHitRecords(since time.Time, amount int64) {
 	for i := int64(1); i <= 15; i++ {
 		service := SelectService(i)

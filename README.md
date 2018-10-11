@@ -9,18 +9,18 @@
 # Statup - Status Page & Monitoring Server
 An easy to use Status Page for your websites and applications. Statup will automatically fetch the application and render a beautiful status page with tons of features for you to build an even better status page. This Status Page generator allows you to use MySQL, Postgres, or SQLite on multiple operating systems.
 
-[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/statup-app/general)
+[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/hunterlong/statup) [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/statup-app/general)
 
 ## A Future-Proof Status Page
-Statup strives to remain future-proof and remain intact if a failure is created. Your Statup service should not be running on the same instance you're trying to monitor. If your server crashes your Status Page should still remaining online to notify your users of downtime. 
+Statup strives to remain future-proof and remain intact if a failure is created. Your Statup service should not be running on the same instance you're trying to monitor. If your server crashes your Status Page should still remaining online to notify your users of downtime.
 
 <p align="center">
 <img width="80%" src="https://img.cjx.io/statupsiterun.gif">
 </p>
 
 ## Lightweight and Fast
-Statup is a very lightweight application and is available for Linux, Mac, and Windows. The Docker image is only ~16Mb so you know that this application won't be filling up your hard drive space. 
-The Status binary for all other OS's is ~17Mb at most. 
+Statup is a very lightweight application and is available for Linux, Mac, and Windows. The Docker image is only ~16Mb so you know that this application won't be filling up your hard drive space.
+The Status binary for all other OS's is ~17Mb at most.
 
 ## No Requirements
 Statup is built in Go Language so all you need is the precompile binary based on your operating system. You won't need to install anything extra once you have the Statup binary installed. You can even run Statup on a Raspberry Pi.
@@ -33,32 +33,32 @@ Statup will allow you to completely customize your Status Page using SASS stylin
 </p>
 
 ## Mobile View is Gorgeous
-Your status page will be optimized for mobile and desktop viewers. Statup has a full width edge to edge view, which you can also edit to meet your requirements. 
+Your status page will be optimized for mobile and desktop viewers. Statup has a full width edge to edge view, which you can also edit to meet your requirements.
 
 ## Run on Any Server
-Whether you're a Docker fan-boy or a [AWS EC2](https://github.com/hunterlong/statup/wiki/AWS-EC2) master, Statup gives you multiple options to simply get running. Our Amazon AMI image is only 8Gb and will automatically update to the most stable version of Statup. 
+Whether you're a Docker fan-boy or a [AWS EC2](https://github.com/hunterlong/statup/wiki/AWS-EC2) master, Statup gives you multiple options to simply get running. Our Amazon AMI image is only 8Gb and will automatically update to the most stable version of Statup.
 Running on an EC2 server might be the most cost effective way to host your own Statup Status Page. The server runs on the smallest EC2 instance (t2.nano) AWS has to offer, which only costs around $4.60 USD a month for your dedicated Status Page.
 Want to run it on your own Docker server? Awesome! Statup has multiple docker-compose.yml files to work with. Statup can automatically create a SSL Certification for your status page.
 
 ## Slack, Email, Twilio and more
-Statup includes email notification via SMTP and Slack integration using [Incoming Webhook](https://api.slack.com/incoming-webhooks). Insert the webhook URL into the Settings page in Statup and enable the Slack integration. Anytime a service fails, you're channel that you specified on Slack will receive a message. 
+Statup includes email notification via SMTP and Slack integration using [Incoming Webhook](https://api.slack.com/incoming-webhooks). Insert the webhook URL into the Settings page in Statup and enable the Slack integration. Anytime a service fails, you're channel that you specified on Slack will receive a message.
 
 ## User Created Plugins and Notifiers
 View the [Plugin Wiki](https://github.com/hunterlong/statup/wiki/Statup-Plugins) to see detailed information about Golang Plugins. Statup isn't just another Status Page for your applications, it's a framework that allows you to create your own plugins to interact with every element of your status page. [Notifier's](https://github.com/hunterlong/statup/wiki/Notifiers) can also be create with only 1 golang file.
-Plugin are created in Golang using the [statup/plugin](https://github.com/hunterlong/statup/tree/master/plugin) golang package. The plugin package has a list of interfaces/events to accept into your own plugin application. 
+Plugin are created in Golang using the [statup/plugin](https://github.com/hunterlong/statup/tree/master/plugin) golang package. The plugin package has a list of interfaces/events to accept into your own plugin application.
 
 <p align="center">
 <img width="100%" src="https://img.cjx.io/statupsc2.png">
 </p>
 
 ## Easy to use Dashboard
-Having a straight forward dashboard makes Statup that much better. Monitor your websites and applications with a basic HTTP GET request, or add a POST request with your own JSON to post to the endpoint. 
+Having a straight forward dashboard makes Statup that much better. Monitor your websites and applications with a basic HTTP GET request, or add a POST request with your own JSON to post to the endpoint.
 <p align="center">
 <img width="80%" src="https://img.cjx.io/statupsettingsview.gif">
 </p>
 
 ## Exporting Static HTML
-If you want to use Statup as a CLI application without running a server, you can export your status page to a static HTML. 
+If you want to use Statup as a CLI application without running a server, you can export your status page to a static HTML.
 This export tool is very useful for people who want to export their HTML and upload/commit it to Github Pages or an FTP server.
 ```dash
 statup export
@@ -73,7 +73,7 @@ docker run -it -p 8080:8080 hunterlong/statup
 There are multiple ways to startup a Statup server. You want to make sure Statup is on it's own instance that is not on the same server as the applications you wish to monitor. It doesn't look good when your Status Page goes down, I recommend a small EC2 instance so you can set it, and forget it.
 
 ## Docker Compose
-In this folder there is a standard docker-compose file that include nginx, postgres, and Statup. 
+In this folder there is a standard docker-compose file that include nginx, postgres, and Statup.
 ```bash
 docker-compose up -d
 ```
@@ -91,7 +91,7 @@ Once your instance has started, it will take a moment to get your SSL certificat
 Running Statup on the smallest EC2 server is very quick using the AWS AMI Image. Checkout the [AWS Wiki](https://github.com/hunterlong/statup/wiki/AWS-EC2) to see a step by step guide on how to get your EC2 Statup service online.
 
 ##### Create Security Groups
-Create the AWS Security Groups with the commands below, Statup will expose port 80 and 443. 
+Create the AWS Security Groups with the commands below, Statup will expose port 80 and 443.
 ```bash
 aws ec2 create-security-group --group-name StatupPublicHTTP \
      --description "Statup HTTP Server on port 80 and 443"
@@ -100,7 +100,7 @@ aws ec2 create-security-group --group-name StatupPublicHTTP \
 aws ec2 authorize-security-group-ingress \
      --group-id sg-7e8b830f --protocol tcp \
      --port 80 --cidr 0.0.0.0/0
-     
+
 aws ec2 authorize-security-group-ingress \
      --group-id sg-7e8b830f --protocol tcp \
      --port 443 --cidr 0.0.0.0/0
@@ -139,10 +139,10 @@ scrape_configs:
 ```
 
 ## Contributing
-Statup accepts Push Requests! Feel free to add your own features and notifiers. You probably want to checkout the [Notifier Wiki](https://github.com/hunterlong/statup/wiki/Notifiers) to get a better understanding on how to create your own notification methods for failing/successful services. Testing on Statup will test each function on MySQL, Postgres, and SQLite. I recommend you run a MySQL and a Postgres Docker image for testing. 
+Statup accepts Push Requests! Feel free to add your own features and notifiers. You probably want to checkout the [Notifier Wiki](https://github.com/hunterlong/statup/wiki/Notifiers) to get a better understanding on how to create your own notification methods for failing/successful services. Testing on Statup will test each function on MySQL, Postgres, and SQLite. I recommend you run a MySQL and a Postgres Docker image for testing.
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/hunterlong/statup)](https://goreportcard.com/report/github.com/hunterlong/statup)
-[![Build Status](https://travis-ci.org/hunterlong/statup.svg?branch=master)](https://travis-ci.org/hunterlong/statup) [![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://dashboard.cypress.io/#/projects/bi8mhr/runs) 
+[![Build Status](https://travis-ci.org/hunterlong/statup.svg?branch=master)](https://travis-ci.org/hunterlong/statup) [![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://dashboard.cypress.io/#/projects/bi8mhr/runs)
 [![Docker Pulls](https://img.shields.io/docker/pulls/hunterlong/statup.svg)](https://hub.docker.com/r/hunterlong/statup/builds/) [![Godoc](https://godoc.org/github.com/hunterlong/statup?status.svg)](https://godoc.org/github.com/hunterlong/statup)[![Coverage Status](https://coveralls.io/repos/github/hunterlong/statup/badge.svg?branch=master)](https://coveralls.io/github/hunterlong/statup?branch=master)
 
 

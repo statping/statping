@@ -70,3 +70,12 @@ func TestCopyToPluginFailed(t *testing.T) {
 	assert.Nil(t, DeleteAllAssets(dir))
 	assert.False(t, UsingAssets(dir))
 }
+
+func ExampleSaveAsset() {
+	data := []byte("alert('helloooo')")
+	SaveAsset(data, "js", "test.js")
+}
+
+func ExampleOpenAsset() {
+	OpenAsset("js", "main.js")
+}

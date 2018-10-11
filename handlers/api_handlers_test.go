@@ -163,7 +163,7 @@ func TestApiDeleteServiceHandler(t *testing.T) {
 	rr, err := httpRequestAPI(t, "DELETE", "/api/services/1", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
-	var obj ApiResponse
+	var obj apiResponse
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
 	assert.Equal(t, "delete", obj.Method)
@@ -190,7 +190,7 @@ func TestApiCreateUserHandler(t *testing.T) {
 	rr, err := httpRequestAPI(t, "POST", "/api/users", strings.NewReader(data))
 	assert.Nil(t, err)
 	body := rr.Body.String()
-	var obj ApiResponse
+	var obj apiResponse
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, "create", obj.Method)
@@ -228,7 +228,7 @@ func TestApiDeleteUserHandler(t *testing.T) {
 	rr, err := httpRequestAPI(t, "DELETE", "/api/users/1", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
-	var obj ApiResponse
+	var obj apiResponse
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
 	assert.Equal(t, "delete", obj.Method)
@@ -247,6 +247,31 @@ func TestApiServiceDataHandler(t *testing.T) {
 		assert.Equal(t, 200, rr.Code)
 		assert.NotZero(t, len(obj.Array))
 	}
+}
+
+func TestApiRenewHandler(t *testing.T) {
+	api := core.CoreApp.ApiKey
+	secret := core.CoreApp.ApiSecret
+	rr, err := httpRequestAPI(t, "GET", "/api/renew", nil)
+	assert.Nil(t, err)
+	body := rr.Body.String()
+	var obj apiResponse
+	formatJSON(body, &obj)
+	assert.Equal(t, 303, rr.Code)
+	assert.NotEqual(t, api, core.CoreApp.ApiKey)
+	assert.NotEqual(t, secret, core.CoreApp.ApiSecret)
+}
+
+func TestApiCheckinHandler(t *testing.T) {
+	t.SkipNow()
+	service := core.SelectService(1)
+	checkin := service.Checkins()
+	rr, err := httpRequestAPI(t, "GET", "/api/checkin/"+checkin[0].ApiKey, nil)
+	assert.Nil(t, err)
+	body := rr.Body.String()
+	var obj apiResponse
+	formatJSON(body, &obj)
+	assert.Equal(t, 200, rr.Code)
 }
 
 func httpRequestAPI(t *testing.T, method, url string, body io.Reader) (*httptest.ResponseRecorder, error) {

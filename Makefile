@@ -1,4 +1,4 @@
-VERSION=0.72
+VERSION=0.74
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -13,6 +13,7 @@ PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 PUBLISH_BODY='{ "request": { "branch": "master", "config": { "env": { "VERSION": "$(VERSION)", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
 TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statup v$(VERSION)", "config": { "os": [ "linux" ], "language": "go", "go": [ "1.10.x" ], "go_import_path": "github.com/hunterlong/statup", "install": true, "sudo": "required", "services": [ "docker" ], "env": { "VERSION": "$(VERSION)" }, "matrix": { "allow_failures": [ { "go": "master" } ], "fast_finish": true }, "before_deploy": [ "git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "make tag" ], "deploy": [ { "provider": "releases", "api_key": "$(GH_TOKEN)", "file": [ "build/statup-osx-x64.tar.gz", "build/statup-osx-x32.tar.gz", "build/statup-linux-x64.tar.gz", "build/statup-linux-x32.tar.gz", "build/statup-linux-arm64.tar.gz", "build/statup-linux-arm7.tar.gz", "build/statup-linux-alpine.tar.gz", "build/statup-windows-x64.zip" ], "skip_cleanup": true } ], "notifications": { "email": false }, "before_script": ["gem install sass"], "script": [ "travis_wait 30 docker pull karalabe/xgo-latest", "make release" ], "after_success": [], "after_deploy": [ "make publish-dev" ] } } }'
 TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statup
+PATH:=$(PATH)
 
 # build and compile Statup and then test
 all: dev-deps compile install test-all docker-build-all
@@ -44,7 +45,13 @@ build: compile
 
 # build Statup plugins
 build-plugin:
-	$(GOBUILD) $(BUILDVERSION) -buildmode=plugin -o $(BINARY_NAME) -v ./dev/plugin
+	$(GOBUILD) $(BUILDVERSION) -buildmode=plugin -o ./dev/plugin/example.so -v ./dev/plugin
+
+test-plugin: clean
+	mkdir plugins
+	$(GOBUILD) $(BUILDVERSION) -buildmode=plugin -o ./dev/plugin/example.so -v ./dev/plugin
+	mv ./dev/plugin/example.so ./plugins/example.so
+	STATUP_DIR=$(TEST_DIR) go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./plugin
 
 # build Statup debug app
 build-debug: compile
@@ -74,7 +81,7 @@ benchmark-view:
 	go tool pprof handlers/handlers.test handlers/prof.cpu > top20
 
 # test Statup golang tetsing files
-test: clean compile install
+test: clean compile install build-plugin
 	STATUP_DIR=$(TEST_DIR) go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./...
 	gocov convert coverage.out > coverage.json
 
@@ -84,9 +91,16 @@ coverage:
 
 # generate documentation for Statup functions
 docs:
-	godoc2md github.com/hunterlong/statup > servers/docs/README.md
-	gocov-html coverage.json > servers/docs/COVERAGE.html
-	revive -formatter stylish > servers/docs/LINT.md
+	godoc2md -ex github.com/hunterlong/statup/cmd >> dev/README.md
+	godoc2md -ex github.com/hunterlong/statup/core > dev/README.md
+	godoc2md -ex github.com/hunterlong/statup/handlers >> dev/README.md
+	godoc2md -ex github.com/hunterlong/statup/notifiers >> dev/README.md
+	godoc2md -ex github.com/hunterlong/statup/plugin >> dev/README.md
+	godoc2md -ex github.com/hunterlong/statup/source >> dev/README.md
+	godoc2md -ex github.com/hunterlong/statup/types >> dev/README.md
+	godoc2md -ex github.com/hunterlong/statup/utils >> dev/README.md
+	gocov-html coverage.json > dev/COVERAGE.html
+	revive -formatter stylish > dev/LINT.md
 
 #
 #    Build binary for Statup
@@ -191,8 +205,7 @@ dep:
 	dep ensure -vendor-only
 
 # install all required golang dependecies
-dev-deps: dep
-	$(GOGET) -u github.com/jinzhu/gorm/...
+dev-deps:
 	$(GOGET) github.com/stretchr/testify/assert
 	$(GOGET) golang.org/x/tools/cmd/cover
 	$(GOGET) github.com/mattn/goveralls
@@ -202,12 +215,13 @@ dev-deps: dep
 	$(GOGET) github.com/GeertJohan/go.rice
 	$(GOGET) github.com/GeertJohan/go.rice/rice
 	$(GOINSTALL) github.com/GeertJohan/go.rice/rice
-	$(GOCMD) get github.com/davecheney/godoc2md
-	$(GOCMD) install github.com/davecheney/godoc2md
+	$(GOCMD) get github.com/frioux/godoc2md
+	$(GOCMD) install github.com/frioux/godoc2md
 	$(GOCMD) get github.com/axw/gocov/gocov
 	$(GOCMD) get gopkg.in/matm/v1/gocov-html
 	$(GOCMD) install gopkg.in/matm/v1/gocov-html
 	$(GOCMD) get github.com/mgechev/revive
+	$(GOCMD) get github.com/fatih/structs
 
 # remove files for a clean compile/build
 clean:
