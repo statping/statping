@@ -109,7 +109,7 @@ func mainProcess() {
 	core.Configs.MigrateDatabase()
 	core.InitApp()
 	if !core.SetupMode {
-		plugin.LoadPlugins(false)
+		plugin.LoadPlugins()
 		fmt.Println(handlers.RunHTTPServer(ipAddress, port))
 		os.Exit(1)
 	}

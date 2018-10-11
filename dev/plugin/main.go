@@ -1,22 +1,40 @@
 package main
 
 import (
-	"github.com/hunterlong/statup/plugin"
+	"github.com/hunterlong/statup/types"
+	"net/http"
 )
 
-type Example struct {
-	*plugin.Plugin
-}
+type PluginObj types.PluginInfo
 
-var example = &Example{&plugin.Plugin{
-	Name:        "Example",
-	Description: "This is an example plugin",
-}}
+var Plugin = PluginObj{
+	Info: &types.Info{
+		Name:        "Example Plugin",
+		Description: "This is an example plugin for Statup Status Page application. It can be implemented pretty quick!",
+	},
+	Routes: []*types.PluginRoute{{
+		Url:    "/setuper",
+		Method: "GET",
+		Func:   SampleHandler,
+	}},
+}
 
 func main() {
 
 }
 
-func (e *Example) Select() *plugin.Plugin {
-	return e.Plugin
+func SampleHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (e *PluginObj) OnLoad() error {
+	return nil
+}
+
+func (e *PluginObj) GetInfo() *types.Info {
+	return e.Info
+}
+
+func (e *PluginObj) Router() []*types.PluginRoute {
+	return e.Routes
 }

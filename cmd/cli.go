@@ -81,7 +81,7 @@ func CatchCLI(args []string) error {
 		cmd := args[1]
 		switch cmd {
 		case "plugins":
-			plugin.LoadPlugins(true)
+			plugin.LoadPlugins()
 		}
 		return errors.New("end")
 	case "export":
@@ -108,7 +108,7 @@ func CatchCLI(args []string) error {
 		fmt.Println("Check is complete.")
 		return errors.New("end")
 	case "env":
-		fmt.Println("Statup Environment Variables")
+		fmt.Println("Statup Environment Variable")
 		envs, err := godotenv.Read(".env")
 		if err != nil {
 			utils.Log(4, "No .env file found in current directory.")

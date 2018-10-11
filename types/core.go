@@ -43,7 +43,7 @@ type Core struct {
 	DbConnection  string             `gorm:"-" json:"database"`
 	Started       time.Time          `gorm:"-" json:"started_on"`
 	Services      []ServiceInterface `gorm:"-" json:"services,omitempty"`
-	Plugins       []Info             `gorm:"-" json:"-"`
+	Plugins       []*Info            `gorm:"-" json:"-"`
 	Repos         []PluginJSON       `gorm:"-" json:"-"`
 	AllPlugins    []PluginActions    `gorm:"-" json:"-"`
 	Notifications []AllNotifiers     `gorm:"-" json:"-"`

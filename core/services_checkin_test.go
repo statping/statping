@@ -95,6 +95,6 @@ func TestSelectCheckinMethods(t *testing.T) {
 	assert.Equal(t, float64(15), testCheckin.Grace().Seconds())
 	t.Log(testCheckin.Expected())
 	assert.True(t, testCheckin.Expected().Seconds() < -5)
-	assert.Equal(t, time.Now().UTC().Day(), lastHit.CreatedAt.UTC().Day())
+	assert.False(t, lastHit.CreatedAt.IsZero())
 	assert.Equal(t, "A minute ago", lastHit.Ago())
 }
