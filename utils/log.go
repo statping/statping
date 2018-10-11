@@ -125,7 +125,6 @@ func Log(level int, err interface{}) error {
 // Http returns a log for a HTTP request
 func Http(r *http.Request) string {
 	msg := fmt.Sprintf("%v (%v) | IP: %v", r.RequestURI, r.Method, r.Host)
-	fmtLogs.Printf("WEB: %v\n", msg)
 	fmt.Printf("WEB: %v\n", msg)
 	pushLastLine(msg)
 	return msg

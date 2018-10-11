@@ -63,7 +63,7 @@ func TestDbConfig_Save(t *testing.T) {
 }
 
 func TestLoadDbConfig(t *testing.T) {
-	Configs, err := LoadConfig(dir)
+	Configs, err := LoadConfigFile(dir)
 	assert.Nil(t, err)
 	assert.Equal(t, "sqlite", Configs.DbConn)
 }
@@ -118,7 +118,7 @@ func TestInsertNotifierDB(t *testing.T) {
 	if skipNewDb {
 		t.SkipNow()
 	}
-	err := insertNotifierDB()
+	err := InsertNotifierDB()
 	assert.Nil(t, err)
 }
 

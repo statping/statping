@@ -27,7 +27,7 @@ var (
 )
 
 func TestSelectHTTPService(t *testing.T) {
-	services, err := CoreApp.SelectAllServices()
+	services, err := CoreApp.SelectAllServices(false)
 	assert.Nil(t, err)
 	assert.Equal(t, 15, len(services))
 	assert.Equal(t, "Google", services[0].Name)
@@ -39,7 +39,7 @@ func TestSelectAllServices(t *testing.T) {
 	for _, s := range services {
 		service := s.(*Service)
 		service.Check(false)
-		assert.True(t, service.IsRunning())
+		assert.False(t, service.IsRunning())
 		t.Logf("ID: %v %v\n", service.Id, service.Name)
 	}
 	assert.Equal(t, 15, len(services))
@@ -77,7 +77,7 @@ func TestUpdateService(t *testing.T) {
 }
 
 func TestUpdateAllServices(t *testing.T) {
-	services, err := CoreApp.SelectAllServices()
+	services, err := CoreApp.SelectAllServices(false)
 	assert.Nil(t, err)
 	for k, srv := range services {
 		srv.Name = "Changed " + srv.Name
@@ -268,7 +268,7 @@ func TestCreateServiceFailure(t *testing.T) {
 func TestDeleteService(t *testing.T) {
 	service := SelectService(newServiceId)
 
-	count, err := CoreApp.SelectAllServices()
+	count, err := CoreApp.SelectAllServices(false)
 	assert.Nil(t, err)
 	assert.Equal(t, 18, len(count))
 

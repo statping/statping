@@ -23,7 +23,7 @@ import (
 
 func TestRunSQLiteApp(t *testing.T) {
 	t.SkipNow()
-	run := CatchCLI([]string{"app"})
+	run := catchCLI([]string{"app"})
 	assert.Nil(t, run)
 }
 
@@ -64,46 +64,46 @@ func TestAssetsCommand(t *testing.T) {
 }
 
 func TestVersionCLI(t *testing.T) {
-	run := CatchCLI([]string{"version"})
+	run := catchCLI([]string{"version"})
 	assert.EqualError(t, run, "end")
 }
 
 func TestAssetsCLI(t *testing.T) {
-	run := CatchCLI([]string{"assets"})
+	run := catchCLI([]string{"assets"})
 	assert.EqualError(t, run, "end")
 	assert.FileExists(t, dir+"/assets/css/base.css")
 	assert.FileExists(t, dir+"/assets/scss/base.scss")
 }
 
 func TestSassCLI(t *testing.T) {
-	run := CatchCLI([]string{"sass"})
+	run := catchCLI([]string{"sass"})
 	assert.EqualError(t, run, "end")
 	assert.FileExists(t, dir+"/assets/css/base.css")
 }
 
 func TestUpdateCLI(t *testing.T) {
 	t.SkipNow()
-	run := CatchCLI([]string{"update"})
+	run := catchCLI([]string{"update"})
 	assert.EqualError(t, run, "end")
 }
 
 func TestTestPackageCLI(t *testing.T) {
-	run := CatchCLI([]string{"test", "plugins"})
+	run := catchCLI([]string{"test", "plugins"})
 	assert.EqualError(t, run, "end")
 }
 
 func TestHelpCLI(t *testing.T) {
-	run := CatchCLI([]string{"help"})
+	run := catchCLI([]string{"help"})
 	assert.EqualError(t, run, "end")
 }
 
 func TestRunOnceCLI(t *testing.T) {
 	t.SkipNow()
-	run := CatchCLI([]string{"run"})
+	run := catchCLI([]string{"run"})
 	assert.Nil(t, run)
 }
 
 func TestEnvCLI(t *testing.T) {
-	run := CatchCLI([]string{"env"})
+	run := catchCLI([]string{"env"})
 	assert.Error(t, run)
 }

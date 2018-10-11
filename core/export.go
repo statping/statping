@@ -31,7 +31,7 @@ func injectDatabase() {
 func ExportIndexHTML() string {
 	source.Assets()
 	injectDatabase()
-	CoreApp.SelectAllServices()
+	CoreApp.SelectAllServices(false)
 	CoreApp.UseCdn = true
 	for _, srv := range CoreApp.Services {
 		service := srv.(*Service)

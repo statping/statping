@@ -193,47 +193,41 @@ func (db *DbConfig) InsertCore() (*Core, error) {
 
 // Connect will attempt to connect to the sqlite, postgres, or mysql database
 func (db *DbConfig) Connect(retry bool, location string) error {
-	var err error
 	if DbSession != nil {
-		DbSession = nil
+		return nil
 	}
 	var conn, dbType string
+	var err error
 	dbType = Configs.DbConn
+	if Configs.DbPort == 0 {
+		Configs.DbPort = DefaultPort(dbType)
+	}
 	switch dbType {
 	case "sqlite":
-		conn = utils.Directory + "/statup.db"
+		conn = location + "/statup.db"
 		dbType = "sqlite3"
 	case "mysql":
-		if Configs.DbPort == 0 {
-			Configs.DbPort = 3306
-		}
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
 		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
 	case "postgres":
-		if Configs.DbPort == 0 {
-			Configs.DbPort = 5432
-		}
 		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v sslmode=disable", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass)
 	case "mssql":
-		if Configs.DbPort == 0 {
-			Configs.DbPort = 1433
-		}
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
 		conn = fmt.Sprintf("sqlserver://%v:%v@%v?database=%v", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
 	}
-	DbSession, err = gorm.Open(dbType, conn)
+	dbSession, err := gorm.Open(dbType, conn)
 	if err != nil {
 		if retry {
 			utils.Log(1, fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", conn))
 			return db.waitForDb()
 		} else {
-			fmt.Println("ERROR:", err)
 			return err
 		}
 	}
-	err = DbSession.DB().Ping()
+	err = dbSession.DB().Ping()
 	if err == nil {
-		utils.Log(1, fmt.Sprintf("Database connection to '%v' was successful.", Configs.DbData))
+		DbSession = dbSession
+		utils.Log(1, fmt.Sprintf("Database %v connection '%v@%v' at %v was successful.", dbType, Configs.DbUser, Configs.DbHost, Configs.DbData))
 	}
 	return err
 }
@@ -358,7 +352,6 @@ func (db *DbConfig) CreateDatabase() error {
 // If this function has an issue, it will ROLLBACK to the previous state.
 func (db *DbConfig) MigrateDatabase() error {
 	utils.Log(1, "Migrating Database Tables...")
-
 	tx := DbSession.Begin()
 	defer func() {
 		if r := recover(); r != nil {

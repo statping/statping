@@ -45,13 +45,13 @@ func init() {
 
 func loadDatabase() {
 	core.NewCore()
-	core.LoadConfig(dir)
+	core.LoadConfigFile(dir)
 	core.Configs = &core.DbConfig{
 		DbConn:   "sqlite",
 		Location: dir,
 	}
-	core.Configs.Connect(false, utils.Directory)
 	core.CoreApp.DbConnection = "sqlite"
+	core.Configs.Connect(false, utils.Directory)
 	core.CoreApp.Version = "DEV"
 	core.Configs.Save()
 }
@@ -75,11 +75,14 @@ func Clean() {
 }
 
 func TestInit(t *testing.T) {
-	Clean()
-	loadDatabase()
-	resetDatabase()
-	loadDatabase()
-	core.InitApp()
+	//Clean()
+	//loadDatabase()
+	//resetDatabase()
+	//loadDatabase()
+	//core.SelectCore()
+	//core.InsertNotifierDB()
+	//core.CoreApp.SelectAllServices(false)
+	//core.CoreApp.Notifications = notifier.Load()
 }
 
 func formatJSON(res string, out interface{}) {
@@ -93,7 +96,7 @@ func TestApiIndexHandler(t *testing.T) {
 	var obj types.Core
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
-	assert.Equal(t, "Statup Sample Data", obj.Name)
+	assert.Equal(t, "Awesome Status", obj.Name)
 	assert.Equal(t, "sqlite", obj.DbConnection)
 }
 
@@ -104,8 +107,8 @@ func TestApiAllServicesHandlerHandler(t *testing.T) {
 	var obj []types.Service
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
-	assert.Equal(t, "Google", obj[0].Name)
-	assert.Equal(t, "https://google.com", obj[0].Domain)
+	assert.Equal(t, "Test Service 9", obj[0].Name)
+	assert.Equal(t, "https://www.youtube.com/watch?v=yydZbVoCbn0&t=870s", obj[0].Domain)
 }
 
 func TestApiServiceHandler(t *testing.T) {
@@ -174,7 +177,7 @@ func TestApiAllUsersHandler(t *testing.T) {
 	var obj []types.User
 	formatJSON(body, &obj)
 	assert.Equal(t, true, obj[0].Admin)
-	assert.Equal(t, "testadmin", obj[0].Username)
+	assert.Equal(t, "admin", obj[0].Username)
 }
 
 func TestApiCreateUserHandler(t *testing.T) {
@@ -194,13 +197,13 @@ func TestApiCreateUserHandler(t *testing.T) {
 }
 
 func TestApiViewUserHandler(t *testing.T) {
-	rr, err := httpRequestAPI(t, "GET", "/api/users/2", nil)
+	rr, err := httpRequestAPI(t, "GET", "/api/users/1", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
 	var obj types.User
 	formatJSON(body, &obj)
-	assert.Equal(t, "testadmin2", obj.Username)
+	assert.Equal(t, "admin", obj.Username)
 	assert.Equal(t, true, obj.Admin)
 }
 

@@ -59,15 +59,15 @@ func (c *Core) ToCore() *types.Core {
 // InitApp will initialize Statup
 func InitApp() {
 	SelectCore()
-	insertNotifierDB()
-	CoreApp.SelectAllServices()
+	InsertNotifierDB()
+	CoreApp.SelectAllServices(true)
 	checkServices()
 	CoreApp.Notifications = notifier.Load()
 	go DatabaseMaintence()
 }
 
-// insertNotifierDB inject the Statup database instance to the Notifier package
-func insertNotifierDB() error {
+// InsertNotifierDB inject the Statup database instance to the Notifier package
+func InsertNotifierDB() error {
 	if DbSession == nil {
 		err := Configs.Connect(false, utils.Directory)
 		if err != nil {

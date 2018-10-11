@@ -57,13 +57,13 @@ func parseFlags() {
 func main() {
 	var err error
 	parseFlags()
-	LoadDotEnvs()
+	loadDotEnvs()
 	source.Assets()
 	utils.InitLogs()
 	args := flag.Args()
 
 	if len(args) >= 1 {
-		err := CatchCLI(args)
+		err := catchCLI(args)
 		if err != nil {
 			if err.Error() == "end" {
 				os.Exit(0)
@@ -73,7 +73,7 @@ func main() {
 		}
 	}
 	utils.Log(1, fmt.Sprintf("Starting Statup v%v", VERSION))
-	core.Configs, err = core.LoadConfig(utils.Directory)
+	core.Configs, err = core.LoadConfigFile(utils.Directory)
 	if err != nil {
 		utils.Log(3, err)
 		core.SetupMode = true
@@ -84,8 +84,8 @@ func main() {
 	mainProcess()
 }
 
-// LoadDotEnvs attempts to load database configs from a '.env' file in root directory
-func LoadDotEnvs() error {
+// loadDotEnvs attempts to load database configs from a '.env' file in root directory
+func loadDotEnvs() error {
 	err := godotenv.Load()
 	if err == nil {
 		utils.Log(1, "Environment file '.env' Loaded")
@@ -98,10 +98,6 @@ func LoadDotEnvs() error {
 func mainProcess() {
 	dir := utils.Directory
 	var err error
-	core.Configs, err = core.LoadConfig(dir)
-	if err != nil {
-		utils.Log(4, fmt.Sprintf("could not load config.yml %v", err))
-	}
 	err = core.Configs.Connect(false, dir)
 	if err != nil {
 		utils.Log(4, fmt.Sprintf("could not connect to database: %v", err))

@@ -30,12 +30,12 @@ import (
 	"time"
 )
 
-// CatchCLI will run functions based on the commands sent to Statup
-func CatchCLI(args []string) error {
+// catchCLI will run functions based on the commands sent to Statup
+func catchCLI(args []string) error {
 	dir := utils.Directory
 	utils.InitLogs()
 	source.Assets()
-	LoadDotEnvs()
+	loadDotEnvs()
 
 	switch args[0] {
 	case "app":
@@ -55,15 +55,13 @@ func CatchCLI(args []string) error {
 			return errors.New("end")
 		}
 	case "sass":
-		utils.InitLogs()
-		source.Assets()
 		err := source.CompileSASS(dir)
 		if err == nil {
 			return errors.New("end")
 		}
 		return err
 	case "update":
-		gitCurrent, err := CheckGithubUpdates()
+		gitCurrent, err := checkGithubUpdates()
 		if err != nil {
 			return nil
 		}
@@ -87,7 +85,7 @@ func CatchCLI(args []string) error {
 	case "export":
 		var err error
 		fmt.Printf("Statup v%v Exporting Static 'index.html' page...\n", VERSION)
-		core.Configs, err = core.LoadConfig(dir)
+		core.Configs, err = core.LoadConfigFile(dir)
 		if err != nil {
 			utils.Log(4, "config.yml file not found")
 			return err
@@ -126,7 +124,7 @@ func CatchCLI(args []string) error {
 // RunOnce will initialize the Statup application and check each service 1 time, will not run HTTP server
 func RunOnce() {
 	var err error
-	core.Configs, err = core.LoadConfig(utils.Directory)
+	core.Configs, err = core.LoadConfigFile(utils.Directory)
 	if err != nil {
 		utils.Log(4, "config.yml file not found")
 	}
@@ -138,7 +136,7 @@ func RunOnce() {
 	if err != nil {
 		fmt.Println("Core database was not found, Statup is not setup yet.")
 	}
-	core.CoreApp.SelectAllServices()
+	_, err = core.CoreApp.SelectAllServices(true)
 	if err != nil {
 		utils.Log(4, err)
 	}
@@ -170,156 +168,22 @@ func HelpEcho() {
 	fmt.Println("Give Statup a Star at https://github.com/hunterlong/statup")
 }
 
-//
-//func TestPlugin(plug types.PluginActions) {
-//	defer utils.DeleteFile("./.plugin_test.db")
-//	source.Assets()
-//
-//	info := plug.GetInfo()
-//	fmt.Printf("\n" + BRAKER + "\n")
-//	fmt.Printf("    Plugin Name:          %v\n", info.Name)
-//	fmt.Printf("    Plugin Description:   %v\n", info.Description)
-//	fmt.Printf("    Plugin Routes:        %v\n", len(plug.Routes()))
-//	for k, r := range plug.Routes() {
-//		fmt.Printf("      - Route %v      - (%v) /%v \n", k+1, r.Method, r.URL)
-//	}
-//
-//	// Function to create a new Core with example services, hits, failures, users, and default communications
-//	FakeSeed(plug)
-//
-//	fmt.Println("\n" + BRAKER)
-//	fmt.Println(POINT + "Sending 'OnLoad(sqlbuilder.Database)'")
-//	core.OnLoad(core.DbSession)
-//	fmt.Println("\n" + BRAKER)
-//	fmt.Println(POINT + "Sending 'OnSuccess(Service)'")
-//	core.OnSuccess(core.SelectService(1))
-//	fmt.Println("\n" + BRAKER)
-//	fmt.Println(POINT + "Sending 'OnFailure(Service, FailureData)'")
-//	fakeFailD := &types.failure{
-//		Issue: "No issue, just testing this plugin. This would include HTTP failure information though",
-//	}
-//	core.OnFailure(core.SelectService(1), fakeFailD)
-//	fmt.Println("\n" + BRAKER)
-//	fmt.Println(POINT + "Sending 'OnSettingsSaved(Core)'")
-//	fmt.Println(BRAKER)
-//	core.OnSettingsSaved(core.CoreApp.ToCore())
-//	fmt.Println("\n" + BRAKER)
-//	fmt.Println(POINT + "Sending 'OnNewService(Service)'")
-//	core.OnNewService(core.SelectService(2))
-//	fmt.Println("\n" + BRAKER)
-//	fmt.Println(POINT + "Sending 'OnNewUser(user)'")
-//	user, _ := core.SelectUser(1)
-//	core.OnNewUser(user)
-//	fmt.Println("\n" + BRAKER)
-//	fmt.Println(POINT + "Sending 'OnUpdateService(Service)'")
-//	srv := core.SelectService(2)
-//	srv.Type = "http"
-//	srv.Domain = "https://yahoo.com"
-//	core.OnUpdateService(srv)
-//	fmt.Println("\n" + BRAKER)
-//	fmt.Println(POINT + "Sending 'OnDeletedService(Service)'")
-//	core.OnDeletedService(core.SelectService(1))
-//	fmt.Println("\n" + BRAKER)
-//}
-//
-//func FakeSeed(plug types.PluginActions) {
-//	var err error
-//	core.CoreApp = core.NewCore()
-//
-//	core.CoreApp.AllPlugins = []types.PluginActions{plug}
-//
-//	fmt.Printf("\n" + BRAKER)
-//
-//	fmt.Println("\nCreating a SQLite database for testing, will be deleted automatically...")
-//	core.DbSession, err = gorm.Open("sqlite", "./.plugin_test.db")
-//	if err != nil {
-//		utils.Log(3, err)
-//	}
-//
-//	fmt.Println("Finished creating Test SQLite database")
-//	fmt.Println("Inserting example services into test database...")
-//
-//	core.CoreApp.Name = "Plugin Test"
-//	core.CoreApp.Description = "This is a fake Core for testing your plugin"
-//	core.CoreApp.Domain = "http://localhost:8080"
-//	core.CoreApp.ApiSecret = "0x0x0x0x0"
-//	core.CoreApp.ApiKey = "abcdefg12345"
-//
-//	fakeSrv := &core.Service{Service: &types.Service{
-//		Name:   "Test Plugin Service",
-//		Domain: "https://google.com",
-//		Method: "GET",
-//	}}
-//	fakeSrv.Create()
-//
-//	fakeSrv2 := &core.Service{Service: &types.Service{
-//		Name:   "Awesome Plugin Service",
-//		Domain: "https://netflix.com",
-//		Method: "GET",
-//	}}
-//	fakeSrv2.Create()
-//
-//	fakeUser := &types.user{
-//		Id:        6334,
-//		Username:  "Bulbasaur",
-//		Password:  "$2a$14$NzT/fLdE3f9iB1Eux2C84O6ZoPhI4NfY0Ke32qllCFo8pMTkUPZzy",
-//		Email:     "info@testdomain.com",
-//		Admin:     true,
-//		CreatedAt: time.Now(),
-//	}
-//	fakeUser.Create()
-//
-//	fakeUser = &types.user{
-//		Id:        6335,
-//		Username:  "Billy",
-//		Password:  "$2a$14$NzT/fLdE3f9iB1Eux2C84O6ZoPhI4NfY0Ke32qllCFo8pMTkUPZzy",
-//		Email:     "info@awesome.com",
-//		CreatedAt: time.Now(),
-//	}
-//	fakeUser.Create()
-//
-//	for i := 0; i <= 50; i++ {
-//		dd := &types.Hit{
-//			Latency: rand.Float64(),
-//		}
-//		fakeSrv.CreateHit(dd)
-//
-//		dd = &types.Hit{
-//			Latency: rand.Float64(),
-//		}
-//		fakeSrv2.CreateHit(dd)
-//
-//		fail := &types.failure{
-//			Issue: "This is not an issue, but it would container HTTP response errors.",
-//		}
-//		fakeSrv.CreateFailure(fail)
-//
-//		fail = &types.failure{
-//			Issue: "HTTP Status Code 521 did not match 200",
-//		}
-//		fakeSrv.CreateFailure(fail)
-//	}
-//
-//	fmt.Println("Seeding example data is complete, running Plugin Tests")
-//
-//}
-
-func CheckGithubUpdates() (GithubResponse, error) {
-	var gitResp GithubResponse
+func checkGithubUpdates() (githubResponse, error) {
+	var gitResp githubResponse
 	response, err := http.Get("https://api.github.com/repos/hunterlong/statup/releases/latest")
 	if err != nil {
-		return GithubResponse{}, err
+		return githubResponse{}, err
 	}
 	defer response.Body.Close()
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return GithubResponse{}, err
+		return githubResponse{}, err
 	}
 	err = json.Unmarshal(contents, &gitResp)
 	return gitResp, err
 }
 
-type GithubResponse struct {
+type githubResponse struct {
 	URL             string      `json:"url"`
 	AssetsURL       string      `json:"assets_url"`
 	UploadURL       string      `json:"upload_url"`
@@ -330,17 +194,17 @@ type GithubResponse struct {
 	TargetCommitish string      `json:"target_commitish"`
 	Name            string      `json:"name"`
 	Draft           bool        `json:"draft"`
-	Author          GitAuthor   `json:"author"`
+	Author          gitAuthor   `json:"author"`
 	Prerelease      bool        `json:"prerelease"`
 	CreatedAt       time.Time   `json:"created_at"`
 	PublishedAt     time.Time   `json:"published_at"`
-	Assets          []GitAssets `json:"assets"`
+	Assets          []gitAssets `json:"assets"`
 	TarballURL      string      `json:"tarball_url"`
 	ZipballURL      string      `json:"zipball_url"`
 	Body            string      `json:"body"`
 }
 
-type GitAuthor struct {
+type gitAuthor struct {
 	Login             string `json:"login"`
 	ID                int    `json:"id"`
 	NodeID            string `json:"node_id"`
@@ -361,13 +225,13 @@ type GitAuthor struct {
 	SiteAdmin         bool   `json:"site_admin"`
 }
 
-type GitAssets struct {
+type gitAssets struct {
 	URL                string      `json:"url"`
 	ID                 int         `json:"id"`
 	NodeID             string      `json:"node_id"`
 	Name               string      `json:"name"`
 	Label              string      `json:"label"`
-	Uploader           GitUploader `json:"uploader"`
+	Uploader           gitUploader `json:"uploader"`
 	ContentType        string      `json:"content_type"`
 	State              string      `json:"state"`
 	Size               int         `json:"size"`
@@ -377,7 +241,7 @@ type GitAssets struct {
 	BrowserDownloadURL string      `json:"browser_download_url"`
 }
 
-type GitUploader struct {
+type gitUploader struct {
 	Login             string `json:"login"`
 	ID                int    `json:"id"`
 	NodeID            string `json:"node_id"`

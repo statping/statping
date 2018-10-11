@@ -41,6 +41,10 @@ func ReturnService(s *types.Service) *Service {
 	return &Service{s}
 }
 
+func Services() []types.ServiceInterface {
+	return CoreApp.Services
+}
+
 // SelectService returns a *core.Service from in memory
 func SelectService(id int64) *Service {
 	for _, s := range CoreApp.Services {
@@ -75,7 +79,7 @@ func (s *Service) LimitedCheckins() []*Checkin {
 }
 
 // SelectAllServices returns a slice of *core.Service to be store on []*core.Services, should only be called once on startup.
-func (c *Core) SelectAllServices() ([]*Service, error) {
+func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 	var services []*Service
 	db := servicesDB().Find(&services).Order("order_id desc")
 	if db.Error != nil {
@@ -84,8 +88,10 @@ func (c *Core) SelectAllServices() ([]*Service, error) {
 	}
 	CoreApp.Services = nil
 	for _, service := range services {
-		service.Start()
-		service.CheckinProcess()
+		if start {
+			service.Start()
+			service.CheckinProcess()
+		}
 		service.AllFailures()
 		CoreApp.Services = append(CoreApp.Services, service)
 	}
