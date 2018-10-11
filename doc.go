@@ -3,8 +3,8 @@
 //
 // Install Statup
 //
-// Statup is available for Mac, Linux and Windows 64x. You can download the tar.gz file of use a couple other methods. Download
-// the latest release at https://github.com/hunterlong/statup/releases/latest or use the methods below. If you're on windows, download
+// Statup is available for Mac, Linux and Windows 64x. You can download the tar.gz file or use a couple other methods. Download
+// the latest release at https://github.com/hunterlong/statup/releases/latest or view below. If you're on windows, download
 // the zip file from the latest releases link.
 //
 //		// MacOS using homebrew
