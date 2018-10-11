@@ -130,8 +130,8 @@ func (w *webhooker) run(body string) (*http.Response, error) {
 			req.Header.Add(split[0], split[1])
 		}
 	}
-	if w.ApiSecret != "" {
-		req.Header.Add("Content-Type", w.ApiSecret)
+	if w.ApiKey != "" {
+		req.Header.Add("Content-Type", w.ApiKey)
 	}
 	resp, err := client.Do(req)
 	if err != nil {
