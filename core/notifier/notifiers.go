@@ -243,6 +243,9 @@ func Init(n Notifier) (*Notification, error) {
 	var notify *Notification
 	if err == nil {
 		notify, _ = SelectNotification(n)
+		if notify.Delay.Seconds() == 0 {
+			notify.Delay = time.Duration(60 * time.Second)
+		}
 		notify.testable = isType(n, new(Tester))
 		notify.Form = n.Select().Form
 	}

@@ -25,19 +25,23 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
 * [func CountFailures() uint64](#CountFailures)
 * [func DatabaseMaintence()](#DatabaseMaintence)
 * [func Dbtimestamp(group string, column string) string](#Dbtimestamp)
+* [func DefaultPort(db string) int64](#DefaultPort)
 * [func DeleteAllSince(table string, date time.Time)](#DeleteAllSince)
-* [func DeleteConfig()](#DeleteConfig)
+* [func DeleteConfig() error](#DeleteConfig)
 * [func ExportChartsJs() string](#ExportChartsJs)
 * [func ExportIndexHTML() string](#ExportIndexHTML)
 * [func InitApp()](#InitApp)
 * [func InsertLargeSampleData() error](#InsertLargeSampleData)
+* [func InsertNotifierDB() error](#InsertNotifierDB)
 * [func InsertSampleData() error](#InsertSampleData)
 * [func InsertSampleHits() error](#InsertSampleHits)
 * [func ReturnCheckinHit(c *types.CheckinHit) *checkinHit](#ReturnCheckinHit)
 * [func ReturnUser(u *types.User) *user](#ReturnUser)
+* [func SampleData() error](#SampleData)
 * [func SelectAllUsers() ([]*user, error)](#SelectAllUsers)
 * [func SelectUser(id int64) (*user, error)](#SelectUser)
 * [func SelectUsername(username string) (*user, error)](#SelectUsername)
+* [func Services() []types.ServiceInterface](#Services)
 * [type Checkin](#Checkin)
   * [func ReturnCheckin(c *types.Checkin) *Checkin](#ReturnCheckin)
   * [func SelectCheckin(api string) *Checkin](#SelectCheckin)
@@ -69,7 +73,7 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
   * [func (c Core) CurrentTime() string](#Core.CurrentTime)
   * [func (c Core) MobileSASS() string](#Core.MobileSASS)
   * [func (c Core) SassVars() string](#Core.SassVars)
-  * [func (c *Core) SelectAllServices() ([]*Service, error)](#Core.SelectAllServices)
+  * [func (c *Core) SelectAllServices(start bool) ([]*Service, error)](#Core.SelectAllServices)
   * [func (c *Core) ServicesCount() int](#Core.ServicesCount)
   * [func (c *Core) ToCore() *types.Core](#Core.ToCore)
   * [func (c Core) UsingAssets() bool](#Core.UsingAssets)
@@ -78,7 +82,8 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
   * [func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group string, column string) *DateScanObj](#GraphDataRaw)
   * [func (d *DateScanObj) ToString() string](#DateScanObj.ToString)
 * [type DbConfig](#DbConfig)
-  * [func LoadConfig(directory string) (*DbConfig, error)](#LoadConfig)
+  * [func EnvToConfig() *DbConfig](#EnvToConfig)
+  * [func LoadConfigFile(directory string) (*DbConfig, error)](#LoadConfigFile)
   * [func LoadUsingEnv() (*DbConfig, error)](#LoadUsingEnv)
   * [func (db *DbConfig) Close() error](#DbConfig.Close)
   * [func (db *DbConfig) Connect(retry bool, location string) error](#DbConfig.Connect)
@@ -196,7 +201,7 @@ CountFailures returns the total count of failures for all services
 
 
 
-## <a name="DatabaseMaintence">func</a> [DatabaseMaintence](https://github.com/hunterlong/statup/tree/master/core/database.go?s=7190:7214#L249)
+## <a name="DatabaseMaintence">func</a> [DatabaseMaintence](https://github.com/hunterlong/statup/tree/master/core/database.go?s=7122:7146#L243)
 ``` go
 func DatabaseMaintence()
 ```
@@ -205,7 +210,7 @@ this function is currently set to delete records 7+ days old every 60 minutes
 
 
 
-## <a name="Dbtimestamp">func</a> [Dbtimestamp](https://github.com/hunterlong/statup/tree/master/core/services.go?s=5755:5807#L200)
+## <a name="Dbtimestamp">func</a> [Dbtimestamp](https://github.com/hunterlong/statup/tree/master/core/services.go?s=5855:5907#L206)
 ``` go
 func Dbtimestamp(group string, column string) string
 ```
@@ -213,7 +218,15 @@ Dbtimestamp will return a SQL query for grouping by date
 
 
 
-## <a name="DeleteAllSince">func</a> [DeleteAllSince](https://github.com/hunterlong/statup/tree/master/core/database.go?s=7523:7572#L259)
+## <a name="DefaultPort">func</a> [DefaultPort](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=3143:3176#L108)
+``` go
+func DefaultPort(db string) int64
+```
+DefaultPort accepts a database type and returns its default port
+
+
+
+## <a name="DeleteAllSince">func</a> [DeleteAllSince](https://github.com/hunterlong/statup/tree/master/core/database.go?s=7455:7504#L253)
 ``` go
 func DeleteAllSince(table string, date time.Time)
 ```
@@ -221,15 +234,15 @@ DeleteAllSince will delete a specific table's records based on a time.
 
 
 
-## <a name="DeleteConfig">func</a> [DeleteConfig](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=3785:3804#L133)
+## <a name="DeleteConfig">func</a> [DeleteConfig](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=4366:4391#L163)
 ``` go
-func DeleteConfig()
+func DeleteConfig() error
 ```
 DeleteConfig will delete the 'config.yml' file
 
 
 
-## <a name="ExportChartsJs">func</a> [ExportChartsJs](https://github.com/hunterlong/statup/tree/master/core/export.go?s=2227:2255#L87)
+## <a name="ExportChartsJs">func</a> [ExportChartsJs](https://github.com/hunterlong/statup/tree/master/core/export.go?s=2232:2260#L87)
 ``` go
 func ExportChartsJs() string
 ```
@@ -258,6 +271,14 @@ InitApp will initialize Statup
 func InsertLargeSampleData() error
 ```
 InsertLargeSampleData will create the example/dummy services for testing the Statup server
+
+
+
+## <a name="InsertNotifierDB">func</a> [InsertNotifierDB](https://github.com/hunterlong/statup/tree/master/core/core.go?s=1924:1953#L70)
+``` go
+func InsertNotifierDB() error
+```
+InsertNotifierDB inject the Statup database instance to the Notifier package
 
 
 
@@ -293,6 +314,14 @@ ReturnUser returns *core.user based off a *types.user
 
 
 
+## <a name="SampleData">func</a> [SampleData](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=4155:4178#L152)
+``` go
+func SampleData() error
+```
+SampleData runs all the sample data for a new Statup installation
+
+
+
 ## <a name="SelectAllUsers">func</a> [SelectAllUsers](https://github.com/hunterlong/statup/tree/master/core/users.go?s=2233:2271#L81)
 ``` go
 func SelectAllUsers() ([]*user, error)
@@ -315,6 +344,12 @@ func SelectUsername(username string) (*user, error)
 ```
 SelectUsername returns the user based on the user's username
 
+
+
+## <a name="Services">func</a> [Services](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1199:1239#L44)
+``` go
+func Services() []types.ServiceInterface
+```
 
 
 
@@ -513,14 +548,14 @@ func NewCore() *Core
 NewCore return a new *core.Core struct
 
 
-### <a name="SelectCore">func</a> [SelectCore](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3752:3784#L136)
+### <a name="SelectCore">func</a> [SelectCore](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3756:3788#L136)
 ``` go
 func SelectCore() (*Core, error)
 ```
 SelectCore will return the CoreApp global variable and the settings/configs for Statup
 
 
-### <a name="UpdateCore">func</a> [UpdateCore](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2242:2281#L82)
+### <a name="UpdateCore">func</a> [UpdateCore](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2246:2285#L82)
 ``` go
 func UpdateCore(c *Core) (*Core, error)
 ```
@@ -530,7 +565,7 @@ UpdateCore will update the CoreApp variable inside of the 'core' table in databa
 
 
 
-### <a name="Core.AllOnline">func</a> (Core) [AllOnline](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3526:3556#L126)
+### <a name="Core.AllOnline">func</a> (Core) [AllOnline](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3530:3560#L126)
 ``` go
 func (c Core) AllOnline() bool
 ```
@@ -539,7 +574,7 @@ AllOnline will be true if all services are online
 
 
 
-### <a name="Core.BaseSASS">func</a> (Core) [BaseSASS](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3029:3060#L109)
+### <a name="Core.BaseSASS">func</a> (Core) [BaseSASS](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3033:3064#L109)
 ``` go
 func (c Core) BaseSASS() string
 ```
@@ -557,7 +592,7 @@ Count24HFailures returns the amount of failures for a service within the last 24
 
 
 
-### <a name="Core.CountOnline">func</a> (\*Core) [CountOnline](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11399:11431#L402)
+### <a name="Core.CountOnline">func</a> (\*Core) [CountOnline](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11499:11531#L408)
 ``` go
 func (c *Core) CountOnline() int
 ```
@@ -566,7 +601,7 @@ CountOnline
 
 
 
-### <a name="Core.CurrentTime">func</a> (Core) [CurrentTime](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2384:2418#L88)
+### <a name="Core.CurrentTime">func</a> (Core) [CurrentTime](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2388:2422#L88)
 ``` go
 func (c Core) CurrentTime() string
 ```
@@ -575,7 +610,7 @@ CurrentTime will return the current local time
 
 
 
-### <a name="Core.MobileSASS">func</a> (Core) [MobileSASS](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3314:3347#L118)
+### <a name="Core.MobileSASS">func</a> (Core) [MobileSASS](https://github.com/hunterlong/statup/tree/master/core/core.go?s=3318:3351#L118)
 ``` go
 func (c Core) MobileSASS() string
 ```
@@ -585,7 +620,7 @@ file /assets/scss/mobile.scss to be edited in Theme
 
 
 
-### <a name="Core.SassVars">func</a> (Core) [SassVars](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2771:2802#L101)
+### <a name="Core.SassVars">func</a> (Core) [SassVars](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2775:2806#L101)
 ``` go
 func (c Core) SassVars() string
 ```
@@ -594,16 +629,16 @@ SassVars opens the file /assets/scss/variables.scss to be edited in Theme
 
 
 
-### <a name="Core.SelectAllServices">func</a> (\*Core) [SelectAllServices](https://github.com/hunterlong/statup/tree/master/core/services.go?s=2159:2213#L78)
+### <a name="Core.SelectAllServices">func</a> (\*Core) [SelectAllServices](https://github.com/hunterlong/statup/tree/master/core/services.go?s=2230:2294#L82)
 ``` go
-func (c *Core) SelectAllServices() ([]*Service, error)
+func (c *Core) SelectAllServices(start bool) ([]*Service, error)
 ```
 SelectAllServices returns a slice of *core.Service to be store on []*core.Services, should only be called once on startup.
 
 
 
 
-### <a name="Core.ServicesCount">func</a> (\*Core) [ServicesCount](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11320:11354#L397)
+### <a name="Core.ServicesCount">func</a> (\*Core) [ServicesCount](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11420:11454#L403)
 ``` go
 func (c *Core) ServicesCount() int
 ```
@@ -621,7 +656,7 @@ ToCore will convert *core.Core to *types.Core
 
 
 
-### <a name="Core.UsingAssets">func</a> (Core) [UsingAssets](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2612:2644#L96)
+### <a name="Core.UsingAssets">func</a> (Core) [UsingAssets](https://github.com/hunterlong/statup/tree/master/core/core.go?s=2616:2648#L96)
 ``` go
 func (c Core) UsingAssets() bool
 ```
@@ -630,7 +665,7 @@ UsingAssets will return true if /assets folder is present
 
 
 
-## <a name="DateScan">type</a> [DateScan](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4111:4193#L149)
+## <a name="DateScan">type</a> [DateScan](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4211:4293#L155)
 ``` go
 type DateScan struct {
     CreatedAt string `json:"x"`
@@ -649,7 +684,7 @@ DateScan struct is for creating the charts.js graph JSON array
 
 
 
-## <a name="DateScanObj">type</a> [DateScanObj](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4264:4323#L155)
+## <a name="DateScanObj">type</a> [DateScanObj](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4364:4423#L161)
 ``` go
 type DateScanObj struct {
     Array []DateScan `json:"data"`
@@ -664,7 +699,7 @@ DateScanObj struct is for creating the charts.js graph JSON array
 
 
 
-### <a name="GraphDataRaw">func</a> [GraphDataRaw](https://github.com/hunterlong/statup/tree/master/core/services.go?s=6880:6993#L236)
+### <a name="GraphDataRaw">func</a> [GraphDataRaw](https://github.com/hunterlong/statup/tree/master/core/services.go?s=6980:7093#L242)
 ``` go
 func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group string, column string) *DateScanObj
 ```
@@ -674,7 +709,7 @@ GraphDataRaw will return all the hits between 2 times for a Service
 
 
 
-### <a name="DateScanObj.ToString">func</a> (\*DateScanObj) [ToString](https://github.com/hunterlong/statup/tree/master/core/services.go?s=7656:7695#L258)
+### <a name="DateScanObj.ToString">func</a> (\*DateScanObj) [ToString](https://github.com/hunterlong/statup/tree/master/core/services.go?s=7756:7795#L264)
 ``` go
 func (d *DateScanObj) ToString() string
 ```
@@ -695,14 +730,21 @@ DbConfig stores the config.yml file for the statup configuration
 
 
 
-### <a name="LoadConfig">func</a> [LoadConfig](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=1020:1072#L34)
+### <a name="EnvToConfig">func</a> [EnvToConfig](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=3378:3406#L122)
 ``` go
-func LoadConfig(directory string) (*DbConfig, error)
+func EnvToConfig() *DbConfig
 ```
-LoadConfig will attempt to load the 'config.yml' file in a specific directory
+EnvToConfig converts environment variables to a DbConfig variable
 
 
-### <a name="LoadUsingEnv">func</a> [LoadUsingEnv](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=1680:1718#L53)
+### <a name="LoadConfigFile">func</a> [LoadConfigFile](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=1024:1080#L34)
+``` go
+func LoadConfigFile(directory string) (*DbConfig, error)
+```
+LoadConfigFile will attempt to load the 'config.yml' file in a specific directory
+
+
+### <a name="LoadUsingEnv">func</a> [LoadUsingEnv](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=1688:1726#L53)
 ``` go
 func LoadUsingEnv() (*DbConfig, error)
 ```
@@ -730,7 +772,7 @@ Connect will attempt to connect to the sqlite, postgres, or mysql database
 
 
 
-### <a name="DbConfig.CreateCore">func</a> (\*DbConfig) [CreateCore](https://github.com/hunterlong/statup/tree/master/core/database.go?s=8682:8719#L306)
+### <a name="DbConfig.CreateCore">func</a> (\*DbConfig) [CreateCore](https://github.com/hunterlong/statup/tree/master/core/database.go?s=8614:8651#L300)
 ``` go
 func (c *DbConfig) CreateCore() *Core
 ```
@@ -739,7 +781,7 @@ CreateCore will initialize the global variable 'CoreApp". This global variable c
 
 
 
-### <a name="DbConfig.CreateDatabase">func</a> (\*DbConfig) [CreateDatabase](https://github.com/hunterlong/statup/tree/master/core/database.go?s=9732:9774#L342)
+### <a name="DbConfig.CreateDatabase">func</a> (\*DbConfig) [CreateDatabase](https://github.com/hunterlong/statup/tree/master/core/database.go?s=9664:9706#L336)
 ``` go
 func (db *DbConfig) CreateDatabase() error
 ```
@@ -748,7 +790,7 @@ CreateDatabase will CREATE TABLES for each of the Statup elements
 
 
 
-### <a name="DbConfig.DropDatabase">func</a> (\*DbConfig) [DropDatabase](https://github.com/hunterlong/statup/tree/master/core/database.go?s=9179:9219#L328)
+### <a name="DbConfig.DropDatabase">func</a> (\*DbConfig) [DropDatabase](https://github.com/hunterlong/statup/tree/master/core/database.go?s=9111:9151#L322)
 ``` go
 func (db *DbConfig) DropDatabase() error
 ```
@@ -766,7 +808,7 @@ InsertCore create the single row for the Core settings in Statup
 
 
 
-### <a name="DbConfig.MigrateDatabase">func</a> (\*DbConfig) [MigrateDatabase](https://github.com/hunterlong/statup/tree/master/core/database.go?s=10513:10556#L359)
+### <a name="DbConfig.MigrateDatabase">func</a> (\*DbConfig) [MigrateDatabase](https://github.com/hunterlong/statup/tree/master/core/database.go?s=10445:10488#L353)
 ``` go
 func (db *DbConfig) MigrateDatabase() error
 ```
@@ -777,7 +819,7 @@ If this function has an issue, it will ROLLBACK to the previous state.
 
 
 
-### <a name="DbConfig.Save">func</a> (\*DbConfig) [Save](https://github.com/hunterlong/statup/tree/master/core/database.go?s=8154:8199#L286)
+### <a name="DbConfig.Save">func</a> (\*DbConfig) [Save](https://github.com/hunterlong/statup/tree/master/core/database.go?s=8086:8131#L280)
 ``` go
 func (db *DbConfig) Save() (*DbConfig, error)
 ```
@@ -786,7 +828,7 @@ Save will initially create the config.yml file
 
 
 
-### <a name="DbConfig.Update">func</a> (\*DbConfig) [Update](https://github.com/hunterlong/statup/tree/master/core/database.go?s=7791:7825#L268)
+### <a name="DbConfig.Update">func</a> (\*DbConfig) [Update](https://github.com/hunterlong/statup/tree/master/core/database.go?s=7723:7757#L262)
 ``` go
 func (db *DbConfig) Update() error
 ```
@@ -893,7 +935,7 @@ func ReturnService(s *types.Service) *Service
 ReturnService will convert *types.Service to *core.Service
 
 
-### <a name="SelectService">func</a> [SelectService](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1255:1292#L45)
+### <a name="SelectService">func</a> [SelectService](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1326:1363#L49)
 ``` go
 func SelectService(id int64) *Service
 ```
@@ -921,7 +963,7 @@ AllFailures will return all failures attached to a service
 
 
 
-### <a name="Service.AvgTime">func</a> (\*Service) [AvgTime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3032:3067#L108)
+### <a name="Service.AvgTime">func</a> (\*Service) [AvgTime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3132:3167#L114)
 ``` go
 func (s *Service) AvgTime() float64
 ```
@@ -930,7 +972,7 @@ AvgTime will return the average amount of time for a service to response back su
 
 
 
-### <a name="Service.AvgUptime">func</a> (\*Service) [AvgUptime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=8401:8450#L287)
+### <a name="Service.AvgUptime">func</a> (\*Service) [AvgUptime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=8501:8550#L293)
 ``` go
 func (s *Service) AvgUptime(ago time.Time) string
 ```
@@ -939,7 +981,7 @@ AvgUptime returns average online status for last 24 hours
 
 
 
-### <a name="Service.AvgUptime24">func</a> (\*Service) [AvgUptime24](https://github.com/hunterlong/statup/tree/master/core/services.go?s=8231:8269#L281)
+### <a name="Service.AvgUptime24">func</a> (\*Service) [AvgUptime24](https://github.com/hunterlong/statup/tree/master/core/services.go?s=8331:8369#L287)
 ``` go
 func (s *Service) AvgUptime24() string
 ```
@@ -975,7 +1017,7 @@ CheckQueue is the main go routine for checking a service
 
 
 
-### <a name="Service.CheckinProcess">func</a> (\*Service) [CheckinProcess](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1485:1519#L55)
+### <a name="Service.CheckinProcess">func</a> (\*Service) [CheckinProcess](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1556:1590#L59)
 ``` go
 func (s *Service) CheckinProcess()
 ```
@@ -984,7 +1026,7 @@ CheckinProcess runs the checkin routine for each checkin attached to service
 
 
 
-### <a name="Service.Checkins">func</a> (\*Service) [Checkins](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1671:1710#L64)
+### <a name="Service.Checkins">func</a> (\*Service) [Checkins](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1742:1781#L68)
 ``` go
 func (s *Service) Checkins() []*Checkin
 ```
@@ -993,7 +1035,7 @@ Checkins will return a slice of Checkins for a Service
 
 
 
-### <a name="Service.Create">func</a> (\*Service) [Create](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10834:10885#L381)
+### <a name="Service.Create">func</a> (\*Service) [Create](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10934:10985#L387)
 ``` go
 func (s *Service) Create(check bool) (int64, error)
 ```
@@ -1020,7 +1062,7 @@ CreateHit will create a new 'hit' record in the database for a successful/online
 
 
 
-### <a name="Service.Delete">func</a> (\*Service) [Delete](https://github.com/hunterlong/statup/tree/master/core/services.go?s=9688:9720#L341)
+### <a name="Service.Delete">func</a> (\*Service) [Delete](https://github.com/hunterlong/statup/tree/master/core/services.go?s=9788:9820#L347)
 ``` go
 func (s *Service) Delete() error
 ```
@@ -1038,7 +1080,7 @@ DeleteFailures will delete all failures for a service
 
 
 
-### <a name="Service.Downtime">func</a> (\*Service) [Downtime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=6490:6532#L222)
+### <a name="Service.Downtime">func</a> (\*Service) [Downtime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=6590:6632#L228)
 ``` go
 func (s *Service) Downtime() time.Duration
 ```
@@ -1047,7 +1089,7 @@ Downtime returns the amount of time of a offline service
 
 
 
-### <a name="Service.DowntimeText">func</a> (\*Service) [DowntimeText](https://github.com/hunterlong/statup/tree/master/core/services.go?s=5554:5593#L195)
+### <a name="Service.DowntimeText">func</a> (\*Service) [DowntimeText](https://github.com/hunterlong/statup/tree/master/core/services.go?s=5654:5693#L201)
 ``` go
 func (s *Service) DowntimeText() string
 ```
@@ -1060,7 +1102,7 @@ DowntimeText will return the amount of downtime for a service based on the durat
 
 
 
-### <a name="Service.GraphData">func</a> (\*Service) [GraphData](https://github.com/hunterlong/statup/tree/master/core/services.go?s=7887:7923#L268)
+### <a name="Service.GraphData">func</a> (\*Service) [GraphData](https://github.com/hunterlong/statup/tree/master/core/services.go?s=7987:8023#L274)
 ``` go
 func (s *Service) GraphData() string
 ```
@@ -1087,7 +1129,7 @@ HitsBetween returns the gorm database query for a collection of service hits bet
 
 
 
-### <a name="Service.LimitedCheckins">func</a> (\*Service) [LimitedCheckins](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1876:1922#L71)
+### <a name="Service.LimitedCheckins">func</a> (\*Service) [LimitedCheckins](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1947:1993#L75)
 ``` go
 func (s *Service) LimitedCheckins() []*Checkin
 ```
@@ -1114,7 +1156,7 @@ LimitedHits returns the last 1024 successful/online 'hit' records for a service
 
 
 
-### <a name="Service.Online24">func</a> (\*Service) [Online24](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3358:3394#L121)
+### <a name="Service.Online24">func</a> (\*Service) [Online24](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3458:3494#L127)
 ``` go
 func (s *Service) Online24() float32
 ```
@@ -1123,7 +1165,7 @@ Online24 returns the service's uptime percent within last 24 hours
 
 
 
-### <a name="Service.OnlineSince">func</a> (\*Service) [OnlineSince](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3558:3610#L127)
+### <a name="Service.OnlineSince">func</a> (\*Service) [OnlineSince](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3658:3710#L133)
 ``` go
 func (s *Service) OnlineSince(ago time.Time) float32
 ```
@@ -1141,7 +1183,7 @@ Select will return the *types.Service struct for Service
 
 
 
-### <a name="Service.SmallText">func</a> (\*Service) [SmallText](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4682:4718#L172)
+### <a name="Service.SmallText">func</a> (\*Service) [SmallText](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4782:4818#L178)
 ``` go
 func (s *Service) SmallText() string
 ```
@@ -1163,7 +1205,7 @@ Sum returns the added value Latency for all of the services successful hits.
 
 
 
-### <a name="Service.ToJSON">func</a> (\*Service) [ToJSON](https://github.com/hunterlong/statup/tree/master/core/services.go?s=2850:2883#L102)
+### <a name="Service.ToJSON">func</a> (\*Service) [ToJSON](https://github.com/hunterlong/statup/tree/master/core/services.go?s=2950:2983#L108)
 ``` go
 func (s *Service) ToJSON() string
 ```
@@ -1217,7 +1259,7 @@ TotalHitsSince returns the total amount of hits based on a specific time/date
 
 
 
-### <a name="Service.TotalUptime">func</a> (\*Service) [TotalUptime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=8876:8914#L309)
+### <a name="Service.TotalUptime">func</a> (\*Service) [TotalUptime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=8976:9014#L315)
 ``` go
 func (s *Service) TotalUptime() string
 ```
@@ -1226,7 +1268,7 @@ TotalUptime returns the total uptime percent of a service
 
 
 
-### <a name="Service.Update">func</a> (\*Service) [Update](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10350:10394#L362)
+### <a name="Service.Update">func</a> (\*Service) [Update](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10450:10494#L368)
 ``` go
 func (s *Service) Update(restart bool) error
 ```
@@ -1235,7 +1277,7 @@ Update will update a service in the database, the service's checking routine can
 
 
 
-### <a name="Service.UpdateSingle">func</a> (\*Service) [UpdateSingle](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10125:10182#L357)
+### <a name="Service.UpdateSingle">func</a> (\*Service) [UpdateSingle](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10225:10282#L363)
 ``` go
 func (s *Service) UpdateSingle(attr ...interface{}) error
 ```
@@ -1244,7 +1286,7 @@ UpdateSingle will update a single column for a service
 
 
 
-## <a name="ServiceOrder">type</a> [ServiceOrder](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4308:4350#L157)
+## <a name="ServiceOrder">type</a> [ServiceOrder](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4312:4354#L157)
 ``` go
 type ServiceOrder []types.ServiceInterface
 ```
@@ -1259,7 +1301,7 @@ ServiceOrder will reorder the services based on 'order_id' (Order)
 
 
 
-### <a name="ServiceOrder.Len">func</a> (ServiceOrder) [Len](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4406:4437#L160)
+### <a name="ServiceOrder.Len">func</a> (ServiceOrder) [Len](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4410:4441#L160)
 ``` go
 func (c ServiceOrder) Len() int
 ```
@@ -1268,14 +1310,14 @@ Sort interface for resroting the Services in order
 
 
 
-### <a name="ServiceOrder.Less">func</a> (ServiceOrder) [Less](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4536:4577#L162)
+### <a name="ServiceOrder.Less">func</a> (ServiceOrder) [Less](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4540:4581#L162)
 ``` go
 func (c ServiceOrder) Less(i, j int) bool
 ```
 
 
 
-### <a name="ServiceOrder.Swap">func</a> (ServiceOrder) [Swap](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4466:4502#L161)
+### <a name="ServiceOrder.Swap">func</a> (ServiceOrder) [Swap](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4470:4506#L161)
 ``` go
 func (c ServiceOrder) Swap(i, j int)
 ```
@@ -1449,7 +1491,7 @@ func LoadPlugin(file string) error
 ```
 
 
-## <a name="LoadPlugins">func</a> [LoadPlugins](https://github.com/hunterlong/statup/tree/master/plugin/plugin.go?s=2708:2726#L97)
+## <a name="LoadPlugins">func</a> [LoadPlugins](https://github.com/hunterlong/statup/tree/master/plugin/plugin.go?s=2670:2688#L96)
 ``` go
 func LoadPlugins()
 ```
@@ -1864,7 +1906,7 @@ type DbConfig struct {
     DbUser      string `yaml:"user"`
     DbPass      string `yaml:"password"`
     DbData      string `yaml:"database"`
-    DbPort      int    `yaml:"port"`
+    DbPort      int64  `yaml:"port"`
     ApiKey      string `yaml:"api_key"`
     ApiSecret   string `yaml:"api_secret"`
     Project     string `yaml:"-"`
@@ -2555,7 +2597,7 @@ UnderScoreString will return a string that replaces spaces and other characters 
 
 
 
-## <a name="LogRow">type</a> [LogRow](https://github.com/hunterlong/statup/tree/master/utils/log.go?s=3739:3795#L154)
+## <a name="LogRow">type</a> [LogRow](https://github.com/hunterlong/statup/tree/master/utils/log.go?s=3705:3761#L153)
 ``` go
 type LogRow struct {
     Date time.Time
@@ -2569,7 +2611,7 @@ type LogRow struct {
 
 
 
-### <a name="GetLastLine">func</a> [GetLastLine](https://github.com/hunterlong/statup/tree/master/utils/log.go?s=3586:3612#L145)
+### <a name="GetLastLine">func</a> [GetLastLine](https://github.com/hunterlong/statup/tree/master/utils/log.go?s=3552:3578#L144)
 ``` go
 func GetLastLine() *LogRow
 ```
@@ -2579,7 +2621,7 @@ GetLastLine returns 1 line for a recent log entry
 
 
 
-### <a name="LogRow.FormatForHtml">func</a> (\*LogRow) [FormatForHtml](https://github.com/hunterlong/statup/tree/master/utils/log.go?s=4105:4144#L178)
+### <a name="LogRow.FormatForHtml">func</a> (\*LogRow) [FormatForHtml](https://github.com/hunterlong/statup/tree/master/utils/log.go?s=4071:4110#L177)
 ``` go
 func (o *LogRow) FormatForHtml() string
 ```

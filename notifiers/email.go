@@ -25,6 +25,7 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"html/template"
 	"net/smtp"
+	"time"
 )
 
 const (
@@ -181,11 +182,11 @@ type emailOutgoing struct {
 // OnFailure will trigger failing service
 func (u *email) OnFailure(s *types.Service, f *types.Failure) {
 	email := &emailOutgoing{
-		To:       emailer.GetValue("var2"),
+		To:       u.Var2,
 		Subject:  fmt.Sprintf("Service %v is Failing", s.Name),
 		Template: mainEmailTemplate,
 		Data:     interface{}(s),
-		From:     emailer.GetValue("var1"),
+		From:     u.Var1,
 	}
 	u.AddQueue(email)
 	u.Online = false
@@ -195,11 +196,11 @@ func (u *email) OnFailure(s *types.Service, f *types.Failure) {
 func (u *email) OnSuccess(s *types.Service) {
 	if !u.Online {
 		email := &emailOutgoing{
-			To:       emailer.GetValue("var2"),
+			To:       u.Var2,
 			Subject:  fmt.Sprintf("Service %v is Back Online", s.Name),
 			Template: mainEmailTemplate,
 			Data:     interface{}(s),
-			From:     emailer.GetValue("var1"),
+			From:     u.Var1,
 		}
 		u.AddQueue(email)
 	}
@@ -221,13 +222,41 @@ func (u *email) OnSave() error {
 func (u *email) OnTest() error {
 	host := fmt.Sprintf("%v:%v", u.Host, u.Port)
 	dial, err := smtp.Dial(host)
-	dial.StartTLS(&tls.Config{InsecureSkipVerify: true})
 	if err != nil {
-		utils.Log(3, err)
+		return err
+	}
+	err = dial.StartTLS(&tls.Config{InsecureSkipVerify: true})
+	if err != nil {
 		return err
 	}
 	auth := smtp.PlainAuth("", u.Username, u.Password, host)
-	return dial.Auth(auth)
+	err = dial.Auth(auth)
+	if err != nil {
+		return err
+	}
+	testService := &types.Service{
+		Id:             1,
+		Name:           "Example Service",
+		Domain:         "https://www.youtube.com/watch?v=-u6DvRyyKGU",
+		ExpectedStatus: 200,
+		Interval:       30,
+		Type:           "http",
+		Method:         "GET",
+		Timeout:        20,
+		LastStatusCode: 200,
+		Expected:       "test example",
+		LastResponse:   "<html>this is an example response</html>",
+		CreatedAt:      time.Now().Add(-24 * time.Hour),
+	}
+	email := &emailOutgoing{
+		To:       u.Var2,
+		Subject:  fmt.Sprintf("Service %v is Back Online", testService.Name),
+		Template: mainEmailTemplate,
+		Data:     interface{}(testService),
+		From:     u.Var1,
+	}
+	err = u.Send(email)
+	return err
 }
 
 func (u *email) dialSend(email *emailOutgoing) error {

@@ -2,7 +2,7 @@
 {{$n := .Select}}
 <form method="POST" class="{{underscore $n.Method }}" action="/settings/notifier/{{ $n.Method }}">
 {{if $n.Title}}<h4>{{$n.Title}}</h4>{{end}}
-{{if $n.Description}}<p class="small text-muted">{{$n.Description}}</p>{{end}}
+{{if $n.Description}}<p class="small text-muted">{{safe $n.Description}}</p>{{end}}
 
 {{range $n.Form}}
     <div class="form-group">
