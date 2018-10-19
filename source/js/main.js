@@ -55,7 +55,6 @@ $('.test_notifier').on('click', function(e) {
 });
 
 $('form').submit(function() {
-    console.log(this);
     $(this).find('button[type=submit]').prop('disabled', true);
 });
 
@@ -70,7 +69,7 @@ $('select#service_type').on('change', function() {
         }
         $('#service_port').parent().parent().removeClass('d-none');
         $('#service_check_type').parent().parent().addClass('d-none');
-        $('#service_url').attr('placeholder', 'localhost');
+        $('#service_url').attr('placeholder', '192.168.1.1');
         $('#post_data').parent().parent().addClass('d-none');
         $('#service_response').parent().parent().addClass('d-none');
         $('#service_response_code').parent().parent().addClass('d-none');

@@ -61,7 +61,7 @@ type Notification struct {
 	Queue       []interface{}      `gorm:"-" json:"-"`
 	Running     chan bool          `gorm:"-" json:"-"`
 	Online      bool               `gorm:"-" json:"-"`
-	testable    bool
+	testable    bool               `gorm:"-" json:"-"`
 }
 
 // NotificationForm contains the HTML fields for each variable/input you want the notifier to accept.
