@@ -38,7 +38,7 @@ type Service struct {
 	Online         bool          `gorm:"-" json:"online"`
 	Latency        float64       `gorm:"-" json:"latency"`
 	PingTime       float64       `gorm:"-" json:"ping_time"`
-	Online24Hours  float32       `gorm:"-" json:"24_hours_online"`
+	Online24Hours  float32       `gorm:"-" json:"online_24_hours"`
 	AvgResponse    string        `gorm:"-" json:"avg_response"`
 	Running        chan bool     `gorm:"-" json:"-"`
 	Checkpoint     time.Time     `gorm:"-" json:"-"`
