@@ -155,7 +155,7 @@
 
                 {{ range .Notifications }}
                 {{$n := .Select}}
-                    <div class="tab-pane" id="v-pills-{{underscore $n.Method}}" role="tabpanel" aria-labelledby="v-pills-{{underscore $n.Method }}-tab">
+                    <div class="tab-pane fade" id="v-pills-{{underscore $n.Method}}" role="tabpanel" aria-labelledby="v-pills-{{underscore $n.Method }}-tab">
 
                     {{template "form_notifier" .}}
 

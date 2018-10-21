@@ -198,8 +198,8 @@ HTML, BODY {
 .nav-pills A {
   color: #424242; }
 
-.nav-pills > i {
-  margin-right: 5px; }
+.nav-pills I {
+  margin-right: 10px; }
 
 .CodeMirror {
   /* Bootstrap Settings */

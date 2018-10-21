@@ -30,7 +30,10 @@ $('.test_notifier').on('click', function(e) {
     var notifier = form.find('input[name=notifier]').val();
     var success = $('#'+notifier+'-success');
     var error = $('#'+notifier+'-error');
+	  var spinner = '<i class="fa fa-spinner fa-spin"></i>';
+	  var btnHtml = btn.html();
     btn.prop("disabled", true);
+	  btn.html(spinner);
     $.ajax({
         url: form.attr("action")+"/test",
         type: 'POST',
@@ -49,13 +52,16 @@ $('.test_notifier').on('click', function(e) {
               }, 8000)
           }
             btn.prop("disabled", false);
+					  btn.html(btnHtml);
         }
     });
     e.preventDefault();
 });
 
 $('form').submit(function() {
+	  var spinner = '<i class="fa fa-spinner fa-spin"></i>';
     $(this).find('button[type=submit]').prop('disabled', true);
+    $(this).find('button[type=submit]').html(spinner);
 });
 
 $('select#service_type').on('change', function() {

@@ -33,6 +33,7 @@ var (
 // Router returns all of the routes used in Statup
 func Router() *mux.Router {
 	dir := utils.Directory
+	storage = NewStorage()
 	r := mux.NewRouter()
 	r.Handle("/", http.HandlerFunc(indexHandler))
 	if source.UsingAssets(dir) {
@@ -96,7 +97,7 @@ func Router() *mux.Router {
 	r.Handle("/api/services", http.HandlerFunc(apiAllServicesHandler)).Methods("GET")
 	r.Handle("/api/services", http.HandlerFunc(apiCreateServiceHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceHandler)).Methods("GET")
-	r.Handle("/api/services/{id}/data", http.HandlerFunc(apiServiceDataHandler)).Methods("GET")
+	r.Handle("/api/services/{id}/data", cached("10s", http.HandlerFunc(apiServiceDataHandler))).Methods("GET")
 	r.Handle("/api/services/{id}/ping", http.HandlerFunc(apiServicePingDataHandler)).Methods("GET")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceUpdateHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceDeleteHandler)).Methods("DELETE")
