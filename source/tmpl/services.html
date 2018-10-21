@@ -18,12 +18,12 @@
             <tbody class="sortable">
             {{range .}}
             <tr id="{{.Id}}">
-                <td><span class="drag_icon d-none d-md-inline">&#9776;</span> {{.Name}}</td>
+                <td><span class="drag_icon d-none d-md-inline"><i class="fas fa-bars"></i></span> {{.Name}}</td>
                 <td class="d-none d-md-table-cell">{{if .Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}} </td>
                 <td class="text-right">
                     <div class="btn-group">
-                        <a href="/service/{{.Id}}" class="btn btn-primary">View</a>
-                        <a href="/service/{{.Id}}/delete" class="btn btn-danger confirm-btn">Delete</a>
+                        <a href="/service/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> View</a>
+                        <a href="/service/{{.Id}}/delete" class="btn btn-danger confirm-btn"><i class="fas fa-times"></i></a>
                     </div>
                 </td>
             </tr>

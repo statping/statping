@@ -118,6 +118,7 @@ var emailer = &email{&notifier.Notification{
 	Description: "Send emails via SMTP when services are online or offline.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
+	Icon:        "far fa-envelope",
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
 		Title:       "SMTP Host",

@@ -41,6 +41,7 @@ var webhook = &webhooker{&notifier.Notification{
 	Description: "Send a custom HTTP request to a specific URL with your own body, headers, and parameters",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
+	Icon:        "fas fa-code-branch",
 	Delay:       time.Duration(1 * time.Second),
 	Form: []notifier.NotificationForm{{
 		Type:        "text",

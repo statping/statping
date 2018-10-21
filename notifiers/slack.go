@@ -46,6 +46,7 @@ var slacker = &slack{&notifier.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Delay:       time.Duration(10 * time.Second),
 	Host:        "https://webhooksurl.slack.com/***",
+	Icon:        "fab fa-slack",
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
 		Title:       "Incoming webhooker Url",

@@ -57,6 +57,7 @@ type Notification struct {
 	Description string             `gorm:"-" json:"-"`
 	Author      string             `gorm:"-" json:"-"`
 	AuthorUrl   string             `gorm:"-" json:"-"`
+	Icon        string             `gorm:"-" json:"-"`
 	Delay       time.Duration      `gorm:"-" json:"-"`
 	Queue       []interface{}      `gorm:"-" json:"-"`
 	Running     chan bool          `gorm:"-" json:"-"`

@@ -39,6 +39,7 @@ var twilioNotifier = &twilio{&notifier.Notification{
 	Description: "Receive SMS text messages directly to your cellphone when a service is offline. You can use a Twilio test account with limits. This notifier uses the <a href=\"https://www.twilio.com/docs/usage/api\">Twilio API</a>.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
+	Icon:        "fas fa-mobile-alt",
 	Delay:       time.Duration(10 * time.Second),
 	Form: []notifier.NotificationForm{{
 		Type:        "text",

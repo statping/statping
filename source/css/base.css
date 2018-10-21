@@ -43,8 +43,9 @@ HTML, BODY {
 
 .container {
   padding-top: 20px;
-  padding-bottom: 20px;
-  max-width: 860px; }
+  padding-bottom: 25px;
+  max-width: 860px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; }
 
 .header-title {
   color: #464646; }
@@ -196,6 +197,9 @@ HTML, BODY {
 
 .nav-pills A {
   color: #424242; }
+
+.nav-pills > i {
+  margin-right: 5px; }
 
 .CodeMirror {
   /* Bootstrap Settings */

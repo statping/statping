@@ -39,6 +39,7 @@ var discorder = &discord{&notifier.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Delay:       time.Duration(5 * time.Second),
 	Host:        "https://discordapp.com/api/webhooks/****/*****",
+	Icon:        "fab fa-discord",
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
 		Title:       "discord webhooker URL",

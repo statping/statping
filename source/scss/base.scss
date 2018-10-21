@@ -24,8 +24,9 @@ HTML,BODY {
 
 .container {
     padding-top: 20px;
-    padding-bottom: 20px;
+    padding-bottom: 25px;
     max-width: $max-width;
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
 }
 
 .header-title {
@@ -231,6 +232,9 @@ HTML,BODY {
     color: #424242;
 }
 
+.nav-pills > i {
+   margin-right: 5px;
+}
 
 .CodeMirror {
   /* Bootstrap Settings */

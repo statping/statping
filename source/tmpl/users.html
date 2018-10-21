@@ -17,8 +17,8 @@
                 <td>{{.Username}}</td>
                 <td class="text-right" id="user_{{.Id}}">
                     <div class="btn-group">
-                        <a href="/user/{{.Id}}" class="btn btn-primary">Edit</a>
-                        <a href="/user/{{.Id}}/delete" class="btn btn-danger confirm-btn" data-id="user_{{.Id}}">Delete</a>
+                        <a href="/user/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-user-edit"></i> Edit</a>
+                        <a href="/user/{{.Id}}/delete" class="btn btn-danger confirm-btn" data-id="user_{{.Id}}"><i class="fas fa-times"></i></a>
                     </div>
                 </td>
             </tr>

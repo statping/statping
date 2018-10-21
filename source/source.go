@@ -32,6 +32,7 @@ var (
 	ScssBox *rice.Box // SCSS files from the 'source/scss' directory, this will be loaded into '/assets/scss'
 	JsBox   *rice.Box // JS files from the 'source/js' directory, this will be loaded into '/assets/js'
 	TmplBox *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
+	FontBox *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
 )
 
 // Assets will load the Rice boxes containing the CSS, SCSS, JS, and HTML files.
@@ -40,6 +41,7 @@ func Assets() {
 	ScssBox = rice.MustFindBox("scss")
 	JsBox = rice.MustFindBox("js")
 	TmplBox = rice.MustFindBox("tmpl")
+	FontBox = rice.MustFindBox("font")
 }
 
 // HelpMarkdown will return the Markdown of help.md into HTML
