@@ -125,7 +125,7 @@ func TestInsertNotifierDB(t *testing.T) {
 func TestExportStaticHTML(t *testing.T) {
 	t.SkipNow()
 	data := ExportIndexHTML()
-	assert.Contains(t, data, "Statup  made with️")
+	assert.Contains(t, data, "https://github.com/hunterlong/statup️")
 	assert.Contains(t, data, "</body>")
 	assert.Contains(t, data, "</html>")
 }

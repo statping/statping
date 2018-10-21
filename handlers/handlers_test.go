@@ -101,7 +101,7 @@ func TestServicesViewHandler(t *testing.T) {
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Google Status</title>")
-	assert.Contains(t, body, "Statup  made with️")
+	assert.Contains(t, body, "https://github.com/hunterlong/statup️")
 }
 
 func TestMissingServiceViewHandler(t *testing.T) {
@@ -134,7 +134,7 @@ func TestDashboardHandler(t *testing.T) {
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Dashboard</title>")
-	assert.Contains(t, body, "Statup  made with️")
+	assert.Contains(t, body, "https://github.com/hunterlong/statup️")
 }
 
 func TestLoginHandler(t *testing.T) {
@@ -171,7 +171,7 @@ func TestServicesHandler(t *testing.T) {
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Services</title>")
-	assert.Contains(t, body, "Statup  made with️")
+	assert.Contains(t, body, "https://github.com/hunterlong/statup️")
 	assert.True(t, isRouteAuthenticated(req))
 }
 
@@ -232,7 +232,7 @@ func TestUsersHandler(t *testing.T) {
 	assert.Contains(t, body, "<title>Statup | Users</title>")
 	assert.Contains(t, body, "<td>admin</td>")
 	assert.NotContains(t, body, "<td>changedusername</td>")
-	assert.Contains(t, body, "Statup  made with️")
+	assert.Contains(t, body, "https://github.com/hunterlong/statup️")
 	assert.True(t, isRouteAuthenticated(req))
 }
 
@@ -247,7 +247,7 @@ func TestUsersEditHandler(t *testing.T) {
 	assert.Contains(t, body, "<h3>User admin</h3>")
 	assert.Contains(t, body, "value=\"info@statup.io\"")
 	assert.Contains(t, body, "value=\"##########\"")
-	assert.Contains(t, body, "Statup  made with️")
+	assert.Contains(t, body, "https://github.com/hunterlong/statup️")
 	assert.True(t, isRouteAuthenticated(req))
 }
 
@@ -259,7 +259,7 @@ func TestSettingsHandler(t *testing.T) {
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Settings</title>")
-	assert.Contains(t, body, "Statup  made with️")
+	assert.Contains(t, body, "https://github.com/hunterlong/statup️")
 	assert.True(t, isRouteAuthenticated(req))
 }
 
@@ -271,7 +271,7 @@ func TestHelpHandler(t *testing.T) {
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Help</title>")
-	assert.Contains(t, body, "Statup  made with️")
+	assert.Contains(t, body, "https://github.com/hunterlong/statup️")
 	assert.True(t, isRouteAuthenticated(req))
 }
 
@@ -327,7 +327,7 @@ func TestServicesHandler2(t *testing.T) {
 	assert.Contains(t, body, "<title>Statup | Services</title>")
 	assert.Contains(t, body, "Crystal Castles - Kept")
 	assert.Contains(t, body, "Local Postgres")
-	assert.Contains(t, body, "Statup  made with️")
+	assert.Contains(t, body, "https://github.com/hunterlong/statup️")
 	assert.True(t, isRouteAuthenticated(req))
 }
 
@@ -339,7 +339,7 @@ func TestViewHTTPServicesHandler(t *testing.T) {
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Crystal Castles - Kept Status</title>")
-	assert.Contains(t, body, "Statup  made with️")
+	assert.Contains(t, body, "https://github.com/hunterlong/statup️")
 }
 
 func TestViewTCPServicesHandler(t *testing.T) {
@@ -350,7 +350,7 @@ func TestViewTCPServicesHandler(t *testing.T) {
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Local Postgres Status</title>")
-	assert.Contains(t, body, "Statup  made with️")
+	assert.Contains(t, body, "https://github.com/hunterlong/statup️")
 }
 
 func TestServicesDeleteFailuresHandler(t *testing.T) {
@@ -395,7 +395,7 @@ func TestServicesUpdateHandler(t *testing.T) {
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>The Bravery - An Honest Mistake Status</title>")
-	assert.Contains(t, body, "Statup  made with️")
+	assert.Contains(t, body, "https://github.com/hunterlong/statup️")
 }
 
 func TestDeleteServiceHandler(t *testing.T) {
@@ -415,7 +415,7 @@ func TestLogsHandler(t *testing.T) {
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Logs</title>")
-	assert.Contains(t, body, "Statup  made with️")
+	assert.Contains(t, body, "https://github.com/hunterlong/statup️")
 	assert.True(t, isRouteAuthenticated(req))
 }
 
@@ -452,7 +452,7 @@ func TestViewSettingsHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Settings</title>")
 	assert.Contains(t, body, "Awesome Status")
-	assert.Contains(t, body, "Statup  made with️")
+	assert.Contains(t, body, "https://github.com/hunterlong/statup️")
 	assert.True(t, isRouteAuthenticated(req))
 }
 
@@ -533,7 +533,7 @@ func TestViewNotificationSettingsHandler(t *testing.T) {
 	assert.Contains(t, body, `value="sendto@gmail.com" id="send_alerts_to"`)
 	assert.Contains(t, body, `id="limits_per_hour_email" value="7"`)
 	assert.Contains(t, body, `id="switch-email" checked`)
-	assert.Contains(t, body, "Statup  made with️")
+	assert.Contains(t, body, "https://github.com/hunterlong/statup️")
 	assert.True(t, isRouteAuthenticated(req))
 }
 
