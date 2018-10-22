@@ -15,8 +15,8 @@ var chartdata_{{js .Id}} = new Chart(ctx_{{js .Id}}, {
     }]
   },
   options: {
-    maintainAspectRatio: !1,
-      scaleShowValues: !0,
+    maintainAspectRatio: false,
+      scaleShowValues: false,
       layout: {
       padding: {
         left: 0,
@@ -31,84 +31,30 @@ var chartdata_{{js .Id}} = new Chart(ctx_{{js .Id}}, {
     responsiveAnimationDuration: 0,
       animation: {
       duration: 3500,
-        onComplete: function() {
-        var chartInstance = this.chart,
-          ctx = chartInstance.ctx;
-        var controller = this.chart.controller;
-        var xAxis = controller.scales['x-axis-0'];
-        var yAxis = controller.scales['y-axis-0'];
-        ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        var numTicks = xAxis.ticks.length;
-        var yOffsetStart = xAxis.width / numTicks;
-        var halfBarWidth = (xAxis.width / (numTicks * 2));
-        xAxis.ticks.forEach(function(value, index) {
-          var xOffset = 20;
-          var yOffset = (yOffsetStart * index) + halfBarWidth;
-          ctx.fillStyle = '#e2e2e2';
-          ctx.fillText(value, yOffset, xOffset)
-        });
-        this.data.datasets.forEach(function(dataset, i) {
-          var meta = chartInstance.controller.getDatasetMeta(i);
-          var hxH = 0;
-          var hyH = 0;
-          var hxL = 0;
-          var hyL = 0;
-          var highestNum = 0;
-          var lowestnum = 999999999999;
-          meta.data.forEach(function(bar, index) {
-            var data = dataset.data[index];
-            if (lowestnum > data.y) {
-              lowestnum = data.y;
-              hxL = bar._model.x;
-              hyL = bar._model.y
-            }
-            if (data.y > highestNum) {
-              highestNum = data.y;
-              hxH = bar._model.x;
-              hyH = bar._model.y
-            }
-          });
-          if (hxH >= 820) {
-            hxH = 820
-          } else if (50 >= hxH) {
-            hxH = 50
-          }
-          if (hxL >= 820) {
-            hxL = 820
-          } else if (70 >= hxL) {
-            hxL = 70
-          }
-          ctx.fillStyle = '#ffa7a2';
-          ctx.fillText(highestNum + "ms", hxH - 40, hyH + 15);
-          ctx.fillStyle = '#45d642';
-          ctx.fillText(lowestnum + "ms", hxL, hyL + 10);
-        })
-      }
+        onComplete: onChartComplete
     },
     legend: {
-      display: !1
+      display: false
     },
     tooltips: {
-      enabled: !1
+      enabled: false
     },
     scales: {
       yAxes: [{
-        display: !1,
+        display: false,
         ticks: {
           fontSize: 20,
-          display: !1,
-          beginAtZero: !1
+          display: false,
+          beginAtZero: false
         },
         gridLines: {
-          display: !1
+          display: false
         }
       }],
         xAxes: [{
         type: 'time',
         distribution: 'series',
-        autoSkip: !1,
+        autoSkip: false,
         time: {
           displayFormats: {
             'hour': 'MMM DD hA'
@@ -116,7 +62,7 @@ var chartdata_{{js .Id}} = new Chart(ctx_{{js .Id}}, {
           source: 'auto'
         },
         gridLines: {
-          display: !1
+          display: false
         },
         ticks: {
           source: 'auto',
@@ -124,7 +70,7 @@ var chartdata_{{js .Id}} = new Chart(ctx_{{js .Id}}, {
           min: 0,
           fontColor: "white",
           fontSize: 20,
-          display: !1
+          display: false
         }
       }]
     },
@@ -135,6 +81,66 @@ var chartdata_{{js .Id}} = new Chart(ctx_{{js .Id}}, {
     }
   }
 });
+{{end}}
 
-AjaxChart(chartdata_{{js .Id}},{{js .Id}},{{$start}},{{$end}},"hour");
-{{end}}{{end}}
+function onChartComplete(chart) {
+	var chartInstance = chart.chart,
+  ctx = chartInstance.ctx;
+	var controller = chart.chart.controller;
+	var xAxis = controller.scales['x-axis-0'];
+	var yAxis = controller.scales['y-axis-0'];
+	ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+	ctx.textAlign = 'center';
+	ctx.textBaseline = 'bottom';
+	var numTicks = xAxis.ticks.length;
+	var yOffsetStart = xAxis.width / numTicks;
+	var halfBarWidth = (xAxis.width / (numTicks * 2));
+	xAxis.ticks.forEach(function(value, index) {
+		var xOffset = 20;
+		var yOffset = (yOffsetStart * index) + halfBarWidth;
+		ctx.fillStyle = '#e2e2e2';
+		ctx.fillText(value, yOffset, xOffset)
+	});
+	this.data.datasets.forEach(function(dataset, i) {
+		var meta = chartInstance.controller.getDatasetMeta(i);
+		var hxH = 0;
+		var hyH = 0;
+		var hxL = 0;
+		var hyL = 0;
+		var highestNum = 0;
+		var lowestnum = 999999999999;
+		meta.data.forEach(function(bar, index) {
+			var data = dataset.data[index];
+			if (lowestnum > data.y) {
+				lowestnum = data.y;
+				hxL = bar._model.x;
+				hyL = bar._model.y
+			}
+			if (data.y > highestNum) {
+				highestNum = data.y;
+				hxH = bar._model.x;
+				hyH = bar._model.y
+			}
+		});
+		if (hxH >= 820) {
+			hxH = 820
+		} else if (50 >= hxH) {
+			hxH = 50
+		}
+		if (hxL >= 820) {
+			hxL = 820
+		} else if (70 >= hxL) {
+			hxL = 70
+		}
+		ctx.fillStyle = '#ffa7a2';
+		ctx.fillText(highestNum + "ms", hxH - 40, hyH + 15);
+		ctx.fillStyle = '#45d642';
+		ctx.fillText(lowestnum + "ms", hxL, hyL + 10);
+	})
+}
+
+$( document ).ready(function() {
+{{ range .Services }}
+AjaxChart(chartdata_{{js .Id}},{{js .Id}},{{$start}},{{$end}},"hour");{{end}}
+});
+{{end}}

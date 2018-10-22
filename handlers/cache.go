@@ -65,18 +65,20 @@ func (s Storage) Set(key string, content []byte, duration time.Duration) {
 	}
 }
 
-func cached(duration string, handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
+func cached(duration, contentType string, handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		content := storage.Get(r.RequestURI)
 		if content != nil {
+			w.Header().Set("Content-Type", contentType)
 			w.Write(content)
 		} else {
 			c := httptest.NewRecorder()
 			handler(c, r)
-			for k, v := range c.HeaderMap {
-				w.Header()[k] = v
-			}
-			w.WriteHeader(c.Code)
+			//for k, v := range c.HeaderMap {
+			//	w.Header()[k] = v
+			//}
+			//w.WriteHeader(c.Code)
+			w.Header().Set("Content-Type", contentType)
 			content := c.Body.Bytes()
 			if d, err := time.ParseDuration(duration); err == nil {
 				storage.Set(r.RequestURI, content, d)
