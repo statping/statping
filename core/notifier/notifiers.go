@@ -245,7 +245,7 @@ func Init(n Notifier) (*Notification, error) {
 	if err == nil {
 		notify, _ = SelectNotification(n)
 		if notify.Delay.Seconds() == 0 {
-			notify.Delay = time.Duration(60 * time.Second)
+			notify.Delay = time.Duration(1 * time.Second)
 		}
 		notify.testable = isType(n, new(Tester))
 		notify.Form = n.Select().Form
@@ -399,9 +399,6 @@ func (n *Notification) WithinLimits() (bool, error) {
 	}
 	if n.SentLastMinute() >= n.Limits {
 		return false, fmt.Errorf("notifier sent %v out of %v in last minute", n.SentLastMinute(), n.Limits)
-	}
-	if n.Delay.Seconds() == 0 {
-		n.Delay = time.Duration(500 * time.Millisecond)
 	}
 	if n.LastSent().Seconds() == 0 {
 		return true, nil

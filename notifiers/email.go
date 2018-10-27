@@ -196,6 +196,7 @@ func (u *email) OnFailure(s *types.Service, f *types.Failure) {
 // OnSuccess will trigger successful service
 func (u *email) OnSuccess(s *types.Service) {
 	if !u.Online {
+		u.ResetQueue()
 		email := &emailOutgoing{
 			To:       u.Var2,
 			Subject:  fmt.Sprintf("Service %v is Back Online", s.Name),

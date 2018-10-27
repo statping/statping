@@ -177,6 +177,7 @@ func (w *webhooker) OnFailure(s *types.Service, f *types.Failure) {
 // OnSuccess will trigger successful service
 func (w *webhooker) OnSuccess(s *types.Service) {
 	if !w.Online {
+		w.ResetQueue()
 		msg := replaceBodyText(w.Var2, s, nil)
 		webhook.AddQueue(msg)
 	}

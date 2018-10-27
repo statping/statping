@@ -66,7 +66,7 @@ func TestDiscordNotifier(t *testing.T) {
 
 	t.Run("discord OnFailure", func(t *testing.T) {
 		discorder.OnFailure(TestService, TestFailure)
-		assert.Len(t, discorder.Queue, 1)
+		assert.Equal(t, 1, len(discorder.Queue))
 	})
 
 	t.Run("discord Check Offline", func(t *testing.T) {
@@ -75,7 +75,7 @@ func TestDiscordNotifier(t *testing.T) {
 
 	t.Run("discord OnSuccess", func(t *testing.T) {
 		discorder.OnSuccess(TestService)
-		assert.Len(t, discorder.Queue, 2)
+		assert.Equal(t, 1, len(discorder.Queue))
 	})
 
 	t.Run("discord Check Back Online", func(t *testing.T) {
@@ -84,7 +84,7 @@ func TestDiscordNotifier(t *testing.T) {
 
 	t.Run("discord OnSuccess Again", func(t *testing.T) {
 		discorder.OnSuccess(TestService)
-		assert.Len(t, discorder.Queue, 2)
+		assert.Equal(t, 1, len(discorder.Queue))
 	})
 
 	t.Run("discord Send", func(t *testing.T) {

@@ -122,6 +122,7 @@ func (u *twilio) OnFailure(s *types.Service, f *types.Failure) {
 // OnSuccess will trigger successful service
 func (u *twilio) OnSuccess(s *types.Service) {
 	if !u.Online {
+		u.ResetQueue()
 		msg := fmt.Sprintf("Your service '%v' is back online!", s.Name)
 		u.AddQueue(msg)
 	}

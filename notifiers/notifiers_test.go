@@ -36,12 +36,12 @@ var TestService = &types.Service{
 	Name:           "Interpol - All The Rage Back Home",
 	Domain:         "https://www.youtube.com/watch?v=-u6DvRyyKGU",
 	ExpectedStatus: 200,
+	Expected:       "test example",
 	Interval:       30,
 	Type:           "http",
 	Method:         "GET",
 	Timeout:        20,
 	LastStatusCode: 404,
-	Expected:       "test example",
 	LastResponse:   "<html>this is an example response</html>",
 	CreatedAt:      time.Now().Add(-24 * time.Hour),
 }

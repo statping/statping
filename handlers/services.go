@@ -202,7 +202,7 @@ func servicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	service.Order = order
 
 	service.Update(true)
-	service.Check(true)
+	go service.Check(true)
 	executeResponse(w, r, "service.html", service, "/services")
 }
 

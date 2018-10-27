@@ -83,6 +83,7 @@ func (u *discord) OnFailure(s *types.Service, f *types.Failure) {
 // OnSuccess will trigger successful service
 func (u *discord) OnSuccess(s *types.Service) {
 	if !u.Online {
+		u.ResetQueue()
 		msg := fmt.Sprintf(`{"content": "Your service '%v' is back online!"}`, s.Name)
 		u.AddQueue(msg)
 	}

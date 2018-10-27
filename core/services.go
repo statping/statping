@@ -227,14 +227,14 @@ func Dbtimestamp(group string, column string) string {
 // Downtime returns the amount of time of a offline service
 func (s *Service) Downtime() time.Duration {
 	hits, _ := s.Hits()
-	fails := s.LimitedFailures()
-	if len(fails) == 0 {
+	fail := s.lastFailure()
+	if fail == nil {
 		return time.Duration(0)
 	}
 	if len(hits) == 0 {
-		return time.Now().UTC().Sub(fails[len(fails)-1].CreatedAt.UTC())
+		return time.Now().UTC().Sub(fail.CreatedAt.UTC())
 	}
-	since := fails[0].CreatedAt.UTC().Sub(hits[0].CreatedAt.UTC())
+	since := fail.CreatedAt.UTC().Sub(fail.CreatedAt.UTC())
 	return since
 }
 
