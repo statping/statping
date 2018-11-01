@@ -291,7 +291,7 @@ func RunSelectAllNotifiers(t *testing.T) {
 	notifier.SetDB(core.DbSession)
 	core.CoreApp.Notifications = notifier.Load()
 	assert.Nil(t, err)
-	assert.Equal(t, 6, len(core.CoreApp.Notifications))
+	assert.Equal(t, 7, len(core.CoreApp.Notifications))
 }
 
 func RunUserSelectAll(t *testing.T) {

@@ -48,7 +48,7 @@ func TestSelectAllServices(t *testing.T) {
 func TestServiceDowntime(t *testing.T) {
 	service := SelectService(15)
 	downtime := service.Downtime()
-	assert.True(t, downtime.Minutes() > 0)
+	assert.True(t, downtime.Seconds() > 0)
 }
 
 func TestSelectTCPService(t *testing.T) {
