@@ -278,11 +278,11 @@ CheckNotifier:
 				ok, _ := notification.WithinLimits()
 				if ok {
 					msg := notification.Queue[0]
-					err := n.Send(msg)
+					err := n.Send(msg.Data)
 					if err != nil {
 						utils.Log(2, fmt.Sprintf("notifier %v had an error: %v", notification.Method, err))
 					}
-					notification.makeLog(msg)
+					notification.makeLog(msg.Data)
 					notification.Queue = notification.Queue[1:]
 					rateLimit = notification.Delay
 				}

@@ -106,12 +106,6 @@ func TestMobileNotifier(t *testing.T) {
 		assert.True(t, ok)
 	})
 
-	t.Run("mobile Send", func(t *testing.T) {
-		err := mobile.Send(slackTestMessage)
-		assert.Nil(t, err)
-		assert.Equal(t, 0, len(mobile.Queue))
-	})
-
 	t.Run("mobile Test", func(t *testing.T) {
 		err := mobile.OnTest()
 		assert.Nil(t, err)

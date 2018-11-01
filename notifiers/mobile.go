@@ -100,7 +100,7 @@ func (u *mobilePush) OnTest() error {
 	return nil
 }
 
-// Send will send a HTTP Post to the discord API. It accepts type: []byte
+// Send will send message to expo mobile push notifications endpoint
 func (u *mobilePush) Send(msg interface{}) error {
 	pushMessage := msg.(*expo.PushMessage)
 	client := expo.NewPushClient(nil)
