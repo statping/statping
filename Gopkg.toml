@@ -59,6 +59,10 @@
 
 [[constraint]]
   branch = "master"
+  name = "github.com/oliveroneill/exponent-server-sdk-golang"
+
+[[constraint]]
+  branch = "master"
   name = "github.com/rendon/testcli"
 
 [[constraint]]
@@ -80,7 +84,3 @@
 [prune]
   go-tests = true
   unused-packages = true
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/oliveroneill/exponent-server-sdk-golang"
