@@ -170,6 +170,14 @@
   version = "v1.9.0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:606d1820e2521700b2604019ddc84c95642b2be06242206a4c6322b1c465b2c9"
+  name = "github.com/oliveroneill/exponent-server-sdk-golang"
+  packages = ["sdk"]
+  pruneopts = "UT"
+  revision = "05bf6f17980f89ec1a1b9599813658b6381e7408"
+
+[[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
@@ -262,6 +270,7 @@
     "github.com/jinzhu/gorm/dialects/postgres",
     "github.com/jinzhu/gorm/dialects/sqlite",
     "github.com/joho/godotenv",
+    "github.com/oliveroneill/exponent-server-sdk-golang/sdk",
     "github.com/rendon/testcli",
     "github.com/stretchr/testify/assert",
     "golang.org/x/crypto/bcrypt",
