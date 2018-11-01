@@ -39,7 +39,7 @@ var twilioNotifier = &twilio{&notifier.Notification{
 	Description: "Receive SMS text messages directly to your cellphone when a service is offline. You can use a Twilio test account with limits. This notifier uses the <a href=\"https://www.twilio.com/docs/usage/api\">Twilio API</a>.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
-	Icon:        "fas fa-mobile-alt",
+	Icon:        "far fa-comment-alt",
 	Delay:       time.Duration(10 * time.Second),
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
@@ -115,16 +115,16 @@ func (u *twilio) Send(msg interface{}) error {
 // OnFailure will trigger failing service
 func (u *twilio) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
-	u.AddQueue(msg)
+	u.AddQueue(s.Id, msg)
 	u.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (u *twilio) OnSuccess(s *types.Service) {
 	if !u.Online {
-		u.ResetQueue()
+		u.ResetUniqueQueue(s.Id)
 		msg := fmt.Sprintf("Your service '%v' is back online!", s.Name)
-		u.AddQueue(msg)
+		u.AddQueue(s.Id, msg)
 	}
 	u.Online = true
 }

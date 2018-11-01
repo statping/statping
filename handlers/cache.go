@@ -74,10 +74,6 @@ func cached(duration, contentType string, handler func(w http.ResponseWriter, r 
 		} else {
 			c := httptest.NewRecorder()
 			handler(c, r)
-			//for k, v := range c.HeaderMap {
-			//	w.Header()[k] = v
-			//}
-			//w.WriteHeader(c.Code)
 			w.Header().Set("Content-Type", contentType)
 			content := c.Body.Bytes()
 			if d, err := time.ParseDuration(duration); err == nil {

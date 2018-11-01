@@ -170,16 +170,16 @@ func (w *webhooker) OnTest() error {
 // OnFailure will trigger failing service
 func (w *webhooker) OnFailure(s *types.Service, f *types.Failure) {
 	msg := replaceBodyText(w.Var2, s, f)
-	webhook.AddQueue(msg)
+	w.AddQueue(s.Id, msg)
 	w.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (w *webhooker) OnSuccess(s *types.Service) {
 	if !w.Online {
-		w.ResetQueue()
+		w.ResetUniqueQueue(s.Id)
 		msg := replaceBodyText(w.Var2, s, nil)
-		webhook.AddQueue(msg)
+		w.AddQueue(s.Id, msg)
 	}
 	w.Online = true
 }

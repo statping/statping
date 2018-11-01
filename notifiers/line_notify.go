@@ -83,16 +83,16 @@ func (u *lineNotifier) Select() *notifier.Notification {
 // OnFailure will trigger failing service
 func (u *lineNotifier) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
-	u.AddQueue(msg)
+	u.AddQueue(s.Id, msg)
 	u.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (u *lineNotifier) OnSuccess(s *types.Service) {
 	if !u.Online {
-		u.ResetQueue()
+		u.ResetUniqueQueue(s.Id)
 		msg := fmt.Sprintf("Your service '%v' is back online!", s.Name)
-		u.AddQueue(msg)
+		u.AddQueue(s.Id, msg)
 	}
 	u.Online = true
 }

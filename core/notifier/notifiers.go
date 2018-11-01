@@ -59,10 +59,16 @@ type Notification struct {
 	AuthorUrl   string             `gorm:"-" json:"-"`
 	Icon        string             `gorm:"-" json:"-"`
 	Delay       time.Duration      `gorm:"-" json:"-"`
-	Queue       []interface{}      `gorm:"-" json:"-"`
+	Queue       []*QueueData       `gorm:"-" json:"-"`
 	Running     chan bool          `gorm:"-" json:"-"`
 	Online      bool               `gorm:"-" json:"-"`
 	testable    bool               `gorm:"-" json:"-"`
+}
+
+// QueueData is the struct for the messaging queue with service
+type QueueData struct {
+	Id   int64
+	Data interface{}
 }
 
 // NotificationForm contains the HTML fields for each variable/input you want the notifier to accept.
@@ -83,8 +89,9 @@ type NotificationLog struct {
 }
 
 // AddQueue will add any type of interface (json, string, struct, etc) into the Notifiers queue
-func (n *Notification) AddQueue(msg interface{}) {
-	n.Queue = append(n.Queue, msg)
+func (n *Notification) AddQueue(uid int64, msg interface{}) {
+	data := &QueueData{uid, msg}
+	n.Queue = append(n.Queue, data)
 }
 
 // CanTest returns true if the notifier implements the OnTest interface
@@ -152,18 +159,6 @@ func normalizeType(ty interface{}) string {
 	default:
 		return fmt.Sprintf("%v", v)
 	}
-}
-
-// removeQueue will remove a specific notification and return the new one
-func (n *Notification) removeQueue(msg interface{}) interface{} {
-	var newArr []interface{}
-	for _, q := range n.Queue {
-		if q != msg {
-			newArr = append(newArr, q)
-		}
-	}
-	n.Queue = newArr
-	return newArr
 }
 
 // Log will record a new notification into memory and will show the logs on the settings page
@@ -412,6 +407,18 @@ func (n *Notification) WithinLimits() (bool, error) {
 // ResetQueue will clear the notifiers Queue
 func (n *Notification) ResetQueue() {
 	n.Queue = nil
+}
+
+// ResetQueue will clear the notifiers Queue for a service
+func (n *Notification) ResetUniqueQueue(id int64) []*QueueData {
+	var queue []*QueueData
+	for _, v := range n.Queue {
+		if v.Id != id {
+			queue = append(queue, v)
+		}
+	}
+	n.Queue = queue
+	return queue
 }
 
 // start will start the go routine for the notifier queue

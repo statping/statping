@@ -97,15 +97,15 @@ func TestSelectNotification(t *testing.T) {
 
 func TestAddQueue(t *testing.T) {
 	msg := "this is a test in the queue!"
-	example.AddQueue(msg)
+	example.AddQueue(0, msg)
 	assert.Equal(t, 1, len(example.Queue))
-	example.AddQueue(msg)
+	example.AddQueue(0, msg)
 	assert.Equal(t, 2, len(example.Queue))
-	example.AddQueue(msg)
+	example.AddQueue(0, msg)
 	assert.Equal(t, 3, len(example.Queue))
-	example.AddQueue(msg)
+	example.AddQueue(0, msg)
 	assert.Equal(t, 4, len(example.Queue))
-	example.AddQueue(msg)
+	example.AddQueue(0, msg)
 	assert.Equal(t, 5, len(example.Queue))
 }
 

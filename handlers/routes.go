@@ -35,7 +35,7 @@ func Router() *mux.Router {
 	dir := utils.Directory
 	storage = NewStorage()
 	r := mux.NewRouter()
-	r.Handle("/", cached("120s", "text/html", http.HandlerFunc(indexHandler)))
+	r.Handle("/", http.HandlerFunc(indexHandler))
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
 		r.PathPrefix("/css/").Handler(http.StripPrefix("/font/", http.FileServer(http.Dir(dir+"/assets/font"))))

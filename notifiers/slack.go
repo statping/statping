@@ -57,14 +57,14 @@ var slacker = &slack{&notifier.Notification{
 	}}},
 }
 
-func parseSlackMessage(temp string, data interface{}) error {
+func parseSlackMessage(id int64, temp string, data interface{}) error {
 	buf := new(bytes.Buffer)
 	slackTemp, _ := template.New("slack").Parse(temp)
 	err := slackTemp.Execute(buf, data)
 	if err != nil {
 		return err
 	}
-	slacker.AddQueue(buf.String())
+	slacker.AddQueue(id, buf.String())
 	return nil
 }
 
@@ -120,20 +120,20 @@ func (u *slack) OnFailure(s *types.Service, f *types.Failure) {
 		Template: failingTemplate,
 		Time:     time.Now().Unix(),
 	}
-	parseSlackMessage(failingTemplate, message)
+	parseSlackMessage(s.Id, failingTemplate, message)
 	u.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (u *slack) OnSuccess(s *types.Service) {
 	if !u.Online {
-		u.ResetQueue()
+		u.ResetUniqueQueue(s.Id)
 		message := slackMessage{
 			Service:  s,
 			Template: successTemplate,
 			Time:     time.Now().Unix(),
 		}
-		parseSlackMessage(successTemplate, message)
+		parseSlackMessage(s.Id, successTemplate, message)
 	}
 	u.Online = true
 }
@@ -141,6 +141,6 @@ func (u *slack) OnSuccess(s *types.Service) {
 // OnSave triggers when this notifier has been saved
 func (u *slack) OnSave() error {
 	message := fmt.Sprintf("Notification %v is receiving updated information.", u.Method)
-	u.AddQueue(message)
+	u.AddQueue(0, message)
 	return nil
 }
