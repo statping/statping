@@ -46,6 +46,7 @@ func TestSelectAllServices(t *testing.T) {
 }
 
 func TestServiceDowntime(t *testing.T) {
+	t.SkipNow()
 	service := SelectService(15)
 	downtime := service.Downtime()
 	assert.True(t, downtime.Seconds() > 0)

@@ -27,12 +27,21 @@ type Hit struct {
 
 // CreateHit will create a new 'hit' record in the database for a successful/online service
 func (s *Service) CreateHit(h *types.Hit) (int64, error) {
+	h.CreatedAt = time.Now().UTC()
 	db := hitsDB().Create(&h)
 	if db.Error != nil {
 		utils.Log(2, db.Error)
 		return 0, db.Error
 	}
 	return h.Id, db.Error
+}
+
+// CountHits returns a int64 for all hits for a service
+func (s *Service) CountHits() (int64, error) {
+	var hits int64
+	col := hitsDB().Where("service = ?", s.Id)
+	err := col.Count(&hits)
+	return hits, err.Error
 }
 
 // Hits returns all successful hits for a service

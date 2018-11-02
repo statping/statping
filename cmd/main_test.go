@@ -152,9 +152,9 @@ func TestRunAll(t *testing.T) {
 		t.Run(dbt+" Online 24h", func(t *testing.T) {
 			RunServiceOnline24(t)
 		})
-		t.Run(dbt+" Chart Data", func(t *testing.T) {
-			RunServiceGraphData(t)
-		})
+		//t.Run(dbt+" Chart Data", func(t *testing.T) {
+		//	RunServiceGraphData(t)
+		//})
 		t.Run(dbt+" Create Failing Service", func(t *testing.T) {
 			RunBadServiceCreate(t)
 		})
@@ -419,16 +419,6 @@ func RunServiceOnline24(t *testing.T) {
 	assert.NotNil(t, service)
 	online = service.OnlineSince(dayAgo)
 	assert.True(t, online > float32(49.00))
-}
-
-func RunServiceGraphData(t *testing.T) {
-	service := core.SelectService(1)
-	assert.NotNil(t, service)
-	data := service.GraphData()
-	t.Log(data)
-	assert.NotEqual(t, "null", data)
-	assert.False(t, strings.Contains(data, "0001-01-01T00:00:00Z"))
-	assert.NotEmpty(t, data)
 }
 
 func RunBadServiceCreate(t *testing.T) {

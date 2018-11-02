@@ -153,7 +153,7 @@ func (s *Service) OnlineSince(ago time.Time) float32 {
 
 // DateScan struct is for creating the charts.js graph JSON array
 type DateScan struct {
-	CreatedAt string `json:"x"`
+	CreatedAt string `json:"x,omitempty"`
 	Value     int64  `json:"y"`
 }
 
@@ -204,23 +204,24 @@ func (s *Service) DowntimeText() string {
 
 // Dbtimestamp will return a SQL query for grouping by date
 func Dbtimestamp(group string, column string) string {
-	seconds := 60
-	if group == "second" {
-		seconds = 60
-	} else if group == "hour" {
+	var seconds int64
+	switch group {
+	case "hour":
 		seconds = 3600
-	} else if group == "day" {
+	case "day":
 		seconds = 86400
+	case "week":
+		seconds = 604800
+	default:
+		seconds = 60
 	}
 	switch CoreApp.DbConnection {
 	case "mysql":
 		return fmt.Sprintf("CONCAT(date_format(created_at, '%%Y-%%m-%%d %%H:00:00')) AS timeframe, AVG(%v) AS value", column)
-	case "sqlite":
-		return fmt.Sprintf("datetime((strftime('%%s', created_at) / %v) * %v, 'unixepoch') AS timeframe, AVG(%v) as value", seconds, seconds, column)
 	case "postgres":
 		return fmt.Sprintf("date_trunc('%v', created_at) AS timeframe, AVG(%v) AS value", group, column)
 	default:
-		return ""
+		return fmt.Sprintf("datetime((strftime('%%s', created_at) / %v) * %v, 'unixepoch') AS timeframe, AVG(%v) as value", seconds, seconds, column)
 	}
 }
 
@@ -241,8 +242,15 @@ func (s *Service) Downtime() time.Duration {
 // GraphDataRaw will return all the hits between 2 times for a Service
 func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group string, column string) *DateScanObj {
 	var d []DateScan
+	var amount int64
 	model := service.(*Service).HitsBetween(start, end, group, column)
+	model.Count(&amount)
+	if amount == 0 {
+		return &DateScanObj{[]DateScan{}}
+	}
+	model = model.Order("timeframe asc", false).Group("timeframe")
 	rows, _ := model.Rows()
+
 	for rows.Next() {
 		var gd DateScan
 		var createdAt string
@@ -266,19 +274,6 @@ func (d *DateScanObj) ToString() string {
 	if err != nil {
 		utils.Log(2, err)
 		return "{}"
-	}
-	return string(data)
-}
-
-// GraphData returns the JSON object used by Charts.js to render the chart
-func (s *Service) GraphData() string {
-	start := time.Now().Add((-24 * 7) * time.Hour)
-	end := time.Now()
-	obj := GraphDataRaw(s, start, end, "hour", "latency")
-	data, err := json.Marshal(obj)
-	if err != nil {
-		utils.Log(2, err)
-		return ""
 	}
 	return string(data)
 }

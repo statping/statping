@@ -60,3 +60,9 @@ type NotifierEvents interface {
 	OnNewNotifier(*Notification)
 	OnUpdatedNotifier(*Notification)
 }
+
+// HTTPRouter interface will allow your notifier to accept http GET/POST requests
+type HTTPRouter interface {
+	OnGET() error
+	OnPOST() error
+}

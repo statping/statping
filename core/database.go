@@ -76,7 +76,7 @@ func checkinHitsDB() *gorm.DB {
 // HitsBetween returns the gorm database query for a collection of service hits between a time range
 func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) *gorm.DB {
 	selector := Dbtimestamp(group, column)
-	return DbSession.Model(&types.Hit{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.Format(types.TIME_DAY), t2.Format(types.TIME_DAY)).Order("timeframe asc", false).Group("timeframe")
+	return DbSession.Model(&types.Hit{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME_DAY), t2.UTC().Format(types.TIME_DAY))
 }
 
 // CloseDB will close the database connection if available
@@ -98,10 +98,10 @@ func (s *Service) AfterFind() (err error) {
 }
 
 // AfterFind for Hit will set the timezone
-func (h *Hit) AfterFind() (err error) {
-	h.CreatedAt = utils.Timezoner(h.CreatedAt, CoreApp.Timezone)
-	return
-}
+//func (h *Hit) AfterFind() (err error) {
+//	h.CreatedAt = utils.Timezoner(h.CreatedAt, CoreApp.Timezone)
+//	return
+//}
 
 // AfterFind for failure will set the timezone
 func (f *failure) AfterFind() (err error) {

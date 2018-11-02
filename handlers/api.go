@@ -89,8 +89,13 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 	grouping := fields.Get("group")
 	startField := utils.StringInt(fields.Get("start"))
 	endField := utils.StringInt(fields.Get("end"))
-	obj := core.GraphDataRaw(service, time.Unix(startField, 0), time.Unix(endField, 0), grouping, "latency")
 
+	if startField == 0 || endField == 0 {
+		startField = 0
+		endField = 99999999999
+	}
+
+	obj := core.GraphDataRaw(service, time.Unix(startField, 0).UTC(), time.Unix(endField, 0).UTC(), grouping, "latency")
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(obj)
 }
