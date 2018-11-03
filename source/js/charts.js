@@ -1,12 +1,12 @@
-{{define; "charts"}}
-{{=; .Start}}
-{{=; .End}}
+{{define "charts"}}
+{{$start := .Start}}
+{{$end := .End}}
 {{ range .Services }}
-var ctx_;{{js .Id}} = document.getElementById("service_{{js .Id}}").getContext('2d');
-var chartdata_;{{js .Id}} = new Chart(ctx_;{{js .Id}}, {
-  'line',
-    data;: {
-    [{
+var ctx_{{js .Id}} = document.getElementById("service_{{js .Id}}").getContext('2d');
+var chartdata_{{js .Id}} = new Chart(ctx_{{js .Id}}, {
+  type: 'line',
+    data: {
+    datasets: [{
       label: 'Response Time (Milliseconds)',
       data: [],
       backgroundColor: ['{{if .Online}}rgba(47, 206, 30, 0.92){{else}}rgb(221, 53, 69){{end}}'],
@@ -14,33 +14,33 @@ var chartdata_;{{js .Id}} = new Chart(ctx_;{{js .Id}}, {
       borderWidth: 1
     }]
   },
-  {
-    false,
-      scaleShowValues;: false,
-      layout;: {
-      {
-        0,
-          right;: 0,
-          top;: 0,
-          bottom;: -10
+  options: {
+    maintainAspectRatio: false,
+      scaleShowValues: false,
+      layout: {
+      padding: {
+        left: 0,
+          right: 0,
+          top: 0,
+          bottom: -10
       }
     },
-    {
-      0,
+    hover: {
+      animationDuration: 0,
     },
-    0,
-      animation;: {
-      3500,
-        onComplete;: onChartComplete
+    responsiveAnimationDuration: 0,
+      animation: {
+      duration: 3500,
+        onComplete: onChartComplete
     },
-    {
-      false
+    legend: {
+      display: false
     },
-    {
-      false
+    tooltips: {
+      enabled: false
     },
-    {
-      [{
+    scales: {
+      yAxes: [{
         display: false,
         ticks: {
           fontSize: 20,
@@ -51,7 +51,7 @@ var chartdata_;{{js .Id}} = new Chart(ctx_;{{js .Id}}, {
           display: false
         }
       }],
-        xAxes;: [{
+        xAxes: [{
         type: 'time',
         distribution: 'series',
         autoSkip: false,
@@ -74,14 +74,13 @@ var chartdata_;{{js .Id}} = new Chart(ctx_;{{js .Id}}, {
         }
       }]
     },
-    {
-      {
-        0
+    elements: {
+      point: {
+        radius: 0
       }
     }
   }
-}
-)
+});
 {{end}}
 
 function onChartComplete(chart) {
@@ -142,31 +141,6 @@ function onChartComplete(chart) {
 
 $( document ).ready(function() {
 {{ range .Services }}
-	AjaxChart(chartdata_;
-	{
-		{
-			js.Id
-		}
-	}
-,
-	{
-		{
-			js.Id
-		}
-	}
-,
-	{
-		{
-			$start
-		}
-	}
-,
-	9999999999, "hour";
-)
-	{
-		{
-			end
-		}
-	}
+AjaxChart(chartdata_{{js .Id}},{{js .Id}},{{$start}},9999999999,"hour");{{end}}
 });
 {{end}}
