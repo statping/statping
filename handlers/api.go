@@ -17,8 +17,10 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
@@ -325,6 +327,21 @@ func apiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(output)
+}
+
+func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	vars := mux.Vars(r)
+	notify, notifierObj, err := notifier.SelectNotifier(vars["notifier"])
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v notifier was not found", vars["notifier"]), http.StatusInternalServerError)
+		return
+	}
+	fmt.Println(notify)
+	fmt.Println(notifierObj)
 }
 
 func isAPIAuthorized(r *http.Request) bool {

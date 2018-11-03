@@ -64,7 +64,7 @@ before_install:
 
 install:
   - make dev-deps
-  - make dev
+  - make dep
   - make install
 
 before_script:
