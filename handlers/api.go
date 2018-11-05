@@ -342,6 +342,8 @@ func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println(notify)
 	fmt.Println(notifierObj)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(notify)
 }
 
 func isAPIAuthorized(r *http.Request) bool {

@@ -33,9 +33,9 @@ var (
 // Router returns all of the routes used in Statup
 func Router() *mux.Router {
 	dir := utils.Directory
-	storage = NewStorage()
+	CacheStorage = NewStorage()
 	r := mux.NewRouter()
-	r.Handle("/", http.HandlerFunc(indexHandler))
+	r.Handle("/", cached("120s", "text/html", http.HandlerFunc(indexHandler)))
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
 		r.PathPrefix("/css/").Handler(http.StripPrefix("/font/", http.FileServer(http.Dir(dir+"/assets/font"))))
@@ -93,6 +93,10 @@ func Router() *mux.Router {
 	r.Handle("/checkin/{id}/delete", http.HandlerFunc(checkinDeleteHandler)).Methods("GET")
 	r.Handle("/checkin/{id}", http.HandlerFunc(checkinHitHandler))
 
+	// API Routes
+	r.Handle("/api", http.HandlerFunc(apiIndexHandler))
+	r.Handle("/api/renew", http.HandlerFunc(apiRenewHandler))
+
 	// API SERVICE Routes
 	r.Handle("/api/services", http.HandlerFunc(apiAllServicesHandler)).Methods("GET")
 	r.Handle("/api/services", http.HandlerFunc(apiCreateServiceHandler)).Methods("POST")
@@ -101,6 +105,7 @@ func Router() *mux.Router {
 	r.Handle("/api/services/{id}/ping", http.HandlerFunc(apiServicePingDataHandler)).Methods("GET")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceUpdateHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceDeleteHandler)).Methods("DELETE")
+	r.Handle("/api/checkin/{api}", http.HandlerFunc(apiCheckinHandler))
 
 	// API USER Routes
 	r.Handle("/api/users", http.HandlerFunc(apiAllUsersHandler)).Methods("GET")
@@ -113,10 +118,6 @@ func Router() *mux.Router {
 	r.Handle("/api/notifier/{notifier}", http.HandlerFunc(apiNotifierGetHandler)).Methods("GET")
 	r.Handle("/api/notifier/{notifier}", http.HandlerFunc(apiNotifierGetHandler)).Methods("POST")
 
-	// Generic API Routes
-	r.Handle("/api", http.HandlerFunc(apiIndexHandler))
-	r.Handle("/api/renew", http.HandlerFunc(apiRenewHandler))
-	r.Handle("/api/checkin/{api}", http.HandlerFunc(apiCheckinHandler))
 	r.Handle("/metrics", http.HandlerFunc(prometheusHandler))
 	r.Handle("/tray", http.HandlerFunc(trayHandler))
 	r.NotFoundHandler = http.HandlerFunc(error404Handler)

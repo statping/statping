@@ -109,6 +109,8 @@
                                     <input type="text" class="form-control select-input" value="{{ .ApiSecret }}" id="api_secret" readonly>
                                     <small class="form-text text-muted">You can <a href="/api/renew">Regenerate API Keys</a> if you need to.</small>
                                 </div>
+
+                                <img width="300" height="300" src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=http://statup://setup?domain={{ .Domain }}&api={{ .ApiKey }}&secret={{ .ApiSecret }}&choe=UTF-8">
                             </div>
 
                             <div class="row">

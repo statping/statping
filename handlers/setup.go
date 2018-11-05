@@ -119,6 +119,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	core.SampleData()
 	core.InitApp()
+	CacheStorage.Delete("/")
 	resetCookies()
 	time.Sleep(2 * time.Second)
 	http.Redirect(w, r, "/", http.StatusSeeOther)

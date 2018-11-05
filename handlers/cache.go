@@ -1,16 +1,18 @@
 package handlers
 
 import (
+	"github.com/hunterlong/statup/core"
 	"net/http"
 	"net/http/httptest"
 	"sync"
 	"time"
 )
 
-var storage Cacher
+var CacheStorage Cacher
 
 type Cacher interface {
 	Get(key string) []byte
+	Delete(key string)
 	Set(key string, content []byte, duration time.Duration)
 }
 
@@ -34,7 +36,7 @@ type Storage struct {
 	mu    *sync.RWMutex
 }
 
-//NewStorage creates a new in memory storage
+//NewStorage creates a new in memory CacheStorage
 func NewStorage() *Storage {
 	return &Storage{
 		items: make(map[string]Item),
@@ -55,6 +57,12 @@ func (s Storage) Get(key string) []byte {
 	return item.Content
 }
 
+func (s Storage) Delete(key string) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	delete(s.items, key)
+}
+
 //Set a cached content by key
 func (s Storage) Set(key string, content []byte, duration time.Duration) {
 	s.mu.Lock()
@@ -67,17 +75,20 @@ func (s Storage) Set(key string, content []byte, duration time.Duration) {
 
 func cached(duration, contentType string, handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		content := storage.Get(r.RequestURI)
+		content := CacheStorage.Get(r.RequestURI)
+		w.Header().Set("Content-Type", contentType)
+		if core.Configs == nil {
+			handler(w, r)
+			return
+		}
 		if content != nil {
-			w.Header().Set("Content-Type", contentType)
 			w.Write(content)
 		} else {
 			c := httptest.NewRecorder()
 			handler(c, r)
-			w.Header().Set("Content-Type", contentType)
 			content := c.Body.Bytes()
 			if d, err := time.ParseDuration(duration); err == nil {
-				storage.Set(r.RequestURI, content, d)
+				CacheStorage.Set(r.RequestURI, content, d)
 			}
 			w.Write(content)
 		}
