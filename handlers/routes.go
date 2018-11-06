@@ -119,6 +119,7 @@ func Router() *mux.Router {
 	r.Handle("/api/notifier/{notifier}", http.HandlerFunc(apiNotifierGetHandler)).Methods("POST")
 
 	r.Handle("/metrics", http.HandlerFunc(prometheusHandler))
+	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
 	r.Handle("/tray", http.HandlerFunc(trayHandler))
 	r.NotFoundHandler = http.HandlerFunc(error404Handler)
 	return r

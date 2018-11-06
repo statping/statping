@@ -16,6 +16,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -28,6 +29,15 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	executeResponse(w, r, "index.html", core.CoreApp, nil)
+}
+
+func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	health := map[string]interface{}{
+		"services": len(core.Services()),
+		"online":   core.Configs != nil,
+	}
+	json.NewEncoder(w).Encode(health)
 }
 
 func trayHandler(w http.ResponseWriter, r *http.Request) {
