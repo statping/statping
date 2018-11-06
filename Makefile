@@ -31,10 +31,10 @@ travis-test: dev-deps cypress-install test coverage
 build-all: build-mac build-linux build-windows build-alpine compress
 
 # build all docker tags
-docker-build-all: docker-build-base docker-build-dev docker-build-latest
+docker-build-all: docker-build-dev docker-build-latest
 
 # push all docker tags built
-docker-publish-all: docker-push-base docker-push-dev docker-push-latest
+docker-publish-all: docker-push-dev docker-push-latest
 
 # build Statup for local arch
 build: compile
@@ -129,21 +129,14 @@ build-alpine: compile
 #
 
 # build :latest docker tag
-docker-build-latest: docker-build-base
+docker-build-latest:
 	docker build --build-arg VERSION=$(VERSION) -t hunterlong/statup:latest --no-cache -f Dockerfile .
-	docker tag hunterlong/statup:latest hunterlong/statup:latest-v$(VERSION)
+	docker tag hunterlong/statup:latest hunterlong/statup:v$(VERSION)
 
 # build :dev docker tag
-docker-build-dev: docker-build-base
+docker-build-dev:
 	docker build --build-arg VERSION=$(VERSION) -t hunterlong/statup:dev --no-cache -f dev/Dockerfile-dev .
 	docker tag hunterlong/statup:dev hunterlong/statup:dev-v$(VERSION)
-
-# build :base and base-v{VERSION} docker tag
-docker-build-base: clean
-	wget -q https://assets.statup.io/sass && chmod +x sass
-	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -linkmode external -extldflags -static" -out alpine ./cmd
-	docker build -t hunterlong/statup:base --no-cache -f dev/Dockerfile-base .
-	docker tag hunterlong/statup:base hunterlong/statup:base-v$(VERSION)
 
 # build Cypress UI testing :cypress docker tag
 docker-build-cypress: clean
@@ -181,7 +174,7 @@ docker-push-cypress:
 # push the :latest tag to Docker hub
 docker-push-latest:
 	docker push hunterlong/statup:latest
-	docker push hunterlong/statup:latest-v$(VERSION)
+	docker push hunterlong/statup:v$(VERSION)
 
 docker-run-mssql:
 	docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=PaSsW0rD123' -p 1433:1433 -d microsoft/mssql-server-linux
