@@ -1,7 +1,10 @@
 .git
+.github
 .idea
+logs
 *.log
 build
+assets
 source/rice-box.go
 .env
 .DS_Store

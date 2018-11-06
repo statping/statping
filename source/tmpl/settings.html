@@ -17,7 +17,7 @@
                 {{end}}
                 </div>
             </div>
-            <div class="col-md-8 col-sm-12">
+            <div class="col-md-9 col-sm-12">
             {{if Error}}
                 <div class="alert alert-danger" role="alert">{{Error}}</div>
             {{end}}
@@ -109,12 +109,15 @@
                                     <input type="text" class="form-control select-input" value="{{ .ApiSecret }}" id="api_secret" readonly>
                                     <small class="form-text text-muted">You can <a href="/api/renew">Regenerate API Keys</a> if you need to.</small>
                                 </div>
-
-                                <img width="300" height="300" src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=http://statup://setup?domain={{ .Domain }}&api={{ .ApiKey }}&secret={{ .ApiSecret }}&choe=UTF-8">
                             </div>
 
                             <div class="row">
                                 <a href="/settings/export" class="btn btn-sm btn-secondary float-right">Export Settings</a>
+                                <a href="#" class="btn btn-sm btn-secondary float-right ml-1">Authentication QR Code</a>
+                            </div>
+
+                            <div class="row align-content-center">
+                                <img class="rounded text-center" width="300" height="300" src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=statup://setup?domain={{ .Domain }}&api={{ .ApiKey }}&secret={{ .ApiSecret }}&choe=UTF-8">
                             </div>
 
                         </form>

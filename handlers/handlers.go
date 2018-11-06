@@ -105,6 +105,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"Services": func() []types.ServiceInterface {
 			return core.CoreApp.Services
 		},
+		"len": func(g []types.ServiceInterface) int {
+			return len(g)
+		},
 		"USE_CDN": func() bool {
 			return core.CoreApp.UseCdn
 		},

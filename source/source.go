@@ -131,7 +131,7 @@ func UsingAssets(folder string) bool {
 
 // SaveAsset will save an asset to the '/assets/' folder.
 func SaveAsset(data []byte, folder, file string) error {
-	utils.Log(1, fmt.Sprintf("Saving %v/%v into assets folder", folder, file))
+	utils.Log(1, fmt.Sprintf("Saving %v/assets/%v into assets folder", folder, file))
 	err := ioutil.WriteFile(folder+"/assets/"+file, data, 0744)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Failed to save %v/%v, %v", folder, file, err))
@@ -157,23 +157,19 @@ func CreateAllAssets(folder string) error {
 	MakePublicFolder(folder + "/assets/js")
 	MakePublicFolder(folder + "/assets/css")
 	MakePublicFolder(folder + "/assets/scss")
+	MakePublicFolder(folder + "/assets/font")
 	utils.Log(1, "Inserting scss, css, and javascript files into assets folder")
-	CopyToPublic(ScssBox, folder+"/assets/scss", "base.scss")
-	CopyToPublic(ScssBox, folder+"/assets/scss", "variables.scss")
-	CopyToPublic(ScssBox, folder+"/assets/scss", "mobile.scss")
-	CopyToPublic(ScssBox, folder+"/assets/scss", "pikaday.scss")
-	CopyToPublic(CssBox, folder+"/assets/css", "bootstrap.min.css")
-	CopyToPublic(CssBox, folder+"/assets/css", "base.css")
-	//CopyToPublic(JsBox, folder+"/assets/js", "bootstrap.min.js")
-	//CopyToPublic(JsBox, folder+"/assets/js", "Chart.bundle.min.js")
-	//CopyToPublic(JsBox, folder+"/assets/js", "jquery-3.3.1.min.js")
-	//CopyToPublic(JsBox, folder+"/assets/js", "sortable.min.js")
-	//CopyToPublic(JsBox, folder+"/assets/js", "main.js")
-	//CopyToPublic(JsBox, folder+"/assets/js", "setup.js")
+	CopyAllToPublic(FontBox, "font")
+	CopyAllToPublic(ScssBox, "scss")
+	CopyAllToPublic(CssBox, "css")
+	CopyAllToPublic(JsBox, "js")
+	CopyToPublic(FontBox, folder+"/assets/font", "all.css")
 	CopyToPublic(TmplBox, folder+"/assets", "robots.txt")
 	CopyToPublic(TmplBox, folder+"/assets", "statup.png")
+	CopyToPublic(TmplBox, folder+"/assets", "favicon.ico")
 	utils.Log(1, "Compiling CSS from SCSS style...")
-	err := utils.Log(1, "Statup assets have been inserted")
+	err := CompileSASS(utils.Directory)
+	utils.Log(1, "Statup assets have been inserted")
 	return err
 }
 
@@ -185,6 +181,27 @@ func DeleteAllAssets(folder string) error {
 		return err
 	}
 	utils.Log(1, "Statup assets have been deleted")
+	return err
+}
+
+func CopyAllToPublic(box *rice.Box, folder string) error {
+	err := box.Walk("/", func(path string, info os.FileInfo, err error) error {
+		if info.Name() == "" {
+			return nil
+		}
+		if info.IsDir() {
+			folder := fmt.Sprintf("%v/assets/%v/%v", utils.Directory, folder, info.Name())
+			MakePublicFolder(folder)
+			return nil
+		}
+		file, err := box.Bytes(path)
+		if err != nil {
+			return nil
+		}
+		filePath := fmt.Sprintf("%v%v", folder, path)
+		SaveAsset(file, utils.Directory, filePath)
+		return nil
+	})
 	return err
 }
 

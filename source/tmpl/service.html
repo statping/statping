@@ -1,7 +1,7 @@
 {{define "title"}}{{.Service.Name}} Status{{end}}
+{{define "description"}}{{$s := .Service}}{{if $s.Online }}{{.Service.Name}} is currently online and responding within {{$s.AvgTime}} milliseconds with {{$s.TotalUptime}}% total uptime on {{$s.Domain}}.{{else}}{{.Service.Name}} is currently offline on {{$s.Domain}}. Notify the admin to let them know their service is offline.{{end}}{{end}}
 {{ define "content" }}
 {{$s := .Service}}
-
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
 
 {{if Auth}}

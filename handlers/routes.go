@@ -38,17 +38,17 @@ func Router() *mux.Router {
 	r.Handle("/", cached("120s", "text/html", http.HandlerFunc(indexHandler)))
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
-		r.PathPrefix("/css/").Handler(http.StripPrefix("/font/", http.FileServer(http.Dir(dir+"/assets/font"))))
-		r.PathPrefix("/font/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(dir+"/assets/css"))))
+		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(dir+"/assets/css"))))
+		r.PathPrefix("/font/").Handler(http.StripPrefix("/font/", http.FileServer(http.Dir(dir+"/assets/font"))))
 		r.PathPrefix("/robots.txt").Handler(indexHandler)
 		r.PathPrefix("/favicon.ico").Handler(indexHandler)
 		r.PathPrefix("/statup.png").Handler(indexHandler)
 	} else {
 		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(source.CssBox.HTTPBox())))
+		r.PathPrefix("/font/").Handler(http.StripPrefix("/font/", http.FileServer(source.FontBox.HTTPBox())))
 		r.PathPrefix("/robots.txt").Handler(http.FileServer(source.TmplBox.HTTPBox()))
 		r.PathPrefix("/favicon.ico").Handler(http.FileServer(source.TmplBox.HTTPBox()))
 		r.PathPrefix("/statup.png").Handler(http.FileServer(source.TmplBox.HTTPBox()))
-		r.PathPrefix("/font/").Handler(http.StripPrefix("/font/", http.FileServer(source.FontBox.HTTPBox())))
 	}
 	r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(source.JsBox.HTTPBox())))
 	r.Handle("/charts.js", http.HandlerFunc(renderServiceChartsHandler))

@@ -31,15 +31,15 @@ type mobilePush struct {
 var mobile = &mobilePush{&notifier.Notification{
 	Method:      "mobile",
 	Title:       "Mobile Notifications",
-	Description: "Receive push notifications on your mobile device using the Statup App.",
+	Description: "Receive push notifications on your Android or iPhone devices using the Statup App. You can scan the Authentication QR Code found in Settings to get the mobile app setup in seconds.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
 	Delay:       time.Duration(5 * time.Second),
 	Icon:        "fas fa-mobile-alt",
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
-		Title:       "Mobile Identifiers",
-		Placeholder: "A list of your mobile push notification ids",
+		Title:       "Device Identifiers",
+		Placeholder: "A list of your mobile device push notification ID's.",
 		DbField:     "var1",
 	}}},
 }

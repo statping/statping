@@ -103,7 +103,7 @@ func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 	err = source.CompileSASS(dir)
 	if err != nil {
 		source.CopyToPublic(source.CssBox, dir+"/assets/css", "base.css")
-		utils.Log(2, "Default 'base.css' was insert because SASS did not work.")
+		utils.Log(3, "Default 'base.css' was inserted because SASS did not work.")
 	}
 	resetRouter()
 	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")

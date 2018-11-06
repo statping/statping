@@ -1,4 +1,5 @@
 {{define "title"}}{{CoreApp.Name}} Status{{end}}
+{{define "description"}}{{CoreApp.Name}} is currently monitoring {{len CoreApp.Services}} services with 0 of them offline. {{CoreApp.Name}} is using Statup to monitor applications.{{end}}
 {{define "content"}}
 <div class="container col-md-7 col-sm-12 mt-2 sm-container">
 <h1 class="col-12 text-center mb-4 mt-sm-3 header-title">{{.Name}}</h1>
