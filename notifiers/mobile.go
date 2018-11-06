@@ -86,9 +86,9 @@ func (u *mobilePush) OnSuccess(s *types.Service) {
 // OnSave triggers when this notifier has been saved
 func (u *mobilePush) OnSave() error {
 	msg := &expo.PushMessage{
-		Body:     "This is a test notification",
+		Body:     "The Mobile Notifier has been saved",
 		Sound:    "default",
-		Title:    "Notification Test",
+		Title:    "Notification Saved",
 		Priority: expo.DefaultPriority,
 	}
 	u.AddQueue(0, msg)

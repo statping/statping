@@ -450,6 +450,94 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "Notifiers",
+			"item": [
+				{
+					"name": "View Notifier",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/notifier/mobile",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"notifier",
+								"mobile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Notifier",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"method\": \"mobile\",\n    \"host\": \"\",\n    \"port\": 0,\n    \"username\": \"\",\n    \"var1\": \"ExponentPushToken[XmsQVgIxjgaMKCP5MBoOp9]\",\n    \"var2\": \"\",\n    \"api_key\": \"\",\n    \"api_secret\": \"\",\n    \"enabled\": true,\n    \"limits\": 3\n}"
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/notifier/mobile",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"notifier",
+								"mobile"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "",
+						"type": "string"
+					}
+				]
+			}
 		}
 	]
 }

@@ -335,15 +335,49 @@ func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	notify, notifierObj, err := notifier.SelectNotifier(vars["notifier"])
+	_, notifierObj, err := notifier.SelectNotifier(vars["notifier"])
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v notifier was not found", vars["notifier"]), http.StatusInternalServerError)
 		return
 	}
-	fmt.Println(notify)
-	fmt.Println(notifierObj)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(notify)
+	json.NewEncoder(w).Encode(notifierObj.Select())
+}
+
+func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	vars := mux.Vars(r)
+	var notification *notifier.Notification
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&notification)
+
+	notif, not, err := notifier.SelectNotifier(vars["notifier"])
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%v notifier was not found", vars["notifier"]), http.StatusInternalServerError)
+		return
+	}
+
+	notif.Var1 = notification.Var1
+	notif.Var2 = notification.Var2
+	notif.Host = notification.Host
+	notif.Port = notification.Port
+	notif.Password = notification.Password
+	notif.Username = notification.Username
+	notif.Enabled = notification.Enabled
+	notif.ApiKey = notification.ApiKey
+	notif.ApiSecret = notification.ApiSecret
+
+	_, err = notifier.Update(not, notif)
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("issue updating notifier: %v", err))
+	}
+	notifier.OnSave(notif.Method)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(notif)
 }
 
 func isAPIAuthorized(r *http.Request) bool {

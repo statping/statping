@@ -184,6 +184,7 @@ func DeleteAllAssets(folder string) error {
 	return err
 }
 
+// CopyAllToPublic will copy all the files in a rice box into a local folder
 func CopyAllToPublic(box *rice.Box, folder string) error {
 	err := box.Walk("/", func(path string, info os.FileInfo, err error) error {
 		if info.Name() == "" {
