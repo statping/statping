@@ -16,6 +16,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
@@ -188,7 +189,8 @@ func saveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	if limits != 0 {
 		notifer.Limits = limits
 	}
-	notifer.Enabled = enabled == "on"
+	notifer.Enabled = sql.NullBool{enabled == "on", true}
+
 	_, err = notifier.Update(notif, notifer)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("issue updating notifier: %v", err))
@@ -253,7 +255,7 @@ func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	if limits != 0 {
 		notifer.Limits = limits
 	}
-	notifer.Enabled = enabled == "on"
+	notifer.Enabled = sql.NullBool{enabled == "on", true}
 
 	err = notif.(notifier.Tester).OnTest()
 	if err == nil {

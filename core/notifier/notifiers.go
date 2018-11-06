@@ -16,6 +16,7 @@
 package notifier
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -46,7 +47,7 @@ type Notification struct {
 	Var2        string             `gorm:"not null;column:var2" json:"var2,omitempty"`
 	ApiKey      string             `gorm:"not null;column:api_key" json:"api_key,omitempty"`
 	ApiSecret   string             `gorm:"not null;column:api_secret" json:"api_secret,omitempty"`
-	Enabled     bool               `gorm:"column:enabled;type:boolean;default:false" json:"enabled"`
+	Enabled     sql.NullBool       `gorm:"column:enabled;type:boolean;default:false" json:"enabled"`
 	Limits      int                `gorm:"not null;column:limits" json:"limits"`
 	Removable   bool               `gorm:"column:removable" json:"-"`
 	CreatedAt   time.Time          `gorm:"column:created_at" json:"created_at"`
@@ -199,11 +200,14 @@ func SelectNotification(n Notifier) (*Notification, error) {
 
 // Update will update the notification into the database
 func Update(n Notifier, notif *Notification) (*Notification, error) {
+	notif.ResetQueue()
 	err := db.Model(&Notification{}).Update(notif)
-	if notif.Enabled {
+	if notif.Enabled.Bool {
 		notif.close()
 		notif.start()
 		go Queue(n)
+	} else {
+		notif.close()
 	}
 	return notif, err.Error
 }
@@ -253,7 +257,7 @@ func startAllNotifiers() {
 	for _, comm := range AllCommunications {
 		if isType(comm, new(Notifier)) {
 			notify := comm.(Notifier)
-			if notify.Select().Enabled {
+			if notify.Select().Enabled.Bool {
 				notify.Select().close()
 				notify.Select().start()
 				go Queue(notify)
@@ -376,8 +380,8 @@ func isType(n interface{}, obj interface{}) bool {
 
 // isEnabled returns true if the notifier is enabled
 func isEnabled(n interface{}) bool {
-	notifier, _ := SelectNotification(n.(Notifier))
-	return notifier.Enabled
+	notifier := n.(Notifier).Select()
+	return notifier.Enabled.Bool
 }
 
 // inLimits will return true if the notifier is within sending limits

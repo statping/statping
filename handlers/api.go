@@ -16,6 +16,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -341,7 +342,7 @@ func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(notifierObj.Select())
+	json.NewEncoder(w).Encode(notifierObj)
 }
 
 func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -351,33 +352,34 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	vars := mux.Vars(r)
 	var notification *notifier.Notification
+	fmt.Println(r.Body)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&notification)
 
-	notif, not, err := notifier.SelectNotifier(vars["notifier"])
+	notifer, not, err := notifier.SelectNotifier(vars["notifier"])
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%v notifier was not found", vars["notifier"]), http.StatusInternalServerError)
 		return
 	}
 
-	notif.Var1 = notification.Var1
-	notif.Var2 = notification.Var2
-	notif.Host = notification.Host
-	notif.Port = notification.Port
-	notif.Password = notification.Password
-	notif.Username = notification.Username
-	notif.Enabled = notification.Enabled
-	notif.ApiKey = notification.ApiKey
-	notif.ApiSecret = notification.ApiSecret
+	notifer.Var1 = notification.Var1
+	notifer.Var2 = notification.Var2
+	notifer.Host = notification.Host
+	notifer.Port = notification.Port
+	notifer.Password = notification.Password
+	notifer.Username = notification.Username
+	notifer.Enabled = sql.NullBool{notification.Enabled.Bool, true}
+	notifer.ApiKey = notification.ApiKey
+	notifer.ApiSecret = notification.ApiSecret
 
-	_, err = notifier.Update(not, notif)
+	_, err = notifier.Update(not, notifer)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("issue updating notifier: %v", err))
 	}
-	notifier.OnSave(notif.Method)
+	notifier.OnSave(notifer.Method)
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(notif)
+	json.NewEncoder(w).Encode(notifer)
 }
 
 func isAPIAuthorized(r *http.Request) bool {
