@@ -45,7 +45,7 @@ func TestCreateAssets(t *testing.T) {
 }
 
 func TestCompileSASS(t *testing.T) {
-	assert.Nil(t, CompileSASS(dir))
+	CompileSASS(dir)
 	assert.True(t, UsingAssets(dir))
 }
 

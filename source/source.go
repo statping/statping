@@ -106,7 +106,7 @@ func CompileSASS(folder string) error {
 	outStr, errStr := string(stdout), string(stderr)
 	utils.Log(1, fmt.Sprintf("out: %v | error: %v", outStr, errStr))
 	utils.Log(1, "SASS Compiling is complete!")
-	return err
+	return nil
 }
 
 // UsingAssets returns true if the '/assets' folder is found in the directory
