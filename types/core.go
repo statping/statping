@@ -16,6 +16,7 @@
 package types
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -32,11 +33,11 @@ type Core struct {
 	ApiKey        string             `gorm:"column:api_key" json:"-"`
 	ApiSecret     string             `gorm:"column:api_secret" json:"-"`
 	Style         string             `gorm:"not null;column:style" json:"style,omitempty"`
-	Footer        string             `gorm:"not null;column:footer" json:"footer,omitempty"`
-	Domain        string             `gorm:"not null;column:domain" json:"domain,omitempty"`
+	Footer        sql.NullString     `gorm:"not null;column:footer" json:"footer"`
+	Domain        string             `gorm:"not null;column:domain" json:"domain"`
 	Version       string             `gorm:"column:version" json:"version"`
 	MigrationId   int64              `gorm:"column:migration_id" json:"migration_id,omitempty"`
-	UseCdn        bool               `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`
+	UseCdn        sql.NullBool       `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`
 	Timezone      float32            `gorm:"column:timezone;default:-8.0" json:"timezone,omitempty"`
 	CreatedAt     time.Time          `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt     time.Time          `gorm:"column:updated_at" json:"updated_at"`

@@ -10,11 +10,11 @@
 
     <div class="col-12 mb-4">
 
-    {{if $s.Online }}
-        <span class="mt-3 mb-3 text-white d-md-none btn bg-success d-block d-md-none">ONLINE</span>
-    {{ else }}
-        <span class="mt-3 mb-3 text-white d-md-none btn bg-danger d-block d-md-none">OFFLINE</span>
-    {{end}}
+        {{if $s.Online }}
+            <span class="mt-3 mb-3 text-white d-md-none btn bg-success d-block d-md-none">ONLINE</span>
+        {{ else }}
+            <span class="mt-3 mb-3 text-white d-md-none btn bg-danger d-block d-md-none">OFFLINE</span>
+        {{end}}
 
         <h4 class="mt-2">{{ $s.Name }}
         {{if $s.Online }}
@@ -46,17 +46,26 @@
         </div>
 
         <form id="service_date_form" class="col-12 mt-2 mb-3">
-            <span id="start_date" class="text-muted small float-left pointer">{{FromUnix .Start}}</span>
-            <span id="end_date" class="text-muted small float-right pointer" style="position: absolute;right: 0;">{{FromUnix .End}}</span>
-            <input type="hidden" name="start" class="form-control" id="service_start" spellcheck="false">
-            <input type="hidden" name="end" class="form-control" id="service_end" spellcheck="false">
-            <button type="submit" class="btn btn-light btn-block btn-sm mt-2">Set Timeframe</button>
+            <input type="text" class="d-none" name="start" id="service_start" data-input>
+            <span data-toggle title="toggle" id="start_date" class="text-muted small float-left pointer mt-2">{{.Start}} to {{.End}}</span>
+            <button type="submit" class="btn btn-light btn-sm mt-2">Set Timeframe</button>
+            <input type="text" class="d-none" name="end" id="service_end" data-input>
+
             <div id="start_container"></div>
             <div id="end_container"></div>
         </form>
 
     {{if not $s.Online}}
         <div class="col-12 small text-center mt-3 text-muted">{{$s.DowntimeText}}</div>
+    {{end}}
+
+    {{if $s.Messages}}
+        {{range $s.Messages}}
+            <div class="alert alert-warning" role="alert">
+                <h3>{{.Title}}</h3>
+                <span>{{safe .Description}}</span>
+            </div>
+        {{end}}
     {{end}}
 
     {{ if $s.LimitedFailures }}
@@ -137,14 +146,15 @@
 {{end}}
 </div>
 {{end}}
-{{define "extra_scripts"}}
-{{if USE_CDN}}
-<script src="https://assets.statup.io/pikaday.js"></script>
-{{ else }}
-<script src="/js/pikaday.js"></script>
+{{define "extra_css"}}
+<link rel="stylesheet" href="/css/flatpickr.min.css">
 {{end}}
+{{define "extra_scripts"}}
 {{$s := .Service}}
+<script src="/js/flatpickr.js"></script>
+<script src="/js/rangePlugin.js"></script>
 <script>
+$(document).ready(function() {
 
     var ctx = document.getElementById("service").getContext('2d');
 
@@ -208,45 +218,29 @@
         }
     });
 
-
-    var startPick = new Pikaday({
-        field: $('#service_start')[0],
-        bound: false,
-        trigger: $("#start_date"),
-        container: $("#start_container")[0],
-        maxDate: new Date(),
-        onSelect: function(date) {
-            $('#service_start')[0].value = Math.round(date.getTime() / 1000);
-            this.hide();
-        }
-    });
-
-    var endPick = new Pikaday({
-        field: $('#service_end')[0],
-        bound: false,
-        trigger: $("#end_date"),
-        container: $("#end_container")[0],
-        maxDate: new Date(),
-        onSelect: function(date) {
-            $('#service_end')[0].value = Math.round(date.getTime() / 1000);
-            this.hide();
-        }
-    });
-
-    startPick.setDate(new Date({{.Start}}* 1000));
-    endPick.setDate(new Date({{.End}}* 1000));
-    startPick.hide();
-    endPick.hide();
-
-    $("#start_date").click(function(e) {
-        startPick.show()
-    });
-
-    $("#end_date").click(function(e) {
-        endPick.show()
-    });
-
     AjaxChart(chartdata,{{$s.Id}},{{.Start}},{{.End}},"hour");
 
+    let startDate = $("#service_start").flatpickr({
+        enableTime: false,
+        static: true,
+        altInput: true,
+        altFormat: "U",
+        maxDate: "today",
+        dateFormat: "F j, Y",
+        onChange: function(selectedDates, dateStr, instance) {
+            var one = Math.round((new Date(selectedDates[0])).getTime() / 1000);
+            var two = Math.round((new Date(selectedDates[1])).getTime() / 1000);
+        	$("#service_start").val(one);
+            $("#service_end").val(two);
+            $("#start_date").html(dateStr);
+        },
+        "plugins": [new rangePlugin({ input: "#service_end"})]
+    });
+
+    $("#start_date").click(function(e) {
+        startDate.open()
+    });
+
+});
 </script>
 {{end}}

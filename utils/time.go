@@ -20,6 +20,12 @@ import (
 	"time"
 )
 
+const (
+	FlatpickrTime     = "2006-01-02 15:04"
+	FlatpickrDay      = "2006-01-02"
+	FlatpickrReadable = "Mon, 02 Jan 2006"
+)
+
 // FormatDuration converts a time.Duration into a string
 func FormatDuration(d time.Duration) string {
 	var out string

@@ -16,37 +16,39 @@
 package types
 
 import (
+	"database/sql"
 	"time"
 )
 
 // Service is the main struct for Services
 type Service struct {
-	Id             int64         `gorm:"primary_key;column:id" json:"id"`
-	Name           string        `gorm:"column:name" json:"name"`
-	Domain         string        `gorm:"column:domain" json:"domain"`
-	Expected       string        `gorm:"not null;column:expected" json:"expected"`
-	ExpectedStatus int           `gorm:"default:200;column:expected_status" json:"expected_status"`
-	Interval       int           `gorm:"default:30;column:check_interval" json:"check_interval"`
-	Type           string        `gorm:"column:check_type" json:"type"`
-	Method         string        `gorm:"column:method" json:"method"`
-	PostData       string        `gorm:"not null;column:post_data" json:"post_data"`
-	Port           int           `gorm:"not null;column:port" json:"port"`
-	Timeout        int           `gorm:"default:30;column:timeout" json:"timeout"`
-	Order          int           `gorm:"default:0;column:order_id" json:"order_id"`
-	CreatedAt      time.Time     `gorm:"column:created_at" json:"created_at"`
-	UpdatedAt      time.Time     `gorm:"column:updated_at" json:"updated_at"`
-	Online         bool          `gorm:"-" json:"online"`
-	Latency        float64       `gorm:"-" json:"latency"`
-	PingTime       float64       `gorm:"-" json:"ping_time"`
-	Online24Hours  float32       `gorm:"-" json:"online_24_hours"`
-	AvgResponse    string        `gorm:"-" json:"avg_response"`
-	Running        chan bool     `gorm:"-" json:"-"`
-	Checkpoint     time.Time     `gorm:"-" json:"-"`
-	SleepDuration  time.Duration `gorm:"-" json:"-"`
-	LastResponse   string        `gorm:"-" json:"-"`
-	LastStatusCode int           `gorm:"-" json:"status_code"`
-	LastOnline     time.Time     `gorm:"-" json:"last_online"`
-	Failures       []interface{} `gorm:"-" json:"failures,omitempty"`
+	Id                 int64          `gorm:"primary_key;column:id" json:"id"`
+	Name               string         `gorm:"column:name" json:"name"`
+	Domain             string         `gorm:"column:domain" json:"domain"`
+	Expected           sql.NullString `gorm:"not null;column:expected" json:"expected"`
+	ExpectedStatus     int            `gorm:"default:200;column:expected_status" json:"expected_status"`
+	Interval           int            `gorm:"default:30;column:check_interval" json:"check_interval"`
+	Type               string         `gorm:"column:check_type" json:"type"`
+	Method             string         `gorm:"column:method" json:"method"`
+	PostData           sql.NullString `gorm:"not null;column:post_data" json:"post_data"`
+	Port               int            `gorm:"not null;column:port" json:"port"`
+	Timeout            int            `gorm:"default:30;column:timeout" json:"timeout"`
+	Order              int            `gorm:"default:0;column:order_id" json:"order_id"`
+	AllowNotifications sql.NullBool   `gorm:"default:false;column:allow_notifications" json:"allow_notifications"`
+	CreatedAt          time.Time      `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt          time.Time      `gorm:"column:updated_at" json:"updated_at"`
+	Online             bool           `gorm:"-" json:"online"`
+	Latency            float64        `gorm:"-" json:"latency"`
+	PingTime           float64        `gorm:"-" json:"ping_time"`
+	Online24Hours      float32        `gorm:"-" json:"online_24_hours"`
+	AvgResponse        string         `gorm:"-" json:"avg_response"`
+	Running            chan bool      `gorm:"-" json:"-"`
+	Checkpoint         time.Time      `gorm:"-" json:"-"`
+	SleepDuration      time.Duration  `gorm:"-" json:"-"`
+	LastResponse       string         `gorm:"-" json:"-"`
+	LastStatusCode     int            `gorm:"-" json:"status_code"`
+	LastOnline         time.Time      `gorm:"-" json:"last_online"`
+	Failures           []interface{}  `gorm:"-" json:"failures,omitempty"`
 }
 
 type ServiceInterface interface {

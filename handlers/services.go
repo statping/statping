@@ -104,12 +104,12 @@ func createServiceHandler(w http.ResponseWriter, r *http.Request) {
 		Name:           name,
 		Domain:         domain,
 		Method:         method,
-		Expected:       expected,
+		Expected:       utils.NullString(expected),
 		ExpectedStatus: status,
 		Interval:       interval,
 		Type:           checkType,
 		Port:           port,
-		PostData:       postData,
+		PostData:       utils.NullString(postData),
 		Timeout:        timeout,
 		Order:          order,
 	})
@@ -139,8 +139,11 @@ func servicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	fields := parseGet(r)
+	r.ParseForm()
+
 	startField := utils.StringInt(fields.Get("start"))
 	endField := utils.StringInt(fields.Get("end"))
+	group := r.Form.Get("group")
 	serv := core.SelectService(utils.StringInt(vars["id"]))
 	if serv == nil {
 		w.WriteHeader(http.StatusNotFound)
@@ -156,15 +159,18 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	if endField != 0 {
 		end = time.Unix(endField, 0)
 	}
+	if group == "" {
+		group = "hour"
+	}
 
-	data := core.GraphDataRaw(serv, start, end, "hour", "latency")
+	data := core.GraphDataRaw(serv, start, end, group, "latency")
 
 	out := struct {
 		Service *core.Service
-		Start   int64
-		End     int64
+		Start   string
+		End     string
 		Data    string
-	}{serv, start.Unix(), end.Unix(), data.ToString()}
+	}{serv, start.Format(utils.FlatpickrReadable), end.Format(utils.FlatpickrReadable), data.ToString()}
 
 	executeResponse(w, r, "service.html", out, nil)
 }
@@ -193,11 +199,11 @@ func servicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	service.Domain = domain
 	service.Method = method
 	service.ExpectedStatus = status
-	service.Expected = expected
+	service.Expected = utils.NullString(expected)
 	service.Interval = interval
 	service.Type = checkType
 	service.Port = port
-	service.PostData = postData
+	service.PostData = utils.NullString(postData)
 	service.Timeout = timeout
 	service.Order = order
 

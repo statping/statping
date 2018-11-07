@@ -16,6 +16,7 @@
 package core
 
 import (
+	"database/sql"
 	"errors"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/source"
@@ -147,9 +148,7 @@ func SelectCore() (*Core, error) {
 	}
 	CoreApp.DbConnection = Configs.DbConn
 	CoreApp.Version = VERSION
-	if os.Getenv("USE_CDN") == "true" {
-		CoreApp.UseCdn = true
-	}
+	CoreApp.UseCdn = sql.NullBool{os.Getenv("USE_CDN") == "true", true}
 	return CoreApp, db.Error
 }
 

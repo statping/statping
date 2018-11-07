@@ -165,7 +165,7 @@ func (s *Service) checkHttp(record bool) *Service {
 
 	var response *http.Response
 	if s.Method == "POST" {
-		response, err = client.Post(s.Domain, "application/json", bytes.NewBuffer([]byte(s.PostData)))
+		response, err = client.Post(s.Domain, "application/json", bytes.NewBuffer([]byte(s.PostData.String)))
 	} else {
 		response, err = client.Get(s.Domain)
 	}
@@ -190,11 +190,11 @@ func (s *Service) checkHttp(record bool) *Service {
 	s.LastResponse = string(contents)
 	s.LastStatusCode = response.StatusCode
 
-	if s.Expected != "" {
+	if s.Expected.String != "" {
 		if err != nil {
 			utils.Log(2, err)
 		}
-		match, err := regexp.MatchString(s.Expected, string(contents))
+		match, err := regexp.MatchString(s.Expected.String, string(contents))
 		if err != nil {
 			utils.Log(2, err)
 		}

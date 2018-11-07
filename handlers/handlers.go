@@ -108,8 +108,11 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"len": func(g []types.ServiceInterface) int {
 			return len(g)
 		},
+		"IsNil": func(g interface{}) bool {
+			return g == nil
+		},
 		"USE_CDN": func() bool {
-			return core.CoreApp.UseCdn
+			return core.CoreApp.UseCdn.Bool
 		},
 		"Type": func(g interface{}) []string {
 			fooType := reflect.TypeOf(g)
@@ -163,6 +166,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"NewCheckin": func() *types.Checkin {
 			return new(types.Checkin)
 		},
+		"NewMessage": func() *types.Message {
+			return new(types.Message)
+		},
 	}
 }
 
@@ -176,7 +182,7 @@ func executeResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		return
 	}
 
-	templates := []string{"base.html", "head.html", "nav.html", "footer.html", "scripts.html", "form_service.html", "form_notifier.html", "form_user.html", "form_checkin.html"}
+	templates := []string{"base.html", "head.html", "nav.html", "footer.html", "scripts.html", "form_service.html", "form_notifier.html", "form_user.html", "form_checkin.html", "form_message.html"}
 
 	javascripts := []string{"charts.js", "chart_index.js"}
 

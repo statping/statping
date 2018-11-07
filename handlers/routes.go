@@ -70,6 +70,13 @@ func Router() *mux.Router {
 	r.Handle("/user/{id}", http.HandlerFunc(updateUserHandler)).Methods("POST")
 	r.Handle("/user/{id}/delete", http.HandlerFunc(usersDeleteHandler)).Methods("GET")
 
+	// MESSAGES Routes
+	r.Handle("/messages", http.HandlerFunc(messagesHandler)).Methods("GET")
+	r.Handle("/messages", http.HandlerFunc(createMessageHandler)).Methods("POST")
+	r.Handle("/message/{id}", http.HandlerFunc(viewMessageHandler)).Methods("GET")
+	r.Handle("/message/{id}", http.HandlerFunc(updateMessageHandler)).Methods("POST")
+	r.Handle("/message/{id}/delete", http.HandlerFunc(deleteMessageHandler)).Methods("GET")
+
 	// SETTINGS Routes
 	r.Handle("/settings", http.HandlerFunc(settingsHandler)).Methods("GET")
 	r.Handle("/settings", http.HandlerFunc(saveSettingsHandler)).Methods("POST")

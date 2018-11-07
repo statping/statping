@@ -16,6 +16,7 @@
 package core
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/go-yaml/yaml"
@@ -71,9 +72,8 @@ func LoadUsingEnv() (*DbConfig, error) {
 	CoreApp.Name = os.Getenv("NAME")
 	CoreApp.Domain = os.Getenv("DOMAIN")
 	CoreApp.DbConnection = Configs.DbConn
-	if os.Getenv("USE_CDN") == "true" {
-		CoreApp.UseCdn = true
-	}
+	CoreApp.UseCdn = sql.NullBool{os.Getenv("USE_CDN") == "true", true}
+
 	err := Configs.Connect(true, utils.Directory)
 	if err != nil {
 		utils.Log(4, err)
@@ -94,7 +94,7 @@ func LoadUsingEnv() (*DbConfig, error) {
 			Username: "admin",
 			Password: "admin",
 			Email:    "info@admin.com",
-			Admin:    true,
+			Admin:    sql.NullBool{true, true},
 		})
 		_, err := admin.Create()
 

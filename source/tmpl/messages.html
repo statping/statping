@@ -1,0 +1,52 @@
+{{define "title"}}Statup Messages{{end}}
+{{define "content"}}
+<div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
+{{template "nav"}}
+    <div class="col-12">
+        <h3>Messages</h3>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {{range .}}
+                <tr>
+                    <td>{{.Title}}</td>
+                    <td class="text-right" id="message_{{.Id}}">
+                        <div class="btn-group">
+                            <a href="/message/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-exclamation-triangle"></i> Edit</a>
+                            <a href="/message/{{.Id}}/delete" class="btn btn-danger confirm-btn" data-id="message_{{.Id}}"><i class="fas fa-times"></i></a>
+                        </div>
+                    </td>
+                </tr>
+            {{end}}
+            </tbody>
+        </table>
+
+        <h3>Create Message</h3>
+
+        {{template "form_message" NewMessage}}
+</div>
+</div>
+{{end}}
+{{define "extra_css"}}
+<link rel="stylesheet" href="/css/flatpickr.min.css">
+{{end}}
+{{define "extra_scripts"}}
+<script src="/js/flatpickr.js"></script>
+<script src="/js/rangePlugin.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $("#start_on").flatpickr({
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            minDate: "today",
+            "plugins": [new rangePlugin({ input: "#end_on"})]
+        });
+    });
+</script>
+{{end}}

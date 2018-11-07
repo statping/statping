@@ -246,7 +246,7 @@ func (u *email) OnTest() error {
 		Method:         "GET",
 		Timeout:        20,
 		LastStatusCode: 200,
-		Expected:       "test example",
+		Expected:       utils.NullString("test example"),
 		LastResponse:   "<html>this is an example response</html>",
 		CreatedAt:      time.Now().Add(-24 * time.Hour),
 	}

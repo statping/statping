@@ -1,0 +1,28 @@
+{{define "title"}}Statup | {{.Title}}{{end}}
+{{define "content"}}
+<div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
+{{template "nav"}}
+    <div class="col-12">
+        <h3>Message {{.Title}}</h3>
+        {{template "form_message" .}}
+    </div>
+</div>
+{{end}}
+{{define "extra_css"}}
+<link rel="stylesheet" href="/css/flatpickr.min.css">
+{{end}}
+{{define "extra_scripts"}}
+<script src="/js/flatpickr.js"></script>
+<script src="/js/rangePlugin.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $("#start_on").flatpickr({
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            minDate: "today",
+            "plugins": [new rangePlugin({ input: "#end_on"})]
+        });
+    });
+</script>
+{{end}}

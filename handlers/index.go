@@ -16,6 +16,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
@@ -108,7 +109,7 @@ func DesktopInit(ip string, port int) {
 		Username: config.Username,
 		Password: config.Password,
 		Email:    config.Email,
-		Admin:    true,
+		Admin:    sql.NullBool{true, true},
 	})
 	admin.Create()
 

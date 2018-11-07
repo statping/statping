@@ -1,0 +1,61 @@
+{{define "form_message"}}
+{{$message := .}}
+<form action="{{if ne .Id 0}}/message/{{.Id}}{{else}}/messages{{end}}" method="POST">
+    <div class="form-group row">
+        <label for="username" class="col-sm-4 col-form-label">Title</label>
+        <div class="col-sm-8">
+            <input type="text" name="title" class="form-control" value="{{.Title}}" id="title" placeholder="Message Title" required>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="username" class="col-sm-4 col-form-label">Description</label>
+        <div class="col-sm-8">
+            <textarea rows="5" name="description" class="form-control" id="description" required>{{.Description}}</textarea>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Message Date Range</label>
+        <div class="col-sm-4">
+            <input type="text" name="start_on" class="form-control form-control-plaintext" id="start_on" value="{{.StartOn}}" required>
+        </div>
+        <div class="col-sm-4">
+            <input type="text" name="end_on" class="form-control form-control-plaintext" id="end_on" value="{{.EndOn}}" required>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="service_id" class="col-sm-4 col-form-label">Service</label>
+        <div class="col-sm-8">
+        <select class="form-control" name="service_id" id="service_id">
+            <option value="0" {{if eq (ToString .ServiceId) "0"}}selected{{end}}>Global Message</option>
+            {{range Services}}
+                {{$s := .Select}}
+                <option value="{{$s.Id}}" {{if eq $message.ServiceId $s.Id}}selected{{end}}>{{$s.Name}}</option>
+            {{end}}
+        </select>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="notify_method" class="col-sm-4 col-form-label">Notification Method</label>
+        <div class="col-sm-8">
+            <input type="text" name="notify_method" class="form-control" id="notify_method" value="{{.NotifyUsers.Bool}}" placeholder="email">
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label for="notify_before" class="col-sm-4 col-form-label">Notify Before</label>
+        <div class="col-sm-8">
+            <input type="text" name="notify_before" class="form-control" id="notify_before" value="{{.NotifyBefore}}">
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-sm-12">
+            <button type="submit" class="btn btn-primary btn-block">{{if ne .Id 0}}Update Message{{else}}Create Message{{end}}</button>
+        </div>
+    </div>
+</form>
+{{end}}

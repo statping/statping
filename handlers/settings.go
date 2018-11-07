@@ -56,8 +56,8 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 		app.Style = style
 	}
 	footer := r.PostForm.Get("footer")
-	if footer != app.Footer {
-		app.Footer = footer
+	if footer != app.Footer.String {
+		app.Footer = utils.NullString(footer)
 	}
 	domain := r.PostForm.Get("domain")
 	if domain != app.Domain {
@@ -67,7 +67,7 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	timeFloat, _ := strconv.ParseFloat(timezone, 10)
 	app.Timezone = float32(timeFloat)
 
-	app.UseCdn = (r.PostForm.Get("enable_cdn") == "on")
+	app.UseCdn = utils.NullBool(r.PostForm.Get("enable_cdn") == "on")
 	core.CoreApp, _ = core.UpdateCore(app)
 	//notifiers.OnSettingsSaved(core.CoreApp.ToCore())
 	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")

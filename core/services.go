@@ -394,6 +394,12 @@ func (s *Service) Create(check bool) (int64, error) {
 	return s.Id, nil
 }
 
+// Messages returns all Messages for a Service
+func (s *Service) Messages() []*Message {
+	messages := SelectServiceMessages(s.Id)
+	return messages
+}
+
 // ServicesCount returns the amount of services inside the []*core.Services slice
 func (c *Core) ServicesCount() int {
 	return len(c.Services)

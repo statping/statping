@@ -16,6 +16,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -113,7 +114,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		Username: config.Username,
 		Password: config.Password,
 		Email:    config.Email,
-		Admin:    true,
+		Admin:    sql.NullBool{true, true},
 	})
 	admin.Create()
 

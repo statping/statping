@@ -68,6 +68,11 @@ func checkinDB() *gorm.DB {
 	return DbSession.Model(&types.Checkin{})
 }
 
+// messagesDb returns the Checkin records for a service
+func messagesDb() *gorm.DB {
+	return DbSession.Model(&types.Message{})
+}
+
 // checkinHitsDB returns the 'hits' from the Checkin record
 func checkinHitsDB() *gorm.DB {
 	return DbSession.Model(&types.CheckinHit{})
@@ -329,6 +334,7 @@ func (db *DbConfig) DropDatabase() error {
 	err = DbSession.DropTableIfExists("hits")
 	err = DbSession.DropTableIfExists("services")
 	err = DbSession.DropTableIfExists("users")
+	err = DbSession.DropTableIfExists("messages")
 	return err.Error
 }
 
@@ -343,6 +349,7 @@ func (db *DbConfig) CreateDatabase() error {
 	err = DbSession.CreateTable(&types.Hit{})
 	err = DbSession.CreateTable(&types.Service{})
 	err = DbSession.CreateTable(&types.User{})
+	err = DbSession.CreateTable(&types.Message{})
 	utils.Log(1, "Statup Database Created")
 	return err.Error
 }
@@ -361,7 +368,7 @@ func (db *DbConfig) MigrateDatabase() error {
 	if tx.Error != nil {
 		return tx.Error
 	}
-	tx = tx.AutoMigrate(&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Checkin{}, &types.CheckinHit{}, &notifier.Notification{}).Table("core").AutoMigrate(&types.Core{})
+	tx = tx.AutoMigrate(&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Message{}, &types.Checkin{}, &types.CheckinHit{}, &notifier.Notification{}).Table("core").AutoMigrate(&types.Core{})
 	if tx.Error != nil {
 		tx.Rollback()
 		utils.Log(3, fmt.Sprintf("Statup Database could not be migrated: %v", tx.Error))

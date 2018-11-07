@@ -35,7 +35,7 @@ func ReturnUser(u *types.User) *user {
 // SelectUser returns the user based on the user's ID.
 func SelectUser(id int64) (*user, error) {
 	var user user
-	err := usersDB().First(&user, id)
+	err := usersDB().Where("id = ?", id).First(&user)
 	return &user, err.Error
 }
 
@@ -54,7 +54,6 @@ func (u *user) Delete() error {
 
 // Update will update the user's record in database
 func (u *user) Update() error {
-	u.Password = utils.HashPassword(u.Password)
 	u.ApiKey = utils.NewSHA1Hash(5)
 	u.ApiSecret = utils.NewSHA1Hash(10)
 	return usersDB().Update(u).Error

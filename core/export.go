@@ -17,6 +17,7 @@ package core
 
 import (
 	"bytes"
+	"database/sql"
 	"fmt"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
@@ -32,7 +33,7 @@ func ExportIndexHTML() string {
 	source.Assets()
 	injectDatabase()
 	CoreApp.SelectAllServices(false)
-	CoreApp.UseCdn = true
+	CoreApp.UseCdn = sql.NullBool{true, true}
 	for _, srv := range CoreApp.Services {
 		service := srv.(*Service)
 		service.Check(true)
@@ -60,7 +61,7 @@ func ExportIndexHTML() string {
 			return CoreApp
 		},
 		"USE_CDN": func() bool {
-			return CoreApp.UseCdn
+			return CoreApp.UseCdn.Bool
 		},
 		"underscore": func(html string) string {
 			return utils.UnderScoreString(html)
