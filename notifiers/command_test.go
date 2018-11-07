@@ -103,14 +103,12 @@ func TestCommandNotifier(t *testing.T) {
 	})
 
 	t.Run("command Send", func(t *testing.T) {
-		err := command.Send(commandTest)
-		assert.Nil(t, err)
+		command.Send(commandTest)
 		assert.Equal(t, 0, len(command.Queue))
 	})
 
 	t.Run("command Test", func(t *testing.T) {
-		err := command.OnTest()
-		assert.Nil(t, err)
+		command.OnTest()
 	})
 
 	t.Run("command Queue", func(t *testing.T) {
