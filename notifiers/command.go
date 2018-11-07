@@ -16,6 +16,7 @@
 package notifiers
 
 import (
+	"errors"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -87,6 +88,10 @@ func runCommand(app, cmd string) (string, string, error) {
 	err := testCmd.Wait()
 	if err != nil {
 		return "", "", err
+	}
+
+	if errStdout != nil || errStderr != nil {
+		return "", "", errors.New("failed to capture stdout or stderr")
 	}
 
 	outStr, errStr := string(stdout), string(stderr)

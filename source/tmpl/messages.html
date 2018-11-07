@@ -2,6 +2,7 @@
 {{define "content"}}
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
 {{template "nav"}}
+{{if .}}
     <div class="col-12">
         <h3>Messages</h3>
         <table class="table table-striped">
@@ -29,11 +30,13 @@
             {{end}}
             </tbody>
         </table>
-
+    </div>
+{{end}}
+    <div class="col-12">
         <h3>Create Message</h3>
 
         {{template "form_message" NewMessage}}
-</div>
+    </div>
 </div>
 {{end}}
 {{define "extra_css"}}

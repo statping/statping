@@ -224,6 +224,7 @@ clean:
 	rm -rf utils/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf dev/test/cypress/videos
 	rm -f coverage.* sass
+	rm -f source/rice-box.go
 	find . -name "*.out" -type f -delete
 	find . -name "*.cpu" -type f -delete
 	find . -name "*.mem" -type f -delete
