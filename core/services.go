@@ -400,6 +400,18 @@ func (s *Service) Messages() []*Message {
 	return messages
 }
 
+// ActiveMessages returns all Messages for a Service
+func (s *Service) ActiveMessages() []*Message {
+	var messages []*Message
+	msgs := SelectServiceMessages(s.Id)
+	for _, m := range msgs {
+		if m.StartOn.UTC().After(time.Now().UTC()) {
+			messages = append(messages, m)
+		}
+	}
+	return messages
+}
+
 // ServicesCount returns the amount of services inside the []*core.Services slice
 func (c *Core) ServicesCount() int {
 	return len(c.Services)

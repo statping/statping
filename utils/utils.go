@@ -43,12 +43,6 @@ func init() {
 	}
 }
 
-func StringPoint(s string) *string {
-	val := new(string)
-	*val = s
-	return val
-}
-
 // StringInt converts a string to an int64
 func StringInt(s string) int64 {
 	num, _ := strconv.Atoi(s)

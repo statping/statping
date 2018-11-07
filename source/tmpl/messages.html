@@ -8,6 +8,8 @@
             <thead>
             <tr>
                 <th scope="col">Title</th>
+                <th scope="col">Service</th>
+                <th scope="col">Begins</th>
                 <th scope="col"></th>
             </tr>
             </thead>
@@ -15,6 +17,8 @@
             {{range .}}
                 <tr>
                     <td>{{.Title}}</td>
+                    <td>{{if .Service}}<a href="/service/{{.Service.Id}}">{{.Service.Name}}</a>{{end}}</td>
+                    <td>{{Duration 0}}</td>
                     <td class="text-right" id="message_{{.Id}}">
                         <div class="btn-group">
                             <a href="/message/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-exclamation-triangle"></i> Edit</a>

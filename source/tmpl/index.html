@@ -74,6 +74,18 @@
                     <a href="/service/{{ .Id }}" class="btn {{if .Online}}btn-success{{else}}btn-danger{{end}} btn-sm float-right dyn-dark btn-block">View Service</a>
                 </div>
             </div>
+
+        {{if .ActiveMessages}}
+            <div class="col-12 mb-4">
+            {{range .ActiveMessages}}
+                <div class="alert alert-warning" role="alert">
+                    <h3>{{.Title}}</h3>
+                    <span>{{safe .Description}}</span>
+                </div>
+            {{end}}
+            </div>
+        {{end}}
+
         </div>
     </div>
 {{ end }}

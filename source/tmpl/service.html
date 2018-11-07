@@ -41,6 +41,17 @@
             </div>
         </div>
 
+        {{if $s.ActiveMessages}}
+        <div class="col-12 mb-4">
+        {{range $s.ActiveMessages}}
+            <div class="alert alert-warning" role="alert">
+                <h3>{{.Title}}</h3>
+                <span>{{safe .Description}}</span>
+            </div>
+        {{end}}
+        </div>
+        {{end}}
+
         <div class="service-chart-container">
             <canvas id="service"></canvas>
         </div>
@@ -57,15 +68,6 @@
 
     {{if not $s.Online}}
         <div class="col-12 small text-center mt-3 text-muted">{{$s.DowntimeText}}</div>
-    {{end}}
-
-    {{if $s.Messages}}
-        {{range $s.Messages}}
-            <div class="alert alert-warning" role="alert">
-                <h3>{{.Title}}</h3>
-                <span>{{safe .Description}}</span>
-            </div>
-        {{end}}
     {{end}}
 
     {{ if $s.LimitedFailures }}

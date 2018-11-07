@@ -52,6 +52,13 @@ func SelectMessage(id int64) (*Message, error) {
 	return &message, db.Error
 }
 
+func (m *Message) Service() *Service {
+	if m.ServiceId == 0 {
+		return nil
+	}
+	return SelectService(m.ServiceId)
+}
+
 // Create will create a Message and insert it into the database
 func (m *Message) Create() (int64, error) {
 	m.CreatedAt = time.Now().UTC()
