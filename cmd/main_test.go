@@ -305,7 +305,7 @@ func RunUserCreate(t *testing.T) {
 		Username: "hunterlong",
 		Password: "password123",
 		Email:    "info@gmail.com",
-		Admin:    true,
+		Admin:    utils.NullBool(true),
 	})
 	id, err := user.Create()
 	assert.Nil(t, err)
@@ -314,7 +314,7 @@ func RunUserCreate(t *testing.T) {
 		Username: "superadmin",
 		Password: "admin",
 		Email:    "info@adminer.com",
-		Admin:    true,
+		Admin:    utils.NullBool(true),
 	})
 	id, err = user2.Create()
 	assert.Nil(t, err)

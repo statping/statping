@@ -91,7 +91,7 @@ func TestSelectNotification(t *testing.T) {
 	notifier, err := SelectNotification(example)
 	assert.Nil(t, err)
 	assert.Equal(t, "example", notifier.Method)
-	assert.False(t, notifier.Enabled)
+	assert.False(t, notifier.Enabled.Bool)
 	assert.False(t, notifier.IsRunning())
 }
 
@@ -131,17 +131,17 @@ func TestNotification_Update(t *testing.T) {
 	assert.Equal(t, "http://demo.statup.io/api", example.Host)
 	assert.Equal(t, "USBdu82HDiiuw9327yGYDGw", selected.GetValue("api_key"))
 	assert.Equal(t, "USBdu82HDiiuw9327yGYDGw", example.ApiKey)
-	assert.False(t, selected.Enabled)
+	assert.False(t, selected.Enabled.Bool)
 	assert.False(t, selected.IsRunning())
 }
 
 func TestEnableNotification(t *testing.T) {
 	notifier, err := SelectNotification(example)
 	assert.Nil(t, err)
-	notifier.Enabled = true
+	notifier.Enabled = utils.NullBool(true)
 	updated, err := Update(example, notifier)
 	assert.Nil(t, err)
-	assert.True(t, updated.Enabled)
+	assert.True(t, updated.Enabled.Bool)
 	assert.True(t, updated.IsRunning())
 }
 

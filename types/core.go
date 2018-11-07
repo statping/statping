@@ -33,7 +33,7 @@ type Core struct {
 	ApiKey        string             `gorm:"column:api_key" json:"-"`
 	ApiSecret     string             `gorm:"column:api_secret" json:"-"`
 	Style         string             `gorm:"not null;column:style" json:"style,omitempty"`
-	Footer        sql.NullString     `gorm:"not null;column:footer" json:"footer"`
+	Footer        sql.NullString     `gorm:"column:footer" json:"footer"`
 	Domain        string             `gorm:"not null;column:domain" json:"domain"`
 	Version       string             `gorm:"column:version" json:"version"`
 	MigrationId   int64              `gorm:"column:migration_id" json:"migration_id,omitempty"`

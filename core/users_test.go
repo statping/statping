@@ -17,6 +17,7 @@ package core
 
 import (
 	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statup/utils"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -26,7 +27,7 @@ func TestCreateUser(t *testing.T) {
 		Username: "hunter",
 		Password: "password123",
 		Email:    "test@email.com",
-		Admin:    true,
+		Admin:    utils.NullBool(true),
 	})
 	userId, err := user.Create()
 	assert.Nil(t, err)
@@ -43,7 +44,7 @@ func TestSelectUser(t *testing.T) {
 	user, err := SelectUser(1)
 	assert.Nil(t, err)
 	assert.Equal(t, "info@betatude.com", user.Email)
-	assert.True(t, user.Admin)
+	assert.True(t, user.Admin.Bool)
 }
 
 func TestSelectUsername(t *testing.T) {
@@ -51,7 +52,7 @@ func TestSelectUsername(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "test@email.com", user.Email)
 	assert.Equal(t, int64(3), user.Id)
-	assert.True(t, user.Admin)
+	assert.True(t, user.Admin.Bool)
 }
 
 func TestUpdateUser(t *testing.T) {
@@ -70,7 +71,7 @@ func TestCreateUser2(t *testing.T) {
 		Username: "hunterlong",
 		Password: "password123",
 		Email:    "user@email.com",
-		Admin:    true,
+		Admin:    utils.NullBool(true),
 	})
 	userId, err := user.Create()
 	assert.Nil(t, err)
@@ -89,7 +90,7 @@ func TestAuthUser(t *testing.T) {
 	assert.NotNil(t, user)
 	assert.Equal(t, "user@email.com", user.Email)
 	assert.Equal(t, int64(4), user.Id)
-	assert.True(t, user.Admin)
+	assert.True(t, user.Admin.Bool)
 }
 
 func TestFailedAuthUser(t *testing.T) {

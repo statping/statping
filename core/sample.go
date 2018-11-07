@@ -85,6 +85,8 @@ func InsertSampleData() error {
 	s4.Create(false)
 	s5.Create(false)
 
+	insertMessages()
+
 	utils.Log(1, "Sample data has finished importing")
 
 	return nil
@@ -182,12 +184,33 @@ func insertSampleUsers() {
 	u3.Create()
 }
 
+func insertMessages() {
+	m1 := ReturnMessage(&types.Message{
+		Title:       "Routine Downtime",
+		Description: "This is an example a upcoming message for a service!",
+		ServiceId:   1,
+		StartOn:     time.Now().Add(15 * time.Minute),
+		EndOn:       time.Now().Add(2 * time.Hour),
+	})
+	m1.Create()
+
+	m2 := ReturnMessage(&types.Message{
+		Title:       "Server Reboot",
+		Description: "This is another example a upcoming message for a service!",
+		ServiceId:   3,
+		StartOn:     time.Now().Add(15 * time.Minute),
+		EndOn:       time.Now().Add(2 * time.Hour),
+	})
+	m2.Create()
+}
+
 // InsertLargeSampleData will create the example/dummy services for testing the Statup server
 func InsertLargeSampleData() error {
 	insertSampleCore()
 	InsertSampleData()
 	insertSampleUsers()
 	insertSampleCheckins()
+	insertMessages()
 	s6 := ReturnService(&types.Service{
 		Name:           "JSON Lint",
 		Domain:         "https://jsonlint.com",
