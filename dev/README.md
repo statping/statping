@@ -97,11 +97,21 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
 * [type ErrorResponse](#ErrorResponse)
 * [type Hit](#Hit)
   * [func (h *Hit) BeforeCreate() (err error)](#Hit.BeforeCreate)
+* [type Message](#Message)
+  * [func ReturnMessage(m *types.Message) *Message](#ReturnMessage)
+  * [func SelectMessage(id int64) (*Message, error)](#SelectMessage)
+  * [func SelectMessages() ([]*Message, error)](#SelectMessages)
+  * [func SelectServiceMessages(id int64) []*Message](#SelectServiceMessages)
+  * [func (m *Message) Create() (int64, error)](#Message.Create)
+  * [func (m *Message) Delete() error](#Message.Delete)
+  * [func (m *Message) Service() *Service](#Message.Service)
+  * [func (m *Message) Update() (*Message, error)](#Message.Update)
 * [type PluginJSON](#PluginJSON)
 * [type PluginRepos](#PluginRepos)
 * [type Service](#Service)
   * [func ReturnService(s *types.Service) *Service](#ReturnService)
   * [func SelectService(id int64) *Service](#SelectService)
+  * [func (s *Service) ActiveMessages() []*Message](#Service.ActiveMessages)
   * [func (s *Service) AfterFind() (err error)](#Service.AfterFind)
   * [func (s *Service) AllFailures() []*failure](#Service.AllFailures)
   * [func (s *Service) AvgTime() float64](#Service.AvgTime)
@@ -125,6 +135,7 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
   * [func (s *Service) LimitedCheckins() []*Checkin](#Service.LimitedCheckins)
   * [func (s *Service) LimitedFailures() []*failure](#Service.LimitedFailures)
   * [func (s *Service) LimitedHits() ([]*types.Hit, error)](#Service.LimitedHits)
+  * [func (s *Service) Messages() []*Message](#Service.Messages)
   * [func (s *Service) Online24() float32](#Service.Online24)
   * [func (s *Service) OnlineSince(ago time.Time) float32](#Service.OnlineSince)
   * [func (s *Service) Select() *types.Service](#Service.Select)
@@ -146,7 +157,7 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
 
 
 #### <a name="pkg-files">Package files</a>
-[checker.go](https://github.com/hunterlong/statup/tree/master/core/checker.go) [checkin.go](https://github.com/hunterlong/statup/tree/master/core/checkin.go) [configs.go](https://github.com/hunterlong/statup/tree/master/core/configs.go) [core.go](https://github.com/hunterlong/statup/tree/master/core/core.go) [database.go](https://github.com/hunterlong/statup/tree/master/core/database.go) [doc.go](https://github.com/hunterlong/statup/tree/master/core/doc.go) [export.go](https://github.com/hunterlong/statup/tree/master/core/export.go) [failures.go](https://github.com/hunterlong/statup/tree/master/core/failures.go) [hits.go](https://github.com/hunterlong/statup/tree/master/core/hits.go) [sample.go](https://github.com/hunterlong/statup/tree/master/core/sample.go) [services.go](https://github.com/hunterlong/statup/tree/master/core/services.go) [users.go](https://github.com/hunterlong/statup/tree/master/core/users.go) 
+[checker.go](https://github.com/hunterlong/statup/tree/master/core/checker.go) [checkin.go](https://github.com/hunterlong/statup/tree/master/core/checkin.go) [configs.go](https://github.com/hunterlong/statup/tree/master/core/configs.go) [core.go](https://github.com/hunterlong/statup/tree/master/core/core.go) [database.go](https://github.com/hunterlong/statup/tree/master/core/database.go) [doc.go](https://github.com/hunterlong/statup/tree/master/core/doc.go) [export.go](https://github.com/hunterlong/statup/tree/master/core/export.go) [failures.go](https://github.com/hunterlong/statup/tree/master/core/failures.go) [hits.go](https://github.com/hunterlong/statup/tree/master/core/hits.go) [messages.go](https://github.com/hunterlong/statup/tree/master/core/messages.go) [sample.go](https://github.com/hunterlong/statup/tree/master/core/sample.go) [services.go](https://github.com/hunterlong/statup/tree/master/core/services.go) [users.go](https://github.com/hunterlong/statup/tree/master/core/users.go) 
 
 
 
@@ -167,7 +178,7 @@ var (
 ```
 
 
-## <a name="AuthUser">func</a> [AuthUser](https://github.com/hunterlong/statup/tree/master/core/users.go?s=2578:2632#L92)
+## <a name="AuthUser">func</a> [AuthUser](https://github.com/hunterlong/statup/tree/master/core/users.go?s=2572:2626#L92)
 ``` go
 func AuthUser(username, password string) (*user, bool)
 ```
@@ -176,7 +187,7 @@ AuthUser accepts username, and password as a string
 
 
 
-## <a name="CheckHash">func</a> [CheckHash](https://github.com/hunterlong/statup/tree/master/core/users.go?s=2900:2942#L105)
+## <a name="CheckHash">func</a> [CheckHash](https://github.com/hunterlong/statup/tree/master/core/users.go?s=2894:2936#L105)
 ``` go
 func CheckHash(password, hash string) bool
 ```
@@ -184,7 +195,7 @@ CheckHash returns true if the password matches with a hashed bcrypt password
 
 
 
-## <a name="CloseDB">func</a> [CloseDB](https://github.com/hunterlong/statup/tree/master/core/database.go?s=2583:2597#L83)
+## <a name="CloseDB">func</a> [CloseDB](https://github.com/hunterlong/statup/tree/master/core/database.go?s=2713:2727#L88)
 ``` go
 func CloseDB()
 ```
@@ -200,7 +211,7 @@ CountFailures returns the total count of failures for all services
 
 
 
-## <a name="DatabaseMaintence">func</a> [DatabaseMaintence](https://github.com/hunterlong/statup/tree/master/core/database.go?s=7093:7117#L243)
+## <a name="DatabaseMaintence">func</a> [DatabaseMaintence](https://github.com/hunterlong/statup/tree/master/core/database.go?s=7223:7247#L248)
 ``` go
 func DatabaseMaintence()
 ```
@@ -217,7 +228,7 @@ Dbtimestamp will return a SQL query for grouping by date
 
 
 
-## <a name="DefaultPort">func</a> [DefaultPort](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=3143:3176#L108)
+## <a name="DefaultPort">func</a> [DefaultPort](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=3167:3200#L107)
 ``` go
 func DefaultPort(db string) int64
 ```
@@ -225,7 +236,7 @@ DefaultPort accepts a database type and returns its default port
 
 
 
-## <a name="DeleteAllSince">func</a> [DeleteAllSince](https://github.com/hunterlong/statup/tree/master/core/database.go?s=7426:7475#L253)
+## <a name="DeleteAllSince">func</a> [DeleteAllSince](https://github.com/hunterlong/statup/tree/master/core/database.go?s=7556:7605#L258)
 ``` go
 func DeleteAllSince(table string, date time.Time)
 ```
@@ -233,7 +244,7 @@ DeleteAllSince will delete a specific table's records based on a time.
 
 
 
-## <a name="DeleteConfig">func</a> [DeleteConfig](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=4366:4391#L163)
+## <a name="DeleteConfig">func</a> [DeleteConfig](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=4390:4415#L162)
 ``` go
 func DeleteConfig() error
 ```
@@ -241,7 +252,7 @@ DeleteConfig will delete the 'config.yml' file
 
 
 
-## <a name="ExportChartsJs">func</a> [ExportChartsJs](https://github.com/hunterlong/statup/tree/master/core/export.go?s=2232:2260#L87)
+## <a name="ExportChartsJs">func</a> [ExportChartsJs](https://github.com/hunterlong/statup/tree/master/core/export.go?s=2294:2322#L88)
 ``` go
 func ExportChartsJs() string
 ```
@@ -249,7 +260,7 @@ ExportChartsJs renders the charts for the index page
 
 
 
-## <a name="ExportIndexHTML">func</a> [ExportIndexHTML](https://github.com/hunterlong/statup/tree/master/core/export.go?s=942:971#L31)
+## <a name="ExportIndexHTML">func</a> [ExportIndexHTML](https://github.com/hunterlong/statup/tree/master/core/export.go?s=980:1009#L32)
 ``` go
 func ExportIndexHTML() string
 ```
@@ -265,7 +276,7 @@ InitApp will initialize Statup
 
 
 
-## <a name="InsertLargeSampleData">func</a> [InsertLargeSampleData](https://github.com/hunterlong/statup/tree/master/core/sample.go?s=4851:4885#L185)
+## <a name="InsertLargeSampleData">func</a> [InsertLargeSampleData](https://github.com/hunterlong/statup/tree/master/core/sample.go?s=5545:5579#L207)
 ``` go
 func InsertLargeSampleData() error
 ```
@@ -289,7 +300,7 @@ InsertSampleData will create the example/dummy services for a brand new Statup i
 
 
 
-## <a name="InsertSampleHits">func</a> [InsertSampleHits](https://github.com/hunterlong/statup/tree/master/core/sample.go?s=3313:3342#L124)
+## <a name="InsertSampleHits">func</a> [InsertSampleHits](https://github.com/hunterlong/statup/tree/master/core/sample.go?s=3374:3403#L126)
 ``` go
 func InsertSampleHits() error
 ```
@@ -313,7 +324,7 @@ ReturnUser returns *core.user based off a *types.user
 
 
 
-## <a name="SampleData">func</a> [SampleData](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=4155:4178#L152)
+## <a name="SampleData">func</a> [SampleData](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=4179:4202#L151)
 ``` go
 func SampleData() error
 ```
@@ -321,7 +332,7 @@ SampleData runs all the sample data for a new Statup installation
 
 
 
-## <a name="SelectAllUsers">func</a> [SelectAllUsers](https://github.com/hunterlong/statup/tree/master/core/users.go?s=2233:2271#L81)
+## <a name="SelectAllUsers">func</a> [SelectAllUsers](https://github.com/hunterlong/statup/tree/master/core/users.go?s=2204:2242#L80)
 ``` go
 func SelectAllUsers() ([]*user, error)
 ```
@@ -337,7 +348,7 @@ SelectUser returns the user based on the user's ID.
 
 
 
-## <a name="SelectUsername">func</a> [SelectUsername](https://github.com/hunterlong/statup/tree/master/core/users.go?s=1210:1261#L43)
+## <a name="SelectUsername">func</a> [SelectUsername](https://github.com/hunterlong/statup/tree/master/core/users.go?s=1226:1277#L43)
 ``` go
 func SelectUsername(username string) (*user, error)
 ```
@@ -389,7 +400,7 @@ SelectCheckin will find a Checkin based on the API supplied
 
 
 
-### <a name="Checkin.AfterFind">func</a> (\*Checkin) [AfterFind](https://github.com/hunterlong/statup/tree/master/core/database.go?s=3464:3505#L119)
+### <a name="Checkin.AfterFind">func</a> (\*Checkin) [AfterFind](https://github.com/hunterlong/statup/tree/master/core/database.go?s=3594:3635#L124)
 ``` go
 func (c *Checkin) AfterFind() (err error)
 ```
@@ -398,7 +409,7 @@ AfterFind for Checkin will set the timezone
 
 
 
-### <a name="Checkin.BeforeCreate">func</a> (\*Checkin) [BeforeCreate](https://github.com/hunterlong/statup/tree/master/core/database.go?s=4491:4535#L163)
+### <a name="Checkin.BeforeCreate">func</a> (\*Checkin) [BeforeCreate](https://github.com/hunterlong/statup/tree/master/core/database.go?s=4621:4665#L168)
 ``` go
 func (c *Checkin) BeforeCreate() (err error)
 ```
@@ -591,7 +602,7 @@ Count24HFailures returns the amount of failures for a service within the last 24
 
 
 
-### <a name="Core.CountOnline">func</a> (\*Core) [CountOnline](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11277:11309#L403)
+### <a name="Core.CountOnline">func</a> (\*Core) [CountOnline](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11724:11756#L421)
 ``` go
 func (c *Core) CountOnline() int
 ```
@@ -637,7 +648,7 @@ SelectAllServices returns a slice of *core.Service to be store on []*core.Servic
 
 
 
-### <a name="Core.ServicesCount">func</a> (\*Core) [ServicesCount](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11198:11232#L398)
+### <a name="Core.ServicesCount">func</a> (\*Core) [ServicesCount](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11645:11679#L416)
 ``` go
 func (c *Core) ServicesCount() int
 ```
@@ -729,7 +740,7 @@ DbConfig stores the config.yml file for the statup configuration
 
 
 
-### <a name="EnvToConfig">func</a> [EnvToConfig](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=3378:3406#L122)
+### <a name="EnvToConfig">func</a> [EnvToConfig](https://github.com/hunterlong/statup/tree/master/core/configs.go?s=3402:3430#L121)
 ``` go
 func EnvToConfig() *DbConfig
 ```
@@ -753,7 +764,7 @@ LoadUsingEnv will attempt to load database configs based on environment variable
 
 
 
-### <a name="DbConfig.Close">func</a> (\*DbConfig) [Close](https://github.com/hunterlong/statup/tree/master/core/database.go?s=2697:2730#L90)
+### <a name="DbConfig.Close">func</a> (\*DbConfig) [Close](https://github.com/hunterlong/statup/tree/master/core/database.go?s=2827:2860#L95)
 ``` go
 func (db *DbConfig) Close() error
 ```
@@ -762,7 +773,7 @@ Close shutsdown the database connection
 
 
 
-### <a name="DbConfig.Connect">func</a> (\*DbConfig) [Connect](https://github.com/hunterlong/statup/tree/master/core/database.go?s=5353:5415#L195)
+### <a name="DbConfig.Connect">func</a> (\*DbConfig) [Connect](https://github.com/hunterlong/statup/tree/master/core/database.go?s=5483:5545#L200)
 ``` go
 func (db *DbConfig) Connect(retry bool, location string) error
 ```
@@ -771,7 +782,7 @@ Connect will attempt to connect to the sqlite, postgres, or mysql database
 
 
 
-### <a name="DbConfig.CreateCore">func</a> (\*DbConfig) [CreateCore](https://github.com/hunterlong/statup/tree/master/core/database.go?s=8585:8622#L300)
+### <a name="DbConfig.CreateCore">func</a> (\*DbConfig) [CreateCore](https://github.com/hunterlong/statup/tree/master/core/database.go?s=8715:8752#L305)
 ``` go
 func (c *DbConfig) CreateCore() *Core
 ```
@@ -780,7 +791,7 @@ CreateCore will initialize the global variable 'CoreApp". This global variable c
 
 
 
-### <a name="DbConfig.CreateDatabase">func</a> (\*DbConfig) [CreateDatabase](https://github.com/hunterlong/statup/tree/master/core/database.go?s=9635:9677#L336)
+### <a name="DbConfig.CreateDatabase">func</a> (\*DbConfig) [CreateDatabase](https://github.com/hunterlong/statup/tree/master/core/database.go?s=9812:9854#L342)
 ``` go
 func (db *DbConfig) CreateDatabase() error
 ```
@@ -789,7 +800,7 @@ CreateDatabase will CREATE TABLES for each of the Statup elements
 
 
 
-### <a name="DbConfig.DropDatabase">func</a> (\*DbConfig) [DropDatabase](https://github.com/hunterlong/statup/tree/master/core/database.go?s=9082:9122#L322)
+### <a name="DbConfig.DropDatabase">func</a> (\*DbConfig) [DropDatabase](https://github.com/hunterlong/statup/tree/master/core/database.go?s=9212:9252#L327)
 ``` go
 func (db *DbConfig) DropDatabase() error
 ```
@@ -798,7 +809,7 @@ DropDatabase will DROP each table Statup created
 
 
 
-### <a name="DbConfig.InsertCore">func</a> (\*DbConfig) [InsertCore](https://github.com/hunterlong/statup/tree/master/core/database.go?s=4861:4908#L179)
+### <a name="DbConfig.InsertCore">func</a> (\*DbConfig) [InsertCore](https://github.com/hunterlong/statup/tree/master/core/database.go?s=4991:5038#L184)
 ``` go
 func (db *DbConfig) InsertCore() (*Core, error)
 ```
@@ -807,7 +818,7 @@ InsertCore create the single row for the Core settings in Statup
 
 
 
-### <a name="DbConfig.MigrateDatabase">func</a> (\*DbConfig) [MigrateDatabase](https://github.com/hunterlong/statup/tree/master/core/database.go?s=10416:10459#L353)
+### <a name="DbConfig.MigrateDatabase">func</a> (\*DbConfig) [MigrateDatabase](https://github.com/hunterlong/statup/tree/master/core/database.go?s=10640:10683#L360)
 ``` go
 func (db *DbConfig) MigrateDatabase() error
 ```
@@ -818,7 +829,7 @@ If this function has an issue, it will ROLLBACK to the previous state.
 
 
 
-### <a name="DbConfig.Save">func</a> (\*DbConfig) [Save](https://github.com/hunterlong/statup/tree/master/core/database.go?s=8057:8102#L280)
+### <a name="DbConfig.Save">func</a> (\*DbConfig) [Save](https://github.com/hunterlong/statup/tree/master/core/database.go?s=8187:8232#L285)
 ``` go
 func (db *DbConfig) Save() (*DbConfig, error)
 ```
@@ -827,7 +838,7 @@ Save will initially create the config.yml file
 
 
 
-### <a name="DbConfig.Update">func</a> (\*DbConfig) [Update](https://github.com/hunterlong/statup/tree/master/core/database.go?s=7694:7728#L262)
+### <a name="DbConfig.Update">func</a> (\*DbConfig) [Update](https://github.com/hunterlong/statup/tree/master/core/database.go?s=7824:7858#L267)
 ``` go
 func (db *DbConfig) Update() error
 ```
@@ -870,11 +881,89 @@ type Hit struct {
 
 
 
-### <a name="Hit.BeforeCreate">func</a> (\*Hit) [BeforeCreate](https://github.com/hunterlong/statup/tree/master/core/database.go?s=3801:3841#L131)
+### <a name="Hit.BeforeCreate">func</a> (\*Hit) [BeforeCreate](https://github.com/hunterlong/statup/tree/master/core/database.go?s=3931:3971#L136)
 ``` go
 func (h *Hit) BeforeCreate() (err error)
 ```
 BeforeCreate for Hit will set CreatedAt to UTC
+
+
+
+
+## <a name="Message">type</a> [Message](https://github.com/hunterlong/statup/tree/master/core/messages.go?s=789:828#L25)
+``` go
+type Message struct {
+    *types.Message
+}
+
+```
+
+
+
+
+
+
+### <a name="ReturnMessage">func</a> [ReturnMessage](https://github.com/hunterlong/statup/tree/master/core/messages.go?s=1109:1154#L37)
+``` go
+func ReturnMessage(m *types.Message) *Message
+```
+ReturnMessage will convert *types.Message to *core.Message
+
+
+### <a name="SelectMessage">func</a> [SelectMessage](https://github.com/hunterlong/statup/tree/master/core/messages.go?s=1429:1475#L49)
+``` go
+func SelectMessage(id int64) (*Message, error)
+```
+SelectMessage returns a Message based on the ID passed
+
+
+### <a name="SelectMessages">func</a> [SelectMessages](https://github.com/hunterlong/statup/tree/master/core/messages.go?s=1219:1260#L42)
+``` go
+func SelectMessages() ([]*Message, error)
+```
+SelectMessages returns all messages
+
+
+### <a name="SelectServiceMessages">func</a> [SelectServiceMessages](https://github.com/hunterlong/statup/tree/master/core/messages.go?s=890:937#L30)
+``` go
+func SelectServiceMessages(id int64) []*Message
+```
+SelectServiceMessages returns all messages for a service
+
+
+
+
+
+### <a name="Message.Create">func</a> (\*Message) [Create](https://github.com/hunterlong/statup/tree/master/core/messages.go?s=1764:1805#L63)
+``` go
+func (m *Message) Create() (int64, error)
+```
+Create will create a Message and insert it into the database
+
+
+
+
+### <a name="Message.Delete">func</a> (\*Message) [Delete](https://github.com/hunterlong/statup/tree/master/core/messages.go?s=2075:2107#L74)
+``` go
+func (m *Message) Delete() error
+```
+Delete will delete a Message from database
+
+
+
+
+### <a name="Message.Service">func</a> (\*Message) [Service](https://github.com/hunterlong/statup/tree/master/core/messages.go?s=1584:1620#L55)
+``` go
+func (m *Message) Service() *Service
+```
+
+
+
+### <a name="Message.Update">func</a> (\*Message) [Update](https://github.com/hunterlong/statup/tree/master/core/messages.go?s=2208:2252#L80)
+``` go
+func (m *Message) Update() (*Message, error)
+```
+Update will update a Message in the database
 
 
 
@@ -935,7 +1024,16 @@ SelectService returns a *core.Service from in memory
 
 
 
-### <a name="Service.AfterFind">func</a> (\*Service) [AfterFind](https://github.com/hunterlong/statup/tree/master/core/database.go?s=2814:2855#L95)
+### <a name="Service.ActiveMessages">func</a> (\*Service) [ActiveMessages](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11319:11364#L404)
+``` go
+func (s *Service) ActiveMessages() []*Message
+```
+ActiveMessages returns all Messages for a Service
+
+
+
+
+### <a name="Service.AfterFind">func</a> (\*Service) [AfterFind](https://github.com/hunterlong/statup/tree/master/core/database.go?s=2944:2985#L100)
 ``` go
 func (s *Service) AfterFind() (err error)
 ```
@@ -980,7 +1078,7 @@ AvgUptime24 returns a service's average online status for last 24 hours
 
 
 
-### <a name="Service.BeforeCreate">func</a> (\*Service) [BeforeCreate](https://github.com/hunterlong/statup/tree/master/core/database.go?s=4316:4360#L155)
+### <a name="Service.BeforeCreate">func</a> (\*Service) [BeforeCreate](https://github.com/hunterlong/statup/tree/master/core/database.go?s=4446:4490#L160)
 ``` go
 func (s *Service) BeforeCreate() (err error)
 ```
@@ -989,7 +1087,7 @@ BeforeCreate for Service will set CreatedAt to UTC
 
 
 
-### <a name="Service.Check">func</a> (\*Service) [Check](https://github.com/hunterlong/statup/tree/master/core/checker.go?s=5565:5601#L222)
+### <a name="Service.Check">func</a> (\*Service) [Check](https://github.com/hunterlong/statup/tree/master/core/checker.go?s=5586:5622#L222)
 ``` go
 func (s *Service) Check(record bool)
 ```
@@ -1025,7 +1123,7 @@ Checkins will return a slice of Checkins for a Service
 
 
 
-### <a name="Service.CountHits">func</a> (\*Service) [CountHits](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=1178:1222#L40)
+### <a name="Service.CountHits">func</a> (\*Service) [CountHits](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=1209:1253#L42)
 ``` go
 func (s *Service) CountHits() (int64, error)
 ```
@@ -1101,7 +1199,7 @@ DowntimeText will return the amount of downtime for a service based on the durat
 
 
 
-### <a name="Service.Hits">func</a> (\*Service) [Hits](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=1387:1433#L48)
+### <a name="Service.Hits">func</a> (\*Service) [Hits](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=1418:1464#L50)
 ``` go
 func (s *Service) Hits() ([]*types.Hit, error)
 ```
@@ -1110,7 +1208,7 @@ Hits returns all successful hits for a service
 
 
 
-### <a name="Service.HitsBetween">func</a> (\*Service) [HitsBetween](https://github.com/hunterlong/statup/tree/master/core/database.go?s=2214:2299#L77)
+### <a name="Service.HitsBetween">func</a> (\*Service) [HitsBetween](https://github.com/hunterlong/statup/tree/master/core/database.go?s=2344:2429#L82)
 ``` go
 func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) *gorm.DB
 ```
@@ -1137,11 +1235,20 @@ LimitedFailures will return the last 10 failures from a service
 
 
 
-### <a name="Service.LimitedHits">func</a> (\*Service) [LimitedHits](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=1654:1707#L56)
+### <a name="Service.LimitedHits">func</a> (\*Service) [LimitedHits](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=1685:1738#L58)
 ``` go
 func (s *Service) LimitedHits() ([]*types.Hit, error)
 ```
 LimitedHits returns the last 1024 successful/online 'hit' records for a service
+
+
+
+
+### <a name="Service.Messages">func</a> (\*Service) [Messages](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11163:11202#L398)
+``` go
+func (s *Service) Messages() []*Message
+```
+Messages returns all Messages for a Service
 
 
 
@@ -1186,7 +1293,7 @@ SmallText returns a short description about a services status
 
 
 
-### <a name="Service.Sum">func</a> (\*Service) [Sum](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=2706:2746#L88)
+### <a name="Service.Sum">func</a> (\*Service) [Sum](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=2737:2777#L90)
 ``` go
 func (s *Service) Sum() (float64, error)
 ```
@@ -1231,7 +1338,7 @@ TotalFailuresSince returns the total amount of failures for a service since a sp
 
 
 
-### <a name="Service.TotalHits">func</a> (\*Service) [TotalHits](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=2137:2182#L72)
+### <a name="Service.TotalHits">func</a> (\*Service) [TotalHits](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=2168:2213#L74)
 ``` go
 func (s *Service) TotalHits() (uint64, error)
 ```
@@ -1240,7 +1347,7 @@ TotalHits returns the total amount of successful hits a service has
 
 
 
-### <a name="Service.TotalHitsSince">func</a> (\*Service) [TotalHitsSince](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=2382:2445#L80)
+### <a name="Service.TotalHitsSince">func</a> (\*Service) [TotalHitsSince](https://github.com/hunterlong/statup/tree/master/core/hits.go?s=2413:2476#L82)
 ``` go
 func (s *Service) TotalHitsSince(ago time.Time) (uint64, error)
 ```
@@ -1276,7 +1383,7 @@ UpdateSingle will update a single column for a service
 
 
 
-## <a name="ServiceOrder">type</a> [ServiceOrder](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4312:4354#L157)
+## <a name="ServiceOrder">type</a> [ServiceOrder](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4316:4358#L155)
 ``` go
 type ServiceOrder []types.ServiceInterface
 ```
@@ -1291,7 +1398,7 @@ ServiceOrder will reorder the services based on 'order_id' (Order)
 
 
 
-### <a name="ServiceOrder.Len">func</a> (ServiceOrder) [Len](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4410:4441#L160)
+### <a name="ServiceOrder.Len">func</a> (ServiceOrder) [Len](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4414:4445#L158)
 ``` go
 func (c ServiceOrder) Len() int
 ```
@@ -1300,14 +1407,14 @@ Sort interface for resroting the Services in order
 
 
 
-### <a name="ServiceOrder.Less">func</a> (ServiceOrder) [Less](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4540:4581#L162)
+### <a name="ServiceOrder.Less">func</a> (ServiceOrder) [Less](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4544:4585#L160)
 ``` go
 func (c ServiceOrder) Less(i, j int) bool
 ```
 
 
 
-### <a name="ServiceOrder.Swap">func</a> (ServiceOrder) [Swap](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4470:4506#L161)
+### <a name="ServiceOrder.Swap">func</a> (ServiceOrder) [Swap](https://github.com/hunterlong/statup/tree/master/core/core.go?s=4474:4510#L159)
 ``` go
 func (c ServiceOrder) Swap(i, j int)
 ```
@@ -1346,18 +1453,19 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
 * [type PluginSelect](#PluginSelect)
 * [type Storage](#Storage)
   * [func NewStorage() *Storage](#NewStorage)
+  * [func (s Storage) Delete(key string)](#Storage.Delete)
   * [func (s Storage) Get(key string) []byte](#Storage.Get)
   * [func (s Storage) Set(key string, content []byte, duration time.Duration)](#Storage.Set)
 
 
 #### <a name="pkg-files">Package files</a>
-[api.go](https://github.com/hunterlong/statup/tree/master/handlers/api.go) [cache.go](https://github.com/hunterlong/statup/tree/master/handlers/cache.go) [dashboard.go](https://github.com/hunterlong/statup/tree/master/handlers/dashboard.go) [doc.go](https://github.com/hunterlong/statup/tree/master/handlers/doc.go) [handlers.go](https://github.com/hunterlong/statup/tree/master/handlers/handlers.go) [index.go](https://github.com/hunterlong/statup/tree/master/handlers/index.go) [plugins.go](https://github.com/hunterlong/statup/tree/master/handlers/plugins.go) [prometheus.go](https://github.com/hunterlong/statup/tree/master/handlers/prometheus.go) [routes.go](https://github.com/hunterlong/statup/tree/master/handlers/routes.go) [services.go](https://github.com/hunterlong/statup/tree/master/handlers/services.go) [settings.go](https://github.com/hunterlong/statup/tree/master/handlers/settings.go) [setup.go](https://github.com/hunterlong/statup/tree/master/handlers/setup.go) [users.go](https://github.com/hunterlong/statup/tree/master/handlers/users.go) 
+[api.go](https://github.com/hunterlong/statup/tree/master/handlers/api.go) [cache.go](https://github.com/hunterlong/statup/tree/master/handlers/cache.go) [dashboard.go](https://github.com/hunterlong/statup/tree/master/handlers/dashboard.go) [doc.go](https://github.com/hunterlong/statup/tree/master/handlers/doc.go) [handlers.go](https://github.com/hunterlong/statup/tree/master/handlers/handlers.go) [index.go](https://github.com/hunterlong/statup/tree/master/handlers/index.go) [messages.go](https://github.com/hunterlong/statup/tree/master/handlers/messages.go) [plugins.go](https://github.com/hunterlong/statup/tree/master/handlers/plugins.go) [prometheus.go](https://github.com/hunterlong/statup/tree/master/handlers/prometheus.go) [routes.go](https://github.com/hunterlong/statup/tree/master/handlers/routes.go) [services.go](https://github.com/hunterlong/statup/tree/master/handlers/services.go) [settings.go](https://github.com/hunterlong/statup/tree/master/handlers/settings.go) [setup.go](https://github.com/hunterlong/statup/tree/master/handlers/setup.go) [users.go](https://github.com/hunterlong/statup/tree/master/handlers/users.go) 
 
 
 
 
 
-## <a name="DesktopInit">func</a> [DesktopInit](https://github.com/hunterlong/statup/tree/master/handlers/index.go?s=1244:1281#L38)
+## <a name="DesktopInit">func</a> [DesktopInit](https://github.com/hunterlong/statup/tree/master/handlers/index.go?s=1526:1563#L48)
 ``` go
 func DesktopInit(ip string, port int)
 ```
@@ -1391,12 +1499,17 @@ RunHTTPServer will start a HTTP server on a specific IP and port
 
 
 
-## <a name="Cacher">type</a> [Cacher](https://github.com/hunterlong/statup/tree/master/handlers/cache.go?s=99:205#L12)
+## <a name="Cacher">type</a> [Cacher](https://github.com/hunterlong/statup/tree/master/handlers/cache.go?s=141:267#L13)
 ``` go
 type Cacher interface {
     Get(key string) []byte
+    Delete(key string)
     Set(key string, content []byte, duration time.Duration)
 }
+```
+
+``` go
+var CacheStorage Cacher
 ```
 
 
@@ -1407,7 +1520,7 @@ type Cacher interface {
 
 
 
-## <a name="Item">type</a> [Item](https://github.com/hunterlong/statup/tree/master/handlers/cache.go?s=237:294#L18)
+## <a name="Item">type</a> [Item](https://github.com/hunterlong/statup/tree/master/handlers/cache.go?s=299:356#L20)
 ``` go
 type Item struct {
     Content    []byte
@@ -1426,7 +1539,7 @@ Item is a cached reference
 
 
 
-### <a name="Item.Expired">func</a> (Item) [Expired](https://github.com/hunterlong/statup/tree/master/handlers/cache.go?s=345:376#L24)
+### <a name="Item.Expired">func</a> (Item) [Expired](https://github.com/hunterlong/statup/tree/master/handlers/cache.go?s=407:438#L26)
 ``` go
 func (item Item) Expired() bool
 ```
@@ -1453,7 +1566,7 @@ type PluginSelect struct {
 
 
 
-## <a name="Storage">type</a> [Storage](https://github.com/hunterlong/statup/tree/master/handlers/cache.go?s=524:591#L32)
+## <a name="Storage">type</a> [Storage](https://github.com/hunterlong/statup/tree/master/handlers/cache.go?s=586:653#L34)
 ``` go
 type Storage struct {
     // contains filtered or unexported fields
@@ -1468,17 +1581,24 @@ Storage mecanism for caching strings in memory
 
 
 
-### <a name="NewStorage">func</a> [NewStorage](https://github.com/hunterlong/statup/tree/master/handlers/cache.go?s=638:664#L38)
+### <a name="NewStorage">func</a> [NewStorage](https://github.com/hunterlong/statup/tree/master/handlers/cache.go?s=705:731#L40)
 ``` go
 func NewStorage() *Storage
 ```
-NewStorage creates a new in memory storage
+NewStorage creates a new in memory CacheStorage
 
 
 
 
 
-### <a name="Storage.Get">func</a> (Storage) [Get](https://github.com/hunterlong/statup/tree/master/handlers/cache.go?s=779:818#L46)
+### <a name="Storage.Delete">func</a> (Storage) [Delete](https://github.com/hunterlong/statup/tree/master/handlers/cache.go?s=1031:1066#L60)
+``` go
+func (s Storage) Delete(key string)
+```
+
+
+
+### <a name="Storage.Get">func</a> (Storage) [Get](https://github.com/hunterlong/statup/tree/master/handlers/cache.go?s=846:885#L48)
 ``` go
 func (s Storage) Get(key string) []byte
 ```
@@ -1487,7 +1607,7 @@ Get a cached content by key
 
 
 
-### <a name="Storage.Set">func</a> (Storage) [Set](https://github.com/hunterlong/statup/tree/master/handlers/cache.go?s=994:1066#L59)
+### <a name="Storage.Set">func</a> (Storage) [Set](https://github.com/hunterlong/statup/tree/master/handlers/cache.go?s=1160:1232#L67)
 ``` go
 func (s Storage) Set(key string, content []byte, duration time.Duration)
 ```
@@ -1525,7 +1645,7 @@ and learn how to create your own custom notifier.
 
 
 #### <a name="pkg-files">Package files</a>
-[discord.go](https://github.com/hunterlong/statup/tree/master/notifiers/discord.go) [doc.go](https://github.com/hunterlong/statup/tree/master/notifiers/doc.go) [email.go](https://github.com/hunterlong/statup/tree/master/notifiers/email.go) [line_notify.go](https://github.com/hunterlong/statup/tree/master/notifiers/line_notify.go) [mobile.go](https://github.com/hunterlong/statup/tree/master/notifiers/mobile.go) [slack.go](https://github.com/hunterlong/statup/tree/master/notifiers/slack.go) [twilio.go](https://github.com/hunterlong/statup/tree/master/notifiers/twilio.go) [webhook.go](https://github.com/hunterlong/statup/tree/master/notifiers/webhook.go) 
+[command.go](https://github.com/hunterlong/statup/tree/master/notifiers/command.go) [discord.go](https://github.com/hunterlong/statup/tree/master/notifiers/discord.go) [doc.go](https://github.com/hunterlong/statup/tree/master/notifiers/doc.go) [email.go](https://github.com/hunterlong/statup/tree/master/notifiers/email.go) [line_notify.go](https://github.com/hunterlong/statup/tree/master/notifiers/line_notify.go) [mobile.go](https://github.com/hunterlong/statup/tree/master/notifiers/mobile.go) [slack.go](https://github.com/hunterlong/statup/tree/master/notifiers/slack.go) [twilio.go](https://github.com/hunterlong/statup/tree/master/notifiers/twilio.go) [webhook.go](https://github.com/hunterlong/statup/tree/master/notifiers/webhook.go) 
 
 
 
@@ -1621,6 +1741,7 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
 * [Variables](#pkg-variables)
 * [func Assets()](#Assets)
 * [func CompileSASS(folder string) error](#CompileSASS)
+* [func CopyAllToPublic(box *rice.Box, folder string) error](#CopyAllToPublic)
 * [func CopyToPublic(box *rice.Box, folder, file string) error](#CopyToPublic)
 * [func CreateAllAssets(folder string) error](#CreateAllAssets)
 * [func DeleteAllAssets(folder string) error](#DeleteAllAssets)
@@ -1667,7 +1788,15 @@ CompileSASS will attempt to compile the SASS files into CSS
 
 
 
-## <a name="CopyToPublic">func</a> [CopyToPublic](https://github.com/hunterlong/statup/tree/master/source/source.go?s=6465:6524#L192)
+## <a name="CopyAllToPublic">func</a> [CopyAllToPublic](https://github.com/hunterlong/statup/tree/master/source/source.go?s=6048:6104#L188)
+``` go
+func CopyAllToPublic(box *rice.Box, folder string) error
+```
+CopyAllToPublic will copy all the files in a rice box into a local folder
+
+
+
+## <a name="CopyToPublic">func</a> [CopyToPublic](https://github.com/hunterlong/statup/tree/master/source/source.go?s=6645:6704#L210)
 ``` go
 func CopyToPublic(box *rice.Box, folder, file string) error
 ```
@@ -1675,7 +1804,7 @@ CopyToPublic will create a file from a rice Box to the '/assets' directory
 
 
 
-## <a name="CreateAllAssets">func</a> [CreateAllAssets](https://github.com/hunterlong/statup/tree/master/source/source.go?s=4742:4783#L154)
+## <a name="CreateAllAssets">func</a> [CreateAllAssets](https://github.com/hunterlong/statup/tree/master/source/source.go?s=4749:4790#L154)
 ``` go
 func CreateAllAssets(folder string) error
 ```
@@ -1683,7 +1812,7 @@ CreateAllAssets will dump HTML, CSS, SCSS, and JS assets into the '/assets' dire
 
 
 
-## <a name="DeleteAllAssets">func</a> [DeleteAllAssets](https://github.com/hunterlong/statup/tree/master/source/source.go?s=6123:6164#L181)
+## <a name="DeleteAllAssets">func</a> [DeleteAllAssets](https://github.com/hunterlong/statup/tree/master/source/source.go?s=5707:5748#L177)
 ``` go
 func DeleteAllAssets(folder string) error
 ```
@@ -1699,7 +1828,7 @@ HelpMarkdown will return the Markdown of help.md into HTML
 
 
 
-## <a name="MakePublicFolder">func</a> [MakePublicFolder](https://github.com/hunterlong/statup/tree/master/source/source.go?s=7032:7074#L209)
+## <a name="MakePublicFolder">func</a> [MakePublicFolder](https://github.com/hunterlong/statup/tree/master/source/source.go?s=7212:7254#L227)
 ``` go
 func MakePublicFolder(folder string) error
 ```
@@ -1707,7 +1836,7 @@ MakePublicFolder will create a new folder
 
 
 
-## <a name="OpenAsset">func</a> [OpenAsset](https://github.com/hunterlong/statup/tree/master/source/source.go?s=4432:4474#L144)
+## <a name="OpenAsset">func</a> [OpenAsset](https://github.com/hunterlong/statup/tree/master/source/source.go?s=4439:4481#L144)
 ``` go
 func OpenAsset(folder, file string) string
 ```
@@ -1784,6 +1913,23 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
 * [type FailureInterface](#FailureInterface)
 * [type Hit](#Hit)
 * [type Info](#Info)
+* [type Message](#Message)
+* [type NullBool](#NullBool)
+  * [func NewNullBool(s bool) NullBool](#NewNullBool)
+  * [func (nb *NullBool) MarshalJSON() ([]byte, error)](#NullBool.MarshalJSON)
+  * [func (nf *NullBool) UnmarshalJSON(b []byte) error](#NullBool.UnmarshalJSON)
+* [type NullFloat64](#NullFloat64)
+  * [func NewNullFloat64(s float64) NullFloat64](#NewNullFloat64)
+  * [func (ni *NullFloat64) MarshalJSON() ([]byte, error)](#NullFloat64.MarshalJSON)
+  * [func (nf *NullFloat64) UnmarshalJSON(b []byte) error](#NullFloat64.UnmarshalJSON)
+* [type NullInt64](#NullInt64)
+  * [func NewNullInt64(s int64) NullInt64](#NewNullInt64)
+  * [func (ni *NullInt64) MarshalJSON() ([]byte, error)](#NullInt64.MarshalJSON)
+  * [func (nf *NullInt64) UnmarshalJSON(b []byte) error](#NullInt64.UnmarshalJSON)
+* [type NullString](#NullString)
+  * [func NewNullString(s string) NullString](#NewNullString)
+  * [func (ns *NullString) MarshalJSON() ([]byte, error)](#NullString.MarshalJSON)
+  * [func (nf *NullString) UnmarshalJSON(b []byte) error](#NullString.UnmarshalJSON)
 * [type Plugin](#Plugin)
 * [type PluginActions](#PluginActions)
 * [type PluginInfo](#PluginInfo)
@@ -1804,7 +1950,7 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
 
 
 #### <a name="pkg-files">Package files</a>
-[checkin.go](https://github.com/hunterlong/statup/tree/master/types/checkin.go) [core.go](https://github.com/hunterlong/statup/tree/master/types/core.go) [doc.go](https://github.com/hunterlong/statup/tree/master/types/doc.go) [failure.go](https://github.com/hunterlong/statup/tree/master/types/failure.go) [plugin.go](https://github.com/hunterlong/statup/tree/master/types/plugin.go) [service.go](https://github.com/hunterlong/statup/tree/master/types/service.go) [time.go](https://github.com/hunterlong/statup/tree/master/types/time.go) [types.go](https://github.com/hunterlong/statup/tree/master/types/types.go) [user.go](https://github.com/hunterlong/statup/tree/master/types/user.go) 
+[checkin.go](https://github.com/hunterlong/statup/tree/master/types/checkin.go) [core.go](https://github.com/hunterlong/statup/tree/master/types/core.go) [doc.go](https://github.com/hunterlong/statup/tree/master/types/doc.go) [failure.go](https://github.com/hunterlong/statup/tree/master/types/failure.go) [message.go](https://github.com/hunterlong/statup/tree/master/types/message.go) [null.go](https://github.com/hunterlong/statup/tree/master/types/null.go) [plugin.go](https://github.com/hunterlong/statup/tree/master/types/plugin.go) [service.go](https://github.com/hunterlong/statup/tree/master/types/service.go) [time.go](https://github.com/hunterlong/statup/tree/master/types/time.go) [types.go](https://github.com/hunterlong/statup/tree/master/types/types.go) [user.go](https://github.com/hunterlong/statup/tree/master/types/user.go) 
 
 
 ## <a name="pkg-constants">Constants</a>
@@ -1929,7 +2075,7 @@ CheckinHit is a successful response from a Checkin
 
 
 
-## <a name="Core">type</a> [Core](https://github.com/hunterlong/statup/tree/master/types/core.go?s=1040:2639#L28)
+## <a name="Core">type</a> [Core](https://github.com/hunterlong/statup/tree/master/types/core.go?s=1040:2610#L28)
 ``` go
 type Core struct {
     Name          string             `gorm:"not null;column:name" json:"name"`
@@ -1938,11 +2084,11 @@ type Core struct {
     ApiKey        string             `gorm:"column:api_key" json:"-"`
     ApiSecret     string             `gorm:"column:api_secret" json:"-"`
     Style         string             `gorm:"not null;column:style" json:"style,omitempty"`
-    Footer        string             `gorm:"not null;column:footer" json:"footer,omitempty"`
-    Domain        string             `gorm:"not null;column:domain" json:"domain,omitempty"`
+    Footer        NullString         `gorm:"column:footer" json:"footer"`
+    Domain        string             `gorm:"not null;column:domain" json:"domain"`
     Version       string             `gorm:"column:version" json:"version"`
     MigrationId   int64              `gorm:"column:migration_id" json:"migration_id,omitempty"`
-    UseCdn        bool               `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`
+    UseCdn        NullBool           `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`
     Timezone      float32            `gorm:"column:timezone;default:-8.0" json:"timezone,omitempty"`
     CreatedAt     time.Time          `gorm:"column:created_at" json:"created_at"`
     UpdatedAt     time.Time          `gorm:"column:updated_at" json:"updated_at"`
@@ -2043,10 +2189,10 @@ a new Failure will be inserted into database.
 
 
 
-## <a name="FailureInterface">type</a> [FailureInterface](https://github.com/hunterlong/statup/tree/master/types/failure.go?s=1407:1592#L35)
+## <a name="FailureInterface">type</a> [FailureInterface](https://github.com/hunterlong/statup/tree/master/types/failure.go?s=1407:1593#L35)
 ``` go
 type FailureInterface interface {
-    Ago() string        // Ago returns a human readble timestamp
+    Ago() string        // Ago returns a human readable timestamp
     ParseError() string // ParseError returns a human readable error for a service failure
 }
 ```
@@ -2095,6 +2241,206 @@ type Info struct {
 
 
 
+
+
+
+
+## <a name="Message">type</a> [Message](https://github.com/hunterlong/statup/tree/master/types/message.go?s=793:1647#L23)
+``` go
+type Message struct {
+    Id           int64         `gorm:"primary_key;column:id" json:"id"`
+    Title        string        `gorm:"column:title" json:"title"`
+    Description  string        `gorm:"column:description" json:"description"`
+    StartOn      time.Time     `gorm:"column:start_on" json:"start_on"`
+    EndOn        time.Time     `gorm:"column:end_on" json:"end_on"`
+    ServiceId    int64         `gorm:"index;column:service" json:"service"`
+    NotifyUsers  NullBool      `gorm:"column:notify_users" json:"notify_users"`
+    NotifyMethod string        `gorm:"column:notify_method" json:"notify_method"`
+    NotifyBefore time.Duration `gorm:"column:notify_before" json:"notify_before"`
+    CreatedAt    time.Time     `gorm:"column:created_at" json:"created_at" json:"created_at"`
+    UpdatedAt    time.Time     `gorm:"column:updated_at" json:"updated_at" json:"updated_at"`
+}
+
+```
+Message is for creating Announcements, Alerts and other messages for the end users
+
+
+
+
+
+
+
+
+
+
+## <a name="NullBool">type</a> [NullBool](https://github.com/hunterlong/statup/tree/master/types/null.go?s=1456:1494#L49)
+``` go
+type NullBool struct {
+    sql.NullBool
+}
+
+```
+NullBool is an alias for sql.NullBool data type
+
+
+
+
+
+
+
+### <a name="NewNullBool">func</a> [NewNullBool](https://github.com/hunterlong/statup/tree/master/types/null.go?s=935:968#L29)
+``` go
+func NewNullBool(s bool) NullBool
+```
+NewNullBool returns a sql.NullBool for JSON parsing
+
+
+
+
+
+### <a name="NullBool.MarshalJSON">func</a> (\*NullBool) [MarshalJSON](https://github.com/hunterlong/statup/tree/master/types/null.go?s=2060:2109#L80)
+``` go
+func (nb *NullBool) MarshalJSON() ([]byte, error)
+```
+MarshalJSON for NullBool
+
+
+
+
+### <a name="NullBool.UnmarshalJSON">func</a> (\*NullBool) [UnmarshalJSON](https://github.com/hunterlong/statup/tree/master/types/null.go?s=2712:2761#L110)
+``` go
+func (nf *NullBool) UnmarshalJSON(b []byte) error
+```
+Unmarshaler for NullBool
+
+
+
+
+## <a name="NullFloat64">type</a> [NullFloat64](https://github.com/hunterlong/statup/tree/master/types/null.go?s=1652:1696#L59)
+``` go
+type NullFloat64 struct {
+    sql.NullFloat64
+}
+
+```
+NullFloat64 is an alias for sql.NullFloat64 data type
+
+
+
+
+
+
+
+### <a name="NewNullFloat64">func</a> [NewNullFloat64](https://github.com/hunterlong/statup/tree/master/types/null.go?s=1216:1258#L39)
+``` go
+func NewNullFloat64(s float64) NullFloat64
+```
+NewNullFloat64 returns a sql.NullFloat64 for JSON parsing
+
+
+
+
+
+### <a name="NullFloat64.MarshalJSON">func</a> (\*NullFloat64) [MarshalJSON](https://github.com/hunterlong/statup/tree/master/types/null.go?s=1893:1945#L72)
+``` go
+func (ni *NullFloat64) MarshalJSON() ([]byte, error)
+```
+MarshalJSON for NullFloat64
+
+
+
+
+### <a name="NullFloat64.UnmarshalJSON">func</a> (\*NullFloat64) [UnmarshalJSON](https://github.com/hunterlong/statup/tree/master/types/null.go?s=2550:2602#L103)
+``` go
+func (nf *NullFloat64) UnmarshalJSON(b []byte) error
+```
+Unmarshaler for NullFloat64
+
+
+
+
+## <a name="NullInt64">type</a> [NullInt64](https://github.com/hunterlong/statup/tree/master/types/null.go?s=1363:1403#L44)
+``` go
+type NullInt64 struct {
+    sql.NullInt64
+}
+
+```
+NullInt64 is an alias for sql.NullInt64 data type
+
+
+
+
+
+
+
+### <a name="NewNullInt64">func</a> [NewNullInt64](https://github.com/hunterlong/statup/tree/master/types/null.go?s=1071:1107#L34)
+``` go
+func NewNullInt64(s int64) NullInt64
+```
+NewNullInt64 returns a sql.NullInt64 for JSON parsing
+
+
+
+
+
+### <a name="NullInt64.MarshalJSON">func</a> (\*NullInt64) [MarshalJSON](https://github.com/hunterlong/statup/tree/master/types/null.go?s=1727:1777#L64)
+``` go
+func (ni *NullInt64) MarshalJSON() ([]byte, error)
+```
+MarshalJSON for NullInt64
+
+
+
+
+### <a name="NullInt64.UnmarshalJSON">func</a> (\*NullInt64) [UnmarshalJSON](https://github.com/hunterlong/statup/tree/master/types/null.go?s=2389:2439#L96)
+``` go
+func (nf *NullInt64) UnmarshalJSON(b []byte) error
+```
+Unmarshaler for NullInt64
+
+
+
+
+## <a name="NullString">type</a> [NullString](https://github.com/hunterlong/statup/tree/master/types/null.go?s=1551:1593#L54)
+``` go
+type NullString struct {
+    sql.NullString
+}
+
+```
+NullString is an alias for sql.NullString data type
+
+
+
+
+
+
+
+### <a name="NewNullString">func</a> [NewNullString](https://github.com/hunterlong/statup/tree/master/types/null.go?s=791:830#L24)
+``` go
+func NewNullString(s string) NullString
+```
+NewNullString returns a sql.NullString for JSON parsing
+
+
+
+
+
+### <a name="NullString.MarshalJSON">func</a> (\*NullString) [MarshalJSON](https://github.com/hunterlong/statup/tree/master/types/null.go?s=2223:2274#L88)
+``` go
+func (ns *NullString) MarshalJSON() ([]byte, error)
+```
+MarshalJSON for NullString
+
+
+
+
+### <a name="NullString.UnmarshalJSON">func</a> (\*NullString) [UnmarshalJSON](https://github.com/hunterlong/statup/tree/master/types/null.go?s=2870:2921#L117)
+``` go
+func (nf *NullString) UnmarshalJSON(b []byte) error
+```
+Unmarshaler for NullString
 
 
 
@@ -2268,35 +2614,36 @@ type Router interface {
 
 
 
-## <a name="Service">type</a> [Service](https://github.com/hunterlong/statup/tree/master/types/service.go?s=750:2527#L23)
+## <a name="Service">type</a> [Service](https://github.com/hunterlong/statup/tree/master/types/service.go?s=750:2724#L23)
 ``` go
 type Service struct {
-    Id             int64         `gorm:"primary_key;column:id" json:"id"`
-    Name           string        `gorm:"column:name" json:"name"`
-    Domain         string        `gorm:"column:domain" json:"domain"`
-    Expected       string        `gorm:"not null;column:expected" json:"expected"`
-    ExpectedStatus int           `gorm:"default:200;column:expected_status" json:"expected_status"`
-    Interval       int           `gorm:"default:30;column:check_interval" json:"check_interval"`
-    Type           string        `gorm:"column:check_type" json:"type"`
-    Method         string        `gorm:"column:method" json:"method"`
-    PostData       string        `gorm:"not null;column:post_data" json:"post_data"`
-    Port           int           `gorm:"not null;column:port" json:"port"`
-    Timeout        int           `gorm:"default:30;column:timeout" json:"timeout"`
-    Order          int           `gorm:"default:0;column:order_id" json:"order_id"`
-    CreatedAt      time.Time     `gorm:"column:created_at" json:"created_at"`
-    UpdatedAt      time.Time     `gorm:"column:updated_at" json:"updated_at"`
-    Online         bool          `gorm:"-" json:"online"`
-    Latency        float64       `gorm:"-" json:"latency"`
-    PingTime       float64       `gorm:"-" json:"ping_time"`
-    Online24Hours  float32       `gorm:"-" json:"online_24_hours"`
-    AvgResponse    string        `gorm:"-" json:"avg_response"`
-    Running        chan bool     `gorm:"-" json:"-"`
-    Checkpoint     time.Time     `gorm:"-" json:"-"`
-    SleepDuration  time.Duration `gorm:"-" json:"-"`
-    LastResponse   string        `gorm:"-" json:"-"`
-    LastStatusCode int           `gorm:"-" json:"status_code"`
-    LastOnline     time.Time     `gorm:"-" json:"last_online"`
-    Failures       []interface{} `gorm:"-" json:"failures,omitempty"`
+    Id                 int64         `gorm:"primary_key;column:id" json:"id"`
+    Name               string        `gorm:"column:name" json:"name"`
+    Domain             string        `gorm:"column:domain" json:"domain"`
+    Expected           NullString    `gorm:"column:expected" json:"expected"`
+    ExpectedStatus     int           `gorm:"default:200;column:expected_status" json:"expected_status"`
+    Interval           int           `gorm:"default:30;column:check_interval" json:"check_interval"`
+    Type               string        `gorm:"column:check_type" json:"type"`
+    Method             string        `gorm:"column:method" json:"method"`
+    PostData           NullString    `gorm:"column:post_data" json:"post_data"`
+    Port               int           `gorm:"not null;column:port" json:"port"`
+    Timeout            int           `gorm:"default:30;column:timeout" json:"timeout"`
+    Order              int           `gorm:"default:0;column:order_id" json:"order_id"`
+    AllowNotifications NullBool      `gorm:"default:false;column:allow_notifications" json:"allow_notifications"`
+    CreatedAt          time.Time     `gorm:"column:created_at" json:"created_at"`
+    UpdatedAt          time.Time     `gorm:"column:updated_at" json:"updated_at"`
+    Online             bool          `gorm:"-" json:"online"`
+    Latency            float64       `gorm:"-" json:"latency"`
+    PingTime           float64       `gorm:"-" json:"ping_time"`
+    Online24Hours      float32       `gorm:"-" json:"online_24_hours"`
+    AvgResponse        string        `gorm:"-" json:"avg_response"`
+    Running            chan bool     `gorm:"-" json:"-"`
+    Checkpoint         time.Time     `gorm:"-" json:"-"`
+    SleepDuration      time.Duration `gorm:"-" json:"-"`
+    LastResponse       string        `gorm:"-" json:"-"`
+    LastStatusCode     int           `gorm:"-" json:"status_code"`
+    LastOnline         time.Time     `gorm:"-" json:"last_online"`
+    Failures           []interface{} `gorm:"-" json:"failures,omitempty"`
 }
 
 ```
@@ -2311,7 +2658,7 @@ Service is the main struct for Services
 
 
 
-### <a name="Service.Close">func</a> (\*Service) [Close](https://github.com/hunterlong/statup/tree/master/types/service.go?s=2887:2912#L67)
+### <a name="Service.Close">func</a> (\*Service) [Close](https://github.com/hunterlong/statup/tree/master/types/service.go?s=3084:3109#L68)
 ``` go
 func (s *Service) Close()
 ```
@@ -2320,7 +2667,7 @@ Close will stop the go routine that is checking if service is online or not
 
 
 
-### <a name="Service.IsRunning">func</a> (\*Service) [IsRunning](https://github.com/hunterlong/statup/tree/master/types/service.go?s=3023:3057#L74)
+### <a name="Service.IsRunning">func</a> (\*Service) [IsRunning](https://github.com/hunterlong/statup/tree/master/types/service.go?s=3220:3254#L75)
 ``` go
 func (s *Service) IsRunning() bool
 ```
@@ -2329,7 +2676,7 @@ IsRunning returns true if the service go routine is running
 
 
 
-### <a name="Service.Start">func</a> (\*Service) [Start](https://github.com/hunterlong/statup/tree/master/types/service.go?s=2748:2773#L62)
+### <a name="Service.Start">func</a> (\*Service) [Start](https://github.com/hunterlong/statup/tree/master/types/service.go?s=2945:2970#L63)
 ``` go
 func (s *Service) Start()
 ```
@@ -2338,7 +2685,7 @@ Start will create a channel for the service checking go routine
 
 
 
-## <a name="ServiceInterface">type</a> [ServiceInterface](https://github.com/hunterlong/statup/tree/master/types/service.go?s=2529:2679#L52)
+## <a name="ServiceInterface">type</a> [ServiceInterface](https://github.com/hunterlong/statup/tree/master/types/service.go?s=2726:2876#L53)
 ``` go
 type ServiceInterface interface {
     Select() *Service
@@ -2367,7 +2714,7 @@ type User struct {
     Email         string    `gorm:"type:varchar(100);unique;column:email" json:"-"`
     ApiKey        string    `gorm:"column:api_key" json:"api_key"`
     ApiSecret     string    `gorm:"column:api_secret" json:"-"`
-    Admin         bool      `gorm:"column:administrator" json:"admin"`
+    Admin         NullBool  `gorm:"column:administrator" json:"admin"`
     CreatedAt     time.Time `gorm:"column:created_at" json:"created_at"`
     UpdatedAt     time.Time `gorm:"column:updated_at" json:"updated_at"`
     UserInterface `gorm:"-" json:"-"`
@@ -2432,6 +2779,7 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
 
 
 ## <a name="pkg-index">Index</a>
+* [Constants](#pkg-constants)
 * [Variables](#pkg-variables)
 * [func Command(cmd string) (string, string, error)](#Command)
 * [func DeleteDirectory(directory string) error](#DeleteDirectory)
@@ -2466,6 +2814,14 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
 [doc.go](https://github.com/hunterlong/statup/tree/master/utils/doc.go) [encryption.go](https://github.com/hunterlong/statup/tree/master/utils/encryption.go) [log.go](https://github.com/hunterlong/statup/tree/master/utils/log.go) [time.go](https://github.com/hunterlong/statup/tree/master/utils/time.go) [utils.go](https://github.com/hunterlong/statup/tree/master/utils/utils.go) 
 
 
+## <a name="pkg-constants">Constants</a>
+``` go
+const (
+    FlatpickrTime     = "2006-01-02 15:04"
+    FlatpickrDay      = "2006-01-02"
+    FlatpickrReadable = "Mon, 02 Jan 2006"
+)
+```
 
 ## <a name="pkg-variables">Variables</a>
 ``` go
@@ -2553,7 +2909,7 @@ FileExists returns true if a file exists
 
 
 
-## <a name="FormatDuration">func</a> [FormatDuration](https://github.com/hunterlong/statup/tree/master/utils/time.go?s=771:814#L24)
+## <a name="FormatDuration">func</a> [FormatDuration](https://github.com/hunterlong/statup/tree/master/utils/time.go?s=896:939#L30)
 ``` go
 func FormatDuration(d time.Duration) string
 ```

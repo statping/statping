@@ -37,7 +37,7 @@ var command = &commandLine{&notifier.Notification{
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
 	Delay:       time.Duration(1 * time.Second),
-	Icon:        "fas fa-command-alt",
+	Icon:        "fas fa-terminal",
 	Host:        "sh",
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
