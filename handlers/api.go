@@ -16,7 +16,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -297,7 +296,10 @@ func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
-	users, _ := core.SelectAllUsers()
+	users, err := core.SelectAllUsers()
+	if err != nil {
+		utils.Log(3, err)
+	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(users)
 }
@@ -311,13 +313,13 @@ func apiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&user)
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	newUser := core.ReturnUser(user)
 	uId, err := newUser.Create()
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	output := apiResponse{
@@ -368,7 +370,7 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	notifer.Port = notification.Port
 	notifer.Password = notification.Password
 	notifer.Username = notification.Username
-	notifer.Enabled = sql.NullBool{notification.Enabled.Bool, true}
+	notifer.Enabled = notification.Enabled
 	notifer.ApiKey = notification.ApiKey
 	notifer.ApiSecret = notification.ApiSecret
 
@@ -380,6 +382,101 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(notifer)
+}
+
+func apiAllMessagesHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	messages, err := core.SelectMessages()
+	if err != nil {
+		http.Error(w, fmt.Sprintf("error fetching all messages: %v", err), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(messages)
+}
+
+func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	vars := mux.Vars(r)
+	message, err := core.SelectMessage(utils.StringInt(vars["id"]))
+	if err != nil {
+		http.Error(w, fmt.Sprintf("message #%v was not found", vars["id"]), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(message)
+}
+
+func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	vars := mux.Vars(r)
+	message, err := core.SelectMessage(utils.StringInt(vars["id"]))
+	if err != nil {
+		http.Error(w, fmt.Sprintf("message #%v was not found", vars["id"]), http.StatusInternalServerError)
+		return
+	}
+	err = message.Delete()
+	if err != nil {
+		http.Error(w, fmt.Sprintf("message #%v could not be deleted %v", vars["id"], err), http.StatusInternalServerError)
+		return
+	}
+
+	output := apiResponse{
+		Object: "message",
+		Method: "delete",
+		Id:     message.Id,
+		Status: "success",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(output)
+}
+
+func apiMessageUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		return
+	}
+	vars := mux.Vars(r)
+	message, err := core.SelectMessage(utils.StringInt(vars["id"]))
+	if err != nil {
+		http.Error(w, fmt.Sprintf("message #%v was not found", vars["id"]), http.StatusInternalServerError)
+		return
+	}
+	var messageBody *types.Message
+	decoder := json.NewDecoder(r.Body)
+	err = decoder.Decode(&messageBody)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	messageBody.Id = message.Id
+	message = core.ReturnMessage(messageBody)
+	_, err = message.Update()
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	output := apiResponse{
+		Object: "message",
+		Method: "update",
+		Id:     message.Id,
+		Status: "success",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(output)
 }
 
 func isAPIAuthorized(r *http.Request) bool {

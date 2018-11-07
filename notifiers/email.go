@@ -164,7 +164,6 @@ func (u *email) Send(msg interface{}) error {
 	email := msg.(*emailOutgoing)
 	err := u.dialSend(email)
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("email Notifier could not send email: %v", err))
 		return err
 	}
 	return nil
@@ -246,7 +245,7 @@ func (u *email) OnTest() error {
 		Method:         "GET",
 		Timeout:        20,
 		LastStatusCode: 200,
-		Expected:       utils.NullString("test example"),
+		Expected:       types.NewNullString("test example"),
 		LastResponse:   "<html>this is an example response</html>",
 		CreatedAt:      time.Now().Add(-24 * time.Hour),
 	}
@@ -271,7 +270,7 @@ func (u *email) dialSend(email *emailOutgoing) error {
 	m.SetHeader("Subject", email.Subject)
 	m.SetBody("text/html", email.Source)
 	if err := mailer.DialAndSend(m); err != nil {
-		utils.Log(3, fmt.Sprintf("email '%v' sent to: %v using the %v template (size: %v) %v", email.Subject, email.To, email.Template, len([]byte(email.Source)), err))
+		utils.Log(3, fmt.Sprintf("email '%v' sent to: %v (size: %v) %v", email.Subject, email.To, len([]byte(email.Source)), err))
 		return err
 	}
 	return nil

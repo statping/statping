@@ -16,7 +16,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
@@ -64,7 +63,7 @@ func updateUserHandler(w http.ResponseWriter, r *http.Request) {
 	user.Username = r.PostForm.Get("username")
 	user.Email = r.PostForm.Get("email")
 	isAdmin := r.PostForm.Get("admin") == "on"
-	user.Admin = sql.NullBool{isAdmin, true}
+	user.Admin = types.NewNullBool(isAdmin)
 	password := r.PostForm.Get("password")
 	if password != "##########" {
 		user.Password = utils.HashPassword(password)
@@ -97,7 +96,7 @@ func createUserHandler(w http.ResponseWriter, r *http.Request) {
 		Username: username,
 		Password: password,
 		Email:    email,
-		Admin:    sql.NullBool{admin == "on", true},
+		Admin:    types.NewNullBool(admin == "on"),
 	})
 	_, err := user.Create()
 	if err != nil {

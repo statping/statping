@@ -16,12 +16,12 @@
 package handlers
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/source"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 	"net/url"
@@ -57,7 +57,7 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	footer := r.PostForm.Get("footer")
 	if footer != app.Footer.String {
-		app.Footer = utils.NullString(footer)
+		app.Footer = types.NewNullString(footer)
 	}
 	domain := r.PostForm.Get("domain")
 	if domain != app.Domain {
@@ -67,7 +67,7 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	timeFloat, _ := strconv.ParseFloat(timezone, 10)
 	app.Timezone = float32(timeFloat)
 
-	app.UseCdn = utils.NullBool(r.PostForm.Get("enable_cdn") == "on")
+	app.UseCdn = types.NewNullBool(r.PostForm.Get("enable_cdn") == "on")
 	core.CoreApp, _ = core.UpdateCore(app)
 	//notifiers.OnSettingsSaved(core.CoreApp.ToCore())
 	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
@@ -189,7 +189,7 @@ func saveNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	if limits != 0 {
 		notifer.Limits = limits
 	}
-	notifer.Enabled = sql.NullBool{enabled == "on", true}
+	notifer.Enabled = types.NewNullBool(enabled == "on")
 
 	_, err = notifier.Update(notif, notifer)
 	if err != nil {
@@ -255,7 +255,7 @@ func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	if limits != 0 {
 		notifer.Limits = limits
 	}
-	notifer.Enabled = sql.NullBool{enabled == "on", true}
+	notifer.Enabled = types.NewNullBool(enabled == "on")
 
 	err = notif.(notifier.Tester).OnTest()
 	if err == nil {

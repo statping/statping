@@ -16,7 +16,6 @@
 package types
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -28,7 +27,7 @@ type Message struct {
 	StartOn      time.Time     `gorm:"column:start_on"`
 	EndOn        time.Time     `gorm:"column:end_on"`
 	ServiceId    int64         `gorm:"index;column:service"`
-	NotifyUsers  sql.NullBool  `gorm:"column:notify_users"`
+	NotifyUsers  NullBool      `gorm:"column:notify_users"`
 	NotifyMethod string        `gorm:"column:notify_method"`
 	NotifyBefore time.Duration `gorm:"column:notify_before"`
 	CreatedAt    time.Time     `gorm:"column:created_at" json:"created_at"`

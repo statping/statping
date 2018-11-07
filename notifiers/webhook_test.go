@@ -23,14 +23,14 @@ import (
 )
 
 var (
-	WEBHOOK_URL    = "https://jsonplaceholder.typicode.com/posts"
+	webhookTestUrl = "https://jsonplaceholder.typicode.com/posts"
 	webhookMessage = `{ "title": "%service.Id", "body": "%service.Name", "online": %service.Online, "userId": 19999 }`
 	apiKey         = "application/json"
 	fullMsg        string
 )
 
 func init() {
-	webhook.Host = WEBHOOK_URL
+	webhook.Host = webhookTestUrl
 	webhook.Var1 = "POST"
 }
 
@@ -40,13 +40,13 @@ func TestWebhookNotifier(t *testing.T) {
 	currentCount = CountNotifiers()
 
 	t.Run("Load webhooker", func(t *testing.T) {
-		webhook.Host = WEBHOOK_URL
+		webhook.Host = webhookTestUrl
 		webhook.Delay = time.Duration(100 * time.Millisecond)
 		webhook.ApiKey = apiKey
 		err := notifier.AddNotifier(webhook)
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", webhook.Author)
-		assert.Equal(t, WEBHOOK_URL, webhook.Host)
+		assert.Equal(t, webhookTestUrl, webhook.Host)
 		assert.Equal(t, apiKey, webhook.ApiKey)
 	})
 
@@ -101,7 +101,7 @@ func TestWebhookNotifier(t *testing.T) {
 	t.Run("webhooker Queue", func(t *testing.T) {
 		go notifier.Queue(webhook)
 		time.Sleep(8 * time.Second)
-		assert.Equal(t, WEBHOOK_URL, webhook.Host)
+		assert.Equal(t, webhookTestUrl, webhook.Host)
 		assert.Equal(t, 1, len(webhook.Queue))
 	})
 

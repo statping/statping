@@ -176,7 +176,7 @@ func TestApiAllUsersHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	var obj []types.User
 	formatJSON(body, &obj)
-	assert.Equal(t, true, obj[0].Admin)
+	assert.Equal(t, true, obj[0].Admin.Bool)
 	assert.Equal(t, "admin", obj[0].Username)
 }
 
@@ -191,6 +191,7 @@ func TestApiCreateUserHandler(t *testing.T) {
 	body := rr.Body.String()
 	var obj apiResponse
 	formatJSON(body, &obj)
+	t.Log(body)
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, "create", obj.Method)
 	assert.Contains(t, "success", obj.Status)
@@ -203,8 +204,9 @@ func TestApiViewUserHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	var obj types.User
 	formatJSON(body, &obj)
+	t.Log(body)
 	assert.Equal(t, "admin", obj.Username)
-	assert.Equal(t, true, obj.Admin)
+	assert.Equal(t, true, obj.Admin.Bool)
 }
 
 func TestApiUpdateUserHandler(t *testing.T) {
@@ -220,7 +222,7 @@ func TestApiUpdateUserHandler(t *testing.T) {
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
 	assert.Equal(t, "adminupdated", obj.Username)
-	assert.Equal(t, true, obj.Admin)
+	assert.Equal(t, true, obj.Admin.Bool)
 }
 
 func TestApiDeleteUserHandler(t *testing.T) {

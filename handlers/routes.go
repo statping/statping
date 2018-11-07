@@ -121,10 +121,18 @@ func Router() *mux.Router {
 	r.Handle("/api/users/{id}", http.HandlerFunc(apiUserUpdateHandler)).Methods("POST")
 	r.Handle("/api/users/{id}", http.HandlerFunc(apiUserDeleteHandler)).Methods("DELETE")
 
-	// API Notifier Routes
+	// API NOTIFIER Routes
 	r.Handle("/api/notifier/{notifier}", http.HandlerFunc(apiNotifierGetHandler)).Methods("GET")
 	r.Handle("/api/notifier/{notifier}", http.HandlerFunc(apiNotifierUpdateHandler)).Methods("POST")
 
+	// API MESSAGES Routes
+	r.Handle("/api/messages", http.HandlerFunc(apiAllMessagesHandler)).Methods("GET")
+	r.Handle("/api/messages", http.HandlerFunc(apiNotifierUpdateHandler)).Methods("POST")
+	r.Handle("/api/messages/{id}", http.HandlerFunc(apiMessageGetHandler)).Methods("GET")
+	r.Handle("/api/messages/{id}", http.HandlerFunc(apiMessageUpdateHandler)).Methods("POST")
+	r.Handle("/api/messages/{id}", http.HandlerFunc(apiMessageDeleteHandler)).Methods("DELETE")
+
+	// API Generic Routes
 	r.Handle("/metrics", http.HandlerFunc(prometheusHandler))
 	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
 	r.Handle("/tray", http.HandlerFunc(trayHandler))

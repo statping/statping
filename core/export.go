@@ -17,9 +17,9 @@ package core
 
 import (
 	"bytes"
-	"database/sql"
 	"fmt"
 	"github.com/hunterlong/statup/source"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"html/template"
 )
@@ -33,7 +33,7 @@ func ExportIndexHTML() string {
 	source.Assets()
 	injectDatabase()
 	CoreApp.SelectAllServices(false)
-	CoreApp.UseCdn = sql.NullBool{true, true}
+	CoreApp.UseCdn = types.NewNullBool(true)
 	for _, srv := range CoreApp.Services {
 		service := srv.(*Service)
 		service.Check(true)

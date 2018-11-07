@@ -82,6 +82,7 @@ func SelectAllUsers() ([]*user, error) {
 	db := usersDB().Find(&users)
 	if db.Error != nil {
 		utils.Log(3, fmt.Sprintf("Failed to load all users. %v", db.Error))
+		return nil, db.Error
 	}
 	return users, db.Error
 }

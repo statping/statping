@@ -16,7 +16,6 @@
 package core
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
@@ -61,11 +60,11 @@ func InsertSampleData() error {
 		Name:           "JSON API Tester",
 		Domain:         "https://jsonplaceholder.typicode.com/posts",
 		ExpectedStatus: 201,
-		Expected:       utils.NullString(`(title)": "((\\"|[statup])*)"`),
+		Expected:       types.NewNullString(`(title)": "((\\"|[statup])*)"`),
 		Interval:       30,
 		Type:           "http",
 		Method:         "POST",
-		PostData:       utils.NullString(`{ "title": "statup", "body": "bar", "userId": 19999 }`),
+		PostData:       types.NewNullString(`{ "title": "statup", "body": "bar", "userId": 19999 }`),
 		Timeout:        30,
 		Order:          4,
 	})
@@ -158,7 +157,7 @@ func insertSampleCore() error {
 		Domain:      "http://localhost:8080",
 		Version:     "test",
 		CreatedAt:   time.Now(),
-		UseCdn:      sql.NullBool{false, true},
+		UseCdn:      types.NewNullBool(false),
 	}
 	query := coreDB().Create(core)
 	return query.Error
@@ -170,14 +169,14 @@ func insertSampleUsers() {
 		Username: "testadmin",
 		Password: "password123",
 		Email:    "info@betatude.com",
-		Admin:    sql.NullBool{true, true},
+		Admin:    types.NewNullBool(true),
 	})
 
 	u3 := ReturnUser(&types.User{
 		Username: "testadmin2",
 		Password: "password123",
 		Email:    "info@adminhere.com",
-		Admin:    sql.NullBool{true, true},
+		Admin:    types.NewNullBool(true),
 	})
 
 	u2.Create()

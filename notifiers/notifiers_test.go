@@ -36,7 +36,7 @@ var TestService = &types.Service{
 	Name:           "Interpol - All The Rage Back Home",
 	Domain:         "https://www.youtube.com/watch?v=-u6DvRyyKGU",
 	ExpectedStatus: 200,
-	Expected:       "test example",
+	Expected:       types.NewNullString("test example"),
 	Interval:       30,
 	Type:           "http",
 	Method:         "GET",

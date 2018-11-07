@@ -16,7 +16,6 @@
 package types
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -33,11 +32,11 @@ type Core struct {
 	ApiKey        string             `gorm:"column:api_key" json:"-"`
 	ApiSecret     string             `gorm:"column:api_secret" json:"-"`
 	Style         string             `gorm:"not null;column:style" json:"style,omitempty"`
-	Footer        sql.NullString     `gorm:"column:footer" json:"footer"`
+	Footer        NullString         `gorm:"column:footer" json:"footer"`
 	Domain        string             `gorm:"not null;column:domain" json:"domain"`
 	Version       string             `gorm:"column:version" json:"version"`
 	MigrationId   int64              `gorm:"column:migration_id" json:"migration_id,omitempty"`
-	UseCdn        sql.NullBool       `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`
+	UseCdn        NullBool           `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`
 	Timezone      float32            `gorm:"column:timezone;default:-8.0" json:"timezone,omitempty"`
 	CreatedAt     time.Time          `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt     time.Time          `gorm:"column:updated_at" json:"updated_at"`
@@ -49,10 +48,3 @@ type Core struct {
 	AllPlugins    []PluginActions    `gorm:"-" json:"-"`
 	Notifications []AllNotifiers     `gorm:"-" json:"-"`
 }
-
-//type CoreInterface interface {
-//	SelectAllServices() ([]*Service, error)
-//	Count24HFailures() uint64
-//	ServicesCount() int
-//	CountOnline() int
-//}

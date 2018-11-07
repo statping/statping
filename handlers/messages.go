@@ -97,7 +97,7 @@ func updateMessageHandler(w http.ResponseWriter, r *http.Request) {
 
 	message.Title = title
 	message.Description = description
-	message.NotifyUsers = utils.NullBool(notifyUsers == "on")
+	message.NotifyUsers = types.NewNullBool(notifyUsers == "on")
 	message.NotifyMethod = notifyMethod
 	message.StartOn = start.UTC()
 	message.EndOn = end.UTC()
@@ -134,7 +134,7 @@ func createMessageHandler(w http.ResponseWriter, r *http.Request) {
 		StartOn:      start.UTC(),
 		EndOn:        end.UTC(),
 		ServiceId:    serviceId,
-		NotifyUsers:  utils.NullBool(notifyUsers == "on"),
+		NotifyUsers:  types.NewNullBool(notifyUsers == "on"),
 		NotifyMethod: notifyMethod,
 		NotifyBefore: before,
 	})

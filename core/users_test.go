@@ -17,7 +17,6 @@ package core
 
 import (
 	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -27,7 +26,7 @@ func TestCreateUser(t *testing.T) {
 		Username: "hunter",
 		Password: "password123",
 		Email:    "test@email.com",
-		Admin:    utils.NullBool(true),
+		Admin:    types.NewNullBool(true),
 	})
 	userId, err := user.Create()
 	assert.Nil(t, err)
@@ -71,7 +70,7 @@ func TestCreateUser2(t *testing.T) {
 		Username: "hunterlong",
 		Password: "password123",
 		Email:    "user@email.com",
-		Admin:    utils.NullBool(true),
+		Admin:    types.NewNullBool(true),
 	})
 	userId, err := user.Create()
 	assert.Nil(t, err)

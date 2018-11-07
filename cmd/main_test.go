@@ -291,7 +291,7 @@ func RunSelectAllNotifiers(t *testing.T) {
 	notifier.SetDB(core.DbSession)
 	core.CoreApp.Notifications = notifier.Load()
 	assert.Nil(t, err)
-	assert.Equal(t, 7, len(core.CoreApp.Notifications))
+	assert.Equal(t, 8, len(core.CoreApp.Notifications))
 }
 
 func RunUserSelectAll(t *testing.T) {
@@ -305,7 +305,7 @@ func RunUserCreate(t *testing.T) {
 		Username: "hunterlong",
 		Password: "password123",
 		Email:    "info@gmail.com",
-		Admin:    utils.NullBool(true),
+		Admin:    types.NewNullBool(true),
 	})
 	id, err := user.Create()
 	assert.Nil(t, err)
@@ -314,7 +314,7 @@ func RunUserCreate(t *testing.T) {
 		Username: "superadmin",
 		Password: "admin",
 		Email:    "info@adminer.com",
-		Admin:    utils.NullBool(true),
+		Admin:    types.NewNullBool(true),
 	})
 	id, err = user2.Create()
 	assert.Nil(t, err)

@@ -152,7 +152,7 @@ func (w *webhooker) OnTest() error {
 		Method:         "GET",
 		Timeout:        20,
 		LastStatusCode: 404,
-		Expected:       utils.NullString("test example"),
+		Expected:       types.NewNullString("test example"),
 		LastResponse:   "<html>this is an example response</html>",
 		CreatedAt:      time.Now().Add(-24 * time.Hour),
 	}

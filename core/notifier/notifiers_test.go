@@ -138,7 +138,7 @@ func TestNotification_Update(t *testing.T) {
 func TestEnableNotification(t *testing.T) {
 	notifier, err := SelectNotification(example)
 	assert.Nil(t, err)
-	notifier.Enabled = utils.NullBool(true)
+	notifier.Enabled = types.NewNullBool(true)
 	updated, err := Update(example, notifier)
 	assert.Nil(t, err)
 	assert.True(t, updated.Enabled.Bool)
@@ -180,57 +180,57 @@ func TestOnSave(t *testing.T) {
 
 func TestOnSuccess(t *testing.T) {
 	OnSuccess(service)
-	assert.Equal(t, 7, len(example.Queue))
+	assert.Equal(t, 2, len(example.Queue))
 }
 
 func TestOnFailure(t *testing.T) {
 	OnFailure(service, failure)
-	assert.Equal(t, 8, len(example.Queue))
+	assert.Equal(t, 3, len(example.Queue))
 }
 
 func TestOnNewService(t *testing.T) {
 	OnNewService(service)
-	assert.Equal(t, 9, len(example.Queue))
+	assert.Equal(t, 4, len(example.Queue))
 }
 
 func TestOnUpdatedService(t *testing.T) {
 	OnUpdatedService(service)
-	assert.Equal(t, 10, len(example.Queue))
+	assert.Equal(t, 5, len(example.Queue))
 }
 
 func TestOnDeletedService(t *testing.T) {
 	OnDeletedService(service)
-	assert.Equal(t, 11, len(example.Queue))
+	assert.Equal(t, 6, len(example.Queue))
 }
 
 func TestOnNewUser(t *testing.T) {
 	OnNewUser(user)
-	assert.Equal(t, 12, len(example.Queue))
+	assert.Equal(t, 7, len(example.Queue))
 }
 
 func TestOnUpdatedUser(t *testing.T) {
 	OnUpdatedUser(user)
-	assert.Equal(t, 13, len(example.Queue))
+	assert.Equal(t, 8, len(example.Queue))
 }
 
 func TestOnDeletedUser(t *testing.T) {
 	OnDeletedUser(user)
-	assert.Equal(t, 14, len(example.Queue))
+	assert.Equal(t, 9, len(example.Queue))
 }
 
 func TestOnUpdatedCore(t *testing.T) {
 	OnUpdatedCore(core)
-	assert.Equal(t, 15, len(example.Queue))
+	assert.Equal(t, 10, len(example.Queue))
 }
 
 func TestOnUpdatedNotifier(t *testing.T) {
 	OnUpdatedNotifier(example.Select())
-	assert.Equal(t, 16, len(example.Queue))
+	assert.Equal(t, 11, len(example.Queue))
 }
 
 func TestRunAllQueueAndStop(t *testing.T) {
 	assert.True(t, example.IsRunning())
-	assert.Equal(t, 16, len(example.Queue))
+	assert.Equal(t, 11, len(example.Queue))
 	go Queue(example)
 	time.Sleep(13 * time.Second)
 	assert.NotZero(t, len(example.Queue))

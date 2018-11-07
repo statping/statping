@@ -104,12 +104,12 @@ func createServiceHandler(w http.ResponseWriter, r *http.Request) {
 		Name:           name,
 		Domain:         domain,
 		Method:         method,
-		Expected:       utils.NullString(expected),
+		Expected:       types.NewNullString(expected),
 		ExpectedStatus: status,
 		Interval:       interval,
 		Type:           checkType,
 		Port:           port,
-		PostData:       utils.NullString(postData),
+		PostData:       types.NewNullString(postData),
 		Timeout:        timeout,
 		Order:          order,
 	})
@@ -199,11 +199,11 @@ func servicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	service.Domain = domain
 	service.Method = method
 	service.ExpectedStatus = status
-	service.Expected = utils.NullString(expected)
+	service.Expected = types.NewNullString(expected)
 	service.Interval = interval
 	service.Type = checkType
 	service.Port = port
-	service.PostData = utils.NullString(postData)
+	service.PostData = types.NewNullString(postData)
 	service.Timeout = timeout
 	service.Order = order
 

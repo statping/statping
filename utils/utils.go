@@ -16,7 +16,6 @@
 package utils
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/ararog/timeago"
@@ -42,14 +41,6 @@ func init() {
 	} else {
 		Directory = dir()
 	}
-}
-
-func NullString(s string) sql.NullString {
-	return sql.NullString{s, true}
-}
-
-func NullBool(s bool) sql.NullBool {
-	return sql.NullBool{s, true}
 }
 
 func StringPoint(s string) *string {
