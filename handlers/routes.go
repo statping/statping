@@ -122,6 +122,7 @@ func Router() *mux.Router {
 	r.Handle("/api/users/{id}", http.HandlerFunc(apiUserDeleteHandler)).Methods("DELETE")
 
 	// API NOTIFIER Routes
+	r.Handle("/api/notifiers", http.HandlerFunc(apiNotifiersHandler)).Methods("GET")
 	r.Handle("/api/notifier/{notifier}", http.HandlerFunc(apiNotifierGetHandler)).Methods("GET")
 	r.Handle("/api/notifier/{notifier}", http.HandlerFunc(apiNotifierUpdateHandler)).Methods("POST")
 

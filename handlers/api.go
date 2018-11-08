@@ -479,6 +479,20 @@ func apiMessageUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(output)
 }
 
+func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	var notifiers []*notifier.Notification
+	for _, n := range core.CoreApp.Notifications {
+		notif := n.(notifier.Notifier)
+		notifiers = append(notifiers, notif.Select())
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(notifiers)
+}
+
 func isAPIAuthorized(r *http.Request) bool {
 	if os.Getenv("GO_ENV") == "test" {
 		return true

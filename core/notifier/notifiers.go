@@ -48,21 +48,21 @@ type Notification struct {
 	ApiSecret   string             `gorm:"not null;column:api_secret" json:"api_secret,omitempty"`
 	Enabled     types.NullBool     `gorm:"column:enabled;type:boolean;default:false" json:"enabled"`
 	Limits      int                `gorm:"not null;column:limits" json:"limits"`
-	Removable   bool               `gorm:"column:removable" json:"-"`
+	Removable   bool               `gorm:"column:removable" json:"removeable"`
 	CreatedAt   time.Time          `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt   time.Time          `gorm:"column:updated_at" json:"updated_at"`
 	Form        []NotificationForm `gorm:"-" json:"form"`
-	logs        []*NotificationLog `gorm:"-" json:"-"`
+	logs        []*NotificationLog `gorm:"-" json:"logs"`
 	Title       string             `gorm:"-" json:"title"`
 	Description string             `gorm:"-" json:"description"`
-	Author      string             `gorm:"-" json:"-"`
-	AuthorUrl   string             `gorm:"-" json:"-"`
-	Icon        string             `gorm:"-" json:"-"`
+	Author      string             `gorm:"-" json:"author"`
+	AuthorUrl   string             `gorm:"-" json:"author_url"`
+	Icon        string             `gorm:"-" json:"icon"`
 	Delay       time.Duration      `gorm:"-" json:"delay"`
-	Queue       []*QueueData       `gorm:"-" json:"-"`
+	Queue       []*QueueData       `gorm:"-" json:"queue"`
 	Running     chan bool          `gorm:"-" json:"-"`
-	Online      bool               `gorm:"-" json:"-"`
-	testable    bool               `gorm:"-" json:"-"`
+	Online      bool               `gorm:"-" json:"online"`
+	testable    bool               `gorm:"-" json:"testable"`
 }
 
 // QueueData is the struct for the messaging queue with service
@@ -73,19 +73,19 @@ type QueueData struct {
 
 // NotificationForm contains the HTML fields for each variable/input you want the notifier to accept.
 type NotificationForm struct {
-	Type        string // the html input type (text, password, email)
-	Title       string // include a title for ease of use
-	Placeholder string // add a placeholder for the input
-	DbField     string // true variable key for input
-	SmallText   string // insert small text under a html input
-	Required    bool   // require this input on the html form
+	Type        string `json:"type"`        // the html input type (text, password, email)
+	Title       string `json:"title"`       // include a title for ease of use
+	Placeholder string `json:"placeholder"` // add a placeholder for the input
+	DbField     string `json:"field"`       // true variable key for input
+	SmallText   string `json:"small_text"`  // insert small text under a html input
+	Required    bool   `json:"required"`    // require this input on the html form
 }
 
 // NotificationLog contains the normalized message from previously sent notifications
 type NotificationLog struct {
-	Message   string
-	Time      utils.Timestamp
-	Timestamp time.Time
+	Message   string          `json:"message"`
+	Time      utils.Timestamp `json:"time"`
+	Timestamp time.Time       `json:"timestamp"`
 }
 
 // AddQueue will add any type of interface (json, string, struct, etc) into the Notifiers queue
