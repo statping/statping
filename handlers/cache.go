@@ -87,6 +87,12 @@ func cached(duration, contentType string, handler func(w http.ResponseWriter, r 
 			c := httptest.NewRecorder()
 			handler(c, r)
 			content := c.Body.Bytes()
+			result := c.Result()
+			if result.StatusCode != 200 {
+				w.WriteHeader(result.StatusCode)
+				w.Write(content)
+				return
+			}
 			if d, err := time.ParseDuration(duration); err == nil {
 				CacheStorage.Set(r.RequestURI, content, d)
 			}

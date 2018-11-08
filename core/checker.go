@@ -246,13 +246,13 @@ func recordSuccess(s *Service) {
 // recordFailure will create a new 'failure' record in the database for a offline service
 func recordFailure(s *Service, issue string) {
 	s.Online = false
-	fail := &types.Failure{
+	fail := &failure{&types.Failure{
 		Service:   s.Id,
 		Issue:     issue,
 		PingTime:  s.PingTime,
 		CreatedAt: time.Now(),
-	}
+	}}
 	utils.Log(2, fmt.Sprintf("Service %v Failing: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
 	s.CreateFailure(fail)
-	notifier.OnFailure(s.Service, fail)
+	notifier.OnFailure(s.Service, fail.Failure)
 }

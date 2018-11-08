@@ -256,10 +256,10 @@ func TestServiceFailedTCPCheck(t *testing.T) {
 }
 
 func TestCreateServiceFailure(t *testing.T) {
-	fail := &types.Failure{
+	fail := &failure{&types.Failure{
 		Issue:  "This is not an issue, but it would container HTTP response errors.",
 		Method: "http",
-	}
+	}}
 	service := SelectService(8)
 	id, err := service.CreateFailure(fail)
 	assert.Nil(t, err)

@@ -58,8 +58,8 @@ type Notification struct {
 	Author      string             `gorm:"-" json:"author"`
 	AuthorUrl   string             `gorm:"-" json:"author_url"`
 	Icon        string             `gorm:"-" json:"icon"`
-	Delay       time.Duration      `gorm:"-" json:"delay"`
-	Queue       []*QueueData       `gorm:"-" json:"queue"`
+	Delay       time.Duration      `gorm:"-" json:"delay,string"`
+	Queue       []*QueueData       `gorm:"-" json:"-"`
 	Running     chan bool          `gorm:"-" json:"-"`
 	Online      bool               `gorm:"-" json:"online"`
 	testable    bool               `gorm:"-" json:"testable"`

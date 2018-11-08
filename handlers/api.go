@@ -37,7 +37,7 @@ type apiResponse struct {
 
 func apiIndexHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	var out core.Core
@@ -55,7 +55,7 @@ func apiIndexHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	var err error
@@ -70,7 +70,7 @@ func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
@@ -121,7 +121,7 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
@@ -137,7 +137,7 @@ func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	var service *types.Service
@@ -159,7 +159,7 @@ func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
@@ -185,7 +185,7 @@ func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
@@ -211,14 +211,13 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	allServices := core.CoreApp.Services
 	var services []types.ServiceInterface
 	for _, s := range allServices {
 		service := s.Select()
-		service.Failures = nil
 		services = append(services, core.ReturnService(service))
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -227,7 +226,7 @@ func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiUserHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
@@ -242,7 +241,7 @@ func apiUserHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
@@ -267,7 +266,7 @@ func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
@@ -293,7 +292,7 @@ func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	users, err := core.SelectAllUsers()
@@ -306,7 +305,7 @@ func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	var user *types.User
@@ -334,7 +333,7 @@ func apiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
@@ -349,7 +348,7 @@ func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
@@ -386,7 +385,7 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiAllMessagesHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	messages, err := core.SelectMessages()
@@ -400,7 +399,7 @@ func apiAllMessagesHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
@@ -415,7 +414,7 @@ func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
@@ -443,7 +442,7 @@ func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiMessageUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAPIAuthorized(r) {
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
@@ -480,8 +479,8 @@ func apiMessageUpdateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+	if !isAPIAuthorized(r) {
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	var notifiers []*notifier.Notification
@@ -491,6 +490,37 @@ func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(notifiers)
+}
+
+func apiAllServiceFailuresHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	allServices, _ := core.CoreApp.SelectAllServices(false)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(allServices)
+}
+
+func apiServiceFailuresHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	vars := mux.Vars(r)
+	service := core.SelectService(utils.StringInt(vars["id"]))
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(service.AllFailures())
+}
+
+func sendUnauthorizedJson(w http.ResponseWriter, r *http.Request) {
+	data := map[string]interface{}{
+		"error": "unauthorized",
+		"url":   r.RequestURI,
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusUnauthorized)
+	json.NewEncoder(w).Encode(data)
 }
 
 func isAPIAuthorized(r *http.Request) bool {

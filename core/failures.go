@@ -29,7 +29,8 @@ type failure struct {
 }
 
 // CreateFailure will create a new failure record for a service
-func (s *Service) CreateFailure(f *types.Failure) (int64, error) {
+func (s *Service) CreateFailure(fail types.FailureInterface) (int64, error) {
+	f := fail.(*failure)
 	f.Service = s.Id
 	s.Failures = append(s.Failures, f)
 	row := failuresDB().Create(f)
@@ -64,10 +65,10 @@ func (s *Service) DeleteFailures() {
 	s.Failures = nil
 }
 
-// LimitedFailures will return the last 10 failures from a service
-func (s *Service) LimitedFailures() []*failure {
+// LimitedFailures will return the last amount of failures from a service
+func (s *Service) LimitedFailures(amount int64) []*failure {
 	var failArr []*failure
-	col := failuresDB().Where("service = ?", s.Id).Order("id desc").Limit(10)
+	col := failuresDB().Where("service = ?", s.Id).Order("id asc").Limit(amount)
 	col.Find(&failArr)
 	return failArr
 }
@@ -76,6 +77,11 @@ func (s *Service) LimitedFailures() []*failure {
 func (f *failure) Ago() string {
 	got, _ := timeago.TimeAgoWithTime(time.Now(), f.CreatedAt)
 	return got
+}
+
+// Select returns a *types.Failure
+func (f *failure) Select() *types.Failure {
+	return f.Failure
 }
 
 // Delete will remove a failure record from the database

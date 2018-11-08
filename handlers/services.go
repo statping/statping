@@ -33,7 +33,6 @@ func renderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/javascript")
 	w.Header().Set("Cache-Control", "max-age=60")
 
-	//var data []string
 	end := time.Now().UTC()
 	start := time.Now().Add((-24 * 7) * time.Hour).UTC()
 	var srvs []*core.Service

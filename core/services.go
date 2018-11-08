@@ -92,7 +92,11 @@ func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 			service.Start()
 			service.CheckinProcess()
 		}
-		service.AllFailures()
+		failures := service.LimitedFailures(100)
+		service.Failures = nil
+		for _, fail := range failures {
+			service.Failures = append(service.Failures, fail)
+		}
 		CoreApp.Services = append(CoreApp.Services, service)
 	}
 	sort.Sort(ServiceOrder(CoreApp.Services))
@@ -164,7 +168,7 @@ type DateScanObj struct {
 
 // lastFailure returns the last failure a service had
 func (s *Service) lastFailure() *failure {
-	limited := s.LimitedFailures()
+	limited := s.LimitedFailures(1)
 	if len(limited) == 0 {
 		return nil
 	}
@@ -176,7 +180,7 @@ func (s *Service) lastFailure() *failure {
 //		service.SmallText()
 //		// Online since Monday 3:04:05PM, Jan _2 2006
 func (s *Service) SmallText() string {
-	last := s.LimitedFailures()
+	last := s.LimitedFailures(1)
 	hits, _ := s.LimitedHits()
 	zone := CoreApp.Timezone
 	if s.Online {

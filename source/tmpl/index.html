@@ -75,17 +75,6 @@
                 </div>
             </div>
 
-        {{if .ActiveMessages}}
-            <div class="col-12 mb-4">
-            {{range .ActiveMessages}}
-                <div class="alert alert-warning" role="alert">
-                    <h3>{{.Title}}</h3>
-                    <span>{{safe .Description}}</span>
-                </div>
-            {{end}}
-            </div>
-        {{end}}
-
         </div>
     </div>
 {{ end }}

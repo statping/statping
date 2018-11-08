@@ -350,11 +350,11 @@ func insertFailureRecords(since time.Time, amount int64) {
 		for fi := int64(1); fi <= amount; fi++ {
 			createdAt = createdAt.Add(2 * time.Minute)
 
-			failure := &types.Failure{
+			failure := &failure{&types.Failure{
 				Service:   service.Id,
 				Issue:     "testing right here",
 				CreatedAt: createdAt,
-			}
+			}}
 
 			service.CreateFailure(failure)
 		}

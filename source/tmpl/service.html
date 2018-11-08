@@ -70,9 +70,10 @@
         <div class="col-12 small text-center mt-3 text-muted">{{$s.DowntimeText}}</div>
     {{end}}
 
-    {{ if $s.LimitedFailures }}
+    {{$failures := $s.LimitedFailures 16}}
+    {{ if $failures }}
         <div class="list-group mt-3 mb-4">
-        {{ range $s.LimitedFailures }}
+        {{ range $failures }}
             <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                 <div class="d-flex w-100 justify-content-between">
                     <h5 class="mb-1">{{.ParseError}}</h5>

@@ -33,10 +33,11 @@
                 </div>
 
             {{ range Services }}
-            {{ if .LimitedFailures }}
+            {{$failures := .LimitedFailures 16}}
+            {{ if $failures }}
                 <h4 class="text-truncate">{{.Name}} Failures</h4>
                 <div class="list-group mt-3 mb-4">
-                {{ range .LimitedFailures }}
+                {{ range $failures }}
                     <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                         <div class="d-flex w-100 justify-content-between">
                             <h5 class="mb-1">{{.ParseError}}</h5>

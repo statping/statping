@@ -112,6 +112,7 @@ func Router() *mux.Router {
 	r.Handle("/api/services/{id}/ping", http.HandlerFunc(apiServicePingDataHandler)).Methods("GET")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceUpdateHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceDeleteHandler)).Methods("DELETE")
+	r.Handle("/api/service/{id}/failures", http.HandlerFunc(apiServiceFailuresHandler)).Methods("GET")
 	r.Handle("/api/checkin/{api}", http.HandlerFunc(apiCheckinHandler))
 
 	// API USER Routes

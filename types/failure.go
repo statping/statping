@@ -22,17 +22,17 @@ import (
 // Failure is a failed attempt to check a service. Any a service does not meet the expected requirements,
 // a new Failure will be inserted into database.
 type Failure struct {
-	Id               int64     `gorm:"primary_key;column:id" json:"id"`
-	Issue            string    `gorm:"column:issue" json:"issue"`
-	Method           string    `gorm:"column:method" json:"method,omitempty"`
-	MethodId         int64     `gorm:"column:method_id" json:"method_id,omitempty"`
-	Service          int64     `gorm:"index;column:service" json:"-"`
-	PingTime         float64   `gorm:"column:ping_time"`
-	CreatedAt        time.Time `gorm:"column:created_at" json:"created_at"`
-	FailureInterface `gorm:"-" json:"-"`
+	Id        int64     `gorm:"primary_key;column:id" json:"id"`
+	Issue     string    `gorm:"column:issue" json:"issue"`
+	Method    string    `gorm:"column:method" json:"method,omitempty"`
+	MethodId  int64     `gorm:"column:method_id" json:"method_id,omitempty"`
+	Service   int64     `gorm:"index;column:service" json:"-"`
+	PingTime  float64   `gorm:"column:ping_time"  json:"ping"`
+	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 }
 
 type FailureInterface interface {
+	Select() *Failure
 	Ago() string        // Ago returns a human readable timestamp
 	ParseError() string // ParseError returns a human readable error for a service failure
 }
