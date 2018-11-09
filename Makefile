@@ -18,6 +18,9 @@ PATH:=$(PATH)
 # build all arch's and release Statup
 release: dev-deps build-all
 
+# build and push the images to docker hub
+docker: docker-build-all docker-publish-all
+
 # test all versions of Statup, golang testing and then cypress UI testing
 test-all: dev-deps test
 

@@ -214,12 +214,7 @@ func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
-	allServices := core.CoreApp.Services
-	var services []types.ServiceInterface
-	for _, s := range allServices {
-		service := s.Select()
-		services = append(services, core.ReturnService(service))
-	}
+	services := core.SelectServices()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(services)
 }

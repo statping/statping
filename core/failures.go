@@ -32,7 +32,7 @@ type failure struct {
 func (s *Service) CreateFailure(fail types.FailureInterface) (int64, error) {
 	f := fail.(*failure)
 	f.Service = s.Id
-	s.Failures = append(s.Failures, f)
+	s.Failures = append(s.Failures, f.Select())
 	row := failuresDB().Create(f)
 	if row.Error != nil {
 		utils.Log(3, row.Error)
@@ -51,7 +51,7 @@ func (s *Service) AllFailures() []*failure {
 		return nil
 	}
 	for _, f := range fails {
-		s.Failures = append(s.Failures, f)
+		s.Failures = append(s.Failures, f.Select())
 	}
 	return fails
 }
@@ -68,8 +68,7 @@ func (s *Service) DeleteFailures() {
 // LimitedFailures will return the last amount of failures from a service
 func (s *Service) LimitedFailures(amount int64) []*failure {
 	var failArr []*failure
-	col := failuresDB().Where("service = ?", s.Id).Order("id asc").Limit(amount)
-	col.Find(&failArr)
+	failuresDB().Where("service = ?", s.Id).Order("id asc").Limit(amount).Find(&failArr)
 	return failArr
 }
 

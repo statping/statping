@@ -78,6 +78,20 @@ func (s *Service) LimitedCheckins() []*Checkin {
 	return checkin
 }
 
+func SelectServices() []*Service {
+	var services []*Service
+	servicesDB().Find(&services).Order("order_id desc")
+	for _, service := range services {
+		failures := service.LimitedFailures(100)
+		service.Failures = nil
+		for _, fail := range failures {
+			utils.Log(1, fail)
+			service.Failures = append(service.Failures, fail.Select())
+		}
+	}
+	return services
+}
+
 // SelectAllServices returns a slice of *core.Service to be store on []*core.Services, should only be called once on startup.
 func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 	var services []*Service
@@ -95,7 +109,7 @@ func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 		failures := service.LimitedFailures(100)
 		service.Failures = nil
 		for _, fail := range failures {
-			service.Failures = append(service.Failures, fail)
+			service.Failures = append(service.Failures, fail.Select())
 		}
 		CoreApp.Services = append(CoreApp.Services, service)
 	}
