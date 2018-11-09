@@ -125,14 +125,14 @@ func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
+	service := core.SelectServicer(utils.StringInt(vars["id"]))
 	if service == nil {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(service)
+	json.NewEncoder(w).Encode(service.Select())
 }
 
 func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -214,14 +214,13 @@ func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
-	allServices := core.CoreApp.Services
-	var services []types.ServiceInterface
-	for _, s := range allServices {
-		service := s.Select()
-		services = append(services, core.ReturnService(service))
+	services := core.Services()
+	var servicesOut []*types.Service
+	for _, s := range services {
+		servicesOut = append(servicesOut, s.Select())
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(services)
+	json.NewEncoder(w).Encode(servicesOut)
 }
 
 func apiUserHandler(w http.ResponseWriter, r *http.Request) {

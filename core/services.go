@@ -47,9 +47,19 @@ func Services() []types.ServiceInterface {
 
 // SelectService returns a *core.Service from in memory
 func SelectService(id int64) *Service {
-	for _, s := range CoreApp.Services {
+	for _, s := range Services() {
 		if s.Select().Id == id {
 			return s.(*Service)
+		}
+	}
+	return nil
+}
+
+// SelectServicer returns a types.ServiceInterface from in memory
+func SelectServicer(id int64) types.ServiceInterface {
+	for _, s := range Services() {
+		if s.Select().Id == id {
+			return s
 		}
 	}
 	return nil
@@ -92,10 +102,10 @@ func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 			service.Start()
 			service.CheckinProcess()
 		}
-		failures := service.LimitedFailures(100)
+		failures := service.LimitedFailures(limitedFailures)
 		service.Failures = nil
 		for _, fail := range failures {
-			service.Failures = append(service.Failures, fail)
+			service.Failures = append(service.Failures, fail.Select())
 		}
 		CoreApp.Services = append(CoreApp.Services, service)
 	}
