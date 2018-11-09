@@ -72,6 +72,14 @@
   version = "v1.4.0"
 
 [[projects]]
+  digest = "1:51712f342cdefcad2c867f399a3ce8223675221d4386c81cfcccd8f0656e722e"
+  name = "github.com/go-telegram-bot-api/telegram-bot-api"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "9860bdfd3a171ceafb6e1eafa163482a6ef92643"
+  version = "v4.6.4"
+
+[[projects]]
   digest = "1:342378ac4dcb378a5448dd723f0784ae519383532f5e70ade24132c4c8693202"
   name = "github.com/go-yaml/yaml"
   packages = ["."]
@@ -210,6 +218,14 @@
   version = "v1.2.2"
 
 [[projects]]
+  digest = "1:420817f94b6c172dabb8a054d0b2d257d7437a87c7c8c7ee432bc008a577fc46"
+  name = "github.com/technoweenie/multipartstreamer"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a90a01d73ae432e2611d178c18367fbaa13e0154"
+  version = "v1.0.1"
+
+[[projects]]
   branch = "master"
   digest = "1:68344dbfaa4179bb50a583eb8172ace3f1edaf3aebc24e68c03f549f6e6b60dc"
   name = "golang.org/x/crypto"
@@ -261,6 +277,7 @@
     "github.com/GeertJohan/go.rice/embedded",
     "github.com/ararog/timeago",
     "github.com/go-mail/mail",
+    "github.com/go-telegram-bot-api/telegram-bot-api",
     "github.com/go-yaml/yaml",
     "github.com/gorilla/mux",
     "github.com/gorilla/sessions",
