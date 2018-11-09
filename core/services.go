@@ -47,9 +47,19 @@ func Services() []types.ServiceInterface {
 
 // SelectService returns a *core.Service from in memory
 func SelectService(id int64) *Service {
-	for _, s := range CoreApp.Services {
+	for _, s := range Services() {
 		if s.Select().Id == id {
 			return s.(*Service)
+		}
+	}
+	return nil
+}
+
+// SelectServicer returns a types.ServiceInterface from in memory
+func SelectServicer(id int64) types.ServiceInterface {
+	for _, s := range Services() {
+		if s.Select().Id == id {
+			return s
 		}
 	}
 	return nil
@@ -76,20 +86,6 @@ func (s *Service) LimitedCheckins() []*Checkin {
 	var checkin []*Checkin
 	checkinDB().Where("service = ?", s.Id).Limit(10).Find(&checkin)
 	return checkin
-}
-
-func SelectServices() []*Service {
-	var services []*Service
-	servicesDB().Find(&services).Order("order_id desc")
-	for _, service := range services {
-		failures := service.LimitedFailures(limitedFailures)
-		service.Failures = nil
-		for _, fail := range failures {
-			utils.Log(1, fail)
-			service.Failures = append(service.Failures, fail.Select())
-		}
-	}
-	return services
 }
 
 // SelectAllServices returns a slice of *core.Service to be store on []*core.Services, should only be called once on startup.
