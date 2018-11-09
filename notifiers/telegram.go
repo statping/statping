@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-telegram-bot-api/telegram-bot-api"
@@ -13,9 +14,8 @@ import (
 )
 
 const (
-	chatID      = -242718636
-	successText = "Hallo is __statup__ success: ✅"
-	errorText   = "Hallo is __statup__ error: ⛔️"
+	successText = "Service %service.Name is *available* 🔆"
+	errorText   = "Service %service.Name is down ❗️\nIssue %failure.Issue"
 )
 
 type telegram struct {
@@ -54,6 +54,18 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func parseTelegramMessage(body string, s *types.Service, f *types.Failure) string {
+	if s != nil {
+		body = strings.Replace(body, "%service.Name", s.Name, -1)
+		body = strings.Replace(body, "%service.Id", utils.ToString(s.Id), -1)
+		body = strings.Replace(body, "%service.Online", utils.ToString(s.Online), -1)
+	}
+	if f != nil {
+		body = strings.Replace(body, "%failure.Issue", f.Issue, -1)
+	}
+	return body
 }
 
 func (u *telegram) Select() *notifier.Notification {
@@ -96,7 +108,7 @@ func (u *telegram) OnTest() error {
 
 // OnFailure will trigger failing service
 func (u *telegram) OnFailure(s *types.Service, f *types.Failure) {
-	msg := errorText
+	msg := parseTelegramMessage(errorText, s, f)
 	u.AddQueue(s.Id, msg)
 	u.Online = false
 }
@@ -105,7 +117,7 @@ func (u *telegram) OnFailure(s *types.Service, f *types.Failure) {
 func (u *telegram) OnSuccess(s *types.Service) {
 	if !u.Online {
 		u.ResetUniqueQueue(s.Id)
-		msg := successText
+		msg := parseTelegramMessage(successText, s, nil)
 		u.AddQueue(s.Id, msg)
 	}
 	u.Online = true
