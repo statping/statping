@@ -82,7 +82,7 @@ func SelectServices() []*Service {
 	var services []*Service
 	servicesDB().Find(&services).Order("order_id desc")
 	for _, service := range services {
-		failures := service.LimitedFailures(100)
+		failures := service.LimitedFailures(limitedFailures)
 		service.Failures = nil
 		for _, fail := range failures {
 			utils.Log(1, fail)
@@ -106,7 +106,7 @@ func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 			service.Start()
 			service.CheckinProcess()
 		}
-		failures := service.LimitedFailures(100)
+		failures := service.LimitedFailures(limitedFailures)
 		service.Failures = nil
 		for _, fail := range failures {
 			service.Failures = append(service.Failures, fail.Select())
