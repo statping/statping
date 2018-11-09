@@ -114,6 +114,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"USE_CDN": func() bool {
 			return core.CoreApp.UseCdn.Bool
 		},
+		"QrAuth": func() string {
+			return fmt.Sprintf("statup://setup?domain=%v&api=%v", core.CoreApp.Domain, core.CoreApp.ApiSecret)
+		},
 		"Type": func(g interface{}) []string {
 			fooType := reflect.TypeOf(g)
 			var methods []string
