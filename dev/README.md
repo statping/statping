@@ -39,6 +39,7 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
 * [func ReturnUser(u *types.User) *user](#ReturnUser)
 * [func SampleData() error](#SampleData)
 * [func SelectAllUsers() ([]*user, error)](#SelectAllUsers)
+* [func SelectServicer(id int64) types.ServiceInterface](#SelectServicer)
 * [func SelectUser(id int64) (*user, error)](#SelectUser)
 * [func SelectUsername(username string) (*user, error)](#SelectUsername)
 * [func Services() []types.ServiceInterface](#Services)
@@ -124,7 +125,7 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
   * [func (s *Service) Checkins() []*Checkin](#Service.Checkins)
   * [func (s *Service) CountHits() (int64, error)](#Service.CountHits)
   * [func (s *Service) Create(check bool) (int64, error)](#Service.Create)
-  * [func (s *Service) CreateFailure(f *types.Failure) (int64, error)](#Service.CreateFailure)
+  * [func (s *Service) CreateFailure(fail types.FailureInterface) (int64, error)](#Service.CreateFailure)
   * [func (s *Service) CreateHit(h *types.Hit) (int64, error)](#Service.CreateHit)
   * [func (s *Service) Delete() error](#Service.Delete)
   * [func (s *Service) DeleteFailures()](#Service.DeleteFailures)
@@ -133,7 +134,7 @@ More info on: <a href="https://github.com/hunterlong/statup">https://github.com/
   * [func (s *Service) Hits() ([]*types.Hit, error)](#Service.Hits)
   * [func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) *gorm.DB](#Service.HitsBetween)
   * [func (s *Service) LimitedCheckins() []*Checkin](#Service.LimitedCheckins)
-  * [func (s *Service) LimitedFailures() []*failure](#Service.LimitedFailures)
+  * [func (s *Service) LimitedFailures(amount int64) []*failure](#Service.LimitedFailures)
   * [func (s *Service) LimitedHits() ([]*types.Hit, error)](#Service.LimitedHits)
   * [func (s *Service) Messages() []*Message](#Service.Messages)
   * [func (s *Service) Online24() float32](#Service.Online24)
@@ -203,7 +204,7 @@ CloseDB will close the database connection if available
 
 
 
-## <a name="CountFailures">func</a> [CountFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=2845:2872#L99)
+## <a name="CountFailures">func</a> [CountFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=3038:3065#L108)
 ``` go
 func CountFailures() uint64
 ```
@@ -220,7 +221,7 @@ this function is currently set to delete records 7+ days old every 60 minutes
 
 
 
-## <a name="Dbtimestamp">func</a> [Dbtimestamp](https://github.com/hunterlong/statup/tree/master/core/services.go?s=5865:5917#L206)
+## <a name="Dbtimestamp">func</a> [Dbtimestamp](https://github.com/hunterlong/statup/tree/master/core/services.go?s=6231:6283#L220)
 ``` go
 func Dbtimestamp(group string, column string) string
 ```
@@ -337,6 +338,14 @@ SampleData runs all the sample data for a new Statup installation
 func SelectAllUsers() ([]*user, error)
 ```
 SelectAllUsers returns all users
+
+
+
+## <a name="SelectServicer">func</a> [SelectServicer](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1536:1588#L59)
+``` go
+func SelectServicer(id int64) types.ServiceInterface
+```
+SelectServicer returns a types.ServiceInterface from in memory
 
 
 
@@ -593,7 +602,7 @@ BaseSASS is the base design , this opens the file /assets/scss/base.scss to be e
 
 
 
-### <a name="Core.Count24HFailures">func</a> (\*Core) [Count24HFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=2573:2613#L88)
+### <a name="Core.Count24HFailures">func</a> (\*Core) [Count24HFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=2766:2806#L97)
 ``` go
 func (c *Core) Count24HFailures() uint64
 ```
@@ -602,7 +611,7 @@ Count24HFailures returns the amount of failures for a service within the last 24
 
 
 
-### <a name="Core.CountOnline">func</a> (\*Core) [CountOnline](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11724:11756#L421)
+### <a name="Core.CountOnline">func</a> (\*Core) [CountOnline](https://github.com/hunterlong/statup/tree/master/core/services.go?s=12090:12122#L435)
 ``` go
 func (c *Core) CountOnline() int
 ```
@@ -639,7 +648,7 @@ SassVars opens the file /assets/scss/variables.scss to be edited in Theme
 
 
 
-### <a name="Core.SelectAllServices">func</a> (\*Core) [SelectAllServices](https://github.com/hunterlong/statup/tree/master/core/services.go?s=2230:2294#L82)
+### <a name="Core.SelectAllServices">func</a> (\*Core) [SelectAllServices](https://github.com/hunterlong/statup/tree/master/core/services.go?s=2438:2502#L92)
 ``` go
 func (c *Core) SelectAllServices(start bool) ([]*Service, error)
 ```
@@ -648,7 +657,7 @@ SelectAllServices returns a slice of *core.Service to be store on []*core.Servic
 
 
 
-### <a name="Core.ServicesCount">func</a> (\*Core) [ServicesCount](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11645:11679#L416)
+### <a name="Core.ServicesCount">func</a> (\*Core) [ServicesCount](https://github.com/hunterlong/statup/tree/master/core/services.go?s=12011:12045#L430)
 ``` go
 func (c *Core) ServicesCount() int
 ```
@@ -675,7 +684,7 @@ UsingAssets will return true if /assets folder is present
 
 
 
-## <a name="DateScan">type</a> [DateScan](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4211:4303#L155)
+## <a name="DateScan">type</a> [DateScan](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4575:4667#L169)
 ``` go
 type DateScan struct {
     CreatedAt string `json:"x,omitempty"`
@@ -694,7 +703,7 @@ DateScan struct is for creating the charts.js graph JSON array
 
 
 
-## <a name="DateScanObj">type</a> [DateScanObj](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4374:4433#L161)
+## <a name="DateScanObj">type</a> [DateScanObj](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4738:4797#L175)
 ``` go
 type DateScanObj struct {
     Array []DateScan `json:"data"`
@@ -709,7 +718,7 @@ DateScanObj struct is for creating the charts.js graph JSON array
 
 
 
-### <a name="GraphDataRaw">func</a> [GraphDataRaw](https://github.com/hunterlong/statup/tree/master/core/services.go?s=6940:7053#L243)
+### <a name="GraphDataRaw">func</a> [GraphDataRaw](https://github.com/hunterlong/statup/tree/master/core/services.go?s=7306:7419#L257)
 ``` go
 func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group string, column string) *DateScanObj
 ```
@@ -719,7 +728,7 @@ GraphDataRaw will return all the hits between 2 times for a Service
 
 
 
-### <a name="DateScanObj.ToString">func</a> (\*DateScanObj) [ToString](https://github.com/hunterlong/statup/tree/master/core/services.go?s=7878:7917#L272)
+### <a name="DateScanObj.ToString">func</a> (\*DateScanObj) [ToString](https://github.com/hunterlong/statup/tree/master/core/services.go?s=8244:8283#L286)
 ``` go
 func (d *DateScanObj) ToString() string
 ```
@@ -1024,7 +1033,7 @@ SelectService returns a *core.Service from in memory
 
 
 
-### <a name="Service.ActiveMessages">func</a> (\*Service) [ActiveMessages](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11319:11364#L404)
+### <a name="Service.ActiveMessages">func</a> (\*Service) [ActiveMessages](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11685:11730#L418)
 ``` go
 func (s *Service) ActiveMessages() []*Message
 ```
@@ -1042,7 +1051,7 @@ AfterFind for Service will set the timezone
 
 
 
-### <a name="Service.AllFailures">func</a> (\*Service) [AllFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=1249:1291#L44)
+### <a name="Service.AllFailures">func</a> (\*Service) [AllFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=1398:1440#L52)
 ``` go
 func (s *Service) AllFailures() []*failure
 ```
@@ -1051,7 +1060,7 @@ AllFailures will return all failures attached to a service
 
 
 
-### <a name="Service.AvgTime">func</a> (\*Service) [AvgTime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3132:3167#L114)
+### <a name="Service.AvgTime">func</a> (\*Service) [AvgTime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3496:3531#L128)
 ``` go
 func (s *Service) AvgTime() float64
 ```
@@ -1060,7 +1069,7 @@ AvgTime will return the average amount of time for a service to response back su
 
 
 
-### <a name="Service.AvgUptime">func</a> (\*Service) [AvgUptime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=8279:8328#L288)
+### <a name="Service.AvgUptime">func</a> (\*Service) [AvgUptime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=8645:8694#L302)
 ``` go
 func (s *Service) AvgUptime(ago time.Time) string
 ```
@@ -1069,7 +1078,7 @@ AvgUptime returns average online status for last 24 hours
 
 
 
-### <a name="Service.AvgUptime24">func</a> (\*Service) [AvgUptime24](https://github.com/hunterlong/statup/tree/master/core/services.go?s=8109:8147#L282)
+### <a name="Service.AvgUptime24">func</a> (\*Service) [AvgUptime24](https://github.com/hunterlong/statup/tree/master/core/services.go?s=8475:8513#L296)
 ``` go
 func (s *Service) AvgUptime24() string
 ```
@@ -1105,7 +1114,7 @@ CheckQueue is the main go routine for checking a service
 
 
 
-### <a name="Service.CheckinProcess">func</a> (\*Service) [CheckinProcess](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1556:1590#L59)
+### <a name="Service.CheckinProcess">func</a> (\*Service) [CheckinProcess](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1764:1798#L69)
 ``` go
 func (s *Service) CheckinProcess()
 ```
@@ -1114,7 +1123,7 @@ CheckinProcess runs the checkin routine for each checkin attached to service
 
 
 
-### <a name="Service.Checkins">func</a> (\*Service) [Checkins](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1742:1781#L68)
+### <a name="Service.Checkins">func</a> (\*Service) [Checkins](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1950:1989#L78)
 ``` go
 func (s *Service) Checkins() []*Checkin
 ```
@@ -1132,7 +1141,7 @@ CountHits returns a int64 for all hits for a service
 
 
 
-### <a name="Service.Create">func</a> (\*Service) [Create](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10712:10763#L382)
+### <a name="Service.Create">func</a> (\*Service) [Create](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11078:11129#L396)
 ``` go
 func (s *Service) Create(check bool) (int64, error)
 ```
@@ -1141,9 +1150,9 @@ Create will create a service and insert it into the database
 
 
 
-### <a name="Service.CreateFailure">func</a> (\*Service) [CreateFailure](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=934:998#L32)
+### <a name="Service.CreateFailure">func</a> (\*Service) [CreateFailure](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=967:1042#L36)
 ``` go
-func (s *Service) CreateFailure(f *types.Failure) (int64, error)
+func (s *Service) CreateFailure(fail types.FailureInterface) (int64, error)
 ```
 CreateFailure will create a new failure record for a service
 
@@ -1159,7 +1168,7 @@ CreateHit will create a new 'hit' record in the database for a successful/online
 
 
 
-### <a name="Service.Delete">func</a> (\*Service) [Delete](https://github.com/hunterlong/statup/tree/master/core/services.go?s=9566:9598#L342)
+### <a name="Service.Delete">func</a> (\*Service) [Delete](https://github.com/hunterlong/statup/tree/master/core/services.go?s=9932:9964#L356)
 ``` go
 func (s *Service) Delete() error
 ```
@@ -1168,7 +1177,7 @@ Delete will remove a service from the database, it will also end the service che
 
 
 
-### <a name="Service.DeleteFailures">func</a> (\*Service) [DeleteFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=1698:1732#L59)
+### <a name="Service.DeleteFailures">func</a> (\*Service) [DeleteFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=1780:1814#L64)
 ``` go
 func (s *Service) DeleteFailures()
 ```
@@ -1177,7 +1186,7 @@ DeleteFailures will delete all failures for a service
 
 
 
-### <a name="Service.Downtime">func</a> (\*Service) [Downtime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=6581:6623#L229)
+### <a name="Service.Downtime">func</a> (\*Service) [Downtime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=6947:6989#L243)
 ``` go
 func (s *Service) Downtime() time.Duration
 ```
@@ -1186,7 +1195,7 @@ Downtime returns the amount of time of a offline service
 
 
 
-### <a name="Service.DowntimeText">func</a> (\*Service) [DowntimeText](https://github.com/hunterlong/statup/tree/master/core/services.go?s=5664:5703#L201)
+### <a name="Service.DowntimeText">func</a> (\*Service) [DowntimeText](https://github.com/hunterlong/statup/tree/master/core/services.go?s=6030:6069#L215)
 ``` go
 func (s *Service) DowntimeText() string
 ```
@@ -1217,7 +1226,7 @@ HitsBetween returns the gorm database query for a collection of service hits bet
 
 
 
-### <a name="Service.LimitedCheckins">func</a> (\*Service) [LimitedCheckins](https://github.com/hunterlong/statup/tree/master/core/services.go?s=1947:1993#L75)
+### <a name="Service.LimitedCheckins">func</a> (\*Service) [LimitedCheckins](https://github.com/hunterlong/statup/tree/master/core/services.go?s=2155:2201#L85)
 ``` go
 func (s *Service) LimitedCheckins() []*Checkin
 ```
@@ -1226,11 +1235,11 @@ LimitedCheckins will return a slice of Checkins for a Service
 
 
 
-### <a name="Service.LimitedFailures">func</a> (\*Service) [LimitedFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=1990:2036#L68)
+### <a name="Service.LimitedFailures">func</a> (\*Service) [LimitedFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=2079:2137#L73)
 ``` go
-func (s *Service) LimitedFailures() []*failure
+func (s *Service) LimitedFailures(amount int64) []*failure
 ```
-LimitedFailures will return the last 10 failures from a service
+LimitedFailures will return the last amount of failures from a service
 
 
 
@@ -1244,7 +1253,7 @@ LimitedHits returns the last 1024 successful/online 'hit' records for a service
 
 
 
-### <a name="Service.Messages">func</a> (\*Service) [Messages](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11163:11202#L398)
+### <a name="Service.Messages">func</a> (\*Service) [Messages](https://github.com/hunterlong/statup/tree/master/core/services.go?s=11529:11568#L412)
 ``` go
 func (s *Service) Messages() []*Message
 ```
@@ -1253,7 +1262,7 @@ Messages returns all Messages for a Service
 
 
 
-### <a name="Service.Online24">func</a> (\*Service) [Online24](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3458:3494#L127)
+### <a name="Service.Online24">func</a> (\*Service) [Online24](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3822:3858#L141)
 ``` go
 func (s *Service) Online24() float32
 ```
@@ -1262,7 +1271,7 @@ Online24 returns the service's uptime percent within last 24 hours
 
 
 
-### <a name="Service.OnlineSince">func</a> (\*Service) [OnlineSince](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3658:3710#L133)
+### <a name="Service.OnlineSince">func</a> (\*Service) [OnlineSince](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4022:4074#L147)
 ``` go
 func (s *Service) OnlineSince(ago time.Time) float32
 ```
@@ -1280,7 +1289,7 @@ Select will return the *types.Service struct for Service
 
 
 
-### <a name="Service.SmallText">func</a> (\*Service) [SmallText](https://github.com/hunterlong/statup/tree/master/core/services.go?s=4792:4828#L178)
+### <a name="Service.SmallText">func</a> (\*Service) [SmallText](https://github.com/hunterlong/statup/tree/master/core/services.go?s=5157:5193#L192)
 ``` go
 func (s *Service) SmallText() string
 ```
@@ -1302,7 +1311,7 @@ Sum returns the added value Latency for all of the services successful hits.
 
 
 
-### <a name="Service.ToJSON">func</a> (\*Service) [ToJSON](https://github.com/hunterlong/statup/tree/master/core/services.go?s=2950:2983#L108)
+### <a name="Service.ToJSON">func</a> (\*Service) [ToJSON](https://github.com/hunterlong/statup/tree/master/core/services.go?s=3314:3347#L122)
 ``` go
 func (s *Service) ToJSON() string
 ```
@@ -1311,7 +1320,7 @@ ToJSON will convert a service to a JSON string
 
 
 
-### <a name="Service.TotalFailures">func</a> (\*Service) [TotalFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=3296:3345#L116)
+### <a name="Service.TotalFailures">func</a> (\*Service) [TotalFailures](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=3489:3538#L125)
 ``` go
 func (s *Service) TotalFailures() (uint64, error)
 ```
@@ -1320,7 +1329,7 @@ TotalFailures returns the total amount of failures for a service
 
 
 
-### <a name="Service.TotalFailures24">func</a> (\*Service) [TotalFailures24](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=3097:3148#L110)
+### <a name="Service.TotalFailures24">func</a> (\*Service) [TotalFailures24](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=3290:3341#L119)
 ``` go
 func (s *Service) TotalFailures24() (uint64, error)
 ```
@@ -1329,7 +1338,7 @@ TotalFailures24 returns the amount of failures for a service within the last 24 
 
 
 
-### <a name="Service.TotalFailuresSince">func</a> (\*Service) [TotalFailuresSince](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=3570:3637#L124)
+### <a name="Service.TotalFailuresSince">func</a> (\*Service) [TotalFailuresSince](https://github.com/hunterlong/statup/tree/master/core/failures.go?s=3763:3830#L133)
 ``` go
 func (s *Service) TotalFailuresSince(ago time.Time) (uint64, error)
 ```
@@ -1356,7 +1365,7 @@ TotalHitsSince returns the total amount of hits based on a specific time/date
 
 
 
-### <a name="Service.TotalUptime">func</a> (\*Service) [TotalUptime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=8754:8792#L310)
+### <a name="Service.TotalUptime">func</a> (\*Service) [TotalUptime](https://github.com/hunterlong/statup/tree/master/core/services.go?s=9120:9158#L324)
 ``` go
 func (s *Service) TotalUptime() string
 ```
@@ -1365,7 +1374,7 @@ TotalUptime returns the total uptime percent of a service
 
 
 
-### <a name="Service.Update">func</a> (\*Service) [Update](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10228:10272#L363)
+### <a name="Service.Update">func</a> (\*Service) [Update](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10594:10638#L377)
 ``` go
 func (s *Service) Update(restart bool) error
 ```
@@ -1374,7 +1383,7 @@ Update will update a service in the database, the service's checking routine can
 
 
 
-### <a name="Service.UpdateSingle">func</a> (\*Service) [UpdateSingle](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10003:10060#L358)
+### <a name="Service.UpdateSingle">func</a> (\*Service) [UpdateSingle](https://github.com/hunterlong/statup/tree/master/core/services.go?s=10369:10426#L372)
 ``` go
 func (s *Service) UpdateSingle(attr ...interface{}) error
 ```
@@ -2163,17 +2172,16 @@ DbConfig struct is used for the database connection and creates the 'config.yml'
 
 
 
-## <a name="Failure">type</a> [Failure](https://github.com/hunterlong/statup/tree/master/types/failure.go?s=862:1405#L24)
+## <a name="Failure">type</a> [Failure](https://github.com/hunterlong/statup/tree/master/types/failure.go?s=862:1331#L24)
 ``` go
 type Failure struct {
-    Id               int64     `gorm:"primary_key;column:id" json:"id"`
-    Issue            string    `gorm:"column:issue" json:"issue"`
-    Method           string    `gorm:"column:method" json:"method,omitempty"`
-    MethodId         int64     `gorm:"column:method_id" json:"method_id,omitempty"`
-    Service          int64     `gorm:"index;column:service" json:"-"`
-    PingTime         float64   `gorm:"column:ping_time"`
-    CreatedAt        time.Time `gorm:"column:created_at" json:"created_at"`
-    FailureInterface `gorm:"-" json:"-"`
+    Id        int64     `gorm:"primary_key;column:id" json:"id"`
+    Issue     string    `gorm:"column:issue" json:"issue"`
+    Method    string    `gorm:"column:method" json:"method,omitempty"`
+    MethodId  int64     `gorm:"column:method_id" json:"method_id,omitempty"`
+    Service   int64     `gorm:"index;column:service" json:"-"`
+    PingTime  float64   `gorm:"column:ping_time"  json:"ping"`
+    CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 }
 
 ```
@@ -2189,9 +2197,10 @@ a new Failure will be inserted into database.
 
 
 
-## <a name="FailureInterface">type</a> [FailureInterface](https://github.com/hunterlong/statup/tree/master/types/failure.go?s=1407:1593#L35)
+## <a name="FailureInterface">type</a> [FailureInterface](https://github.com/hunterlong/statup/tree/master/types/failure.go?s=1333:1538#L34)
 ``` go
 type FailureInterface interface {
+    Select() *Failure
     Ago() string        // Ago returns a human readable timestamp
     ParseError() string // ParseError returns a human readable error for a service failure
 }
@@ -2643,7 +2652,7 @@ type Service struct {
     LastResponse       string        `gorm:"-" json:"-"`
     LastStatusCode     int           `gorm:"-" json:"status_code"`
     LastOnline         time.Time     `gorm:"-" json:"last_online"`
-    Failures           []interface{} `gorm:"-" json:"failures,omitempty"`
+    Failures           []*Failure    `gorm:"-" json:"failures,omitempty"`
 }
 
 ```

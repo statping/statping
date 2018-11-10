@@ -34,10 +34,10 @@ travis-test: dev-deps cypress-install test coverage
 build-all: build-mac build-linux build-windows build-alpine compress
 
 # build all docker tags
-docker-build-all: docker-build-dev docker-build-latest
+docker-build-all: docker-build-latest
 
 # push all docker tags built
-docker-publish-all: docker-push-dev docker-push-latest
+docker-publish-all: docker-push-latest
 
 # build Statup for local arch
 build: compile
@@ -138,7 +138,7 @@ docker-build-latest:
 
 # build :dev docker tag
 docker-build-dev:
-	docker build --build-arg VERSION=$(VERSION) -t hunterlong/statup:dev --no-cache -f dev/Dockerfile-dev .
+	docker build --build-arg VERSION=$(VERSION) -t hunterlong/statup:latest --no-cache -f Dockerfile .
 	docker tag hunterlong/statup:dev hunterlong/statup:dev-v$(VERSION)
 
 # build Cypress UI testing :cypress docker tag
