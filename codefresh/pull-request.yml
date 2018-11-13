@@ -1,0 +1,132 @@
+version: '1.0'
+
+stages:
+- Prepare
+- Build
+- Push
+- Deploy
+
+steps:
+  main_clone:
+    title: "Clone repository"
+    type: git-clone
+    stage: Prepare
+    description: "Initialize"
+    repo: ${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}
+    git: CF-default
+    revision: ${{CF_REVISION}}
+
+  export:
+    title: Export Environment
+    stage: Prepare
+    image: alpine
+    commands:
+    - cf_export GIT_BRANCH=${{CF_BRANCH}}
+    - cf_export BASE_HOST=us-west-2.testing.cloudposse.co
+    - cf_export NAMESPACE=pr-${{CF_PULL_REQUEST_NUMBER}}-${{CF_REPO_NAME}}
+    - cf_export APP_HOST=pr-${{CF_PULL_REQUEST_NUMBER}}-${{CF_REPO_NAME}}.us-west-2.testing.cloudposse.co
+    - cf_export HELM_REPO_ACCESS_TOKEN=${{CF_API_KEY}}
+    - cf_export HELM_REPO_AUTH_HEADER=x-access-token
+    - cf_export HELM_REPO_URL=${{CF_CTX_CF_HELM_DEFAULT_URL}}
+
+  semver:
+    title: Export semantic version
+    stage: Prepare
+    image: cloudposse/build-harness:${{BUILD_HARNESS_VERSION}}
+    commands:
+    - make git/export | tee -a ${{CF_VOLUME_PATH}}/env_vars_to_export
+    - make semver/export | tee -a ${{CF_VOLUME_PATH}}/env_vars_to_export
+    - make codefresh/pipeline/export | tee -a ${{CF_VOLUME_PATH}}/env_vars_to_export
+
+  build_image:
+    title: Build image
+    stage: Build
+    type: build
+    description: Build app
+    image_name: statup
+    dockerfile: Dockerfile
+    no_cache: false
+    no_cf_cache: false
+
+  push_image_commit:
+    title: Push image with commit based semver tags
+    stage: Push
+    type: push
+    candidate: ${{build_image}}
+    tags:
+    - "${{SEMVERSION_COMMIT_SHORT}}"
+    - "${{SEMVERSION_COMMIT}}"
+
+  set_github_deployment_status_to_pending:
+    title: Set GitHub deployment status to "pending"
+    stage: Deploy
+    image: cloudposse/github-status-updater
+    environment:
+    - GITHUB_ACTION=update_state
+    - GITHUB_TOKEN=${{GITHUB_TOKEN}}
+    - GITHUB_OWNER=${{CF_REPO_OWNER}}
+    - GITHUB_REPO=${{CF_REPO_NAME}}
+    - GITHUB_REF=${{CF_REVISION}}
+    - GITHUB_CONTEXT=Staging Environment
+    - GITHUB_STATE=pending
+    - GITHUB_DESCRIPTION=Deploying changes to ${{NAMESPACE}} namespace
+    - GITHUB_TARGET_URL=https://${{APP_HOST}}
+    when:
+      condition:
+        all:
+          githubNotificationsEnabled: "'${{GITHUB_NOTIFICATIONS_ENABLED}}' == 'true'"
+          executeForDeploy: "'${{PIPELINE_ACTION}}' == 'deploy'"
+
+  deploy_helmfile:
+    title: Deploy impacthealth with helmfile
+    stage: Deploy
+    image: cloudposse/build-harness:${{BUILD_HARNESS_VERSION}}
+    environment:
+    - CHART_NAME=statup
+    - CHART_REPO_URL=${{HELM_REPO_URL}}
+    - CHART_VERSION=${{SEMVERSION_COMMIT_SHORT}}
+    - EXTERNAL_DNS_ALPHA_KUBERNETES_IO_TARGET=ingress.us-west-2.staging.joany.net
+    - IMAGE_TAG=${{SEMVERSION_COMMIT_SHORT}}
+    - INGRESS_HOST=${{APP_HOST}}
+    - KUBE_CONTEXT=us-west-2-staging-joany-net
+    - RELEASE_NAME=${{NAMESPACE}}
+    commands:
+    # Install or upgrade tiller
+    - "make helm/toolbox/upsert"
+    # Deploy chart to cluster using helmfile (with chamber secrets)
+    - "helmfile sync"
+    when:
+      condition:
+        all:
+          executeForDeploy: "'${{PIPELINE_ACTION}}' == 'deploy'"
+
+  set_github_deployment_status_to_success:
+    title: Set GitHub deployment status to "success"
+    stage: Deploy
+    image: cloudposse/github-status-updater
+    environment:
+    - GITHUB_ACTION=update_state
+    - GITHUB_TOKEN=${{GITHUB_TOKEN}}
+    - GITHUB_OWNER=${{CF_REPO_OWNER}}
+    - GITHUB_REPO=${{CF_REPO_NAME}}
+    - GITHUB_REF=${{CF_REVISION}}
+    - GITHUB_CONTEXT=Staging Environment
+    - GITHUB_STATE=success
+    - GITHUB_DESCRIPTION=Deployed to ${{NAMESPACE}} namespace
+    - GITHUB_TARGET_URL=https://${{APP_HOST}}
+    when:
+      condition:
+        all:
+          executeForDeploy: "'${{PIPELINE_ACTION}}' == 'deploy'"
+          githubNotificationsEnabled: "'${{GITHUB_NOTIFICATIONS_ENABLED}}' == 'true'"
+
+  send_slack_notification:
+    title: Send notification to Slack channel
+    stage: Deploy
+    image: cloudposse/slack-notifier
+    commands:
+    - make codefresh/notify/slack/deploy/webapp
+    when:
+      condition:
+        all:
+          executeForDeploy: "'${{PIPELINE_ACTION}}' == 'deploy'"

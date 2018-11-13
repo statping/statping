@@ -1,0 +1,143 @@
+#
+# Helm Defaults
+# 
+helmDefaults:
+  wait: true
+  verify: false
+  timeout: 600
+  recreatePods: false
+  force: true
+
+#
+# Helm Repositories
+#
+repositories:
+  # Cloud Posse incubator repo of helm charts
+  - name: "cloudposse-incubator"
+    url: "https://charts.cloudposse.com/incubator/"
+
+#
+# Kubernetes Cluster
+#
+context: '{{ requiredEnv "KUBE_CONTEXT" }}'
+
+#
+# Helm Releases
+#
+releases:
+  # Application
+  - name: '{{ requiredEnv "RELEASE_NAME" "statup" }}'
+    chart: "cloudposse-incubator/monochart"
+    version: "0.6.1"
+    namespace: '{{ requiredEnv "NAMESPACE" "default" }}'
+    labels:
+      chart: '{{requiredEnv "CHART_NAME" }}'
+      component: "app"
+
+    # Override values for this release
+    values:
+      - image:
+          repository: r.cfcr.io/cloudposse/statup
+          tag: '{{ requiredEnv "CHART_VERSION" }}'
+          pullPolicy: Always
+          pullSecrets:
+          - '{{ requiredEnv "NAMESPACE" }}-pull-secret-dockercfg'
+        replicaCount: 2
+
+        # Healthcheck probes
+        probes:
+          livenessProbe:
+            httpGet:
+              path: "/health"
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: "/health"
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+        # Resource limits
+        resources:
+          limits:
+            cpu: 400m
+            memory: 128Mi
+          requests:
+            cpu: 200m
+            memory: 64Mi
+
+        # Service endpoint
+        service:
+          enabled: true
+          type: "ClusterIP"
+          externalPort: 80
+          internalPort: 80
+
+        # Ingress rules
+        ingress:
+          - name: "default"
+            annotations:
+              kubernetes.io/ingress.class: nginx
+              kubernetes.io/tls-acme: "true"
+              external-dns.alpha.kubernetes.io/target: '{{ requiredEnv "NGINX_INGRESS_HOSTNAME" }}'
+            hosts:
+              {{ requiredEnv "APP_HOST" }}: /
+            tls:
+            - secretName: {{ requiredEnv "RELEASE_NAME" }}-tls
+              hosts:
+               - {{ requiredEnv "APP_HOST" }}
+
+        # Deployment configuration
+        deployment:
+          enabled: true
+          strategy:
+            type: "RollingUpdate"
+            rollingUpdate:
+              maxUnavailable: 0
+          revisionHistoryLimit: 10
+
+        # Trigger job that runs /db-migrations.sh
+        job:
+          enabled: false
+          activeDeadlineSeconds: 300
+          restartPolicy: "Never"
+          annotations:
+            "helm.sh/hook": "post-install,post-upgrade"
+            "helm.sh/hook-delete-policy": "before-hook-creation"
+          pod:
+            args: ['/db-migrations.sh']
+
+        # CronJob that processes race results every 15 minutes
+        cronjob:
+          enabled: false
+          successfulJobsHistoryLimit: 1
+          failedJobsHistoryLimit: 1
+          concurrencyPolicy: "Forbid"
+          schedule: "*/15 * * * *"
+          activeDeadlineSeconds: 300
+          restartPolicy: "Never"
+          pod:
+            args: ['/cron.sh']
+
+        # Secrets for this app that are available to deployments, jobs and cronjobs
+        secrets:
+          default:
+            enabled: true
+            env:
+              DB_PASS: '{{ requiredEnv "DB_PASS" "changeme" }}'
+
+        # Config settings for this app
+        configMaps:
+          default:
+            enabled: true
+            env:
+              NAME: '{{ requiredEnv "NAME" "Demo App" }}'
+              DESCRIPTION: '{{ requiredEnv "DESCRIPTION" "This is a Statup uptime dashboard" }}'
+              VIRTUAL_HOST: '{{ requiredEnv "VIRTUAL_HOST" "localhost" }}'
+              VIRTUAL_PORT: '{{ requiredEnv "VIRTUAL_PORT" "80" }}'
+              DB_CONN: '{{ requiredEnv "DB_CONN" "postgres" }}'
+              DB_HOST: '{{ requiredEnv "DB_HOST" "db" }}'
+              DB_USER: '{{ requiredEnv "DB_USER" "statup" }}'
+              DB_DATABASE: '{{ requiredEnv "DB_DATABASE" "statup" }}'

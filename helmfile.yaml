@@ -1,0 +1,14 @@
+# 
+# List of Helmfile releases to deploy (processed in order)
+#
+#
+helmfiles:
+
+  # Provision repository pull secrets
+  - deploy/pull-secret.yaml
+
+  # Provision Postgres
+  - deploy/postgresql.yaml
+
+  # Provision application
+  - deploy/app.yaml

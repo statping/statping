@@ -1,0 +1,51 @@
+#
+# Deploy MariaDB
+#
+
+helmDefaults:
+  wait: true
+  verify: false
+  timeout: 600
+  recreatePods: false
+  force: true
+
+repositories:
+  # Stable repo of official helm charts
+  - name: "stable"
+    url: "https://kubernetes-charts.storage.googleapis.com"
+
+#
+# Kubernetes cluster
+#
+context: '{{ requiredEnv "KUBE_CONTEXT" }}'
+
+#
+# Helm Releases
+#
+releases:
+  - name: '{{ requiredEnv "RELEASE_NAME" }}-db'
+    version: "1.0.0"
+    chart: "stable/postgresql"
+    namespace: '{{ requiredEnv "NAMESPACE" }}'
+
+    # Labels to address this release
+    labels:
+      chart: "postgresql"
+      component: "database"
+
+    # Override values for this release
+    values:
+    - nameOverride: 'db'
+      fullnameOverride: 'db'
+      postgresDatabase: '{{ env "DB_DATABASE" }}'
+      postgresUser: '{{ env "DB_USER" }}'
+      postgresPassword: '{{ env "DB_PASS" }}'
+      strategy:
+        type: "Recreate"
+      resources:
+        limits:
+          memory: "512Mi"
+          cpu: "200m"
+        requests:
+          memory: "256Mi"
+          cpu: "100m"

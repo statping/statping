@@ -1,0 +1,15 @@
+version: '1.0'
+
+stages:
+- Destroy
+
+steps:
+  destroy:
+    title: Destroy namespace
+    stage: Destroy
+    image: cloudposse/build-harness:${{BUILD_HARNESS_VERSION}}
+    environment:
+    - NAMESPACE=pr-${{CF_PULL_REQUEST_NUMBER}}-${{CF_REPO_NAME}}
+    commands:
+    - "make helm/delete/namespace"
+    - "make helm/delete/namespace/empty"
