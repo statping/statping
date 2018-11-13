@@ -88,7 +88,7 @@ func init() {
 
 // Send will send a HTTP Post to the webhooker API. It accepts type: string
 func (w *webhooker) Send(msg interface{}) error {
-	resp, err := w.run(msg.(string))
+	resp, err := w.sendHttpWebhook(msg.(string))
 	if err == nil {
 		resp.Body.Close()
 	}
@@ -105,20 +105,20 @@ func replaceBodyText(body string, s *types.Service, f *types.Failure) string {
 		body = strings.Replace(body, "%service.Id", utils.ToString(s.Id), -1)
 		body = strings.Replace(body, "%service.Online", utils.ToString(s.Online), -1)
 	}
-	if f != nil {
+	if strings.Contains(body, "%failure.Issue") && f != nil {
 		body = strings.Replace(body, "%failure.Issue", f.Issue, -1)
 	}
 	return body
 }
 
-func (w *webhooker) run(body string) (*http.Response, error) {
+func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 	utils.Log(1, fmt.Sprintf("sending body: '%v' to %v as a %v request", body, w.Host, w.Var1))
 	client := new(http.Client)
 	client.Timeout = time.Duration(10 * time.Second)
 	var buf *bytes.Buffer
 	buf = bytes.NewBuffer(nil)
 	if w.Var2 != "" {
-		buf = bytes.NewBuffer([]byte(w.Var2))
+		buf = bytes.NewBuffer([]byte(body))
 	}
 	req, err := http.NewRequest(w.Var1, w.Host, buf)
 	if err != nil {
@@ -134,6 +134,7 @@ func (w *webhooker) run(body string) (*http.Response, error) {
 	if w.ApiKey != "" {
 		req.Header.Add("Content-Type", w.ApiKey)
 	}
+	req.Header.Set("User-Agent", "Statup")
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -157,7 +158,7 @@ func (w *webhooker) OnTest() error {
 		CreatedAt:      time.Now().Add(-24 * time.Hour),
 	}
 	body := replaceBodyText(w.Var2, service, nil)
-	resp, err := w.run(body)
+	resp, err := w.sendHttpWebhook(body)
 	if err != nil {
 		return err
 	}
