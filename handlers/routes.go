@@ -65,17 +65,10 @@ func Router() *mux.Router {
 
 	// USER Routes
 	r.Handle("/users", http.HandlerFunc(usersHandler)).Methods("GET")
-	r.Handle("/users", http.HandlerFunc(createUserHandler)).Methods("POST")
 	r.Handle("/user/{id}", http.HandlerFunc(usersEditHandler)).Methods("GET")
-	r.Handle("/user/{id}", http.HandlerFunc(updateUserHandler)).Methods("POST")
-	r.Handle("/user/{id}/delete", http.HandlerFunc(usersDeleteHandler)).Methods("GET")
 
 	// MESSAGES Routes
 	r.Handle("/messages", http.HandlerFunc(messagesHandler)).Methods("GET")
-	r.Handle("/messages", http.HandlerFunc(createMessageHandler)).Methods("POST")
-	r.Handle("/message/{id}", http.HandlerFunc(viewMessageHandler)).Methods("GET")
-	r.Handle("/message/{id}", http.HandlerFunc(updateMessageHandler)).Methods("POST")
-	r.Handle("/message/{id}/delete", http.HandlerFunc(deleteMessageHandler)).Methods("GET")
 
 	// SETTINGS Routes
 	r.Handle("/settings", http.HandlerFunc(settingsHandler)).Methods("GET")
@@ -89,14 +82,13 @@ func Router() *mux.Router {
 
 	// SERVICE Routes
 	r.Handle("/services", http.HandlerFunc(servicesHandler)).Methods("GET")
-	r.Handle("/services", http.HandlerFunc(createServiceHandler)).Methods("POST")
 	r.Handle("/services/reorder", http.HandlerFunc(reorderServiceHandler)).Methods("POST")
 	r.Handle("/service/{id}", http.HandlerFunc(servicesViewHandler)).Methods("GET")
-	r.Handle("/service/{id}", http.HandlerFunc(servicesUpdateHandler)).Methods("POST")
 	r.Handle("/service/{id}/edit", http.HandlerFunc(servicesViewHandler))
-	r.Handle("/service/{id}/delete", http.HandlerFunc(servicesDeleteHandler))
 	r.Handle("/service/{id}/delete_failures", http.HandlerFunc(servicesDeleteFailuresHandler)).Methods("GET")
 	r.Handle("/service/{id}/checkin", http.HandlerFunc(checkinCreateHandler)).Methods("POST")
+
+	// CHECKIN Routes
 	r.Handle("/checkin/{id}/delete", http.HandlerFunc(checkinDeleteHandler)).Methods("GET")
 	r.Handle("/checkin/{id}", http.HandlerFunc(checkinHitHandler))
 

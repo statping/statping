@@ -59,10 +59,22 @@ $('.test_notifier').on('click', function(e) {
 });
 
 $('form').submit(function() {
-	  var spinner = '<i class="fa fa-spinner fa-spin"></i>';
-    $(this).find('button[type=submit]').prop('disabled', true);
-    $(this).find('button[type=submit]').html(spinner);
+	// Spinner($(this).find('button[type=submit]'))
 });
+
+
+function Spinner(btn, off = false) {
+	btn.prop('disabled', !off);
+	if (off) {
+		let pastVal = btn.attr("data-past");
+		btn.text(pastVal);
+		btn.removeAttr("data-past");
+	} else {
+		let pastVal = btn.text();
+		btn.attr("data-past", pastVal);
+		btn.html('<i class="fa fa-spinner fa-spin"></i>');
+	}
+}
 
 $('select#service_type').on('change', function() {
     var selected = $('#service_type option:selected').val();
@@ -120,6 +132,120 @@ function PingAjaxChart(chart, service, start=0, end=9999999999, group="hour") {
       chart.update();
     }
   });
+}
+
+$('.ajax_delete').on('click', function() {
+	let obj = $(this);
+	let id = obj.attr('data-id');
+	let element = obj.attr('data-obj');
+	let url = obj.attr('href');
+	let method = obj.attr('data-method');
+	$.ajax({
+		url: url,
+		type: method,
+		data: JSON.stringify({id: id}),
+		success: function (data) {
+			if (data.status === 'error') {
+				alert(data.error)
+			} else {
+				console.log(data);
+				$('#' + element).remove();
+			}
+		}
+	});
+	return false
+});
+
+
+$('form.ajax_form').on('submit', function() {
+	const form = $(this);
+	let values = form.serializeArray();
+	let method = form.attr('method');
+	let action = form.attr('action');
+	let func = form.attr('data-func');
+	let redirect = form.attr('data-redirect');
+	let button = form.find('button[type=submit]');
+	let alerter = form.find('#alerter');
+	var arrayData = [];
+	let newArr = {};
+	Spinner(button);
+	values.forEach(function(k, v) {
+		if (k.name === "password_confirm") {
+			return
+		}
+		if (k.value === "") {
+			return
+		}
+		if (k.value === "on") {
+			k.value = true
+		}
+		if($.isNumeric(k.value)){
+			if (k.name !== "password") {
+				k.value = parseInt(k.value)
+			}
+		}
+		newArr[k.name] = k.value;
+		arrayData.push(newArr)
+	});
+	let sendData = JSON.stringify(newArr);
+	console.log('sending '+method.toUpperCase()+' '+action+':',  newArr);
+	$.ajax({
+		url: action,
+		type: method,
+		data: sendData,
+		success: function (data) {
+			console.log(data)
+			if (data.status === 'error') {
+				let alerter = form.find('#alerter');
+				alerter.html(data.error);
+				alerter.removeClass("d-none");
+				Spinner(button, true);
+			} else {
+				Spinner(button, true);
+				if (func) {
+					let fn = window[func];
+					if (typeof fn === "function") fn({form: newArr, data: data});
+				}
+				if (redirect) {
+					window.location.href = redirect;
+				}
+			}
+		}
+	});
+	return false;
+});
+
+function CreateService(output) {
+	console.log('creating service', output)
+	let form = output.form;
+	let data = output.data;
+	let objTbl = `<tr id="service_${data.id}">
+                <td><span class="drag_icon d-none d-md-inline"><i class="fas fa-bars"></i></span> ${form.name}</td>
+                <td class="d-none d-md-table-cell">${data.online}<span class="badge badge-success">ONLINE</span></td>
+                <td class="text-right">
+                    <div class="btn-group">
+                        <a href="/service/${data.id}" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> View</a>
+                        <a href="/api/services/${data.id}" class="ajax_delete btn btn-danger confirm-btn" data-method="DELETE" data-obj="service_${data.id}" data-id="${data.id}"><i class="fas fa-times"></i></a>
+                    </div>
+                </td>
+            </tr>`;
+	$('#services_table').append(objTbl);
+}
+
+function CreateUser(output) {
+	console.log('creating user', output)
+	let form = output.form;
+	let data = output.data;
+	let objTbl = `<tr id="user_${data.id}">
+                <td>${form.username}</td>
+                <td class="text-right">
+                    <div class="btn-group">
+                        <a href="/user/${data.id}" class="btn btn-outline-secondary"><i class="fas fa-user-edit"></i> Edit</a>
+                        <a href="/api/users/${data.id}" class="ajax_delete btn btn-danger confirm-btn" data-method="DELETE" data-obj="user_${data.id}" data-id="${data.id}"><i class="fas fa-times"></i></a>
+                    </div>
+                </td>
+            </tr>`;
+	$('#users_table').append(objTbl);
 }
 
 $('select#service_check_type').on('change', function() {

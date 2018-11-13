@@ -199,7 +199,7 @@ func CopyAllToPublic(box *rice.Box, folder string) error {
 		if err != nil {
 			return nil
 		}
-		filePath := fmt.Sprintf("%v%v", folder, path)
+		filePath := fmt.Sprintf("%v/%v", folder, path)
 		SaveAsset(file, utils.Directory, filePath)
 		return nil
 	})

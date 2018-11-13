@@ -1,5 +1,9 @@
 {{define "form_user"}}
-<form action="{{if ne .Id 0}}/user/{{.Id}}{{else}}/users{{end}}" method="POST">
+{{if ne .Id 0}}
+<form class="ajax_form" action="/api/users/{{.Id}}" data-redirect="/users" method="POST">
+{{else}}
+<form class="ajax_form" action="/api/users" data-redirect="/users" method="POST">
+{{end}}
     <div class="form-group row">
         <label for="username" class="col-sm-4 col-form-label">Username</label>
         <div class="col-6 col-md-4">
@@ -21,13 +25,13 @@
     <div class="form-group row">
         <label for="password" class="col-sm-4 col-form-label">Password</label>
         <div class="col-sm-8">
-            <input type="password" name="password" class="form-control" id="password" value="##########" placeholder="Password" required>
+            <input type="password" name="password" class="form-control" id="password" {{if ne .Id 0}}value="##########"{{end}} placeholder="Password" required>
         </div>
     </div>
     <div class="form-group row">
         <label for="password_confirm" class="col-sm-4 col-form-label">Confirm Password</label>
         <div class="col-sm-8">
-            <input type="password" name="password_confirm" class="form-control" id="password_confirm" value="##########" placeholder="Confirm Password" required>
+            <input type="password" name="password_confirm" class="form-control" id="password_confirm" {{if ne .Id 0}}value="##########"{{end}} placeholder="Confirm Password" required>
         </div>
     </div>
     <div class="form-group row">
@@ -35,5 +39,6 @@
             <button type="submit" class="btn btn-primary btn-block">{{if ne .Id 0}}Update User{{else}}Create User{{end}}</button>
         </div>
     </div>
+    <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
 </form>
 {{end}}

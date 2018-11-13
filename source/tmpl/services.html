@@ -5,8 +5,8 @@
 
     <div class="col-12">
 
+        {{if ne (len .) 0}}
         <h3>Services</h3>
-
         <table class="table">
             <thead>
             <tr>
@@ -15,21 +15,22 @@
                 <th scope="col"></th>
             </tr>
             </thead>
-            <tbody class="sortable">
+            <tbody class="sortable" id="services_table">
             {{range .}}
-            <tr id="{{.Id}}">
+            <tr id="service_{{.Id}}">
                 <td><span class="drag_icon d-none d-md-inline"><i class="fas fa-bars"></i></span> {{.Name}}</td>
                 <td class="d-none d-md-table-cell">{{if .Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}} </td>
                 <td class="text-right">
                     <div class="btn-group">
                         <a href="/service/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> View</a>
-                        <a href="/service/{{.Id}}/delete" class="btn btn-danger confirm-btn"><i class="fas fa-times"></i></a>
+                        <a href="/api/services/{{.Id}}" class="ajax_delete btn btn-danger confirm-btn" data-method="DELETE" data-obj="service_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>
                     </div>
                 </td>
             </tr>
             {{end}}
             </tbody>
         </table>
+        {{end}}
 
         <h3>Create Service</h3>
 

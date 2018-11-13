@@ -17,9 +17,6 @@ You can change multiple settings in your Statup instance.
 # Users
 Users can access the Statup Dashboard to add, remove, and view services.
 
-# Notifications
-
-
 # Plugins
 Creating a plugin for Statup is not that difficult, if you know a little bit of Go Language you can create any type of application to be embedded into the Status framework.
 Checkout the example plugin that includes all the interfaces, information, and custom HTTP routing at <a href="https://github.com/hunterlong/statup_plugin">https://github.com/hunterlong/statup_plugin</a>.

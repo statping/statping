@@ -32,6 +32,13 @@ func ReturnUser(u *types.User) *user {
 	return &user{u}
 }
 
+// CountUsers returns the amount of users
+func CountUsers() int64 {
+	var amount int64
+	usersDB().Count(&amount)
+	return amount
+}
+
 // SelectUser returns the user based on the user's ID.
 func SelectUser(id int64) (*user, error) {
 	var user user
