@@ -1,6 +1,6 @@
 {{define "form_notifier"}}
 {{$n := .Select}}
-<form method="POST" class="{{underscore $n.Method }}" action="/settings/notifier/{{ $n.Method }}">
+<form class="ajax_form {{underscore $n.Method }}" data-func="SaveNotifier" action="/api/notifier/{{ $n.Method }}" method="POST">
 {{if $n.Title}}<h4 class="text-capitalize">{{$n.Title}}</h4>{{end}}
 {{if $n.Description}}<p class="small text-muted">{{safe $n.Description}}</p>{{end}}
 
@@ -33,12 +33,12 @@
 
         <div class="col-3 col-sm-2 mt-1">
             <span class="switch">
-                <input type="checkbox" name="enable" class="switch" id="switch-{{ $n.Method }}" {{if $n.Enabled.Bool}}checked{{end}}>
+                <input type="checkbox" name="enabled" class="switch" id="switch-{{ $n.Method }}" {{if $n.Enabled.Bool}}checked{{end}}>
                 <label for="switch-{{ $n.Method }}"></label>
             </span>
         </div>
 
-        <input type="hidden" name="notifier" value="{{underscore $n.Method }}">
+        <input type="hidden" name="method" value="{{underscore $n.Method }}">
 
         <div class="col-12 col-sm-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
             <button type="submit" class="btn btn-primary btn-block text-capitalize"><i class="fa fa-check-circle"></i> Save</button>
@@ -67,5 +67,6 @@
         <span class="text-capitalize">{{$n.Title}}</span> Notifier created by <a href="{{$n.AuthorUrl}}" target="_blank">{{$n.Author}}</a>
                         </span>
 {{ end }}
+    <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
 </form>
 {{end}}

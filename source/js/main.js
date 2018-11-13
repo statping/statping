@@ -76,6 +76,14 @@ function Spinner(btn, off = false) {
 	}
 }
 
+function SaveNotifier(data) {
+	console.log(data)
+	let button = data.element.find('button[type=submit]');
+	button.text('Saved!')
+	button.removeClass('btn-primary')
+	button.addClass('btn-success')
+}
+
 $('select#service_type').on('change', function() {
     var selected = $('#service_type option:selected').val();
     var typeLabel = $('#service_type_label');
@@ -204,7 +212,7 @@ $('form.ajax_form').on('submit', function() {
 				Spinner(button, true);
 				if (func) {
 					let fn = window[func];
-					if (typeof fn === "function") fn({form: newArr, data: data});
+					if (typeof fn === "function") fn({element: form, form: newArr, data: data});
 				}
 				if (redirect) {
 					window.location.href = redirect;

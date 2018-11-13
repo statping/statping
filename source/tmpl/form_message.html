@@ -32,7 +32,7 @@
     <div class="form-group row">
         <label for="service_id" class="col-sm-4 col-form-label">Service</label>
         <div class="col-sm-8">
-        <select class="form-control" name="service_id" id="service_id">
+        <select class="form-control" name="service" id="service_id">
             <option value="0" {{if eq (ToString .ServiceId) "0"}}selected{{end}}>Global Message</option>
             {{range Services}}
                 {{$s := .Select}}
@@ -61,5 +61,6 @@
             <button type="submit" class="btn btn-primary btn-block">{{if ne .Id 0}}Update Message{{else}}Create Message{{end}}</button>
         </div>
     </div>
+    <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
 </form>
 {{end}}

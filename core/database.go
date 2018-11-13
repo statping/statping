@@ -99,14 +99,15 @@ func (db *DbConfig) Close() error {
 // AfterFind for Service will set the timezone
 func (s *Service) AfterFind() (err error) {
 	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
+	s.UpdatedAt = utils.Timezoner(s.UpdatedAt, CoreApp.Timezone)
 	return
 }
 
 // AfterFind for Hit will set the timezone
-//func (h *Hit) AfterFind() (err error) {
-//	h.CreatedAt = utils.Timezoner(h.CreatedAt, CoreApp.Timezone)
-//	return
-//}
+func (h *Hit) AfterFind() (err error) {
+	h.CreatedAt = utils.Timezoner(h.CreatedAt, CoreApp.Timezone)
+	return
+}
 
 // AfterFind for failure will set the timezone
 func (f *failure) AfterFind() (err error) {
@@ -160,6 +161,7 @@ func (u *user) BeforeCreate() (err error) {
 func (s *Service) BeforeCreate() (err error) {
 	if s.CreatedAt.IsZero() {
 		s.CreatedAt = time.Now().UTC()
+		s.UpdatedAt = time.Now().UTC()
 	}
 	return
 }
@@ -168,6 +170,7 @@ func (s *Service) BeforeCreate() (err error) {
 func (c *Checkin) BeforeCreate() (err error) {
 	if c.CreatedAt.IsZero() {
 		c.CreatedAt = time.Now().UTC()
+		c.UpdatedAt = time.Now().UTC()
 	}
 	return
 }

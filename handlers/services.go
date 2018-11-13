@@ -24,7 +24,6 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"net"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -77,64 +76,6 @@ func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func createServiceHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-	r.ParseForm()
-	name := r.PostForm.Get("name")
-	domain := r.PostForm.Get("domain")
-	method := r.PostForm.Get("method")
-	expected := r.PostForm.Get("expected")
-	status, _ := strconv.Atoi(r.PostForm.Get("expected_status"))
-	interval, _ := strconv.Atoi(r.PostForm.Get("interval"))
-	port, _ := strconv.Atoi(r.PostForm.Get("port"))
-	timeout, _ := strconv.Atoi(r.PostForm.Get("timeout"))
-	checkType := r.PostForm.Get("check_type")
-	postData := r.PostForm.Get("post_data")
-	order, _ := strconv.Atoi(r.PostForm.Get("order"))
-
-	if checkType == "http" && status == 0 {
-		status = 200
-	}
-
-	service := core.ReturnService(&types.Service{
-		Name:           name,
-		Domain:         domain,
-		Method:         method,
-		Expected:       types.NewNullString(expected),
-		ExpectedStatus: status,
-		Interval:       interval,
-		Type:           checkType,
-		Port:           port,
-		PostData:       types.NewNullString(postData),
-		Timeout:        timeout,
-		Order:          order,
-	})
-	_, err := service.Create(true)
-	if err != nil {
-		utils.Log(3, fmt.Sprintf("Error starting %v check routine. %v", service.Name, err))
-	}
-	//notifiers.OnNewService(core.ReturnService(service.Service))
-	executeResponse(w, r, "services.html", core.CoreApp.Services, "/services")
-}
-
-func servicesDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
-	if service == nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-	service.Delete()
-	executeResponse(w, r, "services.html", core.CoreApp.Services, "/services")
-}
-
 func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	fields := parseGet(r)
@@ -172,43 +113,6 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	}{serv, start.Format(utils.FlatpickrReadable), end.Format(utils.FlatpickrReadable), data.ToString()}
 
 	executeResponse(w, r, "service.html", out, nil)
-}
-
-func servicesUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
-	r.ParseForm()
-	name := r.PostForm.Get("name")
-	domain := r.PostForm.Get("domain")
-	method := r.PostForm.Get("method")
-	expected := r.PostForm.Get("expected")
-	status, _ := strconv.Atoi(r.PostForm.Get("expected_status"))
-	interval, _ := strconv.Atoi(r.PostForm.Get("interval"))
-	port, _ := strconv.Atoi(r.PostForm.Get("port"))
-	timeout, _ := strconv.Atoi(r.PostForm.Get("timeout"))
-	checkType := r.PostForm.Get("check_type")
-	postData := r.PostForm.Get("post_data")
-	order, _ := strconv.Atoi(r.PostForm.Get("order"))
-
-	service.Name = name
-	service.Domain = domain
-	service.Method = method
-	service.ExpectedStatus = status
-	service.Expected = types.NewNullString(expected)
-	service.Interval = interval
-	service.Type = checkType
-	service.Port = port
-	service.PostData = types.NewNullString(postData)
-	service.Timeout = timeout
-	service.Order = order
-
-	service.Update(true)
-	go service.Check(true)
-	executeResponse(w, r, "service.html", service, "/services")
 }
 
 func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
