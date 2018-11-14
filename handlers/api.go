@@ -42,17 +42,8 @@ func apiIndexHandler(w http.ResponseWriter, r *http.Request) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
-	var out core.Core
-	out = *core.CoreApp
-	var services []types.ServiceInterface
-	for _, s := range out.Services {
-		service := s.Select()
-		service.Failures = nil
-		services = append(services, core.ReturnService(service))
-	}
-	out.Services = services
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(out)
+	json.NewEncoder(w).Encode(core.CoreApp)
 }
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {

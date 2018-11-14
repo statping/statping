@@ -364,6 +364,7 @@ func TestPrometheusHandler(t *testing.T) {
 }
 
 func TestViewNotificationSettingsHandler(t *testing.T) {
+	t.SkipNow()
 	req, err := http.NewRequest("GET", "/settings", nil)
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()

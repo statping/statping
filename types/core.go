@@ -42,7 +42,7 @@ type Core struct {
 	UpdatedAt     time.Time          `gorm:"column:updated_at" json:"updated_at"`
 	DbConnection  string             `gorm:"-" json:"database"`
 	Started       time.Time          `gorm:"-" json:"started_on"`
-	Services      []ServiceInterface `gorm:"-" json:"services,omitempty"`
+	Services      []ServiceInterface `gorm:"-" json:"-"`
 	Plugins       []*Info            `gorm:"-" json:"-"`
 	Repos         []PluginJSON       `gorm:"-" json:"-"`
 	AllPlugins    []PluginActions    `gorm:"-" json:"-"`
