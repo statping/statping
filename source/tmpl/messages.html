@@ -45,15 +45,14 @@
 {{define "extra_scripts"}}
 <script src="/js/flatpickr.js"></script>
 <script src="/js/rangePlugin.js"></script>
-
 <script>
-    $(document).ready(function() {
-        $("#start_on").flatpickr({
-            enableTime: true,
-            dateFormat: "Y-m-d H:i",
-            minDate: "today",
-            "plugins": [new rangePlugin({ input: "#end_on"})]
-        });
+$(document).ready(function() {
+    $("#start_on").flatpickr({
+        enableTime: true,
+        dateFormat: "Z",
+        minDate: "today",
+        "plugins": [new rangePlugin({ input: "#end_on"})]
     });
+});
 </script>
 {{end}}

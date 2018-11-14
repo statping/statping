@@ -69,6 +69,7 @@ func Router() *mux.Router {
 
 	// MESSAGES Routes
 	r.Handle("/messages", http.HandlerFunc(messagesHandler)).Methods("GET")
+	r.Handle("/message/{id}", http.HandlerFunc(viewMessageHandler)).Methods("GET")
 
 	// SETTINGS Routes
 	r.Handle("/settings", http.HandlerFunc(settingsHandler)).Methods("GET")
@@ -76,7 +77,6 @@ func Router() *mux.Router {
 	r.Handle("/settings/css", http.HandlerFunc(saveSASSHandler)).Methods("POST")
 	r.Handle("/settings/build", http.HandlerFunc(saveAssetsHandler)).Methods("GET")
 	r.Handle("/settings/delete_assets", http.HandlerFunc(deleteAssetsHandler)).Methods("GET")
-	r.Handle("/settings/notifier/{method}", http.HandlerFunc(saveNotificationHandler)).Methods("POST")
 	r.Handle("/settings/notifier/{method}/test", http.HandlerFunc(testNotificationHandler)).Methods("POST")
 	r.Handle("/settings/export", http.HandlerFunc(exportHandler)).Methods("GET")
 
@@ -104,7 +104,6 @@ func Router() *mux.Router {
 	r.Handle("/api/services/{id}/ping", http.HandlerFunc(apiServicePingDataHandler)).Methods("GET")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceUpdateHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceDeleteHandler)).Methods("DELETE")
-	r.Handle("/api/service/{id}/failures", http.HandlerFunc(apiServiceFailuresHandler)).Methods("GET")
 	r.Handle("/api/checkin/{api}", http.HandlerFunc(apiCheckinHandler))
 
 	// API USER Routes
@@ -121,7 +120,7 @@ func Router() *mux.Router {
 
 	// API MESSAGES Routes
 	r.Handle("/api/messages", http.HandlerFunc(apiAllMessagesHandler)).Methods("GET")
-	r.Handle("/api/messages", http.HandlerFunc(apiNotifierUpdateHandler)).Methods("POST")
+	r.Handle("/api/messages", http.HandlerFunc(apiMessageCreateHandler)).Methods("POST")
 	r.Handle("/api/messages/{id}", http.HandlerFunc(apiMessageGetHandler)).Methods("GET")
 	r.Handle("/api/messages/{id}", http.HandlerFunc(apiMessageUpdateHandler)).Methods("POST")
 	r.Handle("/api/messages/{id}", http.HandlerFunc(apiMessageDeleteHandler)).Methods("DELETE")

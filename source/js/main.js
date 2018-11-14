@@ -185,7 +185,7 @@ $('form.ajax_form').on('submit', function() {
 			return
 		}
 		if (k.value === "on") {
-			k.value = true
+			k.value = (k.value === "on")
 		}
 		if($.isNumeric(k.value)){
 			if (k.name !== "password") {

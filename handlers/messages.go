@@ -16,7 +16,9 @@
 package handlers
 
 import (
+	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/utils"
 	"net/http"
 )
 
@@ -27,4 +29,19 @@ func messagesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	messages, _ := core.SelectMessages()
 	executeResponse(w, r, "messages.html", messages, nil)
+}
+
+func viewMessageHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	vars := mux.Vars(r)
+	id := utils.StringInt(vars["id"])
+	message, err := core.SelectMessage(id)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	executeResponse(w, r, "message.html", message, nil)
 }

@@ -128,14 +128,14 @@ func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	service := core.SelectServicer(utils.StringInt(vars["id"]))
-	if service == nil {
+	servicer := core.SelectServicer(utils.StringInt(vars["id"]))
+	if servicer == nil {
 		sendErrorJson(errors.New("service not found"), w, r)
 		return
 	}
-
+	service := servicer.Select()
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(service.Select())
+	json.NewEncoder(w).Encode(service)
 }
 
 func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -181,7 +181,7 @@ func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	service.Check(true)
+	go service.Check(true)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(service)
 }
@@ -218,12 +218,8 @@ func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	services := core.Services()
-	var servicesOut []*types.Service
-	for _, s := range services {
-		servicesOut = append(servicesOut, s.Select())
-	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(servicesOut)
+	json.NewEncoder(w).Encode(services)
 }
 
 func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
@@ -250,8 +246,11 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	var notification *notifier.Notification
 	fmt.Println(r.Body)
 	decoder := json.NewDecoder(r.Body)
-	decoder.Decode(&notification)
-
+	err := decoder.Decode(&notification)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
 	notifer, not, err := notifier.SelectNotifier(vars["notifier"])
 	if err != nil {
 		sendErrorJson(err, w, r)
@@ -264,9 +263,9 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	notifer.Port = notification.Port
 	notifer.Password = notification.Password
 	notifer.Username = notification.Username
-	notifer.Enabled = notification.Enabled
 	notifer.ApiKey = notification.ApiKey
 	notifer.ApiSecret = notification.ApiSecret
+	notifer.Enabled = types.NewNullBool(notification.Enabled.Bool)
 
 	_, err = notifier.Update(not, notifer)
 	if err != nil {
@@ -291,6 +290,28 @@ func apiAllMessagesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(messages)
+}
+
+func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	var message *types.Message
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&message)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	msg := core.ReturnMessage(message)
+	_, err = msg.Create()
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(msg)
 }
 
 func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
@@ -386,27 +407,6 @@ func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(notifiers)
-}
-
-func apiAllServiceFailuresHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
-	allServices, _ := core.CoreApp.SelectAllServices(false)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(allServices)
-}
-
-func apiServiceFailuresHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
-	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(service.AllFailures())
 }
 
 func sendErrorJson(err error, w http.ResponseWriter, r *http.Request) {

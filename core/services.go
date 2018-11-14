@@ -102,10 +102,9 @@ func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 			service.Start()
 			service.CheckinProcess()
 		}
-		failures := service.LimitedFailures(limitedFailures)
-		service.Failures = nil
-		for _, fail := range failures {
-			service.Failures = append(service.Failures, fail.Select())
+		fails := service.LimitedFailures(limitedFailures)
+		for _, f := range fails {
+			service.Failures = append(service.Failures, f)
 		}
 		CoreApp.Services = append(CoreApp.Services, service)
 	}
