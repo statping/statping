@@ -235,7 +235,6 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	vars := mux.Vars(r)
 	var notification *notifier.Notification
-	fmt.Println(r.Body)
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&notification)
 	if err != nil {
@@ -247,7 +246,6 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-
 	notifer.Var1 = notification.Var1
 	notifer.Var2 = notification.Var2
 	notifer.Host = notification.Host

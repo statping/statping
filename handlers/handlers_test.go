@@ -363,6 +363,18 @@ func TestPrometheusHandler(t *testing.T) {
 	assert.True(t, isRouteAuthenticated(req))
 }
 
+func TestUpdateNotificationHandler(t *testing.T) {
+	t.SkipNow()
+	data := `{"limits": 7, "enabled": true, "method": "email", "host": "smtp.emailserver.com", "username": "exampleuser", "password": "password123", "port": 543, "var1": "info@betatude.com", "var2": "sendto@gmail.com"}`
+	rr, err := httpRequestAPI(t, "POST", "/api/notifier/email", strings.NewReader(data))
+	assert.Nil(t, err)
+	body := rr.Body.String()
+	var obj apiResponse
+	formatJSON(body, &obj)
+	assert.Equal(t, 200, rr.Code)
+	assert.Equal(t, "success", obj.Status)
+}
+
 func TestViewNotificationSettingsHandler(t *testing.T) {
 	t.SkipNow()
 	req, err := http.NewRequest("GET", "/settings", nil)

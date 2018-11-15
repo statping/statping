@@ -280,6 +280,9 @@ func httpRequestAPI(t *testing.T, method, url string, body io.Reader) (*httptest
 	if err != nil {
 		return nil, err
 	}
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
 	req.Header.Set("Authorization", core.CoreApp.ApiSecret)
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
