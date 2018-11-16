@@ -23,7 +23,7 @@ import (
 type User struct {
 	Id            int64     `gorm:"primary_key;column:id" json:"id"`
 	Username      string    `gorm:"type:varchar(100);unique;column:username;" json:"username,omitempty"`
-	Password      string    `gorm:"column:password" json:"-"`
+	Password      string    `gorm:"column:password" json:"password,omitempty"`
 	Email         string    `gorm:"type:varchar(100);unique;column:email" json:"email,omitempty"`
 	ApiKey        string    `gorm:"column:api_key" json:"api_key,omitempty"`
 	ApiSecret     string    `gorm:"column:api_secret" json:"api_secret,omitempty"`

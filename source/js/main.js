@@ -58,10 +58,9 @@ $('.test_notifier').on('click', function(e) {
     e.preventDefault();
 });
 
-$('form').submit(function() {
-	// Spinner($(this).find('button[type=submit]'))
+$('.spin_form').on('submit', function() {
+	Spinner($(this).find('button[type=submit]'));
 });
-
 
 function Spinner(btn, off = false) {
 	btn.prop('disabled', !off);
