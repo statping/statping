@@ -25,7 +25,7 @@ import (
 	"os"
 )
 
-// ErrorResponse is used for HTTP errors to show to user
+// ErrorResponse is used for HTTP errors to show to User
 type ErrorResponse struct {
 	Error string
 }

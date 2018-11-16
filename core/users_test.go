@@ -69,7 +69,7 @@ func TestCreateUser2(t *testing.T) {
 	user := ReturnUser(&types.User{
 		Username: "hunterlong",
 		Password: "password123",
-		Email:    "user@email.com",
+		Email:    "User@email.com",
 		Admin:    types.NewNullBool(true),
 	})
 	userId, err := user.Create()
@@ -87,7 +87,7 @@ func TestAuthUser(t *testing.T) {
 	user, auth := AuthUser("hunterlong", "password123")
 	assert.True(t, auth)
 	assert.NotNil(t, user)
-	assert.Equal(t, "user@email.com", user.Email)
+	assert.Equal(t, "User@email.com", user.Email)
 	assert.Equal(t, int64(4), user.Id)
 	assert.True(t, user.Admin.Bool)
 }

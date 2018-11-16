@@ -90,6 +90,13 @@ func (c *Checkin) CreateFailure() (int64, error) {
 	return fail.Id, row.Error
 }
 
+// AllCheckins returns all checkin in system
+func AllCheckins() []*Checkin {
+	var checkins []*Checkin
+	checkinDB().Find(&checkins)
+	return checkins
+}
+
 // SelectCheckin will find a Checkin based on the API supplied
 func SelectCheckin(api string) *Checkin {
 	var checkin Checkin

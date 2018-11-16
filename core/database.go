@@ -116,7 +116,7 @@ func (f *failure) AfterFind() (err error) {
 }
 
 // AfterFind for USer will set the timezone
-func (u *user) AfterFind() (err error) {
+func (u *User) AfterFind() (err error) {
 	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
 	return
 }
@@ -149,8 +149,8 @@ func (f *failure) BeforeCreate() (err error) {
 	return
 }
 
-// BeforeCreate for user will set CreatedAt to UTC
-func (u *user) BeforeCreate() (err error) {
+// BeforeCreate for User will set CreatedAt to UTC
+func (u *User) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
 	}
@@ -218,7 +218,7 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
 		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
 	case "postgres":
-		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v sslmode=disable", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass)
+		conn = fmt.Sprintf("host=%v port=%v User=%v dbname=%v password=%v sslmode=disable", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass)
 	case "mssql":
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
 		conn = fmt.Sprintf("sqlserver://%v:%v@%v?database=%v", Configs.DbUser, Configs.DbPass, host, Configs.DbData)

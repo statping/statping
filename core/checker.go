@@ -183,7 +183,7 @@ func (s *Service) checkHttp(record bool) *Service {
 		return s
 	}
 	response.Header.Set("Connection", "close")
-	response.Header.Set("user-Agent", "StatupMonitor")
+	response.Header.Set("User-Agent", "StatupMonitor")
 	t2 := time.Now()
 	s.Latency = t2.Sub(t1).Seconds()
 	if err != nil {

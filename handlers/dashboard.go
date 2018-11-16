@@ -102,8 +102,12 @@ func logsLineHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type exportData struct {
-	Core      *core.Core         `json:"core"`
-	Notifiers types.AllNotifiers `json:"notifiers"`
+	Core      *types.Core              `json:"core"`
+	Services  []types.ServiceInterface `json:"services"`
+	Messages  []*types.Message         `json:"messages"`
+	Checkins  []*core.Checkin          `json:"checkins"`
+	Users     []*core.User             `json:"users"`
+	Notifiers []types.AllNotifiers     `json:"notifiers"`
 }
 
 func exportHandler(w http.ResponseWriter, r *http.Request) {
@@ -118,7 +122,15 @@ func exportHandler(w http.ResponseWriter, r *http.Request) {
 		notifiers = append(notifiers, notifier.Select())
 	}
 
-	data := exportData{core.CoreApp, notifiers}
+	users, _ := core.SelectAllUsers()
+
+	data := exportData{
+		Core:      core.CoreApp.Core,
+		Notifiers: core.CoreApp.Notifications,
+		Checkins:  core.AllCheckins(),
+		Users:     users,
+		Services:  core.CoreApp.Services,
+	}
 
 	export, _ := json.Marshal(data)
 

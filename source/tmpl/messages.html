@@ -19,7 +19,7 @@
                 <tr id="message_{{.Id}}">
                     <td>{{.Title}}</td>
                     <td>{{if .Service}}<a href="/service/{{.Service.Id}}">{{.Service.Name}}</a>{{end}}</td>
-                    <td>{{Duration 0}}</td>
+                    <td>{{.StartOn}}</td>
                     <td class="text-right">
                         <div class="btn-group">
                             <a href="/message/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-exclamation-triangle"></i> Edit</a>
