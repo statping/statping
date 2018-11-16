@@ -125,6 +125,10 @@ func Router() *mux.Router {
 	r.Handle("/api/messages/{id}", http.HandlerFunc(apiMessageUpdateHandler)).Methods("POST")
 	r.Handle("/api/messages/{id}", http.HandlerFunc(apiMessageDeleteHandler)).Methods("DELETE")
 
+	r.PathPrefix("/files/postman.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
+	r.PathPrefix("/files/swagger.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
+	r.PathPrefix("/files/grafana.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
+
 	// API Generic Routes
 	r.Handle("/metrics", http.HandlerFunc(prometheusHandler))
 	r.Handle("/health", http.HandlerFunc(healthCheckHandler))

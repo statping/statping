@@ -235,7 +235,7 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 	err = dbSession.DB().Ping()
 	if err == nil {
 		DbSession = dbSession
-		utils.Log(1, fmt.Sprintf("Database %v connection '%v@%v' at %v was successful.", dbType, Configs.DbUser, Configs.DbHost, Configs.DbData))
+		utils.Log(1, fmt.Sprintf("Database %v connection '%v@%v:%v' at %v was successful.", dbType, Configs.DbUser, Configs.DbHost, Configs.DbPort, Configs.DbData))
 	}
 	return err
 }

@@ -157,24 +157,24 @@ func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
-	if service == nil {
+	srv := core.SelectServicer(utils.StringInt(vars["id"]))
+	if srv.Select() == nil {
 		sendErrorJson(errors.New("service not found"), w, r)
 		return
 	}
-	var updatedService *types.Service
+	var updatedService *core.Service
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&updatedService)
-	updatedService.Id = service.Id
-	service = core.ReturnService(updatedService)
-	err := service.Update(true)
+	updatedService.Id = srv.Select().Id
+
+	err := updatedService.Update(true)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	go service.Check(true)
+	go updatedService.Check(true)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(service)
+	json.NewEncoder(w).Encode(updatedService)
 }
 
 func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {

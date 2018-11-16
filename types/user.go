@@ -23,10 +23,10 @@ import (
 type User struct {
 	Id            int64     `gorm:"primary_key;column:id" json:"id"`
 	Username      string    `gorm:"type:varchar(100);unique;column:username;" json:"username,omitempty"`
-	Password      string    `gorm:"column:password" json:"password,omitempty"`
+	Password      string    `gorm:"column:password" json:"-"`
 	Email         string    `gorm:"type:varchar(100);unique;column:email" json:"email,omitempty"`
 	ApiKey        string    `gorm:"column:api_key" json:"api_key,omitempty"`
-	ApiSecret     string    `gorm:"column:api_secret" json:"-"`
+	ApiSecret     string    `gorm:"column:api_secret" json:"api_secret,omitempty"`
 	Admin         NullBool  `gorm:"column:administrator" json:"admin,omitempty"`
 	CreatedAt     time.Time `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt     time.Time `gorm:"column:updated_at" json:"updated_at"`
