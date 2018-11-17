@@ -16,14 +16,14 @@
             </thead>
             <tbody>
             {{range .}}
-                <tr>
+                <tr id="message_{{.Id}}">
                     <td>{{.Title}}</td>
                     <td>{{if .Service}}<a href="/service/{{.Service.Id}}">{{.Service.Name}}</a>{{end}}</td>
-                    <td>{{Duration 0}}</td>
-                    <td class="text-right" id="message_{{.Id}}">
+                    <td>{{.StartOn}}</td>
+                    <td class="text-right">
                         <div class="btn-group">
                             <a href="/message/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-exclamation-triangle"></i> Edit</a>
-                            <a href="/message/{{.Id}}/delete" class="btn btn-danger confirm-btn" data-id="message_{{.Id}}"><i class="fas fa-times"></i></a>
+                            <a href="/api/messages/{{.Id}}" class="ajax_delete btn btn-danger confirm-btn" data-method="DELETE" data-obj="message_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>
                         </div>
                     </td>
                 </tr>
@@ -45,15 +45,14 @@
 {{define "extra_scripts"}}
 <script src="/js/flatpickr.js"></script>
 <script src="/js/rangePlugin.js"></script>
-
 <script>
-    $(document).ready(function() {
-        $("#start_on").flatpickr({
-            enableTime: true,
-            dateFormat: "Y-m-d H:i",
-            minDate: "today",
-            "plugins": [new rangePlugin({ input: "#end_on"})]
-        });
+$(document).ready(function() {
+    $("#start_on").flatpickr({
+        enableTime: true,
+        dateFormat: "Z",
+        minDate: "today",
+        "plugins": [new rangePlugin({ input: "#end_on"})]
     });
+});
 </script>
 {{end}}

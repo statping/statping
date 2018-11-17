@@ -65,17 +65,11 @@ func Router() *mux.Router {
 
 	// USER Routes
 	r.Handle("/users", http.HandlerFunc(usersHandler)).Methods("GET")
-	r.Handle("/users", http.HandlerFunc(createUserHandler)).Methods("POST")
 	r.Handle("/user/{id}", http.HandlerFunc(usersEditHandler)).Methods("GET")
-	r.Handle("/user/{id}", http.HandlerFunc(updateUserHandler)).Methods("POST")
-	r.Handle("/user/{id}/delete", http.HandlerFunc(usersDeleteHandler)).Methods("GET")
 
 	// MESSAGES Routes
 	r.Handle("/messages", http.HandlerFunc(messagesHandler)).Methods("GET")
-	r.Handle("/messages", http.HandlerFunc(createMessageHandler)).Methods("POST")
 	r.Handle("/message/{id}", http.HandlerFunc(viewMessageHandler)).Methods("GET")
-	r.Handle("/message/{id}", http.HandlerFunc(updateMessageHandler)).Methods("POST")
-	r.Handle("/message/{id}/delete", http.HandlerFunc(deleteMessageHandler)).Methods("GET")
 
 	// SETTINGS Routes
 	r.Handle("/settings", http.HandlerFunc(settingsHandler)).Methods("GET")
@@ -83,20 +77,18 @@ func Router() *mux.Router {
 	r.Handle("/settings/css", http.HandlerFunc(saveSASSHandler)).Methods("POST")
 	r.Handle("/settings/build", http.HandlerFunc(saveAssetsHandler)).Methods("GET")
 	r.Handle("/settings/delete_assets", http.HandlerFunc(deleteAssetsHandler)).Methods("GET")
-	r.Handle("/settings/notifier/{method}", http.HandlerFunc(saveNotificationHandler)).Methods("POST")
 	r.Handle("/settings/notifier/{method}/test", http.HandlerFunc(testNotificationHandler)).Methods("POST")
 	r.Handle("/settings/export", http.HandlerFunc(exportHandler)).Methods("GET")
 
 	// SERVICE Routes
 	r.Handle("/services", http.HandlerFunc(servicesHandler)).Methods("GET")
-	r.Handle("/services", http.HandlerFunc(createServiceHandler)).Methods("POST")
 	r.Handle("/services/reorder", http.HandlerFunc(reorderServiceHandler)).Methods("POST")
 	r.Handle("/service/{id}", http.HandlerFunc(servicesViewHandler)).Methods("GET")
-	r.Handle("/service/{id}", http.HandlerFunc(servicesUpdateHandler)).Methods("POST")
 	r.Handle("/service/{id}/edit", http.HandlerFunc(servicesViewHandler))
-	r.Handle("/service/{id}/delete", http.HandlerFunc(servicesDeleteHandler))
 	r.Handle("/service/{id}/delete_failures", http.HandlerFunc(servicesDeleteFailuresHandler)).Methods("GET")
 	r.Handle("/service/{id}/checkin", http.HandlerFunc(checkinCreateHandler)).Methods("POST")
+
+	// CHECKIN Routes
 	r.Handle("/checkin/{id}/delete", http.HandlerFunc(checkinDeleteHandler)).Methods("GET")
 	r.Handle("/checkin/{id}", http.HandlerFunc(checkinHitHandler))
 
@@ -112,7 +104,6 @@ func Router() *mux.Router {
 	r.Handle("/api/services/{id}/ping", http.HandlerFunc(apiServicePingDataHandler)).Methods("GET")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceUpdateHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceDeleteHandler)).Methods("DELETE")
-	r.Handle("/api/service/{id}/failures", http.HandlerFunc(apiServiceFailuresHandler)).Methods("GET")
 	r.Handle("/api/checkin/{api}", http.HandlerFunc(apiCheckinHandler))
 
 	// API USER Routes
@@ -129,10 +120,14 @@ func Router() *mux.Router {
 
 	// API MESSAGES Routes
 	r.Handle("/api/messages", http.HandlerFunc(apiAllMessagesHandler)).Methods("GET")
-	r.Handle("/api/messages", http.HandlerFunc(apiNotifierUpdateHandler)).Methods("POST")
+	r.Handle("/api/messages", http.HandlerFunc(apiMessageCreateHandler)).Methods("POST")
 	r.Handle("/api/messages/{id}", http.HandlerFunc(apiMessageGetHandler)).Methods("GET")
 	r.Handle("/api/messages/{id}", http.HandlerFunc(apiMessageUpdateHandler)).Methods("POST")
 	r.Handle("/api/messages/{id}", http.HandlerFunc(apiMessageDeleteHandler)).Methods("DELETE")
+
+	r.PathPrefix("/files/postman.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
+	r.PathPrefix("/files/swagger.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
+	r.PathPrefix("/files/grafana.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
 
 	// API Generic Routes
 	r.Handle("/metrics", http.HandlerFunc(prometheusHandler))

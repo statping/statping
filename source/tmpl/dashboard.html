@@ -19,7 +19,14 @@
         </div>
         <div class="row mt-4">
             <div class="col-12">
-                <h3>Services</h3>
+                {{if eq (len CoreApp.Services) 0}}
+                    <div class="jumbotron jumbotron-fluid">
+                        <div class="text-center">
+                            <h1 class="display-4">No Services!</h1>
+                            <a class="lead">You don't have any websites or applications being monitored by your Statup server. <p><a href="/services" class="btn btn-secondary mt-3">Add Service</a></p></p>
+                        </div>
+                    </div>
+                {{else}}
                 <div class="list-group mb-5 mt-3">
                 {{ range Services }}
                     <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
@@ -29,7 +36,8 @@
                         </div>
                         <p class="mb-1">{{.SmallText}}</p>
                     </a>
-                {{ end }}
+                    {{ end }}
+                 {{end}}
                 </div>
 
             {{ range Services }}

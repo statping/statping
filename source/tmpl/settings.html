@@ -127,7 +127,12 @@
                     <div class="tab-pane" id="v-pills-style" role="tabpanel" aria-labelledby="v-pills-style-tab">
 
                     {{if not .UsingAssets }}
-                        <a href="/settings/build" class="btn btn-primary btn-block"{{if USE_CDN}} disabled{{end}}>Enable Local Assets</a>
+                        <div class="jumbotron jumbotron-fluid">
+                            <div class="text-center col-12">
+                                <h1 class="display-5">Enable Local Assets</h1>
+                                <a class="lead">Customize your status page design by enabling local assets. This will create a 'assets' directory containing all CSS.<p><a href="/settings/build" class="btn btn-primary mt-3"{{if USE_CDN}} disabled{{end}}>Enable Local Assets</a></p></p>
+                            </div>
+                        </div>
                     {{ else }}
                         <form method="POST" action="/settings/css">
                             <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">

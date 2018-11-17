@@ -36,3 +36,15 @@ type FailureInterface interface {
 	Ago() string        // Ago returns a human readable timestamp
 	ParseError() string // ParseError returns a human readable error for a service failure
 }
+
+type FailSort []FailureInterface
+
+func (s FailSort) Len() int {
+	return len(s)
+}
+func (s FailSort) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s FailSort) Less(i, j int) bool {
+	return s[i].Select().Id < s[j].Select().Id
+}

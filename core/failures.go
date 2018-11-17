@@ -20,6 +20,7 @@ import (
 	"github.com/ararog/timeago"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
+	"sort"
 	"strings"
 	"time"
 )
@@ -29,7 +30,7 @@ type failure struct {
 }
 
 const (
-	limitedFailures = 64
+	limitedFailures = 32
 )
 
 // CreateFailure will create a new failure record for a service
@@ -41,8 +42,9 @@ func (s *Service) CreateFailure(fail types.FailureInterface) (int64, error) {
 		utils.Log(3, row.Error)
 		return 0, row.Error
 	}
-	s.Failures = append(s.Failures, f.Select())
-	if len(s.Failures) >= limitedFailures {
+	sort.Sort(types.FailSort(s.Failures))
+	s.Failures = append(s.Failures, f)
+	if len(s.Failures) > limitedFailures {
 		s.Failures = s.Failures[1:]
 	}
 	return f.Id, row.Error

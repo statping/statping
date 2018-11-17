@@ -16,7 +16,8 @@
 package handlers
 
 import (
-	"fmt"
+	"encoding/json"
+	"errors"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
@@ -45,82 +46,116 @@ func usersEditHandler(w http.ResponseWriter, r *http.Request) {
 	executeResponse(w, r, "user.html", user, nil)
 }
 
-func updateUserHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+func apiUserHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		sendUnauthorizedJson(w, r)
 		return
 	}
-	r.ParseForm()
 	vars := mux.Vars(r)
-	id := utils.StringInt(vars["id"])
-	user, err := core.SelectUser(id)
+	user, err := core.SelectUser(utils.StringInt(vars["id"]))
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("user error: %v", err))
-		w.WriteHeader(http.StatusInternalServerError)
+		sendErrorJson(err, w, r)
 		return
 	}
+	user.Password = ""
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
+}
 
-	user.Username = r.PostForm.Get("username")
-	user.Email = r.PostForm.Get("email")
-	isAdmin := r.PostForm.Get("admin") == "on"
-	user.Admin = types.NewNullBool(isAdmin)
-	password := r.PostForm.Get("password")
-	if password != "##########" {
-		user.Password = utils.HashPassword(password)
+func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		sendUnauthorizedJson(w, r)
+		return
 	}
+	vars := mux.Vars(r)
+	user, err := core.SelectUser(utils.StringInt(vars["id"]))
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	var updateUser *types.User
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&updateUser)
+	updateUser.Id = user.Id
+	user = core.ReturnUser(updateUser)
 	err = user.Update()
 	if err != nil {
-		utils.Log(3, err)
-	}
-
-	fmt.Println(user.Id)
-	fmt.Println(user.Password)
-	fmt.Println(user.Admin.Bool)
-
-	users, _ := core.SelectAllUsers()
-	executeResponse(w, r, "users.html", users, "/users")
-}
-
-func createUserHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		sendErrorJson(err, w, r)
 		return
 	}
-	r.ParseForm()
-	username := r.PostForm.Get("username")
-	password := r.PostForm.Get("password")
-	email := r.PostForm.Get("email")
-	admin := r.PostForm.Get("admin")
-
-	user := core.ReturnUser(&types.User{
-		Username: username,
-		Password: password,
-		Email:    email,
-		Admin:    types.NewNullBool(admin == "on"),
-	})
-	_, err := user.Create()
-	if err != nil {
-		utils.Log(3, err)
-	}
-	//notifiers.OnNewUser(user)
-	executeResponse(w, r, "users.html", user, "/users")
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
 }
 
-func usersDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
-	id, _ := strconv.Atoi(vars["id"])
-	user, _ := core.SelectUser(int64(id))
-
-	users, _ := core.SelectAllUsers()
-	if len(users) == 1 {
-		utils.Log(2, "cannot delete the only user in the system")
-		http.Redirect(w, r, "/users", http.StatusSeeOther)
+	users := core.CountUsers()
+	if users == 1 {
+		sendErrorJson(errors.New("cannot delete the last user"), w, r)
 		return
 	}
-	user.Delete()
-	http.Redirect(w, r, "/users", http.StatusSeeOther)
+	user, err := core.SelectUser(utils.StringInt(vars["id"]))
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	err = user.Delete()
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	output := apiResponse{
+		Object: "user",
+		Method: "delete",
+		Id:     user.Id,
+		Status: "success",
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(output)
+}
+
+func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	users, err := core.SelectAllUsers()
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(users)
+}
+
+func apiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	var user *types.User
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&user)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	newUser := core.ReturnUser(user)
+	uId, err := newUser.Create()
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	output := apiResponse{
+		Object: "user",
+		Method: "create",
+		Id:     uId,
+		Status: "success",
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(output)
 }

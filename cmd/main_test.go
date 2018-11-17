@@ -110,7 +110,6 @@ func TestRunAll(t *testing.T) {
 		})
 		t.Run(dbt+" Select Core", func(t *testing.T) {
 			RunSelectCoreMYQL(t, dbt)
-			t.Log(core.CoreApp)
 		})
 		t.Run(dbt+" Select Services", func(t *testing.T) {
 			RunSelectAllMysqlServices(t)
@@ -556,6 +555,7 @@ func RunUsersHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
+	t.Log(rr.Body.String())
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | Users</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
 	assert.True(t, handlers.IsAuthenticated(req))
@@ -566,6 +566,7 @@ func RunUserViewHandler(t *testing.T) {
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
 	route.ServeHTTP(rr, req)
+	t.Log(rr.Body.String())
 	assert.True(t, strings.Contains(rr.Body.String(), "<title>Statup | testadmin</title>"))
 	assert.True(t, strings.Contains(rr.Body.String(), "footer"))
 	assert.True(t, handlers.IsAuthenticated(req))

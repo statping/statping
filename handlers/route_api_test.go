@@ -107,8 +107,8 @@ func TestApiAllServicesHandlerHandler(t *testing.T) {
 	var obj []types.Service
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
-	assert.Equal(t, "Test Service 9", obj[0].Name)
-	assert.Equal(t, "https://www.youtube.com/watch?v=yydZbVoCbn0&t=870s", obj[0].Domain)
+	assert.Equal(t, "Google", obj[0].Name)
+	assert.Equal(t, "https://google.com", obj[0].Domain)
 }
 
 func TestApiServiceHandler(t *testing.T) {
@@ -212,7 +212,6 @@ func TestApiViewUserHandler(t *testing.T) {
 func TestApiUpdateUserHandler(t *testing.T) {
 	data := `{
     "username": "adminupdated",
-    "email": "info@email.com",
     "password": "password123",
     "admin": true}`
 	rr, err := httpRequestAPI(t, "POST", "/api/users/1", strings.NewReader(data))
@@ -220,6 +219,7 @@ func TestApiUpdateUserHandler(t *testing.T) {
 	body := rr.Body.String()
 	var obj types.User
 	formatJSON(body, &obj)
+	t.Log(body)
 	assert.Equal(t, 200, rr.Code)
 	assert.Equal(t, "adminupdated", obj.Username)
 	assert.Equal(t, true, obj.Admin.Bool)
@@ -279,6 +279,9 @@ func httpRequestAPI(t *testing.T, method, url string, body io.Reader) (*httptest
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return nil, err
+	}
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
 	}
 	req.Header.Set("Authorization", core.CoreApp.ApiSecret)
 	rr := httptest.NewRecorder()

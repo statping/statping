@@ -102,10 +102,9 @@ func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 			service.Start()
 			service.CheckinProcess()
 		}
-		failures := service.LimitedFailures(limitedFailures)
-		service.Failures = nil
-		for _, fail := range failures {
-			service.Failures = append(service.Failures, fail.Select())
+		fails := service.LimitedFailures(limitedFailures)
+		for _, f := range fails {
+			service.Failures = append(service.Failures, f)
 		}
 		CoreApp.Services = append(CoreApp.Services, service)
 	}
@@ -270,10 +269,14 @@ func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group st
 		var createdAt string
 		var value float64
 		var createdTime time.Time
+		var err error
 		rows.Scan(&createdAt, &value)
 		createdTime, _ = time.Parse(types.TIME, createdAt)
 		if CoreApp.DbConnection == "postgres" {
-			createdTime, _ = time.Parse(types.TIME_NANO, createdAt)
+			createdTime, err = time.Parse(types.TIME_NANO, createdAt)
+			if err != nil {
+				utils.Log(4, fmt.Errorf("issue parsing time from database: %v to %v", createdAt, types.TIME_NANO))
+			}
 		}
 		gd.CreatedAt = utils.Timezoner(createdTime, CoreApp.Timezone).Format(types.TIME)
 		gd.Value = int64(value * 1000)

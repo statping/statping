@@ -17,6 +17,7 @@ package core
 
 import (
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
@@ -158,11 +159,17 @@ func (s *Service) checkHttp(record bool) *Service {
 	}
 	s.PingTime = dnsLookup
 	t1 := time.Now()
-	timeout := time.Duration(s.Timeout)
-	client := http.Client{
-		Timeout: timeout * time.Second,
+	timeout := time.Duration(time.Duration(s.Timeout) * time.Second)
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+		TLSHandshakeTimeout: timeout,
 	}
-
+	client := &http.Client{
+		Transport: transport,
+		Timeout:   timeout,
+	}
 	var response *http.Response
 	if s.Method == "POST" {
 		response, err = client.Post(s.Domain, "application/json", bytes.NewBuffer([]byte(s.PostData.String)))
@@ -176,7 +183,7 @@ func (s *Service) checkHttp(record bool) *Service {
 		return s
 	}
 	response.Header.Set("Connection", "close")
-	response.Header.Set("user-Agent", "StatupMonitor")
+	response.Header.Set("User-Agent", "StatupMonitor")
 	t2 := time.Now()
 	s.Latency = t2.Sub(t1).Seconds()
 	if err != nil {

@@ -99,14 +99,15 @@ func (db *DbConfig) Close() error {
 // AfterFind for Service will set the timezone
 func (s *Service) AfterFind() (err error) {
 	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
+	s.UpdatedAt = utils.Timezoner(s.UpdatedAt, CoreApp.Timezone)
 	return
 }
 
 // AfterFind for Hit will set the timezone
-//func (h *Hit) AfterFind() (err error) {
-//	h.CreatedAt = utils.Timezoner(h.CreatedAt, CoreApp.Timezone)
-//	return
-//}
+func (h *Hit) AfterFind() (err error) {
+	h.CreatedAt = utils.Timezoner(h.CreatedAt, CoreApp.Timezone)
+	return
+}
 
 // AfterFind for failure will set the timezone
 func (f *failure) AfterFind() (err error) {
@@ -115,7 +116,7 @@ func (f *failure) AfterFind() (err error) {
 }
 
 // AfterFind for USer will set the timezone
-func (u *user) AfterFind() (err error) {
+func (u *User) AfterFind() (err error) {
 	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
 	return
 }
@@ -148,8 +149,8 @@ func (f *failure) BeforeCreate() (err error) {
 	return
 }
 
-// BeforeCreate for user will set CreatedAt to UTC
-func (u *user) BeforeCreate() (err error) {
+// BeforeCreate for User will set CreatedAt to UTC
+func (u *User) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
 	}
@@ -160,6 +161,7 @@ func (u *user) BeforeCreate() (err error) {
 func (s *Service) BeforeCreate() (err error) {
 	if s.CreatedAt.IsZero() {
 		s.CreatedAt = time.Now().UTC()
+		s.UpdatedAt = time.Now().UTC()
 	}
 	return
 }
@@ -168,6 +170,7 @@ func (s *Service) BeforeCreate() (err error) {
 func (c *Checkin) BeforeCreate() (err error) {
 	if c.CreatedAt.IsZero() {
 		c.CreatedAt = time.Now().UTC()
+		c.UpdatedAt = time.Now().UTC()
 	}
 	return
 }
@@ -215,7 +218,7 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
 		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
 	case "postgres":
-		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v sslmode=disable", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass)
+		conn = fmt.Sprintf("host=%v port=%v User=%v dbname=%v password=%v sslmode=disable", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass)
 	case "mssql":
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
 		conn = fmt.Sprintf("sqlserver://%v:%v@%v?database=%v", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
@@ -232,7 +235,7 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 	err = dbSession.DB().Ping()
 	if err == nil {
 		DbSession = dbSession
-		utils.Log(1, fmt.Sprintf("Database %v connection '%v@%v' at %v was successful.", dbType, Configs.DbUser, Configs.DbHost, Configs.DbData))
+		utils.Log(1, fmt.Sprintf("Database %v connection '%v@%v:%v' at %v was successful.", dbType, Configs.DbUser, Configs.DbHost, Configs.DbPort, Configs.DbData))
 	}
 	return err
 }

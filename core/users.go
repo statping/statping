@@ -23,44 +23,51 @@ import (
 	"time"
 )
 
-type user struct {
+type User struct {
 	*types.User
 }
 
-// ReturnUser returns *core.user based off a *types.user
-func ReturnUser(u *types.User) *user {
-	return &user{u}
+// ReturnUser returns *core.User based off a *types.User
+func ReturnUser(u *types.User) *User {
+	return &User{u}
 }
 
-// SelectUser returns the user based on the user's ID.
-func SelectUser(id int64) (*user, error) {
-	var user user
+// CountUsers returns the amount of users
+func CountUsers() int64 {
+	var amount int64
+	usersDB().Count(&amount)
+	return amount
+}
+
+// SelectUser returns the User based on the User's ID.
+func SelectUser(id int64) (*User, error) {
+	var user User
 	err := usersDB().Where("id = ?", id).First(&user)
 	return &user, err.Error
 }
 
-// SelectUsername returns the user based on the user's username
-func SelectUsername(username string) (*user, error) {
-	var user user
+// SelectUsername returns the User based on the User's username
+func SelectUsername(username string) (*User, error) {
+	var user User
 	res := usersDB().Where("username = ?", username)
 	err := res.First(&user)
 	return &user, err.Error
 }
 
-// Delete will remove the user record from the database
-func (u *user) Delete() error {
+// Delete will remove the User record from the database
+func (u *User) Delete() error {
 	return usersDB().Delete(u).Error
 }
 
-// Update will update the user's record in database
-func (u *user) Update() error {
+// Update will update the User's record in database
+func (u *User) Update() error {
 	u.ApiKey = utils.NewSHA1Hash(5)
 	u.ApiSecret = utils.NewSHA1Hash(10)
 	return usersDB().Update(u).Error
 }
 
-// Create will insert a new user into the database
-func (u *user) Create() (int64, error) {
+// Create will insert a new User into the database
+func (u *User) Create() (int64, error) {
 	u.CreatedAt = time.Now()
 	u.Password = utils.HashPassword(u.Password)
 	u.ApiKey = utils.NewSHA1Hash(5)
@@ -70,15 +77,15 @@ func (u *user) Create() (int64, error) {
 		return 0, db.Error
 	}
 	if u.Id == 0 {
-		utils.Log(3, fmt.Sprintf("Failed to create user %v. %v", u.Username, db.Error))
+		utils.Log(3, fmt.Sprintf("Failed to create User %v. %v", u.Username, db.Error))
 		return 0, db.Error
 	}
 	return u.Id, db.Error
 }
 
 // SelectAllUsers returns all users
-func SelectAllUsers() ([]*user, error) {
-	var users []*user
+func SelectAllUsers() ([]*User, error) {
+	var users []*User
 	db := usersDB().Find(&users)
 	if db.Error != nil {
 		utils.Log(3, fmt.Sprintf("Failed to load all users. %v", db.Error))
@@ -87,9 +94,9 @@ func SelectAllUsers() ([]*user, error) {
 	return users, db.Error
 }
 
-// AuthUser will return the user and a boolean if authentication was correct.
+// AuthUser will return the User and a boolean if authentication was correct.
 // AuthUser accepts username, and password as a string
-func AuthUser(username, password string) (*user, bool) {
+func AuthUser(username, password string) (*User, bool) {
 	user, err := SelectUsername(username)
 	if err != nil {
 		utils.Log(2, err)

@@ -405,6 +405,9 @@ HTML, BODY {
 .pointer {
   cursor: pointer; }
 
+.jumbotron {
+  background-color: white; }
+
 @media (max-width: 767px) {
   HTML, BODY {
     background-color: #fcfcfc; }
