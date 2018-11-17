@@ -74,8 +74,7 @@ before_script:
 
 script:
   - make test-all
-  - DB_CONN=postgres statup &
-  - sleep 15 && newman run source/tmpl/postman.json -e dev/postman_environment.json
+  - make test-api
   - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make coverage; fi
 
 after_success:
