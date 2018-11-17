@@ -18,6 +18,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
@@ -70,21 +71,17 @@ func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	user, err := core.SelectUser(utils.StringInt(vars["id"]))
 	if err != nil {
-		sendErrorJson(err, w, r)
+		sendErrorJson(fmt.Errorf("user #%v was not found", vars["id"]), w, r)
 		return
 	}
-	var updateUser *types.User
 	decoder := json.NewDecoder(r.Body)
-	decoder.Decode(&updateUser)
-	updateUser.Id = user.Id
-	user = core.ReturnUser(updateUser)
+	decoder.Decode(&user)
 	err = user.Update()
 	if err != nil {
-		sendErrorJson(err, w, r)
+		sendErrorJson(fmt.Errorf("issue updating user #%v: %v", user.Id, err), w, r)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(user)
+	sendJsonAction(user, "update", w, r)
 }
 
 func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
@@ -108,14 +105,7 @@ func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	output := apiResponse{
-		Object: "user",
-		Method: "delete",
-		Id:     user.Id,
-		Status: "success",
-	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(output)
+	sendJsonAction(user, "delete", w, r)
 }
 
 func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
@@ -145,17 +135,10 @@ func apiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	newUser := core.ReturnUser(user)
-	uId, err := newUser.Create()
+	_, err = newUser.Create()
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	output := apiResponse{
-		Object: "user",
-		Method: "create",
-		Id:     uId,
-		Status: "success",
-	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(output)
+	sendJsonAction(newUser, "create", w, r)
 }

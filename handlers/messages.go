@@ -16,8 +16,11 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 )
@@ -44,4 +47,98 @@ func viewMessageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	executeResponse(w, r, "message.html", message, nil)
+}
+
+func apiAllMessagesHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	messages, err := core.SelectMessages()
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(messages)
+}
+
+func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	var message *types.Message
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&message)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	msg := core.ReturnMessage(message)
+	_, err = msg.Create()
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	sendJsonAction(msg, "create", w, r)
+}
+
+func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	vars := mux.Vars(r)
+	message, err := core.SelectMessage(utils.StringInt(vars["id"]))
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(message)
+}
+
+func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	vars := mux.Vars(r)
+	message, err := core.SelectMessage(utils.StringInt(vars["id"]))
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	err = message.Delete()
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	sendJsonAction(message, "delete", w, r)
+}
+
+func apiMessageUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAPIAuthorized(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	vars := mux.Vars(r)
+	message, err := core.SelectMessage(utils.StringInt(vars["id"]))
+	if err != nil {
+		sendErrorJson(fmt.Errorf("message #%v was not found", vars["id"]), w, r)
+		return
+	}
+	decoder := json.NewDecoder(r.Body)
+	err = decoder.Decode(&message)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	_, err = message.Update()
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	sendJsonAction(message, "update", w, r)
 }

@@ -77,7 +77,6 @@ func Router() *mux.Router {
 	r.Handle("/settings/css", http.HandlerFunc(saveSASSHandler)).Methods("POST")
 	r.Handle("/settings/build", http.HandlerFunc(saveAssetsHandler)).Methods("GET")
 	r.Handle("/settings/delete_assets", http.HandlerFunc(deleteAssetsHandler)).Methods("GET")
-	r.Handle("/settings/notifier/{method}/test", http.HandlerFunc(testNotificationHandler)).Methods("POST")
 	r.Handle("/settings/export", http.HandlerFunc(exportHandler)).Methods("GET")
 
 	// SERVICE Routes
@@ -117,6 +116,7 @@ func Router() *mux.Router {
 	r.Handle("/api/notifiers", http.HandlerFunc(apiNotifiersHandler)).Methods("GET")
 	r.Handle("/api/notifier/{notifier}", http.HandlerFunc(apiNotifierGetHandler)).Methods("GET")
 	r.Handle("/api/notifier/{notifier}", http.HandlerFunc(apiNotifierUpdateHandler)).Methods("POST")
+	r.Handle("/api/notifier/{method}/test", http.HandlerFunc(testNotificationHandler)).Methods("POST")
 
 	// API MESSAGES Routes
 	r.Handle("/api/messages", http.HandlerFunc(apiAllMessagesHandler)).Methods("GET")

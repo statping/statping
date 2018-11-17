@@ -133,6 +133,12 @@ func (c *checkinHit) AfterFind() (err error) {
 	return
 }
 
+// AfterFind for Message will set the timezone
+func (u *Message) AfterFind() (err error) {
+	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
+	return
+}
+
 // BeforeCreate for Hit will set CreatedAt to UTC
 func (h *Hit) BeforeCreate() (err error) {
 	if h.CreatedAt.IsZero() {
@@ -151,6 +157,14 @@ func (f *failure) BeforeCreate() (err error) {
 
 // BeforeCreate for User will set CreatedAt to UTC
 func (u *User) BeforeCreate() (err error) {
+	if u.CreatedAt.IsZero() {
+		u.CreatedAt = time.Now().UTC()
+	}
+	return
+}
+
+// BeforeCreate for Message will set CreatedAt to UTC
+func (u *Message) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
 	}

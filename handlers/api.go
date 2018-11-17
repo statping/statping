@@ -18,7 +18,6 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/core/notifier"
@@ -30,11 +29,12 @@ import (
 )
 
 type apiResponse struct {
-	Status string `json:"status"`
-	Object string `json:"type,omitempty"`
-	Id     int64  `json:"id,omitempty"`
-	Method string `json:"method,omitempty"`
-	Error  string `json:"error,omitempty"`
+	Status string      `json:"status"`
+	Object string      `json:"type,omitempty"`
+	Method string      `json:"method,omitempty"`
+	Error  string      `json:"error,omitempty"`
+	Id     int64       `json:"id,omitempty"`
+	Output interface{} `json:"output,omitempty"`
 }
 
 func apiIndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -147,8 +147,7 @@ func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(service)
+	sendJsonAction(newService, "create", w, r)
 }
 
 func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -157,24 +156,21 @@ func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	srv := core.SelectServicer(utils.StringInt(vars["id"]))
-	if srv.Select() == nil {
+	service := core.SelectServicer(utils.StringInt(vars["id"]))
+	if service.Select() == nil {
 		sendErrorJson(errors.New("service not found"), w, r)
 		return
 	}
-	var updatedService *core.Service
 	decoder := json.NewDecoder(r.Body)
-	decoder.Decode(&updatedService)
-	updatedService.Id = srv.Select().Id
-
-	err := updatedService.Update(true)
+	decoder.Decode(&service)
+	err := service.Update(true)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	go updatedService.Check(true)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(updatedService)
+	go service.Check(true)
+
+	sendJsonAction(service, "update", w, r)
 }
 
 func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
@@ -193,14 +189,7 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	output := apiResponse{
-		Object: "service",
-		Method: "delete",
-		Id:     service.Id,
-		Status: "success",
-	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(output)
+	sendJsonAction(service, "delete", w, r)
 }
 
 func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
@@ -234,154 +223,24 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	var notification *notifier.Notification
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&notification)
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
 	notifer, not, err := notifier.SelectNotifier(vars["notifier"])
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	notifer.Var1 = notification.Var1
-	notifer.Var2 = notification.Var2
-	notifer.Host = notification.Host
-	notifer.Port = notification.Port
-	notifer.Password = notification.Password
-	notifer.Username = notification.Username
-	notifer.ApiKey = notification.ApiKey
-	notifer.ApiSecret = notification.ApiSecret
-	notifer.Enabled = types.NewNullBool(notification.Enabled.Bool)
-
+	decoder := json.NewDecoder(r.Body)
+	err = decoder.Decode(&notifer)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
 	_, err = notifier.Update(not, notifer)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
 	notifier.OnSave(notifer.Method)
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(notifer)
-}
-
-func apiAllMessagesHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
-	messages, err := core.SelectMessages()
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(messages)
-}
-
-func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
-	var message *types.Message
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&message)
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
-	msg := core.ReturnMessage(message)
-	_, err = msg.Create()
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(msg)
-}
-
-func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
-	vars := mux.Vars(r)
-	message, err := core.SelectMessage(utils.StringInt(vars["id"]))
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(message)
-}
-
-func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
-	vars := mux.Vars(r)
-	message, err := core.SelectMessage(utils.StringInt(vars["id"]))
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
-	err = message.Delete()
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
-
-	output := apiResponse{
-		Object: "message",
-		Method: "delete",
-		Id:     message.Id,
-		Status: "success",
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(output)
-}
-
-func apiMessageUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
-	vars := mux.Vars(r)
-	message, err := core.SelectMessage(utils.StringInt(vars["id"]))
-	if err != nil {
-		sendErrorJson(fmt.Errorf("message #%v was not found", vars["id"]), w, r)
-		return
-	}
-	var messageBody *types.Message
-	decoder := json.NewDecoder(r.Body)
-	err = decoder.Decode(&messageBody)
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
-
-	messageBody.Id = message.Id
-	message = core.ReturnMessage(messageBody)
-	_, err = message.Update()
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
-
-	output := apiResponse{
-		Object: "message",
-		Method: "update",
-		Id:     message.Id,
-		Status: "success",
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(output)
+	sendJsonAction(notifer, "update", w, r)
 }
 
 func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
@@ -407,6 +266,49 @@ func sendErrorJson(err error, w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(output)
 }
 
+func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *http.Request) {
+	var objName string
+	var objId int64
+	switch v := obj.(type) {
+	case types.ServiceInterface:
+		objName = "service"
+		objId = v.Select().Id
+	case *notifier.Notification:
+		objName = "notifier"
+		objId = v.Id
+	case *core.Core, *types.Core:
+		objName = "core"
+	case *types.User:
+		objName = "user"
+		objId = v.Id
+	case *core.User:
+		objName = "user"
+		objId = v.Id
+	case *types.Message:
+		objName = "message"
+		objId = v.Id
+	case *core.Message:
+		objName = "message"
+		objId = v.Id
+	case *types.Checkin:
+		objName = "checkin"
+		objId = v.Id
+	default:
+		objName = "missing"
+	}
+
+	output := apiResponse{
+		Object: objName,
+		Method: method,
+		Id:     objId,
+		Status: "success",
+		Output: obj,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(output)
+}
+
 func sendUnauthorizedJson(w http.ResponseWriter, r *http.Request) {
 	output := apiResponse{
 		Status: "error",
@@ -418,6 +320,7 @@ func sendUnauthorizedJson(w http.ResponseWriter, r *http.Request) {
 }
 
 func isAPIAuthorized(r *http.Request) bool {
+	utils.Http(r)
 	if os.Getenv("GO_ENV") == "test" {
 		return true
 	}
