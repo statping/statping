@@ -42,6 +42,7 @@ var mobile = &mobilePush{&notifier.Notification{
 		Title:       "Device Identifiers",
 		Placeholder: "A list of your mobile device push notification ID's.",
 		DbField:     "var1",
+		Hidden:      true,
 	}}},
 }
 
