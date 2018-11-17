@@ -85,6 +85,10 @@ test: clean compile install build-plugin
 	STATUP_DIR=$(TEST_DIR) go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./...
 	gocov convert coverage.out > coverage.json
 
+test-api:
+	DB_CONN=sqlite statup &
+	sleep 15 && newman run source/tmpl/postman.json -e dev/postman_environment.json
+
 # report coverage to Coveralls
 coverage:
 	$(GOPATH)/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $(COVERALLS)
