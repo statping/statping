@@ -55,19 +55,17 @@ func LoadUsingEnv() (*DbConfig, error) {
 	if os.Getenv("DB_CONN") == "" {
 		return nil, errors.New("Missing DB_CONN environment variable")
 	}
-	if os.Getenv("DB_CONN") != "sqlite" {
-		if os.Getenv("DB_HOST") == "" {
-			return nil, errors.New("Missing DB_HOST environment variable")
-		}
-		if os.Getenv("DB_USER") == "" {
-			return nil, errors.New("Missing DB_USER environment variable")
-		}
-		if os.Getenv("DB_PASS") == "" {
-			return nil, errors.New("Missing DB_PASS environment variable")
-		}
-		if os.Getenv("DB_DATABASE") == "" {
-			return nil, errors.New("Missing DB_DATABASE environment variable")
-		}
+	if os.Getenv("DB_HOST") == "" {
+		return nil, errors.New("Missing DB_HOST environment variable")
+	}
+	if os.Getenv("DB_USER") == "" {
+		return nil, errors.New("Missing DB_USER environment variable")
+	}
+	if os.Getenv("DB_PASS") == "" {
+		return nil, errors.New("Missing DB_PASS environment variable")
+	}
+	if os.Getenv("DB_DATABASE") == "" {
+		return nil, errors.New("Missing DB_DATABASE environment variable")
 	}
 	Configs = EnvToConfig()
 	CoreApp.Name = os.Getenv("NAME")

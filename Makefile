@@ -86,7 +86,7 @@ test: clean compile install build-plugin
 	gocov convert coverage.out > coverage.json
 
 test-api:
-	DB_CONN=sqlite statup &
+	DB_CONN=sqlite DB_HOST=localhost DB_DATABASE=sqlite DB_PASS=none DB_USER=none statup &
 	sleep 15 && newman run source/tmpl/postman.json -e dev/postman_environment.json
 
 # report coverage to Coveralls
