@@ -258,7 +258,6 @@
   analyzer-version = 1
   input-imports = [
     "github.com/GeertJohan/go.rice",
-    "github.com/GeertJohan/go.rice/embedded",
     "github.com/ararog/timeago",
     "github.com/go-mail/mail",
     "github.com/go-yaml/yaml",

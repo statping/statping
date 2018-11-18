@@ -232,7 +232,7 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
 		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
 	case "postgres":
-		conn = fmt.Sprintf("host=%v port=%v User=%v dbname=%v password=%v sslmode=disable", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass)
+		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v sslmode=disable", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass)
 	case "mssql":
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
 		conn = fmt.Sprintf("sqlserver://%v:%v@%v?database=%v", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
@@ -343,8 +343,8 @@ func (c *DbConfig) CreateCore() *Core {
 // DropDatabase will DROP each table Statup created
 func (db *DbConfig) DropDatabase() error {
 	utils.Log(1, "Dropping Database Tables...")
-	err := DbSession.DropTableIfExists("checkins")
-	err = DbSession.DropTableIfExists("checkin_hits")
+	//err := DbSession.DropTableIfExists("checkins")
+	err := DbSession.DropTableIfExists("checkin_hits")
 	err = DbSession.DropTableIfExists("notifications")
 	err = DbSession.DropTableIfExists("core")
 	err = DbSession.DropTableIfExists("failures")

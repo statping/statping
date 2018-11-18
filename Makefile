@@ -264,10 +264,6 @@ compress:
 publish-dev:
 	curl -H "Content-Type: application/json" --data '{"docker_tag": "dev"}' -X POST $(DOCKER)
 
-# push the :latest docker tag using curl
-publish-latest:
-	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
-
 # update the homebrew application to latest for mac
 publish-homebrew:
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(PUBLISH_BODY) https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statup/requests
@@ -283,10 +279,11 @@ cypress-test: clean cypress-install
 # build Statup using a travis ci trigger
 travis-build:
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(TRAVIS_BUILD_CMD) https://api.travis-ci.com/repo/hunterlong%2Fstatup/requests
+	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
 
 # install xgo and pull the xgo docker image
 xgo-install: clean
 	go get github.com/karalabe/xgo
 	docker pull karalabe/xgo-latest
 
-.PHONY: all build build-all build-alpine test-all test
+.PHONY: all build build-all build-alpine test-all test test-api

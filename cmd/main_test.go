@@ -89,6 +89,7 @@ func TestRunAll(t *testing.T) {
 			assert.Nil(t, err)
 		})
 		t.Run(dbt+" Drop Database", func(t *testing.T) {
+			assert.NotNil(t, core.Configs)
 			RunDropDatabase(t)
 		})
 		t.Run(dbt+" Connect to Database Again", func(t *testing.T) {
