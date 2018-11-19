@@ -21,10 +21,8 @@ import (
 	"github.com/GeertJohan/go.rice"
 	"github.com/hunterlong/statup/utils"
 	"gopkg.in/russross/blackfriday.v2"
-	"io"
 	"io/ioutil"
 	"os"
-	"os/exec"
 )
 
 var (
@@ -68,31 +66,9 @@ func CompileSASS(folder string) error {
 	utils.Log(1, fmt.Sprintf("Compiling SASS %v into %v", scssFile, baseFile))
 	command := fmt.Sprintf("%v %v %v", sassBin, scssFile, baseFile)
 
-	utils.Log(1, fmt.Sprintf("Command: sh -c %v", command))
+	stdout, stderr, err := utils.Command(command)
 
-	testCmd := exec.Command("sh", "-c", command)
-
-	var stdout, stderr []byte
-	var errStdout, errStderr error
-	stdoutIn, _ := testCmd.StdoutPipe()
-	stderrIn, _ := testCmd.StderrPipe()
-	testCmd.Start()
-
-	go func() {
-		stdout, errStdout = copyAndCapture(os.Stdout, stdoutIn)
-	}()
-
-	go func() {
-		stderr, errStderr = copyAndCapture(os.Stderr, stderrIn)
-	}()
-
-	err := testCmd.Wait()
-	if err != nil {
-		utils.Log(3, err)
-		return err
-	}
-
-	if errStdout != nil || errStderr != nil {
+	if stdout != "" || stderr != "" {
 		utils.Log(3, fmt.Sprintf("Failed to compile assets with SASS %v", err))
 		return errors.New("failed to capture stdout or stderr")
 	}
@@ -103,8 +79,7 @@ func CompileSASS(folder string) error {
 		return err
 	}
 
-	outStr, errStr := string(stdout), string(stderr)
-	utils.Log(1, fmt.Sprintf("out: %v | error: %v", outStr, errStr))
+	utils.Log(1, fmt.Sprintf("out: %v | error: %v", stdout, stderr))
 	utils.Log(1, "SASS Compiling is complete!")
 	return nil
 }
@@ -238,28 +213,4 @@ func MakePublicFolder(folder string) error {
 		}
 	}
 	return nil
-}
-
-// copyAndCapture captures the response from a terminal command
-func copyAndCapture(w io.Writer, r io.Reader) ([]byte, error) {
-	var out []byte
-	buf := make([]byte, 1024, 1024)
-	for {
-		n, err := r.Read(buf[:])
-		if n > 0 {
-			d := buf[:n]
-			out = append(out, d...)
-			_, err := w.Write(d)
-			if err != nil {
-				return out, err
-			}
-		}
-		if err != nil {
-			// Read returns io.EOF at the end of file, which is not an error for us
-			if err == io.EOF {
-				err = nil
-			}
-			return out, err
-		}
-	}
 }

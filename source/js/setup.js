@@ -16,7 +16,10 @@
  */
 
 var currentLocation = window.location;
-$("#domain_input").val(currentLocation.origin);
+var domain = $("#domain_input");
+if (domain.val() === "") {
+	domain.val(currentLocation.origin);
+}
 
 $('select#database_type').on('change', function(){
     var selected = $('#database_type option:selected').val();

@@ -83,6 +83,9 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fields := parseGet(r)
 	grouping := fields.Get("group")
+	if grouping == "" {
+		grouping = "hour"
+	}
 	startField := utils.StringInt(fields.Get("start"))
 	endField := utils.StringInt(fields.Get("end"))
 

@@ -46,4 +46,5 @@ type DbConfig struct {
 	Email       string `yaml:"-"`
 	Error       error  `yaml:"-"`
 	Location    string `yaml:"location"`
+	LocalIP     string `yaml:"-"`
 }

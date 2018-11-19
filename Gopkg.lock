@@ -2,14 +2,6 @@
 
 
 [[projects]]
-  digest = "1:b62a3c5b37db602bf1158e921da1a762315a4c37855fd418a14498aa87a342d5"
-  name = "cloud.google.com/go"
-  packages = ["civil"]
-  pruneopts = "UT"
-  revision = "debcad1964693daf8ef4bc06292d7e828e075130"
-  version = "v0.31.0"
-
-[[projects]]
   branch = "master"
   digest = "1:65796e5fdb94d94bc0ee6bc422aa3541dbe69ed4da275cb5a27f8fa141f4e35c"
   name = "github.com/GeertJohan/go.rice"
@@ -45,31 +37,20 @@
   version = "v1.1.1"
 
 [[projects]]
-  branch = "master"
-  digest = "1:0fd9da444782c2defb1352dc098f55b8b42c538787e29e45677a1dc40ff0ab11"
-  name = "github.com/denisenkom/go-mssqldb"
-  packages = [
-    ".",
-    "internal/cp",
-  ]
-  pruneopts = "UT"
-  revision = "4e0d7dc8888fbb59764060e99b7b68e77a6f9698"
-
-[[projects]]
-  digest = "1:e37eb23cfd852df9c65b5dee28456595d7b12479421221a088b6ea7ad95a3570"
+  digest = "1:3806f369b846160fcbde19bdcf93790868defe7c58d1bb6bc8d974c5b8f8dc1e"
   name = "github.com/go-mail/mail"
   packages = ["."]
   pruneopts = "UT"
-  revision = "63235f23494bf20d713a585bce40b2a0675c2f77"
-  version = "2.2.0"
+  revision = "f59b9b83a4e522098e3d3eb94e6f81850ad6e973"
+  version = "v2.3.1"
 
 [[projects]]
-  digest = "1:adea5a94903eb4384abef30f3d878dc9ff6b6b5b0722da25b82e5169216dfb61"
+  digest = "1:ec6f9bf5e274c833c911923c9193867f3f18788c461f76f05f62bb1510e0ae65"
   name = "github.com/go-sql-driver/mysql"
   packages = ["."]
   pruneopts = "UT"
-  revision = "d523deb1b23d913de5bdada721a6071e71283618"
-  version = "v1.4.0"
+  revision = "72cd26f257d44c1114970e19afddcd812016007e"
+  version = "v1.4.1"
 
 [[projects]]
   digest = "1:342378ac4dcb378a5448dd723f0784ae519383532f5e70ade24132c4c8693202"
@@ -112,11 +93,10 @@
   version = "v1.1.3"
 
 [[projects]]
-  digest = "1:4d28d632da146ec6e632bdd29676a95e0874f1ad837fff06aef6610b3b6b4728"
+  digest = "1:8fe19266ce82209076d4a81007ff93f40dd349faca4a917aea59d33956bbd4fd"
   name = "github.com/jinzhu/gorm"
   packages = [
     ".",
-    "dialects/mssql",
     "dialects/mysql",
     "dialects/postgres",
     "dialects/sqlite",
@@ -211,15 +191,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:68344dbfaa4179bb50a583eb8172ace3f1edaf3aebc24e68c03f549f6e6b60dc"
+  digest = "1:1ecf2a49df33be51e757d0033d5d51d5f784f35f68e5a38f797b2d3f03357d71"
   name = "golang.org/x/crypto"
   packages = [
     "bcrypt",
     "blowfish",
-    "md4",
   ]
   pruneopts = "UT"
-  revision = "4d3f4d9ffa16a13f451c3b2999e9c49e9750bf06"
+  revision = "3d3f9f413869b949e48070b5bc593aa22cc2b8f2"
 
 [[projects]]
   digest = "1:c25289f43ac4a68d88b02245742347c94f1e108c534dda442188015ff80669b3"
@@ -258,13 +237,13 @@
   analyzer-version = 1
   input-imports = [
     "github.com/GeertJohan/go.rice",
+    "github.com/GeertJohan/go.rice/embedded",
     "github.com/ararog/timeago",
     "github.com/go-mail/mail",
     "github.com/go-yaml/yaml",
     "github.com/gorilla/mux",
     "github.com/gorilla/sessions",
     "github.com/jinzhu/gorm",
-    "github.com/jinzhu/gorm/dialects/mssql",
     "github.com/jinzhu/gorm/dialects/mysql",
     "github.com/jinzhu/gorm/dialects/postgres",
     "github.com/jinzhu/gorm/dialects/sqlite",

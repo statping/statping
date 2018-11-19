@@ -94,10 +94,10 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	start := end.Add((-24 * 7) * time.Hour).UTC()
 
 	if startField != 0 {
-		start = time.Unix(startField, 0)
+		start = time.Unix(startField, 0).UTC()
 	}
 	if endField != 0 {
-		end = time.Unix(endField, 0)
+		end = time.Unix(endField, 0).UTC()
 	}
 	if group == "" {
 		group = "hour"
@@ -106,11 +106,13 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	data := core.GraphDataRaw(serv, start, end, group, "latency")
 
 	out := struct {
-		Service *core.Service
-		Start   string
-		End     string
-		Data    string
-	}{serv, start.Format(utils.FlatpickrReadable), end.Format(utils.FlatpickrReadable), data.ToString()}
+		Service   *core.Service
+		Start     string
+		End       string
+		StartUnix int64
+		EndUnix   int64
+		Data      string
+	}{serv, start.Format(utils.FlatpickrReadable), end.Format(utils.FlatpickrReadable), start.Unix(), end.Unix(), data.ToString()}
 
 	executeResponse(w, r, "service.html", out, nil)
 }

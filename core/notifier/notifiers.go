@@ -31,7 +31,8 @@ var (
 	// AllCommunications holds all the loaded notifiers
 	AllCommunications []types.AllNotifiers
 	// db holds the Statup database connection
-	db *gorm.DB
+	db       *gorm.DB
+	timezone float32
 )
 
 // Notification contains all the fields for a Statup Notifier.
@@ -89,6 +90,13 @@ type NotificationLog struct {
 	Timestamp time.Time       `json:"timestamp"`
 }
 
+// AfterFind for Notification will set the timezone
+func (n *Notification) AfterFind() (err error) {
+	n.CreatedAt = utils.Timezoner(n.CreatedAt, timezone)
+	n.UpdatedAt = utils.Timezoner(n.UpdatedAt, timezone)
+	return
+}
+
 // AddQueue will add any type of interface (json, string, struct, etc) into the Notifiers queue
 func (n *Notification) AddQueue(uid int64, msg interface{}) {
 	data := &QueueData{uid, msg}
@@ -106,8 +114,9 @@ func modelDb(n *Notification) *gorm.DB {
 }
 
 // SetDB is called by core to inject the database for a notifier to use
-func SetDB(d *gorm.DB) {
+func SetDB(d *gorm.DB, zone float32) {
 	db = d
+	timezone = zone
 }
 
 // asNotification accepts a Notifier and returns a Notification struct
@@ -243,6 +252,8 @@ func Init(n Notifier) (*Notification, error) {
 	var notify *Notification
 	if err == nil {
 		notify, _ = SelectNotification(n)
+		notify.CreatedAt = utils.Timezoner(notify.CreatedAt, timezone)
+		notify.UpdatedAt = utils.Timezoner(notify.UpdatedAt, timezone)
 		if notify.Delay.Seconds() == 0 {
 			notify.Delay = time.Duration(1 * time.Second)
 		}

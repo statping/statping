@@ -29,11 +29,11 @@ func setupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
 	var data interface{}
 	if os.Getenv("DB_CONN") != "" {
 		data, _ = core.LoadUsingEnv()
 	}
+	w.WriteHeader(http.StatusOK)
 	executeResponse(w, r, "setup.html", data, nil)
 }
 

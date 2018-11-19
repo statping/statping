@@ -225,7 +225,7 @@ $(document).ready(function() {
         }
     });
 
-    AjaxChart(chartdata,{{$s.Id}},{{.Start}},{{.End}},"hour");
+    AjaxChart(chartdata,{{$s.Id}},{{.StartUnix}},{{.EndUnix}},"hour");
 
     let startDate = $("#service_start").flatpickr({
         enableTime: false,

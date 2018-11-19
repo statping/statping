@@ -288,7 +288,7 @@ func RunSelectAllMysqlServices(t *testing.T) {
 
 func RunSelectAllNotifiers(t *testing.T) {
 	var err error
-	notifier.SetDB(core.DbSession)
+	notifier.SetDB(core.DbSession, float32(-8))
 	core.CoreApp.Notifications = notifier.Load()
 	assert.Nil(t, err)
 	assert.Equal(t, 8, len(core.CoreApp.Notifications))

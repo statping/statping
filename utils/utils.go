@@ -68,14 +68,6 @@ func ToString(s interface{}) string {
 	}
 }
 
-// Timezoner returns the time.Time with the user set timezone
-func Timezoner(t time.Time, zone float32) time.Time {
-	zoneInt := float32(3600) * (zone + 1)
-	loc := time.FixedZone("", int(zoneInt))
-	timez := t.In(loc)
-	return timez
-}
-
 // dir returns the current working directory
 func dir() string {
 	dir, err := os.Getwd()

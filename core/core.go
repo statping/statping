@@ -17,10 +17,12 @@ package core
 
 import (
 	"errors"
+	"fmt"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
+	"net"
 	"os"
 	"time"
 )
@@ -74,7 +76,7 @@ func InsertNotifierDB() error {
 			return errors.New("database connection has not been created")
 		}
 	}
-	notifier.SetDB(DbSession)
+	notifier.SetDB(DbSession, CoreApp.Timezone)
 	return nil
 }
 
@@ -149,6 +151,23 @@ func SelectCore() (*Core, error) {
 	CoreApp.Version = VERSION
 	CoreApp.UseCdn = types.NewNullBool(os.Getenv("USE_CDN") == "true")
 	return CoreApp, db.Error
+}
+
+// GetLocalIP returns the non loopback local IP of the host
+func GetLocalIP() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return "http://localhost"
+	}
+	for _, address := range addrs {
+		// check the address type and if it is not a loopback the display it
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				return fmt.Sprintf("http://%v", ipnet.IP.String())
+			}
+		}
+	}
+	return "http://localhost"
 }
 
 // ServiceOrder will reorder the services based on 'order_id' (Order)

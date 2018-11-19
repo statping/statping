@@ -219,12 +219,18 @@ func (s *Service) DowntimeText() string {
 func Dbtimestamp(group string, column string) string {
 	var seconds int64
 	switch group {
+	case "minute":
+		seconds = 60
 	case "hour":
 		seconds = 3600
 	case "day":
 		seconds = 86400
 	case "week":
 		seconds = 604800
+	case "month":
+		seconds = 2592000
+	case "year":
+		seconds = 31557600
 	default:
 		seconds = 60
 	}
@@ -271,14 +277,15 @@ func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group st
 		var createdTime time.Time
 		var err error
 		rows.Scan(&createdAt, &value)
-		createdTime, _ = time.Parse(types.TIME, createdAt)
 		if CoreApp.DbConnection == "postgres" {
 			createdTime, err = time.Parse(types.TIME_NANO, createdAt)
 			if err != nil {
 				utils.Log(4, fmt.Errorf("issue parsing time from database: %v to %v", createdAt, types.TIME_NANO))
 			}
+		} else {
+			createdTime, err = time.Parse(types.TIME, createdAt)
 		}
-		gd.CreatedAt = utils.Timezoner(createdTime, CoreApp.Timezone).Format(types.TIME)
+		gd.CreatedAt = utils.Timezoner(createdTime, CoreApp.Timezone).Format(types.CHART_TIME)
 		gd.Value = int64(value * 1000)
 		d = append(d, gd)
 	}

@@ -18,7 +18,6 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/source"
@@ -30,7 +29,6 @@ import (
 )
 
 func dashboardHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println()
 	if !IsAuthenticated(r) {
 		err := core.ErrorResponse{}
 		executeResponse(w, r, "login.html", err, nil)

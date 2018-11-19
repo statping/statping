@@ -22,7 +22,6 @@ import (
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mssql"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -33,7 +32,12 @@ import (
 var (
 	// DbSession stores the Statup database session
 	DbSession *gorm.DB
+	DbModels  []interface{}
 )
+
+func init() {
+	DbModels = []interface{}{&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Message{}, &types.Checkin{}, &types.CheckinHit{}, &notifier.Notification{}}
+}
 
 // DbConfig stores the config.yml file for the statup configuration
 type DbConfig types.DbConfig
@@ -81,7 +85,12 @@ func checkinHitsDB() *gorm.DB {
 // HitsBetween returns the gorm database query for a collection of service hits between a time range
 func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) *gorm.DB {
 	selector := Dbtimestamp(group, column)
-	return DbSession.Model(&types.Hit{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME_DAY), t2.UTC().Format(types.TIME_DAY))
+	if Configs.DbConn == "postgres" {
+		timeQuery := fmt.Sprintf("service = %v AND created_at BETWEEN '%v.000000' AND '%v.000000'", s.Id, t1.UTC().Format(types.POSTGRES_TIME), t2.UTC().Format(types.POSTGRES_TIME))
+		return DbSession.Model(&types.Hit{}).Select(selector).Where(timeQuery)
+	} else {
+		return DbSession.Model(&types.Hit{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME_DAY), t2.UTC().Format(types.TIME_DAY))
+	}
 }
 
 // CloseDB will close the database connection if available
@@ -94,6 +103,13 @@ func CloseDB() {
 // Close shutsdown the database connection
 func (db *DbConfig) Close() error {
 	return DbSession.DB().Close()
+}
+
+// AfterFind for Core will set the timezone
+func (c *Core) AfterFind() (err error) {
+	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
+	c.UpdatedAt = utils.Timezoner(c.UpdatedAt, CoreApp.Timezone)
+	return
 }
 
 // AfterFind for Service will set the timezone
@@ -118,12 +134,14 @@ func (f *failure) AfterFind() (err error) {
 // AfterFind for USer will set the timezone
 func (u *User) AfterFind() (err error) {
 	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
+	u.UpdatedAt = utils.Timezoner(u.UpdatedAt, CoreApp.Timezone)
 	return
 }
 
 // AfterFind for Checkin will set the timezone
 func (c *Checkin) AfterFind() (err error) {
 	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
+	c.UpdatedAt = utils.Timezoner(c.UpdatedAt, CoreApp.Timezone)
 	return
 }
 
@@ -136,6 +154,9 @@ func (c *checkinHit) AfterFind() (err error) {
 // AfterFind for Message will set the timezone
 func (u *Message) AfterFind() (err error) {
 	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
+	u.UpdatedAt = utils.Timezoner(u.UpdatedAt, CoreApp.Timezone)
+	u.StartOn = utils.Timezoner(u.StartOn, CoreApp.Timezone)
+	u.EndOn = utils.Timezoner(u.EndOn, CoreApp.Timezone)
 	return
 }
 
@@ -159,6 +180,7 @@ func (f *failure) BeforeCreate() (err error) {
 func (u *User) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
+		u.UpdatedAt = time.Now().UTC()
 	}
 	return
 }
@@ -167,6 +189,7 @@ func (u *User) BeforeCreate() (err error) {
 func (u *Message) BeforeCreate() (err error) {
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
+		u.UpdatedAt = time.Now().UTC()
 	}
 	return
 }
@@ -232,7 +255,7 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
 		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
 	case "postgres":
-		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v sslmode=disable", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass)
+		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v timezone=UTC sslmode=disable", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass)
 	case "mssql":
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
 		conn = fmt.Sprintf("sqlserver://%v:%v@%v?database=%v", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
@@ -343,8 +366,8 @@ func (c *DbConfig) CreateCore() *Core {
 // DropDatabase will DROP each table Statup created
 func (db *DbConfig) DropDatabase() error {
 	utils.Log(1, "Dropping Database Tables...")
-	//err := DbSession.DropTableIfExists("checkins")
-	err := DbSession.DropTableIfExists("checkin_hits")
+	err := DbSession.DropTableIfExists("checkins")
+	err = DbSession.DropTableIfExists("checkin_hits")
 	err = DbSession.DropTableIfExists("notifications")
 	err = DbSession.DropTableIfExists("core")
 	err = DbSession.DropTableIfExists("failures")
@@ -357,18 +380,18 @@ func (db *DbConfig) DropDatabase() error {
 
 // CreateDatabase will CREATE TABLES for each of the Statup elements
 func (db *DbConfig) CreateDatabase() error {
+	var err error
 	utils.Log(1, "Creating Database Tables...")
-	err := DbSession.CreateTable(&types.Checkin{})
-	err = DbSession.CreateTable(&types.CheckinHit{})
-	err = DbSession.CreateTable(&notifier.Notification{})
-	err = DbSession.Table("core").CreateTable(&types.Core{})
-	err = DbSession.CreateTable(&types.Failure{})
-	err = DbSession.CreateTable(&types.Hit{})
-	err = DbSession.CreateTable(&types.Service{})
-	err = DbSession.CreateTable(&types.User{})
-	err = DbSession.CreateTable(&types.Message{})
+	for _, table := range DbModels {
+		if err := DbSession.CreateTable(table); err.Error != nil {
+			return err.Error
+		}
+	}
+	if err := DbSession.Table("core").CreateTable(&types.Core{}); err.Error != nil {
+		return err.Error
+	}
 	utils.Log(1, "Statup Database Created")
-	return err.Error
+	return err
 }
 
 // MigrateDatabase will migrate the database structure to current version.
@@ -385,8 +408,10 @@ func (db *DbConfig) MigrateDatabase() error {
 	if tx.Error != nil {
 		return tx.Error
 	}
-	tx = tx.AutoMigrate(&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Message{}, &types.Checkin{}, &types.CheckinHit{}, &notifier.Notification{}).Table("core").AutoMigrate(&types.Core{})
-	if tx.Error != nil {
+	for _, table := range DbModels {
+		tx = tx.AutoMigrate(table)
+	}
+	if err := tx.Table("core").AutoMigrate(&types.Core{}); err.Error != nil {
 		tx.Rollback()
 		utils.Log(3, fmt.Sprintf("Statup Database could not be migrated: %v", tx.Error))
 		return tx.Error
