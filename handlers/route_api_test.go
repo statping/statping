@@ -127,11 +127,13 @@ func TestApiCreateServiceHandler(t *testing.T) {
 	assert.Nil(t, err)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	var obj types.Service
+	var obj apiResponse
 	formatJSON(body, &obj)
+	t.Log(body)
+	object := obj.Output.(map[string]interface{})
 	assert.Equal(t, 200, rr.Code)
-	assert.Equal(t, "Google Website", obj.Name)
-	assert.Equal(t, "https://google.com", obj.Domain)
+	assert.Equal(t, "Google Website", object["name"])
+	assert.Equal(t, "https://google.com", object["domain"])
 }
 
 func TestApiUpdateServiceHandler(t *testing.T) {
@@ -151,11 +153,12 @@ func TestApiUpdateServiceHandler(t *testing.T) {
 	assert.Nil(t, err)
 	body := rr.Body.String()
 	t.Log(body)
-	var obj types.Service
+	var obj apiResponse
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
-	assert.Equal(t, "Updated Service", obj.Name)
-	assert.Equal(t, "https://google.com", obj.Domain)
+	assert.Equal(t, "success", obj.Status)
+	assert.Equal(t, "update", obj.Method)
+	assert.Equal(t, int64(1), obj.Id)
 }
 
 func TestApiDeleteServiceHandler(t *testing.T) {
@@ -217,12 +220,13 @@ func TestApiUpdateUserHandler(t *testing.T) {
 	rr, err := httpRequestAPI(t, "POST", "/api/users/1", strings.NewReader(data))
 	assert.Nil(t, err)
 	body := rr.Body.String()
-	var obj types.User
+	var obj apiResponse
 	formatJSON(body, &obj)
 	t.Log(body)
 	assert.Equal(t, 200, rr.Code)
-	assert.Equal(t, "adminupdated", obj.Username)
-	assert.Equal(t, true, obj.Admin.Bool)
+	assert.Equal(t, "update", obj.Method)
+	assert.Equal(t, "success", obj.Status)
+	assert.Equal(t, int64(1), obj.Id)
 }
 
 func TestApiDeleteUserHandler(t *testing.T) {

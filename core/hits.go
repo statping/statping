@@ -27,9 +27,6 @@ type Hit struct {
 
 // CreateHit will create a new 'hit' record in the database for a successful/online service
 func (s *Service) CreateHit(h *types.Hit) (int64, error) {
-	if h.CreatedAt.IsZero() {
-		h.CreatedAt = time.Now().UTC()
-	}
 	db := hitsDB().Create(&h)
 	if db.Error != nil {
 		utils.Log(2, db.Error)

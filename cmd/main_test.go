@@ -89,6 +89,7 @@ func TestRunAll(t *testing.T) {
 			assert.Nil(t, err)
 		})
 		t.Run(dbt+" Drop Database", func(t *testing.T) {
+			assert.NotNil(t, core.Configs)
 			RunDropDatabase(t)
 		})
 		t.Run(dbt+" Connect to Database Again", func(t *testing.T) {
@@ -287,7 +288,7 @@ func RunSelectAllMysqlServices(t *testing.T) {
 
 func RunSelectAllNotifiers(t *testing.T) {
 	var err error
-	notifier.SetDB(core.DbSession)
+	notifier.SetDB(core.DbSession, float32(-8))
 	core.CoreApp.Notifications = notifier.Load()
 	assert.Nil(t, err)
 	assert.Equal(t, 8, len(core.CoreApp.Notifications))

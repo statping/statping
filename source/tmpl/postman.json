@@ -11,6 +11,27 @@
 			"item": [
 				{
 					"name": "Statup Details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "08b8f487-2318-44b9-bdb8-f1f1041e9462",
+								"exec": [
+									"pm.test(\"Check Core API Route\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.name).to.eql(\"Statup\");",
+									"    pm.expect(jsonData.description).to.eql(\"Statup Monitoring Sample Data\");",
+									"    pm.expect(jsonData.using_cdn).to.eql(false);",
+									"    pm.expect(jsonData.database).to.eql(\"sqlite\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -53,7 +74,22 @@
 			"name": "Services",
 			"item": [
 				{
-					"name": "View All Services",
+					"name": "All Services",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d87f8a4e-7640-45b8-9d45-4f6e6f2463ee",
+								"exec": [
+									"pm.test(\"View All Services\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.eql(5);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -67,7 +103,10 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{endpoint}}/api/services",
 							"host": [
@@ -83,6 +122,26 @@
 				},
 				{
 					"name": "View Service",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
+								"exec": [
+									"pm.test(\"View Service\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.name).to.eql(\"Google\");",
+									"    pm.expect(jsonData.status_code).to.eql(200);",
+									"    pm.expect(jsonData.type).to.eql(\"http\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -95,8 +154,18 @@
 							]
 						},
 						"method": "GET",
-						"header": [],
-						"body": {},
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"token\": {\n\t\t\"value\": \"ExponentPushToken[SBryVgIxjgaMKCP5MBtt2J]\"\n\t},\n\t\"user\": {\n\t\t\"username\": \"Brent\"\n\t}\n}"
+						},
 						"url": {
 							"raw": "{{endpoint}}/api/services/1",
 							"host": [
@@ -112,7 +181,85 @@
 					"response": []
 				},
 				{
+					"name": "View Service Chart Data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
+								"exec": [
+									"pm.test(\"Service Chart Default\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.length).to.be.at.least(100);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/services/1/data",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"services",
+								"1",
+								"data"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create Service",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d4eb16fe-8495-40e5-9ca3-be20951e5133",
+								"exec": [
+									"pm.test(\"Create Service\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.output.name).to.eql(\"New Service\");",
+									"    pm.expect(jsonData.output.domain).to.eql(\"https://statup.io\");",
+									"    pm.expect(jsonData.output.type).to.eql(\"http\");",
+									"    pm.expect(jsonData.output.method).to.eql(\"GET\");",
+									"    pm.expect(jsonData.output.expected_status).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -133,7 +280,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"New Service\",\n    \"domain\": \"https://google.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 15,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 10,\n    \"order_id\": 0\n}"
+							"raw": "{\n    \"name\": \"New Service\",\n    \"domain\": \"https://statup.io\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 30,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 30,\n    \"order_id\": 0\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/services",
@@ -150,6 +297,25 @@
 				},
 				{
 					"name": "Update Service",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b5a67a19-fd08-40b0-a961-3e9474ab78c6",
+								"exec": [
+									"pm.test(\"Update Service\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.output.name).to.eql(\"Updated Google Service\");",
+									"    pm.expect(jsonData.output.domain).to.eql(\"https://google.com\");",
+									"    pm.expect(jsonData.output.type).to.eql(\"http\");",
+									"    pm.expect(jsonData.output.method).to.eql(\"GET\");",
+									"    pm.expect(jsonData.output.expected_status).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -170,17 +336,17 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Updated Service\",\n    \"domain\": \"https://google.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 60,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 10,\n    \"order_id\": 0\n}"
+							"raw": "{\n\t\"id\": 1,\n    \"name\": \"Updated Google Service\",\n    \"domain\": \"https://google.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 60,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 10,\n    \"order_id\": 0\n}"
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/services/19",
+							"raw": "{{endpoint}}/api/services/1",
 							"host": [
 								"{{endpoint}}"
 							],
 							"path": [
 								"api",
 								"services",
-								"19"
+								"1"
 							]
 						}
 					},
@@ -188,6 +354,23 @@
 				},
 				{
 					"name": "Delete Service",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dd4d721d-d874-448b-abc9-59c1afceb58e",
+								"exec": [
+									"pm.test(\"Delete Service\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.type).to.eql(\"service\");",
+									"    pm.expect(jsonData.method).to.eql(\"delete\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -255,6 +438,28 @@
 			"item": [
 				{
 					"name": "View All Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9a2977fe-9689-4039-bdcb-eaa34abee958",
+								"exec": [
+									"pm.test(\"View All Users\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.eql(1);",
+									"    var user = jsonData[0];",
+									"    pm.expect(user.id).to.eql(1);",
+									"    pm.expect(user.username).to.eql(\"admin\");",
+									"    pm.expect(user.email).to.eql(\"info@admin.com\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -269,6 +474,60 @@
 						"method": "GET",
 						"header": [],
 						"body": {},
+						"url": {
+							"raw": "{{endpoint}}/api/users",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1913466d-83b2-4d5b-ac48-89c9abdd0c8d",
+								"exec": [
+									"pm.test(\"Create User\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.type).to.eql(\"user\");",
+									"    pm.expect(jsonData.method).to.eql(\"create\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admissdsn2\",\n    \"email\": \"info@emsdssssail.com\",\n    \"password\": \"passsword123\",\n    \"admin\": true\n}"
+						},
 						"url": {
 							"raw": "{{endpoint}}/api/users",
 							"host": [
@@ -284,6 +543,24 @@
 				},
 				{
 					"name": "View User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "555b7ba4-bb36-4e86-a541-fa5a5008f951",
+								"exec": [
+									"pm.test(\"View User\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.id).to.eql(1);",
+									"    pm.expect(jsonData.username).to.eql(\"admin\");",
+									"    pm.expect(jsonData.email).to.eql(\"info@admin.com\");",
+									"    pm.expect(jsonData.admin).to.eql(true);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -297,7 +574,10 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{endpoint}}/api/users/1",
 							"host": [
@@ -313,44 +593,32 @@
 					"response": []
 				},
 				{
-					"name": "Create User",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{api_key}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"admin\",\n    \"email\": \"info@email.com\",\n    \"password\": \"password123\",\n    \"admin\": true\n}"
-						},
-						"url": {
-							"raw": "{{endpoint}}/api/users",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"api",
-								"users"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Update User",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "d23b1822-d1de-4545-9a82-3cf4719a7e82",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "b0d22bbd-a428-4df3-8295-b40542bfa21f",
+								"exec": [
+									"pm.test(\"Update User\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -371,17 +639,17 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"adminupdated\",\n    \"email\": \"info@email.com\",\n    \"password\": \"password123\",\n    \"admin\": true\n}"
+							"raw": "{\n    \"username\": \"adminupdated\",\n    \"email\": \"info@email.com\",\n    \"password\": \"password12345\",\n    \"admin\": true\n}"
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/users/4",
+							"raw": "{{endpoint}}/api/users/1",
 							"host": [
 								"{{endpoint}}"
 							],
 							"path": [
 								"api",
 								"users",
-								"4"
+								"1"
 							]
 						}
 					},
@@ -389,6 +657,24 @@
 				},
 				{
 					"name": "Delete User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bd8c3425-a97f-4f8c-b849-71b65dd543ee",
+								"exec": [
+									"pm.test(\"Delete User\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.type).to.eql(\"user\");",
+									"    pm.expect(jsonData.id).to.eql(1);",
+									"    pm.expect(jsonData.method).to.eql(\"delete\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -404,14 +690,14 @@
 						"header": [],
 						"body": {},
 						"url": {
-							"raw": "{{endpoint}}/api/users/4",
+							"raw": "{{endpoint}}/api/users/1",
 							"host": [
 								"{{endpoint}}"
 							],
 							"path": [
 								"api",
 								"users",
-								"4"
+								"1"
 							]
 						}
 					},
@@ -455,6 +741,53 @@
 			"name": "Notifiers",
 			"item": [
 				{
+					"name": "All Notifiers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e9105618-6db8-4a57-ae7f-782989842f4a",
+								"exec": [
+									"pm.test(\"View All Notifiers\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.eql(8);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "e351393306ea245de5f9588cbe8627c74db007c6",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/notifiers",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"notifiers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "View Notifier",
 					"request": {
 						"auth": {
@@ -462,7 +795,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "",
+									"value": "e351393306ea245de5f9588cbe8627c74db007c6",
 									"type": "string"
 								}
 							]
@@ -489,13 +822,31 @@
 				},
 				{
 					"name": "Update Notifier",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d714d71d-4d6a-4b2e-a6ea-16c34dec3041",
+								"exec": [
+									"pm.test(\"Update Notifier\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.output.method).to.eql(\"mobile\");",
+									"    pm.expect(jsonData.output.enabled).to.eql(true);",
+									"    pm.expect(jsonData.output.limits).to.eql(55);",
+									"    pm.expect(jsonData.output.removeable).to.eql(false);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "",
+									"value": "e351393306ea245de5f9588cbe8627c74db007c6",
 									"type": "string"
 								}
 							]
@@ -511,7 +862,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"method\": \"mobile\",\n    \"host\": \"\",\n    \"port\": 0,\n    \"username\": \"\",\n    \"var1\": \"ExponentPushToken[XmsQVgIxjgaMKCP5MBoOp9]\",\n    \"var2\": \"\",\n    \"api_key\": \"\",\n    \"api_secret\": \"\",\n    \"enabled\": true,\n    \"limits\": 3\n}"
+							"raw": "{\n    \"method\": \"mobile\",\n    \"host\": \"\",\n    \"port\": 0,\n    \"username\": \"\",\n    \"var1\": \"ExponentPushToken[ToBadIWillError123456]\",\n    \"var2\": \"\",\n    \"api_key\": \"\",\n    \"api_secret\": \"\",\n    \"enabled\": true,\n    \"limits\": 55\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/notifier/mobile",
@@ -533,11 +884,225 @@
 				"bearer": [
 					{
 						"key": "token",
-						"value": "",
+						"value": "e351393306ea245de5f9588cbe8627c74db007c6",
 						"type": "string"
 					}
 				]
 			}
+		},
+		{
+			"name": "Messages",
+			"item": [
+				{
+					"name": "All Messages",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3c484d1b-6e77-4084-b844-3ca77dc50108",
+								"exec": [
+									"pm.test(\"View All Messages\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.eql(2);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/messages",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Message",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "12caf74a-61d7-4f6e-89b5-fca2f65464c4",
+								"exec": [
+									"pm.test(\"Create Message\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.output.title).to.eql(\"API Message\");",
+									"    pm.expect(jsonData.output.service).to.eql(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"API Message\",\n    \"description\": \"This is an example a upcoming message for a service!\",\n    \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n    \"service\": 1,\n    \"notify_users\": null,\n    \"notify_method\": \"\",\n    \"notify_before\": 0\n}"
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/messages",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View Message",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "abbb5178-9613-418c-b5ee-be2d6b4fdb8f",
+								"exec": [
+									"pm.test(\"View Message\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.title).to.eql(\"Routine Downtime\");",
+									"    pm.expect(jsonData.service).to.eql(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/messages/1",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Message",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a0403c03-0838-4fd2-9cce-aebaf8a128c3",
+								"exec": [
+									"pm.test(\"Update Message\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.method).to.eql(\"update\");",
+									"    pm.expect(jsonData.id).to.eql(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Routine Downtime\",\n    \"description\": \"This is an example a upcoming message for a service!\",\n    \"start_on\": \"2055-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2055-11-17T05:13:16.323798-08:00\",\n    \"service\": 2,\n    \"notify_users\": true,\n    \"notify_method\": \"email\",\n    \"notify_before\": 900\n}"
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/messages/1",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Message",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6cb2527f-41c2-4feb-9573-1e4d59efa116",
+								"exec": [
+									"pm.test(\"Delete Message\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.method).to.eql(\"delete\");",
+									"    pm.expect(jsonData.type).to.eql(\"message\");",
+									"    pm.expect(jsonData.id).to.eql(1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/messages/1",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }

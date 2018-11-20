@@ -30,10 +30,7 @@ $('.test_notifier').on('click', function(e) {
     var notifier = form.find('input[name=notifier]').val();
     var success = $('#'+notifier+'-success');
     var error = $('#'+notifier+'-error');
-	  var spinner = '<i class="fa fa-spinner fa-spin"></i>';
-	  var btnHtml = btn.html();
-    btn.prop("disabled", true);
-	  btn.html(spinner);
+		Spinner(btn);
     $.ajax({
         url: form.attr("action")+"/test",
         type: 'POST',
@@ -51,8 +48,7 @@ $('.test_notifier').on('click', function(e) {
                   error.addClass('d-none');
               }, 8000)
           }
-            btn.prop("disabled", false);
-					  btn.html(btnHtml);
+					Spinner(btn, true);
         }
     });
     e.preventDefault();
@@ -186,6 +182,12 @@ $('form.ajax_form').on('submit', function() {
 		if (k.value === "on") {
 			k.value = (k.value === "on")
 		}
+		if (k.value === "false") {
+			k.value = false
+		}
+		if (k.value === "true") {
+			k.value = true
+		}
 		if($.isNumeric(k.value)){
 			if (k.name !== "password") {
 				k.value = parseInt(k.value)
@@ -225,7 +227,7 @@ $('form.ajax_form').on('submit', function() {
 function CreateService(output) {
 	console.log('creating service', output)
 	let form = output.form;
-	let data = output.data;
+	let data = output.data.output;
 	let objTbl = `<tr id="service_${data.id}">
                 <td><span class="drag_icon d-none d-md-inline"><i class="fas fa-bars"></i></span> ${form.name}</td>
                 <td class="d-none d-md-table-cell">${data.online}<span class="badge badge-success">ONLINE</span></td>
@@ -242,7 +244,7 @@ function CreateService(output) {
 function CreateUser(output) {
 	console.log('creating user', output)
 	let form = output.form;
-	let data = output.data;
+	let data = output.data.output;
 	let objTbl = `<tr id="user_${data.id}">
                 <td>${form.username}</td>
                 <td class="text-right">

@@ -79,5 +79,5 @@ func injectDatabase() {
 		panic(err)
 	}
 	db.CreateTable(&notifier.Notification{})
-	notifier.SetDB(db)
+	notifier.SetDB(db, float32(-8))
 }

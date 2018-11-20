@@ -125,7 +125,7 @@ func TestTimezone(t *testing.T) {
 	timestamp := time.Date(2018, 1, 1, 10, 0, 0, 0, loc)
 	timezone := Timezoner(timestamp, zone)
 	assert.Equal(t, "2018-01-01 10:00:00 -0800 PST", timestamp.String())
-	assert.Equal(t, "2018-01-01 15:00:00 -0300 -0300", timezone.String())
+	assert.Equal(t, "2018-01-01 18:00:00 +0000 UTC", timezone.UTC().String())
 }
 
 func TestTimestamp_Ago(t *testing.T) {

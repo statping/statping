@@ -61,6 +61,7 @@ before_install:
   - curl -L -s https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64 -o $GOPATH/bin/dep
   - chmod +x $GOPATH/bin/dep
   - npm install -g sass
+  - npm install -g newman
 
 install:
   - make dev-deps
@@ -73,6 +74,7 @@ before_script:
 
 script:
   - make test-all
+  - make test-api
   - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make coverage; fi
 
 after_success:

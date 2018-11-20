@@ -26,6 +26,14 @@ const (
 	FlatpickrReadable = "Mon, 02 Jan 2006"
 )
 
+// Timezoner returns the time.Time with the user set timezone
+func Timezoner(t time.Time, zone float32) time.Time {
+	zoneInt := float32(3600) * zone
+	loc := time.FixedZone("", int(zoneInt))
+	timez := t.In(loc)
+	return timez
+}
+
 // FormatDuration converts a time.Duration into a string
 func FormatDuration(d time.Duration) string {
 	var out string

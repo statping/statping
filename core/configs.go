@@ -52,24 +52,32 @@ func LoadConfigFile(directory string) (*DbConfig, error) {
 // LoadUsingEnv will attempt to load database configs based on environment variables. If DB_CONN is set if will force this function.
 func LoadUsingEnv() (*DbConfig, error) {
 	Configs = new(DbConfig)
+	Configs.LocalIP = GetLocalIP()
 	if os.Getenv("DB_CONN") == "" {
-		return nil, errors.New("Missing DB_CONN environment variable")
+		return Configs, errors.New("Missing DB_CONN environment variable")
 	}
-	if os.Getenv("DB_HOST") == "" {
-		return nil, errors.New("Missing DB_HOST environment variable")
-	}
-	if os.Getenv("DB_USER") == "" {
-		return nil, errors.New("Missing DB_USER environment variable")
-	}
-	if os.Getenv("DB_PASS") == "" {
-		return nil, errors.New("Missing DB_PASS environment variable")
-	}
-	if os.Getenv("DB_DATABASE") == "" {
-		return nil, errors.New("Missing DB_DATABASE environment variable")
+	if os.Getenv("DB_CONN") != "sqlite" {
+		if os.Getenv("DB_HOST") == "" {
+			return Configs, errors.New("Missing DB_HOST environment variable")
+		}
+		if os.Getenv("DB_USER") == "" {
+			return Configs, errors.New("Missing DB_USER environment variable")
+		}
+		if os.Getenv("DB_PASS") == "" {
+			return Configs, errors.New("Missing DB_PASS environment variable")
+		}
+		if os.Getenv("DB_DATABASE") == "" {
+			return Configs, errors.New("Missing DB_DATABASE environment variable")
+		}
 	}
 	Configs = EnvToConfig()
 	CoreApp.Name = os.Getenv("NAME")
-	CoreApp.Domain = os.Getenv("DOMAIN")
+	domain := os.Getenv("DOMAIN")
+	if domain == "" {
+		CoreApp.Domain = Configs.LocalIP
+	} else {
+		CoreApp.Domain = os.Getenv("DOMAIN")
+	}
 	CoreApp.DbConnection = Configs.DbConn
 	CoreApp.UseCdn = types.NewNullBool(os.Getenv("USE_CDN") == "true")
 
@@ -119,7 +127,10 @@ func DefaultPort(db string) int64 {
 
 // EnvToConfig converts environment variables to a DbConfig variable
 func EnvToConfig() *DbConfig {
-	port := DefaultPort(os.Getenv("DB_PORT"))
+	port := utils.StringInt(os.Getenv("DB_PORT"))
+	if port == 0 {
+		port = DefaultPort(os.Getenv("DB_PORT"))
+	}
 	name := os.Getenv("NAME")
 	if name == "" {
 		name = "Statup"
