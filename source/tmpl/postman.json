@@ -1108,106 +1108,28 @@
 			"name": "Checkins",
 			"item": [
 				{
-					"name": "Run Checkin",
+					"name": "Create Checkin",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "652a1c5b-5379-43c2-9cd8-ebd8f8dad0f6",
+								"id": "af07a95b-1bf5-42c7-bd3f-a32f3ab2a264",
 								"exec": [
-									"pm.test(\"Hit the Checkin API Endpoint\", function () {",
+									"pm.test(\"Create Checkin\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.status).to.eql(\"success\");",
-									"    pm.expect(jsonData.type).to.eql(\"checkin_type\");",
+									"    pm.expect(jsonData.type).to.eql(\"checkin\");",
+									"    pm.expect(jsonData.output.name).to.eql(\"Server Checkin\");",
+									"    pm.expect(jsonData.output.grace).to.eql(60);",
+									"    pm.expect(jsonData.output.interval).to.eql(900);",
+									"    var id = jsonData.output.api_key;",
+									"    pm.globals.set(\"checkin_id\", id);",
 									"});"
 								],
 								"type": "text/javascript"
 							}
 						}
 					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{endpoint}}/checkin/HqQ4zoq",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"checkin",
-								"HqQ4zoq"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "View Checkin",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "93ff6b86-368b-406f-9d75-07338714ebca",
-								"exec": [
-									"pm.test(\"View Checkin\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.name).to.eql(\"Server Checkin\");",
-									"    pm.expect(jsonData.grace).to.eql(60);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{endpoint}}/api/checkin/HqQ4zoq",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"api",
-								"checkin",
-								"HqQ4zoq"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "View All Checkin's",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{endpoint}}/api/checkins",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"api",
-								"checkins"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Checkin",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -1220,7 +1142,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"service_id\": 14,\n    \"name\": \"Server Checkin\",\n    \"interval\": 900,\n    \"grace\": 60\n}"
+							"raw": "{\n    \"service_id\": 1,\n    \"name\": \"Server Checkin\",\n    \"interval\": 900,\n    \"grace\": 60\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/checkin",
@@ -1284,7 +1206,149 @@
 					]
 				},
 				{
+					"name": "Run Checkin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "652a1c5b-5379-43c2-9cd8-ebd8f8dad0f6",
+								"exec": [
+									"pm.test(\"Hit the Checkin API Endpoint\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.type).to.eql(\"checkin_hit\");",
+									"    pm.expect(jsonData.method).to.eql(\"update\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/checkin/{{checkin_id}}",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"checkin",
+								"{{checkin_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View Checkin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "93ff6b86-368b-406f-9d75-07338714ebca",
+								"exec": [
+									"pm.test(\"View Checkin\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var id = pm.globals.get(\"checkin_id\");",
+									"    pm.expect(jsonData.name).to.eql(\"Server Checkin\");",
+									"    pm.expect(jsonData.api_key).to.eql(id);",
+									"    pm.expect(jsonData.grace).to.eql(60);",
+									"    pm.expect(jsonData.interval).to.eql(900);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/checkin/{{checkin_id}}",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"checkin",
+								"{{checkin_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View All Checkin's",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "54bded63-de27-4839-8783-25874c35c3ea",
+								"exec": [
+									"pm.test(\"View All Checkins\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var first = jsonData[0];",
+									"    var id = pm.globals.get(\"checkin_id\");",
+									"    pm.expect(first.name).to.eql(\"Server Checkin\");",
+									"    pm.expect(first.api_key).to.eql(id);",
+									"    pm.expect(first.grace).to.eql(60);",
+									"    pm.expect(first.interval).to.eql(900);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/checkins",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"checkins"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Delete Checkin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d3fdc6b9-d8ca-4634-a735-af8db0f31cef",
+								"exec": [
+									"pm.test(\"Delete Checkin\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var id = pm.globals.get(\"checkin_id\");",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.type).to.eql(\"checkin\");",
+									"    pm.expect(jsonData.method).to.eql(\"delete\");",
+									"    pm.expect(jsonData.output.api_key).to.eql(id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -1293,14 +1357,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/checkin/HqQ4zoq",
+							"raw": "{{endpoint}}/api/checkin/{{checkin_id}}",
 							"host": [
 								"{{endpoint}}"
 							],
 							"path": [
 								"api",
 								"checkin",
-								"HqQ4zoq"
+								"{{checkin_id}}"
 							]
 						}
 					},

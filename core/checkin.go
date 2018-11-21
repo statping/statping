@@ -180,7 +180,7 @@ func (c *Checkin) Create() (int64, error) {
 
 // Update will update a Checkin
 func (c *Checkin) Update() (int64, error) {
-	row := checkinDB().Update(c)
+	row := checkinDB().Update(&c)
 	if row.Error != nil {
 		utils.Log(2, row.Error)
 		return 0, row.Error
@@ -193,7 +193,7 @@ func (c *CheckinHit) Create() (int64, error) {
 	if c.CreatedAt.IsZero() {
 		c.CreatedAt = time.Now()
 	}
-	row := checkinHitsDB().Create(c)
+	row := checkinHitsDB().Create(&c)
 	if row.Error != nil {
 		utils.Log(2, row.Error)
 		return 0, row.Error
