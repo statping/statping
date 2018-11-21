@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statup/utils"
 	"github.com/oliveroneill/exponent-server-sdk-golang/sdk"
 	"strings"
 	"time"
@@ -58,12 +59,37 @@ func (u *mobilePush) Select() *notifier.Notification {
 	return u.Notification
 }
 
+func dataJson(s *types.Service, f *types.Failure) map[string]string {
+	serviceId := "0"
+	if s != nil {
+		serviceId = utils.ToString(s.Id)
+	}
+	online := "online"
+	if !s.Online {
+		online = "offline"
+	}
+	issue := ""
+	if f != nil {
+		issue = f.Issue
+	}
+	link := fmt.Sprintf("statup://service?id=%v", serviceId)
+	out := map[string]string{
+		"status": online,
+		"id":     serviceId,
+		"issue":  issue,
+		"link":   link,
+	}
+	return out
+}
+
 // OnFailure will trigger failing service
 func (u *mobilePush) OnFailure(s *types.Service, f *types.Failure) {
+	data := dataJson(s, f)
 	msg := &expo.PushMessage{
 		Body:     fmt.Sprintf("Your service '%v' is currently failing! Reason: %v", s.Name, f.Issue),
 		Sound:    "default",
 		Title:    "Service Offline",
+		Data:     data,
 		Priority: expo.DefaultPriority,
 	}
 	u.AddQueue(s.Id, msg)
@@ -72,12 +98,14 @@ func (u *mobilePush) OnFailure(s *types.Service, f *types.Failure) {
 
 // OnSuccess will trigger successful service
 func (u *mobilePush) OnSuccess(s *types.Service) {
+	data := dataJson(s, nil)
 	if !u.Online {
 		u.ResetUniqueQueue(s.Id)
 		msg := &expo.PushMessage{
 			Body:     fmt.Sprintf("Your service '%v' is back online!", s.Name),
 			Sound:    "default",
 			Title:    "Service Online",
+			Data:     data,
 			Priority: expo.DefaultPriority,
 		}
 		u.AddQueue(s.Id, msg)

@@ -81,7 +81,7 @@ func TestCreateCheckinHits(t *testing.T) {
 		CreatedAt: created,
 	})
 	hit.Create()
-	hits := testCheckin.Hits()
+	hits := testCheckin.AllHits()
 	assert.Equal(t, 1, len(hits))
 }
 

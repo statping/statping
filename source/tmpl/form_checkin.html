@@ -1,5 +1,5 @@
 {{define "form_checkin"}}
-<form action="/service/{{.Id}}/checkin" method="POST">
+<form class="ajax_form" action="/api/checkin" data-redirect="/service/{{.Id}}" method="POST">
     <div class="form-group row">
         <div class="col-md-3">
             <label for="checkin_interval" class="col-form-label">Checkin Name</label>
@@ -14,8 +14,9 @@
             <input type="number" name="grace" class="form-control" id="grace_period" placeholder="10">
         </div>
         <div class="col-3">
-            <label for="checkin_interval" class="col-form-label"></label>
-            <button type="submit" class="btn btn-success d-block">Save Checkin</button>
+            <label for="submit" class="col-form-label"></label>
+            <input type="hidden" name="service_id" class="form-control" id="checkin_name" placeholder="New Checkin">
+            <button type="submit" id="submit" class="btn btn-success d-block">Save Checkin</button>
         </div>
     </div>
 </form>

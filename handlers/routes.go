@@ -85,11 +85,6 @@ func Router() *mux.Router {
 	r.Handle("/service/{id}", http.HandlerFunc(servicesViewHandler)).Methods("GET")
 	r.Handle("/service/{id}/edit", http.HandlerFunc(servicesViewHandler))
 	r.Handle("/service/{id}/delete_failures", http.HandlerFunc(servicesDeleteFailuresHandler)).Methods("GET")
-	r.Handle("/service/{id}/checkin", http.HandlerFunc(checkinCreateHandler)).Methods("POST")
-
-	// CHECKIN Routes
-	r.Handle("/checkin/{id}/delete", http.HandlerFunc(checkinDeleteHandler)).Methods("GET")
-	r.Handle("/checkin/{id}", http.HandlerFunc(checkinHitHandler))
 
 	// API Routes
 	r.Handle("/api", http.HandlerFunc(apiIndexHandler))
@@ -103,7 +98,6 @@ func Router() *mux.Router {
 	r.Handle("/api/services/{id}/ping", http.HandlerFunc(apiServicePingDataHandler)).Methods("GET")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceUpdateHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceDeleteHandler)).Methods("DELETE")
-	r.Handle("/api/checkin/{api}", http.HandlerFunc(apiCheckinHandler))
 
 	// API USER Routes
 	r.Handle("/api/users", http.HandlerFunc(apiAllUsersHandler)).Methods("GET")
@@ -125,6 +119,14 @@ func Router() *mux.Router {
 	r.Handle("/api/messages/{id}", http.HandlerFunc(apiMessageUpdateHandler)).Methods("POST")
 	r.Handle("/api/messages/{id}", http.HandlerFunc(apiMessageDeleteHandler)).Methods("DELETE")
 
+	// API CHECKIN Routes
+	r.Handle("/api/checkins", http.HandlerFunc(apiAllCheckinsHandler)).Methods("GET")
+	r.Handle("/api/checkin/{api}", http.HandlerFunc(apiCheckinHandler)).Methods("GET")
+	r.Handle("/api/checkin", http.HandlerFunc(checkinCreateHandler)).Methods("POST")
+	r.Handle("/api/checkin/{api}", http.HandlerFunc(checkinDeleteHandler)).Methods("DELETE")
+	r.Handle("/checkin/{api}", http.HandlerFunc(checkinHitHandler))
+
+	// Static Files Routes
 	r.PathPrefix("/files/postman.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
 	r.PathPrefix("/files/swagger.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
 	r.PathPrefix("/files/grafana.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))

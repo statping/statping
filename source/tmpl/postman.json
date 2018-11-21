@@ -1103,6 +1103,210 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Checkins",
+			"item": [
+				{
+					"name": "Run Checkin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "652a1c5b-5379-43c2-9cd8-ebd8f8dad0f6",
+								"exec": [
+									"pm.test(\"Hit the Checkin API Endpoint\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.type).to.eql(\"checkin_type\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/checkin/HqQ4zoq",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"checkin",
+								"HqQ4zoq"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View Checkin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "93ff6b86-368b-406f-9d75-07338714ebca",
+								"exec": [
+									"pm.test(\"View Checkin\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.name).to.eql(\"Server Checkin\");",
+									"    pm.expect(jsonData.grace).to.eql(60);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/checkin/HqQ4zoq",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"checkin",
+								"HqQ4zoq"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View All Checkin's",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/checkins",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"checkins"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Checkin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"service_id\": 14,\n    \"name\": \"Server Checkin\",\n    \"interval\": 900,\n    \"grace\": 60\n}"
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/checkin",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"checkin"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create Checkin",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"service_id\": 14,\n    \"name\": \"Server Checkin\",\n    \"interval\": 900,\n    \"grace\": 60\n}"
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/checkin",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"checkin"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Nov 2018 20:37:10 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "265"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"checkin\",\n    \"method\": \"create\",\n    \"id\": 4,\n    \"output\": {\n        \"id\": 4,\n        \"service_id\": 14,\n        \"name\": \"Server Checkin\",\n        \"interval\": 900,\n        \"grace\": 60,\n        \"api_key\": \"AJ0GsdG\",\n        \"created_at\": \"2018-11-20T20:37:10.437194Z\",\n        \"updated_at\": \"2018-11-20T20:37:10.437194Z\",\n        \"hits\": null\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Checkin",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/checkin/HqQ4zoq",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"checkin",
+								"HqQ4zoq"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }

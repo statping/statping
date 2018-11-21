@@ -74,7 +74,7 @@ func (s *Service) DeleteFailures() {
 // LimitedFailures will return the last amount of failures from a service
 func (s *Service) LimitedFailures(amount int64) []*failure {
 	var failArr []*failure
-	failuresDB().Where("service = ?", s.Id).Order("id desc").Limit(amount).Find(&failArr)
+	failuresDB().Where("service = ?", s.Id).Not("method = 'checkin'").Order("id desc").Limit(amount).Find(&failArr)
 	return failArr
 }
 

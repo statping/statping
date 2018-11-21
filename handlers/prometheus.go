@@ -60,16 +60,3 @@ func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(output))
 }
-
-func isAuthorized(r *http.Request) bool {
-	var token string
-	tokens, ok := r.Header["Authorization"]
-	if ok && len(tokens) >= 1 {
-		token = tokens[0]
-		token = strings.TrimPrefix(token, "Bearer ")
-	}
-	if token == core.CoreApp.ApiSecret {
-		return true
-	}
-	return false
-}

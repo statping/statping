@@ -80,9 +80,9 @@ func logsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	utils.LockLines.Lock()
 	logs := make([]string, 0)
-	len := len(utils.LastLines)
+	length := len(utils.LastLines)
 	// We need string log lines from end to start.
-	for i := len - 1; i >= 0; i-- {
+	for i := length - 1; i >= 0; i-- {
 		logs = append(logs, utils.LastLines[i].FormatForHtml()+"\r\n")
 	}
 	utils.LockLines.Unlock()

@@ -27,7 +27,7 @@ type Checkin struct {
 	*types.Checkin
 }
 
-type checkinHit struct {
+type CheckinHit struct {
 	*types.CheckinHit
 }
 
@@ -68,8 +68,8 @@ func ReturnCheckin(c *types.Checkin) *Checkin {
 }
 
 // ReturnCheckinHit converts *types.checkinHit to *core.checkinHit
-func ReturnCheckinHit(c *types.CheckinHit) *checkinHit {
-	return &checkinHit{CheckinHit: c}
+func ReturnCheckinHit(c *types.CheckinHit) *CheckinHit {
+	return &CheckinHit{CheckinHit: c}
 }
 
 func (c *Checkin) Service() *Service {
@@ -133,8 +133,8 @@ func (c *Checkin) Expected() time.Duration {
 }
 
 // Last returns the last checkinHit for a Checkin
-func (c *Checkin) Last() *checkinHit {
-	var hit checkinHit
+func (c *Checkin) Last() *CheckinHit {
+	var hit CheckinHit
 	checkinHitsDB().Where("checkin = ?", c.Id).Last(&hit)
 	return &hit
 }
@@ -143,11 +143,19 @@ func (c *Checkin) Link() string {
 	return fmt.Sprintf("%v/checkin/%v", CoreApp.Domain, c.ApiKey)
 }
 
-// Hits returns all of the CheckinHits for a given Checkin
-func (c *Checkin) Hits() []*checkinHit {
-	var checkins []*checkinHit
+// AllHits returns all of the CheckinHits for a given Checkin
+func (c *Checkin) AllHits() []*types.CheckinHit {
+	var checkins []*types.CheckinHit
 	checkinHitsDB().Where("checkin = ?", c.Id).Order("id DESC").Find(&checkins)
 	return checkins
+}
+
+// Hits returns all of the CheckinHits for a given Checkin
+func (c *Checkin) AllFailures() []*types.Failure {
+	var failures []*types.Failure
+	col := failuresDB().Where("checkin = ?", c.Id).Where("method = 'checkin'").Order("id desc")
+	col.Find(&failures)
+	return failures
 }
 
 // Create will create a new Checkin
@@ -181,7 +189,7 @@ func (c *Checkin) Update() (int64, error) {
 }
 
 // Create will create a new successful checkinHit
-func (c *checkinHit) Create() (int64, error) {
+func (c *CheckinHit) Create() (int64, error) {
 	if c.CreatedAt.IsZero() {
 		c.CreatedAt = time.Now()
 	}
@@ -194,7 +202,7 @@ func (c *checkinHit) Create() (int64, error) {
 }
 
 // Ago returns the duration of time between now and the last successful checkinHit
-func (c *checkinHit) Ago() string {
+func (c *CheckinHit) Ago() string {
 	got, _ := timeago.TimeAgoWithTime(time.Now(), c.CreatedAt)
 	return got
 }

@@ -122,10 +122,10 @@
                     <th scope="col"></th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody style="font-size: 10pt;">
             {{range $s.LimitedCheckins}}
             {{ $ch := . }}
-            <tr class="{{ if lt $ch.Expected 0}}bg-warning text-black{{else}}bg-light{{end}}">
+            <tr id="checkin_{{$ch.Id}}" class="{{ if lt $ch.Expected 0}}bg-warning text-black{{else}}bg-light{{end}}">
                 <td>{{$ch.Name}}<br><a href="{{$ch.Link}}" target="_blank">{{$ch.Link}}</a></td>
                 <td>every {{Duration $ch.Period}}<br>after {{Duration $ch.Grace}}</td>
                 <td>{{ if $ch.Last.CreatedAt.IsZero}}
@@ -141,7 +141,7 @@
                         {{ if lt $ch.Expected 0}}{{Duration $ch.Expected}} ago{{else}}in {{Duration $ch.Expected}}{{end}}
                     {{end}}
                 </td>
-                <td><a href="/checkin/{{$ch.Id}}/delete" class="btn btn-sm btn-danger">Delete</a></td>
+                <td><a href="/api/checkin/{{$ch.Id}}" data-method="DELETE" data-obj="checkin_{{$ch.Id}}" data-id="{{$ch.Id}}" class="ajax_delete btn btn-sm btn-danger">Delete</a></td>
             </tr>
             {{end}}
             </tbody>
