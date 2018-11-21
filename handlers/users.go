@@ -33,7 +33,7 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	users, _ := core.SelectAllUsers()
-	executeResponse(w, r, "users.html", users, nil)
+	ExecuteResponse(w, r, "users.html", users, nil)
 }
 
 func usersEditHandler(w http.ResponseWriter, r *http.Request) {
@@ -44,16 +44,16 @@ func usersEditHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
 	user, _ := core.SelectUser(int64(id))
-	executeResponse(w, r, "user.html", user, nil)
+	ExecuteResponse(w, r, "user.html", user, nil)
 }
 
 func apiUserHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
-	user, err := core.SelectUser(utils.StringInt(vars["id"]))
+	user, err := core.SelectUser(utils.ToInt(vars["id"]))
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -64,12 +64,12 @@ func apiUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
-	user, err := core.SelectUser(utils.StringInt(vars["id"]))
+	user, err := core.SelectUser(utils.ToInt(vars["id"]))
 	if err != nil {
 		sendErrorJson(fmt.Errorf("user #%v was not found", vars["id"]), w, r)
 		return
@@ -85,7 +85,7 @@ func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -95,7 +95,7 @@ func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(errors.New("cannot delete the last user"), w, r)
 		return
 	}
-	user, err := core.SelectUser(utils.StringInt(vars["id"]))
+	user, err := core.SelectUser(utils.ToInt(vars["id"]))
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -109,7 +109,7 @@ func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -123,7 +123,7 @@ func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}

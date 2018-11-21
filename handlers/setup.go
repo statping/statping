@@ -34,7 +34,7 @@ func setupHandler(w http.ResponseWriter, r *http.Request) {
 		data, _ = core.LoadUsingEnv()
 	}
 	w.WriteHeader(http.StatusOK)
-	executeResponse(w, r, "setup.html", data, nil)
+	ExecuteResponse(w, r, "setup.html", data, nil)
 }
 
 func processSetupHandler(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +49,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	dbPass := r.PostForm.Get("db_password")
 	dbDatabase := r.PostForm.Get("db_database")
 	dbConn := r.PostForm.Get("db_connection")
-	dbPort := utils.StringInt(r.PostForm.Get("db_port"))
+	dbPort := utils.ToInt(r.PostForm.Get("db_port"))
 	project := r.PostForm.Get("project")
 	username := r.PostForm.Get("username")
 	password := r.PostForm.Get("password")
@@ -126,5 +126,5 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func setupResponseError(w http.ResponseWriter, r *http.Request, a interface{}) {
-	executeResponse(w, r, "setup.html", a, nil)
+	ExecuteResponse(w, r, "setup.html", a, nil)
 }

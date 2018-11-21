@@ -27,7 +27,7 @@ import (
 )
 
 func apiAllCheckinsHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -41,7 +41,7 @@ func apiAllCheckinsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}

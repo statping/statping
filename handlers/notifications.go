@@ -27,7 +27,7 @@ import (
 )
 
 func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -41,7 +41,7 @@ func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -56,7 +56,7 @@ func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -92,19 +92,19 @@ func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	method := vars["method"]
 	enabled := form.Get("enable")
 	host := form.Get("host")
-	port := int(utils.StringInt(form.Get("port")))
+	port := int(utils.ToInt(form.Get("port")))
 	username := form.Get("username")
 	password := form.Get("password")
 	var1 := form.Get("var1")
 	var2 := form.Get("var2")
 	apiKey := form.Get("api_key")
 	apiSecret := form.Get("api_secret")
-	limits := int(utils.StringInt(form.Get("limits")))
+	limits := int(utils.ToInt(form.Get("limits")))
 
 	fakeNotifer, notif, err := notifier.SelectNotifier(method)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("issue saving notifier %v: %v", method, err))
-		executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
+		ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
 		return
 	}
 

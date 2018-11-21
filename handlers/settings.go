@@ -31,7 +31,7 @@ func settingsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	executeResponse(w, r, "settings.html", core.CoreApp, nil)
+	ExecuteResponse(w, r, "settings.html", core.CoreApp, nil)
 }
 
 func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +68,7 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	app.UseCdn = types.NewNullBool(r.PostForm.Get("enable_cdn") == "on")
 	core.CoreApp, _ = core.UpdateCore(app)
 	//notifiers.OnSettingsSaved(core.CoreApp.ToCore())
-	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
 func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
@@ -85,7 +85,7 @@ func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
 	source.SaveAsset([]byte(mobile), utils.Directory, "scss/mobile.scss")
 	source.CompileSASS(utils.Directory)
 	resetRouter()
-	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
 func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
@@ -105,7 +105,7 @@ func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		utils.Log(3, "Default 'base.css' was inserted because SASS did not work.")
 	}
 	resetRouter()
-	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
 func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
@@ -115,12 +115,12 @@ func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	source.DeleteAllAssets(utils.Directory)
 	resetRouter()
-	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
 func parseId(r *http.Request) int64 {
 	vars := mux.Vars(r)
-	return utils.StringInt(vars["id"])
+	return utils.ToInt(vars["id"])
 }
 
 func parseForm(r *http.Request) url.Values {

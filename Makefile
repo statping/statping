@@ -1,4 +1,4 @@
-VERSION=0.79.86
+VERSION=0.79.87
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -232,6 +232,7 @@ clean:
 	rm -rf dev/test/cypress/videos
 	rm -f coverage.* sass
 	rm -f source/rice-box.go
+	rm -f *.db-journal
 	find . -name "*.out" -type f -delete
 	find . -name "*.cpu" -type f -delete
 	find . -name "*.mem" -type f -delete

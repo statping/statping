@@ -18,7 +18,6 @@ package handlers
 import (
 	"fmt"
 	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/utils"
 	"net/http"
 	"strings"
 )
@@ -34,7 +33,6 @@ import (
 //
 
 func prometheusHandler(w http.ResponseWriter, r *http.Request) {
-	utils.Log(1, fmt.Sprintf("Prometheus /metrics Request From IP: %v\n", r.RemoteAddr))
 	if !isAuthorized(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return

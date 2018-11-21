@@ -35,7 +35,6 @@ import (
 
 var (
 	route *mux.Router
-	dir   string
 )
 
 func init() {
@@ -50,6 +49,7 @@ func Clean() {
 }
 
 func RunInit(db string, t *testing.T) {
+	Clean()
 	if db == "mssql" {
 		os.Setenv("DB_DATABASE", "tempdb")
 		os.Setenv("DB_PASS", "PaSsW0rD123")
@@ -57,19 +57,18 @@ func RunInit(db string, t *testing.T) {
 		os.Setenv("DB_USER", "sa")
 	}
 	source.Assets()
-	Clean()
 	route = handlers.Router()
 	core.CoreApp = core.NewCore()
 }
 
-func TestMain(m *testing.M) {
-	m.Run()
-}
+//func TestMain(m *testing.M) {
+//	m.Run()
+//}
 
 func TestRunAll(t *testing.T) {
 	//t.Parallel()
 
-	databases := []string{"postgres", "sqlite", "mysql"}
+	databases := []string{"sqlite", "postgres", "mysql"}
 	if os.Getenv("ONLY_DB") != "" {
 		databases = []string{os.Getenv("ONLY_DB")}
 	}

@@ -51,7 +51,7 @@ func servicesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	executeResponse(w, r, "services.html", core.CoreApp.Services, nil)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services, nil)
 }
 
 type serviceOrder struct {
@@ -80,10 +80,10 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	fields := parseGet(r)
 	r.ParseForm()
 
-	startField := utils.StringInt(fields.Get("start"))
-	endField := utils.StringInt(fields.Get("end"))
+	startField := utils.ToInt(fields.Get("start"))
+	endField := utils.ToInt(fields.Get("end"))
 	group := r.Form.Get("group")
-	serv := core.SelectService(utils.StringInt(vars["id"]))
+	serv := core.SelectService(utils.ToInt(vars["id"]))
 	if serv == nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -113,16 +113,16 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 		Data      string
 	}{serv, start.Format(utils.FlatpickrReadable), end.Format(utils.FlatpickrReadable), start.Unix(), end.Unix(), data.ToString()}
 
-	executeResponse(w, r, "service.html", out, nil)
+	ExecuteResponse(w, r, "service.html", out, nil)
 }
 
 func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
-	servicer := core.SelectServicer(utils.StringInt(vars["id"]))
+	servicer := core.SelectServicer(utils.ToInt(vars["id"]))
 	if servicer == nil {
 		sendErrorJson(errors.New("service not found"), w, r)
 		return
@@ -133,7 +133,7 @@ func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -154,12 +154,12 @@ func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
-	service := core.SelectServicer(utils.StringInt(vars["id"]))
+	service := core.SelectServicer(utils.ToInt(vars["id"]))
 	if service.Select() == nil {
 		sendErrorJson(errors.New("service not found"), w, r)
 		return
@@ -178,7 +178,7 @@ func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
+	service := core.SelectService(utils.ToInt(vars["id"]))
 	if service == nil {
 		sendErrorJson(errors.New("service data not found"), w, r)
 		return
@@ -188,8 +188,8 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 	if grouping == "" {
 		grouping = "hour"
 	}
-	startField := utils.StringInt(fields.Get("start"))
-	endField := utils.StringInt(fields.Get("end"))
+	startField := utils.ToInt(fields.Get("start"))
+	endField := utils.ToInt(fields.Get("end"))
 
 	if startField == 0 || endField == 0 {
 		startField = 0
@@ -203,15 +203,15 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
+	service := core.SelectService(utils.ToInt(vars["id"]))
 	if service == nil {
 		sendErrorJson(errors.New("service not found"), w, r)
 		return
 	}
 	fields := parseGet(r)
 	grouping := fields.Get("group")
-	startField := utils.StringInt(fields.Get("start"))
-	endField := utils.StringInt(fields.Get("end"))
+	startField := utils.ToInt(fields.Get("start"))
+	endField := utils.ToInt(fields.Get("end"))
 	obj := core.GraphDataRaw(service, time.Unix(startField, 0), time.Unix(endField, 0), grouping, "ping_time")
 
 	w.Header().Set("Content-Type", "application/json")
@@ -219,12 +219,12 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
+	service := core.SelectService(utils.ToInt(vars["id"]))
 	if service == nil {
 		sendErrorJson(errors.New("service not found"), w, r)
 		return
@@ -238,7 +238,7 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -253,7 +253,7 @@ func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
+	service := core.SelectService(utils.ToInt(vars["id"]))
 	service.DeleteFailures()
-	executeResponse(w, r, "services.html", core.CoreApp.Services, "/services")
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services, "/services")
 }

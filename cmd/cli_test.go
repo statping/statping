@@ -16,20 +16,35 @@
 package main
 
 import (
+	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/utils"
 	"github.com/rendon/testcli"
 	"github.com/stretchr/testify/assert"
+	"os"
+	"os/exec"
 	"testing"
+	"time"
 )
 
-func TestRunSQLiteApp(t *testing.T) {
-	t.SkipNow()
-	run := catchCLI([]string{"app"})
-	assert.Nil(t, run)
+var (
+	dir string
+)
+
+func init() {
+	dir = utils.Directory
 }
 
-func TestConfirmVersion(t *testing.T) {
-	t.SkipNow()
-	assert.NotEmpty(t, VERSION)
+func TestStartServerCommand(t *testing.T) {
+	Clean()
+	os.Setenv("DB_CONN", "sqlite")
+	cmd := helperCommand(nil, "")
+	var got = make(chan string)
+	commandAndSleep(cmd, time.Duration(8*time.Second), got)
+	os.Unsetenv("DB_CONN")
+	gg, _ := <-got
+	assert.Contains(t, gg, "DB_CONN environment variable was found")
+	assert.Contains(t, gg, "Core database does not exist, creating now!")
+	assert.Contains(t, gg, "Starting monitoring process for 5 Services")
 }
 
 func TestVersionCommand(t *testing.T) {
@@ -46,12 +61,21 @@ func TestHelpCommand(t *testing.T) {
 }
 
 func TestExportCommand(t *testing.T) {
-	t.SkipNow()
-	c := testcli.Command("statup", "export")
-	c.Run()
-	t.Log(c.Stdout())
-	assert.True(t, c.StdoutContains("Exporting Static 'index.html' page"))
+	cmd := helperCommand(nil, "export")
+	var got = make(chan string)
+	commandAndSleep(cmd, time.Duration(4*time.Second), got)
+	gg, _ := <-got
+	t.Log(gg)
+	assert.Contains(t, gg, "Exporting Static 'index.html' page...")
+	assert.Contains(t, gg, "Exported Statup index page: 'index.html'")
 	assert.True(t, fileExists(dir+"/index.html"))
+}
+
+func TestUpdateCommand(t *testing.T) {
+	c := testcli.Command("statup", "update")
+	c.Run()
+	assert.True(t, c.StdoutContains("Statup Version: "+VERSION))
+	assert.True(t, c.StdoutContains("Latest Version:"))
 }
 
 func TestAssetsCommand(t *testing.T) {
@@ -61,6 +85,22 @@ func TestAssetsCommand(t *testing.T) {
 	t.Log("Directory for Assets: ", dir)
 	assert.FileExists(t, dir+"/assets/robots.txt")
 	assert.FileExists(t, dir+"/assets/scss/base.scss")
+}
+
+func TestRunCommand(t *testing.T) {
+	cmd := helperCommand(nil, "run")
+	var got = make(chan string)
+	commandAndSleep(cmd, time.Duration(5*time.Second), got)
+	gg, _ := <-got
+	t.Log(gg)
+	assert.Contains(t, gg, "Running 1 time and saving to database...")
+	assert.Contains(t, gg, "Check is complete.")
+}
+
+func TestEnvironmentVarsCommand(t *testing.T) {
+	c := testcli.Command("statup", "env")
+	c.Run()
+	assert.True(t, c.StdoutContains("Statup Environment Variable"))
 }
 
 func TestVersionCLI(t *testing.T) {
@@ -82,7 +122,6 @@ func TestSassCLI(t *testing.T) {
 }
 
 func TestUpdateCLI(t *testing.T) {
-	t.SkipNow()
 	run := catchCLI([]string{"update"})
 	assert.EqualError(t, run, "end")
 }
@@ -100,10 +139,30 @@ func TestHelpCLI(t *testing.T) {
 func TestRunOnceCLI(t *testing.T) {
 	t.SkipNow()
 	run := catchCLI([]string{"run"})
-	assert.Nil(t, run)
+	assert.EqualError(t, run, "end")
 }
 
 func TestEnvCLI(t *testing.T) {
 	run := catchCLI([]string{"env"})
 	assert.Error(t, run)
+	core.CloseDB()
+	Clean()
+}
+
+func commandAndSleep(cmd *exec.Cmd, duration time.Duration, out chan<- string) {
+	go func(out chan<- string) {
+		runCommand(cmd, out)
+	}(out)
+	time.Sleep(duration)
+	cmd.Process.Kill()
+}
+
+func helperCommand(envs []string, s ...string) *exec.Cmd {
+	cmd := exec.Command("statup", s...)
+	return cmd
+}
+
+func runCommand(c *exec.Cmd, out chan<- string) {
+	bout, _ := c.CombinedOutput()
+	out <- string(bout)
 }

@@ -177,8 +177,8 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 
 var mainTmpl = `{{define "main" }} {{ template "base" . }} {{ end }}`
 
-// executeResponse will render a HTTP response for the front end user
-func executeResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{}) {
+// ExecuteResponse will render a HTTP response for the front end user
+func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{}) {
 	utils.Http(r)
 	if url, ok := redirect.(string); ok {
 		http.Redirect(w, r, url, http.StatusSeeOther)
@@ -262,5 +262,5 @@ func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 // error404Handler is a HTTP handler for 404 error pages
 func error404Handler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
-	executeResponse(w, r, "error_404.html", nil, nil)
+	ExecuteResponse(w, r, "error_404.html", nil, nil)
 }

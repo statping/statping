@@ -27,8 +27,7 @@ type PluginSelect struct {
 }
 
 func pluginSavedHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsAuthenticated(r)
-	if !auth {
+	if !isAuthorized(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}

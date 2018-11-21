@@ -106,17 +106,13 @@ func ExampleToString() {
 }
 
 func TestStringInt(t *testing.T) {
-	assert.Equal(t, int64(1), StringInt("1"))
+	assert.Equal(t, int64(1), ToString("1"))
 }
 
 func ExampleStringInt() {
 	amount := "42"
-	fmt.Print(StringInt(amount))
+	fmt.Print(ToString(amount))
 	// Output: 42
-}
-
-func TestDbTime(t *testing.T) {
-
 }
 
 func TestTimezone(t *testing.T) {

@@ -43,10 +43,15 @@ func init() {
 	}
 }
 
-// StringInt converts a string to an int64
-func StringInt(s string) int64 {
-	num, _ := strconv.Atoi(s)
-	return int64(num)
+// ToInt converts a int to a string
+func ToInt(s interface{}) int64 {
+	switch v := s.(type) {
+	case string:
+		val, _ := strconv.Atoi(v)
+		return int64(val)
+	default:
+		return 0
+	}
 }
 
 // ToString converts a int to a string
@@ -55,14 +60,11 @@ func ToString(s interface{}) string {
 	case int, int32, int64:
 		return fmt.Sprintf("%v", v)
 	case float32, float64:
-		return fmt.Sprintf("%v", v)
+		return fmt.Sprintf("%f", v)
 	case []byte:
 		return string(v)
 	case bool:
-		if v {
-			return "true"
-		}
-		return "false"
+		return fmt.Sprintf("%t", v)
 	default:
 		return fmt.Sprintf("%v", v)
 	}

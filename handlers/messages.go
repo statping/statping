@@ -31,7 +31,7 @@ func messagesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	messages, _ := core.SelectMessages()
-	executeResponse(w, r, "messages.html", messages, nil)
+	ExecuteResponse(w, r, "messages.html", messages, nil)
 }
 
 func viewMessageHandler(w http.ResponseWriter, r *http.Request) {
@@ -40,17 +40,17 @@ func viewMessageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	id := utils.StringInt(vars["id"])
+	id := utils.ToInt(vars["id"])
 	message, err := core.SelectMessage(id)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	executeResponse(w, r, "message.html", message, nil)
+	ExecuteResponse(w, r, "message.html", message, nil)
 }
 
 func apiAllMessagesHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -64,7 +64,7 @@ func apiAllMessagesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -85,12 +85,12 @@ func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
-	message, err := core.SelectMessage(utils.StringInt(vars["id"]))
+	message, err := core.SelectMessage(utils.ToInt(vars["id"]))
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -100,12 +100,12 @@ func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
-	message, err := core.SelectMessage(utils.StringInt(vars["id"]))
+	message, err := core.SelectMessage(utils.ToInt(vars["id"]))
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -119,12 +119,12 @@ func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiMessageUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
 	vars := mux.Vars(r)
-	message, err := core.SelectMessage(utils.StringInt(vars["id"]))
+	message, err := core.SelectMessage(utils.ToInt(vars["id"]))
 	if err != nil {
 		sendErrorJson(fmt.Errorf("message #%v was not found", vars["id"]), w, r)
 		return

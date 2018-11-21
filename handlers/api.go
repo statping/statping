@@ -36,21 +36,8 @@ type apiResponse struct {
 	Output interface{} `json:"output,omitempty"`
 }
 
-func isAuthorized(r *http.Request) bool {
-	var token string
-	tokens, ok := r.Header["Authorization"]
-	if ok && len(tokens) >= 1 {
-		token = tokens[0]
-		token = strings.TrimPrefix(token, "Bearer ")
-	}
-	if token == core.CoreApp.ApiSecret {
-		return true
-	}
-	return false
-}
-
 func apiIndexHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -59,7 +46,7 @@ func apiIndexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAPIAuthorized(r) {
+	if !isAuthorized(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -142,7 +129,7 @@ func sendUnauthorizedJson(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(output)
 }
 
-func isAPIAuthorized(r *http.Request) bool {
+func isAuthorized(r *http.Request) bool {
 	utils.Http(r)
 	if os.Getenv("GO_ENV") == "test" {
 		return true
@@ -150,7 +137,13 @@ func isAPIAuthorized(r *http.Request) bool {
 	if IsAuthenticated(r) {
 		return true
 	}
-	if isAuthorized(r) {
+	var token string
+	tokens, ok := r.Header["Authorization"]
+	if ok && len(tokens) >= 1 {
+		token = tokens[0]
+		token = strings.TrimPrefix(token, "Bearer ")
+	}
+	if token == core.CoreApp.ApiSecret {
 		return true
 	}
 	return false

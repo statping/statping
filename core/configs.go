@@ -127,7 +127,7 @@ func DefaultPort(db string) int64 {
 
 // EnvToConfig converts environment variables to a DbConfig variable
 func EnvToConfig() *DbConfig {
-	port := utils.StringInt(os.Getenv("DB_PORT"))
+	port := utils.ToInt(os.Getenv("DB_PORT"))
 	if port == 0 {
 		port = DefaultPort(os.Getenv("DB_PORT"))
 	}
@@ -139,6 +139,17 @@ func EnvToConfig() *DbConfig {
 	if description == "" {
 		description = "Statup Monitoring Sample Data"
 	}
+
+	adminUser := os.Getenv("ADMIN_USER")
+	if adminUser == "" {
+		adminUser = "admin"
+	}
+
+	adminPass := os.Getenv("ADMIN_PASS")
+	if adminPass == "" {
+		adminPass = "admin"
+	}
+
 	data := &DbConfig{
 		DbConn:      os.Getenv("DB_CONN"),
 		DbHost:      os.Getenv("DB_HOST"),
@@ -150,8 +161,8 @@ func EnvToConfig() *DbConfig {
 		Description: description,
 		Domain:      os.Getenv("DOMAIN"),
 		Email:       "",
-		Username:    "admin",
-		Password:    "admin",
+		Username:    adminUser,
+		Password:    adminPass,
 		Error:       nil,
 		Location:    utils.Directory,
 	}

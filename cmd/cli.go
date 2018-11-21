@@ -23,10 +23,12 @@ import (
 	"github.com/hunterlong/statup/handlers"
 	"github.com/hunterlong/statup/plugin"
 	"github.com/hunterlong/statup/source"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 	"time"
 )
 
@@ -85,13 +87,15 @@ func catchCLI(args []string) error {
 	case "export":
 		var err error
 		fmt.Printf("Statup v%v Exporting Static 'index.html' page...\n", VERSION)
+		utils.InitLogs()
 		core.Configs, err = core.LoadConfigFile(dir)
 		if err != nil {
 			utils.Log(4, "config.yml file not found")
 			return err
 		}
-		indexSource := core.ExportIndexHTML()
-		err = utils.SaveFile("./index.html", []byte(indexSource))
+		indexSource := ExportIndexHTML()
+		core.CloseDB()
+		err = utils.SaveFile(dir+"/index.html", indexSource)
 		if err != nil {
 			utils.Log(4, err)
 			return err
@@ -103,6 +107,7 @@ func catchCLI(args []string) error {
 	case "run":
 		utils.Log(1, "Running 1 time and saving to database...")
 		RunOnce()
+		core.CloseDB()
 		fmt.Println("Check is complete.")
 		return errors.New("end")
 	case "env":
@@ -119,6 +124,22 @@ func catchCLI(args []string) error {
 		return nil
 	}
 	return errors.New("end")
+}
+
+// ExportIndexHTML returns the HTML of the index page as a string
+func ExportIndexHTML() []byte {
+	source.Assets()
+	core.Configs.Connect(false, utils.Directory)
+	core.CoreApp.SelectAllServices(false)
+	core.CoreApp.UseCdn = types.NewNullBool(true)
+	for _, srv := range core.CoreApp.Services {
+		service := srv.(*core.Service)
+		service.Check(true)
+	}
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("GET", "/", nil)
+	handlers.ExecuteResponse(w, r, "index.html", nil, nil)
+	return w.Body.Bytes()
 }
 
 // RunOnce will initialize the Statup application and check each service 1 time, will not run HTTP server
@@ -141,9 +162,7 @@ func RunOnce() {
 		utils.Log(4, err)
 	}
 	for _, out := range core.CoreApp.Services {
-		service := out.Select()
 		out.Check(true)
-		fmt.Printf("    Service %v | URL: %v | Latency: %0.0fms | Online: %v\n", service.Name, service.Domain, (service.Latency * 1000), service.Online)
 	}
 }
 
@@ -155,16 +174,32 @@ func HelpEcho() {
 	fmt.Println("     statup                    - Main command to run Statup server")
 	fmt.Println("     statup version            - Returns the current version of Statup")
 	fmt.Println("     statup run                - Check all services 1 time and then quit")
-	fmt.Println("     statup test plugins       - Test all plugins for required information")
 	fmt.Println("     statup assets             - Dump all assets used locally to be edited.")
-	fmt.Println("     statup sass               - Compile .scss files into the css directory")
-	fmt.Println("     statup env                - Show all environment variables being used for Statup")
 	fmt.Println("     statup export             - Exports the index page as a static HTML for pushing")
+	fmt.Println("     statup sass               - Compile .scss files into the css directory")
+	fmt.Println("     statup test plugins       - Test all plugins for required information")
+	fmt.Println("     statup env                - Show all environment variables being used for Statup")
 	fmt.Println("     statup update             - Attempts to update to the latest version")
 	fmt.Println("     statup help               - Shows the user basic information about Statup")
 	fmt.Printf("Flags:\n")
 	fmt.Println("     -ip 127.0.0.1             - Run HTTP server on specific IP address (default: localhost)")
 	fmt.Println("     -port 8080                - Run HTTP server on Port (default: 8080)")
+	fmt.Printf("Environment Variables:\n")
+	fmt.Println("     STATUP_DIR                - Set a absolute path for the root path of Statup server (logs, assets, SQL db)")
+	fmt.Println("     DB_CONN             	   - Automatic Database connection (sqlite, postgres, mysql)")
+	fmt.Println("     DB_HOST             	   - Database hostname or IP address")
+	fmt.Println("     DB_USER             	   - Database username")
+	fmt.Println("     DB_PASS             	   - Database password")
+	fmt.Println("     DB_PORT             	   - Database port (5432, 3306, ...")
+	fmt.Println("     DB_DATABASE               - Database connection's database name")
+	fmt.Println("     GO_ENV                    - Run Statup in testmode, will bypass HTTP authentication (if set as 'true')")
+	fmt.Println("     NAME                      - Set a name for the Statup status page")
+	fmt.Println("     DESCRIPTION               - Set a description for the Statup status page")
+	fmt.Println("     DOMAIN               	   - Set a URL for the Statup status page")
+	fmt.Println("     ADMIN_USER                - Username for administrator account (default: admin)")
+	fmt.Println("     ADMIN_PASS                - Password for administrator account (default: admin)")
+	fmt.Println("   * You can insert environment variables into a '.env' file in root directory.")
+
 	fmt.Println("Give Statup a Star at https://github.com/hunterlong/statup")
 }
 
