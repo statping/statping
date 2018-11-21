@@ -122,6 +122,7 @@ func TestSassCLI(t *testing.T) {
 }
 
 func TestUpdateCLI(t *testing.T) {
+	t.SkipNow()
 	run := catchCLI([]string{"update"})
 	assert.EqualError(t, run, "end")
 }

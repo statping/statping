@@ -106,7 +106,7 @@ func ExampleToString() {
 }
 
 func TestStringInt(t *testing.T) {
-	assert.Equal(t, int64(1), ToString("1"))
+	assert.Equal(t, "1", ToString("1"))
 }
 
 func ExampleStringInt() {
