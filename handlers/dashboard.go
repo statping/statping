@@ -17,11 +17,9 @@ package handlers
 
 import (
 	"bytes"
-	"encoding/json"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/source"
-	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
 	"strconv"
@@ -99,15 +97,6 @@ func logsLineHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type exportData struct {
-	Core      *types.Core              `json:"core"`
-	Services  []types.ServiceInterface `json:"services"`
-	Messages  []*types.Message         `json:"messages"`
-	Checkins  []*core.Checkin          `json:"checkins"`
-	Users     []*core.User             `json:"users"`
-	Notifiers []types.AllNotifiers     `json:"notifiers"`
-}
-
 func exportHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -120,17 +109,7 @@ func exportHandler(w http.ResponseWriter, r *http.Request) {
 		notifiers = append(notifiers, notifier.Select())
 	}
 
-	users, _ := core.SelectAllUsers()
-
-	data := exportData{
-		Core:      core.CoreApp.Core,
-		Notifiers: core.CoreApp.Notifications,
-		Checkins:  core.AllCheckins(),
-		Users:     users,
-		Services:  core.CoreApp.Services,
-	}
-
-	export, _ := json.Marshal(data)
+	export, _ := core.ExportSettings()
 
 	mime := http.DetectContentType(export)
 	fileSize := len(string(export))

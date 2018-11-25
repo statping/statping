@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
-	"io/ioutil"
-	"net/http"
+	"github.com/hunterlong/statup/utils"
+	"strings"
 	"text/template"
 	"time"
 )
@@ -85,14 +85,8 @@ func init() {
 // Send will send a HTTP Post to the slack webhooker API. It accepts type: string
 func (u *slack) Send(msg interface{}) error {
 	message := msg.(string)
-	client := new(http.Client)
-	res, err := client.Post(u.Host, "application/json", bytes.NewBuffer([]byte(message)))
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-	//contents, _ := ioutil.ReadAll(res.Body)
-	return nil
+	_, err := utils.HttpRequest(u.Host, "POST", "application/json", nil, strings.NewReader(message), time.Duration(10*time.Second))
+	return err
 }
 
 func (u *slack) Select() *notifier.Notification {
@@ -100,13 +94,7 @@ func (u *slack) Select() *notifier.Notification {
 }
 
 func (u *slack) OnTest() error {
-	client := new(http.Client)
-	res, err := client.Post(u.Host, "application/json", bytes.NewBuffer([]byte(`{"text":"testing message"}`)))
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-	contents, _ := ioutil.ReadAll(res.Body)
+	contents, err := utils.HttpRequest(u.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(`{"text":"testing message"}`)), time.Duration(10*time.Second))
 	if string(contents) != "ok" {
 		return errors.New("The slack response was incorrect, check the URL")
 	}

@@ -68,7 +68,7 @@ func RunInit(db string, t *testing.T) {
 func TestRunAll(t *testing.T) {
 	//t.Parallel()
 
-	databases := []string{"sqlite", "postgres", "mysql"}
+	databases := []string{"postgres", "sqlite", "mysql"}
 	if os.Getenv("ONLY_DB") != "" {
 		databases = []string{os.Getenv("ONLY_DB")}
 	}
@@ -89,6 +89,8 @@ func TestRunAll(t *testing.T) {
 		})
 		t.Run(dbt+" Drop Database", func(t *testing.T) {
 			assert.NotNil(t, core.Configs)
+			assert.NotNil(t, core.DbSession)
+			assert.Nil(t, core.DbSession.DB().Ping())
 			RunDropDatabase(t)
 		})
 		t.Run(dbt+" Connect to Database Again", func(t *testing.T) {
@@ -209,14 +211,13 @@ func TestRunAll(t *testing.T) {
 			RunSettingsHandler(t)
 		})
 		t.Run(dbt+" Cleanup", func(t *testing.T) {
-			core.Configs.Close()
-			core.DbSession = nil
+			//core.CloseDB()
 			if dbt == "mssql" {
 				os.Setenv("DB_DATABASE", "root")
 				os.Setenv("DB_PASS", "password123")
 				os.Setenv("DB_PORT", "1433")
 			}
-			//Clean()
+			Clean()
 		})
 
 		//<-done

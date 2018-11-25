@@ -26,12 +26,12 @@ import (
 )
 
 var (
-	EMAIL_HOST     = os.Getenv("EMAIL_HOST")
-	EMAIL_USER     = os.Getenv("EMAIL_USER")
-	EMAIL_PASS     = os.Getenv("EMAIL_PASS")
-	EMAIL_OUTGOING = os.Getenv("EMAIL_OUTGOING")
-	EMAIL_SEND_TO  = os.Getenv("EMAIL_SEND_TO")
-	EMAIL_PORT     = utils.StringInt(os.Getenv("EMAIL_PORT"))
+	EMAIL_HOST     string
+	EMAIL_USER     string
+	EMAIL_PASS     string
+	EMAIL_OUTGOING string
+	EMAIL_SEND_TO  string
+	EMAIL_PORT     int64
 )
 
 var testEmail *emailOutgoing
@@ -42,7 +42,7 @@ func init() {
 	EMAIL_PASS = os.Getenv("EMAIL_PASS")
 	EMAIL_OUTGOING = os.Getenv("EMAIL_OUTGOING")
 	EMAIL_SEND_TO = os.Getenv("EMAIL_SEND_TO")
-	EMAIL_PORT = utils.StringInt(os.Getenv("EMAIL_PORT"))
+	EMAIL_PORT = utils.ToInt(os.Getenv("EMAIL_PORT"))
 
 	emailer.Host = EMAIL_HOST
 	emailer.Username = EMAIL_USER

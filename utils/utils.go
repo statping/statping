@@ -16,11 +16,13 @@
 package utils
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"github.com/ararog/timeago"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
 	"regexp"
@@ -220,4 +222,40 @@ func DurationReadable(d time.Duration) string {
 func SaveFile(filename string, data []byte) error {
 	err := ioutil.WriteFile(filename, data, 0644)
 	return err
+}
+
+// HttpRequest is a global function to send a HTTP request
+func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration) ([]byte, error) {
+	var err error
+	var contentType string
+	if content != nil {
+		contentType = content.(string)
+	}
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+		TLSHandshakeTimeout: timeout,
+	}
+	client := &http.Client{
+		Transport: transport,
+		Timeout:   timeout,
+	}
+	var response *http.Response
+	response.Header.Set("User-Agent", "Statup")
+	for _, h := range headers {
+		keyVal := strings.Split(h, "=")
+		response.Header.Add(keyVal[0], keyVal[1])
+	}
+	if method == "POST" {
+		response, err = client.Post(url, contentType, body)
+	} else {
+		response, err = client.Get(url)
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+	contents, err := ioutil.ReadAll(response.Body)
+	return contents, err
 }

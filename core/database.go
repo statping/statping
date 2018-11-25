@@ -69,7 +69,7 @@ func usersDB() *gorm.DB {
 
 // checkinDB returns the Checkin records for a service
 func checkinDB() *gorm.DB {
-	return DbSession.Table("checkins").Model(&types.Checkin{})
+	return DbSession.Model(&types.Checkin{})
 }
 
 // checkinHitsDB returns the Checkin Hits records for a service
@@ -98,11 +98,6 @@ func CloseDB() {
 	if DbSession != nil {
 		DbSession.DB().Close()
 	}
-}
-
-// Close shutsdown the database connection
-func (db *DbConfig) Close() error {
-	return DbSession.DB().Close()
 }
 
 // AfterFind for Core will set the timezone

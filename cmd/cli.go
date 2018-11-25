@@ -27,7 +27,6 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
 	"io/ioutil"
-	"net/http"
 	"net/http/httptest"
 	"time"
 )
@@ -35,7 +34,9 @@ import (
 // catchCLI will run functions based on the commands sent to Statup
 func catchCLI(args []string) error {
 	dir := utils.Directory
-	utils.InitLogs()
+	if err := utils.InitLogs(); err != nil {
+		return err
+	}
 	source.Assets()
 	loadDotEnvs()
 
@@ -50,22 +51,21 @@ func catchCLI(args []string) error {
 		}
 		return errors.New("end")
 	case "assets":
-		err := source.CreateAllAssets(dir)
-		if err != nil {
+		var err error
+		if err = source.CreateAllAssets(dir); err != nil {
 			return err
-		} else {
-			return errors.New("end")
 		}
+		return errors.New("end")
 	case "sass":
-		err := source.CompileSASS(dir)
-		if err == nil {
-			return errors.New("end")
+		if err := source.CompileSASS(dir); err != nil {
+			return err
 		}
-		return err
+		return errors.New("end")
 	case "update":
-		gitCurrent, err := checkGithubUpdates()
-		if err != nil {
-			return nil
+		var err error
+		var gitCurrent githubResponse
+		if gitCurrent, err = checkGithubUpdates(); err != nil {
+			return err
 		}
 		fmt.Printf("Statup Version: v%v\nLatest Version: %v\n", VERSION, gitCurrent.TagName)
 		if VERSION != gitCurrent.TagName[1:] {
@@ -73,10 +73,7 @@ func catchCLI(args []string) error {
 		} else {
 			fmt.Printf("You have the latest version of Statup!\n")
 		}
-		if err == nil {
-			return errors.New("end")
-		}
-		return nil
+		return errors.New("end")
 	case "test":
 		cmd := args[1]
 		switch cmd {
@@ -84,25 +81,57 @@ func catchCLI(args []string) error {
 			plugin.LoadPlugins()
 		}
 		return errors.New("end")
-	case "export":
+	case "static":
 		var err error
 		fmt.Printf("Statup v%v Exporting Static 'index.html' page...\n", VERSION)
 		utils.InitLogs()
-		core.Configs, err = core.LoadConfigFile(dir)
-		if err != nil {
+		if core.Configs, err = core.LoadConfigFile(dir); err != nil {
 			utils.Log(4, "config.yml file not found")
 			return err
 		}
 		indexSource := ExportIndexHTML()
 		core.CloseDB()
-		err = utils.SaveFile(dir+"/index.html", indexSource)
-		if err != nil {
+		if err = utils.SaveFile(dir+"/index.html", indexSource); err != nil {
 			utils.Log(4, err)
 			return err
 		}
 		utils.Log(1, "Exported Statup index page: 'index.html'")
 	case "help":
 		HelpEcho()
+		return errors.New("end")
+	case "export":
+		var err error
+		var data []byte
+		if err := utils.InitLogs(); err != nil {
+			return err
+		}
+		if core.Configs, err = core.LoadConfigFile(dir); err != nil {
+			return err
+		}
+		if err = core.Configs.Connect(false, dir); err != nil {
+			return err
+		}
+		if data, err = core.ExportSettings(); err != nil {
+			return fmt.Errorf("could not export settings: %v", err.Error())
+		}
+		if err = utils.SaveFile(dir+"/statup-export.json", data); err != nil {
+			return fmt.Errorf("could not write file statup-export.json: %v", err.Error())
+		}
+		return errors.New("end")
+	case "import":
+		var err error
+		var data []byte
+		if len(args) != 2 {
+			return fmt.Errorf("did not include a JSON file to import\nstatup import filename.json")
+		}
+		filename := args[1]
+		if data, err = ioutil.ReadFile(filename); err != nil {
+			return err
+		}
+		var exportData core.ExportData
+		if err = json.Unmarshal(data, &exportData); err != nil {
+			return err
+		}
 		return errors.New("end")
 	case "run":
 		utils.Log(1, "Running 1 time and saving to database...")
@@ -175,42 +204,40 @@ func HelpEcho() {
 	fmt.Println("     statup version            - Returns the current version of Statup")
 	fmt.Println("     statup run                - Check all services 1 time and then quit")
 	fmt.Println("     statup assets             - Dump all assets used locally to be edited.")
-	fmt.Println("     statup export             - Exports the index page as a static HTML for pushing")
+	fmt.Println("     statup static             - Creates a static HTML file of the index page")
 	fmt.Println("     statup sass               - Compile .scss files into the css directory")
 	fmt.Println("     statup test plugins       - Test all plugins for required information")
 	fmt.Println("     statup env                - Show all environment variables being used for Statup")
 	fmt.Println("     statup update             - Attempts to update to the latest version")
+	fmt.Println("     statup export             - Exports your Statup settings to a 'statup-export.json' file.")
+	fmt.Println("     statup import <file>      - Imports settings from a previously saved JSON file.")
 	fmt.Println("     statup help               - Shows the user basic information about Statup")
 	fmt.Printf("Flags:\n")
 	fmt.Println("     -ip 127.0.0.1             - Run HTTP server on specific IP address (default: localhost)")
 	fmt.Println("     -port 8080                - Run HTTP server on Port (default: 8080)")
 	fmt.Printf("Environment Variables:\n")
 	fmt.Println("     STATUP_DIR                - Set a absolute path for the root path of Statup server (logs, assets, SQL db)")
-	fmt.Println("     DB_CONN             	   - Automatic Database connection (sqlite, postgres, mysql)")
-	fmt.Println("     DB_HOST             	   - Database hostname or IP address")
-	fmt.Println("     DB_USER             	   - Database username")
-	fmt.Println("     DB_PASS             	   - Database password")
-	fmt.Println("     DB_PORT             	   - Database port (5432, 3306, ...")
+	fmt.Println("     DB_CONN                   - Automatic Database connection (sqlite, postgres, mysql)")
+	fmt.Println("     DB_HOST                   - Database hostname or IP address")
+	fmt.Println("     DB_USER                   - Database username")
+	fmt.Println("     DB_PASS                   - Database password")
+	fmt.Println("     DB_PORT                   - Database port (5432, 3306, ...)")
 	fmt.Println("     DB_DATABASE               - Database connection's database name")
 	fmt.Println("     GO_ENV                    - Run Statup in testmode, will bypass HTTP authentication (if set as 'true')")
 	fmt.Println("     NAME                      - Set a name for the Statup status page")
 	fmt.Println("     DESCRIPTION               - Set a description for the Statup status page")
-	fmt.Println("     DOMAIN               	   - Set a URL for the Statup status page")
+	fmt.Println("     DOMAIN                    - Set a URL for the Statup status page")
 	fmt.Println("     ADMIN_USER                - Username for administrator account (default: admin)")
 	fmt.Println("     ADMIN_PASS                - Password for administrator account (default: admin)")
+	fmt.Println("     SASS                      - Set the absolute path to the sass binary location")
 	fmt.Println("   * You can insert environment variables into a '.env' file in root directory.")
-
 	fmt.Println("Give Statup a Star at https://github.com/hunterlong/statup")
 }
 
 func checkGithubUpdates() (githubResponse, error) {
 	var gitResp githubResponse
-	response, err := http.Get("https://api.github.com/repos/hunterlong/statup/releases/latest")
-	if err != nil {
-		return githubResponse{}, err
-	}
-	defer response.Body.Close()
-	contents, err := ioutil.ReadAll(response.Body)
+	url := "https://api.github.com/repos/hunterlong/statup/releases/latest"
+	contents, err := utils.HttpRequest(url, "GET", nil, nil, nil, time.Duration(10*time.Second))
 	if err != nil {
 		return githubResponse{}, err
 	}

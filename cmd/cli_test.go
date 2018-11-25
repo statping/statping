@@ -61,9 +61,9 @@ func TestHelpCommand(t *testing.T) {
 }
 
 func TestExportCommand(t *testing.T) {
-	cmd := helperCommand(nil, "export")
+	cmd := helperCommand(nil, "static")
 	var got = make(chan string)
-	commandAndSleep(cmd, time.Duration(4*time.Second), got)
+	commandAndSleep(cmd, time.Duration(10*time.Second), got)
 	gg, _ := <-got
 	t.Log(gg)
 	assert.Contains(t, gg, "Exporting Static 'index.html' page...")
@@ -72,10 +72,12 @@ func TestExportCommand(t *testing.T) {
 }
 
 func TestUpdateCommand(t *testing.T) {
-	c := testcli.Command("statup", "update")
-	c.Run()
-	assert.True(t, c.StdoutContains("Statup Version: "+VERSION))
-	assert.True(t, c.StdoutContains("Latest Version:"))
+	cmd := helperCommand(nil, "version")
+	var got = make(chan string)
+	commandAndSleep(cmd, time.Duration(10*time.Second), got)
+	gg, _ := <-got
+	t.Log(gg)
+	assert.Contains(t, gg, "Statup")
 }
 
 func TestAssetsCommand(t *testing.T) {

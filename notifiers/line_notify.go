@@ -20,9 +20,9 @@ import (
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
-	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 const (
@@ -59,21 +59,11 @@ func init() {
 // Send will send a HTTP Post with the Authorization to the notify-api.line.me server. It accepts type: string
 func (u *lineNotifier) Send(msg interface{}) error {
 	message := msg.(string)
-	client := new(http.Client)
 	v := url.Values{}
 	v.Set("message", message)
-	req, err := http.NewRequest("POST", "https://notify-api.line.me/api/notify", strings.NewReader(v.Encode()))
-	if err != nil {
-		return err
-	}
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %v", u.GetValue("api_secret")))
-	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	_, err = client.Do(req)
-	if err != nil {
-		return err
-	}
-	return nil
+	headers := []string{fmt.Sprintf("Authorization=Bearer %v", u.GetValue("api_secret"))}
+	_, err := utils.HttpRequest("https://notify-api.line.me/api/notify", "POST", "application/x-www-form-urlencoded", headers, strings.NewReader(v.Encode()), time.Duration(10*time.Second))
+	return err
 }
 
 func (u *lineNotifier) Select() *notifier.Notification {

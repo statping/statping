@@ -74,13 +74,11 @@ func main() {
 		}
 	}
 	utils.Log(1, fmt.Sprintf("Starting Statup v%v", VERSION))
-	defer core.CloseDB()
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
 		<-c
-		core.CloseDB()
 		os.Exit(1)
 	}()
 
