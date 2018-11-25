@@ -17,7 +17,9 @@ package core
 
 import (
 	"bytes"
+	"encoding/json"
 	"github.com/hunterlong/statup/source"
+	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"html/template"
 )
@@ -41,4 +43,29 @@ func ExportChartsJs() string {
 	}
 	result := tpl.String()
 	return result
+}
+
+type ExportData struct {
+	Core      *types.Core              `json:"core"`
+	Services  []types.ServiceInterface `json:"services"`
+	Messages  []*types.Message         `json:"messages"`
+	Checkins  []*Checkin               `json:"checkins"`
+	Users     []*User                  `json:"users"`
+	Notifiers []types.AllNotifiers     `json:"notifiers"`
+}
+
+func ExportSettings() ([]byte, error) {
+	users, err := SelectAllUsers()
+	if err != nil {
+		return nil, err
+	}
+	data := ExportData{
+		Core:      CoreApp.Core,
+		Notifiers: CoreApp.Notifications,
+		Checkins:  AllCheckins(),
+		Users:     users,
+		Services:  CoreApp.Services,
+	}
+	export, err := json.Marshal(data)
+	return export, err
 }

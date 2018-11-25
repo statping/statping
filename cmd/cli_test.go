@@ -17,6 +17,7 @@ package main
 
 import (
 	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statup/source"
 	"github.com/hunterlong/statup/utils"
 	"github.com/rendon/testcli"
 	"github.com/stretchr/testify/assert"
@@ -35,7 +36,6 @@ func init() {
 }
 
 func TestStartServerCommand(t *testing.T) {
-	Clean()
 	os.Setenv("DB_CONN", "sqlite")
 	cmd := helperCommand(nil, "")
 	var got = make(chan string)
@@ -61,9 +61,9 @@ func TestHelpCommand(t *testing.T) {
 }
 
 func TestExportCommand(t *testing.T) {
-	cmd := helperCommand(nil, "export")
+	cmd := helperCommand(nil, "static")
 	var got = make(chan string)
-	commandAndSleep(cmd, time.Duration(4*time.Second), got)
+	commandAndSleep(cmd, time.Duration(10*time.Second), got)
 	gg, _ := <-got
 	t.Log(gg)
 	assert.Contains(t, gg, "Exporting Static 'index.html' page...")
@@ -72,10 +72,12 @@ func TestExportCommand(t *testing.T) {
 }
 
 func TestUpdateCommand(t *testing.T) {
-	c := testcli.Command("statup", "update")
-	c.Run()
-	assert.True(t, c.StdoutContains("Statup Version: "+VERSION))
-	assert.True(t, c.StdoutContains("Latest Version:"))
+	cmd := helperCommand(nil, "version")
+	var got = make(chan string)
+	commandAndSleep(cmd, time.Duration(10*time.Second), got)
+	gg, _ := <-got
+	t.Log(gg)
+	assert.Contains(t, gg, "Statup")
 }
 
 func TestAssetsCommand(t *testing.T) {
@@ -122,12 +124,12 @@ func TestSassCLI(t *testing.T) {
 }
 
 func TestUpdateCLI(t *testing.T) {
-	t.SkipNow()
 	run := catchCLI([]string{"update"})
 	assert.EqualError(t, run, "end")
 }
 
 func TestTestPackageCLI(t *testing.T) {
+	t.SkipNow()
 	run := catchCLI([]string{"test", "plugins"})
 	assert.EqualError(t, run, "end")
 }
@@ -138,7 +140,6 @@ func TestHelpCLI(t *testing.T) {
 }
 
 func TestRunOnceCLI(t *testing.T) {
-	t.SkipNow()
 	run := catchCLI([]string{"run"})
 	assert.EqualError(t, run, "end")
 }
@@ -146,7 +147,6 @@ func TestRunOnceCLI(t *testing.T) {
 func TestEnvCLI(t *testing.T) {
 	run := catchCLI([]string{"env"})
 	assert.Error(t, run)
-	core.CloseDB()
 	Clean()
 }
 
@@ -166,4 +166,23 @@ func helperCommand(envs []string, s ...string) *exec.Cmd {
 func runCommand(c *exec.Cmd, out chan<- string) {
 	bout, _ := c.CombinedOutput()
 	out <- string(bout)
+}
+
+func fileExists(file string) bool {
+	if _, err := os.Stat(file); os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
+
+func Clean() {
+	utils.DeleteFile(dir + "/config.yml")
+	utils.DeleteFile(dir + "/statup.db")
+	utils.DeleteDirectory(dir + "/assets")
+	utils.DeleteDirectory(dir + "/logs")
+	core.CoreApp = core.NewCore()
+	source.Assets()
+	//core.CloseDB()
+	os.Unsetenv("DB_CONN")
+	time.Sleep(2 * time.Second)
 }

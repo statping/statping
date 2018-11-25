@@ -69,7 +69,7 @@ func usersDB() *gorm.DB {
 
 // checkinDB returns the Checkin records for a service
 func checkinDB() *gorm.DB {
-	return DbSession.Table("checkins").Model(&types.Checkin{})
+	return DbSession.Model(&types.Checkin{})
 }
 
 // checkinHitsDB returns the Checkin Hits records for a service
@@ -85,7 +85,7 @@ func messagesDb() *gorm.DB {
 // HitsBetween returns the gorm database query for a collection of service hits between a time range
 func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) *gorm.DB {
 	selector := Dbtimestamp(group, column)
-	if Configs.DbConn == "postgres" {
+	if CoreApp.DbConnection == "postgres" {
 		timeQuery := fmt.Sprintf("service = %v AND created_at BETWEEN '%v.000000' AND '%v.000000'", s.Id, t1.UTC().Format(types.POSTGRES_TIME), t2.UTC().Format(types.POSTGRES_TIME))
 		return DbSession.Model(&types.Hit{}).Select(selector).Where(timeQuery)
 	} else {
@@ -98,11 +98,6 @@ func CloseDB() {
 	if DbSession != nil {
 		DbSession.DB().Close()
 	}
-}
-
-// Close shutsdown the database connection
-func (db *DbConfig) Close() error {
-	return DbSession.DB().Close()
 }
 
 // AfterFind for Core will set the timezone

@@ -217,7 +217,7 @@ func (s *Service) DowntimeText() string {
 
 // Dbtimestamp will return a SQL query for grouping by date
 func Dbtimestamp(group string, column string) string {
-	var seconds int64
+	seconds := 3600
 	switch group {
 	case "minute":
 		seconds = 60
@@ -268,7 +268,10 @@ func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group st
 		return &DateScanObj{[]DateScan{}}
 	}
 	model = model.Order("timeframe asc", false).Group("timeframe")
-	rows, _ := model.Rows()
+	rows, err := model.Rows()
+	if err != nil {
+		utils.Log(3, fmt.Errorf("issue fetching service chart data: %v", err))
+	}
 
 	for rows.Next() {
 		var gd DateScan

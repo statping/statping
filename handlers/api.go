@@ -18,6 +18,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
@@ -62,6 +63,7 @@ func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func sendErrorJson(err error, w http.ResponseWriter, r *http.Request) {
+	utils.Log(2, fmt.Errorf("sending error response for %v: %v", r.URL.String(), err.Error()))
 	output := apiResponse{
 		Status: "error",
 		Error:  err.Error(),

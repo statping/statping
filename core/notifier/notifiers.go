@@ -80,7 +80,9 @@ type NotificationForm struct {
 	DbField     string `json:"field"`       // true variable key for input
 	SmallText   string `json:"small_text"`  // insert small text under a html input
 	Required    bool   `json:"required"`    // require this input on the html form
-	Hidden      bool   `json:"hidden"`      // hide this form element from end user
+	IsHidden    bool   `json:"hidden"`      // hide this form element from end user
+	IsList      bool   `json:"list"`        // make this form element a comma separated list
+	IsSwitch    bool   `json:"switch"`      // make the notifier a boolean true/false switch
 }
 
 // NotificationLog contains the normalized message from previously sent notifications

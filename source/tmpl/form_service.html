@@ -59,7 +59,7 @@
     <div class="form-group row{{if (eq .Type "tcp") or (eq .Type "udp")}} d-none{{end}}">
         <label for="service_response_code" class="col-sm-4 col-form-label">Expected Status Code</label>
         <div class="col-sm-8">
-            <input type="number" name="expected_status" class="form-control" value="{{if ne .ExpectedStatus 0}}{{.ExpectedStatus}}{{end}}" placeholder="200" id="service_response_code">
+            <input type="number" name="expected_status" class="form-control" value="{{if ne .ExpectedStatus 0}}{{.ExpectedStatus}}{{else}}200{{end}}" placeholder="200" id="service_response_code">
             <small class="form-text text-muted">A status code of 200 is success, or view all the <a target="_blank" href="https://www.restapitutorial.com/httpstatuscodes.html">HTTP Status Codes</a></small>
         </div>
     </div>
@@ -88,6 +88,15 @@
         <div class="col-sm-8">
             <input type="number" name="order" class="form-control" min="0" value="{{.Order}}" id="order">
             <small class="form-text text-muted">You can also drag and drop services to reorder on the Services tab.</small>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="order" class="col-sm-4 col-form-label">Notifications</label>
+        <div class="col-8 mt-1">
+            <span class="switch float-left">
+                <input type="checkbox" name="allow_notifications" class="switch" id="switch-service" {{if eq .Id 0}}checked{{end}}{{if .AllowNotifications.Bool}}checked{{end}}>
+                <label for="switch-service">Allow notifications to be sent for this service</label>
+            </span>
         </div>
     </div>
     <div class="form-group row">

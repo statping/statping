@@ -59,7 +59,14 @@
     <div class="form-group row">
         <label for="notify_before" class="col-sm-4 col-form-label">Notify Before</label>
         <div class="col-sm-8">
-            <input type="text" name="notify_before" class="form-control" id="notify_before" value="{{.NotifyBefore}}">
+            <div class="form-inline">
+            <input type="number" name="notify_before_scale" class="col-4 form-control" id="notify_before" value="{{.NotifyBefore.Int64}}" >
+            <select class="ml-2 col-7 form-control" name="notify_before_scale" id="notify_before_scale">
+                <option value="minute"{{if ne .Id 0}} selected{{end}}>Minutes</option>
+                <option value="hour">Hours</option>
+                <option value="day">Days</option>
+            </select>
+            </div>
         </div>
     </div>
 

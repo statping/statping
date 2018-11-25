@@ -940,8 +940,12 @@
 								"exec": [
 									"pm.test(\"Create Message\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.output.title).to.eql(\"API Message\");",
-									"    pm.expect(jsonData.output.service).to.eql(1);",
+									"    var object = jsonData.output;",
+									"    pm.expect(object.title).to.eql(\"API Message\");",
+									"    pm.expect(object.description).to.eql(\"This is an example a upcoming message for a service!\");",
+									"    pm.expect(object.service).to.eql(1);",
+									"    pm.expect(object.notify_before).to.eql(6);",
+									"    pm.expect(object.notify_before_scale).to.eql(\"hour\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -960,7 +964,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"API Message\",\n    \"description\": \"This is an example a upcoming message for a service!\",\n    \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n    \"service\": 1,\n    \"notify_users\": null,\n    \"notify_method\": \"\",\n    \"notify_before\": 0\n}"
+							"raw": "{\n    \"title\": \"API Message\",\n    \"description\": \"This is an example a upcoming message for a service!\",\n    \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n    \"service\": 1,\n    \"notify_users\": true,\n    \"notify_method\": \"email\",\n    \"notify_before\": 6,\n    \"notify_before_scale\": \"hour\"\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/messages",
@@ -981,7 +985,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "abbb5178-9613-418c-b5ee-be2d6b4fdb8f",
+								"id": "c30cc333-53f4-4e9a-9c32-958c905ec163",
 								"exec": [
 									"pm.test(\"View Message\", function () {",
 									"    var jsonData = pm.response.json();",
@@ -1020,13 +1024,16 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0403c03-0838-4fd2-9cce-aebaf8a128c3",
+								"id": "e9dd78cc-0f38-4516-bf82-38dd3451b2e7",
 								"exec": [
 									"pm.test(\"Update Message\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.status).to.eql(\"success\");",
-									"    pm.expect(jsonData.method).to.eql(\"update\");",
-									"    pm.expect(jsonData.id).to.eql(1);",
+									"    var object = jsonData.output;",
+									"    pm.expect(object.title).to.eql(\"Updated Message\");",
+									"    pm.expect(object.description).to.eql(\"This message was updated\");",
+									"    pm.expect(object.service).to.eql(1);",
+									"    pm.expect(object.notify_before).to.eql(3);",
+									"    pm.expect(object.notify_before_scale).to.eql(\"hour\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1045,7 +1052,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Routine Downtime\",\n    \"description\": \"This is an example a upcoming message for a service!\",\n    \"start_on\": \"2055-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2055-11-17T05:13:16.323798-08:00\",\n    \"service\": 2,\n    \"notify_users\": true,\n    \"notify_method\": \"email\",\n    \"notify_before\": 900\n}"
+							"raw": "{\n    \"title\": \"Updated Message\",\n    \"description\": \"This message was updated\",\n    \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n    \"service\": 1,\n    \"notify_users\": true,\n    \"notify_method\": \"email\",\n    \"notify_before\": 3,\n    \"notify_before_scale\": \"hour\"\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/messages/1",

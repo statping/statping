@@ -22,8 +22,6 @@ import (
 	"github.com/hunterlong/statup/core/notifier"
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -84,32 +82,21 @@ func (u *twilio) Select() *notifier.Notification {
 func (u *twilio) Send(msg interface{}) error {
 	message := msg.(string)
 	twilioUrl := fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%v/Messages.json", u.GetValue("api_key"))
-	client := &http.Client{}
+
 	v := url.Values{}
 	v.Set("To", "+"+u.Var1)
 	v.Set("From", "+"+u.Var2)
 	v.Set("Body", message)
 	rb := *strings.NewReader(v.Encode())
-	req, err := http.NewRequest("POST", twilioUrl, &rb)
-	if err != nil {
-		return err
-	}
-	req.SetBasicAuth(u.ApiKey, u.ApiSecret)
-	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	res, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-	contents, _ := ioutil.ReadAll(res.Body)
+
+	contents, _, err := utils.HttpRequest(twilioUrl, "POST", "application/x-www-form-urlencoded", nil, &rb, time.Duration(10*time.Second))
 	success, _ := twilioSuccess(contents)
 	if !success {
 		errorOut := twilioError(contents)
 		out := fmt.Sprintf("Error code %v - %v", errorOut.Code, errorOut.Message)
 		return errors.New(out)
 	}
-	return nil
+	return err
 }
 
 // OnFailure will trigger failing service
