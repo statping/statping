@@ -85,7 +85,7 @@ func init() {
 // Send will send a HTTP Post to the slack webhooker API. It accepts type: string
 func (u *slack) Send(msg interface{}) error {
 	message := msg.(string)
-	_, err := utils.HttpRequest(u.Host, "POST", "application/json", nil, strings.NewReader(message), time.Duration(10*time.Second))
+	_, _, err := utils.HttpRequest(u.Host, "POST", "application/json", nil, strings.NewReader(message), time.Duration(10*time.Second))
 	return err
 }
 
@@ -94,7 +94,7 @@ func (u *slack) Select() *notifier.Notification {
 }
 
 func (u *slack) OnTest() error {
-	contents, err := utils.HttpRequest(u.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(`{"text":"testing message"}`)), time.Duration(10*time.Second))
+	contents, _, err := utils.HttpRequest(u.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(`{"text":"testing message"}`)), time.Duration(10*time.Second))
 	if string(contents) != "ok" {
 		return errors.New("The slack response was incorrect, check the URL")
 	}

@@ -26,7 +26,6 @@ import (
 	"github.com/hunterlong/statup/utils"
 	"github.com/joho/godotenv"
 	"os"
-	"os/signal"
 )
 
 var (
@@ -74,13 +73,6 @@ func main() {
 		}
 	}
 	utils.Log(1, fmt.Sprintf("Starting Statup v%v", VERSION))
-
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	go func() {
-		<-c
-		os.Exit(1)
-	}()
 
 	core.Configs, err = core.LoadConfigFile(utils.Directory)
 	if err != nil {

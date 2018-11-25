@@ -90,7 +90,7 @@ func catchCLI(args []string) error {
 			return err
 		}
 		indexSource := ExportIndexHTML()
-		core.CloseDB()
+		//core.CloseDB()
 		if err = utils.SaveFile(dir+"/index.html", indexSource); err != nil {
 			utils.Log(4, err)
 			return err
@@ -114,6 +114,7 @@ func catchCLI(args []string) error {
 		if data, err = core.ExportSettings(); err != nil {
 			return fmt.Errorf("could not export settings: %v", err.Error())
 		}
+		//core.CloseDB()
 		if err = utils.SaveFile(dir+"/statup-export.json", data); err != nil {
 			return fmt.Errorf("could not write file statup-export.json: %v", err.Error())
 		}
@@ -136,7 +137,7 @@ func catchCLI(args []string) error {
 	case "run":
 		utils.Log(1, "Running 1 time and saving to database...")
 		RunOnce()
-		core.CloseDB()
+		//core.CloseDB()
 		fmt.Println("Check is complete.")
 		return errors.New("end")
 	case "env":
@@ -237,7 +238,7 @@ func HelpEcho() {
 func checkGithubUpdates() (githubResponse, error) {
 	var gitResp githubResponse
 	url := "https://api.github.com/repos/hunterlong/statup/releases/latest"
-	contents, err := utils.HttpRequest(url, "GET", nil, nil, nil, time.Duration(10*time.Second))
+	contents, _, err := utils.HttpRequest(url, "GET", nil, nil, nil, time.Duration(10*time.Second))
 	if err != nil {
 		return githubResponse{}, err
 	}

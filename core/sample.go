@@ -164,7 +164,7 @@ func insertSampleCore() error {
 }
 
 // insertSampleUsers will create 2 admin users for a seed database
-func insertSampleUsers() {
+func insertSampleUsers() error {
 	u2 := ReturnUser(&types.User{
 		Username: "testadmin",
 		Password: "password123",
@@ -179,11 +179,12 @@ func insertSampleUsers() {
 		Admin:    types.NewNullBool(true),
 	})
 
-	u2.Create()
-	u3.Create()
+	_, err := u2.Create()
+	_, err = u3.Create()
+	return err
 }
 
-func insertMessages() {
+func insertMessages() error {
 	m1 := ReturnMessage(&types.Message{
 		Title:       "Routine Downtime",
 		Description: "This is an example a upcoming message for a service!",
@@ -191,8 +192,9 @@ func insertMessages() {
 		StartOn:     time.Now().Add(15 * time.Minute),
 		EndOn:       time.Now().Add(2 * time.Hour),
 	})
-	m1.Create()
-
+	if _, err := m1.Create(); err != nil {
+		return err
+	}
 	m2 := ReturnMessage(&types.Message{
 		Title:       "Server Reboot",
 		Description: "This is another example a upcoming message for a service!",
@@ -200,16 +202,29 @@ func insertMessages() {
 		StartOn:     time.Now().Add(15 * time.Minute),
 		EndOn:       time.Now().Add(2 * time.Hour),
 	})
-	m2.Create()
+	if _, err := m2.Create(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // InsertLargeSampleData will create the example/dummy services for testing the Statup server
 func InsertLargeSampleData() error {
-	insertSampleCore()
-	InsertSampleData()
-	insertSampleUsers()
-	insertSampleCheckins()
-	insertMessages()
+	if err := insertSampleCore(); err != nil {
+		return err
+	}
+	if err := InsertSampleData(); err != nil {
+		return err
+	}
+	if err := insertSampleUsers(); err != nil {
+		return err
+	}
+	if err := insertSampleCheckins(); err != nil {
+		return err
+	}
+	if err := insertMessages(); err != nil {
+		return err
+	}
 	s6 := ReturnService(&types.Service{
 		Name:           "JSON Lint",
 		Domain:         "https://jsonlint.com",

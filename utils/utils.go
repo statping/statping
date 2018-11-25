@@ -225,37 +225,37 @@ func SaveFile(filename string, data []byte) error {
 }
 
 // HttpRequest is a global function to send a HTTP request
-func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration) ([]byte, error) {
+func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration) ([]byte, *http.Response, error) {
 	var err error
-	var contentType string
-	if content != nil {
-		contentType = content.(string)
-	}
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true,
 		},
-		TLSHandshakeTimeout: timeout,
+		DisableKeepAlives:     true,
+		ResponseHeaderTimeout: timeout,
+		TLSHandshakeTimeout:   timeout,
 	}
 	client := &http.Client{
 		Transport: transport,
 		Timeout:   timeout,
 	}
-	var response *http.Response
-	response.Header.Set("User-Agent", "Statup")
+	r := new(http.Request)
 	for _, h := range headers {
 		keyVal := strings.Split(h, "=")
-		response.Header.Add(keyVal[0], keyVal[1])
+		r.Header.Add(keyVal[0], keyVal[1])
 	}
-	if method == "POST" {
-		response, err = client.Post(url, contentType, body)
-	} else {
-		response, err = client.Get(url)
+	if r, err = http.NewRequest(method, url, body); err != nil {
+		return nil, nil, err
 	}
-	if err != nil {
-		return nil, err
+	r.Header.Set("User-Agent", "Statup")
+	if content != nil {
+		r.Header.Set("Content-Type", content.(string))
 	}
-	defer response.Body.Close()
-	contents, err := ioutil.ReadAll(response.Body)
-	return contents, err
+	var resp *http.Response
+	if resp, err = client.Do(r); err != nil {
+		return nil, resp, err
+	}
+	defer resp.Body.Close()
+	contents, err := ioutil.ReadAll(resp.Body)
+	return contents, resp, err
 }
