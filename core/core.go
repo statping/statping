@@ -94,6 +94,13 @@ func (c Core) CurrentTime() string {
 	return current.Format(ansic)
 }
 
+// Messages will return the current local time
+func (c Core) Messages() []*Message {
+	var message []*Message
+	messagesDb().Where("service = ?", 0).Limit(10).Find(&message)
+	return message
+}
+
 // UsingAssets will return true if /assets folder is present
 func (c Core) UsingAssets() bool {
 	return source.UsingAssets(utils.Directory)
