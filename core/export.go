@@ -48,7 +48,7 @@ func ExportChartsJs() string {
 type ExportData struct {
 	Core      *types.Core              `json:"core"`
 	Services  []types.ServiceInterface `json:"services"`
-	Messages  []*types.Message         `json:"messages"`
+	Messages  []*Message               `json:"messages"`
 	Checkins  []*Checkin               `json:"checkins"`
 	Users     []*User                  `json:"users"`
 	Notifiers []types.AllNotifiers     `json:"notifiers"`
@@ -56,6 +56,7 @@ type ExportData struct {
 
 func ExportSettings() ([]byte, error) {
 	users, err := SelectAllUsers()
+	messages, err := SelectMessages()
 	if err != nil {
 		return nil, err
 	}
@@ -65,6 +66,7 @@ func ExportSettings() ([]byte, error) {
 		Checkins:  AllCheckins(),
 		Users:     users,
 		Services:  CoreApp.Services,
+		Messages:  messages,
 	}
 	export, err := json.Marshal(data)
 	return export, err

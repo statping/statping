@@ -8,8 +8,24 @@
 <h5 class="col-12 text-center mb-5 header-desc">{{ .Description }}</h5>
 {{ end }}
 
+{{ if .Messages }}
+<div class="col-12">
+{{range .Messages}}
+    <div class="alert alert-warning" role="alert">
+        <h3>{{.Title}}</h3>
+        <span class="mb-3">{{safe .Description}}</span>
+        <div class="d-block mt-2 mb-4">
+            <span class="float-left small">Starts at {{.StartOn}}</span>
+            <span class="float-right small">Ends on {{.EndOn}}</span>
+        </div>
+    </div>
+{{end}}
+</div>
+{{end}}
+
 <div class="col-12 full-col-12 mb-5">
-    <div class="list-group online_list">
+
+<div class="list-group online_list">
     {{ range Services }}
         <a href="#" class="service_li list-group-item list-group-item-action {{if not .Online}}bg-danger text-white{{ end }}" data-id="{{.Id}}">
         {{ .Name }}
@@ -32,8 +48,9 @@
         <p class="mb-0">If this is a bug, please make an issue in the Statup Github Repo. <a href="https://github.com/hunterlong/statup" class="btn btn-sm btn-outline-danger float-right">Statup Github Repo</a></p>
     </div>
 {{end}}
+
 {{ range Services }}
-    <div class="mt-4" id="service_id_{{.Id}}">
+    <div class="mb-4" id="service_id_{{.Id}}">
         <div class="card">
             <div class="card-body">
                 <div class="col-12">

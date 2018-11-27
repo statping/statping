@@ -76,6 +76,9 @@ func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&user)
+	if user.Password != "" {
+		user.Password = utils.HashPassword(user.Password)
+	}
 	err = user.Update()
 	if err != nil {
 		sendErrorJson(fmt.Errorf("issue updating user #%v: %v", user.Id, err), w, r)

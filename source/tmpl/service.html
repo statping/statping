@@ -141,7 +141,7 @@
                         {{ if lt $ch.Expected 0}}{{Duration $ch.Expected}} ago{{else}}in {{Duration $ch.Expected}}{{end}}
                     {{end}}
                 </td>
-                <td><a href="/api/checkin/{{$ch.Id}}" data-method="DELETE" data-obj="checkin_{{$ch.Id}}" data-id="{{$ch.Id}}" class="ajax_delete btn btn-sm btn-danger">Delete</a></td>
+                <td><a href="/api/checkin/{{$ch.ApiKey}}" data-method="DELETE" data-obj="checkin_{{$ch.Id}}" data-id="{{$ch.Id}}" class="ajax_delete btn btn-sm btn-danger">Delete</a></td>
             </tr>
             {{end}}
             </tbody>

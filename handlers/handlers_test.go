@@ -197,7 +197,6 @@ func TestUsersEditHandler(t *testing.T) {
 	assert.Contains(t, body, "<title>Statup | admin</title>")
 	assert.Contains(t, body, "<h3>User admin</h3>")
 	assert.Contains(t, body, "value=\"info@statup.io\"")
-	assert.Contains(t, body, "value=\"##########\"")
 	//assert.Contains(t, body, "</footer>️")
 	assert.True(t, isRouteAuthenticated(req))
 }
@@ -385,7 +384,6 @@ func TestViewNotificationSettingsHandler(t *testing.T) {
 	assert.Equal(t, 200, rr.Code)
 	assert.Contains(t, body, "<title>Statup | Settings</title>")
 	assert.Contains(t, body, `value="exampleuser" id="smtp_username"`)
-	assert.Contains(t, body, `value="##########" id="smtp_password"`)
 	assert.Contains(t, body, `value="587" id="smtp_port"`)
 	assert.Contains(t, body, `value="info@betatude.com" id="outgoing_email_address"`)
 	assert.Contains(t, body, `value="sendto@gmail.com" id="send_alerts_to"`)
