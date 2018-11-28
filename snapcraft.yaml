@@ -8,7 +8,9 @@ description: >
   This Status Page generator allows you to use MySQL, Postgres, or SQLite
   on multiple operating systems.
 
-confinement: stable
+type: app
+confinement: strict
+grade: stable
 
 parts:
   statup:
