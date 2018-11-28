@@ -1,4 +1,6 @@
 {{define "form_user"}}
+<div class="card">
+<div class="card-body">
 {{if ne .Id 0}}
 <form class="ajax_form" action="/api/users/{{.Id}}" data-redirect="/users" method="POST">
 {{else}}
@@ -41,4 +43,6 @@
     </div>
     <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
 </form>
+</div>
+</div>
 {{end}}

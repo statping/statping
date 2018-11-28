@@ -1,4 +1,6 @@
 {{define "form_service"}}
+<div class="card">
+<div class="card-body">
 {{if ne .Id 0}}
 <form class="ajax_form" action="/api/services/{{.Id}}" data-redirect="/services" method="POST">
 {{else}}
@@ -111,4 +113,6 @@
     </div>
     <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
 </form>
+</div>
+</div>
 {{end}}

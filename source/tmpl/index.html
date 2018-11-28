@@ -8,22 +8,7 @@
 <h5 class="col-12 text-center mb-5 header-desc">{{ .Description }}</h5>
 {{ end }}
 
-{{ if .Messages }}
-<div class="col-12">
-{{range .Messages}}
-    <div class="alert alert-warning" role="alert">
-        <h3>{{.Title}}</h3>
-        <span class="mb-3">{{safe .Description}}</span>
-        <div class="d-block mt-2 mb-4">
-            <span class="float-left small">Starts at {{.StartOn}}</span>
-            <span class="float-right small">Ends on {{.EndOn}}</span>
-        </div>
-    </div>
-{{end}}
-</div>
-{{end}}
-
-<div class="col-12 full-col-12 mb-5">
+<div class="col-12 full-col-12">
 
 <div class="list-group online_list">
     {{ range Services }}
@@ -38,6 +23,21 @@
     {{ end }}
     </div>
 </div>
+
+{{ if .Messages }}
+    <div class="col-12 mt-3">
+    {{range .Messages}}
+        <div class="alert alert-primary" role="alert">
+            <h3>{{.Title}}</h3>
+            <span class="mb-3">{{safe .Description}}</span>
+            <div class="d-block mt-2 mb-4">
+                <span class="float-left small">Starts at {{.StartOn}}</span>
+                <span class="float-right small">Ends on {{.EndOn}}</span>
+            </div>
+        </div>
+    {{end}}
+    </div>
+{{end}}
 
 <div class="col-12 full-col-12">
 {{ if not Services }}

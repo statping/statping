@@ -1,4 +1,6 @@
 {{define "form_checkin"}}
+<div class="card">
+<div class="card-body">
 <form class="ajax_form" action="/api/checkin" data-redirect="/service/{{.Id}}" method="POST">
     <div class="form-group row">
         <div class="col-md-3">
@@ -6,7 +8,7 @@
             <input type="text" name="name" class="form-control" id="checkin_name" placeholder="New Checkin">
         </div>
         <div class="col-3">
-            <label for="checkin_interval" class="col-form-label">Interval</label>
+            <label for="checkin_interval" class="col-form-label">Interval (seconds)</label>
             <input type="number" name="interval" class="form-control" id="checkin_interval" placeholder="60">
         </div>
         <div class="col-3">
@@ -16,8 +18,10 @@
         <div class="col-3">
             <label for="submit" class="col-form-label"></label>
             <input type="hidden" name="service_id" class="form-control" id="service_id" value="{{.Id}}">
-            <button type="submit" id="submit" class="btn btn-success d-block">Save Checkin</button>
+            <button type="submit" id="submit" class="btn btn-success d-block" style="margin-top: 14px;">Save Checkin</button>
         </div>
     </div>
 </form>
+</div>
+</div>
 {{end}}

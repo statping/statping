@@ -78,6 +78,13 @@ func (s *Service) LimitedFailures(amount int64) []*failure {
 	return failArr
 }
 
+// LimitedFailures will return the last amount of failures from a service
+func (s *Service) LimitedCheckinFailures(amount int64) []*failure {
+	var failArr []*failure
+	failuresDB().Where("service = ?", s.Id).Where("method = 'checkin'").Order("id desc").Limit(amount).Find(&failArr)
+	return failArr
+}
+
 // Ago returns a human readable timestamp for a failure
 func (f *failure) Ago() string {
 	got, _ := timeago.TimeAgoWithTime(time.Now(), f.CreatedAt)

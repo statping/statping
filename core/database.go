@@ -150,8 +150,8 @@ func (c *CheckinHit) AfterFind() (err error) {
 func (u *Message) AfterFind() (err error) {
 	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
 	u.UpdatedAt = utils.Timezoner(u.UpdatedAt, CoreApp.Timezone)
-	u.StartOn = utils.Timezoner(u.StartOn, CoreApp.Timezone)
-	u.EndOn = utils.Timezoner(u.EndOn, CoreApp.Timezone)
+	u.StartOn = utils.Timezoner(u.StartOn.UTC(), CoreApp.Timezone)
+	u.EndOn = utils.Timezoner(u.EndOn.UTC(), CoreApp.Timezone)
 	return
 }
 

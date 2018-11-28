@@ -32,13 +32,14 @@ var (
 )
 
 var service = &types.Service{
-	Name:           "Interpol - All The Rage Back Home",
-	Domain:         "https://www.youtube.com/watch?v=-u6DvRyyKGU",
-	ExpectedStatus: 200,
-	Interval:       30,
-	Type:           "http",
-	Method:         "GET",
-	Timeout:        20,
+	Name:               "Interpol - All The Rage Back Home",
+	Domain:             "https://www.youtube.com/watch?v=-u6DvRyyKGU",
+	ExpectedStatus:     200,
+	Interval:           30,
+	Type:               "http",
+	Method:             "GET",
+	Timeout:            20,
+	AllowNotifications: types.NewNullBool(true),
 }
 
 var failure = &types.Failure{
