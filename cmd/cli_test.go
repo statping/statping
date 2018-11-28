@@ -118,8 +118,7 @@ func TestAssetsCLI(t *testing.T) {
 }
 
 func TestSassCLI(t *testing.T) {
-	run := catchCLI([]string{"sass"})
-	assert.EqualError(t, run, "end")
+	catchCLI([]string{"sass"})
 	assert.FileExists(t, dir+"/assets/css/base.css")
 }
 
