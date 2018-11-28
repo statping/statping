@@ -31,6 +31,9 @@ func OnSave(method string) {
 
 // OnFailure will be triggered when a service is failing - BasicEvents interface
 func OnFailure(s *types.Service, f *types.Failure) {
+	if !s.AllowNotifications.Bool {
+		return
+	}
 	for _, comm := range AllCommunications {
 		if isType(comm, new(BasicEvents)) && isEnabled(comm) && inLimits(comm) {
 			comm.(BasicEvents).OnFailure(s, f)
@@ -40,6 +43,9 @@ func OnFailure(s *types.Service, f *types.Failure) {
 
 // OnSuccess will be triggered when a service is successful - BasicEvents interface
 func OnSuccess(s *types.Service) {
+	if !s.AllowNotifications.Bool {
+		return
+	}
 	for _, comm := range AllCommunications {
 		if isType(comm, new(BasicEvents)) && isEnabled(comm) && inLimits(comm) {
 			comm.(BasicEvents).OnSuccess(s)
@@ -58,6 +64,9 @@ func OnNewService(s *types.Service) {
 
 // OnUpdatedService is triggered when a service is updated - ServiceEvents interface
 func OnUpdatedService(s *types.Service) {
+	if !s.AllowNotifications.Bool {
+		return
+	}
 	for _, comm := range AllCommunications {
 		if isType(comm, new(ServiceEvents)) && isEnabled(comm) && inLimits(comm) {
 			comm.(ServiceEvents).OnUpdatedService(s)
@@ -67,6 +76,9 @@ func OnUpdatedService(s *types.Service) {
 
 // OnDeletedService is triggered when a service is deleted - ServiceEvents interface
 func OnDeletedService(s *types.Service) {
+	if !s.AllowNotifications.Bool {
+		return
+	}
 	for _, comm := range AllCommunications {
 		if isType(comm, new(ServiceEvents)) && isEnabled(comm) && inLimits(comm) {
 			comm.(ServiceEvents).OnDeletedService(s)

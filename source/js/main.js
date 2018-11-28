@@ -138,6 +138,10 @@ function PingAjaxChart(chart, service, start=0, end=9999999999, group="hour") {
 }
 
 $('.ajax_delete').on('click', function() {
+	var r = confirm('Are you sure you want to delete?');
+	if (r !== true) {
+		return false;
+	}
 	let obj = $(this);
 	let id = obj.attr('data-id');
 	let element = obj.attr('data-obj');
@@ -204,21 +208,23 @@ $('form.ajax_form').on('submit', function() {
 		data: sendData,
 		success: function (data) {
 			console.log(data)
-			if (data.status === 'error') {
-				let alerter = form.find('#alerter');
-				alerter.html(data.error);
-				alerter.removeClass("d-none");
-				Spinner(button, true);
-			} else {
-				Spinner(button, true);
-				if (func) {
-					let fn = window[func];
-					if (typeof fn === "function") fn({element: form, form: newArr, data: data});
+			setTimeout(function () {
+				if (data.status === 'error') {
+					let alerter = form.find('#alerter');
+					alerter.html(data.error);
+					alerter.removeClass("d-none");
+					Spinner(button, true);
+				} else {
+					Spinner(button, true);
+					if (func) {
+						let fn = window[func];
+						if (typeof fn === "function") fn({element: form, form: newArr, data: data});
+					}
+					if (redirect) {
+						window.location.href = redirect;
+					}
 				}
-				if (redirect) {
-					window.location.href = redirect;
-				}
-			}
+			}, 1000);
 		}
 	});
 	return false;
