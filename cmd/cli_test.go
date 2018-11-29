@@ -74,7 +74,7 @@ func TestExportCommand(t *testing.T) {
 func TestUpdateCommand(t *testing.T) {
 	cmd := helperCommand(nil, "version")
 	var got = make(chan string)
-	commandAndSleep(cmd, time.Duration(10*time.Second), got)
+	commandAndSleep(cmd, time.Duration(15*time.Second), got)
 	gg, _ := <-got
 	t.Log(gg)
 	assert.Contains(t, gg, "Statup")
@@ -92,7 +92,7 @@ func TestAssetsCommand(t *testing.T) {
 func TestRunCommand(t *testing.T) {
 	cmd := helperCommand(nil, "run")
 	var got = make(chan string)
-	commandAndSleep(cmd, time.Duration(5*time.Second), got)
+	commandAndSleep(cmd, time.Duration(15*time.Second), got)
 	gg, _ := <-got
 	t.Log(gg)
 	assert.Contains(t, gg, "Running 1 time and saving to database...")

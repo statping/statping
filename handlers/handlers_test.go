@@ -460,7 +460,7 @@ func TestSaveSassHandler(t *testing.T) {
 
 func TestReorderServiceHandler(t *testing.T) {
 	data := `[{id: 1, order: 3},{id: 2, order: 2},{id: 3, order: 1}]"`
-	req, err := http.NewRequest("POST", "/services/reorder", strings.NewReader(data))
+	req, err := http.NewRequest("POST", "/api/services/reorder", strings.NewReader(data))
 	req.Header.Set("Content-Type", "application/json")
 	assert.Nil(t, err)
 	rr := httptest.NewRecorder()
