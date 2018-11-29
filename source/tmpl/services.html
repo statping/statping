@@ -61,14 +61,12 @@
             newOrder.push(o);
         });
         $.ajax({
-            url: "/services/reorder",
+            url: "/api/services/reorder",
             type: 'POST',
             data: JSON.stringify(newOrder),
             contentType: "application/json",
             dataType: "json",
-            success: function(data) {
-                console.log(data)
-            }
+            success: function(data) { }
         });
     });
 </script>

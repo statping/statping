@@ -40,8 +40,6 @@ before_deploy:
 
 after_deploy:
   - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make publish-homebrew; fi
-  - snapcraft login --with "$SNAP_TOKEN"
-  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make snapcraft; fi
 
 deploy:
   - provider: releases

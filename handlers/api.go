@@ -68,6 +68,7 @@ func sendErrorJson(err error, w http.ResponseWriter, r *http.Request) {
 		Status: "error",
 		Error:  err.Error(),
 	}
+	r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(output)
 }
@@ -117,6 +118,7 @@ func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *ht
 		Output: obj,
 	}
 
+	r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(output)
 }

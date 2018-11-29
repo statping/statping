@@ -81,7 +81,6 @@ func Router() *mux.Router {
 
 	// SERVICE Routes
 	r.Handle("/services", http.HandlerFunc(servicesHandler)).Methods("GET")
-	r.Handle("/services/reorder", http.HandlerFunc(reorderServiceHandler)).Methods("POST")
 	r.Handle("/service/{id}", http.HandlerFunc(servicesViewHandler)).Methods("GET")
 	r.Handle("/service/{id}/edit", http.HandlerFunc(servicesViewHandler))
 	r.Handle("/service/{id}/delete_failures", http.HandlerFunc(servicesDeleteFailuresHandler)).Methods("GET")
@@ -94,6 +93,7 @@ func Router() *mux.Router {
 	r.Handle("/api/services", http.HandlerFunc(apiAllServicesHandler)).Methods("GET")
 	r.Handle("/api/services", http.HandlerFunc(apiCreateServiceHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceHandler)).Methods("GET")
+	r.Handle("/api/services/reorder", http.HandlerFunc(reorderServiceHandler)).Methods("POST")
 	r.Handle("/api/services/{id}/data", cached("120s", "application/json", http.HandlerFunc(apiServiceDataHandler))).Methods("GET")
 	r.Handle("/api/services/{id}/ping", http.HandlerFunc(apiServicePingDataHandler)).Methods("GET")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceUpdateHandler)).Methods("POST")
