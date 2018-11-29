@@ -10,7 +10,7 @@ XGO=GOPATH=$(GOPATH) xgo -go 1.11 --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
 RICE=$(GOPATH)/bin/rice
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
-PUBLISH_BODY='{ "request": { "branch": "master", "config": { "env": { "VERSION": "$VERSION", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
+PUBLISH_BODY='{ "request": { "branch": "master", "config": { "env": { "VERSION": "${VERSION}", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
 TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statup v${VERSION}", "config": { "os": [ "linux" ], "language": "go", "go": [ "1.10.x" ], "go_import_path": "github.com/hunterlong/statup", "install": true, "sudo": "required", "services": [ "docker" ], "env": { "VERSION": "${VERSION}" }, "matrix": { "allow_failures": [ { "go": "master" } ], "fast_finish": true }, "before_deploy": [ "git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "make tag" ], "deploy": [ { "provider": "releases", "api_key": "$(GH_TOKEN)", "file": [ "build/statup-osx-x64.tar.gz", "build/statup-osx-x32.tar.gz", "build/statup-linux-x64.tar.gz", "build/statup-linux-x32.tar.gz", "build/statup-linux-arm64.tar.gz", "build/statup-linux-arm7.tar.gz", "build/statup-linux-arm6.tar.gz", "build/statup-linux-alpine.tar.gz", "build/statup-windows-x64.zip" ], "skip_cleanup": true } ], "notifications": { "email": false }, "before_script": ["gem install sass"], "script": [ "travis_wait 30 docker pull karalabe/xgo-latest", "make release" ], "after_success": [], "after_deploy": [ "make publish-dev" ] } } }'
 TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statup
 PATH:=$(PATH)
@@ -301,6 +301,9 @@ snapcraft-build:
 
 snapcraft-release:
 	snapcraft push *.snap --release edge
+
+snap:
+	snapcraft cleanbuild
 
 # install xgo and pull the xgo docker image
 xgo-install: clean
