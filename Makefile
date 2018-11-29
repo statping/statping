@@ -1,4 +1,5 @@
 VERSION=$(shell cat version.txt)
+SIGN_KEY=1CD16653F89EDB72A5621D2D253A2CB79B43052D
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -242,22 +243,31 @@ tag:
 # compress built binaries into tar.gz and zip formats
 compress:
 	cd build && mv alpine-linux-amd64 $(BINARY_NAME)
+	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output gpg-statup-alpine.asc --armor $(BINARY_NAME)
 	cd build && tar -czvf $(BINARY_NAME)-linux-alpine.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
 	cd build && mv cmd-darwin-10.6-amd64 $(BINARY_NAME)
+	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output gpg-statup-mac64.asc --armor $(BINARY_NAME)
 	cd build && tar -czvf $(BINARY_NAME)-osx-x64.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
 	cd build && mv cmd-darwin-10.6-386 $(BINARY_NAME)
+	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output gpg-statup-mac32.asc --armor $(BINARY_NAME)
 	cd build && tar -czvf $(BINARY_NAME)-osx-x32.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
 	cd build && mv cmd-linux-amd64 $(BINARY_NAME)
+	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output gpg-statup-linux64.asc --armor $(BINARY_NAME)
 	cd build && tar -czvf $(BINARY_NAME)-linux-x64.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
 	cd build && mv cmd-linux-386 $(BINARY_NAME)
+	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output gpg-statup-linux32.asc --armor $(BINARY_NAME)
 	cd build && tar -czvf $(BINARY_NAME)-linux-x32.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
 	cd build && mv cmd-windows-6.0-amd64.exe $(BINARY_NAME).exe
-	cd build && zip $(BINARY_NAME)-windows-x64.zip $(BINARY_NAME).exe  && rm -f $(BINARY_NAME).exe
+	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output gpg-statup-win64.asc --armor $(BINARY_NAME).exe
+	cd build && zip $(BINARY_NAME)-windows-x64.zip $(BINARY_NAME).exe && rm -f $(BINARY_NAME).exe
 	cd build && mv cmd-linux-arm-7 $(BINARY_NAME)
+	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output gpg-statup-arm7.asc --armor $(BINARY_NAME)
 	cd build && tar -czvf $(BINARY_NAME)-linux-arm7.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
 	cd build && mv cmd-linux-arm-6 $(BINARY_NAME)
+	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output gpg-statup-arm6.asc --armor $(BINARY_NAME)
 	cd build && tar -czvf $(BINARY_NAME)-linux-arm6.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
 	cd build && mv cmd-linux-arm64 $(BINARY_NAME)
+	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output gpg-statup-arm64.asc --armor $(BINARY_NAME)
 	cd build && tar -czvf $(BINARY_NAME)-linux-arm64.tar.gz $(BINARY_NAME) && rm -f $(BINARY_NAME)
 
 # push the :dev docker tag using curl
@@ -304,6 +314,12 @@ snapcraft-release:
 
 snap:
 	snapcraft cleanbuild
+
+sign-all:
+	gpg --default-key CB1895149EEA4A2B8DBC9FB4C326E5C3B26BBA53 --detach-sign --armor statuper
+
+valid-sign:
+	gpg --verify statuper.asc
 
 # install xgo and pull the xgo docker image
 xgo-install: clean

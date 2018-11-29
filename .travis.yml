@@ -80,4 +80,6 @@ script:
   - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make coverage; fi
 
 after_success:
+  - wget -O statup.gpg $SIGN_URL
+  - gpg --import statup.gpg
   - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make travis-build; fi
