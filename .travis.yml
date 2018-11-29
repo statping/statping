@@ -82,5 +82,3 @@ script:
 
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make travis-build; fi
-  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make snapcraft; fi
-  - sudo snap install snapcraft --classic
