@@ -1,4 +1,4 @@
-VERSION=0.79.91
+VERSION=$(shell cat version.txt)
 BINARY_NAME=statup
 GOPATH:=$(GOPATH)
 GOCMD=go
@@ -7,11 +7,11 @@ GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 GOINSTALL=$(GOCMD) install
 XGO=GOPATH=$(GOPATH) xgo -go 1.11 --dest=build
-BUILDVERSION=-ldflags "-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT)"
+BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
 RICE=$(GOPATH)/bin/rice
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
-PUBLISH_BODY='{ "request": { "branch": "master", "config": { "env": { "VERSION": "$(VERSION)", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
-TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statup v$(VERSION)", "config": { "os": [ "linux" ], "language": "go", "go": [ "1.10.x" ], "go_import_path": "github.com/hunterlong/statup", "install": true, "sudo": "required", "services": [ "docker" ], "env": { "VERSION": "$(VERSION)" }, "matrix": { "allow_failures": [ { "go": "master" } ], "fast_finish": true }, "before_deploy": [ "git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "make tag" ], "deploy": [ { "provider": "releases", "api_key": "$(GH_TOKEN)", "file": [ "build/statup-osx-x64.tar.gz", "build/statup-osx-x32.tar.gz", "build/statup-linux-x64.tar.gz", "build/statup-linux-x32.tar.gz", "build/statup-linux-arm64.tar.gz", "build/statup-linux-arm7.tar.gz", "build/statup-linux-alpine.tar.gz", "build/statup-windows-x64.zip" ], "skip_cleanup": true } ], "notifications": { "email": false }, "before_script": ["gem install sass"], "script": [ "travis_wait 30 docker pull karalabe/xgo-latest", "make release" ], "after_success": [], "after_deploy": [ "make publish-dev" ] } } }'
+PUBLISH_BODY='{ "request": { "branch": "master", "config": { "env": { "VERSION": "${VERSION}", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
+TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statup v${VERSION}", "config": { "os": [ "linux" ], "language": "go", "go": [ "1.10.x" ], "go_import_path": "github.com/hunterlong/statup", "install": true, "sudo": "required", "services": [ "docker" ], "env": { "VERSION": "${VERSION}" }, "matrix": { "allow_failures": [ { "go": "master" } ], "fast_finish": true }, "before_deploy": [ "git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "make tag" ], "deploy": [ { "provider": "releases", "api_key": "$(GH_TOKEN)", "file": [ "build/statup-osx-x64.tar.gz", "build/statup-osx-x32.tar.gz", "build/statup-linux-x64.tar.gz", "build/statup-linux-x32.tar.gz", "build/statup-linux-arm64.tar.gz", "build/statup-linux-arm7.tar.gz", "build/statup-linux-alpine.tar.gz", "build/statup-windows-x64.zip" ], "skip_cleanup": true } ], "notifications": { "email": false }, "before_script": ["gem install sass"], "script": [ "travis_wait 30 docker pull karalabe/xgo-latest", "make release" ], "after_success": [], "after_deploy": [ "make publish-dev" ] } } }'
 TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statup
 PATH:=$(PATH)
 
@@ -129,7 +129,7 @@ build-windows: compile
 
 # build Alpine linux binary (used in docker images)
 build-alpine: compile
-	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT) -linkmode external -extldflags -static" -out alpine ./cmd
+	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT) -linkmode external -extldflags -static" -out alpine ./cmd
 
 #
 #    Docker Makefile commands
@@ -137,17 +137,17 @@ build-alpine: compile
 
 # build :latest docker tag
 docker-build-latest:
-	docker build --build-arg VERSION=$(VERSION) -t hunterlong/statup:latest --no-cache -f Dockerfile .
-	docker tag hunterlong/statup:latest hunterlong/statup:v$(VERSION)
+	docker build --build-arg VERSION=${VERSION} -t hunterlong/statup:latest --no-cache -f Dockerfile .
+	docker tag hunterlong/statup:latest hunterlong/statup:v${VERSION}
 
 # build :dev docker tag
 docker-build-dev:
-	docker build --build-arg VERSION=$(VERSION) -t hunterlong/statup:latest --no-cache -f Dockerfile .
-	docker tag hunterlong/statup:dev hunterlong/statup:dev-v$(VERSION)
+	docker build --build-arg VERSION=${VERSION} -t hunterlong/statup:latest --no-cache -f Dockerfile .
+	docker tag hunterlong/statup:dev hunterlong/statup:dev-v${VERSION}
 
 # build Cypress UI testing :cypress docker tag
 docker-build-cypress: clean
-	GOPATH=$(GOPATH) xgo -out statup -go 1.10.x -ldflags "-X main.VERSION=$(VERSION) -X main.COMMIT=$(TRAVIS_COMMIT)" --targets=linux/amd64 ./cmd
+	GOPATH=$(GOPATH) xgo -out statup -go 1.10.x -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" --targets=linux/amd64 ./cmd
 	docker build -t hunterlong/statup:cypress -f dev/Dockerfile-cypress .
 	rm -f statup
 
@@ -165,14 +165,14 @@ docker-run-cypress: docker-build-cypress
 
 # push the :base and :base-v{VERSION} tag to Docker hub
 docker-push-base:
-	docker tag hunterlong/statup:base hunterlong/statup:base-v$(VERSION)
+	docker tag hunterlong/statup:base hunterlong/statup:base-v${VERSION}
 	docker push hunterlong/statup:base
-	docker push hunterlong/statup:base-v$(VERSION)
+	docker push hunterlong/statup:base-v${VERSION}
 
 # push the :dev tag to Docker hub
 docker-push-dev:
 	docker push hunterlong/statup:dev
-	docker push hunterlong/statup:dev-v$(VERSION)
+	docker push hunterlong/statup:dev-v${VERSION}
 
 # push the :cypress tag to Docker hub
 docker-push-cypress:
@@ -181,7 +181,7 @@ docker-push-cypress:
 # push the :latest tag to Docker hub
 docker-push-latest:
 	docker push hunterlong/statup:latest
-	docker push hunterlong/statup:v$(VERSION)
+	docker push hunterlong/statup:v${VERSION}
 
 docker-run-mssql:
 	docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=PaSsW0rD123' -p 1433:1433 -d microsoft/mssql-server-linux
@@ -240,7 +240,7 @@ clean:
 
 # tag version using git
 tag:
-	git tag "v$(VERSION)" --force
+	git tag "v${VERSION}" --force
 
 # compress built binaries into tar.gz and zip formats
 compress:
@@ -283,9 +283,9 @@ travis-build:
 	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
 
 snapcraft:
-	snapcraft --target-arch=amd64
-	snapcraft --target-arch=arm64
-	snapcraft --target-arch=i386
+	snapcraft clean statup -s pull && snapcraft --target-arch=amd64
+	snapcraft clean statup -s pull && snapcraft --target-arch=arm64
+	snapcraft clean statup -s pull && snapcraft --target-arch=i386
 
 # install xgo and pull the xgo docker image
 xgo-install: clean
