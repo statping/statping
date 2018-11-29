@@ -336,7 +336,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"id\": 1,\n    \"name\": \"Updated Google Service\",\n    \"domain\": \"https://google.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 60,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 10,\n    \"order_id\": 0\n}"
+							"raw": "{\n\t\"id\": 1,\n    \"name\": \"Updated Google Service\",\n    \"domain\": \"https://google.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 60,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 10,\n    \"order_id\": 0,\n    \"check_interval\": 60\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/services/1",
@@ -347,6 +347,59 @@
 								"api",
 								"services",
 								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reorder Services",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b5a67a19-fd08-40b0-a961-3e9474ab78c6",
+								"exec": [
+									"pm.test(\"Reorder Services\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.eql(4);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[{\"service\": 1, \"order\": 4},{\"service\": 2, \"order\": 3},{\"service\": 3, \"order\": 2},{\"service\": 4, \"order\": 1}]"
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/services/reorder",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"services",
+								"reorder"
 							]
 						}
 					},
