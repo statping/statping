@@ -1,4 +1,8 @@
 .idea
+snap
+prime
+stage
+parts
 core/rice-box.go
 config.yml
 statup.db

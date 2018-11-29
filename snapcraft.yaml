@@ -16,10 +16,12 @@ grade: stable
 parts:
   statup:
     plugin: dump
-    source: https://github.com/hunterlong/statup/releases/download/latest/statup-linux-x64.tar.gz
+    source: ./build/statup-linux.tar.gz
 
 apps:
   statup:
     command: statup
     plugs:
       - home
+      - network-bind
+      - network

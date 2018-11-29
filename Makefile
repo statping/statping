@@ -229,10 +229,12 @@ clean:
 	rm -rf source/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf types/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf utils/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf {parts,prime,snap,stage}
 	rm -rf dev/test/cypress/videos
 	rm -f coverage.* sass
 	rm -f source/rice-box.go
 	rm -f *.db-journal
+	rm -rf *.snap
 	find . -name "*.out" -type f -delete
 	find . -name "*.cpu" -type f -delete
 	find . -name "*.mem" -type f -delete
@@ -240,7 +242,7 @@ clean:
 
 # tag version using git
 tag:
-	git tag "v${VERSION}" --force
+	git tag v${VERSION} --force
 
 # compress built binaries into tar.gz and zip formats
 compress:
@@ -282,10 +284,26 @@ travis-build:
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(TRAVIS_BUILD_CMD) https://api.travis-ci.com/repo/hunterlong%2Fstatup/requests
 	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
 
-snapcraft:
-	snapcraft clean statup -s pull && snapcraft --target-arch=amd64
-	snapcraft clean statup -s pull && snapcraft --target-arch=arm64
-	snapcraft clean statup -s pull && snapcraft --target-arch=i386
+snapcraft: snapcraft-build snapcraft-release
+
+snapcraft-build:
+	PWD=$(shell pwd)
+	cp build/$(BINARY_NAME)-linux-x64.tar.gz build/$(BINARY_NAME)-linux.tar.gz
+	snapcraft clean statup -s pull
+	docker run --rm -v ${PWD}:/build -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=amd64"
+	cp build/$(BINARY_NAME)-linux-x32.tar.gz build/$(BINARY_NAME)-linux.tar.gz
+	snapcraft clean statup -s pull
+	docker run --rm -v ${PWD}:/build -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=i386"
+	cp build/$(BINARY_NAME)-linux-arm64.tar.gz build/$(BINARY_NAME)-linux.tar.gz
+	snapcraft clean statup -s pull
+	docker run --rm -v ${PWD}:/build -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=arm64"
+	cp build/$(BINARY_NAME)-linux-arm7.tar.gz build/$(BINARY_NAME)-linux.tar.gz
+	snapcraft clean statup -s pull
+	docker run --rm -v ${PWD}:/build -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=armhf"
+	rm -f build/$(BINARY_NAME)-linux.tar.gz
+
+snapcraft-release:
+	snapcraft push *.snap --release edge
 
 # install xgo and pull the xgo docker image
 xgo-install: clean

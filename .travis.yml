@@ -25,6 +25,7 @@ services:
 
 env:
   global:
+    - PATH=/snap/bin:$PATH
     - DB_HOST=localhost
     - DB_USER=travis
     - DB_PASS=
@@ -39,6 +40,8 @@ before_deploy:
 
 after_deploy:
   - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make publish-homebrew; fi
+  - snapcraft login --with "$SNAP_TOKEN"
+  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make snapcraft; fi
 
 deploy:
   - provider: releases
@@ -60,10 +63,10 @@ branches:
 before_install:
   - curl -L -s https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64 -o $GOPATH/bin/dep
   - chmod +x $GOPATH/bin/dep
-  - npm install -g sass
-  - npm install -g newman
 
 install:
+  - npm install -g sass
+  - npm install -g newman
   - make dev-deps
   - make dep
   - make install
@@ -79,3 +82,5 @@ script:
 
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make travis-build; fi
+  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make snapcraft; fi
+  - sudo snap install snapcraft --classic
