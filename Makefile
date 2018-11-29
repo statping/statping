@@ -283,7 +283,9 @@ travis-build:
 	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
 
 snapcraft:
-	docker run --rm -v "$PWD":/build -w /build snapcore/snapcraft bash -c "apt update && snapcraft"
+	snapcraft --target-arch=amd64
+	snapcraft --target-arch=arm64
+	snapcraft --target-arch=i386
 
 # install xgo and pull the xgo docker image
 xgo-install: clean

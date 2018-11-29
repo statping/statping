@@ -7,6 +7,10 @@ description: >
   status page with tons of features for you to build an even better status page.
   This Status Page generator allows you to use MySQL, Postgres, or SQLite
   on multiple operating systems.
+architectures:
+  - amd64
+  - arm64
+  - i386
 
 type: app
 confinement: strict
