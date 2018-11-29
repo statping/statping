@@ -16,7 +16,7 @@
             </thead>
             <tbody class="sortable" id="services_table">
             {{range .}}
-            <tr id="service_{{.Id}}">
+            <tr id="service_{{.Id}}" data-id="{{.Id}}">
                 <td><span class="drag_icon d-none d-md-inline"><i class="fas fa-bars"></i></span> {{.Name}}</td>
                 <td class="d-none d-md-table-cell">{{if .Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}} </td>
                 <td class="text-right">
@@ -56,7 +56,8 @@
         var dest = e.detail.destination.items;
         dest.forEach(function(d) {
             i++;
-            var o = {service: parseInt(d.id), order: i}
+            var dId = $(d).attr('data-id');
+            var o = {service: parseInt(dId), order: i};
             newOrder.push(o);
         });
         $.post("/services/reorder", JSON.stringify(newOrder), function(data, status){

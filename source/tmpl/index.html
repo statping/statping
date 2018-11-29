@@ -10,7 +10,7 @@
 
 <div class="col-12 full-col-12">
 
-<div class="list-group online_list">
+<div class="list-group online_list mb-3">
     {{ range Services }}
         <a href="#" class="service_li list-group-item list-group-item-action {{if not .Online}}bg-danger text-white{{ end }}" data-id="{{.Id}}">
         {{ .Name }}
@@ -25,7 +25,7 @@
 </div>
 
 {{ if .Messages }}
-    <div class="col-12 mt-3">
+    <div class="col-12">
     {{range .Messages}}
         <div class="alert alert-primary" role="alert">
             <h3>{{.Title}}</h3>
