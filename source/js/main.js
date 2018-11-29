@@ -175,12 +175,10 @@ $('form.ajax_form').on('submit', function() {
 	let alerter = form.find('#alerter');
 	var arrayData = [];
 	let newArr = {};
+	console.log(values);
 	Spinner(button);
 	values.forEach(function(k, v) {
-		if (k.name === "password_confirm") {
-			return
-		}
-		if (k.value === "") {
+		if (k.name === "password_confirm" || k.value === "") {
 			return
 		}
 		if (k.value === "on") {
@@ -231,7 +229,6 @@ $('form.ajax_form').on('submit', function() {
 });
 
 function CreateService(output) {
-	console.log('creating service', output)
 	let form = output.form;
 	let data = output.data.output;
 	let objTbl = `<tr id="service_${data.id}">

@@ -76,13 +76,13 @@
 
 {{if Auth}}
     <nav class="nav nav-pills flex-column flex-sm-row mt-3" id="service_tabs" role="serviceLists">
-            <a class="flex-sm-fill text-sm-center nav-link active" id="failures-tab" data-toggle="tab" href="#failures" role="tab" aria-controls="failures" aria-selected="true">Failures</a>
+        <a class="flex-sm-fill text-sm-center nav-link active" id="edit-tab" data-toggle="tab" href="#edit" role="tab" aria-controls="edit" aria-selected="false">Edit Service</a>
+            <a class="flex-sm-fill text-sm-center nav-link" id="failures-tab" data-toggle="tab" href="#failures" role="tab" aria-controls="failures" aria-selected="true">Failures</a>
             <a class="flex-sm-fill text-sm-center nav-link" id="checkins-tab" data-toggle="tab" href="#checkins" role="tab" aria-controls="checkins" aria-selected="false">Checkins</a>
             <a class="flex-sm-fill text-sm-center nav-link" id="response-tab" data-toggle="tab" href="#response" role="tab" aria-controls="response" aria-selected="false">Response</a>
-            <a class="flex-sm-fill text-sm-center nav-link" id="edit-tab" data-toggle="tab" href="#edit" role="tab" aria-controls="edit" aria-selected="false">Edit Service</a>
     </nav>
     <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="failures" role="serviceLists" aria-labelledby="failures-tab">
+        <div class="tab-pane fade" id="failures" role="serviceLists" aria-labelledby="failures-tab">
         {{$failures := $s.LimitedFailures 16}}
         {{ if $failures }}
             <div class="list-group mt-3 mb-4">
@@ -164,7 +164,7 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="edit" role="serviceLists" aria-labelledby="edit-tab">
+        <div class="tab-pane fade show active" id="edit" role="serviceLists" aria-labelledby="edit-tab">
             {{template "form_service" $s}}
         </div>
     </div>

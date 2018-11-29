@@ -393,6 +393,13 @@ func (s *Service) Update(restart bool) error {
 		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", s.Name, err))
 		return err.Error
 	}
+	// clear the notification queue for a service
+	if !s.AllowNotifications.Bool {
+		for _, n := range CoreApp.Notifications {
+			notif := n.(*notifier.Notification)
+			notif.ResetUniqueQueue(s.Id)
+		}
+	}
 	if restart {
 		s.Close()
 		s.Start()

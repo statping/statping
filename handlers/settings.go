@@ -16,6 +16,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/source"
@@ -39,6 +40,7 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
+	var err error
 	r.ParseForm()
 	app := core.CoreApp
 	name := r.PostForm.Get("project")
@@ -65,8 +67,14 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	timeFloat, _ := strconv.ParseFloat(timezone, 10)
 	app.Timezone = float32(timeFloat)
 
+	utils.Log(1, fmt.Sprintf("timezone: %v", timezone))
+	utils.Log(1, fmt.Sprintf("tzone: %f", app.Timezone))
+
 	app.UseCdn = types.NewNullBool(r.PostForm.Get("enable_cdn") == "on")
-	core.CoreApp, _ = core.UpdateCore(app)
+	core.CoreApp, err = core.UpdateCore(app)
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("issue updating Core: %v", err.Error()))
+	}
 	//notifiers.OnSettingsSaved(core.CoreApp.ToCore())
 	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }

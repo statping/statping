@@ -60,6 +60,7 @@
             var o = {service: parseInt(dId), order: i};
             newOrder.push(o);
         });
+        console.log(JSON.stringify(newOrder));
         $.post("/services/reorder", JSON.stringify(newOrder), function(data, status){
         });
     });

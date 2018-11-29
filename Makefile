@@ -192,7 +192,6 @@ databases:
 #
 #    Download and Install dependencies
 #
-
 # run dep to install all required golang dependecies
 dep:
 	dep ensure -vendor-only
