@@ -18,7 +18,6 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statup/core"
 	"github.com/hunterlong/statup/types"
@@ -65,20 +64,17 @@ func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
+	r.ParseForm()
 	var newOrder []*serviceOrder
 	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&newOrder); err != nil {
-		utils.Log(3, fmt.Sprint("error decoding reordering services: %v", err.Error()))
-	}
+	decoder.Decode(&newOrder)
 	for _, s := range newOrder {
 		service := core.SelectService(s.Id)
 		service.Order = s.Order
-		if err := service.Update(false); err != nil {
-			utils.Log(3, fmt.Sprint("error reordering services: %v", err.Error()))
-		}
+		service.Update(false)
 	}
-	w.Write([]byte("ok"))
-	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(newOrder)
 }
 
 func servicesViewHandler(w http.ResponseWriter, r *http.Request) {

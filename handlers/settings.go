@@ -67,9 +67,6 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	timeFloat, _ := strconv.ParseFloat(timezone, 10)
 	app.Timezone = float32(timeFloat)
 
-	utils.Log(1, fmt.Sprintf("timezone: %v", timezone))
-	utils.Log(1, fmt.Sprintf("tzone: %f", app.Timezone))
-
 	app.UseCdn = types.NewNullBool(r.PostForm.Get("enable_cdn") == "on")
 	core.CoreApp, err = core.UpdateCore(app)
 	if err != nil {

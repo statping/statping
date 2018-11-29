@@ -60,8 +60,15 @@
             var o = {service: parseInt(dId), order: i};
             newOrder.push(o);
         });
-        console.log(JSON.stringify(newOrder));
-        $.post("/services/reorder", JSON.stringify(newOrder), function(data, status){
+        $.ajax({
+            url: "/services/reorder",
+            type: 'POST',
+            data: JSON.stringify(newOrder),
+            contentType: "application/json",
+            dataType: "json",
+            success: function(data) {
+                console.log(data)
+            }
         });
     });
 </script>

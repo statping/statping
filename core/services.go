@@ -388,7 +388,7 @@ func (s *Service) UpdateSingle(attr ...interface{}) error {
 
 // Update will update a service in the database, the service's checking routine can be restarted by passing true
 func (s *Service) Update(restart bool) error {
-	err := servicesDB().Update(s)
+	err := servicesDB().Update(&s)
 	if err.Error != nil {
 		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", s.Name, err))
 		return err.Error
@@ -396,7 +396,7 @@ func (s *Service) Update(restart bool) error {
 	// clear the notification queue for a service
 	if !s.AllowNotifications.Bool {
 		for _, n := range CoreApp.Notifications {
-			notif := n.(*notifier.Notification)
+			notif := n.(notifier.Notifier).Select()
 			notif.ResetUniqueQueue(s.Id)
 		}
 	}
