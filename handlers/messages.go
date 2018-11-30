@@ -50,7 +50,7 @@ func viewMessageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllMessagesHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -64,7 +64,7 @@ func apiAllMessagesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -85,7 +85,7 @@ func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -100,7 +100,7 @@ func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -119,7 +119,7 @@ func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiMessageUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}

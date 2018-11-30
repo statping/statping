@@ -48,7 +48,7 @@ func usersEditHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiUserHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -64,7 +64,7 @@ func apiUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -88,7 +88,7 @@ func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -112,7 +112,7 @@ func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -126,7 +126,7 @@ func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}

@@ -27,7 +27,7 @@ import (
 )
 
 func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -41,7 +41,7 @@ func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -56,7 +56,7 @@ func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}

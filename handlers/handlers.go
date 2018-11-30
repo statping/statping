@@ -27,6 +27,7 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -70,10 +71,19 @@ func IsAuthenticated(r *http.Request) bool {
 		return true
 	}
 	if core.CoreApp == nil {
-		return false
+		return true
 	}
 	if sessionStore == nil {
-		return false
+		return true
+	}
+	var token string
+	tokens, ok := r.Header["Authorization"]
+	if ok && len(tokens) >= 1 {
+		token = tokens[0]
+		token = strings.TrimPrefix(token, "Bearer ")
+		if token == core.CoreApp.ApiSecret {
+			return true
+		}
 	}
 	session, err := sessionStore.Get(r, cookieKey)
 	if err != nil {

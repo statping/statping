@@ -24,8 +24,6 @@ import (
 	"github.com/hunterlong/statup/types"
 	"github.com/hunterlong/statup/utils"
 	"net/http"
-	"os"
-	"strings"
 )
 
 type apiResponse struct {
@@ -38,7 +36,7 @@ type apiResponse struct {
 }
 
 func apiIndexHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -47,7 +45,7 @@ func apiIndexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -129,24 +127,4 @@ func sendUnauthorizedJson(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusUnauthorized)
 	json.NewEncoder(w).Encode(output)
-}
-
-func isAuthorized(r *http.Request) bool {
-	utils.Http(r)
-	if os.Getenv("GO_ENV") == "test" {
-		return true
-	}
-	if IsAuthenticated(r) {
-		return true
-	}
-	var token string
-	tokens, ok := r.Header["Authorization"]
-	if ok && len(tokens) >= 1 {
-		token = tokens[0]
-		token = strings.TrimPrefix(token, "Bearer ")
-	}
-	if token == core.CoreApp.ApiSecret {
-		return true
-	}
-	return false
 }

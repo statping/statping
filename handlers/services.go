@@ -119,7 +119,7 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -135,7 +135,7 @@ func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -156,7 +156,7 @@ func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -220,7 +220,7 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -239,7 +239,7 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(r) {
+	if !IsAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
