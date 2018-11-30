@@ -41,11 +41,6 @@ before_deploy:
 after_deploy:
   - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make publish-homebrew; fi
 
-deploy:
-  - provider: releases
-    api_key: $GH_TOKEN
-    skip_cleanup: true
-
 matrix:
   allow_failures:
     - go: master
