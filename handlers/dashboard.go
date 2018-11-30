@@ -93,6 +93,8 @@ func logsLineHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if lastLine := utils.GetLastLine(); lastLine != nil {
+		w.Header().Set("Content-Type", "plain/text")
+		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(lastLine.FormatForHtml()))
 	}
 }
