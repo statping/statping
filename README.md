@@ -142,8 +142,8 @@ scrape_configs:
 Statping accepts Push Requests! Feel free to add your own features and notifiers. You probably want to checkout the [Notifier Wiki](https://github.com/hunterlong/statping/wiki/Notifiers) to get a better understanding on how to create your own notification methods for failing/successful services. Testing on Statping will test each function on MySQL, Postgres, and SQLite. I recommend you run a MySQL and a Postgres Docker image for testing.
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/hunterlong/statping)](https://goreportcard.com/report/github.com/hunterlong/statping)
-[![Build Status](https://travis-ci.org/hunterlong/statup.svg?branch=master)](https://travis-ci.org/hunterlong/statup) [![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://dashboard.cypress.io/#/projects/bi8mhr/runs)
-[![Docker Pulls](https://img.shields.io/docker/pulls/hunterlong/statup.svg)](https://hub.docker.com/r/hunterlong/statup/builds/) [![Godoc](https://godoc.org/github.com/hunterlong/statping?status.svg)](https://godoc.org/github.com/hunterlong/statping)[![Coverage Status](https://coveralls.io/repos/github/hunterlong/statup/badge.svg?branch=master)](https://coveralls.io/github/hunterlong/statup?branch=master)
+[![Build Status](https://travis-ci.com/hunterlong/statping.svg?branch=master)](https://travis-ci.com/hunterlong/statping) [![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://dashboard.cypress.io/#/projects/bi8mhr/runs)
+[![Docker Pulls](https://img.shields.io/docker/pulls/hunterlong/statping.svg)](https://hub.docker.com/r/hunterlong/statping/builds/) [![Godoc](https://godoc.org/github.com/hunterlong/statping?status.svg)](https://godoc.org/github.com/hunterlong/statping)[![Coverage Status](https://coveralls.io/repos/github/hunterlong/statping/badge.svg?branch=master)](https://coveralls.io/github/hunterlong/statping?branch=master)
 
 
 
