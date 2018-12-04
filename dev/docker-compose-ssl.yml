@@ -56,8 +56,8 @@ services:
       DB_USER: statping
       DB_PASS: password123
       DB_DATABASE: statping
-      NAME: SSL Example
-      DESCRIPTION: This Status Status Page should be running ${LETSENCRYPT_HOST} with SSL.
+      NAME: Statping SSL Instance
+      DESCRIPTION: This Statping Status Page should be running ${LETSENCRYPT_HOST} with SSL.
 
   postgres:
     container_name: postgres
@@ -71,6 +71,13 @@ services:
       POSTGRES_PASSWORD: password123
       POSTGRES_USER: statping
       POSTGRES_DB: statping
+
+  watchtower:
+    image: v2tec/watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 120 --cleanup
 
 networks:
   internet:

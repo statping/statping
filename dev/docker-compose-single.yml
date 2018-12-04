@@ -7,9 +7,11 @@ services:
     image: hunterlong/statping:latest
     restart: always
     ports:
-      - 0.0.0.0:80:8080
+      - 80:8080
     volumes:
-      - ./statping/app:/app
+      - ./statping:/app
+    expose:
+      - 8080
     environment:
-      NAME: Single Docker Image
+      NAME: Statping
       DESCRIPTION: You'll need to input your own Database information in Setup process

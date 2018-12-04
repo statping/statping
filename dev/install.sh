@@ -23,4 +23,4 @@ printf "Downloading latest version URL: $FILE\n"
 curl -L -sS $FILE -o statping.tar.gz && tar xzf statping.tar.gz && rm statping.tar.gz
 chmod +x statping
 mv statping /usr/local/bin/
-echo "Statup $VERSION has been successfully installed! Try 'statping version' to check it!"
+echo "Statping $VERSION has been successfully installed! Try 'statping version' to check it!"
