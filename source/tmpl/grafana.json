@@ -524,8 +524,8 @@
       {
         "allValue": null,
         "current": {
-          "text": "SQLite Statup",
-          "value": "SQLite Statup"
+          "text": "SQLite Statping",
+          "value": "SQLite Statping"
         },
         "datasource": "prometheus",
         "hide": 0,
@@ -577,7 +577,7 @@
     ]
   },
   "timezone": "",
-  "title": "Statup",
+  "title": "Statping",
   "uid": "6BzRjddmz",
   "version": 25
 }

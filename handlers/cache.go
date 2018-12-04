@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/hunterlong/statup/core"
+	"github.com/hunterlong/statping/core"
 	"net/http"
 	"net/http/httptest"
 	"sync"

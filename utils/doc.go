@@ -6,5 +6,5 @@
 // You can overwrite the utils.Directory global variable by including
 // STATUP_DIR environment variable to be an absolute path.
 //
-// More info on: https://github.com/hunterlong/statup
+// More info on: https://github.com/hunterlong/statping
 package utils

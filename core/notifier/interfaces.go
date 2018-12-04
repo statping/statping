@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -15,7 +15,7 @@
 
 package notifier
 
-import "github.com/hunterlong/statup/types"
+import "github.com/hunterlong/statping/types"
 
 // Notifier interface is required to create a new Notifier
 type Notifier interface {

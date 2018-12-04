@@ -2,5 +2,5 @@
 // Services, Hits, Failures, Users, service checking mechanisms, databases, and notifiers
 // in the notifier package
 //
-// More info on: https://github.com/hunterlong/statup
+// More info on: https://github.com/hunterlong/statping
 package core

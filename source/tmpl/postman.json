@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "d74ac4a3-8915-46e8-8ed2-5044ea4ce53b",
-		"name": "Statup",
-		"description": "Statup API Requests",
+		"name": "Statping",
+		"description": "Statping API Requests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -10,7 +10,7 @@
 			"name": "Main",
 			"item": [
 				{
-					"name": "Statup Details",
+					"name": "Statping Details",
 					"event": [
 						{
 							"listen": "test",
@@ -19,8 +19,8 @@
 								"exec": [
 									"pm.test(\"Check Core API Route\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.name).to.eql(\"Statup\");",
-									"    pm.expect(jsonData.description).to.eql(\"Statup Monitoring Sample Data\");",
+									"    pm.expect(jsonData.name).to.eql(\"Statping\");",
+									"    pm.expect(jsonData.description).to.eql(\"Statping Monitoring Sample Data\");",
 									"    pm.expect(jsonData.using_cdn).to.eql(false);",
 									"    pm.expect(jsonData.database).to.eql(\"sqlite\");",
 									"});"

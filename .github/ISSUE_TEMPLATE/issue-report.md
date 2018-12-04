@@ -20,4 +20,4 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/statup-app/general) [![GitHub release](https://img.shields.io/github/release/hunterlong/statup.svg)](https://github.com/hunterlong/statup/releases/latest) [![Build Status](https://travis-ci.com/hunterlong/statup.svg?branch=master)](https://travis-ci.com/hunterlong/statup)
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/statup-app/general) [![GitHub release](https://img.shields.io/github/release/hunterlong/statup.svg)](https://github.com/hunterlong/statping/releases/latest) [![Build Status](https://travis-ci.com/hunterlong/statup.svg?branch=master)](https://travis-ci.com/hunterlong/statup)

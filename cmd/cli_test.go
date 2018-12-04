@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -16,9 +16,9 @@
 package main
 
 import (
-	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/source"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/utils"
 	"github.com/rendon/testcli"
 	"github.com/stretchr/testify/assert"
 	"os"
@@ -48,16 +48,16 @@ func TestStartServerCommand(t *testing.T) {
 }
 
 func TestVersionCommand(t *testing.T) {
-	c := testcli.Command("statup", "version")
+	c := testcli.Command("statping", "version")
 	c.Run()
-	assert.True(t, c.StdoutContains("Statup v"+VERSION))
+	assert.True(t, c.StdoutContains("Statping v"+VERSION))
 }
 
 func TestHelpCommand(t *testing.T) {
-	c := testcli.Command("statup", "help")
+	c := testcli.Command("statping", "help")
 	c.Run()
 	t.Log(c.Stdout())
-	assert.True(t, c.StdoutContains("statup help               - Shows the user basic information about Statup"))
+	assert.True(t, c.StdoutContains("statping help               - Shows the user basic information about Statping"))
 }
 
 func TestExportCommand(t *testing.T) {
@@ -67,7 +67,7 @@ func TestExportCommand(t *testing.T) {
 	gg, _ := <-got
 	t.Log(gg)
 	assert.Contains(t, gg, "Exporting Static 'index.html' page...")
-	assert.Contains(t, gg, "Exported Statup index page: 'index.html'")
+	assert.Contains(t, gg, "Exported Statping index page: 'index.html'")
 	assert.True(t, fileExists(dir+"/index.html"))
 }
 
@@ -77,11 +77,11 @@ func TestUpdateCommand(t *testing.T) {
 	commandAndSleep(cmd, time.Duration(15*time.Second), got)
 	gg, _ := <-got
 	t.Log(gg)
-	assert.Contains(t, gg, "Statup")
+	assert.Contains(t, gg, "Statping")
 }
 
 func TestAssetsCommand(t *testing.T) {
-	c := testcli.Command("statup", "assets")
+	c := testcli.Command("statping", "assets")
 	c.Run()
 	t.Log(c.Stdout())
 	t.Log("Directory for Assets: ", dir)
@@ -100,9 +100,9 @@ func TestRunCommand(t *testing.T) {
 }
 
 func TestEnvironmentVarsCommand(t *testing.T) {
-	c := testcli.Command("statup", "env")
+	c := testcli.Command("statping", "env")
 	c.Run()
-	assert.True(t, c.StdoutContains("Statup Environment Variable"))
+	assert.True(t, c.StdoutContains("Statping Environment Variable"))
 }
 
 func TestVersionCLI(t *testing.T) {
@@ -159,7 +159,7 @@ func commandAndSleep(cmd *exec.Cmd, duration time.Duration, out chan<- string) {
 }
 
 func helperCommand(envs []string, s ...string) *exec.Cmd {
-	cmd := exec.Command("statup", s...)
+	cmd := exec.Command("statping", s...)
 	return cmd
 }
 
@@ -177,7 +177,7 @@ func fileExists(file string) bool {
 
 func Clean() {
 	utils.DeleteFile(dir + "/config.yml")
-	utils.DeleteFile(dir + "/statup.db")
+	utils.DeleteFile(dir + "/statping.db")
 	utils.DeleteDirectory(dir + "/assets")
 	utils.DeleteDirectory(dir + "/logs")
 	core.CoreApp = core.NewCore()

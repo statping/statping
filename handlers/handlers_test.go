@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -16,10 +16,10 @@
 package handlers
 
 import (
-	"github.com/hunterlong/statup/core"
-	_ "github.com/hunterlong/statup/notifiers"
-	"github.com/hunterlong/statup/source"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/core"
+	_ "github.com/hunterlong/statping/notifiers"
+	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"

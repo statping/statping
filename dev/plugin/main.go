@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statping/types"
 	"net/http"
 )
 

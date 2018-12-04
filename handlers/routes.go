@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -19,9 +19,9 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/source"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/utils"
 	"net/http"
 	"time"
 )
@@ -42,13 +42,13 @@ func Router() *mux.Router {
 		r.PathPrefix("/font/").Handler(http.StripPrefix("/font/", http.FileServer(http.Dir(dir+"/assets/font"))))
 		r.PathPrefix("/robots.txt").Handler(indexHandler)
 		r.PathPrefix("/favicon.ico").Handler(indexHandler)
-		r.PathPrefix("/statup.png").Handler(indexHandler)
+		r.PathPrefix("/banner.png").Handler(indexHandler)
 	} else {
 		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(source.CssBox.HTTPBox())))
 		r.PathPrefix("/font/").Handler(http.StripPrefix("/font/", http.FileServer(source.FontBox.HTTPBox())))
 		r.PathPrefix("/robots.txt").Handler(http.FileServer(source.TmplBox.HTTPBox()))
 		r.PathPrefix("/favicon.ico").Handler(http.FileServer(source.TmplBox.HTTPBox()))
-		r.PathPrefix("/statup.png").Handler(http.FileServer(source.TmplBox.HTTPBox()))
+		r.PathPrefix("/banner.png").Handler(http.FileServer(source.TmplBox.HTTPBox()))
 	}
 	r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(source.JsBox.HTTPBox())))
 	r.Handle("/charts.js", http.HandlerFunc(renderServiceChartsHandler))

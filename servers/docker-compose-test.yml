@@ -12,7 +12,7 @@ services:
       - postgres_statup
       - postgres_mysql
     entrypoint:
-      - "sleep 30 && cd /go/src/github.com/hunterlong/statup && go test -v ./..."
+      - "sleep 30 && cd /go/src/github.com/hunterlong/statping && go test -v ./..."
     environment:
       GO_ENV: test
       DB_CONN: postgres

@@ -6,14 +6,14 @@ language: go
 go:
   - "1.11.1"
 
-go_import_path: github.com/hunterlong/statup
+go_import_path: github.com/hunterlong/statping
 
 cache:
   directories:
     - $GOPATH/pkg/dep
     - ~/.npm
     - ~/.cache
-    - $GOPATH/src/github.com/hunterlong/statup/vendor
+    - $GOPATH/src/github.com/hunterlong/statping/vendor
 
 sudo: required
 
@@ -31,7 +31,7 @@ env:
     - DB_PASS=
     - DB_DATABASE=test
     - GO_ENV=test
-    - STATUP_DIR=$GOPATH/src/github.com/hunterlong/statup
+    - STATUP_DIR=$GOPATH/src/github.com/hunterlong/statping
 
 before_deploy:
   - git config --local user.name "hunterlong"

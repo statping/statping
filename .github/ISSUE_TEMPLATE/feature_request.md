@@ -19,4 +19,4 @@ I'm always frustrated when [...]
 **Additional context**
 Add any other context or screenshots about the feature request here.
 
-[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/statup-app/general) [![GitHub release](https://img.shields.io/github/release/hunterlong/statup.svg)](https://github.com/hunterlong/statup/releases/latest) [![Build Status](https://travis-ci.com/hunterlong/statup.svg?branch=master)](https://travis-ci.com/hunterlong/statup)
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/statup-app/general) [![GitHub release](https://img.shields.io/github/release/hunterlong/statup.svg)](https://github.com/hunterlong/statping/releases/latest) [![Build Status](https://travis-ci.com/hunterlong/statup.svg?branch=master)](https://travis-ci.com/hunterlong/statup)

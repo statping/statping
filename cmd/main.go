@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -18,20 +18,20 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/handlers"
-	_ "github.com/hunterlong/statup/notifiers"
-	"github.com/hunterlong/statup/plugin"
-	"github.com/hunterlong/statup/source"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/handlers"
+	_ "github.com/hunterlong/statping/notifiers"
+	"github.com/hunterlong/statping/plugin"
+	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/utils"
 	"github.com/joho/godotenv"
 	"os"
 )
 
 var (
-	// VERSION stores the current version of Statup
+	// VERSION stores the current version of Statping
 	VERSION string
-	// COMMIT stores the git commit hash for this version of Statup
+	// COMMIT stores the git commit hash for this version of Statping
 	COMMIT      string
 	ipAddress   string
 	UsingDotEnv bool
@@ -46,14 +46,14 @@ func init() {
 // -ip = 0.0.0.0 IP address for outgoing HTTP server
 // -port = 8080 Port number for outgoing HTTP server
 func parseFlags() {
-	ip := flag.String("ip", "0.0.0.0", "IP address to run the Statup HTTP server")
+	ip := flag.String("ip", "0.0.0.0", "IP address to run the Statping HTTP server")
 	p := flag.Int("port", 8080, "Port to run the HTTP server")
 	flag.Parse()
 	ipAddress = *ip
 	port = *p
 }
 
-// main will run the Statup application
+// main will run the Statping application
 func main() {
 	var err error
 	parseFlags()
@@ -72,7 +72,7 @@ func main() {
 			os.Exit(1)
 		}
 	}
-	utils.Log(1, fmt.Sprintf("Starting Statup v%v", VERSION))
+	utils.Log(1, fmt.Sprintf("Starting Statping v%v", VERSION))
 
 	core.Configs, err = core.LoadConfigFile(utils.Directory)
 	if err != nil {
@@ -94,7 +94,7 @@ func loadDotEnvs() error {
 	return err
 }
 
-// mainProcess will initialize the Statup application and run the HTTP server
+// mainProcess will initialize the Statping application and run the HTTP server
 func mainProcess() {
 	dir := utils.Directory
 	var err error
