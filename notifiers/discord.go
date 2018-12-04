@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -86,7 +86,7 @@ func (u *discord) OnSuccess(s *types.Service) {
 
 // OnSave triggers when this notifier has been saved
 func (u *discord) OnSave() error {
-	msg := fmt.Sprintf(`{"content": "The discord notifier on Statup was just updated."}`)
+	msg := fmt.Sprintf(`{"content": "The discord notifier on Statping was just updated."}`)
 	u.AddQueue(0, msg)
 	return nil
 }

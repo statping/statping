@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -22,7 +22,7 @@ import (
 	"time"
 )
 
-// ExampleNotifier is an example on how to use the Statup notifier struct
+// ExampleNotifier is an example on how to use the Statping notifier struct
 type ExampleNotifier struct {
 	*Notification
 }
@@ -81,7 +81,7 @@ var example = &ExampleNotifier{&Notification{
 	}},
 }}
 
-// init will be ran when Statup is loaded, AddNotifier will add the notifier instance to the system
+// init will be ran when Statping is loaded, AddNotifier will add the notifier instance to the system
 func init() {
 	AddNotifier(example)
 }
@@ -167,7 +167,7 @@ func (n *ExampleNotifier) OnUpdatedCore(s *types.Core) {
 
 // OnStart is triggered when statup has been started
 func (n *ExampleNotifier) OnStart(s *types.Core) {
-	msg := fmt.Sprintf("received a trigger on Statup boot: %v\n", s.Name)
+	msg := fmt.Sprintf("received a trigger on Statping boot: %v\n", s.Name)
 	n.AddQueue(0, msg)
 }
 
@@ -208,7 +208,7 @@ func ExampleNotification() {
 		}},
 	}}
 
-	// AddNotifier accepts a Notifier to load into the Statup Notification system
+	// AddNotifier accepts a Notifier to load into the Statping Notification system
 	err := AddNotifier(example)
 	fmt.Println(err)
 	// Output: <nil>

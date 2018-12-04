@@ -1,4 +1,4 @@
-// Package source holds all the assets for Statup. This includes
+// Package source holds all the assets for Statping. This includes
 // CSS, JS, SCSS, HTML and other website related content.
 // This package uses Rice to compile all assets into a single 'rice-box.go' file.
 //

@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -113,7 +113,7 @@ func TestAddQueue(t *testing.T) {
 func TestNotification_Update(t *testing.T) {
 	notifier, err := SelectNotification(example)
 	assert.Nil(t, err)
-	notifier.Host = "http://demo.statup.io/api"
+	notifier.Host = "http://demo.statping.com/api"
 	notifier.Port = 9090
 	notifier.Username = "admin"
 	notifier.Password = "password123"
@@ -127,9 +127,9 @@ func TestNotification_Update(t *testing.T) {
 
 	selected, err := SelectNotification(example)
 	assert.Nil(t, err)
-	assert.Equal(t, "http://demo.statup.io/api", selected.GetValue("host"))
-	assert.Equal(t, "http://demo.statup.io/api", example.Notification.Host)
-	assert.Equal(t, "http://demo.statup.io/api", example.Host)
+	assert.Equal(t, "http://demo.statping.com/api", selected.GetValue("host"))
+	assert.Equal(t, "http://demo.statping.com/api", example.Notification.Host)
+	assert.Equal(t, "http://demo.statping.com/api", example.Host)
 	assert.Equal(t, "USBdu82HDiiuw9327yGYDGw", selected.GetValue("api_key"))
 	assert.Equal(t, "USBdu82HDiiuw9327yGYDGw", example.ApiKey)
 	assert.False(t, selected.Enabled.Bool)
@@ -171,7 +171,7 @@ func TestNotification_GetValue(t *testing.T) {
 	notifier, err := SelectNotification(example)
 	assert.Nil(t, err)
 	val := notifier.GetValue("Host")
-	assert.Equal(t, "http://demo.statup.io/api", val)
+	assert.Equal(t, "http://demo.statping.com/api", val)
 }
 
 func TestOnSave(t *testing.T) {

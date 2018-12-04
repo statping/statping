@@ -1,6 +1,6 @@
-statup:
-  container_name: statup
-  image: hunterlong/statup
+statping:
+  container_name: statping
+  image: hunterlong/statping
   restart: always
   ports:
     - 8080:8080

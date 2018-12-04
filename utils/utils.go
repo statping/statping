@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -32,14 +32,14 @@ import (
 )
 
 var (
-	// Directory returns the current path or the STATUP_DIR environment variable
+	// Directory returns the current path or the STATPING_DIR environment variable
 	Directory string
 )
 
-// init will set the utils.Directory to the current running directory, or STATUP_DIR if it is set
+// init will set the utils.Directory to the current running directory, or STATPING_DIR if it is set
 func init() {
-	if os.Getenv("STATUP_DIR") != "" {
-		Directory = os.Getenv("STATUP_DIR")
+	if os.Getenv("STATPING_DIR") != "" {
+		Directory = os.Getenv("STATPING_DIR")
 	} else {
 		Directory = dir()
 	}
@@ -247,7 +247,7 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	if r, err = http.NewRequest(method, url, body); err != nil {
 		return nil, nil, err
 	}
-	r.Header.Set("User-Agent", "Statup")
+	r.Header.Set("User-Agent", "Statping")
 	if content != nil {
 		r.Header.Set("Content-Type", content.(string))
 	}

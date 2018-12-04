@@ -3,4 +3,4 @@ MAINTAINER "Hunter Long (https://github.com/hunterlong)"
 RUN apk --no-cache add libstdc++ ca-certificates
 WORKDIR /app
 ADD sass /usr/local/bin/
-ADD ./build/alpine-linux-amd64 /usr/local/bin/statup
+ADD ./build/alpine-linux-amd64 /usr/local/bin/statping

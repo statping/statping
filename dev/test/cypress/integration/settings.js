@@ -1,5 +1,5 @@
 /*
- * Statup
+ * Statping
  * Copyright (C) 2018.  Hunter Long and the project contributors
  * Written by Hunter Long <info@socialeck.com> and the project contributors
  *
@@ -31,7 +31,7 @@ context('Settings Forms', () => {
         cy.get('input[name="domain"]').clear().type('http://0.0.0.0:8080')
         cy.get('textarea[name="footer"]').clear().type('This is a custom footer')
         cy.get('#v-pills-home > form').submit()
-        cy.title().should('eq', 'Statup | Settings')
+        cy.title().should('eq', 'Statping | Settings')
         cy.get('input[name="project"]').should('have.value', 'Project Updated')
         cy.get('input[name="description"]').should('have.value', 'This is an awesome page')
         cy.get('input[name="domain"]').should('have.value', 'http://0.0.0.0:8080')

@@ -1,6 +1,6 @@
-// Package notifiers holds all the notifiers for Statup, which also includes
+// Package notifiers holds all the notifiers for Statping, which also includes
 // user created notifiers that have been accepted in a Push Request. Read the wiki
-// to see a full example of a notifier with all events, visit Statup's
+// to see a full example of a notifier with all events, visit Statping's
 // notifier example code: https://github.com/hunterlong/statping/wiki/Notifier-Example
 //
 // This package shouldn't contain any exports, to see how notifiers work

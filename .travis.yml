@@ -31,7 +31,7 @@ env:
     - DB_PASS=
     - DB_DATABASE=test
     - GO_ENV=test
-    - STATUP_DIR=$GOPATH/src/github.com/hunterlong/statping
+    - STATPING_DIR=$GOPATH/src/github.com/hunterlong/statping
 
 before_deploy:
   - git config --local user.name "hunterlong"

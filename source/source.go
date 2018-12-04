@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -127,7 +127,7 @@ func OpenAsset(folder, file string) string {
 
 // CreateAllAssets will dump HTML, CSS, SCSS, and JS assets into the '/assets' directory
 func CreateAllAssets(folder string) error {
-	utils.Log(1, fmt.Sprintf("Dump Statup assets into %v/assets", folder))
+	utils.Log(1, fmt.Sprintf("Dump Statping assets into %v/assets", folder))
 	MakePublicFolder(folder + "/assets")
 	MakePublicFolder(folder + "/assets/js")
 	MakePublicFolder(folder + "/assets/css")
@@ -148,7 +148,7 @@ func CreateAllAssets(folder string) error {
 	CopyToPublic(TmplBox, folder+"/assets/files", "grafana.json")
 	utils.Log(1, "Compiling CSS from SCSS style...")
 	err := CompileSASS(utils.Directory)
-	utils.Log(1, "Statup assets have been inserted")
+	utils.Log(1, "Statping assets have been inserted")
 	return err
 }
 
@@ -156,10 +156,10 @@ func CreateAllAssets(folder string) error {
 func DeleteAllAssets(folder string) error {
 	err := os.RemoveAll(folder + "/assets")
 	if err != nil {
-		utils.Log(1, fmt.Sprintf("There was an issue deleting Statup Assets, %v", err))
+		utils.Log(1, fmt.Sprintf("There was an issue deleting Statping Assets, %v", err))
 		return err
 	}
-	utils.Log(1, "Statup assets have been deleted")
+	utils.Log(1, "Statping assets have been deleted")
 	return err
 }
 

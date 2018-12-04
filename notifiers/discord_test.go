@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -25,7 +25,7 @@ import (
 
 var (
 	DISCORD_URL    = os.Getenv("DISCORD_URL")
-	discordMessage = `{"content": "The discord notifier on Statup has been tested!"}`
+	discordMessage = `{"content": "The discord notifier on Statping has been tested!"}`
 )
 
 func init() {

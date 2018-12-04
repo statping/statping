@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -30,7 +30,7 @@ var (
 	router *mux.Router
 )
 
-// Router returns all of the routes used in Statup
+// Router returns all of the routes used in Statping
 func Router() *mux.Router {
 	dir := utils.Directory
 	CacheStorage = NewStorage()

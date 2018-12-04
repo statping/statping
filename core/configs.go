@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -133,11 +133,11 @@ func EnvToConfig() *DbConfig {
 	}
 	name := os.Getenv("NAME")
 	if name == "" {
-		name = "Statup"
+		name = "Statping"
 	}
 	description := os.Getenv("DESCRIPTION")
 	if description == "" {
-		description = "Statup Monitoring Sample Data"
+		description = "Statping Monitoring Sample Data"
 	}
 
 	adminUser := os.Getenv("ADMIN_USER")
@@ -169,7 +169,7 @@ func EnvToConfig() *DbConfig {
 	return data
 }
 
-// SampleData runs all the sample data for a new Statup installation
+// SampleData runs all the sample data for a new Statping installation
 func SampleData() error {
 	if err := InsertSampleData(); err != nil {
 		return err

@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -111,7 +111,7 @@ func TestReLoadDbConfig(t *testing.T) {
 func TestSelectCore(t *testing.T) {
 	core, err := SelectCore()
 	assert.Nil(t, err)
-	assert.Equal(t, "Statup Sample Data", core.Name)
+	assert.Equal(t, "Statping Sample Data", core.Name)
 }
 
 func TestInsertNotifierDB(t *testing.T) {

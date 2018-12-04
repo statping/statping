@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -30,7 +30,7 @@ import (
 )
 
 var (
-	// DbSession stores the Statup database session
+	// DbSession stores the Statping database session
 	DbSession *gorm.DB
 	DbModels  []interface{}
 )
@@ -215,7 +215,7 @@ func (c *CheckinHit) BeforeCreate() (err error) {
 	return
 }
 
-// InsertCore create the single row for the Core settings in Statup
+// InsertCore create the single row for the Core settings in Statping
 func (db *DbConfig) InsertCore() (*Core, error) {
 	CoreApp = &Core{Core: &types.Core{
 		Name:        db.Project,
@@ -336,7 +336,7 @@ func (db *DbConfig) Save() (*DbConfig, error) {
 	return db, err
 }
 
-// CreateCore will initialize the global variable 'CoreApp". This global variable contains most of Statup app.
+// CreateCore will initialize the global variable 'CoreApp". This global variable contains most of Statping app.
 func (c *DbConfig) CreateCore() *Core {
 	newCore := &types.Core{
 		Name:        c.Project,
@@ -358,7 +358,7 @@ func (c *DbConfig) CreateCore() *Core {
 	return CoreApp
 }
 
-// DropDatabase will DROP each table Statup created
+// DropDatabase will DROP each table Statping created
 func (db *DbConfig) DropDatabase() error {
 	utils.Log(1, "Dropping Database Tables...")
 	err := DbSession.DropTableIfExists("checkins")
@@ -373,7 +373,7 @@ func (db *DbConfig) DropDatabase() error {
 	return err.Error
 }
 
-// CreateDatabase will CREATE TABLES for each of the Statup elements
+// CreateDatabase will CREATE TABLES for each of the Statping elements
 func (db *DbConfig) CreateDatabase() error {
 	var err error
 	utils.Log(1, "Creating Database Tables...")
@@ -385,7 +385,7 @@ func (db *DbConfig) CreateDatabase() error {
 	if err := DbSession.Table("core").CreateTable(&types.Core{}); err.Error != nil {
 		return err.Error
 	}
-	utils.Log(1, "Statup Database Created")
+	utils.Log(1, "Statping Database Created")
 	return err
 }
 
@@ -408,9 +408,9 @@ func (db *DbConfig) MigrateDatabase() error {
 	}
 	if err := tx.Table("core").AutoMigrate(&types.Core{}); err.Error != nil {
 		tx.Rollback()
-		utils.Log(3, fmt.Sprintf("Statup Database could not be migrated: %v", tx.Error))
+		utils.Log(3, fmt.Sprintf("Statping Database could not be migrated: %v", tx.Error))
 		return tx.Error
 	}
-	utils.Log(1, "Statup Database Migrated")
+	utils.Log(1, "Statping Database Migrated")
 	return tx.Commit().Error
 }

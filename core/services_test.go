@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -65,7 +65,7 @@ func TestUpdateService(t *testing.T) {
 	service := SelectService(1)
 	service2 := SelectService(2)
 	assert.Equal(t, "Google", service.Name)
-	assert.Equal(t, "Statup Github", service2.Name)
+	assert.Equal(t, "Statping Github", service2.Name)
 	assert.True(t, service.Online)
 	assert.True(t, service2.Online)
 	service.Name = "Updated Google"

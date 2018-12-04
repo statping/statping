@@ -53,7 +53,7 @@ type Pluginer interface {
 }
 
 type Databaser interface {
-	StatupDatabase(*gorm.DB)
+	StatpingDatabase(*gorm.DB)
 }
 
 type Router interface {

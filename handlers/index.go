@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -44,7 +44,7 @@ func trayHandler(w http.ResponseWriter, r *http.Request) {
 	ExecuteResponse(w, r, "tray.html", core.CoreApp, nil)
 }
 
-// DesktopInit will run the Statup server on a specific IP and port using SQLite database
+// DesktopInit will run the Statping server on a specific IP and port using SQLite database
 func DesktopInit(ip string, port int) {
 	var err error
 	exists := utils.FileExists(utils.Directory + "/statup.db")
@@ -65,8 +65,8 @@ func DesktopInit(ip string, port int) {
 
 	config := &core.DbConfig{
 		DbConn:      "sqlite",
-		Project:     "Statup",
-		Description: "Statup running as an App!",
+		Project:     "Statping",
+		Description: "Statping running as an App!",
 		Domain:      "http://localhost",
 		Username:    "admin",
 		Password:    "admin",

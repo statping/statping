@@ -52,7 +52,7 @@ test-plugin: clean
 	mkdir plugins
 	$(GOBUILD) $(BUILDVERSION) -buildmode=plugin -o ./dev/plugin/example.so -v ./dev/plugin
 	mv ./dev/plugin/example.so ./plugins/example.so
-	STATUP_DIR=$(TEST_DIR) go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./plugin
+	STATPING_DIR=$(TEST_DIR) go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./plugin
 
 # build Statping debug app
 build-debug: compile
@@ -83,7 +83,7 @@ benchmark-view:
 
 # test Statping golang tetsing files
 test: clean compile install build-plugin
-	STATUP_DIR=$(TEST_DIR) go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./...
+	STATPING_DIR=$(TEST_DIR) go test -v -p=1 $(BUILDVERSION) -coverprofile=coverage.out ./...
 	gocov convert coverage.out > coverage.json
 
 test-api:
@@ -217,14 +217,14 @@ dev-deps:
 
 # remove files for a clean compile/build
 clean:
-	rm -rf ./{logs,assets,plugins,statping.db,config.yml,.sass-cache,config.yml,statping,build,.sass-cache,statping.db,index.html,vendor}
-	rm -rf cmd/{logs,assets,plugins,statping.db,config.yml,.sass-cache,*.log}
-	rm -rf core/{logs,assets,plugins,statping.db,config.yml,.sass-cache,*.log}
-	rm -rf handlers/{logs,assets,plugins,statping.db,config.yml,.sass-cache,*.log}
-	rm -rf notifiers/{logs,assets,plugins,statping.db,config.yml,.sass-cache,*.log}
-	rm -rf source/{logs,assets,plugins,statping.db,config.yml,.sass-cache,*.log}
-	rm -rf types/{logs,assets,plugins,statping.db,config.yml,.sass-cache,*.log}
-	rm -rf utils/{logs,assets,plugins,statping.db,config.yml,.sass-cache,*.log}
+	rm -rf ./{logs,assets,plugins,statup.db,config.yml,.sass-cache,config.yml,statping,build,.sass-cache,statup.db,index.html,vendor}
+	rm -rf cmd/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf core/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf handlers/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf notifiers/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf source/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf types/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf utils/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf {parts,prime,snap,stage}
 	rm -rf dev/test/cypress/videos
 	rm -f coverage.* sass

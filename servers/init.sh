@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 #
 #
-#     Statup Status Page Server
+#     Statping Status Page Server
 #            for EC2
 #
-# This script run everytime the EC2 is booted. It will maintain the most latest version of Statup
+# This script run everytime the EC2 is booted. It will maintain the most latest version of Statping
 # while removing old docker containers and images to reduce hard drive usage for long term use.
 #
 #
@@ -60,8 +60,8 @@ then
     printf "A RECORD     =>   $EC_IP   \n"
     printf "CNAME RECORD =>   $EC2_ENDPOINT\n"
     printf "================================================================================================================\n"
-    printf "Your Statup Server is ready! Go to the URL below to begin.\n"
-    printf "Statup URL: $EC2_ENDPOINT\n"
+    printf "Your Statping Server is ready! Go to the URL below to begin.\n"
+    printf "Statping URL: $EC2_ENDPOINT\n"
     printf "================================================================================================================\n"
 else
    printf "Domain found for SSL certificate - $LETSENCRYPT_HOST\n"
@@ -73,8 +73,8 @@ else
    printf "Once you set your DNS records, Lets Encrypt will automatically\n"
    printf "create a SSL certificate for you and redirect you to HTTPS\n\n"
    printf "================================================================================================================\n"
-   printf "Your Statup Server is ready! Go to the URL below to begin.\n"
-   printf "Statup URL: $EC2_ENDPOINT\n"
+   printf "Your Statping Server is ready! Go to the URL below to begin.\n"
+   printf "Statping URL: $EC2_ENDPOINT\n"
    printf "SSL Domain: $LETSENCRYPT_HOST\n"
    printf "================================================================================================================\n"
 fi

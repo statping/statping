@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -30,12 +30,12 @@ import (
 var (
 	// AllCommunications holds all the loaded notifiers
 	AllCommunications []types.AllNotifiers
-	// db holds the Statup database connection
+	// db holds the Statping database connection
 	db       *gorm.DB
 	timezone float32
 )
 
-// Notification contains all the fields for a Statup Notifier.
+// Notification contains all the fields for a Statping Notifier.
 type Notification struct {
 	Id          int64              `gorm:"primary_key;column:id" json:"id"`
 	Method      string             `gorm:"column:method" json:"method"`

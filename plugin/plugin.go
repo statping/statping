@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -31,7 +31,7 @@ import (
 //
 //            v0.1
 //
-//       https://statup.io
+//       https://statping.com
 //
 //
 // An expandable plugin framework that will still

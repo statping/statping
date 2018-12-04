@@ -250,7 +250,7 @@
 									"pm.test(\"Create Service\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.output.name).to.eql(\"New Service\");",
-									"    pm.expect(jsonData.output.domain).to.eql(\"https://statup.io\");",
+									"    pm.expect(jsonData.output.domain).to.eql(\"https://statping.com\");",
 									"    pm.expect(jsonData.output.type).to.eql(\"http\");",
 									"    pm.expect(jsonData.output.method).to.eql(\"GET\");",
 									"    pm.expect(jsonData.output.expected_status).to.eql(200);",
@@ -280,7 +280,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"New Service\",\n    \"domain\": \"https://statup.io\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 30,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 30,\n    \"order_id\": 0\n}"
+							"raw": "{\n    \"name\": \"New Service\",\n    \"domain\": \"https://statping.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 30,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 30,\n    \"order_id\": 0\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/services",

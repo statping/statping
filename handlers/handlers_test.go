@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -47,7 +47,7 @@ func TestSetupHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "<title>Statup | Setup</title>")
+	assert.Contains(t, body, "<title>Statping | Setup</title>")
 }
 
 func TestProcessSetupHandler(t *testing.T) {
@@ -64,7 +64,7 @@ func TestProcessSetupHandler(t *testing.T) {
 	form.Add("sample_data", "on")
 	form.Add("description", "This is an awesome test")
 	form.Add("domain", "http://localhost:8080")
-	form.Add("email", "info@statup.io")
+	form.Add("email", "info@statping.com")
 	req, err := http.NewRequest("POST", "/setup", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	assert.Nil(t, err)
@@ -131,7 +131,7 @@ func TestDashboardHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "<title>Statup | Dashboard</title>")
+	assert.Contains(t, body, "<title>Statping | Dashboard</title>")
 	assert.Contains(t, body, "</footer>")
 }
 
@@ -168,7 +168,7 @@ func TestServicesHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "<title>Statup | Services</title>")
+	assert.Contains(t, body, "<title>Statping | Services</title>")
 	//assert.Contains(t, body, "</footer>️")
 	assert.True(t, isRouteAuthenticated(req))
 }
@@ -180,7 +180,7 @@ func TestUsersHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "<title>Statup | Users</title>")
+	assert.Contains(t, body, "<title>Statping | Users</title>")
 	assert.Contains(t, body, "<td>admin</td>")
 	assert.NotContains(t, body, "<td>changedusername</td>")
 	assert.Contains(t, body, "</footer>")
@@ -194,9 +194,9 @@ func TestUsersEditHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "<title>Statup | admin</title>")
+	assert.Contains(t, body, "<title>Statping | admin</title>")
 	assert.Contains(t, body, "<h3>User admin</h3>")
-	assert.Contains(t, body, "value=\"info@statup.io\"")
+	assert.Contains(t, body, "value=\"info@statping.com\"")
 	//assert.Contains(t, body, "</footer>️")
 	assert.True(t, isRouteAuthenticated(req))
 }
@@ -208,7 +208,7 @@ func TestSettingsHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "<title>Statup | Settings</title>")
+	assert.Contains(t, body, "<title>Statping | Settings</title>")
 	//assert.Contains(t, body, "</footer>️")
 	assert.True(t, isRouteAuthenticated(req))
 }
@@ -220,7 +220,7 @@ func TestHelpHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "<title>Statup | Help</title>")
+	assert.Contains(t, body, "<title>Statping | Help</title>")
 	//assert.Contains(t, body, "</footer>️")
 	assert.True(t, isRouteAuthenticated(req))
 }
@@ -232,7 +232,7 @@ func TestServicesHandler2(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "<title>Statup | Services</title>")
+	assert.Contains(t, body, "<title>Statping | Services</title>")
 	assert.Contains(t, body, "JSON Users Test")
 	assert.Contains(t, body, "JSON API Tester")
 	//assert.Contains(t, body, "</footer>️")
@@ -286,7 +286,7 @@ func TestLogsHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "<title>Statup | Logs</title>")
+	assert.Contains(t, body, "<title>Statping | Logs</title>")
 	//assert.Contains(t, body, "</footer>️")
 	assert.True(t, isRouteAuthenticated(req))
 }
@@ -322,7 +322,7 @@ func TestViewSettingsHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "<title>Statup | Settings</title>")
+	assert.Contains(t, body, "<title>Statping | Settings</title>")
 	assert.Contains(t, body, "Awesome Status")
 	//assert.Contains(t, body, "</footer>️")
 	assert.True(t, isRouteAuthenticated(req))
@@ -358,7 +358,7 @@ func TestPrometheusHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "statup_total_services 5")
+	assert.Contains(t, body, "statping_total_services 5")
 	assert.True(t, isRouteAuthenticated(req))
 }
 
@@ -382,7 +382,7 @@ func TestViewNotificationSettingsHandler(t *testing.T) {
 	Router().ServeHTTP(rr, req)
 	body := rr.Body.String()
 	assert.Equal(t, 200, rr.Code)
-	assert.Contains(t, body, "<title>Statup | Settings</title>")
+	assert.Contains(t, body, "<title>Statping | Settings</title>")
 	assert.Contains(t, body, `value="exampleuser" id="smtp_username"`)
 	assert.Contains(t, body, `value="587" id="smtp_port"`)
 	assert.Contains(t, body, `value="info@betatude.com" id="outgoing_email_address"`)

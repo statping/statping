@@ -115,15 +115,15 @@ func catchCLI(args []string) error {
 			return fmt.Errorf("could not export settings: %v", err.Error())
 		}
 		//core.CloseDB()
-		if err = utils.SaveFile(dir+"/statup-export.json", data); err != nil {
-			return fmt.Errorf("could not write file statup-export.json: %v", err.Error())
+		if err = utils.SaveFile(dir+"/statping-export.json", data); err != nil {
+			return fmt.Errorf("could not write file statping-export.json: %v", err.Error())
 		}
 		return errors.New("end")
 	case "import":
 		var err error
 		var data []byte
 		if len(args) != 2 {
-			return fmt.Errorf("did not include a JSON file to import\nstatup import filename.json")
+			return fmt.Errorf("did not include a JSON file to import\nstatping import filename.json")
 		}
 		filename := args[1]
 		if data, err = ioutil.ReadFile(filename); err != nil {
@@ -198,26 +198,26 @@ func RunOnce() {
 
 // HelpEcho prints out available commands and flags for Statping
 func HelpEcho() {
-	fmt.Printf("Statping v%v - Statping.io\n", VERSION)
+	fmt.Printf("Statping v%v - Statping.com\n", VERSION)
 	fmt.Printf("A simple Application Status Monitor that is opensource and lightweight.\n")
 	fmt.Printf("Commands:\n")
-	fmt.Println("     statup                    - Main command to run Statping server")
-	fmt.Println("     statup version            - Returns the current version of Statping")
-	fmt.Println("     statup run                - Check all services 1 time and then quit")
-	fmt.Println("     statup assets             - Dump all assets used locally to be edited.")
-	fmt.Println("     statup static             - Creates a static HTML file of the index page")
-	fmt.Println("     statup sass               - Compile .scss files into the css directory")
-	fmt.Println("     statup test plugins       - Test all plugins for required information")
-	fmt.Println("     statup env                - Show all environment variables being used for Statping")
-	fmt.Println("     statup update             - Attempts to update to the latest version")
-	fmt.Println("     statup export             - Exports your Statping settings to a 'statup-export.json' file.")
-	fmt.Println("     statup import <file>      - Imports settings from a previously saved JSON file.")
-	fmt.Println("     statup help               - Shows the user basic information about Statping")
+	fmt.Println("     statping                    - Main command to run Statping server")
+	fmt.Println("     statping version            - Returns the current version of Statping")
+	fmt.Println("     statping run                - Check all services 1 time and then quit")
+	fmt.Println("     statping assets             - Dump all assets used locally to be edited.")
+	fmt.Println("     statping static             - Creates a static HTML file of the index page")
+	fmt.Println("     statping sass               - Compile .scss files into the css directory")
+	fmt.Println("     statping test plugins       - Test all plugins for required information")
+	fmt.Println("     statping env                - Show all environment variables being used for Statping")
+	fmt.Println("     statping update             - Attempts to update to the latest version")
+	fmt.Println("     statping export             - Exports your Statping settings to a 'statping-export.json' file.")
+	fmt.Println("     statping import <file>      - Imports settings from a previously saved JSON file.")
+	fmt.Println("     statping help               - Shows the user basic information about Statping")
 	fmt.Printf("Flags:\n")
 	fmt.Println("     -ip 127.0.0.1             - Run HTTP server on specific IP address (default: localhost)")
 	fmt.Println("     -port 8080                - Run HTTP server on Port (default: 8080)")
 	fmt.Printf("Environment Variables:\n")
-	fmt.Println("     STATUP_DIR                - Set a absolute path for the root path of Statping server (logs, assets, SQL db)")
+	fmt.Println("     STATPING_DIR                - Set a absolute path for the root path of Statping server (logs, assets, SQL db)")
 	fmt.Println("     DB_CONN                   - Automatic Database connection (sqlite, postgres, mysql)")
 	fmt.Println("     DB_HOST                   - Database hostname or IP address")
 	fmt.Println("     DB_USER                   - Database username")
@@ -237,7 +237,7 @@ func HelpEcho() {
 
 func checkGithubUpdates() (githubResponse, error) {
 	var gitResp githubResponse
-	url := "https://api.github.com/repos/hunterlong/statup/releases/latest"
+	url := "https://api.github.com/repos/hunterlong/statping/releases/latest"
 	contents, _, err := utils.HttpRequest(url, "GET", nil, nil, nil, time.Duration(10*time.Second))
 	if err != nil {
 		return githubResponse{}, err

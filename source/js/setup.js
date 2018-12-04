@@ -1,5 +1,5 @@
 /*
- * Statup
+ * Statping
  * Copyright (C) 2018.  Hunter Long and the project contributors
  * Written by Hunter Long <info@socialeck.com> and the project contributors
  *
@@ -46,7 +46,7 @@ $('select#database_type').on('change', function(){
 
 $("#setup_form").submit(function() {
     $("#setup_button").prop("disabled", true);
-    $("#setup_button").text("Creating Statup...");
+    $("#setup_button").text("Creating Statping...");
     return true;
 });
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-#   Steps for Automatic SSL with Statup
+#   Steps for Automatic SSL with Statping
 #
 # 1. Create EC2 Instance while including this file has "--data-file"
 # 2. Once EC2 is created, view System Logs in EC2 instance.
@@ -17,7 +17,7 @@ LETSENCRYPT_EMAIL="noreply@MYEMAIL.com"
 ###################################################
 
 exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
-printf "Statup will try to create an SSL for domain: $LETSENCRYPT_HOST\n"
+printf "Statping will try to create an SSL for domain: $LETSENCRYPT_HOST\n"
 printf "\nexport LETSENCRYPT_HOST=$LETSENCRYPT_HOST\n" >> /home/ubuntu/.profile
 printf "export LETSENCRYPT_EMAIL=$LETSENCRYPT_EMAIL\n" >> /home/ubuntu/.profile
 sudo printf "\nexport LETSENCRYPT_HOST=$LETSENCRYPT_HOST\n" >> /root/.profile

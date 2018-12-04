@@ -2,9 +2,9 @@ version: '2.3'
 
 services:
 
-  statup:
-    container_name: statup
-    image: hunterlong/statup:latest
+  statping:
+    container_name: statping
+    image: hunterlong/statping:latest
     restart: always
     networks:
       - internet
@@ -12,7 +12,7 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./statup:/app
+      - ./statping:/app
     environment:
       VIRTUAL_HOST: localhost
       VIRTUAL_PORT: 8080
@@ -20,11 +20,11 @@ services:
       LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
       DB_CONN: postgres
       DB_HOST: postgres
-      DB_USER: statup
+      DB_USER: statping
       DB_PASS: password123
-      DB_DATABASE: statup
+      DB_DATABASE: statping
       NAME: EC2 Example
-      DESCRIPTION: This is a Statup Docker Compose instance
+      DESCRIPTION: This is a Statping Docker Compose instance
 
   nginx:
     container_name: nginx
@@ -56,8 +56,8 @@ services:
       - ./postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: password123
-      POSTGRES_USER: statup
-      POSTGRES_DB: statup
+      POSTGRES_USER: statping
+      POSTGRES_DB: statping
 
   letsencrypt:
     container_name: letsencrypt

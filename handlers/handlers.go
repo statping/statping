@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -32,7 +32,7 @@ import (
 )
 
 const (
-	cookieKey = "statup_auth"
+	cookieKey = "statping_auth"
 )
 
 var (
@@ -43,7 +43,7 @@ var (
 // RunHTTPServer will start a HTTP server on a specific IP and port
 func RunHTTPServer(ip string, port int) error {
 	host := fmt.Sprintf("%v:%v", ip, port)
-	utils.Log(1, "Statup HTTP Server running on http://"+host)
+	utils.Log(1, "Statping HTTP Server running on http://"+host)
 	//for _, p := range core.CoreApp.AllPlugins {
 	//	info := p.GetInfo()
 	//	for _, route := range p.Routes() {
@@ -128,7 +128,7 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 			return core.CoreApp.UseCdn.Bool
 		},
 		"QrAuth": func() string {
-			return fmt.Sprintf("statup://setup?domain=%v&api=%v", core.CoreApp.Domain, core.CoreApp.ApiSecret)
+			return fmt.Sprintf("statping://setup?domain=%v&api=%v", core.CoreApp.Domain, core.CoreApp.ApiSecret)
 		},
 		"Type": func(g interface{}) []string {
 			fooType := reflect.TypeOf(g)

@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -22,7 +22,7 @@ import (
 // AllNotifiers contains all the Notifiers loaded
 type AllNotifiers interface{}
 
-// Core struct contains all the required fields for Statup. All application settings
+// Core struct contains all the required fields for Statping. All application settings
 // will be saved into 1 row in the 'core' table. You can use the core.CoreApp
 // global variable to interact with the attributes to the application, such as services.
 type Core struct {

@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -134,7 +134,7 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 	if w.ApiKey != "" {
 		req.Header.Add("Content-Type", w.ApiKey)
 	}
-	req.Header.Set("User-Agent", "Statup")
+	req.Header.Set("User-Agent", "Statping")
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err

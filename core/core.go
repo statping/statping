@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -37,7 +37,7 @@ type Core struct {
 var (
 	Configs   *DbConfig // Configs holds all of the config.yml and database info
 	CoreApp   *Core     // CoreApp is a global variable that contains many elements
-	SetupMode bool      // SetupMode will be true if Statup does not have a database connection
+	SetupMode bool      // SetupMode will be true if Statping does not have a database connection
 	VERSION   string    // VERSION is set on build automatically by setting a -ldflag
 )
 
@@ -58,7 +58,7 @@ func (c *Core) ToCore() *types.Core {
 	return c.Core
 }
 
-// InitApp will initialize Statup
+// InitApp will initialize Statping
 func InitApp() {
 	SelectCore()
 	InsertNotifierDB()
@@ -68,7 +68,7 @@ func InitApp() {
 	go DatabaseMaintence()
 }
 
-// InsertNotifierDB inject the Statup database instance to the Notifier package
+// InsertNotifierDB inject the Statping database instance to the Notifier package
 func InsertNotifierDB() error {
 	if DbSession == nil {
 		err := Configs.Connect(false, utils.Directory)
@@ -141,7 +141,7 @@ func (c Core) AllOnline() bool {
 	return true
 }
 
-// SelectCore will return the CoreApp global variable and the settings/configs for Statup
+// SelectCore will return the CoreApp global variable and the settings/configs for Statping
 func SelectCore() (*Core, error) {
 	if DbSession == nil {
 		return nil, errors.New("database has not been initiated yet.")

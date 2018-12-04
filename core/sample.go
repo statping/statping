@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -23,7 +23,7 @@ import (
 	"time"
 )
 
-// InsertSampleData will create the example/dummy services for a brand new Statup installation
+// InsertSampleData will create the example/dummy services for a brand new Statping installation
 func InsertSampleData() error {
 	utils.Log(1, "Inserting Sample Data...")
 	s1 := ReturnService(&types.Service{
@@ -37,7 +37,7 @@ func InsertSampleData() error {
 		Order:          1,
 	})
 	s2 := ReturnService(&types.Service{
-		Name:           "Statup Github",
+		Name:           "Statping Github",
 		Domain:         "https://github.com/hunterlong/statping",
 		ExpectedStatus: 200,
 		Interval:       30,
@@ -150,7 +150,7 @@ func InsertSampleHits() error {
 // insertSampleCore will create a new Core for the seed
 func insertSampleCore() error {
 	core := &types.Core{
-		Name:        "Statup Sample Data",
+		Name:        "Statping Sample Data",
 		Description: "This data is only used to testing",
 		ApiKey:      "sample",
 		ApiSecret:   "samplesecret",
@@ -208,7 +208,7 @@ func insertMessages() error {
 	return nil
 }
 
-// InsertLargeSampleData will create the example/dummy services for testing the Statup server
+// InsertLargeSampleData will create the example/dummy services for testing the Statping server
 func InsertLargeSampleData() error {
 	if err := insertSampleCore(); err != nil {
 		return err
@@ -238,7 +238,7 @@ func InsertLargeSampleData() error {
 
 	s7 := ReturnService(&types.Service{
 		Name:           "Demo Page",
-		Domain:         "https://demo.statup.io",
+		Domain:         "https://demo.statping.com",
 		ExpectedStatus: 200,
 		Interval:       30,
 		Type:           "http",

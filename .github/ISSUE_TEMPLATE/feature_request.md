@@ -4,7 +4,7 @@ about: Suggest a feature and let's see what others say
 
 ---
 
-**What would you like on Statup?**
+**What would you like on Statping?**
 A clear and concise description of what you want to happen.
 
 **Describe the solution you'd like**

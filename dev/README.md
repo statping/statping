@@ -8,7 +8,7 @@
 * [Subdirectories](#pkg-subdirectories)
 
 ## <a name="pkg-overview">Overview</a>
-Package core contains the main functionality of Statup. This includes everything for
+Package core contains the main functionality of Statping. This includes everything for
 Services, Hits, Failures, Users, service checking mechanisms, databases, and notifiers
 in the notifier package
 
@@ -167,13 +167,13 @@ More info on: <a href="https://github.com/hunterlong/statping">https://github.co
 var (
     Configs   *DbConfig // Configs holds all of the config.yml and database info
     CoreApp   *Core     // CoreApp is a global variable that contains many elements
-    SetupMode bool      // SetupMode will be true if Statup does not have a database connection
+    SetupMode bool      // SetupMode will be true if Statping does not have a database connection
     VERSION   string    // VERSION is set on build automatically by setting a -ldflag
 )
 ```
 ``` go
 var (
-    // DbSession stores the Statup database session
+    // DbSession stores the Statping database session
     DbSession *gorm.DB
 )
 ```
@@ -273,7 +273,7 @@ ExportIndexHTML returns the HTML of the index page as a string
 ``` go
 func InitApp()
 ```
-InitApp will initialize Statup
+InitApp will initialize Statping
 
 
 
@@ -281,7 +281,7 @@ InitApp will initialize Statup
 ``` go
 func InsertLargeSampleData() error
 ```
-InsertLargeSampleData will create the example/dummy services for testing the Statup server
+InsertLargeSampleData will create the example/dummy services for testing the Statping server
 
 
 
@@ -289,7 +289,7 @@ InsertLargeSampleData will create the example/dummy services for testing the Sta
 ``` go
 func InsertNotifierDB() error
 ```
-InsertNotifierDB inject the Statup database instance to the Notifier package
+InsertNotifierDB inject the Statping database instance to the Notifier package
 
 
 
@@ -297,7 +297,7 @@ InsertNotifierDB inject the Statup database instance to the Notifier package
 ``` go
 func InsertSampleData() error
 ```
-InsertSampleData will create the example/dummy services for a brand new Statup installation
+InsertSampleData will create the example/dummy services for a brand new Statping installation
 
 
 
@@ -329,7 +329,7 @@ ReturnUser returns *core.user based off a *types.user
 ``` go
 func SampleData() error
 ```
-SampleData runs all the sample data for a new Statup installation
+SampleData runs all the sample data for a new Statping installation
 
 
 
@@ -571,7 +571,7 @@ NewCore return a new *core.Core struct
 ``` go
 func SelectCore() (*Core, error)
 ```
-SelectCore will return the CoreApp global variable and the settings/configs for Statup
+SelectCore will return the CoreApp global variable and the settings/configs for Statping
 
 
 ### <a name="UpdateCore">func</a> [UpdateCore](https://github.com/hunterlong/statping/tree/master/core/core.go?s=2246:2285#L82)
@@ -741,7 +741,7 @@ ToString will convert the DateScanObj into a JSON string for the charts to rende
 ``` go
 type DbConfig types.DbConfig
 ```
-DbConfig stores the config.yml file for the statup configuration
+DbConfig stores the config.yml file for the statping configuration
 
 
 
@@ -795,7 +795,7 @@ Connect will attempt to connect to the sqlite, postgres, or mysql database
 ``` go
 func (c *DbConfig) CreateCore() *Core
 ```
-CreateCore will initialize the global variable 'CoreApp". This global variable contains most of Statup app.
+CreateCore will initialize the global variable 'CoreApp". This global variable contains most of Statping app.
 
 
 
@@ -804,7 +804,7 @@ CreateCore will initialize the global variable 'CoreApp". This global variable c
 ``` go
 func (db *DbConfig) CreateDatabase() error
 ```
-CreateDatabase will CREATE TABLES for each of the Statup elements
+CreateDatabase will CREATE TABLES for each of the Statping elements
 
 
 
@@ -813,7 +813,7 @@ CreateDatabase will CREATE TABLES for each of the Statup elements
 ``` go
 func (db *DbConfig) DropDatabase() error
 ```
-DropDatabase will DROP each table Statup created
+DropDatabase will DROP each table Statping created
 
 
 
@@ -822,7 +822,7 @@ DropDatabase will DROP each table Statup created
 ``` go
 func (db *DbConfig) InsertCore() (*Core, error)
 ```
-InsertCore create the single row for the Core settings in Statup
+InsertCore create the single row for the Core settings in Statping
 
 
 
@@ -1478,7 +1478,7 @@ More info on: <a href="https://github.com/hunterlong/statping">https://github.co
 ``` go
 func DesktopInit(ip string, port int)
 ```
-DesktopInit will run the Statup server on a specific IP and port using SQLite database
+DesktopInit will run the Statping server on a specific IP and port using SQLite database
 
 
 
@@ -1495,7 +1495,7 @@ to bypass the admin authenticate to the dashboard features.
 ``` go
 func Router() *mux.Router
 ```
-Router returns all of the routes used in Statup
+Router returns all of the routes used in Statping
 
 
 
@@ -1638,9 +1638,9 @@ Set a cached content by key
 * [Index](#pkg-index)
 
 ## <a name="pkg-overview">Overview</a>
-Package notifiers holds all the notifiers for Statup, which also includes
+Package notifiers holds all the notifiers for Statping, which also includes
 user created notifiers that have been accepted in a Push Request. Read the wiki
-to see a full example of a notifier with all events, visit Statup's
+to see a full example of a notifier with all events, visit Statping's
 notifier example code: <a href="https://github.com/hunterlong/statping/wiki/Notifier-Example">https://github.com/hunterlong/statping/wiki/Notifier-Example</a>
 
 This package shouldn't contain any exports, to see how notifiers work
@@ -1674,7 +1674,7 @@ and learn how to create your own custom notifier.
 * [Index](#pkg-index)
 
 ## <a name="pkg-overview">Overview</a>
-Package plugin contains the interfaces to build your own Golang Plugin that will receive triggers on Statup events.
+Package plugin contains the interfaces to build your own Golang Plugin that will receive triggers on Statping events.
 
 
 
@@ -1726,7 +1726,7 @@ func LoadPlugins()
 * [Subdirectories](#pkg-subdirectories)
 
 ## <a name="pkg-overview">Overview</a>
-Package source holds all the assets for Statup. This includes
+Package source holds all the assets for Statping. This includes
 CSS, JS, SCSS, HTML and other website related content.
 This package uses Rice to compile all assets into a single 'rice-box.go' file.
 
@@ -1898,7 +1898,7 @@ UsingAssets returns true if the '/assets' folder is found in the directory
 * [Index](#pkg-index)
 
 ## <a name="pkg-overview">Overview</a>
-Package types contains all of the structs for objects in Statup including services, hits, failures, Core, and others.
+Package types contains all of the structs for objects in Statping including services, hits, failures, Core, and others.
 
 More info on: <a href="https://github.com/hunterlong/statping">https://github.com/hunterlong/statping</a>
 
@@ -2111,7 +2111,7 @@ type Core struct {
 }
 
 ```
-Core struct contains all the required fields for Statup. All application settings
+Core struct contains all the required fields for Statping. All application settings
 will be saved into 1 row in the 'core' table. You can use the core.CoreApp
 global variable to interact with the attributes to the application, such as services.
 
@@ -2127,7 +2127,7 @@ global variable to interact with the attributes to the application, such as serv
 ## <a name="Databaser">type</a> [Databaser](https://github.com/hunterlong/statping/tree/master/types/plugin.go?s=806:860#L55)
 ``` go
 type Databaser interface {
-    StatupDatabase(*gorm.DB)
+    StatpingDatabase(*gorm.DB)
 }
 ```
 
@@ -2774,13 +2774,13 @@ UserInterface interfaces the database functions
 * [Examples](#pkg-examples)
 
 ## <a name="pkg-overview">Overview</a>
-Package utils contains common methods used in most packages in Statup.
+Package utils contains common methods used in most packages in Statping.
 This package contains multiple function like:
 Logging, encryption, type conversions, setting utils.Directory as the current directory,
 running local CMD commands, and creating/deleting files/folder.
 
 You can overwrite the utils.Directory global variable by including
-STATUP_DIR environment variable to be an absolute path.
+STATPING_DIR environment variable to be an absolute path.
 
 More info on: <a href="https://github.com/hunterlong/statping">https://github.com/hunterlong/statping</a>
 
@@ -2841,7 +2841,7 @@ var (
 ```
 ``` go
 var (
-    // Directory returns the current path or the STATUP_DIR environment variable
+    // Directory returns the current path or the STATPING_DIR environment variable
     Directory string
 )
 ```
@@ -2946,7 +2946,7 @@ Http returns a log for a HTTP request
 ``` go
 func InitLogs() error
 ```
-InitLogs will create the '/logs' directory and creates a file '/logs/statup.log' for application logging
+InitLogs will create the '/logs' directory and creates a file '/logs/statping.log' for application logging
 
 
 

@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -32,7 +32,7 @@ type mobilePush struct {
 var mobile = &mobilePush{&notifier.Notification{
 	Method: "mobile",
 	Title:  "Mobile Notifications",
-	Description: `Receive push notifications on your Android or iPhone devices using the Statup App. You can scan the Authentication QR Code found in Settings to get the mobile app setup in seconds.
+	Description: `Receive push notifications on your Android or iPhone devices using the Statping App. You can scan the Authentication QR Code found in Settings to get the mobile app setup in seconds.
 				 <p align="center"><a href="https://play.google.com/store/apps/details?id=com.statup"><img src="https://img.cjx.io/google-play.svg"></a> <a href="https://testflight.apple.com/join/TuBIj25Q"><img src="https://img.cjx.io/app-store-badge.svg"></a></p>`,
 	Author:    "Hunter Long",
 	AuthorUrl: "https://github.com/hunterlong",

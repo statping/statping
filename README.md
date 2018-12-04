@@ -3,7 +3,7 @@
 </p>
 <p align="center">
     <b>Statping - Web and App Status Monitoring for Any Type of Project</b><br>
-<a href="https://github.com/hunterlong/statping/wiki">View Wiki</a> | <a href="https://demo.statup.io">Demo</a> <br> <a href="https://github.com/hunterlong/statping/wiki/API">API</a> | <a href="https://github.com/hunterlong/statping/wiki/Docker">Docker</a> | <a href="https://github.com/hunterlong/statping/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/hunterlong/statping/wiki/Heroku">Heroku</a> | <a href="https://github.com/hunterlong/statping/wiki/Mac">Mac</a> | <a href="https://github.com/hunterlong/statping/wiki/Linux">Linux</a> | <a href="https://github.com/hunterlong/statping/wiki/Windows">Windows</a> | <a href="https://github.com/hunterlong/statping/wiki/Statping-Plugins">Plugins</a>
+<a href="https://github.com/hunterlong/statping/wiki">View Wiki</a> | <a href="https://demo.statping.com">Demo</a> <br> <a href="https://github.com/hunterlong/statping/wiki/API">API</a> | <a href="https://github.com/hunterlong/statping/wiki/Docker">Docker</a> | <a href="https://github.com/hunterlong/statping/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/hunterlong/statping/wiki/Heroku">Heroku</a> | <a href="https://github.com/hunterlong/statping/wiki/Mac">Mac</a> | <a href="https://github.com/hunterlong/statping/wiki/Linux">Linux</a> | <a href="https://github.com/hunterlong/statping/wiki/Windows">Windows</a> | <a href="https://github.com/hunterlong/statping/wiki/Statping-Plugins">Plugins</a>
 </p>
 
 # Statping - Status Page & Monitoring Server

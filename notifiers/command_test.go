@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	commandTest = "curl -I https://statup.io/"
+	commandTest = "curl -I https://statping.com/"
 )
 
 func TestCommandNotifier(t *testing.T) {

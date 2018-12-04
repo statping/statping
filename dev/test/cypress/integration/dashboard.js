@@ -1,5 +1,5 @@
 /*
- * Statup
+ * Statping
  * Copyright (C) 2018.  Hunter Long and the project contributors
  * Written by Hunter Long <info@socialeck.com> and the project contributors
  *
@@ -34,8 +34,8 @@ context('Dashboard Tests', () => {
     it('should view help', () => {
         cy.visit('http://localhost:8080/settings')
         cy.get(':nth-child(6) > .nav-link').click()
-        cy.title().should('eq', 'Statup | Help')
-        cy.get('.col-12 > :nth-child(1)').should('contain', 'Statup')
+        cy.title().should('eq', 'Statping | Help')
+        cy.get('.col-12 > :nth-child(1)').should('contain', 'Statping')
     })
 
 });

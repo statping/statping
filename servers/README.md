@@ -7,14 +7,14 @@ It doesn't look good when your Status Page goes down, I recommend a small EC2 in
 # Install on Linux
 Installing on Linux is a pretty easy task. Simply run the command below to have the `statup` command ready to rock. 
 ```bash
-bash <(curl -s https://statup.io/install.sh)
+bash <(curl -s https://statping.com/install.sh)
 statup version
 ```
 
 # Install on Mac
 Installing on Mac/OSX is also very easy, 
 ```bash
-bash <(curl -s https://statup.io/install.sh)
+bash <(curl -s https://statping.com/install.sh)
 statup version
 ```
 

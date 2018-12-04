@@ -1,4 +1,4 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
@@ -122,7 +122,7 @@ func OnUpdatedCore(c *types.Core) {
 	}
 }
 
-// OnStart is triggered when the Statup service has started
+// OnStart is triggered when the Statping service has started
 func OnStart(c *types.Core) {
 	for _, comm := range AllCommunications {
 		if isType(comm, new(CoreEvents)) && isEnabled(comm) && inLimits(comm) {
