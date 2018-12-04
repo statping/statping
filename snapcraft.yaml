@@ -1,4 +1,4 @@
-name: statup
+name: statping
 version-script: cat version.txt
 version: "stable"
 summary: Statping Server Monitoring with Status Page
@@ -14,13 +14,13 @@ confinement: strict
 grade: stable
 
 parts:
-  statup:
+  statping:
     plugin: dump
-    source: ./build/statup-linux.tar.gz
+    source: ./build/statping-linux.tar.gz
 
 apps:
-  statup:
-    command: statup
+  statping:
+    command: statping
     plugs:
       - home
       - network-bind
