@@ -109,6 +109,12 @@ function AjaxChart(chart, service, start=0, end=9999999999, group="hour") {
     url: "/api/services/"+service+"/data?start="+start+"&end="+end+"&group="+group,
     type: 'GET',
     success: function(data) {
+    	if (data.data.length <= 3) {
+				AjaxChart(chart, service, 0, 9999999999, "second")
+				return;
+			} else if (data.data.length === 0) {
+    		return;
+			}
       chart.data.labels.pop();
       data.data.forEach(function(d) {
         chart.data.datasets[0].data.push(d);

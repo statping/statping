@@ -245,7 +245,6 @@ clean:
 	find . -name "*.out" -type f -delete
 	find . -name "*.cpu" -type f -delete
 	find . -name "*.mem" -type f -delete
-	find . -name "*.test" -type f -delete
 
 # tag version using git
 tag:

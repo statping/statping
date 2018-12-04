@@ -12,6 +12,7 @@ source/rice-box.go
 vendor
 servers
 dev
+!dev/postman_environment.json
 !build/alpine-linux-amd64
 config.yml
 statup.db

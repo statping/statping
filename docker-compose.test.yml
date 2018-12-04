@@ -1,4 +1,5 @@
 sut:
+  container_name: statping_sut
   build: .
   dockerfile: Dockerfile.test
   links:
@@ -6,3 +7,6 @@ sut:
 statping:
   build: .
   dockerfile: Dockerfile
+  environment:
+    DB_CONN: sqlite
+    NAME: Docker Tester

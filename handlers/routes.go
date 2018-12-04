@@ -135,6 +135,7 @@ func Router() *mux.Router {
 	r.Handle("/metrics", http.HandlerFunc(prometheusHandler))
 	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
 	r.Handle("/tray", http.HandlerFunc(trayHandler))
+	r.Handle("/.well-known/", http.StripPrefix("/.well-known/", http.FileServer(http.Dir(dir+"/.well-known"))))
 	r.NotFoundHandler = http.HandlerFunc(error404Handler)
 	return r
 }
