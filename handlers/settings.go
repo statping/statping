@@ -102,6 +102,7 @@ func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 	err := source.CreateAllAssets(dir)
 	if err != nil {
 		utils.Log(3, err)
+		sendErrorJson(err, w, r)
 		return
 	}
 	err = source.CompileSASS(dir)

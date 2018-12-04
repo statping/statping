@@ -12,7 +12,7 @@
 //		brew install statping
 //
 //		// Linux installation
-//		bash <(curl -s https://assets.statping.com/install.sh)
+//		bash <(curl -s https://assets.statup.io/install.sh)
 //		statping version
 //
 // Docker

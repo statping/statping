@@ -177,7 +177,9 @@ docker-push-cypress:
 
 # push the :latest tag to Docker hub
 docker-push-latest:
+	docker tag hunterlong/statping hunterlong/statping:dev
 	docker push hunterlong/statping:latest
+	docker push hunterlong/statping:dev
 	docker push hunterlong/statping:v${VERSION}
 
 docker-run-mssql:
