@@ -106,7 +106,7 @@ func UsingAssets(folder string) bool {
 
 // SaveAsset will save an asset to the '/assets/' folder.
 func SaveAsset(data []byte, folder, file string) error {
-	utils.Log(1, fmt.Sprintf("Saving %v/assets/%v into assets folder", folder, file))
+	utils.Log(1, fmt.Sprintf("Saving %v/assets/%v", folder, file))
 	err := ioutil.WriteFile(folder+"/assets/"+file, data, 0744)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Failed to save %v/%v, %v", folder, file, err))
@@ -135,13 +135,13 @@ func CreateAllAssets(folder string) error {
 	MakePublicFolder(folder + "/assets/font")
 	MakePublicFolder(folder + "/assets/files")
 	utils.Log(1, "Inserting scss, css, and javascript files into assets folder")
-	CopyAllToPublic(FontBox, "font")
 	CopyAllToPublic(ScssBox, "scss")
+	CopyAllToPublic(FontBox, "font")
 	CopyAllToPublic(CssBox, "css")
 	CopyAllToPublic(JsBox, "js")
 	CopyToPublic(FontBox, folder+"/assets/font", "all.css")
 	CopyToPublic(TmplBox, folder+"/assets", "robots.txt")
-	CopyToPublic(TmplBox, folder+"/assets", "statup.png")
+	CopyToPublic(TmplBox, folder+"/assets", "banner.png")
 	CopyToPublic(TmplBox, folder+"/assets", "favicon.ico")
 	CopyToPublic(TmplBox, folder+"/assets/files", "swagger.json")
 	CopyToPublic(TmplBox, folder+"/assets/files", "postman.json")
@@ -178,7 +178,7 @@ func CopyAllToPublic(box *rice.Box, folder string) error {
 		if err != nil {
 			return nil
 		}
-		filePath := fmt.Sprintf("%v/%v", folder, path)
+		filePath := fmt.Sprintf("%v%v", folder, path)
 		SaveAsset(file, utils.Directory, filePath)
 		return nil
 	})

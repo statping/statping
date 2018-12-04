@@ -2031,7 +2031,7 @@ CompileSASS will attempt to compile the SASS files into CSS
 
 
 
-## <a name="CopyAllToPublic">func</a> [CopyAllToPublic](https://github.com/hunterlong/statping/tree/master/source/source.go?s=5781:5837#L167)
+## <a name="CopyAllToPublic">func</a> [CopyAllToPublic](https://github.com/hunterlong/statping/tree/master/source/source.go?s=5779:5835#L167)
 ``` go
 func CopyAllToPublic(box *rice.Box, folder string) error
 ```
@@ -2039,7 +2039,7 @@ CopyAllToPublic will copy all the files in a rice box into a local folder
 
 
 
-## <a name="CopyToPublic">func</a> [CopyToPublic](https://github.com/hunterlong/statping/tree/master/source/source.go?s=6379:6438#L189)
+## <a name="CopyToPublic">func</a> [CopyToPublic](https://github.com/hunterlong/statping/tree/master/source/source.go?s=6377:6436#L189)
 ``` go
 func CopyToPublic(box *rice.Box, folder, file string) error
 ```
@@ -2047,7 +2047,7 @@ CopyToPublic will create a file from a rice Box to the '/assets' directory
 
 
 
-## <a name="CreateAllAssets">func</a> [CreateAllAssets](https://github.com/hunterlong/statping/tree/master/source/source.go?s=4241:4282#L129)
+## <a name="CreateAllAssets">func</a> [CreateAllAssets](https://github.com/hunterlong/statping/tree/master/source/source.go?s=4239:4280#L129)
 ``` go
 func CreateAllAssets(folder string) error
 ```
@@ -2055,7 +2055,7 @@ CreateAllAssets will dump HTML, CSS, SCSS, and JS assets into the '/assets' dire
 
 
 
-## <a name="DeleteAllAssets">func</a> [DeleteAllAssets](https://github.com/hunterlong/statping/tree/master/source/source.go?s=5436:5477#L156)
+## <a name="DeleteAllAssets">func</a> [DeleteAllAssets](https://github.com/hunterlong/statping/tree/master/source/source.go?s=5434:5475#L156)
 ``` go
 func DeleteAllAssets(folder string) error
 ```
@@ -2071,7 +2071,7 @@ HelpMarkdown will return the Markdown of help.md into HTML
 
 
 
-## <a name="MakePublicFolder">func</a> [MakePublicFolder](https://github.com/hunterlong/statping/tree/master/source/source.go?s=6946:6988#L206)
+## <a name="MakePublicFolder">func</a> [MakePublicFolder](https://github.com/hunterlong/statping/tree/master/source/source.go?s=6944:6986#L206)
 ``` go
 func MakePublicFolder(folder string) error
 ```
@@ -2079,7 +2079,7 @@ MakePublicFolder will create a new folder
 
 
 
-## <a name="OpenAsset">func</a> [OpenAsset](https://github.com/hunterlong/statping/tree/master/source/source.go?s=3931:3973#L119)
+## <a name="OpenAsset">func</a> [OpenAsset](https://github.com/hunterlong/statping/tree/master/source/source.go?s=3929:3971#L119)
 ``` go
 func OpenAsset(folder, file string) string
 ```

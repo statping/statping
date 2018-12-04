@@ -40,6 +40,8 @@ docker-build-all: docker-build-latest
 # push all docker tags built
 docker-publish-all: docker-push-latest
 
+snapcraft: snapcraft-build snapcraft-release
+
 # build Statping for local arch
 build: compile
 	$(GOBUILD) $(BUILDVERSION) -o $(BINARY_NAME) -v ./cmd
@@ -96,6 +98,7 @@ coverage:
 
 # generate documentation for Statping functions
 docs:
+	godoc2md -ex github.com/hunterlong/statping >> dev/README.md
 	godoc2md -ex github.com/hunterlong/statping/cmd >> dev/README.md
 	godoc2md -ex github.com/hunterlong/statping/core > dev/README.md
 	godoc2md -ex github.com/hunterlong/statping/handlers >> dev/README.md
@@ -299,9 +302,7 @@ travis-build:
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(TRAVIS_BUILD_CMD) https://api.travis-ci.com/repo/hunterlong%2Fstatping/requests
 	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
 
-snapcraft: snapcraft-build snapcraft-release
-
-snapcraft-build:
+snapcraft-build: build-all
 	PWD=$(shell pwd)
 	cp build/$(BINARY_NAME)-linux-x64.tar.gz build/$(BINARY_NAME)-linux.tar.gz
 	snapcraft clean statping -s pull
@@ -320,11 +321,8 @@ snapcraft-build:
 snapcraft-release:
 	snapcraft push *.snap --release edge
 
-snap:
-	snapcraft cleanbuild
-
 sign-all:
-	gpg --default-key CB1895149EEA4A2B8DBC9FB4C326E5C3B26BBA53 --detach-sign --armor statpinger
+	gpg --default-key $SIGN_KEY --detach-sign --armor statpinger
 
 valid-sign:
 	gpg --verify statping.asc
@@ -334,4 +332,4 @@ xgo-install: clean
 	go get github.com/karalabe/xgo
 	docker pull karalabe/xgo-latest
 
-.PHONY: all build build-all build-alpine test-all test test-api
+.PHONY: all build build-all build-alpine test-all test test-api docker

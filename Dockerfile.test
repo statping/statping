@@ -13,10 +13,4 @@ RUN make dep
 RUN make dev-deps
 RUN make install
 
-ENV IS_DOCKER=true
-ENV STATPING_DIR=/app
-WORKDIR /app
-VOLUME /app
-EXPOSE 8080
-
 CMD ["make", "test-api"]
