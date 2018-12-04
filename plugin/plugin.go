@@ -27,7 +27,7 @@ import (
 )
 
 //
-//     STATUP PLUGIN INTERFACE
+//     STATPING PLUGIN INTERFACE
 //
 //            v0.1
 //

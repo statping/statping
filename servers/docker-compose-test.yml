@@ -2,47 +2,47 @@ version: '2.3'
 
 services:
 
-  statup:
-    container_name: statup
-    image: hunterlong/statup:dev
+  statping:
+    container_name: statping
+    image: hunterlong/statping:dev
     networks:
       - internet
       - database
     depends_on:
-      - postgres_statup
+      - postgres_statping
       - postgres_mysql
     entrypoint:
       - "sleep 30 && cd /go/src/github.com/hunterlong/statping && go test -v ./..."
     environment:
       GO_ENV: test
       DB_CONN: postgres
-      DB_HOST: postgres_statup
+      DB_HOST: postgres_statping
       DB_USER: root
       DB_PASS: root
-      DB_DATABASE: statup
+      DB_DATABASE: statping
       NAME: EC2 Example
       DESCRIPTION: This is a Statping Docker Compose instance
 
-  postgres_statup:
-    container_name: postgres_statup
+  postgres_statping:
+    container_name: postgres_statping
     image: postgres
     restart: always
     networks:
       - database
     environment:
       POSTGRES_PASSWORD: password123
-      POSTGRES_USER: statup
-      POSTGRES_DB: statup
+      POSTGRES_USER: statping
+      POSTGRES_DB: statping
 
   postgres_mysql:
-    container_name: mysql_statup
+    container_name: mysql_statping
     image: mysql
     restart: always
     networks:
       - database
     environment:
       MYSQL_ROOT_PASSWORD: password123
-      MYSQL_DATABASE: statup
+      MYSQL_DATABASE: statping
 
 networks:
   internet:

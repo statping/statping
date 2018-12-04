@@ -2,14 +2,14 @@ version: '2.3'
 
 services:
 
-  statup:
-    container_name: statup
-    image: hunterlong/statup:latest
+  statping:
+    container_name: statping
+    image: hunterlong/statping:latest
     restart: always
     ports:
       - 0.0.0.0:80:8080
     volumes:
-      - ./statup/app:/app
+      - ./statping/app:/app
     environment:
       NAME: Single Docker Image
       DESCRIPTION: You'll need to input your own Database information in Setup process

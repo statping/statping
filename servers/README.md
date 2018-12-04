@@ -5,39 +5,39 @@ It doesn't look good when your Status Page goes down, I recommend a small EC2 in
 > It's a good idea to have a Status Page not on the same server as your applications. 
 
 # Install on Linux
-Installing on Linux is a pretty easy task. Simply run the command below to have the `statup` command ready to rock. 
+Installing on Linux is a pretty easy task. Simply run the command below to have the `statping` command ready to rock. 
 ```bash
 bash <(curl -s https://statping.com/install.sh)
-statup version
+statping version
 ```
 
 # Install on Mac
 Installing on Mac/OSX is also very easy, 
 ```bash
 bash <(curl -s https://statping.com/install.sh)
-statup version
+statping version
 ```
 
 # Install on Windows
-Go to the [Latest Releases](https://github.com/hunterlong/statping/releases/latest) page for Statping and simply download `statup-windows-x64`!
-Statping only supports Windows 64-bit currently, sorry 32-bit users. Rename the file to `statup` for ease of use!
+Go to the [Latest Releases](https://github.com/hunterlong/statping/releases/latest) page for Statping and simply download `statping-windows-x64`!
+Statping only supports Windows 64-bit currently, sorry 32-bit users. Rename the file to `statping` for ease of use!
 
 # Install on Docker
 This Docker image uses Alpine Linux to keep it ultra small. 
 ```bash
-docker run -it -p 8080:8080 hunterlong/statup
+docker run -it -p 8080:8080 hunterlong/statping
 ```
 #### Or use Docker Compose
 This Docker Compose file inlcudes NGINX, Postgres, and Statping.
 ```bash
-wget https://raw.githubusercontent.com/hunterlong/statup/master/servers/docker-compose.yml
+wget https://raw.githubusercontent.com/hunterlong/statping/master/servers/docker-compose.yml
 docker-compose up -d
 ```
 
 #### Docker Compose with Automatic SSL
 You can automatically start a Statping server with automatic SSL encryption using this docker-compose file. First point your domain's DNS to the Statping server, and then run this docker-compose command with DOMAIN and EMAIL. Email is for letsencrypt services.
 ```
-wget https://raw.githubusercontent.com/hunterlong/statup/master/servers/docker-compose-ssl.yml
+wget https://raw.githubusercontent.com/hunterlong/statping/master/servers/docker-compose-ssl.yml
 
 LETSENCRYPT_HOST=mydomain.com \ 
     LETSENCRYPT_EMAIL=info@mydomain.com \
@@ -64,7 +64,7 @@ aws ec2 run-instances \
 ```
 ### Create EC2 with Automatic SSL Certification
 ```bash
-wget https://raw.githubusercontent.com/hunterlong/statup/master/servers/ec2-ssl.sh
+wget https://raw.githubusercontent.com/hunterlong/statping/master/servers/ec2-ssl.sh
 ```
 Edit ec2-ssl.sh and insert your domain you want to use, then run command below. Use the Security Group ID that you used above for --security-group-ids
 ```
@@ -114,7 +114,7 @@ DOMAIN=mydomain.com EMAIL=info@mydomain.com \
 
 ## Systemd
 ```$xslt
-/etc/systemd/system/statup.service
+/etc/systemd/system/statping.service
 
 
 ```

@@ -45,7 +45,7 @@ Statping includes email notification via SMTP and Slack integration using [Incom
 
 ## User Created Plugins and Notifiers
 View the [Plugin Wiki](https://github.com/hunterlong/statping/wiki/Statping-Plugins) to see detailed information about Golang Plugins. Statping isn't just another Status Page for your applications, it's a framework that allows you to create your own plugins to interact with every element of your status page. [Notifier's](https://github.com/hunterlong/statping/wiki/Notifiers) can also be create with only 1 golang file.
-Plugin are created in Golang using the [statup/plugin](https://github.com/hunterlong/statping/tree/master/plugin) golang package. The plugin package has a list of interfaces/events to accept into your own plugin application.
+Plugin are created in Golang using the [statping/plugin](https://github.com/hunterlong/statping/tree/master/plugin) golang package. The plugin package has a list of interfaces/events to accept into your own plugin application.
 
 <p align="center">
 <img width="100%" src="https://img.cjx.io/statupsc2.png">
@@ -61,14 +61,14 @@ Having a straight forward dashboard makes Statping that much better. Monitor you
 If you want to use Statping as a CLI application without running a server, you can export your status page to a static HTML.
 This export tool is very useful for people who want to export their HTML and upload/commit it to Github Pages or an FTP server.
 ```dash
-statup export
+statping export
 ```
 ###### `index.html` will be created in the current directory with CDN URL's for assets.
 
 ## Run on Docker
-Use the [Statping Docker Image](https://hub.docker.com/r/hunterlong/statup) to create a status page in seconds. Checkout the [Docker Wiki](https://github.com/hunterlong/statping/wiki/Docker) to view more details on how to get started using Docker.
+Use the [Statping Docker Image](https://hub.docker.com/r/hunterlong/statping) to create a status page in seconds. Checkout the [Docker Wiki](https://github.com/hunterlong/statping/wiki/Docker) to view more details on how to get started using Docker.
 ```bash
-docker run -it -p 8080:8080 hunterlong/statup
+docker run -it -p 8080:8080 hunterlong/statping
 ```
 There are multiple ways to startup a Statping server. You want to make sure Statping is on it's own instance that is not on the same server as the applications you wish to monitor. It doesn't look good when your Status Page goes down, I recommend a small EC2 instance so you can set it, and forget it.
 
@@ -116,7 +116,7 @@ aws ec2 run-instances \
 ##### Create EC2 with Automatic SSL Certification
 The AWS-CLI command below will automatically create an EC2 server and create an SSL certificate from Lets Encrypt, for free.
 ```bash
-wget https://raw.githubusercontent.com/hunterlong/statup/master/servers/ec2-ssl.sh
+wget https://raw.githubusercontent.com/hunterlong/statping/master/servers/ec2-ssl.sh
 # Edit ec2-ssl.sh and insert your domain you want to use, then run command below.
 # Use the Security Group ID that you used above for --security-group-ids
 
@@ -132,10 +132,10 @@ aws ec2 run-instances \
 Statping includes a [Prometheus Exporter](https://github.com/hunterlong/statping/wiki/Prometheus-Exporter) so you can have even more monitoring power with your services. The Prometheus exporter can be seen on `/metrics`, simply create another exporter in your prometheus config. Use your Statping API Secret for the Authorization Bearer header, the `/metrics` URL is dedicated for Prometheus and requires the correct API Secret has `Authorization` header.
 ```yaml
 scrape_configs:
-  - job_name: 'statup'
+  - job_name: 'statping'
     bearer_token: 'MY API SECRET HERE'
     static_configs:
-      - targets: ['statup:8080']
+      - targets: ['statping:8080']
 ```
 
 ## Contributing

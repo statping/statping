@@ -7,7 +7,7 @@ After=network-online.target
 [Service]
 Type=simple
 Restart=always
-ExecStart=/usr/local/bin/statup
+ExecStart=/usr/local/bin/statping
 
 [Install]
 WantedBy=multi-user.target
