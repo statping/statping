@@ -35,7 +35,7 @@ func Router() *mux.Router {
 	dir := utils.Directory
 	CacheStorage = NewStorage()
 	r := mux.NewRouter()
-	r.Handle("/", cached("120s", "text/html", http.HandlerFunc(indexHandler)))
+	r.Handle("/", cached("15s", "text/html", http.HandlerFunc(indexHandler)))
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
 		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(dir+"/assets/css"))))
@@ -94,7 +94,7 @@ func Router() *mux.Router {
 	r.Handle("/api/services", http.HandlerFunc(apiCreateServiceHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceHandler)).Methods("GET")
 	r.Handle("/api/services/reorder", http.HandlerFunc(reorderServiceHandler)).Methods("POST")
-	r.Handle("/api/services/{id}/data", cached("120s", "application/json", http.HandlerFunc(apiServiceDataHandler))).Methods("GET")
+	r.Handle("/api/services/{id}/data", cached("30s", "application/json", http.HandlerFunc(apiServiceDataHandler))).Methods("GET")
 	r.Handle("/api/services/{id}/ping", http.HandlerFunc(apiServicePingDataHandler)).Methods("GET")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceUpdateHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceDeleteHandler)).Methods("DELETE")

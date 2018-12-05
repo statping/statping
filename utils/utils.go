@@ -203,9 +203,9 @@ func copyAndCapture(w io.Writer, r io.Reader) ([]byte, error) {
 }
 
 // DurationReadable will return a time.Duration into a human readable string
-//		t := time.Duration(5 * time.Minute)
-//		DurationReadable(t)
-//		// 5 minutes
+// // t := time.Duration(5 * time.Minute)
+// // DurationReadable(t)
+// // returns: 5 minutes
 func DurationReadable(d time.Duration) string {
 	if d.Hours() >= 1 {
 		return fmt.Sprintf("%0.0f hours", d.Hours())
@@ -225,6 +225,12 @@ func SaveFile(filename string, data []byte) error {
 }
 
 // HttpRequest is a global function to send a HTTP request
+// // url - The URL for HTTP request
+// // method - GET, POST, DELETE, PATCH
+// // content - The HTTP request content type (text/plain, application/json, or nil)
+// // headers - An array of Headers to be sent (KEY=VALUE) []string{"Authentication=12345", ...}
+// // body - The body or form data to send with HTTP request
+// // timeout - Specific duration to timeout on. time.Duration(30 * time.Seconds)
 func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration) ([]byte, *http.Response, error) {
 	var err error
 	transport := &http.Transport{
