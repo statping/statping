@@ -1,10 +1,9 @@
-{{define "title"}}Statup | Services{{end}}
+{{define "title"}}Statping | Services{{end}}
 {{define "content"}}
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
 {{template "nav"}}
 
     <div class="col-12">
-
         {{if ne (len .) 0}}
         <h3>Services</h3>
         <table class="table">
@@ -17,13 +16,13 @@
             </thead>
             <tbody class="sortable" id="services_table">
             {{range .}}
-            <tr id="service_{{.Id}}">
+            <tr id="service_{{.Id}}" data-id="{{.Id}}">
                 <td><span class="drag_icon d-none d-md-inline"><i class="fas fa-bars"></i></span> {{.Name}}</td>
                 <td class="d-none d-md-table-cell">{{if .Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}} </td>
                 <td class="text-right">
                     <div class="btn-group">
                         <a href="/service/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> View</a>
-                        <a href="/api/services/{{.Id}}" class="ajax_delete btn btn-danger confirm-btn" data-method="DELETE" data-obj="service_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>
+                        <a href="/api/services/{{.Id}}" class="ajax_delete btn btn-danger" data-method="DELETE" data-obj="service_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>
                     </div>
                 </td>
             </tr>
@@ -41,7 +40,7 @@
 {{end}}
 {{define "extra_scripts"}}
 {{if USE_CDN}}
-<script src="https://assets.statup.io/sortable.min.js"></script>
+<script src="https://assets.statping.com/sortable.min.js"></script>
 {{ else }}
 <script src="/js/sortable.min.js"></script>
 {{end}}
@@ -57,10 +56,17 @@
         var dest = e.detail.destination.items;
         dest.forEach(function(d) {
             i++;
-            var o = {service: parseInt(d.id), order: i}
+            var dId = $(d).attr('data-id');
+            var o = {service: parseInt(dId), order: i};
             newOrder.push(o);
         });
-        $.post("/services/reorder", JSON.stringify(newOrder), function(data, status){
+        $.ajax({
+            url: "/api/services/reorder",
+            type: 'POST',
+            data: JSON.stringify(newOrder),
+            contentType: "application/json",
+            dataType: "json",
+            success: function(data) { }
         });
     });
 </script>

@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -18,10 +18,10 @@ package core
 import (
 	"errors"
 	"fmt"
-	"github.com/hunterlong/statup/core/notifier"
-	"github.com/hunterlong/statup/source"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"net"
 	"os"
 	"time"
@@ -37,7 +37,7 @@ type Core struct {
 var (
 	Configs   *DbConfig // Configs holds all of the config.yml and database info
 	CoreApp   *Core     // CoreApp is a global variable that contains many elements
-	SetupMode bool      // SetupMode will be true if Statup does not have a database connection
+	SetupMode bool      // SetupMode will be true if Statping does not have a database connection
 	VERSION   string    // VERSION is set on build automatically by setting a -ldflag
 )
 
@@ -58,7 +58,7 @@ func (c *Core) ToCore() *types.Core {
 	return c.Core
 }
 
-// InitApp will initialize Statup
+// InitApp will initialize Statping
 func InitApp() {
 	SelectCore()
 	InsertNotifierDB()
@@ -68,7 +68,7 @@ func InitApp() {
 	go DatabaseMaintence()
 }
 
-// InsertNotifierDB inject the Statup database instance to the Notifier package
+// InsertNotifierDB inject the Statping database instance to the Notifier package
 func InsertNotifierDB() error {
 	if DbSession == nil {
 		err := Configs.Connect(false, utils.Directory)
@@ -92,6 +92,13 @@ func (c Core) CurrentTime() string {
 	current := utils.Timezoner(t, c.Timezone)
 	ansic := "Monday 03:04:05 PM"
 	return current.Format(ansic)
+}
+
+// Messages will return the current local time
+func (c Core) Messages() []*Message {
+	var message []*Message
+	messagesDb().Where("service = ?", 0).Limit(10).Find(&message)
+	return message
 }
 
 // UsingAssets will return true if /assets folder is present
@@ -134,7 +141,7 @@ func (c Core) AllOnline() bool {
 	return true
 }
 
-// SelectCore will return the CoreApp global variable and the settings/configs for Statup
+// SelectCore will return the CoreApp global variable and the settings/configs for Statping
 func SelectCore() (*Core, error) {
 	if DbSession == nil {
 		return nil, errors.New("database has not been initiated yet.")

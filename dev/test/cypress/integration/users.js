@@ -1,9 +1,9 @@
 /*
- * Statup
+ * Statping
  * Copyright (C) 2018.  Hunter Long and the project contributors
  * Written by Hunter Long <info@socialeck.com> and the project contributors
  *
- * https://github.com/hunterlong/statup
+ * https://github.com/hunterlong/statping
  *
  * The licenses for most software and other practical works are designed
  * to take away your freedom to share and change the works.  By contrast,
@@ -27,7 +27,7 @@ context('User Testing', () => {
     it('should view users', () => {
         cy.visit('http://localhost:8080/users')
         cy.get('tr').should('have.length', 2)
-        cy.title().should('eq', 'Statup | Users')
+        cy.title().should('eq', 'Statping | Users')
     })
 
     it('should create a new user', () => {
@@ -50,7 +50,7 @@ context('User Testing', () => {
 
     // it('should logout and login with new password', () => {
     //     cy.visit('http://localhost:8080/logout')
-    //     cy.title().should('eq', 'Statup | Users')
+    //     cy.title().should('eq', 'Statping | Users')
     //     cy.get('#user_2 > .btn-group > .btn-danger').click()
     //     cy.get('tr').should('have.length', 2)
     //     cy.visit('http://localhost:8080/login')

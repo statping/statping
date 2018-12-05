@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -18,8 +18,8 @@ package core
 import (
 	"fmt"
 	"github.com/ararog/timeago"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"sort"
 	"strings"
 	"time"
@@ -74,7 +74,14 @@ func (s *Service) DeleteFailures() {
 // LimitedFailures will return the last amount of failures from a service
 func (s *Service) LimitedFailures(amount int64) []*failure {
 	var failArr []*failure
-	failuresDB().Where("service = ?", s.Id).Order("id desc").Limit(amount).Find(&failArr)
+	failuresDB().Where("service = ?", s.Id).Not("method = 'checkin'").Order("id desc").Limit(amount).Find(&failArr)
+	return failArr
+}
+
+// LimitedFailures will return the last amount of failures from a service
+func (s *Service) LimitedCheckinFailures(amount int64) []*failure {
+	var failArr []*failure
+	failuresDB().Where("service = ?", s.Id).Where("method = 'checkin'").Order("id desc").Limit(amount).Find(&failArr)
 	return failArr
 }
 

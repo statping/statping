@@ -1,4 +1,4 @@
-{{define "title"}}Statup Messages{{end}}
+{{define "title"}}Statping Messages{{end}}
 {{define "content"}}
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
 {{template "nav"}}
@@ -23,7 +23,7 @@
                     <td class="text-right">
                         <div class="btn-group">
                             <a href="/message/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-exclamation-triangle"></i> Edit</a>
-                            <a href="/api/messages/{{.Id}}" class="ajax_delete btn btn-danger confirm-btn" data-method="DELETE" data-obj="message_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>
+                            <a href="/api/messages/{{.Id}}" class="ajax_delete btn btn-danger" data-method="DELETE" data-obj="message_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>
                         </div>
                     </td>
                 </tr>
@@ -34,7 +34,6 @@
 {{end}}
     <div class="col-12">
         <h3>Create Message</h3>
-
         {{template "form_message" NewMessage}}
     </div>
 </div>

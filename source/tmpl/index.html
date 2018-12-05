@@ -1,5 +1,5 @@
 {{define "title"}}{{CoreApp.Name}} Status{{end}}
-{{define "description"}}{{CoreApp.Name}} is currently monitoring {{len CoreApp.Services}} services with 0 of them offline. {{CoreApp.Name}} is using Statup to monitor applications.{{end}}
+{{define "description"}}{{CoreApp.Name}} is currently monitoring {{len CoreApp.Services}} services with 0 of them offline. {{CoreApp.Name}} is using Statping to monitor applications.{{end}}
 {{define "content"}}
 <div class="container col-md-7 col-sm-12 mt-2 sm-container">
 <h1 class="col-12 text-center mb-4 mt-sm-3 header-title">{{.Name}}</h1>
@@ -8,8 +8,9 @@
 <h5 class="col-12 text-center mb-5 header-desc">{{ .Description }}</h5>
 {{ end }}
 
-<div class="col-12 full-col-12 mb-5">
-    <div class="list-group online_list">
+<div class="col-12 full-col-12">
+
+<div class="list-group online_list mb-3">
     {{ range Services }}
         <a href="#" class="service_li list-group-item list-group-item-action {{if not .Online}}bg-danger text-white{{ end }}" data-id="{{.Id}}">
         {{ .Name }}
@@ -23,17 +24,33 @@
     </div>
 </div>
 
+{{ if .Messages }}
+    <div class="col-12">
+    {{range .Messages}}
+        <div class="alert alert-primary" role="alert">
+            <h3>{{.Title}}</h3>
+            <span class="mb-3">{{safe .Description}}</span>
+            <div class="d-block mt-2 mb-4">
+                <span class="float-left small">Starts at {{.StartOn}}</span>
+                <span class="float-right small">Ends on {{.EndOn}}</span>
+            </div>
+        </div>
+    {{end}}
+    </div>
+{{end}}
+
 <div class="col-12 full-col-12">
 {{ if not Services }}
     <div class="alert alert-danger" role="alert">
         <h4 class="alert-heading">No Services to Monitor!</h4>
-        <p>Your Statup Status Page is working correctly, but you don't have any services to monitor. Go to the <b>Dashboard</b> and add a website to begin really using your status page!</p>
+        <p>Your Statping Status Page is working correctly, but you don't have any services to monitor. Go to the <b>Dashboard</b> and add a website to begin really using your status page!</p>
         <hr>
-        <p class="mb-0">If this is a bug, please make an issue in the Statup Github Repo. <a href="https://github.com/hunterlong/statup" class="btn btn-sm btn-outline-danger float-right">Statup Github Repo</a></p>
+        <p class="mb-0">If this is a bug, please make an issue in the Statping Github Repo. <a href="https://github.com/hunterlong/statping" class="btn btn-sm btn-outline-danger float-right">Statping Github Repo</a></p>
     </div>
 {{end}}
+
 {{ range Services }}
-    <div class="mt-4" id="service_id_{{.Id}}">
+    <div class="mb-4" id="service_id_{{.Id}}">
         <div class="card">
             <div class="card-body">
                 <div class="col-12">

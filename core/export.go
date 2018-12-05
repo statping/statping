@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -17,72 +17,12 @@ package core
 
 import (
 	"bytes"
-	"fmt"
-	"github.com/hunterlong/statup/source"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"encoding/json"
+	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"html/template"
 )
-
-func injectDatabase() {
-	Configs.Connect(false, utils.Directory)
-}
-
-// ExportIndexHTML returns the HTML of the index page as a string
-func ExportIndexHTML() string {
-	source.Assets()
-	injectDatabase()
-	CoreApp.SelectAllServices(false)
-	CoreApp.UseCdn = types.NewNullBool(true)
-	for _, srv := range CoreApp.Services {
-		service := srv.(*Service)
-		service.Check(true)
-		fmt.Println(service.Name, service.Online, service.Latency)
-	}
-	nav, _ := source.TmplBox.String("nav.html")
-	footer, _ := source.TmplBox.String("footer.html")
-	render, err := source.TmplBox.String("index.html")
-	if err != nil {
-		utils.Log(3, err)
-	}
-
-	t := template.New("message")
-	t.Funcs(template.FuncMap{
-		"js": func(html string) template.JS {
-			return template.JS(html)
-		},
-		"safe": func(html string) template.HTML {
-			return template.HTML(html)
-		},
-		"VERSION": func() string {
-			return VERSION
-		},
-		"CoreApp": func() *Core {
-			return CoreApp
-		},
-		"USE_CDN": func() bool {
-			return CoreApp.UseCdn.Bool
-		},
-		"underscore": func(html string) string {
-			return utils.UnderScoreString(html)
-		},
-		"URL": func() string {
-			return "/"
-		},
-		"CHART_DATA": func() string {
-			return ExportChartsJs()
-		},
-	})
-	t, _ = t.Parse(nav)
-	t, _ = t.Parse(footer)
-	t.Parse(render)
-	var tpl bytes.Buffer
-	if err := t.Execute(&tpl, CoreApp); err != nil {
-		utils.Log(3, err)
-	}
-	result := tpl.String()
-	return result
-}
 
 // ExportChartsJs renders the charts for the index page
 func ExportChartsJs() string {
@@ -103,4 +43,31 @@ func ExportChartsJs() string {
 	}
 	result := tpl.String()
 	return result
+}
+
+type ExportData struct {
+	Core      *types.Core              `json:"core"`
+	Services  []types.ServiceInterface `json:"services"`
+	Messages  []*Message               `json:"messages"`
+	Checkins  []*Checkin               `json:"checkins"`
+	Users     []*User                  `json:"users"`
+	Notifiers []types.AllNotifiers     `json:"notifiers"`
+}
+
+func ExportSettings() ([]byte, error) {
+	users, err := SelectAllUsers()
+	messages, err := SelectMessages()
+	if err != nil {
+		return nil, err
+	}
+	data := ExportData{
+		Core:      CoreApp.Core,
+		Notifiers: CoreApp.Notifications,
+		Checkins:  AllCheckins(),
+		Users:     users,
+		Services:  CoreApp.Services,
+		Messages:  messages,
+	}
+	export, err := json.Marshal(data)
+	return export, err
 }

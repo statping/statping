@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -17,8 +17,9 @@ package notifiers
 
 import (
 	"fmt"
-	"github.com/hunterlong/statup/core/notifier"
-	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"github.com/oliveroneill/exponent-server-sdk-golang/sdk"
 	"strings"
 	"time"
@@ -31,8 +32,8 @@ type mobilePush struct {
 var mobile = &mobilePush{&notifier.Notification{
 	Method: "mobile",
 	Title:  "Mobile Notifications",
-	Description: `Receive push notifications on your Android or iPhone devices using the Statup App. You can scan the Authentication QR Code found in Settings to get the mobile app setup in seconds.
-				 <p align="center"><a href="https://play.google.com/store/apps/details?id=com.statup"><img src="https://img.cjx.io/google-play.svg"></a> <a href="#"><img src="https://img.cjx.io/app-store-badge.svg"></a></p>`,
+	Description: `Receive push notifications on your Android or iPhone devices using the Statping App. You can scan the Authentication QR Code found in Settings to get the mobile app setup in seconds.
+				 <p align="center"><a href="https://play.google.com/store/apps/details?id=com.statup"><img src="https://img.cjx.io/google-play.svg"></a> <a href="https://testflight.apple.com/join/TuBIj25Q"><img src="https://img.cjx.io/app-store-badge.svg"></a></p>`,
 	Author:    "Hunter Long",
 	AuthorUrl: "https://github.com/hunterlong",
 	Delay:     time.Duration(5 * time.Second),
@@ -42,7 +43,7 @@ var mobile = &mobilePush{&notifier.Notification{
 		Title:       "Device Identifiers",
 		Placeholder: "A list of your mobile device push notification ID's.",
 		DbField:     "var1",
-		Hidden:      true,
+		IsHidden:    true,
 	}}},
 }
 
@@ -58,12 +59,37 @@ func (u *mobilePush) Select() *notifier.Notification {
 	return u.Notification
 }
 
+func dataJson(s *types.Service, f *types.Failure) map[string]string {
+	serviceId := "0"
+	if s != nil {
+		serviceId = utils.ToString(s.Id)
+	}
+	online := "online"
+	if !s.Online {
+		online = "offline"
+	}
+	issue := ""
+	if f != nil {
+		issue = f.Issue
+	}
+	link := fmt.Sprintf("statup://service?id=%v", serviceId)
+	out := map[string]string{
+		"status": online,
+		"id":     serviceId,
+		"issue":  issue,
+		"link":   link,
+	}
+	return out
+}
+
 // OnFailure will trigger failing service
 func (u *mobilePush) OnFailure(s *types.Service, f *types.Failure) {
+	data := dataJson(s, f)
 	msg := &expo.PushMessage{
 		Body:     fmt.Sprintf("Your service '%v' is currently failing! Reason: %v", s.Name, f.Issue),
 		Sound:    "default",
 		Title:    "Service Offline",
+		Data:     data,
 		Priority: expo.DefaultPriority,
 	}
 	u.AddQueue(s.Id, msg)
@@ -72,12 +98,14 @@ func (u *mobilePush) OnFailure(s *types.Service, f *types.Failure) {
 
 // OnSuccess will trigger successful service
 func (u *mobilePush) OnSuccess(s *types.Service) {
+	data := dataJson(s, nil)
 	if !u.Online {
 		u.ResetUniqueQueue(s.Id)
 		msg := &expo.PushMessage{
 			Body:     fmt.Sprintf("Your service '%v' is back online!", s.Name),
 			Sound:    "default",
 			Title:    "Service Online",
+			Data:     data,
 			Priority: expo.DefaultPriority,
 		}
 		u.AddQueue(s.Id, msg)

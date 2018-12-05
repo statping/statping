@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -18,9 +18,9 @@ package core
 import (
 	"fmt"
 	"github.com/go-yaml/yaml"
-	"github.com/hunterlong/statup/core/notifier"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -30,7 +30,7 @@ import (
 )
 
 var (
-	// DbSession stores the Statup database session
+	// DbSession stores the Statping database session
 	DbSession *gorm.DB
 	DbModels  []interface{}
 )
@@ -72,20 +72,20 @@ func checkinDB() *gorm.DB {
 	return DbSession.Model(&types.Checkin{})
 }
 
+// checkinHitsDB returns the Checkin Hits records for a service
+func checkinHitsDB() *gorm.DB {
+	return DbSession.Model(&types.CheckinHit{})
+}
+
 // messagesDb returns the Checkin records for a service
 func messagesDb() *gorm.DB {
 	return DbSession.Model(&types.Message{})
 }
 
-// checkinHitsDB returns the 'hits' from the Checkin record
-func checkinHitsDB() *gorm.DB {
-	return DbSession.Model(&types.CheckinHit{})
-}
-
 // HitsBetween returns the gorm database query for a collection of service hits between a time range
 func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) *gorm.DB {
 	selector := Dbtimestamp(group, column)
-	if Configs.DbConn == "postgres" {
+	if CoreApp.DbConnection == "postgres" {
 		timeQuery := fmt.Sprintf("service = %v AND created_at BETWEEN '%v.000000' AND '%v.000000'", s.Id, t1.UTC().Format(types.POSTGRES_TIME), t2.UTC().Format(types.POSTGRES_TIME))
 		return DbSession.Model(&types.Hit{}).Select(selector).Where(timeQuery)
 	} else {
@@ -98,11 +98,6 @@ func CloseDB() {
 	if DbSession != nil {
 		DbSession.DB().Close()
 	}
-}
-
-// Close shutsdown the database connection
-func (db *DbConfig) Close() error {
-	return DbSession.DB().Close()
 }
 
 // AfterFind for Core will set the timezone
@@ -146,7 +141,7 @@ func (c *Checkin) AfterFind() (err error) {
 }
 
 // AfterFind for checkinHit will set the timezone
-func (c *checkinHit) AfterFind() (err error) {
+func (c *CheckinHit) AfterFind() (err error) {
 	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
 	return
 }
@@ -155,8 +150,8 @@ func (c *checkinHit) AfterFind() (err error) {
 func (u *Message) AfterFind() (err error) {
 	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
 	u.UpdatedAt = utils.Timezoner(u.UpdatedAt, CoreApp.Timezone)
-	u.StartOn = utils.Timezoner(u.StartOn, CoreApp.Timezone)
-	u.EndOn = utils.Timezoner(u.EndOn, CoreApp.Timezone)
+	u.StartOn = utils.Timezoner(u.StartOn.UTC(), CoreApp.Timezone)
+	u.EndOn = utils.Timezoner(u.EndOn.UTC(), CoreApp.Timezone)
 	return
 }
 
@@ -213,14 +208,14 @@ func (c *Checkin) BeforeCreate() (err error) {
 }
 
 // BeforeCreate for checkinHit will set CreatedAt to UTC
-func (c *checkinHit) BeforeCreate() (err error) {
+func (c *CheckinHit) BeforeCreate() (err error) {
 	if c.CreatedAt.IsZero() {
 		c.CreatedAt = time.Now().UTC()
 	}
 	return
 }
 
-// InsertCore create the single row for the Core settings in Statup
+// InsertCore create the single row for the Core settings in Statping
 func (db *DbConfig) InsertCore() (*Core, error) {
 	CoreApp = &Core{Core: &types.Core{
 		Name:        db.Project,
@@ -297,7 +292,7 @@ func DatabaseMaintence() {
 // DeleteAllSince will delete a specific table's records based on a time.
 func DeleteAllSince(table string, date time.Time) {
 	sql := fmt.Sprintf("DELETE FROM %v WHERE created_at < '%v';", table, date.Format("2006-01-02"))
-	db := DbSession.Raw(sql)
+	db := DbSession.Exec(sql)
 	if db.Error != nil {
 		utils.Log(2, db.Error)
 	}
@@ -341,7 +336,7 @@ func (db *DbConfig) Save() (*DbConfig, error) {
 	return db, err
 }
 
-// CreateCore will initialize the global variable 'CoreApp". This global variable contains most of Statup app.
+// CreateCore will initialize the global variable 'CoreApp". This global variable contains most of Statping app.
 func (c *DbConfig) CreateCore() *Core {
 	newCore := &types.Core{
 		Name:        c.Project,
@@ -363,7 +358,7 @@ func (c *DbConfig) CreateCore() *Core {
 	return CoreApp
 }
 
-// DropDatabase will DROP each table Statup created
+// DropDatabase will DROP each table Statping created
 func (db *DbConfig) DropDatabase() error {
 	utils.Log(1, "Dropping Database Tables...")
 	err := DbSession.DropTableIfExists("checkins")
@@ -378,7 +373,7 @@ func (db *DbConfig) DropDatabase() error {
 	return err.Error
 }
 
-// CreateDatabase will CREATE TABLES for each of the Statup elements
+// CreateDatabase will CREATE TABLES for each of the Statping elements
 func (db *DbConfig) CreateDatabase() error {
 	var err error
 	utils.Log(1, "Creating Database Tables...")
@@ -390,7 +385,7 @@ func (db *DbConfig) CreateDatabase() error {
 	if err := DbSession.Table("core").CreateTable(&types.Core{}); err.Error != nil {
 		return err.Error
 	}
-	utils.Log(1, "Statup Database Created")
+	utils.Log(1, "Statping Database Created")
 	return err
 }
 
@@ -413,9 +408,9 @@ func (db *DbConfig) MigrateDatabase() error {
 	}
 	if err := tx.Table("core").AutoMigrate(&types.Core{}); err.Error != nil {
 		tx.Rollback()
-		utils.Log(3, fmt.Sprintf("Statup Database could not be migrated: %v", tx.Error))
+		utils.Log(3, fmt.Sprintf("Statping Database could not be migrated: %v", tx.Error))
 		return tx.Error
 	}
-	utils.Log(1, "Statup Database Migrated")
+	utils.Log(1, "Statping Database Migrated")
 	return tx.Commit().Error
 }

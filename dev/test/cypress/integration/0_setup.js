@@ -1,9 +1,9 @@
 /*
- * Statup
+ * Statping
  * Copyright (C) 2018.  Hunter Long and the project contributors
  * Written by Hunter Long <info@socialeck.com> and the project contributors
  *
- * https://github.com/hunterlong/statup
+ * https://github.com/hunterlong/statping
  *
  * The licenses for most software and other practical works are designed
  * to take away your freedom to share and change the works.  By contrast,
@@ -17,7 +17,7 @@
 
 context('Setup Process', () => {
 
-    // it('should go to setup Statup with Postgres', () => {
+    // it('should go to setup Statping with Postgres', () => {
     //     cy.visit('http://localhost:8080')
     //     cy.get('select[name=db_connection]').select('postgres')
     //     cy.get('input[name="db_host"]').clear().type(Cypress.env('DB_HOST'))
@@ -44,7 +44,7 @@ context('Setup Process', () => {
     //     cy.get('.card').should('have.length', 5)
     // })
 
-    it('should go to setup Statup with SQLite', () => {
+    it('should go to setup Statping with SQLite', () => {
         cy.visit('http://localhost:8080')
         cy.get('select[name=db_connection]').select('sqlite')
         cy.get('input[name="project"]').clear().type('Demo Tester')

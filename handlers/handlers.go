@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -19,19 +19,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/sessions"
-	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/source"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"html/template"
 	"net/http"
 	"os"
 	"reflect"
+	"strings"
 	"time"
 )
 
 const (
-	cookieKey = "statup_auth"
+	cookieKey = "statping_auth"
 )
 
 var (
@@ -42,7 +43,7 @@ var (
 // RunHTTPServer will start a HTTP server on a specific IP and port
 func RunHTTPServer(ip string, port int) error {
 	host := fmt.Sprintf("%v:%v", ip, port)
-	utils.Log(1, "Statup HTTP Server running on http://"+host)
+	utils.Log(1, "Statping HTTP Server running on http://"+host)
 	//for _, p := range core.CoreApp.AllPlugins {
 	//	info := p.GetInfo()
 	//	for _, route := range p.Routes() {
@@ -70,10 +71,19 @@ func IsAuthenticated(r *http.Request) bool {
 		return true
 	}
 	if core.CoreApp == nil {
-		return false
+		return true
 	}
 	if sessionStore == nil {
-		return false
+		return true
+	}
+	var token string
+	tokens, ok := r.Header["Authorization"]
+	if ok && len(tokens) >= 1 {
+		token = tokens[0]
+		token = strings.TrimPrefix(token, "Bearer ")
+		if token == core.CoreApp.ApiSecret {
+			return true
+		}
 	}
 	session, err := sessionStore.Get(r, cookieKey)
 	if err != nil {
@@ -92,6 +102,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		},
 		"safe": func(html string) template.HTML {
 			return template.HTML(html)
+		},
+		"safeURL": func(u string) template.URL {
+			return template.URL(u)
 		},
 		"Auth": func() bool {
 			return IsAuthenticated(r)
@@ -115,7 +128,7 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 			return core.CoreApp.UseCdn.Bool
 		},
 		"QrAuth": func() string {
-			return fmt.Sprintf("statup://setup?domain=%v&api=%v", core.CoreApp.Domain, core.CoreApp.ApiSecret)
+			return fmt.Sprintf("statping://setup?domain=%v&api=%v", core.CoreApp.Domain, core.CoreApp.ApiSecret)
 		},
 		"Type": func(g interface{}) []string {
 			fooType := reflect.TypeOf(g)
@@ -177,8 +190,8 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 
 var mainTmpl = `{{define "main" }} {{ template "base" . }} {{ end }}`
 
-// executeResponse will render a HTTP response for the front end user
-func executeResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{}) {
+// ExecuteResponse will render a HTTP response for the front end user
+func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{}) {
 	utils.Http(r)
 	if url, ok := redirect.(string); ok {
 		http.Redirect(w, r, url, http.StatusSeeOther)
@@ -262,5 +275,5 @@ func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 // error404Handler is a HTTP handler for 404 error pages
 func error404Handler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
-	executeResponse(w, r, "error_404.html", nil, nil)
+	ExecuteResponse(w, r, "error_404.html", nil, nil)
 }

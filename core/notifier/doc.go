@@ -1,4 +1,4 @@
-// Package notifier contains the main functionality for the Statup Notification system
+// Package notifier contains the main functionality for the Statping Notification system
 //
 // Example Notifier
 //
@@ -12,7 +12,7 @@
 //		var example = &ExampleNotifier{&Notification{
 //			Method:      "example",
 //			Title:       "Example Notifier",
-//			Description: "This is an example of a notifier for Statup!",
+//			Description: "This is an example of a notifier for Statping!",
 //			Author:      "Hunter Long",
 //			AuthorUrl:   "https://github.com/hunterlong",
 //			Delay:       time.Duration(3 * time.Second),
@@ -63,7 +63,7 @@
 //
 // Load the Notifier
 //
-// Include the init() function with AddNotifier and your notification struct. This is ran on start of Statup
+// Include the init() function with AddNotifier and your notification struct. This is ran on start of Statping
 // and will automatically create a new row in the database so the end user can save their own values.
 //
 //		func init() {
@@ -116,5 +116,5 @@
 // You can implement your notifier to different types of events that are triggered. Checkout the wiki to
 // see more details and examples of how to build your own notifier.
 //
-// More info on: https://github.com/hunterlong/statup/wiki/Notifiers
+// More info on: https://github.com/hunterlong/statping/wiki/Notifiers
 package notifier

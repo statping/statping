@@ -2,8 +2,8 @@
   "swagger": "2.0",
   "info": {
     "version": "1.0",
-    "title": "Statup",
-    "description": "Statup API Requests"
+    "title": "Statping",
+    "description": "Statping API Requests"
   },
   "host": "example.com",
   "basePath": "/",
@@ -28,7 +28,7 @@
     "/api": {
       "get": {
         "description": "TODO: Add Description",
-        "summary": "Statup Details",
+        "summary": "Statping Details",
         "tags": [
           "Main"
         ],

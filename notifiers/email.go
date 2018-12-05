@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -20,9 +20,9 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/go-mail/mail"
-	"github.com/hunterlong/statup/core/notifier"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"html/template"
 	"net/smtp"
 	"time"
@@ -34,7 +34,7 @@ const (
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Statup email</title>
+    <title>Statping email</title>
 </head>
 <body style="-webkit-text-size-adjust: none; box-sizing: border-box; color: #74787E; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; height: 100%; line-height: 1.4; margin: 0; width: 100% !important;" bgcolor="#F2F4F6">
     <style type="text/css">
@@ -77,9 +77,9 @@ const (
                                         <p style="box-sizing: border-box; color: #74787E; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 16px; line-height: 1.5em; margin-top: 0;" align="left">
 
 {{ if .Online }}
-Your Statup service <a target="_blank" href="{{.Domain}}">{{.Name}}</a> is back online. This service has been triggered with a HTTP status code of '{{.LastStatusCode}}' and is currently online based on your requirements. Your service was reported online at {{.CreatedAt}}. </p>
+Your Statping service <a target="_blank" href="{{.Domain}}">{{.Name}}</a> is back online. This service has been triggered with a HTTP status code of '{{.LastStatusCode}}' and is currently online based on your requirements. Your service was reported online at {{.CreatedAt}}. </p>
 {{ else }}
-Your Statup service <a target="_blank" href="{{.Domain}}">{{.Name}}</a> has been triggered with a HTTP status code of '{{.LastStatusCode}}' and is currently offline based on your requirements. This failure was created on {{.CreatedAt}}. </p>
+Your Statping service <a target="_blank" href="{{.Domain}}">{{.Name}}</a> has been triggered with a HTTP status code of '{{.LastStatusCode}}' and is currently offline based on your requirements. This failure was created on {{.CreatedAt}}. </p>
 {{ end }}
 
 {{if .LastResponse }}
@@ -89,7 +89,7 @@ Last Response</h1>
 {{ .LastResponse }} </p> {{end}}
                                         <table class="body-sub" style="border-top-color: #EDEFF2; border-top-style: solid; border-top-width: 1px; box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; margin-top: 25px; padding-top: 25px;">
                                             <td style="box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; word-break: break-word;"> <a href="/service/{{.Id}}" class="button button--blue" target="_blank" style="-webkit-text-size-adjust: none; background: #3869D4; border-color: #3869d4; border-radius: 3px; border-style: solid; border-width: 10px 18px; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16); box-sizing: border-box; color: #FFF; display: inline-block; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-decoration: none;">View Service</a> </td>
-                                            <td style="box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; word-break: break-word;"> <a href="/dashboard" class="button button--blue" target="_blank" style="-webkit-text-size-adjust: none; background: #3869D4; border-color: #3869d4; border-radius: 3px; border-style: solid; border-width: 10px 18px; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16); box-sizing: border-box; color: #FFF; display: inline-block; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-decoration: none;">Statup Dashboard</a> </td>
+                                            <td style="box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; word-break: break-word;"> <a href="/dashboard" class="button button--blue" target="_blank" style="-webkit-text-size-adjust: none; background: #3869D4; border-color: #3869d4; border-radius: 3px; border-style: solid; border-width: 10px 18px; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16); box-sizing: border-box; color: #FFF; display: inline-block; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-decoration: none;">Statping Dashboard</a> </td>
                                         </table>
                                     </td>
                                 </tr>

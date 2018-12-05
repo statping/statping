@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -17,9 +17,9 @@ package plugin
 
 import (
 	"fmt"
-	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"io/ioutil"
 	"os"
 	"plugin"
@@ -27,11 +27,11 @@ import (
 )
 
 //
-//     STATUP PLUGIN INTERFACE
+//     STATPING PLUGIN INTERFACE
 //
 //            v0.1
 //
-//       https://statup.io
+//       https://statping.com
 //
 //
 // An expandable plugin framework that will still

@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -16,7 +16,7 @@
 package notifiers
 
 import (
-	"github.com/hunterlong/statup/core/notifier"
+	"github.com/hunterlong/statping/core/notifier"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -28,7 +28,7 @@ var (
 	TWILIO_SECRET = os.Getenv("TWILIO_SECRET")
 	TWILIO_FROM   = os.Getenv("TWILIO_FROM")
 	TWILIO_TO     = os.Getenv("TWILIO_TO")
-	twilioMessage = "The Twilio notifier on Statup has been tested!"
+	twilioMessage = "The Twilio notifier on Statping has been tested!"
 )
 
 func init() {

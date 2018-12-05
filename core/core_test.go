@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -16,8 +16,8 @@
 package core
 
 import (
-	"github.com/hunterlong/statup/source"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -111,7 +111,7 @@ func TestReLoadDbConfig(t *testing.T) {
 func TestSelectCore(t *testing.T) {
 	core, err := SelectCore()
 	assert.Nil(t, err)
-	assert.Equal(t, "Statup Sample Data", core.Name)
+	assert.Equal(t, "Statping Sample Data", core.Name)
 }
 
 func TestInsertNotifierDB(t *testing.T) {
@@ -120,12 +120,4 @@ func TestInsertNotifierDB(t *testing.T) {
 	}
 	err := InsertNotifierDB()
 	assert.Nil(t, err)
-}
-
-func TestExportStaticHTML(t *testing.T) {
-	t.SkipNow()
-	data := ExportIndexHTML()
-	assert.Contains(t, data, "https://github.com/hunterlong/statup️")
-	assert.Contains(t, data, "</body>")
-	assert.Contains(t, data, "</html>")
 }

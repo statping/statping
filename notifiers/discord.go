@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -20,10 +20,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hunterlong/statup/core/notifier"
-	"github.com/hunterlong/statup/types"
-	"io/ioutil"
-	"net/http"
+	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
+	"strings"
 	"time"
 )
 
@@ -59,14 +59,8 @@ func init() {
 // Send will send a HTTP Post to the discord API. It accepts type: []byte
 func (u *discord) Send(msg interface{}) error {
 	message := msg.(string)
-	req, _ := http.NewRequest("POST", discorder.GetValue("host"), bytes.NewBuffer([]byte(message)))
-	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	return resp.Body.Close()
+	_, _, err := utils.HttpRequest(discorder.GetValue("host"), "POST", "application/json", nil, strings.NewReader(message), time.Duration(10*time.Second))
+	return err
 }
 
 func (u *discord) Select() *notifier.Notification {
@@ -92,7 +86,7 @@ func (u *discord) OnSuccess(s *types.Service) {
 
 // OnSave triggers when this notifier has been saved
 func (u *discord) OnSave() error {
-	msg := fmt.Sprintf(`{"content": "The discord notifier on Statup was just updated."}`)
+	msg := fmt.Sprintf(`{"content": "The discord notifier on Statping was just updated."}`)
 	u.AddQueue(0, msg)
 	return nil
 }
@@ -101,15 +95,7 @@ func (u *discord) OnSave() error {
 func (u *discord) OnTest() error {
 	outError := errors.New("Incorrect discord URL, please confirm URL is correct")
 	message := `{"content": "Testing the discord notifier"}`
-	req, _ := http.NewRequest("POST", discorder.Host, bytes.NewBuffer([]byte(message)))
-	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	contents, _ := ioutil.ReadAll(resp.Body)
+	contents, _, err := utils.HttpRequest(discorder.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(message)), time.Duration(10*time.Second))
 	if string(contents) == "" {
 		return nil
 	}

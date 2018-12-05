@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "d74ac4a3-8915-46e8-8ed2-5044ea4ce53b",
-		"name": "Statup",
-		"description": "Statup API Requests",
+		"name": "Statping",
+		"description": "Statping API Requests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -10,7 +10,7 @@
 			"name": "Main",
 			"item": [
 				{
-					"name": "Statup Details",
+					"name": "Statping Details",
 					"event": [
 						{
 							"listen": "test",
@@ -19,8 +19,8 @@
 								"exec": [
 									"pm.test(\"Check Core API Route\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.name).to.eql(\"Statup\");",
-									"    pm.expect(jsonData.description).to.eql(\"Statup Monitoring Sample Data\");",
+									"    pm.expect(jsonData.name).to.eql(\"Statping\");",
+									"    pm.expect(jsonData.description).to.eql(\"Statping Monitoring Sample Data\");",
 									"    pm.expect(jsonData.using_cdn).to.eql(false);",
 									"    pm.expect(jsonData.database).to.eql(\"sqlite\");",
 									"});"
@@ -250,7 +250,7 @@
 									"pm.test(\"Create Service\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.output.name).to.eql(\"New Service\");",
-									"    pm.expect(jsonData.output.domain).to.eql(\"https://statup.io\");",
+									"    pm.expect(jsonData.output.domain).to.eql(\"https://statping.com\");",
 									"    pm.expect(jsonData.output.type).to.eql(\"http\");",
 									"    pm.expect(jsonData.output.method).to.eql(\"GET\");",
 									"    pm.expect(jsonData.output.expected_status).to.eql(200);",
@@ -280,7 +280,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"New Service\",\n    \"domain\": \"https://statup.io\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 30,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 30,\n    \"order_id\": 0\n}"
+							"raw": "{\n    \"name\": \"New Service\",\n    \"domain\": \"https://statping.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 30,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 30,\n    \"order_id\": 0\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/services",
@@ -336,7 +336,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"id\": 1,\n    \"name\": \"Updated Google Service\",\n    \"domain\": \"https://google.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 60,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 10,\n    \"order_id\": 0\n}"
+							"raw": "{\n\t\"id\": 1,\n    \"name\": \"Updated Google Service\",\n    \"domain\": \"https://google.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 60,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 10,\n    \"order_id\": 0,\n    \"check_interval\": 60\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/services/1",
@@ -347,6 +347,59 @@
 								"api",
 								"services",
 								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reorder Services",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b5a67a19-fd08-40b0-a961-3e9474ab78c6",
+								"exec": [
+									"pm.test(\"Reorder Services\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.eql(4);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[{\"service\": 1, \"order\": 4},{\"service\": 2, \"order\": 3},{\"service\": 3, \"order\": 2},{\"service\": 4, \"order\": 1}]"
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/services/reorder",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"services",
+								"reorder"
 							]
 						}
 					},
@@ -940,8 +993,12 @@
 								"exec": [
 									"pm.test(\"Create Message\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.output.title).to.eql(\"API Message\");",
-									"    pm.expect(jsonData.output.service).to.eql(1);",
+									"    var object = jsonData.output;",
+									"    pm.expect(object.title).to.eql(\"API Message\");",
+									"    pm.expect(object.description).to.eql(\"This is an example a upcoming message for a service!\");",
+									"    pm.expect(object.service).to.eql(1);",
+									"    pm.expect(object.notify_before).to.eql(6);",
+									"    pm.expect(object.notify_before_scale).to.eql(\"hour\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -960,7 +1017,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"API Message\",\n    \"description\": \"This is an example a upcoming message for a service!\",\n    \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n    \"service\": 1,\n    \"notify_users\": null,\n    \"notify_method\": \"\",\n    \"notify_before\": 0\n}"
+							"raw": "{\n    \"title\": \"API Message\",\n    \"description\": \"This is an example a upcoming message for a service!\",\n    \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n    \"service\": 1,\n    \"notify_users\": true,\n    \"notify_method\": \"email\",\n    \"notify_before\": 6,\n    \"notify_before_scale\": \"hour\"\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/messages",
@@ -981,7 +1038,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "abbb5178-9613-418c-b5ee-be2d6b4fdb8f",
+								"id": "c30cc333-53f4-4e9a-9c32-958c905ec163",
 								"exec": [
 									"pm.test(\"View Message\", function () {",
 									"    var jsonData = pm.response.json();",
@@ -1020,13 +1077,16 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a0403c03-0838-4fd2-9cce-aebaf8a128c3",
+								"id": "e9dd78cc-0f38-4516-bf82-38dd3451b2e7",
 								"exec": [
 									"pm.test(\"Update Message\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.status).to.eql(\"success\");",
-									"    pm.expect(jsonData.method).to.eql(\"update\");",
-									"    pm.expect(jsonData.id).to.eql(1);",
+									"    var object = jsonData.output;",
+									"    pm.expect(object.title).to.eql(\"Updated Message\");",
+									"    pm.expect(object.description).to.eql(\"This message was updated\");",
+									"    pm.expect(object.service).to.eql(1);",
+									"    pm.expect(object.notify_before).to.eql(3);",
+									"    pm.expect(object.notify_before_scale).to.eql(\"hour\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1045,7 +1105,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Routine Downtime\",\n    \"description\": \"This is an example a upcoming message for a service!\",\n    \"start_on\": \"2055-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2055-11-17T05:13:16.323798-08:00\",\n    \"service\": 2,\n    \"notify_users\": true,\n    \"notify_method\": \"email\",\n    \"notify_before\": 900\n}"
+							"raw": "{\n    \"title\": \"Updated Message\",\n    \"description\": \"This message was updated\",\n    \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n    \"service\": 1,\n    \"notify_users\": true,\n    \"notify_method\": \"email\",\n    \"notify_before\": 3,\n    \"notify_before_scale\": \"hour\"\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/messages/1",
@@ -1097,6 +1157,274 @@
 								"api",
 								"messages",
 								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Checkins",
+			"item": [
+				{
+					"name": "Create Checkin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "af07a95b-1bf5-42c7-bd3f-a32f3ab2a264",
+								"exec": [
+									"pm.test(\"Create Checkin\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.type).to.eql(\"checkin\");",
+									"    pm.expect(jsonData.output.name).to.eql(\"Server Checkin\");",
+									"    pm.expect(jsonData.output.grace).to.eql(60);",
+									"    pm.expect(jsonData.output.interval).to.eql(900);",
+									"    var id = jsonData.output.api_key;",
+									"    pm.globals.set(\"checkin_id\", id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"service_id\": 1,\n    \"name\": \"Server Checkin\",\n    \"interval\": 900,\n    \"grace\": 60\n}"
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/checkin",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"checkin"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create Checkin",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"service_id\": 14,\n    \"name\": \"Server Checkin\",\n    \"interval\": 900,\n    \"grace\": 60\n}"
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/checkin",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"checkin"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 20 Nov 2018 20:37:10 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "265"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"checkin\",\n    \"method\": \"create\",\n    \"id\": 4,\n    \"output\": {\n        \"id\": 4,\n        \"service_id\": 14,\n        \"name\": \"Server Checkin\",\n        \"interval\": 900,\n        \"grace\": 60,\n        \"api_key\": \"AJ0GsdG\",\n        \"created_at\": \"2018-11-20T20:37:10.437194Z\",\n        \"updated_at\": \"2018-11-20T20:37:10.437194Z\",\n        \"hits\": null\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Run Checkin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "652a1c5b-5379-43c2-9cd8-ebd8f8dad0f6",
+								"exec": [
+									"pm.test(\"Hit the Checkin API Endpoint\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.type).to.eql(\"checkin_hit\");",
+									"    pm.expect(jsonData.method).to.eql(\"update\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/checkin/{{checkin_id}}",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"checkin",
+								"{{checkin_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View Checkin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "93ff6b86-368b-406f-9d75-07338714ebca",
+								"exec": [
+									"pm.test(\"View Checkin\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var id = pm.globals.get(\"checkin_id\");",
+									"    pm.expect(jsonData.name).to.eql(\"Server Checkin\");",
+									"    pm.expect(jsonData.api_key).to.eql(id);",
+									"    pm.expect(jsonData.grace).to.eql(60);",
+									"    pm.expect(jsonData.interval).to.eql(900);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/checkin/{{checkin_id}}",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"checkin",
+								"{{checkin_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View All Checkin's",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "54bded63-de27-4839-8783-25874c35c3ea",
+								"exec": [
+									"pm.test(\"View All Checkins\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var first = jsonData[0];",
+									"    var id = pm.globals.get(\"checkin_id\");",
+									"    pm.expect(first.name).to.eql(\"Server Checkin\");",
+									"    pm.expect(first.api_key).to.eql(id);",
+									"    pm.expect(first.grace).to.eql(60);",
+									"    pm.expect(first.interval).to.eql(900);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/checkins",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"checkins"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Checkin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d3fdc6b9-d8ca-4634-a735-af8db0f31cef",
+								"exec": [
+									"pm.test(\"Delete Checkin\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var id = pm.globals.get(\"checkin_id\");",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.type).to.eql(\"checkin\");",
+									"    pm.expect(jsonData.method).to.eql(\"delete\");",
+									"    pm.expect(jsonData.output.api_key).to.eql(id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/checkin/{{checkin_id}}",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"checkin",
+								"{{checkin_id}}"
 							]
 						}
 					},

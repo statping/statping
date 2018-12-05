@@ -1,4 +1,8 @@
 .idea
+snap
+prime
+stage
+parts
 core/rice-box.go
 config.yml
 statup.db
@@ -6,6 +10,7 @@ plugins/*.so
 data
 build
 vendor
+dev/plugin/*.so
 html/scss/.sass-cache
 dart-sass
 .sass-cache

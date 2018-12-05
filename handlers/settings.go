@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -18,11 +18,10 @@ package handlers
 import (
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/core/notifier"
-	"github.com/hunterlong/statup/source"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -33,7 +32,7 @@ func settingsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	executeResponse(w, r, "settings.html", core.CoreApp, nil)
+	ExecuteResponse(w, r, "settings.html", core.CoreApp, nil)
 }
 
 func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
@@ -41,6 +40,7 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
+	var err error
 	r.ParseForm()
 	app := core.CoreApp
 	name := r.PostForm.Get("project")
@@ -68,9 +68,12 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	app.Timezone = float32(timeFloat)
 
 	app.UseCdn = types.NewNullBool(r.PostForm.Get("enable_cdn") == "on")
-	core.CoreApp, _ = core.UpdateCore(app)
+	core.CoreApp, err = core.UpdateCore(app)
+	if err != nil {
+		utils.Log(3, fmt.Sprintf("issue updating Core: %v", err.Error()))
+	}
 	//notifiers.OnSettingsSaved(core.CoreApp.ToCore())
-	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
 func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
@@ -87,7 +90,7 @@ func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
 	source.SaveAsset([]byte(mobile), utils.Directory, "scss/mobile.scss")
 	source.CompileSASS(utils.Directory)
 	resetRouter()
-	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
 func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
@@ -99,6 +102,7 @@ func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 	err := source.CreateAllAssets(dir)
 	if err != nil {
 		utils.Log(3, err)
+		sendErrorJson(err, w, r)
 		return
 	}
 	err = source.CompileSASS(dir)
@@ -107,7 +111,7 @@ func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		utils.Log(3, "Default 'base.css' was inserted because SASS did not work.")
 	}
 	resetRouter()
-	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
 func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
@@ -117,12 +121,12 @@ func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	source.DeleteAllAssets(utils.Directory)
 	resetRouter()
-	executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
 }
 
 func parseId(r *http.Request) int64 {
 	vars := mux.Vars(r)
-	return utils.StringInt(vars["id"])
+	return utils.ToInt(vars["id"])
 }
 
 func parseForm(r *http.Request) url.Values {
@@ -133,70 +137,4 @@ func parseForm(r *http.Request) url.Values {
 func parseGet(r *http.Request) url.Values {
 	r.ParseForm()
 	return r.Form
-}
-
-func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
-	var err error
-	if !IsAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-	form := parseForm(r)
-	vars := mux.Vars(r)
-	method := vars["method"]
-	enabled := form.Get("enable")
-	host := form.Get("host")
-	port := int(utils.StringInt(form.Get("port")))
-	username := form.Get("username")
-	password := form.Get("password")
-	var1 := form.Get("var1")
-	var2 := form.Get("var2")
-	apiKey := form.Get("api_key")
-	apiSecret := form.Get("api_secret")
-	limits := int(utils.StringInt(form.Get("limits")))
-
-	fakeNotifer, notif, err := notifier.SelectNotifier(method)
-	if err != nil {
-		utils.Log(3, fmt.Sprintf("issue saving notifier %v: %v", method, err))
-		executeResponse(w, r, "settings.html", core.CoreApp, "/settings")
-		return
-	}
-
-	notifer := *fakeNotifer
-
-	if host != "" {
-		notifer.Host = host
-	}
-	if port != 0 {
-		notifer.Port = port
-	}
-	if username != "" {
-		notifer.Username = username
-	}
-	if password != "" && password != "##########" {
-		notifer.Password = password
-	}
-	if var1 != "" {
-		notifer.Var1 = var1
-	}
-	if var2 != "" {
-		notifer.Var2 = var2
-	}
-	if apiKey != "" {
-		notifer.ApiKey = apiKey
-	}
-	if apiSecret != "" {
-		notifer.ApiSecret = apiSecret
-	}
-	if limits != 0 {
-		notifer.Limits = limits
-	}
-	notifer.Enabled = types.NewNullBool(enabled == "on")
-
-	err = notif.(notifier.Tester).OnTest()
-	if err == nil {
-		w.Write([]byte("ok"))
-	} else {
-		w.Write([]byte(err.Error()))
-	}
 }

@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -15,7 +15,7 @@
 
 package notifier
 
-import "github.com/hunterlong/statup/types"
+import "github.com/hunterlong/statping/types"
 
 // OnSave will trigger a notifier when it has been saved - Notifier interface
 func OnSave(method string) {
@@ -31,6 +31,9 @@ func OnSave(method string) {
 
 // OnFailure will be triggered when a service is failing - BasicEvents interface
 func OnFailure(s *types.Service, f *types.Failure) {
+	if !s.AllowNotifications.Bool {
+		return
+	}
 	for _, comm := range AllCommunications {
 		if isType(comm, new(BasicEvents)) && isEnabled(comm) && inLimits(comm) {
 			comm.(BasicEvents).OnFailure(s, f)
@@ -40,6 +43,9 @@ func OnFailure(s *types.Service, f *types.Failure) {
 
 // OnSuccess will be triggered when a service is successful - BasicEvents interface
 func OnSuccess(s *types.Service) {
+	if !s.AllowNotifications.Bool {
+		return
+	}
 	for _, comm := range AllCommunications {
 		if isType(comm, new(BasicEvents)) && isEnabled(comm) && inLimits(comm) {
 			comm.(BasicEvents).OnSuccess(s)
@@ -58,6 +64,9 @@ func OnNewService(s *types.Service) {
 
 // OnUpdatedService is triggered when a service is updated - ServiceEvents interface
 func OnUpdatedService(s *types.Service) {
+	if !s.AllowNotifications.Bool {
+		return
+	}
 	for _, comm := range AllCommunications {
 		if isType(comm, new(ServiceEvents)) && isEnabled(comm) && inLimits(comm) {
 			comm.(ServiceEvents).OnUpdatedService(s)
@@ -67,6 +76,9 @@ func OnUpdatedService(s *types.Service) {
 
 // OnDeletedService is triggered when a service is deleted - ServiceEvents interface
 func OnDeletedService(s *types.Service) {
+	if !s.AllowNotifications.Bool {
+		return
+	}
 	for _, comm := range AllCommunications {
 		if isType(comm, new(ServiceEvents)) && isEnabled(comm) && inLimits(comm) {
 			comm.(ServiceEvents).OnDeletedService(s)
@@ -110,7 +122,7 @@ func OnUpdatedCore(c *types.Core) {
 	}
 }
 
-// OnStart is triggered when the Statup service has started
+// OnStart is triggered when the Statping service has started
 func OnStart(c *types.Core) {
 	for _, comm := range AllCommunications {
 		if isType(comm, new(CoreEvents)) && isEnabled(comm) && inLimits(comm) {

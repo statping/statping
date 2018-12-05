@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -17,12 +17,10 @@ package core
 
 import (
 	"bytes"
-	"crypto/tls"
 	"fmt"
-	"github.com/hunterlong/statup/core/notifier"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
-	"io/ioutil"
+	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"net"
 	"net/http"
 	"net/url"
@@ -159,22 +157,14 @@ func (s *Service) checkHttp(record bool) *Service {
 	}
 	s.PingTime = dnsLookup
 	t1 := time.Now()
-	timeout := time.Duration(time.Duration(s.Timeout) * time.Second)
-	transport := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: true,
-		},
-		TLSHandshakeTimeout: timeout,
-	}
-	client := &http.Client{
-		Transport: transport,
-		Timeout:   timeout,
-	}
-	var response *http.Response
+
+	timeout := time.Duration(s.Timeout) * time.Second
+	var content []byte
+	var res *http.Response
 	if s.Method == "POST" {
-		response, err = client.Post(s.Domain, "application/json", bytes.NewBuffer([]byte(s.PostData.String)))
+		content, res, err = utils.HttpRequest(s.Domain, s.Method, "application/json", nil, bytes.NewBuffer([]byte(s.PostData.String)), timeout)
 	} else {
-		response, err = client.Get(s.Domain)
+		content, res, err = utils.HttpRequest(s.Domain, s.Method, nil, nil, nil, timeout)
 	}
 	if err != nil {
 		if record {
@@ -182,8 +172,6 @@ func (s *Service) checkHttp(record bool) *Service {
 		}
 		return s
 	}
-	response.Header.Set("Connection", "close")
-	response.Header.Set("User-Agent", "StatupMonitor")
 	t2 := time.Now()
 	s.Latency = t2.Sub(t1).Seconds()
 	if err != nil {
@@ -192,16 +180,14 @@ func (s *Service) checkHttp(record bool) *Service {
 		}
 		return s
 	}
-	defer response.Body.Close()
-	contents, err := ioutil.ReadAll(response.Body)
-	s.LastResponse = string(contents)
-	s.LastStatusCode = response.StatusCode
+	s.LastResponse = string(content)
+	s.LastStatusCode = res.StatusCode
 
 	if s.Expected.String != "" {
 		if err != nil {
 			utils.Log(2, err)
 		}
-		match, err := regexp.MatchString(s.Expected.String, string(contents))
+		match, err := regexp.MatchString(s.Expected.String, string(content))
 		if err != nil {
 			utils.Log(2, err)
 		}
@@ -212,9 +198,9 @@ func (s *Service) checkHttp(record bool) *Service {
 			return s
 		}
 	}
-	if s.ExpectedStatus != response.StatusCode {
+	if s.ExpectedStatus != res.StatusCode {
 		if record {
-			recordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", response.StatusCode, s.ExpectedStatus))
+			recordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", res.StatusCode, s.ExpectedStatus))
 		}
 		return s
 	}

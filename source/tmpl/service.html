@@ -74,82 +74,102 @@
         <div class="col-12 small text-center mt-3 text-muted">{{$s.DowntimeText}}</div>
     {{end}}
 
-    {{$failures := $s.LimitedFailures 16}}
-    {{ if $failures }}
-        <div class="list-group mt-3 mb-4">
-        {{ range $failures }}
-            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">{{.ParseError}}</h5>
-                    <small>{{.Ago}}</small>
-                </div>
-                <p class="mb-1">{{.Issue}}</p>
-            </a>
+{{if Auth}}
+    <nav class="nav nav-pills flex-column flex-sm-row mt-3" id="service_tabs" role="serviceLists">
+        <a class="flex-sm-fill text-sm-center nav-link active" id="edit-tab" data-toggle="tab" href="#edit" role="tab" aria-controls="edit" aria-selected="false">Edit Service</a>
+            <a class="flex-sm-fill text-sm-center nav-link" id="failures-tab" data-toggle="tab" href="#failures" role="tab" aria-controls="failures" aria-selected="true">Failures</a>
+            <a class="flex-sm-fill text-sm-center nav-link" id="checkins-tab" data-toggle="tab" href="#checkins" role="tab" aria-controls="checkins" aria-selected="false">Checkins</a>
+            <a class="flex-sm-fill text-sm-center nav-link" id="response-tab" data-toggle="tab" href="#response" role="tab" aria-controls="response" aria-selected="false">Response</a>
+    </nav>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade" id="failures" role="serviceLists" aria-labelledby="failures-tab">
+        {{$failures := $s.LimitedFailures 16}}
+        {{ if $failures }}
+            <div class="list-group mt-3 mb-4">
+            {{ range $failures }}
+                <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{.ParseError}}</h5>
+                        <small>{{.Ago}}</small>
+                    </div>
+                    <p class="mb-1">{{.Issue}}</p>
+                </a>
+            {{ end }}
+            </div>
         {{ end }}
         </div>
-    {{ end }}
+        <div class="tab-pane fade" id="checkins" role="serviceLists" aria-labelledby="checkins-tab">
+            {{if $s.LimitedCheckins}}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Checkin</th>
+                        <th scope="col">Report Period<br>Grace Period</th>
+                        <th scope="col">Last Seen</th>
+                        <th scope="col">Expected</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody style="font-size: 10pt;">
+                    {{range $s.LimitedCheckins}}
+                    {{ $ch := . }}
+                    <tr id="checkin_{{$ch.Id}}" class="{{ if lt $ch.Expected 0}}bg-warning text-black{{else}}bg-light{{end}}">
+                        <td>{{$ch.Name}}<br><a href="{{$ch.Link}}" target="_blank">{{$ch.Link}}</a></td>
+                        <td>every {{Duration $ch.Period}}<br>after {{Duration $ch.Grace}}</td>
+                        <td>{{ if $ch.Last.CreatedAt.IsZero}}
+                            Never
+                        {{else}}
+                        {{Ago $ch.Last.CreatedAt}}
+                    {{end}}
+                        </td>
+                        <td>
+                        {{ if $ch.Last.CreatedAt.IsZero}}
+                            -
+                        {{else}}
+                        {{ if lt $ch.Expected 0}}{{Duration $ch.Expected}} ago{{else}}in {{Duration $ch.Expected}}{{end}}
+                        {{end}}
+                        </td>
+                        <td><a href="/api/checkin/{{$ch.ApiKey}}" data-method="DELETE" data-obj="checkin_{{$ch.Id}}" data-id="{{$ch.Id}}" class="ajax_delete btn btn-sm btn-danger">Delete</a></td>
+                    </tr>
+                    {{end}}
+                    </tbody>
+                </table>
+            {{end}}
+            {{template "form_checkin" $s}}
 
-    </div>
-
-{{if Auth}}
-
-    <div class="col-12 mt-4{{if ne $s.Type "http"}} d-none{{end}}">
-        <h3>Last Response</h3>
-        <textarea rows="8" class="form-control" readonly>{{ $s.LastResponse }}</textarea>
-        <div class="form-group row mt-2">
-            <label for="last_status_code" class="col-sm-3 col-form-label">HTTP Status Code</label>
-            <div class="col-sm-2">
-                <input type="text" id="last_status_code" class="form-control" value="{{ $s.LastStatusCode }}" readonly>
+            {{$failures := $s.LimitedCheckinFailures 16}}
+            {{ if $failures }}
+                <div class="list-group mt-3 mb-4">
+                {{ range $failures }}
+                    <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{.ParseError}}</h5>
+                            <small>{{.Ago}}</small>
+                        </div>
+                        <p class="mb-1">{{.Issue}}</p>
+                    </a>
+                {{ end }}
+                </div>
+            {{ end }}
+        </div>
+        <div class="tab-pane fade" id="response" role="serviceLists" aria-labelledby="response-tab">
+            <div class="col-12 mt-4{{if ne $s.Type "http"}} d-none{{end}}">
+                <h3>Last Response</h3>
+                <textarea rows="8" class="form-control" readonly>{{ $s.LastResponse }}</textarea>
+                <div class="form-group row mt-2">
+                    <label for="last_status_code" class="col-sm-3 col-form-label">HTTP Status Code</label>
+                    <div class="col-sm-2">
+                        <input type="text" id="last_status_code" class="form-control" value="{{ $s.LastStatusCode }}" readonly>
+                    </div>
+                </div>
             </div>
+        </div>
+        <div class="tab-pane fade show active" id="edit" role="serviceLists" aria-labelledby="edit-tab">
+            {{template "form_service" $s}}
         </div>
     </div>
 
-    <div class="col-12 mt-4">
-        <h3>Edit Service</h3>
-        {{template "form_service" $s}}
     </div>
-
-    <div class="col-12 mt-4">
-        <h3>Service Checkin</h3>
-        {{if $s.LimitedCheckins}}
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Checkin</th>
-                    <th scope="col">Report Period<br>Grace Period</th>
-                    <th scope="col">Last Seen</th>
-                    <th scope="col">Expected</th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tbody>
-            {{range $s.LimitedCheckins}}
-            {{ $ch := . }}
-            <tr class="{{ if lt $ch.Expected 0}}bg-warning text-black{{else}}bg-light{{end}}">
-                <td>{{$ch.Name}}<br><a href="{{$ch.Link}}" target="_blank">{{$ch.Link}}</a></td>
-                <td>every {{Duration $ch.Period}}<br>after {{Duration $ch.Grace}}</td>
-                <td>{{ if $ch.Last.CreatedAt.IsZero}}
-                        Never
-                    {{else}}
-                        {{Ago $ch.Last.CreatedAt}}
-                    {{end}}
-                </td>
-                <td>
-                    {{ if $ch.Last.CreatedAt.IsZero}}
-                        -
-                    {{else}}
-                        {{ if lt $ch.Expected 0}}{{Duration $ch.Expected}} ago{{else}}in {{Duration $ch.Expected}}{{end}}
-                    {{end}}
-                </td>
-                <td><a href="/checkin/{{$ch.Id}}/delete" class="btn btn-sm btn-danger">Delete</a></td>
-            </tr>
-            {{end}}
-            </tbody>
-        </table>
-        {{end}}
-        {{template "form_checkin" $s}}
-    </div>
-
 {{end}}
 </div>
 {{end}}

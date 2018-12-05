@@ -1,5 +1,5 @@
 [Unit]
-Description=Statup Server
+Description=Statping Server
 After=network.target
 After=systemd-user-sessions.service
 After=network-online.target
@@ -7,7 +7,7 @@ After=network-online.target
 [Service]
 Type=simple
 Restart=always
-ExecStart=/usr/local/bin/statup
+ExecStart=/usr/local/bin/statping
 
 [Install]
 WantedBy=multi-user.target

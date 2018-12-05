@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -19,8 +19,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"github.com/jinzhu/gorm"
 	"reflect"
 	"strings"
@@ -30,12 +30,12 @@ import (
 var (
 	// AllCommunications holds all the loaded notifiers
 	AllCommunications []types.AllNotifiers
-	// db holds the Statup database connection
+	// db holds the Statping database connection
 	db       *gorm.DB
 	timezone float32
 )
 
-// Notification contains all the fields for a Statup Notifier.
+// Notification contains all the fields for a Statping Notifier.
 type Notification struct {
 	Id          int64              `gorm:"primary_key;column:id" json:"id"`
 	Method      string             `gorm:"column:method" json:"method"`
@@ -80,7 +80,9 @@ type NotificationForm struct {
 	DbField     string `json:"field"`       // true variable key for input
 	SmallText   string `json:"small_text"`  // insert small text under a html input
 	Required    bool   `json:"required"`    // require this input on the html form
-	Hidden      bool   `json:"hidden"`      // hide this form element from end user
+	IsHidden    bool   `json:"hidden"`      // hide this form element from end user
+	IsList      bool   `json:"list"`        // make this form element a comma separated list
+	IsSwitch    bool   `json:"switch"`      // make the notifier a boolean true/false switch
 }
 
 // NotificationLog contains the normalized message from previously sent notifications

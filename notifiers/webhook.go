@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -18,9 +18,9 @@ package notifiers
 import (
 	"bytes"
 	"fmt"
-	"github.com/hunterlong/statup/core/notifier"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -134,7 +134,7 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 	if w.ApiKey != "" {
 		req.Header.Add("Content-Type", w.ApiKey)
 	}
-	req.Header.Set("User-Agent", "Statup")
+	req.Header.Set("User-Agent", "Statping")
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err

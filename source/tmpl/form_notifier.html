@@ -6,14 +6,14 @@
 
 {{range $n.Form}}
     <div class="form-group">
-            <label class="text-capitalize{{if .Hidden}} d-none{{end}}" for="{{underscore .Title}}">{{.Title}}</label>
+            <label class="text-capitalize{{if .IsHidden}} d-none{{end}}" for="{{underscore .Title}}">{{.Title}}</label>
         {{if eq .Type "textarea"}}
-            <textarea rows="3" class="form-control{{if .Hidden}} d-none{{end}}" name="{{underscore .DbField}}" id="{{underscore .Title}}">{{ $n.GetValue .DbField }}</textarea>
+            <textarea rows="3" class="form-control{{if .IsHidden}} d-none{{end}}" name="{{underscore .DbField}}" id="{{underscore .Title}}">{{ $n.GetValue .DbField }}</textarea>
         {{else}}
-            <input type="{{.Type}}" name="{{underscore .DbField}}" class="form-control{{if .Hidden}} d-none{{end}}" value="{{ $n.GetValue .DbField }}" id="{{underscore .Title}}" placeholder="{{.Placeholder}}" {{if .Required}}required{{end}}>
+            <input type="{{.Type}}" name="{{underscore .DbField}}" class="form-control{{if .IsHidden}} d-none{{end}}" value="{{ $n.GetValue .DbField }}" id="{{underscore .Title}}" placeholder="{{.Placeholder}}" {{if .Required}}required{{end}}>
         {{end}}
         {{if .SmallText}}
-            <small class="form-text text-muted{{if .Hidden}} d-none{{end}}">{{safe .SmallText}}</small>
+            <small class="form-text text-muted{{if .IsHidden}} d-none{{end}}">{{safe .SmallText}}</small>
         {{end}}
     </div>
 {{end}}

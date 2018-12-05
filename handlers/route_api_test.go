@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -17,10 +17,10 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/source"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
@@ -241,7 +241,7 @@ func TestApiDeleteUserHandler(t *testing.T) {
 }
 
 func TestApiServiceDataHandler(t *testing.T) {
-	grouping := []string{"minute", "hour", "day"}
+	grouping := []string{"minute", "hour", "day", "week"}
 	for _, g := range grouping {
 		params := "?start=0&end=999999999999&group=" + g
 		rr, err := httpRequestAPI(t, "GET", "/api/services/5/data"+params, nil)
@@ -277,6 +277,38 @@ func TestApiCheckinHandler(t *testing.T) {
 	var obj apiResponse
 	formatJSON(body, &obj)
 	assert.Equal(t, 200, rr.Code)
+}
+
+func TestApiCreateCheckinHandler(t *testing.T) {
+	data := `{
+    "service_id": 1,
+    "name": "New API Checkin",
+    "interval": 60,
+    "grace": 30}`
+	rr, err := httpRequestAPI(t, "POST", "/api/checkin", strings.NewReader(data))
+	assert.Nil(t, err)
+	body := rr.Body.String()
+	var obj apiResponse
+	formatJSON(body, &obj)
+	t.Log(body)
+	assert.Equal(t, 200, rr.Code)
+	assert.Equal(t, "create", obj.Method)
+	assert.Equal(t, "success", obj.Status)
+	assert.Equal(t, int64(1), obj.Id)
+}
+
+func TestApiAllCheckinsHandler(t *testing.T) {
+	rr, err := httpRequestAPI(t, "GET", "/api/checkins", nil)
+	assert.Nil(t, err)
+	body := rr.Body.String()
+	assert.Equal(t, 200, rr.Code)
+	var obj []types.Checkin
+	formatJSON(body, &obj)
+	t.Log(body)
+	assert.Equal(t, int(1), len(obj))
+	assert.Equal(t, int64(1), obj[0].Id)
+	assert.Equal(t, int64(1), obj[0].ServiceId)
+	assert.Equal(t, "New API Checkin", obj[0].Name)
 }
 
 func httpRequestAPI(t *testing.T, method, url string, body io.Reader) (*httptest.ResponseRecorder, error) {

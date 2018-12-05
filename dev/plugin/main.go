@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/hunterlong/statup/types"
+	"github.com/hunterlong/statping/types"
 	"net/http"
 )
 
@@ -10,7 +10,7 @@ type PluginObj types.PluginInfo
 var Plugin = PluginObj{
 	Info: &types.Info{
 		Name:        "Example Plugin",
-		Description: "This is an example plugin for Statup Status Page application. It can be implemented pretty quick!",
+		Description: "This is an example plugin for Statping Status Page application. It can be implemented pretty quick!",
 	},
 	Routes: []*types.PluginRoute{{
 		Url:    "/setuper",

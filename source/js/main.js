@@ -1,9 +1,9 @@
 /*
- * Statup
+ * Statping
  * Copyright (C) 2018.  Hunter Long and the project contributors
  * Written by Hunter Long <info@socialeck.com> and the project contributors
  *
- * https://github.com/hunterlong/statup
+ * https://github.com/hunterlong/statping
  *
  * The licenses for most software and other practical works are designed
  * to take away your freedom to share and change the works.  By contrast,
@@ -109,6 +109,12 @@ function AjaxChart(chart, service, start=0, end=9999999999, group="hour") {
     url: "/api/services/"+service+"/data?start="+start+"&end="+end+"&group="+group,
     type: 'GET',
     success: function(data) {
+    	if (data.data.length <= 3) {
+				AjaxChart(chart, service, 0, 9999999999, "second")
+				return;
+			} else if (data.data.length === 0) {
+    		return;
+			}
       chart.data.labels.pop();
       data.data.forEach(function(d) {
         chart.data.datasets[0].data.push(d);
@@ -138,6 +144,10 @@ function PingAjaxChart(chart, service, start=0, end=9999999999, group="hour") {
 }
 
 $('.ajax_delete').on('click', function() {
+	var r = confirm('Are you sure you want to delete?');
+	if (r !== true) {
+		return false;
+	}
 	let obj = $(this);
 	let id = obj.attr('data-id');
 	let element = obj.attr('data-obj');
@@ -171,12 +181,10 @@ $('form.ajax_form').on('submit', function() {
 	let alerter = form.find('#alerter');
 	var arrayData = [];
 	let newArr = {};
+	console.log(values);
 	Spinner(button);
 	values.forEach(function(k, v) {
-		if (k.name === "password_confirm") {
-			return
-		}
-		if (k.value === "") {
+		if (k.name === "password_confirm" || k.value === "") {
 			return
 		}
 		if (k.value === "on") {
@@ -204,28 +212,29 @@ $('form.ajax_form').on('submit', function() {
 		data: sendData,
 		success: function (data) {
 			console.log(data)
-			if (data.status === 'error') {
-				let alerter = form.find('#alerter');
-				alerter.html(data.error);
-				alerter.removeClass("d-none");
-				Spinner(button, true);
-			} else {
-				Spinner(button, true);
-				if (func) {
-					let fn = window[func];
-					if (typeof fn === "function") fn({element: form, form: newArr, data: data});
+			setTimeout(function () {
+				if (data.status === 'error') {
+					let alerter = form.find('#alerter');
+					alerter.html(data.error);
+					alerter.removeClass("d-none");
+					Spinner(button, true);
+				} else {
+					Spinner(button, true);
+					if (func) {
+						let fn = window[func];
+						if (typeof fn === "function") fn({element: form, form: newArr, data: data});
+					}
+					if (redirect) {
+						window.location.href = redirect;
+					}
 				}
-				if (redirect) {
-					window.location.href = redirect;
-				}
-			}
+			}, 1000);
 		}
 	});
 	return false;
 });
 
 function CreateService(output) {
-	console.log('creating service', output)
 	let form = output.form;
 	let data = output.data.output;
 	let objTbl = `<tr id="service_${data.id}">

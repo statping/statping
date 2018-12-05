@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -19,7 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/GeertJohan/go.rice"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/utils"
 	"gopkg.in/russross/blackfriday.v2"
 	"io/ioutil"
 	"os"
@@ -106,7 +106,7 @@ func UsingAssets(folder string) bool {
 
 // SaveAsset will save an asset to the '/assets/' folder.
 func SaveAsset(data []byte, folder, file string) error {
-	utils.Log(1, fmt.Sprintf("Saving %v/assets/%v into assets folder", folder, file))
+	utils.Log(1, fmt.Sprintf("Saving %v/assets/%v", folder, file))
 	err := ioutil.WriteFile(folder+"/assets/"+file, data, 0744)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Failed to save %v/%v, %v", folder, file, err))
@@ -127,7 +127,7 @@ func OpenAsset(folder, file string) string {
 
 // CreateAllAssets will dump HTML, CSS, SCSS, and JS assets into the '/assets' directory
 func CreateAllAssets(folder string) error {
-	utils.Log(1, fmt.Sprintf("Dump Statup assets into %v/assets", folder))
+	utils.Log(1, fmt.Sprintf("Dump Statping assets into %v/assets", folder))
 	MakePublicFolder(folder + "/assets")
 	MakePublicFolder(folder + "/assets/js")
 	MakePublicFolder(folder + "/assets/css")
@@ -135,20 +135,20 @@ func CreateAllAssets(folder string) error {
 	MakePublicFolder(folder + "/assets/font")
 	MakePublicFolder(folder + "/assets/files")
 	utils.Log(1, "Inserting scss, css, and javascript files into assets folder")
-	CopyAllToPublic(FontBox, "font")
 	CopyAllToPublic(ScssBox, "scss")
+	CopyAllToPublic(FontBox, "font")
 	CopyAllToPublic(CssBox, "css")
 	CopyAllToPublic(JsBox, "js")
 	CopyToPublic(FontBox, folder+"/assets/font", "all.css")
 	CopyToPublic(TmplBox, folder+"/assets", "robots.txt")
-	CopyToPublic(TmplBox, folder+"/assets", "statup.png")
+	CopyToPublic(TmplBox, folder+"/assets", "banner.png")
 	CopyToPublic(TmplBox, folder+"/assets", "favicon.ico")
 	CopyToPublic(TmplBox, folder+"/assets/files", "swagger.json")
 	CopyToPublic(TmplBox, folder+"/assets/files", "postman.json")
 	CopyToPublic(TmplBox, folder+"/assets/files", "grafana.json")
 	utils.Log(1, "Compiling CSS from SCSS style...")
 	err := CompileSASS(utils.Directory)
-	utils.Log(1, "Statup assets have been inserted")
+	utils.Log(1, "Statping assets have been inserted")
 	return err
 }
 
@@ -156,10 +156,10 @@ func CreateAllAssets(folder string) error {
 func DeleteAllAssets(folder string) error {
 	err := os.RemoveAll(folder + "/assets")
 	if err != nil {
-		utils.Log(1, fmt.Sprintf("There was an issue deleting Statup Assets, %v", err))
+		utils.Log(1, fmt.Sprintf("There was an issue deleting Statping Assets, %v", err))
 		return err
 	}
-	utils.Log(1, "Statup assets have been deleted")
+	utils.Log(1, "Statping assets have been deleted")
 	return err
 }
 
@@ -178,7 +178,7 @@ func CopyAllToPublic(box *rice.Box, folder string) error {
 		if err != nil {
 			return nil
 		}
-		filePath := fmt.Sprintf("%v/%v", folder, path)
+		filePath := fmt.Sprintf("%v%v", folder, path)
 		SaveAsset(file, utils.Directory, filePath)
 		return nil
 	})

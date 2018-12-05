@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -19,8 +19,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-yaml/yaml"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"io/ioutil"
 	"os"
 )
@@ -127,18 +127,29 @@ func DefaultPort(db string) int64 {
 
 // EnvToConfig converts environment variables to a DbConfig variable
 func EnvToConfig() *DbConfig {
-	port := utils.StringInt(os.Getenv("DB_PORT"))
+	port := utils.ToInt(os.Getenv("DB_PORT"))
 	if port == 0 {
 		port = DefaultPort(os.Getenv("DB_PORT"))
 	}
 	name := os.Getenv("NAME")
 	if name == "" {
-		name = "Statup"
+		name = "Statping"
 	}
 	description := os.Getenv("DESCRIPTION")
 	if description == "" {
-		description = "Statup Monitoring Sample Data"
+		description = "Statping Monitoring Sample Data"
 	}
+
+	adminUser := os.Getenv("ADMIN_USER")
+	if adminUser == "" {
+		adminUser = "admin"
+	}
+
+	adminPass := os.Getenv("ADMIN_PASS")
+	if adminPass == "" {
+		adminPass = "admin"
+	}
+
 	data := &DbConfig{
 		DbConn:      os.Getenv("DB_CONN"),
 		DbHost:      os.Getenv("DB_HOST"),
@@ -150,15 +161,15 @@ func EnvToConfig() *DbConfig {
 		Description: description,
 		Domain:      os.Getenv("DOMAIN"),
 		Email:       "",
-		Username:    "admin",
-		Password:    "admin",
+		Username:    adminUser,
+		Password:    adminPass,
 		Error:       nil,
 		Location:    utils.Directory,
 	}
 	return data
 }
 
-// SampleData runs all the sample data for a new Statup installation
+// SampleData runs all the sample data for a new Statping installation
 func SampleData() error {
 	if err := InsertSampleData(); err != nil {
 		return err

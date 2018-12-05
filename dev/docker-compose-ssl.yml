@@ -15,10 +15,10 @@ services:
     restart: always
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ./statup/nginx/certs:/etc/nginx/certs:ro
-      - ./statup/nginx/vhost:/etc/nginx/vhost.d
-      - ./statup/nginx/html:/usr/share/nginx/html:ro
-      - ./statup/nginx/dhparam:/etc/nginx/dhparam
+      - ./statping/nginx/certs:/etc/nginx/certs:ro
+      - ./statping/nginx/vhost:/etc/nginx/vhost.d
+      - ./statping/nginx/html:/usr/share/nginx/html:ro
+      - ./statping/nginx/dhparam:/etc/nginx/dhparam
     environment:
       DEFAULT_HOST: ${LETSENCRYPT_HOST}
 
@@ -30,14 +30,14 @@ services:
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./statup/nginx/certs:/etc/nginx/certs
-      - ./statup/nginx/vhost:/etc/nginx/vhost.d
-      - ./statup/nginx/html:/usr/share/nginx/html
-      - ./statup/nginx/dhparam:/etc/nginx/dhparam
+      - ./statping/nginx/certs:/etc/nginx/certs
+      - ./statping/nginx/vhost:/etc/nginx/vhost.d
+      - ./statping/nginx/html:/usr/share/nginx/html
+      - ./statping/nginx/dhparam:/etc/nginx/dhparam
 
-  statup:
-    container_name: statup
-    image: hunterlong/statup:latest
+  statping:
+    container_name: statping
+    image: hunterlong/statping:latest
     restart: always
     networks:
       - internet
@@ -45,7 +45,7 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./statup/app:/app
+      - ./statping/app:/app
     environment:
       VIRTUAL_HOST: ${LETSENCRYPT_HOST}
       VIRTUAL_PORT: 8080
@@ -53,11 +53,11 @@ services:
       LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
       DB_CONN: postgres
       DB_HOST: postgres
-      DB_USER: statup
+      DB_USER: statping
       DB_PASS: password123
-      DB_DATABASE: statup
-      NAME: SSL Example
-      DESCRIPTION: This Status Status Page should be running ${LETSENCRYPT_HOST} with SSL.
+      DB_DATABASE: statping
+      NAME: Statping SSL Instance
+      DESCRIPTION: This Statping Status Page should be running ${LETSENCRYPT_HOST} with SSL.
 
   postgres:
     container_name: postgres
@@ -66,11 +66,18 @@ services:
     networks:
       - database
     volumes:
-      - ./statup/postgres:/var/lib/postgresql/data
+      - ./statping/postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: password123
-      POSTGRES_USER: statup
-      POSTGRES_DB: statup
+      POSTGRES_USER: statping
+      POSTGRES_DB: statping
+
+  watchtower:
+    image: v2tec/watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 120 --cleanup
 
 networks:
   internet:

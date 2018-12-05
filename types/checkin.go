@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -21,22 +21,24 @@ import (
 
 // Checkin struct will allow an application to send a recurring HTTP GET to confirm a service is online
 type Checkin struct {
-	Id          int64     `gorm:"primary_key;column:id"`
-	ServiceId   int64     `gorm:"index;column:service"`
-	Name        string    `gorm:"column:name"`
-	Interval    int64     `gorm:"column:check_interval"`
-	GracePeriod int64     `gorm:"column:grace_period"`
-	ApiKey      string    `gorm:"column:api_key"`
-	CreatedAt   time.Time `gorm:"column:created_at" json:"created_at"`
-	UpdatedAt   time.Time `gorm:"column:updated_at" json:"updated_at"`
-	Running     chan bool `gorm:"-" json:"-"`
+	Id          int64         `gorm:"primary_key;column:id" json:"id"`
+	ServiceId   int64         `gorm:"index;column:service" json:"service_id"`
+	Name        string        `gorm:"column:name"  json:"name"`
+	Interval    int64         `gorm:"column:check_interval" json:"interval"`
+	GracePeriod int64         `gorm:"column:grace_period"  json:"grace"`
+	ApiKey      string        `gorm:"column:api_key"  json:"api_key"`
+	CreatedAt   time.Time     `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt   time.Time     `gorm:"column:updated_at" json:"updated_at"`
+	Running     chan bool     `gorm:"-" json:"-"`
+	Hits        []*CheckinHit `gorm:"-" json:"hits"`
+	Failures    []*Failure    `gorm:"-" json:"failures"`
 }
 
 // CheckinHit is a successful response from a Checkin
 type CheckinHit struct {
-	Id        int64     `gorm:"primary_key;column:id"`
-	Checkin   int64     `gorm:"index;column:checkin"`
-	From      string    `gorm:"column:from_location"`
+	Id        int64     `gorm:"primary_key;column:id" json:"id"`
+	Checkin   int64     `gorm:"index;column:checkin" json:"checkin"`
+	From      string    `gorm:"column:from_location" json:"from"`
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 }
 

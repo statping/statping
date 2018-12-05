@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -17,12 +17,12 @@ package notifiers
 
 import (
 	"fmt"
-	"github.com/hunterlong/statup/core/notifier"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
-	"net/http"
+	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"net/url"
 	"strings"
+	"time"
 )
 
 const (
@@ -59,21 +59,11 @@ func init() {
 // Send will send a HTTP Post with the Authorization to the notify-api.line.me server. It accepts type: string
 func (u *lineNotifier) Send(msg interface{}) error {
 	message := msg.(string)
-	client := new(http.Client)
 	v := url.Values{}
 	v.Set("message", message)
-	req, err := http.NewRequest("POST", "https://notify-api.line.me/api/notify", strings.NewReader(v.Encode()))
-	if err != nil {
-		return err
-	}
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %v", u.GetValue("api_secret")))
-	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	_, err = client.Do(req)
-	if err != nil {
-		return err
-	}
-	return nil
+	headers := []string{fmt.Sprintf("Authorization=Bearer %v", u.GetValue("api_secret"))}
+	_, _, err := utils.HttpRequest("https://notify-api.line.me/api/notify", "POST", "application/x-www-form-urlencoded", headers, strings.NewReader(v.Encode()), time.Duration(10*time.Second))
+	return err
 }
 
 func (u *lineNotifier) Select() *notifier.Notification {

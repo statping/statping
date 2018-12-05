@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -17,9 +17,9 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"net/http"
 )
 
@@ -28,7 +28,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/setup", http.StatusSeeOther)
 		return
 	}
-	executeResponse(w, r, "index.html", core.CoreApp, nil)
+	ExecuteResponse(w, r, "index.html", core.CoreApp, nil)
 }
 
 func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
@@ -41,10 +41,10 @@ func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func trayHandler(w http.ResponseWriter, r *http.Request) {
-	executeResponse(w, r, "tray.html", core.CoreApp, nil)
+	ExecuteResponse(w, r, "tray.html", core.CoreApp, nil)
 }
 
-// DesktopInit will run the Statup server on a specific IP and port using SQLite database
+// DesktopInit will run the Statping server on a specific IP and port using SQLite database
 func DesktopInit(ip string, port int) {
 	var err error
 	exists := utils.FileExists(utils.Directory + "/statup.db")
@@ -65,8 +65,8 @@ func DesktopInit(ip string, port int) {
 
 	config := &core.DbConfig{
 		DbConn:      "sqlite",
-		Project:     "Statup",
-		Description: "Statup running as an App!",
+		Project:     "Statping",
+		Description: "Statping running as an App!",
 		Domain:      "http://localhost",
 		Username:    "admin",
 		Password:    "admin",

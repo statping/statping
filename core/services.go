@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -19,9 +19,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/ararog/timeago"
-	"github.com/hunterlong/statup/core/notifier"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"sort"
 	"strconv"
 	"time"
@@ -217,7 +217,7 @@ func (s *Service) DowntimeText() string {
 
 // Dbtimestamp will return a SQL query for grouping by date
 func Dbtimestamp(group string, column string) string {
-	var seconds int64
+	seconds := 3600
 	switch group {
 	case "minute":
 		seconds = 60
@@ -268,7 +268,10 @@ func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group st
 		return &DateScanObj{[]DateScan{}}
 	}
 	model = model.Order("timeframe asc", false).Group("timeframe")
-	rows, _ := model.Rows()
+	rows, err := model.Rows()
+	if err != nil {
+		utils.Log(3, fmt.Errorf("issue fetching service chart data: %v", err))
+	}
 
 	for rows.Next() {
 		var gd DateScan
@@ -385,10 +388,17 @@ func (s *Service) UpdateSingle(attr ...interface{}) error {
 
 // Update will update a service in the database, the service's checking routine can be restarted by passing true
 func (s *Service) Update(restart bool) error {
-	err := servicesDB().Update(s)
+	err := servicesDB().Update(&s)
 	if err.Error != nil {
 		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", s.Name, err))
 		return err.Error
+	}
+	// clear the notification queue for a service
+	if !s.AllowNotifications.Bool {
+		for _, n := range CoreApp.Notifications {
+			notif := n.(notifier.Notifier).Select()
+			notif.ResetUniqueQueue(s.Id)
+		}
 	}
 	if restart {
 		s.Close()

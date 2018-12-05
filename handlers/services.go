@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -17,12 +17,11 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"github.com/gorilla/mux"
-	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
-	"net"
+	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"net/http"
 	"time"
 )
@@ -52,7 +51,7 @@ func servicesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	executeResponse(w, r, "services.html", core.CoreApp.Services, nil)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services, nil)
 }
 
 type serviceOrder struct {
@@ -65,6 +64,7 @@ func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
+	r.ParseForm()
 	var newOrder []*serviceOrder
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&newOrder)
@@ -73,7 +73,8 @@ func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
 		service.Order = s.Order
 		service.Update(false)
 	}
-	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(newOrder)
 }
 
 func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
@@ -81,10 +82,10 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	fields := parseGet(r)
 	r.ParseForm()
 
-	startField := utils.StringInt(fields.Get("start"))
-	endField := utils.StringInt(fields.Get("end"))
+	startField := utils.ToInt(fields.Get("start"))
+	endField := utils.ToInt(fields.Get("end"))
 	group := r.Form.Get("group")
-	serv := core.SelectService(utils.StringInt(vars["id"]))
+	serv := core.SelectService(utils.ToInt(vars["id"]))
 	if serv == nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -114,7 +115,137 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 		Data      string
 	}{serv, start.Format(utils.FlatpickrReadable), end.Format(utils.FlatpickrReadable), start.Unix(), end.Unix(), data.ToString()}
 
-	executeResponse(w, r, "service.html", out, nil)
+	ExecuteResponse(w, r, "service.html", out, nil)
+}
+
+func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	vars := mux.Vars(r)
+	servicer := core.SelectServicer(utils.ToInt(vars["id"]))
+	if servicer == nil {
+		sendErrorJson(errors.New("service not found"), w, r)
+		return
+	}
+	service := servicer.Select()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(service)
+}
+
+func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	var service *types.Service
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&service)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	newService := core.ReturnService(service)
+	_, err = newService.Create(true)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	sendJsonAction(newService, "create", w, r)
+}
+
+func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	vars := mux.Vars(r)
+	service := core.SelectServicer(utils.ToInt(vars["id"]))
+	if service.Select() == nil {
+		sendErrorJson(errors.New("service not found"), w, r)
+		return
+	}
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&service)
+	err := service.Update(true)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	go service.Check(true)
+	sendJsonAction(service, "update", w, r)
+}
+
+func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	service := core.SelectService(utils.ToInt(vars["id"]))
+	if service == nil {
+		sendErrorJson(errors.New("service data not found"), w, r)
+		return
+	}
+	fields := parseGet(r)
+	grouping := fields.Get("group")
+	if grouping == "" {
+		grouping = "hour"
+	}
+	startField := utils.ToInt(fields.Get("start"))
+	endField := utils.ToInt(fields.Get("end"))
+
+	if startField == 0 || endField == 0 {
+		startField = 0
+		endField = 99999999999
+	}
+
+	obj := core.GraphDataRaw(service, time.Unix(startField, 0).UTC(), time.Unix(endField, 0).UTC(), grouping, "latency")
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(obj)
+}
+
+func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	service := core.SelectService(utils.ToInt(vars["id"]))
+	if service == nil {
+		sendErrorJson(errors.New("service not found"), w, r)
+		return
+	}
+	fields := parseGet(r)
+	grouping := fields.Get("group")
+	startField := utils.ToInt(fields.Get("start"))
+	endField := utils.ToInt(fields.Get("end"))
+	obj := core.GraphDataRaw(service, time.Unix(startField, 0), time.Unix(endField, 0), grouping, "ping_time")
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(obj)
+}
+
+func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	vars := mux.Vars(r)
+	service := core.SelectService(utils.ToInt(vars["id"]))
+	if service == nil {
+		sendErrorJson(errors.New("service not found"), w, r)
+		return
+	}
+	err := service.Delete()
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	sendJsonAction(service, "delete", w, r)
+}
+
+func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsAuthenticated(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	services := core.Services()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(services)
 }
 
 func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
@@ -123,60 +254,7 @@ func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.StringInt(vars["id"]))
+	service := core.SelectService(utils.ToInt(vars["id"]))
 	service.DeleteFailures()
-	executeResponse(w, r, "services.html", core.CoreApp.Services, "/services")
-}
-
-func checkinDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-	vars := mux.Vars(r)
-	checkin := core.SelectCheckinId(utils.StringInt(vars["id"]))
-	service := core.SelectService(checkin.ServiceId)
-	fmt.Println(checkin, service)
-	checkin.Delete()
-	executeResponse(w, r, "service.html", service, fmt.Sprintf("/service/%v", service.Id))
-}
-
-func checkinCreateHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-	vars := mux.Vars(r)
-	r.ParseForm()
-	service := core.SelectService(utils.StringInt(vars["id"]))
-	fmt.Println(service.Name)
-	name := r.PostForm.Get("name")
-	interval := utils.StringInt(r.PostForm.Get("interval"))
-	grace := utils.StringInt(r.PostForm.Get("grace"))
-	checkin := core.ReturnCheckin(&types.Checkin{
-		Name:        name,
-		ServiceId:   service.Id,
-		Interval:    interval,
-		GracePeriod: grace,
-	})
-	checkin.Create()
-	executeResponse(w, r, "service.html", service, fmt.Sprintf("/service/%v", service.Id))
-}
-
-func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	checkin := core.SelectCheckin(vars["id"])
-	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
-	checkinHit := core.ReturnCheckinHit(&types.CheckinHit{
-		Checkin:   checkin.Id,
-		From:      ip,
-		CreatedAt: time.Now().UTC(),
-	})
-	if checkin.Last() == nil {
-		checkin.Start()
-		go checkin.Routine()
-	}
-	checkinHit.Create()
-	w.Write([]byte("ok"))
-	w.WriteHeader(http.StatusOK)
+	ExecuteResponse(w, r, "services.html", core.CoreApp.Services, "/services")
 }

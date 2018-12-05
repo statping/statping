@@ -1,7 +1,7 @@
 {
-  "name": "statup-testing",
+  "name": "statping-testing",
   "version": "1.0.0",
-  "description": "Statup Application Testing using Cypress!",
+  "description": "Statping Application Testing using Cypress!",
   "main": "index.js",
   "dependencies": {
     "cypress": "^3.1.0"

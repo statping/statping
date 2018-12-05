@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -39,7 +39,7 @@ func TestFileExists(t *testing.T) {
 }
 
 func TestDir(t *testing.T) {
-	assert.Contains(t, Directory, "github.com/hunterlong/statup")
+	assert.Contains(t, Directory, "github.com/hunterlong/statping")
 }
 
 func TestCommand(t *testing.T) {
@@ -106,17 +106,13 @@ func ExampleToString() {
 }
 
 func TestStringInt(t *testing.T) {
-	assert.Equal(t, int64(1), StringInt("1"))
+	assert.Equal(t, "1", ToString("1"))
 }
 
 func ExampleStringInt() {
 	amount := "42"
-	fmt.Print(StringInt(amount))
+	fmt.Print(ToString(amount))
 	// Output: 42
-}
-
-func TestDbTime(t *testing.T) {
-
 }
 
 func TestTimezone(t *testing.T) {

@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -16,14 +16,14 @@
 package notifiers
 
 import (
-	"github.com/hunterlong/statup/core/notifier"
+	"github.com/hunterlong/statping/core/notifier"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
 
 const (
-	commandTest = "curl -I https://statup.io/"
+	commandTest = "curl -I https://statping.com/"
 )
 
 func TestCommandNotifier(t *testing.T) {

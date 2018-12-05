@@ -7,24 +7,24 @@ RUN curl -L -s https://github.com/golang/dep/releases/download/$DEP_VERSION/dep-
     chmod +x /go/bin/dep
 RUN curl -L -s https://assets.statup.io/sass -o /usr/local/bin/sass && \
     chmod +x /usr/local/bin/sass
-WORKDIR /go/src/github.com/hunterlong/statup
-ADD . /go/src/github.com/hunterlong/statup
+WORKDIR /go/src/github.com/hunterlong/statping
+ADD . /go/src/github.com/hunterlong/statping
 RUN make dep
 RUN make dev-deps
 RUN make install
 
-# Statup :latest Docker Image
+# Statping :latest Docker Image
 FROM alpine:latest
 MAINTAINER "Hunter Long (https://github.com/hunterlong)"
 
 ARG VERSION
 ENV IS_DOCKER=true
-ENV STATUP_DIR=/app
+ENV STATPING_DIR=/app
 
 RUN apk --no-cache add curl jq
 
 COPY --from=base /usr/local/bin/sass /usr/local/bin/sass
-COPY --from=base /go/bin/statup /usr/local/bin/statup
+COPY --from=base /go/bin/statping /usr/local/bin/statping
 
 WORKDIR /app
 VOLUME /app
@@ -32,4 +32,4 @@ EXPOSE 8080
 
 HEALTHCHECK --interval=5s --timeout=5s --retries=5 CMD curl -s "http://localhost:8080/health" | jq -r -e ".online==true"
 
-CMD ["statup"]
+CMD ["statping"]

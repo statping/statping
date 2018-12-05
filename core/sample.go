@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -17,13 +17,13 @@ package core
 
 import (
 	"fmt"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"math/rand"
 	"time"
 )
 
-// InsertSampleData will create the example/dummy services for a brand new Statup installation
+// InsertSampleData will create the example/dummy services for a brand new Statping installation
 func InsertSampleData() error {
 	utils.Log(1, "Inserting Sample Data...")
 	s1 := ReturnService(&types.Service{
@@ -37,8 +37,8 @@ func InsertSampleData() error {
 		Order:          1,
 	})
 	s2 := ReturnService(&types.Service{
-		Name:           "Statup Github",
-		Domain:         "https://github.com/hunterlong/statup",
+		Name:           "Statping Github",
+		Domain:         "https://github.com/hunterlong/statping",
 		ExpectedStatus: 200,
 		Interval:       30,
 		Type:           "http",
@@ -150,7 +150,7 @@ func InsertSampleHits() error {
 // insertSampleCore will create a new Core for the seed
 func insertSampleCore() error {
 	core := &types.Core{
-		Name:        "Statup Sample Data",
+		Name:        "Statping Sample Data",
 		Description: "This data is only used to testing",
 		ApiKey:      "sample",
 		ApiSecret:   "samplesecret",
@@ -164,7 +164,7 @@ func insertSampleCore() error {
 }
 
 // insertSampleUsers will create 2 admin users for a seed database
-func insertSampleUsers() {
+func insertSampleUsers() error {
 	u2 := ReturnUser(&types.User{
 		Username: "testadmin",
 		Password: "password123",
@@ -179,11 +179,12 @@ func insertSampleUsers() {
 		Admin:    types.NewNullBool(true),
 	})
 
-	u2.Create()
-	u3.Create()
+	_, err := u2.Create()
+	_, err = u3.Create()
+	return err
 }
 
-func insertMessages() {
+func insertMessages() error {
 	m1 := ReturnMessage(&types.Message{
 		Title:       "Routine Downtime",
 		Description: "This is an example a upcoming message for a service!",
@@ -191,8 +192,9 @@ func insertMessages() {
 		StartOn:     time.Now().Add(15 * time.Minute),
 		EndOn:       time.Now().Add(2 * time.Hour),
 	})
-	m1.Create()
-
+	if _, err := m1.Create(); err != nil {
+		return err
+	}
 	m2 := ReturnMessage(&types.Message{
 		Title:       "Server Reboot",
 		Description: "This is another example a upcoming message for a service!",
@@ -200,16 +202,29 @@ func insertMessages() {
 		StartOn:     time.Now().Add(15 * time.Minute),
 		EndOn:       time.Now().Add(2 * time.Hour),
 	})
-	m2.Create()
+	if _, err := m2.Create(); err != nil {
+		return err
+	}
+	return nil
 }
 
-// InsertLargeSampleData will create the example/dummy services for testing the Statup server
+// InsertLargeSampleData will create the example/dummy services for testing the Statping server
 func InsertLargeSampleData() error {
-	insertSampleCore()
-	InsertSampleData()
-	insertSampleUsers()
-	insertSampleCheckins()
-	insertMessages()
+	if err := insertSampleCore(); err != nil {
+		return err
+	}
+	if err := InsertSampleData(); err != nil {
+		return err
+	}
+	if err := insertSampleUsers(); err != nil {
+		return err
+	}
+	if err := insertSampleCheckins(); err != nil {
+		return err
+	}
+	if err := insertMessages(); err != nil {
+		return err
+	}
 	s6 := ReturnService(&types.Service{
 		Name:           "JSON Lint",
 		Domain:         "https://jsonlint.com",
@@ -223,7 +238,7 @@ func InsertLargeSampleData() error {
 
 	s7 := ReturnService(&types.Service{
 		Name:           "Demo Page",
-		Domain:         "https://demo.statup.io",
+		Domain:         "https://demo.statping.com",
 		ExpectedStatus: 200,
 		Interval:       30,
 		Type:           "http",

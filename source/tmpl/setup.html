@@ -1,12 +1,14 @@
-{{define "title"}}Statup | Setup{{end}}
-{{define "description"}}Setup your Statup instance to monitor your websites and servers using MySQL, Postgres or SQLite.{{end}}
+{{define "title"}}Statping | Setup{{end}}
+{{define "description"}}Setup your Statping instance to monitor your websites and servers using MySQL, Postgres or SQLite.{{end}}
 {{define "content"}}
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
-    <div class="col-4 offset-4 mt-2 mb-5"><img width="100%" src="/statup.png"></div>
+    <div class="col-6 offset-3 mt-2 mb-5">
+        <img width="100%" src="/banner.png">
+    </div>
     <div class="col-12">
     {{ if .Error }}
         <div class="alert alert-danger" role="alert">
-        {{ .Error }}
+            {{ .Error }}
         </div>
     {{ end }}
         <form method="POST" id="setup_form" action="/setup">

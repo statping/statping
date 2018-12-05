@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -16,51 +16,93 @@
 package main
 
 import (
+	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/utils"
 	"github.com/rendon/testcli"
 	"github.com/stretchr/testify/assert"
+	"os"
+	"os/exec"
 	"testing"
+	"time"
 )
 
-func TestRunSQLiteApp(t *testing.T) {
-	t.SkipNow()
-	run := catchCLI([]string{"app"})
-	assert.Nil(t, run)
+var (
+	dir string
+)
+
+func init() {
+	dir = utils.Directory
 }
 
-func TestConfirmVersion(t *testing.T) {
-	t.SkipNow()
-	assert.NotEmpty(t, VERSION)
+func TestStartServerCommand(t *testing.T) {
+	os.Setenv("DB_CONN", "sqlite")
+	cmd := helperCommand(nil, "")
+	var got = make(chan string)
+	commandAndSleep(cmd, time.Duration(8*time.Second), got)
+	os.Unsetenv("DB_CONN")
+	gg, _ := <-got
+	assert.Contains(t, gg, "DB_CONN environment variable was found")
+	assert.Contains(t, gg, "Core database does not exist, creating now!")
+	assert.Contains(t, gg, "Starting monitoring process for 5 Services")
 }
 
 func TestVersionCommand(t *testing.T) {
-	c := testcli.Command("statup", "version")
+	c := testcli.Command("statping", "version")
 	c.Run()
-	assert.True(t, c.StdoutContains("Statup v"+VERSION))
+	assert.True(t, c.StdoutContains("Statping v"+VERSION))
 }
 
 func TestHelpCommand(t *testing.T) {
-	c := testcli.Command("statup", "help")
+	c := testcli.Command("statping", "help")
 	c.Run()
 	t.Log(c.Stdout())
-	assert.True(t, c.StdoutContains("statup help               - Shows the user basic information about Statup"))
+	assert.True(t, c.StdoutContains("statping help               - Shows the user basic information about Statping"))
 }
 
 func TestExportCommand(t *testing.T) {
-	t.SkipNow()
-	c := testcli.Command("statup", "export")
-	c.Run()
-	t.Log(c.Stdout())
-	assert.True(t, c.StdoutContains("Exporting Static 'index.html' page"))
+	cmd := helperCommand(nil, "static")
+	var got = make(chan string)
+	commandAndSleep(cmd, time.Duration(10*time.Second), got)
+	gg, _ := <-got
+	t.Log(gg)
+	assert.Contains(t, gg, "Exporting Static 'index.html' page...")
+	assert.Contains(t, gg, "Exported Statping index page: 'index.html'")
 	assert.True(t, fileExists(dir+"/index.html"))
 }
 
+func TestUpdateCommand(t *testing.T) {
+	cmd := helperCommand(nil, "version")
+	var got = make(chan string)
+	commandAndSleep(cmd, time.Duration(15*time.Second), got)
+	gg, _ := <-got
+	t.Log(gg)
+	assert.Contains(t, gg, "Statping")
+}
+
 func TestAssetsCommand(t *testing.T) {
-	c := testcli.Command("statup", "assets")
+	c := testcli.Command("statping", "assets")
 	c.Run()
 	t.Log(c.Stdout())
 	t.Log("Directory for Assets: ", dir)
 	assert.FileExists(t, dir+"/assets/robots.txt")
 	assert.FileExists(t, dir+"/assets/scss/base.scss")
+}
+
+func TestRunCommand(t *testing.T) {
+	cmd := helperCommand(nil, "run")
+	var got = make(chan string)
+	commandAndSleep(cmd, time.Duration(15*time.Second), got)
+	gg, _ := <-got
+	t.Log(gg)
+	assert.Contains(t, gg, "Running 1 time and saving to database...")
+	assert.Contains(t, gg, "Check is complete.")
+}
+
+func TestEnvironmentVarsCommand(t *testing.T) {
+	c := testcli.Command("statping", "env")
+	c.Run()
+	assert.True(t, c.StdoutContains("Statping Environment Variable"))
 }
 
 func TestVersionCLI(t *testing.T) {
@@ -76,8 +118,7 @@ func TestAssetsCLI(t *testing.T) {
 }
 
 func TestSassCLI(t *testing.T) {
-	run := catchCLI([]string{"sass"})
-	assert.EqualError(t, run, "end")
+	catchCLI([]string{"sass"})
 	assert.FileExists(t, dir+"/assets/css/base.css")
 }
 
@@ -88,6 +129,7 @@ func TestUpdateCLI(t *testing.T) {
 }
 
 func TestTestPackageCLI(t *testing.T) {
+	t.SkipNow()
 	run := catchCLI([]string{"test", "plugins"})
 	assert.EqualError(t, run, "end")
 }
@@ -98,12 +140,49 @@ func TestHelpCLI(t *testing.T) {
 }
 
 func TestRunOnceCLI(t *testing.T) {
-	t.SkipNow()
 	run := catchCLI([]string{"run"})
-	assert.Nil(t, run)
+	assert.EqualError(t, run, "end")
 }
 
 func TestEnvCLI(t *testing.T) {
 	run := catchCLI([]string{"env"})
 	assert.Error(t, run)
+	Clean()
+}
+
+func commandAndSleep(cmd *exec.Cmd, duration time.Duration, out chan<- string) {
+	go func(out chan<- string) {
+		runCommand(cmd, out)
+	}(out)
+	time.Sleep(duration)
+	cmd.Process.Kill()
+}
+
+func helperCommand(envs []string, s ...string) *exec.Cmd {
+	cmd := exec.Command("statping", s...)
+	return cmd
+}
+
+func runCommand(c *exec.Cmd, out chan<- string) {
+	bout, _ := c.CombinedOutput()
+	out <- string(bout)
+}
+
+func fileExists(file string) bool {
+	if _, err := os.Stat(file); os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
+
+func Clean() {
+	utils.DeleteFile(dir + "/config.yml")
+	utils.DeleteFile(dir + "/statping.db")
+	utils.DeleteDirectory(dir + "/assets")
+	utils.DeleteDirectory(dir + "/logs")
+	core.CoreApp = core.NewCore()
+	source.Assets()
+	//core.CloseDB()
+	os.Unsetenv("DB_CONN")
+	time.Sleep(2 * time.Second)
 }

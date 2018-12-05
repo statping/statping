@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -21,15 +21,16 @@ import (
 
 // Message is for creating Announcements, Alerts and other messages for the end users
 type Message struct {
-	Id           int64         `gorm:"primary_key;column:id" json:"id"`
-	Title        string        `gorm:"column:title" json:"title"`
-	Description  string        `gorm:"column:description" json:"description"`
-	StartOn      time.Time     `gorm:"column:start_on" json:"start_on"`
-	EndOn        time.Time     `gorm:"column:end_on" json:"end_on"`
-	ServiceId    int64         `gorm:"index;column:service" json:"service"`
-	NotifyUsers  NullBool      `gorm:"column:notify_users" json:"notify_users"`
-	NotifyMethod string        `gorm:"column:notify_method" json:"notify_method"`
-	NotifyBefore time.Duration `gorm:"column:notify_before" json:"notify_before"`
-	CreatedAt    time.Time     `gorm:"column:created_at" json:"created_at" json:"created_at"`
-	UpdatedAt    time.Time     `gorm:"column:updated_at" json:"updated_at" json:"updated_at"`
+	Id                int64     `gorm:"primary_key;column:id" json:"id"`
+	Title             string    `gorm:"column:title" json:"title"`
+	Description       string    `gorm:"column:description" json:"description"`
+	StartOn           time.Time `gorm:"column:start_on" json:"start_on"`
+	EndOn             time.Time `gorm:"column:end_on" json:"end_on"`
+	ServiceId         int64     `gorm:"index;column:service" json:"service"`
+	NotifyUsers       NullBool  `gorm:"column:notify_users" json:"notify_users"`
+	NotifyMethod      string    `gorm:"column:notify_method" json:"notify_method"`
+	NotifyBefore      NullInt64 `gorm:"column:notify_before" json:"notify_before"`
+	NotifyBeforeScale string    `gorm:"column:notify_before_scale" json:"notify_before_scale"`
+	CreatedAt         time.Time `gorm:"column:created_at" json:"created_at" json:"created_at"`
+	UpdatedAt         time.Time `gorm:"column:updated_at" json:"updated_at" json:"updated_at"`
 }

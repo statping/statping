@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -16,11 +16,13 @@
 package utils
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"github.com/ararog/timeago"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
 	"regexp"
@@ -30,23 +32,28 @@ import (
 )
 
 var (
-	// Directory returns the current path or the STATUP_DIR environment variable
+	// Directory returns the current path or the STATPING_DIR environment variable
 	Directory string
 )
 
-// init will set the utils.Directory to the current running directory, or STATUP_DIR if it is set
+// init will set the utils.Directory to the current running directory, or STATPING_DIR if it is set
 func init() {
-	if os.Getenv("STATUP_DIR") != "" {
-		Directory = os.Getenv("STATUP_DIR")
+	if os.Getenv("STATPING_DIR") != "" {
+		Directory = os.Getenv("STATPING_DIR")
 	} else {
 		Directory = dir()
 	}
 }
 
-// StringInt converts a string to an int64
-func StringInt(s string) int64 {
-	num, _ := strconv.Atoi(s)
-	return int64(num)
+// ToInt converts a int to a string
+func ToInt(s interface{}) int64 {
+	switch v := s.(type) {
+	case string:
+		val, _ := strconv.Atoi(v)
+		return int64(val)
+	default:
+		return 0
+	}
 }
 
 // ToString converts a int to a string
@@ -55,14 +62,11 @@ func ToString(s interface{}) string {
 	case int, int32, int64:
 		return fmt.Sprintf("%v", v)
 	case float32, float64:
-		return fmt.Sprintf("%v", v)
+		return fmt.Sprintf("%f", v)
 	case []byte:
 		return string(v)
 	case bool:
-		if v {
-			return "true"
-		}
-		return "false"
+		return fmt.Sprintf("%t", v)
 	default:
 		return fmt.Sprintf("%v", v)
 	}
@@ -218,4 +222,40 @@ func DurationReadable(d time.Duration) string {
 func SaveFile(filename string, data []byte) error {
 	err := ioutil.WriteFile(filename, data, 0644)
 	return err
+}
+
+// HttpRequest is a global function to send a HTTP request
+func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration) ([]byte, *http.Response, error) {
+	var err error
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+		DisableKeepAlives:     true,
+		ResponseHeaderTimeout: timeout,
+		TLSHandshakeTimeout:   timeout,
+	}
+	client := &http.Client{
+		Transport: transport,
+		Timeout:   timeout,
+	}
+	r := new(http.Request)
+	for _, h := range headers {
+		keyVal := strings.Split(h, "=")
+		r.Header.Add(keyVal[0], keyVal[1])
+	}
+	if r, err = http.NewRequest(method, url, body); err != nil {
+		return nil, nil, err
+	}
+	r.Header.Set("User-Agent", "Statping")
+	if content != nil {
+		r.Header.Set("Content-Type", content.(string))
+	}
+	var resp *http.Response
+	if resp, err = client.Do(r); err != nil {
+		return nil, resp, err
+	}
+	defer resp.Body.Close()
+	contents, err := ioutil.ReadAll(resp.Body)
+	return contents, resp, err
 }

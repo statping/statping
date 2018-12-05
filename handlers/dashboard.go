@@ -1,8 +1,8 @@
-// Statup
+// Statping
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statup
+// https://github.com/hunterlong/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -17,12 +17,10 @@ package handlers
 
 import (
 	"bytes"
-	"encoding/json"
-	"github.com/hunterlong/statup/core"
-	"github.com/hunterlong/statup/core/notifier"
-	"github.com/hunterlong/statup/source"
-	"github.com/hunterlong/statup/types"
-	"github.com/hunterlong/statup/utils"
+	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/utils"
 	"net/http"
 	"strconv"
 	"time"
@@ -31,9 +29,9 @@ import (
 func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsAuthenticated(r) {
 		err := core.ErrorResponse{}
-		executeResponse(w, r, "login.html", err, nil)
+		ExecuteResponse(w, r, "login.html", err, nil)
 	} else {
-		executeResponse(w, r, "dashboard.html", core.CoreApp, nil)
+		ExecuteResponse(w, r, "dashboard.html", core.CoreApp, nil)
 	}
 }
 
@@ -53,7 +51,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 	} else {
 		err := core.ErrorResponse{Error: "Incorrect login information submitted, try again."}
-		executeResponse(w, r, "login.html", err, nil)
+		ExecuteResponse(w, r, "login.html", err, nil)
 	}
 }
 
@@ -70,7 +68,7 @@ func helpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	help := source.HelpMarkdown()
-	executeResponse(w, r, "help.html", help, nil)
+	ExecuteResponse(w, r, "help.html", help, nil)
 }
 
 func logsHandler(w http.ResponseWriter, r *http.Request) {
@@ -80,13 +78,13 @@ func logsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	utils.LockLines.Lock()
 	logs := make([]string, 0)
-	len := len(utils.LastLines)
+	length := len(utils.LastLines)
 	// We need string log lines from end to start.
-	for i := len - 1; i >= 0; i-- {
+	for i := length - 1; i >= 0; i-- {
 		logs = append(logs, utils.LastLines[i].FormatForHtml()+"\r\n")
 	}
 	utils.LockLines.Unlock()
-	executeResponse(w, r, "logs.html", logs, nil)
+	ExecuteResponse(w, r, "logs.html", logs, nil)
 }
 
 func logsLineHandler(w http.ResponseWriter, r *http.Request) {
@@ -95,17 +93,10 @@ func logsLineHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if lastLine := utils.GetLastLine(); lastLine != nil {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(lastLine.FormatForHtml()))
 	}
-}
-
-type exportData struct {
-	Core      *types.Core              `json:"core"`
-	Services  []types.ServiceInterface `json:"services"`
-	Messages  []*types.Message         `json:"messages"`
-	Checkins  []*core.Checkin          `json:"checkins"`
-	Users     []*core.User             `json:"users"`
-	Notifiers []types.AllNotifiers     `json:"notifiers"`
 }
 
 func exportHandler(w http.ResponseWriter, r *http.Request) {
@@ -120,17 +111,7 @@ func exportHandler(w http.ResponseWriter, r *http.Request) {
 		notifiers = append(notifiers, notifier.Select())
 	}
 
-	users, _ := core.SelectAllUsers()
-
-	data := exportData{
-		Core:      core.CoreApp.Core,
-		Notifiers: core.CoreApp.Notifications,
-		Checkins:  core.AllCheckins(),
-		Users:     users,
-		Services:  core.CoreApp.Services,
-	}
-
-	export, _ := json.Marshal(data)
+	export, _ := core.ExportSettings()
 
 	mime := http.DetectContentType(export)
 	fileSize := len(string(export))

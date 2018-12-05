@@ -16,15 +16,15 @@ DOCKER_PORT=8080
 
 function usage() {
 cat <<EOM
-##### Statup Installer #####
-A simple shell script that will help you install Statup on your local machine, AWS, or Docker.
+##### Statping Installer #####
+A simple shell script that will help you install Statping on your local machine, AWS, or Docker.
 
 Commands:
     install             Install statup to your local system
-    aws                 Create a new EC2 instance running Statup
-    docker              Start the latest Statup Docker image
-    docker-compose      Create Statup with a Postgres database
-    version             Return the latest version of Statup
+    aws                 Create a new EC2 instance running Statping
+    docker              Start the latest Statping Docker image
+    docker-compose      Create Statping with a Postgres database
+    version             Return the latest version of Statping
 
 Available Flags:
     -k | --aws-access-key        AWS Access Key ID. May also be set as environment variable AWS_ACCESS_KEY_ID
@@ -32,7 +32,7 @@ Available Flags:
     -r | --region                AWS Region Name. May also be set as environment variable AWS_DEFAULT_REGION
     -x | --verbose               Verbose output
 
-Visit the github repo at: https://github.com/hunterlong/statup
+Visit the github repo at: https://github.com/hunterlong/statping
 EOM
     exit 3
 }
@@ -113,18 +113,18 @@ function askSecurityName {
 
 # ask user if they want to install statup to the bin folder
 function askInstallGlobal {
-    read -p "Do you want to move Statup to the bin folder? (y/N): "  MOVEBIN
+    read -p "Do you want to move Statping to the bin folder? (y/N): "  MOVEBIN
 }
 
 # ask user if they want statup to start on boot
 function askInstallSystemCTL {
-    read -p "Do you want to auto start Statup on boot? (y/N): "  SYSTEMCTL
+    read -p "Do you want to auto start Statping on boot? (y/N): "  SYSTEMCTL
 }
 
 # Task to create a new AWS security group
 function awsSecurityGroup {
   echo "Running task: Creating Security Group";
-  GROUPID=`$AWS_ECS ec2 create-security-group --group-name "$EC2SECGROUP" --description "Statup HTTP Server on port 80 and 443" | jq -r .GroupId`
+  GROUPID=`$AWS_ECS ec2 create-security-group --group-name "$EC2SECGROUP" --description "Statping HTTP Server on port 80 and 443" | jq -r .GroupId`
   echo "Created new security group: $GROUPID";
   awsAuthSecurityGroup
 }
@@ -166,7 +166,7 @@ function checkEC2Instance {
   fi
 }
 
-# function to create the Statup EC2 instance
+# function to create the Statping EC2 instance
 function awsTask {
     setAWSPresets
     askEC2Name
@@ -194,7 +194,7 @@ function installSystemCTL {
 FILE=statup.service
 cat > $FILE <<- EOM
 [Unit]
-Description=Statup Server
+Description=Statping Server
 After=network.target
 After=systemd-user-sessions.service
 After=network-online.target
@@ -212,7 +212,7 @@ mv $FILE /etc/systemd/system/$FILE
 systemctl daemon-reload
 systemctl enable statup.service
 systemctl start statup
-echo "Statup has been installed to SystemCTL and will start on boot"
+echo "Statping has been installed to SystemCTL and will start on boot"
 }
 
 
@@ -221,7 +221,7 @@ function downloadBin {
      getArch
      get_latest_release
      GIT_DOWNLOAD="https://github.com/$DOCKER_IMG/releases/download/$STATUP_VERSION/statup-$OS-$ARCH.tar.gz"
-     echo "Downloading Statup $STATUP_VERSION from $GIT_DOWNLOAD"
+     echo "Downloading Statping $STATUP_VERSION from $GIT_DOWNLOAD"
      curl -L --silent $GIT_DOWNLOAD | tar xz
      echo "Download complete"
 }
@@ -229,11 +229,11 @@ function downloadBin {
 # install statup locally from github
 function localTask {
      downloadBin
-     echo "Try Statup by running 'statup version'!"
+     echo "Try Statping by running 'statup version'!"
      askInstallGlobal
      if [ $MOVEBIN == "y" ]; then
         moveToBin
-        echo "Statup can now be ran anywhere with command 'statup'"
+        echo "Statping can now be ran anywhere with command 'statup'"
         echo "Install location: /usr/local/bin/statup"
         if [ $OS == "linux" ]; then
           askInstallSystemCTL
@@ -248,9 +248,9 @@ function uninstallTask {
     rm -f /usr/local/bin/statup
 }
 
-# start the Statup docker image
+# start the Statping docker image
 function dockerTask {
-     echo "Starting Statup Docker container on port $DOCKER_PORT"
+     echo "Starting Statping Docker container on port $DOCKER_PORT"
      $DOCKER_CLI run -d -p $DOCKER_PORT:8080 $DOCKER_IMG
 }
 
@@ -293,8 +293,8 @@ function getOS {
 function echoVersion {
     require jq
     get_latest_release
-    echo "Statup Latest: $STATUP_VERSION"
-    echo "Statuper Tool: v$VERSION"
+    echo "Statping Latest: $STATUP_VERSION"
+    echo "Statpinger Tool: v$VERSION"
 }
 
 # main CLI entrypoint

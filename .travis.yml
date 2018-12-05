@@ -6,14 +6,14 @@ language: go
 go:
   - "1.11.1"
 
-go_import_path: github.com/hunterlong/statup
+go_import_path: github.com/hunterlong/statping
 
 cache:
   directories:
     - $GOPATH/pkg/dep
     - ~/.npm
     - ~/.cache
-    - $GOPATH/src/github.com/hunterlong/statup/vendor
+    - $GOPATH/src/github.com/hunterlong/statping/vendor
 
 sudo: required
 
@@ -25,12 +25,13 @@ services:
 
 env:
   global:
+    - PATH=/snap/bin:$PATH
     - DB_HOST=localhost
     - DB_USER=travis
     - DB_PASS=
     - DB_DATABASE=test
     - GO_ENV=test
-    - STATUP_DIR=$GOPATH/src/github.com/hunterlong/statup
+    - STATPING_DIR=$GOPATH/src/github.com/hunterlong/statping
 
 before_deploy:
   - git config --local user.name "hunterlong"
@@ -39,11 +40,6 @@ before_deploy:
 
 after_deploy:
   - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make publish-homebrew; fi
-
-deploy:
-  - provider: releases
-    api_key: $GH_TOKEN
-    skip_cleanup: true
 
 matrix:
   allow_failures:
@@ -54,16 +50,17 @@ notifications:
   email: true
 
 branches:
-  except:
-    - /^v\d/
+  only:
+    - master
+    - dev
 
 before_install:
   - curl -L -s https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64 -o $GOPATH/bin/dep
   - chmod +x $GOPATH/bin/dep
-  - npm install -g sass
-  - npm install -g newman
 
 install:
+  - npm install -g sass
+  - npm install -g newman
   - make dev-deps
   - make dep
   - make install
