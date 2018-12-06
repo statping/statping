@@ -31,7 +31,7 @@ func messagesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	messages, _ := core.SelectMessages()
-	ExecuteResponse(w, r, "messages.html", messages, nil)
+	ExecuteResponse(w, r, "messages.gohtml", messages, nil)
 }
 
 func viewMessageHandler(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +46,7 @@ func viewMessageHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	ExecuteResponse(w, r, "message.html", message, nil)
+	ExecuteResponse(w, r, "message.gohtml", message, nil)
 }
 
 func apiAllMessagesHandler(w http.ResponseWriter, r *http.Request) {

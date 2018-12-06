@@ -120,8 +120,8 @@ func (h *Hit) AfterFind() (err error) {
 	return
 }
 
-// AfterFind for failure will set the timezone
-func (f *failure) AfterFind() (err error) {
+// AfterFind for Failure will set the timezone
+func (f *Failure) AfterFind() (err error) {
 	f.CreatedAt = utils.Timezoner(f.CreatedAt, CoreApp.Timezone)
 	return
 }
@@ -163,8 +163,8 @@ func (h *Hit) BeforeCreate() (err error) {
 	return
 }
 
-// BeforeCreate for failure will set CreatedAt to UTC
-func (f *failure) BeforeCreate() (err error) {
+// BeforeCreate for Failure will set CreatedAt to UTC
+func (f *Failure) BeforeCreate() (err error) {
 	if f.CreatedAt.IsZero() {
 		f.CreatedAt = time.Now().UTC()
 	}

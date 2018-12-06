@@ -21,6 +21,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"net"
 	"net/http"
 	"time"
@@ -34,7 +35,7 @@ func apiAllCheckinsHandler(w http.ResponseWriter, r *http.Request) {
 	checkins := core.AllCheckins()
 	for _, c := range checkins {
 		c.Hits = c.AllHits()
-		c.Failures = c.AllFailures()
+		c.Failures = c.LimitedFailures(64)
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(checkins)
@@ -51,8 +52,8 @@ func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(fmt.Errorf("checkin %v was not found", vars["api"]), w, r)
 		return
 	}
-	checkin.Hits = checkin.AllHits()
-	checkin.Failures = checkin.AllFailures()
+	checkin.Hits = checkin.LimitedHits(32)
+	checkin.Failures = checkin.LimitedFailures(32)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(checkin)
 }
@@ -67,6 +68,11 @@ func checkinCreateHandler(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&checkin)
 	if err != nil {
 		sendErrorJson(err, w, r)
+		return
+	}
+	service := core.SelectService(checkin.ServiceId)
+	if service == nil {
+		sendErrorJson(fmt.Errorf("missing service_id field"), w, r)
 		return
 	}
 	_, err = checkin.Create()
@@ -85,20 +91,25 @@ func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
-	checkinHit := core.ReturnCheckinHit(&types.CheckinHit{
+
+	hit := &types.CheckinHit{
 		Checkin:   checkin.Id,
 		From:      ip,
 		CreatedAt: time.Now().UTC(),
-	})
+	}
+	checkinHit := core.ReturnCheckinHit(hit)
 	if checkin.Last() == nil {
 		checkin.Start()
 		go checkin.Routine()
 	}
 	_, err := checkinHit.Create()
+	checkin.Hits = append(checkin.Hits, checkinHit.CheckinHit)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
+	checkin.Failing = false
+	checkin.LastHit = utils.Timezoner(time.Now().UTC(), core.CoreApp.Timezone)
 	w.Header().Set("Content-Type", "application/json")
 	sendJsonAction(checkinHit, "update", w, r)
 }

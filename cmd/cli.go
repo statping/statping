@@ -168,7 +168,7 @@ func ExportIndexHTML() []byte {
 	}
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("GET", "/", nil)
-	handlers.ExecuteResponse(w, r, "index.html", nil, nil)
+	handlers.ExecuteResponse(w, r, "index.gohtml", nil, nil)
 	return w.Body.Bytes()
 }
 

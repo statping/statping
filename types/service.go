@@ -46,8 +46,9 @@ type Service struct {
 	SleepDuration      time.Duration      `gorm:"-" json:"-"`
 	LastResponse       string             `gorm:"-" json:"-"`
 	LastStatusCode     int                `gorm:"-" json:"status_code"`
-	LastOnline         time.Time          `gorm:"-" json:"last_online"`
+	LastOnline         time.Time          `gorm:"-" json:"last_success"`
 	Failures           []FailureInterface `gorm:"-" json:"failures,omitempty"`
+	Checkins           []CheckinInterface `gorm:"-" json:"checkins,omitempty"`
 }
 
 type ServiceInterface interface {

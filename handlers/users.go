@@ -33,7 +33,7 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	users, _ := core.SelectAllUsers()
-	ExecuteResponse(w, r, "users.html", users, nil)
+	ExecuteResponse(w, r, "users.gohtml", users, nil)
 }
 
 func usersEditHandler(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +44,7 @@ func usersEditHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
 	user, _ := core.SelectUser(int64(id))
-	ExecuteResponse(w, r, "user.html", user, nil)
+	ExecuteResponse(w, r, "user.gohtml", user, nil)
 }
 
 func apiUserHandler(w http.ResponseWriter, r *http.Request) {

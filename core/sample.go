@@ -359,13 +359,13 @@ func InsertLargeSampleData() error {
 func insertFailureRecords(since time.Time, amount int64) {
 	for i := int64(14); i <= 15; i++ {
 		service := SelectService(i)
-		utils.Log(1, fmt.Sprintf("Adding %v failure records to service %v", amount, service.Name))
+		utils.Log(1, fmt.Sprintf("Adding %v Failure records to service %v", amount, service.Name))
 		createdAt := since
 
 		for fi := int64(1); fi <= amount; fi++ {
 			createdAt = createdAt.Add(2 * time.Minute)
 
-			failure := &failure{&types.Failure{
+			failure := &Failure{&types.Failure{
 				Service:   service.Id,
 				Issue:     "testing right here",
 				CreatedAt: createdAt,

@@ -51,7 +51,7 @@ func servicesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "services.html", core.CoreApp.Services, nil)
+	ExecuteResponse(w, r, "services.gohtml", core.CoreApp.Services, nil)
 }
 
 type serviceOrder struct {
@@ -115,7 +115,7 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 		Data      string
 	}{serv, start.Format(utils.FlatpickrReadable), end.Format(utils.FlatpickrReadable), start.Unix(), end.Unix(), data.ToString()}
 
-	ExecuteResponse(w, r, "service.html", out, nil)
+	ExecuteResponse(w, r, "service.gohtml", out, nil)
 }
 
 func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -124,14 +124,13 @@ func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	servicer := core.SelectServicer(utils.ToInt(vars["id"]))
+	servicer := core.SelectService(utils.ToInt(vars["id"]))
 	if servicer == nil {
 		sendErrorJson(errors.New("service not found"), w, r)
 		return
 	}
-	service := servicer.Select()
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(service)
+	json.NewEncoder(w).Encode(servicer)
 }
 
 func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -161,8 +160,8 @@ func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	service := core.SelectServicer(utils.ToInt(vars["id"]))
-	if service.Select() == nil {
+	service := core.SelectService(utils.ToInt(vars["id"]))
+	if service == nil {
 		sendErrorJson(errors.New("service not found"), w, r)
 		return
 	}
@@ -256,5 +255,5 @@ func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	service := core.SelectService(utils.ToInt(vars["id"]))
 	service.DeleteFailures()
-	ExecuteResponse(w, r, "services.html", core.CoreApp.Services, "/services")
+	ExecuteResponse(w, r, "services.gohtml", core.CoreApp.Services, "/services")
 }

@@ -162,7 +162,7 @@ func TestApiUpdateServiceHandler(t *testing.T) {
 }
 
 func TestApiDeleteServiceHandler(t *testing.T) {
-	rr, err := httpRequestAPI(t, "DELETE", "/api/services/1", nil)
+	rr, err := httpRequestAPI(t, "DELETE", "/api/services/2", nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()
 	var obj apiResponse
@@ -270,7 +270,7 @@ func TestApiRenewHandler(t *testing.T) {
 func TestApiCheckinHandler(t *testing.T) {
 	t.SkipNow()
 	service := core.SelectService(1)
-	checkin := service.Checkins()
+	checkin := service.AllCheckins()
 	rr, err := httpRequestAPI(t, "GET", "/api/checkin/"+checkin[0].ApiKey, nil)
 	assert.Nil(t, err)
 	body := rr.Body.String()

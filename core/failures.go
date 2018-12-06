@@ -25,7 +25,7 @@ import (
 	"time"
 )
 
-type failure struct {
+type Failure struct {
 	*types.Failure
 }
 
@@ -33,9 +33,9 @@ const (
 	limitedFailures = 32
 )
 
-// CreateFailure will create a new failure record for a service
+// CreateFailure will create a new Failure record for a service
 func (s *Service) CreateFailure(fail types.FailureInterface) (int64, error) {
-	f := fail.(*failure)
+	f := fail.(*Failure)
 	f.Service = s.Id
 	row := failuresDB().Create(f)
 	if row.Error != nil {
@@ -51,8 +51,8 @@ func (s *Service) CreateFailure(fail types.FailureInterface) (int64, error) {
 }
 
 // AllFailures will return all failures attached to a service
-func (s *Service) AllFailures() []*failure {
-	var fails []*failure
+func (s *Service) AllFailures() []*Failure {
+	var fails []*Failure
 	col := failuresDB().Where("service = ?", s.Id).Not("method = 'checkin'").Order("id desc")
 	err := col.Find(&fails)
 	if err.Error != nil {
@@ -72,32 +72,32 @@ func (s *Service) DeleteFailures() {
 }
 
 // LimitedFailures will return the last amount of failures from a service
-func (s *Service) LimitedFailures(amount int64) []*failure {
-	var failArr []*failure
+func (s *Service) LimitedFailures(amount int64) []*Failure {
+	var failArr []*Failure
 	failuresDB().Where("service = ?", s.Id).Not("method = 'checkin'").Order("id desc").Limit(amount).Find(&failArr)
 	return failArr
 }
 
 // LimitedFailures will return the last amount of failures from a service
-func (s *Service) LimitedCheckinFailures(amount int64) []*failure {
-	var failArr []*failure
+func (s *Service) LimitedCheckinFailures(amount int64) []*Failure {
+	var failArr []*Failure
 	failuresDB().Where("service = ?", s.Id).Where("method = 'checkin'").Order("id desc").Limit(amount).Find(&failArr)
 	return failArr
 }
 
-// Ago returns a human readable timestamp for a failure
-func (f *failure) Ago() string {
+// Ago returns a human readable timestamp for a Failure
+func (f *Failure) Ago() string {
 	got, _ := timeago.TimeAgoWithTime(time.Now(), f.CreatedAt)
 	return got
 }
 
 // Select returns a *types.Failure
-func (f *failure) Select() *types.Failure {
+func (f *Failure) Select() *types.Failure {
 	return f.Failure
 }
 
-// Delete will remove a failure record from the database
-func (f *failure) Delete() error {
+// Delete will remove a Failure record from the database
+func (f *Failure) Delete() error {
 	db := failuresDB().Delete(f)
 	return db.Error
 }
@@ -146,8 +146,8 @@ func (s *Service) TotalFailuresSince(ago time.Time) (uint64, error) {
 	return count, err.Error
 }
 
-// ParseError returns a human readable error for a failure
-func (f *failure) ParseError() string {
+// ParseError returns a human readable error for a Failure
+func (f *Failure) ParseError() string {
 	if f.Method == "checkin" {
 		return fmt.Sprintf("Checkin is Offline")
 	}

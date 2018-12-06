@@ -104,7 +104,7 @@ func TestSlackNotifier(t *testing.T) {
 		slacker.OnSuccess(TestService)
 		assert.Equal(t, 1, len(slacker.Queue))
 		go notifier.Queue(slacker)
-		time.Sleep(5 * time.Second)
+		time.Sleep(6 * time.Second)
 		assert.Equal(t, 0, len(slacker.Queue))
 	})
 

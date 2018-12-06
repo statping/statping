@@ -28,7 +28,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/setup", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "index.html", core.CoreApp, nil)
+	ExecuteResponse(w, r, "index.gohtml", core.CoreApp, nil)
 }
 
 func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
@@ -41,7 +41,7 @@ func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func trayHandler(w http.ResponseWriter, r *http.Request) {
-	ExecuteResponse(w, r, "tray.html", core.CoreApp, nil)
+	ExecuteResponse(w, r, "tray.gohtml", core.CoreApp, nil)
 }
 
 // DesktopInit will run the Statping server on a specific IP and port using SQLite database

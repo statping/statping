@@ -256,7 +256,7 @@ func TestServiceFailedTCPCheck(t *testing.T) {
 }
 
 func TestCreateServiceFailure(t *testing.T) {
-	fail := &failure{&types.Failure{
+	fail := &Failure{&types.Failure{
 		Issue:  "This is not an issue, but it would container HTTP response errors.",
 		Method: "http",
 	}}

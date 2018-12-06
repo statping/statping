@@ -27,6 +27,7 @@ type Failure struct {
 	Method    string    `gorm:"column:method" json:"method,omitempty"`
 	MethodId  int64     `gorm:"column:method_id" json:"method_id,omitempty"`
 	Service   int64     `gorm:"index;column:service" json:"-"`
+	Checkin   int64     `gorm:"index;column:checkin" json:"-"`
 	PingTime  float64   `gorm:"column:ping_time"  json:"ping"`
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 }

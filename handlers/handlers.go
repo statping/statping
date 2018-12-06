@@ -198,7 +198,7 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		return
 	}
 
-	templates := []string{"base.html", "head.html", "nav.html", "footer.html", "scripts.html", "form_service.html", "form_notifier.html", "form_user.html", "form_checkin.html", "form_message.html"}
+	templates := []string{"base.gohtml", "head.gohtml", "nav.gohtml", "footer.gohtml", "scripts.gohtml", "form_service.gohtml", "form_notifier.gohtml", "form_user.gohtml", "form_checkin.gohtml", "form_message.gohtml"}
 
 	javascripts := []string{"charts.js", "chart_index.js"}
 
@@ -275,5 +275,5 @@ func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 // error404Handler is a HTTP handler for 404 error pages
 func error404Handler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
-	ExecuteResponse(w, r, "error_404.html", nil, nil)
+	ExecuteResponse(w, r, "error_404.gohtml", nil, nil)
 }

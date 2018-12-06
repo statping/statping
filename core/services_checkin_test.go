@@ -46,7 +46,7 @@ func TestCreateCheckin(t *testing.T) {
 
 func TestSelectCheckin(t *testing.T) {
 	service := SelectService(1)
-	checkins := service.Checkins()
+	checkins := service.AllCheckins()
 	assert.NotNil(t, checkins)
 	assert.Equal(t, 1, len(checkins))
 	testCheckin = checkins[0]
@@ -63,7 +63,7 @@ func TestUpdateCheckin(t *testing.T) {
 	assert.NotZero(t, id)
 	assert.NotEmpty(t, testCheckin.ApiKey)
 	service := SelectService(1)
-	checkin := service.Checkins()[0]
+	checkin := service.AllCheckins()[0]
 	assert.Equal(t, int64(60), checkin.Interval)
 	assert.Equal(t, int64(15), checkin.GracePeriod)
 	t.Log(testCheckin.Expected())
@@ -72,7 +72,7 @@ func TestUpdateCheckin(t *testing.T) {
 
 func TestCreateCheckinHits(t *testing.T) {
 	service := SelectService(1)
-	checkins := service.Checkins()
+	checkins := service.AllCheckins()
 	assert.Equal(t, 1, len(checkins))
 	created := time.Now().UTC().Add(-60 * time.Second)
 	hit := ReturnCheckinHit(&types.CheckinHit{
@@ -88,7 +88,7 @@ func TestCreateCheckinHits(t *testing.T) {
 func TestSelectCheckinMethods(t *testing.T) {
 	time.Sleep(5 * time.Second)
 	service := SelectService(1)
-	checkins := service.Checkins()
+	checkins := service.AllCheckins()
 	assert.NotNil(t, checkins)
 	lastHit := testCheckin.Last()
 	assert.Equal(t, float64(60), testCheckin.Period().Seconds())

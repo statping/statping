@@ -236,10 +236,10 @@ func recordSuccess(s *Service) {
 	notifier.OnSuccess(s.Service)
 }
 
-// recordFailure will create a new 'failure' record in the database for a offline service
+// recordFailure will create a new 'Failure' record in the database for a offline service
 func recordFailure(s *Service, issue string) {
 	s.Online = false
-	fail := &failure{&types.Failure{
+	fail := &Failure{&types.Failure{
 		Service:   s.Id,
 		Issue:     issue,
 		PingTime:  s.PingTime,

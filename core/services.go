@@ -55,36 +55,19 @@ func SelectService(id int64) *Service {
 	return nil
 }
 
-// SelectServicer returns a types.ServiceInterface from in memory
-func SelectServicer(id int64) types.ServiceInterface {
-	for _, s := range Services() {
-		if s.Select().Id == id {
-			return s
-		}
-	}
-	return nil
-}
-
 // CheckinProcess runs the checkin routine for each checkin attached to service
 func (s *Service) CheckinProcess() {
-	checkins := s.Checkins()
+	checkins := s.AllCheckins()
 	for _, c := range checkins {
 		c.Start()
 		go c.Routine()
 	}
 }
 
-// Checkins will return a slice of Checkins for a Service
-func (s *Service) Checkins() []*Checkin {
+// AllCheckins will return a slice of AllCheckins for a Service
+func (s *Service) AllCheckins() []*Checkin {
 	var checkin []*Checkin
 	checkinDB().Where("service = ?", s.Id).Find(&checkin)
-	return checkin
-}
-
-// LimitedCheckins will return a slice of Checkins for a Service
-func (s *Service) LimitedCheckins() []*Checkin {
-	var checkin []*Checkin
-	checkinDB().Where("service = ?", s.Id).Limit(10).Find(&checkin)
 	return checkin
 }
 
@@ -106,9 +89,15 @@ func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 		for _, f := range fails {
 			service.Failures = append(service.Failures, f)
 		}
+		checkins := service.AllCheckins()
+		for _, c := range checkins {
+			c.Failures = c.LimitedFailures(limitedFailures)
+			c.Hits = c.LimitedHits(limitedFailures)
+			service.Checkins = append(service.Checkins, c)
+		}
 		CoreApp.Services = append(CoreApp.Services, service)
 	}
-	sort.Sort(ServiceOrder(CoreApp.Services))
+	reorderServices()
 	return services, db.Error
 }
 
@@ -175,8 +164,8 @@ type DateScanObj struct {
 	Array []DateScan `json:"data"`
 }
 
-// lastFailure returns the last failure a service had
-func (s *Service) lastFailure() *failure {
+// lastFailure returns the last Failure a service had
+func (s *Service) lastFailure() *Failure {
 	limited := s.LimitedFailures(1)
 	if len(limited) == 0 {
 		return nil
@@ -196,7 +185,7 @@ func (s *Service) SmallText() string {
 		if len(last) == 0 {
 			return fmt.Sprintf("Online since %v", utils.Timezoner(s.CreatedAt, zone).Format("Monday 3:04:05PM, Jan _2 2006"))
 		} else {
-			return fmt.Sprintf("Online, last failure was %v", utils.Timezoner(hits[0].CreatedAt, zone).Format("Monday 3:04:05PM, Jan _2 2006"))
+			return fmt.Sprintf("Online, last Failure was %v", utils.Timezoner(hits[0].CreatedAt, zone).Format("Monday 3:04:05PM, Jan _2 2006"))
 		}
 	}
 	if len(last) > 0 {

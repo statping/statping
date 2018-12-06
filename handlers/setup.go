@@ -34,7 +34,7 @@ func setupHandler(w http.ResponseWriter, r *http.Request) {
 		data, _ = core.LoadUsingEnv()
 	}
 	w.WriteHeader(http.StatusOK)
-	ExecuteResponse(w, r, "setup.html", data, nil)
+	ExecuteResponse(w, r, "setup.gohtml", data, nil)
 }
 
 func processSetupHandler(w http.ResponseWriter, r *http.Request) {
@@ -126,5 +126,5 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func setupResponseError(w http.ResponseWriter, r *http.Request, a interface{}) {
-	ExecuteResponse(w, r, "setup.html", a, nil)
+	ExecuteResponse(w, r, "setup.gohtml", a, nil)
 }

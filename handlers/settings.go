@@ -32,7 +32,7 @@ func settingsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "settings.html", core.CoreApp, nil)
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, nil)
 }
 
 func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
@@ -73,7 +73,7 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 		utils.Log(3, fmt.Sprintf("issue updating Core: %v", err.Error()))
 	}
 	//notifiers.OnSettingsSaved(core.CoreApp.ToCore())
-	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
 }
 
 func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
@@ -90,7 +90,7 @@ func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
 	source.SaveAsset([]byte(mobile), utils.Directory, "scss/mobile.scss")
 	source.CompileSASS(utils.Directory)
 	resetRouter()
-	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
 }
 
 func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
@@ -111,7 +111,7 @@ func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		utils.Log(3, "Default 'base.css' was inserted because SASS did not work.")
 	}
 	resetRouter()
-	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
 }
 
 func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
@@ -121,7 +121,7 @@ func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	source.DeleteAllAssets(utils.Directory)
 	resetRouter()
-	ExecuteResponse(w, r, "settings.html", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
 }
 
 func parseId(r *http.Request) int64 {
