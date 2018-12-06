@@ -16,6 +16,7 @@
 package handlers
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/sessions"
@@ -33,35 +34,66 @@ import (
 
 const (
 	cookieKey = "statping_auth"
+	timeout   = time.Second * 60
 )
 
 var (
 	sessionStore *sessions.CookieStore
 	httpServer   *http.Server
+	usingSSL     bool
 )
 
 // RunHTTPServer will start a HTTP server on a specific IP and port
 func RunHTTPServer(ip string, port int) error {
 	host := fmt.Sprintf("%v:%v", ip, port)
-	utils.Log(1, "Statping HTTP Server running on http://"+host)
-	//for _, p := range core.CoreApp.AllPlugins {
-	//	info := p.GetInfo()
-	//	for _, route := range p.Routes() {
-	//		path := fmt.Sprintf("%v", route.URL)
-	//		router.Handle(path, http.HandlerFunc(route.Handler)).Methods(route.Method)
-	//		utils.Log(1, fmt.Sprintf("Added Route %v for plugin %v\n", path, info.Name))
-	//	}
-	//}
-	router = Router()
-	httpServer = &http.Server{
-		Addr:         host,
-		WriteTimeout: time.Second * 60,
-		ReadTimeout:  time.Second * 60,
-		IdleTimeout:  time.Second * 60,
-		Handler:      router,
+
+	key := utils.FileExists(utils.Directory + "/server.key")
+	cert := utils.FileExists(utils.Directory + "/server.crt")
+
+	if key && cert {
+		utils.Log(1, "server.cert and server.key was found in root directory! Starting in SSL mode.")
+		utils.Log(1, fmt.Sprintf("Statping Secure HTTPS Server running on https://%v:%v", ip, 443))
+		usingSSL = true
+	} else {
+		utils.Log(1, "Statping HTTP Server running on http://"+host)
 	}
+
+	router = Router()
 	resetCookies()
-	return httpServer.ListenAndServe()
+
+	if usingSSL {
+		cfg := &tls.Config{
+			MinVersion:               tls.VersionTLS12,
+			CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
+			PreferServerCipherSuites: true,
+			CipherSuites: []uint16{
+				tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+				tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+				tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+				tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+			},
+		}
+		srv := &http.Server{
+			Addr:         fmt.Sprintf("%v:%v", ip, 443),
+			Handler:      router,
+			TLSConfig:    cfg,
+			TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
+			WriteTimeout: timeout,
+			ReadTimeout:  timeout,
+			IdleTimeout:  timeout,
+		}
+		return srv.ListenAndServeTLS(utils.Directory+"/server.crt", utils.Directory+"/server.key")
+	} else {
+		httpServer = &http.Server{
+			Addr:         host,
+			WriteTimeout: timeout,
+			ReadTimeout:  timeout,
+			IdleTimeout:  timeout,
+			Handler:      router,
+		}
+		return httpServer.ListenAndServe()
+	}
+	return nil
 }
 
 // IsAuthenticated returns true if the HTTP request is authenticated. You can set the environment variable GO_ENV=test
@@ -198,8 +230,11 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		return
 	}
 
-	templates := []string{"base.gohtml", "head.gohtml", "nav.gohtml", "footer.gohtml", "scripts.gohtml", "form_service.gohtml", "form_notifier.gohtml", "form_user.gohtml", "form_checkin.gohtml", "form_message.gohtml"}
+	if usingSSL {
+		w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
+	}
 
+	templates := []string{"base.gohtml", "head.gohtml", "nav.gohtml", "footer.gohtml", "scripts.gohtml", "form_service.gohtml", "form_notifier.gohtml", "form_user.gohtml", "form_checkin.gohtml", "form_message.gohtml"}
 	javascripts := []string{"charts.js", "chart_index.js"}
 
 	render, err := source.TmplBox.String(file)
@@ -252,6 +287,9 @@ func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 	if err != nil {
 		utils.Log(4, err)
 	}
+	if usingSSL {
+		w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
+	}
 	t := template.New("charts")
 	t.Funcs(template.FuncMap{
 		"safe": func(html string) template.HTML {
@@ -274,6 +312,9 @@ func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 
 // error404Handler is a HTTP handler for 404 error pages
 func error404Handler(w http.ResponseWriter, r *http.Request) {
+	if usingSSL {
+		w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
+	}
 	w.WriteHeader(http.StatusNotFound)
 	ExecuteResponse(w, r, "error_404.gohtml", nil, nil)
 }

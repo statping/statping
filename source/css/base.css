@@ -6,7 +6,8 @@
 /*   Mobile Settings   */
 /*   Mobile Service Container   */
 HTML, BODY {
-  background-color: #fcfcfc; }
+  background-color: #fcfcfc;
+  padding-bottom: 10px; }
 
 .container {
   padding-top: 20px;
