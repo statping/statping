@@ -27,7 +27,7 @@
     <div class="form-group row">
         <label for="service_url" class="col-sm-4 col-form-label">{{if (eq .Type "tcp") or (eq .Type "udp")}}Host/IP Address{{else}}Application Endpoint (URL){{end}}</label>
         <div class="col-sm-8">
-            <input type="url" name="domain" class="form-control" id="service_url" value="{{.Domain}}" placeholder="https://google.com" required autocapitalize="none" spellcheck="false">
+            <input type="text" name="domain" class="form-control" id="service_url" value="{{.Domain}}" placeholder="https://google.com" required autocapitalize="none" spellcheck="false">
             <small class="form-text text-muted">Statping will attempt to connect to this URL</small>
         </div>
     </div>
