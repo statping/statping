@@ -23,7 +23,7 @@ import (
 )
 
 var (
-	webhookTestUrl = "https://demo.statup.com/api/services"
+	webhookTestUrl = "https://demo.statping.com"
 	webhookMessage = `{"id": "%service.Id","name": "%service.Name","online": "%service.Online","issue": "%failure.Issue"}`
 	apiKey         = "application/json"
 	fullMsg        string
@@ -99,7 +99,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 	t.Run("webhooker Send", func(t *testing.T) {
 		err := webhook.Send(fullMsg)
-		assert.Error(t, err)
+		assert.Nil(t, err)
 		assert.Equal(t, len(webhook.Queue), 1)
 	})
 

@@ -78,7 +78,7 @@
    {{$failures := $s.LimitedFailures 16}}
     <nav class="nav nav-pills flex-column flex-sm-row mt-3" id="service_tabs" role="serviceLists">
         <a class="flex-sm-fill text-sm-center nav-link active" id="edit-tab" data-toggle="tab" href="#edit" role="tab" aria-controls="edit" aria-selected="false">Edit Service</a>
-            <a class="flex-sm-fill text-sm-center nav-link{{ if not $failures }}disabled{{end}}" id="failures-tab" data-toggle="tab" href="#failures" role="tab" aria-controls="failures" aria-selected="true">Failures</a>
+            <a class="flex-sm-fill text-sm-center nav-link{{ if not $failures }} disabled{{end}}" id="failures-tab" data-toggle="tab" href="#failures" role="tab" aria-controls="failures" aria-selected="true">Failures</a>
             <a class="flex-sm-fill text-sm-center nav-link" id="checkins-tab" data-toggle="tab" href="#checkins" role="tab" aria-controls="checkins" aria-selected="false">Checkins</a>
             <a class="flex-sm-fill text-sm-center nav-link" id="response-tab" data-toggle="tab" href="#response" role="tab" aria-controls="response" aria-selected="false">Response</a>
     </nav>
