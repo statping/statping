@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "d74ac4a3-8915-46e8-8ed2-5044ea4ce53b",
-		"name": "Statup",
+		"_postman_id": "e9dd00c9-d37e-42f7-a71e-de317e1044d3",
+		"name": "Statping",
 		"description": "Statup API Requests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -29,9 +29,6 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -45,7 +42,10 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{endpoint}}/api",
 							"host": [
@@ -139,9 +139,6 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -197,9 +194,6 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -360,9 +354,13 @@
 							"script": {
 								"id": "b5a67a19-fd08-40b0-a961-3e9474ab78c6",
 								"exec": [
-									"pm.test(\"Reorder Services\", function () {",
+									"pm.test(\"Update Service\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.length).to.eql(4);",
+									"    pm.expect(jsonData.output.name).to.eql(\"Updated Google Service\");",
+									"    pm.expect(jsonData.output.domain).to.eql(\"https://google.com\");",
+									"    pm.expect(jsonData.output.type).to.eql(\"http\");",
+									"    pm.expect(jsonData.output.method).to.eql(\"GET\");",
+									"    pm.expect(jsonData.output.expected_status).to.eql(200);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -389,7 +387,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[{\"service\": 1, \"order\": 4},{\"service\": 2, \"order\": 3},{\"service\": 3, \"order\": 2},{\"service\": 4, \"order\": 1}]"
+							"raw": "[{\"service\":1,\"order\":1},{\"service\":5,\"order\":2},{\"service\":2,\"order\":3},{\"service\":3,\"order\":4},{\"service\":4,\"order\":5}]"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/services/reorder",
@@ -437,16 +435,19 @@
 						},
 						"method": "DELETE",
 						"header": [],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
-							"raw": "{{endpoint}}/api/services/2",
+							"raw": "{{endpoint}}/api/services/1",
 							"host": [
 								"{{endpoint}}"
 							],
 							"path": [
 								"api",
 								"services",
-								"2"
+								"1"
 							]
 						}
 					},
@@ -510,9 +511,6 @@
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -526,7 +524,10 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{endpoint}}/api/users",
 							"host": [
@@ -741,7 +742,10 @@
 						},
 						"method": "DELETE",
 						"header": [],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
 							"raw": "{{endpoint}}/api/users/1",
 							"host": [
@@ -1202,7 +1206,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"service_id\": 1,\n    \"name\": \"Server Checkin\",\n    \"interval\": 900,\n    \"grace\": 60\n}"
+							"raw": "{\n    \"service_id\": 2,\n    \"name\": \"Server Checkin\",\n    \"interval\": 900,\n    \"grace\": 60\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/checkin",
