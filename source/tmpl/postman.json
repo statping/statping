@@ -333,14 +333,14 @@
 							"raw": "{\n\t\"id\": 1,\n    \"name\": \"Updated Google Service\",\n    \"domain\": \"https://google.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 60,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 10,\n    \"order_id\": 0,\n    \"check_interval\": 60\n}"
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/services/1",
+							"raw": "{{endpoint}}/api/services/2",
 							"host": [
 								"{{endpoint}}"
 							],
 							"path": [
 								"api",
 								"services",
-								"1"
+								"2"
 							]
 						}
 					},
@@ -807,7 +807,7 @@
 								"exec": [
 									"pm.test(\"View All Notifiers\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.length).to.eql(8);",
+									"    pm.expect(jsonData.length).to.eql(9);",
 									"});"
 								],
 								"type": "text/javascript"
