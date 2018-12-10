@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e9dd00c9-d37e-42f7-a71e-de317e1044d3",
+		"_postman_id": "94807b85-ef65-4370-9144-b1a74e04cb0e",
 		"name": "Statping",
 		"description": "Statup API Requests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -54,7 +54,8 @@
 							"path": [
 								"api"
 							]
-						}
+						},
+						"description": "The root API route to view basic Statping settings."
 					},
 					"response": []
 				}
@@ -116,7 +117,8 @@
 								"api",
 								"services"
 							]
-						}
+						},
+						"description": "View an array of all Services added to your Statping instance."
 					},
 					"response": []
 				},
@@ -173,9 +175,59 @@
 								"services",
 								"1"
 							]
-						}
+						},
+						"description": "View a specific service, this will include the service's failures and checkins."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "View Service",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/services/1",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"services",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:31:19 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "482"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"name\": \"Google\",\n    \"domain\": \"https://google.com\",\n    \"expected\": null,\n    \"expected_status\": 200,\n    \"check_interval\": 10,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": null,\n    \"port\": 0,\n    \"timeout\": 10,\n    \"order_id\": 1,\n    \"allow_notifications\": false,\n    \"created_at\": \"2018-12-10T11:15:42.24769-08:00\",\n    \"updated_at\": \"2018-12-10T11:15:42.247837-08:00\",\n    \"online\": true,\n    \"latency\": 0.190599816,\n    \"ping_time\": 0.00476598,\n    \"online_24_hours\": 0,\n    \"avg_response\": \"\",\n    \"status_code\": 200,\n    \"last_success\": \"2018-12-10T11:31:13.511139-08:00\"\n}"
+						}
+					]
 				},
 				{
 					"name": "View Service Chart Data",
@@ -231,120 +283,57 @@
 							]
 						}
 					},
-					"response": []
-				},
-				{
-					"name": "Create Service",
-					"event": [
+					"response": [
 						{
-							"listen": "test",
-							"script": {
-								"id": "d4eb16fe-8495-40e5-9ca3-be20951e5133",
-								"exec": [
-									"pm.test(\"Create Service\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.output.name).to.eql(\"New Service\");",
-									"    pm.expect(jsonData.output.domain).to.eql(\"https://statup.io\");",
-									"    pm.expect(jsonData.output.type).to.eql(\"http\");",
-									"    pm.expect(jsonData.output.method).to.eql(\"GET\");",
-									"    pm.expect(jsonData.output.expected_status).to.eql(200);",
-									"});"
+							"name": "View Service Chart Data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
 								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{api_key}}",
-									"type": "string"
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/services/1/data",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"services",
+										"1",
+										"data"
+									]
 								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"New Service\",\n    \"domain\": \"https://statup.io\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 30,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 30,\n    \"order_id\": 0\n}"
-						},
-						"url": {
-							"raw": "{{endpoint}}/api/services",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"api",
-								"services"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Service",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b5a67a19-fd08-40b0-a961-3e9474ab78c6",
-								"exec": [
-									"pm.test(\"Update Service\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.output.name).to.eql(\"Updated Google Service\");",
-									"    pm.expect(jsonData.output.domain).to.eql(\"https://google.com\");",
-									"    pm.expect(jsonData.output.type).to.eql(\"http\");",
-									"    pm.expect(jsonData.output.method).to.eql(\"GET\");",
-									"    pm.expect(jsonData.output.expected_status).to.eql(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
 								{
-									"key": "token",
-									"value": "{{api_key}}",
-									"type": "string"
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:31:32 GMT"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
 								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"id\": 1,\n    \"name\": \"Updated Google Service\",\n    \"domain\": \"https://google.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 60,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 10,\n    \"order_id\": 0,\n    \"check_interval\": 60\n}"
-						},
-						"url": {
-							"raw": "{{endpoint}}/api/services/2",
-							"host": [
-								"{{endpoint}}"
 							],
-							"path": [
-								"api",
-								"services",
-								"2"
-							]
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"x\": \"2018-12-03T12:00:00-08:00\",\n            \"y\": 476\n        },\n        {\n            \"x\": \"2018-12-03T13:00:00-08:00\",\n            \"y\": 663\n        },\n        {\n            \"x\": \"2018-12-03T14:00:00-08:00\",\n            \"y\": 411\n        },\n        {\n            \"x\": \"2018-12-03T15:00:00-08:00\",\n            \"y\": 759\n        },\n        {\n            \"x\": \"2018-12-03T16:00:00-08:00\",\n            \"y\": 143\n        },\n        {\n            \"x\": \"2018-12-03T17:00:00-08:00\",\n            \"y\": 11\n        },\n        {\n            \"x\": \"2018-12-03T18:00:00-08:00\",\n            \"y\": 1073\n        },\n        {\n            \"x\": \"2018-12-03T19:00:00-08:00\",\n            \"y\": 419\n        },\n        {\n            \"x\": \"2018-12-03T20:00:00-08:00\",\n            \"y\": 85\n        },\n        {\n            \"x\": \"2018-12-03T21:00:00-08:00\",\n            \"y\": 444\n        },\n        {\n            \"x\": \"2018-12-03T22:00:00-08:00\",\n            \"y\": 307\n        },\n        {\n            \"x\": \"2018-12-03T23:00:00-08:00\",\n            \"y\": 889\n        },\n        {\n            \"x\": \"2018-12-04T00:00:00-08:00\",\n            \"y\": 625\n        },\n        {\n            \"x\": \"2018-12-04T01:00:00-08:00\",\n            \"y\": 407\n        },\n        {\n            \"x\": \"2018-12-04T02:00:00-08:00\",\n            \"y\": 505\n        },\n        {\n            \"x\": \"2018-12-04T03:00:00-08:00\",\n            \"y\": 71\n        },\n        {\n            \"x\": \"2018-12-04T04:00:00-08:00\",\n            \"y\": 1063\n        },\n        {\n            \"x\": \"2018-12-04T05:00:00-08:00\",\n            \"y\": 488\n        },\n        {\n            \"x\": \"2018-12-04T06:00:00-08:00\",\n            \"y\": 981\n        },\n        {\n            \"x\": \"2018-12-04T07:00:00-08:00\",\n            \"y\": 1008\n        },\n        {\n            \"x\": \"2018-12-04T08:00:00-08:00\",\n            \"y\": 734\n        },\n        {\n            \"x\": \"2018-12-04T09:00:00-08:00\",\n            \"y\": 307\n        },\n        {\n            \"x\": \"2018-12-04T10:00:00-08:00\",\n            \"y\": 227\n        },\n        {\n            \"x\": \"2018-12-04T11:00:00-08:00\",\n            \"y\": 445\n        },\n        {\n            \"x\": \"2018-12-04T12:00:00-08:00\",\n            \"y\": 1181\n        },\n        {\n            \"x\": \"2018-12-04T13:00:00-08:00\",\n            \"y\": 937\n        },\n        {\n            \"x\": \"2018-12-04T14:00:00-08:00\",\n            \"y\": 506\n        },\n        {\n            \"x\": \"2018-12-04T15:00:00-08:00\",\n            \"y\": 1064\n        },\n        {\n            \"x\": \"2018-12-04T16:00:00-08:00\",\n            \"y\": 459\n        },\n        {\n            \"x\": \"2018-12-04T17:00:00-08:00\",\n            \"y\": 693\n        },\n        {\n            \"x\": \"2018-12-04T18:00:00-08:00\",\n            \"y\": 760\n        },\n        {\n            \"x\": \"2018-12-04T19:00:00-08:00\",\n            \"y\": 277\n        },\n        {\n            \"x\": \"2018-12-04T20:00:00-08:00\",\n            \"y\": 460\n        },\n        {\n            \"x\": \"2018-12-04T21:00:00-08:00\",\n            \"y\": 690\n        },\n        {\n            \"x\": \"2018-12-04T22:00:00-08:00\",\n            \"y\": 940\n        },\n        {\n            \"x\": \"2018-12-04T23:00:00-08:00\",\n            \"y\": 118\n        },\n        {\n            \"x\": \"2018-12-05T00:00:00-08:00\",\n            \"y\": 809\n        },\n        {\n            \"x\": \"2018-12-05T01:00:00-08:00\",\n            \"y\": 11\n        },\n        {\n            \"x\": \"2018-12-05T02:00:00-08:00\",\n            \"y\": 685\n        },\n        {\n            \"x\": \"2018-12-05T03:00:00-08:00\",\n            \"y\": 1064\n        },\n        {\n            \"x\": \"2018-12-05T04:00:00-08:00\",\n            \"y\": 370\n        },\n        {\n            \"x\": \"2018-12-05T05:00:00-08:00\",\n            \"y\": 879\n        },\n        {\n            \"x\": \"2018-12-05T06:00:00-08:00\",\n            \"y\": 1371\n        },\n        {\n            \"x\": \"2018-12-05T07:00:00-08:00\",\n            \"y\": 122\n        },\n        {\n            \"x\": \"2018-12-05T08:00:00-08:00\",\n            \"y\": 24\n        },\n        {\n            \"x\": \"2018-12-05T09:00:00-08:00\",\n            \"y\": 635\n        },\n        {\n            \"x\": \"2018-12-05T10:00:00-08:00\",\n            \"y\": 617\n        },\n        {\n            \"x\": \"2018-12-05T11:00:00-08:00\",\n            \"y\": 928\n        },\n        {\n            \"x\": \"2018-12-05T12:00:00-08:00\",\n            \"y\": 529\n        },\n        {\n            \"x\": \"2018-12-05T13:00:00-08:00\",\n            \"y\": 1471\n        },\n        {\n            \"x\": \"2018-12-05T14:00:00-08:00\",\n            \"y\": 928\n        },\n        {\n            \"x\": \"2018-12-05T15:00:00-08:00\",\n            \"y\": 1191\n        },\n        {\n            \"x\": \"2018-12-05T16:00:00-08:00\",\n            \"y\": 1303\n        },\n        {\n            \"x\": \"2018-12-05T17:00:00-08:00\",\n            \"y\": 923\n        },\n        {\n            \"x\": \"2018-12-05T18:00:00-08:00\",\n            \"y\": 75\n        },\n        {\n            \"x\": \"2018-12-05T19:00:00-08:00\",\n            \"y\": 284\n        },\n        {\n            \"x\": \"2018-12-05T20:00:00-08:00\",\n            \"y\": 1542\n        },\n        {\n            \"x\": \"2018-12-05T21:00:00-08:00\",\n            \"y\": 1494\n        },\n        {\n            \"x\": \"2018-12-05T22:00:00-08:00\",\n            \"y\": 306\n        },\n        {\n            \"x\": \"2018-12-05T23:00:00-08:00\",\n            \"y\": 107\n        },\n        {\n            \"x\": \"2018-12-06T00:00:00-08:00\",\n            \"y\": 354\n        },\n        {\n            \"x\": \"2018-12-06T01:00:00-08:00\",\n            \"y\": 445\n        },\n        {\n            \"x\": \"2018-12-06T02:00:00-08:00\",\n            \"y\": 839\n        },\n        {\n            \"x\": \"2018-12-06T03:00:00-08:00\",\n            \"y\": 1586\n        },\n        {\n            \"x\": \"2018-12-06T04:00:00-08:00\",\n            \"y\": 953\n        },\n        {\n            \"x\": \"2018-12-06T05:00:00-08:00\",\n            \"y\": 407\n        },\n        {\n            \"x\": \"2018-12-06T06:00:00-08:00\",\n            \"y\": 327\n        },\n        {\n            \"x\": \"2018-12-06T07:00:00-08:00\",\n            \"y\": 781\n        },\n        {\n            \"x\": \"2018-12-06T08:00:00-08:00\",\n            \"y\": 666\n        },\n        {\n            \"x\": \"2018-12-06T09:00:00-08:00\",\n            \"y\": 235\n        },\n        {\n            \"x\": \"2018-12-06T10:00:00-08:00\",\n            \"y\": 138\n        },\n        {\n            \"x\": \"2018-12-06T11:00:00-08:00\",\n            \"y\": 1427\n        },\n        {\n            \"x\": \"2018-12-06T12:00:00-08:00\",\n            \"y\": 246\n        },\n        {\n            \"x\": \"2018-12-06T13:00:00-08:00\",\n            \"y\": 753\n        },\n        {\n            \"x\": \"2018-12-06T14:00:00-08:00\",\n            \"y\": 188\n        },\n        {\n            \"x\": \"2018-12-06T15:00:00-08:00\",\n            \"y\": 1238\n        },\n        {\n            \"x\": \"2018-12-06T16:00:00-08:00\",\n            \"y\": 723\n        },\n        {\n            \"x\": \"2018-12-06T17:00:00-08:00\",\n            \"y\": 901\n        },\n        {\n            \"x\": \"2018-12-06T18:00:00-08:00\",\n            \"y\": 971\n        },\n        {\n            \"x\": \"2018-12-06T19:00:00-08:00\",\n            \"y\": 626\n        },\n        {\n            \"x\": \"2018-12-06T20:00:00-08:00\",\n            \"y\": 585\n        },\n        {\n            \"x\": \"2018-12-06T21:00:00-08:00\",\n            \"y\": 275\n        },\n        {\n            \"x\": \"2018-12-06T22:00:00-08:00\",\n            \"y\": 138\n        },\n        {\n            \"x\": \"2018-12-06T23:00:00-08:00\",\n            \"y\": 159\n        },\n        {\n            \"x\": \"2018-12-07T00:00:00-08:00\",\n            \"y\": 1324\n        },\n        {\n            \"x\": \"2018-12-07T01:00:00-08:00\",\n            \"y\": 1654\n        },\n        {\n            \"x\": \"2018-12-07T02:00:00-08:00\",\n            \"y\": 474\n        },\n        {\n            \"x\": \"2018-12-07T03:00:00-08:00\",\n            \"y\": 442\n        },\n        {\n            \"x\": \"2018-12-07T04:00:00-08:00\",\n            \"y\": 1729\n        },\n        {\n            \"x\": \"2018-12-07T05:00:00-08:00\",\n            \"y\": 1146\n        },\n        {\n            \"x\": \"2018-12-07T06:00:00-08:00\",\n            \"y\": 824\n        },\n        {\n            \"x\": \"2018-12-07T07:00:00-08:00\",\n            \"y\": 632\n        },\n        {\n            \"x\": \"2018-12-07T08:00:00-08:00\",\n            \"y\": 1780\n        },\n        {\n            \"x\": \"2018-12-07T09:00:00-08:00\",\n            \"y\": 120\n        },\n        {\n            \"x\": \"2018-12-07T10:00:00-08:00\",\n            \"y\": 1400\n        },\n        {\n            \"x\": \"2018-12-07T11:00:00-08:00\",\n            \"y\": 1138\n        },\n        {\n            \"x\": \"2018-12-07T12:00:00-08:00\",\n            \"y\": 1765\n        },\n        {\n            \"x\": \"2018-12-07T13:00:00-08:00\",\n            \"y\": 1242\n        },\n        {\n            \"x\": \"2018-12-07T14:00:00-08:00\",\n            \"y\": 399\n        },\n        {\n            \"x\": \"2018-12-07T15:00:00-08:00\",\n            \"y\": 105\n        },\n        {\n            \"x\": \"2018-12-07T16:00:00-08:00\",\n            \"y\": 896\n        },\n        {\n            \"x\": \"2018-12-07T17:00:00-08:00\",\n            \"y\": 1043\n        },\n        {\n            \"x\": \"2018-12-07T18:00:00-08:00\",\n            \"y\": 1463\n        },\n        {\n            \"x\": \"2018-12-07T19:00:00-08:00\",\n            \"y\": 130\n        },\n        {\n            \"x\": \"2018-12-07T20:00:00-08:00\",\n            \"y\": 1151\n        },\n        {\n            \"x\": \"2018-12-07T21:00:00-08:00\",\n            \"y\": 659\n        },\n        {\n            \"x\": \"2018-12-07T22:00:00-08:00\",\n            \"y\": 379\n        },\n        {\n            \"x\": \"2018-12-07T23:00:00-08:00\",\n            \"y\": 463\n        },\n        {\n            \"x\": \"2018-12-08T00:00:00-08:00\",\n            \"y\": 433\n        },\n        {\n            \"x\": \"2018-12-08T01:00:00-08:00\",\n            \"y\": 1583\n        },\n        {\n            \"x\": \"2018-12-08T02:00:00-08:00\",\n            \"y\": 1435\n        },\n        {\n            \"x\": \"2018-12-08T03:00:00-08:00\",\n            \"y\": 1260\n        },\n        {\n            \"x\": \"2018-12-08T04:00:00-08:00\",\n            \"y\": 1146\n        },\n        {\n            \"x\": \"2018-12-08T05:00:00-08:00\",\n            \"y\": 1614\n        },\n        {\n            \"x\": \"2018-12-08T06:00:00-08:00\",\n            \"y\": 1659\n        },\n        {\n            \"x\": \"2018-12-08T07:00:00-08:00\",\n            \"y\": 485\n        },\n        {\n            \"x\": \"2018-12-08T08:00:00-08:00\",\n            \"y\": 1373\n        },\n        {\n            \"x\": \"2018-12-08T09:00:00-08:00\",\n            \"y\": 1758\n        },\n        {\n            \"x\": \"2018-12-08T10:00:00-08:00\",\n            \"y\": 1078\n        },\n        {\n            \"x\": \"2018-12-08T11:00:00-08:00\",\n            \"y\": 1691\n        },\n        {\n            \"x\": \"2018-12-08T12:00:00-08:00\",\n            \"y\": 1739\n        },\n        {\n            \"x\": \"2018-12-08T13:00:00-08:00\",\n            \"y\": 1024\n        },\n        {\n            \"x\": \"2018-12-08T14:00:00-08:00\",\n            \"y\": 114\n        },\n        {\n            \"x\": \"2018-12-08T15:00:00-08:00\",\n            \"y\": 1818\n        },\n        {\n            \"x\": \"2018-12-08T16:00:00-08:00\",\n            \"y\": 1855\n        },\n        {\n            \"x\": \"2018-12-08T17:00:00-08:00\",\n            \"y\": 1205\n        },\n        {\n            \"x\": \"2018-12-08T18:00:00-08:00\",\n            \"y\": 1123\n        },\n        {\n            \"x\": \"2018-12-08T19:00:00-08:00\",\n            \"y\": 1\n        },\n        {\n            \"x\": \"2018-12-08T20:00:00-08:00\",\n            \"y\": 1489\n        },\n        {\n            \"x\": \"2018-12-08T21:00:00-08:00\",\n            \"y\": 1665\n        },\n        {\n            \"x\": \"2018-12-08T22:00:00-08:00\",\n            \"y\": 512\n        },\n        {\n            \"x\": \"2018-12-08T23:00:00-08:00\",\n            \"y\": 2086\n        },\n        {\n            \"x\": \"2018-12-09T00:00:00-08:00\",\n            \"y\": 335\n        },\n        {\n            \"x\": \"2018-12-09T01:00:00-08:00\",\n            \"y\": 512\n        },\n        {\n            \"x\": \"2018-12-09T02:00:00-08:00\",\n            \"y\": 410\n        },\n        {\n            \"x\": \"2018-12-09T03:00:00-08:00\",\n            \"y\": 941\n        },\n        {\n            \"x\": \"2018-12-09T04:00:00-08:00\",\n            \"y\": 2134\n        },\n        {\n            \"x\": \"2018-12-09T05:00:00-08:00\",\n            \"y\": 65\n        },\n        {\n            \"x\": \"2018-12-09T06:00:00-08:00\",\n            \"y\": 372\n        },\n        {\n            \"x\": \"2018-12-09T07:00:00-08:00\",\n            \"y\": 2429\n        },\n        {\n            \"x\": \"2018-12-09T08:00:00-08:00\",\n            \"y\": 1014\n        },\n        {\n            \"x\": \"2018-12-09T09:00:00-08:00\",\n            \"y\": 1029\n        },\n        {\n            \"x\": \"2018-12-09T10:00:00-08:00\",\n            \"y\": 605\n        },\n        {\n            \"x\": \"2018-12-09T11:00:00-08:00\",\n            \"y\": 2063\n        },\n        {\n            \"x\": \"2018-12-09T12:00:00-08:00\",\n            \"y\": 1415\n        },\n        {\n            \"x\": \"2018-12-09T13:00:00-08:00\",\n            \"y\": 2058\n        },\n        {\n            \"x\": \"2018-12-09T14:00:00-08:00\",\n            \"y\": 1754\n        },\n        {\n            \"x\": \"2018-12-09T15:00:00-08:00\",\n            \"y\": 1381\n        },\n        {\n            \"x\": \"2018-12-09T16:00:00-08:00\",\n            \"y\": 896\n        },\n        {\n            \"x\": \"2018-12-09T17:00:00-08:00\",\n            \"y\": 1615\n        },\n        {\n            \"x\": \"2018-12-09T18:00:00-08:00\",\n            \"y\": 882\n        },\n        {\n            \"x\": \"2018-12-09T19:00:00-08:00\",\n            \"y\": 2280\n        },\n        {\n            \"x\": \"2018-12-09T20:00:00-08:00\",\n            \"y\": 1624\n        },\n        {\n            \"x\": \"2018-12-09T21:00:00-08:00\",\n            \"y\": 1265\n        },\n        {\n            \"x\": \"2018-12-09T22:00:00-08:00\",\n            \"y\": 2200\n        },\n        {\n            \"x\": \"2018-12-09T23:00:00-08:00\",\n            \"y\": 1826\n        },\n        {\n            \"x\": \"2018-12-10T00:00:00-08:00\",\n            \"y\": 2523\n        },\n        {\n            \"x\": \"2018-12-10T01:00:00-08:00\",\n            \"y\": 2292\n        },\n        {\n            \"x\": \"2018-12-10T02:00:00-08:00\",\n            \"y\": 1280\n        },\n        {\n            \"x\": \"2018-12-10T03:00:00-08:00\",\n            \"y\": 1345\n        },\n        {\n            \"x\": \"2018-12-10T04:00:00-08:00\",\n            \"y\": 2643\n        },\n        {\n            \"x\": \"2018-12-10T05:00:00-08:00\",\n            \"y\": 965\n        },\n        {\n            \"x\": \"2018-12-10T06:00:00-08:00\",\n            \"y\": 1951\n        },\n        {\n            \"x\": \"2018-12-10T07:00:00-08:00\",\n            \"y\": 1894\n        },\n        {\n            \"x\": \"2018-12-10T08:00:00-08:00\",\n            \"y\": 2273\n        },\n        {\n            \"x\": \"2018-12-10T09:00:00-08:00\",\n            \"y\": 2267\n        },\n        {\n            \"x\": \"2018-12-10T10:00:00-08:00\",\n            \"y\": 393\n        },\n        {\n            \"x\": \"2018-12-10T11:00:00-08:00\",\n            \"y\": 227\n        }\n    ]\n}"
 						}
-					},
-					"response": []
+					]
 				},
 				{
 					"name": "Reorder Services",
@@ -392,9 +381,266 @@
 								"services",
 								"reorder"
 							]
-						}
+						},
+						"description": "Reorder services in a specific order for the index page."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Reorder Services",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[{\"service\":1,\"order\":1},{\"service\":5,\"order\":2},{\"service\":2,\"order\":3},{\"service\":3,\"order\":4},{\"service\":4,\"order\":5}]"
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/services/reorder",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"services",
+										"reorder"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:31:40 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "122"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"service\": 1,\n        \"order\": 1\n    },\n    {\n        \"service\": 5,\n        \"order\": 2\n    },\n    {\n        \"service\": 2,\n        \"order\": 3\n    },\n    {\n        \"service\": 3,\n        \"order\": 4\n    },\n    {\n        \"service\": 4,\n        \"order\": 5\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Create Service",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d4eb16fe-8495-40e5-9ca3-be20951e5133",
+								"exec": [
+									"pm.test(\"Create Service\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.output.name).to.eql(\"New Service\");",
+									"    pm.expect(jsonData.output.domain).to.eql(\"https://statping.com\");",
+									"    pm.expect(jsonData.output.type).to.eql(\"http\");",
+									"    pm.expect(jsonData.output.method).to.eql(\"GET\");",
+									"    pm.expect(jsonData.output.expected_status).to.eql(200);",
+									"    pm.globals.set(\"service_id\", jsonData.output.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"New Service\",\n    \"domain\": \"https://statping.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 30,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 30,\n    \"order_id\": 0\n}"
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/services",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"services"
+							]
+						},
+						"description": "Create a new service and begin monitoring."
+					},
+					"response": [
+						{
+							"name": "Create Service",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"New Service\",\n    \"domain\": \"https://statping.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 30,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 30,\n    \"order_id\": 0\n}"
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/services",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"services"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:31:47 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "528"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"service\",\n    \"method\": \"create\",\n    \"id\": 10,\n    \"output\": {\n        \"id\": 10,\n        \"name\": \"New Service\",\n        \"domain\": \"https://statping.com\",\n        \"expected\": \"\",\n        \"expected_status\": 200,\n        \"check_interval\": 30,\n        \"type\": \"http\",\n        \"method\": \"GET\",\n        \"post_data\": \"\",\n        \"port\": 0,\n        \"timeout\": 30,\n        \"order_id\": 0,\n        \"allow_notifications\": false,\n        \"created_at\": \"2018-12-10T11:31:47.535086-08:00\",\n        \"updated_at\": \"2018-12-10T11:31:47.535184-08:00\",\n        \"online\": false,\n        \"latency\": 0,\n        \"ping_time\": 0,\n        \"online_24_hours\": 0,\n        \"avg_response\": \"\",\n        \"status_code\": 0,\n        \"last_success\": \"0001-01-01T00:00:00Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Service",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b5a67a19-fd08-40b0-a961-3e9474ab78c6",
+								"exec": [
+									"pm.test(\"Update Service\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.output.name).to.eql(\"Updated New Service\");",
+									"    pm.expect(jsonData.output.domain).to.eql(\"https://google.com\");",
+									"    pm.expect(jsonData.output.type).to.eql(\"http\");",
+									"    pm.expect(jsonData.output.method).to.eql(\"GET\");",
+									"    pm.expect(jsonData.output.expected_status).to.eql(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated New Service\",\n    \"domain\": \"https://google.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 60,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 10,\n    \"order_id\": 0\n}"
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/services/{{service_id}}",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"services",
+								"{{service_id}}"
+							]
+						},
+						"description": "Update a service with new values and begin monitoring."
+					},
+					"response": [
+						{
+							"name": "Update Service",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Updated New Service\",\n    \"domain\": \"https://google.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 60,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 10,\n    \"order_id\": 0\n}"
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/services/{{service_id}}",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"services",
+										"{{service_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:31:54 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "567"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"service\",\n    \"method\": \"update\",\n    \"id\": 10,\n    \"output\": {\n        \"id\": 10,\n        \"name\": \"Updated New Service\",\n        \"domain\": \"https://google.com\",\n        \"expected\": \"\",\n        \"expected_status\": 200,\n        \"check_interval\": 60,\n        \"type\": \"http\",\n        \"method\": \"GET\",\n        \"post_data\": \"\",\n        \"port\": 0,\n        \"timeout\": 10,\n        \"order_id\": 0,\n        \"allow_notifications\": false,\n        \"created_at\": \"2018-12-10T11:31:47.535086-08:00\",\n        \"updated_at\": \"2018-12-10T11:31:47.535184-08:00\",\n        \"online\": true,\n        \"latency\": 0.550636193,\n        \"ping_time\": 0.073339805,\n        \"online_24_hours\": 0,\n        \"avg_response\": \"\",\n        \"status_code\": 200,\n        \"last_success\": \"2018-12-10T11:31:49.161389-08:00\"\n    }\n}"
+						}
+					]
 				},
 				{
 					"name": "Delete Service",
@@ -433,18 +679,61 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/services/1",
+							"raw": "{{endpoint}}/api/services/{{service_id}}",
 							"host": [
 								"{{endpoint}}"
 							],
 							"path": [
 								"api",
 								"services",
-								"1"
+								"{{service_id}}"
 							]
-						}
+						},
+						"description": "Delete a service and stop monitoring."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Delete Service",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/services/{{service_id}}",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"services",
+										"{{service_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:32:06 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "567"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"service\",\n    \"method\": \"delete\",\n    \"id\": 10,\n    \"output\": {\n        \"id\": 10,\n        \"name\": \"Updated New Service\",\n        \"domain\": \"https://google.com\",\n        \"expected\": \"\",\n        \"expected_status\": 200,\n        \"check_interval\": 60,\n        \"type\": \"http\",\n        \"method\": \"GET\",\n        \"post_data\": \"\",\n        \"port\": 0,\n        \"timeout\": 10,\n        \"order_id\": 0,\n        \"allow_notifications\": false,\n        \"created_at\": \"2018-12-10T11:31:47.535086-08:00\",\n        \"updated_at\": \"2018-12-10T11:31:47.535184-08:00\",\n        \"online\": true,\n        \"latency\": 0.203382878,\n        \"ping_time\": 0.001664491,\n        \"online_24_hours\": 0,\n        \"avg_response\": \"\",\n        \"status_code\": 200,\n        \"last_success\": \"2018-12-10T11:31:55.455091-08:00\"\n    }\n}"
+						}
+					]
 				}
 			],
 			"auth": {
@@ -530,9 +819,51 @@
 								"api",
 								"users"
 							]
-						}
+						},
+						"description": "View all users on your Statping instance."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "View All Users",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/users",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:32:23 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "701"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"username\": \"admin\",\n        \"password\": \"$2a$14$KtPUxcclSu/DTwVCJ1uez.KbrQcGxWK8CKnvlXe1E8rbpALrR5IPi\",\n        \"email\": \"info@admin.com\",\n        \"api_key\": \"0a7181be6ce703851c59dcb8a4e47090f585d3de\",\n        \"api_secret\": \"5fe0e1982f1669ed004ab59d5dc73a5ec375ae31\",\n        \"admin\": true,\n        \"created_at\": \"2018-12-10T11:15:41.12715-08:00\",\n        \"updated_at\": \"2018-12-10T11:15:42.245315-08:00\"\n    },\n    {\n        \"id\": 6,\n        \"username\": \"adminuser2\",\n        \"password\": \"$2a$14$T45y.jRn58G./bLIHO7enOl2c7Xhom9pGVuAo8.3hIPcH66.8ZwCq\",\n        \"email\": \"info@adminemail.com\",\n        \"api_key\": \"373b493a54c0dc8ce6f710e0b99c1fc968d691bb\",\n        \"api_secret\": \"4f7c0469cf8c57032d7693edc8665379274e1f6f\",\n        \"admin\": true,\n        \"created_at\": \"2018-12-10T11:30:17.654832-08:00\",\n        \"updated_at\": \"2018-12-10T11:30:18.699416-08:00\"\n    }\n]"
+						}
+					]
 				},
 				{
 					"name": "Create User",
@@ -547,6 +878,7 @@
 									"    pm.expect(jsonData.status).to.eql(\"success\");",
 									"    pm.expect(jsonData.type).to.eql(\"user\");",
 									"    pm.expect(jsonData.method).to.eql(\"create\");",
+									"    pm.globals.set(\"user_id\", jsonData.output.id);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -573,7 +905,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"admissdsn2\",\n    \"email\": \"info@emsdssssail.com\",\n    \"password\": \"passsword123\",\n    \"admin\": true\n}"
+							"raw": "{\n    \"username\": \"adminuser2\",\n    \"email\": \"info@adminemail.com\",\n    \"password\": \"passsword123\",\n    \"admin\": true\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/users",
@@ -584,7 +916,8 @@
 								"api",
 								"users"
 							]
-						}
+						},
+						"description": "Create a new Statping user"
 					},
 					"response": []
 				},
@@ -598,9 +931,10 @@
 								"exec": [
 									"pm.test(\"View User\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.id).to.eql(1);",
-									"    pm.expect(jsonData.username).to.eql(\"admin\");",
-									"    pm.expect(jsonData.email).to.eql(\"info@admin.com\");",
+									"    var id = pm.globals.get(\"user_id\");",
+									"    pm.expect(jsonData.id).to.eql(id);",
+									"    pm.expect(jsonData.username).to.eql(\"adminuser2\");",
+									"    pm.expect(jsonData.email).to.eql(\"info@adminemail.com\");",
 									"    pm.expect(jsonData.admin).to.eql(true);",
 									"});"
 								],
@@ -626,18 +960,60 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/users/1",
+							"raw": "{{endpoint}}/api/users/{{user_id}}",
 							"host": [
 								"{{endpoint}}"
 							],
 							"path": [
 								"api",
 								"users",
-								"1"
+								"{{user_id}}"
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "View User",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/users/{{user_id}}",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"{{user_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:32:50 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "281"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 6,\n    \"username\": \"adminuser2\",\n    \"email\": \"info@adminemail.com\",\n    \"api_key\": \"373b493a54c0dc8ce6f710e0b99c1fc968d691bb\",\n    \"api_secret\": \"4f7c0469cf8c57032d7693edc8665379274e1f6f\",\n    \"admin\": true,\n    \"created_at\": \"2018-12-10T11:30:17.654832-08:00\",\n    \"updated_at\": \"2018-12-10T11:30:18.699416-08:00\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Update User",
@@ -689,18 +1065,65 @@
 							"raw": "{\n    \"username\": \"adminupdated\",\n    \"email\": \"info@email.com\",\n    \"password\": \"password12345\",\n    \"admin\": true\n}"
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/users/1",
+							"raw": "{{endpoint}}/api/users/{{user_id}}",
 							"host": [
 								"{{endpoint}}"
 							],
 							"path": [
 								"api",
 								"users",
-								"1"
+								"{{user_id}}"
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Update User",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"adminupdated\",\n    \"email\": \"info@email.com\",\n    \"password\": \"password12345\",\n    \"admin\": true\n}"
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/users/{{user_id}}",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"{{user_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:32:58 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "421"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"user\",\n    \"method\": \"update\",\n    \"id\": 6,\n    \"output\": {\n        \"id\": 6,\n        \"username\": \"adminupdated\",\n        \"password\": \"$2a$14$fAUBFWOYtEjj/rhVkGop/Os9OPwCzNOw0ZW7naSSyAs4J7KQeZFCe\",\n        \"email\": \"info@email.com\",\n        \"api_key\": \"c9a5d9cba5a0062812be9d080a54080397b41058\",\n        \"api_secret\": \"e81a58e019c8ce88f3272057ba67c7ab52b4a988\",\n        \"admin\": true,\n        \"created_at\": \"2018-12-10T11:30:17.654832-08:00\",\n        \"updated_at\": \"2018-12-10T11:30:18.699416-08:00\"\n    }\n}"
+						}
+					]
 				},
 				{
 					"name": "Delete User",
@@ -712,9 +1135,10 @@
 								"exec": [
 									"pm.test(\"Delete User\", function () {",
 									"    var jsonData = pm.response.json();",
+									"    var id = pm.globals.get(\"user_id\");",
 									"    pm.expect(jsonData.status).to.eql(\"success\");",
 									"    pm.expect(jsonData.type).to.eql(\"user\");",
-									"    pm.expect(jsonData.id).to.eql(1);",
+									"    pm.expect(jsonData.id).to.eql(id);",
 									"    pm.expect(jsonData.method).to.eql(\"delete\");",
 									"});"
 								],
@@ -740,18 +1164,60 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/users/1",
+							"raw": "{{endpoint}}/api/users/{{user_id}}",
 							"host": [
 								"{{endpoint}}"
 							],
 							"path": [
 								"api",
 								"users",
-								"1"
+								"{{user_id}}"
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Delete User",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/users/{{user_id}}",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"{{user_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:33:06 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "421"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"user\",\n    \"method\": \"delete\",\n    \"id\": 6,\n    \"output\": {\n        \"id\": 6,\n        \"username\": \"adminupdated\",\n        \"password\": \"$2a$14$fAUBFWOYtEjj/rhVkGop/Os9OPwCzNOw0ZW7naSSyAs4J7KQeZFCe\",\n        \"email\": \"info@email.com\",\n        \"api_key\": \"c9a5d9cba5a0062812be9d080a54080397b41058\",\n        \"api_secret\": \"e81a58e019c8ce88f3272057ba67c7ab52b4a988\",\n        \"admin\": true,\n        \"created_at\": \"2018-12-10T11:30:17.654832-08:00\",\n        \"updated_at\": \"2018-12-10T11:32:58.602809-08:00\"\n    }\n}"
+						}
+					]
 				}
 			],
 			"auth": {
@@ -953,7 +1419,7 @@
 								"exec": [
 									"pm.test(\"View All Messages\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.length).to.eql(2);",
+									"    pm.expect(jsonData.length).to.be.at.least(2);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -978,7 +1444,48 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "All Messages",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/messages",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"messages"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:33:17 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1169"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"title\": \"Routine Downtime\",\n        \"description\": \"This is an example a upcoming message for a service!\",\n        \"start_on\": \"2018-12-10T11:30:42.259843-08:00\",\n        \"end_on\": \"2018-12-10T13:15:42.259844-08:00\",\n        \"service\": 1,\n        \"notify_users\": null,\n        \"notify_method\": \"\",\n        \"notify_before\": null,\n        \"notify_before_scale\": \"\",\n        \"created_at\": \"2018-12-10T11:15:42.259845-08:00\",\n        \"updated_at\": \"2018-12-10T11:15:42.260024-08:00\"\n    },\n    {\n        \"id\": 2,\n        \"title\": \"Server Reboot\",\n        \"description\": \"This is another example a upcoming message for a service!\",\n        \"start_on\": \"2018-12-10T11:30:42.261412-08:00\",\n        \"end_on\": \"2018-12-10T13:15:42.261413-08:00\",\n        \"service\": 3,\n        \"notify_users\": null,\n        \"notify_method\": \"\",\n        \"notify_before\": null,\n        \"notify_before_scale\": \"\",\n        \"created_at\": \"2018-12-10T11:15:42.261414-08:00\",\n        \"updated_at\": \"2018-12-10T11:15:42.261494-08:00\"\n    },\n    {\n        \"id\": 4,\n        \"title\": \"API Message\",\n        \"description\": \"This is an example a upcoming message for a service!\",\n        \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n        \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n        \"service\": 1,\n        \"notify_users\": true,\n        \"notify_method\": \"email\",\n        \"notify_before\": 6,\n        \"notify_before_scale\": \"hour\",\n        \"created_at\": \"2018-12-10T11:16:42.658695-08:00\",\n        \"updated_at\": \"2018-12-10T11:16:42.658771-08:00\"\n    }\n]"
+						}
+					]
 				},
 				{
 					"name": "Create Message",
@@ -996,6 +1503,7 @@
 									"    pm.expect(object.service).to.eql(1);",
 									"    pm.expect(object.notify_before).to.eql(6);",
 									"    pm.expect(object.notify_before_scale).to.eql(\"hour\");",
+									"    pm.globals.set(\"message_id\", object.id);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1027,7 +1535,55 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Create Message",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"API Message\",\n    \"description\": \"This is an example a upcoming message for a service!\",\n    \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n    \"service\": 1,\n    \"notify_users\": true,\n    \"notify_method\": \"email\",\n    \"notify_before\": 6,\n    \"notify_before_scale\": \"hour\"\n}"
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/messages",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"messages"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:33:25 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "456"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"message\",\n    \"method\": \"create\",\n    \"id\": 8,\n    \"output\": {\n        \"id\": 8,\n        \"title\": \"API Message\",\n        \"description\": \"This is an example a upcoming message for a service!\",\n        \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n        \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n        \"service\": 1,\n        \"notify_users\": true,\n        \"notify_method\": \"email\",\n        \"notify_before\": 6,\n        \"notify_before_scale\": \"hour\",\n        \"created_at\": \"2018-12-10T19:33:25.875858Z\",\n        \"updated_at\": \"2018-12-10T11:33:25.875947-08:00\"\n    }\n}"
+						}
+					]
 				},
 				{
 					"name": "View Message",
@@ -1039,7 +1595,7 @@
 								"exec": [
 									"pm.test(\"View Message\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.title).to.eql(\"Routine Downtime\");",
+									"    pm.expect(jsonData.title).to.eql(\"API Message\");",
 									"    pm.expect(jsonData.service).to.eql(1);",
 									"});"
 								],
@@ -1055,18 +1611,60 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/messages/1",
+							"raw": "{{endpoint}}/api/messages/{{message_id}}",
 							"host": [
 								"{{endpoint}}"
 							],
 							"path": [
 								"api",
 								"messages",
-								"1"
+								"{{message_id}}"
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "View Message",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/messages/{{message_id}}",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"messages",
+										"{{message_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:33:33 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "389"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 8,\n    \"title\": \"API Message\",\n    \"description\": \"This is an example a upcoming message for a service!\",\n    \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n    \"service\": 1,\n    \"notify_users\": true,\n    \"notify_method\": \"email\",\n    \"notify_before\": 6,\n    \"notify_before_scale\": \"hour\",\n    \"created_at\": \"2018-12-10T11:33:25.875858-08:00\",\n    \"updated_at\": \"2018-12-10T11:33:25.875947-08:00\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Update Message",
@@ -1105,18 +1703,67 @@
 							"raw": "{\n    \"title\": \"Updated Message\",\n    \"description\": \"This message was updated\",\n    \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n    \"service\": 1,\n    \"notify_users\": true,\n    \"notify_method\": \"email\",\n    \"notify_before\": 3,\n    \"notify_before_scale\": \"hour\"\n}"
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/messages/1",
+							"raw": "{{endpoint}}/api/messages/{{message_id}}",
 							"host": [
 								"{{endpoint}}"
 							],
 							"path": [
 								"api",
 								"messages",
-								"1"
+								"{{message_id}}"
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Update Message",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Updated Message\",\n    \"description\": \"This message was updated\",\n    \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n    \"service\": 1,\n    \"notify_users\": true,\n    \"notify_method\": \"email\",\n    \"notify_before\": 3,\n    \"notify_before_scale\": \"hour\"\n}"
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/messages/{{message_id}}",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"messages",
+										"{{message_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:33:39 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "437"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"message\",\n    \"method\": \"update\",\n    \"id\": 8,\n    \"output\": {\n        \"id\": 8,\n        \"title\": \"Updated Message\",\n        \"description\": \"This message was updated\",\n        \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n        \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n        \"service\": 1,\n        \"notify_users\": true,\n        \"notify_method\": \"email\",\n        \"notify_before\": 3,\n        \"notify_before_scale\": \"hour\",\n        \"created_at\": \"2018-12-10T11:33:25.875858-08:00\",\n        \"updated_at\": \"2018-12-10T11:33:25.875947-08:00\"\n    }\n}"
+						}
+					]
 				},
 				{
 					"name": "Delete Message",
@@ -1128,10 +1775,11 @@
 								"exec": [
 									"pm.test(\"Delete Message\", function () {",
 									"    var jsonData = pm.response.json();",
+									"    var id = pm.globals.get(\"message_id\");",
 									"    pm.expect(jsonData.status).to.eql(\"success\");",
 									"    pm.expect(jsonData.method).to.eql(\"delete\");",
 									"    pm.expect(jsonData.type).to.eql(\"message\");",
-									"    pm.expect(jsonData.id).to.eql(1);",
+									"    pm.expect(jsonData.id).to.eql(id);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1146,18 +1794,60 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/messages/1",
+							"raw": "{{endpoint}}/api/messages/{{message_id}}",
 							"host": [
 								"{{endpoint}}"
 							],
 							"path": [
 								"api",
 								"messages",
-								"1"
+								"{{message_id}}"
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Delete Message",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/messages/{{message_id}}",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"messages",
+										"{{message_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:33:47 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "437"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"message\",\n    \"method\": \"delete\",\n    \"id\": 8,\n    \"output\": {\n        \"id\": 8,\n        \"title\": \"Updated Message\",\n        \"description\": \"This message was updated\",\n        \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n        \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n        \"service\": 1,\n        \"notify_users\": true,\n        \"notify_method\": \"email\",\n        \"notify_before\": 3,\n        \"notify_before_scale\": \"hour\",\n        \"created_at\": \"2018-12-10T11:33:25.875858-08:00\",\n        \"updated_at\": \"2018-12-10T11:33:39.797941-08:00\"\n    }\n}"
+						}
+					]
 				}
 			]
 		},
@@ -1227,7 +1917,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"service_id\": 14,\n    \"name\": \"Server Checkin\",\n    \"interval\": 900,\n    \"grace\": 60\n}"
+									"raw": "{\n    \"service_id\": 2,\n    \"name\": \"Server Checkin\",\n    \"interval\": 900,\n    \"grace\": 60\n}"
 								},
 								"url": {
 									"raw": "{{endpoint}}/api/checkin",
@@ -1250,98 +1940,17 @@
 								},
 								{
 									"key": "Date",
-									"value": "Tue, 20 Nov 2018 20:37:10 GMT"
+									"value": "Mon, 10 Dec 2018 19:34:10 GMT"
 								},
 								{
 									"key": "Content-Length",
-									"value": "265"
+									"value": "330"
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"status\": \"success\",\n    \"type\": \"checkin\",\n    \"method\": \"create\",\n    \"id\": 4,\n    \"output\": {\n        \"id\": 4,\n        \"service_id\": 14,\n        \"name\": \"Server Checkin\",\n        \"interval\": 900,\n        \"grace\": 60,\n        \"api_key\": \"AJ0GsdG\",\n        \"created_at\": \"2018-11-20T20:37:10.437194Z\",\n        \"updated_at\": \"2018-11-20T20:37:10.437194Z\",\n        \"hits\": null\n    }\n}"
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"checkin\",\n    \"method\": \"create\",\n    \"id\": 5,\n    \"output\": {\n        \"id\": 5,\n        \"service_id\": 2,\n        \"name\": \"Server Checkin\",\n        \"interval\": 900,\n        \"grace\": 60,\n        \"api_key\": \"1emn9ha\",\n        \"created_at\": \"2018-12-10T19:34:10.991372Z\",\n        \"updated_at\": \"2018-12-10T19:34:10.991372Z\",\n        \"failing\": false,\n        \"last_hit\": \"0001-01-01T00:00:00Z\",\n        \"hits\": null,\n        \"failures\": null\n    }\n}"
 						}
 					]
-				},
-				{
-					"name": "Run Checkin",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "652a1c5b-5379-43c2-9cd8-ebd8f8dad0f6",
-								"exec": [
-									"pm.test(\"Hit the Checkin API Endpoint\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.status).to.eql(\"success\");",
-									"    pm.expect(jsonData.type).to.eql(\"checkin_hit\");",
-									"    pm.expect(jsonData.method).to.eql(\"update\");",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{endpoint}}/checkin/{{checkin_id}}",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"checkin",
-								"{{checkin_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "View Checkin",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "93ff6b86-368b-406f-9d75-07338714ebca",
-								"exec": [
-									"pm.test(\"View Checkin\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var id = pm.globals.get(\"checkin_id\");",
-									"    pm.expect(jsonData.name).to.eql(\"Server Checkin\");",
-									"    pm.expect(jsonData.api_key).to.eql(id);",
-									"    pm.expect(jsonData.grace).to.eql(60);",
-									"    pm.expect(jsonData.interval).to.eql(900);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{endpoint}}/api/checkin/{{checkin_id}}",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"api",
-								"checkin",
-								"{{checkin_id}}"
-							]
-						}
-					},
-					"response": []
 				},
 				{
 					"name": "View All Checkin's",
@@ -1383,7 +1992,212 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "View All Checkin's",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/checkins",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"checkins"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:34:16 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "268"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 5,\n        \"service_id\": 2,\n        \"name\": \"Server Checkin\",\n        \"interval\": 900,\n        \"grace\": 60,\n        \"api_key\": \"1emn9ha\",\n        \"created_at\": \"2018-12-10T11:34:10.991372-08:00\",\n        \"updated_at\": \"2018-12-10T11:34:10.991372-08:00\",\n        \"failing\": false,\n        \"last_hit\": \"0001-01-01T00:00:00Z\",\n        \"hits\": [],\n        \"failures\": null\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Run Checkin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "652a1c5b-5379-43c2-9cd8-ebd8f8dad0f6",
+								"exec": [
+									"pm.test(\"Hit the Checkin API Endpoint\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.type).to.eql(\"checkin_hit\");",
+									"    pm.expect(jsonData.method).to.eql(\"update\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/checkin/{{checkin_id}}",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"checkin",
+								"{{checkin_id}}"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Run Checkin",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{endpoint}}/checkin/{{checkin_id}}",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"checkin",
+										"{{checkin_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:34:23 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "147"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"checkin_hit\",\n    \"method\": \"update\",\n    \"id\": 5,\n    \"output\": {\n        \"id\": 5,\n        \"from\": \"127.0.0.1\",\n        \"created_at\": \"2018-12-10T19:34:23.442087Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "View Checkin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "93ff6b86-368b-406f-9d75-07338714ebca",
+								"exec": [
+									"pm.test(\"View Checkin\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var id = pm.globals.get(\"checkin_id\");",
+									"    pm.expect(jsonData.name).to.eql(\"Server Checkin\");",
+									"    pm.expect(jsonData.api_key).to.eql(id);",
+									"    pm.expect(jsonData.grace).to.eql(60);",
+									"    pm.expect(jsonData.interval).to.eql(900);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/checkin/{{checkin_id}}",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"checkin",
+								"{{checkin_id}}"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "View Checkin",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/checkin/{{checkin_id}}",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"checkin",
+										"{{checkin_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:34:29 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "338"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 5,\n    \"service_id\": 2,\n    \"name\": \"Server Checkin\",\n    \"interval\": 900,\n    \"grace\": 60,\n    \"api_key\": \"1emn9ha\",\n    \"created_at\": \"2018-12-10T19:34:10.991372Z\",\n    \"updated_at\": \"2018-12-10T19:34:10.991372Z\",\n    \"failing\": false,\n    \"last_hit\": \"2018-12-10T11:34:23.443663-08:00\",\n    \"hits\": [\n        {\n            \"id\": 5,\n            \"from\": \"127.0.0.1\",\n            \"created_at\": \"2018-12-10T19:34:23.442087Z\"\n        }\n    ],\n    \"failures\": null\n}"
+						}
+					]
 				},
 				{
 					"name": "Delete Checkin",
@@ -1425,7 +2239,49 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Delete Checkin",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/checkin/{{checkin_id}}",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"checkin",
+										"{{checkin_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:34:35 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "410"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"checkin\",\n    \"method\": \"delete\",\n    \"id\": 5,\n    \"output\": {\n        \"id\": 5,\n        \"service_id\": 2,\n        \"name\": \"Server Checkin\",\n        \"interval\": 900,\n        \"grace\": 60,\n        \"api_key\": \"1emn9ha\",\n        \"created_at\": \"2018-12-10T19:34:10.991372Z\",\n        \"updated_at\": \"2018-12-10T19:34:10.991372Z\",\n        \"failing\": false,\n        \"last_hit\": \"2018-12-10T11:34:23.443663-08:00\",\n        \"hits\": [\n            {\n                \"id\": 5,\n                \"from\": \"127.0.0.1\",\n                \"created_at\": \"2018-12-10T19:34:23.442087Z\"\n            }\n        ],\n        \"failures\": null\n    }\n}"
+						}
+					]
 				}
 			]
 		}
