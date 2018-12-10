@@ -354,14 +354,7 @@
 							"script": {
 								"id": "b5a67a19-fd08-40b0-a961-3e9474ab78c6",
 								"exec": [
-									"pm.test(\"Update Service\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.output.name).to.eql(\"Updated Google Service\");",
-									"    pm.expect(jsonData.output.domain).to.eql(\"https://google.com\");",
-									"    pm.expect(jsonData.output.type).to.eql(\"http\");",
-									"    pm.expect(jsonData.output.method).to.eql(\"GET\");",
-									"    pm.expect(jsonData.output.expected_status).to.eql(200);",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
