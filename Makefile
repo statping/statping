@@ -40,7 +40,7 @@ docker-build-all: docker-build-latest
 # push all docker tags built
 docker-publish-all: docker-push-latest
 
-snapcraft: snapcraft-build snapcraft-release
+snapcraft: clean snapcraft-build snapcraft-release
 
 # build Statping for local arch
 build: compile
@@ -318,7 +318,9 @@ snapcraft-build: build-all
 	rm -f build/$(BINARY_NAME)-linux.tar.gz
 
 snapcraft-release:
-	snapcraft push *.snap --release edge
+	snapcraft push statping_${VERSION}_arm64.snap --release stable
+	snapcraft push statping_${VERSION}_i386.snap --release stable
+	snapcraft push statping_${VERSION}_armhf.snap --release stable
 
 sign-all:
 	gpg --default-key $SIGN_KEY --detach-sign --armor statpinger
