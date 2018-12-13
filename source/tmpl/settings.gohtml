@@ -113,25 +113,27 @@
                                 <label for="api_secret" class="col-sm-3 col-form-label">API Secret</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control select-input" value="{{ .ApiSecret }}" id="api_secret" readonly>
-                                    <small class="form-text text-muted">You can <a href="/api/renew">Regenerate API Keys</a> if you need to.</small>
+                                    <small class="form-text text-muted">You can <a class="confirm_btn" data-msg="Are you sure you want to reset the API keys?" href="/api/renew">Regenerate API Keys</a> if you need to.</small>
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <a href="/settings/export" class="btn btn-sm btn-secondary float-right">Export Settings</a>
-                                {{if .Domain}}
-                                <a href="#" class="btn btn-sm btn-secondary float-right ml-1">Authentication QR Code</a>
-                                {{end}}
-                            </div>
+                        </form>
 
+                        <h3>Additional Settings</h3>
+
+                        <div class="row">
+                            <a href="/settings/export" class="btn btn-sm btn-secondary float-right">Export Settings</a>
                             {{if .Domain}}
+                                <a href="#" class="btn btn-sm btn-secondary float-right ml-1">Authentication QR Code</a>
+                            {{end}}
+                        </div>
+
+                        {{if .Domain}}
                             <div class="row align-content-center">
                                 <img class="rounded text-center" width="300" height="300" src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl={{ QrAuth }}">
                             </div>
                             <a class="btn btn-sm btn-primary" href={{safeURL QrAuth}}>Open in Statping App</a>
-                            {{end}}
-
-                        </form>
+                        {{end}}
 
                     </div>
 
@@ -141,7 +143,7 @@
                         <div class="jumbotron jumbotron-fluid">
                             <div class="text-center col-12">
                                 <h1 class="display-5">Enable Local Assets</h1>
-                                <a class="lead">Customize your status page design by enabling local assets. This will create a 'assets' directory containing all CSS.<p><a href="/settings/build" class="btn btn-primary mt-3"{{if USE_CDN}} disabled{{end}}>Enable Local Assets</a></p></p>
+                                <span class="lead">Customize your status page design by enabling local assets. This will create a 'assets' directory containing all CSS.<p><a href="/settings/build" class="btn btn-primary mt-3"{{if USE_CDN}} disabled{{end}}>Enable Local Assets</a></p></span>
                             </div>
                         </div>
                     {{ else }}

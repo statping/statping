@@ -131,6 +131,12 @@ func (s *Service) Online24() float32 {
 	return s.OnlineSince(ago)
 }
 
+// Online7Days returns the service's uptime percent within last 7 days
+func (s *Service) Online7Days() float32 {
+	ago := time.Now().Add((-24 * 7) * time.Hour)
+	return s.OnlineSince(ago)
+}
+
 // OnlineSince accepts a time since parameter to return the percent of a service's uptime.
 func (s *Service) OnlineSince(ago time.Time) float32 {
 	failed, _ := s.TotalFailuresSince(ago)

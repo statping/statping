@@ -143,6 +143,15 @@ function PingAjaxChart(chart, service, start=0, end=9999999999, group="hour") {
   });
 }
 
+$('.confirm_btn').on('click', function() {
+	let msg = $(this).attr('data-msg');
+	var r = confirm(msg);
+	if (r !== true) {
+		return false;
+	}
+	return true;
+});
+
 $('.ajax_delete').on('click', function() {
 	var r = confirm('Are you sure you want to delete?');
 	if (r !== true) {
