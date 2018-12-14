@@ -61,7 +61,7 @@
             newOrder.push(o);
         });
         $.ajax({
-            url: "/api/services/reorder",
+            url: "/api/reorder",
             type: 'POST',
             data: JSON.stringify(newOrder),
             contentType: "application/json",

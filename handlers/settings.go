@@ -28,7 +28,7 @@ import (
 )
 
 func settingsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -36,7 +36,7 @@ func settingsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -77,7 +77,7 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -94,7 +94,7 @@ func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -115,7 +115,7 @@ func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}

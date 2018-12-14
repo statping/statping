@@ -36,7 +36,7 @@ type apiResponse struct {
 }
 
 func apiIndexHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -45,7 +45,7 @@ func apiIndexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}

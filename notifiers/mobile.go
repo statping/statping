@@ -16,12 +16,13 @@
 package notifiers
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
-	"github.com/oliveroneill/exponent-server-sdk-golang/sdk"
-	"strings"
+	"os"
 	"time"
 )
 
@@ -44,6 +45,12 @@ var mobile = &mobilePush{&notifier.Notification{
 		Placeholder: "A list of your mobile device push notification ID's.",
 		DbField:     "var1",
 		IsHidden:    true,
+	}, {
+		Type:        "number",
+		Title:       "Array of device numbers",
+		Placeholder: "1 for iphone 2 for android",
+		DbField:     "var2",
+		IsHidden:    true,
 	}}},
 }
 
@@ -59,7 +66,7 @@ func (u *mobilePush) Select() *notifier.Notification {
 	return u.Notification
 }
 
-func dataJson(s *types.Service, f *types.Failure) map[string]string {
+func dataJson(s *types.Service, f *types.Failure) map[string]interface{} {
 	serviceId := "0"
 	if s != nil {
 		serviceId = utils.ToString(s.Id)
@@ -73,7 +80,7 @@ func dataJson(s *types.Service, f *types.Failure) map[string]string {
 		issue = f.Issue
 	}
 	link := fmt.Sprintf("statup://service?id=%v", serviceId)
-	out := map[string]string{
+	out := map[string]interface{}{
 		"status": online,
 		"id":     serviceId,
 		"issue":  issue,
@@ -85,12 +92,10 @@ func dataJson(s *types.Service, f *types.Failure) map[string]string {
 // OnFailure will trigger failing service
 func (u *mobilePush) OnFailure(s *types.Service, f *types.Failure) {
 	data := dataJson(s, f)
-	msg := &expo.PushMessage{
-		Body:     fmt.Sprintf("Your service '%v' is currently failing! Reason: %v", s.Name, f.Issue),
-		Sound:    "default",
-		Title:    "Service Offline",
-		Data:     data,
-		Priority: expo.DefaultPriority,
+	msg := &PushArray{
+		Message: fmt.Sprintf("Your service '%v' is currently failing! Reason: %v", s.Name, f.Issue),
+		Title:   "Service Offline",
+		Data:    data,
 	}
 	u.AddQueue(s.Id, msg)
 	u.Online = false
@@ -101,12 +106,10 @@ func (u *mobilePush) OnSuccess(s *types.Service) {
 	data := dataJson(s, nil)
 	if !u.Online {
 		u.ResetUniqueQueue(s.Id)
-		msg := &expo.PushMessage{
-			Body:     fmt.Sprintf("Your service '%v' is back online!", s.Name),
-			Sound:    "default",
-			Title:    "Service Online",
-			Data:     data,
-			Priority: expo.DefaultPriority,
+		msg := &PushArray{
+			Message: fmt.Sprintf("Your service '%v' is back online!", s.Name),
+			Title:   "Service Online",
+			Data:    data,
 		}
 		u.AddQueue(s.Id, msg)
 	}
@@ -115,11 +118,9 @@ func (u *mobilePush) OnSuccess(s *types.Service) {
 
 // OnSave triggers when this notifier has been saved
 func (u *mobilePush) OnSave() error {
-	msg := &expo.PushMessage{
-		Body:     "The Mobile Notifier has been saved",
-		Sound:    "default",
-		Title:    "Notification Saved",
-		Priority: expo.DefaultPriority,
+	msg := &PushArray{
+		Message: "The Mobile Notifier has been saved",
+		Title:   "Notification Saved",
 	}
 	u.AddQueue(0, msg)
 	return nil
@@ -130,26 +131,45 @@ func (u *mobilePush) OnTest() error {
 	return nil
 }
 
-// Send will send message to expo mobile push notifications endpoint
+// Send will send message to Statping push notifications endpoint
 func (u *mobilePush) Send(msg interface{}) error {
-	pushMessage := msg.(*expo.PushMessage)
-	client := expo.NewPushClient(nil)
-	splitIds := strings.Split(u.Var1, ",")
-
-	for _, id := range splitIds {
-		pushToken, err := expo.NewExponentPushToken(expo.ExponentPushToken(id))
-		if err != nil {
-			return err
-		}
-		pushMessage.To = pushToken
-		response, err := client.Publish(pushMessage)
-		if err != nil {
-			return err
-		}
-		if response.ValidateResponse() != nil {
-			fmt.Println(response.PushMessage.To, "failed")
-		}
+	pushMessage := msg.(*PushArray)
+	pushMessage.Tokens = []string{u.Var1}
+	pushMessage.Platform = utils.ToInt(u.Var2)
+	err := pushRequest(pushMessage)
+	if err != nil {
+		return err
 	}
-
 	return nil
+}
+
+func pushRequest(msg *PushArray) error {
+	if msg.Platform == 1 {
+		msg.Title = ""
+	}
+	body, _ := json.Marshal(&PushNotification{[]*PushArray{msg}})
+	url := "https://push.statping.com/api/push"
+	if os.Getenv("GO_ENV") == "test" {
+		url = "https://pushdev.statping.com/api/push"
+	}
+	_, _, err := utils.HttpRequest(url, "POST", "application/json", nil, bytes.NewBuffer(body), time.Duration(10*time.Second))
+	return err
+}
+
+type PushNotification struct {
+	Array []*PushArray `json:"notifications"`
+}
+
+type PushArray struct {
+	Tokens   []string               `json:"tokens"`
+	Platform int64                  `json:"platform"`
+	Message  string                 `json:"message"`
+	Title    string                 `json:"title,omitempty"`
+	Data     map[string]interface{} `json:"data,omitempty"`
+}
+
+type MobileResponse struct {
+	Counts  int           `json:"counts"`
+	Logs    []interface{} `json:"logs"`
+	Success string        `json:"success"`
 }

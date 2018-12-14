@@ -106,6 +106,7 @@
                                 <label for="api_key" class="col-sm-3 col-form-label">API Key</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control select-input" value="{{ .ApiKey }}" id="api_key" readonly>
+                                    <small class="form-text text-muted">API Key can be used for read only routes</small>
                                 </div>
                             </div>
 
@@ -113,6 +114,7 @@
                                 <label for="api_secret" class="col-sm-3 col-form-label">API Secret</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control select-input" value="{{ .ApiSecret }}" id="api_secret" readonly>
+                                    <small class="form-text text-muted">API Secret is used for read, create, update and delete routes</small>
                                     <small class="form-text text-muted">You can <a class="confirm_btn" data-msg="Are you sure you want to reset the API keys?" href="/api/renew">Regenerate API Keys</a> if you need to.</small>
                                 </div>
                             </div>

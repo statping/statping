@@ -96,9 +96,28 @@ func RunHTTPServer(ip string, port int) error {
 	return nil
 }
 
-// IsAuthenticated returns true if the HTTP request is authenticated. You can set the environment variable GO_ENV=test
+// IsReadAuthenticated will allow Read Only authentication for some routes
+func IsReadAuthenticated(r *http.Request) bool {
+	var token string
+	query := r.URL.Query()
+	key := query.Get("api")
+	if key == core.CoreApp.ApiKey {
+		return true
+	}
+	tokens, ok := r.Header["Authorization"]
+	if ok && len(tokens) >= 1 {
+		token = tokens[0]
+		token = strings.TrimPrefix(token, "Bearer ")
+		if token == core.CoreApp.ApiKey {
+			return true
+		}
+	}
+	return IsFullAuthenticated(r)
+}
+
+// IsFullAuthenticated returns true if the HTTP request is authenticated. You can set the environment variable GO_ENV=test
 // to bypass the admin authenticate to the dashboard features.
-func IsAuthenticated(r *http.Request) bool {
+func IsFullAuthenticated(r *http.Request) bool {
 	if os.Getenv("GO_ENV") == "test" {
 		return true
 	}
@@ -139,7 +158,7 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 			return template.URL(u)
 		},
 		"Auth": func() bool {
-			return IsAuthenticated(r)
+			return IsFullAuthenticated(r)
 		},
 		"VERSION": func() string {
 			return core.VERSION

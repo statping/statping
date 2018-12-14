@@ -28,7 +28,7 @@ import (
 )
 
 func apiAllCheckinsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -42,7 +42,7 @@ func apiAllCheckinsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -59,7 +59,7 @@ func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func checkinCreateHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -115,7 +115,7 @@ func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func checkinDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}

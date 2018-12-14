@@ -24,17 +24,20 @@ import (
 )
 
 var (
-	MOBILE_ID string
+	MOBILE_ID     string
+	MOBILE_NUMBER string
 )
 
 func init() {
 	MOBILE_ID = os.Getenv("MOBILE_ID")
+	MOBILE_NUMBER = os.Getenv("MOBILE_NUMBER")
 	mobile.Var1 = MOBILE_ID
 }
 
 func TestMobileNotifier(t *testing.T) {
 	t.Parallel()
 	mobile.Var1 = MOBILE_ID
+	mobile.Var2 = os.Getenv("MOBILE_NUMBER")
 	if MOBILE_ID == "" {
 		t.Log("mobile notifier testing skipped, missing MOBILE_ID environment variable")
 		t.SkipNow()
@@ -43,12 +46,14 @@ func TestMobileNotifier(t *testing.T) {
 
 	t.Run("Load mobile", func(t *testing.T) {
 		mobile.Var1 = MOBILE_ID
+		mobile.Var2 = MOBILE_NUMBER
 		mobile.Delay = time.Duration(100 * time.Millisecond)
 		mobile.Limits = 3
 		err := notifier.AddNotifier(mobile)
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", mobile.Author)
 		assert.Equal(t, MOBILE_ID, mobile.Var1)
+		assert.Equal(t, MOBILE_NUMBER, mobile.Var2)
 	})
 
 	t.Run("Load mobile Notifier", func(t *testing.T) {

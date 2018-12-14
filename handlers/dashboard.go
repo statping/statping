@@ -27,7 +27,7 @@ import (
 )
 
 func dashboardHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		err := core.ErrorResponse{}
 		ExecuteResponse(w, r, "login.gohtml", err, nil)
 	} else {
@@ -63,7 +63,7 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func helpHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -72,7 +72,7 @@ func helpHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func logsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -88,7 +88,7 @@ func logsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func logsLineHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsReadAuthenticated(r) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -100,7 +100,7 @@ func logsLineHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func exportHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

@@ -47,7 +47,7 @@ func renderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func servicesHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -60,7 +60,7 @@ type serviceOrder struct {
 }
 
 func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -119,7 +119,7 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsReadAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -134,7 +134,7 @@ func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -155,7 +155,7 @@ func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -219,7 +219,7 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -238,7 +238,7 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsReadAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
@@ -248,7 +248,7 @@ func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsAuthenticated(r) {
+	if !IsFullAuthenticated(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
