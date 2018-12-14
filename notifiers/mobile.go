@@ -152,7 +152,7 @@ func pushRequest(msg *PushArray) error {
 	if os.Getenv("GO_ENV") == "test" {
 		url = "https://pushdev.statping.com/api/push"
 	}
-	_, _, err := utils.HttpRequest(url, "POST", "application/json", nil, bytes.NewBuffer(body), time.Duration(10*time.Second))
+	_, _, err := utils.HttpRequest(url, "POST", "application/json", nil, bytes.NewBuffer(body), time.Duration(20*time.Second))
 	return err
 }
 

@@ -48,7 +48,7 @@ func TestMobileNotifier(t *testing.T) {
 		mobile.Var1 = MOBILE_ID
 		mobile.Var2 = MOBILE_NUMBER
 		mobile.Delay = time.Duration(100 * time.Millisecond)
-		mobile.Limits = 3
+		mobile.Limits = 10
 		err := notifier.AddNotifier(mobile)
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", mobile.Author)
