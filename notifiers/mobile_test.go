@@ -101,7 +101,7 @@ func TestMobileNotifier(t *testing.T) {
 		mobile.OnSuccess(TestService)
 		assert.Equal(t, 1, len(mobile.Queue))
 		go notifier.Queue(mobile)
-		time.Sleep(5 * time.Second)
+		time.Sleep(20 * time.Second)
 		assert.Equal(t, 0, len(mobile.Queue))
 	})
 
@@ -118,7 +118,7 @@ func TestMobileNotifier(t *testing.T) {
 
 	t.Run("mobile Queue", func(t *testing.T) {
 		go notifier.Queue(mobile)
-		time.Sleep(5 * time.Second)
+		time.Sleep(15 * time.Second)
 		assert.Equal(t, MOBILE_ID, mobile.Var1)
 		assert.Equal(t, 0, len(mobile.Queue))
 	})
