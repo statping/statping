@@ -22,7 +22,7 @@
                 <td class="text-right">
                     <div class="btn-group">
                         <a href="/service/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> View</a>
-                        <a href="/api/services/{{.Id}}" class="ajax_delete btn btn-danger" data-method="DELETE" data-obj="service_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>
+                        {{if Auth}}<a href="/api/services/{{.Id}}" class="ajax_delete btn btn-danger" data-method="DELETE" data-obj="service_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>{{end}}
                     </div>
                 </td>
             </tr>
@@ -30,11 +30,10 @@
             </tbody>
         </table>
         {{end}}
-
-        <h3>Create Service</h3>
-
-        {{template "form_service" NewService}}
-
+        {{if Auth}}
+            <h3>Create Service</h3>
+            {{template "form_service" NewService}}
+        {{end}}
     </div>
 </div>
 {{end}}

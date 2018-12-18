@@ -2,9 +2,10 @@
 {{define "description"}}{{$s := .Service}}{{if $s.Online }}{{.Service.Name}} is currently online and responding within {{$s.AvgTime}} milliseconds with {{$s.TotalUptime}}% total uptime on {{$s.Domain}}.{{else}}{{.Service.Name}} is currently offline on {{$s.Domain}}. Notify the admin to let them know their service is offline.{{end}}{{end}}
 {{ define "content" }}
 {{$s := .Service}}
+{{$isAdmin := Auth}}
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
 
-{{if Auth}}
+{{if IsUser}}
     {{template "nav"}}
 {{end}}
 
@@ -43,16 +44,16 @@
 
         {{if $s.ActiveMessages}}
         <div class="col-12 mb-5">
-        {{range $s.ActiveMessages}}
-            <div class="alert alert-warning" role="alert">
-                <h3>{{.Title}}</h3>
-                <span class="mb-3">{{safe .Description}}</span>
-                <div class="d-block mt-2 mb-4">
-                    <span class="float-left small">Starts at {{.StartOn}}</span>
-                    <span class="float-right small">Ends on {{.EndOn}}</span>
+            {{range $s.ActiveMessages}}
+                <div class="alert alert-warning" role="alert">
+                    <h3>{{.Title}}</h3>
+                    <span class="mb-3">{{safe .Description}}</span>
+                    <div class="d-block mt-2 mb-4">
+                        <span class="float-left small">Starts at {{.StartOn}}</span>
+                        <span class="float-right small">Ends on {{.EndOn}}</span>
+                    </div>
                 </div>
-            </div>
-        {{end}}
+            {{end}}
         </div>
         {{end}}
 
@@ -74,15 +75,16 @@
         <div class="col-12 small text-center mt-3 text-muted">{{$s.DowntimeText}}</div>
     {{end}}
 
-{{if Auth}}
+{{if IsUser}}
    {{$failures := $s.LimitedFailures 16}}
     <nav class="nav nav-pills flex-column flex-sm-row mt-3" id="service_tabs" role="serviceLists">
-        <a class="flex-sm-fill text-sm-center nav-link active" id="edit-tab" data-toggle="tab" href="#edit" role="tab" aria-controls="edit" aria-selected="false">Edit Service</a>
-            <a class="flex-sm-fill text-sm-center nav-link{{ if not $failures }} disabled{{end}}" id="failures-tab" data-toggle="tab" href="#failures" role="tab" aria-controls="failures" aria-selected="true">Failures</a>
-            <a class="flex-sm-fill text-sm-center nav-link" id="checkins-tab" data-toggle="tab" href="#checkins" role="tab" aria-controls="checkins" aria-selected="false">Checkins</a>
-            <a class="flex-sm-fill text-sm-center nav-link" id="response-tab" data-toggle="tab" href="#response" role="tab" aria-controls="response" aria-selected="false">Response</a>
+        {{if $isAdmin}}<a class="flex-sm-fill text-sm-center nav-link active" id="edit-tab" data-toggle="tab" href="#edit" role="tab" aria-controls="edit" aria-selected="false">Edit Service</a>{{end}}
+        <a class="flex-sm-fill text-sm-center nav-link{{ if not $failures }} disabled{{end}}" id="failures-tab" data-toggle="tab" href="#failures" role="tab" aria-controls="failures" aria-selected="true">Failures</a>
+        {{if $isAdmin}}<a class="flex-sm-fill text-sm-center nav-link" id="checkins-tab" data-toggle="tab" href="#checkins" role="tab" aria-controls="checkins" aria-selected="false">Checkins</a>{{end}}
+        <a class="flex-sm-fill text-sm-center nav-link{{if not $isAdmin}} active{{end}}" id="response-tab" data-toggle="tab" href="#response" role="tab" aria-controls="response" aria-selected="false">Response</a>
     </nav>
     <div class="tab-content" id="myTabContent">
+        {{if $isAdmin}}
         <div class="tab-pane fade" id="failures" role="serviceLists" aria-labelledby="failures-tab">
         {{ if $failures }}
             <div class="list-group mt-3 mb-4">
@@ -98,6 +100,8 @@
             </div>
         {{ end }}
         </div>
+        {{end}}
+        {{if $isAdmin}}
         <div class="tab-pane fade" id="checkins" role="serviceLists" aria-labelledby="checkins-tab">
             {{if $s.AllCheckins}}
                 <table class="table">
@@ -135,8 +139,9 @@
                     </tbody>
                 </table>
             {{end}}
-            {{template "form_checkin" $s}}
-
+            {{if $isAdmin}}
+                {{template "form_checkin" $s}}
+            {{end}}
             {{$failures := $s.LimitedCheckinFailures 16}}
             {{ if $failures }}
                 <div class="list-group mt-3 mb-4">
@@ -152,7 +157,8 @@
                 </div>
             {{ end }}
         </div>
-        <div class="tab-pane fade" id="response" role="serviceLists" aria-labelledby="response-tab">
+        {{ end }}
+        <div class="tab-pane fade{{if not $isAdmin}} show active{{end}}" id="response" role="serviceLists" aria-labelledby="response-tab">
             <div class="col-12 mt-4{{if ne $s.Type "http"}} d-none{{end}}">
                 <h3>Last Response</h3>
                 <textarea rows="8" class="form-control" readonly>{{ $s.LastResponse }}</textarea>
@@ -164,13 +170,14 @@
                 </div>
             </div>
         </div>
+        {{if $isAdmin}}
         <div class="tab-pane fade show active" id="edit" role="serviceLists" aria-labelledby="edit-tab">
             {{template "form_service" $s}}
         </div>
-    </div>
-
+        {{end}}
     </div>
 {{end}}
+</div>
 </div>
 {{end}}
 {{define "extra_css"}}

@@ -248,7 +248,11 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	r := new(http.Request)
 	for _, h := range headers {
 		keyVal := strings.Split(h, "=")
-		r.Header.Add(keyVal[0], keyVal[1])
+		if len(keyVal) == 2 {
+			if keyVal[0] != "" && keyVal[1] != "" {
+				r.Header.Add(keyVal[0], keyVal[1])
+			}
+		}
 	}
 	if r, err = http.NewRequest(method, url, body); err != nil {
 		return nil, nil, err

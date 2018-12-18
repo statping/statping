@@ -16,20 +16,19 @@
             <tr id="user_{{.Id}}">
                 <td>{{.Username}}</td>
                 <td class="text-right">
-                    <div class="btn-group">
+                    {{if Auth}}<div class="btn-group">
                         <a href="/user/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-user-edit"></i> Edit</a>
                         <a href="/api/users/{{.Id}}" class="ajax_delete btn btn-danger" data-method="DELETE" data-obj="user_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>
-                    </div>
+                    </div>{{end}}
                 </td>
             </tr>
             {{end}}
             </tbody>
         </table>
-
-        <h3>Create User</h3>
-
-        {{template "form_user" NewUser}}
-
+        {{if Auth}}
+            <h3>Create User</h3>
+            {{template "form_user" NewUser}}
+        {{end}}
     </div>
 </div>
 {{end}}

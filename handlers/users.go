@@ -28,7 +28,7 @@ import (
 )
 
 func usersHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
+	if !IsUser(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}

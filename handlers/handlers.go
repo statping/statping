@@ -136,6 +136,23 @@ func IsFullAuthenticated(r *http.Request) bool {
 			return true
 		}
 	}
+	return IsAdmin(r)
+}
+
+// IsAdmin returns true if the user session is an administrator
+func IsAdmin(r *http.Request) bool {
+	session, err := sessionStore.Get(r, cookieKey)
+	if err != nil {
+		return false
+	}
+	if session.Values["admin"] == nil {
+		return false
+	}
+	return session.Values["admin"].(bool)
+}
+
+// IsUser returns true if the user is registered
+func IsUser(r *http.Request) bool {
 	session, err := sessionStore.Get(r, cookieKey)
 	if err != nil {
 		return false
@@ -159,6 +176,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		},
 		"Auth": func() bool {
 			return IsFullAuthenticated(r)
+		},
+		"IsUser": func() bool {
+			return IsUser(r)
 		},
 		"VERSION": func() string {
 			return core.VERSION

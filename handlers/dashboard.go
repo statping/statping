@@ -17,6 +17,7 @@ package handlers
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/source"
@@ -27,7 +28,7 @@ import (
 )
 
 func dashboardHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
+	if !IsUser(r) {
 		err := core.ErrorResponse{}
 		ExecuteResponse(w, r, "login.gohtml", err, nil)
 	} else {
@@ -47,7 +48,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	if auth {
 		session.Values["authenticated"] = true
 		session.Values["user_id"] = user.Id
+		session.Values["admin"] = user.Admin.Bool
 		session.Save(r, w)
+		utils.Log(1, fmt.Sprintf("User %v logged in from IP %v", user.Username, r.RemoteAddr))
 		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 	} else {
 		err := core.ErrorResponse{Error: "Incorrect login information submitted, try again."}
@@ -58,12 +61,14 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := sessionStore.Get(r, cookieKey)
 	session.Values["authenticated"] = false
+	session.Values["admin"] = false
+	session.Values["user_id"] = 0
 	session.Save(r, w)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func helpHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
+	if !IsUser(r) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}

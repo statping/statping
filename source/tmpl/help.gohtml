@@ -1,7 +1,7 @@
 {{define "title"}}Statping | Help{{end}}
 {{define "content"}}
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
-{{if Auth}}
+{{if IsUser}}
     {{template "nav"}}
 {{end}}
     <div class="col-12">
