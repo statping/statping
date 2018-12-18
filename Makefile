@@ -17,7 +17,7 @@ TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statping
 PATH:=$(PATH)
 
 # build all arch's and release Statping
-release: dev-deps build-all
+release: dev-deps build-all travis-build
 
 # build and push the images to docker hub
 docker: docker-build-all docker-publish-all

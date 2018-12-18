@@ -22,5 +22,6 @@ FILE="https://$REPO/releases/download/$VERSION/statping-$OS-$ARCH.tar.gz"
 printf "Downloading latest version URL: $FILE\n"
 curl -L -sS $FILE -o statping.tar.gz && tar xzf statping.tar.gz && rm statping.tar.gz
 chmod +x statping
+echo "Installing Statping to directory: /usr/local/bin/"
 mv statping /usr/local/bin/
 echo "Statping $VERSION has been successfully installed! Try 'statping version' to check it!"

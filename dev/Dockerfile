@@ -1,31 +1,20 @@
-ARG VERSION
-FROM golang:1.11-alpine
+FROM golang:1.11-alpine as base
 MAINTAINER "Hunter Long (https://github.com/hunterlong)"
-# Statping 'test' image for running a full test using the production environment
-
-ENV DEP_VERSION=v0.5.0
+ARG VERSION
+ENV DEP_VERSION v0.5.0
 RUN apk add --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers wget curl jq
-
 RUN curl -L -s https://github.com/golang/dep/releases/download/$DEP_VERSION/dep-linux-amd64 -o /go/bin/dep && \
     chmod +x /go/bin/dep
-
-RUN curl -L -s https://assets.statup.io/sass -o /usr/local/bin/sass && \
+RUN curl -L -s https://assets.statping.com/sass -o /usr/local/bin/sass && \
     chmod +x /usr/local/bin/sass
-
 WORKDIR /go/src/github.com/hunterlong/statping
 ADD . /go/src/github.com/hunterlong/statping
-
-ENV VERSION=${VERSION}
-ENV IS_DOCKER=true
-
 RUN make dep
 RUN make dev-deps
 RUN make install
 
+ENV IS_DOCKER=true
+ENV STATPING_DIR=/app
 WORKDIR /app
-VOLUME /app
-EXPOSE 8080
 
-HEALTHCHECK --interval=5s --timeout=5s --retries=5 CMD curl -s "http://localhost:8080/health" | jq -r -e ".online==true"
-
-ENTRYPOINT statping
+CMD ["statping"]
