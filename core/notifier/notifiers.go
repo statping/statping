@@ -300,7 +300,11 @@ CheckNotifier:
 						utils.Log(2, fmt.Sprintf("notifier %v had an error: %v", notification.Method, err))
 					}
 					notification.makeLog(msg.Data)
-					notification.Queue = notification.Queue[1:]
+					if len(notification.Queue) > 1 {
+						notification.Queue = notification.Queue[1:]
+					} else {
+						notification.Queue = nil
+					}
 					rateLimit = notification.Delay
 				}
 			}

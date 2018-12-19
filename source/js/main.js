@@ -27,7 +27,7 @@ $('.test_notifier').on('click', function(e) {
     var btn = $(this);
     var form = $(this).parents('form:first');
     var values = form.serialize();
-    var notifier = form.find('input[name=notifier]').val();
+    var notifier = form.find('input[name=method]').val();
     var success = $('#'+notifier+'-success');
     var error = $('#'+notifier+'-error');
 		Spinner(btn);
@@ -72,7 +72,6 @@ function Spinner(btn, off = false) {
 }
 
 function SaveNotifier(data) {
-	console.log(data)
 	let button = data.element.find('button[type=submit]');
 	button.text('Saved!')
 	button.removeClass('btn-primary')
@@ -123,6 +122,11 @@ function AjaxChart(chart, service, start=0, end=9999999999, group="hour") {
     }
   });
 }
+
+$('input[type=checkbox]').on('change', function() {
+	var element = $(this).attr('id');
+	$("#"+element+"-value").val(this.checked ? "true" : "false")
+});
 
 function PingAjaxChart(chart, service, start=0, end=9999999999, group="hour") {
   $.ajax({
@@ -190,37 +194,35 @@ $('form.ajax_form').on('submit', function() {
 	let alerter = form.find('#alerter');
 	var arrayData = [];
 	let newArr = {};
-	console.log(values);
 	Spinner(button);
 	values.forEach(function(k, v) {
-		if (k.name === "password_confirm" || k.value === "") {
+		if (k.name === "password_confirm" || k.value === "" || k.name === "enabled-option") {
 			return
 		}
 		if (k.value === "on") {
 			k.value = (k.value === "on")
 		}
-		if (k.value === "false") {
-			k.value = false
-		}
-		if (k.value === "true") {
-			k.value = true
+		if (k.value === "false" || k.value === "true") {
+			k.value = (k.value === "true")
 		}
 		if($.isNumeric(k.value)){
 			if (k.name !== "password") {
 				k.value = parseInt(k.value)
 			}
 		}
+		if (k.name === "var1" || k.name === "var2" || k.name === "host" || k.name === "username" || k.name === "password" || k.name === "api_key" || k.name === "api_secret") {
+			k.value = k.value.toString()
+		}
 		newArr[k.name] = k.value;
 		arrayData.push(newArr)
 	});
 	let sendData = JSON.stringify(newArr);
-	console.log('sending '+method.toUpperCase()+' '+action+':',  newArr);
+	// console.log('sending '+method.toUpperCase()+' '+action+':',  sendData);
 	$.ajax({
 		url: action,
 		type: method,
 		data: sendData,
 		success: function (data) {
-			console.log(data)
 			setTimeout(function () {
 				if (data.status === 'error') {
 					let alerter = form.find('#alerter');
