@@ -1,7 +1,0 @@
-FROM postman/newman
-
-WORKDIR /app
-ADD dev/postman_environment.json /app/
-ADD source/tmpl/postman.json /app/
-
-ENTRYPOINT sleep 15 && newman run /app/postman.json -e /app/postman_environment.json
