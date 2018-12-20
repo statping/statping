@@ -41,17 +41,17 @@ func main() {
 	utils.Command("git clone https://github.com/hunterlong/statping.wiki.git")
 
 	pages := []string{"Types-of-Monitoring", "Features", "Start-Statping", "Linux", "Mac", "Windows", "AWS-EC2", "Docker", "Mobile-App", "Heroku", "API", "Makefile",
-		"Notifiers", "Notifier-Events", "Notifier-Example", "Prometheus-Exporter", "SSL", "Static-Export", "Statping-Plugins", "Statuper", "PGP-Signature", "Testing"}
+		"Notifiers", "Notifier-Events", "Notifier-Example", "Prometheus-Exporter", "SSL", "Config-with-.env-File", "Static-Export", "Statping-Plugins", "Statuper", "Contributing", "PGP-Signature", "Testing"}
 	newPages := map[string]string{}
 
-	for _, v := range pages {
-		compiled += "<a class=\"scrollclick\" href=\"#\" data-id=\"page_" + v + "\">" + replaceDash(v) + "</a><br>"
+	for k, v := range pages {
+		compiled += "<a class=\"scrollclick\" href=\"#\" data-id=\"page_" + utils.ToString(k) + "\">" + replaceDash(v) + "</a><br>"
 	}
 
-	for _, v := range pages {
+	for k, v := range pages {
 		sc, _ := ioutil.ReadFile("statping.wiki/" + v + ".md")
 		newPages[v] = string(sc)
-		compiled += "\n\n<div class=\"mt-5\" id=\"page_" + v + "\"><h1>" + replaceDash(v) + "</h1></div>\n" + string(sc)
+		compiled += "\n\n<div class=\"mt-5\" id=\"page_" + utils.ToString(k) + "\"><h1>" + replaceDash(v) + "</h1></div>\n" + string(sc)
 	}
 
 	utils.DeleteDirectory("./statping.wiki")

@@ -224,7 +224,7 @@ dev-deps:
 	$(GOCMD) install gopkg.in/matm/v1/gocov-html
 	$(GOCMD) get github.com/mgechev/revive
 	$(GOCMD) get github.com/fatih/structs
-	$(GOCMD) get github.com/oliveroneill/exponent-server-sdk-golang/sdk
+	$(GOGET) github.com/ararog/timeago
 
 # remove files for a clean compile/build
 clean:
