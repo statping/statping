@@ -1,1 +1,1 @@
-web: statping
+web: cmd
