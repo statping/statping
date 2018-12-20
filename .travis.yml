@@ -33,11 +33,6 @@ env:
     - GO_ENV=test
     - STATPING_DIR=$GOPATH/src/github.com/hunterlong/statping
 
-before_deploy:
-  - git config --local user.name "hunterlong"
-  - git config --local user.email "info@socialeck.com"
-  - make tag
-
 matrix:
   allow_failures:
     - go: master
