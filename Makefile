@@ -225,6 +225,8 @@ dev-deps:
 	$(GOCMD) get github.com/mgechev/revive
 	$(GOCMD) get github.com/fatih/structs
 	$(GOGET) github.com/ararog/timeago
+	$(GOGET) gopkg.in/natefinch/lumberjack.v2
+	$(GOGET) golang.org/x/crypto/bcrypt
 
 # remove files for a clean compile/build
 clean:

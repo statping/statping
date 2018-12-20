@@ -41,7 +41,7 @@ func main() {
 	utils.Command("git clone https://github.com/hunterlong/statping.wiki.git")
 
 	pages := []string{"Types-of-Monitoring", "Features", "Start-Statping", "Linux", "Mac", "Windows", "AWS-EC2", "Docker", "Mobile-App", "Heroku", "API", "Makefile",
-		"Notifiers", "Notifier-Events", "Notifier-Example", "Prometheus-Exporter", "SSL", "Config-with-.env-File", "Static-Export", "Statping-Plugins", "Statuper", "Contributing", "PGP-Signature", "Testing"}
+		"Notifiers", "Notifier-Events", "Notifier-Example", "Prometheus-Exporter", "SSL", "Config-with-.env-File", "Static-Export", "Statping-Plugins", "Statuper", "Build-and-Test", "Contributing", "PGP-Signature", "Testing", "Deployment"}
 	newPages := map[string]string{}
 
 	for k, v := range pages {
