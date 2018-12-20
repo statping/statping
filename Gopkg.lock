@@ -53,12 +53,12 @@
   version = "v1.4.1"
 
 [[projects]]
-  digest = "1:342378ac4dcb378a5448dd723f0784ae519383532f5e70ade24132c4c8693202"
+  digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
   name = "github.com/go-yaml/yaml"
   packages = ["."]
   pruneopts = "UT"
-  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
-  version = "v2.2.1"
+  revision = "51d6538a90f86fe93ac480b35f37b2be17fef232"
+  version = "v2.2.2"
 
 [[projects]]
   digest = "1:c79fb010be38a59d657c48c6ba1d003a8aa651fa56b579d959d74573b7dff8e1"
@@ -93,7 +93,7 @@
   version = "v1.1.3"
 
 [[projects]]
-  digest = "1:8fe19266ce82209076d4a81007ff93f40dd349faca4a917aea59d33956bbd4fd"
+  digest = "1:ff312c4d510c67954a6fc6a11c9ff72a2b2169584776b7419c7b8c729e2b13ac"
   name = "github.com/jinzhu/gorm"
   packages = [
     ".",
@@ -102,8 +102,8 @@
     "dialects/sqlite",
   ]
   pruneopts = "UT"
-  revision = "6ed508ec6a4ecb3531899a69cbc746ccf65a4166"
-  version = "v1.9.1"
+  revision = "472c70caa40267cb89fd8facb07fe6454b578626"
+  version = "v1.9.2"
 
 [[projects]]
   branch = "master"
@@ -150,14 +150,6 @@
   version = "v1.10.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:606d1820e2521700b2604019ddc84c95642b2be06242206a4c6322b1c465b2c9"
-  name = "github.com/oliveroneill/exponent-server-sdk-golang"
-  packages = ["sdk"]
-  pruneopts = "UT"
-  revision = "05bf6f17980f89ec1a1b9599813658b6381e7408"
-
-[[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
@@ -198,7 +190,7 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "3d3f9f413869b949e48070b5bc593aa22cc2b8f2"
+  revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
 
 [[projects]]
   digest = "1:c25289f43ac4a68d88b02245742347c94f1e108c534dda442188015ff80669b3"
@@ -237,6 +229,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/GeertJohan/go.rice",
+    "github.com/GeertJohan/go.rice/embedded",
     "github.com/ararog/timeago",
     "github.com/go-mail/mail",
     "github.com/go-yaml/yaml",
@@ -247,7 +240,6 @@
     "github.com/jinzhu/gorm/dialects/postgres",
     "github.com/jinzhu/gorm/dialects/sqlite",
     "github.com/joho/godotenv",
-    "github.com/oliveroneill/exponent-server-sdk-golang/sdk",
     "github.com/rendon/testcli",
     "github.com/stretchr/testify/assert",
     "golang.org/x/crypto/bcrypt",
