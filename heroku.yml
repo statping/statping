@@ -5,8 +5,9 @@ build:
   languages:
     - go
   pre:
+    - export PATH=$GOPATH/bin:$PATH
     - go get github.com/GeertJohan/go.rice
     - go get github.com/GeertJohan/go.rice/rice
-    - cd source && rice embed-go
+    - cd $GOPATH/src/github.com/hunterlong/statping/source && rice embed-go
 run:
   web: cmd --port $PORT
