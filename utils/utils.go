@@ -19,7 +19,6 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"github.com/ararog/timeago"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -29,6 +28,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/ararog/timeago"
 )
 
 var (
@@ -240,6 +241,7 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 		DisableKeepAlives:     true,
 		ResponseHeaderTimeout: timeout,
 		TLSHandshakeTimeout:   timeout,
+		Proxy:                 http.ProxyFromEnvironment,
 	}
 	client := &http.Client{
 		Transport: transport,
