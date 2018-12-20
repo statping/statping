@@ -1,0 +1,7 @@
+build:
+  languages:
+    - go
+  pre:
+    - cd source && rice embed-go
+run:
+  web: cmd --port $PORT

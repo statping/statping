@@ -84,4 +84,5 @@
 [metadata.heroku]
   root-package = "github.com/hunterlong/statping"
   go-version = "1.11.2"
-  install = [ "./..." ]
+  install = [ "./cmd" ]
+  additional-tools = ["github.com/GeertJohan/go.rice", "github.com/GeertJohan/go.rice/rice"]
