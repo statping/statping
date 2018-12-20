@@ -72,7 +72,7 @@ func CompileSASS(folder string) error {
 
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Failed to compile assets with SASS %v", err))
-		utils.Log(3, fmt.Sprintf("bash -c %v %v %v", sassBin, scssFile, baseFile))
+		utils.Log(3, fmt.Sprintf("sh -c %v", command))
 		return err
 	}
 
