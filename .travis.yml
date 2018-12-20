@@ -62,7 +62,7 @@ before_script:
   - psql -c 'create database test;' -U postgres
 
 script:
-  - make test-all
+  - travis_retry make test-all
   - make test-api
   - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make coverage; fi
 

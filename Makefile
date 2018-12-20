@@ -238,6 +238,7 @@ clean:
 	rm -rf source/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf types/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf utils/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf dev/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log,test/app,plugin/*.so}
 	rm -rf {parts,prime,snap,stage}
 	rm -rf dev/test/cypress/videos
 	rm -f coverage.* sass
