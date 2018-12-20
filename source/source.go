@@ -15,6 +15,8 @@
 
 package source
 
+//go:generate go run generate_wiki.go
+
 import (
 	"errors"
 	"fmt"
@@ -44,12 +46,7 @@ func Assets() {
 
 // HelpMarkdown will return the Markdown of help.md into HTML
 func HelpMarkdown() string {
-	helpSrc, err := TmplBox.Bytes("help.md")
-	if err != nil {
-		utils.Log(4, err)
-		return "error generating markdown"
-	}
-	output := blackfriday.Run(helpSrc)
+	output := blackfriday.Run(CompiledWiki)
 	return string(output)
 }
 

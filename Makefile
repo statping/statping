@@ -70,7 +70,7 @@ run: build
 	./$(BINARY_NAME) --ip 0.0.0.0 --port 8080
 
 # compile assets using SASS and Rice. compiles scss -> css, and run rice embed-go
-compile:
+compile: generate
 	sass source/scss/base.scss source/css/base.css
 	cd source && $(GOPATH)/bin/rice embed-go
 	rm -rf .sass-cache
@@ -250,6 +250,9 @@ clean:
 # tag version using git
 tag:
 	git tag v${VERSION} --force
+
+generate:
+	cd source && go generate
 
 # compress built binaries into tar.gz and zip formats
 compress:

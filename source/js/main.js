@@ -78,6 +78,14 @@ function SaveNotifier(data) {
 	button.addClass('btn-success')
 }
 
+$('.scrollclick').on('click',function(e) {
+	let element = $(this).attr("data-id");
+	$('html, body').animate({
+		scrollTop: $("#"+element).offset().top - 15
+	}, 500);
+	e.preventDefault();
+});
+
 $('select#service_type').on('change', function() {
     var selected = $('#service_type option:selected').val();
     var typeLabel = $('#service_type_label');
