@@ -339,4 +339,9 @@ xgo-install: clean
 	go get github.com/karalabe/xgo
 	docker pull karalabe/xgo-latest
 
+heroku:
+	git push heroku master
+	heroku container:push web
+	heroku container:release web
+
 .PHONY: all build build-all build-alpine test-all test test-api docker
