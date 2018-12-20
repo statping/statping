@@ -5,6 +5,8 @@ build:
   languages:
     - go
   pre:
+    - go get github.com/GeertJohan/go.rice
+    - go get github.com/GeertJohan/go.rice/rice
     - cd source && rice embed-go
 run:
   web: cmd --port $PORT
