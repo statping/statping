@@ -20,7 +20,7 @@ MAINTAINER "Hunter Long (https://github.com/hunterlong)"
 ARG VERSION
 ENV IS_DOCKER=true
 ENV STATPING_DIR=/app
-
+ENV PORT=8080
 RUN apk --no-cache add curl jq
 
 COPY --from=base /usr/local/bin/sass /usr/local/bin/sass
@@ -28,8 +28,8 @@ COPY --from=base /go/bin/statping /usr/local/bin/statping
 
 WORKDIR /app
 VOLUME /app
-EXPOSE 8080
+EXPOSE $PORT
 
 HEALTHCHECK --interval=5s --timeout=5s --retries=5 CMD curl -s "http://localhost:8080/health" | jq -r -e ".online==true"
 
-CMD ["statping"]
+CMD ["statping", "--port", "$PORT"]
