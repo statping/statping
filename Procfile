@@ -1,1 +1,1 @@
-web: cmd
+web: cmd --port $PORT
