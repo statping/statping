@@ -51,6 +51,12 @@ func parseFlags() {
 	flag.Parse()
 	ipAddress = *ip
 	port = *p
+	if os.Getenv("PORT") != "" {
+		port = int(utils.ToInt(os.Getenv("PORT")))
+	}
+	if os.Getenv("IP") != "" {
+		ipAddress = os.Getenv("IP")
+	}
 }
 
 // main will run the Statping application

@@ -30,6 +30,6 @@ WORKDIR /app
 VOLUME /app
 EXPOSE $PORT
 
-HEALTHCHECK --interval=5s --timeout=5s --retries=5 CMD curl -s "http://localhost:8080/health" | jq -r -e ".online==true"
+HEALTHCHECK --interval=5s --timeout=5s --retries=5 CMD curl -s "http://localhost:$PORT/health" | jq -r -e ".online==true"
 
-CMD ["statping", "--port", "$PORT"]
+CMD statping -port $PORT
