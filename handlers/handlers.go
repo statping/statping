@@ -192,6 +192,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"Services": func() []types.ServiceInterface {
 			return core.CoreApp.Services
 		},
+		"Groups": func() []*core.Group {
+			return core.SelectGroups()
+		},
 		"len": func(g []types.ServiceInterface) int {
 			return len(g)
 		},
@@ -259,6 +262,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"NewMessage": func() *types.Message {
 			return new(types.Message)
 		},
+		"NewGroup": func() *types.Group {
+			return new(types.Group)
+		},
 	}
 }
 
@@ -276,7 +282,7 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
 	}
 
-	templates := []string{"base.gohtml", "head.gohtml", "nav.gohtml", "footer.gohtml", "scripts.gohtml", "form_service.gohtml", "form_notifier.gohtml", "form_user.gohtml", "form_checkin.gohtml", "form_message.gohtml"}
+	templates := []string{"base.gohtml", "head.gohtml", "nav.gohtml", "footer.gohtml", "scripts.gohtml", "form_service.gohtml", "form_notifier.gohtml", "form_group.gohtml", "form_user.gohtml", "form_checkin.gohtml", "form_message.gohtml"}
 	javascripts := []string{"charts.js", "chart_index.js"}
 
 	render, err := source.TmplBox.String(file)

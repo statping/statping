@@ -104,20 +104,21 @@
     <div class="form-group row">
         <label for="service_type" class="col-sm-4 col-form-label">Group</label>
         <div class="col-sm-8">
-            <select name="group_id" class="form-control" id="group_id" value="{{.GroupId}}" {{if ne .GroupId ""}}readonly{{end}}>
-                <option value="http" {{if eq .GroupId "http"}}selected{{end}}>HTTP Service</option>
-                <option value="tcp" {{if eq .GroupId "tcp"}}selected{{end}}>TCP Service</option>
-                <option value="udp" {{if eq .GroupId "udp"}}selected{{end}}>UDP Service</option>
+            <select name="group_id" class="form-control" id="group_id" value="{{.GroupId}}">
+                <option value="0" {{if eq .GroupId 0}}selected{{end}}>None</option>
+                {{range Groups}}
+                    <option value="{{.Id}}">{{.Name}}</option>
+                {{end}}
             </select>
-            <small class="form-text text-muted">Use HTTP if you are checking a website or use TCP if you are checking a server</small>
+            <small class="form-text text-muted">Attach this service to a group</small>
         </div>
     </div>
     <div class="form-group row">
         <label for="order" class="col-sm-4 col-form-label">Visible</label>
         <div class="col-8 mt-1">
             <span class="switch float-left">
-                <input type="checkbox" name="public" class="switch" id="switch-service" {{if eq .Id 0}}checked{{end}}{{if .AllowNotifications.Bool}}checked{{end}}>
-                <label for="switch-service">Show Failures and service endpoint information to the public</label>
+                <input type="checkbox" name="public" class="switch" id="switch-public" {{if .Public.Bool}}checked{{end}}>
+                <label for="switch-public">Show service details to the public</label>
             </span>
         </div>
     </div>

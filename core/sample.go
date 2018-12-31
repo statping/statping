@@ -86,9 +86,23 @@ func InsertSampleData() error {
 
 	insertMessages()
 
+	insertSampleGroups()
+
 	utils.Log(1, "Sample data has finished importing")
 
 	return nil
+}
+
+func insertSampleGroups() error {
+	group1 := &Group{&types.Group{
+		Name: "Main Services",
+	}}
+	_, err := group1.Create()
+	group2 := &Group{&types.Group{
+		Name: "Linked Services",
+	}}
+	_, err = group2.Create()
+	return err
 }
 
 // insertSampleCheckins will create 2 checkins with 60 successful hits per Checkin
