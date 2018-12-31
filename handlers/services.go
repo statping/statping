@@ -51,7 +51,11 @@ func servicesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
-	ExecuteResponse(w, r, "services.gohtml", core.CoreApp.Services, nil)
+	data := map[string]interface{}{
+		"Services": core.CoreApp.Services,
+		"Groups":   core.CoreApp.Services,
+	}
+	ExecuteResponse(w, r, "services.gohtml", data, nil)
 }
 
 type serviceOrder struct {

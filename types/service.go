@@ -34,6 +34,8 @@ type Service struct {
 	Timeout            int                `gorm:"default:30;column:timeout" json:"timeout"`
 	Order              int                `gorm:"default:0;column:order_id" json:"order_id"`
 	AllowNotifications NullBool           `gorm:"default:false;column:allow_notifications" json:"allow_notifications"`
+	Public             NullBool           `gorm:"default:false;column:public" json:"public"`
+	GroupId            int                `gorm:"default:0;column:group_id" json:"group_id"`
 	CreatedAt          time.Time          `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt          time.Time          `gorm:"column:updated_at" json:"updated_at"`
 	Online             bool               `gorm:"-" json:"online"`

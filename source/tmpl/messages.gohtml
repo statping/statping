@@ -9,8 +9,8 @@
             <thead>
             <tr>
                 <th scope="col">Title</th>
-                <th scope="col">Service</th>
-                <th scope="col">Begins</th>
+                <th scope="col" class="d-none d-md-table-cell">Service</th>
+                <th scope="col" class="d-none d-md-table-cell">Begins</th>
                 <th scope="col"></th>
             </tr>
             </thead>
@@ -18,8 +18,8 @@
             {{range .}}
                 <tr id="message_{{.Id}}">
                     <td>{{.Title}}</td>
-                    <td>{{if .Service}}<a href="/service/{{.Service.Id}}">{{.Service.Name}}</a>{{end}}</td>
-                    <td>{{.StartOn}}</td>
+                    <td class="d-none d-md-table-cell">{{if .Service}}<a href="/service/{{.Service.Id}}">{{.Service.Name}}</a>{{end}}</td>
+                    <td class="d-none d-md-table-cell">{{.StartOn}}</td>
                     <td class="text-right">
                         {{if Auth}}<div class="btn-group">
                             <a href="/message/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-exclamation-triangle"></i> Edit</a>
