@@ -818,7 +818,48 @@
 						},
 						"description": "View an array of all Groups added to your Statping instance."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "All Groups",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/groups",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"groups"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 03 Jan 2019 21:48:40 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "301"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"name\": \"Main Services\",\n        \"public\": true,\n        \"created_at\": \"2019-01-03T13:48:23.488553261-08:00\",\n        \"updated_at\": \"2019-01-03T13:48:23.488614502-08:00\"\n    },\n    {\n        \"id\": 2,\n        \"name\": \"Linked Services\",\n        \"public\": false,\n        \"created_at\": \"2019-01-03T13:48:23.489693923-08:00\",\n        \"updated_at\": \"2019-01-03T13:48:23.489719447-08:00\"\n    }\n]"
+						}
+					]
 				},
 				{
 					"name": "View Group",
@@ -874,7 +915,56 @@
 						},
 						"description": "View a specific group"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "View Group",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/groups/1",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"groups",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 03 Jan 2019 21:48:58 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "148"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"name\": \"Main Services\",\n    \"public\": true,\n    \"created_at\": \"2019-01-03T13:48:23.488553261-08:00\",\n    \"updated_at\": \"2019-01-03T13:48:23.488614502-08:00\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Create Group",
@@ -914,7 +1004,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"New Group\"\n}"
+							"raw": "{\n    \"name\": \"New Group\",\n    \"public\": true\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/groups",
@@ -928,7 +1018,53 @@
 						},
 						"description": "Create a new Group to organize services."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Create Group",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"New Group\",\n    \"public\": true\n}"
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/groups",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"groups"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 03 Jan 2019 21:49:25 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "214"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"group\",\n    \"method\": \"create\",\n    \"id\": 3,\n    \"output\": {\n        \"id\": 3,\n        \"name\": \"New Group\",\n        \"public\": true,\n        \"created_at\": \"2019-01-03T13:49:25.947069211-08:00\",\n        \"updated_at\": \"2019-01-03T13:49:25.947120276-08:00\"\n    }\n}"
+						}
+					]
 				},
 				{
 					"name": "Delete Group",
@@ -979,7 +1115,49 @@
 						},
 						"description": "Delete a group"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Delete Group",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/groups/{{group_id}}",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"groups",
+										"{{group_id}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 03 Jan 2019 21:49:49 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "214"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"group\",\n    \"method\": \"delete\",\n    \"id\": 3,\n    \"output\": {\n        \"id\": 3,\n        \"name\": \"New Group\",\n        \"public\": true,\n        \"created_at\": \"2019-01-03T13:49:25.947069211-08:00\",\n        \"updated_at\": \"2019-01-03T13:49:25.947120276-08:00\"\n    }\n}"
+						}
+					]
 				}
 			],
 			"auth": {
