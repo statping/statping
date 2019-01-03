@@ -42,13 +42,15 @@
                 <thead>
                 <tr>
                     <th scope="col">Name</th>
+                    <th scope="col">Services</th>
                     <th scope="col"></th>
                 </tr>
                 </thead>
-                <tbody class="sortable" id="groups_table">
+                <tbody id="groups_table">
                 {{range .Groups}}
                     <tr id="group_{{.Id}}" data-id="{{.Id}}">
                         <td>{{.Name}}</td>
+                        <td>{{len .Services}}</td>
                         <td class="text-right">
                             <div class="btn-group">
                                 {{if Auth}}<a href="/api/groups/{{.Id}}" class="ajax_delete btn btn-danger" data-method="DELETE" data-obj="group_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>{{end}}

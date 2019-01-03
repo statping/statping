@@ -195,8 +195,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"Groups": func() []*core.Group {
 			return core.SelectGroups()
 		},
-		"len": func(g []types.ServiceInterface) int {
-			return len(g)
+		"len": func(g interface{}) int {
+			val := reflect.ValueOf(g)
+			return val.Len()
 		},
 		"IsNil": func(g interface{}) bool {
 			return g == nil

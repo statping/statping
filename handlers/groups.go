@@ -69,27 +69,6 @@ func apiCreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonAction(group, "create", w, r)
 }
 
-func apiGroupUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
-	vars := mux.Vars(r)
-	group := core.SelectGroup(utils.ToInt(vars["id"]))
-	if group == nil {
-		sendErrorJson(errors.New("group not found"), w, r)
-		return
-	}
-	decoder := json.NewDecoder(r.Body)
-	decoder.Decode(&group)
-	err := group.Update()
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
-	sendJsonAction(group, "update", w, r)
-}
-
 func apiGroupDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsFullAuthenticated(r) {
 		sendUnauthorizedJson(w, r)

@@ -816,7 +816,7 @@
 								"groups"
 							]
 						},
-						"description": "View an array of all Services added to your Statping instance."
+						"description": "View an array of all Groups added to your Statping instance."
 					},
 					"response": []
 				},
@@ -872,58 +872,9 @@
 								"1"
 							]
 						},
-						"description": "View a specific service, this will include the service's failures and checkins."
+						"description": "View a specific group"
 					},
-					"response": [
-						{
-							"name": "View Service",
-							"originalRequest": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Content-Type",
-										"name": "Content-Type",
-										"value": "application/json",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{endpoint}}/api/services/1",
-									"host": [
-										"{{endpoint}}"
-									],
-									"path": [
-										"api",
-										"services",
-										"1"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								},
-								{
-									"key": "Date",
-									"value": "Mon, 10 Dec 2018 19:31:19 GMT"
-								},
-								{
-									"key": "Content-Length",
-									"value": "482"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"id\": 1,\n    \"name\": \"Google\",\n    \"domain\": \"https://google.com\",\n    \"expected\": null,\n    \"expected_status\": 200,\n    \"check_interval\": 10,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": null,\n    \"port\": 0,\n    \"timeout\": 10,\n    \"order_id\": 1,\n    \"allow_notifications\": false,\n    \"created_at\": \"2018-12-10T11:15:42.24769-08:00\",\n    \"updated_at\": \"2018-12-10T11:15:42.247837-08:00\",\n    \"online\": true,\n    \"latency\": 0.190599816,\n    \"ping_time\": 0.00476598,\n    \"online_24_hours\": 0,\n    \"avg_response\": \"\",\n    \"status_code\": 200,\n    \"last_success\": \"2018-12-10T11:31:13.511139-08:00\"\n}"
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "Create Group",
@@ -975,156 +926,9 @@
 								"groups"
 							]
 						},
-						"description": "Create a new service and begin monitoring."
+						"description": "Create a new Group to organize services."
 					},
-					"response": [
-						{
-							"name": "Create Service",
-							"originalRequest": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"name\": \"New Service\",\n    \"domain\": \"https://statping.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 30,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 30,\n    \"order_id\": 0\n}"
-								},
-								"url": {
-									"raw": "{{endpoint}}/api/services",
-									"host": [
-										"{{endpoint}}"
-									],
-									"path": [
-										"api",
-										"services"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								},
-								{
-									"key": "Date",
-									"value": "Mon, 10 Dec 2018 19:31:47 GMT"
-								},
-								{
-									"key": "Content-Length",
-									"value": "528"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"status\": \"success\",\n    \"type\": \"service\",\n    \"method\": \"create\",\n    \"id\": 10,\n    \"output\": {\n        \"id\": 10,\n        \"name\": \"New Service\",\n        \"domain\": \"https://statping.com\",\n        \"expected\": \"\",\n        \"expected_status\": 200,\n        \"check_interval\": 30,\n        \"type\": \"http\",\n        \"method\": \"GET\",\n        \"post_data\": \"\",\n        \"port\": 0,\n        \"timeout\": 30,\n        \"order_id\": 0,\n        \"allow_notifications\": false,\n        \"created_at\": \"2018-12-10T11:31:47.535086-08:00\",\n        \"updated_at\": \"2018-12-10T11:31:47.535184-08:00\",\n        \"online\": false,\n        \"latency\": 0,\n        \"ping_time\": 0,\n        \"online_24_hours\": 0,\n        \"avg_response\": \"\",\n        \"status_code\": 0,\n        \"last_success\": \"0001-01-01T00:00:00Z\"\n    }\n}"
-						}
-					]
-				},
-				{
-					"name": "Update Group",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b5a67a19-fd08-40b0-a961-3e9474ab78c6",
-								"exec": [
-									"pm.test(\"Update Service\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.output.name).to.eql(\"Updated Group\");",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{api_key}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Updated Group\"\n}"
-						},
-						"url": {
-							"raw": "{{endpoint}}/api/groups/{{group_id}}",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"api",
-								"groups",
-								"{{group_id}}"
-							]
-						},
-						"description": "Update a service with new values and begin monitoring."
-					},
-					"response": [
-						{
-							"name": "Update Service",
-							"originalRequest": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"name\": \"Updated New Service\",\n    \"domain\": \"https://google.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 60,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 10,\n    \"order_id\": 0\n}"
-								},
-								"url": {
-									"raw": "{{endpoint}}/api/services/{{service_id}}",
-									"host": [
-										"{{endpoint}}"
-									],
-									"path": [
-										"api",
-										"services",
-										"{{service_id}}"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								},
-								{
-									"key": "Date",
-									"value": "Mon, 10 Dec 2018 19:31:54 GMT"
-								},
-								{
-									"key": "Content-Length",
-									"value": "567"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"status\": \"success\",\n    \"type\": \"service\",\n    \"method\": \"update\",\n    \"id\": 10,\n    \"output\": {\n        \"id\": 10,\n        \"name\": \"Updated New Service\",\n        \"domain\": \"https://google.com\",\n        \"expected\": \"\",\n        \"expected_status\": 200,\n        \"check_interval\": 60,\n        \"type\": \"http\",\n        \"method\": \"GET\",\n        \"post_data\": \"\",\n        \"port\": 0,\n        \"timeout\": 10,\n        \"order_id\": 0,\n        \"allow_notifications\": false,\n        \"created_at\": \"2018-12-10T11:31:47.535086-08:00\",\n        \"updated_at\": \"2018-12-10T11:31:47.535184-08:00\",\n        \"online\": true,\n        \"latency\": 0.550636193,\n        \"ping_time\": 0.073339805,\n        \"online_24_hours\": 0,\n        \"avg_response\": \"\",\n        \"status_code\": 200,\n        \"last_success\": \"2018-12-10T11:31:49.161389-08:00\"\n    }\n}"
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "Delete Group",
@@ -1175,49 +979,7 @@
 						},
 						"description": "Delete a group"
 					},
-					"response": [
-						{
-							"name": "Delete Service",
-							"originalRequest": {
-								"method": "DELETE",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{endpoint}}/api/services/{{service_id}}",
-									"host": [
-										"{{endpoint}}"
-									],
-									"path": [
-										"api",
-										"services",
-										"{{service_id}}"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								},
-								{
-									"key": "Date",
-									"value": "Mon, 10 Dec 2018 19:32:06 GMT"
-								},
-								{
-									"key": "Content-Length",
-									"value": "567"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"status\": \"success\",\n    \"type\": \"service\",\n    \"method\": \"delete\",\n    \"id\": 10,\n    \"output\": {\n        \"id\": 10,\n        \"name\": \"Updated New Service\",\n        \"domain\": \"https://google.com\",\n        \"expected\": \"\",\n        \"expected_status\": 200,\n        \"check_interval\": 60,\n        \"type\": \"http\",\n        \"method\": \"GET\",\n        \"post_data\": \"\",\n        \"port\": 0,\n        \"timeout\": 10,\n        \"order_id\": 0,\n        \"allow_notifications\": false,\n        \"created_at\": \"2018-12-10T11:31:47.535086-08:00\",\n        \"updated_at\": \"2018-12-10T11:31:47.535184-08:00\",\n        \"online\": true,\n        \"latency\": 0.203382878,\n        \"ping_time\": 0.001664491,\n        \"online_24_hours\": 0,\n        \"avg_response\": \"\",\n        \"status_code\": 200,\n        \"last_success\": \"2018-12-10T11:31:55.455091-08:00\"\n    }\n}"
-						}
-					]
+					"response": []
 				}
 			],
 			"auth": {

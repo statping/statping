@@ -11,16 +11,14 @@ type Group struct {
 
 // Delete will remove a group
 func (g *Group) Delete() error {
+	for _, s := range g.Services() {
+		s.GroupId = 0
+		s.Update(false)
+	}
 	err := messagesDb().Delete(g)
 	if err.Error != nil {
 		return err.Error
 	}
-	return err.Error
-}
-
-// Update will update a group in the database
-func (g *Group) Update() error {
-	err := servicesDB().Update(&g)
 	return err.Error
 }
 
@@ -29,6 +27,17 @@ func (g *Group) Create() (int64, error) {
 	g.CreatedAt = time.Now()
 	db := groupsDb().Create(g)
 	return g.Id, db.Error
+}
+
+// Services returns all services belonging to a group
+func (g *Group) Services() []*Service {
+	var services []*Service
+	for _, s := range Services() {
+		if s.Select().GroupId == int(g.Id) {
+			services = append(services, s.(*Service))
+		}
+	}
+	return services
 }
 
 // SelectGroups returns all groups

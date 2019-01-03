@@ -1,6 +1,7 @@
 {{define "form_service"}}
 <div class="card">
 <div class="card-body">
+{{$s := .}}
 {{if ne .Id 0}}
 <form class="ajax_form" action="/api/services/{{.Id}}" data-redirect="/services" method="POST">
 {{else}}
@@ -104,10 +105,10 @@
     <div class="form-group row">
         <label for="service_type" class="col-sm-4 col-form-label">Group</label>
         <div class="col-sm-8">
-            <select name="group_id" class="form-control" id="group_id" value="{{.GroupId}}">
-                <option value="0" {{if eq .GroupId 0}}selected{{end}}>None</option>
+            <select name="group_id" class="form-control" id="group_id">
+                <option value="0" {{if eq $s.GroupId 0}}selected{{end}}>None</option>
                 {{range Groups}}
-                    <option value="{{.Id}}">{{.Name}}</option>
+                    <option value="{{.Id}}" {{if eq $s.GroupId .Id}}selected{{end}}>{{.Name}}</option>
                 {{end}}
             </select>
             <small class="form-text text-muted">Attach this service to a group</small>

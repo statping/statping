@@ -26,6 +26,9 @@ import (
 // InsertSampleData will create the example/dummy services for a brand new Statping installation
 func InsertSampleData() error {
 	utils.Log(1, "Inserting Sample Data...")
+
+	insertSampleGroups()
+
 	s1 := ReturnService(&types.Service{
 		Name:           "Google",
 		Domain:         "https://google.com",
@@ -35,6 +38,7 @@ func InsertSampleData() error {
 		Method:         "GET",
 		Timeout:        10,
 		Order:          1,
+		GroupId:        1,
 	})
 	s2 := ReturnService(&types.Service{
 		Name:           "Statping Github",
@@ -55,6 +59,8 @@ func InsertSampleData() error {
 		Method:         "GET",
 		Timeout:        30,
 		Order:          3,
+		Public:         types.NewNullBool(true),
+		GroupId:        2,
 	})
 	s4 := ReturnService(&types.Service{
 		Name:           "JSON API Tester",
@@ -67,6 +73,8 @@ func InsertSampleData() error {
 		PostData:       types.NewNullString(`{ "title": "statup", "body": "bar", "userId": 19999 }`),
 		Timeout:        30,
 		Order:          4,
+		Public:         types.NewNullBool(true),
+		GroupId:        2,
 	})
 	s5 := ReturnService(&types.Service{
 		Name:     "Google DNS",
@@ -76,6 +84,8 @@ func InsertSampleData() error {
 		Port:     53,
 		Timeout:  120,
 		Order:    5,
+		Public:   types.NewNullBool(true),
+		GroupId:  1,
 	})
 
 	s1.Create(false)
@@ -85,8 +95,6 @@ func InsertSampleData() error {
 	s5.Create(false)
 
 	insertMessages()
-
-	insertSampleGroups()
 
 	utils.Log(1, "Sample data has finished importing")
 
