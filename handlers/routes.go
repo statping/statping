@@ -85,6 +85,12 @@ func Router() *mux.Router {
 	r.Handle("/service/{id}/edit", http.HandlerFunc(servicesViewHandler))
 	r.Handle("/service/{id}/delete_failures", http.HandlerFunc(servicesDeleteFailuresHandler)).Methods("GET")
 
+	// API GROUPS Routes
+	r.Handle("/api/groups", http.HandlerFunc(apiAllGroupHandler)).Methods("GET")
+	r.Handle("/api/groups", http.HandlerFunc(apiCreateGroupHandler)).Methods("POST")
+	r.Handle("/api/groups/{id}", http.HandlerFunc(apiGroupHandler)).Methods("GET")
+	r.Handle("/api/groups/{id}", http.HandlerFunc(apiGroupDeleteHandler)).Methods("DELETE")
+
 	// API Routes
 	r.Handle("/api", http.HandlerFunc(apiIndexHandler))
 	r.Handle("/api/renew", http.HandlerFunc(apiRenewHandler))

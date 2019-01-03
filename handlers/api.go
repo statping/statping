@@ -88,6 +88,12 @@ func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *ht
 	case *core.User:
 		objName = "user"
 		objId = v.Id
+	case *types.Group:
+		objName = "group"
+		objId = v.Id
+	case *core.Group:
+		objName = "group"
+		objId = v.Id
 	case *core.Checkin:
 		objName = "checkin"
 		objId = v.Id

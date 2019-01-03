@@ -1,6 +1,7 @@
 {{define "form_service"}}
 <div class="card">
 <div class="card-body">
+{{$s := .}}
 {{if ne .Id 0}}
 <form class="ajax_form" action="/api/services/{{.Id}}" data-redirect="/services" method="POST">
 {{else}}
@@ -98,6 +99,27 @@
             <span class="switch float-left">
                 <input type="checkbox" name="allow_notifications" class="switch" id="switch-service" {{if eq .Id 0}}checked{{end}}{{if .AllowNotifications.Bool}}checked{{end}}>
                 <label for="switch-service">Allow notifications to be sent for this service</label>
+            </span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="service_type" class="col-sm-4 col-form-label">Group</label>
+        <div class="col-sm-8">
+            <select name="group_id" class="form-control" id="group_id">
+                <option value="0" {{if eq $s.GroupId 0}}selected{{end}}>None</option>
+                {{range Groups false}}
+                    <option value="{{.Id}}" {{if eq $s.GroupId .Id}}selected{{end}}>{{.Name}}</option>
+                {{end}}
+            </select>
+            <small class="form-text text-muted">Attach this service to a group</small>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="order" class="col-sm-4 col-form-label">Visible</label>
+        <div class="col-8 mt-1">
+            <span class="switch float-left">
+                <input type="checkbox" name="public" class="switch" id="switch-public" {{if .Public.Bool}}checked{{end}}>
+                <label for="switch-public">Show service details to the public</label>
             </span>
         </div>
     </div>

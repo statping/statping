@@ -189,6 +189,7 @@ func TestCreateService(t *testing.T) {
 		Type:           "http",
 		Method:         "GET",
 		Timeout:        20,
+		GroupId:        1,
 	})
 	var err error
 	newServiceId, err = s.Create(false)
@@ -212,6 +213,7 @@ func TestCreateFailingHTTPService(t *testing.T) {
 		Type:           "http",
 		Method:         "GET",
 		Timeout:        5,
+		GroupId:        1,
 	})
 	var err error
 	newServiceId, err = s.Create(false)
@@ -238,6 +240,7 @@ func TestCreateFailingTCPService(t *testing.T) {
 		Interval: 30,
 		Type:     "tcp",
 		Timeout:  5,
+		GroupId:  1,
 	})
 	var err error
 	newServiceId, err = s.Create(false)

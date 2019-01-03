@@ -8,21 +8,23 @@
 <h5 class="col-12 text-center mb-5 header-desc">{{ .Description }}</h5>
 {{ end }}
 
-<div class="col-12 full-col-12">
-
-<div class="list-group online_list mb-3">
-    {{ range Services }}
-        <a href="#" class="service_li list-group-item list-group-item-action {{if not .Online}}bg-danger text-white{{ end }}" data-id="{{.Id}}">
-        {{ .Name }}
-        {{if .Online}}
-            <span class="badge bg-success float-right pulse-glow">ONLINE</span>
-        {{ else }}
-            <span class="badge bg-white text-black-50 float-right pulse">OFFLINE</span>
-        {{end}}
-        </a>
-    {{ end }}
+{{ range Groups true }}
+    <div class="col-12 full-col-12">
+        <h4>{{.Name}}</h4>
+        <div class="list-group online_list mb-3">
+            {{ range .Services }}
+            <a href="#" class="service_li list-group-item list-group-item-action {{if not .Online}}bg-danger text-white{{ end }}" data-id="{{.Id}}">
+                {{ .Name }}
+                {{if .Online}}
+                    <span class="badge bg-success float-right pulse-glow">ONLINE</span>
+                {{ else }}
+                    <span class="badge bg-white text-black-50 float-right pulse">OFFLINE</span>
+                {{end}}
+            </a>
+            {{ end }}
+        </div>
     </div>
-</div>
+{{end}}
 
 {{ if .Messages }}
     <div class="col-12">

@@ -31,8 +31,8 @@ import (
 
 func TestResetHandlerDatabase(t *testing.T) {
 	Clean()
-	loadDatabase()
-	createDatabase()
+	//loadDatabase()
+	//createDatabase()
 }
 
 func TestFailedHTTPServer(t *testing.T) {

@@ -36,7 +36,7 @@ var (
 )
 
 func init() {
-	DbModels = []interface{}{&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Message{}, &types.Checkin{}, &types.CheckinHit{}, &notifier.Notification{}}
+	DbModels = []interface{}{&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Message{}, &types.Group{}, &types.Checkin{}, &types.CheckinHit{}, &notifier.Notification{}}
 }
 
 // DbConfig stores the config.yml file for the statup configuration
@@ -80,6 +80,11 @@ func checkinHitsDB() *gorm.DB {
 // messagesDb returns the Checkin records for a service
 func messagesDb() *gorm.DB {
 	return DbSession.Model(&types.Message{})
+}
+
+// messagesDb returns the Checkin records for a service
+func groupsDb() *gorm.DB {
+	return DbSession.Model(&types.Group{})
 }
 
 // HitsBetween returns the gorm database query for a collection of service hits between a time range

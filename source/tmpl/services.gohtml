@@ -4,21 +4,23 @@
 {{template "nav"}}
 
     <div class="col-12">
-        {{if ne (len .) 0}}
+        {{if ne (len .Services) 0}}
         <h3>Services</h3>
         <table class="table">
             <thead>
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col" class="d-none d-md-table-cell">Status</th>
+                <th scope="col">Visibility</th>
                 <th scope="col"></th>
             </tr>
             </thead>
             <tbody class="sortable" id="services_table">
-            {{range .}}
+            {{range .Services}}
             <tr id="service_{{.Id}}" data-id="{{.Id}}">
                 <td><span class="drag_icon d-none d-md-inline"><i class="fas fa-bars"></i></span> {{.Name}}</td>
-                <td class="d-none d-md-table-cell">{{if .Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}} </td>
+                <td class="d-none d-md-table-cell">{{if .Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}}</td>
+                <td class="d-none d-md-table-cell">{{if .Public.Bool}}<span class="badge badge-primary">PUBLIC</span>{{else}}<span class="badge badge-secondary">PRIVATE</span>{{end}}</td>
                 <td class="text-right">
                     <div class="btn-group">
                         <a href="/service/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> View</a>
@@ -35,6 +37,39 @@
             {{template "form_service" NewService}}
         {{end}}
     </div>
+
+    <div class="col-12 mt-3">
+            <h3>Groups</h3>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Services</th>
+                    <th scope="col">Visibility</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody id="groups_table">
+                {{range Groups false}}
+                    <tr id="group_{{.Id}}" data-id="{{.Id}}">
+                        <td>{{.Name}}</td>
+                        <td>{{len .Services}}</td>
+                        <td>{{if .Public.Bool}}<span class="badge badge-primary">PUBLIC</span>{{else}}<span class="badge badge-secondary">PRIVATE</span>{{end}}</td>
+                        <td class="text-right">
+                            <div class="btn-group">
+                                {{if Auth}}<a href="/api/groups/{{.Id}}" class="ajax_delete btn btn-danger" data-method="DELETE" data-obj="group_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>{{end}}
+                            </div>
+                        </td>
+                    </tr>
+                {{end}}
+                </tbody>
+            </table>
+        {{if Auth}}
+            <h3>Create Group</h3>
+            {{template "form_group" NewGroup}}
+        {{end}}
+    </div>
+
 </div>
 {{end}}
 {{define "extra_scripts"}}
