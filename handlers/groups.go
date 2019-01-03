@@ -24,16 +24,19 @@ import (
 	"net/http"
 )
 
+// apiAllGroupHandler will show all the groups
 func apiAllGroupHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsReadAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
-	groups := core.SelectGroups()
+	auth := IsUser(r)
+	groups := core.SelectGroups(false, auth)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(groups)
 }
 
+// apiGroupHandler will show a single group
 func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsReadAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
@@ -49,6 +52,7 @@ func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(group)
 }
 
+// apiCreateGroupHandler accepts a POST method to create new groups
 func apiCreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsFullAuthenticated(r) {
 		sendUnauthorizedJson(w, r)
@@ -69,6 +73,7 @@ func apiCreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonAction(group, "create", w, r)
 }
 
+// apiGroupDeleteHandler accepts a DELETE method to delete groups
 func apiGroupDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsFullAuthenticated(r) {
 		sendUnauthorizedJson(w, r)

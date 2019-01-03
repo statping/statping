@@ -107,7 +107,7 @@
         <div class="col-sm-8">
             <select name="group_id" class="form-control" id="group_id">
                 <option value="0" {{if eq $s.GroupId 0}}selected{{end}}>None</option>
-                {{range Groups}}
+                {{range Groups false}}
                     <option value="{{.Id}}" {{if eq $s.GroupId .Id}}selected{{end}}>{{.Name}}</option>
                 {{end}}
             </select>

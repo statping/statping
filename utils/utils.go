@@ -231,6 +231,7 @@ func SaveFile(filename string, data []byte) error {
 // // headers - An array of Headers to be sent (KEY=VALUE) []string{"Authentication=12345", ...}
 // // body - The body or form data to send with HTTP request
 // // timeout - Specific duration to timeout on. time.Duration(30 * time.Seconds)
+// // You can use a HTTP Proxy if you HTTP_PROXY environment variable
 func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration) ([]byte, *http.Response, error) {
 	var err error
 	transport := &http.Transport{
@@ -240,6 +241,7 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 		DisableKeepAlives:     true,
 		ResponseHeaderTimeout: timeout,
 		TLSHandshakeTimeout:   timeout,
+		Proxy:                 http.ProxyFromEnvironment,
 	}
 	client := &http.Client{
 		Transport: transport,

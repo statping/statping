@@ -41,15 +41,29 @@ func (g *Group) Services() []*Service {
 }
 
 // SelectGroups returns all groups
-func SelectGroups() []*Group {
+func SelectGroups(includeAll bool, auth bool) []*Group {
 	var groups []*Group
+	var validGroups []*Group
 	groupsDb().Find(&groups).Order("id desc")
-	return groups
+	if includeAll {
+		emptyGroup := &Group{&types.Group{Id: 0, Public: types.NewNullBool(true)}}
+		groups = append(groups, emptyGroup)
+	}
+	for _, g := range groups {
+		if !g.Public.Bool {
+			if auth {
+				validGroups = append(validGroups, g)
+			}
+		} else {
+			validGroups = append(validGroups, g)
+		}
+	}
+	return validGroups
 }
 
 // SelectGroup returns a *core.Group
 func SelectGroup(id int64) *Group {
-	for _, g := range SelectGroups() {
+	for _, g := range SelectGroups(false, false) {
 		if g.Id == id {
 			return g
 		}

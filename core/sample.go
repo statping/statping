@@ -103,11 +103,13 @@ func InsertSampleData() error {
 
 func insertSampleGroups() error {
 	group1 := &Group{&types.Group{
-		Name: "Main Services",
+		Name:   "Main Services",
+		Public: types.NewNullBool(true),
 	}}
 	_, err := group1.Create()
 	group2 := &Group{&types.Group{
-		Name: "Linked Services",
+		Name:   "Linked Services",
+		Public: types.NewNullBool(false),
 	}}
 	_, err = group2.Create()
 	return err

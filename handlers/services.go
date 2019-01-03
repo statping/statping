@@ -53,7 +53,6 @@ func servicesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	data := map[string]interface{}{
 		"Services": core.CoreApp.Services,
-		"Groups":   core.SelectGroups(),
 	}
 	ExecuteResponse(w, r, "services.gohtml", data, nil)
 }

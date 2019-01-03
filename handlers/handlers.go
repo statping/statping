@@ -192,8 +192,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"Services": func() []types.ServiceInterface {
 			return core.CoreApp.Services
 		},
-		"Groups": func() []*core.Group {
-			return core.SelectGroups()
+		"Groups": func(includeAll bool) []*core.Group {
+			auth := IsUser(r)
+			return core.SelectGroups(includeAll, auth)
 		},
 		"len": func(g interface{}) int {
 			val := reflect.ValueOf(g)
