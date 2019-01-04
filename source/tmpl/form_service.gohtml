@@ -97,8 +97,19 @@
         <label for="order" class="col-sm-4 col-form-label">Notifications</label>
         <div class="col-8 mt-1">
             <span class="switch float-left">
-                <input type="checkbox" name="allow_notifications" class="switch" id="switch-service" {{if eq .Id 0}}checked{{end}}{{if .AllowNotifications.Bool}}checked{{end}}>
-                <label for="switch-service">Allow notifications to be sent for this service</label>
+                <input type="checkbox" name="allow_notifications-option" class="switch" id="switch-notifications" {{if eq .Id 0}}checked{{end}}{{if .AllowNotifications.Bool}}checked{{end}}>
+                <label for="switch-notifications">Allow notifications to be sent for this service</label>
+                <input type="hidden" name="allow_notifications" id="switch-notifications-value" value="{{if .AllowNotifications.Bool}}true{{else}}false{{end}}">
+            </span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="order" class="col-sm-4 col-form-label">Visible</label>
+        <div class="col-8 mt-1">
+            <span class="switch float-left">
+                <input type="checkbox" name="public-option" class="switch" id="switch-public" {{if .Public.Bool}}checked{{end}}>
+                <label for="switch-public">Show service details to the public</label>
+                <input type="hidden" name="public" id="switch-public-value" value="{{if .Public.Bool}}true{{else}}false{{end}}">
             </span>
         </div>
     </div>
@@ -112,15 +123,6 @@
                 {{end}}
             </select>
             <small class="form-text text-muted">Attach this service to a group</small>
-        </div>
-    </div>
-    <div class="form-group row">
-        <label for="order" class="col-sm-4 col-form-label">Visible</label>
-        <div class="col-8 mt-1">
-            <span class="switch float-left">
-                <input type="checkbox" name="public" class="switch" id="switch-public" {{if .Public.Bool}}checked{{end}}>
-                <label for="switch-public">Show service details to the public</label>
-            </span>
         </div>
     </div>
     <div class="form-group row">

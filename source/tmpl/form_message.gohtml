@@ -55,8 +55,9 @@
         <label for="notify_method" class="col-sm-4 col-form-label">Notify Users</label>
         <div class="col-sm-8">
             <span class="switch">
-            <input type="checkbox" name="notify_users" class="switch" id="switch-normal"{{if .NotifyUsers.Bool}} checked{{end}}>
+            <input type="checkbox" name="notify_users-value" class="switch" id="switch-normal"{{if .NotifyUsers.Bool}} checked{{end}}>
             <label for="switch-normal">Notify Users Before Scheduled Time</label>
+            <input type="hidden" name="notify_users" id="switch-normal-value" value="{{if .NotifyUsers.Bool}}true{{else}}false{{end}}">
           </span>
         </div>
     </div>

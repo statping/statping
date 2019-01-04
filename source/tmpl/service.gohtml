@@ -2,6 +2,8 @@
 {{define "description"}}{{$s := .Service}}{{if $s.Online }}{{.Service.Name}} is currently online and responding within {{$s.AvgTime}} milliseconds with {{$s.TotalUptime}}% total uptime on {{$s.Domain}}.{{else}}{{.Service.Name}} is currently offline on {{$s.Domain}}. Notify the admin to let them know their service is offline.{{end}}{{end}}
 {{ define "content" }}
 {{$s := .Service}}
+{{$failures := $s.LimitedFailures 16}}
+{{$checkinFailures := $s.LimitedCheckinFailures 16}}
 {{$isAdmin := Auth}}
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
 
@@ -25,7 +27,6 @@
         {{end}}</h4>
 
         <div class="row stats_area mt-5 mb-5">
-
             <div class="col-4">
                 <span class="lg_number">{{$s.Online24}}%</span>
                 Online last 24 Hours
@@ -76,7 +77,6 @@
     {{end}}
 
 {{if IsUser}}
-   {{$failures := $s.LimitedFailures 16}}
     <nav class="nav nav-pills flex-column flex-sm-row mt-3" id="service_tabs" role="serviceLists">
         {{if $isAdmin}}<a class="flex-sm-fill text-sm-center nav-link active" id="edit-tab" data-toggle="tab" href="#edit" role="tab" aria-controls="edit" aria-selected="false">Edit Service</a>{{end}}
         <a class="flex-sm-fill text-sm-center nav-link{{ if not $failures }} disabled{{end}}" id="failures-tab" data-toggle="tab" href="#failures" role="tab" aria-controls="failures" aria-selected="true">Failures</a>
@@ -142,10 +142,9 @@
             {{if $isAdmin}}
                 {{template "form_checkin" $s}}
             {{end}}
-            {{$failures := $s.LimitedCheckinFailures 16}}
-            {{ if $failures }}
+            {{ if $checkinFailures }}
                 <div class="list-group mt-3 mb-4">
-                {{ range $failures }}
+                {{ range $checkinFailures }}
                     <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                         <div class="d-flex w-100 justify-content-between">
                             <h5 class="mb-1">{{.ParseError}}</h5>
@@ -176,6 +175,22 @@
         </div>
         {{end}}
     </div>
+{{else}}
+    {{if $s.Public.Bool }}
+        {{ if $failures }}
+            <div class="list-group mt-3 mb-4">
+                {{ range $failures }}
+                    <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{.ParseError}}</h5>
+                            <small>{{.Ago}}</small>
+                        </div>
+                        <p class="mb-1">{{.Issue}}</p>
+                    </a>
+                {{ end }}
+            </div>
+        {{ end }}
+    {{end}}
 {{end}}
 </div>
 </div>

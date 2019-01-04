@@ -15,6 +15,7 @@
           <span class="switch">
             <input type="checkbox" name="admin" class="switch" id="switch-normal"{{if .Admin.Bool}} checked{{end}}>
             <label for="switch-normal">Administrator</label>
+            <input type="hidden" name="admin" id="switch-normal-value" value="{{if .Admin.Bool}}true{{else}}false{{end}}">
           </span>
         </div>
     </div>
