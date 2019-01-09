@@ -13,6 +13,7 @@ vendor
 servers
 dev
 !dev/postman_environment.json
+!dev/demo-script.sh
 !build/alpine-linux-amd64
 config.yml
 statup.db

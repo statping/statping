@@ -51,9 +51,18 @@ type ExportData struct {
 	Messages  []*Message               `json:"messages"`
 	Checkins  []*Checkin               `json:"checkins"`
 	Users     []*User                  `json:"users"`
+	Groups    []*Group                 `json:"groups"`
 	Notifiers []types.AllNotifiers     `json:"notifiers"`
 }
 
+// ExportSettings will export a JSON file containing all of the settings below:
+// - Core
+// - Notifiers
+// - Checkins
+// - Users
+// - Services
+// - Groups
+// - Messages
 func ExportSettings() ([]byte, error) {
 	users, err := SelectAllUsers()
 	messages, err := SelectMessages()
@@ -66,6 +75,7 @@ func ExportSettings() ([]byte, error) {
 		Checkins:  AllCheckins(),
 		Users:     users,
 		Services:  CoreApp.Services,
+		Groups:    SelectGroups(true, true),
 		Messages:  messages,
 	}
 	export, err := json.Marshal(data)

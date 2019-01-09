@@ -40,8 +40,10 @@ func apiIndexHandler(w http.ResponseWriter, r *http.Request) {
 		sendUnauthorizedJson(w, r)
 		return
 	}
+	coreClone := *core.CoreApp
+	coreClone.Started = utils.Timezoner(core.CoreApp.Started, core.CoreApp.Timezone)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(core.CoreApp)
+	json.NewEncoder(w).Encode(coreClone)
 }
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {

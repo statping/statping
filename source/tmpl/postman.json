@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "94807b85-ef65-4370-9144-b1a74e04cb0e",
 		"name": "Statping",
-		"description": "Statup API Requests",
+		"description": "Statping API Requests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -10,7 +10,7 @@
 			"name": "Main",
 			"item": [
 				{
-					"name": "Statup Details",
+					"name": "Statping Details",
 					"event": [
 						{
 							"listen": "test",

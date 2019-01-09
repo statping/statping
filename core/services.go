@@ -355,9 +355,8 @@ func (s *Service) index() int {
 }
 
 // updateService will update a service in the []*core.Services slice
-func updateService(service *Service) {
-	index := service.index()
-	CoreApp.Services[index] = service
+func updateService(s *Service) {
+	CoreApp.Services[s.index()] = s
 }
 
 // Delete will remove a service from the database, it will also end the service checking go routine

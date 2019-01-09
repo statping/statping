@@ -10,7 +10,7 @@ US_E_2="ami-cc7a40a9"
 AMI_IMAGE=$US_W_2
 AWS_CLI=$(which aws)
 DOCKER_CLI=$(which docker)
-DOCKER_IMG="hunterlong/statup"
+DOCKER_IMG="hunterlong/statping"
 AWS_ECS="$AWS_CLI --output json"
 DOCKER_PORT=8080
 
@@ -20,7 +20,7 @@ cat <<EOM
 A simple shell script that will help you install Statping on your local machine, AWS, or Docker.
 
 Commands:
-    install             Install statup to your local system
+    install             Install statping to your local system
     aws                 Create a new EC2 instance running Statping
     docker              Start the latest Statping Docker image
     docker-compose      Create Statping with a Postgres database
@@ -55,7 +55,7 @@ function require() {
 
 # Get the latest release from github
 get_latest_release() {
-  STATUP_VERSION=$(curl --silent "https://api.github.com/repos/$DOCKER_IMG/releases/latest" | jq -r .tag_name)
+  STATPING_VERSION=$(curl --silent "https://api.github.com/repos/$DOCKER_IMG/releases/latest" | jq -r .tag_name)
 }
 
 # auto set AWS environment variables
@@ -111,12 +111,12 @@ function askSecurityName {
     read -p "Enter a name for the new Security Group: "  EC2SECGROUP
 }
 
-# ask user if they want to install statup to the bin folder
+# ask user if they want to install statping to the bin folder
 function askInstallGlobal {
     read -p "Do you want to move Statping to the bin folder? (y/N): "  MOVEBIN
 }
 
-# ask user if they want statup to start on boot
+# ask user if they want statping to start on boot
 function askInstallSystemCTL {
     read -p "Do you want to auto start Statping on boot? (y/N): "  SYSTEMCTL
 }
@@ -143,7 +143,7 @@ function awsCreateEC2 {
   echo "New EC2 instance created: $INSTANCE_ID with status $EC2_STATUS";
 }
 
-# task to created a new EC2 instance with statup image
+# task to created a new EC2 instance with statping image
 function ec2TaskComplete {
   echo "New EC2 instance is ready! $INSTANCE_ID with status $EC2_STATUS";
   echo "Instance ID: $INSTANCE_ID with status $EC2_STATUS";
@@ -184,14 +184,14 @@ function awsTask {
     ec2TaskComplete
 }
 
-# function to move the statup binary to the bin folder
+# function to move the statping binary to the bin folder
 function moveToBin {
-    mv statup /usr/local/bin/statup
+    mv statping /usr/local/bin/statping
 }
 
 # function to install a systemctl service to the local system
 function installSystemCTL {
-FILE=statup.service
+FILE=statping.service
 cat > $FILE <<- EOM
 [Unit]
 Description=Statping Server
@@ -202,7 +202,7 @@ After=network-online.target
 [Service]
 Type=simple
 Restart=always
-ExecStart=/usr/local/bin/statup
+ExecStart=/usr/local/bin/statping
 
 [Install]
 WantedBy=multi-user.target
@@ -210,8 +210,8 @@ EOM
 echo "Installing systemctl service file to: /etc/systemd/system/$FILE"
 mv $FILE /etc/systemd/system/$FILE
 systemctl daemon-reload
-systemctl enable statup.service
-systemctl start statup
+systemctl enable statping.service
+systemctl start statping
 echo "Statping has been installed to SystemCTL and will start on boot"
 }
 
@@ -220,21 +220,21 @@ function downloadBin {
      getOS
      getArch
      get_latest_release
-     GIT_DOWNLOAD="https://github.com/$DOCKER_IMG/releases/download/$STATUP_VERSION/statup-$OS-$ARCH.tar.gz"
-     echo "Downloading Statping $STATUP_VERSION from $GIT_DOWNLOAD"
+     GIT_DOWNLOAD="https://github.com/$DOCKER_IMG/releases/download/$STATPING_VERSION/statping-$OS-$ARCH.tar.gz"
+     echo "Downloading Statping $STATPING_VERSION from $GIT_DOWNLOAD"
      curl -L --silent $GIT_DOWNLOAD | tar xz
      echo "Download complete"
 }
 
-# install statup locally from github
+# install statping locally from github
 function localTask {
      downloadBin
-     echo "Try Statping by running 'statup version'!"
+     echo "Try Statping by running 'statping version'!"
      askInstallGlobal
      if [ $MOVEBIN == "y" ]; then
         moveToBin
-        echo "Statping can now be ran anywhere with command 'statup'"
-        echo "Install location: /usr/local/bin/statup"
+        echo "Statping can now be ran anywhere with command 'statping'"
+        echo "Install location: /usr/local/bin/statping"
         if [ $OS == "linux" ]; then
           askInstallSystemCTL
           if [ $SYSTEMCTL == "y" ]; then
@@ -245,7 +245,7 @@ function localTask {
 }
 
 function uninstallTask {
-    rm -f /usr/local/bin/statup
+    rm -f /usr/local/bin/statping
 }
 
 # start the Statping docker image
@@ -293,7 +293,7 @@ function getOS {
 function echoVersion {
     require jq
     get_latest_release
-    echo "Statping Latest: $STATUP_VERSION"
+    echo "Statping Latest: $STATPING_VERSION"
     echo "Statpinger Tool: v$VERSION"
 }
 

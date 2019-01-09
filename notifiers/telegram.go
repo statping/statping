@@ -117,7 +117,7 @@ func (u *telegram) OnSave() error {
 
 // OnTest will test the Twilio SMS messaging
 func (u *telegram) OnTest() error {
-	msg := fmt.Sprintf("Testing the Twilio SMS Notifier on your Statup server")
+	msg := fmt.Sprintf("Testing the Twilio SMS Notifier on your Statping server")
 	return u.Send(msg)
 }
 

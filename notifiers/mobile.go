@@ -79,7 +79,7 @@ func dataJson(s *types.Service, f *types.Failure) map[string]interface{} {
 	if f != nil {
 		issue = f.Issue
 	}
-	link := fmt.Sprintf("statup://service?id=%v", serviceId)
+	link := fmt.Sprintf("statping://service?id=%v", serviceId)
 	out := map[string]interface{}{
 		"status": online,
 		"id":     serviceId,

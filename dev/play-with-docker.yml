@@ -1,0 +1,15 @@
+# Deploy Portainer demo (demo.portainer.io) in a play-with-docker playground
+#
+# - Go to http://play-with-docker.com/?stack=https://raw.githubusercontent.com/portainer/portainer-demo/master/play-with-docker/docker-stack.yml
+# - Login and/or Start.
+# - Wait until 'Your session is ready!' and 'Close' modal.
+# - Refresh (if a shell is not shown).
+# - Wait until a link with text '80' is shown. It is the link to the demo.
+# - Visit https://github.com/portainer/portainer to check default credentials.
+#
+version: '3'
+services:
+  trigger:
+    image: franela/dind
+    command: sh -c "git clone https://github.com/portainer/portainer-demo/ && ./portainer-demo/portainer-demo.sh && tail -f /dev/null"
+    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
