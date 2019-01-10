@@ -5,7 +5,7 @@
     }
 
     .sm-container {
-        margin-top: 40px !important;
+        margin-top: 0px !important;
         padding: 0 !important;
     }
 
@@ -14,7 +14,12 @@
     }
 
     .container {
-        padding: 0 !important;
+        padding: 0px !important;
+        padding-top: 15px !important;
+    }
+
+    .group_header {
+        margin-left: 15px;
     }
 
     .navbar {

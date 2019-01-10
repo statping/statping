@@ -190,8 +190,22 @@ func (c *Checkin) AllFailures() []*types.Failure {
 // Create will create a new Checkin
 func (c *Checkin) Delete() error {
 	c.Close()
+	i := c.index()
+	service := c.Service()
+	slice := service.Checkins
+	service.Checkins = append(slice[:i], slice[i+1:]...)
 	row := checkinDB().Delete(&c)
 	return row.Error
+}
+
+// index returns a checkin index int for updating the *checkin.Service slice
+func (c *Checkin) index() int {
+	for k, checkin := range c.Service().Checkins {
+		if c.Id == checkin.Select().Id {
+			return k
+		}
+	}
+	return 0
 }
 
 // Create will create a new Checkin

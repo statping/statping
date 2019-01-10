@@ -35,7 +35,7 @@ func Router() *mux.Router {
 	dir := utils.Directory
 	CacheStorage = NewStorage()
 	r := mux.NewRouter()
-	r.Handle("/", cached("15s", "text/html", http.HandlerFunc(indexHandler)))
+	r.Handle("/", cached("120s", "text/html", http.HandlerFunc(indexHandler)))
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
 		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(dir+"/assets/css"))))
@@ -82,7 +82,7 @@ func Router() *mux.Router {
 	// SERVICE Routes
 	r.Handle("/services", http.HandlerFunc(servicesHandler)).Methods("GET")
 	r.Handle("/service/{id}", http.HandlerFunc(servicesViewHandler)).Methods("GET")
-	r.Handle("/service/{id}/edit", http.HandlerFunc(servicesViewHandler))
+	r.Handle("/service/{id}/edit", http.HandlerFunc(servicesViewHandler)).Methods("GET")
 	r.Handle("/service/{id}/delete_failures", http.HandlerFunc(servicesDeleteFailuresHandler)).Methods("GET")
 
 	// API GROUPS Routes
@@ -104,6 +104,8 @@ func Router() *mux.Router {
 	r.Handle("/api/services/{id}/ping", http.HandlerFunc(apiServicePingDataHandler)).Methods("GET")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceUpdateHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceDeleteHandler)).Methods("DELETE")
+	r.Handle("/api/services/{id}/failures", http.HandlerFunc(apiServiceFailuresHandler)).Methods("GET")
+	r.Handle("/api/services/{id}/hits", http.HandlerFunc(apiServiceHitsHandler)).Methods("GET")
 
 	// API USER Routes
 	r.Handle("/api/users", http.HandlerFunc(apiAllUsersHandler)).Methods("GET")

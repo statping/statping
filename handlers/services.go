@@ -260,3 +260,40 @@ func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 	service.DeleteFailures()
 	ExecuteResponse(w, r, "services.gohtml", core.CoreApp.Services, "/services")
 }
+
+func apiServiceFailuresHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsReadAuthenticated(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	vars := mux.Vars(r)
+	servicer := core.SelectService(utils.ToInt(vars["id"]))
+	if servicer == nil {
+		sendErrorJson(errors.New("service not found"), w, r)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(servicer.AllFailures())
+}
+
+func apiServiceHitsHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsReadAuthenticated(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	vars := mux.Vars(r)
+	servicer := core.SelectService(utils.ToInt(vars["id"]))
+	if servicer == nil {
+		sendErrorJson(errors.New("service not found"), w, r)
+		return
+	}
+
+	hits, err := servicer.Hits()
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(hits)
+}

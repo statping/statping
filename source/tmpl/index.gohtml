@@ -10,7 +10,7 @@
 
 {{ range Groups true }}
     <div class="col-12 full-col-12">
-        <h4>{{.Name}}</h4>
+        <h4 class="group_header">{{.Name}}</h4>
         <div class="list-group online_list mb-3">
             {{ range .Services }}
             <a href="#" class="service_li list-group-item list-group-item-action {{if not .Online}}bg-danger text-white{{ end }}" data-id="{{.Id}}">
