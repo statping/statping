@@ -9,9 +9,9 @@ RUN curl -L -s https://assets.statping.com/sass -o /usr/local/bin/sass && \
     chmod +x /usr/local/bin/sass
 WORKDIR /go/src/github.com/hunterlong/statping
 ADD . /go/src/github.com/hunterlong/statping
-RUN make dep
-RUN make dev-deps
-RUN make install
+RUN make dep && \
+    make dev-deps && \
+    make install
 
 # Statping :latest Docker Image
 FROM alpine:latest

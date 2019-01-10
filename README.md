@@ -9,7 +9,7 @@
 # Statping - Status Page & Monitoring Server
 An easy to use Status Page for your websites and applications. Statping will automatically fetch the application and render a beautiful status page with tons of features for you to build an even better status page. This Status Page generator allows you to use MySQL, Postgres, or SQLite on multiple operating systems.
 
-[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/hunterlong/statping) [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/statup-app/general)
+[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/hunterlong/statping) [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/statup-app/general) [![](https://images.microbadger.com/badges/image/hunterlong/statping.svg)](https://microbadger.com/images/hunterlong/statping)
 
 ## A Future-Proof Status Page
 Statping strives to remain future-proof and remain intact if a failure is created. Your Statping service should not be running on the same instance you're trying to monitor. If your server crashes your Status Page should still remaining online to notify your users of downtime.
