@@ -3,7 +3,7 @@
 </p>
 <p align="center">
     <b>Statping - Web and App Status Monitoring for Any Type of Project</b><br>
-<a href="https://github.com/hunterlong/statping/wiki">View Wiki</a> | <a href="https://demo.statping.com">Demo</a> <br> <a href="https://github.com/hunterlong/statping/wiki/API">API</a> | <a href="https://github.com/hunterlong/statping/wiki/Docker">Docker</a> | <a href="https://github.com/hunterlong/statping/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/hunterlong/statping/wiki/Heroku">Heroku</a> | <a href="https://github.com/hunterlong/statping/wiki/Mac">Mac</a> | <a href="https://github.com/hunterlong/statping/wiki/Linux">Linux</a> | <a href="https://github.com/hunterlong/statping/wiki/Windows">Windows</a> | <a href="https://github.com/hunterlong/statping/wiki/Statping-Plugins">Plugins</a>
+<a href="https://github.com/hunterlong/statping/wiki">View Wiki</a> | <a href="https://demo.statping.com">Demo</a> <a href="https://itunes.apple.com/us/app/apple-store/id1445513219">iPhone</a> <a href="https://play.google.com/store/apps/details?id=com.statping">Android</a> <br> <a href="https://github.com/hunterlong/statping/wiki/API">API</a> | <a href="https://github.com/hunterlong/statping/wiki/Docker">Docker</a> | <a href="https://github.com/hunterlong/statping/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/hunterlong/statping/wiki/Heroku">Heroku</a> | <a href="https://github.com/hunterlong/statping/wiki/Mac">Mac</a> | <a href="https://github.com/hunterlong/statping/wiki/Linux">Linux</a> | <a href="https://github.com/hunterlong/statping/wiki/Windows">Windows</a> | <a href="https://github.com/hunterlong/statping/wiki/Statping-Plugins">Plugins</a>
 </p>
 
 # Statping - Status Page & Monitoring Server
@@ -29,7 +29,7 @@ Statping is built in Go Language so all you need is the precompile binary based 
 Statping will allow you to completely customize your Status Page using SASS styling with easy to use variables. The Docker image actually contains a prebuilt SASS binary so you won't even need to setup anything!
 
 <p align="center">
-<img width="100%" src="https://img.cjx.io/statupthempicker.gif">
+<img width="100%" src="https://img.cjx.io/statping_theme.gif">
 </p>
 
 ## Mobile View is Gorgeous
@@ -54,7 +54,7 @@ Plugin are created in Golang using the [statping/plugin](https://github.com/hunt
 ## Easy to use Dashboard
 Having a straight forward dashboard makes Statping that much better. Monitor your websites and applications with a basic HTTP GET request, or add a POST request with your own JSON to post to the endpoint.
 <p align="center">
-<img width="80%" src="https://img.cjx.io/statupsettingsview.gif">
+<img width="80%" src="https://img.cjx.io/statping_settings.gif">
 </p>
 
 ## Exporting Static HTML

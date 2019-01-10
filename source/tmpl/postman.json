@@ -336,6 +336,115 @@
 					]
 				},
 				{
+					"name": "View Service Failures",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/services/1/failures",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"services",
+								"1",
+								"failures"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View Service Hits",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
+								"exec": [
+									"pm.test(\"Service Successful Hits\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.be.at.least(100);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/services/1/hits",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"services",
+								"1",
+								"hits"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Reorder Services",
 					"event": [
 						{
