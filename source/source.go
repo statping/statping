@@ -103,7 +103,7 @@ func UsingAssets(folder string) bool {
 
 // SaveAsset will save an asset to the '/assets/' folder.
 func SaveAsset(data []byte, folder, file string) error {
-	utils.Log(1, fmt.Sprintf("Saving %v/assets/%v", folder, file))
+	utils.Log(1, fmt.Sprintf("Saving %v", folder+"/assets/"+file))
 	err := ioutil.WriteFile(folder+"/assets/"+file, data, 0744)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("Failed to save %v/%v, %v", folder, file, err))
@@ -132,11 +132,11 @@ func CreateAllAssets(folder string) error {
 	MakePublicFolder(folder + "/assets/font")
 	MakePublicFolder(folder + "/assets/files")
 	utils.Log(1, "Inserting scss, css, and javascript files into assets folder")
-	CopyAllToPublic(ScssBox, "scss/")
-	CopyAllToPublic(FontBox, "font/")
-	CopyAllToPublic(CssBox, "css/")
-	CopyAllToPublic(JsBox, "js/")
-	CopyToPublic(FontBox, folder+"/assets/font/", "all.css")
+	CopyAllToPublic(ScssBox, "scss")
+	CopyAllToPublic(FontBox, "font")
+	CopyAllToPublic(CssBox, "css")
+	CopyAllToPublic(JsBox, "js")
+	CopyToPublic(FontBox, folder+"/assets/font", "all.css")
 	CopyToPublic(TmplBox, folder+"/assets", "robots.txt")
 	CopyToPublic(TmplBox, folder+"/assets", "banner.png")
 	CopyToPublic(TmplBox, folder+"/assets", "favicon.ico")

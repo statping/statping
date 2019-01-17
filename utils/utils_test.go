@@ -31,7 +31,7 @@ func TestCreateLog(t *testing.T) {
 
 func TestInitLogs(t *testing.T) {
 	assert.Nil(t, InitLogs())
-	assert.FileExists(t, "./logs/statup.log")
+	assert.FileExists(t, Directory+"/logs/statup.log")
 }
 
 func TestDir(t *testing.T) {

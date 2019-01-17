@@ -40,8 +40,8 @@ func TestCore_UsingAssets(t *testing.T) {
 func TestCreateAssets(t *testing.T) {
 	assert.Nil(t, CreateAllAssets(dir))
 	assert.True(t, UsingAssets(dir))
-	assert.FileExists(t, "./assets/css/base.css")
-	assert.FileExists(t, "./assets/scss/base.scss")
+	assert.FileExists(t, dir+"/assets/css/base.css")
+	assert.FileExists(t, dir+"/assets/scss/base.scss")
 }
 
 func TestCompileSASS(t *testing.T) {
