@@ -3,7 +3,7 @@
 </p>
 <p align="center">
     <b>Statping - Web and App Status Monitoring for Any Type of Project</b><br>
-<a href="https://github.com/hunterlong/statping/wiki">View Wiki</a> | <a href="https://demo.statping.com">Demo</a> <a href="https://itunes.apple.com/us/app/apple-store/id1445513219">iPhone</a> <a href="https://play.google.com/store/apps/details?id=com.statping">Android</a> <br> <a href="https://github.com/hunterlong/statping/wiki/API">API</a> | <a href="https://github.com/hunterlong/statping/wiki/Docker">Docker</a> | <a href="https://github.com/hunterlong/statping/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/hunterlong/statping/wiki/Heroku">Heroku</a> | <a href="https://github.com/hunterlong/statping/wiki/Mac">Mac</a> | <a href="https://github.com/hunterlong/statping/wiki/Linux">Linux</a> | <a href="https://github.com/hunterlong/statping/wiki/Windows">Windows</a> | <a href="https://github.com/hunterlong/statping/wiki/Statping-Plugins">Plugins</a>
+<a href="https://github.com/hunterlong/statping/wiki">View Wiki</a> | <a href="https://demo.statping.com">Demo</a> | <a href="https://itunes.apple.com/us/app/apple-store/id1445513219">iPhone</a> | <a href="https://play.google.com/store/apps/details?id=com.statping">Android</a> <br> <a href="https://github.com/hunterlong/statping/wiki/API">API</a> | <a href="https://github.com/hunterlong/statping/wiki/Docker">Docker</a> | <a href="https://github.com/hunterlong/statping/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/hunterlong/statping/wiki/Heroku">Heroku</a> | <a href="https://github.com/hunterlong/statping/wiki/Mac">Mac</a> | <a href="https://github.com/hunterlong/statping/wiki/Linux">Linux</a> | <a href="https://github.com/hunterlong/statping/wiki/Windows">Windows</a> | <a href="https://github.com/hunterlong/statping/wiki/Statping-Plugins">Plugins</a>
 </p>
 
 # Statping - Status Page & Monitoring Server
@@ -25,20 +25,29 @@ The Status binary for all other OS's is ~17Mb at most.
 ## No Requirements
 Statping is built in Go Language so all you need is the precompile binary based on your operating system. You won't need to install anything extra once you have the Statping binary installed. You can even run Statping on a Raspberry Pi.
 
-## Custom SASS Styling
-Statping will allow you to completely customize your Status Page using SASS styling with easy to use variables. The Docker image actually contains a prebuilt SASS binary so you won't even need to setup anything!
+## Mobile App is Gorgeous
+The Statping app is available on the App Store and Google Play for free. The app will allow you to view services, receive notifications when a service is offline, update groups, users, services, messages, and more! Start your own Statping server and then connect it to the app by scanning the QR code in settings. 
 
 <p align="center">
-<img width="100%" src="https://img.cjx.io/statping_theme.gif">
+<img width="80%" src="https://img.cjx.io/statping_iphone_bk.png">
 </p>
 
-## Mobile View is Gorgeous
-Your status page will be optimized for mobile and desktop viewers. Statping has a full width edge to edge view, which you can also edit to meet your requirements.
+<p align="center">
+<a href="https://play.google.com/store/apps/details?id=com.statping"><img src="https://img.cjx.io/google-play.svg"></a>
+<a href="https://itunes.apple.com/us/app/apple-store/id1445513219"><img src="https://img.cjx.io/app-store-badge.svg"></a>
+</p>
 
 ## Run on Any Server
 Whether you're a Docker fan-boy or a [AWS EC2](https://github.com/hunterlong/statping/wiki/AWS-EC2) master, Statping gives you multiple options to simply get running. Our Amazon AMI image is only 8Gb and will automatically update to the most stable version of Statping.
 Running on an EC2 server might be the most cost effective way to host your own Statping Status Page. The server runs on the smallest EC2 instance (t2.nano) AWS has to offer, which only costs around $4.60 USD a month for your dedicated Status Page.
 Want to run it on your own Docker server? Awesome! Statping has multiple docker-compose.yml files to work with. Statping can automatically create a SSL Certification for your status page.
+
+## Custom SASS Styling
+Statping will allow you to completely customize your Status Page using SASS styling with easy to use variables. The Docker image actually contains a prebuilt SASS binary so you won't even need to setup anything!
+
+<p align="center">
+<img width="80%" src="https://img.cjx.io/statping_theme.gif">
+</p>
 
 ## Slack, Email, Twilio and more
 Statping includes email notification via SMTP and Slack integration using [Incoming Webhook](https://api.slack.com/incoming-webhooks). Insert the webhook URL into the Settings page in Statping and enable the Slack integration. Anytime a service fails, you're channel that you specified on Slack will receive a message.
@@ -87,6 +96,16 @@ LETSENCRYPT_HOST=mydomain.com \
 ```
 Once your instance has started, it will take a moment to get your SSL certificate. Make sure you have a A or CNAME record on your domain that points to the IP/DNS of your server running Statping.
 
+## Prometheus Exporter
+Statping includes a [Prometheus Exporter](https://github.com/hunterlong/statping/wiki/Prometheus-Exporter) so you can have even more monitoring power with your services. The Prometheus exporter can be seen on `/metrics`, simply create another exporter in your prometheus config. Use your Statping API Secret for the Authorization Bearer header, the `/metrics` URL is dedicated for Prometheus and requires the correct API Secret has `Authorization` header.
+```yaml
+scrape_configs:
+  - job_name: 'statping'
+    bearer_token: 'MY API SECRET HERE'
+    static_configs:
+      - targets: ['statping:8080']
+```
+
 ## Run on EC2 Server
 Running Statping on the smallest EC2 server is very quick using the AWS AMI Image. Checkout the [AWS Wiki](https://github.com/hunterlong/statping/wiki/AWS-EC2) to see a step by step guide on how to get your EC2 Statping service online.
 
@@ -128,23 +147,9 @@ aws ec2 run-instances \
     --security-group-ids sg-7e8b830f
 ```
 
-## Prometheus Exporter
-Statping includes a [Prometheus Exporter](https://github.com/hunterlong/statping/wiki/Prometheus-Exporter) so you can have even more monitoring power with your services. The Prometheus exporter can be seen on `/metrics`, simply create another exporter in your prometheus config. Use your Statping API Secret for the Authorization Bearer header, the `/metrics` URL is dedicated for Prometheus and requires the correct API Secret has `Authorization` header.
-```yaml
-scrape_configs:
-  - job_name: 'statping'
-    bearer_token: 'MY API SECRET HERE'
-    static_configs:
-      - targets: ['statping:8080']
-```
-
 ## Contributing
 Statping accepts Push Requests! Feel free to add your own features and notifiers. You probably want to checkout the [Notifier Wiki](https://github.com/hunterlong/statping/wiki/Notifiers) to get a better understanding on how to create your own notification methods for failing/successful services. Testing on Statping will test each function on MySQL, Postgres, and SQLite. I recommend you run a MySQL and a Postgres Docker image for testing.
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/hunterlong/statping)](https://goreportcard.com/report/github.com/hunterlong/statping)
 [![Build Status](https://travis-ci.com/hunterlong/statping.svg?branch=master)](https://travis-ci.com/hunterlong/statping) [![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://dashboard.cypress.io/#/projects/bi8mhr/runs)
 [![Docker Pulls](https://img.shields.io/docker/pulls/hunterlong/statping.svg)](https://hub.docker.com/r/hunterlong/statping/builds/) [![Godoc](https://godoc.org/github.com/hunterlong/statping?status.svg)](https://godoc.org/github.com/hunterlong/statping)[![Coverage Status](https://coveralls.io/repos/github/hunterlong/statping/badge.svg?branch=master)](https://coveralls.io/github/hunterlong/statping?branch=master)
-
-
-
-
