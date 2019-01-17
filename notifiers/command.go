@@ -29,7 +29,7 @@ type commandLine struct {
 var command = &commandLine{&notifier.Notification{
 	Method:      "command",
 	Title:       "Shell Command",
-	Description: "Shell Command allows you to run customize shell or bash commands on the local machine it's running on.",
+	Description: "Shell Command allows you to run a customized shell/bash command on the local machine it's running on.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
 	Delay:       time.Duration(1 * time.Second),
@@ -40,7 +40,7 @@ var command = &commandLine{&notifier.Notification{
 		Title:       "Shell or Bash",
 		Placeholder: "/bin/bash",
 		DbField:     "host",
-		SmallText:   "You can use '/bin/sh', '/bin/bash' or even an absolute path for an application",
+		SmallText:   "You can use '/bin/sh', '/bin/bash' or even an absolute path for an application.",
 	}, {
 		Type:        "text",
 		Title:       "Command to Run on OnSuccess",
