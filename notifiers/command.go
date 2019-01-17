@@ -46,13 +46,13 @@ var command = &commandLine{&notifier.Notification{
 		Title:       "Command to Run on OnSuccess",
 		Placeholder: "curl google.com",
 		DbField:     "var1",
-		SmallText:   "This command will run everytime a service is receiving a Successful event.",
+		SmallText:   "This command will run every time a service is receiving a Successful event.",
 	}, {
 		Type:        "text",
 		Title:       "Command to Run on OnFailure",
 		Placeholder: "curl offline.com",
 		DbField:     "var2",
-		SmallText:   "This command will run everytime a service is receiving a Failing event.",
+		SmallText:   "This command will run every time a service is receiving a Failing event.",
 	}}},
 }
 

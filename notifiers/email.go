@@ -141,13 +141,13 @@ var emailer = &email{&notifier.Notification{
 		DbField:     "Port",
 	}, {
 		Type:        "text",
-		Title:       "Outgoing email Address",
-		Placeholder: "Insert your Outgoing email Address",
+		Title:       "Outgoing Email Address",
+		Placeholder: "outgoing@email.com",
 		DbField:     "Var1",
 	}, {
 		Type:        "email",
 		Title:       "Send Alerts To",
-		Placeholder: "email Address",
+		Placeholder: "sendto@email.com",
 		DbField:     "Var2",
 	}},
 }}

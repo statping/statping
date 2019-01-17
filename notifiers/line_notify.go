@@ -36,7 +36,7 @@ type lineNotifier struct {
 var lineNotify = &lineNotifier{&notifier.Notification{
 	Method:      lineNotifyMethod,
 	Title:       "LINE Notify",
-	Description: "LINE Notify will send notifications to your LINE Notify account when services are offline or online. Baed on the <a href=\"https://notify-bot.line.me/doc/en/\">LINE Notify API</a>.",
+	Description: "LINE Notify will send notifications to your LINE Notify account when services are offline or online. Based on the <a href=\"https://notify-bot.line.me/doc/en/\">LINE Notify API</a>.",
 	Author:      "Kanin Peanviriyakulkit",
 	AuthorUrl:   "https://github.com/dogrocker",
 	Icon:        "far fa-bell",
