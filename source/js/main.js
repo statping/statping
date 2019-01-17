@@ -111,13 +111,15 @@ $('select#service_type').on('change', function() {
     }
 });
 
-function AjaxChart(chart, service, start=0, end=9999999999, group="hour") {
+function AjaxChart(chart, service, start=0, end=9999999999, group="hour", retry=true) {
   $.ajax({
     url: "/api/services/"+service+"/data?start="+start+"&end="+end+"&group="+group,
     type: 'GET',
     success: function(data) {
     	if (data.data.length < 12) {
-				AjaxChart(chart, service, 0, 9999999999, "second")
+    	        if (retry) {
+                    AjaxChart(chart, service, 0, 9999999999, "second", false);
+                }
 				return;
 			} else if (data.data.length === 0) {
     		return;
