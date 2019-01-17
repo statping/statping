@@ -41,8 +41,8 @@ var twilioNotifier = &twilio{&notifier.Notification{
 	Delay:       time.Duration(10 * time.Second),
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
-		Title:       "Account Sid",
-		Placeholder: "Insert your Twilio Account Sid",
+		Title:       "Account SID",
+		Placeholder: "Insert your Twilio Account SID",
 		DbField:     "api_key",
 		Required:    true,
 	}, {

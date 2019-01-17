@@ -38,7 +38,7 @@ type webhooker struct {
 var webhook = &webhooker{&notifier.Notification{
 	Method:      webhookMethod,
 	Title:       "HTTP webhooker",
-	Description: "Send a custom HTTP request to a specific URL with your own body, headers, and parameters",
+	Description: "Send a custom HTTP request to a specific URL with your own body, headers, and parameters.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "fas fa-code-branch",
@@ -47,14 +47,14 @@ var webhook = &webhooker{&notifier.Notification{
 		Type:        "text",
 		Title:       "HTTP Endpoint",
 		Placeholder: "http://webhookurl.com/JW2MCP4SKQP",
-		SmallText:   "Insert the URL for your HTTP Requests",
+		SmallText:   "Insert the URL for your HTTP Requests.",
 		DbField:     "Host",
 		Required:    true,
 	}, {
 		Type:        "text",
 		Title:       "HTTP Method",
 		Placeholder: "POST",
-		SmallText:   "Choose a HTTP method for example: GET, POST, DELETE, or PATCH",
+		SmallText:   "Choose a HTTP method for example: GET, POST, DELETE, or PATCH.",
 		DbField:     "Var1",
 		Required:    true,
 	}, {
