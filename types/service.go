@@ -30,6 +30,7 @@ type Service struct {
 	Type               string             `gorm:"column:check_type" json:"type"`
 	Method             string             `gorm:"column:method" json:"method"`
 	PostData           NullString         `gorm:"column:post_data" json:"post_data"`
+	Headers            NullString         `gorm:"column:headers" json:"headers"`
 	Port               int                `gorm:"not null;column:port" json:"port"`
 	Timeout            int                `gorm:"default:30;column:timeout" json:"timeout"`
 	Order              int                `gorm:"default:0;column:order_id" json:"order_id"`
