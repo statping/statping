@@ -17,7 +17,7 @@
     <div class="form-group row">
         <label for="service_type" class="col-sm-4 col-form-label">Service Type</label>
         <div class="col-sm-8">
-            <select name="type" class="form-control" id="service_type" value="{{.Type}}" {{if ne .Type ""}}readonly{{end}}>
+            <select name="type" class="form-control" id="service_type" {{if ne .Type ""}}readonly{{end}}>
                 <option value="http" {{if eq .Type "http"}}selected{{end}}>HTTP Service</option>
                 <option value="tcp" {{if eq .Type "tcp"}}selected{{end}}>TCP Service</option>
                 <option value="udp" {{if eq .Type "udp"}}selected{{end}}>UDP Service</option>
@@ -35,7 +35,7 @@
     <div class="form-group row{{if (eq .Type "tcp") or (eq .Type "udp")}} d-none{{end}}">
         <label for="service_check_type" class="col-sm-4 col-form-label">Service Check Type</label>
         <div class="col-sm-8">
-            <select name="method" class="form-control" id="service_check_type" value="{{.Method}}">
+            <select name="method" class="form-control" id="service_check_type">
                 <option value="GET" {{if eq .Method "GET"}}selected{{end}}>GET</option>
                 <option value="POST" {{if eq .Method "POST"}}selected{{end}}>POST</option>
                 <option value="DELETE" {{if eq .Method "DELETE"}}selected{{end}}>DELETE</option>
