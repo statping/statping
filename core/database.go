@@ -26,6 +26,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -238,6 +239,7 @@ func (db *DbConfig) InsertCore() (*Core, error) {
 
 // Connect will attempt to connect to the sqlite, postgres, or mysql database
 func (db *DbConfig) Connect(retry bool, location string) error {
+	postgresSSL, _ := strconv.ParseBool(os.Getenv("POSTGRES_SSL"))
 	if DbSession != nil {
 		return nil
 	}
@@ -255,7 +257,11 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
 		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
 	case "postgres":
-		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v timezone=UTC sslmode=disable", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass)
+		sslMode := "disabled"
+		if postgresSSL {
+			sslMode = "enabled"
+		}
+		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v timezone=UTC sslmode=%t", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass, sslMode)
 	case "mssql":
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
 		conn = fmt.Sprintf("sqlserver://%v:%v@%v?database=%v", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
