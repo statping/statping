@@ -51,15 +51,15 @@ func (s Storage) Get(key string) []byte {
 
 	item := s.items[key]
 	if item.Expired() {
-		delete(s.items, key)
+		CacheStorage.Delete(key)
 		return nil
 	}
 	return item.Content
 }
 
 func (s Storage) Delete(key string) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	delete(s.items, key)
 }
 
