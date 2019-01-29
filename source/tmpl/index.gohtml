@@ -63,7 +63,7 @@
                         <span class="badge bg-danger float-right pulse">OFFLINE</span>
                     {{end}}</h4>
 
-                    <div class="row stats_area mt-5 mb-5">
+                    <div class="row stats_area mt-5">
                         <div class="col-4">
                             <span class="lg_number">{{.AvgTime}}ms</span>
                             Average Response
@@ -82,7 +82,7 @@
             </div>
         {{ if .AvgUptime24 }}
             <div class="chart-container">
-                <canvas id="service_{{ .Id }}"></canvas>
+                <div id="service_{{ .Id }}"></div>
             </div>
         {{ end }}
             <div class="row lower_canvas full-col-12 text-white{{if not .Online}} bg-danger{{end}}">

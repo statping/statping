@@ -59,7 +59,11 @@
         {{end}}
 
         <div class="service-chart-container">
-            <canvas id="service"></canvas>
+            <div id="service"></div>
+        </div>
+
+        <div class="col-12">
+            <div id="service_heatmap"></div>
         </div>
 
         <form id="service_date_form" class="col-12 mt-2 mb-3">
@@ -205,69 +209,79 @@
 <script>
 $(document).ready(function() {
 
-    var ctx = document.getElementById("service").getContext('2d');
 
-    var chartdata = new Chart(ctx, {
-        type: 'line',
-        data: {
-            datasets: [{
-                label: 'Response Time (Milliseconds)',
-                data: [],
-                backgroundColor: [
-                    'rgba(47, 206, 30, 0.92)'
-                ],
-                borderColor: [
-                    'rgb(47, 171, 34)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            legend: {
-                display: false
-            },
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    },
-                    gridLines: {
-                        display: true
-                    }
-                }],
-                xAxes: [{
-                    type: 'time',
-                    distribution: 'series',
-                    time: {
-                        displayFormats: {
-                            'millisecond': 'MMM DD',
-                            'second': 'MMM DD',
-                            'minute': 'MMM DD',
-                            'hour': 'MMM DD hA',
-                            'day': 'MMM DD',
-                            'week': 'MMM DD',
-                            'month': 'MMM DD',
-                            'quarter': 'MMM DD',
-                            'year': 'MMM DD',
-                        }
-                    },
-                    gridLines: {
-                        display: true
-                    },
-                    ticks: {
-                        source: 'auto'
-                    }
-                }],
-            },
-            elements: {
-                point: {
-                    radius: 0
+    let options = {
+        chart: {
+            height: "100%",
+            width: "100%",
+            type: "area",
+            animations: {
+                enabled: false,
+                initialAnimation: {
+                    enabled: false
                 }
+            },
+        },
+        fill: {
+            colors: ["#48d338"],
+            opacity: 1,
+            type: 'solid'
+        },
+        stroke: {
+            show: true,
+            curve: 'smooth',
+            lineCap: 'butt',
+            colors: ["#3aa82d"],
+        },
+        series: [
+            {
+                name: "Response Time",
+                data: [
+                    {
+                        x: "02-10-2017 GMT",
+                        y: 34
+                    },
+                    {
+                        x: "02-11-2017 GMT",
+                        y: 43
+                    },
+                    {
+                        x: "02-12-2017 GMT",
+                        y: 31
+                    },
+                    {
+                        x: "02-13-2017 GMT",
+                        y: 43
+                    },
+                    {
+                        x: "02-14-2017 GMT",
+                        y: 33
+                    },
+                    {
+                        x: "02-15-2017 GMT",
+                        y: 52
+                    }
+                ]
             }
-        }
-    });
+        ],
+        xaxis: {
+            type: "datetime",
+        },
+        yaxis: {
+            labels: {
+                formatter: (value) => {
+                    return (value * 0.1).toFixed(0) + "ms"
+                },
+            },
+        },
+        dataLabels: {
+            enabled: false
+        },
+    };
 
-    AjaxChart(chartdata,{{$s.Id}},{{.StartUnix}},{{.EndUnix}},"hour");
+    let chart = new ApexCharts(document.querySelector("#service"), options);
+
+    AjaxChart(chart,{{$s.Id}},{{.StartUnix}},{{.EndUnix}},"hour");
 
     let startDate = $("#service_start").flatpickr({
         enableTime: false,
@@ -289,6 +303,47 @@ $(document).ready(function() {
     $("#start_date").click(function(e) {
         startDate.open()
     });
+
+
+
+    var heat_options = {
+        chart: {
+            height: "100%",
+            width: "100%",
+            type: 'heatmap',
+            toolbar: {
+                show: false
+            }
+        },
+        dataLabels: {
+            enabled: false,
+        },
+        enableShades: true,
+        shadeIntensity: 0.5,
+        colors: ["#d53a3b"],
+        series: [{}],
+    };
+
+    var heatChart = new ApexCharts(
+        document.querySelector("#service_heatmap"),
+        heat_options
+    );
+
+    var heatmapData = [];
+
+    $.ajax({
+        url: "/api/services/{{$s.Id}}/heatmap",
+        type: 'GET',
+        success: function(data) {
+            data.forEach(function(d) {
+                var date = new Date(d.date);
+                heatmapData.push({name: date.toLocaleString('en-us', { month: 'long' }), data: d.data});
+            });
+            heatChart.render();
+            heatChart.updateSeries(heatmapData);
+        }
+    });
+
 
 });
 </script>

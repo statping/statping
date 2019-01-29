@@ -221,6 +221,53 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(obj)
 }
 
+type dataXy struct {
+	X int `json:"x"`
+	Y int `json:"y"`
+}
+
+type dataXyMonth struct {
+	Date time.Time `json:"date"`
+	Data []*dataXy `json:"data"`
+}
+
+func apiServiceHeatmapHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	service := core.SelectService(utils.ToInt(vars["id"]))
+	if service == nil {
+		sendErrorJson(errors.New("service data not found"), w, r)
+		return
+	}
+
+	var monthOutput []*dataXyMonth
+
+	start := service.CreatedAt
+
+	if start.Year() <= 2 {
+		start = service.CreatedAt.Add(time.Duration((-3 * 24) * time.Hour))
+	}
+
+	for y := start; y.Year() == start.Year(); y = y.AddDate(1, 0, 0) {
+
+		for m := y; m.Month() == y.Month(); m = m.AddDate(0, 1, 0) {
+
+			var output []*dataXy
+
+			for day := 1; day <= 31; day++ {
+				date := time.Date(y.Year(), y.Month(), day, 0, 0, 0, 0, time.UTC)
+				failures, _ := service.TotalFailuresOnDate(date)
+				output = append(output, &dataXy{day, int(failures)})
+			}
+
+			monthOutput = append(monthOutput, &dataXyMonth{m, output})
+
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(monthOutput)
+}
+
 func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsFullAuthenticated(r) {
 		sendUnauthorizedJson(w, r)

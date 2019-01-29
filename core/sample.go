@@ -28,7 +28,7 @@ func InsertSampleData() error {
 	utils.Log(1, "Inserting Sample Data...")
 
 	insertSampleGroups()
-
+	createdOn := time.Now().Add((-24 * 90) * time.Hour).UTC()
 	s1 := ReturnService(&types.Service{
 		Name:           "Google",
 		Domain:         "https://google.com",
@@ -39,6 +39,7 @@ func InsertSampleData() error {
 		Timeout:        10,
 		Order:          1,
 		GroupId:        1,
+		CreatedAt:      createdOn,
 	})
 	s2 := ReturnService(&types.Service{
 		Name:           "Statping Github",
@@ -49,6 +50,7 @@ func InsertSampleData() error {
 		Method:         "GET",
 		Timeout:        20,
 		Order:          2,
+		CreatedAt:      createdOn,
 	})
 	s3 := ReturnService(&types.Service{
 		Name:           "JSON Users Test",
@@ -61,6 +63,7 @@ func InsertSampleData() error {
 		Order:          3,
 		Public:         types.NewNullBool(true),
 		GroupId:        2,
+		CreatedAt:      createdOn,
 	})
 	s4 := ReturnService(&types.Service{
 		Name:           "JSON API Tester",
@@ -75,17 +78,19 @@ func InsertSampleData() error {
 		Order:          4,
 		Public:         types.NewNullBool(true),
 		GroupId:        2,
+		CreatedAt:      createdOn,
 	})
 	s5 := ReturnService(&types.Service{
-		Name:     "Google DNS",
-		Domain:   "8.8.8.8",
-		Interval: 20,
-		Type:     "tcp",
-		Port:     53,
-		Timeout:  120,
-		Order:    5,
-		Public:   types.NewNullBool(true),
-		GroupId:  1,
+		Name:      "Google DNS",
+		Domain:    "8.8.8.8",
+		Interval:  20,
+		Type:      "tcp",
+		Port:      53,
+		Timeout:   120,
+		Order:     5,
+		Public:    types.NewNullBool(true),
+		GroupId:   1,
+		CreatedAt: createdOn,
 	})
 
 	s1.Create(false)
@@ -249,6 +254,7 @@ func InsertLargeSampleData() error {
 	if err := insertMessages(); err != nil {
 		return err
 	}
+	createdOn := time.Now().Add((-24 * 90) * time.Hour).UTC()
 	s6 := ReturnService(&types.Service{
 		Name:           "JSON Lint",
 		Domain:         "https://jsonlint.com",
@@ -258,6 +264,7 @@ func InsertLargeSampleData() error {
 		Method:         "GET",
 		Timeout:        10,
 		Order:          6,
+		CreatedAt:      createdOn,
 	})
 
 	s7 := ReturnService(&types.Service{
@@ -269,6 +276,7 @@ func InsertLargeSampleData() error {
 		Method:         "GET",
 		Timeout:        15,
 		Order:          7,
+		CreatedAt:      createdOn,
 	})
 
 	s8 := ReturnService(&types.Service{
@@ -291,6 +299,7 @@ func InsertLargeSampleData() error {
 		Method:         "GET",
 		Timeout:        10,
 		Order:          9,
+		CreatedAt:      createdOn,
 	})
 
 	s10 := ReturnService(&types.Service{
@@ -302,6 +311,7 @@ func InsertLargeSampleData() error {
 		Method:         "GET",
 		Timeout:        10,
 		Order:          10,
+		CreatedAt:      createdOn,
 	})
 
 	s11 := ReturnService(&types.Service{
@@ -313,6 +323,7 @@ func InsertLargeSampleData() error {
 		Method:         "GET",
 		Timeout:        20,
 		Order:          11,
+		CreatedAt:      createdOn,
 	})
 
 	s12 := ReturnService(&types.Service{
@@ -324,6 +335,7 @@ func InsertLargeSampleData() error {
 		Method:         "GET",
 		Timeout:        20,
 		Order:          12,
+		CreatedAt:      createdOn,
 	})
 
 	s13 := ReturnService(&types.Service{
@@ -335,6 +347,7 @@ func InsertLargeSampleData() error {
 		Method:         "GET",
 		Timeout:        10,
 		Order:          13,
+		CreatedAt:      createdOn,
 	})
 
 	s14 := ReturnService(&types.Service{
@@ -346,6 +359,7 @@ func InsertLargeSampleData() error {
 		Method:         "GET",
 		Timeout:        12,
 		Order:          14,
+		CreatedAt:      createdOn,
 	})
 
 	s15 := ReturnService(&types.Service{
@@ -357,6 +371,7 @@ func InsertLargeSampleData() error {
 		Method:         "GET",
 		Timeout:        12,
 		Order:          15,
+		CreatedAt:      createdOn,
 	})
 
 	s6.Create(false)
@@ -370,7 +385,7 @@ func InsertLargeSampleData() error {
 	s14.Create(false)
 	s15.Create(false)
 
-	var dayAgo = time.Now().Add(-24 * time.Hour).Add(-10 * time.Minute)
+	var dayAgo = time.Now().Add((-24 * 90) * time.Hour)
 
 	insertHitRecords(dayAgo, 1450)
 

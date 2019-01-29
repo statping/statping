@@ -124,11 +124,10 @@ function AjaxChart(chart, service, start=0, end=9999999999, group="hour", retry=
 			} else if (data.data.length === 0) {
     		return;
 			}
-      chart.data.labels.pop();
-      data.data.forEach(function(d) {
-        chart.data.datasets[0].data.push(d);
-      });
-      chart.update();
+        chart.render();
+        chart.updateSeries([{
+            data: data.data
+        }]);
     }
   });
 }
