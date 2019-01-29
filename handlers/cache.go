@@ -58,8 +58,8 @@ func (s Storage) Get(key string) []byte {
 }
 
 func (s Storage) Delete(key string) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	delete(s.items, key)
 }
 
