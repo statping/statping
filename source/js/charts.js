@@ -26,6 +26,25 @@ const axisOptions = {
 	}
 };
 
+	const annotationColor = {
+		strokeDashArray: 0,
+		borderColor: "#d0222d",
+		label: {
+			show: false,
+		}
+	};
+
+	let annotation = {
+		annotations: {
+			xaxis: [
+				{
+					// in a datetime series, the x value should be a timestamp, just like it is generated below
+					x: new Date("01/29/2019").getTime(),
+					...annotationColor
+				}]
+		}
+	};
+
 let options = {
 	chart: {
 		height: 210,
@@ -126,7 +145,8 @@ let options = {
 	},
 	yaxis: {
 		...axisOptions
-	}
+	},
+	...annotation
 };
 
 

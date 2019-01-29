@@ -132,6 +132,29 @@ function AjaxChart(chart, service, start=0, end=9999999999, group="hour", retry=
   });
 }
 
+
+
+function FailureAnnotations(chart, service, start=0, end=9999999999, group="hour", retry=true) {
+    const annotationColor = {
+        strokeDashArray: 0,
+        borderColor: "#d0222d",
+        label: {
+            show: false,
+        }
+    };
+    var dataArr = [];
+    $.ajax({
+        url: "/api/services/"+service+"/failures?start="+start+"&end="+end+"&group="+group,
+        type: 'GET',
+        success: function(data) {
+            data.forEach(function (d) {
+                dataArr.push({x: d.created_at, ...annotationColor})
+            });
+            chart.addXaxisAnnotation(dataArr);
+        }
+    });
+}
+
 $('input[type=checkbox]').on('change', function() {
 	var element = $(this).attr('id');
 	$("#"+element+"-value").val(this.checked ? "true" : "false")
