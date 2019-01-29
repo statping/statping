@@ -110,7 +110,7 @@ let options = {
 	},
 	series: [
 		{
-			name: "Series 1",
+			name: "Response Time",
 			data: [
 				{
 					x: "02-10-2017 GMT",
@@ -146,7 +146,6 @@ let options = {
 	yaxis: {
 		...axisOptions
 	},
-	...annotation
 };
 
 
