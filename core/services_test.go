@@ -170,8 +170,7 @@ func TestServiceTotalHits(t *testing.T) {
 
 func TestServiceSum(t *testing.T) {
 	service := SelectService(5)
-	sum, err := service.Sum()
-	assert.Nil(t, err)
+	sum := service.Sum()
 	assert.NotZero(t, sum)
 }
 
