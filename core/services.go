@@ -118,7 +118,7 @@ func (s *Service) AvgTime() float64 {
 	if total == 0 {
 		return float64(0)
 	}
-	sum, _ := s.Sum()
+	sum := s.Sum()
 	avg := sum / float64(total) * 100
 	amount := fmt.Sprintf("%0.0f", avg*10)
 	val, _ := strconv.ParseFloat(amount, 10)

@@ -84,14 +84,11 @@ func (s *Service) TotalHitsSince(ago time.Time) (uint64, error) {
 }
 
 // Sum returns the added value Latency for all of the services successful hits.
-func (s *Service) Sum() (float64, error) {
-	var amount float64
-	hits, err := s.Hits()
-	if err != nil {
-		utils.Log(2, err)
+func (s *Service) Sum() float64 {
+	var sum float64
+	rows, _ := hitsDB().Where("service = ?", s.Id).Select("sum(latency) as total").Rows()
+	for rows.Next() {
+		rows.Scan(&sum)
 	}
-	for _, h := range hits {
-		amount += h.Latency
-	}
-	return amount, err
+	return sum
 }
