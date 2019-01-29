@@ -51,7 +51,7 @@ func (s Storage) Get(key string) []byte {
 
 	item := s.items[key]
 	if item.Expired() {
-		delete(s.items, key)
+		CacheStorage.Delete(key)
 		return nil
 	}
 	return item.Content
