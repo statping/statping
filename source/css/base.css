@@ -148,6 +148,12 @@ HTML, BODY {
   width: 100%;
 }
 
+.service-chart-heatmap {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
 .btn-primary {
   background-color: #3e9bff;
   border-color: #006fe6;

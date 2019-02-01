@@ -111,27 +111,42 @@ $('select#service_type').on('change', function() {
     }
 });
 
-function AjaxChart(chart, service, start=0, end=9999999999, group="hour", retry=true) {
-  $.ajax({
-    url: "/api/services/"+service+"/data?start="+start+"&end="+end+"&group="+group,
-    type: 'GET',
-    success: function(data) {
-    	if (data.data.length < 12) {
-    	        if (retry) {
-                    AjaxChart(chart, service, 0, 9999999999, "second", false);
-                }
-				return;
-			} else if (data.data.length === 0) {
-    		return;
-			}
-        chart.render();
-        chart.updateSeries([{
-            data: data.data
-        }]);
+
+async function RenderChart(chart, service, start=0, end=9999999999, group="hour", retry=true) {
+    let chartData = await ChartLatency(service, start, end, group, retry);
+    if (chartData.length === 0) {
+        chartData = await ChartLatency(service, start, end, "minute", retry);
     }
-  });
+    chart.render();
+    chart.updateSeries([{
+        data: chartData
+    }]);
 }
 
+function ChartLatency(service, start=0, end=9999999999, group="hour", retry=true) {
+    return new Promise(resolve => {
+        $.ajax({
+            url: "/api/services/" + service + "/data?start=" + start + "&end=" + end + "&group=" + group,
+            type: 'GET',
+            success: function (data) {
+                resolve(data.data);
+            }
+        });
+    });
+}
+
+
+function ChartHeatmap(service) {
+    return new Promise(resolve => {
+        $.ajax({
+            url: "/api/services/" + service + "/heatmap",
+            type: 'GET',
+            success: function (data) {
+                resolve(data);
+            }
+        });
+    });
+}
 
 
 function FailureAnnotations(chart, service, start=0, end=9999999999, group="hour", retry=true) {

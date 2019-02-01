@@ -156,7 +156,7 @@ func TestServiceHits(t *testing.T) {
 
 func TestServiceLimitedHits(t *testing.T) {
 	service := SelectService(5)
-	hits, err := service.LimitedHits()
+	hits, err := service.LimitedHits(1024)
 	assert.Nil(t, err)
 	assert.Equal(t, int(1024), len(hits))
 }

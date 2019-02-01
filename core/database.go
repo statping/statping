@@ -161,66 +161,6 @@ func (u *Message) AfterFind() (err error) {
 	return
 }
 
-// BeforeCreate for Hit will set CreatedAt to UTC
-func (h *Hit) BeforeCreate() (err error) {
-	if h.CreatedAt.IsZero() {
-		h.CreatedAt = time.Now().UTC()
-	}
-	return
-}
-
-// BeforeCreate for Failure will set CreatedAt to UTC
-func (f *Failure) BeforeCreate() (err error) {
-	if f.CreatedAt.IsZero() {
-		f.CreatedAt = time.Now().UTC()
-	}
-	return
-}
-
-// BeforeCreate for User will set CreatedAt to UTC
-func (u *User) BeforeCreate() (err error) {
-	if u.CreatedAt.IsZero() {
-		u.CreatedAt = time.Now().UTC()
-		u.UpdatedAt = time.Now().UTC()
-	}
-	return
-}
-
-// BeforeCreate for Message will set CreatedAt to UTC
-func (u *Message) BeforeCreate() (err error) {
-	if u.CreatedAt.IsZero() {
-		u.CreatedAt = time.Now().UTC()
-		u.UpdatedAt = time.Now().UTC()
-	}
-	return
-}
-
-// BeforeCreate for Service will set CreatedAt to UTC
-func (s *Service) BeforeCreate() (err error) {
-	if s.CreatedAt.IsZero() {
-		s.CreatedAt = time.Now().UTC()
-		s.UpdatedAt = time.Now().UTC()
-	}
-	return
-}
-
-// BeforeCreate for Checkin will set CreatedAt to UTC
-func (c *Checkin) BeforeCreate() (err error) {
-	if c.CreatedAt.IsZero() {
-		c.CreatedAt = time.Now().UTC()
-		c.UpdatedAt = time.Now().UTC()
-	}
-	return
-}
-
-// BeforeCreate for checkinHit will set CreatedAt to UTC
-func (c *CheckinHit) BeforeCreate() (err error) {
-	if c.CreatedAt.IsZero() {
-		c.CreatedAt = time.Now().UTC()
-	}
-	return
-}
-
 // InsertCore create the single row for the Core settings in Statping
 func (db *DbConfig) InsertCore() (*Core, error) {
 	CoreApp = &Core{Core: &types.Core{

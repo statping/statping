@@ -145,6 +145,12 @@ HTML,BODY {
   width: 100%;
 }
 
+.service-chart-heatmap {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
 @mixin dynamic-color-hov($color) {
     &.dyn-dark {
         background-color: darken($color, 12%) !important;

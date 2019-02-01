@@ -35,7 +35,7 @@ func Router() *mux.Router {
 	dir := utils.Directory
 	CacheStorage = NewStorage()
 	r := mux.NewRouter()
-	r.Handle("/", cached("120s", "text/html", http.HandlerFunc(indexHandler)))
+	r.Handle("/", cached("60s", "text/html", http.HandlerFunc(indexHandler)))
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
 		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(dir+"/assets/css"))))
@@ -95,6 +95,7 @@ func Router() *mux.Router {
 	// API Routes
 	r.Handle("/api", http.HandlerFunc(apiIndexHandler))
 	r.Handle("/api/renew", http.HandlerFunc(apiRenewHandler))
+	r.Handle("/api/clear_cache", http.HandlerFunc(apiClearCacheHandler))
 
 	// API SERVICE Routes
 	r.Handle("/api/services", http.HandlerFunc(apiAllServicesHandler)).Methods("GET")
@@ -102,8 +103,8 @@ func Router() *mux.Router {
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceHandler)).Methods("GET")
 	r.Handle("/api/reorder", http.HandlerFunc(reorderServiceHandler)).Methods("POST")
 	r.Handle("/api/services/{id}/data", cached("30s", "application/json", http.HandlerFunc(apiServiceDataHandler))).Methods("GET")
-	r.Handle("/api/services/{id}/ping", http.HandlerFunc(apiServicePingDataHandler)).Methods("GET")
-	r.Handle("/api/services/{id}/heatmap", http.HandlerFunc(apiServiceHeatmapHandler)).Methods("GET")
+	r.Handle("/api/services/{id}/ping", cached("30s", "application/json", http.HandlerFunc(apiServicePingDataHandler))).Methods("GET")
+	r.Handle("/api/services/{id}/heatmap", cached("30s", "application/json", http.HandlerFunc(apiServiceHeatmapHandler))).Methods("GET")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceUpdateHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceDeleteHandler)).Methods("DELETE")
 	r.Handle("/api/services/{id}/failures", http.HandlerFunc(apiServiceFailuresHandler)).Methods("GET")
@@ -146,6 +147,7 @@ func Router() *mux.Router {
 	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
 	r.Handle("/tray", http.HandlerFunc(trayHandler))
 	r.Handle("/.well-known/", http.StripPrefix("/.well-known/", http.FileServer(http.Dir(dir+"/.well-known"))))
+
 	r.NotFoundHandler = http.HandlerFunc(error404Handler)
 	return r
 }

@@ -34,3 +34,12 @@ type Message struct {
 	CreatedAt         time.Time `gorm:"column:created_at" json:"created_at" json:"created_at"`
 	UpdatedAt         time.Time `gorm:"column:updated_at" json:"updated_at" json:"updated_at"`
 }
+
+// BeforeCreate for Message will set CreatedAt to UTC
+func (u *Message) BeforeCreate() (err error) {
+	if u.CreatedAt.IsZero() {
+		u.CreatedAt = time.Now().UTC()
+		u.UpdatedAt = time.Now().UTC()
+	}
+	return
+}

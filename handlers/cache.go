@@ -46,9 +46,6 @@ func NewStorage() *Storage {
 
 //Get a cached content by key
 func (s Storage) Get(key string) []byte {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
 	item := s.items[key]
 	if item.Expired() {
 		CacheStorage.Delete(key)
@@ -93,10 +90,10 @@ func cached(duration, contentType string, handler func(w http.ResponseWriter, r 
 				w.Write(content)
 				return
 			}
-			if d, err := time.ParseDuration(duration); err == nil {
-				CacheStorage.Set(r.RequestURI, content, d)
-			}
 			w.Write(content)
+			if d, err := time.ParseDuration(duration); err == nil {
+				go CacheStorage.Set(r.RequestURI, content, d)
+			}
 		}
 	})
 }

@@ -28,6 +28,14 @@ type Hit struct {
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 }
 
+// BeforeCreate for Hit will set CreatedAt to UTC
+func (h *Hit) BeforeCreate() (err error) {
+	if h.CreatedAt.IsZero() {
+		h.CreatedAt = time.Now().UTC()
+	}
+	return
+}
+
 // DbConfig struct is used for the database connection and creates the 'config.yml' file
 type DbConfig struct {
 	DbConn      string `yaml:"connection"`

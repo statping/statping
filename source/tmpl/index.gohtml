@@ -42,7 +42,7 @@
 {{end}}
 
 <div class="col-12 full-col-12">
-{{ if not Services }}
+{{ if not .Services }}
     <div class="alert alert-danger" role="alert">
         <h4 class="alert-heading">No Services to Monitor!</h4>
         <p>Your Statping Status Page is working correctly, but you don't have any services to monitor. Go to the <b>Dashboard</b> and add a website to begin really using your status page!</p>
@@ -51,7 +51,8 @@
     </div>
 {{end}}
 
-{{ range Services }}
+{{ range .Services }}
+    {{$avgTime := .AvgTime}}
     <div class="mb-4" id="service_id_{{.Id}}">
         <div class="card">
             <div class="card-body">
@@ -65,22 +66,22 @@
 
                     <div class="row stats_area mt-5">
                         <div class="col-4">
-                            <span class="lg_number">{{.AvgTime}}ms</span>
+                            <span class="lg_number">{{$avgTime}}ms</span>
                             Average Response
                         </div>
                         <div class="col-4">
-                            <span class="lg_number">{{.Online24}}%</span>
+                            <span class="lg_number">{{.OnlineDaysPercent 1}}%</span>
                             Uptime last 24 Hours
                         </div>
                         <div class="col-4">
-                            <span class="lg_number">{{.Online7Days}}%</span>
+                            <span class="lg_number">{{.OnlineDaysPercent 7}}%</span>
                             Uptime last 7 Days
                         </div>
                     </div>
 
                 </div>
             </div>
-        {{ if .AvgUptime24 }}
+        {{ if $avgTime }}
             <div class="chart-container">
                 <div id="service_{{ .Id }}"></div>
             </div>

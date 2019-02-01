@@ -39,3 +39,12 @@ type UserInterface interface {
 	Update() error
 	Delete() error
 }
+
+// BeforeCreate for User will set CreatedAt to UTC
+func (u *User) BeforeCreate() (err error) {
+	if u.CreatedAt.IsZero() {
+		u.CreatedAt = time.Now().UTC()
+		u.UpdatedAt = time.Now().UTC()
+	}
+	return
+}

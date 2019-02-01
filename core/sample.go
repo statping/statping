@@ -28,7 +28,7 @@ func InsertSampleData() error {
 	utils.Log(1, "Inserting Sample Data...")
 
 	insertSampleGroups()
-	createdOn := time.Now().Add((-24 * 90) * time.Hour).UTC()
+	createdOn := time.Now().Add(((-24 * 30) * 3) * time.Hour).UTC()
 	s1 := ReturnService(&types.Service{
 		Name:           "Google",
 		Domain:         "https://google.com",

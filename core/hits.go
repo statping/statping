@@ -52,9 +52,9 @@ func (s *Service) Hits() ([]*types.Hit, error) {
 }
 
 // LimitedHits returns the last 1024 successful/online 'hit' records for a service
-func (s *Service) LimitedHits() ([]*types.Hit, error) {
+func (s *Service) LimitedHits(amount int64) ([]*types.Hit, error) {
 	var hits []*types.Hit
-	col := hitsDB().Where("service = ?", s.Id).Order("id desc").Limit(1024)
+	col := hitsDB().Where("service = ?", s.Id).Order("id desc").Limit(amount)
 	err := col.Find(&hits)
 	return reverseHits(hits), err.Error
 }
@@ -70,17 +70,15 @@ func reverseHits(input []*types.Hit) []*types.Hit {
 // TotalHits returns the total amount of successful hits a service has
 func (s *Service) TotalHits() (uint64, error) {
 	var count uint64
-	col := hitsDB().Where("service = ?", s.Id)
-	err := col.Count(&count)
-	return count, err.Error
+	col := hitsDB().Where("service = ?", s.Id).Count(&count)
+	return count, col.Error
 }
 
 // TotalHitsSince returns the total amount of hits based on a specific time/date
 func (s *Service) TotalHitsSince(ago time.Time) (uint64, error) {
 	var count uint64
-	rows := hitsDB().Where("service = ? AND created_at > ?", s.Id, ago.UTC().Format("2006-01-02 15:04:05"))
-	err := rows.Count(&count)
-	return count, err.Error
+	rows := hitsDB().Where("service = ? AND created_at > ?", s.Id, ago.UTC().Format("2006-01-02 15:04:05")).Count(&count)
+	return count, rows.Error
 }
 
 // Sum returns the added value Latency for all of the services successful hits.
