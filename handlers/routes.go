@@ -55,7 +55,7 @@ func Router() *mux.Router {
 	r.Handle("/charts.js", http.HandlerFunc(renderServiceChartsHandler))
 	r.Handle("/setup", http.HandlerFunc(setupHandler)).Methods("GET")
 	r.Handle("/setup", http.HandlerFunc(processSetupHandler)).Methods("POST")
-	r.Handle("/dashboard", cached("60s", "text/html", http.HandlerFunc(dashboardHandler))).Methods("GET")
+	r.Handle("/dashboard", http.HandlerFunc(dashboardHandler)).Methods("GET")
 	r.Handle("/dashboard", http.HandlerFunc(loginHandler)).Methods("POST")
 	r.Handle("/logout", http.HandlerFunc(logoutHandler))
 	r.Handle("/plugins/download/{name}", http.HandlerFunc(pluginsDownloadHandler))
