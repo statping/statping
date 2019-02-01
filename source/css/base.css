@@ -139,6 +139,7 @@ HTML, BODY {
   position: relative;
   height: 170px;
   width: 100%;
+  overflow: hidden;
 }
 
 .service-chart-container {

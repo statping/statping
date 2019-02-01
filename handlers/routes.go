@@ -103,6 +103,7 @@ func Router() *mux.Router {
 	r.Handle("/api/reorder", http.HandlerFunc(reorderServiceHandler)).Methods("POST")
 	r.Handle("/api/services/{id}/data", cached("30s", "application/json", http.HandlerFunc(apiServiceDataHandler))).Methods("GET")
 	r.Handle("/api/services/{id}/ping", http.HandlerFunc(apiServicePingDataHandler)).Methods("GET")
+	r.Handle("/api/services/{id}/heatmap", http.HandlerFunc(apiServiceHeatmapHandler)).Methods("GET")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceUpdateHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceDeleteHandler)).Methods("DELETE")
 	r.Handle("/api/services/{id}/failures", http.HandlerFunc(apiServiceFailuresHandler)).Methods("GET")

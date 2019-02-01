@@ -124,6 +124,16 @@ func CountFailures() uint64 {
 	return count
 }
 
+// TotalFailuresOnDate returns the total amount of failures for a service on a specific time/date
+func (s *Service) TotalFailuresOnDate(ago time.Time) (uint64, error) {
+	var count uint64
+	date := ago.UTC().Format("2006-01-02 00:00:00")
+	dateend := ago.UTC().Format("2006-01-02 23:59:59")
+	rows := failuresDB().Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, date, dateend).Not("method = 'checkin'")
+	err := rows.Count(&count)
+	return count, err.Error
+}
+
 // TotalFailures24 returns the amount of failures for a service within the last 24 hours
 func (s *Service) TotalFailures24() (uint64, error) {
 	ago := time.Now().Add(-24 * time.Hour)

@@ -1,86 +1,139 @@
 {{define "charts"}}
 {{$start := .Start}}
 {{$end := .End}}
+
+const axisOptions = {
+	labels: {
+		show: false
+	},
+	crosshairs: {
+		show: false
+	},
+	lines: {
+		show: false
+	},
+	tooltip: {
+		enabled: false
+	},
+	axisTicks: {
+		show: false
+	},
+	grid: {
+		show: false
+	},
+	marker: {
+		show: false
+	}
+};
+
+let options = {
+	chart: {
+		height: 210,
+		width: "100%",
+		type: "area",
+		animations: {
+			enabled: false,
+			initialAnimation: {
+				enabled: false
+			}
+		},
+		selection: {
+			enabled: false
+		},
+		zoom: {
+			enabled: false
+		},
+		toolbar: {
+			show: false
+		}
+	},
+	grid: {
+		show: false,
+		padding: {
+			top: 0,
+			right: 0,
+			bottom: 0,
+			left: 0,
+		},
+	},
+	tooltip: {
+		enabled: false,
+		marker: {
+			show: false,
+		},
+		x: {
+			show: false,
+		}
+	},
+	legend: {
+		show: false,
+	},
+	dataLabels: {
+		enabled: false
+	},
+	floating: true,
+	axisTicks: {
+		show: false
+	},
+	axisBorder: {
+		show: false
+	},
+	fill: {
+		colors: ["#48d338"],
+		opacity: 1,
+		type: 'solid'
+	},
+	stroke: {
+		show: true,
+		curve: 'smooth',
+		lineCap: 'butt',
+		colors: ["#3aa82d"],
+	},
+	series: [
+		{
+			name: "Series 1",
+			data: [
+				{
+					x: "02-10-2017 GMT",
+					y: 34
+				},
+				{
+					x: "02-11-2017 GMT",
+					y: 43
+				},
+				{
+					x: "02-12-2017 GMT",
+					y: 31
+				},
+				{
+					x: "02-13-2017 GMT",
+					y: 43
+				},
+				{
+					x: "02-14-2017 GMT",
+					y: 33
+				},
+				{
+					x: "02-15-2017 GMT",
+					y: 52
+				}
+			]
+		}
+	],
+	xaxis: {
+		type: "datetime",
+		...axisOptions
+	},
+	yaxis: {
+		...axisOptions
+	}
+};
+
+
 {{ range .Services }}
-var ctx_{{js .Id}} = document.getElementById("service_{{js .Id}}").getContext('2d');
-var chartdata_{{js .Id}} = new Chart(ctx_{{js .Id}}, {
-  type: 'line',
-    data: {
-    datasets: [{
-      label: 'Response Time (Milliseconds)',
-      data: [],
-      backgroundColor: ['{{if .Online}}rgba(47, 206, 30, 0.92){{else}}rgb(221, 53, 69){{end}}'],
-      borderColor: ['{{if .Online}}rgb(47, 171, 34){{else}}rgb(183, 32, 47){{end}}'],
-      borderWidth: 1
-    }]
-  },
-  options: {
-    maintainAspectRatio: false,
-      scaleShowValues: false,
-      layout: {
-      padding: {
-        left: 0,
-          right: 0,
-          top: 0,
-          bottom: -10
-      }
-    },
-    hover: {
-      animationDuration: 0,
-    },
-    responsiveAnimationDuration: 0,
-      animation: {
-      duration: 3500,
-        onComplete: onChartComplete
-    },
-    legend: {
-      display: false
-    },
-    tooltips: {
-      enabled: false
-    },
-    scales: {
-      yAxes: [{
-        display: false,
-        ticks: {
-          fontSize: 20,
-          display: false,
-          beginAtZero: false
-        },
-        gridLines: {
-          display: false
-        }
-      }],
-        xAxes: [{
-        type: 'time',
-        distribution: 'series',
-        autoSkip: false,
-        time: {
-          displayFormats: {
-            'hour': 'MMM DD hA'
-          },
-          source: 'auto'
-        },
-        gridLines: {
-          display: false
-        },
-        ticks: {
-          source: 'auto',
-          stepSize: 1,
-          min: 0,
-          fontColor: "white",
-          fontSize: 20,
-          display: false
-        }
-      }]
-    },
-    elements: {
-      point: {
-        radius: 0
-      }
-    }
-  }
-});
+
+let chart{{.Id}} = new ApexCharts(document.querySelector("#service_{{js .Id}}"), options);
+
 {{end}}
 
 function onChartComplete(chart) {
@@ -140,7 +193,7 @@ function onChartComplete(chart) {
 }
 
 $( document ).ready(function() {
-{{ range .Services }}
-AjaxChart(chartdata_{{js .Id}},{{js .Id}},{{$start}},9999999999,"hour");{{end}}
-});
+	{{ range .Services }}AjaxChart(chart{{js .Id}}, {{js .Id}}, 0, 9999999999);
+	{{end}}
+	});
 {{end}}

@@ -245,6 +245,7 @@ func recordFailure(s *Service, issue string) {
 		Issue:     issue,
 		PingTime:  s.PingTime,
 		CreatedAt: time.Now(),
+		ErrorCode: s.LastStatusCode,
 	}}
 	utils.Log(2, fmt.Sprintf("Service %v Failing: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
 	s.CreateFailure(fail)
