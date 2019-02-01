@@ -31,6 +31,7 @@ type Failure struct {
 
 const (
 	limitedFailures = 32
+	limitedHits     = 32
 )
 
 // CreateFailure will create a new Failure record for a service
@@ -146,6 +147,13 @@ func (s *Service) TotalFailures() (uint64, error) {
 	rows := failuresDB().Where("service = ?", s.Id)
 	err := rows.Count(&count)
 	return count, err.Error
+}
+
+// FailuresDaysAgo returns the amount of failures since days ago
+func (s *Service) FailuresDaysAgo(days int) uint64 {
+	ago := time.Now().Add((-24 * time.Duration(days)) * time.Hour)
+	count, _ := s.TotalFailuresSince(ago)
+	return count
 }
 
 // TotalFailuresSince returns the total amount of failures for a service since a specific time/date

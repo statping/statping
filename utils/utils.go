@@ -247,31 +247,28 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 		Transport: transport,
 		Timeout:   timeout,
 	}
-	r := new(http.Request)
-
-	if r, err = http.NewRequest(method, url, body); err != nil {
+	var req *http.Request
+	if req, err = http.NewRequest(method, url, body); err != nil {
 		return nil, nil, err
 	}
-
+	req.Header.Set("User-Agent", "Statping")
+	if content != nil {
+		req.Header.Set("Content-Type", content.(string))
+	}
 	for _, h := range headers {
 		keyVal := strings.Split(h, ":")
 		if len(keyVal) == 2 {
 			if keyVal[0] != "" && keyVal[1] != "" {
-				if strings.ToLower( keyVal[0] ) == "host" {
-					r.Host = keyVal[1]
-				}else {
-					r.Header.Add(keyVal[0], keyVal[1])
+				if strings.ToLower(keyVal[0]) == "host" {
+					req.Host = keyVal[1]
+				} else {
+					req.Header.Add(keyVal[0], keyVal[1])
 				}
 			}
 		}
 	}
-
-	r.Header.Set("User-Agent", "Statping")
-	if content != nil {
-		r.Header.Set("Content-Type", content.(string))
-	}
 	var resp *http.Response
-	if resp, err = client.Do(r); err != nil {
+	if resp, err = client.Do(req); err != nil {
 		return nil, resp, err
 	}
 	defer resp.Body.Close()

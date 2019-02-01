@@ -23,7 +23,7 @@ import (
 )
 
 var (
-	webhookTestUrl = "https://demo.statping.com"
+	webhookTestUrl = "https://statping.com"
 	webhookMessage = `{"id": "%service.Id","name": "%service.Name","online": "%service.Online","issue": "%failure.Issue"}`
 	apiKey         = "application/json"
 	fullMsg        string

@@ -93,9 +93,9 @@ func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) *go
 	selector := Dbtimestamp(group, column)
 	if CoreApp.DbConnection == "postgres" {
 		timeQuery := fmt.Sprintf("service = %v AND created_at BETWEEN '%v.000000' AND '%v.000000'", s.Id, t1.UTC().Format(types.POSTGRES_TIME), t2.UTC().Format(types.POSTGRES_TIME))
-		return DbSession.Model(&types.Hit{}).Select(selector).Where(timeQuery)
+		return hitsDB().Select(selector).Where(timeQuery)
 	} else {
-		return DbSession.Model(&types.Hit{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME_DAY), t2.UTC().Format(types.TIME_DAY))
+		return hitsDB().Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME_DAY), t2.UTC().Format(types.TIME_DAY))
 	}
 }
 
@@ -161,66 +161,6 @@ func (u *Message) AfterFind() (err error) {
 	return
 }
 
-// BeforeCreate for Hit will set CreatedAt to UTC
-func (h *Hit) BeforeCreate() (err error) {
-	if h.CreatedAt.IsZero() {
-		h.CreatedAt = time.Now().UTC()
-	}
-	return
-}
-
-// BeforeCreate for Failure will set CreatedAt to UTC
-func (f *Failure) BeforeCreate() (err error) {
-	if f.CreatedAt.IsZero() {
-		f.CreatedAt = time.Now().UTC()
-	}
-	return
-}
-
-// BeforeCreate for User will set CreatedAt to UTC
-func (u *User) BeforeCreate() (err error) {
-	if u.CreatedAt.IsZero() {
-		u.CreatedAt = time.Now().UTC()
-		u.UpdatedAt = time.Now().UTC()
-	}
-	return
-}
-
-// BeforeCreate for Message will set CreatedAt to UTC
-func (u *Message) BeforeCreate() (err error) {
-	if u.CreatedAt.IsZero() {
-		u.CreatedAt = time.Now().UTC()
-		u.UpdatedAt = time.Now().UTC()
-	}
-	return
-}
-
-// BeforeCreate for Service will set CreatedAt to UTC
-func (s *Service) BeforeCreate() (err error) {
-	if s.CreatedAt.IsZero() {
-		s.CreatedAt = time.Now().UTC()
-		s.UpdatedAt = time.Now().UTC()
-	}
-	return
-}
-
-// BeforeCreate for Checkin will set CreatedAt to UTC
-func (c *Checkin) BeforeCreate() (err error) {
-	if c.CreatedAt.IsZero() {
-		c.CreatedAt = time.Now().UTC()
-		c.UpdatedAt = time.Now().UTC()
-	}
-	return
-}
-
-// BeforeCreate for checkinHit will set CreatedAt to UTC
-func (c *CheckinHit) BeforeCreate() (err error) {
-	if c.CreatedAt.IsZero() {
-		c.CreatedAt = time.Now().UTC()
-	}
-	return
-}
-
 // InsertCore create the single row for the Core settings in Statping
 func (db *DbConfig) InsertCore() (*Core, error) {
 	CoreApp = &Core{Core: &types.Core{
@@ -261,7 +201,7 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 		if postgresSSL {
 			sslMode = "enabled"
 		}
-		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v timezone=UTC sslmode=%t", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass, sslMode)
+		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v timezone=UTC sslmode=%v", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass, sslMode)
 	case "mssql":
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
 		conn = fmt.Sprintf("sqlserver://%v:%v@%v?database=%v", Configs.DbUser, Configs.DbPass, host, Configs.DbData)

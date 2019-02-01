@@ -62,6 +62,15 @@ func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
 }
 
+func apiClearCacheHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsFullAuthenticated(r) {
+		sendUnauthorizedJson(w, r)
+		return
+	}
+	CacheStorage = NewStorage()
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 func sendErrorJson(err error, w http.ResponseWriter, r *http.Request) {
 	utils.Log(2, fmt.Errorf("sending error response for %v: %v", r.URL.String(), err.Error()))
 	output := apiResponse{

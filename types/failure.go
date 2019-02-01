@@ -39,6 +39,14 @@ type FailureInterface interface {
 	ParseError() string // ParseError returns a human readable error for a service failure
 }
 
+// BeforeCreate for Failure will set CreatedAt to UTC
+func (f *Failure) BeforeCreate() (err error) {
+	if f.CreatedAt.IsZero() {
+		f.CreatedAt = time.Now().UTC()
+	}
+	return
+}
+
 type FailSort []FailureInterface
 
 func (s FailSort) Len() int {

@@ -18,6 +18,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/types"
@@ -227,7 +228,7 @@ type dataXy struct {
 }
 
 type dataXyMonth struct {
-	Date time.Time `json:"date"`
+	Date string    `json:"date"`
 	Data []*dataXy `json:"data"`
 }
 
@@ -242,26 +243,37 @@ func apiServiceHeatmapHandler(w http.ResponseWriter, r *http.Request) {
 	var monthOutput []*dataXyMonth
 
 	start := service.CreatedAt
+	//now := time.Now()
 
-	if start.Year() <= 2 {
-		start = service.CreatedAt.Add(time.Duration((-3 * 24) * time.Hour))
-	}
+	sY, sM, _ := start.Date()
 
-	for y := start; y.Year() == start.Year(); y = y.AddDate(1, 0, 0) {
+	var date time.Time
 
-		for m := y; m.Month() == y.Month(); m = m.AddDate(0, 1, 0) {
+	month := int(sM)
+	maxMonth := 12
+
+	for year := int(sY); year <= time.Now().Year(); year++ {
+
+		if year == time.Now().Year() {
+			maxMonth = int(time.Now().Month())
+		}
+
+		for m := month; m <= maxMonth; m++ {
 
 			var output []*dataXy
 
 			for day := 1; day <= 31; day++ {
-				date := time.Date(y.Year(), y.Month(), day, 0, 0, 0, 0, time.UTC)
+				date = time.Date(year, time.Month(m), day, 0, 0, 0, 0, time.UTC)
 				failures, _ := service.TotalFailuresOnDate(date)
 				output = append(output, &dataXy{day, int(failures)})
 			}
 
-			monthOutput = append(monthOutput, &dataXyMonth{m, output})
-
+			thisDate := fmt.Sprintf("%v-%v-01 00:00:00", year, m)
+			monthOutput = append(monthOutput, &dataXyMonth{thisDate, output})
 		}
+
+		month = 1
+
 	}
 
 	w.Header().Set("Content-Type", "application/json")

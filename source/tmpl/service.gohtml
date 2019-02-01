@@ -19,7 +19,7 @@
             <span class="mt-3 mb-3 text-white d-md-none btn bg-danger d-block d-md-none">OFFLINE</span>
         {{end}}
 
-        <h4 class="mt-2">{{ $s.Name }}
+        <h4 class="mt-2"><a href="/">{{CoreApp.Name}}</a> - {{ $s.Name }}
         {{if $s.Online }}
             <span class="badge bg-success float-right d-none d-md-block">ONLINE</span>
         {{ else }}
@@ -28,15 +28,13 @@
 
         <div class="row stats_area mt-5 mb-5">
             <div class="col-4">
-                <span class="lg_number">{{$s.Online24}}%</span>
+                <span class="lg_number">{{$s.OnlineDaysPercent 1}}%</span>
                 Online last 24 Hours
             </div>
-
             <div class="col-4">
                 <span class="lg_number">{{$s.AvgTime}}ms</span>
                 Average Response
             </div>
-
             <div class="col-4">
                 <span class="lg_number">{{$s.TotalUptime}}%</span>
                 Total Uptime
@@ -60,9 +58,10 @@
 
         <div class="service-chart-container">
             <div id="service"></div>
+            <div id="service-bar"></div>
         </div>
 
-        <div class="col-12">
+        <div class="service-chart-heatmap">
             <div id="service_heatmap"></div>
         </div>
 
@@ -207,82 +206,138 @@
 <script src="/js/flatpickr.js"></script>
 <script src="/js/rangePlugin.js"></script>
 <script>
-$(document).ready(function() {
 
-
-    let options = {
-        chart: {
-            height: "100%",
-            width: "100%",
-            type: "area",
-            animations: {
-                enabled: false,
-                initialAnimation: {
-                    enabled: false
-                }
-            },
-        },
-        fill: {
-            colors: ["#48d338"],
-            opacity: 1,
-            type: 'solid'
-        },
-        stroke: {
-            show: true,
-            curve: 'smooth',
-            lineCap: 'butt',
-            colors: ["#3aa82d"],
-        },
-        series: [
-            {
-                name: "Response Time",
-                data: [
-                    {
-                        x: "02-10-2017 GMT",
-                        y: 34
-                    },
-                    {
-                        x: "02-11-2017 GMT",
-                        y: 43
-                    },
-                    {
-                        x: "02-12-2017 GMT",
-                        y: 31
-                    },
-                    {
-                        x: "02-13-2017 GMT",
-                        y: 43
-                    },
-                    {
-                        x: "02-14-2017 GMT",
-                        y: 33
-                    },
-                    {
-                        x: "02-15-2017 GMT",
-                        y: 52
-                    }
-                ]
+let options = {
+    chart: {
+        height: "100%",
+        width: "100%",
+        type: "area",
+        animations: {
+            enabled: false,
+            initialAnimation: {
+                enabled: false
             }
-        ],
-        xaxis: {
-            type: "datetime",
         },
-        yaxis: {
-            labels: {
-                formatter: (value) => {
-                    return (value * 0.1).toFixed(0) + "ms"
+    },
+    fill: {
+        colors: ["#48d338"],
+        opacity: 1,
+        type: 'solid'
+    },
+    stroke: {
+        show: true,
+        curve: 'smooth',
+        lineCap: 'butt',
+        colors: ["#3aa82d"],
+    },
+    series: [
+        {
+            name: "Response Time",
+            data: [
+                {
+                    x: "02-10-2017 GMT",
+                    y: 34
                 },
+                {
+                    x: "02-11-2017 GMT",
+                    y: 43
+                },
+                {
+                    x: "02-12-2017 GMT",
+                    y: 31
+                },
+                {
+                    x: "02-13-2017 GMT",
+                    y: 43
+                },
+                {
+                    x: "02-14-2017 GMT",
+                    y: 33
+                },
+                {
+                    x: "02-15-2017 GMT",
+                    y: 52
+                }
+            ]
+        }
+    ],
+    xaxis: {
+        type: "datetime",
+        tickAmount: 8,
+    },
+    yaxis: {
+        labels: {
+            formatter: (value) => {
+                return (value).toFixed(0) + "ms"
             },
         },
-        dataLabels: {
-            enabled: false
+    },
+    dataLabels: {
+        enabled: false
+    },
+};
+
+
+
+var heat_options = {
+    chart: {
+        height: "100%",
+        width: "100%",
+        type: 'heatmap',
+        toolbar: {
+            show: false
+        }
+    },
+    dataLabels: {
+        enabled: false,
+    },
+    enableShades: true,
+    shadeIntensity: 0.5,
+    colors: ["#d53a3b"],
+    series: [{}],
+    yaxis: {
+        labels: {
+            formatter: (value) => {
+                return value
+            },
         },
-    };
+    },
+    tooltip: {
+        enabled: true,
+        x: {
+            show: false,
+        },
+        y: {
+            formatter: function(val, opts) { return val+" Failures" },
+            title: {
+                formatter: (seriesName) => seriesName,
+            },
+        },
+    }
+};
 
+
+async function RenderHeatmap() {
+    let heatChart = new ApexCharts(
+        document.querySelector("#service_heatmap"),
+        heat_options
+    );
+    let dataArr = [];
+    let heatmapData = await ChartHeatmap({{$s.Id}});
+    heatmapData.forEach(function(d) {
+        var date = new Date(d.date);
+        dataArr.push({name: date.toLocaleString('en-us', { month: 'long' }), data: d.data});
+    });
+    heatChart.render();
+    heatChart.updateSeries(dataArr);
+}
+
+async function RenderChartLatency() {
     let chart = new ApexCharts(document.querySelector("#service"), options);
+    await RenderChart(chart,{{$s.Id}},{{.StartUnix}},{{.EndUnix}},"hour");
+}
 
-    AjaxChart(chart,{{$s.Id}},{{.StartUnix}},{{.EndUnix}},"hour");
-
+$(document).ready(async function() {
     let startDate = $("#service_start").flatpickr({
         enableTime: false,
         static: true,
@@ -293,7 +348,7 @@ $(document).ready(function() {
         onChange: function(selectedDates, dateStr, instance) {
             var one = Math.round((new Date(selectedDates[0])).getTime() / 1000);
             var two = Math.round((new Date(selectedDates[1])).getTime() / 1000);
-        	$("#service_start").val(one);
+            $("#service_start").val(one);
             $("#service_end").val(two);
             $("#start_date").html(dateStr);
         },
@@ -304,46 +359,8 @@ $(document).ready(function() {
         startDate.open()
     });
 
-
-
-    var heat_options = {
-        chart: {
-            height: "100%",
-            width: "100%",
-            type: 'heatmap',
-            toolbar: {
-                show: false
-            }
-        },
-        dataLabels: {
-            enabled: false,
-        },
-        enableShades: true,
-        shadeIntensity: 0.5,
-        colors: ["#d53a3b"],
-        series: [{}],
-    };
-
-    var heatChart = new ApexCharts(
-        document.querySelector("#service_heatmap"),
-        heat_options
-    );
-
-    var heatmapData = [];
-
-    $.ajax({
-        url: "/api/services/{{$s.Id}}/heatmap",
-        type: 'GET',
-        success: function(data) {
-            data.forEach(function(d) {
-                var date = new Date(d.date);
-                heatmapData.push({name: date.toLocaleString('en-us', { month: 'long' }), data: d.data});
-            });
-            heatChart.render();
-            heatChart.updateSeries(heatmapData);
-        }
-    });
-
+    await RenderChartLatency();
+    await RenderHeatmap();
 
 });
 </script>

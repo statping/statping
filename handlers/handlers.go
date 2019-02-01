@@ -17,7 +17,6 @@ package handlers
 
 import (
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statping/core"
@@ -27,20 +26,23 @@ import (
 	"html/template"
 	"net/http"
 	"os"
-	"reflect"
 	"strings"
 	"time"
 )
 
 const (
 	cookieKey = "statping_auth"
-	timeout   = time.Second * 60
+	timeout   = time.Second * 30
 )
 
 var (
 	sessionStore *sessions.CookieStore
 	httpServer   *http.Server
 	usingSSL     bool
+	mainTmpl     = `{{define "main" }} {{ template "base" . }} {{ end }}`
+	templates    = []string{"base.gohtml", "head.gohtml", "nav.gohtml", "footer.gohtml", "scripts.gohtml", "form_service.gohtml", "form_notifier.gohtml", "form_group.gohtml", "form_user.gohtml", "form_checkin.gohtml", "form_message.gohtml"}
+	javascripts  = []string{"charts.js", "chart_index.js"}
+	mainTemplate *template.Template
 )
 
 // RunHTTPServer will start a HTTP server on a specific IP and port
@@ -91,6 +93,7 @@ func RunHTTPServer(ip string, port int) error {
 			IdleTimeout:  timeout,
 			Handler:      router,
 		}
+		httpServer.SetKeepAlivesEnabled(false)
 		return httpServer.ListenAndServe()
 	}
 	return nil
@@ -166,111 +169,36 @@ func IsUser(r *http.Request) bool {
 	return session.Values["authenticated"].(bool)
 }
 
-var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap {
-	return template.FuncMap{
-		"js": func(html interface{}) template.JS {
-			return template.JS(utils.ToString(html))
-		},
-		"safe": func(html string) template.HTML {
-			return template.HTML(html)
-		},
-		"safeURL": func(u string) template.URL {
-			return template.URL(u)
-		},
-		"Auth": func() bool {
-			return IsFullAuthenticated(r)
-		},
-		"IsUser": func() bool {
-			return IsUser(r)
-		},
-		"VERSION": func() string {
-			return core.VERSION
-		},
-		"CoreApp": func() *core.Core {
-			return core.CoreApp
-		},
-		"Services": func() []types.ServiceInterface {
-			return core.CoreApp.Services
-		},
-		"Groups": func(includeAll bool) []*core.Group {
-			auth := IsUser(r)
-			return core.SelectGroups(includeAll, auth)
-		},
-		"len": func(g interface{}) int {
-			val := reflect.ValueOf(g)
-			return val.Len()
-		},
-		"IsNil": func(g interface{}) bool {
-			return g == nil
-		},
-		"USE_CDN": func() bool {
-			return core.CoreApp.UseCdn.Bool
-		},
-		"QrAuth": func() string {
-			return fmt.Sprintf("statping://setup?domain=%v&api=%v", core.CoreApp.Domain, core.CoreApp.ApiSecret)
-		},
-		"Type": func(g interface{}) []string {
-			fooType := reflect.TypeOf(g)
-			var methods []string
-			methods = append(methods, fooType.String())
-			for i := 0; i < fooType.NumMethod(); i++ {
-				method := fooType.Method(i)
-				fmt.Println(method.Name)
-				methods = append(methods, method.Name)
-			}
-			return methods
-		},
-		"ToJSON": func(g interface{}) template.HTML {
-			data, _ := json.Marshal(g)
-			return template.HTML(string(data))
-		},
-		"underscore": func(html string) string {
-			return utils.UnderScoreString(html)
-		},
-		"URL": func() string {
-			return r.URL.String()
-		},
-		"CHART_DATA": func() string {
-			return ""
-		},
-		"Error": func() string {
-			return ""
-		},
-		"ToString": func(v interface{}) string {
-			return utils.ToString(v)
-		},
-		"Ago": func(t time.Time) string {
-			return utils.Timestamp(t).Ago()
-		},
-		"Duration": func(t time.Duration) string {
-			duration, _ := time.ParseDuration(fmt.Sprintf("%vs", t.Seconds()))
-			return utils.FormatDuration(duration)
-		},
-		"ToUnix": func(t time.Time) int64 {
-			return t.UTC().Unix()
-		},
-		"FromUnix": func(t int64) string {
-			return utils.Timezoner(time.Unix(t, 0), core.CoreApp.Timezone).Format("Monday, January 02")
-		},
-		"NewService": func() *types.Service {
-			return new(types.Service)
-		},
-		"NewUser": func() *types.User {
-			return new(types.User)
-		},
-		"NewCheckin": func() *types.Checkin {
-			return new(types.Checkin)
-		},
-		"NewMessage": func() *types.Message {
-			return new(types.Message)
-		},
-		"NewGroup": func() *types.Group {
-			return new(types.Group)
-		},
+func loadTemplate(w http.ResponseWriter, r *http.Request) error {
+	var err error
+	mainTemplate = template.New("main")
+	mainTemplate.Funcs(handlerFuncs(w, r))
+	mainTemplate, err = mainTemplate.Parse(mainTmpl)
+	if err != nil {
+		utils.Log(4, err)
+		return err
 	}
+	// render all templates
+	mainTemplate.Funcs(handlerFuncs(w, r))
+	for _, temp := range templates {
+		tmp, _ := source.TmplBox.String(temp)
+		mainTemplate, err = mainTemplate.Parse(tmp)
+		if err != nil {
+			utils.Log(4, err)
+			return err
+		}
+	}
+	// render all javascript files
+	for _, temp := range javascripts {
+		tmp, _ := source.JsBox.String(temp)
+		mainTemplate, err = mainTemplate.Parse(tmp)
+		if err != nil {
+			utils.Log(4, err)
+			return err
+		}
+	}
+	return err
 }
-
-var mainTmpl = `{{define "main" }} {{ template "base" . }} {{ end }}`
 
 // ExecuteResponse will render a HTTP response for the front end user
 func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{}) {
@@ -279,53 +207,21 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		http.Redirect(w, r, url, http.StatusSeeOther)
 		return
 	}
-
 	if usingSSL {
 		w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
 	}
-
-	templates := []string{"base.gohtml", "head.gohtml", "nav.gohtml", "footer.gohtml", "scripts.gohtml", "form_service.gohtml", "form_notifier.gohtml", "form_group.gohtml", "form_user.gohtml", "form_checkin.gohtml", "form_message.gohtml"}
-	javascripts := []string{"charts.js", "chart_index.js"}
-
+	loadTemplate(w, r)
 	render, err := source.TmplBox.String(file)
 	if err != nil {
 		utils.Log(4, err)
 	}
-
-	// setup the main template and handler funcs
-	t := template.New("main")
-	t.Funcs(handlerFuncs(w, r))
-	t, err = t.Parse(mainTmpl)
-	if err != nil {
-		utils.Log(4, err)
-	}
-
-	// render all templates
-	for _, temp := range templates {
-		tmp, _ := source.TmplBox.String(temp)
-		t, err = t.Parse(tmp)
-		if err != nil {
-			utils.Log(4, err)
-		}
-	}
-
-	// render all javascript files
-	for _, temp := range javascripts {
-		tmp, _ := source.JsBox.String(temp)
-		t, err = t.Parse(tmp)
-		if err != nil {
-			utils.Log(4, err)
-		}
-	}
-
 	// render the page requested
-	_, err = t.Parse(render)
+	_, err = mainTemplate.Parse(render)
 	if err != nil {
 		utils.Log(4, err)
 	}
-
 	// execute the template
-	err = t.Execute(w, data)
+	err = mainTemplate.Execute(w, data)
 	if err != nil {
 		utils.Log(4, err)
 	}

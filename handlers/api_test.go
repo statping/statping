@@ -73,12 +73,11 @@ func TestSetupRoutes(t *testing.T) {
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
-			body, t, err := RunHTTPTest(v, t)
+			_, t, err := RunHTTPTest(v, t)
 			assert.Nil(t, err)
 			if err != nil {
 				t.FailNow()
 			}
-			t.Logf("Test %v got: %v\n", v.Name, string(body))
 		})
 	}
 }
@@ -95,12 +94,12 @@ func TestMainApiRoutes(t *testing.T) {
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
-			body, t, err := RunHTTPTest(v, t)
+			_, t, err := RunHTTPTest(v, t)
 			assert.Nil(t, err)
 			if err != nil {
 				t.FailNow()
 			}
-			t.Logf("Test %v got: %v\n", v.Name, string(body))
+
 		})
 	}
 }
@@ -195,12 +194,12 @@ func TestApiServiceRoutes(t *testing.T) {
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
-			body, t, err := RunHTTPTest(v, t)
+			_, t, err := RunHTTPTest(v, t)
 			assert.Nil(t, err)
 			if err != nil {
 				t.FailNow()
 			}
-			t.Logf("Test %v got: %v\n", v.Name, string(body))
+
 		})
 	}
 }
@@ -239,12 +238,12 @@ func TestGroupAPIRoutes(t *testing.T) {
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
-			body, t, err := RunHTTPTest(v, t)
+			_, t, err := RunHTTPTest(v, t)
 			assert.Nil(t, err)
 			if err != nil {
 				t.FailNow()
 			}
-			t.Logf("Test %v got: %v\n", v.Name, string(body))
+
 		})
 	}
 }
@@ -293,12 +292,12 @@ func TestApiUsersRoutes(t *testing.T) {
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
-			body, t, err := RunHTTPTest(v, t)
+			_, t, err := RunHTTPTest(v, t)
 			assert.Nil(t, err)
 			if err != nil {
 				t.FailNow()
 			}
-			t.Logf("Test %v got: %v\n", v.Name, string(body))
+
 		})
 	}
 }
@@ -330,12 +329,12 @@ func TestApiNotifiersRoutes(t *testing.T) {
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
-			body, t, err := RunHTTPTest(v, t)
+			_, t, err := RunHTTPTest(v, t)
 			assert.Nil(t, err)
 			if err != nil {
 				t.FailNow()
 			}
-			t.Logf("Test %v got: %v\n", v.Name, string(body))
+
 		})
 	}
 }
@@ -400,12 +399,12 @@ func TestMessagesApiRoutes(t *testing.T) {
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
-			body, t, err := RunHTTPTest(v, t)
+			_, t, err := RunHTTPTest(v, t)
 			assert.Nil(t, err)
 			if err != nil {
 				t.FailNow()
 			}
-			t.Logf("Test %v got: %v\n", v.Name, string(body))
+
 		})
 	}
 }
@@ -439,12 +438,12 @@ func TestApiCheckinRoutes(t *testing.T) {
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
-			body, t, err := RunHTTPTest(v, t)
+			_, t, err := RunHTTPTest(v, t)
 			assert.Nil(t, err)
 			if err != nil {
 				t.FailNow()
 			}
-			t.Logf("Test %v got: %v\n", v.Name, string(body))
+
 		})
 	}
 }

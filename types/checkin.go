@@ -40,12 +40,29 @@ type CheckinInterface interface {
 	Select() *Checkin
 }
 
+// BeforeCreate for Checkin will set CreatedAt to UTC
+func (c *Checkin) BeforeCreate() (err error) {
+	if c.CreatedAt.IsZero() {
+		c.CreatedAt = time.Now().UTC()
+		c.UpdatedAt = time.Now().UTC()
+	}
+	return
+}
+
 // CheckinHit is a successful response from a Checkin
 type CheckinHit struct {
 	Id        int64     `gorm:"primary_key;column:id" json:"id"`
 	Checkin   int64     `gorm:"index;column:checkin" json:"-"`
 	From      string    `gorm:"column:from_location" json:"from"`
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
+}
+
+// BeforeCreate for checkinHit will set CreatedAt to UTC
+func (c *CheckinHit) BeforeCreate() (err error) {
+	if c.CreatedAt.IsZero() {
+		c.CreatedAt = time.Now().UTC()
+	}
+	return
 }
 
 // Start will create a channel for the checkin checking go routine

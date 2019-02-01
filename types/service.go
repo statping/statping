@@ -54,6 +54,15 @@ type Service struct {
 	Checkins           []CheckinInterface `gorm:"-" json:"checkins,omitempty"`
 }
 
+// BeforeCreate for Service will set CreatedAt to UTC
+func (s *Service) BeforeCreate() (err error) {
+	if s.CreatedAt.IsZero() {
+		s.CreatedAt = time.Now().UTC()
+		s.UpdatedAt = time.Now().UTC()
+	}
+	return
+}
+
 type ServiceInterface interface {
 	Select() *Service
 	CheckQueue(bool)

@@ -92,7 +92,7 @@ func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 		checkins := service.AllCheckins()
 		for _, c := range checkins {
 			c.Failures = c.LimitedFailures(limitedFailures)
-			c.Hits = c.LimitedHits(limitedFailures)
+			c.Hits = c.LimitedHits(limitedHits)
 			service.Checkins = append(service.Checkins, c)
 		}
 		CoreApp.Services = append(CoreApp.Services, service)
@@ -113,27 +113,19 @@ func (s *Service) ToJSON() string {
 }
 
 // AvgTime will return the average amount of time for a service to response back successfully
-func (s *Service) AvgTime() float64 {
+func (s *Service) AvgTime() string {
 	total, _ := s.TotalHits()
 	if total == 0 {
-		return float64(0)
+		return "0"
 	}
-	sum, _ := s.Sum()
+	sum := s.Sum()
 	avg := sum / float64(total) * 100
-	amount := fmt.Sprintf("%0.0f", avg*10)
-	val, _ := strconv.ParseFloat(amount, 10)
-	return val
+	return fmt.Sprintf("%0.0f", avg*10)
 }
 
-// Online24 returns the service's uptime percent within last 24 hours
-func (s *Service) Online24() float32 {
-	ago := time.Now().Add(-24 * time.Hour)
-	return s.OnlineSince(ago)
-}
-
-// Online7Days returns the service's uptime percent within last 7 days
-func (s *Service) Online7Days() float32 {
-	ago := time.Now().Add((-24 * 7) * time.Hour)
+// OnlineDaysPercent returns the service's uptime percent within last 24 hours
+func (s *Service) OnlineDaysPercent(days int) float32 {
+	ago := time.Now().Add((-24 * time.Duration(days)) * time.Hour)
 	return s.OnlineSince(ago)
 }
 
@@ -185,7 +177,7 @@ func (s *Service) lastFailure() *Failure {
 //		// Online since Monday 3:04:05PM, Jan _2 2006
 func (s *Service) SmallText() string {
 	last := s.LimitedFailures(1)
-	hits, _ := s.LimitedHits()
+	hits, _ := s.LimitedHits(1)
 	zone := CoreApp.Timezone
 	if s.Online {
 		if len(last) == 0 {
@@ -255,19 +247,14 @@ func (s *Service) Downtime() time.Duration {
 
 // GraphDataRaw will return all the hits between 2 times for a Service
 func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group string, column string) *DateScanObj {
-	var d []DateScan
-	var amount int64
+	var data []DateScan
+	outgoing := new(DateScanObj)
 	model := service.(*Service).HitsBetween(start, end, group, column)
-	model.Count(&amount)
-	if amount == 0 {
-		return &DateScanObj{[]DateScan{}}
-	}
 	model = model.Order("timeframe asc", false).Group("timeframe")
 	rows, err := model.Rows()
 	if err != nil {
 		utils.Log(3, fmt.Errorf("issue fetching service chart data: %v", err))
 	}
-
 	for rows.Next() {
 		var gd DateScan
 		var createdAt string
@@ -285,9 +272,10 @@ func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group st
 		}
 		gd.CreatedAt = utils.Timezoner(createdTime, CoreApp.Timezone).Format(types.CHART_TIME)
 		gd.Value = int64(value * 1000)
-		d = append(d, gd)
+		data = append(data, gd)
 	}
-	return &DateScanObj{d}
+	outgoing.Array = data
+	return outgoing
 }
 
 // ToString will convert the DateScanObj into a JSON string for the charts to render
@@ -375,11 +363,6 @@ func (s *Service) Delete() error {
 	return err.Error
 }
 
-// UpdateSingle will update a single column for a service
-func (s *Service) UpdateSingle(attr ...interface{}) error {
-	return servicesDB().Model(s).Update(attr).Error
-}
-
 // Update will update a service in the database, the service's checking routine can be restarted by passing true
 func (s *Service) Update(restart bool) error {
 	err := servicesDB().Update(&s)
@@ -428,7 +411,7 @@ func (s *Service) Messages() []*Message {
 	return messages
 }
 
-// ActiveMessages returns all Messages for a Service
+// ActiveMessages returns all service messages that are available based on the current time
 func (s *Service) ActiveMessages() []*Message {
 	var messages []*Message
 	msgs := SelectServiceMessages(s.Id)
@@ -440,12 +423,7 @@ func (s *Service) ActiveMessages() []*Message {
 	return messages
 }
 
-// ServicesCount returns the amount of services inside the []*core.Services slice
-func (c *Core) ServicesCount() int {
-	return len(c.Services)
-}
-
-// CountOnline
+// CountOnline returns the amount of services online
 func (c *Core) CountOnline() int {
 	amount := 0
 	for _, s := range CoreApp.Services {
