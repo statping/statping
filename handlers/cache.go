@@ -14,6 +14,7 @@ type Cacher interface {
 	Get(key string) []byte
 	Delete(key string)
 	Set(key string, content []byte, duration time.Duration)
+	List() map[string]Item
 }
 
 // Item is a cached reference
@@ -42,6 +43,10 @@ func NewStorage() *Storage {
 		items: make(map[string]Item),
 		mu:    &sync.RWMutex{},
 	}
+}
+
+func (s Storage) List() map[string]Item {
+	return s.items
 }
 
 //Get a cached content by key

@@ -8,6 +8,7 @@
                 <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                     <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true"><i class="fa fa-cogs"></i> Settings</a>
                     <a class="nav-link" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false"><i class="fa fa-image"></i> Theme Editor</a>
+                    <a class="nav-link" id="v-pills-cache-tab" data-toggle="pill" href="#v-pills-cache" role="tab" aria-controls="v-pills-cache" aria-selected="false"><i class="fa fa-paperclip"></i> Cache</a>
                 {{ range .Notifications }}
                     <a class="nav-link text-capitalize" id="v-pills-{{underscore .Select.Method}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Select.Method}}" role="tab" aria-controls="v-pills-{{underscore .Select.Method}}" aria-selected="false"><i class="{{.Select.Icon}}"></i> {{.Select.Method}}</a>
                 {{ end }}
@@ -125,7 +126,6 @@
                         <h3>Additional Settings</h3>
 
                         <div class="row">
-                            <a href="/api/clear_cache" class="btn btn-sm btn-secondary float-right">Clear Cache</a>
                              <a href="/settings/export" class="btn btn-sm btn-secondary float-right">Export Settings</a>
                             {{if .Domain}}
                                 <a href="#" class="btn btn-sm btn-secondary float-right ml-1">Authentication QR Code</a>
@@ -180,6 +180,28 @@
                     {{end}}
                     </div>
 
+                    <div class="tab-pane" id="v-pills-cache" role="tabpanel" aria-labelledby="v-pills-cache-tab">
+                        <h3>Cache</h3>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">URL</th>
+                                <th scope="col">Size</th>
+                                <th scope="col">Expiration</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {{ range $key, $value := Cache.List }}
+                                <tr>
+                                    <td>{{$key}}</td>
+                                    <td>{{len $value.Content}}</td>
+                                    <td>{{UnixTime $value.Expiration true}}</td>
+                                </tr>
+                            {{end}}
+                            </tbody>
+                        </table>
+                        <a href="/api/clear_cache" class="btn btn-danger btn-block">Clear Cache</a>
+                    </div>
                 {{ range .Notifications }}
                 {{$n := .Select}}
                     <div class="tab-pane fade" id="v-pills-{{underscore $n.Method}}" role="tabpanel" aria-labelledby="v-pills-{{underscore $n.Method }}-tab">

@@ -82,6 +82,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"Error": func() string {
 			return ""
 		},
+		"Cache": func() Cacher {
+			return CacheStorage
+		},
 		"ToString": func(v interface{}) string {
 			return utils.ToString(v)
 		},
@@ -97,6 +100,12 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		},
 		"FromUnix": func(t int64) string {
 			return utils.Timezoner(time.Unix(t, 0), core.CoreApp.Timezone).Format("Monday, January 02")
+		},
+		"UnixTime": func(t int64, nano bool) string {
+			if nano {
+				t = t / 1e9
+			}
+			return utils.Timezoner(time.Unix(t, 0), core.CoreApp.Timezone).String()
 		},
 		"NewService": func() *types.Service {
 			return new(types.Service)
