@@ -58,6 +58,7 @@
 
         <div class="service-chart-container">
             <div id="service"></div>
+            <div id="service-bar"></div>
         </div>
 
         <div class="service-chart-heatmap">
@@ -262,6 +263,7 @@ let options = {
     ],
     xaxis: {
         type: "datetime",
+        tickAmount: 8,
     },
     yaxis: {
         labels: {

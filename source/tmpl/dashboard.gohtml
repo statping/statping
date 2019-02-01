@@ -5,7 +5,7 @@
     <div class="col-12 mt-3">
         <div class="row stats_area mb-5">
             <div class="col-4">
-                <span class="lg_number">{{ CoreApp.ServicesCount }}</span>
+                <span class="lg_number">{{ len Services }}</span>
                 Total Services
             </div>
             <div class="col-4">
@@ -17,6 +17,29 @@
                 Online Services
             </div>
         </div>
+
+            {{ range Services }}
+                <div class="col-12 card mb-3" style="min-height: 260px">
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="/service/{{.Id}}">{{.Name}}</a> {{if .Online}}<span class="badge float-right badge-success">ONLINE</span>{{else}}<span class="badge float-right badge-danger">OFFLINE</span>{{end}}</h5>
+                        <div class="row">
+                            <div class="col-md-3 col-sm-6">
+                                <div id="spark_service_{{.Id}}_1"></div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div id="spark_service_{{.Id}}_2"></div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div id="spark_service_{{.Id}}_3"></div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div id="spark_service_{{.Id}}_4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{end}}
+
         <div class="row mt-4">
             <div class="col-12">
                 {{if eq (len CoreApp.Services) 0}}
@@ -26,41 +49,160 @@
                             <a class="lead">You don't have any websites or applications being monitored by your Statping server. <p><a href="/services" class="btn btn-secondary mt-3">Add Service</a></p></p>
                         </div>
                     </div>
-                {{else}}
-                <div class="list-group mb-5 mt-3">
-                {{ range Services }}
-                    <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">{{.Name}}</h5>
-                            <small>{{if .Online}} <span class="badge badge-success">ONLINE</span> {{else}} <span class="badge badge-danger">OFFLINE</span> {{end}}</small>
-                        </div>
-                        <p class="mb-1">{{.SmallText}}</p>
-                    </a>
-                    {{ end }}
-                 {{end}}
-                </div>
-
-            {{ range Services }}
-            {{$failures := .LimitedFailures 16}}
-            {{ if $failures }}
-                <h4 class="text-truncate">{{.Name}} Failures</h4>
-                <div class="list-group mt-3 mb-4">
-                {{ range $failures }}
-                    <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">{{.ParseError}}</h5>
-                            <small>{{.Ago}}</small>
-                        </div>
-                        <p class="mb-1">{{.Issue}}</p>
-                    </a>
-                {{ end }}
-                </div>
-            {{ end }}
-            {{ end }}
-
-
+                {{end}}
             </div>
         </div>
     </div>
 </div>
+{{end}}
+
+{{define "extra_scripts"}}
+<script>
+function AddTotal(arr) {
+    var total = 0;
+    arr.forEach(function(d) {
+        total += d
+    });
+    return total.toString();
+}
+
+function Average(arr) {
+    var total = AddTotal(arr);
+    if (arr.length === 0) {
+        return total+"ms"
+    }
+    return (total / arr.length).toFixed(0)+"ms";
+}
+
+const sparkOption = {
+    chart: {
+        type: 'area',
+        height: 180,
+        sparkline: {
+            enabled: true
+        },
+    },
+    stroke: {
+        curve: 'straight'
+    },
+    fill: {
+        opacity: 0.3,
+    },
+    yaxis: {
+        min: 0
+    },
+    colors: ['#DCE6EC'],
+    tooltip: {
+        enabled: false
+    }
+}
+
+{{ range Services }}
+    var sparklineData_{{js .Id}}_1 = {{js (.SparklineDayFailures 7)}};
+    var sparklineData_{{js .Id}}_2 = {{js (.SparklineDayFailures 30)}};
+    var sparklineData_{{js .Id}}_3 = {{js (.SparklineHourResponse 30 "latency")}};
+    var sparklineData_{{js .Id}}_4 = {{js (.SparklineHourResponse 30 "ping_time")}};
+
+    var options_{{js .Id}}_1 = {
+        ...sparkOption,
+        title: {
+            text: AddTotal(sparklineData_{{js .Id}}_1),
+            offsetX: 0,
+            style: {
+                fontSize: '28px',
+                cssClass: 'apexcharts-yaxis-title'
+            }
+        },
+        subtitle: {
+            text: 'Failures Last 7 Days',
+            offsetX: 0,
+            style: {
+                fontSize: '14px',
+                cssClass: 'apexcharts-yaxis-title'
+            }
+        },
+        series: [{
+            data: sparklineData_{{js .Id}}_1
+        }],
+    };
+    var options_{{js .Id}}_2 = {
+        ...sparkOption,
+        title: {
+            text: AddTotal(sparklineData_{{js .Id}}_2),
+            offsetX: 0,
+            style: {
+                fontSize: '28px',
+                cssClass: 'apexcharts-yaxis-title'
+            }
+        },
+        subtitle: {
+            text: 'Failures Last Month',
+            offsetX: 0,
+            style: {
+                fontSize: '14px',
+                cssClass: 'apexcharts-yaxis-title'
+            }
+        },
+        series: [{
+            data: sparklineData_{{js .Id}}_2
+        }],
+    };
+    var options_{{js .Id}}_3 = {
+        ...sparkOption,
+        title: {
+            text: Average(sparklineData_{{js .Id}}_3),
+            offsetX: 0,
+            style: {
+                fontSize: '28px',
+                cssClass: 'apexcharts-yaxis-title'
+            }
+        },
+        subtitle: {
+            text: 'Average Response',
+            offsetX: 0,
+            style: {
+                fontSize: '14px',
+                cssClass: 'apexcharts-yaxis-title'
+            }
+        },
+        series: [{
+            data: sparklineData_{{js .Id}}_3
+        }],
+    };
+    var options_{{js .Id}}_4 = {
+        ...sparkOption,
+        title: {
+            text: Average(sparklineData_{{js .Id}}_4),
+            offsetX: 0,
+            style: {
+                fontSize: '28px',
+                cssClass: 'apexcharts-yaxis-title'
+            }
+        },
+        subtitle: {
+            text: 'Ping Time',
+            offsetX: 0,
+            style: {
+                fontSize: '14px',
+                cssClass: 'apexcharts-yaxis-title'
+            }
+        },
+        series: [{
+            data: sparklineData_{{js .Id}}_4
+        }],
+    };
+{{end}}
+
+{{ range Services }}
+    var spark_{{js .Id}}_1 = new ApexCharts(document.querySelector("#spark_service_{{.Id}}_1"), options_{{js .Id}}_1);
+    var spark_{{js .Id}}_2 = new ApexCharts(document.querySelector("#spark_service_{{.Id}}_2"), options_{{js .Id}}_2);
+    var spark_{{js .Id}}_3 = new ApexCharts(document.querySelector("#spark_service_{{.Id}}_3"), options_{{js .Id}}_3);
+    var spark_{{js .Id}}_4 = new ApexCharts(document.querySelector("#spark_service_{{.Id}}_4"), options_{{js .Id}}_4);
+    spark_{{js .Id}}_1.render();
+    spark_{{js .Id}}_2.render();
+    spark_{{js .Id}}_3.render();
+    spark_{{js .Id}}_4.render();
+{{end}}
+
+</script>
 {{end}}

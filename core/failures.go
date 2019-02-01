@@ -149,6 +149,13 @@ func (s *Service) TotalFailures() (uint64, error) {
 	return count, err.Error
 }
 
+// FailuresDaysAgo returns the amount of failures since days ago
+func (s *Service) FailuresDaysAgo(days int) uint64 {
+	ago := time.Now().Add((-24 * time.Duration(days)) * time.Hour)
+	count, _ := s.TotalFailuresSince(ago)
+	return count
+}
+
 // TotalFailuresSince returns the total amount of failures for a service since a specific time/date
 func (s *Service) TotalFailuresSince(ago time.Time) (uint64, error) {
 	var count uint64

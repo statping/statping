@@ -129,18 +129,6 @@ func (s *Service) OnlineDaysPercent(days int) float32 {
 	return s.OnlineSince(ago)
 }
 
-// Online24 returns the service's uptime percent within last 24 hours
-func (s *Service) Online24() float32 {
-	ago := time.Now().Add(-24 * time.Hour)
-	return s.OnlineSince(ago)
-}
-
-// Online7Days returns the service's uptime percent within last 7 days
-func (s *Service) Online7Days() float32 {
-	ago := time.Now().Add((-24 * 7) * time.Hour)
-	return s.OnlineSince(ago)
-}
-
 // OnlineSince accepts a time since parameter to return the percent of a service's uptime.
 func (s *Service) OnlineSince(ago time.Time) float32 {
 	failed, _ := s.TotalFailuresSince(ago)
@@ -375,11 +363,6 @@ func (s *Service) Delete() error {
 	return err.Error
 }
 
-// UpdateSingle will update a single column for a service
-func (s *Service) UpdateSingle(attr ...interface{}) error {
-	return servicesDB().Model(s).Update(attr).Error
-}
-
 // Update will update a service in the database, the service's checking routine can be restarted by passing true
 func (s *Service) Update(restart bool) error {
 	err := servicesDB().Update(&s)
@@ -428,7 +411,7 @@ func (s *Service) Messages() []*Message {
 	return messages
 }
 
-// ActiveMessages returns all Messages for a Service
+// ActiveMessages returns all service messages that are available based on the current time
 func (s *Service) ActiveMessages() []*Message {
 	var messages []*Message
 	msgs := SelectServiceMessages(s.Id)
@@ -440,12 +423,7 @@ func (s *Service) ActiveMessages() []*Message {
 	return messages
 }
 
-// ServicesCount returns the amount of services inside the []*core.Services slice
-func (c *Core) ServicesCount() int {
-	return len(c.Services)
-}
-
-// CountOnline
+// CountOnline returns the amount of services online
 func (c *Core) CountOnline() int {
 	amount := 0
 	for _, s := range CoreApp.Services {
