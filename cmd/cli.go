@@ -227,6 +227,7 @@ func HelpEcho() {
 	fmt.Println("     DB_PORT                   - Database port (5432, 3306, ...)")
 	fmt.Println("     DB_DATABASE               - Database connection's database name")
 	fmt.Println("     POSTGRES_SSL              - Enable Postgres SSL Mode 'ssl_mode=enabled' (true/false)")
+	fmt.Println("     POSTGRES_SSLMODE          - Set Postgres SSL Mode to supplied value")
 	fmt.Println("     GO_ENV                    - Run Statping in testmode, will bypass HTTP authentication (if set as 'true')")
 	fmt.Println("     NAME                      - Set a name for the Statping status page")
 	fmt.Println("     DESCRIPTION               - Set a description for the Statping status page")

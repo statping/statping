@@ -180,6 +180,7 @@ func (db *DbConfig) InsertCore() (*Core, error) {
 // Connect will attempt to connect to the sqlite, postgres, or mysql database
 func (db *DbConfig) Connect(retry bool, location string) error {
 	postgresSSL, _ := strconv.ParseBool(os.Getenv("POSTGRES_SSL"))
+	postgresSSLMode := os.Getenv("POSTGRES_SSLMODE")
 	if DbSession != nil {
 		return nil
 	}
@@ -201,6 +202,11 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 		if postgresSSL {
 			sslMode = "enabled"
 		}
+
+		if postgresSSLMode != "" {
+			sslMode = postgresSSLMode
+		}
+
 		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v timezone=UTC sslmode=%v", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass, sslMode)
 	case "mssql":
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
