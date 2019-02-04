@@ -24,12 +24,11 @@ func TestMessageRoutes(t *testing.T) {
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
-			body, t, err := RunHTTPTest(v, t)
+			_, t, err := RunHTTPTest(v, t)
 			assert.Nil(t, err)
 			if err != nil {
 				t.FailNow()
 			}
-			t.Logf("Test %v got: %v\n", v.Name, string(body))
 		})
 	}
 }
