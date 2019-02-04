@@ -15,7 +15,7 @@ func (g *Group) Delete() error {
 		s.GroupId = 0
 		s.Update(false)
 	}
-	err := messagesDb().Delete(g)
+	err := groupsDb().Delete(g)
 	if err.Error != nil {
 		return err.Error
 	}
