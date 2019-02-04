@@ -67,13 +67,7 @@
 							"script": {
 								"id": "08b8f487-2318-44b9-bdb8-f1f1041e9462",
 								"exec": [
-									"pm.test(\"Check Core API Route\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.name).to.eql(\"Statping\");",
-									"    pm.expect(jsonData.description).to.eql(\"Statping Monitoring Sample Data\");",
-									"    pm.expect(jsonData.using_cdn).to.eql(false);",
-									"    pm.expect(jsonData.database).to.eql(\"sqlite\");",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -118,13 +112,7 @@
 							"script": {
 								"id": "08b8f487-2318-44b9-bdb8-f1f1041e9462",
 								"exec": [
-									"pm.test(\"Check Core API Route\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.name).to.eql(\"Statping\");",
-									"    pm.expect(jsonData.description).to.eql(\"Statping Monitoring Sample Data\");",
-									"    pm.expect(jsonData.using_cdn).to.eql(false);",
-									"    pm.expect(jsonData.database).to.eql(\"sqlite\");",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -445,10 +433,7 @@
 							"script": {
 								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
 								"exec": [
-									"pm.test(\"Service Chart Default\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.data.length).to.be.at.least(100);",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -501,10 +486,7 @@
 							"script": {
 								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
 								"exec": [
-									"pm.test(\"Service Chart Default\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.data.length).to.be.at.least(100);",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
