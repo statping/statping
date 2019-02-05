@@ -114,7 +114,7 @@ $('select#service_type').on('change', function() {
 
 async function RenderChart(chart, service, start=0, end=9999999999, group="hour", retry=true) {
     let chartData = await ChartLatency(service, start, end, group, retry);
-    if (chartData.length === 0) {
+    if (!chartData) {
         chartData = await ChartLatency(service, start, end, "minute", retry);
     }
     chart.render();
@@ -123,10 +123,18 @@ async function RenderChart(chart, service, start=0, end=9999999999, group="hour"
     }]);
 }
 
+
+function UTCTime() {
+    var now = new Date();
+    now = new Date(now.toUTCString());
+    return Math.floor(now.getTime() / 1000);
+}
+
 function ChartLatency(service, start=0, end=9999999999, group="hour", retry=true) {
+    let url = "/api/services/" + service + "/data?start=" + start + "&end=" + end + "&group=" + group;
     return new Promise(resolve => {
         $.ajax({
-            url: "/api/services/" + service + "/data?start=" + start + "&end=" + end + "&group=" + group,
+            url: url,
             type: 'GET',
             success: function (data) {
                 resolve(data.data);

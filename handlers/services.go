@@ -195,12 +195,10 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 	startField := utils.ToInt(fields.Get("start"))
 	endField := utils.ToInt(fields.Get("end"))
 
-	if startField == 0 || endField == 0 {
-		startField = 0
-		endField = 99999999999
-	}
+	start := time.Unix(startField, 0)
+	end := time.Unix(endField, 0)
 
-	obj := core.GraphDataRaw(service, time.Unix(startField, 0).UTC(), time.Unix(endField, 0).UTC(), grouping, "latency")
+	obj := core.GraphDataRaw(service, start, end, grouping, "latency")
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(obj)
 }
@@ -216,7 +214,11 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 	grouping := fields.Get("group")
 	startField := utils.ToInt(fields.Get("start"))
 	endField := utils.ToInt(fields.Get("end"))
-	obj := core.GraphDataRaw(service, time.Unix(startField, 0), time.Unix(endField, 0), grouping, "ping_time")
+
+	start := time.Unix(startField, 0)
+	end := time.Unix(endField, 0)
+
+	obj := core.GraphDataRaw(service, start, end, grouping, "ping_time")
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(obj)

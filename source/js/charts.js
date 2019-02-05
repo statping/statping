@@ -148,17 +148,14 @@ let options = {
 	},
 };
 
-const startOn = Math.floor(Date.now() / 1000) - (86400 * 14);
-const endOn = Math.floor(Date.now() / 1000);
-
+const startOn = UTCTime() - (86400 * 14);
 
 async function RenderCharts() {
-	{{ range .Services }}
-	let chart{{.Id}} = new ApexCharts(document.querySelector("#service_{{js .Id}}"), options);
-	{{end}}
+{{ range .Services }}
+let chart{{.Id}} = new ApexCharts(document.querySelector("#service_{{js .Id}}"), options);{{end}}
 
 {{ range .Services }}
-await RenderChart(chart{{js .Id}}, {{js .Id}}, startOn, endOn);{{end}}
+await RenderChart(chart{{js .Id}}, {{js .Id}}, startOn);{{end}}
 }
 
 $( document ).ready(function() {

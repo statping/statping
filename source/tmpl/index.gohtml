@@ -33,8 +33,8 @@
             <h3>{{.Title}}</h3>
             <span class="mb-3">{{safe .Description}}</span>
             <div class="d-block mt-2 mb-4">
-                <span class="float-left small">Starts at {{.StartOn}}</span>
-                <span class="float-right small">Ends on {{.EndOn}}</span>
+                <span class="float-left small">Starts on {{ToString .StartOn}}</span>
+                <span class="float-right small">Ends on {{ToString .EndOn}}</span>
             </div>
         </div>
     {{end}}
