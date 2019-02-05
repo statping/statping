@@ -45,13 +45,13 @@ var mobile = &mobilePush{&notifier.Notification{
 		Title:       "Device Identifiers",
 		Placeholder: "A list of your mobile device push notification ID's.",
 		DbField:     "var1",
-		IsHidden:    false,
+		IsHidden:    true,
 	}, {
 		Type:        "number",
 		Title:       "Array of device numbers",
 		Placeholder: "1 for iphone 2 for android",
 		DbField:     "var2",
-		IsHidden:    false,
+		IsHidden:    true,
 	}}},
 }
 
