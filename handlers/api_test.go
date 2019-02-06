@@ -90,6 +90,18 @@ func TestMainApiRoutes(t *testing.T) {
 			Method:           "GET",
 			ExpectedStatus:   200,
 			ExpectedContains: []string{`"name":"Tester","description":"This is an awesome test"`},
+		},
+		{
+			Name:           "Statping Renew API Keys",
+			URL:            "/api/renew",
+			Method:         "POST",
+			ExpectedStatus: 303,
+		},
+		{
+			Name:           "Statping Clear Cache",
+			URL:            "/api/clear_cache",
+			Method:         "POST",
+			ExpectedStatus: 303,
 		}}
 
 	for _, v := range tests {
@@ -128,6 +140,27 @@ func TestApiServiceRoutes(t *testing.T) {
 			ExpectedStatus: 200,
 		},
 		{
+			Name:           "Statping Service 1 Ping Data",
+			URL:            "/api/services/1/ping",
+			Method:         "GET",
+			Body:           "",
+			ExpectedStatus: 200,
+		},
+		{
+			Name:           "Statping Service 1 Heatmap Data",
+			URL:            "/api/services/1/heatmap",
+			Method:         "GET",
+			Body:           "",
+			ExpectedStatus: 200,
+		},
+		{
+			Name:           "Statping Service 1 Hits",
+			URL:            "/api/services/1/hits",
+			Method:         "GET",
+			Body:           "",
+			ExpectedStatus: 200,
+		},
+		{
 			Name:           "Statping Service 1 Failures",
 			URL:            "/api/services/1/failures",
 			Method:         "GET",
@@ -136,7 +169,7 @@ func TestApiServiceRoutes(t *testing.T) {
 		},
 		{
 			Name:           "Statping Reorder Services",
-			URL:            "/api/services/reorder",
+			URL:            "/api/reorder",
 			Method:         "POST",
 			Body:           `[{"service":1,"order":1},{"service":5,"order":2},{"service":2,"order":3},{"service":3,"order":4},{"service":4,"order":5}]`,
 			ExpectedStatus: 200,

@@ -43,7 +43,7 @@
 
 [[constraint]]
   name = "github.com/gorilla/mux"
-  version = "1.6.2"
+  version = "1.7.0"
 
 [[constraint]]
   name = "github.com/gorilla/sessions"
@@ -63,7 +63,7 @@
 
 [[constraint]]
   name = "github.com/stretchr/testify"
-  version = "1.2.2"
+  version = "1.3.0"
 
 [[constraint]]
   branch = "master"
@@ -80,9 +80,3 @@
 [prune]
   go-tests = true
   unused-packages = true
-
-[metadata.heroku]
-  root-package = "github.com/hunterlong/statping"
-  go-version = "1.11"
-  install = [ "./cmd" ]
-  additional-tools = ["github.com/GeertJohan/go.rice/..."]

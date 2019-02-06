@@ -57,7 +57,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="col-12">
-                    <h4 class="mt-3"><a href="/service/{{.Id}}"{{if not .Online}} class="text-danger"{{end}}>{{ .Name }}</a>
+                    <h4 class="mt-3"><a href="/service/{{ServiceLink .}}"{{if not .Online}} class="text-danger"{{end}}>{{ .Name }}</a>
                     {{if .Online}}
                         <span class="badge bg-success float-right">ONLINE</span>
                     {{ else }}
@@ -91,7 +91,7 @@
                     <span class="d-none d-md-inline">{{.SmallText}}</span>
                 </div>
                 <div class="col-sm-12 col-md-2">
-                    <a href="/service/{{ .Id }}" class="btn {{if .Online}}btn-success{{else}}btn-danger{{end}} btn-sm float-right dyn-dark btn-block">View Service</a>
+                    <a href="/service/{{ServiceLink .}}" class="btn {{if .Online}}btn-success{{else}}btn-danger{{end}} btn-sm float-right dyn-dark btn-block">View Service</a>
                 </div>
             </div>
 

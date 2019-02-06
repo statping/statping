@@ -24,6 +24,7 @@ import (
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -86,14 +87,21 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	fields := parseGet(r)
 	r.ParseForm()
 
-	startField := utils.ToInt(fields.Get("start"))
-	endField := utils.ToInt(fields.Get("end"))
-	group := r.Form.Get("group")
-	serv := core.SelectService(utils.ToInt(vars["id"]))
+	var serv *core.Service
+	id := vars["id"]
+	if _, err := strconv.Atoi(id); err == nil {
+		serv = core.SelectService(utils.ToInt(id))
+	} else {
+		serv = core.SelectServiceLink(id)
+	}
 	if serv == nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+
+	startField := utils.ToInt(fields.Get("start"))
+	endField := utils.ToInt(fields.Get("end"))
+	group := r.Form.Get("group")
 
 	end := time.Now().UTC()
 	start := end.Add((-24 * 7) * time.Hour).UTC()

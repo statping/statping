@@ -107,6 +107,12 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 			}
 			return utils.Timezoner(time.Unix(t, 0), core.CoreApp.Timezone).String()
 		},
+		"ServiceLink": func(s *core.Service) string {
+			if s.Permalink.Valid {
+				return s.Permalink.String
+			}
+			return utils.ToString(s.Id)
+		},
 		"NewService": func() *types.Service {
 			return new(types.Service)
 		},

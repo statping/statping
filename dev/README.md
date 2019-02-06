@@ -1,3395 +1,2609 @@
+This readme is automatically generated from the Golang documentation. [![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/hunterlong/statping)
+
+# statping
+--
+    import "github.com/hunterlong/statping"
+
+Package statping is a server monitoring application that includs a status page
+server. Visit the Statping repo at https://github.com/hunterlong/statping to get
+a full understanding of what this application can do.
 
 
+### Install Statping
+
+Statping is available for Mac, Linux and Windows 64x. You can download the
+tar.gz file or use a couple other methods. Download the latest release at
+https://github.com/hunterlong/statping/releases/latest or view below. If you're
+on windows, download the zip file from the latest releases link.
+
+    // MacOS using homebrew
+    brew tap hunterlong/statping
+    brew install statping
+
+    // Linux installation
+    bash <(curl -s https://assets.statping.com/install.sh)
+    statping version
+
+
+### Docker
+
+Statping can be built in many way, the best way is to use Docker!
+
+    docker run -it -p 8080:8080 hunterlong/statping
+
+Enjoy Statping and tell me any issues you might be having on Github.
+https://github.com/hunterlong
+
+## Usage
+# cmd
+--
+Package main for building the Statping CLI binary application. This package
+connects to all the other packages to make a runnable binary for multiple
+operating system.
+
+
+### Compile Assets
+
+Before building, you must compile the Statping Assets with Rice, to install rice
+run the command below:
+
+    go get github.com/GeertJohan/go.rice
+    go get github.com/GeertJohan/go.rice/rice
+
+Once you have rice install, you can run the following command to build all
+assets inside the source directory.
+
+    cd source && rice embed-go
+
+
+### Build Statping Binary
+
+To build the statup binary for your local environment, run the command below:
+
+    go build -o statup ./cmd
+
+
+Build All Binary Arch's
+
+To build Statping for Mac, Windows, Linux, and ARM devices, you can run xgo to
+build for all. xgo is an awesome golang package that requires Docker.
+https://github.com/karalabe/xgo
+
+    docker pull karalabe/xgo-latest
+    build-all
+
+More info on: https://github.com/hunterlong/statping
 # core
-`import "github.com/hunterlong/statping/core"`
+--
+    import "github.com/hunterlong/statping/core"
 
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-* [Subdirectories](#pkg-subdirectories)
+Package core contains the main functionality of Statping. This includes
+everything for Services, Hits, Failures, Users, service checking mechanisms,
+databases, and notifiers in the notifier package
 
-## <a name="pkg-overview">Overview</a>
-Package core contains the main functionality of Statping. This includes everything for
-Services, Hits, Failures, Users, service checking mechanisms, databases, and notifiers
-in the notifier package
+More info on: https://github.com/hunterlong/statping
 
-More info on: <a href="https://github.com/hunterlong/statping">https://github.com/hunterlong/statping</a>
+## Usage
 
-
-
-
-## <a name="pkg-index">Index</a>
-* [Variables](#pkg-variables)
-* [func CheckHash(password, hash string) bool](#CheckHash)
-* [func CloseDB()](#CloseDB)
-* [func CountFailures() uint64](#CountFailures)
-* [func CountUsers() int64](#CountUsers)
-* [func DatabaseMaintence()](#DatabaseMaintence)
-* [func Dbtimestamp(group string, column string) string](#Dbtimestamp)
-* [func DefaultPort(db string) int64](#DefaultPort)
-* [func DeleteAllSince(table string, date time.Time)](#DeleteAllSince)
-* [func DeleteConfig() error](#DeleteConfig)
-* [func ExportChartsJs() string](#ExportChartsJs)
-* [func ExportSettings() ([]byte, error)](#ExportSettings)
-* [func GetLocalIP() string](#GetLocalIP)
-* [func InitApp()](#InitApp)
-* [func InsertLargeSampleData() error](#InsertLargeSampleData)
-* [func InsertNotifierDB() error](#InsertNotifierDB)
-* [func InsertSampleData() error](#InsertSampleData)
-* [func InsertSampleHits() error](#InsertSampleHits)
-* [func SampleData() error](#SampleData)
-* [func SelectServicer(id int64) types.ServiceInterface](#SelectServicer)
-* [func Services() []types.ServiceInterface](#Services)
-* [type Checkin](#Checkin)
-  * [func AllCheckins() []*Checkin](#AllCheckins)
-  * [func ReturnCheckin(c *types.Checkin) *Checkin](#ReturnCheckin)
-  * [func SelectCheckin(api string) *Checkin](#SelectCheckin)
-  * [func SelectCheckinId(id int64) *Checkin](#SelectCheckinId)
-  * [func (c *Checkin) AfterFind() (err error)](#Checkin.AfterFind)
-  * [func (c *Checkin) AllFailures() []*types.Failure](#Checkin.AllFailures)
-  * [func (c *Checkin) AllHits() []*types.CheckinHit](#Checkin.AllHits)
-  * [func (c *Checkin) BeforeCreate() (err error)](#Checkin.BeforeCreate)
-  * [func (c *Checkin) Create() (int64, error)](#Checkin.Create)
-  * [func (c *Checkin) CreateFailure() (int64, error)](#Checkin.CreateFailure)
-  * [func (c *Checkin) Delete() error](#Checkin.Delete)
-  * [func (c *Checkin) Expected() time.Duration](#Checkin.Expected)
-  * [func (c *Checkin) Grace() time.Duration](#Checkin.Grace)
-  * [func (c *Checkin) Last() *CheckinHit](#Checkin.Last)
-  * [func (c *Checkin) Link() string](#Checkin.Link)
-  * [func (c *Checkin) Period() time.Duration](#Checkin.Period)
-  * [func (c *Checkin) RecheckCheckinFailure(guard chan struct{})](#Checkin.RecheckCheckinFailure)
-  * [func (c *Checkin) Routine()](#Checkin.Routine)
-  * [func (c *Checkin) Service() *Service](#Checkin.Service)
-  * [func (c *Checkin) String() string](#Checkin.String)
-  * [func (c *Checkin) Update() (int64, error)](#Checkin.Update)
-* [type CheckinHit](#CheckinHit)
-  * [func ReturnCheckinHit(c *types.CheckinHit) *CheckinHit](#ReturnCheckinHit)
-  * [func (c *CheckinHit) AfterFind() (err error)](#CheckinHit.AfterFind)
-  * [func (c *CheckinHit) Ago() string](#CheckinHit.Ago)
-  * [func (c *CheckinHit) BeforeCreate() (err error)](#CheckinHit.BeforeCreate)
-  * [func (c *CheckinHit) Create() (int64, error)](#CheckinHit.Create)
-* [type Core](#Core)
-  * [func NewCore() *Core](#NewCore)
-  * [func SelectCore() (*Core, error)](#SelectCore)
-  * [func UpdateCore(c *Core) (*Core, error)](#UpdateCore)
-  * [func (c *Core) AfterFind() (err error)](#Core.AfterFind)
-  * [func (c Core) AllOnline() bool](#Core.AllOnline)
-  * [func (c Core) BaseSASS() string](#Core.BaseSASS)
-  * [func (c *Core) Count24HFailures() uint64](#Core.Count24HFailures)
-  * [func (c *Core) CountOnline() int](#Core.CountOnline)
-  * [func (c Core) CurrentTime() string](#Core.CurrentTime)
-  * [func (c Core) Messages() []*Message](#Core.Messages)
-  * [func (c Core) MobileSASS() string](#Core.MobileSASS)
-  * [func (c Core) SassVars() string](#Core.SassVars)
-  * [func (c *Core) SelectAllServices(start bool) ([]*Service, error)](#Core.SelectAllServices)
-  * [func (c *Core) ServicesCount() int](#Core.ServicesCount)
-  * [func (c *Core) ToCore() *types.Core](#Core.ToCore)
-  * [func (c Core) UsingAssets() bool](#Core.UsingAssets)
-* [type DateScan](#DateScan)
-* [type DateScanObj](#DateScanObj)
-  * [func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group string, column string) *DateScanObj](#GraphDataRaw)
-  * [func (d *DateScanObj) ToString() string](#DateScanObj.ToString)
-* [type DbConfig](#DbConfig)
-  * [func EnvToConfig() *DbConfig](#EnvToConfig)
-  * [func LoadConfigFile(directory string) (*DbConfig, error)](#LoadConfigFile)
-  * [func LoadUsingEnv() (*DbConfig, error)](#LoadUsingEnv)
-  * [func (db *DbConfig) Connect(retry bool, location string) error](#DbConfig.Connect)
-  * [func (c *DbConfig) CreateCore() *Core](#DbConfig.CreateCore)
-  * [func (db *DbConfig) CreateDatabase() error](#DbConfig.CreateDatabase)
-  * [func (db *DbConfig) DropDatabase() error](#DbConfig.DropDatabase)
-  * [func (db *DbConfig) InsertCore() (*Core, error)](#DbConfig.InsertCore)
-  * [func (db *DbConfig) MigrateDatabase() error](#DbConfig.MigrateDatabase)
-  * [func (db *DbConfig) Save() (*DbConfig, error)](#DbConfig.Save)
-  * [func (db *DbConfig) Update() error](#DbConfig.Update)
-* [type ErrorResponse](#ErrorResponse)
-* [type ExportData](#ExportData)
-* [type Hit](#Hit)
-  * [func (h *Hit) AfterFind() (err error)](#Hit.AfterFind)
-  * [func (h *Hit) BeforeCreate() (err error)](#Hit.BeforeCreate)
-* [type Message](#Message)
-  * [func ReturnMessage(m *types.Message) *Message](#ReturnMessage)
-  * [func SelectMessage(id int64) (*Message, error)](#SelectMessage)
-  * [func SelectMessages() ([]*Message, error)](#SelectMessages)
-  * [func SelectServiceMessages(id int64) []*Message](#SelectServiceMessages)
-  * [func (u *Message) AfterFind() (err error)](#Message.AfterFind)
-  * [func (u *Message) BeforeCreate() (err error)](#Message.BeforeCreate)
-  * [func (m *Message) Create() (int64, error)](#Message.Create)
-  * [func (m *Message) Delete() error](#Message.Delete)
-  * [func (m *Message) Service() *Service](#Message.Service)
-  * [func (m *Message) Update() (*Message, error)](#Message.Update)
-* [type PluginJSON](#PluginJSON)
-* [type PluginRepos](#PluginRepos)
-* [type Service](#Service)
-  * [func ReturnService(s *types.Service) *Service](#ReturnService)
-  * [func SelectService(id int64) *Service](#SelectService)
-  * [func (s *Service) ActiveMessages() []*Message](#Service.ActiveMessages)
-  * [func (s *Service) AfterFind() (err error)](#Service.AfterFind)
-  * [func (s *Service) AllFailures() []*failure](#Service.AllFailures)
-  * [func (s *Service) AvgTime() float64](#Service.AvgTime)
-  * [func (s *Service) AvgUptime(ago time.Time) string](#Service.AvgUptime)
-  * [func (s *Service) AvgUptime24() string](#Service.AvgUptime24)
-  * [func (s *Service) BeforeCreate() (err error)](#Service.BeforeCreate)
-  * [func (s *Service) Check(record bool)](#Service.Check)
-  * [func (s *Service) CheckQueue(record bool)](#Service.CheckQueue)
-  * [func (s *Service) CheckinProcess()](#Service.CheckinProcess)
-  * [func (s *Service) Checkins() []*Checkin](#Service.Checkins)
-  * [func (s *Service) CountHits() (int64, error)](#Service.CountHits)
-  * [func (s *Service) Create(check bool) (int64, error)](#Service.Create)
-  * [func (s *Service) CreateFailure(fail types.FailureInterface) (int64, error)](#Service.CreateFailure)
-  * [func (s *Service) CreateHit(h *types.Hit) (int64, error)](#Service.CreateHit)
-  * [func (s *Service) Delete() error](#Service.Delete)
-  * [func (s *Service) DeleteFailures()](#Service.DeleteFailures)
-  * [func (s *Service) Downtime() time.Duration](#Service.Downtime)
-  * [func (s *Service) DowntimeText() string](#Service.DowntimeText)
-  * [func (s *Service) Hits() ([]*types.Hit, error)](#Service.Hits)
-  * [func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) *gorm.DB](#Service.HitsBetween)
-  * [func (s *Service) LimitedCheckinFailures(amount int64) []*failure](#Service.LimitedCheckinFailures)
-  * [func (s *Service) LimitedCheckins() []*Checkin](#Service.LimitedCheckins)
-  * [func (s *Service) LimitedFailures(amount int64) []*failure](#Service.LimitedFailures)
-  * [func (s *Service) LimitedHits() ([]*types.Hit, error)](#Service.LimitedHits)
-  * [func (s *Service) Messages() []*Message](#Service.Messages)
-  * [func (s *Service) Online24() float32](#Service.Online24)
-  * [func (s *Service) OnlineSince(ago time.Time) float32](#Service.OnlineSince)
-  * [func (s *Service) Select() *types.Service](#Service.Select)
-  * [func (s *Service) SmallText() string](#Service.SmallText)
-  * [func (s *Service) Sum() (float64, error)](#Service.Sum)
-  * [func (s *Service) ToJSON() string](#Service.ToJSON)
-  * [func (s *Service) TotalFailures() (uint64, error)](#Service.TotalFailures)
-  * [func (s *Service) TotalFailures24() (uint64, error)](#Service.TotalFailures24)
-  * [func (s *Service) TotalFailuresSince(ago time.Time) (uint64, error)](#Service.TotalFailuresSince)
-  * [func (s *Service) TotalHits() (uint64, error)](#Service.TotalHits)
-  * [func (s *Service) TotalHitsSince(ago time.Time) (uint64, error)](#Service.TotalHitsSince)
-  * [func (s *Service) TotalUptime() string](#Service.TotalUptime)
-  * [func (s *Service) Update(restart bool) error](#Service.Update)
-  * [func (s *Service) UpdateSingle(attr ...interface{}) error](#Service.UpdateSingle)
-* [type ServiceOrder](#ServiceOrder)
-  * [func (c ServiceOrder) Len() int](#ServiceOrder.Len)
-  * [func (c ServiceOrder) Less(i, j int) bool](#ServiceOrder.Less)
-  * [func (c ServiceOrder) Swap(i, j int)](#ServiceOrder.Swap)
-* [type User](#User)
-  * [func AuthUser(username, password string) (*User, bool)](#AuthUser)
-  * [func ReturnUser(u *types.User) *User](#ReturnUser)
-  * [func SelectAllUsers() ([]*User, error)](#SelectAllUsers)
-  * [func SelectUser(id int64) (*User, error)](#SelectUser)
-  * [func SelectUsername(username string) (*User, error)](#SelectUsername)
-  * [func (u *User) AfterFind() (err error)](#User.AfterFind)
-  * [func (u *User) BeforeCreate() (err error)](#User.BeforeCreate)
-  * [func (u *User) Create() (int64, error)](#User.Create)
-  * [func (u *User) Delete() error](#User.Delete)
-  * [func (u *User) Update() error](#User.Update)
-
-
-#### <a name="pkg-files">Package files</a>
-[checker.go](https://github.com/hunterlong/statping/tree/master/core/checker.go) [checkin.go](https://github.com/hunterlong/statping/tree/master/core/checkin.go) [configs.go](https://github.com/hunterlong/statping/tree/master/core/configs.go) [core.go](https://github.com/hunterlong/statping/tree/master/core/core.go) [database.go](https://github.com/hunterlong/statping/tree/master/core/database.go) [doc.go](https://github.com/hunterlong/statping/tree/master/core/doc.go) [export.go](https://github.com/hunterlong/statping/tree/master/core/export.go) [failures.go](https://github.com/hunterlong/statping/tree/master/core/failures.go) [hits.go](https://github.com/hunterlong/statping/tree/master/core/hits.go) [messages.go](https://github.com/hunterlong/statping/tree/master/core/messages.go) [sample.go](https://github.com/hunterlong/statping/tree/master/core/sample.go) [services.go](https://github.com/hunterlong/statping/tree/master/core/services.go) [users.go](https://github.com/hunterlong/statping/tree/master/core/users.go) 
-
-
-
-## <a name="pkg-variables">Variables</a>
-``` go
+```go
 var (
-    Configs   *DbConfig // Configs holds all of the config.yml and database info
-    CoreApp   *Core     // CoreApp is a global variable that contains many elements
-    SetupMode bool      // SetupMode will be true if Statping does not have a database connection
-    VERSION   string    // VERSION is set on build automatically by setting a -ldflag
-)
-```
-``` go
-var (
-    // DbSession stores the Statping database session
-    DbSession *gorm.DB
-    DbModels  []interface{}
+	Configs   *DbConfig // Configs holds all of the config.yml and database info
+	CoreApp   *Core     // CoreApp is a global variable that contains many elements
+	SetupMode bool      // SetupMode will be true if Statping does not have a database connection
+	VERSION   string    // VERSION is set on build automatically by setting a -ldflag
 )
 ```
 
+```go
+var (
+	// DbSession stores the Statping database session
+	DbSession *gorm.DB
+	DbModels  []interface{}
+)
+```
 
-## <a name="CheckHash">func</a> [CheckHash](https://github.com/hunterlong/statping/tree/master/core/users.go?s=3032:3074#L112)
-``` go
+#### func  CheckHash
+
+```go
 func CheckHash(password, hash string) bool
 ```
 CheckHash returns true if the password matches with a hashed bcrypt password
 
+#### func  CloseDB
 
-
-## <a name="CloseDB">func</a> [CloseDB](https://github.com/hunterlong/statping/tree/master/core/database.go?s=3206:3220#L97)
-``` go
+```go
 func CloseDB()
 ```
 CloseDB will close the database connection if available
 
+#### func  CountFailures
 
-
-## <a name="CountFailures">func</a> [CountFailures](https://github.com/hunterlong/statping/tree/master/core/failures.go?s=3409:3436#L117)
-``` go
+```go
 func CountFailures() uint64
 ```
 CountFailures returns the total count of failures for all services
 
+#### func  CountUsers
 
-
-## <a name="CountUsers">func</a> [CountUsers](https://github.com/hunterlong/statping/tree/master/core/users.go?s=1020:1043#L36)
-``` go
+```go
 func CountUsers() int64
 ```
 CountUsers returns the amount of users
 
+#### func  DatabaseMaintence
 
-
-## <a name="DatabaseMaintence">func</a> [DatabaseMaintence](https://github.com/hunterlong/statping/tree/master/core/database.go?s=8692:8716#L283)
-``` go
+```go
 func DatabaseMaintence()
 ```
-DatabaseMaintence will automatically delete old records from 'failures' and 'hits'
-this function is currently set to delete records 7+ days old every 60 minutes
+DatabaseMaintence will automatically delete old records from 'failures' and
+'hits' this function is currently set to delete records 7+ days old every 60
+minutes
 
+#### func  Dbtimestamp
 
-
-## <a name="Dbtimestamp">func</a> [Dbtimestamp](https://github.com/hunterlong/statping/tree/master/core/services.go?s=6195:6247#L219)
-``` go
+```go
 func Dbtimestamp(group string, column string) string
 ```
 Dbtimestamp will return a SQL query for grouping by date
 
+#### func  DefaultPort
 
-
-## <a name="DefaultPort">func</a> [DefaultPort](https://github.com/hunterlong/statping/tree/master/core/configs.go?s=3380:3413#L115)
-``` go
+```go
 func DefaultPort(db string) int64
 ```
 DefaultPort accepts a database type and returns its default port
 
+#### func  DeleteAllSince
 
-
-## <a name="DeleteAllSince">func</a> [DeleteAllSince](https://github.com/hunterlong/statping/tree/master/core/database.go?s=9025:9074#L293)
-``` go
+```go
 func DeleteAllSince(table string, date time.Time)
 ```
 DeleteAllSince will delete a specific table's records based on a time.
 
+#### func  DeleteConfig
 
-
-## <a name="DeleteConfig">func</a> [DeleteConfig](https://github.com/hunterlong/statping/tree/master/core/configs.go?s=4848:4873#L184)
-``` go
+```go
 func DeleteConfig() error
 ```
 DeleteConfig will delete the 'config.yml' file
 
+#### func  ExportChartsJs
 
-
-## <a name="ExportChartsJs">func</a> [ExportChartsJs](https://github.com/hunterlong/statping/tree/master/core/export.go?s=922:950#L28)
-``` go
+```go
 func ExportChartsJs() string
 ```
 ExportChartsJs renders the charts for the index page
 
+#### func  ExportSettings
 
-
-## <a name="ExportSettings">func</a> [ExportSettings](https://github.com/hunterlong/statping/tree/master/core/export.go?s=1690:1727#L57)
-``` go
+```go
 func ExportSettings() ([]byte, error)
 ```
+ExportSettings will export a JSON file containing all of the settings below: -
+Core - Notifiers - Checkins - Users - Services - Groups - Messages
 
+#### func  GetLocalIP
 
-## <a name="GetLocalIP">func</a> [GetLocalIP](https://github.com/hunterlong/statping/tree/master/core/core.go?s=4549:4573#L164)
-``` go
+```go
 func GetLocalIP() string
 ```
 GetLocalIP returns the non loopback local IP of the host
 
+#### func  InitApp
 
-
-## <a name="InitApp">func</a> [InitApp](https://github.com/hunterlong/statping/tree/master/core/core.go?s=1705:1719#L62)
-``` go
+```go
 func InitApp()
 ```
 InitApp will initialize Statping
 
+#### func  InsertLargeSampleData
 
-
-## <a name="InsertLargeSampleData">func</a> [InsertLargeSampleData](https://github.com/hunterlong/statping/tree/master/core/sample.go?s=5703:5737#L212)
-``` go
+```go
 func InsertLargeSampleData() error
 ```
-InsertLargeSampleData will create the example/dummy services for testing the Statping server
+InsertLargeSampleData will create the example/dummy services for testing the
+Statping server
 
+#### func  InsertNotifierDB
 
-
-## <a name="InsertNotifierDB">func</a> [InsertNotifierDB](https://github.com/hunterlong/statping/tree/master/core/core.go?s=1956:1985#L72)
-``` go
+```go
 func InsertNotifierDB() error
 ```
 InsertNotifierDB inject the Statping database instance to the Notifier package
 
+#### func  InsertSampleData
 
-
-## <a name="InsertSampleData">func</a> [InsertSampleData](https://github.com/hunterlong/statping/tree/master/core/sample.go?s=907:936#L27)
-``` go
+```go
 func InsertSampleData() error
 ```
-InsertSampleData will create the example/dummy services for a brand new Statping installation
+InsertSampleData will create the example/dummy services for a brand new Statping
+installation
 
+#### func  InsertSampleHits
 
-
-## <a name="InsertSampleHits">func</a> [InsertSampleHits](https://github.com/hunterlong/statping/tree/master/core/sample.go?s=3388:3417#L126)
-``` go
+```go
 func InsertSampleHits() error
 ```
 InsertSampleHits will create a couple new hits for the sample services
 
+#### func  SampleData
 
-
-## <a name="SampleData">func</a> [SampleData](https://github.com/hunterlong/statping/tree/master/core/configs.go?s=4637:4660#L173)
-``` go
+```go
 func SampleData() error
 ```
 SampleData runs all the sample data for a new Statping installation
 
+#### func  Services
 
-
-## <a name="SelectServicer">func</a> [SelectServicer](https://github.com/hunterlong/statping/tree/master/core/services.go?s=1546:1598#L59)
-``` go
-func SelectServicer(id int64) types.ServiceInterface
-```
-SelectServicer returns a types.ServiceInterface from in memory
-
-
-
-## <a name="Services">func</a> [Services](https://github.com/hunterlong/statping/tree/master/core/services.go?s=1209:1249#L44)
-``` go
+```go
 func Services() []types.ServiceInterface
 ```
 
+#### type Checkin
 
-
-## <a name="Checkin">type</a> [Checkin](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=826:865#L26)
-``` go
+```go
 type Checkin struct {
-    *types.Checkin
+	*types.Checkin
 }
-
 ```
 
 
+#### func  AllCheckins
 
-
-
-
-### <a name="AllCheckins">func</a> [AllCheckins](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=2636:2665#L94)
-``` go
+```go
 func AllCheckins() []*Checkin
 ```
 AllCheckins returns all checkin in system
 
+#### func  ReturnCheckin
 
-### <a name="ReturnCheckin">func</a> [ReturnCheckin](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=1803:1848#L66)
-``` go
+```go
 func ReturnCheckin(c *types.Checkin) *Checkin
 ```
 ReturnCheckin converts *types.Checking to *core.Checkin
 
+#### func  SelectCheckin
 
-### <a name="SelectCheckin">func</a> [SelectCheckin](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=2805:2844#L101)
-``` go
+```go
 func SelectCheckin(api string) *Checkin
 ```
 SelectCheckin will find a Checkin based on the API supplied
 
+#### func (*Checkin) AfterFind
 
-### <a name="SelectCheckinId">func</a> [SelectCheckinId](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=3006:3045#L108)
-``` go
-func SelectCheckinId(id int64) *Checkin
-```
-SelectCheckin will find a Checkin based on the API supplied
-
-
-
-
-
-### <a name="Checkin.AfterFind">func</a> (\*Checkin) [AfterFind](https://github.com/hunterlong/statping/tree/master/core/database.go?s=4310:4351#L137)
-``` go
+```go
 func (c *Checkin) AfterFind() (err error)
 ```
 AfterFind for Checkin will set the timezone
 
+#### func (*Checkin) AllFailures
 
-
-
-### <a name="Checkin.AllFailures">func</a> (\*Checkin) [AllFailures](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=4418:4466#L154)
-``` go
+```go
 func (c *Checkin) AllFailures() []*types.Failure
 ```
 Hits returns all of the CheckinHits for a given Checkin
 
+#### func (*Checkin) AllHits
 
-
-
-### <a name="Checkin.AllHits">func</a> (\*Checkin) [AllHits](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=4178:4225#L147)
-``` go
+```go
 func (c *Checkin) AllHits() []*types.CheckinHit
 ```
 AllHits returns all of the CheckinHits for a given Checkin
 
+#### func (*Checkin) Create
 
-
-
-### <a name="Checkin.BeforeCreate">func</a> (\*Checkin) [BeforeCreate](https://github.com/hunterlong/statping/tree/master/core/database.go?s=6023:6067#L202)
-``` go
-func (c *Checkin) BeforeCreate() (err error)
-```
-BeforeCreate for Checkin will set CreatedAt to UTC
-
-
-
-
-### <a name="Checkin.Create">func</a> (\*Checkin) [Create](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=4804:4845#L169)
-``` go
+```go
 func (c *Checkin) Create() (int64, error)
 ```
 Create will create a new Checkin
 
+#### func (*Checkin) CreateFailure
 
-
-
-### <a name="Checkin.CreateFailure">func</a> (\*Checkin) [CreateFailure](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=2142:2190#L80)
-``` go
+```go
 func (c *Checkin) CreateFailure() (int64, error)
 ```
 
+#### func (*Checkin) Delete
 
-
-### <a name="Checkin.Delete">func</a> (\*Checkin) [Delete](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=4670:4702#L162)
-``` go
+```go
 func (c *Checkin) Delete() error
 ```
 Create will create a new Checkin
 
+#### func (*Checkin) Expected
 
-
-
-### <a name="Checkin.Expected">func</a> (\*Checkin) [Expected](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=3659:3701#L127)
-``` go
+```go
 func (c *Checkin) Expected() time.Duration
 ```
 Expected returns the duration of when the serviec should receive a Checkin
 
+#### func (*Checkin) Grace
 
-
-
-### <a name="Checkin.Grace">func</a> (\*Checkin) [Grace](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=3449:3488#L121)
-``` go
+```go
 func (c *Checkin) Grace() time.Duration
 ```
-Grace will return the duration of the Checkin Grace Period (after service hasn't responded, wait a bit for a response)
+Grace will return the duration of the Checkin Grace Period (after service hasn't
+responded, wait a bit for a response)
 
+#### func (*Checkin) Last
 
-
-
-### <a name="Checkin.Last">func</a> (\*Checkin) [Last](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=3886:3922#L136)
-``` go
+```go
 func (c *Checkin) Last() *CheckinHit
 ```
 Last returns the last checkinHit for a Checkin
 
+#### func (*Checkin) LimitedFailures
 
+```go
+func (c *Checkin) LimitedFailures(amount int64) []types.FailureInterface
+```
+Hits returns all of the CheckinHits for a given Checkin
 
+#### func (*Checkin) LimitedHits
 
-### <a name="Checkin.Link">func</a> (\*Checkin) [Link](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=4016:4047#L142)
-``` go
+```go
+func (c *Checkin) LimitedHits(amount int64) []*types.CheckinHit
+```
+LimitedHits will return the last amount of successful hits from a checkin
+
+#### func (*Checkin) Link
+
+```go
 func (c *Checkin) Link() string
 ```
 
+#### func (*Checkin) Period
 
-
-### <a name="Checkin.Period">func</a> (\*Checkin) [Period](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=3197:3237#L115)
-``` go
+```go
 func (c *Checkin) Period() time.Duration
 ```
 Period will return the duration of the Checkin interval
 
+#### func (*Checkin) RecheckCheckinFailure
 
-
-
-### <a name="Checkin.RecheckCheckinFailure">func</a> (\*Checkin) [RecheckCheckinFailure](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=5812:5872#L211)
-``` go
+```go
 func (c *Checkin) RecheckCheckinFailure(guard chan struct{})
 ```
 RecheckCheckinFailure will check if a Service Checkin has been reported yet
 
+#### func (*Checkin) Routine
 
-
-
-### <a name="Checkin.Routine">func</a> (\*Checkin) [Routine](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=982:1009#L35)
-``` go
+```go
 func (c *Checkin) Routine()
 ```
 Routine for checking if the last Checkin was within its interval
 
+#### func (*Checkin) Select
 
+```go
+func (c *Checkin) Select() *types.Checkin
+```
+Select returns a *types.Checkin
 
+#### func (*Checkin) Service
 
-### <a name="Checkin.Service">func</a> (\*Checkin) [Service](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=2045:2081#L75)
-``` go
+```go
 func (c *Checkin) Service() *Service
 ```
 
+#### func (*Checkin) String
 
-
-### <a name="Checkin.String">func</a> (\*Checkin) [String](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=1688:1721#L61)
-``` go
+```go
 func (c *Checkin) String() string
 ```
 String will return a Checkin API string
 
+#### func (*Checkin) Update
 
-
-
-### <a name="Checkin.Update">func</a> (\*Checkin) [Update](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=5073:5114#L182)
-``` go
+```go
 func (c *Checkin) Update() (int64, error)
 ```
 Update will update a Checkin
 
+#### type CheckinHit
 
-
-
-## <a name="CheckinHit">type</a> [CheckinHit](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=867:912#L30)
-``` go
+```go
 type CheckinHit struct {
-    *types.CheckinHit
+	*types.CheckinHit
 }
-
 ```
 
 
+#### func  ReturnCheckinHit
 
-
-
-
-### <a name="ReturnCheckinHit">func</a> [ReturnCheckinHit](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=1950:2004#L71)
-``` go
+```go
 func ReturnCheckinHit(c *types.CheckinHit) *CheckinHit
 ```
 ReturnCheckinHit converts *types.checkinHit to *core.checkinHit
 
+#### func (*CheckinHit) AfterFind
 
-
-
-
-### <a name="CheckinHit.AfterFind">func</a> (\*CheckinHit) [AfterFind](https://github.com/hunterlong/statping/tree/master/core/database.go?s=4539:4583#L144)
-``` go
+```go
 func (c *CheckinHit) AfterFind() (err error)
 ```
 AfterFind for checkinHit will set the timezone
 
+#### func (*CheckinHit) Ago
 
-
-
-### <a name="CheckinHit.Ago">func</a> (\*CheckinHit) [Ago](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=5622:5655#L205)
-``` go
+```go
 func (c *CheckinHit) Ago() string
 ```
 Ago returns the duration of time between now and the last successful checkinHit
 
+#### func (*CheckinHit) Create
 
-
-
-### <a name="CheckinHit.BeforeCreate">func</a> (\*CheckinHit) [BeforeCreate](https://github.com/hunterlong/statping/tree/master/core/database.go?s=6234:6281#L211)
-``` go
-func (c *CheckinHit) BeforeCreate() (err error)
-```
-BeforeCreate for checkinHit will set CreatedAt to UTC
-
-
-
-
-### <a name="CheckinHit.Create">func</a> (\*CheckinHit) [Create](https://github.com/hunterlong/statping/tree/master/core/checkin.go?s=5299:5343#L192)
-``` go
+```go
 func (c *CheckinHit) Create() (int64, error)
 ```
 Create will create a new successful checkinHit
 
+#### type Core
 
-
-
-## <a name="Core">type</a> [Core](https://github.com/hunterlong/statping/tree/master/core/core.go?s=978:1011#L33)
-``` go
+```go
 type Core struct {
-    *types.Core
+	*types.Core
 }
-
 ```
 
 
+#### func  NewCore
 
-
-
-
-### <a name="NewCore">func</a> [NewCore](https://github.com/hunterlong/statping/tree/master/core/core.go?s=1439:1459#L49)
-``` go
+```go
 func NewCore() *Core
 ```
 NewCore return a new *core.Core struct
 
+#### func  SelectCore
 
-### <a name="SelectCore">func</a> [SelectCore](https://github.com/hunterlong/statping/tree/master/core/core.go?s=3999:4031#L145)
-``` go
+```go
 func SelectCore() (*Core, error)
 ```
-SelectCore will return the CoreApp global variable and the settings/configs for Statping
+SelectCore will return the CoreApp global variable and the settings/configs for
+Statping
 
+#### func  UpdateCore
 
-### <a name="UpdateCore">func</a> [UpdateCore](https://github.com/hunterlong/statping/tree/master/core/core.go?s=2296:2335#L84)
-``` go
+```go
 func UpdateCore(c *Core) (*Core, error)
 ```
-UpdateCore will update the CoreApp variable inside of the 'core' table in database
+UpdateCore will update the CoreApp variable inside of the 'core' table in
+database
 
+#### func (*Core) AfterFind
 
-
-
-
-### <a name="Core.AfterFind">func</a> (\*Core) [AfterFind](https://github.com/hunterlong/statping/tree/master/core/database.go?s=3321:3359#L104)
-``` go
+```go
 func (c *Core) AfterFind() (err error)
 ```
 AfterFind for Core will set the timezone
 
+#### func (Core) AllOnline
 
-
-
-### <a name="Core.AllOnline">func</a> (Core) [AllOnline](https://github.com/hunterlong/statping/tree/master/core/core.go?s=3771:3801#L135)
-``` go
+```go
 func (c Core) AllOnline() bool
 ```
 AllOnline will be true if all services are online
 
+#### func (Core) BaseSASS
 
-
-
-### <a name="Core.BaseSASS">func</a> (Core) [BaseSASS](https://github.com/hunterlong/statping/tree/master/core/core.go?s=3274:3305#L118)
-``` go
+```go
 func (c Core) BaseSASS() string
 ```
-BaseSASS is the base design , this opens the file /assets/scss/base.scss to be edited in Theme
+BaseSASS is the base design , this opens the file /assets/scss/base.scss to be
+edited in Theme
 
+#### func (*Core) Count24HFailures
 
-
-
-### <a name="Core.Count24HFailures">func</a> (\*Core) [Count24HFailures](https://github.com/hunterlong/statping/tree/master/core/failures.go?s=3137:3177#L106)
-``` go
+```go
 func (c *Core) Count24HFailures() uint64
 ```
-Count24HFailures returns the amount of failures for a service within the last 24 hours
+Count24HFailures returns the amount of failures for a service within the last 24
+hours
 
+#### func (*Core) CountOnline
 
-
-
-### <a name="Core.CountOnline">func</a> (\*Core) [CountOnline](https://github.com/hunterlong/statping/tree/master/core/services.go?s=12620:12652#L455)
-``` go
+```go
 func (c *Core) CountOnline() int
 ```
-CountOnline
+CountOnline returns the amount of services online
 
+#### func (Core) CurrentTime
 
-
-
-### <a name="Core.CurrentTime">func</a> (Core) [CurrentTime](https://github.com/hunterlong/statping/tree/master/core/core.go?s=2438:2472#L90)
-``` go
+```go
 func (c Core) CurrentTime() string
 ```
 CurrentTime will return the current local time
 
+#### func (Core) Messages
 
-
-
-### <a name="Core.Messages">func</a> (Core) [Messages](https://github.com/hunterlong/statping/tree/master/core/core.go?s=2652:2687#L98)
-``` go
+```go
 func (c Core) Messages() []*Message
 ```
 Messages will return the current local time
 
+#### func (Core) MobileSASS
 
-
-
-### <a name="Core.MobileSASS">func</a> (Core) [MobileSASS](https://github.com/hunterlong/statping/tree/master/core/core.go?s=3559:3592#L127)
-``` go
+```go
 func (c Core) MobileSASS() string
 ```
-MobileSASS is the -webkit responsive custom css designs. This opens the
-file /assets/scss/mobile.scss to be edited in Theme
+MobileSASS is the -webkit responsive custom css designs. This opens the file
+/assets/scss/mobile.scss to be edited in Theme
 
+#### func (Core) SassVars
 
-
-
-### <a name="Core.SassVars">func</a> (Core) [SassVars](https://github.com/hunterlong/statping/tree/master/core/core.go?s=3016:3047#L110)
-``` go
+```go
 func (c Core) SassVars() string
 ```
 SassVars opens the file /assets/scss/variables.scss to be edited in Theme
 
+#### func (*Core) SelectAllServices
 
-
-
-### <a name="Core.SelectAllServices">func</a> (\*Core) [SelectAllServices](https://github.com/hunterlong/statping/tree/master/core/services.go?s=2448:2512#L92)
-``` go
+```go
 func (c *Core) SelectAllServices(start bool) ([]*Service, error)
 ```
-SelectAllServices returns a slice of *core.Service to be store on []*core.Services, should only be called once on startup.
+SelectAllServices returns a slice of *core.Service to be store on
+[]*core.Services, should only be called once on startup.
 
+#### func (*Core) ToCore
 
-
-
-### <a name="Core.ServicesCount">func</a> (\*Core) [ServicesCount](https://github.com/hunterlong/statping/tree/master/core/services.go?s=12541:12575#L450)
-``` go
-func (c *Core) ServicesCount() int
-```
-ServicesCount returns the amount of services inside the []*core.Services slice
-
-
-
-
-### <a name="Core.ToCore">func</a> (\*Core) [ToCore](https://github.com/hunterlong/statping/tree/master/core/core.go?s=1613:1648#L57)
-``` go
+```go
 func (c *Core) ToCore() *types.Core
 ```
 ToCore will convert *core.Core to *types.Core
 
+#### func (Core) UsingAssets
 
-
-
-### <a name="Core.UsingAssets">func</a> (Core) [UsingAssets](https://github.com/hunterlong/statping/tree/master/core/core.go?s=2857:2889#L105)
-``` go
+```go
 func (c Core) UsingAssets() bool
 ```
 UsingAssets will return true if /assets folder is present
 
+#### type DateScan
 
-
-
-## <a name="DateScan">type</a> [DateScan](https://github.com/hunterlong/statping/tree/master/core/services.go?s=4539:4631#L168)
-``` go
+```go
 type DateScan struct {
-    CreatedAt string `json:"x,omitempty"`
-    Value     int64  `json:"y"`
+	CreatedAt string `json:"x,omitempty"`
+	Value     int64  `json:"y"`
 }
-
 ```
+
 DateScan struct is for creating the charts.js graph JSON array
 
+#### type DateScanObj
 
-
-
-
-
-
-
-
-
-## <a name="DateScanObj">type</a> [DateScanObj](https://github.com/hunterlong/statping/tree/master/core/services.go?s=4702:4761#L174)
-``` go
+```go
 type DateScanObj struct {
-    Array []DateScan `json:"data"`
+	Array []DateScan `json:"data"`
 }
-
 ```
+
 DateScanObj struct is for creating the charts.js graph JSON array
 
+#### func  GraphDataRaw
 
-
-
-
-
-
-### <a name="GraphDataRaw">func</a> [GraphDataRaw](https://github.com/hunterlong/statping/tree/master/core/services.go?s=7369:7482#L262)
-``` go
+```go
 func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group string, column string) *DateScanObj
 ```
 GraphDataRaw will return all the hits between 2 times for a Service
 
+#### func (*DateScanObj) ToString
 
-
-
-
-### <a name="DateScanObj.ToString">func</a> (\*DateScanObj) [ToString](https://github.com/hunterlong/statping/tree/master/core/services.go?s=8567:8606#L299)
-``` go
+```go
 func (d *DateScanObj) ToString() string
 ```
-ToString will convert the DateScanObj into a JSON string for the charts to render
+ToString will convert the DateScanObj into a JSON string for the charts to
+render
 
+#### type DbConfig
 
-
-
-## <a name="DbConfig">type</a> [DbConfig](https://github.com/hunterlong/statping/tree/master/core/database.go?s=1401:1429#L43)
-``` go
+```go
 type DbConfig types.DbConfig
 ```
+
 DbConfig stores the config.yml file for the statup configuration
 
+#### func  EnvToConfig
 
-
-
-
-
-
-### <a name="EnvToConfig">func</a> [EnvToConfig](https://github.com/hunterlong/statping/tree/master/core/configs.go?s=3615:3643#L129)
-``` go
+```go
 func EnvToConfig() *DbConfig
 ```
 EnvToConfig converts environment variables to a DbConfig variable
 
+#### func  LoadConfigFile
 
-### <a name="LoadConfigFile">func</a> [LoadConfigFile](https://github.com/hunterlong/statping/tree/master/core/configs.go?s=1032:1088#L34)
-``` go
+```go
 func LoadConfigFile(directory string) (*DbConfig, error)
 ```
-LoadConfigFile will attempt to load the 'config.yml' file in a specific directory
+LoadConfigFile will attempt to load the 'config.yml' file in a specific
+directory
 
+#### func  LoadUsingEnv
 
-### <a name="LoadUsingEnv">func</a> [LoadUsingEnv](https://github.com/hunterlong/statping/tree/master/core/configs.go?s=1696:1734#L53)
-``` go
+```go
 func LoadUsingEnv() (*DbConfig, error)
 ```
-LoadUsingEnv will attempt to load database configs based on environment variables. If DB_CONN is set if will force this function.
+LoadUsingEnv will attempt to load database configs based on environment
+variables. If DB_CONN is set if will force this function.
 
+#### func (*DbConfig) Connect
 
-
-
-
-### <a name="DbConfig.Connect">func</a> (\*DbConfig) [Connect](https://github.com/hunterlong/statping/tree/master/core/database.go?s=6920:6982#L235)
-``` go
+```go
 func (db *DbConfig) Connect(retry bool, location string) error
 ```
 Connect will attempt to connect to the sqlite, postgres, or mysql database
 
+#### func (*DbConfig) CreateCore
 
-
-
-### <a name="DbConfig.CreateCore">func</a> (\*DbConfig) [CreateCore](https://github.com/hunterlong/statping/tree/master/core/database.go?s=10187:10224#L340)
-``` go
+```go
 func (c *DbConfig) CreateCore() *Core
 ```
-CreateCore will initialize the global variable 'CoreApp". This global variable contains most of Statping app.
+CreateCore will initialize the global variable 'CoreApp". This global variable
+contains most of Statping app.
 
+#### func (*DbConfig) CreateDatabase
 
-
-
-### <a name="DbConfig.CreateDatabase">func</a> (\*DbConfig) [CreateDatabase](https://github.com/hunterlong/statping/tree/master/core/database.go?s=11288:11330#L377)
-``` go
+```go
 func (db *DbConfig) CreateDatabase() error
 ```
 CreateDatabase will CREATE TABLES for each of the Statping elements
 
+#### func (*DbConfig) DropDatabase
 
-
-
-### <a name="DbConfig.DropDatabase">func</a> (\*DbConfig) [DropDatabase](https://github.com/hunterlong/statping/tree/master/core/database.go?s=10686:10726#L362)
-``` go
+```go
 func (db *DbConfig) DropDatabase() error
 ```
 DropDatabase will DROP each table Statping created
 
+#### func (*DbConfig) InsertCore
 
-
-
-### <a name="DbConfig.InsertCore">func</a> (\*DbConfig) [InsertCore](https://github.com/hunterlong/statping/tree/master/core/database.go?s=6428:6475#L219)
-``` go
+```go
 func (db *DbConfig) InsertCore() (*Core, error)
 ```
 InsertCore create the single row for the Core settings in Statping
 
+#### func (*DbConfig) MigrateDatabase
 
-
-
-### <a name="DbConfig.MigrateDatabase">func</a> (\*DbConfig) [MigrateDatabase](https://github.com/hunterlong/statping/tree/master/core/database.go?s=11914:11957#L395)
-``` go
+```go
 func (db *DbConfig) MigrateDatabase() error
 ```
-MigrateDatabase will migrate the database structure to current version.
-This function will NOT remove previous records, tables or columns from the database.
+MigrateDatabase will migrate the database structure to current version. This
+function will NOT remove previous records, tables or columns from the database.
 If this function has an issue, it will ROLLBACK to the previous state.
 
+#### func (*DbConfig) Save
 
-
-
-### <a name="DbConfig.Save">func</a> (\*DbConfig) [Save](https://github.com/hunterlong/statping/tree/master/core/database.go?s=9657:9702#L320)
-``` go
+```go
 func (db *DbConfig) Save() (*DbConfig, error)
 ```
 Save will initially create the config.yml file
 
+#### func (*DbConfig) Update
 
-
-
-### <a name="DbConfig.Update">func</a> (\*DbConfig) [Update](https://github.com/hunterlong/statping/tree/master/core/database.go?s=9294:9328#L302)
-``` go
+```go
 func (db *DbConfig) Update() error
 ```
 Update will save the config.yml file
 
+#### type ErrorResponse
 
-
-
-## <a name="ErrorResponse">type</a> [ErrorResponse](https://github.com/hunterlong/statping/tree/master/core/configs.go?s=902:945#L29)
-``` go
+```go
 type ErrorResponse struct {
-    Error string
+	Error string
 }
-
 ```
+
 ErrorResponse is used for HTTP errors to show to User
 
+#### type ExportData
 
-
-
-
-
-
-
-
-
-## <a name="ExportData">type</a> [ExportData](https://github.com/hunterlong/statping/tree/master/core/export.go?s=1344:1688#L48)
-``` go
+```go
 type ExportData struct {
-    Core      *types.Core              `json:"core"`
-    Services  []types.ServiceInterface `json:"services"`
-    Messages  []*Message               `json:"messages"`
-    Checkins  []*Checkin               `json:"checkins"`
-    Users     []*User                  `json:"users"`
-    Notifiers []types.AllNotifiers     `json:"notifiers"`
+	Core      *types.Core              `json:"core"`
+	Services  []types.ServiceInterface `json:"services"`
+	Messages  []*Message               `json:"messages"`
+	Checkins  []*Checkin               `json:"checkins"`
+	Users     []*User                  `json:"users"`
+	Groups    []*Group                 `json:"groups"`
+	Notifiers []types.AllNotifiers     `json:"notifiers"`
 }
-
 ```
 
 
+#### type Failure
+
+```go
+type Failure struct {
+	*types.Failure
+}
+```
 
 
+#### func (*Failure) AfterFind
+
+```go
+func (f *Failure) AfterFind() (err error)
+```
+AfterFind for Failure will set the timezone
+
+#### func (*Failure) Ago
+
+```go
+func (f *Failure) Ago() string
+```
+Ago returns a human readable timestamp for a Failure
+
+#### func (*Failure) Delete
+
+```go
+func (f *Failure) Delete() error
+```
+Delete will remove a Failure record from the database
+
+#### func (*Failure) ParseError
+
+```go
+func (f *Failure) ParseError() string
+```
+ParseError returns a human readable error for a Failure
+
+#### func (*Failure) Select
+
+```go
+func (f *Failure) Select() *types.Failure
+```
+Select returns a *types.Failure
+
+#### type Group
+
+```go
+type Group struct {
+	*types.Group
+}
+```
 
 
+#### func  SelectGroup
 
+```go
+func SelectGroup(id int64) *Group
+```
+SelectGroup returns a *core.Group
 
+#### func  SelectGroups
 
-## <a name="Hit">type</a> [Hit](https://github.com/hunterlong/statping/tree/master/core/hits.go?s=790:821#L24)
-``` go
+```go
+func SelectGroups(includeAll bool, auth bool) []*Group
+```
+SelectGroups returns all groups
+
+#### func (*Group) Create
+
+```go
+func (g *Group) Create() (int64, error)
+```
+Create will create a group and insert it into the database
+
+#### func (*Group) Delete
+
+```go
+func (g *Group) Delete() error
+```
+Delete will remove a group
+
+#### func (*Group) Services
+
+```go
+func (g *Group) Services() []*Service
+```
+Services returns all services belonging to a group
+
+#### type Hit
+
+```go
 type Hit struct {
-    *types.Hit
+	*types.Hit
 }
-
 ```
 
 
+#### func (*Hit) AfterFind
 
-
-
-
-
-
-
-### <a name="Hit.AfterFind">func</a> (\*Hit) [AfterFind](https://github.com/hunterlong/statping/tree/master/core/database.go?s=3766:3803#L118)
-``` go
+```go
 func (h *Hit) AfterFind() (err error)
 ```
 AfterFind for Hit will set the timezone
 
+#### type Message
 
-
-
-### <a name="Hit.BeforeCreate">func</a> (\*Hit) [BeforeCreate](https://github.com/hunterlong/statping/tree/master/core/database.go?s=5059:5099#L159)
-``` go
-func (h *Hit) BeforeCreate() (err error)
-```
-BeforeCreate for Hit will set CreatedAt to UTC
-
-
-
-
-## <a name="Message">type</a> [Message](https://github.com/hunterlong/statping/tree/master/core/messages.go?s=797:836#L25)
-``` go
+```go
 type Message struct {
-    *types.Message
+	*types.Message
 }
-
 ```
 
 
+#### func  ReturnMessage
 
-
-
-
-### <a name="ReturnMessage">func</a> [ReturnMessage](https://github.com/hunterlong/statping/tree/master/core/messages.go?s=1117:1162#L37)
-``` go
+```go
 func ReturnMessage(m *types.Message) *Message
 ```
 ReturnMessage will convert *types.Message to *core.Message
 
+#### func  SelectMessage
 
-### <a name="SelectMessage">func</a> [SelectMessage](https://github.com/hunterlong/statping/tree/master/core/messages.go?s=1437:1483#L49)
-``` go
+```go
 func SelectMessage(id int64) (*Message, error)
 ```
 SelectMessage returns a Message based on the ID passed
 
+#### func  SelectMessages
 
-### <a name="SelectMessages">func</a> [SelectMessages](https://github.com/hunterlong/statping/tree/master/core/messages.go?s=1227:1268#L42)
-``` go
+```go
 func SelectMessages() ([]*Message, error)
 ```
 SelectMessages returns all messages
 
+#### func  SelectServiceMessages
 
-### <a name="SelectServiceMessages">func</a> [SelectServiceMessages](https://github.com/hunterlong/statping/tree/master/core/messages.go?s=898:945#L30)
-``` go
+```go
 func SelectServiceMessages(id int64) []*Message
 ```
 SelectServiceMessages returns all messages for a service
 
+#### func (*Message) AfterFind
 
-
-
-
-### <a name="Message.AfterFind">func</a> (\*Message) [AfterFind](https://github.com/hunterlong/statping/tree/master/core/database.go?s=4706:4747#L150)
-``` go
+```go
 func (u *Message) AfterFind() (err error)
 ```
 AfterFind for Message will set the timezone
 
+#### func (*Message) Create
 
-
-
-### <a name="Message.BeforeCreate">func</a> (\*Message) [BeforeCreate](https://github.com/hunterlong/statping/tree/master/core/database.go?s=5607:5651#L184)
-``` go
-func (u *Message) BeforeCreate() (err error)
-```
-BeforeCreate for Message will set CreatedAt to UTC
-
-
-
-
-### <a name="Message.Create">func</a> (\*Message) [Create](https://github.com/hunterlong/statping/tree/master/core/messages.go?s=1772:1813#L63)
-``` go
+```go
 func (m *Message) Create() (int64, error)
 ```
 Create will create a Message and insert it into the database
 
+#### func (*Message) Delete
 
-
-
-### <a name="Message.Delete">func</a> (\*Message) [Delete](https://github.com/hunterlong/statping/tree/master/core/messages.go?s=2083:2115#L74)
-``` go
+```go
 func (m *Message) Delete() error
 ```
 Delete will delete a Message from database
 
+#### func (*Message) Service
 
-
-
-### <a name="Message.Service">func</a> (\*Message) [Service](https://github.com/hunterlong/statping/tree/master/core/messages.go?s=1592:1628#L55)
-``` go
+```go
 func (m *Message) Service() *Service
 ```
 
+#### func (*Message) Update
 
-
-### <a name="Message.Update">func</a> (\*Message) [Update](https://github.com/hunterlong/statping/tree/master/core/messages.go?s=2216:2260#L80)
-``` go
+```go
 func (m *Message) Update() (*Message, error)
 ```
 Update will update a Message in the database
 
+#### type PluginJSON
 
-
-
-## <a name="PluginJSON">type</a> [PluginJSON](https://github.com/hunterlong/statping/tree/master/core/core.go?s=909:941#L30)
-``` go
+```go
 type PluginJSON types.PluginJSON
 ```
 
 
+#### type PluginRepos
 
-
-
-
-
-
-
-## <a name="PluginRepos">type</a> [PluginRepos](https://github.com/hunterlong/statping/tree/master/core/core.go?s=942:976#L31)
-``` go
+```go
 type PluginRepos types.PluginRepos
 ```
 
 
+#### type Service
 
-
-
-
-
-
-
-## <a name="Service">type</a> [Service](https://github.com/hunterlong/statping/tree/master/core/services.go?s=910:949#L30)
-``` go
+```go
 type Service struct {
-    *types.Service
+	*types.Service
 }
-
 ```
 
 
+#### func  ReturnService
 
-
-
-
-### <a name="ReturnService">func</a> [ReturnService](https://github.com/hunterlong/statping/tree/master/core/services.go?s=1138:1183#L40)
-``` go
+```go
 func ReturnService(s *types.Service) *Service
 ```
 ReturnService will convert *types.Service to *core.Service
 
+#### func  SelectService
 
-### <a name="SelectService">func</a> [SelectService](https://github.com/hunterlong/statping/tree/master/core/services.go?s=1336:1373#L49)
-``` go
+```go
 func SelectService(id int64) *Service
 ```
 SelectService returns a *core.Service from in memory
 
+#### func  SelectServiceLink
 
+```go
+func SelectServiceLink(permalink string) *Service
+```
+SelectServiceLink returns a *core.Service from the service permalink
 
+#### func (*Service) ActiveMessages
 
-
-### <a name="Service.ActiveMessages">func</a> (\*Service) [ActiveMessages](https://github.com/hunterlong/statping/tree/master/core/services.go?s=12215:12260#L438)
-``` go
+```go
 func (s *Service) ActiveMessages() []*Message
 ```
-ActiveMessages returns all Messages for a Service
+ActiveMessages returns all service messages that are available based on the
+current time
 
+#### func (*Service) AfterFind
 
-
-
-### <a name="Service.AfterFind">func</a> (\*Service) [AfterFind](https://github.com/hunterlong/statping/tree/master/core/database.go?s=3544:3585#L111)
-``` go
+```go
 func (s *Service) AfterFind() (err error)
 ```
 AfterFind for Service will set the timezone
 
+#### func (*Service) AllCheckins
 
+```go
+func (s *Service) AllCheckins() []*Checkin
+```
+AllCheckins will return a slice of AllCheckins for a Service
 
+#### func (*Service) AllFailures
 
-### <a name="Service.AllFailures">func</a> (\*Service) [AllFailures](https://github.com/hunterlong/statping/tree/master/core/failures.go?s=1443:1485#L54)
-``` go
-func (s *Service) AllFailures() []*failure
+```go
+func (s *Service) AllFailures() []*Failure
 ```
 AllFailures will return all failures attached to a service
 
+#### func (*Service) AvgTime
 
-
-
-### <a name="Service.AvgTime">func</a> (\*Service) [AvgTime](https://github.com/hunterlong/statping/tree/master/core/services.go?s=3460:3495#L127)
-``` go
-func (s *Service) AvgTime() float64
+```go
+func (s *Service) AvgTime() string
 ```
-AvgTime will return the average amount of time for a service to response back successfully
+AvgTime will return the average amount of time for a service to response back
+successfully
 
+#### func (*Service) AvgUptime
 
-
-
-### <a name="Service.AvgUptime">func</a> (\*Service) [AvgUptime](https://github.com/hunterlong/statping/tree/master/core/services.go?s=8968:9017#L315)
-``` go
+```go
 func (s *Service) AvgUptime(ago time.Time) string
 ```
 AvgUptime returns average online status for last 24 hours
 
+#### func (*Service) AvgUptime24
 
-
-
-### <a name="Service.AvgUptime24">func</a> (\*Service) [AvgUptime24](https://github.com/hunterlong/statping/tree/master/core/services.go?s=8798:8836#L309)
-``` go
+```go
 func (s *Service) AvgUptime24() string
 ```
 AvgUptime24 returns a service's average online status for last 24 hours
 
+#### func (*Service) Check
 
-
-
-### <a name="Service.BeforeCreate">func</a> (\*Service) [BeforeCreate](https://github.com/hunterlong/statping/tree/master/core/database.go?s=5815:5859#L193)
-``` go
-func (s *Service) BeforeCreate() (err error)
-```
-BeforeCreate for Service will set CreatedAt to UTC
-
-
-
-
-### <a name="Service.Check">func</a> (\*Service) [Check](https://github.com/hunterlong/statping/tree/master/core/checker.go?s=5440:5476#L215)
-``` go
+```go
 func (s *Service) Check(record bool)
 ```
 Check will run checkHttp for HTTP services and checkTcp for TCP services
 
+#### func (*Service) CheckQueue
 
-
-
-### <a name="Service.CheckQueue">func</a> (\*Service) [CheckQueue](https://github.com/hunterlong/statping/tree/master/core/checker.go?s=1253:1294#L42)
-``` go
+```go
 func (s *Service) CheckQueue(record bool)
 ```
 CheckQueue is the main go routine for checking a service
 
+#### func (*Service) CheckinProcess
 
-
-
-### <a name="Service.CheckinProcess">func</a> (\*Service) [CheckinProcess](https://github.com/hunterlong/statping/tree/master/core/services.go?s=1774:1808#L69)
-``` go
+```go
 func (s *Service) CheckinProcess()
 ```
 CheckinProcess runs the checkin routine for each checkin attached to service
 
+#### func (*Service) CountHits
 
-
-
-### <a name="Service.Checkins">func</a> (\*Service) [Checkins](https://github.com/hunterlong/statping/tree/master/core/services.go?s=1960:1999#L78)
-``` go
-func (s *Service) Checkins() []*Checkin
-```
-Checkins will return a slice of Checkins for a Service
-
-
-
-
-### <a name="Service.CountHits">func</a> (\*Service) [CountHits](https://github.com/hunterlong/statping/tree/master/core/hits.go?s=1154:1198#L39)
-``` go
+```go
 func (s *Service) CountHits() (int64, error)
 ```
 CountHits returns a int64 for all hits for a service
 
+#### func (*Service) Create
 
-
-
-### <a name="Service.Create">func</a> (\*Service) [Create](https://github.com/hunterlong/statping/tree/master/core/services.go?s=11608:11659#L416)
-``` go
+```go
 func (s *Service) Create(check bool) (int64, error)
 ```
 Create will create a service and insert it into the database
 
+#### func (*Service) CreateFailure
 
-
-
-### <a name="Service.CreateFailure">func</a> (\*Service) [CreateFailure](https://github.com/hunterlong/statping/tree/master/core/failures.go?s=983:1058#L37)
-``` go
+```go
 func (s *Service) CreateFailure(fail types.FailureInterface) (int64, error)
 ```
-CreateFailure will create a new failure record for a service
+CreateFailure will create a new Failure record for a service
 
+#### func (*Service) CreateHit
 
-
-
-### <a name="Service.CreateHit">func</a> (\*Service) [CreateHit](https://github.com/hunterlong/statping/tree/master/core/hits.go?s=915:971#L29)
-``` go
+```go
 func (s *Service) CreateHit(h *types.Hit) (int64, error)
 ```
-CreateHit will create a new 'hit' record in the database for a successful/online service
+CreateHit will create a new 'hit' record in the database for a successful/online
+service
 
+#### func (*Service) Delete
 
-
-
-### <a name="Service.Delete">func</a> (\*Service) [Delete](https://github.com/hunterlong/statping/tree/master/core/services.go?s=10255:10287#L369)
-``` go
+```go
 func (s *Service) Delete() error
 ```
-Delete will remove a service from the database, it will also end the service checking go routine
+Delete will remove a service from the database, it will also end the service
+checking go routine
 
+#### func (*Service) DeleteFailures
 
-
-
-### <a name="Service.DeleteFailures">func</a> (\*Service) [DeleteFailures](https://github.com/hunterlong/statping/tree/master/core/failures.go?s=1825:1859#L66)
-``` go
+```go
 func (s *Service) DeleteFailures()
 ```
 DeleteFailures will delete all failures for a service
 
+#### func (*Service) Downtime
 
-
-
-### <a name="Service.Downtime">func</a> (\*Service) [Downtime](https://github.com/hunterlong/statping/tree/master/core/services.go?s=7010:7052#L248)
-``` go
+```go
 func (s *Service) Downtime() time.Duration
 ```
 Downtime returns the amount of time of a offline service
 
+#### func (*Service) DowntimeText
 
-
-
-### <a name="Service.DowntimeText">func</a> (\*Service) [DowntimeText](https://github.com/hunterlong/statping/tree/master/core/services.go?s=5994:6033#L214)
-``` go
+```go
 func (s *Service) DowntimeText() string
 ```
-DowntimeText will return the amount of downtime for a service based on the duration
+DowntimeText will return the amount of downtime for a service based on the
+duration
 
+    service.DowntimeText()
+    // Service has been offline for 15 minutes
 
-	service.DowntimeText()
-	// Service has been offline for 15 minutes
+#### func (*Service) FailuresDaysAgo
 
+```go
+func (s *Service) FailuresDaysAgo(days int) uint64
+```
+FailuresDaysAgo returns the amount of failures since days ago
 
+#### func (*Service) Hits
 
-
-### <a name="Service.Hits">func</a> (\*Service) [Hits](https://github.com/hunterlong/statping/tree/master/core/hits.go?s=1363:1409#L47)
-``` go
+```go
 func (s *Service) Hits() ([]*types.Hit, error)
 ```
 Hits returns all successful hits for a service
 
+#### func (*Service) HitsBetween
 
-
-
-### <a name="Service.HitsBetween">func</a> (\*Service) [HitsBetween](https://github.com/hunterlong/statping/tree/master/core/database.go?s=2533:2618#L86)
-``` go
+```go
 func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) *gorm.DB
 ```
-HitsBetween returns the gorm database query for a collection of service hits between a time range
+HitsBetween returns the gorm database query for a collection of service hits
+between a time range
 
+#### func (*Service) LimitedCheckinFailures
 
-
-
-### <a name="Service.LimitedCheckinFailures">func</a> (\*Service) [LimitedCheckinFailures](https://github.com/hunterlong/statping/tree/master/core/failures.go?s=2415:2480#L82)
-``` go
-func (s *Service) LimitedCheckinFailures(amount int64) []*failure
+```go
+func (s *Service) LimitedCheckinFailures(amount int64) []*Failure
 ```
 LimitedFailures will return the last amount of failures from a service
 
+#### func (*Service) LimitedFailures
 
-
-
-### <a name="Service.LimitedCheckins">func</a> (\*Service) [LimitedCheckins](https://github.com/hunterlong/statping/tree/master/core/services.go?s=2165:2211#L85)
-``` go
-func (s *Service) LimitedCheckins() []*Checkin
-```
-LimitedCheckins will return a slice of Checkins for a Service
-
-
-
-
-### <a name="Service.LimitedFailures">func</a> (\*Service) [LimitedFailures](https://github.com/hunterlong/statping/tree/master/core/failures.go?s=2124:2182#L75)
-``` go
-func (s *Service) LimitedFailures(amount int64) []*failure
+```go
+func (s *Service) LimitedFailures(amount int64) []*Failure
 ```
 LimitedFailures will return the last amount of failures from a service
 
+#### func (*Service) LimitedHits
 
-
-
-### <a name="Service.LimitedHits">func</a> (\*Service) [LimitedHits](https://github.com/hunterlong/statping/tree/master/core/hits.go?s=1630:1683#L55)
-``` go
-func (s *Service) LimitedHits() ([]*types.Hit, error)
+```go
+func (s *Service) LimitedHits(amount int64) ([]*types.Hit, error)
 ```
 LimitedHits returns the last 1024 successful/online 'hit' records for a service
 
+#### func (*Service) Messages
 
-
-
-### <a name="Service.Messages">func</a> (\*Service) [Messages](https://github.com/hunterlong/statping/tree/master/core/services.go?s=12059:12098#L432)
-``` go
+```go
 func (s *Service) Messages() []*Message
 ```
 Messages returns all Messages for a Service
 
+#### func (*Service) OnlineDaysPercent
 
-
-
-### <a name="Service.Online24">func</a> (\*Service) [Online24](https://github.com/hunterlong/statping/tree/master/core/services.go?s=3786:3822#L140)
-``` go
-func (s *Service) Online24() float32
+```go
+func (s *Service) OnlineDaysPercent(days int) float32
 ```
-Online24 returns the service's uptime percent within last 24 hours
+OnlineDaysPercent returns the service's uptime percent within last 24 hours
 
+#### func (*Service) OnlineSince
 
-
-
-### <a name="Service.OnlineSince">func</a> (\*Service) [OnlineSince](https://github.com/hunterlong/statping/tree/master/core/services.go?s=3986:4038#L146)
-``` go
+```go
 func (s *Service) OnlineSince(ago time.Time) float32
 ```
-OnlineSince accepts a time since parameter to return the percent of a service's uptime.
+OnlineSince accepts a time since parameter to return the percent of a service's
+uptime.
 
+#### func (*Service) Select
 
-
-
-### <a name="Service.Select">func</a> (\*Service) [Select](https://github.com/hunterlong/statping/tree/master/core/services.go?s=1011:1052#L35)
-``` go
+```go
 func (s *Service) Select() *types.Service
 ```
 Select will return the *types.Service struct for Service
 
+#### func (*Service) SmallText
 
-
-
-### <a name="Service.SmallText">func</a> (\*Service) [SmallText](https://github.com/hunterlong/statping/tree/master/core/services.go?s=5121:5157#L191)
-``` go
+```go
 func (s *Service) SmallText() string
 ```
 SmallText returns a short description about a services status
 
+    service.SmallText()
+    // Online since Monday 3:04:05PM, Jan _2 2006
 
-	service.SmallText()
-	// Online since Monday 3:04:05PM, Jan _2 2006
+#### func (*Service) SparklineDayFailures
 
+```go
+func (s *Service) SparklineDayFailures(days int) string
+```
+SparklineDayFailures returns a string array of daily service failures
 
+#### func (*Service) SparklineHourResponse
 
+```go
+func (s *Service) SparklineHourResponse(hours int, method string) string
+```
+SparklineHourResponse returns a string array for the average response or ping
+time for a service
 
-### <a name="Service.Sum">func</a> (\*Service) [Sum](https://github.com/hunterlong/statping/tree/master/core/hits.go?s=2682:2722#L87)
-``` go
-func (s *Service) Sum() (float64, error)
+#### func (*Service) Sum
+
+```go
+func (s *Service) Sum() float64
 ```
 Sum returns the added value Latency for all of the services successful hits.
 
+#### func (*Service) ToJSON
 
-
-
-### <a name="Service.ToJSON">func</a> (\*Service) [ToJSON](https://github.com/hunterlong/statping/tree/master/core/services.go?s=3278:3311#L121)
-``` go
+```go
 func (s *Service) ToJSON() string
 ```
 ToJSON will convert a service to a JSON string
 
+#### func (*Service) TotalFailures
 
-
-
-### <a name="Service.TotalFailures">func</a> (\*Service) [TotalFailures](https://github.com/hunterlong/statping/tree/master/core/failures.go?s=3860:3909#L134)
-``` go
+```go
 func (s *Service) TotalFailures() (uint64, error)
 ```
 TotalFailures returns the total amount of failures for a service
 
+#### func (*Service) TotalFailures24
 
-
-
-### <a name="Service.TotalFailures24">func</a> (\*Service) [TotalFailures24](https://github.com/hunterlong/statping/tree/master/core/failures.go?s=3661:3712#L128)
-``` go
+```go
 func (s *Service) TotalFailures24() (uint64, error)
 ```
-TotalFailures24 returns the amount of failures for a service within the last 24 hours
+TotalFailures24 returns the amount of failures for a service within the last 24
+hours
 
+#### func (*Service) TotalFailuresOnDate
 
+```go
+func (s *Service) TotalFailuresOnDate(ago time.Time) (uint64, error)
+```
+TotalFailuresOnDate returns the total amount of failures for a service on a
+specific time/date
 
+#### func (*Service) TotalFailuresSince
 
-### <a name="Service.TotalFailuresSince">func</a> (\*Service) [TotalFailuresSince](https://github.com/hunterlong/statping/tree/master/core/failures.go?s=4134:4201#L142)
-``` go
+```go
 func (s *Service) TotalFailuresSince(ago time.Time) (uint64, error)
 ```
-TotalFailuresSince returns the total amount of failures for a service since a specific time/date
+TotalFailuresSince returns the total amount of failures for a service since a
+specific time/date
 
+#### func (*Service) TotalHits
 
-
-
-### <a name="Service.TotalHits">func</a> (\*Service) [TotalHits](https://github.com/hunterlong/statping/tree/master/core/hits.go?s=2113:2158#L71)
-``` go
+```go
 func (s *Service) TotalHits() (uint64, error)
 ```
 TotalHits returns the total amount of successful hits a service has
 
+#### func (*Service) TotalHitsSince
 
-
-
-### <a name="Service.TotalHitsSince">func</a> (\*Service) [TotalHitsSince](https://github.com/hunterlong/statping/tree/master/core/hits.go?s=2358:2421#L79)
-``` go
+```go
 func (s *Service) TotalHitsSince(ago time.Time) (uint64, error)
 ```
 TotalHitsSince returns the total amount of hits based on a specific time/date
 
+#### func (*Service) TotalUptime
 
-
-
-### <a name="Service.TotalUptime">func</a> (\*Service) [TotalUptime](https://github.com/hunterlong/statping/tree/master/core/services.go?s=9443:9481#L337)
-``` go
+```go
 func (s *Service) TotalUptime() string
 ```
 TotalUptime returns the total uptime percent of a service
 
+#### func (*Service) Update
 
-
-
-### <a name="Service.Update">func</a> (\*Service) [Update](https://github.com/hunterlong/statping/tree/master/core/services.go?s=10917:10961#L390)
-``` go
+```go
 func (s *Service) Update(restart bool) error
 ```
-Update will update a service in the database, the service's checking routine can be restarted by passing true
+Update will update a service in the database, the service's checking routine can
+be restarted by passing true
 
+#### type ServiceOrder
 
-
-
-### <a name="Service.UpdateSingle">func</a> (\*Service) [UpdateSingle](https://github.com/hunterlong/statping/tree/master/core/services.go?s=10692:10749#L385)
-``` go
-func (s *Service) UpdateSingle(attr ...interface{}) error
-```
-UpdateSingle will update a single column for a service
-
-
-
-
-## <a name="ServiceOrder">type</a> [ServiceOrder](https://github.com/hunterlong/statping/tree/master/core/core.go?s=5032:5074#L181)
-``` go
+```go
 type ServiceOrder []types.ServiceInterface
 ```
+
 ServiceOrder will reorder the services based on 'order_id' (Order)
 
+#### func (ServiceOrder) Len
 
-
-
-
-
-
-
-
-
-### <a name="ServiceOrder.Len">func</a> (ServiceOrder) [Len](https://github.com/hunterlong/statping/tree/master/core/core.go?s=5130:5161#L184)
-``` go
+```go
 func (c ServiceOrder) Len() int
 ```
 Sort interface for resroting the Services in order
 
+#### func (ServiceOrder) Less
 
-
-
-### <a name="ServiceOrder.Less">func</a> (ServiceOrder) [Less](https://github.com/hunterlong/statping/tree/master/core/core.go?s=5260:5301#L186)
-``` go
+```go
 func (c ServiceOrder) Less(i, j int) bool
 ```
 
+#### func (ServiceOrder) Swap
 
-
-### <a name="ServiceOrder.Swap">func</a> (ServiceOrder) [Swap](https://github.com/hunterlong/statping/tree/master/core/core.go?s=5190:5226#L185)
-``` go
+```go
 func (c ServiceOrder) Swap(i, j int)
 ```
 
+#### type User
 
-
-## <a name="User">type</a> [User](https://github.com/hunterlong/statping/tree/master/core/users.go?s=827:860#L26)
-``` go
+```go
 type User struct {
-    *types.User
+	*types.User
 }
-
 ```
 
 
+#### func  AuthUser
 
-
-
-
-### <a name="AuthUser">func</a> [AuthUser](https://github.com/hunterlong/statping/tree/master/core/users.go?s=2710:2764#L99)
-``` go
+```go
 func AuthUser(username, password string) (*User, bool)
 ```
 AuthUser will return the User and a boolean if authentication was correct.
 AuthUser accepts username, and password as a string
 
+#### func  ReturnUser
 
-### <a name="ReturnUser">func</a> [ReturnUser](https://github.com/hunterlong/statping/tree/master/core/users.go?s=919:955#L31)
-``` go
+```go
 func ReturnUser(u *types.User) *User
 ```
 ReturnUser returns *core.User based off a *types.User
 
+#### func  SelectAllUsers
 
-### <a name="SelectAllUsers">func</a> [SelectAllUsers](https://github.com/hunterlong/statping/tree/master/core/users.go?s=2342:2380#L87)
-``` go
+```go
 func SelectAllUsers() ([]*User, error)
 ```
 SelectAllUsers returns all users
 
+#### func  SelectUser
 
-### <a name="SelectUser">func</a> [SelectUser](https://github.com/hunterlong/statping/tree/master/core/users.go?s=1163:1203#L43)
-``` go
+```go
 func SelectUser(id int64) (*User, error)
 ```
 SelectUser returns the User based on the User's ID.
 
+#### func  SelectUsername
 
-### <a name="SelectUsername">func</a> [SelectUsername](https://github.com/hunterlong/statping/tree/master/core/users.go?s=1364:1415#L50)
-``` go
+```go
 func SelectUsername(username string) (*User, error)
 ```
 SelectUsername returns the User based on the User's username
 
+#### func (*User) AfterFind
 
-
-
-
-### <a name="User.AfterFind">func</a> (\*User) [AfterFind](https://github.com/hunterlong/statping/tree/master/core/database.go?s=4087:4125#L130)
-``` go
+```go
 func (u *User) AfterFind() (err error)
 ```
 AfterFind for USer will set the timezone
 
+#### func (*User) Create
 
-
-
-### <a name="User.BeforeCreate">func</a> (\*User) [BeforeCreate](https://github.com/hunterlong/statping/tree/master/core/database.go?s=5402:5443#L175)
-``` go
-func (u *User) BeforeCreate() (err error)
-```
-BeforeCreate for User will set CreatedAt to UTC
-
-
-
-
-### <a name="User.Create">func</a> (\*User) [Create](https://github.com/hunterlong/statping/tree/master/core/users.go?s=1903:1941#L70)
-``` go
+```go
 func (u *User) Create() (int64, error)
 ```
 Create will insert a new User into the database
 
+#### func (*User) Delete
 
-
-
-### <a name="User.Delete">func</a> (\*User) [Delete](https://github.com/hunterlong/statping/tree/master/core/users.go?s=1592:1621#L58)
-``` go
+```go
 func (u *User) Delete() error
 ```
 Delete will remove the User record from the database
 
+#### func (*User) Update
 
-
-
-### <a name="User.Update">func</a> (\*User) [Update](https://github.com/hunterlong/statping/tree/master/core/users.go?s=1713:1742#L63)
-``` go
+```go
 func (u *User) Update() error
 ```
 Update will update the User's record in database
-
-
-
-
-
-
-
-
-
-
 # handlers
-`import "github.com/hunterlong/statping/handlers"`
+--
+    import "github.com/hunterlong/statping/handlers"
 
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
+Package handlers contains the HTTP server along with the requests and routes.
+All HTTP related functions are in this package.
 
-## <a name="pkg-overview">Overview</a>
-Package handlers contains the HTTP server along with the requests and routes. All HTTP related
-functions are in this package.
+More info on: https://github.com/hunterlong/statping
 
-More info on: <a href="https://github.com/hunterlong/statping">https://github.com/hunterlong/statping</a>
+## Usage
 
+#### func  DesktopInit
 
-
-
-## <a name="pkg-index">Index</a>
-* [func DesktopInit(ip string, port int)](#DesktopInit)
-* [func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{})](#ExecuteResponse)
-* [func IsAuthenticated(r *http.Request) bool](#IsAuthenticated)
-* [func Router() *mux.Router](#Router)
-* [func RunHTTPServer(ip string, port int) error](#RunHTTPServer)
-* [type Cacher](#Cacher)
-* [type Item](#Item)
-  * [func (item Item) Expired() bool](#Item.Expired)
-* [type PluginSelect](#PluginSelect)
-* [type Storage](#Storage)
-  * [func NewStorage() *Storage](#NewStorage)
-  * [func (s Storage) Delete(key string)](#Storage.Delete)
-  * [func (s Storage) Get(key string) []byte](#Storage.Get)
-  * [func (s Storage) Set(key string, content []byte, duration time.Duration)](#Storage.Set)
-
-
-#### <a name="pkg-files">Package files</a>
-[api.go](https://github.com/hunterlong/statping/tree/master/handlers/api.go) [cache.go](https://github.com/hunterlong/statping/tree/master/handlers/cache.go) [checkin.go](https://github.com/hunterlong/statping/tree/master/handlers/checkin.go) [dashboard.go](https://github.com/hunterlong/statping/tree/master/handlers/dashboard.go) [doc.go](https://github.com/hunterlong/statping/tree/master/handlers/doc.go) [handlers.go](https://github.com/hunterlong/statping/tree/master/handlers/handlers.go) [index.go](https://github.com/hunterlong/statping/tree/master/handlers/index.go) [messages.go](https://github.com/hunterlong/statping/tree/master/handlers/messages.go) [notifications.go](https://github.com/hunterlong/statping/tree/master/handlers/notifications.go) [plugins.go](https://github.com/hunterlong/statping/tree/master/handlers/plugins.go) [prometheus.go](https://github.com/hunterlong/statping/tree/master/handlers/prometheus.go) [routes.go](https://github.com/hunterlong/statping/tree/master/handlers/routes.go) [services.go](https://github.com/hunterlong/statping/tree/master/handlers/services.go) [settings.go](https://github.com/hunterlong/statping/tree/master/handlers/settings.go) [setup.go](https://github.com/hunterlong/statping/tree/master/handlers/setup.go) [users.go](https://github.com/hunterlong/statping/tree/master/handlers/users.go) 
-
-
-
-
-
-## <a name="DesktopInit">func</a> [DesktopInit](https://github.com/hunterlong/statping/tree/master/handlers/index.go?s=1538:1575#L48)
-``` go
+```go
 func DesktopInit(ip string, port int)
 ```
-DesktopInit will run the Statping server on a specific IP and port using SQLite database
+DesktopInit will run the Statping server on a specific IP and port using SQLite
+database
 
+#### func  ExecuteResponse
 
-
-## <a name="ExecuteResponse">func</a> [ExecuteResponse](https://github.com/hunterlong/statping/tree/master/handlers/handlers.go?s=5257:5370#L194)
-``` go
+```go
 func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{})
 ```
 ExecuteResponse will render a HTTP response for the front end user
 
+#### func  IsAdmin
 
-
-## <a name="IsAuthenticated">func</a> [IsAuthenticated](https://github.com/hunterlong/statping/tree/master/handlers/handlers.go?s=2076:2118#L69)
-``` go
-func IsAuthenticated(r *http.Request) bool
+```go
+func IsAdmin(r *http.Request) bool
 ```
-IsAuthenticated returns true if the HTTP request is authenticated. You can set the environment variable GO_ENV=test
-to bypass the admin authenticate to the dashboard features.
+IsAdmin returns true if the user session is an administrator
 
+#### func  IsFullAuthenticated
 
+```go
+func IsFullAuthenticated(r *http.Request) bool
+```
+IsFullAuthenticated returns true if the HTTP request is authenticated. You can
+set the environment variable GO_ENV=test to bypass the admin authenticate to the
+dashboard features.
 
-## <a name="Router">func</a> [Router](https://github.com/hunterlong/statping/tree/master/handlers/routes.go?s=992:1017#L34)
-``` go
+#### func  IsReadAuthenticated
+
+```go
+func IsReadAuthenticated(r *http.Request) bool
+```
+IsReadAuthenticated will allow Read Only authentication for some routes
+
+#### func  IsUser
+
+```go
+func IsUser(r *http.Request) bool
+```
+IsUser returns true if the user is registered
+
+#### func  Router
+
+```go
 func Router() *mux.Router
 ```
-Router returns all of the routes used in Statping
+Router returns all of the routes used in Statping. Server will use static assets
+if the 'assets' directory is found in the root directory.
 
+#### func  RunHTTPServer
 
-
-## <a name="RunHTTPServer">func</a> [RunHTTPServer](https://github.com/hunterlong/statping/tree/master/handlers/handlers.go?s=1166:1211#L44)
-``` go
+```go
 func RunHTTPServer(ip string, port int) error
 ```
 RunHTTPServer will start a HTTP server on a specific IP and port
 
+#### type Cacher
 
-
-
-## <a name="Cacher">type</a> [Cacher](https://github.com/hunterlong/statping/tree/master/handlers/cache.go?s=143:269#L13)
-``` go
+```go
 type Cacher interface {
-    Get(key string) []byte
-    Delete(key string)
-    Set(key string, content []byte, duration time.Duration)
+	Get(key string) []byte
+	Delete(key string)
+	Set(key string, content []byte, duration time.Duration)
+	List() map[string]Item
 }
 ```
 
-``` go
+
+```go
 var CacheStorage Cacher
 ```
 
+#### type Item
 
-
-
-
-
-
-
-
-## <a name="Item">type</a> [Item](https://github.com/hunterlong/statping/tree/master/handlers/cache.go?s=301:358#L20)
-``` go
+```go
 type Item struct {
-    Content    []byte
-    Expiration int64
+	Content    []byte
+	Expiration int64
 }
-
 ```
+
 Item is a cached reference
 
+#### func (Item) Expired
 
-
-
-
-
-
-
-
-
-### <a name="Item.Expired">func</a> (Item) [Expired](https://github.com/hunterlong/statping/tree/master/handlers/cache.go?s=409:440#L26)
-``` go
+```go
 func (item Item) Expired() bool
 ```
 Expired returns true if the item has expired.
 
+#### type PluginSelect
 
-
-
-## <a name="PluginSelect">type</a> [PluginSelect](https://github.com/hunterlong/statping/tree/master/handlers/plugins.go?s=729:818#L23)
-``` go
+```go
 type PluginSelect struct {
-    Plugin string
-    Form   string
-    Params map[string]interface{}
+	Plugin string
+	Form   string
+	Params map[string]interface{}
 }
-
 ```
 
 
+#### type Storage
 
-
-
-
-
-
-
-## <a name="Storage">type</a> [Storage](https://github.com/hunterlong/statping/tree/master/handlers/cache.go?s=588:655#L34)
-``` go
+```go
 type Storage struct {
-    // contains filtered or unexported fields
 }
-
 ```
+
 Storage mecanism for caching strings in memory
 
+#### func  NewStorage
 
-
-
-
-
-
-### <a name="NewStorage">func</a> [NewStorage](https://github.com/hunterlong/statping/tree/master/handlers/cache.go?s=707:733#L40)
-``` go
+```go
 func NewStorage() *Storage
 ```
 NewStorage creates a new in memory CacheStorage
 
+#### func (Storage) Delete
 
-
-
-
-### <a name="Storage.Delete">func</a> (Storage) [Delete](https://github.com/hunterlong/statping/tree/master/handlers/cache.go?s=1033:1068#L60)
-``` go
+```go
 func (s Storage) Delete(key string)
 ```
 
+#### func (Storage) Get
 
-
-### <a name="Storage.Get">func</a> (Storage) [Get](https://github.com/hunterlong/statping/tree/master/handlers/cache.go?s=848:887#L48)
-``` go
+```go
 func (s Storage) Get(key string) []byte
 ```
 Get a cached content by key
 
+#### func (Storage) List
 
+```go
+func (s Storage) List() map[string]Item
+```
 
+#### func (Storage) Set
 
-### <a name="Storage.Set">func</a> (Storage) [Set](https://github.com/hunterlong/statping/tree/master/handlers/cache.go?s=1162:1234#L67)
-``` go
+```go
 func (s Storage) Set(key string, content []byte, duration time.Duration)
 ```
 Set a cached content by key
-
-
-
-
-
-
-
-
-
-
 # notifiers
-`import "github.com/hunterlong/statping/notifiers"`
+--
+    import "github.com/hunterlong/statping/notifiers"
 
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
+Package notifiers holds all the notifiers for Statping, which also includes user
+created notifiers that have been accepted in a Push Request. Read the wiki to
+see a full example of a notifier with all events, visit Statping's notifier
+example code: https://github.com/hunterlong/statping/wiki/Notifier-Example
 
-## <a name="pkg-overview">Overview</a>
-Package notifiers holds all the notifiers for Statping, which also includes
-user created notifiers that have been accepted in a Push Request. Read the wiki
-to see a full example of a notifier with all events, visit Statping's
-notifier example code: <a href="https://github.com/hunterlong/statping/wiki/Notifier-Example">https://github.com/hunterlong/statping/wiki/Notifier-Example</a>
+This package shouldn't contain any exports, to see how notifiers work visit the
+core/notifier package at:
+https://godoc.org/github.com/hunterlong/statping/core/notifier and learn how to
+create your own custom notifier.
 
-This package shouldn't contain any exports, to see how notifiers work
-visit the core/notifier package at: <a href="https://godoc.org/github.com/hunterlong/statping/core/notifier">https://godoc.org/github.com/hunterlong/statping/core/notifier</a>
-and learn how to create your own custom notifier.
+## Usage
 
+#### type MobileResponse
 
-
-
-## <a name="pkg-index">Index</a>
-
-
-#### <a name="pkg-files">Package files</a>
-[command.go](https://github.com/hunterlong/statping/tree/master/notifiers/command.go) [discord.go](https://github.com/hunterlong/statping/tree/master/notifiers/discord.go) [doc.go](https://github.com/hunterlong/statping/tree/master/notifiers/doc.go) [email.go](https://github.com/hunterlong/statping/tree/master/notifiers/email.go) [line_notify.go](https://github.com/hunterlong/statping/tree/master/notifiers/line_notify.go) [mobile.go](https://github.com/hunterlong/statping/tree/master/notifiers/mobile.go) [slack.go](https://github.com/hunterlong/statping/tree/master/notifiers/slack.go) [twilio.go](https://github.com/hunterlong/statping/tree/master/notifiers/twilio.go) [webhook.go](https://github.com/hunterlong/statping/tree/master/notifiers/webhook.go) 
-
-
-
-
-
-
-
-
-
-
-
-
-# plugin
-`import "github.com/hunterlong/statping/plugin"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
-Package plugin contains the interfaces to build your own Golang Plugin that will receive triggers on Statping events.
-
-
-
-
-## <a name="pkg-index">Index</a>
-* [Variables](#pkg-variables)
-* [func LoadPlugin(file string) error](#LoadPlugin)
-* [func LoadPlugins()](#LoadPlugins)
-
-
-#### <a name="pkg-files">Package files</a>
-[doc.go](https://github.com/hunterlong/statping/tree/master/plugin/doc.go) [plugin.go](https://github.com/hunterlong/statping/tree/master/plugin/plugin.go) 
-
-
-
-## <a name="pkg-variables">Variables</a>
-``` go
-var (
-    AllPlugins []*types.PluginObject
-)
+```go
+type MobileResponse struct {
+	Counts  int                   `json:"counts"`
+	Logs    []*MobileResponseLogs `json:"logs"`
+	Success string                `json:"success"`
+}
 ```
 
 
-## <a name="LoadPlugin">func</a> [LoadPlugin](https://github.com/hunterlong/statping/tree/master/plugin/plugin.go?s=1188:1222#L51)
-``` go
+#### type MobileResponseLogs
+
+```go
+type MobileResponseLogs struct {
+	Type     string `json:"type"`
+	Platform string `json:"platform"`
+	Token    string `json:"token"`
+	Message  string `json:"message"`
+	Error    string `json:"error"`
+}
+```
+
+
+#### type PushArray
+
+```go
+type PushArray struct {
+	Tokens   []string               `json:"tokens"`
+	Platform int64                  `json:"platform"`
+	Message  string                 `json:"message"`
+	Topic    string                 `json:"topic"`
+	Title    string                 `json:"title,omitempty"`
+	Data     map[string]interface{} `json:"data,omitempty"`
+}
+```
+
+
+#### type PushNotification
+
+```go
+type PushNotification struct {
+	Array []*PushArray `json:"notifications"`
+}
+```
+# plugin
+--
+    import "github.com/hunterlong/statping/plugin"
+
+Package plugin contains the interfaces to build your own Golang Plugin that will
+receive triggers on Statping events.
+
+## Usage
+
+```go
+var (
+	AllPlugins []*types.PluginObject
+)
+```
+
+#### func  LoadPlugin
+
+```go
 func LoadPlugin(file string) error
 ```
 
+#### func  LoadPlugins
 
-## <a name="LoadPlugins">func</a> [LoadPlugins](https://github.com/hunterlong/statping/tree/master/plugin/plugin.go?s=2685:2703#L96)
-``` go
+```go
 func LoadPlugins()
 ```
-
-
-
-
-
-
-
-
-
 # source
-`import "github.com/hunterlong/statping/source"`
+--
+    import "github.com/hunterlong/statping/source"
 
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-* [Examples](#pkg-examples)
-* [Subdirectories](#pkg-subdirectories)
+Package source holds all the assets for Statping. This includes CSS, JS, SCSS,
+HTML and other website related content. This package uses Rice to compile all
+assets into a single 'rice-box.go' file.
 
-## <a name="pkg-overview">Overview</a>
-Package source holds all the assets for Statping. This includes
-CSS, JS, SCSS, HTML and other website related content.
-This package uses Rice to compile all assets into a single 'rice-box.go' file.
 
 ### Required Dependencies
-- rice -> <a href="https://github.com/GeertJohan/go.rice">https://github.com/GeertJohan/go.rice</a>
-- sass -> <a href="https://sass-lang.com/install">https://sass-lang.com/install</a>
+
+- rice -> https://github.com/GeertJohan/go.rice - sass ->
+https://sass-lang.com/install
+
 
 ### Compile Assets
-To compile all the HTML, JS, SCSS, CSS and image assets you'll need to have rice and sass installed on your local system.
 
+To compile all the HTML, JS, SCSS, CSS and image assets you'll need to have rice
+and sass installed on your local system.
 
-	sass source/scss/base.scss source/css/base.css
-	cd source && rice embed-go
+    sass source/scss/base.scss source/css/base.css
+    cd source && rice embed-go
 
-More info on: <a href="https://github.com/hunterlong/statping">https://github.com/hunterlong/statping</a>
+More info on: https://github.com/hunterlong/statping
 
+Code generated by go generate; DO NOT EDIT. This file was generated by robots at
+2019-02-06 10:11:39.973396 -0800 PST m=+0.560856203
 
+This contains the most recently Markdown source for the Statping Wiki.
 
+## Usage
 
-## <a name="pkg-index">Index</a>
-* [Variables](#pkg-variables)
-* [func Assets()](#Assets)
-* [func CompileSASS(folder string) error](#CompileSASS)
-* [func CopyAllToPublic(box *rice.Box, folder string) error](#CopyAllToPublic)
-* [func CopyToPublic(box *rice.Box, folder, file string) error](#CopyToPublic)
-* [func CreateAllAssets(folder string) error](#CreateAllAssets)
-* [func DeleteAllAssets(folder string) error](#DeleteAllAssets)
-* [func HelpMarkdown() string](#HelpMarkdown)
-* [func MakePublicFolder(folder string) error](#MakePublicFolder)
-* [func OpenAsset(folder, file string) string](#OpenAsset)
-* [func SaveAsset(data []byte, folder, file string) error](#SaveAsset)
-* [func UsingAssets(folder string) bool](#UsingAssets)
-
-#### <a name="pkg-examples">Examples</a>
-* [OpenAsset](#example_OpenAsset)
-* [SaveAsset](#example_SaveAsset)
-
-#### <a name="pkg-files">Package files</a>
-[doc.go](https://github.com/hunterlong/statping/tree/master/source/doc.go) [rice-box.go](https://github.com/hunterlong/statping/tree/master/source/rice-box.go) [source.go](https://github.com/hunterlong/statping/tree/master/source/source.go) 
-
-
-
-## <a name="pkg-variables">Variables</a>
-``` go
+```go
 var (
-    CssBox  *rice.Box // CSS files from the 'source/css' directory, this will be loaded into '/assets/css'
-    ScssBox *rice.Box // SCSS files from the 'source/scss' directory, this will be loaded into '/assets/scss'
-    JsBox   *rice.Box // JS files from the 'source/js' directory, this will be loaded into '/assets/js'
-    TmplBox *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
-    FontBox *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
+	CssBox  *rice.Box // CSS files from the 'source/css' directory, this will be loaded into '/assets/css'
+	ScssBox *rice.Box // SCSS files from the 'source/scss' directory, this will be loaded into '/assets/scss'
+	JsBox   *rice.Box // JS files from the 'source/js' directory, this will be loaded into '/assets/js'
+	TmplBox *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
+	FontBox *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
 )
 ```
 
+```go
+var CompiledWiki = []byte("<a class=\"scrollclick\" href=\"#\" data-id=\"page_0\">Types of Monitoring</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_1\">Features</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_2\">Start Statping</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_3\">Linux</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_4\">Mac</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_5\">Windows</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_6\">AWS EC2</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_7\">Docker</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_8\">Mobile App</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_9\">Heroku</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_10\">API</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_11\">Makefile</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_12\">Notifiers</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_13\">Notifier Events</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_14\">Notifier Example</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_15\">Prometheus Exporter</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_16\">SSL</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_17\">Config with .env File</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_18\">Static Export</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_19\">Statping Plugins</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_20\">Statuper</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_21\">Build and Test</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_22\">Contributing</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_23\">PGP Signature</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_24\">Testing</a><br><a class=\"scrollclick\" href=\"#\" data-id=\"page_25\">Deployment</a><br>\n\n<div class=\"mt-5\" id=\"page_0\"><h1>Types of Monitoring</h1></div>\nYou can monitor your application by using a simple HTTP GET to the endpoint to return back a response and status code. Normally you want a 200 status code on an HTTP request. You might want to require a 404 or 500 error as a response code though. With each service you can include a Timeout in seconds to work with your long running services.\n\n# HTTP Endpoints with Custom POST\nFor more advanced monitoring you can add a data as a HTTP POST request. This is useful for automatically submitting JSON, or making sure your signup form is working correctly.\n\n<p align=\"center\">\n<img width=\"100%\" src=\"https://img.cjx.io/statup-httpservice.png\">\n</p>\n\nWith a HTTP service, you can POST a JSON string to your endpoint to retrieve any type of response back. You can then use Regex in the Expected Response field to parse a custom response that exactly matches your status requirements. \n\n# TCP Services\nFor other services that don't use HTTP, you can monitor any type of service by using the PORT of the service. If you're Ethereum Blockchain server is running on 8545, you can use TCP to monitor your server. With a TCP service, you can monitor your Docker containers, or remove service running on a custom port. You don't need to include `http` in the endpoint field, just IP or Hostname.\n\n<p align=\"center\">\n<img width=\"100%\" src=\"https://img.cjx.io/statup-tcpservice.png\">\n</p>\n\n\n<div class=\"mt-5\" id=\"page_1\"><h1>Features</h1></div>\nStatping is a great Status Page that can be deployed with 0 effort.\n\n# 3 Different Databases\nYou can use MySQL, Postgres, or SQLite as a database for your Statping status page. The server will automatically upgrade your database tables depending on which database you have.\n\n# Easy to Startup\nStatping is an extremely easy to setup website monitoring tool without fussing with dependencies or packages. Simply download and install the precompile binary for your operating system. Statping works on Windows, Mac, Linux, Docker, and even the Raspberry Pi.\n\n# Plugins\nStatping is an awesome Status Page generator that allows you to create your own plugins with Golang Plugins! You don't need to request a PR or even tell us about your plugin. Plugin's are compiled and then send as a binary to the Statping `/plugins` folder. Test your plugins using the `statup test plugin` command, checkout the [Plugin Wiki](https://github.com/hunterlong/statping/wiki/Statping-Plugins) to see detailed information about creating plugins.\n\n# No Maintence\nMany other website monitoring applications will collect data until the server fails because of hard drive is 100% full. Statping will automatically delete records to make sure your server will stay UP for years. The EC2 AMI Image is a great way to host your status page without worrying about it crashing one day. Statping will automatically upgrade its software when you reboot your computer.\n\n# Email & Slack Notifications\nReceive email notifications if your website or application goes offline. Statping includes SMTP connections so you can use AWS SES, or any other SMTP emailing service. Go in the Email Settings in Settings to configure these options.\n\n# Prometheus Exporter\nIf you want a deeper view of your applications status, you can use Grafana and Prometheus to graph all types of data about your services. Read more about the [Prometheus Exporter](https://github.com/hunterlong/statping/wiki/Prometheus-Exporter)\n\n<div class=\"mt-5\" id=\"page_2\"><h1>Start Statping</h1></div>\n\n\n<div class=\"mt-5\" id=\"page_3\"><h1>Linux</h1></div>\n# Installing on Linux\nInstalling Statping on Linux is a 1 line command. It's that easy.\n```\nbash <(curl -s https://assets.statup.io/install.sh)\nstatping version\n```\n[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/statping)\n\nIf you are using [snap](https://snapcraft.io/statping), you can simply run this command to install Statping.\n```shell\nsudo snap install statping\n```\n\n## Systemd Service\nSetting up a systemd service is a great way to make sure your Statping server will automatically reboot when needed. You can use the file below for your service. You should have Statping already installed by this step.\n###### /etc/systemd/system/statping.service\n```\n[Unit]\nDescription=Statping Server\nAfter=network.target\nAfter=systemd-user-sessions.service\nAfter=network-online.target\n\n[Service]\nType=simple\nRestart=always\nExecStart=/usr/local/bin/statping\n\n[Install]\nWantedBy=multi-user.target\n```\nThen you can enable and start your systemd service with:\n```\nsystemctl daemon-reload\n\nsystemctl enable statping.service\n\nsystemctl start statping\n```\nYou're Statping server will now automatically restart when your server restarts.\n\n## Raspberry Pi\nYou can even run Statping on your Raspberry Pi by installing the precompiled binary from [Latest Releases](https://github.com/hunterlong/statping/releases/latest). For the Raspberry Pi 3 you'll want to download the `statping-linux-arm7.tar.gz` file. Be sure to change `VERSION` to the latest version in Releases, and include the 'v'.\n\n```\nVERSION=$(curl -s \"https://github.com/hunterlong/statping/releases/latest\" | grep -o 'tag/[v.0-9]*' | awk -F/ '{print $2}')\nwget https://github.com/hunterlong/statping/releases/download/$VERSION/statping-linux-arm7.tar.gz\ntar -xvzf statping-linux-arm7.tar.gz\nchmod +x statping\nmv statping /usr/local/bin/statping\n\nstatping version\n``` \n\n## Alpine Linux\nThe Docker image is using the Statping Alpine binary since it's so incredibly small. You can run it on your own alpine image by downloading `statping-linux-alpine.tar.gz` from [Latest Releases](https://github.com/hunterlong/statping/releases/latest).\n\n<div class=\"mt-5\" id=\"page_4\"><h1>Mac</h1></div>\n# Installing on Mac\nStatping includes an easy to use [Homebrew Formula](https://github.com/hunterlong/homebrew-statping) to quick get your Status Page up and running locally. Statping on brew is automatically generated for each new release to master. Install with the commands below,\n```bash\nbrew tap hunterlong/statping\nbrew install statping\n```\n\n<p align=\"center\">\n<img width=\"80%\" src=\"https://img.cjx.io/statupbrewinstall.gif\">\n</p>\n\nIf you don't have brew, then you can install it with this command below:\n```bash\nbash <(curl -s https://statping.com/install.sh)\n```\n\nOnce you've installed it, checkout which version you have by running `statping version`.\n\n<div class=\"mt-5\" id=\"page_5\"><h1>Windows</h1></div>\n# Installing on Windows\nCurrently, Statping only works on Windows 64-bit computers. Just download the exe file from [Latest Releases](https://github.com/hunterlong/statping/releases/latest) and run it in your command prompt. It will create a HTTP server on port 8080, so you can visit `http://localhost:8080` to see your Statping Status Page.\n\n## Known Issues with Windows\nUnfortunately, Statping only works on Windows 64-bit processors. If you have more than 4gb of ram, there's a good chance you already have a 64-bit processor. Download the [Latest Releases](https://github.com/hunterlong/statping/releases/latest) of Statping, extract the ZIP file, then double click on the `statping.exe` file. You can use a SQLite database for a quick setup, or connect to a local/remote Postgres or MySQL database server.\n\n<div class=\"mt-5\" id=\"page_6\"><h1>AWS EC2</h1></div>\nRunning Statping on the smallest EC2 server is very quick using the AWS AMI Image. The AWS AMI Image will automatically start a Statping Docker container that will automatically update to the latest version. Once the EC2 is booted, you can go to the Public DNS domain to view the Statping installation page. The Statping root folder is located at: `/statping` on the server.\n\n# AMI Image\nChoose the correct AMI Image ID based on your AWS region.\n- us-east-1 `ami-09ccd23d9c7afba61` (Virginia)\n- us-east-2 `ami-0c6c9b714a501cdb3` (Ohio)\n- us-west-1 `ami-02159cc1fc701a77e` (California)\n- us-west-2 `ami-007c6990949f5ccee` (Oregon)\n- eu-central-1 `ami-06e252d6d8b0c2f1f` (Frankfurt)\n\n# Instructions\n\n### 1. Create an EC2 instance from AMI Image\nGo to the main EC2 dashboard and click 'Launch Instance'. Then type `Statping` inside the search field for 'Community AMI'. Once you've found it in your region, click Select!\n\n<img src=\"https://img.cjx.io/statpingaws-ami.png\">\n\n### 2. Get the Public DNS for EC2 Instance\nCopy the 'Public DNS' URL and paste it into your browser.\n\n<img src=\"https://img.cjx.io/statping-aws-ec2.png\">\n\n### 3. Setup Statping\nUse SQLite if you don't want to connect to a remote MySQL or Postgres database.\n\n<img src=\"https://img.cjx.io/statping-setup.png\">\n\n# EC2 Server Features\nRunning your Statping server on a small EC2 instance is perfect for most users. Below you'll find some commands to get up and running in seconds.\n- Super cheap on the t2.nano (~$4.60 monthly)\n- Small usage, 8gb of hard drive\n- Automatic SSL certificate if you require it\n- Automatic reboot when the server needs it\n- Automatic database cleanup, so you'll never be at 100% full.\n- Automatic docker containers/images removal\n\n## Create Security Groups\nUsing the AWS CLI you can copy and paste the commands below to auto create everything for you. The server opens port 80 and 443.\n```bash\naws ec2 create-security-group --group-name StatpingPublicHTTP --description \"Statping HTTP Server on port 80 and 443\"\n# will response back a Group ID. Copy ID and use it for --group-id below.\n```\n```bash\nGROUPS=sg-7e8b830f\naws ec2 authorize-security-group-ingress --group-id $GROUPS --protocol tcp --port 80 --cidr 0.0.0.0/0\naws ec2 authorize-security-group-ingress --group-id $GROUPS --protocol tcp --port 443 --cidr 0.0.0.0/0\n```\n## Create EC2 without SSL\nOnce your server has started, go to the EC2 Public DNS endpoint. You should be redirected to /setup to continue your installation process! The database information is already inputed for you.\n```bash\nGROUPS=sg-7e8b830f\nKEY=MYKEYHERE\nAMI_IMAGE=ami-7be8a103\n\naws ec2 run-instances \\\n    --image-id $AMI_IMAGE \\\n    --count 1 --instance-type t2.nano \\\n    --key-name $KEY \\\n    --security-group-ids $GROUPS\n```\n## Create EC2 with Automatic SSL Certification\nStart a Statping server with an SSL cert that will automatically regenerate when it's near expiration time. You'll need to point your domain's A record (IP address) or CNAME (public DNS endpoint) to use this feature.\n\n```bash\nwget https://raw.githubusercontent.com/hunterlong/statping/master/dev/ec2-ssl.sh\n```\n\n```bash\n# edit the contents inside of ec2-ssl.sh then continue\nLETSENCRYPT_HOST=\"status.MYDOMAIN.com\"\nLETSENCRYPT_EMAIL=\"noreply@MYEMAIL.com\"\n```\nEdit ec2-ssl.sh and insert your domain you want to use, then run command below. Use the Security Group ID that you used above for --security-group-ids\n```\nGROUPS=sg-7e8b830f\nAMI_IMAGE=ami-7be8a103\nKEY=MYKEYHERE\n\naws ec2 run-instances \\\n    --user-data file://ec2-ssl.sh \\\n    --image-id $AMI_IMAGE \\\n    --count 1 --instance-type t2.nano \\\n    --key-name $KEY \\\n    --security-group-ids $GROUPS\n```\n\n### EC2 Server Specs\n- t2.nano ($4.60 monthly)\n- 8gb SSD Memory\n- 0.5gb RAM\n- Docker with Docker Compose installed\n- Running Statping, NGINX, and Postgres\n- boot scripts to automatically clean unused containers.\n\n\n\n<div class=\"mt-5\" id=\"page_7\"><h1>Docker</h1></div>\nStatping is easily ran on Docker with the light weight Alpine linux image. View on [Docker Hub](https://hub.docker.com/r/hunterlong/statping).\n\n[![](https://images.microbadger.com/badges/image/hunterlong/statping.svg)](https://microbadger.com/images/hunterlong/statping) [![Docker Pulls](https://img.shields.io/docker/pulls/hunterlong/statping.svg)](https://hub.docker.com/r/hunterlong/statping/builds/)\n\n# Latest Docker Image\nThe `latest` Docker image uses Alpine Linux to keep it ultra small.\n```bash\ndocker run -d \\\n  -p 8080:8080 \\\n  --restart always \\\n  hunterlong/statping\n```\n\n# Mounting Volume\nYou can mount a volume to the `/app` Statping directory. This folder will contain `logs`, `config.yml`, and static assets if you want to edit the SCSS/CSS. \n```bash\ndocker run -d \\\n  -p 8080:8080 \\\n  -v /mydir/statping:/app \\\n  --restart always \\\n  hunterlong/statping\n```\n\n# Attach a SSL Certificate\nWhen you mount `server.crt` and `server.key` to the `/app` directory, Statping will run a HTTPS server on port 443. Checkout the [SSL Wiki](https://github.com/hunterlong/statping/wiki/SSL) documentation to see more information about this.\n```bash\ndocker run -d \\\n  -p 443:443 \\\n  -v /mydir/domain.crt:/app/server.crt \\\n  -v /mydir/domain.key:/app/server.key \\\n  -v /mydir:/app \\\n  --restart always \\\n  hunterlong/statping\n```\n\n# Development Docker Image\nIf you want to run Statping that was build from the source, use the `dev` Docker image.\n```bash\ndocker run -d -p 8080:8080 hunterlong/statping:dev\n```\n\n# Cypress Testing Docker Image\nThis Docker image will pull the latest version of Statping and test the web interface with [Cypress](https://www.cypress.io/).\n```bash\ndocker run -it -p 8080:8080 hunterlong/statping:cypress\n```\n\n#### Or use Docker Compose\nThis Docker Compose file inlcudes NGINX, Postgres, and Statping.\n\n### Docker Compose with NGINX and Postgres\nOnce you initiate the `docker-compose.yml` file below go to http://localhost and you'll be forwarded to the /setup page. \nDatabase Authentication\n- database: `postgres`\n- port: `5432`\n- username: `statup`\n- password: `password123`\n- database: `statup`\n\n```yaml\nversion: '2.3'\n\nservices:\n\n  nginx:\n    container_name: nginx\n    image: jwilder/nginx-proxy\n    ports:\n      - 0.0.0.0:80:80\n      - 0.0.0.0:443:443\n    networks:\n      - internet\n    restart: always\n    volumes:\n      - /var/run/docker.sock:/tmp/docker.sock:ro\n      - ./statup/nginx/certs:/etc/nginx/certs:ro\n      - ./statup/nginx/vhost:/etc/nginx/vhost.d\n      - ./statup/nginx/html:/usr/share/nginx/html:ro\n      - ./statup/nginx/dhparam:/etc/nginx/dhparam\n    environment:\n      DEFAULT_HOST: localhost\n\n  statup:\n    container_name: statup\n    image: hunterlong/statping:latest\n    restart: always\n    networks:\n      - internet\n      - database\n    depends_on:\n      - postgres\n    volumes:\n      - ./statup/app:/app\n    environment:\n      VIRTUAL_HOST: localhost\n      VIRTUAL_PORT: 8080\n      DB_CONN: postgres\n      DB_HOST: postgres\n      DB_USER: statup\n      DB_PASS: password123\n      DB_DATABASE: statup\n      NAME: EC2 Example\n      DESCRIPTION: This is a Statping Docker Compose instance\n\n  postgres:\n    container_name: postgres\n    image: postgres\n    restart: always\n    networks:\n      - database\n    volumes:\n      - ./statup/postgres:/var/lib/postgresql/data\n    environment:\n      POSTGRES_PASSWORD: password123\n      POSTGRES_USER: statup\n      POSTGRES_DB: statup\n\nnetworks:\n  internet:\n    driver: bridge\n  database:\n    driver: bridge\n```\nOr a simple wget...\n```bash\nwget https://raw.githubusercontent.com/hunterlong/statping/master/servers/docker-compose.yml\ndocker-compose up -d\n```\n\n#### Docker Compose with Automatic SSL\nYou can automatically start a Statping server with automatic SSL encryption using this docker-compose file. First point your domain's DNS to the Statping server, and then run this docker-compose command with DOMAIN and EMAIL. Email is for letsencrypt services.\n```bash\nwget https://raw.githubusercontent.com/hunterlong/statping/master/servers/docker-compose-ssl.yml\n\nLETSENCRYPT_HOST=mydomain.com \\\n    LETSENCRYPT_EMAIL=info@mydomain.com \\\n    docker-compose -f docker-compose-ssl.yml up -d\n```\n\n### Full docker-compose with Automatic SSL\n\n```yaml\nversion: '2.3'\n\nservices:\n\n  nginx:\n    container_name: nginx\n    image: jwilder/nginx-proxy\n    ports:\n      - 0.0.0.0:80:80\n      - 0.0.0.0:443:443\n    labels:\n      - \"com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy\"\n    networks:\n      - internet\n    restart: always\n    volumes:\n      - /var/run/docker.sock:/tmp/docker.sock:ro\n      - ./statup/nginx/certs:/etc/nginx/certs:ro\n      - ./statup/nginx/vhost:/etc/nginx/vhost.d\n      - ./statup/nginx/html:/usr/share/nginx/html:ro\n      - ./statup/nginx/dhparam:/etc/nginx/dhparam\n    environment:\n      DEFAULT_HOST: ${LETSENCRYPT_HOST}\n\n  letsencrypt:\n    container_name: letsencrypt\n    image: jrcs/letsencrypt-nginx-proxy-companion\n    networks:\n      - internet\n    restart: always\n    volumes:\n      - /var/run/docker.sock:/var/run/docker.sock:ro\n      - ./statup/nginx/certs:/etc/nginx/certs\n      - ./statup/nginx/vhost:/etc/nginx/vhost.d\n      - ./statup/nginx/html:/usr/share/nginx/html\n      - ./statup/nginx/dhparam:/etc/nginx/dhparam\n\n  statup:\n    container_name: statup\n    image: hunterlong/statping:latest\n    restart: always\n    networks:\n      - internet\n      - database\n    depends_on:\n      - postgres\n    volumes:\n      - ./statup/app:/app\n    environment:\n      VIRTUAL_HOST: ${LETSENCRYPT_HOST}\n      VIRTUAL_PORT: 8080\n      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}\n      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}\n      DB_CONN: postgres\n      DB_HOST: postgres\n      DB_USER: statup\n      DB_PASS: password123\n      DB_DATABASE: statup\n      NAME: SSL Example\n      DESCRIPTION: This Status Status Page should be running ${LETSENCRYPT_HOST} with SSL.\n\n  postgres:\n    container_name: postgres\n    image: postgres\n    restart: always\n    networks:\n      - database\n    volumes:\n      - ./statup/postgres:/var/lib/postgresql/data\n    environment:\n      POSTGRES_PASSWORD: password123\n      POSTGRES_USER: statup\n      POSTGRES_DB: statup\n\nnetworks:\n  internet:\n    driver: bridge\n  database:\n    driver: bridge\n```\n\n<div class=\"mt-5\" id=\"page_8\"><h1>Mobile App</h1></div>\nStatping has a free mobile app so you can monitor your websites and applications without the need of a computer. It's currently in **beta** on Google Play and the App Store, try it out!\n\n<p align=\"center\">\n<a href=\"https://play.google.com/store/apps/details?id=com.statping\"><img src=\"https://img.cjx.io/google-play.svg\"></a>\n<a href=\"https://itunes.apple.com/us/app/apple-store/id1445513219\"><img src=\"https://img.cjx.io/app-store-badge.svg\"></a>\n</p>\n\n<p align=\"center\">\n<img src=\"https://img.cjx.io/statping_iphone_bk.png\">\n</p>\n\n\n\n<div class=\"mt-5\" id=\"page_9\"><h1>Heroku</h1></div>\nYou can now instantly deploy your Statping instance on a free Heroku container. Simply click the deploy button below and get up in running within seconds. This Heroku deployment is based on the Statping Docker image so you will have all the great features including SASS and all the notifiers without any setup. \n\n[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/hunterlong/statping/tree/master)\n\nView the live Heroku Statping instance at: [https://statping.herokuapp.com](https://statping.herokuapp.com)\n\n# Database Configuration\nYou will need to deploy a Postgres database to your instance and insert some configuration variables. View the image below to see what environment variable you need to configure. If you insert `DB_CONN`, Statping will attempt to automatically connect to the database without the need for the `config.yml` file. \n\n![](https://img.cjx.io/herokustatping.png)\n\n\n<div class=\"mt-5\" id=\"page_10\"><h1>API</h1></div>\nStatping includes a RESTFUL API so you can view, update, and edit your services with easy to use routes. You can currently view, update and delete services, view, create, update users, and get detailed information about the Statping instance. To make life easy, try out a Postman or Swagger JSON file and use it on your Statping Server.\n\n<p align=\"center\">\n<a href=\"https://documenter.getpostman.com/view/1898229/RzfiJUd6\">Postman</a> | <a href=\"https://github.com/hunterlong/statping/blob/master/source/tmpl/postman.json\">Postman JSON Export</a> | <a href=\"https://github.com/hunterlong/statping/blob/master/dev/swagger.json\">Swagger Export</a>\n</p>\n\n## Authentication\nAuthentication uses the Statping API Secret to accept remote requests. You can find the API Secret in the Settings page of your Statping server. To send requests to your Statping API, include a Authorization Header when you send the request. The API will accept any one of the headers below.\n\n- HTTP Header: `Authorization: API SECRET HERE`\n- HTTP Header: `Authorization: Bearer API SECRET HERE`\n\n## Main Route `/api`\nThe main API route will show you all services and failures along with them.\n\n## Services\nThe services API endpoint will show you detailed information about services and will allow you to edit/delete services with POST/DELETE http methods.\n\n### Viewing All Services\n- Endpoint: `/api/services`\n- Method: `GET`\n- Response: Array of [Services](https://github.com/hunterlong/statping/wiki/API#service-response)\n- Response Type: `application/json`\n- Request Type: `application/json`\n\n### Viewing Service\n- Endpoint: `/api/services/{id}`\n- Method: `GET`\n- Response: [Service](https://github.com/hunterlong/statping/wiki/API#service-response)\n- Response Type: `application/json`\n- Request Type: `application/json`\n\n### Updating Service\n- Endpoint: `/api/services/{id}`\n- Method: `POST`\n- Response: [Service](https://github.com/hunterlong/statping/wiki/API#service-response)\n- Response Type: `application/json`\n- Request Type: `application/json`\n\nPOST Data:\n```json\n{\n    \"name\": \"Updated Service\",\n    \"domain\": \"https://google.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 15,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 10,\n    \"order_id\": 0\n}\n```\n\n### Deleting Service\n- Endpoint: `/api/services/{id}`\n- Method: `DELETE`\n- Response: [Object Response](https://github.com/hunterlong/statping/wiki/API#object-response)\n- Response Type: `application/json`\n- Request Type: `application/json`\n\nResponse:\n```json\n{\n    \"status\": \"success\",\n    \"id\": 4,\n    \"type\": \"service\",\n    \"method\": \"delete\"\n}\n```\n\n## Users\nThe users API endpoint will show you users that are registered inside your Statping instance.\n\n### View All Users\n- Endpoint: `/api/users`\n- Method: `GET`\n- Response: Array of [Users](https://github.com/hunterlong/statping/wiki/API#user-response)\n- Response Type: `application/json`\n- Request Type: `application/json`\n\n### Viewing User\n- Endpoint: `/api/users/{id}`\n- Method: `GET`\n- Response: [User](https://github.com/hunterlong/statping/wiki/API#user-response)\n- Response Type: `application/json`\n- Request Type: `application/json`\n\n### Creating New User\n- Endpoint: `/api/users`\n- Method: `POST`\n- Response: [User](https://github.com/hunterlong/statping/wiki/API#user-response)\n- Response Type: `application/json`\n- Request Type: `application/json`\n\nPOST Data:\n```json\n{\n    \"username\": \"newadmin\",\n    \"email\": \"info@email.com\",\n    \"password\": \"password123\",\n    \"admin\": true\n}\n```\n\n### Updating User\n- Endpoint: `/api/users/{id}`\n- Method: `POST`\n- Response: [User](https://github.com/hunterlong/statping/wiki/API#user-response)\n- Response Type: `application/json`\n- Request Type: `application/json`\n\nPOST Data:\n```json\n{\n    \"username\": \"updatedadmin\",\n    \"email\": \"info@email.com\",\n    \"password\": \"password123\",\n    \"admin\": true\n}\n```\n\n### Deleting User\n- Endpoint: `/api/services/{id}`\n- Method: `DELETE`\n- Response: [Object Response](https://github.com/hunterlong/statping/wiki/API#object-response)\n- Response Type: `application/json`\n- Request Type: `application/json`\n\nResponse:\n```json\n{\n    \"status\": \"success\",\n    \"id\": 3,\n    \"type\": \"user\",\n    \"method\": \"delete\"\n}\n```\n\n# Service Response\n```json\n{\n    \"id\": 8,\n    \"name\": \"Test Service 0\",\n    \"domain\": \"https://status.coinapp.io\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 1,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 30,\n    \"order_id\": 0,\n    \"created_at\": \"2018-09-12T09:07:03.045832088-07:00\",\n    \"updated_at\": \"2018-09-12T09:07:03.046114305-07:00\",\n    \"online\": false,\n    \"latency\": 0.031411064,\n    \"24_hours_online\": 0,\n    \"avg_response\": \"\",\n    \"status_code\": 502,\n    \"last_online\": \"0001-01-01T00:00:00Z\",\n    \"dns_lookup_time\": 0.001727175,\n    \"failures\": [\n        {\n            \"id\": 5187,\n            \"issue\": \"HTTP Status Code 502 did not match 200\",\n            \"created_at\": \"2018-09-12T10:41:46.292277471-07:00\"\n        },\n        {\n            \"id\": 5188,\n            \"issue\": \"HTTP Status Code 502 did not match 200\",\n            \"created_at\": \"2018-09-12T10:41:47.337659862-07:00\"\n        }\n    ]\n}\n```\n\n# User Response\n```json\n{\n    \"id\": 1,\n    \"username\": \"admin\",\n    \"api_key\": \"02f324450a631980121e8fd6ea7dfe4a7c685a2f\",\n    \"admin\": true,\n    \"created_at\": \"2018-09-12T09:06:53.906398511-07:00\",\n    \"updated_at\": \"2018-09-12T09:06:54.972440207-07:00\"\n}\n```\n\n# Object Response\n```json\n{\n    \"type\": \"service\",\n    \"id\": 19,\n    \"method\": \"delete\",\n    \"status\": \"success\"\n}\n```\n\n# Main API Response\n```json\n{\n    \"name\": \"Awesome Status\",\n    \"description\": \"An awesome status page by Statping\",\n    \"footer\": \"This is my custom footer\",\n    \"domain\": \"https://demo.statping.com\",\n    \"version\": \"v0.56\",\n    \"migration_id\": 1536768413,\n    \"created_at\": \"2018-09-12T09:06:53.905374829-07:00\",\n    \"updated_at\": \"2018-09-12T09:07:01.654201225-07:00\",\n    \"database\": \"sqlite\",\n    \"started_on\": \"2018-09-12T10:43:07.760729349-07:00\",\n    \"services\": [\n        {\n            \"id\": 1,\n            \"name\": \"Google\",\n            \"domain\": \"https://google.com\",\n            \"expected\": \"\",\n            \"expected_status\": 200,\n            \"check_interval\": 10,\n            \"type\": \"http\",\n            \"method\": \"GET\",\n            \"post_data\": \"\",\n            \"port\": 0,\n            \"timeout\": 10,\n            \"order_id\": 0,\n            \"created_at\": \"2018-09-12T09:06:54.97549122-07:00\",\n            \"updated_at\": \"2018-09-12T09:06:54.975624103-07:00\",\n            \"online\": true,\n            \"latency\": 0.09080986,\n            \"24_hours_online\": 0,\n            \"avg_response\": \"\",\n            \"status_code\": 200,\n            \"last_online\": \"2018-09-12T10:44:07.931990439-07:00\",\n            \"dns_lookup_time\": 0.005543935\n        }\n    ]\n}\n```\n\n\n<div class=\"mt-5\" id=\"page_11\"><h1>Makefile</h1></div>\nHere's a simple list of Makefile commands you can run using `make`. The [Makefile](https://github.com/hunterlong/statping/blob/master/Makefile) may change often, so i'll try to keep this Wiki up-to-date.\n\n- Ubuntu `apt-get install build-essential`\n- MacOSX `sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer`\n- Windows [Install Guide for GNU make utility](http://gnuwin32.sourceforge.net/packages/make.htm)\n- CentOS/RedHat `yum groupinstall \"Development Tools\"`\n\n### Commands\n```bash\nmake build                         # build the binary\nmake install\nmake run\nmake test\nmake coverage\nmake docs\n# Building Statping\nmake build-all\nmake build-alpine\nmake docker\nmake docker-run\nmake docker-dev\nmake docker-run-dev\nmake databases\nmake dep\nmake dev-deps\nmake clean\nmake compress\nmake cypress-install\nmake cypress-test\n```\n\n<div class=\"mt-5\" id=\"page_12\"><h1>Notifiers</h1></div>\n<p align=\"center\">\n<img width=\"80%\" src=\"https://s3-us-west-2.amazonaws.com/gitimgs/statupnotifiers.png\">\n</p>\n\nStatping includes multiple Notifiers to alert you when your services are offline. You can also create your own notifier and send a Push Request to this repo! Creating a custom notifier is pretty easy as long as you follow the requirements. A notifier will automatically be installed into the users Statping database, and form values will save without any hassles. 💃\n\n<p align=\"center\">\n<a href=\"https://github.com/hunterlong/statping/wiki/Notifier-Example\">Example Code</a> | <a href=\"https://github.com/hunterlong/statping/wiki/Notifier-Events\">Events</a> | <a href=\"https://github.com/hunterlong/statping/tree/master/notifiers\">View Notifiers</a><br>\n<a href=\"https://godoc.org/github.com/hunterlong/statping/core/notifier\"><img src=\"https://godoc.org/github.com/golang/gddo?status.svg\"></a>\n</p>\n\n## Notifier Requirements\n- Must have a unique `METHOD` name\n- Struct must have `*notifier.Notification` pointer in it. \n- Must create and add your notifier variable in `init()`\n- Should have a form for user to input their variables/keys. `Form: []notifier.NotificationForm`\n\n## Notifier Interface (required)\nStatping has the `Notifier` interface which you'll need to include in your notifier. Statping includes many other events/triggers for your notifier, checkout <a href=\"https://github.com/hunterlong/statping/wiki/Notifier-Events\">Notifier Events</a> to see all of them.\n```go\n// Notifier interface is required to create a new Notifier\ntype Notifier interface {\n\tOnSave() error          // OnSave is triggered when the notifier is saved\n\tSend(interface{}) error // OnSave is triggered when the notifier is saved\n\tSelect() *Notification  // Select returns the *Notification for a notifier\n}\n```\n\n### Basic Interface (required)\nInclude `OnSuccess` and `OnFailure` to receive events when a service is online or offline.\n```go\n// BasicEvents includes the most minimal events, failing and successful service triggers\ntype BasicEvents interface {\n\t// OnSuccess is triggered when a service is successful\n\tOnSuccess(*types.Service)\n\t// OnFailure is triggered when a service is failing\n\tOnFailure(*types.Service, *types.Failure)\n}\n```\n\n### Test Interface\nThe OnTest method will give the front end user the ability to test your notifier without saving, the OnTest method for your notifier run the functionality to test the user's submitted parameters and respond an error if notifier is not correctly setup.\n```go\n// Tester interface will include a function to Test users settings before saving\ntype Tester interface {\n\tOnTest() error\n}\n```\nIf your notifier includes this interface, the Test button will appear.\n\n## Notifier Struct\n```go\nvar example = &Example{&notifier.Notification{\n\tMethod: \"example\",                               // unique method name\n\tHost:   \"http://exmaplehost.com\",                // default 'host' field\n\tForm: []notifier.NotificationForm{{\n\t\tType:        \"text\",                     // text, password, number, or email\n\t\tTitle:       \"Host\",                     // The title of value in form\n\t\tPlaceholder: \"Insert your Host here.\",   // Optional placeholder in input\n\t\tDbField:     \"host\",                     // An accepted DbField value (read below)\n\t}},\n}\n```\n\n## Notifier Form\nInclude a form with your notifier so other users can save API keys, username, passwords, and other values. \n```go\n// NotificationForm contains the HTML fields for each variable/input you want the notifier to accept.\ntype NotificationForm struct {\n\tType        string `json:\"type\"`        // the html input type (text, password, email)\n\tTitle       string `json:\"title\"`       // include a title for ease of use\n\tPlaceholder string `json:\"placeholder\"` // add a placeholder for the input\n\tDbField     string `json:\"field\"`       // true variable key for input\n\tSmallText   string `json:\"small_text\"`  // insert small text under a html input\n\tRequired    bool   `json:\"required\"`    // require this input on the html form\n\tIsHidden    bool   `json:\"hidden\"`      // hide this form element from end user\n\tIsList      bool   `json:\"list\"`        // make this form element a comma separated list\n\tIsSwitch    bool   `json:\"switch\"`      // make the notifier a boolean true/false switch\n}\n```\n\n### Example Notifier Form\nThis is the Slack Notifier `Form` fields.\n```go\nForm: []notifier.NotificationForm{{\n\t\tType:        \"text\",\n\t\tTitle:       \"Incoming webhooker Url\",\n\t\tPlaceholder: \"Insert your slack webhook URL here.\",\n\t\tSmallText:   \"Incoming webhooker URL from <a href=\\\"https://api.slack.com/apps\\\" target=\\\"_blank\\\">slack Apps</a>\",\n\t\tDbField:     \"Host\",\n\t\tRequired:    true,\n\t}}\n}\n```\n\n### Accepted DbField Values\nThe `notifier.NotificationForm` has a field called `DbField` which is the column to save the value into the database. Below are the acceptable DbField string names to include in your form. \n- `host` used for a URL or API endpoint\n- `username` used for a username\n- `password` used for a password\n- `port` used for a integer port number\n- `api_key` used for some kind of API key\n- `api_secret` used for some API secret\n- `var1` used for any type of string\n- `var2` used for any type of string (extra)\n\n### Form Elements\nYou can completely custom your notifications to include a detailed form. \n- `Type` is a HTML input type for your field\n- `Title` give your input element a title\n- `Placeholder` optional field if you want a placeholder in input\n- `DbField` required field to save variable into database (read above)\n- `Placeholder` optional field for inserting small hint under the input\n\n<div class=\"mt-5\" id=\"page_13\"><h1>Notifier Events</h1></div>\nEvents are handled by added interfaces for the elements you want to monitor.\n\n## Required Notifier Interface\n```go\n// Notifier interface is required to create a new Notifier\ntype Notifier interface {\n\t// Run will trigger inside of the notifier when enabled\n\tRun() error\n\t// OnSave is triggered when the notifier is saved\n\tOnSave() error\n\t// Test will run a function inside the notifier to Test if it works\n\tTest() error\n\t// Select returns the *Notification for a notifier\n\tSelect() *Notification\n}\n```\n\n## Basic Success/Failure Interface\n```go\n// BasicEvents includes the most minimal events, failing and successful service triggers\ntype BasicEvents interface {\n\t// OnSuccess is triggered when a service is successful\n\tOnSuccess(*types.Service)\n\t// OnFailure is triggered when a service is failing\n\tOnFailure(*types.Service, *types.Failure)\n}\n```\n\n\n## Service Events\n```go\n// ServiceEvents are events for Services\ntype ServiceEvents interface {\n\tOnNewService(*types.Service)\n\tOnUpdatedService(*types.Service)\n\tOnDeletedService(*types.Service)\n}\n```\n\n## User Events\n```go\n// UserEvents are events for Users\ntype UserEvents interface {\n\tOnNewUser(*types.User)\n\tOnUpdatedUser(*types.User)\n\tOnDeletedUser(*types.User)\n}\n```\n\n## Core Events\n```go\n// CoreEvents are events for the main Core app\ntype CoreEvents interface {\n\tOnUpdatedCore(*types.Core)\n}\n```\n\n## Notifier Events\n```go\n// NotifierEvents are events for other Notifiers\ntype NotifierEvents interface {\n\tOnNewNotifier(*Notification)\n\tOnUpdatedNotifier(*Notification)\n}\n```\n\n<div class=\"mt-5\" id=\"page_14\"><h1>Notifier Example</h1></div>\nBelow is a full example of a Statping notifier which will give you a good example of how to create your own. Insert your new notifier inside the `/notifiers` folder once your ready!\n\n[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/hunterlong/statping/core/notifier)\n\n```go\npackage notifiers\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n\t\"github.com/hunterlong/statping/types\"\n        \"github.com/hunterlong/statping/core/notifier\"\n\t\"time\"\n)\n\ntype Example struct {\n\t*notifier.Notification\n}\n\nvar example = &Example{&notifier.Notification{\n\tMethod:      METHOD,\n\tTitle:       \"Example\",\n\tDescription: \"Example Notifier\",\n\tAuthor:      \"Hunter Long\",\n\tAuthorUrl:   \"https://github.com/hunterlong\",\n\tDelay:       time.Duration(5 * time.Second),\n\tForm: []notifier.NotificationForm{{\n\t\tType:        \"text\",\n\t\tTitle:       \"Host\",\n\t\tPlaceholder: \"Insert your Host here.\",\n\t\tDbField:     \"host\",\n\t\tSmallText:   \"this is where you would put the host\",\n\t}, {\n\t\tType:        \"text\",\n\t\tTitle:       \"Username\",\n\t\tPlaceholder: \"Insert your Username here.\",\n\t\tDbField:     \"username\",\n\t}, {\n\t\tType:        \"password\",\n\t\tTitle:       \"Password\",\n\t\tPlaceholder: \"Insert your Password here.\",\n\t\tDbField:     \"password\",\n\t}, {\n\t\tType:        \"number\",\n\t\tTitle:       \"Port\",\n\t\tPlaceholder: \"Insert your Port here.\",\n\t\tDbField:     \"port\",\n\t}, {\n\t\tType:        \"text\",\n\t\tTitle:       \"API Key\",\n\t\tPlaceholder: \"Insert your API Key here\",\n\t\tDbField:     \"api_key\",\n\t}, {\n\t\tType:        \"text\",\n\t\tTitle:       \"API Secret\",\n\t\tPlaceholder: \"Insert your API Secret here\",\n\t\tDbField:     \"api_secret\",\n\t}, {\n\t\tType:        \"text\",\n\t\tTitle:       \"Var 1\",\n\t\tPlaceholder: \"Insert your Var1 here\",\n\t\tDbField:     \"var1\",\n\t}, {\n\t\tType:        \"text\",\n\t\tTitle:       \"Var2\",\n\t\tPlaceholder: \"Var2 goes here\",\n\t\tDbField:     \"var2\",\n\t}},\n}}\n\n// REQUIRED init() will install/load the notifier\nfunc init() {\n\tnotifier.AddNotifier(example)\n}\n\n// REQUIRED - Send is where you would put the action's of your notifier\nfunc (n *Example) Send(msg interface{}) error {\n\tmessage := msg.(string)\n\tfmt.Printf(\"i received this string: %v\\n\", message)\n\treturn nil\n}\n\n// REQUIRED\nfunc (n *Example) Select() *notifier.Notification {\n\treturn n.Notification\n}\n\n// REQUIRED\nfunc (n *Example) OnSave() error {\n\tmsg := fmt.Sprintf(\"received on save trigger\")\n\tn.AddQueue(msg)\n\treturn nil\n}\n\n// REQUIRED\nfunc (n *Example) Test() error {\n\tmsg := fmt.Sprintf(\"received a test trigger\\n\")\n\tn.AddQueue(msg)\n\treturn nil\n}\n\n// REQUIRED - BASIC EVENT\nfunc (n *Example) OnSuccess(s *types.Service) {\n\tmsg := fmt.Sprintf(\"received a count trigger for service: %v\\n\", s.Name)\n\tn.AddQueue(msg)\n}\n\n// REQUIRED - BASIC EVENT\nfunc (n *Example) OnFailure(s *types.Service, f *types.Failure) {\n\tmsg := fmt.Sprintf(\"received a failure trigger for service: %v\\n\", s.Name)\n\tn.AddQueue(msg)\n}\n\n// OPTIONAL\nfunc (n *Example) OnNewService(s *types.Service) {\n\tmsg := fmt.Sprintf(\"received a new service trigger for service: %v\\n\", s.Name)\n\tn.AddQueue(msg)\n}\n\n// OPTIONAL\nfunc (n *Example) OnUpdatedService(s *types.Service) {\n\tmsg := fmt.Sprintf(\"received a update service trigger for service: %v\\n\", s.Name)\n\tn.AddQueue(msg)\n}\n\n// OPTIONAL\nfunc (n *Example) OnDeletedService(s *types.Service) {\n\tmsg := fmt.Sprintf(\"received a delete service trigger for service: %v\\n\", s.Name)\n\tn.AddQueue(msg)\n}\n\n// OPTIONAL\nfunc (n *Example) OnNewUser(s *types.User) {\n\tmsg := fmt.Sprintf(\"received a new user trigger for user: %v\\n\", s.Username)\n\tn.AddQueue(msg)\n}\n\n// OPTIONAL\nfunc (n *Example) OnUpdatedUser(s *types.User) {\n\tmsg := fmt.Sprintf(\"received a updated user trigger for user: %v\\n\", s.Username)\n\tn.AddQueue(msg)\n}\n\n// OPTIONAL\nfunc (n *Example) OnDeletedUser(s *types.User) {\n\tmsg := fmt.Sprintf(\"received a deleted user trigger for user: %v\\n\", s.Username)\n\tn.AddQueue(msg)\n}\n\n// OPTIONAL\nfunc (n *Example) OnUpdatedCore(s *types.Core) {\n\tmsg := fmt.Sprintf(\"received a updated core trigger for core: %v\\n\", s.Name)\n\tn.AddQueue(msg)\n}\n\n// OPTIONAL\nfunc (n *Example) OnNewNotifier(s *Notification) {\n\tmsg := fmt.Sprintf(\"received a new notifier trigger for notifier: %v\\n\", s.Method)\n\tn.AddQueue(msg)\n}\n\n// OPTIONAL\nfunc (n *Example) OnUpdatedNotifier(s *Notification) {\n\tmsg := fmt.Sprintf(\"received a update notifier trigger for notifier: %v\\n\", s.Method)\n\tn.AddQueue(msg)\n}\n```\n\n<div class=\"mt-5\" id=\"page_15\"><h1>Prometheus Exporter</h1></div>\nStatping includes a prometheus exporter so you can have even more monitoring power with your services. The prometheus exporter can be seen on `/metrics`, simply create another exporter in your prometheus config. Use your Statping API Secret for the Authorization Bearer header, the `/metrics` URL is dedicated for Prometheus and requires the correct API Secret has `Authorization` header.\n\n# Grafana Dashboard\nStatping has a [Grafana Dashboard](https://grafana.com/dashboards/6950) that you can quickly implement if you've added your Statping service to Prometheus. Import Dashboard ID: `6950` into your Grafana dashboard and watch the metrics come in!\n\n<p align=\"center\"><img width=\"80%\" src=\"https://img.cjx.io/statupgrafana.png\"></p>\n\n## Basic Prometheus Exporter\nIf you have Statping and the Prometheus server in the same Docker network, you can use the yaml config below.\n```yaml\nscrape_configs:\n  - job_name: 'statup'\n    scrape_interval: 30s\n    bearer_token: 'SECRET API KEY HERE'\n    static_configs:\n      - targets: ['statup:8080']\n```\n\n## Remote URL Prometheus Exporter\nThis exporter yaml below has `scheme: https`, which you can remove if you arn't using HTTPS.\n```yaml\nscrape_configs:\n  - job_name: 'statup'\n    scheme: https\n    scrape_interval: 30s\n    bearer_token: 'SECRET API KEY HERE'\n    static_configs:\n      - targets: ['status.mydomain.com']\n```\n\n### `/metrics` Output\n```\nstatup_total_failures 206\nstatup_total_services 4\nstatup_service_failures{id=\"1\" name=\"Google\"} 0\nstatup_service_latency{id=\"1\" name=\"Google\"} 12\nstatup_service_online{id=\"1\" name=\"Google\"} 1\nstatup_service_status_code{id=\"1\" name=\"Google\"} 200\nstatup_service_response_length{id=\"1\" name=\"Google\"} 10777\nstatup_service_failures{id=\"2\" name=\"Statping.com\"} 0\nstatup_service_latency{id=\"2\" name=\"Statping.com\"} 3\nstatup_service_online{id=\"2\" name=\"Statping.com\"} 1\nstatup_service_status_code{id=\"2\" name=\"Statping.com\"} 200\nstatup_service_response_length{id=\"2\" name=\"Statping.com\"} 2\n```\n\n<div class=\"mt-5\" id=\"page_16\"><h1>SSL</h1></div>\nYou can run Statping with a valid certificate by including 2 files in the root directory. Although, I personally recommend using NGINX or Apache to serve the SSL and then have the webserver direct traffic to the Statping instance. This guide will show you how to implement SSL onto your Statping server with multiple options.\n\n## SSL Certificate with Statping\nTo run the Statping HTTP server in SSL mode, you must include 2 files in the root directory of your Statping application. The 2 files you must include are:\n- `server.crt` SSL Certificate File\n- `server.key` SSL Certificate Key File\n\nThe filenames and extensions must match the exact naming above. If these 2 files are found, Statping will automatically start the HTTP server in SSL mode using your certificates. You can also generate your own SSL certificates, but you will receive a \"ERR_CERT_AUTHORITY_INVALID\" error. To generate your own, follow the commands below:\n\n```shell\nopenssl req -new -sha256 -key server.key -out server.csr\nopenssl x509 -req -sha256 -in server.csr -signkey server.key -out server.crt -days 3650\n```\nThis will generate a self signed certificate that you can use for your Statup instance. I recommend using a web server to do SSL termination for your server though.\n\n## Choose a Web Server or Environment\n\n**Choose the environment running the Statping instance.**\n- [Docker](#docker)\n- [NGINX](#nginx)\n- [Apache](#apache)\n\n## Docker\nDocker might be the easiest way to get up and running with a SSL certificate. Below is a `docker-compose.yml` file that will run NGINX, LetEncrypt, and Statping.\n\n1. Point your domain or subdomain to the IP address of the Docker server. This would be done on CloudFlare, Route53, or some other DNS provider.\n\n2. Replace the `docker-compose.yml` contents:\n- `MY.DOMAIN.COM` with the domain you want to use\n- `MY@EMAIL.COM` with your email address\n\n3. Run the docker container by running command `docker-compose up -d`. Give a little bit of time for LetEncrypt to automatically generate your SSL certificate.\n\n###### `docker-compose.yml`\n```yaml\nversion: '2.3'\nservices:\n  nginx:\n    container_name: nginx\n    image: jwilder/nginx-proxy\n    ports:\n      - 0.0.0.0:80:80\n      - 0.0.0.0:443:443\n    labels:\n      - \"com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy\"\n    networks:\n      - internet\n    restart: always\n    volumes:\n      - /var/run/docker.sock:/tmp/docker.sock:ro\n      - ./statping/nginx/certs:/etc/nginx/certs:ro\n      - ./statping/nginx/vhost:/etc/nginx/vhost.d\n      - ./statping/nginx/html:/usr/share/nginx/html:ro\n      - ./statping/nginx/dhparam:/etc/nginx/dhparam\n    environment:\n      DEFAULT_HOST: MY.DOMAIN.COM\n\n  letsencrypt:\n    container_name: letsencrypt\n    image: jrcs/letsencrypt-nginx-proxy-companion\n    networks:\n      - internet\n    restart: always\n    volumes:\n      - /var/run/docker.sock:/var/run/docker.sock:ro\n      - ./statping/nginx/certs:/etc/nginx/certs\n      - ./statping/nginx/vhost:/etc/nginx/vhost.d\n      - ./statping/nginx/html:/usr/share/nginx/html\n      - ./statping/nginx/dhparam:/etc/nginx/dhparam\n\n  statping:\n    container_name: statping\n    image: hunterlong/statping:latest\n    restart: always\n    networks:\n      - internet\n    depends_on:\n      - nginx\n    volumes:\n      - ./statping/app:/app\n    environment:\n      VIRTUAL_HOST: MY.DOMAIN.COM\n      VIRTUAL_PORT: 8080\n      LETSENCRYPT_HOST: MY.DOMAIN.COM\n      LETSENCRYPT_EMAIL: MY@EMAIL.COM\n\nnetworks:\n  internet:\n    driver: bridge\n```\n\n## NGINX\nIf you already have a NGINX web server running, you just have to add a proxy pass and your SSL certs to the nginx config or as a vhost. By default Statping runs on port 8080, you can change this port by starting server with `statping -ip 127.0.0.1 -port 9595`.\n\n- Replace `/my/absolute/directory/for/cert/server.crt` with SSL certificate file.\n- Replace `/my/absolute/directory/for/key/server.key` with SSL key file.\n- Run `service nginx restart` and try out https on your domain.\n\n##### Tutorials\n- [NGINX Guide](https://docs.nginx.com/nginx/admin-guide/security-controls/terminating-ssl-http/)\n- [How To Set Up Nginx Load Balancing with SSL Termination](https://www.digitalocean.com/community/tutorials/how-to-set-up-nginx-load-balancing-with-ssl-termination)\n\n###### `/etc/nginx/nginx.conf`\n```\n#user  nobody;\nworker_processes  1;\nevents {\n    worker_connections  1024;\n}\nhttp {\n    include            mime.types;\n    default_type       application/octet-stream;\n    send_timeout       1800;\n    sendfile           on;\n    keepalive_timeout  6500;\n    server {\n        listen       80;\n        server_name  localhost;\n        location / {\n          proxy_pass          http://localhost:8080;\n          proxy_set_header    Host             $host;\n          proxy_set_header    X-Real-IP        $remote_addr;\n          proxy_set_header    X-Forwarded-For  $proxy_add_x_forwarded_for;\n          proxy_set_header    X-Client-Verify  SUCCESS;\n          proxy_set_header    X-Client-DN      $ssl_client_s_dn;\n          proxy_set_header    X-SSL-Subject    $ssl_client_s_dn;\n          proxy_set_header    X-SSL-Issuer     $ssl_client_i_dn;\n          proxy_read_timeout 1800;\n          proxy_connect_timeout 1800;\n        }\n    }\n    # HTTPS server\n    \n    server {\n        listen       443;\n        server_name  localhost;\n    \n        ssl                  on;\n        ssl_certificate      /my/absolute/directory/for/cert/server.crt;\n        ssl_certificate_key  /my/absolute/directory/for/key/server.key;\n        ssl_session_timeout  5m;\n    \n        ssl_protocols  SSLv2 SSLv3 TLSv1;\n        ssl_ciphers  ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;\n        ssl_prefer_server_ciphers   on;\n    \n        location / {\n          proxy_pass          http://localhost:8080;\n          proxy_set_header    Host             $host;\n          proxy_set_header    X-Real-IP        $remote_addr;\n          proxy_set_header    X-Forwarded-For  $proxy_add_x_forwarded_for;\n          proxy_set_header    X-Client-Verify  SUCCESS;\n          proxy_set_header    X-Client-DN      $ssl_client_s_dn;\n          proxy_set_header    X-SSL-Subject    $ssl_client_s_dn;\n          proxy_set_header    X-SSL-Issuer     $ssl_client_i_dn;\n          proxy_read_timeout 1800;\n          proxy_connect_timeout 1800;\n        }\n    }\n}\n```\n\n## Apache\n\n<div class=\"mt-5\" id=\"page_17\"><h1>Config with .env File</h1></div>\nIt may be useful to load your environment using a `.env` file in the root directory of your Statping server. The .env file will be automatically loaded on startup and will overwrite all values you have in config.yml.\n\nIf you have the `DB_CONN` environment variable set Statping will bypass all values in config.yml and will require you to have the other DB_* variables in place. You can pass in these environment variables without requiring a .env file.\n\n## `.env` File\n```bash\nDB_CONN=postgres\nDB_HOST=0.0.0.0\nDB_PORT=5432\nDB_USER=root\nDB_PASS=password123\nDB_DATABASE=root\n\nNAME=Demo\nDESCRIPTION=This is an awesome page\nDOMAIN=https://domain.com\nADMIN_USER=admin\nADMIN_PASS=admin\nADMIN_EMAIL=info@admin.com\nUSE_CDN=true\nPOSTGRES_SSL=false # enable ssl_mode for postgres (true/false)\n\nIS_DOCKER=false\nIS_AWS=false\nSASS=/usr/local/bin/sass\nCMD_FILE=/bin/bash\n```\nThis .env file will include additional variables in the future, subscribe to this repo to keep up-to-date with changes and updates. \n\n<div class=\"mt-5\" id=\"page_18\"><h1>Static Export</h1></div>\nIf you want to use Statping as a CLI application without running a server, you can export your status page to a static HTML.\nThis export tool is very useful for people who want to export their HTML and upload/commit it to Github Pages or an FTP server.\n```dash\nstatup export\n```\n###### Creates `index.html` in the current directory with CDN asset URL's. 💃 \n\n<div class=\"mt-5\" id=\"page_19\"><h1>Statping Plugins</h1></div>\nSince Statping is built in Go Language we can use the [Go Plugin](https://golang.org/pkg/plugin/) feature to create dynamic plugins that run on load. Statping has an event anytime anything happens, you can create your own plugins and do any type of function. To implement your own ideas into Statping, use the plugin using the [statup/plugin](https://github.com/hunterlong/statping/blob/master/plugin/main.go) package.\n```\ngo get github.com/hunterlong/statping/plugin\n```\n\n## Example Plugin\nStart off with the [Example Statping Plugin](https://github.com/hunterlong/statping_plugin) that includes all the interfaces and some custom options for you to expand on. You can include any type of function in your own plugin!\n\n<p align=\"center\">\n<img width=\"95%\" src=\"https://img.cjx.io/statuppluginrun.gif\">\n</p>\n\n## Building Plugins\nPlugins don't need a push request and they can be private! You'll need to compile your plugin to the Golang `.so` binary format. Once you've built your plugin, insert it into the `plugins` folder in your Statping directory and reboot the application. Clone the [Example Statping Plugin](https://github.com/hunterlong/statping_plugin) repo and try to build it yourself!\n\n#### Build Requirements\n- You must have `main.go`\n- You must create the Plugin variable on `init()`\n\n```bash\ngit clone https://github.com/hunterlong/statping_plugin\ncd statup-plugin\ngo build -buildmode=plugin -o example.so\n```\n###### Insert `example.so` into the `plugins` directory and reload Statping\n\n## Testing Statping Plugins\nStatping includes a couple tools to help you on your Plugin journey, you can use `statup test plugins` command to test all plugins in your `/plugins` folder. This test will attempt to parse your plugin details, and then it will send events for your plugin to be fired.\n```\nstatup test plugins\n```\n<p align=\"center\">\n<img width=\"85%\" src=\"https://img.cjx.io/statupplugintester.gif\">\n</p>\n\nYour plugin should be able to parse and receive events before distributing it. The test tools creates a temporary database (SQLite) that your plugin can interact with. Statping uses [upper.io/db.v3](https://upper.io/db.v3) for database interactions. The database is passed to your plugin `OnLoad(db sqlbuilder.Database)`, so you can use the `db` variable passed here.\n\n## Statping Plugin Interface\nPlease remember Golang plugin's are very new and Statping plugin package may change and 'could' brake your plugin. Checkout the [statup/plugin package](https://github.com/hunterlong/statping/blob/master/plugin/main.go) to see the most current interfaces.\n```go\ntype PluginActions interface {\n\tGetInfo() Info\n\tGetForm() string\n\tSetInfo(map[string]interface{}) Info\n\tRoutes() []Routing\n\tOnSave(map[string]interface{})\n\tOnFailure(map[string]interface{})\n\tOnSuccess(map[string]interface{})\n\tOnSettingsSaved(map[string]interface{})\n\tOnNewUser(map[string]interface{})\n\tOnNewService(map[string]interface{})\n\tOnUpdatedService(map[string]interface{})\n\tOnDeletedService(map[string]interface{})\n\tOnInstall(map[string]interface{})\n\tOnUninstall(map[string]interface{})\n\tOnBeforeRequest(map[string]interface{})\n\tOnAfterRequest(map[string]interface{})\n\tOnShutdown()\n\tOnLoad(sqlbuilder.Database)\n}\n```\n\n## Event Parameters\nAll event interfaces for the Statping Plugin will return a `map[string]interface{}` type, this is because the plugin package will most likely update and change in the future, but using this type will allow your plugin to continue even after updates.\n\n## Example of an Event\nKnowing what happens during an event is important for your plugin. For example, lets have an event that echo something when a service has a Failure status being issued. Checkout some example below to see how this golang plugin action works. \n\n```go\nfunc (p pkg) OnSuccess(data map[string]interface{}) {\n    fmt.Println(\"Statping Example Plugin received a successful service hit! \")\n    fmt.Println(\"Name:    \", data[\"Name\"])\n    fmt.Println(\"Domain:  \", data[\"Domain\"])\n    fmt.Println(\"Method:  \", data[\"Method\"])\n    fmt.Println(\"Latency: \", data[\"Latency\"])\n}\n```\n###### OnSuccess is fired every time a service has check it be online\n\n```go\nfunc OnFailure(service map[string]interface{}) {\n    fmt.Println(\"oh no! an event is failing right now! do something!\")\n    fmt.Println(service)\n}\n```\n###### OnFailure is fired every time a service is failing\n\n```go\nfunc (p pkg) OnLoad(db sqlbuilder.Database) {\n    fmt.Println(\"=============================================================\")\n    fmt.Printf(\"  Statping Example Plugin Loaded using %v database\\n\", db.Name())\n    fmt.Println(\"=============================================================\")\n}\n```\n###### OnLoad is fired after plugin is loaded into the environment\n\n\n## Interacting with Database\nThe Example Statping Plugin includes a variable `Database` that will allow you to interact with the Statping database. Checkout [database.go](https://github.com/hunterlong/statping_plugin/blob/master/database.go) to see a full example of Create, Read, Update and then Deleting a custom Communication entry into the database.\n```go\n// Insert a new communication into database\n// once inserted, return the Communication\nfunc (c *Communication) Create() *Communication {\n\tuuid, err := CommunicationTable().Insert(c)\n\tif err != nil {\n\t\tpanic(err)\n\t}\n\tc.Id = uuid.(int64)\n\treturn c\n}\n```\n\n## Custom HTTP Routes\nPlugin's can include their own HTTP route to accept GET/POST requests. Route are loaded after Statping loads all of it's Routes. Checkout [routes.go](https://github.com/hunterlong/statping_plugin/blob/master/routes.go) on the example plugin to see a full example of how to use it.\n```go\n// You must have a Routes() method in your plugin\nfunc (p *pkg) Routes() []plugin.Routing {\n\treturn []plugin.Routing{{\n\t\tURL:     \"hello\",\n\t\tMethod:  \"GET\",\n\t\tHandler: CustomInfoHandler,\n\t}}\n}\n\n// This is the HTTP handler for the '/hello' URL created above\nfunc CustomInfoHandler(w http.ResponseWriter, r *http.Request) {\n\tw.WriteHeader(http.StatusOK)\n\tfmt.Fprintln(w, \"Oh Wow!!! This is cool...\")\n}\n```\n\n\n## Plugin To-Do List\n- [ ] Ability to includes assets like jpg, json, etc\n\n<div class=\"mt-5\" id=\"page_20\"><h1>Statuper</h1></div>\nStatping includes a simple to use installation shell script that will help you install locally, Docker, and even onto a AWS EC2 instance.\n\n<p align=\"center\">\n<img width=\"90%\" src=\"https://img.cjx.io/statuper1.png\">\n</p>\n\n## Installation\n```bash\ncurl -O https://assets.statup.io/statuper && chmod +x statuper\n```\n\n## Usage\n- `statuper`\n\n<div class=\"mt-5\" id=\"page_21\"><h1>Build and Test</h1></div>\nBuilding from the Go Language source code is pretty easy if you already have Go installed. Clone this repo and `cd` into it. \n\n### Git n' Go Get\n```bash\ngit clone https://github.com/hunterlong/statping.git\ncd statup\ngo get -v\n```\n\n### Install go.rice\nStatping uses go.rice to compile HTML, JS, and CSS files into it's single binary output.\n```\ngo get github.com/GeertJohan/go.rice\ngo get github.com/GeertJohan/go.rice/rice\n```\n\n### Build Statping Binary\nStatping uses go.rice to compile HTML, JS, and CSS files into it's single binary output.\n```\nrice embed-go\ngo build -o statup .\n./statup version\n```\n\n### Test Coverage\nYou can also test Statio on your localhost, but it does require a MySQL, and Postgres server to be accessible since testing does create/drop tables for multiple databases. \n```\ngo test -v\n```\n\n<div class=\"mt-5\" id=\"page_22\"><h1>Contributing</h1></div>\nHave a feature you want to implement into Statping!? Awesome! Follow this guide to see how you can test, compile and build Statping for production use. I recommend you use `make` with this process, it will save you time and it will auto include many customized parameters to get everything working correctly.\n\n# Dependencies\nStatping has a couple of required dependencies when testing and compiling the binary. The [Makefile](https://github.com/hunterlong/statping/blob/master/Makefile) will make these tasks a lot easier. Take a look at the Makefile to see what commands are ran. Run the command below to get setup right away.\n```bash\nmake dev-deps\n```\nList of requirements for compiling assets, building binary, and testing.\n- [Go Language](https://golang.org/) (currently `1.10.3`)\n- [Docker](https://docs.docker.com/)\n- [SASS](https://sass-lang.com/install)\n- [Cypress](https://www.cypress.io/) (only used for UI testing, `make cypress-install`)\n\n# Compiling Assets\nThis Golang project uses [rice](https://github.com/GeertJohan/go.rice) to compile static assets into a single file. The file `source/rice-box.go` is never committed to the Github repo, it is automatically created on build. Statping also requires `sass` to be installed on your local OS. To compile all the static assets run the command below:\n\n```bash\nmake compile\n```\nAfter this is complete, you'll notice the `source/rice-box.go` file has been generated. You can now continue to build, and test.\n\n# Testing\nStatping includes multiple ways to Test the application, you can run the `make` command, or the normal `go test` command. To see the full experience of your updates, you can even run Cypress tests which is in the `.dev/test` folder.\n\nStatping will run all tests in `cmd` folder on MySQL, Postgres, and SQLite databases. You can run `make databases` to automatically create MySQL and Postgres with Docker.\n\n###### Go Unit Testing:\n```bash\nmake test\n```\n\n###### Cypress UI Testing:\n```bash\nmake cypress-test\n```\n\n###### Test Everything:\n```bash\nmake test-all\n```\n\n# Build\nStatping will build on all operating systems except Windows 32-bit. I personally use [xgo](https://github.com/karalabe/xgo) to cross-compile on multiple systems using Docker. Follow the commands below to build on your local system.\n\n###### Build for local operating system:\n```bash\nmake build\n```\n\n# Compile for Production\nOnce you've tested and built locally, you can compile Statping for all available operating systems using the command below. This command will require you to have Docker.\n\n```bash\nmake build-all\n```\n\n# What Now\nEverything tested, compiled and worked out!? Awesome! 💃 You can now commit your changes, and submit a Pull Request with the features/bugs you added or removed.\n\n\n\n\n\n<div class=\"mt-5\" id=\"page_23\"><h1>PGP Signature</h1></div>\nYou can check if the Statping binary you downloaded is authentic by running a few commands.\n\n### Steps to Authenticate\n1. Download the Statping `tar.gz` file from [Latest Releases](https://github.com/hunterlong/statping/releases/latest) and extract the `statping` binary and the `statup.asc` file.\n2. Run command: `gpg --verify statping.asc`\n3. You should see `Good signature from \"Hunter Long <info@statping.com>\" [ultimate]`.\n\n# Statping Public Key\n- [https://statping.com/statping.gpg](https://statping.com/statping.gpg)\n\nYou can also download the key with the command below:\n```\nwget https://statping.com/statping.gpg\n```\n\n###### `statping.gpg`\n```\n-----BEGIN PGP PUBLIC KEY BLOCK-----\n\nmQINBFwGUYIBEADNsDY4aUOx8EoZuTRFPtjuadJzFRyKtHhw/tLlAnoFACanZPIT\nNZoRYvRR5v6lMDXdxsteDbJEOhZ1WDiKIr4OyMahPsyyH6ULzSBKgePUswa0sDef\nUnXYzPFQCzqQyQQFbp9AYfDP7dW6dTL9I6qU2NqlJvjxJiiZTAq87SmsLqHiASnI\n+ottnQuu6vJQBJz2PFIuaS1c3js/+HBbth9GK5B9YN1BIIyZoFmWKVU9HnJf+aM3\nUs6OLjjwYwWzQH38ZV84IjVXyiP9PQVhlCXeHK7XdhPZvnSP1m5Wszj/jowwY6Mz\nLgLotfL540X7yOJ7hJTFYLFBOtJdJr/3Ov8SH4HXdPFPVG+UqxsmtmPqUQ9iAxAE\njRFfkAxBvH5Szf2WZdaLnlrrOcOKJIIjZgHqalquBTAhlh5ul0lUVSSPxetwIBlW\n60L41k94NJFGDt8xOJ+122mLcywmQ1CzhDfeIKlxl6JDiVHjoRqlQQrqIoNZMV85\nrzGfrmbuwv1MXGBJoiNy3330ujOBmhQ9dQVwKpxhBKdjnAgIGM9szbUYxIkGgM1O\nU4b1WF3AF/9JOpKJ0LewslpM3BFFYnemGsHXAv3TBPqKidNdwMAiBOtNykGoXF6i\n0D6jOW/IB1da0gUA+kr5JdAOwIG7JXKhur2MO7Ncid59DL2N8RePRWj+jwARAQAB\ntB9IdW50ZXIgTG9uZyA8aW5mb0BzdGF0cGluZy5jb20+iQJOBBMBCAA4FiEEt21h\n+qbbdZRm6D2ZZLnGquLVUngFAlwGUYICGwMFCwkIBwIGFQoJCAsCBBYCAwECHgEC\nF4AACgkQZLnGquLVUnizwA//c7vmwTMq/8LYlbo37WM2kDE9AKIrz6VSMq4RhGbC\nLikH0X0epa+if79n9BZrVU/Af3aKTn7vu2J4XrvzcdCXtcsR0YmCWML2Y6OSFmhX\nw3o6woiFcp+SUWdcM/kithRun+j9sKV4akdgkdBQUdh/RMVln+radz1c6G59iTdh\nS+Ip3ObO7Gn5VnrLwxix+W9Jhg8YhDgDGEDt8e1yvjuMRY+WhjHFlwEMoE0kvQL8\nQvQH2dGD3dExWAuIL7+0xC0ZGU0PR8vRrq1ukdIsWlDY+42vvhcyPZKFFDTM/QLF\nFcCNiPSGhiK/NQq67xnRMFdh0fnqbydWj2atMpacIrheEkOt8db2/UMyDOwlIxgy\nKOG8x+yNKiG9LyvW4axRLctN608/+TbvtFo5TVOFJYxJQp4b5uz7LgJAJw7PBvfC\nbqx64BH8WGzgyGcAl9unQEtpDuxXoKvP2kbsS7hjvhK0gJgW9llpV4sRJJGApTBc\nWtbcS9DBGs3k1aZdA72bxnayD32syVz7czl4+tkRsbQZ4VgJh1yrHIDsdWQXFnYu\nEQJfCgX5HvvC13MpDUth0NWCFtWQirY3EFbIgSuhB/D5iXA+Dt1Dq5c1u7wQlUVi\nLQCU++oMGrlU3gZrnov5lnBGCEjn0O9bKQm8zmLdEcENFxUZvfPjOIY64YprZxD9\nBv65Ag0EXAZRggEQAMmjHmnvH8SvNJhku/oI96dFKen3bg9xdaFUD1vAuNglCalH\nwgXcCZd0RdobYNG46cXTzTQadtHS4hi/UBJ+oy5ZUpIRglW12eTYtqM2G11VbcQi\nj6rLITP9NIP+G1xBICSYK4UwmH55BolMEQ/1ZX0a9rESM9stDNglheCCudbMGR/1\nZYnufdEsh0yPwyC/1upZeu8LPWK62pt9mE/gccx77QTeDi5OJcRf1fPbUTCm3vSS\nwPPV2AGANodIhostjDymt5vh0tGwc7oUZZLnVdErfuctv7yMgZdiCpYu0jFy1NYf\nJgOpZasrcK7/1ozGzsfAo/sSU4kIkMwuWGgqfx5kGRK2CgU4T0i7oI6DMpOX9ZS8\ns3+oCWu83X0ofvm5R2CbjiUj2gR6JOhBQbJpCeTkLe+SFcUpnyrr7lG8B8QZHm5N\nnBi05V/s63RE3g/6WpR/fWuh+uswe01uqlSx9deW7jT49BL/MdSxwjfwLBLz/hLM\n0ld385XAd9bqMjUtp0XhZX2YORx3f/aKY7PYA62baGibb5RdPRw6viEAWU20eb+8\nX9Pa7hGmwUeal5lka4SD/TGl7wdY+g4oYP+jtKinH/ZftWA5wHTe3jWT5bdWrT2d\ne+0qA0SBkmKIDLpktvtTa19w2nfwBIwJ6fN36ZjYpOn/stxR7aRtnhSqvzxbABEB\nAAGJAjYEGAEIACAWIQS3bWH6ptt1lGboPZlkucaq4tVSeAUCXAZRggIbDAAKCRBk\nucaq4tVSeGWmD/9Pg1x6s98zdZCQa2apmUnuoQAQA9Gf2RBBuglCDGsY67wbvdHZ\n9wdFRs2QEhl2O3oFmidxthBOBRl9z62nXliLwNn1Lcy/yDfaB8wH6gMm4jn2N/z9\nvQXnyIzg8m4PItZ1p5mnY3qH5lpGF8r9Gb7tzK10rqulM2XTDojZOevlEGI6LGw8\nFjccXtNquqGZwxzytmKF3T7UBmpmt2qock8N5iJn987m6WeYmbFNc0ii0guHfdtO\nzQcItz2ngCdyvfgQPwCAoAv72ysSGhz5KZgAXRrEdcqj6Jw3ivoEUKq1aUrYncXQ\n3zC3ED6AjWOGRzjvTZzj22IVacUZ0gqx0x/oldXLOhMB9u6nFXHKj1n9nc0XHMNi\nLp9EuvQgcNLjFZGE9sxh25u9V+OhItfT/aarYEu/Xq0IkUUcdz4GehXth1/Cq1wH\nlSUie4nCs7I7OWhqMNClqP7ywElDXsQ66MCgvf01Dh64YUVjJNnyyK0QiYlCx/JQ\nZ85hNLtVXZfYqC5BRZlVFp8I8Rs2Qos9YEgn2M22+Rj+RIeD74LZFB7Q4myRvTMB\n/P466dFI83KYhwvjBYOP3jPTrV7Ky8poEGifQp2mM294CFIPS7z0z7a8+yMzcsRP\nOluFxewsEO0QNDrfFb+0gnjYlnGqOFcZjUMXbDdY5oLSPtXohynuTK1qyQ==\n=Xn0G\n-----END PGP PUBLIC KEY BLOCK-----\n```\n\n<div class=\"mt-5\" id=\"page_24\"><h1>Testing</h1></div>\nIf you want to test your updates with the current golang testing units, you can follow the guide below to run a full test process. Each test for Statping will run in MySQL, Postgres, and SQlite to make sure all database types work correctly.\n\n## Create Docker Databases\nThe easiest way to run the tests on all 3 databases is by starting temporary databases servers with Docker. Docker is available for Linux, Mac and Windows. You can download/install it by going to the [Docker Installation](https://docs.docker.com/install/) site.\n\n```go\ndocker run -it -d \\\n   -p 3306:3306 \\\n   -env MYSQL_ROOT_PASSWORD=password123 \\\n   -env MYSQL_DATABASE=root mysql\n```\n\n```go\ndocker run -it -d \\\n   -p 5432:5432 \\\n   -env POSTGRES_PASSWORD=password123 \\\n   -env POSTGRES_USER=root \\\n   -env POSTGRES_DB=root postgres\n```\n\nOnce you have MySQL and Postgres running, you can begin the testing. SQLite database will automatically create a `statup.db` file and will delete after testing.\n\n## Run Tests\nInsert the database environment variables to auto connect the the databases and run the normal test command: `go test -v`. You'll see a verbose output of each test. If all tests pass, make a push request! 💃\n```go\nDB_DATABASE=root \\\n   DB_USER=root \\\n   DB_PASS=password123 \\\n   DB_HOST=localhost \\\n   go test -v\n```\n\n<div class=\"mt-5\" id=\"page_25\"><h1>Deployment</h1></div>\nStatping is a pretty cool server for monitoring your services. The way we deploy might be a little cooler though. Statping is using the most bleeding edge technology to release updates and distribute binary files automatically.\n\n1. Source code commits get pushed to Github\n2. [Rice](https://github.com/GeertJohan/go.rice) will compile all the static assets into 1 file (rice-box.go in source)\n3. SASS will generate  a compiled version of the CSS. \n4. Statping Help page is generated by cloning the Wiki repo using `go generate`.\n5. Travis-CI tests the Golang application.\n6. Travis-CI tests the Statping API using [Postman](https://github.com/hunterlong/statping/blob/master/source/tmpl/postman.json).\n7. If all tests are successful, Travis-CI will compile the binaries using [xgo](https://github.com/karalabe/xgo).\n8. Binaries are code signed using the official [PGP key](https://github.com/hunterlong/statping/wiki/PGP-Signature) and compressed.\n9. [Docker](https://cloud.docker.com/repository/docker/hunterlong/statping/builds) receives a trigger to build for the `latest` tag.\n10. Travis-CI uploads the [latest release](https://github.com/hunterlong/statping/releases) as a tagged version on Github.\n11. Travis-CI updates the [homebrew-statping](https://github.com/hunterlong/homebrew-statping) repo with the latest version.\n\nAnd that's it! Statping is ready to be shipped and installed.\n\n")
+```
+CompiledWiki contains all of the Statping Wiki pages from the Github Wiki repo.
 
-## <a name="Assets">func</a> [Assets](https://github.com/hunterlong/statping/tree/master/source/source.go?s=1487:1500#L37)
-``` go
+#### func  Assets
+
+```go
 func Assets()
 ```
 Assets will load the Rice boxes containing the CSS, SCSS, JS, and HTML files.
 
+#### func  CompileSASS
 
-
-## <a name="CompileSASS">func</a> [CompileSASS](https://github.com/hunterlong/statping/tree/master/source/source.go?s=2015:2052#L57)
-``` go
+```go
 func CompileSASS(folder string) error
 ```
 CompileSASS will attempt to compile the SASS files into CSS
 
+#### func  CopyAllToPublic
 
-
-## <a name="CopyAllToPublic">func</a> [CopyAllToPublic](https://github.com/hunterlong/statping/tree/master/source/source.go?s=5779:5835#L167)
-``` go
+```go
 func CopyAllToPublic(box *rice.Box, folder string) error
 ```
 CopyAllToPublic will copy all the files in a rice box into a local folder
 
+#### func  CopyToPublic
 
-
-## <a name="CopyToPublic">func</a> [CopyToPublic](https://github.com/hunterlong/statping/tree/master/source/source.go?s=6377:6436#L189)
-``` go
+```go
 func CopyToPublic(box *rice.Box, folder, file string) error
 ```
 CopyToPublic will create a file from a rice Box to the '/assets' directory
 
+#### func  CreateAllAssets
 
-
-## <a name="CreateAllAssets">func</a> [CreateAllAssets](https://github.com/hunterlong/statping/tree/master/source/source.go?s=4239:4280#L129)
-``` go
+```go
 func CreateAllAssets(folder string) error
 ```
-CreateAllAssets will dump HTML, CSS, SCSS, and JS assets into the '/assets' directory
+CreateAllAssets will dump HTML, CSS, SCSS, and JS assets into the '/assets'
+directory
 
+#### func  DeleteAllAssets
 
-
-## <a name="DeleteAllAssets">func</a> [DeleteAllAssets](https://github.com/hunterlong/statping/tree/master/source/source.go?s=5434:5475#L156)
-``` go
+```go
 func DeleteAllAssets(folder string) error
 ```
 DeleteAllAssets will delete the '/assets' folder
 
+#### func  HelpMarkdown
 
-
-## <a name="HelpMarkdown">func</a> [HelpMarkdown](https://github.com/hunterlong/statping/tree/master/source/source.go?s=1742:1768#L46)
-``` go
+```go
 func HelpMarkdown() string
 ```
 HelpMarkdown will return the Markdown of help.md into HTML
 
+#### func  MakePublicFolder
 
-
-## <a name="MakePublicFolder">func</a> [MakePublicFolder](https://github.com/hunterlong/statping/tree/master/source/source.go?s=6944:6986#L206)
-``` go
+```go
 func MakePublicFolder(folder string) error
 ```
 MakePublicFolder will create a new folder
 
+#### func  OpenAsset
 
-
-## <a name="OpenAsset">func</a> [OpenAsset](https://github.com/hunterlong/statping/tree/master/source/source.go?s=3929:3971#L119)
-``` go
+```go
 func OpenAsset(folder, file string) string
 ```
 OpenAsset returns a file's contents as a string
 
+#### func  SaveAsset
 
-
-#### <a name="example_OpenAsset">Example</a>
-
-Code:
-``` go
-OpenAsset("js", "main.js")
-```
-
-## <a name="SaveAsset">func</a> [SaveAsset](https://github.com/hunterlong/statping/tree/master/source/source.go?s=3556:3610#L108)
-``` go
+```go
 func SaveAsset(data []byte, folder, file string) error
 ```
 SaveAsset will save an asset to the '/assets/' folder.
 
+#### func  UsingAssets
 
-
-#### <a name="example_SaveAsset">Example</a>
-
-Code:
-``` go
-data := []byte("alert('helloooo')")
-SaveAsset(data, "js", "test.js")
-```
-
-## <a name="UsingAssets">func</a> [UsingAssets](https://github.com/hunterlong/statping/tree/master/source/source.go?s=3011:3047#L88)
-``` go
+```go
 func UsingAssets(folder string) bool
 ```
 UsingAssets returns true if the '/assets' folder is found in the directory
-
-
-
-
-
-
-
-
-
-
 # types
-`import "github.com/hunterlong/statping/types"`
+--
+    import "github.com/hunterlong/statping/types"
 
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
+Package types contains all of the structs for objects in Statping including
+services, hits, failures, Core, and others.
 
-## <a name="pkg-overview">Overview</a>
-Package types contains all of the structs for objects in Statping including services, hits, failures, Core, and others.
+More info on: https://github.com/hunterlong/statping
 
-More info on: <a href="https://github.com/hunterlong/statping">https://github.com/hunterlong/statping</a>
+## Usage
 
-
-
-
-## <a name="pkg-index">Index</a>
-* [Constants](#pkg-constants)
-* [Variables](#pkg-variables)
-* [type AllNotifiers](#AllNotifiers)
-* [type Asseter](#Asseter)
-* [type Checkin](#Checkin)
-  * [func (s *Checkin) Close()](#Checkin.Close)
-  * [func (s *Checkin) IsRunning() bool](#Checkin.IsRunning)
-  * [func (s *Checkin) Start()](#Checkin.Start)
-* [type CheckinHit](#CheckinHit)
-* [type Core](#Core)
-* [type Databaser](#Databaser)
-* [type DbConfig](#DbConfig)
-* [type FailSort](#FailSort)
-  * [func (s FailSort) Len() int](#FailSort.Len)
-  * [func (s FailSort) Less(i, j int) bool](#FailSort.Less)
-  * [func (s FailSort) Swap(i, j int)](#FailSort.Swap)
-* [type Failure](#Failure)
-* [type FailureInterface](#FailureInterface)
-* [type Hit](#Hit)
-* [type Info](#Info)
-* [type Message](#Message)
-* [type NullBool](#NullBool)
-  * [func NewNullBool(s bool) NullBool](#NewNullBool)
-  * [func (nb *NullBool) MarshalJSON() ([]byte, error)](#NullBool.MarshalJSON)
-  * [func (nf *NullBool) UnmarshalJSON(b []byte) error](#NullBool.UnmarshalJSON)
-* [type NullFloat64](#NullFloat64)
-  * [func NewNullFloat64(s float64) NullFloat64](#NewNullFloat64)
-  * [func (ni *NullFloat64) MarshalJSON() ([]byte, error)](#NullFloat64.MarshalJSON)
-  * [func (nf *NullFloat64) UnmarshalJSON(b []byte) error](#NullFloat64.UnmarshalJSON)
-* [type NullInt64](#NullInt64)
-  * [func NewNullInt64(s int64) NullInt64](#NewNullInt64)
-  * [func (ni *NullInt64) MarshalJSON() ([]byte, error)](#NullInt64.MarshalJSON)
-  * [func (nf *NullInt64) UnmarshalJSON(b []byte) error](#NullInt64.UnmarshalJSON)
-* [type NullString](#NullString)
-  * [func NewNullString(s string) NullString](#NewNullString)
-  * [func (ns *NullString) MarshalJSON() ([]byte, error)](#NullString.MarshalJSON)
-  * [func (nf *NullString) UnmarshalJSON(b []byte) error](#NullString.UnmarshalJSON)
-* [type Plugin](#Plugin)
-* [type PluginActions](#PluginActions)
-* [type PluginInfo](#PluginInfo)
-* [type PluginJSON](#PluginJSON)
-* [type PluginObject](#PluginObject)
-* [type PluginRepos](#PluginRepos)
-* [type PluginRoute](#PluginRoute)
-* [type PluginRouting](#PluginRouting)
-* [type Pluginer](#Pluginer)
-* [type Router](#Router)
-* [type Service](#Service)
-  * [func (s *Service) Close()](#Service.Close)
-  * [func (s *Service) IsRunning() bool](#Service.IsRunning)
-  * [func (s *Service) Start()](#Service.Start)
-* [type ServiceInterface](#ServiceInterface)
-* [type User](#User)
-* [type UserInterface](#UserInterface)
-
-
-#### <a name="pkg-files">Package files</a>
-[checkin.go](https://github.com/hunterlong/statping/tree/master/types/checkin.go) [core.go](https://github.com/hunterlong/statping/tree/master/types/core.go) [doc.go](https://github.com/hunterlong/statping/tree/master/types/doc.go) [failure.go](https://github.com/hunterlong/statping/tree/master/types/failure.go) [message.go](https://github.com/hunterlong/statping/tree/master/types/message.go) [null.go](https://github.com/hunterlong/statping/tree/master/types/null.go) [plugin.go](https://github.com/hunterlong/statping/tree/master/types/plugin.go) [service.go](https://github.com/hunterlong/statping/tree/master/types/service.go) [time.go](https://github.com/hunterlong/statping/tree/master/types/time.go) [types.go](https://github.com/hunterlong/statping/tree/master/types/types.go) [user.go](https://github.com/hunterlong/statping/tree/master/types/user.go) 
-
-
-## <a name="pkg-constants">Constants</a>
-``` go
+```go
 const (
-    TIME_NANO     = "2006-01-02T15:04:05Z"
-    TIME          = "2006-01-02 15:04:05"
-    POSTGRES_TIME = "2006-01-02 15:04"
-    CHART_TIME    = "2006-01-02T15:04:05.999999-07:00"
-    TIME_DAY      = "2006-01-02"
+	TIME_NANO     = "2006-01-02T15:04:05Z"
+	TIME          = "2006-01-02 15:04:05"
+	POSTGRES_TIME = "2006-01-02 15:04"
+	CHART_TIME    = "2006-01-02T15:04:05.999999-07:00"
+	TIME_DAY      = "2006-01-02"
 )
 ```
 
-## <a name="pkg-variables">Variables</a>
-``` go
+```go
 var (
-    NOW = func() time.Time { return time.Now() }()
+	NOW = func() time.Time { return time.Now() }()
 )
 ```
 
+#### type AllNotifiers
 
-
-## <a name="AllNotifiers">type</a> [AllNotifiers](https://github.com/hunterlong/statping/tree/master/types/core.go?s=761:790#L23)
-``` go
+```go
 type AllNotifiers interface{}
 ```
+
 AllNotifiers contains all the Notifiers loaded
 
+#### type Asseter
 
-
-
-
-
-
-
-
-
-## <a name="Asseter">type</a> [Asseter](https://github.com/hunterlong/statping/tree/master/types/plugin.go?s=966:1023#L64)
-``` go
+```go
 type Asseter interface {
-    Asset(string) ([]byte, error)
+	Asset(string) ([]byte, error)
 }
 ```
 
 
+#### type Checkin
 
-
-
-
-
-
-
-## <a name="Checkin">type</a> [Checkin](https://github.com/hunterlong/statping/tree/master/types/checkin.go?s=815:1548#L23)
-``` go
+```go
 type Checkin struct {
-    Id          int64         `gorm:"primary_key;column:id" json:"id"`
-    ServiceId   int64         `gorm:"index;column:service" json:"service_id"`
-    Name        string        `gorm:"column:name"  json:"name"`
-    Interval    int64         `gorm:"column:check_interval" json:"interval"`
-    GracePeriod int64         `gorm:"column:grace_period"  json:"grace"`
-    ApiKey      string        `gorm:"column:api_key"  json:"api_key"`
-    CreatedAt   time.Time     `gorm:"column:created_at" json:"created_at"`
-    UpdatedAt   time.Time     `gorm:"column:updated_at" json:"updated_at"`
-    Running     chan bool     `gorm:"-" json:"-"`
-    Hits        []*CheckinHit `gorm:"-" json:"hits"`
-    Failures    []*Failure    `gorm:"-" json:"failures"`
+	Id          int64              `gorm:"primary_key;column:id" json:"id"`
+	ServiceId   int64              `gorm:"index;column:service" json:"service_id"`
+	Name        string             `gorm:"column:name" json:"name"`
+	Interval    int64              `gorm:"column:check_interval" json:"interval"`
+	GracePeriod int64              `gorm:"column:grace_period"  json:"grace"`
+	ApiKey      string             `gorm:"column:api_key"  json:"api_key"`
+	CreatedAt   time.Time          `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt   time.Time          `gorm:"column:updated_at" json:"updated_at"`
+	Running     chan bool          `gorm:"-" json:"-"`
+	Failing     bool               `gorm:"-" json:"failing"`
+	LastHit     time.Time          `gorm:"-" json:"last_hit"`
+	Hits        []*CheckinHit      `gorm:"-" json:"hits"`
+	Failures    []FailureInterface `gorm:"-" json:"failures"`
 }
-
 ```
-Checkin struct will allow an application to send a recurring HTTP GET to confirm a service is online
 
+Checkin struct will allow an application to send a recurring HTTP GET to confirm
+a service is online
 
+#### func (*Checkin) BeforeCreate
 
+```go
+func (c *Checkin) BeforeCreate() (err error)
+```
+BeforeCreate for Checkin will set CreatedAt to UTC
 
+#### func (*Checkin) Close
 
-
-
-
-
-
-### <a name="Checkin.Close">func</a> (\*Checkin) [Close](https://github.com/hunterlong/statping/tree/master/types/checkin.go?s=2055:2080#L51)
-``` go
+```go
 func (s *Checkin) Close()
 ```
 Close will stop the checkin routine
 
+#### func (*Checkin) IsRunning
 
-
-
-### <a name="Checkin.IsRunning">func</a> (\*Checkin) [IsRunning](https://github.com/hunterlong/statping/tree/master/types/checkin.go?s=2191:2225#L58)
-``` go
+```go
 func (s *Checkin) IsRunning() bool
 ```
 IsRunning returns true if the checkin go routine is running
 
+#### func (*Checkin) Start
 
-
-
-### <a name="Checkin.Start">func</a> (\*Checkin) [Start](https://github.com/hunterlong/statping/tree/master/types/checkin.go?s=1956:1981#L46)
-``` go
+```go
 func (s *Checkin) Start()
 ```
 Start will create a channel for the checkin checking go routine
 
+#### type CheckinHit
 
-
-
-## <a name="CheckinHit">type</a> [CheckinHit](https://github.com/hunterlong/statping/tree/master/types/checkin.go?s=1604:1887#L38)
-``` go
+```go
 type CheckinHit struct {
-    Id        int64     `gorm:"primary_key;column:id" json:"id"`
-    Checkin   int64     `gorm:"index;column:checkin" json:"checkin"`
-    From      string    `gorm:"column:from_location" json:"from"`
-    CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
+	Id        int64     `gorm:"primary_key;column:id" json:"id"`
+	Checkin   int64     `gorm:"index;column:checkin" json:"-"`
+	From      string    `gorm:"column:from_location" json:"from"`
+	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 }
-
 ```
+
 CheckinHit is a successful response from a Checkin
 
+#### func (*CheckinHit) BeforeCreate
+
+```go
+func (c *CheckinHit) BeforeCreate() (err error)
+```
+BeforeCreate for checkinHit will set CreatedAt to UTC
+
+#### type CheckinInterface
+
+```go
+type CheckinInterface interface {
+	Select() *Checkin
+}
+```
 
 
+#### type Core
 
-
-
-
-
-
-
-## <a name="Core">type</a> [Core](https://github.com/hunterlong/statping/tree/master/types/core.go?s=1046:2599#L28)
-``` go
+```go
 type Core struct {
-    Name          string             `gorm:"not null;column:name" json:"name"`
-    Description   string             `gorm:"not null;column:description" json:"description,omitempty"`
-    Config        string             `gorm:"column:config" json:"-"`
-    ApiKey        string             `gorm:"column:api_key" json:"-"`
-    ApiSecret     string             `gorm:"column:api_secret" json:"-"`
-    Style         string             `gorm:"not null;column:style" json:"style,omitempty"`
-    Footer        NullString         `gorm:"column:footer" json:"footer"`
-    Domain        string             `gorm:"not null;column:domain" json:"domain"`
-    Version       string             `gorm:"column:version" json:"version"`
-    MigrationId   int64              `gorm:"column:migration_id" json:"migration_id,omitempty"`
-    UseCdn        NullBool           `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`
-    Timezone      float32            `gorm:"column:timezone;default:-8.0" json:"timezone,omitempty"`
-    CreatedAt     time.Time          `gorm:"column:created_at" json:"created_at"`
-    UpdatedAt     time.Time          `gorm:"column:updated_at" json:"updated_at"`
-    DbConnection  string             `gorm:"-" json:"database"`
-    Started       time.Time          `gorm:"-" json:"started_on"`
-    Services      []ServiceInterface `gorm:"-" json:"-"`
-    Plugins       []*Info            `gorm:"-" json:"-"`
-    Repos         []PluginJSON       `gorm:"-" json:"-"`
-    AllPlugins    []PluginActions    `gorm:"-" json:"-"`
-    Notifications []AllNotifiers     `gorm:"-" json:"-"`
+	Name          string             `gorm:"not null;column:name" json:"name"`
+	Description   string             `gorm:"not null;column:description" json:"description,omitempty"`
+	Config        string             `gorm:"column:config" json:"-"`
+	ApiKey        string             `gorm:"column:api_key" json:"-"`
+	ApiSecret     string             `gorm:"column:api_secret" json:"-"`
+	Style         string             `gorm:"not null;column:style" json:"style,omitempty"`
+	Footer        NullString         `gorm:"column:footer" json:"footer"`
+	Domain        string             `gorm:"not null;column:domain" json:"domain"`
+	Version       string             `gorm:"column:version" json:"version"`
+	MigrationId   int64              `gorm:"column:migration_id" json:"migration_id,omitempty"`
+	UseCdn        NullBool           `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`
+	Timezone      float32            `gorm:"column:timezone;default:-8.0" json:"timezone,omitempty"`
+	CreatedAt     time.Time          `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt     time.Time          `gorm:"column:updated_at" json:"updated_at"`
+	DbConnection  string             `gorm:"-" json:"database"`
+	Started       time.Time          `gorm:"-" json:"started_on"`
+	Services      []ServiceInterface `gorm:"-" json:"-"`
+	Plugins       []*Info            `gorm:"-" json:"-"`
+	Repos         []PluginJSON       `gorm:"-" json:"-"`
+	AllPlugins    []PluginActions    `gorm:"-" json:"-"`
+	Notifications []AllNotifiers     `gorm:"-" json:"-"`
 }
-
 ```
-Core struct contains all the required fields for Statping. All application settings
-will be saved into 1 row in the 'core' table. You can use the core.CoreApp
-global variable to interact with the attributes to the application, such as services.
 
+Core struct contains all the required fields for Statping. All application
+settings will be saved into 1 row in the 'core' table. You can use the
+core.CoreApp global variable to interact with the attributes to the application,
+such as services.
 
+#### type Databaser
 
-
-
-
-
-
-
-
-## <a name="Databaser">type</a> [Databaser](https://github.com/hunterlong/statping/tree/master/types/plugin.go?s=806:862#L55)
-``` go
+```go
 type Databaser interface {
-    StatpingDatabase(*gorm.DB)
+	StatpingDatabase(*gorm.DB)
 }
 ```
 
 
+#### type DbConfig
 
-
-
-
-
-
-
-## <a name="DbConfig">type</a> [DbConfig](https://github.com/hunterlong/statping/tree/master/types/types.go?s=1132:1737#L32)
-``` go
+```go
 type DbConfig struct {
-    DbConn      string `yaml:"connection"`
-    DbHost      string `yaml:"host"`
-    DbUser      string `yaml:"user"`
-    DbPass      string `yaml:"password"`
-    DbData      string `yaml:"database"`
-    DbPort      int64  `yaml:"port"`
-    ApiKey      string `yaml:"api_key"`
-    ApiSecret   string `yaml:"api_secret"`
-    Project     string `yaml:"-"`
-    Description string `yaml:"-"`
-    Domain      string `yaml:"-"`
-    Username    string `yaml:"-"`
-    Password    string `yaml:"-"`
-    Email       string `yaml:"-"`
-    Error       error  `yaml:"-"`
-    Location    string `yaml:"location"`
-    LocalIP     string `yaml:"-"`
+	DbConn      string `yaml:"connection"`
+	DbHost      string `yaml:"host"`
+	DbUser      string `yaml:"user"`
+	DbPass      string `yaml:"password"`
+	DbData      string `yaml:"database"`
+	DbPort      int64  `yaml:"port"`
+	ApiKey      string `yaml:"api_key"`
+	ApiSecret   string `yaml:"api_secret"`
+	Project     string `yaml:"-"`
+	Description string `yaml:"-"`
+	Domain      string `yaml:"-"`
+	Username    string `yaml:"-"`
+	Password    string `yaml:"-"`
+	Email       string `yaml:"-"`
+	Error       error  `yaml:"-"`
+	Location    string `yaml:"location"`
+	LocalIP     string `yaml:"-"`
 }
-
 ```
-DbConfig struct is used for the database connection and creates the 'config.yml' file
 
+DbConfig struct is used for the database connection and creates the 'config.yml'
+file
 
+#### type FailSort
 
-
-
-
-
-
-
-
-## <a name="FailSort">type</a> [FailSort](https://github.com/hunterlong/statping/tree/master/types/failure.go?s=1544:1576#L40)
-``` go
+```go
 type FailSort []FailureInterface
 ```
 
 
+#### func (FailSort) Len
 
-
-
-
-
-
-
-### <a name="FailSort.Len">func</a> (FailSort) [Len](https://github.com/hunterlong/statping/tree/master/types/failure.go?s=1578:1605#L42)
-``` go
+```go
 func (s FailSort) Len() int
 ```
 
+#### func (FailSort) Less
 
-
-### <a name="FailSort.Less">func</a> (FailSort) [Less](https://github.com/hunterlong/statping/tree/master/types/failure.go?s=1687:1724#L48)
-``` go
+```go
 func (s FailSort) Less(i, j int) bool
 ```
 
+#### func (FailSort) Swap
 
-
-### <a name="FailSort.Swap">func</a> (FailSort) [Swap](https://github.com/hunterlong/statping/tree/master/types/failure.go?s=1625:1657#L45)
-``` go
+```go
 func (s FailSort) Swap(i, j int)
 ```
 
+#### type Failure
 
-
-## <a name="Failure">type</a> [Failure](https://github.com/hunterlong/statping/tree/master/types/failure.go?s=866:1335#L24)
-``` go
+```go
 type Failure struct {
-    Id        int64     `gorm:"primary_key;column:id" json:"id"`
-    Issue     string    `gorm:"column:issue" json:"issue"`
-    Method    string    `gorm:"column:method" json:"method,omitempty"`
-    MethodId  int64     `gorm:"column:method_id" json:"method_id,omitempty"`
-    Service   int64     `gorm:"index;column:service" json:"-"`
-    PingTime  float64   `gorm:"column:ping_time"  json:"ping"`
-    CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
+	Id        int64     `gorm:"primary_key;column:id" json:"id"`
+	Issue     string    `gorm:"column:issue" json:"issue"`
+	Method    string    `gorm:"column:method" json:"method,omitempty"`
+	MethodId  int64     `gorm:"column:method_id" json:"method_id,omitempty"`
+	ErrorCode int       `gorm:"column:error_code" json:"error_code"`
+	Service   int64     `gorm:"index;column:service" json:"-"`
+	Checkin   int64     `gorm:"index;column:checkin" json:"-"`
+	PingTime  float64   `gorm:"column:ping_time"  json:"ping"`
+	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 }
-
 ```
-Failure is a failed attempt to check a service. Any a service does not meet the expected requirements,
-a new Failure will be inserted into database.
 
+Failure is a failed attempt to check a service. Any a service does not meet the
+expected requirements, a new Failure will be inserted into database.
 
+#### func (*Failure) BeforeCreate
 
+```go
+func (f *Failure) BeforeCreate() (err error)
+```
+BeforeCreate for Failure will set CreatedAt to UTC
 
+#### type FailureInterface
 
-
-
-
-
-
-## <a name="FailureInterface">type</a> [FailureInterface](https://github.com/hunterlong/statping/tree/master/types/failure.go?s=1337:1542#L34)
-``` go
+```go
 type FailureInterface interface {
-    Select() *Failure
-    Ago() string        // Ago returns a human readable timestamp
-    ParseError() string // ParseError returns a human readable error for a service failure
+	Select() *Failure
+	Ago() string        // Ago returns a human readable timestamp
+	ParseError() string // ParseError returns a human readable error for a service failure
 }
 ```
 
 
+#### type Group
 
+```go
+type Group struct {
+	Id        int64     `gorm:"primary_key;column:id" json:"id"`
+	Name      string    `gorm:"column:name" json:"name"`
+	Public    NullBool  `gorm:"default:true;column:public" json:"public"`
+	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at" json:"updated_at"`
+}
+```
 
+Group is the main struct for Groups
 
+#### type Hit
 
-
-
-
-## <a name="Hit">type</a> [Hit](https://github.com/hunterlong/statping/tree/master/types/types.go?s=785:1041#L23)
-``` go
+```go
 type Hit struct {
-    Id        int64     `gorm:"primary_key;column:id"`
-    Service   int64     `gorm:"column:service"`
-    Latency   float64   `gorm:"column:latency"`
-    PingTime  float64   `gorm:"column:ping_time"`
-    CreatedAt time.Time `gorm:"column:created_at"`
+	Id        int64     `gorm:"primary_key;column:id" json:"id"`
+	Service   int64     `gorm:"column:service" json:"-"`
+	Latency   float64   `gorm:"column:latency" json:"latency"`
+	PingTime  float64   `gorm:"column:ping_time" json:"ping_time"`
+	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 }
-
 ```
+
 Hit struct is a 'successful' ping or web response entry for a service.
 
+#### func (*Hit) BeforeCreate
 
+```go
+func (h *Hit) BeforeCreate() (err error)
+```
+BeforeCreate for Hit will set CreatedAt to UTC
 
+#### type Info
 
-
-
-
-
-
-
-## <a name="Info">type</a> [Info](https://github.com/hunterlong/statping/tree/master/types/plugin.go?s=499:579#L34)
-``` go
+```go
 type Info struct {
-    Name        string
-    Description string
-    Form        string
+	Name        string
+	Description string
+	Form        string
 }
-
 ```
 
 
+#### type Message
 
-
-
-
-
-
-
-## <a name="Message">type</a> [Message](https://github.com/hunterlong/statping/tree/master/types/message.go?s=797:1754#L23)
-``` go
+```go
 type Message struct {
-    Id                int64     `gorm:"primary_key;column:id" json:"id"`
-    Title             string    `gorm:"column:title" json:"title"`
-    Description       string    `gorm:"column:description" json:"description"`
-    StartOn           time.Time `gorm:"column:start_on" json:"start_on"`
-    EndOn             time.Time `gorm:"column:end_on" json:"end_on"`
-    ServiceId         int64     `gorm:"index;column:service" json:"service"`
-    NotifyUsers       NullBool  `gorm:"column:notify_users" json:"notify_users"`
-    NotifyMethod      string    `gorm:"column:notify_method" json:"notify_method"`
-    NotifyBefore      NullInt64 `gorm:"column:notify_before" json:"notify_before"`
-    NotifyBeforeScale string    `gorm:"column:notify_before_scale" json:"notify_before_scale"`
-    CreatedAt         time.Time `gorm:"column:created_at" json:"created_at" json:"created_at"`
-    UpdatedAt         time.Time `gorm:"column:updated_at" json:"updated_at" json:"updated_at"`
+	Id                int64     `gorm:"primary_key;column:id" json:"id"`
+	Title             string    `gorm:"column:title" json:"title"`
+	Description       string    `gorm:"column:description" json:"description"`
+	StartOn           time.Time `gorm:"column:start_on" json:"start_on"`
+	EndOn             time.Time `gorm:"column:end_on" json:"end_on"`
+	ServiceId         int64     `gorm:"index;column:service" json:"service"`
+	NotifyUsers       NullBool  `gorm:"column:notify_users" json:"notify_users"`
+	NotifyMethod      string    `gorm:"column:notify_method" json:"notify_method"`
+	NotifyBefore      NullInt64 `gorm:"column:notify_before" json:"notify_before"`
+	NotifyBeforeScale string    `gorm:"column:notify_before_scale" json:"notify_before_scale"`
+	CreatedAt         time.Time `gorm:"column:created_at" json:"created_at" json:"created_at"`
+	UpdatedAt         time.Time `gorm:"column:updated_at" json:"updated_at" json:"updated_at"`
 }
-
 ```
-Message is for creating Announcements, Alerts and other messages for the end users
 
+Message is for creating Announcements, Alerts and other messages for the end
+users
 
+#### func (*Message) BeforeCreate
 
+```go
+func (u *Message) BeforeCreate() (err error)
+```
+BeforeCreate for Message will set CreatedAt to UTC
 
+#### type NullBool
 
-
-
-
-
-
-## <a name="NullBool">type</a> [NullBool](https://github.com/hunterlong/statping/tree/master/types/null.go?s=1460:1498#L49)
-``` go
+```go
 type NullBool struct {
-    sql.NullBool
+	sql.NullBool
 }
-
 ```
+
 NullBool is an alias for sql.NullBool data type
 
+#### func  NewNullBool
 
-
-
-
-
-
-### <a name="NewNullBool">func</a> [NewNullBool](https://github.com/hunterlong/statping/tree/master/types/null.go?s=939:972#L29)
-``` go
+```go
 func NewNullBool(s bool) NullBool
 ```
 NewNullBool returns a sql.NullBool for JSON parsing
 
+#### func (*NullBool) MarshalJSON
 
-
-
-
-### <a name="NullBool.MarshalJSON">func</a> (\*NullBool) [MarshalJSON](https://github.com/hunterlong/statping/tree/master/types/null.go?s=2064:2113#L80)
-``` go
+```go
 func (nb *NullBool) MarshalJSON() ([]byte, error)
 ```
 MarshalJSON for NullBool
 
+#### func (*NullBool) UnmarshalJSON
 
-
-
-### <a name="NullBool.UnmarshalJSON">func</a> (\*NullBool) [UnmarshalJSON](https://github.com/hunterlong/statping/tree/master/types/null.go?s=2716:2765#L110)
-``` go
+```go
 func (nf *NullBool) UnmarshalJSON(b []byte) error
 ```
 Unmarshaler for NullBool
 
+#### type NullFloat64
 
-
-
-## <a name="NullFloat64">type</a> [NullFloat64](https://github.com/hunterlong/statping/tree/master/types/null.go?s=1656:1700#L59)
-``` go
+```go
 type NullFloat64 struct {
-    sql.NullFloat64
+	sql.NullFloat64
 }
-
 ```
+
 NullFloat64 is an alias for sql.NullFloat64 data type
 
+#### func  NewNullFloat64
 
-
-
-
-
-
-### <a name="NewNullFloat64">func</a> [NewNullFloat64](https://github.com/hunterlong/statping/tree/master/types/null.go?s=1220:1262#L39)
-``` go
+```go
 func NewNullFloat64(s float64) NullFloat64
 ```
 NewNullFloat64 returns a sql.NullFloat64 for JSON parsing
 
+#### func (*NullFloat64) MarshalJSON
 
-
-
-
-### <a name="NullFloat64.MarshalJSON">func</a> (\*NullFloat64) [MarshalJSON](https://github.com/hunterlong/statping/tree/master/types/null.go?s=1897:1949#L72)
-``` go
+```go
 func (ni *NullFloat64) MarshalJSON() ([]byte, error)
 ```
 MarshalJSON for NullFloat64
 
+#### func (*NullFloat64) UnmarshalJSON
 
-
-
-### <a name="NullFloat64.UnmarshalJSON">func</a> (\*NullFloat64) [UnmarshalJSON](https://github.com/hunterlong/statping/tree/master/types/null.go?s=2554:2606#L103)
-``` go
+```go
 func (nf *NullFloat64) UnmarshalJSON(b []byte) error
 ```
 Unmarshaler for NullFloat64
 
+#### type NullInt64
 
-
-
-## <a name="NullInt64">type</a> [NullInt64](https://github.com/hunterlong/statping/tree/master/types/null.go?s=1367:1407#L44)
-``` go
+```go
 type NullInt64 struct {
-    sql.NullInt64
+	sql.NullInt64
 }
-
 ```
+
 NullInt64 is an alias for sql.NullInt64 data type
 
+#### func  NewNullInt64
 
-
-
-
-
-
-### <a name="NewNullInt64">func</a> [NewNullInt64](https://github.com/hunterlong/statping/tree/master/types/null.go?s=1075:1111#L34)
-``` go
+```go
 func NewNullInt64(s int64) NullInt64
 ```
 NewNullInt64 returns a sql.NullInt64 for JSON parsing
 
+#### func (*NullInt64) MarshalJSON
 
-
-
-
-### <a name="NullInt64.MarshalJSON">func</a> (\*NullInt64) [MarshalJSON](https://github.com/hunterlong/statping/tree/master/types/null.go?s=1731:1781#L64)
-``` go
+```go
 func (ni *NullInt64) MarshalJSON() ([]byte, error)
 ```
 MarshalJSON for NullInt64
 
+#### func (*NullInt64) UnmarshalJSON
 
-
-
-### <a name="NullInt64.UnmarshalJSON">func</a> (\*NullInt64) [UnmarshalJSON](https://github.com/hunterlong/statping/tree/master/types/null.go?s=2393:2443#L96)
-``` go
+```go
 func (nf *NullInt64) UnmarshalJSON(b []byte) error
 ```
 Unmarshaler for NullInt64
 
+#### type NullString
 
-
-
-## <a name="NullString">type</a> [NullString](https://github.com/hunterlong/statping/tree/master/types/null.go?s=1555:1597#L54)
-``` go
+```go
 type NullString struct {
-    sql.NullString
+	sql.NullString
 }
-
 ```
+
 NullString is an alias for sql.NullString data type
 
+#### func  NewNullString
 
-
-
-
-
-
-### <a name="NewNullString">func</a> [NewNullString](https://github.com/hunterlong/statping/tree/master/types/null.go?s=795:834#L24)
-``` go
+```go
 func NewNullString(s string) NullString
 ```
 NewNullString returns a sql.NullString for JSON parsing
 
+#### func (*NullString) MarshalJSON
 
-
-
-
-### <a name="NullString.MarshalJSON">func</a> (\*NullString) [MarshalJSON](https://github.com/hunterlong/statping/tree/master/types/null.go?s=2227:2278#L88)
-``` go
+```go
 func (ns *NullString) MarshalJSON() ([]byte, error)
 ```
 MarshalJSON for NullString
 
+#### func (*NullString) UnmarshalJSON
 
-
-
-### <a name="NullString.UnmarshalJSON">func</a> (\*NullString) [UnmarshalJSON](https://github.com/hunterlong/statping/tree/master/types/null.go?s=2874:2925#L117)
-``` go
+```go
 func (nf *NullString) UnmarshalJSON(b []byte) error
 ```
 Unmarshaler for NullString
 
+#### type Plugin
 
-
-
-## <a name="Plugin">type</a> [Plugin](https://github.com/hunterlong/statping/tree/master/types/plugin.go?s=65:127#L8)
-``` go
+```go
 type Plugin struct {
-    Name        string
-    Description string
+	Name        string
+	Description string
 }
-
 ```
 
 
+#### type PluginActions
 
-
-
-
-
-
-
-## <a name="PluginActions">type</a> [PluginActions](https://github.com/hunterlong/statping/tree/master/types/plugin.go?s=169:234#L17)
-``` go
+```go
 type PluginActions interface {
-    GetInfo() *Info
-    OnLoad() error
+	GetInfo() *Info
+	OnLoad() error
 }
 ```
 
 
+#### type PluginInfo
 
-
-
-
-
-
-
-## <a name="PluginInfo">type</a> [PluginInfo](https://github.com/hunterlong/statping/tree/master/types/plugin.go?s=581:644#L40)
-``` go
+```go
 type PluginInfo struct {
-    Info   *Info
-    Routes []*PluginRoute
+	Info   *Info
+	Routes []*PluginRoute
 }
-
 ```
 
 
+#### type PluginJSON
 
-
-
-
-
-
-
-## <a name="PluginJSON">type</a> [PluginJSON](https://github.com/hunterlong/statping/tree/master/types/plugin.go?s=287:497#L26)
-``` go
+```go
 type PluginJSON struct {
-    Name        string `json:"name"`
-    Description string `json:"description"`
-    Repo        string `json:"repo"`
-    Author      string `json:"author"`
-    Namespace   string `json:"namespace"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Repo        string `json:"repo"`
+	Author      string `json:"author"`
+	Namespace   string `json:"namespace"`
 }
-
 ```
 
 
+#### type PluginObject
 
-
-
-
-
-
-
-## <a name="PluginObject">type</a> [PluginObject](https://github.com/hunterlong/statping/tree/master/types/plugin.go?s=129:167#L13)
-``` go
+```go
 type PluginObject struct {
-    Pluginer
+	Pluginer
 }
-
 ```
 
 
+#### type PluginRepos
 
-
-
-
-
-
-
-## <a name="PluginRepos">type</a> [PluginRepos](https://github.com/hunterlong/statping/tree/master/types/plugin.go?s=236:285#L22)
-``` go
+```go
 type PluginRepos struct {
-    Plugins []PluginJSON
+	Plugins []PluginJSON
 }
-
 ```
 
 
+#### type PluginRoute
 
-
-
-
-
-
-
-## <a name="PluginRoute">type</a> [PluginRoute](https://github.com/hunterlong/statping/tree/master/types/plugin.go?s=1025:1107#L68)
-``` go
+```go
 type PluginRoute struct {
-    Url    string
-    Method string
-    Func   http.HandlerFunc
+	Url    string
+	Method string
+	Func   http.HandlerFunc
 }
-
 ```
 
 
+#### type PluginRouting
 
-
-
-
-
-
-
-## <a name="PluginRouting">type</a> [PluginRouting](https://github.com/hunterlong/statping/tree/master/types/plugin.go?s=646:757#L45)
-``` go
+```go
 type PluginRouting struct {
-    URL     string
-    Method  string
-    Handler func(http.ResponseWriter, *http.Request)
+	URL     string
+	Method  string
+	Handler func(http.ResponseWriter, *http.Request)
 }
-
 ```
 
 
+#### type Pluginer
 
-
-
-
-
-
-
-## <a name="Pluginer">type</a> [Pluginer](https://github.com/hunterlong/statping/tree/master/types/plugin.go?s=759:804#L51)
-``` go
+```go
 type Pluginer interface {
-    Select() *Plugin
+	Select() *Plugin
 }
 ```
 
 
+#### type Router
 
-
-
-
-
-
-
-## <a name="Router">type</a> [Router](https://github.com/hunterlong/statping/tree/master/types/plugin.go?s=864:964#L59)
-``` go
+```go
 type Router interface {
-    Routes() []*PluginRoute
-    AddRoute(string, string, http.HandlerFunc) error
+	Routes() []*PluginRoute
+	AddRoute(string, string, http.HandlerFunc) error
 }
 ```
 
 
+#### type Service
 
-
-
-
-
-
-
-## <a name="Service">type</a> [Service](https://github.com/hunterlong/statping/tree/master/types/service.go?s=754:2863#L23)
-``` go
+```go
 type Service struct {
-    Id                 int64              `gorm:"primary_key;column:id" json:"id"`
-    Name               string             `gorm:"column:name" json:"name"`
-    Domain             string             `gorm:"column:domain" json:"domain"`
-    Expected           NullString         `gorm:"column:expected" json:"expected"`
-    ExpectedStatus     int                `gorm:"default:200;column:expected_status" json:"expected_status"`
-    Interval           int                `gorm:"default:30;column:check_interval" json:"check_interval"`
-    Type               string             `gorm:"column:check_type" json:"type"`
-    Method             string             `gorm:"column:method" json:"method"`
-    PostData           NullString         `gorm:"column:post_data" json:"post_data"`
-    Port               int                `gorm:"not null;column:port" json:"port"`
-    Timeout            int                `gorm:"default:30;column:timeout" json:"timeout"`
-    Order              int                `gorm:"default:0;column:order_id" json:"order_id"`
-    AllowNotifications NullBool           `gorm:"default:false;column:allow_notifications" json:"allow_notifications"`
-    CreatedAt          time.Time          `gorm:"column:created_at" json:"created_at"`
-    UpdatedAt          time.Time          `gorm:"column:updated_at" json:"updated_at"`
-    Online             bool               `gorm:"-" json:"online"`
-    Latency            float64            `gorm:"-" json:"latency"`
-    PingTime           float64            `gorm:"-" json:"ping_time"`
-    Online24Hours      float32            `gorm:"-" json:"online_24_hours"`
-    AvgResponse        string             `gorm:"-" json:"avg_response"`
-    Running            chan bool          `gorm:"-" json:"-"`
-    Checkpoint         time.Time          `gorm:"-" json:"-"`
-    SleepDuration      time.Duration      `gorm:"-" json:"-"`
-    LastResponse       string             `gorm:"-" json:"-"`
-    LastStatusCode     int                `gorm:"-" json:"status_code"`
-    LastOnline         time.Time          `gorm:"-" json:"last_online"`
-    Failures           []FailureInterface `gorm:"-" json:"failures,omitempty"`
+	Id                 int64              `gorm:"primary_key;column:id" json:"id"`
+	Name               string             `gorm:"column:name" json:"name"`
+	Domain             string             `gorm:"column:domain" json:"domain"`
+	Expected           NullString         `gorm:"column:expected" json:"expected"`
+	ExpectedStatus     int                `gorm:"default:200;column:expected_status" json:"expected_status"`
+	Interval           int                `gorm:"default:30;column:check_interval" json:"check_interval"`
+	Type               string             `gorm:"column:check_type" json:"type"`
+	Method             string             `gorm:"column:method" json:"method"`
+	PostData           NullString         `gorm:"column:post_data" json:"post_data"`
+	Port               int                `gorm:"not null;column:port" json:"port"`
+	Timeout            int                `gorm:"default:30;column:timeout" json:"timeout"`
+	Order              int                `gorm:"default:0;column:order_id" json:"order_id"`
+	AllowNotifications NullBool           `gorm:"default:true;column:allow_notifications" json:"allow_notifications"`
+	Public             NullBool           `gorm:"default:true;column:public" json:"public"`
+	GroupId            int                `gorm:"default:0;column:group_id" json:"group_id"`
+	Permalink          NullString         `gorm:"column:permalink" json:"permalink"`
+	CreatedAt          time.Time          `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt          time.Time          `gorm:"column:updated_at" json:"updated_at"`
+	Online             bool               `gorm:"-" json:"online"`
+	Latency            float64            `gorm:"-" json:"latency"`
+	PingTime           float64            `gorm:"-" json:"ping_time"`
+	Online24Hours      float32            `gorm:"-" json:"online_24_hours"`
+	AvgResponse        string             `gorm:"-" json:"avg_response"`
+	Running            chan bool          `gorm:"-" json:"-"`
+	Checkpoint         time.Time          `gorm:"-" json:"-"`
+	SleepDuration      time.Duration      `gorm:"-" json:"-"`
+	LastResponse       string             `gorm:"-" json:"-"`
+	LastStatusCode     int                `gorm:"-" json:"status_code"`
+	LastOnline         time.Time          `gorm:"-" json:"last_success"`
+	Failures           []FailureInterface `gorm:"-" json:"failures,omitempty"`
+	Checkins           []CheckinInterface `gorm:"-" json:"checkins,omitempty"`
 }
-
 ```
+
 Service is the main struct for Services
 
+#### func (*Service) BeforeCreate
 
+```go
+func (s *Service) BeforeCreate() (err error)
+```
+BeforeCreate for Service will set CreatedAt to UTC
 
+#### func (*Service) Close
 
-
-
-
-
-
-
-### <a name="Service.Close">func</a> (\*Service) [Close](https://github.com/hunterlong/statping/tree/master/types/service.go?s=3223:3248#L68)
-``` go
+```go
 func (s *Service) Close()
 ```
 Close will stop the go routine that is checking if service is online or not
 
+#### func (*Service) IsRunning
 
-
-
-### <a name="Service.IsRunning">func</a> (\*Service) [IsRunning](https://github.com/hunterlong/statping/tree/master/types/service.go?s=3359:3393#L75)
-``` go
+```go
 func (s *Service) IsRunning() bool
 ```
 IsRunning returns true if the service go routine is running
 
+#### func (*Service) Start
 
-
-
-### <a name="Service.Start">func</a> (\*Service) [Start](https://github.com/hunterlong/statping/tree/master/types/service.go?s=3084:3109#L63)
-``` go
+```go
 func (s *Service) Start()
 ```
 Start will create a channel for the service checking go routine
 
+#### type ServiceInterface
 
-
-
-## <a name="ServiceInterface">type</a> [ServiceInterface](https://github.com/hunterlong/statping/tree/master/types/service.go?s=2865:3015#L53)
-``` go
+```go
 type ServiceInterface interface {
-    Select() *Service
-    CheckQueue(bool)
-    Check(bool)
-    Create(bool) (int64, error)
-    Update(bool) error
-    Delete() error
+	Select() *Service
+	CheckQueue(bool)
+	Check(bool)
+	Create(bool) (int64, error)
+	Update(bool) error
+	Delete() error
 }
 ```
 
 
+#### type User
 
-
-
-
-
-
-
-## <a name="User">type</a> [User](https://github.com/hunterlong/statping/tree/master/types/user.go?s=748:1514#L23)
-``` go
+```go
 type User struct {
-    Id            int64     `gorm:"primary_key;column:id" json:"id"`
-    Username      string    `gorm:"type:varchar(100);unique;column:username;" json:"username,omitempty"`
-    Password      string    `gorm:"column:password" json:"password,omitempty"`
-    Email         string    `gorm:"type:varchar(100);unique;column:email" json:"email,omitempty"`
-    ApiKey        string    `gorm:"column:api_key" json:"api_key,omitempty"`
-    ApiSecret     string    `gorm:"column:api_secret" json:"api_secret,omitempty"`
-    Admin         NullBool  `gorm:"column:administrator" json:"admin,omitempty"`
-    CreatedAt     time.Time `gorm:"column:created_at" json:"created_at"`
-    UpdatedAt     time.Time `gorm:"column:updated_at" json:"updated_at"`
-    UserInterface `gorm:"-" json:"-"`
+	Id            int64     `gorm:"primary_key;column:id" json:"id"`
+	Username      string    `gorm:"type:varchar(100);unique;column:username;" json:"username,omitempty"`
+	Password      string    `gorm:"column:password" json:"password,omitempty"`
+	Email         string    `gorm:"type:varchar(100);unique;column:email" json:"email,omitempty"`
+	ApiKey        string    `gorm:"column:api_key" json:"api_key,omitempty"`
+	ApiSecret     string    `gorm:"column:api_secret" json:"api_secret,omitempty"`
+	Admin         NullBool  `gorm:"column:administrator" json:"admin,omitempty"`
+	CreatedAt     time.Time `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt     time.Time `gorm:"column:updated_at" json:"updated_at"`
+	UserInterface `gorm:"-" json:"-"`
 }
-
 ```
+
 User is the main struct for Users
 
+#### func (*User) BeforeCreate
 
+```go
+func (u *User) BeforeCreate() (err error)
+```
+BeforeCreate for User will set CreatedAt to UTC
 
+#### type UserInterface
 
-
-
-
-
-
-
-## <a name="UserInterface">type</a> [UserInterface](https://github.com/hunterlong/statping/tree/master/types/user.go?s=1567:1656#L37)
-``` go
+```go
 type UserInterface interface {
-    Create() (int64, error)
-    Update() error
-    Delete() error
+	Create() (int64, error)
+	Update() error
+	Delete() error
 }
 ```
+
 UserInterface interfaces the database functions
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # utils
-`import "github.com/hunterlong/statping/utils"`
+--
+    import "github.com/hunterlong/statping/utils"
 
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-* [Examples](#pkg-examples)
+Package utils contains common methods used in most packages in Statping. This
+package contains multiple function like: Logging, encryption, type conversions,
+setting utils.Directory as the current directory, running local CMD commands,
+and creating/deleting files/folder.
 
-## <a name="pkg-overview">Overview</a>
-Package utils contains common methods used in most packages in Statping.
-This package contains multiple function like:
-Logging, encryption, type conversions, setting utils.Directory as the current directory,
-running local CMD commands, and creating/deleting files/folder.
+You can overwrite the utils.Directory global variable by including STATPING_DIR
+environment variable to be an absolute path.
 
-You can overwrite the utils.Directory global variable by including
-STATPING_DIR environment variable to be an absolute path.
+More info on: https://github.com/hunterlong/statping
 
-More info on: <a href="https://github.com/hunterlong/statping">https://github.com/hunterlong/statping</a>
+## Usage
 
-
-
-
-## <a name="pkg-index">Index</a>
-* [Constants](#pkg-constants)
-* [Variables](#pkg-variables)
-* [func Command(cmd string) (string, string, error)](#Command)
-* [func DeleteDirectory(directory string) error](#DeleteDirectory)
-* [func DeleteFile(file string) error](#DeleteFile)
-* [func DurationReadable(d time.Duration) string](#DurationReadable)
-* [func FileExists(name string) bool](#FileExists)
-* [func FormatDuration(d time.Duration) string](#FormatDuration)
-* [func HashPassword(password string) string](#HashPassword)
-* [func Http(r *http.Request) string](#Http)
-* [func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration) ([]byte, *http.Response, error)](#HttpRequest)
-* [func InitLogs() error](#InitLogs)
-* [func Log(level int, err interface{}) error](#Log)
-* [func NewSHA1Hash(n ...int) string](#NewSHA1Hash)
-* [func RandomString(n int) string](#RandomString)
-* [func SaveFile(filename string, data []byte) error](#SaveFile)
-* [func Timezoner(t time.Time, zone float32) time.Time](#Timezoner)
-* [func ToInt(s interface{}) int64](#ToInt)
-* [func ToString(s interface{}) string](#ToString)
-* [func UnderScoreString(str string) string](#UnderScoreString)
-* [type LogRow](#LogRow)
-  * [func GetLastLine() *LogRow](#GetLastLine)
-  * [func (o *LogRow) FormatForHtml() string](#LogRow.FormatForHtml)
-* [type Timestamp](#Timestamp)
-  * [func (t Timestamp) Ago() string](#Timestamp.Ago)
-* [type Timestamper](#Timestamper)
-
-#### <a name="pkg-examples">Examples</a>
-* [DurationReadable](#example_DurationReadable)
-* [ToString](#example_ToString)
-
-#### <a name="pkg-files">Package files</a>
-[doc.go](https://github.com/hunterlong/statping/tree/master/utils/doc.go) [encryption.go](https://github.com/hunterlong/statping/tree/master/utils/encryption.go) [log.go](https://github.com/hunterlong/statping/tree/master/utils/log.go) [time.go](https://github.com/hunterlong/statping/tree/master/utils/time.go) [utils.go](https://github.com/hunterlong/statping/tree/master/utils/utils.go) 
-
-
-## <a name="pkg-constants">Constants</a>
-``` go
+```go
 const (
-    FlatpickrTime     = "2006-01-02 15:04"
-    FlatpickrDay      = "2006-01-02"
-    FlatpickrReadable = "Mon, 02 Jan 2006"
+	FlatpickrTime     = "2006-01-02 15:04"
+	FlatpickrDay      = "2006-01-02"
+	FlatpickrReadable = "Mon, 02 Jan 2006"
 )
 ```
 
-## <a name="pkg-variables">Variables</a>
-``` go
+```go
 var (
-    LastLines []*LogRow
-    LockLines sync.Mutex
+	LastLines []*LogRow
+	LockLines sync.Mutex
 )
 ```
-``` go
+
+```go
 var (
-    // Directory returns the current path or the STATPING_DIR environment variable
-    Directory string
+	// Directory returns the current path or the STATPING_DIR environment variable
+	Directory string
 )
 ```
 
+#### func  Command
 
-## <a name="Command">func</a> [Command](https://github.com/hunterlong/statping/tree/master/utils/utils.go?s=3714:3762#L151)
-``` go
+```go
 func Command(cmd string) (string, string, error)
 ```
-Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings
+Command will run a terminal command with 'sh -c COMMAND' and return stdout and
+errOut as strings
 
+    in, out, err := Command("sass assets/scss assets/css/base.css")
 
-	in, out, err := Command("sass assets/scss assets/css/base.css")
+#### func  DeleteDirectory
 
-
-
-## <a name="DeleteDirectory">func</a> [DeleteDirectory](https://github.com/hunterlong/statping/tree/master/utils/utils.go?s=3464:3508#L145)
-``` go
+```go
 func DeleteDirectory(directory string) error
 ```
 DeleteDirectory will attempt to delete a directory and all contents inside
 
+    DeleteDirectory("assets")
 
-	DeleteDirectory("assets")
+#### func  DeleteFile
 
-
-
-## <a name="DeleteFile">func</a> [DeleteFile](https://github.com/hunterlong/statping/tree/master/utils/utils.go?s=3215:3249#L134)
-``` go
+```go
 func DeleteFile(file string) error
 ```
 DeleteFile will attempt to delete a file
 
+    DeleteFile("newfile.json")
 
-	DeleteFile("newfile.json")
+#### func  DurationReadable
 
-
-
-## <a name="DurationReadable">func</a> [DurationReadable](https://github.com/hunterlong/statping/tree/master/utils/utils.go?s=5058:5103#L209)
-``` go
+```go
 func DurationReadable(d time.Duration) string
 ```
-DurationReadable will return a time.Duration into a human readable string
+DurationReadable will return a time.Duration into a human readable string // t
+:= time.Duration(5 * time.Minute) // DurationReadable(t) // returns: 5 minutes
 
+#### func  FileExists
 
-	t := time.Duration(5 * time.Minute)
-	DurationReadable(t)
-	// 5 minutes
-
-
-
-#### <a name="example_DurationReadable">Example</a>
-
-Code:
-``` go
-dur, _ := time.ParseDuration("25m")
-readable := DurationReadable(dur)
-fmt.Print(readable)
-```
-Output:
-
-    25 minutes
-    
-
-
-## <a name="FileExists">func</a> [FileExists](https://github.com/hunterlong/statping/tree/master/utils/utils.go?s=2997:3030#L123)
-``` go
+```go
 func FileExists(name string) bool
 ```
 FileExists returns true if a file exists
 
+    exists := FileExists("assets/css/base.css")
 
-	exists := FileExists("assets/css/base.css")
+#### func  FormatDuration
 
-
-
-## <a name="FormatDuration">func</a> [FormatDuration](https://github.com/hunterlong/statping/tree/master/utils/time.go?s=1127:1170#L38)
-``` go
+```go
 func FormatDuration(d time.Duration) string
 ```
 FormatDuration converts a time.Duration into a string
 
+#### func  HashPassword
 
-
-## <a name="HashPassword">func</a> [HashPassword](https://github.com/hunterlong/statping/tree/master/utils/encryption.go?s=837:878#L27)
-``` go
+```go
 func HashPassword(password string) string
 ```
 HashPassword returns the bcrypt hash of a password string
 
+#### func  Http
 
-
-## <a name="Http">func</a> [Http](https://github.com/hunterlong/statping/tree/master/utils/log.go?s=3074:3107#L126)
-``` go
+```go
 func Http(r *http.Request) string
 ```
 Http returns a log for a HTTP request
 
+#### func  HttpRequest
 
-
-## <a name="HttpRequest">func</a> [HttpRequest](https://github.com/hunterlong/statping/tree/master/utils/utils.go?s=5648:5794#L228)
-``` go
+```go
 func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration) ([]byte, *http.Response, error)
 ```
-HttpRequest is a global function to send a HTTP request
+HttpRequest is a global function to send a HTTP request // url - The URL for
+HTTP request // method - GET, POST, DELETE, PATCH // content - The HTTP request
+content type (text/plain, application/json, or nil) // headers - An array of
+Headers to be sent (KEY=VALUE) []string{"Authentication=12345", ...} // body -
+The body or form data to send with HTTP request // timeout - Specific duration
+to timeout on. time.Duration(30 * time.Seconds) // You can use a HTTP Proxy if
+you HTTP_PROXY environment variable
 
+#### func  InitLogs
 
-
-## <a name="InitLogs">func</a> [InitLogs](https://github.com/hunterlong/statping/tree/master/utils/log.go?s=1419:1440#L58)
-``` go
+```go
 func InitLogs() error
 ```
-InitLogs will create the '/logs' directory and creates a file '/logs/statup.log' for application logging
+InitLogs will create the '/logs' directory and creates a file '/logs/statup.log'
+for application logging
 
+#### func  Log
 
-
-## <a name="Log">func</a> [Log](https://github.com/hunterlong/statping/tree/master/utils/log.go?s=2195:2237#L93)
-``` go
+```go
 func Log(level int, err interface{}) error
 ```
-Log creates a new entry in the Logger. Log has 1-5 levels depending on how critical the log/error is
+Log creates a new entry in the Logger. Log has 1-5 levels depending on how
+critical the log/error is
 
+#### func  NewSHA1Hash
 
-
-## <a name="NewSHA1Hash">func</a> [NewSHA1Hash](https://github.com/hunterlong/statping/tree/master/utils/encryption.go?s=1038:1071#L33)
-``` go
+```go
 func NewSHA1Hash(n ...int) string
 ```
 NewSHA1Hash returns a random SHA1 hash based on a specific length
 
+#### func  RandomString
 
-
-## <a name="RandomString">func</a> [RandomString](https://github.com/hunterlong/statping/tree/master/utils/encryption.go?s=1451:1482#L48)
-``` go
+```go
 func RandomString(n int) string
 ```
 RandomString generates a random string of n length
 
+#### func  SaveFile
 
-
-## <a name="SaveFile">func</a> [SaveFile](https://github.com/hunterlong/statping/tree/master/utils/utils.go?s=5475:5524#L222)
-``` go
+```go
 func SaveFile(filename string, data []byte) error
 ```
 SaveFile will create a new file with data inside it
 
+    SaveFile("newfile.json", []byte('{"data": "success"}')
 
-	SaveFile("newfile.json", []byte('{"data": "success"}')
+#### func  Timezoner
 
-
-
-## <a name="Timezoner">func</a> [Timezoner](https://github.com/hunterlong/statping/tree/master/utils/time.go?s=905:956#L30)
-``` go
+```go
 func Timezoner(t time.Time, zone float32) time.Time
 ```
 Timezoner returns the time.Time with the user set timezone
 
+#### func  ToInt
 
-
-## <a name="ToInt">func</a> [ToInt](https://github.com/hunterlong/statping/tree/master/utils/utils.go?s=1222:1253#L49)
-``` go
+```go
 func ToInt(s interface{}) int64
 ```
 ToInt converts a int to a string
 
+#### func  ToString
 
-
-## <a name="ToString">func</a> [ToString](https://github.com/hunterlong/statping/tree/master/utils/utils.go?s=1408:1443#L60)
-``` go
+```go
 func ToString(s interface{}) string
 ```
 ToString converts a int to a string
 
+#### func  UnderScoreString
 
-
-#### <a name="example_ToString">Example</a>
-
-Code:
-``` go
-amount := 42
-fmt.Print(ToString(amount))
-```
-Output:
-
-    42
-    
-
-
-## <a name="UnderScoreString">func</a> [UnderScoreString](https://github.com/hunterlong/statping/tree/master/utils/utils.go?s=2264:2304#L98)
-``` go
+```go
 func UnderScoreString(str string) string
 ```
-UnderScoreString will return a string that replaces spaces and other characters to underscores
+UnderScoreString will return a string that replaces spaces and other characters
+to underscores
 
+    UnderScoreString("Example String")
+    // example_string
 
-	UnderScoreString("Example String")
-	// example_string
+#### type LogRow
 
-
-
-
-## <a name="LogRow">type</a> [LogRow](https://github.com/hunterlong/statping/tree/master/utils/log.go?s=3709:3765#L153)
-``` go
+```go
 type LogRow struct {
-    Date time.Time
-    Line interface{}
+	Date time.Time
+	Line interface{}
 }
-
 ```
 
 
+#### func  GetLastLine
 
-
-
-
-### <a name="GetLastLine">func</a> [GetLastLine](https://github.com/hunterlong/statping/tree/master/utils/log.go?s=3556:3582#L144)
-``` go
+```go
 func GetLastLine() *LogRow
 ```
 GetLastLine returns 1 line for a recent log entry
 
+#### func (*LogRow) FormatForHtml
 
-
-
-
-### <a name="LogRow.FormatForHtml">func</a> (\*LogRow) [FormatForHtml](https://github.com/hunterlong/statping/tree/master/utils/log.go?s=4075:4114#L177)
-``` go
+```go
 func (o *LogRow) FormatForHtml() string
 ```
 
+#### type Timestamp
 
-
-## <a name="Timestamp">type</a> [Timestamp](https://github.com/hunterlong/statping/tree/master/utils/utils.go?s=1837:1861#L84)
-``` go
+```go
 type Timestamp time.Time
 ```
 
 
+#### func (Timestamp) Ago
 
-
-
-
-
-
-
-### <a name="Timestamp.Ago">func</a> (Timestamp) [Ago](https://github.com/hunterlong/statping/tree/master/utils/utils.go?s=1995:2026#L90)
-``` go
+```go
 func (t Timestamp) Ago() string
 ```
-Ago returns a human readable timestamp based on the Timestamp (time.Time) interface
+Ago returns a human readable timestamp based on the Timestamp (time.Time)
+interface
 
+#### type Timestamper
 
-
-
-## <a name="Timestamper">type</a> [Timestamper](https://github.com/hunterlong/statping/tree/master/utils/utils.go?s=1862:1906#L85)
-``` go
+```go
 type Timestamper interface {
-    Ago() string
+	Ago() string
 }
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
