@@ -18,8 +18,6 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
 	"net/http"
 )
 
@@ -38,86 +36,4 @@ func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 		"online":   core.Configs != nil,
 	}
 	json.NewEncoder(w).Encode(health)
-}
-
-func trayHandler(w http.ResponseWriter, r *http.Request) {
-	ExecuteResponse(w, r, "tray.gohtml", core.CoreApp, nil)
-}
-
-// DesktopInit will run the Statping server on a specific IP and port using SQLite database
-func DesktopInit(ip string, port int) {
-	var err error
-	exists := utils.FileExists(utils.Directory + "/statup.db")
-	if exists {
-		core.Configs, err = core.LoadConfigFile(utils.Directory)
-		if err != nil {
-			utils.Log(3, err)
-			return
-		}
-		err = core.Configs.Connect(false, utils.Directory)
-		if err != nil {
-			utils.Log(3, err)
-			return
-		}
-		core.InitApp()
-		RunHTTPServer(ip, port)
-	}
-
-	config := &core.DbConfig{
-		DbConn:      "sqlite",
-		Project:     "Statping",
-		Description: "Statping running as an App!",
-		Domain:      "http://localhost",
-		Username:    "admin",
-		Password:    "admin",
-		Email:       "user@email.com",
-		Error:       nil,
-		Location:    utils.Directory,
-	}
-
-	config, err = config.Save()
-	if err != nil {
-		utils.Log(4, err)
-	}
-
-	config.DropDatabase()
-	config.CreateDatabase()
-	core.CoreApp = config.CreateCore()
-
-	if err != nil {
-		utils.Log(3, err)
-		return
-	}
-
-	core.Configs, err = core.LoadConfigFile(utils.Directory)
-	if err != nil {
-		utils.Log(3, err)
-		config.Error = err
-		return
-	}
-
-	err = core.Configs.Connect(false, utils.Directory)
-	if err != nil {
-		utils.Log(3, err)
-		core.DeleteConfig()
-		config.Error = err
-		return
-	}
-
-	admin := core.ReturnUser(&types.User{
-		Username: config.Username,
-		Password: config.Password,
-		Email:    config.Email,
-		Admin:    types.NewNullBool(true),
-	})
-	admin.Create()
-
-	core.InsertSampleData()
-
-	config.ApiKey = core.CoreApp.ApiKey
-	config.ApiSecret = core.CoreApp.ApiSecret
-	config.Update()
-
-	core.InitApp()
-	RunHTTPServer(ip, port)
 }

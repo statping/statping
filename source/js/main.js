@@ -178,6 +178,13 @@ function FailureAnnotations(chart, service, start=0, end=9999999999, group="hour
     });
 }
 
+
+$('input[id=service_name]').on('keyup', function() {
+    var url = $(this).val();
+    url = url.replace(/[^\w\s]/gi, '').replace(/\s+/g, '-').toLowerCase();
+    $('#permalink').val(url);
+});
+
 $('input[type=checkbox]').on('change', function() {
 	var element = $(this).attr('id');
 	$("#"+element+"-value").val(this.checked ? "true" : "false")

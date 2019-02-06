@@ -41,7 +41,12 @@ func init() {
 	if os.Getenv("STATPING_DIR") != "" {
 		Directory = os.Getenv("STATPING_DIR")
 	} else {
-		Directory = dir()
+		dir, err := os.Getwd()
+		if err != nil {
+			Directory = "."
+			return
+		}
+		Directory = dir
 	}
 }
 
@@ -51,6 +56,23 @@ func ToInt(s interface{}) int64 {
 	case string:
 		val, _ := strconv.Atoi(v)
 		return int64(val)
+	case []byte:
+		val, _ := strconv.Atoi(string(v))
+		return int64(val)
+	case float32:
+		return int64(v)
+	case float64:
+		return int64(v)
+	case int:
+		return int64(v)
+	case int16:
+		return int64(v)
+	case int32:
+		return int64(v)
+	case int64:
+		return v
+	case uint:
+		return int64(v)
 	default:
 		return 0
 	}
@@ -59,7 +81,7 @@ func ToInt(s interface{}) int64 {
 // ToString converts a int to a string
 func ToString(s interface{}) string {
 	switch v := s.(type) {
-	case int, int32, int64:
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
 		return fmt.Sprintf("%v", v)
 	case float32, float64:
 		return fmt.Sprintf("%f", v)
@@ -74,15 +96,6 @@ func ToString(s interface{}) string {
 	default:
 		return fmt.Sprintf("%v", v)
 	}
-}
-
-// dir returns the current working directory
-func dir() string {
-	dir, err := os.Getwd()
-	if err != nil {
-		return "."
-	}
-	return dir
 }
 
 type Timestamp time.Time

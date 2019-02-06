@@ -235,7 +235,7 @@ dev-deps:
 # remove files for a clean compile/build
 clean:
 	rm -rf ./{logs,assets,plugins,statup.db,config.yml,.sass-cache,config.yml,statping,build,.sass-cache,statup.db,index.html,vendor}
-	rm -rf cmd/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
+	rm -rf cmd/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log,*.html,*.json}
 	rm -rf core/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf handlers/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
 	rm -rf notifiers/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
