@@ -30,7 +30,8 @@ var (
 	router *mux.Router
 )
 
-// Router returns all of the routes used in Statping
+// Router returns all of the routes used in Statping.
+// Server will use static assets if the 'assets' directory is found in the root directory.
 func Router() *mux.Router {
 	dir := utils.Directory
 	CacheStorage = NewStorage()

@@ -55,6 +55,16 @@ func SelectService(id int64) *Service {
 	return nil
 }
 
+// SelectServiceLink returns a *core.Service from the service permalink
+func SelectServiceLink(permalink string) *Service {
+	for _, s := range Services() {
+		if s.Select().Permalink.String == permalink {
+			return s.(*Service)
+		}
+	}
+	return nil
+}
+
 // CheckinProcess runs the checkin routine for each checkin attached to service
 func (s *Service) CheckinProcess() {
 	checkins := s.AllCheckins()

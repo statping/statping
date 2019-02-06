@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/hunterlong/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"net/url"
 	"testing"
@@ -15,6 +16,9 @@ func TestGenericRoutes(t *testing.T) {
 	form2 := url.Values{}
 	form2.Add("username", "admin")
 	form2.Add("password", "wrongpassword")
+
+	form3 := url.Values{}
+	form3.Add("variables", "$background-color: #fcfcfc;")
 
 	tests := []HTTPTest{
 		{
@@ -97,6 +101,39 @@ func TestGenericRoutes(t *testing.T) {
 			Method:           "GET",
 			ExpectedStatus:   200,
 			ExpectedContains: []string{"statping_total_services 5"},
+		},
+		{
+			Name:           "Last Log Line",
+			URL:            "/logs/line",
+			Method:         "GET",
+			ExpectedStatus: 200,
+		},
+		{
+			Name:           "Export JSON file of all objcts",
+			URL:            "/settings/export",
+			Method:         "GET",
+			ExpectedStatus: 200,
+		},
+		{
+			Name:           "Export Static Assets",
+			URL:            "/settings/build",
+			Method:         "GET",
+			ExpectedStatus: 303,
+			ExpectedFiles:  []string{utils.Directory + "/assets/css/base.css"},
+		},
+		{
+			Name:           "Save SCSS",
+			URL:            "/settings/css",
+			Method:         "POST",
+			Body:           form3.Encode(),
+			ExpectedStatus: 303,
+			HttpHeaders:    []string{"Content-Type=application/x-www-form-urlencoded"},
+		},
+		{
+			Name:           "Delete Assets",
+			URL:            "/settings/delete_assets",
+			Method:         "GET",
+			ExpectedStatus: 303,
 		},
 	}
 

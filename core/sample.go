@@ -39,6 +39,7 @@ func InsertSampleData() error {
 		Timeout:        10,
 		Order:          1,
 		GroupId:        1,
+		Permalink:      types.NewNullString("google"),
 		CreatedAt:      createdOn,
 	})
 	s2 := ReturnService(&types.Service{
@@ -50,6 +51,7 @@ func InsertSampleData() error {
 		Method:         "GET",
 		Timeout:        20,
 		Order:          2,
+		Permalink:      types.NewNullString("statping_github"),
 		CreatedAt:      createdOn,
 	})
 	s3 := ReturnService(&types.Service{

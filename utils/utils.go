@@ -67,6 +67,10 @@ func ToString(s interface{}) string {
 		return string(v)
 	case bool:
 		return fmt.Sprintf("%t", v)
+	case time.Time:
+		return v.Format("Monday January _2, 2006 at 03:04PM")
+	case time.Duration:
+		return v.String()
 	default:
 		return fmt.Sprintf("%v", v)
 	}

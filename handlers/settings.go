@@ -82,9 +82,10 @@ func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	r.ParseForm()
-	theme := r.PostForm.Get("theme")
-	variables := r.PostForm.Get("variables")
-	mobile := r.PostForm.Get("mobile")
+	form := r.PostForm
+	theme := form.Get("theme")
+	variables := form.Get("variables")
+	mobile := form.Get("mobile")
 	source.SaveAsset([]byte(theme), utils.Directory, "scss/base.scss")
 	source.SaveAsset([]byte(variables), utils.Directory, "scss/variables.scss")
 	source.SaveAsset([]byte(mobile), utils.Directory, "scss/mobile.scss")
