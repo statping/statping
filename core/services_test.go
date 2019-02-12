@@ -24,6 +24,7 @@ import (
 
 var (
 	newServiceId int64
+	newGroupId   int64
 )
 
 func TestSelectHTTPService(t *testing.T) {
@@ -344,4 +345,69 @@ func TestDNScheckService(t *testing.T) {
 	amount, err := s.dnsCheck()
 	assert.Nil(t, err)
 	assert.NotZero(t, amount)
+}
+
+func TestSelectServiceLink(t *testing.T) {
+	service := SelectService(1)
+	assert.Equal(t, "google", service.Permalink.String)
+}
+
+func TestDbtimestamp(t *testing.T) {
+	CoreApp.DbConnection = "mysql"
+	query := Dbtimestamp("minute", "latency")
+	assert.Equal(t, "CONCAT(date_format(created_at, '%Y-%m-%d %H:00:00')) AS timeframe, AVG(latency) AS value", query)
+	CoreApp.DbConnection = "postgres"
+	query = Dbtimestamp("minute", "latency")
+	assert.Equal(t, "date_trunc('minute', created_at) AS timeframe, AVG(latency) AS value", query)
+	CoreApp.DbConnection = "sqlite"
+	query = Dbtimestamp("minute", "latency")
+	assert.Equal(t, "datetime((strftime('%s', created_at) / 60) * 60, 'unixepoch') AS timeframe, AVG(latency) as value", query)
+}
+
+func TestGroup_Create(t *testing.T) {
+	group := &Group{&types.Group{
+		Name: "Testing",
+	}}
+	newGroupId, err := group.Create()
+	assert.Nil(t, err)
+	assert.NotZero(t, newGroupId)
+}
+
+func TestGroup_Services(t *testing.T) {
+	group := SelectGroup(1)
+	assert.NotEmpty(t, group.Services())
+}
+
+func TestSelectGroups(t *testing.T) {
+	groups := SelectGroups(true, false)
+	assert.Equal(t, int(3), len(groups))
+	groups = SelectGroups(true, true)
+	assert.Equal(t, int(4), len(groups))
+}
+
+func TestService_TotalFailures(t *testing.T) {
+	service := SelectService(8)
+	failures, err := service.TotalFailures()
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(1), failures)
+}
+
+func TestService_TotalFailures24(t *testing.T) {
+	service := SelectService(8)
+	failures, err := service.TotalFailures24()
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(1), failures)
+}
+
+func TestService_TotalFailuresOnDate(t *testing.T) {
+	ago := time.Now().UTC()
+	service := SelectService(8)
+	failures, err := service.TotalFailuresOnDate(ago)
+	assert.Nil(t, err)
+	assert.Equal(t, uint64(0), failures)
+}
+
+func TestCountFailures(t *testing.T) {
+	failures := CountFailures()
+	assert.Equal(t, uint64(1463), failures)
 }
