@@ -986,6 +986,53 @@
 							"body": "{\n    \"status\": \"success\",\n    \"type\": \"service\",\n    \"method\": \"delete\",\n    \"id\": 10,\n    \"output\": {\n        \"id\": 10,\n        \"name\": \"Updated New Service\",\n        \"domain\": \"https://google.com\",\n        \"expected\": \"\",\n        \"expected_status\": 200,\n        \"check_interval\": 60,\n        \"type\": \"http\",\n        \"method\": \"GET\",\n        \"post_data\": \"\",\n        \"port\": 0,\n        \"timeout\": 10,\n        \"order_id\": 0,\n        \"allow_notifications\": false,\n        \"created_at\": \"2018-12-10T11:31:47.535086-08:00\",\n        \"updated_at\": \"2018-12-10T11:31:47.535184-08:00\",\n        \"online\": true,\n        \"latency\": 0.203382878,\n        \"ping_time\": 0.001664491,\n        \"online_24_hours\": 0,\n        \"avg_response\": \"\",\n        \"status_code\": 200,\n        \"last_success\": \"2018-12-10T11:31:55.455091-08:00\"\n    }\n}"
 						}
 					]
+				},
+				{
+					"name": "Delete Service Failures",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "dd4d721d-d874-448b-abc9-59c1afceb58e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/services/{{service_id}}/failures",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"services",
+								"{{service_id}}",
+								"failures"
+							]
+						},
+						"description": "Delete a service and stop monitoring."
+					},
+					"response": []
 				}
 			],
 			"auth": {

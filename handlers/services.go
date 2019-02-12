@@ -327,7 +327,8 @@ func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	service := core.SelectService(utils.ToInt(vars["id"]))
 	service.DeleteFailures()
-	ExecuteResponse(w, r, "services.gohtml", core.CoreApp.Services, "/services")
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(service.AllFailures())
 }
 
 func apiServiceFailuresHandler(w http.ResponseWriter, r *http.Request) {
