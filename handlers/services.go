@@ -326,9 +326,12 @@ func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	vars := mux.Vars(r)
 	service := core.SelectService(utils.ToInt(vars["id"]))
+	if service == nil {
+		sendErrorJson(errors.New("service not found"), w, r)
+		return
+	}
 	service.DeleteFailures()
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(service.AllFailures())
+	sendJsonAction(service, "delete_failures", w, r)
 }
 
 func apiServiceFailuresHandler(w http.ResponseWriter, r *http.Request) {
