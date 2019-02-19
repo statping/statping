@@ -103,10 +103,11 @@ func UsingAssets(folder string) bool {
 
 // SaveAsset will save an asset to the '/assets/' folder.
 func SaveAsset(data []byte, folder, file string) error {
-	utils.Log(1, fmt.Sprintf("Saving %v", folder+"/assets/"+file))
-	err := ioutil.WriteFile(folder+"/assets/"+file, data, 0744)
+	location := folder + "/assets/" + file
+	utils.Log(1, fmt.Sprintf("Saving %v", location))
+	err := utils.SaveFile(location, data)
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("Failed to save %v/%v, %v", folder, file, err))
+		utils.Log(3, fmt.Sprintf("Failed to save %v, %v", location, err))
 		return err
 	}
 	return nil
@@ -168,16 +169,14 @@ func CopyAllToPublic(box *rice.Box, folder string) error {
 		}
 		if info.IsDir() {
 			folder := fmt.Sprintf("%v/assets/%v/%v", utils.Directory, folder, info.Name())
-			MakePublicFolder(folder)
-			return nil
+			return MakePublicFolder(folder)
 		}
 		file, err := box.Bytes(path)
 		if err != nil {
-			return nil
+			return err
 		}
-		filePath := fmt.Sprintf("%v%v", folder, path)
-		SaveAsset(file, utils.Directory, filePath)
-		return nil
+		filePath := fmt.Sprintf("%v/%v", folder, path)
+		return SaveAsset(file, utils.Directory, filePath)
 	})
 	return err
 }

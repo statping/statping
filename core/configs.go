@@ -51,29 +51,12 @@ func LoadConfigFile(directory string) (*DbConfig, error) {
 
 // LoadUsingEnv will attempt to load database configs based on environment variables. If DB_CONN is set if will force this function.
 func LoadUsingEnv() (*DbConfig, error) {
-	Configs = new(DbConfig)
-	Configs.LocalIP = GetLocalIP()
-	if os.Getenv("DB_CONN") == "" {
-		return Configs, errors.New("Missing DB_CONN environment variable")
+	Configs, err := EnvToConfig()
+	if err != nil {
+		return Configs, err
 	}
-	if os.Getenv("DB_CONN") != "sqlite" {
-		if os.Getenv("DB_HOST") == "" {
-			return Configs, errors.New("Missing DB_HOST environment variable")
-		}
-		if os.Getenv("DB_USER") == "" {
-			return Configs, errors.New("Missing DB_USER environment variable")
-		}
-		if os.Getenv("DB_PASS") == "" {
-			return Configs, errors.New("Missing DB_PASS environment variable")
-		}
-		if os.Getenv("DB_DATABASE") == "" {
-			return Configs, errors.New("Missing DB_DATABASE environment variable")
-		}
-	}
-	Configs = EnvToConfig()
 	CoreApp.Name = os.Getenv("NAME")
-	domain := os.Getenv("DOMAIN")
-	if domain == "" {
+	if Configs.Domain == "" {
 		CoreApp.Domain = Configs.LocalIP
 	} else {
 		CoreApp.Domain = os.Getenv("DOMAIN")
@@ -81,7 +64,7 @@ func LoadUsingEnv() (*DbConfig, error) {
 	CoreApp.DbConnection = Configs.DbConn
 	CoreApp.UseCdn = types.NewNullBool(os.Getenv("USE_CDN") == "true")
 
-	err := Configs.Connect(true, utils.Directory)
+	err = Configs.Connect(true, utils.Directory)
 	if err != nil {
 		utils.Log(4, err)
 		return nil, err
@@ -126,7 +109,26 @@ func DefaultPort(db string) int64 {
 }
 
 // EnvToConfig converts environment variables to a DbConfig variable
-func EnvToConfig() *DbConfig {
+func EnvToConfig() (*DbConfig, error) {
+	Configs = new(DbConfig)
+	var err error
+	if os.Getenv("DB_CONN") == "" {
+		return Configs, errors.New("Missing DB_CONN environment variable")
+	}
+	if os.Getenv("DB_CONN") != "sqlite" {
+		if os.Getenv("DB_HOST") == "" {
+			return Configs, errors.New("Missing DB_HOST environment variable")
+		}
+		if os.Getenv("DB_USER") == "" {
+			return Configs, errors.New("Missing DB_USER environment variable")
+		}
+		if os.Getenv("DB_PASS") == "" {
+			return Configs, errors.New("Missing DB_PASS environment variable")
+		}
+		if os.Getenv("DB_DATABASE") == "" {
+			return Configs, errors.New("Missing DB_DATABASE environment variable")
+		}
+	}
 	port := utils.ToInt(os.Getenv("DB_PORT"))
 	if port == 0 {
 		port = DefaultPort(os.Getenv("DB_PORT"))
@@ -150,7 +152,7 @@ func EnvToConfig() *DbConfig {
 		adminPass = "admin"
 	}
 
-	data := &DbConfig{
+	Configs = &DbConfig{
 		DbConn:      os.Getenv("DB_CONN"),
 		DbHost:      os.Getenv("DB_HOST"),
 		DbUser:      os.Getenv("DB_USER"),
@@ -166,7 +168,7 @@ func EnvToConfig() *DbConfig {
 		Error:       nil,
 		Location:    utils.Directory,
 	}
-	return data
+	return Configs, err
 }
 
 // SampleData runs all the sample data for a new Statping installation

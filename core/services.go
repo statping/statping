@@ -116,12 +116,6 @@ func reorderServices() {
 	sort.Sort(ServiceOrder(CoreApp.Services))
 }
 
-// ToJSON will convert a service to a JSON string
-func (s *Service) ToJSON() string {
-	data, _ := json.Marshal(s)
-	return string(data)
-}
-
 // AvgTime will return the average amount of time for a service to response back successfully
 func (s *Service) AvgTime() string {
 	total, _ := s.TotalHits()

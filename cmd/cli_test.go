@@ -60,7 +60,7 @@ func TestHelpCommand(t *testing.T) {
 	assert.True(t, c.StdoutContains("statping help               - Shows the user basic information about Statping"))
 }
 
-func TestExportCommand(t *testing.T) {
+func TestStaticCommand(t *testing.T) {
 	cmd := helperCommand(nil, "static")
 	var got = make(chan string)
 	commandAndSleep(cmd, time.Duration(10*time.Second), got)
@@ -68,7 +68,16 @@ func TestExportCommand(t *testing.T) {
 	t.Log(gg)
 	assert.Contains(t, gg, "Exporting Static 'index.html' page...")
 	assert.Contains(t, gg, "Exported Statping index page: 'index.html'")
-	assert.True(t, fileExists(dir+"/index.html"))
+	assert.FileExists(t, dir+"/index.html")
+}
+
+func TestExportCommand(t *testing.T) {
+	cmd := helperCommand(nil, "export")
+	var got = make(chan string)
+	commandAndSleep(cmd, time.Duration(10*time.Second), got)
+	gg, _ := <-got
+	t.Log(gg)
+	assert.FileExists(t, dir+"/statping-export.json")
 }
 
 func TestUpdateCommand(t *testing.T) {
@@ -124,8 +133,12 @@ func TestSassCLI(t *testing.T) {
 
 func TestUpdateCLI(t *testing.T) {
 	t.SkipNow()
-	run := catchCLI([]string{"update"})
-	assert.EqualError(t, run, "end")
+	cmd := helperCommand(nil, "update")
+	var got = make(chan string)
+	commandAndSleep(cmd, time.Duration(15*time.Second), got)
+	gg, _ := <-got
+	t.Log(gg)
+	assert.Contains(t, gg, "version")
 }
 
 func TestTestPackageCLI(t *testing.T) {
@@ -166,13 +179,6 @@ func helperCommand(envs []string, s ...string) *exec.Cmd {
 func runCommand(c *exec.Cmd, out chan<- string) {
 	bout, _ := c.CombinedOutput()
 	out <- string(bout)
-}
-
-func fileExists(file string) bool {
-	if _, err := os.Stat(file); os.IsNotExist(err) {
-		return false
-	}
-	return true
 }
 
 func Clean() {

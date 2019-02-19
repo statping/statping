@@ -41,8 +41,6 @@ func catchCLI(args []string) error {
 	loadDotEnvs()
 
 	switch args[0] {
-	case "app":
-		handlers.DesktopInit(ipAddress, port)
 	case "version":
 		if COMMIT != "" {
 			fmt.Printf("Statping v%v (%v)\n", VERSION, COMMIT)

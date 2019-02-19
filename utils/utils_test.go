@@ -42,21 +42,8 @@ func TestCommand(t *testing.T) {
 	t.SkipNow()
 	in, out, err := Command("pwd")
 	assert.Nil(t, err)
-	assert.Contains(t, in, "statup")
+	assert.Contains(t, in, "statping")
 	assert.Empty(t, out)
-}
-
-func TestDurationReadable(t *testing.T) {
-	dur, _ := time.ParseDuration("1505s")
-	readable := DurationReadable(dur)
-	assert.Equal(t, "25 minutes", readable)
-}
-
-func ExampleDurationReadable() {
-	dur, _ := time.ParseDuration("25m")
-	readable := DurationReadable(dur)
-	fmt.Print(readable)
-	// Output: 25 minutes
 }
 
 func TestLog(t *testing.T) {
@@ -68,37 +55,67 @@ func TestLog(t *testing.T) {
 	assert.Nil(t, Log(5, errors.New("this is a 5 level error")))
 }
 
-func TestFormatDuration(t *testing.T) {
-	dur, _ := time.ParseDuration("158s")
-	formatted := FormatDuration(dur)
-	assert.Equal(t, "3 minutes", formatted)
-	dur, _ = time.ParseDuration("-65s")
-	formatted = FormatDuration(dur)
-	assert.Equal(t, "1 minute", formatted)
-}
-
-func TestDeleteFile(t *testing.T) {
-	assert.Nil(t, DeleteFile(Directory+"/logs/statup.log"))
-}
-
-func TestFailedDeleteFile(t *testing.T) {
-	assert.Error(t, DeleteFile(Directory+"/missingfilehere.txt"))
-}
-
-func TestLogHTTP(t *testing.T) {
-	req, err := http.NewRequest("GET", "/", nil)
-	assert.Nil(t, err)
-	assert.NotEmpty(t, Http(req))
+func TestToInt(t *testing.T) {
+	assert.Equal(t, int64(55), ToInt("55"))
+	assert.Equal(t, int64(55), ToInt(55))
+	assert.Equal(t, int64(55), ToInt(55.0))
+	assert.Equal(t, int64(55), ToInt([]byte("55")))
 }
 
 func TestToString(t *testing.T) {
-	assert.Equal(t, "1", ToString(1))
+	assert.Equal(t, "55", ToString(55))
+	assert.Equal(t, "55.000000", ToString(55.0))
+	assert.Equal(t, "55", ToString([]byte("55")))
+	dir, _ := time.ParseDuration("55s")
+	assert.Equal(t, "55s", ToString(dir))
+	assert.Equal(t, "true", ToString(true))
+	assert.Equal(t, time.Now().Format("Monday January _2, 2006 at 03:04PM"), ToString(time.Now()))
 }
 
 func ExampleToString() {
 	amount := 42
 	fmt.Print(ToString(amount))
 	// Output: 42
+}
+
+func TestSaveFile(t *testing.T) {
+	assert.Nil(t, SaveFile(Directory+"/test.txt", []byte("testing saving a file")))
+}
+
+func TestFileExists(t *testing.T) {
+	assert.True(t, FileExists(Directory+"/test.txt"))
+	assert.False(t, FileExists(Directory+"fake.txt"))
+}
+
+func TestDeleteFile(t *testing.T) {
+	assert.Nil(t, DeleteFile(Directory+"/test.txt"))
+	assert.Error(t, DeleteFile(Directory+"/missingfilehere.txt"))
+}
+
+func TestFormatDuration(t *testing.T) {
+	dur, _ := time.ParseDuration("158s")
+	assert.Equal(t, "3 minutes", FormatDuration(dur))
+	dur, _ = time.ParseDuration("-65s")
+	assert.Equal(t, "1 minute", FormatDuration(dur))
+	dur, _ = time.ParseDuration("3s")
+	assert.Equal(t, "3 seconds", FormatDuration(dur))
+	dur, _ = time.ParseDuration("48h")
+	assert.Equal(t, "2 days", FormatDuration(dur))
+	dur, _ = time.ParseDuration("12h")
+	assert.Equal(t, "12 hours", FormatDuration(dur))
+}
+
+func ExampleDurationReadable() {
+	dur, _ := time.ParseDuration("25m")
+	readable := DurationReadable(dur)
+	fmt.Print(readable)
+	// Output: 25 minutes
+}
+
+func TestLogHTTP(t *testing.T) {
+	req, err := http.NewRequest("GET", "/", nil)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, Http(req))
 }
 
 func TestStringInt(t *testing.T) {

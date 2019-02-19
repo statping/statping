@@ -205,5 +205,13 @@ func (f *Failure) ParseError() string {
 	if err {
 		return fmt.Sprintf("Domain is offline or not found")
 	}
+	err = strings.Contains(f.Issue, "i/o timeout")
+	if err {
+		return fmt.Sprintf("Connection Timed Out")
+	}
+	err = strings.Contains(f.Issue, "Client.Timeout exceeded while reading body")
+	if err {
+		return fmt.Sprintf("Timed Out on Response Body")
+	}
 	return f.Issue
 }
