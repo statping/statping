@@ -119,7 +119,7 @@ async function RenderChart(chart, service, start=0, end=9999999999, group="hour"
     }
     chart.render();
     chart.updateSeries([{
-        data: chartData
+        data: chartData || []
     }]);
 }
 
