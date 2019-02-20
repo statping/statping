@@ -49,10 +49,10 @@
                     <th scope="col"></th>
                 </tr>
                 </thead>
-                <tbody id="groups_table">
+                <tbody class="sortable_groups" id="groups_table">
                 {{range Groups false}}
                     <tr id="group_{{.Id}}" data-id="{{.Id}}">
-                        <td>{{.Name}}</td>
+                        <td><span class="drag_icon d-none d-md-inline"><i class="fas fa-bars"></i></span>{{.Name}}</td>
                         <td>{{len .Services}}</td>
                         <td>{{if .Public.Bool}}<span class="badge badge-primary">PUBLIC</span>{{else}}<span class="badge badge-secondary">PRIVATE</span>{{end}}</td>
                         <td class="text-right">
@@ -95,7 +95,31 @@
             newOrder.push(o);
         });
         $.ajax({
-            url: "/api/reorder",
+            url: "/api/services/reorder",
+            type: 'POST',
+            data: JSON.stringify(newOrder),
+            contentType: "application/json",
+            dataType: "json",
+            success: function(data) { }
+        });
+    });
+    sortable('.sortable_groups', {
+        forcePlaceholderSize: true,
+        hoverClass: 'sortable_drag',
+        handle: '.drag_icon'
+    });
+    sortable('.sortable_groups')[0].addEventListener('sortupdate', function(e) {
+        var i = 0;
+        var newOrder = [];
+        var dest = e.detail.destination.items;
+        dest.forEach(function(d) {
+            i++;
+            var dId = $(d).attr('data-id');
+            var o = {group: parseInt(dId), order: i};
+            newOrder.push(o);
+        });
+        $.ajax({
+            url: "/api/groups/reorder",
             type: 'POST',
             data: JSON.stringify(newOrder),
             contentType: "application/json",

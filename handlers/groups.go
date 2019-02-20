@@ -92,3 +92,26 @@ func apiGroupDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	sendJsonAction(group, "delete", w, r)
 }
+
+type groupOrder struct {
+	Id    int64 `json:"group"`
+	Order int   `json:"order"`
+}
+
+func apiGroupReorderHandler(w http.ResponseWriter, r *http.Request) {
+	if !IsFullAuthenticated(r) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	r.ParseForm()
+	var newOrder []*groupOrder
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&newOrder)
+	for _, g := range newOrder {
+		group := core.SelectGroup(g.Id)
+		group.Order = g.Order
+		group.Update()
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(newOrder)
+}

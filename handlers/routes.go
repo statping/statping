@@ -92,6 +92,7 @@ func Router() *mux.Router {
 	r.Handle("/api/groups", http.HandlerFunc(apiCreateGroupHandler)).Methods("POST")
 	r.Handle("/api/groups/{id}", http.HandlerFunc(apiGroupHandler)).Methods("GET")
 	r.Handle("/api/groups/{id}", http.HandlerFunc(apiGroupDeleteHandler)).Methods("DELETE")
+	r.Handle("/api/groups/reorder", http.HandlerFunc(apiGroupReorderHandler)).Methods("POST")
 
 	// API Routes
 	r.Handle("/api", http.HandlerFunc(apiIndexHandler))
@@ -102,7 +103,7 @@ func Router() *mux.Router {
 	r.Handle("/api/services", http.HandlerFunc(apiAllServicesHandler)).Methods("GET")
 	r.Handle("/api/services", http.HandlerFunc(apiCreateServiceHandler)).Methods("POST")
 	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceHandler)).Methods("GET")
-	r.Handle("/api/reorder", http.HandlerFunc(reorderServiceHandler)).Methods("POST")
+	r.Handle("/api/services/reorder", http.HandlerFunc(reorderServiceHandler)).Methods("POST")
 	r.Handle("/api/services/{id}/data", cached("30s", "application/json", http.HandlerFunc(apiServiceDataHandler))).Methods("GET")
 	r.Handle("/api/services/{id}/ping", cached("30s", "application/json", http.HandlerFunc(apiServicePingDataHandler))).Methods("GET")
 	r.Handle("/api/services/{id}/heatmap", cached("30s", "application/json", http.HandlerFunc(apiServiceHeatmapHandler))).Methods("GET")

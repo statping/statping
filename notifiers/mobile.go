@@ -93,7 +93,7 @@ func dataJson(s *types.Service, f *types.Failure) map[string]interface{} {
 // OnFailure will trigger failing service
 func (u *mobilePush) OnFailure(s *types.Service, f *types.Failure) {
 	data := dataJson(s, f)
-	msg := &PushArray{
+	msg := &pushArray{
 		Message: fmt.Sprintf("Your service '%v' is currently failing! Reason: %v", s.Name, f.Issue),
 		Title:   "Service Offline",
 		Topic:   mobileIdentifier,
@@ -108,7 +108,7 @@ func (u *mobilePush) OnSuccess(s *types.Service) {
 	data := dataJson(s, nil)
 	if !u.Online {
 		u.ResetUniqueQueue(s.Id)
-		msg := &PushArray{
+		msg := &pushArray{
 			Message: fmt.Sprintf("Your service '%v' is back online!", s.Name),
 			Title:   "Service Online",
 			Topic:   mobileIdentifier,
@@ -121,7 +121,7 @@ func (u *mobilePush) OnSuccess(s *types.Service) {
 
 // OnSave triggers when this notifier has been saved
 func (u *mobilePush) OnSave() error {
-	msg := &PushArray{
+	msg := &pushArray{
 		Message: "The Mobile Notifier has been saved",
 		Title:   "Notification Saved",
 		Topic:   mobileIdentifier,
@@ -132,7 +132,7 @@ func (u *mobilePush) OnSave() error {
 
 // OnTest triggers when this notifier has been saved
 func (u *mobilePush) OnTest() error {
-	msg := &PushArray{
+	msg := &pushArray{
 		Message:  "Testing the Mobile Notifier",
 		Title:    "Testing Notifications",
 		Topic:    mobileIdentifier,
@@ -143,7 +143,7 @@ func (u *mobilePush) OnTest() error {
 	if err != nil {
 		return err
 	}
-	var output MobileResponse
+	var output mobileResponse
 	err = json.Unmarshal(body, &output)
 	if err != nil {
 		return err
@@ -159,7 +159,7 @@ func (u *mobilePush) OnTest() error {
 
 // Send will send message to Statping push notifications endpoint
 func (u *mobilePush) Send(msg interface{}) error {
-	pushMessage := msg.(*PushArray)
+	pushMessage := msg.(*pushArray)
 	pushMessage.Tokens = []string{u.Var1}
 	pushMessage.Platform = utils.ToInt(u.Var2)
 	_, err := pushRequest(pushMessage)
@@ -169,24 +169,24 @@ func (u *mobilePush) Send(msg interface{}) error {
 	return nil
 }
 
-func pushRequest(msg *PushArray) ([]byte, error) {
+func pushRequest(msg *pushArray) ([]byte, error) {
 	if msg.Platform == 1 {
 		msg.Title = ""
 	}
-	body, _ := json.Marshal(&PushNotification{[]*PushArray{msg}})
+	body, err := json.Marshal(&PushNotification{[]*pushArray{msg}})
+	if err != nil {
+		return nil, err
+	}
 	url := "https://push.statping.com/api/push"
-	//if os.Getenv("GO_ENV") == "test" {
-	//	url = "https://pushdev.statping.com/api/push"
-	//}
-	body, _, err := utils.HttpRequest(url, "POST", "application/json", nil, bytes.NewBuffer(body), time.Duration(20*time.Second))
+	body, _, err = utils.HttpRequest(url, "POST", "application/json", nil, bytes.NewBuffer(body), time.Duration(20*time.Second))
 	return body, err
 }
 
 type PushNotification struct {
-	Array []*PushArray `json:"notifications"`
+	Array []*pushArray `json:"notifications"`
 }
 
-type PushArray struct {
+type pushArray struct {
 	Tokens   []string               `json:"tokens"`
 	Platform int64                  `json:"platform"`
 	Message  string                 `json:"message"`
@@ -195,13 +195,13 @@ type PushArray struct {
 	Data     map[string]interface{} `json:"data,omitempty"`
 }
 
-type MobileResponse struct {
+type mobileResponse struct {
 	Counts  int                   `json:"counts"`
-	Logs    []*MobileResponseLogs `json:"logs"`
+	Logs    []*mobileResponseLogs `json:"logs"`
 	Success string                `json:"success"`
 }
 
-type MobileResponseLogs struct {
+type mobileResponseLogs struct {
 	Type     string `json:"type"`
 	Platform string `json:"platform"`
 	Token    string `json:"token"`

@@ -112,13 +112,21 @@ func insertSampleGroups() error {
 	group1 := &Group{&types.Group{
 		Name:   "Main Services",
 		Public: types.NewNullBool(true),
+		Order:  2,
 	}}
 	_, err := group1.Create()
 	group2 := &Group{&types.Group{
 		Name:   "Linked Services",
 		Public: types.NewNullBool(false),
+		Order:  1,
 	}}
 	_, err = group2.Create()
+	group3 := &Group{&types.Group{
+		Name:   "Empty Group",
+		Public: types.NewNullBool(false),
+		Order:  3,
+	}}
+	_, err = group3.Create()
 	return err
 }
 

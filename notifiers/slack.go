@@ -34,6 +34,13 @@ const (
 	slackText       = `{"text":"{{.}}"}`
 )
 
+func init() {
+	err := notifier.AddNotifier(slacker)
+	if err != nil {
+		panic(err)
+	}
+}
+
 type slack struct {
 	*notifier.Notification
 }
@@ -72,14 +79,6 @@ type slackMessage struct {
 	Service  *types.Service
 	Template string
 	Time     int64
-}
-
-// DEFINE YOUR NOTIFICATION HERE.
-func init() {
-	err := notifier.AddNotifier(slacker)
-	if err != nil {
-		panic(err)
-	}
 }
 
 // Send will send a HTTP Post to the slack webhooker API. It accepts type: string

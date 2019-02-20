@@ -24,10 +24,10 @@
     <div class="form-group row">
         <label class="col-sm-4 col-form-label">Message Date Range</label>
         <div class="col-sm-4">
-            <input type="text" name="start_on" class="form-control form-control-plaintext" id="start_on" value="{{.StartOn}}" required>
+            <input type="text" name="start_on" class="form-control form-control-plaintext" id="start_on" value="{{ParseTime .StartOn "2006-01-02T15:04:05Z"}}" required>
         </div>
         <div class="col-sm-4">
-            <input type="text" name="end_on" class="form-control form-control-plaintext" id="end_on" value="{{.EndOn}}" required>
+            <input type="text" name="end_on" class="form-control form-control-plaintext" id="end_on" value="{{ParseTime .EndOn "2006-01-02T15:04:05Z"}}" required>
         </div>
     </div>
 

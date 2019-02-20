@@ -98,6 +98,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"ToUnix": func(t time.Time) int64 {
 			return t.UTC().Unix()
 		},
+		"ParseTime": func(t time.Time, format string) string {
+			return t.Format(format)
+		},
 		"FromUnix": func(t int64) string {
 			return utils.Timezoner(time.Unix(t, 0), core.CoreApp.Timezone).Format("Monday, January 02")
 		},

@@ -230,37 +230,7 @@ let options = {
         lineCap: 'butt',
         colors: ["#3aa82d"],
     },
-    series: [
-        {
-            name: "Response Time",
-            data: [
-                {
-                    x: "02-10-2017 GMT",
-                    y: 34
-                },
-                {
-                    x: "02-11-2017 GMT",
-                    y: 43
-                },
-                {
-                    x: "02-12-2017 GMT",
-                    y: 31
-                },
-                {
-                    x: "02-13-2017 GMT",
-                    y: 43
-                },
-                {
-                    x: "02-14-2017 GMT",
-                    y: 33
-                },
-                {
-                    x: "02-15-2017 GMT",
-                    y: 52
-                }
-            ]
-        }
-    ],
+	series: [{data: [{}]}],
     xaxis: {
         type: "datetime",
         tickAmount: 8,
@@ -294,7 +264,7 @@ var heat_options = {
     enableShades: true,
     shadeIntensity: 0.5,
     colors: ["#d53a3b"],
-    series: [{}],
+    series: [{data: [{}]}],
     yaxis: {
         labels: {
             formatter: (value) => {
