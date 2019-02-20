@@ -382,7 +382,7 @@ func TestSelectGroups(t *testing.T) {
 	groups := SelectGroups(true, false)
 	assert.Equal(t, int(3), len(groups))
 	groups = SelectGroups(true, true)
-	assert.Equal(t, int(4), len(groups))
+	assert.Equal(t, int(5), len(groups))
 }
 
 func TestService_TotalFailures(t *testing.T) {
@@ -404,7 +404,7 @@ func TestService_TotalFailuresOnDate(t *testing.T) {
 	service := SelectService(8)
 	failures, err := service.TotalFailuresOnDate(ago)
 	assert.Nil(t, err)
-	assert.Equal(t, uint64(0), failures)
+	assert.Equal(t, uint64(1), failures)
 }
 
 func TestCountFailures(t *testing.T) {
