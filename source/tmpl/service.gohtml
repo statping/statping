@@ -303,6 +303,8 @@ async function RenderHeatmap() {
 }
 
 async function RenderChartLatency() {
+	options.fill.colors = {{if $s.Online}}["#48d338"]{{else}}["#dd3545"]{{end}};
+	options.stroke.colors = {{if $s.Online}}["#3aa82d"]{{else}}["#c23342"]{{end}};
     let chart = new ApexCharts(document.querySelector("#service"), options);
     await RenderChart(chart,{{$s.Id}},{{.StartUnix}},{{.EndUnix}},"hour");
 }

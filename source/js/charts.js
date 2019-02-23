@@ -111,32 +111,7 @@ let options = {
 	series: [
 		{
 			name: "Response Time",
-			data: [
-				{
-					x: "02-10-2017 GMT",
-					y: 34
-				},
-				{
-					x: "02-11-2017 GMT",
-					y: 43
-				},
-				{
-					x: "02-12-2017 GMT",
-					y: 31
-				},
-				{
-					x: "02-13-2017 GMT",
-					y: 43
-				},
-				{
-					x: "02-14-2017 GMT",
-					y: 33
-				},
-				{
-					x: "02-15-2017 GMT",
-					y: 52
-				}
-			]
+			data: [],
 		}
 	],
 	xaxis: {
@@ -152,10 +127,12 @@ const startOn = UTCTime() - (86400 * 14);
 
 async function RenderCharts() {
 {{ range .Services }}
-let chart{{.Id}} = new ApexCharts(document.querySelector("#service_{{js .Id}}"), options);{{end}}
+	options.fill.colors = {{if .Online}}["#48d338"]{{else}}["#dd3545"]{{end}};
+	options.stroke.colors = {{if .Online}}["#3aa82d"]{{else}}["#c23342"]{{end}};
 
-{{ range .Services }}
-await RenderChart(chart{{js .Id}}, {{js .Id}}, startOn);{{end}}
+	let chart{{.Id}} = new ApexCharts(document.querySelector("#service_{{js .Id}}"), options);
+
+	await RenderChart(chart{{js .Id}}, {{js .Id}}, startOn);{{end}}
 }
 
 $( document ).ready(function() {
