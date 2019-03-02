@@ -36,8 +36,7 @@ func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 		notif := n.(notifier.Notifier)
 		notifiers = append(notifiers, notif.Select())
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(notifiers)
+	returnJson(notifiers, w, r)
 }
 
 func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
@@ -51,8 +50,7 @@ func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(notifierObj)
+	returnJson(notifierObj, w, r)
 }
 
 func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {

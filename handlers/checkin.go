@@ -37,8 +37,7 @@ func apiAllCheckinsHandler(w http.ResponseWriter, r *http.Request) {
 		c.Hits = c.AllHits()
 		c.Failures = c.LimitedFailures(64)
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(checkins)
+	returnJson(checkins, w, r)
 }
 
 func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
@@ -54,8 +53,7 @@ func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	checkin.Hits = checkin.LimitedHits(32)
 	checkin.Failures = checkin.LimitedFailures(32)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(checkin)
+	returnJson(checkin, w, r)
 }
 
 func checkinCreateHandler(w http.ResponseWriter, r *http.Request) {

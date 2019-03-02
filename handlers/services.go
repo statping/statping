@@ -78,8 +78,7 @@ func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
 		service.Order = s.Order
 		service.Update(false)
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(newOrder)
+	returnJson(newOrder, w, r)
 }
 
 func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
@@ -141,8 +140,7 @@ func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(errors.New("service not found"), w, r)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(servicer)
+	returnJson(servicer, w, r)
 }
 
 func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -207,8 +205,7 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 	end := time.Unix(endField, 0)
 
 	obj := core.GraphDataRaw(service, start, end, grouping, "latency")
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(obj)
+	returnJson(obj, w, r)
 }
 
 func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
@@ -227,9 +224,7 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 	end := time.Unix(endField, 0)
 
 	obj := core.GraphDataRaw(service, start, end, grouping, "ping_time")
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(obj)
+	returnJson(obj, w, r)
 }
 
 type dataXy struct {
@@ -285,9 +280,7 @@ func apiServiceHeatmapHandler(w http.ResponseWriter, r *http.Request) {
 		month = 1
 
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(monthOutput)
+	returnJson(monthOutput, w, r)
 }
 
 func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
@@ -315,8 +308,7 @@ func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	services := core.Services()
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(services)
+	returnJson(services, w, r)
 }
 
 func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
@@ -345,8 +337,7 @@ func apiServiceFailuresHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(errors.New("service not found"), w, r)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(servicer.AllFailures())
+	returnJson(servicer.AllFailures(), w, r)
 }
 
 func apiServiceHitsHandler(w http.ResponseWriter, r *http.Request) {
@@ -367,6 +358,5 @@ func apiServiceHitsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(hits)
+	returnJson(hits, w, r)
 }

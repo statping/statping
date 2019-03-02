@@ -32,8 +32,7 @@ func apiAllGroupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	auth := IsUser(r)
 	groups := core.SelectGroups(false, auth)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(groups)
+	returnJson(groups, w, r)
 }
 
 // apiGroupHandler will show a single group
@@ -48,8 +47,7 @@ func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(errors.New("group not found"), w, r)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(group)
+	returnJson(group, w, r)
 }
 
 // apiCreateGroupHandler accepts a POST method to create new groups
@@ -112,6 +110,5 @@ func apiGroupReorderHandler(w http.ResponseWriter, r *http.Request) {
 		group.Order = g.Order
 		group.Update()
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(newOrder)
+	returnJson(newOrder, w, r)
 }

@@ -16,7 +16,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/hunterlong/statping/core"
@@ -42,8 +41,7 @@ func apiIndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	coreClone := *core.CoreApp
 	coreClone.Started = utils.Timezoner(core.CoreApp.Started, core.CoreApp.Timezone)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(coreClone)
+	returnJson(coreClone, w, r)
 }
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
@@ -77,8 +75,7 @@ func sendErrorJson(err error, w http.ResponseWriter, r *http.Request) {
 		Status: "error",
 		Error:  err.Error(),
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(output)
+	returnJson(output, w, r)
 }
 
 func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *http.Request) {
@@ -132,8 +129,7 @@ func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *ht
 		Output: obj,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(output)
+	returnJson(output, w, r)
 }
 
 func sendUnauthorizedJson(w http.ResponseWriter, r *http.Request) {
@@ -141,7 +137,6 @@ func sendUnauthorizedJson(w http.ResponseWriter, r *http.Request) {
 		Status: "error",
 		Error:  errors.New("not authorized").Error(),
 	}
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusUnauthorized)
-	json.NewEncoder(w).Encode(output)
+	returnJson(output, w, r)
 }

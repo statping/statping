@@ -17,6 +17,7 @@ package handlers
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statping/core"
@@ -254,6 +255,12 @@ func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 	if err != nil {
 		utils.Log(4, err)
 	}
+}
+
+func returnJson(d interface{}, w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	json.NewEncoder(w).Encode(d)
 }
 
 // error404Handler is a HTTP handler for 404 error pages

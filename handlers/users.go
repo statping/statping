@@ -59,8 +59,7 @@ func apiUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user.Password = ""
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(user)
+	returnJson(user, w, r)
 }
 
 func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -121,8 +120,7 @@ func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
+	returnJson(users, w, r)
 }
 
 func apiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {

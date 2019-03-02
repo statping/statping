@@ -59,8 +59,7 @@ func apiAllMessagesHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(messages)
+	returnJson(messages, w, r)
 }
 
 func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {
@@ -95,8 +94,7 @@ func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(message)
+	returnJson(message, w, r)
 }
 
 func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
