@@ -70,16 +70,16 @@ func (u *discord) Select() *notifier.Notification {
 // OnFailure will trigger failing service
 func (u *discord) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf(`{"content": "Your service '%v' is currently failing! Reason: %v"}`, s.Name, f.Issue)
-	u.AddQueue(s.Id, msg)
+	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	u.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (u *discord) OnSuccess(s *types.Service) {
 	if !u.Online {
-		u.ResetUniqueQueue(s.Id)
+		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		msg := fmt.Sprintf(`{"content": "Your service '%v' is back online!"}`, s.Name)
-		u.AddQueue(s.Id, msg)
+		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}
 	u.Online = true
 }
@@ -87,7 +87,7 @@ func (u *discord) OnSuccess(s *types.Service) {
 // OnSave triggers when this notifier has been saved
 func (u *discord) OnSave() error {
 	msg := fmt.Sprintf(`{"content": "The discord notifier on Statping was just updated."}`)
-	u.AddQueue(0, msg)
+	u.AddQueue("saved", msg)
 	return nil
 }
 

@@ -16,6 +16,7 @@
 package notifiers
 
 import (
+	"fmt"
 	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
@@ -75,23 +76,23 @@ func (u *commandLine) Select() *notifier.Notification {
 
 // OnFailure for commandLine will trigger failing service
 func (u *commandLine) OnFailure(s *types.Service, f *types.Failure) {
-	u.AddQueue(s.Id, u.Var2)
+	u.AddQueue(fmt.Sprintf("service_%v", s.Id), u.Var2)
 	u.Online = false
 }
 
 // OnSuccess for commandLine will trigger successful service
 func (u *commandLine) OnSuccess(s *types.Service) {
 	if !u.Online {
-		u.ResetUniqueQueue(s.Id)
-		u.AddQueue(s.Id, u.Var1)
+		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
+		u.AddQueue(fmt.Sprintf("service_%v", s.Id), u.Var1)
 	}
 	u.Online = true
 }
 
 // OnSave for commandLine triggers when this notifier has been saved
 func (u *commandLine) OnSave() error {
-	u.AddQueue(0, u.Var1)
-	u.AddQueue(0, u.Var2)
+	u.AddQueue("saved", u.Var1)
+	u.AddQueue("saved", u.Var2)
 	return nil
 }
 

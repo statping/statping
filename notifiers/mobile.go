@@ -99,7 +99,7 @@ func (u *mobilePush) OnFailure(s *types.Service, f *types.Failure) {
 		Topic:   mobileIdentifier,
 		Data:    data,
 	}
-	u.AddQueue(s.Id, msg)
+	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	u.Online = false
 }
 
@@ -107,14 +107,14 @@ func (u *mobilePush) OnFailure(s *types.Service, f *types.Failure) {
 func (u *mobilePush) OnSuccess(s *types.Service) {
 	data := dataJson(s, nil)
 	if !u.Online {
-		u.ResetUniqueQueue(s.Id)
+		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		msg := &pushArray{
 			Message: fmt.Sprintf("Your service '%v' is back online!", s.Name),
 			Title:   "Service Online",
 			Topic:   mobileIdentifier,
 			Data:    data,
 		}
-		u.AddQueue(s.Id, msg)
+		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}
 	u.Online = true
 }
@@ -126,7 +126,7 @@ func (u *mobilePush) OnSave() error {
 		Title:   "Notification Saved",
 		Topic:   mobileIdentifier,
 	}
-	u.AddQueue(0, msg)
+	u.AddQueue("saved", msg)
 	return nil
 }
 

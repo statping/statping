@@ -188,14 +188,14 @@ func (u *email) OnFailure(s *types.Service, f *types.Failure) {
 		Data:     interface{}(s),
 		From:     u.Var1,
 	}
-	u.AddQueue(s.Id, email)
+	u.AddQueue(fmt.Sprintf("service_%v", s.Id), email)
 	u.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (u *email) OnSuccess(s *types.Service) {
 	if !u.Online {
-		u.ResetUniqueQueue(s.Id)
+		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		email := &emailOutgoing{
 			To:       u.Var2,
 			Subject:  fmt.Sprintf("Service %v is Back Online", s.Name),
@@ -203,7 +203,7 @@ func (u *email) OnSuccess(s *types.Service) {
 			Data:     interface{}(s),
 			From:     u.Var1,
 		}
-		u.AddQueue(s.Id, email)
+		u.AddQueue(fmt.Sprintf("service_%v", s.Id), email)
 	}
 	u.Online = true
 }

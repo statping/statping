@@ -378,7 +378,7 @@ func (s *Service) Update(restart bool) error {
 	if !s.AllowNotifications.Bool {
 		for _, n := range CoreApp.Notifications {
 			notif := n.(notifier.Notifier).Select()
-			notif.ResetUniqueQueue(s.Id)
+			notif.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		}
 	}
 	if restart {
