@@ -90,7 +90,7 @@ test: clean compile install build-plugin
 
 test-api:
 	DB_CONN=sqlite DB_HOST=localhost DB_DATABASE=sqlite DB_PASS=none DB_USER=none statping &
-	sleep 15 && newman run source/tmpl/postman.json -e dev/postman_environment.json --delay-request 500
+	sleep 300 && newman run source/tmpl/postman.json -e dev/postman_environment.json --delay-request 500
 
 # report coverage to Coveralls
 coverage:
