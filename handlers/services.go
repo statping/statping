@@ -49,10 +49,6 @@ func renderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func servicesHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsUser(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	data := map[string]interface{}{
 		"Services": core.CoreApp.Services,
 	}
@@ -65,10 +61,6 @@ type serviceOrder struct {
 }
 
 func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	r.ParseForm()
 	var newOrder []*serviceOrder
 	decoder := json.NewDecoder(r.Body)
@@ -130,10 +122,6 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsReadAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	servicer := core.SelectService(utils.ToInt(vars["id"]))
 	if servicer == nil {
@@ -144,10 +132,6 @@ func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	var service *types.Service
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&service)
@@ -165,10 +149,6 @@ func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	service := core.SelectService(utils.ToInt(vars["id"]))
 	if service == nil {
@@ -284,10 +264,6 @@ func apiServiceHeatmapHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	service := core.SelectService(utils.ToInt(vars["id"]))
 	if service == nil {
@@ -303,19 +279,11 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsReadAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	services := core.Services()
 	returnJson(services, w, r)
 }
 
 func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	vars := mux.Vars(r)
 	service := core.SelectService(utils.ToInt(vars["id"]))
 	if service == nil {
@@ -327,10 +295,6 @@ func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceFailuresHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsReadAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	servicer := core.SelectService(utils.ToInt(vars["id"]))
 	if servicer == nil {
@@ -341,10 +305,6 @@ func apiServiceFailuresHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceHitsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsReadAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	servicer := core.SelectService(utils.ToInt(vars["id"]))
 	if servicer == nil {

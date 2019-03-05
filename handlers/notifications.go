@@ -27,10 +27,6 @@ import (
 )
 
 func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	var notifiers []*notifier.Notification
 	for _, n := range core.CoreApp.Notifications {
 		notif := n.(notifier.Notifier)
@@ -40,10 +36,6 @@ func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	_, notifierObj, err := notifier.SelectNotifier(vars["notifier"])
 	if err != nil {
@@ -54,10 +46,6 @@ func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	notifer, not, err := notifier.SelectNotifier(vars["notifier"])
 	if err != nil {
@@ -81,10 +69,6 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	form := parseForm(r)
 	vars := mux.Vars(r)
 	method := vars["method"]

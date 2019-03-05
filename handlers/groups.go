@@ -26,10 +26,6 @@ import (
 
 // apiAllGroupHandler will show all the groups
 func apiAllGroupHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsReadAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	auth := IsUser(r)
 	groups := core.SelectGroups(false, auth)
 	returnJson(groups, w, r)
@@ -37,10 +33,6 @@ func apiAllGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 // apiGroupHandler will show a single group
 func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsReadAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	group := core.SelectGroup(utils.ToInt(vars["id"]))
 	if group == nil {
@@ -52,10 +44,6 @@ func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 // apiCreateGroupHandler accepts a POST method to create new groups
 func apiCreateGroupHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	var group *core.Group
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&group)
@@ -73,10 +61,6 @@ func apiCreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 // apiGroupDeleteHandler accepts a DELETE method to delete groups
 func apiGroupDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	group := core.SelectGroup(utils.ToInt(vars["id"]))
 	if group == nil {
@@ -97,10 +81,6 @@ type groupOrder struct {
 }
 
 func apiGroupReorderHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	r.ParseForm()
 	var newOrder []*groupOrder
 	decoder := json.NewDecoder(r.Body)

@@ -35,10 +35,6 @@ func messagesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func viewMessageHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	vars := mux.Vars(r)
 	id := utils.ToInt(vars["id"])
 	message, err := core.SelectMessage(id)
@@ -50,10 +46,6 @@ func viewMessageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllMessagesHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsReadAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	messages, err := core.SelectMessages()
 	if err != nil {
 		sendErrorJson(err, w, r)
@@ -63,10 +55,6 @@ func apiAllMessagesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	var message *types.Message
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&message)
@@ -84,10 +72,6 @@ func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsReadAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	message, err := core.SelectMessage(utils.ToInt(vars["id"]))
 	if err != nil {
@@ -98,10 +82,6 @@ func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	message, err := core.SelectMessage(utils.ToInt(vars["id"]))
 	if err != nil {
@@ -117,10 +97,6 @@ func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiMessageUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	message, err := core.SelectMessage(utils.ToInt(vars["id"]))
 	if err != nil {

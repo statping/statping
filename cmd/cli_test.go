@@ -33,13 +33,14 @@ var (
 
 func init() {
 	dir = utils.Directory
+	core.SampleHits = 480
 }
 
 func TestStartServerCommand(t *testing.T) {
 	os.Setenv("DB_CONN", "sqlite")
 	cmd := helperCommand(nil, "")
 	var got = make(chan string)
-	commandAndSleep(cmd, time.Duration(360*time.Second), got)
+	commandAndSleep(cmd, time.Duration(60*time.Second), got)
 	os.Unsetenv("DB_CONN")
 	gg, _ := <-got
 	assert.Contains(t, gg, "DB_CONN environment variable was found")

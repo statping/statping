@@ -1,9 +1,6 @@
 package handlers
 
 import (
-	"github.com/hunterlong/statping/core"
-	"net/http"
-	"net/http/httptest"
 	"sync"
 	"time"
 )
@@ -73,32 +70,4 @@ func (s Storage) Set(key string, content []byte, duration time.Duration) {
 		Content:    content,
 		Expiration: time.Now().Add(duration).UnixNano(),
 	}
-}
-
-func cached(duration, contentType string, handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		content := CacheStorage.Get(r.RequestURI)
-		w.Header().Set("Content-Type", contentType)
-		if core.Configs == nil {
-			handler(w, r)
-			return
-		}
-		if content != nil {
-			w.Write(content)
-		} else {
-			c := httptest.NewRecorder()
-			handler(c, r)
-			content := c.Body.Bytes()
-			result := c.Result()
-			if result.StatusCode != 200 {
-				w.WriteHeader(result.StatusCode)
-				w.Write(content)
-				return
-			}
-			w.Write(content)
-			if d, err := time.ParseDuration(duration); err == nil {
-				go CacheStorage.Set(r.RequestURI, content, d)
-			}
-		}
-	})
 }

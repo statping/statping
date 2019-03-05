@@ -35,20 +35,12 @@ type apiResponse struct {
 }
 
 func apiIndexHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	coreClone := *core.CoreApp
 	coreClone.Started = utils.Timezoner(core.CoreApp.Started, core.CoreApp.Timezone)
 	returnJson(coreClone, w, r)
 }
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	var err error
 	core.CoreApp.ApiKey = utils.NewSHA1Hash(40)
 	core.CoreApp.ApiSecret = utils.NewSHA1Hash(40)
@@ -61,10 +53,6 @@ func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiClearCacheHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	CacheStorage = NewStorage()
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

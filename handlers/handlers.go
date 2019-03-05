@@ -217,13 +217,11 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 		utils.Log(4, err)
 	}
 	// render the page requested
-	_, err = mainTemplate.Parse(render)
-	if err != nil {
+	if _, err := mainTemplate.Parse(render); err != nil {
 		utils.Log(4, err)
 	}
 	// execute the template
-	err = mainTemplate.Execute(w, data)
-	if err != nil {
+	if err := mainTemplate.Execute(w, data); err != nil {
 		utils.Log(4, err)
 	}
 }
@@ -246,20 +244,16 @@ func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 			return core.CoreApp.Services
 		},
 	})
-	_, err = t.Parse(render)
-	if err != nil {
+	if _, err := t.Parse(render); err != nil {
 		utils.Log(4, err)
 	}
-
-	err = t.Execute(w, data)
-	if err != nil {
+	if err := t.Execute(w, data); err != nil {
 		utils.Log(4, err)
 	}
 }
 
 func returnJson(d interface{}, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(d)
 }
 

@@ -100,7 +100,7 @@ func TestSelectNotification(t *testing.T) {
 func TestAddQueue(t *testing.T) {
 	msg := "this is a test in the queue!"
 	example.AddQueue(fmt.Sprintf("service_%v", 0), msg)
-	assert.Equal(t, fmt.Sprintf("service_%v", 1), len(example.Queue))
+	assert.Equal(t, 1, len(example.Queue))
 	example.AddQueue(fmt.Sprintf("service_%v", 0), msg)
 	assert.Equal(t, 2, len(example.Queue))
 	example.AddQueue(fmt.Sprintf("service_%v", 0), msg)

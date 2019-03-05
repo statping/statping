@@ -24,7 +24,7 @@ import (
 
 var (
 	sampleStart = time.Now().Add((-24 * 7) * time.Hour).UTC()
-	sampleHits  = 9900.
+	SampleHits  = 9900.
 )
 
 // InsertSampleData will create the example/dummy services for a brand new Statping installation
@@ -173,12 +173,12 @@ func InsertSampleHits() error {
 		service := SelectService(i)
 		seed := time.Now().UnixNano()
 
-		utils.Log(1, fmt.Sprintf("Adding %v sample hit records to service %v", sampleHits, service.Name))
+		utils.Log(1, fmt.Sprintf("Adding %v sample hit records to service %v", SampleHits, service.Name))
 		createdAt := sampleStart
 
 		p := utils.NewPerlin(2., 2., 10, seed)
 
-		for hi := 0.; hi <= float64(sampleHits); hi++ {
+		for hi := 0.; hi <= float64(SampleHits); hi++ {
 
 			latency := p.Noise1D(hi / 500)
 			createdAt = createdAt.Add(60 * time.Second)
@@ -440,17 +440,9 @@ func insertHitRecords(since time.Time, amount int64) {
 		service := SelectService(i)
 		utils.Log(1, fmt.Sprintf("Adding %v hit records to service %v", amount, service.Name))
 		createdAt := since
-
 		p := utils.NewPerlin(2, 2, 5, time.Now().UnixNano())
-
-		utils.Log(1, fmt.Sprint(p))
-
 		for hi := int64(1); hi <= amount; hi++ {
-
 			latency := p.Noise1D(float64(hi / 10))
-
-			fmt.Printf("%0.0f\t%0.4f\n", hi, latency)
-
 			createdAt = createdAt.Add(1 * time.Minute)
 			hit := &types.Hit{
 				Service:   service.Id,

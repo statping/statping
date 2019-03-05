@@ -27,10 +27,6 @@ type PluginSelect struct {
 }
 
 func pluginSavedHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	r.ParseForm()
 	//vars := mux.Vars(router)
 	//plug := SelectPlugin(vars["name"])
@@ -43,11 +39,6 @@ func pluginSavedHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func pluginsDownloadHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsFullAuthenticated(r)
-	if !auth {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	//vars := mux.Vars(router)
 	//name := vars["name"]
 	//DownloadPlugin(name)

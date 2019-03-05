@@ -59,85 +59,85 @@ func Router() *mux.Router {
 	r.Handle("/dashboard", http.HandlerFunc(dashboardHandler)).Methods("GET")
 	r.Handle("/dashboard", http.HandlerFunc(loginHandler)).Methods("POST")
 	r.Handle("/logout", http.HandlerFunc(logoutHandler))
-	r.Handle("/plugins/download/{name}", http.HandlerFunc(pluginsDownloadHandler))
-	r.Handle("/plugins/{name}/save", http.HandlerFunc(pluginSavedHandler)).Methods("POST")
-	r.Handle("/help", http.HandlerFunc(helpHandler))
-	r.Handle("/logs", http.HandlerFunc(logsHandler))
-	r.Handle("/logs/line", http.HandlerFunc(logsLineHandler))
+	r.Handle("/plugins/download/{name}", authenticated(pluginsDownloadHandler, true))
+	r.Handle("/plugins/{name}/save", authenticated(pluginSavedHandler, true)).Methods("POST")
+	r.Handle("/help", authenticated(helpHandler, true))
+	r.Handle("/logs", authenticated(logsHandler, true))
+	r.Handle("/logs/line", readOnly(logsLineHandler, true))
 
 	// USER Routes
-	r.Handle("/users", http.HandlerFunc(usersHandler)).Methods("GET")
-	r.Handle("/user/{id}", http.HandlerFunc(usersEditHandler)).Methods("GET")
+	r.Handle("/users", readOnly(usersHandler, true)).Methods("GET")
+	r.Handle("/user/{id}", authenticated(usersEditHandler, true)).Methods("GET")
 
 	// MESSAGES Routes
-	r.Handle("/messages", http.HandlerFunc(messagesHandler)).Methods("GET")
-	r.Handle("/message/{id}", http.HandlerFunc(viewMessageHandler)).Methods("GET")
+	r.Handle("/messages", authenticated(messagesHandler, true)).Methods("GET")
+	r.Handle("/message/{id}", authenticated(viewMessageHandler, true)).Methods("GET")
 
 	// SETTINGS Routes
-	r.Handle("/settings", http.HandlerFunc(settingsHandler)).Methods("GET")
-	r.Handle("/settings", http.HandlerFunc(saveSettingsHandler)).Methods("POST")
-	r.Handle("/settings/css", http.HandlerFunc(saveSASSHandler)).Methods("POST")
-	r.Handle("/settings/build", http.HandlerFunc(saveAssetsHandler)).Methods("GET")
-	r.Handle("/settings/delete_assets", http.HandlerFunc(deleteAssetsHandler)).Methods("GET")
-	r.Handle("/settings/export", http.HandlerFunc(exportHandler)).Methods("GET")
+	r.Handle("/settings", authenticated(settingsHandler, true)).Methods("GET")
+	r.Handle("/settings", authenticated(saveSettingsHandler, true)).Methods("POST")
+	r.Handle("/settings/css", authenticated(saveSASSHandler, true)).Methods("POST")
+	r.Handle("/settings/build", authenticated(saveAssetsHandler, true)).Methods("GET")
+	r.Handle("/settings/delete_assets", authenticated(deleteAssetsHandler, true)).Methods("GET")
+	r.Handle("/settings/export", authenticated(exportHandler, true)).Methods("GET")
 
 	// SERVICE Routes
 	r.Handle("/services", http.HandlerFunc(servicesHandler)).Methods("GET")
 	r.Handle("/service/{id}", http.HandlerFunc(servicesViewHandler)).Methods("GET")
-	r.Handle("/service/{id}/edit", http.HandlerFunc(servicesViewHandler)).Methods("GET")
-	r.Handle("/service/{id}/delete_failures", http.HandlerFunc(servicesDeleteFailuresHandler)).Methods("GET")
+	r.Handle("/service/{id}/edit", authenticated(servicesViewHandler, true)).Methods("GET")
+	r.Handle("/service/{id}/delete_failures", authenticated(servicesDeleteFailuresHandler, true)).Methods("GET")
 
 	// API GROUPS Routes
-	r.Handle("/api/groups", http.HandlerFunc(apiAllGroupHandler)).Methods("GET")
-	r.Handle("/api/groups", http.HandlerFunc(apiCreateGroupHandler)).Methods("POST")
-	r.Handle("/api/groups/{id}", http.HandlerFunc(apiGroupHandler)).Methods("GET")
-	r.Handle("/api/groups/{id}", http.HandlerFunc(apiGroupDeleteHandler)).Methods("DELETE")
-	r.Handle("/api/groups/reorder", http.HandlerFunc(apiGroupReorderHandler)).Methods("POST")
+	r.Handle("/api/groups", readOnly(apiAllGroupHandler, false)).Methods("GET")
+	r.Handle("/api/groups", authenticated(apiCreateGroupHandler, false)).Methods("POST")
+	r.Handle("/api/groups/{id}", readOnly(apiGroupHandler, false)).Methods("GET")
+	r.Handle("/api/groups/{id}", authenticated(apiGroupDeleteHandler, false)).Methods("DELETE")
+	r.Handle("/api/groups/reorder", authenticated(apiGroupReorderHandler, false)).Methods("POST")
 
 	// API Routes
-	r.Handle("/api", http.HandlerFunc(apiIndexHandler))
-	r.Handle("/api/renew", http.HandlerFunc(apiRenewHandler))
-	r.Handle("/api/clear_cache", http.HandlerFunc(apiClearCacheHandler))
+	r.Handle("/api", authenticated(apiIndexHandler, false))
+	r.Handle("/api/renew", authenticated(apiRenewHandler, false))
+	r.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
 
 	// API SERVICE Routes
-	r.Handle("/api/services", http.HandlerFunc(apiAllServicesHandler)).Methods("GET")
-	r.Handle("/api/services", http.HandlerFunc(apiCreateServiceHandler)).Methods("POST")
-	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceHandler)).Methods("GET")
-	r.Handle("/api/services/reorder", http.HandlerFunc(reorderServiceHandler)).Methods("POST")
+	r.Handle("/api/services", readOnly(apiAllServicesHandler, false)).Methods("GET")
+	r.Handle("/api/services", authenticated(apiCreateServiceHandler, false)).Methods("POST")
+	r.Handle("/api/services/{id}", readOnly(apiServiceHandler, false)).Methods("GET")
+	r.Handle("/api/services/reorder", authenticated(reorderServiceHandler, false)).Methods("POST")
 	r.Handle("/api/services/{id}/data", cached("30s", "application/json", http.HandlerFunc(apiServiceDataHandler))).Methods("GET")
 	r.Handle("/api/services/{id}/ping", cached("30s", "application/json", http.HandlerFunc(apiServicePingDataHandler))).Methods("GET")
 	r.Handle("/api/services/{id}/heatmap", cached("30s", "application/json", http.HandlerFunc(apiServiceHeatmapHandler))).Methods("GET")
-	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceUpdateHandler)).Methods("POST")
-	r.Handle("/api/services/{id}", http.HandlerFunc(apiServiceDeleteHandler)).Methods("DELETE")
-	r.Handle("/api/services/{id}/failures", http.HandlerFunc(apiServiceFailuresHandler)).Methods("GET")
-	r.Handle("/api/services/{id}/failures", http.HandlerFunc(servicesDeleteFailuresHandler)).Methods("DELETE")
-	r.Handle("/api/services/{id}/hits", http.HandlerFunc(apiServiceHitsHandler)).Methods("GET")
+	r.Handle("/api/services/{id}", authenticated(apiServiceUpdateHandler, false)).Methods("POST")
+	r.Handle("/api/services/{id}", authenticated(apiServiceDeleteHandler, false)).Methods("DELETE")
+	r.Handle("/api/services/{id}/failures", authenticated(apiServiceFailuresHandler, false)).Methods("GET")
+	r.Handle("/api/services/{id}/failures", authenticated(servicesDeleteFailuresHandler, false)).Methods("DELETE")
+	r.Handle("/api/services/{id}/hits", authenticated(apiServiceHitsHandler, false)).Methods("GET")
 
 	// API USER Routes
-	r.Handle("/api/users", http.HandlerFunc(apiAllUsersHandler)).Methods("GET")
-	r.Handle("/api/users", http.HandlerFunc(apiCreateUsersHandler)).Methods("POST")
-	r.Handle("/api/users/{id}", http.HandlerFunc(apiUserHandler)).Methods("GET")
-	r.Handle("/api/users/{id}", http.HandlerFunc(apiUserUpdateHandler)).Methods("POST")
-	r.Handle("/api/users/{id}", http.HandlerFunc(apiUserDeleteHandler)).Methods("DELETE")
+	r.Handle("/api/users", authenticated(apiAllUsersHandler, false)).Methods("GET")
+	r.Handle("/api/users", authenticated(apiCreateUsersHandler, false)).Methods("POST")
+	r.Handle("/api/users/{id}", authenticated(apiUserHandler, false)).Methods("GET")
+	r.Handle("/api/users/{id}", authenticated(apiUserUpdateHandler, false)).Methods("POST")
+	r.Handle("/api/users/{id}", authenticated(apiUserDeleteHandler, false)).Methods("DELETE")
 
 	// API NOTIFIER Routes
-	r.Handle("/api/notifiers", http.HandlerFunc(apiNotifiersHandler)).Methods("GET")
-	r.Handle("/api/notifier/{notifier}", http.HandlerFunc(apiNotifierGetHandler)).Methods("GET")
-	r.Handle("/api/notifier/{notifier}", http.HandlerFunc(apiNotifierUpdateHandler)).Methods("POST")
-	r.Handle("/api/notifier/{method}/test", http.HandlerFunc(testNotificationHandler)).Methods("POST")
+	r.Handle("/api/notifiers", authenticated(apiNotifiersHandler, false)).Methods("GET")
+	r.Handle("/api/notifier/{notifier}", authenticated(apiNotifierGetHandler, false)).Methods("GET")
+	r.Handle("/api/notifier/{notifier}", authenticated(apiNotifierUpdateHandler, false)).Methods("POST")
+	r.Handle("/api/notifier/{method}/test", authenticated(testNotificationHandler, false)).Methods("POST")
 
 	// API MESSAGES Routes
-	r.Handle("/api/messages", http.HandlerFunc(apiAllMessagesHandler)).Methods("GET")
-	r.Handle("/api/messages", http.HandlerFunc(apiMessageCreateHandler)).Methods("POST")
-	r.Handle("/api/messages/{id}", http.HandlerFunc(apiMessageGetHandler)).Methods("GET")
-	r.Handle("/api/messages/{id}", http.HandlerFunc(apiMessageUpdateHandler)).Methods("POST")
-	r.Handle("/api/messages/{id}", http.HandlerFunc(apiMessageDeleteHandler)).Methods("DELETE")
+	r.Handle("/api/messages", readOnly(apiAllMessagesHandler, false)).Methods("GET")
+	r.Handle("/api/messages", authenticated(apiMessageCreateHandler, false)).Methods("POST")
+	r.Handle("/api/messages/{id}", readOnly(apiMessageGetHandler, false)).Methods("GET")
+	r.Handle("/api/messages/{id}", authenticated(apiMessageUpdateHandler, false)).Methods("POST")
+	r.Handle("/api/messages/{id}", authenticated(apiMessageDeleteHandler, false)).Methods("DELETE")
 
 	// API CHECKIN Routes
-	r.Handle("/api/checkins", http.HandlerFunc(apiAllCheckinsHandler)).Methods("GET")
-	r.Handle("/api/checkin/{api}", http.HandlerFunc(apiCheckinHandler)).Methods("GET")
-	r.Handle("/api/checkin", http.HandlerFunc(checkinCreateHandler)).Methods("POST")
-	r.Handle("/api/checkin/{api}", http.HandlerFunc(checkinDeleteHandler)).Methods("DELETE")
+	r.Handle("/api/checkins", authenticated(apiAllCheckinsHandler, false)).Methods("GET")
+	r.Handle("/api/checkin/{api}", authenticated(apiCheckinHandler, false)).Methods("GET")
+	r.Handle("/api/checkin", authenticated(checkinCreateHandler, false)).Methods("POST")
+	r.Handle("/api/checkin/{api}", authenticated(checkinDeleteHandler, false)).Methods("DELETE")
 	r.Handle("/checkin/{api}", http.HandlerFunc(checkinHitHandler))
 
 	// Static Files Routes
@@ -146,7 +146,7 @@ func Router() *mux.Router {
 	r.PathPrefix("/files/grafana.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
 
 	// API Generic Routes
-	r.Handle("/metrics", http.HandlerFunc(prometheusHandler))
+	r.Handle("/metrics", readOnly(prometheusHandler, false))
 	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
 	r.Handle("/.well-known/", http.StripPrefix("/.well-known/", http.FileServer(http.Dir(dir+"/.well-known"))))
 

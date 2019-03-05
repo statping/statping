@@ -17,7 +17,6 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
@@ -28,46 +27,38 @@ import (
 )
 
 func settingsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, nil)
 }
 
 func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	var err error
-	r.ParseForm()
+	form := parseForm(r)
 	app := core.CoreApp
-	name := r.PostForm.Get("project")
+	name := form.Get("project")
 	if name != "" {
 		app.Name = name
 	}
-	description := r.PostForm.Get("description")
+	description := form.Get("description")
 	if description != app.Description {
 		app.Description = description
 	}
-	style := r.PostForm.Get("style")
+	style := form.Get("style")
 	if style != app.Style {
 		app.Style = style
 	}
-	footer := r.PostForm.Get("footer")
+	footer := form.Get("footer")
 	if footer != app.Footer.String {
 		app.Footer = types.NewNullString(footer)
 	}
-	domain := r.PostForm.Get("domain")
+	domain := form.Get("domain")
 	if domain != app.Domain {
 		app.Domain = domain
 	}
-	timezone := r.PostForm.Get("timezone")
+	timezone := form.Get("timezone")
 	timeFloat, _ := strconv.ParseFloat(timezone, 10)
 	app.Timezone = float32(timeFloat)
 
-	app.UseCdn = types.NewNullBool(r.PostForm.Get("enable_cdn") == "on")
+	app.UseCdn = types.NewNullBool(form.Get("enable_cdn") == "on")
 	core.CoreApp, err = core.UpdateCore(app)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("issue updating Core: %v", err.Error()))
@@ -77,12 +68,7 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-	r.ParseForm()
-	form := r.PostForm
+	form := parseForm(r)
 	theme := form.Get("theme")
 	variables := form.Get("variables")
 	mobile := form.Get("mobile")
@@ -95,19 +81,13 @@ func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	dir := utils.Directory
-	err := source.CreateAllAssets(dir)
-	if err != nil {
+	if err := source.CreateAllAssets(dir); err != nil {
 		utils.Log(3, err)
 		sendErrorJson(err, w, r)
 		return
 	}
-	err = source.CompileSASS(dir)
-	if err != nil {
+	if err := source.CompileSASS(dir); err != nil {
 		source.CopyToPublic(source.CssBox, dir+"/assets/css", "base.css")
 		utils.Log(3, "Default 'base.css' was inserted because SASS did not work.")
 	}
@@ -116,18 +96,11 @@ func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
+	if err := source.DeleteAllAssets(utils.Directory); err != nil {
+		utils.Log(3, fmt.Errorf("error deleting all assets %v", err))
 	}
-	source.DeleteAllAssets(utils.Directory)
 	resetRouter()
 	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
-}
-
-func parseId(r *http.Request) int64 {
-	vars := mux.Vars(r)
-	return utils.ToInt(vars["id"])
 }
 
 func parseForm(r *http.Request) url.Values {
