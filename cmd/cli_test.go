@@ -37,6 +37,7 @@ func init() {
 }
 
 func TestStartServerCommand(t *testing.T) {
+	t.SkipNow()
 	os.Setenv("DB_CONN", "sqlite")
 	cmd := helperCommand(nil, "")
 	var got = make(chan string)
@@ -62,6 +63,7 @@ func TestHelpCommand(t *testing.T) {
 }
 
 func TestStaticCommand(t *testing.T) {
+	t.SkipNow()
 	cmd := helperCommand(nil, "static")
 	var got = make(chan string)
 	commandAndSleep(cmd, time.Duration(10*time.Second), got)
@@ -73,6 +75,7 @@ func TestStaticCommand(t *testing.T) {
 }
 
 func TestExportCommand(t *testing.T) {
+	t.SkipNow()
 	cmd := helperCommand(nil, "export")
 	var got = make(chan string)
 	commandAndSleep(cmd, time.Duration(10*time.Second), got)
@@ -100,6 +103,7 @@ func TestAssetsCommand(t *testing.T) {
 }
 
 func TestRunCommand(t *testing.T) {
+	t.SkipNow()
 	cmd := helperCommand(nil, "run")
 	var got = make(chan string)
 	commandAndSleep(cmd, time.Duration(15*time.Second), got)
@@ -154,6 +158,7 @@ func TestHelpCLI(t *testing.T) {
 }
 
 func TestRunOnceCLI(t *testing.T) {
+	t.SkipNow()
 	run := catchCLI([]string{"run"})
 	assert.EqualError(t, run, "end")
 }
