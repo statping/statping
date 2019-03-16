@@ -161,10 +161,18 @@ func (s *Service) checkHttp(record bool) *Service {
 	timeout := time.Duration(s.Timeout) * time.Second
 	var content []byte
 	var res *http.Response
-	if s.Method == "POST" {
-		content, res, err = utils.HttpRequest(s.Domain, s.Method, "application/json", nil, bytes.NewBuffer([]byte(s.PostData.String)), timeout)
+
+	var headers []string
+	if s.Headers.Valid {
+		headers = strings.Split(s.Headers.String, ",")
 	} else {
-		content, res, err = utils.HttpRequest(s.Domain, s.Method, nil, nil, nil, timeout)
+		headers = nil
+	}
+
+	if s.Method == "POST" {
+		content, res, err = utils.HttpRequest(s.Domain, s.Method, "application/json", headers, bytes.NewBuffer([]byte(s.PostData.String)), timeout)
+	} else {
+		content, res, err = utils.HttpRequest(s.Domain, s.Method, nil, headers, nil, timeout)
 	}
 	if err != nil {
 		if record {

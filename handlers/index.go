@@ -31,7 +31,8 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	health := map[string]interface{}{
 		"services": len(core.Services()),
-		"online":   core.Configs != nil,
+		"online":   true,
+		"setup":    core.Configs != nil,
 	}
 	returnJson(health, w, r)
 }

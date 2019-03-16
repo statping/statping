@@ -99,7 +99,7 @@ func SelectAllUsers() ([]*User, error) {
 func AuthUser(username, password string) (*User, bool) {
 	user, err := SelectUsername(username)
 	if err != nil {
-		utils.Log(2, err)
+		utils.Log(2, fmt.Errorf("user %v not found", username))
 		return nil, false
 	}
 	if CheckHash(password, user.Password) {
