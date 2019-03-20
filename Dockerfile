@@ -8,10 +8,11 @@ RUN curl -L -s https://github.com/golang/dep/releases/download/$DEP_VERSION/dep-
 RUN curl -L -s https://assets.statping.com/sass -o /usr/local/bin/sass && \
     chmod +x /usr/local/bin/sass
 WORKDIR /go/src/github.com/hunterlong/statping
-ADD . /go/src/github.com/hunterlong/statping
+ADD Makefile Gopkg.* /go/src/github.com/hunterlong/statping/
 RUN make dep && \
-    make dev-deps && \
-    make install
+    make dev-deps
+ADD . /go/src/github.com/hunterlong/statping
+RUN make install
 
 # Statping :latest Docker Image
 FROM alpine:latest
