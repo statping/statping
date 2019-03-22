@@ -62,7 +62,7 @@ func apiGroupUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	group := core.SelectGroup(utils.ToInt(vars["id"]))
 	if group == nil {
-		sendErrorJson(errors.New("service not found"), w, r)
+		sendErrorJson(errors.New("group not found"), w, r)
 		return
 	}
 	decoder := json.NewDecoder(r.Body)
