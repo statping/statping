@@ -57,6 +57,7 @@
                         <td>{{if .Public.Bool}}<span class="badge badge-primary">PUBLIC</span>{{else}}<span class="badge badge-secondary">PRIVATE</span>{{end}}</td>
                         <td class="text-right">
                             <div class="btn-group">
+                                <a href="/group/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> Edit</a>
                                 {{if Auth}}<a href="/api/groups/{{.Id}}" class="ajax_delete btn btn-danger" data-method="DELETE" data-obj="group_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>{{end}}
                             </div>
                         </td>
