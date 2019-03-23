@@ -24,6 +24,21 @@ import (
 	"net/http"
 )
 
+func groupViewHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	var group *core.Group
+	id := vars["id"]
+	group = core.SelectGroup(utils.ToInt(id))
+
+	if group == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	ExecuteResponse(w, r, "group.gohtml", group, nil)
+}
+
 // apiAllGroupHandler will show all the groups
 func apiAllGroupHandler(w http.ResponseWriter, r *http.Request) {
 	auth := IsUser(r)
@@ -40,6 +55,24 @@ func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	returnJson(group, w, r)
+}
+
+// apiGroupUpdateHandler will update a group
+func apiGroupUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	group := core.SelectGroup(utils.ToInt(vars["id"]))
+	if group == nil {
+		sendErrorJson(errors.New("group not found"), w, r)
+		return
+	}
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&group)
+	_, err := group.Update()
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	sendJsonAction(group, "update", w, r)
 }
 
 // apiCreateGroupHandler accepts a POST method to create new groups
