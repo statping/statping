@@ -87,10 +87,13 @@ func Router() *mux.Router {
 	r.Handle("/service/{id}/edit", authenticated(servicesViewHandler, true)).Methods("GET")
 	r.Handle("/service/{id}/delete_failures", authenticated(servicesDeleteFailuresHandler, true)).Methods("GET")
 
+	r.Handle("/group/{id}", http.HandlerFunc(groupViewHandler)).Methods("GET")
+
 	// API GROUPS Routes
 	r.Handle("/api/groups", readOnly(apiAllGroupHandler, false)).Methods("GET")
 	r.Handle("/api/groups", authenticated(apiCreateGroupHandler, false)).Methods("POST")
 	r.Handle("/api/groups/{id}", readOnly(apiGroupHandler, false)).Methods("GET")
+	r.Handle("/api/groups/{id}", authenticated(apiGroupUpdateHandler, false)).Methods("POST")
 	r.Handle("/api/groups/{id}", authenticated(apiGroupDeleteHandler, false)).Methods("DELETE")
 	r.Handle("/api/groups/reorder", authenticated(apiGroupReorderHandler, false)).Methods("POST")
 

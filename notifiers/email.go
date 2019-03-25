@@ -230,10 +230,12 @@ func (u *email) OnTest() error {
 	if err != nil {
 		return err
 	}
-	auth := smtp.PlainAuth("", u.Username, u.Password, host)
-	err = dial.Auth(auth)
-	if err != nil {
-		return err
+	if u.Username != "" || u.Password != "" {
+		auth := smtp.PlainAuth("", u.Username, u.Password, host)
+		err = dial.Auth(auth)
+		if err != nil {
+			return err
+		}
 	}
 	testService := &types.Service{
 		Id:             1,
