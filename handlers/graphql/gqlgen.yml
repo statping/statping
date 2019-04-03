@@ -10,6 +10,10 @@ exec:
 model:
   filename: models_gen.go
 models:
+  Core:
+    model: github.com/hunterlong/statping/types.Core
+  Message:
+    model: github.com/hunterlong/statping/types.Message
   Group:
     model: github.com/hunterlong/statping/types.Group
   Service:

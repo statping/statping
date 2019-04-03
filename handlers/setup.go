@@ -53,10 +53,11 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	project := r.PostForm.Get("project")
 	username := r.PostForm.Get("username")
 	password := r.PostForm.Get("password")
-	//sample := r.PostForm.Get("sample_data")
 	description := r.PostForm.Get("description")
 	domain := r.PostForm.Get("domain")
 	email := r.PostForm.Get("email")
+	sample := r.PostForm.Get("sample_data") == "on"
+	utils.Log(2, sample)
 	dir := utils.Directory
 
 	config := &core.DbConfig{
@@ -117,7 +118,9 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	admin.Create()
 
-	core.SampleData()
+	if sample {
+		core.SampleData()
+	}
 	core.InitApp()
 	CacheStorage.Delete("/")
 	resetCookies()

@@ -1,0 +1,94 @@
+# Gopkg.toml example
+#
+# Refer to https://golang.github.io/dep/docs/Gopkg.toml.html
+# for detailed Gopkg.toml documentation.
+#
+# required = ["github.com/user/thing/cmd/thing"]
+# ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]
+#
+# [[constraint]]
+#   name = "github.com/user/project"
+#   version = "1.0.0"
+#
+# [[constraint]]
+#   name = "github.com/user/project2"
+#   branch = "dev"
+#   source = "github.com/myfork/project2"
+#
+# [[override]]
+#   name = "github.com/x/y"
+#   version = "2.4.0"
+#
+# [prune]
+#   non-go = false
+#   go-tests = true
+#   unused-packages = true
+
+
+[[constraint]]
+  name = "github.com/99designs/gqlgen"
+  version = "0.8.3"
+
+[[constraint]]
+  name = "github.com/GeertJohan/go.rice"
+  version = "1.0.0"
+
+[[constraint]]
+  name = "github.com/ararog/timeago"
+  version = "0.0.1"
+
+[[constraint]]
+  name = "github.com/go-mail/mail"
+  version = "2.3.1"
+
+[[constraint]]
+  name = "github.com/go-yaml/yaml"
+  version = "2.2.2"
+
+[[constraint]]
+  name = "github.com/gorilla/mux"
+  version = "1.7.0"
+
+[[constraint]]
+  name = "github.com/gorilla/sessions"
+  version = "1.1.3"
+
+[[constraint]]
+  name = "github.com/graphql-go/graphql"
+  version = "0.7.8"
+
+[[constraint]]
+  name = "github.com/jinzhu/gorm"
+  version = "1.9.2"
+
+[[constraint]]
+  name = "github.com/joho/godotenv"
+  version = "1.3.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/rendon/testcli"
+
+[[constraint]]
+  name = "github.com/stretchr/testify"
+  version = "1.3.0"
+
+[[constraint]]
+  name = "github.com/vektah/gqlparser"
+  version = "1.1.2"
+
+[[constraint]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+
+[[constraint]]
+  name = "gopkg.in/natefinch/lumberjack.v2"
+  version = "2.1.0"
+
+[[constraint]]
+  name = "gopkg.in/russross/blackfriday.v2"
+  version = "2.0.1"
+
+[prune]
+  go-tests = true
+  unused-packages = true

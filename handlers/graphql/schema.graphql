@@ -3,6 +3,7 @@ schema {
 }
 
 type Query {
+  core: Core
   service(id: ID!): Service
   services: [Service]!
   group(id: ID!): Group
@@ -11,6 +12,21 @@ type Query {
   users: [User]!
   checkin(id: ID!): Checkin
   checkins: [Checkin]!
+  message(id: ID!): Message
+  messages: [Message]!
+}
+
+type Core {
+  name: String!
+  description: String!
+  footer: String!
+  domain: String!
+  version: String!
+  timezone: String!
+  using_cdn: Boolean!
+  started_on: Time!
+  created_at: Time!
+  updated_at: Time!
 }
 
 type Service {
@@ -92,6 +108,20 @@ type Failure {
   error_code: Int!
   ping: Float!
   created_at: Time!
+}
+
+type Message {
+  id: ID!
+  title: String!
+  description: String!
+  start_on: Time!
+  end_on: Time!
+  notify_users: Boolean!
+  notify_method: Boolean!
+  notify_before: Int!
+  notify_before_scale: String!
+  created_at: Time!
+  updated_at: Time!
 }
 
 scalar Time
