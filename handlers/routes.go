@@ -17,9 +17,11 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/99designs/gqlgen/handler"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/handlers/graphql"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
@@ -64,6 +66,9 @@ func Router() *mux.Router {
 	r.Handle("/help", authenticated(helpHandler, true))
 	r.Handle("/logs", authenticated(logsHandler, true))
 	r.Handle("/logs/line", readOnly(logsLineHandler, true))
+
+	// GRAPHQL Route
+	r.Handle("/graphql", authenticated(handler.GraphQL(graphql.NewExecutableSchema(graphql.Config{Resolvers: &graphql.Resolver{}})), true))
 
 	// USER Routes
 	r.Handle("/users", readOnly(usersHandler, true)).Methods("GET")
