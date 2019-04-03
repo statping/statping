@@ -149,6 +149,12 @@ var emailer = &email{&notifier.Notification{
 		Title:       "Send Alerts To",
 		Placeholder: "sendto@email.com",
 		DbField:     "Var2",
+	}, {
+		Type:        "text",
+		Title:       "Disable TLS/SSL",
+		Placeholder: "",
+		SmallText:   "To Disable TLS/SSL insert 'true'",
+		DbField:     "api_key",
 	}},
 }}
 
@@ -264,9 +270,14 @@ func (u *email) OnTest() error {
 
 func (u *email) dialSend(email *emailOutgoing) error {
 	mailer = mail.NewDialer(emailer.Host, emailer.Port, emailer.Username, emailer.Password)
-	mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	emailSource(email)
 	m := mail.NewMessage()
+	// if email setting TLS is Disabled
+	if u.ApiKey == "true" {
+		mailer.SSL = false
+	} else {
+		mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+	}
 	m.SetHeader("From", email.From)
 	m.SetHeader("To", email.To)
 	m.SetHeader("Subject", email.Subject)
