@@ -42,6 +42,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 			auth := IsUser(r)
 			return core.SelectGroups(includeAll, auth)
 		},
+		"Group": func(id int) *core.Group {
+			return core.SelectGroup(int64(id))
+		},
 		"len": func(g interface{}) int {
 			val := reflect.ValueOf(g)
 			return val.Len()

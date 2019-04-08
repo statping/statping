@@ -50,10 +50,6 @@ func SelectGroups(includeAll bool, auth bool) []*Group {
 	var groups []*Group
 	var validGroups []*Group
 	groupsDb().Find(&groups).Order("order_id desc")
-	if includeAll {
-		emptyGroup := &Group{&types.Group{Id: 0, Public: types.NewNullBool(true)}}
-		groups = append(groups, emptyGroup)
-	}
 	for _, g := range groups {
 		if !g.Public.Bool {
 			if auth {
@@ -64,6 +60,10 @@ func SelectGroups(includeAll bool, auth bool) []*Group {
 		}
 	}
 	sort.Sort(GroupOrder(validGroups))
+	if includeAll {
+		emptyGroup := &Group{&types.Group{Id: 0, Public: types.NewNullBool(true)}}
+		validGroups = append(validGroups, emptyGroup)
+	}
 	return validGroups
 }
 
