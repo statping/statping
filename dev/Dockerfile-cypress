@@ -1,5 +1,7 @@
 FROM cypress/browsers:chrome67
-MAINTAINER "Hunter Long (https://github.com/hunterlong)"
+
+LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
+
 # Statping 'test' image for running a full test using the production environment
 
 WORKDIR $HOME/statping
