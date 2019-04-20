@@ -90,12 +90,12 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:ca59b1175189b3f0e9f1793d2c350114be36eaabbe5b9f554b35edee1de50aea"
+  digest = "1:d5f97fc268267ec1b61c3453058c738246fc3e746f14b1ae25161513b7367b0c"
   name = "github.com/gorilla/mux"
   packages = ["."]
   pruneopts = "UT"
-  revision = "a7962380ca08b5a188038c69871b8d3fbdf31e89"
-  version = "v1.7.0"
+  revision = "c5c6c98bc25355028a63748a498942a6398ccd22"
+  version = "v1.7.1"
 
 [[projects]]
   digest = "1:e72d1ebb8d395cf9f346fd9cbc652e5ae222dd85e0ac842dc57f175abed6d195"
@@ -122,26 +122,6 @@
   version = "v1.4.0"
 
 [[projects]]
-  digest = "1:7fbb40f65374cb64a7bf3f1f74e2cb4c4437d93bc3d8921cf7e3d7ad2ab20989"
-  name = "github.com/graphql-go/graphql"
-  packages = [
-    ".",
-    "gqlerrors",
-    "language/ast",
-    "language/kinds",
-    "language/lexer",
-    "language/location",
-    "language/parser",
-    "language/printer",
-    "language/source",
-    "language/typeInfo",
-    "language/visitor",
-  ]
-  pruneopts = "UT"
-  revision = "2b0b7340d2285b861482047fbf5de0488e021bea"
-  version = "v0.7.8"
-
-[[projects]]
   digest = "1:d15ee511aa0f56baacc1eb4c6b922fa1c03b38413b6be18166b996d82a0156ea"
   name = "github.com/hashicorp/golang-lru"
   packages = [
@@ -153,7 +133,7 @@
   version = "v0.5.1"
 
 [[projects]]
-  digest = "1:ff312c4d510c67954a6fc6a11c9ff72a2b2169584776b7419c7b8c729e2b13ac"
+  digest = "1:0731b955911f880c75409845b54203f5127c72e003691e2d34462a0516a9b1f6"
   name = "github.com/jinzhu/gorm"
   packages = [
     ".",
@@ -162,8 +142,8 @@
     "dialects/sqlite",
   ]
   pruneopts = "UT"
-  revision = "472c70caa40267cb89fd8facb07fe6454b578626"
-  version = "v1.9.2"
+  revision = "e3987fd4b803c16497aa4dfd2e75db7a6a061a4e"
+  version = "v1.9.4"
 
 [[projects]]
   branch = "master"
@@ -182,16 +162,17 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:b18ffc558326ebaed3b4a175617f1e12ed4e3f53d6ebfe5ba372a3de16d22278"
+  digest = "1:226be3582c304c347481157049c862924fdd6277256e854781c5ba4728901215"
   name = "github.com/lib/pq"
   packages = [
     ".",
     "hstore",
     "oid",
+    "scram",
   ]
   pruneopts = "UT"
-  revision = "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
-  version = "v1.0.0"
+  revision = "51e2106eed1cea199c802d2a49e91e2491b02056"
+  version = "v1.1.0"
 
 [[projects]]
   digest = "1:4a49346ca45376a2bba679ca0e83bec949d780d4e927931317904bad482943ec"
@@ -234,6 +215,14 @@
   version = "v1.3.0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:9f3a60def1a1eb5ac184e71dde43c6f99606f54d106db7c95f8b8338629a777b"
+  name = "github.com/tatsushid/go-fastping"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "d7bb493dee3e090e2ffb6914adddf17c1e7c026c"
+
+[[projects]]
   digest = "1:b4e8aaca88f799355f4ac560bce4293fb85ff21003dd0d5741ca503f7a788e91"
   name = "github.com/vektah/gqlparser"
   packages = [
@@ -258,7 +247,22 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "a5d413f7728c81fb97d96a2b722368945f651e78"
+  revision = "df01cb2cc480549d72034218dd98bf97671450ac"
+
+[[projects]]
+  branch = "master"
+  digest = "1:18ca16fd6f3c83e931598380b27badbcb669ddd3a690b66fb4a7390467f460ef"
+  name = "golang.org/x/net"
+  packages = [
+    "bpf",
+    "icmp",
+    "internal/iana",
+    "internal/socket",
+    "ipv4",
+    "ipv6",
+  ]
+  pruneopts = "UT"
+  revision = "1f3472d942ba824034fb77cab6a6cfc1bc8a2c3c"
 
 [[projects]]
   digest = "1:c25289f43ac4a68d88b02245742347c94f1e108c534dda442188015ff80669b3"
@@ -306,7 +310,6 @@
     "github.com/go-yaml/yaml",
     "github.com/gorilla/mux",
     "github.com/gorilla/sessions",
-    "github.com/graphql-go/graphql",
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/mysql",
     "github.com/jinzhu/gorm/dialects/postgres",
@@ -314,6 +317,7 @@
     "github.com/joho/godotenv",
     "github.com/rendon/testcli",
     "github.com/stretchr/testify/assert",
+    "github.com/tatsushid/go-fastping",
     "github.com/vektah/gqlparser",
     "github.com/vektah/gqlparser/ast",
     "golang.org/x/crypto/bcrypt",

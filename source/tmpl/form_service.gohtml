@@ -21,6 +21,7 @@
                 <option value="http" {{if eq .Type "http"}}selected{{end}}>HTTP Service</option>
                 <option value="tcp" {{if eq .Type "tcp"}}selected{{end}}>TCP Service</option>
                 <option value="udp" {{if eq .Type "udp"}}selected{{end}}>UDP Service</option>
+                <option value="icmp" {{if eq .Type "icmp"}}selected{{end}}>ICMP Ping</option>
             </select>
             <small class="form-text text-muted">Use HTTP if you are checking a website or use TCP if you are checking a server</small>
         </div>
@@ -113,7 +114,7 @@
             <span class="switch float-left">
                 <input type="checkbox" name="allow_notifications-option" class="switch" id="switch-notifications" {{if eq .Id 0}}checked{{end}}{{if .AllowNotifications.Bool}}checked{{end}}>
                 <label for="switch-notifications">Allow notifications to be sent for this service</label>
-                <input type="hidden" name="allow_notifications" id="switch-notifications-value" value="{{if .AllowNotifications.Bool}}true{{else}}false{{end}}">
+                <input type="hidden" name="allow_notifications" id="switch-notifications-value" value="{{if eq .Id 0}}true{{else}}{{if .AllowNotifications.Bool}}true{{else}}false{{end}}{{end}}">
             </span>
         </div>
     </div>
@@ -123,7 +124,7 @@
             <span class="switch float-left">
                 <input type="checkbox" name="public-option" class="switch" id="switch-public" {{if eq .Id 0}}checked{{else}}{{if .Public.Bool}}checked{{end}}{{end}}>
                 <label for="switch-public">Show service details to the public</label>
-                <input type="hidden" name="public" id="switch-public-value" value="{{if .Public.Bool}}true{{else}}false{{end}}">
+                <input type="hidden" name="public" id="switch-public-value" value="{{if eq .Id 0}}true{{else}}{{if .Public.Bool}}true{{else}}false{{end}}{{end}}">
             </span>
         </div>
     </div>
