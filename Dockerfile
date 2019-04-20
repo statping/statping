@@ -1,5 +1,5 @@
 FROM golang:1.12-alpine as base
-MAINTAINER "Hunter Long (https://github.com/hunterlong)"
+LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG VERSION
 ENV DEP_VERSION v0.5.0
 RUN apk add --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers wget curl jq libsass
@@ -16,7 +16,7 @@ RUN make install
 
 # Statping :latest Docker Image
 FROM alpine:latest
-MAINTAINER "Hunter Long (https://github.com/hunterlong)"
+LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 
 ARG VERSION
 ENV IS_DOCKER=true
