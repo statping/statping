@@ -81,7 +81,10 @@
 {{ else }}
 <script src="/js/sortable.min.js"></script>
 {{end}}
+<script src="/js/inputTags.min.js"></script>
 <script>
+	$(".input-tags").inputTags();
+
     sortable('.sortable', {
         forcePlaceholderSize: true,
         hoverClass: 'sortable_drag',
