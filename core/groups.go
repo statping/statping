@@ -45,6 +45,21 @@ func (g *Group) Services() []*Service {
 	return services
 }
 
+// VisibleServices returns all services based on authentication
+func (g *Group) VisibleServices(auth bool) []*Service {
+	var services []*Service
+	for _, g := range g.Services() {
+		if !g.Public.Bool {
+			if auth {
+				services = append(services, g)
+			}
+		} else {
+			services = append(services, g)
+		}
+	}
+	return services
+}
+
 // SelectGroups returns all groups
 func SelectGroups(includeAll bool, auth bool) []*Group {
 	var groups []*Group

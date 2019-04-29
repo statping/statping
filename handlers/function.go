@@ -38,6 +38,14 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"Services": func() []types.ServiceInterface {
 			return core.CoreApp.Services
 		},
+		"VisibleServices": func() []*core.Service {
+			auth := IsUser(r)
+			return core.SelectServices(auth)
+		},
+		"VisibleGroupServices": func(group *core.Group) []*core.Service {
+			auth := IsUser(r)
+			return group.VisibleServices(auth)
+		},
 		"Groups": func(includeAll bool) []*core.Group {
 			auth := IsUser(r)
 			return core.SelectGroups(includeAll, auth)

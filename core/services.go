@@ -55,6 +55,21 @@ func SelectService(id int64) *Service {
 	return nil
 }
 
+func SelectServices(auth bool) []*Service {
+	var validServices []*Service
+	for _, sr := range CoreApp.Services {
+		s := sr.(*Service)
+		if !s.Public.Bool {
+			if auth {
+				validServices = append(validServices, s)
+			}
+		} else {
+			validServices = append(validServices, s)
+		}
+	}
+	return validServices
+}
+
 // SelectServiceLink returns a *core.Service from the service permalink
 func SelectServiceLink(permalink string) *Service {
 	for _, s := range Services() {
