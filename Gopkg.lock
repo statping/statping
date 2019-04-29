@@ -2,7 +2,8 @@
 
 
 [[projects]]
-  digest = "1:7ea2faecf1d650c855ee70f55b934cc2265404625b7114e048ac7d6a64c23b41"
+  branch = "master"
+  digest = "1:a2de8c02990ea7cb28b962d2effa6840cc2c849b298736eef57a9713432cc0d3"
   name = "github.com/99designs/gqlgen"
   packages = [
     "complexity",
@@ -11,8 +12,7 @@
     "handler",
   ]
   pruneopts = "UT"
-  revision = "010a79b66f08732cb70d133dcab297a8ee895572"
-  version = "v0.8.3"
+  revision = "afe33f73875beca92e917742c1f49c1f6145018b"
 
 [[projects]]
   digest = "1:07f7314344b2771963ada0b2a4a426c59d782dac227dcfff2499188a186446c0"
@@ -247,11 +247,11 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "df01cb2cc480549d72034218dd98bf97671450ac"
+  revision = "a29dc8fdc73485234dbef99ebedb95d2eced08de"
 
 [[projects]]
   branch = "master"
-  digest = "1:18ca16fd6f3c83e931598380b27badbcb669ddd3a690b66fb4a7390467f460ef"
+  digest = "1:5e22b2014e7cd102e2b41ab7dd38b9c5175e3447b653033987164bebc858e958"
   name = "golang.org/x/net"
   packages = [
     "bpf",
@@ -262,7 +262,7 @@
     "ipv6",
   ]
   pruneopts = "UT"
-  revision = "1f3472d942ba824034fb77cab6a6cfc1bc8a2c3c"
+  revision = "4829fb13d2c62012c17688fa7f629f371014946d"
 
 [[projects]]
   digest = "1:c25289f43ac4a68d88b02245742347c94f1e108c534dda442188015ff80669b3"
