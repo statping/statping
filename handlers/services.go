@@ -166,6 +166,21 @@ func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonAction(service, "update", w, r)
 }
 
+func apiServiceRunningHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	service := core.SelectService(utils.ToInt(vars["id"]))
+	if service == nil {
+		sendErrorJson(errors.New("service not found"), w, r)
+		return
+	}
+	if service.IsRunning() {
+		service.Close()
+	} else {
+		service.Start()
+	}
+	sendJsonAction(service, "running", w, r)
+}
+
 func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	service := core.SelectService(utils.ToInt(vars["id"]))

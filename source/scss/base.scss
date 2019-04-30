@@ -522,4 +522,11 @@ input.inputTags-field:focus {
   background-color: white;
 }
 
+.toggle-service {
+  font-size: 18pt;
+  float: left;
+  margin: 2px 3px 0 0;
+  cursor: pointer;
+}
+
 @import 'mobile';

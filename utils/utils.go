@@ -27,6 +27,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -78,6 +79,22 @@ func ToInt(s interface{}) int64 {
 	default:
 		return 0
 	}
+}
+
+// ConvertInterface will take all the keys/values from an interface and replace all %type.Key from a string
+// Input:   {"name": "%service.Name", "domain": "%service.Domain"}
+// Output:  {"name": "Google DNS", "domain": "8.8.8.8"}
+func ConvertInterface(in string, obj interface{}) string {
+	s := reflect.ValueOf(obj).Elem()
+	typeOfT := s.Type()
+	for i := 0; i < s.NumField(); i++ {
+		f := s.Field(i)
+		find := strings.Split(fmt.Sprintf("%s.%v", typeOfT, typeOfT.Field(i).Name), ".")
+		find[1] = strings.ToLower(find[1])
+		key := strings.Join(find[1:], ".")
+		in = strings.ReplaceAll(in, fmt.Sprintf("%%%v", key), fmt.Sprintf("%v", f.Interface()))
+	}
+	return in
 }
 
 // ToString converts a int to a string

@@ -20,7 +20,9 @@
             {{range .Services}}
             <tr id="service_{{.Id}}" data-id="{{.Id}}">
                 <td><span class="drag_icon d-none d-md-inline"><i class="fas fa-bars"></i></span> {{.Name}}</td>
-                <td class="d-none d-md-table-cell">{{if .Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}}</td>
+                <td class="d-none d-md-table-cell">{{if .Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}}
+                    <i class="toggle-service fas {{if .IsRunning}}fa-toggle-on text-success{{else}}fa-toggle-off text-muted{{end}}" data-online="{{if .IsRunning}}true{{else}}false{{end}}" data-id="{{.Id}}"></i>
+                </td>
                 <td class="d-none d-md-table-cell">{{if .Public.Bool}}<span class="badge badge-primary">PUBLIC</span>{{else}}<span class="badge badge-secondary">PRIVATE</span>{{end}}</td>
                 <td class="d-none d-md-table-cell">{{if ne .GroupId 0}}<span class="badge badge-secondary">{{(Group .GroupId).Name}}</span>{{end}}</td>
                 <td class="text-right">

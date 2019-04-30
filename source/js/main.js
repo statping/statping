@@ -86,6 +86,29 @@ $('.scrollclick').on('click',function(e) {
 	e.preventDefault();
 });
 
+$('.toggle-service').on('click',function(e) {
+	let obj = $(this);
+	let serviceId = obj.attr("data-id");
+	let online = obj.attr("data-online");
+	let d = confirm("Do you want to stop this service?");
+	if (d) {
+		$.ajax({
+			url: "/api/services/" + serviceId + "/running",
+			type: 'POST',
+			success: function (data) {
+				if (online === "true") {
+					obj.removeClass("fa-toggle-on text-success");
+					obj.addClass("fa-toggle-off text-black-50");
+				} else {
+					obj.removeClass("fa-toggle-off text-black-50");
+					obj.addClass("fa-toggle-on text-success");
+				}
+				obj.attr("data-online", online !== "true");
+			}
+		});
+	}
+});
+
 $('select#service_type').on('change', function() {
     var selected = $('#service_type option:selected').val();
     var typeLabel = $('#service_type_label');
