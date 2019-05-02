@@ -7,7 +7,7 @@ GOBUILD=$(GOCMD) build -a
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 GOINSTALL=$(GOCMD) install
-XGO=GOPATH=$(GOPATH) xgo -go 1.11 --dest=build
+XGO=GOPATH=$(GOPATH) xgo -go 1.12.x --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
 RICE=$(GOPATH)/bin/rice
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
