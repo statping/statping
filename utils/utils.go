@@ -85,6 +85,9 @@ func ToInt(s interface{}) int64 {
 // Input:   {"name": "%service.Name", "domain": "%service.Domain"}
 // Output:  {"name": "Google DNS", "domain": "8.8.8.8"}
 func ConvertInterface(in string, obj interface{}) string {
+	if reflect.ValueOf(obj).IsNil() {
+		return in
+	}
 	s := reflect.ValueOf(obj).Elem()
 	typeOfT := s.Type()
 	for i := 0; i < s.NumField(); i++ {
