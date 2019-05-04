@@ -100,14 +100,8 @@ func (w *webhooker) Select() *notifier.Notification {
 }
 
 func replaceBodyText(body string, s *types.Service, f *types.Failure) string {
-	if s != nil {
-		body = strings.Replace(body, "%service.Name", s.Name, -1)
-		body = strings.Replace(body, "%service.Id", utils.ToString(s.Id), -1)
-		body = strings.Replace(body, "%service.Online", utils.ToString(s.Online), -1)
-	}
-	if strings.Contains(body, "%failure.Issue") && f != nil {
-		body = strings.Replace(body, "%failure.Issue", f.Issue, -1)
-	}
+	body = utils.ConvertInterface(body, s)
+	body = utils.ConvertInterface(body, f)
 	return body
 }
 

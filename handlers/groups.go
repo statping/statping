@@ -41,8 +41,8 @@ func groupViewHandler(w http.ResponseWriter, r *http.Request) {
 
 // apiAllGroupHandler will show all the groups
 func apiAllGroupHandler(w http.ResponseWriter, r *http.Request) {
-	auth := IsUser(r)
-	groups := core.SelectGroups(false, auth)
+	auth, admin := IsUser(r), IsAdmin(r)
+	groups := core.SelectGroups(admin, auth)
 	returnJson(groups, w, r)
 }
 

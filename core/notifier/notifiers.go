@@ -180,6 +180,7 @@ func (n *Notification) makeLog(msg interface{}) {
 		Time:      utils.Timestamp(time.Now()),
 		Timestamp: time.Now(),
 	}
+	utils.Log(1, fmt.Sprintf("Notifier %v has sent a message %v", n.Method, log.Message))
 	n.logs = append(n.logs, log)
 }
 

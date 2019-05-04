@@ -21,6 +21,7 @@ import (
 	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
+	"github.com/tatsushid/go-fastping"
 	"net"
 	"net/http"
 	"net/url"
@@ -35,6 +36,18 @@ func checkServices() {
 	for _, ser := range CoreApp.Services {
 		//go obj.StartCheckins()
 		go ser.CheckQueue(true)
+	}
+}
+
+// Check will run checkHttp for HTTP services and checkTcp for TCP services
+func (s *Service) Check(record bool) {
+	switch s.Type {
+	case "http":
+		s.checkHttp(record)
+	case "tcp", "udp":
+		s.checkTcp(record)
+	case "icmp":
+		s.checkIcmp(record)
 	}
 }
 
@@ -107,6 +120,28 @@ func (s *Service) dnsCheck() (float64, error) {
 	t2 := time.Now()
 	subTime := t2.Sub(t1).Seconds()
 	return subTime, err
+}
+
+// checkIcmp will send a ICMP ping packet to the service
+func (s *Service) checkIcmp(record bool) *Service {
+	p := fastping.NewPinger()
+	ra, err := net.ResolveIPAddr("ip4:icmp", s.Domain)
+	if err != nil {
+		recordFailure(s, fmt.Sprintf("Could not send ICMP to service %v, %v", s.Domain, err))
+		return s
+	}
+	p.AddIPAddr(ra)
+	p.OnRecv = func(addr *net.IPAddr, rtt time.Duration) {
+		s.Latency = rtt.Seconds()
+		recordSuccess(s)
+	}
+	err = p.Run()
+	if err != nil {
+		recordFailure(s, fmt.Sprintf("Issue running ICMP to service %v, %v", s.Domain, err))
+		return s
+	}
+	s.LastResponse = ""
+	return s
 }
 
 // checkTcp will check a TCP service
@@ -217,16 +252,6 @@ func (s *Service) checkHttp(record bool) *Service {
 		recordSuccess(s)
 	}
 	return s
-}
-
-// Check will run checkHttp for HTTP services and checkTcp for TCP services
-func (s *Service) Check(record bool) {
-	switch s.Type {
-	case "http":
-		s.checkHttp(record)
-	case "tcp", "udp":
-		s.checkTcp(record)
-	}
 }
 
 // recordSuccess will create a new 'hit' record in the database for a successful/online service

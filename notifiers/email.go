@@ -232,9 +232,11 @@ func (u *email) OnTest() error {
 	if err != nil {
 		return err
 	}
-	err = dial.StartTLS(&tls.Config{InsecureSkipVerify: true})
-	if err != nil {
-		return err
+	if u.ApiKey != "true" {
+		err = dial.StartTLS(&tls.Config{InsecureSkipVerify: true})
+		if err != nil {
+			return err
+		}
 	}
 	if u.Username != "" || u.Password != "" {
 		auth := smtp.PlainAuth("", u.Username, u.Password, host)

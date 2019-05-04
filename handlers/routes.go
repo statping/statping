@@ -38,7 +38,7 @@ func Router() *mux.Router {
 	dir := utils.Directory
 	CacheStorage = NewStorage()
 	r := mux.NewRouter()
-	r.Handle("/", cached("60s", "text/html", http.HandlerFunc(indexHandler)))
+	r.Handle("/", http.HandlerFunc(indexHandler))
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
 		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(dir+"/assets/css"))))
@@ -112,6 +112,7 @@ func Router() *mux.Router {
 	r.Handle("/api/services", authenticated(apiCreateServiceHandler, false)).Methods("POST")
 	r.Handle("/api/services/{id}", readOnly(apiServiceHandler, false)).Methods("GET")
 	r.Handle("/api/services/reorder", authenticated(reorderServiceHandler, false)).Methods("POST")
+	r.Handle("/api/services/{id}/running", authenticated(apiServiceRunningHandler, false)).Methods("POST")
 	r.Handle("/api/services/{id}/data", cached("30s", "application/json", http.HandlerFunc(apiServiceDataHandler))).Methods("GET")
 	r.Handle("/api/services/{id}/ping", cached("30s", "application/json", http.HandlerFunc(apiServicePingDataHandler))).Methods("GET")
 	r.Handle("/api/services/{id}/heatmap", cached("30s", "application/json", http.HandlerFunc(apiServiceHeatmapHandler))).Methods("GET")

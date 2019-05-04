@@ -1,5 +1,5 @@
 FROM alpine
-MAINTAINER "Hunter Long (https://github.com/hunterlong)"
+LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 
 ENV STATPING_VERSION=0.80.35
 
