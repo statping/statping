@@ -159,12 +159,12 @@ func commaToService(s []string) (*types.Service, error) {
 		return nil, err
 	}
 
-	allowNotifications, err := strconv.ParseBool(s[10])
+	allowNotifications, err := strconv.ParseBool(s[11])
 	if err != nil {
 		return nil, err
 	}
 
-	public, err := strconv.ParseBool(s[11])
+	public, err := strconv.ParseBool(s[12])
 	if err != nil {
 		return nil, err
 	}
@@ -182,9 +182,9 @@ func commaToService(s []string) (*types.Service, error) {
 		Timeout:            int(utils.ToInt(timeout.Seconds())),
 		AllowNotifications: types.NewNullBool(allowNotifications),
 		Public:             types.NewNullBool(public),
-		GroupId:            int(utils.ToInt(s[12])),
-		Headers:            types.NewNullString(s[13]),
-		Permalink:          types.NewNullString(s[14]),
+		GroupId:            int(utils.ToInt(s[13])),
+		Headers:            types.NewNullString(s[14]),
+		Permalink:          types.NewNullString(s[15]),
 	}
 
 	return newService, nil
