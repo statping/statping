@@ -85,6 +85,7 @@ func Router() *mux.Router {
 	r.Handle("/settings/build", authenticated(saveAssetsHandler, true)).Methods("GET")
 	r.Handle("/settings/delete_assets", authenticated(deleteAssetsHandler, true)).Methods("GET")
 	r.Handle("/settings/export", authenticated(exportHandler, true)).Methods("GET")
+	r.Handle("/settings/bulk_import", authenticated(bulkImportHandler, true)).Methods("POST")
 
 	// SERVICE Routes
 	r.Handle("/services", http.HandlerFunc(servicesHandler)).Methods("GET")

@@ -1,0 +1,2 @@
+name,domain,expected,expected_status,interval,type,method,post_data,port,timeout,order,allow_notifications,public,group_id,headers,permalink
+Bulk Upload,http://google.com,,200,60s,http,get,,,60s,1,true,true,,Authorization=example,bulk_example

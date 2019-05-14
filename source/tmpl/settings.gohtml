@@ -139,6 +139,19 @@
                             <a class="btn btn-sm btn-primary" href={{safeURL QrAuth}}>Open in Statping App</a>
                         {{end}}
 
+
+                        <h3 class="mt-3">Bulk Import Services</h3>
+                        You can import multiple services based on a CSV file with the format shown on the <a href="https://github.com/hunterlong/statping/wiki/Bulk-Import-Services" target="_blank">Bulk Import Wiki</a>.
+
+                        <form action="/settings/bulk_import" method="POST" enctype="multipart/form-data" class="form-inline">
+                            <div class="form-group">
+                                <input type="file" name="file" class="form-control-file" accept=".csv">
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-success ml-3">Upload</button>
+                            </div>
+                        </form>
+
                     </div>
 
                     <div class="tab-pane" id="v-pills-style" role="tabpanel" aria-labelledby="v-pills-style-tab">

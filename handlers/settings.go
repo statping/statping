@@ -16,14 +16,18 @@
 package handlers
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
+	"time"
 )
 
 func settingsHandler(w http.ResponseWriter, r *http.Request) {
@@ -101,6 +105,90 @@ func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	resetRouter()
 	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+}
+
+func bulkImportHandler(w http.ResponseWriter, r *http.Request) {
+	var fileData bytes.Buffer
+	file, _, err := r.FormFile("file")
+	if err != nil {
+		utils.Log(3, fmt.Errorf("error bulk import services: %v", err))
+		w.Write([]byte(err.Error()))
+		return
+	}
+	defer file.Close()
+
+	io.Copy(&fileData, file)
+	data := fileData.String()
+
+	for i, line := range strings.Split(strings.TrimSuffix(data, "\n"), "\n")[1:] {
+		col := strings.Split(line, ",")
+
+		newService, err := commaToService(col)
+		if err != nil {
+			utils.Log(3, fmt.Errorf("issue with row %v: %v", i, err))
+			return
+		}
+
+		service := core.ReturnService(newService)
+		_, err = service.Create(true)
+		if err != nil {
+			utils.Log(3, fmt.Errorf("cannot create service %v: %v", col[0], err))
+			return
+		}
+		utils.Log(1, fmt.Sprintf("Created new service %v", service.Name))
+	}
+
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+}
+
+// commaToService will convert a CSV comma delimited string slice to a Service type
+// this function is used for the bulk import services feature
+func commaToService(s []string) (*types.Service, error) {
+	if len(s) != 16 {
+		err := fmt.Errorf("does not have the expected amount of %v columns for a service", 16)
+		return nil, err
+	}
+
+	interval, err := time.ParseDuration(s[4])
+	if err != nil {
+		return nil, err
+	}
+
+	timeout, err := time.ParseDuration(s[9])
+	if err != nil {
+		return nil, err
+	}
+
+	allowNotifications, err := strconv.ParseBool(s[10])
+	if err != nil {
+		return nil, err
+	}
+
+	public, err := strconv.ParseBool(s[11])
+	if err != nil {
+		return nil, err
+	}
+
+	newService := &types.Service{
+		Name:               s[0],
+		Domain:             s[1],
+		Expected:           types.NewNullString(s[2]),
+		ExpectedStatus:     int(utils.ToInt(s[3])),
+		Interval:           int(utils.ToInt(interval.Seconds())),
+		Type:               s[5],
+		Method:             s[6],
+		PostData:           types.NewNullString(s[7]),
+		Port:               int(utils.ToInt(s[8])),
+		Timeout:            int(utils.ToInt(timeout.Seconds())),
+		AllowNotifications: types.NewNullBool(allowNotifications),
+		Public:             types.NewNullBool(public),
+		GroupId:            int(utils.ToInt(s[12])),
+		Headers:            types.NewNullString(s[13]),
+		Permalink:          types.NewNullString(s[14]),
+	}
+
+	return newService, nil
+
 }
 
 func parseForm(r *http.Request) url.Values {
