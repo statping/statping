@@ -126,14 +126,14 @@ func bulkImportHandler(w http.ResponseWriter, r *http.Request) {
 		newService, err := commaToService(col)
 		if err != nil {
 			utils.Log(3, fmt.Errorf("issue with row %v: %v", i, err))
-			return
+			continue
 		}
 
 		service := core.ReturnService(newService)
 		_, err = service.Create(true)
 		if err != nil {
 			utils.Log(3, fmt.Errorf("cannot create service %v: %v", col[0], err))
-			return
+			continue
 		}
 		utils.Log(1, fmt.Sprintf("Created new service %v", service.Name))
 	}

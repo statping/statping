@@ -163,3 +163,10 @@ Statping accepts Push Requests! Feel free to add your own features and notifiers
 [![Go Report Card](https://goreportcard.com/badge/github.com/hunterlong/statping)](https://goreportcard.com/report/github.com/hunterlong/statping)
 [![Build Status](https://travis-ci.com/hunterlong/statping.svg?branch=master)](https://travis-ci.com/hunterlong/statping) [![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://dashboard.cypress.io/#/projects/bi8mhr/runs)
 [![Docker Pulls](https://img.shields.io/docker/pulls/hunterlong/statping.svg)](https://hub.docker.com/r/hunterlong/statping/builds/) [![Godoc](https://godoc.org/github.com/hunterlong/statping?status.svg)](https://godoc.org/github.com/hunterlong/statping)[![Coverage Status](https://coveralls.io/repos/github/hunterlong/statping/badge.svg?branch=master)](https://coveralls.io/github/hunterlong/statping?branch=master)
+
+
+<p align="center">
+<a href="https://www.buymeacoffee.com/hunterlong" target="_blank">
+<img height="55" src="https://img.cjx.io/buy-me-redbull.png" >
+</a>
+</p>

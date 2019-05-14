@@ -124,7 +124,7 @@ $('select#service_type').on('change', function() {
         $('#post_data').parent().parent().addClass('d-none');
         $('#service_response').parent().parent().addClass('d-none');
         $('#service_response_code').parent().parent().addClass('d-none');
-        $('#headers').parent().parent().removeClass('d-none');
+				$('#headers').parent().parent().addClass('d-none');
     } else if (selected === 'icmp') {
         $('#service_port').parent().parent().removeClass('d-none');
         $('#headers').parent().parent().addClass('d-none');
