@@ -36,7 +36,8 @@ import (
 
 var (
 	// Directory returns the current path or the STATPING_DIR environment variable
-	Directory string
+	Directory   string
+	disableLogs bool
 )
 
 // init will set the utils.Directory to the current running directory, or STATPING_DIR if it is set
@@ -51,6 +52,8 @@ func init() {
 		}
 		Directory = dir
 	}
+	logger := os.Getenv("DISABLE_LOGS")
+	disableLogs, _ = strconv.ParseBool(logger)
 }
 
 // ToInt converts a int to a string

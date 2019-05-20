@@ -217,22 +217,13 @@ func (s *Service) checkHttp(record bool) *Service {
 	}
 	t2 := time.Now()
 	s.Latency = t2.Sub(t1).Seconds()
-	if err != nil {
-		if record {
-			recordFailure(s, fmt.Sprintf("HTTP Error %v", err))
-		}
-		return s
-	}
 	s.LastResponse = string(content)
 	s.LastStatusCode = res.StatusCode
 
 	if s.Expected.String != "" {
-		if err != nil {
-			utils.Log(2, err)
-		}
 		match, err := regexp.MatchString(s.Expected.String, string(content))
 		if err != nil {
-			utils.Log(2, err)
+			utils.Log(2, fmt.Sprintf("Service %v expected: %v to match %v", s.Name, string(content), s.Expected.String))
 		}
 		if !match {
 			if record {
