@@ -90,17 +90,11 @@ func (s *Service) parseHost() string {
 	if s.Type == "tcp" || s.Type == "udp" {
 		return s.Domain
 	} else {
-		domain := s.Domain
-		hasPort, _ := regexp.MatchString(`\:([0-9]+)`, domain)
-		if hasPort {
-			splitDomain := strings.Split(s.Domain, ":")
-			domain = splitDomain[len(splitDomain)-2]
-		}
-		host, err := url.Parse(domain)
+		u, err := url.Parse(s.Domain)
 		if err != nil {
 			return s.Domain
 		}
-		return host.Host
+		return strings.Split(u.Host, ":")[0]
 	}
 }
 
