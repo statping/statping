@@ -88,7 +88,7 @@ func Router() *mux.Router {
 	r.Handle("/settings/bulk_import", authenticated(bulkImportHandler, true)).Methods("POST")
 
 	// SERVICE Routes
-	r.Handle("/services", http.HandlerFunc(servicesHandler)).Methods("GET")
+	r.Handle("/services", authenticated(servicesHandler, true)).Methods("GET")
 	r.Handle("/service/{id}", http.HandlerFunc(servicesViewHandler)).Methods("GET")
 	r.Handle("/service/{id}/edit", authenticated(servicesViewHandler, true)).Methods("GET")
 	r.Handle("/service/{id}/delete_failures", authenticated(servicesDeleteFailuresHandler, true)).Methods("GET")
@@ -101,7 +101,7 @@ func Router() *mux.Router {
 	r.Handle("/api/groups/{id}", readOnly(apiGroupHandler, false)).Methods("GET")
 	r.Handle("/api/groups/{id}", authenticated(apiGroupUpdateHandler, false)).Methods("POST")
 	r.Handle("/api/groups/{id}", authenticated(apiGroupDeleteHandler, false)).Methods("DELETE")
-	r.Handle("/api/groups/reorder", authenticated(apiGroupReorderHandler, false)).Methods("POST")
+	r.Handle("/api/reorder/groups", authenticated(apiGroupReorderHandler, false)).Methods("POST")
 
 	// API Routes
 	r.Handle("/api", authenticated(apiIndexHandler, false))
@@ -112,7 +112,7 @@ func Router() *mux.Router {
 	r.Handle("/api/services", readOnly(apiAllServicesHandler, false)).Methods("GET")
 	r.Handle("/api/services", authenticated(apiCreateServiceHandler, false)).Methods("POST")
 	r.Handle("/api/services/{id}", readOnly(apiServiceHandler, false)).Methods("GET")
-	r.Handle("/api/services/reorder", authenticated(reorderServiceHandler, false)).Methods("POST")
+	r.Handle("/api/reorder/services", authenticated(reorderServiceHandler, false)).Methods("POST")
 	r.Handle("/api/services/{id}/running", authenticated(apiServiceRunningHandler, false)).Methods("POST")
 	r.Handle("/api/services/{id}/data", cached("30s", "application/json", http.HandlerFunc(apiServiceDataHandler))).Methods("GET")
 	r.Handle("/api/services/{id}/ping", cached("30s", "application/json", http.HandlerFunc(apiServicePingDataHandler))).Methods("GET")

@@ -313,7 +313,6 @@ $('form.ajax_form').on('submit', function() {
 		arrayData.push(newArr)
 	});
 	let sendData = JSON.stringify(newArr);
-	// console.log('sending '+method.toUpperCase()+' '+action+':',  sendData);
 	$.ajax({
 		url: action,
 		type: method,
@@ -405,8 +404,24 @@ $(function() {
 
 $('.confirm-btn').on('click', function() {
     var r = confirm('Are you sure you want to delete?');
+    let obj = $(this);
+    let redirect = obj.attr('data-redirect');
+    let href = obj.attr('href');
+    let method = obj.attr('data-method');
+    let data = obj.attr('data-object');
     if (r === true) {
-        return true;
+        $.ajax({
+            url: href,
+            type: method,
+            data: data ? data : null,
+            success: function (data) {
+                console.log("send to url: ", href);
+                if (redirect) {
+                    window.location.href = redirect;
+                }
+                return false;
+            }
+        });
     } else {
         return false;
     }

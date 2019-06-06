@@ -459,15 +459,15 @@ input.inputTags-field:focus {
 
 .pulse-glow:before,
 .pulse-glow:after {
-    position: absolute;
-    content: '';
-    height: 0.5rem;
-    width: 1.75rem;
-    top: 1.2rem;
-    right: 2.15rem;
-    border-radius: 0;
-    box-shadow: 0 0 7px #47d337;
-    animation: glow-grow 2s ease-out infinite;
+  position: absolute;
+  content: "";
+  height: 0.4rem;
+  width: 1.7rem;
+  top: 1.3rem;
+  right: 2.15rem;
+  border-radius: 0;
+  box-shadow: 0 0 6px #47d337;
+  animation: glow-grow 2s ease-out infinite;
 }
 
 .sortable_drag {
