@@ -194,7 +194,7 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 		dbType = "sqlite3"
 	case "mysql":
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
-		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
+		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC&time_zone=%%27UTC%%27", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
 	case "postgres":
 		sslMode := "disable"
 		if postgresSSL != "" {
