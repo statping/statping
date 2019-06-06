@@ -83,10 +83,8 @@
 {{ else }}
 <script src="/js/sortable.min.js"></script>
 {{end}}
-<script src="/js/inputTags.min.js"></script>
 <script>
-	$(".input-tags").inputTags();
-
+    // drag and drop sorting for Services
     sortable('.sortable', {
         forcePlaceholderSize: true,
         hoverClass: 'sortable_drag',
@@ -103,14 +101,16 @@
             newOrder.push(o);
         });
         $.ajax({
-            url: "/api/services/reorder",
-            type: 'POST',
+            url: "/api/reorder/services",
+            type: "POST",
             data: JSON.stringify(newOrder),
             contentType: "application/json",
             dataType: "json",
             success: function(data) { }
         });
     });
+
+    // drag and drop sorting for Groups
     sortable('.sortable_groups', {
         forcePlaceholderSize: true,
         hoverClass: 'sortable_drag',
@@ -127,8 +127,8 @@
             newOrder.push(o);
         });
         $.ajax({
-            url: "/api/groups/reorder",
-            type: 'POST',
+            url: "/api/reorder/groups",
+            type: "POST",
             data: JSON.stringify(newOrder),
             contentType: "application/json",
             dataType: "json",

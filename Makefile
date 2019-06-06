@@ -261,6 +261,7 @@ tag:
 
 generate:
 	cd source && go generate
+	cd handlers/graphql && go generate
 
 # compress built binaries into tar.gz and zip formats
 compress:
