@@ -214,6 +214,9 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 			return err
 		}
 	}
+	if dbType == "sqlite3" {
+		dbSession.DB().SetMaxOpenConns(1)
+	}
 	err = dbSession.DB().Ping()
 	if err == nil {
 		DbSession = dbSession
