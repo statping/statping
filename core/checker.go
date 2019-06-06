@@ -116,10 +116,18 @@ func (s *Service) dnsCheck() (float64, error) {
 	return subTime, err
 }
 
+func isIPv6(address string) bool {
+	return strings.Count(address, ":") >= 2
+}
+
 // checkIcmp will send a ICMP ping packet to the service
 func (s *Service) checkIcmp(record bool) *Service {
 	p := fastping.NewPinger()
-	ra, err := net.ResolveIPAddr("ip4:icmp", s.Domain)
+	resolveIP := "ip4:icmp"
+	if isIPv6(s.Domain) {
+		resolveIP = "ip6:icmp"
+	}
+	ra, err := net.ResolveIPAddr(resolveIP, s.Domain)
 	if err != nil {
 		recordFailure(s, fmt.Sprintf("Could not send ICMP to service %v, %v", s.Domain, err))
 		return s
@@ -152,17 +160,20 @@ func (s *Service) checkTcp(record bool) *Service {
 	domain := fmt.Sprintf("%v", s.Domain)
 	if s.Port != 0 {
 		domain = fmt.Sprintf("%v:%v", s.Domain, s.Port)
+		if isIPv6(s.Domain) {
+			domain = fmt.Sprintf("[%v]:%v", s.Domain, s.Port)
+		}
 	}
 	conn, err := net.DialTimeout(s.Type, domain, time.Duration(s.Timeout)*time.Second)
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("%v Dial Error %v", s.Type, err))
+			recordFailure(s, fmt.Sprintf("Dial Error %v", err))
 		}
 		return s
 	}
 	if err := conn.Close(); err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("TCP Socket Close Error %v", err))
+			recordFailure(s, fmt.Sprintf("%v Socket Close Error %v", strings.ToUpper(s.Type), err))
 		}
 		return s
 	}
