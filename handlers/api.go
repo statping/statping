@@ -105,6 +105,12 @@ func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *ht
 	case *types.Checkin:
 		objName = "checkin"
 		objId = v.Id
+	case *core.Incident:
+		objName = "incident"
+		objId = v.Id
+	case *core.IncidentUpdate:
+		objName = "incident_update"
+		objId = v.Id
 	default:
 		objName = "missing"
 	}

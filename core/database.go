@@ -36,7 +36,7 @@ var (
 )
 
 func init() {
-	DbModels = []interface{}{&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Message{}, &types.Group{}, &types.Checkin{}, &types.CheckinHit{}, &notifier.Notification{}}
+	DbModels = []interface{}{&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Message{}, &types.Group{}, &types.Checkin{}, &types.CheckinHit{}, &notifier.Notification{}, &types.Incident{}, &types.IncidentUpdate{}}
 }
 
 // DbConfig stores the config.yml file for the statup configuration
@@ -85,6 +85,16 @@ func messagesDb() *gorm.DB {
 // messagesDb returns the Checkin records for a service
 func groupsDb() *gorm.DB {
 	return DbSession.Model(&types.Group{})
+}
+
+// incidentsDB returns the 'incidents' database column
+func incidentsDB() *gorm.DB {
+	return DbSession.Model(&types.Incident{})
+}
+
+// incidentsUpdatesDB returns the 'incidents updates' database column
+func incidentsUpdatesDB() *gorm.DB {
+	return DbSession.Model(&types.IncidentUpdate{})
 }
 
 // HitsBetween returns the gorm database query for a collection of service hits between a time range
@@ -323,6 +333,8 @@ func (db *DbConfig) DropDatabase() error {
 	err = DbSession.DropTableIfExists("services")
 	err = DbSession.DropTableIfExists("users")
 	err = DbSession.DropTableIfExists("messages")
+	err = DbSession.DropTableIfExists("incidents")
+	err = DbSession.DropTableIfExists("incident_updates")
 	return err.Error
 }
 
