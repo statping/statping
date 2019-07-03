@@ -123,6 +123,9 @@ func Router() *mux.Router {
 	r.Handle("/api/services/{id}/failures", authenticated(servicesDeleteFailuresHandler, false)).Methods("DELETE")
 	r.Handle("/api/services/{id}/hits", authenticated(apiServiceHitsHandler, false)).Methods("GET")
 
+	// API INCIDENTS Routes
+	r.Handle("/api/incidents", readOnly(apiAllIncidentsHandler, false)).Methods("GET")
+
 	// API USER Routes
 	r.Handle("/api/users", authenticated(apiAllUsersHandler, false)).Methods("GET")
 	r.Handle("/api/users", authenticated(apiCreateUsersHandler, false)).Methods("POST")

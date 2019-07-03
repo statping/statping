@@ -107,9 +107,43 @@ func InsertSampleData() error {
 
 	insertMessages()
 
+	insertSampleIncidents()
+
 	utils.Log(1, "Sample data has finished importing")
 
 	return nil
+}
+
+func insertSampleIncidents() error {
+	incident1 := &Incident{&types.Incident{
+		Title:       "Github Downtime",
+		Description: "This is an example of a incident for a service.",
+		ServiceId:   2,
+	}}
+	_, err := incident1.Create()
+
+	incidentUpdate1 := &IncidentUpdate{&types.IncidentUpdate{
+		IncidentId: incident1.Id,
+		Message:    "Github's page for Statping seems to be sending a 501 error.",
+		Type:       "Investigating",
+	}}
+	_, err = incidentUpdate1.Create()
+
+	incidentUpdate2 := &IncidentUpdate{&types.IncidentUpdate{
+		IncidentId: incident1.Id,
+		Message:    "Problem is continuing and we are looking at the issues.",
+		Type:       "Update",
+	}}
+	_, err = incidentUpdate2.Create()
+
+	incidentUpdate3 := &IncidentUpdate{&types.IncidentUpdate{
+		IncidentId: incident1.Id,
+		Message:    "Github is now back online and everything is working.",
+		Type:       "Resolved",
+	}}
+	_, err = incidentUpdate3.Create()
+
+	return err
 }
 
 func insertSampleGroups() error {
