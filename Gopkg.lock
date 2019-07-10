@@ -296,6 +296,14 @@
   revision = "d3b5b032dc8e8927d31a5071b56e14c89f045135"
   version = "v2.0.1"
 
+[[projects]]
+  digest = "1:e668ebc4cec3a084c222b4255a1565ee652614f029a7b2f4b1bc9557565ed473"
+  name = "github.com/jinzhu/now"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "1a6fdd4591d336a897120c50c69ed3c0e8033468"
+  version = "v1.0.1"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1

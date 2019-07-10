@@ -233,6 +233,7 @@ dev-deps:
 	$(GOGET) gopkg.in/natefinch/lumberjack.v2
 	$(GOGET) golang.org/x/crypto/bcrypt
 	$(GOGET) github.com/99designs/gqlgen
+	$(GOGET) github.com/jinzhu/now
 
 # remove files for a clean compile/build
 clean:
