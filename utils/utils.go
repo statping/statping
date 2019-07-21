@@ -298,7 +298,7 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 		req.Header.Set("Content-Type", content.(string))
 	}
 	for _, h := range headers {
-		keyVal := strings.Split(h, "=")
+		keyVal := strings.SplitN(h, "=", 2)
 		if len(keyVal) == 2 {
 			if keyVal[0] != "" && keyVal[1] != "" {
 				req.Header.Set(keyVal[0], keyVal[1])
