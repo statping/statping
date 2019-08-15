@@ -77,7 +77,7 @@ func TestTwilioNotifier(t *testing.T) {
 	})
 
 	t.Run("Twilio Check Offline", func(t *testing.T) {
-		assert.False(t, twilioNotifier.Online)
+		assert.False(t, TestService.Online)
 	})
 
 	t.Run("Twilio OnSuccess", func(t *testing.T) {
@@ -86,7 +86,7 @@ func TestTwilioNotifier(t *testing.T) {
 	})
 
 	t.Run("Twilio Check Back Online", func(t *testing.T) {
-		assert.True(t, twilioNotifier.Online)
+		assert.True(t, TestService.Online)
 	})
 
 	t.Run("Twilio OnSuccess Again", func(t *testing.T) {

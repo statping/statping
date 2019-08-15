@@ -93,17 +93,15 @@ func (u *telegram) Send(msg interface{}) error {
 func (u *telegram) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
 	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
-	u.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (u *telegram) OnSuccess(s *types.Service) {
-	if !u.Online {
+	if !s.Online {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		msg := fmt.Sprintf("Your service '%v' is back online!", s.Name)
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}
-	u.Online = true
 }
 
 // OnSave triggers when this notifier has been saved

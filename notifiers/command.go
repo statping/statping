@@ -77,16 +77,14 @@ func (u *commandLine) Select() *notifier.Notification {
 // OnFailure for commandLine will trigger failing service
 func (u *commandLine) OnFailure(s *types.Service, f *types.Failure) {
 	u.AddQueue(fmt.Sprintf("service_%v", s.Id), u.Var2)
-	u.Online = false
 }
 
 // OnSuccess for commandLine will trigger successful service
 func (u *commandLine) OnSuccess(s *types.Service) {
-	if !u.Online {
+	if !s.Online {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), u.Var1)
 	}
-	u.Online = true
 }
 
 // OnSave for commandLine triggers when this notifier has been saved

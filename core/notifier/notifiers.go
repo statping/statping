@@ -62,7 +62,6 @@ type Notification struct {
 	Delay       time.Duration      `gorm:"-" json:"delay,string"`
 	Queue       []*QueueData       `gorm:"-" json:"-"`
 	Running     chan bool          `gorm:"-" json:"-"`
-	Online      bool               `gorm:"-" json:"online"`
 	testable    bool               `gorm:"-" json:"testable"`
 }
 

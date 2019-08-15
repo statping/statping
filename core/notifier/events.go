@@ -39,6 +39,7 @@ func OnFailure(s *types.Service, f *types.Failure) {
 			comm.(BasicEvents).OnFailure(s, f)
 		}
 	}
+
 }
 
 // OnSuccess will be triggered when a service is successful - BasicEvents interface
@@ -51,6 +52,7 @@ func OnSuccess(s *types.Service) {
 			comm.(BasicEvents).OnSuccess(s)
 		}
 	}
+
 }
 
 // OnNewService is triggered when a new service is created - ServiceEvents interface

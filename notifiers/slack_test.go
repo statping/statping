@@ -86,7 +86,7 @@ func TestSlackNotifier(t *testing.T) {
 	})
 
 	t.Run("slack Check Offline", func(t *testing.T) {
-		assert.False(t, slacker.Online)
+		assert.False(t, TestService.Online)
 	})
 
 	t.Run("slack OnSuccess", func(t *testing.T) {
@@ -95,12 +95,12 @@ func TestSlackNotifier(t *testing.T) {
 	})
 
 	t.Run("slack Queue after being online", func(t *testing.T) {
-		assert.True(t, slacker.Online)
+		assert.True(t, TestService.Online)
 		assert.Equal(t, 1, len(slacker.Queue))
 	})
 
 	t.Run("slack OnSuccess Again", func(t *testing.T) {
-		assert.True(t, slacker.Online)
+		assert.True(t, TestService.Online)
 		slacker.OnSuccess(TestService)
 		assert.Equal(t, 1, len(slacker.Queue))
 		go notifier.Queue(slacker)

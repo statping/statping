@@ -70,7 +70,7 @@ func TestDiscordNotifier(t *testing.T) {
 	})
 
 	t.Run("discord Check Offline", func(t *testing.T) {
-		assert.False(t, discorder.Online)
+		assert.False(t, TestService.Online)
 	})
 
 	t.Run("discord OnSuccess", func(t *testing.T) {
@@ -79,7 +79,7 @@ func TestDiscordNotifier(t *testing.T) {
 	})
 
 	t.Run("discord Check Back Online", func(t *testing.T) {
-		assert.True(t, discorder.Online)
+		assert.True(t, TestService.Online)
 	})
 
 	t.Run("discord OnSuccess Again", func(t *testing.T) {
