@@ -166,17 +166,15 @@ func (w *webhooker) OnTest() error {
 func (w *webhooker) OnFailure(s *types.Service, f *types.Failure) {
 	msg := replaceBodyText(w.Var2, s, f)
 	w.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
-	w.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (w *webhooker) OnSuccess(s *types.Service) {
-	if !w.Online {
+	if !s.Online {
 		w.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		msg := replaceBodyText(w.Var2, s, nil)
 		w.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}
-	w.Online = true
 }
 
 // OnSave triggers when this notifier has been saved

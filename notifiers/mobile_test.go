@@ -83,7 +83,7 @@ func TestMobileNotifier(t *testing.T) {
 	})
 
 	t.Run("mobile Check Offline", func(t *testing.T) {
-		assert.False(t, mobile.Online)
+		assert.False(t, TestService.Online)
 	})
 
 	t.Run("mobile OnSuccess", func(t *testing.T) {
@@ -92,13 +92,13 @@ func TestMobileNotifier(t *testing.T) {
 	})
 
 	t.Run("mobile Queue after being online", func(t *testing.T) {
-		assert.True(t, mobile.Online)
+		assert.True(t, TestService.Online)
 		assert.Equal(t, 1, len(mobile.Queue))
 	})
 
 	t.Run("mobile OnSuccess Again", func(t *testing.T) {
 		t.SkipNow()
-		assert.True(t, mobile.Online)
+		assert.True(t, TestService.Online)
 		mobile.OnSuccess(TestService)
 		assert.Equal(t, 1, len(mobile.Queue))
 		go notifier.Queue(mobile)

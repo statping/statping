@@ -74,7 +74,7 @@ func TestCommandNotifier(t *testing.T) {
 	})
 
 	t.Run("command Check Offline", func(t *testing.T) {
-		assert.False(t, command.Online)
+		assert.False(t, TestService.Online)
 	})
 
 	t.Run("command OnSuccess", func(t *testing.T) {
@@ -83,12 +83,12 @@ func TestCommandNotifier(t *testing.T) {
 	})
 
 	t.Run("command Queue after being online", func(t *testing.T) {
-		assert.True(t, command.Online)
+		assert.True(t, TestService.Online)
 		assert.Equal(t, 1, len(command.Queue))
 	})
 
 	t.Run("command OnSuccess Again", func(t *testing.T) {
-		assert.True(t, command.Online)
+		assert.True(t, TestService.Online)
 		command.OnSuccess(TestService)
 		assert.Equal(t, 1, len(command.Queue))
 		go notifier.Queue(command)

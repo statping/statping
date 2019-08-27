@@ -80,7 +80,7 @@ func TestWebhookNotifier(t *testing.T) {
 	})
 
 	t.Run("webhooker Check Offline", func(t *testing.T) {
-		assert.False(t, webhook.Online)
+		assert.False(t, TestService.Online)
 	})
 
 	t.Run("webhooker OnSuccess", func(t *testing.T) {
@@ -89,7 +89,7 @@ func TestWebhookNotifier(t *testing.T) {
 	})
 
 	t.Run("webhooker Check Back Online", func(t *testing.T) {
-		assert.True(t, webhook.Online)
+		assert.True(t, TestService.Online)
 	})
 
 	t.Run("webhooker OnSuccess Again", func(t *testing.T) {

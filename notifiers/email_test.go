@@ -106,7 +106,7 @@ func TestEmailNotifier(t *testing.T) {
 	})
 
 	t.Run("email Check Offline", func(t *testing.T) {
-		assert.False(t, emailer.Online)
+		assert.False(t, TestService.Online)
 	})
 
 	t.Run("email OnSuccess", func(t *testing.T) {
@@ -115,7 +115,7 @@ func TestEmailNotifier(t *testing.T) {
 	})
 
 	t.Run("email Check Back Online", func(t *testing.T) {
-		assert.True(t, emailer.Online)
+		assert.True(t, TestService.Online)
 	})
 
 	t.Run("email OnSuccess Again", func(t *testing.T) {

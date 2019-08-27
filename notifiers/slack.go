@@ -108,12 +108,11 @@ func (u *slack) OnFailure(s *types.Service, f *types.Failure) {
 		Time:     time.Now().Unix(),
 	}
 	parseSlackMessage(s.Id, failingTemplate, message)
-	u.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (u *slack) OnSuccess(s *types.Service) {
-	if !u.Online {
+	if !s.Online {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		message := slackMessage{
 			Service:  s,
@@ -122,7 +121,6 @@ func (u *slack) OnSuccess(s *types.Service) {
 		}
 		parseSlackMessage(s.Id, successTemplate, message)
 	}
-	u.Online = true
 }
 
 // OnSave triggers when this notifier has been saved

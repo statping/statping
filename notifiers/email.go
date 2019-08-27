@@ -195,12 +195,11 @@ func (u *email) OnFailure(s *types.Service, f *types.Failure) {
 		From:     u.Var1,
 	}
 	u.AddQueue(fmt.Sprintf("service_%v", s.Id), email)
-	u.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (u *email) OnSuccess(s *types.Service) {
-	if !u.Online {
+	if !s.Online {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		email := &emailOutgoing{
 			To:       u.Var2,
@@ -211,7 +210,6 @@ func (u *email) OnSuccess(s *types.Service) {
 		}
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), email)
 	}
-	u.Online = true
 }
 
 func (u *email) Select() *notifier.Notification {
