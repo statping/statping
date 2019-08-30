@@ -84,15 +84,20 @@ func LoadUsingEnv() (*DbConfig, error) {
 		if username == "" {
 			username = "admin"
 		}
-		password := os.Getenv("ADMIN_PASSWORD")
+		password := os.Getenv("ADMIN_PASS")
 		if password == "" {
 			password = "admin"
+		}
+
+		email := os.Getenv("ADMIN_EMAIL")
+		if email == "" {
+			email = "info@admin.com"
 		}
 
 		admin := ReturnUser(&types.User{
 			Username: username,
 			Password: password,
-			Email:    "info@admin.com",
+			Email:    email,
 			Admin:    types.NewNullBool(true),
 		})
 		_, err := admin.Create()
@@ -161,6 +166,11 @@ func EnvToConfig() (*DbConfig, error) {
 		adminPass = "admin"
 	}
 
+	adminEmail := os.Getenv("ADMIN_EMAIL")
+	if adminEmail == "" {
+		adminEmail = "info@admin.com"
+	}
+
 	Configs = &DbConfig{
 		DbConn:      os.Getenv("DB_CONN"),
 		DbHost:      os.Getenv("DB_HOST"),
@@ -171,7 +181,7 @@ func EnvToConfig() (*DbConfig, error) {
 		Project:     name,
 		Description: description,
 		Domain:      os.Getenv("DOMAIN"),
-		Email:       "",
+		Email:       adminEmail,
 		Username:    adminUser,
 		Password:    adminPass,
 		Error:       nil,
