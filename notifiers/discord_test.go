@@ -69,10 +69,6 @@ func TestDiscordNotifier(t *testing.T) {
 		assert.Equal(t, 1, len(discorder.Queue))
 	})
 
-	t.Run("discord Check Offline", func(t *testing.T) {
-		assert.False(t, TestService.Online)
-	})
-
 	t.Run("discord OnSuccess", func(t *testing.T) {
 		discorder.OnSuccess(TestService)
 		assert.Equal(t, 1, len(discorder.Queue))

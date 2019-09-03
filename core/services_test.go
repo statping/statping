@@ -64,18 +64,15 @@ func TestSelectTCPService(t *testing.T) {
 
 func TestUpdateService(t *testing.T) {
 	service := SelectService(1)
-	service2 := SelectService(2)
 	assert.Equal(t, "Google", service.Name)
-	assert.Equal(t, "Statping Github", service2.Name)
-	assert.True(t, service.Online)
-	assert.True(t, service2.Online)
 	service.Name = "Updated Google"
 	service.Interval = 5
 	err := service.Update(true)
 	assert.Nil(t, err)
 	// check if updating pointer array shutdown any other service
-	service2 = SelectService(2)
-	assert.True(t, service2.Online)
+	service = SelectService(1)
+	assert.Equal(t, "Updated Google", service.Name)
+	assert.Equal(t, 5, service.Interval)
 }
 
 func TestUpdateAllServices(t *testing.T) {

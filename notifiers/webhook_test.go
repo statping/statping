@@ -65,7 +65,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 	t.Run("webhooker Replace Body Text", func(t *testing.T) {
 		fullMsg = replaceBodyText(webhookMessage, TestService, TestFailure)
-		assert.Equal(t, `{"id": "1","name": "Interpol - All The Rage Back Home","online": "false","issue": "testing"}`, fullMsg)
+		assert.Equal(t, `{"id": "1","name": "Interpol - All The Rage Back Home","online": "true","issue": "testing"}`, fullMsg)
 	})
 
 	t.Run("webhooker Within Limits", func(t *testing.T) {
@@ -77,10 +77,6 @@ func TestWebhookNotifier(t *testing.T) {
 	t.Run("webhooker OnFailure", func(t *testing.T) {
 		webhook.OnFailure(TestService, TestFailure)
 		assert.Len(t, webhook.Queue, 1)
-	})
-
-	t.Run("webhooker Check Offline", func(t *testing.T) {
-		assert.False(t, TestService.Online)
 	})
 
 	t.Run("webhooker OnSuccess", func(t *testing.T) {

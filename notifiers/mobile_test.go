@@ -76,24 +76,15 @@ func TestMobileNotifier(t *testing.T) {
 	})
 
 	t.Run("mobile OnFailure multiple times", func(t *testing.T) {
-		for i := 0; i <= 50; i++ {
+		for i := 0; i <= 5; i++ {
 			mobile.OnFailure(TestService, TestFailure)
 		}
-		assert.Equal(t, 52, len(mobile.Queue))
-	})
-
-	t.Run("mobile Check Offline", func(t *testing.T) {
-		assert.False(t, TestService.Online)
+		assert.Equal(t, 7, len(mobile.Queue))
 	})
 
 	t.Run("mobile OnSuccess", func(t *testing.T) {
 		mobile.OnSuccess(TestService)
-		assert.Equal(t, 1, len(mobile.Queue))
-	})
-
-	t.Run("mobile Queue after being online", func(t *testing.T) {
-		assert.True(t, TestService.Online)
-		assert.Equal(t, 1, len(mobile.Queue))
+		assert.Equal(t, 7, len(mobile.Queue))
 	})
 
 	t.Run("mobile OnSuccess Again", func(t *testing.T) {

@@ -105,10 +105,6 @@ func TestEmailNotifier(t *testing.T) {
 		assert.Equal(t, 1, len(emailer.Queue))
 	})
 
-	t.Run("email Check Offline", func(t *testing.T) {
-		assert.False(t, TestService.Online)
-	})
-
 	t.Run("email OnSuccess", func(t *testing.T) {
 		emailer.OnSuccess(TestService)
 		assert.Equal(t, 1, len(emailer.Queue))
