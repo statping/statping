@@ -301,7 +301,11 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 		keyVal := strings.Split(h, "=")
 		if len(keyVal) == 2 {
 			if keyVal[0] != "" && keyVal[1] != "" {
-				req.Header.Set(keyVal[0], keyVal[1])
+				if strings.ToLower(keyVal[0]) == "host" {
+					req.Host = strings.TrimSpace(keyVal[1])
+				} else {
+					req.Header.Set(keyVal[0], keyVal[1])
+				}
 			}
 		}
 	}
