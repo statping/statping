@@ -35,7 +35,7 @@ func OnFailure(s *types.Service, f *types.Failure) {
 		return
 	}
 	for _, comm := range AllCommunications {
-		if isType(comm, new(BasicEvents)) && isEnabled(comm) && inLimits(comm) {
+		if isType(comm, new(BasicEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) {
 			comm.(BasicEvents).OnFailure(s, f)
 		}
 	}
@@ -48,7 +48,7 @@ func OnSuccess(s *types.Service) {
 		return
 	}
 	for _, comm := range AllCommunications {
-		if isType(comm, new(BasicEvents)) && isEnabled(comm) && inLimits(comm) {
+		if isType(comm, new(BasicEvents)) && isEnabled(comm) && (!s.Online || inLimits(comm)) {
 			comm.(BasicEvents).OnSuccess(s)
 		}
 	}
