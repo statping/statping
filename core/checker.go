@@ -261,8 +261,8 @@ func recordSuccess(s *Service) {
 	}
 	utils.Log(1, fmt.Sprintf("Service %v Successful Response: %0.2f ms | Lookup in: %0.2f ms", s.Name, hit.Latency*1000, hit.PingTime*1000))
 	s.CreateHit(hit)
-	s.Online = true
 	notifier.OnSuccess(s.Service)
+	s.Online = true
 }
 
 // recordFailure will create a new 'Failure' record in the database for a offline service
@@ -276,6 +276,6 @@ func recordFailure(s *Service, issue string) {
 	}}
 	utils.Log(2, fmt.Sprintf("Service %v Failing: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
 	s.CreateFailure(fail)
-	s.Online = false
 	notifier.OnFailure(s.Service, fail.Failure)
+	s.Online = false
 }
