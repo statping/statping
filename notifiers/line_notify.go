@@ -62,7 +62,7 @@ func (u *lineNotifier) Send(msg interface{}) error {
 	v := url.Values{}
 	v.Set("message", message)
 	headers := []string{fmt.Sprintf("Authorization=Bearer %v", u.ApiSecret)}
-	_, _, err := utils.HttpRequest("https://notify-api.line.me/api/notify", "POST", "application/x-www-form-urlencoded", headers, strings.NewReader(v.Encode()), time.Duration(10*time.Second))
+	_, _, err := utils.HttpRequest("https://notify-api.line.me/api/notify", "POST", "application/x-www-form-urlencoded", headers, strings.NewReader(v.Encode()), time.Duration(10*time.Second), true)
 	return err
 }
 
