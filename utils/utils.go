@@ -316,7 +316,7 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 		Proxy:                 http.ProxyFromEnvironment,
 		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
 			// redirect all connections to host specified in url
-			addr = req.URL.Host
+			addr = strings.Split(req.URL.Host, ":")[0] + addr[strings.LastIndex(addr, ":"):]
 			return dialer.DialContext(ctx, network, addr)
 		},
 	}
