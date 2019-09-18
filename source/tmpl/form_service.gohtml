@@ -109,6 +109,16 @@
         </div>
     </div>
     <div class="form-group row">
+        <label for="order" class="col-sm-4 col-form-label">Verify SSL</label>
+        <div class="col-8 mt-1">
+            <span class="switch float-left">
+                <input type="checkbox" name="verify_ssl-option" class="switch" id="switch-verify-ssl" {{if eq .Id 0}}checked{{end}}{{if .VerifySSL.Bool}}checked{{end}}>
+                <label for="switch-verify-ssl">Verify SSL Certificate for this service</label>
+                <input type="hidden" name="verify_ssl" id="switch-verify-ssl-value" value="{{if eq .Id 0}}true{{else}}{{if .VerifySSL.Bool}}true{{else}}false{{end}}{{end}}">
+            </span>
+        </div>
+    </div>
+    <div class="form-group row">
         <label for="order" class="col-sm-4 col-form-label">Notifications</label>
         <div class="col-8 mt-1">
             <span class="switch float-left">
