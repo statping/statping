@@ -264,7 +264,7 @@ func (u *email) OnTest() error {
 		Data:     interface{}(testService),
 		From:     u.Var1,
 	}
-	err = u.Send(email)
+	err = u.dialSend(email)
 	return err
 }
 
