@@ -2,7 +2,7 @@ os:
   - linux
 
 language: go
-go: 1.12.1
+go: 1.13.0
 go_import_path: github.com/hunterlong/statping
 
 cache:
