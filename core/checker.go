@@ -267,7 +267,7 @@ func (s *Service) checkHttp(record bool) *Service {
 
 		if l.State.Must.Failed > 0 {
 			if record {
-				recordFailure(s, fmt.Sprintf("microspector script had %v failues\n%s", l.State.Must.Failed,strings.Join(l.State.Must.Messages,"\n")))
+				recordFailure(s, fmt.Sprintf("Microspector had %v failures;\n%s", l.State.Must.Failed,strings.Join(l.State.Must.Messages,"\n")))
 			}
 			return s
 		}
