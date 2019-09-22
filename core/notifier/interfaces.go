@@ -30,6 +30,11 @@ type BasicEvents interface {
 	OnFailure(*types.Service, *types.Failure) // OnFailure is triggered when a service is failing
 }
 
+// ExtendedEvents includes an Alert (sami-failing) method different than BasicEvents
+type ExtendedEvents interface {
+	OnAlert(*types.Service, *types.Failure) // OnAlert is triggered when a service is semi-failing
+}
+
 // Tester interface will include a function to Test users settings before saving
 type Tester interface {
 	OnTest() error

@@ -270,6 +270,11 @@ func (s *Service) checkHttp(record bool) *Service {
 				recordFailure(s, fmt.Sprintf("Microspector had %v failures;\n%s", l.State.Must.Failed,strings.Join(l.State.Must.Messages,"\n")))
 			}
 			return s
+		}else if l.State.Should.Failed > 0{
+			if record {
+				recordAlert(s, fmt.Sprintf("Microspector had %v failures;\n%s", l.State.Should.Failed,strings.Join(l.State.Should.Messages,"\n")))
+			}
+			return s
 		}
 	}
 
@@ -307,4 +312,17 @@ func recordFailure(s *Service, issue string) {
 	s.CreateFailure(fail)
 	notifier.OnFailure(s.Service, fail.Failure)
 	s.Online = false
+}
+
+func recordAlert(s *Service, issue string) {
+	fail := &Failure{&types.Failure{
+		Service:   s.Id,
+		Issue:     issue,
+		PingTime:  s.PingTime,
+		CreatedAt: time.Now(),
+		ErrorCode: s.LastStatusCode,
+	}}
+	utils.Log(2, fmt.Sprintf("Service %v Alerting: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
+	s.CreateFailure(fail)
+	notifier.OnAlert(s.Service, fail.Failure)
 }

@@ -36,7 +36,7 @@ func OnSave(method string) {
 // OnFailure will be triggered when a service is failing - BasicEvents interface
 func OnFailure(s *types.Service, f *types.Failure) {
 	s.FailCount++
-	fmt.Println("Fail COUNT : ",s.FailCount)
+	fmt.Println("Fail COUNT : ", s.FailCount)
 	if !s.AllowNotifications.Bool {
 		return
 	}
@@ -50,9 +50,26 @@ func OnFailure(s *types.Service, f *types.Failure) {
 
 }
 
+// OnAlert will be triggered when a service is semi-failing - ExtendedEvents interface
+func OnAlert(s *types.Service, f *types.Failure) {
+	s.AlertCount++
+	if !s.AllowNotifications.Bool {
+		return
+	}
+	for _, comm := range AllCommunications {
+		if isType(comm, new(ExtendedEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) && (s.AlertCount%s.NotificationCircle) == 1 {
+			notifier := comm.(Notifier).Select()
+			utils.Log(1, fmt.Sprintf("Sending alert %v notification for service %v", notifier.Method, s.Name))
+			comm.(ExtendedEvents).OnAlert(s, f)
+		}
+	}
+
+}
+
 // OnSuccess will be triggered when a service is successful - BasicEvents interface
 func OnSuccess(s *types.Service) {
 	s.FailCount = 0
+	s.AlertCount = 0
 	if !s.AllowNotifications.Bool {
 		return
 	}

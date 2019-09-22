@@ -53,6 +53,7 @@ type Service struct {
 	SleepDuration      time.Duration      `gorm:"-" json:"-"`
 	LastResponse       string             `gorm:"-" json:"-"`
 	FailCount          int                `gorm:"-" json:"-"`
+	AlertCount         int                `gorm:"-" json:"-"`
 	LastStatusCode     int                `gorm:"-" json:"status_code"`
 	LastOnline         time.Time          `gorm:"-" json:"last_success"`
 	Failures           []FailureInterface `gorm:"-" json:"failures,omitempty"`
