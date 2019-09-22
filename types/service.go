@@ -35,7 +35,7 @@ type Service struct {
 	Order              int                `gorm:"default:0;column:order_id" json:"order_id"`
 	AllowNotifications NullBool           `gorm:"default:true;column:allow_notifications" json:"allow_notifications"`
 	VerifySSL          NullBool           `gorm:"default:false;column:verify_ssl" json:"verify_ssl"`
-	Public             NullBool           `gorm:"default:true;column:public" json:"public"`
+	Public             NullBool           `gorm:"default:false;column:public" json:"public"`
 	GroupId            int                `gorm:"default:0;column:group_id" json:"group_id"`
 	Headers            NullString         `gorm:"column:headers" json:"headers"`
 	MicroScript        NullString         `gorm:"column:micro_script" json:"micro_script"`
