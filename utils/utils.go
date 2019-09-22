@@ -16,6 +16,7 @@
 package utils
 
 import (
+	"context"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -24,6 +25,7 @@ import (
 	"io/ioutil"
 	"math"
 	"math/rand"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -298,6 +300,11 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	}
 	var resp *http.Response
 
+	dialer := &net.Dialer{
+		Timeout:   timeout * time.Second,
+		KeepAlive: timeout * time.Second,
+	}
+
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: !verifySSL,
@@ -307,6 +314,11 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 		ResponseHeaderTimeout: timeout,
 		TLSHandshakeTimeout:   timeout,
 		Proxy:                 http.ProxyFromEnvironment,
+		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+			// redirect all connections to host specified in url
+			addr = strings.Split(req.URL.Host, ":")[0] + addr[strings.LastIndex(addr, ":"):]
+			return dialer.DialContext(ctx, network, addr)
+		},
 	}
 	client := &http.Client{
 		Transport: transport,
