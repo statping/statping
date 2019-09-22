@@ -301,8 +301,8 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	var resp *http.Response
 
 	dialer := &net.Dialer{
-		Timeout:   timeout * time.Second,
-		KeepAlive: timeout * time.Second,
+		Timeout:   timeout,
+		KeepAlive: timeout,
 	}
 
 	transport := &http.Transport{
