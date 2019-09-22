@@ -145,6 +145,9 @@ $('select#service_type').on('change', function() {
 
 
 async function RenderChart(chart, service, start=0, end=9999999999, group="hour", retry=true) {
+		if (!chart.el) {
+			return
+		}
     let chartData = await ChartLatency(service, start, end, group, retry);
     if (!chartData) {
         chartData = await ChartLatency(service, start, end, "minute", retry);
