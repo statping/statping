@@ -41,7 +41,7 @@ func OnFailure(s *types.Service, f *types.Failure) {
 		return
 	}
 	for _, comm := range AllCommunications {
-		if isType(comm, new(BasicEvents)) && isEnabled(comm) && inLimits(comm) && (s.FailCount%s.NotificationCircle) == 1 {
+		if isType(comm, new(BasicEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) && (s.FailCount%s.NotificationCircle) == 1 {
 			notifier := comm.(Notifier).Select()
 			utils.Log(1, fmt.Sprintf("Sending failure %v notification for service %v", notifier.Method, s.Name))
 			comm.(BasicEvents).OnFailure(s, f)
@@ -57,7 +57,7 @@ func OnSuccess(s *types.Service) {
 		return
 	}
 	for _, comm := range AllCommunications {
-		if isType(comm, new(BasicEvents)) && isEnabled(comm) && inLimits(comm) {
+		if isType(comm, new(BasicEvents)) && isEnabled(comm) && (!s.Online || inLimits(comm)) {
 			notifier := comm.(Notifier).Select()
 			utils.Log(1, fmt.Sprintf("Sending successful %v notification for service %v", notifier.Method, s.Name))
 			comm.(BasicEvents).OnSuccess(s)
