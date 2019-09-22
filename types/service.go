@@ -38,6 +38,7 @@ type Service struct {
 	Public             NullBool           `gorm:"default:true;column:public" json:"public"`
 	GroupId            int                `gorm:"default:0;column:group_id" json:"group_id"`
 	Headers            NullString         `gorm:"column:headers" json:"headers"`
+	MicroScript        NullString         `gorm:"column:micro_script" json:"micro_script"`
 	Permalink          NullString         `gorm:"column:permalink" json:"permalink"`
 	CreatedAt          time.Time          `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt          time.Time          `gorm:"column:updated_at" json:"updated_at"`

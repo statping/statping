@@ -17,10 +17,12 @@ package core
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
+	"github.com/microspector/microspector/pkg/parser"
 	"github.com/tatsushid/go-fastping"
 	"net"
 	"net/http"
@@ -244,6 +246,34 @@ func (s *Service) checkHttp(record bool) *Service {
 		}
 		return s
 	}
+
+	if s.MicroScript.String != "" {
+		l := parser.Parse(s.MicroScript.String)
+		fmt.Println("got Lex")
+		mr := parser.HttpResult{
+			ContentLength: len(content),
+			Content:       string(content),
+			Headers:       make(map[string]string),
+			StatusCode:    res.StatusCode,
+		}
+
+		for k, v := range res.Header {
+			mr.Headers[parser.ToVariableName(k)] = v[0]
+		}
+
+		_ = json.Unmarshal(content, &mr.Json)
+		l.GlobalVars["Response"] = mr
+
+		parser.Run(l)
+
+		if l.State.Must.Failed > 0 {
+			if record {
+				recordFailure(s, fmt.Sprintf("microspector script had %v failues", l.State.Must.Failed))
+			}
+			return s
+		}
+	}
+
 	if record {
 		recordSuccess(s)
 	}
