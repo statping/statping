@@ -249,7 +249,6 @@ func (s *Service) checkHttp(record bool) *Service {
 
 	if s.MicroScript.String != "" {
 		l := parser.Parse(s.MicroScript.String)
-		fmt.Println("got Lex")
 		mr := parser.HttpResult{
 			ContentLength: len(content),
 			Content:       string(content),
@@ -268,7 +267,7 @@ func (s *Service) checkHttp(record bool) *Service {
 
 		if l.State.Must.Failed > 0 {
 			if record {
-				recordFailure(s, fmt.Sprintf("microspector script had %v failues", l.State.Must.Failed))
+				recordFailure(s, fmt.Sprintf("microspector script had %v failues\n%s", l.State.Must.Failed,strings.Join(l.State.Must.Messages,"\n")))
 			}
 			return s
 		}
