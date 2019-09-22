@@ -294,6 +294,11 @@ compress:
 	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output statping.asc --armor $(BINARY_NAME)
 	cd build && tar -czvf $(BINARY_NAME)-linux-arm64.tar.gz $(BINARY_NAME) statping.asc && rm -f $(BINARY_NAME) statping.asc
 
+compress-linux:
+	cd build && mv cmd-linux-amd64 $(BINARY_NAME)
+	#cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output statping.asc --armor $(BINARY_NAME)
+	cd build && tar -czvf $(BINARY_NAME)-linux-x64.tar.gz $(BINARY_NAME)  && rm -f $(BINARY_NAME)
+
 # push the :dev docker tag using curl
 publish-dev:
 	curl -H "Content-Type: application/json" --data '{"docker_tag": "dev"}' -X POST $(DOCKER)
