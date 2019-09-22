@@ -254,6 +254,7 @@ func (s *Service) checkHttp(record bool) *Service {
 			Content:       string(content),
 			Headers:       make(map[string]string),
 			StatusCode:    res.StatusCode,
+			Took:          int64(s.Latency),
 		}
 
 		for k, v := range res.Header {
@@ -267,12 +268,12 @@ func (s *Service) checkHttp(record bool) *Service {
 
 		if l.State.Must.Failed > 0 {
 			if record {
-				recordFailure(s, fmt.Sprintf("Microspector had %v failures;\n%s", l.State.Must.Failed,strings.Join(l.State.Must.Messages,"\n")))
+				recordFailure(s, fmt.Sprintf("Microspector had %v failures;\n%s", l.State.Must.Failed, strings.Join(l.State.Must.Messages, "\n")))
 			}
 			return s
-		}else if l.State.Should.Failed > 0{
+		} else if l.State.Should.Failed > 0 {
 			if record {
-				recordAlert(s, fmt.Sprintf("Microspector had %v failures;\n%s", l.State.Should.Failed,strings.Join(l.State.Should.Messages,"\n")))
+				recordAlert(s, fmt.Sprintf("Microspector had %v failures;\n%s", l.State.Should.Failed, strings.Join(l.State.Should.Messages, "\n")))
 			}
 			return s
 		}
