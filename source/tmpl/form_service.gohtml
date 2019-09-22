@@ -70,7 +70,7 @@
     <div class="form-group row{{if (eq .Type "tcp") or (eq .Type "udp")}} d-none{{end}}">
         <label for="micro_script" class="col-sm-4 col-form-label">Microspector Script</label>
         <div class="col-sm-8">
-            <textarea name="micro_script" class="form-control" id="micro_script" rows="3" autocapitalize="none" spellcheck="false" placeholder='MUST Response.Took < 900"'>{{.MicroScript.String}}</textarea>
+            <textarea name="micro_script" class="form-control" id="micro_script" rows="3" autocapitalize="none" spellcheck="false" placeholder='MUST Response.Took < 900'>{{.MicroScript.String}}</textarea>
             <small class="form-text text-muted">Custom <a target="_blank" href="https://github.com/microspector/microspector#scripting">Microspector Script</a> to validate the response in a sexy way</small>
         </div>
     </div>
