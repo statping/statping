@@ -146,7 +146,7 @@
         <label for="order" class="col-sm-4 col-form-label">Visible</label>
         <div class="col-8 mt-1">
             <span class="switch float-left">
-                <input type="checkbox" name="public-option" class="switch" id="switch-public" {{if eq .Id 0}}checked{{else}}{{if .Public.Bool}}checked{{end}}{{end}}>
+                <input type="checkbox" name="public-option" class="switch" id="switch-public" {{if eq .Id 0}}{{else}}{{if .Public.Bool}}checked{{end}}{{end}}>
                 <label for="switch-public">Show service details to the public</label>
                 <input type="hidden" name="public" id="switch-public-value" value="{{if eq .Id 0}}true{{else}}{{if .Public.Bool}}true{{else}}false{{end}}{{end}}">
             </span>
