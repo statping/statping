@@ -40,9 +40,9 @@ func OnFailure(s *types.Service, f *types.Failure) {
 	if !s.AllowNotifications.Bool {
 		return
 	}
-	s.NotificationCirclePeriod = int(math.Max(math.Round(float64(s.NotificationCirclePeriod)*1.25), float64(s.NotificationCirclePeriod+1)))
 	for _, comm := range AllCommunications {
 		if isType(comm, new(BasicEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) && (s.FailCount%s.NotificationCirclePeriod) == 1 {
+			s.NotificationCirclePeriod = int(math.Max(math.Round(float64(s.NotificationCirclePeriod)*1.25), float64(s.NotificationCirclePeriod+1)))
 			notifier := comm.(Notifier).Select()
 			utils.Log(1, fmt.Sprintf("Sending failure %v notification for service %v", notifier.Method, s.Name))
 			comm.(BasicEvents).OnFailure(s, f)
@@ -56,9 +56,9 @@ func OnAlert(s *types.Service, f *types.Failure) {
 	if !s.AllowNotifications.Bool {
 		return
 	}
-	s.NotificationCirclePeriod = int(math.Max(math.Round(float64(s.NotificationCirclePeriod)*1.25), float64(s.NotificationCirclePeriod+1)))
 	for _, comm := range AllCommunications {
 		if isType(comm, new(ExtendedEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) && (s.AlertCount%s.NotificationCirclePeriod) == 1 {
+			s.NotificationCirclePeriod = int(math.Max(math.Round(float64(s.NotificationCirclePeriod)*1.25), float64(s.NotificationCirclePeriod+1)))
 			notifier := comm.(Notifier).Select()
 			utils.Log(1, fmt.Sprintf("Sending alert %v notification for service %v", notifier.Method, s.Name))
 			comm.(ExtendedEvents).OnAlert(s, f)
