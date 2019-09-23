@@ -305,24 +305,37 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 		KeepAlive: timeout,
 	}
 
+	dialDepth := 1
+	conf := &tls.Config{
+		InsecureSkipVerify: !verifySSL,
+		ServerName:         req.Host,
+	}
+
 	transport := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: !verifySSL,
-			ServerName:         req.Host,
-		},
+		TLSClientConfig:       conf,
 		DisableKeepAlives:     true,
 		ResponseHeaderTimeout: timeout,
 		TLSHandshakeTimeout:   timeout,
 		Proxy:                 http.ProxyFromEnvironment,
 		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
 			// redirect all connections to host specified in url
-			addr = strings.Split(req.URL.Host, ":")[0] + addr[strings.LastIndex(addr, ":"):]
+			if dialDepth == 1 { // use the host in url just for firs dial, others
+				addr = strings.Split(req.URL.Host, ":")[0] + addr[strings.LastIndex(addr, ":"):]
+				dialDepth++
+			} else {
+				conf.ServerName = ""
+			}
 			return dialer.DialContext(ctx, network, addr)
 		},
 	}
 	client := &http.Client{
 		Transport: transport,
 		Timeout:   timeout,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			fmt.Println("Checking Redirect Policy")
+			return nil
+			//return http.ErrUseLastResponse
+		},
 	}
 
 	if resp, err = client.Do(req); err != nil {

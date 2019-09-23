@@ -37,11 +37,11 @@ func OnSave(method string) {
 // OnFailure will be triggered when a service is failing - BasicEvents interface
 func OnFailure(s *types.Service, f *types.Failure) {
 	s.FailCount++
-	if !s.AllowNotifications.Bool {
+	if !s.AllowNotifications.Bool || (s.FailCount%s.NotificationCirclePeriod) != 1 {
 		return
 	}
 	for _, comm := range AllCommunications {
-		if isType(comm, new(BasicEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) && (s.FailCount%s.NotificationCirclePeriod) == 1 {
+		if isType(comm, new(BasicEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) {
 			s.NotificationCirclePeriod = int(math.Max(math.Round(float64(s.NotificationCirclePeriod)*1.25), float64(s.NotificationCirclePeriod+1)))
 			notifier := comm.(Notifier).Select()
 			utils.Log(1, fmt.Sprintf("Sending failure %v notification for service %v", notifier.Method, s.Name))
@@ -53,11 +53,11 @@ func OnFailure(s *types.Service, f *types.Failure) {
 // OnAlert will be triggered when a service is semi-failing - ExtendedEvents interface
 func OnAlert(s *types.Service, f *types.Failure) {
 	s.AlertCount++
-	if !s.AllowNotifications.Bool {
+	if !s.AllowNotifications.Bool || (s.AlertCount%s.NotificationCirclePeriod) != 1 {
 		return
 	}
 	for _, comm := range AllCommunications {
-		if isType(comm, new(ExtendedEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) && (s.AlertCount%s.NotificationCirclePeriod) == 1 {
+		if isType(comm, new(ExtendedEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) {
 			s.NotificationCirclePeriod = int(math.Max(math.Round(float64(s.NotificationCirclePeriod)*1.25), float64(s.NotificationCirclePeriod+1)))
 			notifier := comm.(Notifier).Select()
 			utils.Log(1, fmt.Sprintf("Sending alert %v notification for service %v", notifier.Method, s.Name))
@@ -69,10 +69,11 @@ func OnAlert(s *types.Service, f *types.Failure) {
 
 // OnSuccess will be triggered when a service is successful - BasicEvents interface
 func OnSuccess(s *types.Service) {
+	alreadyOnlineOrFirstOpen := s.FailCount == 0
 	s.FailCount = 0
 	s.AlertCount = 0
 	s.NotificationCirclePeriod = s.NotificationCircle
-	if !s.AllowNotifications.Bool {
+	if !s.AllowNotifications.Bool || alreadyOnlineOrFirstOpen {
 		return
 	}
 	for _, comm := range AllCommunications {
