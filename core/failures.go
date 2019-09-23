@@ -30,8 +30,8 @@ type Failure struct {
 }
 
 const (
-	limitedFailures = 32
-	limitedHits     = 32
+	limitedFailures = 5
+	limitedHits     = 5
 )
 
 // CreateFailure will create a new Failure record for a service
