@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
+	"math"
 )
 
 // OnSave will trigger a notifier when it has been saved - Notifier interface
@@ -36,18 +37,17 @@ func OnSave(method string) {
 // OnFailure will be triggered when a service is failing - BasicEvents interface
 func OnFailure(s *types.Service, f *types.Failure) {
 	s.FailCount++
-	fmt.Println("Fail COUNT : ", s.FailCount)
 	if !s.AllowNotifications.Bool {
 		return
 	}
+	s.NotificationCirclePeriod = int(math.Max(math.Round(float64(s.NotificationCirclePeriod)*1.25), float64(s.NotificationCirclePeriod+1)))
 	for _, comm := range AllCommunications {
-		if isType(comm, new(BasicEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) && (s.FailCount%s.NotificationCircle) == 1 {
+		if isType(comm, new(BasicEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) && (s.FailCount%s.NotificationCirclePeriod) == 1 {
 			notifier := comm.(Notifier).Select()
 			utils.Log(1, fmt.Sprintf("Sending failure %v notification for service %v", notifier.Method, s.Name))
 			comm.(BasicEvents).OnFailure(s, f)
 		}
 	}
-
 }
 
 // OnAlert will be triggered when a service is semi-failing - ExtendedEvents interface
@@ -56,8 +56,9 @@ func OnAlert(s *types.Service, f *types.Failure) {
 	if !s.AllowNotifications.Bool {
 		return
 	}
+	s.NotificationCirclePeriod = int(math.Max(math.Round(float64(s.NotificationCirclePeriod)*1.25), float64(s.NotificationCirclePeriod+1)))
 	for _, comm := range AllCommunications {
-		if isType(comm, new(ExtendedEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) && (s.AlertCount%s.NotificationCircle) == 1 {
+		if isType(comm, new(ExtendedEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) && (s.AlertCount%s.NotificationCirclePeriod) == 1 {
 			notifier := comm.(Notifier).Select()
 			utils.Log(1, fmt.Sprintf("Sending alert %v notification for service %v", notifier.Method, s.Name))
 			comm.(ExtendedEvents).OnAlert(s, f)
@@ -70,6 +71,7 @@ func OnAlert(s *types.Service, f *types.Failure) {
 func OnSuccess(s *types.Service) {
 	s.FailCount = 0
 	s.AlertCount = 0
+	s.NotificationCirclePeriod = s.NotificationCircle
 	if !s.AllowNotifications.Bool {
 		return
 	}

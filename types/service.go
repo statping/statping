@@ -21,43 +21,44 @@ import (
 
 // Service is the main struct for Services
 type Service struct {
-	Id                 int64              `gorm:"primary_key;column:id" json:"id"`
-	Name               string             `gorm:"column:name" json:"name"`
-	Domain             string             `gorm:"column:domain" json:"domain"`
-	Expected           NullString         `gorm:"column:expected" json:"expected"`
-	ExpectedStatus     int                `gorm:"default:200;column:expected_status" json:"expected_status"`
-	Interval           int                `gorm:"default:30;column:check_interval" json:"check_interval"`
-	Type               string             `gorm:"column:check_type" json:"type"`
-	Method             string             `gorm:"column:method" json:"method"`
-	PostData           NullString         `gorm:"column:post_data" json:"post_data"`
-	Port               int                `gorm:"not null;column:port" json:"port"`
-	Timeout            int                `gorm:"default:30;column:timeout" json:"timeout"`
-	Order              int                `gorm:"default:0;column:order_id" json:"order_id"`
-	AllowNotifications NullBool           `gorm:"default:true;column:allow_notifications" json:"allow_notifications"`
-	VerifySSL          NullBool           `gorm:"default:false;column:verify_ssl" json:"verify_ssl"`
-	Public             NullBool           `gorm:"default:false;column:public" json:"public"`
-	GroupId            int                `gorm:"default:0;column:group_id" json:"group_id"`
-	Headers            NullString         `gorm:"column:headers" json:"headers"`
-	MicroScript        NullString         `gorm:"column:micro_script" json:"micro_script"`
-	Permalink          NullString         `gorm:"column:permalink" json:"permalink"`
-	CreatedAt          time.Time          `gorm:"column:created_at" json:"created_at"`
-	UpdatedAt          time.Time          `gorm:"column:updated_at" json:"updated_at"`
-	Online             bool               `gorm:"-" json:"online"`
-	Latency            float64            `gorm:"-" json:"latency"`
-	PingTime           float64            `gorm:"-" json:"ping_time"`
-	Online24Hours      float32            `gorm:"-" json:"online_24_hours"`
-	AvgResponse        string             `gorm:"-" json:"avg_response"`
-	NotificationCircle int                `gorm:"default:5;column:notification_circle" json:"notification_circle"`
-	Running            chan bool          `gorm:"-" json:"-"`
-	Checkpoint         time.Time          `gorm:"-" json:"-"`
-	SleepDuration      time.Duration      `gorm:"-" json:"-"`
-	LastResponse       string             `gorm:"-" json:"-"`
-	FailCount          int                `gorm:"-" json:"-"`
-	AlertCount         int                `gorm:"-" json:"-"`
-	LastStatusCode     int                `gorm:"-" json:"status_code"`
-	LastOnline         time.Time          `gorm:"-" json:"last_success"`
-	Failures           []FailureInterface `gorm:"-" json:"failures,omitempty"`
-	Checkins           []CheckinInterface `gorm:"-" json:"checkins,omitempty"`
+	Id                       int64              `gorm:"primary_key;column:id" json:"id"`
+	Name                     string             `gorm:"column:name" json:"name"`
+	Domain                   string             `gorm:"column:domain" json:"domain"`
+	Expected                 NullString         `gorm:"column:expected" json:"expected"`
+	ExpectedStatus           int                `gorm:"default:200;column:expected_status" json:"expected_status"`
+	Interval                 int                `gorm:"default:30;column:check_interval" json:"check_interval"`
+	Type                     string             `gorm:"column:check_type" json:"type"`
+	Method                   string             `gorm:"column:method" json:"method"`
+	PostData                 NullString         `gorm:"column:post_data" json:"post_data"`
+	Port                     int                `gorm:"not null;column:port" json:"port"`
+	Timeout                  int                `gorm:"default:30;column:timeout" json:"timeout"`
+	Order                    int                `gorm:"default:0;column:order_id" json:"order_id"`
+	AllowNotifications       NullBool           `gorm:"default:true;column:allow_notifications" json:"allow_notifications"`
+	VerifySSL                NullBool           `gorm:"default:false;column:verify_ssl" json:"verify_ssl"`
+	Public                   NullBool           `gorm:"default:false;column:public" json:"public"`
+	GroupId                  int                `gorm:"default:0;column:group_id" json:"group_id"`
+	Headers                  NullString         `gorm:"column:headers" json:"headers"`
+	MicroScript              NullString         `gorm:"column:micro_script" json:"micro_script"`
+	Permalink                NullString         `gorm:"column:permalink" json:"permalink"`
+	CreatedAt                time.Time          `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt                time.Time          `gorm:"column:updated_at" json:"updated_at"`
+	Online                   bool               `gorm:"-" json:"online"`
+	Latency                  float64            `gorm:"-" json:"latency"`
+	PingTime                 float64            `gorm:"-" json:"ping_time"`
+	Online24Hours            float32            `gorm:"-" json:"online_24_hours"`
+	AvgResponse              string             `gorm:"-" json:"avg_response"`
+	NotificationCircle       int                `gorm:"default:5;column:notification_circle" json:"notification_circle"`
+	NotificationCirclePeriod int                `gorm:"-" json:"-"`
+	Running                  chan bool          `gorm:"-" json:"-"`
+	Checkpoint               time.Time          `gorm:"-" json:"-"`
+	SleepDuration            time.Duration      `gorm:"-" json:"-"`
+	LastResponse             string             `gorm:"-" json:"-"`
+	FailCount                int                `gorm:"-" json:"-"`
+	AlertCount               int                `gorm:"-" json:"-"`
+	LastStatusCode           int                `gorm:"-" json:"status_code"`
+	LastOnline               time.Time          `gorm:"-" json:"last_success"`
+	Failures                 []FailureInterface `gorm:"-" json:"failures,omitempty"`
+	Checkins                 []CheckinInterface `gorm:"-" json:"checkins,omitempty"`
 }
 
 // BeforeCreate for Service will set CreatedAt to UTC

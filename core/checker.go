@@ -44,6 +44,11 @@ func checkServices() {
 // Check will run checkHttp for HTTP services and checkTcp for TCP services
 // if record param is set to true, it will add a record into the database.
 func (s *Service) Check(record bool) {
+
+	if s.NotificationCirclePeriod == 0 && s.NotificationCircle != 0 {
+		s.NotificationCirclePeriod = s.NotificationCircle
+	}
+
 	switch s.Type {
 	case "http":
 		s.checkHttp(record)
