@@ -276,7 +276,7 @@ func SaveFile(filename string, data []byte) error {
 // // body - The body or form data to send with HTTP request
 // // timeout - Specific duration to timeout on. time.Duration(30 * time.Seconds)
 // // You can use a HTTP Proxy if you HTTP_PROXY environment variable
-func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool) ([]byte, *http.Response, error) {
+func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool, followRedirects bool) ([]byte, *http.Response, error) {
 	var err error
 	var req *http.Request
 	if req, err = http.NewRequest(method, url, body); err != nil {
@@ -332,7 +332,9 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 		Transport: transport,
 		Timeout:   timeout,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			fmt.Println("Checking Redirect Policy")
+			if !followRedirects {
+				return http.ErrUseLastResponse
+			}
 			return nil
 			//return http.ErrUseLastResponse
 		},

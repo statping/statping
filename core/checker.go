@@ -218,9 +218,9 @@ func (s *Service) checkHttp(record bool) *Service {
 	}
 
 	if s.Method == "POST" {
-		content, res, err = utils.HttpRequest(s.Domain, s.Method, "application/json", headers, bytes.NewBuffer([]byte(s.PostData.String)), timeout, s.VerifySSL.Bool)
+		content, res, err = utils.HttpRequest(s.Domain, s.Method, "application/json", headers, bytes.NewBuffer([]byte(s.PostData.String)), timeout, s.VerifySSL.Bool,s.FollowRedirects.Bool)
 	} else {
-		content, res, err = utils.HttpRequest(s.Domain, s.Method, nil, headers, nil, timeout, s.VerifySSL.Bool)
+		content, res, err = utils.HttpRequest(s.Domain, s.Method, nil, headers, nil, timeout, s.VerifySSL.Bool,s.FollowRedirects.Bool)
 	}
 	if err != nil {
 		if record {
