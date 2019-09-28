@@ -218,9 +218,9 @@ func (s *Service) checkHttp(record bool) *Service {
 	}
 
 	if s.Method == "POST" {
-		content, res, err = utils.HttpRequest(s.Domain, s.Method, "application/json", headers, bytes.NewBuffer([]byte(s.PostData.String)), timeout, s.VerifySSL.Bool,s.FollowRedirects.Bool)
+		content, res, err = utils.HttpRequest(s.Domain, s.Method, "application/json", headers, bytes.NewBuffer([]byte(s.PostData.String)), timeout, s.VerifySSL.Bool, s.FollowRedirects.Bool)
 	} else {
-		content, res, err = utils.HttpRequest(s.Domain, s.Method, nil, headers, nil, timeout, s.VerifySSL.Bool,s.FollowRedirects.Bool)
+		content, res, err = utils.HttpRequest(s.Domain, s.Method, nil, headers, nil, timeout, s.VerifySSL.Bool, s.FollowRedirects.Bool)
 	}
 	if err != nil {
 		if record {
@@ -314,6 +314,12 @@ func recordFailure(s *Service, issue string) {
 		CreatedAt: time.Now(),
 		ErrorCode: s.LastStatusCode,
 	}}
+	if s.DependsOn != 0 {
+		sd := SelectService(s.DependsOn)
+		if sd != nil && sd.Service != nil {
+			s.DependsOnService = sd.Service
+		}
+	}
 	utils.Log(2, fmt.Sprintf("Service %v Failing: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
 	s.CreateFailure(fail)
 	notifier.OnFailure(s.Service, fail.Failure)

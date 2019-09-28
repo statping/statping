@@ -37,11 +37,11 @@ func OnSave(method string) {
 // OnFailure will be triggered when a service is failing - BasicEvents interface
 func OnFailure(s *types.Service, f *types.Failure) {
 	s.FailCount++
-	if !s.AllowNotifications.Bool || (s.FailCount%s.NotificationCirclePeriod) != 1 {
+	if !s.AllowNotifications.Bool || ((s.FailCount-1)%s.NotificationCirclePeriod) != 0 {
 		return
 	}
 	for _, comm := range AllCommunications {
-		if isType(comm, new(BasicEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) {
+		if isType(comm, new(BasicEvents)) && isEnabled(comm) && (s.Online || inLimits(comm) && (s.DependsOn == 0 || s.DependsOnService.Online)) {
 			s.NotificationCirclePeriod = int(math.Max(math.Round(float64(s.NotificationCirclePeriod)*1.25), float64(s.NotificationCirclePeriod+1)))
 			notifier := comm.(Notifier).Select()
 			utils.Log(1, fmt.Sprintf("Sending failure %v notification for service %v", notifier.Method, s.Name))
@@ -53,7 +53,7 @@ func OnFailure(s *types.Service, f *types.Failure) {
 // OnAlert will be triggered when a service is semi-failing - ExtendedEvents interface
 func OnAlert(s *types.Service, f *types.Failure) {
 	s.AlertCount++
-	if !s.AllowNotifications.Bool || (s.AlertCount%s.NotificationCirclePeriod) != 1 {
+	if !s.AllowNotifications.Bool || ((s.AlertCount-1)%s.NotificationCirclePeriod) != 1 {
 		return
 	}
 	for _, comm := range AllCommunications {

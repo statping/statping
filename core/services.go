@@ -96,6 +96,7 @@ func (s *Service) AllCheckins() []*Checkin {
 	return checkin
 }
 
+
 // SelectAllServices returns a slice of *core.Service to be store on []*core.Services, should only be called once on startup.
 func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 	var services []*Service
@@ -106,6 +107,21 @@ func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 	}
 	CoreApp.Services = nil
 	for _, service := range services {
+
+		if service.DependsOn != 0 {
+		findDependency:
+			for _, dependency := range services {
+				if dependency.Id == service.DependsOn {
+					service.DependsOnService = service.Service
+					break findDependency
+				}
+			}
+			if service.DependsOnService == nil || service.DependsOn == service.Id {
+				service.DependsOn = 0 //we could not find the dependency, maybe we deleted it? so, just ignore and act like independ service
+				//TODO: log this as a warning???
+			}
+		}
+
 		if start {
 			service.Start()
 			service.CheckinProcess()
@@ -114,7 +130,7 @@ func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 		for _, f := range fails {
 			service.Failures = append(service.Failures, f)
 		}
-		checkins := service.AllCheckins()
+		checkins := service.AllCheckins() // whaaaatttt?
 		for _, c := range checkins {
 			c.Failures = c.LimitedFailures(limitedFailures)
 			c.Hits = c.LimitedHits(limitedHits)
@@ -122,6 +138,7 @@ func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 		}
 		CoreApp.Services = append(CoreApp.Services, service)
 	}
+
 	reorderServices()
 	return services, db.Error
 }

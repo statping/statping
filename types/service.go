@@ -49,6 +49,8 @@ type Service struct {
 	Online24Hours            float32            `gorm:"-" json:"online_24_hours"`
 	AvgResponse              string             `gorm:"-" json:"avg_response"`
 	NotificationCircle       int                `gorm:"default:5;column:notification_circle" json:"notification_circle"`
+	DependsOn                int64              `gorm:"default:0;column:depends_on" json:"depends_on"`
+	DependsOnService         *Service           `gorm:"-" json:"-"`
 	NotificationCirclePeriod int                `gorm:"-" json:"-"`
 	Running                  chan bool          `gorm:"-" json:"-"`
 	Checkpoint               time.Time          `gorm:"-" json:"-"`
