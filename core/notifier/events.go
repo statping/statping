@@ -41,7 +41,7 @@ func OnFailure(s *types.Service, f *types.Failure) {
 		return
 	}
 	for _, comm := range AllCommunications {
-		if isType(comm, new(BasicEvents)) && isEnabled(comm) && (s.Online || inLimits(comm) && (s.DependsOn == 0 || s.DependsOnService.Online)) {
+		if isType(comm, new(BasicEvents)) && isEnabled(comm) && (s.Online || inLimits(comm) && (s.DependsOn == 0 || s.DependsOnService.Online || !s.DependsOnService.AllowNotifications.Bool)) {
 			s.NotificationCirclePeriod = int(math.Max(math.Round(float64(s.NotificationCirclePeriod)*1.25), float64(s.NotificationCirclePeriod+1)))
 			notifier := comm.(Notifier).Select()
 			utils.Log(1, fmt.Sprintf("Sending failure %v notification for service %v", notifier.Method, s.Name))
