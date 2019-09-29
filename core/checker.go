@@ -24,6 +24,7 @@ import (
 	"github.com/hunterlong/statping/utils"
 	"github.com/microspector/microspector/pkg/parser"
 	"github.com/tatsushid/go-fastping"
+	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
@@ -38,6 +39,7 @@ func checkServices() {
 	for _, ser := range CoreApp.Services {
 		//go obj.StartCheckins()
 		go ser.CheckQueue(true)
+		time.Sleep(time.Duration(400+rand.Intn(100)) * time.Millisecond) // wait .5 seconds between checkers
 	}
 }
 
