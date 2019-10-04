@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
-	"github.com/hunterlong/statping/core"
 )
 
 // OnSave will trigger a notifier when it has been saved - Notifier interface
@@ -41,7 +40,7 @@ func OnFailure(s *types.Service, f *types.Failure) {
 	}
 
 	// check if User wants to receive every Status Change
-	if core.CoreApp.UpdateNotify.Bool {
+	if s.UpdateNotify {
 		// send only if User hasn't been already notified about the Downtime
 		if !s.UserNotified {
 			s.UserNotified = true
@@ -68,7 +67,7 @@ func OnSuccess(s *types.Service) {
 	}
 
 	// check if User wants to receive every Status Change
-	if core.CoreApp.UpdateNotify.Bool && s.UserNotified {
+	if s.UpdateNotify && s.UserNotified {
 		s.UserNotified = false
 	}
 
