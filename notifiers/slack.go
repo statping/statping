@@ -29,7 +29,7 @@ import (
 
 const (
 	slackMethod     = "slack"
-	failingTemplate = `{ "attachments": [ { "fallback": "Service {{.Service.Name}} - is currently failing", "text": "Your Statping service <{{.Service.Domain}}|{{.Service.Name}}> has just received a Failure notification based on your expected results. {{.Service.Name}} responded with a HTTP Status code of {{.Service.LastStatusCode}}.", "fields": [ { "title": "Expected Status Code", "value": "{{.Service.ExpectedStatus}}", "short": true }, { "title": "Received Status Code", "value": "{{.Service.LastStatusCode}}", "short": true } ], "color": "#FF0000", "thumb_url": "https://statping.com", "footer": "Statping", "footer_icon": "https://img.cjx.io/statuplogo32.png" } ] }`
+	failingTemplate = `{ "attachments": [ { "fallback": "Service {{.Service.Name}} - is currently failing", "text": "Your Statping service <{{.Service.Domain}}|{{.Service.Name}}> has just received a Failure notification based on your expected results. {{.Service.Name}} responded with a HTTP Status code of {{.Service.LastStatusCode}}.", "fields": [ { "title": "Expected Status Code", "value": "{{.Service.ExpectedStatus}}", "short": true }, { "title": "Received Status Code", "value": "{{.Service.LastStatusCode}}", "short": true } ,{ "title": "Error Message", "value": "{{.Issue}}", "short": false } ], "color": "#FF0000", "thumb_url": "https://statping.com", "footer": "Statping", "footer_icon": "https://img.cjx.io/statuplogo32.png" } ] }`
 	successTemplate = `{ "attachments": [ { "fallback": "Service {{.Service.Name}} - is now back online", "text": "Your Statping service <{{.Service.Domain}}|{{.Service.Name}}> is now back online and meets your expected responses.", "color": "#00FF00", "thumb_url": "https://statping.com", "footer": "Statping", "footer_icon": "https://img.cjx.io/statuplogo32.png" } ] }`
 	slackText       = `{"text":"{{.}}"}`
 )
@@ -79,12 +79,13 @@ type slackMessage struct {
 	Service  *types.Service
 	Template string
 	Time     int64
+	Issue    string
 }
 
 // Send will send a HTTP Post to the slack webhooker API. It accepts type: string
 func (u *slack) Send(msg interface{}) error {
 	message := msg.(string)
-	_, _, err := utils.HttpRequest(u.Host, "POST", "application/json", nil, strings.NewReader(message), time.Duration(10*time.Second))
+	_, _, err := utils.HttpRequest(u.Host, "POST", "application/json", nil, strings.NewReader(message), time.Duration(10*time.Second), true)
 	return err
 }
 
@@ -93,7 +94,7 @@ func (u *slack) Select() *notifier.Notification {
 }
 
 func (u *slack) OnTest() error {
-	contents, _, err := utils.HttpRequest(u.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(`{"text":"testing message"}`)), time.Duration(10*time.Second))
+	contents, _, err := utils.HttpRequest(u.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(`{"text":"testing message"}`)), time.Duration(10*time.Second), true)
 	if string(contents) != "ok" {
 		return errors.New("The slack response was incorrect, check the URL")
 	}
@@ -106,6 +107,7 @@ func (u *slack) OnFailure(s *types.Service, f *types.Failure) {
 		Service:  s,
 		Template: failingTemplate,
 		Time:     time.Now().Unix(),
+		Issue:    f.Issue,
 	}
 	parseSlackMessage(s.Id, failingTemplate, message)
 }

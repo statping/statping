@@ -241,7 +241,7 @@ func HelpEcho() {
 func checkGithubUpdates() (githubResponse, error) {
 	var gitResp githubResponse
 	url := "https://api.github.com/repos/hunterlong/statping/releases/latest"
-	contents, _, err := utils.HttpRequest(url, "GET", nil, nil, nil, time.Duration(10*time.Second))
+	contents, _, err := utils.HttpRequest(url, "GET", nil, nil, nil, time.Duration(10*time.Second), true)
 	if err != nil {
 		return githubResponse{}, err
 	}

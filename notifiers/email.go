@@ -24,7 +24,6 @@ import (
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"html/template"
-	"net/smtp"
 	"time"
 )
 
@@ -225,24 +224,6 @@ func (u *email) OnSave() error {
 
 // OnTest triggers when this notifier has been saved
 func (u *email) OnTest() error {
-	host := fmt.Sprintf("%v:%v", u.Host, u.Port)
-	dial, err := smtp.Dial(host)
-	if err != nil {
-		return err
-	}
-	if u.ApiKey != "true" {
-		err = dial.StartTLS(&tls.Config{InsecureSkipVerify: true})
-		if err != nil {
-			return err
-		}
-	}
-	if u.Username != "" || u.Password != "" {
-		auth := smtp.PlainAuth("", u.Username, u.Password, host)
-		err = dial.Auth(auth)
-		if err != nil {
-			return err
-		}
-	}
 	testService := &types.Service{
 		Id:             1,
 		Name:           "Example Service",
@@ -261,11 +242,10 @@ func (u *email) OnTest() error {
 		To:       u.Var2,
 		Subject:  fmt.Sprintf("Service %v is Back Online", testService.Name),
 		Template: mainEmailTemplate,
-		Data:     interface{}(testService),
+		Data:     testService,
 		From:     u.Var1,
 	}
-	err = u.Send(email)
-	return err
+	return u.dialSend(email)
 }
 
 func (u *email) dialSend(email *emailOutgoing) error {
