@@ -50,6 +50,7 @@ type Service struct {
 	Checkpoint         time.Time          `gorm:"-" json:"-"`
 	SleepDuration      time.Duration      `gorm:"-" json:"-"`
 	LastResponse       string             `gorm:"-" json:"-"`
+	UserNotified       bool               `gorm:"-" json:"-"` /// True if the User was already notified about a Downtime
 	LastStatusCode     int                `gorm:"-" json:"status_code"`
 	LastOnline         time.Time          `gorm:"-" json:"last_success"`
 	Failures           []FailureInterface `gorm:"-" json:"failures,omitempty"`
