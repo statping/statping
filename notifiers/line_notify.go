@@ -78,13 +78,12 @@ func (u *lineNotifier) OnFailure(s *types.Service, f *types.Failure) {
 
 // OnSuccess will trigger successful service
 func (u *lineNotifier) OnSuccess(s *types.Service) {
-	if !s.Online {
+	if !s.Online || !s.SuccessNotified {
 		var msg string
-		if core.CoreApp.UpdateNotify.Bool {
-			msg = core.ReturnService(s).SmallText()
-		} else {
-			msg = fmt.Sprintf("Your Service %v is Back Online", s.Name)
+		if s.UpdateNotify {
+			s.UpdateNotify = false
 		}
+		msg = s.DownText
 
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)

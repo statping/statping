@@ -75,14 +75,13 @@ func (u *discord) OnFailure(s *types.Service, f *types.Failure) {
 
 // OnSuccess will trigger successful service
 func (u *discord) OnSuccess(s *types.Service) {
-	if !s.Online {
+	if !s.Online || !s.SuccessNotified {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		var msg interface{}
-		if core.CoreApp.UpdateNotify.Bool {
-			msg = fmt.Sprintf(`{"content": "%s"}`, core.ReturnService(s).SmallText())
-		} else {
-			msg = fmt.Sprintf(`{"content": "Your service '%v' is back online!"}`, s.Name)
+		if s.UpdateNotify {
+			s.UpdateNotify = false
 		}
+		msg = s.DownText
 
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}

@@ -105,13 +105,12 @@ func (u *mobilePush) OnFailure(s *types.Service, f *types.Failure) {
 // OnSuccess will trigger successful service
 func (u *mobilePush) OnSuccess(s *types.Service) {
 	data := dataJson(s, nil)
-	if !s.Online {
+	if !s.Online || !s.SuccessNotified {
 		var msgStr string
-		if core.CoreApp.UpdateNotify.Bool {
-			msgStr = core.ReturnService(s).SmallText()
-		} else {
-			msgStr = fmt.Sprintf("Your Service %v is Back Online", s.Name)
+		if s.UpdateNotify {
+			s.UpdateNotify = false
 		}
+		msgStr = s.DownText
 
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		msg := &pushArray{

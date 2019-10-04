@@ -97,14 +97,14 @@ func (u *telegram) OnFailure(s *types.Service, f *types.Failure) {
 
 // OnSuccess will trigger successful service
 func (u *telegram) OnSuccess(s *types.Service) {
-	if !s.Online {
+	if !s.Online || !s.SuccessNotified {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		var msg interface{}
-		if core.CoreApp.UpdateNotify.Bool {
-			msg = core.ReturnService(s).SmallText()
-		} else {
-			msg = fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
+		if s.UpdateNotify {
+			s.UpdateNotify = false
 		}
+		msg = s.DownText
+
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}
 }
