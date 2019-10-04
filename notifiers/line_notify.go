@@ -18,6 +18,7 @@ package notifiers
 import (
 	"fmt"
 	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/url"
@@ -79,8 +80,14 @@ func (u *lineNotifier) OnFailure(s *types.Service, f *types.Failure) {
 // OnSuccess will trigger successful service
 func (u *lineNotifier) OnSuccess(s *types.Service) {
 	if !s.Online {
+		var msg string
+		if core.CoreApp.UpdateNotify.Bool {
+			msg = core.ReturnService(s).SmallText()
+		} else {
+			msg = fmt.Sprintf("Your Service %v is Back Online", s.Name)
+		}
+
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
-		msg := fmt.Sprintf("Your service '%v' is back online!", s.Name)
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}
 }
