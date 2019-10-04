@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
@@ -106,9 +107,16 @@ func (u *mobilePush) OnFailure(s *types.Service, f *types.Failure) {
 func (u *mobilePush) OnSuccess(s *types.Service) {
 	data := dataJson(s, nil)
 	if !s.Online {
+		var msgStr string
+		if core.CoreApp.UpdateNotify.Bool {
+			msgStr = core.ReturnService(s).SmallText()
+		} else {
+			msgStr = fmt.Sprintf("Your Service %v is Back Online", s.Name)
+		}
+
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		msg := &pushArray{
-			Message: fmt.Sprintf("Your service '%v' is back online!", s.Name),
+			Message: msgStr,
 			Title:   "Service Online",
 			Topic:   mobileIdentifier,
 			Data:    data,

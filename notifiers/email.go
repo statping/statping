@@ -20,6 +20,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/go-mail/mail"
+	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
@@ -199,10 +200,17 @@ func (u *email) OnFailure(s *types.Service, f *types.Failure) {
 // OnSuccess will trigger successful service
 func (u *email) OnSuccess(s *types.Service) {
 	if !s.Online {
+		var msg string
+		if core.CoreApp.UpdateNotify.Bool {
+			msg = core.ReturnService(s).SmallText()
+		} else {
+			msg = fmt.Sprintf("Service %v is Back Online", s.Name)
+		}
+
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		email := &emailOutgoing{
 			To:       u.Var2,
-			Subject:  fmt.Sprintf("Service %v is Back Online", s.Name),
+			Subject:  msg,
 			Template: mainEmailTemplate,
 			Data:     interface{}(s),
 			From:     u.Var1,

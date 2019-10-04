@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"strings"
@@ -77,7 +78,13 @@ func (u *discord) OnFailure(s *types.Service, f *types.Failure) {
 func (u *discord) OnSuccess(s *types.Service) {
 	if !s.Online {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
-		msg := fmt.Sprintf(`{"content": "Your service '%v' is back online!"}`, s.Name)
+		var msg interface{}
+		if core.CoreApp.UpdateNotify.Bool {
+			msg = fmt.Sprintf(`{"content": "%s"}`, core.ReturnService(s).SmallText())
+		} else {
+			msg = fmt.Sprintf(`{"content": "Your service '%v' is back online!"}`, s.Name)
+		}
+
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}
 }
