@@ -18,7 +18,6 @@ package notifiers
 import (
 	"fmt"
 	"github.com/hunterlong/statping/core/notifier"
-	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/url"

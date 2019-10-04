@@ -20,7 +20,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/go-mail/mail"
-	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
