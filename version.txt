@@ -1,1 +1,1 @@
-0.80.64-microspector-1.0.6
+0.80.64-microspector-1.0.7
