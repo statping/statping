@@ -65,7 +65,10 @@ func main() {
 	parseFlags()
 	loadDotEnvs()
 	source.Assets()
-	utils.InitLogs()
+	if err := utils.InitLogs(); err != nil {
+		fmt.Printf("Statping Log Error: \n %v\n", err)
+		os.Exit(2)
+	}
 	args := flag.Args()
 
 	if len(args) >= 1 {

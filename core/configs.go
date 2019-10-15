@@ -80,9 +80,18 @@ func LoadUsingEnv() (*DbConfig, error) {
 			utils.Log(3, err)
 		}
 
+		username := os.Getenv("ADMIN_USER")
+		if username == "" {
+			username = "admin"
+		}
+		password := os.Getenv("ADMIN_PASSWORD")
+		if password == "" {
+			password = "admin"
+		}
+
 		admin := ReturnUser(&types.User{
-			Username: "admin",
-			Password: "admin",
+			Username: username,
+			Password: password,
 			Email:    "info@admin.com",
 			Admin:    types.NewNullBool(true),
 		})

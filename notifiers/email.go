@@ -24,7 +24,6 @@ import (
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"html/template"
-	"net/smtp"
 	"time"
 )
 
@@ -149,6 +148,12 @@ var emailer = &email{&notifier.Notification{
 		Title:       "Send Alerts To",
 		Placeholder: "sendto@email.com",
 		DbField:     "Var2",
+	}, {
+		Type:        "text",
+		Title:       "Disable TLS/SSL",
+		Placeholder: "",
+		SmallText:   "To Disable TLS/SSL insert 'true'",
+		DbField:     "api_key",
 	}},
 }}
 
@@ -188,24 +193,28 @@ func (u *email) OnFailure(s *types.Service, f *types.Failure) {
 		Data:     interface{}(s),
 		From:     u.Var1,
 	}
-	u.AddQueue(s.Id, email)
-	u.Online = false
+	u.AddQueue(fmt.Sprintf("service_%v", s.Id), email)
 }
 
 // OnSuccess will trigger successful service
 func (u *email) OnSuccess(s *types.Service) {
-	if !u.Online {
-		u.ResetUniqueQueue(s.Id)
+	if !s.Online || !s.SuccessNotified {
+		var msg string
+		if s.UpdateNotify {
+			s.UpdateNotify = false
+		}
+		msg = s.DownText
+
+		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		email := &emailOutgoing{
 			To:       u.Var2,
-			Subject:  fmt.Sprintf("Service %v is Back Online", s.Name),
+			Subject:  msg,
 			Template: mainEmailTemplate,
 			Data:     interface{}(s),
 			From:     u.Var1,
 		}
-		u.AddQueue(s.Id, email)
+		u.AddQueue(fmt.Sprintf("service_%v", s.Id), email)
 	}
-	u.Online = true
 }
 
 func (u *email) Select() *notifier.Notification {
@@ -221,20 +230,6 @@ func (u *email) OnSave() error {
 
 // OnTest triggers when this notifier has been saved
 func (u *email) OnTest() error {
-	host := fmt.Sprintf("%v:%v", u.Host, u.Port)
-	dial, err := smtp.Dial(host)
-	if err != nil {
-		return err
-	}
-	err = dial.StartTLS(&tls.Config{InsecureSkipVerify: true})
-	if err != nil {
-		return err
-	}
-	auth := smtp.PlainAuth("", u.Username, u.Password, host)
-	err = dial.Auth(auth)
-	if err != nil {
-		return err
-	}
 	testService := &types.Service{
 		Id:             1,
 		Name:           "Example Service",
@@ -253,18 +248,22 @@ func (u *email) OnTest() error {
 		To:       u.Var2,
 		Subject:  fmt.Sprintf("Service %v is Back Online", testService.Name),
 		Template: mainEmailTemplate,
-		Data:     interface{}(testService),
+		Data:     testService,
 		From:     u.Var1,
 	}
-	err = u.Send(email)
-	return err
+	return u.dialSend(email)
 }
 
 func (u *email) dialSend(email *emailOutgoing) error {
 	mailer = mail.NewDialer(emailer.Host, emailer.Port, emailer.Username, emailer.Password)
-	mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	emailSource(email)
 	m := mail.NewMessage()
+	// if email setting TLS is Disabled
+	if u.ApiKey == "true" {
+		mailer.SSL = false
+	} else {
+		mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+	}
 	m.SetHeader("From", email.From)
 	m.SetHeader("To", email.To)
 	m.SetHeader("Subject", email.Subject)

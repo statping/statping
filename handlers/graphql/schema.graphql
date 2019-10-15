@@ -1,0 +1,127 @@
+schema {
+  query: Query
+}
+
+type Query {
+  core: Core
+  service(id: ID!): Service
+  services: [Service]!
+  group(id: ID!): Group
+  groups: [Group]!
+  user(id: ID!): User
+  users: [User]!
+  checkin(id: ID!): Checkin
+  checkins: [Checkin]!
+  message(id: ID!): Message
+  messages: [Message]!
+}
+
+type Core {
+  name: String!
+  description: String!
+  footer: String!
+  domain: String!
+  version: String!
+  timezone: String!
+  using_cdn: Boolean!
+  started_on: Time!
+  created_at: Time!
+  updated_at: Time!
+}
+
+type Service {
+  id: ID!
+  name: String!
+  domain: String!
+  expected: String!
+  expected_status: Int!
+  interval: Int!
+  type: String!
+  method: String!
+  post_data: String!
+  port: Int!
+  timeout: Int!
+  order_id: Int!
+  allow_notifications: Boolean!
+  public: Boolean!
+  group: Group!
+  headers: String!
+  permalink: String!
+  online: Boolean!
+  latency: Float!
+  ping_time: Float!
+  online_24_hours: Float!
+  avg_response: String!
+  status_code: Int!
+  last_success: Time!
+  failures: [Failure]
+  created_at: Time!
+  updated_at: Time!
+}
+
+type Checkin {
+  id: ID!
+  service: Service!
+  name: String!
+  interval: Int!
+  grace: Int!
+  api_key: String!
+  failing: Boolean!
+  last_hit: Time!
+  failures: [Failure]
+  hits: [CheckinHit]
+  created_at: Time!
+  updated_at: Time!
+}
+
+type CheckinHit {
+  id: ID!
+  from: String!
+  created_at: Time!
+}
+
+type Group {
+  id: ID!
+  name: String!
+  public: Boolean!
+  order_id: Int!
+  created_at: Time!
+  updated_at: Time!
+}
+
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  api_key: String!
+  api_secret: String!
+  admin: Boolean!
+  created_at: Time!
+  updated_at: Time!
+}
+
+type Failure {
+  id: ID!
+  issue: String!
+  method: String!
+  method_id: Int!
+  error_code: Int!
+  ping: Float!
+  created_at: Time!
+}
+
+type Message {
+  id: ID!
+  title: String!
+  description: String!
+  start_on: Time!
+  end_on: Time!
+  notify_users: Boolean!
+  notify_method: Boolean!
+  notify_before: Int!
+  notify_before_scale: String!
+  created_at: Time!
+  updated_at: Time!
+}
+
+scalar Time

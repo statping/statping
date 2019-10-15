@@ -78,33 +78,17 @@ func TestSlackNotifier(t *testing.T) {
 		assert.Equal(t, 1, len(slacker.Queue))
 	})
 
-	t.Run("slack OnFailure multiple times", func(t *testing.T) {
-		for i := 0; i <= 50; i++ {
-			slacker.OnFailure(TestService, TestFailure)
-		}
-		assert.Equal(t, 52, len(slacker.Queue))
-	})
-
-	t.Run("slack Check Offline", func(t *testing.T) {
-		assert.False(t, slacker.Online)
-	})
-
 	t.Run("slack OnSuccess", func(t *testing.T) {
 		slacker.OnSuccess(TestService)
 		assert.Equal(t, 1, len(slacker.Queue))
 	})
 
-	t.Run("slack Queue after being online", func(t *testing.T) {
-		assert.True(t, slacker.Online)
-		assert.Equal(t, 1, len(slacker.Queue))
-	})
-
 	t.Run("slack OnSuccess Again", func(t *testing.T) {
-		assert.True(t, slacker.Online)
+		assert.True(t, TestService.Online)
 		slacker.OnSuccess(TestService)
 		assert.Equal(t, 1, len(slacker.Queue))
 		go notifier.Queue(slacker)
-		time.Sleep(6 * time.Second)
+		time.Sleep(15 * time.Second)
 		assert.Equal(t, 0, len(slacker.Queue))
 	})
 
@@ -127,7 +111,7 @@ func TestSlackNotifier(t *testing.T) {
 
 	t.Run("slack Queue", func(t *testing.T) {
 		go notifier.Queue(slacker)
-		time.Sleep(5 * time.Second)
+		time.Sleep(10 * time.Second)
 		assert.Equal(t, SLACK_URL, slacker.Host)
 		assert.Equal(t, 0, len(slacker.Queue))
 	})

@@ -36,7 +36,7 @@ var (
 )
 
 func init() {
-	DbModels = []interface{}{&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Message{}, &types.Group{}, &types.Checkin{}, &types.CheckinHit{}, &notifier.Notification{}}
+	DbModels = []interface{}{&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Message{}, &types.Group{}, &types.Checkin{}, &types.CheckinHit{}, &notifier.Notification{}, &types.Incident{}, &types.IncidentUpdate{}}
 }
 
 // DbConfig stores the config.yml file for the statup configuration
@@ -87,12 +87,21 @@ func groupsDb() *gorm.DB {
 	return DbSession.Model(&types.Group{})
 }
 
+// incidentsDB returns the 'incidents' database column
+func incidentsDB() *gorm.DB {
+	return DbSession.Model(&types.Incident{})
+}
+
+// incidentsUpdatesDB returns the 'incidents updates' database column
+func incidentsUpdatesDB() *gorm.DB {
+	return DbSession.Model(&types.IncidentUpdate{})
+}
+
 // HitsBetween returns the gorm database query for a collection of service hits between a time range
 func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) *gorm.DB {
 	selector := Dbtimestamp(group, column)
 	if CoreApp.DbConnection == "postgres" {
-		timeQuery := fmt.Sprintf("service = %v AND created_at BETWEEN '%v.000000' AND '%v.000000'", s.Id, t1.UTC().Format(types.POSTGRES_TIME), t2.UTC().Format(types.POSTGRES_TIME))
-		return hitsDB().Select(selector).Where(timeQuery)
+		return hitsDB().Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME), t2.UTC().Format(types.TIME))
 	} else {
 		return hitsDB().Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME_DAY), t2.UTC().Format(types.TIME_DAY))
 	}
@@ -194,7 +203,7 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 		dbType = "sqlite3"
 	case "mysql":
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
-		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
+		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC&time_zone=%%27UTC%%27", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
 	case "postgres":
 		sslMode := "disable"
 		if postgresSSL != "" {
@@ -208,16 +217,19 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 	dbSession, err := gorm.Open(dbType, conn)
 	if err != nil {
 		if retry {
-			utils.Log(1, fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", conn))
+			utils.Log(1, fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", Configs.DbHost))
 			return db.waitForDb()
 		} else {
 			return err
 		}
 	}
+	if dbType == "sqlite3" {
+		dbSession.DB().SetMaxOpenConns(1)
+	}
 	err = dbSession.DB().Ping()
 	if err == nil {
 		DbSession = dbSession
-		utils.Log(1, fmt.Sprintf("Database %v connection '%v@%v:%v' at %v was successful.", dbType, Configs.DbUser, Configs.DbHost, Configs.DbPort, Configs.DbData))
+		utils.Log(1, fmt.Sprintf("Database %v connection was successful.", dbType))
 	}
 	return err
 }
@@ -320,6 +332,8 @@ func (db *DbConfig) DropDatabase() error {
 	err = DbSession.DropTableIfExists("services")
 	err = DbSession.DropTableIfExists("users")
 	err = DbSession.DropTableIfExists("messages")
+	err = DbSession.DropTableIfExists("incidents")
+	err = DbSession.DropTableIfExists("incident_updates")
 	return err.Error
 }
 

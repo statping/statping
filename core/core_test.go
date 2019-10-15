@@ -33,6 +33,7 @@ func init() {
 	utils.InitLogs()
 	source.Assets()
 	skipNewDb = false
+	SampleHits = 480
 }
 
 func TestNewCore(t *testing.T) {

@@ -16,7 +16,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"github.com/hunterlong/statping/core"
 	"net/http"
 )
@@ -30,10 +29,10 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	health := map[string]interface{}{
 		"services": len(core.Services()),
-		"online":   core.Configs != nil,
+		"online":   true,
+		"setup":    core.Configs != nil,
 	}
-	json.NewEncoder(w).Encode(health)
+	returnJson(health, w, r)
 }

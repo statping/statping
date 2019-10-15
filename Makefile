@@ -3,16 +3,17 @@ SIGN_KEY=B76D61FAA6DB759466E83D9964B9C6AAE2D55278
 BINARY_NAME=statping
 GOPATH:=$(GOPATH)
 GOCMD=go
-GOBUILD=$(GOCMD) build
+GOBUILD=$(GOCMD) build -a
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
+GOVERSION=1.12.x
 GOINSTALL=$(GOCMD) install
-XGO=GOPATH=$(GOPATH) xgo -go 1.11 --dest=build
+XGO=GOPATH=$(GOPATH) xgo -go $(GOVERSION) --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
 RICE=$(GOPATH)/bin/rice
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 PUBLISH_BODY='{ "request": { "branch": "master", "message": "Homebrew update version v${VERSION}", "config": { "env": { "VERSION": "${VERSION}", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
-TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "os": [ "linux" ], "language": "go", "go": [ "1.10.x" ], "go_import_path": "github.com/hunterlong/statping", "install": true, "sudo": "required", "services": [ "docker" ], "env": { "VERSION": "${VERSION}" }, "matrix": { "allow_failures": [ { "go": "master" } ], "fast_finish": true }, "before_deploy": [ "git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [ { "provider": "releases", "api_key": "$(GH_TOKEN)", "file_glob": true, "file": "build/*", "skip_cleanup": true } ], "notifications": { "email": false }, "before_script": ["gem install sass"], "script": [ "wget -O statping.gpg $(SIGN_URL)", "gpg --import statping.gpg", "travis_wait 30 docker pull karalabe/xgo-latest", "make release" ], "after_success": [], "after_deploy": [ "make publish-homebrew" ] } } }'
+TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "os": [ "linux" ], "language": "go", "go": [ "${GOVERSION}" ], "go_import_path": "github.com/hunterlong/statping", "install": true, "sudo": "required", "services": [ "docker" ], "env": { "VERSION": "${VERSION}" }, "matrix": { "allow_failures": [ { "go": "master" } ], "fast_finish": true }, "before_deploy": [ "git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [ { "provider": "releases", "api_key": "$(GH_TOKEN)", "file_glob": true, "file": "build/*", "skip_cleanup": true } ], "notifications": { "email": false }, "before_script": ["gem install sass"], "script": [ "wget -O statping.gpg $(SIGN_URL)", "gpg --import statping.gpg", "travis_wait 30 docker pull karalabe/xgo-latest", "make release" ], "after_success": [], "after_deploy": [ "make publish-homebrew" ] } } }'
 TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statping
 PATH:=$(PATH)
 
@@ -90,7 +91,7 @@ test: clean compile install build-plugin
 
 test-api:
 	DB_CONN=sqlite DB_HOST=localhost DB_DATABASE=sqlite DB_PASS=none DB_USER=none statping &
-	sleep 15 && newman run source/tmpl/postman.json -e dev/postman_environment.json --delay-request 500
+	sleep 300 && newman run source/tmpl/postman.json -e dev/postman_environment.json --delay-request 500
 
 # report coverage to Coveralls
 coverage:
@@ -156,7 +157,7 @@ docker-build-dev:
 
 # build Cypress UI testing :cypress docker tag
 docker-build-cypress: clean
-	GOPATH=$(GOPATH) xgo -out statping -go 1.10.x -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" --targets=linux/amd64 ./cmd
+	GOPATH=$(GOPATH) xgo -out statping -go $(GOVERSION) -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" --targets=linux/amd64 ./cmd
 	docker build -t hunterlong/statping:cypress -f dev/Dockerfile-cypress .
 	rm -f statping
 
@@ -231,6 +232,7 @@ dev-deps:
 	$(GOGET) github.com/ararog/timeago
 	$(GOGET) gopkg.in/natefinch/lumberjack.v2
 	$(GOGET) golang.org/x/crypto/bcrypt
+	$(GOGET) github.com/99designs/gqlgen/...
 
 # remove files for a clean compile/build
 clean:
@@ -260,6 +262,7 @@ tag:
 
 generate:
 	cd source && go generate
+	cd handlers/graphql && go generate
 
 # compress built binaries into tar.gz and zip formats
 compress:

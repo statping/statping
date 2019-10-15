@@ -16,6 +16,7 @@
 package notifier
 
 import (
+	"fmt"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
@@ -98,15 +99,15 @@ func TestSelectNotification(t *testing.T) {
 
 func TestAddQueue(t *testing.T) {
 	msg := "this is a test in the queue!"
-	example.AddQueue(0, msg)
+	example.AddQueue(fmt.Sprintf("service_%v", 0), msg)
 	assert.Equal(t, 1, len(example.Queue))
-	example.AddQueue(0, msg)
+	example.AddQueue(fmt.Sprintf("service_%v", 0), msg)
 	assert.Equal(t, 2, len(example.Queue))
-	example.AddQueue(0, msg)
+	example.AddQueue(fmt.Sprintf("service_%v", 0), msg)
 	assert.Equal(t, 3, len(example.Queue))
-	example.AddQueue(0, msg)
+	example.AddQueue(fmt.Sprintf("service_%v", 0), msg)
 	assert.Equal(t, 4, len(example.Queue))
-	example.AddQueue(0, msg)
+	example.AddQueue(fmt.Sprintf("service_%v", 0), msg)
 	assert.Equal(t, 5, len(example.Queue))
 }
 

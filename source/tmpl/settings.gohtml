@@ -37,6 +37,20 @@
                                 <input type="text" name="description" class="form-control" value="{{ .Description }}" id="description" placeholder="Great Uptime">
                             </div>
 
+                            <div class="form-group">
+                                <div class="col-4 col-sm-4 mt-sm-1 mt-0">
+                                    <label for="update_notify" class="d-inline d-sm-none">Send Updates only</label>
+                                    <label for="update_notify" class="d-none d-sm-block">Send Updates only</label>
+
+                                    <span class="switch">
+                                        <input type="checkbox" name="update_notify-option" class="switch" id="switch-update_notify"{{if UPDATENOTIFY}} checked{{end}}>
+                                        <label for="switch-update_notify" class="mt-2 mt-sm-0"></label>
+                                    </span>
+
+                                    <input type="hidden" name="update_notify" id="switch-update_notify-value" value="{{if UPDATENOTIFY}}true{{else}}false{{end}}">
+                                </div>
+                            </div>
+
                             <div class="form-group row">
                                 <div class="col-8 col-sm-9">
                                     <label for="domain">Domain</label>
@@ -55,7 +69,7 @@
 
                             {{if not .Domain}}
                                 <div class="alert alert-danger" role="alert">
-                                    Your Statup server does not have a dedicated URL!
+                                    Your Statping server does not have a dedicated URL!
                                 </div>
                             {{end}}
 
@@ -123,14 +137,31 @@
 
                         </form>
 
-                        <h3>Additional Settings</h3>
+                        <h3 class="mt-4">Bulk Import Services</h3>
+                        You can import multiple services based on a CSV file with the format shown on the <a href="https://github.com/hunterlong/statping/wiki/Bulk-Import-Services" target="_blank">Bulk Import Wiki</a>.
+
+                        <div class="card">
+                            <div class="card-body">
+                                <form action="/settings/bulk_import" method="POST" enctype="multipart/form-data" class="form-inline">
+                                    <div class="form-group col-10">
+                                        <input type="file" name="file" class="form-control-file" accept=".csv">
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-outline-success right">Import</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+
+                        <h3 class="mt-4">Additional Settings</h3>
 
                         <div class="row">
-                             <a href="/settings/export" class="btn btn-sm btn-secondary float-right">Export Settings</a>
+                            <div class="col-12">
+                            <a href="/settings/export" class="btn btn-sm btn-secondary float-right">Export Settings</a>
                             {{if .Domain}}
                                 <a href="#" class="btn btn-sm btn-secondary float-right ml-1">Authentication QR Code</a>
                             {{end}}
-                        </div>
 
                         {{if .Domain}}
                             <div class="row align-content-center">
@@ -139,6 +170,8 @@
                             <a class="btn btn-sm btn-primary" href={{safeURL QrAuth}}>Open in Statping App</a>
                         {{end}}
 
+                        </div>
+                        </div>
                     </div>
 
                     <div class="tab-pane" id="v-pills-style" role="tabpanel" aria-labelledby="v-pills-style-tab">

@@ -100,14 +100,8 @@ func (w *webhooker) Select() *notifier.Notification {
 }
 
 func replaceBodyText(body string, s *types.Service, f *types.Failure) string {
-	if s != nil {
-		body = strings.Replace(body, "%service.Name", s.Name, -1)
-		body = strings.Replace(body, "%service.Id", utils.ToString(s.Id), -1)
-		body = strings.Replace(body, "%service.Online", utils.ToString(s.Online), -1)
-	}
-	if strings.Contains(body, "%failure.Issue") && f != nil {
-		body = strings.Replace(body, "%failure.Issue", f.Issue, -1)
-	}
+	body = utils.ConvertInterface(body, s)
+	body = utils.ConvertInterface(body, f)
 	return body
 }
 
@@ -171,18 +165,16 @@ func (w *webhooker) OnTest() error {
 // OnFailure will trigger failing service
 func (w *webhooker) OnFailure(s *types.Service, f *types.Failure) {
 	msg := replaceBodyText(w.Var2, s, f)
-	w.AddQueue(s.Id, msg)
-	w.Online = false
+	w.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
 // OnSuccess will trigger successful service
 func (w *webhooker) OnSuccess(s *types.Service) {
-	if !w.Online {
-		w.ResetUniqueQueue(s.Id)
+	if !s.Online {
+		w.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		msg := replaceBodyText(w.Var2, s, nil)
-		w.AddQueue(s.Id, msg)
+		w.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}
-	w.Online = true
 }
 
 // OnSave triggers when this notifier has been saved

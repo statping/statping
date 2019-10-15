@@ -151,6 +151,48 @@ HTML,BODY {
   width: 100%;
 }
 
+.inputTags-field {
+  border: 0;
+  background-color: transparent;
+  padding-top: .13rem;
+}
+
+input.inputTags-field:focus {
+  outline-width: 0;
+}
+
+.inputTags-list {
+  display: block;
+  width: 100%;
+  min-height: calc(2.25rem + 2px);
+  padding: .2rem .35rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.inputTags-item {
+  background-color: #3aba39;
+  margin-right: 5px;
+  padding: 5px 8px;
+  font-size: 10pt;
+  color: white;
+  border-radius: 4px;
+}
+
+.inputTags-item .close-item {
+  margin-left: 6px;
+  font-size: 13pt;
+  font-weight: bold;
+  cursor: pointer;
+}
+
 @mixin dynamic-color-hov($color) {
     &.dyn-dark {
         background-color: darken($color, 12%) !important;
@@ -417,15 +459,15 @@ HTML,BODY {
 
 .pulse-glow:before,
 .pulse-glow:after {
-    position: absolute;
-    content: '';
-    height: 0.5rem;
-    width: 1.75rem;
-    top: 1.2rem;
-    right: 2.15rem;
-    border-radius: 0;
-    box-shadow: 0 0 7px #47d337;
-    animation: glow-grow 2s ease-out infinite;
+  position: absolute;
+  content: "";
+  height: 0.4rem;
+  width: 1.7rem;
+  top: 1.3rem;
+  right: 2.15rem;
+  border-radius: 0;
+  box-shadow: 0 0 6px #47d337;
+  animation: glow-grow 2s ease-out infinite;
 }
 
 .sortable_drag {
@@ -478,6 +520,13 @@ HTML,BODY {
 
 .jumbotron {
   background-color: white;
+}
+
+.toggle-service {
+  font-size: 18pt;
+  float: left;
+  margin: 2px 3px 0 0;
+  cursor: pointer;
 }
 
 @import 'mobile';

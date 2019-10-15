@@ -28,24 +28,15 @@ import (
 )
 
 func apiAllCheckinsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	checkins := core.AllCheckins()
 	for _, c := range checkins {
 		c.Hits = c.AllHits()
 		c.Failures = c.LimitedFailures(64)
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(checkins)
+	returnJson(checkins, w, r)
 }
 
 func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	checkin := core.SelectCheckin(vars["api"])
 	if checkin == nil {
@@ -54,15 +45,10 @@ func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	checkin.Hits = checkin.LimitedHits(32)
 	checkin.Failures = checkin.LimitedFailures(32)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(checkin)
+	returnJson(checkin, w, r)
 }
 
 func checkinCreateHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	var checkin *core.Checkin
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&checkin)
@@ -110,15 +96,10 @@ func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	checkin.Failing = false
 	checkin.LastHit = utils.Timezoner(time.Now().UTC(), core.CoreApp.Timezone)
-	w.Header().Set("Content-Type", "application/json")
 	sendJsonAction(checkinHit, "update", w, r)
 }
 
 func checkinDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	vars := mux.Vars(r)
 	checkin := core.SelectCheckin(vars["api"])
 	if checkin == nil {

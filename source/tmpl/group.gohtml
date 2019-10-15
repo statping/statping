@@ -1,0 +1,17 @@
+{{define "title"}}{{.Name}} Status{{end}}
+{{define "description"}}Group {{.Name}}{{end}}
+{{ define "content" }}
+
+{{$isAdmin := Auth}}
+<div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
+
+{{if IsUser}}
+    {{template "nav"}}
+{{end}}
+
+    <div class="col-12 mb-4">
+        {{template "form_group" .Group}}
+    </div>
+</div>
+
+{{end}}

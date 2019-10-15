@@ -218,6 +218,7 @@ func HelpEcho() {
 	fmt.Println("     PORT                      - Set the outgoing port for the HTTP server (or use -port)")
 	fmt.Println("     IP                        - Bind a specific IP address to the HTTP server (or use -ip)")
 	fmt.Println("     STATPING_DIR              - Set a absolute path for the root path of Statping server (logs, assets, SQL db)")
+	fmt.Println("     DISABLE_LOGS              - Disable viewing and writing to the log file (default is false)")
 	fmt.Println("     DB_CONN                   - Automatic Database connection (sqlite, postgres, mysql)")
 	fmt.Println("     DB_HOST                   - Database hostname or IP address")
 	fmt.Println("     DB_USER                   - Database username")
@@ -240,7 +241,7 @@ func HelpEcho() {
 func checkGithubUpdates() (githubResponse, error) {
 	var gitResp githubResponse
 	url := "https://api.github.com/repos/hunterlong/statping/releases/latest"
-	contents, _, err := utils.HttpRequest(url, "GET", nil, nil, nil, time.Duration(10*time.Second))
+	contents, _, err := utils.HttpRequest(url, "GET", nil, nil, nil, time.Duration(10*time.Second), true)
 	if err != nil {
 		return githubResponse{}, err
 	}

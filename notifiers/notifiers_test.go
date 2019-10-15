@@ -42,6 +42,7 @@ var TestService = &types.Service{
 	Method:         "GET",
 	Timeout:        20,
 	LastStatusCode: 404,
+	Online:         true,
 	LastResponse:   "<html>this is an example response</html>",
 	CreatedAt:      time.Now().Add(-24 * time.Hour),
 }

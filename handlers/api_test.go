@@ -102,6 +102,12 @@ func TestMainApiRoutes(t *testing.T) {
 			URL:            "/api/clear_cache",
 			Method:         "POST",
 			ExpectedStatus: 303,
+		},
+		{
+			Name:           "404 Error Page",
+			URL:            "/api/missing_404_page",
+			Method:         "GET",
+			ExpectedStatus: 404,
 		}}
 
 	for _, v := range tests {
@@ -169,7 +175,7 @@ func TestApiServiceRoutes(t *testing.T) {
 		},
 		{
 			Name:           "Statping Reorder Services",
-			URL:            "/api/reorder",
+			URL:            "/api/services/reorder",
 			Method:         "POST",
 			Body:           `[{"service":1,"order":1},{"service":5,"order":2},{"service":2,"order":3},{"service":3,"order":4},{"service":4,"order":5}]`,
 			ExpectedStatus: 200,

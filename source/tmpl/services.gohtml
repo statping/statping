@@ -11,7 +11,8 @@
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col" class="d-none d-md-table-cell">Status</th>
-                <th scope="col">Visibility</th>
+                <th scope="col" class="d-none d-md-table-cell">Visibility</th>
+                <th scope="col" class="d-none d-md-table-cell">Group</th>
                 <th scope="col"></th>
             </tr>
             </thead>
@@ -19,8 +20,11 @@
             {{range .Services}}
             <tr id="service_{{.Id}}" data-id="{{.Id}}">
                 <td><span class="drag_icon d-none d-md-inline"><i class="fas fa-bars"></i></span> {{.Name}}</td>
-                <td class="d-none d-md-table-cell">{{if .Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}}</td>
+                <td class="d-none d-md-table-cell">{{if .Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}}
+                    <i class="toggle-service fas {{if .IsRunning}}fa-toggle-on text-success{{else}}fa-toggle-off text-muted{{end}}" data-online="{{if .IsRunning}}true{{else}}false{{end}}" data-id="{{.Id}}"></i>
+                </td>
                 <td class="d-none d-md-table-cell">{{if .Public.Bool}}<span class="badge badge-primary">PUBLIC</span>{{else}}<span class="badge badge-secondary">PRIVATE</span>{{end}}</td>
+                <td class="d-none d-md-table-cell">{{if ne .GroupId 0}}<span class="badge badge-secondary">{{(Group .GroupId).Name}}</span>{{end}}</td>
                 <td class="text-right">
                     <div class="btn-group">
                         <a href="/service/{{ServiceLink .}}" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> View</a>
@@ -57,6 +61,7 @@
                         <td>{{if .Public.Bool}}<span class="badge badge-primary">PUBLIC</span>{{else}}<span class="badge badge-secondary">PRIVATE</span>{{end}}</td>
                         <td class="text-right">
                             <div class="btn-group">
+                                <a href="/group/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> Edit</a>
                                 {{if Auth}}<a href="/api/groups/{{.Id}}" class="ajax_delete btn btn-danger" data-method="DELETE" data-obj="group_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>{{end}}
                             </div>
                         </td>
@@ -79,6 +84,7 @@
 <script src="/js/sortable.min.js"></script>
 {{end}}
 <script>
+    // drag and drop sorting for Services
     sortable('.sortable', {
         forcePlaceholderSize: true,
         hoverClass: 'sortable_drag',
@@ -95,14 +101,16 @@
             newOrder.push(o);
         });
         $.ajax({
-            url: "/api/services/reorder",
-            type: 'POST',
+            url: "/api/reorder/services",
+            type: "POST",
             data: JSON.stringify(newOrder),
             contentType: "application/json",
             dataType: "json",
             success: function(data) { }
         });
     });
+
+    // drag and drop sorting for Groups
     sortable('.sortable_groups', {
         forcePlaceholderSize: true,
         hoverClass: 'sortable_drag',
@@ -119,8 +127,8 @@
             newOrder.push(o);
         });
         $.ajax({
-            url: "/api/groups/reorder",
-            type: 'POST',
+            url: "/api/reorder/groups",
+            type: "POST",
             data: JSON.stringify(newOrder),
             contentType: "application/json",
             dataType: "json",

@@ -16,7 +16,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/hunterlong/statping/core"
@@ -36,21 +35,12 @@ type apiResponse struct {
 }
 
 func apiIndexHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	coreClone := *core.CoreApp
 	coreClone.Started = utils.Timezoner(core.CoreApp.Started, core.CoreApp.Timezone)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(coreClone)
+	returnJson(coreClone, w, r)
 }
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	var err error
 	core.CoreApp.ApiKey = utils.NewSHA1Hash(40)
 	core.CoreApp.ApiSecret = utils.NewSHA1Hash(40)
@@ -63,10 +53,6 @@ func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiClearCacheHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	CacheStorage = NewStorage()
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
@@ -77,8 +63,7 @@ func sendErrorJson(err error, w http.ResponseWriter, r *http.Request) {
 		Status: "error",
 		Error:  err.Error(),
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(output)
+	returnJson(output, w, r)
 }
 
 func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *http.Request) {
@@ -120,6 +105,12 @@ func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *ht
 	case *types.Checkin:
 		objName = "checkin"
 		objId = v.Id
+	case *core.Incident:
+		objName = "incident"
+		objId = v.Id
+	case *core.IncidentUpdate:
+		objName = "incident_update"
+		objId = v.Id
 	default:
 		objName = "missing"
 	}
@@ -132,8 +123,7 @@ func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *ht
 		Output: obj,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(output)
+	returnJson(output, w, r)
 }
 
 func sendUnauthorizedJson(w http.ResponseWriter, r *http.Request) {
@@ -141,7 +131,6 @@ func sendUnauthorizedJson(w http.ResponseWriter, r *http.Request) {
 		Status: "error",
 		Error:  errors.New("not authorized").Error(),
 	}
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusUnauthorized)
-	json.NewEncoder(w).Encode(output)
+	returnJson(output, w, r)
 }

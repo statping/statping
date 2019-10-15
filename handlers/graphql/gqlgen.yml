@@ -1,0 +1,35 @@
+# .gqlgen.yml example
+#
+# Refer to https://gqlgen.com/config/
+# for detailed .gqlgen.yml documentation.
+
+schema:
+- schema.graphql
+exec:
+  filename: generated.go
+model:
+  filename: models_gen.go
+models:
+  Core:
+    model: github.com/hunterlong/statping/types.Core
+  Message:
+    model: github.com/hunterlong/statping/types.Message
+  Group:
+    model: github.com/hunterlong/statping/types.Group
+  Service:
+    model: github.com/hunterlong/statping/types.Service
+  User:
+    model: github.com/hunterlong/statping/types.User
+  Failure:
+    model: github.com/hunterlong/statping/types.Failure
+  Checkin:
+    model: github.com/hunterlong/statping/types.Checkin
+  CheckinHit:
+    model: github.com/hunterlong/statping/types.CheckinHit
+  ID:
+    model:
+      - github.com/99designs/gqlgen/graphql.Int64
+struct_tag: json
+resolver:
+  filename: resolver.go
+  type: Resolver

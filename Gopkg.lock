@@ -2,15 +2,36 @@
 
 
 [[projects]]
-  branch = "master"
-  digest = "1:6212ce7f839b40213d1ff75c3df7816c4023faf4d29da630ce1dfdd1ccd5fb02"
+  digest = "1:d4bfd57449b0bdfe927ec45c8463afd8f5b6012d4bcd5a9da8581a408c23e57c"
+  name = "github.com/99designs/gqlgen"
+  packages = [
+    "complexity",
+    "graphql",
+    "graphql/introspection",
+    "handler",
+  ]
+  pruneopts = "UT"
+  revision = "a7bc468ca1b184a5ce1b07ea331e0121fc56ae82"
+  version = "v0.9.3"
+
+[[projects]]
+  digest = "1:07f7314344b2771963ada0b2a4a426c59d782dac227dcfff2499188a186446c0"
   name = "github.com/GeertJohan/go.rice"
   packages = [
     ".",
     "embedded",
   ]
   pruneopts = "UT"
-  revision = "0af3f3b09a0a8b391f63ab52ba5ab50f84fabd30"
+  revision = "cd53cd147dd5288bc2fb990fb983e58e301abb5e"
+  version = "v1.0.0"
+
+[[projects]]
+  digest = "1:786e862ec180708b60ee670723e3edd969fd4309e7b1c315cd7de058ac62a011"
+  name = "github.com/agnivade/levenshtein"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "51b298ff305e72cfd29166dccc3f9878e82f9fdc"
+  version = "v1.0.2"
 
 [[projects]]
   digest = "1:f1ec92a2b8473612547f6e13edbc8c8e6cda6c8be9c54b31958aad4a7ccaaa2b"
@@ -21,12 +42,12 @@
   version = "0.0.1"
 
 [[projects]]
-  branch = "master"
-  digest = "1:5fd5c4d4282935b7a575299494f2c09e9d2cacded7815c83aff7c1602aff3154"
+  digest = "1:8e8da6cc8cca12851d4e089d970a0f7387b3a6bcc8c459ff432213b03076a66d"
   name = "github.com/daaku/go.zipexe"
   packages = ["."]
   pruneopts = "UT"
-  revision = "a5fe2436ffcb3236e175e5149162b41cd28bd27d"
+  revision = "74d766ac1dde7458348221869a7d1e7e5fa0597e"
+  version = "v1.0.1"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -61,20 +82,12 @@
   version = "v2.2.2"
 
 [[projects]]
-  digest = "1:c79fb010be38a59d657c48c6ba1d003a8aa651fa56b579d959d74573b7dff8e1"
-  name = "github.com/gorilla/context"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "08b5f424b9271eedf6f9f0ce86cb9396ed337a42"
-  version = "v1.1.1"
-
-[[projects]]
-  digest = "1:ca59b1175189b3f0e9f1793d2c350114be36eaabbe5b9f554b35edee1de50aea"
+  digest = "1:cbec35fe4d5a4fba369a656a8cd65e244ea2c743007d8f6c1ccb132acf9d1296"
   name = "github.com/gorilla/mux"
   packages = ["."]
   pruneopts = "UT"
-  revision = "a7962380ca08b5a188038c69871b8d3fbdf31e89"
-  version = "v1.7.0"
+  revision = "00bdffe0f3c77e27d2cf6f5c70232a2d3e4d9c15"
+  version = "v1.7.3"
 
 [[projects]]
   digest = "1:e72d1ebb8d395cf9f346fd9cbc652e5ae222dd85e0ac842dc57f175abed6d195"
@@ -85,15 +98,34 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:e5bf52fd66a2e984b57b4c0f2c4ee024ed749a19886246240629998dc0cf31ce"
+  digest = "1:172c862eabc72e90f461bcef223c49869628bec6d989386dfb03281ae3222148"
   name = "github.com/gorilla/sessions"
   packages = ["."]
   pruneopts = "UT"
-  revision = "f57b7e2d29c6211d16ffa52a0998272f75799030"
-  version = "v1.1.3"
+  revision = "4355a998706e83fe1d71c31b07af94e34f68d74a"
+  version = "v1.2.0"
 
 [[projects]]
-  digest = "1:ff312c4d510c67954a6fc6a11c9ff72a2b2169584776b7419c7b8c729e2b13ac"
+  digest = "1:e62657cca9badaa308d86e7716083e4c5933bb78e30a17743fc67f50be26f6f4"
+  name = "github.com/gorilla/websocket"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "c3e18be99d19e6b3e8f1559eea2c161a665c4b6b"
+  version = "v1.4.1"
+
+[[projects]]
+  digest = "1:c77361e611524ec8f2ad37c408c3c916111a70b6acf806a1200855696bf8fa4d"
+  name = "github.com/hashicorp/golang-lru"
+  packages = [
+    ".",
+    "simplelru",
+  ]
+  pruneopts = "UT"
+  revision = "7f827b33c0f158ec5dfbba01bb0b14a4541fd81d"
+  version = "v0.5.3"
+
+[[projects]]
+  digest = "1:b0c1770be8c52cf00117b98049de1e4df91c8df588102198364b09669bb60178"
   name = "github.com/jinzhu/gorm"
   packages = [
     ".",
@@ -102,16 +134,16 @@
     "dialects/sqlite",
   ]
   pruneopts = "UT"
-  revision = "472c70caa40267cb89fd8facb07fe6454b578626"
-  version = "v1.9.2"
+  revision = "836fb2c19d84dac7b0272958dfb9af7cf0d0ade4"
+  version = "v1.9.10"
 
 [[projects]]
-  branch = "master"
-  digest = "1:fd97437fbb6b7dce04132cf06775bd258cce305c44add58eb55ca86c6c325160"
+  digest = "1:01ed62f8f4f574d8aff1d88caee113700a2b44c42351943fa73cc1808f736a50"
   name = "github.com/jinzhu/inflection"
   packages = ["."]
   pruneopts = "UT"
-  revision = "04140366298a54a039076d798123ffa108fff46c"
+  revision = "f5c5f50e6090ae76a29240b61ae2a90dd810112e"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:ecd9aa82687cf31d1585d4ac61d0ba180e42e8a6182b85bd785fcca8dfeefc1b"
@@ -122,24 +154,25 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:b18ffc558326ebaed3b4a175617f1e12ed4e3f53d6ebfe5ba372a3de16d22278"
+  digest = "1:0ead8e64fe356bd9221605e3ec40b4438509868018cbbbaaaff3ebae1b69b78b"
   name = "github.com/lib/pq"
   packages = [
     ".",
     "hstore",
     "oid",
+    "scram",
   ]
   pruneopts = "UT"
-  revision = "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
-  version = "v1.0.0"
+  revision = "3427c32cb71afc948325f299f040e53c1dd78979"
+  version = "v1.2.0"
 
 [[projects]]
-  digest = "1:4a49346ca45376a2bba679ca0e83bec949d780d4e927931317904bad482943ec"
+  digest = "1:79e87abf06b873987dee86598950f5b51732ac454d5a5cab6445a14330e6c9e3"
   name = "github.com/mattn/go-sqlite3"
   packages = ["."]
   pruneopts = "UT"
-  revision = "c7c4067b79cc51e6dfdcef5c702e74b1e0fa7c75"
-  version = "v1.10.0"
+  revision = "b612a2feea6aa87c6d052d9086572551df06497e"
+  version = "v1.11.0"
 
 [[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
@@ -166,31 +199,81 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:972c2427413d41a1e06ca4897e8528e5a1622894050e2f527b38ddf0f343f759"
+  digest = "1:8548c309c65a85933a625be5e7d52b6ac927ca30c56869fae58123b8a77a75e1"
   name = "github.com/stretchr/testify"
   packages = ["assert"]
   pruneopts = "UT"
-  revision = "ffdc059bfe9ce6a4e144ba849dbedead332c6053"
-  version = "v1.3.0"
+  revision = "221dbe5ed46703ee255b1da0dec05086f5035f62"
+  version = "v1.4.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:1ecf2a49df33be51e757d0033d5d51d5f784f35f68e5a38f797b2d3f03357d71"
+  digest = "1:9f3a60def1a1eb5ac184e71dde43c6f99606f54d106db7c95f8b8338629a777b"
+  name = "github.com/tatsushid/go-fastping"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "d7bb493dee3e090e2ffb6914adddf17c1e7c026c"
+
+[[projects]]
+  digest = "1:b4e8aaca88f799355f4ac560bce4293fb85ff21003dd0d5741ca503f7a788e91"
+  name = "github.com/vektah/gqlparser"
+  packages = [
+    ".",
+    "ast",
+    "gqlerror",
+    "lexer",
+    "parser",
+    "validator",
+    "validator/rules",
+  ]
+  pruneopts = "UT"
+  revision = "05741cdb0871330d8bc980d4afd21ab34eceee83"
+  version = "v1.1.2"
+
+[[projects]]
+  branch = "master"
+  digest = "1:9d5b5d543996dd584da1db1e0de1926f3e4c3a8dba0fa2f8db70f3ebee2342e0"
   name = "golang.org/x/crypto"
   packages = [
     "bcrypt",
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "b8fe1690c61389d7d2a8074a507d1d40c5d30448"
+  revision = "9756ffdc24725223350eb3266ffb92590d28f278"
+
+[[projects]]
+  branch = "master"
+  digest = "1:caffb9a4f8c756941de4b3eb577abd167e7fd4b570f2078c05ceb8835a1514cb"
+  name = "golang.org/x/net"
+  packages = [
+    "bpf",
+    "icmp",
+    "internal/iana",
+    "internal/socket",
+    "ipv4",
+    "ipv6",
+  ]
+  pruneopts = "UT"
+  revision = "ba9fcec4b297b415637633c5a6e8fa592e4a16c3"
+
+[[projects]]
+  branch = "master"
+  digest = "1:d94059c196c160bd1c4030d49ffaa39a456be516501e5916bea663f5d79a75ec"
+  name = "golang.org/x/sys"
+  packages = [
+    "unix",
+    "windows",
+  ]
+  pruneopts = "UT"
+  revision = "9109b7679e13aa34a54834cfb4949cac4b96e576"
 
 [[projects]]
   digest = "1:c25289f43ac4a68d88b02245742347c94f1e108c534dda442188015ff80669b3"
   name = "google.golang.org/appengine"
   packages = ["cloudsql"]
   pruneopts = "UT"
-  revision = "e9657d882bb81064595ca3b56cbe2546bbabf7b1"
-  version = "v1.4.0"
+  revision = "5f2a59506353b8d5ba8cbbcd9f3c1f41f1eaf079"
+  version = "v1.6.2"
 
 [[projects]]
   branch = "v3"
@@ -216,10 +299,21 @@
   revision = "d3b5b032dc8e8927d31a5071b56e14c89f045135"
   version = "v2.0.1"
 
+[[projects]]
+  digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
+  name = "gopkg.in/yaml.v2"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "51d6538a90f86fe93ac480b35f37b2be17fef232"
+  version = "v2.2.2"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/99designs/gqlgen/graphql",
+    "github.com/99designs/gqlgen/graphql/introspection",
+    "github.com/99designs/gqlgen/handler",
     "github.com/GeertJohan/go.rice",
     "github.com/GeertJohan/go.rice/embedded",
     "github.com/ararog/timeago",
@@ -234,6 +328,9 @@
     "github.com/joho/godotenv",
     "github.com/rendon/testcli",
     "github.com/stretchr/testify/assert",
+    "github.com/tatsushid/go-fastping",
+    "github.com/vektah/gqlparser",
+    "github.com/vektah/gqlparser/ast",
     "golang.org/x/crypto/bcrypt",
     "gopkg.in/natefinch/lumberjack.v2",
     "gopkg.in/russross/blackfriday.v2",

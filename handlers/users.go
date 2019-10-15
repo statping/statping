@@ -28,19 +28,11 @@ import (
 )
 
 func usersHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsUser(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	users, _ := core.SelectAllUsers()
 	ExecuteResponse(w, r, "users.gohtml", users, nil)
 }
 
 func usersEditHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
 	user, _ := core.SelectUser(int64(id))
@@ -48,10 +40,6 @@ func usersEditHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiUserHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	user, err := core.SelectUser(utils.ToInt(vars["id"]))
 	if err != nil {
@@ -59,15 +47,10 @@ func apiUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user.Password = ""
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(user)
+	returnJson(user, w, r)
 }
 
 func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	user, err := core.SelectUser(utils.ToInt(vars["id"]))
 	if err != nil {
@@ -88,10 +71,6 @@ func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	users := core.CountUsers()
 	if users == 1 {
@@ -112,24 +91,15 @@ func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	users, err := core.SelectAllUsers()
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
+	returnJson(users, w, r)
 }
 
 func apiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	var user *types.User
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&user)

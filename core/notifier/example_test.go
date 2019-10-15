@@ -101,20 +101,20 @@ func (n *ExampleNotifier) Select() *Notification {
 // OnSave is a required basic event for the Notifier interface
 func (n *ExampleNotifier) OnSave() error {
 	msg := fmt.Sprintf("received on save trigger")
-	n.AddQueue(0, msg)
+	n.AddQueue("onsave", msg)
 	return errors.New("onsave triggered")
 }
 
 // OnSuccess is a required basic event for the Notifier interface
 func (n *ExampleNotifier) OnSuccess(s *types.Service) {
 	msg := fmt.Sprintf("received a count trigger for service: %v\n", s.Name)
-	n.AddQueue(s.Id, msg)
+	n.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
 // OnFailure is a required basic event for the Notifier interface
 func (n *ExampleNotifier) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf("received a failure trigger for service: %v\n", s.Name)
-	n.AddQueue(s.Id, msg)
+	n.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
 // OnTest is a option testing event for the Notifier interface
@@ -126,61 +126,61 @@ func (n *ExampleNotifier) OnTest() error {
 // OnNewService is a option event for new services
 func (n *ExampleNotifier) OnNewService(s *types.Service) {
 	msg := fmt.Sprintf("received a new service trigger for service: %v\n", s.Name)
-	n.AddQueue(s.Id, msg)
+	n.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
 // OnUpdatedService is a option event for updated services
 func (n *ExampleNotifier) OnUpdatedService(s *types.Service) {
 	msg := fmt.Sprintf("received a update service trigger for service: %v\n", s.Name)
-	n.AddQueue(s.Id, msg)
+	n.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
 // OnDeletedService is a option event for deleted services
 func (n *ExampleNotifier) OnDeletedService(s *types.Service) {
 	msg := fmt.Sprintf("received a delete service trigger for service: %v\n", s.Name)
-	n.AddQueue(s.Id, msg)
+	n.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
 // OnNewUser is a option event for new users
 func (n *ExampleNotifier) OnNewUser(s *types.User) {
 	msg := fmt.Sprintf("received a new user trigger for user: %v\n", s.Username)
-	n.AddQueue(s.Id, msg)
+	n.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
 // OnUpdatedUser is a option event for updated users
 func (n *ExampleNotifier) OnUpdatedUser(s *types.User) {
 	msg := fmt.Sprintf("received a updated user trigger for user: %v\n", s.Username)
-	n.AddQueue(s.Id, msg)
+	n.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
 // OnDeletedUser is a option event for deleted users
 func (n *ExampleNotifier) OnDeletedUser(s *types.User) {
 	msg := fmt.Sprintf("received a deleted user trigger for user: %v\n", s.Username)
-	n.AddQueue(s.Id, msg)
+	n.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
 // OnUpdatedCore is a option event when the settings are updated
 func (n *ExampleNotifier) OnUpdatedCore(s *types.Core) {
 	msg := fmt.Sprintf("received a updated core trigger for core: %v\n", s.Name)
-	n.AddQueue(0, msg)
+	n.AddQueue("core", msg)
 }
 
 // OnStart is triggered when statup has been started
 func (n *ExampleNotifier) OnStart(s *types.Core) {
 	msg := fmt.Sprintf("received a trigger on Statping boot: %v\n", s.Name)
-	n.AddQueue(0, msg)
+	n.AddQueue(fmt.Sprintf("core"), msg)
 }
 
 // OnNewNotifier is triggered when a new notifier has initialized
 func (n *ExampleNotifier) OnNewNotifier(s *Notification) {
 	msg := fmt.Sprintf("received a new notifier trigger for notifier: %v\n", s.Method)
-	n.AddQueue(s.Id, msg)
+	n.AddQueue(fmt.Sprintf("notifier_%v", s.Id), msg)
 }
 
 // OnUpdatedNotifier is triggered when a notifier has been updated
 func (n *ExampleNotifier) OnUpdatedNotifier(s *Notification) {
 	msg := fmt.Sprintf("received a update notifier trigger for notifier: %v\n", s.Method)
-	n.AddQueue(s.Id, msg)
+	n.AddQueue(fmt.Sprintf("notifier_%v", s.Id), msg)
 }
 
 // Create a new notifier that includes a form for the end user to insert their own values
@@ -224,7 +224,7 @@ func ExampleAddNotifier() {
 // OnSuccess will be triggered everytime a service is online
 func ExampleNotification_OnSuccess() {
 	msg := fmt.Sprintf("this is a successful message as a string passing into AddQueue function")
-	example.AddQueue(0, msg)
+	example.AddQueue("example", msg)
 	fmt.Println(len(example.Queue))
 	// Output: 1
 }
@@ -232,13 +232,13 @@ func ExampleNotification_OnSuccess() {
 // Add a new message into the queue OnSuccess
 func ExampleOnSuccess() {
 	msg := fmt.Sprintf("received a count trigger for service: %v\n", service.Name)
-	example.AddQueue(0, msg)
+	example.AddQueue("example", msg)
 }
 
 // Add a new message into the queue OnFailure
 func ExampleOnFailure() {
 	msg := fmt.Sprintf("received a failing service: %v\n", service.Name)
-	example.AddQueue(0, msg)
+	example.AddQueue("example", msg)
 }
 
 // OnTest allows your notifier to be testable
@@ -258,7 +258,7 @@ func ExampleNotification_CanTest() {
 // Add any type of interface to the AddQueue function to be ran in the queue
 func ExampleNotification_AddQueue() {
 	msg := fmt.Sprintf("this is a failing message as a string passing into AddQueue function")
-	example.AddQueue(0, msg)
+	example.AddQueue("example", msg)
 	queue := example.Queue
 	fmt.Printf("Example has %v items in the queue", len(queue))
 	// Output: Example has 2 items in the queue

@@ -59,7 +59,7 @@ func init() {
 // Send will send a HTTP Post to the discord API. It accepts type: []byte
 func (u *discord) Send(msg interface{}) error {
 	message := msg.(string)
-	_, _, err := utils.HttpRequest(discorder.GetValue("host"), "POST", "application/json", nil, strings.NewReader(message), time.Duration(10*time.Second))
+	_, _, err := utils.HttpRequest(discorder.GetValue("host"), "POST", "application/json", nil, strings.NewReader(message), time.Duration(10*time.Second), true)
 	return err
 }
 
@@ -70,24 +70,27 @@ func (u *discord) Select() *notifier.Notification {
 // OnFailure will trigger failing service
 func (u *discord) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf(`{"content": "Your service '%v' is currently failing! Reason: %v"}`, s.Name, f.Issue)
-	u.AddQueue(s.Id, msg)
-	u.Online = false
+	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
 // OnSuccess will trigger successful service
 func (u *discord) OnSuccess(s *types.Service) {
-	if !u.Online {
-		u.ResetUniqueQueue(s.Id)
-		msg := fmt.Sprintf(`{"content": "Your service '%v' is back online!"}`, s.Name)
-		u.AddQueue(s.Id, msg)
+	if !s.Online || !s.SuccessNotified {
+		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
+		var msg interface{}
+		if s.UpdateNotify {
+			s.UpdateNotify = false
+		}
+		msg = s.DownText
+
+		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}
-	u.Online = true
 }
 
 // OnSave triggers when this notifier has been saved
 func (u *discord) OnSave() error {
 	msg := fmt.Sprintf(`{"content": "The discord notifier on Statping was just updated."}`)
-	u.AddQueue(0, msg)
+	u.AddQueue("saved", msg)
 	return nil
 }
 
@@ -95,7 +98,7 @@ func (u *discord) OnSave() error {
 func (u *discord) OnTest() error {
 	outError := errors.New("Incorrect discord URL, please confirm URL is correct")
 	message := `{"content": "Testing the discord notifier"}`
-	contents, _, err := utils.HttpRequest(discorder.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(message)), time.Duration(10*time.Second))
+	contents, _, err := utils.HttpRequest(discorder.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(message)), time.Duration(10*time.Second), true)
 	if string(contents) == "" {
 		return nil
 	}

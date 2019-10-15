@@ -24,6 +24,17 @@ import (
 	"time"
 )
 
+func TestConvertInterface(t *testing.T) {
+	type Service struct {
+		Name   string
+		Domain string
+	}
+	sample := `{"name": "%service.Name", "domain": "%service.Domain"}`
+	input := &Service{"Test Name", "statping.com"}
+	out := ConvertInterface(sample, input)
+	assert.Equal(t, `{"name": "Test Name", "domain": "statping.com"}`, out)
+}
+
 func TestCreateLog(t *testing.T) {
 	err := createLog(Directory)
 	assert.Nil(t, err)

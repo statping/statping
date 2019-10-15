@@ -89,7 +89,7 @@ func (u *twilio) Send(msg interface{}) error {
 	v.Set("Body", message)
 	rb := *strings.NewReader(v.Encode())
 
-	contents, _, err := utils.HttpRequest(twilioUrl, "POST", "application/x-www-form-urlencoded", nil, &rb, time.Duration(10*time.Second))
+	contents, _, err := utils.HttpRequest(twilioUrl, "POST", "application/x-www-form-urlencoded", nil, &rb, time.Duration(10*time.Second), true)
 	success, _ := twilioSuccess(contents)
 	if !success {
 		errorOut := twilioError(contents)
@@ -102,18 +102,21 @@ func (u *twilio) Send(msg interface{}) error {
 // OnFailure will trigger failing service
 func (u *twilio) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
-	u.AddQueue(s.Id, msg)
-	u.Online = false
+	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
 // OnSuccess will trigger successful service
 func (u *twilio) OnSuccess(s *types.Service) {
-	if !u.Online {
-		u.ResetUniqueQueue(s.Id)
-		msg := fmt.Sprintf("Your service '%v' is back online!", s.Name)
-		u.AddQueue(s.Id, msg)
+	if !s.Online || !s.SuccessNotified {
+		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
+		var msg string
+		if s.UpdateNotify {
+			s.UpdateNotify = false
+		}
+		msg = s.DownText
+
+		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}
-	u.Online = true
 }
 
 // OnSave triggers when this notifier has been saved

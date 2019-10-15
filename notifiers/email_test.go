@@ -105,17 +105,13 @@ func TestEmailNotifier(t *testing.T) {
 		assert.Equal(t, 1, len(emailer.Queue))
 	})
 
-	t.Run("email Check Offline", func(t *testing.T) {
-		assert.False(t, emailer.Online)
-	})
-
 	t.Run("email OnSuccess", func(t *testing.T) {
 		emailer.OnSuccess(TestService)
 		assert.Equal(t, 1, len(emailer.Queue))
 	})
 
 	t.Run("email Check Back Online", func(t *testing.T) {
-		assert.True(t, emailer.Online)
+		assert.True(t, TestService.Online)
 	})
 
 	t.Run("email OnSuccess Again", func(t *testing.T) {
@@ -136,7 +132,7 @@ func TestEmailNotifier(t *testing.T) {
 
 	t.Run("email Run Queue", func(t *testing.T) {
 		go notifier.Queue(emailer)
-		time.Sleep(5 * time.Second)
+		time.Sleep(6 * time.Second)
 		assert.Equal(t, EMAIL_HOST, emailer.Host)
 		assert.Equal(t, 0, len(emailer.Queue))
 	})

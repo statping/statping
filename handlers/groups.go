@@ -24,40 +24,59 @@ import (
 	"net/http"
 )
 
-// apiAllGroupHandler will show all the groups
-func apiAllGroupHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsReadAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
+func groupViewHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	var group *core.Group
+	id := vars["id"]
+	group = core.SelectGroup(utils.ToInt(id))
+
+	if group == nil {
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	auth := IsUser(r)
-	groups := core.SelectGroups(false, auth)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(groups)
+
+	ExecuteResponse(w, r, "group.gohtml", group, nil)
+}
+
+// apiAllGroupHandler will show all the groups
+func apiAllGroupHandler(w http.ResponseWriter, r *http.Request) {
+	auth, admin := IsUser(r), IsAdmin(r)
+	groups := core.SelectGroups(admin, auth)
+	returnJson(groups, w, r)
 }
 
 // apiGroupHandler will show a single group
 func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsReadAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	group := core.SelectGroup(utils.ToInt(vars["id"]))
 	if group == nil {
 		sendErrorJson(errors.New("group not found"), w, r)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(group)
+	returnJson(group, w, r)
+}
+
+// apiGroupUpdateHandler will update a group
+func apiGroupUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	group := core.SelectGroup(utils.ToInt(vars["id"]))
+	if group == nil {
+		sendErrorJson(errors.New("group not found"), w, r)
+		return
+	}
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&group)
+	_, err := group.Update()
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	sendJsonAction(group, "update", w, r)
 }
 
 // apiCreateGroupHandler accepts a POST method to create new groups
 func apiCreateGroupHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	var group *core.Group
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&group)
@@ -75,10 +94,6 @@ func apiCreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 // apiGroupDeleteHandler accepts a DELETE method to delete groups
 func apiGroupDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		sendUnauthorizedJson(w, r)
-		return
-	}
 	vars := mux.Vars(r)
 	group := core.SelectGroup(utils.ToInt(vars["id"]))
 	if group == nil {
@@ -99,10 +114,6 @@ type groupOrder struct {
 }
 
 func apiGroupReorderHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	r.ParseForm()
 	var newOrder []*groupOrder
 	decoder := json.NewDecoder(r.Body)
@@ -112,6 +123,5 @@ func apiGroupReorderHandler(w http.ResponseWriter, r *http.Request) {
 		group.Order = g.Order
 		group.Update()
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(newOrder)
+	returnJson(newOrder, w, r)
 }

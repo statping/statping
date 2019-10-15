@@ -62,13 +62,12 @@ type Notification struct {
 	Delay       time.Duration      `gorm:"-" json:"delay,string"`
 	Queue       []*QueueData       `gorm:"-" json:"-"`
 	Running     chan bool          `gorm:"-" json:"-"`
-	Online      bool               `gorm:"-" json:"online"`
 	testable    bool               `gorm:"-" json:"testable"`
 }
 
 // QueueData is the struct for the messaging queue with service
 type QueueData struct {
-	Id   int64
+	Id   string
 	Data interface{}
 }
 
@@ -100,7 +99,7 @@ func (n *Notification) AfterFind() (err error) {
 }
 
 // AddQueue will add any type of interface (json, string, struct, etc) into the Notifiers queue
-func (n *Notification) AddQueue(uid int64, msg interface{}) {
+func (n *Notification) AddQueue(uid string, msg interface{}) {
 	data := &QueueData{uid, msg}
 	n.Queue = append(n.Queue, data)
 }
@@ -180,6 +179,7 @@ func (n *Notification) makeLog(msg interface{}) {
 		Time:      utils.Timestamp(time.Now()),
 		Timestamp: time.Now(),
 	}
+	utils.Log(1, fmt.Sprintf("Notifier %v has sent a message %v", n.Method, log.Message))
 	n.logs = append(n.logs, log)
 }
 
@@ -431,10 +431,10 @@ func (n *Notification) ResetQueue() {
 }
 
 // ResetQueue will clear the notifiers Queue for a service
-func (n *Notification) ResetUniqueQueue(id int64) []*QueueData {
+func (n *Notification) ResetUniqueQueue(uid string) []*QueueData {
 	var queue []*QueueData
 	for _, v := range n.Queue {
-		if v.Id != id {
+		if v.Id != uid {
 			queue = append(queue, v)
 		}
 	}

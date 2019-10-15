@@ -66,33 +66,16 @@ func TestCommandNotifier(t *testing.T) {
 		assert.Equal(t, 1, len(command.Queue))
 	})
 
-	t.Run("command OnFailure multiple times", func(t *testing.T) {
-		for i := 0; i <= 50; i++ {
-			command.OnFailure(TestService, TestFailure)
-		}
-		assert.Equal(t, 52, len(command.Queue))
-	})
-
-	t.Run("command Check Offline", func(t *testing.T) {
-		assert.False(t, command.Online)
-	})
-
 	t.Run("command OnSuccess", func(t *testing.T) {
 		command.OnSuccess(TestService)
 		assert.Equal(t, 1, len(command.Queue))
 	})
 
-	t.Run("command Queue after being online", func(t *testing.T) {
-		assert.True(t, command.Online)
-		assert.Equal(t, 1, len(command.Queue))
-	})
-
 	t.Run("command OnSuccess Again", func(t *testing.T) {
-		assert.True(t, command.Online)
 		command.OnSuccess(TestService)
 		assert.Equal(t, 1, len(command.Queue))
 		go notifier.Queue(command)
-		time.Sleep(5 * time.Second)
+		time.Sleep(20 * time.Second)
 		assert.Equal(t, 0, len(command.Queue))
 	})
 

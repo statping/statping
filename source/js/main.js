@@ -86,6 +86,29 @@ $('.scrollclick').on('click',function(e) {
 	e.preventDefault();
 });
 
+$('.toggle-service').on('click',function(e) {
+	let obj = $(this);
+	let serviceId = obj.attr("data-id");
+	let online = obj.attr("data-online");
+	let d = confirm("Do you want to "+(eval(online) ? "stop" : "start")+" checking this service?");
+	if (d) {
+		$.ajax({
+			url: "/api/services/" + serviceId + "/running",
+			type: 'POST',
+			success: function (data) {
+				if (online === "true") {
+					obj.removeClass("fa-toggle-on text-success");
+					obj.addClass("fa-toggle-off text-black-50");
+				} else {
+					obj.removeClass("fa-toggle-off text-black-50");
+					obj.addClass("fa-toggle-on text-success");
+				}
+				obj.attr("data-online", online !== "true");
+			}
+		});
+	}
+});
+
 $('select#service_type').on('change', function() {
     var selected = $('#service_type option:selected').val();
     var typeLabel = $('#service_type_label');
@@ -96,6 +119,15 @@ $('select#service_type').on('change', function() {
             typeLabel.html('UDP Port')
         }
         $('#service_port').parent().parent().removeClass('d-none');
+        $('#service_check_type').parent().parent().addClass('d-none');
+        $('#service_url').attr('placeholder', '192.168.1.1');
+        $('#post_data').parent().parent().addClass('d-none');
+        $('#service_response').parent().parent().addClass('d-none');
+        $('#service_response_code').parent().parent().addClass('d-none');
+				$('#headers').parent().parent().addClass('d-none');
+    } else if (selected === 'icmp') {
+        $('#service_port').parent().parent().removeClass('d-none');
+        $('#headers').parent().parent().addClass('d-none');
         $('#service_check_type').parent().parent().addClass('d-none');
         $('#service_url').attr('placeholder', '192.168.1.1');
         $('#post_data').parent().parent().addClass('d-none');
@@ -113,6 +145,9 @@ $('select#service_type').on('change', function() {
 
 
 async function RenderChart(chart, service, start=0, end=9999999999, group="hour", retry=true) {
+		if (!chart.el) {
+			return
+		}
     let chartData = await ChartLatency(service, start, end, group, retry);
     if (!chartData) {
         chartData = await ChartLatency(service, start, end, "minute", retry);
@@ -279,7 +314,6 @@ $('form.ajax_form').on('submit', function() {
 		arrayData.push(newArr)
 	});
 	let sendData = JSON.stringify(newArr);
-	// console.log('sending '+method.toUpperCase()+' '+action+':',  sendData);
 	$.ajax({
 		url: action,
 		type: method,
@@ -371,8 +405,24 @@ $(function() {
 
 $('.confirm-btn').on('click', function() {
     var r = confirm('Are you sure you want to delete?');
+    let obj = $(this);
+    let redirect = obj.attr('data-redirect');
+    let href = obj.attr('href');
+    let method = obj.attr('data-method');
+    let data = obj.attr('data-object');
     if (r === true) {
-        return true;
+        $.ajax({
+            url: href,
+            type: method,
+            data: data ? data : null,
+            success: function (data) {
+                console.log("send to url: ", href);
+                if (redirect) {
+                    window.location.href = redirect;
+                }
+                return false;
+            }
+        });
     } else {
         return false;
     }

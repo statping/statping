@@ -1081,7 +1081,7 @@
 								"exec": [
 									"pm.test(\"View All Groups\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.length).to.eql(2);",
+									"    pm.expect(jsonData.length).to.eql(3);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1364,6 +1364,57 @@
 							"body": "{\n    \"status\": \"success\",\n    \"type\": \"group\",\n    \"method\": \"create\",\n    \"id\": 3,\n    \"output\": {\n        \"id\": 3,\n        \"name\": \"New Group\",\n        \"public\": true,\n        \"created_at\": \"2019-01-03T13:49:25.947069211-08:00\",\n        \"updated_at\": \"2019-01-03T13:49:25.947120276-08:00\"\n    }\n}"
 						}
 					]
+				},
+				{
+					"name": "Reorder Groups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b5a67a19-fd08-40b0-a961-3e9474ab78c6",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[{\"group\":1,\"order\":1},{\"group\":2,\"order\":2}]"
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/groups/reorder",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"groups",
+								"reorder"
+							]
+						},
+						"description": "Reorder services in a specific order for the index page."
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Group",

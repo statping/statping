@@ -16,73 +16,67 @@
 package handlers
 
 import (
+	"bytes"
 	"fmt"
-	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
+	"time"
 )
 
 func settingsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, nil)
 }
 
 func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	var err error
-	r.ParseForm()
+	form := parseForm(r)
 	app := core.CoreApp
-	name := r.PostForm.Get("project")
+	name := form.Get("project")
 	if name != "" {
 		app.Name = name
 	}
-	description := r.PostForm.Get("description")
+	description := form.Get("description")
 	if description != app.Description {
 		app.Description = description
 	}
-	style := r.PostForm.Get("style")
+	style := form.Get("style")
 	if style != app.Style {
 		app.Style = style
 	}
-	footer := r.PostForm.Get("footer")
+	footer := form.Get("footer")
 	if footer != app.Footer.String {
 		app.Footer = types.NewNullString(footer)
 	}
-	domain := r.PostForm.Get("domain")
+	domain := form.Get("domain")
 	if domain != app.Domain {
 		app.Domain = domain
 	}
-	timezone := r.PostForm.Get("timezone")
+	timezone := form.Get("timezone")
 	timeFloat, _ := strconv.ParseFloat(timezone, 10)
 	app.Timezone = float32(timeFloat)
 
-	app.UseCdn = types.NewNullBool(r.PostForm.Get("enable_cdn") == "on")
+	app.UpdateNotify = types.NewNullBool(form.Get("update_notify") == "true")
+
+	app.UseCdn = types.NewNullBool(form.Get("enable_cdn") == "on")
 	core.CoreApp, err = core.UpdateCore(app)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("issue updating Core: %v", err.Error()))
 	}
+
+
 	//notifiers.OnSettingsSaved(core.CoreApp.ToCore())
 	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
 }
 
 func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-	r.ParseForm()
-	form := r.PostForm
+	form := parseForm(r)
 	theme := form.Get("theme")
 	variables := form.Get("variables")
 	mobile := form.Get("mobile")
@@ -95,19 +89,13 @@ func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	dir := utils.Directory
-	err := source.CreateAllAssets(dir)
-	if err != nil {
+	if err := source.CreateAllAssets(dir); err != nil {
 		utils.Log(3, err)
 		sendErrorJson(err, w, r)
 		return
 	}
-	err = source.CompileSASS(dir)
-	if err != nil {
+	if err := source.CompileSASS(dir); err != nil {
 		source.CopyToPublic(source.CssBox, dir+"/assets/css", "base.css")
 		utils.Log(3, "Default 'base.css' was inserted because SASS did not work.")
 	}
@@ -116,18 +104,101 @@ func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
+	if err := source.DeleteAllAssets(utils.Directory); err != nil {
+		utils.Log(3, fmt.Errorf("error deleting all assets %v", err))
 	}
-	source.DeleteAllAssets(utils.Directory)
 	resetRouter()
 	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
 }
 
-func parseId(r *http.Request) int64 {
-	vars := mux.Vars(r)
-	return utils.ToInt(vars["id"])
+func bulkImportHandler(w http.ResponseWriter, r *http.Request) {
+	var fileData bytes.Buffer
+	file, _, err := r.FormFile("file")
+	if err != nil {
+		utils.Log(3, fmt.Errorf("error bulk import services: %v", err))
+		w.Write([]byte(err.Error()))
+		return
+	}
+	defer file.Close()
+
+	io.Copy(&fileData, file)
+	data := fileData.String()
+
+	for i, line := range strings.Split(strings.TrimSuffix(data, "\n"), "\n")[1:] {
+		col := strings.Split(line, ",")
+
+		newService, err := commaToService(col)
+		if err != nil {
+			utils.Log(3, fmt.Errorf("issue with row %v: %v", i, err))
+			continue
+		}
+
+		service := core.ReturnService(newService)
+		_, err = service.Create(true)
+		if err != nil {
+			utils.Log(3, fmt.Errorf("cannot create service %v: %v", col[0], err))
+			continue
+		}
+		utils.Log(1, fmt.Sprintf("Created new service %v", service.Name))
+	}
+
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+}
+
+// commaToService will convert a CSV comma delimited string slice to a Service type
+// this function is used for the bulk import services feature
+func commaToService(s []string) (*types.Service, error) {
+	if len(s) != 17 {
+		err := fmt.Errorf("does not have the expected amount of %v columns for a service", 16)
+		return nil, err
+	}
+
+	interval, err := time.ParseDuration(s[4])
+	if err != nil {
+		return nil, err
+	}
+
+	timeout, err := time.ParseDuration(s[9])
+	if err != nil {
+		return nil, err
+	}
+
+	allowNotifications, err := strconv.ParseBool(s[11])
+	if err != nil {
+		return nil, err
+	}
+
+	public, err := strconv.ParseBool(s[12])
+	if err != nil {
+		return nil, err
+	}
+
+	verifySsl, err := strconv.ParseBool(s[16])
+	if err != nil {
+		return nil, err
+	}
+
+	newService := &types.Service{
+		Name:               s[0],
+		Domain:             s[1],
+		Expected:           types.NewNullString(s[2]),
+		ExpectedStatus:     int(utils.ToInt(s[3])),
+		Interval:           int(utils.ToInt(interval.Seconds())),
+		Type:               s[5],
+		Method:             s[6],
+		PostData:           types.NewNullString(s[7]),
+		Port:               int(utils.ToInt(s[8])),
+		Timeout:            int(utils.ToInt(timeout.Seconds())),
+		AllowNotifications: types.NewNullBool(allowNotifications),
+		Public:             types.NewNullBool(public),
+		GroupId:            int(utils.ToInt(s[13])),
+		Headers:            types.NewNullString(s[14]),
+		Permalink:          types.NewNullString(s[15]),
+		VerifySSL:          types.NewNullBool(verifySsl),
+	}
+
+	return newService, nil
+
 }
 
 func parseForm(r *http.Request) url.Values {

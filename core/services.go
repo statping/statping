@@ -55,6 +55,21 @@ func SelectService(id int64) *Service {
 	return nil
 }
 
+func SelectServices(auth bool) []*Service {
+	var validServices []*Service
+	for _, sr := range CoreApp.Services {
+		s := sr.(*Service)
+		if !s.Public.Bool {
+			if auth {
+				validServices = append(validServices, s)
+			}
+		} else {
+			validServices = append(validServices, s)
+		}
+	}
+	return validServices
+}
+
 // SelectServiceLink returns a *core.Service from the service permalink
 func SelectServiceLink(permalink string) *Service {
 	for _, s := range Services() {
@@ -181,13 +196,13 @@ func (s *Service) lastFailure() *Failure {
 //		// Online since Monday 3:04:05PM, Jan _2 2006
 func (s *Service) SmallText() string {
 	last := s.LimitedFailures(1)
-	hits, _ := s.LimitedHits(1)
+	//hits, _ := s.LimitedHits(1)
 	zone := CoreApp.Timezone
 	if s.Online {
 		if len(last) == 0 {
 			return fmt.Sprintf("Online since %v", utils.Timezoner(s.CreatedAt, zone).Format("Monday 3:04:05PM, Jan _2 2006"))
 		} else {
-			return fmt.Sprintf("Online, last Failure was %v", utils.Timezoner(hits[0].CreatedAt, zone).Format("Monday 3:04:05PM, Jan _2 2006"))
+			return fmt.Sprintf("Online, last Failure was %v", utils.Timezoner(last[0].CreatedAt, zone).Format("Monday 3:04:05PM, Jan _2 2006"))
 		}
 	}
 	if len(last) > 0 {
@@ -378,7 +393,7 @@ func (s *Service) Update(restart bool) error {
 	if !s.AllowNotifications.Bool {
 		for _, n := range CoreApp.Notifications {
 			notif := n.(notifier.Notifier).Select()
-			notif.ResetUniqueQueue(s.Id)
+			notif.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		}
 	}
 	if restart {

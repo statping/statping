@@ -3,6 +3,7 @@
 {{ define "content" }}
 {{$s := .Service}}
 {{$failures := $s.LimitedFailures 16}}
+{{$incidents := $s.Incidents}}
 {{$checkinFailures := $s.LimitedCheckinFailures 16}}
 {{$isAdmin := Auth}}
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
@@ -83,6 +84,7 @@
     <nav class="nav nav-pills flex-column flex-sm-row mt-3" id="service_tabs" role="serviceLists">
         {{if $isAdmin}}<a class="flex-sm-fill text-sm-center nav-link active" id="edit-tab" data-toggle="tab" href="#edit" role="tab" aria-controls="edit" aria-selected="false">Edit Service</a>{{end}}
         <a class="flex-sm-fill text-sm-center nav-link{{ if not $failures }} disabled{{end}}" id="failures-tab" data-toggle="tab" href="#failures" role="tab" aria-controls="failures" aria-selected="true">Failures</a>
+        <a class="flex-sm-fill text-sm-center nav-link{{ if not $incidents }} disabled{{end}}" id="incidents-tab" data-toggle="tab" href="#incidents" role="tab" aria-controls="incidents" aria-selected="true">Incidents</a>
         {{if $isAdmin}}<a class="flex-sm-fill text-sm-center nav-link" id="checkins-tab" data-toggle="tab" href="#checkins" role="tab" aria-controls="checkins" aria-selected="false">Checkins</a>{{end}}
         <a class="flex-sm-fill text-sm-center nav-link{{if not $isAdmin}} active{{end}}" id="response-tab" data-toggle="tab" href="#response" role="tab" aria-controls="response" aria-selected="false">Response</a>
     </nav>
@@ -104,6 +106,36 @@
         {{ end }}
         </div>
         {{end}}
+        <div class="tab-pane fade" id="incidents" role="serviceLists" aria-labelledby="incidents-tab">
+            {{ if $incidents }}
+                <div class="list-group mt-3 mb-4">
+                    {{ range $incidents }}
+                        <div class="list-group-item flex-column align-items-start">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{.Title}}</h5>
+                                <small>{{.CreatedAt}}</small>
+                            </div>
+                            <p class="mb-1">{{.Description}}</p>
+
+                            <ul class="list-group mt-3">
+                                {{ range .AllUpdates }}
+                                    <li class="list-group-item">
+                                        <p>
+                                            <span class="badge badge-primary">{{.Type}}</span>
+                                            <span class="float-right">
+                                                {{.Message}}
+                                                <p class="text-muted text-right small">{{.CreatedAt}}</p>
+                                            </span>
+                                        </p>
+                                    </li>
+                                {{end}}
+                            </ul>
+
+                        </div>
+                    {{ end }}
+                </div>
+            {{ end }}
+        </div>
         {{if $isAdmin}}
         <div class="tab-pane fade" id="checkins" role="serviceLists" aria-labelledby="checkins-tab">
             {{if $s.AllCheckins}}
@@ -303,11 +335,14 @@ async function RenderHeatmap() {
 }
 
 async function RenderChartLatency() {
+	options.fill.colors = {{if $s.Online}}["#48d338"]{{else}}["#dd3545"]{{end}};
+	options.stroke.colors = {{if $s.Online}}["#3aa82d"]{{else}}["#c23342"]{{end}};
     let chart = new ApexCharts(document.querySelector("#service"), options);
     await RenderChart(chart,{{$s.Id}},{{.StartUnix}},{{.EndUnix}},"hour");
 }
 
 $(document).ready(async function() {
+
     let startDate = $("#service_start").flatpickr({
         enableTime: false,
         static: true,

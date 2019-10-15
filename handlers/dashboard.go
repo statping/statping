@@ -41,9 +41,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		resetCookies()
 	}
 	session, _ := sessionStore.Get(r, cookieKey)
-	r.ParseForm()
-	username := r.PostForm.Get("username")
-	password := r.PostForm.Get("password")
+	form := parseForm(r)
+	username := form.Get("username")
+	password := form.Get("password")
 	user, auth := core.AuthUser(username, password)
 	if auth {
 		session.Values["authenticated"] = true
@@ -77,10 +77,6 @@ func helpHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func logsHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
 	utils.LockLines.Lock()
 	logs := make([]string, 0)
 	length := len(utils.LastLines)
@@ -93,10 +89,6 @@ func logsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func logsLineHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsReadAuthenticated(r) {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
 	if lastLine := utils.GetLastLine(); lastLine != nil {
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(http.StatusOK)
@@ -105,11 +97,6 @@ func logsLineHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func exportHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsFullAuthenticated(r) {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
 	var notifiers []*notifier.Notification
 	for _, v := range core.CoreApp.Notifications {
 		notifier := v.(notifier.Notifier)
