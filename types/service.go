@@ -50,6 +50,10 @@ type Service struct {
 	Checkpoint         time.Time          `gorm:"-" json:"-"`
 	SleepDuration      time.Duration      `gorm:"-" json:"-"`
 	LastResponse       string             `gorm:"-" json:"-"`
+	UserNotified       bool               `gorm:"-" json:"-"` // True if the User was already notified about a Downtime
+	UpdateNotify       bool               `gorm:"-" json:"-"` // This Variable is a simple copy of `core.CoreApp.UpdateNotify.Bool`
+	DownText           string             `gorm:"-" json:"-"` // Contains the current generated Downtime Text
+	SuccessNotified    bool               `gorm:"-" json:"-"` // Is 'true' if the user has already be informed that the Services now again available
 	LastStatusCode     int                `gorm:"-" json:"status_code"`
 	LastOnline         time.Time          `gorm:"-" json:"last_success"`
 	Failures           []FailureInterface `gorm:"-" json:"failures,omitempty"`

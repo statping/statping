@@ -38,6 +38,19 @@ func OnFailure(s *types.Service, f *types.Failure) {
 	if !s.AllowNotifications.Bool {
 		return
 	}
+
+	// check if User wants to receive every Status Change
+	if s.UpdateNotify {
+		// send only if User hasn't been already notified about the Downtime
+		if !s.UserNotified {
+			s.UserNotified = true
+			goto sendMessages
+		} else {
+			return
+		}
+	}
+
+sendMessages:
 	for _, comm := range AllCommunications {
 		if isType(comm, new(BasicEvents)) && isEnabled(comm) && inLimits(comm) {
 			notifier := comm.(Notifier).Select()
@@ -45,7 +58,6 @@ func OnFailure(s *types.Service, f *types.Failure) {
 			comm.(BasicEvents).OnFailure(s, f)
 		}
 	}
-
 }
 
 // OnSuccess will be triggered when a service is successful - BasicEvents interface
@@ -53,6 +65,12 @@ func OnSuccess(s *types.Service) {
 	if !s.AllowNotifications.Bool {
 		return
 	}
+
+	// check if User wants to receive every Status Change
+	if s.UpdateNotify && s.UserNotified {
+		s.UserNotified = false
+	}
+
 	for _, comm := range AllCommunications {
 		if isType(comm, new(BasicEvents)) && isEnabled(comm) && inLimits(comm) {
 			notifier := comm.(Notifier).Select()
@@ -60,7 +78,6 @@ func OnSuccess(s *types.Service) {
 			comm.(BasicEvents).OnSuccess(s)
 		}
 	}
-
 }
 
 // OnNewService is triggered when a new service is created - ServiceEvents interface
