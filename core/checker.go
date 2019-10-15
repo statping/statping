@@ -261,8 +261,8 @@ func recordSuccess(s *Service) {
 	}
 	utils.Log(1, fmt.Sprintf("Service %v Successful Response: %0.2f ms | Lookup in: %0.2f ms", s.Name, hit.Latency*1000, hit.PingTime*1000))
 	s.CreateHit(hit)
-	s.Online = true
 	notifier.OnSuccess(s.Service)
+	s.Online = true
 	s.SuccessNotified = true
 }
 
