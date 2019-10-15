@@ -62,11 +62,15 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	timeFloat, _ := strconv.ParseFloat(timezone, 10)
 	app.Timezone = float32(timeFloat)
 
+	app.UpdateNotify = types.NewNullBool(form.Get("update_notify") == "true")
+
 	app.UseCdn = types.NewNullBool(form.Get("enable_cdn") == "on")
 	core.CoreApp, err = core.UpdateCore(app)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("issue updating Core: %v", err.Error()))
 	}
+
+
 	//notifiers.OnSettingsSaved(core.CoreApp.ToCore())
 	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
 }

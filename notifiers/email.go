@@ -198,11 +198,17 @@ func (u *email) OnFailure(s *types.Service, f *types.Failure) {
 
 // OnSuccess will trigger successful service
 func (u *email) OnSuccess(s *types.Service) {
-	if !s.Online {
+	if !s.Online || !s.SuccessNotified {
+		var msg string
+		if s.UpdateNotify {
+			s.UpdateNotify = false
+		}
+		msg = s.DownText
+
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		email := &emailOutgoing{
 			To:       u.Var2,
-			Subject:  fmt.Sprintf("Service %v is Back Online", s.Name),
+			Subject:  msg,
 			Template: mainEmailTemplate,
 			Data:     interface{}(s),
 			From:     u.Var1,
