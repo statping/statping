@@ -62,6 +62,10 @@ type Service struct {
 	LastOnline               time.Time          `gorm:"-" json:"last_success"`
 	Failures                 []FailureInterface `gorm:"-" json:"failures,omitempty"`
 	Checkins                 []CheckinInterface `gorm:"-" json:"checkins,omitempty"`
+	UserNotified             bool               `gorm:"-" json:"-"` // True if the User was already notified about a Downtime
+	UpdateNotify             bool               `gorm:"-" json:"-"` // This Variable is a simple copy of `core.CoreApp.UpdateNotify.Bool`
+	DownText                 string             `gorm:"-" json:"-"` // Contains the current generated Downtime Text
+	SuccessNotified          bool               `gorm:"-" json:"-"` // Is 'true' if the user has already be informed that the Services now again available
 }
 
 // BeforeCreate for Service will set CreatedAt to UTC
