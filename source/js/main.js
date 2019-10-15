@@ -90,7 +90,7 @@ $('.toggle-service').on('click',function(e) {
 	let obj = $(this);
 	let serviceId = obj.attr("data-id");
 	let online = obj.attr("data-online");
-	let d = confirm("Do you want to "+(online ? "stop" : "start")+" checking this service?");
+	let d = confirm("Do you want to "+(eval(online) ? "stop" : "start")+" checking this service?");
 	if (d) {
 		$.ajax({
 			url: "/api/services/" + serviceId + "/running",
@@ -145,6 +145,9 @@ $('select#service_type').on('change', function() {
 
 
 async function RenderChart(chart, service, start=0, end=9999999999, group="hour", retry=true) {
+		if (!chart.el) {
+			return
+		}
     let chartData = await ChartLatency(service, start, end, group, retry);
     if (!chartData) {
         chartData = await ChartLatency(service, start, end, "minute", retry);

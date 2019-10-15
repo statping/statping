@@ -59,7 +59,7 @@ func init() {
 // Send will send a HTTP Post to the discord API. It accepts type: []byte
 func (u *discord) Send(msg interface{}) error {
 	message := msg.(string)
-	_, _, err := utils.HttpRequest(discorder.GetValue("host"), "POST", "application/json", nil, strings.NewReader(message), time.Duration(10*time.Second))
+	_, _, err := utils.HttpRequest(discorder.GetValue("host"), "POST", "application/json", nil, strings.NewReader(message), time.Duration(10*time.Second), true)
 	return err
 }
 
@@ -75,9 +75,14 @@ func (u *discord) OnFailure(s *types.Service, f *types.Failure) {
 
 // OnSuccess will trigger successful service
 func (u *discord) OnSuccess(s *types.Service) {
-	if !s.Online {
+	if !s.Online || !s.SuccessNotified {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
-		msg := fmt.Sprintf(`{"content": "Your service '%v' is back online!"}`, s.Name)
+		var msg interface{}
+		if s.UpdateNotify {
+			s.UpdateNotify = false
+		}
+		msg = s.DownText
+
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}
 }
@@ -93,7 +98,7 @@ func (u *discord) OnSave() error {
 func (u *discord) OnTest() error {
 	outError := errors.New("Incorrect discord URL, please confirm URL is correct")
 	message := `{"content": "Testing the discord notifier"}`
-	contents, _, err := utils.HttpRequest(discorder.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(message)), time.Duration(10*time.Second))
+	contents, _, err := utils.HttpRequest(discorder.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(message)), time.Duration(10*time.Second), true)
 	if string(contents) == "" {
 		return nil
 	}

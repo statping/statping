@@ -16,6 +16,7 @@
 package utils
 
 import (
+	"context"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -24,6 +25,7 @@ import (
 	"io/ioutil"
 	"math"
 	"math/rand"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -274,21 +276,8 @@ func SaveFile(filename string, data []byte) error {
 // // body - The body or form data to send with HTTP request
 // // timeout - Specific duration to timeout on. time.Duration(30 * time.Seconds)
 // // You can use a HTTP Proxy if you HTTP_PROXY environment variable
-func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration) ([]byte, *http.Response, error) {
+func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool) ([]byte, *http.Response, error) {
 	var err error
-	transport := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: true,
-		},
-		DisableKeepAlives:     true,
-		ResponseHeaderTimeout: timeout,
-		TLSHandshakeTimeout:   timeout,
-		Proxy:                 http.ProxyFromEnvironment,
-	}
-	client := &http.Client{
-		Transport: transport,
-		Timeout:   timeout,
-	}
 	var req *http.Request
 	if req, err = http.NewRequest(method, url, body); err != nil {
 		return nil, nil, err
@@ -310,6 +299,32 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 		}
 	}
 	var resp *http.Response
+
+	dialer := &net.Dialer{
+		Timeout:   timeout,
+		KeepAlive: timeout,
+	}
+
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: !verifySSL,
+			ServerName:         req.Host,
+		},
+		DisableKeepAlives:     true,
+		ResponseHeaderTimeout: timeout,
+		TLSHandshakeTimeout:   timeout,
+		Proxy:                 http.ProxyFromEnvironment,
+		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+			// redirect all connections to host specified in url
+			addr = strings.Split(req.URL.Host, ":")[0] + addr[strings.LastIndex(addr, ":"):]
+			return dialer.DialContext(ctx, network, addr)
+		},
+	}
+	client := &http.Client{
+		Transport: transport,
+		Timeout:   timeout,
+	}
+
 	if resp, err = client.Do(req); err != nil {
 		return nil, resp, err
 	}

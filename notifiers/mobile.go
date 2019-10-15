@@ -105,10 +105,16 @@ func (u *mobilePush) OnFailure(s *types.Service, f *types.Failure) {
 // OnSuccess will trigger successful service
 func (u *mobilePush) OnSuccess(s *types.Service) {
 	data := dataJson(s, nil)
-	if !s.Online {
+	if !s.Online || !s.SuccessNotified {
+		var msgStr string
+		if s.UpdateNotify {
+			s.UpdateNotify = false
+		}
+		msgStr = s.DownText
+
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		msg := &pushArray{
-			Message: fmt.Sprintf("Your service '%v' is back online!", s.Name),
+			Message: msgStr,
 			Title:   "Service Online",
 			Topic:   mobileIdentifier,
 			Data:    data,
@@ -176,7 +182,7 @@ func pushRequest(msg *pushArray) ([]byte, error) {
 		return nil, err
 	}
 	url := "https://push.statping.com/api/push"
-	body, _, err = utils.HttpRequest(url, "POST", "application/json", nil, bytes.NewBuffer(body), time.Duration(20*time.Second))
+	body, _, err = utils.HttpRequest(url, "POST", "application/json", nil, bytes.NewBuffer(body), time.Duration(20*time.Second), true)
 	return body, err
 }
 

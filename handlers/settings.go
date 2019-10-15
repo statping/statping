@@ -62,11 +62,15 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	timeFloat, _ := strconv.ParseFloat(timezone, 10)
 	app.Timezone = float32(timeFloat)
 
+	app.UpdateNotify = types.NewNullBool(form.Get("update_notify") == "true")
+
 	app.UseCdn = types.NewNullBool(form.Get("enable_cdn") == "on")
 	core.CoreApp, err = core.UpdateCore(app)
 	if err != nil {
 		utils.Log(3, fmt.Sprintf("issue updating Core: %v", err.Error()))
 	}
+
+
 	//notifiers.OnSettingsSaved(core.CoreApp.ToCore())
 	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
 }
@@ -144,7 +148,7 @@ func bulkImportHandler(w http.ResponseWriter, r *http.Request) {
 // commaToService will convert a CSV comma delimited string slice to a Service type
 // this function is used for the bulk import services feature
 func commaToService(s []string) (*types.Service, error) {
-	if len(s) != 16 {
+	if len(s) != 17 {
 		err := fmt.Errorf("does not have the expected amount of %v columns for a service", 16)
 		return nil, err
 	}
@@ -169,6 +173,11 @@ func commaToService(s []string) (*types.Service, error) {
 		return nil, err
 	}
 
+	verifySsl, err := strconv.ParseBool(s[16])
+	if err != nil {
+		return nil, err
+	}
+
 	newService := &types.Service{
 		Name:               s[0],
 		Domain:             s[1],
@@ -185,6 +194,7 @@ func commaToService(s []string) (*types.Service, error) {
 		GroupId:            int(utils.ToInt(s[13])),
 		Headers:            types.NewNullString(s[14]),
 		Permalink:          types.NewNullString(s[15]),
+		VerifySSL:          types.NewNullBool(verifySsl),
 	}
 
 	return newService, nil
