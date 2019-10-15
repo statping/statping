@@ -38,14 +38,26 @@ func OnFailure(s *types.Service, f *types.Failure) {
 	if !s.AllowNotifications.Bool {
 		return
 	}
+
+	// check if User wants to receive every Status Change
+	if s.UpdateNotify {
+		// send only if User hasn't been already notified about the Downtime
+		if !s.UserNotified {
+			s.UserNotified = true
+			goto sendMessages
+		} else {
+			return
+		}
+	}
+
+sendMessages:
 	for _, comm := range AllCommunications {
-		if isType(comm, new(BasicEvents)) && isEnabled(comm) && inLimits(comm) {
+		if isType(comm, new(BasicEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) {
 			notifier := comm.(Notifier).Select()
 			utils.Log(1, fmt.Sprintf("Sending failure %v notification for service %v", notifier.Method, s.Name))
 			comm.(BasicEvents).OnFailure(s, f)
 		}
 	}
-
 }
 
 // OnSuccess will be triggered when a service is successful - BasicEvents interface
@@ -53,14 +65,19 @@ func OnSuccess(s *types.Service) {
 	if !s.AllowNotifications.Bool {
 		return
 	}
+
+	// check if User wants to receive every Status Change
+	if s.UpdateNotify && s.UserNotified {
+		s.UserNotified = false
+	}
+
 	for _, comm := range AllCommunications {
-		if isType(comm, new(BasicEvents)) && isEnabled(comm) && inLimits(comm) {
+		if isType(comm, new(BasicEvents)) && isEnabled(comm) && (!s.Online || inLimits(comm)) {
 			notifier := comm.(Notifier).Select()
 			utils.Log(1, fmt.Sprintf("Sending successful %v notification for service %v", notifier.Method, s.Name))
 			comm.(BasicEvents).OnSuccess(s)
 		}
 	}
-
 }
 
 // OnNewService is triggered when a new service is created - ServiceEvents interface

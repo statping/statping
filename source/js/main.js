@@ -153,11 +153,9 @@ async function RenderChart(chart, service, start=0, end=9999999999, group="hour"
         chartData = await ChartLatency(service, start, end, "minute", retry);
     }
     chart.render();
-    if (chartData) {
-			chart.updateSeries([{
-				data: chartData
-			}]);
-		}
+    chart.updateSeries([{
+        data: chartData || []
+    }]);
 }
 
 
