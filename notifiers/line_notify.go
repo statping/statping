@@ -78,16 +78,22 @@ func (u *lineNotifier) OnFailure(s *types.Service, f *types.Failure) {
 
 // OnSuccess will trigger successful service
 func (u *lineNotifier) OnSuccess(s *types.Service) {
-	if !s.Online {
+	if !s.Online || !s.SuccessNotified {
+		var msg string
+		if s.UpdateNotify {
+			s.UpdateNotify = false
+		}
+		msg = s.DownText
+
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
-		msg := fmt.Sprintf("Your service '%v' is back online!", s.Name)
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}
 }
 
 // OnSave triggers when this notifier has been saved
 func (u *lineNotifier) OnSave() error {
-	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
-	// Do updating stuff here
+	msg := fmt.Sprintf("Notification %v is receiving updated information.", u.Method)
+	utils.Log(1, msg)
+	u.AddQueue("saved", message)
 	return nil
 }

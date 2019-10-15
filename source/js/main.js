@@ -90,7 +90,7 @@ $('.toggle-service').on('click',function(e) {
 	let obj = $(this);
 	let serviceId = obj.attr("data-id");
 	let online = obj.attr("data-online");
-	let d = confirm("Do you want to "+(online ? "stop" : "start")+" checking this service?");
+	let d = confirm("Do you want to "+(eval(online) ? "stop" : "start")+" checking this service?");
 	if (d) {
 		$.ajax({
 			url: "/api/services/" + serviceId + "/running",
