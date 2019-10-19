@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"sync"
 	"syscall"
 	"time"
@@ -89,6 +90,19 @@ func rotate() {
 	}()
 }
 
+func ByteCountDecimal(b uint64) string {
+	const unit = 1024
+	if b < unit {
+		return fmt.Sprintf("%d B", b)
+	}
+	div, exp := uint64(unit), 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.3f %cB", float64(b)/float64(div), "kMGTPE"[exp])
+}
+
 // Log creates a new entry in the Logger. Log has 1-5 levels depending on how critical the log/error is
 func Log(level int, err interface{}) error {
 	if disableLogs {
@@ -96,30 +110,35 @@ func Log(level int, err interface{}) error {
 	}
 	pushLastLine(err)
 	var outErr error
+
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	totalAlloc := ByteCountDecimal(m.TotalAlloc)
+
 	switch level {
 	case 5:
-		_, outErr = fmt.Printf("PANIC: %v\n", err)
-		fmtLogs.Printf("PANIC: %v\n", err)
+		_, outErr = fmt.Printf("PANIC[%s]: %v\n", totalAlloc,err)
+		fmtLogs.Printf("PANIC[%s]: %v\n", totalAlloc, err)
 	case 4:
-		_, outErr = fmt.Printf("FATAL: %v\n", err)
-		fmtLogs.Printf("FATAL: %v\n", err)
+		_, outErr = fmt.Printf("FATAL[%s]: %v\n", totalAlloc,err)
+		fmtLogs.Printf("FATAL[%s]: %v\n", totalAlloc, err)
 		//color.Red("ERROR: %v\n", err)
 		//os.Exit(2)
 	case 3:
-		_, outErr = fmt.Printf("ERROR: %v\n", err)
-		fmtLogs.Printf("ERROR: %v\n", err)
+		_, outErr = fmt.Printf("ERROR[%s]: %v\n", totalAlloc,err)
+		fmtLogs.Printf("ERROR[%s]: %v\n", totalAlloc, err)
 		//color.Red("ERROR: %v\n", err)
 	case 2:
-		_, outErr = fmt.Printf("WARNING: %v\n", err)
-		fmtLogs.Printf("WARNING: %v\n", err)
+		_, outErr = fmt.Printf("WARNING[%s]: %v\n", totalAlloc,err)
+		fmtLogs.Printf("WARNING[%s]: %v\n", totalAlloc, err)
 		//color.Yellow("WARNING: %v\n", err)
 	case 1:
-		_, outErr = fmt.Printf("INFO: %v\n", err)
-		fmtLogs.Printf("INFO: %v\n", err)
+		_, outErr = fmt.Printf("INFO[%s]: %v\n", totalAlloc,err)
+		fmtLogs.Printf("INFO[%s]: %v\n", totalAlloc, err)
 		//color.Blue("INFO: %v\n", err)
 	case 0:
-		_, outErr = fmt.Printf("%v\n", err)
-		fmtLogs.Printf("%v\n", err)
+		_, outErr = fmt.Printf("[%s]%v\n", totalAlloc,err)
+		fmtLogs.Printf("[%s]%v\n", totalAlloc, err)
 		//color.White("%v\n", err)
 	}
 	return outErr
