@@ -343,8 +343,9 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	if resp, err = client.Do(req); err != nil {
 		return nil, resp, err
 	}
-	defer resp.Body.Close()
 	contents, err := ioutil.ReadAll(resp.Body)
+	_ = resp.Body.Close()
+	client.CloseIdleConnections()
 	return contents, resp, err
 }
 
