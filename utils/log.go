@@ -104,44 +104,40 @@ func ByteCountDecimal(b uint64) string {
 }
 
 // Log creates a new entry in the Logger. Log has 1-5 levels depending on how critical the log/error is
-func Log(level int, err interface{}) error {
+func Log(level int, err interface{}) {
 	if disableLogs {
-		return nil
+		return
 	}
+
 	pushLastLine(err)
-	var outErr error
 
 	var m runtime.MemStats
+
 	runtime.ReadMemStats(&m)
-	totalAlloc := ByteCountDecimal(m.TotalAlloc)
+	totalAlloc := ByteCountDecimal(m.Alloc)
 
 	switch level {
 	case 5:
-		_, outErr = fmt.Printf("PANIC[%s]: %v\n", totalAlloc,err)
+		_, _ = fmt.Printf("PANIC[%s]: %v\n", totalAlloc, err)
 		fmtLogs.Printf("PANIC[%s]: %v\n", totalAlloc, err)
 	case 4:
-		_, outErr = fmt.Printf("FATAL[%s]: %v\n", totalAlloc,err)
+		_, _ = fmt.Printf("FATAL[%s]: %v\n", totalAlloc, err)
 		fmtLogs.Printf("FATAL[%s]: %v\n", totalAlloc, err)
-		//color.Red("ERROR: %v\n", err)
-		//os.Exit(2)
 	case 3:
-		_, outErr = fmt.Printf("ERROR[%s]: %v\n", totalAlloc,err)
+		fmt.Println("ERROR ["+totalAlloc+"]", err)
+		_, _ = fmt.Printf("ERROR[%s]: %v\n", totalAlloc, err)
 		fmtLogs.Printf("ERROR[%s]: %v\n", totalAlloc, err)
-		//color.Red("ERROR: %v\n", err)
 	case 2:
-		_, outErr = fmt.Printf("WARNING[%s]: %v\n", totalAlloc,err)
+		fmt.Println("WARNING ["+totalAlloc+"]", err)
+		_, _ = fmt.Printf("WARNING[%s]: %v\n", totalAlloc, err)
 		fmtLogs.Printf("WARNING[%s]: %v\n", totalAlloc, err)
-		//color.Yellow("WARNING: %v\n", err)
 	case 1:
-		_, outErr = fmt.Printf("INFO[%s]: %v\n", totalAlloc,err)
+		_, _ = fmt.Printf("INFO[%s]: %v\n", totalAlloc, err)
 		fmtLogs.Printf("INFO[%s]: %v\n", totalAlloc, err)
-		//color.Blue("INFO: %v\n", err)
 	case 0:
-		_, outErr = fmt.Printf("[%s]%v\n", totalAlloc,err)
+		_, _ = fmt.Printf("[%s]%v\n", totalAlloc, err)
 		fmtLogs.Printf("[%s]%v\n", totalAlloc, err)
-		//color.White("%v\n", err)
 	}
-	return outErr
 }
 
 // Http returns a log for a HTTP request
@@ -157,7 +153,7 @@ func pushLastLine(line interface{}) {
 	defer LockLines.Unlock()
 	LastLines = append(LastLines, newLogRow(line))
 	// We want to store max 1000 lines in memory (for /logs page).
-	for len(LastLines) > 1000 {
+	for len(LastLines) > 100 {
 		LastLines = LastLines[1:]
 	}
 }
