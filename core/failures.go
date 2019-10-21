@@ -35,20 +35,20 @@ const (
 )
 
 // CreateFailure will create a new Failure record for a service
-func (s *Service) CreateFailure(fail types.FailureInterface) (int64, error) {
+func (s *Service) CreateFailure(fail types.FailureInterface) error {
 	f := fail.(*Failure)
 	f.Service = s.Id
 	row := failuresDB().Create(f)
 	if row.Error != nil {
 		utils.Log(3, row.Error)
-		return 0, row.Error
+		return row.Error
 	}
 	sort.Sort(types.FailSort(s.Failures))
 	s.Failures = append(s.Failures, f)
 	if len(s.Failures) > limitedFailures {
 		s.Failures = s.Failures[1:]
 	}
-	return f.Id, row.Error
+	return row.Error
 }
 
 // AllFailures will return all failures attached to a service
