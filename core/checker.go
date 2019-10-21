@@ -197,13 +197,13 @@ func (s *Service) checkTcp(record bool) *Service {
 }
 
 // checkHttp will check a HTTP service
-func (s *Service) checkHttp(record bool) *Service {
+func (s *Service) checkHttp(record bool) {
 	dnsLookup, err := s.dnsCheck()
 	if err != nil {
 		if record {
 			recordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
 		}
-		return s
+		return
 	}
 	s.PingTime = dnsLookup
 	t1 := time.Now()
@@ -228,7 +228,8 @@ func (s *Service) checkHttp(record bool) *Service {
 		if record {
 			recordFailure(s, fmt.Sprintf("HTTP Error %v", err))
 		}
-		return s
+		res = nil
+		return
 	}
 	t2 := time.Now()
 	s.Latency = t2.Sub(t1).Seconds()
@@ -244,14 +245,16 @@ func (s *Service) checkHttp(record bool) *Service {
 			if record {
 				recordFailure(s, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
 			}
-			return s
+			res = nil
+			return
 		}
 	}
 	if s.ExpectedStatus != res.StatusCode {
 		if record {
 			recordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", res.StatusCode, s.ExpectedStatus))
 		}
-		return s
+		res = nil
+		return
 	}
 
 	if s.MicroScript.String != "" {
@@ -277,19 +280,22 @@ func (s *Service) checkHttp(record bool) *Service {
 			if record {
 				recordFailure(s, fmt.Sprintf("Microspector had %v failures;\n%s", l.State.Must.Fail, strings.Join(l.State.Must.Messages, "\n")))
 			}
-			return s
+			res = nil
+			return
 		} else if l.State.Should.Fail > 0 {
 			if record {
 				recordAlert(s, fmt.Sprintf("Microspector had %v failures;\n%s", l.State.Should.Fail, strings.Join(l.State.Should.Messages, "\n")))
 			}
-			return s
+			res = nil
+			return
 		}
 	}
 
 	if record {
 		recordSuccess(s)
 	}
-	return s
+	res = nil
+	return
 }
 
 // recordSuccess will create a new 'hit' record in the database for a successful/online service
@@ -302,7 +308,8 @@ func recordSuccess(s *Service) {
 		CreatedAt: time.Now(),
 	}
 	utils.Log(1, fmt.Sprintf("Service %v Successful Response: %0.2f ms | Lookup in: %0.2f ms", s.Name, hit.Latency*1000, hit.PingTime*1000))
-	s.CreateHit(hit)
+	_, _ = s.CreateHit(hit)
+	hit = nil
 	notifier.OnSuccess(s.Service)
 	s.Online = true
 	s.SuccessNotified = true
