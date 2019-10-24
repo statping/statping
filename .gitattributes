@@ -1,0 +1,2 @@
+*.go -text diff=golang
+*.gohtml -text diff=golang
