@@ -17,7 +17,6 @@ package notifier
 
 import (
 	"fmt"
-	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"github.com/jinzhu/gorm"
@@ -54,13 +53,6 @@ var user = &types.User{
 
 var core = &types.Core{
 	Name: "testing notifiers",
-}
-
-func init() {
-	dir = utils.Directory
-	source.Assets()
-	utils.InitLogs()
-	injectDatabase()
 }
 
 func injectDatabase() {
