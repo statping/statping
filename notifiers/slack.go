@@ -34,18 +34,11 @@ const (
 	slackText       = `{"text":"{{.}}"}`
 )
 
-func init() {
-	err := notifier.AddNotifier(slacker)
-	if err != nil {
-		panic(err)
-	}
-}
-
 type slack struct {
 	*notifier.Notification
 }
 
-var slacker = &slack{&notifier.Notification{
+var Slacker = &slack{&notifier.Notification{
 	Method:      slackMethod,
 	Title:       "slack",
 	Description: "Send notifications to your slack channel when a service is offline. Insert your Incoming webhooker URL for your channel to receive notifications. Based on the <a href=\"https://api.slack.com/incoming-webhooks\">slack API</a>.",
@@ -57,7 +50,7 @@ var slacker = &slack{&notifier.Notification{
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
 		Title:       "Incoming webhooker Url",
-		Placeholder: "Insert your slack webhook URL here.",
+		Placeholder: "Insert your slack Webhook URL here.",
 		SmallText:   "Incoming webhooker URL from <a href=\"https://api.slack.com/apps\" target=\"_blank\">slack Apps</a>",
 		DbField:     "Host",
 		Required:    true,
@@ -71,7 +64,7 @@ func parseSlackMessage(id int64, temp string, data interface{}) error {
 	if err != nil {
 		return err
 	}
-	slacker.AddQueue(fmt.Sprintf("service_%v", id), buf.String())
+	Slacker.AddQueue(fmt.Sprintf("service_%v", id), buf.String())
 	return nil
 }
 

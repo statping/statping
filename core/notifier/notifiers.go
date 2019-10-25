@@ -102,6 +102,7 @@ func (n *Notification) AfterFind() (err error) {
 func (n *Notification) AddQueue(uid string, msg interface{}) {
 	data := &QueueData{uid, msg}
 	n.Queue = append(n.Queue, data)
+	utils.Log(0, fmt.Sprintf("Notifier '%v' added new item (%v) to the queue. (%v queued)", n.Method, uid, len(n.Queue)))
 }
 
 // CanTest returns true if the notifier implements the OnTest interface
@@ -126,29 +127,21 @@ func asNotification(n Notifier) *Notification {
 }
 
 // AddNotifier accept a Notifier interface to be added into the array
-func AddNotifier(n Notifier) error {
-	if isType(n, new(Notifier)) {
-		err := checkNotifierForm(n)
-		if err != nil {
-			return err
+func AddNotifiers(notifiers ...Notifier) error {
+	for _, n := range notifiers {
+		if isType(n, new(Notifier)) {
+			err := checkNotifierForm(n)
+			if err != nil {
+				return err
+			}
+			AllCommunications = append(AllCommunications, n)
+			Init(n)
+		} else {
+			return errors.New("notifier does not have the required methods")
 		}
-		AllCommunications = append(AllCommunications, n)
-	} else {
-		return errors.New("notifier does not have the required methods")
-	}
-	return nil
-}
-
-// Load is called by core to add all the notifier into memory
-func Load() []types.AllNotifiers {
-	var notifiers []types.AllNotifiers
-	for _, comm := range AllCommunications {
-		n := comm.(Notifier)
-		Init(n)
-		notifiers = append(notifiers, n)
 	}
 	startAllNotifiers()
-	return notifiers
+	return nil
 }
 
 // normalizeType will accept multiple interfaces and converts it into a string for logging
@@ -179,7 +172,6 @@ func (n *Notification) makeLog(msg interface{}) {
 		Time:      utils.Timestamp(time.Now()),
 		Timestamp: time.Now(),
 	}
-	utils.Log(1, fmt.Sprintf("Notifier %v has sent a message %v", n.Method, log.Message))
 	n.logs = append(n.logs, log)
 }
 
@@ -297,7 +289,9 @@ CheckNotifier:
 					msg := notification.Queue[0]
 					err := n.Send(msg.Data)
 					if err != nil {
-						utils.Log(2, fmt.Sprintf("notifier %v had an error: %v", notification.Method, err))
+						utils.Log(2, fmt.Sprintf("Notifier '%v' had an error: %v", notification.Method, err))
+					} else {
+						utils.Log(1, fmt.Sprintf("Notifier '%v' sent outgoing message (%v) %v left in queue.", notification.Method, msg.Id, len(notification.Queue)))
 					}
 					notification.makeLog(msg.Data)
 					if len(notification.Queue) > 1 {

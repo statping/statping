@@ -18,6 +18,7 @@ package notifier
 import (
 	"errors"
 	"fmt"
+	c "github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/types"
 	"time"
 )
@@ -83,7 +84,7 @@ var example = &ExampleNotifier{&Notification{
 
 // init will be ran when Statping is loaded, AddNotifier will add the notifier instance to the system
 func init() {
-	AddNotifier(example)
+	c.AttachNotifiers()
 }
 
 // Send is the main function to hold your notifier functionality
@@ -209,14 +210,14 @@ func ExampleNotification() {
 	}}
 
 	// AddNotifier accepts a Notifier to load into the Statping Notification system
-	err := AddNotifier(example)
+	err := AddNotifiers(example)
 	fmt.Println(err)
 	// Output: <nil>
 }
 
 // Add a Notifier to the AddQueue function to insert it into the system
 func ExampleAddNotifier() {
-	err := AddNotifier(example)
+	err := AddNotifiers(example)
 	fmt.Println(err)
 	// Output: <nil>
 }

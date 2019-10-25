@@ -79,11 +79,6 @@ func TestIsBasicType(t *testing.T) {
 	assert.True(t, isType(example, new(Tester)))
 }
 
-func TestLoad(t *testing.T) {
-	notifiers := Load()
-	assert.Equal(t, 1, len(notifiers))
-}
-
 func TestIsInDatabase(t *testing.T) {
 	in := isInDatabase(example.Notification)
 	assert.True(t, in)
