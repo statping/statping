@@ -308,7 +308,7 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: !verifySSL,
-			ServerName:         req.Host,
+			ServerName:         req.URL.Hostname(),
 		},
 		DisableKeepAlives:     true,
 		ResponseHeaderTimeout: timeout,
