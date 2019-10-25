@@ -1,2 +1,5 @@
-*.go -text diff=golang
-*.gohtml -text diff=golang
+*.gohtml linguist-language=golang
+*.js linguist-detectable=false
+*.yml linguist-detectable=false
+*.json linguist-detectable=false
+dev/* linguist-vendored
