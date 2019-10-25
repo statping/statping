@@ -89,7 +89,7 @@ func (u *twilio) Send(msg interface{}) error {
 	v.Set("Body", message)
 	rb := *strings.NewReader(v.Encode())
 
-	contents, _, err := utils.HttpRequest(twilioUrl, "POST", "application/x-www-form-urlencoded", nil, &rb, time.Duration(10*time.Second), true,true)
+	contents, _, err := utils.HttpRequest(twilioUrl, "POST", map[string]string{"content-type": "application/x-www-form-urlencoded"}, &rb, time.Duration(10*time.Second), true, true)
 	success, _ := twilioSuccess(contents)
 	if !success {
 		errorOut := twilioError(contents)

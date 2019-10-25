@@ -56,15 +56,8 @@
     <div class="form-group row{{if (eq .Type "tcp") or (eq .Type "udp")}} d-none{{end}}">
         <label for="headers" class="col-sm-4 col-form-label">HTTP Headers</label>
         <div class="col-sm-8">
-            <input name="headers" class="form-control" id="headers" autocapitalize="none" spellcheck="false" placeholder='Authorization=1010101,Content-Type=application/json' value="{{.Headers.String}}">
-            <small class="form-text text-muted">Comma delimited list of HTTP Headers (KEY=VALUE,KEY=VALUE)</small>
-        </div>
-    </div>
-    <div class="form-group row{{if (eq .Type "tcp") or (eq .Type "udp")}} d-none{{end}}">
-        <label for="service_response" class="col-sm-4 col-form-label">Expected Response (Regex)</label>
-        <div class="col-sm-8">
-            <textarea name="expected" class="form-control" id="service_response" rows="3" autocapitalize="none" spellcheck="false" placeholder='(method)": "((\\"|[success])*)"'>{{.Expected.String}}</textarea>
-            <small class="form-text text-muted">You can use plain text or insert <a target="_blank" href="https://regex101.com/r/I5bbj9/1">Regex</a> to validate the response</small>
+            <textarea name="headers" class="form-control" id="headers" autocapitalize="none" spellcheck="false" placeholder='Authorization: Bearer 1010101Content-Type: plain/text; charset=utf-8'>{{.Headers.String}}</textarea>
+            <small class="form-text text-muted">HTTP Headers as in <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2" target="_blank">RFC2616</a></small>
         </div>
     </div>
     <div class="form-group row{{if (eq .Type "tcp") or (eq .Type "udp")}} d-none{{end}}">

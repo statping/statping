@@ -182,7 +182,7 @@ func pushRequest(msg *pushArray) ([]byte, error) {
 		return nil, err
 	}
 	url := "https://push.statping.com/api/push"
-	body, _, err = utils.HttpRequest(url, "POST", "application/json", nil, bytes.NewBuffer(body), time.Duration(20*time.Second), true, true)
+	body, _, err = utils.HttpRequest(url, "POST", map[string]string{"content-type": "application/json"}, bytes.NewBuffer(body), time.Duration(20*time.Second), true, true)
 	return body, err
 }
 

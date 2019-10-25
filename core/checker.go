@@ -28,7 +28,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"regexp"
 	"strings"
 	"time"
 )
@@ -212,17 +211,20 @@ func (s *Service) checkHttp(record bool) {
 	var content []byte
 	var res *http.Response
 
-	var headers []string
+	headers := map[string]string{}
 	if s.Headers.Valid {
-		headers = strings.Split(s.Headers.String, ",")
-	} else {
-		headers = nil
+		headers = utils.ParseHeaders(s.Headers.String)
 	}
 
 	if s.Method == "POST" {
-		content, res, err = utils.HttpRequest(s.Domain, s.Method, "application/json", headers, bytes.NewBuffer([]byte(s.PostData.String)), timeout, s.VerifySSL.Bool, s.FollowRedirects.Bool)
+		//content-type is application/json by default when request is a post
+		if _, ok := headers["content-type"]; !ok {
+			headers["content-type"] = "application/json"
+		}
+
+		content, res, err = utils.HttpRequest(s.Domain, s.Method, headers, bytes.NewBuffer([]byte(s.PostData.String)), timeout, s.VerifySSL.Bool, s.FollowRedirects.Bool)
 	} else {
-		content, res, err = utils.HttpRequest(s.Domain, s.Method, nil, headers, nil, timeout, s.VerifySSL.Bool, s.FollowRedirects.Bool)
+		content, res, err = utils.HttpRequest(s.Domain, s.Method, headers, nil, timeout, s.VerifySSL.Bool, s.FollowRedirects.Bool)
 	}
 	if err != nil {
 		if record {
@@ -236,19 +238,6 @@ func (s *Service) checkHttp(record bool) {
 	s.LastResponse = string(content)
 	s.LastStatusCode = res.StatusCode
 
-	if s.Expected.String != "" {
-		match, err := regexp.MatchString(s.Expected.String, string(content))
-		if err != nil {
-			utils.Log(2, fmt.Sprintf("Service %v expected: %v to match %v", s.Name, string(content), s.Expected.String))
-		}
-		if !match {
-			if record {
-				recordFailure(s, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
-			}
-			res = nil
-			return
-		}
-	}
 	if s.ExpectedStatus != res.StatusCode {
 		if record {
 			recordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", res.StatusCode, s.ExpectedStatus))

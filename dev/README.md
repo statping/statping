@@ -2478,7 +2478,7 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 HttpRequest is a global function to send a HTTP request // url - The URL for
 HTTP request // method - GET, POST, DELETE, PATCH // content - The HTTP request
 content type (text/plain, application/json, or nil) // headers - An array of
-Headers to be sent (KEY=VALUE) []string{"Authentication=12345", ...} // body -
+Headers to be sent (key:value) []string{"Authentication:12345", ...} // body -
 The body or form data to send with HTTP request // timeout - Specific duration
 to timeout on. time.Duration(30 * time.Seconds) // You can use a HTTP Proxy if
 you HTTP_PROXY environment variable

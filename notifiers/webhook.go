@@ -73,7 +73,7 @@ var webhook = &webhooker{&notifier.Notification{
 		Type:        "text",
 		Title:       "Header",
 		Placeholder: "Authorization=Token12345",
-		SmallText:   "Optional Headers for request use format: KEY=Value,Key=Value",
+		SmallText:   "Optional Headers for request use format: Header:Value",
 		DbField:     "api_secret",
 	},
 	}}}

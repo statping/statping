@@ -67,7 +67,7 @@ func TestSetupRoutes(t *testing.T) {
 			Method:         "POST",
 			Body:           form.Encode(),
 			ExpectedStatus: 303,
-			HttpHeaders:    []string{"Content-Type=application/x-www-form-urlencoded"},
+			HttpHeaders:    []string{"Content-Type:application/x-www-form-urlencoded"},
 			ExpectedFiles:  []string{utils.Directory + "/config.yml", utils.Directory + "/statup.db"},
 		}}
 
@@ -179,12 +179,12 @@ func TestApiServiceRoutes(t *testing.T) {
 			Method:         "POST",
 			Body:           `[{"service":1,"order":1},{"service":5,"order":2},{"service":2,"order":3},{"service":3,"order":4},{"service":4,"order":5}]`,
 			ExpectedStatus: 200,
-			HttpHeaders:    []string{"Content-Type=application/json"},
+			HttpHeaders:    []string{"Content-Type:application/json"},
 		},
 		{
 			Name:        "Statping Create Service",
 			URL:         "/api/services",
-			HttpHeaders: []string{"Content-Type=application/json"},
+			HttpHeaders: []string{"Content-Type:application/json"},
 			Method:      "POST",
 			Body: `{
     "name": "New Service",
@@ -205,7 +205,7 @@ func TestApiServiceRoutes(t *testing.T) {
 		{
 			Name:        "Statping Update Service",
 			URL:         "/api/services/1",
-			HttpHeaders: []string{"Content-Type=application/json"},
+			HttpHeaders: []string{"Content-Type:application/json"},
 			Method:      "POST",
 			Body: `{
     "name": "Updated New Service",
@@ -260,7 +260,7 @@ func TestGroupAPIRoutes(t *testing.T) {
 		{
 			Name:        "Statping Create Group",
 			URL:         "/api/groups",
-			HttpHeaders: []string{"Content-Type=application/json"},
+			HttpHeaders: []string{"Content-Type:application/json"},
 			Body: `{
     "name": "New Group",
     "public": true
@@ -297,7 +297,7 @@ func TestApiUsersRoutes(t *testing.T) {
 		}, {
 			Name:        "Statping Create User",
 			URL:         "/api/users",
-			HttpHeaders: []string{"Content-Type=application/json"},
+			HttpHeaders: []string{"Content-Type:application/json"},
 			Method:      "POST",
 			Body: `{
     "username": "adminuser2",
@@ -508,7 +508,7 @@ func RunHTTPTest(test HTTPTest, t *testing.T) (string, *testing.T, error) {
 	}
 	if len(test.HttpHeaders) != 0 {
 		for _, v := range test.HttpHeaders {
-			splits := strings.Split(v, "=")
+			splits := strings.Split(v, ":")
 			req.Header.Set(splits[0], splits[1])
 		}
 	}

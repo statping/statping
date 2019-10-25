@@ -59,7 +59,7 @@ func init() {
 // Send will send a HTTP Post to the discord API. It accepts type: []byte
 func (u *discord) Send(msg interface{}) error {
 	message := msg.(string)
-	_, _, err := utils.HttpRequest(discorder.GetValue("host"), "POST", "application/json", nil, strings.NewReader(message), time.Duration(10*time.Second), true,true)
+	_, _, err := utils.HttpRequest(discorder.GetValue("host"), "POST", nil, strings.NewReader(message), time.Duration(10*time.Second), true, true)
 	return err
 }
 
@@ -98,7 +98,7 @@ func (u *discord) OnSave() error {
 func (u *discord) OnTest() error {
 	outError := errors.New("Incorrect discord URL, please confirm URL is correct")
 	message := `{"content": "Testing the discord notifier"}`
-	contents, _, err := utils.HttpRequest(discorder.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(message)), time.Duration(10*time.Second), true,true)
+	contents, _, err := utils.HttpRequest(discorder.Host, "POST", nil, bytes.NewBuffer([]byte(message)), time.Duration(10*time.Second), true, true)
 	if string(contents) == "" {
 		return nil
 	}

@@ -271,31 +271,23 @@ func SaveFile(filename string, data []byte) error {
 // HttpRequest is a global function to send a HTTP request
 // // url - The URL for HTTP request
 // // method - GET, POST, DELETE, PATCH
-// // content - The HTTP request content type (text/plain, application/json, or nil)
+// // ContentType - The HTTP request content type (text/plain, application/json, or nil)
 // // headers - An array of Headers to be sent (KEY=VALUE) []string{"Authentication=12345", ...}
 // // body - The body or form data to send with HTTP request
 // // timeout - Specific duration to timeout on. time.Duration(30 * time.Seconds)
 // // You can use a HTTP Proxy if you HTTP_PROXY environment variable
-func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool, followRedirects bool) ([]byte, *http.Response, error) {
+func HttpRequest(url, method string, headers map[string]string, body io.Reader, timeout time.Duration, verifySSL bool, followRedirects bool) ([]byte, *http.Response, error) {
 	var err error
 	var req *http.Request
 	if req, err = http.NewRequest(method, url, body); err != nil {
 		return nil, nil, err
 	}
 	req.Header.Set("User-Agent", "Statping")
-	if content != nil {
-		req.Header.Set("Content-Type", content.(string))
-	}
-	for _, h := range headers {
-		keyVal := strings.Split(h, "=")
-		if len(keyVal) == 2 {
-			if keyVal[0] != "" && keyVal[1] != "" {
-				if strings.ToLower(keyVal[0]) == "host" {
-					req.Host = strings.TrimSpace(keyVal[1])
-				} else {
-					req.Header.Set(keyVal[0], keyVal[1])
-				}
-			}
+	for k, v := range headers {
+		if k == "host" {
+			req.Host = v
+		} else {
+			req.Header.Set(k, v)
 		}
 	}
 	var resp *http.Response
@@ -459,4 +451,17 @@ func sCurve(t float64) float64 {
 
 func lerp(t, a, b float64) float64 {
 	return a + t*(b-a)
+}
+
+func ParseHeaders(str string) map[string]string {
+	headers := map[string]string{}
+
+	for _, l := range strings.Split(str, "\n") {
+		kv := strings.Split(l, ":")
+		if len(kv) == 2 { //valid header format
+			headers[ strings.ToLower(strings.TrimSpace(kv[0]))] = strings.TrimSpace(kv[1])
+		}
+	}
+
+	return headers
 }

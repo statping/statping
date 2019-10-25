@@ -36,7 +36,7 @@ func TestGenericRoutes(t *testing.T) {
 			URL:              "/dashboard",
 			Method:           "POST",
 			Body:             form.Encode(),
-			HttpHeaders:      []string{"Content-Type=application/x-www-form-urlencoded"},
+			HttpHeaders:      []string{"Content-Type:application/x-www-form-urlencoded"},
 			ExpectedContains: []string{"Incorrect login information submitted, try again."},
 			ExpectedStatus:   200,
 		},
@@ -127,7 +127,7 @@ func TestGenericRoutes(t *testing.T) {
 			Method:         "POST",
 			Body:           form3.Encode(),
 			ExpectedStatus: 303,
-			HttpHeaders:    []string{"Content-Type=application/x-www-form-urlencoded"},
+			HttpHeaders:    []string{"Content-Type:application/x-www-form-urlencoded"},
 		},
 		{
 			Name:           "Delete Assets",
