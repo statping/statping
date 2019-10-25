@@ -94,6 +94,6 @@ func (u *lineNotifier) OnSuccess(s *types.Service) {
 func (u *lineNotifier) OnSave() error {
 	msg := fmt.Sprintf("Notification %v is receiving updated information.", u.Method)
 	utils.Log(1, msg)
-	u.AddQueue("saved", message)
+	u.AddQueue("saved", msg)
 	return nil
 }
