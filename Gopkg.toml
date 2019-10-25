@@ -27,7 +27,7 @@
 
 [[constraint]]
   name = "github.com/99designs/gqlgen"
-  version = "0.9.3"
+  version = "0.10.1"
 
 [[constraint]]
   name = "github.com/GeertJohan/go.rice"
@@ -43,7 +43,7 @@
 
 [[constraint]]
   name = "github.com/go-yaml/yaml"
-  version = "2.2.2"
+  version = "2.2.4"
 
 [[constraint]]
   name = "github.com/gorilla/mux"
@@ -55,7 +55,7 @@
 
 [[constraint]]
   name = "github.com/jinzhu/gorm"
-  version = "1.9.10"
+  version = "1.9.11"
 
 [[constraint]]
   name = "github.com/joho/godotenv"
