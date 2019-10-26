@@ -283,9 +283,11 @@ func HttpRequest(url, method string, headers map[string]string, body io.Reader, 
 		return nil, nil, err
 	}
 	req.Header.Set("User-Agent", "Statping")
+	sni := req.URL.Hostname()
 	for k, v := range headers {
 		if k == "host" {
 			req.Host = v
+			sni = v
 		} else {
 			req.Header.Set(k, v)
 		}
@@ -300,7 +302,7 @@ func HttpRequest(url, method string, headers map[string]string, body io.Reader, 
 	dialDepth := 1
 	conf := &tls.Config{
 		InsecureSkipVerify: !verifySSL,
-		ServerName:         req.Host,
+		ServerName:         sni,
 	}
 
 	transport := &http.Transport{
