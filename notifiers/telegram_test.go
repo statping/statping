@@ -32,8 +32,8 @@ var (
 func init() {
 	telegramToken = os.Getenv("TELEGRAM_TOKEN")
 	telegramChannel = os.Getenv("TELEGRAM_CHANNEL")
-	telegramNotifier.ApiSecret = telegramToken
-	telegramNotifier.Var1 = telegramChannel
+	Telegram.ApiSecret = telegramToken
+	Telegram.Var1 = telegramChannel
 }
 
 func TestTelegramNotifier(t *testing.T) {
@@ -46,29 +46,25 @@ func TestTelegramNotifier(t *testing.T) {
 	currentCount = CountNotifiers()
 
 	t.Run("Load Telegram", func(t *testing.T) {
-		telegramNotifier.ApiSecret = telegramToken
-		telegramNotifier.Var1 = telegramChannel
-		telegramNotifier.Delay = time.Duration(1 * time.Second)
-		err := notifier.AddNotifier(telegramNotifier)
+		Telegram.ApiSecret = telegramToken
+		Telegram.Var1 = telegramChannel
+		Telegram.Delay = time.Duration(1 * time.Second)
+		err := notifier.AddNotifiers(Telegram)
 		assert.Nil(t, err)
-		assert.Equal(t, "Hunter Long", telegramNotifier.Author)
-		assert.Equal(t, telegramToken, telegramNotifier.ApiSecret)
-		assert.Equal(t, telegramChannel, telegramNotifier.Var1)
-	})
-
-	t.Run("Load Telegram Notifier", func(t *testing.T) {
-		notifier.Load()
+		assert.Equal(t, "Hunter Long", Telegram.Author)
+		assert.Equal(t, telegramToken, Telegram.ApiSecret)
+		assert.Equal(t, telegramChannel, Telegram.Var1)
 	})
 
 	t.Run("Telegram Within Limits", func(t *testing.T) {
-		ok, err := telegramNotifier.WithinLimits()
+		ok, err := Telegram.WithinLimits()
 		assert.Nil(t, err)
 		assert.True(t, ok)
 	})
 
 	t.Run("Telegram OnFailure", func(t *testing.T) {
-		telegramNotifier.OnFailure(TestService, TestFailure)
-		assert.Equal(t, 1, len(telegramNotifier.Queue))
+		Telegram.OnFailure(TestService, TestFailure)
+		assert.Equal(t, 1, len(Telegram.Queue))
 	})
 
 	t.Run("Telegram Check Offline", func(t *testing.T) {
@@ -76,8 +72,8 @@ func TestTelegramNotifier(t *testing.T) {
 	})
 
 	t.Run("Telegram OnSuccess", func(t *testing.T) {
-		telegramNotifier.OnSuccess(TestService)
-		assert.Equal(t, 1, len(telegramNotifier.Queue))
+		Telegram.OnSuccess(TestService)
+		assert.Equal(t, 1, len(Telegram.Queue))
 	})
 
 	t.Run("Telegram Check Back Online", func(t *testing.T) {
@@ -85,25 +81,25 @@ func TestTelegramNotifier(t *testing.T) {
 	})
 
 	t.Run("Telegram OnSuccess Again", func(t *testing.T) {
-		telegramNotifier.OnSuccess(TestService)
-		assert.Equal(t, 1, len(telegramNotifier.Queue))
+		Telegram.OnSuccess(TestService)
+		assert.Equal(t, 1, len(Telegram.Queue))
 	})
 
 	t.Run("Telegram Send", func(t *testing.T) {
-		err := telegramNotifier.Send(telegramMessage)
+		err := Telegram.Send(telegramMessage)
 		assert.Nil(t, err)
 	})
 
 	t.Run("Telegram Test", func(t *testing.T) {
-		err := telegramNotifier.OnTest()
+		err := Telegram.OnTest()
 		assert.Nil(t, err)
 	})
 
 	t.Run("Telegram Queue", func(t *testing.T) {
-		go notifier.Queue(telegramNotifier)
+		go notifier.Queue(Telegram)
 		time.Sleep(3 * time.Second)
-		assert.Equal(t, telegramToken, telegramNotifier.ApiSecret)
-		assert.Equal(t, 0, len(telegramNotifier.Queue))
+		assert.Equal(t, telegramToken, Telegram.ApiSecret)
+		assert.Equal(t, 0, len(Telegram.Queue))
 	})
 
 }

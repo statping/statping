@@ -18,7 +18,9 @@ package notifier
 import (
 	"errors"
 	"fmt"
+	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"time"
 )
 
@@ -83,7 +85,11 @@ var example = &ExampleNotifier{&Notification{
 
 // init will be ran when Statping is loaded, AddNotifier will add the notifier instance to the system
 func init() {
-	AddNotifier(example)
+	dir = utils.Directory
+	source.Assets()
+	utils.InitLogs()
+	injectDatabase()
+	AddNotifiers(example)
 }
 
 // Send is the main function to hold your notifier functionality
@@ -209,14 +215,14 @@ func ExampleNotification() {
 	}}
 
 	// AddNotifier accepts a Notifier to load into the Statping Notification system
-	err := AddNotifier(example)
+	err := AddNotifiers(example)
 	fmt.Println(err)
 	// Output: <nil>
 }
 
 // Add a Notifier to the AddQueue function to insert it into the system
 func ExampleAddNotifier() {
-	err := AddNotifier(example)
+	err := AddNotifiers(example)
 	fmt.Println(err)
 	// Output: <nil>
 }
@@ -226,7 +232,9 @@ func ExampleNotification_OnSuccess() {
 	msg := fmt.Sprintf("this is a successful message as a string passing into AddQueue function")
 	example.AddQueue("example", msg)
 	fmt.Println(len(example.Queue))
-	// Output: 1
+	// Output:
+	// Notifier 'Example' added new item (example) to the queue. (1 queued)
+	// 1
 }
 
 // Add a new message into the queue OnSuccess
@@ -252,7 +260,7 @@ func ExampleOnTest() {
 func ExampleNotification_CanTest() {
 	testable := example.CanTest()
 	fmt.Print(testable)
-	// Output: false
+	// Output: true
 }
 
 // Add any type of interface to the AddQueue function to be ran in the queue
@@ -261,7 +269,9 @@ func ExampleNotification_AddQueue() {
 	example.AddQueue("example", msg)
 	queue := example.Queue
 	fmt.Printf("Example has %v items in the queue", len(queue))
-	// Output: Example has 2 items in the queue
+	// Output:
+	// Notifier 'Example' added new item (example) to the queue. (2 queued)
+	// Example has 2 items in the queue
 }
 
 // The Send method will run the main functionality of your notifier

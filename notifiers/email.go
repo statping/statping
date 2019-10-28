@@ -111,7 +111,7 @@ type email struct {
 	*notifier.Notification
 }
 
-var emailer = &email{&notifier.Notification{
+var Emailer = &email{&notifier.Notification{
 	Method:      "email",
 	Title:       "email",
 	Description: "Send emails via SMTP when services are online or offline.",
@@ -156,13 +156,6 @@ var emailer = &email{&notifier.Notification{
 		DbField:     "api_key",
 	}},
 }}
-
-func init() {
-	err := notifier.AddNotifier(emailer)
-	if err != nil {
-		panic(err)
-	}
-}
 
 // Send will send the SMTP email with your authentication It accepts type: *emailOutgoing
 func (u *email) Send(msg interface{}) error {
@@ -255,7 +248,7 @@ func (u *email) OnTest() error {
 }
 
 func (u *email) dialSend(email *emailOutgoing) error {
-	mailer = mail.NewDialer(emailer.Host, emailer.Port, emailer.Username, emailer.Password)
+	mailer = mail.NewDialer(Emailer.Host, Emailer.Port, Emailer.Username, Emailer.Password)
 	emailSource(email)
 	m := mail.NewMessage()
 	// if email setting TLS is Disabled

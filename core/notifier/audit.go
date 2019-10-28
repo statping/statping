@@ -25,7 +25,7 @@ var (
 )
 
 func checkNotifierForm(n Notifier) error {
-	notifier := asNotification(n)
+	notifier := n.Select()
 	for _, f := range notifier.Form {
 		contains := contains(f.DbField, allowedVars)
 		if !contains {
