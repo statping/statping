@@ -31,90 +31,79 @@ var (
 func init() {
 	MOBILE_ID = os.Getenv("MOBILE_ID")
 	MOBILE_NUMBER = os.Getenv("MOBILE_NUMBER")
-	mobile.Var1 = MOBILE_ID
+	Mobile.Var1 = MOBILE_ID
 }
 
 func TestMobileNotifier(t *testing.T) {
 	t.Parallel()
-	mobile.Var1 = MOBILE_ID
-	mobile.Var2 = os.Getenv("MOBILE_NUMBER")
+	Mobile.Var1 = MOBILE_ID
+	Mobile.Var2 = os.Getenv("MOBILE_NUMBER")
 	if MOBILE_ID == "" {
-		t.Log("mobile notifier testing skipped, missing MOBILE_ID environment variable")
+		t.Log("Mobile notifier testing skipped, missing MOBILE_ID environment variable")
 		t.SkipNow()
 	}
 	currentCount = CountNotifiers()
 
-	t.Run("Load mobile", func(t *testing.T) {
-		mobile.Var1 = MOBILE_ID
-		mobile.Var2 = MOBILE_NUMBER
-		mobile.Delay = time.Duration(100 * time.Millisecond)
-		mobile.Limits = 10
-		err := notifier.AddNotifier(mobile)
+	t.Run("Load Mobile", func(t *testing.T) {
+		Mobile.Var1 = MOBILE_ID
+		Mobile.Var2 = MOBILE_NUMBER
+		Mobile.Delay = time.Duration(100 * time.Millisecond)
+		Mobile.Limits = 10
+		err := notifier.AddNotifiers(Mobile)
 		assert.Nil(t, err)
-		assert.Equal(t, "Hunter Long", mobile.Author)
-		assert.Equal(t, MOBILE_ID, mobile.Var1)
-		assert.Equal(t, MOBILE_NUMBER, mobile.Var2)
+		assert.Equal(t, "Hunter Long", Mobile.Author)
+		assert.Equal(t, MOBILE_ID, Mobile.Var1)
+		assert.Equal(t, MOBILE_NUMBER, Mobile.Var2)
 	})
 
-	t.Run("Load mobile Notifier", func(t *testing.T) {
-		notifier.Load()
+	t.Run("Mobile Notifier Tester", func(t *testing.T) {
+		assert.True(t, Mobile.CanTest())
 	})
 
-	t.Run("mobile Notifier Tester", func(t *testing.T) {
-		assert.True(t, mobile.CanTest())
-	})
-
-	t.Run("mobile Within Limits", func(t *testing.T) {
-		ok, err := mobile.WithinLimits()
+	t.Run("Mobile Within Limits", func(t *testing.T) {
+		ok, err := Mobile.WithinLimits()
 		assert.Nil(t, err)
 		assert.True(t, ok)
 	})
 
-	t.Run("mobile OnFailure", func(t *testing.T) {
-		mobile.OnFailure(TestService, TestFailure)
-		assert.Equal(t, 1, len(mobile.Queue))
+	t.Run("Mobile OnFailure", func(t *testing.T) {
+		Mobile.OnFailure(TestService, TestFailure)
+		assert.Equal(t, 1, len(Mobile.Queue))
 	})
 
-	t.Run("mobile OnFailure multiple times", func(t *testing.T) {
-		for i := 0; i <= 5; i++ {
-			mobile.OnFailure(TestService, TestFailure)
-		}
-		assert.Equal(t, 7, len(mobile.Queue))
+	t.Run("Mobile OnSuccess", func(t *testing.T) {
+		Mobile.OnSuccess(TestService)
+		assert.Equal(t, 1, len(Mobile.Queue))
 	})
 
-	t.Run("mobile OnSuccess", func(t *testing.T) {
-		mobile.OnSuccess(TestService)
-		assert.Equal(t, 7, len(mobile.Queue))
-	})
-
-	t.Run("mobile OnSuccess Again", func(t *testing.T) {
+	t.Run("Mobile OnSuccess Again", func(t *testing.T) {
 		t.SkipNow()
 		assert.True(t, TestService.Online)
-		mobile.OnSuccess(TestService)
-		assert.Equal(t, 1, len(mobile.Queue))
-		go notifier.Queue(mobile)
+		Mobile.OnSuccess(TestService)
+		assert.Equal(t, 1, len(Mobile.Queue))
+		go notifier.Queue(Mobile)
 		time.Sleep(20 * time.Second)
-		assert.Equal(t, 1, len(mobile.Queue))
+		assert.Equal(t, 1, len(Mobile.Queue))
 	})
 
-	t.Run("mobile Within Limits again", func(t *testing.T) {
-		ok, err := mobile.WithinLimits()
+	t.Run("Mobile Within Limits again", func(t *testing.T) {
+		ok, err := Mobile.WithinLimits()
 		assert.Nil(t, err)
 		assert.True(t, ok)
 	})
 
-	t.Run("mobile Test", func(t *testing.T) {
+	t.Run("Mobile Test", func(t *testing.T) {
 		t.SkipNow()
-		err := mobile.OnTest()
+		err := Mobile.OnTest()
 		assert.Nil(t, err)
 	})
 
-	t.Run("mobile Queue", func(t *testing.T) {
+	t.Run("Mobile Queue", func(t *testing.T) {
 		t.SkipNow()
-		go notifier.Queue(mobile)
+		go notifier.Queue(Mobile)
 		time.Sleep(15 * time.Second)
-		assert.Equal(t, MOBILE_ID, mobile.Var1)
-		assert.Equal(t, 0, len(mobile.Queue))
+		assert.Equal(t, MOBILE_ID, Mobile.Var1)
+		assert.Equal(t, 0, len(Mobile.Queue))
 	})
 
 }

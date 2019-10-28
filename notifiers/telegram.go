@@ -31,7 +31,7 @@ type telegram struct {
 	*notifier.Notification
 }
 
-var telegramNotifier = &telegram{&notifier.Notification{
+var Telegram = &telegram{&notifier.Notification{
 	Method:      "telegram",
 	Title:       "Telegram",
 	Description: "Receive notifications on your Telegram channel when a service has an issue. You must get a Telegram API token from the /botfather. Review the <a target=\"_blank\" href=\"http://techthoughts.info/how-to-create-a-telegram-bot-and-send-messages-via-api\">Telegram API Tutorial</a> to learn how to generate a new API Token.",
@@ -54,14 +54,6 @@ var telegramNotifier = &telegram{&notifier.Notification{
 		DbField:     "Var1",
 		Required:    true,
 	}}},
-}
-
-// DEFINE YOUR NOTIFICATION HERE.
-func init() {
-	err := notifier.AddNotifier(telegramNotifier)
-	if err != nil {
-		panic(err)
-	}
 }
 
 func (u *telegram) Select() *notifier.Notification {

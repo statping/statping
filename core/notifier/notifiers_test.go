@@ -17,7 +17,6 @@ package notifier
 
 import (
 	"fmt"
-	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"github.com/jinzhu/gorm"
@@ -56,13 +55,6 @@ var core = &types.Core{
 	Name: "testing notifiers",
 }
 
-func init() {
-	dir = utils.Directory
-	source.Assets()
-	utils.InitLogs()
-	injectDatabase()
-}
-
 func injectDatabase() {
 	utils.DeleteFile(dir + "/statup.db")
 	db, _ = gorm.Open("sqlite3", dir+"/statup.db")
@@ -77,11 +69,6 @@ func TestIsBasicType(t *testing.T) {
 	assert.True(t, isType(example, new(CoreEvents)))
 	assert.True(t, isType(example, new(NotifierEvents)))
 	assert.True(t, isType(example, new(Tester)))
-}
-
-func TestLoad(t *testing.T) {
-	notifiers := Load()
-	assert.Equal(t, 1, len(notifiers))
 }
 
 func TestIsInDatabase(t *testing.T) {

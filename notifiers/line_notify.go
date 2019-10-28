@@ -33,7 +33,7 @@ type lineNotifier struct {
 	*notifier.Notification
 }
 
-var lineNotify = &lineNotifier{&notifier.Notification{
+var LineNotify = &lineNotifier{&notifier.Notification{
 	Method:      lineNotifyMethod,
 	Title:       "LINE Notify",
 	Description: "LINE Notify will send notifications to your LINE Notify account when services are offline or online. Based on the <a href=\"https://notify-bot.line.me/doc/en/\">LINE Notify API</a>.",
@@ -46,14 +46,6 @@ var lineNotify = &lineNotifier{&notifier.Notification{
 		Placeholder: "Insert your Line Notify Access Token here.",
 		DbField:     "api_secret",
 	}}},
-}
-
-// DEFINE YOUR NOTIFICATION HERE.
-func init() {
-	err := notifier.AddNotifier(lineNotify)
-	if err != nil {
-		panic(err)
-	}
 }
 
 // Send will send a HTTP Post with the Authorization to the notify-api.line.me server. It accepts type: string

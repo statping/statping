@@ -31,7 +31,7 @@ type twilio struct {
 	*notifier.Notification
 }
 
-var twilioNotifier = &twilio{&notifier.Notification{
+var Twilio = &twilio{&notifier.Notification{
 	Method:      "twilio",
 	Title:       "Twilio",
 	Description: "Receive SMS text messages directly to your cellphone when a service is offline. You can use a Twilio test account with limits. This notifier uses the <a href=\"https://www.twilio.com/docs/usage/api\">Twilio API</a>.",
@@ -64,14 +64,6 @@ var twilioNotifier = &twilio{&notifier.Notification{
 		DbField:     "Var2",
 		Required:    true,
 	}}},
-}
-
-// DEFINE YOUR NOTIFICATION HERE.
-func init() {
-	err := notifier.AddNotifier(twilioNotifier)
-	if err != nil {
-		panic(err)
-	}
 }
 
 func (u *twilio) Select() *notifier.Notification {

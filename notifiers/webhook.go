@@ -28,14 +28,14 @@ import (
 )
 
 const (
-	webhookMethod = "webhook"
+	webhookMethod = "Webhook"
 )
 
 type webhooker struct {
 	*notifier.Notification
 }
 
-var webhook = &webhooker{&notifier.Notification{
+var Webhook = &webhooker{&notifier.Notification{
 	Method:      webhookMethod,
 	Title:       "HTTP webhooker",
 	Description: "Send a custom HTTP request to a specific URL with your own body, headers, and parameters.",
@@ -77,14 +77,6 @@ var webhook = &webhooker{&notifier.Notification{
 		DbField:     "api_secret",
 	},
 	}}}
-
-// DEFINE YOUR NOTIFICATION HERE.
-func init() {
-	err := notifier.AddNotifier(webhook)
-	if err != nil {
-		panic(err)
-	}
-}
 
 // Send will send a HTTP Post to the webhooker API. It accepts type: string
 func (w *webhooker) Send(msg interface{}) error {
@@ -158,7 +150,7 @@ func (w *webhooker) OnTest() error {
 	}
 	defer resp.Body.Close()
 	content, err := ioutil.ReadAll(resp.Body)
-	utils.Log(1, fmt.Sprintf("webhook notifier received: '%v'", string(content)))
+	utils.Log(1, fmt.Sprintf("Webhook notifier received: '%v'", string(content)))
 	return err
 }
 

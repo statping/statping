@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/handlers"
-	_ "github.com/hunterlong/statping/notifiers"
 	"github.com/hunterlong/statping/plugin"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/utils"
@@ -117,13 +116,5 @@ func mainProcess() {
 		plugin.LoadPlugins()
 		fmt.Println(handlers.RunHTTPServer(ipAddress, port))
 		os.Exit(1)
-	}
-}
-
-func ForEachPlugin() {
-	if len(core.CoreApp.Plugins) > 0 {
-		//for _, p := range core.Plugins {
-		//	p.OnShutdown()
-		//}
 	}
 }

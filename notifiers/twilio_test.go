@@ -37,10 +37,10 @@ func init() {
 	TWILIO_FROM = os.Getenv("TWILIO_FROM")
 	TWILIO_TO = os.Getenv("TWILIO_TO")
 
-	twilioNotifier.ApiKey = TWILIO_SID
-	twilioNotifier.ApiSecret = TWILIO_SECRET
-	twilioNotifier.Var1 = TWILIO_TO
-	twilioNotifier.Var2 = TWILIO_FROM
+	Twilio.ApiKey = TWILIO_SID
+	Twilio.ApiSecret = TWILIO_SECRET
+	Twilio.Var1 = TWILIO_TO
+	Twilio.Var2 = TWILIO_FROM
 }
 
 func TestTwilioNotifier(t *testing.T) {
@@ -52,27 +52,23 @@ func TestTwilioNotifier(t *testing.T) {
 	currentCount = CountNotifiers()
 
 	t.Run("Load Twilio", func(t *testing.T) {
-		twilioNotifier.ApiKey = TWILIO_SID
-		twilioNotifier.Delay = time.Duration(100 * time.Millisecond)
-		err := notifier.AddNotifier(twilioNotifier)
+		Twilio.ApiKey = TWILIO_SID
+		Twilio.Delay = time.Duration(100 * time.Millisecond)
+		err := notifier.AddNotifiers(Twilio)
 		assert.Nil(t, err)
-		assert.Equal(t, "Hunter Long", twilioNotifier.Author)
-		assert.Equal(t, TWILIO_SID, twilioNotifier.ApiKey)
-	})
-
-	t.Run("Load Twilio Notifier", func(t *testing.T) {
-		notifier.Load()
+		assert.Equal(t, "Hunter Long", Twilio.Author)
+		assert.Equal(t, TWILIO_SID, Twilio.ApiKey)
 	})
 
 	t.Run("Twilio Within Limits", func(t *testing.T) {
-		ok, err := twilioNotifier.WithinLimits()
+		ok, err := Twilio.WithinLimits()
 		assert.Nil(t, err)
 		assert.True(t, ok)
 	})
 
 	t.Run("Twilio OnFailure", func(t *testing.T) {
-		twilioNotifier.OnFailure(TestService, TestFailure)
-		assert.Len(t, twilioNotifier.Queue, 1)
+		Twilio.OnFailure(TestService, TestFailure)
+		assert.Len(t, Twilio.Queue, 1)
 	})
 
 	t.Run("Twilio Check Offline", func(t *testing.T) {
@@ -80,8 +76,8 @@ func TestTwilioNotifier(t *testing.T) {
 	})
 
 	t.Run("Twilio OnSuccess", func(t *testing.T) {
-		twilioNotifier.OnSuccess(TestService)
-		assert.Len(t, twilioNotifier.Queue, 2)
+		Twilio.OnSuccess(TestService)
+		assert.Len(t, Twilio.Queue, 2)
 	})
 
 	t.Run("Twilio Check Back Online", func(t *testing.T) {
@@ -89,25 +85,25 @@ func TestTwilioNotifier(t *testing.T) {
 	})
 
 	t.Run("Twilio OnSuccess Again", func(t *testing.T) {
-		twilioNotifier.OnSuccess(TestService)
-		assert.Len(t, twilioNotifier.Queue, 2)
+		Twilio.OnSuccess(TestService)
+		assert.Len(t, Twilio.Queue, 2)
 	})
 
 	t.Run("Twilio Send", func(t *testing.T) {
-		err := twilioNotifier.Send(twilioMessage)
+		err := Twilio.Send(twilioMessage)
 		assert.Nil(t, err)
 	})
 
 	t.Run("Twilio Test", func(t *testing.T) {
-		err := twilioNotifier.OnTest()
+		err := Twilio.OnTest()
 		assert.Nil(t, err)
 	})
 
 	t.Run("Twilio Queue", func(t *testing.T) {
-		go notifier.Queue(twilioNotifier)
+		go notifier.Queue(Twilio)
 		time.Sleep(1 * time.Second)
-		assert.Equal(t, TWILIO_SID, twilioNotifier.ApiKey)
-		assert.Equal(t, 0, len(twilioNotifier.Queue))
+		assert.Equal(t, TWILIO_SID, Twilio.ApiKey)
+		assert.Equal(t, 0, len(Twilio.Queue))
 	})
 
 }
