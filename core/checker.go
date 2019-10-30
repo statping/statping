@@ -267,13 +267,13 @@ func (s *Service) checkHttp(record bool) {
 
 		if l.State.Must.Fail > 0 {
 			if record {
-				recordFailure(s, fmt.Sprintf("Microspector had %v failures;\n%s", l.State.Must.Fail, strings.Join(l.State.Must.Messages, "\n")))
+				recordFailure(s, fmt.Sprintf("Microspector has %v messages;\n%s", l.State.Must.Fail, strings.Join(l.State.Must.Messages, "\n")))
 			}
 			res = nil
 			return
 		} else if l.State.Should.Fail > 0 {
 			if record {
-				recordAlert(s, fmt.Sprintf("Microspector had %v failures;\n%s", l.State.Should.Fail, strings.Join(l.State.Should.Messages, "\n")))
+				recordAlert(s, fmt.Sprintf("Microspector has %v messages;\n%s", l.State.Should.Fail, strings.Join(l.State.Should.Messages, "\n")))
 			}
 			res = nil
 			return
