@@ -285,7 +285,7 @@ func HttpRequest(url, method string, headers map[string]string, body io.Reader, 
 	req.Header.Set("User-Agent", "Statping")
 	sni := req.URL.Hostname()
 	for k, v := range headers {
-		if k == "host" {
+		if strings.ToLower(k) == "host" {
 			req.Host = v
 			sni = v
 		} else {
@@ -461,7 +461,7 @@ func ParseHeaders(str string) map[string]string {
 	for _, l := range strings.Split(str, "\n") {
 		kv := strings.Split(l, ":")
 		if len(kv) == 2 { //valid header format
-			headers[ strings.ToLower(strings.TrimSpace(kv[0]))] = strings.TrimSpace(kv[1])
+			headers[strings.ToLower(strings.TrimSpace(kv[0]))] = strings.TrimSpace(kv[1])
 		}
 	}
 
