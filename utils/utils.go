@@ -286,12 +286,15 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	if content != nil {
 		req.Header.Set("Content-Type", content.(string))
 	}
+
+	verifyHost := req.URL.Hostname()
 	for _, h := range headers {
 		keyVal := strings.Split(h, "=")
 		if len(keyVal) == 2 {
 			if keyVal[0] != "" && keyVal[1] != "" {
 				if strings.ToLower(keyVal[0]) == "host" {
 					req.Host = strings.TrimSpace(keyVal[1])
+					verifyHost = req.Host
 				} else {
 					req.Header.Set(keyVal[0], keyVal[1])
 				}
@@ -308,7 +311,7 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: !verifySSL,
-			ServerName:         req.Host,
+			ServerName:         verifyHost,
 		},
 		DisableKeepAlives:     true,
 		ResponseHeaderTimeout: timeout,
