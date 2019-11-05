@@ -31,10 +31,10 @@ type mobilePush struct {
 	*notifier.Notification
 }
 
-var mobile = &mobilePush{&notifier.Notification{
+var Mobile = &mobilePush{&notifier.Notification{
 	Method: "mobile",
 	Title:  "Mobile Notifications",
-	Description: `Receive push notifications on your mobile device using the Statping App. You can scan the Authentication QR Code found in Settings to get the mobile app setup in seconds.
+	Description: `Receive push notifications on your Mobile device using the Statping App. You can scan the Authentication QR Code found in Settings to get the Mobile app setup in seconds.
 				 <p align="center"><a href="https://play.google.com/store/apps/details?id=com.statping"><img src="https://img.cjx.io/google-play.svg"></a><a href="https://itunes.apple.com/us/app/apple-store/id1445513219"><img src="https://img.cjx.io/app-store-badge.svg"></a></p>`,
 	Author:    "Hunter Long",
 	AuthorUrl: "https://github.com/hunterlong",
@@ -43,7 +43,7 @@ var mobile = &mobilePush{&notifier.Notification{
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
 		Title:       "Device Identifiers",
-		Placeholder: "A list of your mobile device push notification ID's.",
+		Placeholder: "A list of your Mobile device push notification ID's.",
 		DbField:     "var1",
 		IsHidden:    true,
 	}, {
@@ -53,14 +53,6 @@ var mobile = &mobilePush{&notifier.Notification{
 		DbField:     "var2",
 		IsHidden:    true,
 	}}},
-}
-
-// init the discord notifier
-func init() {
-	err := notifier.AddNotifier(mobile)
-	if err != nil {
-		panic(err)
-	}
 }
 
 func (u *mobilePush) Select() *notifier.Notification {
