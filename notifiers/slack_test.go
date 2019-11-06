@@ -30,13 +30,13 @@ var (
 
 func init() {
 	SLACK_URL = os.Getenv("SLACK_URL")
-	slacker.Host = SLACK_URL
+	Slacker.Host = SLACK_URL
 }
 
 func TestSlackNotifier(t *testing.T) {
 	t.Parallel()
 	SLACK_URL = os.Getenv("SLACK_URL")
-	slacker.Host = SLACK_URL
+	Slacker.Host = SLACK_URL
 	if SLACK_URL == "" {
 		t.Log("slack notifier testing skipped, missing SLACK_URL environment variable")
 		t.SkipNow()
@@ -44,76 +44,72 @@ func TestSlackNotifier(t *testing.T) {
 	currentCount = CountNotifiers()
 
 	t.Run("Load slack", func(t *testing.T) {
-		slacker.Host = SLACK_URL
-		slacker.Delay = time.Duration(100 * time.Millisecond)
-		slacker.Limits = 3
-		err := notifier.AddNotifier(slacker)
+		Slacker.Host = SLACK_URL
+		Slacker.Delay = time.Duration(100 * time.Millisecond)
+		Slacker.Limits = 3
+		err := notifier.AddNotifiers(Slacker)
 		assert.Nil(t, err)
-		assert.Equal(t, "Hunter Long", slacker.Author)
-		assert.Equal(t, SLACK_URL, slacker.Host)
-	})
-
-	t.Run("Load slack Notifier", func(t *testing.T) {
-		notifier.Load()
+		assert.Equal(t, "Hunter Long", Slacker.Author)
+		assert.Equal(t, SLACK_URL, Slacker.Host)
 	})
 
 	t.Run("slack Notifier Tester", func(t *testing.T) {
-		assert.True(t, slacker.CanTest())
+		assert.True(t, Slacker.CanTest())
 	})
 
 	//t.Run("slack parse message", func(t *testing.T) {
 	//	err := parseSlackMessage(slackText, "this is a test!")
 	//	assert.Nil(t, err)
-	//	assert.Equal(t, 1, len(slacker.Queue))
+	//	assert.Equal(t, 1, len(Slacker.Queue))
 	//})
 
 	t.Run("slack Within Limits", func(t *testing.T) {
-		ok, err := slacker.WithinLimits()
+		ok, err := Slacker.WithinLimits()
 		assert.Nil(t, err)
 		assert.True(t, ok)
 	})
 
 	t.Run("slack OnFailure", func(t *testing.T) {
-		slacker.OnFailure(TestService, TestFailure)
-		assert.Equal(t, 1, len(slacker.Queue))
+		Slacker.OnFailure(TestService, TestFailure)
+		assert.Equal(t, 1, len(Slacker.Queue))
 	})
 
 	t.Run("slack OnSuccess", func(t *testing.T) {
-		slacker.OnSuccess(TestService)
-		assert.Equal(t, 1, len(slacker.Queue))
+		Slacker.OnSuccess(TestService)
+		assert.Equal(t, 1, len(Slacker.Queue))
 	})
 
 	t.Run("slack OnSuccess Again", func(t *testing.T) {
 		assert.True(t, TestService.Online)
-		slacker.OnSuccess(TestService)
-		assert.Equal(t, 1, len(slacker.Queue))
-		go notifier.Queue(slacker)
+		Slacker.OnSuccess(TestService)
+		assert.Equal(t, 1, len(Slacker.Queue))
+		go notifier.Queue(Slacker)
 		time.Sleep(15 * time.Second)
-		assert.Equal(t, 0, len(slacker.Queue))
+		assert.Equal(t, 0, len(Slacker.Queue))
 	})
 
 	t.Run("slack Within Limits again", func(t *testing.T) {
-		ok, err := slacker.WithinLimits()
+		ok, err := Slacker.WithinLimits()
 		assert.Nil(t, err)
 		assert.True(t, ok)
 	})
 
 	t.Run("slack Send", func(t *testing.T) {
-		err := slacker.Send(slackTestMessage)
+		err := Slacker.Send(slackTestMessage)
 		assert.Nil(t, err)
-		assert.Equal(t, 0, len(slacker.Queue))
+		assert.Equal(t, 0, len(Slacker.Queue))
 	})
 
 	t.Run("slack Test", func(t *testing.T) {
-		err := slacker.OnTest()
+		err := Slacker.OnTest()
 		assert.Nil(t, err)
 	})
 
 	t.Run("slack Queue", func(t *testing.T) {
-		go notifier.Queue(slacker)
+		go notifier.Queue(Slacker)
 		time.Sleep(10 * time.Second)
-		assert.Equal(t, SLACK_URL, slacker.Host)
-		assert.Equal(t, 0, len(slacker.Queue))
+		assert.Equal(t, SLACK_URL, Slacker.Host)
+		assert.Equal(t, 0, len(Slacker.Queue))
 	})
 
 }

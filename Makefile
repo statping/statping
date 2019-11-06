@@ -6,14 +6,14 @@ GOCMD=go
 GOBUILD=$(GOCMD) build -a
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
-GOVERSION=1.12.x
+GOVERSION=1.13.1
 GOINSTALL=$(GOCMD) install
 XGO=GOPATH=$(GOPATH) xgo -go $(GOVERSION) --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
 RICE=$(GOPATH)/bin/rice
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 PUBLISH_BODY='{ "request": { "branch": "master", "message": "Homebrew update version v${VERSION}", "config": { "env": { "VERSION": "${VERSION}", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
-TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "os": [ "linux" ], "language": "go", "go": [ "${GOVERSION}" ], "go_import_path": "github.com/hunterlong/statping", "install": true, "sudo": "required", "services": [ "docker" ], "env": { "VERSION": "${VERSION}" }, "matrix": { "allow_failures": [ { "go": "master" } ], "fast_finish": true }, "before_deploy": [ "git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [ { "provider": "releases", "api_key": "$(GH_TOKEN)", "file_glob": true, "file": "build/*", "skip_cleanup": true } ], "notifications": { "email": false }, "before_script": ["gem install sass"], "script": [ "wget -O statping.gpg $(SIGN_URL)", "gpg --import statping.gpg", "travis_wait 30 docker pull karalabe/xgo-latest", "make release" ], "after_success": [], "after_deploy": [ "make publish-homebrew" ] } } }'
+TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "os": [ "linux" ], "language": "go", "go": [ "${GOVERSION}" ], "go_import_path": "github.com/hunterlong/statping", "install": true, "sudo": "required", "services": [ "docker" ], "env": { "VERSION": "${VERSION}" }, "matrix": { "allow_failures": [ { "go": "master" } ], "fast_finish": true }, "before_deploy": [ "git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [ { "provider": "releases", "api_key": "$(GH_TOKEN)", "file_glob": true, "file": "build/*", "skip_cleanup": true } ], "notifications": { "email": false }, "before_script": ["gem install sass"], "script": [ "wget -O statping.gpg $(SIGN_URL)", "gpg --import statping.gpg", "travis_wait 30 docker pull crazymax/xgo:$(GOVERSION)", "make release" ], "after_success": [], "after_deploy": [ "make publish-homebrew" ] } } }'
 TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statping
 PATH:=$(PATH)
 
@@ -220,7 +220,7 @@ dev-deps:
 	$(GOINSTALL) github.com/mattn/goveralls
 	$(GOGET) github.com/rendon/testcli
 	$(GOGET) github.com/robertkrimen/godocdown/godocdown
-	$(GOGET) github.com/karalabe/xgo
+	$(GOGET) github.com/crazy-max/xgo
 	$(GOGET) github.com/GeertJohan/go.rice
 	$(GOGET) github.com/GeertJohan/go.rice/rice
 	$(GOINSTALL) github.com/GeertJohan/go.rice/rice
@@ -344,8 +344,8 @@ valid-sign:
 
 # install xgo and pull the xgo docker image
 xgo-install: clean
-	go get github.com/karalabe/xgo
-	docker pull karalabe/xgo-latest
+	go get github.com/crazy-max/xgo
+	docker pull crazy-max/xgo:${GOVERSION}
 
 heroku:
 	git push heroku master

@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/notifiers"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
@@ -64,7 +65,8 @@ func InitApp() {
 	InsertNotifierDB()
 	CoreApp.SelectAllServices(true)
 	checkServices()
-	CoreApp.Notifications = notifier.Load()
+	AttachNotifiers()
+	CoreApp.Notifications = notifier.AllCommunications
 	go DatabaseMaintence()
 }
 
@@ -175,6 +177,21 @@ func GetLocalIP() string {
 		}
 	}
 	return "http://localhost"
+}
+
+// AttachNotifiers will attach all the notifier's into the system
+func AttachNotifiers() error {
+	return notifier.AddNotifiers(
+		notifiers.Command,
+		notifiers.Discorder,
+		notifiers.Emailer,
+		notifiers.LineNotify,
+		notifiers.Mobile,
+		notifiers.Slacker,
+		notifiers.Telegram,
+		notifiers.Twilio,
+		notifiers.Webhook,
+	)
 }
 
 // ServiceOrder will reorder the services based on 'order_id' (Order)

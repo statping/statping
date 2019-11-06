@@ -27,10 +27,10 @@ type commandLine struct {
 	*notifier.Notification
 }
 
-var command = &commandLine{&notifier.Notification{
-	Method:      "command",
+var Command = &commandLine{&notifier.Notification{
+	Method:      "Command",
 	Title:       "Shell Command",
-	Description: "Shell Command allows you to run a customized shell/bash command on the local machine it's running on.",
+	Description: "Shell Command allows you to run a customized shell/bash Command on the local machine it's running on.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
 	Delay:       time.Duration(1 * time.Second),
@@ -47,22 +47,14 @@ var command = &commandLine{&notifier.Notification{
 		Title:       "Command to Run on OnSuccess",
 		Placeholder: "curl google.com",
 		DbField:     "var1",
-		SmallText:   "This command will run every time a service is receiving a Successful event.",
+		SmallText:   "This Command will run every time a service is receiving a Successful event.",
 	}, {
 		Type:        "text",
 		Title:       "Command to Run on OnFailure",
 		Placeholder: "curl offline.com",
 		DbField:     "var2",
-		SmallText:   "This command will run every time a service is receiving a Failing event.",
+		SmallText:   "This Command will run every time a service is receiving a Failing event.",
 	}}},
-}
-
-// init the command notifier
-func init() {
-	err := notifier.AddNotifier(command)
-	if err != nil {
-		panic(err)
-	}
 }
 
 func runCommand(app, cmd string) (string, string, error) {
@@ -102,7 +94,7 @@ func (u *commandLine) OnTest() error {
 	return err
 }
 
-// Send for commandLine will send message to expo command push notifications endpoint
+// Send for commandLine will send message to expo Command push notifications endpoint
 func (u *commandLine) Send(msg interface{}) error {
 	cmd := msg.(string)
 	_, _, err := runCommand(u.Host, cmd)

@@ -140,7 +140,7 @@
                         <h3 class="mt-4">Bulk Import Services</h3>
                         You can import multiple services based on a CSV file with the format shown on the <a href="https://github.com/hunterlong/statping/wiki/Bulk-Import-Services" target="_blank">Bulk Import Wiki</a>.
 
-                        <div class="card">
+                        <div class="card mt-2">
                             <div class="card-body">
                                 <form action="/settings/bulk_import" method="POST" enctype="multipart/form-data" class="form-inline">
                                     <div class="form-group col-10">
@@ -158,16 +158,13 @@
 
                         <div class="row">
                             <div class="col-12">
-                            <a href="/settings/export" class="btn btn-sm btn-secondary float-right">Export Settings</a>
-                            {{if .Domain}}
-                                <a href="#" class="btn btn-sm btn-secondary float-right ml-1">Authentication QR Code</a>
-                            {{end}}
-
                         {{if .Domain}}
                             <div class="row align-content-center">
                                 <img class="rounded text-center" width="300" height="300" src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl={{ QrAuth }}">
                             </div>
+
                             <a class="btn btn-sm btn-primary" href={{safeURL QrAuth}}>Open in Statping App</a>
+                            <a href="/settings/export" class="btn btn-sm btn-secondary">Export Settings</a>
                         {{end}}
 
                         </div>
