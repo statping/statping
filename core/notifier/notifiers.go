@@ -102,7 +102,7 @@ func (n *Notification) AfterFind() (err error) {
 func (n *Notification) AddQueue(uid string, msg interface{}) {
 	data := &QueueData{uid, msg}
 	n.Queue = append(n.Queue, data)
-	utils.Log(0, fmt.Sprintf("Notifier '%v' added new item (%v) to the queue. (%v queued)", n.Method, uid, len(n.Queue)))
+	utils.Log(1, fmt.Sprintf("Notifier '%v' added new item (%v) to the queue. (%v queued)", n.Method, uid, len(n.Queue)))
 }
 
 // CanTest returns true if the notifier implements the OnTest interface
@@ -189,8 +189,8 @@ func reverseLogs(input []*NotificationLog) []*NotificationLog {
 }
 
 // isInDatabase returns true if the notifier has already been installed
-func isInDatabase(n *Notification) bool {
-	inDb := modelDb(n).RecordNotFound()
+func isInDatabase(n Notifier) bool {
+	inDb := modelDb(n.Select()).RecordNotFound()
 	return !inDb
 }
 
@@ -216,13 +216,14 @@ func Update(n Notifier, notif *Notification) (*Notification, error) {
 }
 
 // insertDatabase will create a new record into the database for the notifier
-func insertDatabase(n *Notification) (int64, error) {
-	n.Limits = 3
-	query := db.Create(n)
+func insertDatabase(n Notifier) (int64, error) {
+	noti := n.Select()
+	noti.Limits = 3
+	query := db.Create(noti)
 	if query.Error != nil {
 		return 0, query.Error
 	}
-	return n.Id, query.Error
+	return noti.Id, query.Error
 }
 
 // SelectNotifier returns the Notification struct from the database
@@ -237,7 +238,7 @@ func SelectNotifier(method string) (*Notification, Notifier, error) {
 			return notifier, comm.(Notifier), nil
 		}
 	}
-	return nil, nil, nil
+	return nil, nil, errors.New("cannot find notifier")
 }
 
 // Init accepts the Notifier interface to initialize the notifier
@@ -309,9 +310,9 @@ CheckNotifier:
 
 // install will check the database for the notification, if its not inserted it will insert a new record for it
 func install(n Notifier) error {
-	inDb := isInDatabase(n.Select())
+	inDb := isInDatabase(n)
 	if !inDb {
-		_, err := insertDatabase(n.Select())
+		_, err := insertDatabase(n)
 		if err != nil {
 			utils.Log(3, err)
 			return err
