@@ -17,6 +17,7 @@ package notifier
 
 import (
 	"fmt"
+
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 )
@@ -36,6 +37,11 @@ func OnSave(method string) {
 // OnFailure will be triggered when a service is failing - BasicEvents interface
 func OnFailure(s *types.Service, f *types.Failure) {
 	if !s.AllowNotifications.Bool {
+		return
+	}
+
+	s.CurrentFailureCount++
+	if s.CurrentFailureCount < s.FailureThreshold {
 		return
 	}
 
@@ -69,6 +75,7 @@ func OnSuccess(s *types.Service) {
 	// check if User wants to receive every Status Change
 	if s.UpdateNotify && s.UserNotified {
 		s.UserNotified = false
+		s.CurrentFailureCount = 0
 	}
 
 	for _, comm := range AllCommunications {
