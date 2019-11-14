@@ -72,10 +72,11 @@ func OnSuccess(s *types.Service) {
 		return
 	}
 
+	s.CurrentFailureCount = 0
+
 	// check if User wants to receive every Status Change
 	if s.UpdateNotify && s.UserNotified {
 		s.UserNotified = false
-		s.CurrentFailureCount = 0
 	}
 
 	for _, comm := range AllCommunications {
