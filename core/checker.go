@@ -264,6 +264,7 @@ func recordSuccess(s *Service) {
 	notifier.OnSuccess(s.Service)
 	s.Online = true
 	s.SuccessNotified = true
+	s.CurrentFailureCount = 0
 }
 
 // recordFailure will create a new 'Failure' record in the database for a offline service
@@ -281,5 +282,8 @@ func recordFailure(s *Service, issue string) {
 	s.SuccessNotified = false
 	s.UpdateNotify = CoreApp.UpdateNotify.Bool
 	s.DownText = s.DowntimeText()
-	notifier.OnFailure(s.Service, fail.Failure)
+	s.CurrentFailureCount++
+	if s.CurrentFailureCount >= s.FailureThreshold {
+		notifier.OnFailure(s.Service, fail.Failure)
+	}
 }
