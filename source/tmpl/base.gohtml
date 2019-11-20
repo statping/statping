@@ -4,8 +4,8 @@
 {{block "head" .}} {{end}}
 <body>
     {{template "content" .}}
+    <footer>{{template "footer" .}}</footer>
+    {{template "scripts" .}}
 </body>
-<footer>{{template "footer" .}}</footer>
-{{template "scripts" .}}
 </html>
 {{end}}
