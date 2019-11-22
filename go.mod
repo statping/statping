@@ -18,7 +18,7 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/lib/pq v1.2.0 // indirect
 	github.com/rendon/testcli v0.0.0-20161027181003-6283090d169f
-	github.com/russross/blackfriday/v2 v2.0.1 // indirect
+	github.com/russross/blackfriday/v2 v2.0.1
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/stretchr/testify v1.4.0
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e

@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"github.com/GeertJohan/go.rice"
 	"github.com/hunterlong/statping/utils"
-	"gopkg.in/russross/blackfriday.v2"
+	"github.com/russross/blackfriday/v2"
 	"io/ioutil"
 	"os"
 )
