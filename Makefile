@@ -45,6 +45,7 @@ snapcraft: clean snapcraft-build snapcraft-release
 
 # build Statping for local arch
 build: compile
+	go mod vendor
 	$(GOBUILD) $(BUILDVERSION) -o $(BINARY_NAME) -v ./cmd
 
 # build Statping plugins
@@ -204,14 +205,6 @@ databases:
 	docker run --name statping_mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password123 -e MYSQL_DATABASE=root -d mysql
 	sleep 30
 
-
-#
-#    Download and Install dependencies
-#
-# run dep to install all required golang dependecies
-dep:
-	dep ensure -vendor-only
-
 # install all required golang dependecies
 dev-deps:
 	$(GOGET) github.com/stretchr/testify/assert
@@ -232,7 +225,6 @@ dev-deps:
 	$(GOGET) github.com/ararog/timeago
 	$(GOGET) gopkg.in/natefinch/lumberjack.v2
 	$(GOGET) golang.org/x/crypto/bcrypt
-	$(GOGET) github.com/99designs/gqlgen/...
 
 # remove files for a clean compile/build
 clean:
