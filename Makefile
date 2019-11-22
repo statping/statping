@@ -218,8 +218,7 @@ dev-deps:
 	$(GOGET) github.com/GeertJohan/go.rice/rice
 	$(GOINSTALL) github.com/GeertJohan/go.rice/rice
 	$(GOCMD) get github.com/axw/gocov/gocov
-	$(GOCMD) get gopkg.in/matm/v1/gocov-html
-	$(GOCMD) install gopkg.in/matm/v1/gocov-html
+	$(GOCMD) get github.com/matm/gocov-html
 	$(GOCMD) get github.com/mgechev/revive
 	$(GOCMD) get github.com/fatih/structs
 	$(GOGET) github.com/ararog/timeago
