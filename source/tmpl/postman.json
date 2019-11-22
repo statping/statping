@@ -2597,86 +2597,6 @@
 			"name": "Checkins",
 			"item": [
 				{
-					"name": "View All Checkin's",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "54bded63-de27-4839-8783-25874c35c3ea",
-								"exec": [
-									"pm.test(\"Response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"View All Checkins\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    var first = jsonData[0];",
-									"    var id = pm.globals.get(\"checkin_id\");",
-									"    pm.expect(first.name).to.eql(\"Server Checkin\");",
-									"    pm.expect(first.api_key).to.eql(id);",
-									"    pm.expect(first.grace).to.eql(60);",
-									"    pm.expect(first.interval).to.eql(900);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{endpoint}}/api/checkins",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"api",
-								"checkins"
-							]
-						},
-						"description": "View an array of all the Checkin's inserted into the system."
-					},
-					"response": [
-						{
-							"name": "View All Checkin's",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{endpoint}}/api/checkins",
-									"host": [
-										"{{endpoint}}"
-									],
-									"path": [
-										"api",
-										"checkins"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								},
-								{
-									"key": "Date",
-									"value": "Mon, 10 Dec 2018 19:34:16 GMT"
-								},
-								{
-									"key": "Content-Length",
-									"value": "268"
-								}
-							],
-							"cookie": [],
-							"body": "[\n    {\n        \"id\": 5,\n        \"service_id\": 2,\n        \"name\": \"Server Checkin\",\n        \"interval\": 900,\n        \"grace\": 60,\n        \"api_key\": \"1emn9ha\",\n        \"created_at\": \"2018-12-10T11:34:10.991372-08:00\",\n        \"updated_at\": \"2018-12-10T11:34:10.991372-08:00\",\n        \"failing\": false,\n        \"last_hit\": \"0001-01-01T00:00:00Z\",\n        \"hits\": [],\n        \"failures\": null\n    }\n]"
-						}
-					]
-				},
-				{
 					"name": "Create Checkin",
 					"event": [
 						{
@@ -2776,6 +2696,86 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"status\": \"success\",\n    \"type\": \"checkin\",\n    \"method\": \"create\",\n    \"id\": 5,\n    \"output\": {\n        \"id\": 5,\n        \"service_id\": 2,\n        \"name\": \"Server Checkin\",\n        \"interval\": 900,\n        \"grace\": 60,\n        \"api_key\": \"1emn9ha\",\n        \"created_at\": \"2018-12-10T19:34:10.991372Z\",\n        \"updated_at\": \"2018-12-10T19:34:10.991372Z\",\n        \"failing\": false,\n        \"last_hit\": \"0001-01-01T00:00:00Z\",\n        \"hits\": null,\n        \"failures\": null\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "View All Checkin's",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "54bded63-de27-4839-8783-25874c35c3ea",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"View All Checkins\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var first = jsonData[0];",
+									"    var id = pm.globals.get(\"checkin_id\");",
+									"    pm.expect(first.name).to.eql(\"Server Checkin\");",
+									"    pm.expect(first.api_key).to.eql(id);",
+									"    pm.expect(first.grace).to.eql(60);",
+									"    pm.expect(first.interval).to.eql(900);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint}}/api/checkins",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"checkins"
+							]
+						},
+						"description": "View an array of all the Checkin's inserted into the system."
+					},
+					"response": [
+						{
+							"name": "View All Checkin's",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint}}/api/checkins",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"checkins"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 10 Dec 2018 19:34:16 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "268"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 5,\n        \"service_id\": 2,\n        \"name\": \"Server Checkin\",\n        \"interval\": 900,\n        \"grace\": 60,\n        \"api_key\": \"1emn9ha\",\n        \"created_at\": \"2018-12-10T11:34:10.991372-08:00\",\n        \"updated_at\": \"2018-12-10T11:34:10.991372-08:00\",\n        \"failing\": false,\n        \"last_hit\": \"0001-01-01T00:00:00Z\",\n        \"hits\": [],\n        \"failures\": null\n    }\n]"
 						}
 					]
 				},
