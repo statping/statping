@@ -110,9 +110,9 @@ func (u *telegram) OnSave() error {
 	return nil
 }
 
-// OnTest will test the Twilio SMS messaging
+// OnTest will test the Telegram SMS messaging
 func (u *telegram) OnTest() error {
-	msg := fmt.Sprintf("Testing the Twilio SMS Notifier on your Statping server")
+	msg := fmt.Sprintf("Testing the Telegram Notifier on your Statping server")
 	return u.Send(msg)
 }
 
