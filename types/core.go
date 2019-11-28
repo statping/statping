@@ -37,7 +37,7 @@ type Core struct {
 	Version       string             `gorm:"column:version" json:"version"`
 	MigrationId   int64              `gorm:"column:migration_id" json:"migration_id,omitempty"`
 	UseCdn        NullBool           `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`
-	UpdateNotify  NullBool           `gorm:"column:update_notify;default:false" json:"update_notify,omitempty"`
+	UpdateNotify  NullBool           `gorm:"column:update_notify;default:true" json:"update_notify,omitempty"`
 	Timezone      float32            `gorm:"column:timezone;default:-8.0" json:"timezone,omitempty"`
 	CreatedAt     time.Time          `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt     time.Time          `gorm:"column:updated_at" json:"updated_at"`
