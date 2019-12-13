@@ -318,6 +318,21 @@ var heat_options = {
     }
 };
 
+async function zoomedEvent(chart, { xaxis, yaxis }) {
+    let start = Math.round(xaxis.min / 1000),
+        end = Math.round(xaxis.max / 1000);
+
+    let chartData = await ChartLatency({{$s.Id}}, start, end);
+    if (!chartData) {
+        chartData = await ChartLatency({{$s.Id}}, start, end, "minute");
+    }
+
+    if(!chartData || !chartData.length) {
+        return false
+    }
+
+    chart.updateSeries([{ data: chartData }]);
+}
 
 async function RenderHeatmap() {
     let heatChart = new ApexCharts(
@@ -335,8 +350,12 @@ async function RenderHeatmap() {
 }
 
 async function RenderChartLatency() {
-	options.fill.colors = {{if $s.Online}}["#48d338"]{{else}}["#dd3545"]{{end}};
-	options.stroke.colors = {{if $s.Online}}["#3aa82d"]{{else}}["#c23342"]{{end}};
+    options.chart.events = {
+        zoomed: zoomedEvent,
+    }
+    options.fill.colors = {{if $s.Online}}["#48d338"]{{else}}["#dd3545"]{{end}};
+    options.stroke.colors = {{if $s.Online}}["#3aa82d"]{{else}}["#c23342"]{{end}};
+
     let chart = new ApexCharts(document.querySelector("#service"), options);
     await RenderChart(chart,{{$s.Id}},{{.StartUnix}},{{.EndUnix}},"hour");
 }
