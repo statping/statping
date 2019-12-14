@@ -277,7 +277,7 @@ func (s *Service) Downtime() time.Duration {
 	if len(hits) == 0 {
 		return time.Now().UTC().Sub(fail.CreatedAt.UTC())
 	}
-	since := fail.CreatedAt.UTC().Sub(fail.CreatedAt.UTC())
+	since := fail.CreatedAt.UTC().Sub(hits[0].CreatedAt.UTC())
 	return since
 }
 

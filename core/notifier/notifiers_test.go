@@ -72,7 +72,7 @@ func TestIsBasicType(t *testing.T) {
 }
 
 func TestIsInDatabase(t *testing.T) {
-	in := isInDatabase(example.Notification)
+	in := isInDatabase(example)
 	assert.True(t, in)
 }
 
@@ -88,14 +88,6 @@ func TestAddQueue(t *testing.T) {
 	msg := "this is a test in the queue!"
 	example.AddQueue(fmt.Sprintf("service_%v", 0), msg)
 	assert.Equal(t, 1, len(example.Queue))
-	example.AddQueue(fmt.Sprintf("service_%v", 0), msg)
-	assert.Equal(t, 2, len(example.Queue))
-	example.AddQueue(fmt.Sprintf("service_%v", 0), msg)
-	assert.Equal(t, 3, len(example.Queue))
-	example.AddQueue(fmt.Sprintf("service_%v", 0), msg)
-	assert.Equal(t, 4, len(example.Queue))
-	example.AddQueue(fmt.Sprintf("service_%v", 0), msg)
-	assert.Equal(t, 5, len(example.Queue))
 }
 
 func TestNotification_Update(t *testing.T) {

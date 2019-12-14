@@ -50,8 +50,8 @@ before_install:
 install:
   - npm install -g sass
   - npm install -g newman
+  - go mod vendor
   - make dev-deps
-  - make dep
   - make install
 
 before_script:
