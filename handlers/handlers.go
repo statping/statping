@@ -16,19 +16,21 @@
 package handlers
 
 import (
+	"crypto/subtle"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/sessions"
-	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/source"
-	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
 	"html/template"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/gorilla/sessions"
+	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 )
 
 const (
@@ -105,14 +107,14 @@ func IsReadAuthenticated(r *http.Request) bool {
 	var token string
 	query := r.URL.Query()
 	key := query.Get("api")
-	if key == core.CoreApp.ApiKey {
+	if subtle.ConstantTimeCompare([]byte(key), []byte(core.CoreApp.ApiKey)) == 1 {
 		return true
 	}
 	tokens, ok := r.Header["Authorization"]
 	if ok && len(tokens) >= 1 {
 		token = tokens[0]
 		token = strings.TrimPrefix(token, "Bearer ")
-		if token == core.CoreApp.ApiKey {
+		if subtle.ConstantTimeCompare([]byte(token), []byte(core.CoreApp.ApiKey)) == 1 {
 			return true
 		}
 	}
@@ -136,7 +138,7 @@ func IsFullAuthenticated(r *http.Request) bool {
 	if ok && len(tokens) >= 1 {
 		token = tokens[0]
 		token = strings.TrimPrefix(token, "Bearer ")
-		if token == core.CoreApp.ApiSecret {
+		if subtle.ConstantTimeCompare([]byte(token), []byte(core.CoreApp.ApiKey)) == 1 {
 			return true
 		}
 	}
