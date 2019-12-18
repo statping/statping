@@ -461,3 +461,19 @@ func (n *Notification) IsRunning() bool {
 		return true
 	}
 }
+
+// ExampleService can be used for the OnTest() method for notifiers
+var ExampleService = &types.Service{
+	Id:             1,
+	Name:           "Interpol - All The Rage Back Home",
+	Domain:         "https://www.youtube.com/watch?v=-u6DvRyyKGU",
+	ExpectedStatus: 200,
+	Interval:       30,
+	Type:           "http",
+	Method:         "GET",
+	Timeout:        20,
+	LastStatusCode: 404,
+	Expected:       types.NewNullString("test example"),
+	LastResponse:   "<html>this is an example response</html>",
+	CreatedAt:      time.Now().Add(-24 * time.Hour),
+}

@@ -129,21 +129,7 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 }
 
 func (w *webhooker) OnTest() error {
-	service := &types.Service{
-		Id:             1,
-		Name:           "Interpol - All The Rage Back Home",
-		Domain:         "https://www.youtube.com/watch?v=-u6DvRyyKGU",
-		ExpectedStatus: 200,
-		Interval:       30,
-		Type:           "http",
-		Method:         "GET",
-		Timeout:        20,
-		LastStatusCode: 404,
-		Expected:       types.NewNullString("test example"),
-		LastResponse:   "<html>this is an example response</html>",
-		CreatedAt:      time.Now().Add(-24 * time.Hour),
-	}
-	body := replaceBodyText(w.Var2, service, nil)
+	body := replaceBodyText(w.Var2, notifier.ExampleService, nil)
 	resp, err := w.sendHttpWebhook(body)
 	if err != nil {
 		return err

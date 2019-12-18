@@ -71,10 +71,20 @@ install: build
 run: build
 	./$(BINARY_NAME) --ip 0.0.0.0 --port 8080
 
+# run Statping with Delve for debugging
+rundlv:
+	dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient exec ./$(BINARY_NAME)
+
+builddlv:
+	$(GOBUILD) -gcflags "all=-N -l" -o ./$(BINARY_NAME) -v ./cmd
+
+watch:
+	reflex -v -r '\.go' -s -- sh -c 'make builddlv && make rundlv'
+
 # compile assets using SASS and Rice. compiles scss -> css, and run rice embed-go
 compile: generate
 	sass source/scss/base.scss source/css/base.css
-	cd source && $(GOPATH)/bin/rice embed-go
+	cd source && rice embed-go
 	rm -rf .sass-cache
 
 # benchmark testing

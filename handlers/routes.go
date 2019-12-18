@@ -92,6 +92,7 @@ func Router() *mux.Router {
 	r.Handle("/service/{id}", http.HandlerFunc(servicesViewHandler)).Methods("GET")
 	r.Handle("/service/{id}/edit", authenticated(servicesViewHandler, true)).Methods("GET")
 	r.Handle("/service/{id}/delete_failures", authenticated(servicesDeleteFailuresHandler, true)).Methods("GET")
+	r.Handle("/service/create", authenticated(createServiceHandler, true)).Methods("GET")
 
 	r.Handle("/group/{id}", http.HandlerFunc(groupViewHandler)).Methods("GET")
 
