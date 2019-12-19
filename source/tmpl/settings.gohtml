@@ -6,13 +6,16 @@
         <div class="row">
             <div class="col-md-3 col-sm-12 mb-4 mb-md-0">
                 <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    <h6 class="text-muted">Main Settings</h6>
                     <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true"><i class="fa fa-cogs"></i> Settings</a>
-                    <a class="nav-link" id="v-pills-notifications-tab" data-toggle="pill" href="#v-pills-notifications" role="tab" aria-controls="v-pills-notifications" aria-selected="true"><i class="fa fa-cogs"></i> Notifications</a>
-                    <h6>Notifiers</h6>
+                    <a class="nav-link" id="v-pills-notifications-tab" data-toggle="pill" href="#v-pills-notifications" role="tab" aria-controls="v-pills-notifications" aria-selected="true"><i class="fa fa-bell"></i> Notifications</a>
                     <a class="nav-link" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false"><i class="fa fa-image"></i> Theme Editor</a>
                     <a class="nav-link" id="v-pills-cache-tab" data-toggle="pill" href="#v-pills-cache" role="tab" aria-controls="v-pills-cache" aria-selected="false"><i class="fa fa-paperclip"></i> Cache</a>
+                    <h6 class="mt-4 text-muted">Notifiers</h6>
+
                 {{ range .Notifications }}
-                    <a class="nav-link text-capitalize" id="v-pills-{{underscore .Select.Method}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Select.Method}}" role="tab" aria-controls="v-pills-{{underscore .Select.Method}}" aria-selected="false"><i class="{{.Select.Icon}}"></i> {{.Select.Method}}<span class="badge badge-success float-right">4</span></a>
+                    <a class="nav-link text-capitalize" id="v-pills-{{underscore .Select.Method}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Select.Method}}" role="tab" aria-controls="v-pills-{{underscore .Select.Method}}" aria-selected="false"><i class="{{.Select.Icon}}"></i> {{.Select.Method}}
+                        {{if .Select.Enabled.Bool}}<span class="badge badge-light float-right mt-1"><div class="fas fa-check text-success"></div></span>{{end}}</a>
                 {{ end }}
                     <a class="nav-link d-none" id="v-pills-backups-tab" data-toggle="pill" href="#v-pills-backups" role="tab" aria-controls="v-pills-backups" aria-selected="false">Backups</a>
                 {{ range .Plugins }}
@@ -26,8 +29,6 @@
             {{end}}
                 <div class="tab-content" id="v-pills-tabContent">
                     <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
-                        <h3>Settings</h3>
-
                         <form method="POST" action="/settings">
                             <div class="form-group">
                                 <label for="project">Project Name</label>
@@ -125,7 +126,7 @@
 
                         </form>
 
-                        <h3 class="mt-4">Bulk Import Services</h3>
+                        <h2 class="mt-5">Bulk Import Services</h2>
                         You can import multiple services based on a CSV file with the format shown on the <a href="https://github.com/hunterlong/statping/wiki/Bulk-Import-Services" target="_blank">Bulk Import Wiki</a>.
 
                         <div class="card mt-2">
@@ -141,22 +142,18 @@
                             </div>
                         </div>
 
-
-                        <h3 class="mt-4">Additional Settings</h3>
-
-                        <div class="row">
-                            <div class="col-12">
                         {{if .Domain}}
-                            <div class="row align-content-center">
-                                <img class="rounded text-center" width="300" height="300" src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl={{ QrAuth }}">
+                            <h2 class="mt-5">Additional Settings</h2>
+                            <div class="row">
+                                <div class="col-12">
+                                <div class="row align-content-center">
+                                    <img class="rounded text-center" width="300" height="300" src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl={{ QrAuth }}">
+                                </div>
+                                <a class="btn btn-sm btn-primary" href={{safeURL QrAuth}}>Open in Statping App</a>
+                                <a href="/settings/export" class="btn btn-sm btn-secondary">Export Settings</a>
                             </div>
-
-                            <a class="btn btn-sm btn-primary" href={{safeURL QrAuth}}>Open in Statping App</a>
-                            <a href="/settings/export" class="btn btn-sm btn-secondary">Export Settings</a>
+                            </div>
                         {{end}}
-
-                        </div>
-                        </div>
                     </div>
 
                     <div class="tab-pane" id="v-pills-notifications" role="tabpanel" aria-labelledby="v-pills-notifications-tab">

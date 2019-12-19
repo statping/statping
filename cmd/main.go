@@ -25,6 +25,8 @@ import (
 	"github.com/hunterlong/statping/utils"
 	"github.com/joho/godotenv"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 var (
@@ -61,6 +63,7 @@ func parseFlags() {
 // main will run the Statping application
 func main() {
 	var err error
+	go sigterm()
 	parseFlags()
 	loadDotEnvs()
 	source.Assets()
@@ -90,6 +93,15 @@ func main() {
 		os.Exit(1)
 	}
 	mainProcess()
+}
+
+// sigterm will attempt to close the database connections gracefully
+func sigterm() {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
+	<-sigs
+	core.CloseDB()
+	os.Exit(1)
 }
 
 // loadDotEnvs attempts to load database configs from a '.env' file in root directory

@@ -4,7 +4,7 @@
 {{template "nav"}}
 {{if .}}
     <div class="col-12">
-        <h3>Messages</h3>
+        <h1 class="text-black-50">Messages</h1>
         <table class="table table-striped">
             <thead>
             <tr>
@@ -34,7 +34,7 @@
 {{end}}
     {{if Auth}}
     <div class="col-12">
-        <h3>Create Message</h3>
+        <h1 class="text-black-50 mt-5">Create Message</h1>
         {{template "form_message" NewMessage}}
     </div>
     {{end}}

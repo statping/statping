@@ -73,13 +73,21 @@ run: build
 
 # run Statping with Delve for debugging
 rundlv:
-	dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient exec ./$(BINARY_NAME)
+	lsof -ti:8080 | xargs kill
+	DB_CONN=sqlite DB_HOST=localhost DB_DATABASE=sqlite DB_PASS=none DB_USER=none GO_ENV=test \
+	dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient exec ./statping
+
+killdlv:
+	lsof -ti:2345 | xargs kill
 
 builddlv:
 	$(GOBUILD) -gcflags "all=-N -l" -o ./$(BINARY_NAME) -v ./cmd
 
 watch:
-	reflex -v -r '\.go' -s -- sh -c 'make builddlv && make rundlv'
+	find . -print | grep -i '.*\.\(go\|gohtml\)' | justrun -v -c \
+	'go build -v -gcflags "all=-N -l" -o statping ./cmd && make rundlv &' \
+	-delay 10s -stdin \
+	-i="Makefile,statping,statup.db,statup.db-journal,handlers/graphql/generated.go"
 
 # compile assets using SASS and Rice. compiles scss -> css, and run rice embed-go
 compile: generate
@@ -250,7 +258,7 @@ clean:
 	rm -rf dev/test/cypress/videos
 	rm -f coverage.* sass
 	rm -f source/rice-box.go
-	rm -f *.db-journal
+	rm -rf **/*.db-journal
 	rm -rf *.snap
 	find . -name "*.out" -type f -delete
 	find . -name "*.cpu" -type f -delete
