@@ -44,7 +44,7 @@ func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 			online = 0
 		}
 		met := fmt.Sprintf("statping_service_failures{id=\"%v\" name=\"%v\"} %v\n", v.Id, v.Name, len(v.Failures))
-		met += fmt.Sprintf("statping_service_latency{id=\"%v\" name=\"%v\"} %0.0f\n", v.Id, v.Name, (v.Latency * 100))
+		met += fmt.Sprintf("statping_service_latency{id=\"%v\" name=\"%v\"} %0.0f\n", v.Id, v.Name, (v.Latency * 1000))
 		met += fmt.Sprintf("statping_service_online{id=\"%v\" name=\"%v\"} %v\n", v.Id, v.Name, online)
 		met += fmt.Sprintf("statping_service_status_code{id=\"%v\" name=\"%v\"} %v\n", v.Id, v.Name, v.LastStatusCode)
 		met += fmt.Sprintf("statping_service_response_length{id=\"%v\" name=\"%v\"} %v", v.Id, v.Name, len([]byte(v.LastResponse)))
