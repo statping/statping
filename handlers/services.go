@@ -335,3 +335,7 @@ func apiServiceHitsHandler(w http.ResponseWriter, r *http.Request) {
 
 	returnJson(hits, w, r)
 }
+
+func createServiceHandler(w http.ResponseWriter, r *http.Request) {
+	ExecuteResponse(w, r, "service_create.gohtml", core.CoreApp, nil)
+}

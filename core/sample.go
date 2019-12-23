@@ -44,6 +44,7 @@ func InsertSampleData() error {
 		Order:          1,
 		GroupId:        1,
 		Permalink:      types.NewNullString("google"),
+		VerifySSL:      types.NewNullBool(true),
 		CreatedAt:      createdOn,
 	})
 	s2 := ReturnService(&types.Service{
@@ -56,6 +57,7 @@ func InsertSampleData() error {
 		Timeout:        20,
 		Order:          2,
 		Permalink:      types.NewNullString("statping_github"),
+		VerifySSL:      types.NewNullBool(true),
 		CreatedAt:      createdOn,
 	})
 	s3 := ReturnService(&types.Service{
@@ -68,6 +70,7 @@ func InsertSampleData() error {
 		Timeout:        30,
 		Order:          3,
 		Public:         types.NewNullBool(true),
+		VerifySSL:      types.NewNullBool(true),
 		GroupId:        2,
 		CreatedAt:      createdOn,
 	})
@@ -83,6 +86,7 @@ func InsertSampleData() error {
 		Timeout:        30,
 		Order:          4,
 		Public:         types.NewNullBool(true),
+		VerifySSL:      types.NewNullBool(true),
 		GroupId:        2,
 		CreatedAt:      createdOn,
 	})
