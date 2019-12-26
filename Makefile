@@ -71,10 +71,28 @@ install: build
 run: build
 	./$(BINARY_NAME) --ip 0.0.0.0 --port 8080
 
+# run Statping with Delve for debugging
+rundlv:
+	lsof -ti:8080 | xargs kill
+	DB_CONN=sqlite DB_HOST=localhost DB_DATABASE=sqlite DB_PASS=none DB_USER=none GO_ENV=test \
+	dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient exec ./statping
+
+killdlv:
+	lsof -ti:2345 | xargs kill
+
+builddlv:
+	$(GOBUILD) -gcflags "all=-N -l" -o ./$(BINARY_NAME) -v ./cmd
+
+watch:
+	find . -print | grep -i '.*\.\(go\|gohtml\)' | justrun -v -c \
+	'go build -v -gcflags "all=-N -l" -o statping ./cmd && make rundlv &' \
+	-delay 10s -stdin \
+	-i="Makefile,statping,statup.db,statup.db-journal,handlers/graphql/generated.go"
+
 # compile assets using SASS and Rice. compiles scss -> css, and run rice embed-go
 compile: generate
 	sass source/scss/base.scss source/css/base.css
-	cd source && $(GOPATH)/bin/rice embed-go
+	cd source && rice embed-go
 	rm -rf .sass-cache
 
 # benchmark testing
@@ -240,7 +258,7 @@ clean:
 	rm -rf dev/test/cypress/videos
 	rm -f coverage.* sass
 	rm -f source/rice-box.go
-	rm -f *.db-journal
+	rm -rf **/*.db-journal
 	rm -rf *.snap
 	find . -name "*.out" -type f -delete
 	find . -name "*.cpu" -type f -delete
