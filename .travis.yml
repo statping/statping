@@ -1,70 +1,59 @@
 os:
-  - linux
-
+- linux
 language: go
 go: 1.13.5
 go_import_path: github.com/hunterlong/statping
-
 cache:
   directories:
-    - $GOPATH/pkg/dep
-    - ~/.npm
-    - ~/.cache
-    - $GOPATH/src/github.com/hunterlong/statping/vendor
-
+  - "~/.npm"
+  - "~/.cache"
+  - "$GOPATH/src/github.com/hunterlong/statping/vendor"
 sudo: required
-
 services:
-  - docker
-  - postgresql
-  - mysql
-  - mongodb
-
+- docker
+- postgresql
+- mysql
+- mongodb
 env:
   global:
-    - PATH=/snap/bin:$PATH
-    - DB_HOST=localhost
-    - DB_USER=travis
-    - DB_PASS=
-    - DB_DATABASE=test
-    - GO_ENV=test
-    - STATPING_DIR=$GOPATH/src/github.com/hunterlong/statping
+  - PATH=/snap/bin:$PATH
+  - DB_HOST=localhost
+  - DB_USER=travis
+  - DB_PASS=
+  - DB_DATABASE=test
+  - GO_ENV=test
+  - STATPING_DIR=$GOPATH/src/github.com/hunterlong/statping
+  - secure: Gj78iZc3DarXSrE/brlzmoRvYDIaPXkwI6Blphqw0X2caGL85F2DVc7LbXwJJI4BvJrqiDhsGtnWebKCG1MZzXrPwy702wxEmfLYQ41kU/60tLgF3/Bb2KbqDqLnUjfpZd+h/xxOP71PE6HxKn/Ncg4sEyHc9oxbzKg1mhovIccGPIUqvA9EMjPdRwD9ZDB63F2eHuDJ2QI5i7R878aIctqC5MFj4+1F5/rQBXKhDuJuR8Lq4b5m/bR3Z5r5OH0gKEYsMSZ2/ddJgtFkSR3SNHNhYmkSuicFTESGiAqHWI3M8DkHwgGbryKcJbKfDyCk+hlXbBkTb8DBpJgGeCjCK2uTsc9JUPQpmlGgZvnlg0wVKtYcd+Rr3HP7Aa+mVfW7p+krkh7ds1XkZpTs5W/RcWAeyHFBf8QdGRwWwTPvvW+AyHTKpRbVgPKQbNYhl+Bu3Cvl0DX/tx75fRRiIAHYYUH+hoUi9t+oLZDroIxaqkvAN4w8Dwc7UOlWRkBTPDTKIGjPFqOWuyWKgkI2i1e3iA7sfxTitqO9PG4NCkvdnHtoDLEgvRAk5qfnJI1Q0ajvNA9RBhkGLlJSGetxvpPxZ0FHrf8ZFapsODn0aIJjUdr9pHhEG7BWyoxgW/Dy0VYX5r/bhBLT4fF34W6wIXARJLRK4NQDxCLDi9yrNexW7eQ=
 
 matrix:
   allow_failures:
-    - go: master
+  - go: master
   fast_finish: true
-
 notifications:
   email: true
-
 branches:
   only:
-    - master
-    - dev
-
+  - master
 install:
-  - npm install -g sass
-  - npm install -g newman
-  - go mod vendor
-  - make dev-deps
-  - make install
-
+- npm install -g sass
+- npm install -g newman
+- go mod vendor
+- make dev-deps
+- make install
 before_script:
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
-  - psql -c 'create database test;' -U postgres
-
+- mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
+- psql -c 'create database test;' -U postgres
 script:
-  - travis_retry make test-all
-  - make test-api
-  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make coverage; fi
-
+- travis_retry make test-all
+- make test-api
+- if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then
+  make coverage; fi
 after_success:
-  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make travis-build; fi
-
+- if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then
+  make travis-build; fi
 webhooks:
   urls:
-    - $GITTER
+  - "$GITTER"
   on_success: change
   on_failure: always
   on_start: never
