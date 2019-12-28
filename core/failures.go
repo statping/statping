@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"github.com/ararog/timeago"
 	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
 	"sort"
 	"strings"
 	"time"
@@ -35,20 +34,19 @@ const (
 )
 
 // CreateFailure will create a new Failure record for a service
-func (s *Service) CreateFailure(fail types.FailureInterface) error {
-	f := fail.(*Failure)
+func (s *Service) CreateFailure(f *types.Failure) (int64, error) {
 	f.Service = s.Id
 	row := failuresDB().Create(f)
 	if row.Error != nil {
-		utils.Log(3, row.Error)
-		return row.Error
+		log.Errorln(row.Error)
+		return 0, row.Error
 	}
 	sort.Sort(types.FailSort(s.Failures))
-	s.Failures = append(s.Failures, f)
+	//s.Failures = append(s.Failures, f)
 	if len(s.Failures) > limitedFailures {
 		s.Failures = s.Failures[1:]
 	}
-	return row.Error
+	return f.Id, row.Error
 }
 
 // AllFailures will return all failures attached to a service
@@ -57,7 +55,7 @@ func (s *Service) AllFailures() []*Failure {
 	col := failuresDB().Where("service = ?", s.Id).Not("method = 'checkin'").Order("id desc")
 	err := col.Find(&fails)
 	if err.Error != nil {
-		utils.Log(3, fmt.Sprintf("Issue getting failures for service %v, %v", s.Name, err))
+		log.Errorln(fmt.Sprintf("Issue getting failures for service %v, %v", s.Name, err))
 		return nil
 	}
 	return fails
@@ -67,7 +65,7 @@ func (s *Service) AllFailures() []*Failure {
 func (s *Service) DeleteFailures() {
 	err := DbSession.Exec(`DELETE FROM failures WHERE service = ?`, s.Id)
 	if err.Error != nil {
-		utils.Log(3, fmt.Sprintf("failed to delete all failures: %v", err))
+		log.Errorln(fmt.Sprintf("failed to delete all failures: %v", err))
 	}
 	s.Failures = nil
 }
@@ -119,7 +117,7 @@ func CountFailures() uint64 {
 	var count uint64
 	err := failuresDB().Count(&count)
 	if err.Error != nil {
-		utils.Log(2, err.Error)
+		log.Warnln(err.Error)
 		return 0
 	}
 	return count

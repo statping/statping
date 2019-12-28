@@ -16,15 +16,18 @@
 package main
 
 import (
+	"github.com/hunterlong/statping/utils"
+
 	"flag"
 	"fmt"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/handlers"
 	"github.com/hunterlong/statping/plugin"
 	"github.com/hunterlong/statping/source"
-	"github.com/hunterlong/statping/utils"
 	"github.com/joho/godotenv"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 var (
@@ -33,7 +36,8 @@ var (
 	// COMMIT stores the git commit hash for this version of Statping
 	COMMIT      string
 	ipAddress   string
-	UsingDotEnv bool
+	envFile     string
+	verboseMode int
 	port        int
 )
 
@@ -45,25 +49,31 @@ func init() {
 // -ip = 0.0.0.0 IP address for outgoing HTTP server
 // -port = 8080 Port number for outgoing HTTP server
 func parseFlags() {
-	ip := flag.String("ip", "0.0.0.0", "IP address to run the Statping HTTP server")
-	p := flag.Int("port", 8080, "Port to run the HTTP server")
+	flag.StringVar(&ipAddress, "ip", "0.0.0.0", "IP address to run the Statping HTTP server")
+	flag.StringVar(&envFile, "env", "", "IP address to run the Statping HTTP server")
+	flag.IntVar(&port, "port", 8080, "Port to run the HTTP server")
+	flag.IntVar(&verboseMode, "verbose", 1, "Run in verbose mode to see detailed logs (1 - 4)")
 	flag.Parse()
-	ipAddress = *ip
-	port = *p
+
 	if os.Getenv("PORT") != "" {
 		port = int(utils.ToInt(os.Getenv("PORT")))
 	}
 	if os.Getenv("IP") != "" {
 		ipAddress = os.Getenv("IP")
 	}
+	if os.Getenv("VERBOSE") != "" {
+		verboseMode = int(utils.ToInt(os.Getenv("VERBOSE")))
+	}
 }
 
 // main will run the Statping application
 func main() {
 	var err error
+	go sigterm()
 	parseFlags()
 	loadDotEnvs()
 	source.Assets()
+	utils.VerboseMode = verboseMode
 	if err := utils.InitLogs(); err != nil {
 		fmt.Printf("Statping Log Error: \n %v\n", err)
 		os.Exit(2)
@@ -80,24 +90,39 @@ func main() {
 			os.Exit(1)
 		}
 	}
-	utils.Log(1, fmt.Sprintf("Starting Statping v%v", VERSION))
+	utils.Log.Info(fmt.Sprintf("Starting Statping v%v", VERSION))
+	updateDisplay()
 
 	core.Configs, err = core.LoadConfigFile(utils.Directory)
 	if err != nil {
-		utils.Log(3, err)
+		utils.Log.Errorln(err)
 		core.SetupMode = true
-		utils.Log(1, handlers.RunHTTPServer(ipAddress, port))
+		utils.Log.Infoln(handlers.RunHTTPServer(ipAddress, port))
 		os.Exit(1)
 	}
 	mainProcess()
 }
 
+// Close will gracefully stop the database connection, and log file
+func Close() {
+	core.CloseDB()
+	utils.CloseLogs()
+}
+
+// sigterm will attempt to close the database connections gracefully
+func sigterm() {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
+	<-sigs
+	Close()
+	os.Exit(1)
+}
+
 // loadDotEnvs attempts to load database configs from a '.env' file in root directory
 func loadDotEnvs() error {
-	err := godotenv.Load()
+	err := godotenv.Load(envFile)
 	if err == nil {
-		utils.Log(1, "Environment file '.env' Loaded")
-		UsingDotEnv = true
+		utils.Log.Infoln("Environment file '.env' Loaded")
 	}
 	return err
 }
@@ -108,7 +133,7 @@ func mainProcess() {
 	var err error
 	err = core.Configs.Connect(false, dir)
 	if err != nil {
-		utils.Log(4, fmt.Sprintf("could not connect to database: %v", err))
+		utils.Log.Errorln(fmt.Sprintf("could not connect to database: %v", err))
 	}
 	core.Configs.MigrateDatabase()
 	core.InitApp()

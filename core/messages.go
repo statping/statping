@@ -18,7 +18,6 @@ package core
 import (
 	"fmt"
 	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
 	"time"
 )
 
@@ -64,7 +63,7 @@ func (m *Message) Create() (int64, error) {
 	m.CreatedAt = time.Now().UTC()
 	db := messagesDb().Create(m)
 	if db.Error != nil {
-		utils.Log(3, fmt.Sprintf("Failed to create message %v #%v: %v", m.Title, m.Id, db.Error))
+		log.Errorln(fmt.Sprintf("Failed to create message %v #%v: %v", m.Title, m.Id, db.Error))
 		return 0, db.Error
 	}
 	return m.Id, nil
@@ -80,7 +79,7 @@ func (m *Message) Delete() error {
 func (m *Message) Update() (*Message, error) {
 	db := messagesDb().Update(m)
 	if db.Error != nil {
-		utils.Log(3, fmt.Sprintf("Failed to update message %v #%v: %v", m.Title, m.Id, db.Error))
+		log.Errorln(fmt.Sprintf("Failed to update message %v #%v: %v", m.Title, m.Id, db.Error))
 		return nil, db.Error
 	}
 	return m, nil

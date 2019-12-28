@@ -17,6 +17,7 @@ package core
 
 import (
 	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -24,7 +25,6 @@ import (
 
 var (
 	newServiceId int64
-	newGroupId   int64
 )
 
 func TestSelectHTTPService(t *testing.T) {
@@ -118,7 +118,7 @@ func TestCheckTCPService(t *testing.T) {
 }
 
 func TestServiceOnline24Hours(t *testing.T) {
-	since := time.Now().Add(-24 * time.Hour).Add(-10 * time.Minute)
+	since := utils.Now().Add(-24 * time.Hour).Add(-10 * time.Minute)
 	service := SelectService(1)
 	assert.Equal(t, float32(100), service.OnlineSince(since))
 	service2 := SelectService(5)
@@ -134,7 +134,7 @@ func TestServiceSmallText(t *testing.T) {
 }
 
 func TestServiceAvgUptime(t *testing.T) {
-	since := time.Now().Add(-24 * time.Hour).Add(-10 * time.Minute)
+	since := utils.Now().Add(-24 * time.Hour).Add(-10 * time.Minute)
 	service := SelectService(1)
 	assert.NotEqual(t, "0.00", service.AvgUptime(since))
 	service2 := SelectService(5)
@@ -256,10 +256,10 @@ func TestServiceFailedTCPCheck(t *testing.T) {
 }
 
 func TestCreateServiceFailure(t *testing.T) {
-	fail := &Failure{&types.Failure{
+	fail := &types.Failure{
 		Issue:  "This is not an issue, but it would container HTTP response errors.",
 		Method: "http",
-	}}
+	}
 	service := SelectService(8)
 	id, err := service.CreateFailure(fail)
 	assert.Nil(t, err)
@@ -398,7 +398,7 @@ func TestService_TotalFailures24(t *testing.T) {
 
 func TestService_TotalFailuresOnDate(t *testing.T) {
 	t.SkipNow()
-	ago := time.Now().UTC()
+	ago := utils.Now().UTC()
 	service := SelectService(8)
 	failures, err := service.TotalFailuresOnDate(ago)
 	assert.Nil(t, err)

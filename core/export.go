@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
 	"html/template"
 )
 
@@ -28,7 +27,7 @@ import (
 func ExportChartsJs() string {
 	render, err := source.JsBox.String("charts.js")
 	if err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 	}
 	t := template.New("charts")
 	t.Funcs(template.FuncMap{
@@ -39,7 +38,7 @@ func ExportChartsJs() string {
 	t.Parse(render)
 	var tpl bytes.Buffer
 	if err := t.Execute(&tpl, CoreApp.Services); err != nil {
-		utils.Log(3, err)
+		log.Errorln(err)
 	}
 	result := tpl.String()
 	return result

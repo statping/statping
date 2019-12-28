@@ -217,7 +217,7 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 	dbSession, err := gorm.Open(dbType, conn)
 	if err != nil {
 		if retry {
-			utils.Log(1, fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", Configs.DbHost))
+			log.Infoln(fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", Configs.DbHost))
 			return db.waitForDb()
 		} else {
 			return err
@@ -229,7 +229,10 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 	err = dbSession.DB().Ping()
 	if err == nil {
 		DbSession = dbSession
-		utils.Log(1, fmt.Sprintf("Database %v connection was successful.", dbType))
+		if utils.VerboseMode >= 4 {
+			DbSession.LogMode(true).Debug().SetLogger(log)
+		}
+		log.Infoln(fmt.Sprintf("Database %v connection was successful.", dbType))
 	}
 	return err
 }
@@ -244,7 +247,7 @@ func (db *DbConfig) waitForDb() error {
 // this function is currently set to delete records 7+ days old every 60 minutes
 func DatabaseMaintence() {
 	for range time.Tick(60 * time.Minute) {
-		utils.Log(1, "Checking for database records older than 3 months...")
+		log.Infoln("Checking for database records older than 3 months...")
 		since := time.Now().AddDate(0, -3, 0).UTC()
 		DeleteAllSince("failures", since)
 		DeleteAllSince("hits", since)
@@ -256,7 +259,7 @@ func DeleteAllSince(table string, date time.Time) {
 	sql := fmt.Sprintf("DELETE FROM %v WHERE created_at < '%v';", table, date.Format("2006-01-02"))
 	db := DbSession.Exec(sql)
 	if db.Error != nil {
-		utils.Log(2, db.Error)
+		log.Warnln(db.Error)
 	}
 }
 
@@ -265,12 +268,12 @@ func (db *DbConfig) Update() error {
 	var err error
 	config, err := os.Create(utils.Directory + "/config.yml")
 	if err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 		return err
 	}
 	data, err := yaml.Marshal(db)
 	if err != nil {
-		utils.Log(3, err)
+		log.Errorln(err)
 		return err
 	}
 	config.WriteString(string(data))
@@ -283,14 +286,14 @@ func (db *DbConfig) Save() (*DbConfig, error) {
 	var err error
 	config, err := os.Create(utils.Directory + "/config.yml")
 	if err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 		return nil, err
 	}
 	db.ApiKey = utils.NewSHA1Hash(16)
 	db.ApiSecret = utils.NewSHA1Hash(16)
 	data, err := yaml.Marshal(db)
 	if err != nil {
-		utils.Log(3, err)
+		log.Errorln(err)
 		return nil, err
 	}
 	config.WriteString(string(data))
@@ -315,14 +318,14 @@ func (c *DbConfig) CreateCore() *Core {
 	}
 	CoreApp, err := SelectCore()
 	if err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 	}
 	return CoreApp
 }
 
 // DropDatabase will DROP each table Statping created
 func (db *DbConfig) DropDatabase() error {
-	utils.Log(1, "Dropping Database Tables...")
+	log.Infoln("Dropping Database Tables...")
 	err := DbSession.DropTableIfExists("checkins")
 	err = DbSession.DropTableIfExists("checkin_hits")
 	err = DbSession.DropTableIfExists("notifications")
@@ -340,7 +343,7 @@ func (db *DbConfig) DropDatabase() error {
 // CreateDatabase will CREATE TABLES for each of the Statping elements
 func (db *DbConfig) CreateDatabase() error {
 	var err error
-	utils.Log(1, "Creating Database Tables...")
+	log.Infoln("Creating Database Tables...")
 	for _, table := range DbModels {
 		if err := DbSession.CreateTable(table); err.Error != nil {
 			return err.Error
@@ -349,7 +352,7 @@ func (db *DbConfig) CreateDatabase() error {
 	if err := DbSession.Table("core").CreateTable(&types.Core{}); err.Error != nil {
 		return err.Error
 	}
-	utils.Log(1, "Statping Database Created")
+	log.Infoln("Statping Database Created")
 	return err
 }
 
@@ -357,7 +360,7 @@ func (db *DbConfig) CreateDatabase() error {
 // This function will NOT remove previous records, tables or columns from the database.
 // If this function has an issue, it will ROLLBACK to the previous state.
 func (db *DbConfig) MigrateDatabase() error {
-	utils.Log(1, "Migrating Database Tables...")
+	log.Infoln("Migrating Database Tables...")
 	tx := DbSession.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -372,9 +375,9 @@ func (db *DbConfig) MigrateDatabase() error {
 	}
 	if err := tx.Table("core").AutoMigrate(&types.Core{}); err.Error != nil {
 		tx.Rollback()
-		utils.Log(3, fmt.Sprintf("Statping Database could not be migrated: %v", tx.Error))
+		log.Errorln(fmt.Sprintf("Statping Database could not be migrated: %v", tx.Error))
 		return tx.Error
 	}
-	utils.Log(1, "Statping Database Migrated")
+	log.Infoln("Statping Database Migrated")
 	return tx.Commit().Error
 }

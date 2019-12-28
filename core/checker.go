@@ -24,6 +24,7 @@ import (
 	"github.com/hunterlong/statping/utils"
 	"github.com/microspector/microspector/pkg/parser"
 	"github.com/tatsushid/go-fastping"
+	"math"
 	"math/rand"
 	"net"
 	"net/http"
@@ -34,7 +35,7 @@ import (
 
 // checkServices will start the checking go routine for each service
 func checkServices() {
-	utils.Log(1, fmt.Sprintf("Starting monitoring process for %v Services", len(CoreApp.Services)))
+	log.Infoln(fmt.Sprintf("Starting monitoring process for %v Services", len(CoreApp.Services)))
 	for _, ser := range CoreApp.Services {
 		//go obj.StartCheckins()
 		go ser.CheckQueue(true)
@@ -45,10 +46,7 @@ func checkServices() {
 // Check will run checkHttp for HTTP services and checkTcp for TCP services
 // if record param is set to true, it will add a record into the database.
 func (s *Service) Check(record bool) {
-
-	if s.NotificationCirclePeriod == 0 && s.NotificationCircle != 0 {
-		s.NotificationCirclePeriod = s.NotificationCircle
-	}
+	s.NotificationCirclePeriod = int(math.Max(float64(s.NotificationCircle), 1))
 
 	switch s.Type {
 	case "http":
@@ -68,7 +66,7 @@ CheckLoop:
 	for {
 		select {
 		case <-s.Running:
-			utils.Log(1, fmt.Sprintf("Stopping service: %v", s.Name))
+			log.Infoln(fmt.Sprintf("Stopping service: %v", s.Name))
 			break CheckLoop
 		case <-time.After(s.SleepDuration):
 			s.Check(record)
@@ -296,9 +294,8 @@ func recordSuccess(s *Service) {
 		PingTime:  s.PingTime,
 		CreatedAt: time.Now(),
 	}
-	utils.Log(1, fmt.Sprintf("Service %v Successful Response: %0.2f ms | Lookup in: %0.2f ms", s.Name, hit.Latency*1000, hit.PingTime*1000))
-	_, _ = s.CreateHit(hit)
-	hit = nil
+	s.CreateHit(hit)
+	log.WithFields(utils.ToFields(hit, s.Select())).Infoln(fmt.Sprintf("Service %v Successful Response: %0.2f ms | Lookup in: %0.2f ms", s.Name, hit.Latency*1000, hit.PingTime*1000))
 	notifier.OnSuccess(s.Service)
 	s.Online = true
 	s.SuccessNotified = true
@@ -306,37 +303,37 @@ func recordSuccess(s *Service) {
 
 // recordFailure will create a new 'Failure' record in the database for a offline service
 func recordFailure(s *Service, issue string) {
-	fail := &Failure{&types.Failure{
+	fail := &types.Failure{
 		Service:   s.Id,
 		Issue:     issue,
 		PingTime:  s.PingTime,
 		CreatedAt: time.Now(),
 		ErrorCode: s.LastStatusCode,
-	}}
+	}
 	if s.DependsOn != 0 {
 		sd := SelectService(s.DependsOn)
 		if sd != nil && sd.Service != nil {
 			s.DependsOnService = sd.Service
 		}
 	}
-	utils.Log(2, fmt.Sprintf("Service %v Failing: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
+	log.WithFields(utils.ToFields(fail, s.Select())).Warnln(fmt.Sprintf("Service %v Failing: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
 	s.CreateFailure(fail)
 	s.Online = false
 	s.SuccessNotified = false
 	s.UpdateNotify = CoreApp.UpdateNotify.Bool
 	s.DownText = s.DowntimeText()
-	notifier.OnFailure(s.Service, fail.Failure)
+	notifier.OnFailure(s.Service, fail)
 }
 
 func recordAlert(s *Service, issue string) {
-	fail := &Failure{&types.Failure{
+	fail := &types.Failure{
 		Service:   s.Id,
 		Issue:     issue,
 		PingTime:  s.PingTime,
 		CreatedAt: time.Now(),
 		ErrorCode: s.LastStatusCode,
-	}}
-	utils.Log(2, fmt.Sprintf("Service %v Alerting: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
+	}
+	utils.Log.Warn(fmt.Sprintf("Service %v Alerting: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
 	s.CreateFailure(fail)
-	notifier.OnAlert(s.Service, fail.Failure)
+	notifier.OnAlert(s.Service, fail)
 }

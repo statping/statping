@@ -2496,7 +2496,7 @@ for application logging
 ```go
 func Log(level int, err interface{}) error
 ```
-Log creates a new entry in the Logger. Log has 1-5 levels depending on how
+Log creates a new entry in the utils.Log. Log has 1-5 levels depending on how
 critical the log/error is
 
 #### func  NewSHA1Hash

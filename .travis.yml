@@ -2,7 +2,7 @@ os:
   - linux
 
 language: go
-go: 1.13
+go: 1.13.5
 go_import_path: github.com/hunterlong/statping
 
 cache:
@@ -42,10 +42,6 @@ branches:
   only:
     - master
     - dev
-
-before_install:
-  - curl -L -s https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64 -o $GOPATH/bin/dep
-  - chmod +x $GOPATH/bin/dep
 
 install:
   - npm install -g sass

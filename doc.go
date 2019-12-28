@@ -1,4 +1,4 @@
-// Package statping is a server monitoring application that includs a status page server. Visit the Statping repo at
+// Package statping is a server monitoring application that includes a status page server. Visit the Statping repo at
 // https://github.com/hunterlong/statping to get a full understanding of what this application can do.
 //
 // Install Statping
@@ -12,7 +12,7 @@
 //		brew install statping
 //
 //		// Linux installation
-//		bash <(curl -s https://assets.statping.com/install.sh)
+//		curl -o- -L https://statping.com/install.sh | bash
 //		statping version
 //
 // Docker

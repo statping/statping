@@ -1,24 +1,28 @@
 VERSION=$(shell cat version.txt)
 SIGN_KEY=B76D61FAA6DB759466E83D9964B9C6AAE2D55278
 BINARY_NAME=statping
-GOPATH:=$(GOPATH)
 GOCMD=go
 GOBUILD=$(GOCMD) build -a
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
-GOVERSION=1.13.1
+GOVERSION=1.13.5
 GOINSTALL=$(GOCMD) install
-XGO=GOPATH=$(GOPATH) xgo -go $(GOVERSION) --dest=build
+GOPATH:=$(GOPATH)
+XGO=$(GOPATH) xgo -go $(GOVERSION) --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
 RICE=$(GOPATH)/bin/rice
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 PUBLISH_BODY='{ "request": { "branch": "master", "message": "Homebrew update version v${VERSION}", "config": { "env": { "VERSION": "${VERSION}", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
-TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "os": [ "linux" ], "language": "go", "go": [ "${GOVERSION}" ], "go_import_path": "github.com/hunterlong/statping", "install": true, "sudo": "required", "services": [ "docker" ], "env": { "VERSION": "${VERSION}" }, "matrix": { "allow_failures": [ { "go": "master" } ], "fast_finish": true }, "before_deploy": [ "git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [ { "provider": "releases", "api_key": "$(GH_TOKEN)", "file_glob": true, "file": "build/*", "skip_cleanup": true } ], "notifications": { "email": false }, "before_script": ["gem install sass"], "script": [ "wget -O statping.gpg $(SIGN_URL)", "gpg --import statping.gpg", "travis_wait 30 docker pull crazymax/xgo:$(GOVERSION)", "make release" ], "after_success": [], "after_deploy": [ "make publish-homebrew" ] } } }'
+TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "os": [ "linux" ], "language": "go", "go": [ "${GOVERSION}" ], "go_import_path": "github.com/hunterlong/statping", "install": true, "sudo": "required", "services": [ "docker" ], "env": { "VERSION": "${VERSION}" }, "matrix": { "allow_failures": [ { "go": "master" } ], "fast_finish": true }, "before_deploy": [ "git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [ { "provider": "releases", "api_key": "$(GH_TOKEN)", "file_glob": true, "file": "build/*", "skip_cleanup": true } ], "notifications": { "email": false }, "before_script": ["gem install sass"], "script": [ "make release" ], "after_success": [], "after_deploy": [ "make publish-homebrew" ] } } }'
 TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statping
 PATH:=$(PATH)
 
 # build all arch's and release Statping
-release: dev-deps build-all
+release: dev-deps
+	travis_wait 30 docker pull crazymax/xgo:$(GOVERSION)
+	wget -O statping.gpg $(SIGN_URL)
+	gpg --import statping.gpg
+	make build-all
 
 # build and push the images to docker hub
 docker: docker-build-all docker-publish-all
@@ -71,10 +75,28 @@ install: build
 run: build
 	./$(BINARY_NAME) --ip 0.0.0.0 --port 8080
 
+# run Statping with Delve for debugging
+rundlv:
+	lsof -ti:8080 | xargs kill
+	DB_CONN=sqlite DB_HOST=localhost DB_DATABASE=sqlite DB_PASS=none DB_USER=none GO_ENV=test \
+	dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient exec ./statping
+
+killdlv:
+	lsof -ti:2345 | xargs kill
+
+builddlv:
+	$(GOBUILD) -gcflags "all=-N -l" -o ./$(BINARY_NAME) -v ./cmd
+
+watch:
+	find . -print | grep -i '.*\.\(go\|gohtml\)' | justrun -v -c \
+	'go build -v -gcflags "all=-N -l" -o statping ./cmd && make rundlv &' \
+	-delay 10s -stdin \
+	-i="Makefile,statping,statup.db,statup.db-journal,handlers/graphql/generated.go"
+
 # compile assets using SASS and Rice. compiles scss -> css, and run rice embed-go
 compile: generate
 	sass source/scss/base.scss source/css/base.css
-	cd source && $(GOPATH)/bin/rice embed-go
+	cd source && rice embed-go
 	rm -rf .sass-cache
 
 # benchmark testing
@@ -240,7 +262,7 @@ clean:
 	rm -rf dev/test/cypress/videos
 	rm -f coverage.* sass
 	rm -f source/rice-box.go
-	rm -f *.db-journal
+	rm -rf **/*.db-journal
 	rm -rf *.snap
 	find . -name "*.out" -type f -delete
 	find . -name "*.cpu" -type f -delete

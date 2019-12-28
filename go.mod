@@ -8,6 +8,7 @@ require (
 	github.com/agnivade/levenshtein v1.0.2 // indirect
 	github.com/ararog/timeago v0.0.0-20160328174124-e9969cf18b8d
 	github.com/daaku/go.zipexe v1.0.1 // indirect
+	github.com/fatih/structs v1.1.0
 	github.com/go-mail/mail v2.3.1+incompatible
 	github.com/go-yaml/yaml v2.1.0+incompatible
 	github.com/gorilla/mux v1.7.3
@@ -17,9 +18,11 @@ require (
 	github.com/jinzhu/gorm v1.9.11
 	github.com/joho/godotenv v1.3.0
 	github.com/lib/pq v1.2.0 // indirect
+	github.com/microspector/microspector v1.0.0
 	github.com/rendon/testcli v0.0.0-20161027181003-6283090d169f
 	github.com/russross/blackfriday/v2 v2.0.1
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
+	github.com/sirupsen/logrus v1.2.0
 	github.com/stretchr/testify v1.4.0
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
 	github.com/vektah/gqlparser v1.1.2

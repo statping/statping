@@ -3,7 +3,7 @@
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
 {{template "nav"}}
     <div class="col-12">
-        <h3>Users</h3>
+        <h1 class="text-black-50">Users</h1>
         <table class="table table-striped">
             <thead>
             <tr>
@@ -26,7 +26,7 @@
             </tbody>
         </table>
         {{if Auth}}
-            <h3>Create User</h3>
+            <h1 class="text-black-50 mt-5">Create User</h1>
             {{template "form_user" NewUser}}
         {{end}}
     </div>

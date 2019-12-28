@@ -1,12 +1,11 @@
-FROM golang:1.12-alpine as base
+FROM golang:1.13.5-alpine as base
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG VERSION
-ENV DEP_VERSION v0.5.0
 RUN apk add --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers wget curl jq libsass
 RUN curl -L -s https://assets.statping.com/sass -o /usr/local/bin/sass && \
     chmod +x /usr/local/bin/sass
 WORKDIR /go/src/github.com/hunterlong/statping
-ADD Makefile Gopkg.* /go/src/github.com/hunterlong/statping/
+ADD Makefile go.mod /go/src/github.com/hunterlong/statping/
 RUN go mod vendor && \
     make dev-deps
 ADD . /go/src/github.com/hunterlong/statping

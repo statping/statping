@@ -52,7 +52,7 @@ func TestStartServerCommand(t *testing.T) {
 func TestVersionCommand(t *testing.T) {
 	c := testcli.Command("statping", "version")
 	c.Run()
-	assert.True(t, c.StdoutContains("Statping v"+VERSION))
+	assert.True(t, c.StdoutContains(VERSION))
 }
 
 func TestHelpCommand(t *testing.T) {
@@ -90,7 +90,7 @@ func TestUpdateCommand(t *testing.T) {
 	commandAndSleep(cmd, time.Duration(15*time.Second), got)
 	gg, _ := <-got
 	t.Log(gg)
-	assert.Contains(t, gg, "Statping")
+	assert.Contains(t, gg, VERSION)
 }
 
 func TestAssetsCommand(t *testing.T) {

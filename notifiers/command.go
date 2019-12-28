@@ -89,8 +89,8 @@ func (u *commandLine) OnSave() error {
 // OnTest for commandLine triggers when this notifier has been saved
 func (u *commandLine) OnTest() error {
 	in, out, err := runCommand(u.Host, u.Var1)
-	utils.Log(1, in)
-	utils.Log(1, out)
+	utils.Log.Infoln(in)
+	utils.Log.Infoln(out)
 	return err
 }
 

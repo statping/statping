@@ -216,7 +216,7 @@ func (u *email) Select() *notifier.Notification {
 
 // OnSave triggers when this notifier has been saved
 func (u *email) OnSave() error {
-	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
+	utils.Log.Infoln(fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
 	// Do updating stuff here
 	return nil
 }
@@ -235,7 +235,7 @@ func (u *email) OnTest() error {
 		LastStatusCode: 200,
 		Expected:       types.NewNullString("test example"),
 		LastResponse:   "<html>this is an example response</html>",
-		CreatedAt:      time.Now().Add(-24 * time.Hour),
+		CreatedAt:      utils.Now().Add(-24 * time.Hour),
 	}
 	email := &emailOutgoing{
 		To:       u.Var2,
@@ -262,7 +262,7 @@ func (u *email) dialSend(email *emailOutgoing) error {
 	m.SetHeader("Subject", email.Subject)
 	m.SetBody("text/html", email.Source)
 	if err := mailer.DialAndSend(m); err != nil {
-		utils.Log(3, fmt.Sprintf("email '%v' sent to: %v (size: %v) %v", email.Subject, email.To, len([]byte(email.Source)), err))
+		utils.Log.Errorln(fmt.Sprintf("email '%v' sent to: %v (size: %v) %v", email.Subject, email.To, len([]byte(email.Source)), err))
 		return err
 	}
 	return nil
@@ -277,11 +277,11 @@ func emailTemplate(contents string, data interface{}) string {
 	t := template.New("email")
 	t, err := t.Parse(contents)
 	if err != nil {
-		utils.Log(3, err)
+		utils.Log.Errorln(err)
 	}
 	var tpl bytes.Buffer
 	if err := t.Execute(&tpl, data); err != nil {
-		utils.Log(2, err)
+		utils.Log.Warnln(err)
 	}
 	result := tpl.String()
 	return result
