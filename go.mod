@@ -1,6 +1,6 @@
 module github.com/hunterlong/statping
 
-go 1.13
+go 1.13.5
 
 require (
 	github.com/99designs/gqlgen v0.10.1

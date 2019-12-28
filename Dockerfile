@@ -1,4 +1,4 @@
-FROM golang:1.13-alpine as base
+FROM golang:1.13.5-alpine as base
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG VERSION
 RUN apk add --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers wget curl jq libsass

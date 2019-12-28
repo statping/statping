@@ -5,7 +5,7 @@ GOCMD=go
 GOBUILD=$(GOCMD) build -a
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
-GOVERSION=1.13.1
+GOVERSION=1.13.5
 GOINSTALL=$(GOCMD) install
 GOPATH:=$(GOPATH)
 XGO=$(GOPATH) xgo -go $(GOVERSION) --dest=build
