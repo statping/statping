@@ -215,7 +215,6 @@ systemctl start statping
 echo "Statping has been installed to SystemCTL and will start on boot"
 }
 
-
 function downloadBin {
      getOS
      getArch
