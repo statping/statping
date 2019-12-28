@@ -41,6 +41,7 @@
     </div>
 
     <div class="col-12 mt-5">
+        {{if ne (len (Groups false)) 0}}
             <h1 class="text-muted">Groups</h1>
             <table class="table">
                 <thead>
@@ -67,6 +68,7 @@
                 {{end}}
                 </tbody>
             </table>
+        {{end}}
         {{if Auth}}
             <h1 class="text-muted mt-5">Create Group</h1>
             {{template "form_group" NewGroup}}

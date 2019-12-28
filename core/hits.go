@@ -17,7 +17,6 @@ package core
 
 import (
 	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
 	"time"
 )
 
@@ -29,7 +28,7 @@ type Hit struct {
 func (s *Service) CreateHit(h *types.Hit) (int64, error) {
 	db := hitsDB().Create(&h)
 	if db.Error != nil {
-		utils.Log(2, db.Error)
+		log.Warnln(db.Error)
 		return 0, db.Error
 	}
 	return h.Id, db.Error

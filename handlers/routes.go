@@ -25,11 +25,11 @@ import (
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
-	"time"
 )
 
 var (
 	router *mux.Router
+	log    = utils.Log.WithField("type", "handlers")
 )
 
 // Router returns all of the routes used in Statping.
@@ -58,9 +58,9 @@ func Router() *mux.Router {
 	r.Handle("/charts.js", http.HandlerFunc(renderServiceChartsHandler))
 	r.Handle("/setup", http.HandlerFunc(setupHandler)).Methods("GET")
 	r.Handle("/setup", http.HandlerFunc(processSetupHandler)).Methods("POST")
-	r.Handle("/dashboard", http.HandlerFunc(dashboardHandler)).Methods("GET")
-	r.Handle("/dashboard", http.HandlerFunc(loginHandler)).Methods("POST")
-	r.Handle("/logout", http.HandlerFunc(logoutHandler))
+	r.Handle("/dashboard", sendLog(dashboardHandler)).Methods("GET")
+	r.Handle("/dashboard", sendLog(loginHandler)).Methods("POST")
+	r.Handle("/logout", sendLog(logoutHandler))
 	r.Handle("/plugins/download/{name}", authenticated(pluginsDownloadHandler, true))
 	r.Handle("/plugins/{name}/save", authenticated(pluginSavedHandler, true)).Methods("POST")
 	r.Handle("/help", authenticated(helpHandler, true))
@@ -90,11 +90,11 @@ func Router() *mux.Router {
 	// SERVICE Routes
 	r.Handle("/services", authenticated(servicesHandler, true)).Methods("GET")
 	r.Handle("/service/create", authenticated(createServiceHandler, true)).Methods("GET")
-	r.Handle("/service/{id}", http.HandlerFunc(servicesViewHandler)).Methods("GET")
+	r.Handle("/service/{id}", sendLog(servicesViewHandler)).Methods("GET")
 	r.Handle("/service/{id}/edit", authenticated(servicesViewHandler, true)).Methods("GET")
 	r.Handle("/service/{id}/delete_failures", authenticated(servicesDeleteFailuresHandler, true)).Methods("GET")
 
-	r.Handle("/group/{id}", http.HandlerFunc(groupViewHandler)).Methods("GET")
+	r.Handle("/group/{id}", sendLog(groupViewHandler)).Methods("GET")
 
 	// API GROUPS Routes
 	r.Handle("/api/groups", readOnly(apiAllGroupHandler, false)).Methods("GET")
@@ -115,9 +115,9 @@ func Router() *mux.Router {
 	r.Handle("/api/services/{id}", readOnly(apiServiceHandler, false)).Methods("GET")
 	r.Handle("/api/reorder/services", authenticated(reorderServiceHandler, false)).Methods("POST")
 	r.Handle("/api/services/{id}/running", authenticated(apiServiceRunningHandler, false)).Methods("POST")
-	r.Handle("/api/services/{id}/data", cached("30s", "application/json", http.HandlerFunc(apiServiceDataHandler))).Methods("GET")
-	r.Handle("/api/services/{id}/ping", cached("30s", "application/json", http.HandlerFunc(apiServicePingDataHandler))).Methods("GET")
-	r.Handle("/api/services/{id}/heatmap", cached("30s", "application/json", http.HandlerFunc(apiServiceHeatmapHandler))).Methods("GET")
+	r.Handle("/api/services/{id}/data", cached("30s", "application/json", apiServiceDataHandler)).Methods("GET")
+	r.Handle("/api/services/{id}/ping", cached("30s", "application/json", apiServicePingDataHandler)).Methods("GET")
+	r.Handle("/api/services/{id}/heatmap", cached("30s", "application/json", apiServiceHeatmapHandler)).Methods("GET")
 	r.Handle("/api/services/{id}", authenticated(apiServiceUpdateHandler, false)).Methods("POST")
 	r.Handle("/api/services/{id}", authenticated(apiServiceDeleteHandler, false)).Methods("DELETE")
 	r.Handle("/api/services/{id}/failures", authenticated(apiServiceFailuresHandler, false)).Methods("GET")
@@ -152,7 +152,7 @@ func Router() *mux.Router {
 	r.Handle("/api/checkin/{api}", authenticated(apiCheckinHandler, false)).Methods("GET")
 	r.Handle("/api/checkin", authenticated(checkinCreateHandler, false)).Methods("POST")
 	r.Handle("/api/checkin/{api}", authenticated(checkinDeleteHandler, false)).Methods("DELETE")
-	r.Handle("/checkin/{api}", http.HandlerFunc(checkinHitHandler))
+	r.Handle("/checkin/{api}", sendLog(checkinHitHandler))
 
 	// Static Files Routes
 	r.PathPrefix("/files/postman.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
@@ -161,10 +161,10 @@ func Router() *mux.Router {
 
 	// API Generic Routes
 	r.Handle("/metrics", readOnly(prometheusHandler, false))
-	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
+	r.Handle("/health", sendLog(healthCheckHandler))
 	r.Handle("/.well-known/", http.StripPrefix("/.well-known/", http.FileServer(http.Dir(dir+"/.well-known"))))
 
-	r.NotFoundHandler = http.HandlerFunc(error404Handler)
+	r.NotFoundHandler = sendLog(error404Handler)
 	return r
 }
 
@@ -175,7 +175,7 @@ func resetRouter() {
 
 func resetCookies() {
 	if core.CoreApp != nil {
-		cookie := fmt.Sprintf("%v_%v", core.CoreApp.ApiSecret, time.Now().Nanosecond())
+		cookie := fmt.Sprintf("%v_%v", core.CoreApp.ApiSecret, utils.Now().Nanosecond())
 		sessionStore = sessions.NewCookieStore([]byte(cookie))
 	} else {
 		sessionStore = sessions.NewCookieStore([]byte("secretinfo"))

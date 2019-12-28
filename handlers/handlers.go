@@ -56,11 +56,11 @@ func RunHTTPServer(ip string, port int) error {
 	cert := utils.FileExists(utils.Directory + "/server.crt")
 
 	if key && cert {
-		utils.Log(1, "server.cert and server.key was found in root directory! Starting in SSL mode.")
-		utils.Log(1, fmt.Sprintf("Statping Secure HTTPS Server running on https://%v:%v", ip, 443))
+		log.Infoln("server.cert and server.key was found in root directory! Starting in SSL mode.")
+		log.Infoln(fmt.Sprintf("Statping Secure HTTPS Server running on https://%v:%v", ip, 443))
 		usingSSL = true
 	} else {
-		utils.Log(1, "Statping HTTP Server running on http://"+host)
+		log.Infoln("Statping HTTP Server running on http://" + host)
 	}
 
 	router = Router()
@@ -178,7 +178,7 @@ func loadTemplate(w http.ResponseWriter, r *http.Request) error {
 	mainTemplate.Funcs(handlerFuncs(w, r))
 	mainTemplate, err = mainTemplate.Parse(mainTmpl)
 	if err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 		return err
 	}
 	// render all templates
@@ -187,7 +187,7 @@ func loadTemplate(w http.ResponseWriter, r *http.Request) error {
 		tmp, _ := source.TmplBox.String(temp)
 		mainTemplate, err = mainTemplate.Parse(tmp)
 		if err != nil {
-			utils.Log(4, err)
+			log.Errorln(err)
 			return err
 		}
 	}
@@ -196,7 +196,7 @@ func loadTemplate(w http.ResponseWriter, r *http.Request) error {
 		tmp, _ := source.JsBox.String(temp)
 		mainTemplate, err = mainTemplate.Parse(tmp)
 		if err != nil {
-			utils.Log(4, err)
+			log.Errorln(err)
 			return err
 		}
 	}
@@ -205,7 +205,6 @@ func loadTemplate(w http.ResponseWriter, r *http.Request) error {
 
 // ExecuteResponse will render a HTTP response for the front end user
 func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{}) {
-	utils.Http(r)
 	if url, ok := redirect.(string); ok {
 		http.Redirect(w, r, url, http.StatusSeeOther)
 		return
@@ -216,15 +215,15 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 	loadTemplate(w, r)
 	render, err := source.TmplBox.String(file)
 	if err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 	}
 	// render the page requested
 	if _, err := mainTemplate.Parse(render); err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 	}
 	// execute the template
 	if err := mainTemplate.Execute(w, data); err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 	}
 }
 
@@ -232,7 +231,7 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}) {
 	render, err := source.JsBox.String(file)
 	if err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 	}
 	if usingSSL {
 		w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
@@ -247,10 +246,10 @@ func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 		},
 	})
 	if _, err := t.Parse(render); err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 	}
 	if err := t.Execute(w, data); err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 	}
 }
 

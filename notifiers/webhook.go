@@ -98,7 +98,7 @@ func replaceBodyText(body string, s *types.Service, f *types.Failure) string {
 }
 
 func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
-	utils.Log(1, fmt.Sprintf("sending body: '%v' to %v as a %v request", body, w.Host, w.Var1))
+	utils.Log.Infoln(fmt.Sprintf("sending body: '%v' to %v as a %v request", body, w.Host, w.Var1))
 	client := new(http.Client)
 	client.Timeout = time.Duration(10 * time.Second)
 	var buf *bytes.Buffer
@@ -136,7 +136,7 @@ func (w *webhooker) OnTest() error {
 	}
 	defer resp.Body.Close()
 	content, err := ioutil.ReadAll(resp.Body)
-	utils.Log(1, fmt.Sprintf("Webhook notifier received: '%v'", string(content)))
+	utils.Log.Infoln(fmt.Sprintf("Webhook notifier received: '%v'", string(content)))
 	return err
 }
 

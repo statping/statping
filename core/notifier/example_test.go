@@ -233,7 +233,6 @@ func ExampleNotification_OnSuccess() {
 	example.AddQueue("example", msg)
 	fmt.Println(len(example.Queue))
 	// Output:
-	// INFO: Notifier 'Example' added new item (example) to the queue. (1 queued)
 	// 1
 }
 
@@ -270,7 +269,6 @@ func ExampleNotification_AddQueue() {
 	queue := example.Queue
 	fmt.Printf("Example has %v items in the queue", len(queue))
 	// Output:
-	// INFO: Notifier 'Example' added new item (example) to the queue. (2 queued)
 	// Example has 2 items in the queue
 }
 

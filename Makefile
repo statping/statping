@@ -1,14 +1,14 @@
 VERSION=$(shell cat version.txt)
 SIGN_KEY=B76D61FAA6DB759466E83D9964B9C6AAE2D55278
 BINARY_NAME=statping
-GOPATH:=$(GOPATH)
 GOCMD=go
 GOBUILD=$(GOCMD) build -a
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 GOVERSION=1.13.1
 GOINSTALL=$(GOCMD) install
-XGO=GOPATH=$(GOPATH) xgo -go $(GOVERSION) --dest=build
+GOPATH:=$(GOPATH)
+XGO=$(GOPATH) xgo -go $(GOVERSION) --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
 RICE=$(GOPATH)/bin/rice
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)

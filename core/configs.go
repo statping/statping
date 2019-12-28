@@ -34,7 +34,7 @@ type ErrorResponse struct {
 func LoadConfigFile(directory string) (*DbConfig, error) {
 	var configs *DbConfig
 	if os.Getenv("DB_CONN") != "" {
-		utils.Log(1, "DB_CONN environment variable was found, waiting for database...")
+		log.Infoln("DB_CONN environment variable was found, waiting for database...")
 		return LoadUsingEnv()
 	}
 	file, err := ioutil.ReadFile(directory + "/config.yml")
@@ -66,18 +66,18 @@ func LoadUsingEnv() (*DbConfig, error) {
 
 	err = Configs.Connect(true, utils.Directory)
 	if err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 		return nil, err
 	}
 	Configs.Save()
 	exists := DbSession.HasTable("core")
 	if !exists {
-		utils.Log(1, fmt.Sprintf("Core database does not exist, creating now!"))
+		log.Infoln(fmt.Sprintf("Core database does not exist, creating now!"))
 		Configs.DropDatabase()
 		Configs.CreateDatabase()
 		CoreApp, err = Configs.InsertCore()
 		if err != nil {
-			utils.Log(3, err)
+			log.Errorln(err)
 		}
 
 		username := os.Getenv("ADMIN_USER")
@@ -195,7 +195,7 @@ func SampleData() error {
 func DeleteConfig() error {
 	err := os.Remove(utils.Directory + "/config.yml")
 	if err != nil {
-		utils.Log(3, err)
+		log.Errorln(err)
 		return err
 	}
 	return nil

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/hunterlong/statping/utils"
 	"sync"
 	"time"
 )
@@ -25,7 +26,7 @@ func (item Item) Expired() bool {
 	if item.Expiration == 0 {
 		return false
 	}
-	return time.Now().UnixNano() > item.Expiration
+	return utils.Now().UnixNano() > item.Expiration
 }
 
 //Storage mecanism for caching strings in memory
@@ -68,6 +69,6 @@ func (s Storage) Set(key string, content []byte, duration time.Duration) {
 	defer s.mu.Unlock()
 	s.items[key] = Item{
 		Content:    content,
-		Expiration: time.Now().Add(duration).UnixNano(),
+		Expiration: utils.Now().Add(duration).UnixNano(),
 	}
 }

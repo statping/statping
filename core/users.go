@@ -77,7 +77,7 @@ func (u *User) Create() (int64, error) {
 		return 0, db.Error
 	}
 	if u.Id == 0 {
-		utils.Log(3, fmt.Sprintf("Failed to create User %v. %v", u.Username, db.Error))
+		log.Errorln(fmt.Sprintf("Failed to create User %v. %v", u.Username, db.Error))
 		return 0, db.Error
 	}
 	return u.Id, db.Error
@@ -88,7 +88,7 @@ func SelectAllUsers() ([]*User, error) {
 	var users []*User
 	db := usersDB().Find(&users)
 	if db.Error != nil {
-		utils.Log(3, fmt.Sprintf("Failed to load all users. %v", db.Error))
+		log.Errorln(fmt.Sprintf("Failed to load all users. %v", db.Error))
 		return nil, db.Error
 	}
 	return users, db.Error
@@ -99,7 +99,7 @@ func SelectAllUsers() ([]*User, error) {
 func AuthUser(username, password string) (*User, bool) {
 	user, err := SelectUsername(username)
 	if err != nil {
-		utils.Log(2, fmt.Errorf("user %v not found", username))
+		log.Warnln(fmt.Errorf("user %v not found", username))
 		return nil, false
 	}
 	if CheckHash(password, user.Password) {

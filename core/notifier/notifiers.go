@@ -33,6 +33,7 @@ var (
 	// db holds the Statping database connection
 	db       *gorm.DB
 	timezone float32
+	log      = utils.Log.WithField("type", "notifier")
 )
 
 // Notification contains all the fields for a Statping Notifier.
@@ -102,7 +103,7 @@ func (n *Notification) AfterFind() (err error) {
 func (n *Notification) AddQueue(uid string, msg interface{}) {
 	data := &QueueData{uid, msg}
 	n.Queue = append(n.Queue, data)
-	utils.Log(1, fmt.Sprintf("Notifier '%v' added new item (%v) to the queue. (%v queued)", n.Method, uid, len(n.Queue)))
+	log.WithFields(utils.ToFields(data, n)).Infoln(fmt.Sprintf("Notifier '%v' added new item (%v) to the queue. (%v queued)", n.Method, uid, len(n.Queue)))
 }
 
 // CanTest returns true if the notifier implements the OnTest interface
@@ -169,8 +170,8 @@ func normalizeType(ty interface{}) string {
 func (n *Notification) makeLog(msg interface{}) {
 	log := &NotificationLog{
 		Message:   normalizeType(msg),
-		Time:      utils.Timestamp(time.Now()),
-		Timestamp: time.Now(),
+		Time:      utils.Timestamp(utils.Now()),
+		Timestamp: utils.Now(),
 	}
 	n.logs = append(n.logs, log)
 }
@@ -290,9 +291,9 @@ CheckNotifier:
 					msg := notification.Queue[0]
 					err := n.Send(msg.Data)
 					if err != nil {
-						utils.Log(2, fmt.Sprintf("Notifier '%v' had an error: %v", notification.Method, err))
+						log.WithFields(utils.ToFields(notification, msg)).Warnln(fmt.Sprintf("Notifier '%v' had an error: %v", notification.Method, err))
 					} else {
-						utils.Log(1, fmt.Sprintf("Notifier '%v' sent outgoing message (%v) %v left in queue.", notification.Method, msg.Id, len(notification.Queue)))
+						log.WithFields(utils.ToFields(notification, msg)).Infoln(fmt.Sprintf("Notifier '%v' sent outgoing message (%v) %v left in queue.", notification.Method, msg.Id, len(notification.Queue)))
 					}
 					notification.makeLog(msg.Data)
 					if len(notification.Queue) > 1 {
@@ -311,10 +312,13 @@ CheckNotifier:
 // install will check the database for the notification, if its not inserted it will insert a new record for it
 func install(n Notifier) error {
 	inDb := isInDatabase(n)
+	log.WithField("installed", inDb).
+		WithFields(utils.ToFields(n)).
+		Debugln(fmt.Sprintf("Checking if notifier '%v' is installed: %v", n.Select().Method, inDb))
 	if !inDb {
 		_, err := insertDatabase(n)
 		if err != nil {
-			utils.Log(3, err)
+			log.Errorln(err)
 			return err
 		}
 	}
@@ -333,13 +337,13 @@ func (n *Notification) LastSent() time.Duration {
 
 // SentLastHour returns the total amount of notifications sent in last 1 hour
 func (n *Notification) SentLastHour() int {
-	since := time.Now().Add(-1 * time.Hour)
+	since := utils.Now().Add(-1 * time.Hour)
 	return n.SentLast(since)
 }
 
 // SentLastMinute returns the total amount of notifications sent in last 1 minute
 func (n *Notification) SentLastMinute() int {
-	since := time.Now().Add(-1 * time.Minute)
+	since := utils.Now().Add(-1 * time.Minute)
 	return n.SentLast(since)
 }
 
@@ -475,5 +479,5 @@ var ExampleService = &types.Service{
 	LastStatusCode: 404,
 	Expected:       types.NewNullString("test example"),
 	LastResponse:   "<html>this is an example response</html>",
-	CreatedAt:      time.Now().Add(-24 * time.Hour),
+	CreatedAt:      utils.Now().Add(-24 * time.Hour),
 }

@@ -113,7 +113,7 @@ func (u *twilio) OnSuccess(s *types.Service) {
 
 // OnSave triggers when this notifier has been saved
 func (u *twilio) OnSave() error {
-	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
+	utils.Log.Infoln(fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
 
 	// Do updating stuff here
 

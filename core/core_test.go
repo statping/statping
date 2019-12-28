@@ -134,6 +134,7 @@ func TestEnvToConfig(t *testing.T) {
 	os.Setenv("DESCRIPTION", "Testing Statping")
 	os.Setenv("ADMIN_USER", "admin")
 	os.Setenv("ADMIN_PASS", "admin123")
+	os.Setenv("VERBOSE", "true")
 	config, err := EnvToConfig()
 	assert.Nil(t, err)
 	assert.Equal(t, config.DbConn, "sqlite")

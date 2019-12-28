@@ -44,13 +44,13 @@ var TestService = &types.Service{
 	LastStatusCode: 404,
 	Online:         true,
 	LastResponse:   "<html>this is an example response</html>",
-	CreatedAt:      time.Now().Add(-24 * time.Hour),
+	CreatedAt:      utils.Now().Add(-24 * time.Hour),
 }
 
 var TestFailure = &types.Failure{
 	Issue:     "testing",
 	Service:   1,
-	CreatedAt: time.Now().Add(-12 * time.Hour),
+	CreatedAt: utils.Now().Add(-12 * time.Hour),
 }
 
 var TestUser = &types.User{

@@ -24,7 +24,6 @@ import (
 	"github.com/hunterlong/statping/utils"
 	"net"
 	"net/http"
-	"time"
 )
 
 func apiAllCheckinsHandler(w http.ResponseWriter, r *http.Request) {
@@ -81,7 +80,7 @@ func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
 	hit := &types.CheckinHit{
 		Checkin:   checkin.Id,
 		From:      ip,
-		CreatedAt: time.Now().UTC(),
+		CreatedAt: utils.Now().UTC(),
 	}
 	checkinHit := core.ReturnCheckinHit(hit)
 	if checkin.Last() == nil {
@@ -95,7 +94,7 @@ func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	checkin.Failing = false
-	checkin.LastHit = utils.Timezoner(time.Now().UTC(), core.CoreApp.Timezone)
+	checkin.LastHit = utils.Timezoner(utils.Now().UTC(), core.CoreApp.Timezone)
 	sendJsonAction(checkinHit, "update", w, r)
 }
 

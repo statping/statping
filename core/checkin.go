@@ -47,14 +47,14 @@ CheckinLoop:
 	for {
 		select {
 		case <-c.Running:
-			utils.Log(1, fmt.Sprintf("Stopping checkin routine: %v", c.Name))
+			log.Infoln(fmt.Sprintf("Stopping checkin routine: %v", c.Name))
 			c.Failing = false
 			break CheckinLoop
 		case <-time.After(reCheck):
-			utils.Log(1, fmt.Sprintf("Checkin %v is expected at %v, checking every %v", c.Name, utils.FormatDuration(c.Expected()), utils.FormatDuration(c.Period())))
+			log.Infoln(fmt.Sprintf("Checkin %v is expected at %v, checking every %v", c.Name, utils.FormatDuration(c.Expected()), utils.FormatDuration(c.Period())))
 			if c.Expected().Seconds() <= 0 {
 				issue := fmt.Sprintf("Checkin %v is failing, no request since %v", c.Name, c.Last().CreatedAt)
-				utils.Log(3, issue)
+				log.Errorln(issue)
 				c.CreateFailure()
 			}
 			reCheck = c.Period()
@@ -143,7 +143,7 @@ func (c *Checkin) Grace() time.Duration {
 // Expected returns the duration of when the serviec should receive a Checkin
 func (c *Checkin) Expected() time.Duration {
 	last := c.Last().CreatedAt
-	now := time.Now()
+	now := utils.Now()
 	lastDir := now.Sub(last)
 	sub := time.Duration(c.Period() - lastDir)
 	return sub
@@ -213,7 +213,7 @@ func (c *Checkin) Create() (int64, error) {
 	c.ApiKey = utils.RandomString(7)
 	row := checkinDB().Create(&c)
 	if row.Error != nil {
-		utils.Log(2, row.Error)
+		log.Warnln(row.Error)
 		return 0, row.Error
 	}
 	service := SelectService(c.ServiceId)
@@ -227,7 +227,7 @@ func (c *Checkin) Create() (int64, error) {
 func (c *Checkin) Update() (int64, error) {
 	row := checkinDB().Update(&c)
 	if row.Error != nil {
-		utils.Log(2, row.Error)
+		log.Warnln(row.Error)
 		return 0, row.Error
 	}
 	return c.Id, row.Error
@@ -236,11 +236,11 @@ func (c *Checkin) Update() (int64, error) {
 // Create will create a new successful checkinHit
 func (c *CheckinHit) Create() (int64, error) {
 	if c.CreatedAt.IsZero() {
-		c.CreatedAt = time.Now()
+		c.CreatedAt = utils.Now()
 	}
 	row := checkinHitsDB().Create(&c)
 	if row.Error != nil {
-		utils.Log(2, row.Error)
+		log.Warnln(row.Error)
 		return 0, row.Error
 	}
 	return c.Id, row.Error
@@ -248,13 +248,13 @@ func (c *CheckinHit) Create() (int64, error) {
 
 // Ago returns the duration of time between now and the last successful checkinHit
 func (c *CheckinHit) Ago() string {
-	got, _ := timeago.TimeAgoWithTime(time.Now(), c.CreatedAt)
+	got, _ := timeago.TimeAgoWithTime(utils.Now(), c.CreatedAt)
 	return got
 }
 
 // RecheckCheckinFailure will check if a Service Checkin has been reported yet
 func (c *Checkin) RecheckCheckinFailure(guard chan struct{}) {
-	between := time.Now().Sub(time.Now()).Seconds()
+	between := utils.Now().Sub(utils.Now()).Seconds()
 	if between > float64(c.Interval) {
 		fmt.Println("rechecking every 15 seconds!")
 		time.Sleep(15 * time.Second)

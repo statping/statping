@@ -101,7 +101,7 @@ func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 	var services []*Service
 	db := servicesDB().Find(&services).Order("order_id desc")
 	if db.Error != nil {
-		utils.Log(3, fmt.Sprintf("service error: %v", db.Error))
+		log.Errorln(fmt.Sprintf("service error: %v", db.Error))
 		return nil, db.Error
 	}
 	CoreApp.Services = nil
@@ -272,7 +272,7 @@ func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group st
 	model = model.Order("timeframe asc", false).Group("timeframe")
 	rows, err := model.Rows()
 	if err != nil {
-		utils.Log(3, fmt.Errorf("issue fetching service chart data: %v", err))
+		log.Errorln(fmt.Errorf("issue fetching service chart data: %v", err))
 	}
 	for rows.Next() {
 		var gd DateScan
@@ -284,7 +284,7 @@ func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group st
 		if CoreApp.DbConnection == "postgres" {
 			createdTime, err = time.Parse(types.TIME_NANO, createdAt)
 			if err != nil {
-				utils.Log(4, fmt.Errorf("issue parsing time from database: %v to %v", createdAt, types.TIME_NANO))
+				log.Errorln(fmt.Errorf("issue parsing time from database: %v to %v", createdAt, types.TIME_NANO))
 			}
 		} else {
 			createdTime, err = time.Parse(types.TIME, createdAt)
@@ -301,7 +301,7 @@ func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group st
 func (d *DateScanObj) ToString() string {
 	data, err := json.Marshal(d.Array)
 	if err != nil {
-		utils.Log(2, err)
+		log.Warnln(err)
 		return "{}"
 	}
 	return string(data)
@@ -371,7 +371,7 @@ func (s *Service) Delete() error {
 	i := s.index()
 	err := servicesDB().Delete(s)
 	if err.Error != nil {
-		utils.Log(3, fmt.Sprintf("Failed to delete service %v. %v", s.Name, err.Error))
+		log.Errorln(fmt.Sprintf("Failed to delete service %v. %v", s.Name, err.Error))
 		return err.Error
 	}
 	s.Close()
@@ -386,7 +386,7 @@ func (s *Service) Delete() error {
 func (s *Service) Update(restart bool) error {
 	err := servicesDB().Update(&s)
 	if err.Error != nil {
-		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", s.Name, err))
+		log.Errorln(fmt.Sprintf("Failed to update service %v. %v", s.Name, err))
 		return err.Error
 	}
 	// clear the notification queue for a service
@@ -413,7 +413,7 @@ func (s *Service) Create(check bool) (int64, error) {
 	s.CreatedAt = time.Now()
 	db := servicesDB().Create(s)
 	if db.Error != nil {
-		utils.Log(3, fmt.Sprintf("Failed to create service %v #%v: %v", s.Name, s.Id, db.Error))
+		log.Errorln(fmt.Sprintf("Failed to create service %v #%v: %v", s.Name, s.Id, db.Error))
 		return 0, db.Error
 	}
 	s.Start()
