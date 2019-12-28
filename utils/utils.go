@@ -176,7 +176,7 @@ func FileExists(name string) bool {
 // DeleteFile will attempt to delete a file
 //		DeleteFile("newfile.json")
 func DeleteFile(file string) error {
-	Log(1, "deleting file: "+file)
+	Log.Infoln("deleting file: " + file)
 	err := os.Remove(file)
 	if err != nil {
 		return err
@@ -193,7 +193,7 @@ func DeleteDirectory(directory string) error {
 // Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings
 //		in, out, err := Command("sass assets/scss assets/css/base.css")
 func Command(cmd string) (string, string, error) {
-	Log(1, "running command: "+cmd)
+	Log.Infoln("running command: " + cmd)
 	testCmd := exec.Command("sh", "-c", cmd)
 	var stdout, stderr []byte
 	var errStdout, errStderr error

@@ -29,7 +29,7 @@ var (
 
 // InsertSampleData will create the example/dummy services for a brand new Statping installation
 func InsertSampleData() error {
-	utils.Log(1, "Inserting Sample Data...")
+	log.Infoln("Inserting Sample Data...")
 
 	insertSampleGroups()
 	createdOn := time.Now().Add(((-24 * 30) * 3) * time.Hour).UTC()
@@ -44,6 +44,7 @@ func InsertSampleData() error {
 		Order:          1,
 		GroupId:        1,
 		Permalink:      types.NewNullString("google"),
+		VerifySSL:      types.NewNullBool(true),
 		CreatedAt:      createdOn,
 	})
 	s2 := ReturnService(&types.Service{
@@ -56,6 +57,7 @@ func InsertSampleData() error {
 		Timeout:        20,
 		Order:          2,
 		Permalink:      types.NewNullString("statping_github"),
+		VerifySSL:      types.NewNullBool(true),
 		CreatedAt:      createdOn,
 	})
 	s3 := ReturnService(&types.Service{
@@ -68,6 +70,7 @@ func InsertSampleData() error {
 		Timeout:        30,
 		Order:          3,
 		Public:         types.NewNullBool(true),
+		VerifySSL:      types.NewNullBool(true),
 		GroupId:        2,
 		CreatedAt:      createdOn,
 	})
@@ -83,6 +86,7 @@ func InsertSampleData() error {
 		Timeout:        30,
 		Order:          4,
 		Public:         types.NewNullBool(true),
+		VerifySSL:      types.NewNullBool(true),
 		GroupId:        2,
 		CreatedAt:      createdOn,
 	})
@@ -109,7 +113,7 @@ func InsertSampleData() error {
 
 	insertSampleIncidents()
 
-	utils.Log(1, "Sample data has finished importing")
+	log.Infoln("Sample data has finished importing")
 
 	return nil
 }
@@ -207,7 +211,7 @@ func InsertSampleHits() error {
 		service := SelectService(i)
 		seed := time.Now().UnixNano()
 
-		utils.Log(1, fmt.Sprintf("Adding %v sample hit records to service %v", SampleHits, service.Name))
+		log.Infoln(fmt.Sprintf("Adding %v sample hit records to service %v", SampleHits, service.Name))
 		createdAt := sampleStart
 
 		p := utils.NewPerlin(2., 2., 10, seed)
@@ -451,17 +455,17 @@ func InsertLargeSampleData() error {
 func insertFailureRecords(since time.Time, amount int64) {
 	for i := int64(14); i <= 15; i++ {
 		service := SelectService(i)
-		utils.Log(1, fmt.Sprintf("Adding %v Failure records to service %v", amount, service.Name))
+		log.Infoln(fmt.Sprintf("Adding %v Failure records to service %v", amount, service.Name))
 		createdAt := since
 
 		for fi := int64(1); fi <= amount; fi++ {
 			createdAt = createdAt.Add(2 * time.Minute)
 
-			failure := &Failure{&types.Failure{
+			failure := &types.Failure{
 				Service:   service.Id,
 				Issue:     "testing right here",
 				CreatedAt: createdAt,
-			}}
+			}
 
 			service.CreateFailure(failure)
 		}
@@ -472,7 +476,7 @@ func insertFailureRecords(since time.Time, amount int64) {
 func insertHitRecords(since time.Time, amount int64) {
 	for i := int64(1); i <= 15; i++ {
 		service := SelectService(i)
-		utils.Log(1, fmt.Sprintf("Adding %v hit records to service %v", amount, service.Name))
+		log.Infoln(fmt.Sprintf("Adding %v hit records to service %v", amount, service.Name))
 		createdAt := since
 		p := utils.NewPerlin(2, 2, 5, time.Now().UnixNano())
 		for hi := int64(1); hi <= amount; hi++ {

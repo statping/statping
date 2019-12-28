@@ -67,7 +67,7 @@ func main() {
 		Compiled  string
 		Pages     map[string]string
 	}{
-		Timestamp: time.Now(),
+		Timestamp: utils.Now(),
 		URL:       "ok",
 		Compiled:  compiled,
 		Pages:     newPages,

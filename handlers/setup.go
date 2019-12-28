@@ -57,7 +57,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	domain := r.PostForm.Get("domain")
 	email := r.PostForm.Get("email")
 	sample := r.PostForm.Get("sample_data") == "on"
-	utils.Log(2, sample)
+	log.Warnln(sample)
 	dir := utils.Directory
 
 	config := &core.DbConfig{
@@ -78,21 +78,21 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if core.Configs, err = config.Save(); err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 		config.Error = err
 		setupResponseError(w, r, config)
 		return
 	}
 
 	if core.Configs, err = core.LoadConfigFile(dir); err != nil {
-		utils.Log(3, err)
+		log.Errorln(err)
 		config.Error = err
 		setupResponseError(w, r, config)
 		return
 	}
 
 	if err = core.Configs.Connect(false, dir); err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 		core.DeleteConfig()
 		config.Error = err
 		setupResponseError(w, r, config)
@@ -104,7 +104,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	core.CoreApp, err = config.InsertCore()
 	if err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 		config.Error = err
 		setupResponseError(w, r, config)
 		return

@@ -43,9 +43,9 @@ func catchCLI(args []string) error {
 	switch args[0] {
 	case "version":
 		if COMMIT != "" {
-			fmt.Printf("Statping v%v (%v)\n", VERSION, COMMIT)
+			fmt.Printf("%v (%v)\n", VERSION, COMMIT)
 		} else {
-			fmt.Printf("Statping v%v\n", VERSION)
+			fmt.Printf("%v\n", VERSION)
 		}
 		return errors.New("end")
 	case "assets":
@@ -60,18 +60,7 @@ func catchCLI(args []string) error {
 		}
 		return errors.New("end")
 	case "update":
-		var err error
-		var gitCurrent githubResponse
-		if gitCurrent, err = checkGithubUpdates(); err != nil {
-			return err
-		}
-		fmt.Printf("Statping Version: v%v\nLatest Version: %v\n", VERSION, gitCurrent.TagName)
-		if VERSION != gitCurrent.TagName[1:] {
-			fmt.Printf("You don't have the latest version v%v!\nDownload the latest release at: https://github.com/hunterlong/statping\n", gitCurrent.TagName[1:])
-		} else {
-			fmt.Printf("You have the latest version of Statping!\n")
-		}
-		return errors.New("end")
+		return updateDisplay()
 	case "test":
 		cmd := args[1]
 		switch cmd {
@@ -84,16 +73,16 @@ func catchCLI(args []string) error {
 		fmt.Printf("Statping v%v Exporting Static 'index.html' page...\n", VERSION)
 		utils.InitLogs()
 		if core.Configs, err = core.LoadConfigFile(dir); err != nil {
-			utils.Log(4, "config.yml file not found")
+			utils.Log.Errorln("config.yml file not found")
 			return err
 		}
 		indexSource := ExportIndexHTML()
 		//core.CloseDB()
 		if err = utils.SaveFile(dir+"/index.html", indexSource); err != nil {
-			utils.Log(4, err)
+			utils.Log.Errorln(err)
 			return err
 		}
-		utils.Log(1, "Exported Statping index page: 'index.html'")
+		utils.Log.Infoln("Exported Statping index page: 'index.html'")
 	case "help":
 		HelpEcho()
 		return errors.New("end")
@@ -133,8 +122,8 @@ func catchCLI(args []string) error {
 		}
 		return errors.New("end")
 	case "run":
-		utils.Log(1, "Running 1 time and saving to database...")
-		RunOnce()
+		utils.Log.Infoln("Running 1 time and saving to database...")
+		runOnce()
 		//core.CloseDB()
 		fmt.Println("Check is complete.")
 		return errors.New("end")
@@ -142,7 +131,7 @@ func catchCLI(args []string) error {
 		fmt.Println("Statping Environment Variable")
 		envs, err := godotenv.Read(".env")
 		if err != nil {
-			utils.Log(4, "No .env file found in current directory.")
+			utils.Log.Errorln("No .env file found in current directory.")
 			return err
 		}
 		for k, e := range envs {
@@ -170,16 +159,33 @@ func ExportIndexHTML() []byte {
 	return w.Body.Bytes()
 }
 
-// RunOnce will initialize the Statping application and check each service 1 time, will not run HTTP server
-func RunOnce() {
+func updateDisplay() error {
+	var err error
+	var gitCurrent githubResponse
+	if gitCurrent, err = checkGithubUpdates(); err != nil {
+		return err
+	}
+	fmt.Printf("Statping Version: v%v\nLatest Version: %v\n", VERSION, gitCurrent.TagName)
+	if VERSION != gitCurrent.TagName[1:] {
+		fmt.Printf("\n   New Update %v Available\n", gitCurrent.TagName[1:])
+		fmt.Printf("Update Command:\n")
+		fmt.Printf("curl -o- -L https://statping.com/install.sh | bash\n\n")
+	} else {
+		fmt.Printf("You have the latest version of Statping!\n")
+	}
+	return errors.New("end")
+}
+
+// runOnce will initialize the Statping application and check each service 1 time, will not run HTTP server
+func runOnce() {
 	var err error
 	core.Configs, err = core.LoadConfigFile(utils.Directory)
 	if err != nil {
-		utils.Log(4, "config.yml file not found")
+		utils.Log.Errorln("config.yml file not found")
 	}
 	err = core.Configs.Connect(false, utils.Directory)
 	if err != nil {
-		utils.Log(4, err)
+		utils.Log.Errorln(err)
 	}
 	core.CoreApp, err = core.SelectCore()
 	if err != nil {
@@ -187,7 +193,7 @@ func RunOnce() {
 	}
 	_, err = core.CoreApp.SelectAllServices(true)
 	if err != nil {
-		utils.Log(4, err)
+		utils.Log.Errorln(err)
 	}
 	for _, out := range core.CoreApp.Services {
 		out.Check(true)
@@ -214,6 +220,8 @@ func HelpEcho() {
 	fmt.Printf("Flags:\n")
 	fmt.Println("     -ip 127.0.0.1             - Run HTTP server on specific IP address (default: localhost)")
 	fmt.Println("     -port 8080                - Run HTTP server on Port (default: 8080)")
+	fmt.Println("     -verbose 1                - Verbose mode levels 1 - 4 (default: 1)")
+	fmt.Println("     -env path/debug.env       - Optional .env file to set as environment variables while running server")
 	fmt.Printf("Environment Variables:\n")
 	fmt.Println("     PORT                      - Set the outgoing port for the HTTP server (or use -port)")
 	fmt.Println("     IP                        - Bind a specific IP address to the HTTP server (or use -ip)")
@@ -241,7 +249,7 @@ func HelpEcho() {
 func checkGithubUpdates() (githubResponse, error) {
 	var gitResp githubResponse
 	url := "https://api.github.com/repos/hunterlong/statping/releases/latest"
-	contents, _, err := utils.HttpRequest(url, "GET", nil, nil, nil, time.Duration(10*time.Second), true)
+	contents, _, err := utils.HttpRequest(url, "GET", nil, nil, nil, time.Duration(2*time.Second), true)
 	if err != nil {
 		return githubResponse{}, err
 	}
