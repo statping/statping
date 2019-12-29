@@ -328,6 +328,7 @@ upload_to_s3:
 	aws s3 cp ./source/js $(ASSETS_BKT) --recursive --exclude "*" --include "*.js"
 	aws s3 cp ./source/font $(ASSETS_BKT) --recursive --exclude "*" --include "*.eot" --include "*.svg" --include "*.woff" --include "*.woff2" --include "*.ttf" --include "*.css"
 	aws s3 cp ./source/scss $(ASSETS_BKT) --recursive --exclude "*" --include "*.scss"
+	aws s3 cp ./install.sh $(ASSETS_BKT)
 
 travis_s3_creds:
 	mkdir -p ~/.aws

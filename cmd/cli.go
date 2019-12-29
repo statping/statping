@@ -60,7 +60,8 @@ func catchCLI(args []string) error {
 		}
 		return errors.New("end")
 	case "update":
-		return updateDisplay()
+		updateDisplay()
+		return errors.New("end")
 	case "test":
 		cmd := args[1]
 		switch cmd {
@@ -163,17 +164,17 @@ func updateDisplay() error {
 	var err error
 	var gitCurrent githubResponse
 	if gitCurrent, err = checkGithubUpdates(); err != nil {
+		fmt.Printf("Issue connecting to https://github.com/hunterlong/statping\n%v\n", err)
 		return err
 	}
-	fmt.Printf("Statping Version: v%v\nLatest Version: %v\n", VERSION, gitCurrent.TagName)
 	if VERSION != gitCurrent.TagName[1:] {
 		fmt.Printf("\n   New Update %v Available\n", gitCurrent.TagName[1:])
 		fmt.Printf("Update Command:\n")
 		fmt.Printf("curl -o- -L https://statping.com/install.sh | bash\n\n")
 	} else {
-		fmt.Printf("You have the latest version of Statping!\n")
+		fmt.Printf("You have the latest version of Statping\n")
 	}
-	return errors.New("end")
+	return nil
 }
 
 // runOnce will initialize the Statping application and check each service 1 time, will not run HTTP server
@@ -225,6 +226,7 @@ func HelpEcho() {
 	fmt.Printf("Environment Variables:\n")
 	fmt.Println("     PORT                      - Set the outgoing port for the HTTP server (or use -port)")
 	fmt.Println("     IP                        - Bind a specific IP address to the HTTP server (or use -ip)")
+	fmt.Println("     VERBOSE                   - Display more logs in verbose mode. (1 - 4)")
 	fmt.Println("     STATPING_DIR              - Set a absolute path for the root path of Statping server (logs, assets, SQL db)")
 	fmt.Println("     DISABLE_LOGS              - Disable viewing and writing to the log file (default is false)")
 	fmt.Println("     DB_CONN                   - Automatic Database connection (sqlite, postgres, mysql)")
@@ -234,7 +236,7 @@ func HelpEcho() {
 	fmt.Println("     DB_PORT                   - Database port (5432, 3306, ...)")
 	fmt.Println("     DB_DATABASE               - Database connection's database name")
 	fmt.Println("     POSTGRES_SSLMODE          - Enable Postgres SSL Mode 'ssl_mode=VALUE' (enable/disable/verify-full/verify-ca)")
-	fmt.Println("     GO_ENV                    - Run Statping in testmode, will bypass HTTP authentication (if set as 'true')")
+	fmt.Println("     GO_ENV                    - Run Statping in testmode, will bypass HTTP authentication (if set as 'test')")
 	fmt.Println("     NAME                      - Set a name for the Statping status page")
 	fmt.Println("     DESCRIPTION               - Set a description for the Statping status page")
 	fmt.Println("     DOMAIN                    - Set a URL for the Statping status page")
@@ -247,12 +249,12 @@ func HelpEcho() {
 }
 
 func checkGithubUpdates() (githubResponse, error) {
-	var gitResp githubResponse
 	url := "https://api.github.com/repos/hunterlong/statping/releases/latest"
 	contents, _, err := utils.HttpRequest(url, "GET", nil, nil, nil, time.Duration(2*time.Second), true)
 	if err != nil {
 		return githubResponse{}, err
 	}
+	var gitResp githubResponse
 	err = json.Unmarshal(contents, &gitResp)
 	return gitResp, err
 }
