@@ -1,29 +1,21 @@
 VERSION=$(shell cat version.txt)
 SIGN_KEY=B76D61FAA6DB759466E83D9964B9C6AAE2D55278
 BINARY_NAME=statping
-GOCMD=go
-GOBUILD=$(GOCMD) build -a
-GOTEST=$(GOCMD) test
-GOGET=$(GOCMD) get
+GOBUILD=go build -a
 GOVERSION=1.13.5
-GOINSTALL=$(GOCMD) install
-GOPATH:=$(GOPATH)
-XGO=$(GOPATH) xgo -go $(GOVERSION) --dest=build
+XGO=xgo -go $(GOVERSION) --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
-RICE=$(GOPATH)/bin/rice
-PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 TRVIS_SECRET=CAVxMvW04wS/APA6QGjlWjLfTx5hc+TWwCKuBkMV2MioZSQGOTQBC4nITySUwepAFY25mI8zNV5oROOKzG0FxYvr2iIqKDkTTdVF1+XS2uyHfEKlsWMPErcqkGjRksDil75Pckz15uvvOYPndetK2QiamQkSf9U8dUJgzrPuV+UOFj6RO/kkEWhzmoyTdVdwIRKmiL8jINkvvFOWCAfg3WlBmucgYHHqjqeTn1kSeUJ+DV9lF8+ENq+74GZrnsq26UtskJexywDeFhhUYjWEvOFXQ19txB/JrvdZ2KSkYeuhHr1ZxlENSpQ/rySQqBvg7+XAl1RhQlL5V7/feXA+I/COqNYG5KqbDgeSUwGkZIumz1ITi24Lz4xATG5hnuRQkOIaO8/FGHAeQxU0JcdWlzS8M5RpvpN9tT12XSFDPYswFmkO+gGSEpu+2gSEbiaX7qocLLvZiMpkQxfOmItaUW5ZMXRvTWijhQTb2nyPOQ9JEabuAtAUrCwe7Enmc8P8ZasNZaJLJO53iQ8FyzrNFyAFwY5F87OQ/v3Hnjv0ADG8fDc4VUxlj8TweuRzETT8U2hchxqnK4BON2WMSj4d1V96pDuzb5fArtq5PTbI4VB7mZPriXYZEiKdfLEIufOYhg7uKdNRekMLkuJRr+ttH0Gyb+lILzSiHMHwxOH5bfM=
 PUBLISH_BODY='{ "request": { "branch": "master", "message": "Homebrew update version v${VERSION}", "config": { "env": { "VERSION": "${VERSION}", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
 TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": {"merge_mode": ["deep_merge"], "os": [ "linux" ], "language": "go", "go": [ "${GOVERSION}" ], "go_import_path": "github.com/hunterlong/statping", "install": true, "sudo": "required", "services": [ "docker" ], "env": { "VERSION": "${VERSION}" }, "matrix": { "allow_failures": [ { "go": "master" } ], "fast_finish": true }, "before_deploy": [ "git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [ { "provider": "releases", "api_key": {"secret": "$(TRVIS_SECRET)"}, "file_glob": true, "file": "build/*", "skip_cleanup": true } ], "notifications": { "email": false }, "before_script": ["gem install sass"], "script": [ "travis_wait 30 docker pull crazymax/xgo:$(GOVERSION)", "make release" ], "after_success": [], "after_deploy": [ "make publish-homebrew" ] } } }'
 TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statping
-PATH:=$(PATH)
+PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 
 # build all arch's and release Statping
 release: dev-deps
 	wget -O statping.gpg $(SIGN_URL)
 	gpg --import statping.gpg
 	make build-all
-	make upload_to_s3
 
 # build and push the images to docker hub
 docker: docker-build-all docker-publish-all
@@ -230,22 +222,22 @@ databases:
 
 # install all required golang dependecies
 dev-deps:
-	$(GOGET) github.com/stretchr/testify/assert
-	$(GOGET) golang.org/x/tools/cmd/cover
-	$(GOGET) github.com/mattn/goveralls
-	$(GOINSTALL) github.com/mattn/goveralls
-	$(GOGET) github.com/rendon/testcli
-	$(GOGET) github.com/robertkrimen/godocdown/godocdown
-	$(GOGET) github.com/crazy-max/xgo
-	$(GOGET) github.com/GeertJohan/go.rice
-	$(GOGET) github.com/GeertJohan/go.rice/rice
-	$(GOINSTALL) github.com/GeertJohan/go.rice/rice
-	$(GOGET) github.com/axw/gocov/gocov
-	$(GOGET) github.com/matm/gocov-html
-	$(GOGET) github.com/fatih/structs
-	$(GOGET) github.com/ararog/timeago
-	$(GOGET) gopkg.in/natefinch/lumberjack.v2
-	$(GOGET) golang.org/x/crypto/bcrypt
+	go get github.com/stretchr/testify/assert
+	go get golang.org/x/tools/cmd/cover
+	go get github.com/mattn/goveralls
+	go install github.com/mattn/goveralls
+	go get github.com/rendon/testcli
+	go get github.com/robertkrimen/godocdown/godocdown
+	go get github.com/crazy-max/xgo
+	go get github.com/GeertJohan/go.rice
+	go get github.com/GeertJohan/go.rice/rice
+	go install github.com/GeertJohan/go.rice/rice
+	go get github.com/axw/gocov/gocov
+	go get github.com/matm/gocov-html
+	go get github.com/fatih/structs
+	go get github.com/ararog/timeago
+	go get gopkg.in/natefinch/lumberjack.v2
+	go get golang.org/x/crypto/bcrypt
 
 # remove files for a clean compile/build
 clean:
