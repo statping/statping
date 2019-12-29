@@ -249,15 +249,15 @@ dev-deps:
 
 # remove files for a clean compile/build
 clean:
-	rm -rf ./{logs,assets,plugins,statup.db,config.yml,.sass-cache,config.yml,statping,build,.sass-cache,statup.db,index.html,vendor}
-	rm -rf cmd/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log,*.html,*.json}
-	rm -rf core/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
-	rm -rf handlers/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
-	rm -rf notifiers/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
-	rm -rf source/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
-	rm -rf types/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
-	rm -rf utils/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
-	rm -rf dev/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log,test/app,plugin/*.so}
+	rm -rf ./{logs,assets,plugins,*.db,config.yml,.sass-cache,config.yml,statping,build,.sass-cache,index.html,vendor}
+	rm -rf cmd/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log,*.html,*.json}
+	rm -rf core/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	rm -rf handlers/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	rm -rf notifiers/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	rm -rf source/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	rm -rf types/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	rm -rf utils/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	rm -rf dev/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log,test/app,plugin/*.so}
 	rm -rf {parts,prime,snap,stage}
 	rm -rf dev/test/cypress/videos
 	rm -f coverage.* sass
