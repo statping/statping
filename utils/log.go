@@ -181,22 +181,31 @@ func InitLogs() error {
 		ForceColors:   true,
 		DisableColors: false,
 	})
-	Log.AddHook(new(hook))
-	Log.SetNoLock()
-
-	if VerboseMode == 1 {
-		Log.SetLevel(Logger.WarnLevel)
-	} else if VerboseMode == 2 {
-		Log.SetLevel(Logger.InfoLevel)
-	} else if VerboseMode == 3 {
-		Log.SetLevel(Logger.DebugLevel)
-	} else {
-		Log.SetReportCaller(true)
-		Log.SetLevel(Logger.TraceLevel)
-	}
+	checkVerboseMode()
 
 	LastLines = make([]*LogRow, 0)
 	return err
+}
+
+// checkVerboseMode will reset the Logging verbose setting
+// statping -v 1 (only Warnings)
+// statping -v 2 (Info and Warnings)
+// statping -v 3 (Info, Warnings and Debug)
+// statping -v 4 (Info, Warnings, Debug and Traces (SQL queries))
+func checkVerboseMode() {
+	switch VerboseMode {
+	case 1:
+		Log.SetLevel(Logger.WarnLevel)
+	case 2:
+		Log.SetLevel(Logger.InfoLevel)
+	case 3:
+		Log.SetLevel(Logger.DebugLevel)
+	case 4:
+		Log.SetReportCaller(true)
+		Log.SetLevel(Logger.TraceLevel)
+	default:
+		Log.SetLevel(Logger.InfoLevel)
+	}
 }
 
 // CloseLogs will close the log file correctly on shutdown

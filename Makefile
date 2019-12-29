@@ -23,6 +23,7 @@ release: dev-deps
 	wget -O statping.gpg $(SIGN_URL)
 	gpg --import statping.gpg
 	make build-all
+	make upload_to_s3
 
 # build and push the images to docker hub
 docker: docker-build-all docker-publish-all
@@ -322,8 +323,18 @@ cypress-install:
 cypress-test: clean cypress-install
 	cd dev/test && npm test
 
+upload_to_s3:
+	aws s3 cp ./source/css $(ASSETS_BKT) --recursive --exclude "*" --include "*.css"
+	aws s3 cp ./source/js $(ASSETS_BKT) --recursive --exclude "*" --include "*.js"
+	aws s3 cp ./source/font $(ASSETS_BKT) --recursive --exclude "*" --include "*.eot" --include "*.svg" --include "*.woff" --include "*.woff2" --include "*.ttf" --include "*.css"
+	aws s3 cp ./source/scss $(ASSETS_BKT) --recursive --exclude "*" --include "*.scss"
+
+travis_s3_creds:
+	mkdir -p ~/.aws
+	echo "[default]\naws_access_key_id = ${AWS_ACCESS_KEY_ID}\naws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" > ~/.aws/credentials
+
 # build Statping using a travis ci trigger
-travis-build:
+travis-build: travis_s3_creds upload_to_s3
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(TRAVIS_BUILD_CMD) https://api.travis-ci.com/repo/hunterlong%2Fstatping/requests
 	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
 
@@ -365,3 +376,4 @@ heroku:
 	heroku container:release web
 
 .PHONY: all build build-all build-alpine test-all test test-api docker
+.SILENT: travis_s3_creds

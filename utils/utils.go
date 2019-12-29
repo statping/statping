@@ -54,8 +54,16 @@ func init() {
 		}
 		Directory = dir
 	}
+	// check if logs are disabled
 	logger := os.Getenv("DISABLE_LOGS")
 	disableLogs, _ = strconv.ParseBool(logger)
+	if disableLogs {
+		Log.Out = ioutil.Discard
+		return
+	}
+	Log.AddHook(new(hook))
+	Log.SetNoLock()
+	checkVerboseMode()
 }
 
 // ToInt converts a int to a string
