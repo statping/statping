@@ -68,7 +68,7 @@ func TestLoadDbConfig(t *testing.T) {
 }
 
 func TestDbConnection(t *testing.T) {
-	err := Configs.Connect(false, dir)
+	err := CoreApp.Connect(false, dir)
 	assert.Nil(t, err)
 }
 
@@ -77,7 +77,7 @@ func TestDropDatabase(t *testing.T) {
 	if skipNewDb {
 		t.SkipNow()
 	}
-	err := Configs.DropDatabase()
+	err := CoreApp.DropDatabase()
 	assert.Nil(t, err)
 }
 
@@ -86,13 +86,13 @@ func TestSeedSchemaDatabase(t *testing.T) {
 	if skipNewDb {
 		t.SkipNow()
 	}
-	err := Configs.CreateDatabase()
+	err := CoreApp.CreateDatabase()
 	assert.Nil(t, err)
 }
 
 func TestMigrateDatabase(t *testing.T) {
 	t.SkipNow()
-	err := Configs.MigrateDatabase()
+	err := CoreApp.MigrateDatabase()
 	assert.Nil(t, err)
 }
 
@@ -103,9 +103,9 @@ func TestSeedDatabase(t *testing.T) {
 }
 
 func TestReLoadDbConfig(t *testing.T) {
-	err := Configs.Connect(false, dir)
+	err := CoreApp.Connect(false, dir)
 	assert.Nil(t, err)
-	assert.Equal(t, "sqlite", Configs.DbConn)
+	assert.Equal(t, "sqlite", CoreApp.Config.DbConn)
 }
 
 func TestSelectCore(t *testing.T) {

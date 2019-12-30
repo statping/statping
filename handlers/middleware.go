@@ -15,6 +15,9 @@ func sendLog(handler func(w http.ResponseWriter, r *http.Request)) http.Handler 
 		t1 := utils.Now()
 		handler(w, r)
 		t2 := utils.Now().Sub(t1)
+		if r.RequestURI == "/logs/line" {
+			return
+		}
 		log.WithFields(utils.ToFields(w, r)).
 			WithField("url", r.RequestURI).
 			WithField("method", r.Method).
@@ -59,7 +62,7 @@ func cached(duration, contentType string, handler func(w http.ResponseWriter, r 
 		content := CacheStorage.Get(r.RequestURI)
 		w.Header().Set("Content-Type", contentType)
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		if core.Configs == nil {
+		if core.CoreApp.Config == nil {
 			handler(w, r)
 			return
 		}

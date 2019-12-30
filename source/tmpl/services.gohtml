@@ -4,6 +4,15 @@
 {{template "nav"}}
 
     <div class="col-12">
+        {{if eq (len CoreApp.Services) 0}}
+            <div class="jumbotron jumbotron-fluid">
+                <div class="text-center">
+                    <h1 class="display-4">No Services!</h1>
+                    <a class="lead">You don't have any websites or applications being monitored by your Statping server. <p><a href="/service/create" class="btn btn-secondary mt-3">Add Service</a></p></p>
+                </div>
+            </div>
+        {{end}}
+
         {{if ne (len .Services) 0}}
         <h1 class="text-black-50">Services <a href="/service/create" class="btn btn-outline-success mt-1 float-right">
                 <i class="fas fa-plus"></i> Create</a>

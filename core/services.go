@@ -240,7 +240,7 @@ func Dbtimestamp(group string, column string) string {
 	default:
 		seconds = 60
 	}
-	switch CoreApp.DbConnection {
+	switch CoreApp.Config.DbConn {
 	case "mysql":
 		return fmt.Sprintf("CONCAT(date_format(created_at, '%%Y-%%m-%%d %%H:00:00')) AS timeframe, AVG(%v) AS value", column)
 	case "postgres":
@@ -281,7 +281,7 @@ func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group st
 		var createdTime time.Time
 		var err error
 		rows.Scan(&createdAt, &value)
-		if CoreApp.DbConnection == "postgres" {
+		if CoreApp.Config.DbConn == "postgres" {
 			createdTime, err = time.Parse(types.TIME_NANO, createdAt)
 			if err != nil {
 				log.Errorln(fmt.Errorf("issue parsing time from database: %v to %v", createdAt, types.TIME_NANO))

@@ -36,10 +36,9 @@ type Core struct {
 }
 
 var (
-	Configs   *DbConfig // Configs holds all of the config.yml and database info
-	CoreApp   *Core     // CoreApp is a global variable that contains many elements
-	SetupMode bool      // SetupMode will be true if Statping does not have a database connection
-	VERSION   string    // VERSION is set on build automatically by setting a -ldflag
+	CoreApp   *Core  // CoreApp is a global variable that contains many elements
+	SetupMode bool   // SetupMode will be true if Statping does not have a database connection
+	VERSION   string // VERSION is set on build automatically by setting a -ldflag
 	log       = utils.Log.WithField("type", "core")
 )
 
@@ -49,9 +48,10 @@ func init() {
 
 // NewCore return a new *core.Core struct
 func NewCore() *Core {
-	CoreApp = new(Core)
-	CoreApp.Core = new(types.Core)
-	CoreApp.Started = time.Now()
+	CoreApp = &Core{&types.Core{
+		Started: time.Now(),
+	},
+	}
 	return CoreApp
 }
 
@@ -69,12 +69,13 @@ func InitApp() {
 	AttachNotifiers()
 	CoreApp.Notifications = notifier.AllCommunications
 	go DatabaseMaintence()
+	SetupMode = false
 }
 
 // InsertNotifierDB inject the Statping database instance to the Notifier package
 func InsertNotifierDB() error {
 	if DbSession == nil {
-		err := Configs.Connect(false, utils.Directory)
+		err := CoreApp.Connect(false, utils.Directory)
 		if err != nil {
 			return errors.New("database connection has not been created")
 		}
@@ -159,7 +160,6 @@ func SelectCore() (*Core, error) {
 	if db.Error != nil {
 		return nil, db.Error
 	}
-	CoreApp.DbConnection = Configs.DbConn
 	CoreApp.Version = VERSION
 	CoreApp.UseCdn = types.NewNullBool(os.Getenv("USE_CDN") == "true")
 	return CoreApp, db.Error

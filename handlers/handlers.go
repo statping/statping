@@ -104,6 +104,9 @@ func RunHTTPServer(ip string, port int) error {
 
 // IsReadAuthenticated will allow Read Only authentication for some routes
 func IsReadAuthenticated(r *http.Request) bool {
+	if core.SetupMode {
+		return false
+	}
 	var token string
 	query := r.URL.Query()
 	key := query.Get("api")
@@ -130,6 +133,9 @@ func IsFullAuthenticated(r *http.Request) bool {
 	if core.CoreApp == nil {
 		return true
 	}
+	if core.SetupMode {
+		return false
+	}
 	if sessionStore == nil {
 		return true
 	}
@@ -147,6 +153,9 @@ func IsFullAuthenticated(r *http.Request) bool {
 
 // IsAdmin returns true if the user session is an administrator
 func IsAdmin(r *http.Request) bool {
+	if core.SetupMode {
+		return false
+	}
 	session, err := sessionStore.Get(r, cookieKey)
 	if err != nil {
 		return false
@@ -159,6 +168,9 @@ func IsAdmin(r *http.Request) bool {
 
 // IsUser returns true if the user is registered
 func IsUser(r *http.Request) bool {
+	if core.SetupMode {
+		return false
+	}
 	if os.Getenv("GO_ENV") == "test" {
 		return true
 	}

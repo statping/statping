@@ -115,8 +115,7 @@ func createLog(dir string) error {
 
 // InitLogs will create the '/logs' directory and creates a file '/logs/statup.log' for application logging
 func InitLogs() error {
-	err := createLog(Directory)
-	if err != nil {
+	if err := createLog(Directory); err != nil {
 		return err
 	}
 	ljLogger = &lumberjack.Logger{
@@ -135,12 +134,13 @@ func InitLogs() error {
 	checkVerboseMode()
 
 	LastLines = make([]*logRow, 0)
-	return err
+	return nil
 }
 
-// checkVerboseMode will reset the Logging verbose setting
+// checkVerboseMode will reset the Logging verbose setting. You can set
+// the verbose level with "-v 3" or by setting VERBOSE=3 environment variable.
 // statping -v 1 (only Warnings)
-// statping -v 2 (Info and Warnings)
+// statping -v 2 (Info and Warnings, default)
 // statping -v 3 (Info, Warnings and Debug)
 // statping -v 4 (Info, Warnings, Debug and Traces (SQL queries))
 func checkVerboseMode() {
@@ -157,6 +157,7 @@ func checkVerboseMode() {
 	default:
 		Log.SetLevel(Logger.InfoLevel)
 	}
+	Log.Debugf("logging running in %v mode", Log.GetLevel().String())
 }
 
 // CloseLogs will close the log file correctly on shutdown

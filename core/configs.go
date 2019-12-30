@@ -31,12 +31,13 @@ type ErrorResponse struct {
 }
 
 // LoadConfigFile will attempt to load the 'config.yml' file in a specific directory
-func LoadConfigFile(directory string) (*DbConfig, error) {
-	var configs *DbConfig
+func LoadConfigFile(directory string) (*types.DbConfig, error) {
+	var configs *types.DbConfig
 	if os.Getenv("DB_CONN") != "" {
 		log.Infoln("DB_CONN environment variable was found, waiting for database...")
 		return LoadUsingEnv()
 	}
+	log.Debugln("attempting to read config file at: " + directory + "/config.yml")
 	file, err := ioutil.ReadFile(directory + "/config.yml")
 	if err != nil {
 		return nil, errors.New("config.yml file not found at " + directory + "/config.yml - starting in setup mode")
@@ -45,12 +46,13 @@ func LoadConfigFile(directory string) (*DbConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	Configs = configs
-	return Configs, err
+	log.WithFields(utils.ToFields(configs)).Debugln("read config file: " + directory + "/config.yml")
+	CoreApp.Config = configs
+	return configs, err
 }
 
 // LoadUsingEnv will attempt to load database configs based on environment variables. If DB_CONN is set if will force this function.
-func LoadUsingEnv() (*DbConfig, error) {
+func LoadUsingEnv() (*types.DbConfig, error) {
 	Configs, err := EnvToConfig()
 	if err != nil {
 		return Configs, err
@@ -61,21 +63,20 @@ func LoadUsingEnv() (*DbConfig, error) {
 	} else {
 		CoreApp.Domain = os.Getenv("DOMAIN")
 	}
-	CoreApp.DbConnection = Configs.DbConn
 	CoreApp.UseCdn = types.NewNullBool(os.Getenv("USE_CDN") == "true")
 
-	err = Configs.Connect(true, utils.Directory)
+	err = CoreApp.Connect(true, utils.Directory)
 	if err != nil {
 		log.Errorln(err)
 		return nil, err
 	}
-	Configs.Save()
+	CoreApp.SaveConfig(Configs)
 	exists := DbSession.HasTable("core")
 	if !exists {
 		log.Infoln(fmt.Sprintf("Core database does not exist, creating now!"))
-		Configs.DropDatabase()
-		Configs.CreateDatabase()
-		CoreApp, err = Configs.InsertCore()
+		CoreApp.DropDatabase()
+		CoreApp.CreateDatabase()
+		CoreApp, err = CoreApp.InsertCore(Configs)
 		if err != nil {
 			log.Errorln(err)
 		}
@@ -118,24 +119,23 @@ func DefaultPort(db string) int64 {
 }
 
 // EnvToConfig converts environment variables to a DbConfig variable
-func EnvToConfig() (*DbConfig, error) {
-	Configs = new(DbConfig)
+func EnvToConfig() (*types.DbConfig, error) {
 	var err error
 	if os.Getenv("DB_CONN") == "" {
-		return Configs, errors.New("Missing DB_CONN environment variable")
+		return nil, errors.New("Missing DB_CONN environment variable")
 	}
 	if os.Getenv("DB_CONN") != "sqlite" {
 		if os.Getenv("DB_HOST") == "" {
-			return Configs, errors.New("Missing DB_HOST environment variable")
+			return nil, errors.New("Missing DB_HOST environment variable")
 		}
 		if os.Getenv("DB_USER") == "" {
-			return Configs, errors.New("Missing DB_USER environment variable")
+			return nil, errors.New("Missing DB_USER environment variable")
 		}
 		if os.Getenv("DB_PASS") == "" {
-			return Configs, errors.New("Missing DB_PASS environment variable")
+			return nil, errors.New("Missing DB_PASS environment variable")
 		}
 		if os.Getenv("DB_DATABASE") == "" {
-			return Configs, errors.New("Missing DB_DATABASE environment variable")
+			return nil, errors.New("Missing DB_DATABASE environment variable")
 		}
 	}
 	port := utils.ToInt(os.Getenv("DB_PORT"))
@@ -161,7 +161,7 @@ func EnvToConfig() (*DbConfig, error) {
 		adminPass = "admin"
 	}
 
-	Configs = &DbConfig{
+	configs := &types.DbConfig{
 		DbConn:      os.Getenv("DB_CONN"),
 		DbHost:      os.Getenv("DB_HOST"),
 		DbUser:      os.Getenv("DB_USER"),
@@ -178,7 +178,8 @@ func EnvToConfig() (*DbConfig, error) {
 		Location:    utils.Directory,
 		SqlFile:     os.Getenv("SQL_FILE"),
 	}
-	return Configs, err
+	CoreApp.Config = configs
+	return configs, err
 }
 
 // SampleData runs all the sample data for a new Statping installation
@@ -194,7 +195,8 @@ func SampleData() error {
 
 // DeleteConfig will delete the 'config.yml' file
 func DeleteConfig() error {
-	err := os.Remove(utils.Directory + "/config.yml")
+	log.Debugln("deleting config yaml file", utils.Directory+"/config.yml")
+	err := utils.DeleteFile(utils.Directory + "/config.yml")
 	if err != nil {
 		log.Errorln(err)
 		return err

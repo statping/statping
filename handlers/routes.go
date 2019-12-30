@@ -38,7 +38,7 @@ func Router() *mux.Router {
 	dir := utils.Directory
 	CacheStorage = NewStorage()
 	r := mux.NewRouter()
-	r.Handle("/", http.HandlerFunc(indexHandler))
+	r.Handle("/", sendLog(indexHandler))
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
 		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(dir+"/assets/css"))))
@@ -55,9 +55,9 @@ func Router() *mux.Router {
 		r.PathPrefix("/favicon.ico").Handler(http.FileServer(source.TmplBox.HTTPBox()))
 		r.PathPrefix("/banner.png").Handler(http.FileServer(source.TmplBox.HTTPBox()))
 	}
-	r.Handle("/charts.js", http.HandlerFunc(renderServiceChartsHandler))
-	r.Handle("/setup", http.HandlerFunc(setupHandler)).Methods("GET")
-	r.Handle("/setup", http.HandlerFunc(processSetupHandler)).Methods("POST")
+	r.Handle("/charts.js", sendLog(renderServiceChartsHandler))
+	r.Handle("/setup", sendLog(setupHandler)).Methods("GET")
+	r.Handle("/setup", sendLog(processSetupHandler)).Methods("POST")
 	r.Handle("/dashboard", sendLog(dashboardHandler)).Methods("GET")
 	r.Handle("/dashboard", sendLog(loginHandler)).Methods("POST")
 	r.Handle("/logout", sendLog(logoutHandler))

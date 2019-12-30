@@ -88,17 +88,17 @@ func catchCLI(args []string) error {
 			return err
 		}
 		fmt.Printf("Statping v%v Exporting Static 'index.html' page...\n", VERSION)
-		if core.Configs, err = core.LoadConfigFile(dir); err != nil {
-			utils.Log.Errorln("config.yml file not found")
+		if core.CoreApp.Config, err = core.LoadConfigFile(dir); err != nil {
+			log.Errorln("config.yml file not found")
 			return err
 		}
 		indexSource := ExportIndexHTML()
 		//core.CloseDB()
 		if err = utils.SaveFile(dir+"/index.html", indexSource); err != nil {
-			utils.Log.Errorln(err)
+			log.Errorln(err)
 			return err
 		}
-		utils.Log.Infoln("Exported Statping index page: 'index.html'")
+		log.Infoln("Exported Statping index page: 'index.html'")
 	case "help":
 		HelpEcho()
 		return errors.New("end")
@@ -111,10 +111,10 @@ func catchCLI(args []string) error {
 		if err = runAssets(); err != nil {
 			return err
 		}
-		if core.Configs, err = core.LoadConfigFile(dir); err != nil {
+		if core.CoreApp.Config, err = core.LoadConfigFile(dir); err != nil {
 			return err
 		}
-		if err = core.Configs.Connect(false, dir); err != nil {
+		if err = core.CoreApp.Connect(false, dir); err != nil {
 			return err
 		}
 		if data, err = core.ExportSettings(); err != nil {
@@ -147,7 +147,7 @@ func catchCLI(args []string) error {
 		if err := runAssets(); err != nil {
 			return err
 		}
-		utils.Log.Infoln("Running 1 time and saving to database...")
+		log.Infoln("Running 1 time and saving to database...")
 		runOnce()
 		//core.CloseDB()
 		fmt.Println("Check is complete.")
@@ -162,7 +162,7 @@ func catchCLI(args []string) error {
 		}
 		envs, err := godotenv.Read(".env")
 		if err != nil {
-			utils.Log.Errorln("No .env file found in current directory.")
+			log.Errorln("No .env file found in current directory.")
 			return err
 		}
 		for k, e := range envs {
@@ -177,7 +177,7 @@ func catchCLI(args []string) error {
 // ExportIndexHTML returns the HTML of the index page as a string
 func ExportIndexHTML() []byte {
 	source.Assets()
-	core.Configs.Connect(false, utils.Directory)
+	core.CoreApp.Connect(false, utils.Directory)
 	core.CoreApp.SelectAllServices(false)
 	core.CoreApp.UseCdn = types.NewNullBool(true)
 	for _, srv := range core.CoreApp.Services {
@@ -208,13 +208,13 @@ func updateDisplay() error {
 // runOnce will initialize the Statping application and check each service 1 time, will not run HTTP server
 func runOnce() {
 	var err error
-	core.Configs, err = core.LoadConfigFile(utils.Directory)
+	core.CoreApp.Config, err = core.LoadConfigFile(utils.Directory)
 	if err != nil {
-		utils.Log.Errorln("config.yml file not found")
+		log.Errorln("config.yml file not found")
 	}
-	err = core.Configs.Connect(false, utils.Directory)
+	err = core.CoreApp.Connect(false, utils.Directory)
 	if err != nil {
-		utils.Log.Errorln(err)
+		log.Errorln(err)
 	}
 	core.CoreApp, err = core.SelectCore()
 	if err != nil {
@@ -222,7 +222,7 @@ func runOnce() {
 	}
 	_, err = core.CoreApp.SelectAllServices(true)
 	if err != nil {
-		utils.Log.Errorln(err)
+		log.Errorln(err)
 	}
 	for _, out := range core.CoreApp.Services {
 		out.Check(true)

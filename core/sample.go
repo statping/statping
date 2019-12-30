@@ -506,18 +506,18 @@ func TmpRecords(dbFile string) error {
 	var err error
 	CoreApp = NewCore()
 	CoreApp.Name = "Tester"
-	Configs = &DbConfig{
+	configs := &types.DbConfig{
 		DbConn:   "sqlite",
 		Project:  "Tester",
 		Location: utils.Directory,
 		SqlFile:  sqlFile,
 	}
 	log.Infoln("saving config.yml in: " + utils.Directory)
-	if Configs, err = Configs.Save(); err != nil {
+	if configs, err = CoreApp.SaveConfig(configs); err != nil {
 		return err
 	}
 	log.Infoln("loading config.yml from: " + utils.Directory)
-	if Configs, err = LoadConfigFile(utils.Directory); err != nil {
+	if configs, err = LoadConfigFile(utils.Directory); err != nil {
 		return err
 	}
 	log.Infoln("connecting to database")
@@ -533,7 +533,7 @@ func TmpRecords(dbFile string) error {
 		}
 		log.Infoln("loading config.yml from: " + utils.Directory)
 
-		if err := Configs.Connect(false, utils.Directory); err != nil {
+		if err := CoreApp.Connect(false, utils.Directory); err != nil {
 			return err
 		}
 		log.Infoln("selecting the Core variable")
@@ -557,15 +557,15 @@ func TmpRecords(dbFile string) error {
 
 	log.Infoln(tmpSqlFile + " not found, creating a new database...")
 
-	if err := Configs.Connect(false, utils.Directory); err != nil {
+	if err := CoreApp.Connect(false, utils.Directory); err != nil {
 		return err
 	}
 	log.Infoln("creating database")
-	if err := Configs.CreateDatabase(); err != nil {
+	if err := CoreApp.CreateDatabase(); err != nil {
 		return err
 	}
 	log.Infoln("migrating database")
-	if err := Configs.MigrateDatabase(); err != nil {
+	if err := CoreApp.MigrateDatabase(); err != nil {
 		return err
 	}
 	log.Infoln("insert large sample data into database")

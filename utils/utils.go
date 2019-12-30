@@ -61,6 +61,7 @@ func init() {
 		Log.Out = ioutil.Discard
 		return
 	}
+	Log.Debugln("current working directory: ", Directory)
 	Log.AddHook(new(hook))
 	Log.SetNoLock()
 	checkVerboseMode()
@@ -174,6 +175,7 @@ func UnderScoreString(str string) string {
 //		exists := FileExists("assets/css/base.css")
 func FileExists(name string) bool {
 	if _, err := os.Stat(name); err != nil {
+		Log.Debugf("file exist: %v (%v)", name, !os.IsNotExist(err))
 		if os.IsNotExist(err) {
 			return false
 		}

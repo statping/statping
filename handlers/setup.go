@@ -39,7 +39,7 @@ func setupHandler(w http.ResponseWriter, r *http.Request) {
 
 func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
-	if core.Services() != nil {
+	if !core.SetupMode {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -57,10 +57,9 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	domain := r.PostForm.Get("domain")
 	email := r.PostForm.Get("email")
 	sample := r.PostForm.Get("sample_data") == "on"
-	log.Warnln(sample)
 	dir := utils.Directory
 
-	config := &core.DbConfig{
+	config := &types.DbConfig{
 		DbConn:      dbConn,
 		DbHost:      dbHost,
 		DbUser:      dbUser,
@@ -77,21 +76,23 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		Location:    utils.Directory,
 	}
 
-	if core.Configs, err = config.Save(); err != nil {
+	log.WithFields(utils.ToFields(core.CoreApp, config)).Debugln("new configs posted")
+
+	if _, err := core.CoreApp.SaveConfig(config); err != nil {
 		log.Errorln(err)
 		config.Error = err
 		setupResponseError(w, r, config)
 		return
 	}
 
-	if core.Configs, err = core.LoadConfigFile(dir); err != nil {
+	if _, err = core.LoadConfigFile(dir); err != nil {
 		log.Errorln(err)
 		config.Error = err
 		setupResponseError(w, r, config)
 		return
 	}
 
-	if err = core.Configs.Connect(false, dir); err != nil {
+	if err = core.CoreApp.Connect(false, dir); err != nil {
 		log.Errorln(err)
 		core.DeleteConfig()
 		config.Error = err
@@ -99,10 +100,10 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	config.DropDatabase()
-	config.CreateDatabase()
+	core.CoreApp.DropDatabase()
+	core.CoreApp.CreateDatabase()
 
-	core.CoreApp, err = config.InsertCore()
+	core.CoreApp, err = core.CoreApp.InsertCore(config)
 	if err != nil {
 		log.Errorln(err)
 		config.Error = err
