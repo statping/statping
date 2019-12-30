@@ -34,7 +34,7 @@ type ErrorResponse struct {
 func LoadConfigFile(directory string) (*types.DbConfig, error) {
 	var configs *types.DbConfig
 	if os.Getenv("DB_CONN") != "" {
-		log.Infoln("DB_CONN environment variable was found, waiting for database...")
+		log.Warnln("DB_CONN environment variable was found, waiting for database...")
 		return LoadUsingEnv()
 	}
 	log.Debugln("attempting to read config file at: " + directory + "/config.yml")

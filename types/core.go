@@ -50,5 +50,5 @@ type Core struct {
 	Repos         []PluginJSON       `gorm:"-" json:"-"`
 	AllPlugins    []PluginActions    `gorm:"-" json:"-"`
 	Notifications []AllNotifiers     `gorm:"-" json:"-"`
-	Config        *DbConfig          `gorm:"-" json:"-"`
+	Config        *DbConfig          `gorm:"-" json:"config"`
 }

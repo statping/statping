@@ -222,6 +222,7 @@ func (c *Core) Connect(retry bool, location string) error {
 	case "sqlite":
 		sqlFilename := findDbFile()
 		conn = sqlFilename
+		log.Infoln("SQL database file at: ", conn)
 		dbType = "sqlite3"
 	case "mysql":
 		host := fmt.Sprintf("%v:%v", CoreApp.Config.DbHost, CoreApp.Config.DbPort)

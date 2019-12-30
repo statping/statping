@@ -955,8 +955,7 @@
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Groups",
@@ -1434,8 +1433,7 @@
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Users",
@@ -1918,8 +1916,7 @@
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Notifiers",
@@ -2112,8 +2109,7 @@
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Messages",
@@ -2590,8 +2586,7 @@
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Checkins",
@@ -3049,8 +3044,7 @@
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "Miscellaneous",
@@ -3071,7 +3065,7 @@
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.description).to.eql(\"Statping Monitoring Sample Data\");",
 									"    pm.expect(jsonData.using_cdn).to.eql(false);",
-									"    pm.expect(jsonData.database).to.eql(\"sqlite\");",
+									"    pm.expect(jsonData.config.connection).to.eql(\"sqlite\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -3223,8 +3217,7 @@
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		}
 	],
 	"auth": {
@@ -3258,6 +3251,5 @@
 				]
 			}
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }

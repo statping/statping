@@ -76,7 +76,7 @@ func main() {
 	source.Assets()
 	utils.VerboseMode = verboseMode
 	if err := utils.InitLogs(); err != nil {
-		log.Fatalf("Statping Log Error: \n %v\n", err)
+		log.Errorf("Statping Log Error: %v\n", err)
 	}
 	args := flag.Args()
 
@@ -102,7 +102,9 @@ func main() {
 		}
 	}
 	core.CoreApp.Config = configs
-	mainProcess()
+	if err := mainProcess(); err != nil {
+		log.Fatalln(err)
+	}
 }
 
 // Close will gracefully stop the database connection, and log file
@@ -130,12 +132,13 @@ func loadDotEnvs() error {
 }
 
 // mainProcess will initialize the Statping application and run the HTTP server
-func mainProcess() {
+func mainProcess() error {
 	dir := utils.Directory
 	var err error
 	err = core.CoreApp.Connect(false, dir)
 	if err != nil {
 		log.Errorln(fmt.Sprintf("could not connect to database: %v", err))
+		return err
 	}
 	core.CoreApp.MigrateDatabase()
 	core.InitApp()
@@ -145,4 +148,5 @@ func mainProcess() {
 			log.Fatalln(err)
 		}
 	}
+	return err
 }
