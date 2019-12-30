@@ -256,6 +256,7 @@ clean:
 	rm -f source/rice-box.go
 	rm -rf **/*.db-journal
 	rm -rf *.snap
+	rm -rf /tmp/statping.db
 	find . -name "*.out" -type f -delete
 	find . -name "*.cpu" -type f -delete
 	find . -name "*.mem" -type f -delete

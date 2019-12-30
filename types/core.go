@@ -19,6 +19,9 @@ import (
 	"time"
 )
 
+// SqliteFilename is the name of the SQLlite database file
+const SqliteFilename = "statping.db"
+
 // AllNotifiers contains all the Notifiers loaded
 type AllNotifiers interface{}
 
