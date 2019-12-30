@@ -34,10 +34,8 @@ import (
 // catchCLI will run functions based on the commands sent to Statping
 func catchCLI(args []string) error {
 	dir := utils.Directory
-	if err := utils.InitLogs(); err != nil {
-		return err
-	}
-	source.Assets()
+	runLogs := utils.InitLogs
+	runAssets := source.Assets
 	loadDotEnvs()
 
 	switch args[0] {
@@ -50,11 +48,23 @@ func catchCLI(args []string) error {
 		return errors.New("end")
 	case "assets":
 		var err error
+		if err = runLogs(); err != nil {
+			return err
+		}
+		if err = runAssets(); err != nil {
+			return err
+		}
 		if err = source.CreateAllAssets(dir); err != nil {
 			return err
 		}
 		return errors.New("end")
 	case "sass":
+		if err := runLogs(); err != nil {
+			return err
+		}
+		if err := runAssets(); err != nil {
+			return err
+		}
 		if err := source.CompileSASS(dir); err != nil {
 			return err
 		}
@@ -71,8 +81,13 @@ func catchCLI(args []string) error {
 		return errors.New("end")
 	case "static":
 		var err error
+		if err = runLogs(); err != nil {
+			return err
+		}
+		if err = runAssets(); err != nil {
+			return err
+		}
 		fmt.Printf("Statping v%v Exporting Static 'index.html' page...\n", VERSION)
-		utils.InitLogs()
 		if core.Configs, err = core.LoadConfigFile(dir); err != nil {
 			utils.Log.Errorln("config.yml file not found")
 			return err
@@ -90,7 +105,10 @@ func catchCLI(args []string) error {
 	case "export":
 		var err error
 		var data []byte
-		if err := utils.InitLogs(); err != nil {
+		if err = runLogs(); err != nil {
+			return err
+		}
+		if err = runAssets(); err != nil {
 			return err
 		}
 		if core.Configs, err = core.LoadConfigFile(dir); err != nil {
@@ -123,6 +141,12 @@ func catchCLI(args []string) error {
 		}
 		return errors.New("end")
 	case "run":
+		if err := runLogs(); err != nil {
+			return err
+		}
+		if err := runAssets(); err != nil {
+			return err
+		}
 		utils.Log.Infoln("Running 1 time and saving to database...")
 		runOnce()
 		//core.CloseDB()
@@ -130,6 +154,12 @@ func catchCLI(args []string) error {
 		return errors.New("end")
 	case "env":
 		fmt.Println("Statping Environment Variable")
+		if err := runLogs(); err != nil {
+			return err
+		}
+		if err := runAssets(); err != nil {
+			return err
+		}
 		envs, err := godotenv.Read(".env")
 		if err != nil {
 			utils.Log.Errorln("No .env file found in current directory.")

@@ -184,21 +184,21 @@ func FileExists(name string) bool {
 // DeleteFile will attempt to delete a file
 //		DeleteFile("newfile.json")
 func DeleteFile(file string) error {
-	Log.Infoln("deleting file: " + file)
+	Log.Debugln("deleting file: " + file)
 	return os.Remove(file)
 }
 
 // DeleteDirectory will attempt to delete a directory and all contents inside
 //		DeleteDirectory("assets")
 func DeleteDirectory(directory string) error {
-	Log.Infoln("removing directory: " + directory)
+	Log.Debugln("removing directory: " + directory)
 	return os.RemoveAll(directory)
 }
 
 // CreateDirectory will attempt to create a directory
 //		CreateDirectory("assets")
 func CreateDirectory(directory string) error {
-	Log.Infoln("creating directory: " + directory)
+	Log.Debugln("creating directory: " + directory)
 	if err := os.Mkdir(directory, os.ModePerm); err != os.ErrExist {
 		return err
 	}
@@ -216,7 +216,7 @@ func FolderExists(folder string) bool {
 // CopyFile will copy a file to a new directory
 //		CopyFile("source.jpg", "/tmp/source.jpg")
 func CopyFile(src, dst string) error {
-	Log.Infoln(fmt.Sprintf("copying file: %v to %v", src, dst))
+	Log.Debugln(fmt.Sprintf("copying file: %v to %v", src, dst))
 	in, err := os.Open(src)
 	if err != nil {
 		return err
@@ -239,7 +239,7 @@ func CopyFile(src, dst string) error {
 // Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings
 //		in, out, err := Command("sass assets/scss assets/css/base.css")
 func Command(cmd string) (string, string, error) {
-	Log.Infoln("running command: " + cmd)
+	Log.Debugln("running command: " + cmd)
 	testCmd := exec.Command("sh", "-c", cmd)
 	var stdout, stderr []byte
 	var errStdout, errStderr error

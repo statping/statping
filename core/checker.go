@@ -275,7 +275,8 @@ func recordFailure(s *Service, issue string) {
 		CreatedAt: time.Now(),
 		ErrorCode: s.LastStatusCode,
 	}
-	log.WithFields(utils.ToFields(fail, s.Select())).Warnln(fmt.Sprintf("Service %v Failing: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
+	log.WithFields(utils.ToFields(fail, s.Select())).
+		Warnln(fmt.Sprintf("Service %v Failing: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
 	s.CreateFailure(fail)
 	s.Online = false
 	s.SuccessNotified = false

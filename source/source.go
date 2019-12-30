@@ -37,12 +37,13 @@ var (
 )
 
 // Assets will load the Rice boxes containing the CSS, SCSS, JS, and HTML files.
-func Assets() {
+func Assets() error {
 	CssBox = rice.MustFindBox("css")
 	ScssBox = rice.MustFindBox("scss")
 	JsBox = rice.MustFindBox("js")
 	TmplBox = rice.MustFindBox("tmpl")
 	FontBox = rice.MustFindBox("font")
+	return nil
 }
 
 // HelpMarkdown will return the Markdown of help.md into HTML

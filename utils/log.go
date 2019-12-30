@@ -59,7 +59,7 @@ func (t *hook) Levels() []Logger.Level {
 // type "*types.Service", on string field "Name" converts to "service_name=value". There is also an
 // additional field called "_pointer" that will return the pointer hex value.
 func ToFields(d ...interface{}) map[string]interface{} {
-	if VerboseMode <= 1 {
+	if !Log.IsLevelEnabled(Logger.DebugLevel) {
 		return nil
 	}
 	fieldKey := make(map[string]interface{})
@@ -108,9 +108,7 @@ func replaceVal(d interface{}) interface{} {
 // createLog will create the '/logs' directory based on a directory
 func createLog(dir string) error {
 	if !FolderExists(dir + "/logs") {
-		if err := CreateDirectory(dir + "/logs"); err != nil {
-			return err
-		}
+		CreateDirectory(dir + "/logs")
 	}
 	return nil
 }
