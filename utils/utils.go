@@ -199,7 +199,18 @@ func DeleteDirectory(directory string) error {
 //		CreateDirectory("assets")
 func CreateDirectory(directory string) error {
 	Log.Infoln("creating directory: " + directory)
-	return os.Mkdir(directory, os.ModePerm)
+	if err := os.Mkdir(directory, os.ModePerm); err != os.ErrExist {
+		return err
+	}
+	return nil
+}
+
+// FolderExists will return true if the folder exists
+func FolderExists(folder string) bool {
+	if _, err := os.Stat(folder); os.IsExist(err) {
+		return true
+	}
+	return false
 }
 
 // CopyFile will copy a file to a new directory

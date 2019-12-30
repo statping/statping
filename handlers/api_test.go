@@ -73,7 +73,7 @@ func TestSetupRoutes(t *testing.T) {
 			Body:           form.Encode(),
 			ExpectedStatus: 303,
 			HttpHeaders:    []string{"Content-Type=application/x-www-form-urlencoded"},
-			ExpectedFiles:  []string{dir + "/config.yml", dir + "/" + types.SqliteFilename},
+			ExpectedFiles:  []string{dir + "/config.yml", dir + "/tmp/" + types.SqliteFilename},
 		}}
 
 	for _, v := range tests {
