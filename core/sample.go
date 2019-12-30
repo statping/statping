@@ -584,8 +584,8 @@ func TmpRecords(dbFile string) error {
 	if _, err := CoreApp.SelectAllServices(false); err != nil {
 		return err
 	}
-	log.Infoln("copying sql database file to: " + "/tmp/" + types.SqliteFilename)
-	if err := utils.CopyFile(sqlFile, "/tmp/"+types.SqliteFilename); err != nil {
+	log.Infoln("copying sql database file to: " + tmpSqlFile)
+	if err := utils.CopyFile(sqlFile, tmpSqlFile); err != nil {
 		return err
 	}
 	return err
