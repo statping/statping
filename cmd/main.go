@@ -76,7 +76,7 @@ func main() {
 	source.Assets()
 	utils.VerboseMode = verboseMode
 	if err := utils.InitLogs(); err != nil {
-		log.Fatalln("Statping Log Error: \n %v\n", err)
+		log.Fatalf("Statping Log Error: \n %v\n", err)
 	}
 	args := flag.Args()
 
