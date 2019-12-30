@@ -38,7 +38,7 @@ func init() {
 }
 
 func TestNewCore(t *testing.T) {
-	err := TmpRecords()
+	err := TmpRecords("core.db")
 	require.Nil(t, err)
 	require.NotNil(t, CoreApp)
 }

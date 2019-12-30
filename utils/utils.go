@@ -195,6 +195,13 @@ func DeleteDirectory(directory string) error {
 	return os.RemoveAll(directory)
 }
 
+// CreateDirectory will attempt to create a directory
+//		CreateDirectory("assets")
+func CreateDirectory(directory string) error {
+	Log.Infoln("creating directory: " + directory)
+	return os.Mkdir(directory, os.ModePerm)
+}
+
 // CopyFile will copy a file to a new directory
 //		CopyFile("source.jpg", "/tmp/source.jpg")
 func CopyFile(src, dst string) error {

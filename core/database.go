@@ -187,6 +187,9 @@ func (db *DbConfig) InsertCore() (*Core, error) {
 }
 
 func findDbFile() string {
+	if Configs.SqlFile != "" {
+		return Configs.SqlFile
+	}
 	filename := types.SqliteFilename
 	err := filepath.Walk(utils.Directory, func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
@@ -218,7 +221,7 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 	switch dbType {
 	case "sqlite":
 		sqlFilename := findDbFile()
-		conn = location + "/" + sqlFilename
+		conn = sqlFilename
 		dbType = "sqlite3"
 	case "mysql":
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)

@@ -7,7 +7,7 @@ cache:
   directories:
   - "~/.npm"
   - "~/.cache"
-  - "/tmp/statping.db"
+  - "$GOPATH/src/github.com/hunterlong/statping/tmp"
   - "$GOPATH/src/github.com/hunterlong/statping/vendor"
 sudo: required
 services:

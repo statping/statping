@@ -16,4 +16,5 @@ dev
 !dev/demo-script.sh
 !build/alpine-linux-amd64
 config.yml
-statup.db
+*.db
+tmp

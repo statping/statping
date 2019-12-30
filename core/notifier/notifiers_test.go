@@ -18,7 +18,6 @@ package notifier
 import (
 	"fmt"
 	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/stretchr/testify/assert"
@@ -56,8 +55,7 @@ var core = &types.Core{
 }
 
 func injectDatabase() {
-	utils.DeleteFile(dir + types.SqliteFilename)
-	db, _ = gorm.Open("sqlite3", dir+"/statup.db")
+	db, _ = gorm.Open("sqlite3", dir+"/notifier.db")
 	db.CreateTable(&Notification{})
 }
 

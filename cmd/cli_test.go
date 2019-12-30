@@ -97,6 +97,7 @@ func TestAssetsCommand(t *testing.T) {
 	c.Run()
 	t.Log(c.Stdout())
 	t.Log("Directory for Assets: ", dir)
+	time.Sleep(1 * time.Second)
 	assert.FileExists(t, dir+"/assets/robots.txt")
 	assert.FileExists(t, dir+"/assets/scss/base.scss")
 }

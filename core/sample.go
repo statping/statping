@@ -495,17 +495,32 @@ func insertHitRecords(since time.Time, amount int64) {
 
 }
 
-// TmpRecordsDelete will delete the temporary SQLite database file
-func TmpRecordsDelete() error {
-	return utils.DeleteFile("/tmp/" + types.SqliteFilename)
-}
-
 // TmpRecords is used for testing Statping. It will create a SQLite database file
 // with sample data and store it in the /tmp folder to be used by the tests.
-func TmpRecords() error {
-	var sqlFile = utils.Directory + "/" + types.SqliteFilename
-	var tmpSqlFile = "/tmp/" + types.SqliteFilename
+func TmpRecords(dbFile string) error {
+	var sqlFile = utils.Directory + "/" + dbFile
+	utils.CreateDirectory(utils.Directory + "/tmp")
+	var tmpSqlFile = utils.Directory + "/tmp/" + types.SqliteFilename
 	SampleHits = 480
+
+	var err error
+	CoreApp = NewCore()
+	CoreApp.Name = "Tester"
+	Configs = &DbConfig{
+		DbConn:   "sqlite",
+		Project:  "Tester",
+		Location: utils.Directory,
+		SqlFile:  sqlFile,
+	}
+	log.Infoln("saving config.yml in: " + utils.Directory)
+	if Configs, err = Configs.Save(); err != nil {
+		return err
+	}
+	log.Infoln("loading config.yml from: " + utils.Directory)
+	if Configs, err = LoadConfigFile(utils.Directory); err != nil {
+		return err
+	}
+	log.Infoln("connecting to database")
 
 	exists := utils.FileExists(tmpSqlFile)
 	if exists {
@@ -517,10 +532,7 @@ func TmpRecords() error {
 			return err
 		}
 		log.Infoln("loading config.yml from: " + utils.Directory)
-		if _, err := LoadConfigFile(utils.Directory); err != nil {
-			return err
-		}
-		log.Infoln("connecting to database")
+
 		if err := Configs.Connect(false, utils.Directory); err != nil {
 			return err
 		}
@@ -545,23 +557,6 @@ func TmpRecords() error {
 
 	log.Infoln(tmpSqlFile + " not found, creating a new database...")
 
-	var err error
-	CoreApp = NewCore()
-	CoreApp.Name = "Tester"
-	Configs = &DbConfig{
-		DbConn:   "sqlite",
-		Project:  "Tester",
-		Location: utils.Directory,
-	}
-	log.Infoln("saving config.yml in: " + utils.Directory)
-	if Configs, err = Configs.Save(); err != nil {
-		return err
-	}
-	log.Infoln("loading config.yml from: " + utils.Directory)
-	if Configs, err = LoadConfigFile(utils.Directory); err != nil {
-		return err
-	}
-	log.Infoln("connecting to database")
 	if err := Configs.Connect(false, utils.Directory); err != nil {
 		return err
 	}
