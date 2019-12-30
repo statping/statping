@@ -2,10 +2,13 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/hunterlong/statping/core"
 	_ "github.com/hunterlong/statping/notifiers"
 	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -29,7 +32,9 @@ func init() {
 }
 
 func TestResetDatabase(t *testing.T) {
-	Clean()
+	err := core.TmpRecords("handlers.db")
+	require.Nil(t, err)
+	require.NotNil(t, core.CoreApp)
 }
 
 func TestFailedHTTPServer(t *testing.T) {
@@ -59,7 +64,7 @@ func TestSetupRoutes(t *testing.T) {
 			Name:           "Statping Setup Check",
 			URL:            "/setup",
 			Method:         "GET",
-			ExpectedStatus: 200,
+			ExpectedStatus: 303,
 		},
 		{
 			Name:           "Statping Run Setup",
@@ -68,7 +73,7 @@ func TestSetupRoutes(t *testing.T) {
 			Body:           form.Encode(),
 			ExpectedStatus: 303,
 			HttpHeaders:    []string{"Content-Type=application/x-www-form-urlencoded"},
-			ExpectedFiles:  []string{utils.Directory + "/config.yml", utils.Directory + "/statup.db"},
+			ExpectedFiles:  []string{dir + "/config.yml", dir + "/" + types.SqliteFilename},
 		}}
 
 	for _, v := range tests {
@@ -89,7 +94,7 @@ func TestMainApiRoutes(t *testing.T) {
 			URL:              "/api",
 			Method:           "GET",
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"name":"Tester","description":"This is an awesome test"`},
+			ExpectedContains: []string{`"name":"Statping Sample Data","description":"This data is only used to testing"`},
 		},
 		{
 			Name:           "Statping Renew API Keys",
@@ -113,11 +118,7 @@ func TestMainApiRoutes(t *testing.T) {
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
 			_, t, err := RunHTTPTest(v, t)
-			assert.Nil(t, err)
-			if err != nil {
-				t.FailNow()
-			}
-
+			require.Nil(t, err)
 		})
 	}
 }
@@ -234,11 +235,7 @@ func TestApiServiceRoutes(t *testing.T) {
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
 			_, t, err := RunHTTPTest(v, t)
-			assert.Nil(t, err)
-			if err != nil {
-				t.FailNow()
-			}
-
+			require.Nil(t, err)
 		})
 	}
 }
@@ -278,11 +275,7 @@ func TestGroupAPIRoutes(t *testing.T) {
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
 			_, t, err := RunHTTPTest(v, t)
-			assert.Nil(t, err)
-			if err != nil {
-				t.FailNow()
-			}
-
+			require.Nil(t, err)
 		})
 	}
 }
@@ -332,11 +325,7 @@ func TestApiUsersRoutes(t *testing.T) {
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
 			_, t, err := RunHTTPTest(v, t)
-			assert.Nil(t, err)
-			if err != nil {
-				t.FailNow()
-			}
-
+			require.Nil(t, err)
 		})
 	}
 }
@@ -369,11 +358,7 @@ func TestApiNotifiersRoutes(t *testing.T) {
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
 			_, t, err := RunHTTPTest(v, t)
-			assert.Nil(t, err)
-			if err != nil {
-				t.FailNow()
-			}
-
+			require.Nil(t, err)
 		})
 	}
 }
@@ -439,11 +424,7 @@ func TestMessagesApiRoutes(t *testing.T) {
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
 			_, t, err := RunHTTPTest(v, t)
-			assert.Nil(t, err)
-			if err != nil {
-				t.FailNow()
-			}
-
+			require.Nil(t, err)
 		})
 	}
 }
@@ -478,11 +459,7 @@ func TestApiCheckinRoutes(t *testing.T) {
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
 			_, t, err := RunHTTPTest(v, t)
-			assert.Nil(t, err)
-			if err != nil {
-				t.FailNow()
-			}
-
+			require.Nil(t, err)
 		})
 	}
 }
@@ -514,10 +491,7 @@ func RunHTTPTest(test HTTPTest, t *testing.T) (string, *testing.T, error) {
 	}
 	rr := httptest.NewRecorder()
 	Router().ServeHTTP(rr, req)
-	if err != nil {
-		assert.Nil(t, err)
-		return "", t, err
-	}
+
 	body, err := ioutil.ReadAll(rr.Result().Body)
 	if err != nil {
 		assert.Nil(t, err)
@@ -539,10 +513,4 @@ func RunHTTPTest(test HTTPTest, t *testing.T) (string, *testing.T, error) {
 		}
 	}
 	return stringBody, t, err
-}
-
-func Clean() {
-	utils.DeleteFile(dir + "/config.yml")
-	utils.DeleteFile(dir + "/statup.db")
-	utils.DeleteDirectory(dir + "/logs")
 }

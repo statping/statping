@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/hunterlong/statping/utils"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"net/url"
 	"testing"
 )
@@ -27,7 +27,7 @@ func TestGenericRoutes(t *testing.T) {
 			Method:         "GET",
 			ExpectedStatus: 200,
 			ExpectedContains: []string{
-				`<title>Tester Status</title>`,
+				`<title>Statping Sample Data Status</title>`,
 				`<footer>`,
 			},
 		},
@@ -100,7 +100,7 @@ func TestGenericRoutes(t *testing.T) {
 			URL:              "/metrics",
 			Method:           "GET",
 			ExpectedStatus:   200,
-			ExpectedContains: []string{"statping_total_services 5"},
+			ExpectedContains: []string{"statping_total_services 15"},
 		},
 		{
 			Name:           "Last Log Line",
@@ -140,10 +140,7 @@ func TestGenericRoutes(t *testing.T) {
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
 			_, t, err := RunHTTPTest(v, t)
-			assert.Nil(t, err)
-			if err != nil {
-				t.FailNow()
-			}
+			require.Nil(t, err)
 		})
 	}
 }

@@ -15,14 +15,23 @@ gpgurl=https://statping.com/statping.gpg
 repo=https://github.com/hunterlong/statping
 
 statping_get_tarball() {
-  url="$repo/releases/latest/download/statping-$1-$2.tar.gz"
+  fext='tar.gz'
+  if [ ${OS} == 'windows' ]; then
+    fext='zip'
+    ARCH='x64'
+  fi
+  url="$repo/releases/latest/download/statping-$1-$2.$fext"
   printf "$cyan> Downloading latest version for $OS $ARCH...\n$url $reset\n"
   # Get both the tarball and its GPG signature
   tarball_tmp=`mktemp -t statping.tar.gz.XXXXXXXXXX`
   if curl --fail -L -o "$tarball_tmp" "$url"; then
     # All this dance is because `tar --strip=1` does not work everywhere
     temp=$(mktemp -d statping.XXXXXXXXXX)
-    tar xzf $tarball_tmp -C "$temp"
+    if [ ${OS} == 'windows' ]; then
+      unzip $tarball_tmp -d "$temp"
+    else
+      tar xzf $tarball_tmp -C "$temp"
+    fi
     statping_verify_integrity "$temp"/statping
     printf "$green> Installing to $DEST/statping\n"
     mv "$temp"/statping "$DEST"
@@ -138,6 +147,14 @@ getOS() {
         alias ls='ls -G'
         ;;
       'WindowsNT')
+        OS='windows'
+        DEST=/usr/local/bin
+        ;;
+      'MINGW*')
+        OS='windows'
+        DEST=/usr/local/bin
+        ;;
+      'CYGWIN*')
         OS='windows'
         DEST=/usr/local/bin
         ;;

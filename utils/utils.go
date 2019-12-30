@@ -185,17 +185,44 @@ func FileExists(name string) bool {
 //		DeleteFile("newfile.json")
 func DeleteFile(file string) error {
 	Log.Infoln("deleting file: " + file)
-	err := os.Remove(file)
-	if err != nil {
-		return err
-	}
-	return nil
+	return os.Remove(file)
 }
 
 // DeleteDirectory will attempt to delete a directory and all contents inside
 //		DeleteDirectory("assets")
 func DeleteDirectory(directory string) error {
+	Log.Infoln("removing directory: " + directory)
 	return os.RemoveAll(directory)
+}
+
+// CreateDirectory will attempt to create a directory
+//		CreateDirectory("assets")
+func CreateDirectory(directory string) error {
+	Log.Infoln("creating directory: " + directory)
+	return os.Mkdir(directory, os.ModePerm)
+}
+
+// CopyFile will copy a file to a new directory
+//		CopyFile("source.jpg", "/tmp/source.jpg")
+func CopyFile(src, dst string) error {
+	Log.Infoln(fmt.Sprintf("copying file: %v to %v", src, dst))
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return err
+	}
+	return out.Close()
 }
 
 // Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings

@@ -176,6 +176,7 @@ func EnvToConfig() (*DbConfig, error) {
 		Password:    adminPass,
 		Error:       nil,
 		Location:    utils.Directory,
+		SqlFile:     os.Getenv("SQL_FILE"),
 	}
 	return Configs, err
 }

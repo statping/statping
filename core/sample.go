@@ -17,6 +17,7 @@ package core
 
 import (
 	"fmt"
+	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"time"
@@ -492,4 +493,100 @@ func insertHitRecords(since time.Time, amount int64) {
 
 	}
 
+}
+
+// TmpRecords is used for testing Statping. It will create a SQLite database file
+// with sample data and store it in the /tmp folder to be used by the tests.
+func TmpRecords(dbFile string) error {
+	var sqlFile = utils.Directory + "/" + dbFile
+	utils.CreateDirectory(utils.Directory + "/tmp")
+	var tmpSqlFile = utils.Directory + "/tmp/" + types.SqliteFilename
+	SampleHits = 480
+
+	var err error
+	CoreApp = NewCore()
+	CoreApp.Name = "Tester"
+	Configs = &DbConfig{
+		DbConn:   "sqlite",
+		Project:  "Tester",
+		Location: utils.Directory,
+		SqlFile:  sqlFile,
+	}
+	log.Infoln("saving config.yml in: " + utils.Directory)
+	if Configs, err = Configs.Save(); err != nil {
+		return err
+	}
+	log.Infoln("loading config.yml from: " + utils.Directory)
+	if Configs, err = LoadConfigFile(utils.Directory); err != nil {
+		return err
+	}
+	log.Infoln("connecting to database")
+
+	exists := utils.FileExists(tmpSqlFile)
+	if exists {
+		log.Infoln(tmpSqlFile + " was found, copying the temp database to " + sqlFile)
+		if err := utils.DeleteFile(sqlFile); err != nil {
+			log.Infoln(sqlFile + " was not found")
+		}
+		if err := utils.CopyFile(tmpSqlFile, sqlFile); err != nil {
+			return err
+		}
+		log.Infoln("loading config.yml from: " + utils.Directory)
+
+		if err := Configs.Connect(false, utils.Directory); err != nil {
+			return err
+		}
+		log.Infoln("selecting the Core variable")
+		if _, err := SelectCore(); err != nil {
+			return err
+		}
+		log.Infoln("inserting notifiers into database")
+		if err := InsertNotifierDB(); err != nil {
+			return err
+		}
+		log.Infoln("loading all services")
+		if _, err := CoreApp.SelectAllServices(false); err != nil {
+			return err
+		}
+		if err := AttachNotifiers(); err != nil {
+			return err
+		}
+		CoreApp.Notifications = notifier.AllCommunications
+		return nil
+	}
+
+	log.Infoln(tmpSqlFile + " not found, creating a new database...")
+
+	if err := Configs.Connect(false, utils.Directory); err != nil {
+		return err
+	}
+	log.Infoln("creating database")
+	if err := Configs.CreateDatabase(); err != nil {
+		return err
+	}
+	log.Infoln("migrating database")
+	if err := Configs.MigrateDatabase(); err != nil {
+		return err
+	}
+	log.Infoln("insert large sample data into database")
+	if err := InsertLargeSampleData(); err != nil {
+		return err
+	}
+	log.Infoln("selecting the Core variable")
+	if CoreApp, err = SelectCore(); err != nil {
+		return err
+	}
+	log.Infoln("inserting notifiers into database")
+	if err := InsertNotifierDB(); err != nil {
+		return err
+	}
+	log.Infoln("loading all services")
+	if _, err := CoreApp.SelectAllServices(false); err != nil {
+		return err
+	}
+	log.Infoln("copying sql database file to: " + "/tmp/" + types.SqliteFilename)
+	if err := utils.CopyFile(sqlFile, "/tmp/"+types.SqliteFilename); err != nil {
+		return err
+	}
+	return err
 }

@@ -26,6 +26,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -185,6 +186,26 @@ func (db *DbConfig) InsertCore() (*Core, error) {
 	return CoreApp, query.Error
 }
 
+func findDbFile() string {
+	if Configs.SqlFile != "" {
+		return Configs.SqlFile
+	}
+	filename := types.SqliteFilename
+	err := filepath.Walk(utils.Directory, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+		if filepath.Ext(path) == ".db" {
+			filename = info.Name()
+		}
+		return nil
+	})
+	if err != nil {
+		log.Error(err)
+	}
+	return filename
+}
+
 // Connect will attempt to connect to the sqlite, postgres, or mysql database
 func (db *DbConfig) Connect(retry bool, location string) error {
 	postgresSSL := os.Getenv("POSTGRES_SSLMODE")
@@ -199,7 +220,8 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 	}
 	switch dbType {
 	case "sqlite":
-		conn = location + "/statup.db"
+		sqlFilename := findDbFile()
+		conn = sqlFilename
 		dbType = "sqlite3"
 	case "mysql":
 		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
@@ -226,8 +248,7 @@ func (db *DbConfig) Connect(retry bool, location string) error {
 	if dbType == "sqlite3" {
 		dbSession.DB().SetMaxOpenConns(1)
 	}
-	err = dbSession.DB().Ping()
-	if err == nil {
+	if dbSession.DB().Ping() == nil {
 		DbSession = dbSession
 		if utils.VerboseMode >= 4 {
 			DbSession.LogMode(true).Debug().SetLogger(log)
@@ -283,8 +304,8 @@ func (db *DbConfig) Update() error {
 
 // Save will initially create the config.yml file
 func (db *DbConfig) Save() (*DbConfig, error) {
-	var err error
 	config, err := os.Create(utils.Directory + "/config.yml")
+	defer config.Close()
 	if err != nil {
 		log.Errorln(err)
 		return nil, err
@@ -297,7 +318,6 @@ func (db *DbConfig) Save() (*DbConfig, error) {
 		return nil, err
 	}
 	config.WriteString(string(data))
-	defer config.Close()
 	return db, err
 }
 

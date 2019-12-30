@@ -168,11 +168,9 @@ func updateDisplay() error {
 		return err
 	}
 	if VERSION != gitCurrent.TagName[1:] {
-		fmt.Printf("\n   New Update %v Available\n", gitCurrent.TagName[1:])
+		fmt.Printf("\nNew Update %v Available!\n", gitCurrent.TagName[1:])
 		fmt.Printf("Update Command:\n")
 		fmt.Printf("curl -o- -L https://statping.com/install.sh | bash\n\n")
-	} else {
-		fmt.Printf("You have the latest version of Statping\n")
 	}
 	return nil
 }

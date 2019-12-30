@@ -147,10 +147,12 @@ func (c Core) AllOnline() bool {
 // SelectCore will return the CoreApp global variable and the settings/configs for Statping
 func SelectCore() (*Core, error) {
 	if DbSession == nil {
+		log.Traceln("database has not been initiated yet.")
 		return nil, errors.New("database has not been initiated yet.")
 	}
 	exists := DbSession.HasTable("core")
 	if !exists {
+		log.Errorf("core database has not been setup yet, does not have the 'core' table")
 		return nil, errors.New("core database has not been setup yet.")
 	}
 	db := coreDB().First(&CoreApp)

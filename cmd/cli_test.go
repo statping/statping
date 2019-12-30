@@ -17,7 +17,6 @@ package main
 
 import (
 	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/utils"
 	"github.com/rendon/testcli"
 	"github.com/stretchr/testify/assert"
@@ -98,6 +97,7 @@ func TestAssetsCommand(t *testing.T) {
 	c.Run()
 	t.Log(c.Stdout())
 	t.Log("Directory for Assets: ", dir)
+	time.Sleep(1 * time.Second)
 	assert.FileExists(t, dir+"/assets/robots.txt")
 	assert.FileExists(t, dir+"/assets/scss/base.scss")
 }
@@ -166,7 +166,6 @@ func TestRunOnceCLI(t *testing.T) {
 func TestEnvCLI(t *testing.T) {
 	run := catchCLI([]string{"env"})
 	assert.Error(t, run)
-	Clean()
 }
 
 func commandAndSleep(cmd *exec.Cmd, duration time.Duration, out chan<- string) {
@@ -185,16 +184,4 @@ func helperCommand(envs []string, s ...string) *exec.Cmd {
 func runCommand(c *exec.Cmd, out chan<- string) {
 	bout, _ := c.CombinedOutput()
 	out <- string(bout)
-}
-
-func Clean() {
-	utils.DeleteFile(dir + "/config.yml")
-	utils.DeleteFile(dir + "/statping.db")
-	utils.DeleteDirectory(dir + "/assets")
-	utils.DeleteDirectory(dir + "/logs")
-	core.CoreApp = core.NewCore()
-	source.Assets()
-	//core.CloseDB()
-	os.Unsetenv("DB_CONN")
-	time.Sleep(2 * time.Second)
 }
