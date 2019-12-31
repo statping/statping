@@ -7,7 +7,7 @@ XGO=xgo -go $(GOVERSION) --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
 TRVIS_SECRET=CAVxMvW04wS/APA6QGjlWjLfTx5hc+TWwCKuBkMV2MioZSQGOTQBC4nITySUwepAFY25mI8zNV5oROOKzG0FxYvr2iIqKDkTTdVF1+XS2uyHfEKlsWMPErcqkGjRksDil75Pckz15uvvOYPndetK2QiamQkSf9U8dUJgzrPuV+UOFj6RO/kkEWhzmoyTdVdwIRKmiL8jINkvvFOWCAfg3WlBmucgYHHqjqeTn1kSeUJ+DV9lF8+ENq+74GZrnsq26UtskJexywDeFhhUYjWEvOFXQ19txB/JrvdZ2KSkYeuhHr1ZxlENSpQ/rySQqBvg7+XAl1RhQlL5V7/feXA+I/COqNYG5KqbDgeSUwGkZIumz1ITi24Lz4xATG5hnuRQkOIaO8/FGHAeQxU0JcdWlzS8M5RpvpN9tT12XSFDPYswFmkO+gGSEpu+2gSEbiaX7qocLLvZiMpkQxfOmItaUW5ZMXRvTWijhQTb2nyPOQ9JEabuAtAUrCwe7Enmc8P8ZasNZaJLJO53iQ8FyzrNFyAFwY5F87OQ/v3Hnjv0ADG8fDc4VUxlj8TweuRzETT8U2hchxqnK4BON2WMSj4d1V96pDuzb5fArtq5PTbI4VB7mZPriXYZEiKdfLEIufOYhg7uKdNRekMLkuJRr+ttH0Gyb+lILzSiHMHwxOH5bfM=
 PUBLISH_BODY='{ "request": { "branch": "master", "message": "Homebrew update version v${VERSION}", "config": { "env": { "VERSION": "${VERSION}", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
-TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "os": [ "linux" ], "language": "go", "go": [ "${GOVERSION}" ], "go_import_path": "github.com/hunterlong/statping", "install": true, "sudo": "required", "services": [ "docker" ], "env": { "VERSION": "${VERSION}" }, "matrix": { "allow_failures": [ { "go": "master" } ], "fast_finish": true }, "before_deploy": [ "git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [ { "provider": "releases", "api_key": {"secret": "$(TRVIS_SECRET)"}, "file_glob": true, "file": "build/*", "skip_cleanup": true, "on": {"branch": "master"} } ], "notifications": { "email": false }, "before_script": ["gem install sass"], "script": [ "travis_wait 30 docker pull crazymax/xgo:$(GOVERSION)", "make release" ], "after_success": [], "after_deploy": [ "make publish-homebrew" ] } } }'
+TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "os": [ "linux" ], "language": "go", "go": [ "${GOVERSION}" ], "go_import_path": "github.com/hunterlong/statping", "install": true, "sudo": "required", "services": [ "docker" ], "env": { "VERSION": "${VERSION}", "secret": "$(TRVIS_SECRET)" }, "matrix": { "allow_failures": [ { "go": "master" } ], "fast_finish": true }, "before_deploy": [ "git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [ { "provider": "releases", "api_key": {"secret": "$(TRVIS_SECRET)"}, "file_glob": true, "file": "build/*", "skip_cleanup": true, "on": {"branch": "master"} } ], "notifications": { "email": false }, "before_script": ["gem install sass"], "script": [ "travis_wait 30 docker pull crazymax/xgo:$(GOVERSION)", "make release" ], "after_success": [], "after_deploy": [ "make publish-homebrew" ] } } }'
 TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statping
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 
@@ -367,6 +367,9 @@ heroku:
 	git push heroku master
 	heroku container:push web
 	heroku container:release web
+
+checkall:
+	golangci-lint run ./...
 
 .PHONY: all build build-all build-alpine test-all test test-api docker
 .SILENT: travis_s3_creds
