@@ -8,11 +8,6 @@ import (
 
 func TestDockerIntegration(t *testing.T) {
 
-	t.Run("Docker Open containers", func(t *testing.T) {
-		err := dockerIntegrator.Open()
-		require.Nil(t, err)
-	})
-
 	t.Run("List Services from Docker", func(t *testing.T) {
 		services, err := dockerIntegrator.List()
 		require.Nil(t, err)
@@ -25,11 +20,6 @@ func TestDockerIntegration(t *testing.T) {
 		for _, s := range services {
 			t.Log(s)
 		}
-	})
-
-	t.Run("Close Docker", func(t *testing.T) {
-		err := dockerIntegrator.Close()
-		require.Nil(t, err)
 	})
 
 }

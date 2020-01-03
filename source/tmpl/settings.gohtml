@@ -25,7 +25,7 @@
                     <h6 class="mt-4 text-muted">Integrations</h6>
                     {{ range .Integrations }}
                         {{$i := .Get}}
-                        <a class="nav-link text-capitalize" id="v-pills-integration-{{underscore $i.ShortName}}-tab" data-toggle="pill" href="#v-pills-integration-{{underscore $i.ShortName}}" role="tab" aria-controls="v-pills-integration-{{underscore $i.ShortName}}" aria-selected="false">{{$i.Name}}</a>
+                        <a class="nav-link text-capitalize" id="v-pills-integration-{{underscore $i.ShortName}}-tab" data-toggle="pill" href="#v-pills-integration-{{underscore $i.ShortName}}" role="tab" aria-controls="v-pills-integration-{{underscore $i.ShortName}}" aria-selected="false">{{safe $i.Icon}} {{$i.Name}}</a>
                     {{end}}
                 </div>
             </div>

@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/integrations"
+	"github.com/hunterlong/statping/core/integrations"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"

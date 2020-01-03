@@ -12,6 +12,8 @@
             <textarea rows="3" class="form-control" name="{{underscore .Name}}" id="{{underscore .Name}}">{{ .Value }}</textarea>
         {{else if eq .Type "text"}}
             <input type="text" name="{{underscore .Name}}" class="form-control" value="{{ .Value }}" id="{{underscore .Name}}">
+        {{else if eq .Type "password"}}
+            <input type="password" name="{{underscore .Name}}" class="form-control" value="{{ .Value }}" id="{{underscore .Name}}">
         {{else if eq .Type "integer"}}
             <input type="number" name="{{underscore .Name}}" class="form-control" value="{{ .Value }}" id="{{underscore .Name}}">
         {{else if eq .Type "file"}}

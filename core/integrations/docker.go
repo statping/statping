@@ -30,6 +30,7 @@ type dockerIntegration struct {
 var dockerIntegrator = &dockerIntegration{&types.Integration{
 	ShortName: "docker",
 	Name:      "Docker",
+	Icon:      "<i class=\"fab fa-docker\"></i>",
 	Description: `Import multiple services from Docker by attaching the unix socket to Statping. 
 You can also do this in Docker by setting <u>-v /var/run/docker.sock:/var/run/docker.sock</u> in the Statping Docker container. 
 All of the containers with open TCP/UDP ports will be listed for you to choose which services you want to add. If you running Statping inside of a container, 

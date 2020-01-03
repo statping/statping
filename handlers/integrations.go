@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/hunterlong/statping/integrations"
+	"github.com/hunterlong/statping/core/integrations"
 	"net/http"
 )
 

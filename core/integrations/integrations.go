@@ -30,6 +30,7 @@ func init() {
 	Integrations = append(Integrations,
 		csvIntegrator,
 		dockerIntegrator,
+		traefikIntegrator,
 	)
 }
 

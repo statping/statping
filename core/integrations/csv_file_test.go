@@ -15,11 +15,6 @@ func TestCsvFileIntegration(t *testing.T) {
 		assert.Equal(t, "test_files/example_services.csv", path)
 	})
 
-	t.Run("CSV Open File", func(t *testing.T) {
-		err := csvIntegrator.Open()
-		require.Nil(t, err)
-	})
-
 	t.Run("List Services from CSV File", func(t *testing.T) {
 		services, err := csvIntegrator.List()
 		require.Nil(t, err)
@@ -35,11 +30,6 @@ func TestCsvFileIntegration(t *testing.T) {
 		for _, s := range services {
 			t.Log(s)
 		}
-	})
-
-	t.Run("Close CSV", func(t *testing.T) {
-		err := csvIntegrator.Close()
-		require.Nil(t, err)
 	})
 
 }

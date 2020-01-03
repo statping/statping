@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
-	"io/ioutil"
 	"strconv"
 	"strings"
 	"time"
@@ -35,12 +34,13 @@ type csvIntegration struct {
 var csvIntegrator = &csvIntegration{&types.Integration{
 	ShortName:   "csv",
 	Name:        "CSV File",
+	Icon:        "<i class=\"fas fa-file-csv\"></i>",
 	Description: "Import multiple services from a CSV file",
 	Fields: []*types.IntegrationField{
 		{
-			Name:     "input",
-			Type:     "file",
-			MimeType: "application/csv",
+			Name:        "input",
+			Type:        "textarea",
+			Description: "",
 		},
 	},
 }}
@@ -52,12 +52,8 @@ func (t *csvIntegration) Get() *types.Integration {
 }
 
 func (t *csvIntegration) List() ([]*types.Service, error) {
-	path := csvIntegrator.Fields[0].Value.(string)
-	data, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	for _, line := range strings.Split(strings.TrimSuffix(string(data), "\n"), "\n") {
+	data := Value(t, "input").(string)
+	for _, line := range strings.Split(strings.TrimSuffix(data, "\n"), "\n") {
 		col := strings.Split(line, ",")
 		csvData = append(csvData, col)
 	}
