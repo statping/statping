@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"crypto/subtle"
 	"fmt"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/utils"
@@ -8,6 +9,28 @@ import (
 	"net/http/httptest"
 	"time"
 )
+
+var (
+	authUser string
+	authPass string
+)
+
+// basicAuthHandler is a middleware to implement HTTP basic authentication using
+// AUTH_USERNAME and AUTH_PASSWORD environment variables
+func basicAuthHandler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user, pass, ok := r.BasicAuth()
+		if !ok || subtle.ConstantTimeCompare([]byte(user),
+			[]byte(authUser)) != 1 || subtle.ConstantTimeCompare([]byte(pass),
+			[]byte(authPass)) != 1 {
+			w.Header().Set("WWW-Authenticate", `Basic realm="statping"`)
+			w.WriteHeader(401)
+			w.Write([]byte("You are unauthorized to access the application.\n"))
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
 
 // sendLog is a http middleware that will log the duration of request and other useful fields
 func sendLog(handler func(w http.ResponseWriter, r *http.Request)) http.Handler {

@@ -25,6 +25,7 @@ import (
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
+	"os"
 )
 
 var (
@@ -38,6 +39,11 @@ func Router() *mux.Router {
 	dir := utils.Directory
 	CacheStorage = NewStorage()
 	r := mux.NewRouter()
+	if os.Getenv("AUTH_USERNAME") != "" && os.Getenv("AUTH_PASSWORD") != "" {
+		authUser = os.Getenv("AUTH_USERNAME")
+		authPass = os.Getenv("AUTH_PASSWORD")
+		r.Use(basicAuthHandler)
+	}
 	r.Handle("/", sendLog(indexHandler))
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
@@ -86,6 +92,7 @@ func Router() *mux.Router {
 	r.Handle("/settings/delete_assets", authenticated(deleteAssetsHandler, true)).Methods("GET")
 	r.Handle("/settings/export", authenticated(exportHandler, true)).Methods("GET")
 	r.Handle("/settings/bulk_import", authenticated(bulkImportHandler, true)).Methods("POST")
+	r.Handle("/settings/integrator/{name}", authenticated(integratorHandler, true)).Methods("POST")
 
 	// SERVICE Routes
 	r.Handle("/services", authenticated(servicesHandler, true)).Methods("GET")
@@ -108,6 +115,10 @@ func Router() *mux.Router {
 	r.Handle("/api", authenticated(apiIndexHandler, false))
 	r.Handle("/api/renew", authenticated(apiRenewHandler, false))
 	r.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
+
+	r.Handle("/api/integrations", authenticated(apiAllIntegrationsHandler, false)).Methods("GET")
+	r.Handle("/api/integrations/{name}", authenticated(apiIntegrationHandler, false)).Methods("GET")
+	r.Handle("/api/integrations/{name}", authenticated(apiIntegrationHandler, false)).Methods("POST")
 
 	// API SERVICE Routes
 	r.Handle("/api/services", readOnly(apiAllServicesHandler, false)).Methods("GET")

@@ -43,7 +43,7 @@ var (
 	httpServer   *http.Server
 	usingSSL     bool
 	mainTmpl     = `{{define "main" }} {{ template "base" . }} {{ end }}`
-	templates    = []string{"base.gohtml", "head.gohtml", "nav.gohtml", "footer.gohtml", "scripts.gohtml", "form_service.gohtml", "form_notifier.gohtml", "form_group.gohtml", "form_user.gohtml", "form_checkin.gohtml", "form_message.gohtml"}
+	templates    = []string{"base.gohtml", "head.gohtml", "nav.gohtml", "footer.gohtml", "scripts.gohtml", "form_service.gohtml", "form_notifier.gohtml", "form_integration.gohtml", "form_group.gohtml", "form_user.gohtml", "form_checkin.gohtml", "form_message.gohtml"}
 	javascripts  = []string{"charts.js", "chart_index.js"}
 	mainTemplate *template.Template
 )

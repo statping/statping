@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/integrations"
 	"github.com/hunterlong/statping/notifiers"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
@@ -68,6 +69,7 @@ func InitApp() {
 	checkServices()
 	AttachNotifiers()
 	CoreApp.Notifications = notifier.AllCommunications
+	CoreApp.Integrations = integrations.Integrations
 	go DatabaseMaintence()
 	SetupMode = false
 }
