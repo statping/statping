@@ -3,22 +3,30 @@ package integrations
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"io/ioutil"
 	"testing"
 )
 
 func TestCsvFileIntegration(t *testing.T) {
+	data, err := ioutil.ReadFile("../../source/tmpl/bulk_import.csv")
+	require.Nil(t, err)
 
-	csvIntegrator.Fields[0].Value = "test_files/example_services.csv"
+	t.Run("Set Field Value", func(t *testing.T) {
+		formPost := map[string][]string{}
+		formPost["input"] = []string{string(data)}
+		_, err = SetFields(csvIntegrator, formPost)
+		require.Nil(t, err)
+	})
 
-	t.Run("CSV File", func(t *testing.T) {
-		path := csvIntegrator.Fields[0].Value
-		assert.Equal(t, "test_files/example_services.csv", path)
+	t.Run("Get Field Value", func(t *testing.T) {
+		value := Value(csvIntegrator, "input").(string)
+		assert.Equal(t, string(data), value)
 	})
 
 	t.Run("List Services from CSV File", func(t *testing.T) {
 		services, err := csvIntegrator.List()
 		require.Nil(t, err)
-		assert.Equal(t, len(services), 1)
+		assert.Equal(t, 10, len(services))
 	})
 
 	t.Run("Confirm Services from CSV File", func(t *testing.T) {

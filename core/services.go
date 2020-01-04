@@ -144,7 +144,7 @@ func (s *Service) AvgTime() string {
 
 // OnlineDaysPercent returns the service's uptime percent within last 24 hours
 func (s *Service) OnlineDaysPercent(days int) float32 {
-	ago := time.Now().Add((-24 * time.Duration(days)) * time.Hour)
+	ago := time.Now().UTC().Add((-24 * time.Duration(days)) * time.Hour)
 	return s.OnlineSince(ago)
 }
 
@@ -207,7 +207,7 @@ func (s *Service) SmallText() string {
 	}
 	if len(last) > 0 {
 		lastFailure := s.lastFailure()
-		got, _ := timeago.TimeAgoWithTime(time.Now().Add(s.Downtime()), time.Now())
+		got, _ := timeago.TimeAgoWithTime(time.Now().UTC().Add(s.Downtime()), time.Now().UTC())
 		return fmt.Sprintf("Reported offline %v, %v", got, lastFailure.ParseError())
 	} else {
 		return fmt.Sprintf("%v is currently offline", s.Name)
@@ -309,7 +309,7 @@ func (d *DateScanObj) ToString() string {
 
 // AvgUptime24 returns a service's average online status for last 24 hours
 func (s *Service) AvgUptime24() string {
-	ago := time.Now().Add(-24 * time.Hour)
+	ago := time.Now().UTC().Add(-24 * time.Hour)
 	return s.AvgUptime(ago)
 }
 
@@ -410,7 +410,7 @@ func (s *Service) Update(restart bool) error {
 
 // Create will create a service and insert it into the database
 func (s *Service) Create(check bool) (int64, error) {
-	s.CreatedAt = time.Now()
+	s.CreatedAt = time.Now().UTC()
 	db := servicesDB().Create(s)
 	if db.Error != nil {
 		log.Errorln(fmt.Sprintf("Failed to create service %v #%v: %v", s.Name, s.Id, db.Error))

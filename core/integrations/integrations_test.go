@@ -9,7 +9,7 @@ func TestIntegrations(t *testing.T) {
 
 	t.Run("Collect Integrations", func(t *testing.T) {
 		amount := len(Integrations)
-		assert.Equal(t, 2, amount)
+		assert.Equal(t, 3, amount)
 	})
 
 }

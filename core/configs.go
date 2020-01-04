@@ -104,8 +104,8 @@ func LoadUsingEnv() (*types.DbConfig, error) {
 	return Configs, nil
 }
 
-// DefaultPort accepts a database type and returns its default port
-func DefaultPort(db string) int64 {
+// defaultPort accepts a database type and returns its default port
+func defaultPort(db string) int64 {
 	switch db {
 	case "mysql":
 		return 3306
@@ -140,7 +140,7 @@ func EnvToConfig() (*types.DbConfig, error) {
 	}
 	port := utils.ToInt(os.Getenv("DB_PORT"))
 	if port == 0 {
-		port = DefaultPort(os.Getenv("DB_PORT"))
+		port = defaultPort(os.Getenv("DB_PORT"))
 	}
 	name := os.Getenv("NAME")
 	if name == "" {
@@ -185,9 +185,11 @@ func EnvToConfig() (*types.DbConfig, error) {
 // SampleData runs all the sample data for a new Statping installation
 func SampleData() error {
 	if err := InsertSampleData(); err != nil {
+		log.Errorln(err)
 		return err
 	}
 	if err := InsertSampleHits(); err != nil {
+		log.Errorln(err)
 		return err
 	}
 	return nil

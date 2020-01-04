@@ -16,12 +16,13 @@
 package integrations
 
 import (
+	"bytes"
+	"encoding/csv"
 	"errors"
 	"fmt"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -35,7 +36,7 @@ var csvIntegrator = &csvIntegration{&types.Integration{
 	ShortName:   "csv",
 	Name:        "CSV File",
 	Icon:        "<i class=\"fas fa-file-csv\"></i>",
-	Description: "Import multiple services from a CSV file",
+	Description: "Import multiple services from a CSV file. Please have your CSV file formatted with the correct amount of columns based on the <a href=\"https://raw.githubusercontent.com/hunterlong/statping/master/source/tmpl/bulk_import.csv\">example file on Github</a>.",
 	Fields: []*types.IntegrationField{
 		{
 			Name:        "input",
@@ -53,16 +54,19 @@ func (t *csvIntegration) Get() *types.Integration {
 
 func (t *csvIntegration) List() ([]*types.Service, error) {
 	data := Value(t, "input").(string)
-	for _, line := range strings.Split(strings.TrimSuffix(data, "\n"), "\n") {
-		col := strings.Split(line, ",")
-		csvData = append(csvData, col)
+	buf := bytes.NewReader([]byte(data))
+	r := csv.NewReader(buf)
+	records, err := r.ReadAll()
+	if err != nil {
+		return nil, err
 	}
 
 	var services []*types.Service
-	for _, v := range csvData {
+	for k, v := range records[1:] {
 		s, err := commaToService(v)
 		if err != nil {
-			return nil, err
+			log.Errorf("error on line %v: %v", k, err)
+			continue
 		}
 		services = append(services, s)
 	}

@@ -47,14 +47,14 @@ func (i *Incident) Delete() error {
 
 // Create will create a incident and insert it into the database
 func (i *Incident) Create() (int64, error) {
-	i.CreatedAt = time.Now()
+	i.CreatedAt = time.Now().UTC()
 	db := incidentsDB().Create(i)
 	return i.Id, db.Error
 }
 
 // Update will update a incident
 func (i *Incident) Update() (int64, error) {
-	i.UpdatedAt = time.Now()
+	i.UpdatedAt = time.Now().UTC()
 	db := incidentsDB().Update(i)
 	return i.Id, db.Error
 }
@@ -67,7 +67,7 @@ func (i *IncidentUpdate) Delete() error {
 
 // Create will create a incident update and insert it into the database
 func (i *IncidentUpdate) Create() (int64, error) {
-	i.CreatedAt = time.Now()
+	i.CreatedAt = time.Now().UTC()
 	db := incidentsUpdatesDB().Create(i)
 	return i.Id, db.Error
 }

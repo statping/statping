@@ -50,7 +50,7 @@ func init() {
 // NewCore return a new *core.Core struct
 func NewCore() *Core {
 	CoreApp = &Core{&types.Core{
-		Started: time.Now(),
+		Started: time.Now().UTC(),
 	},
 	}
 	return CoreApp
