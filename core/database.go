@@ -38,6 +38,10 @@ var (
 
 func init() {
 	DbModels = []interface{}{&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Message{}, &types.Group{}, &types.Checkin{}, &types.CheckinHit{}, &notifier.Notification{}, &types.Incident{}, &types.IncidentUpdate{}}
+
+	gorm.NowFunc = func() time.Time {
+		return time.Now().UTC()
+	}
 }
 
 // DbConfig stores the config.yml file for the statup configuration
@@ -115,60 +119,60 @@ func CloseDB() {
 	}
 }
 
-// AfterFind for Core will set the timezone
-func (c *Core) AfterFind() (err error) {
-	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
-	c.UpdatedAt = utils.Timezoner(c.UpdatedAt, CoreApp.Timezone)
-	return
-}
-
-// AfterFind for Service will set the timezone
-func (s *Service) AfterFind() (err error) {
-	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
-	s.UpdatedAt = utils.Timezoner(s.UpdatedAt, CoreApp.Timezone)
-	return
-}
-
-// AfterFind for Hit will set the timezone
-func (h *Hit) AfterFind() (err error) {
-	h.CreatedAt = utils.Timezoner(h.CreatedAt, CoreApp.Timezone)
-	return
-}
-
-// AfterFind for Failure will set the timezone
-func (f *Failure) AfterFind() (err error) {
-	f.CreatedAt = utils.Timezoner(f.CreatedAt, CoreApp.Timezone)
-	return
-}
-
-// AfterFind for USer will set the timezone
-func (u *User) AfterFind() (err error) {
-	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
-	u.UpdatedAt = utils.Timezoner(u.UpdatedAt, CoreApp.Timezone)
-	return
-}
-
-// AfterFind for Checkin will set the timezone
-func (c *Checkin) AfterFind() (err error) {
-	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
-	c.UpdatedAt = utils.Timezoner(c.UpdatedAt, CoreApp.Timezone)
-	return
-}
-
-// AfterFind for checkinHit will set the timezone
-func (c *CheckinHit) AfterFind() (err error) {
-	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
-	return
-}
-
-// AfterFind for Message will set the timezone
-func (u *Message) AfterFind() (err error) {
-	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
-	u.UpdatedAt = utils.Timezoner(u.UpdatedAt, CoreApp.Timezone)
-	u.StartOn = utils.Timezoner(u.StartOn.UTC(), CoreApp.Timezone)
-	u.EndOn = utils.Timezoner(u.EndOn.UTC(), CoreApp.Timezone)
-	return
-}
+//// AfterFind for Core will set the timezone
+//func (c *Core) AfterFind() (err error) {
+//	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
+//	c.UpdatedAt = utils.Timezoner(c.UpdatedAt, CoreApp.Timezone)
+//	return
+//}
+//
+//// AfterFind for Service will set the timezone
+//func (s *Service) AfterFind() (err error) {
+//	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
+//	s.UpdatedAt = utils.Timezoner(s.UpdatedAt, CoreApp.Timezone)
+//	return
+//}
+//
+//// AfterFind for Hit will set the timezone
+//func (h *Hit) AfterFind() (err error) {
+//	h.CreatedAt = utils.Timezoner(h.CreatedAt, CoreApp.Timezone)
+//	return
+//}
+//
+//// AfterFind for Failure will set the timezone
+//func (f *Failure) AfterFind() (err error) {
+//	f.CreatedAt = utils.Timezoner(f.CreatedAt, CoreApp.Timezone)
+//	return
+//}
+//
+//// AfterFind for USer will set the timezone
+//func (u *User) AfterFind() (err error) {
+//	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
+//	u.UpdatedAt = utils.Timezoner(u.UpdatedAt, CoreApp.Timezone)
+//	return
+//}
+//
+//// AfterFind for Checkin will set the timezone
+//func (c *Checkin) AfterFind() (err error) {
+//	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
+//	c.UpdatedAt = utils.Timezoner(c.UpdatedAt, CoreApp.Timezone)
+//	return
+//}
+//
+//// AfterFind for checkinHit will set the timezone
+//func (c *CheckinHit) AfterFind() (err error) {
+//	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
+//	return
+//}
+//
+//// AfterFind for Message will set the timezone
+//func (u *Message) AfterFind() (err error) {
+//	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
+//	u.UpdatedAt = utils.Timezoner(u.UpdatedAt, CoreApp.Timezone)
+//	u.StartOn = utils.Timezoner(u.StartOn.UTC(), CoreApp.Timezone)
+//	u.EndOn = utils.Timezoner(u.EndOn.UTC(), CoreApp.Timezone)
+//	return
+//}
 
 // InsertCore create the single row for the Core settings in Statping
 func (c *Core) InsertCore(db *types.DbConfig) (*Core, error) {
@@ -216,7 +220,7 @@ func (c *Core) Connect(retry bool, location string) error {
 	var err error
 	dbType = CoreApp.Config.DbConn
 	if CoreApp.Config.DbPort == 0 {
-		CoreApp.Config.DbPort = DefaultPort(dbType)
+		CoreApp.Config.DbPort = defaultPort(dbType)
 	}
 	switch dbType {
 	case "sqlite":
@@ -395,6 +399,7 @@ func (c *Core) MigrateDatabase() error {
 		}
 	}()
 	if tx.Error != nil {
+		log.Errorln(tx.Error)
 		return tx.Error
 	}
 	for _, table := range DbModels {

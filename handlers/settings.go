@@ -18,7 +18,9 @@ package handlers
 import (
 	"bytes"
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/core/integrations"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
@@ -142,6 +144,54 @@ func bulkImportHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+}
+
+type integratorOut struct {
+	Integrator *types.Integration `json:"integrator"`
+	Services   []*types.Service   `json:"services"`
+	Error      error
+}
+
+func integratorHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	integratorName := vars["name"]
+	r.ParseForm()
+
+	integrator, err := integrations.Find(integratorName)
+	if err != nil {
+		log.Errorln(err)
+		ExecuteResponse(w, r, "integrator.gohtml", integratorOut{
+			Error: err,
+		}, nil)
+		return
+	}
+
+	log.Info(r.PostForm)
+
+	for _, v := range integrator.Get().Fields {
+		log.Info(v.Name, v.Value)
+	}
+
+	integrations.SetFields(integrator, r.PostForm)
+
+	for _, v := range integrator.Get().Fields {
+		log.Info(v.Name, v.Value)
+	}
+
+	services, err := integrator.List()
+	if err != nil {
+		log.Errorln(err)
+		ExecuteResponse(w, r, "integrator.gohtml", integratorOut{
+			Integrator: integrator.Get(),
+			Error:      err,
+		}, nil)
+		return
+	}
+
+	ExecuteResponse(w, r, "integrator.gohtml", integratorOut{
+		Integrator: integrator.Get(),
+		Services:   services,
+	}, nil)
 }
 
 // commaToService will convert a CSV comma delimited string slice to a Service type

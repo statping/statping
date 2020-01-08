@@ -18,6 +18,7 @@ package core
 import (
 	"errors"
 	"fmt"
+	"github.com/hunterlong/statping/core/integrations"
 	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/notifiers"
 	"github.com/hunterlong/statping/source"
@@ -49,7 +50,7 @@ func init() {
 // NewCore return a new *core.Core struct
 func NewCore() *Core {
 	CoreApp = &Core{&types.Core{
-		Started: time.Now(),
+		Started: time.Now().UTC(),
 	},
 	}
 	return CoreApp
@@ -68,6 +69,7 @@ func InitApp() {
 	checkServices()
 	AttachNotifiers()
 	CoreApp.Notifications = notifier.AllCommunications
+	CoreApp.Integrations = integrations.Integrations
 	go DatabaseMaintence()
 	SetupMode = false
 }

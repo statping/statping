@@ -21,6 +21,12 @@
                 {{ range .Plugins }}
                     <a class="nav-link text-capitalize" id="v-pills-{{underscore .Name}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Name}}" role="tab" aria-controls="v-pills-profile" aria-selected="false">{{.Name}}</a>
                 {{end}}
+
+                    <h6 class="mt-4 text-muted">Integrations</h6>
+                    {{ range .Integrations }}
+                        {{$i := .Get}}
+                        <a class="nav-link text-capitalize" id="v-pills-integration-{{underscore $i.ShortName}}-tab" data-toggle="pill" href="#v-pills-integration-{{underscore $i.ShortName}}" role="tab" aria-controls="v-pills-integration-{{underscore $i.ShortName}}" aria-selected="false">{{safe $i.Icon}} {{$i.Name}}</a>
+                    {{end}}
                 </div>
             </div>
             <div class="col-md-9 col-sm-12">
@@ -260,6 +266,15 @@
                     {{ end }}
                     </div>
                 {{ end }}
+
+
+                    {{ range .Integrations }}
+                        {{$i := .Get}}
+                        <div class="tab-pane fade" id="v-pills-integration-{{underscore $i.ShortName}}" role="tabpanel" aria-labelledby="v-pills-integration-{{underscore $i.ShortName}}-tab">
+                            {{template "form_integration" .}}
+                        </div>
+                    {{ end }}
+
 
                     <div class="tab-pane fade" id="v-pills-browse" role="tabpanel" aria-labelledby="v-pills-browse-tab">
                     {{ range .Repos }}

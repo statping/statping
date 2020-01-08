@@ -257,7 +257,7 @@ func recordSuccess(s *Service) {
 		Service:   s.Id,
 		Latency:   s.Latency,
 		PingTime:  s.PingTime,
-		CreatedAt: time.Now(),
+		CreatedAt: time.Now().UTC(),
 	}
 	s.CreateHit(hit)
 	log.WithFields(utils.ToFields(hit, s.Select())).Infoln(fmt.Sprintf("Service %v Successful Response: %0.2f ms | Lookup in: %0.2f ms", s.Name, hit.Latency*1000, hit.PingTime*1000))
@@ -272,7 +272,7 @@ func recordFailure(s *Service, issue string) {
 		Service:   s.Id,
 		Issue:     issue,
 		PingTime:  s.PingTime,
-		CreatedAt: time.Now(),
+		CreatedAt: time.Now().UTC(),
 		ErrorCode: s.LastStatusCode,
 	}
 	log.WithFields(utils.ToFields(fail, s.Select())).

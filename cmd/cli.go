@@ -272,6 +272,8 @@ func HelpEcho() {
 	fmt.Println("     ADMIN_PASS                - Password for administrator account (default: admin)")
 	fmt.Println("     SASS                      - Set the absolute path to the sass binary location")
 	fmt.Println("     HTTP_PROXY                - Use a HTTP Proxy for HTTP Requests")
+	fmt.Println("     AUTH_USERNAME             - HTTP Basic Authentication username")
+	fmt.Println("     AUTH_PASSWORD             - HTTP Basic Authentication password")
 	fmt.Println("   * You can insert environment variables into a '.env' file in root directory.")
 	fmt.Println("Give Statping a Star at https://github.com/hunterlong/statping")
 }

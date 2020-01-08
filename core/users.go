@@ -68,7 +68,7 @@ func (u *User) Update() error {
 
 // Create will insert a new User into the database
 func (u *User) Create() (int64, error) {
-	u.CreatedAt = time.Now()
+	u.CreatedAt = time.Now().UTC()
 	u.Password = utils.HashPassword(u.Password)
 	u.ApiKey = utils.NewSHA1Hash(5)
 	u.ApiSecret = utils.NewSHA1Hash(10)

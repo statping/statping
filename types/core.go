@@ -51,4 +51,5 @@ type Core struct {
 	AllPlugins    []PluginActions    `gorm:"-" json:"-"`
 	Notifications []AllNotifiers     `gorm:"-" json:"-"`
 	Config        *DbConfig          `gorm:"-" json:"config"`
+	Integrations  []Integrator       `gorm:"-" json:"-"`
 }

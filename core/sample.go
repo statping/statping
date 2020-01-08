@@ -20,6 +20,7 @@ import (
 	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
+	"sync"
 	"time"
 )
 
@@ -191,7 +192,7 @@ func insertSampleCheckins() error {
 	})
 	checkin2.Update()
 
-	checkTime := time.Now().Add(-24 * time.Hour)
+	checkTime := time.Now().UTC().Add(-24 * time.Hour)
 	for i := 0; i <= 60; i++ {
 		checkHit := ReturnCheckinHit(&types.CheckinHit{
 			Checkin:   checkin1.Id,
@@ -206,32 +207,35 @@ func insertSampleCheckins() error {
 
 // InsertSampleHits will create a couple new hits for the sample services
 func InsertSampleHits() error {
-
+	tx := hitsDB().Begin()
+	sg := new(sync.WaitGroup)
 	for i := int64(1); i <= 5; i++ {
-
+		sg.Add(1)
 		service := SelectService(i)
 		seed := time.Now().UnixNano()
-
 		log.Infoln(fmt.Sprintf("Adding %v sample hit records to service %v", SampleHits, service.Name))
 		createdAt := sampleStart
-
 		p := utils.NewPerlin(2., 2., 10, seed)
-
-		for hi := 0.; hi <= float64(SampleHits); hi++ {
-
-			latency := p.Noise1D(hi / 500)
-			createdAt = createdAt.Add(60 * time.Second)
-			hit := &types.Hit{
-				Service:   service.Id,
-				CreatedAt: createdAt,
-				Latency:   latency,
+		go func() {
+			defer sg.Done()
+			for hi := 0.; hi <= float64(SampleHits); hi++ {
+				latency := p.Noise1D(hi / 500)
+				createdAt = createdAt.Add(60 * time.Second)
+				hit := &types.Hit{
+					Service:   service.Id,
+					CreatedAt: createdAt,
+					Latency:   latency,
+				}
+				tx = tx.Create(&hit)
 			}
-			service.CreateHit(hit)
-
-		}
+		}()
 	}
-
-	return nil
+	sg.Wait()
+	err := tx.Commit().Error
+	if err != nil {
+		log.Errorln(err)
+	}
+	return err
 }
 
 // insertSampleCore will create a new Core for the seed
@@ -243,7 +247,7 @@ func insertSampleCore() error {
 		ApiSecret:   "samplesecret",
 		Domain:      "http://localhost:8080",
 		Version:     "test",
-		CreatedAt:   time.Now(),
+		CreatedAt:   time.Now().UTC(),
 		UseCdn:      types.NewNullBool(false),
 	}
 	query := coreDB().Create(core)
@@ -276,8 +280,8 @@ func insertMessages() error {
 		Title:       "Routine Downtime",
 		Description: "This is an example a upcoming message for a service!",
 		ServiceId:   1,
-		StartOn:     time.Now().Add(15 * time.Minute),
-		EndOn:       time.Now().Add(2 * time.Hour),
+		StartOn:     time.Now().UTC().Add(15 * time.Minute),
+		EndOn:       time.Now().UTC().Add(2 * time.Hour),
 	})
 	if _, err := m1.Create(); err != nil {
 		return err
@@ -312,7 +316,7 @@ func InsertLargeSampleData() error {
 	if err := insertMessages(); err != nil {
 		return err
 	}
-	createdOn := time.Now().Add((-24 * 90) * time.Hour).UTC()
+	createdOn := time.Now().UTC().Add((-24 * 90) * time.Hour)
 	s6 := ReturnService(&types.Service{
 		Name:           "JSON Lint",
 		Domain:         "https://jsonlint.com",
@@ -443,7 +447,7 @@ func InsertLargeSampleData() error {
 	s14.Create(false)
 	s15.Create(false)
 
-	var dayAgo = time.Now().Add((-24 * 90) * time.Hour)
+	var dayAgo = time.Now().UTC().Add((-24 * 90) * time.Hour)
 
 	insertHitRecords(dayAgo, 5450)
 
@@ -485,7 +489,7 @@ func insertHitRecords(since time.Time, amount int64) {
 			createdAt = createdAt.Add(1 * time.Minute)
 			hit := &types.Hit{
 				Service:   service.Id,
-				CreatedAt: createdAt,
+				CreatedAt: createdAt.UTC(),
 				Latency:   latency,
 			}
 			service.CreateHit(hit)
