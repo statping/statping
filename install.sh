@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Statping installation script for Linux, Mac, and maybe Windows.
 #
 # This installation script is a modification of Yarn's installation
@@ -65,7 +65,7 @@ statping_verify_integrity() {
 
   printf "$cyan> Verifying integrity with gpg key from $gpgurl...$reset\n"
   # Grab the public key if it doesn't already exist
-  gpg --list-keys $gpg_key >/dev/null 2>&1 || (curl -sS $gpgurl | gpg --import)
+  gpg --list-keys $gpg_key >/dev/null 2>&1 || (curl -sS -L $gpgurl | gpg --import)
 
   if [ ! -f "$1.asc" ]; then
     printf "$red> Could not download GPG signature for this Statping release. This means the release can not be verified!$reset\n"
@@ -74,7 +74,7 @@ statping_verify_integrity() {
   fi
 
   # Actually perform the verification
-  if gpg --verify "$1.asc" $1; then
+  if gpg --verify "$1.asc" $1 &> /dev/null; then
     printf "$green> GPG signature looks good$reset\n"
   else
     printf "$red> GPG signature for this Statping release is invalid! This is BAD and may mean the release has been tampered with. It is strongly recommended that you report this to the Statping developers.$reset\n"
@@ -104,16 +104,6 @@ statping_install() {
   printf "${white}Installing Statping!$reset\n"
   getOS
   getArch
-  if [ -d "$DEST" ]; then
-    if ! loc="$(type -p "statping version")" || [[ -z $loc ]]; then
-      specified_version=`curl -sS https://raw.githubusercontent.com/hunterlong/statping/master/version.txt`
-      statping_version=`statping version`
-      if [ "$specified_version" = "$statping_version" ]; then
-        printf "$green> Statping is already at the $specified_version version.$reset\n"
-        exit 0
-      fi
-    fi
-  fi
   if [ "$OS" == "osx" ]; then
       statping_brew_install
     else
