@@ -262,7 +262,11 @@ let options = {
         lineCap: 'butt',
         colors: ["#3aa82d"],
     },
-	series: [{data: [{}]}],
+	series: [{name: "Latency", data: [{}]}],
+    tooltip: {
+      enabled: true,
+      x: {show: true, format: 'MMM dd hh:mm:ss tt'},
+    },
     xaxis: {
         type: "datetime",
         tickAmount: 8,
@@ -331,7 +335,7 @@ async function zoomedEvent(chart, { xaxis, yaxis }) {
         return false
     }
 
-    chart.updateSeries([{ data: chartData }]);
+    chart.updateSeries([{ name: "Latency", data: chartData }]);
 }
 
 async function RenderHeatmap() {
