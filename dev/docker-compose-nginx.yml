@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    restart: always
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+    expose:
+      - 80
+
+  statping:
+    container_name: statping
+    image: hunterlong/statping:latest
+    restart: always
+    expose:
+      - 8080

@@ -123,8 +123,4 @@ type traefikService struct {
 		} `json:"servers"`
 		PassHostHeader bool `json:"passHostHeader"`
 	} `json:"loadBalancer,omitempty"`
-	ServerStatus struct {
-		HTTP17217128080 string `json:"http://172.17.1.2:8080"`
-	} `json:"serverStatus,omitempty"`
-	Type string `json:"type,omitempty"`
 }
