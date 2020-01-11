@@ -51,7 +51,7 @@ func sendLog(handler func(w http.ResponseWriter, r *http.Request)) http.Handler 
 
 // authenticated is a middleware function to check if user is an Admin before running original request
 func authenticated(handler func(w http.ResponseWriter, r *http.Request), redirect bool) http.Handler {
-	return sendLog(func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !IsFullAuthenticated(r) {
 			if redirect {
 				http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -66,7 +66,7 @@ func authenticated(handler func(w http.ResponseWriter, r *http.Request), redirec
 
 // readOnly is a middleware function to check if user is a User before running original request
 func readOnly(handler func(w http.ResponseWriter, r *http.Request), redirect bool) http.Handler {
-	return sendLog(func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !IsReadAuthenticated(r) {
 			if redirect {
 				http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -81,7 +81,7 @@ func readOnly(handler func(w http.ResponseWriter, r *http.Request), redirect boo
 
 // cached is a middleware function that accepts a duration and content type and will cache the response of the original request
 func cached(duration, contentType string, handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
-	return sendLog(func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		content := CacheStorage.Get(r.RequestURI)
 		w.Header().Set("Content-Type", contentType)
 		w.Header().Set("Access-Control-Allow-Origin", "*")
