@@ -117,12 +117,6 @@ func (u *mobilePush) OnSuccess(s *types.Service) {
 
 // OnSave triggers when this notifier has been saved
 func (u *mobilePush) OnSave() error {
-	msg := &pushArray{
-		Message: "The Mobile Notifier has been saved",
-		Title:   "Notification Saved",
-		Topic:   mobileIdentifier,
-	}
-	u.AddQueue("saved", msg)
 	return nil
 }
 

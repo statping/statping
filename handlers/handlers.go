@@ -194,7 +194,6 @@ func loadTemplate(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 	// render all templates
-	mainTemplate.Funcs(handlerFuncs(w, r))
 	for _, temp := range templates {
 		tmp, _ := source.TmplBox.String(temp)
 		mainTemplate, err = mainTemplate.Parse(tmp)

@@ -253,9 +253,11 @@ func (c *Core) Connect(retry bool, location string) error {
 		}
 	}
 	log.WithFields(utils.ToFields(dbSession)).Debugln("connected to database")
-	if dbType == "sqlite3" {
-		dbSession.DB().SetMaxOpenConns(1)
-	}
+
+	dbSession.DB().SetMaxOpenConns(5)
+	dbSession.DB().SetMaxIdleConns(5)
+	dbSession.DB().SetConnMaxLifetime(1 * time.Minute)
+
 	if dbSession.DB().Ping() == nil {
 		DbSession = dbSession
 		if utils.VerboseMode >= 4 {

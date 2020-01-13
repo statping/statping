@@ -38,13 +38,14 @@ var (
 func Router() *mux.Router {
 	dir := utils.Directory
 	CacheStorage = NewStorage()
-	r := mux.NewRouter()
+	r := mux.NewRouter().StrictSlash(true)
 	if os.Getenv("AUTH_USERNAME") != "" && os.Getenv("AUTH_PASSWORD") != "" {
 		authUser = os.Getenv("AUTH_USERNAME")
 		authPass = os.Getenv("AUTH_PASSWORD")
 		r.Use(basicAuthHandler)
 	}
-	r.Handle("/", sendLog(indexHandler))
+	r.Use(sendLog)
+	r.Handle("/", http.HandlerFunc(indexHandler))
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
 		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(dir+"/assets/css"))))
@@ -61,12 +62,12 @@ func Router() *mux.Router {
 		r.PathPrefix("/favicon.ico").Handler(http.FileServer(source.TmplBox.HTTPBox()))
 		r.PathPrefix("/banner.png").Handler(http.FileServer(source.TmplBox.HTTPBox()))
 	}
-	r.Handle("/charts.js", sendLog(renderServiceChartsHandler))
-	r.Handle("/setup", sendLog(setupHandler)).Methods("GET")
-	r.Handle("/setup", sendLog(processSetupHandler)).Methods("POST")
-	r.Handle("/dashboard", sendLog(dashboardHandler)).Methods("GET")
-	r.Handle("/dashboard", sendLog(loginHandler)).Methods("POST")
-	r.Handle("/logout", sendLog(logoutHandler))
+	r.Handle("/charts.js", http.HandlerFunc(renderServiceChartsHandler))
+	r.Handle("/setup", http.HandlerFunc(setupHandler)).Methods("GET")
+	r.Handle("/setup", http.HandlerFunc(processSetupHandler)).Methods("POST")
+	r.Handle("/dashboard", http.HandlerFunc(dashboardHandler)).Methods("GET")
+	r.Handle("/dashboard", http.HandlerFunc(loginHandler)).Methods("POST")
+	r.Handle("/logout", http.HandlerFunc(logoutHandler))
 	r.Handle("/plugins/download/{name}", authenticated(pluginsDownloadHandler, true))
 	r.Handle("/plugins/{name}/save", authenticated(pluginSavedHandler, true)).Methods("POST")
 	r.Handle("/help", authenticated(helpHandler, true))
@@ -97,11 +98,11 @@ func Router() *mux.Router {
 	// SERVICE Routes
 	r.Handle("/services", authenticated(servicesHandler, true)).Methods("GET")
 	r.Handle("/service/create", authenticated(createServiceHandler, true)).Methods("GET")
-	r.Handle("/service/{id}", sendLog(servicesViewHandler)).Methods("GET")
+	r.Handle("/service/{id}", readOnly(servicesViewHandler, true)).Methods("GET")
 	r.Handle("/service/{id}/edit", authenticated(servicesViewHandler, true)).Methods("GET")
 	r.Handle("/service/{id}/delete_failures", authenticated(servicesDeleteFailuresHandler, true)).Methods("GET")
 
-	r.Handle("/group/{id}", sendLog(groupViewHandler)).Methods("GET")
+	r.Handle("/group/{id}", http.HandlerFunc(groupViewHandler)).Methods("GET")
 
 	// API Routes
 	r.Handle("/api", authenticated(apiIndexHandler, false))
@@ -163,7 +164,7 @@ func Router() *mux.Router {
 	r.Handle("/api/checkin/{api}", authenticated(apiCheckinHandler, false)).Methods("GET")
 	r.Handle("/api/checkin", authenticated(checkinCreateHandler, false)).Methods("POST")
 	r.Handle("/api/checkin/{api}", authenticated(checkinDeleteHandler, false)).Methods("DELETE")
-	r.Handle("/checkin/{api}", sendLog(checkinHitHandler))
+	r.Handle("/checkin/{api}", http.HandlerFunc(checkinHitHandler))
 
 	// Static Files Routes
 	r.PathPrefix("/files/postman.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
@@ -172,10 +173,10 @@ func Router() *mux.Router {
 
 	// API Generic Routes
 	r.Handle("/metrics", readOnly(prometheusHandler, false))
-	r.Handle("/health", sendLog(healthCheckHandler))
+	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
 	r.Handle("/.well-known/", http.StripPrefix("/.well-known/", http.FileServer(http.Dir(dir+"/.well-known"))))
 
-	r.NotFoundHandler = sendLog(error404Handler)
+	r.NotFoundHandler = http.HandlerFunc(error404Handler)
 	return r
 }
 

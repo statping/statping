@@ -33,10 +33,9 @@ func basicAuthHandler(next http.Handler) http.Handler {
 }
 
 // sendLog is a http middleware that will log the duration of request and other useful fields
-func sendLog(handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
+func sendLog(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t1 := utils.Now()
-		handler(w, r)
 		t2 := utils.Now().Sub(t1)
 		if r.RequestURI == "/logs/line" {
 			return
@@ -46,6 +45,7 @@ func sendLog(handler func(w http.ResponseWriter, r *http.Request)) http.Handler 
 			WithField("method", r.Method).
 			WithField("load_micro_seconds", t2.Microseconds()).
 			Infoln(fmt.Sprintf("%v (%v) | IP: %v", r.RequestURI, r.Method, r.Host))
+		next.ServeHTTP(w, r)
 	})
 }
 
