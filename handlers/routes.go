@@ -103,14 +103,6 @@ func Router() *mux.Router {
 
 	r.Handle("/group/{id}", sendLog(groupViewHandler)).Methods("GET")
 
-	// API GROUPS Routes
-	r.Handle("/api/groups", readOnly(apiAllGroupHandler, false)).Methods("GET")
-	r.Handle("/api/groups", authenticated(apiCreateGroupHandler, false)).Methods("POST")
-	r.Handle("/api/groups/{id}", readOnly(apiGroupHandler, false)).Methods("GET")
-	r.Handle("/api/groups/{id}", authenticated(apiGroupUpdateHandler, false)).Methods("POST")
-	r.Handle("/api/groups/{id}", authenticated(apiGroupDeleteHandler, false)).Methods("DELETE")
-	r.Handle("/api/reorder/groups", authenticated(apiGroupReorderHandler, false)).Methods("POST")
-
 	// API Routes
 	r.Handle("/api", authenticated(apiIndexHandler, false))
 	r.Handle("/api/renew", authenticated(apiRenewHandler, false))
@@ -119,6 +111,14 @@ func Router() *mux.Router {
 	r.Handle("/api/integrations", authenticated(apiAllIntegrationsHandler, false)).Methods("GET")
 	r.Handle("/api/integrations/{name}", authenticated(apiIntegrationHandler, false)).Methods("GET")
 	r.Handle("/api/integrations/{name}", authenticated(apiIntegrationHandler, false)).Methods("POST")
+
+	// API GROUPS Routes
+	r.Handle("/api/groups", readOnly(apiAllGroupHandler, false)).Methods("GET")
+	r.Handle("/api/groups", authenticated(apiCreateGroupHandler, false)).Methods("POST")
+	r.Handle("/api/groups/{id}", readOnly(apiGroupHandler, false)).Methods("GET")
+	r.Handle("/api/groups/{id}", authenticated(apiGroupUpdateHandler, false)).Methods("POST")
+	r.Handle("/api/groups/{id}", authenticated(apiGroupDeleteHandler, false)).Methods("DELETE")
+	r.Handle("/api/reorder/groups", authenticated(apiGroupReorderHandler, false)).Methods("POST")
 
 	// API SERVICE Routes
 	r.Handle("/api/services", readOnly(apiAllServicesHandler, false)).Methods("GET")

@@ -22,7 +22,7 @@
                     <a class="nav-link text-capitalize" id="v-pills-{{underscore .Name}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Name}}" role="tab" aria-controls="v-pills-profile" aria-selected="false">{{.Name}}</a>
                 {{end}}
 
-                    <h6 class="mt-4 text-muted">Integrations</h6>
+                    <h6 class="mt-4 text-muted">Integrations (beta)</h6>
                     {{ range .Integrations }}
                         {{$i := .Get}}
                         <a class="nav-link text-capitalize" id="v-pills-integration-{{underscore $i.ShortName}}-tab" data-toggle="pill" href="#v-pills-integration-{{underscore $i.ShortName}}" role="tab" aria-controls="v-pills-integration-{{underscore $i.ShortName}}" aria-selected="false">{{safe $i.Icon}} {{$i.Name}}</a>
