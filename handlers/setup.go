@@ -26,7 +26,7 @@ import (
 
 func setupHandler(w http.ResponseWriter, r *http.Request) {
 	if core.CoreApp.Services != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, basePath, http.StatusSeeOther)
 		return
 	}
 	var data interface{}
@@ -40,7 +40,7 @@ func setupHandler(w http.ResponseWriter, r *http.Request) {
 func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 	if !core.SetupMode {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, basePath, http.StatusSeeOther)
 		return
 	}
 	r.ParseForm()
@@ -126,7 +126,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	CacheStorage.Delete("/")
 	resetCookies()
 	time.Sleep(2 * time.Second)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, basePath, http.StatusSeeOther)
 }
 
 func setupResponseError(w http.ResponseWriter, r *http.Request, a interface{}) {

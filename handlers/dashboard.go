@@ -63,12 +63,12 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	session.Values["admin"] = false
 	session.Values["user_id"] = 0
 	session.Save(r, w)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, basePath, http.StatusSeeOther)
 }
 
 func helpHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsUser(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, basePath, http.StatusSeeOther)
 		return
 	}
 	help := source.HelpMarkdown()

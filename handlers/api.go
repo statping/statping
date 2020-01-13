@@ -54,7 +54,7 @@ func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiClearCacheHandler(w http.ResponseWriter, r *http.Request) {
 	CacheStorage = NewStorage()
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, basePath, http.StatusSeeOther)
 }
 
 func sendErrorJson(err error, w http.ResponseWriter, r *http.Request) {
