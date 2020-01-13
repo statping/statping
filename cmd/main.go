@@ -97,6 +97,13 @@ func main() {
 	if err != nil {
 		log.Errorln(err)
 		core.SetupMode = true
+		writeAble, err := utils.DirWritable(utils.Directory)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		if !writeAble {
+			log.Fatalf("Statping does not have write permissions at: %v", utils.Directory)
+		}
 		if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
 			log.Fatalln(err)
 		}
