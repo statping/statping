@@ -102,7 +102,7 @@ func main() {
 			log.Fatalln(err)
 		}
 		if !writeAble {
-			log.Fatalf("Statping does not have write permissions at: %v", utils.Directory)
+			log.Fatalf("Statping does not have write permissions at: %v\nYou can change this directory by setting the STATPING_DIR environment variable to a dedicated path before starting.", utils.Directory)
 		}
 		if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
 			log.Fatalln(err)
