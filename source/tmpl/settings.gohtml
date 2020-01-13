@@ -35,7 +35,7 @@
             {{end}}
                 <div class="tab-content" id="v-pills-tabContent">
                     <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
-                        <form method="POST" action="/settings">
+                        <form method="POST" action="settings">
                             <div class="form-group">
                                 <label for="project">Project Name</label>
                                 <input type="text" name="project" class="form-control" value="{{ .Name }}" id="project" placeholder="Great Uptime">
@@ -196,7 +196,7 @@
                             </div>
                         </div>
                     {{ else }}
-                        <form method="POST" action="/settings/css">
+                        <form method="POST" action="settings/css">
                             <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                                 <li class="nav-item col text-center">
                                     <a class="nav-link active" id="pills-vars-tab" data-toggle="pill" href="#pills-vars" role="tab" aria-controls="pills-vars" aria-selected="true">Variables</a>

@@ -54,7 +54,7 @@ func authenticated(handler func(w http.ResponseWriter, r *http.Request), redirec
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !IsFullAuthenticated(r) {
 			if redirect {
-				http.Redirect(w, r, "/", http.StatusSeeOther)
+				http.Redirect(w, r, basePath, http.StatusSeeOther)
 			} else {
 				sendUnauthorizedJson(w, r)
 			}
@@ -69,7 +69,7 @@ func readOnly(handler func(w http.ResponseWriter, r *http.Request), redirect boo
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !IsReadAuthenticated(r) {
 			if redirect {
-				http.Redirect(w, r, "/", http.StatusSeeOther)
+				http.Redirect(w, r, basePath, http.StatusSeeOther)
 			} else {
 				sendUnauthorizedJson(w, r)
 			}

@@ -2,7 +2,7 @@
 <div class="card">
 <div class="card-body">
 {{$message := .}}
-<form class="ajax_form" action="/api/groups{{if ne .Id 0}}/{{.Id}}{{end}}" data-redirect="/services" method="POST">
+<form class="ajax_form" action="api/groups{{if ne .Id 0}}/{{.Id}}{{end}}" data-redirect="services" method="POST">
     <div class="form-group row">
         <label for="username" class="col-sm-4 col-form-label">Group Name</label>
         <div class="col-sm-8">

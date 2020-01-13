@@ -1,7 +1,7 @@
 {{define "form_user"}}
 <div class="card">
 <div class="card-body">
-<form class="ajax_form" action="/api/users{{if ne .Id 0}}/{{.Id}}{{end}}" data-redirect="/users" method="POST">
+<form class="ajax_form" action="api/users{{if ne .Id 0}}/{{.Id}}{{end}}" data-redirect="users" method="POST">
     <div class="form-group row">
         <label for="username" class="col-sm-4 col-form-label">Username</label>
         <div class="col-6 col-md-4">

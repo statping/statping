@@ -1,6 +1,6 @@
 {{define "form_integration"}}
 {{$i := .Get}}
-<form class="integration_{{underscore $i.ShortName }}" action="/settings/integrator/{{ $i.ShortName }}" method="POST">
+<form class="integration_{{underscore $i.ShortName }}" action="settings/integrator/{{ $i.ShortName }}" method="POST">
     <input type="hidden" name="integrator" class="form-control" value="{{ $i.ShortName }}">
 {{if $i.ShortName}}<h4 class="text-capitalize">{{$i.ShortName}}</h4>{{end}}
 {{if $i.Description}}<p class="small text-muted">{{safe $i.Description}}</p>{{end}}

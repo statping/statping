@@ -39,25 +39,30 @@ func Router() *mux.Router {
 	dir := utils.Directory
 	CacheStorage = NewStorage()
 	r := mux.NewRouter().StrictSlash(true)
+
 	if os.Getenv("AUTH_USERNAME") != "" && os.Getenv("AUTH_PASSWORD") != "" {
 		authUser = os.Getenv("AUTH_USERNAME")
 		authPass = os.Getenv("AUTH_PASSWORD")
 		r.Use(basicAuthHandler)
 	}
+	if basePath != "/" {
+		r = r.PathPrefix(basePath).Subrouter()
+	}
+
 	r.Use(sendLog)
 	r.Handle("/", http.HandlerFunc(indexHandler))
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
-		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(dir+"/assets/css"))))
-		r.PathPrefix("/font/").Handler(http.StripPrefix("/font/", http.FileServer(http.Dir(dir+"/assets/font"))))
-		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir(dir+"/assets/js"))))
+		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath+"/css/", http.FileServer(http.Dir(dir+"/assets/css"))))
+		r.PathPrefix("/font/").Handler(http.StripPrefix(basePath+"/font/", http.FileServer(http.Dir(dir+"/assets/font"))))
+		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath+"/js/", http.FileServer(http.Dir(dir+"/assets/js"))))
 		r.PathPrefix("/robots.txt").Handler(indexHandler)
 		r.PathPrefix("/favicon.ico").Handler(indexHandler)
 		r.PathPrefix("/banner.png").Handler(indexHandler)
 	} else {
-		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(source.CssBox.HTTPBox())))
-		r.PathPrefix("/font/").Handler(http.StripPrefix("/font/", http.FileServer(source.FontBox.HTTPBox())))
-		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(source.JsBox.HTTPBox())))
+		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath+"/css/", http.FileServer(source.CssBox.HTTPBox())))
+		r.PathPrefix("/font/").Handler(http.StripPrefix(basePath+"/font/", http.FileServer(source.FontBox.HTTPBox())))
+		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath+"/js/", http.FileServer(source.JsBox.HTTPBox())))
 		r.PathPrefix("/robots.txt").Handler(http.FileServer(source.TmplBox.HTTPBox()))
 		r.PathPrefix("/favicon.ico").Handler(http.FileServer(source.TmplBox.HTTPBox()))
 		r.PathPrefix("/banner.png").Handler(http.FileServer(source.TmplBox.HTTPBox()))

@@ -1,6 +1,9 @@
 package utils
 
-import "errors"
+import (
+	"errors"
+	"os"
+)
 
 func DirWritable(path string) (bool, error) {
 	info, err := os.Stat(path)

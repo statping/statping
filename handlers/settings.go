@@ -73,7 +73,7 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//notifiers.OnSettingsSaved(core.CoreApp.ToCore())
-	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "settings")
 }
 
 func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +86,7 @@ func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
 	source.SaveAsset([]byte(mobile), utils.Directory, "scss/mobile.scss")
 	source.CompileSASS(utils.Directory)
 	resetRouter()
-	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "settings")
 }
 
 func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +101,7 @@ func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Errorln("Default 'base.css' was inserted because SASS did not work.")
 	}
 	resetRouter()
-	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "settings")
 }
 
 func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
@@ -109,7 +109,7 @@ func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Errorln(fmt.Errorf("error deleting all assets %v", err))
 	}
 	resetRouter()
-	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "settings")
 }
 
 func bulkImportHandler(w http.ResponseWriter, r *http.Request) {
