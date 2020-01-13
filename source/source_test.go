@@ -18,7 +18,6 @@ package source
 import (
 	"github.com/hunterlong/statping/utils"
 	"github.com/stretchr/testify/assert"
-	"os"
 	"testing"
 )
 
@@ -30,7 +29,7 @@ func init() {
 	dir = utils.Directory
 	utils.InitLogs()
 	Assets()
-	os.RemoveAll(dir + "/assets")
+	utils.DeleteDirectory(dir + "/assets")
 }
 
 func TestCore_UsingAssets(t *testing.T) {

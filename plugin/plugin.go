@@ -41,6 +41,7 @@ import (
 var (
 	AllPlugins []*types.PluginObject
 	dir        string
+	log        = utils.Log.WithField("type", "plugin")
 )
 
 func init() {
@@ -49,7 +50,7 @@ func init() {
 }
 
 func LoadPlugin(file string) error {
-	utils.Log(1, fmt.Sprintf("opening file %v", file))
+	log.Infoln(fmt.Sprintf("opening file %v", file))
 	f, err := os.Open(file)
 	if err != nil {
 		return err
@@ -58,29 +59,29 @@ func LoadPlugin(file string) error {
 	fSplit := strings.Split(f.Name(), "/")
 	fileBin := fSplit[len(fSplit)-1]
 
-	utils.Log(1, fmt.Sprintf("Attempting to load plugin '%v'", fileBin))
+	log.Infoln(fmt.Sprintf("Attempting to load plugin '%v'", fileBin))
 	ext := strings.Split(fileBin, ".")
 	if len(ext) != 2 {
-		utils.Log(3, fmt.Sprintf("Plugin '%v' must end in .so extension", fileBin))
+		log.Errorln(fmt.Sprintf("Plugin '%v' must end in .so extension", fileBin))
 		return fmt.Errorf("Plugin '%v' must end in .so extension %v", fileBin, len(ext))
 	}
 	if ext[1] != "so" {
-		utils.Log(3, fmt.Sprintf("Plugin '%v' must end in .so extension", fileBin))
+		log.Errorln(fmt.Sprintf("Plugin '%v' must end in .so extension", fileBin))
 		return fmt.Errorf("Plugin '%v' must end in .so extension", fileBin)
 	}
 	plug, err := plugin.Open(file)
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("Plugin '%v' could not load correctly. %v", fileBin, err))
+		log.Errorln(fmt.Sprintf("Plugin '%v' could not load correctly. %v", fileBin, err))
 		return err
 	}
 	symPlugin, err := plug.Lookup("Plugin")
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("Plugin '%v' could not locate Plugin variable. %v", fileBin, err))
+		log.Errorln(fmt.Sprintf("Plugin '%v' could not locate Plugin variable. %v", fileBin, err))
 		return err
 	}
 	plugActions, ok := symPlugin.(types.PluginActions)
 	if !ok {
-		utils.Log(3, fmt.Sprintf("Plugin %v was not type PluginObject", f.Name()))
+		log.Errorln(fmt.Sprintf("Plugin %v was not type PluginObject", f.Name()))
 		return fmt.Errorf("Plugin %v was not type PluginActions %v", f.Name(), plugActions.GetInfo())
 	}
 	info := plugActions.GetInfo()
@@ -88,28 +89,28 @@ func LoadPlugin(file string) error {
 	if err != nil {
 		return err
 	}
-	utils.Log(1, fmt.Sprintf("Plugin %v loaded from %v", info.Name, f.Name()))
+	log.Infoln(fmt.Sprintf("Plugin %v loaded from %v", info.Name, f.Name()))
 	core.CoreApp.AllPlugins = append(core.CoreApp.AllPlugins, plugActions)
 	return nil
 }
 
 func LoadPlugins() {
 	pluginDir := dir + "/plugins"
-	utils.Log(1, fmt.Sprintf("Loading any available Plugins from /plugins directory"))
+	log.Infoln(fmt.Sprintf("Loading any available Plugins from /plugins directory"))
 	if _, err := os.Stat(pluginDir); os.IsNotExist(err) {
 		os.Mkdir(pluginDir, os.ModePerm)
 	}
 	files, err := ioutil.ReadDir(pluginDir)
 	if err != nil {
-		utils.Log(2, fmt.Sprintf("Plugins directory was not found. Error: %v", err))
+		log.Warnln(fmt.Sprintf("Plugins directory was not found. Error: %v", err))
 		return
 	}
 	for _, f := range files {
 		err := LoadPlugin(f.Name())
 		if err != nil {
-			utils.Log(3, err)
+			log.Errorln(err)
 			continue
 		}
 	}
-	utils.Log(1, fmt.Sprintf("Loaded %v Plugins", len(core.CoreApp.Plugins)))
+	log.Infoln(fmt.Sprintf("Loaded %v Plugins", len(core.CoreApp.Plugins)))
 }

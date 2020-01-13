@@ -22,12 +22,13 @@ import (
 	"fmt"
 	"github.com/GeertJohan/go.rice"
 	"github.com/hunterlong/statping/utils"
-	"gopkg.in/russross/blackfriday.v2"
+	"github.com/russross/blackfriday/v2"
 	"io/ioutil"
 	"os"
 )
 
 var (
+	log     = utils.Log.WithField("type", "source")
 	CssBox  *rice.Box // CSS files from the 'source/css' directory, this will be loaded into '/assets/css'
 	ScssBox *rice.Box // SCSS files from the 'source/scss' directory, this will be loaded into '/assets/scss'
 	JsBox   *rice.Box // JS files from the 'source/js' directory, this will be loaded into '/assets/js'
@@ -36,12 +37,13 @@ var (
 )
 
 // Assets will load the Rice boxes containing the CSS, SCSS, JS, and HTML files.
-func Assets() {
+func Assets() error {
 	CssBox = rice.MustFindBox("css")
 	ScssBox = rice.MustFindBox("scss")
 	JsBox = rice.MustFindBox("js")
 	TmplBox = rice.MustFindBox("tmpl")
 	FontBox = rice.MustFindBox("font")
+	return nil
 }
 
 // HelpMarkdown will return the Markdown of help.md into HTML
@@ -60,24 +62,24 @@ func CompileSASS(folder string) error {
 	scssFile := fmt.Sprintf("%v/%v", folder, "assets/scss/base.scss")
 	baseFile := fmt.Sprintf("%v/%v", folder, "assets/css/base.css")
 
-	utils.Log(1, fmt.Sprintf("Compiling SASS %v into %v", scssFile, baseFile))
+	log.Infoln(fmt.Sprintf("Compiling SASS %v into %v", scssFile, baseFile))
 	command := fmt.Sprintf("%v %v %v", sassBin, scssFile, baseFile)
 
 	stdout, stderr, err := utils.Command(command)
 
 	if stdout != "" || stderr != "" {
-		utils.Log(3, fmt.Sprintf("Failed to compile assets with SASS %v", err))
+		log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v", err))
 		return errors.New("failed to capture stdout or stderr")
 	}
 
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("Failed to compile assets with SASS %v", err))
-		utils.Log(3, fmt.Sprintf("sh -c %v", command))
+		log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v", err))
+		log.Errorln(fmt.Sprintf("sh -c %v", command))
 		return err
 	}
 
-	utils.Log(1, fmt.Sprintf("out: %v | error: %v", stdout, stderr))
-	utils.Log(1, "SASS Compiling is complete!")
+	log.Infoln(fmt.Sprintf("out: %v | error: %v", stdout, stderr))
+	log.Infoln("SASS Compiling is complete!")
 	return nil
 }
 
@@ -87,12 +89,12 @@ func UsingAssets(folder string) bool {
 		return true
 	} else {
 		if os.Getenv("USE_ASSETS") == "true" {
-			utils.Log(1, "Environment variable USE_ASSETS was found.")
+			log.Infoln("Environment variable USE_ASSETS was found.")
 			CreateAllAssets(folder)
 			err := CompileSASS(folder)
 			if err != nil {
 				CopyToPublic(CssBox, folder+"/css", "base.css")
-				utils.Log(2, "Default 'base.css' was insert because SASS did not work.")
+				log.Warnln("Default 'base.css' was insert because SASS did not work.")
 				return true
 			}
 			return true
@@ -104,10 +106,10 @@ func UsingAssets(folder string) bool {
 // SaveAsset will save an asset to the '/assets/' folder.
 func SaveAsset(data []byte, folder, file string) error {
 	location := folder + "/assets/" + file
-	utils.Log(1, fmt.Sprintf("Saving %v", location))
+	log.Infoln(fmt.Sprintf("Saving %v", location))
 	err := utils.SaveFile(location, data)
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("Failed to save %v, %v", location, err))
+		log.Errorln(fmt.Sprintf("Failed to save %v, %v", location, err))
 		return err
 	}
 	return nil
@@ -117,7 +119,7 @@ func SaveAsset(data []byte, folder, file string) error {
 func OpenAsset(folder, file string) string {
 	dat, err := ioutil.ReadFile(folder + "/assets/" + file)
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("Failed to open %v, %v", file, err))
+		log.Errorln(fmt.Sprintf("Failed to open %v, %v", file, err))
 		return ""
 	}
 	return string(dat)
@@ -125,14 +127,14 @@ func OpenAsset(folder, file string) string {
 
 // CreateAllAssets will dump HTML, CSS, SCSS, and JS assets into the '/assets' directory
 func CreateAllAssets(folder string) error {
-	utils.Log(1, fmt.Sprintf("Dump Statping assets into %v/assets", folder))
+	log.Infoln(fmt.Sprintf("Dump Statping assets into %v/assets", folder))
 	MakePublicFolder(folder + "/assets")
 	MakePublicFolder(folder + "/assets/js")
 	MakePublicFolder(folder + "/assets/css")
 	MakePublicFolder(folder + "/assets/scss")
 	MakePublicFolder(folder + "/assets/font")
 	MakePublicFolder(folder + "/assets/files")
-	utils.Log(1, "Inserting scss, css, and javascript files into assets folder")
+	log.Infoln("Inserting scss, css, and javascript files into assets folder")
 	CopyAllToPublic(ScssBox, "scss")
 	CopyAllToPublic(FontBox, "font")
 	CopyAllToPublic(CssBox, "css")
@@ -144,20 +146,20 @@ func CreateAllAssets(folder string) error {
 	CopyToPublic(TmplBox, folder+"/assets/files", "swagger.json")
 	CopyToPublic(TmplBox, folder+"/assets/files", "postman.json")
 	CopyToPublic(TmplBox, folder+"/assets/files", "grafana.json")
-	utils.Log(1, "Compiling CSS from SCSS style...")
+	log.Infoln("Compiling CSS from SCSS style...")
 	err := CompileSASS(utils.Directory)
-	utils.Log(1, "Statping assets have been inserted")
+	log.Infoln("Statping assets have been inserted")
 	return err
 }
 
 // DeleteAllAssets will delete the '/assets' folder
 func DeleteAllAssets(folder string) error {
-	err := os.RemoveAll(folder + "/assets")
+	err := utils.DeleteDirectory(folder + "/assets")
 	if err != nil {
-		utils.Log(1, fmt.Sprintf("There was an issue deleting Statping Assets, %v", err))
+		log.Infoln(fmt.Sprintf("There was an issue deleting Statping Assets, %v", err))
 		return err
 	}
-	utils.Log(1, "Statping assets have been deleted")
+	log.Infoln("Statping assets have been deleted")
 	return err
 }
 
@@ -184,15 +186,15 @@ func CopyAllToPublic(box *rice.Box, folder string) error {
 // CopyToPublic will create a file from a rice Box to the '/assets' directory
 func CopyToPublic(box *rice.Box, folder, file string) error {
 	assetFolder := fmt.Sprintf("%v/%v", folder, file)
-	utils.Log(1, fmt.Sprintf("Copying %v to %v", file, assetFolder))
+	log.Infoln(fmt.Sprintf("Copying %v to %v", file, assetFolder))
 	base, err := box.String(file)
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("Failed to copy %v to %v, %v.", file, assetFolder, err))
+		log.Errorln(fmt.Sprintf("Failed to copy %v to %v, %v.", file, assetFolder, err))
 		return err
 	}
 	err = ioutil.WriteFile(assetFolder, []byte(base), 0744)
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("Failed to write file %v to %v, %v.", file, assetFolder, err))
+		log.Errorln(fmt.Sprintf("Failed to write file %v to %v, %v.", file, assetFolder, err))
 		return err
 	}
 	return nil
@@ -200,11 +202,11 @@ func CopyToPublic(box *rice.Box, folder, file string) error {
 
 // MakePublicFolder will create a new folder
 func MakePublicFolder(folder string) error {
-	utils.Log(1, fmt.Sprintf("Creating folder '%v'", folder))
-	if _, err := os.Stat(folder); os.IsNotExist(err) {
-		err = os.MkdirAll(folder, 0777)
+	log.Infoln(fmt.Sprintf("Creating folder '%v'", folder))
+	if !utils.FolderExists(folder) {
+		err := utils.CreateDirectory(folder)
 		if err != nil {
-			utils.Log(3, fmt.Sprintf("Failed to created %v directory, %v", folder, err))
+			log.Errorln(fmt.Sprintf("Failed to created %v directory, %v", folder, err))
 			return err
 		}
 	}

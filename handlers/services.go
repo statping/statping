@@ -33,8 +33,8 @@ func renderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/javascript")
 	w.Header().Set("Cache-Control", "max-age=60")
 
-	end := time.Now().UTC()
-	start := time.Now().Add((-24 * 7) * time.Hour).UTC()
+	end := utils.Now().UTC()
+	start := utils.Now().Add((-24 * 7) * time.Hour).UTC()
 	var srvs []*core.Service
 	for _, s := range services {
 		srvs = append(srvs, s.(*core.Service))
@@ -94,7 +94,7 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	endField := utils.ToInt(fields.Get("end"))
 	group := r.Form.Get("group")
 
-	end := time.Now().UTC()
+	end := utils.Now().UTC()
 	start := end.Add((-24 * 7) * time.Hour).UTC()
 
 	if startField != 0 {
@@ -243,7 +243,7 @@ func apiServiceHeatmapHandler(w http.ResponseWriter, r *http.Request) {
 	var monthOutput []*dataXyMonth
 
 	start := service.CreatedAt
-	//now := time.Now()
+	//now := utils.Now()
 
 	sY, sM, _ := start.Date()
 
@@ -252,10 +252,10 @@ func apiServiceHeatmapHandler(w http.ResponseWriter, r *http.Request) {
 	month := int(sM)
 	maxMonth := 12
 
-	for year := int(sY); year <= time.Now().Year(); year++ {
+	for year := int(sY); year <= utils.Now().Year(); year++ {
 
-		if year == time.Now().Year() {
-			maxMonth = int(time.Now().Month())
+		if year == utils.Now().Year() {
+			maxMonth = int(utils.Now().Month())
 		}
 
 		for m := month; m <= maxMonth; m++ {
@@ -334,4 +334,8 @@ func apiServiceHitsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	returnJson(hits, w, r)
+}
+
+func createServiceHandler(w http.ResponseWriter, r *http.Request) {
+	ExecuteResponse(w, r, "service_create.gohtml", core.CoreApp, nil)
 }

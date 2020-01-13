@@ -28,96 +28,75 @@ const (
 
 func TestCommandNotifier(t *testing.T) {
 	t.Parallel()
-	command.Host = "sh"
-	command.Var1 = commandTest
-	command.Var2 = commandTest
+	Command.Host = "sh"
+	Command.Var1 = commandTest
+	Command.Var2 = commandTest
 	currentCount = CountNotifiers()
 
-	t.Run("Load command", func(t *testing.T) {
-		command.Host = "sh"
-		command.Var1 = commandTest
-		command.Var2 = commandTest
-		command.Delay = time.Duration(100 * time.Millisecond)
-		command.Limits = 99
-		err := notifier.AddNotifier(command)
+	t.Run("Load Command", func(t *testing.T) {
+		Command.Host = "sh"
+		Command.Var1 = commandTest
+		Command.Var2 = commandTest
+		Command.Delay = time.Duration(100 * time.Millisecond)
+		Command.Limits = 99
+		err := notifier.AddNotifiers(Command)
 		assert.Nil(t, err)
-		assert.Equal(t, "Hunter Long", command.Author)
-		assert.Equal(t, "sh", command.Host)
-		assert.Equal(t, commandTest, command.Var1)
-		assert.Equal(t, commandTest, command.Var2)
+		assert.Equal(t, "Hunter Long", Command.Author)
+		assert.Equal(t, "sh", Command.Host)
+		assert.Equal(t, commandTest, Command.Var1)
+		assert.Equal(t, commandTest, Command.Var2)
 	})
 
-	t.Run("Load command Notifier", func(t *testing.T) {
-		notifier.Load()
+	t.Run("Command Notifier Tester", func(t *testing.T) {
+		assert.True(t, Command.CanTest())
 	})
 
-	t.Run("command Notifier Tester", func(t *testing.T) {
-		assert.True(t, command.CanTest())
-	})
-
-	t.Run("command Within Limits", func(t *testing.T) {
-		ok, err := command.WithinLimits()
+	t.Run("Command Within Limits", func(t *testing.T) {
+		ok, err := Command.WithinLimits()
 		assert.Nil(t, err)
 		assert.True(t, ok)
 	})
 
-	t.Run("command OnFailure", func(t *testing.T) {
-		command.OnFailure(TestService, TestFailure)
-		assert.Equal(t, 1, len(command.Queue))
+	t.Run("Command OnFailure", func(t *testing.T) {
+		Command.OnFailure(TestService, TestFailure)
+		assert.Equal(t, 1, len(Command.Queue))
 	})
 
-	t.Run("command OnFailure multiple times", func(t *testing.T) {
-		for i := 0; i <= 50; i++ {
-			command.OnFailure(TestService, TestFailure)
-		}
-		assert.Equal(t, 52, len(command.Queue))
+	t.Run("Command OnSuccess", func(t *testing.T) {
+		Command.OnSuccess(TestService)
+		assert.Equal(t, 1, len(Command.Queue))
 	})
 
-	t.Run("command Check Offline", func(t *testing.T) {
-		assert.False(t, command.Online)
+	t.Run("Command OnSuccess Again", func(t *testing.T) {
+		Command.OnSuccess(TestService)
+		assert.Equal(t, 1, len(Command.Queue))
+		go notifier.Queue(Command)
+		time.Sleep(20 * time.Second)
+		assert.Equal(t, 0, len(Command.Queue))
 	})
 
-	t.Run("command OnSuccess", func(t *testing.T) {
-		command.OnSuccess(TestService)
-		assert.Equal(t, 1, len(command.Queue))
-	})
-
-	t.Run("command Queue after being online", func(t *testing.T) {
-		assert.True(t, command.Online)
-		assert.Equal(t, 1, len(command.Queue))
-	})
-
-	t.Run("command OnSuccess Again", func(t *testing.T) {
-		assert.True(t, command.Online)
-		command.OnSuccess(TestService)
-		assert.Equal(t, 1, len(command.Queue))
-		go notifier.Queue(command)
-		time.Sleep(5 * time.Second)
-		assert.Equal(t, 0, len(command.Queue))
-	})
-
-	t.Run("command Within Limits again", func(t *testing.T) {
-		ok, err := command.WithinLimits()
+	t.Run("Command Within Limits again", func(t *testing.T) {
+		ok, err := Command.WithinLimits()
 		assert.Nil(t, err)
 		assert.True(t, ok)
 	})
 
-	t.Run("command Send", func(t *testing.T) {
-		command.Send(commandTest)
-		assert.Equal(t, 0, len(command.Queue))
+	t.Run("Command Send", func(t *testing.T) {
+		Command.Send(commandTest)
+		assert.Equal(t, 0, len(Command.Queue))
 	})
 
-	t.Run("command Test", func(t *testing.T) {
-		command.OnTest()
+	t.Run("Command Test", func(t *testing.T) {
+		Command.OnTest()
 	})
 
-	t.Run("command Queue", func(t *testing.T) {
-		go notifier.Queue(command)
+	t.Run("Command Queue", func(t *testing.T) {
+		go notifier.Queue(Command)
 		time.Sleep(5 * time.Second)
-		assert.Equal(t, "sh", command.Host)
-		assert.Equal(t, commandTest, command.Var1)
-		assert.Equal(t, commandTest, command.Var2)
-		assert.Equal(t, 0, len(command.Queue))
+		assert.Equal(t, "sh", Command.Host)
+		assert.Equal(t, commandTest, Command.Var1)
+		assert.Equal(t, commandTest, Command.Var2)
+		assert.Equal(t, 0, len(Command.Queue))
 	})
 
 }

@@ -24,7 +24,6 @@ import (
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"html/template"
-	"net/smtp"
 	"time"
 )
 
@@ -112,7 +111,7 @@ type email struct {
 	*notifier.Notification
 }
 
-var emailer = &email{&notifier.Notification{
+var Emailer = &email{&notifier.Notification{
 	Method:      "email",
 	Title:       "email",
 	Description: "Send emails via SMTP when services are online or offline.",
@@ -158,13 +157,6 @@ var emailer = &email{&notifier.Notification{
 	}},
 }}
 
-func init() {
-	err := notifier.AddNotifier(emailer)
-	if err != nil {
-		panic(err)
-	}
-}
-
 // Send will send the SMTP email with your authentication It accepts type: *emailOutgoing
 func (u *email) Send(msg interface{}) error {
 	email := msg.(*emailOutgoing)
@@ -195,23 +187,27 @@ func (u *email) OnFailure(s *types.Service, f *types.Failure) {
 		From:     u.Var1,
 	}
 	u.AddQueue(fmt.Sprintf("service_%v", s.Id), email)
-	u.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (u *email) OnSuccess(s *types.Service) {
-	if !u.Online {
+	if !s.Online || !s.SuccessNotified {
+		var msg string
+		if s.UpdateNotify {
+			s.UpdateNotify = false
+		}
+		msg = s.DownText
+
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		email := &emailOutgoing{
 			To:       u.Var2,
-			Subject:  fmt.Sprintf("Service %v is Back Online", s.Name),
+			Subject:  msg,
 			Template: mainEmailTemplate,
 			Data:     interface{}(s),
 			From:     u.Var1,
 		}
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), email)
 	}
-	u.Online = true
 }
 
 func (u *email) Select() *notifier.Notification {
@@ -220,31 +216,13 @@ func (u *email) Select() *notifier.Notification {
 
 // OnSave triggers when this notifier has been saved
 func (u *email) OnSave() error {
-	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
+	utils.Log.Infoln(fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
 	// Do updating stuff here
 	return nil
 }
 
 // OnTest triggers when this notifier has been saved
 func (u *email) OnTest() error {
-	host := fmt.Sprintf("%v:%v", u.Host, u.Port)
-	dial, err := smtp.Dial(host)
-	if err != nil {
-		return err
-	}
-	if u.ApiKey != "true" {
-		err = dial.StartTLS(&tls.Config{InsecureSkipVerify: true})
-		if err != nil {
-			return err
-		}
-	}
-	if u.Username != "" || u.Password != "" {
-		auth := smtp.PlainAuth("", u.Username, u.Password, host)
-		err = dial.Auth(auth)
-		if err != nil {
-			return err
-		}
-	}
 	testService := &types.Service{
 		Id:             1,
 		Name:           "Example Service",
@@ -257,21 +235,20 @@ func (u *email) OnTest() error {
 		LastStatusCode: 200,
 		Expected:       types.NewNullString("test example"),
 		LastResponse:   "<html>this is an example response</html>",
-		CreatedAt:      time.Now().Add(-24 * time.Hour),
+		CreatedAt:      utils.Now().Add(-24 * time.Hour),
 	}
 	email := &emailOutgoing{
 		To:       u.Var2,
 		Subject:  fmt.Sprintf("Service %v is Back Online", testService.Name),
 		Template: mainEmailTemplate,
-		Data:     interface{}(testService),
+		Data:     testService,
 		From:     u.Var1,
 	}
-	err = u.Send(email)
-	return err
+	return u.dialSend(email)
 }
 
 func (u *email) dialSend(email *emailOutgoing) error {
-	mailer = mail.NewDialer(emailer.Host, emailer.Port, emailer.Username, emailer.Password)
+	mailer = mail.NewDialer(Emailer.Host, Emailer.Port, Emailer.Username, Emailer.Password)
 	emailSource(email)
 	m := mail.NewMessage()
 	// if email setting TLS is Disabled
@@ -285,7 +262,7 @@ func (u *email) dialSend(email *emailOutgoing) error {
 	m.SetHeader("Subject", email.Subject)
 	m.SetBody("text/html", email.Source)
 	if err := mailer.DialAndSend(m); err != nil {
-		utils.Log(3, fmt.Sprintf("email '%v' sent to: %v (size: %v) %v", email.Subject, email.To, len([]byte(email.Source)), err))
+		utils.Log.Errorln(fmt.Sprintf("email '%v' sent to: %v (size: %v) %v", email.Subject, email.To, len([]byte(email.Source)), err))
 		return err
 	}
 	return nil
@@ -300,11 +277,11 @@ func emailTemplate(contents string, data interface{}) string {
 	t := template.New("email")
 	t, err := t.Parse(contents)
 	if err != nil {
-		utils.Log(3, err)
+		utils.Log.Errorln(err)
 	}
 	var tpl bytes.Buffer
 	if err := t.Execute(&tpl, data); err != nil {
-		utils.Log(2, err)
+		utils.Log.Warnln(err)
 	}
 	result := tpl.String()
 	return result

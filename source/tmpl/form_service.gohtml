@@ -2,11 +2,8 @@
 <div class="card">
 <div class="card-body">
 {{$s := .}}
-{{if ne .Id 0}}
-<form class="ajax_form" action="/api/services/{{.Id}}" data-redirect="/services" method="POST">
-{{else}}
-<form class="ajax_form" action="/api/services" data-redirect="/services" method="POST">
-{{end}}
+<form class="ajax_form" action="api/services{{if ne .Id 0}}/{{.Id}}{{end}}" data-redirect="services" method="POST">
+    <h4 class="mb-5 text-muted">Basic Information</h4>
     <div class="form-group row">
         <label for="service_name" class="col-sm-4 col-form-label">Service Name</label>
         <div class="col-sm-8">
@@ -33,6 +30,21 @@
             <small class="form-text text-muted">Statping will attempt to connect to this URL</small>
         </div>
     </div>
+    <div class="form-group row">
+        <label for="service_type" class="col-sm-4 col-form-label">Group</label>
+        <div class="col-sm-8">
+            <select name="group_id" class="form-control" id="group_id">
+                <option value="0" {{if eq $s.GroupId 0}}selected{{end}}>None</option>
+                {{range Groups false}}
+                    <option value="{{.Id}}" {{if eq $s.GroupId .Id}}selected{{end}}>{{.Name}}</option>
+                {{end}}
+            </select>
+            <small class="form-text text-muted">Attach this service to a group</small>
+        </div>
+    </div>
+
+    <h4 class="mt-5 mb-5 text-muted">Request Details</h4>
+
     <div class="form-group row{{if (eq .Type "tcp") or (eq .Type "udp")}} d-none{{end}}">
         <label for="service_check_type" class="col-sm-4 col-form-label">Service Check Type</label>
         <div class="col-sm-8">
@@ -80,6 +92,9 @@
             <input type="number" name="port" class="form-control" value="{{if ne .Port 0}}{{.Port}}{{end}}" id="service_port" placeholder="8080">
         </div>
     </div>
+
+    <h4 class="mt-5 mb-5 text-muted">Additional Options</h4>
+
     <div class="form-group row">
         <label for="service_interval" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
         <div class="col-sm-8">
@@ -109,6 +124,16 @@
         </div>
     </div>
     <div class="form-group row">
+        <label for="order" class="col-sm-4 col-form-label">Verify SSL</label>
+        <div class="col-8 mt-1">
+            <span class="switch float-left">
+                <input type="checkbox" name="verify_ssl-option" class="switch" id="switch-verify-ssl" {{if eq .Id 0}}checked{{end}}{{if .VerifySSL.Bool}}checked{{end}}>
+                <label for="switch-verify-ssl">Verify SSL Certificate for this service</label>
+                <input type="hidden" name="verify_ssl" id="switch-verify-ssl-value" value="{{if eq .Id 0}}true{{else}}{{if .VerifySSL.Bool}}true{{else}}false{{end}}{{end}}">
+            </span>
+        </div>
+    </div>
+    <div class="form-group row">
         <label for="order" class="col-sm-4 col-form-label">Notifications</label>
         <div class="col-8 mt-1">
             <span class="switch float-left">
@@ -129,24 +154,12 @@
         </div>
     </div>
     <div class="form-group row">
-        <label for="service_type" class="col-sm-4 col-form-label">Group</label>
-        <div class="col-sm-8">
-            <select name="group_id" class="form-control" id="group_id">
-                <option value="0" {{if eq $s.GroupId 0}}selected{{end}}>None</option>
-                {{range Groups false}}
-                    <option value="{{.Id}}" {{if eq $s.GroupId .Id}}selected{{end}}>{{.Name}}</option>
-                {{end}}
-            </select>
-            <small class="form-text text-muted">Attach this service to a group</small>
-        </div>
-    </div>
-    <div class="form-group row">
         <div class="{{if ne .Id 0}}col-6{{else}}col-12{{end}}">
             <button type="submit" class="btn btn-success btn-block">{{if ne .Id 0}}Update Service{{else}}Create Service{{end}}</button>
         </div>
         {{if ne .Id 0}}
         <div class="col-6">
-            <a href="/service/{{ .Id }}/delete_failures" data-method="GET" data-redirect="/service/{{ .Id }}" class="btn btn-danger btn-block confirm-btn">Delete All Failures</a>
+            <a href="service/{{ .Id }}/delete_failures" data-method="GET" data-redirect="/service/{{ .Id }}" class="btn btn-danger btn-block confirm-btn">Delete All Failures</a>
         </div>
         {{end}}
     </div>

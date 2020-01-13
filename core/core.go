@@ -18,7 +18,9 @@ package core
 import (
 	"errors"
 	"fmt"
+	"github.com/hunterlong/statping/core/integrations"
 	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/notifiers"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
@@ -35,10 +37,10 @@ type Core struct {
 }
 
 var (
-	Configs   *DbConfig // Configs holds all of the config.yml and database info
-	CoreApp   *Core     // CoreApp is a global variable that contains many elements
-	SetupMode bool      // SetupMode will be true if Statping does not have a database connection
-	VERSION   string    // VERSION is set on build automatically by setting a -ldflag
+	CoreApp   *Core  // CoreApp is a global variable that contains many elements
+	SetupMode bool   // SetupMode will be true if Statping does not have a database connection
+	VERSION   string // VERSION is set on build automatically by setting a -ldflag
+	log       = utils.Log.WithField("type", "core")
 )
 
 func init() {
@@ -47,9 +49,10 @@ func init() {
 
 // NewCore return a new *core.Core struct
 func NewCore() *Core {
-	CoreApp = new(Core)
-	CoreApp.Core = new(types.Core)
-	CoreApp.Started = time.Now()
+	CoreApp = &Core{&types.Core{
+		Started: time.Now().UTC(),
+	},
+	}
 	return CoreApp
 }
 
@@ -64,14 +67,17 @@ func InitApp() {
 	InsertNotifierDB()
 	CoreApp.SelectAllServices(true)
 	checkServices()
-	CoreApp.Notifications = notifier.Load()
+	AttachNotifiers()
+	CoreApp.Notifications = notifier.AllCommunications
+	CoreApp.Integrations = integrations.Integrations
 	go DatabaseMaintence()
+	SetupMode = false
 }
 
 // InsertNotifierDB inject the Statping database instance to the Notifier package
 func InsertNotifierDB() error {
 	if DbSession == nil {
-		err := Configs.Connect(false, utils.Directory)
+		err := CoreApp.Connect(false, utils.Directory)
 		if err != nil {
 			return errors.New("database connection has not been created")
 		}
@@ -144,17 +150,18 @@ func (c Core) AllOnline() bool {
 // SelectCore will return the CoreApp global variable and the settings/configs for Statping
 func SelectCore() (*Core, error) {
 	if DbSession == nil {
+		log.Traceln("database has not been initiated yet.")
 		return nil, errors.New("database has not been initiated yet.")
 	}
 	exists := DbSession.HasTable("core")
 	if !exists {
+		log.Errorf("core database has not been setup yet, does not have the 'core' table")
 		return nil, errors.New("core database has not been setup yet.")
 	}
 	db := coreDB().First(&CoreApp)
 	if db.Error != nil {
 		return nil, db.Error
 	}
-	CoreApp.DbConnection = Configs.DbConn
 	CoreApp.Version = VERSION
 	CoreApp.UseCdn = types.NewNullBool(os.Getenv("USE_CDN") == "true")
 	return CoreApp, db.Error
@@ -175,6 +182,21 @@ func GetLocalIP() string {
 		}
 	}
 	return "http://localhost"
+}
+
+// AttachNotifiers will attach all the notifier's into the system
+func AttachNotifiers() error {
+	return notifier.AddNotifiers(
+		notifiers.Command,
+		notifiers.Discorder,
+		notifiers.Emailer,
+		notifiers.LineNotify,
+		notifiers.Mobile,
+		notifiers.Slacker,
+		notifiers.Telegram,
+		notifiers.Twilio,
+		notifiers.Webhook,
+	)
 }
 
 // ServiceOrder will reorder the services based on 'order_id' (Order)

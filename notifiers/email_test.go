@@ -44,12 +44,12 @@ func init() {
 	EMAIL_SEND_TO = os.Getenv("EMAIL_SEND_TO")
 	EMAIL_PORT = utils.ToInt(os.Getenv("EMAIL_PORT"))
 
-	emailer.Host = EMAIL_HOST
-	emailer.Username = EMAIL_USER
-	emailer.Password = EMAIL_PASS
-	emailer.Var1 = EMAIL_OUTGOING
-	emailer.Var2 = EMAIL_SEND_TO
-	emailer.Port = int(EMAIL_PORT)
+	Emailer.Host = EMAIL_HOST
+	Emailer.Username = EMAIL_USER
+	Emailer.Password = EMAIL_PASS
+	Emailer.Var1 = EMAIL_OUTGOING
+	Emailer.Var2 = EMAIL_SEND_TO
+	Emailer.Port = int(EMAIL_PORT)
 }
 
 func TestEmailNotifier(t *testing.T) {
@@ -61,36 +61,32 @@ func TestEmailNotifier(t *testing.T) {
 	currentCount = CountNotifiers()
 
 	t.Run("New Emailer", func(t *testing.T) {
-		emailer.Host = EMAIL_HOST
-		emailer.Username = EMAIL_USER
-		emailer.Password = EMAIL_PASS
-		emailer.Var1 = EMAIL_OUTGOING
-		emailer.Var2 = EMAIL_SEND_TO
-		emailer.Port = int(EMAIL_PORT)
-		emailer.Delay = time.Duration(100 * time.Millisecond)
+		Emailer.Host = EMAIL_HOST
+		Emailer.Username = EMAIL_USER
+		Emailer.Password = EMAIL_PASS
+		Emailer.Var1 = EMAIL_OUTGOING
+		Emailer.Var2 = EMAIL_SEND_TO
+		Emailer.Port = int(EMAIL_PORT)
+		Emailer.Delay = time.Duration(100 * time.Millisecond)
 
 		testEmail = &emailOutgoing{
-			To:       emailer.GetValue("var2"),
+			To:       Emailer.GetValue("var2"),
 			Subject:  fmt.Sprintf("Service %v is Failing", TestService.Name),
 			Template: mainEmailTemplate,
 			Data:     TestService,
-			From:     emailer.GetValue("var1"),
+			From:     Emailer.GetValue("var1"),
 		}
 	})
 
 	t.Run("Add email Notifier", func(t *testing.T) {
-		err := notifier.AddNotifier(emailer)
+		err := notifier.AddNotifiers(Emailer)
 		assert.Nil(t, err)
-		assert.Equal(t, "Hunter Long", emailer.Author)
-		assert.Equal(t, EMAIL_HOST, emailer.Host)
-	})
-
-	t.Run("Emailer Load", func(t *testing.T) {
-		notifier.Load()
+		assert.Equal(t, "Hunter Long", Emailer.Author)
+		assert.Equal(t, EMAIL_HOST, Emailer.Host)
 	})
 
 	t.Run("email Within Limits", func(t *testing.T) {
-		ok, err := emailer.WithinLimits()
+		ok, err := Emailer.WithinLimits()
 		assert.Nil(t, err)
 		assert.True(t, ok)
 	})
@@ -101,44 +97,40 @@ func TestEmailNotifier(t *testing.T) {
 	})
 
 	t.Run("email OnFailure", func(t *testing.T) {
-		emailer.OnFailure(TestService, TestFailure)
-		assert.Equal(t, 1, len(emailer.Queue))
-	})
-
-	t.Run("email Check Offline", func(t *testing.T) {
-		assert.False(t, emailer.Online)
+		Emailer.OnFailure(TestService, TestFailure)
+		assert.Equal(t, 1, len(Emailer.Queue))
 	})
 
 	t.Run("email OnSuccess", func(t *testing.T) {
-		emailer.OnSuccess(TestService)
-		assert.Equal(t, 1, len(emailer.Queue))
+		Emailer.OnSuccess(TestService)
+		assert.Equal(t, 1, len(Emailer.Queue))
 	})
 
 	t.Run("email Check Back Online", func(t *testing.T) {
-		assert.True(t, emailer.Online)
+		assert.True(t, TestService.Online)
 	})
 
 	t.Run("email OnSuccess Again", func(t *testing.T) {
-		emailer.OnSuccess(TestService)
-		assert.Equal(t, 1, len(emailer.Queue))
+		Emailer.OnSuccess(TestService)
+		assert.Equal(t, 1, len(Emailer.Queue))
 	})
 
 	t.Run("email Send", func(t *testing.T) {
-		err := emailer.Send(testEmail)
+		err := Emailer.Send(testEmail)
 		assert.Nil(t, err)
 	})
 
-	t.Run("emailer Test", func(t *testing.T) {
+	t.Run("Emailer Test", func(t *testing.T) {
 		t.SkipNow()
-		err := emailer.OnTest()
+		err := Emailer.OnTest()
 		assert.Nil(t, err)
 	})
 
 	t.Run("email Run Queue", func(t *testing.T) {
-		go notifier.Queue(emailer)
+		go notifier.Queue(Emailer)
 		time.Sleep(6 * time.Second)
-		assert.Equal(t, EMAIL_HOST, emailer.Host)
-		assert.Equal(t, 0, len(emailer.Queue))
+		assert.Equal(t, EMAIL_HOST, Emailer.Host)
+		assert.Equal(t, 0, len(Emailer.Queue))
 	})
 
 }

@@ -30,10 +30,10 @@ var (
 )
 
 func init() {
-	webhook.Host = webhookTestUrl
-	webhook.Var1 = "POST"
-	webhook.Var2 = webhookMessage
-	webhook.ApiKey = "application/json"
+	Webhook.Host = webhookTestUrl
+	Webhook.Var1 = "POST"
+	Webhook.Var2 = webhookMessage
+	Webhook.ApiKey = "application/json"
 }
 
 func TestWebhookNotifier(t *testing.T) {
@@ -41,73 +41,61 @@ func TestWebhookNotifier(t *testing.T) {
 	currentCount = CountNotifiers()
 
 	t.Run("Load webhooker", func(t *testing.T) {
-		webhook.Host = webhookTestUrl
-		webhook.Delay = time.Duration(100 * time.Millisecond)
-		webhook.ApiKey = apiKey
-		err := notifier.AddNotifier(webhook)
+		Webhook.Host = webhookTestUrl
+		Webhook.Delay = time.Duration(100 * time.Millisecond)
+		Webhook.ApiKey = apiKey
+		err := notifier.AddNotifiers(Webhook)
 		assert.Nil(t, err)
-		assert.Equal(t, "Hunter Long", webhook.Author)
-		assert.Equal(t, webhookTestUrl, webhook.Host)
-		assert.Equal(t, apiKey, webhook.ApiKey)
-	})
-
-	t.Run("Load webhooker Notifier", func(t *testing.T) {
-		notifier.Load()
-	})
-
-	t.Run("Load webhooker Notifier", func(t *testing.T) {
-		notifier.Load()
+		assert.Equal(t, "Hunter Long", Webhook.Author)
+		assert.Equal(t, webhookTestUrl, Webhook.Host)
+		assert.Equal(t, apiKey, Webhook.ApiKey)
 	})
 
 	t.Run("webhooker Notifier Tester", func(t *testing.T) {
-		assert.True(t, webhook.CanTest())
+		assert.True(t, Webhook.CanTest())
 	})
 
 	t.Run("webhooker Replace Body Text", func(t *testing.T) {
 		fullMsg = replaceBodyText(webhookMessage, TestService, TestFailure)
-		assert.Equal(t, `{"id": "1","name": "Interpol - All The Rage Back Home","online": "false","issue": "testing"}`, fullMsg)
+		assert.Equal(t, `{"id": "1","name": "Interpol - All The Rage Back Home","online": "true","issue": "testing"}`, fullMsg)
 	})
 
 	t.Run("webhooker Within Limits", func(t *testing.T) {
-		ok, err := webhook.WithinLimits()
+		ok, err := Webhook.WithinLimits()
 		assert.Nil(t, err)
 		assert.True(t, ok)
 	})
 
 	t.Run("webhooker OnFailure", func(t *testing.T) {
-		webhook.OnFailure(TestService, TestFailure)
-		assert.Len(t, webhook.Queue, 1)
-	})
-
-	t.Run("webhooker Check Offline", func(t *testing.T) {
-		assert.False(t, webhook.Online)
+		Webhook.OnFailure(TestService, TestFailure)
+		assert.Len(t, Webhook.Queue, 1)
 	})
 
 	t.Run("webhooker OnSuccess", func(t *testing.T) {
-		webhook.OnSuccess(TestService)
-		assert.Equal(t, len(webhook.Queue), 1)
+		Webhook.OnSuccess(TestService)
+		assert.Equal(t, len(Webhook.Queue), 1)
 	})
 
 	t.Run("webhooker Check Back Online", func(t *testing.T) {
-		assert.True(t, webhook.Online)
+		assert.True(t, TestService.Online)
 	})
 
 	t.Run("webhooker OnSuccess Again", func(t *testing.T) {
-		webhook.OnSuccess(TestService)
-		assert.Equal(t, len(webhook.Queue), 1)
+		Webhook.OnSuccess(TestService)
+		assert.Equal(t, len(Webhook.Queue), 1)
 	})
 
 	t.Run("webhooker Send", func(t *testing.T) {
-		err := webhook.Send(fullMsg)
+		err := Webhook.Send(fullMsg)
 		assert.Nil(t, err)
-		assert.Equal(t, len(webhook.Queue), 1)
+		assert.Equal(t, len(Webhook.Queue), 1)
 	})
 
 	t.Run("webhooker Queue", func(t *testing.T) {
-		go notifier.Queue(webhook)
+		go notifier.Queue(Webhook)
 		time.Sleep(8 * time.Second)
-		assert.Equal(t, webhookTestUrl, webhook.Host)
-		assert.Equal(t, len(webhook.Queue), 0)
+		assert.Equal(t, webhookTestUrl, Webhook.Host)
+		assert.Equal(t, len(Webhook.Queue), 0)
 	})
 
 }

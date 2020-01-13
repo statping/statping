@@ -9,7 +9,7 @@ import (
 // SparklineDayFailures returns a string array of daily service failures
 func (s *Service) SparklineDayFailures(days int) string {
 	var arr []string
-	ago := time.Now().Add((time.Duration(days) * -24) * time.Hour)
+	ago := time.Now().UTC().Add((time.Duration(days) * -24) * time.Hour)
 	for day := 1; day <= days; day++ {
 		ago = ago.Add(24 * time.Hour)
 		failures, _ := s.TotalFailuresOnDate(ago)

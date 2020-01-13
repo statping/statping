@@ -31,7 +31,7 @@ type twilio struct {
 	*notifier.Notification
 }
 
-var twilioNotifier = &twilio{&notifier.Notification{
+var Twilio = &twilio{&notifier.Notification{
 	Method:      "twilio",
 	Title:       "Twilio",
 	Description: "Receive SMS text messages directly to your cellphone when a service is offline. You can use a Twilio test account with limits. This notifier uses the <a href=\"https://www.twilio.com/docs/usage/api\">Twilio API</a>.",
@@ -66,14 +66,6 @@ var twilioNotifier = &twilio{&notifier.Notification{
 	}}},
 }
 
-// DEFINE YOUR NOTIFICATION HERE.
-func init() {
-	err := notifier.AddNotifier(twilioNotifier)
-	if err != nil {
-		panic(err)
-	}
-}
-
 func (u *twilio) Select() *notifier.Notification {
 	return u.Notification
 }
@@ -89,7 +81,7 @@ func (u *twilio) Send(msg interface{}) error {
 	v.Set("Body", message)
 	rb := *strings.NewReader(v.Encode())
 
-	contents, _, err := utils.HttpRequest(twilioUrl, "POST", "application/x-www-form-urlencoded", nil, &rb, time.Duration(10*time.Second))
+	contents, _, err := utils.HttpRequest(twilioUrl, "POST", "application/x-www-form-urlencoded", nil, &rb, time.Duration(10*time.Second), true)
 	success, _ := twilioSuccess(contents)
 	if !success {
 		errorOut := twilioError(contents)
@@ -103,22 +95,25 @@ func (u *twilio) Send(msg interface{}) error {
 func (u *twilio) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
 	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
-	u.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (u *twilio) OnSuccess(s *types.Service) {
-	if !u.Online {
+	if !s.Online || !s.SuccessNotified {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
-		msg := fmt.Sprintf("Your service '%v' is back online!", s.Name)
+		var msg string
+		if s.UpdateNotify {
+			s.UpdateNotify = false
+		}
+		msg = s.DownText
+
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}
-	u.Online = true
 }
 
 // OnSave triggers when this notifier has been saved
 func (u *twilio) OnSave() error {
-	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
+	utils.Log.Infoln(fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
 
 	// Do updating stuff here
 

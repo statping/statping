@@ -27,10 +27,10 @@ type commandLine struct {
 	*notifier.Notification
 }
 
-var command = &commandLine{&notifier.Notification{
-	Method:      "command",
+var Command = &commandLine{&notifier.Notification{
+	Method:      "Command",
 	Title:       "Shell Command",
-	Description: "Shell Command allows you to run a customized shell/bash command on the local machine it's running on.",
+	Description: "Shell Command allows you to run a customized shell/bash Command on the local machine it's running on.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
 	Delay:       time.Duration(1 * time.Second),
@@ -47,22 +47,14 @@ var command = &commandLine{&notifier.Notification{
 		Title:       "Command to Run on OnSuccess",
 		Placeholder: "curl google.com",
 		DbField:     "var1",
-		SmallText:   "This command will run every time a service is receiving a Successful event.",
+		SmallText:   "This Command will run every time a service is receiving a Successful event.",
 	}, {
 		Type:        "text",
 		Title:       "Command to Run on OnFailure",
 		Placeholder: "curl offline.com",
 		DbField:     "var2",
-		SmallText:   "This command will run every time a service is receiving a Failing event.",
+		SmallText:   "This Command will run every time a service is receiving a Failing event.",
 	}}},
-}
-
-// init the command notifier
-func init() {
-	err := notifier.AddNotifier(command)
-	if err != nil {
-		panic(err)
-	}
 }
 
 func runCommand(app, cmd string) (string, string, error) {
@@ -77,16 +69,14 @@ func (u *commandLine) Select() *notifier.Notification {
 // OnFailure for commandLine will trigger failing service
 func (u *commandLine) OnFailure(s *types.Service, f *types.Failure) {
 	u.AddQueue(fmt.Sprintf("service_%v", s.Id), u.Var2)
-	u.Online = false
 }
 
 // OnSuccess for commandLine will trigger successful service
 func (u *commandLine) OnSuccess(s *types.Service) {
-	if !u.Online {
+	if !s.Online {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), u.Var1)
 	}
-	u.Online = true
 }
 
 // OnSave for commandLine triggers when this notifier has been saved
@@ -99,12 +89,12 @@ func (u *commandLine) OnSave() error {
 // OnTest for commandLine triggers when this notifier has been saved
 func (u *commandLine) OnTest() error {
 	in, out, err := runCommand(u.Host, u.Var1)
-	utils.Log(1, in)
-	utils.Log(1, out)
+	utils.Log.Infoln(in)
+	utils.Log.Infoln(out)
 	return err
 }
 
-// Send for commandLine will send message to expo command push notifications endpoint
+// Send for commandLine will send message to expo Command push notifications endpoint
 func (u *commandLine) Send(msg interface{}) error {
 	cmd := msg.(string)
 	_, _, err := runCommand(u.Host, cmd)

@@ -22,14 +22,14 @@ func (g *Group) Delete() error {
 
 // Create will create a group and insert it into the database
 func (g *Group) Create() (int64, error) {
-	g.CreatedAt = time.Now()
+	g.CreatedAt = time.Now().UTC()
 	db := groupsDb().Create(g)
 	return g.Id, db.Error
 }
 
 // Update will update a group
 func (g *Group) Update() (int64, error) {
-	g.UpdatedAt = time.Now()
+	g.UpdatedAt = time.Now().UTC()
 	db := groupsDb().Update(g)
 	return g.Id, db.Error
 }

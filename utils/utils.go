@@ -16,6 +16,7 @@
 package utils
 
 import (
+	"context"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -24,6 +25,7 @@ import (
 	"io/ioutil"
 	"math"
 	"math/rand"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -52,8 +54,17 @@ func init() {
 		}
 		Directory = dir
 	}
+	// check if logs are disabled
 	logger := os.Getenv("DISABLE_LOGS")
 	disableLogs, _ = strconv.ParseBool(logger)
+	if disableLogs {
+		Log.Out = ioutil.Discard
+		return
+	}
+	Log.Debugln("current working directory: ", Directory)
+	Log.AddHook(new(hook))
+	Log.SetNoLock()
+	checkVerboseMode()
 }
 
 // ToInt converts a int to a string
@@ -164,6 +175,7 @@ func UnderScoreString(str string) string {
 //		exists := FileExists("assets/css/base.css")
 func FileExists(name string) bool {
 	if _, err := os.Stat(name); err != nil {
+		Log.Debugf("file exist: %v (%v)", name, !os.IsNotExist(err))
 		if os.IsNotExist(err) {
 			return false
 		}
@@ -174,24 +186,62 @@ func FileExists(name string) bool {
 // DeleteFile will attempt to delete a file
 //		DeleteFile("newfile.json")
 func DeleteFile(file string) error {
-	Log(1, "deleting file: "+file)
-	err := os.Remove(file)
-	if err != nil {
-		return err
-	}
-	return nil
+	Log.Debugln("deleting file: " + file)
+	return os.Remove(file)
 }
 
 // DeleteDirectory will attempt to delete a directory and all contents inside
 //		DeleteDirectory("assets")
 func DeleteDirectory(directory string) error {
+	Log.Debugln("removing directory: " + directory)
 	return os.RemoveAll(directory)
+}
+
+// CreateDirectory will attempt to create a directory
+//		CreateDirectory("assets")
+func CreateDirectory(directory string) error {
+	Log.Debugln("creating directory: " + directory)
+	if err := os.Mkdir(directory, os.ModePerm); err != os.ErrExist {
+		return err
+	}
+	return nil
+}
+
+// FolderExists will return true if the folder exists
+func FolderExists(folder string) bool {
+	if _, err := os.Stat(folder); os.IsExist(err) {
+		return true
+	}
+	return false
+}
+
+// CopyFile will copy a file to a new directory
+//		CopyFile("source.jpg", "/tmp/source.jpg")
+func CopyFile(src, dst string) error {
+	Log.Debugln(fmt.Sprintf("copying file: %v to %v", src, dst))
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return err
+	}
+	return out.Close()
 }
 
 // Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings
 //		in, out, err := Command("sass assets/scss assets/css/base.css")
 func Command(cmd string) (string, string, error) {
-	Log(1, "running command: "+cmd)
+	Log.Debugln("running command: " + cmd)
 	testCmd := exec.Command("sh", "-c", cmd)
 	var stdout, stderr []byte
 	var errStdout, errStderr error
@@ -274,21 +324,8 @@ func SaveFile(filename string, data []byte) error {
 // // body - The body or form data to send with HTTP request
 // // timeout - Specific duration to timeout on. time.Duration(30 * time.Seconds)
 // // You can use a HTTP Proxy if you HTTP_PROXY environment variable
-func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration) ([]byte, *http.Response, error) {
+func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool) ([]byte, *http.Response, error) {
 	var err error
-	transport := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: true,
-		},
-		DisableKeepAlives:     true,
-		ResponseHeaderTimeout: timeout,
-		TLSHandshakeTimeout:   timeout,
-		Proxy:                 http.ProxyFromEnvironment,
-	}
-	client := &http.Client{
-		Transport: transport,
-		Timeout:   timeout,
-	}
 	var req *http.Request
 	if req, err = http.NewRequest(method, url, body); err != nil {
 		return nil, nil, err
@@ -297,15 +334,48 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	if content != nil {
 		req.Header.Set("Content-Type", content.(string))
 	}
+
+	verifyHost := req.URL.Hostname()
 	for _, h := range headers {
 		keyVal := strings.SplitN(h, "=", 2)
 		if len(keyVal) == 2 {
 			if keyVal[0] != "" && keyVal[1] != "" {
-				req.Header.Set(keyVal[0], keyVal[1])
+				if strings.ToLower(keyVal[0]) == "host" {
+					req.Host = strings.TrimSpace(keyVal[1])
+					verifyHost = req.Host
+				} else {
+					req.Header.Set(keyVal[0], keyVal[1])
+				}
 			}
 		}
 	}
 	var resp *http.Response
+
+	dialer := &net.Dialer{
+		Timeout:   timeout,
+		KeepAlive: timeout,
+	}
+
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: !verifySSL,
+			ServerName:         verifyHost,
+		},
+		DisableKeepAlives:     true,
+		ResponseHeaderTimeout: timeout,
+		TLSHandshakeTimeout:   timeout,
+		Proxy:                 http.ProxyFromEnvironment,
+		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+			// redirect all connections to host specified in url
+			addr = strings.Split(req.URL.Host, ":")[0] + addr[strings.LastIndex(addr, ":"):]
+			return dialer.DialContext(ctx, network, addr)
+		},
+	}
+	client := &http.Client{
+		Transport: transport,
+		Timeout:   timeout,
+	}
+
 	if resp, err = client.Do(req); err != nil {
 		return nil, resp, err
 	}

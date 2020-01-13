@@ -137,7 +137,7 @@ HTML, BODY {
 
 .chart-container {
   position: relative;
-  height: 170px;
+  height: 190px;
   width: 100%;
   overflow: hidden;
 }
@@ -606,7 +606,7 @@ input.inputTags-field:focus {
 
   .card-body {
     font-size: 10pt;
-    padding: 0px 10px;
+    padding: 10px 10px;
   }
 
   .lg_number {

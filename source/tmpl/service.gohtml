@@ -20,7 +20,7 @@
             <span class="mt-3 mb-3 text-white d-md-none btn bg-danger d-block d-md-none">OFFLINE</span>
         {{end}}
 
-        <h4 class="mt-2"><a href="/">{{CoreApp.Name}}</a> - {{ $s.Name }}
+        <h4 class="mt-2"><a href="">{{CoreApp.Name}}</a> - {{ $s.Name }}
         {{if $s.Online }}
             <span class="badge bg-success float-right d-none d-md-block">ONLINE</span>
         {{ else }}
@@ -168,7 +168,7 @@
                         {{ if lt $ch.Expected 0}}{{Duration $ch.Expected}} ago{{else}}in {{Duration $ch.Expected}}{{end}}
                         {{end}}
                         </td>
-                        <td><a href="/api/checkin/{{$ch.ApiKey}}" data-method="DELETE" data-obj="checkin_{{$ch.Id}}" data-id="{{$ch.Id}}" class="ajax_delete btn btn-sm btn-danger">Delete</a></td>
+                        <td><a href="api/checkin/{{$ch.ApiKey}}" data-method="DELETE" data-obj="checkin_{{$ch.Id}}" data-id="{{$ch.Id}}" class="ajax_delete btn btn-sm btn-danger">Delete</a></td>
                     </tr>
                     {{end}}
                     </tbody>
@@ -231,12 +231,12 @@
 </div>
 {{end}}
 {{define "extra_css"}}
-<link rel="stylesheet" href="/css/flatpickr.min.css">
+<link rel="stylesheet" href="css/flatpickr.min.css">
 {{end}}
 {{define "extra_scripts"}}
 {{$s := .Service}}
-<script src="/js/flatpickr.js"></script>
-<script src="/js/rangePlugin.js"></script>
+<script src="js/flatpickr.js"></script>
+<script src="js/rangePlugin.js"></script>
 <script>
 
 let options = {
@@ -262,7 +262,11 @@ let options = {
         lineCap: 'butt',
         colors: ["#3aa82d"],
     },
-	series: [{data: [{}]}],
+	series: [{name: "Latency", data: [{}]}],
+    tooltip: {
+      enabled: true,
+      x: {show: true, format: 'MMM dd hh:mm:ss tt'},
+    },
     xaxis: {
         type: "datetime",
         tickAmount: 8,
@@ -318,6 +322,21 @@ var heat_options = {
     }
 };
 
+async function zoomedEvent(chart, { xaxis, yaxis }) {
+    let start = Math.round(xaxis.min / 1000),
+        end = Math.round(xaxis.max / 1000);
+
+    let chartData = await ChartLatency({{$s.Id}}, start, end);
+    if (!chartData) {
+        chartData = await ChartLatency({{$s.Id}}, start, end, "minute");
+    }
+
+    if(!chartData || !chartData.length) {
+        return false
+    }
+
+    chart.updateSeries([{ name: "Latency", data: chartData }]);
+}
 
 async function RenderHeatmap() {
     let heatChart = new ApexCharts(
@@ -335,8 +354,12 @@ async function RenderHeatmap() {
 }
 
 async function RenderChartLatency() {
-	options.fill.colors = {{if $s.Online}}["#48d338"]{{else}}["#dd3545"]{{end}};
-	options.stroke.colors = {{if $s.Online}}["#3aa82d"]{{else}}["#c23342"]{{end}};
+    options.chart.events = {
+        zoomed: zoomedEvent,
+    }
+    options.fill.colors = {{if $s.Online}}["#48d338"]{{else}}["#dd3545"]{{end}};
+    options.stroke.colors = {{if $s.Online}}["#3aa82d"]{{else}}["#c23342"]{{end}};
+
     let chart = new ApexCharts(document.querySelector("#service"), options);
     await RenderChart(chart,{{$s.Id}},{{.StartUnix}},{{.EndUnix}},"hour");
 }

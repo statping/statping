@@ -28,14 +28,14 @@ import (
 )
 
 const (
-	webhookMethod = "webhook"
+	webhookMethod = "Webhook"
 )
 
 type webhooker struct {
 	*notifier.Notification
 }
 
-var webhook = &webhooker{&notifier.Notification{
+var Webhook = &webhooker{&notifier.Notification{
 	Method:      webhookMethod,
 	Title:       "HTTP webhooker",
 	Description: "Send a custom HTTP request to a specific URL with your own body, headers, and parameters.",
@@ -78,14 +78,6 @@ var webhook = &webhooker{&notifier.Notification{
 	},
 	}}}
 
-// DEFINE YOUR NOTIFICATION HERE.
-func init() {
-	err := notifier.AddNotifier(webhook)
-	if err != nil {
-		panic(err)
-	}
-}
-
 // Send will send a HTTP Post to the webhooker API. It accepts type: string
 func (w *webhooker) Send(msg interface{}) error {
 	resp, err := w.sendHttpWebhook(msg.(string))
@@ -106,7 +98,7 @@ func replaceBodyText(body string, s *types.Service, f *types.Failure) string {
 }
 
 func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
-	utils.Log(1, fmt.Sprintf("sending body: '%v' to %v as a %v request", body, w.Host, w.Var1))
+	utils.Log.Infoln(fmt.Sprintf("sending body: '%v' to %v as a %v request", body, w.Host, w.Var1))
 	client := new(http.Client)
 	client.Timeout = time.Duration(10 * time.Second)
 	var buf *bytes.Buffer
@@ -137,28 +129,14 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 }
 
 func (w *webhooker) OnTest() error {
-	service := &types.Service{
-		Id:             1,
-		Name:           "Interpol - All The Rage Back Home",
-		Domain:         "https://www.youtube.com/watch?v=-u6DvRyyKGU",
-		ExpectedStatus: 200,
-		Interval:       30,
-		Type:           "http",
-		Method:         "GET",
-		Timeout:        20,
-		LastStatusCode: 404,
-		Expected:       types.NewNullString("test example"),
-		LastResponse:   "<html>this is an example response</html>",
-		CreatedAt:      time.Now().Add(-24 * time.Hour),
-	}
-	body := replaceBodyText(w.Var2, service, nil)
+	body := replaceBodyText(w.Var2, notifier.ExampleService, nil)
 	resp, err := w.sendHttpWebhook(body)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 	content, err := ioutil.ReadAll(resp.Body)
-	utils.Log(1, fmt.Sprintf("webhook notifier received: '%v'", string(content)))
+	utils.Log.Infoln(fmt.Sprintf("Webhook notifier received: '%v'", string(content)))
 	return err
 }
 
@@ -166,17 +144,15 @@ func (w *webhooker) OnTest() error {
 func (w *webhooker) OnFailure(s *types.Service, f *types.Failure) {
 	msg := replaceBodyText(w.Var2, s, f)
 	w.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
-	w.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (w *webhooker) OnSuccess(s *types.Service) {
-	if !w.Online {
+	if !s.Online {
 		w.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		msg := replaceBodyText(w.Var2, s, nil)
 		w.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}
-	w.Online = true
 }
 
 // OnSave triggers when this notifier has been saved

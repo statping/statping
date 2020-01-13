@@ -31,7 +31,7 @@ type telegram struct {
 	*notifier.Notification
 }
 
-var telegramNotifier = &telegram{&notifier.Notification{
+var Telegram = &telegram{&notifier.Notification{
 	Method:      "telegram",
 	Title:       "Telegram",
 	Description: "Receive notifications on your Telegram channel when a service has an issue. You must get a Telegram API token from the /botfather. Review the <a target=\"_blank\" href=\"http://techthoughts.info/how-to-create-a-telegram-bot-and-send-messages-via-api\">Telegram API Tutorial</a> to learn how to generate a new API Token.",
@@ -56,14 +56,6 @@ var telegramNotifier = &telegram{&notifier.Notification{
 	}}},
 }
 
-// DEFINE YOUR NOTIFICATION HERE.
-func init() {
-	err := notifier.AddNotifier(telegramNotifier)
-	if err != nil {
-		panic(err)
-	}
-}
-
 func (u *telegram) Select() *notifier.Notification {
 	return u.Notification
 }
@@ -78,7 +70,7 @@ func (u *telegram) Send(msg interface{}) error {
 	v.Set("text", message)
 	rb := *strings.NewReader(v.Encode())
 
-	contents, _, err := utils.HttpRequest(apiEndpoint, "GET", "application/x-www-form-urlencoded", nil, &rb, time.Duration(10*time.Second))
+	contents, _, err := utils.HttpRequest(apiEndpoint, "GET", "application/x-www-form-urlencoded", nil, &rb, time.Duration(10*time.Second), true)
 
 	success, _ := telegramSuccess(contents)
 	if !success {
@@ -93,22 +85,25 @@ func (u *telegram) Send(msg interface{}) error {
 func (u *telegram) OnFailure(s *types.Service, f *types.Failure) {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
 	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
-	u.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (u *telegram) OnSuccess(s *types.Service) {
-	if !u.Online {
+	if !s.Online || !s.SuccessNotified {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
-		msg := fmt.Sprintf("Your service '%v' is back online!", s.Name)
+		var msg interface{}
+		if s.UpdateNotify {
+			s.UpdateNotify = false
+		}
+		msg = s.DownText
+
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}
-	u.Online = true
 }
 
 // OnSave triggers when this notifier has been saved
 func (u *telegram) OnSave() error {
-	utils.Log(1, fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
+	utils.Log.Infoln(fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
 
 	// Do updating stuff here
 

@@ -34,6 +34,11 @@ func Timezoner(t time.Time, zone float32) time.Time {
 	return timez
 }
 
+// Now returns the UTC timestamp
+func Now() time.Time {
+	return time.Now().UTC()
+}
+
 // FormatDuration converts a time.Duration into a string
 func FormatDuration(d time.Duration) string {
 	var out string

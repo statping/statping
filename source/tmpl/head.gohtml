@@ -4,16 +4,17 @@
     <title>{{block "title" .}} {{end}}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=0">
     <meta name="description" content="{{block "description" .}}{{end}}">
+    <base href="{{BasePath}}">
 {{if USE_CDN}}
     <link rel="shortcut icon" type="image/x-icon" href="https://assets.statping.com/favicon.ico">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://assets.statping.com/base.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
 {{ else }}
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/base.css">
-    <link rel="stylesheet" href="/font/all.css">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="font/all.css">
 {{end}}
 {{block "extra_css" .}} {{end}}
 </head>

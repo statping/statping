@@ -18,7 +18,9 @@ package handlers
 import (
 	"bytes"
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/core/integrations"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
@@ -62,13 +64,16 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	timeFloat, _ := strconv.ParseFloat(timezone, 10)
 	app.Timezone = float32(timeFloat)
 
+	app.UpdateNotify = types.NewNullBool(form.Get("update_notify") == "true")
+
 	app.UseCdn = types.NewNullBool(form.Get("enable_cdn") == "on")
 	core.CoreApp, err = core.UpdateCore(app)
 	if err != nil {
-		utils.Log(3, fmt.Sprintf("issue updating Core: %v", err.Error()))
+		log.Errorln(fmt.Sprintf("issue updating Core: %v", err.Error()))
 	}
+
 	//notifiers.OnSettingsSaved(core.CoreApp.ToCore())
-	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "settings")
 }
 
 func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
@@ -81,37 +86,37 @@ func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
 	source.SaveAsset([]byte(mobile), utils.Directory, "scss/mobile.scss")
 	source.CompileSASS(utils.Directory)
 	resetRouter()
-	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "settings")
 }
 
 func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 	dir := utils.Directory
 	if err := source.CreateAllAssets(dir); err != nil {
-		utils.Log(3, err)
+		log.Errorln(err)
 		sendErrorJson(err, w, r)
 		return
 	}
 	if err := source.CompileSASS(dir); err != nil {
 		source.CopyToPublic(source.CssBox, dir+"/assets/css", "base.css")
-		utils.Log(3, "Default 'base.css' was inserted because SASS did not work.")
+		log.Errorln("Default 'base.css' was inserted because SASS did not work.")
 	}
 	resetRouter()
-	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "settings")
 }
 
 func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
 	if err := source.DeleteAllAssets(utils.Directory); err != nil {
-		utils.Log(3, fmt.Errorf("error deleting all assets %v", err))
+		log.Errorln(fmt.Errorf("error deleting all assets %v", err))
 	}
 	resetRouter()
-	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "settings")
 }
 
 func bulkImportHandler(w http.ResponseWriter, r *http.Request) {
 	var fileData bytes.Buffer
 	file, _, err := r.FormFile("file")
 	if err != nil {
-		utils.Log(3, fmt.Errorf("error bulk import services: %v", err))
+		log.Errorln(fmt.Errorf("error bulk import services: %v", err))
 		w.Write([]byte(err.Error()))
 		return
 	}
@@ -125,26 +130,74 @@ func bulkImportHandler(w http.ResponseWriter, r *http.Request) {
 
 		newService, err := commaToService(col)
 		if err != nil {
-			utils.Log(3, fmt.Errorf("issue with row %v: %v", i, err))
+			log.Errorln(fmt.Errorf("issue with row %v: %v", i, err))
 			continue
 		}
 
 		service := core.ReturnService(newService)
 		_, err = service.Create(true)
 		if err != nil {
-			utils.Log(3, fmt.Errorf("cannot create service %v: %v", col[0], err))
+			log.Errorln(fmt.Errorf("cannot create service %v: %v", col[0], err))
 			continue
 		}
-		utils.Log(1, fmt.Sprintf("Created new service %v", service.Name))
+		log.Infoln(fmt.Sprintf("Created new service %v", service.Name))
 	}
 
 	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
 }
 
+type integratorOut struct {
+	Integrator *types.Integration `json:"integrator"`
+	Services   []*types.Service   `json:"services"`
+	Error      error
+}
+
+func integratorHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	integratorName := vars["name"]
+	r.ParseForm()
+
+	integrator, err := integrations.Find(integratorName)
+	if err != nil {
+		log.Errorln(err)
+		ExecuteResponse(w, r, "integrator.gohtml", integratorOut{
+			Error: err,
+		}, nil)
+		return
+	}
+
+	log.Info(r.PostForm)
+
+	for _, v := range integrator.Get().Fields {
+		log.Info(v.Name, v.Value)
+	}
+
+	integrations.SetFields(integrator, r.PostForm)
+
+	for _, v := range integrator.Get().Fields {
+		log.Info(v.Name, v.Value)
+	}
+
+	services, err := integrator.List()
+	if err != nil {
+		log.Errorln(err)
+		ExecuteResponse(w, r, "integrator.gohtml", integratorOut{
+			Integrator: integrator.Get(),
+			Error:      err,
+		}, nil)
+		return
+	}
+
+	ExecuteResponse(w, r, "integrator.gohtml", integratorOut{
+		Integrator: integrator.Get(),
+		Services:   services,
+	}, nil)
+}
+
 // commaToService will convert a CSV comma delimited string slice to a Service type
 // this function is used for the bulk import services feature
 func commaToService(s []string) (*types.Service, error) {
-	if len(s) != 16 {
+	if len(s) != 17 {
 		err := fmt.Errorf("does not have the expected amount of %v columns for a service", 16)
 		return nil, err
 	}
@@ -169,6 +222,11 @@ func commaToService(s []string) (*types.Service, error) {
 		return nil, err
 	}
 
+	verifySsl, err := strconv.ParseBool(s[16])
+	if err != nil {
+		return nil, err
+	}
+
 	newService := &types.Service{
 		Name:               s[0],
 		Domain:             s[1],
@@ -185,6 +243,7 @@ func commaToService(s []string) (*types.Service, error) {
 		GroupId:            int(utils.ToInt(s[13])),
 		Headers:            types.NewNullString(s[14]),
 		Permalink:          types.NewNullString(s[15]),
+		VerifySSL:          types.NewNullBool(verifySsl),
 	}
 
 	return newService, nil

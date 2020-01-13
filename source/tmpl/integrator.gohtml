@@ -1,0 +1,90 @@
+{{define "title"}}Statping | {{.Integrator.Name}} Integration{{end}}
+{{define "content"}}
+<div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
+{{if Auth}}
+    {{template "nav"}}
+{{end}}
+{{$i := .Integrator}}
+<div class="col-12">
+    <h3 class="mb-2 text-muted">{{$i.Name}} Integration</h3>
+    <p>{{safe $i.Description}}</p>
+    {{if .Error}}
+        <div class="alert alert-danger" role="alert">
+            {{.Error}}
+        </div>
+    {{else}}
+    <table id="integrator_table" class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col"><input name="all" type="checkbox" checked></th></th>
+            <th scope="col">Service Name</th>
+            <th scope="col">Endpoint</th>
+            <th scope="col">Port</th>
+            <th scope="col">Type</th>
+            <th scope="col">Interval</th>
+            <th scope="col">Timeout</th>
+        </tr>
+        </thead>
+        <tbody id="integrator_services">
+        {{range .Services}}
+            <tr id="{{underscore .Name}}">
+                <th scope="row"><input name="add" type="checkbox" checked></th>
+                <th><div class="input-group-sm"><input type="text" class="form-control" name="name" value="{{.Name}}"></div></th>
+                <th><div style="width: 80pt;" class="input-group-sm"><input type="text" class="form-control" name="domain" value="{{.Domain}}"></div></th>
+                <th><div style="width: 55pt;" class="input-group-sm"><input type="number" class="form-control" name="port" value="{{.Port}}"></div></th>
+                <th><div style="width: 32pt;" class="input-group-sm"><input type="text" class="form-control" name="type" value="{{.Type}}"></div></th>
+                <th><div style="width: 40pt;" class="input-group-sm"><input type="text" class="form-control" name="check_interval" value="{{.Interval}}"></div></th>
+                <th><div style="width: 40pt;" class="input-group-sm"><input type="text" class="form-control" name="timeout" value="{{.Timeout}}"></div></th>
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
+
+    <div id="imported_area"></div>
+
+    <button class="btn btn-block btn-primary add_integration_services mb-5" data-id="{{.Integrator.ShortName}}">Add Services</button>
+
+    {{end}}
+</div>
+</div>
+{{end}}
+{{define "extra_scripts"}}
+    <script>
+      $('.add_integration_services').on('click', function(e) {
+        var table = $(`#integrator_services`);
+
+        table.find('tr').each(function() {
+          var t = $(this).find('input');
+          var eachService = t.serializeArray();
+          let newArr = {};
+
+          var add = false;
+
+          eachService.forEach(function(k, v) {
+            if (k.value === "on" && k.name === "add") {
+              add = true
+            }
+            if($.isNumeric(k.value)){
+                k.value = parseInt(k.value)
+            }
+            if (add && k.name !== "add") {
+                newArr[k.name] = k.value;
+            }
+          });
+
+          let sendData = JSON.stringify(newArr);
+          $.ajax({
+            url: "/api/services",
+            type: "POST",
+            data: sendData,
+            success: function (data) {
+                var box = `<div class="alert alert-success" role="alert">Service '${data.output.name}' Added <a href="service/${data.output.id}" class="badge badge-secondary mt-1 float-right">View</a></div>`;
+                $("#imported_area").append(box);
+            }
+          });
+        });
+
+      });
+
+    </script>
+{{end}}

@@ -31,10 +31,10 @@ type mobilePush struct {
 	*notifier.Notification
 }
 
-var mobile = &mobilePush{&notifier.Notification{
+var Mobile = &mobilePush{&notifier.Notification{
 	Method: "mobile",
 	Title:  "Mobile Notifications",
-	Description: `Receive push notifications on your mobile device using the Statping App. You can scan the Authentication QR Code found in Settings to get the mobile app setup in seconds.
+	Description: `Receive push notifications on your Mobile device using the Statping App. You can scan the Authentication QR Code found in Settings to get the Mobile app setup in seconds.
 				 <p align="center"><a href="https://play.google.com/store/apps/details?id=com.statping"><img src="https://img.cjx.io/google-play.svg"></a><a href="https://itunes.apple.com/us/app/apple-store/id1445513219"><img src="https://img.cjx.io/app-store-badge.svg"></a></p>`,
 	Author:    "Hunter Long",
 	AuthorUrl: "https://github.com/hunterlong",
@@ -43,7 +43,7 @@ var mobile = &mobilePush{&notifier.Notification{
 	Form: []notifier.NotificationForm{{
 		Type:        "text",
 		Title:       "Device Identifiers",
-		Placeholder: "A list of your mobile device push notification ID's.",
+		Placeholder: "A list of your Mobile device push notification ID's.",
 		DbField:     "var1",
 		IsHidden:    true,
 	}, {
@@ -53,14 +53,6 @@ var mobile = &mobilePush{&notifier.Notification{
 		DbField:     "var2",
 		IsHidden:    true,
 	}}},
-}
-
-// init the discord notifier
-func init() {
-	err := notifier.AddNotifier(mobile)
-	if err != nil {
-		panic(err)
-	}
 }
 
 func (u *mobilePush) Select() *notifier.Notification {
@@ -100,33 +92,31 @@ func (u *mobilePush) OnFailure(s *types.Service, f *types.Failure) {
 		Data:    data,
 	}
 	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
-	u.Online = false
 }
 
 // OnSuccess will trigger successful service
 func (u *mobilePush) OnSuccess(s *types.Service) {
 	data := dataJson(s, nil)
-	if !u.Online {
+	if !s.Online || !s.SuccessNotified {
+		var msgStr string
+		if s.UpdateNotify {
+			s.UpdateNotify = false
+		}
+		msgStr = s.DownText
+
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		msg := &pushArray{
-			Message: fmt.Sprintf("Your service '%v' is back online!", s.Name),
+			Message: msgStr,
 			Title:   "Service Online",
 			Topic:   mobileIdentifier,
 			Data:    data,
 		}
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 	}
-	u.Online = true
 }
 
 // OnSave triggers when this notifier has been saved
 func (u *mobilePush) OnSave() error {
-	msg := &pushArray{
-		Message: "The Mobile Notifier has been saved",
-		Title:   "Notification Saved",
-		Topic:   mobileIdentifier,
-	}
-	u.AddQueue("saved", msg)
 	return nil
 }
 
@@ -178,7 +168,7 @@ func pushRequest(msg *pushArray) ([]byte, error) {
 		return nil, err
 	}
 	url := "https://push.statping.com/api/push"
-	body, _, err = utils.HttpRequest(url, "POST", "application/json", nil, bytes.NewBuffer(body), time.Duration(20*time.Second))
+	body, _, err = utils.HttpRequest(url, "POST", "application/json", nil, bytes.NewBuffer(body), time.Duration(20*time.Second), true)
 	return body, err
 }
 

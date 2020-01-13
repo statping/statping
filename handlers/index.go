@@ -21,7 +21,7 @@ import (
 )
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	if core.Configs == nil {
+	if core.CoreApp.Config == nil {
 		http.Redirect(w, r, "/setup", http.StatusSeeOther)
 		return
 	}
@@ -32,7 +32,7 @@ func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	health := map[string]interface{}{
 		"services": len(core.Services()),
 		"online":   true,
-		"setup":    core.Configs != nil,
+		"setup":    core.CoreApp.Config != nil,
 	}
 	returnJson(health, w, r)
 }
