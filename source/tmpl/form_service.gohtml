@@ -159,7 +159,7 @@
         </div>
         {{if ne .Id 0}}
         <div class="col-6">
-            <a href="/service/{{ .Id }}/delete_failures" data-method="GET" data-redirect="/service/{{ .Id }}" class="btn btn-danger btn-block confirm-btn">Delete All Failures</a>
+            <a href="service/{{ .Id }}/delete_failures" data-method="GET" data-redirect="/service/{{ .Id }}" class="btn btn-danger btn-block confirm-btn">Delete All Failures</a>
         </div>
         {{end}}
     </div>

@@ -49,8 +49,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		session.Values["user_id"] = user.Id
 		session.Values["admin"] = user.Admin.Bool
 		session.Save(r, w)
-		log.Infoln(fmt.Sprintf("User %v logged in from IP %v", user.Username, r.RemoteAddr))
-		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
+		utils.Log.Infoln(fmt.Sprintf("User %v logged in from IP %v", user.Username, r.RemoteAddr))
+		http.Redirect(w, r, basePath+"dashboard", http.StatusSeeOther)
 	} else {
 		err := core.ErrorResponse{Error: "Incorrect login information submitted, try again."}
 		ExecuteResponse(w, r, "login.gohtml", err, nil)

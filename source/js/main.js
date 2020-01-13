@@ -93,7 +93,7 @@ $('.toggle-service').on('click',function(e) {
 	let d = confirm("Do you want to "+(eval(online) ? "stop" : "start")+" checking this service?");
 	if (d) {
 		$.ajax({
-			url: "/api/services/" + serviceId + "/running",
+			url: "api/services/" + serviceId + "/running",
 			type: 'POST',
 			success: function (data) {
 				if (online === "true") {
@@ -166,7 +166,7 @@ function UTCTime() {
 }
 
 function ChartLatency(service, start=0, end=9999999999, group="hour", retry=true) {
-    let url = "/api/services/" + service + "/data?start=" + start + "&end=" + end + "&group=" + group;
+    let url = "api/services/" + service + "/data?start=" + start + "&end=" + end + "&group=" + group;
     return new Promise(resolve => {
         $.ajax({
             url: url,
@@ -182,7 +182,7 @@ function ChartLatency(service, start=0, end=9999999999, group="hour", retry=true
 function ChartHeatmap(service) {
     return new Promise(resolve => {
         $.ajax({
-            url: "/api/services/" + service + "/heatmap",
+            url: "api/services/" + service + "/heatmap",
             type: 'GET',
             success: function (data) {
                 resolve(data);
@@ -202,7 +202,7 @@ function FailureAnnotations(chart, service, start=0, end=9999999999, group="hour
     };
     var dataArr = [];
     $.ajax({
-        url: "/api/services/"+service+"/failures?start="+start+"&end="+end+"&group="+group,
+        url: "api/services/"+service+"/failures?start="+start+"&end="+end+"&group="+group,
         type: 'GET',
         success: function(data) {
             data.forEach(function (d) {
@@ -227,7 +227,7 @@ $('input[type=checkbox]').on('change', function() {
 
 function PingAjaxChart(chart, service, start=0, end=9999999999, group="hour") {
   $.ajax({
-    url: "/api/services/"+service+"/ping?start="+start+"&end="+end+"&group="+group,
+    url: "api/services/"+service+"/ping?start="+start+"&end="+end+"&group="+group,
     type: 'GET',
     success: function(data) {
       chart.data.labels.pop();
@@ -349,8 +349,8 @@ function CreateService(output) {
                 <td class="d-none d-md-table-cell">${data.online}<span class="badge badge-success">ONLINE</span></td>
                 <td class="text-right">
                     <div class="btn-group">
-                        <a href="/service/${data.id}" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> View</a>
-                        <a href="/api/services/${data.id}" class="ajax_delete btn btn-danger confirm-btn" data-method="DELETE" data-obj="service_${data.id}" data-id="${data.id}"><i class="fas fa-times"></i></a>
+                        <a href="service/${data.id}" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> View</a>
+                        <a href="api/services/${data.id}" class="ajax_delete btn btn-danger confirm-btn" data-method="DELETE" data-obj="service_${data.id}" data-id="${data.id}"><i class="fas fa-times"></i></a>
                     </div>
                 </td>
             </tr>`;
@@ -365,8 +365,8 @@ function CreateUser(output) {
                 <td>${form.username}</td>
                 <td class="text-right">
                     <div class="btn-group">
-                        <a href="/user/${data.id}" class="btn btn-outline-secondary"><i class="fas fa-user-edit"></i> Edit</a>
-                        <a href="/api/users/${data.id}" class="ajax_delete btn btn-danger confirm-btn" data-method="DELETE" data-obj="user_${data.id}" data-id="${data.id}"><i class="fas fa-times"></i></a>
+                        <a href="user/${data.id}" class="btn btn-outline-secondary"><i class="fas fa-user-edit"></i> Edit</a>
+                        <a href="api/users/${data.id}" class="ajax_delete btn btn-danger confirm-btn" data-method="DELETE" data-obj="user_${data.id}" data-id="${data.id}"><i class="fas fa-times"></i></a>
                     </div>
                 </td>
             </tr>`;

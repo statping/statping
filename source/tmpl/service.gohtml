@@ -20,7 +20,7 @@
             <span class="mt-3 mb-3 text-white d-md-none btn bg-danger d-block d-md-none">OFFLINE</span>
         {{end}}
 
-        <h4 class="mt-2"><a href="/">{{CoreApp.Name}}</a> - {{ $s.Name }}
+        <h4 class="mt-2"><a href="">{{CoreApp.Name}}</a> - {{ $s.Name }}
         {{if $s.Online }}
             <span class="badge bg-success float-right d-none d-md-block">ONLINE</span>
         {{ else }}
@@ -168,7 +168,7 @@
                         {{ if lt $ch.Expected 0}}{{Duration $ch.Expected}} ago{{else}}in {{Duration $ch.Expected}}{{end}}
                         {{end}}
                         </td>
-                        <td><a href="/api/checkin/{{$ch.ApiKey}}" data-method="DELETE" data-obj="checkin_{{$ch.Id}}" data-id="{{$ch.Id}}" class="ajax_delete btn btn-sm btn-danger">Delete</a></td>
+                        <td><a href="api/checkin/{{$ch.ApiKey}}" data-method="DELETE" data-obj="checkin_{{$ch.Id}}" data-id="{{$ch.Id}}" class="ajax_delete btn btn-sm btn-danger">Delete</a></td>
                     </tr>
                     {{end}}
                     </tbody>
@@ -231,12 +231,12 @@
 </div>
 {{end}}
 {{define "extra_css"}}
-<link rel="stylesheet" href="/css/flatpickr.min.css">
+<link rel="stylesheet" href="css/flatpickr.min.css">
 {{end}}
 {{define "extra_scripts"}}
 {{$s := .Service}}
-<script src="/js/flatpickr.js"></script>
-<script src="/js/rangePlugin.js"></script>
+<script src="js/flatpickr.js"></script>
+<script src="js/rangePlugin.js"></script>
 <script>
 
 let options = {

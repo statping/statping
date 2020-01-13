@@ -23,6 +23,7 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -50,10 +51,6 @@ var (
 // RunHTTPServer will start a HTTP server on a specific IP and port
 func RunHTTPServer(ip string, port int) error {
 	host := fmt.Sprintf("%v:%v", ip, port)
-
-	if os.Getenv("BASE_PATH") != "" {
-		basePath = "/" + os.Getenv("BASE_PATH")
-	}
 
 	key := utils.FileExists(utils.Directory + "/server.key")
 	cert := utils.FileExists(utils.Directory + "/server.crt")
@@ -220,7 +217,7 @@ func loadTemplate(w http.ResponseWriter, r *http.Request) (*template.Template, e
 // ExecuteResponse will render a HTTP response for the front end user
 func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{}) {
 	if url, ok := redirect.(string); ok {
-		http.Redirect(w, r, basePath+url, http.StatusSeeOther)
+		http.Redirect(w, r, path.Join(basePath, url), http.StatusSeeOther)
 		return
 	}
 	if usingSSL {

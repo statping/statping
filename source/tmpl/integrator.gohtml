@@ -78,7 +78,7 @@
             type: "POST",
             data: sendData,
             success: function (data) {
-                var box = `<div class="alert alert-success" role="alert">Service '${data.output.name}' Added <a href="/service/${data.output.id}" class="badge badge-secondary mt-1 float-right">View</a></div>`;
+                var box = `<div class="alert alert-success" role="alert">Service '${data.output.name}' Added <a href="service/${data.output.id}" class="badge badge-secondary mt-1 float-right">View</a></div>`;
                 $("#imported_area").append(box);
             }
           });

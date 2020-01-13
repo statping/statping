@@ -126,7 +126,7 @@
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control select-input" value="{{ .ApiSecret }}" id="api_secret" readonly>
                                     <small class="form-text text-muted">API Secret is used for read, create, update and delete routes</small>
-                                    <small class="form-text text-muted">You can <a class="confirm_btn" data-msg="Are you sure you want to reset the API keys?" href="/api/renew">Regenerate API Keys</a> if you need to.</small>
+                                    <small class="form-text text-muted">You can <a class="confirm_btn" data-msg="Are you sure you want to reset the API keys?" href="api/renew">Regenerate API Keys</a> if you need to.</small>
                                 </div>
                             </div>
 
@@ -137,7 +137,7 @@
 
                         <div class="card mt-2">
                             <div class="card-body">
-                                <form action="/settings/bulk_import" method="POST" enctype="multipart/form-data" class="form-inline">
+                                <form action="settings/bulk_import" method="POST" enctype="multipart/form-data" class="form-inline">
                                     <div class="form-group col-10">
                                         <input type="file" name="file" class="form-control-file" accept=".csv">
                                     </div>
@@ -156,7 +156,7 @@
                                     <img class="rounded text-center" width="300" height="300" src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl={{ QrAuth }}">
                                 </div>
                                 <a class="btn btn-sm btn-primary" href={{safeURL QrAuth}}>Open in Statping App</a>
-                                <a href="/settings/export" class="btn btn-sm btn-secondary">Export Settings</a>
+                                <a href="settings/export" class="btn btn-sm btn-secondary">Export Settings</a>
                             </div>
                             </div>
                         {{end}}
@@ -165,7 +165,7 @@
                     <div class="tab-pane" id="v-pills-notifications" role="tabpanel" aria-labelledby="v-pills-notifications-tab">
                         <h3>Notifications</h3>
 
-                        <form method="POST" action="/settings">
+                        <form method="POST" action="settings">
 
                             <div class="form-group">
                                 <div class="col-12">
@@ -192,7 +192,7 @@
                         <div class="jumbotron jumbotron-fluid">
                             <div class="text-center col-12">
                                 <h1 class="display-5">Enable Local Assets</h1>
-                                <span class="lead">Customize your status page design by enabling local assets. This will create a 'assets' directory containing all CSS.<p><a href="/settings/build" class="btn btn-primary mt-3"{{if USE_CDN}} disabled{{end}}>Enable Local Assets</a></p></span>
+                                <span class="lead">Customize your status page design by enabling local assets. This will create a 'assets' directory containing all CSS.<p><a href="settings/build" class="btn btn-primary mt-3"{{if USE_CDN}} disabled{{end}}>Enable Local Assets</a></p></span>
                             </div>
                         </div>
                     {{ else }}
@@ -220,7 +220,7 @@
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary btn-block mt-2">Save Style</button>
-                            <a href="/settings/delete_assets" class="btn btn-danger btn-block confirm-btn">Delete All Assets</a>
+                            <a href="settings/delete_assets" class="btn btn-danger btn-block confirm-btn">Delete All Assets</a>
                         </form>
                     {{end}}
                     </div>
@@ -245,7 +245,7 @@
                             {{end}}
                             </tbody>
                         </table>
-                        <a href="/api/clear_cache" class="btn btn-danger btn-block">Clear Cache</a>
+                        <a href="api/clear_cache" class="btn btn-danger btn-block">Clear Cache</a>
                     </div>
                 {{ range .Notifications }}
                 {{$n := .Select}}
@@ -282,7 +282,7 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{ .Name }}</h5>
                                 <p class="card-text">{{ .Description }}</p>
-                                <a href="/plugins/download/{{ .Name }}" class="card-link">Add</a>
+                                <a href="plugins/download/{{ .Name }}" class="card-link">Add</a>
                             </div>
                         </div>
                     {{ end }}
@@ -290,7 +290,7 @@
 
 
                     <div class="tab-pane fade" id="v-pills-backups" role="tabpanel" aria-labelledby="v-pills-backups-tab">
-                        <a href="/backups/create" class="btn btn-primary btn-block">Backup Database</a>
+                        <a href="backups/create" class="btn btn-primary btn-block">Backup Database</a>
                     </div>
 
                 {{ range .Plugins }}

@@ -45,27 +45,31 @@ func Router() *mux.Router {
 		authPass = os.Getenv("AUTH_PASSWORD")
 		r.Use(basicAuthHandler)
 	}
-	if basePath != "/" {
-		r = r.PathPrefix(basePath).Subrouter()
+
+	if os.Getenv("BASE_PATH") != "" {
+		basePath = "/" + os.Getenv("BASE_PATH") + "/"
+		r = r.PathPrefix("/" + os.Getenv("BASE_PATH")).Subrouter()
+		r.Handle("", http.HandlerFunc(indexHandler))
+	} else {
+		r.Handle("/", http.HandlerFunc(indexHandler))
 	}
 
 	r.Use(sendLog)
-	r.Handle("/", http.HandlerFunc(indexHandler))
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
-		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath+"/css/", http.FileServer(http.Dir(dir+"/assets/css"))))
-		r.PathPrefix("/font/").Handler(http.StripPrefix(basePath+"/font/", http.FileServer(http.Dir(dir+"/assets/font"))))
-		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath+"/js/", http.FileServer(http.Dir(dir+"/assets/js"))))
-		r.PathPrefix("/robots.txt").Handler(indexHandler)
-		r.PathPrefix("/favicon.ico").Handler(indexHandler)
-		r.PathPrefix("/banner.png").Handler(indexHandler)
+		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath+"css/", http.FileServer(http.Dir(dir+"/assets/css"))))
+		r.PathPrefix("/font/").Handler(http.StripPrefix(basePath+"font/", http.FileServer(http.Dir(dir+"/assets/font"))))
+		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath+"js/", http.FileServer(http.Dir(dir+"/assets/js"))))
+		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, indexHandler))
+		r.PathPrefix("/favicon.ico").Handler(http.StripPrefix(basePath, indexHandler))
+		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, indexHandler))
 	} else {
-		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath+"/css/", http.FileServer(source.CssBox.HTTPBox())))
-		r.PathPrefix("/font/").Handler(http.StripPrefix(basePath+"/font/", http.FileServer(source.FontBox.HTTPBox())))
-		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath+"/js/", http.FileServer(source.JsBox.HTTPBox())))
-		r.PathPrefix("/robots.txt").Handler(http.FileServer(source.TmplBox.HTTPBox()))
-		r.PathPrefix("/favicon.ico").Handler(http.FileServer(source.TmplBox.HTTPBox()))
-		r.PathPrefix("/banner.png").Handler(http.FileServer(source.TmplBox.HTTPBox()))
+		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath+"css/", http.FileServer(source.CssBox.HTTPBox())))
+		r.PathPrefix("/font/").Handler(http.StripPrefix(basePath+"font/", http.FileServer(source.FontBox.HTTPBox())))
+		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath+"js/", http.FileServer(source.JsBox.HTTPBox())))
+		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
+		r.PathPrefix("/favicon.ico").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
+		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
 	}
 	r.Handle("/charts.js", http.HandlerFunc(renderServiceChartsHandler))
 	r.Handle("/setup", http.HandlerFunc(setupHandler)).Methods("GET")
