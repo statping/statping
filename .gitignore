@@ -15,7 +15,6 @@ html/scss/.sass-cache
 dart-sass
 .sass-cache
 public
-assets
 *.log
 .env
 logs
