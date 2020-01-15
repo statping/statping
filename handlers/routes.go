@@ -114,7 +114,7 @@ func Router() *mux.Router {
 	r.Handle("/group/{id}", http.HandlerFunc(groupViewHandler)).Methods("GET")
 
 	// API Routes
-	r.Handle("/api", authenticated(apiIndexHandler, false))
+	r.Handle("/api", scopedRoute(apiIndexHandler))
 	r.Handle("/api/renew", authenticated(apiRenewHandler, false))
 	r.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
 
@@ -123,7 +123,7 @@ func Router() *mux.Router {
 	r.Handle("/api/integrations/{name}", authenticated(apiIntegrationHandler, false)).Methods("POST")
 
 	// API GROUPS Routes
-	r.Handle("/api/groups", readOnly(apiAllGroupHandler, false)).Methods("GET")
+	r.Handle("/api/groups", scopedRoute(apiAllGroupHandler)).Methods("GET")
 	r.Handle("/api/groups", authenticated(apiCreateGroupHandler, false)).Methods("POST")
 	r.Handle("/api/groups/{id}", readOnly(apiGroupHandler, false)).Methods("GET")
 	r.Handle("/api/groups/{id}", authenticated(apiGroupUpdateHandler, false)).Methods("POST")
@@ -131,9 +131,9 @@ func Router() *mux.Router {
 	r.Handle("/api/reorder/groups", authenticated(apiGroupReorderHandler, false)).Methods("POST")
 
 	// API SERVICE Routes
-	r.Handle("/api/services", http.HandlerFunc(apiAllServicesHandler)).Methods("GET")
+	r.Handle("/api/services", scopedRoute(apiAllServicesHandler)).Methods("GET")
 	r.Handle("/api/services", authenticated(apiCreateServiceHandler, false)).Methods("POST")
-	r.Handle("/api/services/{id}", readOnly(apiServiceHandler, false)).Methods("GET")
+	r.Handle("/api/services/{id}", scopedRoute(apiServiceHandler)).Methods("GET")
 	r.Handle("/api/reorder/services", authenticated(reorderServiceHandler, false)).Methods("POST")
 	r.Handle("/api/services/{id}/running", authenticated(apiServiceRunningHandler, false)).Methods("POST")
 	r.Handle("/api/services/{id}/data", cached("30s", "application/json", apiServiceDataHandler)).Methods("GET")

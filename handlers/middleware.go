@@ -15,6 +15,12 @@ var (
 	authPass string
 )
 
+func scopedRoute(handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		handler(w, r)
+	})
+}
+
 // basicAuthHandler is a middleware to implement HTTP basic authentication using
 // AUTH_USERNAME and AUTH_PASSWORD environment variables
 func basicAuthHandler(next http.Handler) http.Handler {

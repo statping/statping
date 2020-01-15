@@ -23,21 +23,21 @@ import (
 type Service struct {
 	Id                 int64              `gorm:"primary_key;column:id" json:"id"`
 	Name               string             `gorm:"column:name" json:"name"`
-	Domain             string             `gorm:"column:domain" json:"domain" private:"true"`
-	Expected           NullString         `gorm:"column:expected" json:"expected"`
-	ExpectedStatus     int                `gorm:"default:200;column:expected_status" json:"expected_status"`
-	Interval           int                `gorm:"default:30;column:check_interval" json:"check_interval"`
-	Type               string             `gorm:"column:check_type" json:"type"`
-	Method             string             `gorm:"column:method" json:"method"`
-	PostData           NullString         `gorm:"column:post_data" json:"post_data"`
-	Port               int                `gorm:"not null;column:port" json:"port"`
-	Timeout            int                `gorm:"default:30;column:timeout" json:"timeout"`
+	Domain             string             `gorm:"column:domain" json:"domain" private:"true" scope:"user,admin"`
+	Expected           NullString         `gorm:"column:expected" json:"expected" scope:"user,admin"`
+	ExpectedStatus     int                `gorm:"default:200;column:expected_status" json:"expected_status" scope:"user,admin"`
+	Interval           int                `gorm:"default:30;column:check_interval" json:"check_interval" scope:"user,admin"`
+	Type               string             `gorm:"column:check_type" json:"type" scope:"user,admin"`
+	Method             string             `gorm:"column:method" json:"method" scope:"user,admin"`
+	PostData           NullString         `gorm:"column:post_data" json:"post_data" scope:"user,admin"`
+	Port               int                `gorm:"not null;column:port" json:"port" scope:"user,admin"`
+	Timeout            int                `gorm:"default:30;column:timeout" json:"timeout" scope:"user,admin"`
 	Order              int                `gorm:"default:0;column:order_id" json:"order_id"`
-	AllowNotifications NullBool           `gorm:"default:true;column:allow_notifications" json:"allow_notifications"`
-	VerifySSL          NullBool           `gorm:"default:false;column:verify_ssl" json:"verify_ssl"`
+	AllowNotifications NullBool           `gorm:"default:true;column:allow_notifications" json:"allow_notifications" scope:"user,admin"`
+	VerifySSL          NullBool           `gorm:"default:false;column:verify_ssl" json:"verify_ssl" scope:"user,admin"`
 	Public             NullBool           `gorm:"default:true;column:public" json:"public"`
 	GroupId            int                `gorm:"default:0;column:group_id" json:"group_id"`
-	Headers            NullString         `gorm:"column:headers" json:"headers"`
+	Headers            NullString         `gorm:"column:headers" json:"headers" scope:"user,admin"`
 	Permalink          NullString         `gorm:"column:permalink" json:"permalink"`
 	CreatedAt          time.Time          `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt          time.Time          `gorm:"column:updated_at" json:"updated_at"`
@@ -56,8 +56,8 @@ type Service struct {
 	SuccessNotified    bool               `gorm:"-" json:"-"` // Is 'true' if the user has already be informed that the Services now again available
 	LastStatusCode     int                `gorm:"-" json:"status_code"`
 	LastOnline         time.Time          `gorm:"-" json:"last_success"`
-	Failures           []FailureInterface `gorm:"-" json:"failures,omitempty"`
-	Checkins           []CheckinInterface `gorm:"-" json:"checkins,omitempty"`
+	Failures           []FailureInterface `gorm:"-" json:"failures,omitempty" scope:"user,admin"`
+	Checkins           []CheckinInterface `gorm:"-" json:"checkins,omitempty" scope:"user,admin"`
 }
 
 // BeforeCreate for Service will set CreatedAt to UTC

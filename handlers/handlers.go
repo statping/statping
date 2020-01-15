@@ -294,43 +294,94 @@ func expandServices(s []types.ServiceInterface) []*types.Service {
 	return services
 }
 
-func returnSafeJson(w http.ResponseWriter, r *http.Request, input interface{}) {
-	allData := make([]map[string]*json.RawMessage, 0, 1)
-	s := reflect.ValueOf(input)
-	for i := 0; i < s.Len(); i++ {
-		obj := s.Index(i)
-		allData = append(allData, safeJsonKeys(obj))
+func toSafeJson(input interface{}) map[string]interface{} {
+	thisData := make(map[string]interface{})
+	t := reflect.TypeOf(input)
+	elem := reflect.ValueOf(input)
+
+	d, _ := json.Marshal(input)
+
+	var raw map[string]*json.RawMessage
+	json.Unmarshal(d, &raw)
+
+	if t.Kind() == reflect.Ptr {
+		input = &input
 	}
-	returnJson(allData, w, r)
+
+	fmt.Println("Type:", t.Name())
+	fmt.Println("Kind:", t.Kind())
+
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+
+		// Get the field tag value
+		tag := field.Tag.Get("scope")
+		jsonTag := field.Tag.Get("json")
+
+		tags := strings.Split(tag, ",")
+
+		if jsonTag == "" || jsonTag == "-" {
+			continue
+		}
+
+		trueValue := elem.Field(i).Interface()
+		trueValue = fixValue(field, trueValue)
+
+		if tag == "" {
+			thisData[jsonTag] = trueValue
+			continue
+		}
+
+		if isPublic(tags) {
+			thisData[jsonTag] = trueValue
+		}
+
+		fmt.Printf("%d. %v (%v), tags: '%v'\n", i, field.Name, field.Type.Name(), tags)
+	}
+	return thisData
 }
 
-func safeJsonKeys(in reflect.Value) map[string]*json.RawMessage {
-
-	thisObj := in.Elem().Interface()
-	nn := make(map[string]*json.RawMessage)
-
-	v := reflect.ValueOf(thisObj)
-	typeOfS := v.Type()
-	fmt.Println("fields: ", v.NumField())
-	for i := 0; i < v.NumField(); i++ {
-		inter := v.Field(i).Interface()
-		fmt.Println(v.Field(i).CanSet())
-		if typeOfS.Field(i).Type.String() == "types.NullString" {
-			ggg := inter.(types.NullString)
-			fmt.Println("OKKOKOK: ", ggg)
-			v.Field(i).SetString(ggg.String)
+func returnSafeJson(w http.ResponseWriter, r *http.Request, input interface{}) {
+	if reflect.ValueOf(input).Kind() == reflect.Slice {
+		alldata := make([]map[string]interface{}, 0, 1)
+		s := reflect.ValueOf(input)
+		for i := 0; i < s.Len(); i++ {
+			alldata = append(alldata, toSafeJson(s.Index(i).Interface()))
 		}
-		fmt.Printf("Field: %s\tValue: %v\n", typeOfS.Field(i).Type.String(), v.Field(i).Interface())
+		returnJson(alldata, w, r)
+		return
 	}
+	returnJson(input, w, r)
+	return
+}
 
-	data, _ := json.Marshal(thisObj)
-
-	json.Unmarshal(data, &nn)
-	removeKeys := safeTypes(thisObj)
-	for _, k := range removeKeys {
-		delete(nn, k)
+func fixValue(field reflect.StructField, val interface{}) interface{} {
+	typeName := field.Type.Name()
+	switch typeName {
+	case "NullString":
+		nullItem := val.(types.NullString)
+		return nullItem.String
+	case "NullBool":
+		nullItem := val.(types.NullBool)
+		return nullItem.Bool
+	case "NullFloat64":
+		nullItem := val.(types.NullFloat64)
+		return nullItem.Float64
+	case "NullInt64":
+		nullItem := val.(types.NullInt64)
+		return nullItem.Int64
+	default:
+		return val
 	}
-	return nn
+}
+
+func isPublic(tags []string) bool {
+	for _, v := range tags {
+		if v == "public" {
+			return true
+		}
+	}
+	return false
 }
 
 // error404Handler is a HTTP handler for 404 error pages

@@ -13,8 +13,16 @@ class Api {
     return axios.get('/api/services').then(response => (response.data))
   }
 
+  async service (id) {
+    return axios.get('/api/services/'+id).then(response => (response.data))
+  }
+
   async groups () {
     return axios.get('/api/groups').then(response => (response.data))
+  }
+
+  async group (id) {
+    return axios.get('/api/groups/'+id).then(response => (response.data))
   }
 
 }

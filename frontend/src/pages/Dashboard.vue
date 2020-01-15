@@ -1,11 +1,8 @@
 <template>
-    <div class="container col-md-7 col-sm-12 mt-2 sm-container">
+    <div v-show="core" class="container col-md-7 col-sm-12 mt-2 sm-container">
 
         <Header :core="core"/>
 
-        <Group/>
-        <Group/>
-        <Group/>
         <div v-for="(group, index) in groups" v-bind:key="index">
             <Group :group=group />
         </div>
@@ -29,6 +26,7 @@ import ServiceBlock from '../components/Service/ServiceBlock.vue'
 import MessageBlock from "../components/Index/MessageBlock";
 import Group from "../components/Index/Group";
 import Header from "../components/Index/Header";
+import Api from "../components/API"
 
 export default {
   name: 'Dashboard',
@@ -46,25 +44,13 @@ export default {
     }
   },
   beforeMount() {
-    this.getAPI()
-    this.getGroups()
-    this.getServices()
+    this.loadAll()
   },
   methods: {
-    getAPI: function() {
-      axios
-        .get('/api')
-        .then(response => (this.core = response.data))
-    },
-    getServices: function() {
-      axios
-        .get('/api/services')
-        .then(response => (this.services = response.data))
-    },
-    getGroups: function() {
-      axios
-        .get('/api/groups')
-        .then(response => (this.groups = response.data))
+    async loadAll () {
+      this.core = await Api.root()
+      this.groups = await Api.groups()
+      this.services = await Api.services()
     }
   }
 }

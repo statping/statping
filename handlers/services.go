@@ -294,13 +294,21 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
-	admin := IsAdmin(r)
+	isAdmin := IsAdmin(r)
 	services := core.Services()
-	if !admin {
-		returnSafeJson(w, r, expandServices(services))
+	if !isAdmin {
+		returnSafeJson(w, r, joinServices(services))
 		return
 	}
 	returnJson(services, w, r)
+}
+
+func joinServices(srvs []types.ServiceInterface) []types.Service {
+	var services []types.Service
+	for _, v := range srvs {
+		services = append(services, *v.Select())
+	}
+	return services
 }
 
 func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
