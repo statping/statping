@@ -25,15 +25,14 @@
 </template>
 
 <script>
-import ServiceBlock from '../Service/ServiceBlock.vue'
-import MessageBlock from "../Index/MessageBlock";
-import Group from "../Index/Group";
-import Header from "../Index/Header";
-const axios = require('axios');
+import ServiceBlock from '../components/Service/ServiceBlock.vue'
+import MessageBlock from "../components/Index/MessageBlock";
+import Group from "../components/Index/Group";
+import Header from "../components/Index/Header";
 
 
 export default {
-  name: 'Index',
+  name: 'Settings',
   components: {
     Header,
     Group,

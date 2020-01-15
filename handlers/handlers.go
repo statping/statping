@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"reflect"
 	"strings"
 	"time"
 
@@ -270,6 +271,66 @@ func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 func returnJson(d interface{}, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(d)
+}
+
+func safeTypes(obj interface{}) []string {
+	if reflect.ValueOf(obj).Kind() == reflect.Ptr {
+		obj = &obj
+	}
+	switch v := obj.(type) {
+	case types.Service:
+		return types.SafeService
+	default:
+		fmt.Printf("%T\n", v)
+	}
+	return nil
+}
+
+func expandServices(s []types.ServiceInterface) []*types.Service {
+	var services []*types.Service
+	for _, v := range s {
+		services = append(services, v.Select())
+	}
+	return services
+}
+
+func returnSafeJson(w http.ResponseWriter, r *http.Request, input interface{}) {
+	allData := make([]map[string]*json.RawMessage, 0, 1)
+	s := reflect.ValueOf(input)
+	for i := 0; i < s.Len(); i++ {
+		obj := s.Index(i)
+		allData = append(allData, safeJsonKeys(obj))
+	}
+	returnJson(allData, w, r)
+}
+
+func safeJsonKeys(in reflect.Value) map[string]*json.RawMessage {
+
+	thisObj := in.Elem().Interface()
+	nn := make(map[string]*json.RawMessage)
+
+	v := reflect.ValueOf(thisObj)
+	typeOfS := v.Type()
+	fmt.Println("fields: ", v.NumField())
+	for i := 0; i < v.NumField(); i++ {
+		inter := v.Field(i).Interface()
+		fmt.Println(v.Field(i).CanSet())
+		if typeOfS.Field(i).Type.String() == "types.NullString" {
+			ggg := inter.(types.NullString)
+			fmt.Println("OKKOKOK: ", ggg)
+			v.Field(i).SetString(ggg.String)
+		}
+		fmt.Printf("Field: %s\tValue: %v\n", typeOfS.Field(i).Type.String(), v.Field(i).Interface())
+	}
+
+	data, _ := json.Marshal(thisObj)
+
+	json.Unmarshal(data, &nn)
+	removeKeys := safeTypes(thisObj)
+	for _, k := range removeKeys {
+		delete(nn, k)
+	}
+	return nn
 }
 
 // error404Handler is a HTTP handler for 404 error pages

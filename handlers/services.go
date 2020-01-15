@@ -294,7 +294,12 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
+	admin := IsAdmin(r)
 	services := core.Services()
+	if !admin {
+		returnSafeJson(w, r, expandServices(services))
+		return
+	}
 	returnJson(services, w, r)
 }
 

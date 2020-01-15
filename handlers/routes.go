@@ -131,7 +131,7 @@ func Router() *mux.Router {
 	r.Handle("/api/reorder/groups", authenticated(apiGroupReorderHandler, false)).Methods("POST")
 
 	// API SERVICE Routes
-	r.Handle("/api/services", readOnly(apiAllServicesHandler, false)).Methods("GET")
+	r.Handle("/api/services", http.HandlerFunc(apiAllServicesHandler)).Methods("GET")
 	r.Handle("/api/services", authenticated(apiCreateServiceHandler, false)).Methods("POST")
 	r.Handle("/api/services/{id}", readOnly(apiServiceHandler, false)).Methods("GET")
 	r.Handle("/api/reorder/services", authenticated(reorderServiceHandler, false)).Methods("POST")

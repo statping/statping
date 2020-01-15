@@ -23,7 +23,7 @@ import (
 type Service struct {
 	Id                 int64              `gorm:"primary_key;column:id" json:"id"`
 	Name               string             `gorm:"column:name" json:"name"`
-	Domain             string             `gorm:"column:domain" json:"domain"`
+	Domain             string             `gorm:"column:domain" json:"domain" private:"true"`
 	Expected           NullString         `gorm:"column:expected" json:"expected"`
 	ExpectedStatus     int                `gorm:"default:200;column:expected_status" json:"expected_status"`
 	Interval           int                `gorm:"default:30;column:check_interval" json:"check_interval"`

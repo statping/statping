@@ -17,6 +17,9 @@ release: dev-deps
 	gpg --import statping.gpg
 	make build-all
 
+frontend:
+	cd frontend && yarn serve
+
 # build and push the images to docker hub
 docker: docker-build-all docker-publish-all
 
@@ -371,5 +374,5 @@ heroku:
 checkall:
 	golangci-lint run ./...
 
-.PHONY: all build build-all build-alpine test-all test test-api docker
+.PHONY: all build build-all build-alpine test-all test test-api docker frontend
 .SILENT: travis_s3_creds
