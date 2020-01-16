@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"github.com/99designs/gqlgen/handler"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/handlers/graphql"
 	"github.com/hunterlong/statping/source"
@@ -115,6 +114,8 @@ func Router() *mux.Router {
 
 	// API Routes
 	r.Handle("/api", scopedRoute(apiIndexHandler))
+	r.Handle("/api/login", http.HandlerFunc(apiLoginHandler)).Methods("POST")
+	r.Handle("/api/logout", http.HandlerFunc(logoutHandler))
 	r.Handle("/api/renew", authenticated(apiRenewHandler, false))
 	r.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
 
@@ -195,10 +196,5 @@ func resetRouter() {
 }
 
 func resetCookies() {
-	if core.CoreApp != nil {
-		cookie := fmt.Sprintf("%v_%v", core.CoreApp.ApiSecret, utils.Now().Nanosecond())
-		sessionStore = sessions.NewCookieStore([]byte(cookie))
-	} else {
-		sessionStore = sessions.NewCookieStore([]byte("secretinfo"))
-	}
+	jwtKey = fmt.Sprintf("%v_%v", core.CoreApp.ApiSecret, utils.Now().Nanosecond())
 }

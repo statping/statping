@@ -1,14 +1,18 @@
 <template>
     <footer>
         <div class="footer text-center mb-4 p-2">
-            <a href="https://github.com/hunterlong/statping" target="_blank">Statping 0.80.70 made with <i class="text-danger fas fa-heart"></i></a> | <a href="dashboard">Dashboard</a>
+            <a href="https://github.com/hunterlong/statping" target="_blank">Statping {{version}} made with <i class="text-danger fas fa-heart"></i></a> |
+            <router-link to="/dashboard">Dashboard</router-link>
         </div>
     </footer>
 </template>
 
 <script>
 export default {
-  name: 'Footer'
+  name: 'Footer',
+  props: {
+    version: String
+  }
 }
 </script>
 

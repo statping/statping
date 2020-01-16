@@ -11,6 +11,7 @@
     "apexcharts": "^3.15.0",
     "axios": "^0.19.1",
     "core-js": "^3.4.4",
+    "querystring": "^0.2.0",
     "vue": "^2.6.10",
     "vue-apexcharts": "^1.5.2",
     "vue-router": "^3.1.3"

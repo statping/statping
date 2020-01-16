@@ -20,6 +20,9 @@ release: dev-deps
 frontend:
 	cd frontend && yarn serve
 
+frontend-build:
+	cd frontend && rm -rf dist && yarn build
+
 # build and push the images to docker hub
 docker: docker-build-all docker-publish-all
 

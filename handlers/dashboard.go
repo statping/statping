@@ -18,12 +18,14 @@ package handlers
 import (
 	"bytes"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func dashboardHandler(w http.ResponseWriter, r *http.Request) {
@@ -36,19 +38,12 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	if sessionStore == nil {
-		resetCookies()
-	}
-	session, _ := sessionStore.Get(r, cookieKey)
 	form := parseForm(r)
 	username := form.Get("username")
 	password := form.Get("password")
 	user, auth := core.AuthUser(username, password)
 	if auth {
-		session.Values["authenticated"] = true
-		session.Values["user_id"] = user.Id
-		session.Values["admin"] = user.Admin.Bool
-		session.Save(r, w)
+		setJwtToken(user, w)
 		utils.Log.Infoln(fmt.Sprintf("User %v logged in from IP %v", user.Username, r.RemoteAddr))
 		http.Redirect(w, r, basePath+"dashboard", http.StatusSeeOther)
 	} else {
@@ -58,11 +53,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
-	session, _ := sessionStore.Get(r, cookieKey)
-	session.Values["authenticated"] = false
-	session.Values["admin"] = false
-	session.Values["user_id"] = 0
-	session.Save(r, w)
+	removeJwtToken(w)
 	http.Redirect(w, r, basePath, http.StatusSeeOther)
 }
 
@@ -116,4 +107,64 @@ func exportHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.ServeContent(w, r, "export.json", utils.Now(), bytes.NewReader(export))
 
+}
+
+type JwtClaim struct {
+	Username string `json:"username"`
+	Admin    bool   `json:"admin"`
+	jwt.StandardClaims
+}
+
+func removeJwtToken(w http.ResponseWriter) {
+	http.SetCookie(w, &http.Cookie{
+		Name:    cookieKey,
+		Value:   "",
+		Expires: time.Now().UTC(),
+	})
+}
+
+func setJwtToken(user *core.User, w http.ResponseWriter) (*JwtClaim, string) {
+	expirationTime := time.Now().Add(24 * time.Hour)
+	jwtClaim := &JwtClaim{
+		user.Username,
+		user.Admin.Bool,
+		jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		}}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaim)
+	tokenString, err := token.SignedString([]byte(jwtKey))
+	if err != nil {
+		utils.Log.Errorln("error setting token: ", err)
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:    cookieKey,
+		Value:   tokenString,
+		Expires: expirationTime,
+	})
+	return jwtClaim, tokenString
+}
+
+func apiLoginHandler(w http.ResponseWriter, r *http.Request) {
+	form := parseForm(r)
+	username := form.Get("username")
+	password := form.Get("password")
+	user, auth := core.AuthUser(username, password)
+	if auth {
+		utils.Log.Infoln(fmt.Sprintf("User %v logged in from IP %v", user.Username, r.RemoteAddr))
+		_, token := setJwtToken(user, w)
+
+		resp := struct {
+			Token string `json:"token"`
+		}{
+			token,
+		}
+		returnJson(resp, w, r)
+	} else {
+		resp := struct {
+			Error string `json:"error"`
+		}{
+			"incorrect authentication",
+		}
+		returnJson(resp, w, r)
+	}
 }

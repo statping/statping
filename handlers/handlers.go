@@ -20,6 +20,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"html/template"
 	"net/http"
 	"os"
@@ -28,7 +29,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gorilla/sessions"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
@@ -41,12 +41,12 @@ const (
 )
 
 var (
-	sessionStore *sessions.CookieStore
-	httpServer   *http.Server
-	usingSSL     bool
-	mainTmpl     = `{{define "main" }} {{ template "base" . }} {{ end }}`
-	templates    = []string{"base.gohtml", "head.gohtml", "nav.gohtml", "footer.gohtml", "scripts.gohtml", "form_service.gohtml", "form_notifier.gohtml", "form_integration.gohtml", "form_group.gohtml", "form_user.gohtml", "form_checkin.gohtml", "form_message.gohtml"}
-	javascripts  = []string{"charts.js", "chart_index.js"}
+	jwtKey      string
+	httpServer  *http.Server
+	usingSSL    bool
+	mainTmpl    = `{{define "main" }} {{ template "base" . }} {{ end }}`
+	templates   = []string{"base.gohtml", "head.gohtml", "nav.gohtml", "footer.gohtml", "scripts.gohtml", "form_service.gohtml", "form_notifier.gohtml", "form_integration.gohtml", "form_group.gohtml", "form_user.gohtml", "form_checkin.gohtml", "form_message.gohtml"}
+	javascripts = []string{"charts.js", "chart_index.js"}
 )
 
 // RunHTTPServer will start a HTTP server on a specific IP and port
@@ -137,9 +137,6 @@ func IsFullAuthenticated(r *http.Request) bool {
 	if core.SetupMode {
 		return false
 	}
-	if sessionStore == nil {
-		return true
-	}
 	var token string
 	tokens, ok := r.Header["Authorization"]
 	if ok && len(tokens) >= 1 {
@@ -152,19 +149,44 @@ func IsFullAuthenticated(r *http.Request) bool {
 	return IsAdmin(r)
 }
 
+func getJwtAuth(r *http.Request) (bool, string) {
+	c, err := r.Cookie(cookieKey)
+	if err != nil {
+		utils.Log.Errorln(err)
+		if err == http.ErrNoCookie {
+			return false, ""
+		}
+		return false, ""
+	}
+	tknStr := c.Value
+	var claims JwtClaim
+	tkn, err := jwt.ParseWithClaims(tknStr, &claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(jwtKey), nil
+	})
+	if err != nil {
+		utils.Log.Errorln("error getting jwt token: ", err)
+		if err == jwt.ErrSignatureInvalid {
+			return false, ""
+		}
+		return false, ""
+	}
+	if !tkn.Valid {
+		utils.Log.Errorln("token is not valid")
+		return false, ""
+	}
+	return claims.Admin, claims.Username
+}
+
 // IsAdmin returns true if the user session is an administrator
 func IsAdmin(r *http.Request) bool {
 	if core.SetupMode {
 		return false
 	}
-	session, err := sessionStore.Get(r, cookieKey)
-	if err != nil {
+	admin, username := getJwtAuth(r)
+	if username == "" {
 		return false
 	}
-	if session.Values["admin"] == nil {
-		return false
-	}
-	return session.Values["admin"].(bool)
+	return admin
 }
 
 // IsUser returns true if the user is registered
@@ -175,14 +197,9 @@ func IsUser(r *http.Request) bool {
 	if os.Getenv("GO_ENV") == "test" {
 		return true
 	}
-	session, err := sessionStore.Get(r, cookieKey)
-	if err != nil {
-		return false
-	}
-	if session.Values["authenticated"] == nil {
-		return false
-	}
-	return session.Values["authenticated"].(bool)
+	ff, username := getJwtAuth(r)
+	fmt.Println(ff, username)
+	return username != ""
 }
 
 func loadTemplate(w http.ResponseWriter, r *http.Request) (*template.Template, error) {

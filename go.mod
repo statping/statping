@@ -9,6 +9,7 @@ require (
 	github.com/agnivade/levenshtein v1.0.2 // indirect
 	github.com/ararog/timeago v0.0.0-20160328174124-e9969cf18b8d
 	github.com/daaku/go.zipexe v1.0.1 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v1.13.1
 	github.com/docker/go-connections v0.4.0 // indirect

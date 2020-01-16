@@ -1,5 +1,8 @@
 import axios from 'axios'
 
+const qs = require('querystring')
+const tokenKey = "statping_user";
+
 class Api {
   constructor() {
 
@@ -21,8 +24,50 @@ class Api {
     return axios.get('/api/groups').then(response => (response.data))
   }
 
+  async users () {
+    return axios.get('/api/users').then(response => (response.data))
+  }
+
+  async messages () {
+    return axios.get('/api/messages').then(response => (response.data))
+  }
+
   async group (id) {
     return axios.get('/api/groups/'+id).then(response => (response.data))
+  }
+
+  async notifiers () {
+    return axios.get('/api/notifiers').then(response => (response.data))
+  }
+
+  async login (username, password) {
+    const f = {username: username, password: password}
+    return axios.post('/api/login', qs.stringify(f))
+      .then(response => (response.data))
+  }
+
+  async logout () {
+    await axios.get('/api/logout').then(response => (response.data))
+    return localStorage.removeItem(tokenKey)
+  }
+
+  saveToken (username, token) {
+    const user = {username: username, token: token}
+    localStorage.setItem(tokenKey, JSON.stringify(user));
+    return user
+  }
+
+  token () {
+    return JSON.parse(localStorage.getItem(tokenKey));
+  }
+
+  authToken () {
+    let user = JSON.parse(localStorage.getItem(tokenKey));
+    if (user && user.token) {
+      return { 'Authorization': 'Bearer ' + user.token };
+    } else {
+      return {};
+    }
   }
 
 }

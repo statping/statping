@@ -3,7 +3,8 @@
         <div class="card">
             <div class="card-body">
                 <div class="col-12">
-                    <h4 class="mt-3"><a href="service/1">{{service.name}}</a>
+                    <h4 class="mt-3">
+                        <router-link :to="`/service/${service.id}`">{{service.name}}</router-link>
                         <span class="badge bg-success float-right">{{service.online ? "ONLINE" : "OFFLINE"}}</span>
                     </h4>
 
@@ -34,7 +35,7 @@
                     <span class="d-none d-md-inline">Online, last Failure was Wednesday 1:16:49PM, Dec 18 2019</span>
                 </div>
                 <div class="col-sm-12 col-md-2">
-                    <a href="service/1" class="btn btn-success btn-sm float-right dyn-dark btn-block">View Service</a>
+                    <router-link :to="`/service/${service.id}`" class="btn btn-success btn-sm float-right dyn-dark btn-block">View Service</router-link>
                 </div>
             </div>
 

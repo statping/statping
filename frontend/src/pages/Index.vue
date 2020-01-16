@@ -22,13 +22,13 @@
 </template>
 
 <script>
-import ServiceBlock from '../components/Service/ServiceBlock.vue'
-import MessageBlock from "../components/Index/MessageBlock";
-import Group from "../components/Index/Group";
-import Header from "../components/Index/Header";
-import Api from "../components/API"
+  import ServiceBlock from '../components/Service/ServiceBlock.vue'
+  import MessageBlock from "../components/Index/MessageBlock";
+  import Group from "../components/Index/Group";
+  import Header from "../components/Index/Header";
+  import Api from "../components/API"
 
-export default {
+  export default {
   name: 'Index',
   components: {
     Header,
@@ -41,13 +41,19 @@ export default {
       services: null,
       groups: null,
       core: null,
+      auth: null
     }
   },
-  beforeMount() {
+  created() {
+    this.auth = Api.authToken()
+    this.core = Api.root()
+  },
+  mounted() {
     this.loadAll()
   },
   methods: {
     async loadAll () {
+      this.auth = Api.authToken()
       this.core = await Api.root()
       this.groups = await Api.groups()
       this.services = await Api.services()
