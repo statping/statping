@@ -41,6 +41,9 @@ export default new Vuex.Store({
         groupById: (state) => (id) => {
             return state.groups.find(g => g.id === id)
         },
+        cleanGroups: (state) => () => {
+          return state.groups.filter(g => g.name !== '')
+        },
         userById: (state) => (id) => {
             return state.users.find(u => u.id === id)
         },

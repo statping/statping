@@ -10,6 +10,11 @@
   },
   "dependencies": {
     "@babel/polyfill": "~7.2",
+    "@fortawesome/fontawesome-free-solid": "^5.1.0-3",
+    "@fortawesome/fontawesome-svg-core": "^1.2.26",
+    "@fortawesome/free-brands-svg-icons": "^5.12.0",
+    "@fortawesome/free-solid-svg-icons": "^5.12.0",
+    "@fortawesome/vue-fontawesome": "^0.1.9",
     "apexcharts": "^3.15.0",
     "axios": "^0.19.1",
     "core-js": "^3.4.4",

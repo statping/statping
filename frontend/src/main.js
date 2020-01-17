@@ -4,6 +4,15 @@ import VueRouter from 'vue-router'
 import App from '@/App.vue'
 import store from '@/store'
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
+import { fas } from '@fortawesome/fontawesome-free-solid';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+library.add(fas)
+
+Vue.component('font-awesome-icon', FontAwesomeIcon)
+
+
 const Index = () => import("@/pages/Index");
 const Dashboard = () => import("@/pages/Dashboard");
 const Login = () => import("@/pages/Login");
@@ -13,6 +22,7 @@ const Service = () => import("@/pages/Service");
 
 require("@/assets/css/bootstrap.min.css")
 require("@/assets/css/base.css")
+
 
 // require("./assets/js/bootstrap.min")
 // require("./assets/js/flatpickr")
