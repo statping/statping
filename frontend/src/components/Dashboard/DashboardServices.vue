@@ -18,8 +18,8 @@
 <template>
     <div>
     <div class="col-12">
-        <h1 class="text-black-50">Services <a href="service/create" class="btn btn-outline-success mt-1 float-right">
-            <i class="fas fa-plus"></i> Create</a>
+        <h1 class="text-black-50">Services
+            <router-link to="/service/create" class="btn btn-outline-success mt-1 float-right"><i class="fas fa-plus"></i> Create</router-link>
         </h1>
         <table class="table">
             <thead>
@@ -33,7 +33,7 @@
             </thead>
             <tbody class="sortable" id="services_table">
 
-            <tr v-for="(service, index) in services" v-bind:key="index">
+            <tr v-for="(service, index) in $store.getters.services" v-bind:key="index">
                 <td><span class="drag_icon d-none d-md-inline"><i class="fas fa-bars"></i></span> {{service.name}}</td>
                 <td class="d-none d-md-table-cell"><span class="badge badge-success">ONLINE</span>
                     <i class="toggle-service fas fa-toggle-on text-success" data-online="true" data-id="1"></i>
@@ -67,7 +67,7 @@
             </thead>
             <tbody class="sortable_groups" id="groups_table">
 
-            <tr v-for="(group, index) in groups" v-bind:key="index">
+            <tr v-for="(group, index) in $store.getters.groups" v-bind:key="index">
                 <td><span class="drag_icon d-none d-md-inline"><i class="fas fa-bars"></i></span>{{group.name}}</td>
                 <td></td>
                 <td><span class="badge badge-secondary">PRIVATE</span></td>
@@ -123,10 +123,6 @@
 
 export default {
   name: 'DashboardServices',
-  props: {
-    services: Array,
-    groups: Array,
-  },
   data () {
     return {
 

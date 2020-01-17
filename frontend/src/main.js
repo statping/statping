@@ -1,15 +1,18 @@
 import Vue from 'vue'
-import App from './App.vue'
 import VueRouter from 'vue-router'
-import Index from "./pages/Index";
-import Dashboard from "./pages/Dashboard";
-import Login from "./pages/Login";
-import Settings from "./pages/Settings";
-import Services from "./pages/Services";
-import Service from "./pages/Service";
 
-require("./assets/css/bootstrap.min.css")
-require("./assets/css/base.css")
+import App from '@/App.vue'
+import store from '@/store'
+
+const Index = () => import("@/pages/Index");
+const Dashboard = () => import("@/pages/Dashboard");
+const Login = () => import("@/pages/Login");
+const Settings = () => import("@/pages/Settings");
+const Services = () => import("@/pages/Services");
+const Service = () => import("@/pages/Service");
+
+require("@/assets/css/bootstrap.min.css")
+require("@/assets/css/base.css")
 
 // require("./assets/js/bootstrap.min")
 // require("./assets/js/flatpickr")
@@ -27,7 +30,8 @@ const routes = [
     path: '/dashboard',
     name: 'Dashboard',
     component: Dashboard,
-    alias: ['/dashboard/settings', '/dashboard/services', '/dashboard/messages', '/dashboard/groups', '/dashboard/users', '/dashboard/logs', '/dashboard/help']
+    alias: ['/dashboard/settings', '/dashboard/services', '/dashboard/messages', '/dashboard/groups', '/dashboard/users', '/dashboard/logs', '/dashboard/help',
+        '/service/create']
   },
   {
     path: '/login',
@@ -63,5 +67,6 @@ Vue.use(VueRouter);
 Vue.config.productionTip = false
 new Vue({
   router,
+  store,
   render: h => h(App),
 }).$mount('#app')

@@ -30,9 +30,11 @@
             </thead>
             <tbody>
 
-            <tr v-for="(message, index) in messages" v-bind:key="index">
+            <tr v-for="(message, index) in $store.getters.messages" v-bind:key="index">
                 <td>{{message.title}}</td>
-                <td class="d-none d-md-table-cell"><a href="service/1">{{message.service}}</a></td>
+                <td class="d-none d-md-table-cell">
+                    <router-link to="/service/${service(message.service).id}">{{service(message.service).name}}</router-link>
+                </td>
                 <td class="d-none d-md-table-cell">{{message.start_on}}</td>
                 <td class="text-right">
                     <div class="btn-group">
@@ -162,15 +164,15 @@
   name: 'DashboardMessages',
   data () {
     return {
-        messages: null
+
     }
   },
   created() {
-    this.getMessages()
+
   },
   methods: {
-    async getMessages () {
-      this.messages = await Api.messages()
+    service (id) {
+        return this.$store.getters.serviceById(id)
     }
   }
 }

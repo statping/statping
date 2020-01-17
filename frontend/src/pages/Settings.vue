@@ -12,7 +12,7 @@
 
                     <h6 class="mt-4 text-muted">Notifiers</h6>
 
-                    <a v-for="(notifier, index) in notifiers" v-bind:key="index" v-on:click="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" data-toggle="pill" v-bind:href="`#v-pills-${notifier.method.toLowerCase()}`" role="tab" v-bind:aria-controls="`v-pills-${notifier.method.toLowerCase()}`" aria-selected="false"><i class="fas fa-terminal"></i> {{notifier.method}}</a>
+                    <a v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="index" v-on:click="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" data-toggle="pill" v-bind:href="`#v-pills-${notifier.method.toLowerCase()}`" role="tab" v-bind:aria-controls="`v-pills-${notifier.method.toLowerCase()}`" aria-selected="false"><i class="fas fa-terminal"></i> {{notifier.method}}</a>
 
                     <h6 class="mt-4 text-muted">Integrations (beta)</h6>
 
@@ -28,98 +28,8 @@
 
                 <div class="tab-content" id="v-pills-tabContent">
                     <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-home-tab'), show: liClass('v-pills-home-tab')}" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
-                        <form method="POST" action="settings">
-                            <div class="form-group">
-                                <label for="project">Project Name</label>
-                                <input type="text" name="project" class="form-control" value="Statup Demo" id="project" placeholder="Great Uptime">
-                            </div>
 
-                            <div class="form-group">
-                                <label for="description">Project Description</label>
-                                <input type="text" name="description" class="form-control" value="An Awesome Demo of Statping running on Docker" id="description" placeholder="Great Uptime">
-                            </div>
-
-                            <div class="form-group row">
-                                <div class="col-8 col-sm-9">
-                                    <label for="domain">Domain</label>
-                                    <input type="url" name="domain" class="form-control" value="https://demo.statping.com" id="domain">
-                                </div>
-                                <div class="col-4 col-sm-3 mt-sm-1 mt-0">
-                                    <label for="enable_cdn" class="d-inline d-sm-none">Enable CDN</label>
-                                    <label for="enable_cdn" class="d-none d-sm-block">Enable CDN</label>
-                                    <span class="switch">
-                                        <input type="checkbox" name="enable_cdn-option" class="switch" id="switch-normal"  disabled>
-                                        <label for="switch-normal" class="mt-2 mt-sm-0"></label>
-                                    </span>
-                                    <input type="hidden" name="enable_cdn" id="switch-normal-value" value="false">
-                                </div>
-                            </div>
-
-
-
-                            <div class="form-group">
-                                <label for="footer">Custom Footer</label>
-                                <textarea rows="4" name="footer" class="form-control" id="footer"></textarea>
-                                <small class="form-text text-muted">HTML is allowed inside the footer</small>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="timezone">Timezone</label><span class="mt-1 small float-right">Current: Wednesday 08:03:24 PM</span>
-                                <select class="form-control" name="timezone" id="timezone">
-                                    <option value="-12.0" >(GMT -12:00) Eniwetok, Kwajalein</option>
-                                    <option value="-11.0" >(GMT -11:00) Midway Island, Samoa</option>
-                                    <option value="-10.0" >(GMT -10:00) Hawaii</option>
-                                    <option value="-9.0" >(GMT -9:00) Alaska</option>
-                                    <option value="-8.0" selected>(GMT -8:00) Pacific Time (US &amp; Canada)</option>
-                                    <option value="-7.0" >(GMT -7:00) Mountain Time (US &amp; Canada)</option>
-                                    <option value="-6.0" >(GMT -6:00) Central Time (US &amp; Canada), Mexico City</option>
-                                    <option value="-5.0" >(GMT -5:00) Eastern Time (US &amp; Canada), Bogota, Lima</option>
-                                    <option value="-4.0" >(GMT -4:00) Atlantic Time (Canada), Caracas, La Paz</option>
-                                    <option value="-3.5" >(GMT -3:30) Newfoundland</option>
-                                    <option value="-3.0" >(GMT -3:00) Brazil, Buenos Aires, Georgetown</option>
-                                    <option value="-2.0" >(GMT -2:00) Mid-Atlantic</option>
-                                    <option value="-1.0" >(GMT -1:00 hour) Azores, Cape Verde Islands</option>
-                                    <option value="0.0" >(GMT) Western Europe Time, London, Lisbon, Casablanca</option>
-                                    <option value="1.0" >(GMT +1:00 hour) Brussels, Copenhagen, Madrid, Paris</option>
-                                    <option value="2.0" >(GMT +2:00) Kaliningrad, South Africa</option>
-                                    <option value="3.0" >(GMT +3:00) Baghdad, Riyadh, Moscow, St. Petersburg</option>
-                                    <option value="3.5" >(GMT +3:30) Tehran</option>
-                                    <option value="4.0" >(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi</option>
-                                    <option value="4.5" >(GMT +4:30) Kabul</option>
-                                    <option value="5.0" >(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent</option>
-                                    <option value="5.5" >(GMT +5:30) Bombay, Calcutta, Madras, New Delhi</option>
-                                    <option value="5.75" >(GMT +5:45) Kathmandu</option>
-                                    <option value="6.0" >(GMT +6:00) Almaty, Dhaka, Colombo</option>
-                                    <option value="7.0" >(GMT +7:00) Bangkok, Hanoi, Jakarta</option>
-                                    <option value="8.0" >(GMT +8:00) Beijing, Perth, Singapore, Hong Kong</option>
-                                    <option value="9.0" >(GMT +9:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk</option>
-                                    <option value="9.5" >(GMT +9:30) Adelaide, Darwin</option>
-                                    <option value="10.0" >(GMT +10:00) Eastern Australia, Guam, Vladivostok</option>
-                                    <option value="11.0" >(GMT +11:00) Magadan, Solomon Islands, New Caledonia</option>
-                                    <option value="12.0" >(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka</option>
-                                </select>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary btn-block">Save Settings</button>
-
-                            <div class="form-group row mt-3">
-                                <label for="api_key" class="col-sm-3 col-form-label">API Key</label>
-                                <div class="col-sm-9">
-                                    <input type="text" class="form-control select-input" value="9e657102489b63946908a084befc187e6e506eb0" id="api_key" readonly>
-                                    <small class="form-text text-muted">API Key can be used for read only routes</small>
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="api_secret" class="col-sm-3 col-form-label">API Secret</label>
-                                <div class="col-sm-9">
-                                    <input type="text" class="form-control select-input" value="6b05b48f4b3a1460f3864c31b26cab6a27dbaff9" id="api_secret" readonly>
-                                    <small class="form-text text-muted">API Secret is used for read, create, update and delete routes</small>
-                                    <small class="form-text text-muted">You can <a class="confirm_btn" data-msg="Are you sure you want to reset the API keys?" href="api/renew">Regenerate API Keys</a> if you need to.</small>
-                                </div>
-                            </div>
-
-                        </form>
+                        <CoreSettings/>
 
                         <h2 class="mt-5">Bulk Import Services</h2>
                         You can import multiple services based on a CSV file with the format shown on the <a href="https://github.com/hunterlong/statping/wiki/Bulk-Import-Services" target="_blank">Bulk Import Wiki</a>.
@@ -215,210 +125,6 @@
                             <tbody>
 
                             <tr>
-                                <td>/api/services/1/data?start=1577923728&amp;end=9999999999&amp;group=hour</td>
-                                <td>14129</td>
-                                <td>2020-01-15 16:09:20 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/1/data?start=1577923878&amp;end=9999999999&amp;group=hour</td>
-                                <td>14129</td>
-                                <td>2020-01-15 16:11:49 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/1/data?start=1577935040&amp;end=9999999999&amp;group=hour</td>
-                                <td>14255</td>
-                                <td>2020-01-15 19:17:52 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/1/data?start=1577935058&amp;end=9999999999&amp;group=hour</td>
-                                <td>14255</td>
-                                <td>2020-01-15 19:18:10 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/1/data?start=1577937580&amp;end=9999999999&amp;group=hour</td>
-                                <td>14255</td>
-                                <td>2020-01-15 20:00:11 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/2/data?start=1577923728&amp;end=9999999999&amp;group=hour</td>
-                                <td>14165</td>
-                                <td>2020-01-15 16:09:21 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/2/data?start=1577923878&amp;end=9999999999&amp;group=hour</td>
-                                <td>14165</td>
-                                <td>2020-01-15 16:11:49 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/2/data?start=1577935040&amp;end=9999999999&amp;group=hour</td>
-                                <td>14291</td>
-                                <td>2020-01-15 19:17:53 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/2/data?start=1577935058&amp;end=9999999999&amp;group=hour</td>
-                                <td>14291</td>
-                                <td>2020-01-15 19:18:11 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/2/data?start=1577937580&amp;end=9999999999&amp;group=hour</td>
-                                <td>14291</td>
-                                <td>2020-01-15 20:00:11 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/3/data?start=1577923728&amp;end=9999999999&amp;group=hour</td>
-                                <td>13941</td>
-                                <td>2020-01-15 16:09:21 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/3/data?start=1577923878&amp;end=9999999999&amp;group=hour</td>
-                                <td>13941</td>
-                                <td>2020-01-15 16:11:50 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/3/data?start=1577935040&amp;end=9999999999&amp;group=hour</td>
-                                <td>14064</td>
-                                <td>2020-01-15 19:17:54 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/3/data?start=1577935058&amp;end=9999999999&amp;group=hour</td>
-                                <td>14064</td>
-                                <td>2020-01-15 19:18:12 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/3/data?start=1577937580&amp;end=9999999999&amp;group=hour</td>
-                                <td>14064</td>
-                                <td>2020-01-15 20:00:11 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/4/data?start=1577923728&amp;end=9999999999&amp;group=hour</td>
-                                <td>14229</td>
-                                <td>2020-01-15 16:09:22 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/4/data?start=1577923878&amp;end=9999999999&amp;group=hour</td>
-                                <td>14229</td>
-                                <td>2020-01-15 16:11:50 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/4/data?start=1577935040&amp;end=9999999999&amp;group=hour</td>
-                                <td>14355</td>
-                                <td>2020-01-15 19:17:54 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/4/data?start=1577935058&amp;end=9999999999&amp;group=hour</td>
-                                <td>14355</td>
-                                <td>2020-01-15 19:18:13 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/4/data?start=1577937580&amp;end=9999999999&amp;group=hour</td>
-                                <td>14355</td>
-                                <td>2020-01-15 20:00:12 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/5/data?start=1577923728&amp;end=9999999999&amp;group=hour</td>
-                                <td>13491</td>
-                                <td>2020-01-15 16:09:22 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/5/data?start=1577923878&amp;end=9999999999&amp;group=hour</td>
-                                <td>13491</td>
-                                <td>2020-01-15 16:11:50 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/5/data?start=1577935040&amp;end=9999999999&amp;group=hour</td>
-                                <td>13611</td>
-                                <td>2020-01-15 19:17:55 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/5/data?start=1577935058&amp;end=9999999999&amp;group=hour</td>
-                                <td>13611</td>
-                                <td>2020-01-15 19:18:14 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/5/data?start=1577937580&amp;end=9999999999&amp;group=hour</td>
-                                <td>13611</td>
-                                <td>2020-01-15 20:00:12 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/6/data?start=1577923728&amp;end=9999999999&amp;group=hour</td>
-                                <td>13828</td>
-                                <td>2020-01-15 16:09:19 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/6/data?start=1577923878&amp;end=9999999999&amp;group=hour</td>
-                                <td>13828</td>
-                                <td>2020-01-15 16:11:48 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/6/data?start=1577935040&amp;end=9999999999&amp;group=hour</td>
-                                <td>13951</td>
-                                <td>2020-01-15 19:17:52 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/6/data?start=1577935058&amp;end=9999999999&amp;group=hour</td>
-                                <td>13951</td>
-                                <td>2020-01-15 19:18:09 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/6/data?start=1577937580&amp;end=9999999999&amp;group=hour</td>
-                                <td>13951</td>
-                                <td>2020-01-15 20:00:10 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/7/data?start=1577923728&amp;end=9999999999&amp;group=hour</td>
-                                <td>13828</td>
-                                <td>2020-01-15 16:09:18 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/7/data?start=1577923878&amp;end=9999999999&amp;group=hour</td>
-                                <td>13828</td>
-                                <td>2020-01-15 16:11:48 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/7/data?start=1577935040&amp;end=9999999999&amp;group=hour</td>
-                                <td>13951</td>
-                                <td>2020-01-15 19:17:51 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
-                                <td>/api/services/7/data?start=1577935058&amp;end=9999999999&amp;group=hour</td>
-                                <td>13951</td>
-                                <td>2020-01-15 19:18:08 -0800 -0800</td>
-                            </tr>
-
-                            <tr>
                                 <td>/api/services/7/data?start=1577937580&amp;end=9999999999&amp;group=hour</td>
                                 <td>13951</td>
                                 <td>2020-01-15 20:00:10 -0800 -0800</td>
@@ -429,7 +135,7 @@
                         <a href="api/clear_cache" class="btn btn-danger btn-block">Clear Cache</a>
                     </div>
 
-                    <div v-for="(notifier, index) in notifiers" v-bind:key="index" class="tab-pane fade" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), show: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" role="tabpanel" v-bind:aria-labelledby="`v-pills-${notifier.method.toLowerCase()}-tab`">
+                    <div v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="index" class="tab-pane fade" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), show: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" role="tabpanel" v-bind:aria-labelledby="`v-pills-${notifier.method.toLowerCase()}-tab`">
 
                         <form class="ajax_form command">
                             <h4 class="text-capitalize">{{notifier.title}}</h4>
@@ -1368,28 +1074,26 @@
 
 <script>
   import Api from "../components/API"
+  import CoreSettings from '../forms/CoreSettings';
 
   export default {
   name: 'Settings',
   components: {
+      CoreSettings
 
   },
   data () {
     return {
       tab: "v-pills-home-tab",
-      notifiers: null
     }
   },
   created() {
-    this.getNotifiers()
+
   },
   beforeMount() {
 
   },
   methods: {
-    async getNotifiers () {
-      this.notifiers = await Api.notifiers()
-    },
     changeTab (e) {
       this.tab = e.target.id
     },

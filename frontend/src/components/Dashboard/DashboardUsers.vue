@@ -27,7 +27,7 @@
             </thead>
             <tbody id="users_table">
 
-            <tr v-for="(user, index) in users" v-bind:key="index" >
+            <tr v-for="(user, index) in $store.getters.users" v-bind:key="index" >
                 <td>{{user.username}}</td>
                 <td class="text-right">
                     <div class="btn-group">
@@ -95,16 +95,13 @@
   name: 'DashboardUsers',
   data () {
     return {
-        users: null
     }
   },
   created() {
-    this.getUsers()
+
   },
   methods: {
-    async getUsers () {
-      this.users = await Api.users()
-    }
+
   }
 }
 </script>

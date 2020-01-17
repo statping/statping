@@ -8,7 +8,7 @@ class Api {
 
   }
 
-  async root () {
+  async core () {
     return axios.get('/api').then(response => (response.data))
   }
 

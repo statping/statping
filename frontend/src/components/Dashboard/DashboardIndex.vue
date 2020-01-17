@@ -3,7 +3,7 @@
 
         <div class="row stats_area mb-5">
             <div class="col-4">
-                <span class="lg_number">{{services.length}}</span>
+                <span class="lg_number">{{$store.getters.services.length}}</span>
                 Total Services
             </div>
             <div class="col-4">
@@ -11,12 +11,12 @@
                 Failures last 24 Hours
             </div>
             <div class="col-4">
-                <span class="lg_number">7</span>
+                <span class="lg_number">{{$store.getters.onlineServices(true).length}}</span>
                 Online Services
             </div>
         </div>
 
-        <div v-for="(service, index) in services" v-bind:key="index">
+        <div v-for="(service, index) in $store.getters.services" v-bind:key="index">
             <ServiceInfo :service=service />
         </div>
     </div>
@@ -29,9 +29,6 @@
   name: 'DashboardIndex',
   components: {
     ServiceInfo
-  },
-  props: {
-    services: Array
   },
   methods: {
 

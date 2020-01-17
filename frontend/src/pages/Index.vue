@@ -1,9 +1,9 @@
 <template>
-    <div v-show="core" class="container col-md-7 col-sm-12 mt-2 sm-container">
+    <div class="container col-md-7 col-sm-12 mt-2 sm-container">
 
-        <Header :core="core"/>
+        <Header/>
 
-        <div v-for="(group, index) in groups" v-bind:key="index">
+        <div v-for="(group, index) in $store.getters.groups" v-bind:key="index">
             <Group :group=group />
         </div>
 
@@ -13,7 +13,7 @@
 
         <div class="col-12 full-col-12">
 
-            <div v-for="(service, index) in services" v-bind:key="index">
+            <div v-for="(service, index) in $store.getters.services" v-bind:key="index">
                 <ServiceBlock :service=service />
             </div>
 
@@ -22,13 +22,12 @@
 </template>
 
 <script>
-  import ServiceBlock from '../components/Service/ServiceBlock.vue'
-  import MessageBlock from "../components/Index/MessageBlock";
-  import Group from "../components/Index/Group";
-  import Header from "../components/Index/Header";
-  import Api from "../components/API"
+const Header = () => import("@/components/Index/Header");
+const ServiceBlock = () => import("@/components/Service/ServiceBlock.vue");
+const MessageBlock = () => import("@/components/Index/MessageBlock");
+const Group = () => import("@/components/Index/Group");
 
-  export default {
+export default {
   name: 'Index',
   components: {
     Header,
@@ -38,26 +37,17 @@
   },
   data () {
     return {
-      services: null,
-      groups: null,
-      core: null,
-      auth: null
+
     }
   },
   created() {
-    this.auth = Api.authToken()
-    this.core = Api.root()
+
   },
   mounted() {
-    this.loadAll()
+
   },
   methods: {
-    async loadAll () {
-      this.auth = Api.authToken()
-      this.core = await Api.root()
-      this.groups = await Api.groups()
-      this.services = await Api.services()
-    }
+
   }
 }
 </script>

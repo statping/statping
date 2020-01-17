@@ -50,6 +50,8 @@
   methods: {
     async logout () {
       await Api.logout()
+      this.$store.commit('setHasAllData', false)
+      this.$store.commit('setToken', null)
       await this.$router.push('/')
     }
   }

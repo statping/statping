@@ -26,7 +26,10 @@
 export default {
   name: 'ServiceInfo',
   props: {
-    service: Object
+    service: {
+        type: Object,
+        required: true
+    }
   }
 }
 </script>
