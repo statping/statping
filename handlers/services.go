@@ -121,14 +121,13 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	ExecuteResponse(w, r, "service.gohtml", out, nil)
 }
 
-func apiServiceHandler(w http.ResponseWriter, r *http.Request) {
+func apiServiceHandler(r *http.Request) (interface{}, error) {
 	vars := mux.Vars(r)
 	servicer := core.SelectService(utils.ToInt(vars["id"]))
 	if servicer == nil {
-		sendErrorJson(errors.New("service not found"), w, r)
-		return
+		return nil, errors.New("service not found")
 	}
-	returnJson(servicer, w, r)
+	return servicer, nil
 }
 
 func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -293,14 +292,9 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonAction(service, "delete", w, r)
 }
 
-func apiAllServicesHandler(w http.ResponseWriter, r *http.Request) {
-	isAdmin := IsAdmin(r)
+func apiAllServicesHandler(r *http.Request) (interface{}, error) {
 	services := core.Services()
-	if !isAdmin {
-		returnSafeJson(w, r, joinServices(services))
-		return
-	}
-	returnJson(services, w, r)
+	return joinServices(services), nil
 }
 
 func joinServices(srvs []types.ServiceInterface) []types.Service {

@@ -26,11 +26,9 @@
             </div>
         </div>
 
-
-
         <div class="form-group">
             <label>Custom Footer</label>
-            <textarea rows="4" class="form-control">{{core.footer}}</textarea>
+            <textarea v-model="core.footer" rows="4" class="form-control">{{core.footer}}</textarea>
             <small class="form-text text-muted">HTML is allowed inside the footer</small>
         </div>
 
@@ -71,22 +69,22 @@
             </select>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block">Save Settings</button>
+        <button v-on:submit="saveSettings" type="submit" class="btn btn-primary btn-block">Save Settings</button>
 
         <div class="form-group row mt-3">
-            <label for="api_key" class="col-sm-3 col-form-label">API Key</label>
+            <label class="col-sm-3 col-form-label">API Key</label>
             <div class="col-sm-9">
-                <input type="text" class="form-control select-input" value="9e657102489b63946908a084befc187e6e506eb0" id="api_key" readonly>
+                <input v-model="core.api_key" type="text" class="form-control select-input" readonly>
                 <small class="form-text text-muted">API Key can be used for read only routes</small>
             </div>
         </div>
 
         <div class="form-group row">
-            <label for="api_secret" class="col-sm-3 col-form-label">API Secret</label>
+            <label class="col-sm-3 col-form-label">API Secret</label>
             <div class="col-sm-9">
-                <input type="text" class="form-control select-input" value="6b05b48f4b3a1460f3864c31b26cab6a27dbaff9" id="api_secret" readonly>
+                <input v-model="core.api_secret" type="text" class="form-control select-input" readonly>
                 <small class="form-text text-muted">API Secret is used for read, create, update and delete routes</small>
-                <small class="form-text text-muted">You can <a class="confirm_btn" data-msg="Are you sure you want to reset the API keys?" href="api/renew">Regenerate API Keys</a> if you need to.</small>
+                <small class="form-text text-muted">You can <a href="#" v-on:click="renewApiKeys">Regenerate API Keys</a> if you need to.</small>
             </div>
         </div>
 
@@ -95,6 +93,7 @@
 
 <script>
 import time from '../components/Time'
+import Api from '../components/API'
 
 export default {
   name: 'CoreSettings',
@@ -111,6 +110,15 @@ export default {
     methods: {
         saveSettings () {
 
+        },
+        async renewApiKeys () {
+            let r = confirm("Are you sure you want to reset the API keys?");
+            if (r === true) {
+                await Api.renewApiKeys()
+                const core = await Api.core()
+                this.$store.commit('setCore', core)
+                this.core = core
+            }
         }
     }
 }

@@ -15,9 +15,14 @@ var (
 	authPass string
 )
 
-func scopedRoute(handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
+func scopedRoute(handler func(r *http.Request) (interface{}, error)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		handler(w, r)
+		data, err := handler(r)
+		if err != nil {
+			sendErrorJson(err, w, r)
+			return
+		}
+		returnSafeJson(w, r, data)
 	})
 }
 

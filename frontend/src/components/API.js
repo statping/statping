@@ -40,6 +40,10 @@ class Api {
     return axios.get('/api/notifiers').then(response => (response.data))
   }
 
+    async renewApiKeys () {
+        return axios.get('/api/renew').then(response => (response.data))
+    }
+
   async login (username, password) {
     const f = {username: username, password: password}
     return axios.post('/api/login', qs.stringify(f))

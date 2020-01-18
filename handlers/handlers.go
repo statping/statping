@@ -311,11 +311,10 @@ func expandServices(s []types.ServiceInterface) []*types.Service {
 	return services
 }
 
-func toSafeJson(input interface{}) map[string]interface{} {
+func toSafeJson(input interface{}, onlyAdmin, onlyUsers bool) map[string]interface{} {
 	thisData := make(map[string]interface{})
 	t := reflect.TypeOf(input)
 	elem := reflect.ValueOf(input)
-
 	d, _ := json.Marshal(input)
 
 	var raw map[string]*json.RawMessage
@@ -327,30 +326,43 @@ func toSafeJson(input interface{}) map[string]interface{} {
 
 	fmt.Println("Type:", t.Name())
 	fmt.Println("Kind:", t.Kind())
+	fmt.Println("Fields:", t.NumField())
 
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 
 		// Get the field tag value
 		tag := field.Tag.Get("scope")
-		jsonTag := field.Tag.Get("json")
-
 		tags := strings.Split(tag, ",")
 
-		if jsonTag == "" || jsonTag == "-" {
+		jTags := field.Tag.Get("json")
+		jsonTag := strings.Split(jTags, ",")
+
+		fmt.Println(jsonTag, tag)
+		if len(jsonTag) == 0 {
+			continue
+		}
+
+		if jsonTag[0] == "" || jsonTag[0] == "-" {
 			continue
 		}
 
 		trueValue := elem.Field(i).Interface()
 		trueValue = fixValue(field, trueValue)
 
+		if len(jsonTag) == 2 {
+			if jsonTag[1] == "omitempty" && trueValue == "" {
+				continue
+			}
+		}
+
 		if tag == "" {
-			thisData[jsonTag] = trueValue
+			thisData[jsonTag[0]] = trueValue
 			continue
 		}
 
-		if isPublic(tags) {
-			thisData[jsonTag] = trueValue
+		if forType(tags, onlyAdmin, onlyUsers) {
+			thisData[jsonTag[0]] = trueValue
 		}
 
 		fmt.Printf("%d. %v (%v), tags: '%v'\n", i, field.Name, field.Type.Name(), tags)
@@ -359,17 +371,17 @@ func toSafeJson(input interface{}) map[string]interface{} {
 }
 
 func returnSafeJson(w http.ResponseWriter, r *http.Request, input interface{}) {
+	admin, user := IsAdmin(r), IsUser(r)
 	if reflect.ValueOf(input).Kind() == reflect.Slice {
 		alldata := make([]map[string]interface{}, 0, 1)
 		s := reflect.ValueOf(input)
 		for i := 0; i < s.Len(); i++ {
-			alldata = append(alldata, toSafeJson(s.Index(i).Interface()))
+			alldata = append(alldata, toSafeJson(s.Index(i).Interface(), admin, user))
 		}
 		returnJson(alldata, w, r)
 		return
 	}
-	returnJson(input, w, r)
-	return
+	returnJson(toSafeJson(input, admin, user), w, r)
 }
 
 func fixValue(field reflect.StructField, val interface{}) interface{} {
@@ -392,9 +404,12 @@ func fixValue(field reflect.StructField, val interface{}) interface{} {
 	}
 }
 
-func isPublic(tags []string) bool {
+func forType(tags []string, onlyAdmin, onlyUsers bool) bool {
 	for _, v := range tags {
-		if v == "public" {
+		if v == "admin" && onlyAdmin {
+			return true
+		}
+		if v == "user" && onlyUsers {
 			return true
 		}
 	}

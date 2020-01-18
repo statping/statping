@@ -32,8 +32,8 @@ type Core struct {
 	Name          string             `gorm:"not null;column:name" json:"name"`
 	Description   string             `gorm:"not null;column:description" json:"description,omitempty"`
 	ConfigFile    string             `gorm:"column:config" json:"-"`
-	ApiKey        string             `gorm:"column:api_key" json:"-"`
-	ApiSecret     string             `gorm:"column:api_secret" json:"-"`
+	ApiKey        string             `gorm:"column:api_key" json:"api_key" scope:"admin"`
+	ApiSecret     string             `gorm:"column:api_secret" json:"api_secret" scope:"admin"`
 	Style         string             `gorm:"not null;column:style" json:"style,omitempty"`
 	Footer        NullString         `gorm:"column:footer" json:"footer"`
 	Domain        string             `gorm:"not null;column:domain" json:"domain"`
@@ -50,6 +50,6 @@ type Core struct {
 	Repos         []PluginJSON       `gorm:"-" json:"-"`
 	AllPlugins    []PluginActions    `gorm:"-" json:"-"`
 	Notifications []AllNotifiers     `gorm:"-" json:"-"`
-	Config        *DbConfig          `gorm:"-" json:"config"`
+	Config        *DbConfig          `gorm:"-" json:"-"`
 	Integrations  []Integrator       `gorm:"-" json:"-"`
 }

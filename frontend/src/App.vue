@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" v-if="ready">
     <router-view/>
       <Footer version="DEV" />
   </div>
@@ -14,6 +14,11 @@ export default {
   components: {
     Footer
   },
+    computed: {
+        ready () {
+
+        }
+    },
     created () {
       if (!this.$store.getters.hasPublicData) {
           this.setAllObjects()

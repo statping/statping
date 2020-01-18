@@ -1,7 +1,17 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
-
 Vue.use(Vuex)
+
+export const HAS_ALL_DATA = 'HAS_ALL_DATA'
+export const HAS_PUBLIC_DATA = 'HAS_PUBLIC_DATA'
+
+export const GET_CORE = 'GET_CORE'
+export const GET_SERVICES = 'GET_SERVICES'
+export const GET_TOKEN = 'GET_TOKEN'
+export const GET_GROUPS = 'GET_GROUPS'
+export const GET_MESSAGES = 'GET_MESSAGES'
+export const GET_NOTIFIERS = 'GET_NOTIFIERS'
+export const GET_USERS = 'GET_USERS'
 
 export default new Vuex.Store({
     state: {
