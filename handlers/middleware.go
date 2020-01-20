@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"crypto/subtle"
+	"encoding/json"
 	"fmt"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/utils"
@@ -14,17 +15,6 @@ var (
 	authUser string
 	authPass string
 )
-
-func scopedRoute(handler func(r *http.Request) (interface{}, error)) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		data, err := handler(r)
-		if err != nil {
-			sendErrorJson(err, w, r)
-			return
-		}
-		returnSafeJson(w, r, data)
-	})
-}
 
 // basicAuthHandler is a middleware to implement HTTP basic authentication using
 // AUTH_USERNAME and AUTH_PASSWORD environment variables
@@ -57,6 +47,15 @@ func sendLog(next http.Handler) http.Handler {
 			WithField("load_micro_seconds", t2.Microseconds()).
 			Infoln(fmt.Sprintf("%v (%v) | IP: %v", r.RequestURI, r.Method, r.Host))
 		next.ServeHTTP(w, r)
+	})
+}
+
+func scoped(handler func(r *http.Request) interface{}) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		data := handler(r)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(scope{data: data, scope: ScopeName(r)})
 	})
 }
 

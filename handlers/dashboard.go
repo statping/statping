@@ -43,7 +43,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	password := form.Get("password")
 	user, auth := core.AuthUser(username, password)
 	if auth {
-		setJwtToken(user, w)
+		claim, stt := setJwtToken(user, w)
+		fmt.Println(claim.Username, stt)
 		utils.Log.Infoln(fmt.Sprintf("User %v logged in from IP %v", user.Username, r.RemoteAddr))
 		http.Redirect(w, r, basePath+"dashboard", http.StatusSeeOther)
 	} else {
@@ -123,12 +124,12 @@ func removeJwtToken(w http.ResponseWriter) {
 	})
 }
 
-func setJwtToken(user *core.User, w http.ResponseWriter) (*JwtClaim, string) {
-	expirationTime := time.Now().Add(24 * time.Hour)
-	jwtClaim := &JwtClaim{
-		user.Username,
-		user.Admin.Bool,
-		jwt.StandardClaims{
+func setJwtToken(user *core.User, w http.ResponseWriter) (JwtClaim, string) {
+	expirationTime := time.Now().Add(72 * time.Hour)
+	jwtClaim := JwtClaim{
+		Username: user.Username,
+		Admin:    user.Admin.Bool,
+		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		}}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaim)

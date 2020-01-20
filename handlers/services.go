@@ -121,13 +121,13 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 	ExecuteResponse(w, r, "service.gohtml", out, nil)
 }
 
-func apiServiceHandler(r *http.Request) (interface{}, error) {
+func apiServiceHandler(r *http.Request) interface{} {
 	vars := mux.Vars(r)
 	servicer := core.SelectService(utils.ToInt(vars["id"]))
 	if servicer == nil {
-		return nil, errors.New("service not found")
+		return errors.New("service not found")
 	}
-	return servicer, nil
+	return *servicer.Select()
 }
 
 func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -292,15 +292,15 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonAction(service, "delete", w, r)
 }
 
-func apiAllServicesHandler(r *http.Request) (interface{}, error) {
+func apiAllServicesHandler(r *http.Request) interface{} {
 	services := core.Services()
-	return joinServices(services), nil
+	return joinServices(services)
 }
 
-func joinServices(srvs []types.ServiceInterface) []types.Service {
-	var services []types.Service
+func joinServices(srvs []types.ServiceInterface) []*types.Service {
+	var services []*types.Service
 	for _, v := range srvs {
-		services = append(services, *v.Select())
+		services = append(services, v.Select())
 	}
 	return services
 }
@@ -316,31 +316,27 @@ func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonAction(service, "delete_failures", w, r)
 }
 
-func apiServiceFailuresHandler(w http.ResponseWriter, r *http.Request) {
+func apiServiceFailuresHandler(r *http.Request) interface{} {
 	vars := mux.Vars(r)
 	servicer := core.SelectService(utils.ToInt(vars["id"]))
 	if servicer == nil {
-		sendErrorJson(errors.New("service not found"), w, r)
-		return
+		return errors.New("service not found")
 	}
-	returnJson(servicer.AllFailures(), w, r)
+	return servicer.AllFailures()
 }
 
-func apiServiceHitsHandler(w http.ResponseWriter, r *http.Request) {
+func apiServiceHitsHandler(r *http.Request) interface{} {
 	vars := mux.Vars(r)
 	servicer := core.SelectService(utils.ToInt(vars["id"]))
 	if servicer == nil {
-		sendErrorJson(errors.New("service not found"), w, r)
-		return
+		return errors.New("service not found")
 	}
 
 	hits, err := servicer.Hits()
 	if err != nil {
-		sendErrorJson(err, w, r)
-		return
+		return err
 	}
-
-	returnJson(hits, w, r)
+	return hits
 }
 
 func createServiceHandler(w http.ResponseWriter, r *http.Request) {

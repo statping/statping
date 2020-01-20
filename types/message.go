@@ -27,10 +27,10 @@ type Message struct {
 	StartOn           time.Time `gorm:"column:start_on" json:"start_on"`
 	EndOn             time.Time `gorm:"column:end_on" json:"end_on"`
 	ServiceId         int64     `gorm:"index;column:service" json:"service"`
-	NotifyUsers       NullBool  `gorm:"column:notify_users" json:"notify_users"`
-	NotifyMethod      string    `gorm:"column:notify_method" json:"notify_method"`
-	NotifyBefore      NullInt64 `gorm:"column:notify_before" json:"notify_before"`
-	NotifyBeforeScale string    `gorm:"column:notify_before_scale" json:"notify_before_scale"`
+	NotifyUsers       NullBool  `gorm:"column:notify_users" json:"notify_users" scope:"user,admin"`
+	NotifyMethod      string    `gorm:"column:notify_method" json:"notify_method" scope:"user,admin"`
+	NotifyBefore      NullInt64 `gorm:"column:notify_before" json:"notify_before" scope:"user,admin"`
+	NotifyBeforeScale string    `gorm:"column:notify_before_scale" json:"notify_before_scale" scope:"user,admin"`
 	CreatedAt         time.Time `gorm:"column:created_at" json:"created_at" json:"created_at"`
 	UpdatedAt         time.Time `gorm:"column:updated_at" json:"updated_at" json:"updated_at"`
 }

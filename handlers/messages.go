@@ -45,13 +45,21 @@ func viewMessageHandler(w http.ResponseWriter, r *http.Request) {
 	ExecuteResponse(w, r, "message.gohtml", message, nil)
 }
 
-func apiAllMessagesHandler(w http.ResponseWriter, r *http.Request) {
+func apiAllMessagesHandler(r *http.Request) interface{} {
 	messages, err := core.SelectMessages()
 	if err != nil {
-		sendErrorJson(err, w, r)
-		return
+		log.Error(err)
+		return nil
 	}
-	returnJson(messages, w, r)
+	return joinMessages(messages)
+}
+
+func joinMessages(messages []*core.Message) []*types.Message {
+	var m []*types.Message
+	for _, v := range messages {
+		m = append(m, v.Message)
+	}
+	return m
 }
 
 func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {

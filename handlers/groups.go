@@ -20,6 +20,7 @@ import (
 	"errors"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
 )
@@ -40,10 +41,18 @@ func groupViewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // apiAllGroupHandler will show all the groups
-func apiAllGroupHandler(r *http.Request) (interface{}, error) {
+func apiAllGroupHandler(r *http.Request) interface{} {
 	auth, admin := IsUser(r), IsAdmin(r)
 	groups := core.SelectGroups(admin, auth)
-	return groups, nil
+	return joinGroups(groups)
+}
+
+func joinGroups(groups []*core.Group) []*types.Group {
+	var g []*types.Group
+	for _, v := range groups {
+		g = append(g, v.Group)
+	}
+	return g
 }
 
 // apiGroupHandler will show a single group

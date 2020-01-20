@@ -19,13 +19,13 @@ import (
 	"crypto/subtle"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"html/template"
 	"net/http"
 	"os"
 	"path"
-	"reflect"
 	"strings"
 	"time"
 
@@ -149,14 +149,14 @@ func IsFullAuthenticated(r *http.Request) bool {
 	return IsAdmin(r)
 }
 
-func getJwtAuth(r *http.Request) (bool, string) {
+func getJwtToken(r *http.Request) (JwtClaim, error) {
 	c, err := r.Cookie(cookieKey)
 	if err != nil {
 		utils.Log.Errorln(err)
 		if err == http.ErrNoCookie {
-			return false, ""
+			return JwtClaim{}, err
 		}
-		return false, ""
+		return JwtClaim{}, err
 	}
 	tknStr := c.Value
 	var claims JwtClaim
@@ -166,15 +166,26 @@ func getJwtAuth(r *http.Request) (bool, string) {
 	if err != nil {
 		utils.Log.Errorln("error getting jwt token: ", err)
 		if err == jwt.ErrSignatureInvalid {
-			return false, ""
+			return JwtClaim{}, err
 		}
-		return false, ""
+		return JwtClaim{}, err
 	}
 	if !tkn.Valid {
 		utils.Log.Errorln("token is not valid")
-		return false, ""
+		return claims, errors.New("token is not valid")
 	}
-	return claims.Admin, claims.Username
+	return claims, err
+}
+
+func ScopeName(r *http.Request) string {
+	claim, err := getJwtToken(r)
+	if err != nil {
+		return ""
+	}
+	if claim.Admin {
+		return "admin"
+	}
+	return "user"
 }
 
 // IsAdmin returns true if the user session is an administrator
@@ -182,11 +193,15 @@ func IsAdmin(r *http.Request) bool {
 	if core.SetupMode {
 		return false
 	}
-	admin, username := getJwtAuth(r)
-	if username == "" {
+	if os.Getenv("GO_ENV") == "test" {
+		return true
+	}
+	claim, err := getJwtToken(r)
+	if err != nil {
 		return false
 	}
-	return admin
+	fmt.Println("user: ", claim.Username, claim.Admin)
+	return claim.Admin
 }
 
 // IsUser returns true if the user is registered
@@ -197,9 +212,11 @@ func IsUser(r *http.Request) bool {
 	if os.Getenv("GO_ENV") == "test" {
 		return true
 	}
-	ff, username := getJwtAuth(r)
-	fmt.Println(ff, username)
-	return username != ""
+	_, err := getJwtToken(r)
+	if err != nil {
+		return false
+	}
+	return true
 }
 
 func loadTemplate(w http.ResponseWriter, r *http.Request) (*template.Template, error) {
@@ -288,132 +305,6 @@ func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 func returnJson(d interface{}, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(d)
-}
-
-func safeTypes(obj interface{}) []string {
-	if reflect.ValueOf(obj).Kind() == reflect.Ptr {
-		obj = &obj
-	}
-	switch v := obj.(type) {
-	case types.Service:
-		return types.SafeService
-	default:
-		fmt.Printf("%T\n", v)
-	}
-	return nil
-}
-
-func expandServices(s []types.ServiceInterface) []*types.Service {
-	var services []*types.Service
-	for _, v := range s {
-		services = append(services, v.Select())
-	}
-	return services
-}
-
-func toSafeJson(input interface{}, onlyAdmin, onlyUsers bool) map[string]interface{} {
-	thisData := make(map[string]interface{})
-	t := reflect.TypeOf(input)
-	elem := reflect.ValueOf(input)
-	d, _ := json.Marshal(input)
-
-	var raw map[string]*json.RawMessage
-	json.Unmarshal(d, &raw)
-
-	if t.Kind() == reflect.Ptr {
-		input = &input
-	}
-
-	fmt.Println("Type:", t.Name())
-	fmt.Println("Kind:", t.Kind())
-	fmt.Println("Fields:", t.NumField())
-
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-
-		// Get the field tag value
-		tag := field.Tag.Get("scope")
-		tags := strings.Split(tag, ",")
-
-		jTags := field.Tag.Get("json")
-		jsonTag := strings.Split(jTags, ",")
-
-		fmt.Println(jsonTag, tag)
-		if len(jsonTag) == 0 {
-			continue
-		}
-
-		if jsonTag[0] == "" || jsonTag[0] == "-" {
-			continue
-		}
-
-		trueValue := elem.Field(i).Interface()
-		trueValue = fixValue(field, trueValue)
-
-		if len(jsonTag) == 2 {
-			if jsonTag[1] == "omitempty" && trueValue == "" {
-				continue
-			}
-		}
-
-		if tag == "" {
-			thisData[jsonTag[0]] = trueValue
-			continue
-		}
-
-		if forType(tags, onlyAdmin, onlyUsers) {
-			thisData[jsonTag[0]] = trueValue
-		}
-
-		fmt.Printf("%d. %v (%v), tags: '%v'\n", i, field.Name, field.Type.Name(), tags)
-	}
-	return thisData
-}
-
-func returnSafeJson(w http.ResponseWriter, r *http.Request, input interface{}) {
-	admin, user := IsAdmin(r), IsUser(r)
-	if reflect.ValueOf(input).Kind() == reflect.Slice {
-		alldata := make([]map[string]interface{}, 0, 1)
-		s := reflect.ValueOf(input)
-		for i := 0; i < s.Len(); i++ {
-			alldata = append(alldata, toSafeJson(s.Index(i).Interface(), admin, user))
-		}
-		returnJson(alldata, w, r)
-		return
-	}
-	returnJson(toSafeJson(input, admin, user), w, r)
-}
-
-func fixValue(field reflect.StructField, val interface{}) interface{} {
-	typeName := field.Type.Name()
-	switch typeName {
-	case "NullString":
-		nullItem := val.(types.NullString)
-		return nullItem.String
-	case "NullBool":
-		nullItem := val.(types.NullBool)
-		return nullItem.Bool
-	case "NullFloat64":
-		nullItem := val.(types.NullFloat64)
-		return nullItem.Float64
-	case "NullInt64":
-		nullItem := val.(types.NullInt64)
-		return nullItem.Int64
-	default:
-		return val
-	}
-}
-
-func forType(tags []string, onlyAdmin, onlyUsers bool) bool {
-	for _, v := range tags {
-		if v == "admin" && onlyAdmin {
-			return true
-		}
-		if v == "user" && onlyUsers {
-			return true
-		}
-	}
-	return false
 }
 
 // error404Handler is a HTTP handler for 404 error pages

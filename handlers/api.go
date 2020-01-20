@@ -34,10 +34,10 @@ type apiResponse struct {
 	Output interface{} `json:"output,omitempty"`
 }
 
-func apiIndexHandler(r *http.Request) (interface{}, error) {
+func apiIndexHandler(r *http.Request) interface{} {
 	coreClone := *core.CoreApp
 	coreClone.Started = utils.Timezoner(coreClone.Started, coreClone.Timezone)
-	return *coreClone.ToCore(), nil
+	return *coreClone.ToCore()
 }
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
