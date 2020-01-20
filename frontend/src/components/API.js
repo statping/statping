@@ -20,12 +20,32 @@ class Api {
     return axios.get('/api/services/'+id).then(response => (response.data))
   }
 
+  async service_delete (id) {
+    return axios.delete('/api/services/'+id).then(response => (response.data))
+  }
+
   async groups () {
     return axios.get('/api/groups').then(response => (response.data))
   }
 
+  async group_delete (id) {
+    return axios.delete('/api/groups/'+id).then(response => (response.data))
+  }
+
+  async group_create (data) {
+    return axios.post('/api/groups', data).then(response => (response.data))
+  }
+
   async users () {
     return axios.get('/api/users').then(response => (response.data))
+  }
+
+  async user_create (id) {
+    return axios.post('/api/users').then(response => (response.data))
+  }
+
+  async user_delete (id) {
+    return axios.delete('/api/users/'+id).then(response => (response.data))
   }
 
   async messages () {

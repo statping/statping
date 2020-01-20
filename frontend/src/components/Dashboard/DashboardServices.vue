@@ -34,22 +34,24 @@
             <tbody class="sortable" id="services_table">
 
             <tr v-for="(service, index) in $store.getters.services" v-bind:key="index">
-                <td><span class="drag_icon d-none d-md-inline"><font-awesome-icon icon="bars" /></span> {{service.name}}</td>
+                <td>
+                    <span class="drag_icon d-none d-md-inline"><font-awesome-icon icon="bars" /></span> {{service.name}}
+                </td>
                 <td class="d-none d-md-table-cell">
-                    <div v-if="service.online"><span class="badge badge-success">ONLINE</span><font-awesome-icon class="toggle-service text-success" icon="toggle-on" /></div>
-                    <div v-if="!service.online"><span class="badge badge-success">OFFLINE</span><font-awesome-icon class="toggle-service text-danger" icon="toggle-off" /></div>
+                    <div v-if="service.online"><span class="badge badge-success">ONLINE</span><ToggleSwitch :next="stopChecking" :service="service"/></div>
+                    <div v-if="!service.online"><span class="badge badge-success">OFFLINE</span><ToggleSwitch :next="stopChecking" :service="service"/></div>
                 </td>
                 <td class="d-none d-md-table-cell">
                     <div v-if="service.public"><span class="badge badge-primary">PUBLIC</span></div>
                     <div v-if="!service.public"><span class="badge badge-secondary">PRIVATE</span></div>
                 </td>
                 <td class="d-none d-md-table-cell">
-                    <div v-if="service.group_id !== 0"><span class="badge badge-secondary">{{$store.getters.groupById(service.group_id).name}}</span></div>
+                    <div v-if="service.group_id !== 0"><span class="badge badge-secondary">{{serviceGroup(service)}}</span></div>
                 </td>
                 <td class="text-right">
                     <div class="btn-group">
                         <router-link :to="{path: `/service/${service.id}`, params: {service: service} }" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> View</router-link>
-                        <a href="api/services/1" class="ajax_delete btn btn-danger" data-method="DELETE" data-obj="service_1" data-id="1">
+                        <a @click="deleteService(service)" href="#" class="btn btn-danger">
                             <font-awesome-icon icon="times" />
                         </a>
                     </div>
@@ -85,7 +87,7 @@
                 <td class="text-right">
                     <div class="btn-group">
                         <a href="group/2" class="btn btn-outline-secondary"> <font-awesome-icon icon="chart-area" /> Edit</a>
-                        <a href="api/groups/2" class="btn btn-danger">
+                        <a @click="deleteGroup(group)" href="#" class="btn btn-danger">
                             <font-awesome-icon icon="times" />
                         </a>
                     </div>
@@ -99,7 +101,7 @@
 
         <div class="card">
             <div class="card-body">
-                <FormGroup :group="null"/>
+                <FormGroup/>
             </div>
         </div>
 
@@ -109,10 +111,15 @@
 
 <script>
 import FormGroup from "../../forms/Group";
+import Api from "../../components/API";
+import ToggleSwitch from "../../forms/ToggleSwitch";
 
 export default {
   name: 'DashboardServices',
-  components: {FormGroup},
+  components: {
+    ToggleSwitch,
+    FormGroup
+  },
   data () {
     return {
 
@@ -122,7 +129,32 @@ export default {
 
   },
   methods: {
-
+    stopChecking(s) {
+      alert(JSON.stringify(s))
+    },
+    serviceGroup(s) {
+      let group = this.$store.getters.groupById(s.group_id)
+      if (group) {
+        return group.name
+      }
+      return ""
+    },
+    async deleteGroup(g) {
+      let c = confirm(`Are you sure you want to delete '${g.name}'?`)
+      if (c) {
+        await Api.group_delete(g.id)
+        const groups = await Api.groups()
+        this.$store.commit('setGroups', groups)
+      }
+    },
+    async deleteService(s) {
+      let c = confirm(`Are you sure you want to delete '${s.name}'?`)
+      if (c) {
+        await Api.service_delete(s.id)
+        const services = await Api.services()
+        this.$store.commit('setServices', services)
+      }
+    }
   }
 }
 </script>

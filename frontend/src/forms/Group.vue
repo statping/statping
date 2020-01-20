@@ -1,5 +1,5 @@
 <template>
-    <form @submit="saveGroup" action="api/groups" method="POST">
+    <form @submit="saveGroup">
         <div class="form-group row">
             <label for="title" class="col-sm-4 col-form-label">Group Name</label>
             <div class="col-sm-8">
@@ -17,7 +17,7 @@
         </div>
         <div class="form-group row">
             <div class="col-sm-12">
-                <button v-on:click="saveGroup" type="submit" class="btn btn-primary btn-block">Create Group</button>
+                <button @click="saveGroup" type="submit" class="btn btn-primary btn-block">Create Group</button>
             </div>
         </div>
         <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
@@ -25,14 +25,19 @@
 </template>
 
 <script>
+import Api from "../components/API";
+
 export default {
   name: 'FormGroup',
   props: {
-    group: Object
+
   },
   data () {
     return {
-      group: {}
+      group: {
+        name: "",
+        public: true
+      }
     }
   },
   mounted() {
@@ -41,9 +46,13 @@ export default {
     }
   },
   methods: {
-    saveGroup: {
-
-    }
+    async saveGroup(e) {
+      e.preventDefault();
+      const data = {name: this.group.name, public: this.group.public}
+      await Api.group_create(data)
+      const groups = await Api.groups()
+      this.$store.commit('setGroups', groups)
+    },
   }
 }
 </script>

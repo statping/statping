@@ -3,10 +3,10 @@
         <h1 class="text-black-50">Users</h1>
         <table class="table table-striped">
             <thead>
-            <tr>
-                <th scope="col">Username</th>
-                <th scope="col"></th>
-            </tr>
+                <tr>
+                    <th scope="col">Username</th>
+                    <th scope="col"></th>
+                </tr>
             </thead>
             <tbody id="users_table">
 
@@ -15,11 +15,10 @@
                 <td class="text-right">
                     <div class="btn-group"><font-awesome-icon icon="user-edit" />
                         <a href="user/1" class="btn btn-outline-secondary"><i class="fas fa-user-edit"></i> Edit</a>
-                        <a href="api/users/1" class="ajax_delete btn btn-danger"><i class="fas fa-times"></i></a>
+                        <a @click="deleteUser(user)" href="#" class="btn btn-danger"><font-awesome-icon icon="times" /></a>
                     </div>
                 </td>
             </tr>
-
             </tbody>
         </table>
 
@@ -27,45 +26,7 @@
 
         <div class="card">
             <div class="card-body">
-                <form class="ajax_form" action="api/users" data-redirect="users" method="POST">
-                    <div class="form-group row">
-                        <label for="username" class="col-sm-4 col-form-label">Username</label>
-                        <div class="col-6 col-md-4">
-                            <input type="text" name="username" class="form-control" value="" id="username" placeholder="Username" required autocorrect="off" autocapitalize="none">
-                        </div>
-                        <div class="col-6 col-md-4">
-                          <span class="switch">
-                            <input type="checkbox" name="admin" class="switch" id="switch-normal">
-                            <label for="switch-normal">Administrator</label>
-                            <input type="hidden" name="admin" id="switch-normal-value" value="false">
-                          </span>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="email" class="col-sm-4 col-form-label">Email Address</label>
-                        <div class="col-sm-8">
-                            <input type="email" name="email" class="form-control" id="email" value="" placeholder="user@domain.com" required autocapitalize="none" spellcheck="false">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="password" class="col-sm-4 col-form-label">Password</label>
-                        <div class="col-sm-8">
-                            <input type="password" name="password" class="form-control" id="password"  placeholder="Password" required>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="password_confirm" class="col-sm-4 col-form-label">Confirm Password</label>
-                        <div class="col-sm-8">
-                            <input type="password" name="password_confirm" class="form-control" id="password_confirm"  placeholder="Confirm Password" required>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-sm-12">
-                            <button type="submit" class="btn btn-primary btn-block">Create User</button>
-                        </div>
-                    </div>
-                    <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
-                </form>
+
             </div>
         </div>
     </div>
@@ -78,13 +39,39 @@
   name: 'DashboardUsers',
   data () {
     return {
+      user: {
+        username: "",
+        admin: false,
+        email: "",
+        password: "",
+        confirm_password: ""
+      }
     }
   },
   created() {
 
   },
   methods: {
-
+    async saveUser(e) {
+      e.preventDefault();
+      let u = this.user;
+      if (u.password === u.confirm_password) {
+        alert("Both password do not match")
+        return
+      }
+      const data = {name: this.group.name, public: this.group.public}
+      await Api.user_create(data)
+      const users = await Api.users()
+      this.$store.commit('setUsers', users)
+    },
+    async deleteUser(u) {
+      let c = confirm(`Are you sure you want to delete user '${u.username}'?`)
+      if (c) {
+        await Api.user_delete(u.id)
+        const users = await Api.users()
+        this.$store.commit('setUsers', users)
+      }
+    }
   }
 }
 </script>

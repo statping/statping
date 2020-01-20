@@ -16,7 +16,7 @@ export default {
   },
     computed: {
         ready () {
-
+            return true
         }
     },
     created () {
