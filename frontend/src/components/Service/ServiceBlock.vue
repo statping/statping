@@ -27,7 +27,7 @@
             </div>
 
             <div class="chart-container">
-                <div id="service_1"></div>
+                <ServiceChart service="service"/>
             </div>
 
             <div class="row lower_canvas full-col-12 text-white">
@@ -44,8 +44,11 @@
 </template>
 
 <script>
-export default {
+  import ServiceChart from "./ServiceChart";
+
+  export default {
   name: 'ServiceBlock',
+  components: {ServiceChart},
   props: {
     service: Object
   }

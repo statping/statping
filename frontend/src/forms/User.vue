@@ -6,11 +6,11 @@
                 <input v-model="user.username" type="text" class="form-control" placeholder="Username" required autocorrect="off" autocapitalize="none">
             </div>
             <div class="col-6 col-md-4">
-                          <span class="switch">
-                            <input type="checkbox" name="admin" class="switch" id="switch-normal">
-                            <label for="switch-normal">Administrator</label>
-                            <input v-model="user.admin" type="hidden" name="admin" id="switch-normal-value" value="false">
-                          </span>
+                  <span class="switch">
+                    <input @change="user.admin = !user.admin" type="checkbox" name="admin" class="switch" id="switch-normal">
+                    <label for="switch-normal">Administrator</label>
+                    <input type="hidden" name="admin" id="switch-normal-value">
+                  </span>
             </div>
         </div>
         <div class="form-group row">
@@ -41,9 +41,9 @@
 </template>
 
 <script>
-import Api from "../components/API";
+  import Api from "../components/API";
 
-export default {
+  export default {
   name: 'FormUser',
   props: {
 
@@ -62,9 +62,13 @@ export default {
   mounted() {
 
   },
-  methods: {
-    saveUser () {
+  computed() {
 
+  },
+  methods: {
+    saveUser (e) {
+      e.preventDefault();
+      alert(JSON.stringify(this.user))
     },
     async saveGroup(e) {
       e.preventDefault();

@@ -1,5 +1,5 @@
 <template>
-    <form @submit="saveSettings" method="POST">
+    <form @submit="saveSettings">
         <div class="form-group">
             <label>Project Name</label>
             <input v-model="core.name" type="text" class="form-control" placeholder="Great Uptime">
@@ -19,10 +19,10 @@
                 <label class="d-inline d-sm-none">Enable CDN</label>
                 <label class="d-none d-sm-block">Enable CDN</label>
                 <span class="switch">
-                                        <input v-model="core.using_cdn" type="checkbox" class="switch" v-bind:disabled="core.using_cdn">
-                                        <label class="mt-2 mt-sm-0"></label>
-                                    </span>
-                <input v-model="core.using_cdn" type="hidden" name="enable_cdn" id="switch-normal-value" value="false">
+                    <input @change="core.using_cdn = !core.using_cdn" type="checkbox" name="admin" class="switch" id="switch-normal">
+                    <label for="switch-normal"></label>
+                    <input type="hidden" name="admin" id="switch-normal-value">
+                  </span>
             </div>
         </div>
 
@@ -112,8 +112,11 @@
       }
     },
     methods: {
-        saveSettings () {
-
+        async saveSettings (e) {
+          e.preventDefault()
+          await Api.core_save(this.core)
+          const core = await Api.core()
+          this.$store.commit('setCore', core)
         },
         async renewApiKeys () {
             let r = confirm("Are you sure you want to reset the API keys?");

@@ -12,12 +12,20 @@ class Api {
     return axios.get('/api').then(response => (response.data))
   }
 
+  async core_save (obj) {
+    return axios.post('/api', obj).then(response => (response.data))
+  }
+
   async services () {
     return axios.get('/api/services').then(response => (response.data))
   }
 
   async service (id) {
     return axios.get('/api/services/'+id).then(response => (response.data))
+  }
+
+  async service_hits (id, start, end, group) {
+    return axios.get('/api/services/'+id+'/data?start=' + start + '&end=' + end + '&group=' + group).then(response => (response.data))
   }
 
   async service_delete (id) {
