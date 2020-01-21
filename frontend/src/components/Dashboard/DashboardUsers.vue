@@ -26,7 +26,7 @@
 
         <div class="card">
             <div class="card-body">
-
+                <FormUser/>
             </div>
         </div>
     </div>
@@ -34,10 +34,12 @@
 
 <script>
   import Api from "../API"
+  import FormUser from "../../forms/User";
 
   export default {
   name: 'DashboardUsers',
-  data () {
+    components: {FormUser},
+    data () {
     return {
       user: {
         username: "",

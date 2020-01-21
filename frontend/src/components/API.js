@@ -52,6 +52,10 @@ class Api {
     return axios.get('/api/messages').then(response => (response.data))
   }
 
+  async message_delete (id) {
+    return axios.delete('/api/messages/'+id).then(response => (response.data))
+  }
+
   async group (id) {
     return axios.get('/api/groups/'+id).then(response => (response.data))
   }

@@ -1,5 +1,5 @@
 <template>
-    <form @submit="saveSettings" method="POST" action="settings">
+    <form @submit="saveSettings" method="POST">
         <div class="form-group">
             <label>Project Name</label>
             <input v-model="core.name" type="text" class="form-control" placeholder="Great Uptime">
@@ -92,16 +92,20 @@
 </template>
 
 <script>
-import time from '../components/Time'
-import Api from '../components/API'
+  import time from '../components/Time'
+  import Api from '../components/API'
 
-export default {
+  export default {
   name: 'CoreSettings',
     data () {
         return {
             core: this.$store.getters.core,
         }
     },
+  async mounted () {
+    const core = await Api.core()
+    this.$store.commit('setCore', core)
+  },
     computed: {
       now () {
           return time.now()

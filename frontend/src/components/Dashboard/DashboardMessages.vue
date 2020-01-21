@@ -1,20 +1,3 @@
-<!--
-  - Statup
-  - Copyright (C) 2020.  Hunter Long and the project contributors
-  - Written by Hunter Long <info@socialeck.com> and the project contributors
-  -
-  - https://github.com/hunterlong/statup
-  -
-  - The licenses for most software and other practical works are designed
-  - to take away your freedom to share and change the works.  By contrast,
-  - the GNU General Public License is intended to guarantee your freedom to
-  - share and change all versions of a program--to make sure it remains free
-  - software for all its users.
-  -
-  - You should have received a copy of the GNU General Public License
-  - along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  -->
-
 <template>
     <div>
     <div class="col-12">
@@ -39,7 +22,7 @@
                 <td class="text-right">
                     <div class="btn-group">
                         <a href="message/1" class="btn btn-outline-secondary"><i class="fas fa-exclamation-triangle"></i> Edit</a>
-                        <a href="api/messages/1" class="ajax_delete btn btn-danger"><i class="fas fa-times"></i></a>
+                        <a @click="deleteMessage(message)" href="#" class="btn btn-danger"><font-awesome-icon icon="times" /></a>
                     </div>
                 </td>
             </tr>
@@ -173,6 +156,14 @@
   methods: {
     service (id) {
         return this.$store.getters.serviceById(id)
+    },
+    async deleteMessage(m) {
+      let c = confirm(`Are you sure you want to delete message '${m.title}'?`)
+      if (c) {
+        await Api.message_delete(m.id)
+        const messages = await Api.messages()
+        this.$store.commit('setMessages', messages)
+      }
     }
   }
 }
