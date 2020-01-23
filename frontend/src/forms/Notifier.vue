@@ -32,7 +32,9 @@
             </div>
 
             <div class="col-12 col-sm-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
-                <button @click="saveNotifier" type="submit" class="btn btn-primary btn-block text-capitalize"><i class="fa fa-check-circle"></i> Save</button>
+                <button @click="saveNotifier" type="submit" class="btn btn-block text-capitalize" :class="{'btn-primary': !saved, 'btn-success': saved}">
+                    <i class="fa fa-check-circle"></i> {{saved ? "Saved" : "Save"}}
+                </button>
             </div>
 
             <div class="col-12 col-sm-12">
@@ -71,7 +73,8 @@
   },
   data () {
     return {
-        error: null
+        error: null,
+      saved: false,
     }
   },
   mounted() {
@@ -87,9 +90,14 @@
       form.enabled = this.notifier.enabled
       form.limits = parseInt(this.notifier.limits)
       form.method = this.notifier.method
+      alert(JSON.stringify(form))
       await Api.notifier_save(form)
       const notifiers = await Api.notifiers()
       this.$store.commit('setNotifiers', notifiers)
+      this.saved = true
+      setTimeout(() => {
+        this.saved = false
+      }, 2000)
     },
     async testNotifier(e) {
       e.preventDefault();
@@ -100,6 +108,7 @@
       form.enabled = this.notifier.enabled
       form.limits = parseInt(this.notifier.limits)
       form.method = this.notifier.method
+      alert(JSON.stringify(form))
       const tested = await Api.notifier_test(form)
       if (tested === "ok") {
         alert('This notifier seems to be working!')

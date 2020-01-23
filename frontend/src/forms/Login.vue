@@ -1,5 +1,6 @@
 <template>
     <form @submit="login">
+        {{$store.getters.token}}
         <div class="form-group row">
             <label for="username" class="col-sm-2 col-form-label">Username</label>
             <div class="col-sm-10">
@@ -14,7 +15,7 @@
         </div>
         <div class="form-group row">
             <div class="col-sm-12">
-                <button v-on:click="login" type="submit" class="btn btn-primary btn-block mb-3">Sign in</button>
+                <button @click="login" type="submit" class="btn btn-primary btn-block mb-3">Sign in</button>
             </div>
         </div>
     </form>

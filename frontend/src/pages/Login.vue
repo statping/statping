@@ -18,7 +18,9 @@
     FormLogin
   },
   data () {
+        return {
 
+        }
   },
   methods: {
 

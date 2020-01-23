@@ -3,7 +3,8 @@ import VueRouter from 'vue-router'
 import VueApexCharts from 'vue-apexcharts'
 
 import App from '@/App.vue'
-import store from '@/store'
+import Api from './components/API'
+import store from './store'
 
 import {library} from '@fortawesome/fontawesome-svg-core'
 import {fas} from '@fortawesome/fontawesome-free-solid';
@@ -44,6 +45,9 @@ const routes = [
     path: '/dashboard',
     name: 'Dashboard',
     component: Dashboard,
+    meta: {
+      requiresAuth: true
+    },
     children: [{
       path: '',
       component: DashboardIndex
@@ -90,6 +94,18 @@ const routes = [
 const router = new VueRouter({
   mode: 'history',
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (Api.token()) {
+      next()
+      return
+    }
+    next('/login')
+  } else {
+    next()
+  }
 })
 
 Vue.use(VueRouter);

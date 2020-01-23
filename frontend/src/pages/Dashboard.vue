@@ -1,11 +1,7 @@
 <template>
-    <div>
-        <Login v-if="!authenticated"/>
-
-        <div v-if="authenticated" class="container col-md-7 col-sm-12 mt-md-5 bg-light">
-            <TopNav/>
-            <router-view></router-view>
-         </div>
+    <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
+        <TopNav/>
+        <router-view></router-view>
     </div>
 </template>
 
