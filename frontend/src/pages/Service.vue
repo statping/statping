@@ -1,21 +1,21 @@
 <template>
-    <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
-
-        <TopNav/>
+    <div v-if="ready" class="container col-md-7 col-sm-12 mt-md-5 bg-light">
 
         <div class="col-12 mb-4">
 
-            <span class="mt-3 mb-3 text-white d-md-none btn bg-success d-block d-md-none">ONLINE</span>
+            <span class="mt-3 mb-3 text-white d-md-none btn d-block d-md-none" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
+                {{service.online ? "ONLINE" : "OFFLINE"}}
+            </span>
 
-
-            <h4 class="mt-2"><a href="">{{service.name}}</a> - {{service.name}}
-
-                <span class="badge bg-success float-right d-none d-md-block">ONLINE</span>
+            <h4 class="mt-2"><a href="/">{{$store.getters.core.name}}</a> - {{service.name}}
+                <span class="badge float-right d-none d-md-block" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
+                    {{service.online ? "ONLINE" : "OFFLINE"}}
+                </span>
             </h4>
 
             <div class="row stats_area mt-5 mb-5">
                 <div class="col-4">
-                    <span class="lg_number">100%</span>
+                    <span class="lg_number">{{service.online_24_hours}}%</span>
                     Online last 24 Hours
                 </div>
                 <div class="col-4">
@@ -28,11 +28,8 @@
                 </div>
             </div>
 
-
-
             <div class="service-chart-container">
-                <div id="service"></div>
-                <div id="service-bar"></div>
+                <apexchart width="100%" height="215" type="area" :options="chartOptions" :series="series"></apexchart>
             </div>
 
             <div class="service-chart-heatmap">
@@ -49,191 +46,42 @@
                 <div id="end_container"></div>
             </form>
 
-
-            <nav class="nav nav-pills flex-column flex-sm-row mt-3" id="service_tabs" role="serviceLists">
-                <a class="flex-sm-fill text-sm-center nav-link active" id="edit-tab" data-toggle="tab" href="#edit" role="tab" aria-controls="edit" aria-selected="false">Edit Service</a>
-                <a class="flex-sm-fill text-sm-center nav-link" id="failures-tab" data-toggle="tab" href="#failures" role="tab" aria-controls="failures" aria-selected="true">Failures</a>
-                <a class="flex-sm-fill text-sm-center nav-link disabled" id="incidents-tab" data-toggle="tab" href="#incidents" role="tab" aria-controls="incidents" aria-selected="true">Incidents</a>
-                <a class="flex-sm-fill text-sm-center nav-link" id="checkins-tab" data-toggle="tab" href="#checkins" role="tab" aria-controls="checkins" aria-selected="false">Checkins</a>
-                <a class="flex-sm-fill text-sm-center nav-link" id="response-tab" data-toggle="tab" href="#response" role="tab" aria-controls="response" aria-selected="false">Response</a>
+            <nav class="nav nav-pills flex-column flex-sm-row mt-3" id="service_tabs">
+                <a @click="tab='failures'" class="flex-sm-fill text-sm-center nav-link active">Failures</a>
+                <a @click="tab='incidents'" class="flex-sm-fill text-sm-center nav-link">Incidents</a>
+                <a @click="tab='checkins'" v-if="$store.getters.token.token" class="flex-sm-fill text-sm-center nav-link">Checkins</a>
+                <a @click="tab='response'" v-if="$store.getters.token.token" class="flex-sm-fill text-sm-center nav-link">Response</a>
             </nav>
-            <div class="tab-content" id="myTabContent">
 
-                <div class="tab-pane fade" id="failures" role="serviceLists" aria-labelledby="failures-tab">
-
+            <div class="tab-content">
+                <div class="tab-pane fade active show">
                     <div class="list-group mt-3 mb-4">
 
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div v-for="(failure, index) in failures" :key="index" class="mb-2 list-group-item list-group-item-action flex-column align-items-start">
                             <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Incorrect HTTP Status Code</h5>
-                                <small>4 weeks ago</small>
+                                <h5 class="mb-1">{{failure.issue}}</h5>
+                                <small>{{failure.created_at | moment("dddd, MMMM Do YYYY")}}</small>
                             </div>
-                            <p class="mb-1">HTTP Status Code 502 did not match 200</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Connection Failed</h5>
-                                <small>4 weeks ago</small>
-                            </div>
-                            <p class="mb-1">HTTP Error Get https://api.statping.com: dial tcp 162.248.92.36:443: connect: connection refused</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Connection Failed</h5>
-                                <small>4 weeks ago</small>
-                            </div>
-                            <p class="mb-1">HTTP Error Get https://api.statping.com: dial tcp 162.248.92.36:443: connect: connection refused</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Connection Failed</h5>
-                                <small>4 weeks ago</small>
-                            </div>
-                            <p class="mb-1">HTTP Error Get https://api.statping.com: dial tcp 162.248.92.36:443: connect: connection refused</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Connection Failed</h5>
-                                <small>4 weeks ago</small>
-                            </div>
-                            <p class="mb-1">HTTP Error Get https://api.statping.com: dial tcp 162.248.92.36:443: connect: connection refused</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Connection Failed</h5>
-                                <small>4 weeks ago</small>
-                            </div>
-                            <p class="mb-1">HTTP Error Get https://api.statping.com: dial tcp 162.248.92.36:443: connect: connection refused</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Connection Reset</h5>
-                                <small>4 weeks ago</small>
-                            </div>
-                            <p class="mb-1">HTTP Error Get https://api.statping.com: read tcp 172.27.0.8:46586-&gt;162.248.92.36:443: read: connection reset by peer</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Connection Failed</h5>
-                                <small>4 weeks ago</small>
-                            </div>
-                            <p class="mb-1">Could not get IP address for domain https://api.statping.com, lookup api.statping.com on 127.0.0.11:53: read udp 127.0.0.1:50890-&gt;127.0.0.11:53: read: connection refused</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Connection Failed</h5>
-                                <small>4 weeks ago</small>
-                            </div>
-                            <p class="mb-1">Could not get IP address for domain https://api.statping.com, lookup api.statping.com on 127.0.0.11:53: read udp 127.0.0.1:35222-&gt;127.0.0.11:53: read: connection refused</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Connection Failed</h5>
-                                <small>4 weeks ago</small>
-                            </div>
-                            <p class="mb-1">Could not get IP address for domain https://api.statping.com, lookup api.statping.com on 127.0.0.11:53: read udp 127.0.0.1:49817-&gt;127.0.0.11:53: read: connection refused</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Connection Failed</h5>
-                                <small>4 weeks ago</small>
-                            </div>
-                            <p class="mb-1">Could not get IP address for domain https://api.statping.com, lookup api.statping.com on 127.0.0.11:53: read udp 127.0.0.1:57247-&gt;127.0.0.11:53: read: connection refused</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Connection Reset</h5>
-                                <small>4 weeks ago</small>
-                            </div>
-                            <p class="mb-1">HTTP Error Get https://api.statping.com: read tcp 172.27.0.10:52594-&gt;162.248.92.36:443: read: connection reset by peer</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Connection Timed Out</h5>
-                                <small>Last month</small>
-                            </div>
-                            <p class="mb-1">Could not get IP address for domain https://api.statping.com, lookup api.statping.com on 127.0.0.11:53: read udp 127.0.0.1:51238-&gt;127.0.0.11:53: i/o timeout</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Connection Timed Out</h5>
-                                <small>Last month</small>
-                            </div>
-                            <p class="mb-1">Could not get IP address for domain https://api.statping.com, lookup api.statping.com on 127.0.0.11:53: read udp 127.0.0.1:47323-&gt;127.0.0.11:53: i/o timeout</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Incorrect HTTP Status Code</h5>
-                                <small>Last month</small>
-                            </div>
-                            <p class="mb-1">HTTP Status Code 503 did not match 200</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Incorrect HTTP Status Code</h5>
-                                <small>Last month</small>
-                            </div>
-                            <p class="mb-1">HTTP Status Code 503 did not match 200</p>
-                        </a>
-
+                            <p class="mb-1">{{failure.issue}}</p>
+                        </div>
                     </div>
+                </div>
+
+                <div class="tab-pane fade" :class="{active: tab === 'incidents'}" id="incidents">
 
                 </div>
 
-                <div class="tab-pane fade" id="incidents" role="serviceLists" aria-labelledby="incidents-tab">
-
-                </div>
-
-                <div class="tab-pane fade" id="checkins" role="serviceLists" aria-labelledby="checkins-tab">
-
-
+                <div class="tab-pane fade" :class="{show: tab === 'checkins'}" id="checkins">
 
                     <div class="card">
                         <div class="card-body">
-                            <form class="ajax_form" action="api/checkin" data-redirect="/service/7" method="POST">
-                                <div class="form-group row">
-                                    <div class="col-md-3">
-                                        <label for="checkin_interval" class="col-form-label">Checkin Name</label>
-                                        <input type="text" name="name" class="form-control" id="checkin_name" placeholder="New Checkin">
-                                    </div>
-                                    <div class="col-3">
-                                        <label for="checkin_interval" class="col-form-label">Interval (seconds)</label>
-                                        <input type="number" name="interval" class="form-control" id="checkin_interval" placeholder="60">
-                                    </div>
-                                    <div class="col-3">
-                                        <label for="grace_period" class="col-form-label">Grace Period</label>
-                                        <input type="number" name="grace" class="form-control" id="grace_period" placeholder="10">
-                                    </div>
-                                    <div class="col-3">
-                                        <label for="submit" class="col-form-label"></label>
-                                        <input type="hidden" name="service_id" class="form-control" id="service_id" value="7">
-                                        <button type="submit" id="submit" class="btn btn-success d-block" style="margin-top: 14px;">Save Checkin</button>
-                                    </div>
-                                </div>
-                            </form>
+                            <Checkin :service="service"/>
                         </div>
                     </div>
 
-
-
                 </div>
 
-                <div class="tab-pane fade" id="response" role="serviceLists" aria-labelledby="response-tab">
+                <div class="tab-pane fade" :class="{show: tab === 'response'}" id="response">
                     <div class="col-12 mt-4">
                         <h3>Last Response</h3>
                         <textarea rows="8" class="form-control" readonly>invalid route</textarea>
@@ -246,183 +94,6 @@
                     </div>
                 </div>
 
-                <div class="tab-pane fade show active" id="edit" role="serviceLists" aria-labelledby="edit-tab">
-
-                    <div class="card">
-                        <div class="card-body">
-
-                            <form class="ajax_form" action="api/services/7" data-redirect="services" method="POST">
-                                <h4 class="mb-5 text-muted">Basic Information</h4>
-                                <div class="form-group row">
-                                    <label for="service_name" class="col-sm-4 col-form-label">Service Name</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" name="name" class="form-control" id="service_name" value="Statping API" placeholder="Name" required spellcheck="false" autocorrect="off">
-                                        <small class="form-text text-muted">Give your service a name you can recognize</small>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="service_type" class="col-sm-4 col-form-label">Service Type</label>
-                                    <div class="col-sm-8">
-                                        <select name="type" class="form-control" id="service_type" value="http" readonly>
-                                            <option value="http" selected>HTTP Service</option>
-                                            <option value="tcp" >TCP Service</option>
-                                            <option value="udp" >UDP Service</option>
-                                            <option value="icmp" >ICMP Ping</option>
-                                        </select>
-                                        <small class="form-text text-muted">Use HTTP if you are checking a website or use TCP if you are checking a server</small>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="service_url" class="col-sm-4 col-form-label">Application Endpoint (URL)</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" name="domain" class="form-control" id="service_url" value="https://api.statping.com" placeholder="https://google.com" required autocapitalize="none" spellcheck="false">
-                                        <small class="form-text text-muted">Statping will attempt to connect to this URL</small>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="service_type" class="col-sm-4 col-form-label">Group</label>
-                                    <div class="col-sm-8">
-                                        <select name="group_id" class="form-control" id="group_id">
-                                            <option value="0" >None</option>
-
-                                            <option value="1" >JSON Test Servers</option>
-
-                                            <option value="2" >Google Servers</option>
-
-                                            <option value="3" selected>Statping Servers</option>
-
-                                        </select>
-                                        <small class="form-text text-muted">Attach this service to a group</small>
-                                    </div>
-                                </div>
-
-                                <h4 class="mt-5 mb-5 text-muted">Request Details</h4>
-
-                                <div class="form-group row">
-                                    <label for="service_check_type" class="col-sm-4 col-form-label">Service Check Type</label>
-                                    <div class="col-sm-8">
-                                        <select name="method" class="form-control" id="service_check_type" value="GET">
-                                            <option value="GET" selected>GET</option>
-                                            <option value="POST" >POST</option>
-                                            <option value="DELETE" >DELETE</option>
-                                            <option value="PATCH" >PATCH</option>
-                                            <option value="PUT" >PUT</option>
-                                        </select>
-                                        <small class="form-text text-muted">A GET request will simply request the endpoint, you can also send data with POST.</small>
-                                    </div>
-                                </div>
-                                <div class="form-group row d-none">
-                                    <label for="post_data" class="col-sm-4 col-form-label">Optional Post Data (JSON)</label>
-                                    <div class="col-sm-8">
-                                        <textarea name="post_data" class="form-control" id="post_data" rows="3" autocapitalize="none" spellcheck="false" placeholder='{"data": { "method": "success", "id": 148923 } }'></textarea>
-                                        <small class="form-text text-muted">Insert a JSON string to send data to the endpoint.</small>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="headers" class="col-sm-4 col-form-label">HTTP Headers</label>
-                                    <div class="col-sm-8">
-                                        <input name="headers" class="form-control" id="headers" autocapitalize="none" spellcheck="false" placeholder='Authorization=1010101,Content-Type=application/json' value="">
-                                        <small class="form-text text-muted">Comma delimited list of HTTP Headers (KEY=VALUE,KEY=VALUE)</small>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="service_response" class="col-sm-4 col-form-label">Expected Response (Regex)</label>
-                                    <div class="col-sm-8">
-                                        <textarea name="expected" class="form-control" id="service_response" rows="3" autocapitalize="none" spellcheck="false" placeholder='(method)": "((\\"|[success])*)"'></textarea>
-                                        <small class="form-text text-muted">You can use plain text or insert <a target="_blank" href="https://regex101.com/r/I5bbj9/1">Regex</a> to validate the response</small>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="service_response_code" class="col-sm-4 col-form-label">Expected Status Code</label>
-                                    <div class="col-sm-8">
-                                        <input type="number" name="expected_status" class="form-control" value="200" placeholder="200" id="service_response_code">
-                                        <small class="form-text text-muted">A status code of 200 is success, or view all the <a target="_blank" href="https://www.restapitutorial.com/httpstatuscodes.html">HTTP Status Codes</a></small>
-                                    </div>
-                                </div>
-                                <div class="form-group row d-none">
-                                    <label for="port" class="col-sm-4 col-form-label">TCP Port</label>
-                                    <div class="col-sm-8">
-                                        <input type="number" name="port" class="form-control" value="" id="service_port" placeholder="8080">
-                                    </div>
-                                </div>
-
-                                <h4 class="mt-5 mb-5 text-muted">Additional Options</h4>
-
-                                <div class="form-group row">
-                                    <label for="service_interval" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
-                                    <div class="col-sm-8">
-                                        <input type="number" name="check_interval" class="form-control" value="60" min="1" id="service_interval" required>
-                                        <small id="interval" class="form-text text-muted">10,000+ will be checked in Microseconds (1 millisecond = 1000 microseconds).</small>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="service_timeout" class="col-sm-4 col-form-label">Timeout in Seconds</label>
-                                    <div class="col-sm-8">
-                                        <input type="number" name="timeout" class="form-control" value="15" placeholder="15" id="service_timeout" min="1">
-                                        <small class="form-text text-muted">If the endpoint does not respond within this time it will be considered to be offline</small>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="post_data" class="col-sm-4 col-form-label">Permalink URL</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" name="permalink" class="form-control" value="" id="permalink" autocapitalize="none" spellcheck="true" placeholder='awesome_service'>
-                                        <small class="form-text text-muted">Use text for the service URL rather than the service number.</small>
-                                    </div>
-                                </div>
-                                <div class="form-group row d-none">
-                                    <label for="order" class="col-sm-4 col-form-label">List Order</label>
-                                    <div class="col-sm-8">
-                                        <input type="number" name="order" class="form-control" min="0" value="0" id="order">
-                                        <small class="form-text text-muted">You can also drag and drop services to reorder on the Services tab.</small>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="order" class="col-sm-4 col-form-label">Verify SSL</label>
-                                    <div class="col-8 mt-1">
-            <span class="switch float-left">
-                <input type="checkbox" name="verify_ssl-option" class="switch" id="switch-verify-ssl" >
-                <label for="switch-verify-ssl">Verify SSL Certificate for this service</label>
-                <input type="hidden" name="verify_ssl" id="switch-verify-ssl-value" value="false">
-            </span>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="order" class="col-sm-4 col-form-label">Notifications</label>
-                                    <div class="col-8 mt-1">
-            <span class="switch float-left">
-                <input type="checkbox" name="allow_notifications-option" class="switch" id="switch-notifications" checked>
-                <label for="switch-notifications">Allow notifications to be sent for this service</label>
-                <input type="hidden" name="allow_notifications" id="switch-notifications-value" value="true">
-            </span>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="order" class="col-sm-4 col-form-label">Visible</label>
-                                    <div class="col-8 mt-1">
-            <span class="switch float-left">
-                <input type="checkbox" name="public-option" class="switch" id="switch-public" checked>
-                <label for="switch-public">Show service details to the public</label>
-                <input type="hidden" name="public" id="switch-public-value" value="true">
-            </span>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <div class="col-6">
-                                        <button type="submit" class="btn btn-success btn-block">Update Service</button>
-                                    </div>
-
-                                    <div class="col-6">
-                                        <a href="service/7/delete_failures" data-method="GET" data-redirect="/service/7" class="btn btn-danger btn-block confirm-btn">Delete All Failures</a>
-                                    </div>
-
-                                </div>
-                                <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
-                            </form>
-                        </div>
-                    </div>
-
-                </div>
-
             </div>
 
         </div>
@@ -432,32 +103,148 @@
 
 <script>
   import Api from "../components/API"
-  import TopNav from "../components/Dashboard/TopNav";
+  import Checkin from "../forms/Checkin";
 
-  export default {
+  const axisOptions = {
+    labels: {
+      show: false
+    },
+    crosshairs: {
+      show: false
+    },
+    lines: {
+      show: false
+    },
+    tooltip: {
+      enabled: false
+    },
+    axisTicks: {
+      show: true
+    },
+    grid: {
+      show: true
+    },
+    marker: {
+      show: false
+    }
+  };
+
+export default {
   name: 'Service',
   components: {
-    TopNav
+    Checkin
   },
   data () {
     return {
       id: null,
+      tab: "failures",
       service: null,
+      authenticated: false,
+      ready: false,
+      data: null,
+      failures: [],
+      chartOptions: {
+        chart: {
+          height: 500,
+          width: "100%",
+          type: "area",
+          animations: {
+            enabled: true,
+            initialAnimation: {
+              enabled: true
+            }
+          },
+          selection: {
+            enabled: false
+          },
+          zoom: {
+            enabled: false
+          },
+          toolbar: {
+            show: false
+          },
+        },
+        grid: {
+          show: true,
+          padding: {
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: -10,
+          }
+        },
+        xaxis: {
+          type: "datetime",
+          ...axisOptions
+        },
+        yaxis: {
+          ...axisOptions
+        },
+        tooltip: {
+          enabled: false,
+          marker: {
+            show: false,
+          },
+          x: {
+            show: false,
+          }
+        },
+        legend: {
+          show: false,
+        },
+        dataLabels: {
+          enabled: false
+        },
+        floating: true,
+        axisTicks: {
+          show: false
+        },
+        axisBorder: {
+          show: false
+        },
+        fill: {
+          colors: ["#48d338"],
+          opacity: 1,
+          type: 'solid'
+        },
+        stroke: {
+          show: true,
+          curve: 'smooth',
+          lineCap: 'butt',
+          colors: ["#3aa82d"],
+        }
+      },
+      series: [{
+        data: []
+      }]
     }
   },
-  mounted() {
-    this.service = this.$route.params.service
-    this.id = this.$route.params.id
-    if (!this.service) {
-      this.getService(this.id)
-    }
-  },
-  beforeMount() {
+    created() {
+      this.service = this.$route.params.service
+      this.id = this.$route.params.id
+      if (!this.service) {
+        this.getService(this.id)
+      }
+    },
+    mounted() {
 
   },
   methods: {
     async getService(id) {
         this.service = await Api.service(id)
+        await this.chartHits()
+        await this.serviceFailures()
+    },
+    async serviceFailures() {
+      this.failures = await Api.service_failures(this.service.id, 0, 99999999999)
+    },
+    async chartHits() {
+      this.data = await Api.service_hits(this.service.id, 0, 99999999999, "hour")
+      this.series = [{
+        name: this.service.name,
+        ...this.data
+      }]
+      this.ready = true
     }
   }
 }

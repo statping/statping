@@ -69,7 +69,7 @@
             </select>
         </div>
 
-        <button v-on:submit="saveSettings" type="submit" class="btn btn-primary btn-block">Save Settings</button>
+        <button @click="saveSettings" type="submit" class="btn btn-primary btn-block">Save Settings</button>
 
         <div class="form-group row mt-3">
             <label class="col-sm-3 col-form-label">API Key</label>
@@ -84,7 +84,7 @@
             <div class="col-sm-9">
                 <input v-model="core.api_secret" type="text" class="form-control select-input" readonly>
                 <small class="form-text text-muted">API Secret is used for read, create, update and delete routes</small>
-                <small class="form-text text-muted">You can <a href="#" v-on:click="renewApiKeys">Regenerate API Keys</a> if you need to.</small>
+                <small class="form-text text-muted">You can <a href="#" @click="renewApiKeys">Regenerate API Keys</a> if you need to.</small>
             </div>
         </div>
 

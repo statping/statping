@@ -251,12 +251,10 @@
 
                             <button type="submit" class="btn btn-block btn-info fetch_integrator">Fetch Services</button>
 
-                            <div class="alert alert-danger d-none" id="integration_alerter" role="alert"></div>
+                            <div class="alert alert-danger d-none" role="alert"></div>
                         </form>
 
                     </div>
-
-
 
                     <div class="tab-pane fade" id="v-pills-browse" role="tabpanel" aria-labelledby="v-pills-browse-tab">
 
@@ -277,6 +275,7 @@
 </template>
 
 <script>
+  import Api from '../components/API';
   import CoreSettings from '../forms/CoreSettings';
   import Notifier from "../forms/Notifier";
 
@@ -284,16 +283,18 @@
   name: 'Settings',
   components: {
     Notifier,
-      CoreSettings
-
+    CoreSettings
   },
   data () {
     return {
       tab: "v-pills-home-tab",
     }
   },
-  created() {
-
+  async created() {
+    const core = await Api.core()
+    this.$store.commit('setCore', core)
+    const notifiers = await Api.notifiers()
+    this.$store.commit('setNotifiers', notifiers)
   },
   beforeMount() {
 

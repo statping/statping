@@ -66,16 +66,13 @@
 
   },
   methods: {
-    saveUser (e) {
+    async saveUser(e) {
       e.preventDefault();
-      alert(JSON.stringify(this.user))
-    },
-    async saveGroup(e) {
-      e.preventDefault();
-      const data = {name: this.group.name, public: this.group.public}
-      await Api.group_create(data)
-      const groups = await Api.groups()
-      this.$store.commit('setGroups', groups)
+      let user = this.user
+      delete user.confirm_password
+      await Api.user_create(user)
+      const users = await Api.users()
+      this.$store.commit('setUsers', users)
     },
   }
 }

@@ -28,8 +28,16 @@ class Api {
     return axios.get('/api/services/'+id+'/data?start=' + start + '&end=' + end + '&group=' + group).then(response => (response.data))
   }
 
+  async service_failures (id, start, end) {
+    return axios.get('/api/services/'+id+'/failures?start=' + start + '&end=' + end).then(response => (response.data))
+  }
+
   async service_delete (id) {
     return axios.delete('/api/services/'+id).then(response => (response.data))
+  }
+
+  async services_reorder (data) {
+    return axios.post('/api/services/reorder', data).then(response => (response.data))
   }
 
   async groups () {
@@ -48,8 +56,8 @@ class Api {
     return axios.get('/api/users').then(response => (response.data))
   }
 
-  async user_create (id) {
-    return axios.post('/api/users').then(response => (response.data))
+  async user_create (data) {
+    return axios.post('/api/users', data).then(response => (response.data))
   }
 
   async user_delete (id) {
@@ -70,6 +78,14 @@ class Api {
 
   async notifiers () {
     return axios.get('/api/notifiers').then(response => (response.data))
+  }
+
+  async notifier_save (data) {
+    return axios.post('/api/notifier/'+data.method, data).then(response => (response.data))
+  }
+
+  async notifier_test (data) {
+    return axios.post('/api/notifier/'+data.method+'/test', data).then(response => (response.data))
   }
 
     async renewApiKeys () {

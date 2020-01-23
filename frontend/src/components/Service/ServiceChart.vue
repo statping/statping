@@ -1,9 +1,33 @@
 <template>
-    <div>{{data}}</div>
+    <apexchart v-if="ready" width="100%" height="215" type="area" :options="chartOptions" :series="series"></apexchart>
 </template>
 
 <script>
   import Api from "../../components/API"
+
+  const axisOptions = {
+    labels: {
+      show: false
+    },
+    crosshairs: {
+      show: false
+    },
+    lines: {
+      show: false
+    },
+    tooltip: {
+      enabled: false
+    },
+    axisTicks: {
+      show: false
+    },
+    grid: {
+      show: false
+    },
+    marker: {
+      show: false
+    }
+  };
 
   export default {
   name: 'ServiceChart',
@@ -18,39 +42,94 @@
   },
   methods: {
     async chartHits() {
-      this.data = await Api.service_hits(this.props.service.id, 0, 99999999999, "minute")
-      this.series = [this.data]
+      this.data = await Api.service_hits(this.service.id, 0, 99999999999, "hour")
+      this.series = [{
+        name: this.service.name,
+        ...this.data
+      }]
       this.ready = true
     }
   },
   data () {
     return {
-      ready: true,
+      ready: false,
       data: null,
       chartOptions: {
         chart: {
-          id: 'vuechart-example',
+          height: 210,
+          width: "100%",
+          type: "area",
+          animations: {
+            enabled: true,
+            initialAnimation: {
+              enabled: true
+            }
+          },
+          selection: {
+            enabled: false
+          },
+          zoom: {
+            enabled: false
+          },
+          toolbar: {
+            show: false
+          },
+        },
+        grid: {
+          show: false,
+          padding: {
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: -10,
+          }
         },
         xaxis: {
-          categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998],
+          type: "datetime",
+          ...axisOptions
         },
-      },
+        yaxis: {
+          ...axisOptions
+        },
+          tooltip: {
+            enabled: false,
+            marker: {
+              show: false,
+            },
+            x: {
+              show: false,
+            }
+          },
+          legend: {
+            show: false,
+          },
+          dataLabels: {
+            enabled: false
+          },
+          floating: true,
+          axisTicks: {
+            show: false
+          },
+          axisBorder: {
+            show: false
+          },
+          fill: {
+            colors: ["#48d338"],
+            opacity: 1,
+            type: 'solid'
+          },
+          stroke: {
+            show: true,
+            curve: 'smooth',
+            lineCap: 'butt',
+            colors: ["#3aa82d"],
+          }
+        },
       series: [{
-        name: 'Vue Chart',
-        data: [30, 40, 45, 50, 49, 60, 70, 81]
+        name: this.service.name,
+        data: []
       }]
     }
-  },
-  mounted() {
-    const max = 90;
-    const min = 20;
-    const newData = this.series[0].data.map(() => {
-      return Math.floor(Math.random() * (max - min + 1)) + min
-    })
-    // In the same way, update the series option
-    this.series = [{
-      data: newData
-    }]
   }
 }
 </script>

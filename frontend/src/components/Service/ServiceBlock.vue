@@ -27,7 +27,7 @@
             </div>
 
             <div class="chart-container">
-                <ServiceChart service="service"/>
+                <ServiceChart :service="service"/>
             </div>
 
             <div class="row lower_canvas full-col-12 text-white">
@@ -50,7 +50,10 @@
   name: 'ServiceBlock',
   components: {ServiceChart},
   props: {
-    service: Object
+    service: {
+      type: Object,
+      required: true
+    },
   }
 }
 </script>

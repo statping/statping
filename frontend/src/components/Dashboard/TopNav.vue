@@ -8,27 +8,27 @@
         <div class="collapse navbar-collapse" id="navbarText">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a v-on:click="changeView('DashboardIndex', '/dashboard')" class="nav-link" href="#">Dashboard</a>
+                    <router-link to="/dashboard" class="nav-link">Dashboard</router-link>
                 </li>
                 <li class="nav-item">
-                    <a v-on:click="changeView('DashboardServices', '/dashboard/services')" class="nav-link" href="#">Services</a>
+                    <router-link to="/dashboard/services" class="nav-link">Services</router-link>
                 </li>
                 <li class="nav-item">
-                    <a v-on:click="changeView('DashboardUsers', '/dashboard/users')" class="nav-link" href="#">Users</a>
+                    <router-link to="/dashboard/users" class="nav-link">Users</router-link>
                 </li>
                 <li class="nav-item">
-                    <a v-on:click="changeView('DashboardMessages', '/dashboard/messages')" class="nav-link" href="#">Messages</a>
-                </li>
-
-                <li class="nav-item">
-                    <a v-on:click="changeView('Settings', '/dashboard/settings')" class="nav-link" href="#">Settings</a>
-                </li>
-                <li class="nav-item">
-                    <a v-on:click="changeView('Logs', '/dashboard/logs')" class="nav-link" href="#">Logs</a>
+                    <router-link to="/dashboard/messages" class="nav-link">Messages</router-link>
                 </li>
 
                 <li class="nav-item">
-                    <a v-on:click="changeView('DashboardIndex', '/dashboard/help')" class="nav-link" href="#">Help</a>
+                    <router-link to="/dashboard/settings" class="nav-link">Settings</router-link>
+                </li>
+                <li class="nav-item">
+                    <router-link to="/dashboard/logs" class="nav-link">Logs</router-link>
+                </li>
+
+                <li class="nav-item">
+                    <router-link to="/dashboard/help" class="nav-link">Help</router-link>
                 </li>
             </ul>
             <span class="navbar-text">
@@ -45,7 +45,7 @@
   export default {
   name: 'TopNav',
   props: {
-    changeView: Function
+
   },
   methods: {
     async logout () {

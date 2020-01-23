@@ -1,5 +1,6 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
+
 Vue.use(Vuex)
 
 export const HAS_ALL_DATA = 'HAS_ALL_DATA'
@@ -44,6 +45,9 @@ export default new Vuex.Store({
         },
         servicesInGroup: (state) => (id) => {
             return state.services.filter(s => s.group_id === id)
+        },
+        servicesInOrder: (state) => () => {
+          return state.services.sort((a, b) => a.order_id - b.order_id)
         },
         onlineServices: (state) => (online) => {
             return state.services.filter(s => s.online === online)

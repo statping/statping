@@ -1,17 +1,12 @@
 <template>
-    <font-awesome-icon @click="toggleChecking" class="toggle-service text-success" icon="toggle-on" />
+    <font-awesome-icon @click="toggleChecking" class="toggle-service" :class="{'text-success': running, 'text-muted': !running}" :icon="icon" />
 </template>
 
 <script>
-import Api from "../components/API";
 
-export default {
+  export default {
   name: 'ToggleSwitch',
   props: {
-    next: {
-      type: Function,
-      required: true
-    },
     service: {
       type: Object,
       required: true
@@ -19,19 +14,27 @@ export default {
   },
   data () {
     return {
-
+        icon: "toggle-on",
+      running: true
     }
   },
   mounted() {
-
+    if (this.service.online) {
+      this.running = true
+      this.icon = "toggle-on"
+    } else {
+      this.running = false
+      this.icon = "toggle-off"
+    }
   },
   methods: {
     toggleChecking() {
-      let c = confirm(`Are you sure you want to stop monitoring '${this.service.name}'?`)
-      if (c) {
-
+      if (this.running) {
+        this.icon = "toggle-off"
+      } else {
+        this.icon = "toggle-on"
       }
-      this.props.next(this.props.service)
+      this.running = !this.running
     },
   }
 }

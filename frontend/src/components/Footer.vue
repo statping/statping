@@ -8,8 +8,13 @@
 </template>
 
 <script>
-export default {
+  import Dashboard from "../pages/Dashboard";
+
+  export default {
   name: 'Footer',
+  components: {
+    Dashboard
+  },
   props: {
     version: String
   }

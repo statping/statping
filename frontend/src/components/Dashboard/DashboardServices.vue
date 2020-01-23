@@ -19,7 +19,9 @@
     <div>
     <div class="col-12">
         <h1 class="text-black-50">Services
-            <router-link to="/service/create" class="btn btn-outline-success mt-1 float-right"><i class="fas fa-plus"></i> Create</router-link>
+            <router-link to="/dashboard/create_service" class="btn btn-outline-success mt-1 float-right">
+                <i class="fas fa-plus"></i> Create
+            </router-link>
         </h1>
         <table class="table">
             <thead>
@@ -31,34 +33,37 @@
                 <th scope="col"></th>
             </tr>
             </thead>
-            <tbody class="sortable" id="services_table">
-
-            <tr v-for="(service, index) in $store.getters.services" v-bind:key="index">
+            <draggable tag="tbody" :list="services" :key="services.length" class="sortable" handle=".drag_icon">
+            <tr v-for="(service, index) in services" :key="index">
                 <td>
-                    <span class="drag_icon d-none d-md-inline"><font-awesome-icon icon="bars" /></span> {{service.name}}
+                    <span class="drag_icon d-none d-md-inline">
+                        <font-awesome-icon icon="bars" />
+                    </span> {{service.name}}
                 </td>
                 <td class="d-none d-md-table-cell">
-                    <div v-if="service.online"><span class="badge badge-success">ONLINE</span><ToggleSwitch :next="stopChecking" :service="service"/></div>
-                    <div v-if="!service.online"><span class="badge badge-success">OFFLINE</span><ToggleSwitch :next="stopChecking" :service="service"/></div>
+                    <span class="badge" :class="{'badge-success': service.online, 'badge-danger': !service.online}">{{service.online ? "ONLINE" : "OFFLINE"}}</span>
+                    <ToggleSwitch :service="service"/>
                 </td>
                 <td class="d-none d-md-table-cell">
-                    <div v-if="service.public"><span class="badge badge-primary">PUBLIC</span></div>
-                    <div v-if="!service.public"><span class="badge badge-secondary">PRIVATE</span></div>
+                    <span class="badge" :class="{'badge-primary': service.public, 'badge-secondary': !service.public}">
+                        {{service.public ? "PUBLIC" : "PRIVATE"}}
+                    </span>
                 </td>
                 <td class="d-none d-md-table-cell">
                     <div v-if="service.group_id !== 0"><span class="badge badge-secondary">{{serviceGroup(service)}}</span></div>
                 </td>
                 <td class="text-right">
                     <div class="btn-group">
-                        <router-link :to="{path: `/service/${service.id}`, params: {service: service} }" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> View</router-link>
+                        <router-link :to="{path: `/dashboard/edit_service/${service.id}`, params: {service: service} }" class="btn btn-outline-secondary">
+                            <i class="fas fa-chart-area"></i> View
+                        </router-link>
                         <a @click="deleteService(service)" href="#" class="btn btn-danger">
                             <font-awesome-icon icon="times" />
                         </a>
                     </div>
                 </td>
             </tr>
-
-            </tbody>
+            </draggable>
         </table>
 
     </div>
@@ -75,8 +80,8 @@
                 <th scope="col"></th>
             </tr>
             </thead>
-            <tbody class="sortable_groups" id="groups_table">
 
+            <draggable tag="tbody" v-model="groupsList" class="sortable_groups" handle=".drag_icon">
             <tr v-for="(group, index) in $store.getters.cleanGroups()" v-bind:key="index">
                 <td><span class="drag_icon d-none d-md-inline"><font-awesome-icon icon="bars" /></span> {{group.name}}</td>
                 <td>{{$store.getters.servicesInGroup(group.id).length}}</td>
@@ -94,7 +99,7 @@
                 </td>
             </tr>
 
-            </tbody>
+                </draggable>
         </table>
 
         <h1 class="text-muted mt-5">Create Group</h1>
@@ -110,27 +115,64 @@
 </template>
 
 <script>
-import FormGroup from "../../forms/Group";
-import Api from "../../components/API";
-import ToggleSwitch from "../../forms/ToggleSwitch";
+  import FormGroup from "../../forms/Group";
+  import Api from "../../components/API";
+  import ToggleSwitch from "../../forms/ToggleSwitch";
+  import draggable from 'vuedraggable'
 
-export default {
+  export default {
   name: 'DashboardServices',
   components: {
     ToggleSwitch,
-    FormGroup
+    FormGroup,
+    draggable
   },
   data () {
     return {
-
+        services: []
+    }
+  },
+  async created() {
+    const services = await Api.services()
+    this.$store.commit('setServices', services)
+    this.services = this.$store.getters.servicesInOrder()
+  },
+  computed: {
+    servicesList: {
+      get() {
+        return this.$store.getters.servicesInOrder()
+      },
+      async set(value) {
+        let data = [];
+        value.forEach((s, k) => {
+          data.push({service: s.id, order: k+1})
+        });
+        alert(JSON.stringify(data))
+        const ord = await Api.services_reorder(data)
+        alert(JSON.parse(ord))
+      }
+    },
+    groupsList: {
+      get() {
+        return this.$store.state.groups
+      },
+      async set(value) {
+        let data = [];
+        value.forEach((s, k) => {
+          data.push({group: s.id, order: k+1})
+        });
+        alert(JSON.stringify(data))
+        const ord = await Api.services_reorder(data)
+        alert(JSON.parse(ord))
+      }
     }
   },
   beforeMount() {
 
   },
   methods: {
-    stopChecking(s) {
-      alert(JSON.stringify(s))
+    reordered_services() {
+
     },
     serviceGroup(s) {
       let group = this.$store.getters.groupById(s.group_id)

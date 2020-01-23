@@ -8,19 +8,21 @@ import store from '@/store'
 import {library} from '@fortawesome/fontawesome-svg-core'
 import {fas} from '@fortawesome/fontawesome-free-solid';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
+import DashboardIndex from "./components/Dashboard/DashboardIndex";
+import DashboardUsers from "./components/Dashboard/DashboardUsers";
+import DashboardServices from "./components/Dashboard/DashboardServices";
+import DashboardMessages from "./components/Dashboard/DashboardMessages";
+import Settings from "./pages/Settings";
+import EditService from "./components/Dashboard/EditService";
+import Dashboard from "./pages/Dashboard";
+import Index from "./pages/Index";
+import Login from "./pages/Login";
+import Service from "./pages/Service";
 
 library.add(fas)
 
 Vue.component('apexchart', VueApexCharts)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
-
-
-const Index = () => import("@/pages/Index");
-const Dashboard = () => import("@/pages/Dashboard");
-const Login = () => import("@/pages/Login");
-const Settings = () => import("@/pages/Settings");
-const Services = () => import("@/pages/Services");
-const Service = () => import("@/pages/Service");
 
 require("@/assets/css/bootstrap.min.css")
 require("@/assets/css/base.css")
@@ -42,8 +44,34 @@ const routes = [
     path: '/dashboard',
     name: 'Dashboard',
     component: Dashboard,
-    alias: ['/dashboard/settings', '/dashboard/services', '/dashboard/messages', '/dashboard/groups', '/dashboard/users', '/dashboard/logs', '/dashboard/help',
-        '/service/create']
+    children: [{
+      path: '',
+      component: DashboardIndex
+    },{
+      path: 'users',
+      component: DashboardUsers
+    },{
+      path: 'services',
+      component: DashboardServices
+    },{
+      path: 'create_service',
+      component: EditService
+    },{
+      path: 'edit_service/:id',
+      component: EditService
+    },{
+      path: 'messages',
+      component: DashboardMessages
+    },{
+      path: 'settings',
+      component: Settings
+      },{
+      path: 'logs',
+      component: DashboardUsers
+    },{
+      path: 'help',
+      component: DashboardUsers
+    }]
   },
   {
     path: '/login',
@@ -51,16 +79,6 @@ const routes = [
     component: Login
   },
   { path: '/logout', redirect: '/' },
-  {
-    path: '/settings',
-    name: 'Settings',
-    component: Settings
-  },
-  {
-    path: '/services',
-    name: 'Services',
-    component: Services
-  },
   {
     path: '/service/:id',
     name: 'Service',
@@ -75,6 +93,7 @@ const router = new VueRouter({
 })
 
 Vue.use(VueRouter);
+Vue.use(require('vue-moment'));
 
 Vue.config.productionTip = false
 new Vue({

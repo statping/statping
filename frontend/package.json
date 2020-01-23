@@ -18,9 +18,11 @@
     "apexcharts": "^3.15.0",
     "axios": "^0.19.1",
     "core-js": "^3.4.4",
+    "moment": "^2.24.0",
     "querystring": "^0.2.0",
     "vue": "^2.6.10",
     "vue-apexcharts": "^1.5.2",
+    "vue-moment": "^4.1.0",
     "vue-router": "~3.0",
     "vuedraggable": "^2.23.2",
     "vuex": "^3.1.2"

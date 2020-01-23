@@ -50,8 +50,8 @@ func (s *Service) CreateFailure(f *types.Failure) (int64, error) {
 }
 
 // AllFailures will return all failures attached to a service
-func (s *Service) AllFailures() []*Failure {
-	var fails []*Failure
+func (s *Service) AllFailures() []*types.Failure {
+	var fails []*types.Failure
 	col := failuresDB().Where("service = ?", s.Id).Not("method = 'checkin'").Order("id desc")
 	err := col.Find(&fails)
 	if err.Error != nil {
