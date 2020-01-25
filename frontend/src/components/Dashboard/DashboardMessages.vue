@@ -34,13 +34,11 @@
 
     <div class="col-12">
         <h1 class="text-black-50 mt-5">Create Message</h1>
-
         <div class="card">
             <div class="card-body">
                 <FormMessage/>
             </div>
         </div>
-
     </div>
     </div>
 </template>
@@ -62,7 +60,7 @@
   },
   methods: {
     service (id) {
-        return this.$store.getters.serviceById(id)
+        return this.$store.getters.serviceById(id).name || ""
     },
     async deleteMessage(m) {
       let c = confirm(`Are you sure you want to delete message '${m.title}'?`)

@@ -16,6 +16,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/hunterlong/statping/core"
@@ -50,6 +51,39 @@ func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+}
+
+func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
+	var c *core.Core
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&c)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	app := core.CoreApp
+	if c.Name != "" {
+		app.Name = c.Name
+	}
+	if c.Description != app.Description {
+		app.Description = c.Description
+	}
+	if c.Style != app.Style {
+		app.Style = c.Style
+	}
+	if c.Footer.String != app.Footer.String {
+		app.Footer = c.Footer
+	}
+	if c.Domain != app.Domain {
+		app.Domain = c.Domain
+	}
+	if c.Timezone != app.Timezone {
+		app.Timezone = c.Timezone
+	}
+	app.UpdateNotify = c.UpdateNotify
+	app.UseCdn = types.NewNullBool(c.UseCdn.Bool)
+	core.CoreApp, err = core.UpdateCore(app)
+	returnJson(core.CoreApp, w, r)
 }
 
 func apiClearCacheHandler(w http.ResponseWriter, r *http.Request) {

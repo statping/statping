@@ -6,13 +6,14 @@
                     <h6 class="text-muted">Main Settings</h6>
 
                     <a v-on:click="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-home-tab')}" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true"><i class="fa fa-cogs"></i> Settings</a>
-                    <a v-on:click="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-notifications-tab')}" id="v-pills-notifications-tab" data-toggle="pill" href="#v-pills-notifications" role="tab" aria-controls="v-pills-notifications" aria-selected="true"><i class="fa fa-bell"></i> Notifications</a>
                     <a v-on:click="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-style-tab')}" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false"><i class="fa fa-image"></i> Theme Editor</a>
                     <a v-on:click="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-cache-tab')}" id="v-pills-cache-tab" data-toggle="pill" href="#v-pills-cache" role="tab" aria-controls="v-pills-cache" aria-selected="false"><i class="fa fa-paperclip"></i> Cache</a>
 
                     <h6 class="mt-4 text-muted">Notifiers</h6>
 
-                    <a v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="index" v-on:click="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" data-toggle="pill" v-bind:href="`#v-pills-${notifier.method.toLowerCase()}`" role="tab" v-bind:aria-controls="`v-pills-${notifier.method.toLowerCase()}`" aria-selected="false"><i class="fas fa-terminal"></i> {{notifier.method}}</a>
+                    <a v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="index" v-on:click="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" data-toggle="pill" v-bind:href="`#v-pills-${notifier.method.toLowerCase()}`" role="tab" v-bind:aria-controls="`v-pills-${notifier.method.toLowerCase()}`" aria-selected="false">
+                        <i class="fas fa-terminal"></i> {{notifier.method}}
+                    </a>
 
                     <h6 class="mt-4 text-muted">Integrations (beta)</h6>
 
@@ -52,37 +53,13 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="row align-content-center">
-                                    <img class="rounded text-center" width="300" height="300" src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=statping%3a%2f%2fsetup%3fdomain%3dhttps%3a%2f%2fdemo.statping.com%26api%3d6b05b48f4b3a1460f3864c31b26cab6a27dbaff9">
+                                    <img class="rounded text-center" width="300" height="300" :src="qrcode">
                                 </div>
                                 <a class="btn btn-sm btn-primary" href=statping://setup?domain&#61;https://demo.statping.com&amp;api&#61;6b05b48f4b3a1460f3864c31b26cab6a27dbaff9>Open in Statping App</a>
                                 <a href="settings/export" class="btn btn-sm btn-secondary">Export Settings</a>
                             </div>
                         </div>
 
-                    </div>
-
-                    <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-notifications-tab'), show: liClass('v-pills-notifications-tab')}" id="v-pills-notifications" role="tabpanel" aria-labelledby="v-pills-notifications-tab">
-                        <h3>Notifications</h3>
-
-                        <form method="POST" action="settings">
-
-                            <div class="form-group">
-                                <div class="col-12">
-                                    <label class="d-inline d-sm-none">Send Updates only</label>
-                                    <label class="d-none d-sm-block">Send Updates only</label>
-
-                                    <span class="switch">
-                                        <input type="checkbox" name="update_notify-option" class="switch" id="switch-update_notify">
-                                        <label for="switch-update_notify" class="mt-2 mt-sm-0"></label>
-                                        <small class="form-text text-muted">Enabling this will send only notifications when the status of a services changes.</small>
-                                    </span>
-
-                                    <input type="hidden" name="update_notify" id="switch-update_notify-value" value="false">
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-block">Save Settings</button>
-
-                        </form>
                     </div>
 
                     <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-style-tab'), show: liClass('v-pills-style-tab')}" id="v-pills-style" role="tabpanel" aria-labelledby="v-pills-style-tab">
@@ -162,7 +139,7 @@
 
                             <button type="submit" class="btn btn-block btn-info fetch_integrator">Fetch Services</button>
 
-                            <div class="alert alert-danger d-none" id="integration_alerter" role="alert"></div>
+                            <div class="alert alert-danger d-none" role="alert"></div>
                         </form>
 
                     </div>
@@ -288,6 +265,7 @@
   data () {
     return {
       tab: "v-pills-home-tab",
+      qrcode: ""
     }
   },
   async created() {
@@ -295,6 +273,8 @@
     this.$store.commit('setCore', core)
     const notifiers = await Api.notifiers()
     this.$store.commit('setNotifiers', notifiers)
+    const qrurl = `statping://setup?domain=${core.domain}&api=${core.api_secret}`
+    this.qrcode = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=" + encodeURI(qrurl)
   },
   beforeMount() {
 

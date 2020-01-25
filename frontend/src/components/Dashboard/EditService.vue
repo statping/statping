@@ -1,5 +1,7 @@
 <template>
-    <FormService v-if="ready" :in_service="service"/>
+    <div>
+        <FormService v-if="ready" :in_service="service"/>
+    </div>
 </template>
 
 <script>

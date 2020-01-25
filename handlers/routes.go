@@ -118,6 +118,7 @@ func Router() *mux.Router {
 	r.Handle("/api/logout", http.HandlerFunc(logoutHandler))
 	r.Handle("/api/renew", authenticated(apiRenewHandler, false))
 	r.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
+	r.Handle("/api/core", authenticated(apiCoreHandler, false)).Methods("POST")
 
 	r.Handle("/api/integrations", authenticated(apiAllIntegrationsHandler, false)).Methods("GET")
 	r.Handle("/api/integrations/{name}", authenticated(apiIntegrationHandler, false)).Methods("GET")

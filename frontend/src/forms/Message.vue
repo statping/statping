@@ -65,11 +65,10 @@
         <div class="form-group row">
             <label for="notify_method" class="col-sm-4 col-form-label">Notify Users</label>
             <div class="col-sm-8">
-            <span class="switch">
-            <input type="checkbox" name="notify_users-value" class="switch" id="switch-normal">
-            <label for="switch-normal">Notify Users Before Scheduled Time</label>
-            <input type="hidden" name="notify_users" id="switch-normal-value" value="false">
-          </span>
+                <span class="switch">
+                    <input @click="message.notify = !!message.notify" type="checkbox" class="switch" id="switch-normal">
+                    <label for="switch-normal">Notify Users Before Scheduled Time</label>
+                </span>
             </div>
         </div>
 

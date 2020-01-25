@@ -24,10 +24,9 @@
             </div>
 
             <div class="col-3 col-sm-2 mt-1">
-                <span class="switch">
-                    <input @change="notifier.enabled = !notifier.enabled" type="checkbox" name="enabled-option" class="switch" v-model="notifier.enabled" v-bind:id="`switch-${notifier.method}`">
+                <span @click="notifier.enabled = !!notifier.enabled" class="switch">
+                    <input type="checkbox" name="enabled-option" class="switch" v-model="notifier.enabled" v-bind:id="`switch-${notifier.method}`" v-bind:checked="notifier.enabled">
                     <label v-bind:for="`switch-${notifier.method}`"></label>
-                    <input type="hidden" name="enabled" v-bind:id="`switch-${notifier.method}`">
                 </span>
             </div>
 
@@ -90,7 +89,6 @@
       form.enabled = this.notifier.enabled
       form.limits = parseInt(this.notifier.limits)
       form.method = this.notifier.method
-      alert(JSON.stringify(form))
       await Api.notifier_save(form)
       const notifiers = await Api.notifiers()
       this.$store.commit('setNotifiers', notifiers)

@@ -13,7 +13,7 @@ class Api {
   }
 
   async core_save (obj) {
-    return axios.post('/api', obj).then(response => (response.data))
+    return axios.post('/api/core', obj).then(response => (response.data))
   }
 
   async services () {

@@ -6,10 +6,9 @@
                 <input v-model="user.username" type="text" class="form-control" placeholder="Username" required autocorrect="off" autocapitalize="none">
             </div>
             <div class="col-6 col-md-4">
-                  <span class="switch">
-                    <input @change="user.admin = !user.admin" type="checkbox" name="admin" class="switch" id="switch-normal">
+                  <span @click="user.admin = !!user.admin" class="switch">
+                    <input type="checkbox" name="admin" class="switch" id="switch-normal" v-bind:checked="user.admin">
                     <label for="switch-normal">Administrator</label>
-                    <input type="hidden" name="admin" id="switch-normal-value">
                   </span>
             </div>
         </div>

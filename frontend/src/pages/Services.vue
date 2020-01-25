@@ -26,7 +26,7 @@
   methods: {
     async loadAll () {
       this.auth = Api.authToken()
-      this.core = await Api.root()
+      this.core = await Api.core()
       this.groups = await Api.groups()
       this.services = await Api.services()
     }
