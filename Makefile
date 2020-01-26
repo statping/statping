@@ -22,6 +22,8 @@ frontend:
 
 frontend-build:
 	cd frontend && rm -rf dist && yarn build
+	rm -rf source/dist && cp -r frontend/dist source/
+	cp -r source/tmpl/*.* source/dist/
 
 # build and push the images to docker hub
 docker: docker-build-all docker-publish-all
@@ -93,10 +95,8 @@ watch:
 	-i="Makefile,statping,statup.db,statup.db-journal,handlers/graphql/generated.go"
 
 # compile assets using SASS and Rice. compiles scss -> css, and run rice embed-go
-compile: generate
-	sass source/scss/base.scss source/css/base.css
+compile: frontend-build generate
 	cd source && rice embed-go
-	rm -rf .sass-cache
 
 # benchmark testing
 benchmark:

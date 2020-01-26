@@ -16,33 +16,11 @@
 package core
 
 import (
-	"bytes"
 	"encoding/json"
-	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
-	"html/template"
 )
 
 // ExportChartsJs renders the charts for the index page
-func ExportChartsJs() string {
-	render, err := source.JsBox.String("charts.js")
-	if err != nil {
-		log.Errorln(err)
-	}
-	t := template.New("charts")
-	t.Funcs(template.FuncMap{
-		"safe": func(html string) template.HTML {
-			return template.HTML(html)
-		},
-	})
-	t.Parse(render)
-	var tpl bytes.Buffer
-	if err := t.Execute(&tpl, CoreApp.Services); err != nil {
-		log.Errorln(err)
-	}
-	result := tpl.String()
-	return result
-}
 
 type ExportData struct {
 	Core      *types.Core              `json:"core"`

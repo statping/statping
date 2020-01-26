@@ -47,7 +47,7 @@ export default new Vuex.Store({
             return state.services.filter(s => s.group_id === id)
         },
         servicesInOrder: (state) => () => {
-          return state.services.sort((a, b) => a.order_id - b.order_id)
+          return state.services
         },
         onlineServices: (state) => (online) => {
             return state.services.filter(s => s.online === online)
@@ -79,7 +79,7 @@ export default new Vuex.Store({
             state.token = token
         },
         setServices(state, services) {
-            state.services = services
+            state.services = services.sort((a, b) => a.order_id - b.order_id)
         },
         setGroups(state, groups) {
             state.groups = groups

@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"github.com/ararog/timeago"
 	"github.com/hunterlong/statping/types"
+	"net/http"
 	"sort"
 	"strings"
 	"time"
@@ -37,48 +38,51 @@ const (
 func (s *Service) CreateFailure(f *types.Failure) (int64, error) {
 	f.Service = s.Id
 	row := failuresDB().Create(f)
-	if row.Error != nil {
-		log.Errorln(row.Error)
-		return 0, row.Error
+	if row.Error() != nil {
+		log.Errorln(row.Error())
+		return 0, row.Error()
 	}
 	sort.Sort(types.FailSort(s.Failures))
 	//s.Failures = append(s.Failures, f)
 	if len(s.Failures) > limitedFailures {
 		s.Failures = s.Failures[1:]
 	}
-	return f.Id, row.Error
+	return f.Id, row.Error()
 }
 
 // AllFailures will return all failures attached to a service
-func (s *Service) AllFailures() []*types.Failure {
-	var fails []*types.Failure
-	col := failuresDB().Where("service = ?", s.Id).Not("method = 'checkin'").Order("id desc")
-	err := col.Find(&fails)
-	if err.Error != nil {
+func (s *Service) AllFailures() []types.Failure {
+	var fails []types.Failure
+	err := DbSession.Failures(s.Id).Find(&fails)
+	if err.Error() != nil {
 		log.Errorln(fmt.Sprintf("Issue getting failures for service %v, %v", s.Name, err))
 		return nil
 	}
 	return fails
 }
 
+func (s *Service) FailuresDb(r *http.Request) types.Database {
+	return failuresDB().Where("service = ?", s.Id).QuerySearch(r).Order("id desc")
+}
+
 // DeleteFailures will delete all failures for a service
 func (s *Service) DeleteFailures() {
 	err := DbSession.Exec(`DELETE FROM failures WHERE service = ?`, s.Id)
-	if err.Error != nil {
+	if err.Error() != nil {
 		log.Errorln(fmt.Sprintf("failed to delete all failures: %v", err))
 	}
 	s.Failures = nil
 }
 
 // LimitedFailures will return the last amount of failures from a service
-func (s *Service) LimitedFailures(amount int64) []*Failure {
+func (s *Service) LimitedFailures(amount int) []*Failure {
 	var failArr []*Failure
 	failuresDB().Where("service = ?", s.Id).Not("method = 'checkin'").Order("id desc").Limit(amount).Find(&failArr)
 	return failArr
 }
 
 // LimitedFailures will return the last amount of failures from a service
-func (s *Service) LimitedCheckinFailures(amount int64) []*Failure {
+func (s *Service) LimitedCheckinFailures(amount int) []*Failure {
 	var failArr []*Failure
 	failuresDB().Where("service = ?", s.Id).Where("method = 'checkin'").Order("id desc").Limit(amount).Find(&failArr)
 	return failArr
@@ -98,7 +102,7 @@ func (f *Failure) Select() *types.Failure {
 // Delete will remove a Failure record from the database
 func (f *Failure) Delete() error {
 	db := failuresDB().Delete(f)
-	return db.Error
+	return db.Error()
 }
 
 // Count24HFailures returns the amount of failures for a service within the last 24 hours
@@ -116,7 +120,7 @@ func (c *Core) Count24HFailures() uint64 {
 func CountFailures() uint64 {
 	var count uint64
 	err := failuresDB().Count(&count)
-	if err.Error != nil {
+	if err.Error() != nil {
 		log.Warnln(err.Error)
 		return 0
 	}
@@ -130,7 +134,7 @@ func (s *Service) TotalFailuresOnDate(ago time.Time) (uint64, error) {
 	dateend := ago.UTC().Format("2006-01-02") + " 23:59:59"
 	rows := failuresDB().Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, date, dateend).Not("method = 'checkin'")
 	err := rows.Count(&count)
-	return count, err.Error
+	return count, err.Error()
 }
 
 // TotalFailures24 returns the amount of failures for a service within the last 24 hours
@@ -144,7 +148,7 @@ func (s *Service) TotalFailures() (uint64, error) {
 	var count uint64
 	rows := failuresDB().Where("service = ?", s.Id)
 	err := rows.Count(&count)
-	return count, err.Error
+	return count, err.Error()
 }
 
 // FailuresDaysAgo returns the amount of failures since days ago
@@ -159,7 +163,7 @@ func (s *Service) TotalFailuresSince(ago time.Time) (uint64, error) {
 	var count uint64
 	rows := failuresDB().Where("service = ? AND created_at > ?", s.Id, ago.UTC().Format("2006-01-02 15:04:05")).Not("method = 'checkin'")
 	err := rows.Count(&count)
-	return count, err.Error
+	return count, err.Error()
 }
 
 // ParseError returns a human readable error for a Failure

@@ -1,5 +1,5 @@
 <template>
-  <div id="app" v-if="ready">
+  <div id="app" v-if="loaded">
     <router-view/>
       <Footer version="DEV" />
   </div>
@@ -9,32 +9,30 @@
   import Api from './components/API';
   import Footer from "./components/Footer";
 
-export default {
+  export default {
   name: 'app',
   components: {
     Footer
   },
-    computed: {
-        ready () {
-            return true
-        }
-    },
-    created () {
-      if (!this.$store.getters.hasPublicData) {
-          this.setAllObjects()
-      }
-      },
-    mounted () {
-        this.$store.commit('setHasPublicData', true)
-    },
+  data () {
+    return {
+      loaded: false
+    }
+  },
+    async created () {
+     await this.setAllObjects()
+      this.loaded = true
+      this.$store.commit('setHasPublicData', true)
+   },
     methods: {
       async setAllObjects () {
           await this.setCore()
-          await this.setToken()
           await this.setServices()
           await this.setGroups()
           await this.setMessages()
+          await this.setToken()
           this.$store.commit('setHasPublicData', true)
+        this.loaded = true
       },
           async setCore () {
               const core = await Api.core()
@@ -60,5 +58,9 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+    @import "./assets/css/bootstrap.min.css";
+    @import "./assets/scss/variables";
+    @import "./assets/scss/base";
+    @import "./assets/scss/mobile";
 </style>

@@ -8,6 +8,7 @@
 <script>
   import Login from "./Login";
   import TopNav from "../components/Dashboard/TopNav";
+  import Api from "../components/API";
 
   export default {
   name: 'Dashboard',
@@ -17,17 +18,19 @@
   },
   data () {
     return {
-      view: "DashboardIndex",
       authenticated: false
     }
   },
-  mounted() {
+    mounted() {
     if (this.$store.getters.token !== null) {
       this.authenticated = true
     }
   },
   methods: {
-
+    async setServices () {
+      const services = await Api.services()
+      this.$store.commit('setServices', services)
+    },
   }
 }
 </script>

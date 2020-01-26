@@ -100,9 +100,9 @@ func (s *Service) AllCheckins() []*Checkin {
 func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 	var services []*Service
 	db := servicesDB().Find(&services).Order("order_id desc")
-	if db.Error != nil {
-		log.Errorln(fmt.Sprintf("service error: %v", db.Error))
-		return nil, db.Error
+	if db.Error() != nil {
+		log.Errorln(fmt.Sprintf("service error: %v", db.Error()))
+		return nil, db.Error()
 	}
 	CoreApp.Services = nil
 	for _, service := range services {
@@ -123,7 +123,7 @@ func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 		CoreApp.Services = append(CoreApp.Services, service)
 	}
 	reorderServices()
-	return services, db.Error
+	return services, db.Error()
 }
 
 // reorderServices will sort the services based on 'order_id'
@@ -168,17 +168,6 @@ func (s *Service) OnlineSince(ago time.Time) float32 {
 	amount, _ := strconv.ParseFloat(fmt.Sprintf("%0.2f", avg), 10)
 	s.Online24Hours = float32(amount)
 	return s.Online24Hours
-}
-
-// DateScan struct is for creating the charts.js graph JSON array
-type DateScan struct {
-	CreatedAt string `json:"x,omitempty"`
-	Value     int64  `json:"y"`
-}
-
-// DateScanObj struct is for creating the charts.js graph JSON array
-type DateScanObj struct {
-	Array []DateScan `json:"data"`
 }
 
 // lastFailure returns the last Failure a service had
@@ -264,37 +253,20 @@ func (s *Service) Downtime() time.Duration {
 	return since
 }
 
+// DateScanObj struct is for creating the charts.js graph JSON array
+type DateScanObj struct {
+	Array []*types.DateScan `json:"data"`
+}
+
 // GraphDataRaw will return all the hits between 2 times for a Service
 func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group string, column string) *DateScanObj {
-	var data []DateScan
-	outgoing := new(DateScanObj)
 	model := service.(*Service).HitsBetween(start, end, group, column)
 	model = model.Order("timeframe asc", false).Group("timeframe")
-	rows, err := model.Rows()
+	outgoing, err := model.ToChart()
 	if err != nil {
-		log.Errorln(fmt.Errorf("issue fetching service chart data: %v", err))
+		log.Error(err)
 	}
-	for rows.Next() {
-		var gd DateScan
-		var createdAt string
-		var value float64
-		var createdTime time.Time
-		var err error
-		rows.Scan(&createdAt, &value)
-		if CoreApp.Config.DbConn == "postgres" {
-			createdTime, err = time.Parse(types.TIME_NANO, createdAt)
-			if err != nil {
-				log.Errorln(fmt.Errorf("issue parsing time from database: %v to %v", createdAt, types.TIME_NANO))
-			}
-		} else {
-			createdTime, err = time.Parse(types.TIME, createdAt)
-		}
-		gd.CreatedAt = utils.Timezoner(createdTime, CoreApp.Timezone).Format(types.CHART_TIME)
-		gd.Value = int64(value * 1000)
-		data = append(data, gd)
-	}
-	outgoing.Array = data
-	return outgoing
+	return &DateScanObj{outgoing}
 }
 
 // ToString will convert the DateScanObj into a JSON string for the charts to render
@@ -370,24 +342,24 @@ func updateService(s *Service) {
 func (s *Service) Delete() error {
 	i := s.index()
 	err := servicesDB().Delete(s)
-	if err.Error != nil {
+	if err.Error() != nil {
 		log.Errorln(fmt.Sprintf("Failed to delete service %v. %v", s.Name, err.Error))
-		return err.Error
+		return err.Error()
 	}
 	s.Close()
 	slice := CoreApp.Services
 	CoreApp.Services = append(slice[:i], slice[i+1:]...)
 	reorderServices()
 	notifier.OnDeletedService(s.Service)
-	return err.Error
+	return err.Error()
 }
 
 // Update will update a service in the database, the service's checking routine can be restarted by passing true
 func (s *Service) Update(restart bool) error {
 	err := servicesDB().Update(&s)
-	if err.Error != nil {
+	if err.Error() != nil {
 		log.Errorln(fmt.Sprintf("Failed to update service %v. %v", s.Name, err))
-		return err.Error
+		return err.Error()
 	}
 	// clear the notification queue for a service
 	if !s.AllowNotifications.Bool {
@@ -405,16 +377,16 @@ func (s *Service) Update(restart bool) error {
 	reorderServices()
 	updateService(s)
 	notifier.OnUpdatedService(s.Service)
-	return err.Error
+	return err.Error()
 }
 
 // Create will create a service and insert it into the database
 func (s *Service) Create(check bool) (int64, error) {
 	s.CreatedAt = time.Now().UTC()
 	db := servicesDB().Create(s)
-	if db.Error != nil {
-		log.Errorln(fmt.Sprintf("Failed to create service %v #%v: %v", s.Name, s.Id, db.Error))
-		return 0, db.Error
+	if db.Error() != nil {
+		log.Errorln(fmt.Sprintf("Failed to create service %v #%v: %v", s.Name, s.Id, db.Error()))
+		return 0, db.Error()
 	}
 	s.Start()
 	go s.CheckQueue(check)

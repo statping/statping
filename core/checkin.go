@@ -99,11 +99,11 @@ func (c *Checkin) CreateFailure() (int64, error) {
 	if len(c.Failures) > limitedFailures {
 		c.Failures = c.Failures[1:]
 	}
-	return fail.Id, row.Error
+	return fail.Id, row.Error()
 }
 
 // LimitedHits will return the last amount of successful hits from a checkin
-func (c *Checkin) LimitedHits(amount int64) []*types.CheckinHit {
+func (c *Checkin) LimitedHits(amount int) []*types.CheckinHit {
 	var hits []*types.CheckinHit
 	checkinHitsDB().Where("checkin = ?", c.Id).Order("id desc").Limit(amount).Find(&hits)
 	return hits
@@ -168,7 +168,7 @@ func (c *Checkin) AllHits() []*types.CheckinHit {
 }
 
 // Hits returns all of the CheckinHits for a given Checkin
-func (c *Checkin) LimitedFailures(amount int64) []types.FailureInterface {
+func (c *Checkin) LimitedFailures(amount int) []types.FailureInterface {
 	var failures []*Failure
 	var failInterfaces []types.FailureInterface
 	col := failuresDB().Where("checkin = ?", c.Id).Where("method = 'checkin'").Limit(amount).Order("id desc")
@@ -195,7 +195,7 @@ func (c *Checkin) Delete() error {
 	slice := service.Checkins
 	service.Checkins = append(slice[:i], slice[i+1:]...)
 	row := checkinDB().Delete(&c)
-	return row.Error
+	return row.Error()
 }
 
 // index returns a checkin index int for updating the *checkin.Service slice
@@ -212,25 +212,25 @@ func (c *Checkin) index() int {
 func (c *Checkin) Create() (int64, error) {
 	c.ApiKey = utils.RandomString(7)
 	row := checkinDB().Create(&c)
-	if row.Error != nil {
-		log.Warnln(row.Error)
-		return 0, row.Error
+	if row.Error() != nil {
+		log.Warnln(row.Error())
+		return 0, row.Error()
 	}
 	service := SelectService(c.ServiceId)
 	service.Checkins = append(service.Checkins, c)
 	c.Start()
 	go c.Routine()
-	return c.Id, row.Error
+	return c.Id, row.Error()
 }
 
 // Update will update a Checkin
 func (c *Checkin) Update() (int64, error) {
 	row := checkinDB().Update(&c)
-	if row.Error != nil {
-		log.Warnln(row.Error)
-		return 0, row.Error
+	if row.Error() != nil {
+		log.Warnln(row.Error())
+		return 0, row.Error()
 	}
-	return c.Id, row.Error
+	return c.Id, row.Error()
 }
 
 // Create will create a new successful checkinHit
@@ -239,11 +239,11 @@ func (c *CheckinHit) Create() (int64, error) {
 		c.CreatedAt = utils.Now()
 	}
 	row := checkinHitsDB().Create(&c)
-	if row.Error != nil {
-		log.Warnln(row.Error)
-		return 0, row.Error
+	if row.Error() != nil {
+		log.Warnln(row.Error())
+		return 0, row.Error()
 	}
-	return c.Id, row.Error
+	return c.Id, row.Error()
 }
 
 // Ago returns the duration of time between now and the last successful checkinHit

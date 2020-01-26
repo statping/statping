@@ -31,7 +31,6 @@ import (
 
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/source"
-	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 )
 
@@ -41,12 +40,11 @@ const (
 )
 
 var (
-	jwtKey      string
-	httpServer  *http.Server
-	usingSSL    bool
-	mainTmpl    = `{{define "main" }} {{ template "base" . }} {{ end }}`
-	templates   = []string{"base.gohtml", "head.gohtml", "nav.gohtml", "footer.gohtml", "scripts.gohtml", "form_service.gohtml", "form_notifier.gohtml", "form_integration.gohtml", "form_group.gohtml", "form_user.gohtml", "form_checkin.gohtml", "form_message.gohtml"}
-	javascripts = []string{"charts.js", "chart_index.js"}
+	jwtKey     string
+	httpServer *http.Server
+	usingSSL   bool
+	mainTmpl   = `{{define "main" }} {{ template "base" . }} {{ end }}`
+	templates  = []string{"base.gohtml", "head.gohtml", "nav.gohtml", "footer.gohtml", "scripts.gohtml", "form_service.gohtml", "form_notifier.gohtml", "form_integration.gohtml", "form_group.gohtml", "form_user.gohtml", "form_checkin.gohtml", "form_message.gohtml"}
 )
 
 // RunHTTPServer will start a HTTP server on a specific IP and port
@@ -152,7 +150,6 @@ func IsFullAuthenticated(r *http.Request) bool {
 func getJwtToken(r *http.Request) (JwtClaim, error) {
 	c, err := r.Cookie(cookieKey)
 	if err != nil {
-		utils.Log.Errorln(err)
 		if err == http.ErrNoCookie {
 			return JwtClaim{}, err
 		}
@@ -164,14 +161,12 @@ func getJwtToken(r *http.Request) (JwtClaim, error) {
 		return []byte(jwtKey), nil
 	})
 	if err != nil {
-		utils.Log.Errorln("error getting jwt token: ", err)
 		if err == jwt.ErrSignatureInvalid {
 			return JwtClaim{}, err
 		}
 		return JwtClaim{}, err
 	}
 	if !tkn.Valid {
-		utils.Log.Errorln("token is not valid")
 		return claims, errors.New("token is not valid")
 	}
 	return claims, err
@@ -237,15 +232,6 @@ func loadTemplate(w http.ResponseWriter, r *http.Request) (*template.Template, e
 			return nil, err
 		}
 	}
-	// render all javascript files
-	for _, temp := range javascripts {
-		tmp, _ := source.JsBox.String(temp)
-		mainTemplate, err = mainTemplate.Parse(tmp)
-		if err != nil {
-			log.Errorln(err)
-			return nil, err
-		}
-	}
 	return mainTemplate, err
 }
 
@@ -278,28 +264,28 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 
 // executeJSResponse will render a Javascript response
 func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}) {
-	render, err := source.JsBox.String(file)
-	if err != nil {
-		log.Errorln(err)
-	}
-	if usingSSL {
-		w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
-	}
-	t := template.New("charts")
-	t.Funcs(template.FuncMap{
-		"safe": func(html string) template.HTML {
-			return template.HTML(html)
-		},
-		"Services": func() []types.ServiceInterface {
-			return core.CoreApp.Services
-		},
-	})
-	if _, err := t.Parse(render); err != nil {
-		log.Errorln(err)
-	}
-	if err := t.Execute(w, data); err != nil {
-		log.Errorln(err)
-	}
+	//render, err := source.JsBox.String(file)
+	//if err != nil {
+	//	log.Errorln(err)
+	//}
+	//if usingSSL {
+	//	w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
+	//}
+	//t := template.New("charts")
+	//t.Funcs(template.FuncMap{
+	//	"safe": func(html string) template.HTML {
+	//		return template.HTML(html)
+	//	},
+	//	"Services": func() []types.ServiceInterface {
+	//		return core.CoreApp.Services
+	//	},
+	//})
+	//if _, err := t.Parse(render); err != nil {
+	//	log.Errorln(err)
+	//}
+	//if err := t.Execute(w, data); err != nil {
+	//	log.Errorln(err)
+	//}
 }
 
 func returnJson(d interface{}, w http.ResponseWriter, r *http.Request) {
@@ -313,5 +299,5 @@ func error404Handler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
 	}
 	w.WriteHeader(http.StatusNotFound)
-	ExecuteResponse(w, r, "error_404.gohtml", nil, nil)
+	ExecuteResponse(w, r, "index.html", nil, nil)
 }

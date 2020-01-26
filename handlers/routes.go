@@ -17,10 +17,8 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/99designs/gqlgen/handler"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/handlers/graphql"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
@@ -56,65 +54,26 @@ func Router() *mux.Router {
 	r.Use(sendLog)
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
-		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath+"css/", http.FileServer(http.Dir(dir+"/assets/css"))))
+		r.PathPrefix("/css/").Handler(Gzip(http.StripPrefix(basePath+"css/", http.FileServer(http.Dir(dir+"/assets/css")))))
 		r.PathPrefix("/font/").Handler(http.StripPrefix(basePath+"font/", http.FileServer(http.Dir(dir+"/assets/font"))))
-		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath+"js/", http.FileServer(http.Dir(dir+"/assets/js"))))
+		r.PathPrefix("/js/").Handler(Gzip(http.StripPrefix(basePath+"js/", http.FileServer(http.Dir(dir+"/assets/js")))))
 		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, indexHandler))
 		r.PathPrefix("/favicon.ico").Handler(http.StripPrefix(basePath, indexHandler))
 		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, indexHandler))
 	} else {
-		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath+"css/", http.FileServer(source.CssBox.HTTPBox())))
-		r.PathPrefix("/font/").Handler(http.StripPrefix(basePath+"font/", http.FileServer(source.FontBox.HTTPBox())))
-		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath+"js/", http.FileServer(source.JsBox.HTTPBox())))
+		//r.PathPrefix("/").Handler(http.StripPrefix(basePath+"/", http.FileServer(source.TmplBox.HTTPBox())))
+		r.PathPrefix("/css/").Handler(Gzip(http.FileServer(source.TmplBox.HTTPBox())))
+		r.PathPrefix("/font/").Handler(http.FileServer(source.TmplBox.HTTPBox()))
+		r.PathPrefix("/js/").Handler(Gzip(http.FileServer(source.TmplBox.HTTPBox())))
 		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
 		r.PathPrefix("/favicon.ico").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
 		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
 	}
-	r.Handle("/charts.js", http.HandlerFunc(renderServiceChartsHandler))
-	r.Handle("/setup", http.HandlerFunc(setupHandler)).Methods("GET")
-	r.Handle("/setup", http.HandlerFunc(processSetupHandler)).Methods("POST")
-	r.Handle("/dashboard", http.HandlerFunc(dashboardHandler)).Methods("GET")
-	r.Handle("/dashboard", http.HandlerFunc(loginHandler)).Methods("POST")
-	r.Handle("/logout", http.HandlerFunc(logoutHandler))
-	r.Handle("/plugins/download/{name}", authenticated(pluginsDownloadHandler, true))
-	r.Handle("/plugins/{name}/save", authenticated(pluginSavedHandler, true)).Methods("POST")
-	r.Handle("/help", authenticated(helpHandler, true))
-	r.Handle("/logs", authenticated(logsHandler, true))
-	r.Handle("/logs/line", readOnly(logsLineHandler, true))
-
-	// GRAPHQL Route
-	r.Handle("/graphql", authenticated(handler.GraphQL(graphql.NewExecutableSchema(graphql.Config{Resolvers: &graphql.Resolver{}})), true))
-
-	// USER Routes
-	r.Handle("/users", readOnly(usersHandler, true)).Methods("GET")
-	r.Handle("/user/{id}", authenticated(usersEditHandler, true)).Methods("GET")
-
-	// MESSAGES Routes
-	r.Handle("/messages", authenticated(messagesHandler, true)).Methods("GET")
-	r.Handle("/message/{id}", authenticated(viewMessageHandler, true)).Methods("GET")
-
-	// SETTINGS Routes
-	r.Handle("/settings", authenticated(settingsHandler, true)).Methods("GET")
-	r.Handle("/settings", authenticated(saveSettingsHandler, true)).Methods("POST")
-	r.Handle("/settings/css", authenticated(saveSASSHandler, true)).Methods("POST")
-	r.Handle("/settings/build", authenticated(saveAssetsHandler, true)).Methods("GET")
-	r.Handle("/settings/delete_assets", authenticated(deleteAssetsHandler, true)).Methods("GET")
-	r.Handle("/settings/export", authenticated(exportHandler, true)).Methods("GET")
-	r.Handle("/settings/bulk_import", authenticated(bulkImportHandler, true)).Methods("POST")
-	r.Handle("/settings/integrator/{name}", authenticated(integratorHandler, true)).Methods("POST")
-
-	// SERVICE Routes
-	r.Handle("/services", authenticated(servicesHandler, true)).Methods("GET")
-	r.Handle("/service/create", authenticated(createServiceHandler, true)).Methods("GET")
-	r.Handle("/service/{id}", readOnly(servicesViewHandler, true)).Methods("GET")
-	r.Handle("/service/{id}/edit", authenticated(servicesViewHandler, true)).Methods("GET")
-	r.Handle("/service/{id}/delete_failures", authenticated(servicesDeleteFailuresHandler, true)).Methods("GET")
-
-	r.Handle("/group/{id}", http.HandlerFunc(groupViewHandler)).Methods("GET")
 
 	// API Routes
 	r.Handle("/api", scoped(apiIndexHandler))
 	r.Handle("/api/login", http.HandlerFunc(apiLoginHandler)).Methods("POST")
+	r.Handle("/api/setup", http.HandlerFunc(processSetupHandler)).Methods("POST")
 	r.Handle("/api/logout", http.HandlerFunc(logoutHandler))
 	r.Handle("/api/renew", authenticated(apiRenewHandler, false))
 	r.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
@@ -176,6 +135,8 @@ func Router() *mux.Router {
 	r.Handle("/api/checkin", authenticated(checkinCreateHandler, false)).Methods("POST")
 	r.Handle("/api/checkin/{api}", authenticated(checkinDeleteHandler, false)).Methods("DELETE")
 	r.Handle("/checkin/{api}", http.HandlerFunc(checkinHitHandler))
+
+	//r.PathPrefix("/").Handler(http.HandlerFunc(indexHandler))
 
 	// Static Files Routes
 	r.PathPrefix("/files/postman.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))

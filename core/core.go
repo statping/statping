@@ -89,7 +89,7 @@ func InsertNotifierDB() error {
 // UpdateCore will update the CoreApp variable inside of the 'core' table in database
 func UpdateCore(c *Core) (*Core, error) {
 	db := coreDB().Update(&c)
-	return c, db.Error
+	return c, db.Error()
 }
 
 // CurrentTime will return the current local time
@@ -159,12 +159,12 @@ func SelectCore() (*Core, error) {
 		return nil, errors.New("core database has not been setup yet.")
 	}
 	db := coreDB().First(&CoreApp)
-	if db.Error != nil {
-		return nil, db.Error
+	if db.Error() != nil {
+		return nil, db.Error()
 	}
 	CoreApp.Version = VERSION
 	CoreApp.UseCdn = types.NewNullBool(os.Getenv("USE_CDN") == "true")
-	return CoreApp, db.Error
+	return CoreApp, db.Error()
 }
 
 // GetLocalIP returns the non loopback local IP of the host

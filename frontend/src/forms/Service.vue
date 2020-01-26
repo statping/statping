@@ -63,7 +63,7 @@
         <div v-if="service.type.match(/^(http)$/)" class="form-group row">
             <label class="col-sm-4 col-form-label">HTTP Headers</label>
             <div class="col-sm-8">
-                <input v-model="service.headers" class="form-control" autocapitalize="none" spellcheck="false" placeholder='Authorization=1010101,Content-Type=application/json' value="">
+                <input v-model="service.headers" class="form-control" autocapitalize="none" spellcheck="false" placeholder='Authorization=1010101,Content-Type=application/json'>
                 <small class="form-text text-muted">Comma delimited list of HTTP Headers (KEY=VALUE,KEY=VALUE)</small>
             </div>
         </div>
@@ -93,28 +93,28 @@
         <div class="form-group row">
             <label for="service_interval" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
             <div class="col-sm-8">
-                <input v-model="service.check_interval" type="number" class="form-control" value="60" min="1" id="service_interval" required>
+                <input v-model="service.check_interval" type="number" class="form-control" min="1" id="service_interval" required>
                 <small id="interval" class="form-text text-muted">10,000+ will be checked in Microseconds (1 millisecond = 1000 microseconds).</small>
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Timeout in Seconds</label>
             <div class="col-sm-8">
-                <input v-model="service.timeout" type="number" name="timeout" class="form-control" value="15" placeholder="15" min="1">
+                <input v-model="service.timeout" type="number" name="timeout" class="form-control" placeholder="15" min="1">
                 <small class="form-text text-muted">If the endpoint does not respond within this time it will be considered to be offline</small>
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Permalink URL</label>
             <div class="col-sm-8">
-                <input v-model="service.permalink" type="text" name="permalink" class="form-control" value="" id="permalink" autocapitalize="none" spellcheck="true" placeholder='awesome_service'>
+                <input v-model="service.permalink" type="text" name="permalink" class="form-control" id="permalink" autocapitalize="none" spellcheck="true" placeholder='awesome_service'>
                 <small class="form-text text-muted">Use text for the service URL rather than the service number.</small>
             </div>
         </div>
         <div class="form-group row">
             <label for="order" class="col-sm-4 col-form-label">List Order</label>
             <div class="col-sm-8">
-                <input v-model="service.order" type="number" name="order" class="form-control" min="0" value="0" id="order">
+                <input v-model="service.order" type="number" name="order" class="form-control" min="0" id="order">
                 <small class="form-text text-muted">You can also drag and drop services to reorder on the Services tab.</small>
             </div>
         </div>
@@ -122,9 +122,8 @@
             <label for="order" class="col-sm-4 col-form-label">Verify SSL</label>
             <div class="col-8 mt-1">
             <span class="switch float-left">
-                <input v-model="service.verify_ssl" type="checkbox" name="verify_ssl-option" class="switch" id="switch-verify-ssl" checked>
+                <input v-model="service.verify_ssl" type="checkbox" name="verify_ssl-option" class="switch" id="switch-verify-ssl" v-bind:checked="service.verify_ssl">
                 <label for="switch-verify-ssl">Verify SSL Certificate for this service</label>
-                <input type="hidden" name="verify_ssl" id="switch-verify-ssl-value" value="true">
             </span>
             </div>
         </div>
@@ -132,9 +131,8 @@
             <label for="order" class="col-sm-4 col-form-label">Notifications</label>
             <div class="col-8 mt-1">
             <span class="switch float-left">
-                <input v-model="service.allow_notifications" type="checkbox" name="allow_notifications-option" class="switch" id="switch-notifications" checked>
+                <input v-model="service.allow_notifications" type="checkbox" name="allow_notifications-option" class="switch" id="switch-notifications" v-bind:checked="service.allow_notifications">
                 <label for="switch-notifications">Allow notifications to be sent for this service</label>
-                <input type="hidden" name="allow_notifications" id="switch-notifications-value" value="true">
             </span>
             </div>
         </div>
@@ -142,9 +140,8 @@
             <label for="order" class="col-sm-4 col-form-label">Visible</label>
             <div class="col-8 mt-1">
             <span class="switch float-left">
-                <input v-model="service.public" type="checkbox" name="public-option" class="switch" id="switch-public" checked>
+                <input v-model="service.public" type="checkbox" name="public-option" class="switch" id="switch-public" v-bind:checked="service.public">
                 <label for="switch-public">Show service details to the public</label>
-                <input type="hidden" name="public" id="switch-public-value" value="true">
             </span>
             </div>
         </div>
@@ -196,8 +193,8 @@
     }
   },
   async created() {
-    if (this.in_service) {
-      this.service = this.in_service
+    if (this.props.in_service) {
+      this.service = this.props.in_service
     }
     if (!this.$store.getters.groups) {
       const groups = await Api.groups()
@@ -205,8 +202,16 @@
     }
   },
   methods: {
-    saveService(e) {
+    async saveService(e) {
       e.preventDefault()
+      let s = this.service
+      delete s.failures
+      delete s.created_at
+      delete s.updated_at
+      delete s.last_success
+      delete s.latency
+      delete s.online_24_hours
+      await Api.service_save()
     }
   }
 }

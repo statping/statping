@@ -32,7 +32,7 @@ import (
 
 var (
 	// DbSession stores the Statping database session
-	DbSession *gorm.DB
+	DbSession types.Database
 	DbModels  []interface{}
 )
 
@@ -48,62 +48,62 @@ func init() {
 type DbConfig types.DbConfig
 
 // failuresDB returns the 'failures' database column
-func failuresDB() *gorm.DB {
+func failuresDB() types.Database {
 	return DbSession.Model(&types.Failure{})
 }
 
 // hitsDB returns the 'hits' database column
-func hitsDB() *gorm.DB {
+func hitsDB() types.Database {
 	return DbSession.Model(&types.Hit{})
 }
 
 // servicesDB returns the 'services' database column
-func servicesDB() *gorm.DB {
+func servicesDB() types.Database {
 	return DbSession.Model(&types.Service{})
 }
 
 // coreDB returns the single column 'core'
-func coreDB() *gorm.DB {
+func coreDB() types.Database {
 	return DbSession.Table("core").Model(&CoreApp)
 }
 
 // usersDB returns the 'users' database column
-func usersDB() *gorm.DB {
+func usersDB() types.Database {
 	return DbSession.Model(&types.User{})
 }
 
 // checkinDB returns the Checkin records for a service
-func checkinDB() *gorm.DB {
+func checkinDB() types.Database {
 	return DbSession.Model(&types.Checkin{})
 }
 
 // checkinHitsDB returns the Checkin Hits records for a service
-func checkinHitsDB() *gorm.DB {
+func checkinHitsDB() types.Database {
 	return DbSession.Model(&types.CheckinHit{})
 }
 
 // messagesDb returns the Checkin records for a service
-func messagesDb() *gorm.DB {
+func messagesDb() types.Database {
 	return DbSession.Model(&types.Message{})
 }
 
 // messagesDb returns the Checkin records for a service
-func groupsDb() *gorm.DB {
+func groupsDb() types.Database {
 	return DbSession.Model(&types.Group{})
 }
 
 // incidentsDB returns the 'incidents' database column
-func incidentsDB() *gorm.DB {
+func incidentsDB() types.Database {
 	return DbSession.Model(&types.Incident{})
 }
 
 // incidentsUpdatesDB returns the 'incidents updates' database column
-func incidentsUpdatesDB() *gorm.DB {
+func incidentsUpdatesDB() types.Database {
 	return DbSession.Model(&types.IncidentUpdate{})
 }
 
 // HitsBetween returns the gorm database query for a collection of service hits between a time range
-func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) *gorm.DB {
+func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) types.Database {
 	selector := Dbtimestamp(group, column)
 	if CoreApp.Config.DbConn == "postgres" {
 		return hitsDB().Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME), t2.UTC().Format(types.TIME))
@@ -187,7 +187,7 @@ func (c *Core) InsertCore(db *types.DbConfig) (*Core, error) {
 		Config:      db,
 	}}
 	query := coreDB().Create(&CoreApp)
-	return CoreApp, query.Error
+	return CoreApp, query.Error()
 }
 
 func findDbFile() string {
@@ -242,7 +242,7 @@ func (c *Core) Connect(retry bool, location string) error {
 		conn = fmt.Sprintf("sqlserver://%v:%v@%v?database=%v", CoreApp.Config.DbUser, CoreApp.Config.DbPass, host, CoreApp.Config.DbData)
 	}
 	log.WithFields(utils.ToFields(c, conn)).Debugln("attempting to connect to database")
-	dbSession, err := gorm.Open(dbType, conn)
+	dbSession, err := types.Openw(dbType, conn)
 	if err != nil {
 		log.Debugln(fmt.Sprintf("Database connection error %v", err))
 		if retry {
@@ -261,7 +261,7 @@ func (c *Core) Connect(retry bool, location string) error {
 	if dbSession.DB().Ping() == nil {
 		DbSession = dbSession
 		if utils.VerboseMode >= 4 {
-			DbSession.LogMode(true).Debug().SetLogger(log)
+			DbSession.LogMode(true).Debug().SetLogger(gorm.Logger{log})
 		}
 		log.Infoln(fmt.Sprintf("Database %v connection was successful.", dbType))
 	}
@@ -289,8 +289,8 @@ func DatabaseMaintence() {
 func DeleteAllSince(table string, date time.Time) {
 	sql := fmt.Sprintf("DELETE FROM %v WHERE created_at < '%v';", table, date.Format("2006-01-02"))
 	db := DbSession.Exec(sql)
-	if db.Error != nil {
-		log.Warnln(db.Error)
+	if db.Error() != nil {
+		log.Warnln(db.Error())
 	}
 }
 
@@ -346,7 +346,7 @@ func (c *Core) CreateCore() *Core {
 		MigrationId: time.Now().Unix(),
 	}
 	db := coreDB().Create(&newCore)
-	if db.Error == nil {
+	if db.Error() == nil {
 		CoreApp = &Core{Core: newCore}
 	}
 	CoreApp, err := SelectCore()
@@ -370,7 +370,7 @@ func (c *Core) DropDatabase() error {
 	err = DbSession.DropTableIfExists("messages")
 	err = DbSession.DropTableIfExists("incidents")
 	err = DbSession.DropTableIfExists("incident_updates")
-	return err.Error
+	return err.Error()
 }
 
 // CreateDatabase will CREATE TABLES for each of the Statping elements
@@ -378,12 +378,12 @@ func (c *Core) CreateDatabase() error {
 	var err error
 	log.Infoln("Creating Database Tables...")
 	for _, table := range DbModels {
-		if err := DbSession.CreateTable(table); err.Error != nil {
-			return err.Error
+		if err := DbSession.CreateTable(table); err.Error() != nil {
+			return err.Error()
 		}
 	}
-	if err := DbSession.Table("core").CreateTable(&types.Core{}); err.Error != nil {
-		return err.Error
+	if err := DbSession.Table("core").CreateTable(&types.Core{}); err.Error() != nil {
+		return err.Error()
 	}
 	log.Infoln("Statping Database Created")
 	return err
@@ -401,17 +401,17 @@ func (c *Core) MigrateDatabase() error {
 		}
 	}()
 	if tx.Error != nil {
-		log.Errorln(tx.Error)
-		return tx.Error
+		log.Errorln(tx.Error())
+		return tx.Error()
 	}
 	for _, table := range DbModels {
 		tx = tx.AutoMigrate(table)
 	}
-	if err := tx.Table("core").AutoMigrate(&types.Core{}); err.Error != nil {
+	if err := tx.Table("core").AutoMigrate(&types.Core{}); err.Error() != nil {
 		tx.Rollback()
 		log.Errorln(fmt.Sprintf("Statping Database could not be migrated: %v", tx.Error))
-		return tx.Error
+		return tx.Error()
 	}
 	log.Infoln("Statping Database Migrated")
-	return tx.Commit().Error
+	return tx.Commit().Error()
 }

@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
-	"github.com/jinzhu/gorm"
 	"reflect"
 	"strings"
 	"time"
@@ -31,7 +30,7 @@ var (
 	// AllCommunications holds all the loaded notifiers
 	AllCommunications []types.AllNotifiers
 	// db holds the Statping database connection
-	db       *gorm.DB
+	db       types.Database
 	timezone float32
 	log      = utils.Log.WithField("type", "notifier")
 )
@@ -112,12 +111,12 @@ func (n *Notification) CanTest() bool {
 }
 
 // db will return the notifier database column/record
-func modelDb(n *Notification) *gorm.DB {
+func modelDb(n *Notification) types.Database {
 	return db.Model(&Notification{}).Where("method = ?", n.Method).Find(n)
 }
 
 // SetDB is called by core to inject the database for a notifier to use
-func SetDB(d *gorm.DB, zone float32) {
+func SetDB(d types.Database, zone float32) {
 	db = d
 	timezone = zone
 }
@@ -199,7 +198,7 @@ func isInDatabase(n Notifier) bool {
 func SelectNotification(n Notifier) (*Notification, error) {
 	notifier := n.Select()
 	err := db.Model(&Notification{}).Where("method = ?", notifier.Method).Scan(&notifier)
-	return notifier, err.Error
+	return notifier, err.Error()
 }
 
 // Update will update the notification into the database
@@ -213,7 +212,7 @@ func Update(n Notifier, notif *Notification) (*Notification, error) {
 	} else {
 		notif.close()
 	}
-	return notif, err.Error
+	return notif, err.Error()
 }
 
 // insertDatabase will create a new record into the database for the notifier
@@ -221,10 +220,10 @@ func insertDatabase(n Notifier) (int64, error) {
 	noti := n.Select()
 	noti.Limits = 3
 	query := db.Create(noti)
-	if query.Error != nil {
-		return 0, query.Error
+	if query.Error() != nil {
+		return 0, query.Error()
 	}
-	return noti.Id, query.Error
+	return noti.Id, query.Error()
 }
 
 // SelectNotifier returns the Notification struct from the database

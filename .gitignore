@@ -19,6 +19,7 @@ public
 .env
 logs
 tmp
+source/dist
 /dev/test/node_modules
 dev/test/cypress/videos
 dev/test/cypress/screenshots

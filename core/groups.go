@@ -17,21 +17,21 @@ func (g *Group) Delete() error {
 		s.Update(false)
 	}
 	err := groupsDb().Delete(g)
-	return err.Error
+	return err.Error()
 }
 
 // Create will create a group and insert it into the database
 func (g *Group) Create() (int64, error) {
 	g.CreatedAt = time.Now().UTC()
 	db := groupsDb().Create(g)
-	return g.Id, db.Error
+	return g.Id, db.Error()
 }
 
 // Update will update a group
 func (g *Group) Update() (int64, error) {
 	g.UpdatedAt = time.Now().UTC()
 	db := groupsDb().Update(g)
-	return g.Id, db.Error
+	return g.Id, db.Error()
 }
 
 // Services returns all services belonging to a group

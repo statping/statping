@@ -16,8 +16,8 @@ const webpackConfig = merge(commonConfig, {
     output: {
         path: helpers.root('dist'),
         publicPath: '/',
-        filename: 'js/[hash].js',
-        chunkFilename: 'js/[id].[hash].chunk.js'
+        filename: 'js/[name].js',
+        chunkFilename: 'js/[name].chunk.js'
     },
     optimization: {
         runtimeChunk: 'single',
@@ -57,8 +57,8 @@ const webpackConfig = merge(commonConfig, {
     plugins: [
         new webpack.EnvironmentPlugin(environment),
         new MiniCSSExtractPlugin({
-            filename: 'css/[name].[hash].css',
-            chunkFilename: 'css/[id].[hash].css'
+            filename: 'css/[name].css',
+            chunkFilename: 'css/[name].[hash].css'
         }),
         new CompressionPlugin({
             filename: '[path].gz[query]',

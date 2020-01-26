@@ -43,7 +43,7 @@ func CountUsers() int64 {
 func SelectUser(id int64) (*User, error) {
 	var user User
 	err := usersDB().Where("id = ?", id).First(&user)
-	return &user, err.Error
+	return &user, err.Error()
 }
 
 // SelectUsername returns the User based on the User's username
@@ -51,19 +51,19 @@ func SelectUsername(username string) (*User, error) {
 	var user User
 	res := usersDB().Where("username = ?", username)
 	err := res.First(&user)
-	return &user, err.Error
+	return &user, err.Error()
 }
 
 // Delete will remove the User record from the database
 func (u *User) Delete() error {
-	return usersDB().Delete(u).Error
+	return usersDB().Delete(u).Error()
 }
 
 // Update will update the User's record in database
 func (u *User) Update() error {
 	u.ApiKey = utils.NewSHA1Hash(5)
 	u.ApiSecret = utils.NewSHA1Hash(10)
-	return usersDB().Update(u).Error
+	return usersDB().Update(u).Error()
 }
 
 // Create will insert a new User into the database
@@ -73,25 +73,25 @@ func (u *User) Create() (int64, error) {
 	u.ApiKey = utils.NewSHA1Hash(5)
 	u.ApiSecret = utils.NewSHA1Hash(10)
 	db := usersDB().Create(u)
-	if db.Error != nil {
-		return 0, db.Error
+	if db.Error() != nil {
+		return 0, db.Error()
 	}
 	if u.Id == 0 {
-		log.Errorln(fmt.Sprintf("Failed to create User %v. %v", u.Username, db.Error))
-		return 0, db.Error
+		log.Errorln(fmt.Sprintf("Failed to create User %v. %v", u.Username, db.Error()))
+		return 0, db.Error()
 	}
-	return u.Id, db.Error
+	return u.Id, db.Error()
 }
 
 // SelectAllUsers returns all users
 func SelectAllUsers() ([]*User, error) {
 	var users []*User
 	db := usersDB().Find(&users)
-	if db.Error != nil {
-		log.Errorln(fmt.Sprintf("Failed to load all users. %v", db.Error))
-		return nil, db.Error
+	if db.Error() != nil {
+		log.Errorln(fmt.Sprintf("Failed to load all users. %v", db.Error()))
+		return nil, db.Error()
 	}
-	return users, db.Error
+	return users, db.Error()
 }
 
 // AuthUser will return the User and a boolean if authentication was correct.

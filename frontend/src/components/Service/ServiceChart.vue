@@ -42,7 +42,8 @@
   },
   methods: {
     async chartHits() {
-      this.data = await Api.service_hits(this.service.id, 0, 99999999999, "hour")
+      const start = this.ago(3600 * 24)
+      this.data = await Api.service_hits(this.service.id, start, this.now(), "hour")
       this.series = [{
         name: this.service.name,
         ...this.data
@@ -126,7 +127,6 @@
           }
         },
       series: [{
-        name: this.service.name,
         data: []
       }]
     }

@@ -67,6 +67,14 @@ func init() {
 	checkVerboseMode()
 }
 
+func SliceConvert(g []*interface{}) []interface{} {
+	var arr []interface{}
+	for _, v := range g {
+		arr = append(arr, v)
+	}
+	return arr
+}
+
 // ToInt converts a int to a string
 func ToInt(s interface{}) int64 {
 	switch v := s.(type) {

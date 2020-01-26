@@ -29,20 +29,12 @@ import (
 
 var (
 	log     = utils.Log.WithField("type", "source")
-	CssBox  *rice.Box // CSS files from the 'source/css' directory, this will be loaded into '/assets/css'
-	ScssBox *rice.Box // SCSS files from the 'source/scss' directory, this will be loaded into '/assets/scss'
-	JsBox   *rice.Box // JS files from the 'source/js' directory, this will be loaded into '/assets/js'
 	TmplBox *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
-	FontBox *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
 )
 
 // Assets will load the Rice boxes containing the CSS, SCSS, JS, and HTML files.
 func Assets() error {
-	CssBox = rice.MustFindBox("css")
-	ScssBox = rice.MustFindBox("scss")
-	JsBox = rice.MustFindBox("js")
-	TmplBox = rice.MustFindBox("tmpl")
-	FontBox = rice.MustFindBox("font")
+	TmplBox = rice.MustFindBox("dist")
 	return nil
 }
 
@@ -93,7 +85,7 @@ func UsingAssets(folder string) bool {
 			CreateAllAssets(folder)
 			err := CompileSASS(folder)
 			if err != nil {
-				CopyToPublic(CssBox, folder+"/css", "base.css")
+				//CopyToPublic(CssBox, folder+"/css", "base.css")
 				log.Warnln("Default 'base.css' was insert because SASS did not work.")
 				return true
 			}
@@ -135,11 +127,7 @@ func CreateAllAssets(folder string) error {
 	MakePublicFolder(folder + "/assets/font")
 	MakePublicFolder(folder + "/assets/files")
 	log.Infoln("Inserting scss, css, and javascript files into assets folder")
-	CopyAllToPublic(ScssBox, "scss")
-	CopyAllToPublic(FontBox, "font")
-	CopyAllToPublic(CssBox, "css")
-	CopyAllToPublic(JsBox, "js")
-	CopyToPublic(FontBox, folder+"/assets/font", "all.css")
+	CopyAllToPublic(TmplBox, folder+"/assets")
 	CopyToPublic(TmplBox, folder+"/assets", "robots.txt")
 	CopyToPublic(TmplBox, folder+"/assets", "banner.png")
 	CopyToPublic(TmplBox, folder+"/assets", "favicon.ico")

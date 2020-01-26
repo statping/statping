@@ -322,7 +322,11 @@ func apiServiceFailuresHandler(r *http.Request) interface{} {
 	if servicer == nil {
 		return errors.New("service not found")
 	}
-	return servicer.AllFailures()
+	fails, err := servicer.FailuresDb(r).Fails()
+	if err != nil {
+		return err
+	}
+	return fails
 }
 
 func apiServiceHitsHandler(r *http.Request) interface{} {
@@ -331,8 +335,7 @@ func apiServiceHitsHandler(r *http.Request) interface{} {
 	if servicer == nil {
 		return errors.New("service not found")
 	}
-
-	hits, err := servicer.Hits()
+	hits, err := servicer.HitsDb(r).Hits()
 	if err != nil {
 		return err
 	}

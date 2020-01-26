@@ -97,7 +97,7 @@ func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := source.CompileSASS(dir); err != nil {
-		source.CopyToPublic(source.CssBox, dir+"/assets/css", "base.css")
+		source.CopyToPublic(source.TmplBox, dir+"/assets/css", "base.css")
 		log.Errorln("Default 'base.css' was inserted because SASS did not work.")
 	}
 	resetRouter()

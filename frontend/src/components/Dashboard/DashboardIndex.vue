@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <div v-for="(service, index) in $store.getters.servicesInOrder()" v-bind:key="index">
+        <div v-for="(service, index) in services" v-bind:key="index">
             <ServiceInfo :service=service />
         </div>
     </div>
@@ -30,7 +30,12 @@
   components: {
     ServiceInfo
   },
-  methods: {
+    data () {
+      return {
+        services: this.$store.getters.servicesInOrder()
+      }
+    },
+    methods: {
 
   }
 }

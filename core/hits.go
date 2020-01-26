@@ -17,6 +17,7 @@ package core
 
 import (
 	"github.com/hunterlong/statping/types"
+	"net/http"
 	"time"
 )
 
@@ -27,11 +28,11 @@ type Hit struct {
 // CreateHit will create a new 'hit' record in the database for a successful/online service
 func (s *Service) CreateHit(h *types.Hit) (int64, error) {
 	db := hitsDB().Create(&h)
-	if db.Error != nil {
-		log.Errorln(db.Error)
-		return 0, db.Error
+	if db.Error() != nil {
+		log.Errorln(db.Error())
+		return 0, db.Error()
 	}
-	return h.Id, db.Error
+	return h.Id, db.Error()
 }
 
 // CountHits returns a int64 for all hits for a service
@@ -39,7 +40,19 @@ func (s *Service) CountHits() (int64, error) {
 	var hits int64
 	col := hitsDB().Where("service = ?", s.Id)
 	err := col.Count(&hits)
-	return hits, err.Error
+	return hits, err.Error()
+}
+
+// Hits returns all successful hits for a service
+func (s *Service) HitsQuery(r *http.Request) ([]*types.Hit, error) {
+	var hits []*types.Hit
+	col := hitsDB().Where("service = ?", s.Id).QuerySearch(r).Order("id desc")
+	err := col.Find(&hits)
+	return hits, err.Error()
+}
+
+func (s *Service) HitsDb(r *http.Request) types.Database {
+	return hitsDB().Where("service = ?", s.Id).QuerySearch(r).Order("id desc")
 }
 
 // Hits returns all successful hits for a service
@@ -47,15 +60,15 @@ func (s *Service) Hits() ([]*types.Hit, error) {
 	var hits []*types.Hit
 	col := hitsDB().Where("service = ?", s.Id).Order("id desc")
 	err := col.Find(&hits)
-	return hits, err.Error
+	return hits, err.Error()
 }
 
 // LimitedHits returns the last 1024 successful/online 'hit' records for a service
-func (s *Service) LimitedHits(amount int64) ([]*types.Hit, error) {
+func (s *Service) LimitedHits(amount int) ([]*types.Hit, error) {
 	var hits []*types.Hit
 	col := hitsDB().Where("service = ?", s.Id).Order("id desc").Limit(amount)
 	err := col.Find(&hits)
-	return reverseHits(hits), err.Error
+	return reverseHits(hits), err.Error()
 }
 
 // reverseHits will reverse the service's hit slice
@@ -70,14 +83,14 @@ func reverseHits(input []*types.Hit) []*types.Hit {
 func (s *Service) TotalHits() (uint64, error) {
 	var count uint64
 	col := hitsDB().Where("service = ?", s.Id).Count(&count)
-	return count, col.Error
+	return count, col.Error()
 }
 
 // TotalHitsSince returns the total amount of hits based on a specific time/date
 func (s *Service) TotalHitsSince(ago time.Time) (uint64, error) {
 	var count uint64
 	rows := hitsDB().Where("service = ? AND created_at > ?", s.Id, ago.UTC().Format("2006-01-02 15:04:05")).Count(&count)
-	return count, rows.Error
+	return count, rows.Error()
 }
 
 // Sum returns the added value Latency for all of the services successful hits.

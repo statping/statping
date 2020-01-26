@@ -1,13 +1,16 @@
 package handlers
 
 import (
+	"compress/gzip"
 	"crypto/subtle"
 	"encoding/json"
 	"fmt"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/utils"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"time"
 )
 
@@ -15,6 +18,30 @@ var (
 	authUser string
 	authPass string
 )
+
+// Gzip Compression
+type gzipResponseWriter struct {
+	io.Writer
+	http.ResponseWriter
+}
+
+func (w gzipResponseWriter) Write(b []byte) (int, error) {
+	return w.Writer.Write(b)
+}
+
+func Gzip(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+			handler.ServeHTTP(w, r)
+			return
+		}
+		w.Header().Set("Content-Encoding", "gzip")
+		gz := gzip.NewWriter(w)
+		defer gz.Close()
+		gzw := gzipResponseWriter{Writer: gz, ResponseWriter: w}
+		handler.ServeHTTP(gzw, r)
+	})
+}
 
 // basicAuthHandler is a middleware to implement HTTP basic authentication using
 // AUTH_USERNAME and AUTH_PASSWORD environment variables

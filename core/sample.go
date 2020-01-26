@@ -231,7 +231,7 @@ func InsertSampleHits() error {
 		}()
 	}
 	sg.Wait()
-	err := tx.Commit().Error
+	err := tx.Commit().Error()
 	if err != nil {
 		log.Errorln(err)
 	}
@@ -251,7 +251,7 @@ func insertSampleCore() error {
 		UseCdn:      types.NewNullBool(false),
 	}
 	query := coreDB().Create(core)
-	return query.Error
+	return query.Error()
 }
 
 // insertSampleUsers will create 2 admin users for a seed database
@@ -457,13 +457,13 @@ func InsertLargeSampleData() error {
 }
 
 // insertFailureRecords will create failures for 15 services from seed
-func insertFailureRecords(since time.Time, amount int64) {
+func insertFailureRecords(since time.Time, amount int) {
 	for i := int64(14); i <= 15; i++ {
 		service := SelectService(i)
 		log.Infoln(fmt.Sprintf("Adding %v Failure records to service %v", amount, service.Name))
 		createdAt := since
 
-		for fi := int64(1); fi <= amount; fi++ {
+		for fi := 1; fi <= amount; fi++ {
 			createdAt = createdAt.Add(2 * time.Minute)
 
 			failure := &types.Failure{
@@ -478,13 +478,13 @@ func insertFailureRecords(since time.Time, amount int64) {
 }
 
 // insertHitRecords will create successful Hit records for 15 services
-func insertHitRecords(since time.Time, amount int64) {
+func insertHitRecords(since time.Time, amount int) {
 	for i := int64(1); i <= 15; i++ {
 		service := SelectService(i)
 		log.Infoln(fmt.Sprintf("Adding %v hit records to service %v", amount, service.Name))
 		createdAt := since
 		p := utils.NewPerlin(2, 2, 5, time.Now().UnixNano())
-		for hi := int64(1); hi <= amount; hi++ {
+		for hi := 1; hi <= amount; hi++ {
 			latency := p.Noise1D(float64(hi / 10))
 			createdAt = createdAt.Add(1 * time.Minute)
 			hit := &types.Hit{
