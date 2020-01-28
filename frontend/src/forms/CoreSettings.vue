@@ -19,7 +19,7 @@
                 <label class="d-inline d-sm-none">Enable CDN</label>
                 <label class="d-none d-sm-block">Enable CDN</label>
                 <span @click="core.using_cdn = !!core.using_cdn" class="switch">
-                    <input type="checkbox" name="using_cdn" class="switch" id="switch-normal" v-bind:checked="core.using_cdn">
+                    <input v-model="core.using_cdn" type="checkbox" name="using_cdn" class="switch" id="switch-normal" :checked="core.using_cdn">
                     <label for="switch-normal"></label>
                   </span>
             </div>
@@ -32,8 +32,8 @@
         </div>
 
         <div class="form-group">
-            <label for="timezone">Timezone</label><span class="mt-1 small float-right">Current: {{now}}</span>
-            <select v-model="core.timezone" class="form-control" name="timezone" id="timezone">
+            <label for="timezone">Timezone</label><span class="mt-1 small float-right">Current: {{now()}}</span>
+            <select v-model="core.timezone" class="form-control" id="timezone">
                 <option value="-12.0" >(GMT -12:00) Eniwetok, Kwajalein</option>
                 <option value="-11.0" >(GMT -11:00) Midway Island, Samoa</option>
                 <option value="-10.0" >(GMT -10:00) Hawaii</option>
@@ -72,7 +72,7 @@
             <div class="col-12">
                 <label class="d-none d-sm-block">Send Updates only</label>
                 <span class="switch">
-                    <input @change="core.update_notify = !core.update_notify" type="checkbox" name="update_notify-option" class="switch" id="switch-update_notify" v-bind:checked="core.update_notify">
+                    <input v-model="core.update_notify" @change="core.update_notify = !!core.update_notify" type="checkbox" class="switch" id="switch-update_notify" v-bind:checked="core.update_notify">
                     <label for="switch-update_notify" class="mt-2 mt-sm-0"></label>
                     <small class="form-text text-muted">Enabling this will send only notifications when the status of a services changes.</small>
                 </span>
@@ -125,7 +125,7 @@ export default {
           e.preventDefault()
           const c = this.core
           const coreForm = {name: c.name, description: c.description, domain: c.domain,
-            timezone: c.timezone, using_cdn: c.using_cdn, footer: c.footer}
+            timezone: c.timezone, using_cdn: c.using_cdn, footer: c.footer, update_notify: c.update_notify}
           alert(JSON.stringify(coreForm))
           await Api.core_save(coreForm)
           const core = await Api.core()

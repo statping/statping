@@ -7,7 +7,7 @@
             </div>
             <div class="col-6 col-md-4">
                   <span @click="user.admin = !!user.admin" class="switch">
-                    <input type="checkbox" name="admin" class="switch" id="switch-normal" v-bind:checked="user.admin">
+                    <input v-model="user.admin" type="checkbox" class="switch" id="switch-normal" v-bind:checked="user.admin">
                     <label for="switch-normal">Administrator</label>
                   </span>
             </div>

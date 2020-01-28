@@ -121,7 +121,7 @@
         <div v-if="service.type.match(/^(http)$/)" class="form-group row">
             <label for="order" class="col-sm-4 col-form-label">Verify SSL</label>
             <div class="col-8 mt-1">
-            <span class="switch float-left">
+            <span @click="service.verify_ssl = !!service.verify_ssl" class="switch float-left">
                 <input v-model="service.verify_ssl" type="checkbox" name="verify_ssl-option" class="switch" id="switch-verify-ssl" v-bind:checked="service.verify_ssl">
                 <label for="switch-verify-ssl">Verify SSL Certificate for this service</label>
             </span>
@@ -130,7 +130,7 @@
         <div class="form-group row">
             <label for="order" class="col-sm-4 col-form-label">Notifications</label>
             <div class="col-8 mt-1">
-            <span class="switch float-left">
+            <span @click="service.allow_notifications = !!service.allow_notifications" class="switch float-left">
                 <input v-model="service.allow_notifications" type="checkbox" name="allow_notifications-option" class="switch" id="switch-notifications" v-bind:checked="service.allow_notifications">
                 <label for="switch-notifications">Allow notifications to be sent for this service</label>
             </span>
@@ -139,7 +139,7 @@
         <div class="form-group row">
             <label for="order" class="col-sm-4 col-form-label">Visible</label>
             <div class="col-8 mt-1">
-            <span class="switch float-left">
+            <span @click="service.public = !!service.public" class="switch float-left">
                 <input v-model="service.public" type="checkbox" name="public-option" class="switch" id="switch-public" v-bind:checked="service.public">
                 <label for="switch-public">Show service details to the public</label>
             </span>

@@ -10,7 +10,7 @@
             <label for="switch-group-public" class="col-sm-4 col-form-label">Public Group</label>
             <div class="col-8 mt-1">
             <span @click="group.public = !!group.public" class="switch float-left">
-                <input v-model="group.public" type="checkbox" name="public" class="switch" id="switch-group-public" v-bind:checked="group.public">
+                <input v-model="group.public" type="checkbox" class="switch" id="switch-group-public" :checked="group.public">
                 <label for="switch-group-public">Show group services to the public</label>
             </span>
             </div>

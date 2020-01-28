@@ -74,8 +74,8 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    const tk = Api.token()
-    if (tk === null) {
+    const tk = localStorage.getItem("statping_user")
+    if (tk !== null) {
       next()
       return
     }
