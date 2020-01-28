@@ -9,13 +9,18 @@ import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import Service from "./pages/Service";
 import VueRouter from "vue-router";
-import Api from "./components/API";
+import Setup from "./forms/Setup";
 
 const routes = [
   {
+    path: '/setup',
+    name: 'Setup',
+    component: Setup
+  },
+  {
     path: '/',
     name: 'Index',
-    component: Index
+    component: Index,
   },
   {
     path: '/dashboard',

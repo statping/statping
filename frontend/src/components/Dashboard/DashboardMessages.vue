@@ -55,9 +55,6 @@
 
     }
   },
-  created() {
-
-  },
   methods: {
     service (id) {
         return this.$store.getters.serviceById(id).name || ""

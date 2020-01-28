@@ -60,7 +60,7 @@
         this.error = true
       } else if (auth.token) {
         this.auth = Api.saveToken(this.username, auth.token)
-        this.$store.commit('setToken', auth)
+        await this.$store.dispatch('loadRequired')
         this.$router.push('/dashboard')
       }
       this.loading = false

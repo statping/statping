@@ -37,10 +37,9 @@ type Core struct {
 }
 
 var (
-	CoreApp   *Core  // CoreApp is a global variable that contains many elements
-	SetupMode bool   // SetupMode will be true if Statping does not have a database connection
-	VERSION   string // VERSION is set on build automatically by setting a -ldflag
-	log       = utils.Log.WithField("type", "core")
+	CoreApp *Core  // CoreApp is a global variable that contains many elements
+	VERSION string // VERSION is set on build automatically by setting a -ldflag
+	log     = utils.Log.WithField("type", "core")
 )
 
 func init() {
@@ -71,7 +70,7 @@ func InitApp() {
 	CoreApp.Notifications = notifier.AllCommunications
 	CoreApp.Integrations = integrations.Integrations
 	go DatabaseMaintence()
-	SetupMode = false
+	CoreApp.Setup = true
 }
 
 // InsertNotifierDB inject the Statping database instance to the Notifier package

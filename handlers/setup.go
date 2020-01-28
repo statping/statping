@@ -16,11 +16,13 @@
 package handlers
 
 import (
+	"errors"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -39,11 +41,15 @@ func setupHandler(w http.ResponseWriter, r *http.Request) {
 
 func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
-	if !core.SetupMode {
-		http.Redirect(w, r, basePath, http.StatusSeeOther)
+	if core.CoreApp.Setup {
+		sendErrorJson(errors.New("Statping has already been setup"), w, r)
 		return
 	}
-	r.ParseForm()
+	if err = r.ParseForm(); err != nil {
+		log.Errorln(err)
+		sendErrorJson(err, w, r)
+		return
+	}
 	dbHost := r.PostForm.Get("db_host")
 	dbUser := r.PostForm.Get("db_user")
 	dbPass := r.PostForm.Get("db_password")
@@ -56,7 +62,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	description := r.PostForm.Get("description")
 	domain := r.PostForm.Get("domain")
 	email := r.PostForm.Get("email")
-	sample := r.PostForm.Get("sample_data") == "on"
+	sample, _ := strconv.ParseBool(r.PostForm.Get("sample_data"))
 	dir := utils.Directory
 
 	config := &types.DbConfig{
@@ -80,34 +86,37 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	if _, err := core.CoreApp.SaveConfig(config); err != nil {
 		log.Errorln(err)
-		config.Error = err
-		setupResponseError(w, r, config)
+		sendErrorJson(err, w, r)
 		return
 	}
 
 	if _, err = core.LoadConfigFile(dir); err != nil {
 		log.Errorln(err)
-		config.Error = err
-		setupResponseError(w, r, config)
+		sendErrorJson(err, w, r)
 		return
 	}
 
 	if err = core.CoreApp.Connect(false, dir); err != nil {
 		log.Errorln(err)
 		core.DeleteConfig()
-		config.Error = err
-		setupResponseError(w, r, config)
+		sendErrorJson(err, w, r)
 		return
 	}
 
-	core.CoreApp.DropDatabase()
-	core.CoreApp.CreateDatabase()
+	if err = core.CoreApp.DropDatabase(); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	if err = core.CoreApp.CreateDatabase(); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
 
 	core.CoreApp, err = core.CoreApp.InsertCore(config)
 	if err != nil {
 		log.Errorln(err)
-		config.Error = err
-		setupResponseError(w, r, config)
+		sendErrorJson(err, w, r)
 		return
 	}
 
@@ -120,13 +129,23 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	admin.Create()
 
 	if sample {
-		core.SampleData()
+		if err = core.SampleData(); err != nil {
+			sendErrorJson(err, w, r)
+			return
+		}
 	}
 	core.InitApp()
 	CacheStorage.Delete("/")
 	resetCookies()
-	time.Sleep(2 * time.Second)
-	http.Redirect(w, r, basePath, http.StatusSeeOther)
+	time.Sleep(1 * time.Second)
+	out := struct {
+		Message string          `json:"message"`
+		Config  *types.DbConfig `json:"config"`
+	}{
+		"okokok",
+		config,
+	}
+	returnJson(out, w, r)
 }
 
 func setupResponseError(w http.ResponseWriter, r *http.Request, a interface{}) {

@@ -16,8 +16,8 @@
                 <th scope="col"></th>
             </tr>
             </thead>
-            <draggable tag="tbody" :list="services" :key="services.length" class="sortable" handle=".drag_icon">
-            <tr v-for="(service, index) in services" :key="index">
+            <draggable tag="tbody" :list="$store.getters.servicesInOrder" :key="this.$store.getters.servicesInOrder.length" class="sortable" handle=".drag_icon">
+            <tr v-for="(service, index) in $store.getters.services" :key="index">
                 <td>
                     <span class="drag_icon d-none d-md-inline">
                         <font-awesome-icon icon="bars" />
@@ -65,7 +65,7 @@
             </thead>
 
             <draggable tag="tbody" v-model="groupsList" class="sortable_groups" handle=".drag_icon">
-            <tr v-for="(group, index) in $store.getters.cleanGroups()" v-bind:key="index">
+            <tr v-for="(group, index) in $store.getters.groupsCleaned" v-bind:key="index">
                 <td><span class="drag_icon d-none d-md-inline"><font-awesome-icon icon="bars" /></span> {{group.name}}</td>
                 <td>{{$store.getters.servicesInGroup(group.id).length}}</td>
                 <td>
@@ -74,7 +74,7 @@
                 </td>
                 <td class="text-right">
                     <div class="btn-group">
-                        <a href="group/2" class="btn btn-outline-secondary"> <font-awesome-icon icon="chart-area" /> Edit</a>
+                        <a href="group/2" class="btn btn-outline-secondary"><font-awesome-icon icon="chart-area" /> Edit</a>
                         <a @click="deleteGroup(group)" href="#" class="btn btn-danger">
                             <font-awesome-icon icon="times" />
                         </a>
@@ -112,13 +112,8 @@
   },
   data () {
     return {
-        services: []
+
     }
-  },
-  async created() {
-    const services = await Api.services()
-    this.$store.commit('setServices', services)
-    this.services = this.$store.getters.servicesInOrder()
   },
   computed: {
     servicesList: {

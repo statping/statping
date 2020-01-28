@@ -1,5 +1,6 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
+import Api from "./components/API"
 
 Vue.use(Vuex)
 
@@ -37,6 +38,9 @@ export default new Vuex.Store({
         users: state => state.users,
         notifiers: state => state.notifiers,
 
+        servicesInOrder: state => state.services,
+        groupsCleaned:  state => state.groups.filter(g => g.name !== ''),
+
         serviceById: (state) => (id) => {
             return state.services.find(s => s.id === id)
         },
@@ -45,9 +49,6 @@ export default new Vuex.Store({
         },
         servicesInGroup: (state) => (id) => {
             return state.services.filter(s => s.group_id === id)
-        },
-        servicesInOrder: (state) => () => {
-          return state.services
         },
         onlineServices: (state) => (online) => {
             return state.services.filter(s => s.online === online)
@@ -79,7 +80,7 @@ export default new Vuex.Store({
             state.token = token
         },
         setServices(state, services) {
-            state.services = services.sort((a, b) => a.order_id - b.order_id)
+            state.services = services
         },
         setGroups(state, groups) {
             state.groups = groups
@@ -95,6 +96,23 @@ export default new Vuex.Store({
         }
     },
     actions: {
-
+      async loadRequired(context) {
+        const core = await Api.core()
+        context.commit("setCore", core);
+        const services = await Api.services()
+        context.commit("setServices", services);
+        const groups = await Api.groups()
+        context.commit("setGroups", groups);
+        const messages = await Api.messages()
+        context.commit("setMessages", messages)
+        context.commit("setHasPublicData", true)
+      },
+      async loadAdmin(context) {
+        await context.dispatch('loadRequired')
+        const notifiers = await Api.notifiers()
+        context.commit("setNotifiers", notifiers);
+        const users = await Api.users()
+        context.commit("setUsers", users);
+      }
     }
 });

@@ -18,9 +18,9 @@ require (
 	github.com/go-mail/mail v2.3.1+incompatible
 	github.com/go-yaml/yaml v2.1.0+incompatible
 	github.com/gorilla/mux v1.7.3
-	github.com/gorilla/sessions v1.2.0
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
+	github.com/hunterlong/scopr v0.0.0
 	github.com/jinzhu/gorm v1.9.11
 	github.com/joho/godotenv v1.3.0
 	github.com/lib/pq v1.2.0 // indirect
@@ -41,3 +41,5 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gopkg.in/yaml.v2 v2.2.7 // indirect
 )
+
+replace github.com/hunterlong/scopr v0.0.0 => ../scopr

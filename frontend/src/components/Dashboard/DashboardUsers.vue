@@ -44,10 +44,6 @@
 
     }
   },
-  async created() {
-    const users = await Api.users()
-    this.$store.commit('setUsers', users)
-  },
   methods: {
     async deleteUser(u) {
       let c = confirm(`Are you sure you want to delete user '${u.username}'?`)

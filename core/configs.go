@@ -40,6 +40,7 @@ func LoadConfigFile(directory string) (*types.DbConfig, error) {
 	log.Debugln("attempting to read config file at: " + directory + "/config.yml")
 	file, err := ioutil.ReadFile(directory + "/config.yml")
 	if err != nil {
+		CoreApp.Setup = false
 		return nil, errors.New("config.yml file not found at " + directory + "/config.yml - starting in setup mode")
 	}
 	err = yaml.Unmarshal(file, &configs)

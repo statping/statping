@@ -50,7 +50,7 @@
 
 
                         <h2 class="mt-5">Additional Settings</h2>
-                        <div class="row">
+                        <div v-if="core.domain !== ''" class="row">
                             <div class="col-12">
                                 <div class="row align-content-center">
                                     <img class="rounded text-center" width="300" height="300" :src="qrcode">
@@ -265,7 +265,8 @@
   data () {
     return {
       tab: "v-pills-home-tab",
-      qrcode: ""
+      qrcode: "",
+      core: this.$store.getters.core
     }
   },
   async created() {

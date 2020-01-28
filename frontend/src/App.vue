@@ -1,12 +1,11 @@
 <template>
   <div id="app" v-if="loaded">
     <router-view/>
-      <Footer version="DEV" />
+      <Footer version="DEV" v-if="$route.path !== '/setup'"/>
   </div>
 </template>
 
 <script>
-  import Api from './components/API';
   import Footer from "./components/Footer";
 
   export default {
@@ -19,42 +18,20 @@
       loaded: false
     }
   },
-    async created () {
-     await this.setAllObjects()
+    async mounted() {
+      if (this.$route.path !== '/setup') {
+        const tk = JSON.parse(localStorage.getItem("statping_user"))
+        if (!this.$store.getters.hasPublicData) {
+          await this.$store.dispatch('loadAdmin')
+        }
+      }
       this.loaded = true
-      this.$store.commit('setHasPublicData', true)
-   },
+    },
     methods: {
       async setAllObjects () {
-          await this.setCore()
-          await this.setServices()
-          await this.setGroups()
-          await this.setMessages()
-          await this.setToken()
-          this.$store.commit('setHasPublicData', true)
         this.loaded = true
-      },
-          async setCore () {
-              const core = await Api.core()
-              this.$store.commit('setCore', core)
-          },
-          async setToken () {
-              const token = await Api.token()
-              this.$store.commit('setToken', token)
-          },
-          async setServices () {
-              const services = await Api.services()
-              this.$store.commit('setServices', services)
-          },
-          async setGroups () {
-              const groups = await Api.groups()
-              this.$store.commit('setGroups', groups)
-          },
-          async setMessages () {
-              const messages = await Api.messages()
-              this.$store.commit('setMessages', messages)
-          }
       }
+    }
 }
 </script>
 

@@ -6,31 +6,17 @@
 </template>
 
 <script>
-  import Login from "./Login";
   import TopNav from "../components/Dashboard/TopNav";
-  import Api from "../components/API";
 
   export default {
   name: 'Dashboard',
   components: {
     TopNav,
-    Login,
   },
   data () {
     return {
       authenticated: false
     }
-  },
-    mounted() {
-    if (this.$store.getters.token !== null) {
-      this.authenticated = true
-    }
-  },
-  methods: {
-    async setServices () {
-      const services = await Api.services()
-      this.$store.commit('setServices', services)
-    },
   }
 }
 </script>

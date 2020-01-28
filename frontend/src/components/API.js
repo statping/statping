@@ -16,6 +16,10 @@ class Api {
     return axios.post('/api/core', obj).then(response => (response.data))
   }
 
+  async setup_save (data) {
+    return axios.post('/api/setup', qs.stringify(data)).then(response => (response.data))
+  }
+
   async services () {
     return axios.get('/api/services').then(response => (response.data))
   }
