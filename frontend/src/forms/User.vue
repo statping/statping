@@ -1,4 +1,9 @@
 <template>
+    <div>
+        <h1 class="text-black-50 mt-5">{{in_user === null ? "Create User" : "Edit User"}}</h1>
+
+        <div class="card">
+            <div class="card-body">
     <form @submit="saveUser">
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Username</label>
@@ -37,6 +42,9 @@
         </div>
         <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
     </form>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -45,7 +53,9 @@
   export default {
   name: 'FormUser',
   props: {
-
+    in_user: {
+      type: Object
+    }
   },
   data () {
     return {
@@ -59,7 +69,9 @@
     }
   },
   mounted() {
-
+    if (this.in_user) {
+      this.user = this.in_user
+    }
   },
   computed() {
 

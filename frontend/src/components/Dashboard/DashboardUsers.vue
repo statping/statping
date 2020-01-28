@@ -14,7 +14,7 @@
                 <td>{{user.username}}</td>
                 <td class="text-right">
                     <div class="btn-group">
-                        <a href="user/1" class="btn btn-outline-secondary"><font-awesome-icon icon="user" /> Edit</a>
+                        <a @click="editUser(user)" href="#" class="btn btn-outline-secondary"><font-awesome-icon icon="user" /> Edit</a>
                         <a @click="deleteUser(user)" href="#" class="btn btn-danger"><font-awesome-icon icon="times" /></a>
                     </div>
                 </td>
@@ -22,13 +22,7 @@
             </tbody>
         </table>
 
-        <h1 class="text-black-50 mt-5">Create User</h1>
-
-        <div class="card">
-            <div class="card-body">
-                <FormUser/>
-            </div>
-        </div>
+        <FormUser :in_user="user"/>
     </div>
 </template>
 
@@ -41,10 +35,15 @@
     components: {FormUser},
     data () {
     return {
-
+      edit: false,
+      user: null
     }
   },
   methods: {
+    editUser(u) {
+      this.edit = true
+      this.user = u
+    },
     async deleteUser(u) {
       let c = confirm(`Are you sure you want to delete user '${u.username}'?`)
       if (c) {

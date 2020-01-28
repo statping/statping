@@ -38,7 +38,7 @@ export default new Vuex.Store({
         users: state => state.users,
         notifiers: state => state.notifiers,
 
-        servicesInOrder: state => state.services,
+        servicesInOrder: state => state.services.sort((a, b) => a.order_id - b.order_id),
         groupsCleaned:  state => state.groups.filter(g => g.name !== ''),
 
         serviceById: (state) => (id) => {

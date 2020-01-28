@@ -16,7 +16,7 @@
                 <th scope="col"></th>
             </tr>
             </thead>
-            <draggable tag="tbody" :list="$store.getters.servicesInOrder" :key="this.$store.getters.servicesInOrder.length" class="sortable" handle=".drag_icon">
+            <draggable @update="log" tag="tbody" v-model="servicesList" :list="$store.getters.servicesInOrder" :key="this.$store.getters.servicesInOrder.length" class="sortable" handle=".drag_icon">
             <tr v-for="(service, index) in $store.getters.services" :key="index">
                 <td>
                     <span class="drag_icon d-none d-md-inline">
@@ -118,7 +118,7 @@
   computed: {
     servicesList: {
       get() {
-        return this.$store.getters.servicesInOrder()
+        return this.$store.getters.servicesInOrder
       },
       async set(value) {
         let data = [];
@@ -151,6 +151,10 @@
   methods: {
     reordered_services() {
 
+    },
+    saveUpdatedOrder: function (e) {
+      window.console.log("saving...");
+      window.console.log(this.myViews.array()); // this.myViews.array is not a function
     },
     serviceGroup(s) {
       let group = this.$store.getters.groupById(s.group_id)
