@@ -9,6 +9,19 @@ export default Vue.mixin({
       return this.now() - seconds
     },
     hour(){ return 3600 },
-    day() { return 3600 * 24 }
+    day() { return 3600 * 24 },
+    serviceLink(service) {
+      if (!service) {
+        return ""
+      }
+      if (!service.id) {
+        service = this.$store.getters.serviceById(service)
+      }
+      let link = service.permalink ? service.permalink : service.id
+      return `/service/${link}`
+    },
+    isInt(n) {
+      return n % 1 === 0;
+    }
   }
 });

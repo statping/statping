@@ -64,6 +64,10 @@ class Api {
     return axios.post('/api/groups', data).then(response => (response.data))
   }
 
+  async group_update (data) {
+    return axios.post('/api/groups/'+data.id, data).then(response => (response.data))
+  }
+
   async users () {
     return axios.get('/api/users').then(response => (response.data))
   }
@@ -72,12 +76,24 @@ class Api {
     return axios.post('/api/users', data).then(response => (response.data))
   }
 
+  async user_update (data) {
+    return axios.post('/api/users/'+data.id, data).then(response => (response.data))
+  }
+
   async user_delete (id) {
     return axios.delete('/api/users/'+id).then(response => (response.data))
   }
 
   async messages () {
     return axios.get('/api/messages').then(response => (response.data))
+  }
+
+  async message_create (data) {
+    return axios.post('/api/messages', data).then(response => (response.data))
+  }
+
+  async message_update (data) {
+    return axios.post('/api/messages/'+data.id, data).then(response => (response.data))
   }
 
   async message_delete (id) {

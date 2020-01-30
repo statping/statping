@@ -35,7 +35,7 @@
                     <span class="d-none d-md-inline">Online, last Failure was Wednesday 1:16:49PM, Dec 18 2019</span>
                 </div>
                 <div class="col-sm-12 col-md-2">
-                    <router-link :to="`/service/${service.id}`" class="btn btn-success btn-sm float-right dyn-dark btn-block">View Service</router-link>
+                    <router-link :to="serviceLink(service)" class="btn btn-success btn-sm float-right dyn-dark btn-block">View Service</router-link>
                 </div>
             </div>
 

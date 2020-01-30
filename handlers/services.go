@@ -147,6 +147,24 @@ func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonAction(newService, "create", w, r)
 }
 
+func apiTestServiceHandler(w http.ResponseWriter, r *http.Request) {
+	var service *types.Service
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&service)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	newService := core.ReturnService(service)
+	_, err = newService.Create(true)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	sendJsonAction(newService, "create", w, r)
+}
+
 func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	service := core.SelectService(utils.ToInt(vars["id"]))

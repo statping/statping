@@ -1,9 +1,17 @@
 <template>
+    <div>
+        <h1 class="text-muted mt-5">
+            {{group.id ? `Update ${group.name}` : "Create Group"}}
+            <button @click="removeEdit" v-if="group.id" class="mt-3 btn float-right btn-danger btn-sm">Close</button>
+        </h1>
+
+        <div class="card">
+            <div class="card-body">
     <form @submit="saveGroup">
         <div class="form-group row">
             <label for="title" class="col-sm-4 col-form-label">Group Name</label>
             <div class="col-sm-8">
-                <input v-model="group.name" type="text" name="name" class="form-control" value="" id="title" placeholder="Group Name" required>
+                <input v-model="group.name" type="text" class="form-control" id="title" placeholder="Group Name" required>
             </div>
         </div>
         <div class="form-group row">
@@ -17,21 +25,29 @@
         </div>
         <div class="form-group row">
             <div class="col-sm-12">
-                <button @click="saveGroup" type="submit" class="btn btn-primary btn-block">Create Group</button>
+                <button @click="saveGroup" type="submit" class="btn btn-block" :class="{'btn-primary': !group.name, 'btn-secondary': group.name}">
+                    {{group.id ? "Update Group" : "Create Group"}}
+                </button>
             </div>
         </div>
         <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
     </form>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
-import Api from "../components/API";
+  import Api from "../components/API";
 
-export default {
+  export default {
   name: 'FormGroup',
   props: {
     in_group: {
       type: Object
+    },
+    edit: {
+      type: Function
     }
   },
   data () {
@@ -42,20 +58,41 @@ export default {
       }
     }
   },
-  mounted() {
-    if (this.props.in_group) {
-      this.group = this.props.in_group
+  watch: {
+    in_group() {
+      this.group = this.in_group
     }
   },
   methods: {
+    removeEdit() {
+      this.group = {}
+      this.edit(false)
+    },
     async saveGroup(e) {
       e.preventDefault();
+      if (this.in_group) {
+        await this.updateGroup()
+      } else {
+        await this.createGroup()
+      }
+    },
+
+    async createGroup() {
       const g = this.group
       const data = {name: g.name, public: g.public}
       await Api.group_create(data)
       const groups = await Api.groups()
       this.$store.commit('setGroups', groups)
+      this.group = {}
     },
+    async updateGroup() {
+      const g = this.group
+      const data = {id: g.id, name: g.name, public: g.public}
+      await Api.group_update(data)
+      const groups = await Api.groups()
+      this.$store.commit('setGroups', groups)
+      this.edit(false)
+    }
   }
 }
 </script>

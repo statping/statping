@@ -44,11 +44,11 @@ func checkServices() {
 func (s *Service) Check(record bool) {
 	switch s.Type {
 	case "http":
-		s.checkHttp(record)
+		s.CheckHttp(record)
 	case "tcp", "udp":
-		s.checkTcp(record)
+		s.CheckTcp(record)
 	case "icmp":
-		s.checkIcmp(record)
+		s.CheckIcmp(record)
 	}
 }
 
@@ -122,7 +122,7 @@ func isIPv6(address string) bool {
 }
 
 // checkIcmp will send a ICMP ping packet to the service
-func (s *Service) checkIcmp(record bool) *Service {
+func (s *Service) CheckIcmp(record bool) *Service {
 	p := fastping.NewPinger()
 	resolveIP := "ip4:icmp"
 	if isIPv6(s.Domain) {
@@ -148,7 +148,7 @@ func (s *Service) checkIcmp(record bool) *Service {
 }
 
 // checkTcp will check a TCP service
-func (s *Service) checkTcp(record bool) *Service {
+func (s *Service) CheckTcp(record bool) *Service {
 	dnsLookup, err := s.dnsCheck()
 	if err != nil {
 		if record {
@@ -188,7 +188,7 @@ func (s *Service) checkTcp(record bool) *Service {
 }
 
 // checkHttp will check a HTTP service
-func (s *Service) checkHttp(record bool) *Service {
+func (s *Service) CheckHttp(record bool) *Service {
 	dnsLookup, err := s.dnsCheck()
 	if err != nil {
 		if record {

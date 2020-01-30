@@ -44,8 +44,8 @@ export default new Vuex.Store({
         serviceById: (state) => (id) => {
             return state.services.find(s => s.id === id)
         },
-        serviceByName: (state) => (name) => {
-            return state.services.find(s => s.name === name)
+        serviceByPermalink: (state) => (permalink) => {
+            return state.services.find(s => s.permalink === permalink)
         },
         servicesInGroup: (state) => (id) => {
             return state.services.filter(s => s.group_id === id)
@@ -57,7 +57,7 @@ export default new Vuex.Store({
             return state.groups.find(g => g.id === id)
         },
         cleanGroups: (state) => () => {
-          return state.groups.filter(g => g.name !== '')
+          return state.groups.filter(g => g.name !== 'Empty Group')
         },
         userById: (state) => (id) => {
             return state.users.find(u => u.id === id)

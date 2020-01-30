@@ -94,6 +94,7 @@ func Router() *mux.Router {
 	// API SERVICE Routes
 	r.Handle("/api/services", scoped(apiAllServicesHandler)).Methods("GET")
 	r.Handle("/api/services", authenticated(apiCreateServiceHandler, false)).Methods("POST")
+	r.Handle("/api/services_test", authenticated(apiTestServiceHandler, false)).Methods("POST")
 	r.Handle("/api/services/{id}", scoped(apiServiceHandler)).Methods("GET")
 	r.Handle("/api/reorder/services", authenticated(reorderServiceHandler, false)).Methods("POST")
 	r.Handle("/api/services/{id}/running", authenticated(apiServiceRunningHandler, false)).Methods("POST")

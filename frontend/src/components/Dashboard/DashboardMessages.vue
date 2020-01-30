@@ -16,13 +16,13 @@
             <tr v-for="(message, index) in $store.getters.messages" v-bind:key="index">
                 <td>{{message.title}}</td>
                 <td class="d-none d-md-table-cell">
-                    <router-link to="/service/${service(message.service).id}">{{service(message.service)}}</router-link>
+                    <router-link :to="serviceLink(message.service)">{{service(message.service)}}</router-link>
                 </td>
                 <td class="d-none d-md-table-cell">{{message.start_on}}</td>
                 <td class="text-right">
                     <div class="btn-group">
-                        <a href="message/1" class="btn btn-outline-secondary"><i class="fas fa-exclamation-triangle"></i> Edit</a>
-                        <a @click="deleteMessage(message)" href="#" class="btn btn-danger"><font-awesome-icon icon="times" /></a>
+                        <a @click.prevent="editMessage(message, edit)" href="#" class="btn btn-outline-secondary"><i class="fas fa-exclamation-triangle"></i> Edit</a>
+                        <a @click.prevent="deleteMessage(message)" href="#" class="btn btn-danger"><font-awesome-icon icon="times" /></a>
                     </div>
                 </td>
             </tr>
@@ -31,15 +31,8 @@
         </table>
     </div>
 
+        <FormMessage :edit="editChange" :in_message="message"/>
 
-    <div class="col-12">
-        <h1 class="text-black-50 mt-5">Create Message</h1>
-        <div class="card">
-            <div class="card-body">
-                <FormMessage/>
-            </div>
-        </div>
-    </div>
     </div>
 </template>
 
@@ -52,12 +45,22 @@
     components: {FormMessage},
     data () {
     return {
-
+      edit: false,
+      message: {}
     }
   },
   methods: {
+    editChange(v) {
+      this.message = {}
+      this.edit = v
+    },
+    editMessage(m, mode) {
+      this.message = m
+      this.edit = !mode
+    },
     service (id) {
-        return this.$store.getters.serviceById(id).name || ""
+      const s = this.$store.getters.serviceById(id) || {}
+      return s.name || "Global Message"
     },
     async deleteMessage(m) {
       let c = confirm(`Are you sure you want to delete message '${m.title}'?`)

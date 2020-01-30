@@ -1,8 +1,10 @@
 <template v-if="service">
     <div class="col-12 card mb-3" style="min-height: 260px">
         <div class="card-body">
-            <h5 class="card-title"><a href="service/7">{{service.name}}</a>
-                <span class="badge float-right badge-success">{{service.online ? "ONLINE" : "OFFLINE"}}</span>
+            <h5 class="card-title"><router-link :to="serviceLink(service)">{{service.name}}</router-link>
+                <span class="badge float-right" :class="{'badge-success': service.online, 'badge-danger': !service.online}">
+                    {{service.online ? "ONLINE" : "OFFLINE"}}
+                </span>
             </h5>
             <div class="row">
                 <div class="col-md-3 col-sm-6">

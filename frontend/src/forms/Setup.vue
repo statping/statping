@@ -6,7 +6,7 @@
 
         <div class="col-12">
 
-    <form @submit="">
+    <form @submit="saveSetup">
         <div class="row">
             <div class="col-6">
                 <div class="form-group">
@@ -147,15 +147,13 @@
         this.loading = false
         return
       }
-      await this.completeAuth()
-      this.loading = false
-      this.$router.push('')
-    },
-    async completeAuth() {
-      const auth = await Api.login(this.setup.username, this.setup.password)
-      this.auth = Api.saveToken(this.setup.username, auth.token)
 
+      const auth = await Api.login(s.username, s.password)
+      this.auth = Api.saveToken(s.username, auth.token)
       await this.$store.dispatch('loadAdmin')
+
+      this.loading = false
+      this.$router.push('/')
     }
   }
 }

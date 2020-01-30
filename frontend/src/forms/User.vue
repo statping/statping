@@ -1,6 +1,9 @@
 <template>
     <div>
-        <h1 class="text-black-50 mt-5">{{in_user === null ? "Create User" : "Edit User"}}</h1>
+        <h1 class="text-black-50 mt-5">
+            {{user.id ? `Update ${user.username}` : "Create User"}}
+
+        <button @click="removeEdit" v-if="user.id" class="mt-3 btn float-right btn-danger btn-sm">Close</button></h1>
 
         <div class="card">
             <div class="card-body">
@@ -20,24 +23,26 @@
         <div class="form-group row">
             <label for="email" class="col-sm-4 col-form-label">Email Address</label>
             <div class="col-sm-8">
-                <input v-model="user.email" type="email" name="email" class="form-control" id="email" value="" placeholder="user@domain.com" required autocapitalize="none" spellcheck="false">
+                <input v-model="user.email" type="email" class="form-control" id="email" placeholder="user@domain.com" required autocapitalize="none" spellcheck="false">
             </div>
         </div>
         <div class="form-group row">
-            <label for="password" class="col-sm-4 col-form-label">Password</label>
+            <label class="col-sm-4 col-form-label">Password</label>
             <div class="col-sm-8">
-                <input v-model="user.password" type="password" name="password" class="form-control" id="password"  placeholder="Password" required>
+                <input v-model="user.password" type="password" class="form-control" placeholder="Password" required>
             </div>
         </div>
         <div class="form-group row">
-            <label for="password_confirm" class="col-sm-4 col-form-label">Confirm Password</label>
+            <label class="col-sm-4 col-form-label">Confirm Password</label>
             <div class="col-sm-8">
-                <input v-model="user.confirm_password" type="password" name="password_confirm" class="form-control" id="password_confirm"  placeholder="Confirm Password" required>
+                <input v-model="user.confirm_password" type="password" class="form-control" placeholder="Confirm Password" required>
             </div>
         </div>
         <div class="form-group row">
             <div class="col-sm-12">
-                <button @click="saveUser" class="btn btn-primary btn-block">Create User</button>
+                <button @click="saveUser" class="btn btn-block" :class="{'btn-primary': !user.id, 'btn-secondary': user.id}">
+                    {{user.id ? "Update User" : "Create User"}}
+                </button>
             </div>
         </div>
         <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
@@ -55,6 +60,9 @@
   props: {
     in_user: {
       type: Object
+    },
+    edit: {
+      type: Function
     }
   },
   data () {
@@ -68,23 +76,46 @@
       }
     }
   },
-  mounted() {
-    if (this.in_user) {
-      this.user = this.in_user
+  watch: {
+    in_user() {
+        const u = this.in_user
+        delete u.password
+        delete u.confirm_password
+        this.user = u
     }
   },
-  computed() {
-
-  },
   methods: {
+    removeEdit() {
+      this.user = {}
+      this.edit(false)
+    },
     async saveUser(e) {
       e.preventDefault();
+      if (this.user.id) {
+        await this.updateUser()
+      } else {
+        await this.createUser()
+      }
+    },
+    async createUser() {
       let user = this.user
       delete user.confirm_password
       await Api.user_create(user)
       const users = await Api.users()
       this.$store.commit('setUsers', users)
+      this.user = {}
     },
+    async updateUser() {
+      let user = this.user
+      if (!user.password) {
+        delete user.password
+      }
+      delete user.confirm_password
+      await Api.user_update(user)
+      const users = await Api.users()
+      this.$store.commit('setUsers', users)
+      this.edit(false)
+    }
   }
 }
 </script>

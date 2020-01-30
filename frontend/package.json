@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "rm -rf dist && cross-env NODE_ENV=production webpack",
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --progress",
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --host 0.0.0.0 --port 8888 --progress",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -22,6 +22,7 @@
     "querystring": "^0.2.0",
     "vue": "^2.6.10",
     "vue-apexcharts": "^1.5.2",
+    "vue-flatpickr-component": "^8.1.5",
     "vue-moment": "^4.1.0",
     "vue-router": "~3.0",
     "vuedraggable": "^2.23.2",

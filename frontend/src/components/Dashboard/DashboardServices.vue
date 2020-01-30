@@ -6,6 +6,7 @@
                 <i class="fas fa-plus"></i> Create
             </router-link>
         </h1>
+
         <table class="table">
             <thead>
             <tr>
@@ -16,7 +17,7 @@
                 <th scope="col"></th>
             </tr>
             </thead>
-            <draggable @update="log" tag="tbody" v-model="servicesList" :list="$store.getters.servicesInOrder" :key="this.$store.getters.servicesInOrder.length" class="sortable" handle=".drag_icon">
+            <draggable tag="tbody" v-model="servicesList" :list="$store.getters.servicesInOrder" :key="this.$store.getters.servicesInOrder.length" class="sortable" handle=".drag_icon">
             <tr v-for="(service, index) in $store.getters.services" :key="index">
                 <td>
                     <span class="drag_icon d-none d-md-inline">
@@ -40,7 +41,7 @@
                         <router-link :to="{path: `/dashboard/edit_service/${service.id}`, params: {service: service} }" class="btn btn-outline-secondary">
                             <i class="fas fa-chart-area"></i> View
                         </router-link>
-                        <a @click="deleteService(service)" href="#" class="btn btn-danger">
+                        <a @click.prevent="deleteService(service)" href="#" class="btn btn-danger">
                             <font-awesome-icon icon="times" />
                         </a>
                     </div>
@@ -74,8 +75,8 @@
                 </td>
                 <td class="text-right">
                     <div class="btn-group">
-                        <a href="group/2" class="btn btn-outline-secondary"><font-awesome-icon icon="chart-area" /> Edit</a>
-                        <a @click="deleteGroup(group)" href="#" class="btn btn-danger">
+                        <a @click.prevent="editGroup(group, edit)" href="#" class="btn btn-outline-secondary"><font-awesome-icon icon="chart-area" /> Edit</a>
+                        <a @click.prevent="deleteGroup(group)" href="#" class="btn btn-danger">
                             <font-awesome-icon icon="times" />
                         </a>
                     </div>
@@ -85,13 +86,7 @@
                 </draggable>
         </table>
 
-        <h1 class="text-muted mt-5">Create Group</h1>
-
-        <div class="card">
-            <div class="card-body">
-                <FormGroup/>
-            </div>
-        </div>
+        <FormGroup :edit="editChange" :in_group="group"/>
 
     </div>
     </div>
@@ -112,7 +107,8 @@
   },
   data () {
     return {
-
+      edit: false,
+      group: {}
     }
   },
   computed: {
@@ -149,6 +145,14 @@
 
   },
   methods: {
+    editChange(v) {
+      this.group = {}
+      this.edit = v
+    },
+    editGroup(g, mode) {
+      this.group = g
+      this.edit = !mode
+    },
     reordered_services() {
 
     },

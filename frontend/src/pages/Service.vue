@@ -49,9 +49,10 @@
             <nav class="nav nav-pills flex-column flex-sm-row mt-3" id="service_tabs">
                 <a @click="tab='failures'" class="flex-sm-fill text-sm-center nav-link active">Failures</a>
                 <a @click="tab='incidents'" class="flex-sm-fill text-sm-center nav-link">Incidents</a>
-                <a @click="tab='checkins'" v-if="$store.getters.token.token" class="flex-sm-fill text-sm-center nav-link">Checkins</a>
-                <a @click="tab='response'" v-if="$store.getters.token.token" class="flex-sm-fill text-sm-center nav-link">Response</a>
+                <a @click="tab='checkins'" v-if="$store.getters.token" class="flex-sm-fill text-sm-center nav-link">Checkins</a>
+                <a @click="tab='response'" v-if="$store.getters.token" class="flex-sm-fill text-sm-center nav-link">Response</a>
             </nav>
+
 
             <div class="tab-content">
                 <div class="tab-pane fade active show">
@@ -138,7 +139,7 @@ export default {
     return {
       id: null,
       tab: "failures",
-      service: null,
+      service: {},
       authenticated: false,
       ready: false,
       data: null,
@@ -219,19 +220,22 @@ export default {
       }]
     }
   },
-    created() {
-      this.service = this.$route.params.service
+    async created() {
       this.id = this.$route.params.id
-      if (!this.service) {
-        this.getService(this.id)
+      let service;
+      if (this.isInt(this.id)) {
+        service = this.$store.getters.serviceById(this.id)
+      } else {
+        service = this.$store.getters.serviceByPermalink(this.id)
       }
+      await this.getService(service)
     },
     mounted() {
 
   },
   methods: {
-    async getService(id) {
-        this.service = await Api.service(id)
+    async getService(s) {
+        this.service = await Api.service(s.id)
         await this.chartHits()
         await this.serviceFailures()
     },

@@ -14,15 +14,15 @@
                 <td>{{user.username}}</td>
                 <td class="text-right">
                     <div class="btn-group">
-                        <a @click="editUser(user)" href="#" class="btn btn-outline-secondary"><font-awesome-icon icon="user" /> Edit</a>
-                        <a @click="deleteUser(user)" href="#" class="btn btn-danger"><font-awesome-icon icon="times" /></a>
+                        <a @click.prevent="editUser(user, edit)" href="" class="btn btn-outline-secondary"><font-awesome-icon icon="user" /> Edit</a>
+                        <a v-if="index !== 0" @click.prevent="deleteUser(user)" href="" class="btn btn-danger"><font-awesome-icon icon="times" /></a>
                     </div>
                 </td>
             </tr>
             </tbody>
         </table>
 
-        <FormUser :in_user="user"/>
+        <FormUser :edit="editChange" :in_user="user"/>
     </div>
 </template>
 
@@ -36,13 +36,17 @@
     data () {
     return {
       edit: false,
-      user: null
+      user: {}
     }
   },
   methods: {
-    editUser(u) {
-      this.edit = true
+    editChange(v) {
+      this.user = {}
+      this.edit = v
+    },
+    editUser(u, mode) {
       this.user = u
+      this.edit = !mode
     },
     async deleteUser(u) {
       let c = confirm(`Are you sure you want to delete user '${u.username}'?`)

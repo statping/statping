@@ -1,6 +1,10 @@
 <template>
-    <div>
-        <FormService v-if="ready" :in_service="service"/>
+    <div class="col-12">
+    <div class="card">
+    <div class="card-body">
+        <FormService :in_service="service"/>
+    </div>
+    </div>
     </div>
 </template>
 
@@ -25,15 +29,16 @@
   data () {
     return {
       ready: false,
-      service: null
+      service: {}
     }
   },
   computed: {
 
   },
   async beforeCreate() {
-    if (this.$route.params.id) {
-      this.service = await Api.service(this.$route.params.id)
+    const id = this.$route.params.id
+    if (id) {
+      this.service = await Api.service(id)
     }
     this.ready = true
   },

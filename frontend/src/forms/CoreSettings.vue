@@ -84,7 +84,7 @@
         <div class="form-group row mt-3">
             <label class="col-sm-3 col-form-label">API Key</label>
             <div class="col-sm-9">
-                <input v-model="core.api_key" type="text" class="form-control select-input" readonly>
+                <input v-model="core.api_key" @focus="$event.target.select()" type="text" class="form-control select-input" readonly>
                 <small class="form-text text-muted">API Key can be used for read only routes</small>
             </div>
         </div>
@@ -92,7 +92,7 @@
         <div class="form-group row">
             <label class="col-sm-3 col-form-label">API Secret</label>
             <div class="col-sm-9">
-                <input v-model="core.api_secret" type="text" class="form-control select-input" readonly>
+                <input v-model="core.api_secret" @focus="$event.target.select()" type="text" class="form-control select-input" readonly>
                 <small class="form-text text-muted">API Secret is used for read, create, update and delete routes</small>
                 <small class="form-text text-muted">You can <a href="#" @click="renewApiKeys">Regenerate API Keys</a> if you need to.</small>
             </div>
@@ -102,20 +102,14 @@
 </template>
 
 <script>
-import time from '../components/Time'
-import Api from '../components/API'
+  import Api from '../components/API'
 
-export default {
+  export default {
   name: 'CoreSettings',
     data () {
         return {
-            core: null,
+            core: this.$store.getters.core,
         }
-    },
-    async created() {
-      const core = await Api.core()
-      this.core = core
-      this.$store.commit('setCore', core)
     },
     async mounted () {
 
@@ -126,7 +120,6 @@ export default {
           const c = this.core
           const coreForm = {name: c.name, description: c.description, domain: c.domain,
             timezone: c.timezone, using_cdn: c.using_cdn, footer: c.footer, update_notify: c.update_notify}
-          alert(JSON.stringify(coreForm))
           await Api.core_save(coreForm)
           const core = await Api.core()
           this.$store.commit('setCore', core)
@@ -140,7 +133,10 @@ export default {
                 this.$store.commit('setCore', core)
                 this.core = core
             }
-        }
+        },
+      selectAll() {
+        this.$refs.input.select();
+      }
     }
 }
 </script>

@@ -38,7 +38,7 @@
             </div>
         </div>
 
-        <h4 class="mt-5 mb-5 text-muted">Request Details</h4>
+        <h4 v-if="service.type !== 'icmp'" class="mt-5 mb-5 text-muted">Request Details</h4>
 
         <div v-if="service.type.match(/^(http)$/)" class="form-group row">
             <label class="col-sm-4 col-form-label">Service Check Type</label>
@@ -82,7 +82,7 @@
             </div>
         </div>
         <div v-if="service.type.match(/^(tcp|udp)$/)" class="form-group row">
-            <label class="col-sm-4 col-form-label">TCP Port</label>
+            <label class="col-sm-4 col-form-label">{{service.type.toUpperCase()}} Port</label>
             <div class="col-sm-8">
                 <input v-model="service.port" type="number" name="port" class="form-control" id="service_port" placeholder="8080">
             </div>
@@ -146,8 +146,12 @@
             </div>
         </div>
         <div class="form-group row">
-            <div class="col-12">
-                <button @click="saveService" type="submit" class="btn btn-success btn-block">Create Service</button>
+            <div class="col-6">
+                <button @click.prevent="saveService" type="submit" class="btn btn-success btn-block">Create Service</button>
+            </div>
+
+            <div class="col-6">
+                <button @click.prevent="saveService" class="btn btn-secondary btn-block">Test</button>
             </div>
 
         </div>
@@ -178,7 +182,7 @@
         check_interval: 60,
         timeout: 15,
         permalink: "",
-        order: 0,
+        order: 1,
         verify_ssl: true,
         allow_notifications: true,
         public: true,
@@ -186,16 +190,17 @@
       groups: [],
     }
   },
-  props: {
-    in_service: {
-      type: Object,
-      required: false,
-    }
-  },
-  async created() {
-    if (this.props.in_service) {
-      this.service = this.props.in_service
-    }
+    props: {
+      in_service: {
+        type: Object
+      }
+    },
+    watch: {
+      in_service() {
+        this.service = this.in_service
+      }
+    },
+  async mounted() {
     if (!this.$store.getters.groups) {
       const groups = await Api.groups()
       this.$store.commit('setGroups', groups)
@@ -211,7 +216,10 @@
       delete s.last_success
       delete s.latency
       delete s.online_24_hours
-      await Api.service_save()
+      await Api.service_create(s)
+    },
+    async testService(e) {
+
     }
   }
 }
