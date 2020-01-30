@@ -400,7 +400,7 @@ func (c *Core) MigrateDatabase() error {
 			tx.Rollback()
 		}
 	}()
-	if tx.Error != nil {
+	if tx.Error() != nil {
 		log.Errorln(tx.Error())
 		return tx.Error()
 	}
