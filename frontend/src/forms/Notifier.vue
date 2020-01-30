@@ -60,9 +60,9 @@
 </template>
 
 <script>
-  import Api from "../components/API";
+import Api from "../components/API";
 
-  export default {
+export default {
   name: 'Notifier',
   props: {
     notifier: {

@@ -96,6 +96,7 @@ func main() {
 	configs, err := core.LoadConfigFile(utils.Directory)
 	if err != nil {
 		log.Errorln(err)
+		core.CoreApp.Setup = false
 		writeAble, err := utils.DirWritable(utils.Directory)
 		if err != nil {
 			log.Fatalln(err)
@@ -103,7 +104,6 @@ func main() {
 		if !writeAble {
 			log.Fatalf("Statping does not have write permissions at: %v\nYou can change this directory by setting the STATPING_DIR environment variable to a dedicated path before starting.", utils.Directory)
 		}
-		core.CoreApp.Setup = false
 		if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
 			log.Fatalln(err)
 		}
@@ -149,7 +149,7 @@ func mainProcess() error {
 	}
 	core.CoreApp.MigrateDatabase()
 	core.InitApp()
-	if !core.CoreApp.Setup {
+	if core.CoreApp.Setup {
 		plugin.LoadPlugins()
 		if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
 			log.Fatalln(err)
