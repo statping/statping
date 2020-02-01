@@ -40,6 +40,7 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 	form := parseForm(r)
 	app := core.CoreApp
+
 	name := form.Get("project")
 	if name != "" {
 		app.Name = name
@@ -64,15 +65,35 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	timeFloat, _ := strconv.ParseFloat(timezone, 10)
 	app.Timezone = float32(timeFloat)
 
-	app.UpdateNotify = types.NewNullBool(form.Get("update_notify") == "true")
-
 	app.UseCdn = types.NewNullBool(form.Get("enable_cdn") == "on")
+
 	core.CoreApp, err = core.UpdateCore(app)
 	if err != nil {
 		log.Errorln(fmt.Sprintf("issue updating Core: %v", err.Error()))
 	}
 
 	//notifiers.OnSettingsSaved(core.CoreApp.ToCore())
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "settings")
+}
+
+func saveSettingsNotificationsHandler(w http.ResponseWriter, r *http.Request) {
+	var err error
+	form := parseForm(r)
+	app := core.CoreApp
+
+	value := form.Get("update_notify")
+
+	if value == "true" {
+		app.UpdateNotify = types.NewNullBool(true)
+	} else if value == "false" {
+		app.UpdateNotify = types.NewNullBool(false)
+	} // discard if empty or other value
+
+	core.CoreApp, err = core.UpdateCore(app)
+	if err != nil {
+		log.Errorln(fmt.Sprintf("issue updating Core: %v", err.Error()))
+	}
+
 	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "settings")
 }
 

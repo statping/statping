@@ -97,6 +97,7 @@ func Router() *mux.Router {
 	// SETTINGS Routes
 	r.Handle("/settings", authenticated(settingsHandler, true)).Methods("GET")
 	r.Handle("/settings", authenticated(saveSettingsHandler, true)).Methods("POST")
+	r.Handle("/settings/notifications", authenticated(saveSettingsNotificationsHandler, true)).Methods("POST")
 	r.Handle("/settings/css", authenticated(saveSASSHandler, true)).Methods("POST")
 	r.Handle("/settings/build", authenticated(saveAssetsHandler, true)).Methods("GET")
 	r.Handle("/settings/delete_assets", authenticated(deleteAssetsHandler, true)).Methods("GET")
