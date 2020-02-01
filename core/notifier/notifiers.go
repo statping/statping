@@ -102,7 +102,7 @@ func (n *Notification) AfterFind() (err error) {
 func (n *Notification) AddQueue(uid string, msg interface{}) {
 	data := &QueueData{uid, msg}
 	n.Queue = append(n.Queue, data)
-	log.WithFields(utils.ToFields(data, n)).Infoln(fmt.Sprintf("Notifier '%v' added new item (%v) to the queue. (%v queued)", n.Method, uid, len(n.Queue)))
+	log.WithFields(utils.ToFields(data, n)).Debug(fmt.Sprintf("Notifier '%v' added new item (%v) to the queue. (%v queued)", n.Method, uid, len(n.Queue)))
 }
 
 // CanTest returns true if the notifier implements the OnTest interface
@@ -129,7 +129,7 @@ func asNotification(n Notifier) *Notification {
 // AddNotifier accept a Notifier interface to be added into the array
 func AddNotifiers(notifiers ...Notifier) error {
 	for _, n := range notifiers {
-		if isType(n, new(Notifier)) {
+		if utils.IsType(n, new(Notifier)) {
 			err := checkNotifierForm(n)
 			if err != nil {
 				return err
@@ -252,7 +252,7 @@ func Init(n Notifier) (*Notification, error) {
 		if notify.Delay.Seconds() == 0 {
 			notify.Delay = time.Duration(1 * time.Second)
 		}
-		notify.testable = isType(n, new(Tester))
+		notify.testable = utils.IsType(n, new(Tester))
 		notify.Form = n.Select().Form
 	}
 	return notify, err
@@ -261,7 +261,7 @@ func Init(n Notifier) (*Notification, error) {
 // startAllNotifiers will start the go routine for each loaded notifier
 func startAllNotifiers() {
 	for _, comm := range AllCommunications {
-		if isType(comm, new(Notifier)) {
+		if utils.IsType(comm, new(Notifier)) {
 			notify := comm.(Notifier)
 			if notify.Select().Enabled.Bool {
 				notify.Select().close()
@@ -290,9 +290,9 @@ CheckNotifier:
 					msg := notification.Queue[0]
 					err := n.Send(msg.Data)
 					if err != nil {
-						log.WithFields(utils.ToFields(notification, msg)).Warnln(fmt.Sprintf("Notifier '%v' had an error: %v", notification.Method, err))
+						log.WithFields(utils.ToFields(notification, msg)).Error(fmt.Sprintf("Notifier '%v' had an error: %v", notification.Method, err))
 					} else {
-						log.WithFields(utils.ToFields(notification, msg)).Infoln(fmt.Sprintf("Notifier '%v' sent outgoing message (%v) %v left in queue.", notification.Method, msg.Id, len(notification.Queue)))
+						log.WithFields(utils.ToFields(notification, msg)).Debug(fmt.Sprintf("Notifier '%v' sent outgoing message (%v) %v left in queue.", notification.Method, msg.Id, len(notification.Queue)))
 					}
 					notification.makeLog(msg.Data)
 					if len(notification.Queue) > 1 {
@@ -384,13 +384,6 @@ func (n *Notification) GetValue(dbField string) string {
 		return utils.ToString(int(n.Limits))
 	}
 	return ""
-}
-
-// isType will return true if a variable can implement an interface
-func isType(n interface{}, obj interface{}) bool {
-	one := reflect.TypeOf(n)
-	two := reflect.ValueOf(obj).Elem()
-	return one.Implements(two.Type())
 }
 
 // isEnabled returns true if the notifier is enabled

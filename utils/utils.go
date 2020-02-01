@@ -246,6 +246,13 @@ func CopyFile(src, dst string) error {
 	return out.Close()
 }
 
+// IsType will return true if a variable can implement an interface
+func IsType(n interface{}, obj interface{}) bool {
+	one := reflect.TypeOf(n)
+	two := reflect.ValueOf(obj).Elem()
+	return one.Implements(two.Type())
+}
+
 // Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings
 //		in, out, err := Command("sass assets/scss assets/css/base.css")
 func Command(cmd string) (string, string, error) {

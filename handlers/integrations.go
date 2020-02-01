@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core/integrations"
+	"github.com/hunterlong/statping/types"
 	"net/http"
 )
 
@@ -11,20 +13,41 @@ func apiAllIntegrationsHandler(w http.ResponseWriter, r *http.Request) {
 	returnJson(integrations, w, r)
 }
 
-func apiIntegrationHandler(w http.ResponseWriter, r *http.Request) {
+func apiIntegrationViewHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	intg := vars["name"]
-	r.ParseForm()
-	for k, v := range r.PostForm {
-		log.Info(k, v)
-	}
-
-	integration, err := integrations.Find(intg)
+	intgr, err := integrations.Find(vars["name"])
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	list, err := integration.List()
+	returnJson(intgr.Get(), w, r)
+}
+
+func apiIntegrationHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	intgr, err := integrations.Find(vars["name"])
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	var intJson *types.Integration
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&intJson); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	integration := intgr.Get()
+	integration.Enabled = intJson.Enabled
+	integration.Fields = intJson.Fields
+
+	if err := integrations.Update(integration); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	list, err := intgr.List()
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return

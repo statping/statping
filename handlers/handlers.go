@@ -195,7 +195,6 @@ func IsAdmin(r *http.Request) bool {
 	if err != nil {
 		return false
 	}
-	fmt.Println("user: ", claim.Username, claim.Admin)
 	return claim.Admin
 }
 

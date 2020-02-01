@@ -76,7 +76,7 @@ func logsHandler(w http.ResponseWriter, r *http.Request) {
 		logs = append(logs, utils.LastLines[i].FormatForHtml()+"\r\n")
 	}
 	utils.LockLines.Unlock()
-	ExecuteResponse(w, r, "logs.gohtml", logs, nil)
+	returnJson(logs, w, r)
 }
 
 func logsLineHandler(w http.ResponseWriter, r *http.Request) {

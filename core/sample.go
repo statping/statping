@@ -548,11 +548,18 @@ func TmpRecords(dbFile string) error {
 		if err := InsertNotifierDB(); err != nil {
 			return err
 		}
+		log.Infoln("inserting integrations into database")
+		if err := InsertIntegratorDB(); err != nil {
+			return err
+		}
 		log.Infoln("loading all services")
 		if _, err := CoreApp.SelectAllServices(false); err != nil {
 			return err
 		}
 		if err := AttachNotifiers(); err != nil {
+			return err
+		}
+		if err := AddIntegrations(); err != nil {
 			return err
 		}
 		CoreApp.Notifications = notifier.AllCommunications
@@ -582,6 +589,10 @@ func TmpRecords(dbFile string) error {
 	}
 	log.Infoln("inserting notifiers into database")
 	if err := InsertNotifierDB(); err != nil {
+		return err
+	}
+	log.Infoln("inserting integrations into database")
+	if err := InsertIntegratorDB(); err != nil {
 		return err
 	}
 	log.Infoln("loading all services")

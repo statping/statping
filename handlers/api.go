@@ -86,9 +86,31 @@ func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 	returnJson(core.CoreApp, w, r)
 }
 
+type cacheJson struct {
+	URL        string `json:"url"`
+	Expiration int64  `json:"expiration"`
+	Size       int    `json:"size"`
+}
+
+func apiCacheHandler(w http.ResponseWriter, r *http.Request) {
+	cache := CacheStorage
+	var cacheList []cacheJson
+	for k, v := range cache.List() {
+		cacheList = append(cacheList, cacheJson{
+			URL:        k,
+			Expiration: v.Expiration,
+			Size:       len(v.Content),
+		})
+	}
+	returnJson(cacheList, w, r)
+}
+
 func apiClearCacheHandler(w http.ResponseWriter, r *http.Request) {
 	CacheStorage = NewStorage()
-	http.Redirect(w, r, basePath, http.StatusSeeOther)
+	output := apiResponse{
+		Status: "success",
+	}
+	returnJson(output, w, r)
 }
 
 func sendErrorJson(err error, w http.ResponseWriter, r *http.Request) {

@@ -49,12 +49,16 @@ class Api {
   }
 
   async services_reorder (data) {
-    return axios.post('/api/services/reorder', data).then(response => (response.data))
+    return axios.post('/api/reorder/services', data).then(response => (response.data))
   }
 
   async groups () {
     return axios.get('/api/groups').then(response => (response.data))
   }
+
+    async groups_reorder (data) {
+        return axios.post('/api/reorder/groups', data).then(response => (response.data))
+    }
 
   async group_delete (id) {
     return axios.delete('/api/groups/'+id).then(response => (response.data))
@@ -116,8 +120,36 @@ class Api {
     return axios.post('/api/notifier/'+data.method+'/test', data).then(response => (response.data))
   }
 
+    async integrations () {
+        return axios.get('/api/integrations').then(response => (response.data))
+    }
+
+    async integration (name) {
+        return axios.get('/api/integrations/'+name).then(response => (response.data))
+    }
+
+    async integration_save (data) {
+        return axios.post('/api/integrations/'+data.name, data).then(response => (response.data))
+    }
+
     async renewApiKeys () {
         return axios.get('/api/renew').then(response => (response.data))
+    }
+
+    async cache () {
+        return axios.get('/api/cache').then(response => (response.data))
+    }
+
+    async clearCache () {
+        return axios.get('/api/clear_cache').then(response => (response.data))
+    }
+
+    async logs () {
+        return axios.get('/api/logs').then(response => (response.data))
+    }
+
+    async logs_last () {
+        return axios.get('/api/logs/last').then(response => (response.data))
     }
 
   async login (username, password) {
@@ -138,7 +170,11 @@ class Api {
   }
 
   token () {
-    return JSON.parse(localStorage.getItem(tokenKey));
+      const tk = localStorage.getItem(tokenKey)
+      if (!tk) {
+          return {};
+      }
+    return JSON.parse(tk);
   }
 
   authToken () {

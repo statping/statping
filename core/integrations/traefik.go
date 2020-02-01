@@ -27,7 +27,7 @@ type traefikIntegration struct {
 	*types.Integration
 }
 
-var traefikIntegrator = &traefikIntegration{&types.Integration{
+var TraefikIntegrator = &traefikIntegration{&types.Integration{
 	ShortName:   "traefik",
 	Name:        "Traefik",
 	Icon:        "<i class=\"fas fa-network-wired\"></i>",

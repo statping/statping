@@ -1,3 +1,4 @@
+import Help from './pages/Help';
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import DashboardIndex from "./components/Dashboard/DashboardIndex";
@@ -5,11 +6,14 @@ import DashboardUsers from "./components/Dashboard/DashboardUsers";
 import DashboardServices from "./components/Dashboard/DashboardServices";
 import EditService from "./components/Dashboard/EditService";
 import DashboardMessages from "./components/Dashboard/DashboardMessages";
+import Logs from './pages/Logs';
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import Service from "./pages/Service";
 import VueRouter from "vue-router";
 import Setup from "./forms/Setup";
+
+import Api from "./components/API";
 
 const routes = [
   {
@@ -52,10 +56,10 @@ const routes = [
       component: Settings
     },{
       path: 'logs',
-      component: DashboardUsers
+      component: Logs
     },{
       path: 'help',
-      component: DashboardUsers
+      component: Help
     }]
   },
   {
@@ -79,15 +83,13 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    const tk = localStorage.getItem("statping_user")
-    if (tk !== null) {
-      next()
-      return
-    }
-    if (to.path !== '/login') {
+    const tk = Api.token()
+    if (to.path !== '/login' && !tk.token) {
       next('/login')
       return
     }
+      next()
+      return
   } else {
     next()
   }

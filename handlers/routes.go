@@ -76,11 +76,15 @@ func Router() *mux.Router {
 	r.Handle("/api/setup", http.HandlerFunc(processSetupHandler)).Methods("POST")
 	r.Handle("/api/logout", http.HandlerFunc(logoutHandler))
 	r.Handle("/api/renew", authenticated(apiRenewHandler, false))
+	r.Handle("/api/cache", authenticated(apiCacheHandler, false)).Methods("GET")
 	r.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
 	r.Handle("/api/core", authenticated(apiCoreHandler, false)).Methods("POST")
+	r.Handle("/api/logs", authenticated(logsHandler, false)).Methods("GET")
+	r.Handle("/api/logs/last", authenticated(logsLineHandler, false)).Methods("GET")
 
+	// API INTEGRATIONS Routes
 	r.Handle("/api/integrations", authenticated(apiAllIntegrationsHandler, false)).Methods("GET")
-	r.Handle("/api/integrations/{name}", authenticated(apiIntegrationHandler, false)).Methods("GET")
+	r.Handle("/api/integrations/{name}", authenticated(apiIntegrationViewHandler, false)).Methods("GET")
 	r.Handle("/api/integrations/{name}", authenticated(apiIntegrationHandler, false)).Methods("POST")
 
 	// API GROUPS Routes
@@ -109,6 +113,9 @@ func Router() *mux.Router {
 
 	// API INCIDENTS Routes
 	r.Handle("/api/incidents", readOnly(apiAllIncidentsHandler, false)).Methods("GET")
+	r.Handle("/api/incidents", authenticated(apiCreateIncidentHandler, false)).Methods("POST")
+	r.Handle("/api/incidents/:id", authenticated(apiIncidentUpdateHandler, false)).Methods("POST")
+	r.Handle("/api/incidents/:id", authenticated(apiDeleteIncidentHandler, false)).Methods("DELETE")
 
 	// API USER Routes
 	r.Handle("/api/users", authenticated(apiAllUsersHandler, false)).Methods("GET")

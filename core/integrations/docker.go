@@ -27,7 +27,7 @@ type dockerIntegration struct {
 	*types.Integration
 }
 
-var dockerIntegrator = &dockerIntegration{&types.Integration{
+var DockerIntegrator = &dockerIntegration{&types.Integration{
 	ShortName: "docker",
 	Name:      "Docker",
 	Icon:      "<i class=\"fab fa-docker\"></i>",

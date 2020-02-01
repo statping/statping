@@ -64,9 +64,11 @@ func (c *Core) ToCore() *types.Core {
 func InitApp() {
 	SelectCore()
 	InsertNotifierDB()
+	InsertIntegratorDB()
 	CoreApp.SelectAllServices(true)
 	checkServices()
 	AttachNotifiers()
+	AddIntegrations()
 	CoreApp.Notifications = notifier.AllCommunications
 	CoreApp.Integrations = integrations.Integrations
 	go DatabaseMaintence()
@@ -82,6 +84,18 @@ func InsertNotifierDB() error {
 		}
 	}
 	notifier.SetDB(DbSession, CoreApp.Timezone)
+	return nil
+}
+
+// InsertIntegratorDB inject the Statping database instance to the Integrations package
+func InsertIntegratorDB() error {
+	if DbSession == nil {
+		err := CoreApp.Connect(false, utils.Directory)
+		if err != nil {
+			return errors.New("database connection has not been created")
+		}
+	}
+	integrations.SetDB(DbSession)
 	return nil
 }
 
@@ -195,6 +209,15 @@ func AttachNotifiers() error {
 		notifiers.Telegram,
 		notifiers.Twilio,
 		notifiers.Webhook,
+	)
+}
+
+// AddIntegrations will attach all the integrations into the system
+func AddIntegrations() error {
+	return integrations.AddIntegrations(
+		integrations.CsvIntegrator,
+		integrations.TraefikIntegrator,
+		integrations.DockerIntegrator,
 	)
 }
 

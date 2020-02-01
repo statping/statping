@@ -17,8 +17,8 @@
                 <th scope="col"></th>
             </tr>
             </thead>
-            <draggable tag="tbody" v-model="servicesList" :list="$store.getters.servicesInOrder" :key="this.$store.getters.servicesInOrder.length" class="sortable" handle=".drag_icon">
-            <tr v-for="(service, index) in $store.getters.services" :key="index">
+            <draggable tag="tbody" v-model="servicesList" :key="$store.getters.servicesInOrder.length" class="sortable" handle=".drag_icon">
+            <tr v-for="(service, index) in $store.getters.servicesInOrder" :key="index">
                 <td>
                     <span class="drag_icon d-none d-md-inline">
                         <font-awesome-icon icon="bars" />
@@ -66,7 +66,7 @@
             </thead>
 
             <draggable tag="tbody" v-model="groupsList" class="sortable_groups" handle=".drag_icon">
-            <tr v-for="(group, index) in $store.getters.groupsCleaned" v-bind:key="index">
+            <tr v-for="(group, index) in $store.getters.groupsInOrder" v-bind:key="index">
                 <td><span class="drag_icon d-none d-md-inline"><font-awesome-icon icon="bars" /></span> {{group.name}}</td>
                 <td>{{$store.getters.servicesInGroup(group.id).length}}</td>
                 <td>
@@ -121,23 +121,23 @@
         value.forEach((s, k) => {
           data.push({service: s.id, order: k+1})
         });
-        alert(JSON.stringify(data))
-        const ord = await Api.services_reorder(data)
-        alert(JSON.parse(ord))
+        await Api.services_reorder(data)
+          const services = await Api.services()
+          this.$store.commit('setServices', services)
       }
     },
     groupsList: {
       get() {
-        return this.$store.state.groups
+        return this.$store.state.groupsInOrder
       },
       async set(value) {
         let data = [];
         value.forEach((s, k) => {
           data.push({group: s.id, order: k+1})
         });
-        alert(JSON.stringify(data))
-        const ord = await Api.services_reorder(data)
-        alert(JSON.parse(ord))
+          await Api.groups_reorder(data)
+          const groups = await Api.groups()
+          this.$store.commit('setGroups', groups)
       }
     }
   },

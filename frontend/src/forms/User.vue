@@ -11,7 +11,7 @@
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Username</label>
             <div class="col-6 col-md-4">
-                <input v-model="user.username" type="text" class="form-control" placeholder="Username" required autocorrect="off" autocapitalize="none">
+                <input v-model="user.username" type="text" class="form-control" placeholder="Username" required autocorrect="off" autocapitalize="none" v-bind:readonly="user.id">
             </div>
             <div class="col-6 col-md-4">
                   <span @click="user.admin = !!user.admin" class="switch">
@@ -40,8 +40,10 @@
         </div>
         <div class="form-group row">
             <div class="col-sm-12">
-                <button @click="saveUser" class="btn btn-block" :class="{'btn-primary': !user.id, 'btn-secondary': user.id}">
-                    {{user.id ? "Update User" : "Create User"}}
+                <button @click="saveUser"
+                        :disabled="loading || !user.username || !user.email || !user.password || !user.confirm_password || (user.password !== user.confirm_password)"
+                        class="btn btn-block" :class="{'btn-primary': !user.id, 'btn-secondary': user.id}">
+                    {{loading ? "Loading..." : user.id ? "Update User" : "Create User"}}
                 </button>
             </div>
         </div>
@@ -67,6 +69,7 @@
   },
   data () {
     return {
+        loading: false,
       user: {
         username: "",
         admin: false,
@@ -91,11 +94,13 @@
     },
     async saveUser(e) {
       e.preventDefault();
+      this.loading = true
       if (this.user.id) {
         await this.updateUser()
       } else {
         await this.createUser()
       }
+        this.loading = false
     },
     async createUser() {
       let user = this.user

@@ -5,23 +5,21 @@
                 <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                     <h6 class="text-muted">Main Settings</h6>
 
-                    <a v-on:click="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-home-tab')}" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true"><i class="fa fa-cogs"></i> Settings</a>
-                    <a v-on:click="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-style-tab')}" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false"><i class="fa fa-image"></i> Theme Editor</a>
-                    <a v-on:click="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-cache-tab')}" id="v-pills-cache-tab" data-toggle="pill" href="#v-pills-cache" role="tab" aria-controls="v-pills-cache" aria-selected="false"><i class="fa fa-paperclip"></i> Cache</a>
+                    <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-home-tab')}" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true"><i class="fa fa-cogs"></i> Settings</a>
+                    <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-style-tab')}" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false"><i class="fa fa-image"></i> Theme Editor</a>
+                    <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-cache-tab')}" id="v-pills-cache-tab" data-toggle="pill" href="#v-pills-cache" role="tab" aria-controls="v-pills-cache" aria-selected="false"><i class="fa fa-paperclip"></i> Cache</a>
 
                     <h6 class="mt-4 text-muted">Notifiers</h6>
 
-                    <a v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="index" v-on:click="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" data-toggle="pill" v-bind:href="`#v-pills-${notifier.method.toLowerCase()}`" role="tab" v-bind:aria-controls="`v-pills-${notifier.method.toLowerCase()}`" aria-selected="false">
+                    <a v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="`${notifier.method}_${index}`" @click.prevent="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" data-toggle="pill" v-bind:href="`#v-pills-${notifier.method.toLowerCase()}`" role="tab" v-bind:aria-controls="`v-pills-${notifier.method.toLowerCase()}`" aria-selected="false">
                         <i class="fas fa-terminal"></i> {{notifier.method}}
                     </a>
 
                     <h6 class="mt-4 text-muted">Integrations (beta)</h6>
 
-                    <a class="nav-link text-capitalize" id="v-pills-integration-csv-tab" data-toggle="pill" href="#v-pills-integration-csv" role="tab" aria-controls="v-pills-integration-csv" aria-selected="false"><i class="fas fa-file-csv"></i> CSV File</a>
-
-                    <a class="nav-link text-capitalize" id="v-pills-integration-docker-tab" data-toggle="pill" href="#v-pills-integration-docker" role="tab" aria-controls="v-pills-integration-docker" aria-selected="false"><i class="fab fa-docker"></i> Docker</a>
-
-                    <a class="nav-link text-capitalize" id="v-pills-integration-traefik-tab" data-toggle="pill" href="#v-pills-integration-traefik" role="tab" aria-controls="v-pills-integration-traefik" aria-selected="false"><i class="fas fa-network-wired"></i> Traefik</a>
+                    <a v-for="(integration, index) in $store.getters.integrations" v-bind:key="`${integration.name}_${index}`" @click.prevent="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-integration-${integration.name}`)}" v-bind:id="`v-pills-integration-${integration.name}`" data-toggle="pill" v-bind:href="`#v-pills-integration-${integration.name}`" role="tab" :aria-controls="`v-pills-integration-${integration.name}`" aria-selected="false">
+                        <i class="fas fa-file-csv"></i> {{integration.full_name}}
+                    </a>
 
                 </div>
             </div>
@@ -101,148 +99,24 @@
                             </thead>
                             <tbody>
 
-                            <tr>
-                                <td>/api/services/7/data?start=1577937580&amp;end=9999999999&amp;group=hour</td>
-                                <td>13951</td>
-                                <td>2020-01-15 20:00:10 -0800 -0800</td>
+                            <tr v-for="(cache, index) in cache">
+                                <td>{{cache.url}}</td>
+                                <td>{{cache.size}}</td>
+                                <td>{{cache.expiration}}</td>
                             </tr>
 
                             </tbody>
                         </table>
-                        <a href="api/clear_cache" class="btn btn-danger btn-block">Clear Cache</a>
+                        <a @click.prevent="clearCache" href="#" class="btn btn-danger btn-block">Clear Cache</a>
                     </div>
 
-                    <div v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="index" class="tab-pane fade" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), show: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" role="tabpanel" v-bind:aria-labelledby="`v-pills-${notifier.method.toLowerCase()}-tab`">
-
+                    <div v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="`${notifier.title}_${index}`" class="tab-pane fade" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), show: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" role="tabpanel" v-bind:aria-labelledby="`v-pills-${notifier.method.toLowerCase()}-tab`">
                         <Notifier :notifier="notifier"/>
                     </div>
 
-
-
-                    <div class="tab-pane fade" id="v-pills-integration-csv" role="tabpanel" aria-labelledby="v-pills-integration-csv-tab">
-
-
-                        <form class="integration_csv" action="settings/integrator/csv" method="POST">
-                            <input type="hidden" name="integrator" class="form-control" value="csv">
-                            <h4 class="text-capitalize">csv</h4>
-                            <p class="small text-muted">Import multiple services from a CSV file. Please have your CSV file formatted with the correct amount of columns based on the <a href="https://raw.githubusercontent.com/hunterlong/statping/master/source/tmpl/bulk_import.csv">example file on Github</a>.</p>
-
-
-                            <div class="form-group">
-                                <label class="text-capitalize" for="input">input</label>
-
-                                <textarea rows="3" class="form-control" name="input" id="input"></textarea>
-
-
-                            </div>
-
-
-                            <button type="submit" class="btn btn-block btn-info fetch_integrator">Fetch Services</button>
-
-                            <div class="alert alert-danger d-none" role="alert"></div>
-                        </form>
-
+                    <div v-for="(integration, index) in $store.getters.integrations" v-bind:key="`${integration.name}_${index}`" class="tab-pane fade" v-bind:class="{active: liClass(`v-pills-integration-${integration.name}`), show: liClass(`v-pills-integration-${integration.name}`)}" v-bind:id="`v-pills-integration-${integration.name}`" role="tabpanel">
+                        <FormIntegration :integration="integration"/>
                     </div>
-
-
-                    <div class="tab-pane fade" id="v-pills-integration-docker" role="tabpanel" aria-labelledby="v-pills-integration-docker-tab">
-
-
-                        <form class="integration_docker" action="settings/integrator/docker" method="POST">
-                            <input type="hidden" name="integrator" class="form-control" value="docker">
-                            <h4 class="text-capitalize">docker</h4>
-                            <p class="small text-muted">Import multiple services from Docker by attaching the unix socket to Statping.
-                                You can also do this in Docker by setting <u>-v /var/run/docker.sock:/var/run/docker.sock</u> in the Statping Docker container.
-                                All of the containers with open TCP/UDP ports will be listed for you to choose which services you want to add. If you running Statping inside of a container,
-                                this container must be attached to all networks you want to communicate with.</p>
-
-
-                            <div class="form-group">
-                                <label class="text-capitalize" for="path">path</label>
-
-                                <input type="text" name="path" class="form-control" value="unix:///var/run/docker.sock" id="path">
-
-
-                                <small class="form-text text-muted">The absolute path to the Docker unix socket</small>
-
-                            </div>
-
-                            <div class="form-group">
-                                <label class="text-capitalize" for="version">version</label>
-
-                                <input type="text" name="version" class="form-control" value="1.25" id="version">
-
-
-                                <small class="form-text text-muted">Version number of Docker server</small>
-
-                            </div>
-
-
-                            <button type="submit" class="btn btn-block btn-info fetch_integrator">Fetch Services</button>
-
-                            <div class="alert alert-danger d-none" id="integration_alerter" role="alert"></div>
-                        </form>
-
-                    </div>
-
-
-                    <div class="tab-pane fade" id="v-pills-integration-traefik" role="tabpanel" aria-labelledby="v-pills-integration-traefik-tab">
-
-
-                        <form class="integration_traefik" action="settings/integrator/traefik" method="POST">
-                            <input type="hidden" name="integrator" class="form-control" value="traefik">
-                            <h4 class="text-capitalize">traefik</h4>
-
-
-
-                            <div class="form-group">
-                                <label class="text-capitalize" for="endpoint">endpoint</label>
-
-                                <input type="text" name="endpoint" class="form-control" value="http://localhost:8080" id="endpoint">
-
-
-                                <small class="form-text text-muted">The URL for the traefik API Endpoint</small>
-
-                            </div>
-
-                            <div class="form-group">
-                                <label class="text-capitalize" for="username">username</label>
-
-                                <input type="text" name="username" class="form-control" value="" id="username">
-
-
-                                <small class="form-text text-muted">Username for HTTP Basic Authentication</small>
-
-                            </div>
-
-                            <div class="form-group">
-                                <label class="text-capitalize" for="password">password</label>
-
-                                <input type="password" name="password" class="form-control" value="" id="password">
-
-
-                                <small class="form-text text-muted">Password for HTTP Basic Authentication</small>
-
-                            </div>
-
-
-                            <button type="submit" class="btn btn-block btn-info fetch_integrator">Fetch Services</button>
-
-                            <div class="alert alert-danger d-none" role="alert"></div>
-                        </form>
-
-                    </div>
-
-                    <div class="tab-pane fade" id="v-pills-browse" role="tabpanel" aria-labelledby="v-pills-browse-tab">
-
-                    </div>
-
-
-                    <div class="tab-pane fade" id="v-pills-backups" role="tabpanel" aria-labelledby="v-pills-backups-tab">
-                        <a href="backups/create" class="btn btn-primary btn-block">Backup Database</a>
-                    </div>
-
-
 
                 </div>
             </div>
@@ -254,11 +128,13 @@
 <script>
   import Api from '../components/API';
   import CoreSettings from '../forms/CoreSettings';
+  import FormIntegration from '../forms/Integration';
   import Notifier from "../forms/Notifier";
 
   export default {
   name: 'Settings',
   components: {
+      FormIntegration,
     Notifier,
     CoreSettings
   },
@@ -266,16 +142,15 @@
     return {
       tab: "v-pills-home-tab",
       qrcode: "",
-      core: this.$store.getters.core
+      core: this.$store.getters.core,
+    cache: [],
     }
   },
   async created() {
-    const core = await Api.core()
-    this.$store.commit('setCore', core)
-    const notifiers = await Api.notifiers()
-    this.$store.commit('setNotifiers', notifiers)
     const qrurl = `statping://setup?domain=${core.domain}&api=${core.api_secret}`
     this.qrcode = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=" + encodeURI(qrurl)
+
+    this.cache = await Api.cache()
   },
   beforeMount() {
 
@@ -286,7 +161,11 @@
     },
     liClass (id) {
       return this.tab === id
-    }
+    },
+      async clearCache () {
+          await Api.clearCache()
+          this.cache = await Api.cache()
+     }
   }
 }
 </script>

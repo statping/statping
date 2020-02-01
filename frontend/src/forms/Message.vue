@@ -74,7 +74,9 @@
 
         <div class="form-group row">
             <div class="col-sm-12">
-                <button @click="saveMessage" type="submit" class="btn btn-block" :class="{'btn-primary': !message.id, 'btn-secondary': message.id}">
+                <button @click="saveMessage"
+                        :disabled="!message.title || !message.description"
+                        type="submit" class="btn btn-block" :class="{'btn-primary': !message.id, 'btn-secondary': message.id}">
                     {{message.id ? "Edit Message" : "Create Message"}}
                 </button>
             </div>

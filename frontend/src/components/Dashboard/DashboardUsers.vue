@@ -5,6 +5,7 @@
             <thead>
                 <tr>
                     <th scope="col">Username</th>
+                    <th scope="col">Type</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -12,6 +13,8 @@
 
             <tr v-for="(user, index) in $store.getters.users" v-bind:key="index" >
                 <td>{{user.username}}</td>
+                <td v-if="user.admin"><span class="badge badge-danger">ADMIN</span></td>
+                <td v-if="!user.admin"><span class="badge badge-primary">USER</span></td>
                 <td class="text-right">
                     <div class="btn-group">
                         <a @click.prevent="editUser(user, edit)" href="" class="btn btn-outline-secondary"><font-awesome-icon icon="user" /> Edit</a>

@@ -1,7 +1,14 @@
 <template>
     <form @submit="saveNotifier">
+
+        <div v-if="error" class="alert alert-danger col-12" role="alert">{{error}}</div>
+
+        <div v-if="ok" class="alert alert-success col-12" role="alert">
+            <i class="fa fa-smile-beam"></i> The {{notifier.method}} notifier is working correctly!
+        </div>
+
         <h4 class="text-capitalize">{{notifier.title}}</h4>
-        <p class="small text-muted" v-html="notifier.description"></p>
+        <p class="small text-muted" v-html="notifier.description"/>
 
         <div v-for="(form, index) in notifier.form" v-bind:key="index" class="form-group">
             <label class="text-capitalize">{{form.title}}</label>
@@ -32,30 +39,20 @@
 
             <div class="col-12 col-sm-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
                 <button @click="saveNotifier" type="submit" class="btn btn-block text-capitalize" :class="{'btn-primary': !saved, 'btn-success': saved}">
-                    <i class="fa fa-check-circle"></i> {{saved ? "Saved" : "Save"}}
+                    <i class="fa fa-check-circle"></i> {{loading ? "Loading..." : saved ? "Saved" : "Save"}}
                 </button>
             </div>
 
             <div class="col-12 col-sm-12">
-                <button @click="testNotifier" class="btn btn-secondary btn-block text-capitalize col-12 float-right"><i class="fa fa-vial"></i> Test Notifier</button>
+                <button @click="testNotifier" class="btn btn-secondary btn-block text-capitalize col-12 float-right"><i class="fa fa-vial"></i>
+                    {{loading ? "Loading..." : "Test Notifier"}}</button>
             </div>
 
-            <div class="col-12 col-sm-12 mt-2">
-                <div class="alert alert-danger d-none" id="command-error" role="alert">
-                    <i class="fa fa-exclamation-triangle"></i> {{notifier.method}} has an error!
-                </div>
-
-                <div class="alert alert-success d-none" id="command-success" role="alert">
-                    <i class="fa fa-smile-beam"></i> The {{notifier.method}} notifier is working correctly!
-                </div>
-            </div>
         </div>
 
         <span class="d-block small text-center mt-3 mb-5">
             <span class="text-capitalize">{{notifier.title}}</span> Notifier created by <a :href="notifier.author_url" target="_blank">{{notifier.author}}</a>
         </span>
-
-        <div v-if="error" class="alert alert-danger d-none" id="alerter" role="alert"></div>
     </form>
 </template>
 
@@ -72,8 +69,10 @@ export default {
   },
   data () {
     return {
+        loading: false,
         error: null,
       saved: false,
+        ok: false,
     }
   },
   mounted() {
@@ -82,6 +81,7 @@ export default {
   methods: {
     async saveNotifier(e) {
       e.preventDefault();
+      this.loading = true
       let form = {}
       this.notifier.form.forEach((f) => {
         form[f.field] = this.notifier[f.field]
@@ -93,12 +93,15 @@ export default {
       const notifiers = await Api.notifiers()
       this.$store.commit('setNotifiers', notifiers)
       this.saved = true
+        this.loading = false
       setTimeout(() => {
         this.saved = false
       }, 2000)
     },
     async testNotifier(e) {
       e.preventDefault();
+        this.ok = false
+        this.loading = true
       let form = {}
       this.notifier.form.forEach((f) => {
         form[f.field] = this.notifier[f.field]
@@ -106,13 +109,13 @@ export default {
       form.enabled = this.notifier.enabled
       form.limits = parseInt(this.notifier.limits)
       form.method = this.notifier.method
-      alert(JSON.stringify(form))
       const tested = await Api.notifier_test(form)
-      if (tested === "ok") {
-        alert('This notifier seems to be working!')
+      if (tested === 'ok') {
+        this.ok = true
       } else {
         this.error = tested
       }
+        this.loading = false
     },
   }
 }

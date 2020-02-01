@@ -25,8 +25,8 @@
         </div>
         <div class="form-group row">
             <div class="col-sm-12">
-                <button @click="saveGroup" type="submit" class="btn btn-block" :class="{'btn-primary': !group.name, 'btn-secondary': group.name}">
-                    {{group.id ? "Update Group" : "Create Group"}}
+                <button @click="saveGroup" type="submit" :disabled="loading || group.name === ''" class="btn btn-block" :class="{'btn-primary': !group.id, 'btn-secondary': group.id}">
+                    {{loading ? "Loading..." : group.id ? "Update Group" : "Create Group"}}
                 </button>
             </div>
         </div>
@@ -52,6 +52,7 @@
   },
   data () {
     return {
+        loading: false,
       group: {
         name: "",
         public: true
@@ -70,13 +71,14 @@
     },
     async saveGroup(e) {
       e.preventDefault();
+      this.loading = true
       if (this.in_group) {
         await this.updateGroup()
       } else {
         await this.createGroup()
       }
+        this.loading = false
     },
-
     async createGroup() {
       const g = this.group
       const data = {name: g.name, public: g.public}

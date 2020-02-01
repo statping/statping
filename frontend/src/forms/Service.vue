@@ -168,6 +168,7 @@
   name: 'FormService',
   data () {
     return {
+        loading: false,
       service: {
         name: "",
         type: "http",

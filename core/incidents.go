@@ -13,6 +13,18 @@ type IncidentUpdate struct {
 	*types.IncidentUpdate
 }
 
+// ReturnIncident returns *core.Incident based off a *types.Incident
+func ReturnIncident(u *types.Incident) *Incident {
+	return &Incident{u}
+}
+
+// SelectIncident returns the Incident based on the Incident's ID.
+func SelectIncident(id int64) (*Incident, error) {
+	var incident Incident
+	err := incidentsDB().Where("id = ?", id).First(&incident)
+	return &incident, err.Error()
+}
+
 // AllIncidents will return all incidents and updates recorded
 func AllIncidents() []*Incident {
 	var incidents []*Incident

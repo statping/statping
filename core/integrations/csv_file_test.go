@@ -14,23 +14,23 @@ func TestCsvFileIntegration(t *testing.T) {
 	t.Run("Set Field Value", func(t *testing.T) {
 		formPost := map[string][]string{}
 		formPost["input"] = []string{string(data)}
-		_, err = SetFields(csvIntegrator, formPost)
+		_, err = SetFields(CsvIntegrator, formPost)
 		require.Nil(t, err)
 	})
 
 	t.Run("Get Field Value", func(t *testing.T) {
-		value := Value(csvIntegrator, "input").(string)
+		value := Value(CsvIntegrator, "input").(string)
 		assert.Equal(t, string(data), value)
 	})
 
 	t.Run("List Services from CSV File", func(t *testing.T) {
-		services, err := csvIntegrator.List()
+		services, err := CsvIntegrator.List()
 		require.Nil(t, err)
 		assert.Equal(t, 10, len(services))
 	})
 
 	t.Run("Confirm Services from CSV File", func(t *testing.T) {
-		services, err := csvIntegrator.List()
+		services, err := CsvIntegrator.List()
 		require.Nil(t, err)
 		assert.Equal(t, "Bulk Upload", services[0].Name)
 		assert.Equal(t, "http://google.com", services[0].Domain)

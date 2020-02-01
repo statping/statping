@@ -65,7 +65,8 @@ func sendLog(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t1 := utils.Now()
 		t2 := utils.Now().Sub(t1)
-		if r.RequestURI == "/logs/line" {
+		if r.RequestURI == "/api/logs" || r.RequestURI == "/api/logs/last" {
+			next.ServeHTTP(w, r)
 			return
 		}
 		log.WithFields(utils.ToFields(w, r)).

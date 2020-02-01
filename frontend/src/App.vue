@@ -1,5 +1,5 @@
 <template>
-  <div id="app" v-if="loaded">
+  <div id="app">
     <router-view/>
       <Footer version="DEV" v-if="$route.path !== '/setup'"/>
   </div>

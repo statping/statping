@@ -32,7 +32,7 @@ type csvIntegration struct {
 	*types.Integration
 }
 
-var csvIntegrator = &csvIntegration{&types.Integration{
+var CsvIntegrator = &csvIntegration{&types.Integration{
 	ShortName:   "csv",
 	Name:        "CSV File",
 	Icon:        "<i class=\"fas fa-file-csv\"></i>",
