@@ -41,7 +41,8 @@ export default new Vuex.Store({
         integrations: state => state.integrations,
 
         servicesInOrder: state => state.services.sort((a, b) => a.order_id - b.order_id),
-        groupsInOrder:  state => state.groups.filter(g => g.name !== '').sort((a, b) => a.order_id - b.order_id),
+        groupsInOrder:  state => state.groups.sort((a, b) => a.order_id - b.order_id),
+        groupsClean: state => state.groups.filter(g => g.name !== '').sort((a, b) => a.order_id - b.order_id),
 
         serviceById: (state) => (id) => {
             return state.services.find(s => s.id === id)
@@ -50,7 +51,7 @@ export default new Vuex.Store({
             return state.services.find(s => s.permalink === permalink)
         },
         servicesInGroup: (state) => (id) => {
-            return state.services.filter(s => s.group_id === id)
+            return state.services.filter(s => s.group_id === id).sort((a, b) => a.order_id - b.order_id)
         },
         onlineServices: (state) => (online) => {
             return state.services.filter(s => s.online === online)
@@ -59,7 +60,7 @@ export default new Vuex.Store({
             return state.groups.find(g => g.id === id)
         },
         cleanGroups: (state) => () => {
-          return state.groups.filter(g => g.name !== 'Empty Group')
+          return state.groups.filter(g => g.name !== '').sort((a, b) => a.order_id - b.order_id)
         },
         userById: (state) => (id) => {
             return state.users.find(u => u.id === id)

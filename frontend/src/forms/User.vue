@@ -81,10 +81,7 @@
   },
   watch: {
     in_user() {
-        const u = this.in_user
-        delete u.password
-        delete u.confirm_password
-        this.user = u
+        this.user = this.in_user
     }
   },
   methods: {

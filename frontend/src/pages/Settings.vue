@@ -146,11 +146,12 @@
     cache: [],
     }
   },
-  async created() {
+      async mounted () {
+          this.cache = await Api.cache()
+      },
+      async created() {
     const qrurl = `statping://setup?domain=${core.domain}&api=${core.api_secret}`
     this.qrcode = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=" + encodeURI(qrurl)
-
-    this.cache = await Api.cache()
   },
   beforeMount() {
 

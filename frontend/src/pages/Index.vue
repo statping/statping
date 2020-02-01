@@ -3,7 +3,7 @@
 
         <Header/>
 
-        <div v-for="(group, index) in $store.getters.groups" v-bind:key="index">
+        <div v-for="(group, index) in $store.getters.groupsInOrder" v-bind:key="index">
             <Group :group=group />
         </div>
 

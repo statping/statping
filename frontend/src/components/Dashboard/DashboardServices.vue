@@ -66,7 +66,7 @@
             </thead>
 
             <draggable tag="tbody" v-model="groupsList" class="sortable_groups" handle=".drag_icon">
-            <tr v-for="(group, index) in $store.getters.groupsInOrder" v-bind:key="index">
+            <tr v-for="(group, index) in $store.getters.groupsClean" v-bind:key="index">
                 <td><span class="drag_icon d-none d-md-inline"><font-awesome-icon icon="bars" /></span> {{group.name}}</td>
                 <td>{{$store.getters.servicesInGroup(group.id).length}}</td>
                 <td>
