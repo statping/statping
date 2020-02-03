@@ -7,17 +7,11 @@
                 </span>
             </h5>
             <div class="row">
-                <div class="col-md-3 col-sm-6">
-                    <ServiceSparkLine title="here" subtitle="Failures in 7 Days" :series="first"/>
+                <div class="col-6">
+                    <ServiceSparkLine :title="calc(set1)" subtitle="Last Day Latency" :series="set1"/>
                 </div>
-                <div class="col-md-3 col-sm-6">
-                    <ServiceSparkLine title="here" subtitle="Failures Last Month" :series="second"/>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <ServiceSparkLine title="here" subtitle="Average Response" :series="third"/>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <ServiceSparkLine title="here" subtitle="Ping Time" :series="fourth"/>
+                <div class="col-6">
+                    <ServiceSparkLine :title="calc(set2)" subtitle="Last 7 Days Latency" :series="set2"/>
                 </div>
             </div>
         </div>
@@ -41,28 +35,31 @@
   },
   data() {
     return {
-        first: [],
-        second: [],
-        third: [],
-        fourth: []
+        set1: [],
+        set2: []
     }
   },
   async created() {
-    this.first = await this.getFailures(7, "hour")
-    this.second = await this.getFailures(30, "hour")
-    this.third = await this.getHits(7, "hour")
-    this.fourth = await this.getHits(30, "hour")
+    this.set1 = await this.getHits(24, "hour")
+    this.set2 = await this.getHits(24 * 7, "day")
   },
   methods: {
-    async getHits(days, group) {
-      const start = this.ago(3600 * 24)
+    async getHits(hours, group) {
+      const start = this.ago(3600 * hours)
       const data = await Api.service_hits(this.service.id, start, this.now(), group)
-      return [data]
+      if (!data) {
+          return [{name: "None", data: []}]
+      }
+        return [{name: "Latency", data: data.data}]
     },
-    async getFailures(days, group) {
-      const start = this.ago(3600 * 24)
-      const data = await Api.service_failures(this.service.id, start, this.now())
-      return [data]
+    calc (s) {
+        let data = s[0].data
+        let total = 0
+        data.forEach((f) => {
+            total += f.y
+        });
+        total = total / data.length
+        return total.toFixed(0) + "ms Average"
     }
   }
 }

@@ -43,13 +43,11 @@
                         <td><input v-model="service.check_interval" type="number" style="width: 35pt"></td>
                         <td><input v-model="service.timeout" type="number" style="width: 35pt"></td>
                         <td>{{service.type}}</td>
-                        <td><button @click.prevent="addService(service)" v-bind:disabled="service.added" class="btn btn-sm btn-outline-primary">Add</button></td>
+                        <td><button @click.prevent="addService(service)" v-bind:disabled="service.added" :disabled="service.added" class="btn btn-sm btn-outline-primary">Add</button></td>
                     </tr>
                     </tbody>
                 </table>
             </div>
-
-            {{out}}
 
             <div class="col-12">
                 <button @click.prevent="updateIntegration" type="submit" class="btn btn-block btn-info">Fetch Services</button>
@@ -83,18 +81,18 @@
       async addService(s) {
         const data = {name: s.name, type: s.type, domain: s.domain, port: s.port, check_interval: s.check_interval, timeout: s.timeout}
           const out = await Api.service_create(data)
-          window.console.log(out)
+          const services = await Api.services()
+          this.$store.commit('setServices', services)
           s.added = true
       },
     async updateIntegration() {
         const i = this.integration
         const data = {name: i.name, enabled: i.enabled, fields: i.fields}
         this.out = data
-     const out = await Api.integration_save(data)
+        const out = await Api.integration_save(data)
         if (out != null) {
             this.services = out
         }
-        window.console.log(out)
       const integrations = await Api.integrations()
       this.$store.commit('setIntegrations', integrations)
     }

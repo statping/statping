@@ -3,7 +3,7 @@
         <h1 class="text-black-50 mt-5">
             {{user.id ? `Update ${user.username}` : "Create User"}}
 
-        <button @click="removeEdit" v-if="user.id" class="mt-3 btn float-right btn-danger btn-sm">Close</button></h1>
+        <button @click.prevent="removeEdit" v-if="user.id" class="mt-3 btn float-right btn-danger btn-sm">Close</button></h1>
 
         <div class="card">
             <div class="card-body">
@@ -69,7 +69,7 @@
   },
   data () {
     return {
-        loading: false,
+      loading: false,
       user: {
         username: "",
         admin: false,
@@ -81,7 +81,9 @@
   },
   watch: {
     in_user() {
-        this.user = this.in_user
+        const u = this.in_user
+        delete u.password
+        this.user = u
     }
   },
   methods: {

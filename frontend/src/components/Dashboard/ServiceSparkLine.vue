@@ -17,6 +17,14 @@ export default {
       type: String,
     }
   },
+    watch: {
+        title () {
+
+        },
+        subtitle () {
+
+        }
+    },
   data() {
     return {
       chartOpts: {
@@ -41,7 +49,7 @@ export default {
           enabled: false
         },
         title: {
-          text: "title",
+          text: this.title,
           offsetX: 0,
           style: {
             fontSize: '28px',
@@ -49,7 +57,7 @@ export default {
           }
         },
         subtitle: {
-          text: "subtitle",
+          text: this.subtitle,
           offsetX: 0,
           style: {
             fontSize: '14px',
