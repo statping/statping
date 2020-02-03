@@ -28,12 +28,16 @@
                 </div>
             </div>
 
+            <div v-for="(message, index) in messages" v-if="messageInRange(message)">
+                <MessageBlock :message="message"/>
+            </div>
+
             <div class="service-chart-container">
-                <apexchart width="100%" height="215" type="area" :options="chartOptions" :series="series"></apexchart>
+                <apexchart width="100%" height="420" type="area" :options="chartOptions" :series="series"></apexchart>
             </div>
 
             <div class="service-chart-heatmap">
-                <div id="service_heatmap"></div>
+                <apexchart width="100%" height="215" type="heatmap" :options="chartOptions" :series="series"></apexchart>
             </div>
 
             <form id="service_date_form" class="col-12 mt-2 mb-3">
@@ -104,17 +108,18 @@
 
 <script>
   import Api from "../components/API"
+  import MessageBlock from '../components/Index/MessageBlock';
   import Checkin from "../forms/Checkin";
 
   const axisOptions = {
     labels: {
-      show: false
+      show: true
     },
     crosshairs: {
       show: false
     },
     lines: {
-      show: false
+      show: true
     },
     tooltip: {
       enabled: false
@@ -133,6 +138,7 @@
 export default {
   name: 'Service',
   components: {
+      MessageBlock,
     Checkin
   },
   data () {
@@ -143,6 +149,7 @@ export default {
       authenticated: false,
       ready: false,
       data: null,
+        messages: [],
       failures: [],
       chartOptions: {
         chart: {
@@ -171,7 +178,7 @@ export default {
             top: 0,
             right: 0,
             bottom: 0,
-            left: -10,
+            left: 0,
           }
         },
         xaxis: {
@@ -221,19 +228,25 @@ export default {
     }
   },
     async created() {
-      this.id = this.$route.params.id
+        await this.$store.dispatch('loadRequired')
+    },
+    async mounted() {
+      const id = this.$route.params.id
       let service;
-      if (this.isInt(this.id)) {
-        service = this.$store.getters.serviceById(this.id)
+      if (this.isInt(id)) {
+        service = await Api.service(id)
       } else {
         service = this.$store.getters.serviceByPermalink(this.id)
       }
       await this.getService(service)
+        this.messages = this.$store.getters.serviceMessages(service.id)
     },
-    mounted() {
-
-  },
   methods: {
+      messageInRange(message) {
+          const start = this.isBetween(new Date(), message.start_on)
+          const end = this.isBetween(message.end_on, new Date())
+          return start && end
+      },
     async getService(s) {
         this.service = await Api.service(s.id)
         await this.chartHits()

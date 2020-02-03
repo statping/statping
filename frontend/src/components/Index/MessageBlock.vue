@@ -1,17 +1,25 @@
 <template>
     <div class="alert alert-primary" role="alert">
-        <h3>Login as Admin!</h3>
-        <span class="mb-3">This is the Demo Statping instance, the database gets reset every 30 minutes. Login as "admin" password is "admin".</span>
+        <h3>{{message.title}}</h3>
+        <span class="mb-3">{{message.description}}</span>
         <div class="d-block mt-2 mb-4">
-            <span class="float-left small">Starts on Tuesday January  8, 2019 at 08:00PM</span>
-            <span class="float-right small">Ends on Thursday May 12, 2022 at 07:00PM</span>
+            <span class="float-left small">
+               Starts on {{parseTime(message.start_on)}}
+            </span>
+            <span class="float-right small">
+                Ends on {{parseTime(message.end_on)}}</span>
         </div>
     </div>
 </template>
 
 <script>
 export default {
-  name: 'MessageBlock'
+  name: 'MessageBlock',
+    props: {
+        message: {
+            type: Object
+        }
+    }
 }
 </script>
 

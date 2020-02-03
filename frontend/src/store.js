@@ -41,7 +41,7 @@ export default new Vuex.Store({
         integrations: state => state.integrations,
 
         servicesInOrder: state => state.services.sort((a, b) => a.order_id - b.order_id),
-        groupsInOrder:  state => state.groups.sort((a, b) => a.order_id - b.order_id),
+        groupsInOrder: state => state.groups.sort((a, b) => a.order_id - b.order_id),
         groupsClean: state => state.groups.filter(g => g.name !== '').sort((a, b) => a.order_id - b.order_id),
 
         serviceById: (state) => (id) => {
@@ -53,6 +53,9 @@ export default new Vuex.Store({
         servicesInGroup: (state) => (id) => {
             return state.services.filter(s => s.group_id === id).sort((a, b) => a.order_id - b.order_id)
         },
+        serviceMessages: (state) => (id) => {
+            return state.messages.filter(s => s.service === id)
+        },
         onlineServices: (state) => (online) => {
             return state.services.filter(s => s.online === online)
         },
@@ -60,7 +63,7 @@ export default new Vuex.Store({
             return state.groups.find(g => g.id === id)
         },
         cleanGroups: (state) => () => {
-          return state.groups.filter(g => g.name !== '').sort((a, b) => a.order_id - b.order_id)
+            return state.groups.filter(g => g.name !== '').sort((a, b) => a.order_id - b.order_id)
         },
         userById: (state) => (id) => {
             return state.users.find(u => u.id === id)
@@ -70,57 +73,57 @@ export default new Vuex.Store({
         },
     },
     mutations: {
-        setHasAllData(state, bool) {
+        setHasAllData (state, bool) {
             state.hasAllData = bool
         },
-        setHasPublicData(state, bool) {
+        setHasPublicData (state, bool) {
             state.hasPublicData = bool
         },
-        setCore(state, core) {
+        setCore (state, core) {
             state.core = core
         },
-        setToken(state, token) {
+        setToken (state, token) {
             state.token = token
         },
-        setServices(state, services) {
+        setServices (state, services) {
             state.services = services
         },
-        setGroups(state, groups) {
+        setGroups (state, groups) {
             state.groups = groups
         },
-        setMessages(state, messages) {
+        setMessages (state, messages) {
             state.messages = messages
         },
-        setUsers(state, users) {
+        setUsers (state, users) {
             state.users = users
         },
-        setNotifiers(state, notifiers) {
+        setNotifiers (state, notifiers) {
             state.notifiers = notifiers
         },
-        setIntegrations(state, integrations) {
+        setIntegrations (state, integrations) {
             state.integrations = integrations
         }
     },
     actions: {
-      async loadRequired(context) {
-        const core = await Api.core()
-        context.commit("setCore", core);
-        const services = await Api.services()
-        context.commit("setServices", services);
-        const groups = await Api.groups()
-        context.commit("setGroups", groups);
-        const messages = await Api.messages()
-        context.commit("setMessages", messages)
-        context.commit("setHasPublicData", true)
-      },
-      async loadAdmin(context) {
-        await context.dispatch('loadRequired')
-        const notifiers = await Api.notifiers()
-        context.commit("setNotifiers", notifiers);
-        const users = await Api.users()
-        context.commit("setUsers", users);
-          const integrations = await Api.integrations()
-          context.commit("setIntegrations", integrations);
-      }
+        async loadRequired (context) {
+            const core = await Api.core()
+            context.commit("setCore", core);
+            const services = await Api.services()
+            context.commit("setServices", services);
+            const groups = await Api.groups()
+            context.commit("setGroups", groups);
+            const messages = await Api.messages()
+            context.commit("setMessages", messages)
+            context.commit("setHasPublicData", true)
+        },
+        async loadAdmin (context) {
+            await context.dispatch('loadRequired')
+            const notifiers = await Api.notifiers()
+            context.commit("setNotifiers", notifiers);
+            const users = await Api.users()
+            context.commit("setUsers", users);
+            const integrations = await Api.integrations()
+            context.commit("setIntegrations", integrations);
+        }
     }
 });

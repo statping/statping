@@ -146,18 +146,11 @@
             </div>
         </div>
         <div class="form-group row">
-            <div class="col-6">
+            <div class="col-12">
                 <button @click.prevent="saveService" type="submit" class="btn btn-success btn-block">Create Service</button>
             </div>
-
-            <div class="col-6">
-                <button @click.prevent="saveService" class="btn btn-secondary btn-block">Test</button>
-            </div>
-
         </div>
         <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
-
-        {{JSON.stringify(service)}}
     </form>
 </template>
 

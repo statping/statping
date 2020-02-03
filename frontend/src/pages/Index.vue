@@ -7,8 +7,8 @@
             <Group :group=group />
         </div>
 
-        <div class="col-12">
-            <MessageBlock/>
+        <div v-for="(message, index) in $store.getters.messages" v-bind:key="index" v-if="inRange(message) && message.service === 0">
+            <MessageBlock :message="message"/>
         </div>
 
         <div class="col-12 full-col-12">
@@ -47,7 +47,11 @@ export default {
 
   },
   methods: {
-
+      inRange(message) {
+          const start = this.isBetween(new Date(), message.start_on)
+          const end = this.isBetween(message.end_on, new Date())
+          return start && end
+      },
   }
 }
 </script>
