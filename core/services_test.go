@@ -177,6 +177,11 @@ func TestCountOnline(t *testing.T) {
 	assert.True(t, amount >= 2)
 }
 
+func TestCountOffline(t *testing.T) {
+	amount := CoreApp.CountOffline()
+	assert.True(t, amount < 2)
+}
+
 func TestCreateService(t *testing.T) {
 	s := ReturnService(&types.Service{
 		Name:           "That'll do 🐢",
