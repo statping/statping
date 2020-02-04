@@ -20,9 +20,9 @@
   },
     async mounted() {
       if (this.$route.path !== '/setup') {
-        const tk = JSON.parse(localStorage.getItem("statping_user"))
+        // const tk = JSON.parse(localStorage.getItem("statping_user"))
         if (!this.$store.getters.hasPublicData) {
-          await this.$store.dispatch('loadAdmin')
+          await this.$store.dispatch('loadRequired')
         }
       }
       this.loaded = true

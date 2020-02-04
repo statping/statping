@@ -125,7 +125,10 @@
   async created() {
     const core = await Api.core()
     if (core.setup) {
-      this.$router.push(Index)
+        if (!this.$store.getters.hasPublicData) {
+            await this.$store.dispatch('loadRequired')
+        }
+      this.$router.push('/')
     }
   },
   mounted() {

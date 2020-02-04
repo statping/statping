@@ -7,7 +7,7 @@
                 Total Services
             </div>
             <div class="col-4">
-                <span class="lg_number">48</span>
+                <span class="lg_number">{{failuresLast24Hours()}}</span>
                 Failures last 24 Hours
             </div>
             <div class="col-4">
@@ -35,6 +35,11 @@
       }
     },
     methods: {
+        failuresLast24Hours() {
+            let total = 0;
+            this.$store.getters.services.map((s) => { total += s.failures_24_hours })
+            return total
+        },
 
   }
 }

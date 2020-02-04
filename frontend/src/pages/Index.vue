@@ -22,6 +22,8 @@
 </template>
 
 <script>
+import Api from '../components/API';
+
 const Header = () => import("@/components/Index/Header");
 const ServiceBlock = () => import("@/components/Service/ServiceBlock.vue");
 const MessageBlock = () => import("@/components/Index/MessageBlock");
@@ -40,10 +42,14 @@ export default {
 
     }
   },
-  created() {
-
+  async created() {
+      const core = await Api.core()
+      context.commit("setCore", core);
+      if (!core.setup) {
+          this.$router.push('/setup')
+      }
   },
-  mounted() {
+  async mounted() {
 
   },
   methods: {
@@ -51,7 +57,7 @@ export default {
           const start = this.isBetween(new Date(), message.start_on)
           const end = this.isBetween(message.end_on, new Date())
           return start && end
-      },
+      }
   }
 }
 </script>

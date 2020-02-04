@@ -5,20 +5,20 @@
                 <div class="col-12">
                     <h4 class="mt-3">
                         <router-link :to="`/service/${service.id}`">{{service.name}}</router-link>
-                        <span class="badge bg-success float-right">{{service.online ? "ONLINE" : "OFFLINE"}}</span>
+                        <span class="badge float-right" :class="{'bg-success': service.online, 'bg-danger': !service.online}">{{service.online ? "ONLINE" : "OFFLINE"}}</span>
                     </h4>
 
                     <div class="row stats_area mt-5">
                         <div class="col-4">
-                            <span class="lg_number">131ms</span>
+                            <span class="lg_number">{{service.avg_response}}ms</span>
                             Average Response
                         </div>
                         <div class="col-4">
-                            <span class="lg_number">100%</span>
+                            <span class="lg_number">{{service.online_24_hours}}%</span>
                             Uptime last 24 Hours
                         </div>
                         <div class="col-4">
-                            <span class="lg_number">100%</span>
+                            <span class="lg_number">{{service.online_7_days}}%</span>
                             Uptime last 7 Days
                         </div>
                     </div>
@@ -30,12 +30,15 @@
                 <ServiceChart :service="service"/>
             </div>
 
-            <div class="row lower_canvas full-col-12 text-white">
+            <div class="row lower_canvas full-col-12 text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
                 <div class="col-10 text-truncate">
-                    <span class="d-none d-md-inline">Online, last Failure was Wednesday 1:16:49PM, Dec 18 2019</span>
+                    <span class="d-none d-md-inline">
+                        {{smallText(service)}}
+                    </span>
                 </div>
                 <div class="col-sm-12 col-md-2">
-                    <router-link :to="serviceLink(service)" class="btn btn-success btn-sm float-right dyn-dark btn-block">View Service</router-link>
+                    <router-link :to="serviceLink(service)" class="btn btn-sm float-right dyn-dark btn-block" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
+                        View Service</router-link>
                 </div>
             </div>
 
@@ -54,7 +57,16 @@
       type: Object,
       required: true
     },
-  }
+  },
+      methods: {
+        smallText(s) {
+            if (s.online) {
+                return `Online, last checked on ${s.last_success}`
+            } else {
+                return `Offline, last error: ${s.last_failure.issue}`
+            }
+          }
+      }
 }
 </script>
 

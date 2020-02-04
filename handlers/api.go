@@ -37,7 +37,6 @@ type apiResponse struct {
 
 func apiIndexHandler(r *http.Request) interface{} {
 	coreClone := *core.CoreApp
-	coreClone.Started = utils.Timezoner(coreClone.Started, coreClone.Timezone)
 	return *coreClone.ToCore()
 }
 

@@ -252,7 +252,7 @@ func (s *Service) CheckHttp(record bool) *Service {
 
 // recordSuccess will create a new 'hit' record in the database for a successful/online service
 func recordSuccess(s *Service) {
-	s.LastOnline = utils.Timezoner(time.Now().UTC(), CoreApp.Timezone)
+	s.LastOnline = time.Now().UTC()
 	hit := &types.Hit{
 		Service:   s.Id,
 		Latency:   s.Latency,

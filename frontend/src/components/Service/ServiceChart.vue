@@ -115,7 +115,7 @@
             show: false
           },
           fill: {
-            colors: ["#48d338"],
+            colors: [this.service.online ? "#48d338" : "#d3132a"],
             opacity: 1,
             type: 'solid'
           },
@@ -123,7 +123,7 @@
             show: true,
             curve: 'smooth',
             lineCap: 'butt',
-            colors: ["#3aa82d"],
+            colors: [this.service.online ? "#3aa82d" : "#a40f21"],
           }
         },
       series: [{

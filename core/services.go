@@ -49,10 +49,21 @@ func Services() []types.ServiceInterface {
 func SelectService(id int64) *Service {
 	for _, s := range Services() {
 		if s.Select().Id == id {
-			return s.(*Service)
+			service := s.(*Service)
+			service = service.UpdateStats()
+			return service
 		}
 	}
 	return nil
+}
+
+func (s *Service) UpdateStats() *Service {
+	s.Online24Hours = s.OnlineDaysPercent(1)
+	s.Online7Days = s.OnlineDaysPercent(7)
+	s.AvgResponse = s.AvgTime()
+	s.FailuresLast24Hours = s.FailuresDaysAgo(1)
+	s.LastFailure = s.lastFailure()
+	return s
 }
 
 func SelectServices(auth bool) []*Service {
@@ -120,6 +131,8 @@ func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 			c.Hits = c.LimitedHits(limitedHits)
 			service.Checkins = append(service.Checkins, c)
 		}
+		// collect initial service stats
+		service = service.UpdateStats()
 		CoreApp.Services = append(CoreApp.Services, service)
 	}
 	reorderServices()
@@ -132,14 +145,14 @@ func reorderServices() {
 }
 
 // AvgTime will return the average amount of time for a service to response back successfully
-func (s *Service) AvgTime() string {
+func (s *Service) AvgTime() float64 {
 	total, _ := s.TotalHits()
 	if total == 0 {
-		return "0"
+		return 0
 	}
-	sum := s.Sum()
-	avg := sum / float64(total) * 100
-	return fmt.Sprintf("%0.0f", avg*10)
+	avg := s.Sum() / float64(total) * 100
+	f, _ := strconv.ParseFloat(fmt.Sprintf("%0.0f", avg*10), 32)
+	return f
 }
 
 // OnlineDaysPercent returns the service's uptime percent within last 24 hours

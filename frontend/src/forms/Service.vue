@@ -147,7 +147,9 @@
         </div>
         <div class="form-group row">
             <div class="col-12">
-                <button @click.prevent="saveService" type="submit" class="btn btn-success btn-block">Create Service</button>
+                <button @click.prevent="saveService" type="submit" class="btn btn-success btn-block">
+                    {{service.id ? "Update Service" : "Create Service"}}
+                </button>
             </div>
         </div>
         <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
@@ -210,11 +212,18 @@
       delete s.last_success
       delete s.latency
       delete s.online_24_hours
-      await Api.service_create(s)
+        if (s.id) {
+            await this.updateService(s)
+        } else {
+            await this.createService(s)
+        }
     },
-    async testService(e) {
-
-    }
+    async createService(s) {
+        await Api.service_create(s)
+    },
+      async updateService(s) {
+          await Api.service_update(s)
+      }
   }
 }
 </script>
