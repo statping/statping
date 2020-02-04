@@ -452,3 +452,14 @@ func (c *Core) CountOnline() int {
 	}
 	return amount
 }
+
+// CountOffline returns the amount of services offline
+func (c *Core) CountOffline() int {
+	amount := 0
+	for _, s := range CoreApp.Services {
+		if !s.Select().Online {
+			amount++
+		}
+	}
+	return amount
+}
