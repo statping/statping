@@ -24,6 +24,7 @@ import (
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
+	"time"
 )
 
 type apiResponse struct {
@@ -86,9 +87,9 @@ func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type cacheJson struct {
-	URL        string `json:"url"`
-	Expiration int64  `json:"expiration"`
-	Size       int    `json:"size"`
+	URL        string    `json:"url"`
+	Expiration time.Time `json:"expiration"`
+	Size       int       `json:"size"`
 }
 
 func apiCacheHandler(w http.ResponseWriter, r *http.Request) {
@@ -97,7 +98,7 @@ func apiCacheHandler(w http.ResponseWriter, r *http.Request) {
 	for k, v := range cache.List() {
 		cacheList = append(cacheList, cacheJson{
 			URL:        k,
-			Expiration: v.Expiration,
+			Expiration: time.Unix(0, v.Expiration).UTC(),
 			Size:       len(v.Content),
 		})
 	}
@@ -106,6 +107,7 @@ func apiCacheHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiClearCacheHandler(w http.ResponseWriter, r *http.Request) {
 	CacheStorage = NewStorage()
+	go CleanRoutine()
 	output := apiResponse{
 		Status: "success",
 	}

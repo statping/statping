@@ -39,6 +39,9 @@
                 <td class="text-right">
                     <div class="btn-group">
                         <router-link :to="{path: `/dashboard/edit_service/${service.id}`, params: {service: service} }" class="btn btn-outline-secondary">
+                            <i class="fas fa-chart-area"></i> Edit
+                        </router-link>
+                        <router-link :to="{path: serviceLink(service), params: {service: service} }" class="btn btn-outline-secondary">
                             <i class="fas fa-chart-area"></i> View
                         </router-link>
                         <a @click.prevent="deleteService(service)" href="#" class="btn btn-danger">

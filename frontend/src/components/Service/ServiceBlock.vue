@@ -61,10 +61,14 @@
       methods: {
         smallText(s) {
             if (s.online) {
-                return `Online, last checked on ${s.last_success}`
+                return `Online, last checked ${this.ago(s.last_success)}`
             } else {
-                return `Offline, last error: ${s.last_failure.issue}`
+                return `Offline, last error: ${s.last_failure.issue} ${this.ago(s.last_failure.created_at)}`
             }
+          },
+          ago(t1) {
+            const tm = this.parseTime(t1)
+            return this.duration(this.$moment().utc(), tm)
           }
       }
 }

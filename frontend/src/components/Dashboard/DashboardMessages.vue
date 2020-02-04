@@ -18,7 +18,7 @@
                 <td class="d-none d-md-table-cell">
                     <router-link :to="serviceLink(message.service)">{{service(message.service)}}</router-link>
                 </td>
-                <td class="d-none d-md-table-cell">{{message.start_on}}</td>
+                <td class="d-none d-md-table-cell">{{toLocal(message.start_on)}}</td>
                 <td class="text-right">
                     <div class="btn-group">
                         <a @click.prevent="editMessage(message, edit)" href="#" class="btn btn-outline-secondary"><i class="fas fa-exclamation-triangle"></i> Edit</a>

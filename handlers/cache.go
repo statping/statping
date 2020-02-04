@@ -13,12 +13,28 @@ type Cacher interface {
 	Delete(key string)
 	Set(key string, content []byte, duration time.Duration)
 	List() map[string]Item
+	Lock()
+	Unlock()
 }
 
 // Item is a cached reference
 type Item struct {
 	Content    []byte
 	Expiration int64
+}
+
+// CleanRoutine is a go routine to automatically remove expired caches that haven't been hit recently
+func CleanRoutine() {
+	for CacheStorage != nil {
+		CacheStorage.Lock()
+		for k, v := range CacheStorage.List() {
+			if v.Expired() {
+				CacheStorage.Delete(k)
+			}
+		}
+		CacheStorage.Unlock()
+		time.Sleep(5 * time.Second)
+	}
 }
 
 // Expired returns true if the item has expired.
@@ -41,6 +57,14 @@ func NewStorage() *Storage {
 		items: make(map[string]Item),
 		mu:    &sync.RWMutex{},
 	}
+}
+
+func (s Storage) Lock() {
+	s.mu.Lock()
+}
+
+func (s Storage) Unlock() {
+	s.mu.Unlock()
 }
 
 func (s Storage) List() map[string]Item {

@@ -4,10 +4,10 @@
         <span class="mb-3">{{message.description}}</span>
         <div class="d-block mt-2 mb-4">
             <span class="float-left small">
-               Starts on {{parseTime(message.start_on)}}
+               Started {{toLocal(message.start_on)}} ({{duration(new Date(), message.start_on)}} ago)
             </span>
             <span class="float-right small">
-                Ends on {{parseTime(message.end_on)}}</span>
+                Ends on {{toLocal(message.end_on)}} (in {{duration(message.end_on, new Date())}})</span>
         </div>
     </div>
 </template>

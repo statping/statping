@@ -86,8 +86,6 @@
             </div>
         </div>
 
-        {{JSON.stringify(temp)}}
-
     </div>
 </template>
 
@@ -123,7 +121,7 @@
         notify_before_scale: "minute",
       },
       config: {
-        altFormat: "Y-m-d H:iK",
+        altFormat: "l M J, \\at h:iK",
         altInput: true,
         enableTime: true,
         dateFormat: "Z",

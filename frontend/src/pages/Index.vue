@@ -13,7 +13,7 @@
 
         <div class="col-12 full-col-12">
 
-            <div v-for="(service, index) in $store.getters.services" v-bind:key="index">
+            <div v-for="(service, index) in $store.getters.services" :ref="service.id" v-bind:key="index">
                 <ServiceBlock :service=service />
             </div>
 
@@ -57,7 +57,12 @@ export default {
           const start = this.isBetween(new Date(), message.start_on)
           const end = this.isBetween(message.end_on, new Date())
           return start && end
-      }
+      },
+    clickService(s) {
+      this.$nextTick(() => {
+        this.$refs.s.scrollTop = 0;
+      });
+    }
   }
 }
 </script>

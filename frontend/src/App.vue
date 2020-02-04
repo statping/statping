@@ -20,12 +20,16 @@
   },
     async mounted() {
       if (this.$route.path !== '/setup') {
-        // const tk = JSON.parse(localStorage.getItem("statping_user"))
+        const tk = JSON.parse(localStorage.getItem("statping_user"))
+        if (tk.token) {
+          await this.$store.dispatch('loadAdmin')
+          this.loaded = true
+          return
+        }
         if (!this.$store.getters.hasPublicData) {
           await this.$store.dispatch('loadRequired')
         }
       }
-      this.loaded = true
     },
     methods: {
       async setAllObjects () {

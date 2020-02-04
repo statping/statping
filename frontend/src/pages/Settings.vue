@@ -102,7 +102,7 @@
                             <tr v-for="(cache, index) in cache">
                                 <td>{{cache.url}}</td>
                                 <td>{{cache.size}}</td>
-                                <td>{{cache.expiration}}</td>
+                                <td>{{expireTime(cache.expiration)}}</td>
                             </tr>
 
                             </tbody>
@@ -162,6 +162,9 @@
     },
     liClass (id) {
       return this.tab === id
+    },
+    expireTime(ex) {
+      return this.toLocal(ex)
     },
       async clearCache () {
           await Api.clearCache()
