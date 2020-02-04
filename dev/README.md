@@ -506,6 +506,13 @@ func (c *Core) CountOnline() int
 ```
 CountOnline returns the amount of services online
 
+#### func (*Core) CountOffline
+
+```go
+func (c *Core) CountOffline() int
+```
+CountOffline returns the amount of services offline
+
 #### func (Core) CurrentTime
 
 ```go
