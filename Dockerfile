@@ -1,7 +1,8 @@
 FROM golang:1.13.5-alpine as base
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG VERSION
-RUN apk add --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers wget curl jq libsass
+RUN apk add --update --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers wget curl jq libsass nodejs nodejs-npm
+RUN npm install -g yarn
 RUN curl -L -s https://assets.statping.com/sass -o /usr/local/bin/sass && \
     chmod +x /usr/local/bin/sass
 WORKDIR /go/src/github.com/hunterlong/statping
@@ -9,7 +10,8 @@ ADD Makefile go.mod /go/src/github.com/hunterlong/statping/
 RUN go mod vendor && \
     make dev-deps
 ADD . /go/src/github.com/hunterlong/statping
-RUN make install
+RUN cd frontend && yarn install
+RUN make compile install
 
 # Statping :latest Docker Image
 FROM alpine:latest

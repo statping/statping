@@ -18,3 +18,4 @@ dev
 config.yml
 *.db
 tmp
+frontend/node_modules
