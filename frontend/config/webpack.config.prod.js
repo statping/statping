@@ -10,14 +10,15 @@ const helpers                  = require('./helpers');
 const commonConfig             = require('./webpack.config.common');
 const isProd                   = process.env.NODE_ENV === 'production';
 const environment              = require('./prod.env');
+const VERSION                   = process.env.VERSION;
 
 const webpackConfig = merge(commonConfig, {
     mode: 'production',
     output: {
         path: helpers.root('dist'),
         publicPath: '/',
-        filename: 'js/[name].js',
-        chunkFilename: 'js/[name].chunk.js'
+        filename: `js/[name].js`,
+        chunkFilename: 'js/[name].js'
     },
     optimization: {
         runtimeChunk: 'single',
@@ -42,7 +43,7 @@ const webpackConfig = merge(commonConfig, {
                     test: /[\\/]node_modules[\\/]/,
                     name (module) {
                         const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
-                        return `npm.${packageName.replace('@', '')}`;
+                        return `${packageName.replace('@', '')}`;
                     }
                 },
                 styles: {

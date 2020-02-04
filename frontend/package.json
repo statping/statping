@@ -22,6 +22,7 @@
     "querystring": "^0.2.0",
     "vue": "^2.6.10",
     "vue-apexcharts": "^1.5.2",
+    "vue-codemirror": "^4.0.6",
     "vue-flatpickr-component": "^8.1.5",
     "vue-moment": "^4.1.0",
     "vue-router": "~3.0",

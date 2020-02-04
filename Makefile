@@ -22,7 +22,7 @@ frontend:
 
 frontend-build:
 	cd frontend && rm -rf dist && yarn build
-	rm -rf source/dist && cp -r frontend/dist source/
+	rm -rf source/dist && cp -r frontend/dist source/ && cp -r frontend/src/assets/scss source/dist/
 	cp -r source/tmpl/*.* source/dist/
 
 # build and push the images to docker hub

@@ -63,6 +63,7 @@ func Router() *mux.Router {
 	} else {
 		//r.PathPrefix("/").Handler(http.StripPrefix(basePath+"/", http.FileServer(source.TmplBox.HTTPBox())))
 		r.PathPrefix("/css/").Handler(Gzip(http.FileServer(source.TmplBox.HTTPBox())))
+		r.PathPrefix("/scss/").Handler(Gzip(http.FileServer(source.TmplBox.HTTPBox())))
 		r.PathPrefix("/font/").Handler(http.FileServer(source.TmplBox.HTTPBox()))
 		r.PathPrefix("/js/").Handler(Gzip(http.FileServer(source.TmplBox.HTTPBox())))
 		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))

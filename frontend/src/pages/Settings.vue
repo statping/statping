@@ -62,28 +62,7 @@
 
                     <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-style-tab'), show: liClass('v-pills-style-tab')}" id="v-pills-style" role="tabpanel" aria-labelledby="v-pills-style-tab">
 
-
-                        <form method="POST" action="settings/css">
-                            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-                                <li class="nav-item col text-center">
-                                    <a class="nav-link active" id="pills-vars-tab" data-toggle="pill" href="#pills-vars" role="tab" aria-controls="pills-vars" aria-selected="true">Variables</a>
-                                </li>
-                                <li class="nav-item col text-center">
-                                    <a class="nav-link" id="pills-theme-tab" data-toggle="pill" href="#pills-theme" role="tab" aria-controls="pills-theme" aria-selected="false">Base Theme</a>
-                                </li>
-                                <li class="nav-item col text-center">
-                                    <a class="nav-link" id="pills-mobile-tab" data-toggle="pill" href="#pills-mobile" role="tab" aria-controls="pills-mobile" aria-selected="false">Mobile</a>
-                                </li>
-                            </ul>
-                            <div class="tab-content" id="pills-tabContent">
-                                <div class="tab-pane show active" id="pills-vars" role="tabpanel" aria-labelledby="pills-vars-tab">
-                                    <textarea name="variables" id="sass_vars">
-                                        </textarea>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-block mt-2">Save Style</button>
-                            <a href="settings/delete_assets" class="btn btn-danger btn-block confirm-btn">Delete All Assets</a>
-                        </form>
+                        <ThemeEditor :core="core"/>
 
                     </div>
 
@@ -130,10 +109,12 @@
   import CoreSettings from '../forms/CoreSettings';
   import FormIntegration from '../forms/Integration';
   import Notifier from "../forms/Notifier";
+  import ThemeEditor from "../components/Dashboard/ThemeEditor";
 
   export default {
   name: 'Settings',
   components: {
+    ThemeEditor,
       FormIntegration,
     Notifier,
     CoreSettings
@@ -176,4 +157,5 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
 </style>

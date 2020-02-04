@@ -169,6 +169,17 @@ class Api {
     return user
   }
 
+  async scss_base () {
+    return await axios({
+      url: '/scss/base.scss',
+      method: 'GET',
+      responseType: 'blob'
+    }).then((response) => {
+      const reader = new window.FileReader();
+      return reader.readAsText(response.data)
+    })
+  }
+
   token () {
       const tk = localStorage.getItem(tokenKey)
       if (!tk) {

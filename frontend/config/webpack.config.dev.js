@@ -41,7 +41,11 @@ const webpackConfig = merge(commonConfig, {
       '/api': {
           logLevel: 'debug',
           target: 'http://0.0.0.0:8585'
-      }
+      },
+    '/scss': {
+      logLevel: 'debug',
+      target: 'http://0.0.0.0:8585'
+    }
   }
   }
 });
