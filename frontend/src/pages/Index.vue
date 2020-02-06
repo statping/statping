@@ -44,7 +44,7 @@ export default {
   },
   async created() {
       const core = await Api.core()
-      context.commit("setCore", core);
+      this.$store.commit("setCore", core);
       if (!core.setup) {
           this.$router.push('/setup')
       }

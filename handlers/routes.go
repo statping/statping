@@ -83,6 +83,12 @@ func Router() *mux.Router {
 	r.Handle("/api/logs", authenticated(logsHandler, false)).Methods("GET")
 	r.Handle("/api/logs/last", authenticated(logsLineHandler, false)).Methods("GET")
 
+	// API SCSS and ASSETS Routes
+	r.Handle("/api/theme", authenticated(apiThemeHandler, false)).Methods("GET")
+	r.Handle("/api/theme", authenticated(apiThemeSaveHandler, false)).Methods("POST")
+	r.Handle("/api/theme/create", authenticated(apiThemeCreateHandler, false)).Methods("GET")
+	r.Handle("/api/theme", authenticated(apiThemeRemoveHandler, false)).Methods("DELETE")
+
 	// API INTEGRATIONS Routes
 	r.Handle("/api/integrations", authenticated(apiAllIntegrationsHandler, false)).Methods("GET")
 	r.Handle("/api/integrations/{name}", authenticated(apiIntegrationViewHandler, false)).Methods("GET")

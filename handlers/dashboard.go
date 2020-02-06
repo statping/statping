@@ -17,6 +17,7 @@ package handlers
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/hunterlong/statping/core"
@@ -24,6 +25,7 @@ import (
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
@@ -77,6 +79,91 @@ func logsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	utils.LockLines.Unlock()
 	returnJson(logs, w, r)
+}
+
+type themeApi struct {
+	Directory string `json:"directory,omitempty"`
+	Base      string `json:"base"`
+	Variables string `json:"variables"`
+	Mobile    string `json:"mobile"`
+}
+
+func apiThemeHandler(w http.ResponseWriter, r *http.Request) {
+	var base, variables, mobile, dir string
+	assets := utils.Directory + "/assets"
+
+	if _, err := os.Stat(assets); err == nil {
+		dir = assets
+	}
+
+	if dir != "" {
+		base, _ = utils.OpenFile(dir + "/scss/base.scss")
+		variables, _ = utils.OpenFile(dir + "/scss/variables.scss")
+		mobile, _ = utils.OpenFile(dir + "/scss/mobile.scss")
+	} else {
+		base, _ = source.TmplBox.String("scss/base.scss")
+		variables, _ = source.TmplBox.String("scss/variables.scss")
+		mobile, _ = source.TmplBox.String("scss/mobile.scss")
+	}
+
+	resp := &themeApi{
+		Directory: dir,
+		Base:      base,
+		Variables: variables,
+		Mobile:    mobile,
+	}
+	returnJson(resp, w, r)
+}
+
+func apiThemeSaveHandler(w http.ResponseWriter, r *http.Request) {
+	var themes themeApi
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&themes)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	if err := source.SaveAsset([]byte(themes.Base), utils.Directory+"/assets/scss/base.scss"); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	if err := source.SaveAsset([]byte(themes.Variables), utils.Directory+"/assets/scss/variables.scss"); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	if err := source.SaveAsset([]byte(themes.Mobile), utils.Directory+"/assets/scss/mobile.scss"); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	if err := source.CompileSASS(utils.Directory); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	resetRouter()
+	sendJsonAction(themes, "saved", w, r)
+}
+
+func apiThemeCreateHandler(w http.ResponseWriter, r *http.Request) {
+	dir := utils.Directory
+	utils.Log.Infof("creating assets in folder: %s/%s", dir, "assets")
+	if err := source.CreateAllAssets(dir); err != nil {
+		log.Errorln(err)
+		sendErrorJson(err, w, r)
+		return
+	}
+	if err := source.CompileSASS(dir); err != nil {
+		source.CopyToPublic(source.TmplBox, dir+"/assets/css", "base.css")
+		log.Errorln("Default 'base.css' was inserted because SASS did not work.")
+	}
+	resetRouter()
+	sendJsonAction(dir+"/assets", "created", w, r)
+}
+
+func apiThemeRemoveHandler(w http.ResponseWriter, r *http.Request) {
+	if err := source.DeleteAllAssets(utils.Directory); err != nil {
+		log.Errorln(fmt.Errorf("error deleting all assets %v", err))
+	}
+	sendJsonAction(utils.Directory+"/assets", "deleted", w, r)
 }
 
 func logsLineHandler(w http.ResponseWriter, r *http.Request) {

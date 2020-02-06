@@ -37,7 +37,7 @@
                     </span>
                 </div>
                 <div class="col-sm-12 col-md-2">
-                    <router-link :to="serviceLink(service)" class="btn btn-sm float-right dyn-dark btn-block" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
+                    <router-link :to="serviceLink(service)" class="btn btn-sm float-right dyn-dark btn-block text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
                         View Service</router-link>
                 </div>
             </div>

@@ -25,6 +25,7 @@ import (
 	"github.com/russross/blackfriday/v2"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 var (
@@ -59,15 +60,15 @@ func CompileSASS(folder string) error {
 
 	stdout, stderr, err := utils.Command(command)
 
-	if stdout != "" || stderr != "" {
-		log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v", err))
-		return errors.New("failed to capture stdout or stderr")
-	}
-
 	if err != nil {
 		log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v", err))
 		log.Errorln(fmt.Sprintf("sh -c %v", command))
-		return err
+		return fmt.Errorf("failed to compile assets with SASS: %v %v \n%v", err, stdout, stderr)
+	}
+
+	if stdout != "" || stderr != "" {
+		log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v %v %v", err, stdout, stderr))
+		return errors.New("failed to capture stdout or stderr")
 	}
 
 	log.Infoln(fmt.Sprintf("out: %v | error: %v", stdout, stderr))
@@ -96,8 +97,7 @@ func UsingAssets(folder string) bool {
 }
 
 // SaveAsset will save an asset to the '/assets/' folder.
-func SaveAsset(data []byte, folder, file string) error {
-	location := folder + "/assets/" + file
+func SaveAsset(data []byte, location string) error {
 	log.Infoln(fmt.Sprintf("Saving %v", location))
 	err := utils.SaveFile(location, data)
 	if err != nil {
@@ -120,14 +120,20 @@ func OpenAsset(folder, file string) string {
 // CreateAllAssets will dump HTML, CSS, SCSS, and JS assets into the '/assets' directory
 func CreateAllAssets(folder string) error {
 	log.Infoln(fmt.Sprintf("Dump Statping assets into %v/assets", folder))
-	MakePublicFolder(folder + "/assets")
-	MakePublicFolder(folder + "/assets/js")
-	MakePublicFolder(folder + "/assets/css")
-	MakePublicFolder(folder + "/assets/scss")
-	MakePublicFolder(folder + "/assets/font")
-	MakePublicFolder(folder + "/assets/files")
+	fp := filepath.Join
+
+	MakePublicFolder(fp(folder, "/assets"))
+	MakePublicFolder(fp(folder, "assets", "js"))
+	MakePublicFolder(fp(folder, "assets", "css"))
+	MakePublicFolder(fp(folder, "assets", "scss"))
+	MakePublicFolder(fp(folder, "assets", "font"))
+	MakePublicFolder(fp(folder, "assets", "files"))
 	log.Infoln("Inserting scss, css, and javascript files into assets folder")
-	CopyAllToPublic(TmplBox, folder+"/assets")
+
+	if err := CopyAllToPublic(TmplBox, fp(folder, "assets")); err != nil {
+		log.Errorln(err)
+	}
+
 	CopyToPublic(TmplBox, folder+"/assets", "robots.txt")
 	CopyToPublic(TmplBox, folder+"/assets", "banner.png")
 	CopyToPublic(TmplBox, folder+"/assets", "favicon.ico")
@@ -153,20 +159,32 @@ func DeleteAllAssets(folder string) error {
 
 // CopyAllToPublic will copy all the files in a rice box into a local folder
 func CopyAllToPublic(box *rice.Box, folder string) error {
+
+	exclude := map[string]bool{
+		"base.gohtml":  true,
+		"index.html":   true,
+		"swagger.json": true,
+		"postman.json": true,
+		"grafana.json": true,
+	}
+
 	err := box.Walk("/", func(path string, info os.FileInfo, err error) error {
 		if info.Name() == "" {
 			return nil
 		}
-		if info.IsDir() {
-			folder := fmt.Sprintf("%v/assets/%v/%v", utils.Directory, folder, info.Name())
-			return MakePublicFolder(folder)
+		if exclude[info.Name()] {
+			return nil
 		}
+		if info.IsDir() {
+			return nil
+		}
+		utils.Log.Infoln(path)
 		file, err := box.Bytes(path)
 		if err != nil {
 			return err
 		}
-		filePath := fmt.Sprintf("%v/%v", folder, path)
-		return SaveAsset(file, utils.Directory, filePath)
+		filePath := filepath.Join(folder, path)
+		return SaveAsset(file, filePath)
 	})
 	return err
 }

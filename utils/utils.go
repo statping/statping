@@ -223,6 +223,11 @@ func FolderExists(folder string) bool {
 	return false
 }
 
+func OpenFile(filePath string) (string, error) {
+	data, err := ioutil.ReadFile(filePath)
+	return string(data), err
+}
+
 // CopyFile will copy a file to a new directory
 //		CopyFile("source.jpg", "/tmp/source.jpg")
 func CopyFile(src, dst string) error {
@@ -262,7 +267,10 @@ func Command(cmd string) (string, string, error) {
 	var errStdout, errStderr error
 	stdoutIn, _ := testCmd.StdoutPipe()
 	stderrIn, _ := testCmd.StderrPipe()
-	testCmd.Start()
+	err := testCmd.Start()
+	if err != nil {
+		return "", "", err
+	}
 
 	go func() {
 		stdout, errStdout = copyAndCapture(os.Stdout, stdoutIn)
@@ -272,13 +280,13 @@ func Command(cmd string) (string, string, error) {
 		stderr, errStderr = copyAndCapture(os.Stderr, stderrIn)
 	}()
 
-	err := testCmd.Wait()
+	err = testCmd.Wait()
 	if err != nil {
-		return "", "", err
+		return string(stdout), string(stderr), err
 	}
 
 	if errStdout != nil || errStderr != nil {
-		return "", "", errors.New("failed to capture stdout or stderr")
+		return string(stdout), string(stderr), errors.New("failed to capture stdout or stderr")
 	}
 
 	outStr, errStr := string(stdout), string(stderr)
@@ -327,7 +335,7 @@ func DurationReadable(d time.Duration) string {
 // SaveFile will create a new file with data inside it
 //		SaveFile("newfile.json", []byte('{"data": "success"}')
 func SaveFile(filename string, data []byte) error {
-	err := ioutil.WriteFile(filename, data, 0644)
+	err := ioutil.WriteFile(filename, data, 0655)
 	return err
 }
 

@@ -152,6 +152,22 @@ class Api {
         return axios.get('/api/logs/last').then(response => (response.data))
     }
 
+    async theme () {
+        return axios.get('/api/theme').then(response => (response.data))
+    }
+
+    async theme_generate (create=true) {
+      if (create) {
+          return axios.get('/api/theme/create').then(response => (response.data))
+      } else {
+          return axios.delete('/api/theme').then(response => (response.data))
+      }
+    }
+
+    async theme_save (data) {
+        return axios.post('/api/theme', data).then(response => (response.data))
+    }
+
   async login (username, password) {
     const f = {username: username, password: password}
     return axios.post('/api/login', qs.stringify(f))

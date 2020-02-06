@@ -17,6 +17,7 @@
     "@fortawesome/vue-fontawesome": "^0.1.9",
     "apexcharts": "^3.15.0",
     "axios": "^0.19.1",
+    "codemirror-colorpicker": "^1.9.66",
     "core-js": "^3.4.4",
     "moment": "^2.24.0",
     "querystring": "^0.2.0",
