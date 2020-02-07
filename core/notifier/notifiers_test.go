@@ -56,8 +56,8 @@ var core = &types.Core{
 }
 
 func injectDatabase() {
-	utils.DeleteFile(dir + "/statup.db")
-	db, _ = gorm.Open("sqlite3", dir+"/statup.db")
+	utils.DeleteFile(dir + "/notifier.db")
+	db, _ = gorm.Open("sqlite3", dir+"/notifier.db")
 	db.CreateTable(&Notification{})
 }
 

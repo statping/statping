@@ -19,6 +19,9 @@ import (
 	"time"
 )
 
+// SqliteFilename is the name of the SQLlite database file
+const SqliteFilename = "statping.db"
+
 // AllNotifiers contains all the Notifiers loaded
 type AllNotifiers interface{}
 
@@ -28,7 +31,7 @@ type AllNotifiers interface{}
 type Core struct {
 	Name          string             `gorm:"not null;column:name" json:"name"`
 	Description   string             `gorm:"not null;column:description" json:"description,omitempty"`
-	Config        string             `gorm:"column:config" json:"-"`
+	ConfigFile    string             `gorm:"column:config" json:"-"`
 	ApiKey        string             `gorm:"column:api_key" json:"-"`
 	ApiSecret     string             `gorm:"column:api_secret" json:"-"`
 	Style         string             `gorm:"not null;column:style" json:"style,omitempty"`
@@ -41,11 +44,12 @@ type Core struct {
 	Timezone      float32            `gorm:"column:timezone;default:-8.0" json:"timezone,omitempty"`
 	CreatedAt     time.Time          `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt     time.Time          `gorm:"column:updated_at" json:"updated_at"`
-	DbConnection  string             `gorm:"-" json:"database"`
 	Started       time.Time          `gorm:"-" json:"started_on"`
 	Services      []ServiceInterface `gorm:"-" json:"-"`
 	Plugins       []*Info            `gorm:"-" json:"-"`
 	Repos         []PluginJSON       `gorm:"-" json:"-"`
 	AllPlugins    []PluginActions    `gorm:"-" json:"-"`
 	Notifications []AllNotifiers     `gorm:"-" json:"-"`
+	Config        *DbConfig          `gorm:"-" json:"config"`
+	Integrations  []Integrator       `gorm:"-" json:"-"`
 }

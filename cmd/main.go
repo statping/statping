@@ -39,6 +39,7 @@ var (
 	envFile     string
 	verboseMode int
 	port        int
+	log         = utils.Log.WithField("type", "cmd")
 )
 
 func init() {
@@ -52,7 +53,7 @@ func parseFlags() {
 	flag.StringVar(&ipAddress, "ip", "0.0.0.0", "IP address to run the Statping HTTP server")
 	flag.StringVar(&envFile, "env", "", "IP address to run the Statping HTTP server")
 	flag.IntVar(&port, "port", 8080, "Port to run the HTTP server")
-	flag.IntVar(&verboseMode, "verbose", 1, "Run in verbose mode to see detailed logs (1 - 4)")
+	flag.IntVar(&verboseMode, "verbose", 2, "Run in verbose mode to see detailed logs (1 - 4)")
 	flag.Parse()
 
 	if os.Getenv("PORT") != "" {
@@ -75,8 +76,7 @@ func main() {
 	source.Assets()
 	utils.VerboseMode = verboseMode
 	if err := utils.InitLogs(); err != nil {
-		fmt.Printf("Statping Log Error: \n %v\n", err)
-		os.Exit(2)
+		log.Errorf("Statping Log Error: %v\n", err)
 	}
 	args := flag.Args()
 
@@ -90,17 +90,28 @@ func main() {
 			os.Exit(1)
 		}
 	}
-	utils.Log.Info(fmt.Sprintf("Starting Statping v%v", VERSION))
+	log.Info(fmt.Sprintf("Starting Statping v%v", VERSION))
 	updateDisplay()
 
-	core.Configs, err = core.LoadConfigFile(utils.Directory)
+	configs, err := core.LoadConfigFile(utils.Directory)
 	if err != nil {
-		utils.Log.Errorln(err)
+		log.Errorln(err)
 		core.SetupMode = true
-		utils.Log.Infoln(handlers.RunHTTPServer(ipAddress, port))
-		os.Exit(1)
+		writeAble, err := utils.DirWritable(utils.Directory)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		if !writeAble {
+			log.Fatalf("Statping does not have write permissions at: %v\nYou can change this directory by setting the STATPING_DIR environment variable to a dedicated path before starting.", utils.Directory)
+		}
+		if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
+			log.Fatalln(err)
+		}
 	}
-	mainProcess()
+	core.CoreApp.Config = configs
+	if err := mainProcess(); err != nil {
+		log.Fatalln(err)
+	}
 }
 
 // Close will gracefully stop the database connection, and log file
@@ -122,24 +133,27 @@ func sigterm() {
 func loadDotEnvs() error {
 	err := godotenv.Load(envFile)
 	if err == nil {
-		utils.Log.Infoln("Environment file '.env' Loaded")
+		log.Infoln("Environment file '.env' Loaded")
 	}
 	return err
 }
 
 // mainProcess will initialize the Statping application and run the HTTP server
-func mainProcess() {
+func mainProcess() error {
 	dir := utils.Directory
 	var err error
-	err = core.Configs.Connect(false, dir)
+	err = core.CoreApp.Connect(false, dir)
 	if err != nil {
-		utils.Log.Errorln(fmt.Sprintf("could not connect to database: %v", err))
+		log.Errorln(fmt.Sprintf("could not connect to database: %v", err))
+		return err
 	}
-	core.Configs.MigrateDatabase()
+	core.CoreApp.MigrateDatabase()
 	core.InitApp()
 	if !core.SetupMode {
 		plugin.LoadPlugins()
-		fmt.Println(handlers.RunHTTPServer(ipAddress, port))
-		os.Exit(1)
+		if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
+			log.Fatalln(err)
+		}
 	}
+	return err
 }

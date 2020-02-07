@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Statping installation script for Linux, Mac, and maybe Windows.
 #
 # This installation script is a modification of Yarn's installation
@@ -15,14 +15,23 @@ gpgurl=https://statping.com/statping.gpg
 repo=https://github.com/hunterlong/statping
 
 statping_get_tarball() {
-  url="https://github.com/hunterlong/statping/releases/latest/download/statping-$1-$2.tar.gz"
+  fext='tar.gz'
+  if [ ${OS} == 'windows' ]; then
+    fext='zip'
+    ARCH='x64'
+  fi
+  url="$repo/releases/latest/download/statping-$1-$2.$fext"
   printf "$cyan> Downloading latest version for $OS $ARCH...\n$url $reset\n"
   # Get both the tarball and its GPG signature
   tarball_tmp=`mktemp -t statping.tar.gz.XXXXXXXXXX`
   if curl --fail -L -o "$tarball_tmp" "$url"; then
     # All this dance is because `tar --strip=1` does not work everywhere
     temp=$(mktemp -d statping.XXXXXXXXXX)
-    tar xzf $tarball_tmp -C "$temp"
+    if [ ${OS} == 'windows' ]; then
+      unzip $tarball_tmp -d "$temp"
+    else
+      tar xzf $tarball_tmp -C "$temp"
+    fi
     statping_verify_integrity "$temp"/statping
     printf "$green> Installing to $DEST/statping\n"
     mv "$temp"/statping "$DEST"
@@ -56,7 +65,7 @@ statping_verify_integrity() {
 
   printf "$cyan> Verifying integrity with gpg key from $gpgurl...$reset\n"
   # Grab the public key if it doesn't already exist
-  gpg --list-keys $gpg_key >/dev/null 2>&1 || (curl -sS $gpgurl | gpg --import)
+  gpg --list-keys $gpg_key >/dev/null 2>&1 || (curl -sS -L $gpgurl | gpg --import)
 
   if [ ! -f "$1.asc" ]; then
     printf "$red> Could not download GPG signature for this Statping release. This means the release can not be verified!$reset\n"
@@ -65,7 +74,7 @@ statping_verify_integrity() {
   fi
 
   # Actually perform the verification
-  if gpg --verify "$1.asc" $1; then
+  if gpg --verify "$1.asc" $1 &> /dev/null; then
     printf "$green> GPG signature looks good$reset\n"
   else
     printf "$red> GPG signature for this Statping release is invalid! This is BAD and may mean the release has been tampered with. It is strongly recommended that you report this to the Statping developers.$reset\n"
@@ -80,8 +89,9 @@ statping_reset() {
 statping_brew_install() {
   if [[ -z "$(command -v brew --version)" ]]; then
     printf "${white}Using Brew to install!$reset\n"
-    printf "${yellow}brew tap hunterlong/statping$reset\n"
+    printf "${yellow}---> brew tap hunterlong/statping$reset\n"
     brew tap hunterlong/statping
+    printf "${yellow}---> brew install statping$reset\n"
     brew install statping
     printf "${green}Brew installation is complete!$reset\n"
     printf "${yellow}You can use 'brew upgrade' to upgrade Statping next time.$reset\n"
@@ -94,16 +104,6 @@ statping_install() {
   printf "${white}Installing Statping!$reset\n"
   getOS
   getArch
-  if [ -d "$DEST" ]; then
-    if ! loc="$(type -p "statping version")" || [[ -z $loc ]]; then
-      specified_version=`curl -sS https://raw.githubusercontent.com/hunterlong/statping/master/version.txt`
-      statping_version=`statping version`
-      if [ "$specified_version" = "$statping_version" ]; then
-        printf "$green> Statping is already at the $specified_version version.$reset\n"
-        exit 0
-      fi
-    fi
-  fi
   if [ "$OS" == "osx" ]; then
       statping_brew_install
     else
@@ -137,6 +137,14 @@ getOS() {
         alias ls='ls -G'
         ;;
       'WindowsNT')
+        OS='windows'
+        DEST=/usr/local/bin
+        ;;
+      'MINGW*')
+        OS='windows'
+        DEST=/usr/local/bin
+        ;;
+      'CYGWIN*')
         OS='windows'
         DEST=/usr/local/bin
         ;;

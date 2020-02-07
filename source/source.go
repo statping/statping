@@ -28,7 +28,7 @@ import (
 )
 
 var (
-	log = utils.Log.WithField("type", "source")
+	log     = utils.Log.WithField("type", "source")
 	CssBox  *rice.Box // CSS files from the 'source/css' directory, this will be loaded into '/assets/css'
 	ScssBox *rice.Box // SCSS files from the 'source/scss' directory, this will be loaded into '/assets/scss'
 	JsBox   *rice.Box // JS files from the 'source/js' directory, this will be loaded into '/assets/js'
@@ -37,12 +37,13 @@ var (
 )
 
 // Assets will load the Rice boxes containing the CSS, SCSS, JS, and HTML files.
-func Assets() {
+func Assets() error {
 	CssBox = rice.MustFindBox("css")
 	ScssBox = rice.MustFindBox("scss")
 	JsBox = rice.MustFindBox("js")
 	TmplBox = rice.MustFindBox("tmpl")
 	FontBox = rice.MustFindBox("font")
+	return nil
 }
 
 // HelpMarkdown will return the Markdown of help.md into HTML
@@ -153,7 +154,7 @@ func CreateAllAssets(folder string) error {
 
 // DeleteAllAssets will delete the '/assets' folder
 func DeleteAllAssets(folder string) error {
-	err := os.RemoveAll(folder + "/assets")
+	err := utils.DeleteDirectory(folder + "/assets")
 	if err != nil {
 		log.Infoln(fmt.Sprintf("There was an issue deleting Statping Assets, %v", err))
 		return err
@@ -202,8 +203,8 @@ func CopyToPublic(box *rice.Box, folder, file string) error {
 // MakePublicFolder will create a new folder
 func MakePublicFolder(folder string) error {
 	log.Infoln(fmt.Sprintf("Creating folder '%v'", folder))
-	if _, err := os.Stat(folder); os.IsNotExist(err) {
-		err = os.MkdirAll(folder, 0777)
+	if !utils.FolderExists(folder) {
+		err := utils.CreateDirectory(folder)
 		if err != nil {
 			log.Errorln(fmt.Sprintf("Failed to created %v directory, %v", folder, err))
 			return err

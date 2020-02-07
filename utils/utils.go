@@ -54,8 +54,17 @@ func init() {
 		}
 		Directory = dir
 	}
+	// check if logs are disabled
 	logger := os.Getenv("DISABLE_LOGS")
 	disableLogs, _ = strconv.ParseBool(logger)
+	if disableLogs {
+		Log.Out = ioutil.Discard
+		return
+	}
+	Log.Debugln("current working directory: ", Directory)
+	Log.AddHook(new(hook))
+	Log.SetNoLock()
+	checkVerboseMode()
 }
 
 // ToInt converts a int to a string
@@ -166,6 +175,7 @@ func UnderScoreString(str string) string {
 //		exists := FileExists("assets/css/base.css")
 func FileExists(name string) bool {
 	if _, err := os.Stat(name); err != nil {
+		Log.Debugf("file exist: %v (%v)", name, !os.IsNotExist(err))
 		if os.IsNotExist(err) {
 			return false
 		}
@@ -176,24 +186,62 @@ func FileExists(name string) bool {
 // DeleteFile will attempt to delete a file
 //		DeleteFile("newfile.json")
 func DeleteFile(file string) error {
-	Log.Infoln("deleting file: " + file)
-	err := os.Remove(file)
-	if err != nil {
-		return err
-	}
-	return nil
+	Log.Debugln("deleting file: " + file)
+	return os.Remove(file)
 }
 
 // DeleteDirectory will attempt to delete a directory and all contents inside
 //		DeleteDirectory("assets")
 func DeleteDirectory(directory string) error {
+	Log.Debugln("removing directory: " + directory)
 	return os.RemoveAll(directory)
+}
+
+// CreateDirectory will attempt to create a directory
+//		CreateDirectory("assets")
+func CreateDirectory(directory string) error {
+	Log.Debugln("creating directory: " + directory)
+	if err := os.Mkdir(directory, os.ModePerm); err != os.ErrExist {
+		return err
+	}
+	return nil
+}
+
+// FolderExists will return true if the folder exists
+func FolderExists(folder string) bool {
+	if _, err := os.Stat(folder); os.IsExist(err) {
+		return true
+	}
+	return false
+}
+
+// CopyFile will copy a file to a new directory
+//		CopyFile("source.jpg", "/tmp/source.jpg")
+func CopyFile(src, dst string) error {
+	Log.Debugln(fmt.Sprintf("copying file: %v to %v", src, dst))
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return err
+	}
+	return out.Close()
 }
 
 // Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings
 //		in, out, err := Command("sass assets/scss assets/css/base.css")
 func Command(cmd string) (string, string, error) {
-	Log.Infoln("running command: " + cmd)
+	Log.Debugln("running command: " + cmd)
 	testCmd := exec.Command("sh", "-c", cmd)
 	var stdout, stderr []byte
 	var errStdout, errStderr error

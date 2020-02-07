@@ -28,7 +28,7 @@ type Hit struct {
 func (s *Service) CreateHit(h *types.Hit) (int64, error) {
 	db := hitsDB().Create(&h)
 	if db.Error != nil {
-		log.Warnln(db.Error)
+		log.Errorln(db.Error)
 		return 0, db.Error
 	}
 	return h.Id, db.Error

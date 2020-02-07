@@ -350,13 +350,13 @@ func TestSelectServiceLink(t *testing.T) {
 }
 
 func TestDbtimestamp(t *testing.T) {
-	CoreApp.DbConnection = "mysql"
+	CoreApp.Config.DbConn = "mysql"
 	query := Dbtimestamp("minute", "latency")
 	assert.Equal(t, "CONCAT(date_format(created_at, '%Y-%m-%d %H:00:00')) AS timeframe, AVG(latency) AS value", query)
-	CoreApp.DbConnection = "postgres"
+	CoreApp.Config.DbConn = "postgres"
 	query = Dbtimestamp("minute", "latency")
 	assert.Equal(t, "date_trunc('minute', created_at) AS timeframe, AVG(latency) AS value", query)
-	CoreApp.DbConnection = "sqlite"
+	CoreApp.Config.DbConn = "sqlite"
 	query = Dbtimestamp("minute", "latency")
 	assert.Equal(t, "datetime((strftime('%s', created_at) / 60) * 60, 'unixepoch') AS timeframe, AVG(latency) as value", query)
 }

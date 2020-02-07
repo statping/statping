@@ -34,10 +34,8 @@ import (
 // catchCLI will run functions based on the commands sent to Statping
 func catchCLI(args []string) error {
 	dir := utils.Directory
-	if err := utils.InitLogs(); err != nil {
-		return err
-	}
-	source.Assets()
+	runLogs := utils.InitLogs
+	runAssets := source.Assets
 	loadDotEnvs()
 
 	switch args[0] {
@@ -50,17 +48,30 @@ func catchCLI(args []string) error {
 		return errors.New("end")
 	case "assets":
 		var err error
+		if err = runLogs(); err != nil {
+			return err
+		}
+		if err = runAssets(); err != nil {
+			return err
+		}
 		if err = source.CreateAllAssets(dir); err != nil {
 			return err
 		}
 		return errors.New("end")
 	case "sass":
+		if err := runLogs(); err != nil {
+			return err
+		}
+		if err := runAssets(); err != nil {
+			return err
+		}
 		if err := source.CompileSASS(dir); err != nil {
 			return err
 		}
 		return errors.New("end")
 	case "update":
-		return updateDisplay()
+		updateDisplay()
+		return errors.New("end")
 	case "test":
 		cmd := args[1]
 		switch cmd {
@@ -70,32 +81,40 @@ func catchCLI(args []string) error {
 		return errors.New("end")
 	case "static":
 		var err error
+		if err = runLogs(); err != nil {
+			return err
+		}
+		if err = runAssets(); err != nil {
+			return err
+		}
 		fmt.Printf("Statping v%v Exporting Static 'index.html' page...\n", VERSION)
-		utils.InitLogs()
-		if core.Configs, err = core.LoadConfigFile(dir); err != nil {
-			utils.Log.Errorln("config.yml file not found")
+		if core.CoreApp.Config, err = core.LoadConfigFile(dir); err != nil {
+			log.Errorln("config.yml file not found")
 			return err
 		}
 		indexSource := ExportIndexHTML()
 		//core.CloseDB()
 		if err = utils.SaveFile(dir+"/index.html", indexSource); err != nil {
-			utils.Log.Errorln(err)
+			log.Errorln(err)
 			return err
 		}
-		utils.Log.Infoln("Exported Statping index page: 'index.html'")
+		log.Infoln("Exported Statping index page: 'index.html'")
 	case "help":
 		HelpEcho()
 		return errors.New("end")
 	case "export":
 		var err error
 		var data []byte
-		if err := utils.InitLogs(); err != nil {
+		if err = runLogs(); err != nil {
 			return err
 		}
-		if core.Configs, err = core.LoadConfigFile(dir); err != nil {
+		if err = runAssets(); err != nil {
 			return err
 		}
-		if err = core.Configs.Connect(false, dir); err != nil {
+		if core.CoreApp.Config, err = core.LoadConfigFile(dir); err != nil {
+			return err
+		}
+		if err = core.CoreApp.Connect(false, dir); err != nil {
 			return err
 		}
 		if data, err = core.ExportSettings(); err != nil {
@@ -122,16 +141,28 @@ func catchCLI(args []string) error {
 		}
 		return errors.New("end")
 	case "run":
-		utils.Log.Infoln("Running 1 time and saving to database...")
+		if err := runLogs(); err != nil {
+			return err
+		}
+		if err := runAssets(); err != nil {
+			return err
+		}
+		log.Infoln("Running 1 time and saving to database...")
 		runOnce()
 		//core.CloseDB()
 		fmt.Println("Check is complete.")
 		return errors.New("end")
 	case "env":
 		fmt.Println("Statping Environment Variable")
+		if err := runLogs(); err != nil {
+			return err
+		}
+		if err := runAssets(); err != nil {
+			return err
+		}
 		envs, err := godotenv.Read(".env")
 		if err != nil {
-			utils.Log.Errorln("No .env file found in current directory.")
+			log.Errorln("No .env file found in current directory.")
 			return err
 		}
 		for k, e := range envs {
@@ -146,7 +177,7 @@ func catchCLI(args []string) error {
 // ExportIndexHTML returns the HTML of the index page as a string
 func ExportIndexHTML() []byte {
 	source.Assets()
-	core.Configs.Connect(false, utils.Directory)
+	core.CoreApp.Connect(false, utils.Directory)
 	core.CoreApp.SelectAllServices(false)
 	core.CoreApp.UseCdn = types.NewNullBool(true)
 	for _, srv := range core.CoreApp.Services {
@@ -163,29 +194,27 @@ func updateDisplay() error {
 	var err error
 	var gitCurrent githubResponse
 	if gitCurrent, err = checkGithubUpdates(); err != nil {
+		fmt.Printf("Issue connecting to https://github.com/hunterlong/statping\n%v\n", err)
 		return err
 	}
-	fmt.Printf("Statping Version: v%v\nLatest Version: %v\n", VERSION, gitCurrent.TagName)
 	if VERSION != gitCurrent.TagName[1:] {
-		fmt.Printf("\n   New Update %v Available\n", gitCurrent.TagName[1:])
+		fmt.Printf("\nNew Update %v Available!\n", gitCurrent.TagName[1:])
 		fmt.Printf("Update Command:\n")
 		fmt.Printf("curl -o- -L https://statping.com/install.sh | bash\n\n")
-	} else {
-		fmt.Printf("You have the latest version of Statping!\n")
 	}
-	return errors.New("end")
+	return nil
 }
 
 // runOnce will initialize the Statping application and check each service 1 time, will not run HTTP server
 func runOnce() {
 	var err error
-	core.Configs, err = core.LoadConfigFile(utils.Directory)
+	core.CoreApp.Config, err = core.LoadConfigFile(utils.Directory)
 	if err != nil {
-		utils.Log.Errorln("config.yml file not found")
+		log.Errorln("config.yml file not found")
 	}
-	err = core.Configs.Connect(false, utils.Directory)
+	err = core.CoreApp.Connect(false, utils.Directory)
 	if err != nil {
-		utils.Log.Errorln(err)
+		log.Errorln(err)
 	}
 	core.CoreApp, err = core.SelectCore()
 	if err != nil {
@@ -193,7 +222,7 @@ func runOnce() {
 	}
 	_, err = core.CoreApp.SelectAllServices(true)
 	if err != nil {
-		utils.Log.Errorln(err)
+		log.Errorln(err)
 	}
 	for _, out := range core.CoreApp.Services {
 		out.Check(true)
@@ -225,6 +254,7 @@ func HelpEcho() {
 	fmt.Printf("Environment Variables:\n")
 	fmt.Println("     PORT                      - Set the outgoing port for the HTTP server (or use -port)")
 	fmt.Println("     IP                        - Bind a specific IP address to the HTTP server (or use -ip)")
+	fmt.Println("     VERBOSE                   - Display more logs in verbose mode. (1 - 4)")
 	fmt.Println("     STATPING_DIR              - Set a absolute path for the root path of Statping server (logs, assets, SQL db)")
 	fmt.Println("     DISABLE_LOGS              - Disable viewing and writing to the log file (default is false)")
 	fmt.Println("     DB_CONN                   - Automatic Database connection (sqlite, postgres, mysql)")
@@ -234,7 +264,7 @@ func HelpEcho() {
 	fmt.Println("     DB_PORT                   - Database port (5432, 3306, ...)")
 	fmt.Println("     DB_DATABASE               - Database connection's database name")
 	fmt.Println("     POSTGRES_SSLMODE          - Enable Postgres SSL Mode 'ssl_mode=VALUE' (enable/disable/verify-full/verify-ca)")
-	fmt.Println("     GO_ENV                    - Run Statping in testmode, will bypass HTTP authentication (if set as 'true')")
+	fmt.Println("     GO_ENV                    - Run Statping in testmode, will bypass HTTP authentication (if set as 'test')")
 	fmt.Println("     NAME                      - Set a name for the Statping status page")
 	fmt.Println("     DESCRIPTION               - Set a description for the Statping status page")
 	fmt.Println("     DOMAIN                    - Set a URL for the Statping status page")
@@ -242,17 +272,20 @@ func HelpEcho() {
 	fmt.Println("     ADMIN_PASS                - Password for administrator account (default: admin)")
 	fmt.Println("     SASS                      - Set the absolute path to the sass binary location")
 	fmt.Println("     HTTP_PROXY                - Use a HTTP Proxy for HTTP Requests")
+	fmt.Println("     AUTH_USERNAME             - HTTP Basic Authentication username")
+	fmt.Println("     AUTH_PASSWORD             - HTTP Basic Authentication password")
+	fmt.Println("     BASE_PATH                 - Set the base URL prefix (set to 'monitor' if URL is domain.com/monitor)")
 	fmt.Println("   * You can insert environment variables into a '.env' file in root directory.")
 	fmt.Println("Give Statping a Star at https://github.com/hunterlong/statping")
 }
 
 func checkGithubUpdates() (githubResponse, error) {
-	var gitResp githubResponse
 	url := "https://api.github.com/repos/hunterlong/statping/releases/latest"
 	contents, _, err := utils.HttpRequest(url, "GET",  nil, nil, time.Duration(2*time.Second), true, true)
 	if err != nil {
 		return githubResponse{}, err
 	}
+	var gitResp githubResponse
 	err = json.Unmarshal(contents, &gitResp)
 	return gitResp, err
 }

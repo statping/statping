@@ -3,14 +3,14 @@
 <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
     <div class="col-10 offset-1 col-md-8 offset-md-2 mt-md-2">
         <div class="col-12 col-md-8 offset-md-2 mb-4">
-            <img class="col-12 mt-5 mt-md-0" src="/banner.png">
+            <img class="col-12 mt-5 mt-md-0" src="banner.png">
         </div>
     {{ if .Error }}
         <div class="alert alert-danger" role="alert">
             Incorrect login information submitted, try again.
         </div>
     {{ end }}
-        <form action="/dashboard" class="spin_form" method="POST">
+        <form action="dashboard" class="spin_form" method="POST">
             <div class="form-group row">
                 <label for="username" class="col-sm-2 col-form-label">Username</label>
                 <div class="col-sm-10">

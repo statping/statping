@@ -2,11 +2,7 @@
 <div class="card">
 <div class="card-body">
 {{$s := .}}
-{{if ne .Id 0}}
-<form class="ajax_form" action="/api/services/{{.Id}}" data-redirect="/services" method="POST">
-{{else}}
-<form class="ajax_form" action="/api/services" data-redirect="/services" method="POST">
-{{end}}
+<form class="ajax_form" action="api/services{{if ne .Id 0}}/{{.Id}}{{end}}" data-redirect="services" method="POST">
     <h4 class="mb-5 text-muted">Basic Information</h4>
     <div class="form-group row">
         <label for="service_name" class="col-sm-4 col-form-label">Service Name</label>
@@ -208,7 +204,7 @@
         </div>
         {{if ne .Id 0}}
         <div class="col-6">
-            <a href="/service/{{ .Id }}/delete_failures" data-method="GET" data-redirect="/service/{{ .Id }}" class="btn btn-danger btn-block confirm-btn">Delete All Failures</a>
+            <a href="service/{{ .Id }}/delete_failures" data-method="GET" data-redirect="/service/{{ .Id }}" class="btn btn-danger btn-block confirm-btn">Delete All Failures</a>
         </div>
         {{end}}
     </div>

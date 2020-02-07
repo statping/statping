@@ -86,7 +86,7 @@ func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	fakeNotifer, notif, err := notifier.SelectNotifier(method)
 	if err != nil {
 		log.Errorln(fmt.Sprintf("issue saving notifier %v: %v", method, err))
-		ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+		ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "settings")
 		return
 	}
 

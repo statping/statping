@@ -21,6 +21,12 @@
                 {{ range .Plugins }}
                     <a class="nav-link text-capitalize" id="v-pills-{{underscore .Name}}-tab" data-toggle="pill" href="#v-pills-{{underscore .Name}}" role="tab" aria-controls="v-pills-profile" aria-selected="false">{{.Name}}</a>
                 {{end}}
+
+                    <h6 class="mt-4 text-muted">Integrations (beta)</h6>
+                    {{ range .Integrations }}
+                        {{$i := .Get}}
+                        <a class="nav-link text-capitalize" id="v-pills-integration-{{underscore $i.ShortName}}-tab" data-toggle="pill" href="#v-pills-integration-{{underscore $i.ShortName}}" role="tab" aria-controls="v-pills-integration-{{underscore $i.ShortName}}" aria-selected="false">{{safe $i.Icon}} {{$i.Name}}</a>
+                    {{end}}
                 </div>
             </div>
             <div class="col-md-9 col-sm-12">
@@ -29,7 +35,7 @@
             {{end}}
                 <div class="tab-content" id="v-pills-tabContent">
                     <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
-                        <form method="POST" action="/settings">
+                        <form method="POST" action="settings">
                             <div class="form-group">
                                 <label for="project">Project Name</label>
                                 <input type="text" name="project" class="form-control" value="{{ .Name }}" id="project" placeholder="Great Uptime">
@@ -120,7 +126,7 @@
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control select-input" value="{{ .ApiSecret }}" id="api_secret" readonly>
                                     <small class="form-text text-muted">API Secret is used for read, create, update and delete routes</small>
-                                    <small class="form-text text-muted">You can <a class="confirm_btn" data-msg="Are you sure you want to reset the API keys?" href="/api/renew">Regenerate API Keys</a> if you need to.</small>
+                                    <small class="form-text text-muted">You can <a class="confirm_btn" data-msg="Are you sure you want to reset the API keys?" href="api/renew">Regenerate API Keys</a> if you need to.</small>
                                 </div>
                             </div>
 
@@ -131,7 +137,7 @@
 
                         <div class="card mt-2">
                             <div class="card-body">
-                                <form action="/settings/bulk_import" method="POST" enctype="multipart/form-data" class="form-inline">
+                                <form action="settings/bulk_import" method="POST" enctype="multipart/form-data" class="form-inline">
                                     <div class="form-group col-10">
                                         <input type="file" name="file" class="form-control-file" accept=".csv">
                                     </div>
@@ -150,7 +156,7 @@
                                     <img class="rounded text-center" width="300" height="300" src="https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl={{ QrAuth }}">
                                 </div>
                                 <a class="btn btn-sm btn-primary" href={{safeURL QrAuth}}>Open in Statping App</a>
-                                <a href="/settings/export" class="btn btn-sm btn-secondary">Export Settings</a>
+                                <a href="settings/export" class="btn btn-sm btn-secondary">Export Settings</a>
                             </div>
                             </div>
                         {{end}}
@@ -159,7 +165,7 @@
                     <div class="tab-pane" id="v-pills-notifications" role="tabpanel" aria-labelledby="v-pills-notifications-tab">
                         <h3>Notifications</h3>
 
-                        <form method="POST" action="/settings">
+                        <form method="POST" action="settings">
 
                             <div class="form-group">
                                 <div class="col-12">
@@ -186,11 +192,11 @@
                         <div class="jumbotron jumbotron-fluid">
                             <div class="text-center col-12">
                                 <h1 class="display-5">Enable Local Assets</h1>
-                                <span class="lead">Customize your status page design by enabling local assets. This will create a 'assets' directory containing all CSS.<p><a href="/settings/build" class="btn btn-primary mt-3"{{if USE_CDN}} disabled{{end}}>Enable Local Assets</a></p></span>
+                                <span class="lead">Customize your status page design by enabling local assets. This will create a 'assets' directory containing all CSS.<p><a href="settings/build" class="btn btn-primary mt-3"{{if USE_CDN}} disabled{{end}}>Enable Local Assets</a></p></span>
                             </div>
                         </div>
                     {{ else }}
-                        <form method="POST" action="/settings/css">
+                        <form method="POST" action="settings/css">
                             <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                                 <li class="nav-item col text-center">
                                     <a class="nav-link active" id="pills-vars-tab" data-toggle="pill" href="#pills-vars" role="tab" aria-controls="pills-vars" aria-selected="true">Variables</a>
@@ -214,7 +220,7 @@
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary btn-block mt-2">Save Style</button>
-                            <a href="/settings/delete_assets" class="btn btn-danger btn-block confirm-btn">Delete All Assets</a>
+                            <a href="settings/delete_assets" class="btn btn-danger btn-block confirm-btn">Delete All Assets</a>
                         </form>
                     {{end}}
                     </div>
@@ -239,7 +245,7 @@
                             {{end}}
                             </tbody>
                         </table>
-                        <a href="/api/clear_cache" class="btn btn-danger btn-block">Clear Cache</a>
+                        <a href="api/clear_cache" class="btn btn-danger btn-block">Clear Cache</a>
                     </div>
                 {{ range .Notifications }}
                 {{$n := .Select}}
@@ -261,13 +267,22 @@
                     </div>
                 {{ end }}
 
+
+                    {{ range .Integrations }}
+                        {{$i := .Get}}
+                        <div class="tab-pane fade" id="v-pills-integration-{{underscore $i.ShortName}}" role="tabpanel" aria-labelledby="v-pills-integration-{{underscore $i.ShortName}}-tab">
+                            {{template "form_integration" .}}
+                        </div>
+                    {{ end }}
+
+
                     <div class="tab-pane fade" id="v-pills-browse" role="tabpanel" aria-labelledby="v-pills-browse-tab">
                     {{ range .Repos }}
                         <div class="card col-6" style="width: 18rem;">
                             <div class="card-body">
                                 <h5 class="card-title">{{ .Name }}</h5>
                                 <p class="card-text">{{ .Description }}</p>
-                                <a href="/plugins/download/{{ .Name }}" class="card-link">Add</a>
+                                <a href="plugins/download/{{ .Name }}" class="card-link">Add</a>
                             </div>
                         </div>
                     {{ end }}
@@ -275,7 +290,7 @@
 
 
                     <div class="tab-pane fade" id="v-pills-backups" role="tabpanel" aria-labelledby="v-pills-backups-tab">
-                        <a href="/backups/create" class="btn btn-primary btn-block">Backup Database</a>
+                        <a href="backups/create" class="btn btn-primary btn-block">Backup Database</a>
                     </div>
 
                 {{ range .Plugins }}

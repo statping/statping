@@ -74,8 +74,8 @@ func init() {
 }
 
 func injectDatabase() {
-	utils.DeleteFile(dir + "/statup.db")
-	db, err := gorm.Open("sqlite3", dir+"/statup.db")
+	utils.DeleteFile(dir + "/notifiers.db")
+	db, err := gorm.Open("sqlite3", dir+"/notifiers.db")
 	if err != nil {
 		panic(err)
 	}

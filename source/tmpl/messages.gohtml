@@ -18,12 +18,12 @@
             {{range .}}
                 <tr id="message_{{.Id}}">
                     <td>{{.Title}}</td>
-                    <td class="d-none d-md-table-cell">{{if .Service}}<a href="/service/{{.Service.Id}}">{{.Service.Name}}</a>{{end}}</td>
+                    <td class="d-none d-md-table-cell">{{if .Service}}<a href="service/{{.Service.Id}}">{{.Service.Name}}</a>{{end}}</td>
                     <td class="d-none d-md-table-cell">{{ToString .StartOn}}</td>
                     <td class="text-right">
                         {{if Auth}}<div class="btn-group">
-                            <a href="/message/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-exclamation-triangle"></i> Edit</a>
-                            <a href="/api/messages/{{.Id}}" class="ajax_delete btn btn-danger" data-method="DELETE" data-obj="message_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>
+                            <a href="message/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-exclamation-triangle"></i> Edit</a>
+                            <a href="api/messages/{{.Id}}" class="ajax_delete btn btn-danger" data-method="DELETE" data-obj="message_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>
                         </div>{{end}}
                     </td>
                 </tr>
@@ -41,11 +41,11 @@
 </div>
 {{end}}
 {{define "extra_css"}}
-<link rel="stylesheet" href="/css/flatpickr.min.css">
+<link rel="stylesheet" href="css/flatpickr.min.css">
 {{end}}
 {{define "extra_scripts"}}
-<script src="/js/flatpickr.js"></script>
-<script src="/js/rangePlugin.js"></script>
+<script src="js/flatpickr.js"></script>
+<script src="js/rangePlugin.js"></script>
 <script>
 $(document).ready(function() {
     $("#start_on").flatpickr({

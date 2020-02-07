@@ -23,6 +23,7 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -43,9 +44,8 @@ var (
 	httpServer   *http.Server
 	usingSSL     bool
 	mainTmpl     = `{{define "main" }} {{ template "base" . }} {{ end }}`
-	templates    = []string{"base.gohtml", "head.gohtml", "nav.gohtml", "footer.gohtml", "scripts.gohtml", "form_service.gohtml", "form_notifier.gohtml", "form_group.gohtml", "form_user.gohtml", "form_checkin.gohtml", "form_message.gohtml"}
+	templates    = []string{"base.gohtml", "head.gohtml", "nav.gohtml", "footer.gohtml", "scripts.gohtml", "form_service.gohtml", "form_notifier.gohtml", "form_integration.gohtml", "form_group.gohtml", "form_user.gohtml", "form_checkin.gohtml", "form_message.gohtml"}
 	javascripts  = []string{"charts.js", "chart_index.js"}
-	mainTemplate *template.Template
 )
 
 // RunHTTPServer will start a HTTP server on a specific IP and port
@@ -104,17 +104,20 @@ func RunHTTPServer(ip string, port int) error {
 
 // IsReadAuthenticated will allow Read Only authentication for some routes
 func IsReadAuthenticated(r *http.Request) bool {
+	if core.SetupMode {
+		return false
+	}
 	var token string
 	query := r.URL.Query()
 	key := query.Get("api")
-	if subtle.ConstantTimeCompare([]byte(key), []byte(core.CoreApp.ApiKey)) == 1 {
+	if subtle.ConstantTimeCompare([]byte(key), []byte(core.CoreApp.ApiSecret)) == 1 {
 		return true
 	}
 	tokens, ok := r.Header["Authorization"]
 	if ok && len(tokens) >= 1 {
 		token = tokens[0]
 		token = strings.TrimPrefix(token, "Bearer ")
-		if subtle.ConstantTimeCompare([]byte(token), []byte(core.CoreApp.ApiKey)) == 1 {
+		if subtle.ConstantTimeCompare([]byte(token), []byte(core.CoreApp.ApiSecret)) == 1 {
 			return true
 		}
 	}
@@ -130,6 +133,9 @@ func IsFullAuthenticated(r *http.Request) bool {
 	if core.CoreApp == nil {
 		return true
 	}
+	if core.SetupMode {
+		return false
+	}
 	if sessionStore == nil {
 		return true
 	}
@@ -138,7 +144,7 @@ func IsFullAuthenticated(r *http.Request) bool {
 	if ok && len(tokens) >= 1 {
 		token = tokens[0]
 		token = strings.TrimPrefix(token, "Bearer ")
-		if subtle.ConstantTimeCompare([]byte(token), []byte(core.CoreApp.ApiKey)) == 1 {
+		if subtle.ConstantTimeCompare([]byte(token), []byte(core.CoreApp.ApiSecret)) == 1 {
 			return true
 		}
 	}
@@ -147,6 +153,9 @@ func IsFullAuthenticated(r *http.Request) bool {
 
 // IsAdmin returns true if the user session is an administrator
 func IsAdmin(r *http.Request) bool {
+	if core.SetupMode {
+		return false
+	}
 	session, err := sessionStore.Get(r, cookieKey)
 	if err != nil {
 		return false
@@ -159,6 +168,9 @@ func IsAdmin(r *http.Request) bool {
 
 // IsUser returns true if the user is registered
 func IsUser(r *http.Request) bool {
+	if core.SetupMode {
+		return false
+	}
 	if os.Getenv("GO_ENV") == "test" {
 		return true
 	}
@@ -172,23 +184,22 @@ func IsUser(r *http.Request) bool {
 	return session.Values["authenticated"].(bool)
 }
 
-func loadTemplate(w http.ResponseWriter, r *http.Request) error {
+func loadTemplate(w http.ResponseWriter, r *http.Request) (*template.Template, error) {
 	var err error
-	mainTemplate = template.New("main")
-	mainTemplate.Funcs(handlerFuncs(w, r))
+	mainTemplate := template.New("main")
 	mainTemplate, err = mainTemplate.Parse(mainTmpl)
 	if err != nil {
 		log.Errorln(err)
-		return err
+		return nil, err
 	}
-	// render all templates
 	mainTemplate.Funcs(handlerFuncs(w, r))
+	// render all templates
 	for _, temp := range templates {
 		tmp, _ := source.TmplBox.String(temp)
 		mainTemplate, err = mainTemplate.Parse(tmp)
 		if err != nil {
 			log.Errorln(err)
-			return err
+			return nil, err
 		}
 	}
 	// render all javascript files
@@ -197,22 +208,25 @@ func loadTemplate(w http.ResponseWriter, r *http.Request) error {
 		mainTemplate, err = mainTemplate.Parse(tmp)
 		if err != nil {
 			log.Errorln(err)
-			return err
+			return nil, err
 		}
 	}
-	return err
+	return mainTemplate, err
 }
 
 // ExecuteResponse will render a HTTP response for the front end user
 func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}, redirect interface{}) {
 	if url, ok := redirect.(string); ok {
-		http.Redirect(w, r, url, http.StatusSeeOther)
+		http.Redirect(w, r, path.Join(basePath, url), http.StatusSeeOther)
 		return
 	}
 	if usingSSL {
 		w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
 	}
-	loadTemplate(w, r)
+	mainTemplate, err := loadTemplate(w, r)
+	if err != nil {
+		log.Errorln(err)
+	}
 	render, err := source.TmplBox.String(file)
 	if err != nil {
 		log.Errorln(err)

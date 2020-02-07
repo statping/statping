@@ -27,7 +27,7 @@ import (
 
 func messagesHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsUser(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, basePath, http.StatusSeeOther)
 		return
 	}
 	messages, _ := core.SelectMessages()

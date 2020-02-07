@@ -18,7 +18,9 @@ package handlers
 import (
 	"bytes"
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/core/integrations"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
@@ -71,7 +73,7 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//notifiers.OnSettingsSaved(core.CoreApp.ToCore())
-	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "settings")
 }
 
 func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
@@ -84,7 +86,7 @@ func saveSASSHandler(w http.ResponseWriter, r *http.Request) {
 	source.SaveAsset([]byte(mobile), utils.Directory, "scss/mobile.scss")
 	source.CompileSASS(utils.Directory)
 	resetRouter()
-	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "settings")
 }
 
 func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
@@ -99,7 +101,7 @@ func saveAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Errorln("Default 'base.css' was inserted because SASS did not work.")
 	}
 	resetRouter()
-	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "settings")
 }
 
 func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
@@ -107,7 +109,7 @@ func deleteAssetsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Errorln(fmt.Errorf("error deleting all assets %v", err))
 	}
 	resetRouter()
-	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "settings")
 }
 
 func bulkImportHandler(w http.ResponseWriter, r *http.Request) {
@@ -142,6 +144,54 @@ func bulkImportHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ExecuteResponse(w, r, "settings.gohtml", core.CoreApp, "/settings")
+}
+
+type integratorOut struct {
+	Integrator *types.Integration `json:"integrator"`
+	Services   []*types.Service   `json:"services"`
+	Error      error
+}
+
+func integratorHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	integratorName := vars["name"]
+	r.ParseForm()
+
+	integrator, err := integrations.Find(integratorName)
+	if err != nil {
+		log.Errorln(err)
+		ExecuteResponse(w, r, "integrator.gohtml", integratorOut{
+			Error: err,
+		}, nil)
+		return
+	}
+
+	log.Info(r.PostForm)
+
+	for _, v := range integrator.Get().Fields {
+		log.Info(v.Name, v.Value)
+	}
+
+	integrations.SetFields(integrator, r.PostForm)
+
+	for _, v := range integrator.Get().Fields {
+		log.Info(v.Name, v.Value)
+	}
+
+	services, err := integrator.List()
+	if err != nil {
+		log.Errorln(err)
+		ExecuteResponse(w, r, "integrator.gohtml", integratorOut{
+			Integrator: integrator.Get(),
+			Error:      err,
+		}, nil)
+		return
+	}
+
+	ExecuteResponse(w, r, "integrator.gohtml", integratorOut{
+		Integrator: integrator.Get(),
+		Services:   services,
+	}, nil)
 }
 
 // commaToService will convert a CSV comma delimited string slice to a Service type

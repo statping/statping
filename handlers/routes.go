@@ -25,6 +25,7 @@ import (
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
+	"os"
 )
 
 var (
@@ -37,30 +38,45 @@ var (
 func Router() *mux.Router {
 	dir := utils.Directory
 	CacheStorage = NewStorage()
-	r := mux.NewRouter()
-	r.Handle("/", http.HandlerFunc(indexHandler))
+	r := mux.NewRouter().StrictSlash(true)
+
+	if os.Getenv("AUTH_USERNAME") != "" && os.Getenv("AUTH_PASSWORD") != "" {
+		authUser = os.Getenv("AUTH_USERNAME")
+		authPass = os.Getenv("AUTH_PASSWORD")
+		r.Use(basicAuthHandler)
+	}
+
+	if os.Getenv("BASE_PATH") != "" {
+		basePath = "/" + os.Getenv("BASE_PATH") + "/"
+		r = r.PathPrefix("/" + os.Getenv("BASE_PATH")).Subrouter()
+		r.Handle("", http.HandlerFunc(indexHandler))
+	} else {
+		r.Handle("/", http.HandlerFunc(indexHandler))
+	}
+
+	r.Use(sendLog)
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
-		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(dir+"/assets/css"))))
-		r.PathPrefix("/font/").Handler(http.StripPrefix("/font/", http.FileServer(http.Dir(dir+"/assets/font"))))
-		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir(dir+"/assets/js"))))
-		r.PathPrefix("/robots.txt").Handler(indexHandler)
-		r.PathPrefix("/favicon.ico").Handler(indexHandler)
-		r.PathPrefix("/banner.png").Handler(indexHandler)
+		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath+"css/", http.FileServer(http.Dir(dir+"/assets/css"))))
+		r.PathPrefix("/font/").Handler(http.StripPrefix(basePath+"font/", http.FileServer(http.Dir(dir+"/assets/font"))))
+		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath+"js/", http.FileServer(http.Dir(dir+"/assets/js"))))
+		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, indexHandler))
+		r.PathPrefix("/favicon.ico").Handler(http.StripPrefix(basePath, indexHandler))
+		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, indexHandler))
 	} else {
-		r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(source.CssBox.HTTPBox())))
-		r.PathPrefix("/font/").Handler(http.StripPrefix("/font/", http.FileServer(source.FontBox.HTTPBox())))
-		r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(source.JsBox.HTTPBox())))
-		r.PathPrefix("/robots.txt").Handler(http.FileServer(source.TmplBox.HTTPBox()))
-		r.PathPrefix("/favicon.ico").Handler(http.FileServer(source.TmplBox.HTTPBox()))
-		r.PathPrefix("/banner.png").Handler(http.FileServer(source.TmplBox.HTTPBox()))
+		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath+"css/", http.FileServer(source.CssBox.HTTPBox())))
+		r.PathPrefix("/font/").Handler(http.StripPrefix(basePath+"font/", http.FileServer(source.FontBox.HTTPBox())))
+		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath+"js/", http.FileServer(source.JsBox.HTTPBox())))
+		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
+		r.PathPrefix("/favicon.ico").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
+		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
 	}
 	r.Handle("/charts.js", http.HandlerFunc(renderServiceChartsHandler))
 	r.Handle("/setup", http.HandlerFunc(setupHandler)).Methods("GET")
 	r.Handle("/setup", http.HandlerFunc(processSetupHandler)).Methods("POST")
-	r.Handle("/dashboard", sendLog(dashboardHandler)).Methods("GET")
-	r.Handle("/dashboard", sendLog(loginHandler)).Methods("POST")
-	r.Handle("/logout", sendLog(logoutHandler))
+	r.Handle("/dashboard", http.HandlerFunc(dashboardHandler)).Methods("GET")
+	r.Handle("/dashboard", http.HandlerFunc(loginHandler)).Methods("POST")
+	r.Handle("/logout", http.HandlerFunc(logoutHandler))
 	r.Handle("/plugins/download/{name}", authenticated(pluginsDownloadHandler, true))
 	r.Handle("/plugins/{name}/save", authenticated(pluginSavedHandler, true)).Methods("POST")
 	r.Handle("/help", authenticated(helpHandler, true))
@@ -86,15 +102,25 @@ func Router() *mux.Router {
 	r.Handle("/settings/delete_assets", authenticated(deleteAssetsHandler, true)).Methods("GET")
 	r.Handle("/settings/export", authenticated(exportHandler, true)).Methods("GET")
 	r.Handle("/settings/bulk_import", authenticated(bulkImportHandler, true)).Methods("POST")
+	r.Handle("/settings/integrator/{name}", authenticated(integratorHandler, true)).Methods("POST")
 
 	// SERVICE Routes
 	r.Handle("/services", authenticated(servicesHandler, true)).Methods("GET")
 	r.Handle("/service/create", authenticated(createServiceHandler, true)).Methods("GET")
-	r.Handle("/service/{id}", sendLog(servicesViewHandler)).Methods("GET")
+	r.Handle("/service/{id}", http.HandlerFunc(servicesViewHandler)).Methods("GET")
 	r.Handle("/service/{id}/edit", authenticated(servicesViewHandler, true)).Methods("GET")
 	r.Handle("/service/{id}/delete_failures", authenticated(servicesDeleteFailuresHandler, true)).Methods("GET")
 
-	r.Handle("/group/{id}", sendLog(groupViewHandler)).Methods("GET")
+	r.Handle("/group/{id}", http.HandlerFunc(groupViewHandler)).Methods("GET")
+
+	// API Routes
+	r.Handle("/api", authenticated(apiIndexHandler, false))
+	r.Handle("/api/renew", authenticated(apiRenewHandler, false))
+	r.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
+
+	r.Handle("/api/integrations", authenticated(apiAllIntegrationsHandler, false)).Methods("GET")
+	r.Handle("/api/integrations/{name}", authenticated(apiIntegrationHandler, false)).Methods("GET")
+	r.Handle("/api/integrations/{name}", authenticated(apiIntegrationHandler, false)).Methods("POST")
 
 	// API GROUPS Routes
 	r.Handle("/api/groups", readOnly(apiAllGroupHandler, false)).Methods("GET")
@@ -103,11 +129,6 @@ func Router() *mux.Router {
 	r.Handle("/api/groups/{id}", authenticated(apiGroupUpdateHandler, false)).Methods("POST")
 	r.Handle("/api/groups/{id}", authenticated(apiGroupDeleteHandler, false)).Methods("DELETE")
 	r.Handle("/api/reorder/groups", authenticated(apiGroupReorderHandler, false)).Methods("POST")
-
-	// API Routes
-	r.Handle("/api", authenticated(apiIndexHandler, false))
-	r.Handle("/api/renew", authenticated(apiRenewHandler, false))
-	r.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
 
 	// API SERVICE Routes
 	r.Handle("/api/services", readOnly(apiAllServicesHandler, false)).Methods("GET")
@@ -152,7 +173,7 @@ func Router() *mux.Router {
 	r.Handle("/api/checkin/{api}", authenticated(apiCheckinHandler, false)).Methods("GET")
 	r.Handle("/api/checkin", authenticated(checkinCreateHandler, false)).Methods("POST")
 	r.Handle("/api/checkin/{api}", authenticated(checkinDeleteHandler, false)).Methods("DELETE")
-	r.Handle("/checkin/{api}", sendLog(checkinHitHandler))
+	r.Handle("/checkin/{api}", http.HandlerFunc(checkinHitHandler))
 
 	// Static Files Routes
 	r.PathPrefix("/files/postman.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
@@ -161,10 +182,10 @@ func Router() *mux.Router {
 
 	// API Generic Routes
 	r.Handle("/metrics", readOnly(prometheusHandler, false))
-	r.Handle("/health", sendLog(healthCheckHandler))
+	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
 	r.Handle("/.well-known/", http.StripPrefix("/.well-known/", http.FileServer(http.Dir(dir+"/.well-known"))))
 
-	r.NotFoundHandler = sendLog(error404Handler)
+	r.NotFoundHandler = http.HandlerFunc(error404Handler)
 	return r
 }
 

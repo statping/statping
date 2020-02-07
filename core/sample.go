@@ -17,8 +17,10 @@ package core
 
 import (
 	"fmt"
+	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
+	"sync"
 	"time"
 )
 
@@ -190,7 +192,7 @@ func insertSampleCheckins() error {
 	})
 	checkin2.Update()
 
-	checkTime := time.Now().Add(-24 * time.Hour)
+	checkTime := time.Now().UTC().Add(-24 * time.Hour)
 	for i := 0; i <= 60; i++ {
 		checkHit := ReturnCheckinHit(&types.CheckinHit{
 			Checkin:   checkin1.Id,
@@ -205,32 +207,35 @@ func insertSampleCheckins() error {
 
 // InsertSampleHits will create a couple new hits for the sample services
 func InsertSampleHits() error {
-
+	tx := hitsDB().Begin()
+	sg := new(sync.WaitGroup)
 	for i := int64(1); i <= 5; i++ {
-
+		sg.Add(1)
 		service := SelectService(i)
 		seed := time.Now().UnixNano()
-
 		log.Infoln(fmt.Sprintf("Adding %v sample hit records to service %v", SampleHits, service.Name))
 		createdAt := sampleStart
-
 		p := utils.NewPerlin(2., 2., 10, seed)
-
-		for hi := 0.; hi <= float64(SampleHits); hi++ {
-
-			latency := p.Noise1D(hi / 500)
-			createdAt = createdAt.Add(60 * time.Second)
-			hit := &types.Hit{
-				Service:   service.Id,
-				CreatedAt: createdAt,
-				Latency:   latency,
+		go func() {
+			defer sg.Done()
+			for hi := 0.; hi <= float64(SampleHits); hi++ {
+				latency := p.Noise1D(hi / 500)
+				createdAt = createdAt.Add(60 * time.Second)
+				hit := &types.Hit{
+					Service:   service.Id,
+					CreatedAt: createdAt,
+					Latency:   latency,
+				}
+				tx = tx.Create(&hit)
 			}
-			service.CreateHit(hit)
-
-		}
+		}()
 	}
-
-	return nil
+	sg.Wait()
+	err := tx.Commit().Error
+	if err != nil {
+		log.Errorln(err)
+	}
+	return err
 }
 
 // insertSampleCore will create a new Core for the seed
@@ -242,7 +247,7 @@ func insertSampleCore() error {
 		ApiSecret:   "samplesecret",
 		Domain:      "http://localhost:8080",
 		Version:     "test",
-		CreatedAt:   time.Now(),
+		CreatedAt:   time.Now().UTC(),
 		UseCdn:      types.NewNullBool(false),
 	}
 	query := coreDB().Create(core)
@@ -275,8 +280,8 @@ func insertMessages() error {
 		Title:       "Routine Downtime",
 		Description: "This is an example a upcoming message for a service!",
 		ServiceId:   1,
-		StartOn:     time.Now().Add(15 * time.Minute),
-		EndOn:       time.Now().Add(2 * time.Hour),
+		StartOn:     time.Now().UTC().Add(15 * time.Minute),
+		EndOn:       time.Now().UTC().Add(2 * time.Hour),
 	})
 	if _, err := m1.Create(); err != nil {
 		return err
@@ -311,7 +316,7 @@ func InsertLargeSampleData() error {
 	if err := insertMessages(); err != nil {
 		return err
 	}
-	createdOn := time.Now().Add((-24 * 90) * time.Hour).UTC()
+	createdOn := time.Now().UTC().Add((-24 * 90) * time.Hour)
 	s6 := ReturnService(&types.Service{
 		Name:           "JSON Lint",
 		Domain:         "https://jsonlint.com",
@@ -442,7 +447,7 @@ func InsertLargeSampleData() error {
 	s14.Create(false)
 	s15.Create(false)
 
-	var dayAgo = time.Now().Add((-24 * 90) * time.Hour)
+	var dayAgo = time.Now().UTC().Add((-24 * 90) * time.Hour)
 
 	insertHitRecords(dayAgo, 5450)
 
@@ -484,7 +489,7 @@ func insertHitRecords(since time.Time, amount int64) {
 			createdAt = createdAt.Add(1 * time.Minute)
 			hit := &types.Hit{
 				Service:   service.Id,
-				CreatedAt: createdAt,
+				CreatedAt: createdAt.UTC(),
 				Latency:   latency,
 			}
 			service.CreateHit(hit)
@@ -492,4 +497,100 @@ func insertHitRecords(since time.Time, amount int64) {
 
 	}
 
+}
+
+// TmpRecords is used for testing Statping. It will create a SQLite database file
+// with sample data and store it in the /tmp folder to be used by the tests.
+func TmpRecords(dbFile string) error {
+	var sqlFile = utils.Directory + "/" + dbFile
+	utils.CreateDirectory(utils.Directory + "/tmp")
+	var tmpSqlFile = utils.Directory + "/tmp/" + types.SqliteFilename
+	SampleHits = 480
+
+	var err error
+	CoreApp = NewCore()
+	CoreApp.Name = "Tester"
+	configs := &types.DbConfig{
+		DbConn:   "sqlite",
+		Project:  "Tester",
+		Location: utils.Directory,
+		SqlFile:  sqlFile,
+	}
+	log.Infoln("saving config.yml in: " + utils.Directory)
+	if configs, err = CoreApp.SaveConfig(configs); err != nil {
+		return err
+	}
+	log.Infoln("loading config.yml from: " + utils.Directory)
+	if configs, err = LoadConfigFile(utils.Directory); err != nil {
+		return err
+	}
+	log.Infoln("connecting to database")
+
+	exists := utils.FileExists(tmpSqlFile)
+	if exists {
+		log.Infoln(tmpSqlFile + " was found, copying the temp database to " + sqlFile)
+		if err := utils.DeleteFile(sqlFile); err != nil {
+			log.Infoln(sqlFile + " was not found")
+		}
+		if err := utils.CopyFile(tmpSqlFile, sqlFile); err != nil {
+			return err
+		}
+		log.Infoln("loading config.yml from: " + utils.Directory)
+
+		if err := CoreApp.Connect(false, utils.Directory); err != nil {
+			return err
+		}
+		log.Infoln("selecting the Core variable")
+		if _, err := SelectCore(); err != nil {
+			return err
+		}
+		log.Infoln("inserting notifiers into database")
+		if err := InsertNotifierDB(); err != nil {
+			return err
+		}
+		log.Infoln("loading all services")
+		if _, err := CoreApp.SelectAllServices(false); err != nil {
+			return err
+		}
+		if err := AttachNotifiers(); err != nil {
+			return err
+		}
+		CoreApp.Notifications = notifier.AllCommunications
+		return nil
+	}
+
+	log.Infoln(tmpSqlFile + " not found, creating a new database...")
+
+	if err := CoreApp.Connect(false, utils.Directory); err != nil {
+		return err
+	}
+	log.Infoln("creating database")
+	if err := CoreApp.CreateDatabase(); err != nil {
+		return err
+	}
+	log.Infoln("migrating database")
+	if err := CoreApp.MigrateDatabase(); err != nil {
+		return err
+	}
+	log.Infoln("insert large sample data into database")
+	if err := InsertLargeSampleData(); err != nil {
+		return err
+	}
+	log.Infoln("selecting the Core variable")
+	if CoreApp, err = SelectCore(); err != nil {
+		return err
+	}
+	log.Infoln("inserting notifiers into database")
+	if err := InsertNotifierDB(); err != nil {
+		return err
+	}
+	log.Infoln("loading all services")
+	if _, err := CoreApp.SelectAllServices(false); err != nil {
+		return err
+	}
+	log.Infoln("copying sql database file to: " + tmpSqlFile)
+	if err := utils.CopyFile(sqlFile, tmpSqlFile); err != nil {
+		return err
+	}
+	return err
 }

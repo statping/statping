@@ -1,0 +1,32 @@
+{{define "form_integration"}}
+{{$i := .Get}}
+<form class="integration_{{underscore $i.ShortName }}" action="settings/integrator/{{ $i.ShortName }}" method="POST">
+    <input type="hidden" name="integrator" class="form-control" value="{{ $i.ShortName }}">
+{{if $i.ShortName}}<h4 class="text-capitalize">{{$i.ShortName}}</h4>{{end}}
+{{if $i.Description}}<p class="small text-muted">{{safe $i.Description}}</p>{{end}}
+
+{{range $i.Fields}}
+    <div class="form-group">
+            <label class="text-capitalize" for="{{underscore .Name}}">{{.Name}}</label>
+        {{if eq .Type "textarea"}}
+            <textarea rows="3" class="form-control" name="{{underscore .Name}}" id="{{underscore .Name}}">{{ .Value }}</textarea>
+        {{else if eq .Type "text"}}
+            <input type="text" name="{{underscore .Name}}" class="form-control" value="{{ .Value }}" id="{{underscore .Name}}">
+        {{else if eq .Type "password"}}
+            <input type="password" name="{{underscore .Name}}" class="form-control" value="{{ .Value }}" id="{{underscore .Name}}">
+        {{else if eq .Type "integer"}}
+            <input type="number" name="{{underscore .Name}}" class="form-control" value="{{ .Value }}" id="{{underscore .Name}}">
+        {{else if eq .Type "file"}}
+            <input type="file" name="{{underscore .Name}}" class="form-control" value="{{ .Value }}" id="{{underscore .Name}}">
+        {{end}}
+        {{if .Description}}
+            <small class="form-text text-muted">{{safe .Description}}</small>
+        {{end}}
+    </div>
+{{end}}
+
+    <button type="submit" class="btn btn-block btn-info fetch_integrator">Fetch Services</button>
+
+    <div class="alert alert-danger d-none" id="integration_alerter" role="alert"></div>
+</form>
+{{end}}

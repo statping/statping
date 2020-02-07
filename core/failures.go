@@ -86,7 +86,7 @@ func (s *Service) LimitedCheckinFailures(amount int64) []*Failure {
 
 // Ago returns a human readable timestamp for a Failure
 func (f *Failure) Ago() string {
-	got, _ := timeago.TimeAgoWithTime(time.Now(), f.CreatedAt)
+	got, _ := timeago.TimeAgoWithTime(time.Now().UTC(), f.CreatedAt)
 	return got
 }
 
@@ -135,7 +135,7 @@ func (s *Service) TotalFailuresOnDate(ago time.Time) (uint64, error) {
 
 // TotalFailures24 returns the amount of failures for a service within the last 24 hours
 func (s *Service) TotalFailures24() (uint64, error) {
-	ago := time.Now().Add(-24 * time.Hour)
+	ago := time.Now().UTC().Add(-24 * time.Hour)
 	return s.TotalFailuresSince(ago)
 }
 
@@ -149,7 +149,7 @@ func (s *Service) TotalFailures() (uint64, error) {
 
 // FailuresDaysAgo returns the amount of failures since days ago
 func (s *Service) FailuresDaysAgo(days int) uint64 {
-	ago := time.Now().Add((-24 * time.Duration(days)) * time.Hour)
+	ago := time.Now().UTC().Add((-24 * time.Duration(days)) * time.Hour)
 	count, _ := s.TotalFailuresSince(ago)
 	return count
 }

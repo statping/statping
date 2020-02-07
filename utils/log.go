@@ -24,21 +24,17 @@ import (
 	"io"
 	"os"
 	"reflect"
-	"runtime"
 	"strings"
 	"sync"
 	"time"
 )
 
 var (
-	Log                = Logger.StandardLogger()
-	ljLogger           *lumberjack.Logger
-	LastLines          []*LogRow
-	LockLines          sync.Mutex
-	VerboseMode        int
-	callerInitOnce     sync.Once
-	logrusPackage      string
-	minimumCallerDepth = 1
+	Log         = Logger.StandardLogger()
+	ljLogger    *lumberjack.Logger
+	LastLines   []*logRow
+	LockLines   sync.Mutex
+	VerboseMode int
 )
 
 const logFilePath = "/logs/statping.log"
@@ -57,52 +53,13 @@ func (t *hook) Levels() []Logger.Level {
 	return Logger.AllLevels
 }
 
-// LogCaller retrieves the name of the first non-logrus calling function
-func LogCaller(min int) *runtime.Frame {
-	const maximumCallerDepth = 25
-	var minimumCallerDepth = min
-	// Restrict the lookback frames to avoid runaway lookups
-	pcs := make([]uintptr, maximumCallerDepth)
-	depth := runtime.Callers(minimumCallerDepth, pcs)
-	frames := runtime.CallersFrames(pcs[:depth])
-
-	// cache this package's fully-qualified name
-	callerInitOnce.Do(func() {
-		logrusPackage = getPackageName(runtime.FuncForPC(pcs[0]).Name())
-
-		fmt.Println("caller once", logrusPackage, minimumCallerDepth, frames)
-	})
-
-	for f, again := frames.Next(); again; f, again = frames.Next() {
-		fmt.Println(f.Func, f.File, f.Line)
-		return &f
-	}
-
-	// if we got here, we failed to find the caller's context
-	return nil
-}
-
-func getPackageName(f string) string {
-	for {
-		lastPeriod := strings.LastIndex(f, ".")
-		lastSlash := strings.LastIndex(f, "/")
-		if lastPeriod > lastSlash {
-			f = f[:lastPeriod]
-		} else {
-			break
-		}
-	}
-
-	return f
-}
-
 // ToFields accepts any amount of interfaces to create a new mapping for log.Fields. You will need to
 // turn on verbose mode by starting Statping with "-v". This function will convert a struct of to the
 // base struct name, and each field into it's own mapping, for example:
 // type "*types.Service", on string field "Name" converts to "service_name=value". There is also an
 // additional field called "_pointer" that will return the pointer hex value.
 func ToFields(d ...interface{}) map[string]interface{} {
-	if VerboseMode == 1 {
+	if !Log.IsLevelEnabled(Logger.DebugLevel) {
 		return nil
 	}
 	fieldKey := make(map[string]interface{})
@@ -150,22 +107,15 @@ func replaceVal(d interface{}) interface{} {
 
 // createLog will create the '/logs' directory based on a directory
 func createLog(dir string) error {
-	var err error
-	_, err = os.Stat(dir + "/logs")
-	if err != nil {
-		if os.IsNotExist(err) {
-			os.Mkdir(dir+"/logs", 0777)
-		} else {
-			return err
-		}
+	if !FolderExists(dir + "/logs") {
+		CreateDirectory(dir + "/logs")
 	}
-	return err
+	return nil
 }
 
 // InitLogs will create the '/logs' directory and creates a file '/logs/statup.log' for application logging
 func InitLogs() error {
-	err := createLog(Directory)
-	if err != nil {
+	if err := createLog(Directory); err != nil {
 		return err
 	}
 	ljLogger = &lumberjack.Logger{
@@ -181,22 +131,33 @@ func InitLogs() error {
 		ForceColors:   true,
 		DisableColors: false,
 	})
-	Log.AddHook(new(hook))
-	Log.SetNoLock()
+	checkVerboseMode()
 
-	if VerboseMode == 1 {
+	LastLines = make([]*logRow, 0)
+	return nil
+}
+
+// checkVerboseMode will reset the Logging verbose setting. You can set
+// the verbose level with "-v 3" or by setting VERBOSE=3 environment variable.
+// statping -v 1 (only Warnings)
+// statping -v 2 (Info and Warnings, default)
+// statping -v 3 (Info, Warnings and Debug)
+// statping -v 4 (Info, Warnings, Debug and Traces (SQL queries))
+func checkVerboseMode() {
+	switch VerboseMode {
+	case 1:
 		Log.SetLevel(Logger.WarnLevel)
-	} else if VerboseMode == 2 {
+	case 2:
 		Log.SetLevel(Logger.InfoLevel)
-	} else if VerboseMode == 3 {
+	case 3:
 		Log.SetLevel(Logger.DebugLevel)
-	} else {
+	case 4:
 		Log.SetReportCaller(true)
 		Log.SetLevel(Logger.TraceLevel)
+	default:
+		Log.SetLevel(Logger.InfoLevel)
 	}
-
-	LastLines = make([]*LogRow, 0)
-	return err
+	Log.Debugf("logging running in %v mode", Log.GetLevel().String())
 }
 
 // CloseLogs will close the log file correctly on shutdown
@@ -217,7 +178,7 @@ func pushLastLine(line interface{}) {
 }
 
 // GetLastLine returns 1 line for a recent log entry
-func GetLastLine() *LogRow {
+func GetLastLine() *logRow {
 	LockLines.Lock()
 	defer LockLines.Unlock()
 	if len(LastLines) > 0 {
@@ -226,19 +187,19 @@ func GetLastLine() *LogRow {
 	return nil
 }
 
-type LogRow struct {
+type logRow struct {
 	Date time.Time
 	Line interface{}
 }
 
-func newLogRow(line interface{}) (logRow *LogRow) {
-	logRow = new(LogRow)
-	logRow.Date = time.Now()
-	logRow.Line = line
+func newLogRow(line interface{}) (lgRow *logRow) {
+	lgRow = new(logRow)
+	lgRow.Date = time.Now()
+	lgRow.Line = line
 	return
 }
 
-func (o *LogRow) lineAsString() string {
+func (o *logRow) lineAsString() string {
 	switch v := o.Line.(type) {
 	case string:
 		return v
@@ -250,6 +211,6 @@ func (o *LogRow) lineAsString() string {
 	return ""
 }
 
-func (o *LogRow) FormatForHtml() string {
+func (o *logRow) FormatForHtml() string {
 	return fmt.Sprintf("%s: %s", o.Date.Format("2006-01-02 15:04:05"), o.lineAsString())
 }
