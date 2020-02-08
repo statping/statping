@@ -40,8 +40,12 @@ class Api {
     return axios.get('/api/services/'+id+'/data?start=' + start + '&end=' + end + '&group=' + group).then(response => (response.data))
   }
 
-  async service_failures (id, start, end) {
-    return axios.get('/api/services/'+id+'/failures?start=' + start + '&end=' + end).then(response => (response.data))
+    async service_heatmap (id, start, end, group) {
+        return axios.get('/api/services/'+id+'/heatmap?start=' + start + '&end=' + end + '&group=' + group).then(response => (response.data))
+    }
+
+  async service_failures (id, start, end, limit=999, offset=0) {
+    return axios.get('/api/services/'+id+'/failures?start=' + start + '&end=' + end + '&limit=' + limit).then(response => (response.data))
   }
 
   async service_delete (id) {

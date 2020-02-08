@@ -12,42 +12,38 @@
         </div>
 
         <div class="col-12 full-col-12">
-
             <div v-for="(service, index) in $store.getters.services" :ref="service.id" v-bind:key="index">
                 <ServiceBlock :service=service />
             </div>
-
         </div>
+
+
     </div>
 </template>
 
 <script>
 import Api from '../components/API';
+import Group from '../components/Index/Group';
+import Header from '../components/Index/Header';
+import MessageBlock from '../components/Index/MessageBlock';
+import ServiceBlock from '../components/Service/ServiceBlock';
 
-const Header = () => import("@/components/Index/Header");
-const ServiceBlock = () => import("@/components/Service/ServiceBlock.vue");
-const MessageBlock = () => import("@/components/Index/MessageBlock");
-const Group = () => import("@/components/Index/Group");
 
 export default {
   name: 'Index',
   components: {
-    Header,
-    Group,
-    MessageBlock,
-    ServiceBlock,
+      ServiceBlock,
+      MessageBlock,
+      Group,
+      Header
   },
   data () {
     return {
-
+        logged_in: false
     }
   },
   async created() {
-      const core = await Api.core()
-      this.$store.commit("setCore", core);
-      if (!core.setup) {
-          this.$router.push('/setup')
-      }
+      this.logged_in = this.loggedIn()
   },
   async mounted() {
 
@@ -69,4 +65,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity .5s;
+    }
+    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+        opacity: 0;
+    }
 </style>

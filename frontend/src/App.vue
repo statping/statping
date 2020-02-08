@@ -1,11 +1,12 @@
 <template>
   <div id="app">
-    <router-view/>
-      <Footer version="DEV" v-if="$route.path !== '/setup'"/>
+    <router-view :loaded="loaded"/>
+      <Footer :version="version" v-if="$route.path !== '/setup'"/>
   </div>
 </template>
 
 <script>
+  import Api from './components/API';
   import Footer from "./components/Footer";
 
   export default {
@@ -15,26 +16,26 @@
   },
   data () {
     return {
-      loaded: false
+      loaded: false,
+        version: "",
+        logged_in: false,
     }
   },
-    async mounted() {
-      if (this.$route.path !== '/setup') {
-        const tk = JSON.parse(localStorage.getItem("statping_user"))
-        if (tk.token) {
-          await this.$store.dispatch('loadAdmin')
-          this.loaded = true
-          return
-        }
-        if (!this.$store.getters.hasPublicData) {
+      async created() {
           await this.$store.dispatch('loadRequired')
-        }
-      }
+          this.loaded = true
+          window.console.log('finished loadRequired')
+      },
+    async mounted() {
+          if (this.$route.path !== '/setup') {
+              const tk = localStorage.getItem("statping_user")
+              if (tk) {
+                  // await this.$store.dispatch('loadAdmin')
+              }
+          }
     },
     methods: {
-      async setAllObjects () {
-        this.loaded = true
-      }
+
     }
 }
 </script>

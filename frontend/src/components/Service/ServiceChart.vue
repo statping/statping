@@ -40,21 +40,10 @@
   async created() {
     await this.chartHits()
   },
-  methods: {
-    async chartHits() {
-      const start = this.ago(3600 * 24)
-      this.data = await Api.service_hits(this.service.id, start, this.now(), "hour")
-      this.series = [{
-        name: this.service.name,
-        ...this.data
-      }]
-      this.ready = true
-    }
-  },
   data () {
     return {
       ready: false,
-      data: null,
+      data: [],
       chartOptions: {
         chart: {
           height: 210,
@@ -115,22 +104,33 @@
             show: false
           },
           fill: {
-            colors: [this.service.online ? "#48d338" : "#d3132a"],
+            colors: [this.service.online ? "#48d338" : "#dd3545"],
             opacity: 1,
             type: 'solid'
           },
           stroke: {
-            show: true,
+            show: false,
             curve: 'smooth',
             lineCap: 'butt',
-            colors: [this.service.online ? "#3aa82d" : "#a40f21"],
+            colors: [this.service.online ? "#3aa82d" : "#dd3545"],
           }
         },
       series: [{
         data: []
       }]
     }
-  }
+  },
+      methods: {
+          async chartHits() {
+              const start = this.ago((3600 * 24) * 7)
+              this.data = await Api.service_hits(this.service.id, start, this.now(), "hour")
+              this.series = [{
+                  name: this.service.name,
+                  ...this.data
+              }]
+              this.ready = true
+          }
+      },
 }
 </script>
 

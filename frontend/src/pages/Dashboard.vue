@@ -1,11 +1,12 @@
 <template>
     <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
         <TopNav/>
-        <router-view></router-view>
+        <router-view/>
     </div>
 </template>
 
 <script>
+    import Api from "../components/API"
   import TopNav from "../components/Dashboard/TopNav";
 
   export default {
@@ -17,7 +18,13 @@
     return {
       authenticated: false
     }
-  }
+  },
+      async mounted() {
+          const core = await Api.core()
+          if (!core.logged_in) {
+              this.$router.push('/login')
+          }
+      },
 }
 </script>
 

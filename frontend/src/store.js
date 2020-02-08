@@ -16,18 +16,18 @@ export const GET_NOTIFIERS = 'GET_NOTIFIERS'
 export const GET_USERS = 'GET_USERS'
 
 export default new Vuex.Store({
-    state: {
-        hasAllData: false,
-        hasPublicData: false,
-        core: {},
-        token: null,
-        services: [],
-        groups: [],
-        messages: [],
-        users: [],
-        notifiers: [],
-        integrations: []
-    },
+        state: {
+            hasAllData: false,
+            hasPublicData: false,
+            core: {},
+            token: null,
+            services: [],
+            groups: [],
+            messages: [],
+            users: [],
+            notifiers: [],
+            integrations: []
+        },
     getters: {
         hasAllData: state => state.hasAllData,
         hasPublicData: state => state.hasPublicData,
@@ -45,7 +45,7 @@ export default new Vuex.Store({
         groupsClean: state => state.groups.filter(g => g.name !== '').sort((a, b) => a.order_id - b.order_id),
 
         serviceById: (state) => (id) => {
-            return state.services.find(s => s.id === id)
+            return state.services.find(s => s.id == id)
         },
         serviceByPermalink: (state) => (permalink) => {
             return state.services.find(s => s.permalink === permalink)
@@ -108,13 +108,22 @@ export default new Vuex.Store({
         async loadRequired (context) {
             const core = await Api.core()
             context.commit("setCore", core);
-            const services = await Api.services()
-            context.commit("setServices", services);
             const groups = await Api.groups()
             context.commit("setGroups", groups);
+            const services = await Api.services()
+            context.commit("setServices", services);
             const messages = await Api.messages()
             context.commit("setMessages", messages)
             context.commit("setHasPublicData", true)
+            // if (core.logged_in) {
+            //     const notifiers = await Api.notifiers()
+            //     context.commit("setNotifiers", notifiers);
+            //     const users = await Api.users()
+            //     context.commit("setUsers", users);
+            //     const integrations = await Api.integrations()
+            //     context.commit("setIntegrations", integrations);
+            // }
+            window.console.log('finished loading required data')
         },
         async loadAdmin (context) {
             await context.dispatch('loadRequired')

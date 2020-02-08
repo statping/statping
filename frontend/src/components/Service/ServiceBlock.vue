@@ -1,10 +1,10 @@
 <template>
-    <div class="mb-4" id="service_id_1">
+    <div class="mb-4">
         <div class="card">
             <div class="card-body">
                 <div class="col-12">
                     <h4 class="mt-3">
-                        <router-link :to="`/service/${service.id}`">{{service.name}}</router-link>
+                        <router-link :to="serviceLink(service)" :in_service="service">{{service.name}}</router-link>
                         <span class="badge float-right" :class="{'bg-success': service.online, 'bg-danger': !service.online}">{{service.online ? "ONLINE" : "OFFLINE"}}</span>
                     </h4>
 
@@ -47,9 +47,9 @@
 </template>
 
 <script>
-  import ServiceChart from "./ServiceChart";
+import ServiceChart from "./ServiceChart";
 
-  export default {
+export default {
   name: 'ServiceBlock',
   components: {ServiceChart},
   props: {

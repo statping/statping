@@ -22,13 +22,13 @@
         </ul>
         <div class="tab-content" id="pills-tabContent">
             <div class="tab-pane show" :class="{active: tab === 'vars'}" id="pills-vars" role="tabpanel" aria-labelledby="pills-vars-tab">
-                <codemirror v-if="loaded && tab === 'vars'" v-model="vars" :options="cmOptions" class="codemirrorInput"/>
+                <codemirror v-if="loaded && tab === 'vars'" v-model="vars" ref="vars" :options="cmOptions" class="codemirrorInput"/>
             </div>
             <div class="tab-pane show" :class="{active: tab === 'base'}" id="pills-base" role="tabpanel" aria-labelledby="pills-base-tab">
-                <codemirror v-if="loaded && tab === 'base'" v-model="base" :options="cmOptions" class="codemirrorInput"/>
+                <codemirror v-if="loaded && tab === 'base'" v-model="base" ref="base" :options="cmOptions" class="codemirrorInput"/>
             </div>
             <div class="tab-pane show" :class="{active: tab === 'mobile'}" id="pills-mobile" role="tabpanel" aria-labelledby="pills-mobile-tab">
-                <codemirror v-if="loaded && tab === 'mobile'" v-model="mobile" :options="cmOptions" class="codemirrorInput"/>
+                <codemirror v-if="loaded && tab === 'mobile'" v-model="mobile" ref="mobile" :options="cmOptions" class="codemirrorInput"/>
             </div>
         </div>
         <div v-if="error" class="alert alert-danger mt-3" style="white-space: pre-line;">{{error}}</div>
@@ -93,6 +93,7 @@
       },
       async mounted () {
           await this.fetchTheme()
+          this.changeTab('vars')
       },
       methods: {
           async fetchTheme() {
@@ -111,7 +112,6 @@
           async createAssets() {
               this.pending = true
               const resp = await Api.theme_generate(true)
-              window.console.log(resp)
               this.pending = false
               await this.fetchTheme()
           },
@@ -120,7 +120,6 @@
               let c = confirm('Are you sure you want to delete all local assets?')
               if (c) {
                   const resp = await Api.theme_generate(false)
-                  window.console.log(resp)
                   await this.fetchTheme()
               }
               this.pending = false
@@ -142,6 +141,13 @@
           },
           changeTab (v) {
               this.tab = v
+              if (v === 'base') {
+                  this.$refs.base.codemirror.refresh();
+              } else if (v === 'vars') {
+                  this.$refs.vars.codemirror.refresh();
+              } else if (v === 'mobile') {
+                  this.$refs.mobile.codemirror.refresh();
+              }
           }
       }
   }

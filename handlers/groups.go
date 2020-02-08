@@ -25,21 +25,6 @@ import (
 	"net/http"
 )
 
-func groupViewHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	var group *core.Group
-	id := vars["id"]
-	group = core.SelectGroup(utils.ToInt(id))
-
-	if group == nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	ExecuteResponse(w, r, "group.gohtml", group, nil)
-}
-
 // apiAllGroupHandler will show all the groups
 func apiAllGroupHandler(r *http.Request) interface{} {
 	auth, admin := IsUser(r), IsAdmin(r)

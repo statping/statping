@@ -5,7 +5,7 @@
                 <img class="col-12 mt-5 mt-md-0" src="/public/banner.png">
             </div>
 
-            <form @submit="login">
+            <form @submit.prevent="login">
                 <div class="form-group row">
                     <label for="username" class="col-sm-2 col-form-label">Username</label>
                     <div class="col-sm-10">
@@ -20,7 +20,7 @@
                 </div>
                 <div class="form-group row">
                     <div class="col-sm-12">
-                        <button @click="login" type="submit" class="btn btn-block mb-3" :class="{'btn-primary': !loading, 'btn-default': loading}" v-bind:disabled="loading">
+                        <button @click.prevent="login" type="submit" class="btn btn-block mb-3 btn-primary" :disabled="loading">
                             {{loading ? "Loading" : "Sign in"}}
                         </button>
                         <div v-if="error" class="alert alert-danger" role="alert">
@@ -52,7 +52,6 @@
   },
   methods: {
     async login (e) {
-      e.preventDefault();
       this.loading = true
       this.error = false
       const auth = await Api.login(this.username, this.password)

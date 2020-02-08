@@ -32,8 +32,15 @@
   },
     data () {
       return {
+
       }
     },
+      computed: {
+
+      },
+      async created() {
+
+      },
     methods: {
         failuresLast24Hours() {
             let total = 0;

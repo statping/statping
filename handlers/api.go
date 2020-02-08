@@ -38,6 +38,12 @@ type apiResponse struct {
 
 func apiIndexHandler(r *http.Request) interface{} {
 	coreClone := *core.CoreApp
+	var loggedIn bool
+	_, err := getJwtToken(r)
+	if err == nil {
+		loggedIn = true
+	}
+	coreClone.LoggedIn = loggedIn
 	return *coreClone.ToCore()
 }
 

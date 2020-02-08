@@ -43,6 +43,7 @@ type Core struct {
 	UseCdn        NullBool           `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`
 	UpdateNotify  NullBool           `gorm:"column:update_notify;default:true" json:"update_notify,omitempty"`
 	Timezone      float32            `gorm:"column:timezone;default:-8.0" json:"timezone,omitempty"`
+	LoggedIn      bool               `gorm:"-" json:"logged_in"`
 	CreatedAt     time.Time          `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt     time.Time          `gorm:"column:updated_at" json:"updated_at"`
 	Started       time.Time          `gorm:"-" json:"started_on"`

@@ -6,6 +6,7 @@
                 <tr>
                     <th scope="col">Username</th>
                     <th scope="col">Type</th>
+                    <th scope="col">Last Login</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -15,10 +16,11 @@
                 <td>{{user.username}}</td>
                 <td v-if="user.admin"><span class="badge badge-danger">ADMIN</span></td>
                 <td v-if="!user.admin"><span class="badge badge-primary">USER</span></td>
+                <td>{{toLocal(user.updated_at)}}</td>
                 <td class="text-right">
                     <div class="btn-group">
                         <a @click.prevent="editUser(user, edit)" href="" class="btn btn-outline-secondary"><font-awesome-icon icon="user" /> Edit</a>
-                        <a v-if="index !== 0" @click.prevent="deleteUser(user)" href="" class="btn btn-danger"><font-awesome-icon icon="times" /></a>
+                        <a @click.prevent="deleteUser(user)" v-if="index !== 0" href="" class="btn btn-danger"><font-awesome-icon icon="times" /></a>
                     </div>
                 </td>
             </tr>

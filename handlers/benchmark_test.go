@@ -17,25 +17,24 @@ package handlers
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"testing"
 )
 
 func BenchmarkHandleIndex(b *testing.B) {
-	b.ReportAllocs()
-	r := request(b, "/")
-	for i := 0; i < b.N; i++ {
-		rw := httptest.NewRecorder()
-		indexHandler(rw, r)
-	}
+	//b.ReportAllocs()
+	//r := request(b, "/")
+	//for i := 0; i < b.N; i++ {
+	//	rw := httptest.NewRecorder()
+	//	indexHandler(rw, r)
+	//}
 }
 
 func BenchmarkServicesHandlerIndex(b *testing.B) {
-	r := request(b, "/")
-	for i := 0; i < b.N; i++ {
-		rw := httptest.NewRecorder()
-		servicesHandler(rw, r)
-	}
+	//r := request(b, "/")
+	//for i := 0; i < b.N; i++ {
+	//	rw := httptest.NewRecorder()
+	//	servicesHandler(rw, r)
+	//}
 }
 
 func request(t testing.TB, url string) *http.Request {

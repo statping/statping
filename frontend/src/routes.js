@@ -77,14 +77,14 @@ const routes = [
 ];
 
 const router = new VueRouter({
-  mode: 'history',
-  routes
+    mode: 'history',
+    routes
 })
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    const tk = Api.token()
-    if (to.path !== '/login' && !tk.token) {
+      let item = localStorage.getItem("statping_user")
+    if (to.path !== '/login' && !item) {
       next('/login')
       return
     }

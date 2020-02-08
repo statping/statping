@@ -103,6 +103,8 @@ func AuthUser(username, password string) (*User, bool) {
 		return nil, false
 	}
 	if CheckHash(password, user.Password) {
+		user.UpdatedAt = time.Now().UTC()
+		user.Update()
 		return user, true
 	}
 	return nil, false

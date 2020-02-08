@@ -30,31 +30,6 @@ import (
 	"time"
 )
 
-func dashboardHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsUser(r) {
-		err := core.ErrorResponse{}
-		ExecuteResponse(w, r, "login.gohtml", err, nil)
-	} else {
-		ExecuteResponse(w, r, "dashboard.gohtml", core.CoreApp, nil)
-	}
-}
-
-func loginHandler(w http.ResponseWriter, r *http.Request) {
-	form := parseForm(r)
-	username := form.Get("username")
-	password := form.Get("password")
-	user, auth := core.AuthUser(username, password)
-	if auth {
-		claim, stt := setJwtToken(user, w)
-		fmt.Println(claim.Username, stt)
-		utils.Log.Infoln(fmt.Sprintf("User %v logged in from IP %v", user.Username, r.RemoteAddr))
-		http.Redirect(w, r, basePath+"dashboard", http.StatusSeeOther)
-	} else {
-		err := core.ErrorResponse{Error: "Incorrect login information submitted, try again."}
-		ExecuteResponse(w, r, "login.gohtml", err, nil)
-	}
-}
-
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	removeJwtToken(w)
 	http.Redirect(w, r, basePath, http.StatusSeeOther)

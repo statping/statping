@@ -7,7 +7,7 @@
                 {{service.online ? "ONLINE" : "OFFLINE"}}
             </span>
 
-            <h4 class="mt-2"><a href="/">{{$store.getters.core.name}}</a> - {{service.name}}
+            <h4 class="mt-2"><router-link to="/">{{$store.getters.core.name}}</router-link> - {{service.name}}
                 <span class="badge float-right d-none d-md-block" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
                     {{service.online ? "ONLINE" : "OFFLINE"}}
                 </span>
@@ -32,11 +32,11 @@
                 <MessageBlock :message="message"/>
             </div>
 
-            <div class="service-chart-container">
+            <div v-if="series" class="service-chart-container">
                 <apexchart width="100%" height="420" type="area" :options="chartOptions" :series="series"></apexchart>
             </div>
 
-            <div class="service-chart-heatmap">
+            <div v-if="series" class="service-chart-heatmap">
                 <apexchart width="100%" height="215" type="heatmap" :options="chartOptions" :series="series"></apexchart>
             </div>
 
@@ -224,21 +224,21 @@ export default {
       },
       series: [{
         data: []
-      }]
+      }],
+        heatmap_data: []
     }
   },
-    async created() {
-        await this.$store.dispatch('loadRequired')
-    },
     async mounted() {
-      const id = this.$route.params.id
+      const id = this.$attrs.id
+        this.id = id
       let service;
       if (this.isInt(id)) {
-        service = await Api.service(id)
+        service = this.$store.getters.serviceById(id)
       } else {
-        service = this.$store.getters.serviceByPermalink(this.id)
+        service = this.$store.getters.serviceByPermalink(id)
       }
-      await this.getService(service)
+        this.service = service
+        this.getService(service)
         this.messages = this.$store.getters.serviceMessages(service.id)
     },
   methods: {
@@ -248,8 +248,8 @@ export default {
           return start && end
       },
     async getService(s) {
-        this.service = await Api.service(s.id)
         await this.chartHits()
+        await this.heatmapData()
         await this.serviceFailures()
     },
     async serviceFailures() {
@@ -262,7 +262,15 @@ export default {
         ...this.data
       }]
       this.ready = true
-    }
+    },
+      async heatmapData() {
+          this.data = await Api.service_heatmap(this.service.id, 0, 99999999999, "hour")
+          this.series = [{
+              name: this.service.name,
+              ...this.data
+          }]
+          this.ready = true
+      }
   }
 }
 </script>
