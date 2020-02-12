@@ -1,9 +1,9 @@
-FROM golang:1.13.5-alpine as base
+FROM golang:1.13.5 as base
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG VERSION
-RUN apk add --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers wget curl jq libsass
-RUN curl -L -s https://assets.statping.com/sass -o /usr/local/bin/sass && \
-    chmod +x /usr/local/bin/sass
+RUN apt-get update \
+ && apt-get install -y binutils-gold gcc g++ make git ca-certificates wget curl jq libsass-dev sassc \
+ && rm /var/lib/apt/lists/* -fR
 WORKDIR /go/src/github.com/hunterlong/statping
 ADD Makefile go.mod /go/src/github.com/hunterlong/statping/
 RUN go mod vendor && \
@@ -12,16 +12,17 @@ ADD . /go/src/github.com/hunterlong/statping
 RUN make install
 
 # Statping :latest Docker Image
-FROM alpine:latest
+FROM debian:buster
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 
 ARG VERSION
 ENV IS_DOCKER=true
 ENV STATPING_DIR=/app
 ENV PORT=8080
-RUN apk --no-cache add curl jq libsass
+RUN apt-get update \
+ && apt-get install -y curl jq sassc \
+ && rm /var/lib/apt/lists/* -fR
 
-COPY --from=base /usr/local/bin/sass /usr/local/bin/sass
 COPY --from=base /go/bin/statping /usr/local/bin/statping
 
 WORKDIR /app

@@ -88,7 +88,7 @@ watch:
 
 # compile assets using SASS and Rice. compiles scss -> css, and run rice embed-go
 compile: generate
-	sass source/scss/base.scss source/css/base.css
+	sassc source/scss/base.scss source/css/base.css
 	cd source && rice embed-go
 	rm -rf .sass-cache
 
