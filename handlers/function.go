@@ -12,6 +12,10 @@ import (
 	"time"
 )
 
+var (
+	basePath = "/"
+)
+
 var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap {
 	return template.FuncMap{
 		"js": func(html interface{}) template.JS {
@@ -88,7 +92,7 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 			return utils.UnderScoreString(html)
 		},
 		"URL": func() string {
-			return r.URL.String()
+			return basePath + r.URL.String()
 		},
 		"CHART_DATA": func() string {
 			return ""
@@ -144,6 +148,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		},
 		"NewGroup": func() *types.Group {
 			return new(types.Group)
+		},
+		"BasePath": func() string {
+			return basePath
 		},
 	}
 }

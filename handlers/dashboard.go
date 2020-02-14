@@ -24,7 +24,6 @@ import (
 	"github.com/hunterlong/statping/utils"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 func dashboardHandler(w http.ResponseWriter, r *http.Request) {
@@ -50,8 +49,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		session.Values["user_id"] = user.Id
 		session.Values["admin"] = user.Admin.Bool
 		session.Save(r, w)
-		utils.Log(1, fmt.Sprintf("User %v logged in from IP %v", user.Username, r.RemoteAddr))
-		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
+		utils.Log.Infoln(fmt.Sprintf("User %v logged in from IP %v", user.Username, r.RemoteAddr))
+		http.Redirect(w, r, basePath+"dashboard", http.StatusSeeOther)
 	} else {
 		err := core.ErrorResponse{Error: "Incorrect login information submitted, try again."}
 		ExecuteResponse(w, r, "login.gohtml", err, nil)
@@ -64,12 +63,12 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	session.Values["admin"] = false
 	session.Values["user_id"] = 0
 	session.Save(r, w)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, basePath, http.StatusSeeOther)
 }
 
 func helpHandler(w http.ResponseWriter, r *http.Request) {
 	if !IsUser(r) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, basePath, http.StatusSeeOther)
 		return
 	}
 	help := source.HelpMarkdown()
@@ -115,6 +114,6 @@ func exportHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Length", strconv.Itoa(fileSize))
 	w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
 
-	http.ServeContent(w, r, "export.json", time.Now(), bytes.NewReader(export))
+	http.ServeContent(w, r, "export.json", utils.Now(), bytes.NewReader(export))
 
 }

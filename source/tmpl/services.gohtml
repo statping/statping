@@ -4,8 +4,19 @@
 {{template "nav"}}
 
     <div class="col-12">
+        {{if eq (len CoreApp.Services) 0}}
+            <div class="jumbotron jumbotron-fluid">
+                <div class="text-center">
+                    <h1 class="display-4">No Services!</h1>
+                    <a class="lead">You don't have any websites or applications being monitored by your Statping server. <p><a href="service/create" class="btn btn-secondary mt-3">Add Service</a></p></p>
+                </div>
+            </div>
+        {{end}}
+
         {{if ne (len .Services) 0}}
-        <h3>Services</h3>
+        <h1 class="text-black-50">Services <a href="service/create" class="btn btn-outline-success mt-1 float-right">
+                <i class="fas fa-plus"></i> Create</a>
+        </h1>
         <table class="table">
             <thead>
             <tr>
@@ -21,14 +32,14 @@
             <tr id="service_{{.Id}}" data-id="{{.Id}}">
                 <td><span class="drag_icon d-none d-md-inline"><i class="fas fa-bars"></i></span> {{.Name}}</td>
                 <td class="d-none d-md-table-cell">{{if .Online}}<span class="badge badge-success">ONLINE</span>{{else}}<span class="badge badge-danger">OFFLINE</span>{{end}}
-                    <i class="toggle-service fas {{if .IsRunning}}fa-toggle-on text-success{{else}}fa-toggle-off text-muted{{end}}" data-online="{{if .IsRunning}}true{{else}}false{{end}}" data-id="{{.Id}}"></i>
+                    <i class="toggle-service fas {{if .IsRunning}}fa-toggle-on{{else}}fa-toggle-off{{end}} {{if .Online}}text-success{{else}}text-danger{{end}}" data-online="{{if .IsRunning}}true{{else}}false{{end}}" data-id="{{.Id}}"></i>
                 </td>
                 <td class="d-none d-md-table-cell">{{if .Public.Bool}}<span class="badge badge-primary">PUBLIC</span>{{else}}<span class="badge badge-secondary">PRIVATE</span>{{end}}</td>
                 <td class="d-none d-md-table-cell">{{if ne .GroupId 0}}<span class="badge badge-secondary">{{(Group .GroupId).Name}}</span>{{end}}</td>
                 <td class="text-right">
                     <div class="btn-group">
-                        <a href="/service/{{ServiceLink .}}" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> View</a>
-                        {{if Auth}}<a href="/api/services/{{.Id}}" class="ajax_delete btn btn-danger" data-method="DELETE" data-obj="service_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>{{end}}
+                        <a href="service/{{ServiceLink .}}" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> View</a>
+                        {{if Auth}}<a href="api/services/{{.Id}}" class="ajax_delete btn btn-danger" data-method="DELETE" data-obj="service_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>{{end}}
                     </div>
                 </td>
             </tr>
@@ -36,14 +47,11 @@
             </tbody>
         </table>
         {{end}}
-        {{if Auth}}
-            <h3>Create Service</h3>
-            {{template "form_service" NewService}}
-        {{end}}
     </div>
 
-    <div class="col-12 mt-3">
-            <h3>Groups</h3>
+    <div class="col-12 mt-5">
+        {{if ne (len (Groups false)) 0}}
+            <h1 class="text-muted">Groups</h1>
             <table class="table">
                 <thead>
                 <tr>
@@ -61,16 +69,17 @@
                         <td>{{if .Public.Bool}}<span class="badge badge-primary">PUBLIC</span>{{else}}<span class="badge badge-secondary">PRIVATE</span>{{end}}</td>
                         <td class="text-right">
                             <div class="btn-group">
-                                <a href="/group/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> Edit</a>
-                                {{if Auth}}<a href="/api/groups/{{.Id}}" class="ajax_delete btn btn-danger" data-method="DELETE" data-obj="group_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>{{end}}
+                                <a href="group/{{.Id}}" class="btn btn-outline-secondary"><i class="fas fa-chart-area"></i> Edit</a>
+                                {{if Auth}}<a href="api/groups/{{.Id}}" class="ajax_delete btn btn-danger" data-method="DELETE" data-obj="group_{{.Id}}" data-id="{{.Id}}"><i class="fas fa-times"></i></a>{{end}}
                             </div>
                         </td>
                     </tr>
                 {{end}}
                 </tbody>
             </table>
+        {{end}}
         {{if Auth}}
-            <h3>Create Group</h3>
+            <h1 class="text-muted mt-5">Create Group</h1>
             {{template "form_group" NewGroup}}
         {{end}}
     </div>
@@ -81,7 +90,7 @@
 {{if USE_CDN}}
 <script src="https://assets.statping.com/sortable.min.js"></script>
 {{ else }}
-<script src="/js/sortable.min.js"></script>
+<script src="js/sortable.min.js"></script>
 {{end}}
 <script>
     // drag and drop sorting for Services

@@ -99,7 +99,7 @@ func (u *slack) OnFailure(s *types.Service, f *types.Failure) {
 	message := slackMessage{
 		Service:  s,
 		Template: failingTemplate,
-		Time:     time.Now().Unix(),
+		Time:     utils.Now().Unix(),
 		Issue:    f.Issue,
 	}
 	parseSlackMessage(s.Id, failingTemplate, message)
@@ -112,7 +112,7 @@ func (u *slack) OnSuccess(s *types.Service) {
 		message := slackMessage{
 			Service:  s,
 			Template: successTemplate,
-			Time:     time.Now().Unix(),
+			Time:     utils.Now().Unix(),
 		}
 		parseSlackMessage(s.Id, successTemplate, message)
 	}

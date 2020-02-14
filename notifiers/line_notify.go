@@ -85,7 +85,7 @@ func (u *lineNotifier) OnSuccess(s *types.Service) {
 // OnSave triggers when this notifier has been saved
 func (u *lineNotifier) OnSave() error {
 	msg := fmt.Sprintf("Notification %v is receiving updated information.", u.Method)
-	utils.Log(1, msg)
+	utils.Log.Infoln(msg)
 	u.AddQueue("saved", msg)
 	return nil
 }

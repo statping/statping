@@ -44,13 +44,13 @@ var TestService = &types.Service{
 	LastStatusCode: 404,
 	Online:         true,
 	LastResponse:   "<html>this is an example response</html>",
-	CreatedAt:      time.Now().Add(-24 * time.Hour),
+	CreatedAt:      utils.Now().Add(-24 * time.Hour),
 }
 
 var TestFailure = &types.Failure{
 	Issue:     "testing",
 	Service:   1,
-	CreatedAt: time.Now().Add(-12 * time.Hour),
+	CreatedAt: utils.Now().Add(-12 * time.Hour),
 }
 
 var TestUser = &types.User{
@@ -74,8 +74,8 @@ func init() {
 }
 
 func injectDatabase() {
-	utils.DeleteFile(dir + "/statup.db")
-	db, err := gorm.Open("sqlite3", dir+"/statup.db")
+	utils.DeleteFile(dir + "/notifiers.db")
+	db, err := gorm.Open("sqlite3", dir+"/notifiers.db")
 	if err != nil {
 		panic(err)
 	}

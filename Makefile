@@ -1,24 +1,21 @@
 VERSION=$(shell cat version.txt)
 SIGN_KEY=B76D61FAA6DB759466E83D9964B9C6AAE2D55278
 BINARY_NAME=statping
-GOPATH:=$(GOPATH)
-GOCMD=go
-GOBUILD=$(GOCMD) build -a
-GOTEST=$(GOCMD) test
-GOGET=$(GOCMD) get
-GOVERSION=1.13.1
-GOINSTALL=$(GOCMD) install
-XGO=GOPATH=$(GOPATH) xgo -go $(GOVERSION) --dest=build
+GOBUILD=go build -a
+GOVERSION=1.13.5
+XGO=xgo -go $(GOVERSION) --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
-RICE=$(GOPATH)/bin/rice
-PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
+TRVIS_SECRET=lRqWSt5BoekFK6+padJF+b77YkGdispPXEUKNuD7/Hxb7yJMoI8T/n8xZrTHtCZPdjtpy7wIlJCezNoYEZB3l2GnD6Y1QEZEXF7MIxP7hwsB/uSc5/lgdGW0ZLvTBfv6lwI/GjQIklPBW/4xcKJtj4s1YBP7xvqyIb/lDN7TiOqAKF4gqRVVfsxvlkm7j4TiPCXtz17hYQfU8kKBbd+vd3PuZgdWqs//5RwKk3Ld8QR8zoo9xXQVC5NthiyVbHznzczBsHy2cRZZoWxyi7eJM1HrDw8Jn/ivJONIHNv3RgFVn2rAoKu1X8F6FyuvPO0D2hWC62mdO/e0kt4X0mn9/6xlLSKwrHir67UgNVQe3tvlH0xNKh+yNZqR5x9t0V54vNks6Pgbhas5EfLHoWn5cF4kbJzqkXeHjt1msrsqpA3HKbmtwwjJr4Slotfiu22mAhqLSOV+xWV+IxrcNnrEq/Pa+JAzU12Uyxs8swaLJGPRAlWnJwzL9HK5aOpN0sGTuSEsTwj0WxeMMRx25YEq3+LZOgwOy3fvezmeDnKuBZa6MVCoMMpx1CRxMqAOlTGZXHjj+ZPmqDUUBpzAsFSzIdVRgcnDlLy7YRiz3tVWa1G5S07l/VcBN7ZgvCwOWZ0QgOH0MxkoDfhrfoMhNO6MBFDTRKCEl4TroPEhcInmXU8=
 PUBLISH_BODY='{ "request": { "branch": "master", "message": "Homebrew update version v${VERSION}", "config": { "env": { "VERSION": "${VERSION}", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
-TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "os": [ "linux" ], "language": "go", "go": [ "${GOVERSION}" ], "go_import_path": "github.com/hunterlong/statping", "install": true, "sudo": "required", "services": [ "docker" ], "env": { "VERSION": "${VERSION}" }, "matrix": { "allow_failures": [ { "go": "master" } ], "fast_finish": true }, "before_deploy": [ "git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [ { "provider": "releases", "api_key": "$(GH_TOKEN)", "file_glob": true, "file": "build/*", "skip_cleanup": true } ], "notifications": { "email": false }, "before_script": ["gem install sass"], "script": [ "wget -O statping.gpg $(SIGN_URL)", "gpg --import statping.gpg", "travis_wait 30 docker pull crazymax/xgo:$(GOVERSION)", "make release" ], "after_success": [], "after_deploy": [ "make publish-homebrew" ] } } }'
+TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "os": [ "linux" ], "language": "go", "go": [ "${GOVERSION}" ], "go_import_path": "github.com/hunterlong/statping", "install": true, "sudo": "required", "services": [ "docker" ], "env": { "VERSION": "${VERSION}", "secure": "${TRVIS_SECRET}" }, "matrix": { "allow_failures": [ { "go": "master" } ], "fast_finish": true }, "before_deploy": [ "git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [ { "provider": "releases", "api_key": "$$TAG_TOKEN", "file_glob": true, "file": "build/*", "skip_cleanup": true, "on": {"branch": "master"} } ], "notifications": { "email": false }, "before_script": ["gem install sass"], "script": [ "travis_wait 30 docker pull crazymax/xgo:$(GOVERSION)", "make release" ], "after_success": [], "after_deploy": [ "make publish-homebrew" ] } } }'
 TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statping
-PATH:=$(PATH)
+PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 
 # build all arch's and release Statping
-release: dev-deps build-all
+release: dev-deps
+	wget -O statping.gpg $(SIGN_URL)
+	gpg --import statping.gpg
+	make build-all
 
 # build and push the images to docker hub
 docker: docker-build-all docker-publish-all
@@ -45,6 +42,7 @@ snapcraft: clean snapcraft-build snapcraft-release
 
 # build Statping for local arch
 build: compile
+	go mod vendor
 	$(GOBUILD) $(BUILDVERSION) -o $(BINARY_NAME) -v ./cmd
 
 # build Statping plugins
@@ -70,10 +68,28 @@ install: build
 run: build
 	./$(BINARY_NAME) --ip 0.0.0.0 --port 8080
 
+# run Statping with Delve for debugging
+rundlv:
+	lsof -ti:8080 | xargs kill
+	DB_CONN=sqlite DB_HOST=localhost DB_DATABASE=sqlite DB_PASS=none DB_USER=none GO_ENV=test \
+	dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient exec ./statping
+
+killdlv:
+	lsof -ti:2345 | xargs kill
+
+builddlv:
+	$(GOBUILD) -gcflags "all=-N -l" -o ./$(BINARY_NAME) -v ./cmd
+
+watch:
+	find . -print | grep -i '.*\.\(go\|gohtml\)' | justrun -v -c \
+	'go build -v -gcflags "all=-N -l" -o statping ./cmd && make rundlv &' \
+	-delay 10s -stdin \
+	-i="Makefile,statping,statup.db,statup.db-journal,handlers/graphql/generated.go"
+
 # compile assets using SASS and Rice. compiles scss -> css, and run rice embed-go
 compile: generate
 	sass source/scss/base.scss source/css/base.css
-	cd source && $(GOPATH)/bin/rice embed-go
+	cd source && rice embed-go
 	rm -rf .sass-cache
 
 # benchmark testing
@@ -204,52 +220,41 @@ databases:
 	docker run --name statping_mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password123 -e MYSQL_DATABASE=root -d mysql
 	sleep 30
 
-
-#
-#    Download and Install dependencies
-#
-# run dep to install all required golang dependecies
-dep:
-	dep ensure -vendor-only
-
 # install all required golang dependecies
 dev-deps:
-	$(GOGET) github.com/stretchr/testify/assert
-	$(GOGET) golang.org/x/tools/cmd/cover
-	$(GOGET) github.com/mattn/goveralls
-	$(GOINSTALL) github.com/mattn/goveralls
-	$(GOGET) github.com/rendon/testcli
-	$(GOGET) github.com/robertkrimen/godocdown/godocdown
-	$(GOGET) github.com/crazy-max/xgo
-	$(GOGET) github.com/GeertJohan/go.rice
-	$(GOGET) github.com/GeertJohan/go.rice/rice
-	$(GOINSTALL) github.com/GeertJohan/go.rice/rice
-	$(GOCMD) get github.com/axw/gocov/gocov
-	$(GOCMD) get gopkg.in/matm/v1/gocov-html
-	$(GOCMD) install gopkg.in/matm/v1/gocov-html
-	$(GOCMD) get github.com/mgechev/revive
-	$(GOCMD) get github.com/fatih/structs
-	$(GOGET) github.com/ararog/timeago
-	$(GOGET) gopkg.in/natefinch/lumberjack.v2
-	$(GOGET) golang.org/x/crypto/bcrypt
-	$(GOGET) github.com/99designs/gqlgen/...
+	go get github.com/stretchr/testify/assert
+	go get golang.org/x/tools/cmd/cover
+	go get github.com/mattn/goveralls
+	go install github.com/mattn/goveralls
+	go get github.com/rendon/testcli
+	go get github.com/robertkrimen/godocdown/godocdown
+	go get github.com/crazy-max/xgo
+	go get github.com/GeertJohan/go.rice
+	go get github.com/GeertJohan/go.rice/rice
+	go install github.com/GeertJohan/go.rice/rice
+	go get github.com/axw/gocov/gocov
+	go get github.com/matm/gocov-html
+	go get github.com/fatih/structs
+	go get github.com/ararog/timeago
+	go get gopkg.in/natefinch/lumberjack.v2
+	go get golang.org/x/crypto/bcrypt
 
 # remove files for a clean compile/build
 clean:
-	rm -rf ./{logs,assets,plugins,statup.db,config.yml,.sass-cache,config.yml,statping,build,.sass-cache,statup.db,index.html,vendor}
-	rm -rf cmd/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log,*.html,*.json}
-	rm -rf core/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
-	rm -rf handlers/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
-	rm -rf notifiers/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
-	rm -rf source/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
-	rm -rf types/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
-	rm -rf utils/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log}
-	rm -rf dev/{logs,assets,plugins,statup.db,config.yml,.sass-cache,*.log,test/app,plugin/*.so}
+	rm -rf ./{logs,assets,plugins,*.db,config.yml,.sass-cache,config.yml,statping,build,.sass-cache,index.html,vendor}
+	rm -rf cmd/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log,*.html,*.json}
+	rm -rf core/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	rm -rf handlers/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	rm -rf notifiers/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	rm -rf source/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	rm -rf types/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	rm -rf utils/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	rm -rf dev/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log,test/app,plugin/*.so}
 	rm -rf {parts,prime,snap,stage}
 	rm -rf dev/test/cypress/videos
 	rm -f coverage.* sass
 	rm -f source/rice-box.go
-	rm -f *.db-journal
+	rm -rf **/*.db-journal
 	rm -rf *.snap
 	find . -name "*.out" -type f -delete
 	find . -name "*.cpu" -type f -delete
@@ -310,8 +315,19 @@ cypress-install:
 cypress-test: clean cypress-install
 	cd dev/test && npm test
 
+upload_to_s3:
+	aws s3 cp ./source/css $(ASSETS_BKT) --recursive --exclude "*" --include "*.css"
+	aws s3 cp ./source/js $(ASSETS_BKT) --recursive --exclude "*" --include "*.js"
+	aws s3 cp ./source/font $(ASSETS_BKT) --recursive --exclude "*" --include "*.eot" --include "*.svg" --include "*.woff" --include "*.woff2" --include "*.ttf" --include "*.css"
+	aws s3 cp ./source/scss $(ASSETS_BKT) --recursive --exclude "*" --include "*.scss"
+	aws s3 cp ./install.sh $(ASSETS_BKT)
+
+travis_s3_creds:
+	mkdir -p ~/.aws
+	echo "[default]\naws_access_key_id = ${AWS_ACCESS_KEY_ID}\naws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" > ~/.aws/credentials
+
 # build Statping using a travis ci trigger
-travis-build:
+travis-build: travis_s3_creds upload_to_s3
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(TRAVIS_BUILD_CMD) https://api.travis-ci.com/repo/hunterlong%2Fstatping/requests
 	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
 
@@ -352,4 +368,8 @@ heroku:
 	heroku container:push web
 	heroku container:release web
 
+checkall:
+	golangci-lint run ./...
+
 .PHONY: all build build-all build-alpine test-all test test-api docker
+.SILENT: travis_s3_creds

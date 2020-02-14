@@ -8,9 +8,9 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://assets.statping.com/base.css">
 {{ else }}
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/base.css">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/base.css">
 {{end}}
 
     <title>{{.Name}} Status</title>
@@ -46,7 +46,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="col-12">
-                        <h4 class="mt-3"><a href="/service/{{.Id}}"{{if not .Online}} class="text-danger"{{end}}>{{ .Name }}</a>
+                        <h4 class="mt-3"><a href="service/{{.Id}}"{{if not .Online}} class="text-danger"{{end}}>{{ .Name }}</a>
                         {{if .Online}}
                             <span class="badge bg-success float-right">ONLINE</span>
                         {{ else }}
@@ -94,7 +94,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
 <script src="https://assets.statping.com/main.js"></script>
 
-<script src="/charts.js"></script>
+<script src="charts.js"></script>
 
 </body>
 </html>

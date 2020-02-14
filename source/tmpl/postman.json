@@ -2,165 +2,10 @@
 	"info": {
 		"_postman_id": "94807b85-ef65-4370-9144-b1a74e04cb0e",
 		"name": "Statping",
-		"description": "Statup API Requests",
+		"description": "Statping API Documentation for all endpoints to manage your services, users, groups, notifiers, messages, and more. \n\n## API Requirements\n\n- `endpoint` variable should be the URL of your Statping instance.\n- `api_key` variable is the API Secret key from the Settings page and is used for the Authorization Bearer token.\n\n",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
-		{
-			"name": "Main",
-			"item": [
-				{
-					"name": "Statping Details",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "08b8f487-2318-44b9-bdb8-f1f1041e9462",
-								"exec": [
-									"pm.test(\"Check Core API Route\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.name).to.eql(\"Statping\");",
-									"    pm.expect(jsonData.description).to.eql(\"Statping Monitoring Sample Data\");",
-									"    pm.expect(jsonData.using_cdn).to.eql(false);",
-									"    pm.expect(jsonData.database).to.eql(\"sqlite\");",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{api_key}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{endpoint}}/api",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"api"
-							]
-						},
-						"description": "The root API route to view basic Statping settings."
-					},
-					"response": []
-				},
-				{
-					"name": "Statping Clear Cache",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "08b8f487-2318-44b9-bdb8-f1f1041e9462",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{api_key}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{endpoint}}/api/clear_cache",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"api",
-								"clear_cache"
-							]
-						},
-						"description": "The root API route to view basic Statping settings."
-					},
-					"response": []
-				},
-				{
-					"name": "Statping Reset API Tokens",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "08b8f487-2318-44b9-bdb8-f1f1041e9462",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{api_key}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{endpoint}}/api/renew",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"api",
-								"renew"
-							]
-						},
-						"description": "The root API route to view basic Statping settings."
-					},
-					"response": []
-				}
-			],
-			"auth": {
-				"type": "bearer",
-				"bearer": [
-					{
-						"key": "token",
-						"value": "{{api_key}}",
-						"type": "string"
-					}
-				]
-			}
-		},
 		{
 			"name": "Services",
 			"item": [
@@ -172,6 +17,10 @@
 							"script": {
 								"id": "d87f8a4e-7640-45b8-9d45-4f6e6f2463ee",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"View All Services\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.length).to.eql(5);",
@@ -194,10 +43,6 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/api/services",
 							"host": [
@@ -220,6 +65,10 @@
 							"script": {
 								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"View Service\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.name).to.eql(\"Google\");",
@@ -251,10 +100,6 @@
 								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/api/services/1",
 							"host": [
@@ -281,10 +126,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{endpoint}}/api/services/1",
 									"host": [
@@ -327,7 +168,9 @@
 							"script": {
 								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
 								"exec": [
-									""
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -353,12 +196,8 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
-							"raw": "{{endpoint}}/api/services/1/data",
+							"raw": "{{endpoint}}/api/services/1/data?start=0&end=1973064434&group=hour",
 							"host": [
 								"{{endpoint}}"
 							],
@@ -367,8 +206,26 @@
 								"services",
 								"1",
 								"data"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0",
+									"description": "Starting from time (unix timestamp)"
+								},
+								{
+									"key": "end",
+									"value": "1973064434",
+									"description": "End on time (unix timestamp)"
+								},
+								{
+									"key": "group",
+									"value": "hour",
+									"description": "Increment grouping (minute, hour, day)"
+								}
 							]
-						}
+						},
+						"description": "View the chart data for the service's latency. The response returns an array of objects as `x` for timestamp, and `y` for value in ascending order."
 					},
 					"response": []
 				},
@@ -380,7 +237,9 @@
 							"script": {
 								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
 								"exec": [
-									""
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -406,12 +265,8 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
-							"raw": "{{endpoint}}/api/services/1/ping",
+							"raw": "{{endpoint}}/api/services/1/ping?start=0&end=1973064434&group=hour",
 							"host": [
 								"{{endpoint}}"
 							],
@@ -420,8 +275,26 @@
 								"services",
 								"1",
 								"ping"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "0",
+									"description": "Starting from time (unix timestamp)"
+								},
+								{
+									"key": "end",
+									"value": "1973064434",
+									"description": "End on time (unix timestamp)"
+								},
+								{
+									"key": "group",
+									"value": "hour",
+									"description": "Increment grouping (minute, hour, day)"
+								}
 							]
-						}
+						},
+						"description": "View the chart data for the service's ping response time. The response returns an array of objects as `x` for timestamp, and `y` for value in ascending order."
 					},
 					"response": []
 				},
@@ -433,7 +306,9 @@
 							"script": {
 								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
 								"exec": [
-									""
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -459,10 +334,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/api/services/1/heatmap",
 							"host": [
@@ -474,7 +345,8 @@
 								"1",
 								"heatmap"
 							]
-						}
+						},
+						"description": "View the data service failures in a heatmap. The field `x` is the day of the month, and `y` is the amount of failures the service had."
 					},
 					"response": []
 				},
@@ -486,7 +358,9 @@
 							"script": {
 								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
 								"exec": [
-									""
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -512,10 +386,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/api/services/1/failures",
 							"host": [
@@ -527,7 +397,8 @@
 								"1",
 								"failures"
 							]
-						}
+						},
+						"description": "Returns an array of failures for this service. It includes the error message, http status code, and the ping response time."
 					},
 					"response": []
 				},
@@ -539,6 +410,10 @@
 							"script": {
 								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Service Successful Hits\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.length).to.be.at.least(100);",
@@ -568,10 +443,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/api/services/1/hits",
 							"host": [
@@ -583,7 +454,8 @@
 								"1",
 								"hits"
 							]
-						}
+						},
+						"description": "Returns on array of all the successful hits for this service."
 					},
 					"response": []
 				},
@@ -595,7 +467,9 @@
 							"script": {
 								"id": "b5a67a19-fd08-40b0-a961-3e9474ab78c6",
 								"exec": [
-									""
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -693,6 +567,10 @@
 							"script": {
 								"id": "d4eb16fe-8495-40e5-9ca3-be20951e5133",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Create Service\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.output.name).to.eql(\"New Service\");",
@@ -797,6 +675,10 @@
 							"script": {
 								"id": "b5a67a19-fd08-40b0-a961-3e9474ab78c6",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Update Service\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.output.name).to.eql(\"Updated New Service\");",
@@ -902,6 +784,10 @@
 							"script": {
 								"id": "dd4d721d-d874-448b-abc9-59c1afceb58e",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Delete Service\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.status).to.eql(\"success\");",
@@ -941,7 +827,7 @@
 								"{{service_id}}"
 							]
 						},
-						"description": "Delete a service and stop monitoring."
+						"description": "Delete a service and stops monitoring."
 					},
 					"response": [
 						{
@@ -995,7 +881,9 @@
 							"script": {
 								"id": "dd4d721d-d874-448b-abc9-59c1afceb58e",
 								"exec": [
-									""
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -1030,11 +918,12 @@
 								"failures"
 							]
 						},
-						"description": "Delete a service and stop monitoring."
+						"description": "Delete all the service failures."
 					},
 					"response": []
 				}
 			],
+			"description": "With the Statping API, you can add, remove, edit all your services fields from the API directly. This includes viewing Service chart data for latency/up-time, and even viewing a log of failures. ",
 			"auth": {
 				"type": "bearer",
 				"bearer": [
@@ -1079,6 +968,10 @@
 							"script": {
 								"id": "d87f8a4e-7640-45b8-9d45-4f6e6f2463ee",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"View All Groups\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.length).to.eql(3);",
@@ -1101,10 +994,6 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/api/groups",
 							"host": [
@@ -1123,10 +1012,6 @@
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{endpoint}}/api/groups",
 									"host": [
@@ -1168,6 +1053,10 @@
 							"script": {
 								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"View Group\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.name).to.eql(\"Main Services\");",
@@ -1197,10 +1086,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/api/groups/1",
 							"host": [
@@ -1227,10 +1112,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{endpoint}}/api/groups/1",
 									"host": [
@@ -1273,6 +1154,10 @@
 							"script": {
 								"id": "d4eb16fe-8495-40e5-9ca3-be20951e5133",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Create Group\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.output.name).to.eql(\"New Group\");",
@@ -1373,7 +1258,9 @@
 							"script": {
 								"id": "b5a67a19-fd08-40b0-a961-3e9474ab78c6",
 								"exec": [
-									""
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -1424,6 +1311,10 @@
 							"script": {
 								"id": "dd4d721d-d874-448b-abc9-59c1afceb58e",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Delete Service\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.status).to.eql(\"success\");",
@@ -1463,7 +1354,7 @@
 								"{{group_id}}"
 							]
 						},
-						"description": "Delete a group"
+						"description": "Delete a group and removes all services attached to this group."
 					},
 					"response": [
 						{
@@ -1510,6 +1401,7 @@
 					]
 				}
 			],
+			"description": "Statping allows you to group multiple services with a unique name for better viewablity. You can reorder the groups to make your status page a little more organized if you have tons of services.",
 			"auth": {
 				"type": "bearer",
 				"bearer": [
@@ -1554,6 +1446,10 @@
 							"script": {
 								"id": "9a2977fe-9689-4039-bdcb-eaa34abee958",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"View All Users\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.length).to.eql(1);",
@@ -1580,10 +1476,6 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/api/users",
 							"host": [
@@ -1602,10 +1494,6 @@
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{endpoint}}/api/users",
 									"host": [
@@ -1647,6 +1535,10 @@
 							"script": {
 								"id": "1913466d-83b2-4d5b-ac48-89c9abdd0c8d",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Create User\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.status).to.eql(\"success\");",
@@ -1703,6 +1595,10 @@
 							"script": {
 								"id": "555b7ba4-bb36-4e86-a541-fa5a5008f951",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"View User\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var id = pm.globals.get(\"user_id\");",
@@ -1729,10 +1625,6 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/api/users/{{user_id}}",
 							"host": [
@@ -1751,10 +1643,6 @@
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{endpoint}}/api/users/{{user_id}}",
 									"host": [
@@ -1807,6 +1695,10 @@
 							"script": {
 								"id": "b0d22bbd-a428-4df3-8295-b40542bfa21f",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Update User\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.status).to.eql(\"success\");",
@@ -1848,7 +1740,8 @@
 								"users",
 								"{{user_id}}"
 							]
-						}
+						},
+						"description": "Update a user's information including username, email, password, and if they are an admin or not."
 					},
 					"response": [
 						{
@@ -1907,6 +1800,10 @@
 							"script": {
 								"id": "bd8c3425-a97f-4f8c-b849-71b65dd543ee",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Delete User\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var id = pm.globals.get(\"user_id\");",
@@ -1933,10 +1830,6 @@
 						},
 						"method": "DELETE",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/api/users/{{user_id}}",
 							"host": [
@@ -1947,7 +1840,8 @@
 								"users",
 								"{{user_id}}"
 							]
-						}
+						},
+						"description": "Delete a specific user from the database."
 					},
 					"response": [
 						{
@@ -1955,10 +1849,6 @@
 							"originalRequest": {
 								"method": "DELETE",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{endpoint}}/api/users/{{user_id}}",
 									"host": [
@@ -1994,6 +1884,7 @@
 					]
 				}
 			],
+			"description": "You can create new users with different permissions to allow for read only API access, and super admin abilities. ",
 			"auth": {
 				"type": "bearer",
 				"bearer": [
@@ -2038,6 +1929,10 @@
 							"script": {
 								"id": "e9105618-6db8-4a57-ae7f-782989842f4a",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"View All Notifiers\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.length).to.eql(9);",
@@ -2060,10 +1955,6 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/api/notifiers",
 							"host": [
@@ -2073,12 +1964,27 @@
 								"api",
 								"notifiers"
 							]
-						}
+						},
+						"description": "View an array of all the Notifiers including all details about the notifier."
 					},
 					"response": []
 				},
 				{
 					"name": "View Notifier",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "acac30b6-3caa-46c9-89be-1efbadf89f22",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -2092,10 +1998,6 @@
 						},
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/api/notifier/mobile",
 							"host": [
@@ -2106,7 +2008,8 @@
 								"notifier",
 								"mobile"
 							]
-						}
+						},
+						"description": "View a specific notifier and it's details."
 					},
 					"response": []
 				},
@@ -2118,6 +2021,10 @@
 							"script": {
 								"id": "d714d71d-4d6a-4b2e-a6ea-16c34dec3041",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Update Notifier\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.output.method).to.eql(\"mobile\");",
@@ -2164,11 +2071,13 @@
 								"notifier",
 								"mobile"
 							]
-						}
+						},
+						"description": "Update a notifier to change it's values."
 					},
 					"response": []
 				}
 			],
+			"description": "Statping contains multiple notifiers that will send you a notification whenever a service become offline, or online. You can create your own 3rd party notifier by reading more on the [Notifiers Wiki](https://github.com/hunterlong/statping/wiki/Notifiers) on the Github repo.",
 			"auth": {
 				"type": "bearer",
 				"bearer": [
@@ -2178,7 +2087,29 @@
 						"type": "string"
 					}
 				]
-			}
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "bd5d8232-7ed7-4607-ab7c-14de85c3a033",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "ef420ba0-37dc-4ffc-b38f-a43ccca76606",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
 		},
 		{
 			"name": "Messages",
@@ -2191,6 +2122,10 @@
 							"script": {
 								"id": "3c484d1b-6e77-4084-b844-3ca77dc50108",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"View All Messages\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.length).to.be.at.least(2);",
@@ -2203,10 +2138,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/api/messages",
 							"host": [
@@ -2216,7 +2147,8 @@
 								"api",
 								"messages"
 							]
-						}
+						},
+						"description": "View an array of all messages inserted into the database."
 					},
 					"response": [
 						{
@@ -2224,10 +2156,6 @@
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{endpoint}}/api/messages",
 									"host": [
@@ -2269,6 +2197,10 @@
 							"script": {
 								"id": "12caf74a-61d7-4f6e-89b5-fca2f65464c4",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Create Message\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var object = jsonData.output;",
@@ -2307,7 +2239,8 @@
 								"api",
 								"messages"
 							]
-						}
+						},
+						"description": "Create a new message show show on index page, or on a service."
 					},
 					"response": [
 						{
@@ -2367,6 +2300,10 @@
 							"script": {
 								"id": "c30cc333-53f4-4e9a-9c32-958c905ec163",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"View Message\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.title).to.eql(\"API Message\");",
@@ -2380,10 +2317,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/api/messages/{{message_id}}",
 							"host": [
@@ -2394,7 +2327,8 @@
 								"messages",
 								"{{message_id}}"
 							]
-						}
+						},
+						"description": "View a specific message and it's details."
 					},
 					"response": [
 						{
@@ -2402,10 +2336,6 @@
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{endpoint}}/api/messages/{{message_id}}",
 									"host": [
@@ -2448,6 +2378,10 @@
 							"script": {
 								"id": "e9dd78cc-0f38-4516-bf82-38dd3451b2e7",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Update Message\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var object = jsonData.output;",
@@ -2486,7 +2420,8 @@
 								"messages",
 								"{{message_id}}"
 							]
-						}
+						},
+						"description": "Update a specific message with new details."
 					},
 					"response": [
 						{
@@ -2547,6 +2482,10 @@
 							"script": {
 								"id": "6cb2527f-41c2-4feb-9573-1e4d59efa116",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Delete Message\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var id = pm.globals.get(\"message_id\");",
@@ -2577,7 +2516,8 @@
 								"messages",
 								"{{message_id}}"
 							]
-						}
+						},
+						"description": "Delete a specific message from the database."
 					},
 					"response": [
 						{
@@ -2623,6 +2563,29 @@
 						}
 					]
 				}
+			],
+			"description": "Messages allows you to create an alert for a service for a scheduled downtime, or a simple message letting users know a service might be having internal issues. ",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "8d24599b-f157-475b-9e30-06c1171c85bc",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "497c2428-fe8a-42c2-bf6f-8f2cdf959771",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
 			]
 		},
 		{
@@ -2636,6 +2599,10 @@
 							"script": {
 								"id": "af07a95b-1bf5-42c7-bd3f-a32f3ab2a264",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Create Checkin\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.status).to.eql(\"success\");",
@@ -2674,7 +2641,8 @@
 								"api",
 								"checkin"
 							]
-						}
+						},
+						"description": "Create a new Checkin."
 					},
 					"response": [
 						{
@@ -2734,6 +2702,10 @@
 							"script": {
 								"id": "54bded63-de27-4839-8783-25874c35c3ea",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"View All Checkins\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var first = jsonData[0];",
@@ -2751,10 +2723,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/api/checkins",
 							"host": [
@@ -2764,7 +2732,8 @@
 								"api",
 								"checkins"
 							]
-						}
+						},
+						"description": "View an array of all the Checkin's inserted into the system."
 					},
 					"response": [
 						{
@@ -2772,10 +2741,6 @@
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{endpoint}}/api/checkins",
 									"host": [
@@ -2817,6 +2782,10 @@
 							"script": {
 								"id": "652a1c5b-5379-43c2-9cd8-ebd8f8dad0f6",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Hit the Checkin API Endpoint\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.status).to.eql(\"success\");",
@@ -2831,10 +2800,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/checkin/{{checkin_id}}",
 							"host": [
@@ -2844,7 +2809,8 @@
 								"checkin",
 								"{{checkin_id}}"
 							]
-						}
+						},
+						"description": "Initiate the Checkin request to your Statping instance. This request will come from your service and will trigger a failure if your service does not hit this URL in the routine interval set.\n\n- `checkin_id` is the ID for the checkin"
 					},
 					"response": [
 						{
@@ -2852,10 +2818,6 @@
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{endpoint}}/checkin/{{checkin_id}}",
 									"host": [
@@ -2897,6 +2859,10 @@
 							"script": {
 								"id": "93ff6b86-368b-406f-9d75-07338714ebca",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"View Checkin\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var id = pm.globals.get(\"checkin_id\");",
@@ -2913,10 +2879,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{endpoint}}/api/checkin/{{checkin_id}}",
 							"host": [
@@ -2927,7 +2889,8 @@
 								"checkin",
 								"{{checkin_id}}"
 							]
-						}
+						},
+						"description": "View a specific checkin and it's details."
 					},
 					"response": [
 						{
@@ -2935,10 +2898,6 @@
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{endpoint}}/api/checkin/{{checkin_id}}",
 									"host": [
@@ -2981,6 +2940,10 @@
 							"script": {
 								"id": "d3fdc6b9-d8ca-4634-a735-af8db0f31cef",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Delete Checkin\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    var id = pm.globals.get(\"checkin_id\");",
@@ -3011,7 +2974,8 @@
 								"checkin",
 								"{{checkin_id}}"
 							]
-						}
+						},
+						"description": "Delete a checkin from database and stop failures from service not hitting the checkin URL."
 					},
 					"response": [
 						{
@@ -3057,7 +3021,235 @@
 						}
 					]
 				}
+			],
+			"description": "A Checkin is when a service communicates to your Statping instance rather than Statping attempting to hit your service. Checkin's have a scheduled interval that waits for your service to notify Statping, if your service does not hit the Checkin URL during the interval you set, it will result in a service failing notification.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "fefe9fc9-8020-41ec-b20f-dd2c5ad951e9",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "4a611b52-8ec2-4e26-8ed8-51f2729f93a1",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
 			]
+		},
+		{
+			"name": "Miscellaneous",
+			"item": [
+				{
+					"name": "Statping Details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "08b8f487-2318-44b9-bdb8-f1f1041e9462",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Check Core API Route\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.description).to.eql(\"Statping Monitoring Sample Data\");",
+									"    pm.expect(jsonData.using_cdn).to.eql(false);",
+									"    pm.expect(jsonData.config.connection).to.eql(\"sqlite\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint}}/api",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api"
+							]
+						},
+						"description": "The root API endpoint to view basic Statping configuration including Name, URL, database type, and other useful fields."
+					},
+					"response": []
+				},
+				{
+					"name": "Statping Clear Cache",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "08b8f487-2318-44b9-bdb8-f1f1041e9462",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint}}/api/clear_cache",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"clear_cache"
+							]
+						},
+						"description": "This endpoint will clear all the cache files in your Statping instance. This includes chart data and service views."
+					},
+					"response": []
+				},
+				{
+					"name": "Statping Reset API Tokens",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "08b8f487-2318-44b9-bdb8-f1f1041e9462",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint}}/api/renew",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"renew"
+							]
+						},
+						"description": "Reset your root API Key and Secret values to brand new values."
+					},
+					"response": []
+				}
+			],
+			"description": "This is for Statping's miscellaneous API endpoints that aren't a part of another category.",
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{api_key}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "883519e8-7c7d-49c0-9812-d988d0179907",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "7a0738e6-2fc4-45cb-9f1a-1cd57fb76b66",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "4eb22861-cca3-4592-a1a4-4d01bc62ee74",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "cac1a6f2-2dc3-4b09-9849-3d5aab919244",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }

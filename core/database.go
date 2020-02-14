@@ -26,6 +26,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -37,6 +38,10 @@ var (
 
 func init() {
 	DbModels = []interface{}{&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Message{}, &types.Group{}, &types.Checkin{}, &types.CheckinHit{}, &notifier.Notification{}, &types.Incident{}, &types.IncidentUpdate{}}
+
+	gorm.NowFunc = func() time.Time {
+		return time.Now().UTC()
+	}
 }
 
 // DbConfig stores the config.yml file for the statup configuration
@@ -100,7 +105,7 @@ func incidentsUpdatesDB() *gorm.DB {
 // HitsBetween returns the gorm database query for a collection of service hits between a time range
 func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) *gorm.DB {
 	selector := Dbtimestamp(group, column)
-	if CoreApp.DbConnection == "postgres" {
+	if CoreApp.Config.DbConn == "postgres" {
 		return hitsDB().Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME), t2.UTC().Format(types.TIME))
 	} else {
 		return hitsDB().Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME_DAY), t2.UTC().Format(types.TIME_DAY))
@@ -114,137 +119,166 @@ func CloseDB() {
 	}
 }
 
-// AfterFind for Core will set the timezone
-func (c *Core) AfterFind() (err error) {
-	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
-	c.UpdatedAt = utils.Timezoner(c.UpdatedAt, CoreApp.Timezone)
-	return
-}
-
-// AfterFind for Service will set the timezone
-func (s *Service) AfterFind() (err error) {
-	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
-	s.UpdatedAt = utils.Timezoner(s.UpdatedAt, CoreApp.Timezone)
-	return
-}
-
-// AfterFind for Hit will set the timezone
-func (h *Hit) AfterFind() (err error) {
-	h.CreatedAt = utils.Timezoner(h.CreatedAt, CoreApp.Timezone)
-	return
-}
-
-// AfterFind for Failure will set the timezone
-func (f *Failure) AfterFind() (err error) {
-	f.CreatedAt = utils.Timezoner(f.CreatedAt, CoreApp.Timezone)
-	return
-}
-
-// AfterFind for USer will set the timezone
-func (u *User) AfterFind() (err error) {
-	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
-	u.UpdatedAt = utils.Timezoner(u.UpdatedAt, CoreApp.Timezone)
-	return
-}
-
-// AfterFind for Checkin will set the timezone
-func (c *Checkin) AfterFind() (err error) {
-	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
-	c.UpdatedAt = utils.Timezoner(c.UpdatedAt, CoreApp.Timezone)
-	return
-}
-
-// AfterFind for checkinHit will set the timezone
-func (c *CheckinHit) AfterFind() (err error) {
-	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
-	return
-}
-
-// AfterFind for Message will set the timezone
-func (u *Message) AfterFind() (err error) {
-	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
-	u.UpdatedAt = utils.Timezoner(u.UpdatedAt, CoreApp.Timezone)
-	u.StartOn = utils.Timezoner(u.StartOn.UTC(), CoreApp.Timezone)
-	u.EndOn = utils.Timezoner(u.EndOn.UTC(), CoreApp.Timezone)
-	return
-}
+//// AfterFind for Core will set the timezone
+//func (c *Core) AfterFind() (err error) {
+//	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
+//	c.UpdatedAt = utils.Timezoner(c.UpdatedAt, CoreApp.Timezone)
+//	return
+//}
+//
+//// AfterFind for Service will set the timezone
+//func (s *Service) AfterFind() (err error) {
+//	s.CreatedAt = utils.Timezoner(s.CreatedAt, CoreApp.Timezone)
+//	s.UpdatedAt = utils.Timezoner(s.UpdatedAt, CoreApp.Timezone)
+//	return
+//}
+//
+//// AfterFind for Hit will set the timezone
+//func (h *Hit) AfterFind() (err error) {
+//	h.CreatedAt = utils.Timezoner(h.CreatedAt, CoreApp.Timezone)
+//	return
+//}
+//
+//// AfterFind for Failure will set the timezone
+//func (f *Failure) AfterFind() (err error) {
+//	f.CreatedAt = utils.Timezoner(f.CreatedAt, CoreApp.Timezone)
+//	return
+//}
+//
+//// AfterFind for USer will set the timezone
+//func (u *User) AfterFind() (err error) {
+//	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
+//	u.UpdatedAt = utils.Timezoner(u.UpdatedAt, CoreApp.Timezone)
+//	return
+//}
+//
+//// AfterFind for Checkin will set the timezone
+//func (c *Checkin) AfterFind() (err error) {
+//	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
+//	c.UpdatedAt = utils.Timezoner(c.UpdatedAt, CoreApp.Timezone)
+//	return
+//}
+//
+//// AfterFind for checkinHit will set the timezone
+//func (c *CheckinHit) AfterFind() (err error) {
+//	c.CreatedAt = utils.Timezoner(c.CreatedAt, CoreApp.Timezone)
+//	return
+//}
+//
+//// AfterFind for Message will set the timezone
+//func (u *Message) AfterFind() (err error) {
+//	u.CreatedAt = utils.Timezoner(u.CreatedAt, CoreApp.Timezone)
+//	u.UpdatedAt = utils.Timezoner(u.UpdatedAt, CoreApp.Timezone)
+//	u.StartOn = utils.Timezoner(u.StartOn.UTC(), CoreApp.Timezone)
+//	u.EndOn = utils.Timezoner(u.EndOn.UTC(), CoreApp.Timezone)
+//	return
+//}
 
 // InsertCore create the single row for the Core settings in Statping
-func (db *DbConfig) InsertCore() (*Core, error) {
+func (c *Core) InsertCore(db *types.DbConfig) (*Core, error) {
 	CoreApp = &Core{Core: &types.Core{
 		Name:        db.Project,
 		Description: db.Description,
-		Config:      "config.yml",
+		ConfigFile:  "config.yml",
 		ApiKey:      utils.NewSHA1Hash(9),
 		ApiSecret:   utils.NewSHA1Hash(16),
 		Domain:      db.Domain,
 		MigrationId: time.Now().Unix(),
+		Config:      db,
 	}}
-	CoreApp.DbConnection = db.DbConn
 	query := coreDB().Create(&CoreApp)
 	return CoreApp, query.Error
 }
 
+func findDbFile() string {
+	if CoreApp.Config.SqlFile != "" {
+		return CoreApp.Config.SqlFile
+	}
+	filename := types.SqliteFilename
+	err := filepath.Walk(utils.Directory, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+		if filepath.Ext(path) == ".db" {
+			filename = info.Name()
+		}
+		return nil
+	})
+	if err != nil {
+		log.Error(err)
+	}
+	return filename
+}
+
 // Connect will attempt to connect to the sqlite, postgres, or mysql database
-func (db *DbConfig) Connect(retry bool, location string) error {
+func (c *Core) Connect(retry bool, location string) error {
 	postgresSSL := os.Getenv("POSTGRES_SSLMODE")
 	if DbSession != nil {
 		return nil
 	}
 	var conn, dbType string
 	var err error
-	dbType = Configs.DbConn
-	if Configs.DbPort == 0 {
-		Configs.DbPort = DefaultPort(dbType)
+	dbType = CoreApp.Config.DbConn
+	if CoreApp.Config.DbPort == 0 {
+		CoreApp.Config.DbPort = defaultPort(dbType)
 	}
 	switch dbType {
 	case "sqlite":
-		conn = location + "/statup.db"
+		sqlFilename := findDbFile()
+		conn = sqlFilename
+		log.Infof("SQL database file at: %v/%v", utils.Directory, conn)
 		dbType = "sqlite3"
 	case "mysql":
-		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
-		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC&time_zone=%%27UTC%%27", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
+		host := fmt.Sprintf("%v:%v", CoreApp.Config.DbHost, CoreApp.Config.DbPort)
+		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC&time_zone=%%27UTC%%27", CoreApp.Config.DbUser, CoreApp.Config.DbPass, host, CoreApp.Config.DbData)
 	case "postgres":
 		sslMode := "disable"
 		if postgresSSL != "" {
 			sslMode = postgresSSL
 		}
-		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v timezone=UTC sslmode=%v", Configs.DbHost, Configs.DbPort, Configs.DbUser, Configs.DbData, Configs.DbPass, sslMode)
+		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v timezone=UTC sslmode=%v", CoreApp.Config.DbHost, CoreApp.Config.DbPort, CoreApp.Config.DbUser, CoreApp.Config.DbData, CoreApp.Config.DbPass, sslMode)
 	case "mssql":
-		host := fmt.Sprintf("%v:%v", Configs.DbHost, Configs.DbPort)
-		conn = fmt.Sprintf("sqlserver://%v:%v@%v?database=%v", Configs.DbUser, Configs.DbPass, host, Configs.DbData)
+		host := fmt.Sprintf("%v:%v", CoreApp.Config.DbHost, CoreApp.Config.DbPort)
+		conn = fmt.Sprintf("sqlserver://%v:%v@%v?database=%v", CoreApp.Config.DbUser, CoreApp.Config.DbPass, host, CoreApp.Config.DbData)
 	}
+	log.WithFields(utils.ToFields(c, conn)).Debugln("attempting to connect to database")
 	dbSession, err := gorm.Open(dbType, conn)
 	if err != nil {
+		log.Debugln(fmt.Sprintf("Database connection error %v", err))
 		if retry {
-			utils.Log(1, fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", Configs.DbHost))
-			return db.waitForDb()
+			log.Errorln(fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", CoreApp.Config.DbHost))
+			return c.waitForDb()
 		} else {
 			return err
 		}
 	}
-	if dbType == "sqlite3" {
-		dbSession.DB().SetMaxOpenConns(1)
-	}
-	err = dbSession.DB().Ping()
-	if err == nil {
+	log.WithFields(utils.ToFields(dbSession)).Debugln("connected to database")
+
+	dbSession.DB().SetMaxOpenConns(5)
+	dbSession.DB().SetMaxIdleConns(5)
+	dbSession.DB().SetConnMaxLifetime(1 * time.Minute)
+
+	if dbSession.DB().Ping() == nil {
 		DbSession = dbSession
-		utils.Log(1, fmt.Sprintf("Database %v connection was successful.", dbType))
+		if utils.VerboseMode >= 4 {
+			DbSession.LogMode(true).Debug().SetLogger(log)
+		}
+		log.Infoln(fmt.Sprintf("Database %v connection was successful.", dbType))
 	}
 	return err
 }
 
 // waitForDb will sleep for 5 seconds and try to connect to the database again
-func (db *DbConfig) waitForDb() error {
+func (c *Core) waitForDb() error {
 	time.Sleep(5 * time.Second)
-	return db.Connect(true, utils.Directory)
+	return c.Connect(true, utils.Directory)
 }
 
 // DatabaseMaintence will automatically delete old records from 'failures' and 'hits'
 // this function is currently set to delete records 7+ days old every 60 minutes
 func DatabaseMaintence() {
 	for range time.Tick(60 * time.Minute) {
-		utils.Log(1, "Checking for database records older than 3 months...")
+		log.Infoln("Checking for database records older than 3 months...")
 		since := time.Now().AddDate(0, -3, 0).UTC()
 		DeleteAllSince("failures", since)
 		DeleteAllSince("hits", since)
@@ -256,21 +290,21 @@ func DeleteAllSince(table string, date time.Time) {
 	sql := fmt.Sprintf("DELETE FROM %v WHERE created_at < '%v';", table, date.Format("2006-01-02"))
 	db := DbSession.Exec(sql)
 	if db.Error != nil {
-		utils.Log(2, db.Error)
+		log.Warnln(db.Error)
 	}
 }
 
 // Update will save the config.yml file
-func (db *DbConfig) Update() error {
+func (c *Core) UpdateConfig() error {
 	var err error
 	config, err := os.Create(utils.Directory + "/config.yml")
 	if err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 		return err
 	}
-	data, err := yaml.Marshal(db)
+	data, err := yaml.Marshal(c.Config)
 	if err != nil {
-		utils.Log(3, err)
+		log.Errorln(err)
 		return err
 	}
 	config.WriteString(string(data))
@@ -279,31 +313,33 @@ func (db *DbConfig) Update() error {
 }
 
 // Save will initially create the config.yml file
-func (db *DbConfig) Save() (*DbConfig, error) {
-	var err error
+func (c *Core) SaveConfig(configs *types.DbConfig) (*types.DbConfig, error) {
 	config, err := os.Create(utils.Directory + "/config.yml")
 	if err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 		return nil, err
 	}
-	db.ApiKey = utils.NewSHA1Hash(16)
-	db.ApiSecret = utils.NewSHA1Hash(16)
-	data, err := yaml.Marshal(db)
+	defer config.Close()
+	log.WithFields(utils.ToFields(configs)).Debugln("saving config file at: " + utils.Directory + "/config.yml")
+	c.Config = configs
+	c.Config.ApiKey = utils.NewSHA1Hash(16)
+	c.Config.ApiSecret = utils.NewSHA1Hash(16)
+	data, err := yaml.Marshal(configs)
 	if err != nil {
-		utils.Log(3, err)
+		log.Errorln(err)
 		return nil, err
 	}
 	config.WriteString(string(data))
-	defer config.Close()
-	return db, err
+	log.WithFields(utils.ToFields(configs)).Infoln("saved config file at: " + utils.Directory + "/config.yml")
+	return c.Config, err
 }
 
 // CreateCore will initialize the global variable 'CoreApp". This global variable contains most of Statping app.
-func (c *DbConfig) CreateCore() *Core {
+func (c *Core) CreateCore() *Core {
 	newCore := &types.Core{
-		Name:        c.Project,
+		Name:        c.Name,
 		Description: c.Description,
-		Config:      "config.yml",
+		ConfigFile:  utils.Directory + "/config.yml",
 		ApiKey:      c.ApiKey,
 		ApiSecret:   c.ApiSecret,
 		Domain:      c.Domain,
@@ -315,14 +351,14 @@ func (c *DbConfig) CreateCore() *Core {
 	}
 	CoreApp, err := SelectCore()
 	if err != nil {
-		utils.Log(4, err)
+		log.Errorln(err)
 	}
 	return CoreApp
 }
 
 // DropDatabase will DROP each table Statping created
-func (db *DbConfig) DropDatabase() error {
-	utils.Log(1, "Dropping Database Tables...")
+func (c *Core) DropDatabase() error {
+	log.Infoln("Dropping Database Tables...")
 	err := DbSession.DropTableIfExists("checkins")
 	err = DbSession.DropTableIfExists("checkin_hits")
 	err = DbSession.DropTableIfExists("notifications")
@@ -338,9 +374,9 @@ func (db *DbConfig) DropDatabase() error {
 }
 
 // CreateDatabase will CREATE TABLES for each of the Statping elements
-func (db *DbConfig) CreateDatabase() error {
+func (c *Core) CreateDatabase() error {
 	var err error
-	utils.Log(1, "Creating Database Tables...")
+	log.Infoln("Creating Database Tables...")
 	for _, table := range DbModels {
 		if err := DbSession.CreateTable(table); err.Error != nil {
 			return err.Error
@@ -349,15 +385,15 @@ func (db *DbConfig) CreateDatabase() error {
 	if err := DbSession.Table("core").CreateTable(&types.Core{}); err.Error != nil {
 		return err.Error
 	}
-	utils.Log(1, "Statping Database Created")
+	log.Infoln("Statping Database Created")
 	return err
 }
 
 // MigrateDatabase will migrate the database structure to current version.
 // This function will NOT remove previous records, tables or columns from the database.
 // If this function has an issue, it will ROLLBACK to the previous state.
-func (db *DbConfig) MigrateDatabase() error {
-	utils.Log(1, "Migrating Database Tables...")
+func (c *Core) MigrateDatabase() error {
+	log.Infoln("Migrating Database Tables...")
 	tx := DbSession.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -365,6 +401,7 @@ func (db *DbConfig) MigrateDatabase() error {
 		}
 	}()
 	if tx.Error != nil {
+		log.Errorln(tx.Error)
 		return tx.Error
 	}
 	for _, table := range DbModels {
@@ -372,9 +409,9 @@ func (db *DbConfig) MigrateDatabase() error {
 	}
 	if err := tx.Table("core").AutoMigrate(&types.Core{}); err.Error != nil {
 		tx.Rollback()
-		utils.Log(3, fmt.Sprintf("Statping Database could not be migrated: %v", tx.Error))
+		log.Errorln(fmt.Sprintf("Statping Database could not be migrated: %v", tx.Error))
 		return tx.Error
 	}
-	utils.Log(1, "Statping Database Migrated")
+	log.Infoln("Statping Database Migrated")
 	return tx.Commit().Error
 }

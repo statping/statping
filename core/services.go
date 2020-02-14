@@ -101,7 +101,7 @@ func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 	var services []*Service
 	db := servicesDB().Find(&services).Order("order_id desc")
 	if db.Error != nil {
-		utils.Log(3, fmt.Sprintf("service error: %v", db.Error))
+		log.Errorln(fmt.Sprintf("service error: %v", db.Error))
 		return nil, db.Error
 	}
 	CoreApp.Services = nil
@@ -144,7 +144,7 @@ func (s *Service) AvgTime() string {
 
 // OnlineDaysPercent returns the service's uptime percent within last 24 hours
 func (s *Service) OnlineDaysPercent(days int) float32 {
-	ago := time.Now().Add((-24 * time.Duration(days)) * time.Hour)
+	ago := time.Now().UTC().Add((-24 * time.Duration(days)) * time.Hour)
 	return s.OnlineSince(ago)
 }
 
@@ -207,7 +207,7 @@ func (s *Service) SmallText() string {
 	}
 	if len(last) > 0 {
 		lastFailure := s.lastFailure()
-		got, _ := timeago.TimeAgoWithTime(time.Now().Add(s.Downtime()), time.Now())
+		got, _ := timeago.TimeAgoWithTime(time.Now().UTC().Add(s.Downtime()), time.Now().UTC())
 		return fmt.Sprintf("Reported offline %v, %v", got, lastFailure.ParseError())
 	} else {
 		return fmt.Sprintf("%v is currently offline", s.Name)
@@ -240,7 +240,7 @@ func Dbtimestamp(group string, column string) string {
 	default:
 		seconds = 60
 	}
-	switch CoreApp.DbConnection {
+	switch CoreApp.Config.DbConn {
 	case "mysql":
 		return fmt.Sprintf("CONCAT(date_format(created_at, '%%Y-%%m-%%d %%H:00:00')) AS timeframe, AVG(%v) AS value", column)
 	case "postgres":
@@ -260,7 +260,7 @@ func (s *Service) Downtime() time.Duration {
 	if len(hits) == 0 {
 		return time.Now().UTC().Sub(fail.CreatedAt.UTC())
 	}
-	since := fail.CreatedAt.UTC().Sub(fail.CreatedAt.UTC())
+	since := fail.CreatedAt.UTC().Sub(hits[0].CreatedAt.UTC())
 	return since
 }
 
@@ -272,7 +272,7 @@ func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group st
 	model = model.Order("timeframe asc", false).Group("timeframe")
 	rows, err := model.Rows()
 	if err != nil {
-		utils.Log(3, fmt.Errorf("issue fetching service chart data: %v", err))
+		log.Errorln(fmt.Errorf("issue fetching service chart data: %v", err))
 	}
 	for rows.Next() {
 		var gd DateScan
@@ -281,10 +281,10 @@ func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group st
 		var createdTime time.Time
 		var err error
 		rows.Scan(&createdAt, &value)
-		if CoreApp.DbConnection == "postgres" {
+		if CoreApp.Config.DbConn == "postgres" {
 			createdTime, err = time.Parse(types.TIME_NANO, createdAt)
 			if err != nil {
-				utils.Log(4, fmt.Errorf("issue parsing time from database: %v to %v", createdAt, types.TIME_NANO))
+				log.Errorln(fmt.Errorf("issue parsing time from database: %v to %v", createdAt, types.TIME_NANO))
 			}
 		} else {
 			createdTime, err = time.Parse(types.TIME, createdAt)
@@ -301,7 +301,7 @@ func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group st
 func (d *DateScanObj) ToString() string {
 	data, err := json.Marshal(d.Array)
 	if err != nil {
-		utils.Log(2, err)
+		log.Warnln(err)
 		return "{}"
 	}
 	return string(data)
@@ -309,7 +309,7 @@ func (d *DateScanObj) ToString() string {
 
 // AvgUptime24 returns a service's average online status for last 24 hours
 func (s *Service) AvgUptime24() string {
-	ago := time.Now().Add(-24 * time.Hour)
+	ago := time.Now().UTC().Add(-24 * time.Hour)
 	return s.AvgUptime(ago)
 }
 
@@ -371,7 +371,7 @@ func (s *Service) Delete() error {
 	i := s.index()
 	err := servicesDB().Delete(s)
 	if err.Error != nil {
-		utils.Log(3, fmt.Sprintf("Failed to delete service %v. %v", s.Name, err.Error))
+		log.Errorln(fmt.Sprintf("Failed to delete service %v. %v", s.Name, err.Error))
 		return err.Error
 	}
 	s.Close()
@@ -386,7 +386,7 @@ func (s *Service) Delete() error {
 func (s *Service) Update(restart bool) error {
 	err := servicesDB().Update(&s)
 	if err.Error != nil {
-		utils.Log(3, fmt.Sprintf("Failed to update service %v. %v", s.Name, err))
+		log.Errorln(fmt.Sprintf("Failed to update service %v. %v", s.Name, err))
 		return err.Error
 	}
 	// clear the notification queue for a service
@@ -410,10 +410,10 @@ func (s *Service) Update(restart bool) error {
 
 // Create will create a service and insert it into the database
 func (s *Service) Create(check bool) (int64, error) {
-	s.CreatedAt = time.Now()
+	s.CreatedAt = time.Now().UTC()
 	db := servicesDB().Create(s)
 	if db.Error != nil {
-		utils.Log(3, fmt.Sprintf("Failed to create service %v #%v: %v", s.Name, s.Id, db.Error))
+		log.Errorln(fmt.Sprintf("Failed to create service %v #%v: %v", s.Name, s.Id, db.Error))
 		return 0, db.Error
 	}
 	s.Start()

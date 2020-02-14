@@ -17,6 +17,7 @@ package core
 
 import (
 	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -24,7 +25,6 @@ import (
 
 var (
 	newServiceId int64
-	newGroupId   int64
 )
 
 func TestSelectHTTPService(t *testing.T) {
@@ -118,7 +118,7 @@ func TestCheckTCPService(t *testing.T) {
 }
 
 func TestServiceOnline24Hours(t *testing.T) {
-	since := time.Now().Add(-24 * time.Hour).Add(-10 * time.Minute)
+	since := utils.Now().Add(-24 * time.Hour).Add(-10 * time.Minute)
 	service := SelectService(1)
 	assert.Equal(t, float32(100), service.OnlineSince(since))
 	service2 := SelectService(5)
@@ -134,7 +134,7 @@ func TestServiceSmallText(t *testing.T) {
 }
 
 func TestServiceAvgUptime(t *testing.T) {
-	since := time.Now().Add(-24 * time.Hour).Add(-10 * time.Minute)
+	since := utils.Now().Add(-24 * time.Hour).Add(-10 * time.Minute)
 	service := SelectService(1)
 	assert.NotEqual(t, "0.00", service.AvgUptime(since))
 	service2 := SelectService(5)
@@ -256,10 +256,10 @@ func TestServiceFailedTCPCheck(t *testing.T) {
 }
 
 func TestCreateServiceFailure(t *testing.T) {
-	fail := &Failure{&types.Failure{
+	fail := &types.Failure{
 		Issue:  "This is not an issue, but it would container HTTP response errors.",
 		Method: "http",
-	}}
+	}
 	service := SelectService(8)
 	id, err := service.CreateFailure(fail)
 	assert.Nil(t, err)
@@ -350,13 +350,13 @@ func TestSelectServiceLink(t *testing.T) {
 }
 
 func TestDbtimestamp(t *testing.T) {
-	CoreApp.DbConnection = "mysql"
+	CoreApp.Config.DbConn = "mysql"
 	query := Dbtimestamp("minute", "latency")
 	assert.Equal(t, "CONCAT(date_format(created_at, '%Y-%m-%d %H:00:00')) AS timeframe, AVG(latency) AS value", query)
-	CoreApp.DbConnection = "postgres"
+	CoreApp.Config.DbConn = "postgres"
 	query = Dbtimestamp("minute", "latency")
 	assert.Equal(t, "date_trunc('minute', created_at) AS timeframe, AVG(latency) AS value", query)
-	CoreApp.DbConnection = "sqlite"
+	CoreApp.Config.DbConn = "sqlite"
 	query = Dbtimestamp("minute", "latency")
 	assert.Equal(t, "datetime((strftime('%s', created_at) / 60) * 60, 'unixepoch') AS timeframe, AVG(latency) as value", query)
 }
@@ -398,7 +398,7 @@ func TestService_TotalFailures24(t *testing.T) {
 
 func TestService_TotalFailuresOnDate(t *testing.T) {
 	t.SkipNow()
-	ago := time.Now().UTC()
+	ago := utils.Now().UTC()
 	service := SelectService(8)
 	failures, err := service.TotalFailuresOnDate(ago)
 	assert.Nil(t, err)

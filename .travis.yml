@@ -1,74 +1,59 @@
 os:
-  - linux
-
+- linux
 language: go
-go: 1.13
+go: 1.13.5
 go_import_path: github.com/hunterlong/statping
-
 cache:
   directories:
-    - $GOPATH/pkg/dep
-    - ~/.npm
-    - ~/.cache
-    - $GOPATH/src/github.com/hunterlong/statping/vendor
-
+  - "~/.npm"
+  - "~/.cache"
+  - "$GOPATH/src/github.com/hunterlong/statping/tmp"
+  - "$GOPATH/src/github.com/hunterlong/statping/vendor"
 sudo: required
-
 services:
-  - docker
-  - postgresql
-  - mysql
-  - mongodb
-
+- docker
+- postgresql
+- mysql
+- mongodb
 env:
   global:
-    - PATH=/snap/bin:$PATH
-    - DB_HOST=localhost
-    - DB_USER=travis
-    - DB_PASS=
-    - DB_DATABASE=test
-    - GO_ENV=test
-    - STATPING_DIR=$GOPATH/src/github.com/hunterlong/statping
-
+  - PATH=$HOME/.local/bin:$PATH
+  - DB_HOST=localhost
+  - DB_USER=travis
+  - DB_PASS=
+  - DB_DATABASE=test
+  - GO_ENV=test
+  - STATPING_DIR=$GOPATH/src/github.com/hunterlong/statping
 matrix:
   allow_failures:
-    - go: master
+  - go: master
   fast_finish: true
-
 notifications:
   email: true
-
 branches:
   only:
-    - master
-    - dev
-
-before_install:
-  - curl -L -s https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64 -o $GOPATH/bin/dep
-  - chmod +x $GOPATH/bin/dep
-
+  - master
 install:
-  - npm install -g sass
-  - npm install -g newman
-  - make dev-deps
-  - make dep
-  - make install
-
+- npm install -g sass
+- npm install -g newman
+- pip install --user awscli
+- go mod vendor
+- make dev-deps
+- make install
 before_script:
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
-  - psql -c 'create database test;' -U postgres
-
+- mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
+- psql -c 'create database test;' -U postgres
 script:
-  - travis_retry make test-all
-  - make test-api
-  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make coverage; fi
-
+- travis_retry make test-all
+- make test-api
+- if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then
+  make coverage; fi
 after_success:
-  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then make travis-build; fi
-
+- if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then
+  make travis-build; fi
 webhooks:
   urls:
-    - $GITTER
+  - "$GITTER"
   on_success: change
   on_failure: always
   on_start: never

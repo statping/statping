@@ -32,7 +32,7 @@ import (
 
 // checkServices will start the checking go routine for each service
 func checkServices() {
-	utils.Log(1, fmt.Sprintf("Starting monitoring process for %v Services", len(CoreApp.Services)))
+	log.Infoln(fmt.Sprintf("Starting monitoring process for %v Services", len(CoreApp.Services)))
 	for _, ser := range CoreApp.Services {
 		//go obj.StartCheckins()
 		go ser.CheckQueue(true)
@@ -60,7 +60,7 @@ CheckLoop:
 	for {
 		select {
 		case <-s.Running:
-			utils.Log(1, fmt.Sprintf("Stopping service: %v", s.Name))
+			log.Infoln(fmt.Sprintf("Stopping service: %v", s.Name))
 			break CheckLoop
 		case <-time.After(s.SleepDuration):
 			s.Check(record)
@@ -229,7 +229,7 @@ func (s *Service) checkHttp(record bool) *Service {
 	if s.Expected.String != "" {
 		match, err := regexp.MatchString(s.Expected.String, string(content))
 		if err != nil {
-			utils.Log(2, fmt.Sprintf("Service %v expected: %v to match %v", s.Name, string(content), s.Expected.String))
+			log.Warnln(fmt.Sprintf("Service %v expected: %v to match %v", s.Name, string(content), s.Expected.String))
 		}
 		if !match {
 			if record {
@@ -257,10 +257,10 @@ func recordSuccess(s *Service) {
 		Service:   s.Id,
 		Latency:   s.Latency,
 		PingTime:  s.PingTime,
-		CreatedAt: time.Now(),
+		CreatedAt: time.Now().UTC(),
 	}
-	utils.Log(1, fmt.Sprintf("Service %v Successful Response: %0.2f ms | Lookup in: %0.2f ms", s.Name, hit.Latency*1000, hit.PingTime*1000))
 	s.CreateHit(hit)
+	log.WithFields(utils.ToFields(hit, s.Select())).Infoln(fmt.Sprintf("Service %v Successful Response: %0.2f ms | Lookup in: %0.2f ms", s.Name, hit.Latency*1000, hit.PingTime*1000))
 	notifier.OnSuccess(s.Service)
 	s.Online = true
 	s.SuccessNotified = true
@@ -268,18 +268,19 @@ func recordSuccess(s *Service) {
 
 // recordFailure will create a new 'Failure' record in the database for a offline service
 func recordFailure(s *Service, issue string) {
-	fail := &Failure{&types.Failure{
+	fail := &types.Failure{
 		Service:   s.Id,
 		Issue:     issue,
 		PingTime:  s.PingTime,
-		CreatedAt: time.Now(),
+		CreatedAt: time.Now().UTC(),
 		ErrorCode: s.LastStatusCode,
-	}}
-	utils.Log(2, fmt.Sprintf("Service %v Failing: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
+	}
+	log.WithFields(utils.ToFields(fail, s.Select())).
+		Warnln(fmt.Sprintf("Service %v Failing: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
 	s.CreateFailure(fail)
 	s.Online = false
 	s.SuccessNotified = false
 	s.UpdateNotify = CoreApp.UpdateNotify.Bool
 	s.DownText = s.DowntimeText()
-	notifier.OnFailure(s.Service, fail.Failure)
+	notifier.OnFailure(s.Service, fail)
 }

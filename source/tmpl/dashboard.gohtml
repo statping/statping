@@ -21,7 +21,7 @@
             {{ range Services }}
                 <div class="col-12 card mb-3" style="min-height: 260px">
                     <div class="card-body">
-                        <h5 class="card-title"><a href="/service/{{.Id}}">{{.Name}}</a> {{if .Online}}<span class="badge float-right badge-success">ONLINE</span>{{else}}<span class="badge float-right badge-danger">OFFLINE</span>{{end}}</h5>
+                        <h5 class="card-title"><a href="service/{{.Id}}">{{.Name}}</a> {{if .Online}}<span class="badge float-right badge-success">ONLINE</span>{{else}}<span class="badge float-right badge-danger">OFFLINE</span>{{end}}</h5>
                         <div class="row">
                             <div class="col-md-3 col-sm-6">
                                 <div id="spark_service_{{.Id}}_1"></div>
@@ -46,7 +46,7 @@
                     <div class="jumbotron jumbotron-fluid">
                         <div class="text-center">
                             <h1 class="display-4">No Services!</h1>
-                            <a class="lead">You don't have any websites or applications being monitored by your Statping server. <p><a href="/services" class="btn btn-secondary mt-3">Add Service</a></p></p>
+                            <a class="lead">You don't have any websites or applications being monitored by your Statping server. <p><a href="service/create" class="btn btn-secondary mt-3">Add Service</a></p></p>
                         </div>
                     </div>
                 {{end}}
