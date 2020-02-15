@@ -254,6 +254,7 @@ func (u *email) dialSend(email *emailOutgoing) error {
 	// if email setting TLS is Disabled
 	if u.ApiKey == "true" {
 		mailer.SSL = false
+		mailer.StartTLSPolicy = mail.NoStartTLS
 	} else {
 		mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	}
