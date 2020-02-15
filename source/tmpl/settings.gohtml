@@ -11,6 +11,7 @@
                     <a class="nav-link" id="v-pills-notifications-tab" data-toggle="pill" href="#v-pills-notifications" role="tab" aria-controls="v-pills-notifications" aria-selected="true"><i class="fa fa-bell"></i> Notifications</a>
                     <a class="nav-link" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false"><i class="fa fa-image"></i> Theme Editor</a>
                     <a class="nav-link" id="v-pills-cache-tab" data-toggle="pill" href="#v-pills-cache" role="tab" aria-controls="v-pills-cache" aria-selected="false"><i class="fa fa-paperclip"></i> Cache</a>
+                    <a class="nav-link" id="v-pills-maintenance-tab" data-toggle="pill" href="#v-pills-maintenance" role="tab" aria-controls="v-pills-maintenance" aria-selected="false"><i class="fa fa-database"></i> Maintenance</a>
                     <h6 class="mt-4 text-muted">Notifiers</h6>
 
                 {{ range .Notifications }}
@@ -223,6 +224,9 @@
                             <a href="settings/delete_assets" class="btn btn-danger btn-block confirm-btn">Delete All Assets</a>
                         </form>
                     {{end}}
+                    </div>
+
+                    <div class="tab-pane" id="v-pills-maintenance" role="tabpanel" aria-labelledby="v-pills-maintenance-tab">
                     </div>
 
                     <div class="tab-pane" id="v-pills-cache" role="tabpanel" aria-labelledby="v-pills-cache-tab">
