@@ -110,14 +110,14 @@ func IsReadAuthenticated(r *http.Request) bool {
 	var token string
 	query := r.URL.Query()
 	key := query.Get("api")
-	if subtle.ConstantTimeCompare([]byte(key), []byte(core.CoreApp.ApiSecret)) == 1 {
+	if subtle.ConstantTimeCompare([]byte(key), []byte(core.CoreApp.ApiKey)) == 1 || subtle.ConstantTimeCompare([]byte(key), []byte(core.CoreApp.ApiSecret)) == 1 {
 		return true
 	}
 	tokens, ok := r.Header["Authorization"]
 	if ok && len(tokens) >= 1 {
 		token = tokens[0]
 		token = strings.TrimPrefix(token, "Bearer ")
-		if subtle.ConstantTimeCompare([]byte(token), []byte(core.CoreApp.ApiSecret)) == 1 {
+		if subtle.ConstantTimeCompare([]byte(token), []byte(core.CoreApp.ApiKey)) == 1 || subtle.ConstantTimeCompare([]byte(token), []byte(core.CoreApp.ApiSecret)) == 1 {
 			return true
 		}
 	}
