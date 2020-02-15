@@ -38,22 +38,23 @@ func (h *Hit) BeforeCreate() (err error) {
 
 // DbConfig struct is used for the database connection and creates the 'config.yml' file
 type DbConfig struct {
-	DbConn      string `yaml:"connection" json:"connection"`
-	DbHost      string `yaml:"host" json:"-"`
-	DbUser      string `yaml:"user" json:"-"`
-	DbPass      string `yaml:"password" json:"-"`
-	DbData      string `yaml:"database" json:"-"`
-	DbPort      int64  `yaml:"port" json:"-"`
-	ApiKey      string `yaml:"api_key" json:"-"`
-	ApiSecret   string `yaml:"api_secret" json:"-"`
-	Project     string `yaml:"-" json:"-"`
-	Description string `yaml:"-" json:"-"`
-	Domain      string `yaml:"-" json:"-"`
-	Username    string `yaml:"-" json:"-"`
-	Password    string `yaml:"-" json:"-"`
-	Email       string `yaml:"-" json:"-"`
-	Error       error  `yaml:"-" json:"-"`
-	Location    string `yaml:"location" json:"-"`
-	SqlFile     string `yaml:"sqlfile,omitempty" json:"-"`
-	LocalIP     string `yaml:"-" json:"-"`
+	DbConn        string `yaml:"connection" json:"connection"`
+	DbHost        string `yaml:"host" json:"-"`
+	DbUser        string `yaml:"user" json:"-"`
+	DbPass        string `yaml:"password" json:"-"`
+	DbData        string `yaml:"database" json:"-"`
+	DbPort        int64  `yaml:"port" json:"-"`
+	ApiKey        string `yaml:"api_key" json:"-"`
+	ApiSecret     string `yaml:"api_secret" json:"-"`
+	Project       string `yaml:"-" json:"-"`
+	Description   string `yaml:"-" json:"-"`
+	Domain        string `yaml:"-" json:"-"`
+	Username      string `yaml:"-" json:"-"`
+	Password      string `yaml:"-" json:"-"`
+	Email         string `yaml:"-" json:"-"`
+	Error         error  `yaml:"-" json:"-"`
+	Location      string `yaml:"location" json:"-"`
+	SqlFile       string `yaml:"sqlfile,omitempty" json:"-"`
+	LocalIP       string `yaml:"-" json:"-"`
+	DataRetention int    `yaml:"-" json:"-"` // How long the data will be keept stored in the Database in Days
 }
