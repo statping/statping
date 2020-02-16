@@ -81,7 +81,8 @@ func (u *twilio) Send(msg interface{}) error {
 	v.Set("Body", message)
 	rb := *strings.NewReader(v.Encode())
 
-	contents, _, err := utils.HttpRequest(twilioUrl, "POST", "application/x-www-form-urlencoded", nil, &rb, time.Duration(10*time.Second), true)
+	headers := []string{fmt.Sprintf("Authorization=Basic %v", utils.BasicAuth(u.ApiKey, u.ApiSecret))}
+	contents, _, err := utils.HttpRequest(twilioUrl, "POST", "application/x-www-form-urlencoded", headers, &rb, time.Duration(10*time.Second), true)
 	success, _ := twilioSuccess(contents)
 	if !success {
 		errorOut := twilioError(contents)

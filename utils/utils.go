@@ -18,6 +18,7 @@ package utils
 import (
 	"context"
 	"crypto/tls"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/ararog/timeago"
@@ -314,6 +315,12 @@ func DurationReadable(d time.Duration) string {
 func SaveFile(filename string, data []byte) error {
 	err := ioutil.WriteFile(filename, data, 0644)
 	return err
+}
+
+// BasicAuth converts username and password to a base64-encoded string for HTTP basic auth
+func BasicAuth(username, password string) string {
+	auth := username + ":" + password
+	return base64.StdEncoding.EncodeToString([]byte(auth))
 }
 
 // HttpRequest is a global function to send a HTTP request
