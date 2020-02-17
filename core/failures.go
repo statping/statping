@@ -71,6 +71,8 @@ func (s *Service) DeleteFailures() {
 		// deleted.
 		return
 	}
+
+	log.Infof("Deleted all failures of Service with ID '%d'\n", s.Id)
 	s.Failures = nil
 }
 
