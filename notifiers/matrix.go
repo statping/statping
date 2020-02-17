@@ -23,56 +23,59 @@ import (
 	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/types"
 	"io"
-	"math/rand"
 	"net/http"
 	"time"
 )
 
 type matrix struct {
 	*notifier.Notification
+	txId int
 }
 
-var Matrix = &matrix{&notifier.Notification{
-	Method:      "matrix",
-	Title:       "Matrix",
-	Description: "Receive notifications on your Matrix room when a service has an issue. You must get a username and token. It is recommended to create a dedicated user for this.",
-	Author:      "Tero Vierimaa",
-	AuthorUrl:   "https://github.com/tryffel",
-	Icon:        "far fa-bell",
-	Delay:       5 * time.Second,
-	Form: []notifier.NotificationForm{{
-		Type:        "text",
-		Title:       "Homeserver url",
-		Placeholder: "https://matrix.org",
-		SmallText:   "Enter homeserver url, http(s) included",
-		DbField:     "host",
-		Required:    true,
-	}, {
-		Type:        "text",
-		Title:       "Room Id",
-		Placeholder: "!MzCSpOkYukLxYisAbY:matrix.org",
-		SmallText:   "Enter full room id",
-		DbField:     "var1",
-		Required:    true,
-	}, {
-		Type:        "text",
-		Title:       "Token",
-		Placeholder: "MDAxyz...",
-		SmallText:   "Enter user token",
-		DbField:     "api_secret",
-		Required:    true,
-	}, {
-		Type:        "text",
-		Title:       "Event type",
-		Placeholder: "m.text",
-		SmallText:   "Either m.text (normal message) or m.notice (silent message)",
-		DbField:     "var2",
-		Required:    false,
-	}},
-}}
+var Matrix = &matrix{
+	Notification: &notifier.Notification{
+		Method:      "matrix",
+		Title:       "Matrix",
+		Description: "Receive notifications on your Matrix room when a service has an issue. You must get a username and token. It is recommended to create a dedicated user for this.",
+		Author:      "Tero Vierimaa",
+		AuthorUrl:   "https://github.com/tryffel",
+		Icon:        "far fa-bell",
+		Delay:       5 * time.Second,
+		Form: []notifier.NotificationForm{{
+			Type:        "text",
+			Title:       "Homeserver url",
+			Placeholder: "https://matrix.org",
+			SmallText:   "Enter homeserver url, http(s) included",
+			DbField:     "host",
+			Required:    true,
+		}, {
+			Type:        "text",
+			Title:       "Room Id",
+			Placeholder: "!MzCSpOkYukLxYisAbY:matrix.org",
+			SmallText:   "Enter full room id",
+			DbField:     "var1",
+			Required:    true,
+		}, {
+			Type:        "text",
+			Title:       "Token",
+			Placeholder: "MDAxyz...",
+			SmallText:   "Enter user token",
+			DbField:     "api_secret",
+			Required:    true,
+		}, {
+			Type:        "text",
+			Title:       "Event type",
+			Placeholder: "m.text",
+			SmallText:   "Either m.text (normal message) or m.notice (silent message)",
+			DbField:     "var2",
+			Required:    false,
+		}},
+	},
+	txId: 0,
+}
 
 // matrixUrl, params: room, nonce
-var matrixUrlPath = "/_matrix/client/r0/rooms/%s/send/m.room.message/%d"
+var matrixUrlPath = "/_matrix/client/r0/rooms/%s/send/m.room.message/%d%d"
 
 func (m *matrix) Select() *notifier.Notification {
 	return m.Notification
@@ -122,9 +125,11 @@ func (m *matrix) sendMsg(msg, msgType string) error {
 		"body":    msg,
 	}
 
-	nonce := rand.Intn(10000)
-	url := m.Host + matrixUrlPath
-	url = fmt.Sprintf(m.Host+matrixUrlPath, m.Var1, nonce)
+	m.txId += 1
+
+	// create a unique transaction id coming from this matrix client (timestamp + counter)
+	timestamp := time.Now().Nanosecond()
+	url := fmt.Sprintf(m.Host+matrixUrlPath, m.Var1, timestamp, m.txId)
 
 	body, err := json.Marshal(data)
 	if err != nil {
@@ -150,9 +155,8 @@ func (m *matrix) sendMsg(msg, msgType string) error {
 
 	if resp.StatusCode == 200 {
 		return nil
-	} else {
-		return parseMatrixError(resp.Body)
 	}
+	return parseMatrixError(resp.Body)
 }
 
 func parseMatrixError(reader io.Reader) error {
