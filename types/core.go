@@ -41,6 +41,7 @@ type Core struct {
 	MigrationId   int64              `gorm:"column:migration_id" json:"migration_id,omitempty"`
 	UseCdn        NullBool           `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`
 	UpdateNotify  NullBool           `gorm:"column:update_notify;default:true" json:"update_notify,omitempty"`
+	DataRetention int64              `gorm:"column:data_retention;default:7" json:"data_retention,omitempty"` // How long the data will be keept stored in the Database in days
 	Timezone      float32            `gorm:"column:timezone;default:-8.0" json:"timezone,omitempty"`
 	CreatedAt     time.Time          `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt     time.Time          `gorm:"column:updated_at" json:"updated_at"`
