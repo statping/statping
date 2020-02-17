@@ -4,6 +4,7 @@ import (
 	"compress/gzip"
 	"crypto/subtle"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/utils"
@@ -54,6 +55,17 @@ func basicAuthHandler(next http.Handler) http.Handler {
 			w.Header().Set("WWW-Authenticate", `Basic realm="statping"`)
 			w.WriteHeader(401)
 			w.Write([]byte("You are unauthorized to access the application.\n"))
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+// apiMiddleware will confirm if Core has been setup
+func apiMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !core.CoreApp.Setup {
+			sendErrorJson(errors.New("statping has not been setup"), w, r)
 			return
 		}
 		next.ServeHTTP(w, r)

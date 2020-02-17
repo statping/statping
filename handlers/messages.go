@@ -25,26 +25,6 @@ import (
 	"net/http"
 )
 
-func messagesHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsUser(r) {
-		http.Redirect(w, r, basePath, http.StatusSeeOther)
-		return
-	}
-	messages, _ := core.SelectMessages()
-	ExecuteResponse(w, r, "messages.gohtml", messages, nil)
-}
-
-func viewMessageHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := utils.ToInt(vars["id"])
-	message, err := core.SelectMessage(id)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-	ExecuteResponse(w, r, "message.gohtml", message, nil)
-}
-
 func apiAllMessagesHandler(r *http.Request) interface{} {
 	messages, err := core.SelectMessages()
 	if err != nil {

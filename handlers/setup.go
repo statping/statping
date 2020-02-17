@@ -21,23 +21,9 @@ import (
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 )
-
-func setupHandler(w http.ResponseWriter, r *http.Request) {
-	if core.CoreApp.Services != nil {
-		http.Redirect(w, r, basePath, http.StatusSeeOther)
-		return
-	}
-	var data interface{}
-	if os.Getenv("DB_CONN") != "" {
-		data, _ = core.LoadUsingEnv()
-	}
-	w.WriteHeader(http.StatusOK)
-	ExecuteResponse(w, r, "setup.gohtml", data, nil)
-}
 
 func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	var err error

@@ -30,6 +30,11 @@ var (
 	log    = utils.Log.WithField("type", "handlers")
 )
 
+
+func staticAssets(src string) http.Handler {
+	return http.StripPrefix(basePath+src+"/", http.FileServer(http.Dir(utils.Directory+"/assets/"+src)))
+}
+
 // Router returns all of the routes used in Statping.
 // Server will use static assets if the 'assets' directory is found in the root directory.
 func Router() *mux.Router {
@@ -54,101 +59,108 @@ func Router() *mux.Router {
 	r.Use(sendLog)
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
-		r.PathPrefix("/css/").Handler(Gzip(http.StripPrefix(basePath+"css/", http.FileServer(http.Dir(dir+"/assets/css")))))
-		r.PathPrefix("/font/").Handler(http.StripPrefix(basePath+"font/", http.FileServer(http.Dir(dir+"/assets/font"))))
-		r.PathPrefix("/js/").Handler(Gzip(http.StripPrefix(basePath+"js/", http.FileServer(http.Dir(dir+"/assets/js")))))
+
+		r.PathPrefix("/css/").Handler(Gzip(staticAssets("css")))
+		r.PathPrefix("/font/").Handler(staticAssets("font"))
+		r.PathPrefix("/js/").Handler(Gzip(staticAssets("css")))
 		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, indexHandler))
 		r.PathPrefix("/favicon.ico").Handler(http.StripPrefix(basePath, indexHandler))
 		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, indexHandler))
 	} else {
-		//r.PathPrefix("/").Handler(http.StripPrefix(basePath+"/", http.FileServer(source.TmplBox.HTTPBox())))
-		r.PathPrefix("/css/").Handler(Gzip(http.FileServer(source.TmplBox.HTTPBox())))
-		r.PathPrefix("/scss/").Handler(Gzip(http.FileServer(source.TmplBox.HTTPBox())))
-		r.PathPrefix("/font/").Handler(http.FileServer(source.TmplBox.HTTPBox()))
-		r.PathPrefix("/js/").Handler(Gzip(http.FileServer(source.TmplBox.HTTPBox())))
-		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
-		r.PathPrefix("/favicon.ico").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
-		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
+		tmplFileSrv := http.FileServer(source.TmplBox.HTTPBox())
+		tmplBoxHandler := http.StripPrefix(basePath, tmplFileSrv)
+
+		r.PathPrefix("/css/").Handler(Gzip(tmplFileSrv))
+		r.PathPrefix("/scss/").Handler(Gzip(tmplFileSrv))
+		r.PathPrefix("/font/").Handler(tmplFileSrv)
+		r.PathPrefix("/js/").Handler(Gzip(tmplFileSrv))
+		r.PathPrefix("/robots.txt").Handler(tmplBoxHandler)
+		r.PathPrefix("/favicon.ico").Handler(tmplBoxHandler)
+		r.PathPrefix("/banner.png").Handler(tmplBoxHandler)
 	}
+
+	api := r.NewRoute().Subrouter()
+	//api := mux.NewRouter().StrictSlash(true)
+	api.Use(apiMiddleware)
 
 	// API Routes
 	r.Handle("/api", scoped(apiIndexHandler))
-	r.Handle("/api/login", http.HandlerFunc(apiLoginHandler)).Methods("POST")
+	api.Handle("/api/login", http.HandlerFunc(apiLoginHandler)).Methods("POST")
 	r.Handle("/api/setup", http.HandlerFunc(processSetupHandler)).Methods("POST")
-	r.Handle("/api/logout", http.HandlerFunc(logoutHandler))
-	r.Handle("/api/renew", authenticated(apiRenewHandler, false))
-	r.Handle("/api/cache", authenticated(apiCacheHandler, false)).Methods("GET")
-	r.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
-	r.Handle("/api/core", authenticated(apiCoreHandler, false)).Methods("POST")
-	r.Handle("/api/logs", authenticated(logsHandler, false)).Methods("GET")
-	r.Handle("/api/logs/last", authenticated(logsLineHandler, false)).Methods("GET")
+	api.Handle("/api/logout", http.HandlerFunc(logoutHandler))
+	api.Handle("/api/renew", authenticated(apiRenewHandler, false))
+	api.Handle("/api/cache", authenticated(apiCacheHandler, false)).Methods("GET")
+	api.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
+	api.Handle("/api/core", authenticated(apiCoreHandler, false)).Methods("POST")
+	api.Handle("/api/logs", authenticated(logsHandler, false)).Methods("GET")
+	api.Handle("/api/logs/last", authenticated(logsLineHandler, false)).Methods("GET")
 
 	// API SCSS and ASSETS Routes
-	r.Handle("/api/theme", authenticated(apiThemeHandler, false)).Methods("GET")
-	r.Handle("/api/theme", authenticated(apiThemeSaveHandler, false)).Methods("POST")
-	r.Handle("/api/theme/create", authenticated(apiThemeCreateHandler, false)).Methods("GET")
-	r.Handle("/api/theme", authenticated(apiThemeRemoveHandler, false)).Methods("DELETE")
+	api.Handle("/api/theme", authenticated(apiThemeHandler, false)).Methods("GET")
+	api.Handle("/api/theme", authenticated(apiThemeSaveHandler, false)).Methods("POST")
+	api.Handle("/api/theme/create", authenticated(apiThemeCreateHandler, false)).Methods("GET")
+	api.Handle("/api/theme", authenticated(apiThemeRemoveHandler, false)).Methods("DELETE")
 
 	// API INTEGRATIONS Routes
-	r.Handle("/api/integrations", authenticated(apiAllIntegrationsHandler, false)).Methods("GET")
-	r.Handle("/api/integrations/{name}", authenticated(apiIntegrationViewHandler, false)).Methods("GET")
-	r.Handle("/api/integrations/{name}", authenticated(apiIntegrationHandler, false)).Methods("POST")
+	api.Handle("/api/integrations", authenticated(apiAllIntegrationsHandler, false)).Methods("GET")
+	api.Handle("/api/integrations/{name}", authenticated(apiIntegrationViewHandler, false)).Methods("GET")
+	api.Handle("/api/integrations/{name}", authenticated(apiIntegrationHandler, false)).Methods("POST")
 
 	// API GROUPS Routes
-	r.Handle("/api/groups", scoped(apiAllGroupHandler)).Methods("GET")
-	r.Handle("/api/groups", authenticated(apiCreateGroupHandler, false)).Methods("POST")
-	r.Handle("/api/groups/{id}", readOnly(apiGroupHandler, false)).Methods("GET")
-	r.Handle("/api/groups/{id}", authenticated(apiGroupUpdateHandler, false)).Methods("POST")
-	r.Handle("/api/groups/{id}", authenticated(apiGroupDeleteHandler, false)).Methods("DELETE")
-	r.Handle("/api/reorder/groups", authenticated(apiGroupReorderHandler, false)).Methods("POST")
+	api.Handle("/api/groups", scoped(apiAllGroupHandler)).Methods("GET")
+	api.Handle("/api/groups", authenticated(apiCreateGroupHandler, false)).Methods("POST")
+	api.Handle("/api/groups/{id}", readOnly(apiGroupHandler, false)).Methods("GET")
+	api.Handle("/api/groups/{id}", authenticated(apiGroupUpdateHandler, false)).Methods("POST")
+	api.Handle("/api/groups/{id}", authenticated(apiGroupDeleteHandler, false)).Methods("DELETE")
+	api.Handle("/api/reorder/groups", authenticated(apiGroupReorderHandler, false)).Methods("POST")
 
 	// API SERVICE Routes
-	r.Handle("/api/services", scoped(apiAllServicesHandler)).Methods("GET")
-	r.Handle("/api/services", authenticated(apiCreateServiceHandler, false)).Methods("POST")
-	r.Handle("/api/services_test", authenticated(apiTestServiceHandler, false)).Methods("POST")
-	r.Handle("/api/services/{id}", scoped(apiServiceHandler)).Methods("GET")
-	r.Handle("/api/reorder/services", authenticated(reorderServiceHandler, false)).Methods("POST")
-	r.Handle("/api/services/{id}/running", authenticated(apiServiceRunningHandler, false)).Methods("POST")
-	r.Handle("/api/services/{id}/data", cached("30s", "application/json", apiServiceDataHandler)).Methods("GET")
-	r.Handle("/api/services/{id}/ping", cached("30s", "application/json", apiServicePingDataHandler)).Methods("GET")
-	r.Handle("/api/services/{id}/heatmap", cached("30s", "application/json", apiServiceHeatmapHandler)).Methods("GET")
-	r.Handle("/api/services/{id}", authenticated(apiServiceUpdateHandler, false)).Methods("POST")
-	r.Handle("/api/services/{id}", authenticated(apiServiceDeleteHandler, false)).Methods("DELETE")
-	r.Handle("/api/services/{id}/failures", scoped(apiServiceFailuresHandler)).Methods("GET")
-	r.Handle("/api/services/{id}/failures", authenticated(servicesDeleteFailuresHandler, false)).Methods("DELETE")
-	r.Handle("/api/services/{id}/hits", scoped(apiServiceHitsHandler)).Methods("GET")
+	api.Handle("/api/services", scoped(apiAllServicesHandler)).Methods("GET")
+	api.Handle("/api/services", authenticated(apiCreateServiceHandler, false)).Methods("POST")
+	api.Handle("/api/services_test", authenticated(apiTestServiceHandler, false)).Methods("POST")
+	api.Handle("/api/services/{id}", scoped(apiServiceHandler)).Methods("GET")
+	api.Handle("/api/reorder/services", authenticated(reorderServiceHandler, false)).Methods("POST")
+	api.Handle("/api/services/{id}/running", authenticated(apiServiceRunningHandler, false)).Methods("POST")
+	api.Handle("/api/services/{id}/data", cached("30s", "application/json", apiServiceDataHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/ping", cached("30s", "application/json", apiServicePingDataHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/heatmap", cached("30s", "application/json", apiServiceHeatmapHandler)).Methods("GET")
+	api.Handle("/api/services/{id}", authenticated(apiServiceUpdateHandler, false)).Methods("POST")
+	api.Handle("/api/services/{id}", authenticated(apiServiceDeleteHandler, false)).Methods("DELETE")
+	api.Handle("/api/services/{id}/failures", scoped(apiServiceFailuresHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/failures", authenticated(servicesDeleteFailuresHandler, false)).Methods("DELETE")
+	api.Handle("/api/services/{id}/hits", scoped(apiServiceHitsHandler)).Methods("GET")
 
 	// API INCIDENTS Routes
-	r.Handle("/api/incidents", readOnly(apiAllIncidentsHandler, false)).Methods("GET")
-	r.Handle("/api/incidents", authenticated(apiCreateIncidentHandler, false)).Methods("POST")
-	r.Handle("/api/incidents/:id", authenticated(apiIncidentUpdateHandler, false)).Methods("POST")
-	r.Handle("/api/incidents/:id", authenticated(apiDeleteIncidentHandler, false)).Methods("DELETE")
+	api.Handle("/api/incidents", readOnly(apiAllIncidentsHandler, false)).Methods("GET")
+	api.Handle("/api/incidents", authenticated(apiCreateIncidentHandler, false)).Methods("POST")
+	api.Handle("/api/incidents/:id", authenticated(apiIncidentUpdateHandler, false)).Methods("POST")
+	api.Handle("/api/incidents/:id", authenticated(apiDeleteIncidentHandler, false)).Methods("DELETE")
 
 	// API USER Routes
-	r.Handle("/api/users", authenticated(apiAllUsersHandler, false)).Methods("GET")
-	r.Handle("/api/users", authenticated(apiCreateUsersHandler, false)).Methods("POST")
-	r.Handle("/api/users/{id}", authenticated(apiUserHandler, false)).Methods("GET")
-	r.Handle("/api/users/{id}", authenticated(apiUserUpdateHandler, false)).Methods("POST")
-	r.Handle("/api/users/{id}", authenticated(apiUserDeleteHandler, false)).Methods("DELETE")
+	api.Handle("/api/users", authenticated(apiAllUsersHandler, false)).Methods("GET")
+	api.Handle("/api/users", authenticated(apiCreateUsersHandler, false)).Methods("POST")
+	api.Handle("/api/users/{id}", authenticated(apiUserHandler, false)).Methods("GET")
+	api.Handle("/api/users/{id}", authenticated(apiUserUpdateHandler, false)).Methods("POST")
+	api.Handle("/api/users/{id}", authenticated(apiUserDeleteHandler, false)).Methods("DELETE")
 
 	// API NOTIFIER Routes
-	r.Handle("/api/notifiers", authenticated(apiNotifiersHandler, false)).Methods("GET")
-	r.Handle("/api/notifier/{notifier}", authenticated(apiNotifierGetHandler, false)).Methods("GET")
-	r.Handle("/api/notifier/{notifier}", authenticated(apiNotifierUpdateHandler, false)).Methods("POST")
-	r.Handle("/api/notifier/{method}/test", authenticated(testNotificationHandler, false)).Methods("POST")
+	api.Handle("/api/notifiers", authenticated(apiNotifiersHandler, false)).Methods("GET")
+	api.Handle("/api/notifier/{notifier}", authenticated(apiNotifierGetHandler, false)).Methods("GET")
+	api.Handle("/api/notifier/{notifier}", authenticated(apiNotifierUpdateHandler, false)).Methods("POST")
+	api.Handle("/api/notifier/{method}/test", authenticated(testNotificationHandler, false)).Methods("POST")
 
 	// API MESSAGES Routes
-	r.Handle("/api/messages", scoped(apiAllMessagesHandler)).Methods("GET")
-	r.Handle("/api/messages", authenticated(apiMessageCreateHandler, false)).Methods("POST")
-	r.Handle("/api/messages/{id}", readOnly(apiMessageGetHandler, false)).Methods("GET")
-	r.Handle("/api/messages/{id}", authenticated(apiMessageUpdateHandler, false)).Methods("POST")
-	r.Handle("/api/messages/{id}", authenticated(apiMessageDeleteHandler, false)).Methods("DELETE")
+	api.Handle("/api/messages", scoped(apiAllMessagesHandler)).Methods("GET")
+	api.Handle("/api/messages", authenticated(apiMessageCreateHandler, false)).Methods("POST")
+	api.Handle("/api/messages/{id}", readOnly(apiMessageGetHandler, false)).Methods("GET")
+	api.Handle("/api/messages/{id}", authenticated(apiMessageUpdateHandler, false)).Methods("POST")
+	api.Handle("/api/messages/{id}", authenticated(apiMessageDeleteHandler, false)).Methods("DELETE")
 
 	// API CHECKIN Routes
-	r.Handle("/api/checkins", authenticated(apiAllCheckinsHandler, false)).Methods("GET")
-	r.Handle("/api/checkin/{api}", authenticated(apiCheckinHandler, false)).Methods("GET")
-	r.Handle("/api/checkin", authenticated(checkinCreateHandler, false)).Methods("POST")
-	r.Handle("/api/checkin/{api}", authenticated(checkinDeleteHandler, false)).Methods("DELETE")
+	api.Handle("/api/checkins", authenticated(apiAllCheckinsHandler, false)).Methods("GET")
+	api.Handle("/api/checkin/{api}", authenticated(apiCheckinHandler, false)).Methods("GET")
+	api.Handle("/api/checkin", authenticated(checkinCreateHandler, false)).Methods("POST")
+	api.Handle("/api/checkin/{api}", authenticated(checkinDeleteHandler, false)).Methods("DELETE")
 	r.Handle("/checkin/{api}", http.HandlerFunc(checkinHitHandler))
 
 	//r.PathPrefix("/").Handler(http.HandlerFunc(indexHandler))

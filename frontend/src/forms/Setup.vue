@@ -6,7 +6,7 @@
 
         <div class="col-12">
 
-    <form @submit="saveSetup">
+    <form @submit.prevent="saveSetup">
         <div class="row">
             <div class="col-6">
                 <div class="form-group">
@@ -85,7 +85,7 @@
                 {{error}}
             </div>
 
-            <button @click="saveSetup" v-bind:disabled="loading" type="submit" class="btn btn-primary btn-block" :class="{'btn-primary': !loading, 'btn-default': loading}">
+            <button @click.prevent="saveSetup" v-bind:disabled="canSubmit() && loading" type="submit" class="btn btn-primary btn-block" :class="{'btn-primary': !loading, 'btn-default': loading}">
                {{loading ? "Loading..." : "Save Settings"}}
             </button>
         </div>
@@ -135,8 +135,15 @@
     this.setup.domain = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":"+window.location.port : "")
   },
   methods: {
-    async saveSetup(e) {
-      e.preventDefault();
+      canSubmit() {
+          if (this.db_connection !== 'sqlite') {
+              if (!this.db_host || !this.db_port || !this.db_user || !this.db_password || !this.db_database) {
+                  return false
+              }
+          }
+          return !(!this.project || !this.description || !this.domain || !this.username || !this.password || !this.confirm_password);
+      },
+    async saveSetup() {
       this.loading = true
       const s = this.setup
       if (s.password !== s.confirm_password) {

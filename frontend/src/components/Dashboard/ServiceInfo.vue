@@ -6,7 +6,6 @@
                     {{service.online ? "ONLINE" : "OFFLINE"}}
                 </span>
             </h5>
-            <transition name="fade">
             <div v-if="loaded && service.online" class="row">
                 <div class="col-6">
                     <ServiceSparkLine :title="set1_name" subtitle="Last Day Latency" :series="set1"/>
@@ -15,7 +14,6 @@
                     <ServiceSparkLine :title="set2_name" subtitle="Last 7 Days Latency" :series="set2"/>
                 </div>
             </div>
-            </transition>
         </div>
         <span v-for="(failure, index) in failures" v-bind:key="index" class="alert alert-light">
             Failed {{duration(current(), failure.created_at)}}<br>

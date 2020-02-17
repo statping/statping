@@ -21,7 +21,7 @@ import (
 )
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	if core.CoreApp.Config == nil {
+	if !core.CoreApp.Setup {
 		http.Redirect(w, r, "/setup", http.StatusSeeOther)
 		return
 	}

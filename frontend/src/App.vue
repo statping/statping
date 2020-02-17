@@ -24,6 +24,9 @@
       async created() {
           await this.$store.dispatch('loadRequired')
           this.loaded = true
+          if (!this.$store.getters.core.setup) {
+            this.$router.push('/setup')
+          }
           window.console.log('finished loadRequired')
       },
     async mounted() {
