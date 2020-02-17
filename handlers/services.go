@@ -305,6 +305,7 @@ func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(errors.New("service not found"), w, r)
 		return
 	}
+
 	service.DeleteFailures()
 	sendJsonAction(service, "delete_failures", w, r)
 }
