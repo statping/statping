@@ -66,6 +66,10 @@ func (s *Service) DeleteFailures() {
 	err := DbSession.Exec(`DELETE FROM failures WHERE service = ?`, s.Id)
 	if err.Error != nil {
 		log.Errorln(fmt.Sprintf("failed to delete all failures: %v", err))
+
+		// do not set `Failures` field to null since they have not been
+		// deleted.
+		return
 	}
 	s.Failures = nil
 }
