@@ -29,7 +29,6 @@ import (
 
 type matrix struct {
 	*notifier.Notification
-	txId int
 }
 
 var Matrix = &matrix{
@@ -71,11 +70,10 @@ var Matrix = &matrix{
 			Required:    false,
 		}},
 	},
-	txId: 0,
 }
 
 // matrixUrl, params: room, nonce
-var matrixUrlPath = "/_matrix/client/r0/rooms/%s/send/m.room.message/%d%d"
+var matrixUrlPath = "/_matrix/client/r0/rooms/%s/send/m.room.message/%d"
 
 func (m *matrix) Select() *notifier.Notification {
 	return m.Notification
@@ -125,11 +123,9 @@ func (m *matrix) sendMsg(msg, msgType string) error {
 		"body":    msg,
 	}
 
-	m.txId += 1
-
 	// create a unique transaction id coming from this matrix client (timestamp + counter)
 	timestamp := time.Now().Nanosecond()
-	url := fmt.Sprintf(m.Host+matrixUrlPath, m.Var1, timestamp, m.txId)
+	url := fmt.Sprintf(m.Host+matrixUrlPath, m.Var1, timestamp)
 
 	body, err := json.Marshal(data)
 	if err != nil {
