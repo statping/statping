@@ -70,6 +70,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"UPDATENOTIFY": func() bool {
 			return core.CoreApp.UpdateNotify.Bool
 		},
+		"DATA_RETENTION": func() int64 {
+			return core.CoreApp.DataRetention
+		},
 		"QrAuth": func() string {
 			return fmt.Sprintf("statping://setup?domain=%v&api=%v", core.CoreApp.Domain, core.CoreApp.ApiSecret)
 		},

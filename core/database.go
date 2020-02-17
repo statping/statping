@@ -274,14 +274,23 @@ func (c *Core) waitForDb() error {
 	return c.Connect(true, utils.Directory)
 }
 
-// DatabaseMaintence will automatically delete old records from 'failures' and 'hits'
-// this function is currently set to delete records 7+ days old every 60 minutes
+// DatabaseMaintence will automatically delete old records from 'failures' and 'hits'.
+// It will delete every record which is which is older than - in the default
+// settings - 7 days every 60 minutes. This value is configurable in the
+// Web UI under `Settings -> Maintenance`.
 func DatabaseMaintence() {
-	for range time.Tick(60 * time.Minute) {
-		log.Infoln("Checking for database records older than 3 months...")
-		since := time.Now().AddDate(0, -3, 0).UTC()
+	for true {
+		retentionTime := (int)(CoreApp.DataRetention * (-1))
+
+		log.Infof("Checking for database records older than %d days.\n",
+			retentionTime)
+		since := time.Now().AddDate(0, retentionTime, 0).UTC()
+
 		DeleteAllSince("failures", since)
 		DeleteAllSince("hits", since)
+
+		// sleep for 60 minutes
+		time.Sleep(60 * time.Minute)
 	}
 }
 
