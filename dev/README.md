@@ -135,9 +135,10 @@ CountUsers returns the amount of users
 ```go
 func DatabaseMaintence()
 ```
-DatabaseMaintence will automatically delete old records from 'failures' and
-'hits' this function is currently set to delete records 7+ days old every 60
-minutes
+DatabaseMaintence will automatically delete old records from 'failures' and 'hits'.
+It will delete every record which is which is older than - in the default
+settings - 7 days every 60 minutes. This value is configurable in the
+Web UI under `Settings -> Maintenance`.
 
 #### func  Dbtimestamp
 
