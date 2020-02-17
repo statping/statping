@@ -227,6 +227,26 @@
                     </div>
 
                     <div class="tab-pane" id="v-pills-maintenance" role="tabpanel" aria-labelledby="v-pills-maintenance-tab">
+                        <form method="POST" action="settings">
+                        <div class="form-group">
+                                <div class="col-12 col-sm-8">
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">Data Retention Time</div>
+                                        </div>
+                                        <input type="number" class="form-control" name="limits" min="1" id="data-retention" value="3" placeholder="7" data-kpxc-id="data-retention">
+                                        <div class="input-group-append">
+                                            <div class="input-group-text">days</div>
+                                        </div>
+
+                                        <small class="form-text text-muted">Max. age of data which is hold by the Database in days.</small>
+                                    </div>
+                                </div>
+
+
+                                <button type="submit" class="btn btn-primary btn-block">Save Settings</button>
+                            </div>
+                        </form>
                     </div>
 
                     <div class="tab-pane" id="v-pills-cache" role="tabpanel" aria-labelledby="v-pills-cache-tab">
