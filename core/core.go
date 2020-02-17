@@ -194,6 +194,7 @@ func AttachNotifiers() error {
 		notifiers.Mobile,
 		notifiers.Slacker,
 		notifiers.Telegram,
+		notifiers.Matrix,
 		notifiers.Twilio,
 		notifiers.Webhook,
 	)
