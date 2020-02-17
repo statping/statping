@@ -64,7 +64,7 @@ func saveSettingsHandler(w http.ResponseWriter, r *http.Request) {
 	timeFloat, _ := strconv.ParseFloat(timezone, 10)
 	app.Timezone = float32(timeFloat)
 
-	app.DataRetention, err = strconv.ParseInt(form.Get("data-retention"),
+	app.DataRetention, err = strconv.ParseInt(form.Get("data_retention"),
 		10, 64)
 	if err != nil {
 		log.Errorf("Can not convert form data to int64: %v\n", err.Error())
