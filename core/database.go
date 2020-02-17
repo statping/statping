@@ -278,8 +278,12 @@ func (c *Core) waitForDb() error {
 // this function is currently set to delete records 7+ days old every 60 minutes
 func DatabaseMaintence() {
 	for range time.Tick(60 * time.Minute) {
-		log.Infoln("Checking for database records older than 3 months...")
-		since := time.Now().AddDate(0, -3, 0).UTC()
+		retentionTime := (int)(CoreApp.DataRetention * (-1))
+
+		log.Infof("Checking for database records older than %d days.\n",
+			retentionTime)
+		since := time.Now().AddDate(0, retentionTime, 0).UTC()
+
 		DeleteAllSince("failures", since)
 		DeleteAllSince("hits", since)
 	}
