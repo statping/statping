@@ -279,7 +279,7 @@ func (c *Core) waitForDb() error {
 // settings - 7 days every 60 minutes. This value is configurable in the
 // Web UI under `Settings -> Maintenance`.
 func DatabaseMaintence() {
-	for range time.Tick(60 * time.Minute) {
+	for true {
 		retentionTime := (int)(CoreApp.DataRetention * (-1))
 
 		log.Infof("Checking for database records older than %d days.\n",
@@ -288,6 +288,9 @@ func DatabaseMaintence() {
 
 		DeleteAllSince("failures", since)
 		DeleteAllSince("hits", since)
+
+		// sleep for 60 minutes
+		time.Sleep(60 * time.Minute)
 	}
 }
 
