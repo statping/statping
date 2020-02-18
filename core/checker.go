@@ -260,8 +260,24 @@ func recordSuccess(s *Service) {
 		CreatedAt: time.Now().UTC(),
 	}
 	s.CreateHit(hit)
-	log.WithFields(utils.ToFields(hit, s.Select())).Infoln(fmt.Sprintf("Service %v Successful Response: %0.2f ms | Lookup in: %0.2f ms", s.Name, hit.Latency*1000, hit.PingTime*1000))
-	notifier.OnSuccess(s.Service)
+
+	log.WithFields(utils.ToFields(hit, s.Select())).
+		Infoln(fmt.Sprintf("Service %v Successful Response: %0.2f ms | Lookup in: %0.2f ms",
+			s.Name, hit.Latency*1000, hit.PingTime*1000))
+
+	// omit calling notifieres if its the first successfull Hit on the
+	// service, this tries to prevent sending Messages to all notification
+	// channels when statping was restarted.
+	// NOTE: This COULD lead into problems when for example:
+	//	 the Services goes down; then statping gets stopped;
+	//	 the previous services is now online again;
+	//	 statping gets started ==> User will not receive any message
+	//	 that the service is Up again.
+	if s.EventCount > 0 {
+		notifier.OnSuccess(s.Service)
+	}
+
+	s.EventCount++
 	s.Online = true
 	s.SuccessNotified = true
 }
