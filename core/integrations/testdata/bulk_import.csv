@@ -1,0 +1,11 @@
+name,domain,expected,expected_status,interval,type,method,post_data,port,timeout,order,allow_notifications,public,group_id,headers,permalink,verify_ssl
+Bulk Upload,http://google.com,,200,60s,http,get,,,60s,1,TRUE,TRUE,,Authorization=example,bulk_example,FALSE
+JSON Post,https://jsonplaceholder.typicode.com/posts,,200,1m,http,post,"{""id"": 1, ""title"": 'foo', ""body"": 'bar', ""userId"": 1}",,15s,2,TRUE,TRUE,,Content-Type=application/json,json_post_example,FALSE
+Google DNS,8.8.8.8,,,60s,tcp,,,53,10s,3,TRUE,TRUE,,,google_dns_example,FALSE
+Google DNS UDP,8.8.8.8,,,60s,udp,,,53,10s,4,TRUE,TRUE,,,google_dns_udp_example,FALSE
+Statping Demo Page,https://demo.statping.com/health,"(\""online\"": true)",200,30s,http,get,,,10s,5,TRUE,TRUE,,,demo_link,FALSE
+Statping MySQL Page,https://mysql.statping.com/health,"(\""online\"": true)",200,30s,http,get,,,10s,6,TRUE,TRUE,,,mysql_demo_link,FALSE
+Statping SQLite Page,https://sqlite.statping.com/health,"(\""online\"": true)",200,30s,http,get,,,10s,7,TRUE,TRUE,,,sqlite_demo_link,FALSE
+Token Balance,https://status.tokenbalance.com/health,"(\""online\"": true)",200,30s,http,get,,,10s,8,TRUE,TRUE,,,token_balance,FALSE
+CloudFlare DNS,1.1.1.1,,,60s,tcp,,,53,10s,9,TRUE,TRUE,,,cloudflare_dns_example,FALSE
+Verisign DNS,64.6.64.4,,,60s,tcp,,,53,10s,10,TRUE,TRUE,,,verisign_dns_example,FALSE

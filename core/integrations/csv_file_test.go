@@ -8,7 +8,7 @@ import (
 )
 
 func TestCsvFileIntegration(t *testing.T) {
-	data, err := ioutil.ReadFile("../../source/tmpl/bulk_import.csv")
+	data, err := ioutil.ReadFile("testdata/bulk_import.csv")
 	require.Nil(t, err)
 
 	t.Run("Set Field Value", func(t *testing.T) {

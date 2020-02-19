@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-// SqliteFilename is the name of the SQLlite database file
+// SqliteFilename is the name of the SQLlite Db file
 const SqliteFilename = "statping.db"
 
 // AllNotifiers contains all the Notifiers loaded

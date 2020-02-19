@@ -56,7 +56,10 @@ func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+	output := apiResponse{
+		Status: "success",
+	}
+	returnJson(output, w, r)
 }
 
 func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
@@ -99,9 +102,8 @@ type cacheJson struct {
 }
 
 func apiCacheHandler(w http.ResponseWriter, r *http.Request) {
-	cache := CacheStorage
 	var cacheList []cacheJson
-	for k, v := range cache.List() {
+	for k, v := range CacheStorage.List() {
 		cacheList = append(cacheList, cacheJson{
 			URL:        k,
 			Expiration: time.Unix(0, v.Expiration).UTC(),
@@ -112,8 +114,8 @@ func apiCacheHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiClearCacheHandler(w http.ResponseWriter, r *http.Request) {
+	CacheStorage.StopRoutine()
 	CacheStorage = NewStorage()
-	go CleanRoutine()
 	output := apiResponse{
 		Status: "success",
 	}

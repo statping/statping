@@ -2,6 +2,7 @@
 
 const webpack                  = require('webpack');
 const merge                    = require('webpack-merge');
+const HtmlPlugin               = require('html-webpack-plugin');
 const OptimizeCSSAssetsPlugin  = require('optimize-css-assets-webpack-plugin');
 const MiniCSSExtractPlugin     = require('mini-css-extract-plugin');
 const UglifyJSPlugin           = require('uglifyjs-webpack-plugin');
@@ -48,7 +49,7 @@ const webpackConfig = merge(commonConfig, {
                 },
                 styles: {
                     test: /\.css$/,
-                    name: 'styles',
+                    name: 'style',
                     chunks: 'all',
                     enforce: true
                 }
@@ -59,7 +60,7 @@ const webpackConfig = merge(commonConfig, {
         new webpack.EnvironmentPlugin(environment),
         new MiniCSSExtractPlugin({
             filename: 'css/[name].css',
-            chunkFilename: 'css/[name].[hash].css'
+            chunkFilename: 'css/[name].css'
         }),
         new CompressionPlugin({
             filename: '[path].gz[query]',
@@ -68,7 +69,13 @@ const webpackConfig = merge(commonConfig, {
             threshold: 10240,
             minRatio: 0.8
         }),
-        new webpack.HashedModuleIdsPlugin()
+        new webpack.HashedModuleIdsPlugin(),
+        new HtmlPlugin({
+            template: 'public/base.gohtml',
+            filename: 'base.gohtml',
+            inject: false,
+            minify: false
+        })
     ]
 });
 

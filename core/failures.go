@@ -37,7 +37,7 @@ const (
 // CreateFailure will create a new Failure record for a service
 func (s *Service) CreateFailure(f *types.Failure) (int64, error) {
 	f.Service = s.Id
-	row := failuresDB().Create(f)
+	row := Database(&types.Failure{}).Create(f)
 	if row.Error() != nil {
 		log.Errorln(row.Error())
 		return 0, row.Error()
@@ -62,7 +62,7 @@ func (s *Service) AllFailures() []types.Failure {
 }
 
 func (s *Service) FailuresDb(r *http.Request) types.Database {
-	return failuresDB().Where("service = ?", s.Id).QuerySearch(r).Order("id desc")
+	return Database(&types.Failure{}).Where("service = ?", s.Id).QuerySearch(r).Order("id desc")
 }
 
 // DeleteFailures will delete all failures for a service
@@ -77,14 +77,14 @@ func (s *Service) DeleteFailures() {
 // LimitedFailures will return the last amount of failures from a service
 func (s *Service) LimitedFailures(amount int) []*Failure {
 	var failArr []*Failure
-	failuresDB().Where("service = ?", s.Id).Not("method = 'checkin'").Order("id desc").Limit(amount).Find(&failArr)
+	Database(&types.Failure{}).Where("service = ?", s.Id).Not("method = 'checkin'").Order("id desc").Limit(amount).Find(&failArr)
 	return failArr
 }
 
 // LimitedFailures will return the last amount of failures from a service
 func (s *Service) LimitedCheckinFailures(amount int) []*Failure {
 	var failArr []*Failure
-	failuresDB().Where("service = ?", s.Id).Where("method = 'checkin'").Order("id desc").Limit(amount).Find(&failArr)
+	Database(&types.Failure{}).Where("service = ?", s.Id).Where("method = 'checkin'").Order("id desc").Limit(amount).Find(&failArr)
 	return failArr
 }
 
@@ -101,7 +101,7 @@ func (f *Failure) Select() *types.Failure {
 
 // Delete will remove a Failure record from the database
 func (f *Failure) Delete() error {
-	db := failuresDB().Delete(f)
+	db := Database(&types.Failure{}).Delete(f)
 	return db.Error()
 }
 
@@ -119,9 +119,9 @@ func (c *Core) Count24HFailures() uint64 {
 // CountFailures returns the total count of failures for all services
 func CountFailures() uint64 {
 	var count uint64
-	err := failuresDB().Count(&count)
+	err := Database(&types.Failure{}).Count(&count)
 	if err.Error() != nil {
-		log.Warnln(err.Error)
+		log.Warnln(err.Error())
 		return 0
 	}
 	return count
@@ -132,7 +132,7 @@ func (s *Service) TotalFailuresOnDate(ago time.Time) (uint64, error) {
 	var count uint64
 	date := ago.UTC().Format("2006-01-02 00:00:00")
 	dateend := ago.UTC().Format("2006-01-02") + " 23:59:59"
-	rows := failuresDB().Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, date, dateend).Not("method = 'checkin'")
+	rows := Database(&types.Failure{}).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, date, dateend).Not("method = 'checkin'")
 	err := rows.Count(&count)
 	return count, err.Error()
 }
@@ -146,7 +146,7 @@ func (s *Service) TotalFailures24() (uint64, error) {
 // TotalFailures returns the total amount of failures for a service
 func (s *Service) TotalFailures() (uint64, error) {
 	var count uint64
-	rows := failuresDB().Where("service = ?", s.Id)
+	rows := Database(&types.Failure{}).Where("service = ?", s.Id)
 	err := rows.Count(&count)
 	return count, err.Error()
 }
@@ -161,7 +161,7 @@ func (s *Service) FailuresDaysAgo(days int) uint64 {
 // TotalFailuresSince returns the total amount of failures for a service since a specific time/date
 func (s *Service) TotalFailuresSince(ago time.Time) (uint64, error) {
 	var count uint64
-	rows := failuresDB().Where("service = ? AND created_at > ?", s.Id, ago.UTC().Format("2006-01-02 15:04:05")).Not("method = 'checkin'")
+	rows := Database(&types.Failure{}).Where("service = ? AND created_at > ?", s.Id, ago.UTC().Format("2006-01-02 15:04:05")).Not("method = 'checkin'")
 	err := rows.Count(&count)
 	return count, err.Error()
 }

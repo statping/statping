@@ -83,7 +83,7 @@ func InsertNotifierDB() error {
 			return errors.New("database connection has not been created")
 		}
 	}
-	notifier.SetDB(DbSession, CoreApp.Timezone)
+	notifier.SetDB(DbSession)
 	return nil
 }
 
@@ -101,7 +101,7 @@ func InsertIntegratorDB() error {
 
 // UpdateCore will update the CoreApp variable inside of the 'core' table in database
 func UpdateCore(c *Core) (*Core, error) {
-	db := coreDB().Update(&c)
+	db := Database(&Core{}).Update(&c)
 	return c, db.Error()
 }
 
@@ -116,7 +116,7 @@ func (c Core) CurrentTime() string {
 // Messages will return the current local time
 func (c Core) Messages() []*Message {
 	var message []*Message
-	messagesDb().Where("service = ?", 0).Limit(10).Find(&message)
+	Database(&Message{}).Where("service = ?", 0).Limit(10).Find(&message)
 	return message
 }
 
@@ -130,7 +130,7 @@ func (c Core) SassVars() string {
 	if !source.UsingAssets(utils.Directory) {
 		return ""
 	}
-	return source.OpenAsset(utils.Directory, "scss/variables.scss")
+	return source.OpenAsset("scss/variables.scss")
 }
 
 // BaseSASS is the base design , this opens the file /assets/scss/base.scss to be edited in Theme
@@ -138,7 +138,7 @@ func (c Core) BaseSASS() string {
 	if !source.UsingAssets(utils.Directory) {
 		return ""
 	}
-	return source.OpenAsset(utils.Directory, "scss/base.scss")
+	return source.OpenAsset("scss/base.scss")
 }
 
 // MobileSASS is the -webkit responsive custom css designs. This opens the
@@ -147,7 +147,7 @@ func (c Core) MobileSASS() string {
 	if !source.UsingAssets(utils.Directory) {
 		return ""
 	}
-	return source.OpenAsset(utils.Directory, "scss/mobile.scss")
+	return source.OpenAsset("scss/mobile.scss")
 }
 
 // AllOnline will be true if all services are online
@@ -171,7 +171,7 @@ func SelectCore() (*Core, error) {
 		log.Errorf("core database has not been setup yet, does not have the 'core' table")
 		return nil, errors.New("core database has not been setup yet.")
 	}
-	db := coreDB().First(&CoreApp)
+	db := Database(&Core{}).First(&CoreApp)
 	if db.Error() != nil {
 		return nil, db.Error()
 	}

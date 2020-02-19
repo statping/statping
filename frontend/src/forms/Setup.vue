@@ -11,7 +11,7 @@
             <div class="col-6">
                 <div class="form-group">
                     <label>Database Connection</label>
-                    <select v-model="setup.db_connection" class="form-control">
+                    <select @change="canSubmit" v-model="setup.db_connection" class="form-control">
                         <option value="sqlite">Sqlite</option>
                         <option value="postgres">Postgres</option>
                         <option value="mysql">MySQL</option>
@@ -19,23 +19,23 @@
                 </div>
                 <div v-if="setup.db_connection !== 'sqlite'" class="form-group" id="db_host">
                     <label>Host</label>
-                    <input v-model="setup.db_host" type="text" class="form-control" placeholder="localhost">
+                    <input @keyup="canSubmit" v-model="setup.db_host" type="text" class="form-control" placeholder="localhost">
                 </div>
                 <div v-if="setup.db_connection !== 'sqlite'" class="form-group" id="db_port">
                     <label>Database Port</label>
-                    <input v-model="setup.db_port" type="text" class="form-control" placeholder="localhost">
+                    <input @keyup="canSubmit" v-model="setup.db_port" type="text" class="form-control" placeholder="localhost">
                 </div>
                 <div v-if="setup.db_connection !== 'sqlite'" class="form-group" id="db_user">
                     <label>Username</label>
-                    <input v-model="setup.db_user" type="text" class="form-control" placeholder="root">
+                    <input @keyup="canSubmit" v-model="setup.db_user" type="text" class="form-control" placeholder="root">
                 </div>
                 <div v-if="setup.db_connection !== 'sqlite'" class="form-group" id="db_password">
                     <label for="db_password">Password</label>
-                    <input v-model="setup.db_password" type="password" class="form-control" placeholder="password123">
+                    <input @keyup="canSubmit" v-model="setup.db_password" type="password" class="form-control" placeholder="password123">
                 </div>
                 <div v-if="setup.db_connection !== 'sqlite'" class="form-group" id="db_database">
                     <label for="db_database">Database</label>
-                    <input v-model="setup.db_database" type="text" class="form-control" placeholder="Database name">
+                    <input @keyup="canSubmit" v-model="setup.db_database" type="text" class="form-control" placeholder="Database name">
                 </div>
 
             </div>
@@ -44,37 +44,37 @@
 
                 <div class="form-group">
                     <label>Project Name</label>
-                    <input v-model="setup.project" type="text" class="form-control" placeholder="Great Uptime" required>
+                    <input @keyup="canSubmit" v-model="setup.project" type="text" class="form-control" placeholder="Great Uptime" required>
                 </div>
 
                 <div class="form-group">
                     <label>Project Description</label>
-                    <input v-model="setup.description" type="text" class="form-control" placeholder="Great Uptime">
+                    <input @keyup="canSubmit" v-model="setup.description" type="text" class="form-control" placeholder="Great Uptime">
                 </div>
 
                 <div class="form-group">
                     <label for="domain_input">Domain URL</label>
-                    <input v-model="setup.domain" type="text" class="form-control" id="domain_input" required>
+                    <input @keyup="canSubmit" v-model="setup.domain" type="text" class="form-control" id="domain_input" required>
                 </div>
 
                 <div class="form-group">
                     <label>Admin Username</label>
-                    <input v-model="setup.username" type="text" class="form-control" placeholder="admin" required>
+                    <input @keyup="canSubmit" v-model="setup.username" type="text" class="form-control" placeholder="admin" required>
                 </div>
 
                 <div class="form-group">
                     <label>Admin Password</label>
-                    <input v-model="setup.password" type="password" class="form-control" placeholder="password" required>
+                    <input @keyup="canSubmit" v-model="setup.password" type="password" class="form-control" placeholder="password" required>
                 </div>
 
                 <div class="form-group">
                     <label>Confirm Admin Password</label>
-                    <input v-model="setup.confirm_password" type="password" class="form-control" placeholder="password" required>
+                    <input @keyup="canSubmit" v-model="setup.confirm_password" type="password" class="form-control" placeholder="password" required>
                 </div>
 
                 <div class="form-group">
                   <span class="switch">
-                    <input v-model="setup.sample_data" type="checkbox" class="switch" id="switch-normal">
+                    <input @keyup="canSubmit" v-model="setup.sample_data" type="checkbox" class="switch" id="switch-normal">
                     <label for="switch-normal">Load Sample Data</label>
                   </span>
                 </div>
@@ -85,7 +85,7 @@
                 {{error}}
             </div>
 
-            <button @click.prevent="saveSetup" v-bind:disabled="canSubmit() && loading" type="submit" class="btn btn-primary btn-block" :class="{'btn-primary': !loading, 'btn-default': loading}">
+            <button @click.prevent="saveSetup" v-bind:disabled="disabled || loading" type="submit" class="btn btn-primary btn-block" :class="{'btn-primary': !loading, 'btn-default': loading}">
                {{loading ? "Loading..." : "Save Settings"}}
             </button>
         </div>
@@ -105,6 +105,7 @@
     return {
       error: null,
       loading: false,
+      disabled: true,
       setup: {
         db_connection: "sqlite",
         db_host: "",
@@ -128,7 +129,7 @@
         if (!this.$store.getters.hasPublicData) {
             await this.$store.dispatch('loadRequired')
         }
-      this.$router.push('/')
+        this.$router.push('/')
     }
   },
   mounted() {
@@ -136,12 +137,23 @@
   },
   methods: {
       canSubmit() {
-          if (this.db_connection !== 'sqlite') {
-              if (!this.db_host || !this.db_port || !this.db_user || !this.db_password || !this.db_database) {
-                  return false
+          this.error = null
+          const s = this.setup
+          if (s.db_connection !== 'sqlite') {
+              if (!s.db_host || !s.db_port || !s.db_user || !s.db_password || !s.db_database) {
+                  this.disabled = true
+                  return
               }
           }
-          return !(!this.project || !this.description || !this.domain || !this.username || !this.password || !this.confirm_password);
+          if (!s.project || !s.description || !s.domain || !s.username || !s.password || !s.confirm_password) {
+              this.disabled = true
+              return
+          }
+          if (s.password !== s.confirm_password) {
+              this.disabled = true
+              return
+          }
+          this.disabled = false
       },
     async saveSetup() {
       this.loading = true

@@ -47,68 +47,42 @@ func init() {
 // DbConfig stores the config.yml file for the statup configuration
 type DbConfig types.DbConfig
 
-// failuresDB returns the 'failures' database column
-func failuresDB() types.Database {
-	return DbSession.Model(&types.Failure{})
-}
-
-// hitsDB returns the 'hits' database column
-func hitsDB() types.Database {
-	return DbSession.Model(&types.Hit{})
-}
-
-// servicesDB returns the 'services' database column
-func servicesDB() types.Database {
-	return DbSession.Model(&types.Service{})
-}
-
-// coreDB returns the single column 'core'
-func coreDB() types.Database {
-	return DbSession.Table("core").Model(&CoreApp)
-}
-
-// usersDB returns the 'users' database column
-func usersDB() types.Database {
-	return DbSession.Model(&types.User{})
-}
-
-// checkinDB returns the Checkin records for a service
-func checkinDB() types.Database {
-	return DbSession.Model(&types.Checkin{})
-}
-
-// checkinHitsDB returns the Checkin Hits records for a service
-func checkinHitsDB() types.Database {
-	return DbSession.Model(&types.CheckinHit{})
-}
-
-// messagesDb returns the Checkin records for a service
-func messagesDb() types.Database {
-	return DbSession.Model(&types.Message{})
-}
-
-// messagesDb returns the Checkin records for a service
-func groupsDb() types.Database {
-	return DbSession.Model(&types.Group{})
-}
-
-// incidentsDB returns the 'incidents' database column
-func incidentsDB() types.Database {
-	return DbSession.Model(&types.Incident{})
-}
-
-// incidentsUpdatesDB returns the 'incidents updates' database column
-func incidentsUpdatesDB() types.Database {
-	return DbSession.Model(&types.IncidentUpdate{})
+func Database(obj interface{}) types.Database {
+	switch obj.(type) {
+	case *types.Service, *Service, []*Service:
+		return DbSession.Model(&types.Service{})
+	case *types.Hit, *Hit, []*Hit:
+		return DbSession.Model(&types.Hit{})
+	case *types.Failure, *Failure, []*Failure:
+		return DbSession.Model(&types.Failure{})
+	case *types.Core, *Core:
+		return DbSession.Table("core").Model(&CoreApp)
+	case *types.Checkin, *Checkin, []*Checkin:
+		return DbSession.Model(&types.Checkin{})
+	case *types.CheckinHit, *CheckinHit, []*CheckinHit:
+		return DbSession.Model(&types.CheckinHit{})
+	case *types.User, *User, []*User:
+		return DbSession.Model(&types.User{})
+	case *types.Group, *Group, []*Group:
+		return DbSession.Model(&types.Group{})
+	case *types.Incident, *Incident, []*Incident:
+		return DbSession.Model(&types.Incident{})
+	case *types.IncidentUpdate, *IncidentUpdate, []*IncidentUpdate:
+		return DbSession.Model(&types.IncidentUpdate{})
+	case *types.Message, *Message, []*Message:
+		return DbSession.Model(&types.Message{})
+	default:
+		return DbSession
+	}
 }
 
 // HitsBetween returns the gorm database query for a collection of service hits between a time range
 func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) types.Database {
 	selector := Dbtimestamp(group, column)
 	if CoreApp.Config.DbConn == "postgres" {
-		return hitsDB().Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME), t2.UTC().Format(types.TIME))
+		return Database(&Hit{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME), t2.UTC().Format(types.TIME))
 	} else {
-		return hitsDB().Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME_DAY), t2.UTC().Format(types.TIME_DAY))
+		return Database(&Hit{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME_DAY), t2.UTC().Format(types.TIME_DAY))
 	}
 }
 
@@ -186,7 +160,7 @@ func (c *Core) InsertCore(db *types.DbConfig) (*Core, error) {
 		MigrationId: time.Now().Unix(),
 		Config:      db,
 	}}
-	query := coreDB().Create(&CoreApp)
+	query := Database(CoreApp).Create(&CoreApp)
 	return CoreApp, query.Error()
 }
 
@@ -345,7 +319,7 @@ func (c *Core) CreateCore() *Core {
 		Domain:      c.Domain,
 		MigrationId: time.Now().Unix(),
 	}
-	db := coreDB().Create(&newCore)
+	db := Database(newCore).Create(&newCore)
 	if db.Error() == nil {
 		CoreApp = &Core{Core: newCore}
 	}
@@ -409,7 +383,7 @@ func (c *Core) MigrateDatabase() error {
 	}
 	if err := tx.Table("core").AutoMigrate(&types.Core{}); err.Error() != nil {
 		tx.Rollback()
-		log.Errorln(fmt.Sprintf("Statping Database could not be migrated: %v", tx.Error))
+		log.Errorln(fmt.Sprintf("Statping Database could not be migrated: %v", tx.Error()))
 		return tx.Error()
 	}
 	log.Infoln("Statping Database Migrated")

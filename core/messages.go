@@ -28,7 +28,7 @@ type Message struct {
 // SelectServiceMessages returns all messages for a service
 func SelectServiceMessages(id int64) []*Message {
 	var message []*Message
-	messagesDb().Where("service = ?", id).Limit(10).Find(&message)
+	Database(&Message{}).Where("service = ?", id).Limit(10).Find(&message)
 	return message
 }
 
@@ -40,14 +40,14 @@ func ReturnMessage(m *types.Message) *Message {
 // SelectMessages returns all messages
 func SelectMessages() ([]*Message, error) {
 	var messages []*Message
-	db := messagesDb().Find(&messages).Order("id desc")
+	db := Database(&Message{}).Find(&messages).Order("id desc")
 	return messages, db.Error()
 }
 
 // SelectMessage returns a Message based on the ID passed
 func SelectMessage(id int64) (*Message, error) {
 	var message Message
-	db := messagesDb().Where("id = ?", id).Find(&message)
+	db := Database(&Message{}).Where("id = ?", id).Find(&message)
 	return &message, db.Error()
 }
 
@@ -61,7 +61,7 @@ func (m *Message) Service() *Service {
 // Create will create a Message and insert it into the database
 func (m *Message) Create() (int64, error) {
 	m.CreatedAt = time.Now().UTC()
-	db := messagesDb().Create(m)
+	db := Database(&Message{}).Create(m)
 	if db.Error() != nil {
 		log.Errorln(fmt.Sprintf("Failed to create message %v #%v: %v", m.Title, m.Id, db.Error()))
 		return 0, db.Error()
@@ -71,13 +71,13 @@ func (m *Message) Create() (int64, error) {
 
 // Delete will delete a Message from database
 func (m *Message) Delete() error {
-	db := messagesDb().Delete(m)
+	db := Database(&Message{}).Delete(m)
 	return db.Error()
 }
 
 // Update will update a Message in the database
 func (m *Message) Update() (*Message, error) {
-	db := messagesDb().Update(m)
+	db := Database(&Message{}).Update(m)
 	if db.Error() != nil {
 		log.Errorln(fmt.Sprintf("Failed to update message %v #%v: %v", m.Title, m.Id, db.Error()))
 		return nil, db.Error()

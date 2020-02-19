@@ -19,12 +19,6 @@
       authenticated: false
     }
   },
-      async mounted() {
-          const core = await Api.core()
-          if (!core.logged_in) {
-              this.$router.push('/login')
-          }
-      },
 }
 </script>
 

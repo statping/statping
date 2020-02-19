@@ -4,12 +4,11 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "rm -rf dist && cross-env NODE_ENV=production webpack",
+    "build": "rm -rf dist && cross-env NODE_ENV=production webpack --mode production",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --host 0.0.0.0 --port 8888 --progress",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@babel/polyfill": "~7.2",
     "@fortawesome/fontawesome-free-solid": "^5.1.0-3",
     "@fortawesome/fontawesome-svg-core": "^1.2.26",
     "@fortawesome/free-brands-svg-icons": "^5.12.0",
@@ -37,6 +36,7 @@
     "@babel/plugin-proposal-json-strings": "~7.2",
     "@babel/plugin-syntax-dynamic-import": "~7.2",
     "@babel/plugin-syntax-import-meta": "~7.2",
+    "@babel/polyfill": "~7.2",
     "@babel/preset-env": "~7.8.3",
     "@vue/babel-preset-app": "^4.1.2",
     "@vue/cli-plugin-babel": "^4.1.0",
@@ -57,7 +57,7 @@
     "eslint-plugin-vue": "~5.1",
     "file-loader": "^5.0.2",
     "friendly-errors-webpack-plugin": "~1.7",
-    "html-webpack-plugin": "~3.2",
+    "html-webpack-plugin": "^4.0.0-beta.11",
     "mini-css-extract-plugin": "~0.5",
     "node-sass": "^4.13.1",
     "optimize-css-assets-webpack-plugin": "~5.0",

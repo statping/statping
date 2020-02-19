@@ -42,13 +42,6 @@
         </div>
 
         <div class="form-group row">
-            <label for="notify_method" class="col-sm-4 col-form-label">Notification Method</label>
-            <div class="col-sm-8">
-                <input v-model="message.notify_method" type="text" name="notify_method" class="form-control" id="notify_method" value="" placeholder="email">
-            </div>
-        </div>
-
-        <div class="form-group row">
             <label for="notify_method" class="col-sm-4 col-form-label">Notify Users</label>
             <div class="col-sm-8">
                 <span @click="message.notify = !!message.notify" class="switch">
@@ -58,7 +51,14 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div v-if="message.notify" class="form-group row">
+            <label for="notify_method" class="col-sm-4 col-form-label">Notification Method</label>
+            <div class="col-sm-8">
+                <input v-model="message.notify_method" type="text" name="notify_method" class="form-control" id="notify_method" value="" placeholder="email">
+            </div>
+        </div>
+
+        <div v-if="message.notify" class="form-group row">
             <label for="notify_before" class="col-sm-4 col-form-label">Notify Before</label>
             <div class="col-sm-8">
                 <div class="form-inline">

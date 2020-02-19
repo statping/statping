@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -56,19 +55,20 @@ var core = &types.Core{
 }
 
 func injectDatabase() {
-	utils.DeleteFile(dir + "/notifier.db")
-	db, _ = gorm.Open("sqlite3", dir+"/notifier.db")
+	sqlPath := dir + "/notifier.db"
+	utils.DeleteFile(sqlPath)
+	db, _ = types.Openw("sqlite3", sqlPath)
 	db.CreateTable(&Notification{})
 }
 
 func TestIsBasicType(t *testing.T) {
-	assert.True(t, isType(example, new(Notifier)))
-	assert.True(t, isType(example, new(BasicEvents)))
-	assert.True(t, isType(example, new(ServiceEvents)))
-	assert.True(t, isType(example, new(UserEvents)))
-	assert.True(t, isType(example, new(CoreEvents)))
-	assert.True(t, isType(example, new(NotifierEvents)))
-	assert.True(t, isType(example, new(Tester)))
+	assert.True(t, utils.IsType(example, new(Notifier)))
+	assert.True(t, utils.IsType(example, new(BasicEvents)))
+	assert.True(t, utils.IsType(example, new(ServiceEvents)))
+	assert.True(t, utils.IsType(example, new(UserEvents)))
+	assert.True(t, utils.IsType(example, new(CoreEvents)))
+	assert.True(t, utils.IsType(example, new(NotifierEvents)))
+	assert.True(t, utils.IsType(example, new(Tester)))
 }
 
 func TestIsInDatabase(t *testing.T) {

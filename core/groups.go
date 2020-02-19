@@ -16,21 +16,21 @@ func (g *Group) Delete() error {
 		s.GroupId = 0
 		s.Update(false)
 	}
-	err := groupsDb().Delete(g)
+	err := Database(&Group{}).Delete(g)
 	return err.Error()
 }
 
 // Create will create a group and insert it into the database
 func (g *Group) Create() (int64, error) {
 	g.CreatedAt = time.Now().UTC()
-	db := groupsDb().Create(g)
+	db := Database(&Group{}).Create(g)
 	return g.Id, db.Error()
 }
 
 // Update will update a group
 func (g *Group) Update() (int64, error) {
 	g.UpdatedAt = time.Now().UTC()
-	db := groupsDb().Update(g)
+	db := Database(&Group{}).Update(g)
 	return g.Id, db.Error()
 }
 
@@ -64,7 +64,7 @@ func (g *Group) VisibleServices(auth bool) []*Service {
 func SelectGroups(includeAll bool, auth bool) []*Group {
 	var groups []*Group
 	var validGroups []*Group
-	groupsDb().Find(&groups).Order("order_id desc")
+	Database(&Group{}).Find(&groups).Order("order_id desc")
 	for _, g := range groups {
 		if !g.Public.Bool {
 			if auth {

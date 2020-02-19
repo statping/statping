@@ -30,7 +30,6 @@ var (
 	log    = utils.Log.WithField("type", "handlers")
 )
 
-
 func staticAssets(src string) http.Handler {
 	return http.StripPrefix(basePath+src+"/", http.FileServer(http.Dir(utils.Directory+"/assets/"+src)))
 }
@@ -80,7 +79,6 @@ func Router() *mux.Router {
 	}
 
 	api := r.NewRoute().Subrouter()
-	//api := mux.NewRouter().StrictSlash(true)
 	api.Use(apiMiddleware)
 
 	// API Routes

@@ -33,7 +33,7 @@ type User struct {
 	UserInterface `gorm:"-" json:"-"`
 }
 
-// UserInterface interfaces the database functions
+// UserInterface interfaces the Db functions
 type UserInterface interface {
 	Create() (int64, error)
 	Update() error

@@ -20,7 +20,7 @@ import (
 )
 
 // Failure is a failed attempt to check a service. Any a service does not meet the expected requirements,
-// a new Failure will be inserted into database.
+// a new Failure will be inserted into Db.
 type Failure struct {
 	Id        int64     `gorm:"primary_key;column:id" json:"id"`
 	Issue     string    `gorm:"column:issue" json:"issue"`

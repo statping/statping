@@ -116,18 +116,18 @@ type Failurer interface {
 	Fails() ([]*Failure, error)
 }
 
-func (it *database) Failures(id int64) Database {
+func (it *Db) Failures(id int64) Database {
 	return it.Model(&Failure{}).Where("service = ?", id).Not("method = 'checkin'").Order("id desc")
 }
 
-func (it *database) Fails() ([]*Failure, error) {
+func (it *Db) Fails() ([]*Failure, error) {
 	var fails []*Failure
 	err := it.Find(&fails)
 	return fails, err.Error()
 }
 
-type database struct {
-	w *gorm.DB
+type Db struct {
+	Database *gorm.DB
 }
 
 // Openw is a drop-in replacement for Open()
@@ -138,316 +138,316 @@ func Openw(dialect string, args ...interface{}) (db Database, err error) {
 
 // Wrap wraps gorm.DB in an interface
 func Wrap(db *gorm.DB) Database {
-	return &database{db}
+	return &Db{db}
 }
 
-func (it *database) Close() error {
-	return it.w.Close()
+func (it *Db) Close() error {
+	return it.Database.Close()
 }
 
-func (it *database) DB() *sql.DB {
-	return it.w.DB()
+func (it *Db) DB() *sql.DB {
+	return it.Database.DB()
 }
 
-func (it *database) New() Database {
-	return Wrap(it.w.New())
+func (it *Db) New() Database {
+	return Wrap(it.Database.New())
 }
 
-func (it *database) NewScope(value interface{}) *gorm.Scope {
-	return it.w.NewScope(value)
+func (it *Db) NewScope(value interface{}) *gorm.Scope {
+	return it.Database.NewScope(value)
 }
 
-func (it *database) CommonDB() gorm.SQLCommon {
-	return it.w.CommonDB()
+func (it *Db) CommonDB() gorm.SQLCommon {
+	return it.Database.CommonDB()
 }
 
-func (it *database) Callback() *gorm.Callback {
-	return it.w.Callback()
+func (it *Db) Callback() *gorm.Callback {
+	return it.Database.Callback()
 }
 
-func (it *database) SetLogger(log gorm.Logger) {
-	it.w.SetLogger(log)
+func (it *Db) SetLogger(log gorm.Logger) {
+	it.Database.SetLogger(log)
 }
 
-func (it *database) LogMode(enable bool) Database {
-	return Wrap(it.w.LogMode(enable))
+func (it *Db) LogMode(enable bool) Database {
+	return Wrap(it.Database.LogMode(enable))
 }
 
-func (it *database) SingularTable(enable bool) {
-	it.w.SingularTable(enable)
+func (it *Db) SingularTable(enable bool) {
+	it.Database.SingularTable(enable)
 }
 
-func (it *database) Where(query interface{}, args ...interface{}) Database {
-	return Wrap(it.w.Where(query, args...))
+func (it *Db) Where(query interface{}, args ...interface{}) Database {
+	return Wrap(it.Database.Where(query, args...))
 }
 
-func (it *database) Or(query interface{}, args ...interface{}) Database {
-	return Wrap(it.w.Or(query, args...))
+func (it *Db) Or(query interface{}, args ...interface{}) Database {
+	return Wrap(it.Database.Or(query, args...))
 }
 
-func (it *database) Not(query interface{}, args ...interface{}) Database {
-	return Wrap(it.w.Not(query, args...))
+func (it *Db) Not(query interface{}, args ...interface{}) Database {
+	return Wrap(it.Database.Not(query, args...))
 }
 
-func (it *database) Limit(value int) Database {
-	return Wrap(it.w.Limit(value))
+func (it *Db) Limit(value int) Database {
+	return Wrap(it.Database.Limit(value))
 }
 
-func (it *database) Offset(value int) Database {
-	return Wrap(it.w.Offset(value))
+func (it *Db) Offset(value int) Database {
+	return Wrap(it.Database.Offset(value))
 }
 
-func (it *database) Order(value string, reorder ...bool) Database {
-	return Wrap(it.w.Order(value, reorder...))
+func (it *Db) Order(value string, reorder ...bool) Database {
+	return Wrap(it.Database.Order(value, reorder...))
 }
 
-func (it *database) Select(query interface{}, args ...interface{}) Database {
-	return Wrap(it.w.Select(query, args...))
+func (it *Db) Select(query interface{}, args ...interface{}) Database {
+	return Wrap(it.Database.Select(query, args...))
 }
 
-func (it *database) Omit(columns ...string) Database {
-	return Wrap(it.w.Omit(columns...))
+func (it *Db) Omit(columns ...string) Database {
+	return Wrap(it.Database.Omit(columns...))
 }
 
-func (it *database) Group(query string) Database {
-	return Wrap(it.w.Group(query))
+func (it *Db) Group(query string) Database {
+	return Wrap(it.Database.Group(query))
 }
 
-func (it *database) Having(query string, values ...interface{}) Database {
-	return Wrap(it.w.Having(query, values...))
+func (it *Db) Having(query string, values ...interface{}) Database {
+	return Wrap(it.Database.Having(query, values...))
 }
 
-func (it *database) Joins(query string, args ...interface{}) Database {
-	return Wrap(it.w.Joins(query, args...))
+func (it *Db) Joins(query string, args ...interface{}) Database {
+	return Wrap(it.Database.Joins(query, args...))
 }
 
-func (it *database) Scopes(funcs ...func(*gorm.DB) *gorm.DB) Database {
-	return Wrap(it.w.Scopes(funcs...))
+func (it *Db) Scopes(funcs ...func(*gorm.DB) *gorm.DB) Database {
+	return Wrap(it.Database.Scopes(funcs...))
 }
 
-func (it *database) Unscoped() Database {
-	return Wrap(it.w.Unscoped())
+func (it *Db) Unscoped() Database {
+	return Wrap(it.Database.Unscoped())
 }
 
-func (it *database) Attrs(attrs ...interface{}) Database {
-	return Wrap(it.w.Attrs(attrs...))
+func (it *Db) Attrs(attrs ...interface{}) Database {
+	return Wrap(it.Database.Attrs(attrs...))
 }
 
-func (it *database) Assign(attrs ...interface{}) Database {
-	return Wrap(it.w.Assign(attrs...))
+func (it *Db) Assign(attrs ...interface{}) Database {
+	return Wrap(it.Database.Assign(attrs...))
 }
 
-func (it *database) First(out interface{}, where ...interface{}) Database {
-	return Wrap(it.w.First(out, where...))
+func (it *Db) First(out interface{}, where ...interface{}) Database {
+	return Wrap(it.Database.First(out, where...))
 }
 
-func (it *database) Last(out interface{}, where ...interface{}) Database {
-	return Wrap(it.w.Last(out, where...))
+func (it *Db) Last(out interface{}, where ...interface{}) Database {
+	return Wrap(it.Database.Last(out, where...))
 }
 
-func (it *database) Find(out interface{}, where ...interface{}) Database {
-	return Wrap(it.w.Find(out, where...))
+func (it *Db) Find(out interface{}, where ...interface{}) Database {
+	return Wrap(it.Database.Find(out, where...))
 }
 
-func (it *database) Scan(dest interface{}) Database {
-	return Wrap(it.w.Scan(dest))
+func (it *Db) Scan(dest interface{}) Database {
+	return Wrap(it.Database.Scan(dest))
 }
 
-func (it *database) Row() *sql.Row {
-	return it.w.Row()
+func (it *Db) Row() *sql.Row {
+	return it.Database.Row()
 }
 
-func (it *database) Rows() (*sql.Rows, error) {
-	return it.w.Rows()
+func (it *Db) Rows() (*sql.Rows, error) {
+	return it.Database.Rows()
 }
 
-func (it *database) ScanRows(rows *sql.Rows, result interface{}) error {
-	return it.w.ScanRows(rows, result)
+func (it *Db) ScanRows(rows *sql.Rows, result interface{}) error {
+	return it.Database.ScanRows(rows, result)
 }
 
-func (it *database) Pluck(column string, value interface{}) Database {
-	return Wrap(it.w.Pluck(column, value))
+func (it *Db) Pluck(column string, value interface{}) Database {
+	return Wrap(it.Database.Pluck(column, value))
 }
 
-func (it *database) Count(value interface{}) Database {
-	return Wrap(it.w.Count(value))
+func (it *Db) Count(value interface{}) Database {
+	return Wrap(it.Database.Count(value))
 }
 
-func (it *database) Related(value interface{}, foreignKeys ...string) Database {
-	return Wrap(it.w.Related(value, foreignKeys...))
+func (it *Db) Related(value interface{}, foreignKeys ...string) Database {
+	return Wrap(it.Database.Related(value, foreignKeys...))
 }
 
-func (it *database) FirstOrInit(out interface{}, where ...interface{}) Database {
-	return Wrap(it.w.FirstOrInit(out, where...))
+func (it *Db) FirstOrInit(out interface{}, where ...interface{}) Database {
+	return Wrap(it.Database.FirstOrInit(out, where...))
 }
 
-func (it *database) FirstOrCreate(out interface{}, where ...interface{}) Database {
-	return Wrap(it.w.FirstOrCreate(out, where...))
+func (it *Db) FirstOrCreate(out interface{}, where ...interface{}) Database {
+	return Wrap(it.Database.FirstOrCreate(out, where...))
 }
 
-func (it *database) Update(attrs ...interface{}) Database {
-	return Wrap(it.w.Update(attrs...))
+func (it *Db) Update(attrs ...interface{}) Database {
+	return Wrap(it.Database.Update(attrs...))
 }
 
-func (it *database) Updates(values interface{}, ignoreProtectedAttrs ...bool) Database {
-	return Wrap(it.w.Updates(values, ignoreProtectedAttrs...))
+func (it *Db) Updates(values interface{}, ignoreProtectedAttrs ...bool) Database {
+	return Wrap(it.Database.Updates(values, ignoreProtectedAttrs...))
 }
 
-func (it *database) UpdateColumn(attrs ...interface{}) Database {
-	return Wrap(it.w.UpdateColumn(attrs...))
+func (it *Db) UpdateColumn(attrs ...interface{}) Database {
+	return Wrap(it.Database.UpdateColumn(attrs...))
 }
 
-func (it *database) UpdateColumns(values interface{}) Database {
-	return Wrap(it.w.UpdateColumns(values))
+func (it *Db) UpdateColumns(values interface{}) Database {
+	return Wrap(it.Database.UpdateColumns(values))
 }
 
-func (it *database) Save(value interface{}) Database {
-	return Wrap(it.w.Save(value))
+func (it *Db) Save(value interface{}) Database {
+	return Wrap(it.Database.Save(value))
 }
 
-func (it *database) Create(value interface{}) Database {
-	return Wrap(it.w.Create(value))
+func (it *Db) Create(value interface{}) Database {
+	return Wrap(it.Database.Create(value))
 }
 
-func (it *database) Delete(value interface{}, where ...interface{}) Database {
-	return Wrap(it.w.Delete(value, where...))
+func (it *Db) Delete(value interface{}, where ...interface{}) Database {
+	return Wrap(it.Database.Delete(value, where...))
 }
 
-func (it *database) Raw(sql string, values ...interface{}) Database {
-	return Wrap(it.w.Raw(sql, values...))
+func (it *Db) Raw(sql string, values ...interface{}) Database {
+	return Wrap(it.Database.Raw(sql, values...))
 }
 
-func (it *database) Exec(sql string, values ...interface{}) Database {
-	return Wrap(it.w.Exec(sql, values...))
+func (it *Db) Exec(sql string, values ...interface{}) Database {
+	return Wrap(it.Database.Exec(sql, values...))
 }
 
-func (it *database) Model(value interface{}) Database {
-	return Wrap(it.w.Model(value))
+func (it *Db) Model(value interface{}) Database {
+	return Wrap(it.Database.Model(value))
 }
 
-func (it *database) Table(name string) Database {
-	return Wrap(it.w.Table(name))
+func (it *Db) Table(name string) Database {
+	return Wrap(it.Database.Table(name))
 }
 
-func (it *database) Debug() Database {
-	return Wrap(it.w.Debug())
+func (it *Db) Debug() Database {
+	return Wrap(it.Database.Debug())
 }
 
-func (it *database) Begin() Database {
-	return Wrap(it.w.Begin())
+func (it *Db) Begin() Database {
+	return Wrap(it.Database.Begin())
 }
 
-func (it *database) Commit() Database {
-	return Wrap(it.w.Commit())
+func (it *Db) Commit() Database {
+	return Wrap(it.Database.Commit())
 }
 
-func (it *database) Rollback() Database {
-	return Wrap(it.w.Rollback())
+func (it *Db) Rollback() Database {
+	return Wrap(it.Database.Rollback())
 }
 
-func (it *database) NewRecord(value interface{}) bool {
-	return it.w.NewRecord(value)
+func (it *Db) NewRecord(value interface{}) bool {
+	return it.Database.NewRecord(value)
 }
 
-func (it *database) RecordNotFound() bool {
-	return it.w.RecordNotFound()
+func (it *Db) RecordNotFound() bool {
+	return it.Database.RecordNotFound()
 }
 
-func (it *database) CreateTable(values ...interface{}) Database {
-	return Wrap(it.w.CreateTable(values...))
+func (it *Db) CreateTable(values ...interface{}) Database {
+	return Wrap(it.Database.CreateTable(values...))
 }
 
-func (it *database) DropTable(values ...interface{}) Database {
-	return Wrap(it.w.DropTable(values...))
+func (it *Db) DropTable(values ...interface{}) Database {
+	return Wrap(it.Database.DropTable(values...))
 }
 
-func (it *database) DropTableIfExists(values ...interface{}) Database {
-	return Wrap(it.w.DropTableIfExists(values...))
+func (it *Db) DropTableIfExists(values ...interface{}) Database {
+	return Wrap(it.Database.DropTableIfExists(values...))
 }
 
-func (it *database) HasTable(value interface{}) bool {
-	return it.w.HasTable(value)
+func (it *Db) HasTable(value interface{}) bool {
+	return it.Database.HasTable(value)
 }
 
-func (it *database) AutoMigrate(values ...interface{}) Database {
-	return Wrap(it.w.AutoMigrate(values...))
+func (it *Db) AutoMigrate(values ...interface{}) Database {
+	return Wrap(it.Database.AutoMigrate(values...))
 }
 
-func (it *database) ModifyColumn(column string, typ string) Database {
-	return Wrap(it.w.ModifyColumn(column, typ))
+func (it *Db) ModifyColumn(column string, typ string) Database {
+	return Wrap(it.Database.ModifyColumn(column, typ))
 }
 
-func (it *database) DropColumn(column string) Database {
-	return Wrap(it.w.DropColumn(column))
+func (it *Db) DropColumn(column string) Database {
+	return Wrap(it.Database.DropColumn(column))
 }
 
-func (it *database) AddIndex(indexName string, columns ...string) Database {
-	return Wrap(it.w.AddIndex(indexName, columns...))
+func (it *Db) AddIndex(indexName string, columns ...string) Database {
+	return Wrap(it.Database.AddIndex(indexName, columns...))
 }
 
-func (it *database) AddUniqueIndex(indexName string, columns ...string) Database {
-	return Wrap(it.w.AddUniqueIndex(indexName, columns...))
+func (it *Db) AddUniqueIndex(indexName string, columns ...string) Database {
+	return Wrap(it.Database.AddUniqueIndex(indexName, columns...))
 }
 
-func (it *database) RemoveIndex(indexName string) Database {
-	return Wrap(it.w.RemoveIndex(indexName))
+func (it *Db) RemoveIndex(indexName string) Database {
+	return Wrap(it.Database.RemoveIndex(indexName))
 }
 
-func (it *database) Association(column string) *gorm.Association {
-	return it.w.Association(column)
+func (it *Db) Association(column string) *gorm.Association {
+	return it.Database.Association(column)
 }
 
-func (it *database) Preload(column string, conditions ...interface{}) Database {
-	return Wrap(it.w.Preload(column, conditions...))
+func (it *Db) Preload(column string, conditions ...interface{}) Database {
+	return Wrap(it.Database.Preload(column, conditions...))
 }
 
-func (it *database) Set(name string, value interface{}) Database {
-	return Wrap(it.w.Set(name, value))
+func (it *Db) Set(name string, value interface{}) Database {
+	return Wrap(it.Database.Set(name, value))
 }
 
-func (it *database) InstantSet(name string, value interface{}) Database {
-	return Wrap(it.w.InstantSet(name, value))
+func (it *Db) InstantSet(name string, value interface{}) Database {
+	return Wrap(it.Database.InstantSet(name, value))
 }
 
-func (it *database) Get(name string) (interface{}, bool) {
-	return it.w.Get(name)
+func (it *Db) Get(name string) (interface{}, bool) {
+	return it.Database.Get(name)
 }
 
-func (it *database) SetJoinTableHandler(source interface{}, column string, handler gorm.JoinTableHandlerInterface) {
-	it.w.SetJoinTableHandler(source, column, handler)
+func (it *Db) SetJoinTableHandler(source interface{}, column string, handler gorm.JoinTableHandlerInterface) {
+	it.Database.SetJoinTableHandler(source, column, handler)
 }
 
-func (it *database) AddForeignKey(field string, dest string, onDelete string, onUpdate string) Database {
-	return Wrap(it.w.AddForeignKey(field, dest, onDelete, onUpdate))
+func (it *Db) AddForeignKey(field string, dest string, onDelete string, onUpdate string) Database {
+	return Wrap(it.Database.AddForeignKey(field, dest, onDelete, onUpdate))
 }
 
-func (it *database) AddError(err error) error {
-	return it.w.AddError(err)
+func (it *Db) AddError(err error) error {
+	return it.Database.AddError(err)
 }
 
-func (it *database) GetErrors() (errors []error) {
-	return it.w.GetErrors()
+func (it *Db) GetErrors() (errors []error) {
+	return it.Database.GetErrors()
 }
 
-func (it *database) RowsAffected() int64 {
-	return it.w.RowsAffected
+func (it *Db) RowsAffected() int64 {
+	return it.Database.RowsAffected
 }
 
-func (it *database) Error() error {
-	return it.w.Error
+func (it *Db) Error() error {
+	return it.Database.Error
 }
 
-func (it *database) Hits() ([]*Hit, error) {
+func (it *Db) Hits() ([]*Hit, error) {
 	var hits []*Hit
 	err := it.Find(&hits)
 	return hits, err.Error()
 }
 
-func (it *database) Since(ago time.Time) Database {
+func (it *Db) Since(ago time.Time) Database {
 	return it.Where("created_at > ?", ago.UTC().Format(TIME))
 }
 
-func (it *database) Between(t1 time.Time, t2 time.Time) Database {
+func (it *Db) Between(t1 time.Time, t2 time.Time) Database {
 	return it.Where("created_at BETWEEN ? AND ?", t1.UTC().Format(TIME), t2.UTC().Format(TIME))
 }
 
@@ -457,8 +457,8 @@ type DateScan struct {
 	Value     int64  `json:"y"`
 }
 
-func (it *database) ToChart() ([]*DateScan, error) {
-	rows, err := it.w.Rows()
+func (it *Db) ToChart() ([]*DateScan, error) {
+	rows, err := it.Database.Rows()
 	if err != nil {
 		return nil, err
 	}
@@ -481,11 +481,11 @@ func (it *database) ToChart() ([]*DateScan, error) {
 	return data, err
 }
 
-func (it *database) QuerySearch(r *http.Request) Database {
+func (it *Db) QuerySearch(r *http.Request) Database {
 	if r == nil {
 		return it
 	}
-	db := it.w
+	db := it.Database
 	start := defaultField(r, "start")
 	end := defaultField(r, "end")
 	limit := defaultField(r, "limit")

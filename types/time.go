@@ -27,7 +27,7 @@ const (
 )
 
 var (
-	NOW = func() time.Time { return time.Now() }()
+	NOW = func() time.Time { return time.Now().UTC() }()
 	//HOUR_1_AGO  = time.Now().Add(-1 * time.Hour)
 	//HOUR_24_AGO = time.Now().Add(-24 * time.Hour)
 	//HOUR_72_AGO = time.Now().Add(-72 * time.Hour)

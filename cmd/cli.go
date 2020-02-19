@@ -65,7 +65,7 @@ func catchCLI(args []string) error {
 		if err := runAssets(); err != nil {
 			return err
 		}
-		if err := source.CompileSASS(dir); err != nil {
+		if err := source.CompileSASS(); err != nil {
 			return err
 		}
 		return errors.New("end")

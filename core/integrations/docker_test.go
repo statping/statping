@@ -8,6 +8,8 @@ import (
 
 func TestDockerIntegration(t *testing.T) {
 
+	t.SkipNow()
+
 	t.Run("Set Field Value", func(t *testing.T) {
 		formPost := map[string][]string{}
 		formPost["path"] = []string{"unix:///var/run/docker.sock"}

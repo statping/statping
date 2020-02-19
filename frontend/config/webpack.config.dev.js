@@ -2,6 +2,7 @@
 
 const webpack              = require('webpack');
 const merge                = require('webpack-merge');
+const HtmlPlugin           = require('html-webpack-plugin');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 const helpers              = require('./helpers');
 const commonConfig         = require('./webpack.config.common');
@@ -25,7 +26,11 @@ const webpackConfig = merge(commonConfig, {
   plugins: [
     new webpack.EnvironmentPlugin(environment),
     new webpack.HotModuleReplacementPlugin(),
-    new FriendlyErrorsPlugin()
+    new FriendlyErrorsPlugin(),
+      new HtmlPlugin({
+          template: 'public/index.html',
+          chunksSortMode: 'dependency'
+      })
   ],
   devServer: {
     compress: true,

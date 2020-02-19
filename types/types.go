@@ -36,13 +36,13 @@ func (h *Hit) BeforeCreate() (err error) {
 	return
 }
 
-// DbConfig struct is used for the database connection and creates the 'config.yml' file
+// DbConfig struct is used for the Db connection and creates the 'config.yml' file
 type DbConfig struct {
 	DbConn      string `yaml:"connection" json:"connection"`
 	DbHost      string `yaml:"host" json:"-"`
 	DbUser      string `yaml:"user" json:"-"`
 	DbPass      string `yaml:"password" json:"-"`
-	DbData      string `yaml:"database" json:"-"`
+	DbData      string `yaml:"Db" json:"-"`
 	DbPort      int64  `yaml:"port" json:"-"`
 	ApiKey      string `yaml:"api_key" json:"-"`
 	ApiSecret   string `yaml:"api_secret" json:"-"`

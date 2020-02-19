@@ -1,7 +1,6 @@
 'use strict';
 
 const VueLoaderPlugin      = require('vue-loader/lib/plugin');
-const HtmlPlugin           = require('html-webpack-plugin');
 const MiniCSSExtractPlugin = require('mini-css-extract-plugin');
 const helpers              = require('./helpers');
 const isDev                = process.env.NODE_ENV === 'development';
@@ -60,8 +59,7 @@ const webpackConfig = {
     ]
   },
   plugins: [
-    new VueLoaderPlugin(),
-    new HtmlPlugin({ template: 'public/index.html', chunksSortMode: 'dependency' })
+    new VueLoaderPlugin()
   ]
 };
 

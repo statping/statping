@@ -98,19 +98,19 @@ func apiThemeSaveHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	if err := source.SaveAsset([]byte(themes.Base), utils.Directory+"/assets/scss/base.scss"); err != nil {
+	if err := source.SaveAsset([]byte(themes.Base), "scss/base.scss"); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	if err := source.SaveAsset([]byte(themes.Variables), utils.Directory+"/assets/scss/variables.scss"); err != nil {
+	if err := source.SaveAsset([]byte(themes.Variables), "scss/variables.scss"); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	if err := source.SaveAsset([]byte(themes.Mobile), utils.Directory+"/assets/scss/mobile.scss"); err != nil {
+	if err := source.SaveAsset([]byte(themes.Mobile), "scss/mobile.scss"); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	if err := source.CompileSASS(utils.Directory); err != nil {
+	if err := source.CompileSASS(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
@@ -126,8 +126,8 @@ func apiThemeCreateHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	if err := source.CompileSASS(dir); err != nil {
-		source.CopyToPublic(source.TmplBox, dir+"/assets/css", "base.css")
+	if err := source.CompileSASS(); err != nil {
+		source.CopyToPublic(source.TmplBox, "css", "base.css")
 		log.Errorln("Default 'base.css' was inserted because SASS did not work.")
 	}
 	resetRouter()

@@ -93,8 +93,8 @@ type NotificationLog struct {
 
 // AfterFind for Notification will set the timezone
 func (n *Notification) AfterFind() (err error) {
-	n.CreatedAt = utils.Timezoner(n.CreatedAt, timezone)
-	n.UpdatedAt = utils.Timezoner(n.UpdatedAt, timezone)
+	n.CreatedAt = utils.Now()
+	n.UpdatedAt = utils.Now()
 	return
 }
 
@@ -116,9 +116,8 @@ func modelDb(n *Notification) types.Database {
 }
 
 // SetDB is called by core to inject the database for a notifier to use
-func SetDB(d types.Database, zone float32) {
+func SetDB(d types.Database) {
 	db = d
-	timezone = zone
 }
 
 // asNotification accepts a Notifier and returns a Notification struct
@@ -247,8 +246,8 @@ func Init(n Notifier) (*Notification, error) {
 	var notify *Notification
 	if err == nil {
 		notify, _ = SelectNotification(n)
-		notify.CreatedAt = utils.Timezoner(notify.CreatedAt, timezone)
-		notify.UpdatedAt = utils.Timezoner(notify.UpdatedAt, timezone)
+		notify.CreatedAt = time.Now().UTC()
+		notify.UpdatedAt = time.Now().UTC()
 		if notify.Delay.Seconds() == 0 {
 			notify.Delay = time.Duration(1 * time.Second)
 		}
@@ -350,7 +349,7 @@ func (n *Notification) SentLastMinute() int {
 func (n *Notification) SentLast(since time.Time) int {
 	sent := 0
 	for _, v := range n.Logs() {
-		lastTime := time.Time(v.Time)
+		lastTime := time.Time(v.Time).UTC()
 		if lastTime.After(since) {
 			sent++
 		}

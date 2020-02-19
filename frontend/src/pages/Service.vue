@@ -60,16 +60,7 @@
 
             <div class="tab-content">
                 <div class="tab-pane fade active show">
-                    <div class="list-group mt-3 mb-4">
-
-                        <div v-for="(failure, index) in failures" :key="index" class="mb-2 list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">{{failure.issue}}</h5>
-                                <small>{{failure.created_at | moment("dddd, MMMM Do YYYY")}}</small>
-                            </div>
-                            <p class="mb-1">{{failure.issue}}</p>
-                        </div>
-                    </div>
+                    <ServiceFailures :service="service"/>
                 </div>
 
                 <div class="tab-pane fade" :class="{active: tab === 'incidents'}" id="incidents">
@@ -109,6 +100,7 @@
 <script>
   import Api from "../components/API"
   import MessageBlock from '../components/Index/MessageBlock';
+  import ServiceFailures from '../components/Service/ServiceFailures';
   import Checkin from "../forms/Checkin";
 
   const axisOptions = {
@@ -138,6 +130,7 @@
 export default {
   name: 'Service',
   components: {
+      ServiceFailures,
       MessageBlock,
     Checkin
   },
@@ -253,7 +246,7 @@ export default {
         await this.serviceFailures()
     },
     async serviceFailures() {
-      this.failures = await Api.service_failures(this.service.id, 0, 99999999999)
+      this.failures = await Api.service_failures(this.service.id, this.now() - 3600, this.now(), 15)
     },
     async chartHits() {
       this.data = await Api.service_hits(this.service.id, 0, 99999999999, "hour")

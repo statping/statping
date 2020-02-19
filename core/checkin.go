@@ -93,7 +93,7 @@ func (c *Checkin) CreateFailure() (int64, error) {
 		Checkin:  c.Id,
 		PingTime: c.Expected().Seconds(),
 	}}
-	row := failuresDB().Create(&fail)
+	row := Database(&Failure{}).Create(&fail)
 	sort.Sort(types.FailSort(c.Failures))
 	c.Failures = append(c.Failures, fail)
 	if len(c.Failures) > limitedFailures {
@@ -105,14 +105,14 @@ func (c *Checkin) CreateFailure() (int64, error) {
 // LimitedHits will return the last amount of successful hits from a checkin
 func (c *Checkin) LimitedHits(amount int) []*types.CheckinHit {
 	var hits []*types.CheckinHit
-	checkinHitsDB().Where("checkin = ?", c.Id).Order("id desc").Limit(amount).Find(&hits)
+	Database(&CheckinHit{}).Where("checkin = ?", c.Id).Order("id desc").Limit(amount).Find(&hits)
 	return hits
 }
 
 // AllCheckins returns all checkin in system
 func AllCheckins() []*Checkin {
 	var checkins []*Checkin
-	checkinDB().Find(&checkins)
+	Database(&types.Checkin{}).Find(&checkins)
 	return checkins
 }
 
@@ -152,7 +152,7 @@ func (c *Checkin) Expected() time.Duration {
 // Last returns the last checkinHit for a Checkin
 func (c *Checkin) Last() *CheckinHit {
 	var hit CheckinHit
-	checkinHitsDB().Where("checkin = ?", c.Id).Last(&hit)
+	Database(c).Where("checkin = ?", c.Id).Last(&hit)
 	return &hit
 }
 
@@ -163,7 +163,7 @@ func (c *Checkin) Link() string {
 // AllHits returns all of the CheckinHits for a given Checkin
 func (c *Checkin) AllHits() []*types.CheckinHit {
 	var checkins []*types.CheckinHit
-	checkinHitsDB().Where("checkin = ?", c.Id).Order("id DESC").Find(&checkins)
+	Database(&types.CheckinHit{}).Where("checkin = ?", c.Id).Order("id DESC").Find(&checkins)
 	return checkins
 }
 
@@ -171,7 +171,7 @@ func (c *Checkin) AllHits() []*types.CheckinHit {
 func (c *Checkin) LimitedFailures(amount int) []types.FailureInterface {
 	var failures []*Failure
 	var failInterfaces []types.FailureInterface
-	col := failuresDB().Where("checkin = ?", c.Id).Where("method = 'checkin'").Limit(amount).Order("id desc")
+	col := Database(&types.Failure{}).Where("checkin = ?", c.Id).Where("method = 'checkin'").Limit(amount).Order("id desc")
 	col.Find(&failures)
 	for _, f := range failures {
 		failInterfaces = append(failInterfaces, f)
@@ -182,7 +182,7 @@ func (c *Checkin) LimitedFailures(amount int) []types.FailureInterface {
 // Hits returns all of the CheckinHits for a given Checkin
 func (c *Checkin) AllFailures() []*types.Failure {
 	var failures []*types.Failure
-	col := failuresDB().Where("checkin = ?", c.Id).Where("method = 'checkin'").Order("id desc")
+	col := Database(&types.Failure{}).Where("checkin = ?", c.Id).Where("method = 'checkin'").Order("id desc")
 	col.Find(&failures)
 	return failures
 }
@@ -194,7 +194,7 @@ func (c *Checkin) Delete() error {
 	service := c.Service()
 	slice := service.Checkins
 	service.Checkins = append(slice[:i], slice[i+1:]...)
-	row := checkinDB().Delete(&c)
+	row := Database(c).Delete(&c)
 	return row.Error()
 }
 
@@ -211,7 +211,7 @@ func (c *Checkin) index() int {
 // Create will create a new Checkin
 func (c *Checkin) Create() (int64, error) {
 	c.ApiKey = utils.RandomString(7)
-	row := checkinDB().Create(&c)
+	row := Database(c).Create(&c)
 	if row.Error() != nil {
 		log.Warnln(row.Error())
 		return 0, row.Error()
@@ -225,7 +225,7 @@ func (c *Checkin) Create() (int64, error) {
 
 // Update will update a Checkin
 func (c *Checkin) Update() (int64, error) {
-	row := checkinDB().Update(&c)
+	row := Database(c).Update(&c)
 	if row.Error() != nil {
 		log.Warnln(row.Error())
 		return 0, row.Error()
@@ -238,7 +238,7 @@ func (c *CheckinHit) Create() (int64, error) {
 	if c.CreatedAt.IsZero() {
 		c.CreatedAt = utils.Now()
 	}
-	row := checkinHitsDB().Create(&c)
+	row := Database(c).Create(&c)
 	if row.Error() != nil {
 		log.Warnln(row.Error())
 		return 0, row.Error()

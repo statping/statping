@@ -18,6 +18,7 @@ package source
 import (
 	"github.com/hunterlong/statping/utils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
@@ -42,39 +43,45 @@ func TestCreateAssets(t *testing.T) {
 	assert.FileExists(t, dir+"/assets/css/base.css")
 	assert.FileExists(t, dir+"/assets/scss/base.scss")
 }
+func TestCopyAllToPublic(t *testing.T) {
+	err := CopyAllToPublic(TmplBox)
+	require.Nil(t, err)
+}
 
 func TestCompileSASS(t *testing.T) {
-	CompileSASS(dir)
+	err := CompileSASS()
+	require.Nil(t, err)
 	assert.True(t, UsingAssets(dir))
 }
 
 func TestSaveAsset(t *testing.T) {
 	data := []byte("BODY { color: black; }")
-	asset := SaveAsset(data, dir, "scss/theme.scss")
-	assert.Nil(t, asset)
+	err := SaveAsset(data, "scss/theme.scss")
+	assert.Nil(t, err)
 	assert.FileExists(t, dir+"/assets/scss/theme.scss")
 }
 
 func TestOpenAsset(t *testing.T) {
-	asset := OpenAsset(dir, "scss/theme.scss")
+	asset := OpenAsset("scss/theme.scss")
 	assert.NotEmpty(t, asset)
 }
 
 func TestDeleteAssets(t *testing.T) {
+	assert.True(t, UsingAssets(dir))
 	assert.Nil(t, DeleteAllAssets(dir))
 	assert.False(t, UsingAssets(dir))
 }
 
 func TestCopyToPluginFailed(t *testing.T) {
-	assert.Nil(t, DeleteAllAssets(dir))
+	//assert.Nil(t, DeleteAllAssets(dir))
 	assert.False(t, UsingAssets(dir))
 }
 
 func ExampleSaveAsset() {
 	data := []byte("alert('helloooo')")
-	SaveAsset(data, "js", "test.js")
+	SaveAsset(data, "js/test.js")
 }
 
 func ExampleOpenAsset() {
-	OpenAsset("js", "main.js")
+	OpenAsset("js/main.js")
 }

@@ -35,35 +35,35 @@ func ReturnUser(u *types.User) *User {
 // CountUsers returns the amount of users
 func CountUsers() int64 {
 	var amount int64
-	usersDB().Count(&amount)
+	Database(&User{}).Count(&amount)
 	return amount
 }
 
 // SelectUser returns the User based on the User's ID.
 func SelectUser(id int64) (*User, error) {
 	var user User
-	err := usersDB().Where("id = ?", id).First(&user)
+	err := Database(&User{}).Where("id = ?", id).First(&user)
 	return &user, err.Error()
 }
 
 // SelectUsername returns the User based on the User's username
 func SelectUsername(username string) (*User, error) {
 	var user User
-	res := usersDB().Where("username = ?", username)
+	res := Database(&User{}).Where("username = ?", username)
 	err := res.First(&user)
 	return &user, err.Error()
 }
 
 // Delete will remove the User record from the database
 func (u *User) Delete() error {
-	return usersDB().Delete(u).Error()
+	return Database(&User{}).Delete(u).Error()
 }
 
 // Update will update the User's record in database
 func (u *User) Update() error {
 	u.ApiKey = utils.NewSHA1Hash(5)
 	u.ApiSecret = utils.NewSHA1Hash(10)
-	return usersDB().Update(u).Error()
+	return Database(&User{}).Update(u).Error()
 }
 
 // Create will insert a new User into the database
@@ -72,7 +72,7 @@ func (u *User) Create() (int64, error) {
 	u.Password = utils.HashPassword(u.Password)
 	u.ApiKey = utils.NewSHA1Hash(5)
 	u.ApiSecret = utils.NewSHA1Hash(10)
-	db := usersDB().Create(u)
+	db := Database(&User{}).Create(u)
 	if db.Error() != nil {
 		return 0, db.Error()
 	}
@@ -86,7 +86,7 @@ func (u *User) Create() (int64, error) {
 // SelectAllUsers returns all users
 func SelectAllUsers() ([]*User, error) {
 	var users []*User
-	db := usersDB().Find(&users)
+	db := Database(&User{}).Find(&users)
 	if db.Error() != nil {
 		log.Errorln(fmt.Sprintf("Failed to load all users. %v", db.Error()))
 		return nil, db.Error()

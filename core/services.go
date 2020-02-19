@@ -103,14 +103,14 @@ func (s *Service) CheckinProcess() {
 // AllCheckins will return a slice of AllCheckins for a Service
 func (s *Service) AllCheckins() []*Checkin {
 	var checkin []*Checkin
-	checkinDB().Where("service = ?", s.Id).Find(&checkin)
+	Database(&Checkin{}).Where("service = ?", s.Id).Find(&checkin)
 	return checkin
 }
 
 // SelectAllServices returns a slice of *core.Service to be store on []*core.Services, should only be called once on startup.
 func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 	var services []*Service
-	db := servicesDB().Find(&services).Order("order_id desc")
+	db := Database(&Service{}).Find(&services).Order("order_id desc")
 	if db.Error() != nil {
 		log.Errorln(fmt.Sprintf("service error: %v", db.Error()))
 		return nil, db.Error()
@@ -354,9 +354,9 @@ func updateService(s *Service) {
 // Delete will remove a service from the database, it will also end the service checking go routine
 func (s *Service) Delete() error {
 	i := s.index()
-	err := servicesDB().Delete(s)
+	err := Database(&Service{}).Delete(s)
 	if err.Error() != nil {
-		log.Errorln(fmt.Sprintf("Failed to delete service %v. %v", s.Name, err.Error))
+		log.Errorln(fmt.Sprintf("Failed to delete service %v. %v", s.Name, err.Error()))
 		return err.Error()
 	}
 	s.Close()
@@ -369,7 +369,7 @@ func (s *Service) Delete() error {
 
 // Update will update a service in the database, the service's checking routine can be restarted by passing true
 func (s *Service) Update(restart bool) error {
-	err := servicesDB().Update(&s)
+	err := Database(&Service{}).Update(&s)
 	if err.Error() != nil {
 		log.Errorln(fmt.Sprintf("Failed to update service %v. %v", s.Name, err))
 		return err.Error()
@@ -396,7 +396,7 @@ func (s *Service) Update(restart bool) error {
 // Create will create a service and insert it into the database
 func (s *Service) Create(check bool) (int64, error) {
 	s.CreatedAt = time.Now().UTC()
-	db := servicesDB().Create(s)
+	db := Database(&Service{}).Create(s)
 	if db.Error() != nil {
 		log.Errorln(fmt.Sprintf("Failed to create service %v #%v: %v", s.Name, s.Id, db.Error()))
 		return 0, db.Error()

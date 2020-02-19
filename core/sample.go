@@ -207,7 +207,7 @@ func insertSampleCheckins() error {
 
 // InsertSampleHits will create a couple new hits for the sample services
 func InsertSampleHits() error {
-	tx := hitsDB().Begin()
+	tx := Database(&Hit{}).Begin()
 	sg := new(sync.WaitGroup)
 	for i := int64(1); i <= 5; i++ {
 		sg.Add(1)
@@ -250,7 +250,7 @@ func insertSampleCore() error {
 		CreatedAt:   time.Now().UTC(),
 		UseCdn:      types.NewNullBool(false),
 	}
-	query := coreDB().Create(core)
+	query := Database(&Core{}).Create(core)
 	return query.Error()
 }
 
@@ -510,6 +510,7 @@ func TmpRecords(dbFile string) error {
 	var err error
 	CoreApp = NewCore()
 	CoreApp.Name = "Tester"
+	CoreApp.Setup = true
 	configs := &types.DbConfig{
 		DbConn:   "sqlite",
 		Project:  "Tester",

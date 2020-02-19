@@ -35,6 +35,7 @@ func TestResetDatabase(t *testing.T) {
 	err := core.TmpRecords("handlers.db")
 	require.Nil(t, err)
 	require.NotNil(t, core.CoreApp)
+	require.NotNil(t, core.CoreApp.Config)
 }
 
 func TestFailedHTTPServer(t *testing.T) {
@@ -43,7 +44,6 @@ func TestFailedHTTPServer(t *testing.T) {
 }
 
 func TestSetupRoutes(t *testing.T) {
-
 	form := url.Values{}
 	form.Add("db_host", "")
 	form.Add("db_user", "")
@@ -61,17 +61,17 @@ func TestSetupRoutes(t *testing.T) {
 
 	tests := []HTTPTest{
 		{
-			Name:           "Statping Setup Check",
-			URL:            "/setup",
+			Name:           "Statping Check",
+			URL:            "/api",
 			Method:         "GET",
-			ExpectedStatus: 303,
+			ExpectedStatus: 200,
 		},
 		{
 			Name:           "Statping Run Setup",
-			URL:            "/setup",
+			URL:            "/api/setup",
 			Method:         "POST",
 			Body:           form.Encode(),
-			ExpectedStatus: 303,
+			ExpectedStatus: 200,
 			HttpHeaders:    []string{"Content-Type=application/x-www-form-urlencoded"},
 			ExpectedFiles:  []string{dir + "/config.yml", dir + "/tmp/" + types.SqliteFilename},
 		}}
@@ -94,19 +94,19 @@ func TestMainApiRoutes(t *testing.T) {
 			URL:              "/api",
 			Method:           "GET",
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"name":"Statping Sample Data","description":"This data is only used to testing"`},
+			ExpectedContains: []string{`"description":"This data is only used to testing"`},
 		},
 		{
 			Name:           "Statping Renew API Keys",
 			URL:            "/api/renew",
 			Method:         "POST",
-			ExpectedStatus: 303,
+			ExpectedStatus: 200,
 		},
 		{
 			Name:           "Statping Clear Cache",
 			URL:            "/api/clear_cache",
 			Method:         "POST",
-			ExpectedStatus: 303,
+			ExpectedStatus: 200,
 		},
 		{
 			Name:           "404 Error Page",
@@ -129,14 +129,14 @@ func TestApiServiceRoutes(t *testing.T) {
 			Name:             "Statping All Services",
 			URL:              "/api/services",
 			Method:           "GET",
+			ExpectedContains: []string{`"name":"Google"`},
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"id":1,"name":"Google","domain":"https://google.com"`},
 		},
 		{
 			Name:             "Statping Service 1",
 			URL:              "/api/services/1",
 			Method:           "GET",
-			ExpectedContains: []string{`"id":1,"name":"Google","domain":"https://google.com"`},
+			ExpectedContains: []string{`"name":"Google"`},
 			ExpectedStatus:   200,
 		},
 		{
@@ -370,7 +370,7 @@ func TestMessagesApiRoutes(t *testing.T) {
 			URL:              "/api/messages",
 			Method:           "GET",
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"id":1,"title":"Routine Downtime"`},
+			ExpectedContains: []string{`"title":"Routine Downtime"`},
 		}, {
 			Name:   "Statping Create Message",
 			URL:    "/api/messages",
@@ -394,7 +394,7 @@ func TestMessagesApiRoutes(t *testing.T) {
 			URL:              "/api/messages/1",
 			Method:           "GET",
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"id":1,"title":"Routine Downtime"`},
+			ExpectedContains: []string{`"title":"Routine Downtime"`},
 		}, {
 			Name:   "Statping Update Message",
 			URL:    "/api/messages/1",

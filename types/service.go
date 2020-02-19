@@ -61,6 +61,16 @@ type Service struct {
 	LastOnline          time.Time          `gorm:"-" json:"last_success"`
 	Failures            []FailureInterface `gorm:"-" json:"failures,omitempty" scope:"user,admin"`
 	Checkins            []CheckinInterface `gorm:"-" json:"checkins,omitempty" scope:"user,admin"`
+	Stats               Stater             `gorm:"-" json:"stats,omitempty"`
+}
+
+type Stater interface {
+	Fetch() *Stats
+}
+
+type Stats struct {
+	Failures uint64 `gorm:"-" json:"failures,omitempty"`
+	Hits     uint64 `gorm:"-" json:"hits,omitempty"`
 }
 
 // BeforeCreate for Service will set CreatedAt to UTC

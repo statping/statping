@@ -30,23 +30,6 @@
 
                         <CoreSettings/>
 
-                        <h2 class="mt-5">Bulk Import Services</h2>
-                        You can import multiple services based on a CSV file with the format shown on the <a href="https://github.com/hunterlong/statping/wiki/Bulk-Import-Services" target="_blank">Bulk Import Wiki</a>.
-
-                        <div class="card mt-2">
-                            <div class="card-body">
-                                <form action="settings/bulk_import" method="POST" enctype="multipart/form-data" class="form-inline">
-                                    <div class="form-group col-10">
-                                        <input type="file" name="file" class="form-control-file" accept=".csv">
-                                    </div>
-                                    <div class="form-group">
-                                        <button type="submit" class="btn btn-outline-success right">Import</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-
-
                         <h2 class="mt-5">Additional Settings</h2>
                         <div v-if="core.domain !== ''" class="row">
                             <div class="col-12">
@@ -56,6 +39,9 @@
                                 <a class="btn btn-sm btn-primary" href=statping://setup?domain&#61;https://demo.statping.com&amp;api&#61;6b05b48f4b3a1460f3864c31b26cab6a27dbaff9>Open in Statping App</a>
                                 <a href="settings/export" class="btn btn-sm btn-secondary">Export Settings</a>
                             </div>
+                        </div>
+                        <div v-else>
+                            Insert a domain to view QR code for the mobile app.
                         </div>
 
                     </div>

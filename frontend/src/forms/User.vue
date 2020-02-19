@@ -82,7 +82,6 @@
   watch: {
     in_user() {
         const u = this.in_user
-        delete u.password
         this.user = u
     }
   },
