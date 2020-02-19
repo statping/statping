@@ -126,7 +126,15 @@ export default new Vuex.Store({
             window.console.log('finished loading required data')
         },
         async loadAdmin (context) {
-            await context.dispatch('loadRequired')
+            const core = await Api.core()
+            context.commit("setCore", core);
+            const groups = await Api.groups()
+            context.commit("setGroups", groups);
+            const services = await Api.services()
+            context.commit("setServices", services);
+            const messages = await Api.messages()
+            context.commit("setMessages", messages)
+            context.commit("setHasPublicData", true)
             const notifiers = await Api.notifiers()
             context.commit("setNotifiers", notifiers);
             const users = await Api.users()

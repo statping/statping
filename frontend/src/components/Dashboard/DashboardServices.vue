@@ -25,8 +25,10 @@
                     </span> {{service.name}}
                 </td>
                 <td class="d-none d-md-table-cell">
-                    <span class="badge" :class="{'badge-success': service.online, 'badge-danger': !service.online}">{{service.online ? "ONLINE" : "OFFLINE"}}</span>
-                    <ToggleSwitch :service="service"/>
+                    <span class="badge" :class="{'animate-fader': !service.online, 'badge-success': service.online, 'badge-danger': !service.online}">
+                        {{service.online ? "ONLINE" : "OFFLINE"}}
+                    </span>
+                    <ToggleSwitch v-if="service.online" :service="service"/>
                 </td>
                 <td class="d-none d-md-table-cell">
                     <span class="badge" :class="{'badge-primary': service.public, 'badge-secondary': !service.public}">
@@ -117,7 +119,7 @@
   computed: {
     servicesList: {
       get() {
-        return this.$store.getters.servicesInOrder
+        return this.$store.state.servicesInOrder
       },
       async set(value) {
         let data = [];

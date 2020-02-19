@@ -52,7 +52,7 @@
     }
 
     .lg_number {
-        font-size: 7.8vw;
+        font-size: 7vw;
     }
 
     .stats_area {
@@ -64,6 +64,10 @@
         padding-left: 0;
         padding-right: 0;
         font-size: 0.6rem;
+    }
+
+    .navbar-item {
+        border-bottom: 1px solid #eaeaea;
     }
 
     .list-group-item {

@@ -1,13 +1,13 @@
 <template>
   <div id="app">
     <router-view :loaded="loaded"/>
-      <Footer :version="version" v-if="$route.path !== '/setup'"/>
+      <Footer :logged_in="logged_in" :version="version" v-if="$route.path !== '/setup'"/>
   </div>
 </template>
 
 <script>
   import Api from './components/API';
-  import Footer from "./components/Footer";
+  import Footer from "./components/Index/Footer";
 
   export default {
   name: 'app',
@@ -22,7 +22,11 @@
     }
   },
       async created() {
-          await this.$store.dispatch('loadRequired')
+        await this.$store.dispatch('loadRequired')
+
+        if (this.$store.getters.core.logged_in) {
+          await this.$store.dispatch('loadAdmin')
+        }
           this.loaded = true
           if (!this.$store.getters.core.setup) {
             this.$router.push('/setup')
@@ -32,8 +36,9 @@
     async mounted() {
           if (this.$route.path !== '/setup') {
               const tk = localStorage.getItem("statping_user")
-              if (tk) {
-                  // await this.$store.dispatch('loadAdmin')
+              if (this.$store.getters.core.logged_in) {
+                this.logged_in = true
+                  await this.$store.dispatch('loadAdmin')
               }
           }
     },

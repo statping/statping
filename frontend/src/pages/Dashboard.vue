@@ -14,6 +14,15 @@
   components: {
     TopNav,
   },
+      async mounted() {
+          if (this.$route.path !== "/login") {
+              try {
+                  const u = await Api.users()
+              } catch (e) {
+                  this.$router.push('/logout')
+              }
+          }
+      },
   data () {
     return {
       authenticated: false

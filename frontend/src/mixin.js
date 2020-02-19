@@ -56,6 +56,36 @@ export default Vue.mixin({
       loggedIn() {
           const core = this.$store.getters.core
           return core.logged_in === true
+      },
+    iconName(name) {
+      switch (name) {
+        case "fas fa-terminal":
+          return "terminal"
+        case "fab fa-discord":
+          return ["fab", "discord"]
+        case "far fa-envelope":
+          return "envelope"
+        case "far fa-bell":
+          return "bell"
+        case "fas fa-mobile-alt":
+          return "mobile"
+        case "fab fa-slack":
+          return ["fab", "slack-hash"]
+        case "fab fa-telegram-plane":
+          return ["fab", "telegram-plane"]
+        case "far fa-comment-alt":
+          return "comment"
+        case "fas fa-code-branch":
+          return "code-branch"
+        case "csv":
+          return "file"
+        case "docker":
+          return ["fab", "docker"]
+        case "traefik":
+          return "server"
+        default:
+          return "bars"
       }
+    },
   }
 });

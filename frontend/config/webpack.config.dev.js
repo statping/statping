@@ -29,7 +29,6 @@ const webpackConfig = merge(commonConfig, {
     new FriendlyErrorsPlugin(),
       new HtmlPlugin({
           template: 'public/index.html',
-          chunksSortMode: 'dependency'
       })
   ],
   devServer: {

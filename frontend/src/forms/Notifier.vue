@@ -17,7 +17,7 @@
             <small class="form-text text-muted" v-html="form.small_text"></small>
         </div>
 
-        <div class="row">
+        <div class="row mt-4">
             <div class="col-9 col-sm-6">
                 <div class="input-group mb-2">
                     <div class="input-group-prepend">
@@ -43,14 +43,14 @@
                 </button>
             </div>
 
-            <div class="col-12 col-sm-12">
+            <div class="col-12 col-sm-12 mt-3">
                 <button @click="testNotifier" class="btn btn-secondary btn-block text-capitalize col-12 float-right"><i class="fa fa-vial"></i>
                     {{loading ? "Loading..." : "Test Notifier"}}</button>
             </div>
 
         </div>
 
-        <span class="d-block small text-center mt-3 mb-5">
+        <span class="d-block small text-center mt-5 mb-5">
             <span class="text-capitalize">{{notifier.title}}</span> Notifier created by <a :href="notifier.author_url" target="_blank">{{notifier.author}}</a>
         </span>
     </form>

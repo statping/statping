@@ -147,9 +147,14 @@ HTML,BODY {
     text-decoration: none;
 }
 
+.card-title A {
+  color: $service-title;
+  text-decoration: none;
+}
+
 .chart-container {
   position: relative;
-  height: 200px;
+  height: 24.1vh;
   width: 100%;
   overflow: hidden;
 }
@@ -282,6 +287,33 @@ input.inputTags-field:focus {
 
 .nav-pills I {
    margin-right: 10px;
+}
+
+@keyframes fadeInOut {
+  0%   { opacity:1; }
+  50%  { opacity:0.3; }
+  100% { opacity:1; }
+}
+@-o-keyframes fadeInOut {
+  0%   { opacity:1; }
+  50%  { opacity:0.3; }
+  100% { opacity:1; }
+}
+@-moz-keyframes fadeInOut {
+  0%   { opacity:1; }
+  50%  { opacity:0.3; }
+  100% { opacity:1; }
+}
+@-webkit-keyframes fadeInOut {
+  0%   { opacity:1; }
+  50%  { opacity:0.3; }
+  100% { opacity:1; }
+}
+.animate-fader {
+  -webkit-animation: fadeInOut 1s infinite;
+  -moz-animation: fadeInOut 1s infinite;
+  -o-animation: fadeInOut 1s infinite;
+  animation: fadeInOut 21 infinite;
 }
 
 .CodeMirror {

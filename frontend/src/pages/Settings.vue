@@ -5,20 +5,26 @@
                 <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                     <h6 class="text-muted">Main Settings</h6>
 
-                    <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-home-tab')}" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true"><i class="fa fa-cogs"></i> Settings</a>
-                    <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-style-tab')}" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false"><i class="fa fa-image"></i> Theme Editor</a>
-                    <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-cache-tab')}" id="v-pills-cache-tab" data-toggle="pill" href="#v-pills-cache" role="tab" aria-controls="v-pills-cache" aria-selected="false"><i class="fa fa-paperclip"></i> Cache</a>
+                    <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-home-tab')}" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">
+                        <font-awesome-icon icon="cog" class="mr-2"/> Settings
+                    </a>
+                    <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-style-tab')}" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false">
+                        <font-awesome-icon icon="image" class="mr-2"/> Theme Editor
+                    </a>
+                    <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-cache-tab')}" id="v-pills-cache-tab" data-toggle="pill" href="#v-pills-cache" role="tab" aria-controls="v-pills-cache" aria-selected="false">
+                        <font-awesome-icon icon="paperclip" class="mr-2"/> Cache
+                    </a>
 
                     <h6 class="mt-4 text-muted">Notifiers</h6>
 
                     <a v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="`${notifier.method}_${index}`" @click.prevent="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" data-toggle="pill" v-bind:href="`#v-pills-${notifier.method.toLowerCase()}`" role="tab" v-bind:aria-controls="`v-pills-${notifier.method.toLowerCase()}`" aria-selected="false">
-                        <i class="fas fa-terminal"></i> {{notifier.method}}
+                        <font-awesome-icon :icon="iconName(notifier.icon)" class="mr-2"/> {{notifier.method}}
                     </a>
 
                     <h6 class="mt-4 text-muted">Integrations (beta)</h6>
 
                     <a v-for="(integration, index) in $store.getters.integrations" v-bind:key="`${integration.name}_${index}`" @click.prevent="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-integration-${integration.name}`)}" v-bind:id="`v-pills-integration-${integration.name}`" data-toggle="pill" v-bind:href="`#v-pills-integration-${integration.name}`" role="tab" :aria-controls="`v-pills-integration-${integration.name}`" aria-selected="false">
-                        <i class="fas fa-file-csv"></i> {{integration.full_name}}
+                        <font-awesome-icon :icon="iconName(integration.name)" class="mr-2"/> {{integration.full_name}}
                     </a>
 
                 </div>

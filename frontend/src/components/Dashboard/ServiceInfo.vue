@@ -7,10 +7,10 @@
                 </span>
             </h5>
             <div v-if="loaded && service.online" class="row">
-                <div class="col-6">
+                <div class="col-md-6 col-sm-12">
                     <ServiceSparkLine :title="set1_name" subtitle="Last Day Latency" :series="set1"/>
                 </div>
-                <div class="col-6">
+                <div class="col-md-6 col-sm-12">
                     <ServiceSparkLine :title="set2_name" subtitle="Last 7 Days Latency" :series="set2"/>
                 </div>
             </div>
