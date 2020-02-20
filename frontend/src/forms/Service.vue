@@ -1,5 +1,5 @@
 <template>
-    <form @submit="saveService">
+    <form @submit.prevent="saveService">
         <h4 class="mb-5 text-muted">Basic Information</h4>
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Service Name</label>
@@ -12,10 +12,10 @@
             <label for="service_type" class="col-sm-4 col-form-label">Service Type</label>
             <div class="col-sm-8">
                 <select v-model="service.type" class="form-control" id="service_type" >
-                    <option value="http" >HTTP Service</option>
-                    <option value="tcp" >TCP Service</option>
-                    <option value="udp" >UDP Service</option>
-                    <option value="icmp" >ICMP Ping</option>
+                    <option value="http">HTTP Service</option>
+                    <option value="tcp">TCP Service</option>
+                    <option value="udp">UDP Service</option>
+                    <option value="icmp">ICMP Ping</option>
                 </select>
                 <small class="form-text text-muted">Use HTTP if you are checking a website or use TCP if you are checking a server</small>
             </div>
@@ -111,15 +111,8 @@
                 <small class="form-text text-muted">Use text for the service URL rather than the service number.</small>
             </div>
         </div>
-        <div class="form-group row">
-            <label for="order" class="col-sm-4 col-form-label">List Order</label>
-            <div class="col-sm-8">
-                <input v-model="service.order" type="number" name="order" class="form-control" min="0" id="order">
-                <small class="form-text text-muted">You can also drag and drop services to reorder on the Services tab.</small>
-            </div>
-        </div>
         <div v-if="service.type.match(/^(http)$/)" class="form-group row">
-            <label for="order" class="col-sm-4 col-form-label">Verify SSL</label>
+            <label class="col-sm-4 col-form-label">Verify SSL</label>
             <div class="col-8 mt-1">
             <span @click="service.verify_ssl = !!service.verify_ssl" class="switch float-left">
                 <input v-model="service.verify_ssl" type="checkbox" name="verify_ssl-option" class="switch" id="switch-verify-ssl" v-bind:checked="service.verify_ssl">
@@ -128,7 +121,7 @@
             </div>
         </div>
         <div class="form-group row">
-            <label for="order" class="col-sm-4 col-form-label">Notifications</label>
+            <label class="col-sm-4 col-form-label">Notifications</label>
             <div class="col-8 mt-1">
             <span @click="service.allow_notifications = !!service.allow_notifications" class="switch float-left">
                 <input v-model="service.allow_notifications" type="checkbox" name="allow_notifications-option" class="switch" id="switch-notifications" v-bind:checked="service.allow_notifications">
@@ -136,8 +129,17 @@
             </span>
             </div>
         </div>
+        <div v-if="service.allow_notifications" class="form-group row">
+            <label class="col-sm-4 col-form-label">Notify All Changes</label>
+            <div class="col-8 mt-1">
+            <span @click="service.notify_all_changes = !!service.notify_all_changes" class="switch float-left">
+                <input v-model="service.notify_all_changes" type="checkbox" name="notify_all-option" class="switch" id="notify_all" v-bind:checked="service.notify_all_changes">
+                <label for="notify_all">Continuously notify when service is failing.</label>
+            </span>
+            </div>
+        </div>
         <div class="form-group row">
-            <label for="order" class="col-sm-4 col-form-label">Visible</label>
+            <label class="col-sm-4 col-form-label">Visible</label>
             <div class="col-8 mt-1">
             <span @click="service.public = !!service.public" class="switch float-left">
                 <input v-model="service.public" type="checkbox" name="public-option" class="switch" id="switch-public" v-bind:checked="service.public">
@@ -157,7 +159,7 @@
 </template>
 
 <script>
-  import Api from "../components/API";
+  import Api from "../API";
 
   export default {
   name: 'FormService',
@@ -181,6 +183,7 @@
         order: 1,
         verify_ssl: true,
         allow_notifications: true,
+        notify_all_changes: true,
         public: true,
       },
       groups: [],
@@ -203,8 +206,7 @@
     }
   },
   methods: {
-    async saveService(e) {
-      e.preventDefault()
+    async saveService() {
       let s = this.service
       delete s.failures
       delete s.created_at

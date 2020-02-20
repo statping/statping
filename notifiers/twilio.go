@@ -102,9 +102,6 @@ func (u *twilio) OnSuccess(s *types.Service) {
 	if !s.Online || !s.SuccessNotified {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		var msg string
-		if s.UpdateNotify {
-			s.UpdateNotify = false
-		}
 		msg = s.DownText
 
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)

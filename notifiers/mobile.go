@@ -99,9 +99,6 @@ func (u *mobilePush) OnSuccess(s *types.Service) {
 	data := dataJson(s, nil)
 	if !s.Online || !s.SuccessNotified {
 		var msgStr string
-		if s.UpdateNotify {
-			s.UpdateNotify = false
-		}
 		msgStr = s.DownText
 
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))

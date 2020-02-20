@@ -55,7 +55,7 @@
 </template>
 
 <script>
-  import Api from "../components/API";
+  import Api from "../API";
 
   export default {
   name: 'FormUser',

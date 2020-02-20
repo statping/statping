@@ -10,12 +10,14 @@ const environment          = require('./dev.env');
 
 const webpackConfig = merge(commonConfig, {
   mode: 'development',
-  devtool: 'cheap-module-eval-source-map',
+  devtool: 'inline-cheap-module-source-map',
   output: {
     path: helpers.root('dist'),
     publicPath: '/',
     filename: 'js/[name].bundle.js',
-    chunkFilename: 'js/[name].chunk.js'
+    chunkFilename: 'js/[name].chunk.js',
+    devtoolModuleFilenameTemplate: '[absolute-resource-path]',
+    devtoolFallbackModuleFilenameTemplate: '[absolute-resource-path]?[hash]'
   },
   optimization: {
     runtimeChunk: 'single',

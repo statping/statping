@@ -99,97 +99,97 @@
 
 <script>
   import FormGroup from "../../forms/Group";
-  import Api from "../../components/API";
+  import Api from "../../API";
   import ToggleSwitch from "../../forms/ToggleSwitch";
   import draggable from 'vuedraggable'
 
   export default {
-  name: 'DashboardServices',
-  components: {
-    ToggleSwitch,
-    FormGroup,
-    draggable
-  },
-  data () {
-    return {
-      edit: false,
-      group: {}
-    }
-  },
-  computed: {
-    servicesList: {
-      get() {
-        return this.$store.state.servicesInOrder
+      name: 'DashboardServices',
+      components: {
+          ToggleSwitch,
+          FormGroup,
+          draggable
       },
-      async set(value) {
-        let data = [];
-        value.forEach((s, k) => {
-          data.push({service: s.id, order: k+1})
-        });
-        await Api.services_reorder(data)
-          const services = await Api.services()
-          this.$store.commit('setServices', services)
-      }
-    },
-    groupsList: {
-      get() {
-        return this.$store.state.groupsInOrder
+      data() {
+          return {
+              edit: false,
+              group: {}
+          }
       },
-      async set(value) {
-        let data = [];
-        value.forEach((s, k) => {
-          data.push({group: s.id, order: k+1})
-        });
-          await Api.groups_reorder(data)
-          const groups = await Api.groups()
-          this.$store.commit('setGroups', groups)
-      }
-    }
-  },
-  beforeMount() {
+      computed: {
+          servicesList: {
+              get() {
+                  return this.$store.state.servicesInOrder
+              },
+              async set(value) {
+                  let data = [];
+                  value.forEach((s, k) => {
+                      data.push({service: s.id, order: k + 1})
+                  });
+                  await Api.services_reorder(data)
+                  const services = await Api.services()
+                  this.$store.commit('setServices', services)
+              }
+          },
+          groupsList: {
+              get() {
+                  return this.$store.state.groupsInOrder
+              },
+              async set(value) {
+                  let data = [];
+                  value.forEach((s, k) => {
+                      data.push({group: s.id, order: k + 1})
+                  });
+                  await Api.groups_reorder(data)
+                  const groups = await Api.groups()
+                  this.$store.commit('setGroups', groups)
+              }
+          }
+      },
+      beforeMount() {
 
-  },
-  methods: {
-    editChange(v) {
-      this.group = {}
-      this.edit = v
-    },
-    editGroup(g, mode) {
-      this.group = g
-      this.edit = !mode
-    },
-    reordered_services() {
+      },
+      methods: {
+          editChange(v) {
+              this.group = {}
+              this.edit = v
+          },
+          editGroup(g, mode) {
+              this.group = g
+              this.edit = !mode
+          },
+          reordered_services() {
 
-    },
-    saveUpdatedOrder: function (e) {
-      window.console.log("saving...");
-      window.console.log(this.myViews.array()); // this.myViews.array is not a function
-    },
-    serviceGroup(s) {
-      let group = this.$store.getters.groupById(s.group_id)
-      if (group) {
-        return group.name
+          },
+          saveUpdatedOrder: function (e) {
+              window.console.log("saving...");
+              window.console.log(this.myViews.array()); // this.myViews.array is not a function
+          },
+          serviceGroup(s) {
+              let group = this.$store.getters.groupById(s.group_id)
+              if (group) {
+                  return group.name
+              }
+              return ""
+          },
+          async deleteGroup(g) {
+              let c = confirm(`Are you sure you want to delete '${g.name}'?`)
+              if (c) {
+                  await Api.group_delete(g.id)
+                  const groups = await Api.groups()
+                  this.$store.commit('setGroups', groups)
+              }
+          },
+          async deleteService(s) {
+              let c = confirm(`Are you sure you want to delete '${s.name}'?`)
+              if (c) {
+                  await Api.service_delete(s.id)
+                  const services = await Api.services()
+                  this.$store.commit('setServices', services)
+              }
+          }
       }
-      return ""
-    },
-    async deleteGroup(g) {
-      let c = confirm(`Are you sure you want to delete '${g.name}'?`)
-      if (c) {
-        await Api.group_delete(g.id)
-        const groups = await Api.groups()
-        this.$store.commit('setGroups', groups)
-      }
-    },
-    async deleteService(s) {
-      let c = confirm(`Are you sure you want to delete '${s.name}'?`)
-      if (c) {
-        await Api.service_delete(s.id)
-        const services = await Api.services()
-        this.$store.commit('setServices', services)
-      }
-    }
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

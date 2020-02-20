@@ -26,43 +26,43 @@
 </template>
 
 <script>
-  import Api from "../components/API";
+  import Api from "../API";
 
   export default {
-  name: 'FormLogin',
-  data () {
-    return {
-        username: "",
-        password: "",
-        auth: {},
-        loading: false,
-        error: false,
-        disabled: true
-    }
-  },
-  methods: {
-      checkForm() {
-          if (!this.username || !this.password) {
-              this.disabled = true
-          } else {
-              this.disabled = false
+      name: 'FormLogin',
+      data() {
+          return {
+              username: "",
+              password: "",
+              auth: {},
+              loading: false,
+              error: false,
+              disabled: true
           }
       },
-      async login () {
-          this.loading = true
-          this.error = false
-          const auth = await Api.login(this.username, this.password)
-          if (auth.error) {
-              this.error = true
-          } else if (auth.token) {
-              this.auth = Api.saveToken(this.username, auth.token)
-              await this.$store.dispatch('loadAdmin')
-              this.$router.push('/dashboard')
+      methods: {
+          checkForm() {
+              if (!this.username || !this.password) {
+                  this.disabled = true
+              } else {
+                  this.disabled = false
+              }
+          },
+          async login() {
+              this.loading = true
+              this.error = false
+              const auth = await Api.login(this.username, this.password)
+              if (auth.error) {
+                  this.error = true
+              } else if (auth.token) {
+                  this.auth = Api.saveToken(this.username, auth.token)
+                  await this.$store.dispatch('loadAdmin')
+                  this.$router.push('/dashboard')
+              }
+              this.loading = false
           }
-          this.loading = false
       }
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

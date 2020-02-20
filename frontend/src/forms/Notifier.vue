@@ -1,5 +1,5 @@
 <template>
-    <form @submit="saveNotifier">
+    <form @submit.prevent="saveNotifier">
 
         <div v-if="error" class="alert alert-danger col-12" role="alert">{{error}}</div>
 
@@ -38,13 +38,13 @@
             </div>
 
             <div class="col-12 col-sm-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
-                <button @click="saveNotifier" type="submit" class="btn btn-block text-capitalize" :class="{'btn-primary': !saved, 'btn-success': saved}">
+                <button @click.prevent="saveNotifier" type="submit" class="btn btn-block text-capitalize" :class="{'btn-primary': !saved, 'btn-success': saved}">
                     <i class="fa fa-check-circle"></i> {{loading ? "Loading..." : saved ? "Saved" : "Save"}}
                 </button>
             </div>
 
             <div class="col-12 col-sm-12 mt-3">
-                <button @click="testNotifier" class="btn btn-secondary btn-block text-capitalize col-12 float-right"><i class="fa fa-vial"></i>
+                <button @click.prevent="testNotifier" class="btn btn-secondary btn-block text-capitalize col-12 float-right"><i class="fa fa-vial"></i>
                     {{loading ? "Loading..." : "Test Notifier"}}</button>
             </div>
 
@@ -57,67 +57,65 @@
 </template>
 
 <script>
-import Api from "../components/API";
+import Api from "../API";
 
 export default {
-  name: 'Notifier',
-  props: {
-    notifier: {
-      type: Object,
-      required: true
-    }
-  },
-  data () {
-    return {
-        loading: false,
-        error: null,
-      saved: false,
-        ok: false,
-    }
-  },
-  mounted() {
+    name: 'Notifier',
+    props: {
+        notifier: {
+            type: Object,
+            required: true
+        }
+    },
+    data() {
+        return {
+            loading: false,
+            error: null,
+            saved: false,
+            ok: false,
+        }
+    },
+    mounted() {
 
-  },
-  methods: {
-    async saveNotifier(e) {
-      e.preventDefault();
-      this.loading = true
-      let form = {}
-      this.notifier.form.forEach((f) => {
-        form[f.field] = this.notifier[f.field]
-      });
-      form.enabled = this.notifier.enabled
-      form.limits = parseInt(this.notifier.limits)
-      form.method = this.notifier.method
-      await Api.notifier_save(form)
-      const notifiers = await Api.notifiers()
-      this.$store.commit('setNotifiers', notifiers)
-      this.saved = true
-        this.loading = false
-      setTimeout(() => {
-        this.saved = false
-      }, 2000)
     },
-    async testNotifier(e) {
-      e.preventDefault();
-        this.ok = false
-        this.loading = true
-      let form = {}
-      this.notifier.form.forEach((f) => {
-        form[f.field] = this.notifier[f.field]
-      });
-      form.enabled = this.notifier.enabled
-      form.limits = parseInt(this.notifier.limits)
-      form.method = this.notifier.method
-      const tested = await Api.notifier_test(form)
-      if (tested === 'ok') {
-        this.ok = true
-      } else {
-        this.error = tested
-      }
-        this.loading = false
-    },
-  }
+    methods: {
+        async saveNotifier() {
+            this.loading = true
+            let form = {}
+            this.notifier.form.forEach((f) => {
+                form[f.field] = this.notifier[f.field]
+            });
+            form.enabled = this.notifier.enabled
+            form.limits = parseInt(this.notifier.limits)
+            form.method = this.notifier.method
+            await Api.notifier_save(form)
+            const notifiers = await Api.notifiers()
+            await this.$store.commit('setNotifiers', notifiers)
+            this.saved = true
+            this.loading = false
+            setTimeout(() => {
+                this.saved = false
+            }, 2000)
+        },
+        async testNotifier() {
+            this.ok = false
+            this.loading = true
+            let form = {}
+            this.notifier.form.forEach((f) => {
+                form[f.field] = this.notifier[f.field]
+            });
+            form.enabled = this.notifier.enabled
+            form.limits = parseInt(this.notifier.limits)
+            form.method = this.notifier.method
+            const tested = await Api.notifier_test(form)
+            if (tested === 'ok') {
+                this.ok = true
+            } else {
+                this.error = tested
+            }
+            this.loading = false
+        },
+    }
 }
 </script>
 

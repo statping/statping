@@ -59,45 +59,50 @@
 </template>
 
 <script>
-  import Api from "../components/API";
+  import Api from "../API";
 
   export default {
-  name: 'FormIntegration',
-  props: {
-    integration: {
-      type: Object
-    }
-  },
-  data () {
-    return {
-        out: {},
-        services: []
-    }
-  },
-  watch: {
-
-  },
-  methods: {
-      async addService(s) {
-        const data = {name: s.name, type: s.type, domain: s.domain, port: s.port, check_interval: s.check_interval, timeout: s.timeout}
-          const out = await Api.service_create(data)
-          const services = await Api.services()
-          this.$store.commit('setServices', services)
-          s.added = true
+      name: 'FormIntegration',
+      props: {
+          integration: {
+              type: Object
+          }
       },
-    async updateIntegration() {
-        const i = this.integration
-        const data = {name: i.name, enabled: i.enabled, fields: i.fields}
-        this.out = data
-        const out = await Api.integration_save(data)
-        if (out != null) {
-            this.services = out
-        }
-      const integrations = await Api.integrations()
-      this.$store.commit('setIntegrations', integrations)
-    }
+      data() {
+          return {
+              out: {},
+              services: []
+          }
+      },
+      watch: {},
+      methods: {
+          async addService(s) {
+              const data = {
+                  name: s.name,
+                  type: s.type,
+                  domain: s.domain,
+                  port: s.port,
+                  check_interval: s.check_interval,
+                  timeout: s.timeout
+              }
+              const out = await Api.service_create(data)
+              const services = await Api.services()
+              this.$store.commit('setServices', services)
+              s.added = true
+          },
+          async updateIntegration() {
+              const i = this.integration
+              const data = {name: i.name, enabled: i.enabled, fields: i.fields}
+              this.out = data
+              const out = await Api.integration_save(data)
+              if (out != null) {
+                  this.services = out
+              }
+              const integrations = await Api.integrations()
+              this.$store.commit('setIntegrations', integrations)
+          }
+      }
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

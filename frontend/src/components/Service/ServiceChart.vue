@@ -3,7 +3,7 @@
 </template>
 
 <script>
-  import Api from "../../components/API"
+  import Api from "../../API"
 
   const axisOptions = {
     labels: {
@@ -30,108 +30,108 @@
   };
 
   export default {
-  name: 'ServiceChart',
-  props: {
-    service: {
-      type: Object,
-      required: true
-    }
-  },
-  async created() {
-    await this.chartHits()
-  },
-  data () {
-    return {
-      ready: false,
-      data: [],
-      chartOptions: {
-        chart: {
-          height: 210,
-          width: "100%",
-          type: "area",
-          animations: {
-            enabled: true,
-            initialAnimation: {
-              enabled: true
-            }
-          },
-          selection: {
-            enabled: false
-          },
-          zoom: {
-            enabled: false
-          },
-          toolbar: {
-            show: false
-          },
-        },
-        grid: {
-          show: false,
-          padding: {
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: -10,
+      name: 'ServiceChart',
+      props: {
+          service: {
+              type: Object,
+              required: true
           }
-        },
-        xaxis: {
-          type: "datetime",
-          ...axisOptions
-        },
-        yaxis: {
-          ...axisOptions
-        },
-          tooltip: {
-            enabled: false,
-            marker: {
-              show: false,
-            },
-            x: {
-              show: false,
-            }
-          },
-          legend: {
-            show: false,
-          },
-          dataLabels: {
-            enabled: false
-          },
-          floating: true,
-          axisTicks: {
-            show: false
-          },
-          axisBorder: {
-            show: false
-          },
-          fill: {
-            colors: [this.service.online ? "#48d338" : "#dd3545"],
-            opacity: 1,
-            type: 'solid'
-          },
-          stroke: {
-            show: false,
-            curve: 'smooth',
-            lineCap: 'butt',
-            colors: [this.service.online ? "#3aa82d" : "#dd3545"],
+      },
+      async created() {
+          await this.chartHits()
+      },
+      data() {
+          return {
+              ready: false,
+              data: [],
+              chartOptions: {
+                  chart: {
+                      height: 210,
+                      width: "100%",
+                      type: "area",
+                      animations: {
+                          enabled: true,
+                          initialAnimation: {
+                              enabled: true
+                          }
+                      },
+                      selection: {
+                          enabled: false
+                      },
+                      zoom: {
+                          enabled: false
+                      },
+                      toolbar: {
+                          show: false
+                      },
+                  },
+                  grid: {
+                      show: false,
+                      padding: {
+                          top: 0,
+                          right: 0,
+                          bottom: 0,
+                          left: -10,
+                      }
+                  },
+                  xaxis: {
+                      type: "datetime",
+                      ...axisOptions
+                  },
+                  yaxis: {
+                      ...axisOptions
+                  },
+                  tooltip: {
+                      enabled: false,
+                      marker: {
+                          show: false,
+                      },
+                      x: {
+                          show: false,
+                      }
+                  },
+                  legend: {
+                      show: false,
+                  },
+                  dataLabels: {
+                      enabled: false
+                  },
+                  floating: true,
+                  axisTicks: {
+                      show: false
+                  },
+                  axisBorder: {
+                      show: false
+                  },
+                  fill: {
+                      colors: [this.service.online ? "#48d338" : "#dd3545"],
+                      opacity: 1,
+                      type: 'solid'
+                  },
+                  stroke: {
+                      show: false,
+                      curve: 'smooth',
+                      lineCap: 'butt',
+                      colors: [this.service.online ? "#3aa82d" : "#dd3545"],
+                  }
+              },
+              series: [{
+                  data: []
+              }]
           }
-        },
-      series: [{
-        data: []
-      }]
-    }
-  },
+      },
       methods: {
           async chartHits() {
-              const start = this.ago((3600 * 24) * 7)
-              this.data = await Api.service_hits(this.service.id, start, this.now(), "hour")
+              const start = this.nowSubtract((3600 * 24) * 7)
+              this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), "hour")
               this.series = [{
                   name: this.service.name,
                   ...this.data
               }]
               this.ready = true
           }
-      },
-}
+      }
+  }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

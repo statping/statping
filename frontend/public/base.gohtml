@@ -10,10 +10,19 @@
     <base href="{{BasePath}}">
     {{if USE_CDN}}
     <link rel="shortcut icon" type="image/x-icon" href="https://assets.statping.com/favicon.ico">
+    <link rel="stylesheet" href="https://assets.statping.com/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://assets.statping.com/css/base.css">
+    <link rel="stylesheet" href="https://assets.statping.com/font/all.css">
     {{else}}
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    {{if USING_ASSETS}}
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="font/all.css">
+    {{else}}
     <% _.each(htmlWebpackPlugin.tags.headTags, function(headTag) { %>
     <%= headTag %> <% }) %>
+    {{end}}
     {{end}}
 </head>
 <body>

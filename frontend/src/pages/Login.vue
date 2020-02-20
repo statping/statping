@@ -12,7 +12,7 @@
 </template>
 
 <script>
-  import Api from "../components/API";
+  import Api from "../API";
   import FormLogin from '../forms/Login';
 
   export default {

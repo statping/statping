@@ -1,5 +1,5 @@
 <template>
-    <form @submit="saveCheckin">
+    <form @submit.prevent="saveCheckin">
         <div class="form-group row">
             <div class="col-md-3">
                 <label for="checkin_interval" class="col-form-label">Checkin Name</label>
@@ -14,46 +14,45 @@
                 <input v-model="checkin.grace" type="number" name="grace" class="form-control" id="grace_period" placeholder="10">
             </div>
             <div class="col-3">
-                <button @click="saveCheckin" type="submit" id="submit" class="btn btn-success d-block" style="margin-top: 14px;">Save Checkin</button>
+                <button @click.prevent="saveCheckin" type="submit" id="submit" class="btn btn-success d-block" style="margin-top: 14px;">Save Checkin</button>
             </div>
         </div>
     </form>
 </template>
 
 <script>
-  import Api from "../components/API";
+  import Api from "../API";
 
   export default {
-  name: 'Checkin',
-  props: {
-    service: {
-      type: Object,
-      required: true
-    }
-  },
-  data () {
-    return {
-      checkin: {
-        name: "",
-        interval: 60,
-        grace: 60,
-        service: this.service.id
-      }
-    }
-  },
-  mounted() {
+      name: 'Checkin',
+      props: {
+          service: {
+              type: Object,
+              required: true
+          }
+      },
+      data() {
+          return {
+              checkin: {
+                  name: "",
+                  interval: 60,
+                  grace: 60,
+                  service: this.service.id
+              }
+          }
+      },
+      mounted() {
 
-  },
-  methods: {
-    async saveCheckin(e) {
-      e.preventDefault();
-      const data = {name: this.group.name, public: this.group.public}
-      await Api.group_create(data)
-      const groups = await Api.groups()
-      this.$store.commit('setGroups', groups)
-    },
+      },
+      methods: {
+          async saveCheckin() {
+              const data = {name: this.group.name, public: this.group.public}
+              await Api.group_create(data)
+              const groups = await Api.groups()
+              this.$store.commit('setGroups', groups)
+          },
+      }
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

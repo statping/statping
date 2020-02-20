@@ -193,9 +193,6 @@ func (u *email) OnFailure(s *types.Service, f *types.Failure) {
 func (u *email) OnSuccess(s *types.Service) {
 	if !s.Online || !s.SuccessNotified {
 		var msg string
-		if s.UpdateNotify {
-			s.UpdateNotify = false
-		}
 		msg = s.DownText
 
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))

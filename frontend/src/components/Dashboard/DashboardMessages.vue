@@ -37,7 +37,7 @@
 </template>
 
 <script>
-  import Api from "../API"
+  import Api from "../../API"
   import FormMessage from "../../forms/Message";
 
   export default {

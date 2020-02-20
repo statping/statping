@@ -13,7 +13,7 @@ import Service from "./pages/Service";
 import VueRouter from "vue-router";
 import Setup from "./forms/Setup";
 
-import Api from "./components/API";
+import Api from "./API";
 
 const routes = [
   {

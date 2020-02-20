@@ -16,15 +16,16 @@
             </div>
         </div>
         <span v-for="(failure, index) in failures" v-bind:key="index" class="alert alert-light">
-            Failed {{duration(current(), failure.created_at)}}<br>
+            Failed {{ago(parseTime(failure.created_at))}}<br>
             {{failure.issue}}
         </span>
+
     </div>
 </template>
 
 <script>
   import ServiceSparkLine from "./ServiceSparkLine";
-  import Api from "../API";
+  import Api from "../../API";
 
   export default {
       name: 'ServiceInfo',
@@ -37,7 +38,7 @@
               required: true
           }
       },
-      data () {
+      data() {
           return {
               set1: [],
               set2: [],
@@ -47,7 +48,7 @@
               failures: null
           }
       },
-      async mounted () {
+      async mounted() {
           this.set1 = await this.getHits(24 * 2, "hour")
           this.set1_name = this.calc(this.set1)
           this.set2 = await this.getHits(24 * 7, "hour")
@@ -55,19 +56,19 @@
           this.loaded = true
       },
       methods: {
-          async getHits (hours, group) {
-              const start = this.ago(3600 * hours)
+          async getHits(hours, group) {
+              const start = this.nowSubtract(3600 * hours)
               if (!this.service.online) {
-                  this.failures = await Api.service_failures(this.service.id, this.now()-360, this.now(), 5)
-                  return [ { name: "None", data: [] } ]
+                  this.failures = await Api.service_failures(this.service.id, this.toUnix(start), this.toUnix(this.now()), 5)
+                  return [{name: "None", data: []}]
               }
-              const data = await Api.service_hits(this.service.id, start, this.now(), group)
+              const data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(this.now()), group)
               if (!data) {
-                  return [ { name: "None", data: [] } ]
+                  return [{name: "None", data: []}]
               }
-              return [ { name: "Latency", data: data.data } ]
+              return [{name: "Latency", data: data.data}]
           },
-          calc (s) {
+          calc(s) {
               let data = s[0].data
               if (data.length > 1) {
                   let total = 0
@@ -75,7 +76,7 @@
                       total += f.y
                   });
                   total = total / data.length
-                  return total.toFixed(0) + "ms Average"
+                  return total.toFixed(0) + "ms"
               } else {
                   return "Offline"
               }

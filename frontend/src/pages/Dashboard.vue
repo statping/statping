@@ -6,7 +6,7 @@
 </template>
 
 <script>
-    import Api from "../components/API"
+    import Api from "../API"
   import TopNav from "../components/Dashboard/TopNav";
 
   export default {

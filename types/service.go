@@ -33,7 +33,6 @@ type Service struct {
 	Port                int                `gorm:"not null;column:port" json:"port" scope:"user,admin"`
 	Timeout             int                `gorm:"default:30;column:timeout" json:"timeout" scope:"user,admin"`
 	Order               int                `gorm:"default:0;column:order_id" json:"order_id"`
-	AllowNotifications  NullBool           `gorm:"default:true;column:allow_notifications" json:"allow_notifications" scope:"user,admin"`
 	VerifySSL           NullBool           `gorm:"default:false;column:verify_ssl" json:"verify_ssl" scope:"user,admin"`
 	Public              NullBool           `gorm:"default:true;column:public" json:"public"`
 	GroupId             int                `gorm:"default:0;column:group_id" json:"group_id"`
@@ -53,10 +52,11 @@ type Service struct {
 	Checkpoint          time.Time          `gorm:"-" json:"-"`
 	SleepDuration       time.Duration      `gorm:"-" json:"-"`
 	LastResponse        string             `gorm:"-" json:"-"`
-	UserNotified        bool               `gorm:"-" json:"-"` // True if the User was already notified about a Downtime
-	UpdateNotify        bool               `gorm:"-" json:"-"` // This Variable is a simple copy of `core.CoreApp.UpdateNotify.Bool`
-	DownText            string             `gorm:"-" json:"-"` // Contains the current generated Downtime Text
-	SuccessNotified     bool               `gorm:"-" json:"-"` // Is 'true' if the user has already be informed that the Services now again available
+	AllowNotifications  NullBool           `gorm:"default:true;column:allow_notifications" json:"allow_notifications" scope:"user,admin"`
+	UserNotified        bool               `gorm:"-" json:"-"`                                                                          // True if the User was already notified about a Downtime
+	UpdateNotify        NullBool           `gorm:"default:true;column:notify_all_changes" json:"notify_all_changes" scope:"user,admin"` // This Variable is a simple copy of `core.CoreApp.UpdateNotify.Bool`
+	DownText            string             `gorm:"-" json:"-"`                                                                          // Contains the current generated Downtime Text
+	SuccessNotified     bool               `gorm:"-" json:"-"`                                                                          // Is 'true' if the user has already be informed that the Services now again available
 	LastStatusCode      int                `gorm:"-" json:"status_code"`
 	LastOnline          time.Time          `gorm:"-" json:"last_success"`
 	Failures            []FailureInterface `gorm:"-" json:"failures,omitempty" scope:"user,admin"`

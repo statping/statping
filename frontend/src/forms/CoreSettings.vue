@@ -1,5 +1,5 @@
 <template>
-    <form @submit="saveSettings">
+    <form @submit.prevent="saveSettings">
         <div class="form-group">
             <label>Project Name</label>
             <input v-model="core.name" type="text" class="form-control" placeholder="Great Uptime">
@@ -68,20 +68,9 @@
             </select>
         </div>
 
-        <div class="form-group">
-            <div class="col-12">
-                <label class="d-none d-sm-block">Send Updates only</label>
-                <span class="switch">
-                    <input v-model="core.update_notify" @change="core.update_notify = !!core.update_notify" type="checkbox" class="switch" id="switch-update_notify" v-bind:checked="core.update_notify">
-                    <label for="switch-update_notify" class="mt-2 mt-sm-0"></label>
-                    <small class="form-text text-muted">Enabling this will send only notifications when the status of a services changes.</small>
-                </span>
-            </div>
-        </div>
+        <button @click.prevent="saveSettings" type="submit" class="btn btn-primary btn-block">Save Settings</button>
 
-        <button @click="saveSettings" type="submit" class="btn btn-primary btn-block">Save Settings</button>
-
-        <div class="form-group row mt-3">
+        <div class="form-group row mt-5">
             <label class="col-sm-3 col-form-label">API Key</label>
             <div class="col-sm-9">
                 <input v-model="core.api_key" @focus="$event.target.select()" type="text" class="form-control select-input" readonly>
@@ -102,43 +91,44 @@
 </template>
 
 <script>
-  import Api from '../components/API'
+  import Api from '../API'
 
   export default {
-  name: 'CoreSettings',
-    data () {
-        return {
-            core: this.$store.getters.core,
-        }
-    },
-    async mounted () {
+      name: 'CoreSettings',
+      data() {
+          return {
+              core: this.$store.getters.core,
+          }
+      },
+      async mounted() {
 
-    },
-    methods: {
-        async saveSettings (e) {
-          e.preventDefault()
-          const c = this.core
-          const coreForm = {name: c.name, description: c.description, domain: c.domain,
-            timezone: c.timezone, using_cdn: c.using_cdn, footer: c.footer, update_notify: c.update_notify}
-          await Api.core_save(coreForm)
-          const core = await Api.core()
-          this.$store.commit('setCore', core)
-          this.core = core
-        },
-        async renewApiKeys () {
-            let r = confirm("Are you sure you want to reset the API keys?");
-            if (r === true) {
-                await Api.renewApiKeys()
-                const core = await Api.core()
-                this.$store.commit('setCore', core)
-                this.core = core
-            }
-        },
-      selectAll() {
-        this.$refs.input.select();
+      },
+      methods: {
+          async saveSettings() {
+              const c = this.core
+              const coreForm = {
+                  name: c.name, description: c.description, domain: c.domain,
+                  timezone: c.timezone, using_cdn: c.using_cdn, footer: c.footer, update_notify: c.update_notify
+              }
+              await Api.core_save(coreForm)
+              const core = await Api.core()
+              this.$store.commit('setCore', core)
+              this.core = core
+          },
+          async renewApiKeys() {
+              let r = confirm("Are you sure you want to reset the API keys?");
+              if (r === true) {
+                  await Api.renewApiKeys()
+                  const core = await Api.core()
+                  this.$store.commit('setCore', core)
+                  this.core = core
+              }
+          },
+          selectAll() {
+              this.$refs.input.select();
+          }
       }
-    }
-}
+  }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

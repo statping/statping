@@ -7,50 +7,37 @@
                 {{service.online ? "ONLINE" : "OFFLINE"}}
             </span>
 
-            <h4 class="mt-2"><router-link to="/">{{$store.getters.core.name}}</router-link> - {{service.name}}
+            <h4 class="mt-2">
+                <router-link to="/">{{$store.getters.core.name}}</router-link> - {{service.name}}
                 <span class="badge float-right d-none d-md-block" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
                     {{service.online ? "ONLINE" : "OFFLINE"}}
                 </span>
             </h4>
 
-            <div class="row stats_area mt-5 mb-5">
-                <div class="col-4">
-                    <span class="lg_number">{{service.online_24_hours}}%</span>
-                    Online last 24 Hours
-                </div>
-                <div class="col-4">
-                    <span class="lg_number">31ms</span>
-                    Average Response
-                </div>
-                <div class="col-4">
-                    <span class="lg_number">85.70%</span>
-                    Total Uptime
-                </div>
-            </div>
+            <ServiceTopStats :service="service"/>
 
             <div v-for="(message, index) in messages" v-if="messageInRange(message)">
                 <MessageBlock :message="message"/>
+            </div>
+
+            <div class="row mt-5 mb-4">
+                <span class="col-6 font-2">
+                    <flatPickr v-model="start_time" type="text" name="start_time" class="form-control form-control-plaintext" id="start_time" value="0001-01-01T00:00:00Z" required />
+                </span>
+                <span class="col-6 font-2">
+                    <flatPickr v-model="end_time" type="text" name="end_time" class="form-control form-control-plaintext" id="end_time" value="0001-01-01T00:00:00Z" required />
+                </span>
             </div>
 
             <div v-if="series" class="service-chart-container">
                 <apexchart width="100%" height="420" type="area" :options="chartOptions" :series="series"></apexchart>
             </div>
 
-            <div v-if="series" class="service-chart-heatmap">
-                <apexchart width="100%" height="215" type="heatmap" :options="chartOptions" :series="series"></apexchart>
+            <div class="service-chart-heatmap mt-3 mb-4">
+                <ServiceHeatmap :service="service"/>
             </div>
 
-            <form id="service_date_form" class="col-12 mt-2 mb-3">
-                <input type="text" class="d-none" name="start" id="service_start" data-input>
-                <span data-toggle title="toggle" id="start_date" class="text-muted small float-left pointer mt-2">Thu, 09 Jan 2020 to Thu, 16 Jan 2020</span>
-                <button type="submit" class="btn btn-light btn-sm mt-2">Set Timeframe</button>
-                <input type="text" class="d-none" name="end" id="service_end" data-input>
-
-                <div id="start_container"></div>
-                <div id="end_container"></div>
-            </form>
-
-            <nav class="nav nav-pills flex-column flex-sm-row mt-3" id="service_tabs">
+            <nav v-if="service.failures" class="nav nav-pills flex-column flex-sm-row mt-3" id="service_tabs">
                 <a @click="tab='failures'" class="flex-sm-fill text-sm-center nav-link active">Failures</a>
                 <a @click="tab='incidents'" class="flex-sm-fill text-sm-center nav-link">Incidents</a>
                 <a @click="tab='checkins'" v-if="$store.getters.token" class="flex-sm-fill text-sm-center nav-link">Checkins</a>
@@ -58,7 +45,7 @@
             </nav>
 
 
-            <div class="tab-content">
+            <div v-if="service.failures" class="tab-content">
                 <div class="tab-pane fade active show">
                     <ServiceFailures :service="service"/>
                 </div>
@@ -98,10 +85,14 @@
 </template>
 
 <script>
-  import Api from "../components/API"
+  import Api from "../API"
   import MessageBlock from '../components/Index/MessageBlock';
   import ServiceFailures from '../components/Service/ServiceFailures';
   import Checkin from "../forms/Checkin";
+  import ServiceHeatmap from "@/components/Service/ServiceHeatmap";
+  import ServiceTopStats from "@/components/Service/ServiceTopStats";
+  import flatPickr from 'vue-flatpickr-component';
+  import 'flatpickr/dist/flatpickr.css';
 
   const axisOptions = {
     labels: {
@@ -128,143 +119,145 @@
   };
 
 export default {
-  name: 'Service',
-  components: {
-      ServiceFailures,
-      MessageBlock,
-    Checkin
-  },
-  data () {
-    return {
-      id: null,
-      tab: "failures",
-      service: {},
-      authenticated: false,
-      ready: false,
-      data: null,
-        messages: [],
-      failures: [],
-      chartOptions: {
-        chart: {
-          height: 500,
-          width: "100%",
-          type: "area",
-          animations: {
-            enabled: true,
-            initialAnimation: {
-              enabled: true
-            }
-          },
-          selection: {
-            enabled: false
-          },
-          zoom: {
-            enabled: false
-          },
-          toolbar: {
-            show: false
-          },
-        },
-        grid: {
-          show: true,
-          padding: {
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0,
-          }
-        },
-        xaxis: {
-          type: "datetime",
-          ...axisOptions
-        },
-        yaxis: {
-          ...axisOptions
-        },
-        tooltip: {
-          enabled: false,
-          marker: {
-            show: false,
-          },
-          x: {
-            show: false,
-          }
-        },
-        legend: {
-          show: false,
-        },
-        dataLabels: {
-          enabled: false
-        },
-        floating: true,
-        axisTicks: {
-          show: false
-        },
-        axisBorder: {
-          show: false
-        },
-        fill: {
-          colors: ["#48d338"],
-          opacity: 1,
-          type: 'solid'
-        },
-        stroke: {
-          show: true,
-          curve: 'smooth',
-          lineCap: 'butt',
-          colors: ["#3aa82d"],
+    name: 'Service',
+    components: {
+        ServiceTopStats,
+        ServiceHeatmap,
+        ServiceFailures,
+        MessageBlock,
+        Checkin,
+        flatPickr
+    },
+    data() {
+        return {
+            id: null,
+            tab: "failures",
+            service: {},
+            authenticated: false,
+            ready: false,
+            data: null,
+            messages: [],
+            failures: [],
+            start_time: "",
+            end_time: "",
+            chartOptions: {
+                chart: {
+                    height: 500,
+                    width: "100%",
+                    type: "area",
+                    animations: {
+                        enabled: true,
+                        initialAnimation: {
+                            enabled: true
+                        }
+                    },
+                    selection: {
+                        enabled: false
+                    },
+                    zoom: {
+                        enabled: false
+                    },
+                    toolbar: {
+                        show: false
+                    },
+                },
+                grid: {
+                    show: true,
+                    padding: {
+                        top: 0,
+                        right: 0,
+                        bottom: 0,
+                        left: 0,
+                    }
+                },
+                xaxis: {
+                    type: "datetime",
+                    ...axisOptions
+                },
+                yaxis: {
+                    ...axisOptions
+                },
+                tooltip: {
+                    enabled: false,
+                    marker: {
+                        show: false,
+                    },
+                    x: {
+                        show: false,
+                    }
+                },
+                legend: {
+                    show: false,
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                floating: true,
+                axisTicks: {
+                    show: false
+                },
+                axisBorder: {
+                    show: false
+                },
+                fill: {
+                    colors: ["#48d338"],
+                    opacity: 1,
+                    type: 'solid'
+                },
+                stroke: {
+                    show: true,
+                    curve: 'smooth',
+                    lineCap: 'butt',
+                    colors: ["#3aa82d"],
+                }
+            },
+            series: [{
+                data: []
+            }],
+            heatmap_data: [],
+            config: {
+                enableTime: true
+            },
         }
-      },
-      series: [{
-        data: []
-      }],
-        heatmap_data: []
-    }
-  },
+    },
     async mounted() {
-      const id = this.$attrs.id
+        const id = this.$attrs.id
         this.id = id
-      let service;
-      if (this.isInt(id)) {
-        service = this.$store.getters.serviceById(id)
-      } else {
-        service = this.$store.getters.serviceByPermalink(id)
-      }
+        let service;
+        if (this.isInt(id)) {
+            service = this.$store.getters.serviceById(id)
+        } else {
+            service = this.$store.getters.serviceByPermalink(id)
+        }
         this.service = service
         this.getService(service)
         this.messages = this.$store.getters.serviceMessages(service.id)
     },
-  methods: {
-      messageInRange(message) {
-          const start = this.isBetween(new Date(), message.start_on)
-          const end = this.isBetween(message.end_on, new Date())
-          return start && end
-      },
-    async getService(s) {
-        await this.chartHits()
-        await this.heatmapData()
-        await this.serviceFailures()
-    },
-    async serviceFailures() {
-      this.failures = await Api.service_failures(this.service.id, this.now() - 3600, this.now(), 15)
-    },
-    async chartHits() {
-      this.data = await Api.service_hits(this.service.id, 0, 99999999999, "hour")
-      this.series = [{
-        name: this.service.name,
-        ...this.data
-      }]
-      this.ready = true
-    },
-      async heatmapData() {
-          this.data = await Api.service_heatmap(this.service.id, 0, 99999999999, "hour")
-          this.series = [{
-              name: this.service.name,
-              ...this.data
-          }]
-          this.ready = true
-      }
-  }
+    methods: {
+        messageInRange(message) {
+            const start = this.isBetween(new Date(), message.start_on)
+            const end = this.isBetween(message.end_on, new Date())
+            return start && end
+        },
+        async getService(s) {
+            await this.chartHits()
+            await this.serviceFailures()
+        },
+        async serviceFailures() {
+            this.failures = await Api.service_failures(this.service.id, this.now() - 3600, this.now(), 15)
+        },
+        async chartHits() {
+            const start = this.nowSubtract((3600 * 24) * 7)
+            this.start_time = start
+            this.end_time = new Date()
+            this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), "hour")
+            this.series = [{
+                name: this.service.name,
+                ...this.data
+            }]
+            this.ready = true
+        }
+    }
 }
 </script>
 

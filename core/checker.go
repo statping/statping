@@ -280,7 +280,6 @@ func recordFailure(s *Service, issue string) {
 	s.CreateFailure(fail)
 	s.Online = false
 	s.SuccessNotified = false
-	s.UpdateNotify = CoreApp.UpdateNotify.Bool
 	s.DownText = s.DowntimeText()
 	notifier.OnFailure(s.Service, fail)
 }

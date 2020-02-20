@@ -8,20 +8,7 @@
                         <span class="badge float-right" :class="{'bg-success': service.online, 'bg-danger': !service.online}">{{service.online ? "ONLINE" : "OFFLINE"}}</span>
                     </h4>
 
-                    <div class="row stats_area mt-5">
-                        <div class="col-4">
-                            <span class="lg_number">{{service.avg_response}}ms</span>
-                            Average Response
-                        </div>
-                        <div class="col-4">
-                            <span class="lg_number">{{service.online_24_hours}}%</span>
-                            Uptime last 24 Hours
-                        </div>
-                        <div class="col-4">
-                            <span class="lg_number">{{service.online_7_days}}%</span>
-                            Uptime last 7 Days
-                        </div>
-                    </div>
+                    <ServiceTopStats :service="service"/>
 
                 </div>
             </div>
@@ -48,29 +35,26 @@
 
 <script>
 import ServiceChart from "./ServiceChart";
+import ServiceTopStats from "@/components/Service/ServiceTopStats";
 
 export default {
-  name: 'ServiceBlock',
-  components: {ServiceChart},
-  props: {
-    service: {
-      type: Object,
-      required: true
+    name: 'ServiceBlock',
+    components: {ServiceTopStats, ServiceChart},
+    props: {
+        service: {
+            type: Object,
+            required: true
+        },
     },
-  },
-      methods: {
+    methods: {
         smallText(s) {
             if (s.online) {
-                return `Online, last checked ${this.ago(s.last_success)}`
+                return `Online, last checked ${this.ago(this.parseTime(s.last_success))}`
             } else {
-                return `Offline, last error: ${s.last_failure.issue} ${this.ago(s.last_failure.created_at)}`
+                return `Offline, last error: ${s.last_failure.issue} ${this.ago(this.parseTime(s.last_failure.created_at))}`
             }
-          },
-          ago(t1) {
-            const tm = this.parseTime(t1)
-            return this.duration(this.$moment().utc(), tm)
-          }
-      }
+        }
+    }
 }
 </script>
 

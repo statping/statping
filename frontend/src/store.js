@@ -1,6 +1,6 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
-import Api from "./components/API"
+import Api from "./API"
 
 Vue.use(Vuex)
 
@@ -105,7 +105,7 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        async loadRequired (context) {
+        async loadRequired(context) {
             const core = await Api.core()
             context.commit("setCore", core);
             const groups = await Api.groups()
@@ -125,7 +125,7 @@ export default new Vuex.Store({
             // }
             window.console.log('finished loading required data')
         },
-        async loadAdmin (context) {
+        async loadAdmin(context) {
             const core = await Api.core()
             context.commit("setCore", core);
             const groups = await Api.groups()

@@ -32,7 +32,7 @@
 </template>
 
 <script>
-  import Api from "../API"
+  import Api from "../../API"
   import FormUser from "../../forms/User";
 
   export default {

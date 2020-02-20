@@ -23,33 +23,24 @@
 </template>
 
 <script>
-  import ServiceInfo from "./ServiceInfo";
+  import ServiceInfo from "../Service/ServiceInfo";
 
   export default {
-  name: 'DashboardIndex',
-  components: {
-    ServiceInfo
-  },
-    data () {
-      return {
+      name: 'DashboardIndex',
+      components: {
+          ServiceInfo
+      },
+      methods: {
+          failuresLast24Hours() {
+              let total = 0;
+              this.$store.getters.services.map((s) => {
+                  total += s.failures_24_hours
+              })
+              return total
+          },
 
       }
-    },
-      computed: {
-
-      },
-      async created() {
-
-      },
-    methods: {
-        failuresLast24Hours() {
-            let total = 0;
-            this.$store.getters.services.map((s) => { total += s.failures_24_hours })
-            return total
-        },
-
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

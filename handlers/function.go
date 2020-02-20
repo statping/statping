@@ -25,6 +25,9 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"USE_CDN": func() bool {
 			return core.CoreApp.UseCdn.Bool
 		},
+		"USING_ASSETS": func() bool {
+			return core.CoreApp.UsingAssets()
+		},
 		"BasePath": func() string {
 			return basePath
 		},

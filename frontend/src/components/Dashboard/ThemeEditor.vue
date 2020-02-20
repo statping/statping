@@ -44,7 +44,7 @@
 </template>
 
 <script>
-  import Api from "../API";
+  import Api from "../../API";
 
   // require component
   import { codemirror } from 'vue-codemirror'
@@ -136,7 +136,6 @@
                   this.error = null
               }
               this.pending = false
-              window.console.log(resp)
               await this.fetchTheme()
           },
           changeTab (v) {

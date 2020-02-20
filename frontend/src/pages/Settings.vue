@@ -42,7 +42,7 @@
                                 <div class="row align-content-center">
                                     <img class="rounded text-center" width="300" height="300" :src="qrcode">
                                 </div>
-                                <a class="btn btn-sm btn-primary" href=statping://setup?domain&#61;https://demo.statping.com&amp;api&#61;6b05b48f4b3a1460f3864c31b26cab6a27dbaff9>Open in Statping App</a>
+                                <a class="btn btn-sm btn-primary" :href="qrurl">Open in Statping App</a>
                                 <a href="settings/export" class="btn btn-sm btn-secondary">Export Settings</a>
                             </div>
                         </div>
@@ -53,32 +53,11 @@
                     </div>
 
                     <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-style-tab'), show: liClass('v-pills-style-tab')}" id="v-pills-style" role="tabpanel" aria-labelledby="v-pills-style-tab">
-
                         <ThemeEditor :core="core"/>
-
                     </div>
 
                     <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-cache-tab'), show: liClass('v-pills-cache-tab')}" id="v-pills-cache" role="tabpanel" aria-labelledby="v-pills-cache-tab">
-                        <h3>Cache</h3>
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th scope="col">URL</th>
-                                <th scope="col">Size</th>
-                                <th scope="col">Expiration</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-
-                            <tr v-for="(cache, index) in cache">
-                                <td>{{cache.url}}</td>
-                                <td>{{cache.size}}</td>
-                                <td>{{expireTime(cache.expiration)}}</td>
-                            </tr>
-
-                            </tbody>
-                        </table>
-                        <a @click.prevent="clearCache" href="#" class="btn btn-danger btn-block">Clear Cache</a>
+                        <Cache/>
                     </div>
 
                     <div v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="`${notifier.title}_${index}`" class="tab-pane fade" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), show: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" role="tabpanel" v-bind:aria-labelledby="`v-pills-${notifier.method.toLowerCase()}-tab`">
@@ -97,54 +76,50 @@
 </template>
 
 <script>
-  import Api from '../components/API';
+  import Api from '../API';
   import CoreSettings from '../forms/CoreSettings';
   import FormIntegration from '../forms/Integration';
   import Notifier from "../forms/Notifier";
   import ThemeEditor from "../components/Dashboard/ThemeEditor";
+  import Cache from "@/components/Dashboard/Cache";
 
   export default {
-  name: 'Settings',
-  components: {
-    ThemeEditor,
-      FormIntegration,
-    Notifier,
-    CoreSettings
-  },
-  data () {
-    return {
-      tab: "v-pills-home-tab",
-      qrcode: "",
-      core: this.$store.getters.core,
-    cache: [],
-    }
-  },
-      async mounted () {
+      name: 'Settings',
+      components: {
+          Cache,
+          ThemeEditor,
+          FormIntegration,
+          Notifier,
+          CoreSettings
+      },
+      data() {
+          return {
+              tab: "v-pills-home-tab",
+              qrcode: "",
+              qrurl: "",
+              core: this.$store.getters.core
+          }
+      },
+      async mounted() {
           this.cache = await Api.cache()
       },
       async created() {
-    const qrurl = `statping://setup?domain=${core.domain}&api=${core.api_secret}`
-    this.qrcode = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=" + encodeURI(qrurl)
-  },
-  beforeMount() {
+          const c = this.$store.getters.core
+          this.qrurl = `statping://setup?domain=${c.domain}&api=${c.api_secret}`
+          this.qrcode = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=" + encodeURI(this.qrurl)
+      },
+      beforeMount() {
 
-  },
-  methods: {
-    changeTab (e) {
-      this.tab = e.target.id
-    },
-    liClass (id) {
-      return this.tab === id
-    },
-    expireTime(ex) {
-      return this.toLocal(ex)
-    },
-      async clearCache () {
-          await Api.clearCache()
-          this.cache = await Api.cache()
-     }
+      },
+      methods: {
+          changeTab(e) {
+              this.tab = e.target.id
+          },
+          liClass(id) {
+              return this.tab === id
+          }
+      }
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

@@ -92,9 +92,6 @@ func (u *telegram) OnSuccess(s *types.Service) {
 	if !s.Online || !s.SuccessNotified {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		var msg interface{}
-		if s.UpdateNotify {
-			s.UpdateNotify = false
-		}
 		msg = s.DownText
 
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)

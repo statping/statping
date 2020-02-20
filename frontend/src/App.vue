@@ -6,7 +6,7 @@
 </template>
 
 <script>
-  import Api from './components/API';
+  import Api from './API';
   import Footer from "./components/Index/Footer";
 
   export default {

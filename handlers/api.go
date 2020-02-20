@@ -89,7 +89,6 @@ func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 	if c.Timezone != app.Timezone {
 		app.Timezone = c.Timezone
 	}
-	app.UpdateNotify = c.UpdateNotify
 	app.UseCdn = types.NewNullBool(c.UseCdn.Bool)
 	core.CoreApp, err = core.UpdateCore(app)
 	returnJson(core.CoreApp, w, r)

@@ -1,45 +1,51 @@
 import Vue from "vue";
+const { zonedTimeToUtc, utcToZonedTime, subSeconds, parse, parseISO, getUnixTime, fromUnixTime, format, differenceInSeconds, formatDistanceToNow, formatDistance } = require('date-fns')
 
 export default Vue.mixin({
   methods: {
     now() {
-      return Math.round(new Date().getTime() / 1000)
+      return new Date()
     },
-      current() {
-        return new Date()
-      },
-    ago(seconds) {
-      return this.now() - seconds
+    current() {
+      return parse(new Date())
+    },
+    utc(val) {
+      return fromUnixTime(this.toUnix(val) + val.getTimezoneOffset() * 60 * 1000)
+    },
+    ago(t1) {
+      return formatDistanceToNow(t1)
+    },
+    nowSubtract(seconds) {
+      return subSeconds(new Date(), seconds)
     },
     duration(t1, t2) {
-      const val = (this.toUnix(t1) - this.toUnix(t2))
-      if (val <= 59) {
-        return this.$moment.duration(val, 'seconds').get('seconds') + " seconds ago"
-      }
-      return this.$moment.duration(val, 'seconds').humanize();
+      return formatDistance(t1, t2)
     },
-      niceDate(val) {
-        return this.parseTime(val).format('LLLL')
-      },
-      parseTime(val) {
-          return this.$moment(val, this.$moment.ISO_8601, true)
-      },
-    toLocal(val, suf='at') {
-      return this.parseTime(val).local().format(`dddd, MMM Do \\${suf} h:mma`)
+    niceDate(val) {
+      return this.parseTime(val).format('LLLL')
     },
-      toUnix(val) {
-         return this.$moment(val).utc().unix().valueOf()
-      },
+    parseTime(val) {
+      return parseISO(val)
+    },
+    toLocal(val, suf = 'at') {
+      const t = this.parseTime(val)
+      return format(t, `EEEE, MMM do h:mma`)
+    },
+    toUnix(val) {
+      return getUnixTime(val)
+    },
     fromUnix(val) {
-      return this.$moment.unix(val).utc()
+      return fromUnixTime(val)
     },
-      isBetween(t1, t2) {
-          const now = this.$moment(t1).utc().valueOf()
-          const sub = this.$moment(t2).utc().valueOf()
-          return (now - sub) > 0
-      },
-    hour(){ return 3600 },
-    day() { return 3600 * 24 },
+    isBetween(t1, t2) {
+      return differenceInSeconds(parseISO(t1), parseISO(t2)) > 0
+    },
+    hour() {
+      return 3600
+    },
+    day() {
+      return 3600 * 24
+    },
     serviceLink(service) {
       if (!service) {
         return ""
@@ -53,10 +59,10 @@ export default Vue.mixin({
     isInt(n) {
       return n % 1 === 0;
     },
-      loggedIn() {
-          const core = this.$store.getters.core
-          return core.logged_in === true
-      },
+    loggedIn() {
+      const core = this.$store.getters.core
+      return core.logged_in === true
+    },
     iconName(name) {
       switch (name) {
         case "fas fa-terminal":

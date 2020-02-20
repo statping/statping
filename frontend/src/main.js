@@ -12,7 +12,6 @@ import "./icons"
 Vue.component('apexchart', VueApexCharts)
 
 Vue.use(VueRouter);
-Vue.use(require('vue-moment'));
 
 Vue.config.productionTip = false
 new Vue({

@@ -1,16 +1,16 @@
 <template>
     <div class="col-12">
-    <div class="card">
-    <div class="card-body">
-        <FormService :in_service="service"/>
-    </div>
-    </div>
+        <div class="card">
+            <div class="card-body">
+                <FormService :in_service="service"/>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
   import FormGroup from "../../forms/Group";
-  import Api from "../../components/API";
+  import Api from "../../API";
   import ToggleSwitch from "../../forms/ToggleSwitch";
   import draggable from 'vuedraggable'
   import FormService from "../../forms/Service";
