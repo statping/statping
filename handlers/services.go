@@ -235,8 +235,8 @@ func apiServiceFailureDataHandler(w http.ResponseWriter, r *http.Request) {
 	startField := utils.ToInt(fields.Get("start"))
 	endField := utils.ToInt(fields.Get("end"))
 
-	start := time.Unix(startField, 0)
-	end := time.Unix(endField, 0)
+	start := time.Unix(startField, 0).UTC()
+	end := time.Unix(endField, 0).UTC()
 
 	obj := core.GraphFailuresDataRaw(service, start, end, grouping)
 	returnJson(obj, w, r)

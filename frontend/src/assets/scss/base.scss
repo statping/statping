@@ -133,6 +133,24 @@ HTML,BODY {
     border-radius: $global-border-radius;
 }
 
+.mini_success {
+  background-color: #f3f3f3;
+}
+
+.no-decoration {
+  color: black;
+  text-decoration: none;
+}
+
+.no-decoration:HOVER {
+  color: #2b2b2b;
+  text-decoration: none;
+}
+
+.mini_error {
+  background-color: #ffbbbb;
+}
+
 .card {
     background-color: $service-background;
     border: $service-border;

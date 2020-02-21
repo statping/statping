@@ -111,7 +111,7 @@ type Database interface {
 	ToChart() ([]*DateScan, error)
 
 	GroupByTimeframe() Database
-	ToTimeValue() ([]TimeValue, error)
+	ToTimeValue(time.Time, time.Time) ([]*TimeValue, error)
 
 	MultipleSelects(args ...string) Database
 
@@ -509,12 +509,12 @@ type TimeValue struct {
 	Amount    int64     `json:"amount"`
 }
 
-func (it *Db) ToTimeValue() ([]TimeValue, error) {
+func (it *Db) ToTimeValue(start, end time.Time) ([]*TimeValue, error) {
 	rows, err := it.Database.Rows()
 	if err != nil {
 		return nil, err
 	}
-	var data []TimeValue
+	var data []*TimeValue
 	for rows.Next() {
 		var timeframe string
 		var amount int64
@@ -522,12 +522,53 @@ func (it *Db) ToTimeValue() ([]TimeValue, error) {
 			return nil, err
 		}
 		createdTime, _ := time.Parse(TIME, timeframe)
-		data = append(data, TimeValue{
-			Timeframe: createdTime,
+		fmt.Println("got: ", createdTime.UTC(), amount)
+		data = append(data, &TimeValue{
+			Timeframe: createdTime.UTC(),
 			Amount:    amount,
 		})
 	}
-	return data, nil
+	return fillMissing(data, start, end), nil
+}
+
+func parseTime(t time.Time) string {
+	return t.Format("2006-01-02T00:00:00Z")
+}
+
+func reparseTime(t string) time.Time {
+	re, _ := time.Parse("2006-01-02T00:00:00Z", t)
+	return re.UTC()
+}
+
+func fillMissing(vals []*TimeValue, start, end time.Time) []*TimeValue {
+	timeMap := make(map[string]*TimeValue)
+	var validSet []*TimeValue
+
+	for _, v := range vals {
+		timeMap[parseTime(v.Timeframe)] = v
+	}
+
+	current := start.UTC()
+	maxTime := end
+	for {
+		amount := int64(0)
+		currentStr := parseTime(current)
+		if timeMap[currentStr] != nil {
+			amount = timeMap[currentStr].Amount
+		}
+
+		validSet = append(validSet, &TimeValue{
+			Timeframe: reparseTime(currentStr),
+			Amount:    amount,
+		})
+
+		if current.After(maxTime) {
+			break
+		}
+		current = current.Add(24 * time.Hour)
+	}
+
+	return validSet
 }
 
 func (it *Db) ToChart() ([]*DateScan, error) {

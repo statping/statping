@@ -1,8 +1,12 @@
 <template>
-    <div class="row">
-
-        <span class="bg-danger">o</span>
-
+    <div>
+        <div class="d-flex mt-3 mb-2">
+            <div class="flex-fill service_day" v-for="(d, index) in failureData" :class="{'mini_error': d.amount > 0, 'mini_success': d.amount === 0}"></div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-6 text-left font-2 text-muted">30 Days Ago</div>
+            <div class="col-6 text-right font-2 text-muted">Today</div>
+        </div>
     </div>
 </template>
 
@@ -16,7 +20,7 @@ export default {
   },
     data() {
         return {
-            failureData: null
+            failureData: null,
         }
     },
   props: {
@@ -30,7 +34,7 @@ export default {
     },
     methods: {
       async lastDaysFailures() {
-          const start = this.nowSubtract((3600 * 24) * 30)
+          const start = this.nowSubtract(86400 * 30)
         this.failureData = await Api.service_failures_data(this.service.id, this.toUnix(start), this.toUnix(this.now()), "day")
       }
     }
@@ -39,6 +43,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+    .service_day {
+        height: 20px;
+        margin-right: 2px;
+        border-radius: 4px;
+    }
+
     @keyframes pulse_animation {
         0% { transform: scale(1); }
         30% { transform: scale(1); }

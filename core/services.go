@@ -283,7 +283,7 @@ func GraphHitsDataRaw(service types.ServiceInterface, start, end time.Time, grou
 }
 
 // GraphDataRaw will return all the hits between 2 times for a Service
-func GraphFailuresDataRaw(service types.ServiceInterface, start, end time.Time, group string) []types.TimeValue {
+func GraphFailuresDataRaw(service types.ServiceInterface, start, end time.Time, group string) []*types.TimeValue {
 	srv := service.(*Service)
 
 	query := Database(&types.Failure{}).
@@ -292,7 +292,7 @@ func GraphFailuresDataRaw(service types.ServiceInterface, start, end time.Time, 
 		MultipleSelects(types.SelectByTime(group), types.CountAmount()).
 		GroupByTimeframe().Debug()
 
-	outgoing, err := query.ToTimeValue()
+	outgoing, err := query.ToTimeValue(start, end)
 	if err != nil {
 		log.Error(err)
 	}
