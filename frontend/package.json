@@ -26,6 +26,7 @@
     "vue-codemirror": "^4.0.6",
     "vue-flatpickr-component": "^8.1.5",
     "vue-moment": "^4.1.0",
+    "vue-observe-visibility": "^0.4.6",
     "vue-router": "~3.0",
     "vuedraggable": "^2.23.2",
     "vuex": "^3.1.2"

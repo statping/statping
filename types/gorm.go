@@ -17,9 +17,11 @@ package types
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/jinzhu/gorm"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -108,12 +110,53 @@ type Database interface {
 	Hits() ([]*Hit, error)
 	ToChart() ([]*DateScan, error)
 
+	GroupByTimeframe() Database
+	ToTimeValue() ([]TimeValue, error)
+
+	MultipleSelects(args ...string) Database
+
 	Failurer
 }
 
 type Failurer interface {
 	Failures(id int64) Database
 	Fails() ([]*Failure, error)
+}
+
+func sqlTimeframes(increment string) string {
+	switch increment {
+	case "second":
+		return "%Y-%m-%d %H:%M:%S"
+	case "minute":
+		return "%Y-%m-%d %H:%M:00"
+	case "hour":
+		return "%Y-%m-%d %H:00:00"
+	case "day":
+		return "%Y-%m-%d 00:00:00"
+	case "month":
+		return "%Y-%m 00:00:00"
+	case "year":
+		return "%Y"
+	default:
+		return "%Y-%m-%d 00:00:00"
+	}
+}
+
+func (it *Db) MultipleSelects(args ...string) Database {
+	joined := strings.Join(args, ", ")
+	return it.Select(joined)
+}
+
+func CountAmount() string {
+	return fmt.Sprintf("COUNT(id) as amount")
+}
+
+func SelectByTime(increment string) string {
+	return fmt.Sprintf("strftime('%s', created_at, 'utc') as timeframe", sqlTimeframes(increment))
+}
+
+func (it *Db) GroupByTimeframe() Database {
+	return it.Group("timeframe")
 }
 
 func (it *Db) Failures(id int64) Database {
@@ -128,6 +171,7 @@ func (it *Db) Fails() ([]*Failure, error) {
 
 type Db struct {
 	Database *gorm.DB
+	Type     string
 }
 
 // Openw is a drop-in replacement for Open()
@@ -138,7 +182,10 @@ func Openw(dialect string, args ...interface{}) (db Database, err error) {
 
 // Wrap wraps gorm.DB in an interface
 func Wrap(db *gorm.DB) Database {
-	return &Db{db}
+	return &Db{
+		Database: db,
+		Type:     db.Dialect().GetName(),
+	}
 }
 
 func (it *Db) Close() error {
@@ -455,6 +502,32 @@ func (it *Db) Between(t1 time.Time, t2 time.Time) Database {
 type DateScan struct {
 	CreatedAt string `json:"x,omitempty"`
 	Value     int64  `json:"y"`
+}
+
+type TimeValue struct {
+	Timeframe time.Time `json:"timeframe"`
+	Amount    int64     `json:"amount"`
+}
+
+func (it *Db) ToTimeValue() ([]TimeValue, error) {
+	rows, err := it.Database.Rows()
+	if err != nil {
+		return nil, err
+	}
+	var data []TimeValue
+	for rows.Next() {
+		var timeframe string
+		var amount int64
+		if err := rows.Scan(&timeframe, &amount); err != nil {
+			return nil, err
+		}
+		createdTime, _ := time.Parse(TIME, timeframe)
+		data = append(data, TimeValue{
+			Timeframe: createdTime,
+			Amount:    amount,
+		})
+	}
+	return data, nil
 }
 
 func (it *Db) ToChart() ([]*DateScan, error) {

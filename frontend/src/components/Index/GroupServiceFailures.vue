@@ -1,32 +1,39 @@
 <template>
-    <div class="col-12 full-col-12">
-        <h4 v-if="group.name !== 'Empty Group'" class="group_header">{{group.name}}</h4>
-        <div class="list-group online_list mb-3">
+    <div class="row">
 
-            <a v-for="(service, index) in $store.getters.servicesInGroup(group.id)" v-bind:key="index" class="service_li list-group-item list-group-item-action">
-                {{service.name}}
-                <span class="badge bg-success float-right pulse-glow">{{service.online ? "ONLINE" : "OFFLINE"}}</span>
+        <span class="bg-danger">o</span>
 
-                <GroupServiceFailures :service="service"/>
-            </a>
-
-        </div>
     </div>
 </template>
 
 <script>
     import Api from '../../API';
-    import GroupServiceFailures from './GroupServiceFailures';
 
 export default {
-  name: 'Group',
+  name: 'GroupServiceFailures',
   components: {
-      GroupServiceFailures
 
   },
+    data() {
+        return {
+            failureData: null
+        }
+    },
   props: {
-    group: Object
+      service: {
+          type: Object,
+          required: true
+      }
   },
+    mounted () {
+      this.lastDaysFailures()
+    },
+    methods: {
+      async lastDaysFailures() {
+          const start = this.nowSubtract((3600 * 24) * 30)
+        this.failureData = await Api.service_failures_data(this.service.id, this.toUnix(start), this.toUnix(this.now()), "day")
+      }
+    }
 }
 </script>
 

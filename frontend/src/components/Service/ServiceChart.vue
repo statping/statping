@@ -1,5 +1,5 @@
-<template>
-    <apexchart v-if="ready" width="100%" height="225" type="area" :options="chartOptions" :series="series"></apexchart>
+<template v-show="showing">
+    <apexchart v-if="ready" width="100%" height="235" type="area" :options="chartOptions" :series="series"/>
 </template>
 
 <script>
@@ -35,14 +35,16 @@
           service: {
               type: Object,
               required: true
+          },
+          visible: {
+              type: Boolean,
+              required: true
           }
-      },
-      async created() {
-          await this.chartHits()
       },
       data() {
           return {
               ready: false,
+              showing: false,
               data: [],
               chartOptions: {
                   chart: {
@@ -118,6 +120,14 @@
               series: [{
                   data: []
               }]
+          }
+      },
+      watch: {
+          visible: function(newVal, oldVal) {
+              if (newVal && !this.showing) {
+                  this.showing = true
+                  this.chartHits()
+              }
           }
       },
       methods: {

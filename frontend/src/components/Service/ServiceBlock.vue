@@ -13,8 +13,8 @@
                 </div>
             </div>
 
-            <div class="chart-container">
-                <ServiceChart :service="service"/>
+            <div v-observe-visibility="visibleChart" class="chart-container">
+                <ServiceChart :service="service" :visible="visible"/>
             </div>
 
             <div class="row lower_canvas full-col-12 text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
@@ -46,6 +46,11 @@ export default {
             required: true
         },
     },
+    data() {
+        return {
+            visible: false,
+        }
+    },
     methods: {
         smallText(s) {
             if (s.online) {
@@ -53,6 +58,11 @@ export default {
             } else {
                 return `Offline, last error: ${s.last_failure.issue} ${this.ago(this.parseTime(s.last_failure.created_at))}`
             }
+        },
+        visibleChart(isVisible, entry) {
+                if (isVisible && !this.visible) {
+                    this.visible = true
+                }
         }
     }
 }

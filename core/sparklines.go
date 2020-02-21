@@ -23,7 +23,7 @@ func (s *Service) SparklineHourResponse(hours int, method string) string {
 	var arr []string
 	end := time.Now().UTC()
 	start := end.Add(time.Duration(-hours) * time.Hour)
-	obj := GraphDataRaw(s, start, end, "hour", method)
+	obj := GraphHitsDataRaw(s, start, end, "hour", method)
 	for _, v := range obj.Array {
 		arr = append(arr, utils.ToString(v.Value))
 	}

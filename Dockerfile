@@ -10,7 +10,7 @@ ADD Makefile go.mod /go/src/github.com/hunterlong/statping/
 RUN go mod vendor && \
     make dev-deps
 ADD . /go/src/github.com/hunterlong/statping
-RUN cd frontend && yarn install
+RUN cd frontend && yarn install --network-timeout 1000000
 RUN make compile install
 
 # Statping :latest Docker Image

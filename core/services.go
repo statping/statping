@@ -272,7 +272,7 @@ type DateScanObj struct {
 }
 
 // GraphDataRaw will return all the hits between 2 times for a Service
-func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group string, column string) *DateScanObj {
+func GraphHitsDataRaw(service types.ServiceInterface, start, end time.Time, group string, column string) *DateScanObj {
 	model := service.(*Service).HitsBetween(start, end, group, column)
 	model = model.Order("timeframe asc", false).Group("timeframe")
 	outgoing, err := model.ToChart()
@@ -280,6 +280,23 @@ func GraphDataRaw(service types.ServiceInterface, start, end time.Time, group st
 		log.Error(err)
 	}
 	return &DateScanObj{outgoing}
+}
+
+// GraphDataRaw will return all the hits between 2 times for a Service
+func GraphFailuresDataRaw(service types.ServiceInterface, start, end time.Time, group string) []types.TimeValue {
+	srv := service.(*Service)
+
+	query := Database(&types.Failure{}).
+		Where("service = ?", srv.Id).
+		Between(start, end).
+		MultipleSelects(types.SelectByTime(group), types.CountAmount()).
+		GroupByTimeframe().Debug()
+
+	outgoing, err := query.ToTimeValue()
+	if err != nil {
+		log.Error(err)
+	}
+	return outgoing
 }
 
 // ToString will convert the DateScanObj into a JSON string for the charts to render

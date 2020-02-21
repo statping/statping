@@ -40,6 +40,10 @@ class Api {
     return axios.get('/api/services/' + id + '/data?start=' + start + '&end=' + end + '&group=' + group).then(response => (response.data))
   }
 
+    async service_failures_data(id, start, end, group) {
+        return axios.get('/api/services/' + id + '/failure_data?start=' + start + '&end=' + end + '&group=' + group).then(response => (response.data))
+    }
+
   async service_heatmap(id, start, end, group) {
     return axios.get('/api/services/' + id + '/heatmap').then(response => (response.data))
   }
@@ -61,6 +65,7 @@ class Api {
   }
 
   async groups_reorder(data) {
+      window.console.log('/api/reorder/groups', data)
     return axios.post('/api/reorder/groups', data).then(response => (response.data))
   }
 

@@ -107,7 +107,7 @@ func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
 		group = "hour"
 	}
 
-	data := core.GraphDataRaw(serv, start, end, group, "latency")
+	data := core.GraphHitsDataRaw(serv, start, end, group, "latency")
 
 	out := struct {
 		Service   *core.Service
@@ -216,7 +216,29 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 	start := time.Unix(startField, 0)
 	end := time.Unix(endField, 0)
 
-	obj := core.GraphDataRaw(service, start, end, grouping, "latency")
+	obj := core.GraphHitsDataRaw(service, start, end, grouping, "latency")
+	returnJson(obj, w, r)
+}
+
+func apiServiceFailureDataHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	service := core.SelectService(utils.ToInt(vars["id"]))
+	if service == nil {
+		sendErrorJson(errors.New("service data not found"), w, r)
+		return
+	}
+	fields := parseGet(r)
+	grouping := fields.Get("group")
+	if grouping == "" {
+		grouping = "hour"
+	}
+	startField := utils.ToInt(fields.Get("start"))
+	endField := utils.ToInt(fields.Get("end"))
+
+	start := time.Unix(startField, 0)
+	end := time.Unix(endField, 0)
+
+	obj := core.GraphFailuresDataRaw(service, start, end, grouping)
 	returnJson(obj, w, r)
 }
 
@@ -235,7 +257,7 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 	start := time.Unix(startField, 0)
 	end := time.Unix(endField, 0)
 
-	obj := core.GraphDataRaw(service, start, end, grouping, "ping_time")
+	obj := core.GraphHitsDataRaw(service, start, end, grouping, "ping_time")
 	returnJson(obj, w, r)
 }
 

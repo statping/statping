@@ -1,5 +1,5 @@
 <template>
-    <div class="container col-md-7 col-sm-12 mt-2 sm-container">
+    <div class="container col-md-7 col-sm-12 mt-4 sm-container">
 
         <Header/>
 
@@ -12,11 +12,10 @@
         </div>
 
         <div class="col-12 full-col-12">
-            <div v-for="(service, index) in $store.getters.services" :ref="service.id" v-bind:key="index">
+            <div v-for="(service, index) in $store.getters.servicesInOrder" :ref="service.id" v-bind:key="index">
                 <ServiceBlock :service=service />
             </div>
         </div>
-
 
     </div>
 </template>
