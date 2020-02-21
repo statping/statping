@@ -7,6 +7,7 @@ const OptimizeCSSAssetsPlugin  = require('optimize-css-assets-webpack-plugin');
 const MiniCSSExtractPlugin     = require('mini-css-extract-plugin');
 const UglifyJSPlugin           = require('uglifyjs-webpack-plugin');
 const CompressionPlugin        = require('compression-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const helpers                  = require('./helpers');
 const commonConfig             = require('./webpack.config.common');
 const isProd                   = process.env.NODE_ENV === 'production';
@@ -17,12 +18,13 @@ const webpackConfig = merge(commonConfig, {
     mode: 'production',
     output: {
         path: helpers.root('dist'),
-        publicPath: '/',
-        filename: `js/[name].js`,
-        chunkFilename: 'js/[name].js'
+        publicPath: '',
+        filename: 'js/bundle.js',
+        chunkFilename: 'js/[name].chunk.js',
     },
     optimization: {
         runtimeChunk: 'single',
+        minimize: true,
         minimizer: [
             new OptimizeCSSAssetsPlugin({
                 cssProcessorPluginOptions: {
@@ -42,10 +44,9 @@ const webpackConfig = merge(commonConfig, {
             cacheGroups: {
                 vendor: {
                     test: /[\\/]node_modules[\\/]/,
-                    name (module) {
-                        const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
-                        return `${packageName.replace('@', '')}`;
-                    }
+                    chunks: "all",
+                    name: "vendor",
+                    enforce: true
                 },
                 styles: {
                     test: /\.css$/,
@@ -58,6 +59,7 @@ const webpackConfig = merge(commonConfig, {
     },
     plugins: [
         new webpack.EnvironmentPlugin(environment),
+        new CleanWebpackPlugin(),
         new MiniCSSExtractPlugin({
             filename: 'css/[name].css',
             chunkFilename: 'css/[name].css'
