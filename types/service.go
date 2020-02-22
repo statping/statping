@@ -58,6 +58,7 @@ type Service struct {
 	LastOnline         time.Time          `gorm:"-" json:"last_success"`
 	Failures           []FailureInterface `gorm:"-" json:"failures,omitempty"`
 	Checkins           []CheckinInterface `gorm:"-" json:"checkins,omitempty"`
+	EventCount         uint64             `gorm:"-" json:"-"` // Describes how many "Success" and "Failures" are recordet since `statping` start
 }
 
 // BeforeCreate for Service will set CreatedAt to UTC

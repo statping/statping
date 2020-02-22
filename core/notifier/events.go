@@ -17,6 +17,7 @@ package notifier
 
 import (
 	"fmt"
+
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 )
@@ -76,9 +77,12 @@ func OnSuccess(s *types.Service) {
 	for _, comm := range AllCommunications {
 		if isType(comm, new(BasicEvents)) && isEnabled(comm) && (!s.Online || inLimits(comm)) {
 			notifier := comm.(Notifier).Select()
-			log.
-				WithField("trigger", "OnSuccess").
-				WithFields(utils.ToFields(notifier, s)).Infoln(fmt.Sprintf("Sending [OnSuccess] '%v' notification for service %v", notifier.Method, s.Name))
+
+			log.WithField("trigger", "OnSuccess").
+				WithFields(utils.ToFields(notifier, s)).
+				Infoln(fmt.Sprintf("Sending [OnSuccess] '%v' notification for service %v",
+					notifier.Method, s.Name))
+
 			comm.(BasicEvents).OnSuccess(s)
 		}
 	}
