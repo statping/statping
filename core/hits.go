@@ -16,6 +16,7 @@
 package core
 
 import (
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"net/http"
 	"time"
@@ -51,7 +52,7 @@ func (s *Service) HitsQuery(r *http.Request) ([]*types.Hit, error) {
 	return hits, err.Error()
 }
 
-func (s *Service) HitsDb(r *http.Request) types.Database {
+func (s *Service) HitsDb(r *http.Request) database.Database {
 	return Database(&types.Hit{}).Where("service = ?", s.Id).QuerySearch(r).Order("id desc")
 }
 

@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"github.com/go-yaml/yaml"
 	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"github.com/jinzhu/gorm"
@@ -32,7 +33,7 @@ import (
 
 var (
 	// DbSession stores the Statping database session
-	DbSession types.Database
+	DbSession database.Database
 	DbModels  []interface{}
 )
 
@@ -47,7 +48,7 @@ func init() {
 // DbConfig stores the config.yml file for the statup configuration
 type DbConfig types.DbConfig
 
-func Database(obj interface{}) types.Database {
+func Database(obj interface{}) database.Database {
 	switch obj.(type) {
 	case *types.Service, *Service, []*Service:
 		return DbSession.Model(&types.Service{})
@@ -77,7 +78,7 @@ func Database(obj interface{}) types.Database {
 }
 
 // HitsBetween returns the gorm database query for a collection of service hits between a time range
-func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) types.Database {
+func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) database.Database {
 	selector := Dbtimestamp(group, column)
 	if CoreApp.Config.DbConn == "postgres" {
 		return Database(&Hit{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME), t2.UTC().Format(types.TIME))
@@ -87,7 +88,7 @@ func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) typ
 }
 
 // FailuresBetween returns the gorm database query for a collection of service hits between a time range
-func (s *Service) FailuresBetween(t1, t2 time.Time, group string, column string) types.Database {
+func (s *Service) FailuresBetween(t1, t2 time.Time, group string, column string) database.Database {
 	selector := Dbtimestamp(group, column)
 	if CoreApp.Config.DbConn == "postgres" {
 		return Database(&Failure{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME), t2.UTC().Format(types.TIME))
@@ -226,7 +227,7 @@ func (c *Core) Connect(retry bool, location string) error {
 		conn = fmt.Sprintf("sqlserver://%v:%v@%v?database=%v", CoreApp.Config.DbUser, CoreApp.Config.DbPass, host, CoreApp.Config.DbData)
 	}
 	log.WithFields(utils.ToFields(c, conn)).Debugln("attempting to connect to database")
-	dbSession, err := types.Openw(dbType, conn)
+	dbSession, err := database.Openw(dbType, conn)
 	if err != nil {
 		log.Debugln(fmt.Sprintf("Database connection error %v", err))
 		if retry {

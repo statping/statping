@@ -1,23 +1,9 @@
-// Statup
-// Copyright (C) 2020.  Hunter Long and the project contributors
-// Written by Hunter Long <info@socialeck.com> and the project contributors
-//
-// https://github.com/hunterlong/statup
-//
-// The licenses for most software and other practical works are designed
-// to take away your freedom to share and change the works.  By contrast,
-// the GNU General Public License is intended to guarantee your freedom to
-// share and change all versions of a program--to make sure it remains free
-// software for all its users.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-package types
+package database
 
 import (
 	"database/sql"
 	"fmt"
+	"github.com/hunterlong/statping/types"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -26,6 +12,13 @@ import (
 	"strconv"
 	"strings"
 	"time"
+)
+
+const (
+	TIME_NANO  = "2006-01-02T15:04:05Z"
+	TIME       = "2006-01-02 15:04:05"
+	CHART_TIME = "2006-01-02T15:04:05.999999-07:00"
+	TIME_DAY   = "2006-01-02"
 )
 
 // Database is an interface which DB implements
@@ -110,58 +103,16 @@ type Database interface {
 
 	Since(time.Time) Database
 	Between(time.Time, time.Time) Database
-	Hits() ([]*Hit, error)
+	Hits() ([]*types.Hit, error)
 	ToChart() ([]*DateScan, error)
 
-	GroupByTimeframe() Database
-	ToTimeValue(time.Time, time.Time) ([]*TimeValue, error)
 	SelectByTime(string) string
 	MultipleSelects(args ...string) Database
 
-	Failurer
-}
+	FormatTime(t time.Time) string
+	ParseTime(t string) (time.Time, error)
 
-type Failurer interface {
-	Failures(id int64) Database
-	Fails() ([]*Failure, error)
-}
-
-func mysqlTimestamps(increment string) string {
-	switch increment {
-	case "second":
-		return "%Y-%m-%d %H:%i:%S"
-	case "minute":
-		return "%Y-%m-%d %H:%i:00"
-	case "hour":
-		return "%Y-%m-%d %H:00:00"
-	case "day":
-		return "%Y-%m-%d 00:00:00"
-	case "month":
-		return "%Y-%m 00:00:00"
-	case "year":
-		return "%Y"
-	default:
-		return "%Y-%m-%d 00:00:00"
-	}
-}
-
-func sqliteTimestamps(increment string) string {
-	switch increment {
-	case "second":
-		return "%Y-%m-%d %H:%M:%S"
-	case "minute":
-		return "%Y-%m-%d %H:%M:00"
-	case "hour":
-		return "%Y-%m-%d %H:00:00"
-	case "day":
-		return "%Y-%m-%d 00:00:00"
-	case "month":
-		return "%Y-%m 00:00:00"
-	case "year":
-		return "%Y"
-	default:
-		return "%Y-%m-%d 00:00:00"
-	}
+	GroupQuery(query *types.GroupQuery) GroupByer
 }
 
 func (it *Db) MultipleSelects(args ...string) Database {
@@ -171,31 +122,6 @@ func (it *Db) MultipleSelects(args ...string) Database {
 
 func CountAmount() string {
 	return fmt.Sprintf("COUNT(id) as amount")
-}
-
-func (it *Db) SelectByTime(increment string) string {
-	switch it.Type {
-	case "mysql":
-		return fmt.Sprintf("CONCAT(date_format(created_at, '%s')) AS timeframe", mysqlTimestamps(increment))
-	case "postgres":
-		return fmt.Sprintf("date_trunc('%s', created_at) AS timeframe", increment)
-	default:
-		return fmt.Sprintf("strftime('%s', created_at, 'utc') as timeframe", sqliteTimestamps(increment))
-	}
-}
-
-func (it *Db) GroupByTimeframe() Database {
-	return it.Group("timeframe")
-}
-
-func (it *Db) Failures(id int64) Database {
-	return it.Model(&Failure{}).Where("service = ?", id).Not("method = 'checkin'").Order("id desc")
-}
-
-func (it *Db) Fails() ([]*Failure, error) {
-	var fails []*Failure
-	err := it.Find(&fails)
-	return fails, err.Error()
 }
 
 type Db struct {
@@ -513,18 +439,18 @@ func (it *Db) Error() error {
 	return it.Database.Error
 }
 
-func (it *Db) Hits() ([]*Hit, error) {
-	var hits []*Hit
+func (it *Db) Hits() ([]*types.Hit, error) {
+	var hits []*types.Hit
 	err := it.Find(&hits)
 	return hits, err.Error()
 }
 
 func (it *Db) Since(ago time.Time) Database {
-	return it.Where("created_at > ?", ago.UTC().Format(TIME))
+	return it.Where("created_at > ?", it.FormatTime(ago))
 }
 
 func (it *Db) Between(t1 time.Time, t2 time.Time) Database {
-	return it.Where("created_at BETWEEN ? AND ?", t1.UTC().Format(TIME), t2.UTC().Format(TIME))
+	return it.Where("created_at BETWEEN ? AND ?", it.FormatTime(t1), it.FormatTime(t2))
 }
 
 // DateScan struct is for creating the charts.js graph JSON array
@@ -536,75 +462,6 @@ type DateScan struct {
 type TimeValue struct {
 	Timeframe time.Time `json:"timeframe"`
 	Amount    int64     `json:"amount"`
-}
-
-func (it *Db) ToTimeValue(start, end time.Time) ([]*TimeValue, error) {
-	rows, err := it.Database.Rows()
-	if err != nil {
-		return nil, err
-	}
-	var data []*TimeValue
-	for rows.Next() {
-		var timeframe string
-		var amount int64
-		if err := rows.Scan(&timeframe, &amount); err != nil {
-			return nil, err
-		}
-		createdTime, _ := time.Parse(TIME, timeframe)
-		fmt.Println("got: ", createdTime.UTC(), amount)
-		data = append(data, &TimeValue{
-			Timeframe: createdTime.UTC(),
-			Amount:    amount,
-		})
-	}
-	return it.fillMissing(data, start, end), nil
-}
-
-func (it *Db) FormatTime(t time.Time) string {
-	switch it.Type {
-	case "mysql":
-		return t.UTC().Format("2006-01-02T00:00:00Z")
-	case "postgres":
-		return t.UTC().Format("2006-01-02T00:00:00Z")
-	default:
-		return t.UTC().Format("2006-01-02T00:00:00Z")
-	}
-}
-
-func reparseTime(t string) time.Time {
-	re, _ := time.Parse("2006-01-02T00:00:00Z", t)
-	return re.UTC()
-}
-
-func (it *Db) fillMissing(vals []*TimeValue, start, end time.Time) []*TimeValue {
-	timeMap := make(map[string]*TimeValue)
-	var validSet []*TimeValue
-
-	for _, v := range vals {
-		timeMap[it.FormatTime(v.Timeframe)] = v
-	}
-
-	current := start.UTC()
-	maxTime := end
-	for {
-		amount := int64(0)
-		currentStr := it.FormatTime(current)
-		if timeMap[currentStr] != nil {
-			amount = timeMap[currentStr].Amount
-		}
-
-		validSet = append(validSet, &TimeValue{
-			Timeframe: reparseTime(currentStr),
-			Amount:    amount,
-		})
-
-		if current.After(maxTime) {
-			break
-		}
-		current = current.Add(24 * time.Hour)
-	}
-
-	return validSet
 }
 
 func (it *Db) ToChart() ([]*DateScan, error) {

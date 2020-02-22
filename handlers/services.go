@@ -175,7 +175,7 @@ func apiServiceFailureDataHandler(w http.ResponseWriter, r *http.Request) {
 	returnJson(obj, w, r)
 }
 
-func parseGroupQuery(r *http.Request) types.GroupQuery {
+func parseGroupQuery(r *http.Request) *types.GroupQuery {
 	fields := parseGet(r)
 	grouping := fields.Get("group")
 	if grouping == "" {
@@ -184,7 +184,7 @@ func parseGroupQuery(r *http.Request) types.GroupQuery {
 	startField := utils.ToInt(fields.Get("start"))
 	endField := utils.ToInt(fields.Get("end"))
 
-	return types.GroupQuery{
+	return &types.GroupQuery{
 		Start: time.Unix(startField, 0).UTC(),
 		End:   time.Unix(endField, 0).UTC(),
 		Group: grouping,
@@ -305,10 +305,7 @@ func apiServiceFailuresHandler(r *http.Request) interface{} {
 	if servicer == nil {
 		return errors.New("service not found")
 	}
-	fails, err := servicer.FailuresDb(r).Fails()
-	if err != nil {
-		return err
-	}
+	fails := servicer.LimitedFailures(100)
 	return fails
 }
 

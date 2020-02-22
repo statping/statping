@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"reflect"
@@ -30,7 +31,7 @@ var (
 	// AllCommunications holds all the loaded notifiers
 	AllCommunications []types.AllNotifiers
 	// db holds the Statping database connection
-	db       types.Database
+	db       database.Database
 	timezone float32
 	log      = utils.Log.WithField("type", "notifier")
 )
@@ -111,12 +112,12 @@ func (n *Notification) CanTest() bool {
 }
 
 // db will return the notifier database column/record
-func modelDb(n *Notification) types.Database {
+func modelDb(n *Notification) database.Database {
 	return db.Model(&Notification{}).Where("method = ?", n.Method).Find(n)
 }
 
 // SetDB is called by core to inject the database for a notifier to use
-func SetDB(d types.Database) {
+func SetDB(d database.Database) {
 	db = d
 }
 

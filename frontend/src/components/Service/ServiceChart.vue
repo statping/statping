@@ -126,14 +126,18 @@
           visible: function(newVal, oldVal) {
               if (newVal && !this.showing) {
                   this.showing = true
-                  this.chartHits()
+                  this.chartHits("hour")
               }
           }
       },
       methods: {
-          async chartHits() {
+          async chartHits(group) {
               const start = this.nowSubtract((3600 * 24) * 7)
-              this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), "hour")
+              this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), group)
+
+              if (this.data.length === 0 && group !== "minute") {
+                  await this.chartHits("minute")
+              }
               this.series = [{
                   name: this.service.name,
                   ...this.data

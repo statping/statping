@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 )
@@ -26,7 +27,7 @@ import (
 var (
 	Integrations []types.Integrator
 	log          = utils.Log.WithField("type", "integration")
-	db           types.Database
+	db           database.Database
 )
 
 //func init() {
@@ -38,12 +39,12 @@ var (
 //}
 
 // integrationsDb returns the 'integrations' database column
-func integrationsDb() types.Database {
+func integrationsDb() database.Database {
 	return db.Model(&types.Integration{})
 }
 
 // SetDB is called by core to inject the database for a integrator to use
-func SetDB(d types.Database) {
+func SetDB(d database.Database) {
 	db = d
 }
 
@@ -106,7 +107,7 @@ func Find(name string) (types.Integrator, error) {
 }
 
 // db will return the notifier database column/record
-func integratorDb(n *types.Integration) types.Database {
+func integratorDb(n *types.Integration) database.Database {
 	return db.Model(&types.Integration{}).Where("name = ?", n.Name).Find(n)
 }
 

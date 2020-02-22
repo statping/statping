@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"github.com/ararog/timeago"
 	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"sort"
@@ -268,41 +269,37 @@ func (s *Service) Downtime() time.Duration {
 
 // DateScanObj struct is for creating the charts.js graph JSON array
 type DateScanObj struct {
-	Array []*types.DateScan `json:"data"`
+	Array []*database.DateScan `json:"data"`
 }
 
 // GraphDataRaw will return all the hits between 2 times for a Service
-func GraphHitsDataRaw(service types.ServiceInterface, query types.GroupQuery, column string) *DateScanObj {
+func GraphHitsDataRaw(service types.ServiceInterface, query *types.GroupQuery, column string) []*database.TimeValue {
 	srv := service.(*Service)
 
-	dbQuery := Database(&types.Hit{}).
+	dbQuery, err := Database(&types.Hit{}).
 		Where("service = ?", srv.Id).
-		Between(query.Start, query.End).
-		MultipleSelects(Database(&types.Hit{}).SelectByTime(query.Group), types.CountAmount()).
-		GroupByTimeframe()
+		GroupQuery(query).ToTimeValue()
 
-	outgoing, err := dbQuery.ToChart()
 	if err != nil {
 		log.Error(err)
+		return nil
 	}
-	return &DateScanObj{outgoing}
+	return dbQuery.FillMissing()
 }
 
 // GraphDataRaw will return all the hits between 2 times for a Service
-func GraphFailuresDataRaw(service types.ServiceInterface, query types.GroupQuery) []*types.TimeValue {
+func GraphFailuresDataRaw(service types.ServiceInterface, query *types.GroupQuery) []*database.TimeValue {
 	srv := service.(*Service)
 
-	dbQuery := Database(&types.Failure{}).
+	dbQuery, err := Database(&types.Failure{}).
 		Where("service = ?", srv.Id).
-		Between(query.Start, query.End).
-		MultipleSelects(Database(&types.Failure{}).SelectByTime(query.Group), types.CountAmount()).
-		GroupByTimeframe()
+		GroupQuery(query).ToTimeValue()
 
-	outgoing, err := dbQuery.ToTimeValue(query.Start, query.End)
 	if err != nil {
 		log.Error(err)
+		return nil
 	}
-	return outgoing
+	return dbQuery.FillMissing()
 }
 
 // ToString will convert the DateScanObj into a JSON string for the charts to render

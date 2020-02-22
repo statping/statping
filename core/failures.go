@@ -18,6 +18,7 @@ package core
 import (
 	"fmt"
 	"github.com/ararog/timeago"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"net/http"
 	"sort"
@@ -53,7 +54,7 @@ func (s *Service) CreateFailure(f *types.Failure) (int64, error) {
 // AllFailures will return all failures attached to a service
 func (s *Service) AllFailures() []types.Failure {
 	var fails []types.Failure
-	err := DbSession.Failures(s.Id).Find(&fails)
+	err := Database(&types.Failure{}).Find(&fails)
 	if err.Error() != nil {
 		log.Errorln(fmt.Sprintf("Issue getting failures for service %v, %v", s.Name, err))
 		return nil
@@ -61,7 +62,7 @@ func (s *Service) AllFailures() []types.Failure {
 	return fails
 }
 
-func (s *Service) FailuresDb(r *http.Request) types.Database {
+func (s *Service) FailuresDb(r *http.Request) database.Database {
 	return Database(&types.Failure{}).Where("service = ?", s.Id).QuerySearch(r).Order("id desc")
 }
 
