@@ -173,8 +173,8 @@ func parseMatrixError(reader io.Reader) error {
 		// invalid room etc
 		return errors.New(code.Error)
 	case "M_UNRECOGNIZED":
-		// matrix handled request -> homeserver url probably includes invalid subdirectory
-		return errors.New("invalid homeserver url")
+		// matrix handled request -> homeserver url or room_id probably includes invalid subdirectory
+		return errors.New("invalid homeserver url or room name")
 	default:
 		return fmt.Errorf("%s: %s", code.Code, code.Error)
 	}
