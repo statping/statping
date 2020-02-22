@@ -19,6 +19,9 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"net/http"
 	"strconv"
 	"strings"
@@ -112,7 +115,7 @@ type Database interface {
 
 	GroupByTimeframe() Database
 	ToTimeValue(time.Time, time.Time) ([]*TimeValue, error)
-
+	SelectByTime(string) string
 	MultipleSelects(args ...string) Database
 
 	Failurer
@@ -123,7 +126,26 @@ type Failurer interface {
 	Fails() ([]*Failure, error)
 }
 
-func sqlTimeframes(increment string) string {
+func mysqlTimestamps(increment string) string {
+	switch increment {
+	case "second":
+		return "%Y-%m-%d %H:%i:%S"
+	case "minute":
+		return "%Y-%m-%d %H:%i:00"
+	case "hour":
+		return "%Y-%m-%d %H:00:00"
+	case "day":
+		return "%Y-%m-%d 00:00:00"
+	case "month":
+		return "%Y-%m 00:00:00"
+	case "year":
+		return "%Y"
+	default:
+		return "%Y-%m-%d 00:00:00"
+	}
+}
+
+func sqliteTimestamps(increment string) string {
 	switch increment {
 	case "second":
 		return "%Y-%m-%d %H:%M:%S"
@@ -151,8 +173,15 @@ func CountAmount() string {
 	return fmt.Sprintf("COUNT(id) as amount")
 }
 
-func SelectByTime(increment string) string {
-	return fmt.Sprintf("strftime('%s', created_at, 'utc') as timeframe", sqlTimeframes(increment))
+func (it *Db) SelectByTime(increment string) string {
+	switch it.Type {
+	case "mysql":
+		return fmt.Sprintf("CONCAT(date_format(created_at, '%s')) AS timeframe", mysqlTimestamps(increment))
+	case "postgres":
+		return fmt.Sprintf("date_trunc('%s', created_at) AS timeframe", increment)
+	default:
+		return fmt.Sprintf("strftime('%s', created_at, 'utc') as timeframe", sqliteTimestamps(increment))
+	}
 }
 
 func (it *Db) GroupByTimeframe() Database {
@@ -528,11 +557,18 @@ func (it *Db) ToTimeValue(start, end time.Time) ([]*TimeValue, error) {
 			Amount:    amount,
 		})
 	}
-	return fillMissing(data, start, end), nil
+	return it.fillMissing(data, start, end), nil
 }
 
-func parseTime(t time.Time) string {
-	return t.Format("2006-01-02T00:00:00Z")
+func (it *Db) FormatTime(t time.Time) string {
+	switch it.Type {
+	case "mysql":
+		return t.UTC().Format("2006-01-02T00:00:00Z")
+	case "postgres":
+		return t.UTC().Format("2006-01-02T00:00:00Z")
+	default:
+		return t.UTC().Format("2006-01-02T00:00:00Z")
+	}
 }
 
 func reparseTime(t string) time.Time {
@@ -540,19 +576,19 @@ func reparseTime(t string) time.Time {
 	return re.UTC()
 }
 
-func fillMissing(vals []*TimeValue, start, end time.Time) []*TimeValue {
+func (it *Db) fillMissing(vals []*TimeValue, start, end time.Time) []*TimeValue {
 	timeMap := make(map[string]*TimeValue)
 	var validSet []*TimeValue
 
 	for _, v := range vals {
-		timeMap[parseTime(v.Timeframe)] = v
+		timeMap[it.FormatTime(v.Timeframe)] = v
 	}
 
 	current := start.UTC()
 	maxTime := end
 	for {
 		amount := int64(0)
-		currentStr := parseTime(current)
+		currentStr := it.FormatTime(current)
 		if timeMap[currentStr] != nil {
 			amount = timeMap[currentStr].Amount
 		}

@@ -272,10 +272,16 @@ type DateScanObj struct {
 }
 
 // GraphDataRaw will return all the hits between 2 times for a Service
-func GraphHitsDataRaw(service types.ServiceInterface, start, end time.Time, group string, column string) *DateScanObj {
-	model := service.(*Service).HitsBetween(start, end, group, column)
-	model = model.Order("timeframe asc", false).Group("timeframe")
-	outgoing, err := model.ToChart()
+func GraphHitsDataRaw(service types.ServiceInterface, query types.GroupQuery, column string) *DateScanObj {
+	srv := service.(*Service)
+
+	dbQuery := Database(&types.Hit{}).
+		Where("service = ?", srv.Id).
+		Between(query.Start, query.End).
+		MultipleSelects(Database(&types.Hit{}).SelectByTime(query.Group), types.CountAmount()).
+		GroupByTimeframe()
+
+	outgoing, err := dbQuery.ToChart()
 	if err != nil {
 		log.Error(err)
 	}
@@ -283,16 +289,16 @@ func GraphHitsDataRaw(service types.ServiceInterface, start, end time.Time, grou
 }
 
 // GraphDataRaw will return all the hits between 2 times for a Service
-func GraphFailuresDataRaw(service types.ServiceInterface, start, end time.Time, group string) []*types.TimeValue {
+func GraphFailuresDataRaw(service types.ServiceInterface, query types.GroupQuery) []*types.TimeValue {
 	srv := service.(*Service)
 
-	query := Database(&types.Failure{}).
+	dbQuery := Database(&types.Failure{}).
 		Where("service = ?", srv.Id).
-		Between(start, end).
-		MultipleSelects(types.SelectByTime(group), types.CountAmount()).
-		GroupByTimeframe().Debug()
+		Between(query.Start, query.End).
+		MultipleSelects(Database(&types.Failure{}).SelectByTime(query.Group), types.CountAmount()).
+		GroupByTimeframe()
 
-	outgoing, err := query.ToTimeValue(start, end)
+	outgoing, err := dbQuery.ToTimeValue(query.Start, query.End)
 	if err != nil {
 		log.Error(err)
 	}

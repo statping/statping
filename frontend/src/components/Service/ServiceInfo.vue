@@ -49,7 +49,7 @@
           }
       },
       async mounted() {
-          this.set1 = await this.getHits(24 * 2, "hour")
+          this.set1 = await this.getHits(24, "minute")
           this.set1_name = this.calc(this.set1)
           this.set2 = await this.getHits(24 * 7, "hour")
           this.set2_name = this.calc(this.set2)

@@ -24,7 +24,6 @@ import (
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -71,54 +70,6 @@ func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
 		service.Update(false)
 	}
 	returnJson(newOrder, w, r)
-}
-
-func servicesViewHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	fields := parseGet(r)
-	r.ParseForm()
-
-	var serv *core.Service
-	id := vars["id"]
-	if _, err := strconv.Atoi(id); err == nil {
-		serv = core.SelectService(utils.ToInt(id))
-	} else {
-		serv = core.SelectServiceLink(id)
-	}
-	if serv == nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	startField := utils.ToInt(fields.Get("start"))
-	endField := utils.ToInt(fields.Get("end"))
-	group := r.Form.Get("group")
-
-	end := utils.Now().UTC()
-	start := end.Add((-24 * 7) * time.Hour).UTC()
-
-	if startField != 0 {
-		start = time.Unix(startField, 0).UTC()
-	}
-	if endField != 0 {
-		end = time.Unix(endField, 0).UTC()
-	}
-	if group == "" {
-		group = "hour"
-	}
-
-	data := core.GraphHitsDataRaw(serv, start, end, group, "latency")
-
-	out := struct {
-		Service   *core.Service
-		Start     string
-		End       string
-		StartUnix int64
-		EndUnix   int64
-		Data      string
-	}{serv, start.Format(utils.FlatpickrReadable), end.Format(utils.FlatpickrReadable), start.Unix(), end.Unix(), data.ToString()}
-
-	ExecuteResponse(w, r, "service.gohtml", out, nil)
 }
 
 func apiServiceHandler(r *http.Request) interface{} {
@@ -205,18 +156,9 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(errors.New("service data not found"), w, r)
 		return
 	}
-	fields := parseGet(r)
-	grouping := fields.Get("group")
-	if grouping == "" {
-		grouping = "hour"
-	}
-	startField := utils.ToInt(fields.Get("start"))
-	endField := utils.ToInt(fields.Get("end"))
+	groupQuery := parseGroupQuery(r)
 
-	start := time.Unix(startField, 0)
-	end := time.Unix(endField, 0)
-
-	obj := core.GraphHitsDataRaw(service, start, end, grouping, "latency")
+	obj := core.GraphHitsDataRaw(service, groupQuery, "latency")
 	returnJson(obj, w, r)
 }
 
@@ -227,6 +169,13 @@ func apiServiceFailureDataHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(errors.New("service data not found"), w, r)
 		return
 	}
+	groupQuery := parseGroupQuery(r)
+
+	obj := core.GraphFailuresDataRaw(service, groupQuery)
+	returnJson(obj, w, r)
+}
+
+func parseGroupQuery(r *http.Request) types.GroupQuery {
 	fields := parseGet(r)
 	grouping := fields.Get("group")
 	if grouping == "" {
@@ -235,11 +184,11 @@ func apiServiceFailureDataHandler(w http.ResponseWriter, r *http.Request) {
 	startField := utils.ToInt(fields.Get("start"))
 	endField := utils.ToInt(fields.Get("end"))
 
-	start := time.Unix(startField, 0).UTC()
-	end := time.Unix(endField, 0).UTC()
-
-	obj := core.GraphFailuresDataRaw(service, start, end, grouping)
-	returnJson(obj, w, r)
+	return types.GroupQuery{
+		Start: time.Unix(startField, 0).UTC(),
+		End:   time.Unix(endField, 0).UTC(),
+		Group: grouping,
+	}
 }
 
 func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
@@ -249,15 +198,9 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(errors.New("service not found"), w, r)
 		return
 	}
-	fields := parseGet(r)
-	grouping := fields.Get("group")
-	startField := utils.ToInt(fields.Get("start"))
-	endField := utils.ToInt(fields.Get("end"))
+	groupQuery := parseGroupQuery(r)
 
-	start := time.Unix(startField, 0)
-	end := time.Unix(endField, 0)
-
-	obj := core.GraphHitsDataRaw(service, start, end, grouping, "ping_time")
+	obj := core.GraphHitsDataRaw(service, groupQuery, "ping_time")
 	returnJson(obj, w, r)
 }
 

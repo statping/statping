@@ -1,0 +1,51 @@
+version: '3.1'
+
+volumes:
+  mysql_data: {}
+  postgres_data: {}
+
+services:
+
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: password123
+      MYSQL_DATABASE: statping
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+
+  postgres:
+    container_name: postgres
+    image: postgres:10.0-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/pg_data
+    environment:
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: statping
+      POSTGRES_USER: root
+      POSTGRES_PORT: 5432
+      PGDATA: /var/lib/postgresql/data/pg_data
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      - PMA_HOST=mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=password123
+    restart: always
+    depends_on:
+      - mysql
+    links:
+      - mysql
+    ports:
+      - 7474:80
+    volumes:
+      - /sessions

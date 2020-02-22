@@ -19,6 +19,13 @@ import (
 	"time"
 )
 
+type GroupQuery struct {
+	Id    int64
+	Start time.Time
+	End   time.Time
+	Group string
+}
+
 // Hit struct is a 'successful' ping or web response entry for a service.
 type Hit struct {
 	Id        int64     `gorm:"primary_key;column:id" json:"id"`

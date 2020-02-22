@@ -37,7 +37,7 @@ class Api {
   }
 
   async service_hits(id, start, end, group) {
-    return axios.get('/api/services/' + id + '/data?start=' + start + '&end=' + end + '&group=' + group).then(response => (response.data))
+    return axios.get('/api/services/' + id + '/hits_data?start=' + start + '&end=' + end + '&group=' + group).then(response => (response.data))
   }
 
     async service_failures_data(id, start, end, group) {
