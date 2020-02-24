@@ -133,6 +133,15 @@ $('select#service_type').on('change', function() {
         $('#post_data').parent().parent().addClass('d-none');
         $('#service_response').parent().parent().addClass('d-none');
         $('#service_response_code').parent().parent().addClass('d-none');
+    } else if (selected === 'grpc') {
+        typeLabel.html('GRPC Port')
+        $('#service_port').parent().parent().removeClass('d-none');
+        $('#service_check_type').parent().parent().addClass('d-none');
+        $('#service_url').attr('placeholder', 'grpc.google.com');
+        $('#post_data').parent().parent().addClass('d-none');
+        $('#service_response').parent().parent().addClass('d-none');
+        $('#service_response_code').parent().parent().addClass('d-none');
+		$('#headers').parent().parent().addClass('d-none');
     } else {
         $('#post_data').parent().parent().removeClass('d-none');
         $('#service_response').parent().parent().removeClass('d-none');

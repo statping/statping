@@ -17,17 +17,24 @@ package core
 
 import (
 	"bytes"
+	"context"
+	"crypto/tls"
 	"fmt"
-	"github.com/hunterlong/statping/core/notifier"
-	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
-	"github.com/tatsushid/go-fastping"
 	"net"
 	"net/http"
 	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
+
+	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
+	"github.com/tatsushid/go-fastping"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
 // checkServices will start the checking go routine for each service
@@ -45,6 +52,8 @@ func (s *Service) Check(record bool) {
 	switch s.Type {
 	case "http":
 		s.checkHttp(record)
+	case "grpc":
+		s.checkGrpc(record)
 	case "tcp", "udp":
 		s.checkTcp(record)
 	case "icmp":
@@ -88,7 +97,7 @@ func (s *Service) duration() time.Duration {
 }
 
 func (s *Service) parseHost() string {
-	if s.Type == "tcp" || s.Type == "udp" {
+	if s.Type == "tcp" || s.Type == "udp" || s.Type == "grpc" {
 		return s.Domain
 	} else {
 		u, err := url.Parse(s.Domain)
@@ -99,7 +108,7 @@ func (s *Service) parseHost() string {
 	}
 }
 
-// dnsCheck will check the domain name and return a float64 for the amount of time the DNS check took
+// dnsCheck will check the domain name and return a float64 for the amount of time the Dnamespace check took
 func (s *Service) dnsCheck() (float64, error) {
 	var err error
 	t1 := time.Now()
@@ -181,6 +190,78 @@ func (s *Service) checkTcp(record bool) *Service {
 	t2 := time.Now()
 	s.Latency = t2.Sub(t1).Seconds()
 	s.LastResponse = ""
+	if record {
+		recordSuccess(s)
+	}
+	return s
+}
+
+// checkGrpc will check a GRPC service
+func (s *Service) checkGrpc(record bool) *Service {
+	dnsLookup, err := s.dnsCheck()
+	if err != nil {
+		if record {
+			recordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
+		}
+		return s
+	}
+	s.PingTime = dnsLookup
+	t1 := time.Now()
+	timeout := time.Duration(s.Timeout) * time.Second
+
+	grpcOption := grpc.WithInsecure()
+
+	// Check if TLS
+	if s.VerifySSL.Bool {
+		h2creds := credentials.NewTLS(&tls.Config{NextProtos: []string{"h2"}})
+		grpcOption = grpc.WithTransportCredentials(h2creds)
+	}
+
+	// Set up a connection to the server.
+	conn, err := grpc.Dial(s.Domain+":"+strconv.Itoa(s.Port), grpcOption)
+	if err != nil {
+		if record {
+			recordFailure(s, fmt.Sprintf("GRPC Error %v", err))
+		}
+		return s
+	}
+	defer conn.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	c := healthpb.NewHealthClient(conn)
+	in := &healthpb.HealthCheckRequest{}
+	res, err := c.Check(ctx, in)
+	if err != nil {
+		if record {
+			recordFailure(s, fmt.Sprintf("GRPC Error %v", err))
+		}
+		return s
+	}
+	t2 := time.Now()
+	s.Latency = t2.Sub(t1).Seconds()
+	s.LastResponse = res.String()
+	s.LastStatusCode = int(res.GetStatus())
+	s.ExpectedStatus = 1
+	s.Expected.String = "SERVING"
+
+	match, err := regexp.MatchString(s.Expected.String, res.String())
+	if err != nil {
+		log.Warnln(fmt.Sprintf("Service %v expected: %v to match %v", s.Name, res.String(), s.Expected.String))
+	}
+	if !match {
+		if record {
+			recordFailure(s, fmt.Sprintf("GRPC Response Body did not match '%v'", s.Expected))
+		}
+		return s
+	}
+	if s.ExpectedStatus != int(res.Status) {
+		if record {
+			recordFailure(s, fmt.Sprintf("GRPC Status Code %v did not match %v", res.Status, healthpb.HealthCheckResponse_ServingStatus(s.ExpectedStatus)))
+		}
+		return s
+	}
 	if record {
 		recordSuccess(s)
 	}

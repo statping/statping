@@ -35,6 +35,7 @@ require (
 	golang.org/x/net v0.0.0-20191014212845-da9a3fd4c582 // indirect
 	golang.org/x/sys v0.0.0-20191010194322-b09406accb47 // indirect
 	google.golang.org/appengine v1.6.5 // indirect
+	google.golang.org/grpc v1.19.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/mail.v2 v2.3.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
