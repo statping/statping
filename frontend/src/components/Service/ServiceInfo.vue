@@ -16,7 +16,7 @@
             </div>
         </div>
         <span v-for="(failure, index) in failures" v-bind:key="index" class="alert alert-light">
-            Failed {{ago(parseTime(failure.created_at))}}<br>
+            Failed {{failure.created_at}}<br>
             {{failure.issue}}
         </span>
 
@@ -49,9 +49,9 @@
           }
       },
       async mounted() {
-          this.set1 = await this.getHits(24, "minute")
+          this.set1 = await this.getHits(24, "hour")
           this.set1_name = this.calc(this.set1)
-          this.set2 = await this.getHits(24 * 7, "hour")
+          this.set2 = await this.getHits(24 * 7, "day")
           this.set2_name = this.calc(this.set2)
           this.loaded = true
       },
@@ -62,15 +62,16 @@
                   this.failures = await Api.service_failures(this.service.id, this.toUnix(start), this.toUnix(this.now()), 5)
                   return [{name: "None", data: []}]
               }
-              const data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(this.now()), group)
+              const fetched = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(this.now()), group)
               if (!data) {
                   return [{name: "None", data: []}]
               }
-              return [{name: "Latency", data: data.data}]
+              const data = this.convertToChartData(fetched, 1000, true)
+              return [{name: "Latency", data}]
           },
           calc(s) {
               let data = s[0].data
-              if (data.length > 1) {
+              if (data) {
                   let total = 0
                   data.forEach((f) => {
                       total += f.y

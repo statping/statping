@@ -16,9 +16,7 @@
 package core
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/ararog/timeago"
 	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
@@ -56,6 +54,13 @@ func SelectService(id int64) *Service {
 		}
 	}
 	return nil
+}
+
+func (s *Service) GetFailures(count int) []*Failure {
+	var fails []*Failure
+	db := Database(&types.Failure{}).Where("service = ?", s.Id)
+	db.Limit(count).Find(&fails)
+	return fails
 }
 
 func (s *Service) UpdateStats() *Service {
@@ -108,7 +113,8 @@ func (s *Service) AllCheckins() []*Checkin {
 	return checkin
 }
 
-// SelectAllServices returns a slice of *core.Service to be store on []*core.Services, should only be called once on startup.
+// SelectAllServices returns a slice of *core.Service to be store on []*core.Services
+// should only be called once on startup.
 func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 	var services []*Service
 	db := Database(&Service{}).Find(&services).Order("order_id desc")
@@ -122,13 +128,13 @@ func (c *Core) SelectAllServices(start bool) ([]*Service, error) {
 			service.Start()
 			service.CheckinProcess()
 		}
-		fails := service.LimitedFailures(limitedFailures)
+		fails := service.GetFailures(limitedFailures)
 		for _, f := range fails {
 			service.Failures = append(service.Failures, f)
 		}
 		checkins := service.AllCheckins()
 		for _, c := range checkins {
-			c.Failures = c.LimitedFailures(limitedFailures)
+			c.Failures = c.GetFailures(limitedFailures)
 			c.Hits = c.LimitedHits(limitedHits)
 			service.Checkins = append(service.Checkins, c)
 		}
@@ -185,36 +191,13 @@ func (s *Service) OnlineSince(ago time.Time) float32 {
 }
 
 // lastFailure returns the last Failure a service had
-func (s *Service) lastFailure() *Failure {
-	limited := s.LimitedFailures(1)
+func (s *Service) lastFailure() types.FailureInterface {
+	limited := s.GetFailures(1)
 	if len(limited) == 0 {
 		return nil
 	}
 	last := limited[len(limited)-1]
 	return last
-}
-
-// SmallText returns a short description about a services status
-//		service.SmallText()
-//		// Online since Monday 3:04:05PM, Jan _2 2006
-func (s *Service) SmallText() string {
-	last := s.LimitedFailures(1)
-	//hits, _ := s.LimitedHits(1)
-	zone := CoreApp.Timezone
-	if s.Online {
-		if len(last) == 0 {
-			return fmt.Sprintf("Online since %v", utils.Timezoner(s.CreatedAt, zone).Format("Monday 3:04:05PM, Jan _2 2006"))
-		} else {
-			return fmt.Sprintf("Online, last Failure was %v", utils.Timezoner(last[0].CreatedAt, zone).Format("Monday 3:04:05PM, Jan _2 2006"))
-		}
-	}
-	if len(last) > 0 {
-		lastFailure := s.lastFailure()
-		got, _ := timeago.TimeAgoWithTime(time.Now().UTC().Add(s.Downtime()), time.Now().UTC())
-		return fmt.Sprintf("Reported offline %v, %v", got, lastFailure.ParseError())
-	} else {
-		return fmt.Sprintf("%v is currently offline", s.Name)
-	}
 }
 
 // DowntimeText will return the amount of downtime for a service based on the duration
@@ -261,99 +244,24 @@ func (s *Service) Downtime() time.Duration {
 		return time.Duration(0)
 	}
 	if len(hits) == 0 {
-		return time.Now().UTC().Sub(fail.CreatedAt.UTC())
+		return time.Now().UTC().Sub(fail.Select().CreatedAt.UTC())
 	}
-	since := fail.CreatedAt.UTC().Sub(hits[0].CreatedAt.UTC())
+	since := fail.Select().CreatedAt.UTC().Sub(hits[0].CreatedAt.UTC())
 	return since
 }
 
-// DateScanObj struct is for creating the charts.js graph JSON array
-type DateScanObj struct {
-	Array []*database.DateScan `json:"data"`
-}
-
-// GraphDataRaw will return all the hits between 2 times for a Service
-func GraphHitsDataRaw(service types.ServiceInterface, query *types.GroupQuery, column string) []*database.TimeValue {
-	srv := service.(*Service)
-
-	dbQuery, err := Database(&types.Hit{}).
-		Where("service = ?", srv.Id).
-		GroupQuery(query).ToTimeValue()
+// GraphData will return all hits or failures
+func GraphData(q *database.GroupQuery, dbType interface{}, by database.By) []*database.TimeValue {
+	dbQuery, err := q.Database().GroupQuery(q, by).ToTimeValue(dbType)
 
 	if err != nil {
 		log.Error(err)
 		return nil
 	}
-	return dbQuery.FillMissing()
-}
-
-// GraphDataRaw will return all the hits between 2 times for a Service
-func GraphFailuresDataRaw(service types.ServiceInterface, query *types.GroupQuery) []*database.TimeValue {
-	srv := service.(*Service)
-
-	dbQuery, err := Database(&types.Failure{}).
-		Where("service = ?", srv.Id).
-		GroupQuery(query).ToTimeValue()
-
-	if err != nil {
-		log.Error(err)
-		return nil
+	if q.FillEmpty {
+		return dbQuery.FillMissing(q.Start, q.End)
 	}
-	return dbQuery.FillMissing()
-}
-
-// ToString will convert the DateScanObj into a JSON string for the charts to render
-func (d *DateScanObj) ToString() string {
-	data, err := json.Marshal(d.Array)
-	if err != nil {
-		log.Warnln(err)
-		return "{}"
-	}
-	return string(data)
-}
-
-// AvgUptime24 returns a service's average online status for last 24 hours
-func (s *Service) AvgUptime24() string {
-	ago := time.Now().UTC().Add(-24 * time.Hour)
-	return s.AvgUptime(ago)
-}
-
-// AvgUptime returns average online status for last 24 hours
-func (s *Service) AvgUptime(ago time.Time) string {
-	failed, _ := s.TotalFailuresSince(ago)
-	if failed == 0 {
-		return "100"
-	}
-	total, _ := s.TotalHitsSince(ago)
-	if total == 0 {
-		return "0.00"
-	}
-	percent := float64(failed) / float64(total) * 100
-	percent = 100 - percent
-	if percent < 0 {
-		percent = 0
-	}
-	amount := fmt.Sprintf("%0.2f", percent)
-	if amount == "100.00" {
-		amount = "100"
-	}
-	return amount
-}
-
-// TotalUptime returns the total uptime percent of a service
-func (s *Service) TotalUptime() string {
-	hits, _ := s.TotalHits()
-	failures, _ := s.TotalFailures()
-	percent := float64(failures) / float64(hits) * 100
-	percent = 100 - percent
-	if percent < 0 {
-		percent = 0
-	}
-	amount := fmt.Sprintf("%0.2f", percent)
-	if amount == "100.00" {
-		amount = "100"
-	}
-	return amount
+	return dbQuery.ToValues()
 }
 
 // index returns a services index int for updating the []*core.Services slice

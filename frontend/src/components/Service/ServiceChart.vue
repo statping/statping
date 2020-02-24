@@ -132,15 +132,15 @@
       },
       methods: {
           async chartHits(group) {
-              const start = this.nowSubtract((3600 * 24) * 7)
+              const start = this.nowSubtract((3600 * 24) * 30)
               this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), group)
 
-              if (this.data.length === 0 && group !== "minute") {
-                  await this.chartHits("minute")
+              if (this.data.length === 0 && group !== "hour") {
+                  await this.chartHits("hour")
               }
               this.series = [{
                   name: this.service.name,
-                  ...this.data
+                  ...this.convertToChartData(this.data)
               }]
               this.ready = true
           }

@@ -30,7 +30,7 @@ func apiAllCheckinsHandler(w http.ResponseWriter, r *http.Request) {
 	checkins := core.AllCheckins()
 	for _, c := range checkins {
 		c.Hits = c.AllHits()
-		c.Failures = c.LimitedFailures(64)
+		c.Failures = c.GetFailures(64)
 	}
 	returnJson(checkins, w, r)
 }
@@ -43,7 +43,7 @@ func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	checkin.Hits = checkin.LimitedHits(32)
-	checkin.Failures = checkin.LimitedFailures(32)
+	checkin.Failures = checkin.GetFailures(32)
 	returnJson(checkin, w, r)
 }
 

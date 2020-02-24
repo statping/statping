@@ -16,6 +16,7 @@
 package types
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -27,11 +28,41 @@ const (
 )
 
 var (
-	NOW = func() time.Time { return time.Now().UTC() }()
-	//HOUR_1_AGO  = time.Now().Add(-1 * time.Hour)
-	//HOUR_24_AGO = time.Now().Add(-24 * time.Hour)
-	//HOUR_72_AGO = time.Now().Add(-72 * time.Hour)
-	//DAY_7_AGO   = NOW.AddDate(0, 0, -7)
-	//MONTH_1_AGO = NOW.AddDate(0, -1, 0)
-	//YEAR_1_AGO  = NOW.AddDate(-1, 0, 0)
+	Second = time.Second
+	Minute = time.Minute
+	Hour   = time.Hour
+	Day    = Hour * 24
+	Week   = Day * 7
+	Month  = Week * 4
+	Year   = Day * 365
 )
+
+func FixedTime(t time.Time, d time.Duration) string {
+	switch d {
+	case Month:
+		month := fmt.Sprintf("%v", int(t.Month()))
+		if int(t.Month()) < 10 {
+			month = fmt.Sprintf("0%v", int(t.Month()))
+		}
+		return fmt.Sprintf("%v-%v-01T00:00:00Z", t.Year(), month)
+	case Year:
+		return fmt.Sprintf("%v-01-01T00:00:00Z", t.Year())
+	default:
+		return t.Format(durationStr(d))
+	}
+}
+
+func durationStr(d time.Duration) string {
+	switch d {
+	case Second:
+		return "2006-01-02T15:04:05Z"
+	case Minute:
+		return "2006-01-02T15:04:00Z"
+	case Hour:
+		return "2006-01-02T15:00:00Z"
+	case Day:
+		return "2006-01-02T00:00:00Z"
+	default:
+		return "2006-01-02T00:00:00Z"
+	}
+}

@@ -2,14 +2,12 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/hunterlong/statping/types"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -19,6 +17,10 @@ const (
 	TIME       = "2006-01-02 15:04:05"
 	CHART_TIME = "2006-01-02T15:04:05.999999-07:00"
 	TIME_DAY   = "2006-01-02"
+)
+
+var (
+	database Database
 )
 
 // Database is an interface which DB implements
@@ -99,11 +101,9 @@ type Database interface {
 	// extra
 	Error() error
 	RowsAffected() int64
-	QuerySearch(*http.Request) Database
 
 	Since(time.Time) Database
 	Between(time.Time, time.Time) Database
-	Hits() ([]*types.Hit, error)
 	ToChart() ([]*DateScan, error)
 
 	SelectByTime(string) string
@@ -112,16 +112,19 @@ type Database interface {
 	FormatTime(t time.Time) string
 	ParseTime(t string) (time.Time, error)
 
-	GroupQuery(query *types.GroupQuery) GroupByer
+	Requests(*http.Request) Database
+
+	GroupQuery(query *GroupQuery, by By) GroupByer
+}
+
+func (it *Db) Requests(r *http.Request) Database {
+	g := ParseQueries(r, it)
+	return g.db
 }
 
 func (it *Db) MultipleSelects(args ...string) Database {
 	joined := strings.Join(args, ", ")
 	return it.Select(joined)
-}
-
-func CountAmount() string {
-	return fmt.Sprintf("COUNT(id) as amount")
 }
 
 type Db struct {
@@ -132,7 +135,11 @@ type Db struct {
 // Openw is a drop-in replacement for Open()
 func Openw(dialect string, args ...interface{}) (db Database, err error) {
 	gormdb, err := gorm.Open(dialect, args...)
-	return Wrap(gormdb), err
+	if err != nil {
+		return nil, err
+	}
+	database = Wrap(gormdb)
+	return database, err
 }
 
 // Wrap wraps gorm.DB in an interface
@@ -460,8 +467,8 @@ type DateScan struct {
 }
 
 type TimeValue struct {
-	Timeframe time.Time `json:"timeframe"`
-	Amount    int64     `json:"amount"`
+	Timeframe string  `json:"timeframe"`
+	Amount    float64 `json:"amount"`
 }
 
 func (it *Db) ToChart() ([]*DateScan, error) {
@@ -486,56 +493,4 @@ func (it *Db) ToChart() ([]*DateScan, error) {
 		data = append(data, gd)
 	}
 	return data, err
-}
-
-func (it *Db) QuerySearch(r *http.Request) Database {
-	if r == nil {
-		return it
-	}
-	db := it.Database
-	start := defaultField(r, "start")
-	end := defaultField(r, "end")
-	limit := defaultField(r, "limit")
-	offset := defaultField(r, "offset")
-	params := &Params{
-		Start:  start,
-		End:    end,
-		Limit:  limit,
-		Offset: offset,
-	}
-	if params.Start != nil && params.End != nil {
-		db = db.Where("created_at BETWEEN ? AND ?", time.Unix(*params.Start, 0).Format(TIME), time.Unix(*params.End, 0).UTC().Format(TIME))
-	} else if params.Start != nil && params.End == nil {
-		db = db.Where("created_at > ?", time.Unix(*params.Start, 0).UTC().Format(TIME))
-	}
-	if params.Limit != nil {
-		db = db.Limit(*params.Limit)
-	} else {
-		db = db.Limit(10000)
-	}
-	if params.Offset != nil {
-		db = db.Offset(*params.Offset)
-	} else {
-		db = db.Offset(0)
-	}
-	return Wrap(db)
-}
-
-type Params struct {
-	Start  *int64
-	End    *int64
-	Limit  *int64
-	Offset *int64
-}
-
-func defaultField(r *http.Request, key string) *int64 {
-	r.ParseForm()
-	val := r.Form.Get(key)
-	if val == "" {
-		return nil
-	}
-
-	gg, _ := strconv.Atoi(val)
-	num := int64(gg)
-	return &num
 }

@@ -127,12 +127,6 @@ func TestServiceOnline24Hours(t *testing.T) {
 	assert.True(t, service3.OnlineSince(since) > float32(49))
 }
 
-func TestServiceSmallText(t *testing.T) {
-	service := SelectService(5)
-	text := service.SmallText()
-	assert.Contains(t, text, "Online since")
-}
-
 func TestServiceAvgUptime(t *testing.T) {
 	since := utils.Now().Add(-24 * time.Hour).Add(-10 * time.Minute)
 	service := SelectService(1)

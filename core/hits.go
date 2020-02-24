@@ -47,13 +47,13 @@ func (s *Service) CountHits() (int64, error) {
 // Hits returns all successful hits for a service
 func (s *Service) HitsQuery(r *http.Request) ([]*types.Hit, error) {
 	var hits []*types.Hit
-	col := Database(&types.Hit{}).Where("service = ?", s.Id).QuerySearch(r).Order("id desc")
+	col := Database(&types.Hit{}).Where("service = ?", s.Id).Requests(r)
 	err := col.Find(&hits)
 	return hits, err.Error()
 }
 
 func (s *Service) HitsDb(r *http.Request) database.Database {
-	return Database(&types.Hit{}).Where("service = ?", s.Id).QuerySearch(r).Order("id desc")
+	return Database(&types.Hit{}).Where("service = ?", s.Id).Requests(r).Order("id desc")
 }
 
 // Hits returns all successful hits for a service

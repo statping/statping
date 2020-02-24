@@ -20,7 +20,6 @@ import (
 	"github.com/ararog/timeago"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
-	"sort"
 	"time"
 )
 
@@ -94,8 +93,8 @@ func (c *Checkin) CreateFailure() (int64, error) {
 		PingTime: c.Expected().Seconds(),
 	}}
 	row := Database(&Failure{}).Create(&fail)
-	sort.Sort(types.FailSort(c.Failures))
-	c.Failures = append(c.Failures, fail)
+	//sort.Sort(types.FailSort(c.Failures))
+	//c.Failures = append(c.Failures, fail)
 	if len(c.Failures) > limitedFailures {
 		c.Failures = c.Failures[1:]
 	}
@@ -168,22 +167,26 @@ func (c *Checkin) AllHits() []*types.CheckinHit {
 }
 
 // Hits returns all of the CheckinHits for a given Checkin
-func (c *Checkin) LimitedFailures(amount int) []types.FailureInterface {
-	var failures []*Failure
-	var failInterfaces []types.FailureInterface
-	col := Database(&types.Failure{}).Where("checkin = ?", c.Id).Where("method = 'checkin'").Limit(amount).Order("id desc")
-	col.Find(&failures)
-	for _, f := range failures {
-		failInterfaces = append(failInterfaces, f)
-	}
-	return failInterfaces
-}
-
-// Hits returns all of the CheckinHits for a given Checkin
 func (c *Checkin) AllFailures() []*types.Failure {
 	var failures []*types.Failure
-	col := Database(&types.Failure{}).Where("checkin = ?", c.Id).Where("method = 'checkin'").Order("id desc")
-	col.Find(&failures)
+	Database(&types.Failure{}).
+		Where("checkin = ?", c.Id).
+		Where("method = 'checkin'").
+		Order("id desc").
+		Find(&failures)
+
+	return failures
+}
+
+func (c *Checkin) GetFailures(count int) []*types.Failure {
+	var failures []*types.Failure
+	Database(&types.Failure{}).
+		Where("checkin = ?", c.Id).
+		Where("method = 'checkin'").
+		Limit(count).
+		Order("id desc").
+		Find(&failures)
+
 	return failures
 }
 

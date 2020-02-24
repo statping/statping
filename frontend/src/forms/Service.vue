@@ -149,7 +149,7 @@
         </div>
         <div class="form-group row">
             <div class="col-12">
-                <button @click.prevent="saveService" type="submit" class="btn btn-success btn-block">
+                <button :disabled="loading" @click.prevent="saveService" type="submit" class="btn btn-success btn-block">
                     {{service.id ? "Update Service" : "Create Service"}}
                 </button>
             </div>
@@ -208,6 +208,7 @@
   methods: {
     async saveService() {
       let s = this.service
+        this.loading = true
       delete s.failures
       delete s.created_at
       delete s.updated_at
@@ -219,6 +220,10 @@
         } else {
             await this.createService(s)
         }
+        const services = await Api.services()
+        this.$store.commit('setServices', services)
+        this.loading = false
+        this.$router.push('/dashboard/services')
     },
     async createService(s) {
         await Api.service_create(s)

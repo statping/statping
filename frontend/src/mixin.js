@@ -93,5 +93,19 @@ export default Vue.mixin({
           return "bars"
       }
     },
+    convertToChartData(data = [], multiplier=1, asInt=false) {
+      let newSet = [];
+      data.forEach((f) => {
+        let amount = f.amount * multiplier;
+        if (asInt) {
+          amount = amount.toFixed(0)
+        }
+        newSet.push({
+          x: f.timeframe,
+          y: amount
+        })
+      })
+      return {data: newSet}
+    }
   }
 });

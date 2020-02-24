@@ -18,9 +18,7 @@ package core
 import (
 	"fmt"
 	"github.com/ararog/timeago"
-	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
-	"net/http"
 	"sort"
 	"strings"
 	"time"
@@ -62,10 +60,6 @@ func (s *Service) AllFailures() []types.Failure {
 	return fails
 }
 
-func (s *Service) FailuresDb(r *http.Request) database.Database {
-	return Database(&types.Failure{}).Where("service = ?", s.Id).QuerySearch(r).Order("id desc")
-}
-
 // DeleteFailures will delete all failures for a service
 func (s *Service) DeleteFailures() {
 	err := DbSession.Exec(`DELETE FROM failures WHERE service = ?`, s.Id)
@@ -73,13 +67,6 @@ func (s *Service) DeleteFailures() {
 		log.Errorln(fmt.Sprintf("failed to delete all failures: %v", err))
 	}
 	s.Failures = nil
-}
-
-// LimitedFailures will return the last amount of failures from a service
-func (s *Service) LimitedFailures(amount int) []*Failure {
-	var failArr []*Failure
-	Database(&types.Failure{}).Where("service = ?", s.Id).Not("method = 'checkin'").Order("id desc").Limit(amount).Find(&failArr)
-	return failArr
 }
 
 // LimitedFailures will return the last amount of failures from a service

@@ -35,8 +35,6 @@ type Failure struct {
 
 type FailureInterface interface {
 	Select() *Failure
-	Ago() string        // Ago returns a human readable timestamp
-	ParseError() string // ParseError returns a human readable error for a service failure
 }
 
 // BeforeCreate for Failure will set CreatedAt to UTC

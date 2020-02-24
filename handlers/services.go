@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
@@ -151,56 +152,41 @@ func apiServiceRunningHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.ToInt(vars["id"]))
-	if service == nil {
+	service, err := database.Service(utils.ToInt(vars["id"]))
+	if err != nil {
 		sendErrorJson(errors.New("service data not found"), w, r)
 		return
 	}
-	groupQuery := parseGroupQuery(r)
 
-	obj := core.GraphHitsDataRaw(service, groupQuery, "latency")
+	groupQuery := database.ParseQueries(r, service.Hits())
+
+	obj := core.GraphData(groupQuery, &types.Hit{}, database.ByAverage("latency"))
 	returnJson(obj, w, r)
 }
 
 func apiServiceFailureDataHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.ToInt(vars["id"]))
-	if service == nil {
+	service, err := database.Service(utils.ToInt(vars["id"]))
+	if err != nil {
 		sendErrorJson(errors.New("service data not found"), w, r)
 		return
 	}
-	groupQuery := parseGroupQuery(r)
+	groupQuery := database.ParseQueries(r, service.Failures())
 
-	obj := core.GraphFailuresDataRaw(service, groupQuery)
+	obj := core.GraphData(groupQuery, &types.Failure{}, database.ByCount)
 	returnJson(obj, w, r)
-}
-
-func parseGroupQuery(r *http.Request) *types.GroupQuery {
-	fields := parseGet(r)
-	grouping := fields.Get("group")
-	if grouping == "" {
-		grouping = "hour"
-	}
-	startField := utils.ToInt(fields.Get("start"))
-	endField := utils.ToInt(fields.Get("end"))
-
-	return &types.GroupQuery{
-		Start: time.Unix(startField, 0).UTC(),
-		End:   time.Unix(endField, 0).UTC(),
-		Group: grouping,
-	}
 }
 
 func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.ToInt(vars["id"]))
-	if service == nil {
-		sendErrorJson(errors.New("service not found"), w, r)
+	service, err := database.Service(utils.ToInt(vars["id"]))
+	if err != nil {
+		sendErrorJson(errors.New("service data not found"), w, r)
 		return
 	}
-	groupQuery := parseGroupQuery(r)
+	groupQuery := database.ParseQueries(r, service.Hits())
 
-	obj := core.GraphHitsDataRaw(service, groupQuery, "ping_time")
+	obj := core.GraphData(groupQuery, &types.Hit{}, database.ByAverage("ping_time"))
 	returnJson(obj, w, r)
 }
 
@@ -301,24 +287,26 @@ func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiServiceFailuresHandler(r *http.Request) interface{} {
 	vars := mux.Vars(r)
-	servicer := core.SelectService(utils.ToInt(vars["id"]))
-	if servicer == nil {
+
+	service, err := database.Service(utils.ToInt(vars["id"]))
+	if err != nil {
 		return errors.New("service not found")
 	}
-	fails := servicer.LimitedFailures(100)
+
+	var fails []types.Failure
+	service.Failures().Requests(r).Find(&fails)
 	return fails
 }
 
 func apiServiceHitsHandler(r *http.Request) interface{} {
 	vars := mux.Vars(r)
-	servicer := core.SelectService(utils.ToInt(vars["id"]))
-	if servicer == nil {
+	service, err := database.Service(utils.ToInt(vars["id"]))
+	if err != nil {
 		return errors.New("service not found")
 	}
-	hits, err := servicer.HitsDb(r).Hits()
-	if err != nil {
-		return err
-	}
+
+	var hits []types.Hit
+	service.Hits().Find(&hits)
 	return hits
 }
 

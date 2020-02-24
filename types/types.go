@@ -19,13 +19,6 @@ import (
 	"time"
 )
 
-type GroupQuery struct {
-	Id    int64
-	Start time.Time
-	End   time.Time
-	Group string
-}
-
 // Hit struct is a 'successful' ping or web response entry for a service.
 type Hit struct {
 	Id        int64     `gorm:"primary_key;column:id" json:"id"`
@@ -49,7 +42,7 @@ type DbConfig struct {
 	DbHost      string `yaml:"host" json:"-"`
 	DbUser      string `yaml:"user" json:"-"`
 	DbPass      string `yaml:"password" json:"-"`
-	DbData      string `yaml:"Db" json:"-"`
+	DbData      string `yaml:"database" json:"-"`
 	DbPort      int64  `yaml:"port" json:"-"`
 	ApiKey      string `yaml:"api_key" json:"-"`
 	ApiSecret   string `yaml:"api_secret" json:"-"`
