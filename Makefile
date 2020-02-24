@@ -61,7 +61,7 @@ build-debug: compile
 
 # install Statping for local arch and move binary to gopath/src/bin/statping
 install: build
-	mv $(BINARY_NAME) $(GOPATH)/bin/$(BINARY_NAME)
+	mv ./$(BINARY_NAME) $(GOPATH)/bin/$(BINARY_NAME)
 	$(GOPATH)/bin/$(BINARY_NAME) version
 
 # run Statping from local arch
