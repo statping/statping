@@ -30,11 +30,11 @@ type User struct {
 	Admin         NullBool  `gorm:"column:administrator" json:"admin,omitempty"`
 	CreatedAt     time.Time `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt     time.Time `gorm:"column:updated_at" json:"updated_at"`
-	UserInterface `gorm:"-" json:"-"`
+	DatabaseInter `gorm:"-" json:"-"`
 }
 
 // UserInterface interfaces the Db functions
-type UserInterface interface {
+type DatabaseInter interface {
 	Create() (int64, error)
 	Update() error
 	Delete() error

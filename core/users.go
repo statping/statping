@@ -17,6 +17,7 @@ package core
 
 import (
 	"fmt"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"golang.org/x/crypto/bcrypt"
@@ -56,14 +57,14 @@ func SelectUsername(username string) (*User, error) {
 
 // Delete will remove the User record from the database
 func (u *User) Delete() error {
-	return Database(&User{}).Delete(u).Error()
+	return database.Delete(&u)
 }
 
 // Update will update the User's record in database
 func (u *User) Update() error {
 	u.ApiKey = utils.NewSHA1Hash(5)
 	u.ApiSecret = utils.NewSHA1Hash(10)
-	return Database(&User{}).Update(u).Error()
+	return database.Update(&u)
 }
 
 // Create will insert a new User into the database
@@ -72,15 +73,16 @@ func (u *User) Create() (int64, error) {
 	u.Password = utils.HashPassword(u.Password)
 	u.ApiKey = utils.NewSHA1Hash(5)
 	u.ApiSecret = utils.NewSHA1Hash(10)
-	db := Database(&User{}).Create(u)
-	if db.Error() != nil {
-		return 0, db.Error()
+
+	user, err := database.Create(&u)
+	if err != nil {
+		return 0, err
 	}
-	if u.Id == 0 {
-		log.Errorln(fmt.Sprintf("Failed to create User %v. %v", u.Username, db.Error()))
-		return 0, db.Error()
+	if user.Id == 0 {
+		log.Errorln(fmt.Sprintf("Failed to create User %v. %v", u.Username, err))
+		return 0, err
 	}
-	return u.Id, db.Error()
+	return u.Id, err
 }
 
 // SelectAllUsers returns all users

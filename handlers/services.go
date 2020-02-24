@@ -150,7 +150,7 @@ func apiServiceRunningHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonAction(service, "running", w, r)
 }
 
-func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
+func apiServiceDataHandler(w Responder, r *http.Request) {
 	vars := mux.Vars(r)
 	service, err := database.Service(utils.ToInt(vars["id"]))
 	if err != nil {
@@ -158,7 +158,7 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	groupQuery := database.ParseQueries(r, service.Hits())
+	groupQuery := database.ParseQueries(r, service.Hits().DB)
 
 	obj := core.GraphData(groupQuery, &types.Hit{}, database.ByAverage("latency"))
 	returnJson(obj, w, r)
@@ -171,7 +171,7 @@ func apiServiceFailureDataHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(errors.New("service data not found"), w, r)
 		return
 	}
-	groupQuery := database.ParseQueries(r, service.Failures())
+	groupQuery := database.ParseQueries(r, service.Hits().DB)
 
 	obj := core.GraphData(groupQuery, &types.Failure{}, database.ByCount)
 	returnJson(obj, w, r)
@@ -184,7 +184,7 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(errors.New("service data not found"), w, r)
 		return
 	}
-	groupQuery := database.ParseQueries(r, service.Hits())
+	groupQuery := database.ParseQueries(r, service.Hits().DB)
 
 	obj := core.GraphData(groupQuery, &types.Hit{}, database.ByAverage("ping_time"))
 	returnJson(obj, w, r)
@@ -274,7 +274,7 @@ func joinServices(srvs []types.ServiceInterface) []*types.Service {
 	return services
 }
 
-func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
+func servicesDeleteFailuresHandler(w Responder, r *http.Request) {
 	vars := mux.Vars(r)
 	service := core.SelectService(utils.ToInt(vars["id"]))
 	if service == nil {
@@ -293,8 +293,12 @@ func apiServiceFailuresHandler(r *http.Request) interface{} {
 		return errors.New("service not found")
 	}
 
+	service.Hits()
+
+	service.Failures()
+
 	var fails []types.Failure
-	service.Failures().Requests(r).Find(&fails)
+	service.Failures().DB.Requests(r).Find(&fails)
 	return fails
 }
 
