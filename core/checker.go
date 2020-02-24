@@ -108,7 +108,7 @@ func (s *Service) parseHost() string {
 	}
 }
 
-// dnsCheck will check the domain name and return a float64 for the amount of time the Dnamespace check took
+// dnsCheck will check the domain name and return a float64 for the amount of time the DNS check took
 func (s *Service) dnsCheck() (float64, error) {
 	var err error
 	t1 := time.Now()
