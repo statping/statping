@@ -25,20 +25,7 @@ import (
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
-	"strconv"
 )
-
-func usersHandler(w http.ResponseWriter, r *http.Request) {
-	users, _ := core.SelectAllUsers()
-	ExecuteResponse(w, r, "users.gohtml", users, nil)
-}
-
-func usersEditHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, _ := strconv.Atoi(vars["id"])
-	user, _ := core.SelectUser(int64(id))
-	ExecuteResponse(w, r, "user.gohtml", user, nil)
-}
 
 func apiUserHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -92,11 +79,7 @@ func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-	users, err := core.SelectAllUsers()
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
+	users := core.SelectAllUsers()
 	returnJson(users, w, r)
 }
 

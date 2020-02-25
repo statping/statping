@@ -18,6 +18,7 @@ package core
 import (
 	"fmt"
 	"github.com/hunterlong/statping/database"
+	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"golang.org/x/crypto/bcrypt"
 	"time"
@@ -88,14 +89,9 @@ func (u *User) Create() (int64, error) {
 }
 
 // SelectAllUsers returns all users
-func SelectAllUsers() ([]*User, error) {
-	var users []*User
-	err := database.AllUsers(&users)
-	if err != nil {
-		log.Errorln(fmt.Sprintf("Failed to load all users. %v", err))
-		return nil, err
-	}
-	return users, err
+func SelectAllUsers() []*types.User {
+	users := database.AllUsers()
+	return users
 }
 
 // AuthUser will return the User and a boolean if authentication was correct.

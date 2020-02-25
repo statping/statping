@@ -178,11 +178,10 @@ func catchCLI(args []string) error {
 func ExportIndexHTML() []byte {
 	source.Assets()
 	core.CoreApp.Connect(false, utils.Directory)
-	core.CoreApp.SelectAllServices(false)
+	core.SelectAllServices(false)
 	core.CoreApp.UseCdn = types.NewNullBool(true)
-	for _, srv := range core.CoreApp.Services {
-		service := srv.(*core.Service)
-		service.Check(true)
+	for _, srv := range core.Services() {
+		core.CheckService(srv, true)
 	}
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("GET", "/", nil)
@@ -220,12 +219,12 @@ func runOnce() {
 	if err != nil {
 		fmt.Println("Core database was not found, Statping is not setup yet.")
 	}
-	_, err = core.CoreApp.SelectAllServices(true)
+	_, err = core.SelectAllServices(true)
 	if err != nil {
 		log.Errorln(err)
 	}
-	for _, out := range core.CoreApp.Services {
-		out.Check(true)
+	for _, srv := range core.Services() {
+		core.CheckService(srv, true)
 	}
 }
 

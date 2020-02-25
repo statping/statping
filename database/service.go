@@ -159,17 +159,22 @@ func (s *ServiceObj) UpdateStats() *types.Stats {
 
 // AvgTime will return the average amount of time for a service to response back successfully
 func (s *ServiceObj) AvgTime() float64 {
-	var sum float64
+	var sum []float64
 	database.Hits().
 		Select("AVG(latency) as amount").
 		Where("service = ?", s.Id).Pluck("amount", &sum).Debug()
+
+	sumTotal := float64(0)
+	for _, v := range sum {
+		sumTotal += v
+	}
 
 	total := s.Hits().Count()
 
 	if total == 0 {
 		return 0
 	}
-	avg := sum / float64(total) * 100
+	avg := sumTotal / float64(total) * 100
 	f, _ := strconv.ParseFloat(fmt.Sprintf("%0.0f", avg*10), 32)
 	return f
 }

@@ -21,9 +21,10 @@ func UserByUsername(username string) (*UserObj, error) {
 	return &UserObj{User: &user, o: wrapObject(user.Id, &user, query)}, finder.Error()
 }
 
-func AllUsers(input interface{}) error {
-	err := database.Users().Find(&input)
-	return err.Error()
+func AllUsers() []*types.User {
+	var users []*types.User
+	database.Users().Find(&users)
+	return users
 }
 
 func (u *UserObj) object() *Object {

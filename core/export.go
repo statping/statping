@@ -16,6 +16,8 @@
 package core
 
 import (
+	"encoding/json"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 )
 
@@ -39,21 +41,19 @@ type ExportData struct {
 // - Services
 // - Groups
 // - Messages
-//func ExportSettings() ([]byte, error) {
-//	users, err := SelectAllUsers()
-//	messages, err := SelectMessages()
-//	if err != nil {
-//		return nil, err
-//	}
-//	data := ExportData{
-//		Core:      CoreApp.Core,
-//		Notifiers: CoreApp.Notifications,
-//		Checkins:  database.AllCheckins(),
-//		Users:     database.AllUsers(),
-//		Services:  CoreApp.Services,
-//		Groups:    SelectGroups(true, true),
-//		Messages:  messages,
-//	}
-//	export, err := json.Marshal(data)
-//	return export, err
-//}
+func ExportSettings() ([]byte, error) {
+	users := database.AllUsers()
+	messages := database.AllMessages()
+
+	data := ExportData{
+		Core:      CoreApp.Core,
+		Notifiers: CoreApp.Notifications,
+		//Checkins:  database.AllCheckins(),
+		Users:     users,
+		//Services:  CoreApp.Services,
+		//Groups:    SelectGroups(true, true),
+		Messages:  messages,
+	}
+	export, err := json.Marshal(data)
+	return export, err
+}
