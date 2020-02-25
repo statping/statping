@@ -195,7 +195,7 @@ func insertSampleGroups() error {
 func insertSampleCheckins() error {
 	s1 := SelectService(1)
 	checkin1 := &types.Checkin{
-		ServiceId:   s1.Id,
+		ServiceId:   s1.Model().Id,
 		Interval:    300,
 		GracePeriod: 300,
 	}
@@ -206,7 +206,7 @@ func insertSampleCheckins() error {
 
 	s2 := SelectService(1)
 	checkin2 := &types.Checkin{
-		ServiceId:   s2.Id,
+		ServiceId:   s2.Model().Id,
 		Interval:    900,
 		GracePeriod: 300,
 	}
@@ -240,7 +240,7 @@ func InsertSampleHits() error {
 		sg.Add(1)
 		service := SelectService(i)
 		seed := time.Now().UnixNano()
-		log.Infoln(fmt.Sprintf("Adding %v sample hit records to service %v", SampleHits, service.Name))
+		log.Infoln(fmt.Sprintf("Adding %v sample hit records to service %v", SampleHits, service.Model().Name))
 		createdAt := sampleStart
 		p := utils.NewPerlin(2., 2., 10, seed)
 		go func() {
@@ -249,7 +249,7 @@ func InsertSampleHits() error {
 				latency := p.Noise1D(hi / 500)
 				createdAt = createdAt.Add(60 * time.Second)
 				hit := &types.Hit{
-					Service:   service.Id,
+					Service:   service.Model().Id,
 					CreatedAt: createdAt,
 					Latency:   latency,
 				}
@@ -527,14 +527,14 @@ func InsertLargeSampleData() error {
 func insertFailureRecords(since time.Time, amount int) {
 	for i := int64(14); i <= 15; i++ {
 		service := SelectService(i)
-		log.Infoln(fmt.Sprintf("Adding %v Failure records to service %v", amount, service.Name))
+		log.Infoln(fmt.Sprintf("Adding %v Failure records to service %v", amount, service.Model().Name))
 		createdAt := since
 
 		for fi := 1; fi <= amount; fi++ {
 			createdAt = createdAt.Add(2 * time.Minute)
 
 			failure := &types.Failure{
-				Service:   service.Id,
+				Service:   service.Model().Id,
 				Issue:     "testing right here",
 				CreatedAt: createdAt,
 			}
@@ -548,14 +548,14 @@ func insertFailureRecords(since time.Time, amount int) {
 func insertHitRecords(since time.Time, amount int) {
 	for i := int64(1); i <= 15; i++ {
 		service := SelectService(i)
-		log.Infoln(fmt.Sprintf("Adding %v hit records to service %v", amount, service.Name))
+		log.Infoln(fmt.Sprintf("Adding %v hit records to service %v", amount, service.Model().Name))
 		createdAt := since
 		p := utils.NewPerlin(2, 2, 5, time.Now().UnixNano())
 		for hi := 1; hi <= amount; hi++ {
 			latency := p.Noise1D(float64(hi / 10))
 			createdAt = createdAt.Add(1 * time.Minute)
 			hit := &types.Hit{
-				Service:   service.Id,
+				Service:   service.Model().Id,
 				CreatedAt: createdAt.UTC(),
 				Latency:   latency,
 			}

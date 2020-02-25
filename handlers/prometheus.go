@@ -18,6 +18,7 @@ package handlers
 import (
 	"fmt"
 	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/database"
 	"net/http"
 	"strings"
 )
@@ -34,11 +35,12 @@ import (
 
 func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 	metrics := []string{}
-	system := fmt.Sprintf("statping_total_failures %v\n", core.CountFailures())
-	system += fmt.Sprintf("statping_total_services %v", len(core.CoreApp.Services))
+	allFails := database.AllFailures()
+	system := fmt.Sprintf("statping_total_failures %v\n", allFails)
+	system += fmt.Sprintf("statping_total_services %v", len(core.Services()))
 	metrics = append(metrics, system)
-	for _, ser := range core.CoreApp.Services {
-		v := ser.Select()
+	for _, ser := range core.Services() {
+		v := ser.Model()
 		online := 1
 		if !v.Online {
 			online = 0

@@ -18,6 +18,7 @@ package handlers
 import (
 	"errors"
 	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
@@ -106,13 +107,13 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	admin := core.ReturnUser(&types.User{
+	admin := &types.User{
 		Username: config.Username,
 		Password: config.Password,
 		Email:    config.Email,
 		Admin:    types.NewNullBool(true),
-	})
-	admin.Create()
+	}
+	database.Create(admin)
 
 	if sample {
 		if err = core.SampleData(); err != nil {

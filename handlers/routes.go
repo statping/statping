@@ -115,7 +115,6 @@ func Router() *mux.Router {
 	// API SERVICE Routes
 	api.Handle("/api/services", scoped(apiAllServicesHandler)).Methods("GET")
 	api.Handle("/api/services", authenticated(apiCreateServiceHandler, false)).Methods("POST")
-	api.Handle("/api/services_test", authenticated(apiTestServiceHandler, false)).Methods("POST")
 	api.Handle("/api/services/{id}", scoped(apiServiceHandler)).Methods("GET")
 	api.Handle("/api/reorder/services", authenticated(reorderServiceHandler, false)).Methods("POST")
 	api.Handle("/api/services/{id}/running", authenticated(apiServiceRunningHandler, false)).Methods("POST")
@@ -129,7 +128,7 @@ func Router() *mux.Router {
 	api.Handle("/api/services/{id}/hits_data", cached("30s", "application/json", apiServiceDataHandler)).Methods("GET")
 	api.Handle("/api/services/{id}/failure_data", cached("30s", "application/json", apiServiceFailureDataHandler)).Methods("GET")
 	api.Handle("/api/services/{id}/ping_data", cached("30s", "application/json", apiServicePingDataHandler)).Methods("GET")
-	api.Handle("/api/services/{id}/heatmap", cached("30s", "application/json", apiServiceHeatmapHandler)).Methods("GET")
+	//api.Handle("/api/services/{id}/heatmap", cached("30s", "application/json", apiServiceHeatmapHandler)).Methods("GET")
 
 	// API INCIDENTS Routes
 	api.Handle("/api/incidents", readOnly(apiAllIncidentsHandler, false)).Methods("GET")

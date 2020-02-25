@@ -20,7 +20,7 @@ import (
 	"errors"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
 )
@@ -29,15 +29,7 @@ import (
 func apiAllGroupHandler(r *http.Request) interface{} {
 	auth, admin := IsUser(r), IsAdmin(r)
 	groups := core.SelectGroups(admin, auth)
-	return joinGroups(groups)
-}
-
-func joinGroups(groups []*core.Group) []*types.Group {
-	var g []*types.Group
-	for _, v := range groups {
-		g = append(g, v.Group)
-	}
-	return g
+	return groups
 }
 
 // apiGroupHandler will show a single group
@@ -61,7 +53,7 @@ func apiGroupUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&group)
-	_, err := group.Update()
+	err := database.Update(group)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -78,7 +70,7 @@ func apiCreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	_, err = group.Create()
+	_, err = database.Create(group)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -94,7 +86,7 @@ func apiGroupDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(errors.New("group not found"), w, r)
 		return
 	}
-	err := group.Delete()
+	err := database.Delete(group)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -115,7 +107,7 @@ func apiGroupReorderHandler(w http.ResponseWriter, r *http.Request) {
 	for _, g := range newOrder {
 		group := core.SelectGroup(g.Id)
 		group.Order = g.Order
-		group.Update()
+		database.Update(group)
 	}
 	returnJson(newOrder, w, r)
 }

@@ -168,8 +168,6 @@ func (c *Checkin) Create() (int64, error) {
 		log.Warnln(err)
 		return 0, err
 	}
-	service := SelectService(c.ServiceId)
-	service.Checkins = append(service.Checkins, c)
 	c.Start()
 	go CheckinRoutine(c)
 	return c.Id, err

@@ -35,11 +35,11 @@ func Services() []database.Servicer {
 }
 
 // SelectService returns a *core.Service from in memory
-func SelectService(id int64) *types.Service {
+func SelectService(id int64) database.Servicer {
 	for _, s := range Services() {
 		if s.Model().Id == id {
 			fmt.Println("service: ", s.Model())
-			return s.Model()
+			return s
 		}
 	}
 	return nil

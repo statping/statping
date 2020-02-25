@@ -16,17 +16,14 @@
 package handlers
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -149,28 +146,28 @@ func logsLineHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func exportHandler(w http.ResponseWriter, r *http.Request) {
-	var notifiers []*notifier.Notification
-	for _, v := range core.CoreApp.Notifications {
-		notifier := v.(notifier.Notifier)
-		notifiers = append(notifiers, notifier.Select())
-	}
-
-	export, _ := core.ExportSettings()
-
-	mime := http.DetectContentType(export)
-	fileSize := len(string(export))
-
-	w.Header().Set("Content-Type", mime)
-	w.Header().Set("Content-Disposition", "attachment; filename=export.json")
-	w.Header().Set("Expires", "0")
-	w.Header().Set("Content-Transfer-Encoding", "binary")
-	w.Header().Set("Content-Length", strconv.Itoa(fileSize))
-	w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
-
-	http.ServeContent(w, r, "export.json", utils.Now(), bytes.NewReader(export))
-
-}
+//func exportHandler(w http.ResponseWriter, r *http.Request) {
+//	var notifiers []*notifier.Notification
+//	for _, v := range core.CoreApp.Notifications {
+//		notifier := v.(notifier.Notifier)
+//		notifiers = append(notifiers, notifier.Select())
+//	}
+//
+//	export, _ := core.ExportSettings()
+//
+//	mime := http.DetectContentType(export)
+//	fileSize := len(string(export))
+//
+//	w.Header().Set("Content-Type", mime)
+//	w.Header().Set("Content-Disposition", "attachment; filename=export.json")
+//	w.Header().Set("Expires", "0")
+//	w.Header().Set("Content-Transfer-Encoding", "binary")
+//	w.Header().Set("Content-Length", strconv.Itoa(fileSize))
+//	w.Header().Set("Content-Control", "private, no-transform, no-store, must-revalidate")
+//
+//	http.ServeContent(w, r, "export.json", utils.Now(), bytes.NewReader(export))
+//
+//}
 
 type JwtClaim struct {
 	Username string `json:"username"`

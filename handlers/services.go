@@ -18,42 +18,13 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
-	"time"
 )
-
-func renderServiceChartsHandler(w http.ResponseWriter, r *http.Request) {
-	services := core.CoreApp.Services
-	w.Header().Set("Content-Type", "text/javascript")
-	w.Header().Set("Cache-Control", "max-age=60")
-
-	end := utils.Now().UTC()
-	start := utils.Now().Add((-24 * 7) * time.Hour).UTC()
-	var srvs []*core.Service
-	for _, s := range services {
-		srvs = append(srvs, s.(*core.Service))
-	}
-	out := struct {
-		Services []*core.Service
-		Start    int64
-		End      int64
-	}{srvs, start.Unix(), end.Unix()}
-
-	executeJSResponse(w, r, "charts.js", out)
-}
-
-func servicesHandler(w http.ResponseWriter, r *http.Request) {
-	data := map[string]interface{}{
-		"Services": core.CoreApp.Services,
-	}
-	ExecuteResponse(w, r, "services.gohtml", data, nil)
-}
 
 type serviceOrder struct {
 	Id    int64 `json:"service"`
@@ -66,20 +37,20 @@ func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&newOrder)
 	for _, s := range newOrder {
-		service := core.SelectService(s.Id)
+		service := core.SelectService(s.Id).Model()
 		service.Order = s.Order
-		service.Update(false)
+		database.Update(service)
 	}
 	returnJson(newOrder, w, r)
 }
 
 func apiServiceHandler(r *http.Request) interface{} {
 	vars := mux.Vars(r)
-	servicer := core.SelectService(utils.ToInt(vars["id"]))
+	servicer := core.SelectService(utils.ToInt(vars["id"])).Model()
 	if servicer == nil {
 		return errors.New("service not found")
 	}
-	return *servicer.Select()
+	return *servicer
 }
 
 func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -90,13 +61,12 @@ func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	newService := core.ReturnService(service)
-	_, err = newService.Create(true)
+	_, err = database.Create(service)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	sendJsonAction(newService, "create", w, r)
+	sendJsonAction(service, "create", w, r)
 }
 
 func apiTestServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -108,13 +78,12 @@ func apiTestServiceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newService := core.ReturnService(service)
-	_, err = newService.Create(true)
+	_, err = database.Create(service)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	sendJsonAction(newService, "create", w, r)
+	sendJsonAction(service, "create", w, r)
 }
 
 func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -126,18 +95,19 @@ func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&service)
-	err := service.Update(true)
+	err := database.Update(service)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	go service.Check(true)
+	go core.CheckService(service, true)
 	sendJsonAction(service, "update", w, r)
 }
 
 func apiServiceRunningHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.ToInt(vars["id"]))
+	srv := core.SelectService(utils.ToInt(vars["id"]))
+	service := srv.Model()
 	if service == nil {
 		sendErrorJson(errors.New("service not found"), w, r)
 		return
@@ -200,52 +170,6 @@ type dataXyMonth struct {
 	Data []*dataXy `json:"data"`
 }
 
-func apiServiceHeatmapHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	service := core.SelectService(utils.ToInt(vars["id"]))
-	if service == nil {
-		sendErrorJson(errors.New("service data not found"), w, r)
-		return
-	}
-
-	var monthOutput []*dataXyMonth
-
-	start := service.CreatedAt
-	//now := utils.Now()
-
-	sY, sM, _ := start.Date()
-
-	var date time.Time
-
-	month := int(sM)
-	maxMonth := 12
-
-	for year := int(sY); year <= utils.Now().Year(); year++ {
-
-		if year == utils.Now().Year() {
-			maxMonth = int(utils.Now().Month())
-		}
-
-		for m := month; m <= maxMonth; m++ {
-
-			var output []*dataXy
-
-			for day := 1; day <= 31; day++ {
-				date = time.Date(year, time.Month(m), day, 0, 0, 0, 0, time.UTC)
-				failures, _ := service.TotalFailuresOnDate(date)
-				output = append(output, &dataXy{day, int(failures)})
-			}
-
-			thisDate := fmt.Sprintf("%v-%v-01 00:00:00", year, m)
-			monthOutput = append(monthOutput, &dataXyMonth{thisDate, output})
-		}
-
-		month = 1
-
-	}
-	returnJson(monthOutput, w, r)
-}
-
 func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	service := core.SelectService(utils.ToInt(vars["id"]))
@@ -253,7 +177,7 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(errors.New("service not found"), w, r)
 		return
 	}
-	err := service.Delete()
+	err := database.Delete(service)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -266,23 +190,27 @@ func apiAllServicesHandler(r *http.Request) interface{} {
 	return joinServices(services)
 }
 
-func joinServices(srvs []types.ServiceInterface) []*types.Service {
+func joinServices(srvs []database.Servicer) []*types.Service {
 	var services []*types.Service
 	for _, v := range srvs {
-		services = append(services, v.Select())
+		services = append(services, v.Model())
 	}
 	return services
 }
 
 func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	service := core.SelectService(utils.ToInt(vars["id"]))
-	if service == nil {
+	srv, err := database.Service(utils.ToInt(vars["id"]))
+	if err != nil {
 		sendErrorJson(errors.New("service not found"), w, r)
 		return
 	}
-	service.DeleteFailures()
-	sendJsonAction(service, "delete_failures", w, r)
+	err = srv.Failures().DeleteAll()
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	sendJsonAction(srv.Model(), "delete_failures", w, r)
 }
 
 func apiServiceFailuresHandler(r *http.Request) interface{} {

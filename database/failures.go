@@ -23,6 +23,12 @@ func (f *FailureObj) All() []*types.Failure {
 	return fails
 }
 
+func AllFailures() int {
+	var amount int
+	database.Failures().Count(&amount)
+	return amount
+}
+
 func (f *FailureObj) DeleteAll() error {
 	query := database.Exec(`DELETE FROM failures WHERE service = ?`, f.o.Id)
 	return query.Error()

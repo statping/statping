@@ -40,10 +40,7 @@ func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	out := checkin.Model()
-
-	out.Hits = checkin.Hits()
-	out.Failures = checkin.Failures(32)
-	returnJson(checkin, w, r)
+	returnJson(out, w, r)
 }
 
 func checkinCreateHandler(w http.ResponseWriter, r *http.Request) {
@@ -69,8 +66,8 @@ func checkinCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	checkin := core.SelectCheckin(vars["api"])
-	if checkin == nil {
+	checkin, err := database.CheckinByKey(vars["api"])
+	if err != nil {
 		sendErrorJson(fmt.Errorf("checkin %v was not found", vars["api"]), w, r)
 		return
 	}
@@ -81,20 +78,14 @@ func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
 		From:      ip,
 		CreatedAt: utils.Now().UTC(),
 	}
-	checkinHit := core.ReturnCheckinHit(hit)
-	if checkin.Last() == nil {
-		checkin.Start()
-		go checkin.Routine()
-	}
-	_, err := checkinHit.Create()
-	checkin.Hits = append(checkin.Hits, checkinHit.CheckinHit)
+	newCheck, err := database.Create(hit)
 	if err != nil {
-		sendErrorJson(err, w, r)
+		sendErrorJson(fmt.Errorf("checkin %v was not found", vars["api"]), w, r)
 		return
 	}
 	checkin.Failing = false
 	checkin.LastHit = utils.Timezoner(utils.Now().UTC(), core.CoreApp.Timezone)
-	sendJsonAction(checkinHit, "update", w, r)
+	sendJsonAction(newCheck.Id, "update", w, r)
 }
 
 func checkinDeleteHandler(w http.ResponseWriter, r *http.Request) {

@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
@@ -107,11 +108,10 @@ func apiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	newUser := core.ReturnUser(user)
-	_, err = newUser.Create()
+	_, err = database.Create(user)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	sendJsonAction(newUser, "create", w, r)
+	sendJsonAction(user, "create", w, r)
 }
