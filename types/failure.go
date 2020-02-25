@@ -33,10 +33,6 @@ type Failure struct {
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 }
 
-type FailureInterface interface {
-	Select() *Failure
-}
-
 // BeforeCreate for Failure will set CreatedAt to UTC
 func (f *Failure) BeforeCreate() (err error) {
 	if f.CreatedAt.IsZero() {
@@ -45,7 +41,7 @@ func (f *Failure) BeforeCreate() (err error) {
 	return
 }
 
-type FailSort []FailureInterface
+type FailSort []Failure
 
 func (s FailSort) Len() int {
 	return len(s)
@@ -54,5 +50,5 @@ func (s FailSort) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 func (s FailSort) Less(i, j int) bool {
-	return s[i].Select().Id < s[j].Select().Id
+	return s[i].Id < s[j].Id
 }

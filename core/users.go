@@ -18,18 +18,17 @@ package core
 import (
 	"fmt"
 	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
 
 type User struct {
-	*types.User
+	*database.UserObj
 }
 
 // ReturnUser returns *core.User based off a *types.User
-func ReturnUser(u *types.User) *User {
+func uwrap(u *database.UserObj) *User {
 	return &User{u}
 }
 
@@ -42,29 +41,32 @@ func CountUsers() int64 {
 
 // SelectUser returns the User based on the User's ID.
 func SelectUser(id int64) (*User, error) {
-	var user User
-	err := Database(&User{}).Where("id = ?", id).First(&user)
-	return &user, err.Error()
+	user, err := database.User(id)
+	if err != nil {
+		return nil, err
+	}
+	return uwrap(user), err
 }
 
 // SelectUsername returns the User based on the User's username
 func SelectUsername(username string) (*User, error) {
-	var user User
-	res := Database(&User{}).Where("username = ?", username)
-	err := res.First(&user)
-	return &user, err.Error()
+	user, err := database.UserByUsername(username)
+	if err != nil {
+		return nil, err
+	}
+	return uwrap(user), err
 }
 
 // Delete will remove the User record from the database
 func (u *User) Delete() error {
-	return database.Delete(&u)
+	return database.Delete(u)
 }
 
 // Update will update the User's record in database
 func (u *User) Update() error {
 	u.ApiKey = utils.NewSHA1Hash(5)
 	u.ApiSecret = utils.NewSHA1Hash(10)
-	return database.Update(&u)
+	return database.Update(u)
 }
 
 // Create will insert a new User into the database
@@ -74,7 +76,7 @@ func (u *User) Create() (int64, error) {
 	u.ApiKey = utils.NewSHA1Hash(5)
 	u.ApiSecret = utils.NewSHA1Hash(10)
 
-	user, err := database.Create(&u)
+	user, err := database.Create(u)
 	if err != nil {
 		return 0, err
 	}
@@ -88,12 +90,12 @@ func (u *User) Create() (int64, error) {
 // SelectAllUsers returns all users
 func SelectAllUsers() ([]*User, error) {
 	var users []*User
-	db := Database(&User{}).Find(&users)
-	if db.Error() != nil {
-		log.Errorln(fmt.Sprintf("Failed to load all users. %v", db.Error()))
-		return nil, db.Error()
+	err := database.AllUsers(&users)
+	if err != nil {
+		log.Errorln(fmt.Sprintf("Failed to load all users. %v", err))
+		return nil, err
 	}
-	return users, db.Error()
+	return users, err
 }
 
 // AuthUser will return the User and a boolean if authentication was correct.

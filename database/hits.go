@@ -1,30 +1,38 @@
 package database
 
-import "github.com/hunterlong/statping/types"
+import (
+	"github.com/hunterlong/statping/types"
+	"time"
+)
 
-type hits struct {
-	DB Database
+type HitObj struct {
+	o *Object
 }
 
-func (h *hits) All() []*types.Hit {
+func (h *HitObj) All() []*types.Hit {
 	var fails []*types.Hit
-	h.DB = h.DB.Find(&fails)
+	h.o.db.Find(&fails)
 	return fails
 }
 
-func (h *hits) Last(amount int) *types.Hit {
+func (h *HitObj) Last(amount int) *types.Hit {
 	var hits types.Hit
-	h.DB = h.DB.Limit(amount).Find(&hits)
+	h.o.db.Limit(amount).Find(&hits)
 	return &hits
 }
 
-func (h *hits) Count() int {
+func (h *HitObj) Since(t time.Time) []*types.Hit {
+	var hits []*types.Hit
+	h.o.db.Since(t).Find(&hits)
+	return hits
+}
+
+func (h *HitObj) Count() int {
 	var amount int
-	h.DB = h.DB.Count(&amount)
+	h.o.db.Count(&amount)
 	return amount
 }
 
-func (h *hits) Find(data interface{}) error {
-	q := h.Find(&data)
-	return q
+func (h *HitObj) object() *Object {
+	return h.o
 }

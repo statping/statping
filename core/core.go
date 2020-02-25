@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"github.com/hunterlong/statping/core/integrations"
 	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/notifiers"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
@@ -34,6 +35,7 @@ type PluginRepos types.PluginRepos
 
 type Core struct {
 	*types.Core
+	services []database.Servicer
 }
 
 var (
@@ -48,7 +50,7 @@ func init() {
 
 // NewCore return a new *core.Core struct
 func NewCore() *Core {
-	CoreApp = &Core{&types.Core{
+	CoreApp = &Core{Core: &types.Core{
 		Started: time.Now().UTC(),
 	},
 	}
@@ -65,7 +67,7 @@ func InitApp() {
 	SelectCore()
 	InsertNotifierDB()
 	InsertIntegratorDB()
-	CoreApp.SelectAllServices(true)
+	SelectAllServices(true)
 	checkServices()
 	AttachNotifiers()
 	AddIntegrations()
@@ -150,16 +152,6 @@ func (c Core) MobileSASS() string {
 	return source.OpenAsset("scss/mobile.scss")
 }
 
-// AllOnline will be true if all services are online
-func (c Core) AllOnline() bool {
-	for _, s := range CoreApp.Services {
-		if !s.Select().Online {
-			return false
-		}
-	}
-	return true
-}
-
 // SelectCore will return the CoreApp global variable and the settings/configs for Statping
 func SelectCore() (*Core, error) {
 	if DbSession == nil {
@@ -222,9 +214,9 @@ func AddIntegrations() error {
 }
 
 // ServiceOrder will reorder the services based on 'order_id' (Order)
-type ServiceOrder []types.ServiceInterface
+type ServiceOrder []database.Servicer
 
 // Sort interface for resroting the Services in order
 func (c ServiceOrder) Len() int           { return len(c) }
 func (c ServiceOrder) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
-func (c ServiceOrder) Less(i, j int) bool { return c[i].(*Service).Order < c[j].(*Service).Order }
+func (c ServiceOrder) Less(i, j int) bool { return c[i].Model().Order < c[j].Model().Order }

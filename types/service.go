@@ -46,8 +46,7 @@ type Service struct {
 	Online24Hours       float32            `gorm:"-" json:"online_24_hours"`
 	Online7Days         float32            `gorm:"-" json:"online_7_days"`
 	AvgResponse         float64            `gorm:"-" json:"avg_response"`
-	FailuresLast24Hours uint64             `gorm:"-" json:"failures_24_hours"`
-	LastFailure         FailureInterface   `gorm:"-" json:"last_failure,omitempty"`
+	FailuresLast24Hours int                `gorm:"-" json:"failures_24_hours"`
 	Running             chan bool          `gorm:"-" json:"-"`
 	Checkpoint          time.Time          `gorm:"-" json:"-"`
 	SleepDuration       time.Duration      `gorm:"-" json:"-"`
@@ -59,9 +58,13 @@ type Service struct {
 	SuccessNotified     bool               `gorm:"-" json:"-"`                                                                          // Is 'true' if the user has already be informed that the Services now again available
 	LastStatusCode      int                `gorm:"-" json:"status_code"`
 	LastOnline          time.Time          `gorm:"-" json:"last_success"`
-	Failures            []FailureInterface `gorm:"-" json:"failures,omitempty" scope:"user,admin"`
+	Failures            []Failure          `gorm:"-" json:"failures,omitempty" scope:"user,admin"`
 	Checkins            []CheckinInterface `gorm:"-" json:"checkins,omitempty" scope:"user,admin"`
-	Stats               Stater             `gorm:"-" json:"stats,omitempty"`
+	Stats               *Stats             `gorm:"-" json:"stats,omitempty"`
+}
+
+type CheckinInterface interface {
+	Model() *Checkin
 }
 
 type Stater interface {
@@ -80,15 +83,6 @@ func (s *Service) BeforeCreate() (err error) {
 		s.UpdatedAt = time.Now().UTC()
 	}
 	return
-}
-
-type ServiceInterface interface {
-	Select() *Service
-	CheckQueue(bool)
-	Check(bool)
-	Create(bool) (int64, error)
-	Update(bool) error
-	Delete() error
 }
 
 // Start will create a channel for the service checking go routine

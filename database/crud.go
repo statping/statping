@@ -1,6 +1,8 @@
 package database
 
 import (
+	"fmt"
+	"github.com/hunterlong/statping/types"
 	"reflect"
 )
 
@@ -10,19 +12,32 @@ type Object struct {
 	db    Database
 }
 
-type HitsFailures interface {
-	Hits() *hits
-	Failures() *failures
+type isObject interface {
+	object() *Object
+}
+
+func wrapObject(id int64, model interface{}, db Database) *Object {
+	return &Object{
+		Id:    id,
+		model: model,
+		db:    db,
+	}
 }
 
 func modelId(model interface{}) int64 {
+	fmt.Printf("%T\n", model)
 	iface := reflect.ValueOf(model)
 	field := iface.Elem().FieldByName("Id")
 	return field.Int()
 }
 
 func toModel(model interface{}) Database {
-	return database.Model(&model)
+	switch model.(type) {
+	case *types.Core:
+		return database.Model(&types.Core{}).Table("core")
+	default:
+		return database.Model(&model)
+	}
 }
 
 func Create(data interface{}) (*Object, error) {

@@ -2,31 +2,50 @@ package database
 
 import (
 	"github.com/hunterlong/statping/types"
+	"time"
 )
 
-type failures struct {
-	DB Database
+type FailureObj struct {
+	o *Object
 }
 
-func (f *failures) All() []*types.Failure {
+type Failurer interface {
+	Model() []*types.Failure
+}
+
+func (f *FailureObj) Model() []*types.Failure {
+	return f.All()
+}
+
+func (f *FailureObj) All() []*types.Failure {
 	var fails []*types.Failure
-	f.DB = f.DB.Find(&fails)
+	f.o.db.Find(&fails)
 	return fails
 }
 
-func (f *failures) Last(amount int) *types.Failure {
+func (f *FailureObj) DeleteAll() error {
+	query := database.Exec(`DELETE FROM failures WHERE service = ?`, f.o.Id)
+	return query.Error()
+}
+
+func (f *FailureObj) Last(amount int) *types.Failure {
 	var fail types.Failure
-	f.DB = f.DB.Limit(amount).Find(&fail)
+	f.o.db.Limit(amount).Last(&fail)
 	return &fail
 }
 
-func (f *failures) Count() int {
+func (f *FailureObj) Count() int {
 	var amount int
-	f.DB = f.DB.Count(&amount)
+	f.o.db.Count(&amount)
 	return amount
 }
 
-func (f *failures) Find(data interface{}) error {
-	q := f.Find(&data)
-	return q
+func (f *FailureObj) Since(t time.Time) []*types.Failure {
+	var fails []*types.Failure
+	f.o.db.Since(t).Find(&fails)
+	return fails
+}
+
+func (f *FailureObj) object() *Object {
+	return f.o
 }

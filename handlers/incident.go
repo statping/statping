@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
 )
 
 func apiAllIncidentsHandler(w http.ResponseWriter, r *http.Request) {
-	incidents := core.AllIncidents()
+	incidents := database.AllIncidents()
 	returnJson(incidents, w, r)
 }
 

@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"bytes"
+	"encoding/json"
 	"github.com/hunterlong/statping/core"
 	"html/template"
 	"net/http"
@@ -12,37 +12,30 @@ var (
 	basePath = "/"
 )
 
-type HandlerFunc func(Responder, *Request)
-
-func (f HandlerFunc) ServeHTTP(w Responder, r *Request) {
-	f(w, r)
+type CustomResponseWriter struct {
+	body       []byte
+	statusCode int
+	header     http.Header
 }
 
-type Handler interface {
-	ServeHTTP(Responder, *Request)
+func NewCustomResponseWriter() *CustomResponseWriter {
+	return &CustomResponseWriter{
+		header: http.Header{},
+	}
 }
 
-type Responder struct {
-	Code      int           // the HTTP response code from WriteHeader
-	HeaderMap http.Header   // the HTTP response headers
-	Body      *bytes.Buffer // if non-nil, the bytes.Buffer to append written data to
-	Flushed   bool
+func (w *CustomResponseWriter) Header() http.Header {
+	return w.header
 }
 
-type Request struct {
-	*http.Request
+func (w *CustomResponseWriter) Write(b []byte) (int, error) {
+	w.body = b
+	// implement it as per your requirement
+	return 0, nil
 }
 
-func (r Responder) Header() http.Header {
-	return r.HeaderMap
-}
-
-func (r Responder) Write(p []byte) (int, error) {
-	return r.Body.Write(p)
-}
-
-func (r Responder) WriteHeader(statusCode int) {
-	r.Code = statusCode
+func (w *CustomResponseWriter) WriteHeader(statusCode int) {
+	w.statusCode = statusCode
 }
 
 func parseForm(r *http.Request) url.Values {
@@ -53,6 +46,20 @@ func parseForm(r *http.Request) url.Values {
 func parseGet(r *http.Request) url.Values {
 	r.ParseForm()
 	return r.Form
+}
+
+func decodeRequest(r *http.Request, object interface{}) error {
+	decoder := json.NewDecoder(r.Body)
+	defer r.Body.Close()
+	return decoder.Decode(&object)
+}
+
+type parsedObject struct {
+	Error Error
+}
+
+func serviceFromID(r *http.Request, object interface{}) error {
+	return nil
 }
 
 var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap {

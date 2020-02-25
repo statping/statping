@@ -36,10 +36,6 @@ type Checkin struct {
 	Failures    []*Failure    `gorm:"-" json:"failures"`
 }
 
-type CheckinInterface interface {
-	Select() *Checkin
-}
-
 // BeforeCreate for Checkin will set CreatedAt to UTC
 func (c *Checkin) BeforeCreate() (err error) {
 	if c.CreatedAt.IsZero() {

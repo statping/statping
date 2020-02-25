@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"github.com/tatsushid/go-fastping"
@@ -32,30 +33,31 @@ import (
 
 // checkServices will start the checking go routine for each service
 func checkServices() {
-	log.Infoln(fmt.Sprintf("Starting monitoring process for %v Services", len(CoreApp.Services)))
-	for _, ser := range CoreApp.Services {
-		//go obj.StartCheckins()
-		go ser.CheckQueue(true)
+	log.Infoln(fmt.Sprintf("Starting monitoring process for %v Services", len(CoreApp.services)))
+	for _, ser := range CoreApp.services {
+		//go CheckinRoutine()
+		go ServiceCheckQueue(ser, true)
 	}
 }
 
 // Check will run checkHttp for HTTP services and checkTcp for TCP services
 // if record param is set to true, it will add a record into the database.
-func (s *Service) Check(record bool) {
-	switch s.Type {
+func CheckService(srv database.Servicer, record bool) {
+	switch srv.Model().Type {
 	case "http":
-		s.CheckHttp(record)
+		CheckHttp(srv, record)
 	case "tcp", "udp":
-		s.CheckTcp(record)
+		CheckTcp(srv, record)
 	case "icmp":
-		s.CheckIcmp(record)
+		CheckIcmp(srv, record)
 	}
 }
 
 // CheckQueue is the main go routine for checking a service
-func (s *Service) CheckQueue(record bool) {
+func ServiceCheckQueue(srv database.Servicer, record bool) {
+	s := srv.Model()
 	s.Checkpoint = time.Now()
-	s.SleepDuration = time.Duration((time.Duration(s.Id) * 100) * time.Millisecond)
+	s.SleepDuration = (time.Duration(s.Id) * 100) * time.Millisecond
 CheckLoop:
 	for {
 		select {
@@ -63,11 +65,11 @@ CheckLoop:
 			log.Infoln(fmt.Sprintf("Stopping service: %v", s.Name))
 			break CheckLoop
 		case <-time.After(s.SleepDuration):
-			s.Check(record)
-			s.Checkpoint = s.Checkpoint.Add(s.duration())
+			CheckService(srv, record)
+			s.Checkpoint = s.Checkpoint.Add(srv.Interval())
 			sleep := s.Checkpoint.Sub(time.Now())
 			if !s.Online {
-				s.SleepDuration = s.duration()
+				s.SleepDuration = srv.Interval()
 			} else {
 				s.SleepDuration = sleep
 			}
@@ -77,17 +79,18 @@ CheckLoop:
 }
 
 // duration returns the amount of duration for a service to check its status
-func (s *Service) duration() time.Duration {
+func duration(s database.Servicer) time.Duration {
 	var amount time.Duration
-	if s.Interval >= 10000 {
-		amount = time.Duration(s.Interval) * time.Microsecond
+	if s.Interval() >= 10000 {
+		amount = s.Interval() * time.Microsecond
 	} else {
-		amount = time.Duration(s.Interval) * time.Second
+		amount = s.Interval() * time.Second
 	}
 	return amount
 }
 
-func (s *Service) parseHost() string {
+func parseHost(srv database.Servicer) string {
+	s := srv.Model()
 	if s.Type == "tcp" || s.Type == "udp" {
 		return s.Domain
 	} else {
@@ -100,10 +103,11 @@ func (s *Service) parseHost() string {
 }
 
 // dnsCheck will check the domain name and return a float64 for the amount of time the DNS check took
-func (s *Service) dnsCheck() (float64, error) {
+func dnsCheck(srv database.Servicer) (float64, error) {
+	s := srv.Model()
 	var err error
 	t1 := time.Now()
-	host := s.parseHost()
+	host := parseHost(srv)
 	if s.Type == "tcp" {
 		_, err = net.LookupHost(host)
 	} else {
@@ -122,7 +126,8 @@ func isIPv6(address string) bool {
 }
 
 // checkIcmp will send a ICMP ping packet to the service
-func (s *Service) CheckIcmp(record bool) *Service {
+func CheckIcmp(srv database.Servicer, record bool) *types.Service {
+	s := srv.Model()
 	p := fastping.NewPinger()
 	resolveIP := "ip4:icmp"
 	if isIPv6(s.Domain) {
@@ -130,7 +135,7 @@ func (s *Service) CheckIcmp(record bool) *Service {
 	}
 	ra, err := net.ResolveIPAddr(resolveIP, s.Domain)
 	if err != nil {
-		recordFailure(s, fmt.Sprintf("Could not send ICMP to service %v, %v", s.Domain, err))
+		recordFailure(srv, fmt.Sprintf("Could not send ICMP to service %v, %v", s.Domain, err))
 		return s
 	}
 	p.AddIPAddr(ra)
@@ -140,7 +145,7 @@ func (s *Service) CheckIcmp(record bool) *Service {
 	}
 	err = p.Run()
 	if err != nil {
-		recordFailure(s, fmt.Sprintf("Issue running ICMP to service %v, %v", s.Domain, err))
+		recordFailure(srv, fmt.Sprintf("Issue running ICMP to service %v, %v", s.Domain, err))
 		return s
 	}
 	s.LastResponse = ""
@@ -148,11 +153,12 @@ func (s *Service) CheckIcmp(record bool) *Service {
 }
 
 // checkTcp will check a TCP service
-func (s *Service) CheckTcp(record bool) *Service {
-	dnsLookup, err := s.dnsCheck()
+func CheckTcp(srv database.Servicer, record bool) *types.Service {
+	s := srv.Model()
+	dnsLookup, err := dnsCheck(srv)
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("Could not get IP address for TCP service %v, %v", s.Domain, err))
+			recordFailure(srv, fmt.Sprintf("Could not get IP address for TCP service %v, %v", s.Domain, err))
 		}
 		return s
 	}
@@ -168,13 +174,13 @@ func (s *Service) CheckTcp(record bool) *Service {
 	conn, err := net.DialTimeout(s.Type, domain, time.Duration(s.Timeout)*time.Second)
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("Dial Error %v", err))
+			recordFailure(srv, fmt.Sprintf("Dial Error %v", err))
 		}
 		return s
 	}
 	if err := conn.Close(); err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("%v Socket Close Error %v", strings.ToUpper(s.Type), err))
+			recordFailure(srv, fmt.Sprintf("%v Socket Close Error %v", strings.ToUpper(s.Type), err))
 		}
 		return s
 	}
@@ -188,11 +194,12 @@ func (s *Service) CheckTcp(record bool) *Service {
 }
 
 // checkHttp will check a HTTP service
-func (s *Service) CheckHttp(record bool) *Service {
-	dnsLookup, err := s.dnsCheck()
+func CheckHttp(srv database.Servicer, record bool) *types.Service {
+	s := srv.Model()
+	dnsLookup, err := dnsCheck(srv)
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
+			recordFailure(srv, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
 		}
 		return s
 	}
@@ -217,7 +224,7 @@ func (s *Service) CheckHttp(record bool) *Service {
 	}
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("HTTP Error %v", err))
+			recordFailure(srv, fmt.Sprintf("HTTP Error %v", err))
 		}
 		return s
 	}
@@ -233,14 +240,14 @@ func (s *Service) CheckHttp(record bool) *Service {
 		}
 		if !match {
 			if record {
-				recordFailure(s, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
+				recordFailure(srv, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
 			}
 			return s
 		}
 	}
 	if s.ExpectedStatus != res.StatusCode {
 		if record {
-			recordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", res.StatusCode, s.ExpectedStatus))
+			recordFailure(srv, fmt.Sprintf("HTTP Status Code %v did not match %v", res.StatusCode, s.ExpectedStatus))
 		}
 		return s
 	}
@@ -251,7 +258,7 @@ func (s *Service) CheckHttp(record bool) *Service {
 }
 
 // recordSuccess will create a new 'hit' record in the database for a successful/online service
-func recordSuccess(s *Service) {
+func recordSuccess(s *types.Service) {
 	s.LastOnline = time.Now().UTC()
 	hit := &types.Hit{
 		Service:   s.Id,
@@ -259,15 +266,16 @@ func recordSuccess(s *Service) {
 		PingTime:  s.PingTime,
 		CreatedAt: time.Now().UTC(),
 	}
-	s.CreateHit(hit)
-	log.WithFields(utils.ToFields(hit, s.Select())).Infoln(fmt.Sprintf("Service %v Successful Response: %0.2f ms | Lookup in: %0.2f ms", s.Name, hit.Latency*1000, hit.PingTime*1000))
-	notifier.OnSuccess(s.Service)
+	database.Create(hit)
+	log.WithFields(utils.ToFields(hit, s)).Infoln(fmt.Sprintf("Service %v Successful Response: %0.2f ms | Lookup in: %0.2f ms", s.Name, hit.Latency*1000, hit.PingTime*1000))
+	notifier.OnSuccess(s)
 	s.Online = true
 	s.SuccessNotified = true
 }
 
 // recordFailure will create a new 'Failure' record in the database for a offline service
-func recordFailure(s *Service, issue string) {
+func recordFailure(srv database.Servicer, issue string) {
+	s := srv.Model()
 	fail := &types.Failure{
 		Service:   s.Id,
 		Issue:     issue,
@@ -275,11 +283,11 @@ func recordFailure(s *Service, issue string) {
 		CreatedAt: time.Now().UTC(),
 		ErrorCode: s.LastStatusCode,
 	}
-	log.WithFields(utils.ToFields(fail, s.Select())).
+	log.WithFields(utils.ToFields(fail, s)).
 		Warnln(fmt.Sprintf("Service %v Failing: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
-	s.CreateFailure(fail)
+	database.Create(fail)
 	s.Online = false
 	s.SuccessNotified = false
-	s.DownText = s.DowntimeText()
-	notifier.OnFailure(s.Service, fail)
+	s.DownText = srv.DowntimeText()
+	notifier.OnFailure(s, fail)
 }

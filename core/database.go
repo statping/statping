@@ -77,26 +77,6 @@ func Database(obj interface{}) database.Database {
 	}
 }
 
-// HitsBetween returns the gorm database query for a collection of service hits between a time range
-func (s *Service) HitsBetween(t1, t2 time.Time, group string, column string) database.Database {
-	selector := Dbtimestamp(group, column)
-	if CoreApp.Config.DbConn == "postgres" {
-		return Database(&Hit{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME), t2.UTC().Format(types.TIME))
-	} else {
-		return Database(&Hit{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME_DAY), t2.UTC().Format(types.TIME_DAY))
-	}
-}
-
-// FailuresBetween returns the gorm database query for a collection of service hits between a time range
-func (s *Service) FailuresBetween(t1, t2 time.Time, group string, column string) database.Database {
-	selector := Dbtimestamp(group, column)
-	if CoreApp.Config.DbConn == "postgres" {
-		return Database(&Failure{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME), t2.UTC().Format(types.TIME))
-	} else {
-		return Database(&Failure{}).Select(selector).Where("service = ? AND created_at BETWEEN ? AND ?", s.Id, t1.UTC().Format(types.TIME_DAY), t2.UTC().Format(types.TIME_DAY))
-	}
-}
-
 // CloseDB will close the database connection if available
 func CloseDB() {
 	if DbSession != nil {

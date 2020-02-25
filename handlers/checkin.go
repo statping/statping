@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net"
@@ -27,23 +28,21 @@ import (
 )
 
 func apiAllCheckinsHandler(w http.ResponseWriter, r *http.Request) {
-	checkins := core.AllCheckins()
-	for _, c := range checkins {
-		c.Hits = c.AllHits()
-		c.Failures = c.GetFailures(64)
-	}
+	checkins := database.AllCheckins()
 	returnJson(checkins, w, r)
 }
 
 func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	checkin := core.SelectCheckin(vars["api"])
-	if checkin == nil {
+	checkin, err := database.CheckinByKey(vars["api"])
+	if err != nil {
 		sendErrorJson(fmt.Errorf("checkin %v was not found", vars["api"]), w, r)
 		return
 	}
-	checkin.Hits = checkin.LimitedHits(32)
-	checkin.Failures = checkin.GetFailures(32)
+	out := checkin.Model()
+
+	out.Hits = checkin.Hits()
+	out.Failures = checkin.Failures(32)
 	returnJson(checkin, w, r)
 }
 

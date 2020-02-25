@@ -104,7 +104,6 @@ type Database interface {
 
 	Since(time.Time) Database
 	Between(time.Time, time.Time) Database
-	ToChart() ([]*DateScan, error)
 
 	SelectByTime(string) string
 	MultipleSelects(args ...string) Database
@@ -112,13 +111,73 @@ type Database interface {
 	FormatTime(t time.Time) string
 	ParseTime(t string) (time.Time, error)
 
-	Requests(*http.Request) Database
+	Requests(*http.Request, isObject) Database
 
 	GroupQuery(query *GroupQuery, by By) GroupByer
+
+	Objects
 }
 
-func (it *Db) Requests(r *http.Request) Database {
-	g := ParseQueries(r, it)
+type Objects interface {
+	Services() Database
+	Users() Database
+	Groups() Database
+	Incidents() Database
+	IncidentUpdates() Database
+	Hits() Database
+	Failures() Database
+	Checkins() Database
+	CheckinHits() Database
+	Messages() Database
+	Integrations() Database
+}
+
+func (d *Db) Services() Database {
+	return d.Model(&types.Service{})
+}
+
+func (d *Db) Users() Database {
+	return d.Model(&types.User{})
+}
+
+func (d *Db) Groups() Database {
+	return d.Model(&types.Group{})
+}
+
+func (d *Db) Incidents() Database {
+	return d.Model(&types.Incident{})
+}
+
+func (d *Db) IncidentUpdates() Database {
+	return d.Model(&types.IncidentUpdate{})
+}
+
+func (d *Db) Hits() Database {
+	return d.Model(&types.Hit{})
+}
+
+func (d *Db) Integrations() Database {
+	return d.Model(&types.Integration{})
+}
+
+func (d *Db) Failures() Database {
+	return d.Model(&types.Failure{})
+}
+
+func (d *Db) Checkins() Database {
+	return d.Model(&types.Checkin{})
+}
+
+func (d *Db) CheckinHits() Database {
+	return d.Model(&types.CheckinHit{})
+}
+
+func (d *Db) Messages() Database {
+	return d.Model(&types.Message{})
+}
+
+func (it *Db) Requests(r *http.Request, o isObject) Database {
+	g := ParseQueries(r, o)
 	return g.db
 }
 
@@ -446,12 +505,6 @@ func (it *Db) Error() error {
 	return it.Database.Error
 }
 
-func (it *Db) Hits() ([]*types.Hit, error) {
-	var hits []*types.Hit
-	err := it.Find(&hits)
-	return hits, err.Error()
-}
-
 func (it *Db) Since(ago time.Time) Database {
 	return it.Where("created_at > ?", it.FormatTime(ago))
 }
@@ -460,37 +513,7 @@ func (it *Db) Between(t1 time.Time, t2 time.Time) Database {
 	return it.Where("created_at BETWEEN ? AND ?", it.FormatTime(t1), it.FormatTime(t2))
 }
 
-// DateScan struct is for creating the charts.js graph JSON array
-type DateScan struct {
-	CreatedAt string `json:"x,omitempty"`
-	Value     int64  `json:"y"`
-}
-
 type TimeValue struct {
 	Timeframe string  `json:"timeframe"`
 	Amount    float64 `json:"amount"`
-}
-
-func (it *Db) ToChart() ([]*DateScan, error) {
-	rows, err := it.Database.Rows()
-	if err != nil {
-		return nil, err
-	}
-	var data []*DateScan
-	for rows.Next() {
-		gd := new(DateScan)
-		var createdAt string
-		var value float64
-		if err := rows.Scan(&createdAt, &value); err != nil {
-			return nil, err
-		}
-		createdTime, err := time.Parse(TIME, createdAt)
-		if err != nil {
-			return nil, err
-		}
-		gd.CreatedAt = createdTime.UTC().String()
-		gd.Value = int64(value * 1000)
-		data = append(data, gd)
-	}
-	return data, err
 }

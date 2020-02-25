@@ -139,36 +139,10 @@ func TestServiceAvgUptime(t *testing.T) {
 	assert.NotEqual(t, "0", service4.AvgUptime(since))
 }
 
-func TestServiceHits(t *testing.T) {
-	service := SelectService(5)
-	hits, err := service.Hits()
-	assert.Nil(t, err)
-	assert.True(t, len(hits) > 1400)
-}
-
-func TestServiceLimitedHits(t *testing.T) {
-	service := SelectService(5)
-	hits, err := service.LimitedHits(1024)
-	assert.Nil(t, err)
-	assert.Equal(t, int(1024), len(hits))
-}
-
-func TestServiceTotalHits(t *testing.T) {
-	service := SelectService(5)
-	hits, err := service.TotalHits()
-	assert.Nil(t, err)
-	assert.NotZero(t, hits)
-}
-
 func TestServiceSum(t *testing.T) {
 	service := SelectService(5)
 	sum := service.Sum()
 	assert.NotZero(t, sum)
-}
-
-func TestCountOnline(t *testing.T) {
-	amount := CoreApp.CountOnline()
-	assert.True(t, amount >= 2)
 }
 
 func TestCreateService(t *testing.T) {
@@ -374,32 +348,4 @@ func TestSelectGroups(t *testing.T) {
 	assert.Equal(t, int(3), len(groups))
 	groups = SelectGroups(true, true)
 	assert.Equal(t, int(5), len(groups))
-}
-
-func TestService_TotalFailures(t *testing.T) {
-	service := SelectService(8)
-	failures, err := service.TotalFailures()
-	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), failures)
-}
-
-func TestService_TotalFailures24(t *testing.T) {
-	service := SelectService(8)
-	failures, err := service.TotalFailures24()
-	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), failures)
-}
-
-func TestService_TotalFailuresOnDate(t *testing.T) {
-	t.SkipNow()
-	ago := utils.Now().UTC()
-	service := SelectService(8)
-	failures, err := service.TotalFailuresOnDate(ago)
-	assert.Nil(t, err)
-	assert.Equal(t, uint64(1), failures)
-}
-
-func TestCountFailures(t *testing.T) {
-	failures := CountFailures()
-	assert.NotEqual(t, uint64(0), failures)
 }

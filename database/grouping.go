@@ -3,7 +3,6 @@ package database
 import (
 	"fmt"
 	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -36,15 +35,16 @@ type GroupQuery struct {
 	FillEmpty bool
 }
 
+func (b GroupQuery) Find(data interface{}) error {
+	return b.db.Find(&data).Error()
+}
+
 func (b GroupQuery) Database() Database {
 	return b.db
 }
 
 var (
-	ByCount = By("COUNT(id) as amount")
-	BySum   = func(column string) By {
-		return By(fmt.Sprintf("SUM(%s) as amount", column))
-	}
+	ByCount   = By("COUNT(id) as amount")
 	ByAverage = func(column string) By {
 		return By(fmt.Sprintf("AVG(%s) as amount", column))
 	}
@@ -154,16 +154,21 @@ func (g *GroupBy) duration() time.Duration {
 	}
 }
 
-func ParseQueries(r *http.Request, db Database) *GroupQuery {
+func toInt(v string) int64 {
+	val, _ := strconv.Atoi(v)
+	return int64(val)
+}
+
+func ParseQueries(r *http.Request, o isObject) *GroupQuery {
 	fields := parseGet(r)
 	grouping := fields.Get("group")
 	if grouping == "" {
 		grouping = "hour"
 	}
-	startField := utils.ToInt(fields.Get("start"))
-	endField := utils.ToInt(fields.Get("end"))
-	limit := utils.ToInt(fields.Get("limit"))
-	offset := utils.ToInt(fields.Get("offset"))
+	startField := toInt(fields.Get("start"))
+	endField := toInt(fields.Get("end"))
+	limit := toInt(fields.Get("limit"))
+	offset := toInt(fields.Get("offset"))
 	fill, _ := strconv.ParseBool(fields.Get("fill"))
 	orderBy := fields.Get("order")
 	if limit == 0 {
@@ -179,6 +184,8 @@ func ParseQueries(r *http.Request, db Database) *GroupQuery {
 		Offset:    int(offset),
 		FillEmpty: fill,
 	}
+
+	db := o.object().db
 
 	if query.Limit != 0 {
 		db = db.Limit(query.Limit)

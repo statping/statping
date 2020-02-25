@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-yaml/yaml"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"io/ioutil"
@@ -71,7 +72,9 @@ func LoadUsingEnv() (*types.DbConfig, error) {
 		log.Errorln(err)
 		return nil, err
 	}
-	CoreApp.SaveConfig(Configs)
+	if _, err := CoreApp.SaveConfig(Configs); err != nil {
+		return nil, err
+	}
 	exists := DbSession.HasTable("core")
 	if !exists {
 		log.Infoln(fmt.Sprintf("Core database does not exist, creating now!"))
@@ -91,15 +94,20 @@ func LoadUsingEnv() (*types.DbConfig, error) {
 			password = "admin"
 		}
 
-		admin := ReturnUser(&types.User{
+		admin := &types.User{
 			Username: username,
 			Password: password,
 			Email:    "info@admin.com",
 			Admin:    types.NewNullBool(true),
-		})
-		_, err := admin.Create()
+		}
+		if _, err := database.Create(admin); err != nil {
+			return nil, err
+		}
 
-		SampleData()
+		if err := SampleData(); err != nil {
+			return nil, err
+		}
+
 		return Configs, err
 	}
 	return Configs, nil

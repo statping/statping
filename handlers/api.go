@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
@@ -134,9 +135,9 @@ func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *ht
 	var objName string
 	var objId int64
 	switch v := obj.(type) {
-	case types.ServiceInterface:
+	case types.Servicer:
 		objName = "service"
-		objId = v.Select().Id
+		objId = v.Model().Id
 	case *notifier.Notification:
 		objName = "notifier"
 		objId = v.Id
@@ -151,9 +152,9 @@ func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *ht
 	case *types.Group:
 		objName = "group"
 		objId = v.Id
-	case *core.Group:
+	case database.Grouper:
 		objName = "group"
-		objId = v.Id
+		objId = v.Model().Id
 	case *core.Checkin:
 		objName = "checkin"
 		objId = v.Id

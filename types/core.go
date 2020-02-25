@@ -29,28 +29,31 @@ type AllNotifiers interface{}
 // will be saved into 1 row in the 'core' table. You can use the core.CoreApp
 // global variable to interact with the attributes to the application, such as services.
 type Core struct {
-	Name          string             `gorm:"not null;column:name" json:"name"`
-	Description   string             `gorm:"not null;column:description" json:"description,omitempty"`
-	ConfigFile    string             `gorm:"column:config" json:"-"`
-	ApiKey        string             `gorm:"column:api_key" json:"api_key" scope:"admin"`
-	ApiSecret     string             `gorm:"column:api_secret" json:"api_secret" scope:"admin"`
-	Style         string             `gorm:"not null;column:style" json:"style,omitempty"`
-	Footer        NullString         `gorm:"column:footer" json:"footer"`
-	Domain        string             `gorm:"not null;column:domain" json:"domain"`
-	Version       string             `gorm:"column:version" json:"version"`
-	Setup         bool               `gorm:"-" json:"setup"`
-	MigrationId   int64              `gorm:"column:migration_id" json:"migration_id,omitempty"`
-	UseCdn        NullBool           `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`
-	Timezone      float32            `gorm:"column:timezone;default:-8.0" json:"timezone,omitempty"`
-	LoggedIn      bool               `gorm:"-" json:"logged_in"`
-	CreatedAt     time.Time          `gorm:"column:created_at" json:"created_at"`
-	UpdatedAt     time.Time          `gorm:"column:updated_at" json:"updated_at"`
-	Started       time.Time          `gorm:"-" json:"started_on"`
-	Services      []ServiceInterface `gorm:"-" json:"-"`
-	Plugins       []*Info            `gorm:"-" json:"-"`
-	Repos         []PluginJSON       `gorm:"-" json:"-"`
-	AllPlugins    []PluginActions    `gorm:"-" json:"-"`
-	Notifications []AllNotifiers     `gorm:"-" json:"-"`
-	Config        *DbConfig          `gorm:"-" json:"-"`
-	Integrations  []Integrator       `gorm:"-" json:"-"`
+	Name          string          `gorm:"not null;column:name" json:"name"`
+	Description   string          `gorm:"not null;column:description" json:"description,omitempty"`
+	ConfigFile    string          `gorm:"column:config" json:"-"`
+	ApiKey        string          `gorm:"column:api_key" json:"api_key" scope:"admin"`
+	ApiSecret     string          `gorm:"column:api_secret" json:"api_secret" scope:"admin"`
+	Style         string          `gorm:"not null;column:style" json:"style,omitempty"`
+	Footer        NullString      `gorm:"column:footer" json:"footer"`
+	Domain        string          `gorm:"not null;column:domain" json:"domain"`
+	Version       string          `gorm:"column:version" json:"version"`
+	Setup         bool            `gorm:"-" json:"setup"`
+	MigrationId   int64           `gorm:"column:migration_id" json:"migration_id,omitempty"`
+	UseCdn        NullBool        `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`
+	Timezone      float32         `gorm:"column:timezone;default:-8.0" json:"timezone,omitempty"`
+	LoggedIn      bool            `gorm:"-" json:"logged_in"`
+	CreatedAt     time.Time       `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt     time.Time       `gorm:"column:updated_at" json:"updated_at"`
+	Started       time.Time       `gorm:"-" json:"started_on"`
+	Plugins       []*Info         `gorm:"-" json:"-"`
+	Repos         []PluginJSON    `gorm:"-" json:"-"`
+	AllPlugins    []PluginActions `gorm:"-" json:"-"`
+	Notifications []AllNotifiers  `gorm:"-" json:"-"`
+	Config        *DbConfig       `gorm:"-" json:"-"`
+	Integrations  []Integrator    `gorm:"-" json:"-"`
+}
+
+type Servicer interface {
+	Model() *Service
 }

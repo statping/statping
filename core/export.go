@@ -16,20 +16,19 @@
 package core
 
 import (
-	"encoding/json"
 	"github.com/hunterlong/statping/types"
 )
 
 // ExportChartsJs renders the charts for the index page
 
 type ExportData struct {
-	Core      *types.Core              `json:"core"`
-	Services  []types.ServiceInterface `json:"services"`
-	Messages  []*Message               `json:"messages"`
-	Checkins  []*Checkin               `json:"checkins"`
-	Users     []*User                  `json:"users"`
-	Groups    []*Group                 `json:"groups"`
-	Notifiers []types.AllNotifiers     `json:"notifiers"`
+	Core      *types.Core          `json:"core"`
+	Services  []*types.Service     `json:"services"`
+	Messages  []*types.Message     `json:"messages"`
+	Checkins  []*types.Checkin     `json:"checkins"`
+	Users     []*types.User        `json:"users"`
+	Groups    []*types.Group       `json:"groups"`
+	Notifiers []types.AllNotifiers `json:"notifiers"`
 }
 
 // ExportSettings will export a JSON file containing all of the settings below:
@@ -40,21 +39,21 @@ type ExportData struct {
 // - Services
 // - Groups
 // - Messages
-func ExportSettings() ([]byte, error) {
-	users, err := SelectAllUsers()
-	messages, err := SelectMessages()
-	if err != nil {
-		return nil, err
-	}
-	data := ExportData{
-		Core:      CoreApp.Core,
-		Notifiers: CoreApp.Notifications,
-		Checkins:  AllCheckins(),
-		Users:     users,
-		Services:  CoreApp.Services,
-		Groups:    SelectGroups(true, true),
-		Messages:  messages,
-	}
-	export, err := json.Marshal(data)
-	return export, err
-}
+//func ExportSettings() ([]byte, error) {
+//	users, err := SelectAllUsers()
+//	messages, err := SelectMessages()
+//	if err != nil {
+//		return nil, err
+//	}
+//	data := ExportData{
+//		Core:      CoreApp.Core,
+//		Notifiers: CoreApp.Notifications,
+//		Checkins:  database.AllCheckins(),
+//		Users:     database.AllUsers(),
+//		Services:  CoreApp.Services,
+//		Groups:    SelectGroups(true, true),
+//		Messages:  messages,
+//	}
+//	export, err := json.Marshal(data)
+//	return export, err
+//}

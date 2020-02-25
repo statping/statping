@@ -18,6 +18,7 @@ package core
 import (
 	"fmt"
 	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"sync"
@@ -35,7 +36,7 @@ func InsertSampleData() error {
 
 	insertSampleGroups()
 	createdOn := time.Now().Add(((-24 * 30) * 3) * time.Hour).UTC()
-	s1 := ReturnService(&types.Service{
+	s1 := &types.Service{
 		Name:           "Google",
 		Domain:         "https://google.com",
 		ExpectedStatus: 200,
@@ -48,8 +49,8 @@ func InsertSampleData() error {
 		Permalink:      types.NewNullString("google"),
 		VerifySSL:      types.NewNullBool(true),
 		CreatedAt:      createdOn,
-	})
-	s2 := ReturnService(&types.Service{
+	}
+	s2 := &types.Service{
 		Name:           "Statping Github",
 		Domain:         "https://github.com/hunterlong/statping",
 		ExpectedStatus: 200,
@@ -61,8 +62,8 @@ func InsertSampleData() error {
 		Permalink:      types.NewNullString("statping_github"),
 		VerifySSL:      types.NewNullBool(true),
 		CreatedAt:      createdOn,
-	})
-	s3 := ReturnService(&types.Service{
+	}
+	s3 := &types.Service{
 		Name:           "JSON Users Test",
 		Domain:         "https://jsonplaceholder.typicode.com/users",
 		ExpectedStatus: 200,
@@ -75,8 +76,8 @@ func InsertSampleData() error {
 		VerifySSL:      types.NewNullBool(true),
 		GroupId:        2,
 		CreatedAt:      createdOn,
-	})
-	s4 := ReturnService(&types.Service{
+	}
+	s4 := &types.Service{
 		Name:           "JSON API Tester",
 		Domain:         "https://jsonplaceholder.typicode.com/posts",
 		ExpectedStatus: 201,
@@ -91,8 +92,8 @@ func InsertSampleData() error {
 		VerifySSL:      types.NewNullBool(true),
 		GroupId:        2,
 		CreatedAt:      createdOn,
-	})
-	s5 := ReturnService(&types.Service{
+	}
+	s5 := &types.Service{
 		Name:      "Google DNS",
 		Domain:    "8.8.8.8",
 		Interval:  20,
@@ -103,13 +104,13 @@ func InsertSampleData() error {
 		Public:    types.NewNullBool(true),
 		GroupId:   1,
 		CreatedAt: createdOn,
-	})
+	}
 
-	s1.Create(false)
-	s2.Create(false)
-	s3.Create(false)
-	s4.Create(false)
-	s5.Create(false)
+	database.Create(s1)
+	database.Create(s2)
+	database.Create(s3)
+	database.Create(s4)
+	database.Create(s5)
 
 	insertMessages()
 
@@ -121,85 +122,111 @@ func InsertSampleData() error {
 }
 
 func insertSampleIncidents() error {
-	incident1 := &Incident{&types.Incident{
+	incident1 := &types.Incident{
 		Title:       "Github Downtime",
 		Description: "This is an example of a incident for a service.",
 		ServiceId:   2,
-	}}
-	_, err := incident1.Create()
+	}
+	if _, err := database.Create(incident1); err != nil {
+		return err
+	}
 
-	incidentUpdate1 := &IncidentUpdate{&types.IncidentUpdate{
+	incidentUpdate1 := &types.IncidentUpdate{
 		IncidentId: incident1.Id,
 		Message:    "Github's page for Statping seems to be sending a 501 error.",
 		Type:       "Investigating",
-	}}
-	_, err = incidentUpdate1.Create()
+	}
+	if _, err := database.Create(incidentUpdate1); err != nil {
+		return err
+	}
 
-	incidentUpdate2 := &IncidentUpdate{&types.IncidentUpdate{
+	incidentUpdate2 := &types.IncidentUpdate{
 		IncidentId: incident1.Id,
 		Message:    "Problem is continuing and we are looking at the issues.",
 		Type:       "Update",
-	}}
-	_, err = incidentUpdate2.Create()
+	}
+	if _, err := database.Create(incidentUpdate2); err != nil {
+		return err
+	}
 
-	incidentUpdate3 := &IncidentUpdate{&types.IncidentUpdate{
+	incidentUpdate3 := &types.IncidentUpdate{
 		IncidentId: incident1.Id,
 		Message:    "Github is now back online and everything is working.",
 		Type:       "Resolved",
-	}}
-	_, err = incidentUpdate3.Create()
+	}
+	if _, err := database.Create(incidentUpdate3); err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }
 
 func insertSampleGroups() error {
-	group1 := &Group{&types.Group{
+	group1 := &types.Group{
 		Name:   "Main Services",
 		Public: types.NewNullBool(true),
 		Order:  2,
-	}}
-	_, err := group1.Create()
-	group2 := &Group{&types.Group{
+	}
+	if _, err := database.Create(group1); err != nil {
+		return err
+	}
+
+	group2 := &types.Group{
 		Name:   "Linked Services",
 		Public: types.NewNullBool(false),
 		Order:  1,
-	}}
-	_, err = group2.Create()
-	group3 := &Group{&types.Group{
+	}
+	if _, err := database.Create(group2); err != nil {
+		return err
+	}
+
+	group3 := &types.Group{
 		Name:   "Empty Group",
 		Public: types.NewNullBool(false),
 		Order:  3,
-	}}
-	_, err = group3.Create()
-	return err
+	}
+	if _, err := database.Create(group3); err != nil {
+		return err
+	}
+	return nil
 }
 
 // insertSampleCheckins will create 2 checkins with 60 successful hits per Checkin
 func insertSampleCheckins() error {
 	s1 := SelectService(1)
-	checkin1 := ReturnCheckin(&types.Checkin{
+	checkin1 := &types.Checkin{
 		ServiceId:   s1.Id,
 		Interval:    300,
 		GracePeriod: 300,
-	})
-	checkin1.Update()
+	}
+
+	if _, err := database.Create(checkin1); err != nil {
+		return err
+	}
 
 	s2 := SelectService(1)
-	checkin2 := ReturnCheckin(&types.Checkin{
+	checkin2 := &types.Checkin{
 		ServiceId:   s2.Id,
 		Interval:    900,
 		GracePeriod: 300,
-	})
-	checkin2.Update()
+	}
+
+	if _, err := database.Create(checkin2); err != nil {
+		return err
+	}
 
 	checkTime := time.Now().UTC().Add(-24 * time.Hour)
 	for i := 0; i <= 60; i++ {
-		checkHit := ReturnCheckinHit(&types.CheckinHit{
+		checkHit := &types.CheckinHit{
 			Checkin:   checkin1.Id,
 			From:      "192.168.0.1",
 			CreatedAt: checkTime.UTC(),
-		})
-		checkHit.Create()
+		}
+
+		if _, err := database.Create(checkHit); err != nil {
+			return err
+		}
+
 		checkTime = checkTime.Add(10 * time.Minute)
 	}
 	return nil
@@ -250,50 +277,61 @@ func insertSampleCore() error {
 		CreatedAt:   time.Now().UTC(),
 		UseCdn:      types.NewNullBool(false),
 	}
-	query := Database(&Core{}).Create(core)
-	return query.Error()
+
+	_, err := database.Create(core)
+
+	return err
 }
 
 // insertSampleUsers will create 2 admin users for a seed database
 func insertSampleUsers() error {
-	u2 := ReturnUser(&types.User{
+	u2 := &types.User{
 		Username: "testadmin",
 		Password: "password123",
 		Email:    "info@betatude.com",
 		Admin:    types.NewNullBool(true),
-	})
+	}
 
-	u3 := ReturnUser(&types.User{
+	if _, err := database.Create(u2); err != nil {
+		return err
+	}
+
+	u3 := &types.User{
 		Username: "testadmin2",
 		Password: "password123",
 		Email:    "info@adminhere.com",
 		Admin:    types.NewNullBool(true),
-	})
+	}
 
-	_, err := u2.Create()
-	_, err = u3.Create()
-	return err
+	if _, err := database.Create(u3); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func insertMessages() error {
-	m1 := ReturnMessage(&types.Message{
+	m1 := &types.Message{
 		Title:       "Routine Downtime",
 		Description: "This is an example a upcoming message for a service!",
 		ServiceId:   1,
 		StartOn:     time.Now().UTC().Add(15 * time.Minute),
 		EndOn:       time.Now().UTC().Add(2 * time.Hour),
-	})
-	if _, err := m1.Create(); err != nil {
+	}
+
+	if _, err := database.Create(m1); err != nil {
 		return err
 	}
-	m2 := ReturnMessage(&types.Message{
+
+	m2 := &types.Message{
 		Title:       "Server Reboot",
 		Description: "This is another example a upcoming message for a service!",
 		ServiceId:   3,
 		StartOn:     time.Now().UTC().Add(15 * time.Minute),
 		EndOn:       time.Now().UTC().Add(2 * time.Hour),
-	})
-	if _, err := m2.Create(); err != nil {
+	}
+
+	if _, err := database.Create(m2); err != nil {
 		return err
 	}
 	return nil
@@ -317,7 +355,7 @@ func InsertLargeSampleData() error {
 		return err
 	}
 	createdOn := time.Now().UTC().Add((-24 * 90) * time.Hour)
-	s6 := ReturnService(&types.Service{
+	s6 := &types.Service{
 		Name:           "JSON Lint",
 		Domain:         "https://jsonlint.com",
 		ExpectedStatus: 200,
@@ -327,9 +365,13 @@ func InsertLargeSampleData() error {
 		Timeout:        10,
 		Order:          6,
 		CreatedAt:      createdOn,
-	})
+	}
 
-	s7 := ReturnService(&types.Service{
+	if _, err := database.Create(s6); err != nil {
+		return err
+	}
+
+	s7 := &types.Service{
 		Name:           "Demo Page",
 		Domain:         "https://demo.statping.com",
 		ExpectedStatus: 200,
@@ -339,9 +381,13 @@ func InsertLargeSampleData() error {
 		Timeout:        15,
 		Order:          7,
 		CreatedAt:      createdOn,
-	})
+	}
 
-	s8 := ReturnService(&types.Service{
+	if _, err := database.Create(s7); err != nil {
+		return err
+	}
+
+	s8 := &types.Service{
 		Name:           "Golang",
 		Domain:         "https://golang.org",
 		ExpectedStatus: 200,
@@ -350,9 +396,13 @@ func InsertLargeSampleData() error {
 		Method:         "GET",
 		Timeout:        10,
 		Order:          8,
-	})
+	}
 
-	s9 := ReturnService(&types.Service{
+	if _, err := database.Create(s8); err != nil {
+		return err
+	}
+
+	s9 := &types.Service{
 		Name:           "Santa Monica",
 		Domain:         "https://www.santamonica.com",
 		ExpectedStatus: 200,
@@ -362,9 +412,13 @@ func InsertLargeSampleData() error {
 		Timeout:        10,
 		Order:          9,
 		CreatedAt:      createdOn,
-	})
+	}
 
-	s10 := ReturnService(&types.Service{
+	if _, err := database.Create(s9); err != nil {
+		return err
+	}
+
+	s10 := &types.Service{
 		Name:           "Oeschs Die Dritten",
 		Domain:         "https://www.oeschs-die-dritten.ch/en/",
 		ExpectedStatus: 200,
@@ -374,9 +428,13 @@ func InsertLargeSampleData() error {
 		Timeout:        10,
 		Order:          10,
 		CreatedAt:      createdOn,
-	})
+	}
 
-	s11 := ReturnService(&types.Service{
+	if _, err := database.Create(s10); err != nil {
+		return err
+	}
+
+	s11 := &types.Service{
 		Name:           "XS Project - Bochka, Bass, Kolbaser",
 		Domain:         "https://www.youtube.com/watch?v=VLW1ieY4Izw",
 		ExpectedStatus: 200,
@@ -386,9 +444,13 @@ func InsertLargeSampleData() error {
 		Timeout:        20,
 		Order:          11,
 		CreatedAt:      createdOn,
-	})
+	}
 
-	s12 := ReturnService(&types.Service{
+	if _, err := database.Create(s11); err != nil {
+		return err
+	}
+
+	s12 := &types.Service{
 		Name:           "Github",
 		Domain:         "https://github.com/hunterlong",
 		ExpectedStatus: 200,
@@ -398,9 +460,13 @@ func InsertLargeSampleData() error {
 		Timeout:        20,
 		Order:          12,
 		CreatedAt:      createdOn,
-	})
+	}
 
-	s13 := ReturnService(&types.Service{
+	if _, err := database.Create(s12); err != nil {
+		return err
+	}
+
+	s13 := &types.Service{
 		Name:           "Failing URL",
 		Domain:         "http://thisdomainisfakeanditsgoingtofail.com",
 		ExpectedStatus: 200,
@@ -410,9 +476,13 @@ func InsertLargeSampleData() error {
 		Timeout:        10,
 		Order:          13,
 		CreatedAt:      createdOn,
-	})
+	}
 
-	s14 := ReturnService(&types.Service{
+	if _, err := database.Create(s13); err != nil {
+		return err
+	}
+
+	s14 := &types.Service{
 		Name:           "Oesch's die Dritten - Die Jodelsprache",
 		Domain:         "https://www.youtube.com/watch?v=k3GTxRt4iao",
 		ExpectedStatus: 200,
@@ -422,9 +492,13 @@ func InsertLargeSampleData() error {
 		Timeout:        12,
 		Order:          14,
 		CreatedAt:      createdOn,
-	})
+	}
 
-	s15 := ReturnService(&types.Service{
+	if _, err := database.Create(s14); err != nil {
+		return err
+	}
+
+	s15 := &types.Service{
 		Name:           "Gorm",
 		Domain:         "http://gorm.io/",
 		ExpectedStatus: 200,
@@ -434,18 +508,11 @@ func InsertLargeSampleData() error {
 		Timeout:        12,
 		Order:          15,
 		CreatedAt:      createdOn,
-	})
+	}
 
-	s6.Create(false)
-	s7.Create(false)
-	s8.Create(false)
-	s9.Create(false)
-	s10.Create(false)
-	s11.Create(false)
-	s12.Create(false)
-	s13.Create(false)
-	s14.Create(false)
-	s15.Create(false)
+	if _, err := database.Create(s15); err != nil {
+		return err
+	}
 
 	var dayAgo = time.Now().UTC().Add((-24 * 90) * time.Hour)
 
@@ -472,7 +539,7 @@ func insertFailureRecords(since time.Time, amount int) {
 				CreatedAt: createdAt,
 			}
 
-			service.CreateFailure(failure)
+			database.Create(failure)
 		}
 	}
 }
@@ -492,7 +559,7 @@ func insertHitRecords(since time.Time, amount int) {
 				CreatedAt: createdAt.UTC(),
 				Latency:   latency,
 			}
-			service.CreateHit(hit)
+			database.Create(hit)
 		}
 
 	}
@@ -554,7 +621,7 @@ func TmpRecords(dbFile string) error {
 			return err
 		}
 		log.Infoln("loading all services")
-		if _, err := CoreApp.SelectAllServices(false); err != nil {
+		if _, err := SelectAllServices(false); err != nil {
 			return err
 		}
 		if err := AttachNotifiers(); err != nil {
@@ -597,7 +664,7 @@ func TmpRecords(dbFile string) error {
 		return err
 	}
 	log.Infoln("loading all services")
-	if _, err := CoreApp.SelectAllServices(false); err != nil {
+	if _, err := SelectAllServices(false); err != nil {
 		return err
 	}
 	log.Infoln("copying sql database file to: " + tmpSqlFile)
