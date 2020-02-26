@@ -87,7 +87,7 @@ func main() {
 	log.Info(fmt.Sprintf("Starting Statping v%v", VERSION))
 	updateDisplay()
 
-	_, err = core.LoadConfigFile(utils.Directory)
+	config, err := core.LoadConfigFile(utils.Directory)
 	if err != nil {
 		log.Errorln(err)
 		core.CoreApp.Setup = false
@@ -102,6 +102,9 @@ func main() {
 			log.Fatalln(err)
 		}
 	}
+
+	core.CoreApp.Config = config.DbConfig
+
 	if err := mainProcess(); err != nil {
 		log.Fatalln(err)
 		os.Exit(2)

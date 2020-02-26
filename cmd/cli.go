@@ -182,11 +182,13 @@ func ExportIndexHTML() []byte {
 }
 
 func updateDisplay() error {
-	var err error
-	var gitCurrent githubResponse
-	if gitCurrent, err = checkGithubUpdates(); err != nil {
+	gitCurrent, err := checkGithubUpdates()
+	if err != nil {
 		fmt.Printf("Issue connecting to https://github.com/hunterlong/statping\n%v\n", err)
 		return err
+	}
+	if gitCurrent.TagName == "" {
+		return nil
 	}
 	if len(gitCurrent.TagName) < 2 {
 		return nil

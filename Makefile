@@ -28,6 +28,10 @@ frontend-build:
 # build and push the images to docker hub
 docker: docker-build-all docker-publish-all
 
+push-vue:
+	docker build -t hunterlong/statping:vue .
+	docker push hunterlong/statping:vue
+
 # test all versions of Statping, golang testing and then cypress UI testing
 test-all: dev-deps test
 

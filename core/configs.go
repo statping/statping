@@ -22,7 +22,6 @@ import (
 	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
-	"io/ioutil"
 )
 
 // ErrorResponse is used for HTTP errors to show to User
@@ -41,12 +40,12 @@ func LoadConfigFile(directory string) (*DbConfig, error) {
 		return LoadUsingEnv()
 	}
 	log.Debugln("Attempting to read config file at: " + directory + "/config.yml")
-	file, err := ioutil.ReadFile(directory + "/config.yml")
+	file, err := utils.OpenFile(directory + "/config.yml")
 	if err != nil {
 		CoreApp.Setup = false
 		return nil, errors.New("config.yml file not found at " + directory + "/config.yml - starting in setup mode")
 	}
-	err = yaml.Unmarshal(file, &configs)
+	err = yaml.Unmarshal([]byte(file), &configs)
 	if err != nil {
 		return nil, err
 	}
