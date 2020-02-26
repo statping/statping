@@ -39,8 +39,8 @@ func (c *Checkin) Select() *types.Checkin {
 
 // Routine for checking if the last Checkin was within its interval
 func CheckinRoutine(checkin database.Checkiner) {
-	c := checkin.Object()
-	if c.Hits().Last() == nil {
+	c := checkin.Model()
+	if checkin.Hits().Last() == nil {
 		return
 	}
 	reCheck := c.Period()
@@ -53,11 +53,11 @@ CheckinLoop:
 			break CheckinLoop
 		case <-time.After(reCheck):
 			log.Infoln(fmt.Sprintf("Checkin %v is expected at %v, checking every %v", c.Name, utils.FormatDuration(c.Expected()), utils.FormatDuration(c.Period())))
-			if c.Expected().Seconds() <= 0 {
-				issue := fmt.Sprintf("Checkin %v is failing, no request since %v", c.Name, c.Hits().Last().CreatedAt)
+			if c.Expected() <= 0 {
+				issue := fmt.Sprintf("Checkin %v is failing, no request since %v", c.Name, checkin.Hits().Last().CreatedAt)
 				log.Errorln(issue)
 
-				CreateCheckinFailure(c)
+				CreateCheckinFailure(checkin)
 			}
 			reCheck = c.Period()
 		}
@@ -71,8 +71,8 @@ func (c *Checkin) String() string {
 }
 
 func CreateCheckinFailure(checkin database.Checkiner) (int64, error) {
-	c := checkin.Object()
-	service := c.Service()
+	c := checkin.Model()
+	service := checkin.Service()
 	c.Failing = true
 	fail := &types.Failure{
 		Issue:    fmt.Sprintf("Checkin %v was not reported %v ago, it expects a request every %v", c.Name, utils.FormatDuration(c.Expected()), utils.FormatDuration(c.Period())),

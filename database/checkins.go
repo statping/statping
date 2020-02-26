@@ -18,7 +18,7 @@ type Checkiner interface {
 	Hits() *CheckinHitObj
 	Failures() *FailureObj
 	Model() *types.Checkin
-	Object() *CheckinObj
+	Service() *ServiceObj
 }
 
 func (c *CheckinObj) BeforeCreate() (err error) {
@@ -67,11 +67,11 @@ func AllCheckins() []*CheckinObj {
 
 func (s *CheckinObj) Service() *ServiceObj {
 	var srv *types.Service
-	q := database.Checkins().Where("service = ?", s.ServiceId)
+	q := database.Services().Where("id = ?", s.ServiceId)
 	q.Find(&srv)
 	return &ServiceObj{
 		Service: srv,
-		o:       wrapObject(srv.Id, srv, q),
+		o:       wrapObject(s.ServiceId, srv, q),
 	}
 }
 
@@ -88,10 +88,6 @@ func (s *CheckinObj) object() *Object {
 
 func (c *CheckinObj) Model() *types.Checkin {
 	return c.Checkin
-}
-
-func (c *CheckinObj) Object() *CheckinObj {
-	return c
 }
 
 // Period will return the duration of the Checkin interval

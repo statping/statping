@@ -52,6 +52,16 @@ func (c *CheckinHit) BeforeCreate() (err error) {
 	return
 }
 
+func (s *Checkin) Expected() time.Duration {
+	last := s.LastHit
+	now := time.Now().UTC()
+	return time.Duration(now.Second() - last.Second())
+}
+
+func (s *Checkin) Period() time.Duration {
+	return time.Duration(s.Interval) * time.Second
+}
+
 // Start will create a channel for the checkin checking go routine
 func (s *Checkin) Start() {
 	s.Running = make(chan bool)
