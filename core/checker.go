@@ -286,9 +286,11 @@ func (s *Service) checkGrpc(record bool) *Service {
 		return s
 	}
 
+
 	if record {
 		recordSuccess(s)
 	}
+
 	return s
 }
 
