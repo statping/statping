@@ -140,9 +140,12 @@ func EnvToConfig() (*DbConfig, error) {
 	domain := utils.Getenv("DOMAIN", "").(string)
 	sqlFile := utils.Getenv("SQL_FILE", "").(string)
 
-	if dbConn != "sqlite" {
+	if dbConn != "" {
 		if dbHost == "" {
 			return nil, errors.New("Missing DB_HOST environment variable")
+		}
+		if dbPort == 0 {
+			return nil, errors.New("Missing DB_PORT environment variable")
 		}
 		if dbUser == "" {
 			return nil, errors.New("Missing DB_USER environment variable")
@@ -155,7 +158,7 @@ func EnvToConfig() (*DbConfig, error) {
 		}
 	}
 
-	CoreApp.Config = &types.DbConfig{
+	config := &types.DbConfig{
 		DbConn:      dbConn,
 		DbHost:      dbHost,
 		DbUser:      dbUser,
@@ -173,7 +176,9 @@ func EnvToConfig() (*DbConfig, error) {
 		SqlFile:     sqlFile,
 	}
 
-	return &DbConfig{CoreApp.Config}, err
+	CoreApp.Config = config
+
+	return &DbConfig{config}, err
 }
 
 // SampleData runs all the sample data for a new Statping installation
@@ -183,6 +188,10 @@ func SampleData() error {
 		return err
 	}
 	if err := InsertSampleHits(); err != nil {
+		log.Errorln(err)
+		return err
+	}
+	if err := insertSampleCheckins(); err != nil {
 		log.Errorln(err)
 		return err
 	}

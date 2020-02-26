@@ -30,7 +30,7 @@ import (
 func apiAllGroupHandler(r *http.Request) interface{} {
 	auth, admin := IsUser(r), IsAdmin(r)
 	groups := core.SelectGroups(admin, auth)
-	return groups
+	return flattenGroups(groups)
 }
 
 func flattenGroups(groups []*core.Group) []*types.Group {

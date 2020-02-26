@@ -16,6 +16,7 @@
 package core
 
 import (
+	"errors"
 	"fmt"
 	"github.com/go-yaml/yaml"
 	"github.com/hunterlong/statping/core/notifier"
@@ -179,33 +180,39 @@ func (c *Core) Connect(retry bool, location string) error {
 	if DbSession != nil {
 		return nil
 	}
-	var conn, dbType string
+	var conn string
 	var err error
-	switch dbType {
+
+	if c.Config == nil {
+		return errors.New("missing database connection configs")
+	}
+
+	configs := c.Config
+	switch configs.DbConn {
 	case "sqlite":
 		sqlFilename := findDbFile()
 		conn = sqlFilename
 		log.Infof("SQL database file at: %v/%v", utils.Directory, conn)
-		dbType = "sqlite3"
+		configs.DbConn = "sqlite3"
 	case "mysql":
-		host := fmt.Sprintf("%v:%v", CoreApp.Config.DbHost, CoreApp.Config.DbPort)
-		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC&time_zone=%%27UTC%%27", CoreApp.Config.DbUser, CoreApp.Config.DbPass, host, CoreApp.Config.DbData)
+		host := fmt.Sprintf("%v:%v", configs.DbHost, configs.DbPort)
+		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC&time_zone=%%27UTC%%27", configs.DbUser, configs.DbPass, host, configs.DbData)
 	case "postgres":
 		sslMode := "disable"
 		if postgresSSL != "" {
 			sslMode = postgresSSL
 		}
-		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v timezone=UTC sslmode=%v", CoreApp.Config.DbHost, CoreApp.Config.DbPort, CoreApp.Config.DbUser, CoreApp.Config.DbData, CoreApp.Config.DbPass, sslMode)
+		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v timezone=UTC sslmode=%v", configs.DbHost, configs.DbPort, configs.DbUser, configs.DbData, configs.DbPass, sslMode)
 	case "mssql":
-		host := fmt.Sprintf("%v:%v", CoreApp.Config.DbHost, CoreApp.Config.DbPort)
-		conn = fmt.Sprintf("sqlserver://%v:%v@%v?database=%v", CoreApp.Config.DbUser, CoreApp.Config.DbPass, host, CoreApp.Config.DbData)
+		host := fmt.Sprintf("%v:%v", configs.DbHost, configs.DbPort)
+		conn = fmt.Sprintf("sqlserver://%v:%v@%v?database=%v", configs.DbUser, configs.DbPass, host, configs.DbData)
 	}
 	log.WithFields(utils.ToFields(c, conn)).Debugln("attempting to connect to database")
-	dbSession, err := database.Openw(dbType, conn)
+	dbSession, err := database.Openw(configs.DbConn, conn)
 	if err != nil {
 		log.Debugln(fmt.Sprintf("Database connection error %v", err))
 		if retry {
-			log.Errorln(fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", CoreApp.Config.DbHost))
+			log.Errorln(fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", configs.DbHost))
 			return c.waitForDb()
 		} else {
 			return err
@@ -226,7 +233,7 @@ func (c *Core) Connect(retry bool, location string) error {
 		if utils.VerboseMode >= 4 {
 			DbSession.LogMode(true).Debug().SetLogger(gorm.Logger{log})
 		}
-		log.Infoln(fmt.Sprintf("Database %v connection was successful.", dbType))
+		log.Infoln(fmt.Sprintf("Database %v connection was successful.", configs.DbConn))
 	}
 	return err
 }

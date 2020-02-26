@@ -26,9 +26,9 @@ func SelectGroups(includeAll bool, auth bool) []*Group {
 		}
 	}
 	sort.Sort(GroupOrder(validGroups))
-	if includeAll {
-		validGroups = append(validGroups, &Group{})
-	}
+	//if includeAll {
+	//	validGroups = append(validGroups, &Group{})
+	//}
 	return validGroups
 }
 

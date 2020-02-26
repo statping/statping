@@ -216,9 +216,11 @@ func insertSampleGroups() error {
 func insertSampleCheckins() error {
 	s1 := SelectService(1)
 	checkin1 := &types.Checkin{
+		Name:        "Example Checkin 1",
 		ServiceId:   s1.Id,
 		Interval:    300,
 		GracePeriod: 300,
+		ApiKey:      utils.RandomString(7),
 	}
 
 	if _, err := database.Create(checkin1); err != nil {
@@ -227,9 +229,11 @@ func insertSampleCheckins() error {
 
 	s2 := SelectService(1)
 	checkin2 := &types.Checkin{
+		Name:        "Example Checkin 2",
 		ServiceId:   s2.Id,
 		Interval:    900,
 		GracePeriod: 300,
+		ApiKey:      utils.RandomString(7),
 	}
 
 	if _, err := database.Create(checkin2); err != nil {

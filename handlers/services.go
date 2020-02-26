@@ -238,9 +238,8 @@ func apiServiceFailuresHandler(r *http.Request) interface{} {
 		return errors.New("service not found")
 	}
 
-	var fails []types.Failure
+	var fails []*types.Failure
 	database.ParseQueries(r, service.Failures()).Find(&fails)
-
 	return fails
 }
 
