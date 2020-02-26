@@ -16,18 +16,22 @@ type ServiceObj struct {
 }
 
 type Servicer interface {
-	Hits() *HitObj
 	Failures() *FailureObj
-	AllCheckins() []*CheckinObj
-	Model() *types.Service
-	Interval() time.Duration
+	Checkins() []*CheckinObj
 	DowntimeText() string
+	UpdateStats()
+	Model() *ServiceObj
 
 	Hittable
 }
 
 type Hittable interface {
-	CreateHit(*types.Hit) (int64, error)
+	Hits() *HitObj
+	CreateHit(hit *types.Hit) *HitObj
+}
+
+func (s *ServiceObj) Model() *ServiceObj {
+	return s
 }
 
 func Service(id int64) (*ServiceObj, error) {
@@ -52,7 +56,7 @@ func Services() []*ServiceObj {
 	return wrapServices(services, db)
 }
 
-func (s *ServiceObj) AllCheckins() []*CheckinObj {
+func (s *ServiceObj) Checkins() []*CheckinObj {
 	var checkins []*types.Checkin
 	query := database.Checkins().Where("service = ?", s.Id)
 	query.Find(&checkins)
@@ -61,7 +65,10 @@ func (s *ServiceObj) AllCheckins() []*CheckinObj {
 
 func (s *ServiceObj) DowntimeText() string {
 	last := s.Failures().Last(1)
-	return parseError(last)
+	if len(last) == 0 {
+		return ""
+	}
+	return parseError(last[0])
 }
 
 // ParseError returns a human readable error for a Failure
@@ -116,16 +123,7 @@ func parseError(f *types.Failure) string {
 	return f.Issue
 }
 
-func (s *ServiceObj) Interval() time.Duration {
-	return time.Duration(s.Service.Interval) * time.Second
-}
-
-func (s *ServiceObj) Model() *types.Service {
-	return s.Service
-}
-
 func (s *ServiceObj) Hits() *HitObj {
-	fmt.Println("hits")
 	query := database.Hits().Where("service = ?", s.Id)
 	return &HitObj{wrapObject(s.Id, nil, query)}
 }
@@ -149,34 +147,27 @@ func (s *ServiceObj) object() *Object {
 	return s.o
 }
 
-func (s *ServiceObj) UpdateStats() *types.Stats {
+func (s *ServiceObj) UpdateStats() {
 	s.Online24Hours = s.OnlineDaysPercent(1)
 	s.Online7Days = s.OnlineDaysPercent(7)
 	s.AvgResponse = s.AvgTime()
-	s.FailuresLast24Hours = len(s.Failures().Since(time.Now().Add(-time.Hour * 24)))
-	return s.Stats
+	s.FailuresLast24Hours = len(s.Failures().Since(time.Now().UTC().Add(-time.Hour * 24)))
+	s.Stats = &types.Stats{
+		Failures: s.Failures().Count(),
+		Hits:     s.Hits().Count(),
+	}
 }
 
 // AvgTime will return the average amount of time for a service to response back successfully
 func (s *ServiceObj) AvgTime() float64 {
-	var sum []float64
-	database.Hits().
-		Select("AVG(latency) as amount").
-		Where("service = ?", s.Id).Pluck("amount", &sum).Debug()
+	sum := s.Hits().Sum()
+	return sum
+}
 
-	sumTotal := float64(0)
-	for _, v := range sum {
-		sumTotal += v
-	}
-
-	total := s.Hits().Count()
-
-	if total == 0 {
-		return 0
-	}
-	avg := sumTotal / float64(total) * 100
-	f, _ := strconv.ParseFloat(fmt.Sprintf("%0.0f", avg*10), 32)
-	return f
+// AvgUptime will return the average amount of time for a service to response back successfully
+func (s *ServiceObj) AvgUptime(since time.Time) float64 {
+	sum := s.Hits().Sum()
+	return sum
 }
 
 // OnlineDaysPercent returns the service's uptime percent within last 24 hours
@@ -211,12 +202,12 @@ func (s *ServiceObj) OnlineSince(ago time.Time) float32 {
 func (s *ServiceObj) Downtime() time.Duration {
 	hits := s.Hits().Last(1)
 	fail := s.Failures().Last(1)
-	if fail == nil {
+	if len(fail) == 0 {
 		return time.Duration(0)
 	}
-	if hits == nil {
-		return time.Now().UTC().Sub(fail.CreatedAt.UTC())
+	if len(fail) == 0 {
+		return time.Now().UTC().Sub(fail[0].CreatedAt.UTC())
 	}
-	since := fail.CreatedAt.UTC().Sub(hits.CreatedAt.UTC())
+	since := fail[0].CreatedAt.UTC().Sub(hits[0].CreatedAt.UTC())
 	return since
 }

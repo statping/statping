@@ -15,10 +15,25 @@ func (h *HitObj) All() []*types.Hit {
 	return fails
 }
 
-func (h *HitObj) Last(amount int) *types.Hit {
-	var hits types.Hit
+func (s *ServiceObj) CreateHit(hit *types.Hit) *HitObj {
+	hit.Service = s.Id
+	database.Create(hit)
+	return &HitObj{wrapObject(hit.Id, hit, database.Hits().Where("id = ?", hit.Id))}
+}
+
+func (h *HitObj) Sum() float64 {
+	result := struct {
+		amount float64
+	}{0}
+
+	h.o.db.Select("AVG(latency) as amount").Scan(&result).Debug()
+	return result.amount
+}
+
+func (h *HitObj) Last(amount int) []*types.Hit {
+	var hits []*types.Hit
 	h.o.db.Limit(amount).Find(&hits)
-	return &hits
+	return hits
 }
 
 func (h *HitObj) Since(t time.Time) []*types.Hit {

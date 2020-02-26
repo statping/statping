@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/handlers"
-	"github.com/hunterlong/statping/plugin"
 	"github.com/hunterlong/statping/source"
 	"github.com/joho/godotenv"
 	"os"
@@ -49,22 +48,17 @@ func init() {
 // parseFlags will parse the application flags
 // -ip = 0.0.0.0 IP address for outgoing HTTP server
 // -port = 8080 Port number for outgoing HTTP server
+// environment variables WILL overwrite flags
 func parseFlags() {
-	flag.StringVar(&ipAddress, "ip", "0.0.0.0", "IP address to run the Statping HTTP server")
-	flag.StringVar(&envFile, "env", "", "IP address to run the Statping HTTP server")
-	flag.IntVar(&port, "port", 8080, "Port to run the HTTP server")
-	flag.IntVar(&verboseMode, "verbose", 2, "Run in verbose mode to see detailed logs (1 - 4)")
-	flag.Parse()
+	envPort := utils.Getenv("PORT", 8080).(int)
+	envIpAddress := utils.Getenv("IP", "0.0.0.0").(string)
+	envVerbose := utils.Getenv("VERBOSE", 2).(int)
 
-	if os.Getenv("PORT") != "" {
-		port = int(utils.ToInt(os.Getenv("PORT")))
-	}
-	if os.Getenv("IP") != "" {
-		ipAddress = os.Getenv("IP")
-	}
-	if os.Getenv("VERBOSE") != "" {
-		verboseMode = int(utils.ToInt(os.Getenv("VERBOSE")))
-	}
+	flag.StringVar(&ipAddress, "ip", envIpAddress, "IP address to run the Statping HTTP server")
+	flag.StringVar(&envFile, "env", "", "IP address to run the Statping HTTP server")
+	flag.IntVar(&port, "port", envPort, "Port to run the HTTP server")
+	flag.IntVar(&verboseMode, "verbose", envVerbose, "Run in verbose mode to see detailed logs (1 - 4)")
+	flag.Parse()
 }
 
 // main will run the Statping application
@@ -93,7 +87,7 @@ func main() {
 	log.Info(fmt.Sprintf("Starting Statping v%v", VERSION))
 	updateDisplay()
 
-	configs, err := core.LoadConfigFile(utils.Directory)
+	_, err = core.LoadConfigFile(utils.Directory)
 	if err != nil {
 		log.Errorln(err)
 		core.CoreApp.Setup = false
@@ -108,16 +102,16 @@ func main() {
 			log.Fatalln(err)
 		}
 	}
-	core.CoreApp.Config = configs
 	if err := mainProcess(); err != nil {
 		log.Fatalln(err)
+		os.Exit(2)
 	}
 }
 
 // Close will gracefully stop the database connection, and log file
 func Close() {
-	core.CloseDB()
 	utils.CloseLogs()
+	core.CloseDB()
 }
 
 // sigterm will attempt to close the database connections gracefully
@@ -147,10 +141,13 @@ func mainProcess() error {
 		log.Errorln(fmt.Sprintf("could not connect to database: %v", err))
 		return err
 	}
-	core.CoreApp.MigrateDatabase()
-	core.InitApp()
+	if err := core.CoreApp.MigrateDatabase(); err != nil {
+		return err
+	}
+	if err := core.InitApp(); err != nil {
+		return err
+	}
 	if core.CoreApp.Setup {
-		plugin.LoadPlugins()
 		if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
 			log.Fatalln(err)
 		}

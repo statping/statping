@@ -17,6 +17,7 @@ package notifier
 
 import (
 	"fmt"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -57,7 +58,7 @@ var core = &types.Core{
 func injectDatabase() {
 	sqlPath := dir + "/notifier.db"
 	utils.DeleteFile(sqlPath)
-	db, _ = types.Openw("sqlite3", sqlPath)
+	db, _ = database.Openw("sqlite3", sqlPath)
 	db.CreateTable(&Notification{})
 }
 

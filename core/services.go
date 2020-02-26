@@ -25,20 +25,19 @@ import (
 )
 
 type Service struct {
-	*types.Service
+	*database.ServiceObj
 }
 
-type Servicer interface{}
-
-func Services() []database.Servicer {
+func Services() []*Service {
 	return CoreApp.services
 }
 
 // SelectService returns a *core.Service from in memory
-func SelectService(id int64) database.Servicer {
+func SelectService(id int64) *Service {
 	for _, s := range Services() {
-		if s.Model().Id == id {
-			fmt.Println("service: ", s.Model())
+		if s.Id == id {
+			s.UpdateStats()
+			fmt.Println("service: ", s.Name, s.Stats)
 			return s
 		}
 	}
@@ -47,7 +46,7 @@ func SelectService(id int64) database.Servicer {
 
 // CheckinProcess runs the checkin routine for each checkin attached to service
 func CheckinProcess(s database.Servicer) {
-	for _, c := range s.AllCheckins() {
+	for _, c := range s.Checkins() {
 		c.Start()
 		go CheckinRoutine(c)
 	}
@@ -55,31 +54,35 @@ func CheckinProcess(s database.Servicer) {
 
 // SelectAllServices returns a slice of *core.Service to be store on []*core.Services
 // should only be called once on startup.
-func SelectAllServices(start bool) ([]*database.ServiceObj, error) {
+func SelectAllServices(start bool) ([]*Service, error) {
 	srvs := database.Services()
 	for _, s := range srvs {
-		fmt.Println("services: ", s.Id, s.Name)
-	}
-
-	for _, s := range srvs {
 		if start {
-			service := s.Model()
-			service.Start()
+			s.Start()
 			CheckinProcess(s)
 		}
-		//fails := service.Service (limitedFailures)
-		//for _, f := range fails {
-		//	service.Failures = append(service.Failures, f)
-		//}
-		for _, c := range s.AllCheckins() {
-			s.Checkins = append(s.Checkins, c)
+
+		fails := s.Failures().Last(limitedFailures)
+		s.Service.Failures = fails
+
+		for _, c := range s.Checkins() {
+			s.Service.Checkins = append(s.Service.Checkins, c.Checkin)
 		}
+
 		// collect initial service stats
-		s.Service.Stats = s.UpdateStats()
-		CoreApp.services = append(CoreApp.services, s)
+		s.UpdateStats()
+		CoreApp.services = append(CoreApp.services, &Service{s})
 	}
 	reorderServices()
-	return srvs, nil
+	return CoreApp.services, nil
+}
+
+func wrapFailures(f []*types.Failure) []*Failure {
+	var fails []*Failure
+	for _, v := range f {
+		fails = append(fails, &Failure{v})
+	}
+	return fails
 }
 
 // reorderServices will sort the services based on 'order_id'
@@ -87,24 +90,10 @@ func reorderServices() {
 	sort.Sort(ServiceOrder(CoreApp.services))
 }
 
-// GraphData will return all hits or failures
-func GraphData(q *database.GroupQuery, dbType interface{}, by database.By) []*database.TimeValue {
-	dbQuery, err := q.Database().GroupQuery(q, by).ToTimeValue(dbType)
-
-	if err != nil {
-		log.Error(err)
-		return nil
-	}
-	if q.FillEmpty {
-		return dbQuery.FillMissing(q.Start, q.End)
-	}
-	return dbQuery.ToValues()
-}
-
 // index returns a services index int for updating the []*core.Services slice
-func index(s database.Servicer) int {
+func index(s int64) int {
 	for k, service := range CoreApp.services {
-		if s.Model().Id == service.Model().Id {
+		if s == service.Id {
 			return k
 		}
 	}
@@ -112,14 +101,13 @@ func index(s database.Servicer) int {
 }
 
 // updateService will update a service in the []*core.Services slice
-func updateService(s database.Servicer) {
-	CoreApp.services[index(s)] = s
+func updateService(s *Service) {
+	CoreApp.services[index(s.Id)] = s
 }
 
 // Delete will remove a service from the database, it will also end the service checking go routine
-func Delete(srv database.Servicer) error {
-	i := index(srv)
-	s := srv.Model()
+func (s *Service) Delete() error {
+	i := index(s.Id)
 	err := database.Delete(s)
 	if err != nil {
 		log.Errorln(fmt.Sprintf("Failed to delete service %v. %v", s.Name, err))
@@ -129,13 +117,12 @@ func Delete(srv database.Servicer) error {
 	slice := CoreApp.services
 	CoreApp.services = append(slice[:i], slice[i+1:]...)
 	reorderServices()
-	notifier.OnDeletedService(s)
+	notifier.OnDeletedService(s.Service)
 	return err
 }
 
 // Update will update a service in the database, the service's checking routine can be restarted by passing true
-func Update(srv database.Servicer, restart bool) error {
-	s := srv.Model()
+func Update(s *Service, restart bool) error {
 	err := database.Update(s)
 	if err != nil {
 		log.Errorln(fmt.Sprintf("Failed to update service %v. %v", s.Name, err))
@@ -151,12 +138,12 @@ func Update(srv database.Servicer, restart bool) error {
 	if restart {
 		s.Close()
 		s.Start()
-		s.SleepDuration = time.Duration(s.Interval) * time.Second
-		go ServiceCheckQueue(srv, true)
+		s.SleepDuration = s.Duration()
+		go ServiceCheckQueue(s, true)
 	}
 	reorderServices()
-	updateService(srv)
-	notifier.OnUpdatedService(s)
+	updateService(s)
+	notifier.OnUpdatedService(s.Service)
 	return err
 }
 
@@ -169,10 +156,11 @@ func Create(srv database.Servicer, check bool) (int64, error) {
 		log.Errorln(fmt.Sprintf("Failed to create service %v #%v: %v", s.Name, s.Id, err))
 		return 0, err
 	}
+	service := &Service{s}
 	s.Start()
-	go ServiceCheckQueue(srv, check)
-	CoreApp.services = append(CoreApp.services, srv)
+	CoreApp.services = append(CoreApp.services, service)
+	go ServiceCheckQueue(service, check)
 	reorderServices()
-	notifier.OnNewService(s)
+	notifier.OnNewService(s.Service)
 	return s.Id, nil
 }

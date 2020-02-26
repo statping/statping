@@ -30,35 +30,37 @@ type scope struct {
 func (s scope) MarshalJSON() ([]byte, error) {
 	svc := reflect.ValueOf(s.data)
 	if svc.Kind() == reflect.Slice {
-		alldata := make([]map[string]interface{}, 0)
+		alldata := make([]map[string]interface{}, svc.Len())
 		for i := 0; i < svc.Len(); i++ {
 			objIndex := svc.Index(i)
-			if objIndex.Kind() == reflect.Ptr {
-				objIndex = objIndex.Elem()
-			}
-			alldata = append(alldata, SafeJson(objIndex.Interface(), s.scope))
+			alldata[i] = SafeJson(objIndex, s.scope)
 		}
 		return json.Marshal(alldata)
 	}
-	return json.Marshal(SafeJson(svc.Interface(), s.scope))
+	return json.Marshal(SafeJson(svc, s.scope))
 }
 
-func SafeJson(input interface{}, scope string) map[string]interface{} {
+func SafeJson(val reflect.Value, scope string) map[string]interface{} {
 	thisData := make(map[string]interface{})
-	t := reflect.TypeOf(input)
-	elem := reflect.ValueOf(input)
-	d, _ := json.Marshal(input)
+	if val.Kind() == reflect.Interface && !val.IsNil() {
+		elm := val.Elem()
+		if elm.Kind() == reflect.Ptr && !elm.IsNil() && elm.Elem().Kind() == reflect.Ptr {
+			val = elm
+		}
+	}
+	if val.Kind() == reflect.Ptr {
+		val = val.Elem()
+	}
 
-	var raw map[string]*json.RawMessage
-	json.Unmarshal(d, &raw)
+	for i := 0; i < val.NumField(); i++ {
+		valueField := val.Field(i)
+		typeField := val.Type().Field(i)
+		tagVal := typeField.Tag
 
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-
-		tag := field.Tag.Get("scope")
+		tag := tagVal.Get("scope")
 		tags := strings.Split(tag, ",")
 
-		jTags := field.Tag.Get("json")
+		jTags := tagVal.Get("json")
 		jsonTag := strings.Split(jTags, ",")
 
 		if len(jsonTag) == 0 {
@@ -69,21 +71,19 @@ func SafeJson(input interface{}, scope string) map[string]interface{} {
 			continue
 		}
 
-		trueValue := elem.Field(i).Interface()
-
 		if len(jsonTag) == 2 {
-			if jsonTag[1] == "omitempty" && trueValue == "" {
+			if jsonTag[1] == "omitempty" && valueField.Interface() == "" {
 				continue
 			}
 		}
 
 		if tag == "" {
-			thisData[jsonTag[0]] = trueValue
+			thisData[jsonTag[0]] = valueField.Interface()
 			continue
 		}
 
 		if forTag(tags, scope) {
-			thisData[jsonTag[0]] = trueValue
+			thisData[jsonTag[0]] = valueField.Interface()
 		}
 	}
 	return thisData

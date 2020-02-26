@@ -17,6 +17,7 @@ package core
 
 import (
 	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -39,26 +40,27 @@ func init() {
 
 func TestNewCore(t *testing.T) {
 	err := TmpRecords("core.db")
+	t.Log(err)
 	require.Nil(t, err)
 	require.NotNil(t, CoreApp)
 }
 
 func TestDbConfig_Save(t *testing.T) {
-	t.SkipNow()
-	//if skipNewDb {
-	//	t.SkipNow()
-	//}
-	//var err error
-	//Configs = &DbConfig{
-	//	DbConn:   "sqlite",
-	//	Project:  "Tester",
-	//	Location: dir,
-	//}
-	//Configs, err = Configs.Save()
-	//assert.Nil(t, err)
-	//assert.Equal(t, "sqlite", Configs.DbConn)
-	//assert.NotEmpty(t, Configs.ApiKey)
-	//assert.NotEmpty(t, Configs.ApiSecret)
+	if skipNewDb {
+		t.SkipNow()
+	}
+
+	config := &DbConfig{&types.DbConfig{
+		DbConn:   "sqlite",
+		Project:  "Tester",
+		Location: dir,
+	}}
+
+	err := config.Save()
+	require.Nil(t, err)
+	assert.Equal(t, "sqlite", CoreApp.Config.DbConn)
+	assert.NotEmpty(t, CoreApp.Config.ApiKey)
+	assert.NotEmpty(t, CoreApp.Config.ApiSecret)
 }
 
 func TestLoadDbConfig(t *testing.T) {
@@ -73,7 +75,6 @@ func TestDbConnection(t *testing.T) {
 }
 
 func TestDropDatabase(t *testing.T) {
-	t.SkipNow()
 	if skipNewDb {
 		t.SkipNow()
 	}
@@ -82,7 +83,6 @@ func TestDropDatabase(t *testing.T) {
 }
 
 func TestSeedSchemaDatabase(t *testing.T) {
-	t.SkipNow()
 	if skipNewDb {
 		t.SkipNow()
 	}
@@ -97,7 +97,6 @@ func TestMigrateDatabase(t *testing.T) {
 }
 
 func TestSeedDatabase(t *testing.T) {
-	t.SkipNow()
 	err := InsertLargeSampleData()
 	assert.Nil(t, err)
 }
@@ -115,7 +114,6 @@ func TestSelectCore(t *testing.T) {
 }
 
 func TestInsertNotifierDB(t *testing.T) {
-	t.SkipNow()
 	if skipNewDb {
 		t.SkipNow()
 	}

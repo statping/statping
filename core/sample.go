@@ -34,7 +34,10 @@ var (
 func InsertSampleData() error {
 	log.Infoln("Inserting Sample Data...")
 
-	insertSampleGroups()
+	if err := insertSampleGroups(); err != nil {
+		return err
+	}
+
 	createdOn := time.Now().Add(((-24 * 30) * 3) * time.Hour).UTC()
 	s1 := &types.Service{
 		Name:           "Google",
@@ -106,15 +109,33 @@ func InsertSampleData() error {
 		CreatedAt: createdOn,
 	}
 
-	database.Create(s1)
-	database.Create(s2)
-	database.Create(s3)
-	database.Create(s4)
-	database.Create(s5)
+	if _, err := database.Create(s1); err != nil {
+		return types.ErrWrap(err, types.ErrorCreateService)
+	}
+	if _, err := database.Create(s2); err != nil {
+		return types.ErrWrap(err, types.ErrorCreateService)
+	}
+	if _, err := database.Create(s3); err != nil {
+		return types.ErrWrap(err, types.ErrorCreateService)
+	}
+	if _, err := database.Create(s4); err != nil {
+		return types.ErrWrap(err, types.ErrorCreateService)
+	}
+	if _, err := database.Create(s5); err != nil {
+		return types.ErrWrap(err, types.ErrorCreateService)
+	}
 
-	insertMessages()
+	if _, err := SelectAllServices(false); err != nil {
+		return types.ErrWrap(err, types.ErrorServiceSelection)
+	}
 
-	insertSampleIncidents()
+	if err := insertMessages(); err != nil {
+		return types.ErrWrap(err, types.ErrorCreateMessage)
+	}
+
+	if err := insertSampleIncidents(); err != nil {
+		return types.ErrWrap(err, types.ErrorCreateIncident)
+	}
 
 	log.Infoln("Sample data has finished importing")
 
@@ -128,7 +149,7 @@ func insertSampleIncidents() error {
 		ServiceId:   2,
 	}
 	if _, err := database.Create(incident1); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateIncidentUp)
 	}
 
 	incidentUpdate1 := &types.IncidentUpdate{
@@ -137,7 +158,7 @@ func insertSampleIncidents() error {
 		Type:       "Investigating",
 	}
 	if _, err := database.Create(incidentUpdate1); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateIncidentUp)
 	}
 
 	incidentUpdate2 := &types.IncidentUpdate{
@@ -146,7 +167,7 @@ func insertSampleIncidents() error {
 		Type:       "Update",
 	}
 	if _, err := database.Create(incidentUpdate2); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateIncidentUp)
 	}
 
 	incidentUpdate3 := &types.IncidentUpdate{
@@ -155,7 +176,7 @@ func insertSampleIncidents() error {
 		Type:       "Resolved",
 	}
 	if _, err := database.Create(incidentUpdate3); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateIncidentUp)
 	}
 
 	return nil
@@ -168,7 +189,7 @@ func insertSampleGroups() error {
 		Order:  2,
 	}
 	if _, err := database.Create(group1); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateGroup)
 	}
 
 	group2 := &types.Group{
@@ -177,7 +198,7 @@ func insertSampleGroups() error {
 		Order:  1,
 	}
 	if _, err := database.Create(group2); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateGroup)
 	}
 
 	group3 := &types.Group{
@@ -186,7 +207,7 @@ func insertSampleGroups() error {
 		Order:  3,
 	}
 	if _, err := database.Create(group3); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateGroup)
 	}
 	return nil
 }
@@ -195,24 +216,24 @@ func insertSampleGroups() error {
 func insertSampleCheckins() error {
 	s1 := SelectService(1)
 	checkin1 := &types.Checkin{
-		ServiceId:   s1.Model().Id,
+		ServiceId:   s1.Id,
 		Interval:    300,
 		GracePeriod: 300,
 	}
 
 	if _, err := database.Create(checkin1); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateService)
 	}
 
 	s2 := SelectService(1)
 	checkin2 := &types.Checkin{
-		ServiceId:   s2.Model().Id,
+		ServiceId:   s2.Id,
 		Interval:    900,
 		GracePeriod: 300,
 	}
 
 	if _, err := database.Create(checkin2); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateCheckinHit)
 	}
 
 	checkTime := time.Now().UTC().Add(-24 * time.Hour)
@@ -224,7 +245,7 @@ func insertSampleCheckins() error {
 		}
 
 		if _, err := database.Create(checkHit); err != nil {
-			return err
+			return types.ErrWrap(err, types.ErrorCreateCheckinHit)
 		}
 
 		checkTime = checkTime.Add(10 * time.Minute)
@@ -240,7 +261,7 @@ func InsertSampleHits() error {
 		sg.Add(1)
 		service := SelectService(i)
 		seed := time.Now().UnixNano()
-		log.Infoln(fmt.Sprintf("Adding %v sample hit records to service %v", SampleHits, service.Model().Name))
+		log.Infoln(fmt.Sprintf("Adding %v sample hit records to service %v", SampleHits, service.Name))
 		createdAt := sampleStart
 		p := utils.NewPerlin(2., 2., 10, seed)
 		go func() {
@@ -249,7 +270,7 @@ func InsertSampleHits() error {
 				latency := p.Noise1D(hi / 500)
 				createdAt = createdAt.Add(60 * time.Second)
 				hit := &types.Hit{
-					Service:   service.Model().Id,
+					Service:   service.Id,
 					CreatedAt: createdAt,
 					Latency:   latency,
 				}
@@ -258,11 +279,11 @@ func InsertSampleHits() error {
 		}()
 	}
 	sg.Wait()
-	err := tx.Commit().Error()
-	if err != nil {
+	if err := tx.Commit().Error(); err != nil {
 		log.Errorln(err)
+		return types.ErrWrap(err, types.ErrorCreateSampleHits)
 	}
-	return err
+	return nil
 }
 
 // insertSampleCore will create a new Core for the seed
@@ -276,11 +297,14 @@ func insertSampleCore() error {
 		Version:     "test",
 		CreatedAt:   time.Now().UTC(),
 		UseCdn:      types.NewNullBool(false),
+		Footer:      types.NewNullString(""),
 	}
 
-	_, err := database.Create(core)
+	if _, err := database.Create(core); err != nil {
+		return types.ErrWrap(err, types.ErrorCreateCore)
+	}
 
-	return err
+	return nil
 }
 
 // insertSampleUsers will create 2 admin users for a seed database
@@ -293,7 +317,7 @@ func insertSampleUsers() error {
 	}
 
 	if _, err := database.Create(u2); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateUser)
 	}
 
 	u3 := &types.User{
@@ -304,7 +328,7 @@ func insertSampleUsers() error {
 	}
 
 	if _, err := database.Create(u3); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateUser)
 	}
 
 	return nil
@@ -320,7 +344,7 @@ func insertMessages() error {
 	}
 
 	if _, err := database.Create(m1); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateMessage)
 	}
 
 	m2 := &types.Message{
@@ -332,7 +356,7 @@ func insertMessages() error {
 	}
 
 	if _, err := database.Create(m2); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateMessage)
 	}
 	return nil
 }
@@ -368,7 +392,7 @@ func InsertLargeSampleData() error {
 	}
 
 	if _, err := database.Create(s6); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateService)
 	}
 
 	s7 := &types.Service{
@@ -384,7 +408,7 @@ func InsertLargeSampleData() error {
 	}
 
 	if _, err := database.Create(s7); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateService)
 	}
 
 	s8 := &types.Service{
@@ -399,7 +423,7 @@ func InsertLargeSampleData() error {
 	}
 
 	if _, err := database.Create(s8); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateService)
 	}
 
 	s9 := &types.Service{
@@ -415,7 +439,7 @@ func InsertLargeSampleData() error {
 	}
 
 	if _, err := database.Create(s9); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateService)
 	}
 
 	s10 := &types.Service{
@@ -431,7 +455,7 @@ func InsertLargeSampleData() error {
 	}
 
 	if _, err := database.Create(s10); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateService)
 	}
 
 	s11 := &types.Service{
@@ -447,7 +471,7 @@ func InsertLargeSampleData() error {
 	}
 
 	if _, err := database.Create(s11); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateService)
 	}
 
 	s12 := &types.Service{
@@ -463,7 +487,7 @@ func InsertLargeSampleData() error {
 	}
 
 	if _, err := database.Create(s12); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateService)
 	}
 
 	s13 := &types.Service{
@@ -479,7 +503,7 @@ func InsertLargeSampleData() error {
 	}
 
 	if _, err := database.Create(s13); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateService)
 	}
 
 	s14 := &types.Service{
@@ -495,7 +519,7 @@ func InsertLargeSampleData() error {
 	}
 
 	if _, err := database.Create(s14); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateService)
 	}
 
 	s15 := &types.Service{
@@ -511,7 +535,7 @@ func InsertLargeSampleData() error {
 	}
 
 	if _, err := database.Create(s15); err != nil {
-		return err
+		return types.ErrWrap(err, types.ErrorCreateService)
 	}
 
 	var dayAgo = time.Now().UTC().Add((-24 * 90) * time.Hour)
@@ -527,14 +551,14 @@ func InsertLargeSampleData() error {
 func insertFailureRecords(since time.Time, amount int) {
 	for i := int64(14); i <= 15; i++ {
 		service := SelectService(i)
-		log.Infoln(fmt.Sprintf("Adding %v Failure records to service %v", amount, service.Model().Name))
+		log.Infoln(fmt.Sprintf("Adding %v Failure records to service %v", amount, service.Name))
 		createdAt := since
 
 		for fi := 1; fi <= amount; fi++ {
 			createdAt = createdAt.Add(2 * time.Minute)
 
 			failure := &types.Failure{
-				Service:   service.Model().Id,
+				Service:   service.Id,
 				Issue:     "testing right here",
 				CreatedAt: createdAt,
 			}
@@ -545,32 +569,36 @@ func insertFailureRecords(since time.Time, amount int) {
 }
 
 // insertHitRecords will create successful Hit records for 15 services
-func insertHitRecords(since time.Time, amount int) {
+func insertHitRecords(since time.Time, amount int) error {
 	for i := int64(1); i <= 15; i++ {
 		service := SelectService(i)
-		log.Infoln(fmt.Sprintf("Adding %v hit records to service %v", amount, service.Model().Name))
+		log.Infoln(fmt.Sprintf("Adding %v hit records to service %v", amount, service.Name))
 		createdAt := since
 		p := utils.NewPerlin(2, 2, 5, time.Now().UnixNano())
 		for hi := 1; hi <= amount; hi++ {
 			latency := p.Noise1D(float64(hi / 10))
 			createdAt = createdAt.Add(1 * time.Minute)
 			hit := &types.Hit{
-				Service:   service.Model().Id,
+				Service:   service.Id,
 				CreatedAt: createdAt.UTC(),
 				Latency:   latency,
 			}
-			database.Create(hit)
+			if _, err := database.Create(hit); err != nil {
+				return types.ErrWrap(err, types.ErrorCreateHit, service.Id)
+			}
 		}
 
 	}
-
+	return nil
 }
 
 // TmpRecords is used for testing Statping. It will create a SQLite database file
 // with sample data and store it in the /tmp folder to be used by the tests.
 func TmpRecords(dbFile string) error {
 	var sqlFile = utils.Directory + "/" + dbFile
-	utils.CreateDirectory(utils.Directory + "/tmp")
+	if err := utils.CreateDirectory(utils.Directory + "/tmp"); err != nil {
+		log.Error(err)
+	}
 	var tmpSqlFile = utils.Directory + "/tmp/" + types.SqliteFilename
 	SampleHits = 480
 
@@ -578,19 +606,19 @@ func TmpRecords(dbFile string) error {
 	CoreApp = NewCore()
 	CoreApp.Name = "Tester"
 	CoreApp.Setup = true
-	configs := &types.DbConfig{
+	configs := &DbConfig{&types.DbConfig{
 		DbConn:   "sqlite",
 		Project:  "Tester",
 		Location: utils.Directory,
 		SqlFile:  sqlFile,
-	}
+	}}
 	log.Infoln("saving config.yml in: " + utils.Directory)
-	if configs, err = CoreApp.SaveConfig(configs); err != nil {
-		return err
+	if err := configs.Save(); err != nil {
+		log.Error(err)
 	}
 	log.Infoln("loading config.yml from: " + utils.Directory)
 	if configs, err = LoadConfigFile(utils.Directory); err != nil {
-		return err
+		log.Error(err)
 	}
 	log.Infoln("connecting to database")
 
@@ -598,37 +626,37 @@ func TmpRecords(dbFile string) error {
 	if exists {
 		log.Infoln(tmpSqlFile + " was found, copying the temp database to " + sqlFile)
 		if err := utils.DeleteFile(sqlFile); err != nil {
-			log.Infoln(sqlFile + " was not found")
+			log.Error(err)
 		}
 		if err := utils.CopyFile(tmpSqlFile, sqlFile); err != nil {
-			return err
+			log.Error(err)
 		}
 		log.Infoln("loading config.yml from: " + utils.Directory)
 
 		if err := CoreApp.Connect(false, utils.Directory); err != nil {
-			return err
+			log.Error(err)
 		}
 		log.Infoln("selecting the Core variable")
 		if _, err := SelectCore(); err != nil {
-			return err
+			log.Error(err)
 		}
 		log.Infoln("inserting notifiers into database")
 		if err := InsertNotifierDB(); err != nil {
-			return err
+			log.Error(err)
 		}
 		log.Infoln("inserting integrations into database")
 		if err := InsertIntegratorDB(); err != nil {
-			return err
+			log.Error(err)
 		}
 		log.Infoln("loading all services")
 		if _, err := SelectAllServices(false); err != nil {
 			return err
 		}
 		if err := AttachNotifiers(); err != nil {
-			return err
+			log.Error(err)
 		}
 		if err := AddIntegrations(); err != nil {
-			return err
+			log.Error(err)
 		}
 		CoreApp.Notifications = notifier.AllCommunications
 		return nil

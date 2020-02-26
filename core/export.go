@@ -49,10 +49,10 @@ func ExportSettings() ([]byte, error) {
 		Core:      CoreApp.Core,
 		Notifiers: CoreApp.Notifications,
 		//Checkins:  database.AllCheckins(),
-		Users:     users,
+		Users: users,
 		//Services:  CoreApp.Services,
 		//Groups:    SelectGroups(true, true),
-		Messages:  messages,
+		Messages: messages,
 	}
 	export, err := json.Marshal(data)
 	return export, err

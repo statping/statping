@@ -113,8 +113,6 @@ type Database interface {
 
 	Requests(*http.Request, isObject) Database
 
-	GroupQuery(query *GroupQuery, by By) GroupByer
-
 	Objects
 }
 
@@ -193,6 +191,9 @@ type Db struct {
 
 // Openw is a drop-in replacement for Open()
 func Openw(dialect string, args ...interface{}) (db Database, err error) {
+	gorm.NowFunc = func() time.Time {
+		return time.Now().UTC()
+	}
 	gormdb, err := gorm.Open(dialect, args...)
 	if err != nil {
 		return nil, err

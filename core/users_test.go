@@ -16,26 +16,26 @@
 package core
 
 import (
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestCreateUser(t *testing.T) {
-	user := ReturnUser(&types.User{
+	user := &types.User{
 		Username: "hunter",
 		Password: "password123",
 		Email:    "test@email.com",
 		Admin:    types.NewNullBool(true),
-	})
-	userId, err := user.Create()
+	}
+	obj, err := database.Create(user)
 	assert.Nil(t, err)
-	assert.NotZero(t, userId)
+	assert.NotZero(t, obj.Id)
 }
 
 func TestSelectAllUsers(t *testing.T) {
-	users, err := SelectAllUsers()
-	assert.Nil(t, err)
+	users := SelectAllUsers()
 	assert.Equal(t, 3, len(users))
 }
 
@@ -66,20 +66,19 @@ func TestUpdateUser(t *testing.T) {
 }
 
 func TestCreateUser2(t *testing.T) {
-	user := ReturnUser(&types.User{
+	user := &types.User{
 		Username: "hunterlong",
 		Password: "password123",
 		Email:    "User@email.com",
 		Admin:    types.NewNullBool(true),
-	})
-	userId, err := user.Create()
+	}
+	obj, err := database.Create(user)
 	assert.Nil(t, err)
-	assert.NotZero(t, userId)
+	assert.NotZero(t, obj.Id)
 }
 
 func TestSelectAllUsersAgain(t *testing.T) {
-	users, err := SelectAllUsers()
-	assert.Nil(t, err)
+	users := SelectAllUsers()
 	assert.Equal(t, 4, len(users))
 }
 

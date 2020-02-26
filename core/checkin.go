@@ -99,7 +99,7 @@ func AllCheckins() []*database.CheckinObj {
 // SelectCheckin will find a Checkin based on the API supplied
 func SelectCheckin(api string) *Checkin {
 	for _, s := range Services() {
-		for _, c := range s.AllCheckins() {
+		for _, c := range s.Checkins() {
 			if c.ApiKey == api {
 				return &Checkin{c}
 			}
@@ -140,19 +140,17 @@ func (c *Checkin) GetFailures(count int) []*types.Failure {
 }
 
 // Create will create a new Checkin
-func (c *Checkin) Delete() error {
+func (c *Checkin) Delete() {
 	c.Close()
 	i := c.index()
-	service := c.Service()
-	slice := service.Checkins
-	service.Checkins = append(slice[:i], slice[i+1:]...)
-	row := Database(c).Delete(&c)
-	return row.Error()
+	srv := c.Service()
+	slice := srv.Service.Checkins
+	srv.Service.Checkins = append(slice[:i], slice[i+1:]...)
 }
 
 // index returns a checkin index int for updating the *checkin.Service slice
 func (c *Checkin) index() int {
-	for k, checkin := range c.Service().Checkins {
+	for k, checkin := range c.Service().Checkins() {
 		if c.Id == checkin.Model().Id {
 			return k
 		}

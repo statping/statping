@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"time"
 )
 
@@ -18,6 +19,21 @@ type Checkiner interface {
 	Failures() *FailureObj
 	Model() *types.Checkin
 	Object() *CheckinObj
+}
+
+func (c *CheckinObj) BeforeCreate() (err error) {
+	c.ApiKey = utils.RandomString(7)
+	if c.CreatedAt.IsZero() {
+		c.CreatedAt = time.Now().UTC()
+		c.UpdatedAt = time.Now().UTC()
+	}
+	return
+}
+
+func (c *CheckinObj) BeforeDelete(tx Database) (err error) {
+	q := tx.Services().Where("id = ?", c.ServiceId).
+		Update("group_id", 0)
+	return q.Error()
 }
 
 func Checkin(id int64) (*CheckinObj, error) {

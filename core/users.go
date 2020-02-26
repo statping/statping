@@ -96,16 +96,21 @@ func SelectAllUsers() []*types.User {
 
 // AuthUser will return the User and a boolean if authentication was correct.
 // AuthUser accepts username, and password as a string
-func AuthUser(username, password string) (*User, bool) {
-	user, err := SelectUsername(username)
+func AuthUser(username, password string) (*types.User, bool) {
+	user, err := database.UserByUsername(username)
 	if err != nil {
 		log.Warnln(fmt.Errorf("user %v not found", username))
 		return nil, false
 	}
+
+	fmt.Println(username, password)
+
+	fmt.Println(username, user.Password)
+
 	if CheckHash(password, user.Password) {
 		user.UpdatedAt = time.Now().UTC()
-		user.Update()
-		return user, true
+		database.Update(user)
+		return user.User, true
 	}
 	return nil, false
 }

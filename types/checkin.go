@@ -36,15 +36,6 @@ type Checkin struct {
 	Failures    []*Failure    `gorm:"-" json:"failures"`
 }
 
-// BeforeCreate for Checkin will set CreatedAt to UTC
-func (c *Checkin) BeforeCreate() (err error) {
-	if c.CreatedAt.IsZero() {
-		c.CreatedAt = time.Now().UTC()
-		c.UpdatedAt = time.Now().UTC()
-	}
-	return
-}
-
 // CheckinHit is a successful response from a Checkin
 type CheckinHit struct {
 	Id        int64     `gorm:"primary_key;column:id" json:"id"`

@@ -22,7 +22,6 @@ import (
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
-	"os"
 )
 
 var (
@@ -41,15 +40,18 @@ func Router() *mux.Router {
 	CacheStorage = NewStorage()
 	r := mux.NewRouter().StrictSlash(true)
 
-	if os.Getenv("AUTH_USERNAME") != "" && os.Getenv("AUTH_PASSWORD") != "" {
-		authUser = os.Getenv("AUTH_USERNAME")
-		authPass = os.Getenv("AUTH_PASSWORD")
+	authUser := utils.Getenv("AUTH_USERNAME", "").(string)
+	authPass := utils.Getenv("AUTH_PASSWORD", "").(string)
+
+	if authUser != "" && authPass != "" {
 		r.Use(basicAuthHandler)
 	}
 
-	if os.Getenv("BASE_PATH") != "" {
-		basePath = "/" + os.Getenv("BASE_PATH") + "/"
-		r = r.PathPrefix("/" + os.Getenv("BASE_PATH")).Subrouter()
+	bPath := utils.Getenv("BASE_PATH", "").(string)
+
+	if bPath != "" {
+		basePath = "/" + bPath + "/"
+		r = r.PathPrefix("/" + bPath).Subrouter()
 		r.Handle("", http.HandlerFunc(indexHandler))
 	} else {
 		r.Handle("/", http.HandlerFunc(indexHandler))

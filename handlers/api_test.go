@@ -33,6 +33,7 @@ func init() {
 
 func TestResetDatabase(t *testing.T) {
 	err := core.TmpRecords("handlers.db")
+	t.Log(err)
 	require.Nil(t, err)
 	require.NotNil(t, core.CoreApp)
 	require.NotNil(t, core.CoreApp.Config)

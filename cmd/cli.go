@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/handlers"
-	"github.com/hunterlong/statping/plugin"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
@@ -72,13 +71,6 @@ func catchCLI(args []string) error {
 	case "update":
 		updateDisplay()
 		return errors.New("end")
-	case "test":
-		cmd := args[1]
-		switch cmd {
-		case "plugins":
-			plugin.LoadPlugins()
-		}
-		return errors.New("end")
 	case "static":
 		var err error
 		if err = runLogs(); err != nil {
@@ -88,7 +80,7 @@ func catchCLI(args []string) error {
 			return err
 		}
 		fmt.Printf("Statping v%v Exporting Static 'index.html' page...\n", VERSION)
-		if core.CoreApp.Config, err = core.LoadConfigFile(dir); err != nil {
+		if _, err = core.LoadConfigFile(dir); err != nil {
 			log.Errorln("config.yml file not found")
 			return err
 		}
@@ -111,7 +103,7 @@ func catchCLI(args []string) error {
 		if err = runAssets(); err != nil {
 			return err
 		}
-		if core.CoreApp.Config, err = core.LoadConfigFile(dir); err != nil {
+		if _, err = core.LoadConfigFile(dir); err != nil {
 			return err
 		}
 		if err = core.CoreApp.Connect(false, dir); err != nil {
@@ -207,7 +199,7 @@ func updateDisplay() error {
 // runOnce will initialize the Statping application and check each service 1 time, will not run HTTP server
 func runOnce() {
 	var err error
-	core.CoreApp.Config, err = core.LoadConfigFile(utils.Directory)
+	_, err = core.LoadConfigFile(utils.Directory)
 	if err != nil {
 		log.Errorln("config.yml file not found")
 	}

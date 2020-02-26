@@ -39,14 +39,12 @@ var (
 
 func init() {
 	DbModels = []interface{}{&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Message{}, &types.Group{}, &types.Checkin{}, &types.CheckinHit{}, &notifier.Notification{}, &types.Incident{}, &types.IncidentUpdate{}, &types.Integration{}}
-
-	gorm.NowFunc = func() time.Time {
-		return time.Now().UTC()
-	}
 }
 
 // DbConfig stores the config.yml file for the statup configuration
-type DbConfig types.DbConfig
+type DbConfig struct {
+	*types.DbConfig
+}
 
 func Database(obj interface{}) database.Database {
 	switch obj.(type) {
@@ -140,18 +138,18 @@ func CloseDB() {
 //}
 
 // InsertCore create the single row for the Core settings in Statping
-func (c *Core) InsertCore(db *types.DbConfig) (*Core, error) {
+func (d *DbConfig) InsertCore() (*Core, error) {
 	CoreApp = &Core{Core: &types.Core{
-		Name:        db.Project,
-		Description: db.Description,
+		Name:        d.Project,
+		Description: d.Description,
 		ConfigFile:  "config.yml",
 		ApiKey:      utils.NewSHA1Hash(9),
 		ApiSecret:   utils.NewSHA1Hash(16),
-		Domain:      db.Domain,
+		Domain:      d.Domain,
 		MigrationId: time.Now().Unix(),
-		Config:      db,
+		Config:      d.DbConfig,
 	}}
-	query := Database(CoreApp).Create(&CoreApp)
+	query := DbSession.Create(CoreApp.Core)
 	return CoreApp, query.Error()
 }
 
@@ -219,9 +217,13 @@ func (c *Core) Connect(retry bool, location string) error {
 	}
 	log.WithFields(utils.ToFields(dbSession)).Debugln("connected to database")
 
-	dbSession.DB().SetMaxOpenConns(5)
-	dbSession.DB().SetMaxIdleConns(5)
-	dbSession.DB().SetConnMaxLifetime(1 * time.Minute)
+	maxOpenConn := utils.Getenv("MAX_OPEN_CONN", 5)
+	maxIdleConn := utils.Getenv("MAX_IDLE_CONN", 5)
+	maxLifeConn := utils.Getenv("MAX_LIFE_CONN", 2*time.Minute)
+
+	dbSession.DB().SetMaxOpenConns(maxOpenConn.(int))
+	dbSession.DB().SetMaxIdleConns(maxIdleConn.(int))
+	dbSession.DB().SetConnMaxLifetime(maxLifeConn.(time.Duration))
 
 	if dbSession.DB().Ping() == nil {
 		DbSession = dbSession
@@ -237,26 +239,6 @@ func (c *Core) Connect(retry bool, location string) error {
 func (c *Core) waitForDb() error {
 	time.Sleep(5 * time.Second)
 	return c.Connect(true, utils.Directory)
-}
-
-// DatabaseMaintence will automatically delete old records from 'failures' and 'hits'
-// this function is currently set to delete records 7+ days old every 60 minutes
-func DatabaseMaintence() {
-	for range time.Tick(60 * time.Minute) {
-		log.Infoln("Checking for database records older than 3 months...")
-		since := time.Now().AddDate(0, -3, 0).UTC()
-		DeleteAllSince("failures", since)
-		DeleteAllSince("hits", since)
-	}
-}
-
-// DeleteAllSince will delete a specific table's records based on a time.
-func DeleteAllSince(table string, date time.Time) {
-	sql := fmt.Sprintf("DELETE FROM %v WHERE created_at < '%v';", table, date.Format("2006-01-02"))
-	db := DbSession.Exec(sql)
-	if db.Error() != nil {
-		log.Warnln(db.Error())
-	}
 }
 
 // Update will save the config.yml file
@@ -278,25 +260,25 @@ func (c *Core) UpdateConfig() error {
 }
 
 // Save will initially create the config.yml file
-func (c *Core) SaveConfig(configs *types.DbConfig) (*types.DbConfig, error) {
+func (d *DbConfig) Save() error {
 	config, err := os.Create(utils.Directory + "/config.yml")
 	if err != nil {
 		log.Errorln(err)
-		return nil, err
+		return err
 	}
 	defer config.Close()
-	log.WithFields(utils.ToFields(configs)).Debugln("saving config file at: " + utils.Directory + "/config.yml")
-	c.Config = configs
-	c.Config.ApiKey = utils.NewSHA1Hash(16)
-	c.Config.ApiSecret = utils.NewSHA1Hash(16)
-	data, err := yaml.Marshal(configs)
+	log.WithFields(utils.ToFields(d)).Debugln("saving config file at: " + utils.Directory + "/config.yml")
+	CoreApp.Config = d.DbConfig
+	CoreApp.Config.ApiKey = utils.NewSHA1Hash(16)
+	CoreApp.Config.ApiSecret = utils.NewSHA1Hash(16)
+	data, err := yaml.Marshal(d)
 	if err != nil {
 		log.Errorln(err)
-		return nil, err
+		return err
 	}
 	config.WriteString(string(data))
-	log.WithFields(utils.ToFields(configs)).Infoln("saved config file at: " + utils.Directory + "/config.yml")
-	return c.Config, err
+	log.WithFields(utils.ToFields(d)).Infoln("saved config file at: " + utils.Directory + "/config.yml")
+	return err
 }
 
 // CreateCore will initialize the global variable 'CoreApp". This global variable contains most of Statping app.
@@ -324,18 +306,13 @@ func (c *Core) CreateCore() *Core {
 // DropDatabase will DROP each table Statping created
 func (c *Core) DropDatabase() error {
 	log.Infoln("Dropping Database Tables...")
-	err := DbSession.DropTableIfExists("checkins")
-	err = DbSession.DropTableIfExists("checkin_hits")
-	err = DbSession.DropTableIfExists("notifications")
-	err = DbSession.DropTableIfExists("core")
-	err = DbSession.DropTableIfExists("failures")
-	err = DbSession.DropTableIfExists("hits")
-	err = DbSession.DropTableIfExists("services")
-	err = DbSession.DropTableIfExists("users")
-	err = DbSession.DropTableIfExists("messages")
-	err = DbSession.DropTableIfExists("incidents")
-	err = DbSession.DropTableIfExists("incident_updates")
-	return err.Error()
+	tables := []string{"checkins", "checkin_hits", "notifications", "core", "failures", "hits", "services", "users", "messages", "incidents", "incident_updates"}
+	for _, t := range tables {
+		if err := DbSession.DropTableIfExists(t); err != nil {
+			return err.Error()
+		}
+	}
+	return nil
 }
 
 // CreateDatabase will CREATE TABLES for each of the Statping elements

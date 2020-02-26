@@ -44,27 +44,52 @@ var (
 
 // init will set the utils.Directory to the current running directory, or STATPING_DIR if it is set
 func init() {
-	if os.Getenv("STATPING_DIR") != "" {
-		Directory = os.Getenv("STATPING_DIR")
-	} else {
-		dir, err := os.Getwd()
-		if err != nil {
-			Directory = "."
-			return
-		}
-		Directory = dir
+	defaultDir, err := os.Getwd()
+	if err != nil {
+		defaultDir = "."
 	}
+
+	Directory = Getenv("STATPING_DIR", defaultDir).(string)
+
 	// check if logs are disabled
-	logger := os.Getenv("DISABLE_LOGS")
-	disableLogs, _ = strconv.ParseBool(logger)
+	disableLogs = Getenv("DISABLE_LOGS", false).(bool)
 	if disableLogs {
 		Log.Out = ioutil.Discard
-		return
 	}
+
 	Log.Debugln("current working directory: ", Directory)
 	Log.AddHook(new(hook))
 	Log.SetNoLock()
 	checkVerboseMode()
+}
+
+func Getenv(key string, defaultValue interface{}) interface{} {
+	if val, ok := os.LookupEnv(key); ok {
+		if val != "" {
+			switch d := defaultValue.(type) {
+
+			case int, int64:
+				return int(ToInt(val))
+
+			case time.Duration:
+				dur, err := time.ParseDuration(val)
+				if err != nil {
+					return d
+				}
+				return dur
+			case bool:
+				ok, err := strconv.ParseBool(val)
+				if err != nil {
+					return d
+				}
+				return ok
+
+			default:
+				return val
+			}
+		}
+	}
+	return defaultValue
 }
 
 func SliceConvert(g []*interface{}) []interface{} {

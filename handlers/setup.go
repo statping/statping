@@ -52,7 +52,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	sample, _ := strconv.ParseBool(r.PostForm.Get("sample_data"))
 	dir := utils.Directory
 
-	config := &types.DbConfig{
+	config := &core.DbConfig{DbConfig: &types.DbConfig{
 		DbConn:      dbConn,
 		DbHost:      dbHost,
 		DbUser:      dbUser,
@@ -67,11 +67,11 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		Email:       email,
 		Error:       nil,
 		Location:    utils.Directory,
-	}
+	}}
 
 	log.WithFields(utils.ToFields(core.CoreApp, config)).Debugln("new configs posted")
 
-	if _, err := core.CoreApp.SaveConfig(config); err != nil {
+	if err := config.Save(); err != nil {
 		log.Errorln(err)
 		sendErrorJson(err, w, r)
 		return
@@ -100,7 +100,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	core.CoreApp, err = core.CoreApp.InsertCore(config)
+	core.CoreApp, err = config.InsertCore()
 	if err != nil {
 		log.Errorln(err)
 		sendErrorJson(err, w, r)
@@ -130,7 +130,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		Config  *types.DbConfig `json:"config"`
 	}{
 		"okokok",
-		config,
+		config.DbConfig,
 	}
 	returnJson(out, w, r)
 }

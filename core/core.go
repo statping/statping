@@ -35,7 +35,7 @@ type PluginRepos types.PluginRepos
 
 type Core struct {
 	*types.Core
-	services []database.Servicer
+	services []*Service
 }
 
 var (
@@ -63,18 +63,31 @@ func (c *Core) ToCore() *types.Core {
 }
 
 // InitApp will initialize Statping
-func InitApp() {
-	SelectCore()
-	InsertNotifierDB()
-	InsertIntegratorDB()
-	SelectAllServices(true)
+func InitApp() error {
+	if _, err := SelectCore(); err != nil {
+		return err
+	}
+	if err := InsertNotifierDB(); err != nil {
+		return err
+	}
+	if err := InsertIntegratorDB(); err != nil {
+		return err
+	}
+	if _, err := SelectAllServices(true); err != nil {
+		return err
+	}
 	checkServices()
-	AttachNotifiers()
-	AddIntegrations()
+	if err := AttachNotifiers(); err != nil {
+		return err
+	}
+	if err := AddIntegrations(); err != nil {
+		return err
+	}
 	CoreApp.Notifications = notifier.AllCommunications
 	CoreApp.Integrations = integrations.Integrations
-	go DatabaseMaintence()
+	database.StartMaintenceRoutine()
 	CoreApp.Setup = true
+	return nil
 }
 
 // InsertNotifierDB inject the Statping database instance to the Notifier package
@@ -214,9 +227,9 @@ func AddIntegrations() error {
 }
 
 // ServiceOrder will reorder the services based on 'order_id' (Order)
-type ServiceOrder []database.Servicer
+type ServiceOrder []*Service
 
 // Sort interface for resroting the Services in order
 func (c ServiceOrder) Len() int           { return len(c) }
 func (c ServiceOrder) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
-func (c ServiceOrder) Less(i, j int) bool { return c[i].Model().Order < c[j].Model().Order }
+func (c ServiceOrder) Less(i, j int) bool { return c[i].Order < c[j].Order }

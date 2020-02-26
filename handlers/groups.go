@@ -21,6 +21,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/database"
+	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
 )
@@ -32,11 +33,19 @@ func apiAllGroupHandler(r *http.Request) interface{} {
 	return groups
 }
 
+func flattenGroups(groups []*core.Group) []*types.Group {
+	var groupers []*types.Group
+	for _, g := range groups {
+		groupers = append(groupers, g.Group)
+	}
+	return groupers
+}
+
 // apiGroupHandler will show a single group
 func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	group := core.SelectGroup(utils.ToInt(vars["id"]))
-	if group == nil {
+	if group.Id == 0 {
 		sendErrorJson(errors.New("group not found"), w, r)
 		return
 	}
@@ -47,7 +56,7 @@ func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
 func apiGroupUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	group := core.SelectGroup(utils.ToInt(vars["id"]))
-	if group == nil {
+	if group.Id == 0 {
 		sendErrorJson(errors.New("group not found"), w, r)
 		return
 	}
@@ -82,7 +91,7 @@ func apiCreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 func apiGroupDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	group := core.SelectGroup(utils.ToInt(vars["id"]))
-	if group == nil {
+	if group.Id == 0 {
 		sendErrorJson(errors.New("group not found"), w, r)
 		return
 	}

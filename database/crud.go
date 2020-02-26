@@ -1,10 +1,13 @@
 package database
 
 import (
-	"fmt"
 	"github.com/hunterlong/statping/types"
 	"reflect"
 )
+
+type CrudObject interface {
+	Create()
+}
 
 type Object struct {
 	Id    int64
@@ -25,41 +28,35 @@ func wrapObject(id int64, model interface{}, db Database) *Object {
 }
 
 func modelId(model interface{}) int64 {
-	fmt.Printf("%T\n", model)
-	iface := reflect.ValueOf(model)
-	field := iface.Elem().FieldByName("Id")
-	return field.Int()
-}
-
-func toModel(model interface{}) Database {
 	switch model.(type) {
 	case *types.Core:
-		return database.Model(&types.Core{}).Table("core")
+		return 0
 	default:
-		return database.Model(&model)
+		iface := reflect.ValueOf(model)
+		field := iface.Elem().FieldByName("Id")
+		return field.Int()
 	}
 }
 
 func Create(data interface{}) (*Object, error) {
-	model := toModel(data)
-	query := model.Create(data)
-	if query.Error() != nil {
-		return nil, query.Error()
+	model := database.Model(&data)
+	if err := model.Create(data).Error(); err != nil {
+		return nil, err
 	}
 	obj := &Object{
 		Id:    modelId(data),
 		model: data,
 		db:    model,
 	}
-	return obj, query.Error()
+	return obj, nil
 }
 
 func Update(data interface{}) error {
-	model := toModel(data)
+	model := database.Model(&data)
 	return model.Update(&data).Error()
 }
 
 func Delete(data interface{}) error {
-	model := toModel(data)
+	model := database.Model(&data)
 	return model.Delete(data).Error()
 }

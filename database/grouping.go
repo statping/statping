@@ -15,7 +15,7 @@ type GroupBy struct {
 }
 
 type GroupByer interface {
-	ToTimeValue(interface{}) (*TimeVar, error)
+	ToTimeValue() (*TimeVar, error)
 }
 
 type By string
@@ -25,7 +25,6 @@ func (b By) String() string {
 }
 
 type GroupQuery struct {
-	db        Database
 	Start     time.Time
 	End       time.Time
 	Group     string
@@ -33,6 +32,8 @@ type GroupQuery struct {
 	Limit     int
 	Offset    int
 	FillEmpty bool
+
+	db Database
 }
 
 func (b GroupQuery) Find(data interface{}) error {
@@ -50,25 +51,16 @@ var (
 	}
 )
 
-func (db *Db) GroupQuery(q *GroupQuery, by By) GroupByer {
-	dbQuery := db.MultipleSelects(
-		db.SelectByTime(q.Group),
-		by.String(),
-	).Group("timeframe")
-
-	return &GroupBy{dbQuery, q}
-}
-
 type TimeVar struct {
-	g    *GroupBy
+	g    *GroupQuery
 	data []*TimeValue
 }
 
-func (t *TimeVar) ToValues() []*TimeValue {
-	return t.data
+func (t *TimeVar) ToValues() ([]*TimeValue, error) {
+	return t.data, nil
 }
 
-func (g *GroupBy) toFloatRows() []*TimeValue {
+func (g *GroupQuery) toFloatRows() []*TimeValue {
 	rows, err := g.db.Rows()
 	if err != nil {
 		return nil
@@ -77,7 +69,12 @@ func (g *GroupBy) toFloatRows() []*TimeValue {
 	for rows.Next() {
 		var timeframe time.Time
 		amount := float64(0)
-		rows.Scan(&timeframe, &amount)
+		if err := rows.Scan(&timeframe, &amount); err != nil {
+			log.Errorln(err)
+		}
+
+		fmt.Println("float rows: ", timeframe, amount)
+
 		newTs := types.FixedTime(timeframe, g.duration())
 		data = append(data, &TimeValue{
 			Timeframe: newTs,
@@ -87,17 +84,41 @@ func (g *GroupBy) toFloatRows() []*TimeValue {
 	return data
 }
 
-func (g *GroupBy) ToTimeValue(dbType interface{}) (*TimeVar, error) {
+// GraphData will return all hits or failures
+func (g *GroupQuery) GraphData(by By) ([]*TimeValue, error) {
+
+	dbQuery := g.db.MultipleSelects(
+		g.db.SelectByTime(g.Group),
+		by.String(),
+	).Group("timeframe")
+
+	g.db = dbQuery
+
+	caller, err := g.ToTimeValue()
+	if err != nil {
+		return nil, err
+	}
+
+	if g.FillEmpty {
+		return caller.FillMissing(g.Start, g.End)
+	}
+	return caller.ToValues()
+}
+
+func (g *GroupQuery) ToTimeValue() (*TimeVar, error) {
 	rows, err := g.db.Rows()
 	if err != nil {
 		return nil, err
 	}
 	var data []*TimeValue
 	for rows.Next() {
-		var timeframe time.Time
+		var timeframe string
 		amount := float64(0)
-		rows.Scan(&timeframe, &amount)
-		newTs := types.FixedTime(timeframe, g.duration())
+		if err := rows.Scan(&timeframe, &amount); err != nil {
+			log.Error(err, timeframe)
+		}
+		trueTime, _ := g.db.ParseTime(timeframe)
+		newTs := types.FixedTime(trueTime, g.duration())
 		data = append(data, &TimeValue{
 			Timeframe: newTs,
 			Amount:    amount,
@@ -106,7 +127,7 @@ func (g *GroupBy) ToTimeValue(dbType interface{}) (*TimeVar, error) {
 	return &TimeVar{g, data}, nil
 }
 
-func (t *TimeVar) FillMissing(current, end time.Time) []*TimeValue {
+func (t *TimeVar) FillMissing(current, end time.Time) ([]*TimeValue, error) {
 	timeMap := make(map[string]float64)
 	var validSet []*TimeValue
 	dur := t.g.duration()
@@ -132,11 +153,11 @@ func (t *TimeVar) FillMissing(current, end time.Time) []*TimeValue {
 		currentStr = types.FixedTime(current, t.g.duration())
 	}
 
-	return validSet
+	return validSet, nil
 }
 
-func (g *GroupBy) duration() time.Duration {
-	switch g.query.Group {
+func (g *GroupQuery) duration() time.Duration {
+	switch g.Group {
 	case "second":
 		return types.Second
 	case "minute":
@@ -175,6 +196,8 @@ func ParseQueries(r *http.Request, o isObject) *GroupQuery {
 		limit = 10000
 	}
 
+	db := o.object().db
+
 	query := &GroupQuery{
 		Start:     time.Unix(startField, 0).UTC(),
 		End:       time.Unix(endField, 0).UTC(),
@@ -183,9 +206,8 @@ func ParseQueries(r *http.Request, o isObject) *GroupQuery {
 		Limit:     int(limit),
 		Offset:    int(offset),
 		FillEmpty: fill,
+		db:        db,
 	}
-
-	db := o.object().db
 
 	if query.Limit != 0 {
 		db = db.Limit(query.Limit)

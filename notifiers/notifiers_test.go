@@ -17,6 +17,7 @@ package notifiers
 
 import (
 	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
@@ -80,5 +81,5 @@ func injectDatabase() {
 		panic(err)
 	}
 	db.CreateTable(&notifier.Notification{})
-	notifier.SetDB(&types.Db{db})
+	notifier.SetDB(&database.Db{db, "sqlite3"})
 }

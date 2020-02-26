@@ -19,7 +19,9 @@ import (
 	"github.com/hunterlong/statping/types"
 )
 
-type Failure struct{}
+type Failure struct {
+	*types.Failure
+}
 
 const (
 	limitedFailures = 32

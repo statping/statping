@@ -84,6 +84,7 @@ func TestExportCommand(t *testing.T) {
 }
 
 func TestUpdateCommand(t *testing.T) {
+	t.SkipNow()
 	cmd := helperCommand(nil, "version")
 	var got = make(chan string)
 	commandAndSleep(cmd, time.Duration(15*time.Second), got)
@@ -93,6 +94,7 @@ func TestUpdateCommand(t *testing.T) {
 }
 
 func TestAssetsCommand(t *testing.T) {
+	t.SkipNow()
 	c := testcli.Command("statping", "assets")
 	c.Run()
 	t.Log(c.Stdout())

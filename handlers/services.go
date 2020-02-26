@@ -46,11 +46,11 @@ func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiServiceHandler(r *http.Request) interface{} {
 	vars := mux.Vars(r)
-	servicer := core.SelectService(utils.ToInt(vars["id"])).Model()
+	servicer := core.SelectService(utils.ToInt(vars["id"]))
 	if servicer == nil {
 		return errors.New("service not found")
 	}
-	return *servicer
+	return servicer.Service
 }
 
 func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -130,8 +130,12 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 
 	groupQuery := database.ParseQueries(r, service.Hits())
 
-	obj := core.GraphData(groupQuery, &types.Hit{}, database.ByAverage("latency"))
-	returnJson(obj, w, r)
+	objs, err := groupQuery.GraphData(database.ByAverage("latency"))
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	returnJson(objs, w, r)
 }
 
 func apiServiceFailureDataHandler(w http.ResponseWriter, r *http.Request) {
@@ -141,10 +145,16 @@ func apiServiceFailureDataHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(errors.New("service data not found"), w, r)
 		return
 	}
-	groupQuery := database.ParseQueries(r, service.Hits())
 
-	obj := core.GraphData(groupQuery, &types.Failure{}, database.ByCount)
-	returnJson(obj, w, r)
+	groupQuery := database.ParseQueries(r, service.Failures())
+
+	objs, err := groupQuery.GraphData(database.ByCount)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	returnJson(objs, w, r)
 }
 
 func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
@@ -154,10 +164,16 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(errors.New("service data not found"), w, r)
 		return
 	}
+
 	groupQuery := database.ParseQueries(r, service.Hits())
 
-	obj := core.GraphData(groupQuery, &types.Hit{}, database.ByAverage("ping_time"))
-	returnJson(obj, w, r)
+	objs, err := groupQuery.GraphData(database.ByAverage("ping_time"))
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	returnJson(objs, w, r)
 }
 
 type dataXy struct {
@@ -190,10 +206,11 @@ func apiAllServicesHandler(r *http.Request) interface{} {
 	return joinServices(services)
 }
 
-func joinServices(srvs []database.Servicer) []*types.Service {
+func joinServices(srvs []*core.Service) []*types.Service {
 	var services []*types.Service
 	for _, v := range srvs {
-		services = append(services, v.Model())
+		v.UpdateStats()
+		services = append(services, v.Service)
 	}
 	return services
 }

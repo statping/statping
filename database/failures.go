@@ -34,10 +34,10 @@ func (f *FailureObj) DeleteAll() error {
 	return query.Error()
 }
 
-func (f *FailureObj) Last(amount int) *types.Failure {
-	var fail types.Failure
-	f.o.db.Limit(amount).Last(&fail)
-	return &fail
+func (f *FailureObj) Last(amount int) []*types.Failure {
+	var fail []*types.Failure
+	f.o.db.Limit(amount).Find(&fail)
+	return fail
 }
 
 func (f *FailureObj) Count() int {

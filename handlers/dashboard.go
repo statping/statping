@@ -21,6 +21,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
 	"os"
@@ -183,7 +184,7 @@ func removeJwtToken(w http.ResponseWriter) {
 	})
 }
 
-func setJwtToken(user *core.User, w http.ResponseWriter) (JwtClaim, string) {
+func setJwtToken(user *types.User, w http.ResponseWriter) (JwtClaim, string) {
 	expirationTime := time.Now().Add(72 * time.Hour)
 	jwtClaim := JwtClaim{
 		Username: user.Username,

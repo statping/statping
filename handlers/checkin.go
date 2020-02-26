@@ -95,10 +95,13 @@ func checkinDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(fmt.Errorf("checkin %v was not found", vars["api"]), w, r)
 		return
 	}
-	err := checkin.Delete()
-	if err != nil {
+
+	if err := database.Delete(checkin); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
+
+	checkin.Delete()
+
 	sendJsonAction(checkin, "delete", w, r)
 }
