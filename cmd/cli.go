@@ -188,6 +188,9 @@ func updateDisplay() error {
 		fmt.Printf("Issue connecting to https://github.com/hunterlong/statping\n%v\n", err)
 		return err
 	}
+	if len(gitCurrent.TagName) < 2 {
+		return nil
+	}
 	if VERSION != gitCurrent.TagName[1:] {
 		fmt.Printf("\nNew Update %v Available!\n", gitCurrent.TagName[1:])
 		fmt.Printf("Update Command:\n")
