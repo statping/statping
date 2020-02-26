@@ -181,10 +181,6 @@ func (c *Core) Connect(retry bool, location string) error {
 	}
 	var conn, dbType string
 	var err error
-	dbType = CoreApp.Config.DbConn
-	if CoreApp.Config.DbPort == 0 {
-		CoreApp.Config.DbPort = defaultPort(dbType)
-	}
 	switch dbType {
 	case "sqlite":
 		sqlFilename := findDbFile()
