@@ -269,7 +269,7 @@ clean:
 	find . -name "*.out" -type f -delete
 	find . -name "*.cpu" -type f -delete
 	find . -name "*.mem" -type f -delete
-	rm -rf build
+	rm -rf {build,tmp}
 
 # tag version using git
 tag:

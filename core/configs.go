@@ -110,7 +110,7 @@ func LoadUsingEnv() (*DbConfig, error) {
 }
 
 // defaultPort accepts a database type and returns its default port
-func defaultPort(db string) int64 {
+func defaultPort(db string) int {
 	switch db {
 	case "mysql":
 		return 3306
@@ -132,7 +132,7 @@ func EnvToConfig() (*DbConfig, error) {
 	dbUser := utils.Getenv("DB_USER", "").(string)
 	dbPass := utils.Getenv("DB_PASS", "").(string)
 	dbData := utils.Getenv("DB_DATABASE", "").(string)
-	dbPort := utils.Getenv("DB_PORT", defaultPort(dbConn)).(int64)
+	dbPort := utils.Getenv("DB_PORT", defaultPort(dbConn)).(int)
 	name := utils.Getenv("NAME", "Statping").(string)
 	desc := utils.Getenv("DESCRIPTION", "Statping Monitoring Sample Data").(string)
 	user := utils.Getenv("ADMIN_USER", "admin").(string)

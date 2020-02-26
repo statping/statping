@@ -58,7 +58,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		DbUser:      dbUser,
 		DbPass:      dbPass,
 		DbData:      dbDatabase,
-		DbPort:      dbPort,
+		DbPort:      int(dbPort),
 		Project:     project,
 		Description: description,
 		Domain:      domain,
