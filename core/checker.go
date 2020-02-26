@@ -198,17 +198,27 @@ func (s *Service) checkTcp(record bool) *Service {
 
 // checkGrpc will check a GRPC service
 func (s *Service) checkGrpc(record bool) *Service {
-	dnsLookup, err := s.dnsCheck()
+	var err error
+	// Strip URL scheme if present. Eg: https:// , http://
+	if strings.Contains(s.Domain, "://") {
+		u, err := url.Parse(s.Domain)
+		if err != nil {
+			// Unable to parse.
+			log.Warnln(fmt.Sprintf("GRPC Service: '%s', Unable to parse URL: '%v'", s.Name, s.Domain))
+		}
+
+		// Set domain as hostname without port number.
+		s.Domain = u.Hostname()
+	}
+
+	// Calculate DNS check time
+	s.PingTime, err = s.dnsCheck()
 	if err != nil {
 		if record {
 			recordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
 		}
 		return s
 	}
-
-	s.PingTime = dnsLookup
-	t1 := time.Now()
-	timeout := time.Duration(s.Timeout) * time.Second
 
 	// Connect to grpc service without TLS certs.
 	grpcOption := grpc.WithInsecure()
@@ -221,6 +231,7 @@ func (s *Service) checkGrpc(record bool) *Service {
 		grpcOption = grpc.WithTransportCredentials(h2creds)
 	}
 
+	t1 := time.Now()
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(s.Domain+":"+strconv.Itoa(s.Port), grpcOption)
 	if err != nil {
@@ -232,10 +243,12 @@ func (s *Service) checkGrpc(record bool) *Service {
 	defer conn.Close()
 
 	// Context will cancel the request when timeout is exceeded.
-	// Cqncel the context when request is served within the timeout limit.
+	// Cancel the context when request is served within the timeout limit.
+	timeout := time.Duration(s.Timeout) * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
+	// Create a new health check client
 	c := healthpb.NewHealthClient(conn)
 	in := &healthpb.HealthCheckRequest{}
 	res, err := c.Check(ctx, in)
@@ -246,6 +259,7 @@ func (s *Service) checkGrpc(record bool) *Service {
 		return s
 	}
 
+	// Record latency and response
 	t2 := time.Now()
 	s.Latency = t2.Sub(t1).Seconds()
 	s.LastResponse = res.String()
