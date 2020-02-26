@@ -114,9 +114,9 @@ $('select#service_type').on('change', function() {
     var typeLabel = $('#service_type_label');
     if (selected === 'tcp' || selected === 'udp') {
         if (selected === 'tcp') {
-            typeLabel.html('TCP Port')
+            typeLabel.html('TCP Port');
         } else {
-            typeLabel.html('UDP Port')
+            typeLabel.html('UDP Port');
         }
         $('#service_port').parent().parent().removeClass('d-none');
         $('#service_check_type').parent().parent().addClass('d-none');
@@ -124,7 +124,7 @@ $('select#service_type').on('change', function() {
         $('#post_data').parent().parent().addClass('d-none');
         $('#service_response').parent().parent().addClass('d-none');
         $('#service_response_code').parent().parent().addClass('d-none');
-				$('#headers').parent().parent().addClass('d-none');
+	$('#headers').parent().parent().addClass('d-none');
     } else if (selected === 'icmp') {
         $('#service_port').parent().parent().removeClass('d-none');
         $('#headers').parent().parent().addClass('d-none');
@@ -134,14 +134,14 @@ $('select#service_type').on('change', function() {
         $('#service_response').parent().parent().addClass('d-none');
         $('#service_response_code').parent().parent().addClass('d-none');
     } else if (selected === 'grpc') {
-        typeLabel.html('GRPC Port')
+        typeLabel.html('GRPC Port');
         $('#service_port').parent().parent().removeClass('d-none');
         $('#service_check_type').parent().parent().addClass('d-none');
         $('#service_url').attr('placeholder', 'grpc.google.com');
         $('#post_data').parent().parent().addClass('d-none');
         $('#service_response').parent().parent().addClass('d-none');
         $('#service_response_code').parent().parent().addClass('d-none');
-		$('#headers').parent().parent().addClass('d-none');
+	$('#headers').parent().parent().addClass('d-none');
     } else {
         $('#post_data').parent().parent().removeClass('d-none');
         $('#service_response').parent().parent().removeClass('d-none');
@@ -154,9 +154,9 @@ $('select#service_type').on('change', function() {
 
 
 async function RenderChart(chart, service, start=0, end=9999999999, group="hour", retry=true) {
-		if (!chart.el) {
-			return
-		}
+    if (!chart.el) {
+	return
+    }
     let chartData = await ChartLatency(service, start, end, group, retry);
     if (!chartData) {
         chartData = await ChartLatency(service, start, end, "minute", retry);

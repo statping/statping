@@ -205,13 +205,17 @@ func (s *Service) checkGrpc(record bool) *Service {
 		}
 		return s
 	}
+
 	s.PingTime = dnsLookup
 	t1 := time.Now()
 	timeout := time.Duration(s.Timeout) * time.Second
 
+	// Connect to grpc service without TLS certs.
 	grpcOption := grpc.WithInsecure()
 
-	// Check if TLS
+	// Check if TLS is enabled
+	// Upgrade GRPC connection if using TLS
+	// Force to connect on HTTP2 with TLS. Needed when using a reverse proxy such as nginx.
 	if s.VerifySSL.Bool {
 		h2creds := credentials.NewTLS(&tls.Config{NextProtos: []string{"h2"}})
 		grpcOption = grpc.WithTransportCredentials(h2creds)
@@ -227,6 +231,8 @@ func (s *Service) checkGrpc(record bool) *Service {
 	}
 	defer conn.Close()
 
+	// Context will cancel the request when timeout is exceeded.
+	// Cqncel the context when request is served within the timeout limit.
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
@@ -239,6 +245,7 @@ func (s *Service) checkGrpc(record bool) *Service {
 		}
 		return s
 	}
+
 	t2 := time.Now()
 	s.Latency = t2.Sub(t1).Seconds()
 	s.LastResponse = res.String()
@@ -248,20 +255,23 @@ func (s *Service) checkGrpc(record bool) *Service {
 
 	match, err := regexp.MatchString(s.Expected.String, res.String())
 	if err != nil {
-		log.Warnln(fmt.Sprintf("Service %v expected: %v to match %v", s.Name, res.String(), s.Expected.String))
+		log.Warnln(fmt.Sprintf("GRPC Service: '%s', Response: expected '%v', got '%v'", s.Name, res.String(), s.Expected.String))
 	}
+
 	if !match {
 		if record {
 			recordFailure(s, fmt.Sprintf("GRPC Response Body did not match '%v'", s.Expected))
 		}
 		return s
 	}
+
 	if s.ExpectedStatus != int(res.Status) {
 		if record {
-			recordFailure(s, fmt.Sprintf("GRPC Status Code %v did not match %v", res.Status, healthpb.HealthCheckResponse_ServingStatus(s.ExpectedStatus)))
+			recordFailure(s, fmt.Sprintf("GRPC Service: '%s', Status Code: expected '%v', got '%v'", s.Name, res.Status, healthpb.HealthCheckResponse_ServingStatus(s.ExpectedStatus)))
 		}
 		return s
 	}
+
 	if record {
 		recordSuccess(s)
 	}
