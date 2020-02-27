@@ -1,0 +1,180 @@
+version: '3.7'
+
+services:
+
+  statping:
+    container_name: statping
+    build:
+      context: ./
+    restart: on-failure
+    volumes:
+      - ./docker/statping/sqlite:/app
+    environment:
+      DB_CONN: sqlite
+    ports:
+      - 8080:8080
+
+  statping_mysql:
+    container_name: statping_mysql
+    build:
+      context: ./
+    restart: on-failure
+    depends_on:
+      - mysql
+    ports:
+      - 8085:8080
+    volumes:
+      - ./docker/statping/mysql:/app
+    links:
+      - mysql
+    environment:
+      DB_CONN: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: statping
+      DB_USER: root
+      DB_PASS: password123
+
+  statping_postgres:
+    container_name: statping_postgres
+    build:
+      context: ./
+    restart: on-failure
+    ports:
+      - 8090:8080
+    volumes:
+      - ./docker/statping/postgres:/app
+    links:
+      - postgres
+    depends_on:
+      - postgres
+    environment:
+      DB_CONN: postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: statping
+      DB_USER: root
+      DB_PASS: password123
+
+  statping_latest:
+    container_name: statping_latest
+    image: hunterlong/statping:latest
+    restart: on-failure
+    volumes:
+      - ./docker/statping/latest:/app
+    environment:
+      DB_CONN: sqlite
+    ports:
+      - 8095:8080
+
+  statping_vue:
+    container_name: statping_vue
+    image: hunterlong/statping:vue
+    restart: on-failure
+    volumes:
+      - ./docker/statping/vue:/app
+    environment:
+      DB_CONN: sqlite
+    ports:
+      - 8100:8080
+
+  postgres:
+    container_name: postgres
+    image: postgres:10.0-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ./docker/databases/postgres:/var/lib/postgresql/data/pg_data
+    environment:
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: statping
+      POSTGRES_USER: root
+      POSTGRES_PORT: 5432
+      PGDATA: /var/lib/postgresql/data/pg_data
+
+  mysql:
+    container_name: mysql
+    image: mysql:5.7
+    volumes:
+      - ./docker/databases/mysql:/var/lib/mysql
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: password123
+      MYSQL_DATABASE: statping
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    restart: on-failure
+    depends_on:
+      - mysql
+    ports:
+      - 5050:8080
+    links:
+      - mysql:db
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: password123
+      PMA_PORT: 3306
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.0.0
+    restart: on-failure
+    ports:
+      - 9292:9090
+    volumes:
+      - ./dev/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./docker/databases/prometheus:/prometheus
+    links:
+      - statping
+      - statping_mysql
+      - statping_postgres
+      - statping_latest
+      - statping_vue
+    depends_on:
+      - statping
+      - statping_mysql
+      - statping_postgres
+      - statping_latest
+      - statping_vue
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    restart: on-failure
+    ports:
+      - 3000:3000
+    volumes:
+      - ./docker/grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=password123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    links:
+      - prometheus
+
+  vscoder:
+    container_name: vscoder
+    image: codercom/code-server
+    volumes:
+      - .:/home/coder/project
+    restart: always
+    ports:
+      - 7777:8080
+    security_opt:
+      - seccomp:unconfined
+
+volumes:
+  mysql_data:
+  postgres_data:
+  statping_mysql:
+  statping_postgres:
+  prometheus_data:
+  grafana_data:
