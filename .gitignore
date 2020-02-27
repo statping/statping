@@ -29,3 +29,5 @@ sass
 source/css/base.css.map
 dev/test/node_modules
 source/scss
+databases
+statping

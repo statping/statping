@@ -174,8 +174,6 @@ type ComplexityRoot struct {
 
 type CheckinResolver interface {
 	Service(ctx context.Context, obj *types.Checkin) (*types.Service, error)
-
-	Failures(ctx context.Context, obj *types.Checkin) ([]*types.Failure, error)
 }
 type CoreResolver interface {
 	Footer(ctx context.Context, obj *types.Core) (string, error)
@@ -216,8 +214,7 @@ type ServiceResolver interface {
 	Permalink(ctx context.Context, obj *types.Service) (string, error)
 
 	Online24Hours(ctx context.Context, obj *types.Service) (float64, error)
-
-	Failures(ctx context.Context, obj *types.Service) ([]*types.Failure, error)
+	AvgResponse(ctx context.Context, obj *types.Service) (string, error)
 }
 type UserResolver interface {
 	Admin(ctx context.Context, obj *types.User) (bool, error)
@@ -1539,13 +1536,13 @@ func (ec *executionContext) _Checkin_failures(ctx context.Context, field graphql
 		Object:   "Checkin",
 		Field:    field,
 		Args:     nil,
-		IsMethod: true,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Checkin().Failures(rctx, obj)
+		return obj.Failures, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4326,13 +4323,13 @@ func (ec *executionContext) _Service_avg_response(ctx context.Context, field gra
 		Object:   "Service",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.AvgResponse, nil
+		return ec.resolvers.Service().AvgResponse(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4437,13 +4434,13 @@ func (ec *executionContext) _Service_failures(ctx context.Context, field graphql
 		Object:   "Service",
 		Field:    field,
 		Args:     nil,
-		IsMethod: true,
+		IsMethod: false,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Service().Failures(rctx, obj)
+		return obj.Failures, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6048,16 +6045,7 @@ func (ec *executionContext) _Checkin(ctx context.Context, sel ast.SelectionSet, 
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "failures":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Checkin_failures(ctx, field, obj)
-				return res
-			})
+			out.Values[i] = ec._Checkin_failures(ctx, field, obj)
 		case "hits":
 			out.Values[i] = ec._Checkin_hits(ctx, field, obj)
 		case "created_at":
@@ -6794,10 +6782,19 @@ func (ec *executionContext) _Service(ctx context.Context, sel ast.SelectionSet, 
 				return res
 			})
 		case "avg_response":
-			out.Values[i] = ec._Service_avg_response(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Service_avg_response(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "status_code":
 			out.Values[i] = ec._Service_status_code(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -6809,16 +6806,7 @@ func (ec *executionContext) _Service(ctx context.Context, sel ast.SelectionSet, 
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "failures":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Service_failures(ctx, field, obj)
-				return res
-			})
+			out.Values[i] = ec._Service_failures(ctx, field, obj)
 		case "created_at":
 			out.Values[i] = ec._Service_created_at(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

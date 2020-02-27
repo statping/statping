@@ -123,7 +123,7 @@ func defaultPort(db string) int {
 	}
 }
 
-// EnvToConfig converts environment variables to a DbConfig variable
+// EnvToConfig converts environment variables to a DbConfig
 func EnvToConfig() (*DbConfig, error) {
 	var err error
 
@@ -140,7 +140,7 @@ func EnvToConfig() (*DbConfig, error) {
 	domain := utils.Getenv("DOMAIN", "").(string)
 	sqlFile := utils.Getenv("SQL_FILE", "").(string)
 
-	if dbConn != "" {
+	if dbConn != "" && dbConn != "sqlite" {
 		if dbHost == "" {
 			return nil, errors.New("Missing DB_HOST environment variable")
 		}

@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -175,21 +176,16 @@ func (g *GroupQuery) duration() time.Duration {
 	}
 }
 
-func toInt(v string) int64 {
-	val, _ := strconv.Atoi(v)
-	return int64(val)
-}
-
 func ParseQueries(r *http.Request, o isObject) *GroupQuery {
 	fields := parseGet(r)
 	grouping := fields.Get("group")
 	if grouping == "" {
 		grouping = "hour"
 	}
-	startField := toInt(fields.Get("start"))
-	endField := toInt(fields.Get("end"))
-	limit := toInt(fields.Get("limit"))
-	offset := toInt(fields.Get("offset"))
+	startField := utils.ToInt(fields.Get("start"))
+	endField := utils.ToInt(fields.Get("end"))
+	limit := utils.ToInt(fields.Get("limit"))
+	offset := utils.ToInt(fields.Get("offset"))
 	fill, _ := strconv.ParseBool(fields.Get("fill"))
 	orderBy := fields.Get("order")
 	if limit == 0 {
@@ -228,7 +224,7 @@ func ParseQueries(r *http.Request, o isObject) *GroupQuery {
 	if query.Order != "" {
 		db = db.Order(query.Order)
 	}
-	query.db = db.Debug()
+	query.db = db
 
 	return query
 }

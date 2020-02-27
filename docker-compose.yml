@@ -1,53 +1,14 @@
-statping:
-  container_name: statping
-  image: hunterlong/statping
-  restart: always
-  volumes:
-    - statping_data:/app
-  environment:
-    DB_CONN: sqlite
-    LETSENCRYPT_HOST: demo.statping.com
-    VIRTUAL_HOST: demo.statping.com
-    VIRTUAL_PORT: 8080
+version: '3.7'
 
-prometheus:
-  container_name: prometheus
-  image: prom/prometheus:v2.0.0
-  restart: always
-  ports:
-    - 9090:9090
-  volumes:
-    - prometheus_config_data:/etc/prometheus/
-    - prometheus_data:/prometheus
-  links:
-    - statping
-  depends_on:
-    - statping
+services:
 
-grafana:
-  container_name: grafana
-  image: grafana/grafana
-  restart: always
-  ports:
-    - 3000:3000
-  volumes:
-    - grafana_data:/var/lib/grafana
-  environment:
-    - GF_SECURITY_ADMIN_PASSWORD=password123
-    - GF_USERS_ALLOW_SIGN_UP=false
-  depends_on:
-    - prometheus
-  links:
-    - prometheus
-
-
-global:
-  scrape_interval:     30s
-  evaluation_interval: 30s
-
-scrape_configs:
-  - job_name: 'statping'
-    scrape_interval: 30s
-    bearer_token: 'SECRET API KEY HERE'
-    static_configs:
-      - targets: ['statping:8080']
+  statping:
+    container_name: statping
+    image: hunterlong/statping:latest
+    restart: always
+    volumes:
+      - statping_data:/app
+    environment:
+      DB_CONN: sqlite
+    ports:
+      - 8080:8080

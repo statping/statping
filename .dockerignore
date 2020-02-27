@@ -19,3 +19,10 @@ config.yml
 *.db
 tmp
 frontend/node_modules
+.next
+node_modules
+source/dist
+frontend/dist
+Dockerfile
+Dockerfile.base
+docker

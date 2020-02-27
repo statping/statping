@@ -358,5 +358,10 @@ func (c *Core) MigrateDatabase() error {
 		return tx.Error()
 	}
 	log.Infoln("Statping Database Migrated")
-	return tx.Commit().Error()
+
+	if err := tx.Commit().Error(); err != nil {
+		return err
+	}
+
+	return nil
 }
