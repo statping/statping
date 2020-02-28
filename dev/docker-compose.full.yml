@@ -5,8 +5,8 @@ services:
   statping_dev:
     container_name: statping_dev
     build:
-      context: ./
-      dockerfile: ./dev/Dockerfile.dev
+      context: .
+      dockerfile: Dockerfile.dev
       args:
         VERSION: DEV
         COMMIT: DEV
