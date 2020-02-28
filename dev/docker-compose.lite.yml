@@ -1,0 +1,38 @@
+version: '2.3'
+
+services:
+
+  statping_dev:
+    container_name: statping_dev
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+      args:
+        VERSION: DEV
+        COMMIT: DEV
+    restart: on-failure
+    volumes:
+      - .:/go/src/github.com/hunterlong/statping:ro
+    environment:
+      DB_CONN: sqlite
+      API_KEY: exampleapikey
+      API_SECRET: exampleapisecret
+      NAME: Statping
+      DOMAIN: http://localhost:8585
+      DESCRIPTION: This is a dev environment with auto reloading!
+      ADMIN_USER: admin
+      ADMIN_PASS: admin
+      PORT: 8585
+    ports:
+      - 8888:8888
+      - 8585:8585
+    networks:
+      - statping
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8585/health || false"]
+      timeout: 2s
+      interval: 5s
+      retries: 10
+
+networks:
+  statping:

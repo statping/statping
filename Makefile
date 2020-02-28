@@ -18,6 +18,9 @@ up:
 down:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml down --volumes --remove-orphans
 
+lite: clean
+	docker-compose -f dev/docker-compose.lite.yml up -d --remove-orphans
+
 reup: down clean compose-build-full up
 
 start:
@@ -43,6 +46,9 @@ docker-latest: docker-base
 
 docker-vue:
 	docker build -t hunterlong/statping:vue --build-arg VERSION=${VERSION} .
+
+modd:
+	modd -f ./dev/modd.conf
 
 top:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml top
@@ -104,5 +110,5 @@ print_details:
 	@echo \==== Monitoring and IDE ====
 	@echo \Grafana:             http://localhost:3000  \(username: admin, password: admin\)
 
-.PHONY: all build build-all build-alpine test-all test test-api docker frontend up down print_details
+.PHONY: all build build-all build-alpine test-all test test-api docker frontend up down print_details lite
 .SILENT: travis_s3_creds

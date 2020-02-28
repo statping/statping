@@ -29,7 +29,7 @@ RUN go get github.com/stretchr/testify/assert && \
 	go get gopkg.in/natefinch/lumberjack.v2 && \
 	go get golang.org/x/crypto/bcrypt && \
 	go get github.com/cortesi/devd/cmd/devd && \
-	go get github.com/cortesi/modd/cmd/modd
+	env GO111MODULE=on go get github.com/cortesi/modd/cmd/modd
 
 ADD frontend/package.json frontend/yarn.lock ./frontend/
 
