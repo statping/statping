@@ -11,17 +11,29 @@ TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master 
 TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statping
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 
-up: docker-base
-	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml up -d --remove-orphans --build
+up:
+	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml up -d --remove-orphans
+	make print_details
 
 down:
-	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml down --volumes
+	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml down --volumes --remove-orphans
+
+reup: down clean compose-build-full up
+
+start:
+	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml start
+
+stop:
+	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml stop
 
 logs:
 	docker logs statping --follow
 
 console:
 	docker exec -t -i statping /bin/sh
+
+compose-build-full: docker-base
+	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml build --parallel --build-arg VERSION=${VERSION}
 
 docker-base:
 	docker build -t hunterlong/statping:base -f Dockerfile.base --build-arg VERSION=${VERSION} .
@@ -76,23 +88,21 @@ clean:
 	find . -name "*.mem" -type f -delete
 	rm -rf {build,tmp,docker}
 
-# install all required golang dependecies
-dev-deps:
-	go get github.com/stretchr/testify/assert
-	go get golang.org/x/tools/cmd/cover
-	go get github.com/mattn/goveralls
-	go install github.com/mattn/goveralls
-	go get github.com/rendon/testcli
-	go get github.com/robertkrimen/godocdown/godocdown
-	go get github.com/crazy-max/xgo
-	go get github.com/GeertJohan/go.rice
-	go get github.com/GeertJohan/go.rice/rice
-	go get github.com/axw/gocov/gocov
-	go get github.com/matm/gocov-html
-	go get github.com/fatih/structs
-	go get github.com/ararog/timeago
-	go get gopkg.in/natefinch/lumberjack.v2
-	go get golang.org/x/crypto/bcrypt
+print_details:
+	@echo \==== Statping Development Instance ====
+	@echo \Statping Vue Frontend:     http://localhost:8888
+	@echo \Statping Backend API:      http://localhost:8585
+	@echo \==== Statping Instances ====
+	@echo \Statping SQLite:     http://localhost:4000
+	@echo \Statping MySQL:      http://localhost:4005
+	@echo \Statping Postgres:   http://localhost:4010
+	@echo \==== Databases ====
+	@echo \PHPMyAdmin:          http://localhost:6000  \(MySQL database management\)
+	@echo \SQLite Web:          http://localhost:6050  \(SQLite database management\)
+	@echo \PGAdmin:             http://localhost:7000  \(Postgres database management \| email: admin@admin.com password: admin\)
+	@echo \Prometheus:          http://localhost:7050  \(Prometheus Web UI\)
+	@echo \==== Monitoring and IDE ====
+	@echo \Grafana:             http://localhost:3000  \(username: admin, password: admin\)
 
-.PHONY: all build build-all build-alpine test-all test test-api docker frontend up down
+.PHONY: all build build-all build-alpine test-all test test-api docker frontend up down print_details
 .SILENT: travis_s3_creds

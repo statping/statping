@@ -292,11 +292,15 @@ func InsertSampleHits() error {
 
 // insertSampleCore will create a new Core for the seed
 func insertSampleCore() error {
+
+	apiKey := utils.Getenv("API_KEY", "samplekey")
+	apiSecret := utils.Getenv("API_SECRET", "samplesecret")
+
 	core := &types.Core{
 		Name:        "Statping Sample Data",
 		Description: "This data is only used to testing",
-		ApiKey:      "sample",
-		ApiSecret:   "samplesecret",
+		ApiKey:      apiKey.(string),
+		ApiSecret:   apiSecret.(string),
 		Domain:      "http://localhost:8080",
 		Version:     "test",
 		CreatedAt:   time.Now().UTC(),

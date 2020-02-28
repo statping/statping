@@ -31,3 +31,5 @@ dev/test/node_modules
 source/scss
 databases
 statping
+docker
+tmp

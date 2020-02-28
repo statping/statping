@@ -1,6 +1,38 @@
-version: '3.7'
+version: '2.3'
 
 services:
+
+  statping_dev:
+    container_name: statping_dev
+    build:
+      context: ./
+      dockerfile: ./dev/Dockerfile.dev
+      args:
+        VERSION: DEV
+        COMMIT: DEV
+    restart: on-failure
+    volumes:
+      - ./:/go/src/github.com/hunterlong/statping
+    environment:
+      DB_CONN: sqlite
+      API_KEY: exampleapikey
+      API_SECRET: exampleapisecret
+      NAME: Statping on SQLite
+      DOMAIN: http://localhost:4000
+      DESCRIPTION: This is a dev environment on SQLite!
+      ADMIN_USER: admin
+      ADMIN_PASS: admin
+      PORT: 8585
+    ports:
+      - 8888:8888
+      - 8585:8585
+    networks:
+      - statping
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || false"]
+      timeout: 2s
+      interval: 5s
+      retries: 10
 
   statping:
     container_name: statping
@@ -11,18 +43,30 @@ services:
       - ./docker/statping/sqlite:/app
     environment:
       DB_CONN: sqlite
+      API_KEY: exampleapikey
+      API_SECRET: exampleapisecret
+      NAME: Statping on SQLite
+      DOMAIN: http://localhost:4000
+      DESCRIPTION: This is a dev environment on SQLite!
+      ADMIN_USER: admin
+      ADMIN_PASS: admin
     ports:
-      - 8080:8080
+      - 4000:8080
+    networks:
+      - statping
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || false"]
+      timeout: 2s
+      interval: 5s
+      retries: 10
 
   statping_mysql:
     container_name: statping_mysql
     build:
       context: ./
     restart: on-failure
-    depends_on:
-      - mysql
     ports:
-      - 8085:8080
+      - 4005:8080
     volumes:
       - ./docker/statping/mysql:/app
     links:
@@ -34,6 +78,23 @@ services:
       DB_DATABASE: statping
       DB_USER: root
       DB_PASS: password123
+      API_KEY: exampleapikey
+      API_SECRET: exampleapisecret
+      NAME: Statping on MySQL
+      DOMAIN: http://localhost:4005
+      DESCRIPTION: This is a dev environment on MySQL!
+      ADMIN_USER: admin
+      ADMIN_PASS: admin
+    networks:
+      - statping
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || false"]
+      timeout: 2s
+      interval: 5s
+      retries: 10
 
   statping_postgres:
     container_name: statping_postgres
@@ -41,12 +102,10 @@ services:
       context: ./
     restart: on-failure
     ports:
-      - 8090:8080
+      - 4010:8080
     volumes:
       - ./docker/statping/postgres:/app
     links:
-      - postgres
-    depends_on:
       - postgres
     environment:
       DB_CONN: postgres
@@ -55,42 +114,40 @@ services:
       DB_DATABASE: statping
       DB_USER: root
       DB_PASS: password123
-
-  statping_latest:
-    container_name: statping_latest
-    image: hunterlong/statping:latest
-    restart: on-failure
-    volumes:
-      - ./docker/statping/latest:/app
-    environment:
-      DB_CONN: sqlite
-    ports:
-      - 8095:8080
-
-  statping_vue:
-    container_name: statping_vue
-    image: hunterlong/statping:vue
-    restart: on-failure
-    volumes:
-      - ./docker/statping/vue:/app
-    environment:
-      DB_CONN: sqlite
-    ports:
-      - 8100:8080
+      API_KEY: exampleapikey
+      API_SECRET: exampleapisecret
+      NAME: Statping on Postgres
+      DOMAIN: http://localhost:4010
+      DESCRIPTION: This is a dev environment on Postgres!
+      ADMIN_USER: admin
+      ADMIN_PASS: admin
+    networks:
+      - statping
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || false"]
+      timeout: 2s
+      interval: 5s
+      retries: 10
 
   postgres:
     container_name: postgres
-    image: postgres:10.0-alpine
-    ports:
-      - 5432:5432
+    image: postgres
     volumes:
-      - ./docker/databases/postgres:/var/lib/postgresql/data/pg_data
+      - ./docker/databases/postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: password123
       POSTGRES_DB: statping
       POSTGRES_USER: root
-      POSTGRES_PORT: 5432
-      PGDATA: /var/lib/postgresql/data/pg_data
+    networks:
+      - statping
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   mysql:
     container_name: mysql
@@ -98,36 +155,79 @@ services:
     volumes:
       - ./docker/databases/mysql:/var/lib/mysql
     restart: always
-    ports:
-      - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD: password123
       MYSQL_DATABASE: statping
       MYSQL_USER: root
       MYSQL_PASSWORD: password
+    networks:
+      - statping
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      interval: 15s
+      retries: 10
 
   phpmyadmin:
     container_name: phpmyadmin
     image: phpmyadmin/phpmyadmin
     restart: on-failure
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     ports:
-      - 5050:8080
+      - 5050:80
     links:
       - mysql:db
     environment:
+      MYSQL_ROOT_PASSWORD: password123
       PMA_HOST: mysql
       PMA_USER: root
       PMA_PASSWORD: password123
       PMA_PORT: 3306
+    networks:
+      - statping
+
+  sqlite-web:
+    container_name: sqlite-web
+    image: coleifer/sqlite-web
+    restart: on-failure
+    command: sqlite_web -H 0.0.0.0 -r -x /data/statping.db
+    depends_on:
+      statping:
+        condition: service_healthy
+    ports:
+      - 6050:8080
+    links:
+      - statping
+    volumes:
+      - ./docker/statping/sqlite/statping.db:/data/statping.db:ro
+    environment:
+      SQLITE_DATABASE: /data/statping.db
+    networks:
+      - statping
+
+  pgadmin4:
+    container_name: pgadmin4
+    image: fenglc/pgadmin4
+    restart: on-failure
+    environment:
+      DEFAULT_USER: admin@admin.com
+      DEFAULT_PASSWORD: admin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - 7000:5050
+    links:
+      - postgres:postgres
+    networks:
+      - statping
 
   prometheus:
     container_name: prometheus
     image: prom/prometheus:v2.0.0
     restart: on-failure
-    ports:
-      - 9292:9090
     volumes:
       - ./dev/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./docker/databases/prometheus:/prometheus
@@ -135,14 +235,15 @@ services:
       - statping
       - statping_mysql
       - statping_postgres
-      - statping_latest
-      - statping_vue
-    depends_on:
+      - statping_dev
+    ports:
+      - 7050:9090
+    networks:
       - statping
-      - statping_mysql
-      - statping_postgres
-      - statping_latest
-      - statping_vue
+    healthcheck:
+      test: "/bin/wget -q -Y off http://localhost:9090/status -O /dev/null > /dev/null 2>&1"
+      interval: 10s
+      timeout: 3s
 
   grafana:
     container_name: grafana
@@ -152,29 +253,23 @@ services:
       - 3000:3000
     volumes:
       - ./docker/grafana:/var/lib/grafana
+      - ./dev/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+      - ./dev/grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
+      - ./dev/grafana/statping_dashboard.json:/etc/grafana/provisioning/dashboards/statping_dashboard.json
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=password123
       - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_ANONYMOUS_ENABLED=true
     depends_on:
-      - prometheus
+      prometheus:
+        condition: service_healthy
     links:
       - prometheus
+    networks:
+      - statping
+    healthcheck:
+      test: "/usr/bin/wget -q -Y off http://localhost:3000/api/health -O /dev/null > /dev/null 2>&1"
+      interval: 5s
+      retries: 20
 
-  vscoder:
-    container_name: vscoder
-    image: codercom/code-server
-    volumes:
-      - .:/home/coder/project
-    restart: always
-    ports:
-      - 7777:8080
-    security_opt:
-      - seccomp:unconfined
-
-volumes:
-  mysql_data:
-  postgres_data:
-  statping_mysql:
-  statping_postgres:
-  prometheus_data:
-  grafana_data:
+networks:
+  statping:

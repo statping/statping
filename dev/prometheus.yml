@@ -5,30 +5,24 @@ global:
 scrape_configs:
   - job_name: 'statping'
     scrape_interval: 15s
-    bearer_token: 'TESTAPISECRETKEY'
+    bearer_token: 'exampleapisecret'
     static_configs:
       - targets: ['statping:8080']
 
   - job_name: 'statping_mysql'
     scrape_interval: 15s
-    bearer_token: 'TESTAPISECRETKEY'
+    bearer_token: 'exampleapisecret'
     static_configs:
       - targets: ['statping_mysql:8080']
 
   - job_name: 'statping_postgres'
     scrape_interval: 15s
-    bearer_token: 'TESTAPISECRETKEY'
+    bearer_token: 'exampleapisecret'
     static_configs:
       - targets: ['statping_postgres:8080']
 
-  - job_name: 'statping_latest'
+  - job_name: 'statping_dev'
     scrape_interval: 15s
-    bearer_token: 'TESTAPISECRETKEY'
+    bearer_token: 'exampleapisecret'
     static_configs:
-      - targets: ['statping_latest:8080']
-
-  - job_name: 'statping_vue'
-    scrape_interval: 15s
-    bearer_token: 'TESTAPISECRETKEY'
-    static_configs:
-      - targets: ['statping_vue:8080']
+      - targets: ['statping_dev:8080']

@@ -9,10 +9,25 @@ RUN curl -L -s https://assets.statping.com/sass -o /usr/local/bin/sass && \
 
 WORKDIR /go/src/github.com/hunterlong/statping
 
-ADD Makefile go.mod go.sum version.txt ./
+ADD go.mod go.sum version.txt ./
 
 RUN go mod download
-RUN make dev-deps
+
+RUN go get github.com/stretchr/testify/assert && \
+	go get golang.org/x/tools/cmd/cover && \
+	go get github.com/mattn/goveralls && \
+	go install github.com/mattn/goveralls && \
+	go get github.com/rendon/testcli && \
+	go get github.com/robertkrimen/godocdown/godocdown && \
+	go get github.com/crazy-max/xgo && \
+	go get github.com/GeertJohan/go.rice && \
+	go get github.com/GeertJohan/go.rice/rice && \
+	go get github.com/axw/gocov/gocov && \
+	go get github.com/matm/gocov-html && \
+	go get github.com/fatih/structs && \
+	go get github.com/ararog/timeago && \
+	go get gopkg.in/natefinch/lumberjack.v2 && \
+	go get golang.org/x/crypto/bcrypt
 
 ADD frontend/package.json frontend/yarn.lock ./frontend/
 

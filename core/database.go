@@ -140,12 +140,15 @@ func CloseDB() {
 
 // InsertCore create the single row for the Core settings in Statping
 func (d *DbConfig) InsertCore() (*Core, error) {
+	apiKey := utils.Getenv("API_KEY", utils.NewSHA1Hash(40))
+	apiSecret := utils.Getenv("API_SECRET", utils.NewSHA1Hash(40))
+
 	CoreApp = &Core{Core: &types.Core{
 		Name:        d.Project,
 		Description: d.Description,
 		ConfigFile:  "config.yml",
-		ApiKey:      utils.NewSHA1Hash(9),
-		ApiSecret:   utils.NewSHA1Hash(16),
+		ApiKey:      apiKey.(string),
+		ApiSecret:   apiSecret.(string),
 		Domain:      d.Domain,
 		MigrationId: time.Now().Unix(),
 		Config:      d.DbConfig,
@@ -272,8 +275,12 @@ func (d *DbConfig) Save() error {
 	defer config.Close()
 	log.WithFields(utils.ToFields(d)).Debugln("saving config file at: " + utils.Directory + "/config.yml")
 	CoreApp.Config = d.DbConfig
-	CoreApp.Config.ApiKey = utils.NewSHA1Hash(16)
-	CoreApp.Config.ApiSecret = utils.NewSHA1Hash(16)
+
+	apiKey := utils.Getenv("API_KEY", utils.NewSHA1Hash(16))
+	apiSecret := utils.Getenv("API_SECRET", utils.NewSHA1Hash(16))
+
+	CoreApp.Config.ApiKey = apiKey.(string)
+	CoreApp.Config.ApiSecret = apiSecret.(string)
 	data, err := yaml.Marshal(d)
 	if err != nil {
 		log.Errorln(err)
