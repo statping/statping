@@ -19,7 +19,9 @@ down:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml down --volumes --remove-orphans
 
 lite: clean
-	docker-compose -f dev/docker-compose.lite.yml up -d --remove-orphans
+	docker build -t hunterlong/statping:dev -f dev/Dockerfile.dev .
+	docker-compose -f dev/docker-compose.lite.yml down
+	docker-compose -f dev/docker-compose.lite.yml up --remove-orphans
 
 reup: down clean compose-build-full up
 

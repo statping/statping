@@ -42,6 +42,7 @@
     "@babel/preset-env": "~7.8.3",
     "@vue/babel-preset-app": "^4.1.2",
     "@vue/cli-plugin-babel": "^4.1.0",
+    "@vue/cli-service": "^4.2.3",
     "@vue/test-utils": "^1.0.0-beta.31",
     "babel-eslint": "~10.0",
     "babel-loader": "~8.0",

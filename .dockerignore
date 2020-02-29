@@ -25,4 +25,9 @@ source/dist
 frontend/dist
 Dockerfile
 Dockerfile.base
+!dev/dev-env.sh
+!dev/modd.conf
+!dev/grafana
+!dev/prometheus.yml
 docker
+statping.db

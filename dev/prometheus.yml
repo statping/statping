@@ -25,4 +25,4 @@ scrape_configs:
     scrape_interval: 15s
     bearer_token: 'exampleapisecret'
     static_configs:
-      - targets: ['statping_dev:8080']
+      - targets: ['statping_dev:8585']

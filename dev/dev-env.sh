@@ -1,5 +1,11 @@
 #!/usr/bin/env sh
 
-modd -f ./dev/modd.conf
+echo "Starting!"
 
-devd -w ./src http://localhost:8585
+echo "Serving Vue frontend first..."
+
+cd frontend && yarn serve &
+
+echo "Now serving Vue, lets build the golang backend now..."
+
+modd -f dev/modd.conf

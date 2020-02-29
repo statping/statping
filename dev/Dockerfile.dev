@@ -13,35 +13,24 @@ ADD go.mod go.sum version.txt ./
 
 RUN go mod download
 
-RUN go get github.com/stretchr/testify/assert && \
-	go get golang.org/x/tools/cmd/cover && \
-	go get github.com/mattn/goveralls && \
-	go install github.com/mattn/goveralls && \
-	go get github.com/rendon/testcli && \
-	go get github.com/robertkrimen/godocdown/godocdown && \
-	go get github.com/crazy-max/xgo && \
-	go get github.com/GeertJohan/go.rice && \
+RUN go get github.com/stretchr/testify/... && \
 	go get github.com/GeertJohan/go.rice/rice && \
-	go get github.com/axw/gocov/gocov && \
-	go get github.com/matm/gocov-html && \
-	go get github.com/fatih/structs && \
-	go get github.com/ararog/timeago && \
-	go get gopkg.in/natefinch/lumberjack.v2 && \
-	go get golang.org/x/crypto/bcrypt && \
-	go get github.com/cortesi/devd/cmd/devd && \
-	env GO111MODULE=on go get github.com/cortesi/modd/cmd/modd
+	go get github.com/cortesi/modd/cmd/modd
 
 ADD frontend/package.json frontend/yarn.lock ./frontend/
 
-RUN cd frontend && yarn install --pure-lockfile --network-timeout 1000000 && \
-    yarn cache clean
+RUN cd frontend && yarn install --pure-lockfile --network-timeout 1000000 && yarn cache clean
 
 ENV IS_DOCKER=true
 ENV STATPING_DIR=/go/src/github.com/hunterlong/statping
-ENV PORT=8585
+
 EXPOSE 8585
 EXPOSE 8888
 
-VOLUME /go/src/github.com/hunterlong/statping
+RUN cd frontend && yarn build && cp -R dist ../source/
 
-CMD /go/src/github.com/hunterlong/statping/dev/dev-env.sh
+RUN pwd && ls
+
+COPY . .
+
+CMD dev/dev-env.sh

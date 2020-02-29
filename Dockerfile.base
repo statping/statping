@@ -9,36 +9,25 @@ RUN curl -L -s https://assets.statping.com/sass -o /usr/local/bin/sass && \
 
 WORKDIR /go/src/github.com/hunterlong/statping
 
-ADD go.mod go.sum version.txt ./
+ADD go.mod go.sum ./
 
 RUN go mod download
 
-RUN go get github.com/stretchr/testify/assert && \
-	go get golang.org/x/tools/cmd/cover && \
-	go get github.com/mattn/goveralls && \
-	go install github.com/mattn/goveralls && \
-	go get github.com/rendon/testcli && \
-	go get github.com/robertkrimen/godocdown/godocdown && \
-	go get github.com/crazy-max/xgo && \
-	go get github.com/GeertJohan/go.rice && \
+ENV GO111MODULE on
+
+RUN go get github.com/stretchr/testify/... && \
 	go get github.com/GeertJohan/go.rice/rice && \
-	go get github.com/axw/gocov/gocov && \
-	go get github.com/matm/gocov-html && \
-	go get github.com/fatih/structs && \
-	go get github.com/ararog/timeago && \
-	go get gopkg.in/natefinch/lumberjack.v2 && \
-	go get golang.org/x/crypto/bcrypt
+	go get github.com/cortesi/modd/cmd/modd
 
 ADD frontend/package.json frontend/yarn.lock ./frontend/
 
 RUN cd frontend && yarn install --pure-lockfile --network-timeout 1000000 && \
     yarn cache clean
 
-ADD . ./
+COPY . ./
 
 RUN make clean frontend-build compile
 RUN make build
 RUN chmod a+x statping && mv statping /go/bin/statping
 
 WORKDIR /app
-

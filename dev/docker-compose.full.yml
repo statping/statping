@@ -6,7 +6,7 @@ services:
     container_name: statping_dev
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: ./dev/Dockerfile.dev
       args:
         VERSION: DEV
         COMMIT: DEV
@@ -14,6 +14,7 @@ services:
     volumes:
       - ./:/go/src/github.com/hunterlong/statping
     environment:
+      GO_ENV: test
       DB_CONN: sqlite
       API_KEY: exampleapikey
       API_SECRET: exampleapisecret
@@ -29,10 +30,10 @@ services:
     networks:
       - statping
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || false"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8585/health || false"]
       timeout: 2s
-      interval: 5s
-      retries: 10
+      interval: 20s
+      retries: 30
 
   statping:
     container_name: statping
@@ -57,8 +58,8 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/health || false"]
       timeout: 2s
-      interval: 5s
-      retries: 10
+      interval: 10s
+      retries: 20
 
   statping_mysql:
     container_name: statping_mysql
@@ -93,8 +94,8 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/health || false"]
       timeout: 2s
-      interval: 5s
-      retries: 10
+      interval: 10s
+      retries: 20
 
   statping_postgres:
     container_name: statping_postgres
@@ -128,9 +129,9 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/health || false"]
-      timeout: 2s
+      timeout: 5s
       interval: 5s
-      retries: 10
+      retries: 30
 
   postgres:
     container_name: postgres
@@ -146,8 +147,8 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U root"]
       interval: 15s
-      timeout: 5s
-      retries: 5
+      timeout: 10s
+      retries: 20
 
   mysql:
     container_name: mysql
@@ -166,7 +167,7 @@ services:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
       timeout: 20s
       interval: 15s
-      retries: 10
+      retries: 30
 
   phpmyadmin:
     container_name: phpmyadmin
@@ -268,7 +269,7 @@ services:
       - statping
     healthcheck:
       test: "/usr/bin/wget -q -Y off http://localhost:3000/api/health -O /dev/null > /dev/null 2>&1"
-      interval: 5s
+      interval: 10s
       retries: 20
 
 networks:
