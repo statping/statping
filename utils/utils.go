@@ -18,9 +18,11 @@ package utils
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/ararog/timeago"
+	"github.com/hunterlong/statping/types"
 	"io"
 	"io/ioutil"
 	"math"
@@ -84,6 +86,13 @@ func Getenv(key string, defaultValue interface{}) interface{} {
 				}
 				return ok
 
+			case []*types.Service:
+				var services []*types.Service
+				if err := json.Unmarshal([]byte(val), services); err != nil {
+					Log.Error("Incorrect formatting with SERVICE environment variable")
+					return nil
+				}
+				return services
 			default:
 				return val
 			}

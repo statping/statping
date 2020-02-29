@@ -17,6 +17,7 @@ package main
 
 import (
 	"github.com/hunterlong/statping/utils"
+	"github.com/pkg/errors"
 
 	"flag"
 	"fmt"
@@ -144,16 +145,25 @@ func mainProcess() error {
 		log.Errorln(fmt.Sprintf("could not connect to database: %v", err))
 		return err
 	}
+
 	if err := core.CoreApp.MigrateDatabase(); err != nil {
-		return err
+		return errors.Wrap(err, "database migration")
 	}
+
+	if err := core.CoreApp.CreateServicesFromEnvs(); err != nil {
+		errStr := "error 'SERVICE' environment variable"
+		log.Errorln(errStr)
+		return errors.Wrap(err, errStr)
+	}
+
 	if err := core.InitApp(); err != nil {
 		return err
 	}
 	if core.CoreApp.Setup {
 		if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
 			log.Fatalln(err)
+			return errors.Wrap(err, "http server")
 		}
 	}
-	return err
+	return nil
 }

@@ -16,6 +16,10 @@
 package types
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
+	"fmt"
+	"github.com/pkg/errors"
 	"time"
 )
 
@@ -91,6 +95,9 @@ func (s *Service) Duration() time.Duration {
 
 // Start will create a channel for the service checking go routine
 func (s *Service) Start() {
+	if s.IsRunning() {
+		return
+	}
 	s.Running = make(chan bool)
 }
 
@@ -112,4 +119,24 @@ func (s *Service) IsRunning() bool {
 	default:
 		return true
 	}
+}
+
+func (s *Service) String() string {
+	format := fmt.Sprintf("name:%sdomain:%sport:%dtype:%smethod:%s", s.Name, s.Domain, s.Port, s.Type, s.Method)
+	h := sha1.New()
+	h.Write([]byte(format))
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func (s *Service) Valid() error {
+	if s.Name == "" {
+		return errors.New("invalid - missing service name")
+	}
+	if s.Domain == "" {
+		return errors.New("invalid - missing service domain")
+	}
+	if s.Type == "" {
+		return errors.New("invalid - missing service type")
+	}
+	return nil
 }

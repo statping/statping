@@ -38,9 +38,22 @@ func modelId(model interface{}) int64 {
 	}
 }
 
-func Create(data interface{}) (*Object, error) {
+type CreateCallback func(interface{}, error)
+
+func runCallbacks(data interface{}, err error, fns ...AfterCreate) {
+	for _, fn := range fns {
+		fn.AfterCreate(data, err)
+	}
+}
+
+type AfterCreate interface {
+	AfterCreate(interface{}, error)
+}
+
+func Create(data interface{}, fns ...AfterCreate) (*Object, error) {
 	model := database.Model(&data)
 	if err := model.Create(data).Error(); err != nil {
+		runCallbacks(data, err, fns...)
 		return nil, err
 	}
 	obj := &Object{
@@ -48,6 +61,7 @@ func Create(data interface{}) (*Object, error) {
 		model: data,
 		db:    model,
 	}
+	runCallbacks(data, nil, fns...)
 	return obj, nil
 }
 

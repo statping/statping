@@ -21,7 +21,6 @@ import (
 	"github.com/hunterlong/statping/core/integrations"
 	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/notifiers"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
@@ -200,30 +199,6 @@ func GetLocalIP() string {
 		}
 	}
 	return "http://localhost"
-}
-
-// AttachNotifiers will attach all the notifier's into the system
-func AttachNotifiers() error {
-	return notifier.AddNotifiers(
-		notifiers.Command,
-		notifiers.Discorder,
-		notifiers.Emailer,
-		notifiers.LineNotify,
-		notifiers.Mobile,
-		notifiers.Slacker,
-		notifiers.Telegram,
-		notifiers.Twilio,
-		notifiers.Webhook,
-	)
-}
-
-// AddIntegrations will attach all the integrations into the system
-func AddIntegrations() error {
-	return integrations.AddIntegrations(
-		integrations.CsvIntegrator,
-		integrations.TraefikIntegrator,
-		integrations.DockerIntegrator,
-	)
 }
 
 // ServiceOrder will reorder the services based on 'order_id' (Order)

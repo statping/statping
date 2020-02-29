@@ -25,6 +25,12 @@ lite: clean
 
 reup: down clean compose-build-full up
 
+yarn-serve:
+	cd frontend && yarn serve
+
+go-run:
+	go run ./cmd
+
 start:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml start
 

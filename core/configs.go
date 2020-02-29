@@ -16,12 +16,12 @@
 package core
 
 import (
-	"errors"
 	"fmt"
 	"github.com/go-yaml/yaml"
 	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
+	"github.com/pkg/errors"
 )
 
 // ErrorResponse is used for HTTP errors to show to User
@@ -43,11 +43,11 @@ func LoadConfigFile(directory string) (*DbConfig, error) {
 	file, err := utils.OpenFile(directory + "/config.yml")
 	if err != nil {
 		CoreApp.Setup = false
-		return nil, errors.New("config.yml file not found at " + directory + "/config.yml - starting in setup mode")
+		return nil, errors.Wrapf(err, "config.yml file not found at %s/config.yml - starting in setup mode", directory)
 	}
 	err = yaml.Unmarshal([]byte(file), &configs)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "yaml file not formatted correctly")
 	}
 	log.WithFields(utils.ToFields(configs)).Debugln("read config file: " + directory + "/config.yml")
 	CoreApp.Config = configs.DbConfig
@@ -67,24 +67,23 @@ func LoadUsingEnv() (*DbConfig, error) {
 
 	err = CoreApp.Connect(true, utils.Directory)
 	if err != nil {
-		log.Errorln(err)
-		return nil, err
+		return nil, errors.Wrap(err, "error connecting to database")
 	}
 	if err := Configs.Save(); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "error saving configuration")
 	}
 	exists := DbSession.HasTable("core")
 	if !exists {
 		log.Infoln(fmt.Sprintf("Core database does not exist, creating now!"))
 		if err := CoreApp.DropDatabase(); err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "error dropping database")
 		}
 		if err := CoreApp.CreateDatabase(); err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "error creating database")
 		}
 		CoreApp, err = Configs.InsertCore()
 		if err != nil {
-			log.Errorln(err)
+			return nil, errors.Wrap(err, "error creating the core database")
 		}
 
 		username := utils.Getenv("ADMIN_USER", "admin").(string)
@@ -97,13 +96,12 @@ func LoadUsingEnv() (*DbConfig, error) {
 			Admin:    types.NewNullBool(true),
 		}
 		if _, err := database.Create(admin); err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "error creating admin")
 		}
 
 		if err := SampleData(); err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "error connecting sample data")
 		}
-
 		return Configs, err
 	}
 	return Configs, nil
@@ -184,16 +182,13 @@ func EnvToConfig() (*DbConfig, error) {
 // SampleData runs all the sample data for a new Statping installation
 func SampleData() error {
 	if err := InsertSampleData(); err != nil {
-		log.Errorln(err)
-		return err
+		return errors.Wrap(err, "sample data")
 	}
 	if err := InsertSampleHits(); err != nil {
-		log.Errorln(err)
-		return err
+		return errors.Wrap(err, "sample service hits")
 	}
 	if err := insertSampleCheckins(); err != nil {
-		log.Errorln(err)
-		return err
+		return errors.Wrap(err, "sample checkin examples")
 	}
 	return nil
 }
@@ -203,8 +198,7 @@ func DeleteConfig() error {
 	log.Debugln("deleting config yaml file", utils.Directory+"/config.yml")
 	err := utils.DeleteFile(utils.Directory + "/config.yml")
 	if err != nil {
-		log.Errorln(err)
-		return err
+		return errors.Wrap(err, "error deleting config.yml")
 	}
 	return nil
 }

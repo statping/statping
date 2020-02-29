@@ -37,11 +37,14 @@ func SelectService(id int64) *Service {
 	for _, s := range Services() {
 		if s.Id == id {
 			s.UpdateStats()
-			fmt.Println("service: ", s.Name, s.Stats)
 			return s
 		}
 	}
 	return nil
+}
+
+func (s *Service) AfterCreate(obj interface{}, err error) {
+
 }
 
 // CheckinProcess runs the checkin routine for each checkin attached to service
@@ -55,8 +58,12 @@ func CheckinProcess(s database.Servicer) {
 // SelectAllServices returns a slice of *core.Service to be store on []*core.Services
 // should only be called once on startup.
 func SelectAllServices(start bool) ([]*Service, error) {
-	srvs := database.Services()
-	for _, s := range srvs {
+	var coreServices []*Service
+	if len(CoreApp.services) > 0 {
+		return CoreApp.services, nil
+	}
+
+	for _, s := range database.Services() {
 		if start {
 			s.Start()
 			CheckinProcess(s)
@@ -71,10 +78,13 @@ func SelectAllServices(start bool) ([]*Service, error) {
 
 		// collect initial service stats
 		s.UpdateStats()
-		CoreApp.services = append(CoreApp.services, &Service{s})
+		coreServices = append(coreServices, &Service{s})
 	}
+
+	CoreApp.services = coreServices
 	reorderServices()
-	return CoreApp.services, nil
+
+	return coreServices, nil
 }
 
 func wrapFailures(f []*types.Failure) []*Failure {

@@ -17,7 +17,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/handlers"
@@ -25,6 +24,7 @@ import (
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"github.com/joho/godotenv"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http/httptest"
 	"time"
@@ -184,8 +184,7 @@ func ExportIndexHTML() []byte {
 func updateDisplay() error {
 	gitCurrent, err := checkGithubUpdates()
 	if err != nil {
-		fmt.Printf("Issue connecting to https://github.com/hunterlong/statping\n%v\n", err)
-		return err
+		return errors.Wrap(err, "Issue connecting to https://github.com/hunterlong/statping")
 	}
 	if gitCurrent.TagName == "" {
 		return nil
@@ -194,7 +193,7 @@ func updateDisplay() error {
 		return nil
 	}
 	if VERSION != gitCurrent.TagName[1:] {
-		fmt.Printf("\nNew Update %v Available!\n", gitCurrent.TagName[1:])
+		fmt.Printf("New Update %v Available!\n", gitCurrent.TagName[1:])
 		fmt.Printf("Update Command:\n")
 		fmt.Printf("curl -o- -L https://statping.com/install.sh | bash\n\n")
 	}
@@ -202,27 +201,27 @@ func updateDisplay() error {
 }
 
 // runOnce will initialize the Statping application and check each service 1 time, will not run HTTP server
-func runOnce() {
-	var err error
-	_, err = core.LoadConfigFile(utils.Directory)
+func runOnce() error {
+	_, err := core.LoadConfigFile(utils.Directory)
 	if err != nil {
-		log.Errorln("config.yml file not found")
+		return errors.Wrap(err, "config.yml file not found")
 	}
 	err = core.CoreApp.Connect(false, utils.Directory)
 	if err != nil {
-		log.Errorln(err)
+		return errors.Wrap(err, "issue connecting to database")
 	}
 	core.CoreApp, err = core.SelectCore()
 	if err != nil {
-		fmt.Println("Core database was not found, Statping is not setup yet.")
+		return errors.Wrap(err, "core database was not found or setup")
 	}
 	_, err = core.SelectAllServices(true)
 	if err != nil {
-		log.Errorln(err)
+		return errors.Wrap(err, "could not select all services")
 	}
 	for _, srv := range core.Services() {
 		core.CheckService(srv, true)
 	}
+	return nil
 }
 
 // HelpEcho prints out available commands and flags for Statping

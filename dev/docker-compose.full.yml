@@ -2,38 +2,48 @@ version: '2.3'
 
 services:
 
-  statping_dev:
-    container_name: statping_dev
-    build:
-      context: .
-      dockerfile: ./dev/Dockerfile.dev
-      args:
-        VERSION: DEV
-        COMMIT: DEV
-    restart: on-failure
-    volumes:
-      - ./:/go/src/github.com/hunterlong/statping
-    environment:
-      GO_ENV: test
-      DB_CONN: sqlite
-      API_KEY: exampleapikey
-      API_SECRET: exampleapisecret
-      NAME: Statping on SQLite
-      DOMAIN: http://localhost:4000
-      DESCRIPTION: This is a dev environment on SQLite!
-      ADMIN_USER: admin
-      ADMIN_PASS: admin
-      PORT: 8585
+  nginx-proxy:
+    image: jwilder/nginx-proxy
     ports:
-      - 8888:8888
-      - 8585:8585
-    networks:
-      - statping
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8585/health || false"]
-      timeout: 2s
-      interval: 20s
-      retries: 30
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+#  statping_dev:
+#    container_name: statping_dev
+#    build:
+#      context: .
+#      dockerfile: ./dev/Dockerfile.dev
+#      args:
+#        VERSION: DEV
+#        COMMIT: DEV
+#    restart: on-failure
+#    volumes:
+#      - ./:/go/src/github.com/hunterlong/statping
+#    environment:
+#      VIRTUAL_HOST: local.statping.com
+#      VIRTUAL_PORT: 8888
+#      GO_ENV: test
+#      DB_CONN: sqlite
+#      API_KEY: exampleapikey
+#      API_SECRET: exampleapisecret
+#      NAME: Statping on SQLite
+#      DOMAIN: http://localhost:4000
+#      DESCRIPTION: This is a dev environment on SQLite!
+#      ADMIN_USER: admin
+#      ADMIN_PASS: admin
+#      PORT: 8585
+#      SERVICES: '[{"name": "Local Statping", "type": "http", "domain": "http://localhost:8585", "interval": 30}]'
+#    ports:
+#      - 8888:8888
+#      - 8585:8585
+#    networks:
+#      - statping
+#    healthcheck:
+#      test: ["CMD-SHELL", "curl -f http://localhost:8585/health || false"]
+#      timeout: 2s
+#      interval: 20s
+#      retries: 30
 
   statping:
     container_name: statping
@@ -43,6 +53,9 @@ services:
     volumes:
       - ./docker/statping/sqlite:/app
     environment:
+      SERVICES: '[{"name": "Local Statping", "type": "http", "domain": "http://localhost:8585", "interval": 30}]'
+      VIRTUAL_HOST: sqlite.dev.statping.com
+      VIRTUAL_PORT: 8080
       DB_CONN: sqlite
       API_KEY: exampleapikey
       API_SECRET: exampleapisecret
@@ -73,6 +86,8 @@ services:
     links:
       - mysql
     environment:
+      VIRTUAL_HOST: mysql.dev.statping.com
+      VIRTUAL_PORT: 8080
       DB_CONN: mysql
       DB_HOST: mysql
       DB_PORT: 3306
@@ -109,6 +124,8 @@ services:
     links:
       - postgres
     environment:
+      VIRTUAL_HOST: postgres.dev.statping.com
+      VIRTUAL_PORT: 8080
       DB_CONN: postgres
       DB_HOST: postgres
       DB_PORT: 5432
@@ -181,6 +198,8 @@ services:
     links:
       - mysql:db
     environment:
+      VIRTUAL_HOST: phpmyadmin.statping.com
+      VIRTUAL_PORT: 80
       MYSQL_ROOT_PASSWORD: password123
       PMA_HOST: mysql
       PMA_USER: root
@@ -204,6 +223,8 @@ services:
     volumes:
       - ./docker/statping/sqlite/statping.db:/data/statping.db:ro
     environment:
+      VIRTUAL_HOST: sqladmin.statping.com
+      VIRTUAL_PORT: 8080
       SQLITE_DATABASE: /data/statping.db
     networks:
       - statping
@@ -213,6 +234,8 @@ services:
     image: fenglc/pgadmin4
     restart: on-failure
     environment:
+      VIRTUAL_HOST: pgadmin.statping.com
+      VIRTUAL_PORT: 5050
       DEFAULT_USER: admin@admin.com
       DEFAULT_PASSWORD: admin
     depends_on:
@@ -236,11 +259,13 @@ services:
       - statping
       - statping_mysql
       - statping_postgres
-      - statping_dev
     ports:
       - 7050:9090
     networks:
       - statping
+    environment:
+      VIRTUAL_HOST: prometheus.statping.com
+      VIRTUAL_PORT: 9090
     healthcheck:
       test: "/bin/wget -q -Y off http://localhost:9090/status -O /dev/null > /dev/null 2>&1"
       interval: 10s
@@ -258,6 +283,8 @@ services:
       - ./dev/grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
       - ./dev/grafana/statping_dashboard.json:/etc/grafana/provisioning/dashboards/statping_dashboard.json
     environment:
+      - VIRTUAL_HOST=grafana.statping.com
+      - VIRTUAL_PORT=3000
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_AUTH_ANONYMOUS_ENABLED=true
     depends_on:

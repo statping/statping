@@ -112,18 +112,27 @@ func InsertSampleData() error {
 	if _, err := database.Create(s1); err != nil {
 		return types.ErrWrap(err, types.ErrorCreateService)
 	}
+	log.Infof("Created Service '%s'", s1.Name)
+
 	if _, err := database.Create(s2); err != nil {
 		return types.ErrWrap(err, types.ErrorCreateService)
 	}
+	log.Infof("Created Service '%s'", s2.Name)
+
 	if _, err := database.Create(s3); err != nil {
 		return types.ErrWrap(err, types.ErrorCreateService)
 	}
+	log.Infof("Created Service '%s'", s3.Name)
+
 	if _, err := database.Create(s4); err != nil {
 		return types.ErrWrap(err, types.ErrorCreateService)
 	}
+	log.Infof("Created Service '%s'", s4.Name)
+
 	if _, err := database.Create(s5); err != nil {
 		return types.ErrWrap(err, types.ErrorCreateService)
 	}
+	log.Infof("Created Service '%s'", s5.Name)
 
 	if _, err := SelectAllServices(false); err != nil {
 		return types.ErrWrap(err, types.ErrorServiceSelection)

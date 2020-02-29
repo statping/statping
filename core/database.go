@@ -16,7 +16,6 @@
 package core
 
 import (
-	"errors"
 	"fmt"
 	"github.com/go-yaml/yaml"
 	"github.com/hunterlong/statping/core/notifier"
@@ -27,6 +26,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/pkg/errors"
 	"os"
 	"path/filepath"
 	"time"
@@ -339,6 +339,43 @@ func (c *Core) CreateDatabase() error {
 	}
 	log.Infoln("Statping Database Created")
 	return err
+}
+
+// findServiceByHas will return a service that matches the SHA256 hash of a service
+// Service hash example: sha256(name:EXAMPLEdomain:HTTP://DOMAIN.COMport:8080type:HTTPmethod:GET)
+func findServiceByHash(hash string) *Service {
+	for _, service := range Services() {
+		if service.String() == hash {
+			return service
+		}
+	}
+	return nil
+}
+
+func (c *Core) CreateServicesFromEnvs() error {
+	servicesEnv := utils.Getenv("SERVICES", []*types.Service{}).([]*types.Service)
+
+	for k, service := range servicesEnv {
+
+		if err := service.Valid(); err != nil {
+			return errors.Wrapf(err, "invalid service at index %d in SERVICES environment variable", k)
+		}
+		if findServiceByHash(service.String()) == nil {
+			newService := &types.Service{
+				Name:   service.Name,
+				Domain: service.Domain,
+				Method: service.Method,
+				Type:   service.Type,
+			}
+			if _, err := database.Create(newService); err != nil {
+				return errors.Wrapf(err, "could not create service %s", newService.Name)
+			}
+			log.Infof("Created new service '%s'", newService.Name)
+		}
+
+	}
+
+	return nil
 }
 
 // MigrateDatabase will migrate the database structure to current version.
