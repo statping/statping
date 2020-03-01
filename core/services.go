@@ -28,17 +28,15 @@ type Service struct {
 	*database.ServiceObj
 }
 
-func Services() []*Service {
+func Services() map[int64]*Service {
 	return CoreApp.services
 }
 
 // SelectService returns a *core.Service from in memory
 func SelectService(id int64) *Service {
-	for _, s := range Services() {
-		if s.Id == id {
-			s.UpdateStats()
-			return s
-		}
+	service := CoreApp.services[id]
+	if service != nil {
+		return service
 	}
 	return nil
 }
@@ -57,8 +55,8 @@ func CheckinProcess(s database.Servicer) {
 
 // SelectAllServices returns a slice of *core.Service to be store on []*core.Services
 // should only be called once on startup.
-func SelectAllServices(start bool) ([]*Service, error) {
-	var coreServices []*Service
+func SelectAllServices(start bool) (map[int64]*Service, error) {
+	services := make(map[int64]*Service)
 	if len(CoreApp.services) > 0 {
 		return CoreApp.services, nil
 	}
@@ -78,13 +76,14 @@ func SelectAllServices(start bool) ([]*Service, error) {
 
 		// collect initial service stats
 		s.UpdateStats()
-		coreServices = append(coreServices, &Service{s})
+
+		services[s.Id] = &Service{s}
 	}
 
-	CoreApp.services = coreServices
+	CoreApp.services = services
 	reorderServices()
 
-	return coreServices, nil
+	return services, nil
 }
 
 func wrapFailures(f []*types.Failure) []*Failure {
@@ -97,35 +96,24 @@ func wrapFailures(f []*types.Failure) []*Failure {
 
 // reorderServices will sort the services based on 'order_id'
 func reorderServices() {
+	fmt.Println("sorting: ", len(CoreApp.services))
 	sort.Sort(ServiceOrder(CoreApp.services))
-}
-
-// index returns a services index int for updating the []*core.Services slice
-func index(s int64) int {
-	for k, service := range CoreApp.services {
-		if s == service.Id {
-			return k
-		}
-	}
-	return 0
 }
 
 // updateService will update a service in the []*core.Services slice
 func updateService(s *Service) {
-	CoreApp.services[index(s.Id)] = s
+	CoreApp.services[s.Id] = s
 }
 
 // Delete will remove a service from the database, it will also end the service checking go routine
 func (s *Service) Delete() error {
-	i := index(s.Id)
 	err := database.Delete(s)
 	if err != nil {
 		log.Errorln(fmt.Sprintf("Failed to delete service %v. %v", s.Name, err))
 		return err
 	}
 	s.Close()
-	slice := CoreApp.services
-	CoreApp.services = append(slice[:i], slice[i+1:]...)
+	CoreApp.services[s.Id] = nil
 	reorderServices()
 	notifier.OnDeletedService(s.Service)
 	return err
@@ -168,7 +156,7 @@ func Create(srv database.Servicer, check bool) (int64, error) {
 	}
 	service := &Service{s}
 	s.Start()
-	CoreApp.services = append(CoreApp.services, service)
+	CoreApp.services[service.Id] = service
 	go ServiceCheckQueue(service, check)
 	reorderServices()
 	notifier.OnNewService(s.Service)

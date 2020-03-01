@@ -206,7 +206,7 @@ func apiAllServicesHandler(r *http.Request) interface{} {
 	return joinServices(services)
 }
 
-func joinServices(srvs []*core.Service) []*types.Service {
+func joinServices(srvs map[int64]*core.Service) []*types.Service {
 	var services []*types.Service
 	for _, v := range srvs {
 		v.UpdateStats()

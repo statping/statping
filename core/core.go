@@ -34,7 +34,7 @@ type PluginRepos types.PluginRepos
 
 type Core struct {
 	*types.Core
-	services []*Service
+	services map[int64]*Service
 }
 
 var (
@@ -51,8 +51,8 @@ func init() {
 func NewCore() *Core {
 	CoreApp = &Core{Core: &types.Core{
 		Started: time.Now().UTC(),
-	},
-	}
+	}}
+	CoreApp.services = make(map[int64]*Service)
 	return CoreApp
 }
 
@@ -204,9 +204,17 @@ func GetLocalIP() string {
 }
 
 // ServiceOrder will reorder the services based on 'order_id' (Order)
-type ServiceOrder []*Service
+type ServiceOrder map[int64]*Service
 
 // Sort interface for resroting the Services in order
-func (c ServiceOrder) Len() int           { return len(c) }
-func (c ServiceOrder) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
-func (c ServiceOrder) Less(i, j int) bool { return c[i].Order < c[j].Order }
+func (c ServiceOrder) Len() int      { return len(c) }
+func (c ServiceOrder) Swap(i, j int) { c[int64(i)], c[int64(j)] = c[int64(j)], c[int64(i)] }
+func (c ServiceOrder) Less(i, j int) bool {
+	if c[int64(i)] == nil {
+		return false
+	}
+	if c[int64(j)] == nil {
+		return false
+	}
+	return c[int64(i)].Order < c[int64(j)].Order
+}
