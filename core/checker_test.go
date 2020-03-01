@@ -87,9 +87,9 @@ func grpcServer(port int, enableHealthCheck bool) *grpc.Server {
 	return server
 }
 
-// TestGrpcCheck ranges over the testdata struct.
-// Examines GrpcCheck() function
-func TestGrpcCheck(t *testing.T) {
+// TestCheckGrpc ranges over the testdata struct.
+// Examines checkGrpc() function
+func TestCheckGrpc(t *testing.T) {
 	for _, testscenario := range testdata {
 		v := testscenario
 		t.Run(v.clientChecker.Name, func(t *testing.T) {
