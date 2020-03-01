@@ -265,16 +265,12 @@ func (s *Service) checkGrpc(record bool) *Service {
 	s.LastResponse = res.String()
 	s.LastStatusCode = int(res.GetStatus())
 	s.ExpectedStatus = 1
-	s.Expected.String = "SERVING"
+	s.Expected.String = "status:SERVING"
 
-	match, err := regexp.MatchString(s.Expected.String, res.String())
-	if err != nil {
-		log.Warnln(fmt.Sprintf("GRPC Service: '%s', Response: expected '%v', got '%v'", s.Name, res.String(), s.Expected.String))
-	}
-
-	if !match {
+	if !(s.Expected.String == strings.TrimSpace(s.LastResponse)) {
+		log.Warnln(fmt.Sprintf("GRPC Service: '%s', Response: expected '%v', got '%v'", s.Name, s.LastResponse, s.Expected.String))
 		if record {
-			recordFailure(s, fmt.Sprintf("GRPC Response Body did not match '%v'", s.Expected))
+			recordFailure(s, fmt.Sprintf("GRPC Response Body did not match '%v'", s.Expected.String))
 		}
 		return s
 	}
@@ -285,7 +281,6 @@ func (s *Service) checkGrpc(record bool) *Service {
 		}
 		return s
 	}
-
 
 	if record {
 		recordSuccess(s)
