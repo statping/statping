@@ -90,7 +90,7 @@ func Getenv(key string, defaultValue interface{}) interface{} {
 				var services []*types.Service
 				if err := json.Unmarshal([]byte(val), services); err != nil {
 					Log.Error("Incorrect formatting with SERVICE environment variable")
-					return nil
+					return []*types.Service{}
 				}
 				return services
 			default:

@@ -33,7 +33,7 @@ type ErrorResponse struct {
 func LoadConfigFile(directory string) (*DbConfig, error) {
 	var configs *DbConfig
 
-	dbConn := utils.Getenv("DB_CONN", "")
+	dbConn := utils.Getenv("DB_CONN", "").(string)
 
 	if dbConn != "" {
 		log.Infof("DB_CONN=%s environment variable was found, waiting for database...", dbConn)
