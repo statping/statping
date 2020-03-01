@@ -75,15 +75,17 @@ func InitApp() error {
 	if _, err := SelectAllServices(true); err != nil {
 		return err
 	}
-	checkServices()
 	if err := AttachNotifiers(); err != nil {
 		return err
 	}
+	CoreApp.Notifications = notifier.AllCommunications
 	if err := AddIntegrations(); err != nil {
 		return err
 	}
-	CoreApp.Notifications = notifier.AllCommunications
 	CoreApp.Integrations = integrations.Integrations
+
+	go checkServices()
+
 	database.StartMaintenceRoutine()
 	CoreApp.Setup = true
 	return nil

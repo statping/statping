@@ -15,7 +15,8 @@ RUN go mod download
 
 ENV GO111MODULE on
 
-RUN go get github.com/stretchr/testify/... && \
+RUN go get github.com/stretchr/testify/assert && \
+    go get github.com/stretchr/testify/require && \
 	go get github.com/GeertJohan/go.rice/rice && \
 	go get github.com/cortesi/modd/cmd/modd && \
 	go get github.com/crazy-max/xgo
@@ -27,7 +28,9 @@ RUN cd frontend && yarn install --pure-lockfile --network-timeout 1000000 && \
 
 COPY . ./
 
-RUN make clean frontend-build compile
+RUN make clean
+RUN make frontend-build
+RUN make compile
 RUN make build
 RUN chmod a+x statping && mv statping /go/bin/statping
 

@@ -2,8 +2,6 @@ module github.com/hunterlong/statping
 
 go 1.13
 
-replace github.com/hunterlong/statping/utils v0.0.0 => ./utils
-
 require (
 	github.com/99designs/gqlgen v0.10.1
 	github.com/GeertJohan/go.rice v1.0.0
