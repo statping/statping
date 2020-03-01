@@ -150,7 +150,7 @@ func mainProcess() error {
 		return errors.Wrap(err, "database migration")
 	}
 
-	if err := core.CoreApp.CreateServicesFromEnvs(); err != nil {
+	if err := core.CoreApp.ServicesFromEnvFile(); err != nil {
 		errStr := "error 'SERVICE' environment variable"
 		log.Errorln(errStr)
 		return errors.Wrap(err, errStr)

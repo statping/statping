@@ -19,7 +19,6 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
-	"github.com/pkg/errors"
 	"time"
 )
 
@@ -121,22 +120,9 @@ func (s *Service) IsRunning() bool {
 	}
 }
 
-func (s *Service) String() string {
+func (s Service) String() string {
 	format := fmt.Sprintf("name:%sdomain:%sport:%dtype:%smethod:%s", s.Name, s.Domain, s.Port, s.Type, s.Method)
 	h := sha1.New()
 	h.Write([]byte(format))
 	return hex.EncodeToString(h.Sum(nil))
-}
-
-func (s *Service) Valid() error {
-	if s.Name == "" {
-		return errors.New("invalid - missing service name")
-	}
-	if s.Domain == "" {
-		return errors.New("invalid - missing service domain")
-	}
-	if s.Type == "" {
-		return errors.New("invalid - missing service type")
-	}
-	return nil
 }

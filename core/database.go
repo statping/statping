@@ -16,6 +16,7 @@
 package core
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/go-yaml/yaml"
 	"github.com/hunterlong/statping/core/notifier"
@@ -352,25 +353,39 @@ func findServiceByHash(hash string) *Service {
 	return nil
 }
 
-func (c *Core) CreateServicesFromEnvs() error {
-	servicesEnv := utils.Getenv("SERVICES", []*types.Service{}).([]*types.Service)
+func (c *Core) ServicesFromEnvFile() error {
+	servicesEnv := utils.Getenv("SERVICES_FILE", "").(string)
+	if servicesEnv == "" {
+		return nil
+	}
 
-	for k, service := range servicesEnv {
+	file, err := os.Open(servicesEnv)
+	if err != nil {
+		return errors.Wrapf(err, "error opening 'SERVICES_FILE' at: %s", servicesEnv)
+	}
+	defer file.Close()
 
-		if err := service.Valid(); err != nil {
-			return errors.Wrapf(err, "invalid service at index %d in SERVICES environment variable", k)
+	var serviceLines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		serviceLines = append(serviceLines, scanner.Text())
+	}
+
+	if len(serviceLines) == 0 {
+		return nil
+	}
+
+	for k, service := range serviceLines {
+
+		svr, err := utils.ValidateService(service)
+		if err != nil {
+			return errors.Wrapf(err, "invalid service at index %d in SERVICES_FILE environment variable", k)
 		}
-		if findServiceByHash(service.String()) == nil {
-			newService := &types.Service{
-				Name:   service.Name,
-				Domain: service.Domain,
-				Method: service.Method,
-				Type:   service.Type,
+		if findServiceByHash(svr.String()) == nil {
+			if _, err := database.Create(svr); err != nil {
+				return errors.Wrapf(err, "could not create service %s", svr.Name)
 			}
-			if _, err := database.Create(newService); err != nil {
-				return errors.Wrapf(err, "could not create service %s", newService.Name)
-			}
-			log.Infof("Created new service '%s'", newService.Name)
+			log.Infof("Created new service '%s'", svr.Name)
 		}
 
 	}

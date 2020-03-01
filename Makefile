@@ -55,6 +55,10 @@ docker-latest: docker-base
 docker-vue:
 	docker build -t hunterlong/statping:vue --build-arg VERSION=${VERSION} .
 
+push-vue: clean frontend-build compile docker-base docker-vue
+	docker push hunterlong/statping:base
+	docker push hunterlong/statping:vue
+
 modd:
 	modd -f ./dev/modd.conf
 
