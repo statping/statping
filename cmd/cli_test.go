@@ -129,13 +129,19 @@ func TestVersionCLI(t *testing.T) {
 func TestAssetsCLI(t *testing.T) {
 	catchCLI([]string{"assets"})
 	//assert.EqualError(t, run, "end")
-	assert.FileExists(t, dir+"/assets/css/base.css")
+	assert.FileExists(t, dir+"/assets/css/main.css")
+	assert.FileExists(t, dir+"/assets/css/style.css")
+	assert.FileExists(t, dir+"/assets/css/vendor.css")
 	assert.FileExists(t, dir+"/assets/scss/base.scss")
+	assert.FileExists(t, dir+"/assets/scss/mobile.scss")
+	assert.FileExists(t, dir+"/assets/scss/variables.scss")
 }
 
 func TestSassCLI(t *testing.T) {
 	catchCLI([]string{"sass"})
-	assert.FileExists(t, dir+"/assets/css/base.css")
+	assert.FileExists(t, dir+"/assets/css/main.css")
+	assert.FileExists(t, dir+"/assets/css/style.css")
+	assert.FileExists(t, dir+"/assets/css/vendor.css")
 }
 
 func TestUpdateCLI(t *testing.T) {

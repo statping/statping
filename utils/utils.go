@@ -295,9 +295,9 @@ func IsType(n interface{}, obj interface{}) bool {
 
 // Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings
 //		in, out, err := Command("sass assets/scss assets/css/base.css")
-func Command(cmd string) (string, string, error) {
-	Log.Debugln("running command: " + cmd)
-	testCmd := exec.Command("sh", "-c", cmd)
+func Command(name string, args ...string) (string, string, error) {
+	Log.Debugln("running command: " + name + strings.Join(args, " "))
+	testCmd := exec.Command(name, args...)
 	var stdout, stderr []byte
 	var errStdout, errStderr error
 	stdoutIn, _ := testCmd.StdoutPipe()

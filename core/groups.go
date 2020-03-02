@@ -11,18 +11,18 @@ type Group struct {
 }
 
 // SelectGroups returns all groups
-func SelectGroups(includeAll bool, auth bool) []*Group {
-	var validGroups []*Group
+func SelectGroups(includeAll bool, auth bool) map[int64]*Group {
+	validGroups := make(map[int64]*Group)
 
 	groups := database.AllGroups()
 
 	for _, g := range groups {
 		if !g.Public.Bool {
 			if auth {
-				validGroups = append(validGroups, &Group{g.Group})
+				validGroups[g.Id] = &Group{g.Group}
 			}
 		} else {
-			validGroups = append(validGroups, &Group{g.Group})
+			validGroups[g.Id] = &Group{g.Group}
 		}
 	}
 	sort.Sort(GroupOrder(validGroups))
@@ -34,18 +34,25 @@ func SelectGroups(includeAll bool, auth bool) []*Group {
 
 // SelectGroup returns a *core.Group
 func SelectGroup(id int64) *Group {
-	for _, g := range SelectGroups(true, true) {
-		if g.Id == id {
-			return g
-		}
+	groups := SelectGroups(true, true)
+	if groups[id] != nil {
+		return groups[id]
 	}
 	return nil
 }
 
 // GroupOrder will reorder the groups based on 'order_id' (Order)
-type GroupOrder []*Group
+type GroupOrder map[int64]*Group
 
 // Sort interface for resorting the Groups in order
-func (c GroupOrder) Len() int           { return len(c) }
-func (c GroupOrder) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
-func (c GroupOrder) Less(i, j int) bool { return c[i].Order < c[j].Order }
+func (c GroupOrder) Len() int      { return len(c) }
+func (c GroupOrder) Swap(i, j int) { c[int64(i)], c[int64(j)] = c[int64(j)], c[int64(i)] }
+func (c GroupOrder) Less(i, j int) bool {
+	if c[int64(i)] == nil {
+		return false
+	}
+	if c[int64(j)] == nil {
+		return false
+	}
+	return c[int64(i)].Order < c[int64(j)].Order
+}

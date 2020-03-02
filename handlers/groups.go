@@ -33,10 +33,10 @@ func apiAllGroupHandler(r *http.Request) interface{} {
 	return flattenGroups(groups)
 }
 
-func flattenGroups(groups []*core.Group) []*types.Group {
+func flattenGroups(groups map[int64]*core.Group) []*types.Group {
 	var groupers []*types.Group
-	for _, g := range groups {
-		groupers = append(groupers, g.Group)
+	for _, group := range groups {
+		groupers = append(groupers, group.Group)
 	}
 	return groupers
 }

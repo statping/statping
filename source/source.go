@@ -18,18 +18,20 @@ package source
 //go:generate go run generate_wiki.go
 
 import (
-	"errors"
 	"fmt"
 	"github.com/GeertJohan/go.rice"
 	"github.com/hunterlong/statping/utils"
+	"github.com/pkg/errors"
 	"github.com/russross/blackfriday/v2"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var (
-	log     = utils.Log.WithField("type", "source")
-	TmplBox *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
+	log         = utils.Log.WithField("type", "source")
+	TmplBox     *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
+	DefaultScss = []string{"scss/base.scss", "scss/mobile.scss"}
 )
 
 // Assets will load the Rice boxes containing the CSS, SCSS, JS, and HTML files.
@@ -44,33 +46,38 @@ func HelpMarkdown() string {
 	return string(output)
 }
 
+func scssRendered(name string) string {
+	spl := strings.Split(name, "/")
+	path := spl[:len(spl)-2]
+	file := spl[len(spl)-1]
+	splFile := strings.Split(file, ".")
+	return fmt.Sprintf("%s/css/%s.css", strings.Join(path, "/"), splFile[len(splFile)-2])
+}
+
 // CompileSASS will attempt to compile the SASS files into CSS
-func CompileSASS() error {
-	sassBin := os.Getenv("SASS")
-	if sassBin == "" {
-		sassBin = "sass"
+func CompileSASS(files ...string) error {
+	sassBin := utils.Getenv("SASS", "sass").(string)
+
+	for _, file := range files {
+		scssFile := fmt.Sprintf("%v/assets/%v", utils.Directory, file)
+
+		log.Infoln(fmt.Sprintf("Compiling SASS %v into %v", scssFile, scssRendered(scssFile)))
+
+		stdout, stderr, err := utils.Command(sassBin, scssFile, scssRendered(scssFile))
+
+		if err != nil {
+			log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v", err))
+			log.Errorln(fmt.Sprintf("%s %s %s", sassBin, scssFile, scssRendered(scssFile)))
+			return errors.Wrapf(err, "failed to compile assets, %s %s %s", err, stdout, stderr)
+		}
+
+		if stdout != "" || stderr != "" {
+			log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v %v %v", err, stdout, stderr))
+			return errors.Wrap(err, "failed to capture stdout or stderr")
+		}
+
+		log.Infoln(fmt.Sprintf("out: %v | error: %v", stdout, stderr))
 	}
-
-	scssFile := fmt.Sprintf("%v/assets/%v", utils.Directory, "scss/base.scss")
-	baseFile := fmt.Sprintf("%v/assets/%v", utils.Directory, "css/base.css")
-
-	log.Infoln(fmt.Sprintf("Compiling SASS %v into %v", scssFile, baseFile))
-	command := fmt.Sprintf("%v %v %v", sassBin, scssFile, baseFile)
-
-	stdout, stderr, err := utils.Command(command)
-
-	if err != nil {
-		log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v", err))
-		log.Errorln(fmt.Sprintf("sh -c %v", command))
-		return fmt.Errorf("failed to compile assets with SASS: %v %v \n%v", err, stdout, stderr)
-	}
-
-	if stdout != "" || stderr != "" {
-		log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v %v %v", err, stdout, stderr))
-		return errors.New("failed to capture stdout or stderr")
-	}
-
-	log.Infoln(fmt.Sprintf("out: %v | error: %v", stdout, stderr))
 	log.Infoln("SASS Compiling is complete!")
 	return nil
 }
@@ -87,7 +94,7 @@ func UsingAssets(folder string) bool {
 			if err := CreateAllAssets(folder); err != nil {
 				log.Warnln(err)
 			}
-			err := CompileSASS()
+			err := CompileSASS(DefaultScss...)
 			if err != nil {
 				//CopyToPublic(CssBox, folder+"/css", "base.css")
 				log.Warnln("Default 'base.css' was insert because SASS did not work.")
@@ -102,7 +109,6 @@ func UsingAssets(folder string) bool {
 // SaveAsset will save an asset to the '/assets/' folder.
 func SaveAsset(data []byte, path string) error {
 	path = fmt.Sprintf("%s/assets/%s", utils.Directory, path)
-	log.Infoln(fmt.Sprintf("Saving %v", path))
 	err := utils.SaveFile(path, data)
 	if err != nil {
 		log.Errorln(fmt.Sprintf("Failed to save %v, %v", path, err))
@@ -137,7 +143,7 @@ func CreateAllAssets(folder string) error {
 
 	if err := CopyAllToPublic(TmplBox); err != nil {
 		log.Errorln(err)
-		return err
+		return errors.Wrap(err, "copying all to public")
 	}
 
 	CopyToPublic(TmplBox, "", "robots.txt")
@@ -147,7 +153,7 @@ func CreateAllAssets(folder string) error {
 	CopyToPublic(TmplBox, "files", "postman.json")
 	CopyToPublic(TmplBox, "files", "grafana.json")
 	log.Infoln("Compiling CSS from SCSS style...")
-	err := CompileSASS()
+	err := CompileSASS(DefaultScss...)
 	log.Infoln("Statping assets have been inserted")
 	return err
 }

@@ -20,6 +20,7 @@ import (
 	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
+	"strings"
 	"time"
 )
 
@@ -57,8 +58,8 @@ var Command = &commandLine{&notifier.Notification{
 	}}},
 }
 
-func runCommand(app, cmd string) (string, string, error) {
-	outStr, errStr, err := utils.Command(cmd)
+func runCommand(app string, cmd ...string) (string, string, error) {
+	outStr, errStr, err := utils.Command(app, cmd...)
 	return outStr, errStr, err
 }
 
@@ -88,7 +89,8 @@ func (u *commandLine) OnSave() error {
 
 // OnTest for commandLine triggers when this notifier has been saved
 func (u *commandLine) OnTest() error {
-	in, out, err := runCommand(u.Host, u.Var1)
+	cmds := strings.Split(u.Var1, " ")
+	in, out, err := runCommand(u.Host, cmds...)
 	utils.Log.Infoln(in)
 	utils.Log.Infoln(out)
 	return err

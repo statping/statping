@@ -96,7 +96,6 @@ func wrapFailures(f []*types.Failure) []*Failure {
 
 // reorderServices will sort the services based on 'order_id'
 func reorderServices() {
-	fmt.Println("sorting: ", len(CoreApp.services))
 	sort.Sort(ServiceOrder(CoreApp.services))
 }
 
