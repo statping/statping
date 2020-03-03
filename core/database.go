@@ -187,10 +187,6 @@ func (c *Core) Connect(retry bool, location string) error {
 	var conn string
 	var err error
 
-	if c.Config == nil {
-		return errors.New("missing database connection configs")
-	}
-
 	configs := c.Config
 	switch configs.DbConn {
 	case "sqlite":
