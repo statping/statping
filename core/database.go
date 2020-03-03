@@ -255,8 +255,8 @@ func SaveConfig(d *types.DbConfig) error {
 	if d.ApiKey == "" || d.ApiSecret == "" {
 		apiKey := utils.Getenv("API_KEY", utils.NewSHA1Hash(16))
 		apiSecret := utils.Getenv("API_SECRET", utils.NewSHA1Hash(16))
-		CoreApp.config.ApiKey = apiKey.(string)
-		CoreApp.config.ApiSecret = apiSecret.(string)
+		d.ApiKey = apiKey.(string)
+		d.ApiSecret = apiSecret.(string)
 	}
 	if d.DbConn == "sqlite3" {
 		d.DbConn = "sqlite"

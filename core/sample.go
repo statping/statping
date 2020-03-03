@@ -561,6 +561,8 @@ func InsertLargeSampleData() error {
 
 	var dayAgo = time.Now().UTC().Add((-24 * 90) * time.Hour)
 
+	CoreApp.services, _ = SelectAllServices(false)
+
 	insertHitRecords(dayAgo, 5450)
 
 	insertFailureRecords(dayAgo, 730)
