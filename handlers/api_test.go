@@ -36,7 +36,6 @@ func TestResetDatabase(t *testing.T) {
 	t.Log(err)
 	require.Nil(t, err)
 	require.NotNil(t, core.CoreApp)
-	require.NotNil(t, core.CoreApp.Config)
 }
 
 func TestFailedHTTPServer(t *testing.T) {

@@ -48,7 +48,6 @@ type Core struct {
 	Started       time.Time      `gorm:"-" json:"started_on"`
 	Plugins       []*Info        `gorm:"-" json:"-"`
 	Notifications []AllNotifiers `gorm:"-" json:"-"`
-	Config        *DbConfig      `gorm:"-" json:"-"`
 	Integrations  []Integrator   `gorm:"-" json:"-"`
 }
 

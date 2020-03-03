@@ -3,6 +3,10 @@ package database
 import (
 	"github.com/hunterlong/statping/types"
 	"reflect"
+
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 type CrudObject interface {

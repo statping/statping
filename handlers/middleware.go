@@ -135,7 +135,7 @@ func cached(duration, contentType string, handler func(w http.ResponseWriter, r 
 		content := CacheStorage.Get(r.RequestURI)
 		w.Header().Set("Content-Type", contentType)
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		if core.CoreApp.Config == nil {
+		if !core.IsSetup() {
 			handler(w, r)
 			return
 		}

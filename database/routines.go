@@ -6,6 +6,10 @@ import (
 	"github.com/hunterlong/statping/utils"
 	"os"
 	"time"
+
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 var (
@@ -38,6 +42,8 @@ func StartMaintenceRoutine() {
 // this function is currently set to delete records 7+ days old every 60 minutes
 func databaseMaintence(dur time.Duration) {
 	deleteAfter := time.Now().UTC().Add(dur)
+
+	time.Sleep(20 * types.Second)
 
 	for range time.Tick(maintenceDuration) {
 		log.Infof("Deleting failures older than %s", dur.String())

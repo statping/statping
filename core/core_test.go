@@ -30,6 +30,8 @@ var (
 	skipNewDb bool
 )
 
+var configs *types.DbConfig
+
 func init() {
 	dir = utils.Directory
 	utils.InitLogs()
@@ -50,27 +52,29 @@ func TestDbConfig_Save(t *testing.T) {
 		t.SkipNow()
 	}
 
-	config := &DbConfig{&types.DbConfig{
+	config := &types.DbConfig{
 		DbConn:   "sqlite",
 		Project:  "Tester",
 		Location: dir,
-	}}
+	}
 
-	err := config.Save()
+	err := SaveConfig(config)
 	require.Nil(t, err)
-	assert.Equal(t, "sqlite", CoreApp.Config.DbConn)
-	assert.NotEmpty(t, CoreApp.Config.ApiKey)
-	assert.NotEmpty(t, CoreApp.Config.ApiSecret)
+	assert.Equal(t, "sqlite", config.DbConn)
+	assert.NotEmpty(t, config.ApiKey)
+	assert.NotEmpty(t, config.ApiSecret)
 }
 
 func TestLoadDbConfig(t *testing.T) {
 	Configs, err := LoadConfigFile(dir)
 	assert.Nil(t, err)
 	assert.Equal(t, "sqlite", Configs.DbConn)
+
+	configs = Configs
 }
 
 func TestDbConnection(t *testing.T) {
-	err := CoreApp.Connect(false, dir)
+	err := CoreApp.Connect(configs, false, dir)
 	assert.Nil(t, err)
 }
 
@@ -102,9 +106,9 @@ func TestSeedDatabase(t *testing.T) {
 }
 
 func TestReLoadDbConfig(t *testing.T) {
-	err := CoreApp.Connect(false, dir)
+	err := CoreApp.Connect(configs, false, dir)
 	assert.Nil(t, err)
-	assert.Equal(t, "sqlite", CoreApp.Config.DbConn)
+	assert.Equal(t, "sqlite", CoreApp.config.DbConn)
 }
 
 func TestSelectCore(t *testing.T) {

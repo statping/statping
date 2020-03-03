@@ -21,11 +21,12 @@ import (
 	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
+	"sync"
+	"time"
+
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"sync"
-	"time"
 )
 
 var (
@@ -271,7 +272,7 @@ func insertSampleCheckins() error {
 
 // InsertSampleHits will create a couple new hits for the sample services
 func InsertSampleHits() error {
-	tx := Database(&Hit{}).Begin()
+	tx := database.Begin(&types.Hit{})
 	sg := new(sync.WaitGroup)
 	for i := int64(1); i <= 5; i++ {
 		sg.Add(1)
@@ -280,7 +281,7 @@ func InsertSampleHits() error {
 		log.Infoln(fmt.Sprintf("Adding %v sample hit records to service %v", SampleHits, service.Name))
 		createdAt := sampleStart
 		p := utils.NewPerlin(2., 2., 10, seed)
-		go func() {
+		go func(sg *sync.WaitGroup) {
 			defer sg.Done()
 			for hi := 0.; hi <= float64(SampleHits); hi++ {
 				latency := p.Noise1D(hi / 500)
@@ -292,7 +293,7 @@ func InsertSampleHits() error {
 				}
 				tx = tx.Create(&hit)
 			}
-		}()
+		}(sg)
 	}
 	sg.Wait()
 	if err := tx.Commit().Error(); err != nil {
@@ -626,14 +627,14 @@ func TmpRecords(dbFile string) error {
 	CoreApp = NewCore()
 	CoreApp.Name = "Tester"
 	CoreApp.Setup = true
-	configs := &DbConfig{&types.DbConfig{
+	configs := &types.DbConfig{
 		DbConn:   "sqlite",
 		Project:  "Tester",
 		Location: utils.Directory,
 		SqlFile:  sqlFile,
-	}}
+	}
 	log.Infoln("saving config.yml in: " + utils.Directory)
-	if err := configs.Save(); err != nil {
+	if err := SaveConfig(configs); err != nil {
 		log.Error(err)
 	}
 	log.Infoln("loading config.yml from: " + utils.Directory)
@@ -653,7 +654,7 @@ func TmpRecords(dbFile string) error {
 		}
 		log.Infoln("loading config.yml from: " + utils.Directory)
 
-		if err := CoreApp.Connect(false, utils.Directory); err != nil {
+		if err := CoreApp.Connect(configs, false, utils.Directory); err != nil {
 			log.Error(err)
 		}
 		log.Infoln("selecting the Core variable")
@@ -684,7 +685,7 @@ func TmpRecords(dbFile string) error {
 
 	log.Infoln(tmpSqlFile + " not found, creating a new database...")
 
-	if err := CoreApp.Connect(false, utils.Directory); err != nil {
+	if err := CoreApp.Connect(configs, false, utils.Directory); err != nil {
 		return err
 	}
 	log.Infoln("creating database")

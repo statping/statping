@@ -30,15 +30,9 @@ type ErrorResponse struct {
 }
 
 // LoadConfigFile will attempt to load the 'config.yml' file in a specific directory
-func LoadConfigFile(directory string) (*DbConfig, error) {
-	var configs *DbConfig
+func LoadConfigFile(directory string) (*types.DbConfig, error) {
+	var configs *types.DbConfig
 
-	dbConn := utils.Getenv("DB_CONN", "").(string)
-
-	if dbConn != "" {
-		log.Infof("DB_CONN=%s environment variable was found, waiting for database...", dbConn)
-		return LoadUsingEnv()
-	}
 	log.Debugln("Attempting to read config file at: " + directory + "/config.yml")
 	file, err := utils.OpenFile(directory + "/config.yml")
 	if err != nil {
@@ -50,61 +44,75 @@ func LoadConfigFile(directory string) (*DbConfig, error) {
 		return nil, errors.Wrap(err, "yaml file not formatted correctly")
 	}
 	log.WithFields(utils.ToFields(configs)).Debugln("read config file: " + directory + "/config.yml")
-	CoreApp.Config = configs.DbConfig
+
+	CoreApp.config = configs
+
 	return configs, err
 }
 
+func Configs() *types.DbConfig {
+	return CoreApp.config
+}
+
 // LoadUsingEnv will attempt to load database configs based on environment variables. If DB_CONN is set if will force this function.
-func LoadUsingEnv() (*DbConfig, error) {
-	Configs, err := EnvToConfig()
+func LoadUsingEnv() (*types.DbConfig, error) {
+	configs, err := EnvToConfig()
 	if err != nil {
-		return Configs, err
+		return configs, err
 	}
 
 	CoreApp.Name = utils.Getenv("NAME", "").(string)
-	CoreApp.Domain = utils.Getenv("DOMAIN", Configs.LocalIP).(string)
+	CoreApp.Domain = utils.Getenv("DOMAIN", "").(string)
 	CoreApp.UseCdn = types.NewNullBool(utils.Getenv("USE_CDN", false).(bool))
 
-	err = CoreApp.Connect(true, utils.Directory)
+	err = CoreApp.Connect(configs, true, utils.Directory)
 	if err != nil {
 		return nil, errors.Wrap(err, "error connecting to database")
 	}
-	if err := Configs.Save(); err != nil {
+	if err := SaveConfig(configs); err != nil {
 		return nil, errors.Wrap(err, "error saving configuration")
 	}
-	exists := DbSession.HasTable("core")
+	exists := database.Get().HasTable("core")
 	if !exists {
-		log.Infoln(fmt.Sprintf("Core database does not exist, creating now!"))
-		if err := CoreApp.DropDatabase(); err != nil {
-			return nil, errors.Wrap(err, "error dropping database")
-		}
-		if err := CoreApp.CreateDatabase(); err != nil {
-			return nil, errors.Wrap(err, "error creating database")
-		}
-		CoreApp, err = Configs.InsertCore()
-		if err != nil {
-			return nil, errors.Wrap(err, "error creating the core database")
-		}
-
-		username := utils.Getenv("ADMIN_USER", "admin").(string)
-		password := utils.Getenv("ADMIN_PASSWORD", "admin").(string)
-
-		admin := &types.User{
-			Username: username,
-			Password: utils.HashPassword(password),
-			Email:    "info@admin.com",
-			Admin:    types.NewNullBool(true),
-		}
-		if _, err := database.Create(admin); err != nil {
-			return nil, errors.Wrap(err, "error creating admin")
-		}
-
-		if err := SampleData(); err != nil {
-			return nil, errors.Wrap(err, "error connecting sample data")
-		}
-		return Configs, err
+		return InitialSetup(configs)
 	}
-	return Configs, nil
+
+	CoreApp.config = configs
+	return configs, nil
+}
+
+func InitialSetup(configs *types.DbConfig) (*types.DbConfig, error) {
+	log.Infoln(fmt.Sprintf("Core database does not exist, creating now!"))
+	if err := CoreApp.DropDatabase(); err != nil {
+		return nil, errors.Wrap(err, "error dropping database")
+	}
+	if err := CoreApp.CreateDatabase(); err != nil {
+		return nil, errors.Wrap(err, "error creating database")
+	}
+	CoreApp, err := InsertCore(configs)
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating the core database")
+	}
+
+	username := utils.Getenv("ADMIN_USER", "admin").(string)
+	password := utils.Getenv("ADMIN_PASSWORD", "admin").(string)
+
+	admin := &types.User{
+		Username: username,
+		Password: utils.HashPassword(password),
+		Email:    "info@admin.com",
+		Admin:    types.NewNullBool(true),
+	}
+	if _, err := database.Create(admin); err != nil {
+		return nil, errors.Wrap(err, "error creating admin")
+	}
+
+	if err := SampleData(); err != nil {
+		return nil, errors.Wrap(err, "error connecting sample data")
+	}
+
+	CoreApp.config = configs
+	return configs, err
 }
 
 // defaultPort accepts a database type and returns its default port
@@ -122,7 +130,7 @@ func defaultPort(db string) int {
 }
 
 // EnvToConfig converts environment variables to a DbConfig
-func EnvToConfig() (*DbConfig, error) {
+func EnvToConfig() (*types.DbConfig, error) {
 	var err error
 
 	dbConn := utils.Getenv("DB_CONN", "").(string)
@@ -173,10 +181,7 @@ func EnvToConfig() (*DbConfig, error) {
 		Location:    utils.Directory,
 		SqlFile:     sqlFile,
 	}
-
-	CoreApp.Config = config
-
-	return &DbConfig{config}, err
+	return config, err
 }
 
 // SampleData runs all the sample data for a new Statping installation
@@ -201,4 +206,11 @@ func DeleteConfig() error {
 		return errors.Wrap(err, "error deleting config.yml")
 	}
 	return nil
+}
+
+func IsSetup() bool {
+	if CoreApp.config != nil {
+		return true
+	}
+	return false
 }

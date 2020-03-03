@@ -52,7 +52,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	sample, _ := strconv.ParseBool(r.PostForm.Get("sample_data"))
 	dir := utils.Directory
 
-	config := &core.DbConfig{DbConfig: &types.DbConfig{
+	configs := &types.DbConfig{
 		DbConn:      dbConn,
 		DbHost:      dbHost,
 		DbUser:      dbUser,
@@ -67,11 +67,11 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		Email:       email,
 		Error:       nil,
 		Location:    utils.Directory,
-	}}
+	}
 
-	log.WithFields(utils.ToFields(core.CoreApp, config)).Debugln("new configs posted")
+	log.WithFields(utils.ToFields(core.CoreApp, configs)).Debugln("new configs posted")
 
-	if err := config.Save(); err != nil {
+	if err := core.SaveConfig(configs); err != nil {
 		log.Errorln(err)
 		sendErrorJson(err, w, r)
 		return
@@ -83,7 +83,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = core.CoreApp.Connect(false, dir); err != nil {
+	if err = core.CoreApp.Connect(configs, false, dir); err != nil {
 		log.Errorln(err)
 		core.DeleteConfig()
 		sendErrorJson(err, w, r)
@@ -100,7 +100,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	core.CoreApp, err = config.InsertCore()
+	core.CoreApp, err = core.InsertCore(configs)
 	if err != nil {
 		log.Errorln(err)
 		sendErrorJson(err, w, r)
@@ -108,9 +108,9 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	admin := &types.User{
-		Username: config.Username,
-		Password: config.Password,
-		Email:    config.Email,
+		Username: configs.Username,
+		Password: configs.Password,
+		Email:    configs.Email,
 		Admin:    types.NewNullBool(true),
 	}
 	database.Create(admin)
@@ -129,8 +129,8 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		Message string          `json:"message"`
 		Config  *types.DbConfig `json:"config"`
 	}{
-		"okokok",
-		config.DbConfig,
+		"success",
+		configs,
 	}
 	returnJson(out, w, r)
 }

@@ -27,9 +27,3 @@ const (
 	limitedFailures = 32
 	limitedHits     = 32
 )
-
-// Delete will remove a Failure record from the database
-func (f *Failure) Delete() error {
-	db := Database(&types.Failure{}).Delete(f)
-	return db.Error()
-}

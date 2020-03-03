@@ -19,27 +19,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
 )
 
 func apiAllMessagesHandler(r *http.Request) interface{} {
-	messages, err := core.SelectMessages()
-	if err != nil {
-		log.Error(err)
-		return nil
-	}
-	return joinMessages(messages)
-}
-
-func joinMessages(messages []*core.Message) []*types.Message {
-	var m []*types.Message
-	for _, v := range messages {
-		m = append(m, v.Message)
-	}
-	return m
+	messages := database.AllMessages()
+	return messages
 }
 
 func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {
@@ -50,18 +38,17 @@ func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	msg := core.ReturnMessage(message)
-	_, err = msg.Create()
+	_, err = database.Create(message)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	sendJsonAction(msg, "create", w, r)
+	sendJsonAction(message, "create", w, r)
 }
 
 func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	message, err := core.SelectMessage(utils.ToInt(vars["id"]))
+	message, err := database.Message(utils.ToInt(vars["id"]))
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -71,12 +58,12 @@ func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	message, err := core.SelectMessage(utils.ToInt(vars["id"]))
+	message, err := database.Message(utils.ToInt(vars["id"]))
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	err = message.Delete()
+	err = database.Delete(message)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -86,7 +73,7 @@ func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiMessageUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	message, err := core.SelectMessage(utils.ToInt(vars["id"]))
+	message, err := database.Message(utils.ToInt(vars["id"]))
 	if err != nil {
 		sendErrorJson(fmt.Errorf("message #%v was not found", vars["id"]), w, r)
 		return
@@ -97,7 +84,7 @@ func apiMessageUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	_, err = message.Update()
+	err = database.Update(message)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return

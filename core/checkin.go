@@ -17,7 +17,6 @@ package core
 
 import (
 	"fmt"
-	"github.com/ararog/timeago"
 	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
@@ -108,37 +107,6 @@ func SelectCheckin(api string) *Checkin {
 	return nil
 }
 
-// AllHits returns all of the CheckinHits for a given Checkin
-func (c *Checkin) AllHits() []*types.CheckinHit {
-	var checkins []*types.CheckinHit
-	Database(&types.CheckinHit{}).Where("checkin = ?", c.Id).Order("id DESC").Find(&checkins)
-	return checkins
-}
-
-// Hits returns all of the CheckinHits for a given Checkin
-func (c *Checkin) AllFailures() []*types.Failure {
-	var failures []*types.Failure
-	Database(&types.Failure{}).
-		Where("checkin = ?", c.Id).
-		Where("method = 'checkin'").
-		Order("id desc").
-		Find(&failures)
-
-	return failures
-}
-
-func (c *Checkin) GetFailures(count int) []*types.Failure {
-	var failures []*types.Failure
-	Database(&types.Failure{}).
-		Where("checkin = ?", c.Id).
-		Where("method = 'checkin'").
-		Limit(count).
-		Order("id desc").
-		Find(&failures)
-
-	return failures
-}
-
 // Create will create a new Checkin
 func (c *Checkin) Delete() {
 	c.Close()
@@ -169,35 +137,6 @@ func (c *Checkin) Create() (int64, error) {
 	c.Start()
 	go CheckinRoutine(c)
 	return c.Id, err
-}
-
-// Update will update a Checkin
-func (c *Checkin) Update() (int64, error) {
-	row := Database(c).Update(&c)
-	if row.Error() != nil {
-		log.Warnln(row.Error())
-		return 0, row.Error()
-	}
-	return c.Id, row.Error()
-}
-
-// Create will create a new successful checkinHit
-func (c *CheckinHit) Create() (int64, error) {
-	if c.CreatedAt.IsZero() {
-		c.CreatedAt = utils.Now()
-	}
-	row := Database(c).Create(&c)
-	if row.Error() != nil {
-		log.Warnln(row.Error())
-		return 0, row.Error()
-	}
-	return c.Id, row.Error()
-}
-
-// Ago returns the duration of time between now and the last successful checkinHit
-func (c *CheckinHit) Ago() string {
-	got, _ := timeago.TimeAgoWithTime(utils.Now(), c.CreatedAt)
-	return got
 }
 
 // RecheckCheckinFailure will check if a Service Checkin has been reported yet

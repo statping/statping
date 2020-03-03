@@ -4,12 +4,13 @@ import (
 	"database/sql"
 	"github.com/hunterlong/statping/types"
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"net/http"
 	"strings"
 	"time"
+
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 const (
@@ -117,6 +118,7 @@ type Database interface {
 }
 
 type Objects interface {
+	Core() Database
 	Services() Database
 	Users() Database
 	Groups() Database
@@ -128,6 +130,51 @@ type Objects interface {
 	CheckinHits() Database
 	Messages() Database
 	Integrations() Database
+}
+
+func Close() error {
+	if database == nil {
+		return nil
+	}
+	return database.Close()
+}
+
+func LogMode(b bool) Database {
+	return database.LogMode(b)
+}
+
+func Begin(model interface{}) Database {
+	if all, ok := model.(string); ok {
+		if all == "migration" {
+			return database.Begin()
+		}
+	}
+	return database.Model(model).Begin()
+}
+
+func Core() Database {
+	return database.Core()
+}
+
+func Get() Database {
+	if Available() {
+		return database
+	}
+	return nil
+}
+
+func Available() bool {
+	if database == nil {
+		return false
+	}
+	if err := database.DB().Ping(); err != nil {
+		return false
+	}
+	return true
+}
+
+func (d *Db) Core() Database {
+	return d.Table("core").Model(&types.Service{})
 }
 
 func (d *Db) Services() Database {

@@ -33,13 +33,6 @@ func uwrap(u *database.UserObj) *User {
 	return &User{u}
 }
 
-// CountUsers returns the amount of users
-func CountUsers() int64 {
-	var amount int64
-	Database(&User{}).Count(&amount)
-	return amount
-}
-
 // SelectUser returns the User based on the User's ID.
 func SelectUser(id int64) (*User, error) {
 	user, err := database.User(id)

@@ -24,17 +24,17 @@ func apiCreateIncidentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	newIncident := core.ReturnIncident(incident)
-	_, err = newIncident.Create()
+	obj, err := database.Create(newIncident)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	sendJsonAction(newIncident, "create", w, r)
+	sendJsonAction(obj, "create", w, r)
 }
 
 func apiIncidentUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	incident, err := core.SelectIncident(utils.ToInt(vars["id"]))
+	incident, err := database.Incident(utils.ToInt(vars["id"]))
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -47,7 +47,7 @@ func apiIncidentUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = incident.Update()
+	err = database.Update(&incident)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -57,12 +57,12 @@ func apiIncidentUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiDeleteIncidentHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	incident, err := core.SelectIncident(utils.ToInt(vars["id"]))
+	incident, err := database.Incident(utils.ToInt(vars["id"]))
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	err = incident.Delete()
+	err = database.Delete(incident)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return

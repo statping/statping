@@ -35,6 +35,7 @@ type PluginRepos types.PluginRepos
 type Core struct {
 	*types.Core
 	services map[int64]*Service
+	config   *types.DbConfig
 }
 
 var (
@@ -93,47 +94,26 @@ func InitApp() error {
 
 // InsertNotifierDB inject the Statping database instance to the Notifier package
 func InsertNotifierDB() error {
-	if DbSession == nil {
-		err := CoreApp.Connect(false, utils.Directory)
+	if !database.Available() {
+		err := CoreApp.Connect(CoreApp.config, false, utils.Directory)
 		if err != nil {
 			return errors.New("database connection has not been created")
 		}
 	}
-	notifier.SetDB(DbSession)
+	notifier.SetDB(database.Get())
 	return nil
 }
 
 // InsertIntegratorDB inject the Statping database instance to the Integrations package
 func InsertIntegratorDB() error {
-	if DbSession == nil {
-		err := CoreApp.Connect(false, utils.Directory)
+	if !database.Available() {
+		err := CoreApp.Connect(CoreApp.config, false, utils.Directory)
 		if err != nil {
 			return errors.New("database connection has not been created")
 		}
 	}
-	integrations.SetDB(DbSession)
+	integrations.SetDB(database.Get())
 	return nil
-}
-
-// UpdateCore will update the CoreApp variable inside of the 'core' table in database
-func UpdateCore(c *Core) (*Core, error) {
-	db := Database(&Core{}).Update(&c)
-	return c, db.Error()
-}
-
-// CurrentTime will return the current local time
-func (c Core) CurrentTime() string {
-	t := time.Now().UTC()
-	current := utils.Timezoner(t, c.Timezone)
-	ansic := "Monday 03:04:05 PM"
-	return current.Format(ansic)
-}
-
-// Messages will return the current local time
-func (c Core) Messages() []*Message {
-	var message []*Message
-	Database(&Message{}).Where("service = ?", 0).Limit(10).Find(&message)
-	return message
 }
 
 // UsingAssets will return true if /assets folder is present
@@ -141,43 +121,18 @@ func (c Core) UsingAssets() bool {
 	return source.UsingAssets(utils.Directory)
 }
 
-// SassVars opens the file /assets/scss/variables.scss to be edited in Theme
-func (c Core) SassVars() string {
-	if !source.UsingAssets(utils.Directory) {
-		return ""
-	}
-	return source.OpenAsset("scss/variables.scss")
-}
-
-// BaseSASS is the base design , this opens the file /assets/scss/base.scss to be edited in Theme
-func (c Core) BaseSASS() string {
-	if !source.UsingAssets(utils.Directory) {
-		return ""
-	}
-	return source.OpenAsset("scss/base.scss")
-}
-
-// MobileSASS is the -webkit responsive custom css designs. This opens the
-// file /assets/scss/mobile.scss to be edited in Theme
-func (c Core) MobileSASS() string {
-	if !source.UsingAssets(utils.Directory) {
-		return ""
-	}
-	return source.OpenAsset("scss/mobile.scss")
-}
-
 // SelectCore will return the CoreApp global variable and the settings/configs for Statping
 func SelectCore() (*Core, error) {
-	if DbSession == nil {
+	if !database.Available() {
 		log.Traceln("database has not been initiated yet.")
 		return nil, errors.New("database has not been initiated yet.")
 	}
-	exists := DbSession.HasTable("core")
+	exists := database.Get().HasTable("core")
 	if !exists {
 		log.Errorf("core database has not been setup yet, does not have the 'core' table")
 		return nil, errors.New("core database has not been setup yet.")
 	}
-	db := Database(&Core{}).First(&CoreApp)
+	db := database.Core().First(&CoreApp)
 	if db.Error() != nil {
 		return nil, db.Error()
 	}

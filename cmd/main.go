@@ -62,6 +62,13 @@ func parseFlags() {
 	flag.Parse()
 }
 
+func exit(err error) {
+	fmt.Printf("%+v", core.Configs())
+	panic(err)
+	//log.Fatalln(err)
+	//os.Exit(2)
+}
+
 // main will run the Statping application
 func main() {
 	var err error
@@ -80,35 +87,54 @@ func main() {
 		if err != nil {
 			if err.Error() == "end" {
 				os.Exit(0)
+				return
 			}
-			fmt.Println(err)
-			os.Exit(1)
+			exit(err)
 		}
 	}
 	log.Info(fmt.Sprintf("Starting Statping v%v", VERSION))
-	updateDisplay()
 
-	config, err := core.LoadConfigFile(utils.Directory)
+	if err := updateDisplay(); err != nil {
+		log.Warnln(err)
+	}
+
+	// check if DB_CONN was set, and load config from that
+	autoConfigDb := utils.Getenv("DB_CONN", "").(string)
+	if autoConfigDb != "" {
+		log.Infof("Environment variable 'DB_CONN' was set to %s, loading configs from ENV.", autoConfigDb)
+		if _, err := core.LoadUsingEnv(); err != nil {
+			exit(err)
+			return
+		} else {
+			afterConfigLoaded()
+		}
+	}
+
+	// attempt to load config.yml file from current directory, if no file, then start in setup mode.
+	_, err = core.LoadConfigFile(utils.Directory)
 	if err != nil {
 		log.Errorln(err)
 		core.CoreApp.Setup = false
 		writeAble, err := utils.DirWritable(utils.Directory)
 		if err != nil {
-			log.Fatalln(err)
+			exit(err)
+			return
 		}
 		if !writeAble {
 			log.Fatalf("Statping does not have write permissions at: %v\nYou can change this directory by setting the STATPING_DIR environment variable to a dedicated path before starting.", utils.Directory)
+			return
 		}
 		if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
 			log.Fatalln(err)
 		}
+	} else {
+		afterConfigLoaded()
 	}
+}
 
-	core.CoreApp.Config = config.DbConfig
-
+func afterConfigLoaded() {
 	if err := mainProcess(); err != nil {
-		log.Fatalln(err)
-		os.Exit(2)
+		exit(err)
 	}
 }
 
@@ -140,7 +166,7 @@ func loadDotEnvs() error {
 func mainProcess() error {
 	dir := utils.Directory
 	var err error
-	err = core.CoreApp.Connect(false, dir)
+	err = core.CoreApp.Connect(core.Configs(), false, dir)
 	if err != nil {
 		log.Errorln(fmt.Sprintf("could not connect to database: %v", err))
 		return err

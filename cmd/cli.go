@@ -19,14 +19,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/handlers"
 	"github.com/hunterlong/statping/source"
-	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"io/ioutil"
-	"net/http/httptest"
 	"time"
 )
 
@@ -72,25 +69,25 @@ func catchCLI(args []string) error {
 		updateDisplay()
 		return errors.New("end")
 	case "static":
-		var err error
-		if err = runLogs(); err != nil {
-			return err
-		}
-		if err = runAssets(); err != nil {
-			return err
-		}
-		fmt.Printf("Statping v%v Exporting Static 'index.html' page...\n", VERSION)
-		if _, err = core.LoadConfigFile(dir); err != nil {
-			log.Errorln("config.yml file not found")
-			return err
-		}
-		indexSource := ExportIndexHTML()
-		//core.CloseDB()
-		if err = utils.SaveFile(dir+"/index.html", indexSource); err != nil {
-			log.Errorln(err)
-			return err
-		}
-		log.Infoln("Exported Statping index page: 'index.html'")
+		//var err error
+		//if err = runLogs(); err != nil {
+		//	return err
+		//}
+		//if err = runAssets(); err != nil {
+		//	return err
+		//}
+		//fmt.Printf("Statping v%v Exporting Static 'index.html' page...\n", VERSION)
+		//if _, err = core.LoadConfigFile(dir); err != nil {
+		//	log.Errorln("config.yml file not found")
+		//	return err
+		//}
+		//indexSource := ExportIndexHTML()
+		////core.CloseDB()
+		//if err = utils.SaveFile(dir+"/index.html", indexSource); err != nil {
+		//	log.Errorln(err)
+		//	return err
+		//}
+		//log.Infoln("Exported Statping index page: 'index.html'")
 	case "help":
 		HelpEcho()
 		return errors.New("end")
@@ -103,10 +100,11 @@ func catchCLI(args []string) error {
 		if err = runAssets(); err != nil {
 			return err
 		}
-		if _, err = core.LoadConfigFile(dir); err != nil {
+		configs, err := core.LoadConfigFile(dir)
+		if err != nil {
 			return err
 		}
-		if err = core.CoreApp.Connect(false, dir); err != nil {
+		if err = core.CoreApp.Connect(configs, false, dir); err != nil {
 			return err
 		}
 		if data, err = core.ExportSettings(); err != nil {
@@ -167,19 +165,19 @@ func catchCLI(args []string) error {
 }
 
 // ExportIndexHTML returns the HTML of the index page as a string
-func ExportIndexHTML() []byte {
-	source.Assets()
-	core.CoreApp.Connect(false, utils.Directory)
-	core.SelectAllServices(false)
-	core.CoreApp.UseCdn = types.NewNullBool(true)
-	for _, srv := range core.Services() {
-		core.CheckService(srv, true)
-	}
-	w := httptest.NewRecorder()
-	r := httptest.NewRequest("GET", "/", nil)
-	handlers.ExecuteResponse(w, r, "index.gohtml", nil, nil)
-	return w.Body.Bytes()
-}
+//func ExportIndexHTML() []byte {
+//	source.Assets()
+//	core.CoreApp.Connect(core.CoreApp., utils.Directory)
+//	core.SelectAllServices(false)
+//	core.CoreApp.UseCdn = types.NewNullBool(true)
+//	for _, srv := range core.Services() {
+//		core.CheckService(srv, true)
+//	}
+//	w := httptest.NewRecorder()
+//	r := httptest.NewRequest("GET", "/", nil)
+//	handlers.ExecuteResponse(w, r, "index.gohtml", nil, nil)
+//	return w.Body.Bytes()
+//}
 
 func updateDisplay() error {
 	gitCurrent, err := checkGithubUpdates()
@@ -202,11 +200,11 @@ func updateDisplay() error {
 
 // runOnce will initialize the Statping application and check each service 1 time, will not run HTTP server
 func runOnce() error {
-	_, err := core.LoadConfigFile(utils.Directory)
+	configs, err := core.LoadConfigFile(utils.Directory)
 	if err != nil {
 		return errors.Wrap(err, "config.yml file not found")
 	}
-	err = core.CoreApp.Connect(false, utils.Directory)
+	err = core.CoreApp.Connect(configs, false, utils.Directory)
 	if err != nil {
 		return errors.Wrap(err, "issue connecting to database")
 	}

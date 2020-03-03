@@ -78,7 +78,7 @@ func TestSaveAndCompileAsset(t *testing.T) {
 	themeCSS, err := utils.OpenFile(dir + "/assets/css/theme.css")
 	require.Nil(t, err)
 
-	assert.Equal(t, scssData, themeCSS)
+	assert.Contains(t, themeCSS, `color: #333;`)
 }
 
 func TestOpenAsset(t *testing.T) {
@@ -88,12 +88,7 @@ func TestOpenAsset(t *testing.T) {
 
 func TestDeleteAssets(t *testing.T) {
 	assert.True(t, UsingAssets(dir))
-	//assert.Nil(t, DeleteAllAssets(dir))
-	assert.False(t, UsingAssets(dir))
-}
-
-func TestCopyToPluginFailed(t *testing.T) {
-	//assert.Nil(t, DeleteAllAssets(dir))
+	assert.Nil(t, DeleteAllAssets(dir))
 	assert.False(t, UsingAssets(dir))
 }
 

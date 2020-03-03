@@ -18,70 +18,35 @@ package core
 import (
 	"bufio"
 	"fmt"
+	"github.com/pkg/errors"
+	"os"
+	"path/filepath"
+	"time"
+
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
+
 	"github.com/go-yaml/yaml"
 	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"github.com/pkg/errors"
-	"os"
-	"path/filepath"
-	"time"
 )
 
 var (
 	// DbSession stores the Statping database session
-	DbSession database.Database
-	DbModels  []interface{}
+	DbModels []interface{}
 )
 
 func init() {
 	DbModels = []interface{}{&types.Service{}, &types.User{}, &types.Hit{}, &types.Failure{}, &types.Message{}, &types.Group{}, &types.Checkin{}, &types.CheckinHit{}, &notifier.Notification{}, &types.Incident{}, &types.IncidentUpdate{}, &types.Integration{}}
 }
 
-// DbConfig stores the config.yml file for the statup configuration
-type DbConfig struct {
-	*types.DbConfig
-}
-
-func Database(obj interface{}) database.Database {
-	switch obj.(type) {
-	case *types.Service, *Service, []*Service:
-		return DbSession.Model(&types.Service{})
-	case *types.Hit, *Hit, []*Hit:
-		return DbSession.Model(&types.Hit{})
-	case *types.Failure, *Failure, []*Failure:
-		return DbSession.Model(&types.Failure{})
-	case *types.Core, *Core:
-		return DbSession.Table("core").Model(&CoreApp)
-	case *types.Checkin, *Checkin, []*Checkin:
-		return DbSession.Model(&types.Checkin{})
-	case *types.CheckinHit, *CheckinHit, []*CheckinHit:
-		return DbSession.Model(&types.CheckinHit{})
-	case *types.User, *User, []*User:
-		return DbSession.Model(&types.User{})
-	case *types.Group, *Group, []*Group:
-		return DbSession.Model(&types.Group{})
-	case *types.Incident, *Incident, []*Incident:
-		return DbSession.Model(&types.Incident{})
-	case *types.IncidentUpdate, *IncidentUpdate, []*IncidentUpdate:
-		return DbSession.Model(&types.IncidentUpdate{})
-	case *types.Message, *Message, []*Message:
-		return DbSession.Model(&types.Message{})
-	default:
-		return DbSession
-	}
-}
-
 // CloseDB will close the database connection if available
 func CloseDB() {
-	if DbSession != nil {
-		DbSession.DB().Close()
-	}
+	database.Close()
 }
 
 //// AfterFind for Core will set the timezone
@@ -140,11 +105,11 @@ func CloseDB() {
 //}
 
 // InsertCore create the single row for the Core settings in Statping
-func (d *DbConfig) InsertCore() (*Core, error) {
+func InsertCore(d *types.DbConfig) (*Core, error) {
 	apiKey := utils.Getenv("API_KEY", utils.NewSHA1Hash(40))
 	apiSecret := utils.Getenv("API_SECRET", utils.NewSHA1Hash(40))
 
-	CoreApp = &Core{Core: &types.Core{
+	core := &types.Core{
 		Name:        d.Project,
 		Description: d.Description,
 		ConfigFile:  "config.yml",
@@ -152,22 +117,34 @@ func (d *DbConfig) InsertCore() (*Core, error) {
 		ApiSecret:   apiSecret.(string),
 		Domain:      d.Domain,
 		MigrationId: time.Now().Unix(),
-		Config:      d.DbConfig,
-	}}
-	query := DbSession.Create(CoreApp.Core)
-	return CoreApp, query.Error()
+	}
+
+	CoreApp = &Core{Core: core}
+
+	CoreApp.config = d
+
+	_, err := database.Create(CoreApp.Core)
+	return CoreApp, err
 }
 
 func findDbFile() string {
-	if CoreApp.Config.SqlFile != "" {
-		return CoreApp.Config.SqlFile
+	if CoreApp.config == nil {
+		return findSQLin(utils.Directory)
 	}
+	if CoreApp.config.SqlFile != "" {
+		return CoreApp.config.SqlFile
+	}
+	return utils.Directory + "/" + types.SqliteFilename
+}
+
+func findSQLin(path string) string {
 	filename := types.SqliteFilename
-	err := filepath.Walk(utils.Directory, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
 		if filepath.Ext(path) == ".db" {
+			fmt.Println("DB file is now: ", info.Name())
 			filename = info.Name()
 		}
 		return nil
@@ -179,20 +156,19 @@ func findDbFile() string {
 }
 
 // Connect will attempt to connect to the sqlite, postgres, or mysql database
-func (c *Core) Connect(retry bool, location string) error {
+func (c *Core) Connect(configs *types.DbConfig, retry bool, location string) error {
 	postgresSSL := os.Getenv("POSTGRES_SSLMODE")
-	if DbSession != nil {
+	if database.Available() {
 		return nil
 	}
 	var conn string
 	var err error
 
-	configs := c.Config
 	switch configs.DbConn {
-	case "sqlite":
-		sqlFilename := findDbFile()
-		conn = sqlFilename
-		log.Infof("SQL database file at: %v/%v", utils.Directory, conn)
+	case "sqlite", "sqlite3":
+		conn = findDbFile()
+		configs.SqlFile = fmt.Sprintf("%s/%s", utils.Directory, conn)
+		log.Infof("SQL database file at: %s", configs.SqlFile)
 		configs.DbConn = "sqlite3"
 	case "mysql":
 		host := fmt.Sprintf("%v:%v", configs.DbHost, configs.DbPort)
@@ -210,10 +186,10 @@ func (c *Core) Connect(retry bool, location string) error {
 	log.WithFields(utils.ToFields(c, conn)).Debugln("attempting to connect to database")
 	dbSession, err := database.Openw(configs.DbConn, conn)
 	if err != nil {
-		log.Debugln(fmt.Sprintf("Database connection error %v", err))
+		log.Debugln(fmt.Sprintf("Database connection error %s", err))
 		if retry {
-			log.Errorln(fmt.Sprintf("Database connection to '%v' is not available, trying again in 5 seconds...", configs.DbHost))
-			return c.waitForDb()
+			log.Errorln(fmt.Sprintf("Database %s connection to '%s' is not available, trying again in 5 seconds...", configs.DbConn, configs.DbHost))
+			return c.waitForDb(configs)
 		} else {
 			return err
 		}
@@ -229,19 +205,21 @@ func (c *Core) Connect(retry bool, location string) error {
 	dbSession.DB().SetConnMaxLifetime(maxLifeConn.(time.Duration))
 
 	if dbSession.DB().Ping() == nil {
-		DbSession = dbSession
 		if utils.VerboseMode >= 4 {
-			DbSession.LogMode(true).Debug().SetLogger(gorm.Logger{log})
+			database.LogMode(true).Debug().SetLogger(gorm.Logger{log})
 		}
 		log.Infoln(fmt.Sprintf("Database %v connection was successful.", configs.DbConn))
 	}
+
+	CoreApp.config = configs
+
 	return err
 }
 
 // waitForDb will sleep for 5 seconds and try to connect to the database again
-func (c *Core) waitForDb() error {
+func (c *Core) waitForDb(configs *types.DbConfig) error {
 	time.Sleep(5 * time.Second)
-	return c.Connect(true, utils.Directory)
+	return c.Connect(configs, true, utils.Directory)
 }
 
 // Update will save the config.yml file
@@ -252,18 +230,20 @@ func (c *Core) UpdateConfig() error {
 		log.Errorln(err)
 		return err
 	}
-	data, err := yaml.Marshal(c.Config)
+	defer config.Close()
+
+	data, err := yaml.Marshal(c.config)
 	if err != nil {
 		log.Errorln(err)
 		return err
 	}
 	config.WriteString(string(data))
-	config.Close()
+
 	return err
 }
 
 // Save will initially create the config.yml file
-func (d *DbConfig) Save() error {
+func SaveConfig(d *types.DbConfig) error {
 	config, err := os.Create(utils.Directory + "/config.yml")
 	if err != nil {
 		log.Errorln(err)
@@ -271,20 +251,28 @@ func (d *DbConfig) Save() error {
 	}
 	defer config.Close()
 	log.WithFields(utils.ToFields(d)).Debugln("saving config file at: " + utils.Directory + "/config.yml")
-	CoreApp.Config = d.DbConfig
 
-	apiKey := utils.Getenv("API_KEY", utils.NewSHA1Hash(16))
-	apiSecret := utils.Getenv("API_SECRET", utils.NewSHA1Hash(16))
+	if d.ApiKey == "" || d.ApiSecret == "" {
+		apiKey := utils.Getenv("API_KEY", utils.NewSHA1Hash(16))
+		apiSecret := utils.Getenv("API_SECRET", utils.NewSHA1Hash(16))
+		CoreApp.config.ApiKey = apiKey.(string)
+		CoreApp.config.ApiSecret = apiSecret.(string)
+	}
+	if d.DbConn == "sqlite3" {
+		d.DbConn = "sqlite"
+	}
 
-	CoreApp.Config.ApiKey = apiKey.(string)
-	CoreApp.Config.ApiSecret = apiSecret.(string)
 	data, err := yaml.Marshal(d)
 	if err != nil {
 		log.Errorln(err)
 		return err
 	}
-	config.WriteString(string(data))
-	log.WithFields(utils.ToFields(d)).Infoln("saved config file at: " + utils.Directory + "/config.yml")
+	if _, err := config.WriteString(string(data)); err != nil {
+		return errors.Wrap(err, "error writing to config.yml")
+	}
+	log.WithFields(utils.ToFields(d)).Infoln("Saved config file at: " + utils.Directory + "/config.yml")
+
+	CoreApp.config = d
 	return err
 }
 
@@ -299,8 +287,8 @@ func (c *Core) CreateCore() *Core {
 		Domain:      c.Domain,
 		MigrationId: time.Now().Unix(),
 	}
-	db := Database(newCore).Create(&newCore)
-	if db.Error() == nil {
+	_, err := database.Create(&newCore)
+	if err == nil {
 		CoreApp = &Core{Core: newCore}
 	}
 	CoreApp, err := SelectCore()
@@ -313,11 +301,11 @@ func (c *Core) CreateCore() *Core {
 // DropDatabase will DROP each table Statping created
 func (c *Core) DropDatabase() error {
 	log.Infoln("Dropping Database Tables...")
-	tables := []string{"checkins", "checkin_hits", "notifications", "core", "failures", "hits", "services", "users", "messages", "incidents", "incident_updates"}
-	for _, t := range tables {
-		if err := DbSession.DropTableIfExists(t); err != nil {
+	for _, t := range DbModels {
+		if err := database.Get().DropTableIfExists(t); err != nil {
 			return err.Error()
 		}
+		log.Infof("Dropped table: %T\n", t)
 	}
 	return nil
 }
@@ -327,11 +315,11 @@ func (c *Core) CreateDatabase() error {
 	var err error
 	log.Infoln("Creating Database Tables...")
 	for _, table := range DbModels {
-		if err := DbSession.CreateTable(table); err.Error() != nil {
+		if err := database.Get().CreateTable(table); err.Error() != nil {
 			return err.Error()
 		}
 	}
-	if err := DbSession.Table("core").CreateTable(&types.Core{}); err.Error() != nil {
+	if err := database.Get().Table("core").CreateTable(&types.Core{}); err.Error() != nil {
 		return err.Error()
 	}
 	log.Infoln("Statping Database Created")
@@ -394,7 +382,7 @@ func (c *Core) ServicesFromEnvFile() error {
 // If this function has an issue, it will ROLLBACK to the previous state.
 func (c *Core) MigrateDatabase() error {
 	log.Infoln("Migrating Database Tables...")
-	tx := DbSession.Begin()
+	tx := database.Begin("migration")
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -412,11 +400,11 @@ func (c *Core) MigrateDatabase() error {
 		log.Errorln(fmt.Sprintf("Statping Database could not be migrated: %v", tx.Error()))
 		return tx.Error()
 	}
-	log.Infoln("Statping Database Migrated")
 
 	if err := tx.Commit().Error(); err != nil {
 		return err
 	}
+	log.Infoln("Statping Database Migrated")
 
 	return nil
 }

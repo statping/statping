@@ -52,7 +52,7 @@ func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 	core.CoreApp.ApiKey = utils.NewSHA1Hash(40)
 	core.CoreApp.ApiSecret = utils.NewSHA1Hash(40)
-	core.CoreApp, err = core.UpdateCore(core.CoreApp)
+	err = database.Update(core.CoreApp)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -91,7 +91,7 @@ func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 		app.Timezone = c.Timezone
 	}
 	app.UseCdn = types.NewNullBool(c.UseCdn.Bool)
-	core.CoreApp, err = core.UpdateCore(app)
+	err = database.Update(app)
 	returnJson(core.CoreApp, w, r)
 }
 

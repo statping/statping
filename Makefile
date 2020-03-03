@@ -82,13 +82,13 @@ install:
 
 generate:
 	cd source && go generate
-	cd handlers/graphql && go generate
 
 # remove files for a clean compile/build
 clean:
 	rm -rf ./{logs,assets,plugins,*.db,config.yml,.sass-cache,config.yml,statping,build,.sass-cache,index.html,vendor}
 	rm -rf cmd/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log,*.html,*.json}
 	rm -rf core/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	rm -rf core/notifier/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
 	rm -rf handlers/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
 	rm -rf notifiers/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
 	rm -rf source/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
@@ -104,7 +104,7 @@ clean:
 	find . -name "*.out" -type f -delete
 	find . -name "*.cpu" -type f -delete
 	find . -name "*.mem" -type f -delete
-	rm -rf {build,tmp,docker}
+	rm -rf {build,tmp}
 
 print_details:
 	@echo \==== Statping Development Instance ====

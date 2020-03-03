@@ -32,7 +32,7 @@ func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	health := map[string]interface{}{
 		"services": len(core.Services()),
 		"online":   true,
-		"setup":    core.CoreApp.Config != nil,
+		"setup":    core.IsSetup(),
 	}
 	returnJson(health, w, r)
 }

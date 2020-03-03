@@ -6,13 +6,13 @@ services:
     container_name: postgres
     image: postgres
     volumes:
-      - ./docker/databases/postgres:/var/lib/postgresql/data
+      - ../docker/databases/postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: password123
       POSTGRES_DB: statping
       POSTGRES_USER: root
-    networks:
-      - statping
+    ports:
+      - 5432:5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U root"]
       interval: 15s
@@ -23,15 +23,15 @@ services:
     container_name: mysql
     image: mysql:5.7
     volumes:
-      - ./docker/databases/mysql:/var/lib/mysql
+      - ../docker/databases/mysql:/var/lib/mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: password123
       MYSQL_DATABASE: statping
       MYSQL_USER: root
       MYSQL_PASSWORD: password
-    networks:
-      - statping
+    ports:
+      - 3306:3306
     healthcheck:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
       timeout: 20s
@@ -55,27 +55,18 @@ services:
       PMA_USER: root
       PMA_PASSWORD: password123
       PMA_PORT: 3306
-    networks:
-      - statping
 
   sqlite-web:
     container_name: sqlite-web
     image: coleifer/sqlite-web
     restart: on-failure
     command: sqlite_web -H 0.0.0.0 -r -x /data/statping.db
-    depends_on:
-      statping:
-        condition: service_healthy
     ports:
       - 6050:8080
-    links:
-      - statping
     volumes:
-      - ./docker/statping/sqlite/statping.db:/data/statping.db:ro
+      - ../docker/statping/sqlite/statping.db:/data/statping.db:ro
     environment:
       SQLITE_DATABASE: /data/statping.db
-    networks:
-      - statping
 
   pgadmin4:
     container_name: pgadmin4
@@ -91,25 +82,16 @@ services:
       - 7000:5050
     links:
       - postgres:postgres
-    networks:
-      - statping
 
   prometheus:
     container_name: prometheus
     image: prom/prometheus:v2.0.0
     restart: on-failure
     volumes:
-      - ./dev/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./docker/databases/prometheus:/prometheus
-    links:
-      - statping
-      - statping_mysql
-      - statping_postgres
-      - statping_dev
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../docker/databases/prometheus:/prometheus
     ports:
       - 7050:9090
-    networks:
-      - statping
     healthcheck:
       test: "/bin/wget -q -Y off http://localhost:9090/status -O /dev/null > /dev/null 2>&1"
       interval: 10s

@@ -60,8 +60,8 @@ func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	users := core.CountUsers()
-	if users == 1 {
+	users := database.AllUsers()
+	if len(users) == 1 {
 		sendErrorJson(errors.New("cannot delete the last user"), w, r)
 		return
 	}

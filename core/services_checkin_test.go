@@ -58,9 +58,9 @@ func TestSelectCheckin(t *testing.T) {
 func TestUpdateCheckin(t *testing.T) {
 	testCheckin.Interval = 60
 	testCheckin.GracePeriod = 15
-	id, err := testCheckin.Update()
+	err := database.Update(testCheckin)
 	assert.Nil(t, err)
-	assert.NotZero(t, id)
+	assert.NotZero(t, testCheckin.Id)
 	assert.NotEmpty(t, testCheckin.ApiKey)
 	service := SelectService(1)
 	checkin := service.Checkins()[0]
@@ -82,8 +82,9 @@ func TestCreateCheckinHits(t *testing.T) {
 	}
 	_, err := database.Create(hit)
 	require.Nil(t, err)
-	hits := testCheckin.AllHits()
-	assert.Equal(t, 1, len(hits))
+
+	checks := service.Checkins()
+	assert.Equal(t, 1, len(checks))
 }
 
 func TestSelectCheckinMethods(t *testing.T) {
