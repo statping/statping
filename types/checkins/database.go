@@ -33,11 +33,10 @@ func All() []*Checkin {
 
 func (c *Checkin) Create() error {
 	c.ApiKey = utils.RandomString(7)
+	db := DB().Create(&c)
 
 	c.Start()
 	go c.CheckinRoutine()
-
-	db := DB().Create(&c)
 	return db.Error()
 }
 

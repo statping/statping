@@ -77,7 +77,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err = configs.LoadConfigs(); err != nil {
+	if confg, err = configs.LoadConfigFile(utils.Directory); err != nil {
 		log.Errorln(err)
 		sendErrorJson(err, w, r)
 		return
@@ -88,7 +88,9 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		if err := confg.Delete(); err != nil {
 			log.Errorln(err)
 			sendErrorJson(err, w, r)
+			return
 		}
+		return
 	}
 
 	if err = confg.MigrateDatabase(); err != nil {

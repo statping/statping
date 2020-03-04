@@ -40,12 +40,12 @@ func LoadConfigs() (*DbConfig, error) {
 	if dbConn != "" {
 		configs, err := loadConfigEnvs()
 		if err != nil {
-			return loadConfigFile(utils.Directory)
+			return LoadConfigFile(utils.Directory)
 		}
 		return configs, nil
 	}
 
-	return loadConfigFile(utils.Directory)
+	return LoadConfigFile(utils.Directory)
 }
 
 func findDbFile(configs *DbConfig) string {

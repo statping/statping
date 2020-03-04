@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func loadConfigFile(directory string) (*DbConfig, error) {
+func LoadConfigFile(directory string) (*DbConfig, error) {
 	var configs *DbConfig
 
 	log.Infof("Attempting to read config file at: %s/config.yml ", directory)
