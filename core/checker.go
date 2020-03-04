@@ -217,6 +217,7 @@ func (s *Service) checkHttp(record bool) *Service {
 	}
 	if err != nil {
 		if record {
+			s.LastStatusCode = 503
 			recordFailure(s, fmt.Sprintf("HTTP Error %v", err))
 		}
 		return s
