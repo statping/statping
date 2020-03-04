@@ -2,8 +2,10 @@ package notifiers
 
 import (
 	"fmt"
+	"github.com/google/martian/log"
 	"github.com/hunterlong/statping/types/notifications"
 	"github.com/hunterlong/statping/utils"
+	"github.com/pkg/errors"
 	"strings"
 )
 
@@ -34,12 +36,12 @@ func contains(s string, arr []string) bool {
 // AddNotifier accept a Notifier interface to be added into the array
 func AddNotifiers(notifiers ...notifications.Notifier) error {
 	for _, n := range notifiers {
+		log.Infof("Installing %s Notifier...", n.Select().Method)
 		if err := checkNotifierForm(n); err != nil {
-			return err
+			return errors.Wrap(err, "error with notifier form fields")
 		}
-		notifications.AllCommunications = append(notifications.AllCommunications, n)
 		if _, err := notifications.Init(n); err != nil {
-			return err
+			return errors.Wrap(err, "error initiating notifier")
 		}
 	}
 	startAllNotifiers()

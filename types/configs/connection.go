@@ -13,7 +13,7 @@ import (
 )
 
 // Connect will attempt to connect to the sqlite, postgres, or mysql database
-func Connect(configs *DbConfig, retry bool, location string) error {
+func Connect(configs *DbConfig, retry bool) error {
 	postgresSSL := os.Getenv("POSTGRES_SSLMODE")
 	if database.Available() {
 		return nil
@@ -28,7 +28,7 @@ func Connect(configs *DbConfig, retry bool, location string) error {
 			configs.DbConn = ":memory"
 		} else {
 			conn = findDbFile(configs)
-			configs.SqlFile = fmt.Sprintf("%s/%s", utils.Directory, conn)
+			configs.SqlFile = conn
 			log.Infof("SQL database file at: %s", configs.SqlFile)
 			configs.DbConn = "sqlite3"
 		}
@@ -84,12 +84,17 @@ func (c *DbConfig) waitForDb(configs *DbConfig) error {
 }
 
 func InitialSetup(configs *DbConfig) error {
-	var err error
 	log.Infoln(fmt.Sprintf("Core database does not exist, creating now!"))
+
 	if err := configs.DropDatabase(); err != nil {
 		return errors.Wrap(err, "error dropping database")
 	}
+
 	if err := CreateDatabase(); err != nil {
+		return errors.Wrap(err, "error creating database")
+	}
+
+	if err := TriggerSamples(); err != nil {
 		return errors.Wrap(err, "error creating database")
 	}
 
@@ -106,5 +111,5 @@ func InitialSetup(configs *DbConfig) error {
 		return errors.Wrap(err, "error creating admin")
 	}
 
-	return err
+	return nil
 }

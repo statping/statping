@@ -66,7 +66,7 @@ func apiServiceHandler(r *http.Request) interface{} {
 	if err != nil {
 		return err
 	}
-	return service
+	return *service
 }
 
 func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -100,7 +100,7 @@ func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	go services.CheckService(service, true)
+	go service.CheckService(true)
 	sendJsonAction(service, "update", w, r)
 }
 

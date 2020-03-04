@@ -16,7 +16,7 @@
 package notifiers
 
 import (
-	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/types/notifications"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -49,7 +49,7 @@ func TestMobileNotifier(t *testing.T) {
 		Mobile.Var2 = MOBILE_NUMBER
 		Mobile.Delay = time.Duration(100 * time.Millisecond)
 		Mobile.Limits = 10
-		err := notifier.AddNotifiers(Mobile)
+		err := AddNotifiers(Mobile)
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", Mobile.Author)
 		assert.Equal(t, MOBILE_ID, Mobile.Var1)
@@ -81,7 +81,7 @@ func TestMobileNotifier(t *testing.T) {
 		assert.True(t, TestService.Online)
 		Mobile.OnSuccess(TestService)
 		assert.Equal(t, 1, len(Mobile.Queue))
-		go notifier.Queue(Mobile)
+		go notifications.Queue(Mobile)
 		time.Sleep(20 * time.Second)
 		assert.Equal(t, 1, len(Mobile.Queue))
 	})
@@ -100,7 +100,7 @@ func TestMobileNotifier(t *testing.T) {
 
 	t.Run("Mobile Queue", func(t *testing.T) {
 		t.SkipNow()
-		go notifier.Queue(Mobile)
+		go notifications.Queue(Mobile)
 		time.Sleep(15 * time.Second)
 		assert.Equal(t, MOBILE_ID, Mobile.Var1)
 		assert.Equal(t, 0, len(Mobile.Queue))

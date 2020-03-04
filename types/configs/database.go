@@ -1,7 +1,6 @@
 package configs
 
 import (
-	"github.com/go-yaml/yaml"
 	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types/checkins"
 	"github.com/hunterlong/statping/types/core"
@@ -15,8 +14,11 @@ import (
 	"github.com/hunterlong/statping/types/services"
 	"github.com/hunterlong/statping/types/users"
 	"github.com/hunterlong/statping/utils"
+	"gopkg.in/yaml.v2"
 	"os"
 )
+
+type SamplerFunc func()
 
 type Sampler interface {
 	Samples() []database.DbObject
@@ -24,25 +26,23 @@ type Sampler interface {
 
 func TriggerSamples() error {
 	return createSamples(
-		&services.Service{},
-		&users.User{},
-		&hits.Hit{},
-		&failures.Failure{},
-		&groups.Group{},
-		&checkins.Checkin{},
-		&checkins.CheckinHit{},
-		&incidents.Incident{},
-		&incidents.IncidentUpdate{},
+		core.Samples,
+		users.Samples,
+		messages.Samples,
+		services.Samples,
+		checkins.Samples,
+		checkins.SamplesChkHits,
+		failures.Samples,
+		groups.Samples,
+		hits.Samples,
+		incidents.Samples,
+		incidents.SamplesUpdates,
 	)
 }
 
-func createSamples(sm ...Sampler) error {
+func createSamples(sm ...SamplerFunc) error {
 	for _, v := range sm {
-		for _, sample := range v.Samples() {
-			if err := sample.Create(); err != nil {
-				return err
-			}
-		}
+		v()
 	}
 	return nil
 }
@@ -103,11 +103,16 @@ func CreateDatabase() error {
 	for _, table := range DbModels {
 		if err := database.DB().CreateTable(table); err.Error() != nil {
 			return err.Error()
+		} else {
+			log.Infof("Database table: '%T' was created", table)
 		}
 	}
 	if err := database.DB().Table("core").CreateTable(&core.Core{}); err.Error() != nil {
 		return err.Error()
+	} else {
+		log.Infof("Database table: '%s' was created", "core")
 	}
 	log.Infoln("Statping Database Created")
+
 	return err
 }

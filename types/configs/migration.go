@@ -43,7 +43,7 @@ import (
 //MigrateDatabase will migrate the database structure to current version.
 //This function will NOT remove previous records, tables or columns from the database.
 //If this function has an issue, it will ROLLBACK to the previous state.
-func MigrateDatabase() error {
+func (c *DbConfig) MigrateDatabase() error {
 
 	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}, &integrations.Integration{}}
 
@@ -54,12 +54,12 @@ func MigrateDatabase() error {
 			tx.Rollback()
 		}
 	}()
-	if tx.Error() != nil {
-		log.Errorln(tx.Error())
-		return tx.Error()
-	}
 	for _, table := range DbModels {
 		tx = tx.AutoMigrate(table)
+		if tx.Error() != nil {
+			log.Errorln(tx.Error())
+			return tx.Error()
+		}
 	}
 	if err := tx.Table("core").AutoMigrate(&core.Core{}); err.Error() != nil {
 		tx.Rollback()

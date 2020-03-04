@@ -16,7 +16,8 @@
 package notifiers
 
 import (
-	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/notifiers"
+	"github.com/hunterlong/statping/types/notifications"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -47,7 +48,7 @@ func TestSlackNotifier(t *testing.T) {
 		Slacker.Host = SLACK_URL
 		Slacker.Delay = time.Duration(100 * time.Millisecond)
 		Slacker.Limits = 3
-		err := notifier.AddNotifiers(Slacker)
+		err := AddNotifiers(Slacker)
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", Slacker.Author)
 		assert.Equal(t, SLACK_URL, Slacker.Host)
@@ -83,7 +84,7 @@ func TestSlackNotifier(t *testing.T) {
 		assert.True(t, TestService.Online)
 		Slacker.OnSuccess(TestService)
 		assert.Equal(t, 1, len(Slacker.Queue))
-		go notifier.Queue(Slacker)
+		go notifications.Queue(Slacker)
 		time.Sleep(15 * time.Second)
 		assert.Equal(t, 0, len(Slacker.Queue))
 	})
@@ -106,7 +107,7 @@ func TestSlackNotifier(t *testing.T) {
 	})
 
 	t.Run("slack Queue", func(t *testing.T) {
-		go notifier.Queue(Slacker)
+		go notifications.Queue(Slacker)
 		time.Sleep(10 * time.Second)
 		assert.Equal(t, SLACK_URL, Slacker.Host)
 		assert.Equal(t, 0, len(Slacker.Queue))

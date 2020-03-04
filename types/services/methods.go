@@ -47,7 +47,7 @@ func (s *Service) IsRunning() bool {
 	}
 }
 
-func (s Service) String() string {
+func (s Service) Hash() string {
 	format := fmt.Sprintf("name:%sdomain:%sport:%dtype:%smethod:%s", s.Name, s.Domain, s.Port, s.Type, s.Method)
 	h := sha1.New()
 	h.Write([]byte(format))
@@ -66,9 +66,11 @@ func SelectAllServices(start bool) (map[int64]*Service, error) {
 		return allServices, nil
 	}
 
-	for _, s := range allServices {
+	for _, s := range All() {
+
+		allServices[s.Id] = s
+
 		if start {
-			s.Start()
 			CheckinProcess(s)
 		}
 
@@ -81,8 +83,6 @@ func SelectAllServices(start bool) (map[int64]*Service, error) {
 
 		// collect initial service stats
 		s.UpdateStats()
-
-		allServices[s.Id] = s
 	}
 
 	reorderServices()

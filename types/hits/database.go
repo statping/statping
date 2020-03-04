@@ -1,6 +1,11 @@
 package hits
 
-import "github.com/hunterlong/statping/database"
+import (
+	"github.com/hunterlong/statping/database"
+	"github.com/hunterlong/statping/utils"
+)
+
+var log = utils.Log
 
 func DB() database.Database {
 	return database.DB().Model(&Hit{})

@@ -1,8 +1,6 @@
 package core
 
 import (
-	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/types/services"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -13,7 +11,6 @@ func NewCore() *Core {
 	core := &Core{
 		Started: time.Now().UTC(),
 	}
-	core.services = make(map[int64]*services.Service)
 	return core
 }
 

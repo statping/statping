@@ -20,17 +20,17 @@ func CheckServices() {
 	log.Infoln(fmt.Sprintf("Starting monitoring process for %v Services", len(allServices)))
 	for _, s := range allServices {
 		//go CheckinRoutine()
-		time.Sleep(200 * time.Millisecond) // short delay so requests don't run all at the same time.
+		time.Sleep(250 * time.Millisecond)
 		go ServiceCheckQueue(s, true)
 	}
 }
 
 // CheckQueue is the main go routine for checking a service
 func ServiceCheckQueue(s *Service, record bool) {
-	log.Infof("Starting new service '%s', checking every %0.2f seconds.", s.Name, s.Duration().Seconds())
 	s.Start()
 	s.Checkpoint = time.Now()
 	s.SleepDuration = (time.Duration(s.Id) * 100) * time.Millisecond
+
 CheckLoop:
 	for {
 		select {
@@ -38,7 +38,7 @@ CheckLoop:
 			log.Infoln(fmt.Sprintf("Stopping service: %v", s.Name))
 			break CheckLoop
 		case <-time.After(s.SleepDuration):
-			CheckService(s, record)
+			s.CheckService(record)
 			s.Checkpoint = s.Checkpoint.Add(s.Duration())
 			sleep := s.Checkpoint.Sub(time.Now())
 			if !s.Online {
@@ -217,16 +217,19 @@ func CheckHttp(s *Service, record bool) *Service {
 // recordSuccess will create a new 'hit' record in the database for a successful/online service
 func recordSuccess(s *Service) {
 	s.LastOnline = time.Now().UTC()
+	s.Online = true
 	hit := &hits.Hit{
 		Service:   s.Id,
 		Latency:   s.Latency,
 		PingTime:  s.PingTime,
 		CreatedAt: time.Now().UTC(),
 	}
-	hit.Create()
-	log.WithFields(utils.ToFields(hit, s)).Infoln(fmt.Sprintf("Service %v Successful Response: %0.2f ms | Lookup in: %0.2f ms", s.Name, hit.Latency*1000, hit.PingTime*1000))
+	if err := hit.Create(); err != nil {
+		log.Error(err)
+	}
+	log.WithFields(utils.ToFields(hit, s)).Infoln(
+		fmt.Sprintf("Service #%d '%v' Successful Response: %0.2f ms | Lookup in: %0.2f ms | Online: %v | Interval: %d seconds", s.Id, s.Name, hit.Latency*1000, hit.PingTime*1000, s.Online, s.Interval))
 	//notifier.OnSuccess(s)
-	s.Online = true
 	s.SuccessNotified = true
 }
 
@@ -242,7 +245,9 @@ func recordFailure(s *Service, issue string) {
 	log.WithFields(utils.ToFields(fail, s)).
 		Warnln(fmt.Sprintf("Service %v Failing: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
 
-	fail.Create()
+	if err := fail.Create(); err != nil {
+		log.Error(err)
+	}
 	s.Online = false
 	s.SuccessNotified = false
 	s.DownText = s.DowntimeText()
@@ -251,13 +256,13 @@ func recordFailure(s *Service, issue string) {
 
 // Check will run checkHttp for HTTP services and checkTcp for TCP services
 // if record param is set to true, it will add a record into the database.
-func CheckService(srv *Service, record bool) {
-	switch srv.Type {
+func (s *Service) CheckService(record bool) {
+	switch s.Type {
 	case "http":
-		CheckHttp(srv, record)
+		CheckHttp(s, record)
 	case "tcp", "udp":
-		CheckTcp(srv, record)
+		CheckTcp(s, record)
 	case "icmp":
-		CheckIcmp(srv, record)
+		CheckIcmp(s, record)
 	}
 }

@@ -91,7 +91,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if err = configs.MigrateDatabase(); err != nil {
+	if err = confg.MigrateDatabase(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}

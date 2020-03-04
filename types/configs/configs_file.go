@@ -1,16 +1,16 @@
 package configs
 
 import (
-	"github.com/go-yaml/yaml"
 	"github.com/hunterlong/statping/types/core"
 	"github.com/hunterlong/statping/utils"
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
 )
 
 func loadConfigFile(directory string) (*DbConfig, error) {
 	var configs *DbConfig
 
-	log.Debugln("Attempting to read config file at: " + directory + "/config.yml")
+	log.Infof("Attempting to read config file at: %s/config.yml ", directory)
 	file, err := utils.OpenFile(directory + "/config.yml")
 	if err != nil {
 		core.App.Setup = false

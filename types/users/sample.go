@@ -1,14 +1,10 @@
 package users
 
 import (
-	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types/null"
 )
 
-func (u *User) Samples() []database.DbObject {
-
-	var samples []database.DbObject
-
+func Samples() {
 	u2 := &User{
 		Username: "testadmin",
 		Password: "password123",
@@ -16,7 +12,7 @@ func (u *User) Samples() []database.DbObject {
 		Admin:    null.NewNullBool(true),
 	}
 
-	samples = append(samples, u2)
+	u2.Create()
 
 	u3 := &User{
 		Username: "testadmin2",
@@ -25,7 +21,5 @@ func (u *User) Samples() []database.DbObject {
 		Admin:    null.NewNullBool(true),
 	}
 
-	samples = append(samples, u3)
-
-	return samples
+	u3.Create()
 }

@@ -16,10 +16,14 @@
 package notifiers
 
 import (
-	"github.com/hunterlong/statping/core/notifier"
 	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/source"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/core"
+	"github.com/hunterlong/statping/types/failures"
+	"github.com/hunterlong/statping/types/notifications"
+	"github.com/hunterlong/statping/types/null"
+	"github.com/hunterlong/statping/types/services"
+	"github.com/hunterlong/statping/types/users"
 	"github.com/hunterlong/statping/utils"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -37,7 +41,7 @@ var TestService = &services.Service{
 	Name:           "Interpol - All The Rage Back Home",
 	Domain:         "https://www.youtube.com/watch?v=-u6DvRyyKGU",
 	ExpectedStatus: 200,
-	Expected:       types.NewNullString("test example"),
+	Expected:       null.NewNullString("test example"),
 	Interval:       30,
 	Type:           "http",
 	Method:         "GET",
@@ -48,23 +52,23 @@ var TestService = &services.Service{
 	CreatedAt:      utils.Now().Add(-24 * time.Hour),
 }
 
-var TestFailure = &types.Failure{
+var TestFailure = &failures.Failure{
 	Issue:     "testing",
 	Service:   1,
 	CreatedAt: utils.Now().Add(-12 * time.Hour),
 }
 
-var TestUser = &types.User{
+var TestUser = &users.User{
 	Username: "admin",
 	Email:    "info@email.com",
 }
 
-var TestCore = &types.Core{
+var TestCore = &core.Core{
 	Name: "testing notifiers",
 }
 
 func CountNotifiers() int {
-	return len(notifier.AllCommunications)
+	return len(notifications.AllCommunications)
 }
 
 func init() {
@@ -80,6 +84,6 @@ func injectDatabase() {
 	if err != nil {
 		panic(err)
 	}
-	db.CreateTable(&notifier.Notification{})
-	notifier.SetDB(&database.Db{db, "sqlite3"})
+	db.CreateTable(&notifications.Notification{})
+	notifications.SetDB(&database.Db{db, "sqlite3"})
 }

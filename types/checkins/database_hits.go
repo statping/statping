@@ -2,7 +2,7 @@ package checkins
 
 func (c *Checkin) LastHit() *CheckinHit {
 	var hit *CheckinHit
-	DBhits().Where("checkin = ?", c.Id).Last(&hit)
+	DBhits().Where("checkin = ?", c.Id).Limit(1).Find(&hit)
 	return hit
 }
 

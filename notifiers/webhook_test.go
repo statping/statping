@@ -16,7 +16,7 @@
 package notifiers
 
 import (
-	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/types/notifications"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -44,7 +44,7 @@ func TestWebhookNotifier(t *testing.T) {
 		Webhook.Host = webhookTestUrl
 		Webhook.Delay = time.Duration(100 * time.Millisecond)
 		Webhook.ApiKey = apiKey
-		err := notifier.AddNotifiers(Webhook)
+		err := AddNotifiers(Webhook)
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", Webhook.Author)
 		assert.Equal(t, webhookTestUrl, Webhook.Host)
@@ -92,7 +92,7 @@ func TestWebhookNotifier(t *testing.T) {
 	})
 
 	t.Run("webhooker Queue", func(t *testing.T) {
-		go notifier.Queue(Webhook)
+		go notifications.Queue(Webhook)
 		time.Sleep(8 * time.Second)
 		assert.Equal(t, webhookTestUrl, Webhook.Host)
 		assert.Equal(t, len(Webhook.Queue), 0)

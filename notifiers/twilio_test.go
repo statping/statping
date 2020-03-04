@@ -16,7 +16,7 @@
 package notifiers
 
 import (
-	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/types/notifications"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -54,7 +54,7 @@ func TestTwilioNotifier(t *testing.T) {
 	t.Run("Load Twilio", func(t *testing.T) {
 		Twilio.ApiKey = TWILIO_SID
 		Twilio.Delay = time.Duration(100 * time.Millisecond)
-		err := notifier.AddNotifiers(Twilio)
+		err := AddNotifiers(Twilio)
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", Twilio.Author)
 		assert.Equal(t, TWILIO_SID, Twilio.ApiKey)
@@ -100,7 +100,7 @@ func TestTwilioNotifier(t *testing.T) {
 	})
 
 	t.Run("Twilio Queue", func(t *testing.T) {
-		go notifier.Queue(Twilio)
+		go notifications.Queue(Twilio)
 		time.Sleep(1 * time.Second)
 		assert.Equal(t, TWILIO_SID, Twilio.ApiKey)
 		assert.Equal(t, 0, len(Twilio.Queue))

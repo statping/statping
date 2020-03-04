@@ -1,12 +1,11 @@
 package checkins
 
 import (
-	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/utils"
 	"time"
 )
 
-func (c *Checkin) Samples() []database.DbObject {
+func Samples() {
 	checkin1 := &Checkin{
 		Name:        "Example Checkin 1",
 		ServiceId:   1,
@@ -14,6 +13,7 @@ func (c *Checkin) Samples() []database.DbObject {
 		GracePeriod: 300,
 		ApiKey:      utils.RandomString(7),
 	}
+	checkin1.Create()
 
 	checkin2 := &Checkin{
 		Name:        "Example Checkin 2",
@@ -22,14 +22,11 @@ func (c *Checkin) Samples() []database.DbObject {
 		GracePeriod: 300,
 		ApiKey:      utils.RandomString(7),
 	}
-
-	return []database.DbObject{checkin1, checkin2}
+	checkin2.Create()
 }
 
-func (c *CheckinHit) Samples() []database.DbObject {
+func SamplesChkHits() {
 	checkTime := time.Now().UTC().Add(-24 * time.Hour)
-
-	var hits []database.DbObject
 
 	for i := int64(1); i <= 2; i++ {
 		checkHit := &CheckinHit{
@@ -38,10 +35,8 @@ func (c *CheckinHit) Samples() []database.DbObject {
 			CreatedAt: checkTime.UTC(),
 		}
 
-		hits = append(hits, checkHit)
+		checkHit.Create()
 
 		checkTime = checkTime.Add(10 * time.Minute)
 	}
-
-	return hits
 }

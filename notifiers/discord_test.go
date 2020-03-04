@@ -16,7 +16,6 @@
 package notifiers
 
 import (
-	"github.com/hunterlong/statping/core/notifier"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -44,7 +43,7 @@ func TestDiscordNotifier(t *testing.T) {
 	t.Run("Load discord", func(t *testing.T) {
 		Discorder.Host = DISCORD_URL
 		Discorder.Delay = time.Duration(100 * time.Millisecond)
-		err := notifier.AddNotifiers(Discorder)
+		err := AddNotifiers(Discorder)
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", Discorder.Author)
 		assert.Equal(t, DISCORD_URL, Discorder.Host)

@@ -17,7 +17,7 @@ package notifiers
 
 import (
 	"fmt"
-	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/types/notifications"
 	"github.com/hunterlong/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"os"
@@ -79,7 +79,7 @@ func TestEmailNotifier(t *testing.T) {
 	})
 
 	t.Run("Add email Notifier", func(t *testing.T) {
-		err := notifier.AddNotifiers(Emailer)
+		err := AddNotifiers(Emailer)
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", Emailer.Author)
 		assert.Equal(t, EMAIL_HOST, Emailer.Host)
@@ -127,7 +127,7 @@ func TestEmailNotifier(t *testing.T) {
 	})
 
 	t.Run("email Run Queue", func(t *testing.T) {
-		go notifier.Queue(Emailer)
+		go notifications.Queue(Emailer)
 		time.Sleep(6 * time.Second)
 		assert.Equal(t, EMAIL_HOST, Emailer.Host)
 		assert.Equal(t, 0, len(Emailer.Queue))

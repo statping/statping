@@ -24,9 +24,18 @@ import (
 	"net/http"
 )
 
-func apiUserHandler(w http.ResponseWriter, r *http.Request) {
+func getUser(r *http.Request) (*users.User, int64, error) {
 	vars := mux.Vars(r)
-	user, err := users.Find(utils.ToInt(vars["id"]))
+	num := utils.ToInt(vars["id"])
+	user, err := users.Find(num)
+	if err != nil {
+		return nil, num, err
+	}
+	return user, num, nil
+}
+
+func apiUserHandler(w http.ResponseWriter, r *http.Request) {
+	user, _, err := getUser(r)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -36,16 +45,15 @@ func apiUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	user, err := users.Find(utils.ToInt(vars["id"]))
+	user, id, err := getUser(r)
 	if err != nil {
-		sendErrorJson(fmt.Errorf("user #%v was not found", vars["id"]), w, r)
+		sendErrorJson(fmt.Errorf("user #%d was not found", id), w, r)
 		return
 	}
 
 	err = DecodeJSON(r, &user)
 	if err != nil {
-		sendErrorJson(fmt.Errorf("user #%v was not found", vars["id"]), w, r)
+		sendErrorJson(fmt.Errorf("user #%d was not found", id), w, r)
 		return
 	}
 
@@ -55,20 +63,19 @@ func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = user.Update()
 	if err != nil {
-		sendErrorJson(fmt.Errorf("issue updating user #%v: %v", user.Id, err), w, r)
+		sendErrorJson(fmt.Errorf("issue updating user #%d: %s", user.Id, err), w, r)
 		return
 	}
 	sendJsonAction(user, "update", w, r)
 }
 
 func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
 	allUsers := users.All()
 	if len(allUsers) == 1 {
 		sendErrorJson(errors.New("cannot delete the last user"), w, r)
 		return
 	}
-	user, err := users.Find(utils.ToInt(vars["id"]))
+	user, _, err := getUser(r)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -88,7 +95,6 @@ func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
 	var user *users.User
-
 	err := DecodeJSON(r, &user)
 	if err != nil {
 		sendErrorJson(err, w, r)

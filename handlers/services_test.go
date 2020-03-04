@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/types/services"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -17,7 +17,7 @@ func TestApiServiceRoutes(t *testing.T) {
 			ExpectedStatus:   200,
 			ResponseLen:      5,
 			FuncTest: func() error {
-				count := len(core.Services())
+				count := len(services.Services())
 				if count != 5 {
 					return errors.Errorf("incorrect services count: %d", count)
 				}
@@ -95,7 +95,7 @@ func TestApiServiceRoutes(t *testing.T) {
 			ExpectedStatus:   200,
 			ExpectedContains: []string{`"status":"success","type":"service","method":"create"`},
 			FuncTest: func() error {
-				count := len(core.Services())
+				count := len(services.Services())
 				if count != 6 {
 					return errors.Errorf("incorrect services count: %d", count)
 				}
@@ -130,7 +130,7 @@ func TestApiServiceRoutes(t *testing.T) {
 			ExpectedStatus:   200,
 			ExpectedContains: []string{`"status":"success"`, `"method":"delete"`},
 			FuncTest: func() error {
-				count := len(core.Services())
+				count := len(services.Services())
 				if count != 5 {
 					return errors.Errorf("incorrect services count: %d", count)
 				}

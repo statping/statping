@@ -16,12 +16,15 @@ func InitApp() error {
 	//if err := InsertIntegratorDB(); err != nil {
 	//	return err
 	//}
+
 	if _, err := services.SelectAllServices(true); err != nil {
 		return err
 	}
+
 	if err := notifiers.AttachNotifiers(); err != nil {
 		return err
 	}
+
 	//App.Notifications = notifications.AllCommunications
 	//if err := integrations.AddIntegrations(); err != nil {
 	//	return err

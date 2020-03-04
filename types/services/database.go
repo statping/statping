@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/utils"
@@ -13,9 +14,11 @@ func DB() database.Database {
 }
 
 func Find(id int64) (*Service, error) {
-	var service *Service
-	db := DB().Where("id = ?", id).Find(&service)
-	return service, db.Error()
+	srv := allServices[id]
+	if srv == nil {
+		return nil, errors.New("service not found")
+	}
+	return srv, nil
 }
 
 func All() []*Service {
@@ -25,15 +28,14 @@ func All() []*Service {
 }
 
 func (s *Service) Create() error {
-
-	err := s.Create()
-	if err != nil {
+	err := DB().Create(&s)
+	if err.Error() != nil {
 		log.Errorln(fmt.Sprintf("Failed to create service %v #%v: %v", s.Name, s.Id, err))
-		return err
+		return err.Error()
 	}
 	allServices[s.Id] = s
 
-	go ServiceCheckQueue(s, true)
+	go ServiceCheckQueue(allServices[s.Id], true)
 	reorderServices()
 	//notifications.OnNewService(s)
 
@@ -52,9 +54,8 @@ func (s *Service) Update() error {
 		//}
 	}
 	s.Close()
-	s.Start()
 	s.SleepDuration = s.Duration()
-	go ServiceCheckQueue(s, true)
+	go ServiceCheckQueue(allServices[s.Id], true)
 
 	reorderServices()
 	//notifier.OnUpdatedService(s.Service)

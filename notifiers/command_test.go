@@ -16,7 +16,7 @@
 package notifiers
 
 import (
-	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/types/notifications"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -39,7 +39,7 @@ func TestCommandNotifier(t *testing.T) {
 		Command.Var2 = commandTest
 		Command.Delay = time.Duration(100 * time.Millisecond)
 		Command.Limits = 99
-		err := notifier.AddNotifiers(Command)
+		err := AddNotifiers(Command)
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", Command.Author)
 		assert.Equal(t, "sh", Command.Host)
@@ -70,7 +70,7 @@ func TestCommandNotifier(t *testing.T) {
 	t.Run("Command OnSuccess Again", func(t *testing.T) {
 		Command.OnSuccess(TestService)
 		assert.Equal(t, 1, len(Command.Queue))
-		go notifier.Queue(Command)
+		go notifications.Queue(Command)
 		time.Sleep(20 * time.Second)
 		assert.Equal(t, 0, len(Command.Queue))
 	})
@@ -91,7 +91,7 @@ func TestCommandNotifier(t *testing.T) {
 	})
 
 	t.Run("Command Queue", func(t *testing.T) {
-		go notifier.Queue(Command)
+		go notifications.Queue(Command)
 		time.Sleep(5 * time.Second)
 		assert.Equal(t, "sh", Command.Host)
 		assert.Equal(t, commandTest, Command.Var1)

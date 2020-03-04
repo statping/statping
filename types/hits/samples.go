@@ -1,30 +1,41 @@
 package hits
 
 import (
-	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
+	"sync"
 	"time"
 )
 
-func (u *Hit) Samples() []database.DbObject {
-	createdAt := time.Now().Add(-1 * types.Month)
-	var hits []database.DbObject
+var SampleHits = 9900.
 
-	for i := int64(1); i <= 5; i++ {
+func Samples() {
+	tx := DB().Begin()
+	sg := new(sync.WaitGroup)
+
+	createdAt := time.Now().Add(-1 * types.Month)
+	for i := int64(1); i <= 4; i++ {
+		sg.Add(1)
+
 		p := utils.NewPerlin(2, 2, 5, time.Now().UnixNano())
 
-		for hi := 1; hi <= 5500; hi++ {
-			latency := p.Noise1D(float64(hi / 10))
-			createdAt = createdAt.Add(1 * time.Minute)
-			hit := &Hit{
-				Service:   i,
-				CreatedAt: createdAt.UTC(),
-				Latency:   latency,
+		go func() {
+			defer sg.Done()
+			for hi := 0.; hi <= SampleHits; hi++ {
+				latency := p.Noise1D(hi / 500)
+				createdAt = createdAt.Add(1 * time.Minute)
+				hit := &Hit{
+					Service:   i,
+					CreatedAt: createdAt.UTC(),
+					Latency:   latency,
+				}
+				tx = tx.Create(&hit)
 			}
-			hits = append(hits, hit)
-		}
+		}()
 	}
+	sg.Wait()
 
-	return hits
+	if err := tx.Commit().Error(); err != nil {
+		log.Error(err)
+	}
 }

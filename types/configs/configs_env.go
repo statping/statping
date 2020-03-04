@@ -9,6 +9,8 @@ import (
 func loadConfigEnvs() (*DbConfig, error) {
 	var err error
 
+	log.Infof("Loading configs from environment variables")
+
 	loadDotEnvs()
 
 	dbConn := utils.Getenv("DB_CONN", "").(string)

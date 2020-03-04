@@ -149,7 +149,7 @@ func reverseLogs(input []*NotificationLog) []*NotificationLog {
 // SelectNotification returns the Notification struct from the database
 func SelectNotification(n Notifier) (*Notification, error) {
 	notifier := n.Select()
-	err := db.Model(&Notification{}).Where("method = ?", notifier.Method).Scan(&notifier)
+	err := DB().Where("method = ?", notifier.Method).Scan(&notifier)
 	return notifier, err.Error()
 }
 
@@ -221,6 +221,8 @@ func install(n Notifier) error {
 		log.Errorln(err)
 		return err
 	}
+
+	AllCommunications = append(AllCommunications, n)
 
 	log.WithFields(utils.ToFields(n)).
 		Debugln(fmt.Sprintf("Checking if notifier '%v' is installed", n.Select().Method))

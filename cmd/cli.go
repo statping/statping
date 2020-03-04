@@ -222,7 +222,7 @@ func runOnce() error {
 		return errors.Wrap(err, "could not select all services")
 	}
 	for _, srv := range services.Services() {
-		services.CheckService(srv, true)
+		srv.CheckService(true)
 	}
 	return nil
 }

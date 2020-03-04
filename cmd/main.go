@@ -113,11 +113,11 @@ func main() {
 		}
 	}
 
-	if err = c.Connect(); err != nil {
+	if err = configs.ConnectConfigs(c); err != nil {
 		exit(err)
 	}
 
-	if err := configs.MigrateDatabase(); err != nil {
+	if err := c.MigrateDatabase(); err != nil {
 		exit(err)
 	}
 
@@ -182,6 +182,7 @@ func httpServerProcess(process <-chan bool) {
 		default:
 			if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
 				log.Errorln(err)
+				exit(err)
 			}
 		}
 	}

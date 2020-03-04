@@ -1,10 +1,12 @@
 module github.com/hunterlong/statping
 
-go 1.13
+go 1.14
 
 require (
+	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/GeertJohan/go.rice v1.0.0
 	github.com/Microsoft/go-winio v0.4.14 // indirect
+	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d // indirect
 	github.com/ararog/timeago v0.0.0-20160328174124-e9969cf18b8d
 	github.com/daaku/go.zipexe v1.0.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -14,27 +16,28 @@ require (
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/fatih/structs v1.1.0
 	github.com/go-mail/mail v2.3.1+incompatible
-	github.com/go-yaml/yaml v2.1.0+incompatible
-	github.com/gorilla/mux v1.7.3
-	github.com/jinzhu/gorm v1.9.11
+	github.com/go-sql-driver/mysql v1.5.0 // indirect
+	github.com/google/martian v2.1.0+incompatible
+	github.com/gorilla/mux v1.7.4
+	github.com/jinzhu/gorm v1.9.12
 	github.com/joho/godotenv v1.3.0
-	github.com/kr/pretty v0.1.0 // indirect
-	github.com/lib/pq v1.2.0 // indirect
+	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
+	github.com/lib/pq v1.3.0 // indirect
+	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
-	github.com/pkg/errors v0.8.1
-	github.com/prometheus/common v0.2.0
+	github.com/pkg/errors v0.9.1
+	github.com/prometheus/common v0.9.1
 	github.com/rendon/testcli v0.0.0-20161027181003-6283090d169f
 	github.com/russross/blackfriday/v2 v2.0.1
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
-	github.com/sirupsen/logrus v1.4.1
-	github.com/stretchr/testify v1.4.0
+	github.com/sirupsen/logrus v1.4.2
+	github.com/stretchr/testify v1.5.1
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
-	golang.org/x/crypto v0.0.0-20191119213627-4f8c1d86b1ba
-	golang.org/x/net v0.0.0-20191014212845-da9a3fd4c582 // indirect
-	golang.org/x/sys v0.0.0-20191010194322-b09406accb47 // indirect
-	google.golang.org/appengine v1.6.5 // indirect
+	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073
+	golang.org/x/net v0.0.0-20200301022130-244492dfa37a // indirect
+	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/mail.v2 v2.3.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
-	gopkg.in/yaml.v2 v2.2.7 // indirect
+	gopkg.in/yaml.v2 v2.2.8
 )

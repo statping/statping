@@ -11,7 +11,7 @@ import (
 // Service hash example: sha256(name:EXAMPLEdomain:HTTP://DOMAIN.COMport:8080type:HTTPmethod:GET)
 func findServiceByHash(hash string) *Service {
 	for _, service := range All() {
-		if service.String() == hash {
+		if service.Hash() == hash {
 			return service
 		}
 	}
@@ -46,7 +46,7 @@ func ServicesFromEnvFile() error {
 		if err != nil {
 			return errors.Wrapf(err, "invalid service at index %d in SERVICES_FILE environment variable", k)
 		}
-		if findServiceByHash(svr.String()) == nil {
+		if findServiceByHash(svr.Hash()) == nil {
 			if err := svr.Create(); err != nil {
 				return errors.Wrapf(err, "could not create service %s", svr.Name)
 			}

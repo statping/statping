@@ -12,7 +12,7 @@ import (
 var log = utils.Log
 
 func ConnectConfigs(configs *DbConfig) error {
-	err := Connect(configs, true, utils.Directory)
+	err := Connect(configs, true)
 	if err != nil {
 		return errors.Wrap(err, "error connecting to database")
 	}

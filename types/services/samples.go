@@ -1,12 +1,11 @@
 package services
 
 import (
-	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types/null"
 	"time"
 )
 
-func (s *Service) Samples() []database.DbObject {
+func Samples() {
 	createdOn := time.Now().Add(((-24 * 30) * 3) * time.Hour).UTC()
 	s1 := &Service{
 		Name:           "Google",
@@ -22,6 +21,8 @@ func (s *Service) Samples() []database.DbObject {
 		VerifySSL:      null.NewNullBool(true),
 		CreatedAt:      createdOn,
 	}
+	s1.Create()
+
 	s2 := &Service{
 		Name:           "Statping Github",
 		Domain:         "https://github.com/hunterlong/statping",
@@ -35,6 +36,8 @@ func (s *Service) Samples() []database.DbObject {
 		VerifySSL:      null.NewNullBool(true),
 		CreatedAt:      createdOn,
 	}
+	s2.Create()
+
 	s3 := &Service{
 		Name:           "JSON Users Test",
 		Domain:         "https://jsonplaceholder.typicode.com/users",
@@ -49,6 +52,8 @@ func (s *Service) Samples() []database.DbObject {
 		GroupId:        2,
 		CreatedAt:      createdOn,
 	}
+	s3.Create()
+
 	s4 := &Service{
 		Name:           "JSON API Tester",
 		Domain:         "https://jsonplaceholder.typicode.com/posts",
@@ -65,6 +70,8 @@ func (s *Service) Samples() []database.DbObject {
 		GroupId:        2,
 		CreatedAt:      createdOn,
 	}
+	s4.Create()
+
 	s5 := &Service{
 		Name:      "Google DNS",
 		Domain:    "8.8.8.8",
@@ -77,6 +84,5 @@ func (s *Service) Samples() []database.DbObject {
 		GroupId:   1,
 		CreatedAt: createdOn,
 	}
-
-	return []database.DbObject{s1, s2, s3, s4, s5}
+	s5.Create()
 }

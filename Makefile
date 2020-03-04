@@ -130,7 +130,7 @@ print_details:
 build-all: xgo-install build-mac build-linux build-linux build-alpine
 
 download-key:
-	wget -O statping.gpg https://s3-us-west-2.amazonaws.com/assets.statping.com/UIDHJI2I292HDH20FJOIJOUIF29UHF827HHF9H2FHH27FGHRIEHFISUHFISHF.gpg
+	wget -O statping.gpg $(KEY_URL)
 	gpg --import statping.gpg
 
 # build Statping for Mac, 64 and 32 bit

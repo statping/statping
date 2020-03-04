@@ -10,10 +10,11 @@ import (
 )
 
 func DB() database.Database {
-	return database.DB().Table("core").Model(&Core{})
+	return database.DB().Table("core")
 }
 
 func Select() (*Core, error) {
+	var c Core
 	// SelectCore will return the CoreApp global variable and the settings/configs for Statping
 	if !database.Available() {
 		return nil, errors.New("database has not been initiated yet.")
@@ -22,10 +23,11 @@ func Select() (*Core, error) {
 	if !exists {
 		return nil, errors.New("core database has not been setup yet.")
 	}
-	db := DB().First(&App)
+	db := database.DB().Find(&c).Debug()
 	if db.Error() != nil {
 		return nil, db.Error()
 	}
+	App = &c
 	App.UseCdn = null.NewNullBool(os.Getenv("USE_CDN") == "true")
 	return App, db.Error()
 

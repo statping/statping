@@ -16,7 +16,6 @@
 package main
 
 import (
-	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/utils"
 	"github.com/rendon/testcli"
 	"github.com/stretchr/testify/assert"
@@ -32,7 +31,7 @@ var (
 
 func init() {
 	dir = utils.Directory
-	core.SampleHits = 480
+	//core.SampleHits = 480
 }
 
 func TestStartServerCommand(t *testing.T) {

@@ -3,10 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hunterlong/statping/core"
 	_ "github.com/hunterlong/statping/notifiers"
 	"github.com/hunterlong/statping/source"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/core"
 	"github.com/hunterlong/statping/utils"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -68,7 +67,7 @@ func TestSetupRoutes(t *testing.T) {
 			Method:         "GET",
 			ExpectedStatus: 200,
 			FuncTest: func() error {
-				if core.CoreApp.Setup {
+				if core.App.Setup {
 					return errors.New("core has already been setup")
 				}
 				return nil
@@ -81,9 +80,9 @@ func TestSetupRoutes(t *testing.T) {
 			Body:           form.Encode(),
 			ExpectedStatus: 200,
 			HttpHeaders:    []string{"Content-Type=application/x-www-form-urlencoded"},
-			ExpectedFiles:  []string{dir + "/config.yml", dir + "/handlers/" + types.SqliteFilename},
+			ExpectedFiles:  []string{dir + "/config.yml", dir + "/handlers/" + "statping.db"},
 			FuncTest: func() error {
-				if !core.CoreApp.Setup {
+				if !core.App.Setup {
 					return errors.New("core has not been setup")
 				}
 				return nil
@@ -110,7 +109,7 @@ func TestMainApiRoutes(t *testing.T) {
 			ExpectedStatus:   200,
 			ExpectedContains: []string{`"description":"This is an awesome test"`},
 			FuncTest: func() error {
-				if !core.CoreApp.Setup {
+				if !core.App.Setup {
 					return errors.New("database is not setup")
 				}
 				return nil

@@ -1,13 +1,12 @@
 package core
 
 import (
-	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types/null"
 	"github.com/hunterlong/statping/utils"
 	"time"
 )
 
-func (c *Core) Samples() []database.DbObject {
+func Samples() {
 	apiKey := utils.Getenv("API_KEY", "samplekey")
 	apiSecret := utils.Getenv("API_SECRET", "samplesecret")
 
@@ -22,7 +21,5 @@ func (c *Core) Samples() []database.DbObject {
 		UseCdn:      null.NewNullBool(false),
 		Footer:      null.NewNullString(""),
 	}
-
-	return []database.DbObject{core}
-
+	core.Create()
 }

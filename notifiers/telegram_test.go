@@ -16,7 +16,7 @@
 package notifiers
 
 import (
-	"github.com/hunterlong/statping/core/notifier"
+	"github.com/hunterlong/statping/types/notifications"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -49,7 +49,7 @@ func TestTelegramNotifier(t *testing.T) {
 		Telegram.ApiSecret = telegramToken
 		Telegram.Var1 = telegramChannel
 		Telegram.Delay = time.Duration(1 * time.Second)
-		err := notifier.AddNotifiers(Telegram)
+		err := AddNotifiers(Telegram)
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", Telegram.Author)
 		assert.Equal(t, telegramToken, Telegram.ApiSecret)
@@ -96,7 +96,7 @@ func TestTelegramNotifier(t *testing.T) {
 	})
 
 	t.Run("Telegram Queue", func(t *testing.T) {
-		go notifier.Queue(Telegram)
+		go notifications.Queue(Telegram)
 		time.Sleep(3 * time.Second)
 		assert.Equal(t, telegramToken, Telegram.ApiSecret)
 		assert.Equal(t, 0, len(Telegram.Queue))

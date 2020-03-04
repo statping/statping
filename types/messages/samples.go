@@ -1,11 +1,10 @@
 package messages
 
 import (
-	"github.com/hunterlong/statping/database"
 	"time"
 )
 
-func (m *Message) Samples() []database.DbObject {
+func Samples() {
 	m1 := &Message{
 		Title:       "Routine Downtime",
 		Description: "This is an example a upcoming message for a service!",
@@ -13,6 +12,8 @@ func (m *Message) Samples() []database.DbObject {
 		StartOn:     time.Now().UTC().Add(15 * time.Minute),
 		EndOn:       time.Now().UTC().Add(2 * time.Hour),
 	}
+
+	m1.Create()
 
 	m2 := &Message{
 		Title:       "Server Reboot",
@@ -22,5 +23,5 @@ func (m *Message) Samples() []database.DbObject {
 		EndOn:       time.Now().UTC().Add(2 * time.Hour),
 	}
 
-	return []database.DbObject{m1, m2}
+	m2.Create()
 }
