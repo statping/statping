@@ -32,7 +32,7 @@ var (
 	currentCount int
 )
 
-var TestService = &types.Service{
+var TestService = &services.Service{
 	Id:             1,
 	Name:           "Interpol - All The Rage Back Home",
 	Domain:         "https://www.youtube.com/watch?v=-u6DvRyyKGU",

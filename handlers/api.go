@@ -19,10 +19,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/core/notifier"
-	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/checkins"
+	"github.com/hunterlong/statping/types/core"
+	"github.com/hunterlong/statping/types/groups"
+	"github.com/hunterlong/statping/types/incidents"
+	"github.com/hunterlong/statping/types/messages"
+	"github.com/hunterlong/statping/types/notifications"
+	"github.com/hunterlong/statping/types/null"
+	"github.com/hunterlong/statping/types/services"
+	"github.com/hunterlong/statping/types/users"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
 	"time"
@@ -38,21 +43,21 @@ type apiResponse struct {
 }
 
 func apiIndexHandler(r *http.Request) interface{} {
-	coreClone := *core.CoreApp
+	coreClone := core.App
 	var loggedIn bool
 	_, err := getJwtToken(r)
 	if err == nil {
 		loggedIn = true
 	}
 	coreClone.LoggedIn = loggedIn
-	return *coreClone.ToCore()
+	return coreClone
 }
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
-	core.CoreApp.ApiKey = utils.NewSHA1Hash(40)
-	core.CoreApp.ApiSecret = utils.NewSHA1Hash(40)
-	err = database.Update(core.CoreApp)
+	core.App.ApiKey = utils.NewSHA1Hash(40)
+	core.App.ApiSecret = utils.NewSHA1Hash(40)
+	err = core.App.Update()
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -71,7 +76,7 @@ func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	app := core.CoreApp
+	app := core.App
 	if c.Name != "" {
 		app.Name = c.Name
 	}
@@ -90,9 +95,9 @@ func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 	if c.Timezone != app.Timezone {
 		app.Timezone = c.Timezone
 	}
-	app.UseCdn = types.NewNullBool(c.UseCdn.Bool)
-	err = database.Update(app)
-	returnJson(core.CoreApp, w, r)
+	app.UseCdn = null.NewNullBool(c.UseCdn.Bool)
+	err = app.Update()
+	returnJson(core.App, w, r)
 }
 
 type cacheJson struct {
@@ -135,45 +140,33 @@ func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *ht
 	var objName string
 	var objId int64
 	switch v := obj.(type) {
-	case types.Servicer:
+	case *services.Service:
 		objName = "service"
-		objId = v.Model().Id
-	case *notifier.Notification:
+		objId = v.Id
+	case *notifications.Notification:
 		objName = "notifier"
 		objId = v.Id
-	case *core.Core, *types.Core:
+	case *core.Core:
 		objName = "core"
-	case *types.User:
+	case *users.User:
 		objName = "user"
 		objId = v.Id
-	case *core.User:
-		objName = "user"
-		objId = v.Id
-	case *types.Group:
+	case *groups.Group:
 		objName = "group"
 		objId = v.Id
-	case database.Grouper:
-		objName = "group"
-		objId = v.Model().Id
-	case *core.Checkin:
+	case *checkins.Checkin:
 		objName = "checkin"
 		objId = v.Id
-	case *core.CheckinHit:
+	case *checkins.CheckinHit:
 		objName = "checkin_hit"
 		objId = v.Id
-	case *types.Message:
+	case *messages.Message:
 		objName = "message"
 		objId = v.Id
-	case *core.Message:
-		objName = "message"
-		objId = v.Id
-	case *types.Checkin:
-		objName = "checkin"
-		objId = v.Id
-	case *core.Incident:
+	case *incidents.Incident:
 		objName = "incident"
 		objId = v.Id
-	case *core.IncidentUpdate:
+	case *incidents.IncidentUpdate:
 		objName = "incident_update"
 		objId = v.Id
 	default:

@@ -18,8 +18,8 @@ package handlers
 import (
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/types/core"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
 )
@@ -188,5 +188,5 @@ func resetRouter() {
 }
 
 func resetCookies() {
-	jwtKey = fmt.Sprintf("%v_%v", core.CoreApp.ApiSecret, utils.Now().Nanosecond())
+	jwtKey = fmt.Sprintf("%v_%v", core.App.ApiSecret, utils.Now().Nanosecond())
 }

@@ -19,44 +19,43 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/checkins"
+	"github.com/hunterlong/statping/types/services"
 	"github.com/hunterlong/statping/utils"
 	"net"
 	"net/http"
 )
 
 func apiAllCheckinsHandler(w http.ResponseWriter, r *http.Request) {
-	checkins := database.AllCheckins()
-	returnJson(checkins, w, r)
+	chks := checkins.All()
+	returnJson(chks, w, r)
 }
 
 func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	checkin, err := database.CheckinByKey(vars["api"])
+	checkin, err := checkins.FindByAPI(vars["api"])
 	if err != nil {
 		sendErrorJson(fmt.Errorf("checkin %v was not found", vars["api"]), w, r)
 		return
 	}
-	out := checkin.Model()
-	returnJson(out, w, r)
+	returnJson(checkin, w, r)
 }
 
 func checkinCreateHandler(w http.ResponseWriter, r *http.Request) {
-	var checkin *core.Checkin
+	var checkin *checkins.Checkin
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&checkin)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	service := core.SelectService(checkin.ServiceId)
-	if service == nil {
+	service, err := services.Find(checkin.ServiceId)
+	if err != nil {
 		sendErrorJson(fmt.Errorf("missing service_id field"), w, r)
 		return
 	}
-	_, err = checkin.Create()
+	checkin.ServiceId = service.Id
+	err = checkin.Create()
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -66,42 +65,40 @@ func checkinCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	checkin, err := database.CheckinByKey(vars["api"])
+	checkin, err := checkins.FindByAPI(vars["api"])
 	if err != nil {
 		sendErrorJson(fmt.Errorf("checkin %v was not found", vars["api"]), w, r)
 		return
 	}
 	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
 
-	hit := &types.CheckinHit{
+	hit := &checkins.CheckinHit{
 		Checkin:   checkin.Id,
 		From:      ip,
 		CreatedAt: utils.Now().UTC(),
 	}
-	newCheck, err := database.Create(hit)
+	err = hit.Create()
 	if err != nil {
 		sendErrorJson(fmt.Errorf("checkin %v was not found", vars["api"]), w, r)
 		return
 	}
 	checkin.Failing = false
-	checkin.LastHit = utils.Timezoner(utils.Now().UTC(), core.CoreApp.Timezone)
-	sendJsonAction(newCheck.Id, "update", w, r)
+	checkin.LastHitTime = utils.Now().UTC()
+	sendJsonAction(hit.Id, "update", w, r)
 }
 
 func checkinDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	checkin := core.SelectCheckin(vars["api"])
-	if checkin == nil {
+	checkin, err := checkins.FindByAPI(vars["api"])
+	if err != nil {
 		sendErrorJson(fmt.Errorf("checkin %v was not found", vars["api"]), w, r)
 		return
 	}
 
-	if err := database.Delete(checkin); err != nil {
+	if err := checkin.Delete(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-
-	checkin.Delete()
 
 	sendJsonAction(checkin, "delete", w, r)
 }

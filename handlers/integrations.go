@@ -3,54 +3,51 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"github.com/hunterlong/statping/core/integrations"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/integrations"
 	"net/http"
 )
 
+func findIntegration(r *http.Request) (*integrations.Integration, string, error) {
+	vars := mux.Vars(r)
+	name := vars["name"]
+	intgr, err := integrations.Find(name)
+	if err != nil {
+		return nil, "", err
+	}
+	return intgr, name, nil
+}
+
 func apiAllIntegrationsHandler(w http.ResponseWriter, r *http.Request) {
-	integrations := integrations.Integrations
-	returnJson(integrations, w, r)
+	inte := integrations.All()
+	returnJson(inte, w, r)
 }
 
 func apiIntegrationViewHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	intgr, err := integrations.Find(vars["name"])
+	intgr, _, err := findIntegration(r)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	returnJson(intgr.Get(), w, r)
+	returnJson(intgr, w, r)
 }
 
 func apiIntegrationHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	intgr, err := integrations.Find(vars["name"])
+	intgr, _, err := findIntegration(r)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
 
-	var intJson *types.Integration
 	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&intJson); err != nil {
+	if err := decoder.Decode(&intgr); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
 
-	integration := intgr.Get()
-	integration.Enabled = intJson.Enabled
-	integration.Fields = intJson.Fields
-
-	if err := integrations.Update(integration); err != nil {
+	if err := intgr.Update(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
 
-	list, err := intgr.List()
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
-	returnJson(list, w, r)
+	returnJson(intgr, w, r)
 }

@@ -19,8 +19,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/hunterlong/statping/core/notifier"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/failures"
+	"github.com/hunterlong/statping/types/notifications"
+	"github.com/hunterlong/statping/types/services"
 	"github.com/hunterlong/statping/utils"
 	"time"
 )
@@ -28,10 +29,10 @@ import (
 const mobileIdentifier = "com.statping"
 
 type mobilePush struct {
-	*notifier.Notification
+	*notifications.Notification
 }
 
-var Mobile = &mobilePush{&notifier.Notification{
+var Mobile = &mobilePush{&notifications.Notification{
 	Method: "mobile",
 	Title:  "Mobile Notifications",
 	Description: `Receive push notifications on your Mobile device using the Statping App. You can scan the Authentication QR Code found in Settings to get the Mobile app setup in seconds.
@@ -40,7 +41,7 @@ var Mobile = &mobilePush{&notifier.Notification{
 	AuthorUrl: "https://github.com/hunterlong",
 	Delay:     time.Duration(5 * time.Second),
 	Icon:      "fas fa-mobile-alt",
-	Form: []notifier.NotificationForm{{
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Device Identifiers",
 		Placeholder: "A list of your Mobile device push notification ID's.",
@@ -55,11 +56,11 @@ var Mobile = &mobilePush{&notifier.Notification{
 	}}},
 }
 
-func (u *mobilePush) Select() *notifier.Notification {
+func (u *mobilePush) Select() *notifications.Notification {
 	return u.Notification
 }
 
-func dataJson(s *types.Service, f *types.Failure) map[string]interface{} {
+func dataJson(s *services.Service, f *failures.Failure) map[string]interface{} {
 	serviceId := "0"
 	if s != nil {
 		serviceId = utils.ToString(s.Id)
@@ -83,7 +84,7 @@ func dataJson(s *types.Service, f *types.Failure) map[string]interface{} {
 }
 
 // OnFailure will trigger failing service
-func (u *mobilePush) OnFailure(s *types.Service, f *types.Failure) {
+func (u *mobilePush) OnFailure(s *services.Service, f *failures.Failure) {
 	data := dataJson(s, f)
 	msg := &pushArray{
 		Message: fmt.Sprintf("Your service '%v' is currently failing! Reason: %v", s.Name, f.Issue),
@@ -95,7 +96,7 @@ func (u *mobilePush) OnFailure(s *types.Service, f *types.Failure) {
 }
 
 // OnSuccess will trigger successful service
-func (u *mobilePush) OnSuccess(s *types.Service) {
+func (u *mobilePush) OnSuccess(s *services.Service) {
 	data := dataJson(s, nil)
 	if !s.Online || !s.SuccessNotified {
 		var msgStr string

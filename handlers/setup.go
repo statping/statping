@@ -17,9 +17,10 @@ package handlers
 
 import (
 	"errors"
-	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/configs"
+	"github.com/hunterlong/statping/types/core"
+	"github.com/hunterlong/statping/types/null"
+	"github.com/hunterlong/statping/types/users"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
 	"strconv"
@@ -28,7 +29,7 @@ import (
 
 func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
-	if core.CoreApp.Setup {
+	if core.App.Setup {
 		sendErrorJson(errors.New("Statping has already been setup"), w, r)
 		return
 	}
@@ -50,9 +51,8 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	domain := r.PostForm.Get("domain")
 	email := r.PostForm.Get("email")
 	sample, _ := strconv.ParseBool(r.PostForm.Get("sample_data"))
-	dir := utils.Directory
 
-	configs := &types.DbConfig{
+	confg := &configs.DbConfig{
 		DbConn:      dbConn,
 		DbHost:      dbHost,
 		DbUser:      dbUser,
@@ -69,68 +69,83 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		Location:    utils.Directory,
 	}
 
-	log.WithFields(utils.ToFields(core.CoreApp, configs)).Debugln("new configs posted")
+	log.WithFields(utils.ToFields(core.App, confg)).Debugln("new configs posted")
 
-	if err := core.SaveConfig(configs); err != nil {
+	if err := confg.Save(utils.Directory); err != nil {
 		log.Errorln(err)
 		sendErrorJson(err, w, r)
 		return
 	}
 
-	if _, err = core.LoadConfigFile(dir); err != nil {
+	if _, err = configs.LoadConfigs(); err != nil {
 		log.Errorln(err)
 		sendErrorJson(err, w, r)
 		return
 	}
 
-	if err = core.CoreApp.Connect(configs, false, dir); err != nil {
+	if err = configs.ConnectConfigs(confg); err != nil {
 		log.Errorln(err)
-		core.DeleteConfig()
+		if err := confg.Delete(); err != nil {
+			log.Errorln(err)
+			sendErrorJson(err, w, r)
+		}
+	}
+
+	if err = configs.MigrateDatabase(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
 
-	if err = core.CoreApp.DropDatabase(); err != nil {
-		sendErrorJson(err, w, r)
-		return
+	c := &core.Core{
+		Name:        "Statping Sample Data",
+		Description: "This data is only used to testing",
+		//ApiKey:      apiKey.(string),
+		//ApiSecret:   apiSecret.(string),
+		Domain:    "http://localhost:8080",
+		Version:   "test",
+		CreatedAt: time.Now().UTC(),
+		UseCdn:    null.NewNullBool(false),
+		Footer:    null.NewNullString(""),
 	}
 
-	if err = core.CoreApp.CreateDatabase(); err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
-
-	core.CoreApp, err = core.InsertCore(configs)
-	if err != nil {
+	if err := c.Create(); err != nil {
 		log.Errorln(err)
 		sendErrorJson(err, w, r)
 		return
 	}
 
-	admin := &types.User{
-		Username: configs.Username,
-		Password: configs.Password,
-		Email:    configs.Email,
-		Admin:    types.NewNullBool(true),
+	core.App = c
+
+	admin := &users.User{
+		Username: confg.Username,
+		Password: confg.Password,
+		Email:    confg.Email,
+		Admin:    null.NewNullBool(true),
 	}
-	database.Create(admin)
+
+	if err := admin.Create(); err != nil {
+		log.Errorln(err)
+		sendErrorJson(err, w, r)
+		return
+	}
 
 	if sample {
-		if err = core.SampleData(); err != nil {
+		if err = configs.TriggerSamples(); err != nil {
 			sendErrorJson(err, w, r)
 			return
 		}
 	}
+
 	core.InitApp()
 	CacheStorage.Delete("/")
 	resetCookies()
 	time.Sleep(1 * time.Second)
 	out := struct {
-		Message string          `json:"message"`
-		Config  *types.DbConfig `json:"config"`
+		Message string            `json:"message"`
+		Config  *configs.DbConfig `json:"config"`
 	}{
 		"success",
-		configs,
+		confg,
 	}
 	returnJson(out, w, r)
 }

@@ -20,18 +20,19 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hunterlong/statping/core/notifier"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/failures"
+	"github.com/hunterlong/statping/types/notifications"
+	"github.com/hunterlong/statping/types/services"
 	"github.com/hunterlong/statping/utils"
 	"strings"
 	"time"
 )
 
 type discord struct {
-	*notifier.Notification
+	*notifications.Notification
 }
 
-var Discorder = &discord{&notifier.Notification{
+var Discorder = &discord{&notifications.Notification{
 	Method:      "discord",
 	Title:       "discord",
 	Description: "Send notifications to your discord channel using discord webhooks. Insert your discord channel Webhook URL to receive notifications. Based on the <a href=\"https://discordapp.com/developers/docs/resources/Webhook\">discord webhooker API</a>.",
@@ -40,7 +41,7 @@ var Discorder = &discord{&notifier.Notification{
 	Delay:       time.Duration(5 * time.Second),
 	Host:        "https://discordapp.com/api/webhooks/****/*****",
 	Icon:        "fab fa-discord",
-	Form: []notifier.NotificationForm{{
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "discord webhooker URL",
 		Placeholder: "Insert your Webhook URL here",
@@ -55,18 +56,18 @@ func (u *discord) Send(msg interface{}) error {
 	return err
 }
 
-func (u *discord) Select() *notifier.Notification {
+func (u *discord) Select() *notifications.Notification {
 	return u.Notification
 }
 
 // OnFailure will trigger failing service
-func (u *discord) OnFailure(s *types.Service, f *types.Failure) {
+func (u *discord) OnFailure(s *services.Service, f *failures.Failure) {
 	msg := fmt.Sprintf(`{"content": "Your service '%v' is currently failing! Reason: %v"}`, s.Name, f.Issue)
 	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
 // OnSuccess will trigger successful service
-func (u *discord) OnSuccess(s *types.Service) {
+func (u *discord) OnSuccess(s *services.Service) {
 	if !s.Online || !s.SuccessNotified {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		var msg interface{}

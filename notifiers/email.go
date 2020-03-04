@@ -20,8 +20,10 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/go-mail/mail"
-	"github.com/hunterlong/statping/core/notifier"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/failures"
+	"github.com/hunterlong/statping/types/notifications"
+	"github.com/hunterlong/statping/types/null"
+	"github.com/hunterlong/statping/types/services"
 	"github.com/hunterlong/statping/utils"
 	"html/template"
 	"time"
@@ -108,17 +110,17 @@ var (
 )
 
 type email struct {
-	*notifier.Notification
+	*notifications.Notification
 }
 
-var Emailer = &email{&notifier.Notification{
+var Emailer = &email{&notifications.Notification{
 	Method:      "email",
 	Title:       "email",
 	Description: "Send emails via SMTP when services are online or offline.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "far fa-envelope",
-	Form: []notifier.NotificationForm{{
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "SMTP Host",
 		Placeholder: "Insert your SMTP Host here.",
@@ -178,7 +180,7 @@ type emailOutgoing struct {
 }
 
 // OnFailure will trigger failing service
-func (u *email) OnFailure(s *types.Service, f *types.Failure) {
+func (u *email) OnFailure(s *services.Service, f *failures.Failure) {
 	email := &emailOutgoing{
 		To:       u.Var2,
 		Subject:  fmt.Sprintf("Service %v is Failing", s.Name),
@@ -190,7 +192,7 @@ func (u *email) OnFailure(s *types.Service, f *types.Failure) {
 }
 
 // OnSuccess will trigger successful service
-func (u *email) OnSuccess(s *types.Service) {
+func (u *email) OnSuccess(s *services.Service) {
 	if !s.Online || !s.SuccessNotified {
 		var msg string
 		msg = s.DownText
@@ -207,7 +209,7 @@ func (u *email) OnSuccess(s *types.Service) {
 	}
 }
 
-func (u *email) Select() *notifier.Notification {
+func (u *email) Select() *notifications.Notification {
 	return u.Notification
 }
 
@@ -220,7 +222,7 @@ func (u *email) OnSave() error {
 
 // OnTest triggers when this notifier has been saved
 func (u *email) OnTest() error {
-	testService := &types.Service{
+	testService := &services.Service{
 		Id:             1,
 		Name:           "Example Service",
 		Domain:         "https://www.youtube.com/watch?v=-u6DvRyyKGU",
@@ -230,7 +232,7 @@ func (u *email) OnTest() error {
 		Method:         "GET",
 		Timeout:        20,
 		LastStatusCode: 200,
-		Expected:       types.NewNullString("test example"),
+		Expected:       null.NewNullString("test example"),
 		LastResponse:   "<html>this is an example response</html>",
 		CreatedAt:      utils.Now().Add(-24 * time.Hour),
 	}

@@ -19,9 +19,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/source"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/users"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
 	"os"
@@ -184,7 +183,7 @@ func removeJwtToken(w http.ResponseWriter) {
 	})
 }
 
-func setJwtToken(user *types.User, w http.ResponseWriter) (JwtClaim, string) {
+func setJwtToken(user *users.User, w http.ResponseWriter) (JwtClaim, string) {
 	expirationTime := time.Now().Add(72 * time.Hour)
 	jwtClaim := JwtClaim{
 		Username: user.Username,
@@ -209,7 +208,7 @@ func apiLoginHandler(w http.ResponseWriter, r *http.Request) {
 	form := parseForm(r)
 	username := form.Get("username")
 	password := form.Get("password")
-	user, auth := core.AuthUser(username, password)
+	user, auth := users.AuthUser(username, password)
 	if auth {
 		utils.Log.Infoln(fmt.Sprintf("User %v logged in from IP %v", user.Username, r.RemoteAddr))
 		_, token := setJwtToken(user, w)

@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/types/core"
+	"github.com/hunterlong/statping/utils"
 	"html/template"
 	"net/http"
 	"net/url"
@@ -65,20 +67,20 @@ func serviceFromID(r *http.Request, object interface{}) error {
 var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap {
 	return template.FuncMap{
 		"VERSION": func() string {
-			return core.VERSION
+			return core.App.Version
 		},
 		"CoreApp": func() core.Core {
-			c := *core.CoreApp
+			c := *core.App
 			if c.Name == "" {
 				c.Name = "Statping"
 			}
 			return c
 		},
 		"USE_CDN": func() bool {
-			return core.CoreApp.UseCdn.Bool
+			return core.App.UseCdn.Bool
 		},
 		"USING_ASSETS": func() bool {
-			return core.CoreApp.UsingAssets()
+			return source.UsingAssets(utils.Directory)
 		},
 		"BasePath": func() string {
 			return basePath

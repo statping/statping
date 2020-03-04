@@ -17,8 +17,9 @@ package notifiers
 
 import (
 	"fmt"
-	"github.com/hunterlong/statping/core/notifier"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/failures"
+	"github.com/hunterlong/statping/types/notifications"
+	"github.com/hunterlong/statping/types/services"
 	"github.com/hunterlong/statping/utils"
 	"net/url"
 	"strings"
@@ -30,17 +31,17 @@ const (
 )
 
 type lineNotifier struct {
-	*notifier.Notification
+	*notifications.Notification
 }
 
-var LineNotify = &lineNotifier{&notifier.Notification{
+var LineNotify = &lineNotifier{&notifications.Notification{
 	Method:      lineNotifyMethod,
 	Title:       "LINE Notify",
 	Description: "LINE Notify will send notifications to your LINE Notify account when services are offline or online. Based on the <a href=\"https://notify-bot.line.me/doc/en/\">LINE Notify API</a>.",
 	Author:      "Kanin Peanviriyakulkit",
 	AuthorUrl:   "https://github.com/dogrocker",
 	Icon:        "far fa-bell",
-	Form: []notifier.NotificationForm{{
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Access Token",
 		Placeholder: "Insert your Line Notify Access Token here.",
@@ -58,18 +59,18 @@ func (u *lineNotifier) Send(msg interface{}) error {
 	return err
 }
 
-func (u *lineNotifier) Select() *notifier.Notification {
+func (u *lineNotifier) Select() *notifications.Notification {
 	return u.Notification
 }
 
 // OnFailure will trigger failing service
-func (u *lineNotifier) OnFailure(s *types.Service, f *types.Failure) {
+func (u *lineNotifier) OnFailure(s *services.Service, f *failures.Failure) {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
 	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
 // OnSuccess will trigger successful service
-func (u *lineNotifier) OnSuccess(s *types.Service) {
+func (u *lineNotifier) OnSuccess(s *services.Service) {
 	if !s.Online || !s.SuccessNotified {
 		var msg string
 		msg = s.DownText

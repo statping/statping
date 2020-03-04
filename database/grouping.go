@@ -38,7 +38,7 @@ type GroupQuery struct {
 }
 
 func (b GroupQuery) Find(data interface{}) error {
-	return b.db.Find(&data).Error()
+	return b.db.Find(data).Error()
 }
 
 func (b GroupQuery) Database() Database {
@@ -176,6 +176,10 @@ func (g *GroupQuery) duration() time.Duration {
 	}
 }
 
+type isObject interface {
+	Db() Database
+}
+
 func ParseQueries(r *http.Request, o isObject) *GroupQuery {
 	fields := parseGet(r)
 	grouping := fields.Get("group")
@@ -192,7 +196,7 @@ func ParseQueries(r *http.Request, o isObject) *GroupQuery {
 		limit = 10000
 	}
 
-	db := o.object().db
+	db := o.Db()
 
 	query := &GroupQuery{
 		Start:     time.Unix(startField, 0).UTC(),
@@ -205,22 +209,22 @@ func ParseQueries(r *http.Request, o isObject) *GroupQuery {
 		db:        db,
 	}
 
+	if startField == 0 {
+		query.Start = time.Now().Add(-3 * types.Month).UTC()
+	}
+	if endField == 0 {
+		query.End = time.Now().UTC()
+	}
+
 	if query.Limit != 0 {
 		db = db.Limit(query.Limit)
 	}
 	if query.Offset > 0 {
 		db = db.Offset(query.Offset)
 	}
-	if !query.Start.IsZero() && !query.End.IsZero() {
-		db = db.Where("created_at BETWEEN ? AND ?", db.FormatTime(query.Start), db.FormatTime(query.End))
-	} else {
-		if !query.Start.IsZero() {
-			db = db.Where("created_at > ?", db.FormatTime(query.Start))
-		}
-		if !query.End.IsZero() {
-			db = db.Where("created_at < ?", db.FormatTime(query.End))
-		}
-	}
+
+	db = db.Where("created_at BETWEEN ? AND ?", db.FormatTime(query.Start), db.FormatTime(query.End))
+
 	if query.Order != "" {
 		db = db.Order(query.Order)
 	}

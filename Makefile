@@ -11,6 +11,8 @@ TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master 
 TEST_DIR=$(GOPATH)/src/github.com/hunterlong/statping
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 
+all: clean yarn-install compile docker-base docker-vue build-all compress
+
 up:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml up -d --remove-orphans
 	make print_details
@@ -27,6 +29,9 @@ reup: down clean compose-build-full up
 
 yarn-serve:
 	cd frontend && yarn serve
+
+yarn-install:
+	cd frontend && rm -rf node_modules && yarn
 
 go-run:
 	go run ./cmd
@@ -122,21 +127,27 @@ print_details:
 	@echo \==== Monitoring and IDE ====
 	@echo \Grafana:             http://localhost:3000  \(username: admin, password: admin\)
 
+build-all: xgo-install build-mac build-linux build-linux build-alpine
+
+download-key:
+	wget -O statping.gpg https://s3-us-west-2.amazonaws.com/assets.statping.com/UIDHJI2I292HDH20FJOIJOUIF29UHF827HHF9H2FHH27FGHRIEHFISUHFISHF.gpg
+	gpg --import statping.gpg
+
 # build Statping for Mac, 64 and 32 bit
-build-mac: compile
+build-mac:
 	mkdir build
 	$(XGO) $(BUILDVERSION) --targets=darwin/amd64,darwin/386 ./cmd
 
 # build Statping for Linux 64, 32 bit, arm6/arm7
-build-linux: compile
+build-linux:
 	$(XGO) $(BUILDVERSION) --targets=linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64 ./cmd
 
 # build for windows 64 bit only
-build-windows: compile
+build-windows:
 	$(XGO) $(BUILDVERSION) --targets=windows-6.0/amd64 ./cmd
 
 # build Alpine linux binary (used in docker images)
-build-alpine: compile
+build-alpine:
 	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT) -linkmode external -extldflags -static" -out alpine ./cmd
 
 # build :latest docker tag
@@ -145,7 +156,7 @@ docker-build-latest:
 	docker tag hunterlong/statping:latest hunterlong/statping:v${VERSION}
 
 # compress built binaries into tar.gz and zip formats
-compress:
+compress: download-key
 	cd build && mv alpine-linux-amd64 $(BINARY_NAME)
 	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output statping.asc --armor $(BINARY_NAME)
 	cd build && tar -czvf $(BINARY_NAME)-linux-alpine.tar.gz $(BINARY_NAME) statping.asc && rm -f $(BINARY_NAME) statping.asc

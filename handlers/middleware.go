@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/types/core"
 	"github.com/hunterlong/statping/utils"
 	"io"
 	"net/http"
@@ -64,7 +64,7 @@ func basicAuthHandler(next http.Handler) http.Handler {
 // apiMiddleware will confirm if Core has been setup
 func apiMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !core.CoreApp.Setup {
+		if !core.App.Setup {
 			sendErrorJson(errors.New("statping has not been setup"), w, r)
 			return
 		}
@@ -135,7 +135,7 @@ func cached(duration, contentType string, handler func(w http.ResponseWriter, r 
 		content := CacheStorage.Get(r.RequestURI)
 		w.Header().Set("Content-Type", contentType)
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		if !core.IsSetup() {
+		if !core.App.Setup {
 			handler(w, r)
 			return
 		}

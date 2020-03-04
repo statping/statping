@@ -19,8 +19,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hunterlong/statping/core/notifier"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/failures"
+	"github.com/hunterlong/statping/types/notifications"
+	"github.com/hunterlong/statping/types/services"
 	"github.com/hunterlong/statping/utils"
 	"net/url"
 	"strings"
@@ -28,10 +29,10 @@ import (
 )
 
 type telegram struct {
-	*notifier.Notification
+	*notifications.Notification
 }
 
-var Telegram = &telegram{&notifier.Notification{
+var Telegram = &telegram{&notifications.Notification{
 	Method:      "telegram",
 	Title:       "Telegram",
 	Description: "Receive notifications on your Telegram channel when a service has an issue. You must get a Telegram API token from the /botfather. Review the <a target=\"_blank\" href=\"http://techthoughts.info/how-to-create-a-telegram-bot-and-send-messages-via-api\">Telegram API Tutorial</a> to learn how to generate a new API Token.",
@@ -39,7 +40,7 @@ var Telegram = &telegram{&notifier.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "fab fa-telegram-plane",
 	Delay:       time.Duration(5 * time.Second),
-	Form: []notifier.NotificationForm{{
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Telegram API Token",
 		Placeholder: "383810182:EEx829dtCeufeQYXG7CUdiQopqdmmxBPO7-s",
@@ -56,7 +57,7 @@ var Telegram = &telegram{&notifier.Notification{
 	}}},
 }
 
-func (u *telegram) Select() *notifier.Notification {
+func (u *telegram) Select() *notifications.Notification {
 	return u.Notification
 }
 
@@ -82,13 +83,13 @@ func (u *telegram) Send(msg interface{}) error {
 }
 
 // OnFailure will trigger failing service
-func (u *telegram) OnFailure(s *types.Service, f *types.Failure) {
+func (u *telegram) OnFailure(s *services.Service, f *failures.Failure) {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
 	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
 // OnSuccess will trigger successful service
-func (u *telegram) OnSuccess(s *types.Service) {
+func (u *telegram) OnSuccess(s *services.Service) {
 	if !s.Online || !s.SuccessNotified {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		var msg interface{}

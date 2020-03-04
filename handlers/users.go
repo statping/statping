@@ -16,20 +16,17 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/users"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
 )
 
 func apiUserHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	user, err := core.SelectUser(utils.ToInt(vars["id"]))
+	user, err := users.Find(utils.ToInt(vars["id"]))
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -40,16 +37,22 @@ func apiUserHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	user, err := core.SelectUser(utils.ToInt(vars["id"]))
+	user, err := users.Find(utils.ToInt(vars["id"]))
 	if err != nil {
 		sendErrorJson(fmt.Errorf("user #%v was not found", vars["id"]), w, r)
 		return
 	}
-	decoder := json.NewDecoder(r.Body)
-	decoder.Decode(&user)
+
+	err = DecodeJSON(r, &user)
+	if err != nil {
+		sendErrorJson(fmt.Errorf("user #%v was not found", vars["id"]), w, r)
+		return
+	}
+
 	if user.Password != "" {
 		user.Password = utils.HashPassword(user.Password)
 	}
+
 	err = user.Update()
 	if err != nil {
 		sendErrorJson(fmt.Errorf("issue updating user #%v: %v", user.Id, err), w, r)
@@ -60,12 +63,12 @@ func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	users := database.AllUsers()
-	if len(users) == 1 {
+	allUsers := users.All()
+	if len(allUsers) == 1 {
 		sendErrorJson(errors.New("cannot delete the last user"), w, r)
 		return
 	}
-	user, err := core.SelectUser(utils.ToInt(vars["id"]))
+	user, err := users.Find(utils.ToInt(vars["id"]))
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -79,19 +82,20 @@ func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-	users := core.SelectAllUsers()
-	returnJson(users, w, r)
+	allUsers := users.All()
+	returnJson(allUsers, w, r)
 }
 
 func apiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
-	var user *types.User
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&user)
+	var user *users.User
+
+	err := DecodeJSON(r, &user)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	_, err = database.Create(user)
+
+	err = user.Create()
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return

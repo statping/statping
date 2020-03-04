@@ -17,18 +17,19 @@ package notifiers
 
 import (
 	"fmt"
-	"github.com/hunterlong/statping/core/notifier"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/failures"
+	"github.com/hunterlong/statping/types/notifications"
+	"github.com/hunterlong/statping/types/services"
 	"github.com/hunterlong/statping/utils"
 	"strings"
 	"time"
 )
 
 type commandLine struct {
-	*notifier.Notification
+	*notifications.Notification
 }
 
-var Command = &commandLine{&notifier.Notification{
+var Command = &commandLine{&notifications.Notification{
 	Method:      "Command",
 	Title:       "Shell Command",
 	Description: "Shell Command allows you to run a customized shell/bash Command on the local machine it's running on.",
@@ -37,7 +38,7 @@ var Command = &commandLine{&notifier.Notification{
 	Delay:       time.Duration(1 * time.Second),
 	Icon:        "fas fa-terminal",
 	Host:        "/bin/bash",
-	Form: []notifier.NotificationForm{{
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Shell or Bash",
 		Placeholder: "/bin/bash",
@@ -63,17 +64,17 @@ func runCommand(app string, cmd ...string) (string, string, error) {
 	return outStr, errStr, err
 }
 
-func (u *commandLine) Select() *notifier.Notification {
+func (u *commandLine) Select() *notifications.Notification {
 	return u.Notification
 }
 
 // OnFailure for commandLine will trigger failing service
-func (u *commandLine) OnFailure(s *types.Service, f *types.Failure) {
+func (u *commandLine) OnFailure(s *services.Service, f *failures.Failure) {
 	u.AddQueue(fmt.Sprintf("service_%v", s.Id), u.Var2)
 }
 
 // OnSuccess for commandLine will trigger successful service
-func (u *commandLine) OnSuccess(s *types.Service) {
+func (u *commandLine) OnSuccess(s *services.Service) {
 	if !s.Online {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		u.AddQueue(fmt.Sprintf("service_%v", s.Id), u.Var1)

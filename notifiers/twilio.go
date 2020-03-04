@@ -19,8 +19,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hunterlong/statping/core/notifier"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/failures"
+	"github.com/hunterlong/statping/types/notifications"
+	"github.com/hunterlong/statping/types/services"
 	"github.com/hunterlong/statping/utils"
 	"net/url"
 	"strings"
@@ -28,10 +29,10 @@ import (
 )
 
 type twilio struct {
-	*notifier.Notification
+	*notifications.Notification
 }
 
-var Twilio = &twilio{&notifier.Notification{
+var Twilio = &twilio{&notifications.Notification{
 	Method:      "twilio",
 	Title:       "Twilio",
 	Description: "Receive SMS text messages directly to your cellphone when a service is offline. You can use a Twilio test account with limits. This notifier uses the <a href=\"https://www.twilio.com/docs/usage/api\">Twilio API</a>.",
@@ -39,7 +40,7 @@ var Twilio = &twilio{&notifier.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "far fa-comment-alt",
 	Delay:       time.Duration(10 * time.Second),
-	Form: []notifier.NotificationForm{{
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Account SID",
 		Placeholder: "Insert your Twilio Account SID",
@@ -66,7 +67,7 @@ var Twilio = &twilio{&notifier.Notification{
 	}}},
 }
 
-func (u *twilio) Select() *notifier.Notification {
+func (u *twilio) Select() *notifications.Notification {
 	return u.Notification
 }
 
@@ -92,13 +93,13 @@ func (u *twilio) Send(msg interface{}) error {
 }
 
 // OnFailure will trigger failing service
-func (u *twilio) OnFailure(s *types.Service, f *types.Failure) {
+func (u *twilio) OnFailure(s *services.Service, f *failures.Failure) {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
 	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
 // OnSuccess will trigger successful service
-func (u *twilio) OnSuccess(s *types.Service) {
+func (u *twilio) OnSuccess(s *services.Service) {
 	if !s.Online || !s.SuccessNotified {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		var msg string

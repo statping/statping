@@ -19,8 +19,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/hunterlong/statping/core/notifier"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/failures"
+	"github.com/hunterlong/statping/types/notifications"
+	"github.com/hunterlong/statping/types/services"
 	"github.com/hunterlong/statping/utils"
 	"strings"
 	"text/template"
@@ -35,10 +36,10 @@ const (
 )
 
 type slack struct {
-	*notifier.Notification
+	*notifications.Notification
 }
 
-var Slacker = &slack{&notifier.Notification{
+var Slacker = &slack{&notifications.Notification{
 	Method:      slackMethod,
 	Title:       "slack",
 	Description: "Send notifications to your slack channel when a service is offline. Insert your Incoming webhooker URL for your channel to receive notifications. Based on the <a href=\"https://api.slack.com/incoming-webhooks\">slack API</a>.",
@@ -47,7 +48,7 @@ var Slacker = &slack{&notifier.Notification{
 	Delay:       time.Duration(10 * time.Second),
 	Host:        "https://webhooksurl.slack.com/***",
 	Icon:        "fab fa-slack",
-	Form: []notifier.NotificationForm{{
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Incoming webhooker Url",
 		Placeholder: "Insert your slack Webhook URL here.",
@@ -69,7 +70,7 @@ func parseSlackMessage(id int64, temp string, data interface{}) error {
 }
 
 type slackMessage struct {
-	Service  *types.Service
+	Service  *services.Service
 	Template string
 	Time     int64
 	Issue    string
@@ -82,7 +83,7 @@ func (u *slack) Send(msg interface{}) error {
 	return err
 }
 
-func (u *slack) Select() *notifier.Notification {
+func (u *slack) Select() *notifications.Notification {
 	return u.Notification
 }
 
@@ -95,7 +96,7 @@ func (u *slack) OnTest() error {
 }
 
 // OnFailure will trigger failing service
-func (u *slack) OnFailure(s *types.Service, f *types.Failure) {
+func (u *slack) OnFailure(s *services.Service, f *failures.Failure) {
 	message := slackMessage{
 		Service:  s,
 		Template: failingTemplate,
@@ -106,7 +107,7 @@ func (u *slack) OnFailure(s *types.Service, f *types.Failure) {
 }
 
 // OnSuccess will trigger successful service
-func (u *slack) OnSuccess(s *types.Service) {
+func (u *slack) OnSuccess(s *services.Service) {
 	if !s.Online {
 		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		message := slackMessage{

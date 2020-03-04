@@ -18,18 +18,15 @@ package utils
 import (
 	"context"
 	"crypto/tls"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/ararog/timeago"
-	"github.com/hunterlong/statping/types"
 	"io"
 	"io/ioutil"
 	"math"
 	"math/rand"
 	"net"
 	"net/http"
-	"net/url"
 	"os"
 	"os/exec"
 	"reflect"
@@ -86,14 +83,6 @@ func Getenv(key string, defaultValue interface{}) interface{} {
 					return d
 				}
 				return ok
-
-			case []*types.Service:
-				var services []*types.Service
-				if err := json.Unmarshal([]byte(val), services); err != nil {
-					Log.Error("Incorrect formatting with SERVICE environment variable")
-					return []*types.Service{}
-				}
-				return services
 			default:
 				return val
 			}
@@ -440,57 +429,6 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	defer resp.Body.Close()
 	contents, err := ioutil.ReadAll(resp.Body)
 	return contents, resp, err
-}
-
-func ValidateService(line string) (*types.Service, error) {
-	p, err := url.Parse(line)
-	if err != nil {
-		return nil, err
-	}
-	newService := new(types.Service)
-
-	domain := p.Host
-	newService.Name = niceDomainName(domain, p.Path)
-	if p.Port() != "" {
-		newService.Port = int(ToInt(p.Port()))
-		if p.Scheme != "http" && p.Scheme != "https" {
-			domain = strings.ReplaceAll(domain, ":"+p.Port(), "")
-		}
-	}
-	newService.Domain = domain
-
-	switch p.Scheme {
-	case "http", "https":
-		newService.Type = "http"
-		newService.Method = "get"
-		if p.Scheme == "https" {
-			newService.VerifySSL = types.NewNullBool(true)
-		}
-	default:
-		newService.Type = p.Scheme
-	}
-	return newService, nil
-}
-
-func niceDomainName(domain string, paths string) string {
-	domain = strings.ReplaceAll(domain, "www.", "")
-	splitPath := strings.Split(paths, "/")
-	if len(splitPath) == 1 {
-		return domain
-	}
-	var addedName []string
-	for k, p := range splitPath {
-		if k > 2 {
-			break
-		}
-		if len(p) > 16 {
-			addedName = append(addedName, p+"...")
-			break
-		} else {
-			addedName = append(addedName, p)
-		}
-	}
-	return domain + strings.Join(addedName, "/")
 }
 
 const (

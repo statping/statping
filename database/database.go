@@ -2,9 +2,7 @@ package database
 
 import (
 	"database/sql"
-	"github.com/hunterlong/statping/types"
 	"github.com/jinzhu/gorm"
-	"net/http"
 	"strings"
 	"time"
 
@@ -111,25 +109,10 @@ type Database interface {
 
 	FormatTime(t time.Time) string
 	ParseTime(t string) (time.Time, error)
-
-	Requests(*http.Request, isObject) Database
-
-	Objects
 }
 
-type Objects interface {
-	Core() Database
-	Services() Database
-	Users() Database
-	Groups() Database
-	Incidents() Database
-	IncidentUpdates() Database
-	Hits() Database
-	Failures() Database
-	Checkins() Database
-	CheckinHits() Database
-	Messages() Database
-	Integrations() Database
+func DB() Database {
+	return database
 }
 
 func Close() error {
@@ -152,17 +135,6 @@ func Begin(model interface{}) Database {
 	return database.Model(model).Begin()
 }
 
-func Core() Database {
-	return database.Core()
-}
-
-func Get() Database {
-	if Available() {
-		return database
-	}
-	return nil
-}
-
 func Available() bool {
 	if database == nil {
 		return false
@@ -171,59 +143,6 @@ func Available() bool {
 		return false
 	}
 	return true
-}
-
-func (d *Db) Core() Database {
-	return d.Table("core").Model(&types.Service{})
-}
-
-func (d *Db) Services() Database {
-	return d.Model(&types.Service{})
-}
-
-func (d *Db) Users() Database {
-	return d.Model(&types.User{})
-}
-
-func (d *Db) Groups() Database {
-	return d.Model(&types.Group{})
-}
-
-func (d *Db) Incidents() Database {
-	return d.Model(&types.Incident{})
-}
-
-func (d *Db) IncidentUpdates() Database {
-	return d.Model(&types.IncidentUpdate{})
-}
-
-func (d *Db) Hits() Database {
-	return d.Model(&types.Hit{})
-}
-
-func (d *Db) Integrations() Database {
-	return d.Model(&types.Integration{})
-}
-
-func (d *Db) Failures() Database {
-	return d.Model(&types.Failure{})
-}
-
-func (d *Db) Checkins() Database {
-	return d.Model(&types.Checkin{})
-}
-
-func (d *Db) CheckinHits() Database {
-	return d.Model(&types.CheckinHit{})
-}
-
-func (d *Db) Messages() Database {
-	return d.Model(&types.Message{})
-}
-
-func (it *Db) Requests(r *http.Request, o isObject) Database {
-	g := ParseQueries(r, o)
-	return g.db
 }
 
 func (it *Db) MultipleSelects(args ...string) Database {
@@ -245,7 +164,8 @@ func Openw(dialect string, args ...interface{}) (db Database, err error) {
 	if err != nil {
 		return nil, err
 	}
-	database = Wrap(gormdb)
+	db = Wrap(gormdb)
+	database = db
 	return database, err
 }
 

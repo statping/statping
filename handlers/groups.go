@@ -16,37 +16,30 @@
 package handlers
 
 import (
-	"encoding/json"
-	"errors"
 	"github.com/gorilla/mux"
-	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/groups"
 	"github.com/hunterlong/statping/utils"
+	"github.com/pkg/errors"
 	"net/http"
 )
+
+func selectGroup(r *http.Request) (*groups.Group, error) {
+	vars := mux.Vars(r)
+	id := utils.ToInt(vars["id"])
+	return groups.Find(id)
+}
 
 // apiAllGroupHandler will show all the groups
 func apiAllGroupHandler(r *http.Request) interface{} {
 	auth, admin := IsUser(r), IsAdmin(r)
-	groups := core.SelectGroups(admin, auth)
-	return flattenGroups(groups)
-}
-
-func flattenGroups(groups map[int64]*core.Group) []*types.Group {
-	var groupers []*types.Group
-	for _, group := range groups {
-		groupers = append(groupers, group.Group)
-	}
-	return groupers
+	return groups.SelectGroups(admin, auth)
 }
 
 // apiGroupHandler will show a single group
 func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	group := core.SelectGroup(utils.ToInt(vars["id"]))
-	if group.Id == 0 {
-		sendErrorJson(errors.New("group not found"), w, r)
+	group, err := selectGroup(r)
+	if err != nil {
+		sendErrorJson(errors.Wrap(err, "group not found"), w, r)
 		return
 	}
 	returnJson(group, w, r)
@@ -54,52 +47,54 @@ func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 // apiGroupUpdateHandler will update a group
 func apiGroupUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	group := core.SelectGroup(utils.ToInt(vars["id"]))
-	if group.Id == 0 {
-		sendErrorJson(errors.New("group not found"), w, r)
+	group, err := selectGroup(r)
+	if err != nil {
+		sendErrorJson(errors.Wrap(err, "group not found"), w, r)
 		return
 	}
-	decoder := json.NewDecoder(r.Body)
-	decoder.Decode(&group)
-	err := database.Update(group)
-	if err != nil {
+
+	if err := DecodeJSON(r, &group); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
+
+	if err := group.Update(); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
 	sendJsonAction(group, "update", w, r)
 }
 
 // apiCreateGroupHandler accepts a POST method to create new groups
 func apiCreateGroupHandler(w http.ResponseWriter, r *http.Request) {
-	var group *core.Group
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&group)
-	if err != nil {
+	var group *groups.Group
+	if err := DecodeJSON(r, &group); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	_, err = database.Create(group)
-	if err != nil {
+
+	if err := group.Create(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
+
 	sendJsonAction(group, "create", w, r)
 }
 
 // apiGroupDeleteHandler accepts a DELETE method to delete groups
 func apiGroupDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	group := core.SelectGroup(utils.ToInt(vars["id"]))
-	if group.Id == 0 {
-		sendErrorJson(errors.New("group not found"), w, r)
+	group, err := selectGroup(r)
+	if err != nil {
+		sendErrorJson(errors.Wrap(err, "group not found"), w, r)
 		return
 	}
-	err := database.Delete(group)
-	if err != nil {
+
+	if err := group.Delete(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
+
 	sendJsonAction(group, "delete", w, r)
 }
 
@@ -111,12 +106,23 @@ type groupOrder struct {
 func apiGroupReorderHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	var newOrder []*groupOrder
-	decoder := json.NewDecoder(r.Body)
-	decoder.Decode(&newOrder)
+
+	if err := DecodeJSON(r, &newOrder); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
 	for _, g := range newOrder {
-		group := core.SelectGroup(g.Id)
+		group, err := groups.Find(g.Id)
+		if err != nil {
+			sendErrorJson(err, w, r)
+			return
+		}
 		group.Order = g.Order
-		database.Update(group)
+		if err := group.Update(); err != nil {
+			sendErrorJson(err, w, r)
+			return
+		}
 	}
 	returnJson(newOrder, w, r)
 }

@@ -18,8 +18,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hunterlong/statping/core"
+	"github.com/hunterlong/statping/handlers"
 	"github.com/hunterlong/statping/source"
+	"github.com/hunterlong/statping/types/configs"
+	"github.com/hunterlong/statping/types/core"
+	"github.com/hunterlong/statping/types/services"
 	"github.com/hunterlong/statping/utils"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
@@ -32,7 +35,6 @@ func catchCLI(args []string) error {
 	dir := utils.Directory
 	runLogs := utils.InitLogs
 	runAssets := source.Assets
-	loadDotEnvs()
 
 	switch args[0] {
 	case "version":
@@ -100,14 +102,14 @@ func catchCLI(args []string) error {
 		if err = runAssets(); err != nil {
 			return err
 		}
-		configs, err := core.LoadConfigFile(dir)
+		config, err := configs.LoadConfigs()
 		if err != nil {
 			return err
 		}
-		if err = core.CoreApp.Connect(configs, false, dir); err != nil {
+		if err = config.Connect(); err != nil {
 			return err
 		}
-		if data, err = core.ExportSettings(); err != nil {
+		if data, err = handlers.ExportSettings(); err != nil {
 			return fmt.Errorf("could not export settings: %v", err.Error())
 		}
 		//core.CloseDB()
@@ -125,7 +127,7 @@ func catchCLI(args []string) error {
 		if data, err = ioutil.ReadFile(filename); err != nil {
 			return err
 		}
-		var exportData core.ExportData
+		var exportData handlers.ExportData
 		if err = json.Unmarshal(data, &exportData); err != nil {
 			return err
 		}
@@ -200,24 +202,27 @@ func updateDisplay() error {
 
 // runOnce will initialize the Statping application and check each service 1 time, will not run HTTP server
 func runOnce() error {
-	configs, err := core.LoadConfigFile(utils.Directory)
+	config, err := configs.LoadConfigs()
 	if err != nil {
 		return errors.Wrap(err, "config.yml file not found")
 	}
-	err = core.CoreApp.Connect(configs, false, utils.Directory)
+	err = config.Connect()
 	if err != nil {
 		return errors.Wrap(err, "issue connecting to database")
 	}
-	core.CoreApp, err = core.SelectCore()
+	c, err := core.Select()
 	if err != nil {
 		return errors.Wrap(err, "core database was not found or setup")
 	}
-	_, err = core.SelectAllServices(true)
+
+	core.App = c
+
+	_, err = services.SelectAllServices(true)
 	if err != nil {
 		return errors.Wrap(err, "could not select all services")
 	}
-	for _, srv := range core.Services() {
-		core.CheckService(srv, true)
+	for _, srv := range services.Services() {
+		services.CheckService(srv, true)
 	}
 	return nil
 }

@@ -1,0 +1,18 @@
+package services
+
+import (
+	"github.com/hunterlong/statping/types/hits"
+	"time"
+)
+
+func (s *Service) HitsColumnID() (string, int64) {
+	return "service", s.Id
+}
+
+func (s *Service) AllHits() hits.Hitters {
+	return hits.AllHits(s)
+}
+
+func (s *Service) HitsSince(t time.Time) hits.Hitters {
+	return hits.HitsSince(t, s)
+}

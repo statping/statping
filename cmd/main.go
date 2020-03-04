@@ -16,15 +16,17 @@
 package main
 
 import (
+	"github.com/hunterlong/statping/database"
+	"github.com/hunterlong/statping/types/configs"
+	"github.com/hunterlong/statping/types/core"
+	"github.com/hunterlong/statping/types/services"
 	"github.com/hunterlong/statping/utils"
 	"github.com/pkg/errors"
 
 	"flag"
 	"fmt"
-	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/handlers"
 	"github.com/hunterlong/statping/source"
-	"github.com/joho/godotenv"
 	"os"
 	"os/signal"
 	"syscall"
@@ -40,10 +42,11 @@ var (
 	verboseMode int
 	port        int
 	log         = utils.Log.WithField("type", "cmd")
+	httpServer  = make(chan bool)
 )
 
 func init() {
-	core.VERSION = VERSION
+
 }
 
 // parseFlags will parse the application flags
@@ -63,7 +66,6 @@ func parseFlags() {
 }
 
 func exit(err error) {
-	fmt.Printf("%+v", core.Configs())
 	panic(err)
 	//log.Fatalln(err)
 	//os.Exit(2)
@@ -73,13 +75,19 @@ func exit(err error) {
 func main() {
 	var err error
 	go sigterm()
+
 	parseFlags()
-	loadDotEnvs()
-	source.Assets()
+
+	if err := source.Assets(); err != nil {
+		exit(err)
+	}
+
 	utils.VerboseMode = verboseMode
+
 	if err := utils.InitLogs(); err != nil {
 		log.Errorf("Statping Log Error: %v\n", err)
 	}
+
 	args := flag.Args()
 
 	if len(args) >= 1 {
@@ -98,41 +106,21 @@ func main() {
 		log.Warnln(err)
 	}
 
-	// check if DB_CONN was set, and load config from that
-	autoConfigDb := utils.Getenv("DB_CONN", "").(string)
-	if autoConfigDb != "" {
-		log.Infof("Environment variable 'DB_CONN' was set to %s, loading configs from ENV.", autoConfigDb)
-		if _, err := core.LoadUsingEnv(); err != nil {
-			exit(err)
-			return
-		} else {
-			afterConfigLoaded()
-		}
-	}
-
-	// attempt to load config.yml file from current directory, if no file, then start in setup mode.
-	_, err = core.LoadConfigFile(utils.Directory)
+	c, err := configs.LoadConfigs()
 	if err != nil {
-		log.Errorln(err)
-		core.CoreApp.Setup = false
-		writeAble, err := utils.DirWritable(utils.Directory)
-		if err != nil {
+		if err := SetupMode(); err != nil {
 			exit(err)
-			return
 		}
-		if !writeAble {
-			log.Fatalf("Statping does not have write permissions at: %v\nYou can change this directory by setting the STATPING_DIR environment variable to a dedicated path before starting.", utils.Directory)
-			return
-		}
-		if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
-			log.Fatalln(err)
-		}
-	} else {
-		afterConfigLoaded()
 	}
-}
 
-func afterConfigLoaded() {
+	if err = c.Connect(); err != nil {
+		exit(err)
+	}
+
+	if err := configs.MigrateDatabase(); err != nil {
+		exit(err)
+	}
+
 	if err := mainProcess(); err != nil {
 		exit(err)
 	}
@@ -141,7 +129,11 @@ func afterConfigLoaded() {
 // Close will gracefully stop the database connection, and log file
 func Close() {
 	utils.CloseLogs()
-	core.CloseDB()
+	database.Close()
+}
+
+func SetupMode() error {
+	return handlers.RunHTTPServer(ipAddress, port)
 }
 
 // sigterm will attempt to close the database connections gracefully
@@ -153,30 +145,9 @@ func sigterm() {
 	os.Exit(1)
 }
 
-// loadDotEnvs attempts to load database configs from a '.env' file in root directory
-func loadDotEnvs() error {
-	err := godotenv.Load(envFile)
-	if err == nil {
-		log.Infoln("Environment file '.env' Loaded")
-	}
-	return err
-}
-
 // mainProcess will initialize the Statping application and run the HTTP server
 func mainProcess() error {
-	dir := utils.Directory
-	var err error
-	err = core.CoreApp.Connect(core.Configs(), false, dir)
-	if err != nil {
-		log.Errorln(fmt.Sprintf("could not connect to database: %v", err))
-		return err
-	}
-
-	if err := core.CoreApp.MigrateDatabase(); err != nil {
-		return errors.Wrap(err, "database migration")
-	}
-
-	if err := core.CoreApp.ServicesFromEnvFile(); err != nil {
+	if err := services.ServicesFromEnvFile(); err != nil {
 		errStr := "error 'SERVICE' environment variable"
 		log.Errorln(errStr)
 		return errors.Wrap(err, errStr)
@@ -185,11 +156,33 @@ func mainProcess() error {
 	if err := core.InitApp(); err != nil {
 		return err
 	}
-	if core.CoreApp.Setup {
-		if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
-			log.Fatalln(err)
-			return errors.Wrap(err, "http server")
-		}
+
+	if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
+		log.Fatalln(err)
+		return errors.Wrap(err, "http server")
 	}
 	return nil
+}
+
+func StartHTTPServer() {
+	httpServer = make(chan bool)
+	go httpServerProcess(httpServer)
+}
+
+func StopHTTPServer() {
+
+}
+
+func httpServerProcess(process <-chan bool) {
+	for {
+		select {
+		case <-process:
+			fmt.Println("HTTP Server has stopped")
+			return
+		default:
+			if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
+				log.Errorln(err)
+			}
+		}
+	}
 }

@@ -16,30 +16,35 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/messages"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
 )
 
+func getMessageByID(r *http.Request) (*messages.Message, int64, error) {
+	vars := mux.Vars(r)
+	num := utils.ToInt(vars["id"])
+	message, err := messages.Find(num)
+	if err != nil {
+		return nil, num, err
+	}
+	return message, num, nil
+}
+
 func apiAllMessagesHandler(r *http.Request) interface{} {
-	messages := database.AllMessages()
-	return messages
+	msgs := messages.All()
+	return msgs
 }
 
 func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {
-	var message *types.Message
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&message)
-	if err != nil {
+	var message *messages.Message
+	if err := DecodeJSON(r, &message); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	_, err = database.Create(message)
-	if err != nil {
+	if err := message.Create(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
@@ -47,23 +52,21 @@ func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	message, err := database.Message(utils.ToInt(vars["id"]))
+	message, id, err := getMessageByID(r)
 	if err != nil {
-		sendErrorJson(err, w, r)
+		sendErrorJson(fmt.Errorf("message #%d was not found", id), w, r)
 		return
 	}
 	returnJson(message, w, r)
 }
 
 func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	message, err := database.Message(utils.ToInt(vars["id"]))
+	message, id, err := getMessageByID(r)
 	if err != nil {
-		sendErrorJson(err, w, r)
+		sendErrorJson(fmt.Errorf("message #%d was not found", id), w, r)
 		return
 	}
-	err = database.Delete(message)
+	err = message.Delete()
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -72,20 +75,16 @@ func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiMessageUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	message, err := database.Message(utils.ToInt(vars["id"]))
+	message, id, err := getMessageByID(r)
 	if err != nil {
-		sendErrorJson(fmt.Errorf("message #%v was not found", vars["id"]), w, r)
+		sendErrorJson(fmt.Errorf("message #%d was not found", id), w, r)
 		return
 	}
-	decoder := json.NewDecoder(r.Body)
-	err = decoder.Decode(&message)
-	if err != nil {
+	if err := DecodeJSON(r, &message); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	err = database.Update(message)
-	if err != nil {
+	if err := message.Update(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}

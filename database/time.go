@@ -22,11 +22,11 @@ func (it *Db) ParseTime(t string) (time.Time, error) {
 func (it *Db) FormatTime(t time.Time) string {
 	switch it.Type {
 	case "mysql":
-		return t.UTC().Format("2006-01-02 15:04:05")
+		return t.Format("2006-01-02 15:04:05")
 	case "postgres":
-		return t.UTC().Format("2006-01-02 15:04:05.999999999")
+		return t.Format("2006-01-02 15:04:05.999999999")
 	default:
-		return t.UTC().Format("2006-01-02 15:04:05")
+		return t.Format("2006-01-02 15:04:05")
 	}
 }
 

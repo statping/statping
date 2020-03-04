@@ -18,7 +18,7 @@ package utils
 import (
 	"fmt"
 	"github.com/fatih/structs"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/null"
 	Logger "github.com/sirupsen/logrus"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
@@ -56,7 +56,7 @@ func (t *hook) Levels() []Logger.Level {
 // ToFields accepts any amount of interfaces to create a new mapping for log.Fields. You will need to
 // turn on verbose mode by starting Statping with "-v". This function will convert a struct of to the
 // base struct name, and each field into it's own mapping, for example:
-// type "*types.Service", on string field "Name" converts to "service_name=value". There is also an
+// type "*services.Service", on string field "Name" converts to "service_name=value". There is also an
 // additional field called "_pointer" that will return the pointer hex value.
 func ToFields(d ...interface{}) map[string]interface{} {
 	if !Log.IsLevelEnabled(Logger.DebugLevel) {
@@ -83,13 +83,13 @@ func ToFields(d ...interface{}) map[string]interface{} {
 // replaceVal accepts an interface to be converted into human readable type
 func replaceVal(d interface{}) interface{} {
 	switch v := d.(type) {
-	case types.NullBool:
+	case null.NullBool:
 		return v.Bool
-	case types.NullString:
+	case null.NullString:
 		return v.String
-	case types.NullFloat64:
+	case null.NullFloat64:
 		return v.Float64
-	case types.NullInt64:
+	case null.NullInt64:
 		return v.Int64
 	case string:
 		if len(v) > 500 {

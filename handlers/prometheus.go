@@ -17,8 +17,8 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/database"
+	"github.com/hunterlong/statping/types/failures"
+	"github.com/hunterlong/statping/types/services"
 	"net/http"
 	"strings"
 )
@@ -35,21 +35,20 @@ import (
 
 func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 	metrics := []string{}
-	allFails := database.AllFailures()
+	allFails := failures.All()
 	system := fmt.Sprintf("statping_total_failures %v\n", allFails)
-	system += fmt.Sprintf("statping_total_services %v", len(core.Services()))
+	system += fmt.Sprintf("statping_total_services %v", len(services.All()))
 	metrics = append(metrics, system)
-	for _, ser := range core.Services() {
-		v := ser.Model()
+	for _, ser := range services.All() {
 		online := 1
-		if !v.Online {
+		if !ser.Online {
 			online = 0
 		}
-		met := fmt.Sprintf("statping_service_failures{id=\"%v\" name=\"%v\"} %v\n", v.Id, v.Name, v.Failures().Count())
-		met += fmt.Sprintf("statping_service_latency{id=\"%v\" name=\"%v\"} %0.0f\n", v.Id, v.Name, (v.Latency * 100))
-		met += fmt.Sprintf("statping_service_online{id=\"%v\" name=\"%v\"} %v\n", v.Id, v.Name, online)
-		met += fmt.Sprintf("statping_service_status_code{id=\"%v\" name=\"%v\"} %v\n", v.Id, v.Name, v.LastStatusCode)
-		met += fmt.Sprintf("statping_service_response_length{id=\"%v\" name=\"%v\"} %v", v.Id, v.Name, len([]byte(v.LastResponse)))
+		met := fmt.Sprintf("statping_service_failures{id=\"%v\" name=\"%v\"} %v\n", ser.Id, ser.Name, ser.AllFailures().Count())
+		met += fmt.Sprintf("statping_service_latency{id=\"%v\" name=\"%v\"} %0.0f\n", ser.Id, ser.Name, (ser.Latency * 100))
+		met += fmt.Sprintf("statping_service_online{id=\"%v\" name=\"%v\"} %v\n", ser.Id, ser.Name, online)
+		met += fmt.Sprintf("statping_service_status_code{id=\"%v\" name=\"%v\"} %v\n", ser.Id, ser.Name, ser.LastStatusCode)
+		met += fmt.Sprintf("statping_service_response_length{id=\"%v\" name=\"%v\"} %v", ser.Id, ser.Name, len([]byte(ser.LastResponse)))
 		metrics = append(metrics, met)
 	}
 	output := strings.Join(metrics, "\n")

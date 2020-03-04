@@ -18,8 +18,9 @@ package notifiers
 import (
 	"bytes"
 	"fmt"
-	"github.com/hunterlong/statping/core/notifier"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/failures"
+	"github.com/hunterlong/statping/types/notifications"
+	"github.com/hunterlong/statping/types/services"
 	"github.com/hunterlong/statping/utils"
 	"io/ioutil"
 	"net/http"
@@ -32,10 +33,10 @@ const (
 )
 
 type webhooker struct {
-	*notifier.Notification
+	*notifications.Notification
 }
 
-var Webhook = &webhooker{&notifier.Notification{
+var Webhook = &webhooker{&notifications.Notification{
 	Method:      webhookMethod,
 	Title:       "HTTP webhooker",
 	Description: "Send a custom HTTP request to a specific URL with your own body, headers, and parameters.",
@@ -43,7 +44,7 @@ var Webhook = &webhooker{&notifier.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "fas fa-code-branch",
 	Delay:       time.Duration(1 * time.Second),
-	Form: []notifier.NotificationForm{{
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "HTTP Endpoint",
 		Placeholder: "http://webhookurl.com/JW2MCP4SKQP",
@@ -87,11 +88,11 @@ func (w *webhooker) Send(msg interface{}) error {
 	return err
 }
 
-func (w *webhooker) Select() *notifier.Notification {
+func (w *webhooker) Select() *notifications.Notification {
 	return w.Notification
 }
 
-func replaceBodyText(body string, s *types.Service, f *types.Failure) string {
+func replaceBodyText(body string, s *services.Service, f *failures.Failure) string {
 	body = utils.ConvertInterface(body, s)
 	body = utils.ConvertInterface(body, f)
 	return body
@@ -129,7 +130,7 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 }
 
 func (w *webhooker) OnTest() error {
-	body := replaceBodyText(w.Var2, notifier.ExampleService, nil)
+	body := replaceBodyText(w.Var2, notifications.ExampleService, nil)
 	resp, err := w.sendHttpWebhook(body)
 	if err != nil {
 		return err
@@ -141,13 +142,13 @@ func (w *webhooker) OnTest() error {
 }
 
 // OnFailure will trigger failing service
-func (w *webhooker) OnFailure(s *types.Service, f *types.Failure) {
+func (w *webhooker) OnFailure(s *services.Service, f *failures.Failure) {
 	msg := replaceBodyText(w.Var2, s, f)
 	w.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
 // OnSuccess will trigger successful service
-func (w *webhooker) OnSuccess(s *types.Service) {
+func (w *webhooker) OnSuccess(s *services.Service) {
 	if !s.Online {
 		w.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
 		msg := replaceBodyText(w.Var2, s, nil)

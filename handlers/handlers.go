@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/hunterlong/statping/types/core"
 	"html/template"
 	"net/http"
 	"os"
@@ -29,7 +30,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hunterlong/statping/core"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/utils"
 )
@@ -98,25 +98,24 @@ func RunHTTPServer(ip string, port int) error {
 		httpServer.SetKeepAlivesEnabled(false)
 		return httpServer.ListenAndServe()
 	}
-	return nil
 }
 
 // IsReadAuthenticated will allow Read Only authentication for some routes
 func IsReadAuthenticated(r *http.Request) bool {
-	if !core.CoreApp.Setup {
+	if !core.App.Setup {
 		return false
 	}
 	var token string
 	query := r.URL.Query()
 	key := query.Get("api")
-	if subtle.ConstantTimeCompare([]byte(key), []byte(core.CoreApp.ApiSecret)) == 1 {
+	if subtle.ConstantTimeCompare([]byte(key), []byte(core.App.ApiSecret)) == 1 {
 		return true
 	}
 	tokens, ok := r.Header["Authorization"]
 	if ok && len(tokens) >= 1 {
 		token = tokens[0]
 		token = strings.TrimPrefix(token, "Bearer ")
-		if subtle.ConstantTimeCompare([]byte(token), []byte(core.CoreApp.ApiSecret)) == 1 {
+		if subtle.ConstantTimeCompare([]byte(token), []byte(core.App.ApiSecret)) == 1 {
 			return true
 		}
 	}
@@ -129,10 +128,10 @@ func IsFullAuthenticated(r *http.Request) bool {
 	if os.Getenv("GO_ENV") == "test" {
 		return true
 	}
-	if core.CoreApp == nil {
+	if core.App == nil {
 		return true
 	}
-	if !core.CoreApp.Setup {
+	if !core.App.Setup {
 		return false
 	}
 	var token string
@@ -140,7 +139,7 @@ func IsFullAuthenticated(r *http.Request) bool {
 	if ok && len(tokens) >= 1 {
 		token = tokens[0]
 		token = strings.TrimPrefix(token, "Bearer ")
-		if subtle.ConstantTimeCompare([]byte(token), []byte(core.CoreApp.ApiSecret)) == 1 {
+		if subtle.ConstantTimeCompare([]byte(token), []byte(core.App.ApiSecret)) == 1 {
 			return true
 		}
 	}
@@ -185,7 +184,7 @@ func ScopeName(r *http.Request) string {
 
 // IsAdmin returns true if the user session is an administrator
 func IsAdmin(r *http.Request) bool {
-	if !core.CoreApp.Setup {
+	if !core.App.Setup {
 		return false
 	}
 	if os.Getenv("GO_ENV") == "test" {
@@ -200,7 +199,7 @@ func IsAdmin(r *http.Request) bool {
 
 // IsUser returns true if the user is registered
 func IsUser(r *http.Request) bool {
-	if !core.CoreApp.Setup {
+	if !core.App.Setup {
 		return false
 	}
 	if os.Getenv("GO_ENV") == "test" {
@@ -275,7 +274,7 @@ func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 	//	"safe": func(html string) template.HTML {
 	//		return template.HTML(html)
 	//	},
-	//	"Services": func() []types.ServiceInterface {
+	//	"Services": func() []services.ServiceInterface {
 	//		return core.CoreApp.Services
 	//	},
 	//})
