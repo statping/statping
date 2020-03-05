@@ -87,6 +87,8 @@ func isIPv6(address string) bool {
 
 // checkIcmp will send a ICMP ping packet to the service
 func CheckIcmp(s *Service, record bool) *Service {
+	defer s.updateLastCheck()
+
 	p := fastping.NewPinger()
 	resolveIP := "ip4:icmp"
 	if isIPv6(s.Domain) {
@@ -113,6 +115,8 @@ func CheckIcmp(s *Service, record bool) *Service {
 
 // checkTcp will check a TCP service
 func CheckTcp(s *Service, record bool) *Service {
+	defer s.updateLastCheck()
+
 	dnsLookup, err := dnsCheck(s)
 	if err != nil {
 		if record {
@@ -151,8 +155,14 @@ func CheckTcp(s *Service, record bool) *Service {
 	return s
 }
 
+func (s *Service) updateLastCheck() {
+	s.LastCheck = time.Now()
+}
+
 // checkHttp will check a HTTP service
 func CheckHttp(s *Service, record bool) *Service {
+	defer s.updateLastCheck()
+
 	dnsLookup, err := dnsCheck(s)
 	if err != nil {
 		if record {
@@ -229,12 +239,16 @@ func recordSuccess(s *Service) {
 	}
 	log.WithFields(utils.ToFields(hit, s)).Infoln(
 		fmt.Sprintf("Service #%d '%v' Successful Response: %0.2f ms | Lookup in: %0.2f ms | Online: %v | Interval: %d seconds", s.Id, s.Name, hit.Latency*1000, hit.PingTime*1000, s.Online, s.Interval))
+	s.LastLookupTime = int64(hit.PingTime * 1000)
+	s.LastLatency = int64(hit.Latency * 1000)
 	//notifier.OnSuccess(s)
 	s.SuccessNotified = true
 }
 
 // recordFailure will create a new 'Failure' record in the database for a offline service
 func recordFailure(s *Service, issue string) {
+	s.LastOffline = time.Now().UTC()
+
 	fail := &failures.Failure{
 		Service:   s.Id,
 		Issue:     issue,

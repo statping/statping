@@ -58,9 +58,16 @@ type Service struct {
 	SuccessNotified     bool                `gorm:"-" json:"-"`                                                                          // Is 'true' if the user has already be informed that the Services now again available
 	LastStatusCode      int                 `gorm:"-" json:"status_code"`
 	LastOnline          time.Time           `gorm:"-" json:"last_success"`
+	LastOffline         time.Time           `gorm:"-" json:"last_error"`
 	Failures            []*failures.Failure `gorm:"-" json:"failures,omitempty" scope:"user,admin"`
 	AllCheckins         []*checkins.Checkin `gorm:"-" json:"checkins,omitempty" scope:"user,admin"`
 	Stats               *Stats              `gorm:"-" json:"stats,omitempty"`
+	LastLookupTime      int64               `gorm:"-" json:"-"`
+	LastLatency         int64               `gorm:"-" json:"-"`
+	LastCheck           time.Time           `gorm:"-" json:"-"`
+
+	SecondsOnline  int64 `gorm:"-" json:"-"`
+	SecondsOffline int64 `gorm:"-" json:"-"`
 }
 
 type Stats struct {

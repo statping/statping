@@ -63,7 +63,13 @@ type Notification struct {
 	Running     chan bool          `gorm:"-" json:"-"`
 	testable    bool               `gorm:"-" json:"testable"`
 
+	Hits notificationHits
 	Notifier
+}
+
+type notificationHits struct {
+	onSuccess int64 `gorm:"-" json:"-"`
+	onFailure int64 `gorm:"-" json:"-"`
 }
 
 // QueueData is the struct for the messaging queue with service

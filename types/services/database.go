@@ -21,10 +21,14 @@ func Find(id int64) (*Service, error) {
 	return srv, nil
 }
 
-func All() []*Service {
+func all() []*Service {
 	var services []*Service
 	DB().Find(&services)
 	return services
+}
+
+func All() map[int64]*Service {
+	return allServices
 }
 
 func (s *Service) Create() error {

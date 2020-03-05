@@ -28,13 +28,13 @@ import (
 // ExportChartsJs renders the charts for the index page
 
 type ExportData struct {
-	Core      *core.Core          `json:"core"`
-	Services  []*services.Service `json:"services"`
-	Messages  []*messages.Message `json:"messages"`
-	Checkins  []*checkins.Checkin `json:"checkins"`
-	Users     []*users.User       `json:"users"`
-	Groups    []*groups.Group     `json:"groups"`
-	Notifiers []core.AllNotifiers `json:"notifiers"`
+	Core      *core.Core                  `json:"core"`
+	Services  map[int64]*services.Service `json:"services"`
+	Messages  []*messages.Message         `json:"messages"`
+	Checkins  []*checkins.Checkin         `json:"checkins"`
+	Users     []*users.User               `json:"users"`
+	Groups    []*groups.Group             `json:"groups"`
+	Notifiers []core.AllNotifiers         `json:"notifiers"`
 }
 
 // ExportSettings will export a JSON file containing all of the settings below:
@@ -51,7 +51,7 @@ func ExportSettings() ([]byte, error) {
 		//Notifiers: notifications.All(),
 		Checkins: checkins.All(),
 		Users:    users.All(),
-		Services: services.All(),
+		Services: services.Services(),
 		Groups:   groups.All(),
 		Messages: messages.All(),
 	}

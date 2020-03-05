@@ -374,7 +374,9 @@ func SaveFile(filename string, data []byte) error {
 func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool) ([]byte, *http.Response, error) {
 	var err error
 	var req *http.Request
+	t1 := time.Now()
 	if req, err = http.NewRequest(method, url, body); err != nil {
+		httpMetric.Errors++
 		return nil, nil, err
 	}
 	req.Header.Set("User-Agent", "Statping")
@@ -424,10 +426,18 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	}
 
 	if resp, err = client.Do(req); err != nil {
+		httpMetric.Errors++
 		return nil, resp, err
 	}
 	defer resp.Body.Close()
 	contents, err := ioutil.ReadAll(resp.Body)
+
+	// record HTTP metrics
+	t2 := time.Now().Sub(t1).Milliseconds()
+	httpMetric.Requests++
+	httpMetric.Milliseconds += t2 / httpMetric.Requests
+	httpMetric.Bytes += int64(len(contents))
+
 	return contents, resp, err
 }
 
