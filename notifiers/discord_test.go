@@ -16,6 +16,7 @@
 package notifiers
 
 import (
+	"github.com/hunterlong/statping/types/notifications"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -89,7 +90,7 @@ func TestDiscordNotifier(t *testing.T) {
 	})
 
 	t.Run("discord Queue", func(t *testing.T) {
-		go notifier.Queue(Discorder)
+		go notifications.Queue(Discorder)
 		time.Sleep(1 * time.Second)
 		assert.Equal(t, DISCORD_URL, Discorder.Host)
 		assert.Equal(t, 0, len(Discorder.Queue))

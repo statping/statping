@@ -16,8 +16,7 @@
 package services
 
 import (
-	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/checkins"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -25,19 +24,20 @@ import (
 )
 
 var (
-	testCheckin *Checkin
+	testCheckin *checkins.Checkin
 )
 
 func TestCreateCheckin(t *testing.T) {
-	service := SelectService(1)
-	checkin := &types.Checkin{
+	service, err := Find(2)
+	require.Nil(t, err)
+	checkin := &checkins.Checkin{
 		ServiceId:   service.Id,
 		Interval:    10,
 		GracePeriod: 5,
 	}
-	id, err := database.Create(checkin)
-	assert.Nil(t, err)
-	assert.NotZero(t, id)
+	err = checkin.Create()
+	require.Nil(t, err)
+	assert.NotZero(t, checkin.Id)
 	assert.NotEmpty(t, testCheckin.ApiKey)
 	assert.Equal(t, int64(10), testCheckin.Interval)
 	assert.Equal(t, int64(5), testCheckin.GracePeriod)
@@ -45,11 +45,12 @@ func TestCreateCheckin(t *testing.T) {
 }
 
 func TestSelectCheckin(t *testing.T) {
-	service := SelectService(1)
-	checkins := service.Checkins()
-	assert.NotNil(t, checkins)
-	assert.Equal(t, 1, len(checkins))
-	c := checkins[0]
+	service, err := Find(2)
+	require.Nil(t, err)
+	chks := service.Checkins()
+	assert.NotNil(t, chks)
+	assert.Equal(t, 1, len(chks))
+	c := chks[0]
 	assert.Equal(t, int64(10), c.Interval)
 	assert.Equal(t, int64(5), c.GracePeriod)
 	assert.Equal(t, 7, len(c.ApiKey))
@@ -58,11 +59,13 @@ func TestSelectCheckin(t *testing.T) {
 func TestUpdateCheckin(t *testing.T) {
 	testCheckin.Interval = 60
 	testCheckin.GracePeriod = 15
-	err := database.Update(testCheckin)
-	assert.Nil(t, err)
+	err := testCheckin.Update()
+	require.Nil(t, err)
 	assert.NotZero(t, testCheckin.Id)
 	assert.NotEmpty(t, testCheckin.ApiKey)
-	service := SelectService(1)
+
+	service, err := Find(1)
+	require.Nil(t, err)
 	checkin := service.Checkins()[0]
 	assert.Equal(t, int64(60), checkin.Interval)
 	assert.Equal(t, int64(15), checkin.GracePeriod)
@@ -71,16 +74,17 @@ func TestUpdateCheckin(t *testing.T) {
 }
 
 func TestCreateCheckinHits(t *testing.T) {
-	service := SelectService(1)
-	checkins := service.Checkins()
-	assert.Equal(t, 1, len(checkins))
+	service, err := Find(1)
+	require.Nil(t, err)
+	check := service.Checkins()
+	assert.Equal(t, 1, len(check))
 	created := time.Now().UTC().Add(-60 * time.Second)
-	hit := &types.CheckinHit{
+	hit := &checkins.CheckinHit{
 		Checkin:   testCheckin.Id,
 		From:      "192.168.1.1",
 		CreatedAt: created,
 	}
-	_, err := database.Create(hit)
+	err = hit.Create()
 	require.Nil(t, err)
 
 	checks := service.Checkins()
@@ -89,7 +93,8 @@ func TestCreateCheckinHits(t *testing.T) {
 
 func TestSelectCheckinMethods(t *testing.T) {
 	time.Sleep(5 * time.Second)
-	service := SelectService(1)
+	service, err := Find(1)
+	require.Nil(t, err)
 	checkins := service.Checkins()
 	assert.NotNil(t, checkins)
 	assert.Equal(t, float64(60), testCheckin.Period().Seconds())

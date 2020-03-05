@@ -80,7 +80,7 @@ func TestSetupRoutes(t *testing.T) {
 			Body:           form.Encode(),
 			ExpectedStatus: 200,
 			HttpHeaders:    []string{"Content-Type=application/x-www-form-urlencoded"},
-			ExpectedFiles:  []string{dir + "/config.yml", dir + "/handlers/" + "statping.db"},
+			ExpectedFiles:  []string{dir + "/config.yml", dir + "/" + "statping.db"},
 			FuncTest: func() error {
 				if !core.App.Setup {
 					return errors.New("core has not been setup")
@@ -107,7 +107,7 @@ func TestMainApiRoutes(t *testing.T) {
 			URL:              "/api",
 			Method:           "GET",
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"description":"This is an awesome test"`},
+			ExpectedContains: []string{`"description":"This data is only used to testing"`},
 			FuncTest: func() error {
 				if !core.App.Setup {
 					return errors.New("database is not setup")

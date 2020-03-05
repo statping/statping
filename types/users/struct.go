@@ -2,6 +2,7 @@ package users
 
 import (
 	"github.com/hunterlong/statping/types/null"
+	"github.com/hunterlong/statping/utils"
 	"time"
 )
 
@@ -20,6 +21,8 @@ type User struct {
 
 // BeforeCreate for User will set CreatedAt to UTC
 func (u *User) BeforeCreate() (err error) {
+	u.ApiKey = utils.RandomString(16)
+	u.ApiSecret = utils.RandomString(16)
 	if u.CreatedAt.IsZero() {
 		u.CreatedAt = time.Now().UTC()
 		u.UpdatedAt = time.Now().UTC()

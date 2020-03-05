@@ -17,37 +17,37 @@ package users
 
 import (
 	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/null"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestCreateUser(t *testing.T) {
-	user := &types.User{
+	user := &User{
 		Username: "hunter",
 		Password: "password123",
 		Email:    "test@email.com",
-		Admin:    types.NewNullBool(true),
+		Admin:    null.NewNullBool(true),
 	}
-	obj, err := database.Create(user)
+	err := user.Create()
 	assert.Nil(t, err)
-	assert.NotZero(t, obj.Id)
+	assert.NotZero(t, user.Id)
 }
 
 func TestSelectAllUsers(t *testing.T) {
-	users := SelectAllUsers()
+	users := All()
 	assert.Equal(t, 3, len(users))
 }
 
 func TestSelectUser(t *testing.T) {
-	user, err := SelectUser(1)
+	user, err := Find(1)
 	assert.Nil(t, err)
 	assert.Equal(t, "info@betatude.com", user.Email)
 	assert.True(t, user.Admin.Bool)
 }
 
 func TestSelectUsername(t *testing.T) {
-	user, err := SelectUsername("hunter")
+	user, err := FindByUsername("hunter")
 	assert.Nil(t, err)
 	assert.Equal(t, "test@email.com", user.Email)
 	assert.Equal(t, int64(3), user.Id)
@@ -55,30 +55,30 @@ func TestSelectUsername(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
-	user, err := SelectUser(1)
+	user, err := Find(1)
 	assert.Nil(t, err)
 	user.Username = "updated"
 	err = user.Update()
 	assert.Nil(t, err)
-	updatedUser, err := SelectUser(1)
+	updatedUser, err := Find(1)
 	assert.Nil(t, err)
 	assert.Equal(t, "updated", updatedUser.Username)
 }
 
 func TestCreateUser2(t *testing.T) {
-	user := &types.User{
+	user := &User{
 		Username: "hunterlong",
 		Password: "password123",
 		Email:    "User@email.com",
-		Admin:    types.NewNullBool(true),
+		Admin:    null.NewNullBool(true),
 	}
-	obj, err := database.Create(user)
+	err := user.Create()
 	assert.Nil(t, err)
-	assert.NotZero(t, obj.Id)
+	assert.NotZero(t, user.Id)
 }
 
 func TestSelectAllUsersAgain(t *testing.T) {
-	users := SelectAllUsers()
+	users := All()
 	assert.Equal(t, 4, len(users))
 }
 
@@ -98,14 +98,14 @@ func TestFailedAuthUser(t *testing.T) {
 }
 
 func TestCheckPassword(t *testing.T) {
-	user, err := SelectUser(2)
+	user, err := Find(2)
 	assert.Nil(t, err)
 	pass := CheckHash("password123", user.Password)
 	assert.True(t, pass)
 }
 
 func TestDeleteUser(t *testing.T) {
-	user, err := SelectUser(2)
+	user, err := Find(2)
 	assert.Nil(t, err)
 	err = user.Delete()
 	assert.Nil(t, err)

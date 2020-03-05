@@ -18,7 +18,6 @@ package notifications
 import (
 	"fmt"
 	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/types/core"
 	"github.com/hunterlong/statping/types/failures"
 	"github.com/hunterlong/statping/types/null"
 	"github.com/hunterlong/statping/types/services"
@@ -55,10 +54,6 @@ var user = &users.User{
 	Email:    "info@email.com",
 }
 
-var testCore = &core.Core{
-	Name: "testing notifiers",
-}
-
 func injectDatabase() {
 	sqlPath := dir + "/notifier.db"
 	utils.DeleteFile(sqlPath)
@@ -71,14 +66,15 @@ func TestIsBasicType(t *testing.T) {
 	assert.True(t, utils.IsType(example, new(BasicEvents)))
 	assert.True(t, utils.IsType(example, new(ServiceEvents)))
 	assert.True(t, utils.IsType(example, new(UserEvents)))
-	assert.True(t, utils.IsType(example, new(CoreEvents)))
 	assert.True(t, utils.IsType(example, new(NotifierEvents)))
 	assert.True(t, utils.IsType(example, new(Tester)))
 }
 
 func TestSelectNotification(t *testing.T) {
-	notifier, err := SelectNotification(example)
+	notifier, notif, err := SelectNotifier(example.Method)
 	assert.Nil(t, err)
+	assert.NotNil(t, notifier)
+	assert.NotNil(t, notif)
 	assert.Equal(t, "example", notifier.Method)
 	assert.False(t, notifier.Enabled.Bool)
 	assert.False(t, notifier.IsRunning())
@@ -199,11 +195,6 @@ func TestOnDeletedUser(t *testing.T) {
 	assert.Equal(t, 9, len(example.Queue))
 }
 
-func TestOnUpdatedCore(t *testing.T) {
-	OnUpdatedCore(testCore)
-	assert.Equal(t, 10, len(example.Queue))
-}
-
 func TestOnUpdatedNotifier(t *testing.T) {
 	OnUpdatedNotifier(example.Select())
 	assert.Equal(t, 11, len(example.Queue))
@@ -215,7 +206,7 @@ func TestRunAllQueueAndStop(t *testing.T) {
 	go Queue(example)
 	time.Sleep(13 * time.Second)
 	assert.NotZero(t, len(example.Queue))
-	example.close()
+	example.Close()
 	assert.False(t, example.IsRunning())
 	assert.NotZero(t, len(example.Queue))
 }

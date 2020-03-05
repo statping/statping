@@ -91,7 +91,6 @@ func init() {
 	source.Assets()
 	utils.InitLogs()
 	injectDatabase()
-	AddNotifiers(example)
 }
 
 // Send is the main function to hold your notifier functionality
@@ -167,18 +166,6 @@ func (n *ExampleNotifier) OnDeletedUser(s *users.User) {
 	n.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
 }
 
-//// OnUpdatedCore is a option event when the settings are updated
-//func (n *ExampleNotifier) OnUpdatedCore(c *core.Core) {
-//	msg := fmt.Sprintf("received a updated core trigger for core: %v\n", c.Name)
-//	n.AddQueue("core", msg)
-//}
-//
-//// OnStart is triggered when statup has been started
-//func (n *ExampleNotifier) OnStart(c *core.Core) {
-//	msg := fmt.Sprintf("received a trigger on Statping boot: %v\n", c.Name)
-//	n.AddQueue(fmt.Sprintf("core"), msg)
-//}
-
 // OnNewNotifier is triggered when a new notifier has initialized
 func (n *ExampleNotifier) OnNewNotifier(s *Notification) {
 	msg := fmt.Sprintf("received a new notifier trigger for notifier: %v\n", s.Method)
@@ -189,138 +176,4 @@ func (n *ExampleNotifier) OnNewNotifier(s *Notification) {
 func (n *ExampleNotifier) OnUpdatedNotifier(s *Notification) {
 	msg := fmt.Sprintf("received a update notifier trigger for notifier: %v\n", s.Method)
 	n.AddQueue(fmt.Sprintf("notifier_%v", s.Id), msg)
-}
-
-// Create a new notifier that includes a form for the end user to insert their own values
-func ExampleNotification() {
-	// Create a new variable for your Notifier
-	example = &ExampleNotifier{&Notification{
-		Method:      "Example",
-		Title:       "Example Notifier",
-		Description: "Example Notifier can hold many different types of fields for a customized look.",
-		Author:      "Hunter Long",
-		AuthorUrl:   "https://github.com/hunterlong",
-		Delay:       time.Duration(1500 * time.Millisecond),
-		Limits:      7,
-		Form: []NotificationForm{{
-			Type:        "text",
-			Title:       "Host",
-			Placeholder: "Insert your Host here.",
-			DbField:     "host",
-			SmallText:   "you can also use SmallText to insert some helpful hints under this input",
-		}, {
-			Type:        "text",
-			Title:       "API Key",
-			Placeholder: "Include some type of API key here",
-			DbField:     "api_key",
-		}},
-	}}
-
-	// AddNotifier accepts a Notifier to load into the Statping Notification system
-	err := AddNotifiers(example)
-	fmt.Println(err)
-	// Output: <nil>
-}
-
-// Add a Notifier to the AddQueue function to insert it into the system
-func ExampleAddNotifier() {
-	err := AddNotifiers(example)
-	fmt.Println(err)
-	// Output: <nil>
-}
-
-// OnSuccess will be triggered everytime a service is online
-func ExampleNotification_OnSuccess() {
-	msg := fmt.Sprintf("this is a successful message as a string passing into AddQueue function")
-	example.AddQueue("example", msg)
-	fmt.Println(len(example.Queue))
-	// Output:
-	// 1
-}
-
-// Add a new message into the queue OnSuccess
-func ExampleOnSuccess() {
-	msg := fmt.Sprintf("received a count trigger for service: %v\n", service.Name)
-	example.AddQueue("example", msg)
-}
-
-// Add a new message into the queue OnFailure
-func ExampleOnFailure() {
-	msg := fmt.Sprintf("received a failing service: %v\n", service.Name)
-	example.AddQueue("example", msg)
-}
-
-// OnTest allows your notifier to be testable
-func ExampleOnTest() {
-	err := example.OnTest()
-	fmt.Print(err)
-	// Output <nil>
-}
-
-// Implement the Test interface to give your notifier testing abilities
-func ExampleNotification_CanTest() {
-	testable := example.CanTest()
-	fmt.Print(testable)
-	// Output: true
-}
-
-// Add any type of interface to the AddQueue function to be ran in the queue
-func ExampleNotification_AddQueue() {
-	msg := fmt.Sprintf("this is a failing message as a string passing into AddQueue function")
-	example.AddQueue("example", msg)
-	queue := example.Queue
-	fmt.Printf("Example has %v items in the queue", len(queue))
-	// Output:
-	// Example has 2 items in the queue
-}
-
-// The Send method will run the main functionality of your notifier
-func ExampleNotification_Send() {
-	msg := "this can be any type of interface"
-	example.Send(msg)
-	queue := example.Queue
-	fmt.Printf("Example has %v items in the queue", len(queue))
-	// Output:
-	// i received this string: this can be any type of interface
-	// Example has 2 items in the queue
-}
-
-// LastSent will return the time.Duration of the last sent message
-func ExampleNotification_LastSent() {
-	last := example.LastSent()
-	fmt.Printf("Last message was sent %v seconds ago", last.Seconds())
-	// Output: Last message was sent 0 seconds ago
-}
-
-// Logs will return a slice of previously sent items from your notifier
-func ExampleNotification_Logs() {
-	logs := example.Logs()
-	fmt.Printf("Example has %v items in the log", len(logs))
-	// Output: Example has 0 items in the log
-}
-
-// SentLastMinute will return he amount of notifications sent in last 1 minute
-func ExampleNotification_SentLastMinute() {
-	lastMinute := example.SentLastMinute()
-	fmt.Printf("%v notifications sent in the last minute", lastMinute)
-	// Output: 0 notifications sent in the last minute
-}
-
-// SentLastHour will return he amount of notifications sent in last 1 hour
-func ExampleNotification_SentLastHour() {
-	lastHour := example.SentLastHour()
-	fmt.Printf("%v notifications sent in the last hour", lastHour)
-	// Output: 0 notifications sent in the last hour
-}
-
-// SentLastHour will return he amount of notifications sent in last 1 hour
-func ExampleNotification_WithinLimits() {
-	ok, err := example.WithinLimits()
-	if err != nil {
-		panic(err)
-	}
-	if ok {
-		fmt.Printf("Example notifier is still within its sending limits")
-	}
-	// Output: Example notifier is still within its sending limits
 }

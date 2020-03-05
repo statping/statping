@@ -56,7 +56,11 @@ export default {
             if (s.online) {
                 return `Online, last checked ${this.ago(this.parseTime(s.last_success))}`
             } else {
-                return `Offline, last error: ${s.last_failure.issue} ${this.ago(this.parseTime(s.last_failure.created_at))}`
+                const last = s.last_failure
+                if (last) {
+                    return `Offline, last error: ${last} ${this.ago(this.parseTime(last.created_at))}`
+                }
+                return `Offline`
             }
         },
         visibleChart(isVisible, entry) {

@@ -18,7 +18,6 @@ package notifiers
 import (
 	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/source"
-	"github.com/hunterlong/statping/types/core"
 	"github.com/hunterlong/statping/types/failures"
 	"github.com/hunterlong/statping/types/notifications"
 	"github.com/hunterlong/statping/types/null"
@@ -61,10 +60,6 @@ var TestFailure = &failures.Failure{
 var TestUser = &users.User{
 	Username: "admin",
 	Email:    "info@email.com",
-}
-
-var TestCore = &core.Core{
-	Name: "testing notifiers",
 }
 
 func CountNotifiers() int {

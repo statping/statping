@@ -7,9 +7,9 @@ func DB() database.Database {
 }
 
 func Find(id int64) (*Message, error) {
-	var user *Message
-	db := DB().Where("id = ?", id).Find(&user)
-	return user, db.Error()
+	var message Message
+	db := DB().Where("id = ?", id).Find(&message)
+	return &message, db.Error()
 }
 
 func All() []*Message {

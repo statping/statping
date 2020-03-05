@@ -12,7 +12,7 @@ func TestApiUsersRoutes(t *testing.T) {
 			URL:            "/api/users",
 			Method:         "GET",
 			ExpectedStatus: 200,
-			ResponseLen:    1,
+			ResponseLen:    4,
 		}, {
 			Name:        "Statping Create User",
 			URL:         "/api/users",
@@ -45,6 +45,24 @@ func TestApiUsersRoutes(t *testing.T) {
 			Name:           "Statping Delete User",
 			URL:            "/api/users/1",
 			Method:         "DELETE",
+			ExpectedStatus: 200,
+		}, {
+			Name:   "Statping Login User",
+			URL:    "/api/login",
+			Method: "POST",
+			Body: `{
+    "username": "admin",
+    "password": "admin"
+}`, ExpectedContains: []string{`"token"`},
+			ExpectedStatus: 200,
+		}, {
+			Name:   "Statping Bad Login User",
+			URL:    "/api/login",
+			Method: "POST",
+			Body: `{
+    "username": "admin",
+    "password": "wrongpassword"
+}`, ExpectedContains: []string{`"token"`},
 			ExpectedStatus: 200,
 		}}
 

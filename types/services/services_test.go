@@ -16,8 +16,7 @@
 package services
 
 import (
-	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/types/failures"
 	"github.com/hunterlong/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -38,9 +37,9 @@ func TestSelectHTTPService(t *testing.T) {
 }
 
 func TestSelectAllServices(t *testing.T) {
-	services := CoreApp.services
+	services := All()
 	for _, s := range services {
-		CheckService(s, false)
+		s.CheckService(false)
 		assert.False(t, s.IsRunning())
 		t.Logf("ID: %v %v\n", s.Id, s.Name)
 	}
@@ -48,32 +47,35 @@ func TestSelectAllServices(t *testing.T) {
 }
 
 func TestServiceDowntime(t *testing.T) {
-	t.SkipNow()
-	service := SelectService(15)
+	service, err := Find(15)
+	require.Nil(t, err)
 	downtime := service.Downtime()
 	assert.True(t, downtime.Seconds() > 0)
 }
 
 func TestSelectTCPService(t *testing.T) {
-	services := CoreApp.services
+	services := All()
 	assert.Equal(t, 15, len(services))
-	service := SelectService(5)
+	service, err := Find(5)
+	require.Nil(t, err)
 	assert.NotNil(t, service)
 	assert.Equal(t, "Google DNS", service.Name)
 	assert.Equal(t, "tcp", service.Type)
 }
 
 func TestUpdateService(t *testing.T) {
-	service := SelectService(1)
+	service, err := Find(1)
+	require.Nil(t, err)
 	assert.Equal(t, "Google", service.Name)
 	service.Name = "Updated Google"
 	service.Interval = 5
 
-	err := database.Update(service)
+	err = service.Update()
 	require.Nil(t, err)
 
 	// check if updating pointer array shutdown any other service
-	service = SelectService(1)
+	service, err = Find(1)
+	require.Nil(t, err)
 	assert.Equal(t, "Updated Google", service.Name)
 	assert.Equal(t, 5, service.Interval)
 }
@@ -86,21 +88,23 @@ func TestUpdateAllServices(t *testing.T) {
 		srv.Name = "Changed " + srv.Name
 		srv.Interval = i + 3
 
-		err := database.Update(srv)
+		err := srv.Update()
 		require.Nil(t, err)
 		i++
 	}
 }
 
 func TestServiceHTTPCheck(t *testing.T) {
-	service := SelectService(1)
-	CheckService(service, true)
+	service, err := Find(1)
+	require.Nil(t, err)
+	service.CheckService(true)
 	assert.Equal(t, "Changed Updated Google", service.Name)
 	assert.True(t, service.Online)
 }
 
 func TestCheckHTTPService(t *testing.T) {
-	service := SelectService(1)
+	service, err := Find(1)
+	require.Nil(t, err)
 	assert.Equal(t, "Changed Updated Google", service.Name)
 	assert.True(t, service.Online)
 	assert.Equal(t, 200, service.LastStatusCode)
@@ -109,14 +113,16 @@ func TestCheckHTTPService(t *testing.T) {
 }
 
 func TestServiceTCPCheck(t *testing.T) {
-	service := SelectService(5)
-	CheckService(service, true)
+	service, err := Find(5)
+	require.Nil(t, err)
+	service.CheckService(false)
 	assert.Equal(t, "Changed Google DNS", service.Name)
 	assert.True(t, service.Online)
 }
 
 func TestCheckTCPService(t *testing.T) {
-	service := SelectService(5)
+	service, err := Find(5)
+	require.Nil(t, err)
 	assert.Equal(t, "Changed Google DNS", service.Name)
 	assert.True(t, service.Online)
 	assert.NotZero(t, service.Latency)
@@ -125,28 +131,32 @@ func TestCheckTCPService(t *testing.T) {
 
 func TestServiceOnline24Hours(t *testing.T) {
 	since := utils.Now().Add(-24 * time.Hour).Add(-10 * time.Minute)
-	service := SelectService(1)
+	service, err := Find(1)
+	require.Nil(t, err)
 	assert.Equal(t, float32(100), service.OnlineSince(since))
-	service2 := SelectService(5)
+	service2, err := Find(5)
+	require.Nil(t, err)
 	assert.Equal(t, float32(100), service2.OnlineSince(since))
-	service3 := SelectService(14)
+	service3, err := Find(14)
+	require.Nil(t, err)
 	assert.True(t, service3.OnlineSince(since) > float32(49))
 }
 
 func TestServiceAvgUptime(t *testing.T) {
 	since := utils.Now().Add(-24 * time.Hour).Add(-10 * time.Minute)
-	service := SelectService(1)
+	service, err := Find(1)
+	require.Nil(t, err)
 	assert.NotEqual(t, "0.00", service.AvgTime())
-	service2 := SelectService(5)
+	service2, err := Find(5)
 	assert.Equal(t, "100", service2.AvgTime())
-	service3 := SelectService(13)
+	service3, err := Find(13)
 	assert.NotEqual(t, "0", service3.AvgUptime(since))
-	service4 := SelectService(15)
+	service4, err := Find(15)
 	assert.NotEqual(t, "0", service4.AvgUptime(since))
 }
 
 func TestCreateService(t *testing.T) {
-	s := &services.Service{
+	s := &Service{
 		Name:           "That'll do 🐢",
 		Domain:         "https://www.youtube.com/watch?v=rjQtzV9IZ0Q",
 		ExpectedStatus: 200,
@@ -156,20 +166,21 @@ func TestCreateService(t *testing.T) {
 		Timeout:        20,
 		GroupId:        1,
 	}
-	obj, err := database.Create(s)
+	err := s.Create()
 	require.Nil(t, err)
-	assert.NotZero(t, obj.Id)
-	newService := SelectService(obj.Id)
+	assert.NotZero(t, s.Id)
+	newService, err := Find(s.Id)
 	assert.Equal(t, "That'll do 🐢", newService.Name)
 }
 
 func TestViewNewService(t *testing.T) {
-	newService := SelectService(newServiceId)
+	newService, err := Find(newServiceId)
+	require.Nil(t, err)
 	assert.Equal(t, "That'll do 🐢", newService.Name)
 }
 
 func TestCreateFailingHTTPService(t *testing.T) {
-	s := &services.Service{
+	s := &Service{
 		Name:           "Bad URL",
 		Domain:         "http://localhost/iamnothere",
 		ExpectedStatus: 200,
@@ -179,24 +190,26 @@ func TestCreateFailingHTTPService(t *testing.T) {
 		Timeout:        5,
 		GroupId:        1,
 	}
-	obj, err := database.Create(s)
+	err := s.Create()
 	require.Nil(t, err)
-	assert.NotZero(t, obj.Id)
-	newService := SelectService(obj.Id)
+	assert.NotZero(t, s.Id)
+	newService, err := Find(s.Id)
+	require.Nil(t, err)
 	assert.Equal(t, "Bad URL", newService.Name)
 	t.Log("new service ID: ", newServiceId)
 }
 
 func TestServiceFailedCheck(t *testing.T) {
-	service := SelectService(17)
+	service, err := Find(17)
+	require.Nil(t, err)
 	assert.Equal(t, "Bad URL", service.Name)
-	CheckService(service, false)
+	service.CheckService(false)
 	assert.Equal(t, "Bad URL", service.Name)
 	assert.False(t, service.Online)
 }
 
 func TestCreateFailingTCPService(t *testing.T) {
-	s := &services.Service{
+	s := &Service{
 		Name:     "Bad TCP",
 		Domain:   "localhost",
 		Port:     5050,
@@ -205,36 +218,37 @@ func TestCreateFailingTCPService(t *testing.T) {
 		Timeout:  5,
 		GroupId:  1,
 	}
-	var err error
-	obj, err := database.Create(s)
+	err := s.Create()
 	assert.Nil(t, err)
-	assert.NotZero(t, obj.Id)
-	newService := SelectService(obj.Id)
+	assert.NotZero(t, s.Id)
+	newService, err := Find(s.Id)
+	require.Nil(t, err)
 	assert.Equal(t, "Bad TCP", newService.Name)
 	t.Log("new failing tcp service ID: ", newServiceId)
 }
 
 func TestServiceFailedTCPCheck(t *testing.T) {
-	service := SelectService(newServiceId)
-	CheckService(service, false)
-	assert.Equal(t, "Bad TCP", service.Name)
-	assert.False(t, service.Online)
+	srv, err := Find(newServiceId)
+	require.Nil(t, err)
+	srv.CheckService(false)
+	assert.Equal(t, "Bad TCP", srv.Name)
+	assert.False(t, srv.Online)
 }
 
 func TestCreateServiceFailure(t *testing.T) {
-	service := SelectService(8)
-	fail := &types.Failure{
+	service, err := Find(8)
+	fail := &failures.Failure{
 		Issue:   "This is not an issue, but it would container HTTP response errors.",
 		Method:  "http",
 		Service: service.Id,
 	}
-	obj, err := database.Create(fail)
+	err = fail.Create()
 	assert.Nil(t, err)
-	assert.NotZero(t, obj.Id)
+	assert.NotZero(t, fail.Id)
 }
 
 func TestDeleteService(t *testing.T) {
-	service := SelectService(newServiceId)
+	service, err := Find(newServiceId)
 
 	count, err := SelectAllServices(false)
 	assert.Nil(t, err)
@@ -243,7 +257,7 @@ func TestDeleteService(t *testing.T) {
 	err = service.Delete()
 	assert.Nil(t, err)
 
-	services := CoreApp.services
+	services := All()
 	assert.Equal(t, 17, len(services))
 }
 
@@ -311,29 +325,8 @@ func TestDNScheckService(t *testing.T) {
 	assert.NotZero(t, amount)
 }
 
-func TestSelectServiceLink(t *testing.T) {
-	service := SelectService(1)
+func TestFindLink(t *testing.T) {
+	service, err := Find(1)
+	require.Nil(t, err)
 	assert.Equal(t, "google", service.Permalink.String)
-}
-
-func TestGroup_Create(t *testing.T) {
-	group := &types.Group{
-		Name: "Testing",
-	}
-	obj, err := database.Create(group)
-	assert.Nil(t, err)
-	assert.NotZero(t, obj.Id)
-}
-
-func TestGroup_Services(t *testing.T) {
-	t.SkipNow()
-	//group := SelectGroup(1)
-	//assert.NotEmpty(t, group.Services())
-}
-
-func TestSelectGroups(t *testing.T) {
-	groups := SelectGroups(true, false)
-	assert.Equal(t, int(3), len(groups))
-	groups = SelectGroups(true, true)
-	assert.Equal(t, int(5), len(groups))
 }

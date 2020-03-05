@@ -1,4 +1,3 @@
-import Help from './pages/Help';
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import DashboardIndex from "./components/Dashboard/DashboardIndex";
@@ -59,7 +58,7 @@ const routes = [
       component: Logs
     },{
       path: 'help',
-      component: Help
+      component: Logs
     }]
   },
   {

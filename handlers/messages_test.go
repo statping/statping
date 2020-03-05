@@ -29,7 +29,7 @@ func TestMessagesApiRoutes(t *testing.T) {
     "notify_before_scale": "hour"
 }`,
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"status":"success"`, `"type":"message"`, `"method":"create"`, `"title": "API Message"`},
+			ExpectedContains: []string{`"status":"success"`, `"type":"message"`, `"method":"create"`, `"title":"API Message"`},
 		},
 		{
 			Name:             "Statping View Message",

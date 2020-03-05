@@ -16,7 +16,6 @@
 package notifiers
 
 import (
-	"github.com/hunterlong/statping/notifiers"
 	"github.com/hunterlong/statping/types/notifications"
 	"github.com/stretchr/testify/assert"
 	"os"

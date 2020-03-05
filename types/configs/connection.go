@@ -52,11 +52,18 @@ func Connect(configs *DbConfig, retry bool) error {
 		log.Debugln(fmt.Sprintf("Database connection error %s", err))
 		if retry {
 			log.Errorln(fmt.Sprintf("Database %s connection to '%s' is not available, trying again in 5 seconds...", configs.DbConn, configs.DbHost))
-			return configs.waitForDb(configs)
+			time.Sleep(5 * time.Second)
+			return Connect(configs, retry)
 		} else {
 			return err
 		}
 	}
+
+	apiKey := utils.Getenv("API_KEY", utils.RandomString(16)).(string)
+	apiSecret := utils.Getenv("API_SECRET", utils.RandomString(16)).(string)
+	configs.ApiKey = apiKey
+	configs.ApiSecret = apiSecret
+
 	log.WithFields(utils.ToFields(dbSession)).Debugln("connected to database")
 
 	maxOpenConn := utils.Getenv("MAX_OPEN_CONN", 5)
@@ -75,12 +82,6 @@ func Connect(configs *DbConfig, retry bool) error {
 	}
 
 	return err
-}
-
-// waitForDb will sleep for 5 seconds and try to connect to the database again
-func (c *DbConfig) waitForDb(configs *DbConfig) error {
-	time.Sleep(5 * time.Second)
-	return c.Connect()
 }
 
 func InitialSetup(configs *DbConfig) error {

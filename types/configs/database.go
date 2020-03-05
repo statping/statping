@@ -47,16 +47,6 @@ func createSamples(sm ...SamplerFunc) error {
 	return nil
 }
 
-func (d *DbConfig) Connect() error {
-
-	return nil
-}
-
-func (d *DbConfig) Create() error {
-
-	return nil
-}
-
 // Migrate function
 func (d *DbConfig) Update() error {
 	var err error
@@ -103,14 +93,10 @@ func CreateDatabase() error {
 	for _, table := range DbModels {
 		if err := database.DB().CreateTable(table); err.Error() != nil {
 			return err.Error()
-		} else {
-			log.Infof("Database table: '%T' was created", table)
 		}
 	}
 	if err := database.DB().Table("core").CreateTable(&core.Core{}); err.Error() != nil {
 		return err.Error()
-	} else {
-		log.Infof("Database table: '%s' was created", "core")
 	}
 	log.Infoln("Statping Database Created")
 

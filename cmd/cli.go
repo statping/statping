@@ -106,7 +106,7 @@ func catchCLI(args []string) error {
 		if err != nil {
 			return err
 		}
-		if err = config.Connect(); err != nil {
+		if err = configs.ConnectConfigs(config); err != nil {
 			return err
 		}
 		if data, err = handlers.ExportSettings(); err != nil {
@@ -206,7 +206,7 @@ func runOnce() error {
 	if err != nil {
 		return errors.Wrap(err, "config.yml file not found")
 	}
-	err = config.Connect()
+	err = configs.ConnectConfigs(config)
 	if err != nil {
 		return errors.Wrap(err, "issue connecting to database")
 	}

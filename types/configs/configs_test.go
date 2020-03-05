@@ -1,30 +1,39 @@
 package configs
 
 import (
+	"github.com/hunterlong/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"os"
 	"testing"
 )
 
+var (
+	configs *DbConfig
+)
+
 func TestDbConfig_Save(t *testing.T) {
-	config := &types.DbConfig{
+	config := &DbConfig{
 		DbConn:   "sqlite",
 		Project:  "Tester",
-		Location: dir,
+		Location: utils.Directory,
 	}
 
-	err := SaveConfig(config)
+	err := ConnectConfigs(config)
 	require.Nil(t, err)
-	assert.Equal(t, "sqlite", config.DbConn)
+
+	err = config.Save(utils.Directory)
+	require.Nil(t, err)
+
+	assert.Equal(t, "sqlite3", config.DbConn)
 	assert.NotEmpty(t, config.ApiKey)
 	assert.NotEmpty(t, config.ApiSecret)
 }
 
 func TestLoadDbConfig(t *testing.T) {
-	Configs, err := LoadConfigFile(dir)
+	Configs, err := LoadConfigFile(utils.Directory)
 	assert.Nil(t, err)
-	assert.Equal(t, "sqlite", Configs.DbConn)
+	assert.Equal(t, "sqlite3", Configs.DbConn)
 
 	configs = Configs
 }
@@ -40,7 +49,7 @@ func TestEnvToConfig(t *testing.T) {
 	os.Setenv("ADMIN_USER", "admin")
 	os.Setenv("ADMIN_PASS", "admin123")
 	os.Setenv("VERBOSE", "1")
-	config, err := EnvToConfig()
+	config, err := loadConfigEnvs()
 	assert.Nil(t, err)
 	assert.Equal(t, config.DbConn, "sqlite")
 	assert.Equal(t, config.Domain, "http://localhost:8080")
