@@ -19,11 +19,11 @@ func Select() (*Core, error) {
 	if !database.Available() {
 		return nil, errors.New("database has not been initiated yet.")
 	}
-	exists := database.DB().HasTable("core")
+	exists := DB().HasTable("core")
 	if !exists {
 		return nil, errors.New("core database has not been setup yet.")
 	}
-	db := database.DB().Find(&c).Debug()
+	db := DB().Find(&c)
 	if db.Error() != nil {
 		return nil, db.Error()
 	}
@@ -45,7 +45,7 @@ func (c *Core) Create() error {
 		Domain:      c.Domain,
 		MigrationId: time.Now().Unix(),
 	}
-	db := DB().FirstOrCreate(&newCore)
+	db := DB().Create(&newCore)
 	return db.Error()
 }
 
@@ -74,6 +74,6 @@ func Sample() error {
 		Footer:      null.NewNullString(""),
 	}
 
-	db := database.DB().Create(&core)
+	db := DB().Create(&core)
 	return db.Error()
 }

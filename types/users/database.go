@@ -38,18 +38,18 @@ func (u *User) Create() error {
 	u.ApiKey = utils.NewSHA1Hash(5)
 	u.ApiSecret = utils.NewSHA1Hash(10)
 
-	db := DB().Create(u)
+	db := DB().Create(&u)
 	return db.Error()
 }
 
 func (u *User) Update() error {
 	u.ApiKey = utils.NewSHA1Hash(5)
 	u.ApiSecret = utils.NewSHA1Hash(10)
-	db := DB().Update(u)
+	db := DB().Update(&u)
 	return db.Error()
 }
 
 func (u *User) Delete() error {
-	db := DB().Delete(u)
+	db := DB().Delete(&u)
 	return db.Error()
 }

@@ -60,7 +60,7 @@ docker-latest: docker-base
 docker-vue:
 	docker build -t hunterlong/statping:vue --build-arg VERSION=${VERSION} .
 
-push-vue: clean docker-base docker-vue
+push-vue: clean compile docker-base docker-vue
 	docker push hunterlong/statping:base
 	docker push hunterlong/statping:vue
 

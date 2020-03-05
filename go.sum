@@ -18,6 +18,8 @@ github.com/ararog/timeago v0.0.0-20160328174124-e9969cf18b8d h1:ZX0t+GA3MWiP7LWt
 github.com/ararog/timeago v0.0.0-20160328174124-e9969cf18b8d/go.mod h1:EcJ034SpbWy4heOSDiBZJRn3b5wKJM1b4sFfYeVAkI4=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+CedLV8=
+github.com/crazy-max/xgo v0.3.2 h1:A5KmtgpPVzzqJzYcEmzpM0zFgCCyUar1FSvHFXxLiWA=
+github.com/crazy-max/xgo v0.3.2/go.mod h1:9sA9qZWLR9koBkgNTcktix7/MVbYrLWNnIQvYYq6/DA=
 github.com/daaku/go.zipexe v1.0.0 h1:VSOgZtH418pH9L16hC/JrgSNJbbAL26pj7lmD1+CGdY=
 github.com/daaku/go.zipexe v1.0.0/go.mod h1:z8IiR6TsVLEYKwXAoE/I+8ys/sDkgTzSL0CLnGVd57E=
 github.com/daaku/go.zipexe v1.0.1 h1:wV4zMsDOI2SZ2m7Tdz1Ps96Zrx+TzaK15VbUaGozw0M=

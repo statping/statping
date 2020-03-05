@@ -29,7 +29,6 @@ RUN cd frontend && yarn install --pure-lockfile --network-timeout 1000000 && \
 COPY . ./
 
 RUN make clean
-RUN make frontend-build
 RUN make compile
 RUN make build
 RUN chmod a+x statping && mv statping /go/bin/statping
