@@ -2,13 +2,12 @@ FROM hunterlong/statping:base as base
 
 FROM alpine:latest
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
+COPY --from=base /usr/local/bin/sass /usr/local/bin/sass
+COPY --from=base /go/bin/statping /usr/local/bin/statping
 
 ARG VERSION
 
-RUN apk --no-cache add curl jq libsass
-
-COPY --from=base /usr/local/bin/sass /usr/local/bin/sass
-COPY --from=base /go/bin/statping /usr/local/bin/statping
+RUN apk --no-cache add curl jq
 
 WORKDIR /app
 VOLUME /app
