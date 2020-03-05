@@ -52,7 +52,7 @@ compose-build-full: docker-base
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml build --parallel --build-arg VERSION=${VERSION}
 
 docker-base:
-	docker build -t hunterlong/statping:base -f Dockerfile.base --build-arg VERSION=${VERSION} .
+	docker build -t hunterlong/statping:base -f Dockerfile.base --no-cache --build-arg VERSION=${VERSION} .
 
 docker-latest: docker-base
 	docker build -t hunterlong/statping:latest --build-arg VERSION=${VERSION} .
@@ -60,7 +60,7 @@ docker-latest: docker-base
 docker-vue:
 	docker build -t hunterlong/statping:vue --build-arg VERSION=${VERSION} .
 
-push-vue: clean compile docker-base docker-vue
+push-vue: clean docker-base docker-vue
 	docker push hunterlong/statping:base
 	docker push hunterlong/statping:vue
 

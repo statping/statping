@@ -36,8 +36,9 @@ var (
 
 // Assets will load the Rice boxes containing the CSS, SCSS, JS, and HTML files.
 func Assets() error {
-	TmplBox = rice.MustFindBox("dist")
-	return nil
+	var err error
+	TmplBox, err = rice.FindBox("dist")
+	return err
 }
 
 // HelpMarkdown will return the Markdown of help.md into HTML
