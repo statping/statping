@@ -497,6 +497,6 @@ func (it *Db) Between(t1 time.Time, t2 time.Time) Database {
 }
 
 type TimeValue struct {
-	Timeframe string  `json:"timeframe"`
-	Amount    float64 `json:"amount"`
+	Timeframe string `json:"timeframe"`
+	Amount    int64  `json:"amount"`
 }

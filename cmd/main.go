@@ -16,20 +16,21 @@
 package main
 
 import (
+	"flag"
+	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/hunterlong/statping/source"
+
 	"github.com/hunterlong/statping/database"
+	"github.com/hunterlong/statping/handlers"
 	"github.com/hunterlong/statping/types/configs"
 	"github.com/hunterlong/statping/types/core"
 	"github.com/hunterlong/statping/types/services"
 	"github.com/hunterlong/statping/utils"
 	"github.com/pkg/errors"
-
-	"flag"
-	"fmt"
-	"github.com/hunterlong/statping/handlers"
-	"github.com/hunterlong/statping/source"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 var (
@@ -113,7 +114,7 @@ func main() {
 		}
 	}
 
-	if err = configs.ConnectConfigs(c); err != nil {
+	if err = configs.ConnectConfigs(c, true); err != nil {
 		exit(err)
 	}
 
@@ -139,8 +140,9 @@ func SetupMode() error {
 // sigterm will attempt to close the database connections gracefully
 func sigterm() {
 	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	<-sigs
+	fmt.Println("Shutting down Statping")
 	Close()
 	os.Exit(1)
 }

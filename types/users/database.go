@@ -1,7 +1,6 @@
 package users
 
 import (
-	"errors"
 	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/utils"
 	"github.com/prometheus/common/log"
@@ -32,13 +31,11 @@ func All() []*User {
 
 func (u *User) Create() error {
 	u.CreatedAt = time.Now().UTC()
-	if u.Password == "" {
-		return errors.New("did not supply user password")
-	}
 	u.Password = utils.HashPassword(u.Password)
-	u.ApiKey = utils.NewSHA1Hash(16)
-	u.ApiSecret = utils.NewSHA1Hash(16)
-
+	if u.ApiKey == "" || u.ApiSecret == "" {
+		u.ApiKey = utils.NewSHA1Hash(16)
+		u.ApiSecret = utils.NewSHA1Hash(16)
+	}
 	db := DB().Create(u)
 	if db.Error() == nil {
 		log.Warnf("User #%d (%s) has been created", u.Id, u.Username)

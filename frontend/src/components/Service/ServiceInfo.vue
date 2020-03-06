@@ -62,7 +62,7 @@
                   this.failures = await Api.service_failures(this.service.id, this.toUnix(start), this.toUnix(this.now()), 5)
                   return [{name: "None", data: []}]
               }
-              const fetched = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(this.now()), group)
+              const fetched = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(this.now()), group, false)
               if (!data) {
                   return [{name: "None", data: []}]
               }

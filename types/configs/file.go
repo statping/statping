@@ -11,7 +11,7 @@ import (
 
 var log = utils.Log
 
-func ConnectConfigs(configs *DbConfig) error {
+func ConnectConfigs(configs *DbConfig, initiate bool) error {
 	err := Connect(configs, true)
 	if err != nil {
 		return errors.Wrap(err, "error connecting to database")
@@ -21,7 +21,7 @@ func ConnectConfigs(configs *DbConfig) error {
 	}
 
 	exists := database.DB().HasTable("core")
-	if !exists {
+	if !exists && initiate {
 		return InitialSetup(configs)
 	}
 	return nil

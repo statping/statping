@@ -68,37 +68,13 @@ func (t *TimeVar) ToValues() ([]*TimeValue, error) {
 	return t.data, nil
 }
 
-func (g *GroupQuery) toFloatRows() []*TimeValue {
-	rows, err := g.db.Rows()
-	if err != nil {
-		return nil
-	}
-	var data []*TimeValue
-	for rows.Next() {
-		var timeframe time.Time
-		amount := float64(0)
-		if err := rows.Scan(&timeframe, &amount); err != nil {
-			log.Errorln(err)
-		}
-
-		fmt.Println("float rows: ", timeframe, amount)
-
-		newTs := types.FixedTime(timeframe, g.Group)
-		data = append(data, &TimeValue{
-			Timeframe: newTs,
-			Amount:    amount,
-		})
-	}
-	return data
-}
-
 // GraphData will return all hits or failures
 func (g *GroupQuery) GraphData(by By) ([]*TimeValue, error) {
 
 	dbQuery := g.db.MultipleSelects(
 		g.db.SelectByTime(g.Group),
 		by.String(),
-	).Group("timeframe").Debug()
+	).Group("timeframe")
 
 	g.db = dbQuery
 
@@ -121,7 +97,7 @@ func (g *GroupQuery) ToTimeValue() (*TimeVar, error) {
 	var data []*TimeValue
 	for rows.Next() {
 		var timeframe string
-		amount := float64(0)
+		amount := int64(0)
 		if err := rows.Scan(&timeframe, &amount); err != nil {
 			log.Error(err, timeframe)
 		}
@@ -136,7 +112,7 @@ func (g *GroupQuery) ToTimeValue() (*TimeVar, error) {
 }
 
 func (t *TimeVar) FillMissing(current, end time.Time) ([]*TimeValue, error) {
-	timeMap := make(map[string]float64)
+	timeMap := make(map[string]int64)
 	var validSet []*TimeValue
 	dur := t.g.Group
 	for _, v := range t.data {
@@ -146,7 +122,7 @@ func (t *TimeVar) FillMissing(current, end time.Time) ([]*TimeValue, error) {
 	currentStr := types.FixedTime(current, t.g.Group)
 
 	for {
-		var amount float64
+		var amount int64
 		if timeMap[currentStr] != 0 {
 			amount = timeMap[currentStr]
 		}

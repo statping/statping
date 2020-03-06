@@ -20,10 +20,8 @@ import (
 	"github.com/hunterlong/statping/types/configs"
 	"github.com/hunterlong/statping/types/core"
 	"github.com/hunterlong/statping/types/null"
-	"github.com/hunterlong/statping/types/users"
 	"github.com/hunterlong/statping/utils"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -33,59 +31,21 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(errors.New("Statping has already been setup"), w, r)
 		return
 	}
-	if err = r.ParseForm(); err != nil {
-		log.Errorln(err)
-		sendErrorJson(err, w, r)
-		return
-	}
-	dbHost := r.PostForm.Get("db_host")
-	dbUser := r.PostForm.Get("db_user")
-	dbPass := r.PostForm.Get("db_password")
-	dbDatabase := r.PostForm.Get("db_database")
-	dbConn := r.PostForm.Get("db_connection")
-	dbPort := utils.ToInt(r.PostForm.Get("db_port"))
-	project := r.PostForm.Get("project")
-	username := r.PostForm.Get("username")
-	password := r.PostForm.Get("password")
-	description := r.PostForm.Get("description")
-	domain := r.PostForm.Get("domain")
-	email := r.PostForm.Get("email")
-	sample, _ := strconv.ParseBool(r.PostForm.Get("sample_data"))
 
-	confg := &configs.DbConfig{
-		DbConn:      dbConn,
-		DbHost:      dbHost,
-		DbUser:      dbUser,
-		DbPass:      dbPass,
-		DbData:      dbDatabase,
-		DbPort:      int(dbPort),
-		Project:     project,
-		Description: description,
-		Domain:      domain,
-		Username:    username,
-		Password:    password,
-		Email:       email,
-		Error:       nil,
-		Location:    utils.Directory,
-	}
-
-	log.WithFields(utils.ToFields(core.App, confg)).Debugln("new configs posted")
-
-	if err := confg.Save(utils.Directory); err != nil {
+	confgs, err := configs.LoadConfigForm(r)
+	if err != nil {
 		log.Errorln(err)
 		sendErrorJson(err, w, r)
 		return
 	}
 
-	if confg, err = configs.LoadConfigFile(utils.Directory); err != nil {
-		log.Errorln(err)
-		sendErrorJson(err, w, r)
-		return
-	}
+	//sample, _ := strconv.ParseBool(r.PostForm.Get("sample_data"))
 
-	if err = configs.ConnectConfigs(confg); err != nil {
+	log.WithFields(utils.ToFields(core.App, confgs)).Debugln("new configs posted")
+
+	if err = configs.ConnectConfigs(confgs, true); err != nil {
 		log.Errorln(err)
-		if err := confg.Delete(); err != nil {
+		if err := confgs.Delete(); err != nil {
 			log.Errorln(err)
 			sendErrorJson(err, w, r)
 			return
@@ -94,7 +54,13 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = confg.MigrateDatabase(); err != nil {
+	if err := confgs.Save(utils.Directory); err != nil {
+		log.Errorln(err)
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	if err = confgs.MigrateDatabase(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
@@ -111,6 +77,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		Footer:    null.NewNullString(""),
 	}
 
+	log.Infoln("Creating new Core")
 	if err := c.Create(); err != nil {
 		log.Errorln(err)
 		sendErrorJson(err, w, r)
@@ -119,27 +86,22 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	core.App = c
 
-	admin := &users.User{
-		Username: confg.Username,
-		Password: confg.Password,
-		Email:    confg.Email,
-		Admin:    null.NewNullBool(true),
-	}
+	//if sample {
+	//	log.Infoln("Adding sample data into new database")
+	//	if err = configs.TriggerSamples(); err != nil {
+	//		log.Errorln(err)
+	//		sendErrorJson(err, w, r)
+	//		return
+	//	}
+	//}
 
-	if err := admin.Create(); err != nil {
+	log.Infoln("Initializing new Statping instance")
+	if err := core.InitApp(); err != nil {
 		log.Errorln(err)
 		sendErrorJson(err, w, r)
 		return
 	}
 
-	if sample {
-		if err = configs.TriggerSamples(); err != nil {
-			sendErrorJson(err, w, r)
-			return
-		}
-	}
-
-	core.InitApp()
 	CacheStorage.Delete("/")
 	resetCookies()
 	time.Sleep(1 * time.Second)
@@ -148,11 +110,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		Config  *configs.DbConfig `json:"config"`
 	}{
 		"success",
-		confg,
+		confgs,
 	}
 	returnJson(out, w, r)
-}
-
-func setupResponseError(w http.ResponseWriter, r *http.Request, a interface{}) {
-	ExecuteResponse(w, r, "setup.gohtml", a, nil)
 }

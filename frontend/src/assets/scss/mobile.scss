@@ -11,6 +11,11 @@
         padding: 0 !important;
     }
 
+    .lower_canvas {
+      height: 4rem;
+      margin-top: -1px;
+    }
+
     .list-group-item H5 {
         font-size: 0.9rem;
     }
@@ -36,8 +41,8 @@
     }
 
     .btn-sm {
-        line-height: 0.9rem;
-        font-size: 0.65rem;
+        line-height: 1.4rem;
+        font-size: 1rem;
     }
 
     .full-col-12 {

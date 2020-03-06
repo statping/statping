@@ -4,19 +4,19 @@ about: Suggest a feature and let's see what others say
 
 ---
 
-**What would you like on Statping?**
+### What would you like on Statping?
 A clear and concise description of what you want to happen.
 
-**Describe the solution you'd like**
+### Describe the solution you'd like
 A clear and concise description of what you want to happen.
 
-**Describe alternatives you've considered**
+### Describe alternatives you've considered
 A clear and concise description of any alternative solutions or features you've considered.
 
-**Is your feature request related to a problem? Please describe.**
+### Is your feature request related to a problem? Please describe.
 I'm always frustrated when [...]
 
-**Additional context**
+### Additional context
 Add any other context or screenshots about the feature request here.
 
-[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/statup-app/general) [![GitHub release](https://img.shields.io/github/release/hunterlong/statup.svg)](https://github.com/hunterlong/statping/releases/latest) [![Build Status](https://travis-ci.com/hunterlong/statup.svg?branch=master)](https://travis-ci.com/hunterlong/statup)
+[![Slack](https://slack.statping.com/badge.svg)](https://slack.statping.com/) [![GitHub release](https://img.shields.io/github/release/hunterlong/statping.svg)](https://github.com/hunterlong/statping/releases/latest) [![Build Status](https://travis-ci.com/hunterlong/statping.svg?branch=master)](https://travis-ci.com/hunterlong/statping)

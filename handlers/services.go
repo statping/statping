@@ -62,11 +62,12 @@ func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceHandler(r *http.Request) interface{} {
-	service, err := serviceByID(r)
+	srv, err := serviceByID(r)
 	if err != nil {
 		return err
 	}
-	return *service
+	srv = srv.UpdateStats()
+	return *srv
 }
 
 func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -190,15 +191,6 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiAllServicesHandler(r *http.Request) interface{} {
 	return services.AllInOrder()
-}
-
-func joinServices(srvss map[int64]*services.Service) []*services.Service {
-	var srvs []*services.Service
-	for _, v := range srvss {
-		v.UpdateStats()
-		srvs = append(srvs, v)
-	}
-	return srvs
 }
 
 func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {

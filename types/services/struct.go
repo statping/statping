@@ -45,7 +45,7 @@ type Service struct {
 	PingTime            float64             `gorm:"-" json:"ping_time"`
 	Online24Hours       float32             `gorm:"-" json:"online_24_hours"`
 	Online7Days         float32             `gorm:"-" json:"online_7_days"`
-	AvgResponse         float64             `gorm:"-" json:"avg_response"`
+	AvgResponse         int64               `gorm:"-" json:"avg_response"`
 	FailuresLast24Hours int                 `gorm:"-" json:"failures_24_hours"`
 	Running             chan bool           `gorm:"-" json:"-"`
 	Checkpoint          time.Time           `gorm:"-" json:"-"`
@@ -57,22 +57,25 @@ type Service struct {
 	DownText            string              `gorm:"-" json:"-"`                                                                          // Contains the current generated Downtime Text
 	SuccessNotified     bool                `gorm:"-" json:"-"`                                                                          // Is 'true' if the user has already be informed that the Services now again available
 	LastStatusCode      int                 `gorm:"-" json:"status_code"`
-	LastOnline          time.Time           `gorm:"-" json:"last_success"`
-	LastOffline         time.Time           `gorm:"-" json:"last_error"`
 	Failures            []*failures.Failure `gorm:"-" json:"failures,omitempty" scope:"user,admin"`
 	AllCheckins         []*checkins.Checkin `gorm:"-" json:"checkins,omitempty" scope:"user,admin"`
-	Stats               *Stats              `gorm:"-" json:"stats,omitempty"`
 	LastLookupTime      int64               `gorm:"-" json:"-"`
 	LastLatency         int64               `gorm:"-" json:"-"`
 	LastCheck           time.Time           `gorm:"-" json:"-"`
+	LastOnline          time.Time           `gorm:"-" json:"last_success"`
+	LastOffline         time.Time           `gorm:"-" json:"last_error"`
+	Stats               *Stats              `gorm:"-" json:"stats,omitempty"`
 
 	SecondsOnline  int64 `gorm:"-" json:"-"`
 	SecondsOffline int64 `gorm:"-" json:"-"`
 }
 
 type Stats struct {
-	Failures int `gorm:"-" json:"failures"`
-	Hits     int `gorm:"-" json:"hits"`
+	Failures       int       `gorm:"-" json:"failures"`
+	Hits           int       `gorm:"-" json:"hits"`
+	LastLookupTime int64     `gorm:"-" json:"last_lookup"`
+	LastLatency    int64     `gorm:"-" json:"last_latency"`
+	FirstHit       time.Time `gorm:"-" json:"first_hit"`
 }
 
 // BeforeCreate for Service will set CreatedAt to UTC

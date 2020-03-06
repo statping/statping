@@ -3,6 +3,7 @@ package failures
 import (
 	"fmt"
 	"github.com/hunterlong/statping/types"
+	"github.com/hunterlong/statping/utils"
 	"github.com/prometheus/common/log"
 	"sync"
 	"time"
@@ -16,7 +17,7 @@ func Samples() {
 	tx := DB().Begin()
 	sg := new(sync.WaitGroup)
 
-	createdAt := time.Now().Add(-1 * types.Month)
+	createdAt := utils.Now().Add(-3 * types.Day)
 
 	for i := int64(1); i <= 4; i++ {
 		sg.Add(1)
@@ -25,8 +26,8 @@ func Samples() {
 
 		go func() {
 			defer sg.Done()
-			for fi := 0.; fi <= float64(730); fi++ {
-				createdAt = createdAt.Add(2 * time.Minute)
+			for fi := 0.; fi <= float64(400); fi++ {
+				createdAt = createdAt.Add(35 * time.Minute)
 				failure := &Failure{
 					Service:   i,
 					Issue:     "testing right here",

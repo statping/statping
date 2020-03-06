@@ -19,7 +19,7 @@ func TestDbConfig_Save(t *testing.T) {
 		Location: utils.Directory,
 	}
 
-	err := ConnectConfigs(config)
+	err := ConnectConfigs(config, true)
 	require.Nil(t, err)
 
 	err = config.Save(utils.Directory)

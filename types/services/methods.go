@@ -133,32 +133,35 @@ func niceDomainName(domain string, paths string) string {
 	return domain + strings.Join(addedName, "/")
 }
 
-func (s *Service) UpdateStats() {
+func (s *Service) UpdateStats() *Service {
 	s.Online24Hours = s.OnlineDaysPercent(1)
 	s.Online7Days = s.OnlineDaysPercent(7)
 	s.AvgResponse = s.AvgTime()
-	s.FailuresLast24Hours = len(s.AllFailures().Since(time.Now().UTC().Add(-time.Hour * 24)))
+	s.FailuresLast24Hours = len(s.AllFailures().Since(utils.Now().Add(-time.Hour * 24)))
+
+	if s.LastOffline.IsZero() {
+		lastFail := s.LastFailure()
+		if lastFail != nil {
+			s.LastOffline = s.LastFailure().CreatedAt
+		}
+	}
+
 	s.Stats = &Stats{
 		Failures: s.AllFailures().Count(),
 		Hits:     s.AllHits().Count(),
+		FirstHit: s.FirstHit().CreatedAt,
 	}
+	return s
 }
 
 // AvgTime will return the average amount of time for a service to response back successfully
-func (s *Service) AvgTime() float64 {
-	sum := s.AllHits().Sum()
-	return sum
-}
-
-// AvgUptime will return the average amount of time for a service to response back successfully
-func (s *Service) AvgUptime(since time.Time) float64 {
-	sum := s.AllHits().Sum()
-	return sum
+func (s *Service) AvgTime() int64 {
+	return s.AllHits().Avg()
 }
 
 // OnlineDaysPercent returns the service's uptime percent within last 24 hours
 func (s *Service) OnlineDaysPercent(days int) float32 {
-	ago := time.Now().UTC().Add((-24 * time.Duration(days)) * time.Hour)
+	ago := utils.Now().Add((-24 * time.Duration(days)) * time.Hour)
 	return s.OnlineSince(ago)
 }
 

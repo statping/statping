@@ -170,9 +170,7 @@
         return
       }
 
-      const auth = await Api.login(s.username, s.password)
-      this.auth = Api.saveToken(s.username, auth.token)
-      await this.$store.dispatch('loadAdmin')
+      await this.$store.dispatch('loadRequired')
 
       this.loading = false
       this.$router.push('/')

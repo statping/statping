@@ -63,6 +63,15 @@ func (h Hitters) Sum() float64 {
 	return result.amount
 }
 
+func (h Hitters) Avg() int64 {
+	result := struct {
+		amount int64
+	}{0}
+
+	h.db.Select("AVG(latency) as amount").Scan(&result)
+	return result.amount
+}
+
 func AllHits(obj ColumnIDInterfacer) Hitters {
 	column, id := obj.HitsColumnID()
 	return Hitters{DB().Where(fmt.Sprintf("%s = ?", column), id)}

@@ -80,15 +80,20 @@ top:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml top
 
 frontend-build:
-	cd frontend && rm -rf dist && yarn build
-	rm -rf source/dist && cp -r frontend/dist source/ && cp -r frontend/src/assets/scss source/dist/
+	rm -rf source/dist && rm -rf frontend/dist
+	cd frontend && yarn build
+	cp -r frontend/dist source/ && cp -r frontend/src/assets/scss source/dist/
 	cp -r source/tmpl/*.* source/dist/
 
 # compile assets using SASS and Rice. compiles scss -> css, and run rice embed-go
 compile: generate frontend-build
+	rm -f source/rice-box.go
 	cd source && rice embed-go
 
-build: clean
+embed:
+	cd source && rice embed-go
+
+build:
 	$(GOBUILD) $(BUILDVERSION) -o $(BINARY_NAME) ./cmd
 
 install: build

@@ -99,15 +99,18 @@ func InitialSetup(configs *DbConfig) error {
 		return errors.Wrap(err, "error creating database")
 	}
 
-	username := utils.Getenv("ADMIN_USER", "admin").(string)
-	password := utils.Getenv("ADMIN_PASSWORD", "admin").(string)
+	if configs.Username == "" && configs.Password == "" {
+		configs.Username = utils.Getenv("ADMIN_USER", "admin").(string)
+		configs.Password = utils.Getenv("ADMIN_PASSWORD", "admin").(string)
+	}
 
 	admin := &users.User{
-		Username: username,
-		Password: password,
+		Username: configs.Username,
+		Password: configs.Password,
 		Email:    "info@admin.com",
 		Admin:    null.NewNullBool(true),
 	}
+
 	if err := admin.Create(); err != nil {
 		return errors.Wrap(err, "error creating admin")
 	}

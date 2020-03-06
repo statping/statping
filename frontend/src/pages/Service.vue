@@ -247,10 +247,10 @@ export default {
             this.failures = await Api.service_failures(this.service.id, this.now() - 3600, this.now(), 15)
         },
         async chartHits() {
-            const start = this.nowSubtract((3600 * 24) * 7)
+            const start = this.nowSubtract((3600 * 24) * 3)
             this.start_time = start
             this.end_time = new Date()
-            this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), "1h")
+            this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), "15m", false)
             this.series = [{
                 name: this.service.name,
                 ...this.data

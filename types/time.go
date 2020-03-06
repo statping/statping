@@ -16,7 +16,6 @@
 package types
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -38,31 +37,29 @@ var (
 )
 
 func FixedTime(t time.Time, d time.Duration) string {
-	switch d {
-	case Month:
-		month := fmt.Sprintf("%v", int(t.Month()))
-		if int(t.Month()) < 10 {
-			month = fmt.Sprintf("0%v", int(t.Month()))
-		}
-		return fmt.Sprintf("%v-%v-01T00:00:00Z", t.Year(), month)
-	case Year:
-		return fmt.Sprintf("%v-01-01T00:00:00Z", t.Year())
-	default:
-		return t.Format(durationStr(d))
-	}
+	return t.Format(durationStr(d))
 }
 
 func durationStr(d time.Duration) string {
-	switch d {
-	case Second:
-		return "2006-01-02T15:04:05Z"
-	case Minute:
-		return "2006-01-02T15:04:00Z"
-	case Hour:
+
+	switch m := d.Seconds(); {
+
+	case m >= Month.Seconds():
+		return "2006-01-01T00:00:00Z"
+
+	case m >= Week.Seconds():
+		return "2006-01-02T00:00:00Z"
+
+	case m >= Day.Seconds():
 		return "2006-01-02T15:00:00Z"
-	case Day:
-		return "2006-01-02T00:00:00Z"
+
+	case m >= Hour.Seconds():
+		return "2006-01-02T15:04:00Z"
+
+	case m >= Minute.Seconds():
+		return "2006-01-02T15:04:00Z"
+
 	default:
-		return "2006-01-02T00:00:00Z"
+		return "2006-01-02T15:04:05Z"
 	}
 }
