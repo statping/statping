@@ -104,7 +104,7 @@ func InitialSetup(configs *DbConfig) error {
 
 	admin := &users.User{
 		Username: username,
-		Password: utils.HashPassword(password),
+		Password: password,
 		Email:    "info@admin.com",
 		Admin:    null.NewNullBool(true),
 	}

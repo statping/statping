@@ -104,15 +104,20 @@ type Database interface {
 	Since(time.Time) Database
 	Between(time.Time, time.Time) Database
 
-	SelectByTime(string) string
+	SelectByTime(time.Duration) string
 	MultipleSelects(args ...string) Database
 
 	FormatTime(t time.Time) string
 	ParseTime(t string) (time.Time, error)
+	DbType() string
 }
 
 func DB() Database {
 	return database
+}
+
+func (it *Db) DbType() string {
+	return it.Database.Dialect().GetName()
 }
 
 func Close() error {
@@ -145,9 +150,19 @@ func Available() bool {
 	return true
 }
 
+func AmountGreaterThan1000(db *gorm.DB) *gorm.DB {
+	return db.Where("service = ?", 1000)
+}
+
 func (it *Db) MultipleSelects(args ...string) Database {
 	joined := strings.Join(args, ", ")
 	return it.Select(joined)
+}
+
+func OrderStatus(status []string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Scopes(AmountGreaterThan1000).Where("status IN (?)", status)
+	}
 }
 
 type Db struct {

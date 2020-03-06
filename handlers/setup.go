@@ -90,6 +90,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 			sendErrorJson(err, w, r)
 			return
 		}
+		sendErrorJson(err, w, r)
 		return
 	}
 

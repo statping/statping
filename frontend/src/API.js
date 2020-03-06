@@ -36,12 +36,12 @@ class Api {
     return axios.post('/api/services/' + data.id, data).then(response => (response.data))
   }
 
-  async service_hits(id, start, end, group) {
-    return axios.get('/api/services/' + id + '/hits_data?start=' + start + '&end=' + end + '&group=' + group + '&fill=true').then(response => (response.data))
+  async service_hits(id, start, end, group, fill=true) {
+    return axios.get('/api/services/' + id + '/hits_data?start=' + start + '&end=' + end + '&group=' + group + '&fill=' + fill).then(response => (response.data))
   }
 
-    async service_failures_data(id, start, end, group) {
-        return axios.get('/api/services/' + id + '/failure_data?start=' + start + '&end=' + end + '&group=' + group + '&fill=true').then(response => (response.data))
+    async service_failures_data(id, start, end, group, fill=true) {
+        return axios.get('/api/services/' + id + '/failure_data?start=' + start + '&end=' + end + '&group=' + group + '&fill=' + fill).then(response => (response.data))
     }
 
   async service_heatmap(id, start, end, group) {

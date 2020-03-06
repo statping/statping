@@ -3,6 +3,12 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
+  - job_name: 'statping_local'
+    scrape_interval: 15s
+    bearer_token: 'samplesecret'
+    static_configs:
+      - targets: ['docker0:8585']
+
   - job_name: 'statping'
     scrape_interval: 15s
     bearer_token: 'exampleapisecret'

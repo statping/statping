@@ -128,7 +128,7 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 
 	groupQuery := database.ParseQueries(r, service.AllHits())
 
-	objs, err := groupQuery.GraphData(database.ByAverage("latency"))
+	objs, err := groupQuery.GraphData(database.ByAverage("latency", 1000))
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -164,7 +164,7 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 
 	groupQuery := database.ParseQueries(r, service.AllHits())
 
-	objs, err := groupQuery.GraphData(database.ByAverage("ping_time"))
+	objs, err := groupQuery.GraphData(database.ByAverage("ping_time", 1000))
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return

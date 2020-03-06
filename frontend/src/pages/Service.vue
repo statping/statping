@@ -250,7 +250,7 @@ export default {
             const start = this.nowSubtract((3600 * 24) * 7)
             this.start_time = start
             this.end_time = new Date()
-            this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), "hour")
+            this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), "1h")
             this.series = [{
                 name: this.service.name,
                 ...this.data

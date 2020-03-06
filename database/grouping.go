@@ -28,7 +28,7 @@ func (b By) String() string {
 type GroupQuery struct {
 	Start     time.Time
 	End       time.Time
-	Group     string
+	Group     time.Duration
 	Order     string
 	Limit     int
 	Offset    int
@@ -47,8 +47,15 @@ func (b GroupQuery) Database() Database {
 
 var (
 	ByCount   = By("COUNT(id) as amount")
-	ByAverage = func(column string) By {
-		return By(fmt.Sprintf("AVG(%s) as amount", column))
+	ByAverage = func(column string, multiplier int) By {
+		switch database.DbType() {
+		case "mysql":
+			return By(fmt.Sprintf("CAST(AVG(%s)*%d as UNSIGNED) as amount", column, multiplier))
+		case "postgres":
+			return By(fmt.Sprintf("cast(AVG(%s)*%d as int) as amount", column, multiplier))
+		default:
+			return By(fmt.Sprintf("cast(AVG(%s)*%d as int) as amount", column, multiplier))
+		}
 	}
 )
 
@@ -76,7 +83,7 @@ func (g *GroupQuery) toFloatRows() []*TimeValue {
 
 		fmt.Println("float rows: ", timeframe, amount)
 
-		newTs := types.FixedTime(timeframe, g.duration())
+		newTs := types.FixedTime(timeframe, g.Group)
 		data = append(data, &TimeValue{
 			Timeframe: newTs,
 			Amount:    amount,
@@ -91,7 +98,7 @@ func (g *GroupQuery) GraphData(by By) ([]*TimeValue, error) {
 	dbQuery := g.db.MultipleSelects(
 		g.db.SelectByTime(g.Group),
 		by.String(),
-	).Group("timeframe")
+	).Group("timeframe").Debug()
 
 	g.db = dbQuery
 
@@ -119,7 +126,7 @@ func (g *GroupQuery) ToTimeValue() (*TimeVar, error) {
 			log.Error(err, timeframe)
 		}
 		trueTime, _ := g.db.ParseTime(timeframe)
-		newTs := types.FixedTime(trueTime, g.duration())
+		newTs := types.FixedTime(trueTime, g.Group)
 		data = append(data, &TimeValue{
 			Timeframe: newTs,
 			Amount:    amount,
@@ -131,12 +138,12 @@ func (g *GroupQuery) ToTimeValue() (*TimeVar, error) {
 func (t *TimeVar) FillMissing(current, end time.Time) ([]*TimeValue, error) {
 	timeMap := make(map[string]float64)
 	var validSet []*TimeValue
-	dur := t.g.duration()
+	dur := t.g.Group
 	for _, v := range t.data {
 		timeMap[v.Timeframe] = v.Amount
 	}
 
-	currentStr := types.FixedTime(current, t.g.duration())
+	currentStr := types.FixedTime(current, t.g.Group)
 
 	for {
 		var amount float64
@@ -151,29 +158,10 @@ func (t *TimeVar) FillMissing(current, end time.Time) ([]*TimeValue, error) {
 			break
 		}
 		current = current.Add(dur)
-		currentStr = types.FixedTime(current, t.g.duration())
+		currentStr = types.FixedTime(current, t.g.Group)
 	}
 
 	return validSet, nil
-}
-
-func (g *GroupQuery) duration() time.Duration {
-	switch g.Group {
-	case "second":
-		return types.Second
-	case "minute":
-		return types.Minute
-	case "hour":
-		return types.Hour
-	case "day":
-		return types.Day
-	case "month":
-		return types.Month
-	case "year":
-		return types.Year
-	default:
-		return types.Hour
-	}
 }
 
 type isObject interface {
@@ -183,9 +171,6 @@ type isObject interface {
 func ParseQueries(r *http.Request, o isObject) *GroupQuery {
 	fields := parseGet(r)
 	grouping := fields.Get("group")
-	if grouping == "" {
-		grouping = "hour"
-	}
 	startField := utils.ToInt(fields.Get("start"))
 	endField := utils.ToInt(fields.Get("end"))
 	limit := utils.ToInt(fields.Get("limit"))
@@ -198,10 +183,19 @@ func ParseQueries(r *http.Request, o isObject) *GroupQuery {
 
 	db := o.Db()
 
+	if grouping == "" {
+		grouping = "1h"
+	}
+	groupDur, err := time.ParseDuration(grouping)
+	if err != nil {
+		log.Errorln(err)
+		groupDur = 1 * time.Hour
+	}
+
 	query := &GroupQuery{
 		Start:     time.Unix(startField, 0).UTC(),
 		End:       time.Unix(endField, 0).UTC(),
-		Group:     grouping,
+		Group:     groupDur,
 		Order:     orderBy,
 		Limit:     int(limit),
 		Offset:    int(offset),
@@ -210,10 +204,13 @@ func ParseQueries(r *http.Request, o isObject) *GroupQuery {
 	}
 
 	if startField == 0 {
-		query.Start = time.Now().Add(-3 * types.Month).UTC()
+		query.Start = time.Now().Add(-7 * types.Day).UTC()
 	}
 	if endField == 0 {
 		query.End = time.Now().UTC()
+	}
+	if query.End.After(utils.Now()) {
+		query.End = utils.Now()
 	}
 
 	if query.Limit != 0 {

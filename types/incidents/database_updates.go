@@ -10,16 +10,16 @@ func (i *Incident) Updates() []*IncidentUpdate {
 }
 
 func (i *IncidentUpdate) Create() error {
-	db := database.DB().Create(&i)
+	db := database.DB().Create(i)
 	return db.Error()
 }
 
 func (i *IncidentUpdate) Update() error {
-	db := database.DB().Update(&i)
+	db := database.DB().Update(i)
 	return db.Error()
 }
 
 func (i *IncidentUpdate) Delete() error {
-	db := database.DB().Delete(&i)
+	db := database.DB().Delete(i)
 	return db.Error()
 }

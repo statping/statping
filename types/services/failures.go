@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types/failures"
 	"strings"
 	"time"
@@ -16,10 +15,10 @@ func (s *Service) AllFailures() failures.Failurer {
 	return failures.AllFailures(s)
 }
 
-func (s *Service) LastFailures(amount int) []*failures.Failure {
-	var fail []*failures.Failure
-	database.DB().Limit(amount).Find(&fail)
-	return fail
+func (s *Service) LastFailure() *failures.Failure {
+	var fail failures.Failure
+	failures.DB().Where("service = ?", s.Id).Order("id desc").Limit(1).Find(&fail)
+	return &fail
 }
 
 func (s *Service) FailuresCount() int {
@@ -35,11 +34,11 @@ func (s *Service) FailuresSince(t time.Time) []*failures.Failure {
 }
 
 func (s *Service) DowntimeText() string {
-	last := s.LastFailures(1)
-	if len(last) == 0 {
+	last := s.LastFailure()
+	if last == nil {
 		return ""
 	}
-	return parseError(last[0])
+	return parseError(last)
 }
 
 // ParseError returns a human readable error for a Failure

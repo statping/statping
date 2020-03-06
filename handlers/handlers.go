@@ -187,7 +187,7 @@ func IsAdmin(r *http.Request) bool {
 	if !core.App.Setup {
 		return false
 	}
-	if os.Getenv("GO_ENV") == "test" {
+	if utils.Getenv("GO_ENV", false).(bool) {
 		return true
 	}
 	claim, err := getJwtToken(r)

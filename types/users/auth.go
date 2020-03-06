@@ -15,11 +15,6 @@ func AuthUser(username, password string) (*User, bool) {
 		log.Warnln(fmt.Errorf("user %v not found", username))
 		return nil, false
 	}
-
-	fmt.Println(username, password)
-
-	fmt.Println(username, user.Password)
-
 	if CheckHash(password, user.Password) {
 		user.UpdatedAt = time.Now().UTC()
 		user.Update()

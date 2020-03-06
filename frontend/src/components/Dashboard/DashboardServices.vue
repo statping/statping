@@ -1,11 +1,11 @@
 <template>
     <div>
     <div class="col-12">
-        <h1 class="text-black-50">Services
+        <h3 class="text-black-50">Services
             <router-link to="/dashboard/create_service" class="btn btn-outline-success mt-1 float-right">
                 <font-awesome-icon icon="plus"/>  Create
             </router-link>
-        </h1>
+        </h3>
 
         <ServicesList/>
 

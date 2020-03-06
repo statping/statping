@@ -64,7 +64,7 @@
       methods: {
           async chartHeatmap() {
               const start = this.nowSubtract((3600 * 24) * 7)
-              const data = await Api.service_heatmap(this.service.id, this.toUnix(start), this.toUnix(new Date()), "hour")
+              const data = await Api.service_heatmap(this.service.id, this.toUnix(start), this.toUnix(new Date()), "1h")
 
               let dataArr = []
               data.forEach(function(d) {

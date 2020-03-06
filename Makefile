@@ -45,6 +45,12 @@ stop:
 logs:
 	docker logs statping --follow
 
+db-up:
+	docker-compose -f dev/docker-compose.db.yml up -d --remove-orphans
+
+db-down:
+	docker-compose -f dev/docker-compose.full.yml down --remove-orphans
+
 console:
 	docker exec -t -i statping /bin/sh
 

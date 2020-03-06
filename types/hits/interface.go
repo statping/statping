@@ -18,6 +18,18 @@ func (h Hitters) Db() database.Database {
 	return h.db
 }
 
+func (h Hitters) First() *Hit {
+	var hit Hit
+	h.db.Order("id ASC").Limit(1).Find(&hit)
+	return &hit
+}
+
+func (h Hitters) Last() *Hit {
+	var hit Hit
+	h.db.Order("id DESC").Limit(1).Find(&hit)
+	return &hit
+}
+
 func (h Hitters) Since(t time.Time) []*Hit {
 	var hits []*Hit
 	h.db.Since(t).Find(&hits)
@@ -30,9 +42,9 @@ func (h Hitters) List() []*Hit {
 	return hits
 }
 
-func (h Hitters) Last(amount int) []*Hit {
+func (h Hitters) LastCount(amounts int) []*Hit {
 	var hits []*Hit
-	h.db.Limit(amount).Find(&hits)
+	h.db.Order("id asc").Limit(amounts).Find(&hits)
 	return hits
 }
 

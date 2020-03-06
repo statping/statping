@@ -19,16 +19,16 @@ func All() []*Message {
 }
 
 func (m *Message) Create() error {
-	db := DB().Create(&m)
+	db := DB().Create(m)
 	return db.Error()
 }
 
 func (m *Message) Update() error {
-	db := DB().Update(&m)
+	db := DB().Update(m)
 	return db.Error()
 }
 
 func (m *Message) Delete() error {
-	db := DB().Delete(&m)
+	db := DB().Delete(m)
 	return db.Error()
 }

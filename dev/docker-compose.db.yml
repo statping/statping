@@ -29,7 +29,7 @@ services:
       MYSQL_ROOT_PASSWORD: password123
       MYSQL_DATABASE: statping
       MYSQL_USER: root
-      MYSQL_PASSWORD: password
+      MYSQL_PASSWORD: password123
     ports:
       - 3306:3306
     healthcheck:

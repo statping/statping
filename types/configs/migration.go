@@ -14,6 +14,10 @@ import (
 	"github.com/hunterlong/statping/types/notifications"
 	"github.com/hunterlong/statping/types/services"
 	"github.com/hunterlong/statping/types/users"
+
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 // InsertNotifierDB inject the Statping database instance to the Notifier package

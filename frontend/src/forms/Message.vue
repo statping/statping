@@ -1,9 +1,9 @@
 <template>
     <div class="col-12">
-        <h1 class="text-black-50 mt-5">
+        <h3 class="text-black-50 mt-5">
             {{message.id ? `Update ${message.title}` : "Create Message"}}
             <button @click="removeEdit" v-if="message.id" class="mt-3 btn float-right btn-danger btn-sm">Close</button>
-        </h1>
+        </h3>
         <div class="card">
             <div class="card-body">
     <form @submit="saveMessage">

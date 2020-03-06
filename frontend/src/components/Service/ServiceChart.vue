@@ -126,7 +126,7 @@
           visible: function(newVal, oldVal) {
               if (newVal && !this.showing) {
                   this.showing = true
-                  this.chartHits("hour")
+                  this.chartHits("1h")
               }
           }
       },
@@ -135,8 +135,8 @@
               const start = this.nowSubtract((3600 * 24) * 30)
               this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), group)
 
-              if (this.data.length === 0 && group !== "hour") {
-                  await this.chartHits("hour")
+              if (this.data.length === 0 && group !== "1h") {
+                  await this.chartHits("30m")
               }
               this.series = [{
                   name: this.service.name,

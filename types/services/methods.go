@@ -186,14 +186,14 @@ func (s *Service) OnlineSince(ago time.Time) float32 {
 
 // Downtime returns the amount of time of a offline service
 func (s *Service) Downtime() time.Duration {
-	hits := s.AllHits().Last(1)
-	fail := s.AllFailures().Last(1)
-	if len(fail) == 0 {
+	hit := s.LastHit()
+	fail := s.LastFailure()
+	if hit == nil {
 		return time.Duration(0)
 	}
-	if len(fail) == 0 {
-		return time.Now().UTC().Sub(fail[0].CreatedAt.UTC())
+	if fail == nil {
+		return utils.Now().Sub(fail.CreatedAt)
 	}
-	since := fail[0].CreatedAt.UTC().Sub(hits[0].CreatedAt.UTC())
-	return since
+
+	return fail.CreatedAt.Sub(hit.CreatedAt)
 }

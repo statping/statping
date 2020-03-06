@@ -30,14 +30,15 @@ func (it *Db) FormatTime(t time.Time) string {
 	}
 }
 
-func (it *Db) SelectByTime(increment string) string {
+func (it *Db) SelectByTime(increment time.Duration) string {
+	seconds := int(increment.Seconds())
 	switch it.Type {
 	case "mysql":
-		return fmt.Sprintf("CONCAT(date_format(created_at, '%s')) AS timeframe", it.correctTimestamp(increment))
+		return fmt.Sprintf("FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(created_at) / %d) * %d) AS timeframe", seconds, seconds)
 	case "postgres":
 		return fmt.Sprintf("date_trunc('%s', created_at) AS timeframe", increment)
 	default:
-		return fmt.Sprintf("strftime('%s', created_at, 'utc') as timeframe", it.correctTimestamp(increment))
+		return fmt.Sprintf("datetime((strftime('%%s', created_at) / %d) * %d, 'unixepoch') as timeframe", seconds, seconds)
 	}
 }
 

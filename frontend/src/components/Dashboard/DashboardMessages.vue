@@ -1,7 +1,7 @@
 <template>
     <div>
     <div class="col-12">
-        <h1 class="text-black-50">Messages</h1>
+        <h3 class="text-black-50">Messages</h3>
         <table class="table table-striped">
             <thead>
             <tr>
