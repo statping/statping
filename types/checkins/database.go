@@ -14,15 +14,15 @@ func DBhits() database.Database {
 }
 
 func Find(id int64) (*Checkin, error) {
-	var checkin *Checkin
+	var checkin Checkin
 	db := DB().Where("id = ?", id).Find(&checkin)
-	return checkin, db.Error()
+	return &checkin, db.Error()
 }
 
 func FindByAPI(key string) (*Checkin, error) {
-	var checkin *Checkin
+	var checkin Checkin
 	db := DB().Where("api = ?", key).Find(&checkin)
-	return checkin, db.Error()
+	return &checkin, db.Error()
 }
 
 func All() []*Checkin {
@@ -33,7 +33,7 @@ func All() []*Checkin {
 
 func (c *Checkin) Create() error {
 	c.ApiKey = utils.RandomString(7)
-	db := DB().Create(&c)
+	db := DB().Create(c)
 
 	c.Start()
 	go c.CheckinRoutine()
@@ -41,12 +41,12 @@ func (c *Checkin) Create() error {
 }
 
 func (c *Checkin) Update() error {
-	db := DB().Update(&c)
+	db := DB().Update(c)
 	return db.Error()
 }
 
 func (c *Checkin) Delete() error {
 	c.Close()
-	db := DB().Delete(&c)
+	db := DB().Delete(c)
 	return db.Error()
 }

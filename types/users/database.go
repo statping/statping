@@ -12,9 +12,9 @@ func DB() database.Database {
 }
 
 func Find(id int64) (*User, error) {
-	var user *User
+	var user User
 	db := DB().Where("id = ?", id).Find(user)
-	return user, db.Error()
+	return &user, db.Error()
 }
 
 func FindByUsername(username string) (*User, error) {
@@ -38,7 +38,7 @@ func (u *User) Create() error {
 	u.ApiKey = utils.NewSHA1Hash(5)
 	u.ApiSecret = utils.NewSHA1Hash(10)
 
-	db := DB().Create(&u)
+	db := DB().Create(u)
 	return db.Error()
 }
 
@@ -50,6 +50,6 @@ func (u *User) Update() error {
 }
 
 func (u *User) Delete() error {
-	db := DB().Delete(&u)
+	db := DB().Delete(u)
 	return db.Error()
 }

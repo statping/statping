@@ -30,7 +30,6 @@ func Select() (*Core, error) {
 	App = &c
 	App.UseCdn = null.NewNullBool(os.Getenv("USE_CDN") == "true")
 	return App, db.Error()
-
 }
 
 func (c *Core) Create() error {
@@ -50,7 +49,7 @@ func (c *Core) Create() error {
 }
 
 func (c *Core) Update() error {
-	db := DB().Update(&c)
+	db := DB().Update(c)
 	return db.Error()
 }
 
@@ -74,6 +73,6 @@ func Sample() error {
 		Footer:      null.NewNullString(""),
 	}
 
-	db := DB().Create(&core)
+	db := DB().Create(core)
 	return db.Error()
 }

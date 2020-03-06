@@ -7,9 +7,9 @@ func DB() database.Database {
 }
 
 func Find(id int64) (*Failure, error) {
-	var failure *Failure
+	var failure Failure
 	db := DB().Where("id = ?", id).Find(&failure)
-	return failure, db.Error()
+	return &failure, db.Error()
 }
 
 func All() []*Failure {
@@ -19,16 +19,16 @@ func All() []*Failure {
 }
 
 func (f *Failure) Create() error {
-	db := DB().Create(&f)
+	db := DB().Create(f)
 	return db.Error()
 }
 
 func (f *Failure) Update() error {
-	db := DB().Update(&f)
+	db := DB().Update(f)
 	return db.Error()
 }
 
 func (f *Failure) Delete() error {
-	db := DB().Delete(&f)
+	db := DB().Delete(f)
 	return db.Error()
 }

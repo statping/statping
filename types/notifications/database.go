@@ -9,10 +9,10 @@ func DB() database.Database {
 	return database.DB().Model(&Notification{})
 }
 
-func Find(method string) (Notifier, error) {
+func Find(name string) (Notifier, error) {
 	for _, n := range AllCommunications {
 		notif := n.Select()
-		if notif.Method == method {
+		if notif.Name() == name || notif.Method == name {
 			return n, nil
 		}
 	}
@@ -26,26 +26,21 @@ func All() []*Notification {
 }
 
 func (n *Notification) Create() error {
-	db := DB().FirstOrCreate(&n)
+	db := DB().Create(n)
 	return db.Error()
 }
 
-func Update(notifier Notifier) error {
-	n := notifier.Select()
+func (n *Notification) Update() error {
 	n.ResetQueue()
-	err := n.Update()
 	if n.Enabled.Bool {
 		n.Close()
 		n.Start()
-		go Queue(notifier)
+		go Queue(Notifier(n))
 	} else {
 		n.Close()
 	}
-	return err
-}
-
-func (n *Notification) Update() error {
-	return Update(n)
+	err := DB().Update(n)
+	return err.Error()
 }
 
 func (n *Notification) Delete() error {

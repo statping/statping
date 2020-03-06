@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/utils"
+	"sort"
 )
 
 var log = utils.Log
@@ -31,8 +32,17 @@ func All() map[int64]*Service {
 	return allServices
 }
 
+func AllInOrder() []Service {
+	var services []Service
+	for _, service := range allServices {
+		services = append(services, *service)
+	}
+	sort.Sort(ServiceOrder(services))
+	return services
+}
+
 func (s *Service) Create() error {
-	err := DB().Create(&s)
+	err := DB().Create(s)
 	if err.Error() != nil {
 		log.Errorln(fmt.Sprintf("Failed to create service %v #%v: %v", s.Name, s.Id, err))
 		return err.Error()
@@ -40,14 +50,11 @@ func (s *Service) Create() error {
 	allServices[s.Id] = s
 
 	go ServiceCheckQueue(allServices[s.Id], true)
-	reorderServices()
-	//notifications.OnNewService(s)
-
 	return nil
 }
 
 func (s *Service) Update() error {
-	db := DB().Update(&s)
+	db := DB().Update(s)
 
 	allServices[s.Id] = s
 
@@ -61,18 +68,16 @@ func (s *Service) Update() error {
 	s.SleepDuration = s.Duration()
 	go ServiceCheckQueue(allServices[s.Id], true)
 
-	reorderServices()
 	//notifier.OnUpdatedService(s.Service)
 
 	return db.Error()
 }
 
 func (s *Service) Delete() error {
-	db := database.DB().Delete(&s)
+	db := database.DB().Delete(s)
 
 	s.Close()
 	delete(allServices, s.Id)
-	reorderServices()
 	//notifier.OnDeletedService(s.Service)
 
 	return db.Error()

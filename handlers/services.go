@@ -189,8 +189,7 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllServicesHandler(r *http.Request) interface{} {
-	services := services.All()
-	return services
+	return services.AllInOrder()
 }
 
 func joinServices(srvss map[int64]*services.Service) []*services.Service {

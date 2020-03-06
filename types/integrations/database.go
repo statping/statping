@@ -10,9 +10,9 @@ func DB() database.Database {
 }
 
 func Find(name string) (*Integration, error) {
-	var integration *Integration
+	var integration Integration
 	db := DB().Where("name = ?", name).Find(&integration)
-	return integration, db.Error()
+	return &integration, db.Error()
 }
 
 func All() []*Integration {
@@ -26,16 +26,16 @@ func List(i Integrator) ([]*services.Service, error) {
 }
 
 func (i *Integration) Create() error {
-	db := DB().Create(&i)
+	db := DB().Create(i)
 	return db.Error()
 }
 
 func (i *Integration) Update() error {
-	db := DB().Update(&i)
+	db := DB().Update(i)
 	return db.Error()
 }
 
 func (i *Integration) Delete() error {
-	db := DB().Delete(&i)
+	db := DB().Delete(i)
 	return db.Error()
 }

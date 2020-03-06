@@ -7,7 +7,6 @@ import (
 	"github.com/hunterlong/statping/types/null"
 	"github.com/hunterlong/statping/utils"
 	"net/url"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -54,11 +53,6 @@ func (s Service) Hash() string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-// reorderServices will sort the services based on 'order_id'
-func reorderServices() {
-	sort.Sort(ServiceOrder(allServices))
-}
-
 // SelectAllServices returns a slice of *core.Service to be store on []*core.Services
 // should only be called once on startup.
 func SelectAllServices(start bool) (map[int64]*Service, error) {
@@ -84,8 +78,6 @@ func SelectAllServices(start bool) (map[int64]*Service, error) {
 		// collect initial service stats
 		s.UpdateStats()
 	}
-
-	reorderServices()
 
 	return allServices, nil
 }

@@ -22,17 +22,17 @@ func All() []*Group {
 }
 
 func (g *Group) Create() error {
-	db := DB().Create(&g)
+	db := DB().Create(g)
 	return db.Error()
 }
 
 func (g *Group) Update() error {
-	db := DB().Update(&g)
+	db := DB().Update(g)
 	return db.Error()
 }
 
 func (g *Group) Delete() error {
-	db := DB().Delete(&g)
+	db := DB().Delete(g)
 	return db.Error()
 }
 

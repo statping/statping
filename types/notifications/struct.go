@@ -68,8 +68,17 @@ type Notification struct {
 }
 
 type notificationHits struct {
-	onSuccess int64 `gorm:"-" json:"-"`
-	onFailure int64 `gorm:"-" json:"-"`
+	OnSuccess         int64 `gorm:"-" json:"-"`
+	OnFailure         int64 `gorm:"-" json:"-"`
+	OnSave            int64 `gorm:"-" json:"-"`
+	OnNewService      int64 `gorm:"-" json:"-"`
+	OnUpdatedService  int64 `gorm:"-" json:"-"`
+	OnDeletedService  int64 `gorm:"-" json:"-"`
+	OnNewUser         int64 `gorm:"-" json:"-"`
+	OnUpdatedUser     int64 `gorm:"-" json:"-"`
+	OnDeletedUser     int64 `gorm:"-" json:"-"`
+	OnNewNotifier     int64 `gorm:"-" json:"-"`
+	OnUpdatedNotifier int64 `gorm:"-" json:"-"`
 }
 
 // QueueData is the struct for the messaging queue with service
@@ -155,7 +164,7 @@ func reverseLogs(input []*NotificationLog) []*NotificationLog {
 // SelectNotification returns the Notification struct from the database
 func SelectNotification(n Notifier) (*Notification, error) {
 	notifier := n.Select()
-	err := DB().Where("method = ?", notifier.Method).Scan(&notifier)
+	err := DB().Where("method = ?", notifier.Method).Find(&notifier)
 	return notifier, err.Error()
 }
 

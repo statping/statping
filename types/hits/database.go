@@ -12,9 +12,9 @@ func DB() database.Database {
 }
 
 func Find(id int64) (*Hit, error) {
-	var group *Hit
+	var group Hit
 	db := DB().Where("id = ?", id).Find(&group)
-	return group, db.Error()
+	return &group, db.Error()
 }
 
 func All() []*Hit {
@@ -24,16 +24,16 @@ func All() []*Hit {
 }
 
 func (h *Hit) Create() error {
-	db := DB().Create(&h)
+	db := DB().Create(h)
 	return db.Error()
 }
 
 func (h *Hit) Update() error {
-	db := DB().Update(&h)
+	db := DB().Update(h)
 	return db.Error()
 }
 
 func (h *Hit) Delete() error {
-	db := DB().Delete(&h)
+	db := DB().Delete(h)
 	return db.Error()
 }

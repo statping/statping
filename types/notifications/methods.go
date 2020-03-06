@@ -8,6 +8,12 @@ import (
 	"time"
 )
 
+func (n *Notification) Name() string {
+	newName := strings.ToLower(n.Method)
+	newName = strings.ReplaceAll(newName, " ", "_")
+	return newName
+}
+
 // AfterFind for Notification will set the timezone
 func (n *Notification) AfterFind() (err error) {
 	n.CreatedAt = utils.Now()
@@ -97,6 +103,7 @@ func Init(n Notifier) (*Notification, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "error selecting notification")
 		}
+
 		notify.CreatedAt = time.Now().UTC()
 		notify.UpdatedAt = time.Now().UTC()
 		if notify.Delay.Seconds() == 0 {

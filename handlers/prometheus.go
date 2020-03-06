@@ -81,7 +81,7 @@ func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, ser := range services.All() {
+	for _, ser := range services.AllInOrder() {
 		online := 1
 		if !ser.Online {
 			online = 0
@@ -106,8 +106,22 @@ func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 
 	for _, notif := range notifications.All() {
 		PrometheusComment(fmt.Sprintf("Notifier %s:", notif.Method))
-		PrometheusExportKey("notifier_on_success", notif.Id, notif.Method, 0)
-		PrometheusExportKey("notifier_on_failure", notif.Id, notif.Method, 0)
+		enabled := 0
+		if notif.Enabled.Bool {
+			enabled = 1
+		}
+		PrometheusExportKey("notifier_enabled", notif.Id, notif.Method, enabled)
+		PrometheusExportKey("notifier_on_success", notif.Id, notif.Method, notif.Hits.OnSuccess)
+		PrometheusExportKey("notifier_on_failure", notif.Id, notif.Method, notif.Hits.OnFailure)
+		PrometheusExportKey("notifier_on_user_new", notif.Id, notif.Method, notif.Hits.OnNewUser)
+		PrometheusExportKey("notifier_on_user_update", notif.Id, notif.Method, notif.Hits.OnUpdatedUser)
+		PrometheusExportKey("notifier_on_user_delete", notif.Id, notif.Method, notif.Hits.OnDeletedUser)
+		PrometheusExportKey("notifier_on_service_new", notif.Id, notif.Method, notif.Hits.OnNewService)
+		PrometheusExportKey("notifier_on_service_update", notif.Id, notif.Method, notif.Hits.OnUpdatedService)
+		PrometheusExportKey("notifier_on_service_delete", notif.Id, notif.Method, notif.Hits.OnDeletedService)
+		PrometheusExportKey("notifier_on_notifier_new", notif.Id, notif.Method, notif.Hits.OnNewNotifier)
+		PrometheusExportKey("notifier_on_notifier_update", notif.Id, notif.Method, notif.Hits.OnUpdatedNotifier)
+		PrometheusExportKey("notifier_on_notifier_save", notif.Id, notif.Method, notif.Hits.OnSave)
 	}
 
 	PrometheusComment("HTTP Metrics")
