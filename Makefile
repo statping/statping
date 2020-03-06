@@ -82,7 +82,7 @@ frontend-build:
 	cp -r source/tmpl/*.* source/dist/
 
 # compile assets using SASS and Rice. compiles scss -> css, and run rice embed-go
-compile: frontend-build generate
+compile: generate frontend-build
 	cd source && rice embed-go
 
 build: clean
