@@ -1,11 +1,13 @@
 <template>
-    <div class="col-12">
-        <h3 class="text-black-50 mt-5">
-            {{message.id ? `Update ${message.title}` : "Create Message"}}
-            <button @click="removeEdit" v-if="message.id" class="mt-3 btn float-right btn-danger btn-sm">Close</button>
-        </h3>
-        <div class="card">
-            <div class="card-body">
+<div>
+    <div class="card contain-card text-black-50 bg-white mb-5">
+        <div class="card-header">{{message.id ? `Update ${message.title}` : "Create Message"}}
+
+            <transition name="slide-fade">
+                <button @click="removeEdit" v-if="message.id" class="btn btn-sm float-right btn-danger btn-sm">Close</button>
+            </transition>
+        </div>
+        <div class="card-body">
     <form @submit="saveMessage">
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Title</label>
@@ -84,9 +86,8 @@
         <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
     </form>
             </div>
-        </div>
-
     </div>
+</div>
 </template>
 
 <script>

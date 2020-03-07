@@ -1,19 +1,19 @@
 <template>
-    <div>
     <div class="col-12">
-        <h3 class="text-black-50">Services
-            <router-link to="/dashboard/create_service" class="btn btn-outline-success mt-1 float-right">
+        <div class="card contain-card text-black-50 bg-white mb-4">
+            <div class="card-header">Services
+                <router-link to="/dashboard/create_service" class="btn btn-sm btn-outline-success float-right">
                 <font-awesome-icon icon="plus"/>  Create
-            </router-link>
-        </h3>
+            </router-link></div>
+            <div class="card-body">
+                <ServicesList/>
+            </div>
+        </div>
 
-        <ServicesList/>
 
-    </div>
-
-    <div class="col-12 mt-5">
-
-        <h1 class="text-muted">Groups</h1>
+        <div class="card contain-card text-black-50 bg-white mb-4">
+            <div class="card-header">Groups</div>
+            <div class="card-body">
         <table class="table">
             <thead>
             <tr>
@@ -27,7 +27,7 @@
             <draggable tag="tbody" v-model="groupsList" class="sortable_groups" handle=".drag_icon">
             <tr v-for="(group, index) in $store.getters.groupsCleanInOrder" v-bind:key="group.id">
                 <td><span class="drag_icon d-none d-md-inline">
-                    <font-awesome-icon icon="bars" /></span> {{group.name}}
+                    <font-awesome-icon icon="bars" class="mr-3" /></span> {{group.name}}
                 </td>
                 <td>{{$store.getters.servicesInGroup(group.id).length}}</td>
                 <td>
@@ -47,10 +47,14 @@
                 </draggable>
         </table>
 
+            </div>
+        </div>
+
+
         <FormGroup :edit="editChange" :in_group="group"/>
 
     </div>
-    </div>
+
 </template>
 
 <script>

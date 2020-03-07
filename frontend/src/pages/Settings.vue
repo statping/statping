@@ -35,7 +35,19 @@
                 <div class="tab-content" id="v-pills-tabContent">
                     <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-home-tab'), show: liClass('v-pills-home-tab')}" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
 
-                        <CoreSettings/>
+                        <div class="card text-black-50 bg-white mb-5">
+                            <div class="card-header">Statping Settings</div>
+                            <div class="card-body">
+
+                                <CoreSettings/>
+
+                            </div>
+                        </div>
+
+
+                        <div class="card text-black-50 bg-white mb-3">
+                            <div class="card-header">Statping Settings</div>
+                            <div class="card-body">
 
                         <h2 class="mt-5">Additional Settings</h2>
                         <div v-if="core.domain !== ''" class="row">
@@ -51,14 +63,27 @@
                             Insert a domain to view QR code for the mobile app.
                         </div>
 
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-style-tab'), show: liClass('v-pills-style-tab')}" id="v-pills-style" role="tabpanel" aria-labelledby="v-pills-style-tab">
-                        <ThemeEditor :core="core"/>
+                        <div class="card text-black-50 bg-white mb-5">
+                            <div class="card-header">Theme Editor</div>
+                            <div class="card-body">
+                                <ThemeEditor :core="core"/>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-cache-tab'), show: liClass('v-pills-cache-tab')}" id="v-pills-cache" role="tabpanel" aria-labelledby="v-pills-cache-tab">
-                        <Cache/>
+                        <div class="card text-black-50 bg-white mb-5">
+                            <div class="card-header">Cache</div>
+                            <div class="card-body">
+                                <Cache/>
+                            </div>
+                        </div>
                     </div>
 
                     <div v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="`${notifier.title}_${index}`" class="tab-pane fade" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), show: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" role="tabpanel" v-bind:aria-labelledby="`v-pills-${notifier.method.toLowerCase()}-tab`">

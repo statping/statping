@@ -1,5 +1,5 @@
 import Vue from "vue";
-const { zonedTimeToUtc, utcToZonedTime, subSeconds, parse, parseISO, getUnixTime, fromUnixTime, format, differenceInSeconds, formatDistanceToNow, formatDistance } = require('date-fns')
+const { zonedTimeToUtc, utcToZonedTime, lastDayOfMonth, subSeconds, parse, parseISO, getUnixTime, fromUnixTime, format, differenceInSeconds, formatDistanceToNow, formatDistance } = require('date-fns')
 
 export default Vue.mixin({
   methods: {
@@ -15,10 +15,13 @@ export default Vue.mixin({
     ago(t1) {
       return formatDistanceToNow(t1)
     },
+      daysInMonth(t1) {
+          return lastDayOfMonth(t1)
+      },
     nowSubtract(seconds) {
       return subSeconds(new Date(), seconds)
     },
-    duration(t1, t2) {
+    dur(t1, t2) {
       return formatDistance(t1, t2)
     },
     niceDate(val) {

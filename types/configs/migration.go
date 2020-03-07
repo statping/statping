@@ -74,7 +74,25 @@ func (c *DbConfig) MigrateDatabase() error {
 	if err := tx.Commit().Error(); err != nil {
 		return err
 	}
-	log.Infoln("Statping Database Migrated")
+	log.Infoln("Statping Database Tables Migrated")
+
+	if err := database.DB().Model(&hits.Hit{}).AddIndex("idx_service_hit", "service").Error(); err != nil {
+		log.Errorln(err)
+	}
+
+	if err := database.DB().Model(&hits.Hit{}).AddIndex("hit_created_at", "created_at").Error(); err != nil {
+		log.Errorln(err)
+	}
+
+	if err := database.DB().Model(&failures.Failure{}).AddIndex("idx_service_fail", "service").Error(); err != nil {
+		log.Errorln(err)
+	}
+
+	if err := database.DB().Model(&failures.Failure{}).AddIndex("idx_checkin_fail", "checkin").Error(); err != nil {
+		log.Errorln(err)
+	}
+
+	log.Infoln("Statping Database Indexes Migrated")
 
 	return nil
 }

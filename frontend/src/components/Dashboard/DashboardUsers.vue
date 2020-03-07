@@ -1,6 +1,8 @@
 <template>
     <div class="col-12">
-        <h3 class="text-black-50">Users</h3>
+        <div class="card contain-card text-black-50 bg-white mb-5">
+            <div class="card-header">Users</div>
+            <div class="card-body">
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -26,8 +28,11 @@
             </tr>
             </tbody>
         </table>
+            </div>
+        </div>
 
-        <FormUser :edit="editChange" :in_user="user"/>
+                <FormUser :edit="editChange" :in_user="user"/>
+
     </div>
 </template>
 

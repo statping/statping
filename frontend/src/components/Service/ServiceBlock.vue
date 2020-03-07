@@ -18,12 +18,22 @@
             </div>
 
             <div class="row lower_canvas full-col-12 text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
-                <div class="col-10 text-truncate">
-                    <span class="d-none d-md-inline">
-                        {{smallText(service)}}
-                    </span>
+                <div class="col-md-8 col-6">
+                        <div class="dropup" :class="{show: dropDownMenu}">
+                              <button style="font-size: 10pt;" @focusout="dropDownMenu = false"  @click="dropDownMenu = !dropDownMenu" type="button" class="col-4 float-left btn btn-sm float-right btn-block text-white dropdown-toggle service_scale" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  24 Hours
+                              </button>
+                              <div class="dropdown-menu" :class="{show: dropDownMenu}">
+                                <a v-for="(timeframe, i) in timeframes" @click="timeframe.picked = true" class="dropdown-item" href="#">{{timeframe.text}}</a>
+                              </div>
+
+                            <span class="d-none float-right d-md-inline">
+                                {{smallText(service)}}
+                            </span>
+                        </div>
                 </div>
-                <div class="col-sm-12 col-md-2">
+
+                <div class="col-md-4 col-6 float-right">
                     <router-link :to="serviceLink(service)" class="btn btn-sm float-right dyn-dark btn-block text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
                         View Service</router-link>
                 </div>
@@ -49,6 +59,14 @@ export default {
     data() {
         return {
             visible: false,
+            dropDownMenu: false,
+            timeframes: [
+                {value: "72h", text: "3 Days", picked: true },
+                {value: "24h", text: "Since Yesterday" },
+                {value: "3", text: "3 Hours" },
+                {value: "1m", text: "1 Month" },
+                {value: "3", text: "Last 3 Months" },
+            ]
         }
     },
     methods: {

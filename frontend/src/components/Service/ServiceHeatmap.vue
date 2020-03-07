@@ -21,6 +21,29 @@
               ready: false,
               data: [],
               chartOptions: {
+                  heatmap: {
+                      colorScale: {
+                          ranges: [{
+                              from: 0,
+                              to: 1,
+                              color: 'rgba(235,63,48,0.69)',
+                              name: 'low',
+                          },
+                              {
+                                  from: 2,
+                                  to: 10,
+                                  color: 'rgba(245,43,43,0.58)',
+                                  name: 'medium',
+                              },
+                              {
+                                  from: 11,
+                                  to: 999,
+                                  color: '#cb221c',
+                                  name: 'high',
+                              }
+                          ]
+                      }
+                  },
                   chart: {
                       height: "100%",
                       width: "100%",
@@ -64,15 +87,21 @@
       methods: {
           async chartHeatmap() {
               const start = this.nowSubtract((3600 * 24) * 7)
-              const data = await Api.service_heatmap(this.service.id, this.toUnix(start), this.toUnix(new Date()), "1h")
+              const data = await Api.service_failures_data(this.service.id, this.toUnix(start), this.toUnix(new Date()), "24h", true)
+
+              window.console.log(data)
 
               let dataArr = []
               data.forEach(function(d) {
-                  let date = new Date(d.date);
-                  dataArr.push({name: date.toLocaleString('en-us', { month: 'long' }), data: d.data});
+                  dataArr.push({x: d.timeframe, y: 5+d.amount});
               });
 
-              this.series = dataArr
+              let date = new Date(dataArr[0].x);
+              const output = [{name: date.toLocaleString('en-us', { month: 'long'}), data: dataArr}]
+
+              window.console.log(output)
+
+              this.series = output
               this.ready = true
           }
       }

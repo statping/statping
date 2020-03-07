@@ -1,7 +1,8 @@
 <template>
-    <div>
     <div class="col-12">
-        <h3 class="text-black-50">Messages</h3>
+        <div class="card contain-card text-black-50 bg-white mb-4">
+            <div class="card-header">Messages</div>
+            <div class="card-body">
         <table class="table table-striped">
             <thead>
             <tr>
@@ -30,9 +31,9 @@
             </tbody>
         </table>
     </div>
+        </div>
 
-        <FormMessage :edit="editChange" :in_message="message"/>
-
+            <FormMessage :edit="editChange" :in_message="message"/>
     </div>
 </template>
 

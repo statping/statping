@@ -1,12 +1,11 @@
 <template>
-    <div>
-        <h1 class="text-muted mt-5">
-            {{group.id ? `Update ${group.name}` : "Create Group"}}
-            <button @click="removeEdit" v-if="group.id" class="mt-3 btn float-right btn-danger btn-sm">Close</button>
-        </h1>
+    <div class="card contain-card text-black-50 bg-white mb-3">
+        <div class="card-header">{{group.id ? `Update ${group.name}` : "Create Group"}}
+            <transition name="slide-fade">
+                <button @click="removeEdit" v-if="group.id" class="btn float-right btn-danger btn-sm">Close</button>
+            </transition></div>
+        <div class="card-body">
 
-        <div class="card">
-            <div class="card-body">
     <form @submit="saveGroup">
         <div class="form-group row">
             <label for="title" class="col-sm-4 col-form-label">Group Name</label>
@@ -16,7 +15,7 @@
         </div>
         <div class="form-group row">
             <label for="switch-group-public" class="col-sm-4 col-form-label">Public Group</label>
-            <div class="col-8 mt-1">
+            <div class="col-md-8 col-xs-12 mt-1">
             <span @click="group.public = !!group.public" class="switch float-left">
                 <input v-model="group.public" type="checkbox" class="switch" id="switch-group-public" :checked="group.public">
                 <label for="switch-group-public">Show group services to the public</label>
@@ -33,7 +32,6 @@
         <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
     </form>
             </div>
-        </div>
     </div>
 </template>
 

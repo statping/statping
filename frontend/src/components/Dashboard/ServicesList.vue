@@ -3,7 +3,7 @@
         <thead>
         <tr>
             <th scope="col">Name</th>
-            <th scope="col" class="d-none d-md-table-cell">Status</th>
+            <th scope="col" class="d-none d-md-table-cell"></th>
             <th scope="col" class="d-none d-md-table-cell">Visibility</th>
             <th scope="col" class="d-none d-md-table-cell">Group</th>
             <th scope="col"></th>
@@ -13,13 +13,10 @@
             <tr v-for="(service, index) in $store.getters.servicesInOrder" :key="service.id">
                 <td>
                     <span class="drag_icon d-none d-md-inline">
-                        <font-awesome-icon icon="bars" />
+                        <font-awesome-icon icon="bars" class="mr-3"/>
                     </span> {{service.name}}
                 </td>
                 <td class="d-none d-md-table-cell">
-                    <span class="badge" :class="{'animate-fader': !service.online, 'badge-success': service.online, 'badge-danger': !service.online}">
-                        {{service.online ? "ONLINE" : "OFFLINE"}}
-                    </span>
                     <ToggleSwitch v-if="service.online" :service="service"/>
                 </td>
                 <td class="d-none d-md-table-cell">

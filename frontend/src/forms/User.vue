@@ -1,12 +1,11 @@
 <template>
-    <div>
-        <h3 class="text-black-50 mt-5">
-            {{user.id ? `Update ${user.username}` : "Create User"}}
-
-        <button @click.prevent="removeEdit" v-if="user.id" class="mt-3 btn float-right btn-danger btn-sm">Close</button></h3>
-
-        <div class="card">
-            <div class="card-body">
+    <div class="card contain-card text-black-50 bg-white mb-3">
+        <div class="card-header"> {{user.id ? `Update ${user.username}` : "Create User"}}
+            <transition name="slide-fade">
+                <button @click.prevent="removeEdit" v-if="user.id" class="btn btn-sm float-right btn-danger btn-sm">Close</button>
+            </transition>
+        </div>
+        <div class="card-body">
     <form @submit="saveUser">
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Username</label>
@@ -49,8 +48,7 @@
         </div>
         <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
     </form>
-            </div>
-        </div>
+    </div>
     </div>
 </template>
 

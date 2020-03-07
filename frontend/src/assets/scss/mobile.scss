@@ -6,6 +6,10 @@
         background-color: $sm-background-color;
     }
 
+  .index_container {
+    padding-top: 4.5vh !important;
+  }
+
     .sm-container {
         margin-top: 0px !important;
         padding: 0 !important;
@@ -20,9 +24,13 @@
         font-size: 0.9rem;
     }
 
+  .service_li {
+    border: 1px solid #f3f3f3 !important;
+  }
+
     .container {
         padding: 0px !important;
-        padding-top: 4vh !important;
+        padding-top: 0vh !important;
         min-height: 960pt;
     }
 
@@ -34,11 +42,21 @@
         margin-left: 0px;
         margin-top: 0px;
         width: 100%;
-        margin-bottom: 0;
         box-shadow: 1px 10px 20px 0px;
         height: 55pt;
         color: rgba(0, 0, 0, 0.20);
+      margin-bottom: 20pt;
     }
+
+  .navbar-collapse {
+    z-index: 999999;
+    background-color: #f9f9f9;
+    width: 100%;
+    padding: 10pt 15pt;
+    left: 0px;
+    top: 75px;
+    position: absolute;
+  }
 
     .btn-sm {
         line-height: 1.4rem;
