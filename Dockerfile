@@ -7,6 +7,7 @@ RUN yarn install
 COPY ./frontend .
 RUN yarn build && rm -rf node_modules
 
+
 # Statping Golang BACKEND building from source
 # Creates "/go/bin/statping" and "/usr/local/bin/sass" for copying
 FROM golang:1.14-alpine AS backend
@@ -25,9 +26,10 @@ RUN go get github.com/stretchr/testify/assert && \
 	go get github.com/cortesi/modd/cmd/modd && \
 	go get github.com/crazy-max/xgo
 COPY . .
-COPY --from=frontend /statping/dist ./source/
+COPY --from=frontend /statping/dist/ ./source/dist/
 RUN make clean generate embed build
 RUN chmod a+x statping && mv statping /go/bin/statping
+
 
 # Statping main Docker image that contains all required libraries
 FROM alpine:latest
