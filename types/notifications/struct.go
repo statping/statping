@@ -174,11 +174,10 @@ func insertDatabase(n Notifier) (int64, error) {
 	noti := n.Select()
 	noti.Limits = 3
 	noti.name = noti.Name()
-	err := noti.Create()
-	if err != nil {
+	if err := noti.Create(); err != nil {
 		return 0, err
 	}
-	return noti.Id, err
+	return noti.Id, nil
 }
 
 // SelectNotifier returns the Notification struct from the database

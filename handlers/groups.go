@@ -53,6 +53,7 @@ func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
 func apiGroupUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	group, err := selectGroup(r)
 	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
 		sendErrorJson(errors.Wrap(err, "group not found"), w, r)
 		return
 	}

@@ -1,3 +1,5 @@
+// +build int
+
 package handlers
 
 import (
@@ -15,14 +17,6 @@ func TestGroupAPIRoutes(t *testing.T) {
 			ResponseLen:    3,
 			BeforeTest:     SetTestENV,
 			AfterTest:      UnsetTestENV,
-		},
-		{
-			Name:           "Statping Public and Private Groups",
-			URL:            "/api/groups",
-			Method:         "GET",
-			ExpectedStatus: 200,
-			ResponseLen:    3,
-			BeforeTest:     UnsetTestENV,
 		},
 		{
 			Name:           "Statping View Public Group",
@@ -54,6 +48,14 @@ func TestGroupAPIRoutes(t *testing.T) {
 				}`,
 			Method:         "POST",
 			ExpectedStatus: 200,
+		},
+		{
+			Name:           "Statping Public and Private Groups",
+			URL:            "/api/groups",
+			Method:         "GET",
+			ExpectedStatus: 200,
+			ResponseLen:    2,
+			BeforeTest:     UnsetTestENV,
 		},
 		{
 			Name:           "Statping View Private Group",

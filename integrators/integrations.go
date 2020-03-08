@@ -150,24 +150,18 @@ func AddIntegrations(inte ...integrations.Integrator) error {
 
 // install will check the database for the notification, if its not inserted it will insert a new record for it
 func install(i integrations.Integrator) error {
-	inDb := isInDatabase(i)
-	log.WithField("installed", inDb).
-		WithFields(utils.ToFields(i)).
-		Debugln(fmt.Sprintf("Checking if integrator '%v' is installed: %v", i.Get().Name, inDb))
-	if !inDb {
-		_, err := insertDatabase(i)
-		if err != nil {
-			log.Errorln(err)
-			return err
-		}
+	_, err := insertDatabase(i)
+	if err != nil {
+		log.Errorln(err)
+		return err
 	}
-	return nil
+	return err
 }
 
 // insertDatabase will create a new record into the database for the integrator
 func insertDatabase(i integrations.Integrator) (string, error) {
 	integrator := i.Get()
-	query := db.Create(integrator)
+	query := db.FirstOrCreate(integrator)
 	if query.Error() != nil {
 		return "", query.Error()
 	}

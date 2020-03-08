@@ -51,13 +51,12 @@ func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonAction(message, "create", w, r)
 }
 
-func apiMessageGetHandler(w http.ResponseWriter, r *http.Request) {
+func apiMessageGetHandler(r *http.Request) interface{} {
 	message, id, err := getMessageByID(r)
 	if err != nil {
-		sendErrorJson(fmt.Errorf("message #%d was not found", id), w, r)
-		return
+		return fmt.Errorf("message #%d was not found", id)
 	}
-	returnJson(message, w, r)
+	return message
 }
 
 func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {

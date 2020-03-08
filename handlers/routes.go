@@ -156,7 +156,7 @@ func Router() *mux.Router {
 	// API MESSAGES Routes
 	api.Handle("/api/messages", scoped(apiAllMessagesHandler)).Methods("GET")
 	api.Handle("/api/messages", authenticated(apiMessageCreateHandler, false)).Methods("POST")
-	api.Handle("/api/messages/{id}", readOnly(apiMessageGetHandler, false)).Methods("GET")
+	api.Handle("/api/messages/{id}", scoped(apiMessageGetHandler)).Methods("GET")
 	api.Handle("/api/messages/{id}", authenticated(apiMessageUpdateHandler, false)).Methods("POST")
 	api.Handle("/api/messages/{id}", authenticated(apiMessageDeleteHandler, false)).Methods("DELETE")
 

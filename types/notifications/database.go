@@ -26,7 +26,7 @@ func All() []*Notification {
 }
 
 func (n *Notification) Create() error {
-	db := DB().Create(n)
+	db := DB().FirstOrCreate(&n)
 	return db.Error()
 }
 
