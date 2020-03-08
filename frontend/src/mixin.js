@@ -109,6 +109,12 @@ export default Vue.mixin({
         })
       })
       return {data: newSet}
+    },
+    lastDayOfMonth(month) {
+      return new Date(new Date().getUTCFullYear(), month + 1, 0);
+    },
+    firstDayOfMonth(month) {
+      return new Date(new Date().getUTCFullYear(), month, 1).getUTCDate();
     }
   }
 });

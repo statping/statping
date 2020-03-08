@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -59,8 +59,15 @@ func TestGroupAPIRoutes(t *testing.T) {
 			Name:           "Statping View Private Group",
 			URL:            "/api/groups/2",
 			Method:         "GET",
-			ExpectedStatus: 404,
+			ExpectedStatus: 401,
 			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "Statping View Private Group Allowed",
+			URL:            "/api/groups/2",
+			Method:         "GET",
+			ExpectedStatus: 200,
+			BeforeTest:     SetTestENV,
 		},
 		{
 			Name:           "Statping View Unknown Group",
@@ -79,7 +86,7 @@ func TestGroupAPIRoutes(t *testing.T) {
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
 			_, t, err := RunHTTPTest(v, t)
-			require.Nil(t, err)
+			assert.Nil(t, err)
 		})
 	}
 }

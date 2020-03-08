@@ -29,46 +29,44 @@ var (
 )
 
 // InsertSampleHits will create a couple new hits for the sample services
-func InsertSampleHits() error {
-	//tx := Begin(&hits.Hit{})
-	//sg := new(sync.WaitGroup)
-	//for i := int64(1); i <= 5; i++ {
-	//	sg.Add(1)
-	//	service := SelectService(i)
-	//	seed := time.Now().UnixNano()
-	//	log.Infoln(fmt.Sprintf("Adding %v sample hit records to service %v", SampleHits, service.Name))
-	//	createdAt := sampleStart
-	//	p := utils.NewPerlin(2., 2., 10, seed)
-	//	go func(sg *sync.WaitGroup) {
-	//		defer sg.Done()
-	//		for hi := 0.; hi <= float64(SampleHits); hi++ {
-	//			latency := p.Noise1D(hi / 500)
-	//			createdAt = createdAt.Add(60 * time.Second)
-	//			hit := &hits.Hit{
-	//				Service:   service.Id,
-	//				CreatedAt: createdAt,
-	//				Latency:   latency,
-	//			}
-	//			tx = tx.Create(&hit)
-	//		}
-	//	}(sg)
-	//}
-	//sg.Wait()
-	//if err := tx.Commit().Error(); err != nil {
-	//	log.Errorln(err)
-	//	return types.ErrWrap(err, types.ErrorCreateSampleHits)
-	//}
-	return nil
-}
+//func InsertSampleHits() error {
+//	tx := Begin(&hits.Hit{})
+//	sg := new(sync.WaitGroup)
+//	for i := int64(1); i <= 5; i++ {
+//		sg.Add(1)
+//		service := SelectService(i)
+//		seed := time.Now().UnixNano()
+//		log.Infoln(fmt.Sprintf("Adding %v sample hit records to service %v", SampleHits, service.Name))
+//		createdAt := sampleStart
+//		p := utils.NewPerlin(2., 2., 10, seed)
+//		go func(sg *sync.WaitGroup) {
+//			defer sg.Done()
+//			for hi := 0.; hi <= float64(SampleHits); hi++ {
+//				latency := p.Noise1D(hi / 500)
+//				createdAt = createdAt.Add(60 * time.Second)
+//				hit := &hits.Hit{
+//					Service:   service.Id,
+//					CreatedAt: createdAt,
+//					Latency:   latency,
+//				}
+//				tx = tx.Create(&hit)
+//			}
+//		}(sg)
+//	}
+//	sg.Wait()
+//	if err := tx.Commit().Error(); err != nil {
+//		log.Errorln(err)
+//		return types.ErrWrap(err, types.ErrorCreateSampleHits)
+//	}
+//	return nil
+//}
 
-// TmpRecords is used for testing Statping. It will create a SQLite database file
-// with sample data and store it in the /tmp folder to be used by the tests.
 //func TmpRecords(dbFile string) error {
 //	var sqlFile = utils.Directory + "/" + dbFile
 //	if err := utils.CreateDirectory(utils.Directory + "/tmp"); err != nil {
 //		log.Error(err)
 //	}
-//	var tmpSqlFile = utils.Directory + "/tmp/" + types.SqliteFilename
+//	var tmpSqlFile = utils.Directory + "/tmp/" + dbFile
 //	SampleHits = 480
 //
 //	var err error

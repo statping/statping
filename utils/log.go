@@ -124,6 +124,7 @@ func InitLogs() error {
 		MaxBackups: 5,
 		MaxAge:     28,
 	}
+
 	mw := io.MultiWriter(os.Stdout, ljLogger)
 	Log.SetOutput(mw)
 

@@ -49,11 +49,13 @@
           }
       },
       async mounted() {
-          this.set1 = await this.getHits(24, "1h")
+          this.set1 = await this.getHits(24, "15m")
           this.set1_name = this.calc(this.set1)
-          this.set2 = await this.getHits(24 * 7, "24h")
+          this.set2 = await this.getHits(24 * 7, "6h")
           this.set2_name = this.calc(this.set2)
           this.loaded = true
+
+          window.console.log(this.set1)
       },
       methods: {
           async getHits(hours, group) {

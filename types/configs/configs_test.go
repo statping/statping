@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	configs *DbConfig
+	testConfigs *DbConfig
 )
 
 func TestDbConfig_Save(t *testing.T) {
@@ -34,8 +34,6 @@ func TestLoadDbConfig(t *testing.T) {
 	Configs, err := LoadConfigFile(utils.Directory)
 	assert.Nil(t, err)
 	assert.Equal(t, "sqlite3", Configs.DbConn)
-
-	configs = Configs
 }
 
 func TestEnvToConfig(t *testing.T) {
@@ -56,4 +54,6 @@ func TestEnvToConfig(t *testing.T) {
 	assert.Equal(t, config.Description, "Testing Statping")
 	assert.Equal(t, config.Username, "admin")
 	assert.Equal(t, config.Password, "admin123")
+
+	testConfigs = config
 }

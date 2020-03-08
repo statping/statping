@@ -3,19 +3,20 @@ package handlers
 import (
 	"github.com/hunterlong/statping/types/services"
 	"github.com/pkg/errors"
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestApiServiceRoutes(t *testing.T) {
 	tests := []HTTPTest{
 		{
-			Name:             "Statping All Services",
+			Name:             "Statping All Public and Private Services",
 			URL:              "/api/services",
 			Method:           "GET",
 			ExpectedContains: []string{`"name":"Google"`},
 			ExpectedStatus:   200,
 			ResponseLen:      5,
+			BeforeTest:       SetTestENV,
 			FuncTest: func() error {
 				count := len(services.Services())
 				if count != 5 {
@@ -25,11 +26,43 @@ func TestApiServiceRoutes(t *testing.T) {
 			},
 		},
 		{
-			Name:             "Statping Service 1",
+			Name:             "Statping All Public Services",
+			URL:              "/api/services",
+			Method:           "GET",
+			ExpectedContains: []string{`"name":"Google"`},
+			ExpectedStatus:   200,
+			ResponseLen:      5,
+			BeforeTest:       UnsetTestENV,
+			FuncTest: func() error {
+				count := len(services.Services())
+				if count != 5 {
+					return errors.Errorf("incorrect services count: %d", count)
+				}
+				return nil
+			},
+		},
+		{
+			Name:             "Statping Public Service 1",
 			URL:              "/api/services/1",
 			Method:           "GET",
 			ExpectedContains: []string{`"name":"Google"`},
 			ExpectedStatus:   200,
+		},
+		{
+			Name:             "Statping Private Service 1",
+			URL:              "/api/services/1",
+			Method:           "GET",
+			ExpectedContains: []string{`"name":"Google"`},
+			ExpectedStatus:   200,
+			BeforeTest:       SetTestENV,
+		},
+		{
+			Name:             "Statping Service 1 with Private responses",
+			URL:              "/api/services/1",
+			Method:           "GET",
+			ExpectedContains: []string{`"name":"Google"`},
+			ExpectedStatus:   200,
+			BeforeTest:       SetTestENV,
 		},
 		{
 			Name:           "Statping Service 1 Data",
@@ -64,6 +97,7 @@ func TestApiServiceRoutes(t *testing.T) {
 			URL:            "/api/services/1/failure_data",
 			Method:         "GET",
 			Body:           "",
+			ResponseLen:    30,
 			ExpectedStatus: 200,
 		},
 		{
@@ -141,7 +175,7 @@ func TestApiServiceRoutes(t *testing.T) {
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
 			_, t, err := RunHTTPTest(v, t)
-			require.Nil(t, err)
+			assert.Nil(t, err)
 		})
 	}
 }

@@ -34,6 +34,7 @@ type Core struct {
 	CreatedAt     time.Time       `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt     time.Time       `gorm:"column:updated_at" json:"updated_at"`
 	Started       time.Time       `gorm:"-" json:"started_on"`
+	Image         string          `gorm:"image" json:"started_on"`
 	Notifications []AllNotifiers  `gorm:"-" json:"-"`
 	Integrations  []Integrator    `gorm:"-" json:"-"`
 }

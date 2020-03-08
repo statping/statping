@@ -18,9 +18,11 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/getsentry/sentry-go"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/hunterlong/statping/source"
 
@@ -67,9 +69,10 @@ func parseFlags() {
 }
 
 func exit(err error) {
-	panic(err)
-	//log.Fatalln(err)
-	//os.Exit(2)
+	sentry.CaptureException(err)
+	log.Fatalln(err)
+	Close()
+	os.Exit(2)
 }
 
 // main will run the Statping application
@@ -107,6 +110,14 @@ func main() {
 		log.Warnln(err)
 	}
 
+	errorEnv := utils.Getenv("GO_ENV", "production").(string)
+	if err := sentry.Init(sentry.ClientOptions{
+		Dsn:         errorReporter,
+		Environment: errorEnv,
+	}); err != nil {
+		log.Errorln(err)
+	}
+
 	c, err := configs.LoadConfigs()
 	if err != nil {
 		if err := SetupMode(); err != nil {
@@ -129,6 +140,7 @@ func main() {
 
 // Close will gracefully stop the database connection, and log file
 func Close() {
+	sentry.Flush(3 * time.Second)
 	utils.CloseLogs()
 	database.Close()
 }
@@ -189,3 +201,5 @@ func httpServerProcess(process <-chan bool) {
 		}
 	}
 }
+
+const errorReporter = "https://2bedd272821643e1b92c774d3fdf28e7@sentry.statping.com/2"

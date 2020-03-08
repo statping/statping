@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/getsentry/sentry-go"
 	_ "github.com/hunterlong/statping/notifiers"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types/core"
@@ -147,13 +148,13 @@ func TestMainApiRoutes(t *testing.T) {
 				return nil
 			},
 			SecureRoute: true,
+			BeforeTest:  SetTestENV,
 		},
 		{
 			Name:           "404 Error Page",
 			URL:            "/api/missing_404_page",
 			Method:         "GET",
 			ExpectedStatus: 404,
-			AfterTest:      UnsetTestENV,
 		}}
 
 	for _, v := range tests {
@@ -184,41 +185,38 @@ type HTTPTest struct {
 	SecureRoute      bool
 }
 
+func logTest(t *testing.T, err error) error {
+	e := sentry.NewEvent()
+	e.Environment = "testing"
+	e.Timestamp = utils.Now().Unix()
+	e.Message = fmt.Sprintf("failed test %s", t.Name())
+	e.Transaction = t.Name()
+	sentry.CaptureEvent(e)
+	sentry.CaptureException(err)
+	return err
+}
+
 // RunHTTPTest accepts a HTTPTest type to execute the HTTP request
 func RunHTTPTest(test HTTPTest, t *testing.T) (string, *testing.T, error) {
 	if test.BeforeTest != nil {
 		if err := test.BeforeTest(); err != nil {
-			return "", t, err
+			return "", t, logTest(t, err)
 		}
 	}
-	req, err := http.NewRequest(test.Method, serverDomain+test.URL, strings.NewReader(test.Body))
+
+	rr, err := Request(test)
 	if err != nil {
-		assert.Nil(t, err)
-		return "", t, err
+		return "", t, logTest(t, err)
 	}
-	if len(test.HttpHeaders) != 0 {
-		for _, v := range test.HttpHeaders {
-			splits := strings.Split(v, "=")
-			req.Header.Set(splits[0], splits[1])
-		}
-	}
-	rr := httptest.NewRecorder()
-	Router().ServeHTTP(rr, req)
+	defer rr.Result().Body.Close()
 
 	body, err := ioutil.ReadAll(rr.Result().Body)
 	if err != nil {
 		assert.Nil(t, err)
-		return "", t, err
+		return "", t, logTest(t, err)
 	}
-	defer rr.Result().Body.Close()
 
 	stringBody := string(body)
-
-	if test.SecureRoute {
-		test.SecureRoute = false
-		str, tt, err := RunHTTPTest(test, t)
-		return str, tt, err
-	}
 
 	if test.ExpectedStatus != rr.Result().StatusCode {
 		assert.Equal(t, test.ExpectedStatus, rr.Result().StatusCode)
@@ -245,12 +243,38 @@ func RunHTTPTest(test HTTPTest, t *testing.T) (string, *testing.T, error) {
 		assert.Equal(t, test.ResponseLen, len(respArray))
 	}
 
+	if test.SecureRoute {
+		UnsetTestENV()
+		rec, err := Request(test)
+		if err != nil {
+			return "", t, logTest(t, err)
+		}
+		defer rec.Result().Body.Close()
+		assert.Equal(t, http.StatusUnauthorized, rec.Result().StatusCode)
+	}
+
 	if test.AfterTest != nil {
 		if err := test.AfterTest(); err != nil {
-			return "", t, err
+			return "", t, logTest(t, err)
 		}
 	}
-	return stringBody, t, err
+	return stringBody, t, logTest(t, err)
+}
+
+func Request(test HTTPTest) (*httptest.ResponseRecorder, error) {
+	req, err := http.NewRequest(test.Method, serverDomain+test.URL, strings.NewReader(test.Body))
+	if err != nil {
+		return nil, err
+	}
+	if len(test.HttpHeaders) != 0 {
+		for _, v := range test.HttpHeaders {
+			splits := strings.Split(v, "=")
+			req.Header.Set(splits[0], splits[1])
+		}
+	}
+	rr := httptest.NewRecorder()
+	Router().ServeHTTP(rr, req)
+	return rr, err
 }
 
 func SetTestENV() error {

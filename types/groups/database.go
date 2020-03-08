@@ -10,9 +10,9 @@ func DB() database.Database {
 }
 
 func Find(id int64) (*Group, error) {
-	var group *Group
+	var group Group
 	db := DB().Where("id = ?", id).Find(&group)
-	return group, db.Error()
+	return &group, db.Error()
 }
 
 func All() []*Group {

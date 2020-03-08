@@ -86,23 +86,32 @@
       },
       methods: {
           async chartHeatmap() {
-              const start = this.nowSubtract((3600 * 24) * 7)
-              const data = await Api.service_failures_data(this.service.id, this.toUnix(start), this.toUnix(new Date()), "24h", true)
+              let start = new Date(new Date().getUTCFullYear(), new Date().getUTCMonth()-3, 1);
 
-              window.console.log(data)
+              let monthData = [];
+
+              for (i=0; i<=3; i++) {
+                  let end = this.lastDayOfMonth(start.getUTCMonth()+start)
+                  const inputdata = this.heatmapData(start,end)
+                  monthData.push(inputdata)
+              }
+
+              this.series = monthData
+              this.ready = true
+          },
+          async heatmapData(start, end) {
+              console.log(start, end)
+
+              const data = await Api.service_failures_data(this.service.id, this.toUnix(start), this.toUnix(end), "24h", true)
 
               let dataArr = []
               data.forEach(function(d) {
-                  dataArr.push({x: d.timeframe, y: 5+d.amount});
+                  dataArr.push({x: d.timeframe, y: d.amount});
               });
 
               let date = new Date(dataArr[0].x);
               const output = [{name: date.toLocaleString('en-us', { month: 'long'}), data: dataArr}]
 
-              window.console.log(output)
-
-              this.series = output
-              this.ready = true
           }
       }
   }

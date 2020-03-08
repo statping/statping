@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -13,12 +13,7 @@ func TestApiCheckinRoutes(t *testing.T) {
 			Method:         "GET",
 			ExpectedStatus: 200,
 			BeforeTest:     SetTestENV,
-		}, {
-			Name:           "Statping Checkins",
-			URL:            "/api/checkins",
-			Method:         "GET",
-			ExpectedStatus: 200,
-			BeforeTest:     UnsetTestENV,
+			SecureRoute:    true,
 		}, {
 			Name:   "Statping Create Checkin",
 			URL:    "/api/checkin",
@@ -32,20 +27,22 @@ func TestApiCheckinRoutes(t *testing.T) {
 			ExpectedStatus:   200,
 			ExpectedContains: []string{`"status":"success","type":"checkin","method":"create"`},
 			BeforeTest:       SetTestENV,
+			SecureRoute:      true,
 		},
 		{
-			Name:           "Statping Checkins",
+			Name:           "Statping Checkins Unauthorized",
 			URL:            "/api/checkins",
 			Method:         "GET",
-			ExpectedStatus: 200,
-			AfterTest:      UnsetTestENV,
+			ExpectedStatus: 401,
+			AfterTest:      SetTestENV,
+			SecureRoute:    true,
 		}}
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
 			str, t, err := RunHTTPTest(v, t)
 			t.Logf("Test %s: \n %v\n", v.Name, str)
-			require.Nil(t, err)
+			assert.Nil(t, err)
 		})
 	}
 }

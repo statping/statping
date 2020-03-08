@@ -26,7 +26,11 @@ import (
 func selectGroup(r *http.Request) (*groups.Group, error) {
 	vars := mux.Vars(r)
 	id := utils.ToInt(vars["id"])
-	return groups.Find(id)
+	g, err := groups.Find(id)
+	if err != nil {
+		return nil, err
+	}
+	return g, nil
 }
 
 // apiAllGroupHandler will show all the groups

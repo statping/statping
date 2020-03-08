@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/getsentry/sentry-go"
 	"github.com/hunterlong/statping/types/core"
 	"github.com/hunterlong/statping/utils"
 	"io"
@@ -76,17 +77,25 @@ func apiMiddleware(next http.Handler) http.Handler {
 func sendLog(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t1 := utils.Now()
-		t2 := utils.Now().Sub(t1)
 		if r.RequestURI == "/api/logs" || r.RequestURI == "/api/logs/last" {
 			next.ServeHTTP(w, r)
 			return
 		}
+		t2 := utils.Now().Sub(t1)
+		next.ServeHTTP(w, r)
 		log.WithFields(utils.ToFields(w, r)).
 			WithField("url", r.RequestURI).
 			WithField("method", r.Method).
 			WithField("load_micro_seconds", t2.Microseconds()).
 			Infoln(fmt.Sprintf("%v (%v) | IP: %v", r.RequestURI, r.Method, r.Host))
-		next.ServeHTTP(w, r)
+
+		e := sentry.NewEvent()
+		e.Timestamp = utils.Now().Unix()
+		e.Dist = "development"
+		e.Environment = "development"
+		e.Transaction = "http_response"
+		sentry.CaptureEvent(e)
+
 	})
 }
 

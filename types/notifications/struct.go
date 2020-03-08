@@ -38,6 +38,7 @@ var (
 type Notification struct {
 	Id          int64              `gorm:"primary_key;column:id" json:"id"`
 	Method      string             `gorm:"column:method" json:"method"`
+	name        string             `gorm:"column:name" json:"name"`
 	Host        string             `gorm:"not null;column:host" json:"host,omitempty"`
 	Port        int                `gorm:"not null;column:port" json:"port,omitempty"`
 	Username    string             `gorm:"not null;column:username" json:"username,omitempty"`
@@ -172,6 +173,7 @@ func SelectNotification(n Notifier) (*Notification, error) {
 func insertDatabase(n Notifier) (int64, error) {
 	noti := n.Select()
 	noti.Limits = 3
+	noti.name = noti.Name()
 	err := noti.Create()
 	if err != nil {
 		return 0, err

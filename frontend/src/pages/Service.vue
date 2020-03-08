@@ -37,6 +37,10 @@
                 <ServiceHeatmap :service="service"/>
             </div>
 
+            <div v-if="series" class="service-chart-container">
+                <apexchart width="100%" height="300" type="range" :options="dailyRangeOpts" :series="series"></apexchart>
+            </div>
+
             <nav v-if="service.failures" class="nav nav-pills flex-column flex-sm-row mt-3" id="service_tabs">
                 <a @click="tab='failures'" class="flex-sm-fill text-sm-center nav-link active">Failures</a>
                 <a @click="tab='incidents'" class="flex-sm-fill text-sm-center nav-link">Incidents</a>
@@ -140,6 +144,13 @@ export default {
             failures: [],
             start_time: "",
             end_time: "",
+            dailyRangeOpts: {
+                chart: {
+                    height: 500,
+                    width: "100%",
+                    type: "area",
+                }
+            },
             chartOptions: {
                 chart: {
                     height: 500,
@@ -247,13 +258,14 @@ export default {
             this.failures = await Api.service_failures(this.service.id, this.now() - 3600, this.now(), 15)
         },
         async chartHits() {
-            const start = this.nowSubtract((3600 * 24) * 3)
-            this.start_time = start
             this.end_time = new Date()
-            this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), "30m", false)
+            this.data = await Api.service_hits(this.service.id, this.toUnix(this.service.created_at), this.toUnix(new Date()), "30m", false)
+            if (this.data.length === 0 && group !== "1h") {
+                await this.chartHits("1h")
+            }
             this.series = [{
                 name: this.service.name,
-                ...this.data
+                ...this.convertToChartData(this.data)
             }]
             this.ready = true
         }

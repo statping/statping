@@ -17,6 +17,7 @@ package handlers
 
 import (
 	"fmt"
+	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types/core"
@@ -48,13 +49,14 @@ func Router() *mux.Router {
 	}
 
 	bPath := utils.Getenv("BASE_PATH", "").(string)
+	sentryHandler := sentryhttp.New(sentryhttp.Options{})
 
 	if bPath != "" {
 		basePath = "/" + bPath + "/"
 		r = r.PathPrefix("/" + bPath).Subrouter()
-		r.Handle("", http.HandlerFunc(indexHandler))
+		r.Handle("", sentryHandler.Handle(http.HandlerFunc(indexHandler)))
 	} else {
-		r.Handle("/", http.HandlerFunc(indexHandler))
+		r.Handle("/", sentryHandler.Handle(http.HandlerFunc(indexHandler)))
 	}
 
 	r.Use(sendLog)
