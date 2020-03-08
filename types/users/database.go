@@ -53,7 +53,7 @@ func (u *User) Update() error {
 func (u *User) Delete() error {
 	db := DB().Delete(u)
 	if db.Error() == nil {
-		log.Warnf("User #%d (%s) has been deleted")
+		log.Warnf("User #%d (%s) has been deleted", u.Id, u.Username)
 	}
 	return db.Error()
 }

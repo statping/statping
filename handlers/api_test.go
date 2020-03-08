@@ -6,14 +6,17 @@ import (
 	_ "github.com/hunterlong/statping/notifiers"
 	"github.com/hunterlong/statping/source"
 	"github.com/hunterlong/statping/types/core"
+	"github.com/hunterlong/statping/types/groups"
+	"github.com/hunterlong/statping/types/services"
+	"github.com/hunterlong/statping/types/users"
 	"github.com/hunterlong/statping/utils"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"strings"
 	"testing"
 )
@@ -85,6 +88,15 @@ func TestSetupRoutes(t *testing.T) {
 				if !core.App.Setup {
 					return errors.New("core has not been setup")
 				}
+				if len(services.AllInOrder()) == 0 {
+					return errors.New("no services where found")
+				}
+				if len(users.All()) == 0 {
+					return errors.New("no users where found")
+				}
+				if len(groups.All()) == 0 {
+					return errors.New("no groups where found")
+				}
 				return nil
 			},
 		}}
@@ -120,6 +132,8 @@ func TestMainApiRoutes(t *testing.T) {
 			URL:            "/api/renew",
 			Method:         "POST",
 			ExpectedStatus: 200,
+			BeforeTest:     SetTestENV,
+			SecureRoute:    true,
 		},
 		{
 			Name:           "Statping Clear Cache",
@@ -132,18 +146,21 @@ func TestMainApiRoutes(t *testing.T) {
 				}
 				return nil
 			},
+			SecureRoute: true,
 		},
 		{
 			Name:           "404 Error Page",
 			URL:            "/api/missing_404_page",
 			Method:         "GET",
 			ExpectedStatus: 404,
+			AfterTest:      UnsetTestENV,
 		}}
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
-			_, t, err := RunHTTPTest(v, t)
-			require.Nil(t, err)
+			res, t, err := RunHTTPTest(v, t)
+			assert.Nil(t, err)
+			t.Log(res)
 		})
 	}
 }
@@ -161,11 +178,19 @@ type HTTPTest struct {
 	HttpHeaders      []string
 	ExpectedFiles    []string
 	FuncTest         HttpFuncTest
+	BeforeTest       HttpFuncTest
+	AfterTest        HttpFuncTest
 	ResponseLen      int
+	SecureRoute      bool
 }
 
 // RunHTTPTest accepts a HTTPTest type to execute the HTTP request
 func RunHTTPTest(test HTTPTest, t *testing.T) (string, *testing.T, error) {
+	if test.BeforeTest != nil {
+		if err := test.BeforeTest(); err != nil {
+			return "", t, err
+		}
+	}
 	req, err := http.NewRequest(test.Method, serverDomain+test.URL, strings.NewReader(test.Body))
 	if err != nil {
 		assert.Nil(t, err)
@@ -188,6 +213,13 @@ func RunHTTPTest(test HTTPTest, t *testing.T) (string, *testing.T, error) {
 	defer rr.Result().Body.Close()
 
 	stringBody := string(body)
+
+	if test.SecureRoute {
+		test.SecureRoute = false
+		str, tt, err := RunHTTPTest(test, t)
+		return str, tt, err
+	}
+
 	if test.ExpectedStatus != rr.Result().StatusCode {
 		assert.Equal(t, test.ExpectedStatus, rr.Result().StatusCode)
 		return stringBody, t, fmt.Errorf("status code %v does not match %v", rr.Result().StatusCode, test.ExpectedStatus)
@@ -212,5 +244,19 @@ func RunHTTPTest(test HTTPTest, t *testing.T) (string, *testing.T, error) {
 		assert.Nil(t, err)
 		assert.Equal(t, test.ResponseLen, len(respArray))
 	}
+
+	if test.AfterTest != nil {
+		if err := test.AfterTest(); err != nil {
+			return "", t, err
+		}
+	}
 	return stringBody, t, err
+}
+
+func SetTestENV() error {
+	return os.Setenv("GO_ENV", "test")
+}
+
+func UnsetTestENV() error {
+	return os.Setenv("GO_ENV", "production")
 }

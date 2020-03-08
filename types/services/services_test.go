@@ -150,9 +150,9 @@ func TestServiceAvgUptime(t *testing.T) {
 	service2, err := Find(5)
 	assert.Equal(t, "100", service2.AvgTime())
 	service3, err := Find(13)
-	assert.NotEqual(t, "0", service3.AvgUptime(since))
+	assert.NotEqual(t, "0", service3.HitsSince(since).Avg())
 	service4, err := Find(15)
-	assert.NotEqual(t, "0", service4.AvgUptime(since))
+	assert.NotEqual(t, "0", service4.HitsSince(since).Avg())
 }
 
 func TestCreateService(t *testing.T) {

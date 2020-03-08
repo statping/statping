@@ -44,6 +44,7 @@ func TestFixedTime(t *testing.T) {
 	}}
 
 	for _, e := range examples {
+		t.Logf("Testing is %v time converts to %v duration\n", e.Time.String(), e.Duration.String())
 		assert.Equal(t, e.Expected, FixedTime(e.Time, e.Duration), fmt.Sprintf("reformating for: %v %v", e.Time, e.Duration))
 	}
 
