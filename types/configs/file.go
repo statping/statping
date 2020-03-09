@@ -2,8 +2,8 @@ package configs
 
 import (
 	"fmt"
-	"github.com/hunterlong/statping/utils"
 	"github.com/pkg/errors"
+	"github.com/statping/statping/utils"
 	"os"
 	"path/filepath"
 )

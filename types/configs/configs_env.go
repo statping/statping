@@ -1,9 +1,9 @@
 package configs
 
 import (
-	"github.com/hunterlong/statping/utils"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
+	"github.com/statping/statping/utils"
 )
 
 func loadConfigEnvs() (*DbConfig, error) {

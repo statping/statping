@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/hunterlong/statping/source"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/source"
+	"github.com/statping/statping/utils"
 	"net"
 )
 

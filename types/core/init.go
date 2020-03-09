@@ -1,8 +1,8 @@
 package core
 
 import (
-	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/types/services"
+	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/services"
 )
 
 func InitApp() error {

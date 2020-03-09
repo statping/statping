@@ -3,8 +3,8 @@ package services
 import (
 	"errors"
 	"fmt"
-	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/database"
+	"github.com/statping/statping/utils"
 	"sort"
 )
 

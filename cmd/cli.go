@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -18,14 +18,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hunterlong/statping/handlers"
-	"github.com/hunterlong/statping/source"
-	"github.com/hunterlong/statping/types/configs"
-	"github.com/hunterlong/statping/types/core"
-	"github.com/hunterlong/statping/types/services"
-	"github.com/hunterlong/statping/utils"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
+	"github.com/statping/statping/handlers"
+	"github.com/statping/statping/source"
+	"github.com/statping/statping/types/configs"
+	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/utils"
 	"io/ioutil"
 	"time"
 )
@@ -184,7 +184,7 @@ func catchCLI(args []string) error {
 func updateDisplay() error {
 	gitCurrent, err := checkGithubUpdates()
 	if err != nil {
-		return errors.Wrap(err, "Issue connecting to https://github.com/hunterlong/statping")
+		return errors.Wrap(err, "Issue connecting to https://github.com/statping/statping")
 	}
 	if gitCurrent.TagName == "" {
 		return nil
@@ -274,7 +274,7 @@ func HelpEcho() {
 	fmt.Println("     AUTH_PASSWORD             - HTTP Basic Authentication password")
 	fmt.Println("     BASE_PATH                 - Set the base URL prefix (set to 'monitor' if URL is domain.com/monitor)")
 	fmt.Println("   * You can insert environment variables into a '.env' file in root directory.")
-	fmt.Println("Give Statping a Star at https://github.com/hunterlong/statping")
+	fmt.Println("Give Statping a Star at https://github.com/statping/statping")
 }
 
 func checkGithubUpdates() (githubResponse, error) {

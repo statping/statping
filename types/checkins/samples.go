@@ -1,7 +1,7 @@
 package checkins
 
 import (
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/utils"
 	"time"
 )
 

@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/types/checkins"
+	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/checkins"
 )
 
 // CheckinProcess runs the checkin routine for each checkin attached to service

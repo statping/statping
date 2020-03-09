@@ -17,9 +17,9 @@ package handlers
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/hunterlong/statping/types/groups"
-	"github.com/hunterlong/statping/utils"
 	"github.com/pkg/errors"
+	"github.com/statping/statping/types/groups"
+	"github.com/statping/statping/utils"
 	"net/http"
 )
 

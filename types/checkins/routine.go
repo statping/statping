@@ -2,9 +2,9 @@ package checkins
 
 import (
 	"fmt"
-	"github.com/hunterlong/statping/types/failures"
-	"github.com/hunterlong/statping/utils"
 	"github.com/prometheus/common/log"
+	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/utils"
 	"time"
 )
 

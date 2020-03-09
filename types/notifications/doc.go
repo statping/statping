@@ -116,5 +116,5 @@
 // You can implement your notifier to different types of events that are triggered. Checkout the wiki to
 // see more details and examples of how to build your own notifier.
 //
-// More info on: https://github.com/hunterlong/statping/wiki/Notifiers
+// More info on: https://github.com/statping/statping/wiki/Notifiers
 package notifications

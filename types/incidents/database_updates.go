@@ -1,6 +1,6 @@
 package incidents
 
-import "github.com/hunterlong/statping/database"
+import "github.com/statping/statping/database"
 
 func (i *Incident) Updates() []*IncidentUpdate {
 	var updates []*IncidentUpdate

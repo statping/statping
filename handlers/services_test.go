@@ -3,8 +3,8 @@
 package handlers
 
 import (
-	"github.com/hunterlong/statping/types/services"
 	"github.com/pkg/errors"
+	"github.com/statping/statping/types/services"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

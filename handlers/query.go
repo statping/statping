@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/gorilla/mux"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/utils"
 	"net/http"
 )
 

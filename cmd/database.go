@@ -1,15 +1,15 @@
 package main
 
 import (
-	"github.com/hunterlong/statping/types/checkins"
-	"github.com/hunterlong/statping/types/failures"
-	"github.com/hunterlong/statping/types/groups"
-	"github.com/hunterlong/statping/types/hits"
-	"github.com/hunterlong/statping/types/incidents"
-	"github.com/hunterlong/statping/types/messages"
-	"github.com/hunterlong/statping/types/notifications"
-	"github.com/hunterlong/statping/types/services"
-	"github.com/hunterlong/statping/types/users"
+	"github.com/statping/statping/types/checkins"
+	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/groups"
+	"github.com/statping/statping/types/hits"
+	"github.com/statping/statping/types/incidents"
+	"github.com/statping/statping/types/messages"
+	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/types/users"
 )
 
 var (

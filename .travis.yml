@@ -2,13 +2,13 @@ os:
 - linux
 language: go
 go: 1.13.5
-go_import_path: github.com/hunterlong/statping
+go_import_path: github.com/statping/statping
 cache:
   directories:
   - "~/.npm"
   - "~/.cache"
-  - "$GOPATH/src/github.com/hunterlong/statping/tmp"
-  - "$GOPATH/src/github.com/hunterlong/statping/vendor"
+  - "$GOPATH/src/github.com/statping/statping/tmp"
+  - "$GOPATH/src/github.com/statping/statping/vendor"
 sudo: required
 services:
 - docker
@@ -23,7 +23,7 @@ env:
   - DB_PASS=
   - DB_DATABASE=test
   - GO_ENV=test
-  - STATPING_DIR=$GOPATH/src/github.com/hunterlong/statping
+  - STATPING_DIR=$GOPATH/src/github.com/statping/statping
 matrix:
   allow_failures:
   - go: master

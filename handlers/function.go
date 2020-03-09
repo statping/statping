@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/hunterlong/statping/source"
-	"github.com/hunterlong/statping/types/core"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/source"
+	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/utils"
 	"html/template"
 	"net/http"
 	"net/url"

@@ -3,9 +3,9 @@ package services
 import (
 	"bytes"
 	"fmt"
-	"github.com/hunterlong/statping/types/failures"
-	"github.com/hunterlong/statping/types/hits"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/hits"
+	"github.com/statping/statping/utils"
 	"github.com/tatsushid/go-fastping"
 	"net"
 	"net/http"

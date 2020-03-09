@@ -1,9 +1,9 @@
 package configs
 
 import (
-	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/utils"
 	"github.com/romanyx/polluter"
+	"github.com/statping/statping/database"
+	"github.com/statping/statping/utils"
 	"os"
 	"testing"
 )

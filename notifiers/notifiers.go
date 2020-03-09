@@ -3,8 +3,8 @@ package notifiers
 import (
 	"fmt"
 	"github.com/google/martian/log"
-	"github.com/hunterlong/statping/types/notifications"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/utils"
 	"strings"
 )
 

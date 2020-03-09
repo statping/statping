@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/hunterlong/statping/types/hits"
+	"github.com/statping/statping/types/hits"
 	"time"
 )
 

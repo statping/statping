@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -16,9 +16,9 @@
 package notifications
 
 import (
-	"github.com/hunterlong/statping/types/failures"
-	"github.com/hunterlong/statping/types/services"
-	"github.com/hunterlong/statping/types/users"
+	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/types/users"
 )
 
 // Notifier interface is required to create a new Notifier

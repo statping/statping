@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -19,21 +19,21 @@ import (
 	"flag"
 	"fmt"
 	"github.com/getsentry/sentry-go"
-	"github.com/hunterlong/statping/notifiers"
+	"github.com/statping/statping/notifiers"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/hunterlong/statping/source"
+	"github.com/statping/statping/source"
 
-	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/handlers"
-	"github.com/hunterlong/statping/types/configs"
-	"github.com/hunterlong/statping/types/core"
-	"github.com/hunterlong/statping/types/services"
-	"github.com/hunterlong/statping/utils"
 	"github.com/pkg/errors"
+	"github.com/statping/statping/database"
+	"github.com/statping/statping/handlers"
+	"github.com/statping/statping/types/configs"
+	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/utils"
 )
 
 var (

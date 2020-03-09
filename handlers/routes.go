@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -19,9 +19,9 @@ import (
 	"fmt"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
-	"github.com/hunterlong/statping/source"
-	"github.com/hunterlong/statping/types/core"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/source"
+	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/utils"
 	"net/http"
 )
 

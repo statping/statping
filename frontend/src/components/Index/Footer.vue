@@ -1,7 +1,7 @@
 <template>
     <footer>
         <div v-if="!$store.getters.core.footer" class="footer text-center mb-4 p-2">
-            <a href="https://github.com/hunterlong/statping" target="_blank">
+            <a href="https://github.com/statping/statping" target="_blank">
                 Statping {{$store.getters.core.version}} made with <font-awesome-icon style="color: #d40d0d" icon="heart"/>
             </a> |
             <router-link :to="$store.getters.core.logged_in ? '/dashboard' : '/login'">Dashboard</router-link>

@@ -1,9 +1,9 @@
 package users
 
 import (
-	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/utils"
 	"github.com/prometheus/common/log"
+	"github.com/statping/statping/database"
+	"github.com/statping/statping/utils"
 	"time"
 )
 

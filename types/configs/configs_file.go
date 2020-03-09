@@ -1,9 +1,9 @@
 package configs
 
 import (
-	"github.com/hunterlong/statping/types/core"
-	"github.com/hunterlong/statping/utils"
 	"github.com/pkg/errors"
+	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/utils"
 	"gopkg.in/yaml.v2"
 )
 

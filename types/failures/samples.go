@@ -2,9 +2,9 @@ package failures
 
 import (
 	"fmt"
-	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
 	"github.com/prometheus/common/log"
+	"github.com/statping/statping/types"
+	"github.com/statping/statping/utils"
 	"sync"
 	"time"
 

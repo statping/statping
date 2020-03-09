@@ -2,8 +2,8 @@ package database
 
 import (
 	"fmt"
-	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/types"
+	"github.com/statping/statping/utils"
 	"os"
 	"time"
 

@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -46,7 +46,7 @@ func TestInitLogs(t *testing.T) {
 }
 
 func TestDir(t *testing.T) {
-	assert.Contains(t, Directory, "github.com/hunterlong/statping")
+	assert.Contains(t, Directory, "github.com/statping/statping")
 }
 
 func TestCommand(t *testing.T) {

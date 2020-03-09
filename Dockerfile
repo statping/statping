@@ -16,7 +16,7 @@ ARG VERSION
 RUN apk add --update --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers wget curl jq
 RUN curl -L -s https://assets.statping.com/sass -o /usr/local/bin/sass && \
     chmod +x /usr/local/bin/sass
-WORKDIR /go/src/github.com/hunterlong/statping
+WORKDIR /go/src/github.com/statping/statping
 ADD go.mod go.sum ./
 RUN go mod download
 ENV GO111MODULE on

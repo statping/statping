@@ -12,7 +12,7 @@ cyan="\033[36m"
 white="\033[37m"
 gpg_key=64B9C6AAE2D55278
 gpgurl=https://statping.com/statping.gpg
-repo=https://github.com/hunterlong/statping
+repo=https://github.com/statping/statping
 
 statping_get_tarball() {
   fext='tar.gz'

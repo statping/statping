@@ -7,7 +7,7 @@ RUN npm install -g yarn
 RUN curl -L -s https://assets.statping.com/sass -o /usr/local/bin/sass && \
     chmod +x /usr/local/bin/sass
 
-WORKDIR /go/src/github.com/hunterlong/statping
+WORKDIR /go/src/github.com/statping/statping
 
 ADD go.mod go.sum ./
 

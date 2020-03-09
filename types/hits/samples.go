@@ -2,9 +2,9 @@ package hits
 
 import (
 	"fmt"
-	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/database"
+	"github.com/statping/statping/types"
+	"github.com/statping/statping/utils"
 	"sync"
 	"time"
 

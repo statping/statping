@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -20,7 +20,7 @@ package source
 import (
 	"fmt"
 	"github.com/GeertJohan/go.rice"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/utils"
 	"github.com/pkg/errors"
 	"github.com/russross/blackfriday/v2"
 	"os"

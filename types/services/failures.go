@@ -2,7 +2,7 @@ package services
 
 import (
 	"fmt"
-	"github.com/hunterlong/statping/types/failures"
+	"github.com/statping/statping/types/failures"
 	"strings"
 	"time"
 )

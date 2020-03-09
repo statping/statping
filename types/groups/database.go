@@ -1,7 +1,7 @@
 package groups
 
 import (
-	"github.com/hunterlong/statping/database"
+	"github.com/statping/statping/database"
 	"sort"
 )
 

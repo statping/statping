@@ -1,7 +1,7 @@
 package checkins
 
 import (
-	"github.com/hunterlong/statping/types/failures"
+	"github.com/statping/statping/types/failures"
 	"time"
 )
 

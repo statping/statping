@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"github.com/fatih/structs"
 	"github.com/getsentry/sentry-go"
-	"github.com/hunterlong/statping/types/null"
 	Logger "github.com/sirupsen/logrus"
+	"github.com/statping/statping/types/null"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"os"

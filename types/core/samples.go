@@ -1,8 +1,8 @@
 package core
 
 import (
-	"github.com/hunterlong/statping/types/null"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/utils"
 	"time"
 )
 

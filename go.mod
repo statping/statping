@@ -1,4 +1,4 @@
-module github.com/hunterlong/statping
+module github.com/statping/statping
 
 go 1.14
 

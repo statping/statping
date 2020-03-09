@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -19,16 +19,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hunterlong/statping/types/checkins"
-	"github.com/hunterlong/statping/types/core"
-	"github.com/hunterlong/statping/types/groups"
-	"github.com/hunterlong/statping/types/incidents"
-	"github.com/hunterlong/statping/types/messages"
-	"github.com/hunterlong/statping/types/notifications"
-	"github.com/hunterlong/statping/types/null"
-	"github.com/hunterlong/statping/types/services"
-	"github.com/hunterlong/statping/types/users"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/types/checkins"
+	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/groups"
+	"github.com/statping/statping/types/incidents"
+	"github.com/statping/statping/types/messages"
+	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/types/users"
+	"github.com/statping/statping/utils"
 	"net/http"
 	"time"
 )

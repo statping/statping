@@ -2,12 +2,12 @@ package configs
 
 import (
 	"fmt"
-	"github.com/hunterlong/statping/database"
-	"github.com/hunterlong/statping/types/null"
-	"github.com/hunterlong/statping/types/users"
-	"github.com/hunterlong/statping/utils"
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
+	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/types/users"
+	"github.com/statping/statping/utils"
 	"os"
 	"time"
 )

@@ -1,6 +1,6 @@
 package incidents
 
-import "github.com/hunterlong/statping/database"
+import "github.com/statping/statping/database"
 
 func Find(id int64) (*Incident, error) {
 	var incident Incident

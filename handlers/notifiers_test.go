@@ -3,7 +3,7 @@
 package handlers
 
 import (
-	"github.com/hunterlong/statping/notifiers"
+	"github.com/statping/statping/notifiers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"

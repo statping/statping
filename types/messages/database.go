@@ -1,6 +1,6 @@
 package messages
 
-import "github.com/hunterlong/statping/database"
+import "github.com/statping/statping/database"
 
 func DB() database.Database {
 	return database.DB().Model(&Message{})
