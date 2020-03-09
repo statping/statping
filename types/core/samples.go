@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func Samples() {
+func Samples() error {
 	apiKey := utils.Getenv("API_KEY", "samplekey")
 	apiSecret := utils.Getenv("API_SECRET", "samplesecret")
 
@@ -21,5 +21,6 @@ func Samples() {
 		UseCdn:      null.NewNullBool(false),
 		Footer:      null.NewNullString(""),
 	}
-	core.Create()
+
+	return core.Create()
 }

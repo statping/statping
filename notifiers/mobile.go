@@ -26,6 +26,8 @@ import (
 	"time"
 )
 
+var _ notifications.Notifier = (*mobilePush)(nil)
+
 const mobileIdentifier = "com.statping"
 
 type mobilePush struct {

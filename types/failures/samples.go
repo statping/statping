@@ -13,7 +13,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-func Samples() {
+func Samples() error {
 	tx := DB().Begin()
 	sg := new(sync.WaitGroup)
 
@@ -22,7 +22,7 @@ func Samples() {
 	for i := int64(1); i <= 4; i++ {
 		sg.Add(1)
 
-		log.Infoln(fmt.Sprintf("Adding %v Failure records to service", 730))
+		log.Infoln(fmt.Sprintf("Adding %v Failure records to service", 400))
 
 		go func() {
 			defer sg.Done()
@@ -42,6 +42,8 @@ func Samples() {
 
 	if err := tx.Commit().Error(); err != nil {
 		log.Error(err)
+		return err
 	}
 
+	return nil
 }

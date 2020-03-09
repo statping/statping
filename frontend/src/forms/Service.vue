@@ -1,6 +1,8 @@
 <template>
     <form @submit.prevent="saveService">
-        <h4 class="mb-5 text-muted">Basic Information</h4>
+        <div class="card contain-card text-black-50 bg-white mb-4">
+            <div class="card-header">Basic Information</div>
+            <div class="card-body">
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Service Name</label>
             <div class="col-sm-8">
@@ -37,8 +39,12 @@
                 <small class="form-text text-muted">Attach this service to a group</small>
             </div>
         </div>
+            </div>
+        </div>
 
-        <h4 v-if="service.type !== 'icmp'" class="mt-5 mb-5 text-muted">Request Details</h4>
+        <div v-if="service.type !== 'icmp'" class="card contain-card text-black-50 bg-white mb-4">
+            <div class="card-header">Request Details</div>
+            <div class="card-body">
 
         <div v-if="service.type.match(/^(http)$/)" class="form-group row">
             <label class="col-sm-4 col-form-label">Service Check Type</label>
@@ -87,8 +93,12 @@
                 <input v-model="service.port" type="number" name="port" class="form-control" id="service_port" placeholder="8080">
             </div>
         </div>
+            </div>
+        </div>
 
-        <h4 class="mt-5 mb-5 text-muted">Additional Options</h4>
+        <div class="card contain-card text-black-50 bg-white mb-4">
+            <div class="card-header">Additional Options</div>
+            <div class="card-body">
 
         <div class="form-group row">
             <label for="service_interval" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
@@ -152,6 +162,8 @@
                 <button :disabled="loading" @click.prevent="saveService" type="submit" class="btn btn-success btn-block">
                     {{service.id ? "Update Service" : "Create Service"}}
                 </button>
+            </div>
+        </div>
             </div>
         </div>
         <div class="alert alert-danger d-none" id="alerter" role="alert"></div>

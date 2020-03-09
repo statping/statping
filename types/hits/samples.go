@@ -1,6 +1,7 @@
 package hits
 
 import (
+	"fmt"
 	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types"
 	"github.com/hunterlong/statping/utils"
@@ -14,7 +15,7 @@ import (
 
 var SampleHits = 99900.
 
-func Samples() {
+func Samples() error {
 	tx := DB().Begin()
 	sg := new(sync.WaitGroup)
 
@@ -26,9 +27,12 @@ func Samples() {
 		tx = DB().Begin()
 	}
 
+	return tx.Error()
 }
 
 func createHitsAt(db database.Database, serviceID int64, sg *sync.WaitGroup) error {
+	log.Infoln(fmt.Sprintf("Adding sample hit records to service #%d", serviceID))
+
 	createdAt := utils.Now().Add(-3 * types.Day)
 	p := utils.NewPerlin(2, 2, 5, utils.Now().UnixNano())
 
@@ -46,6 +50,10 @@ func createHitsAt(db database.Database, serviceID int64, sg *sync.WaitGroup) err
 		}
 
 		db = db.Create(&hit)
+		if err := db.Error(); err != nil {
+			return err
+		}
+
 		i++
 		if createdAt.After(utils.Now()) {
 			break

@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-func Samples() {
+func Samples() error {
 	m1 := &Message{
 		Title:       "Routine Downtime",
 		Description: "This is an example a upcoming message for a service!",
@@ -13,7 +13,9 @@ func Samples() {
 		EndOn:       time.Now().UTC().Add(2 * time.Hour),
 	}
 
-	m1.Create()
+	if err := m1.Create(); err != nil {
+		return err
+	}
 
 	m2 := &Message{
 		Title:       "Server Reboot",
@@ -23,5 +25,9 @@ func Samples() {
 		EndOn:       time.Now().UTC().Add(2 * time.Hour),
 	}
 
-	m2.Create()
+	if err := m2.Create(); err != nil {
+		return err
+	}
+
+	return nil
 }

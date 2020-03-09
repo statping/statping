@@ -3,7 +3,6 @@ package notifications
 import (
 	"fmt"
 	"github.com/hunterlong/statping/utils"
-	"github.com/pkg/errors"
 	"strings"
 	"time"
 )
@@ -96,30 +95,35 @@ func (n *Notification) GetValue(dbField string) string {
 }
 
 // Init accepts the Notifier interface to initialize the notifier
-func Init(n Notifier) (*Notification, error) {
-	err := install(n)
-	if err == nil {
-		notify, err := SelectNotification(n)
-		if err != nil {
-			return nil, errors.Wrap(err, "error selecting notification")
-		}
-
-		notify.CreatedAt = time.Now().UTC()
-		notify.UpdatedAt = time.Now().UTC()
-		if notify.Delay.Seconds() == 0 {
-			notify.Delay = 1 * time.Second
-		}
-		notify.testable = utils.IsType(n, new(Tester))
-		notify.Form = n.Select().Form
-
-		AllCommunications = append(AllCommunications, n)
-
-	} else {
-		return nil, errors.Wrap(err, "error installing notification")
-	}
-
-	return nil, err
-}
+//func Init(n Notifier) (*Notification, error) {
+//	if Exists(n.Select().Method) {
+//		AllCommunications = append(AllCommunications, n)
+//	} else {
+//		_, err := insertDatabase(n)
+//		if err != nil {
+//			log.Errorln(err)
+//			return nil, err
+//		}
+//		AllCommunications = append(AllCommunications, n)
+//	}
+//
+//		notify, err := SelectNotification(n)
+//		if err != nil {
+//			return nil, errors.Wrap(err, "error selecting notification")
+//		}
+//
+//		notify.CreatedAt = time.Now().UTC()
+//		notify.UpdatedAt = time.Now().UTC()
+//		if notify.Delay.Seconds() == 0 {
+//			notify.Delay = 1 * time.Second
+//		}
+//		notify.testable = utils.IsType(n, new(Tester))
+//		notify.Form = n.Select().Form
+//
+//		AllCommunications = append(AllCommunications, n)
+//
+//	return nil, err
+//}
 
 // ResetQueue will clear the notifiers Queue
 func (n *Notification) ResetQueue() {

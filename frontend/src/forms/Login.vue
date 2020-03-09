@@ -22,6 +22,7 @@
                 </button>
             </div>
         </div>
+
     </form>
 </template>
 
@@ -37,8 +38,12 @@
               auth: {},
               loading: false,
               error: false,
-              disabled: true
+              disabled: true,
+              ghLoginURL: ""
           }
+      },
+      mounted() {
+          this.GHlogin()
       },
       methods: {
           checkForm() {
@@ -60,6 +65,10 @@
                   this.$router.push('/dashboard')
               }
               this.loading = false
+          },
+          async GHlogin() {
+              const core = this.$store.getters.core;
+              this.ghLoginURL = `https://github.com/login/oauth/authorize?client_id=${core.gh_client_id}&redirect_uri=${core.domain}/oauth/callback&scope=user,repo`
           }
       }
   }

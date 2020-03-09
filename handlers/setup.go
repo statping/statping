@@ -17,6 +17,8 @@ package handlers
 
 import (
 	"errors"
+	"github.com/hunterlong/statping/database"
+	"github.com/hunterlong/statping/notifiers"
 	"github.com/hunterlong/statping/types/configs"
 	"github.com/hunterlong/statping/types/core"
 	"github.com/hunterlong/statping/types/null"
@@ -43,7 +45,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.WithFields(utils.ToFields(core.App, confgs)).Debugln("new configs posted")
 
-	if err = configs.ConnectConfigs(confgs, true); err != nil {
+	if err = configs.ConnectConfigs(confgs); err != nil {
 		log.Errorln(err)
 		if err := confgs.Delete(); err != nil {
 			log.Errorln(err)
@@ -60,7 +62,36 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	exists := database.DB().HasTable("core")
+	if !exists {
+		if err := confgs.DropDatabase(); err != nil {
+			sendErrorJson(err, w, r)
+			return
+		}
+
+		if err := configs.CreateDatabase(); err != nil {
+			sendErrorJson(err, w, r)
+			return
+		}
+
+		if err := configs.CreateAdminUser(confgs); err != nil {
+			sendErrorJson(err, w, r)
+			return
+		}
+
+		if err := configs.TriggerSamples(); err != nil {
+			sendErrorJson(err, w, r)
+			return
+		}
+	}
+
 	if err = confgs.MigrateDatabase(); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	log.Infoln("Migrating Notifiers...")
+	if err := notifiers.Migrate(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
@@ -85,15 +116,6 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	core.App = c
-
-	//if sample {
-	//	log.Infoln("Adding sample data into new database")
-	//	if err = configs.TriggerSamples(); err != nil {
-	//		log.Errorln(err)
-	//		sendErrorJson(err, w, r)
-	//		return
-	//	}
-	//}
 
 	log.Infoln("Initializing new Statping instance")
 	if err := core.InitApp(); err != nil {

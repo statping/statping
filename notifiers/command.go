@@ -25,12 +25,14 @@ import (
 	"time"
 )
 
+var _ notifications.Notifier = (*commandLine)(nil)
+
 type commandLine struct {
 	*notifications.Notification
 }
 
 var Command = &commandLine{&notifications.Notification{
-	Method:      "Command",
+	Method:      "command",
 	Title:       "Shell Command",
 	Description: "Shell Command allows you to run a customized shell/bash Command on the local machine it's running on.",
 	Author:      "Hunter Long",

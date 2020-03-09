@@ -4,7 +4,7 @@ import (
 	"github.com/hunterlong/statping/types/null"
 )
 
-func Samples() {
+func Samples() error {
 	u2 := &User{
 		Username: "testadmin",
 		Password: "password123",
@@ -12,7 +12,9 @@ func Samples() {
 		Admin:    null.NewNullBool(true),
 	}
 
-	u2.Create()
+	if err := u2.Create(); err != nil {
+		return err
+	}
 
 	u3 := &User{
 		Username: "testadmin2",
@@ -21,5 +23,9 @@ func Samples() {
 		Admin:    null.NewNullBool(true),
 	}
 
-	u3.Create()
+	if err := u3.Create(); err != nil {
+		return err
+	}
+
+	return nil
 }

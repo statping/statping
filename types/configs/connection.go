@@ -84,20 +84,8 @@ func Connect(configs *DbConfig, retry bool) error {
 	return err
 }
 
-func InitialSetup(configs *DbConfig) error {
+func CreateAdminUser(configs *DbConfig) error {
 	log.Infoln(fmt.Sprintf("Core database does not exist, creating now!"))
-
-	if err := configs.DropDatabase(); err != nil {
-		return errors.Wrap(err, "error dropping database")
-	}
-
-	if err := CreateDatabase(); err != nil {
-		return errors.Wrap(err, "error creating database")
-	}
-
-	if err := TriggerSamples(); err != nil {
-		return errors.Wrap(err, "error creating database")
-	}
 
 	if configs.Username == "" && configs.Password == "" {
 		configs.Username = utils.Getenv("ADMIN_USER", "admin").(string)

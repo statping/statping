@@ -33,14 +33,6 @@ func TestFixedTime(t *testing.T) {
 		timeVal,
 		Day,
 		"2020-05-22T00:00:00Z",
-	}, {
-		timeVal.Add(2 * Month),
-		Month,
-		"2020-07-01T00:00:00Z",
-	}, {
-		timeVal.Add(2 * Year),
-		Year,
-		"2022-01-01T00:00:00Z",
 	}}
 
 	for _, e := range examples {

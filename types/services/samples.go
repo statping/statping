@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func Samples() {
+func Samples() error {
 	createdOn := time.Now().Add(((-24 * 30) * 3) * time.Hour).UTC()
 	s1 := &Service{
 		Name:           "Google",
@@ -21,7 +21,9 @@ func Samples() {
 		VerifySSL:      null.NewNullBool(true),
 		CreatedAt:      createdOn,
 	}
-	s1.Create()
+	if err := s1.Create(); err != nil {
+		return err
+	}
 
 	s2 := &Service{
 		Name:           "Statping Github",
@@ -36,7 +38,9 @@ func Samples() {
 		VerifySSL:      null.NewNullBool(true),
 		CreatedAt:      createdOn,
 	}
-	s2.Create()
+	if err := s2.Create(); err != nil {
+		return err
+	}
 
 	s3 := &Service{
 		Name:           "JSON Users Test",
@@ -52,7 +56,9 @@ func Samples() {
 		GroupId:        2,
 		CreatedAt:      createdOn,
 	}
-	s3.Create()
+	if err := s3.Create(); err != nil {
+		return err
+	}
 
 	s4 := &Service{
 		Name:           "JSON API Tester",
@@ -70,7 +76,9 @@ func Samples() {
 		GroupId:        2,
 		CreatedAt:      createdOn,
 	}
-	s4.Create()
+	if err := s4.Create(); err != nil {
+		return err
+	}
 
 	s5 := &Service{
 		Name:      "Google DNS",
@@ -84,5 +92,9 @@ func Samples() {
 		GroupId:   1,
 		CreatedAt: createdOn,
 	}
-	s5.Create()
+	if err := s5.Create(); err != nil {
+		return err
+	}
+
+	return nil
 }

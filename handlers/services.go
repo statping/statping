@@ -81,6 +81,7 @@ func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
+	go services.ServiceCheckQueue(service, true)
 
 	sendJsonAction(service, "create", w, r)
 }

@@ -28,6 +28,8 @@ import (
 	"time"
 )
 
+var _ notifications.Notifier = (*discord)(nil)
+
 type discord struct {
 	*notifications.Notification
 }

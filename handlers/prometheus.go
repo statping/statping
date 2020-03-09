@@ -104,7 +104,8 @@ func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	for _, notif := range notifications.All() {
+	for _, n := range notifications.All() {
+		notif := n.Select()
 		PrometheusComment(fmt.Sprintf("Notifier %s:", notif.Method))
 		enabled := 0
 		if notif.Enabled.Bool {

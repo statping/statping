@@ -19,7 +19,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/types/null"
 	"github.com/hunterlong/statping/types/services"
 	"github.com/hunterlong/statping/utils"
@@ -29,16 +28,14 @@ import (
 
 var (
 	// db holds the Statping database connection
-	db                database.Database
-	log               = utils.Log.WithField("type", "notifier")
-	AllCommunications []Notifier
+	log          = utils.Log.WithField("type", "notifier")
+	allNotifiers []Notifier
 )
 
 // Notification contains all the fields for a Statping Notifier.
 type Notification struct {
 	Id          int64              `gorm:"primary_key;column:id" json:"id"`
 	Method      string             `gorm:"column:method" json:"method"`
-	name        string             `gorm:"column:name" json:"name"`
 	Host        string             `gorm:"not null;column:host" json:"host,omitempty"`
 	Port        int                `gorm:"not null;column:port" json:"port,omitempty"`
 	Username    string             `gorm:"not null;column:username" json:"username,omitempty"`
@@ -108,16 +105,6 @@ type NotificationLog struct {
 	Timestamp time.Time       `json:"timestamp"`
 }
 
-// SetDB is called by core to inject the database for a notifier to use
-func SetDB(d database.Database) {
-	db = d
-}
-
-// asNotification accepts a Notifier and returns a Notification struct
-func asNotification(n Notifier) *Notification {
-	return n.Select()
-}
-
 // normalizeType will accept multiple interfaces and converts it into a string for logging
 func normalizeType(ty interface{}) string {
 	switch v := ty.(type) {
@@ -169,20 +156,9 @@ func SelectNotification(n Notifier) (*Notification, error) {
 	return notifier, err.Error()
 }
 
-// insertDatabase will create a new record into the database for the notifier
-func insertDatabase(n Notifier) (int64, error) {
-	noti := n.Select()
-	noti.Limits = 3
-	noti.name = noti.Name()
-	if err := noti.Create(); err != nil {
-		return 0, err
-	}
-	return noti.Id, nil
-}
-
 // SelectNotifier returns the Notification struct from the database
 func SelectNotifier(method string) (*Notification, Notifier, error) {
-	for _, comm := range AllCommunications {
+	for _, comm := range allNotifiers {
 		n, ok := comm.(Notifier)
 		if !ok {
 			return nil, nil, fmt.Errorf("incorrect notification type: %v", reflect.TypeOf(n).String())
@@ -231,20 +207,22 @@ CheckNotifier:
 }
 
 // install will check the database for the notification, if its not inserted it will insert a new record for it
-func install(n Notifier) error {
-	_, err := insertDatabase(n)
-	if err != nil {
-		log.Errorln(err)
-		return err
-	}
-
-	AllCommunications = append(AllCommunications, n)
-
-	log.WithFields(utils.ToFields(n)).
-		Debugln(fmt.Sprintf("Checking if notifier '%v' is installed", n.Select().Method))
-
-	return nil
-}
+//func install(n Notifier) error {
+//	log.WithFields(utils.ToFields(n)).
+//		Debugln(fmt.Sprintf("Checking if notifier '%v' is installed", n.Select().Method))
+//
+//	if Exists(n.Select().Method) {
+//		AllCommunications = append(AllCommunications, n)
+//	} else {
+//		_, err := insertDatabase(n)
+//		if err != nil {
+//			log.Errorln(err)
+//			return err
+//		}
+//		AllCommunications = append(AllCommunications, n)
+//	}
+//	return nil
+//}
 
 // isEnabled returns true if the notifier is enabled
 func isEnabled(n interface{}) bool {

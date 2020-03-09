@@ -2,7 +2,6 @@ package configs
 
 import (
 	"fmt"
-	"github.com/hunterlong/statping/database"
 	"github.com/hunterlong/statping/utils"
 	"github.com/pkg/errors"
 	"os"
@@ -11,7 +10,7 @@ import (
 
 var log = utils.Log
 
-func ConnectConfigs(configs *DbConfig, initiate bool) error {
+func ConnectConfigs(configs *DbConfig) error {
 	err := Connect(configs, true)
 	if err != nil {
 		return errors.Wrap(err, "error connecting to database")
@@ -20,10 +19,6 @@ func ConnectConfigs(configs *DbConfig, initiate bool) error {
 		return errors.Wrap(err, "error saving configuration")
 	}
 
-	exists := database.DB().HasTable("core")
-	if !exists && initiate {
-		return InitialSetup(configs)
-	}
 	return nil
 }
 

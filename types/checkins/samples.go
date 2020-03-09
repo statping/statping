@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func Samples() {
+func Samples() error {
 	checkin1 := &Checkin{
 		Name:        "Example Checkin 1",
 		ServiceId:   1,
@@ -13,7 +13,9 @@ func Samples() {
 		GracePeriod: 300,
 		ApiKey:      utils.RandomString(7),
 	}
-	checkin1.Create()
+	if err := checkin1.Create(); err != nil {
+		return err
+	}
 
 	checkin2 := &Checkin{
 		Name:        "Example Checkin 2",
@@ -22,10 +24,13 @@ func Samples() {
 		GracePeriod: 300,
 		ApiKey:      utils.RandomString(7),
 	}
-	checkin2.Create()
+	if err := checkin2.Create(); err != nil {
+		return err
+	}
+	return nil
 }
 
-func SamplesChkHits() {
+func SamplesChkHits() error {
 	checkTime := time.Now().UTC().Add(-24 * time.Hour)
 
 	for i := int64(1); i <= 2; i++ {
@@ -35,8 +40,12 @@ func SamplesChkHits() {
 			CreatedAt: checkTime.UTC(),
 		}
 
-		checkHit.Create()
+		if err := checkHit.Create(); err != nil {
+			return err
+		}
 
 		checkTime = checkTime.Add(10 * time.Minute)
 	}
+
+	return nil
 }

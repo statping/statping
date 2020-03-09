@@ -9,7 +9,6 @@ import (
 	"github.com/hunterlong/statping/types/groups"
 	"github.com/hunterlong/statping/types/hits"
 	"github.com/hunterlong/statping/types/incidents"
-	"github.com/hunterlong/statping/types/integrations"
 	"github.com/hunterlong/statping/types/messages"
 	"github.com/hunterlong/statping/types/notifications"
 	"github.com/hunterlong/statping/types/services"
@@ -49,7 +48,7 @@ import (
 //If this function has an issue, it will ROLLBACK to the previous state.
 func (c *DbConfig) MigrateDatabase() error {
 
-	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}, &integrations.Integration{}}
+	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
 
 	log.Infoln("Migrating Database Tables...")
 	tx := database.Begin("migration")
@@ -91,8 +90,7 @@ func (c *DbConfig) MigrateDatabase() error {
 	if err := database.DB().Model(&failures.Failure{}).AddIndex("idx_checkin_fail", "checkin").Error(); err != nil {
 		log.Errorln(err)
 	}
-
-	log.Infoln("Statping Database Indexes Migrated")
+	log.Infoln("Database Indexes Created")
 
 	return nil
 }

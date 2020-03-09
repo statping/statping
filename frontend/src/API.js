@@ -129,18 +129,6 @@ class Api {
     return axios.post('/api/notifier/' + data.method + '/test', data).then(response => (response.data))
   }
 
-  async integrations() {
-    return axios.get('/api/integrations').then(response => (response.data))
-  }
-
-  async integration(name) {
-    return axios.get('/api/integrations/' + name).then(response => (response.data))
-  }
-
-  async integration_save(data) {
-    return axios.post('/api/integrations/' + data.name, data).then(response => (response.data))
-  }
-
   async renewApiKeys() {
     return axios.get('/api/renew').then(response => (response.data))
   }

@@ -37,6 +37,13 @@ type Core struct {
 	Image         string          `gorm:"image" json:"started_on"`
 	Notifications []AllNotifiers  `gorm:"-" json:"-"`
 	Integrations  []Integrator    `gorm:"-" json:"-"`
+
+	GHAuth
+}
+
+type GHAuth struct {
+	GithubClientID     string `gorm:"gh_client_id" json:"gh_client_id"`
+	GithubClientSecret string `gorm:"gh_client_secret" json:"-"`
 }
 
 // AllNotifiers contains all the Notifiers loaded

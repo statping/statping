@@ -87,6 +87,7 @@ func Router() *mux.Router {
 
 	// API Routes
 	r.Handle("/api", scoped(apiIndexHandler))
+	//r.Handle("/oauth/callback", http.HandlerFunc(OAuthRedirect))
 	api.Handle("/api/login", http.HandlerFunc(apiLoginHandler)).Methods("POST")
 	r.Handle("/api/setup", http.HandlerFunc(processSetupHandler)).Methods("POST")
 	api.Handle("/api/logout", http.HandlerFunc(logoutHandler))
@@ -102,11 +103,6 @@ func Router() *mux.Router {
 	api.Handle("/api/theme", authenticated(apiThemeSaveHandler, false)).Methods("POST")
 	api.Handle("/api/theme/create", authenticated(apiThemeCreateHandler, false)).Methods("GET")
 	api.Handle("/api/theme", authenticated(apiThemeRemoveHandler, false)).Methods("DELETE")
-
-	// API INTEGRATIONS Routes
-	api.Handle("/api/integrations", authenticated(apiAllIntegrationsHandler, false)).Methods("GET")
-	api.Handle("/api/integrations/{name}", authenticated(apiIntegrationViewHandler, false)).Methods("GET")
-	api.Handle("/api/integrations/{name}", authenticated(apiIntegrationHandler, false)).Methods("POST")
 
 	// API GROUPS Routes
 	api.Handle("/api/groups", scoped(apiAllGroupHandler)).Methods("GET")

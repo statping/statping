@@ -28,8 +28,10 @@ import (
 	"time"
 )
 
+var _ notifications.Notifier = (*webhooker)(nil)
+
 const (
-	webhookMethod = "Webhook"
+	webhookMethod = "webhook"
 )
 
 type webhooker struct {

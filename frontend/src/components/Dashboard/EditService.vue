@@ -1,10 +1,6 @@
 <template>
     <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <FormService :in_service="service"/>
-            </div>
-        </div>
+        <FormService :in_service="service"/>
     </div>
 </template>
 

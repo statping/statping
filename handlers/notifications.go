@@ -27,12 +27,8 @@ import (
 )
 
 func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
-	var notifiers []*notifications.Notification
-	for _, n := range core.App.Notifications {
-		notif := n.(notifications.Notifier)
-		notifiers = append(notifiers, notif.Select())
-	}
-	returnJson(notifiers, w, r)
+	all := notifications.All()
+	returnJson(all, w, r)
 }
 
 func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {

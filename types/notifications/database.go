@@ -9,8 +9,12 @@ func DB() database.Database {
 	return database.DB().Model(&Notification{})
 }
 
+func Append(n Notifier) {
+	allNotifiers = append(allNotifiers, n)
+}
+
 func Find(name string) (Notifier, error) {
-	for _, n := range AllCommunications {
+	for _, n := range allNotifiers {
 		notif := n.Select()
 		if notif.Name() == name || notif.Method == name {
 			return n, nil
@@ -19,15 +23,16 @@ func Find(name string) (Notifier, error) {
 	return nil, errors.New("notifier not found")
 }
 
-func All() []*Notification {
-	var notifiers []*Notification
-	DB().Find(&notifiers)
-	return notifiers
+func All() []Notifier {
+	return allNotifiers
 }
 
 func (n *Notification) Create() error {
-	db := DB().FirstOrCreate(&n)
-	return db.Error()
+	var notif Notification
+	if DB().Where("method = ?", n.Method).Find(&notif).RecordNotFound() {
+		return DB().Create(n).Error()
+	}
+	return nil
 }
 
 func (n *Notification) Update() error {

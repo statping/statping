@@ -20,6 +20,9 @@ up:
 down:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml down --volumes --remove-orphans
 
+test: clean
+	go test -v -p=1 -ldflags="-X main.VERSION=dev" -coverprofile=coverage.out ./...
+
 lite: clean
 	docker build -t hunterlong/statping:dev -f dev/Dockerfile.dev .
 	docker-compose -f dev/docker-compose.lite.yml down
@@ -107,7 +110,7 @@ clean:
 	rm -rf ./{logs,assets,plugins,*.db,config.yml,.sass-cache,config.yml,statping,build,.sass-cache,index.html,vendor}
 	rm -rf cmd/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log,*.html,*.json}
 	rm -rf core/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
-	rm -rf core/notifier/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	rm -rf types/notifications/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
 	rm -rf handlers/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
 	rm -rf notifiers/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
 	rm -rf source/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}

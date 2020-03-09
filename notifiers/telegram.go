@@ -28,6 +28,8 @@ import (
 	"time"
 )
 
+var _ notifications.Notifier = (*telegram)(nil)
+
 type telegram struct {
 	*notifications.Notification
 }

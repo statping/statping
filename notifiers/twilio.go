@@ -28,6 +28,8 @@ import (
 	"time"
 )
 
+var _ notifications.Notifier = (*twilio)(nil)
+
 type twilio struct {
 	*notifications.Notification
 }

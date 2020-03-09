@@ -48,8 +48,6 @@ func (s *Service) Create() error {
 		return err.Error()
 	}
 	allServices[s.Id] = s
-
-	go ServiceCheckQueue(allServices[s.Id], true)
 	return nil
 }
 

@@ -5,7 +5,6 @@ import (
 	"github.com/google/martian/log"
 	"github.com/hunterlong/statping/types/notifications"
 	"github.com/hunterlong/statping/utils"
-	"github.com/pkg/errors"
 	"strings"
 )
 
@@ -13,9 +12,8 @@ var (
 	allowedVars = []string{"host", "username", "password", "port", "api_key", "api_secret", "var1", "var2"}
 )
 
-func checkNotifierForm(n notifications.Notifier) error {
-	notifier := n.Select()
-	for _, f := range notifier.Form {
+func checkNotifierForm(n *notifications.Notification) error {
+	for _, f := range n.Form {
 		contains := contains(f.DbField, allowedVars)
 		if !contains {
 			return fmt.Errorf("the DbField '%v' is not allowed, allowed vars: %v", f.DbField, allowedVars)
@@ -35,34 +33,50 @@ func contains(s string, arr []string) bool {
 
 // AddNotifier accept a Notifier interface to be added into the array
 func AddNotifiers(notifiers ...notifications.Notifier) error {
+	log.Infof("Initiating %d Notifiers\n", len(notifiers))
+
 	for _, n := range notifiers {
-		log.Infof("Installing %s Notifier...", n.Select().Method)
-		if err := checkNotifierForm(n); err != nil {
-			return errors.Wrap(err, "error with notifier form fields")
+		notif := n.Select()
+		log.Infof("Initiating %s Notifier\n", notif.Method)
+
+		if err := checkNotifierForm(notif); err != nil {
+			log.Errorf(err.Error())
+			return err
 		}
-		if _, err := notifications.Init(n); err != nil {
-			return errors.Wrap(err, "error initiating notifier")
+
+		log.Infof("Creating %s Notifier\n", notif.Method)
+		if err := notif.Create(); err != nil {
+			return err
 		}
+
+		notifications.Append(notif)
+
+		if notif.Enabled.Bool {
+			notif.Close()
+			notif.Start()
+			go notifications.Queue(notif)
+		}
+
 	}
-	startAllNotifiers()
 	return nil
 }
 
 // startAllNotifiers will start the go routine for each loaded notifier
 func startAllNotifiers() {
-	for _, comm := range notifications.AllCommunications {
-		if utils.IsType(comm, new(notifications.Notifier)) {
-			notify := comm.(notifications.Notifier)
-			if notify.Select().Enabled.Bool {
-				notify.Select().Close()
-				notify.Select().Start()
+	for _, notify := range notifications.All() {
+		n := notify.Select()
+		log.Infof("Initiating %s Notifier\n", n.Method)
+		if utils.IsType(notify, new(notifications.Notifier)) {
+			if n.Enabled.Bool {
+				n.Close()
+				n.Start()
 				go notifications.Queue(notify)
 			}
 		}
 	}
 }
 
-func AttachNotifiers() error {
+func Migrate() error {
 	return AddNotifiers(
 		Command,
 		Discorder,

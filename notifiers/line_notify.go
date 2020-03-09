@@ -26,8 +26,10 @@ import (
 	"time"
 )
 
+var _ notifications.Notifier = (*lineNotifier)(nil)
+
 const (
-	lineNotifyMethod = "line notify"
+	lineNotifyMethod = "line_notify"
 )
 
 type lineNotifier struct {

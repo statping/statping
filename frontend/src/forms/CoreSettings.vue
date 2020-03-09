@@ -87,6 +87,37 @@
             </div>
         </div>
 
+        <div class="row d-none">
+        <div class="col-12">
+        <h4 class="mt-5">Github Authentication</h4>
+
+        <div class="form-group row d-none">
+            <label class="col-sm-4 col-form-label">Github Client ID</label>
+            <div class="col-sm-8">
+                <input v-model="core.github_clientId" type="text" class="form-control" placeholder="" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-4 col-form-label">Github Client Secret</label>
+            <div class="col-sm-8">
+                <input v-model="core.github_clientScret" type="text" class="form-control" placeholder="" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="switch-group-public" class="col-sm-4 col-form-label">Enabled</label>
+            <div class="col-md-8 col-xs-12 mt-1">
+            <span @click="enabled = !!enabled" class="switch float-left">
+                <input v-model="enabled" type="checkbox" class="switch" id="switch-group-public" :checked="enabled">
+                <label for="switch-group-public">Enabled Github Auth</label>
+            </span>
+            </div>
+        </div>
+
+            <button @click.prevent="saveSettings" type="submit" class="btn btn-primary btn-block">Save Settings</button>
+
+        </div>
+        </div>
+
     </form>
 </template>
 
@@ -100,15 +131,13 @@
               core: this.$store.getters.core,
           }
       },
-      async mounted() {
-
-      },
       methods: {
           async saveSettings() {
               const c = this.core
               const coreForm = {
                   name: c.name, description: c.description, domain: c.domain,
-                  timezone: c.timezone, using_cdn: c.using_cdn, footer: c.footer, update_notify: c.update_notify
+                  timezone: c.timezone, using_cdn: c.using_cdn, footer: c.footer, update_notify: c.update_notify,
+                  gh_client_id: c.github_clientId, gh_client_secret: c.github_clientSecret
               }
               await Api.core_save(coreForm)
               const core = await Api.core()

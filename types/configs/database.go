@@ -8,7 +8,6 @@ import (
 	"github.com/hunterlong/statping/types/groups"
 	"github.com/hunterlong/statping/types/hits"
 	"github.com/hunterlong/statping/types/incidents"
-	"github.com/hunterlong/statping/types/integrations"
 	"github.com/hunterlong/statping/types/messages"
 	"github.com/hunterlong/statping/types/notifications"
 	"github.com/hunterlong/statping/types/services"
@@ -18,7 +17,7 @@ import (
 	"os"
 )
 
-type SamplerFunc func()
+type SamplerFunc func() error
 
 type Sampler interface {
 	Samples() []database.DbObject
@@ -27,7 +26,7 @@ type Sampler interface {
 func TriggerSamples() error {
 	return createSamples(
 		core.Samples,
-		users.Samples,
+		//users.Samples,
 		messages.Samples,
 		services.Samples,
 		checkins.Samples,
@@ -42,7 +41,9 @@ func TriggerSamples() error {
 
 func createSamples(sm ...SamplerFunc) error {
 	for _, v := range sm {
-		v()
+		if err := v(); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -72,7 +73,7 @@ func (d *DbConfig) Delete() error {
 
 // DropDatabase will DROP each table Statping created
 func (d *DbConfig) DropDatabase() error {
-	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}, &integrations.Integration{}}
+	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
 	log.Infoln("Dropping Database Tables...")
 	for _, t := range DbModels {
 		if err := database.DB().DropTableIfExists(t); err != nil {
@@ -87,7 +88,7 @@ func (d *DbConfig) DropDatabase() error {
 func CreateDatabase() error {
 	var err error
 
-	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}, &integrations.Integration{}}
+	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
 
 	log.Infoln("Creating Database Tables...")
 	for _, table := range DbModels {

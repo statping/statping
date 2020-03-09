@@ -22,12 +22,6 @@
                         <span v-if="notifier.enabled" class="badge badge-pill float-right mt-1" :class="{'badge-success': !liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), 'badge-light': liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), 'text-dark': liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}">ON</span>
                     </a>
 
-                    <h6 class="mt-4 text-muted">Integrations <span class="badge badge-secondary float-right">BETA</span></h6>
-
-                    <a v-for="(integration, index) in $store.getters.integrations" v-bind:key="`${integration.name}_${index}`" @click.prevent="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-integration-${integration.name}`)}" v-bind:id="`v-pills-integration-${integration.name}`" data-toggle="pill" v-bind:href="`#v-pills-integration-${integration.name}`" role="tab" :aria-controls="`v-pills-integration-${integration.name}`" aria-selected="false">
-                        <font-awesome-icon :icon="iconName(integration.name)" class="mr-2"/> {{integration.full_name}}
-                    </a>
-
                 </div>
             </div>
             <div class="col-md-9 col-sm-12">
@@ -88,10 +82,6 @@
 
                     <div v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="`${notifier.title}_${index}`" class="tab-pane fade" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), show: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" role="tabpanel" v-bind:aria-labelledby="`v-pills-${notifier.method.toLowerCase()}-tab`">
                         <Notifier :notifier="notifier"/>
-                    </div>
-
-                    <div v-for="(integration, index) in $store.getters.integrations" v-bind:key="`${integration.name}_${index}`" class="tab-pane fade" v-bind:class="{active: liClass(`v-pills-integration-${integration.name}`), show: liClass(`v-pills-integration-${integration.name}`)}" v-bind:id="`v-pills-integration-${integration.name}`" role="tabpanel">
-                        <FormIntegration :integration="integration"/>
                     </div>
 
                 </div>

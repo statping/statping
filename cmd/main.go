@@ -19,6 +19,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/getsentry/sentry-go"
+	"github.com/hunterlong/statping/notifiers"
 	"os"
 	"os/signal"
 	"syscall"
@@ -125,13 +126,40 @@ func main() {
 		}
 	}
 
-	if err = configs.ConnectConfigs(c, true); err != nil {
+	if err = configs.ConnectConfigs(c); err != nil {
 		exit(err)
+	}
+
+	exists := database.DB().HasTable("core")
+	if !exists {
+
+		if err := c.DropDatabase(); err != nil {
+			exit(errors.Wrap(err, "error dropping database"))
+		}
+
+		if err := configs.CreateDatabase(); err != nil {
+			exit(errors.Wrap(err, "error creating database"))
+		}
+
+		if err := configs.CreateAdminUser(c); err != nil {
+			exit(errors.Wrap(err, "error creating default admin user"))
+		}
+
+		if err := configs.TriggerSamples(); err != nil {
+			exit(errors.Wrap(err, "error creating database"))
+		}
+
 	}
 
 	if err := c.MigrateDatabase(); err != nil {
 		exit(err)
 	}
+
+	log.Infoln("Migrating Notifiers...")
+	if err := notifiers.Migrate(); err != nil {
+		exit(errors.Wrap(err, "error migrating notifiers"))
+	}
+	log.Infoln("Notifiers Migrated")
 
 	if err := mainProcess(); err != nil {
 		exit(err)

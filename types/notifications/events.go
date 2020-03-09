@@ -25,7 +25,7 @@ import (
 
 // OnSave will trigger a notifier when it has been saved - Notifier interface
 func OnSave(method string) {
-	for _, comm := range AllCommunications {
+	for _, comm := range allNotifiers {
 		if utils.IsType(comm, new(Notifier)) {
 			notifier := comm.(Notifier)
 			if notifier.Select().Method == method {
@@ -53,7 +53,7 @@ func OnFailure(s *services.Service, f *failures.Failure) {
 	}
 
 sendMessages:
-	for _, comm := range AllCommunications {
+	for _, comm := range allNotifiers {
 		if utils.IsType(comm, new(BasicEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) {
 			notifier := comm.(Notifier).Select()
 			log.
@@ -76,7 +76,7 @@ func OnSuccess(s *services.Service) {
 		s.UserNotified = false
 	}
 
-	for _, comm := range AllCommunications {
+	for _, comm := range allNotifiers {
 		if utils.IsType(comm, new(BasicEvents)) && isEnabled(comm) && (!s.Online || inLimits(comm)) {
 			notifier := comm.(Notifier).Select()
 			log.
@@ -90,7 +90,7 @@ func OnSuccess(s *services.Service) {
 
 // OnNewService is triggered when a new service is created - ServiceEvents interface
 func OnNewService(s *services.Service) {
-	for _, comm := range AllCommunications {
+	for _, comm := range allNotifiers {
 		if utils.IsType(comm, new(ServiceEvents)) && isEnabled(comm) && inLimits(comm) {
 			log.
 				WithField("trigger", "OnNewService").
@@ -106,7 +106,7 @@ func OnUpdatedService(s *services.Service) {
 	if !s.AllowNotifications.Bool {
 		return
 	}
-	for _, comm := range AllCommunications {
+	for _, comm := range allNotifiers {
 		if utils.IsType(comm, new(ServiceEvents)) && isEnabled(comm) && inLimits(comm) {
 			log.Debugln(fmt.Sprintf("Sending updated service notification for service %v", s.Name))
 			comm.(ServiceEvents).OnUpdatedService(s)
@@ -120,7 +120,7 @@ func OnDeletedService(s *services.Service) {
 	if !s.AllowNotifications.Bool {
 		return
 	}
-	for _, comm := range AllCommunications {
+	for _, comm := range allNotifiers {
 		if utils.IsType(comm, new(ServiceEvents)) && isEnabled(comm) && inLimits(comm) {
 			log.Debugln(fmt.Sprintf("Sending deleted service notification for service %v", s.Name))
 			comm.(ServiceEvents).OnDeletedService(s)
@@ -131,7 +131,7 @@ func OnDeletedService(s *services.Service) {
 
 // OnNewUser is triggered when a new user is created - UserEvents interface
 func OnNewUser(u *users.User) {
-	for _, comm := range AllCommunications {
+	for _, comm := range allNotifiers {
 		if utils.IsType(comm, new(UserEvents)) && isEnabled(comm) && inLimits(comm) {
 			log.Debugln(fmt.Sprintf("Sending new user notification for user %v", u.Username))
 			comm.(UserEvents).OnNewUser(u)
@@ -142,7 +142,7 @@ func OnNewUser(u *users.User) {
 
 // OnUpdatedUser is triggered when a new user is updated - UserEvents interface
 func OnUpdatedUser(u *users.User) {
-	for _, comm := range AllCommunications {
+	for _, comm := range allNotifiers {
 		if utils.IsType(comm, new(UserEvents)) && isEnabled(comm) && inLimits(comm) {
 			log.Debugln(fmt.Sprintf("Sending updated user notification for user %v", u.Username))
 			comm.(UserEvents).OnUpdatedUser(u)
@@ -153,7 +153,7 @@ func OnUpdatedUser(u *users.User) {
 
 // OnDeletedUser is triggered when a new user is deleted - UserEvents interface
 func OnDeletedUser(u *users.User) {
-	for _, comm := range AllCommunications {
+	for _, comm := range allNotifiers {
 		if utils.IsType(comm, new(UserEvents)) && isEnabled(comm) && inLimits(comm) {
 			log.Debugln(fmt.Sprintf("Sending deleted user notification for user %v", u.Username))
 			comm.(UserEvents).OnDeletedUser(u)
@@ -164,7 +164,7 @@ func OnDeletedUser(u *users.User) {
 
 //// OnUpdatedCore is triggered when the CoreApp settings are saved - CoreEvents interface
 //func OnUpdatedCore(c *core.Core) {
-//	for _, comm := range AllCommunications {
+//	for _, comm := range allNotifiers {
 //		if utils.IsType(comm, new(CoreEvents)) && isEnabled(comm) && inLimits(comm) {
 //			log.Debugln(fmt.Sprintf("Sending updated core notification"))
 //			comm.(CoreEvents).OnUpdatedCore(c)
@@ -174,7 +174,7 @@ func OnDeletedUser(u *users.User) {
 //
 //// OnStart is triggered when the Statping service has started
 //func OnStart(c *core.Core) {
-//	for _, comm := range AllCommunications {
+//	for _, comm := range allNotifiers {
 //		if utils.IsType(comm, new(CoreEvents)) && isEnabled(comm) && inLimits(comm) {
 //			comm.(CoreEvents).OnUpdatedCore(c)
 //		}
@@ -183,7 +183,7 @@ func OnDeletedUser(u *users.User) {
 
 // OnNewNotifier is triggered when a new notifier is loaded
 func OnNewNotifier(n *Notification) {
-	for _, comm := range AllCommunications {
+	for _, comm := range allNotifiers {
 		if utils.IsType(comm, new(NotifierEvents)) && isEnabled(comm) && inLimits(comm) {
 			comm.(NotifierEvents).OnNewNotifier(n)
 			comm.Select().Hits.OnNewNotifier++
@@ -193,7 +193,7 @@ func OnNewNotifier(n *Notification) {
 
 // OnUpdatedNotifier is triggered when a notifier has been updated
 func OnUpdatedNotifier(n *Notification) {
-	for _, comm := range AllCommunications {
+	for _, comm := range allNotifiers {
 		if utils.IsType(comm, new(NotifierEvents)) && isEnabled(comm) && inLimits(comm) {
 			log.Infoln(fmt.Sprintf("Sending updated notifier for %v", n.Id))
 			comm.(NotifierEvents).OnUpdatedNotifier(n)
