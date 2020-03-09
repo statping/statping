@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/getsentry/sentry-go"
 	"github.com/hunterlong/statping/types/core"
 	"github.com/hunterlong/statping/utils"
 	"io"
@@ -81,21 +80,13 @@ func sendLog(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
-		t2 := utils.Now().Sub(t1)
 		next.ServeHTTP(w, r)
+		t2 := utils.Now().Sub(t1)
 		log.WithFields(utils.ToFields(w, r)).
 			WithField("url", r.RequestURI).
 			WithField("method", r.Method).
 			WithField("load_micro_seconds", t2.Microseconds()).
 			Infoln(fmt.Sprintf("%v (%v) | IP: %v", r.RequestURI, r.Method, r.Host))
-
-		e := sentry.NewEvent()
-		e.Timestamp = utils.Now().Unix()
-		e.Dist = "development"
-		e.Environment = "development"
-		e.Transaction = "http_response"
-		sentry.CaptureEvent(e)
-
 	})
 }
 

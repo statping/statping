@@ -18,6 +18,7 @@ package utils
 import (
 	"fmt"
 	"github.com/fatih/structs"
+	"github.com/getsentry/sentry-go"
 	"github.com/hunterlong/statping/types/null"
 	Logger "github.com/sirupsen/logrus"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -133,6 +134,8 @@ func InitLogs() error {
 		DisableColors: false,
 	})
 	checkVerboseMode()
+
+	sentry.CaptureMessage("It works!")
 
 	LastLines = make([]*logRow, 0)
 	return nil
