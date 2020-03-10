@@ -6,7 +6,7 @@ HTML,BODY {
 }
 
 .index-chart {
-  height: 35vh;
+  height: 490px;
 }
 
 .chartmarker {
@@ -80,7 +80,8 @@ HTML,BODY {
   }
 
   .online_list .badge {
-    margin-top: 0.2rem;
+    font-size: 8pt;
+    padding: 5px 7px;
   }
 
   .navbar {
@@ -234,7 +235,7 @@ HTML,BODY {
 
   .chart-container {
     position: relative;
-    height: 18.6vh;
+    height: 240px;
     width: 100%;
     overflow: hidden;
   }
