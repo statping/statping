@@ -131,8 +131,17 @@ func main() {
 		exit(err)
 	}
 
+	if err = confgs.VerifyMigration(); err != nil {
+		exit(err)
+	}
+
 	exists := confgs.Db.HasTable("core")
 	if !exists {
+		var srvs int64
+		confgs.Db.Model(&services.Service{}).Count(&srvs)
+		if srvs > 0 {
+			exit(errors.Wrap(err, "there are already services setup."))
+		}
 
 		if err := confgs.DropDatabase(); err != nil {
 			exit(errors.Wrap(err, "error dropping database"))

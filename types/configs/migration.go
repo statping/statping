@@ -42,6 +42,25 @@ import (
 //	return nil
 //}
 
+func (c *DbConfig) VerifyMigration() error {
+
+	query := `
+BEGIN TRANSACTION;
+ALTER TABLE hits ALTER COLUMN latency BIGINT;
+ALTER TABLE hits ALTER COLUMN ping_time BIGINT; 
+ALTER TABLE failures ALTER COLUMN ping_time BIGINT;
+UPDATE hits SET latency = CAST(latency * 10000 AS BIGINT);
+UPDATE hits SET ping_time = CAST(ping_time * 100000 AS BIGINT);
+UPDATE failures SET ping_time = CAST(ping_time * 100000 AS BIGINT);
+COMMIT;`
+
+	fmt.Println(c.Db.DbType())
+
+	q := c.Db.Raw(query).Debug()
+
+	return q.Error()
+}
+
 //MigrateDatabase will migrate the database structure to current version.
 //This function will NOT remove previous records, tables or columns from the database.
 //If this function has an issue, it will ROLLBACK to the previous state.
@@ -79,6 +98,10 @@ func (c *DbConfig) MigrateDatabase() error {
 	}
 
 	if err := c.Db.Model(&hits.Hit{}).AddIndex("hit_created_at", "created_at").Error(); err != nil {
+		log.Errorln(err)
+	}
+
+	if err := c.Db.Model(&failures.Failure{}).AddIndex("fail_created_at", "created_at").Error(); err != nil {
 		log.Errorln(err)
 	}
 
