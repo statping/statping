@@ -5,48 +5,57 @@ import (
 	"github.com/statping/statping/utils"
 )
 
-func DB() database.Database {
-	return database.DB().Model(&Checkin{})
-}
+var db database.Database
+var dbHits database.Database
 
-func DBhits() database.Database {
-	return database.DB().Model(&CheckinHit{})
+func SetDB(database database.Database) {
+	db = database.Model(&Checkin{})
+	dbHits = database.Model(&CheckinHit{})
 }
 
 func Find(id int64) (*Checkin, error) {
 	var checkin Checkin
-	db := DB().Where("id = ?", id).Find(&checkin)
-	return &checkin, db.Error()
+	q := db.Where("id = ?", id).Find(&checkin)
+	return &checkin, q.Error()
 }
 
 func FindByAPI(key string) (*Checkin, error) {
 	var checkin Checkin
-	db := DB().Where("api = ?", key).Find(&checkin)
-	return &checkin, db.Error()
+	q := db.Where("api_key = ?", key).Find(&checkin)
+	return &checkin, q.Error()
 }
 
 func All() []*Checkin {
 	var checkins []*Checkin
-	DB().Find(&checkins)
+	db.Find(&checkins)
 	return checkins
 }
 
 func (c *Checkin) Create() error {
 	c.ApiKey = utils.RandomString(7)
-	db := DB().Create(c)
+	q := db.Create(c)
 
 	c.Start()
 	go c.CheckinRoutine()
-	return db.Error()
+	return q.Error()
 }
 
 func (c *Checkin) Update() error {
-	db := DB().Update(c)
-	return db.Error()
+	q := db.Update(c)
+	return q.Error()
 }
 
 func (c *Checkin) Delete() error {
 	c.Close()
-	db := DB().Delete(c)
-	return db.Error()
+	q := dbHits.Where("checkin = ?", c.Id).Delete(&CheckinHit{})
+	if err := q.Error(); err != nil {
+		return err
+	}
+	q = db.Model(&Checkin{}).Delete(c)
+	return q.Error()
 }
+
+//func (c *Checkin) AfterDelete() error {
+//	//q := dbHits.Where("checkin = ?", c.Id).Delete(&CheckinHit{})
+//	return q.Error()
+//}

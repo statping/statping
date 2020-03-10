@@ -41,11 +41,11 @@ type Service struct {
 	CreatedAt           time.Time           `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt           time.Time           `gorm:"column:updated_at" json:"updated_at"`
 	Online              bool                `gorm:"-" json:"online"`
-	Latency             float64             `gorm:"-" json:"latency"`
-	PingTime            float64             `gorm:"-" json:"ping_time"`
+	Latency             int64               `gorm:"-" json:"latency"`
+	PingTime            int64               `gorm:"-" json:"ping_time"`
 	Online24Hours       float32             `gorm:"-" json:"online_24_hours"`
 	Online7Days         float32             `gorm:"-" json:"online_7_days"`
-	AvgResponse         int64               `gorm:"-" json:"avg_response"`
+	AvgResponse         float64             `gorm:"-" json:"avg_response"`
 	FailuresLast24Hours int                 `gorm:"-" json:"failures_24_hours"`
 	Running             chan bool           `gorm:"-" json:"-"`
 	Checkpoint          time.Time           `gorm:"-" json:"-"`

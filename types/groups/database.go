@@ -5,35 +5,37 @@ import (
 	"sort"
 )
 
-func DB() database.Database {
-	return database.DB().Model(&Group{})
+var db database.Database
+
+func SetDB(database database.Database) {
+	db = database.Model(&Group{})
 }
 
 func Find(id int64) (*Group, error) {
 	var group Group
-	db := DB().Where("id = ?", id).Find(&group)
-	return &group, db.Error()
+	q := db.Where("id = ?", id).Find(&group)
+	return &group, q.Error()
 }
 
 func All() []*Group {
 	var groups []*Group
-	DB().Find(&groups)
+	db.Find(&groups)
 	return groups
 }
 
 func (g *Group) Create() error {
-	db := DB().Create(g)
-	return db.Error()
+	q := db.Create(g)
+	return q.Error()
 }
 
 func (g *Group) Update() error {
-	db := DB().Update(g)
-	return db.Error()
+	q := db.Update(g)
+	return q.Error()
 }
 
 func (g *Group) Delete() error {
-	db := DB().Delete(g)
-	return db.Error()
+	q := db.Delete(g)
+	return q.Error()
 }
 
 // SelectGroups returns all groups

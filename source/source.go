@@ -20,9 +20,9 @@ package source
 import (
 	"fmt"
 	"github.com/GeertJohan/go.rice"
-	"github.com/statping/statping/utils"
 	"github.com/pkg/errors"
 	"github.com/russross/blackfriday/v2"
+	"github.com/statping/statping/utils"
 	"os"
 	"path/filepath"
 	"strings"

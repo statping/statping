@@ -286,8 +286,12 @@ func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data
 	//}
 }
 
-func returnJson(d interface{}, w http.ResponseWriter, r *http.Request) {
+func returnJson(d interface{}, w http.ResponseWriter, r *http.Request, statusCode ...int) {
 	w.Header().Set("Content-Type", "application/json")
+	if len(statusCode) != 0 {
+		code := statusCode[0]
+		w.WriteHeader(code)
+	}
 	json.NewEncoder(w).Encode(d)
 }
 

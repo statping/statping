@@ -9,27 +9,29 @@ import (
 	"time"
 )
 
-func DB() database.Database {
-	return database.DB().Table("core")
+var db database.Database
+
+func SetDB(database database.Database) {
+	db = database.Model(&Core{})
 }
 
 func Select() (*Core, error) {
 	var c Core
 	// SelectCore will return the CoreApp global variable and the settings/configs for Statping
-	if !database.Available() {
+	if err := db.DB().Ping(); err != nil {
 		return nil, errors.New("database has not been initiated yet.")
 	}
-	exists := DB().HasTable("core")
+	exists := db.HasTable("core")
 	if !exists {
 		return nil, errors.New("core database has not been setup yet.")
 	}
-	db := DB().Find(&c)
-	if db.Error() != nil {
+	q := db.Find(&c)
+	if q.Error() != nil {
 		return nil, db.Error()
 	}
 	App = &c
 	App.UseCdn = null.NewNullBool(os.Getenv("USE_CDN") == "true")
-	return App, db.Error()
+	return App, q.Error()
 }
 
 func (c *Core) Create() error {
@@ -44,13 +46,13 @@ func (c *Core) Create() error {
 		Domain:      c.Domain,
 		MigrationId: time.Now().Unix(),
 	}
-	db := DB().Create(&newCore)
-	return db.Error()
+	q := db.Create(&newCore)
+	return q.Error()
 }
 
 func (c *Core) Update() error {
-	db := DB().Update(c)
-	return db.Error()
+	q := db.Update(c)
+	return q.Error()
 }
 
 func (c *Core) Delete() error {
@@ -73,6 +75,6 @@ func Sample() error {
 		Footer:      null.NewNullString(""),
 	}
 
-	db := DB().Create(core)
-	return db.Error()
+	q := db.Create(core)
+	return q.Error()
 }

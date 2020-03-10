@@ -5,6 +5,22 @@ HTML,BODY {
     background-color: $background-color;
 }
 
+
+.chartmarker {
+  background-color: white;
+  padding: 5px;
+}
+
+.chartmarker SPAN {
+  font-size: 11pt;
+  display: block;
+  color: #8b8b8b;
+}
+
+.apexcharts-tooltip {
+  box-shadow: none;
+}
+
 .contain-card {
 
   .card-header {

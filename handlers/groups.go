@@ -43,7 +43,7 @@ func apiAllGroupHandler(r *http.Request) interface{} {
 func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
 	group, err := selectGroup(r)
 	if err != nil {
-		sendErrorJson(errors.Wrap(err, "group not found"), w, r)
+		sendErrorJson(errors.Wrap(err, "group not found"), w, r, http.StatusNotFound)
 		return
 	}
 	returnJson(group, w, r)

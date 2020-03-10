@@ -47,7 +47,7 @@ CheckinLoop:
 					Method:    "checkin",
 					Service:   c.ServiceId,
 					Checkin:   c.Id,
-					PingTime:  c.Expected().Seconds(),
+					PingTime:  c.Expected().Milliseconds(),
 					CreatedAt: time.Time{},
 				}
 

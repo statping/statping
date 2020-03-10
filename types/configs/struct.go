@@ -1,5 +1,7 @@
 package configs
 
+import "github.com/statping/statping/database"
+
 const SqliteFilename = "statping.db"
 
 // DbConfig struct is used for the Db connection and creates the 'config.yml' file
@@ -23,4 +25,6 @@ type DbConfig struct {
 	SqlFile     string `yaml:"sqlfile,omitempty" json:"-"`
 	LocalIP     string `yaml:"-" json:"-"`
 	filename    string `yaml:"-" json:"-"`
+
+	Db database.Database `yaml:"-" json:"-"`
 }

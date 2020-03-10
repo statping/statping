@@ -1,5 +1,3 @@
-// +build int
-
 package handlers
 
 import (
@@ -10,7 +8,7 @@ import (
 )
 
 func TestAttachment(t *testing.T) {
-	err := notifiers.AttachNotifiers()
+	err := notifiers.Migrate()
 	require.Nil(t, err)
 }
 

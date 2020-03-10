@@ -42,9 +42,9 @@ func (h Hitters) List() []*Hit {
 	return hits
 }
 
-func (h Hitters) LastCount(amounts int) []*Hit {
+func (h Hitters) LastAmount(amount int) []*Hit {
 	var hits []*Hit
-	h.db.Order("id asc").Limit(amounts).Find(&hits)
+	h.db.Order("id asc").Limit(amount).Find(&hits)
 	return hits
 }
 
@@ -54,18 +54,23 @@ func (h Hitters) Count() int {
 	return count
 }
 
+func (h Hitters) DeleteAll() error {
+	q := h.db.Delete(&Hit{})
+	return q.Error()
+}
+
 func (h Hitters) Sum() float64 {
 	result := struct {
 		amount float64
 	}{0}
 
-	h.db.Select("AVG(latency) as amount").Scan(&result).Debug()
+	h.db.Select("AVG(latency) as amount").Scan(&result)
 	return result.amount
 }
 
-func (h Hitters) Avg() int64 {
+func (h Hitters) Avg() float64 {
 	result := struct {
-		amount int64
+		amount float64
 	}{0}
 
 	h.db.Select("AVG(latency) as amount").Scan(&result)
@@ -74,11 +79,11 @@ func (h Hitters) Avg() int64 {
 
 func AllHits(obj ColumnIDInterfacer) Hitters {
 	column, id := obj.HitsColumnID()
-	return Hitters{DB().Where(fmt.Sprintf("%s = ?", column), id)}
+	return Hitters{db.Where(fmt.Sprintf("%s = ?", column), id)}
 }
 
-func HitsSince(t time.Time, obj ColumnIDInterfacer) Hitters {
+func Since(t time.Time, obj ColumnIDInterfacer) Hitters {
 	column, id := obj.HitsColumnID()
-	timestamp := DB().FormatTime(t)
-	return Hitters{DB().Where(fmt.Sprintf("%s = ? AND created_at > ?", column), id, timestamp)}
+	timestamp := db.FormatTime(t)
+	return Hitters{db.Where(fmt.Sprintf("%s = ? AND created_at > ?", column), id, timestamp)}
 }

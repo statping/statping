@@ -1,7 +1,6 @@
 package checkins
 
 import (
-	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/utils"
 	"time"
@@ -32,24 +31,7 @@ type CheckinHit struct {
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 }
 
-// BeforeCreate for checkinHit will set CreatedAt to UTC
-func (c *CheckinHit) BeforeCreate() (err error) {
-	if c.CreatedAt.IsZero() {
-		c.CreatedAt = time.Now().UTC()
-	}
-	return
-}
-
 func (c *Checkin) BeforeCreate() (err error) {
 	c.ApiKey = utils.RandomString(7)
-	if c.CreatedAt.IsZero() {
-		c.CreatedAt = time.Now().UTC()
-		c.UpdatedAt = time.Now().UTC()
-	}
-	return
-}
-
-func (c *Checkin) BeforeDelete(tx database.Database) (err error) {
-	return tx.Where("id = ?", c.ServiceId).
-		Update("group_id", 0).Error()
+	return nil
 }

@@ -17,16 +17,8 @@ type Failure struct {
 	ErrorCode int       `gorm:"column:error_code" json:"error_code"`
 	Service   int64     `gorm:"index;column:service" json:"-"`
 	Checkin   int64     `gorm:"index;column:checkin" json:"-"`
-	PingTime  float64   `gorm:"column:ping_time"  json:"ping"`
+	PingTime  int64     `gorm:"column:ping_time"  json:"ping"`
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
-}
-
-// BeforeCreate for Failure will set CreatedAt to UTC
-func (f *Failure) BeforeCreate() (err error) {
-	if f.CreatedAt.IsZero() {
-		f.CreatedAt = time.Now().UTC()
-	}
-	return
 }
 
 type FailSort []Failure

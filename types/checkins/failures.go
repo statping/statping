@@ -7,7 +7,7 @@ import (
 
 func (c *Checkin) CreateFailure(f *failures.Failure) error {
 	f.Checkin = c.Id
-	return failures.DB().Create(&f).Error()
+	return failures.DB().Create(f).Error()
 }
 
 func (c *Checkin) FailuresColumnID() (string, int64) {
@@ -19,5 +19,5 @@ func (c *Checkin) Failures() failures.Failurer {
 }
 
 func (c *Checkin) FailuresSince(t time.Time) failures.Failurer {
-	return failures.FailuresSince(t, c)
+	return failures.Since(t, c)
 }

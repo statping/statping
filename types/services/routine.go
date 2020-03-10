@@ -64,9 +64,9 @@ func parseHost(s *Service) string {
 }
 
 // dnsCheck will check the domain name and return a float64 for the amount of time the DNS check took
-func dnsCheck(s *Service) (float64, error) {
+func dnsCheck(s *Service) (int64, error) {
 	var err error
-	t1 := time.Now()
+	t1 := utils.Now()
 	host := parseHost(s)
 	if s.Type == "tcp" {
 		_, err = net.LookupHost(host)
@@ -77,7 +77,7 @@ func dnsCheck(s *Service) (float64, error) {
 		return 0, err
 	}
 	t2 := time.Now()
-	subTime := t2.Sub(t1).Seconds()
+	subTime := t2.Sub(t1).Microseconds()
 	return subTime, err
 }
 
@@ -101,7 +101,7 @@ func CheckIcmp(s *Service, record bool) *Service {
 	}
 	p.AddIPAddr(ra)
 	p.OnRecv = func(addr *net.IPAddr, rtt time.Duration) {
-		s.Latency = rtt.Seconds()
+		s.Latency = rtt.Microseconds()
 		recordSuccess(s)
 	}
 	err = p.Run()
@@ -125,7 +125,7 @@ func CheckTcp(s *Service, record bool) *Service {
 		return s
 	}
 	s.PingTime = dnsLookup
-	t1 := time.Now()
+	t1 := utils.Now()
 	domain := fmt.Sprintf("%v", s.Domain)
 	if s.Port != 0 {
 		domain = fmt.Sprintf("%v:%v", s.Domain, s.Port)
@@ -146,8 +146,8 @@ func CheckTcp(s *Service, record bool) *Service {
 		}
 		return s
 	}
-	t2 := time.Now()
-	s.Latency = t2.Sub(t1).Seconds()
+	t2 := utils.Now()
+	s.Latency = t2.Sub(t1).Microseconds()
 	s.LastResponse = ""
 	if record {
 		recordSuccess(s)
@@ -171,7 +171,7 @@ func CheckHttp(s *Service, record bool) *Service {
 		return s
 	}
 	s.PingTime = dnsLookup
-	t1 := time.Now()
+	t1 := utils.Now()
 
 	timeout := time.Duration(s.Timeout) * time.Second
 	var content []byte
@@ -195,8 +195,8 @@ func CheckHttp(s *Service, record bool) *Service {
 		}
 		return s
 	}
-	t2 := time.Now()
-	s.Latency = t2.Sub(t1).Seconds()
+	t2 := utils.Now()
+	s.Latency = t2.Sub(t1).Microseconds()
 	s.LastResponse = string(content)
 	s.LastStatusCode = res.StatusCode
 
@@ -226,21 +226,21 @@ func CheckHttp(s *Service, record bool) *Service {
 
 // recordSuccess will create a new 'hit' record in the database for a successful/online service
 func recordSuccess(s *Service) {
-	s.LastOnline = time.Now().UTC()
+	s.LastOnline = utils.Now()
 	s.Online = true
 	hit := &hits.Hit{
 		Service:   s.Id,
 		Latency:   s.Latency,
 		PingTime:  s.PingTime,
-		CreatedAt: time.Now().UTC(),
+		CreatedAt: utils.Now(),
 	}
 	if err := hit.Create(); err != nil {
 		log.Error(err)
 	}
 	log.WithFields(utils.ToFields(hit, s)).Infoln(
-		fmt.Sprintf("Service #%d '%v' Successful Response: %0.2f ms | Lookup in: %0.2f ms | Online: %v | Interval: %d seconds", s.Id, s.Name, hit.Latency*1000, hit.PingTime*1000, s.Online, s.Interval))
-	s.LastLookupTime = int64(hit.PingTime * 1000)
-	s.LastLatency = int64(hit.Latency * 1000)
+		fmt.Sprintf("Service #%d '%v' Successful Response: %s | Lookup in: %s | Online: %v | Interval: %d seconds", s.Id, s.Name, humanMicro(hit.Latency), humanMicro(hit.PingTime), s.Online, s.Interval))
+	s.LastLookupTime = hit.PingTime
+	s.LastLatency = hit.Latency
 	//notifier.OnSuccess(s)
 	s.SuccessNotified = true
 }

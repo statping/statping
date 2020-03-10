@@ -2,33 +2,39 @@ package failures
 
 import "github.com/statping/statping/database"
 
+var db database.Database
+
+func SetDB(database database.Database) {
+	db = database.Model(&Failure{})
+}
+
 func DB() database.Database {
-	return database.DB().Model(&Failure{})
+	return db
 }
 
 func Find(id int64) (*Failure, error) {
 	var failure Failure
-	db := DB().Where("id = ?", id).Find(&failure)
-	return &failure, db.Error()
+	q := db.Where("id = ?", id).Find(&failure)
+	return &failure, q.Error()
 }
 
 func All() []*Failure {
 	var failures []*Failure
-	DB().Find(&failures)
+	db.Find(&failures)
 	return failures
 }
 
 func (f *Failure) Create() error {
-	db := DB().Create(f)
-	return db.Error()
+	q := db.Create(f)
+	return q.Error()
 }
 
 func (f *Failure) Update() error {
-	db := DB().Update(f)
-	return db.Error()
+	q := db.Update(f)
+	return q.Error()
 }
 
 func (f *Failure) Delete() error {
-	db := DB().Delete(f)
-	return db.Error()
+	q := db.Delete(f)
+	return q.Error()
 }

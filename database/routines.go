@@ -59,8 +59,8 @@ func databaseMaintence(dur time.Duration) {
 // DeleteAllSince will delete a specific table's records based on a time.
 func DeleteAllSince(table string, date time.Time) {
 	sql := fmt.Sprintf("DELETE FROM %v WHERE created_at < '%v';", table, database.FormatTime(date))
-	db := database.Exec(sql)
-	if db.Error() != nil {
-		log.Warnln(db.Error())
+	q := database.Exec(sql)
+	if q.Error() != nil {
+		log.Warnln(q.Error())
 	}
 }

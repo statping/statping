@@ -76,7 +76,7 @@ func (d *DbConfig) DropDatabase() error {
 	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
 	log.Infoln("Dropping Database Tables...")
 	for _, t := range DbModels {
-		if err := database.DB().DropTableIfExists(t); err != nil {
+		if err := d.Db.DropTableIfExists(t); err != nil {
 			return err.Error()
 		}
 		log.Infof("Dropped table: %T\n", t)
@@ -84,19 +84,23 @@ func (d *DbConfig) DropDatabase() error {
 	return nil
 }
 
+func (d *DbConfig) Close() {
+	d.Db.Close()
+}
+
 // CreateDatabase will CREATE TABLES for each of the Statping elements
-func CreateDatabase() error {
+func (d *DbConfig) CreateDatabase() error {
 	var err error
 
 	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
 
 	log.Infoln("Creating Database Tables...")
 	for _, table := range DbModels {
-		if err := database.DB().CreateTable(table); err.Error() != nil {
+		if err := d.Db.CreateTable(table); err.Error() != nil {
 			return err.Error()
 		}
 	}
-	if err := database.DB().Table("core").CreateTable(&core.Core{}); err.Error() != nil {
+	if err := d.Db.Table("core").CreateTable(&core.Core{}); err.Error() != nil {
 		return err.Error()
 	}
 	log.Infoln("Statping Database Created")

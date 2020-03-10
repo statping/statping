@@ -2,29 +2,35 @@ package incidents
 
 import "github.com/statping/statping/database"
 
+var db database.Database
+
+func SetDB(database database.Database) {
+	db = database.Model(&Incident{})
+}
+
 func Find(id int64) (*Incident, error) {
 	var incident Incident
-	db := database.DB().Model(&Incident{}).Where("id = ?", id).Find(&incident)
-	return &incident, db.Error()
+	q := db.Where("id = ?", id).Find(&incident)
+	return &incident, q.Error()
 }
 
 func All() []*Incident {
 	var incidents []*Incident
-	database.DB().Model(&Incident{}).Find(&incidents)
+	db.Find(&incidents)
 	return incidents
 }
 
 func (i *Incident) Create() error {
-	db := database.DB().Create(i)
-	return db.Error()
+	q := db.Create(i)
+	return q.Error()
 }
 
 func (i *Incident) Update() error {
-	db := database.DB().Update(i)
-	return db.Error()
+	q := db.Update(i)
+	return q.Error()
 }
 
 func (i *Incident) Delete() error {
-	db := database.DB().Delete(i)
-	return db.Error()
+	q := db.Delete(i)
+	return q.Error()
 }

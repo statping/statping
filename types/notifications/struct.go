@@ -152,7 +152,7 @@ func reverseLogs(input []*NotificationLog) []*NotificationLog {
 // SelectNotification returns the Notification struct from the database
 func SelectNotification(n Notifier) (*Notification, error) {
 	notifier := n.Select()
-	err := DB().Where("method = ?", notifier.Method).Find(&notifier)
+	err := db.Where("method = ?", notifier.Method).Find(&notifier)
 	return notifier, err.Error()
 }
 

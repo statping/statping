@@ -14,7 +14,7 @@ import (
 )
 
 func Samples() error {
-	tx := DB().Begin()
+	tx := db.Begin()
 	sg := new(sync.WaitGroup)
 
 	createdAt := utils.Now().Add(-3 * types.Day)

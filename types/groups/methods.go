@@ -1,13 +1,12 @@
 package groups
 
 import (
-	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/services"
 )
 
 func (g *Group) Services() []*services.Service {
 	var services []*services.Service
-	database.DB().Where("group = ?", g.Id).Find(&services)
+	db.Where("group = ?", g.Id).Find(&services)
 	return services
 }
 

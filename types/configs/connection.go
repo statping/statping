@@ -5,7 +5,16 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/checkins"
+	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/groups"
+	"github.com/statping/statping/types/hits"
+	"github.com/statping/statping/types/incidents"
+	"github.com/statping/statping/types/messages"
+	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/types/users"
 	"github.com/statping/statping/utils"
 	"os"
@@ -15,9 +24,6 @@ import (
 // Connect will attempt to connect to the sqlite, postgres, or mysql database
 func Connect(configs *DbConfig, retry bool) error {
 	postgresSSL := os.Getenv("POSTGRES_SSLMODE")
-	if database.Available() {
-		return nil
-	}
 	var conn string
 	var err error
 
@@ -25,7 +31,7 @@ func Connect(configs *DbConfig, retry bool) error {
 	case "sqlite", "sqlite3", "memory":
 		if configs.DbConn == "memory" {
 			conn = "sqlite3"
-			configs.DbConn = ":memory"
+			configs.DbConn = ":memory:"
 		} else {
 			conn = findDbFile(configs)
 			configs.SqlFile = conn
@@ -76,12 +82,29 @@ func Connect(configs *DbConfig, retry bool) error {
 
 	if dbSession.DB().Ping() == nil {
 		if utils.VerboseMode >= 4 {
-			database.LogMode(true).Debug().SetLogger(gorm.Logger{log})
+			dbSession.LogMode(true).Debug().SetLogger(gorm.Logger{log})
 		}
 		log.Infoln(fmt.Sprintf("Database %v connection was successful.", configs.DbConn))
 	}
 
+	configs.Db = dbSession
+
+	initModels(configs.Db)
+
 	return err
+}
+
+func initModels(db database.Database) {
+	core.SetDB(db)
+	services.SetDB(db)
+	hits.SetDB(db)
+	failures.SetDB(db)
+	checkins.SetDB(db)
+	notifications.SetDB(db)
+	incidents.SetDB(db)
+	users.SetDB(db)
+	messages.SetDB(db)
+	groups.SetDB(db)
 }
 
 func CreateAdminUser(configs *DbConfig) error {

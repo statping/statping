@@ -2,33 +2,35 @@ package messages
 
 import "github.com/statping/statping/database"
 
-func DB() database.Database {
-	return database.DB().Model(&Message{})
+var db database.Database
+
+func SetDB(database database.Database) {
+	db = database.Model(&Message{})
 }
 
 func Find(id int64) (*Message, error) {
 	var message Message
-	db := DB().Where("id = ?", id).Find(&message)
-	return &message, db.Error()
+	q := db.Where("id = ?", id).Find(&message)
+	return &message, q.Error()
 }
 
 func All() []*Message {
 	var messages []*Message
-	DB().Find(&messages)
+	db.Find(&messages)
 	return messages
 }
 
 func (m *Message) Create() error {
-	db := DB().Create(m)
-	return db.Error()
+	q := db.Create(m)
+	return q.Error()
 }
 
 func (m *Message) Update() error {
-	db := DB().Update(m)
-	return db.Error()
+	q := db.Update(m)
+	return q.Error()
 }
 
 func (m *Message) Delete() error {
-	db := DB().Delete(m)
-	return db.Error()
+	q := db.Delete(m)
+	return q.Error()
 }

@@ -7,33 +7,35 @@ import (
 
 var log = utils.Log
 
-func DB() database.Database {
-	return database.DB().Model(&Hit{})
+var db database.Database
+
+func SetDB(database database.Database) {
+	db = database.Model(&Hit{})
 }
 
 func Find(id int64) (*Hit, error) {
 	var group Hit
-	db := DB().Where("id = ?", id).Find(&group)
-	return &group, db.Error()
+	q := db.Where("id = ?", id).Find(&group)
+	return &group, q.Error()
 }
 
 func All() []*Hit {
 	var hits []*Hit
-	DB().Find(&hits)
+	db.Find(&hits)
 	return hits
 }
 
 func (h *Hit) Create() error {
-	db := DB().Create(h)
-	return db.Error()
+	q := db.Create(h)
+	return q.Error()
 }
 
 func (h *Hit) Update() error {
-	db := DB().Update(h)
-	return db.Error()
+	q := db.Update(h)
+	return q.Error()
 }
 
 func (h *Hit) Delete() error {
-	db := DB().Delete(h)
-	return db.Error()
+	q := db.Delete(h)
+	return q.Error()
 }

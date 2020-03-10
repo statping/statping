@@ -10,8 +10,10 @@ import (
 
 var log = utils.Log
 
-func DB() database.Database {
-	return database.DB().Model(&Service{})
+var db database.Database
+
+func SetDB(database database.Database) {
+	db = database.Model(&Service{})
 }
 
 func Find(id int64) (*Service, error) {
@@ -24,7 +26,7 @@ func Find(id int64) (*Service, error) {
 
 func all() []*Service {
 	var services []*Service
-	DB().Find(&services)
+	db.Find(&services)
 	return services
 }
 
@@ -42,17 +44,21 @@ func AllInOrder() []Service {
 }
 
 func (s *Service) Create() error {
-	err := DB().Create(s)
+	err := db.Create(s)
 	if err.Error() != nil {
 		log.Errorln(fmt.Sprintf("Failed to create service %v #%v: %v", s.Name, s.Id, err))
 		return err.Error()
 	}
+	return nil
+}
+
+func (s *Service) AfterCreate() error {
 	allServices[s.Id] = s
 	return nil
 }
 
 func (s *Service) Update() error {
-	db := DB().Update(s)
+	q := db.Update(s)
 
 	allServices[s.Id] = s
 
@@ -68,20 +74,49 @@ func (s *Service) Update() error {
 
 	//notifier.OnUpdatedService(s.Service)
 
-	return db.Error()
+	return q.Error()
 }
 
 func (s *Service) Delete() error {
-	db := database.DB().Delete(s)
-
 	s.Close()
-	delete(allServices, s.Id)
-	//notifier.OnDeletedService(s.Service)
 
-	return db.Error()
+	if err := s.DeleteFailures(); err != nil {
+		return err
+	}
+	if err := s.DeleteHits(); err != nil {
+		return err
+	}
+
+	delete(allServices, s.Id)
+
+	q := db.Model(&Service{}).Delete(s)
+	//notifier.OnDeletedService(s.Service)
+	return q.Error()
 }
 
 func (s *Service) DeleteFailures() error {
-	query := database.DB().Exec(`DELETE FROM failures WHERE service = ?`, s.Id)
-	return query.Error()
+	return s.AllFailures().DeleteAll()
+}
+
+func (s *Service) DeleteHits() error {
+	return s.AllHits().DeleteAll()
+}
+
+func (s *Service) DeleteCheckins() error {
+	for _, c := range s.Checkins() {
+		if err := c.Delete(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+//func (s *Service) AfterDelete() error {
+//
+//	return nil
+//}
+
+func (s *Service) AfterFind() error {
+	s.UpdateStats()
+	return nil
 }

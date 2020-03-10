@@ -16,7 +16,7 @@ import (
 var SampleHits = 99900.
 
 func Samples() error {
-	tx := DB().Begin()
+	tx := db.Begin()
 	sg := new(sync.WaitGroup)
 
 	for i := int64(1); i <= 5; i++ {
@@ -24,7 +24,7 @@ func Samples() error {
 		if err != nil {
 			log.Error(err)
 		}
-		tx = DB().Begin()
+		tx = db.Begin()
 	}
 
 	return tx.Error()
@@ -44,8 +44,8 @@ func createHitsAt(db database.Database, serviceID int64, sg *sync.WaitGroup) err
 
 		hit := &Hit{
 			Service:   serviceID,
-			Latency:   latency,
-			PingTime:  latency * 0.15,
+			Latency:   int64(latency * 10000000),
+			PingTime:  int64(latency * 5000000),
 			CreatedAt: createdAt,
 		}
 

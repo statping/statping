@@ -18,9 +18,7 @@ const (
 	TIME_DAY   = "2006-01-02"
 )
 
-var (
-	database Database
-)
+var database Database
 
 // Database is an interface which DB implements
 type Database interface {
@@ -112,39 +110,35 @@ type Database interface {
 	DbType() string
 }
 
-func DB() Database {
-	return database
-}
-
 func (it *Db) DbType() string {
 	return it.Database.Dialect().GetName()
 }
 
-func Close() error {
-	if database == nil {
+func Close(db Database) error {
+	if db == nil {
 		return nil
 	}
-	return database.Close()
+	return db.Close()
 }
 
-func LogMode(b bool) Database {
-	return database.LogMode(b)
+func LogMode(db Database, b bool) Database {
+	return db.LogMode(b)
 }
 
-func Begin(model interface{}) Database {
+func Begin(db Database, model interface{}) Database {
 	if all, ok := model.(string); ok {
 		if all == "migration" {
-			return database.Begin()
+			return db.Begin()
 		}
 	}
-	return database.Model(model).Begin()
+	return db.Model(model).Begin()
 }
 
-func Available() bool {
-	if database == nil {
+func Available(db Database) bool {
+	if db == nil {
 		return false
 	}
-	if err := database.DB().Ping(); err != nil {
+	if err := db.DB().Ping(); err != nil {
 		return false
 	}
 	return true
@@ -179,9 +173,13 @@ func Openw(dialect string, args ...interface{}) (db Database, err error) {
 	if err != nil {
 		return nil, err
 	}
-	db = Wrap(gormdb)
-	database = db
+	database = Wrap(gormdb)
 	return database, err
+}
+
+func OpenTester() (Database, error) {
+	newDb, err := Openw("sqlite3", ":memory:?cache=shared")
+	return newDb, err
 }
 
 // Wrap wraps gorm.DB in an interface

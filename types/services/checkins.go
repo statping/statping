@@ -1,7 +1,6 @@
 package services
 
 import (
-	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/checkins"
 )
 
@@ -15,6 +14,6 @@ func CheckinProcess(s *Service) {
 
 func (s *Service) Checkins() []*checkins.Checkin {
 	var chks []*checkins.Checkin
-	database.DB().Where("service = ?", s.Id).Find(&chks)
+	db.Where("service = ?", s.Id).Find(&chks)
 	return chks
 }

@@ -22,5 +22,5 @@ func (s *Service) AllHits() hits.Hitters {
 }
 
 func (s *Service) HitsSince(t time.Time) hits.Hitters {
-	return hits.HitsSince(t, s)
+	return hits.Since(t, s)
 }

@@ -91,14 +91,14 @@ func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 
 		PrometheusComment(fmt.Sprintf("Service #%d '%s':", ser.Id, ser.Name))
 		PrometheusExportKey("service_failures", id, name, ser.AllFailures().Count())
-		PrometheusExportKey("service_latency", id, name, ser.Latency*100)
+		PrometheusExportKey("service_latency", id, name, ser.Latency)
 		PrometheusExportKey("service_online", id, name, online)
 		PrometheusExportKey("service_status_code", id, name, ser.LastStatusCode)
 		PrometheusExportKey("service_response_length", id, name, len([]byte(ser.LastResponse)))
 		PrometheusExportKey("service_ping_time", id, name, ser.PingTime)
 		PrometheusExportKey("service_last_latency", id, name, ser.LastLatency)
 		PrometheusExportKey("service_last_lookup", id, name, ser.LastLookupTime)
-		PrometheusExportKey("service_last_check", id, name, time.Now().Sub(ser.LastCheck).Milliseconds())
+		PrometheusExportKey("service_last_check", id, name, utils.Now().Sub(ser.LastCheck).Milliseconds())
 		//PrometheusExportKey("service_online_seconds", id, name, ser.SecondsOnline)
 		//PrometheusExportKey("service_offline_seconds", id, name, ser.SecondsOffline)
 

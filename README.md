@@ -11,12 +11,10 @@ An easy to use Status Page for your websites and applications. Statping will aut
 
 [![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/statping/statping) [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/statping/general) [![](https://images.microbadger.com/badges/image/hunterlong/statping.svg)](https://microbadger.com/images/hunterlong/statping) [![Docker Pulls](https://img.shields.io/docker/pulls/hunterlong/statping.svg)](https://hub.docker.com/r/hunterlong/statping/builds/)
 
-## A Future-Proof Status Page
-Statping strives to remain future-proof and remain intact if a failure is created. Your Statping service should not be running on the same instance you're trying to monitor. If your server crashes your Status Page should still remaining online to notify your users of downtime.
+<img align="left" width="320" height="235" src="https://img.cjx.io/statupsiterun.gif">
 
-<p align="center">
-<img width="80%" src="https://img.cjx.io/statupsiterun.gif">
-</p>
+<h2>A Future-Proof Status Page</h2>
+Statping strives to remain future-proof and remain intact if a failure is created. Your Statping service should not be running on the same instance you're trying to monitor. If your server crashes your Status Page should still remaining online to notify your users of downtime.
 
 ## Lightweight and Fast
 Statping is a very lightweight application and is available for Linux, Mac, and Windows. The Docker image is only ~16Mb so you know that this application won't be filling up your hard drive space.

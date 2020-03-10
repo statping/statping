@@ -2,28 +2,28 @@ package checkins
 
 func (c *Checkin) LastHit() *CheckinHit {
 	var hit CheckinHit
-	DBhits().Where("checkin = ?", c.Id).Limit(1).Find(&hit)
+	dbHits.Where("checkin = ?", c.Id).Limit(1).Find(&hit)
 	return &hit
 }
 
 func (c *Checkin) Hits() []*CheckinHit {
 	var hits []*CheckinHit
-	DBhits().Where("checkin = ?", c.Id).Find(&hits)
+	dbHits.Where("checkin = ?", c.Id).Find(&hits)
 	c.AllHits = hits
 	return hits
 }
 
 func (c *CheckinHit) Create() error {
-	db := DBhits().Create(c)
-	return db.Error()
+	q := dbHits.Create(c)
+	return q.Error()
 }
 
 func (c *CheckinHit) Update() error {
-	db := DBhits().Update(c)
-	return db.Error()
+	q := dbHits.Update(c)
+	return q.Error()
 }
 
 func (c *CheckinHit) Delete() error {
-	db := DBhits().Delete(c)
-	return db.Error()
+	q := dbHits.Delete(c)
+	return q.Error()
 }

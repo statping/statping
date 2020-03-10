@@ -17,7 +17,6 @@ package handlers
 
 import (
 	"errors"
-	"github.com/statping/statping/database"
 	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/configs"
 	"github.com/statping/statping/types/core"
@@ -62,14 +61,14 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exists := database.DB().HasTable("core")
+	exists := confgs.Db.HasTable("core")
 	if !exists {
 		if err := confgs.DropDatabase(); err != nil {
 			sendErrorJson(err, w, r)
 			return
 		}
 
-		if err := configs.CreateDatabase(); err != nil {
+		if err := confgs.CreateDatabase(); err != nil {
 			sendErrorJson(err, w, r)
 			return
 		}

@@ -15,26 +15,13 @@ func (s *Service) AllFailures() failures.Failurer {
 	return failures.AllFailures(s)
 }
 
-func (s *Service) LastFailure() *failures.Failure {
-	var fail failures.Failure
-	failures.DB().Where("service = ?", s.Id).Order("id desc").Limit(1).Find(&fail)
-	return &fail
-}
-
-func (s *Service) FailuresCount() int {
-	var amount int
-	failures.DB().Where("service = ?", s.Id).Count(&amount)
-	return amount
-}
-
-func (s *Service) FailuresSince(t time.Time) []*failures.Failure {
-	var fails []*failures.Failure
-	failures.DB().Where("service = ?", s.Id).Find(&fails)
+func (s *Service) FailuresSince(t time.Time) failures.Failurer {
+	fails := failures.Since(t, s)
 	return fails
 }
 
 func (s *Service) DowntimeText() string {
-	last := s.LastFailure()
+	last := s.AllFailures().Last()
 	if last == nil {
 		return ""
 	}

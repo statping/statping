@@ -2,7 +2,6 @@ package users
 
 import (
 	"github.com/statping/statping/types/null"
-	"github.com/statping/statping/utils"
 	"time"
 )
 
@@ -17,15 +16,4 @@ type User struct {
 	Admin     null.NullBool `gorm:"column:administrator" json:"admin,omitempty"`
 	CreatedAt time.Time     `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt time.Time     `gorm:"column:updated_at" json:"updated_at"`
-}
-
-// BeforeCreate for User will set CreatedAt to UTC
-func (u *User) BeforeCreate() (err error) {
-	u.ApiKey = utils.RandomString(16)
-	u.ApiSecret = utils.RandomString(16)
-	if u.CreatedAt.IsZero() {
-		u.CreatedAt = time.Now().UTC()
-		u.UpdatedAt = time.Now().UTC()
-	}
-	return
 }

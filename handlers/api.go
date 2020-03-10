@@ -127,13 +127,13 @@ func apiClearCacheHandler(w http.ResponseWriter, r *http.Request) {
 	returnJson(output, w, r)
 }
 
-func sendErrorJson(err error, w http.ResponseWriter, r *http.Request) {
+func sendErrorJson(err error, w http.ResponseWriter, r *http.Request, statusCode ...int) {
 	log.Warnln(fmt.Errorf("sending error response for %v: %v", r.URL.String(), err.Error()))
 	output := apiResponse{
 		Status: "error",
 		Error:  err.Error(),
 	}
-	returnJson(output, w, r)
+	returnJson(output, w, r, statusCode...)
 }
 
 func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *http.Request) {

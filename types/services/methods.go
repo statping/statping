@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
+	"github.com/statping/statping/types"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/utils"
 	"net/url"
@@ -31,6 +32,13 @@ func (s *Service) Close() {
 	if s.IsRunning() {
 		close(s.Running)
 	}
+}
+
+func humanMicro(val int64) string {
+	if val < 10000 {
+		return fmt.Sprintf("%d μs", val)
+	}
+	return fmt.Sprintf("%0.0f ms", float64(val)*0.001)
 }
 
 // IsRunning returns true if the service go routine is running
@@ -68,7 +76,7 @@ func SelectAllServices(start bool) (map[int64]*Service, error) {
 			CheckinProcess(s)
 		}
 
-		fails := s.AllFailures().Last(limitedFailures)
+		fails := s.AllFailures().LastAmount(limitedFailures)
 		s.Failures = fails
 
 		for _, c := range s.Checkins() {
@@ -137,12 +145,12 @@ func (s *Service) UpdateStats() *Service {
 	s.Online24Hours = s.OnlineDaysPercent(1)
 	s.Online7Days = s.OnlineDaysPercent(7)
 	s.AvgResponse = s.AvgTime()
-	s.FailuresLast24Hours = len(s.AllFailures().Since(utils.Now().Add(-time.Hour * 24)))
+	s.FailuresLast24Hours = s.FailuresSince(utils.Now().Add(-time.Hour * 24)).Count()
 
 	if s.LastOffline.IsZero() {
-		lastFail := s.LastFailure()
+		lastFail := s.AllFailures().Last()
 		if lastFail != nil {
-			s.LastOffline = s.LastFailure().CreatedAt
+			s.LastOffline = lastFail.CreatedAt
 		}
 	}
 
@@ -155,29 +163,31 @@ func (s *Service) UpdateStats() *Service {
 }
 
 // AvgTime will return the average amount of time for a service to response back successfully
-func (s *Service) AvgTime() int64 {
+func (s *Service) AvgTime() float64 {
 	return s.AllHits().Avg()
 }
 
 // OnlineDaysPercent returns the service's uptime percent within last 24 hours
 func (s *Service) OnlineDaysPercent(days int) float32 {
-	ago := utils.Now().Add((-24 * time.Duration(days)) * time.Hour)
+	ago := utils.Now().Add(-time.Duration(days) * types.Day)
 	return s.OnlineSince(ago)
 }
 
 // OnlineSince accepts a time since parameter to return the percent of a service's uptime.
 func (s *Service) OnlineSince(ago time.Time) float32 {
-	failed := s.AllFailures().Since(ago)
-	if len(failed) == 0 {
+	failed := s.FailuresSince(ago)
+	failsList := failed.List()
+	if len(failsList) == 0 {
 		s.Online24Hours = 100.00
 		return s.Online24Hours
 	}
-	total := s.AllHits().Since(ago)
-	if len(total) == 0 {
+	total := s.HitsSince(ago)
+	hitsList := total.List()
+	if len(hitsList) == 0 {
 		s.Online24Hours = 0
 		return s.Online24Hours
 	}
-	avg := float64(len(failed)) / float64(len(total)) * 100
+	avg := float64(len(hitsList)) / float64(len(failsList)) * 100
 	avg = 100 - avg
 	if avg < 0 {
 		avg = 0
@@ -190,12 +200,12 @@ func (s *Service) OnlineSince(ago time.Time) float32 {
 // Downtime returns the amount of time of a offline service
 func (s *Service) Downtime() time.Duration {
 	hit := s.LastHit()
-	fail := s.LastFailure()
+	fail := s.AllFailures().Last()
 	if hit == nil {
 		return time.Duration(0)
 	}
 	if fail == nil {
-		return utils.Now().Sub(fail.CreatedAt)
+		return utils.Now().Sub(hit.CreatedAt)
 	}
 
 	return fail.CreatedAt.Sub(hit.CreatedAt)

@@ -4,19 +4,20 @@
 
 <script>
   import Api from "../../API"
+  const timeoptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
 
   const axisOptions = {
     labels: {
       show: false
     },
     crosshairs: {
-      show: false
+      show: true
     },
     lines: {
       show: false
     },
     tooltip: {
-      enabled: false
+      enabled: true
     },
     axisTicks: {
       show: false
@@ -25,7 +26,7 @@
       show: false
     },
     marker: {
-      show: false
+      show: true
     }
   };
 
@@ -47,6 +48,9 @@
               showing: false,
               data: [],
               chartOptions: {
+                  noData: {
+                      text: 'Loading...'
+                  },
                   chart: {
                       height: 210,
                       width: "100%",
@@ -76,21 +80,47 @@
                           left: -10,
                       }
                   },
+                  dropShadow: {
+                      enabled: false,
+                  },
                   xaxis: {
                       type: "datetime",
-                      ...axisOptions
+                      labels: {
+                          show: false
+                      },
                   },
                   yaxis: {
-                      ...axisOptions
+                      labels: {
+                          show: false
+                      },
                   },
                   tooltip: {
-                      enabled: false,
-                      marker: {
-                          show: false,
+                      theme: false,
+                      enabled: true,
+                      markers: {
+                          size: 0
+                      },
+                      custom: function({series, seriesIndex, dataPointIndex, w}) {
+                          let service = w.globals.seriesNames[0];
+                          let ts = w.globals;
+                          window.console.log(ts);
+                          let val = series[seriesIndex][dataPointIndex];
+                          if (val > 1000) {
+                              val = (val * 0.1).toFixed(0) + " milliseconds"
+                          } else {
+                              val = (val * 0.01).toFixed(0) + " microseconds"
+                          }
+                          return `<div class="chartmarker"><span>${service} Average Response</span> <span class="font-3">${val}</span></div>`
+                      },
+                      fixed: {
+                          enabled: true,
+                          position: 'topRight',
+                          offsetX: -30,
+                          offsetY: 0,
                       },
                       x: {
                           show: false,
-                      }
+                      },
                   },
                   legend: {
                       show: false,
@@ -132,6 +162,7 @@
       },
       methods: {
           async chartHits(group) {
+              window.console.log(this.service.created_at)
               this.data = await Api.service_hits(this.service.id, this.toUnix(this.service.created_at), this.toUnix(new Date()), group, false)
 
               if (this.data.length === 0 && group !== "1h") {
@@ -139,7 +170,7 @@
               }
               this.series = [{
                   name: this.service.name,
-                  ...this.convertToChartData(this.data)
+                  ...this.convertToChartData(this.data, 0.01)
               }]
               this.ready = true
           }

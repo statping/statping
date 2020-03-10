@@ -28,7 +28,6 @@ import (
 	"github.com/statping/statping/source"
 
 	"github.com/pkg/errors"
-	"github.com/statping/statping/database"
 	"github.com/statping/statping/handlers"
 	"github.com/statping/statping/types/configs"
 	"github.com/statping/statping/types/core"
@@ -47,6 +46,8 @@ var (
 	port        int
 	log         = utils.Log.WithField("type", "cmd")
 	httpServer  = make(chan bool)
+
+	confgs *configs.DbConfig
 )
 
 func init() {
@@ -119,29 +120,29 @@ func main() {
 		log.Errorln(err)
 	}
 
-	c, err := configs.LoadConfigs()
+	confgs, err = configs.LoadConfigs()
 	if err != nil {
 		if err := SetupMode(); err != nil {
 			exit(err)
 		}
 	}
 
-	if err = configs.ConnectConfigs(c); err != nil {
+	if err = configs.ConnectConfigs(confgs); err != nil {
 		exit(err)
 	}
 
-	exists := database.DB().HasTable("core")
+	exists := confgs.Db.HasTable("core")
 	if !exists {
 
-		if err := c.DropDatabase(); err != nil {
+		if err := confgs.DropDatabase(); err != nil {
 			exit(errors.Wrap(err, "error dropping database"))
 		}
 
-		if err := configs.CreateDatabase(); err != nil {
+		if err := confgs.CreateDatabase(); err != nil {
 			exit(errors.Wrap(err, "error creating database"))
 		}
 
-		if err := configs.CreateAdminUser(c); err != nil {
+		if err := configs.CreateAdminUser(confgs); err != nil {
 			exit(errors.Wrap(err, "error creating default admin user"))
 		}
 
@@ -151,7 +152,7 @@ func main() {
 
 	}
 
-	if err := c.MigrateDatabase(); err != nil {
+	if err := confgs.MigrateDatabase(); err != nil {
 		exit(err)
 	}
 
@@ -170,7 +171,7 @@ func main() {
 func Close() {
 	sentry.Flush(3 * time.Second)
 	utils.CloseLogs()
-	database.Close()
+	confgs.Close()
 }
 
 func SetupMode() error {

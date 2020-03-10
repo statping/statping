@@ -50,11 +50,11 @@ var (
 	ByAverage = func(column string, multiplier int) By {
 		switch database.DbType() {
 		case "mysql":
-			return By(fmt.Sprintf("CAST(AVG(%s)*%d as UNSIGNED) as amount", column, multiplier))
+			return By(fmt.Sprintf("CAST(AVG(%s) as UNSIGNED) as amount", column))
 		case "postgres":
-			return By(fmt.Sprintf("cast(AVG(%s)*%d as int) as amount", column, multiplier))
+			return By(fmt.Sprintf("cast(AVG(%s) as int) as amount", column))
 		default:
-			return By(fmt.Sprintf("cast(AVG(%s)*%d as int) as amount", column, multiplier))
+			return By(fmt.Sprintf("cast(AVG(%s) as int) as amount", column))
 		}
 	}
 )
@@ -157,7 +157,7 @@ func ParseQueries(r *http.Request, o isObject) *GroupQuery {
 		limit = 10000
 	}
 
-	db := o.Db()
+	q := o.Db()
 
 	if grouping == "" {
 		grouping = "1h"
@@ -176,7 +176,7 @@ func ParseQueries(r *http.Request, o isObject) *GroupQuery {
 		Limit:     int(limit),
 		Offset:    int(offset),
 		FillEmpty: fill,
-		db:        db,
+		db:        q,
 	}
 
 	if startField == 0 {
@@ -190,18 +190,18 @@ func ParseQueries(r *http.Request, o isObject) *GroupQuery {
 	}
 
 	if query.Limit != 0 {
-		db = db.Limit(query.Limit)
+		q = q.Limit(query.Limit)
 	}
 	if query.Offset > 0 {
-		db = db.Offset(query.Offset)
+		q = q.Offset(query.Offset)
 	}
 
-	db = db.Where("created_at BETWEEN ? AND ?", db.FormatTime(query.Start), db.FormatTime(query.End))
+	q = q.Where("created_at BETWEEN ? AND ?", q.FormatTime(query.Start), q.FormatTime(query.End))
 
 	if query.Order != "" {
-		db = db.Order(query.Order)
+		q = q.Order(query.Order)
 	}
-	query.db = db
+	query.db = q
 
 	return query
 }

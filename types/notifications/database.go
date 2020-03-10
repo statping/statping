@@ -5,19 +5,21 @@ import (
 	"github.com/statping/statping/database"
 )
 
-func DB() database.Database {
-	return database.DB().Model(&Notification{})
+var db database.Database
+
+func SetDB(database database.Database) {
+	db = database.Model(&Notification{})
 }
 
 func Append(n Notifier) {
 	allNotifiers = append(allNotifiers, n)
 }
 
-func Find(name string) (Notifier, error) {
+func Find(name string) (*Notification, error) {
 	for _, n := range allNotifiers {
 		notif := n.Select()
 		if notif.Name() == name || notif.Method == name {
-			return n, nil
+			return notif, nil
 		}
 	}
 	return nil, errors.New("notifier not found")
@@ -29,9 +31,11 @@ func All() []Notifier {
 
 func (n *Notification) Create() error {
 	var notif Notification
-	if DB().Where("method = ?", n.Method).Find(&notif).RecordNotFound() {
-		return DB().Create(n).Error()
+	if db.Where("method = ?", n.Method).Find(&notif).RecordNotFound() {
+		Append(n)
+		return db.Create(n).Error()
 	}
+	Append(n)
 	return nil
 }
 
@@ -44,7 +48,7 @@ func (n *Notification) Update() error {
 	} else {
 		n.Close()
 	}
-	err := DB().Update(n)
+	err := db.Update(n)
 	return err.Error()
 }
 

@@ -1,5 +1,3 @@
-// +build int
-
 package handlers
 
 import (

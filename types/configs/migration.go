@@ -2,7 +2,6 @@ package configs
 
 import (
 	"fmt"
-	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
@@ -51,7 +50,7 @@ func (c *DbConfig) MigrateDatabase() error {
 	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
 
 	log.Infoln("Migrating Database Tables...")
-	tx := database.Begin("migration")
+	tx := c.Db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -75,19 +74,19 @@ func (c *DbConfig) MigrateDatabase() error {
 	}
 	log.Infoln("Statping Database Tables Migrated")
 
-	if err := database.DB().Model(&hits.Hit{}).AddIndex("idx_service_hit", "service").Error(); err != nil {
+	if err := c.Db.Model(&hits.Hit{}).AddIndex("idx_service_hit", "service").Error(); err != nil {
 		log.Errorln(err)
 	}
 
-	if err := database.DB().Model(&hits.Hit{}).AddIndex("hit_created_at", "created_at").Error(); err != nil {
+	if err := c.Db.Model(&hits.Hit{}).AddIndex("hit_created_at", "created_at").Error(); err != nil {
 		log.Errorln(err)
 	}
 
-	if err := database.DB().Model(&failures.Failure{}).AddIndex("idx_service_fail", "service").Error(); err != nil {
+	if err := c.Db.Model(&failures.Failure{}).AddIndex("idx_service_fail", "service").Error(); err != nil {
 		log.Errorln(err)
 	}
 
-	if err := database.DB().Model(&failures.Failure{}).AddIndex("idx_checkin_fail", "checkin").Error(); err != nil {
+	if err := c.Db.Model(&failures.Failure{}).AddIndex("idx_checkin_fail", "checkin").Error(); err != nil {
 		log.Errorln(err)
 	}
 	log.Infoln("Database Indexes Created")

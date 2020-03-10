@@ -6,8 +6,8 @@ import "time"
 type Hit struct {
 	Id        int64     `gorm:"primary_key;column:id" json:"id"`
 	Service   int64     `gorm:"column:service" json:"-"`
-	Latency   float64   `gorm:"column:latency" json:"latency"`
-	PingTime  float64   `gorm:"column:ping_time" json:"ping_time"`
+	Latency   int64     `gorm:"column:latency" json:"latency"`
+	PingTime  int64     `gorm:"column:ping_time" json:"ping_time"`
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 }
 

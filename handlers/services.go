@@ -89,11 +89,11 @@ func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	service, err := serviceByID(r)
 	if err != nil {
-		sendErrorJson(err, w, r)
+		sendErrorJson(err, w, r, http.StatusNotFound)
 		return
 	}
 	if err := DecodeJSON(r, &service); err != nil {
-		sendErrorJson(err, w, r)
+		sendErrorJson(err, w, r, http.StatusBadRequest)
 		return
 	}
 
