@@ -61,7 +61,7 @@
                   this.error = true
               } else if (auth.token) {
                   this.auth = Api.saveToken(this.username, auth.token)
-                  await this.$store.dispatch('loadAdmin')
+                  this.$store.dispatch('loadAdmin')
                   this.$router.push('/dashboard')
               }
               this.loading = false

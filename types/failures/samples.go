@@ -22,6 +22,20 @@ func Samples() error {
 	for i := int64(1); i <= 4; i++ {
 		sg.Add(1)
 
+		f1 := &Failure{
+			Service:   i,
+			Issue:     "Server failure",
+			CreatedAt: utils.Now().Add(-time.Duration(3*i) * 86400),
+		}
+		f1.Create()
+
+		f2 := &Failure{
+			Service:   i,
+			Issue:     "Server failure",
+			CreatedAt: utils.Now().Add(-time.Duration(5*i) * 12400),
+		}
+		f2.Create()
+
 		log.Infoln(fmt.Sprintf("Adding %v Failure records to service", 400))
 
 		go func() {

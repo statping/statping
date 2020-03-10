@@ -1,6 +1,6 @@
 <template>
     <div class="mb-4">
-        <div class="card">
+        <div class="card index-chart">
             <div class="card-body">
                 <div class="col-12">
                     <h4 class="mt-3">

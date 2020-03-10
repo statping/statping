@@ -5,14 +5,18 @@ HTML,BODY {
     background-color: $background-color;
 }
 
+.index-chart {
+  height: 35vh;
+}
 
 .chartmarker {
-  background-color: white;
   padding: 5px;
+  width: 240px;
+  text-align: right;
 }
 
 .chartmarker SPAN {
-  font-size: 11pt;
+  font-size: 9pt;
   display: block;
   color: #8b8b8b;
 }
@@ -153,9 +157,17 @@ HTML,BODY {
     font-size: 9pt;
   }
 
-  .font-3 {
-    font-size: 11pt;
-  }
+.font-3 {
+  font-size: 11pt;
+}
+
+.font-4 {
+  font-size: 14pt;
+}
+
+.font-5 {
+  font-size: 20pt;
+}
 
   .badge {
     color: white;
@@ -222,7 +234,7 @@ HTML,BODY {
 
   .chart-container {
     position: relative;
-    height: 24.1vh;
+    height: 18.6vh;
     width: 100%;
     overflow: hidden;
   }

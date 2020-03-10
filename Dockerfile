@@ -3,10 +3,10 @@ RUN npm install yarn -g
 WORKDIR /statping
 COPY ./frontend/package.json .
 COPY ./frontend/yarn.lock .
-RUN yarn install
+RUN yarn install --pure-lockfile --network-timeout 1000000
 COPY ./frontend .
-RUN yarn build && rm -rf node_modules
-
+RUN yarn build && rm -rf node_modules && yarn cache clean
+# Compiles webpacked Vue production build for frontend at /statping/dist
 
 # Statping Golang BACKEND building from source
 # Creates "/go/bin/statping" and "/usr/local/bin/sass" for copying

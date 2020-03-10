@@ -25,9 +25,6 @@
     grid: {
       show: false
     },
-    marker: {
-      show: true
-    }
   };
 
   export default {
@@ -88,29 +85,36 @@
                       labels: {
                           show: false
                       },
+                    tooltip: {
+                      enabled: false
+                    }
                   },
                   yaxis: {
                       labels: {
                           show: false
                       },
                   },
+                markers: {
+                  size: 0,
+                  strokeWidth: 0,
+                  hover: {
+                    size: undefined,
+                    sizeOffset: 0
+                  }
+                },
                   tooltip: {
                       theme: false,
                       enabled: true,
-                      markers: {
-                          size: 0
-                      },
                       custom: function({series, seriesIndex, dataPointIndex, w}) {
-                          let service = w.globals.seriesNames[0];
-                          let ts = w.globals;
-                          window.console.log(ts);
+                          let ts = w.globals.seriesX[seriesIndex][dataPointIndex];
+                          const dt = new Date(ts).toLocaleDateString("en-us", timeoptions)
                           let val = series[seriesIndex][dataPointIndex];
-                          if (val > 1000) {
+                          if (val >= 1000) {
                               val = (val * 0.1).toFixed(0) + " milliseconds"
                           } else {
                               val = (val * 0.01).toFixed(0) + " microseconds"
                           }
-                          return `<div class="chartmarker"><span>${service} Average Response</span> <span class="font-3">${val}</span></div>`
+                          return `<div class="chartmarker"><span>Average Response Time: </span><span class="font-3">${val}</span><span>${dt}</span></div>`
                       },
                       fixed: {
                           enabled: true,
@@ -121,6 +125,9 @@
                       x: {
                           show: false,
                       },
+                    y: {
+                      formatter: (value) => { return value + "%" },
+                    },
                   },
                   legend: {
                       show: false,

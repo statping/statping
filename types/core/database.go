@@ -35,8 +35,15 @@ func Select() (*Core, error) {
 }
 
 func (c *Core) Create() error {
-	//apiKey := utils.Getenv("API_KEY", utils.NewSHA1Hash(40))
-	//apiSecret := utils.Getenv("API_SECRET", utils.NewSHA1Hash(40))
+	c.ApiKey = c.ApiKey
+	c.ApiSecret = c.ApiSecret
+	apiKey := utils.Getenv("API_KEY", utils.NewSHA1Hash(40)).(string)
+	apiSecret := utils.Getenv("API_SECRET", utils.NewSHA1Hash(40)).(string)
+
+	if c.ApiKey == "" || c.ApiSecret == "" {
+		c.ApiSecret = apiSecret
+		c.ApiKey = apiKey
+	}
 	newCore := &Core{
 		Name:        c.Name,
 		Description: c.Description,

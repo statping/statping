@@ -1,9 +1,12 @@
 <template v-if="series.length">
-    <apexchart width="100%" height="180" type="area" :options="chartOpts" :series="series"></apexchart>
+    <apexchart width="100%" height="180" type="bar" :options="chartOpts" :series="series"></apexchart>
 </template>
 
 <script>
-export default {
+  const timeoptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+
+
+  export default {
   name: 'ServiceSparkLine',
   props: {
     series: {
@@ -29,7 +32,7 @@ export default {
     return {
       chartOpts: {
         chart: {
-          type: 'area',
+          type: 'bar',
           height: 180,
           sparkline: {
             enabled: true
@@ -44,9 +47,33 @@ export default {
         yaxis: {
           min: 0
         },
-        colors: ['#DCE6EC'],
+        colors: ['#b3bdc3'],
         tooltip: {
-          enabled: false
+          theme: false,
+          enabled: true,
+          custom: function({series, seriesIndex, dataPointIndex, w}) {
+            let ts = w.globals.seriesX[seriesIndex][dataPointIndex];
+            const dt = new Date(ts).toLocaleDateString("en-us", timeoptions)
+            let val = series[seriesIndex][dataPointIndex];
+            if (val >= 1000) {
+              val = (val * 0.1).toFixed(0) + " milliseconds"
+            } else {
+              val = (val * 0.01).toFixed(0) + " microseconds"
+            }
+            return `<div class="chartmarker"><span>Average Response Time: </span><span class="font-3">${val}</span><span>${dt}</span></div>`
+          },
+          fixed: {
+            enabled: true,
+            position: 'topRight',
+            offsetX: -5,
+            offsetY: 0,
+          },
+          x: {
+            show: false,
+          },
+          y: {
+            formatter: (value) => { return value + "%" },
+          },
         },
         title: {
           text: this.title,

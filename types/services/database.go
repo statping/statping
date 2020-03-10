@@ -37,6 +37,7 @@ func All() map[int64]*Service {
 func AllInOrder() []Service {
 	var services []Service
 	for _, service := range allServices {
+		service.UpdateStats()
 		services = append(services, *service)
 	}
 	sort.Sort(ServiceOrder(services))

@@ -1,20 +1,51 @@
 <template v-if="service">
-    <div class="col-12 card mb-3" style="min-height: 260px" :class="{'offline-card': !service.online}">
-        <div class="card-body">
-            <h5 class="card-title"><router-link :to="serviceLink(service)">{{service.name}}</router-link>
+    <div class="col-12 card mb-4" style="min-height: 360px" :class="{'offline-card': !service.online}">
+        <div class="card-body p-3 p-md-1 pt-md-3 pb-md-1">
+            <h4 class="card-title mb-4"><router-link :to="serviceLink(service)">{{service.name}}</router-link>
                 <span class="badge float-right" :class="{'badge-success': service.online, 'badge-danger': !service.online}">
                     {{service.online ? "ONLINE" : "OFFLINE"}}
                 </span>
-            </h5>
+            </h4>
+
+            <transition name="fade">
             <div v-if="loaded && service.online" class="row">
-                <div class="col-md-6 col-sm-12">
-                    <ServiceSparkLine :title="set1_name" subtitle="Last Day Latency" :series="set1"/>
+                <div class="col-md-6 col-sm-12 mt-2 mt-md-0">
+                    <ServiceSparkLine :title="set2_name" subtitle="Latency Last 24 Hours" :series="set2"/>
                 </div>
-                <div class="col-md-6 col-sm-12">
-                    <ServiceSparkLine :title="set2_name" subtitle="Last 7 Days Latency" :series="set2"/>
+                <div class="col-md-6 col-sm-12 mt-4 mt-md-0">
+                    <ServiceSparkLine :title="set1_name" subtitle="Latency Last 7 Days" :series="set1"/>
+                </div>
+
+                <div class="d-none row col-12 mt-4 pt-1 mb-3 align-content-center">
+
+                    <StatsGen :service="service"
+                              title="Since Yesterday"
+                              :start="this.toUnix(this.nowSubtract(86400 * 2))"
+                              :end="this.toUnix(this.nowSubtract(86400))"
+                              group="24h" expression="latencyPercent"/>
+
+                    <StatsGen :service="service"
+                              title="7 Day Change"
+                              :start="this.toUnix(this.nowSubtract(86400 * 7))"
+                              :end="this.toUnix(this.now())"
+                              group="24h" expression="latencyPercent"/>
+
+                    <StatsGen :service="service"
+                              title="Max Latency"
+                              :start="this.toUnix(this.nowSubtract(86400 * 2))"
+                              :end="this.toUnix(this.nowSubtract(86400))"
+                              group="24h" expression="latencyPercent"/>
+
+                    <StatsGen :service="service"
+                              title="Uptime"
+                              :start="this.toUnix(this.nowSubtract(86400 * 2))"
+                              :end="this.toUnix(this.nowSubtract(86400))"
+                              group="24h" expression="latencyPercent"/>
                 </div>
             </div>
+            </transition>
         </div>
+
         <span v-for="(failure, index) in failures" v-bind:key="index" class="alert alert-light">
             Failed {{failure.created_at}}<br>
             {{failure.issue}}
@@ -26,10 +57,12 @@
 <script>
   import ServiceSparkLine from "./ServiceSparkLine";
   import Api from "../../API";
+  import StatsGen from "./StatsGen";
 
   export default {
       name: 'ServiceInfo',
       components: {
+        StatsGen,
           ServiceSparkLine
       },
       props: {
@@ -49,34 +82,37 @@
           }
       },
       async mounted() {
-          this.set1 = await this.getHits(24, "15m")
+          this.set1 = await this.getHits(24 * 7, "6h")
           this.set1_name = this.calc(this.set1)
-          this.set2 = await this.getHits(24 * 7, "6h")
+          this.set2 = await this.getHits(24, "1h")
           this.set2_name = this.calc(this.set2)
           this.loaded = true
-
-          window.console.log(this.set1)
       },
       methods: {
+        sinceYesterday(data) {
+            window.console.log(data)
+          let total = 0
+          data.forEach((f) => {
+            total += parseInt(f.y)
+          });
+          total = total / data.length
+        },
           async getHits(hours, group) {
               const start = this.nowSubtract(3600 * hours)
-              if (!this.service.online) {
-                  this.failures = await Api.service_failures(this.service.id, this.toUnix(start), this.toUnix(this.now()), 5)
-                  return [{name: "None", data: []}]
-              }
               const fetched = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(this.now()), group, false)
-              if (!data) {
-                  return [{name: "None", data: []}]
-              }
-              const data = this.convertToChartData(fetched, 1000, true)
-              return [{name: "Latency", data}]
+
+              const data = this.convertToChartData(fetched, 0.001, true)
+
+              return [{name: "Latency", ...data}]
+
           },
           calc(s) {
               let data = s[0].data
+
               if (data) {
                   let total = 0
                   data.forEach((f) => {
-                      total += f.y
+                      total += parseInt(f.y)
                   });
                   total = total / data.length
                   return total.toFixed(0) + "ms"

@@ -6,8 +6,8 @@
         background-color: $sm-background-color;
     }
 
-  .index_container {
-    padding-top: 4.5vh !important;
+  .index-chart {
+    height: 33vh;
   }
 
     .sm-container {
@@ -60,7 +60,7 @@
 
     .btn-sm {
         line-height: 1.4rem;
-        font-size: 1rem;
+        font-size: 0.83rem;
     }
 
     .full-col-12 {
@@ -73,6 +73,8 @@
         border-radius: $sm-border-radius;
         padding: $sm-padding;
         background-color: $sm-service-background;
+        box-shadow: 0px 3px 10px 2px;
+        color: #b5b5b5;
     }
 
     .card-body {
