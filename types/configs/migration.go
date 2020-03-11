@@ -2,6 +2,9 @@ package configs
 
 import (
 	"fmt"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
@@ -12,53 +15,36 @@ import (
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/types/users"
-
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-// InsertNotifierDB inject the Statping database instance to the Notifier package
-//func (c *DbConfig) InsertNotifierDB() error {
-//	if !database.Available() {
-//		err := c.Connect()
-//		if err != nil {
-//			return errors.New("database connection has not been created")
-//		}
-//	}
-//	notifiers.SetDB(database.DB())
-//	return nil
-//}
+func (c *DbConfig) DatabaseChanges() error {
+	var cr core.Core
+	c.Db.Model(&core.Core{}).Find(&cr)
 
-// InsertIntegratorDB inject the Statping database instance to the Integrations package
-//func (c *DbConfig) InsertIntegratorDB() error {
-//	if !database.Available() {
-//		err := c.Connect()
-//		if err != nil {
-//			return errors.Wrap(err,"database connection has not been created")
-//		}
-//	}
-//	integrations.SetDB(database.DB())
-//	return nil
-//}
+	if latestMigration > cr.MigrationId {
+		log.Infof("Statping database is out of date, migrating to: %d", latestMigration)
 
-func (c *DbConfig) VerifyMigration() error {
+		switch c.Db.DbType() {
+		case "mysql":
+			if err := c.genericMigration("MODIFY"); err != nil {
+				return err
+			}
+		case "postgres":
+			if err := c.genericMigration("ALTER"); err != nil {
+				return err
+			}
+		default:
+			if err := c.sqliteMigration(); err != nil {
+				return err
+			}
+		}
 
-	query := `
-BEGIN TRANSACTION;
-ALTER TABLE hits ALTER COLUMN latency BIGINT;
-ALTER TABLE hits ALTER COLUMN ping_time BIGINT; 
-ALTER TABLE failures ALTER COLUMN ping_time BIGINT;
-UPDATE hits SET latency = CAST(latency * 10000 AS BIGINT);
-UPDATE hits SET ping_time = CAST(ping_time * 100000 AS BIGINT);
-UPDATE failures SET ping_time = CAST(ping_time * 100000 AS BIGINT);
-COMMIT;`
+		if err := c.Db.Exec(fmt.Sprintf("UPDATE core SET migration_id = %d", latestMigration)).Error(); err != nil {
+			return err
+		}
 
-	fmt.Println(c.Db.DbType())
-
-	q := c.Db.Raw(query).Debug()
-
-	return q.Error()
+	}
+	return nil
 }
 
 //MigrateDatabase will migrate the database structure to current version.

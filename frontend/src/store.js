@@ -25,8 +25,7 @@ export default new Vuex.Store({
             groups: [],
             messages: [],
             users: [],
-            notifiers: [],
-            integrations: []
+            notifiers: []
         },
     getters: {
         hasAllData: state => state.hasAllData,
@@ -38,13 +37,19 @@ export default new Vuex.Store({
         messages: state => state.messages,
         users: state => state.users,
         notifiers: state => state.notifiers,
-        integrations: state => state.integrations,
 
         servicesInOrder: state => state.services.sort((a, b) => a.order_id - b.order_id),
         groupsInOrder: state => state.groups.sort((a, b) => a.order_id - b.order_id),
         groupsClean: state => state.groups.filter(g => g.name !== '').sort((a, b) => a.order_id - b.order_id),
         groupsCleanInOrder: state => state.groups.filter(g => g.name !== '').sort((a, b) => a.order_id - b.order_id).sort((a, b) => a.order_id - b.order_id),
 
+        serviceByAll: (state) => (element) => {
+            if (element % 1 === 0) {
+                return state.services.find(s => s.id == element)
+            } else {
+                return state.services.find(s => s.permalink === element)
+            }
+        },
         serviceById: (state) => (id) => {
             return state.services.find(s => s.id == id)
         },
@@ -100,12 +105,13 @@ export default new Vuex.Store({
         },
         setNotifiers (state, notifiers) {
             state.notifiers = notifiers
-        },
-        setIntegrations (state, integrations) {
-            state.integrations = integrations
         }
     },
     actions: {
+        async getAllServices(context) {
+            const services = await Api.services()
+            context.commit("setServices", services);
+        },
         async loadRequired(context) {
             const core = await Api.core()
             context.commit("setCore", core);
@@ -140,8 +146,6 @@ export default new Vuex.Store({
             context.commit("setNotifiers", notifiers);
             const users = await Api.users()
             context.commit("setUsers", users);
-            const integrations = await Api.integrations()
-            context.commit("setIntegrations", integrations);
         }
     }
 });

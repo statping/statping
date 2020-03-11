@@ -1,5 +1,5 @@
 <template>
-    <apexchart v-if="ready" width="100%" height="300" type="heatmap" :options="chartOptions" :series="series"></apexchart>
+    <apexchart v-if="ready" width="100%" height="180" type="heatmap" :options="plotOptions" :series="series"></apexchart>
 </template>
 
 <script>
@@ -20,19 +20,32 @@
           return {
               ready: false,
               data: [],
-              chartOptions: {
-                  heatmap: {
+              plotOptions: {
+                  chart: {
+                      selection: {
+                          enabled: false
+                      },
+                      zoom: {
+                          enabled: false
+                      },
+                      toolbar: {
+                          show: false
+                      },
+                    },
+                      colors: [ "#cb3d36" ],
+                      enableShades: true,
+                      shadeIntensity: 0.5,
                       colorScale: {
-                          ranges: [{
+                          ranges: [ {
                               from: 0,
-                              to: 1,
-                              color: 'rgba(235,63,48,0.69)',
-                              name: 'low',
+                              to: 0,
+                              color: '#bababa',
+                              name: 'none',
                           },
                               {
                                   from: 2,
                                   to: 10,
-                                  color: 'rgba(245,43,43,0.58)',
+                                  color: '#cb3d36',
                                   name: 'medium',
                               },
                               {
@@ -42,76 +55,66 @@
                                   name: 'high',
                               }
                           ]
+                      },
+                  xaxis: {
+                      tickAmount: '1',
+                      tickPlacement: 'between',
+                      min: 1,
+                      max: 31,
+                      type: "numeric",
+                      labels: {
+                          show: true
+                      },
+                      tooltip: {
+                          enabled: false
                       }
                   },
-                  chart: {
-                      height: "100%",
-                      width: "100%",
-                      type: 'heatmap',
-                      toolbar: {
-                          show: false
-                      }
-                  },
-                  dataLabels: {
-                      enabled: false,
-                  },
-                  enableShades: true,
-                  shadeIntensity: 0.5,
-                  colors: ["#d53a3b"],
-                  series: [{data: [{}]}],
                   yaxis: {
                       labels: {
-                          formatter: (value) => {
-                              return value
-                          },
-                      },
-                  },
-                  tooltip: {
-                      enabled: true,
-                      x: {
-                          show: false,
-                      },
-                      y: {
-                          formatter: function(val, opts) { return val+" Failures" },
-                          title: {
-                              formatter: (seriesName) => seriesName,
-                          },
+                          show: true
                       },
                   }
-              },
-              series: [{
+                  },
+              series: [ {
                   data: []
-              }]
+              } ]
           }
       },
       methods: {
           async chartHeatmap() {
-              let start = new Date(new Date().getUTCFullYear(), new Date().getUTCMonth()-3, 1);
-
+              let start = new Date(new Date().getUTCFullYear(), new Date().getUTCMonth()-2, 1);
               let monthData = [];
+              let monthNum = start.getUTCMonth()
 
-              for (i=0; i<=3; i++) {
-                  let end = this.lastDayOfMonth(start.getUTCMonth()+start)
-                  const inputdata = this.heatmapData(start,end)
+              for (let i=1; i<=3; i++) {
+                  let end = this.lastDayOfMonth(monthNum)
+
+                  window.console.log("getting: ",start, end)
+
+                  const inputdata = await this.heatmapData(start, end)
                   monthData.push(inputdata)
+                  start = new Date(start.getUTCFullYear(), start.getUTCMonth()+1, 1);
+                  monthNum += 1
               }
 
-              this.series = monthData
+              window.console.log(monthData)
+              this.series = monthData.reverse()
               this.ready = true
           },
           async heatmapData(start, end) {
-              console.log(start, end)
+
+              window.console.log("start: ", start)
+              window.console.log("end: ", end)
 
               const data = await Api.service_failures_data(this.service.id, this.toUnix(start), this.toUnix(end), "24h", true)
 
               let dataArr = []
-              data.forEach(function(d) {
-                  dataArr.push({x: d.timeframe, y: d.amount});
+              data.forEach((d) => {
+                  dataArr.push({x: this.parseTime(d.timeframe).getUTCDate(), y: d.amount});
               });
 
               let date = new Date(dataArr[0].x);
-              const output = [{name: date.toLocaleString('en-us', { month: 'long'}), data: dataArr}]
-
+              return {name: start.toLocaleString('en-us', { month: 'long'}), data: dataArr}
           }
       }
   }

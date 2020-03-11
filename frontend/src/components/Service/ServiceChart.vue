@@ -1,5 +1,5 @@
 <template v-show="showing">
-    <apexchart v-if="ready" width="100%" height="235" type="area" :options="chartOptions" :series="series"/>
+    <apexchart v-if="ready" class="service-chart" width="100%" height="100%" type="area" :options="chartOptions" :series="series"/>
 </template>
 
 <script>
@@ -49,7 +49,7 @@
                       text: 'Loading...'
                   },
                   chart: {
-                      height: 210,
+                      height: "100%",
                       width: "100%",
                       type: "area",
                       animations: {
@@ -163,14 +163,14 @@
           visible: function(newVal, oldVal) {
               if (newVal && !this.showing) {
                   this.showing = true
-                  this.chartHits("2h")
+                  this.chartHits("1h")
               }
           }
       },
       methods: {
           async chartHits(group) {
-              window.console.log(this.service.created_at)
-              this.data = await Api.service_hits(this.service.id, this.toUnix(this.service.created_at), this.toUnix(new Date()), group, false)
+              const start = this.nowSubtract(84600 * 3)
+              this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), group, false)
 
               if (this.data.length === 0 && group !== "1h") {
                   await this.chartHits("1h")

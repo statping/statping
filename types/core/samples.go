@@ -3,12 +3,11 @@ package core
 import (
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/utils"
-	"time"
 )
 
 func Samples() error {
-	apiKey := utils.Getenv("API_KEY", "samplekey")
-	apiSecret := utils.Getenv("API_SECRET", "samplesecret")
+	apiKey := utils.Getenv("API_KEY", utils.RandomString(16))
+	apiSecret := utils.Getenv("API_SECRET", utils.RandomString(16))
 
 	core := &Core{
 		Name:        "Statping Sample Data",
@@ -16,10 +15,10 @@ func Samples() error {
 		ApiKey:      apiKey.(string),
 		ApiSecret:   apiSecret.(string),
 		Domain:      "http://localhost:8080",
-		Version:     "test",
-		CreatedAt:   time.Now().UTC(),
+		CreatedAt:   utils.Now(),
 		UseCdn:      null.NewNullBool(false),
 		Footer:      null.NewNullString(""),
+		MigrationId: utils.Now().Unix(),
 	}
 
 	return core.Create()

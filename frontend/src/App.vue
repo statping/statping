@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <router-view :loaded="loaded"/>
+    <router-view :app="app" :loaded="loaded"/>
       <Footer :logged_in="logged_in" :version="version" v-if="$route.path !== '/setup'"/>
   </div>
 </template>
@@ -19,10 +19,13 @@
       loaded: false,
         version: "",
         logged_in: false,
+        app: null
     }
   },
       async created() {
-        await this.$store.dispatch('loadRequired')
+          this.app = await this.$store.dispatch('loadRequired')
+
+          this.app = {...this.$store.state}
 
         if (this.$store.getters.core.logged_in) {
           await this.$store.dispatch('loadAdmin')

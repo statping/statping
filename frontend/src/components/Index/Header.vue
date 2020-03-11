@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1 class="col-12 text-center mb-4 mt-sm-3 header-title">{{$store.getters.core.name}}</h1>
+        <h1 class="col-12 text-center pt-4 mt-4 header-title">{{$store.getters.core.name}}</h1>
         <h5 class="col-12 text-center mb-5 header-desc">{{$store.getters.core.description}}</h5>
     </div>
 </template>

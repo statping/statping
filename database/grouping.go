@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"fmt"
 	"github.com/statping/statping/types"
 	"github.com/statping/statping/utils"
@@ -144,7 +145,7 @@ type isObject interface {
 	Db() Database
 }
 
-func ParseQueries(r *http.Request, o isObject) *GroupQuery {
+func ParseQueries(r *http.Request, o isObject) (*GroupQuery, error) {
 	fields := parseGet(r)
 	grouping := fields.Get("group")
 	startField := utils.ToInt(fields.Get("start"))
@@ -179,11 +180,15 @@ func ParseQueries(r *http.Request, o isObject) *GroupQuery {
 		db:        q,
 	}
 
+	if query.Start.After(query.End) {
+		return nil, errors.New("start time is after ending time")
+	}
+
 	if startField == 0 {
-		query.Start = time.Now().Add(-7 * types.Day).UTC()
+		query.Start = utils.Now().Add(-7 * types.Day)
 	}
 	if endField == 0 {
-		query.End = time.Now().UTC()
+		query.End = utils.Now()
 	}
 	if query.End.After(utils.Now()) {
 		query.End = utils.Now()
@@ -203,7 +208,7 @@ func ParseQueries(r *http.Request, o isObject) *GroupQuery {
 	}
 	query.db = q
 
-	return query
+	return query, nil
 }
 
 func parseForm(r *http.Request) url.Values {

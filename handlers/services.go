@@ -128,7 +128,11 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	groupQuery := database.ParseQueries(r, service.AllHits())
+	groupQuery, err := database.ParseQueries(r, service.AllHits())
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
 
 	objs, err := groupQuery.GraphData(database.ByAverage("latency", 1000))
 	if err != nil {
@@ -146,7 +150,11 @@ func apiServiceFailureDataHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	groupQuery := database.ParseQueries(r, service.AllFailures())
+	groupQuery, err := database.ParseQueries(r, service.AllFailures())
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
 
 	objs, err := groupQuery.GraphData(database.ByCount)
 	if err != nil {
@@ -164,7 +172,11 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	groupQuery := database.ParseQueries(r, service.AllHits())
+	groupQuery, err := database.ParseQueries(r, service.AllHits())
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
 
 	objs, err := groupQuery.GraphData(database.ByAverage("ping_time", 1000))
 	if err != nil {
@@ -216,7 +228,11 @@ func apiServiceFailuresHandler(r *http.Request) interface{} {
 	}
 
 	var fails []*failures.Failure
-	database.ParseQueries(r, service.AllFailures()).Find(&fails)
+	query, err := database.ParseQueries(r, service.AllFailures())
+	if err != nil {
+		return err
+	}
+	query.Find(&fails)
 	return fails
 }
 
@@ -228,6 +244,10 @@ func apiServiceHitsHandler(r *http.Request) interface{} {
 	}
 
 	var hts []*hits.Hit
-	database.ParseQueries(r, service.AllHits()).Find(&hts)
+	query, err := database.ParseQueries(r, service.AllHits())
+	if err != nil {
+		return err
+	}
+	query.Find(&hts)
 	return hts
 }

@@ -8,9 +8,11 @@ $description-color: #939393;
 $service-background: #ffffff;
 $service-border: 1px solid rgba(0,0,0,.125);
 $service-title: #444444;
+$service-title-size: 1.8rem;
 $service-stats-color: #4f4f4f;
 $service-description-color: #fff;
 $service-stats-size: 2.3rem;
+$service-card-height: 490px;
 
 /*    Button Colors      */
 $success-color: #47d337;
@@ -24,7 +26,6 @@ $footer-display: block;
 
 /*   Global Settings */
 $global-border-radius: 0.2rem;
-
 
 /*   Mobile Settings   */
 $sm-background-color: #fcfcfc;

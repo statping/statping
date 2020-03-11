@@ -131,10 +131,6 @@ func main() {
 		exit(err)
 	}
 
-	if err = confgs.VerifyMigration(); err != nil {
-		exit(err)
-	}
-
 	exists := confgs.Db.HasTable("core")
 	if !exists {
 		var srvs int64
@@ -159,6 +155,10 @@ func main() {
 			exit(errors.Wrap(err, "error creating database"))
 		}
 
+	}
+
+	if err = confgs.DatabaseChanges(); err != nil {
+		exit(err)
 	}
 
 	if err := confgs.MigrateDatabase(); err != nil {

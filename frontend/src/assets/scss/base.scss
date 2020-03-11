@@ -6,7 +6,34 @@ HTML,BODY {
 }
 
 .index-chart {
-  height: 490px;
+  height: $service-card-height;
+}
+
+.sub-service-card {
+  border: 1px solid #dcdcdc87;
+  padding-top: 7px;
+  padding-bottom: 10px;
+  height: 155px;
+}
+
+.expanded-service {
+  height: 89vh;
+  /*Animation*/
+  -webkit-transition: height 2s ease;
+  -moz-transition: height 2s ease;
+  -o-transition: height 2s ease;
+  -ms-transition: height 2s ease;
+  transition: height 2s ease;
+
+  .stats_area {
+    display: none;
+  }
+
+}
+
+.service-chart {
+  bottom: -15px;
+  position: relative;
 }
 
 .chartmarker {
@@ -167,7 +194,19 @@ HTML,BODY {
 }
 
 .font-5 {
-  font-size: 20pt;
+  font-size: 17pt;
+}
+
+.font-6 {
+  font-size: 24pt;
+}
+
+.font-7 {
+  font-size: 31pt;
+}
+
+.font-8 {
+  font-size: 38pt;
 }
 
   .badge {
@@ -225,6 +264,7 @@ HTML,BODY {
 
   .card-body H4 A {
     color: $service-title;
+    font-size: $service-title-size;
     text-decoration: none;
   }
 
@@ -248,7 +288,7 @@ HTML,BODY {
 
   .service-chart-heatmap {
     position: relative;
-    height: 300px;
+    height: 180px;
     width: 100%;
   }
 

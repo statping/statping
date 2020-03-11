@@ -1,5 +1,8 @@
 import Vue from "vue";
-const { zonedTimeToUtc, utcToZonedTime, lastDayOfMonth, subSeconds, parse, parseISO, getUnixTime, fromUnixTime, format, differenceInSeconds, formatDistanceToNow, formatDistance } = require('date-fns')
+const { zonedTimeToUtc, utcToZonedTime, lastDayOfMonth, subSeconds, parse, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance } = require('date-fns')
+import formatDistanceToNow from 'date-fns/formatDistanceToNow'
+import format from 'date-fns/format'
+import parseISO from 'date-fns/parseISO'
 
 export default Vue.mixin({
   methods: {
@@ -7,10 +10,10 @@ export default Vue.mixin({
       return new Date()
     },
     current() {
-      return parse(new Date())
+      return parseISO(new Date())
     },
     utc(val) {
-      return fromUnixTime(this.toUnix(val) + val.getTimezoneOffset() * 60 * 1000)
+      return new Date.UTC(val)
     },
     ago(t1) {
       return formatDistanceToNow(t1)
@@ -25,11 +28,14 @@ export default Vue.mixin({
       return formatDistance(t1, t2)
     },
     niceDate(val) {
-      return this.parseTime(val).format('LLLL')
+      return format(parseISO(val), "EEEE, MMM do h:mma")
     },
     parseTime(val) {
       return parseISO(val)
     },
+      parseISO(v) {
+        return parseISO(v)
+      },
     toLocal(val, suf = 'at') {
       const t = this.parseTime(val)
       return format(t, `EEEE, MMM do h:mma`)
@@ -41,7 +47,7 @@ export default Vue.mixin({
       return fromUnixTime(val)
     },
     isBetween(t1, t2) {
-      return differenceInSeconds(parseISO(t1), parseISO(t2)) > 0
+      return differenceInSeconds(t1, t2) >= 0
     },
     hour() {
       return 3600
@@ -111,10 +117,10 @@ export default Vue.mixin({
       return {data: newSet}
     },
     lastDayOfMonth(month) {
-      return new Date(new Date().getUTCFullYear(), month + 1, 0);
+      return new Date(Date.UTC(new Date().getUTCFullYear(), month + 1, 0))
     },
     firstDayOfMonth(month) {
-      return new Date(new Date().getUTCFullYear(), month, 1).getUTCDate();
+      return new Date(Date.UTC(new Date().getUTCFullYear(), month, 1)).getUTCDate()
     }
   }
 });
