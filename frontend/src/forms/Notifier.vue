@@ -12,7 +12,7 @@
 
         <div v-for="(form, index) in notifier.form" v-bind:key="index" class="form-group">
             <label class="text-capitalize">{{form.title}}</label>
-            <input v-if="form.type === 'text' || 'number' || 'password'" v-model="notifier[form.field]" :type="form.type" class="form-control" :placeholder="form.placeholder" >
+            <input v-if="form.type === 'text' || 'number' || 'password'" v-model="notifier[form.field.toLowerCase()]" :type="form.type" class="form-control" :placeholder="form.placeholder" >
 
             <small class="form-text text-muted" v-html="form.small_text"></small>
         </div>
@@ -53,6 +53,7 @@
         <span class="d-block small text-center mt-5 mb-5">
             <span class="text-capitalize">{{notifier.title}}</span> Notifier created by <a :href="notifier.author_url" target="_blank">{{notifier.author}}</a>
         </span>
+
     </form>
 </template>
 
@@ -73,6 +74,7 @@ export default {
             error: null,
             saved: false,
             ok: false,
+            form: {},
         }
     },
     mounted() {
@@ -81,14 +83,14 @@ export default {
     methods: {
         async saveNotifier() {
             this.loading = true
-            let form = {}
+            this.form.enabled = this.notifier.enabled
+            this.form.limits = parseInt(this.notifier.limits)
+            this.form.method = this.notifier.method
             this.notifier.form.forEach((f) => {
-                form[f.field] = this.notifier[f.field]
+                let field = f.field.toLowerCase()
+                this.form[field] = this.notifier[field]
             });
-            form.enabled = this.notifier.enabled
-            form.limits = parseInt(this.notifier.limits)
-            form.method = this.notifier.method
-            await Api.notifier_save(form)
+            await Api.notifier_save(this.form)
             const notifiers = await Api.notifiers()
             await this.$store.commit('setNotifiers', notifiers)
             this.saved = true

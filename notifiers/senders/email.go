@@ -13,15 +13,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package notifiers
+package senders
 
 import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
 	"github.com/go-mail/mail"
+	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
@@ -29,7 +29,7 @@ import (
 	"time"
 )
 
-var _ notifications.Notifier = (*email)(nil)
+var _ notifiers.Notifier = (*email)(nil)
 
 const (
 	mainEmailTemplate = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -112,17 +112,17 @@ var (
 )
 
 type email struct {
-	*notifications.Notification
+	*notifiers.Notification
 }
 
-var Emailer = &email{&notifications.Notification{
+var Emailer = &email{&notifiers.Notification{
 	Method:      "email",
 	Title:       "email",
 	Description: "Send emails via SMTP when services are online or offline.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "far fa-envelope",
-	Form: []notifications.NotificationForm{{
+	Form: []notifiers.NotificationForm{{
 		Type:        "text",
 		Title:       "SMTP Host",
 		Placeholder: "Insert your SMTP Host here.",
@@ -211,7 +211,7 @@ func (u *email) OnSuccess(s *services.Service) {
 	}
 }
 
-func (u *email) Select() *notifications.Notification {
+func (u *email) Select() *notifiers.Notification {
 	return u.Notification
 }
 

@@ -17,8 +17,8 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net/http"
@@ -104,7 +104,7 @@ func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	for _, n := range notifications.All() {
+	for _, n := range notifiers.All() {
 		notif := n.Select()
 		PrometheusComment(fmt.Sprintf("Notifier %s:", notif.Method))
 		enabled := 0

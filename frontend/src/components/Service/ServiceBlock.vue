@@ -43,9 +43,9 @@
                 </div>
 
                 <div class="col-md-4 col-6 float-right">
-                    <router-link :to="serviceLink(service)" class="d-none btn btn-sm float-right dyn-dark btn-block text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
+                    <router-link :to="serviceLink(service)" class="d-none btn btn-sm float-right dyn-dark text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
                         View Service</router-link>
-                    <button @click="expanded = !expanded" class="btn btn-sm float-right dyn-dark btn-block text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">View Service</button>
+                    <button @click="expanded = !expanded" class="btn btn-sm float-right dyn-dark text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">View Service</button>
                 </div>
 
                 <div v-if="expanded" class="row">

@@ -19,21 +19,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/utils"
 	"net/http"
 )
 
 func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
-	all := notifications.All()
-	returnJson(all, w, r)
+	var notifs []notifiers.Notifier
+	all := notifiers.All()
+	for _, v := range all {
+		notifs = append(notifs, v)
+	}
+	returnJson(notifs, w, r)
 }
 
 func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	notifier, err := notifications.Find(vars["notifier"])
+	notifier, err := notifiers.Find(vars["notifier"])
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -43,26 +46,24 @@ func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	notifer, err := notifications.Find(vars["notifier"])
+	notifer, err := notifiers.Find(vars["notifier"])
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-
-	n := notifer.Select()
 
 	decoder := json.NewDecoder(r.Body)
-	err = decoder.Decode(&n)
+	err = decoder.Decode(&notifer)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	err = n.Update()
+	err = notifer.Update()
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	notifications.OnSave(n.Method)
+	//notifications.OnSave(notifer.Method)
 	sendJsonAction(notifer, "update", w, r)
 }
 
@@ -82,14 +83,14 @@ func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	apiSecret := form.Get("api_secret")
 	limits := int(utils.ToInt(form.Get("limits")))
 
-	notifier, err := notifications.Find(method)
+	notifier, err := notifiers.Find(method)
 	if err != nil {
 		log.Errorln(fmt.Sprintf("issue saving notifier %v: %v", method, err))
-		ExecuteResponse(w, r, "settings.gohtml", core.App, "settings")
+		sendErrorJson(err, w, r)
 		return
 	}
 
-	n := notifier.Select()
+	n := notifier
 
 	if host != "" {
 		n.Host = host

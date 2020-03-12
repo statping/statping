@@ -13,14 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package notifiers
+package senders
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net/url"
@@ -28,13 +28,13 @@ import (
 	"time"
 )
 
-var _ notifications.Notifier = (*telegram)(nil)
+var _ notifiers.Notifier = (*telegram)(nil)
 
 type telegram struct {
-	*notifications.Notification
+	*notifiers.Notification
 }
 
-var Telegram = &telegram{&notifications.Notification{
+var Telegram = &telegram{&notifiers.Notification{
 	Method:      "telegram",
 	Title:       "Telegram",
 	Description: "Receive notifications on your Telegram channel when a service has an issue. You must get a Telegram API token from the /botfather. Review the <a target=\"_blank\" href=\"http://techthoughts.info/how-to-create-a-telegram-bot-and-send-messages-via-api\">Telegram API Tutorial</a> to learn how to generate a new API Token.",
@@ -42,7 +42,7 @@ var Telegram = &telegram{&notifications.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "fab fa-telegram-plane",
 	Delay:       time.Duration(5 * time.Second),
-	Form: []notifications.NotificationForm{{
+	Form: []notifiers.NotificationForm{{
 		Type:        "text",
 		Title:       "Telegram API Token",
 		Placeholder: "383810182:EEx829dtCeufeQYXG7CUdiQopqdmmxBPO7-s",
@@ -59,7 +59,7 @@ var Telegram = &telegram{&notifications.Notification{
 	}}},
 }
 
-func (u *telegram) Select() *notifications.Notification {
+func (u *telegram) Select() *notifiers.Notification {
 	return u.Notification
 }
 

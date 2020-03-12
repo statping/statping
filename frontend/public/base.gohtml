@@ -18,7 +18,7 @@
     {{if USING_ASSETS}}
     <link href="css/vendor.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/base.css">
+    <link href="css/base.css" rel="stylesheet">
     {{else}}
     <% _.each(htmlWebpackPlugin.tags.headTags, function(headTag) { %>
     <%= headTag %> <% }) %>

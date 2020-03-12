@@ -5,6 +5,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
@@ -12,7 +13,6 @@ import (
 	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/types/incidents"
 	"github.com/statping/statping/types/messages"
-	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/types/users"
@@ -100,7 +100,7 @@ func initModels(db database.Database) {
 	hits.SetDB(db)
 	failures.SetDB(db)
 	checkins.SetDB(db)
-	notifications.SetDB(db)
+	notifiers.SetDB(db)
 	incidents.SetDB(db)
 	users.SetDB(db)
 	messages.SetDB(db)

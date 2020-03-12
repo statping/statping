@@ -117,4 +117,4 @@
 // see more details and examples of how to build your own notifier.
 //
 // More info on: https://github.com/statping/statping/wiki/Notifiers
-package notifications
+package _interface

@@ -1,4 +1,4 @@
-package notifications
+package notifiers
 
 import (
 	"errors"
@@ -11,14 +11,14 @@ func SetDB(database database.Database) {
 	db = database.Model(&Notification{})
 }
 
-func Append(n Notifier) {
+func appendList(n Notifier) {
 	allNotifiers = append(allNotifiers, n)
 }
 
 func Find(name string) (*Notification, error) {
 	for _, n := range allNotifiers {
-		notif := n.Select()
-		if notif.Name() == name || notif.Method == name {
+		notif := n.(*Notification)
+		if notif.Method == name {
 			return notif, nil
 		}
 	}
@@ -30,12 +30,13 @@ func All() []Notifier {
 }
 
 func (n *Notification) Create() error {
-	var notif Notification
-	if db.Where("method = ?", n.Method).Find(&notif).RecordNotFound() {
-		Append(n)
-		return db.Create(n).Error()
+	q := db.Where("method = ?", n.Method).Find(n)
+	if q.RecordNotFound() {
+		if err := db.Create(n).Error(); err != nil {
+			return err
+		}
 	}
-	Append(n)
+	appendList(n)
 	return nil
 }
 
@@ -44,7 +45,7 @@ func (n *Notification) Update() error {
 	if n.Enabled.Bool {
 		n.Close()
 		n.Start()
-		go Queue(Notifier(n))
+		go Queue(n)
 	} else {
 		n.Close()
 	}

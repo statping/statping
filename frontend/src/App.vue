@@ -53,7 +53,5 @@
 
 <style lang="scss">
     @import "./assets/css/bootstrap.min.css";
-    @import "./assets/scss/variables";
-    @import "./assets/scss/base";
-    @import "./assets/scss/mobile";
+    @import "./assets/scss/main";
 </style>

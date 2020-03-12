@@ -3,6 +3,7 @@ package services
 import (
 	"bytes"
 	"fmt"
+	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/utils"
@@ -39,6 +40,7 @@ CheckLoop:
 			break CheckLoop
 		case <-time.After(s.SleepDuration):
 			s.CheckService(record)
+			s.UpdateStats()
 			s.Checkpoint = s.Checkpoint.Add(s.Duration())
 			sleep := s.Checkpoint.Sub(time.Now())
 			if !s.Online {
@@ -238,26 +240,26 @@ func recordSuccess(s *Service) {
 		log.Error(err)
 	}
 	log.WithFields(utils.ToFields(hit, s)).Infoln(
-		fmt.Sprintf("Service #%d '%v' Successful Response: %s | Lookup in: %s | Online: %v | Interval: %d seconds", s.Id, s.Name, humanMicro(hit.Latency), humanMicro(hit.PingTime), s.Online, s.Interval))
+		fmt.Sprintf("Service #%d '%v' Successful Response: %s | Lookup in: %v | Online: %v | Interval: %d seconds", s.Id, s.Name, humanMicro(hit.Latency), humanMicro(hit.PingTime), s.Online, s.Interval))
 	s.LastLookupTime = hit.PingTime
 	s.LastLatency = hit.Latency
-	//notifier.OnSuccess(s)
+	notifiers.OnSuccess(s)
 	s.SuccessNotified = true
 }
 
 // recordFailure will create a new 'Failure' record in the database for a offline service
 func recordFailure(s *Service, issue string) {
-	s.LastOffline = time.Now().UTC()
+	s.LastOffline = utils.Now()
 
 	fail := &failures.Failure{
 		Service:   s.Id,
 		Issue:     issue,
 		PingTime:  s.PingTime,
-		CreatedAt: time.Now().UTC(),
+		CreatedAt: utils.Now(),
 		ErrorCode: s.LastStatusCode,
 	}
 	log.WithFields(utils.ToFields(fail, s)).
-		Warnln(fmt.Sprintf("Service %v Failing: %v | Lookup in: %0.2f ms", s.Name, issue, fail.PingTime*1000))
+		Warnln(fmt.Sprintf("Service %v Failing: %v | Lookup in: %v", s.Name, issue, humanMicro(fail.PingTime)))
 
 	if err := fail.Create(); err != nil {
 		log.Error(err)
@@ -265,7 +267,7 @@ func recordFailure(s *Service, issue string) {
 	s.Online = false
 	s.SuccessNotified = false
 	s.DownText = s.DowntimeText()
-	//notifier.OnFailure(s, fail)
+	notifiers.OnFailure(s, fail)
 }
 
 // Check will run checkHttp for HTTP services and checkTcp for TCP services

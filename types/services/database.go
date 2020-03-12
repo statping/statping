@@ -118,6 +118,5 @@ func (s *Service) DeleteCheckins() error {
 //}
 
 func (s *Service) AfterFind() error {
-	s.UpdateStats()
 	return nil
 }

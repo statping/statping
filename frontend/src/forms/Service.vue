@@ -227,6 +227,8 @@
       delete s.last_success
       delete s.latency
       delete s.online_24_hours
+        s.check_interval = parseInt(s.check_interval)
+
         if (s.id) {
             await this.updateService(s)
         } else {

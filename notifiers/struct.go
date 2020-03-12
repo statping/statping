@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package notifications
+package notifiers
 
 import (
 	"encoding/json"
@@ -173,7 +173,7 @@ func SelectNotifier(method string) (*Notification, Notifier, error) {
 
 // Queue is the FIFO go routine to send notifications when objects are triggered
 func Queue(notifer Notifier) {
-	n := notifer.Select()
+	n := notifer.(*Notification)
 	rateLimit := n.Delay
 
 CheckNotifier:
@@ -182,6 +182,8 @@ CheckNotifier:
 		case <-n.Running:
 			break CheckNotifier
 		case <-time.After(rateLimit):
+			n := notifer.(*Notification)
+			fmt.Printf("checking %s %d\n", n.Method, len(n.Queue))
 			if len(n.Queue) > 0 {
 				ok, _ := n.WithinLimits()
 				if ok {

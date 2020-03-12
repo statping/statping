@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package notifications
+package notifiers
 
 import (
 	"fmt"
@@ -27,9 +27,9 @@ import (
 func OnSave(method string) {
 	for _, comm := range allNotifiers {
 		if utils.IsType(comm, new(Notifier)) {
-			notifier := comm.(Notifier)
-			if notifier.Select().Method == method {
-				notifier.OnSave()
+			notifier := comm.Select()
+			if notifier.Method == method {
+				comm.OnSave()
 			}
 		}
 	}
@@ -55,7 +55,7 @@ func OnFailure(s *services.Service, f *failures.Failure) {
 sendMessages:
 	for _, comm := range allNotifiers {
 		if utils.IsType(comm, new(BasicEvents)) && isEnabled(comm) && (s.Online || inLimits(comm)) {
-			notifier := comm.(Notifier).Select()
+			notifier := comm.(*Notification)
 			log.
 				WithField("trigger", "OnFailure").
 				WithFields(utils.ToFields(notifier, s)).Debugln(fmt.Sprintf("Sending [OnFailure] '%v' notification for service %v", notifier.Method, s.Name))
@@ -78,7 +78,7 @@ func OnSuccess(s *services.Service) {
 
 	for _, comm := range allNotifiers {
 		if utils.IsType(comm, new(BasicEvents)) && isEnabled(comm) && (!s.Online || inLimits(comm)) {
-			notifier := comm.(Notifier).Select()
+			notifier := comm.(*Notification)
 			log.
 				WithField("trigger", "OnSuccess").
 				WithFields(utils.ToFields(notifier, s)).Debugln(fmt.Sprintf("Sending [OnSuccess] '%v' notification for service %v", notifier.Method, s.Name))

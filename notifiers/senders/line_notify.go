@@ -13,12 +13,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package notifiers
+package senders
 
 import (
 	"fmt"
+	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net/url"
@@ -26,24 +26,24 @@ import (
 	"time"
 )
 
-var _ notifications.Notifier = (*lineNotifier)(nil)
+var _ notifiers.Notifier = (*lineNotifier)(nil)
 
 const (
 	lineNotifyMethod = "line_notify"
 )
 
 type lineNotifier struct {
-	*notifications.Notification
+	*notifiers.Notification
 }
 
-var LineNotify = &lineNotifier{&notifications.Notification{
+var LineNotify = &lineNotifier{&notifiers.Notification{
 	Method:      lineNotifyMethod,
 	Title:       "LINE Notify",
 	Description: "LINE Notify will send notifications to your LINE Notify account when services are offline or online. Based on the <a href=\"https://notify-bot.line.me/doc/en/\">LINE Notify API</a>.",
 	Author:      "Kanin Peanviriyakulkit",
 	AuthorUrl:   "https://github.com/dogrocker",
 	Icon:        "far fa-bell",
-	Form: []notifications.NotificationForm{{
+	Form: []notifiers.NotificationForm{{
 		Type:        "text",
 		Title:       "Access Token",
 		Placeholder: "Insert your Line Notify Access Token here.",
@@ -61,7 +61,7 @@ func (u *lineNotifier) Send(msg interface{}) error {
 	return err
 }
 
-func (u *lineNotifier) Select() *notifications.Notification {
+func (u *lineNotifier) Select() *notifiers.Notification {
 	return u.Notification
 }
 
