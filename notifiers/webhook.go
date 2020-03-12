@@ -13,12 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package senders
+package notifiers
 
 import (
 	"bytes"
 	"fmt"
-	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
@@ -28,17 +27,17 @@ import (
 	"time"
 )
 
-var _ notifiers.Notifier = (*webhooker)(nil)
+var _ Notifier = (*webhooker)(nil)
 
 const (
 	webhookMethod = "webhook"
 )
 
 type webhooker struct {
-	*notifiers.Notification
+	*Notification
 }
 
-var Webhook = &webhooker{&notifiers.Notification{
+var Webhook = &webhooker{&Notification{
 	Method:      webhookMethod,
 	Title:       "HTTP webhooker",
 	Description: "Send a custom HTTP request to a specific URL with your own body, headers, and parameters.",
@@ -46,7 +45,7 @@ var Webhook = &webhooker{&notifiers.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "fas fa-code-branch",
 	Delay:       time.Duration(1 * time.Second),
-	Form: []notifiers.NotificationForm{{
+	Form: []NotificationForm{{
 		Type:        "text",
 		Title:       "HTTP Endpoint",
 		Placeholder: "http://webhookurl.com/JW2MCP4SKQP",
@@ -90,7 +89,7 @@ func (w *webhooker) Send(msg interface{}) error {
 	return err
 }
 
-func (w *webhooker) Select() *notifiers.Notification {
+func (w *webhooker) Select() *Notification {
 	return w.Notification
 }
 
@@ -132,7 +131,7 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 }
 
 func (w *webhooker) OnTest() error {
-	body := replaceBodyText(w.Var2, notifiers.ExampleService, nil)
+	body := replaceBodyText(w.Var2, ExampleService, nil)
 	resp, err := w.sendHttpWebhook(body)
 	if err != nil {
 		return err

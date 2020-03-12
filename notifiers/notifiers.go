@@ -2,8 +2,6 @@ package notifiers
 
 import (
 	"fmt"
-	"github.com/google/martian/log"
-	"github.com/statping/statping/notifiers/senders"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
@@ -95,14 +93,14 @@ func startAllNotifiers() {
 
 func Migrate() error {
 	return AddNotifiers(
-		senders.Command,
-		senders.Discorder,
-		senders.Emailer,
-		senders.LineNotify,
-		senders.Mobile,
-		senders.Slacker,
-		senders.Telegram,
-		senders.Twilio,
-		senders.Webhook,
+		Command,
+		Discorder,
+		Emailer,
+		LineNotify,
+		Mobile,
+		Slacker,
+		Telegram,
+		Twilio,
+		Webhook,
 	)
 }

@@ -3,7 +3,6 @@ package services
 import (
 	"bytes"
 	"fmt"
-	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/utils"
@@ -240,10 +239,10 @@ func recordSuccess(s *Service) {
 		log.Error(err)
 	}
 	log.WithFields(utils.ToFields(hit, s)).Infoln(
-		fmt.Sprintf("Service #%d '%v' Successful Response: %s | Lookup in: %v | Online: %v | Interval: %d seconds", s.Id, s.Name, humanMicro(hit.Latency), humanMicro(hit.PingTime), s.Online, s.Interval))
+		fmt.Sprintf("Service #%d '%v' Successful Response: %v | Lookup in: %v | Online: %v | Interval: %d seconds", s.Id, s.Name, humanMicro(hit.Latency), humanMicro(hit.PingTime), s.Online, s.Interval))
 	s.LastLookupTime = hit.PingTime
 	s.LastLatency = hit.Latency
-	notifiers.OnSuccess(s)
+	//notifiers.OnSuccess(s)
 	s.SuccessNotified = true
 }
 
@@ -267,7 +266,7 @@ func recordFailure(s *Service, issue string) {
 	s.Online = false
 	s.SuccessNotified = false
 	s.DownText = s.DowntimeText()
-	notifiers.OnFailure(s, fail)
+	//notifiers.OnFailure(s, fail)
 }
 
 // Check will run checkHttp for HTTP services and checkTcp for TCP services

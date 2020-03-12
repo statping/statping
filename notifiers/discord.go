@@ -13,14 +13,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package senders
+package notifiers
 
 import (
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
@@ -28,13 +27,13 @@ import (
 	"time"
 )
 
-var _ notifiers.Notifier = (*discord)(nil)
+var _ Notifier = (*discord)(nil)
 
 type discord struct {
-	*notifiers.Notification
+	*Notification
 }
 
-var Discorder = &discord{&notifiers.Notification{
+var Discorder = &discord{&Notification{
 	Method:      "discord",
 	Title:       "discord",
 	Description: "Send notifications to your discord channel using discord webhooks. Insert your discord channel Webhook URL to receive notifications. Based on the <a href=\"https://discordapp.com/developers/docs/resources/Webhook\">discord webhooker API</a>.",
@@ -43,7 +42,7 @@ var Discorder = &discord{&notifiers.Notification{
 	Delay:       time.Duration(5 * time.Second),
 	Host:        "https://discordapp.com/api/webhooks/****/*****",
 	Icon:        "fab fa-discord",
-	Form: []notifiers.NotificationForm{{
+	Form: []NotificationForm{{
 		Type:        "text",
 		Title:       "discord webhooker URL",
 		Placeholder: "Insert your Webhook URL here",
@@ -58,7 +57,7 @@ func (u *discord) Send(msg interface{}) error {
 	return err
 }
 
-func (u *discord) Select() *notifiers.Notification {
+func (u *discord) Select() *Notification {
 	return u.Notification
 }
 

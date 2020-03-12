@@ -13,28 +13,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package senders
+package notifiers
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"time"
 )
 
-var _ notifiers.Notifier = (*mobilePush)(nil)
+var _ Notifier = (*mobilePush)(nil)
 
 const mobileIdentifier = "com.statping"
 
 type mobilePush struct {
-	*notifiers.Notification
+	*Notification
 }
 
-var Mobile = &mobilePush{&notifiers.Notification{
+var Mobile = &mobilePush{&Notification{
 	Method: "mobile",
 	Title:  "Mobile Notifications",
 	Description: `Receive push notifications on your Mobile device using the Statping App. You can scan the Authentication QR Code found in Settings to get the Mobile app setup in seconds.
@@ -43,7 +42,7 @@ var Mobile = &mobilePush{&notifiers.Notification{
 	AuthorUrl: "https://github.com/hunterlong",
 	Delay:     time.Duration(5 * time.Second),
 	Icon:      "fas fa-mobile-alt",
-	Form: []notifiers.NotificationForm{{
+	Form: []NotificationForm{{
 		Type:        "text",
 		Title:       "Device Identifiers",
 		Placeholder: "A list of your Mobile device push notification ID's.",
@@ -58,7 +57,7 @@ var Mobile = &mobilePush{&notifiers.Notification{
 	}}},
 }
 
-func (u *mobilePush) Select() *notifiers.Notification {
+func (u *mobilePush) Select() *Notification {
 	return u.Notification
 }
 

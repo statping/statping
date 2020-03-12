@@ -13,11 +13,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package senders
+package notifiers
 
 import (
 	"fmt"
-	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
@@ -25,13 +24,13 @@ import (
 	"time"
 )
 
-var _ notifiers.Notifier = (*commandLine)(nil)
+var _ Notifier = (*commandLine)(nil)
 
 type commandLine struct {
-	*notifiers.Notification
+	*Notification
 }
 
-var Command = &commandLine{&notifiers.Notification{
+var Command = &commandLine{&Notification{
 	Method:      "command",
 	Title:       "Shell Command",
 	Description: "Shell Command allows you to run a customized shell/bash Command on the local machine it's running on.",
@@ -40,7 +39,7 @@ var Command = &commandLine{&notifiers.Notification{
 	Delay:       time.Duration(1 * time.Second),
 	Icon:        "fas fa-terminal",
 	Host:        "/bin/bash",
-	Form: []notifiers.NotificationForm{{
+	Form: []NotificationForm{{
 		Type:        "text",
 		Title:       "Shell or Bash",
 		Placeholder: "/bin/bash",
@@ -66,7 +65,7 @@ func runCommand(app string, cmd ...string) (string, string, error) {
 	return outStr, errStr, err
 }
 
-func (u *commandLine) Select() *notifiers.Notification {
+func (u *commandLine) Select() *Notification {
 	return u.Notification
 }
 

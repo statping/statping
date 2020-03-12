@@ -13,13 +13,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package senders
+package notifiers
 
 import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
@@ -28,7 +27,7 @@ import (
 	"time"
 )
 
-var _ notifiers.Notifier = (*slack)(nil)
+var _ Notifier = (*slack)(nil)
 
 const (
 	slackMethod     = "slack"
@@ -38,10 +37,10 @@ const (
 )
 
 type slack struct {
-	*notifiers.Notification
+	*Notification
 }
 
-var Slacker = &slack{&notifiers.Notification{
+var Slacker = &slack{&Notification{
 	Method:      slackMethod,
 	Title:       "slack",
 	Description: "Send notifications to your slack channel when a service is offline. Insert your Incoming webhooker URL for your channel to receive notifications. Based on the <a href=\"https://api.slack.com/incoming-webhooks\">slack API</a>.",
@@ -50,7 +49,7 @@ var Slacker = &slack{&notifiers.Notification{
 	Delay:       time.Duration(10 * time.Second),
 	Host:        "https://webhooksurl.slack.com/***",
 	Icon:        "fab fa-slack",
-	Form: []notifiers.NotificationForm{{
+	Form: []NotificationForm{{
 		Type:        "text",
 		Title:       "Incoming webhooker Url",
 		Placeholder: "Insert your slack Webhook URL here.",
@@ -85,7 +84,7 @@ func (u *slack) Send(msg interface{}) error {
 	return err
 }
 
-func (u *slack) Select() *notifiers.Notification {
+func (u *slack) Select() *Notification {
 	return u.Notification
 }
 

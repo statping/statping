@@ -13,13 +13,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package senders
+package notifiers
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
@@ -28,13 +27,13 @@ import (
 	"time"
 )
 
-var _ notifiers.Notifier = (*twilio)(nil)
+var _ Notifier = (*twilio)(nil)
 
 type twilio struct {
-	*notifiers.Notification
+	*Notification
 }
 
-var Twilio = &twilio{&notifiers.Notification{
+var Twilio = &twilio{&Notification{
 	Method:      "twilio",
 	Title:       "Twilio",
 	Description: "Receive SMS text messages directly to your cellphone when a service is offline. You can use a Twilio test account with limits. This notifier uses the <a href=\"https://www.twilio.com/docs/usage/api\">Twilio API</a>.",
@@ -42,7 +41,7 @@ var Twilio = &twilio{&notifiers.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "far fa-comment-alt",
 	Delay:       time.Duration(10 * time.Second),
-	Form: []notifiers.NotificationForm{{
+	Form: []NotificationForm{{
 		Type:        "text",
 		Title:       "Account SID",
 		Placeholder: "Insert your Twilio Account SID",
@@ -69,7 +68,7 @@ var Twilio = &twilio{&notifiers.Notification{
 	}}},
 }
 
-func (u *twilio) Select() *notifiers.Notification {
+func (u *twilio) Select() *Notification {
 	return u.Notification
 }
 
