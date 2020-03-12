@@ -16,6 +16,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
@@ -27,6 +28,8 @@ import (
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"io/ioutil"
+	"os"
+	"strings"
 	"time"
 )
 
@@ -109,13 +112,17 @@ func catchCLI(args []string) error {
 		if err = configs.ConnectConfigs(config); err != nil {
 			return err
 		}
+		if _, err := services.SelectAllServices(false); err != nil {
+			return err
+		}
 		if data, err = handlers.ExportSettings(); err != nil {
 			return fmt.Errorf("could not export settings: %v", err.Error())
 		}
-		//core.CloseDB()
-		if err = utils.SaveFile(dir+"/statping-export.json", data); err != nil {
+		filename := fmt.Sprintf("%s/statping-%s.json", dir, time.Now().Format("01-02-2006-1504"))
+		if err = utils.SaveFile(filename, data); err != nil {
 			return fmt.Errorf("could not write file statping-export.json: %v", err.Error())
 		}
+		log.Infoln("Statping export file saved to ", filename)
 		return errors.New("end")
 	case "import":
 		var err error
@@ -131,6 +138,71 @@ func catchCLI(args []string) error {
 		if err = json.Unmarshal(data, &exportData); err != nil {
 			return err
 		}
+		log.Printf("=== %s ===\n", exportData.Core.Name)
+		log.Printf("Services:   %d\n", len(exportData.Services))
+		log.Printf("Checkins:   %d\n", len(exportData.Checkins))
+		log.Printf("Groups:     %d\n", len(exportData.Groups))
+		log.Printf("Messages:   %d\n", len(exportData.Messages))
+		log.Printf("Users:      %d\n", len(exportData.Users))
+
+		config, err := configs.LoadConfigs()
+		if err != nil {
+			return err
+		}
+		if err = configs.ConnectConfigs(config); err != nil {
+			return err
+		}
+		if data, err = handlers.ExportSettings(); err != nil {
+			return fmt.Errorf("could not export settings: %v", err.Error())
+		}
+
+		if ask("Import Core settings?") {
+			c := exportData.Core
+			if err := c.Update(); err != nil {
+				return err
+			}
+		}
+		for _, s := range exportData.Groups {
+			if ask(fmt.Sprintf("Import Group '%s'?", s.Name)) {
+				s.Id = 0
+				if err := s.Create(); err != nil {
+					return err
+				}
+			}
+		}
+		for _, s := range exportData.Services {
+			if ask(fmt.Sprintf("Import Service '%s'?", s.Name)) {
+				s.Id = 0
+				if err := s.Create(); err != nil {
+					return err
+				}
+			}
+		}
+		for _, s := range exportData.Checkins {
+			if ask(fmt.Sprintf("Import Checkin '%s'?", s.Name)) {
+				s.Id = 0
+				if err := s.Create(); err != nil {
+					return err
+				}
+			}
+		}
+		for _, s := range exportData.Messages {
+			if ask(fmt.Sprintf("Import Message '%s'?", s.Title)) {
+				s.Id = 0
+				if err := s.Create(); err != nil {
+					return err
+				}
+			}
+		}
+		for _, s := range exportData.Users {
+			if ask(fmt.Sprintf("Import User '%s'?", s.Username)) {
+				s.Id = 0
+				if err := s.Create(); err != nil {
+					return err
+				}
+			}
+		}
+		log.Infof("Import complete")
 		return errors.New("end")
 	case "run":
 		if err := runLogs(); err != nil {
@@ -164,6 +236,14 @@ func catchCLI(args []string) error {
 		return nil
 	}
 	return errors.New("end")
+}
+
+func ask(format string) bool {
+	fmt.Printf(fmt.Sprintf(format + " [y/N]: "))
+	reader := bufio.NewReader(os.Stdin)
+	text, _ := reader.ReadString('\n')
+	text = strings.Replace(text, "\n", "", -1)
+	return strings.ToLower(text) == "y"
 }
 
 // ExportIndexHTML returns the HTML of the index page as a string
