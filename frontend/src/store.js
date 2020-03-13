@@ -35,6 +35,7 @@ export default new Vuex.Store({
         services: state => state.services,
         groups: state => state.groups,
         messages: state => state.messages,
+        incidents: state => state.incidents,
         users: state => state.users,
         notifiers: state => state.notifiers,
 
@@ -100,6 +101,9 @@ export default new Vuex.Store({
         setMessages (state, messages) {
             state.messages = messages
         },
+        setIncidents (state, incidents) {
+            state.incidents = incidents
+        },
         setUsers (state, users) {
             state.users = users
         },
@@ -121,6 +125,8 @@ export default new Vuex.Store({
             context.commit("setServices", services);
             const messages = await Api.messages()
             context.commit("setMessages", messages)
+            const incidents = await Api.incidents()
+            context.commit("setIncidents", incidents)
             context.commit("setHasPublicData", true)
             // if (core.logged_in) {
             //     const notifiers = await Api.notifiers()

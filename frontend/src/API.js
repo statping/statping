@@ -40,6 +40,10 @@ class Api {
     return axios.get('/api/services/' + id + '/hits_data?start=' + start + '&end=' + end + '&group=' + group + '&fill=' + fill).then(response => (response.data))
   }
 
+    async service_ping(id, start, end, group, fill=true) {
+        return axios.get('/api/services/' + id + '/ping_data?start=' + start + '&end=' + end + '&group=' + group + '&fill=' + fill).then(response => (response.data))
+    }
+
     async service_failures_data(id, start, end, group, fill=true) {
         return axios.get('/api/services/' + id + '/failure_data?start=' + start + '&end=' + end + '&group=' + group + '&fill=' + fill).then(response => (response.data))
     }
@@ -96,6 +100,22 @@ class Api {
   async user_delete(id) {
     return axios.delete('/api/users/' + id).then(response => (response.data))
   }
+
+    async incident_update_create(incident, data) {
+        return axios.post('/api/incidents/'+incident.id+'/updates', data).then(response => (response.data))
+    }
+
+    async incidents_service(service) {
+        return axios.get('/api/services/'+service.id+'/incidents').then(response => (response.data))
+    }
+
+    async incident_create(data) {
+        return axios.post('/api/incidents', data).then(response => (response.data))
+    }
+
+    async incident_delete(incident) {
+        return axios.delete('/api/incidents/'+incident.id).then(response => (response.data))
+    }
 
   async messages() {
     return axios.get('/api/messages').then(response => (response.data))

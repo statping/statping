@@ -1,4 +1,7 @@
 <template>
+    <div class="card text-black-50 bg-white mb-5">
+        <div class="card-header text-capitalize">{{notifier.title}}</div>
+        <div class="card-body">
     <form @submit.prevent="saveNotifier">
 
         <div v-if="error" class="alert alert-danger col-12" role="alert">{{error}}</div>
@@ -7,7 +10,6 @@
             <i class="fa fa-smile-beam"></i> The {{notifier.method}} notifier is working correctly!
         </div>
 
-        <h4 class="text-capitalize">{{notifier.title}}</h4>
         <p class="small text-muted" v-html="notifier.description"/>
 
         <div v-for="(form, index) in notifier.form" v-bind:key="index" class="form-group">
@@ -50,11 +52,12 @@
 
         </div>
 
-        <span class="d-block small text-center mt-5 mb-5">
+    </form>
+        </div>
+        <span class="d-block small text-center mb-3">
             <span class="text-capitalize">{{notifier.title}}</span> Notifier created by <a :href="notifier.author_url" target="_blank">{{notifier.author}}</a>
         </span>
-
-    </form>
+    </div>
 </template>
 
 <script>

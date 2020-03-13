@@ -41,16 +41,16 @@ func StartMaintenceRoutine() {
 // databaseMaintence will automatically delete old records from 'failures' and 'hits'
 // this function is currently set to delete records 7+ days old every 60 minutes
 func databaseMaintence(dur time.Duration) {
-	deleteAfter := time.Now().UTC().Add(dur)
+	//deleteAfter := time.Now().UTC().Add(dur)
 
 	time.Sleep(20 * types.Second)
 
 	for range time.Tick(maintenceDuration) {
 		log.Infof("Deleting failures older than %s", dur.String())
-		DeleteAllSince("failures", deleteAfter)
+		//DeleteAllSince("failures", deleteAfter)
 
 		log.Infof("Deleting hits older than %s", dur.String())
-		DeleteAllSince("hits", deleteAfter)
+		//DeleteAllSince("hits", deleteAfter)
 
 		maintenceDuration = types.Hour
 	}

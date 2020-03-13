@@ -1,5 +1,5 @@
 <template v-if="service">
-    <div class="col-12 card mb-4" style="min-height: 360px" :class="{'offline-card': !service.online}">
+    <div class="col-12 card mb-4" style="min-height: 280px" :class="{'offline-card': !service.online}">
         <div class="card-body p-3 p-md-1 pt-md-3 pb-md-1">
             <h4 class="card-title mb-4"><router-link :to="serviceLink(service)">{{service.name}}</router-link>
                 <span class="badge float-right" :class="{'badge-success': service.online, 'badge-danger': !service.online}">
@@ -8,11 +8,11 @@
             </h4>
 
             <transition name="fade">
-            <div v-if="loaded && service.online" class="row">
-                <div class="col-md-6 col-sm-12 mt-2 mt-md-0">
+            <div v-if="loaded && service.online" class="row pb-3">
+                <div class="col-md-6 col-sm-12 mt-2 mt-md-0 mb-3">
                     <ServiceSparkLine :title="set2_name" subtitle="Latency Last 24 Hours" :series="set2"/>
                 </div>
-                <div class="col-md-6 col-sm-12 mt-4 mt-md-0">
+                <div class="col-md-6 col-sm-12 mt-4 mt-md-0 mb-3">
                     <ServiceSparkLine :title="set1_name" subtitle="Latency Last 7 Days" :series="set1"/>
                 </div>
 
@@ -42,8 +42,33 @@
                               :end="this.toUnix(this.nowSubtract(86400))"
                               group="24h" expression="latencyPercent"/>
                 </div>
+
+                    <div class="col-4">
+                        <button @click.prevent="openTab='incident'" class="btn btn-block btn-outline-secondary">Create Incident</button>
+                    </div>
+                    <div class="col-4">
+                        <button @click.prevent="openTab='message'" class="btn btn-block btn-outline-secondary">Create Announcement</button>
+                    </div>
+                    <div class="col-4">
+                        <button @click.prevent="openTab='failures'" class="btn btn-block btn-outline-secondary" :disabled="!service.failures">
+                            Failures <span class="badge badge-danger float-right mt-1">{{service.stats.failures}}</span></button>
+                    </div>
+
+                <div v-if="openTab === 'incident'" class="col-12 mt-4">
+                    <FormIncident :service="service" />
+                </div>
+
+                <div v-if="openTab === 'message'" class="col-12 mt-4">
+                    <FormMessage :service="service"/>
+                </div>
+
+                <div v-if="openTab === 'failures'" class="col-12 mt-4">
+                    <ServiceFailures :service="service"/>
+                </div>
+
             </div>
             </transition>
+
         </div>
 
         <span v-for="(failure, index) in failures" v-bind:key="index" class="alert alert-light">
@@ -55,6 +80,9 @@
 </template>
 
 <script>
+  import FormIncident from '../../forms/Incident';
+  import FormMessage from '../../forms/Message';
+  import ServiceFailures from './ServiceFailures';
   import ServiceSparkLine from "./ServiceSparkLine";
   import Api from "../../API";
   import StatsGen from "./StatsGen";
@@ -62,7 +90,10 @@
   export default {
       name: 'ServiceInfo',
       components: {
-        StatsGen,
+          ServiceFailures,
+          FormIncident,
+          FormMessage,
+          StatsGen,
           ServiceSparkLine
       },
       props: {
@@ -73,6 +104,7 @@
       },
       data() {
           return {
+              openTab: "",
               set1: [],
               set2: [],
               loaded: false,

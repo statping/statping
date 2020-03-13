@@ -7,7 +7,8 @@
     "build": "rm -rf dist && cross-env NODE_ENV=production webpack --mode production",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --host 0.0.0.0 --port 8888 --progress",
     "lint": "vue-cli-service lint",
-    "test": "cross-env NODE_ENV=development mochapack --webpack-config webpack.config.js --require test/setup.js test/**/*.spec.js"
+    "test": "cross-env NODE_ENV=development mochapack --webpack-config webpack.config.js --require test/setup.js test/**/*.spec.js",
+    "backend-test": "newman run -e ../dev/postman_environment.json --delay-request 500 ../dev/postman.json"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free-solid": "^5.1.0-3",

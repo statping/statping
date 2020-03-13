@@ -5,7 +5,7 @@ COPY ./frontend/package.json .
 COPY ./frontend/yarn.lock .
 RUN yarn install --pure-lockfile --network-timeout 1000000
 COPY ./frontend .
-RUN yarn build && rm -rf node_modules && yarn cache clean
+RUN yarn build && yarn cache clean
 
 
 # Statping Golang BACKEND building from source
@@ -26,6 +26,9 @@ RUN go get github.com/stretchr/testify/assert && \
 	go get github.com/cortesi/modd/cmd/modd && \
 	go get github.com/crazy-max/xgo
 COPY . .
-COPY --from=frontend /statping/dist/ ./source/dist/
+COPY --from=frontend /statping/ ./frontend/
 RUN make clean generate embed build
 RUN chmod a+x statping && mv statping /go/bin/statping
+# /go/bin/statping - statping binary
+# /usr/local/bin/sass - sass binary
+# /statping - Vue frontend (from frontend)

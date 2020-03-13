@@ -20,15 +20,15 @@ up:
 down:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml down --volumes --remove-orphans
 
-test: clean
-	go test -v -p=1 -ldflags="-X main.VERSION=dev" -coverprofile=coverage.out ./...
-
 lite: clean
 	docker build -t hunterlong/statping:dev -f dev/Dockerfile.dev .
 	docker-compose -f dev/docker-compose.lite.yml down
 	docker-compose -f dev/docker-compose.lite.yml up --remove-orphans
 
 reup: down clean compose-build-full up
+
+test: clean
+	go test -v -p=1 -ldflags="-X main.VERSION=dev" -coverprofile=coverage.out ./...
 
 yarn-serve:
 	cd frontend && yarn serve
@@ -61,20 +61,23 @@ compose-build-full: docker-base
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml build --parallel --build-arg VERSION=${VERSION}
 
 docker-base:
-	docker build -t hunterlong/statping:base -f Dockerfile.base --no-cache --build-arg VERSION=${VERSION} .
+	docker build -t statping/statping:base -f Dockerfile.base --no-cache --build-arg VERSION=${VERSION} .
 
 docker-latest: docker-base
-	docker build -t hunterlong/statping:latest --build-arg VERSION=${VERSION} .
+	docker build -t statping/statping:latest --build-arg VERSION=${VERSION} .
 
 docker-vue:
-	docker build -t hunterlong/statping:vue --build-arg VERSION=${VERSION} .
+	docker build -t statping/statping:vue --build-arg VERSION=${VERSION} .
+
+docker-test:
+	docker-compose -f docker-compose.test.yml up --remove-orphans
 
 push-base: docker-base
-	docker push hunterlong/statping:base
+	docker push statping/statping:base
 
 push-vue: clean docker-base docker-vue
-	docker push hunterlong/statping:base
-	docker push hunterlong/statping:vue
+	docker push statping/statping:base
+	docker push statping/statping:vue
 
 modd:
 	modd -f ./dev/modd.conf

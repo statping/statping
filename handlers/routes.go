@@ -131,10 +131,14 @@ func Router() *mux.Router {
 	//api.Handle("/api/services/{id}/heatmap", cached("30s", "application/json", apiServiceHeatmapHandler)).Methods("GET")
 
 	// API INCIDENTS Routes
-	api.Handle("/api/incidents", readOnly(apiAllIncidentsHandler, false)).Methods("GET")
-	api.Handle("/api/incidents", authenticated(apiCreateIncidentHandler, false)).Methods("POST")
-	api.Handle("/api/incidents/:id", authenticated(apiIncidentUpdateHandler, false)).Methods("POST")
-	api.Handle("/api/incidents/:id", authenticated(apiDeleteIncidentHandler, false)).Methods("DELETE")
+	api.Handle("/api/services/{id}/incidents", http.HandlerFunc(apiServiceIncidentsHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/incidents", authenticated(apiCreateIncidentHandler, false)).Methods("POST")
+	api.Handle("/api/incidents/{id}", authenticated(apiIncidentUpdateHandler, false)).Methods("POST")
+	api.Handle("/api/incidents/{id}", authenticated(apiDeleteIncidentHandler, false)).Methods("DELETE")
+
+	// API INCIDENTS UPDATES Routes
+	api.Handle("/api/incidents/{id}/updates", authenticated(apiCreateIncidentUpdateHandler, false)).Methods("POST")
+	api.Handle("/api/incidents/{id}/updates/{uid}", authenticated(apiDeleteIncidentUpdateHandler, false)).Methods("DELETE")
 
 	// API USER Routes
 	api.Handle("/api/users", authenticated(apiAllUsersHandler, false)).Methods("GET")

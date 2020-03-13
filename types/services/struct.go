@@ -45,7 +45,7 @@ type Service struct {
 	PingTime            int64               `gorm:"-" json:"ping_time"`
 	Online24Hours       float32             `gorm:"-" json:"online_24_hours"`
 	Online7Days         float32             `gorm:"-" json:"online_7_days"`
-	AvgResponse         float64             `gorm:"-" json:"avg_response"`
+	AvgResponse         int64               `gorm:"-" json:"avg_response"`
 	FailuresLast24Hours int                 `gorm:"-" json:"failures_24_hours"`
 	Running             chan bool           `gorm:"-" json:"-"`
 	Checkpoint          time.Time           `gorm:"-" json:"-"`
@@ -71,11 +71,9 @@ type Service struct {
 }
 
 type Stats struct {
-	Failures       int       `gorm:"-" json:"failures"`
-	Hits           int       `gorm:"-" json:"hits"`
-	LastLookupTime int64     `gorm:"-" json:"last_lookup"`
-	LastLatency    int64     `gorm:"-" json:"last_latency"`
-	FirstHit       time.Time `gorm:"-" json:"first_hit"`
+	Failures int       `gorm:"-" json:"failures"`
+	Hits     int       `gorm:"-" json:"hits"`
+	FirstHit time.Time `gorm:"-" json:"first_hit"`
 }
 
 // BeforeCreate for Service will set CreatedAt to UTC

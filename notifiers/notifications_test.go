@@ -62,7 +62,7 @@ func TestInit(t *testing.T) {
 }
 
 func TestFind(t *testing.T) {
-	Append(example)
+	appendList(example)
 	itemer, err := Find(example.Method)
 	require.Nil(t, err)
 

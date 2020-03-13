@@ -3,6 +3,18 @@
 
         <Header/>
 
+        <div v-show="$store.getters.groups.length === 0">
+            <div class="col-12">
+                <div class="col-12 loader backgroundAnimated"></div>
+                <div class="col-12 mt-3 border-0 loader backgroundAnimated" style="min-height: 200px;"></div>
+            </div>
+
+            <div class="col-12 mt-4">
+                <div class="col-12 loader backgroundAnimated"></div>
+                <div class="col-12 mt-3 border-0 loader backgroundAnimated" style="min-height: 200px;"></div>
+            </div>
+        </div>
+
         <div v-for="(group, index) in $store.getters.groupsInOrder" v-bind:key="index">
             <Group :group=group />
         </div>

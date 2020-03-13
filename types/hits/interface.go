@@ -59,22 +59,21 @@ func (h Hitters) DeleteAll() error {
 	return q.Error()
 }
 
-func (h Hitters) Sum() float64 {
-	result := struct {
-		amount float64
-	}{0}
+func (h Hitters) Sum() int64 {
+	var r IntResult
 
-	h.db.Select("AVG(latency) as amount").Scan(&result)
-	return result.amount
+	h.db.Select("CAST(SUM(latency) as INT) as amount").Scan(&r)
+	return r.Amount
 }
 
-func (h Hitters) Avg() float64 {
-	result := struct {
-		amount float64
-	}{0}
+type IntResult struct {
+	Amount int64
+}
 
-	h.db.Select("AVG(latency) as amount").Scan(&result)
-	return result.amount
+func (h Hitters) Avg() int64 {
+	var r IntResult
+	h.db.Select("CAST(AVG(latency) as INT) as amount").Scan(&r)
+	return r.Amount
 }
 
 func AllHits(obj ColumnIDInterfacer) Hitters {

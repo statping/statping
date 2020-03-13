@@ -4,23 +4,47 @@ HTML,BODY {
 
 .index-chart {
   height: $service-card-height;
+  /*Animation*/
+  -webkit-transition: height 0.3s ease;
+  -moz-transition: height 0.3s ease;
+  -o-transition: height 0.3s ease;
+  -ms-transition: height 0.3s ease;
+  transition: height 0.3s ease;
+}
+
+@-o-keyframes fadeIt {
+  0%   { background-color: #f5f5f5; }
+  50%  { background-color: #f2f2f2; }
+  100% { background-color: #f5f5f5; }
+}
+@keyframes fadeIt {
+  0%   { background-color: #f5f5f5; }
+  50%  { background-color: #f2f2f2; }
+  100% { background-color: #f5f5f5; }
+}
+
+.backgroundAnimated {
+  background-image:none !important;
+  -o-animation: fadeIt 1s ease-in-out;
+  animation: fadeIt 1s ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.loader {
+  background-color: #f5f5f5;
+  min-height: 35px;
+  border-radius: 3px;
 }
 
 .sub-service-card {
   border: 1px solid #dcdcdc87;
   padding-top: 7px;
   padding-bottom: 10px;
-  height: 155px;
+  min-height: 70px;
 }
 
 .expanded-service {
-  height: 89vh;
-  /*Animation*/
-  -webkit-transition: height 2s ease;
-  -moz-transition: height 2s ease;
-  -o-transition: height 2s ease;
-  -ms-transition: height 2s ease;
-  transition: height 2s ease;
+  height: 550px;
 
   .stats_area {
     display: none;
@@ -140,7 +164,7 @@ HTML,BODY {
 
   .stats_area {
     text-align: center;
-    color: #a5a5a5;
+    line-height: 1.3;
   }
 
   .lower_canvas {
@@ -171,39 +195,43 @@ HTML,BODY {
   }
 
   .font-0 {
-    font-size: 5pt;
+    font-size: 0.35rem;
   }
 
   .font-1 {
-    font-size: 7pt;
+    font-size: 0.8rem;
   }
 
   .font-2 {
-    font-size: 9pt;
+    font-size: 0.8rem;
   }
 
 .font-3 {
-  font-size: 11pt;
+  font-size: 1.1rem;
 }
 
 .font-4 {
-  font-size: 14pt;
+  font-size: 1.7rem;
 }
 
 .font-5 {
-  font-size: 17pt;
+  font-size: 2.3rem;
 }
 
 .font-6 {
-  font-size: 24pt;
+  font-size: 2.8rem;
 }
 
 .font-7 {
-  font-size: 31pt;
+  font-size: 3rem;
 }
 
 .font-8 {
-  font-size: 38pt;
+  font-size: 3.5rem;
+}
+
+.subtitle {
+  color: $subtitle-color;
 }
 
   .badge {
@@ -261,7 +289,6 @@ HTML,BODY {
 
   .card-body H4 A {
     color: $service-title;
-    font-size: $service-title-size;
     text-decoration: none;
   }
 

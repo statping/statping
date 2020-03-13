@@ -4,8 +4,17 @@
         background-color: $sm-background-color;
     }
 
+
   .index-chart {
     height: 380px;
+  }
+
+  .online_list {
+    box-shadow: $mobile-card-shadow;
+  }
+
+  .expanded-service {
+    height: 810px;
   }
 
     .sm-container {
@@ -71,8 +80,7 @@
         border-radius: $sm-border-radius;
         padding: $sm-padding;
         background-color: $sm-service-background;
-        box-shadow: 0px 3px 10px 2px;
-        color: #b5b5b5;
+        box-shadow: $mobile-card-shadow;
     }
 
     .card-body {
@@ -92,7 +100,6 @@
     .stats_area .col-4 {
         padding-left: 0;
         padding-right: 0;
-        font-size: 0.6rem;
     }
 
     .navbar-item {
@@ -121,4 +128,44 @@
     .service-chart-container {
         height: 200px;
     }
+
+
+
+
+  .font-0 {
+    font-size: 0.35rem;
+  }
+
+  .font-1 {
+    font-size: 0.65rem;
+  }
+
+  .font-2 {
+    font-size: 0.8rem;
+  }
+
+  .font-3 {
+    font-size: 1rem;
+  }
+
+  .font-4 {
+    font-size: 1.2rem;
+  }
+
+  .font-5 {
+    font-size: 1.5rem;
+  }
+
+  .font-6 {
+    font-size: 1.9rem;
+  }
+
+  .font-7 {
+    font-size: 2.2rem;
+  }
+
+  .font-8 {
+    font-size: 2.5rem;
+  }
+
 }

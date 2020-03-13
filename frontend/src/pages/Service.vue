@@ -37,10 +37,6 @@
                 <ServiceHeatmap :service="service"/>
             </div>
 
-<!--            <div v-if="series" class="service-chart-container">-->
-<!--                <apexchart width="100%" height="300" type="range" :options="dailyRangeOpts" :series="series"></apexchart>-->
-<!--            </div>-->
-
             <nav v-if="service.failures" class="nav nav-pills flex-column flex-sm-row mt-3" id="service_tabs">
                 <a @click="tab='failures'" class="flex-sm-fill text-sm-center nav-link active">Failures</a>
                 <a @click="tab='incidents'" class="flex-sm-fill text-sm-center nav-link">Incidents</a>
@@ -295,8 +291,8 @@ export default {
             this.messages = this.$store.getters.serviceMessages(this.service.id)
         },
         messageInRange(message) {
-            const start = this.isBetween(this.now(), this.parseTime(message.start_on))
-            const end = this.isBetween(this.parseTime(message.end_on), this.now())
+            const start = this.isBetween(new Date(), message.start_on)
+            const end = this.isBetween(message.end_on, new Date())
             return start && end
         },
         async getService(s) {
@@ -327,7 +323,7 @@ export default {
             this.ready = true
         },
         startEndTimes() {
-            const start = this.toUnix(this.parseTime(this.service.stats.first_hit))
+            const start = this.toUnix(this.service.stats.first_hit)
             const end = this.toUnix(new Date())
             return {start, end}
         }

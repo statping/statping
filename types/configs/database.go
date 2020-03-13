@@ -85,7 +85,9 @@ func (d *DbConfig) DropDatabase() error {
 }
 
 func (d *DbConfig) Close() {
-	d.Db.Close()
+	if d.Db != nil {
+		d.Db.Close()
+	}
 }
 
 // CreateDatabase will CREATE TABLES for each of the Statping elements

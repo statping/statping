@@ -100,6 +100,7 @@ func TestSetupRoutes(t *testing.T) {
 				}
 				return nil
 			},
+			AfterTest: StopServices,
 		}}
 
 	for _, v := range tests {
@@ -283,4 +284,11 @@ func SetTestENV() error {
 
 func UnsetTestENV() error {
 	return os.Setenv("GO_ENV", "production")
+}
+
+func StopServices() error {
+	for _, s := range services.All() {
+		s.Close()
+	}
+	return nil
 }

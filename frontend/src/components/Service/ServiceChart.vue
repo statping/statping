@@ -105,16 +105,16 @@
                   tooltip: {
                       theme: false,
                       enabled: true,
-                      custom: function({series, seriesIndex, dataPointIndex, w}) {
+                      custom: ({series, seriesIndex, dataPointIndex, w}) => {
                           let ts = w.globals.seriesX[seriesIndex][dataPointIndex];
                           const dt = new Date(ts).toLocaleDateString("en-us", timeoptions)
                           let val = series[seriesIndex][dataPointIndex];
-                          if (val >= 1000) {
-                              val = (val * 0.1).toFixed(0) + " milliseconds"
-                          } else {
-                              val = (val * 0.01).toFixed(0) + " microseconds"
-                          }
-                          return `<div class="chartmarker"><span>Average Response Time: </span><span class="font-3">${val}</span><span>${dt}</span></div>`
+                          let humanVal = this.humanTime(val);
+                          return `<div class="chartmarker">
+                                        <span>Average Response Time: </span>
+                                        <span class="font-3">${humanVal}</span>
+                                        <span>${dt}</span>
+                                    </div>`
                       },
                       fixed: {
                           enabled: true,
@@ -170,14 +170,14 @@
       methods: {
           async chartHits(group) {
               const start = this.nowSubtract(84600 * 3)
-              this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), group, false)
+              this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), group, true)
 
               if (this.data.length === 0 && group !== "1h") {
                   await this.chartHits("1h")
               }
               this.series = [{
                   name: this.service.name,
-                  ...this.convertToChartData(this.data, 0.01)
+                  ...this.convertToChartData(this.data)
               }]
               this.ready = true
           }

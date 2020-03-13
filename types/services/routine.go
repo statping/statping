@@ -239,7 +239,7 @@ func recordSuccess(s *Service) {
 		log.Error(err)
 	}
 	log.WithFields(utils.ToFields(hit, s)).Infoln(
-		fmt.Sprintf("Service #%d '%v' Successful Response: %v | Lookup in: %v | Online: %v | Interval: %d seconds", s.Id, s.Name, humanMicro(hit.Latency), humanMicro(hit.PingTime), s.Online, s.Interval))
+		fmt.Sprintf("Service #%d '%v' Successful Response: %s | Lookup in: %s | Online: %v | Interval: %d seconds", s.Id, s.Name, humanMicro(hit.Latency), humanMicro(hit.PingTime), s.Online, s.Interval))
 	s.LastLookupTime = hit.PingTime
 	s.LastLatency = hit.Latency
 	//notifiers.OnSuccess(s)

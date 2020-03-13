@@ -34,22 +34,22 @@ var example = &Service{
 
 var hit1 = &hits.Hit{
 	Service:   1,
-	Latency:   0.1234,
-	PingTime:  0.01234,
+	Latency:   123456,
+	PingTime:  123456,
 	CreatedAt: utils.Now().Add(-120 * time.Second),
 }
 
 var hit2 = &hits.Hit{
 	Service:   1,
-	Latency:   0.2345,
-	PingTime:  0.02345,
+	Latency:   123456,
+	PingTime:  123456,
 	CreatedAt: utils.Now().Add(-60 * time.Second),
 }
 
 var hit3 = &hits.Hit{
 	Service:   1,
-	Latency:   0.3456,
-	PingTime:  0.03456,
+	Latency:   123456,
+	PingTime:  123456,
 	CreatedAt: utils.Now().Add(-30 * time.Second),
 }
 
@@ -65,7 +65,7 @@ var fail1 = &failures.Failure{
 	Issue:     "example not found",
 	ErrorCode: 404,
 	Service:   1,
-	PingTime:  0.0123,
+	PingTime:  123456,
 	CreatedAt: utils.Now().Add(-160 * time.Second),
 }
 
@@ -73,7 +73,7 @@ var fail2 = &failures.Failure{
 	Issue:     "example 2 not found",
 	ErrorCode: 500,
 	Service:   1,
-	PingTime:  0.0123,
+	PingTime:  123456,
 	CreatedAt: utils.Now().Add(-5 * time.Second),
 }
 
@@ -153,6 +153,13 @@ func TestService_Duration(t *testing.T) {
 	item, err := Find(1)
 	require.Nil(t, err)
 	assert.Equal(t, float64(30), item.Duration().Seconds())
+}
+
+func TestService_CountHits(t *testing.T) {
+	item, err := Find(1)
+	require.Nil(t, err)
+	count := item.AllHits().Count()
+	assert.NotZero(t, count)
 }
 
 func TestService_AvgTime(t *testing.T) {

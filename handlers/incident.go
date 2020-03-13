@@ -13,6 +13,32 @@ func apiAllIncidentsHandler(w http.ResponseWriter, r *http.Request) {
 	returnJson(inc, w, r)
 }
 
+func apiServiceIncidentsHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	incids := incidents.FindByService(utils.ToInt(vars["id"]))
+	returnJson(incids, w, r)
+}
+
+func apiCreateIncidentUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	var update *incidents.IncidentUpdate
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&update)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	update.IncidentId = utils.ToInt(vars["id"])
+
+	err = update.Create()
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	sendJsonAction(update, "create", w, r)
+}
+
 func apiCreateIncidentHandler(w http.ResponseWriter, r *http.Request) {
 	var incident *incidents.Incident
 	decoder := json.NewDecoder(r.Body)
@@ -61,4 +87,19 @@ func apiDeleteIncidentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sendJsonAction(incident, "delete", w, r)
+}
+
+func apiDeleteIncidentUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	update, err := incidents.FindUpdate(utils.ToInt(vars["uid"]))
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	err = update.Delete()
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	sendJsonAction(update, "delete", w, r)
 }

@@ -1,6 +1,6 @@
 <template>
     <div class="col-12">
-        <div class="card contain-card text-black-50 bg-white mb-5">
+        <div class="card contain-card text-black-50 bg-white mb-4">
             <div class="card-header">Users</div>
             <div class="card-body">
         <table class="table table-striped">
@@ -18,7 +18,7 @@
                 <td>{{user.username}}</td>
                 <td v-if="user.admin"><span class="badge badge-danger">ADMIN</span></td>
                 <td v-if="!user.admin"><span class="badge badge-primary">USER</span></td>
-                <td class="d-none d-md-table-cell">{{toLocal(user.updated_at)}}</td>
+                <td class="d-none d-md-table-cell">{{niceDate(user.updated_at)}}</td>
                 <td class="text-right">
                     <div class="btn-group">
                         <a @click.prevent="editUser(user, edit)" href="" class="btn btn-outline-secondary"><font-awesome-icon icon="user" /> Edit</a>

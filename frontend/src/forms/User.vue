@@ -79,7 +79,8 @@
   },
   watch: {
     in_user() {
-        const u = this.in_user
+        let u = this.in_user
+        u.password = null
         this.user = u
     }
   },

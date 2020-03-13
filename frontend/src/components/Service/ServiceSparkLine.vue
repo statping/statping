@@ -65,7 +65,7 @@
           fixed: {
             enabled: true,
             position: 'topRight',
-            offsetX: -5,
+            offsetX: 0,
             offsetY: 0,
           },
           x: {

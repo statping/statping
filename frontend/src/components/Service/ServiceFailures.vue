@@ -4,12 +4,12 @@
         <div v-for="(failure, index) in failures" :key="index" class="mb-2 list-group-item list-group-item-action flex-column align-items-start">
             <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1">{{failure.issue}}</h5>
-                <small>{{toLocal(failure.created_at)}}</small>
+                <small>{{niceDate(failure.created_at)}}</small>
             </div>
             <p class="mb-1">{{failure.issue}}</p>
         </div>
 
-        <nav aria-label="Page navigation example">
+        <nav aria-label="page navigation example">
             <ul class="pagination">
                 <li class="page-item">
                     <a class="page-link" href="#" aria-label="Previous">
@@ -49,6 +49,7 @@ export default {
             failures: [],
             limit: 15,
             offset: 0,
+            total: this.service.stats.failures
         }
     },
     async mounted () {
@@ -61,10 +62,6 @@ export default {
             } else {
                 return `Offline, last error: ${s.last_failure.issue} ${this.ago(s.last_failure.created_at)}`
             }
-          },
-          ago(t1) {
-            const tm = this.parseTime(t1)
-            return this.duration(this.$moment().utc(), tm)
           }
       }
 }

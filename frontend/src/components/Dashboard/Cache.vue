@@ -1,9 +1,5 @@
 <template>
     <div>
-      <h3>Cache</h3>
-        <div v-if="!cache && cache.length !== 0" class="alert alert-danger">
-            There are no cached files
-        </div>
         <table class="table">
             <thead>
             <tr>

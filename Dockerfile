@@ -1,43 +1,12 @@
-FROM node:10.17.0 AS frontend
-RUN npm install yarn -g
-WORKDIR /statping
-COPY ./frontend/package.json .
-COPY ./frontend/yarn.lock .
-RUN yarn install --pure-lockfile --network-timeout 1000000
-COPY ./frontend .
-RUN yarn build && rm -rf node_modules && yarn cache clean
-# Compiles webpacked Vue production build for frontend at /statping/dist
-
-# Statping Golang BACKEND building from source
-# Creates "/go/bin/statping" and "/usr/local/bin/sass" for copying
-FROM golang:1.14-alpine AS backend
-LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
-ARG VERSION
-RUN apk add --update --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers wget curl jq
-RUN curl -L -s https://assets.statping.com/sass -o /usr/local/bin/sass && \
-    chmod +x /usr/local/bin/sass
-WORKDIR /go/src/github.com/statping/statping
-ADD go.mod go.sum ./
-RUN go mod download
-ENV GO111MODULE on
-RUN go get github.com/stretchr/testify/assert && \
-    go get github.com/stretchr/testify/require && \
-	go get github.com/GeertJohan/go.rice/rice && \
-	go get github.com/cortesi/modd/cmd/modd && \
-	go get github.com/crazy-max/xgo
-COPY . .
-COPY --from=frontend /statping/dist/ ./source/dist/
-RUN make clean generate embed build
-RUN chmod a+x statping && mv statping /go/bin/statping
-
+FROM statping/statping:base AS base
 
 # Statping main Docker image that contains all required libraries
 FROM alpine:latest
 RUN apk --no-cache add libgcc libstdc++ curl jq
 
-COPY --from=backend /go/bin/statping /usr/local/bin/
-COPY --from=backend /usr/local/bin/sass /usr/local/bin/
-COPY --from=backend /usr/local/share/ca-certificates /usr/local/share/
+COPY --from=base /go/bin/statping /usr/local/bin/
+COPY --from=base /usr/local/bin/sass /usr/local/bin/
+COPY --from=base /usr/local/share/ca-certificates /usr/local/share/
 
 WORKDIR /app
 

@@ -16,7 +16,7 @@ export default Vue.mixin({
       return new Date.UTC(val)
     },
     ago(t1) {
-      return formatDistanceToNow(t1)
+      return formatDistanceToNow(parseISO(t1))
     },
       daysInMonth(t1) {
           return lastDayOfMonth(t1)
@@ -30,16 +30,9 @@ export default Vue.mixin({
     niceDate(val) {
       return format(parseISO(val), "EEEE, MMM do h:mma")
     },
-    parseTime(val) {
-      return parseISO(val)
-    },
       parseISO(v) {
         return parseISO(v)
       },
-    toLocal(val, suf = 'at') {
-      const t = this.parseTime(val)
-      return format(t, `EEEE, MMM do h:mma`)
-    },
     toUnix(val) {
       return getUnixTime(val)
     },
@@ -47,7 +40,7 @@ export default Vue.mixin({
       return fromUnixTime(val)
     },
     isBetween(t1, t2) {
-      return differenceInSeconds(t1, t2) >= 0
+      return differenceInSeconds(parseISO(t1), parseISO(t2)) >= 0
     },
     hour() {
       return 3600
@@ -116,6 +109,12 @@ export default Vue.mixin({
       })
       return {data: newSet}
     },
+      humanTime(val) {
+        if (val >= 10000) {
+            return Math.floor(val / 10000) + "ms"
+        }
+          return Math.floor(val / 1000) + "μs"
+      },
     lastDayOfMonth(month) {
       return new Date(Date.UTC(new Date().getUTCFullYear(), month + 1, 0))
     },

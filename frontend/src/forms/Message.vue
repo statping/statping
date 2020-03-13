@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="card contain-card text-black-50 bg-white mb-5">
-        <div class="card-header">{{message.id ? `Update ${message.title}` : "Create Message"}}
+        <div class="card-header">{{message.id ? `Update ${message.title}` : "Create Annoucement"}}
 
             <transition name="slide-fade">
                 <button @click="removeEdit" v-if="message.id" class="btn btn-sm float-right btn-danger btn-sm">Close</button>
@@ -12,7 +12,7 @@
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Title</label>
             <div class="col-sm-8">
-                <input v-model="message.title" type="text" name="title" class="form-control" id="title" placeholder="Message Title" required>
+                <input v-model="message.title" type="text" name="title" class="form-control" id="title" placeholder="Announcement Title" required>
             </div>
         </div>
 
@@ -24,7 +24,7 @@
         </div>
 
         <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Message Date Range</label>
+            <label class="col-sm-4 col-form-label">Announcement Date Range</label>
             <div class="col-sm-4">
                 <flatPickr v-model="message.start_on" @on-change="startChange" :config="config" type="text" name="start_on" class="form-control form-control-plaintext" id="start_on" value="0001-01-01T00:00:00Z" required />
             </div>
@@ -33,7 +33,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div v-show="this.service === null" class="form-group row">
             <label for="service_id" class="col-sm-4 col-form-label">Service</label>
             <div class="col-sm-8">
                 <select v-model="message.service_id" class="form-control" name="service" id="service_id">
@@ -104,6 +104,9 @@
     in_message: {
       type: Object
     },
+      service: {
+          type: Object
+      },
     edit: {
       type: Function
     }
@@ -135,7 +138,12 @@
       this.message = this.in_message
     }
   },
-  methods: {
+      mounted () {
+        if (this.service) {
+            this.service_id = this.service.id
+        }
+      },
+      methods: {
       startChange(e) {
         window.console.log(e)
       },

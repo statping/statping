@@ -110,7 +110,7 @@
 
               let dataArr = []
               data.forEach((d) => {
-                  dataArr.push({x: this.parseTime(d.timeframe).getUTCDate(), y: d.amount});
+                  dataArr.push({x: this.parseISO(d.timeframe), y: d.amount});
               });
 
               let date = new Date(dataArr[0].x);

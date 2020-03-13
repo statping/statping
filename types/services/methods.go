@@ -38,7 +38,7 @@ func humanMicro(val int64) string {
 	if val < 10000 {
 		return fmt.Sprintf("%d μs", val)
 	}
-	return fmt.Sprintf("%v ms", float64(val)*0.001)
+	return fmt.Sprintf("%0.0f ms", float64(val)*0.001)
 }
 
 // IsRunning returns true if the service go routine is running
@@ -70,8 +70,6 @@ func SelectAllServices(start bool) (map[int64]*Service, error) {
 
 	for _, s := range all() {
 
-		allServices[s.Id] = s
-
 		if start {
 			CheckinProcess(s)
 		}
@@ -85,6 +83,8 @@ func SelectAllServices(start bool) (map[int64]*Service, error) {
 
 		// collect initial service stats
 		s.UpdateStats()
+
+		allServices[s.Id] = s
 	}
 
 	return allServices, nil
@@ -163,7 +163,7 @@ func (s *Service) UpdateStats() *Service {
 }
 
 // AvgTime will return the average amount of time for a service to response back successfully
-func (s *Service) AvgTime() float64 {
+func (s *Service) AvgTime() int64 {
 	return s.AllHits().Avg()
 }
 
@@ -176,18 +176,22 @@ func (s *Service) OnlineDaysPercent(days int) float32 {
 // OnlineSince accepts a time since parameter to return the percent of a service's uptime.
 func (s *Service) OnlineSince(ago time.Time) float32 {
 	failed := s.FailuresSince(ago)
-	failsList := failed.List()
-	if len(failsList) == 0 {
+	failsList := failed.Count()
+
+	total := s.HitsSince(ago)
+	hitsList := total.Count()
+
+	if failsList == 0 {
 		s.Online24Hours = 100.00
 		return s.Online24Hours
 	}
-	total := s.HitsSince(ago)
-	hitsList := total.List()
-	if len(hitsList) == 0 {
+
+	if hitsList == 0 {
 		s.Online24Hours = 0
 		return s.Online24Hours
 	}
-	avg := float64(len(hitsList)) / float64(len(failsList)) * 100
+
+	avg := (float64(failsList) / float64(hitsList)) * 100
 	avg = 100 - avg
 	if avg < 0 {
 		avg = 0

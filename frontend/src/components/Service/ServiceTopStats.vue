@@ -1,16 +1,16 @@
 <template>
     <div class="row stats_area mt-5 mb-4">
         <div class="col-4">
-            <span class="lg_number">{{service.avg_response}}ms</span>
-            Average Response
+            <span class="font-5 d-block font-weight-bold">{{humanTime(service.avg_response)}}</span>
+            <span class="font-1 subtitle">Average Response</span>
         </div>
         <div class="col-4">
-            <span class="lg_number">{{service.online_24_hours}}%</span>
-            Uptime last 24 Hours
+            <span class="font-5 d-block font-weight-bold">{{service.online_24_hours}}%</span>
+            <span class="font-1 subtitle">Uptime last 24 Hours</span>
         </div>
         <div class="col-4">
-            <span class="lg_number">{{service.online_7_days}}%</span>
-            Uptime last 7 Days
+            <span class="font-5 d-block font-weight-bold">{{service.online_7_days}}%</span>
+            <span class="font-1 subtitle">Uptime last 7 Days</span>
         </div>
     </div>
 </template>
