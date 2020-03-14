@@ -94,8 +94,8 @@ export default {
                 this.form[field] = this.notifier[field]
             });
             await Api.notifier_save(this.form)
-            const notifiers = await Api.notifiers()
-            await this.$store.commit('setNotifiers', notifiers)
+            // const notifiers = await Api.notifiers()
+            // await this.$store.commit('setNotifiers', notifiers)
             this.saved = true
             this.loading = false
             setTimeout(() => {

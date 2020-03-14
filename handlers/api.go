@@ -19,12 +19,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/groups"
 	"github.com/statping/statping/types/incidents"
 	"github.com/statping/statping/types/messages"
+	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/types/users"
@@ -143,7 +143,7 @@ func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *ht
 	case *services.Service:
 		objName = "service"
 		objId = v.Id
-	case *notifiers.Notification:
+	case *notifications.Notification:
 		objName = "notifier"
 		objId = v.Id
 	case *core.Core:

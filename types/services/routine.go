@@ -3,16 +3,17 @@ package services
 import (
 	"bytes"
 	"fmt"
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/hits"
-	"github.com/statping/statping/utils"
-	"github.com/tatsushid/go-fastping"
 	"net"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/hits"
+	"github.com/statping/statping/utils"
+	"github.com/tatsushid/go-fastping"
 )
 
 // checkServices will start the checking go routine for each service
@@ -242,8 +243,34 @@ func recordSuccess(s *Service) {
 		fmt.Sprintf("Service #%d '%v' Successful Response: %s | Lookup in: %s | Online: %v | Interval: %d seconds", s.Id, s.Name, humanMicro(hit.Latency), humanMicro(hit.PingTime), s.Online, s.Interval))
 	s.LastLookupTime = hit.PingTime
 	s.LastLatency = hit.Latency
-	//notifiers.OnSuccess(s)
+	sendSuccess(s)
 	s.SuccessNotified = true
+}
+
+func AddNotifier(n ServiceNotifier) {
+	allNotifiers = append(allNotifiers, n)
+}
+
+func sendSuccess(s *Service) {
+	if !s.AllowNotifications.Bool {
+		return
+	}
+	// dont send notification if server was already previous online
+	if s.SuccessNotified {
+		return
+	}
+	for _, n := range allNotifiers {
+		notif := n.Select()
+		if notif.CanSend() {
+			log.Infof("Sending notification to: %s!", notif.Method)
+			if err := n.OnSuccess(s); err != nil {
+				log.Errorln(err)
+			}
+			s.UserNotified = true
+			s.SuccessNotified = true
+			//s.UpdateNotify.Bool
+		}
+	}
 }
 
 // recordFailure will create a new 'Failure' record in the database for a offline service
@@ -266,7 +293,32 @@ func recordFailure(s *Service, issue string) {
 	s.Online = false
 	s.SuccessNotified = false
 	s.DownText = s.DowntimeText()
-	//notifiers.OnFailure(s, fail)
+	sendFailure(s, fail)
+}
+
+func sendFailure(s *Service, f *failures.Failure) {
+	if !s.AllowNotifications.Bool {
+		return
+	}
+
+	// ignore failure if user was already notified and
+	// they have "continuous notifications" switched off.
+	if s.UserNotified && !s.UpdateNotify.Bool {
+		return
+	}
+
+	for _, n := range allNotifiers {
+		notif := n.Select()
+		if notif.CanSend() {
+			log.Infof("Sending Failure notification to: %s!", notif.Method)
+			if err := n.OnFailure(s, f); err != nil {
+				log.Errorln(err)
+			}
+			s.UserNotified = true
+			s.SuccessNotified = true
+			//s.UpdateNotify.Bool
+		}
+	}
 }
 
 // Check will run checkHttp for HTTP services and checkTcp for TCP services

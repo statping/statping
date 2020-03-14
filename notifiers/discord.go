@@ -21,19 +21,21 @@ import (
 	"errors"
 	"fmt"
 	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/types/notifier"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"strings"
 	"time"
 )
 
-var _ Notifier = (*discord)(nil)
+var _ notifier.Notifier = (*discord)(nil)
 
 type discord struct {
-	*Notification
+	*notifications.Notification
 }
 
-var Discorder = &discord{&Notification{
+var Discorder = &discord{&notifications.Notification{
 	Method:      "discord",
 	Title:       "discord",
 	Description: "Send notifications to your discord channel using discord webhooks. Insert your discord channel Webhook URL to receive notifications. Based on the <a href=\"https://discordapp.com/developers/docs/resources/Webhook\">discord webhooker API</a>.",
@@ -42,7 +44,7 @@ var Discorder = &discord{&Notification{
 	Delay:       time.Duration(5 * time.Second),
 	Host:        "https://discordapp.com/api/webhooks/****/*****",
 	Icon:        "fab fa-discord",
-	Form: []NotificationForm{{
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "discord webhooker URL",
 		Placeholder: "Insert your Webhook URL here",
@@ -51,38 +53,25 @@ var Discorder = &discord{&Notification{
 }
 
 // Send will send a HTTP Post to the discord API. It accepts type: []byte
-func (u *discord) Send(msg interface{}) error {
-	message := msg.(string)
-	_, _, err := utils.HttpRequest(Discorder.GetValue("host"), "POST", "application/json", nil, strings.NewReader(message), time.Duration(10*time.Second), true)
+func (u *discord) sendRequest(msg string) error {
+	_, _, err := utils.HttpRequest(Discorder.GetValue("host"), "POST", "application/json", nil, strings.NewReader(msg), time.Duration(10*time.Second), true)
 	return err
 }
 
-func (u *discord) Select() *Notification {
+func (u *discord) Select() *notifications.Notification {
 	return u.Notification
 }
 
 // OnFailure will trigger failing service
-func (u *discord) OnFailure(s *services.Service, f *failures.Failure) {
+func (u *discord) OnFailure(s *services.Service, f *failures.Failure) error {
 	msg := fmt.Sprintf(`{"content": "Your service '%v' is currently failing! Reason: %v"}`, s.Name, f.Issue)
-	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
+	return u.sendRequest(msg)
 }
 
 // OnSuccess will trigger successful service
-func (u *discord) OnSuccess(s *services.Service) {
-	if !s.Online || !s.SuccessNotified {
-		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
-		var msg interface{}
-		msg = s.DownText
-
-		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
-	}
-}
-
-// OnSave triggers when this notifier has been saved
-func (u *discord) OnSave() error {
-	msg := fmt.Sprintf(`{"content": "The discord notifier on Statping was just updated."}`)
-	u.AddQueue("saved", msg)
-	return nil
+func (u *discord) OnSuccess(s *services.Service) error {
+	msg := fmt.Sprintf(`{"content": "Your service '%s' is currently online!"}`, s.Name)
+	return u.sendRequest(msg)
 }
 
 // OnSave triggers when this notifier has been saved

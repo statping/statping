@@ -20,6 +20,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/types/notifier"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net/url"
@@ -27,13 +29,17 @@ import (
 	"time"
 )
 
-var _ Notifier = (*twilio)(nil)
+var _ notifier.Notifier = (*twilio)(nil)
 
 type twilio struct {
-	*Notification
+	*notifications.Notification
 }
 
-var Twilio = &twilio{&Notification{
+func (t *twilio) Select() *notifications.Notification {
+	return t.Notification
+}
+
+var Twilio = &twilio{&notifications.Notification{
 	Method:      "twilio",
 	Title:       "Twilio",
 	Description: "Receive SMS text messages directly to your cellphone when a service is offline. You can use a Twilio test account with limits. This notifier uses the <a href=\"https://www.twilio.com/docs/usage/api\">Twilio API</a>.",
@@ -41,7 +47,7 @@ var Twilio = &twilio{&Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "far fa-comment-alt",
 	Delay:       time.Duration(10 * time.Second),
-	Form: []NotificationForm{{
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Account SID",
 		Placeholder: "Insert your Twilio Account SID",
@@ -68,13 +74,8 @@ var Twilio = &twilio{&Notification{
 	}}},
 }
 
-func (u *twilio) Select() *Notification {
-	return u.Notification
-}
-
 // Send will send a HTTP Post to the Twilio SMS API. It accepts type: string
-func (u *twilio) Send(msg interface{}) error {
-	message := msg.(string)
+func (u *twilio) sendMessage(message string) error {
 	twilioUrl := fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%v/Messages.json", u.GetValue("api_key"))
 
 	v := url.Values{}
@@ -94,35 +95,21 @@ func (u *twilio) Send(msg interface{}) error {
 }
 
 // OnFailure will trigger failing service
-func (u *twilio) OnFailure(s *services.Service, f *failures.Failure) {
+func (u *twilio) OnFailure(s *services.Service, f *failures.Failure) error {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
-	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
+	return u.sendMessage(msg)
 }
 
 // OnSuccess will trigger successful service
-func (u *twilio) OnSuccess(s *services.Service) {
-	if !s.Online || !s.SuccessNotified {
-		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
-		var msg string
-		msg = s.DownText
-
-		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
-	}
-}
-
-// OnSave triggers when this notifier has been saved
-func (u *twilio) OnSave() error {
-	utils.Log.Infoln(fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
-
-	// Do updating stuff here
-
-	return nil
+func (u *twilio) OnSuccess(s *services.Service) error {
+	msg := fmt.Sprintf("Your service '%v' is currently online!", s.Name)
+	return u.sendMessage(msg)
 }
 
 // OnTest will test the Twilio SMS messaging
 func (u *twilio) OnTest() error {
 	msg := fmt.Sprintf("Testing the Twilio SMS Notifier")
-	return u.Send(msg)
+	return u.sendMessage(msg)
 }
 
 func twilioSuccess(res []byte) (bool, twilioResponse) {

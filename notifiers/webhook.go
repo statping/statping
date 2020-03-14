@@ -19,6 +19,8 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/types/notifier"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"io/ioutil"
@@ -27,17 +29,17 @@ import (
 	"time"
 )
 
-var _ Notifier = (*webhooker)(nil)
+var _ notifier.Notifier = (*webhooker)(nil)
 
 const (
 	webhookMethod = "webhook"
 )
 
 type webhooker struct {
-	*Notification
+	*notifications.Notification
 }
 
-var Webhook = &webhooker{&Notification{
+var Webhook = &webhooker{&notifications.Notification{
 	Method:      webhookMethod,
 	Title:       "HTTP webhooker",
 	Description: "Send a custom HTTP request to a specific URL with your own body, headers, and parameters.",
@@ -45,7 +47,7 @@ var Webhook = &webhooker{&Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "fas fa-code-branch",
 	Delay:       time.Duration(1 * time.Second),
-	Form: []NotificationForm{{
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "HTTP Endpoint",
 		Placeholder: "http://webhookurl.com/JW2MCP4SKQP",
@@ -89,7 +91,7 @@ func (w *webhooker) Send(msg interface{}) error {
 	return err
 }
 
-func (w *webhooker) Select() *Notification {
+func (w *webhooker) Select() *notifications.Notification {
 	return w.Notification
 }
 
@@ -131,7 +133,7 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 }
 
 func (w *webhooker) OnTest() error {
-	body := replaceBodyText(w.Var2, ExampleService, nil)
+	body := replaceBodyText(w.Var2, nil, nil)
 	resp, err := w.sendHttpWebhook(body)
 	if err != nil {
 		return err
@@ -143,21 +145,17 @@ func (w *webhooker) OnTest() error {
 }
 
 // OnFailure will trigger failing service
-func (w *webhooker) OnFailure(s *services.Service, f *failures.Failure) {
+func (w *webhooker) OnFailure(s *services.Service, f *failures.Failure) error {
 	msg := replaceBodyText(w.Var2, s, f)
-	w.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
+	resp, err := w.sendHttpWebhook(msg)
+	defer resp.Body.Close()
+	return err
 }
 
 // OnSuccess will trigger successful service
-func (w *webhooker) OnSuccess(s *services.Service) {
-	if !s.Online {
-		w.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
-		msg := replaceBodyText(w.Var2, s, nil)
-		w.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
-	}
-}
-
-// OnSave triggers when this notifier has been saved
-func (w *webhooker) OnSave() error {
-	return nil
+func (w *webhooker) OnSuccess(s *services.Service) error {
+	msg := replaceBodyText(w.Var2, s, nil)
+	resp, err := w.sendHttpWebhook(msg)
+	defer resp.Body.Close()
+	return err
 }

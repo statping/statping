@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"github.com/go-mail/mail"
 	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/types/notifier"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
@@ -28,7 +30,7 @@ import (
 	"time"
 )
 
-var _ Notifier = (*email)(nil)
+var _ notifier.Notifier = (*emailer)(nil)
 
 const (
 	mainEmailTemplate = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -110,18 +112,22 @@ var (
 	mailer *mail.Dialer
 )
 
-type email struct {
-	*Notification
+type emailer struct {
+	*notifications.Notification
 }
 
-var Emailer = &email{&Notification{
+func (e *emailer) Select() *notifications.Notification {
+	return e.Notification
+}
+
+var email = &emailer{&notifications.Notification{
 	Method:      "email",
 	Title:       "email",
 	Description: "Send emails via SMTP when services are online or offline.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "far fa-envelope",
-	Form: []NotificationForm{{
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "SMTP Host",
 		Placeholder: "Insert your SMTP Host here.",
@@ -157,17 +163,7 @@ var Emailer = &email{&Notification{
 		Placeholder: "",
 		SmallText:   "To Disable TLS/SSL insert 'true'",
 		DbField:     "api_key",
-	}},
-}}
-
-// Send will send the SMTP email with your authentication It accepts type: *emailOutgoing
-func (u *email) Send(msg interface{}) error {
-	email := msg.(*emailOutgoing)
-	err := u.dialSend(email)
-	if err != nil {
-		return err
-	}
-	return nil
+	}}},
 }
 
 type emailOutgoing struct {
@@ -181,7 +177,7 @@ type emailOutgoing struct {
 }
 
 // OnFailure will trigger failing service
-func (u *email) OnFailure(s *services.Service, f *failures.Failure) {
+func (u *emailer) OnFailure(s *services.Service, f *failures.Failure) error {
 	email := &emailOutgoing{
 		To:       u.Var2,
 		Subject:  fmt.Sprintf("Service %v is Failing", s.Name),
@@ -189,40 +185,24 @@ func (u *email) OnFailure(s *services.Service, f *failures.Failure) {
 		Data:     interface{}(s),
 		From:     u.Var1,
 	}
-	u.AddQueue(fmt.Sprintf("service_%v", s.Id), email)
+	return u.dialSend(email)
 }
 
 // OnSuccess will trigger successful service
-func (u *email) OnSuccess(s *services.Service) {
-	if !s.Online || !s.SuccessNotified {
-		var msg string
-		msg = s.DownText
-
-		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
-		email := &emailOutgoing{
-			To:       u.Var2,
-			Subject:  msg,
-			Template: mainEmailTemplate,
-			Data:     interface{}(s),
-			From:     u.Var1,
-		}
-		u.AddQueue(fmt.Sprintf("service_%v", s.Id), email)
+func (u *emailer) OnSuccess(s *services.Service) error {
+	msg := s.DownText
+	email := &emailOutgoing{
+		To:       u.Var2,
+		Subject:  msg,
+		Template: mainEmailTemplate,
+		Data:     interface{}(s),
+		From:     u.Var1,
 	}
-}
-
-func (u *email) Select() *Notification {
-	return u.Notification
-}
-
-// OnSave triggers when this notifier has been saved
-func (u *email) OnSave() error {
-	utils.Log.Infoln(fmt.Sprintf("Notification %v is receiving updated information.", u.Method))
-	// Do updating stuff here
-	return nil
+	return u.dialSend(email)
 }
 
 // OnTest triggers when this notifier has been saved
-func (u *email) OnTest() error {
+func (u *emailer) OnTest() error {
 	testService := &services.Service{
 		Id:             1,
 		Name:           "Example Service",
@@ -247,8 +227,8 @@ func (u *email) OnTest() error {
 	return u.dialSend(email)
 }
 
-func (u *email) dialSend(email *emailOutgoing) error {
-	mailer = mail.NewDialer(Emailer.Host, Emailer.Port, Emailer.Username, Emailer.Password)
+func (u *emailer) dialSend(email *emailOutgoing) error {
+	mailer = mail.NewDialer(u.Host, u.Port, u.Username, u.Password)
 	emailSource(email)
 	m := mail.NewMessage()
 	// if email setting TLS is Disabled

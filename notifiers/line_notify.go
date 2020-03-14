@@ -18,6 +18,8 @@ package notifiers
 import (
 	"fmt"
 	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/types/notifier"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net/url"
@@ -25,24 +27,28 @@ import (
 	"time"
 )
 
-var _ Notifier = (*lineNotifier)(nil)
+var _ notifier.Notifier = (*lineNotifier)(nil)
 
 const (
 	lineNotifyMethod = "line_notify"
 )
 
 type lineNotifier struct {
-	*Notification
+	*notifications.Notification
 }
 
-var LineNotify = &lineNotifier{&Notification{
+func (l *lineNotifier) Select() *notifications.Notification {
+	return l.Notification
+}
+
+var LineNotify = &lineNotifier{&notifications.Notification{
 	Method:      lineNotifyMethod,
 	Title:       "LINE Notify",
 	Description: "LINE Notify will send notifications to your LINE Notify account when services are offline or online. Based on the <a href=\"https://notify-bot.line.me/doc/en/\">LINE Notify API</a>.",
 	Author:      "Kanin Peanviriyakulkit",
 	AuthorUrl:   "https://github.com/dogrocker",
 	Icon:        "far fa-bell",
-	Form: []NotificationForm{{
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Access Token",
 		Placeholder: "Insert your Line Notify Access Token here.",
@@ -51,8 +57,7 @@ var LineNotify = &lineNotifier{&Notification{
 }
 
 // Send will send a HTTP Post with the Authorization to the notify-api.line.me server. It accepts type: string
-func (u *lineNotifier) Send(msg interface{}) error {
-	message := msg.(string)
+func (u *lineNotifier) sendMessage(message string) error {
 	v := url.Values{}
 	v.Set("message", message)
 	headers := []string{fmt.Sprintf("Authorization=Bearer %v", u.ApiSecret)}
@@ -60,31 +65,20 @@ func (u *lineNotifier) Send(msg interface{}) error {
 	return err
 }
 
-func (u *lineNotifier) Select() *Notification {
-	return u.Notification
-}
-
 // OnFailure will trigger failing service
-func (u *lineNotifier) OnFailure(s *services.Service, f *failures.Failure) {
+func (u *lineNotifier) OnFailure(s *services.Service, f *failures.Failure) error {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
-	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
+	return u.sendMessage(msg)
 }
 
 // OnSuccess will trigger successful service
-func (u *lineNotifier) OnSuccess(s *services.Service) {
-	if !s.Online || !s.SuccessNotified {
-		var msg string
-		msg = s.DownText
-
-		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
-		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
-	}
+func (u *lineNotifier) OnSuccess(s *services.Service) error {
+	msg := fmt.Sprintf("Service %s is online!", s.Name)
+	return u.sendMessage(msg)
 }
 
-// OnSave triggers when this notifier has been saved
-func (u *lineNotifier) OnSave() error {
-	msg := fmt.Sprintf("Notification %v is receiving updated information.", u.Method)
-	utils.Log.Infoln(msg)
-	u.AddQueue("saved", msg)
-	return nil
+// OnTest triggers when this notifier has been saved
+func (u *lineNotifier) OnTest() error {
+	msg := fmt.Sprintf("Testing if Line Notifier is working!")
+	return u.sendMessage(msg)
 }

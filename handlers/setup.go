@@ -17,10 +17,10 @@ package handlers
 
 import (
 	"errors"
-	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/configs"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net/http"
 	"time"
@@ -89,11 +89,11 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Infoln("Migrating Notifiers...")
-	if err := notifiers.Migrate(); err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
+	//log.Infoln("Migrating Notifiers...")
+	//if err := notifications.Migrate(); err != nil {
+	//	sendErrorJson(err, w, r)
+	//	return
+	//}
 
 	c := &core.Core{
 		Name:        "Statping Sample Data",
@@ -117,11 +117,16 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	core.App = c
 
 	log.Infoln("Initializing new Statping instance")
-	if err := core.InitApp(); err != nil {
+
+	if _, err := services.SelectAllServices(true); err != nil {
 		log.Errorln(err)
 		sendErrorJson(err, w, r)
 		return
 	}
+
+	go services.CheckServices()
+
+	core.App.Setup = true
 
 	CacheStorage.Delete("/")
 	resetCookies()

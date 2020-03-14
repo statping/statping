@@ -5,7 +5,8 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"github.com/statping/statping/notifiers"
+	"github.com/statping/statping/types/notifications"
+
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
@@ -52,7 +53,7 @@ func (c *DbConfig) DatabaseChanges() error {
 //If this function has an issue, it will ROLLBACK to the previous state.
 func (c *DbConfig) MigrateDatabase() error {
 
-	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifiers.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
+	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
 
 	log.Infoln("Migrating Database Tables...")
 	tx := c.Db.Begin()

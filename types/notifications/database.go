@@ -1,32 +1,21 @@
-package notifiers
+package notifications
 
 import (
-	"errors"
 	"github.com/statping/statping/database"
 )
 
-var db database.Database
+var (
+	db database.Database
+)
 
 func SetDB(database database.Database) {
 	db = database.Model(&Notification{})
 }
 
-func appendList(n Notifier) {
-	allNotifiers = append(allNotifiers, n)
-}
-
-func Find(name string) (*Notification, error) {
-	for _, n := range allNotifiers {
-		notif := n.(*Notification)
-		if notif.Method == name {
-			return notif, nil
-		}
-	}
-	return nil, errors.New("notifier not found")
-}
-
-func All() []Notifier {
-	return allNotifiers
+func Find(method string) (*Notification, error) {
+	var notification Notification
+	q := db.Where("method = ?", method).Find(&notification)
+	return &notification, q.Error()
 }
 
 func (n *Notification) Create() error {
@@ -36,7 +25,6 @@ func (n *Notification) Create() error {
 			return err
 		}
 	}
-	appendList(n)
 	return nil
 }
 
@@ -45,7 +33,6 @@ func (n *Notification) Update() error {
 	if n.Enabled.Bool {
 		n.Close()
 		n.Start()
-		go Queue(n)
 	} else {
 		n.Close()
 	}
@@ -53,6 +40,8 @@ func (n *Notification) Update() error {
 	return err.Error()
 }
 
-func (n *Notification) Delete() error {
-	return nil
+func loadAll() []*Notification {
+	var notifications []*Notification
+	db.Find(&notifications)
+	return notifications
 }

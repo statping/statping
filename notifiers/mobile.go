@@ -20,20 +20,26 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/types/notifier"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"time"
 )
 
-var _ Notifier = (*mobilePush)(nil)
+var _ notifier.Notifier = (*mobilePush)(nil)
 
 const mobileIdentifier = "com.statping"
 
 type mobilePush struct {
-	*Notification
+	*notifications.Notification
 }
 
-var Mobile = &mobilePush{&Notification{
+func (m *mobilePush) Select() *notifications.Notification {
+	return m.Notification
+}
+
+var Mobile = &mobilePush{&notifications.Notification{
 	Method: "mobile",
 	Title:  "Mobile Notifications",
 	Description: `Receive push notifications on your Mobile device using the Statping App. You can scan the Authentication QR Code found in Settings to get the Mobile app setup in seconds.
@@ -42,7 +48,7 @@ var Mobile = &mobilePush{&Notification{
 	AuthorUrl: "https://github.com/hunterlong",
 	Delay:     time.Duration(5 * time.Second),
 	Icon:      "fas fa-mobile-alt",
-	Form: []NotificationForm{{
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Device Identifiers",
 		Placeholder: "A list of your Mobile device push notification ID's.",
@@ -55,10 +61,6 @@ var Mobile = &mobilePush{&Notification{
 		DbField:     "var2",
 		IsHidden:    true,
 	}}},
-}
-
-func (u *mobilePush) Select() *Notification {
-	return u.Notification
 }
 
 func dataJson(s *services.Service, f *failures.Failure) map[string]interface{} {
@@ -85,7 +87,7 @@ func dataJson(s *services.Service, f *failures.Failure) map[string]interface{} {
 }
 
 // OnFailure will trigger failing service
-func (u *mobilePush) OnFailure(s *services.Service, f *failures.Failure) {
+func (u *mobilePush) OnFailure(s *services.Service, f *failures.Failure) error {
 	data := dataJson(s, f)
 	msg := &pushArray{
 		Message: fmt.Sprintf("Your service '%v' is currently failing! Reason: %v", s.Name, f.Issue),
@@ -93,30 +95,19 @@ func (u *mobilePush) OnFailure(s *services.Service, f *failures.Failure) {
 		Topic:   mobileIdentifier,
 		Data:    data,
 	}
-	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
+	return u.Send(msg)
 }
 
 // OnSuccess will trigger successful service
-func (u *mobilePush) OnSuccess(s *services.Service) {
+func (u *mobilePush) OnSuccess(s *services.Service) error {
 	data := dataJson(s, nil)
-	if !s.Online || !s.SuccessNotified {
-		var msgStr string
-		msgStr = s.DownText
-
-		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
-		msg := &pushArray{
-			Message: msgStr,
-			Title:   "Service Online",
-			Topic:   mobileIdentifier,
-			Data:    data,
-		}
-		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
+	msg := &pushArray{
+		Message: "Service is Online!",
+		Title:   "Service Online",
+		Topic:   mobileIdentifier,
+		Data:    data,
 	}
-}
-
-// OnSave triggers when this notifier has been saved
-func (u *mobilePush) OnSave() error {
-	return nil
+	return u.Send(msg)
 }
 
 // OnTest triggers when this notifier has been saved
@@ -143,12 +134,10 @@ func (u *mobilePush) OnTest() error {
 		firstLog := output.Logs[0].Error
 		return fmt.Errorf("Mobile Notification error: %v", firstLog)
 	}
-	return err
 }
 
 // Send will send message to Statping push notifications endpoint
-func (u *mobilePush) Send(msg interface{}) error {
-	pushMessage := msg.(*pushArray)
+func (u *mobilePush) Send(pushMessage *pushArray) error {
 	pushMessage.Tokens = []string{u.Var1}
 	pushMessage.Platform = utils.ToInt(u.Var2)
 	_, err := pushRequest(pushMessage)

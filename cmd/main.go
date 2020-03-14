@@ -19,7 +19,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/getsentry/sentry-go"
-	"github.com/statping/statping/notifiers"
 	"os"
 	"os/signal"
 	"syscall"
@@ -30,7 +29,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/statping/statping/handlers"
 	"github.com/statping/statping/types/configs"
-	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 )
@@ -165,11 +163,11 @@ func main() {
 		exit(err)
 	}
 
-	log.Infoln("Migrating Notifiers...")
-	if err := notifiers.Migrate(); err != nil {
-		exit(errors.Wrap(err, "error migrating notifiers"))
-	}
-	log.Infoln("Notifiers Migrated")
+	//log.Infoln("Migrating Notifiers...")
+	//if err := notifier.Migrate(); err != nil {
+	//	exit(errors.Wrap(err, "error migrating notifiers"))
+	//}
+	//log.Infoln("Notifiers Migrated")
 
 	if err := mainProcess(); err != nil {
 		exit(err)
@@ -205,7 +203,7 @@ func mainProcess() error {
 		return errors.Wrap(err, errStr)
 	}
 
-	if err := core.InitApp(); err != nil {
+	if err := InitApp(); err != nil {
 		return err
 	}
 

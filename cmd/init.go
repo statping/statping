@@ -1,12 +1,14 @@
-package core
+package main
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/notifiers"
+	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/services"
 )
 
 func InitApp() error {
-	if _, err := Select(); err != nil {
+	if _, err := core.Select(); err != nil {
 		return err
 	}
 
@@ -16,7 +18,9 @@ func InitApp() error {
 
 	go services.CheckServices()
 
+	notifiers.InitNotifiers()
+
 	database.StartMaintenceRoutine()
-	App.Setup = true
+	core.App.Setup = true
 	return nil
 }

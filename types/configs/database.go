@@ -2,7 +2,6 @@ package configs
 
 import (
 	"github.com/statping/statping/database"
-	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
@@ -10,6 +9,7 @@ import (
 	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/types/incidents"
 	"github.com/statping/statping/types/messages"
+	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/types/users"
 	"github.com/statping/statping/utils"
@@ -73,7 +73,7 @@ func (d *DbConfig) Delete() error {
 
 // DropDatabase will DROP each table Statping created
 func (d *DbConfig) DropDatabase() error {
-	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifiers.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
+	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
 	log.Infoln("Dropping Database Tables...")
 	for _, t := range DbModels {
 		if err := d.Db.DropTableIfExists(t); err != nil {
@@ -94,7 +94,7 @@ func (d *DbConfig) Close() {
 func (d *DbConfig) CreateDatabase() error {
 	var err error
 
-	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifiers.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
+	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
 
 	log.Infoln("Creating Database Tables...")
 	for _, table := range DbModels {

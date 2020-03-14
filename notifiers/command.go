@@ -16,21 +16,26 @@
 package notifiers
 
 import (
-	"fmt"
 	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/types/notifier"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"strings"
 	"time"
 )
 
-var _ Notifier = (*commandLine)(nil)
+var _ notifier.Notifier = (*commandLine)(nil)
 
 type commandLine struct {
-	*Notification
+	*notifications.Notification
 }
 
-var Command = &commandLine{&Notification{
+func (c *commandLine) Select() *notifications.Notification {
+	return c.Notification
+}
+
+var Command = &commandLine{&notifications.Notification{
 	Method:      "command",
 	Title:       "Shell Command",
 	Description: "Shell Command allows you to run a customized shell/bash Command on the local machine it's running on.",
@@ -39,7 +44,7 @@ var Command = &commandLine{&Notification{
 	Delay:       time.Duration(1 * time.Second),
 	Icon:        "fas fa-terminal",
 	Host:        "/bin/bash",
-	Form: []NotificationForm{{
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Shell or Bash",
 		Placeholder: "/bin/bash",
@@ -65,28 +70,18 @@ func runCommand(app string, cmd ...string) (string, string, error) {
 	return outStr, errStr, err
 }
 
-func (u *commandLine) Select() *Notification {
-	return u.Notification
-}
-
 // OnFailure for commandLine will trigger failing service
-func (u *commandLine) OnFailure(s *services.Service, f *failures.Failure) {
-	u.AddQueue(fmt.Sprintf("service_%v", s.Id), u.Var2)
+func (u *commandLine) OnFailure(s *services.Service, f *failures.Failure) error {
+	msg := u.GetValue("host")
+	_, _, err := runCommand(u.Host, msg)
+	return err
 }
 
 // OnSuccess for commandLine will trigger successful service
-func (u *commandLine) OnSuccess(s *services.Service) {
-	if !s.Online {
-		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
-		u.AddQueue(fmt.Sprintf("service_%v", s.Id), u.Var1)
-	}
-}
-
-// OnSave for commandLine triggers when this notifier has been saved
-func (u *commandLine) OnSave() error {
-	u.AddQueue("saved", u.Var1)
-	u.AddQueue("saved", u.Var2)
-	return nil
+func (u *commandLine) OnSuccess(s *services.Service) error {
+	msg := u.GetValue("host")
+	_, _, err := runCommand(u.Host, msg)
+	return err
 }
 
 // OnTest for commandLine triggers when this notifier has been saved
@@ -95,12 +90,5 @@ func (u *commandLine) OnTest() error {
 	in, out, err := runCommand(u.Host, cmds...)
 	utils.Log.Infoln(in)
 	utils.Log.Infoln(out)
-	return err
-}
-
-// Send for commandLine will send message to expo Command push notifications endpoint
-func (u *commandLine) Send(msg interface{}) error {
-	cmd := msg.(string)
-	_, _, err := runCommand(u.Host, cmd)
 	return err
 }

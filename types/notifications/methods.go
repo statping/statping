@@ -1,4 +1,4 @@
-package notifiers
+package notifications
 
 import (
 	"fmt"
@@ -21,49 +21,48 @@ func (n *Notification) AfterFind() (err error) {
 }
 
 // AddQueue will add any type of interface (json, string, struct, etc) into the Notifiers queue
-func (n *Notification) AddQueue(uid string, msg interface{}) {
-	data := &QueueData{uid, msg}
-	n.Queue = append(n.Queue, data)
-	log.WithFields(utils.ToFields(data, n)).Debug(fmt.Sprintf("Notifier '%v' added new item (%v) to the queue. (%v queued)", n.Method, uid, len(n.Queue)))
-}
+//func (n *Notification) AddQueue(uid string, msg interface{}) {
+//	data := &QueueData{uid, msg}
+//	n.Queue = append(n.Queue, data)
+//	log.WithFields(utils.ToFields(data, n)).Debug(fmt.Sprintf("Notifier '%v' added new item (%v) to the queue. (%v queued)", n.Method, uid, len(n.Queue)))
+//}
 
 // CanTest returns true if the notifier implements the OnTest interface
-func (n *Notification) CanTest() bool {
-	return n.testable
-}
+//func (n *Notification) CanTest() bool {
+//	return n.testable
+//}
 
 // LastSent returns a time.Duration of the last sent notification for the notifier
 func (n *Notification) LastSent() time.Duration {
-	if len(n.logs) == 0 {
-		return time.Duration(0)
-	}
-	last := n.Logs()[0]
-	since := time.Since(last.Timestamp)
+	since := time.Since(n.lastSent)
 	return since
 }
 
-// SentLastHour returns the total amount of notifications sent in last 1 hour
-func (n *Notification) SentLastHour() int {
-	since := utils.Now().Add(-1 * time.Hour)
-	return n.SentLast(since)
-}
+func (n *Notification) CanSend() bool {
+	if !n.Enabled.Bool {
+		return false
+	}
 
-// SentLastMinute returns the total amount of notifications sent in last 1 minute
-func (n *Notification) SentLastMinute() int {
-	since := utils.Now().Add(-1 * time.Minute)
-	return n.SentLast(since)
-}
+	fmt.Println("Last sent: ", n.lastSent.String())
+	fmt.Println("Last count: ", n.lastSentCount)
+	fmt.Println("Last sent before now: ", n.lastSent.Add(60*time.Second).Before(utils.Now()))
 
-// SentLast accept a time.Time and returns the amount of sent notifications within your time to current
-func (n *Notification) SentLast(since time.Time) int {
-	sent := 0
-	for _, v := range n.Logs() {
-		lastTime := time.Time(v.Time).UTC()
-		if lastTime.After(since) {
-			sent++
+	// the last sent notification was past 1 minute (limit per minute)
+	if n.lastSent.Add(60 * time.Second).Before(utils.Now()) {
+		if n.lastSentCount != 0 {
+			n.lastSentCount--
 		}
 	}
-	return sent
+
+	// dont send if already beyond the notifier's limit
+	if n.lastSentCount >= n.Limits {
+		return false
+	}
+
+	// action to do since notifier is able to send
+	n.lastSentCount++
+	n.lastSent = utils.Now()
+	return true
 }
 
 // GetValue returns the database value of a accept DbField value.
@@ -128,18 +127,6 @@ func (n *Notification) GetValue(dbField string) string {
 // ResetQueue will clear the notifiers Queue
 func (n *Notification) ResetQueue() {
 	n.Queue = nil
-}
-
-// ResetQueue will clear the notifiers Queue for a service
-func (n *Notification) ResetUniqueQueue(uid string) []*QueueData {
-	var queue []*QueueData
-	for _, v := range n.Queue {
-		if v.Id != uid {
-			queue = append(queue, v)
-		}
-	}
-	n.Queue = queue
-	return queue
 }
 
 // start will start the go routine for the notifier queue
