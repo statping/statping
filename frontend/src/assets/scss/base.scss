@@ -1,3 +1,5 @@
+@import 'variables';
+
 HTML,BODY {
     background-color: $background-color;
 }
@@ -691,5 +693,3 @@ HTML,BODY {
     transform: translateX(10px);
     opacity: 0;
   }
-
-@import 'mobile';
