@@ -61,7 +61,7 @@ compose-build-full: docker-base
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml build --parallel --build-arg VERSION=${VERSION}
 
 docker-base:
-	docker build -t statping/statping:base -f Dockerfile.base --no-cache --build-arg VERSION=${VERSION} .
+	docker build -t statping/statping:base -f Dockerfile.base --build-arg VERSION=${VERSION} .
 
 docker-latest: docker-base
 	docker build -t statping/statping:latest --build-arg VERSION=${VERSION} .
