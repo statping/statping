@@ -3,13 +3,11 @@ package handlers
 import (
 	"github.com/statping/statping/notifiers"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func TestAttachment(t *testing.T) {
-	err := notifiers.Migrate()
-	require.Nil(t, err)
+	notifiers.InitNotifiers()
 }
 
 func TestApiNotifiersRoutes(t *testing.T) {

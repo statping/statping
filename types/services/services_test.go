@@ -166,7 +166,7 @@ func TestService_AvgTime(t *testing.T) {
 	item, err := Find(1)
 	require.Nil(t, err)
 
-	assert.Equal(t, "", item.AvgTime())
+	assert.Equal(t, int64(123456), item.AvgTime())
 }
 
 func TestService_HitsSince(t *testing.T) {
@@ -192,7 +192,7 @@ func TestService_OnlineDaysPercent(t *testing.T) {
 
 	amount := item.OnlineDaysPercent(1)
 
-	assert.Equal(t, "", amount)
+	assert.Equal(t, float32(33.33), amount)
 }
 
 func TestService_Downtime(t *testing.T) {

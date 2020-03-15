@@ -163,12 +163,6 @@ func TestUpdateCLI(t *testing.T) {
 	assert.Contains(t, gg, "version")
 }
 
-func TestTestPackageCLI(t *testing.T) {
-	t.SkipNow()
-	run := catchCLI([]string{"test", "plugins"})
-	assert.EqualError(t, run, "end")
-}
-
 func TestHelpCLI(t *testing.T) {
 	run := catchCLI([]string{"help"})
 	assert.EqualError(t, run, "end")
