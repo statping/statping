@@ -27,11 +27,11 @@ func (c *DbConfig) DatabaseChanges() error {
 
 		switch c.Db.DbType() {
 		case "mysql":
-			if err := c.genericMigration("MODIFY"); err != nil {
+			if err := c.genericMigration("MODIFY", false); err != nil {
 				return err
 			}
 		case "postgres":
-			if err := c.genericMigration("ALTER"); err != nil {
+			if err := c.genericMigration("ALTER", true); err != nil {
 				return err
 			}
 		default:

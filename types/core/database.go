@@ -37,8 +37,8 @@ func Select() (*Core, error) {
 func (c *Core) Create() error {
 	c.ApiKey = c.ApiKey
 	c.ApiSecret = c.ApiSecret
-	apiKey := utils.Getenv("API_KEY", utils.NewSHA1Hash(40)).(string)
-	apiSecret := utils.Getenv("API_SECRET", utils.NewSHA1Hash(40)).(string)
+	apiKey := utils.Getenv("API_KEY", utils.NewSHA256Hash()).(string)
+	apiSecret := utils.Getenv("API_SECRET", utils.NewSHA256Hash()).(string)
 
 	if c.ApiKey == "" || c.ApiSecret == "" {
 		c.ApiSecret = apiSecret

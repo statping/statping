@@ -85,6 +85,9 @@ func (d *DbConfig) DropDatabase() error {
 }
 
 func (d *DbConfig) Close() {
+	if d == nil {
+		return
+	}
 	if d.Db != nil {
 		d.Db.Close()
 	}

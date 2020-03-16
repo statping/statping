@@ -72,10 +72,10 @@ docker-vue:
 docker-test:
 	docker-compose -f docker-compose.test.yml up --remove-orphans
 
-push-base: docker-base
+push-base: clean compile docker-base
 	docker push statping/statping:base
 
-push-vue: clean docker-base docker-vue
+push-vue: clean compile docker-base docker-vue
 	docker push statping/statping:base
 	docker push statping/statping:vue
 

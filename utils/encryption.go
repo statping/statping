@@ -16,7 +16,7 @@
 package utils
 
 import (
-	"crypto/sha1"
+	"crypto/sha256"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"math/rand"
@@ -30,16 +30,13 @@ func HashPassword(password string) string {
 }
 
 // NewSHA1Hash returns a random SHA1 hash based on a specific length
-func NewSHA1Hash(n ...int) string {
-	noRandomCharacters := 32
-	if len(n) > 0 {
-		noRandomCharacters = n[0]
+func NewSHA256Hash() string {
+	d := make([]byte, 10)
+	rand.Seed(Now().UnixNano())
+	if _, err := rand.Read(d); err == nil {
+		fmt.Printf("%x", sha256.Sum256(d))
 	}
-	randString := RandomString(noRandomCharacters)
-	hash := sha1.New()
-	hash.Write([]byte(randString))
-	bs := hash.Sum(nil)
-	return fmt.Sprintf("%x", bs)
+	return fmt.Sprintf("%x", d)
 }
 
 var characterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")

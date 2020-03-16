@@ -99,6 +99,10 @@ func apiThemeSaveHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
+	if err := source.SaveAsset([]byte(themes.Base), "scss/main.scss"); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
 	if err := source.SaveAsset([]byte(themes.Variables), "scss/variables.scss"); err != nil {
 		sendErrorJson(err, w, r)
 		return

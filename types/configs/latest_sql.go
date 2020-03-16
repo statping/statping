@@ -12,14 +12,18 @@ func init() {
 	os.Setenv("MIGRATION_ID", utils.ToString(latestMigration))
 }
 
-func (c *DbConfig) genericMigration(alterStr string) error {
-	if err := c.Db.Exec(fmt.Sprintf("ALTER TABLE hits %s COLUMN latency TYPE BIGINT;", alterStr)).Error(); err != nil {
+func (c *DbConfig) genericMigration(alterStr string, isPostgres bool) error {
+	var extra string
+	if isPostgres {
+		extra = " TYPE"
+	}
+	if err := c.Db.Exec(fmt.Sprintf("ALTER TABLE hits %s COLUMN latency%s BIGINT;", alterStr, extra)).Error(); err != nil {
 		return err
 	}
-	if err := c.Db.Exec(fmt.Sprintf("ALTER TABLE hits %s COLUMN ping_time TYPE BIGINT;", alterStr)).Error(); err != nil {
+	if err := c.Db.Exec(fmt.Sprintf("ALTER TABLE hits %s COLUMN ping_time%s BIGINT;", alterStr, extra)).Error(); err != nil {
 		return err
 	}
-	if err := c.Db.Exec(fmt.Sprintf("ALTER TABLE failures %s COLUMN latency TYPE BIGINT;", alterStr)).Error(); err != nil {
+	if err := c.Db.Exec(fmt.Sprintf("ALTER TABLE failures %s COLUMN latency%s BIGINT;", alterStr, extra)).Error(); err != nil {
 		return err
 	}
 	if err := c.Db.Exec("UPDATE hits SET latency = CAST(latency * 1000000 AS bigint);").Error(); err != nil {
