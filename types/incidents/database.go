@@ -12,16 +12,16 @@ func SetDB(database database.Database) {
 	dbUpdate = database.Model(&IncidentUpdate{})
 }
 
+func FindUpdate(uid int64) (*IncidentUpdate, error) {
+	var update IncidentUpdate
+	q := dbUpdate.Where("id = ?", uid).Find(&update)
+	return &update, q.Error()
+}
+
 func Find(id int64) (*Incident, error) {
 	var incident Incident
 	q := db.Where("id = ?", id).Find(&incident)
 	return &incident, q.Error()
-}
-
-func FindUpdate(id int64) (*IncidentUpdate, error) {
-	var update IncidentUpdate
-	q := dbUpdate.Where("id = ?", id).Find(&update)
-	return &update, q.Error()
 }
 
 func FindByService(id int64) []*Incident {

@@ -76,20 +76,26 @@
     }
   },
       async mounted () {
-          this.incidents = await Api.incidents_service(this.service)
+          await this.loadIncidents()
       },
       methods: {
+    async loadIncidents() {
+      this.incidents = await Api.incidents_service(this.service)
+    },
           async createIncident() {
-              await Api.incident_create(this.incident)
-              const incidents = await Api.incidents()
-              this.$store.commit('setIncidents', incidents)
-              this.incident = {}
+              await Api.incident_create(this.service, this.incident)
+            await this.loadIncidents()
+            this.incident = {
+                title: "",
+              description: "",
+              service: this.service.id,
+            }
           },
           async deleteIncident(incident) {
               let c = confirm(`Are you sure you want to delete '${incident.title}'?`)
               if (c) {
                   await Api.incident_delete(incident)
-                  this.incidents = await Api.incidents_service(this.service)
+                await this.loadIncidents()
               }
           }
   }

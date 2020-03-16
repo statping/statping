@@ -71,21 +71,29 @@
   },
   data () {
     return {
-      updates: this.incident.updates,
+      updates: [],
         incident_update: {
-            incident: this.incident,
+            incident: this.incident.id,
             message: "",
             type: ""
         }
     }
   },
       async mounted () {
-          this.updates = await Api.incident_updates(this.incident)
+          await this.loadUpdates()
       },
       methods: {
-          async createIncidentUpdate(incident) {
-              await Api.incident_update_create(incident, this.incident_update)
-              const updates = await Api.incident_updates()
+            async loadUpdates() {
+              this.updates = await Api.incident_updates(this.incident)
+            },
+          async createIncidentUpdate() {
+              await Api.incident_update_create(this.incident, this.incident_update)
+                await this.loadUpdates()
+                this.incident_update = {
+                  incident: this.incident.id,
+                  message: "",
+                  type: ""
+                }
           }
   }
 }

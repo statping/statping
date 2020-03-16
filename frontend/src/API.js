@@ -101,6 +101,10 @@ class Api {
     return axios.delete('/api/users/' + id).then(response => (response.data))
   }
 
+  async incident_updates(incident) {
+    return axios.post('/api/incidents/'+incident.id+'/updates', data).then(response => (response.data))
+  }
+
     async incident_update_create(incident, data) {
         return axios.post('/api/incidents/'+incident.id+'/updates', data).then(response => (response.data))
     }
@@ -109,8 +113,8 @@ class Api {
         return axios.get('/api/services/'+service.id+'/incidents').then(response => (response.data))
     }
 
-    async incident_create(data) {
-        return axios.post('/api/incidents', data).then(response => (response.data))
+    async incident_create(service, data) {
+        return axios.post('/api/services/'+service.id+'/incidents', data).then(response => (response.data))
     }
 
     async incident_delete(incident) {

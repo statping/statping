@@ -19,6 +19,16 @@ func apiServiceIncidentsHandler(w http.ResponseWriter, r *http.Request) {
 	returnJson(incids, w, r)
 }
 
+func apiIncidentUpdatesHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	incid, err := incidents.Find(utils.ToInt(vars["id"]))
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	returnJson(incid.Updates(), w, r)
+}
+
 func apiCreateIncidentUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var update *incidents.IncidentUpdate
