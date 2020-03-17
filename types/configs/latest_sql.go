@@ -23,7 +23,7 @@ func (c *DbConfig) genericMigration(alterStr string, isPostgres bool) error {
 	if err := c.Db.Exec(fmt.Sprintf("ALTER TABLE hits %s COLUMN ping_time%s BIGINT;", alterStr, extra)).Error(); err != nil {
 		return err
 	}
-	if err := c.Db.Exec(fmt.Sprintf("ALTER TABLE failures %s COLUMN latency%s BIGINT;", alterStr, extra)).Error(); err != nil {
+	if err := c.Db.Exec(fmt.Sprintf("ALTER TABLE failures %s COLUMN ping_time%s BIGINT;", alterStr, extra)).Error(); err != nil {
 		return err
 	}
 	if err := c.Db.Exec("UPDATE hits SET latency = CAST(latency * 1000000 AS bigint);").Error(); err != nil {
