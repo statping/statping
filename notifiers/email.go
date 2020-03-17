@@ -127,6 +127,7 @@ var email = &emailer{&notifications.Notification{
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "far fa-envelope",
+	Limits:      30,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "SMTP Host",

@@ -55,6 +55,7 @@ var slacker = &slack{&notifications.Notification{
 	Delay:       time.Duration(10 * time.Second),
 	Host:        "https://webhooksurl.slack.com/***",
 	Icon:        "fab fa-slack",
+	Limits:      60,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Incoming webhooker Url",
@@ -118,9 +119,5 @@ func (u *slack) OnSuccess(s *services.Service) error {
 		Time:     utils.Now().Unix(),
 	}
 	msg := parseSlackMessage(s.Id, successTemplate, message)
-
-	fmt.Println("Sending OnSuccess message!")
-	fmt.Println(msg)
-	fmt.Printf("%s\n", u.Host)
 	return u.sendSlack(msg)
 }

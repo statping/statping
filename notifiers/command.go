@@ -44,6 +44,7 @@ var Command = &commandLine{&notifications.Notification{
 	Delay:       time.Duration(1 * time.Second),
 	Icon:        "fas fa-terminal",
 	Host:        "/bin/bash",
+	Limits:      60,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Shell or Bash",
@@ -72,14 +73,14 @@ func runCommand(app string, cmd ...string) (string, string, error) {
 
 // OnFailure for commandLine will trigger failing service
 func (u *commandLine) OnFailure(s *services.Service, f *failures.Failure) error {
-	msg := u.GetValue("host")
+	msg := u.GetValue("var2")
 	_, _, err := runCommand(u.Host, msg)
 	return err
 }
 
 // OnSuccess for commandLine will trigger successful service
 func (u *commandLine) OnSuccess(s *services.Service) error {
-	msg := u.GetValue("host")
+	msg := u.GetValue("var1")
 	_, _, err := runCommand(u.Host, msg)
 	return err
 }

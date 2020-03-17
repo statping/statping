@@ -53,7 +53,7 @@ class Api {
   }
 
   async service_failures(id, start, end, limit = 999, offset = 0) {
-    return axios.get('/api/services/' + id + '/failures?start=' + start + '&end=' + end + '&limit=' + limit).then(response => (response.data))
+    return axios.get('/api/services/' + id + '/failures?start=' + start + '&end=' + end + '&limit=' + limit+ '&offset=' + offset).then(response => (response.data))
   }
 
   async service_delete(id) {

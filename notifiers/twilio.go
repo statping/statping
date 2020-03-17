@@ -47,6 +47,7 @@ var Twilio = &twilio{&notifications.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "far fa-comment-alt",
 	Delay:       time.Duration(10 * time.Second),
+	Limits:      15,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Account SID",

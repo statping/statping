@@ -48,6 +48,7 @@ var Mobile = &mobilePush{&notifications.Notification{
 	AuthorUrl: "https://github.com/hunterlong",
 	Delay:     time.Duration(5 * time.Second),
 	Icon:      "fas fa-mobile-alt",
+	Limits:    30,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Device Identifiers",

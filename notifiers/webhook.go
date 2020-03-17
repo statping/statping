@@ -47,6 +47,7 @@ var Webhook = &webhooker{&notifications.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "fas fa-code-branch",
 	Delay:       time.Duration(1 * time.Second),
+	Limits:      180,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "HTTP Endpoint",

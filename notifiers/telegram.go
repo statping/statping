@@ -47,6 +47,7 @@ var Telegram = &telegram{&notifications.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "fab fa-telegram-plane",
 	Delay:       time.Duration(5 * time.Second),
+	Limits:      60,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Telegram API Token",

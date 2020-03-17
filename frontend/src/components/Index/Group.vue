@@ -8,6 +8,7 @@
                 <span class="badge float-right" :class="{'bg-success': service.online, 'bg-danger': !service.online }">{{service.online ? "ONLINE" : "OFFLINE"}}</span>
 
                 <GroupServiceFailures :service="service"/>
+
             </a>
 
         </div>

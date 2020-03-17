@@ -9,19 +9,19 @@
             <p class="mb-1">{{failure.issue}}</p>
         </div>
 
-        <nav aria-label="page navigation example">
-            <ul class="pagination">
-                <li class="page-item">
-                    <a class="page-link" href="#" aria-label="Previous">
+        <nav v-if="total > 4" aria-label="page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" :class="{'disabled': page===1}">
+                    <a @click.prevent="gotoPage(page-1)" :disabled="page===1" class="page-link" href="#" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                         <span class="sr-only">Previous</span>
                     </a>
                 </li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#" aria-label="Next">
+                <li v-for="n in Math.floor(total / limit)" class="page-item" :class="{'active': page === n}">
+                    <a @click.prevent="gotoPage(n)" class="page-link" href="#">{{n}}</a>
+                </li>
+                <li class="page-item" :class="{'disabled': page===Math.floor(total / limit)}">
+                    <a @click.prevent="gotoPage(page+1)" :disabled="page===Math.floor(total / limit)" class="page-link" href="#" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                         <span class="sr-only">Next</span>
                     </a>
@@ -47,15 +47,25 @@ export default {
     data () {
         return {
             failures: [],
-            limit: 15,
+            limit: 4,
             offset: 0,
-            total: this.service.stats.failures
+            total: this.service.stats.failures,
+            page: 1
         }
     },
     async mounted () {
-      this.failures = await Api.service_failures(this.service.id, this.now(), this.now(), this.limit, this.offset)
+        await this.gotoPage(1)
     },
     methods: {
+        async gotoPage(page) {
+            this.page = page;
+
+            this.offset = (page-1) * this.limit;
+
+            window.console.log('page', this.page, this.limit, this.offset);
+
+            this.failures = await Api.service_failures(this.service.id, 0, 9999999999, this.limit, this.offset)
+        },
         smallText(s) {
             if (s.online) {
                 return `Online, last checked ${this.ago(s.last_success)}`

@@ -30,7 +30,7 @@ func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 	notifiers := services.AllNotifiers()
 	var notifs []*notifications.Notification
 	for _, n := range notifiers {
-		notifs = append(notifs, n.Select())
+		notifs = append(notifs, notifications.SelectNotifier(n.Select()))
 	}
 	returnJson(notifs, w, r)
 }

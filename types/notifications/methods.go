@@ -38,6 +38,22 @@ func (n *Notification) LastSent() time.Duration {
 	return since
 }
 
+func SelectNotifier(n *Notification) *Notification {
+	notif, err := Find(n.Method)
+	if err != nil {
+		log.Errorln(err)
+		return n
+	}
+	n.Host = notif.Host
+	n.Username = notif.Username
+	n.Password = notif.Password
+	n.ApiSecret = notif.ApiSecret
+	n.ApiKey = notif.ApiKey
+	n.Var1 = notif.Var1
+	n.Host = notif.Var2
+	return n
+}
+
 func (n *Notification) CanSend() bool {
 	if !n.Enabled.Bool {
 		return false

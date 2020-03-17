@@ -44,6 +44,7 @@ var Discorder = &discord{&notifications.Notification{
 	Delay:       time.Duration(5 * time.Second),
 	Host:        "https://discordapp.com/api/webhooks/****/*****",
 	Icon:        "fab fa-discord",
+	Limits:      60,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "discord webhooker URL",

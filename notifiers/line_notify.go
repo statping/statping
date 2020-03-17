@@ -48,6 +48,7 @@ var LineNotify = &lineNotifier{&notifications.Notification{
 	Author:      "Kanin Peanviriyakulkit",
 	AuthorUrl:   "https://github.com/dogrocker",
 	Icon:        "far fa-bell",
+	Limits:      60,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Access Token",
