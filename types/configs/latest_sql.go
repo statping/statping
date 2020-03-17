@@ -14,8 +14,10 @@ func init() {
 
 func (c *DbConfig) genericMigration(alterStr string, isPostgres bool) error {
 	var extra string
+	extraType := "UNSIGNED INTEGER"
 	if isPostgres {
 		extra = " TYPE"
+		extraType = "bigint"
 	}
 	if err := c.Db.Exec(fmt.Sprintf("ALTER TABLE hits %s COLUMN latency%s BIGINT;", alterStr, extra)).Error(); err != nil {
 		return err
@@ -26,13 +28,13 @@ func (c *DbConfig) genericMigration(alterStr string, isPostgres bool) error {
 	if err := c.Db.Exec(fmt.Sprintf("ALTER TABLE failures %s COLUMN ping_time%s BIGINT;", alterStr, extra)).Error(); err != nil {
 		return err
 	}
-	if err := c.Db.Exec("UPDATE hits SET latency = CAST(latency * 1000000 AS bigint);").Error(); err != nil {
+	if err := c.Db.Exec(fmt.Sprintf("UPDATE hits SET latency = CAST(latency * 1000000 AS %s);", extraType)).Error(); err != nil {
 		return err
 	}
-	if err := c.Db.Exec("UPDATE hits SET ping_time = CAST(ping_time * 1000000 AS bigint);").Error(); err != nil {
+	if err := c.Db.Exec(fmt.Sprintf("UPDATE hits SET ping_time = CAST(ping_time * 1000000 AS %s);", extraType)).Error(); err != nil {
 		return err
 	}
-	if err := c.Db.Exec("UPDATE failures SET ping_time = CAST(ping_time * 1000000 AS bigint);").Error(); err != nil {
+	if err := c.Db.Exec(fmt.Sprintf("UPDATE failures SET ping_time = CAST(ping_time * 1000000 AS %s);", extraType)).Error(); err != nil {
 		return err
 	}
 	return nil
