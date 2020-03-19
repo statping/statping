@@ -36,6 +36,7 @@ branches:
 install:
 - npm install -g sass
 - npm install -g newman
+- npm install -g cross-env
 - pip install --user awscli
 - go mod download
 - make install
