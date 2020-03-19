@@ -36,7 +36,7 @@ branches:
 before_install:
   - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install stable
   - nvm install 10.17.0
-  - nvm use 10.17.0
+  - nvm use 10.17.0 --default
 install:
   - npm install -g sass
   - npm install -g newman
