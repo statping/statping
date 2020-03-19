@@ -77,7 +77,7 @@ var fail2 = &failures.Failure{
 	CreatedAt: utils.Now().Add(-5 * time.Second),
 }
 
-func TestInit(t *testing.T) {
+func TestServices(t *testing.T) {
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&Service{}, &hits.Hit{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &failures.Failure{})
@@ -92,201 +92,186 @@ func TestInit(t *testing.T) {
 	failures.SetDB(db)
 	hits.SetDB(db)
 	SetDB(db)
-}
 
-func TestFind(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
-	assert.Equal(t, "Example Service", item.Name)
-	assert.NotZero(t, item.LastOnline)
-	assert.NotZero(t, item.LastOffline)
-	assert.NotZero(t, item.LastCheck)
-}
+	t.Run("Test Find service", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
+		assert.Equal(t, "Example Service", item.Name)
+		assert.NotZero(t, item.LastOnline)
+		assert.NotZero(t, item.LastOffline)
+		assert.NotZero(t, item.LastCheck)
+	})
 
-func TestAll(t *testing.T) {
-	items := All()
-	assert.Len(t, items, 1)
-}
+	t.Run("Test All", func(t *testing.T) {
+		items := All()
+		assert.Len(t, items, 1)
+	})
 
-func TestService_Checkins(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
-	assert.Len(t, item.Checkins(), 1)
-}
+	t.Run("Test Checkins", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
+		assert.Len(t, item.Checkins(), 1)
+	})
 
-func TestService_AllHits(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
-	assert.Len(t, item.AllHits().List(), 3)
-	assert.Equal(t, 3, item.AllHits().Count())
-}
+	t.Run("Test All Hits", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
+		assert.Len(t, item.AllHits().List(), 3)
+		assert.Equal(t, 3, item.AllHits().Count())
+	})
 
-func TestService_AllFailures(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
-	assert.Len(t, item.AllFailures().List(), 2)
-	assert.Equal(t, 2, item.AllFailures().Count())
-}
+	t.Run("Test All Failures", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
+		assert.Len(t, item.AllFailures().List(), 2)
+		assert.Equal(t, 2, item.AllFailures().Count())
+	})
 
-func TestService_FirstHit(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
-	hit := item.FirstHit()
-	assert.Equal(t, int64(1), hit.Id)
-}
+	t.Run("Test First Hit", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
+		hit := item.FirstHit()
+		assert.Equal(t, int64(1), hit.Id)
+	})
 
-func TestService_LastHit(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
-	hit := item.AllHits().Last()
-	assert.Equal(t, int64(3), hit.Id)
-}
+	t.Run("Test Last Hit", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
+		hit := item.AllHits().Last()
+		assert.Equal(t, int64(3), hit.Id)
+	})
 
-func TestService_LastFailure(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
-	fail := item.AllFailures().Last()
-	assert.Equal(t, int64(2), fail.Id)
-}
+	t.Run("Test Last Failure", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
+		fail := item.AllFailures().Last()
+		assert.Equal(t, int64(2), fail.Id)
+	})
 
-func TestService_Duration(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
-	assert.Equal(t, float64(30), item.Duration().Seconds())
-}
+	t.Run("Test Duration", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
+		assert.Equal(t, float64(30), item.Duration().Seconds())
+	})
 
-func TestService_CountHits(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
-	count := item.AllHits().Count()
-	assert.NotZero(t, count)
-}
+	t.Run("Test Count Hits", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
+		count := item.AllHits().Count()
+		assert.NotZero(t, count)
+	})
 
-func TestService_AvgTime(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
+	t.Run("Test Average Time", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
 
-	assert.Equal(t, int64(123456), item.AvgTime())
-}
+		assert.Equal(t, int64(123456), item.AvgTime())
+	})
 
-func TestService_HitsSince(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
+	t.Run("Test Hits Since", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
 
-	count := item.HitsSince(utils.Now().Add(-30 * time.Second))
-	assert.Equal(t, 1, count.Count())
+		count := item.HitsSince(utils.Now().Add(-30 * time.Second))
+		assert.Equal(t, 1, count.Count())
 
-	count = item.HitsSince(utils.Now().Add(-180 * time.Second))
-	assert.Equal(t, 3, count.Count())
-}
+		count = item.HitsSince(utils.Now().Add(-180 * time.Second))
+		assert.Equal(t, 3, count.Count())
+	})
 
-func TestService_IsRunning(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
-	assert.False(t, item.IsRunning())
-}
+	t.Run("Test Service Running", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
+		assert.False(t, item.IsRunning())
+	})
 
-func TestService_OnlineDaysPercent(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
+	t.Run("Test Online Percent", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
 
-	amount := item.OnlineDaysPercent(1)
+		amount := item.OnlineDaysPercent(1)
 
-	assert.Equal(t, float32(33.33), amount)
-}
+		assert.Equal(t, float32(33.33), amount)
+	})
 
-func TestService_Downtime(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
-	amount := item.Downtime().Seconds()
-	assert.Equal(t, "25", fmt.Sprintf("%0.f", amount))
-}
+	t.Run("Test Downtime", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
+		amount := item.Downtime().Seconds()
+		assert.Equal(t, "25", fmt.Sprintf("%0.f", amount))
+	})
 
-func TestService_FailuresSince(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
+	t.Run("Test Failures Since", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
 
-	count := item.FailuresSince(utils.Now().Add(-6 * time.Second))
-	assert.Equal(t, 1, count.Count())
+		count := item.FailuresSince(utils.Now().Add(-6 * time.Second))
+		assert.Equal(t, 1, count.Count())
 
-	count = item.FailuresSince(utils.Now().Add(-180 * time.Second))
-	assert.Equal(t, 2, count.Count())
-}
+		count = item.FailuresSince(utils.Now().Add(-180 * time.Second))
+		assert.Equal(t, 2, count.Count())
+	})
 
-func TestCreate(t *testing.T) {
-	example := &Service{
-		Name:           "Example Service 2",
-		Domain:         "https://slack.statping.com",
-		ExpectedStatus: 200,
-		Interval:       10,
-		Type:           "http",
-		Method:         "GET",
-		Timeout:        5,
-		Order:          3,
-		VerifySSL:      null.NewNullBool(true),
-		Public:         null.NewNullBool(false),
-		GroupId:        1,
-		Permalink:      null.NewNullString("statping2"),
-	}
-	err := example.Create()
-	require.Nil(t, err)
-	assert.NotZero(t, example.Id)
-	assert.Equal(t, "Example Service 2", example.Name)
-	assert.False(t, example.Public.Bool)
-	assert.NotZero(t, example.CreatedAt)
-	assert.Equal(t, int64(2), example.Id)
-	assert.Len(t, allServices, 2)
-}
+	t.Run("Test Create", func(t *testing.T) {
+		example := &Service{
+			Name:           "Example Service 2",
+			Domain:         "https://slack.statping.com",
+			ExpectedStatus: 200,
+			Interval:       10,
+			Type:           "http",
+			Method:         "GET",
+			Timeout:        5,
+			Order:          3,
+			VerifySSL:      null.NewNullBool(true),
+			Public:         null.NewNullBool(false),
+			GroupId:        1,
+			Permalink:      null.NewNullString("statping2"),
+		}
+		err := example.Create()
+		require.Nil(t, err)
+		assert.NotZero(t, example.Id)
+		assert.Equal(t, "Example Service 2", example.Name)
+		assert.False(t, example.Public.Bool)
+		assert.NotZero(t, example.CreatedAt)
+		assert.Equal(t, int64(2), example.Id)
+		assert.Len(t, allServices, 2)
+	})
 
-func TestUpdate(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
-	item.Name = "Updated Service"
-	item.Order = 1
-	err = item.Update()
-	require.Nil(t, err)
-	assert.Equal(t, int64(1), item.Id)
-	assert.Equal(t, "Updated Service", item.Name)
-}
+	t.Run("Test Update Service", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
+		item.Name = "Updated Service"
+		item.Order = 1
+		err = item.Update()
+		require.Nil(t, err)
+		assert.Equal(t, int64(1), item.Id)
+		assert.Equal(t, "Updated Service", item.Name)
+	})
 
-func TestAllInOrder(t *testing.T) {
-	inOrder := AllInOrder()
-	assert.Len(t, inOrder, 2)
-	assert.Equal(t, "Updated Service", inOrder[0].Name)
-	assert.Equal(t, "Example Service 2", inOrder[1].Name)
-}
+	t.Run("Test In Order", func(t *testing.T) {
+		inOrder := AllInOrder()
+		assert.Len(t, inOrder, 2)
+		assert.Equal(t, "Updated Service", inOrder[0].Name)
+		assert.Equal(t, "Example Service 2", inOrder[1].Name)
+	})
 
-func TestDelete(t *testing.T) {
-	all := All()
-	assert.Len(t, all, 2)
+	t.Run("Test Delete", func(t *testing.T) {
+		all := All()
+		assert.Len(t, all, 2)
 
-	item, err := Find(1)
-	require.Nil(t, err)
-	assert.Equal(t, int64(1), item.Id)
+		item, err := Find(1)
+		require.Nil(t, err)
+		assert.Equal(t, int64(1), item.Id)
 
-	err = item.Delete()
-	require.Nil(t, err)
+		err = item.Delete()
+		require.Nil(t, err)
 
-	all = All()
-	assert.Len(t, all, 1)
-}
+		all = All()
+		assert.Len(t, all, 1)
+	})
 
-func TestService_CheckService(t *testing.T) {
-	item, err := Find(2)
-	require.Nil(t, err)
+	t.Run("Test Close", func(t *testing.T) {
+		assert.Nil(t, db.Close())
+	})
 
-	hitsCount := item.AllHits().Count()
-	failsCount := item.AllFailures().Count()
-
-	assert.Equal(t, 3, hitsCount)
-	assert.Equal(t, 2, failsCount)
-
-	item.CheckService(true)
-
-	assert.Equal(t, 4, hitsCount)
-	assert.Equal(t, 2, failsCount)
-}
-
-func TestClose(t *testing.T) {
-	assert.Nil(t, db.Close())
 }

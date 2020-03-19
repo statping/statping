@@ -59,9 +59,9 @@ func (n *Notification) CanSend() bool {
 		return false
 	}
 
-	fmt.Println("Last sent: ", n.lastSent.String())
-	fmt.Println("Last count: ", n.lastSentCount)
-	fmt.Println("Last sent before now: ", n.lastSent.Add(60*time.Second).Before(utils.Now()))
+	//fmt.Println("Last sent: ", n.lastSent.String())
+	//fmt.Println("Last count: ", n.lastSentCount)
+	//fmt.Println("Last sent before now: ", n.lastSent.Add(60*time.Second).Before(utils.Now()))
 
 	// the last sent notification was past 1 minute (limit per minute)
 	if n.lastSent.Add(60 * time.Second).Before(utils.Now()) {

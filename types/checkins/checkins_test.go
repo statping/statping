@@ -45,73 +45,74 @@ func TestInit(t *testing.T) {
 	assert.True(t, db.HasTable(&CheckinHit{}))
 	assert.True(t, db.HasTable(&failures.Failure{}))
 	SetDB(db)
-}
 
-func TestFind(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
-	assert.Equal(t, "Test Checkin", item.Name)
-	assert.NotEmpty(t, item.ApiKey)
-	testApiKey = item.ApiKey
-}
+	t.Run("Test Checkin", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
+		assert.Equal(t, "Test Checkin", item.Name)
+		assert.NotEmpty(t, item.ApiKey)
+		testApiKey = item.ApiKey
+	})
 
-func TestFindByAPI(t *testing.T) {
-	item, err := FindByAPI(testApiKey)
-	require.Nil(t, err)
-	assert.Equal(t, "Test Checkin", item.Name)
-}
+	t.Run("Test FindByAPI", func(t *testing.T) {
+		item, err := FindByAPI(testApiKey)
+		require.Nil(t, err)
+		assert.Equal(t, "Test Checkin", item.Name)
+	})
 
-func TestAll(t *testing.T) {
-	items := All()
-	assert.Len(t, items, 1)
-}
+	t.Run("Test All", func(t *testing.T) {
+		items := All()
+		assert.Len(t, items, 1)
+	})
 
-func TestCreate(t *testing.T) {
-	example := &Checkin{
-		Name: "Example 2",
-	}
-	err := example.Create()
-	example.Close()
-	require.Nil(t, err)
-	assert.NotZero(t, example.Id)
-	assert.Equal(t, "Example 2", example.Name)
-	assert.NotZero(t, example.CreatedAt)
-	assert.NotEmpty(t, example.ApiKey)
-}
+	t.Run("Test Create", func(t *testing.T) {
+		example := &Checkin{
+			Name: "Example 2",
+		}
+		err := example.Create()
+		example.Close()
+		require.Nil(t, err)
+		assert.NotZero(t, example.Id)
+		assert.Equal(t, "Example 2", example.Name)
+		assert.NotZero(t, example.CreatedAt)
+		assert.NotEmpty(t, example.ApiKey)
+	})
 
-func TestUpdate(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
-	item.Name = "Updated"
+	t.Run("Test Update", func(t *testing.T) {
+		i, err := Find(1)
+		require.Nil(t, err)
+		i.Name = "Updated"
 
-	err = item.Update()
-	require.Nil(t, err)
-	assert.Equal(t, "Updated", item.Name)
-	item.Close()
-}
+		err = i.Update()
+		require.Nil(t, err)
+		assert.Equal(t, "Updated", i.Name)
+		i.Close()
+	})
 
-func TestCheckin_Expected(t *testing.T) {
-	item, err := Find(1)
-	require.Nil(t, err)
+	t.Run("Test Expected Time", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
 
-	expected := item.Expected()
-	assert.GreaterOrEqual(t, expected.Seconds(), float64(29))
-}
+		expected := item.Expected()
+		assert.GreaterOrEqual(t, expected.Seconds(), float64(29))
+	})
 
-func TestDelete(t *testing.T) {
-	all := All()
-	assert.Len(t, all, 2)
+	t.Run("Test Delete", func(t *testing.T) {
+		all := All()
+		assert.Len(t, all, 2)
 
-	item, err := Find(2)
-	require.Nil(t, err)
+		item, err := Find(2)
+		require.Nil(t, err)
 
-	err = item.Delete()
-	require.Nil(t, err)
+		err = item.Delete()
+		require.Nil(t, err)
 
-	all = All()
-	assert.Len(t, all, 1)
-}
+		all = All()
+		assert.Len(t, all, 1)
+	})
 
-func TestClose(t *testing.T) {
-	assert.Nil(t, db.Close())
+	t.Run("Test Checkin", func(t *testing.T) {
+		assert.Nil(t, db.Close())
+	})
+
 }

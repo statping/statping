@@ -24,7 +24,6 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"time"
 )
 
 //
@@ -61,7 +60,7 @@ func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 		prefix = prefix + "_"
 	}
 
-	secondsOnline := time.Now().Sub(utils.StartTime).Seconds()
+	secondsOnline := utils.Now().Sub(utils.StartTime).Seconds()
 	allFails := failures.All()
 
 	var m runtime.MemStats
@@ -105,19 +104,19 @@ func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 
 	for _, n := range services.AllNotifiers() {
 		notif := n.Select()
-		PrometheusComment(fmt.Sprintf("Notifier %s:", notif.Method))
 		if notif.Enabled.Bool {
-			PrometheusExportKey("notifier_on_success", notif.Id, notif.Method, notif.Hits.OnSuccess)
-			PrometheusExportKey("notifier_on_failure", notif.Id, notif.Method, notif.Hits.OnFailure)
-			PrometheusExportKey("notifier_on_user_new", notif.Id, notif.Method, notif.Hits.OnNewUser)
-			PrometheusExportKey("notifier_on_user_update", notif.Id, notif.Method, notif.Hits.OnUpdatedUser)
-			PrometheusExportKey("notifier_on_user_delete", notif.Id, notif.Method, notif.Hits.OnDeletedUser)
-			PrometheusExportKey("notifier_on_service_new", notif.Id, notif.Method, notif.Hits.OnNewService)
-			PrometheusExportKey("notifier_on_service_update", notif.Id, notif.Method, notif.Hits.OnUpdatedService)
-			PrometheusExportKey("notifier_on_service_delete", notif.Id, notif.Method, notif.Hits.OnDeletedService)
-			PrometheusExportKey("notifier_on_notifier_new", notif.Id, notif.Method, notif.Hits.OnNewNotifier)
-			PrometheusExportKey("notifier_on_notifier_update", notif.Id, notif.Method, notif.Hits.OnUpdatedNotifier)
-			PrometheusExportKey("notifier_on_notifier_save", notif.Id, notif.Method, notif.Hits.OnSave)
+			PrometheusComment(fmt.Sprintf("Notifier %s:", notif.Method))
+			PrometheusNoIDExportKey("notifier_on_success", notif.Method, notif.Hits.OnSuccess)
+			PrometheusNoIDExportKey("notifier_on_failure", notif.Method, notif.Hits.OnFailure)
+			PrometheusNoIDExportKey("notifier_on_user_new", notif.Method, notif.Hits.OnNewUser)
+			PrometheusNoIDExportKey("notifier_on_user_update", notif.Method, notif.Hits.OnUpdatedUser)
+			PrometheusNoIDExportKey("notifier_on_user_delete", notif.Method, notif.Hits.OnDeletedUser)
+			PrometheusNoIDExportKey("notifier_on_service_new", notif.Method, notif.Hits.OnNewService)
+			PrometheusNoIDExportKey("notifier_on_service_update", notif.Method, notif.Hits.OnUpdatedService)
+			PrometheusNoIDExportKey("notifier_on_service_delete", notif.Method, notif.Hits.OnDeletedService)
+			PrometheusNoIDExportKey("notifier_on_notifier_new", notif.Method, notif.Hits.OnNewNotifier)
+			PrometheusNoIDExportKey("notifier_on_notifier_update", notif.Method, notif.Hits.OnUpdatedNotifier)
+			PrometheusNoIDExportKey("notifier_on_notifier_save", notif.Method, notif.Hits.OnSave)
 		}
 	}
 
@@ -156,6 +155,12 @@ func PrometheusKeyValue(keyName string, value interface{}) {
 func PrometheusExportKey(keyName string, id int64, name string, value interface{}) {
 	val := promValue(value)
 	prom := fmt.Sprintf("%sstatping_%s{id=\"%d\" name=\"%s\"} %s", prefix, keyName, id, name, val)
+	promValues = append(promValues, prom)
+}
+
+func PrometheusNoIDExportKey(keyName string, name string, value interface{}) {
+	val := promValue(value)
+	prom := fmt.Sprintf("%sstatping_%s{name=\"%s\"} %s", prefix, keyName, name, val)
 	promValues = append(promValues, prom)
 }
 

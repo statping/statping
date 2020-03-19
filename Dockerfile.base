@@ -27,7 +27,7 @@ RUN go get github.com/stretchr/testify/assert && \
 	go get github.com/crazy-max/xgo
 COPY . .
 COPY --from=frontend /statping/dist/ ./source/dist/
-RUN make clean generate embed build
+RUN make clean frontend-copy generate embed build
 RUN chmod a+x statping && mv statping /go/bin/statping
 # /go/bin/statping - statping binary
 # /usr/local/bin/sass - sass binary

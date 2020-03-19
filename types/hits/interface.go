@@ -72,7 +72,14 @@ type IntResult struct {
 
 func (h Hitters) Avg() int64 {
 	var r IntResult
-	h.db.Select("CAST(AVG(latency) as INT) as amount").Scan(&r)
+	switch h.db.DbType() {
+	case "mysql":
+		h.db.Select("CAST(AVG(latency) as UNSIGNED INTEGER) as amount").Scan(&r)
+	case "postgres":
+		h.db.Select("CAST(AVG(latency) as bigint) as amount").Scan(&r)
+	default:
+		h.db.Select("CAST(AVG(latency) as INT) as amount").Scan(&r)
+	}
 	return r.Amount
 }
 

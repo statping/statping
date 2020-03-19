@@ -28,7 +28,17 @@ lite: clean
 reup: down clean compose-build-full up
 
 test: clean
-	go test -v -p=1 -ldflags="-X main.VERSION=dev" -coverprofile=coverage.out ./...
+	go test -v -p=4 -ldflags="-X main.VERSION=testing" -coverprofile=coverage.out ./...
+
+test-ci: clean compile test-deps
+	SASS=`which sass` STATPING_DIR=${GOPATH}/src/github.com/statping/statping go test -v -covermode=count -coverprofile=coverage.out -p=4 ./...
+	goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS
+	bash <(curl -s https://codecov.io/bash)
+
+test-deps:
+	go get golang.org/x/tools/cmd/cover
+	go get github.com/mattn/goveralls
+	go get github.com/GeertJohan/go.rice/rice
 
 yarn-serve:
 	cd frontend && yarn serve
@@ -89,6 +99,9 @@ frontend-build:
 	rm -rf source/dist && rm -rf frontend/dist
 	cd frontend && yarn build
 	cp -r frontend/dist source/ && cp -r frontend/src/assets/scss source/dist/
+	cp -r source/tmpl/*.* source/dist/
+
+frontend-copy:
 	cp -r source/tmpl/*.* source/dist/
 
 # compile assets using SASS and Rice. compiles scss -> css, and run rice embed-go

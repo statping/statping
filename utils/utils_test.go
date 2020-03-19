@@ -50,7 +50,6 @@ func TestDir(t *testing.T) {
 }
 
 func TestCommand(t *testing.T) {
-	t.SkipNow()
 	in, out, err := Command("pwd")
 	assert.Nil(t, err)
 	assert.Contains(t, in, "statping")
@@ -153,7 +152,11 @@ func TestHashPassword(t *testing.T) {
 }
 
 func TestNewSHA1Hash(t *testing.T) {
-	assert.NotEmpty(t, NewSHA1Hash(5))
+	hash := NewSHA256Hash()
+	assert.NotEmpty(t, hash)
+	assert.Len(t, hash, 64)
+	assert.Len(t, NewSHA256Hash(), 64)
+	assert.NotEqual(t, hash, NewSHA256Hash())
 }
 
 func TestRandomString(t *testing.T) {

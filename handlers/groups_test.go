@@ -70,9 +70,20 @@ func TestGroupAPIRoutes(t *testing.T) {
 			BeforeTest:     SetTestENV,
 		},
 		{
+			Name:           "Statping Reorder Groups",
+			URL:            "/api/reorder/groups",
+			Method:         "POST",
+			Body:           `[{"group":1,"order":2},{"group":2,"order":1}]`,
+			ExpectedStatus: 200,
+			HttpHeaders:    []string{"Content-Type=application/json"},
+			BeforeTest:     SetTestENV,
+			SecureRoute:    true,
+		},
+		{
 			Name:           "Statping View Unknown Group",
 			URL:            "/api/groups/8383883838",
 			Method:         "GET",
+			BeforeTest:     SetTestENV,
 			ExpectedStatus: 404,
 		},
 		{
@@ -81,6 +92,7 @@ func TestGroupAPIRoutes(t *testing.T) {
 			Method:         "DELETE",
 			ExpectedStatus: 200,
 			AfterTest:      UnsetTestENV,
+			SecureRoute:    true,
 		}}
 
 	for _, v := range tests {

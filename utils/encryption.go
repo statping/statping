@@ -33,10 +33,8 @@ func HashPassword(password string) string {
 func NewSHA256Hash() string {
 	d := make([]byte, 10)
 	rand.Seed(Now().UnixNano())
-	if _, err := rand.Read(d); err == nil {
-		fmt.Printf("%x", sha256.Sum256(d))
-	}
-	return fmt.Sprintf("%x", d)
+	rand.Read(d)
+	return fmt.Sprintf("%x", sha256.Sum256(d))
 }
 
 var characterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")

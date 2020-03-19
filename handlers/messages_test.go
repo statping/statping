@@ -32,6 +32,7 @@ func TestMessagesApiRoutes(t *testing.T) {
 			ExpectedContains: []string{`"status":"success"`, `"type":"message"`, `"method":"create"`, `"title":"API Message"`},
 			BeforeTest:       SetTestENV,
 			AfterTest:        UnsetTestENV,
+			SecureRoute:      true,
 		},
 		{
 			Name:             "Statping View Message",
@@ -57,6 +58,7 @@ func TestMessagesApiRoutes(t *testing.T) {
 			ExpectedStatus:   200,
 			ExpectedContains: []string{`"status":"success"`, `"type":"message"`, `"method":"update"`},
 			BeforeTest:       SetTestENV,
+			SecureRoute:      true,
 		},
 		{
 			Name:             "Statping Delete Message",
@@ -65,6 +67,7 @@ func TestMessagesApiRoutes(t *testing.T) {
 			ExpectedStatus:   200,
 			ExpectedContains: []string{`"status":"success"`, `"method":"delete"`},
 			BeforeTest:       SetTestENV,
+			SecureRoute:      true,
 		}}
 
 	for _, v := range tests {

@@ -28,14 +28,6 @@ func TestApiCheckinRoutes(t *testing.T) {
 			ExpectedContains: []string{`"status":"success","type":"checkin","method":"create"`},
 			BeforeTest:       SetTestENV,
 			SecureRoute:      true,
-		},
-		{
-			Name:           "Statping Checkins Unauthorized",
-			URL:            "/api/checkins",
-			Method:         "GET",
-			ExpectedStatus: 401,
-			AfterTest:      SetTestENV,
-			SecureRoute:    true,
 		}}
 
 	for _, v := range tests {

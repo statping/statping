@@ -21,6 +21,7 @@ import (
 	"github.com/rendon/testcli"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"os"
 	"os/exec"
 	"testing"
@@ -109,8 +110,17 @@ func TestAssetsCommand(t *testing.T) {
 	t.Log(c.Stdout())
 	t.Log("Directory for Assets: ", dir)
 	time.Sleep(1 * time.Second)
+	err := utils.DeleteDirectory(dir + "/assets")
+	require.Nil(t, err)
 	assert.FileExists(t, dir+"/assets/robots.txt")
 	assert.FileExists(t, dir+"/assets/scss/base.scss")
+	assert.FileExists(t, dir+"/assets/scss/main.scss")
+	assert.FileExists(t, dir+"/assets/scss/variables.scss")
+	assert.FileExists(t, dir+"/assets/css/main.css")
+	assert.FileExists(t, dir+"/assets/css/vendor.css")
+	assert.FileExists(t, dir+"/assets/css/style.css")
+	err = utils.DeleteDirectory(dir + "/assets")
+	require.Nil(t, err)
 }
 
 func TestRunCommand(t *testing.T) {

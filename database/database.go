@@ -2,7 +2,9 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/jinzhu/gorm"
+	"github.com/statping/statping/utils"
 	"strings"
 	"time"
 
@@ -178,7 +180,8 @@ func Openw(dialect string, args ...interface{}) (db Database, err error) {
 }
 
 func OpenTester() (Database, error) {
-	newDb, err := Openw("sqlite3", ":memory:?cache=shared")
+	newDb, err := Openw("sqlite3", fmt.Sprintf("file:%s?mode=memory&cache=shared", utils.RandomString(12)))
+	newDb.DB().SetMaxOpenConns(1)
 	return newDb, err
 }
 
