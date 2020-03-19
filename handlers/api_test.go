@@ -273,7 +273,7 @@ func RunHTTPTest(test HTTPTest, t *testing.T) (string, *testing.T, error) {
 }
 
 func Request(test HTTPTest) (*httptest.ResponseRecorder, error) {
-	req, err := http.NewRequest(test.Method, serverDomain+test.URL, strings.NewReader(test.Body))
+	req, err := http.NewRequest(test.Method, test.URL, strings.NewReader(test.Body))
 	if err != nil {
 		return nil, err
 	}

@@ -259,11 +259,6 @@ travis_s3_creds:
 	mkdir -p ~/.aws
 	echo "[default]\naws_access_key_id = ${AWS_ACCESS_KEY_ID}\naws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" > ~/.aws/credentials
 
-# build Statping using a travis ci trigger
-travis-build: travis_s3_creds upload_to_s3
-	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(TRAVIS_BUILD_CMD) https://api.travis-ci.com/repo/hunterlong%2Fstatping/requests
-	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
-
 sign-all:
 	gpg --default-key $SIGN_KEY --detach-sign --armor statpinger
 
