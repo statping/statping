@@ -1,7 +1,7 @@
 os:
-- linux
+  - linux
 language: go
-go: 1.13.5
+go: 1.14
 go_import_path: github.com/statping/statping
 cache:
   directories:
@@ -33,6 +33,10 @@ notifications:
 branches:
   only:
   - master
+before_install:
+  - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install stable
+  - nvm install 10.17.0
+  - nvm use 10.17.0
 install:
   - npm install -g sass
   - npm install -g newman
