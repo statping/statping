@@ -72,13 +72,6 @@
                     <input @keyup="canSubmit" v-model="setup.confirm_password" type="password" class="form-control" placeholder="password" required>
                 </div>
 
-                <div class="form-group">
-                  <span class="switch">
-                    <input @keyup="canSubmit" v-model="setup.sample_data" type="checkbox" class="switch" id="switch-normal">
-                    <label for="switch-normal">Load Sample Data</label>
-                  </span>
-                </div>
-
             </div>
 
             <div v-if="error" class="col-12 alert alert-danger">
