@@ -2,7 +2,7 @@ FROM statping/statping:base AS base
 
 # Statping main Docker image that contains all required libraries
 FROM alpine:latest
-RUN apk --no-cache add libgcc libstdc++ curl jq
+RUN apk --no-cache add libgcc libstdc++ ca-certificates curl jq && update-ca-certificates
 
 COPY --from=base /go/bin/statping /usr/local/bin/
 COPY --from=base /usr/local/bin/sass /usr/local/bin/

@@ -13,7 +13,8 @@ RUN yarn build && yarn cache clean
 FROM golang:1.14-alpine AS backend
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG VERSION
-RUN apk add --update --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers wget curl jq
+RUN apk add --update --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers wget curl jq && \
+    update-ca-certificates
 RUN curl -L -s https://assets.statping.com/sass -o /usr/local/bin/sass && \
     chmod +x /usr/local/bin/sass
 WORKDIR /go/src/github.com/statping/statping
