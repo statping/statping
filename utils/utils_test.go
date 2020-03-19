@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 )
@@ -165,4 +166,24 @@ func TestRandomString(t *testing.T) {
 
 func TestDeleteDirectory(t *testing.T) {
 	assert.Nil(t, DeleteDirectory(Directory+"/logs"))
+}
+
+func TestHttpRequest(t *testing.T) {
+		// Start a local HTTP server
+		server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			// Test request parameters
+			assert.Equal(t, req.URL.String(), "/")
+			assert.Equal(t, req.Header["Aaa"], []string{"bbbb="})
+			assert.Equal(t, req.Header["Ccc"], []string{"ddd"})
+			// Send response to be tested
+			rw.Write([]byte(`OK`))
+		}))
+		// Close the server when test finishes
+		defer server.Close()
+	
+		body, resp, err := HttpRequest(server.URL, "GET", "application/json", []string{"aaa=bbbb=", "ccc=ddd"}, nil, 2*time.Second)
+	
+		assert.Nil(t, err)
+		assert.Equal(t, []byte("OK"), body)	
+		assert.Equal(t, resp.StatusCode, 200)	
 }
