@@ -15,7 +15,6 @@ cache:
     - ~/.npm
     - ~/.cache
     - $GOPATH/src/github.com/statping/statping/frontend/node_modules
-    - $GOPATH/src/github.com/statping/statping/vendor
 env:
   global:
     - "PATH=$HOME/.local/bin:$PATH"
