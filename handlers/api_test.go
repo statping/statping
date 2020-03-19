@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	serverDomain = "http://localhost:8080"
+	serverDomain = "http://localhost:18888"
 )
 
 var (
