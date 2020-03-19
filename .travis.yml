@@ -48,7 +48,7 @@ before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
   - psql -c 'create database test;' -U postgres
 script:
-  - travis_retry make test-ci
+  - travis_retry make clean test-ci
   - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then
     make coverage; fi
 after_success:
