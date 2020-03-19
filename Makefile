@@ -21,7 +21,7 @@ down:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml down --volumes --remove-orphans
 
 lite: clean
-	docker build -t hunterlong/statping:dev -f dev/Dockerfile.dev .
+	docker build -t statping/statping:dev -f dev/Dockerfile.dev .
 	docker-compose -f dev/docker-compose.lite.yml down
 	docker-compose -f dev/docker-compose.lite.yml up --remove-orphans
 
@@ -206,8 +206,8 @@ build-alpine:
 
 # build :latest docker tag
 docker-build-latest:
-	docker build --build-arg VERSION=${VERSION} -t hunterlong/statping:latest --no-cache -f Dockerfile .
-	docker tag hunterlong/statping:latest hunterlong/statping:v${VERSION}
+	docker build --build-arg VERSION=${VERSION} -t statping/statping:latest --no-cache -f Dockerfile .
+	docker tag statping/statping:latest statping/statping:v${VERSION}
 
 # compress built binaries into tar.gz and zip formats
 compress: download-key
@@ -245,7 +245,7 @@ publish-dev:
 
 # update the homebrew application to latest for mac
 publish-homebrew:
-	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(PUBLISH_BODY) https://api.travis-ci.com/repo/hunterlong%2Fhomebrew-statping/requests
+	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(PUBLISH_BODY) https://api.travis-ci.com/repo/statping%2Fhomebrew-statping/requests
 
 upload_to_s3:
 	aws s3 cp ./source/css $(ASSETS_BKT) --recursive --exclude "*" --include "*.css"
