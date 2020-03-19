@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -16,18 +16,21 @@
 package main
 
 import (
-	"github.com/hunterlong/statping/utils"
-
 	"flag"
 	"fmt"
-	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/handlers"
-	"github.com/hunterlong/statping/plugin"
-	"github.com/hunterlong/statping/source"
-	"github.com/joho/godotenv"
+	"github.com/getsentry/sentry-go"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
+
+	"github.com/statping/statping/source"
+
+	"github.com/pkg/errors"
+	"github.com/statping/statping/handlers"
+	"github.com/statping/statping/types/configs"
+	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/utils"
 )
 
 var (
@@ -40,44 +43,55 @@ var (
 	verboseMode int
 	port        int
 	log         = utils.Log.WithField("type", "cmd")
+	httpServer  = make(chan bool)
+
+	confgs *configs.DbConfig
 )
 
 func init() {
-	core.VERSION = VERSION
+
 }
 
 // parseFlags will parse the application flags
 // -ip = 0.0.0.0 IP address for outgoing HTTP server
 // -port = 8080 Port number for outgoing HTTP server
+// environment variables WILL overwrite flags
 func parseFlags() {
-	flag.StringVar(&ipAddress, "ip", "0.0.0.0", "IP address to run the Statping HTTP server")
-	flag.StringVar(&envFile, "env", "", "IP address to run the Statping HTTP server")
-	flag.IntVar(&port, "port", 8080, "Port to run the HTTP server")
-	flag.IntVar(&verboseMode, "verbose", 2, "Run in verbose mode to see detailed logs (1 - 4)")
-	flag.Parse()
+	envPort := utils.Getenv("PORT", 8080).(int)
+	envIpAddress := utils.Getenv("IP", "0.0.0.0").(string)
+	envVerbose := utils.Getenv("VERBOSE", 2).(int)
 
-	if os.Getenv("PORT") != "" {
-		port = int(utils.ToInt(os.Getenv("PORT")))
-	}
-	if os.Getenv("IP") != "" {
-		ipAddress = os.Getenv("IP")
-	}
-	if os.Getenv("VERBOSE") != "" {
-		verboseMode = int(utils.ToInt(os.Getenv("VERBOSE")))
-	}
+	flag.StringVar(&ipAddress, "ip", envIpAddress, "IP address to run the Statping HTTP server")
+	flag.StringVar(&envFile, "env", "", "IP address to run the Statping HTTP server")
+	flag.IntVar(&port, "port", envPort, "Port to run the HTTP server")
+	flag.IntVar(&verboseMode, "verbose", envVerbose, "Run in verbose mode to see detailed logs (1 - 4)")
+	flag.Parse()
+}
+
+func exit(err error) {
+	sentry.CaptureException(err)
+	log.Fatalln(err)
+	Close()
+	os.Exit(2)
 }
 
 // main will run the Statping application
 func main() {
 	var err error
 	go sigterm()
+
 	parseFlags()
-	loadDotEnvs()
-	source.Assets()
+
+	if err := source.Assets(); err != nil {
+		exit(err)
+	}
+
 	utils.VerboseMode = verboseMode
+
 	if err := utils.InitLogs(); err != nil {
 		log.Errorf("Statping Log Error: %v\n", err)
 	}
+
 	args := flag.Args()
 
 	if len(args) >= 1 {
@@ -85,75 +99,143 @@ func main() {
 		if err != nil {
 			if err.Error() == "end" {
 				os.Exit(0)
+				return
 			}
-			fmt.Println(err)
-			os.Exit(1)
+			exit(err)
 		}
 	}
 	log.Info(fmt.Sprintf("Starting Statping v%v", VERSION))
-	updateDisplay()
 
-	configs, err := core.LoadConfigFile(utils.Directory)
-	if err != nil {
+	if err := updateDisplay(); err != nil {
+		log.Warnln(err)
+	}
+
+	errorEnv := utils.Getenv("GO_ENV", "production").(string)
+	if err := sentry.Init(sentry.ClientOptions{
+		Dsn:         errorReporter,
+		Environment: errorEnv,
+	}); err != nil {
 		log.Errorln(err)
-		core.SetupMode = true
-		writeAble, err := utils.DirWritable(utils.Directory)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		if !writeAble {
-			log.Fatalf("Statping does not have write permissions at: %v\nYou can change this directory by setting the STATPING_DIR environment variable to a dedicated path before starting.", utils.Directory)
-		}
-		if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
-			log.Fatalln(err)
+	}
+
+	confgs, err = configs.LoadConfigs()
+	if err != nil {
+		if err := SetupMode(); err != nil {
+			exit(err)
 		}
 	}
-	core.CoreApp.Config = configs
+
+	if err = configs.ConnectConfigs(confgs); err != nil {
+		exit(err)
+	}
+
+	exists := confgs.Db.HasTable("core")
+	if !exists {
+		var srvs int64
+		confgs.Db.Model(&services.Service{}).Count(&srvs)
+		if srvs > 0 {
+			exit(errors.Wrap(err, "there are already services setup."))
+		}
+
+		if err := confgs.DropDatabase(); err != nil {
+			exit(errors.Wrap(err, "error dropping database"))
+		}
+
+		if err := confgs.CreateDatabase(); err != nil {
+			exit(errors.Wrap(err, "error creating database"))
+		}
+
+		if err := configs.CreateAdminUser(confgs); err != nil {
+			exit(errors.Wrap(err, "error creating default admin user"))
+		}
+
+		if err := configs.TriggerSamples(); err != nil {
+			exit(errors.Wrap(err, "error creating database"))
+		}
+
+	}
+
+	if err = confgs.DatabaseChanges(); err != nil {
+		exit(err)
+	}
+
+	if err := confgs.MigrateDatabase(); err != nil {
+		exit(err)
+	}
+
+	//log.Infoln("Migrating Notifiers...")
+	//if err := notifier.Migrate(); err != nil {
+	//	exit(errors.Wrap(err, "error migrating notifiers"))
+	//}
+	//log.Infoln("Notifiers Migrated")
+
 	if err := mainProcess(); err != nil {
-		log.Fatalln(err)
+		exit(err)
 	}
 }
 
 // Close will gracefully stop the database connection, and log file
 func Close() {
-	core.CloseDB()
+	sentry.Flush(3 * time.Second)
 	utils.CloseLogs()
+	confgs.Close()
+}
+
+func SetupMode() error {
+	return handlers.RunHTTPServer(ipAddress, port)
 }
 
 // sigterm will attempt to close the database connections gracefully
 func sigterm() {
 	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	<-sigs
+	fmt.Println("Shutting down Statping")
 	Close()
 	os.Exit(1)
 }
 
-// loadDotEnvs attempts to load database configs from a '.env' file in root directory
-func loadDotEnvs() error {
-	err := godotenv.Load(envFile)
-	if err == nil {
-		log.Infoln("Environment file '.env' Loaded")
-	}
-	return err
-}
-
 // mainProcess will initialize the Statping application and run the HTTP server
 func mainProcess() error {
-	dir := utils.Directory
-	var err error
-	err = core.CoreApp.Connect(false, dir)
-	if err != nil {
-		log.Errorln(fmt.Sprintf("could not connect to database: %v", err))
+	if err := services.ServicesFromEnvFile(); err != nil {
+		errStr := "error 'SERVICE' environment variable"
+		log.Errorln(errStr)
+		return errors.Wrap(err, errStr)
+	}
+
+	if err := InitApp(); err != nil {
 		return err
 	}
-	core.CoreApp.MigrateDatabase()
-	core.InitApp()
-	if !core.SetupMode {
-		plugin.LoadPlugins()
-		if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
-			log.Fatalln(err)
+
+	if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
+		log.Fatalln(err)
+		return errors.Wrap(err, "http server")
+	}
+	return nil
+}
+
+func StartHTTPServer() {
+	httpServer = make(chan bool)
+	go httpServerProcess(httpServer)
+}
+
+func StopHTTPServer() {
+
+}
+
+func httpServerProcess(process <-chan bool) {
+	for {
+		select {
+		case <-process:
+			fmt.Println("HTTP Server has stopped")
+			return
+		default:
+			if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
+				log.Errorln(err)
+				exit(err)
+			}
 		}
 	}
-	return err
 }
+
+const errorReporter = "https://2bedd272821643e1b92c774d3fdf28e7@sentry.statping.com/2"

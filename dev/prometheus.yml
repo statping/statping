@@ -1,0 +1,34 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'statping_local'
+    scrape_interval: 15s
+    bearer_token: 'samplesecret'
+    static_configs:
+      - targets: ['docker0:8585']
+
+  - job_name: 'statping'
+    scrape_interval: 15s
+    bearer_token: 'exampleapisecret'
+    static_configs:
+      - targets: ['statping:8080']
+
+  - job_name: 'statping_mysql'
+    scrape_interval: 15s
+    bearer_token: 'exampleapisecret'
+    static_configs:
+      - targets: ['statping_mysql:8080']
+
+  - job_name: 'statping_postgres'
+    scrape_interval: 15s
+    bearer_token: 'exampleapisecret'
+    static_configs:
+      - targets: ['statping_postgres:8080']
+
+  - job_name: 'statping_dev'
+    scrape_interval: 15s
+    bearer_token: 'exampleapisecret'
+    static_configs:
+      - targets: ['statping_dev:8585']

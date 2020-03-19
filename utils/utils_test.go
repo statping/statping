@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -47,11 +47,10 @@ func TestInitLogs(t *testing.T) {
 }
 
 func TestDir(t *testing.T) {
-	assert.Contains(t, Directory, "github.com/hunterlong/statping")
+	assert.Contains(t, Directory, "github.com/statping/statping")
 }
 
 func TestCommand(t *testing.T) {
-	t.SkipNow()
 	in, out, err := Command("pwd")
 	assert.Nil(t, err)
 	assert.Contains(t, in, "statping")
@@ -154,7 +153,11 @@ func TestHashPassword(t *testing.T) {
 }
 
 func TestNewSHA1Hash(t *testing.T) {
-	assert.NotEmpty(t, NewSHA1Hash(5))
+	hash := NewSHA256Hash()
+	assert.NotEmpty(t, hash)
+	assert.Len(t, hash, 64)
+	assert.Len(t, NewSHA256Hash(), 64)
+	assert.NotEqual(t, hash, NewSHA256Hash())
 }
 
 func TestRandomString(t *testing.T) {

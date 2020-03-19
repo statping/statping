@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -16,19 +16,27 @@
 package notifiers
 
 import (
-	"fmt"
-	"github.com/hunterlong/statping/core/notifier"
-	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/types/notifier"
+	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/utils"
+	"strings"
 	"time"
 )
 
+var _ notifier.Notifier = (*commandLine)(nil)
+
 type commandLine struct {
-	*notifier.Notification
+	*notifications.Notification
 }
 
-var Command = &commandLine{&notifier.Notification{
-	Method:      "Command",
+func (c *commandLine) Select() *notifications.Notification {
+	return c.Notification
+}
+
+var Command = &commandLine{&notifications.Notification{
+	Method:      "command",
 	Title:       "Shell Command",
 	Description: "Shell Command allows you to run a customized shell/bash Command on the local machine it's running on.",
 	Author:      "Hunter Long",
@@ -36,7 +44,8 @@ var Command = &commandLine{&notifier.Notification{
 	Delay:       time.Duration(1 * time.Second),
 	Icon:        "fas fa-terminal",
 	Host:        "/bin/bash",
-	Form: []notifier.NotificationForm{{
+	Limits:      60,
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Shell or Bash",
 		Placeholder: "/bin/bash",
@@ -57,46 +66,30 @@ var Command = &commandLine{&notifier.Notification{
 	}}},
 }
 
-func runCommand(app, cmd string) (string, string, error) {
-	outStr, errStr, err := utils.Command(cmd)
+func runCommand(app string, cmd ...string) (string, string, error) {
+	outStr, errStr, err := utils.Command(app, cmd...)
 	return outStr, errStr, err
 }
 
-func (u *commandLine) Select() *notifier.Notification {
-	return u.Notification
-}
-
 // OnFailure for commandLine will trigger failing service
-func (u *commandLine) OnFailure(s *types.Service, f *types.Failure) {
-	u.AddQueue(fmt.Sprintf("service_%v", s.Id), u.Var2)
+func (u *commandLine) OnFailure(s *services.Service, f *failures.Failure) error {
+	msg := u.GetValue("var2")
+	_, _, err := runCommand(u.Host, msg)
+	return err
 }
 
 // OnSuccess for commandLine will trigger successful service
-func (u *commandLine) OnSuccess(s *types.Service) {
-	if !s.Online {
-		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
-		u.AddQueue(fmt.Sprintf("service_%v", s.Id), u.Var1)
-	}
-}
-
-// OnSave for commandLine triggers when this notifier has been saved
-func (u *commandLine) OnSave() error {
-	u.AddQueue("saved", u.Var1)
-	u.AddQueue("saved", u.Var2)
-	return nil
+func (u *commandLine) OnSuccess(s *services.Service) error {
+	msg := u.GetValue("var1")
+	_, _, err := runCommand(u.Host, msg)
+	return err
 }
 
 // OnTest for commandLine triggers when this notifier has been saved
 func (u *commandLine) OnTest() error {
-	in, out, err := runCommand(u.Host, u.Var1)
+	cmds := strings.Split(u.Var1, " ")
+	in, out, err := runCommand(u.Host, cmds...)
 	utils.Log.Infoln(in)
 	utils.Log.Infoln(out)
-	return err
-}
-
-// Send for commandLine will send message to expo Command push notifications endpoint
-func (u *commandLine) Send(msg interface{}) error {
-	cmd := msg.(string)
-	_, _, err := runCommand(u.Host, cmd)
 	return err
 }

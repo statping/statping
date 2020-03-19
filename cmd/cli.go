@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -16,18 +16,20 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/handlers"
-	"github.com/hunterlong/statping/plugin"
-	"github.com/hunterlong/statping/source"
-	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
 	"github.com/joho/godotenv"
+	"github.com/pkg/errors"
+	"github.com/statping/statping/handlers"
+	"github.com/statping/statping/source"
+	"github.com/statping/statping/types/configs"
+	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/utils"
 	"io/ioutil"
-	"net/http/httptest"
+	"os"
+	"strings"
 	"time"
 )
 
@@ -36,7 +38,6 @@ func catchCLI(args []string) error {
 	dir := utils.Directory
 	runLogs := utils.InitLogs
 	runAssets := source.Assets
-	loadDotEnvs()
 
 	switch args[0] {
 	case "version":
@@ -65,40 +66,33 @@ func catchCLI(args []string) error {
 		if err := runAssets(); err != nil {
 			return err
 		}
-		if err := source.CompileSASS(dir); err != nil {
+		if err := source.CompileSASS(source.DefaultScss...); err != nil {
 			return err
 		}
 		return errors.New("end")
 	case "update":
 		updateDisplay()
 		return errors.New("end")
-	case "test":
-		cmd := args[1]
-		switch cmd {
-		case "plugins":
-			plugin.LoadPlugins()
-		}
-		return errors.New("end")
 	case "static":
-		var err error
-		if err = runLogs(); err != nil {
-			return err
-		}
-		if err = runAssets(); err != nil {
-			return err
-		}
-		fmt.Printf("Statping v%v Exporting Static 'index.html' page...\n", VERSION)
-		if core.CoreApp.Config, err = core.LoadConfigFile(dir); err != nil {
-			log.Errorln("config.yml file not found")
-			return err
-		}
-		indexSource := ExportIndexHTML()
-		//core.CloseDB()
-		if err = utils.SaveFile(dir+"/index.html", indexSource); err != nil {
-			log.Errorln(err)
-			return err
-		}
-		log.Infoln("Exported Statping index page: 'index.html'")
+		//var err error
+		//if err = runLogs(); err != nil {
+		//	return err
+		//}
+		//if err = runAssets(); err != nil {
+		//	return err
+		//}
+		//fmt.Printf("Statping v%v Exporting Static 'index.html' page...\n", VERSION)
+		//if _, err = core.LoadConfigFile(dir); err != nil {
+		//	log.Errorln("config.yml file not found")
+		//	return err
+		//}
+		//indexSource := ExportIndexHTML()
+		////core.CloseDB()
+		//if err = utils.SaveFile(dir+"/index.html", indexSource); err != nil {
+		//	log.Errorln(err)
+		//	return err
+		//}
+		//log.Infoln("Exported Statping index page: 'index.html'")
 	case "help":
 		HelpEcho()
 		return errors.New("end")
@@ -111,19 +105,24 @@ func catchCLI(args []string) error {
 		if err = runAssets(); err != nil {
 			return err
 		}
-		if core.CoreApp.Config, err = core.LoadConfigFile(dir); err != nil {
+		config, err := configs.LoadConfigs()
+		if err != nil {
 			return err
 		}
-		if err = core.CoreApp.Connect(false, dir); err != nil {
+		if err = configs.ConnectConfigs(config); err != nil {
 			return err
 		}
-		if data, err = core.ExportSettings(); err != nil {
+		if _, err := services.SelectAllServices(false); err != nil {
+			return err
+		}
+		if data, err = handlers.ExportSettings(); err != nil {
 			return fmt.Errorf("could not export settings: %v", err.Error())
 		}
-		//core.CloseDB()
-		if err = utils.SaveFile(dir+"/statping-export.json", data); err != nil {
+		filename := fmt.Sprintf("%s/statping-%s.json", dir, time.Now().Format("01-02-2006-1504"))
+		if err = utils.SaveFile(filename, data); err != nil {
 			return fmt.Errorf("could not write file statping-export.json: %v", err.Error())
 		}
+		log.Infoln("Statping export file saved to ", filename)
 		return errors.New("end")
 	case "import":
 		var err error
@@ -135,10 +134,75 @@ func catchCLI(args []string) error {
 		if data, err = ioutil.ReadFile(filename); err != nil {
 			return err
 		}
-		var exportData core.ExportData
+		var exportData handlers.ExportData
 		if err = json.Unmarshal(data, &exportData); err != nil {
 			return err
 		}
+		log.Printf("=== %s ===\n", exportData.Core.Name)
+		log.Printf("Services:   %d\n", len(exportData.Services))
+		log.Printf("Checkins:   %d\n", len(exportData.Checkins))
+		log.Printf("Groups:     %d\n", len(exportData.Groups))
+		log.Printf("Messages:   %d\n", len(exportData.Messages))
+		log.Printf("Users:      %d\n", len(exportData.Users))
+
+		config, err := configs.LoadConfigs()
+		if err != nil {
+			return err
+		}
+		if err = configs.ConnectConfigs(config); err != nil {
+			return err
+		}
+		if data, err = handlers.ExportSettings(); err != nil {
+			return fmt.Errorf("could not export settings: %v", err.Error())
+		}
+
+		if ask("Import Core settings?") {
+			c := exportData.Core
+			if err := c.Update(); err != nil {
+				return err
+			}
+		}
+		for _, s := range exportData.Groups {
+			if ask(fmt.Sprintf("Import Group '%s'?", s.Name)) {
+				s.Id = 0
+				if err := s.Create(); err != nil {
+					return err
+				}
+			}
+		}
+		for _, s := range exportData.Services {
+			if ask(fmt.Sprintf("Import Service '%s'?", s.Name)) {
+				s.Id = 0
+				if err := s.Create(); err != nil {
+					return err
+				}
+			}
+		}
+		for _, s := range exportData.Checkins {
+			if ask(fmt.Sprintf("Import Checkin '%s'?", s.Name)) {
+				s.Id = 0
+				if err := s.Create(); err != nil {
+					return err
+				}
+			}
+		}
+		for _, s := range exportData.Messages {
+			if ask(fmt.Sprintf("Import Message '%s'?", s.Title)) {
+				s.Id = 0
+				if err := s.Create(); err != nil {
+					return err
+				}
+			}
+		}
+		for _, s := range exportData.Users {
+			if ask(fmt.Sprintf("Import User '%s'?", s.Username)) {
+				s.Id = 0
+				if err := s.Create(); err != nil {
+					return err
+				}
+			}
+		}
+		log.Infof("Import complete")
 		return errors.New("end")
 	case "run":
 		if err := runLogs(); err != nil {
@@ -174,31 +238,42 @@ func catchCLI(args []string) error {
 	return errors.New("end")
 }
 
-// ExportIndexHTML returns the HTML of the index page as a string
-func ExportIndexHTML() []byte {
-	source.Assets()
-	core.CoreApp.Connect(false, utils.Directory)
-	core.CoreApp.SelectAllServices(false)
-	core.CoreApp.UseCdn = types.NewNullBool(true)
-	for _, srv := range core.CoreApp.Services {
-		service := srv.(*core.Service)
-		service.Check(true)
-	}
-	w := httptest.NewRecorder()
-	r := httptest.NewRequest("GET", "/", nil)
-	handlers.ExecuteResponse(w, r, "index.gohtml", nil, nil)
-	return w.Body.Bytes()
+func ask(format string) bool {
+	fmt.Printf(fmt.Sprintf(format + " [y/N]: "))
+	reader := bufio.NewReader(os.Stdin)
+	text, _ := reader.ReadString('\n')
+	text = strings.Replace(text, "\n", "", -1)
+	return strings.ToLower(text) == "y"
 }
 
+// ExportIndexHTML returns the HTML of the index page as a string
+//func ExportIndexHTML() []byte {
+//	source.Assets()
+//	core.CoreApp.Connect(core.CoreApp., utils.Directory)
+//	core.SelectAllServices(false)
+//	core.CoreApp.UseCdn = types.NewNullBool(true)
+//	for _, srv := range core.Services() {
+//		core.CheckService(srv, true)
+//	}
+//	w := httptest.NewRecorder()
+//	r := httptest.NewRequest("GET", "/", nil)
+//	handlers.ExecuteResponse(w, r, "index.gohtml", nil, nil)
+//	return w.Body.Bytes()
+//}
+
 func updateDisplay() error {
-	var err error
-	var gitCurrent githubResponse
-	if gitCurrent, err = checkGithubUpdates(); err != nil {
-		fmt.Printf("Issue connecting to https://github.com/hunterlong/statping\n%v\n", err)
-		return err
+	gitCurrent, err := checkGithubUpdates()
+	if err != nil {
+		return errors.Wrap(err, "Issue connecting to https://github.com/statping/statping")
+	}
+	if gitCurrent.TagName == "" {
+		return nil
+	}
+	if len(gitCurrent.TagName) < 2 {
+		return nil
 	}
 	if VERSION != gitCurrent.TagName[1:] {
-		fmt.Printf("\nNew Update %v Available!\n", gitCurrent.TagName[1:])
+		fmt.Printf("New Update %v Available!\n", gitCurrent.TagName[1:])
 		fmt.Printf("Update Command:\n")
 		fmt.Printf("curl -o- -L https://statping.com/install.sh | bash\n\n")
 	}
@@ -206,27 +281,30 @@ func updateDisplay() error {
 }
 
 // runOnce will initialize the Statping application and check each service 1 time, will not run HTTP server
-func runOnce() {
-	var err error
-	core.CoreApp.Config, err = core.LoadConfigFile(utils.Directory)
+func runOnce() error {
+	config, err := configs.LoadConfigs()
 	if err != nil {
-		log.Errorln("config.yml file not found")
+		return errors.Wrap(err, "config.yml file not found")
 	}
-	err = core.CoreApp.Connect(false, utils.Directory)
+	err = configs.ConnectConfigs(config)
 	if err != nil {
-		log.Errorln(err)
+		return errors.Wrap(err, "issue connecting to database")
 	}
-	core.CoreApp, err = core.SelectCore()
+	c, err := core.Select()
 	if err != nil {
-		fmt.Println("Core database was not found, Statping is not setup yet.")
+		return errors.Wrap(err, "core database was not found or setup")
 	}
-	_, err = core.CoreApp.SelectAllServices(true)
+
+	core.App = c
+
+	_, err = services.SelectAllServices(true)
 	if err != nil {
-		log.Errorln(err)
+		return errors.Wrap(err, "could not select all services")
 	}
-	for _, out := range core.CoreApp.Services {
-		out.Check(true)
+	for _, srv := range services.Services() {
+		srv.CheckService(true)
 	}
+	return nil
 }
 
 // HelpEcho prints out available commands and flags for Statping
@@ -276,7 +354,7 @@ func HelpEcho() {
 	fmt.Println("     AUTH_PASSWORD             - HTTP Basic Authentication password")
 	fmt.Println("     BASE_PATH                 - Set the base URL prefix (set to 'monitor' if URL is domain.com/monitor)")
 	fmt.Println("   * You can insert environment variables into a '.env' file in root directory.")
-	fmt.Println("Give Statping a Star at https://github.com/hunterlong/statping")
+	fmt.Println("Give Statping a Star at https://github.com/statping/statping")
 }
 
 func checkGithubUpdates() (githubResponse, error) {

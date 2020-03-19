@@ -2077,7 +2077,7 @@
 					"response": []
 				}
 			],
-			"description": "Statping contains multiple notifiers that will send you a notification whenever a service become offline, or online. You can create your own 3rd party notifier by reading more on the [Notifiers Wiki](https://github.com/hunterlong/statping/wiki/Notifiers) on the Github repo.",
+			"description": "Statping contains multiple notifiers that will send you a notification whenever a service become offline, or online. You can create your own 3rd party notifier by reading more on the [Notifiers Wiki](https://github.com/statping/statping/wiki/Notifiers) on the Github repo.",
 			"auth": {
 				"type": "bearer",
 				"bearer": [

@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -16,32 +16,26 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/types/users"
+	"github.com/statping/statping/utils"
 	"net/http"
-	"strconv"
 )
 
-func usersHandler(w http.ResponseWriter, r *http.Request) {
-	users, _ := core.SelectAllUsers()
-	ExecuteResponse(w, r, "users.gohtml", users, nil)
-}
-
-func usersEditHandler(w http.ResponseWriter, r *http.Request) {
+func getUser(r *http.Request) (*users.User, int64, error) {
 	vars := mux.Vars(r)
-	id, _ := strconv.Atoi(vars["id"])
-	user, _ := core.SelectUser(int64(id))
-	ExecuteResponse(w, r, "user.gohtml", user, nil)
+	num := utils.ToInt(vars["id"])
+	user, err := users.Find(num)
+	if err != nil {
+		return nil, num, err
+	}
+	return user, num, nil
 }
 
 func apiUserHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	user, err := core.SelectUser(utils.ToInt(vars["id"]))
+	user, _, err := getUser(r)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -51,33 +45,37 @@ func apiUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	user, err := core.SelectUser(utils.ToInt(vars["id"]))
+	user, id, err := getUser(r)
 	if err != nil {
-		sendErrorJson(fmt.Errorf("user #%v was not found", vars["id"]), w, r)
+		sendErrorJson(fmt.Errorf("user #%d was not found", id), w, r)
 		return
 	}
-	decoder := json.NewDecoder(r.Body)
-	decoder.Decode(&user)
+
+	err = DecodeJSON(r, &user)
+	if err != nil {
+		sendErrorJson(fmt.Errorf("user #%d was not found", id), w, r)
+		return
+	}
+
 	if user.Password != "" {
 		user.Password = utils.HashPassword(user.Password)
 	}
+
 	err = user.Update()
 	if err != nil {
-		sendErrorJson(fmt.Errorf("issue updating user #%v: %v", user.Id, err), w, r)
+		sendErrorJson(fmt.Errorf("issue updating user #%d: %s", user.Id, err), w, r)
 		return
 	}
 	sendJsonAction(user, "update", w, r)
 }
 
 func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	users := core.CountUsers()
-	if users == 1 {
+	allUsers := users.All()
+	if len(allUsers) == 1 {
 		sendErrorJson(errors.New("cannot delete the last user"), w, r)
 		return
 	}
-	user, err := core.SelectUser(utils.ToInt(vars["id"]))
+	user, _, err := getUser(r)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -91,27 +89,22 @@ func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllUsersHandler(w http.ResponseWriter, r *http.Request) {
-	users, err := core.SelectAllUsers()
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
-	returnJson(users, w, r)
+	allUsers := users.All()
+	returnJson(allUsers, w, r)
 }
 
 func apiCreateUsersHandler(w http.ResponseWriter, r *http.Request) {
-	var user *types.User
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&user)
+	var user *users.User
+	err := DecodeJSON(r, &user)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	newUser := core.ReturnUser(user)
-	_, err = newUser.Create()
+
+	err = user.Create()
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	sendJsonAction(newUser, "create", w, r)
+	sendJsonAction(user, "create", w, r)
 }

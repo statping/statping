@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -19,19 +19,27 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/hunterlong/statping/core/notifier"
-	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/types/notifier"
+	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/utils"
 	"time"
 )
+
+var _ notifier.Notifier = (*mobilePush)(nil)
 
 const mobileIdentifier = "com.statping"
 
 type mobilePush struct {
-	*notifier.Notification
+	*notifications.Notification
 }
 
-var Mobile = &mobilePush{&notifier.Notification{
+func (m *mobilePush) Select() *notifications.Notification {
+	return m.Notification
+}
+
+var Mobile = &mobilePush{&notifications.Notification{
 	Method: "mobile",
 	Title:  "Mobile Notifications",
 	Description: `Receive push notifications on your Mobile device using the Statping App. You can scan the Authentication QR Code found in Settings to get the Mobile app setup in seconds.
@@ -40,7 +48,8 @@ var Mobile = &mobilePush{&notifier.Notification{
 	AuthorUrl: "https://github.com/hunterlong",
 	Delay:     time.Duration(5 * time.Second),
 	Icon:      "fas fa-mobile-alt",
-	Form: []notifier.NotificationForm{{
+	Limits:    30,
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Device Identifiers",
 		Placeholder: "A list of your Mobile device push notification ID's.",
@@ -55,11 +64,7 @@ var Mobile = &mobilePush{&notifier.Notification{
 	}}},
 }
 
-func (u *mobilePush) Select() *notifier.Notification {
-	return u.Notification
-}
-
-func dataJson(s *types.Service, f *types.Failure) map[string]interface{} {
+func dataJson(s *services.Service, f *failures.Failure) map[string]interface{} {
 	serviceId := "0"
 	if s != nil {
 		serviceId = utils.ToString(s.Id)
@@ -83,7 +88,7 @@ func dataJson(s *types.Service, f *types.Failure) map[string]interface{} {
 }
 
 // OnFailure will trigger failing service
-func (u *mobilePush) OnFailure(s *types.Service, f *types.Failure) {
+func (u *mobilePush) OnFailure(s *services.Service, f *failures.Failure) error {
 	data := dataJson(s, f)
 	msg := &pushArray{
 		Message: fmt.Sprintf("Your service '%v' is currently failing! Reason: %v", s.Name, f.Issue),
@@ -91,33 +96,19 @@ func (u *mobilePush) OnFailure(s *types.Service, f *types.Failure) {
 		Topic:   mobileIdentifier,
 		Data:    data,
 	}
-	u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
+	return u.Send(msg)
 }
 
 // OnSuccess will trigger successful service
-func (u *mobilePush) OnSuccess(s *types.Service) {
+func (u *mobilePush) OnSuccess(s *services.Service) error {
 	data := dataJson(s, nil)
-	if !s.Online || !s.SuccessNotified {
-		var msgStr string
-		if s.UpdateNotify {
-			s.UpdateNotify = false
-		}
-		msgStr = s.DownText
-
-		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
-		msg := &pushArray{
-			Message: msgStr,
-			Title:   "Service Online",
-			Topic:   mobileIdentifier,
-			Data:    data,
-		}
-		u.AddQueue(fmt.Sprintf("service_%v", s.Id), msg)
+	msg := &pushArray{
+		Message: "Service is Online!",
+		Title:   "Service Online",
+		Topic:   mobileIdentifier,
+		Data:    data,
 	}
-}
-
-// OnSave triggers when this notifier has been saved
-func (u *mobilePush) OnSave() error {
-	return nil
+	return u.Send(msg)
 }
 
 // OnTest triggers when this notifier has been saved
@@ -144,12 +135,10 @@ func (u *mobilePush) OnTest() error {
 		firstLog := output.Logs[0].Error
 		return fmt.Errorf("Mobile Notification error: %v", firstLog)
 	}
-	return err
 }
 
 // Send will send message to Statping push notifications endpoint
-func (u *mobilePush) Send(msg interface{}) error {
-	pushMessage := msg.(*pushArray)
+func (u *mobilePush) Send(pushMessage *pushArray) error {
 	pushMessage.Tokens = []string{u.Var1}
 	pushMessage.Platform = utils.ToInt(u.Var2)
 	_, err := pushRequest(pushMessage)

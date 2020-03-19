@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -16,7 +16,7 @@
 package utils
 
 import (
-	"crypto/sha1"
+	"crypto/sha256"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"math/rand"
@@ -30,16 +30,11 @@ func HashPassword(password string) string {
 }
 
 // NewSHA1Hash returns a random SHA1 hash based on a specific length
-func NewSHA1Hash(n ...int) string {
-	noRandomCharacters := 32
-	if len(n) > 0 {
-		noRandomCharacters = n[0]
-	}
-	randString := RandomString(noRandomCharacters)
-	hash := sha1.New()
-	hash.Write([]byte(randString))
-	bs := hash.Sum(nil)
-	return fmt.Sprintf("%x", bs)
+func NewSHA256Hash() string {
+	d := make([]byte, 10)
+	rand.Seed(Now().UnixNano())
+	rand.Read(d)
+	return fmt.Sprintf("%x", sha256.Sum256(d))
 }
 
 var characterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")

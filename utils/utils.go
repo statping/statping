@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -44,27 +44,59 @@ var (
 
 // init will set the utils.Directory to the current running directory, or STATPING_DIR if it is set
 func init() {
-	if os.Getenv("STATPING_DIR") != "" {
-		Directory = os.Getenv("STATPING_DIR")
-	} else {
-		dir, err := os.Getwd()
-		if err != nil {
-			Directory = "."
-			return
-		}
-		Directory = dir
+	defaultDir, err := os.Getwd()
+	if err != nil {
+		defaultDir = "."
 	}
+
+	Directory = Getenv("STATPING_DIR", defaultDir).(string)
+
 	// check if logs are disabled
-	logger := os.Getenv("DISABLE_LOGS")
-	disableLogs, _ = strconv.ParseBool(logger)
+	disableLogs = Getenv("DISABLE_LOGS", false).(bool)
 	if disableLogs {
 		Log.Out = ioutil.Discard
-		return
 	}
+
 	Log.Debugln("current working directory: ", Directory)
 	Log.AddHook(new(hook))
 	Log.SetNoLock()
 	checkVerboseMode()
+}
+
+func Getenv(key string, defaultValue interface{}) interface{} {
+	if val, ok := os.LookupEnv(key); ok {
+		if val != "" {
+			switch d := defaultValue.(type) {
+
+			case int, int64:
+				return int(ToInt(val))
+
+			case time.Duration:
+				dur, err := time.ParseDuration(val)
+				if err != nil {
+					return d
+				}
+				return dur
+			case bool:
+				ok, err := strconv.ParseBool(val)
+				if err != nil {
+					return d
+				}
+				return ok
+			default:
+				return val
+			}
+		}
+	}
+	return defaultValue
+}
+
+func SliceConvert(g []*interface{}) []interface{} {
+	var arr []interface{}
+	for _, v := range g {
+		arr = append(arr, v)
+	}
+	return arr
 }
 
 // ToInt converts a int to a string
@@ -215,6 +247,11 @@ func FolderExists(folder string) bool {
 	return false
 }
 
+func OpenFile(filePath string) (string, error) {
+	data, err := ioutil.ReadFile(filePath)
+	return string(data), err
+}
+
 // CopyFile will copy a file to a new directory
 //		CopyFile("source.jpg", "/tmp/source.jpg")
 func CopyFile(src, dst string) error {
@@ -238,16 +275,26 @@ func CopyFile(src, dst string) error {
 	return out.Close()
 }
 
+// IsType will return true if a variable can implement an interface
+func IsType(n interface{}, obj interface{}) bool {
+	one := reflect.TypeOf(n)
+	two := reflect.ValueOf(obj).Elem()
+	return one.Implements(two.Type())
+}
+
 // Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings
 //		in, out, err := Command("sass assets/scss assets/css/base.css")
-func Command(cmd string) (string, string, error) {
-	Log.Debugln("running command: " + cmd)
-	testCmd := exec.Command("sh", "-c", cmd)
+func Command(name string, args ...string) (string, string, error) {
+	Log.Debugln("running command: " + name + strings.Join(args, " "))
+	testCmd := exec.Command(name, args...)
 	var stdout, stderr []byte
 	var errStdout, errStderr error
 	stdoutIn, _ := testCmd.StdoutPipe()
 	stderrIn, _ := testCmd.StderrPipe()
-	testCmd.Start()
+	err := testCmd.Start()
+	if err != nil {
+		return "", "", err
+	}
 
 	go func() {
 		stdout, errStdout = copyAndCapture(os.Stdout, stdoutIn)
@@ -257,13 +304,13 @@ func Command(cmd string) (string, string, error) {
 		stderr, errStderr = copyAndCapture(os.Stderr, stderrIn)
 	}()
 
-	err := testCmd.Wait()
+	err = testCmd.Wait()
 	if err != nil {
-		return "", "", err
+		return string(stdout), string(stderr), err
 	}
 
 	if errStdout != nil || errStderr != nil {
-		return "", "", errors.New("failed to capture stdout or stderr")
+		return string(stdout), string(stderr), errors.New("failed to capture stdout or stderr")
 	}
 
 	outStr, errStr := string(stdout), string(stderr)
@@ -312,7 +359,7 @@ func DurationReadable(d time.Duration) string {
 // SaveFile will create a new file with data inside it
 //		SaveFile("newfile.json", []byte('{"data": "success"}')
 func SaveFile(filename string, data []byte) error {
-	err := ioutil.WriteFile(filename, data, 0644)
+	err := ioutil.WriteFile(filename, data, os.ModePerm)
 	return err
 }
 
@@ -327,7 +374,9 @@ func SaveFile(filename string, data []byte) error {
 func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool) ([]byte, *http.Response, error) {
 	var err error
 	var req *http.Request
+	t1 := time.Now()
 	if req, err = http.NewRequest(method, url, body); err != nil {
+		httpMetric.Errors++
 		return nil, nil, err
 	}
 	req.Header.Set("User-Agent", "Statping")
@@ -377,10 +426,18 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	}
 
 	if resp, err = client.Do(req); err != nil {
+		httpMetric.Errors++
 		return nil, resp, err
 	}
 	defer resp.Body.Close()
 	contents, err := ioutil.ReadAll(resp.Body)
+
+	// record HTTP metrics
+	t2 := time.Now().Sub(t1).Milliseconds()
+	httpMetric.Requests++
+	httpMetric.Milliseconds += t2 / httpMetric.Requests
+	httpMetric.Bytes += int64(len(contents))
+
 	return contents, resp, err
 }
 

@@ -1,0 +1,36 @@
+FROM golang:1.13.5-alpine
+LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
+ARG VERSION
+RUN apk add --update --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers wget curl jq libsass nodejs nodejs-npm
+RUN npm install -g yarn
+
+RUN curl -L -s https://assets.statping.com/sass -o /usr/local/bin/sass && \
+    chmod +x /usr/local/bin/sass
+
+WORKDIR /go/src/github.com/hunterlong/statping
+
+ADD go.mod go.sum version.txt ./
+
+RUN go mod download
+
+RUN go get github.com/stretchr/testify/... && \
+	go get github.com/GeertJohan/go.rice/rice && \
+	go get github.com/cortesi/modd/cmd/modd
+
+ADD frontend/package.json frontend/yarn.lock ./frontend/
+
+RUN cd frontend && yarn install --pure-lockfile --network-timeout 1000000 && yarn cache clean
+
+ENV IS_DOCKER=true
+ENV STATPING_DIR=/go/src/github.com/hunterlong/statping
+
+EXPOSE 8585
+EXPOSE 8888
+
+RUN cd frontend && yarn build && cp -R dist ../source/
+
+RUN pwd && ls
+
+COPY . .
+
+CMD dev/dev-env.sh

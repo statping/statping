@@ -1,10 +1,14 @@
-statping:
-  container_name: statping
-  image: hunterlong/statping
-  restart: always
-  ports:
-    - 8080:8080
-  volumes:
-    - ./statping:/app
-  environment:
-    DB_CONN: sqlite
+version: '2.3'
+
+services:
+
+  statping:
+    container_name: statping
+    image: hunterlong/statping:latest
+    restart: always
+    volumes:
+      - statping_data:/app
+    environment:
+      DB_CONN: sqlite
+    ports:
+      - 8080:8080

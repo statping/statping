@@ -13,5 +13,5 @@
 //		sass source/scss/base.scss source/css/base.css
 //		cd source && rice embed-go
 //
-// More info on: https://github.com/hunterlong/statping
+// More info on: https://github.com/statping/statping
 package source

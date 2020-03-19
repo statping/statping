@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -18,8 +18,9 @@ package utils
 import (
 	"fmt"
 	"github.com/fatih/structs"
-	"github.com/hunterlong/statping/types"
+	"github.com/getsentry/sentry-go"
 	Logger "github.com/sirupsen/logrus"
+	"github.com/statping/statping/types/null"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"os"
@@ -56,7 +57,7 @@ func (t *hook) Levels() []Logger.Level {
 // ToFields accepts any amount of interfaces to create a new mapping for log.Fields. You will need to
 // turn on verbose mode by starting Statping with "-v". This function will convert a struct of to the
 // base struct name, and each field into it's own mapping, for example:
-// type "*types.Service", on string field "Name" converts to "service_name=value". There is also an
+// type "*services.Service", on string field "Name" converts to "service_name=value". There is also an
 // additional field called "_pointer" that will return the pointer hex value.
 func ToFields(d ...interface{}) map[string]interface{} {
 	if !Log.IsLevelEnabled(Logger.DebugLevel) {
@@ -83,13 +84,13 @@ func ToFields(d ...interface{}) map[string]interface{} {
 // replaceVal accepts an interface to be converted into human readable type
 func replaceVal(d interface{}) interface{} {
 	switch v := d.(type) {
-	case types.NullBool:
+	case null.NullBool:
 		return v.Bool
-	case types.NullString:
+	case null.NullString:
 		return v.String
-	case types.NullFloat64:
+	case null.NullFloat64:
 		return v.Float64
-	case types.NullInt64:
+	case null.NullInt64:
 		return v.Int64
 	case string:
 		if len(v) > 500 {
@@ -124,6 +125,7 @@ func InitLogs() error {
 		MaxBackups: 5,
 		MaxAge:     28,
 	}
+
 	mw := io.MultiWriter(os.Stdout, ljLogger)
 	Log.SetOutput(mw)
 
@@ -132,6 +134,8 @@ func InitLogs() error {
 		DisableColors: false,
 	})
 	checkVerboseMode()
+
+	sentry.CaptureMessage("It works!")
 
 	LastLines = make([]*logRow, 0)
 	return nil

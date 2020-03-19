@@ -18,3 +18,14 @@ dev
 config.yml
 *.db
 tmp
+frontend/node_modules
+.next
+node_modules
+Dockerfile
+Dockerfile.base
+!dev/dev-env.sh
+!dev/modd.conf
+!dev/grafana
+!dev/prometheus.yml
+docker
+statping.db

@@ -1,12 +1,17 @@
 package handlers
 
 import (
+	"compress/gzip"
 	"crypto/subtle"
+	"encoding/json"
+	"errors"
 	"fmt"
-	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/utils"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"time"
 )
 
@@ -14,6 +19,30 @@ var (
 	authUser string
 	authPass string
 )
+
+// Gzip Compression
+type gzipResponseWriter struct {
+	io.Writer
+	http.ResponseWriter
+}
+
+func (w gzipResponseWriter) Write(b []byte) (int, error) {
+	return w.Writer.Write(b)
+}
+
+func Gzip(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+			handler.ServeHTTP(w, r)
+			return
+		}
+		w.Header().Set("Content-Encoding", "gzip")
+		gz := gzip.NewWriter(w)
+		defer gz.Close()
+		gzw := gzipResponseWriter{Writer: gz, ResponseWriter: w}
+		handler.ServeHTTP(gzw, r)
+	})
+}
 
 // basicAuthHandler is a middleware to implement HTTP basic authentication using
 // AUTH_USERNAME and AUTH_PASSWORD environment variables
@@ -32,20 +61,40 @@ func basicAuthHandler(next http.Handler) http.Handler {
 	})
 }
 
+// apiMiddleware will confirm if Core has been setup
+func apiMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !core.App.Setup {
+			sendErrorJson(errors.New("statping has not been setup"), w, r)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
 // sendLog is a http middleware that will log the duration of request and other useful fields
 func sendLog(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t1 := utils.Now()
-		t2 := utils.Now().Sub(t1)
-		if r.RequestURI == "/logs/line" {
+		if r.RequestURI == "/api/logs" || r.RequestURI == "/api/logs/last" {
+			next.ServeHTTP(w, r)
 			return
 		}
+		next.ServeHTTP(w, r)
+		t2 := utils.Now().Sub(t1)
 		log.WithFields(utils.ToFields(w, r)).
 			WithField("url", r.RequestURI).
 			WithField("method", r.Method).
 			WithField("load_micro_seconds", t2.Microseconds()).
 			Infoln(fmt.Sprintf("%v (%v) | IP: %v", r.RequestURI, r.Method, r.Host))
-		next.ServeHTTP(w, r)
+	})
+}
+
+func scoped(handler func(r *http.Request) interface{}) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		data := handler(r)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(scope{data: data, scope: ScopeName(r)})
 	})
 }
 
@@ -85,7 +134,7 @@ func cached(duration, contentType string, handler func(w http.ResponseWriter, r 
 		content := CacheStorage.Get(r.RequestURI)
 		w.Header().Set("Content-Type", contentType)
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		if core.CoreApp.Config == nil {
+		if !core.App.Setup {
 			handler(w, r)
 			return
 		}

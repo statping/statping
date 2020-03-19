@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -16,10 +16,12 @@
 package main
 
 import (
-	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/utils"
+	"fmt"
+	"github.com/getsentry/sentry-go"
 	"github.com/rendon/testcli"
+	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"os"
 	"os/exec"
 	"testing"
@@ -32,7 +34,15 @@ var (
 
 func init() {
 	dir = utils.Directory
-	core.SampleHits = 480
+	//core.SampleHits = 480
+
+	if err := sentry.Init(sentry.ClientOptions{
+		Dsn:         errorReporter,
+		Environment: "testing",
+	}); err != nil {
+		fmt.Println(err)
+	}
+
 }
 
 func TestStartServerCommand(t *testing.T) {
@@ -84,6 +94,7 @@ func TestExportCommand(t *testing.T) {
 }
 
 func TestUpdateCommand(t *testing.T) {
+	t.SkipNow()
 	cmd := helperCommand(nil, "version")
 	var got = make(chan string)
 	commandAndSleep(cmd, time.Duration(15*time.Second), got)
@@ -93,13 +104,23 @@ func TestUpdateCommand(t *testing.T) {
 }
 
 func TestAssetsCommand(t *testing.T) {
+	t.SkipNow()
 	c := testcli.Command("statping", "assets")
 	c.Run()
 	t.Log(c.Stdout())
 	t.Log("Directory for Assets: ", dir)
 	time.Sleep(1 * time.Second)
+	err := utils.DeleteDirectory(dir + "/assets")
+	require.Nil(t, err)
 	assert.FileExists(t, dir+"/assets/robots.txt")
 	assert.FileExists(t, dir+"/assets/scss/base.scss")
+	assert.FileExists(t, dir+"/assets/scss/main.scss")
+	assert.FileExists(t, dir+"/assets/scss/variables.scss")
+	assert.FileExists(t, dir+"/assets/css/main.css")
+	assert.FileExists(t, dir+"/assets/css/vendor.css")
+	assert.FileExists(t, dir+"/assets/css/style.css")
+	err = utils.DeleteDirectory(dir + "/assets")
+	require.Nil(t, err)
 }
 
 func TestRunCommand(t *testing.T) {
@@ -127,13 +148,19 @@ func TestVersionCLI(t *testing.T) {
 func TestAssetsCLI(t *testing.T) {
 	catchCLI([]string{"assets"})
 	//assert.EqualError(t, run, "end")
-	assert.FileExists(t, dir+"/assets/css/base.css")
+	assert.FileExists(t, dir+"/assets/css/main.css")
+	assert.FileExists(t, dir+"/assets/css/style.css")
+	assert.FileExists(t, dir+"/assets/css/vendor.css")
 	assert.FileExists(t, dir+"/assets/scss/base.scss")
+	assert.FileExists(t, dir+"/assets/scss/mobile.scss")
+	assert.FileExists(t, dir+"/assets/scss/variables.scss")
 }
 
 func TestSassCLI(t *testing.T) {
 	catchCLI([]string{"sass"})
-	assert.FileExists(t, dir+"/assets/css/base.css")
+	assert.FileExists(t, dir+"/assets/css/main.css")
+	assert.FileExists(t, dir+"/assets/css/style.css")
+	assert.FileExists(t, dir+"/assets/css/vendor.css")
 }
 
 func TestUpdateCLI(t *testing.T) {
@@ -144,12 +171,6 @@ func TestUpdateCLI(t *testing.T) {
 	gg, _ := <-got
 	t.Log(gg)
 	assert.Contains(t, gg, "version")
-}
-
-func TestTestPackageCLI(t *testing.T) {
-	t.SkipNow()
-	run := catchCLI([]string{"test", "plugins"})
-	assert.EqualError(t, run, "end")
 }
 
 func TestHelpCLI(t *testing.T) {

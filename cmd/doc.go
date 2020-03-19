@@ -23,5 +23,5 @@
 //		docker pull karalabe/xgo-latest
 //		build-all
 //
-// More info on: https://github.com/hunterlong/statping
+// More info on: https://github.com/statping/statping
 package main

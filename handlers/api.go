@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -16,13 +16,21 @@
 package handlers
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hunterlong/statping/core"
-	"github.com/hunterlong/statping/core/notifier"
-	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/types/checkins"
+	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/groups"
+	"github.com/statping/statping/types/incidents"
+	"github.com/statping/statping/types/messages"
+	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/types/users"
+	"github.com/statping/statping/utils"
 	"net/http"
+	"time"
 )
 
 type apiResponse struct {
@@ -34,81 +42,131 @@ type apiResponse struct {
 	Output interface{} `json:"output,omitempty"`
 }
 
-func apiIndexHandler(w http.ResponseWriter, r *http.Request) {
-	coreClone := *core.CoreApp
-	coreClone.Started = utils.Timezoner(core.CoreApp.Started, core.CoreApp.Timezone)
-	returnJson(coreClone, w, r)
+func apiIndexHandler(r *http.Request) interface{} {
+	coreClone := core.App
+	var loggedIn bool
+	_, err := getJwtToken(r)
+	if err == nil {
+		loggedIn = true
+	}
+	coreClone.LoggedIn = loggedIn
+	return coreClone
 }
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
-	core.CoreApp.ApiKey = utils.NewSHA1Hash(40)
-	core.CoreApp.ApiSecret = utils.NewSHA1Hash(40)
-	core.CoreApp, err = core.UpdateCore(core.CoreApp)
+	core.App.ApiKey = utils.NewSHA256Hash()
+	core.App.ApiSecret = utils.NewSHA256Hash()
+	err = core.App.Update()
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+	output := apiResponse{
+		Status: "success",
+	}
+	returnJson(output, w, r)
+}
+
+func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
+	var c *core.Core
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&c)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	app := core.App
+	if c.Name != "" {
+		app.Name = c.Name
+	}
+	if c.Description != app.Description {
+		app.Description = c.Description
+	}
+	if c.Style != app.Style {
+		app.Style = c.Style
+	}
+	if c.Footer.String != app.Footer.String {
+		app.Footer = c.Footer
+	}
+	if c.Domain != app.Domain {
+		app.Domain = c.Domain
+	}
+	if c.Timezone != app.Timezone {
+		app.Timezone = c.Timezone
+	}
+	app.UseCdn = null.NewNullBool(c.UseCdn.Bool)
+	err = app.Update()
+	returnJson(core.App, w, r)
+}
+
+type cacheJson struct {
+	URL        string    `json:"url"`
+	Expiration time.Time `json:"expiration"`
+	Size       int       `json:"size"`
+}
+
+func apiCacheHandler(w http.ResponseWriter, r *http.Request) {
+	var cacheList []cacheJson
+	for k, v := range CacheStorage.List() {
+		cacheList = append(cacheList, cacheJson{
+			URL:        k,
+			Expiration: time.Unix(0, v.Expiration).UTC(),
+			Size:       len(v.Content),
+		})
+	}
+	returnJson(cacheList, w, r)
 }
 
 func apiClearCacheHandler(w http.ResponseWriter, r *http.Request) {
+	CacheStorage.StopRoutine()
 	CacheStorage = NewStorage()
-	http.Redirect(w, r, basePath, http.StatusSeeOther)
+	output := apiResponse{
+		Status: "success",
+	}
+	returnJson(output, w, r)
 }
 
-func sendErrorJson(err error, w http.ResponseWriter, r *http.Request) {
+func sendErrorJson(err error, w http.ResponseWriter, r *http.Request, statusCode ...int) {
 	log.Warnln(fmt.Errorf("sending error response for %v: %v", r.URL.String(), err.Error()))
 	output := apiResponse{
 		Status: "error",
 		Error:  err.Error(),
 	}
-	returnJson(output, w, r)
+	returnJson(output, w, r, statusCode...)
 }
 
 func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *http.Request) {
 	var objName string
 	var objId int64
 	switch v := obj.(type) {
-	case types.ServiceInterface:
+	case *services.Service:
 		objName = "service"
-		objId = v.Select().Id
-	case *notifier.Notification:
+		objId = v.Id
+	case *notifications.Notification:
 		objName = "notifier"
 		objId = v.Id
-	case *core.Core, *types.Core:
+	case *core.Core:
 		objName = "core"
-	case *types.User:
+	case *users.User:
 		objName = "user"
 		objId = v.Id
-	case *core.User:
-		objName = "user"
-		objId = v.Id
-	case *types.Group:
+	case *groups.Group:
 		objName = "group"
 		objId = v.Id
-	case *core.Group:
-		objName = "group"
-		objId = v.Id
-	case *core.Checkin:
+	case *checkins.Checkin:
 		objName = "checkin"
 		objId = v.Id
-	case *core.CheckinHit:
+	case *checkins.CheckinHit:
 		objName = "checkin_hit"
 		objId = v.Id
-	case *types.Message:
+	case *messages.Message:
 		objName = "message"
 		objId = v.Id
-	case *core.Message:
-		objName = "message"
-		objId = v.Id
-	case *types.Checkin:
-		objName = "checkin"
-		objId = v.Id
-	case *core.Incident:
+	case *incidents.Incident:
 		objName = "incident"
 		objId = v.Id
-	case *core.IncidentUpdate:
+	case *incidents.IncidentUpdate:
 		objName = "incident_update"
 		objId = v.Id
 	default:

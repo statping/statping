@@ -2,7 +2,7 @@
 // Copyright (C) 2018.  Hunter Long and the project contributors
 // Written by Hunter Long <info@socialeck.com> and the project contributors
 //
-// https://github.com/hunterlong/statping
+// https://github.com/statping/statping
 //
 // The licenses for most software and other practical works are designed
 // to take away your freedom to share and change the works.  By contrast,
@@ -19,13 +19,17 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/hunterlong/statping/core/notifier"
-	"github.com/hunterlong/statping/types"
-	"github.com/hunterlong/statping/utils"
+	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/types/notifier"
+	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/utils"
 	"strings"
 	"text/template"
 	"time"
 )
+
+var _ notifier.Notifier = (*slack)(nil)
 
 const (
 	slackMethod     = "slack"
@@ -35,10 +39,14 @@ const (
 )
 
 type slack struct {
-	*notifier.Notification
+	*notifications.Notification
 }
 
-var Slacker = &slack{&notifier.Notification{
+func (s *slack) Select() *notifications.Notification {
+	return s.Notification
+}
+
+var slacker = &slack{&notifications.Notification{
 	Method:      slackMethod,
 	Title:       "slack",
 	Description: "Send notifications to your slack channel when a service is offline. Insert your Incoming webhooker URL for your channel to receive notifications. Based on the <a href=\"https://api.slack.com/incoming-webhooks\">slack API</a>.",
@@ -47,7 +55,8 @@ var Slacker = &slack{&notifier.Notification{
 	Delay:       time.Duration(10 * time.Second),
 	Host:        "https://webhooksurl.slack.com/***",
 	Icon:        "fab fa-slack",
-	Form: []notifier.NotificationForm{{
+	Limits:      60,
+	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Incoming webhooker Url",
 		Placeholder: "Insert your slack Webhook URL here.",
@@ -57,70 +66,58 @@ var Slacker = &slack{&notifier.Notification{
 	}}},
 }
 
-func parseSlackMessage(id int64, temp string, data interface{}) error {
+func parseSlackMessage(id int64, temp string, data interface{}) string {
 	buf := new(bytes.Buffer)
 	slackTemp, _ := template.New("slack").Parse(temp)
 	err := slackTemp.Execute(buf, data)
 	if err != nil {
-		return err
+		return err.Error()
 	}
-	Slacker.AddQueue(fmt.Sprintf("service_%v", id), buf.String())
-	return nil
+	return buf.String()
 }
 
 type slackMessage struct {
-	Service  *types.Service
+	Service  *services.Service
 	Template string
 	Time     int64
 	Issue    string
 }
 
 // Send will send a HTTP Post to the slack webhooker API. It accepts type: string
-func (u *slack) Send(msg interface{}) error {
-	message := msg.(string)
-	_, _, err := utils.HttpRequest(u.Host, "POST", "application/json", nil, strings.NewReader(message), time.Duration(10*time.Second), true)
+func (u *slack) sendSlack(msg string) error {
+	contents, resp, err := utils.HttpRequest(u.Host, "POST", "application/json", nil, strings.NewReader(msg), time.Duration(10*time.Second), true)
+	defer resp.Body.Close()
+	fmt.Println("CONTENTS: ", string(contents))
 	return err
 }
 
-func (u *slack) Select() *notifier.Notification {
-	return u.Notification
-}
-
 func (u *slack) OnTest() error {
-	contents, _, err := utils.HttpRequest(u.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(`{"text":"testing message"}`)), time.Duration(10*time.Second), true)
+	contents, resp, err := utils.HttpRequest(u.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(`{"text":"testing message"}`)), time.Duration(10*time.Second), true)
+	defer resp.Body.Close()
 	if string(contents) != "ok" {
-		return errors.New("The slack response was incorrect, check the URL")
+		return errors.New("the slack response was incorrect, check the URL")
 	}
 	return err
 }
 
 // OnFailure will trigger failing service
-func (u *slack) OnFailure(s *types.Service, f *types.Failure) {
+func (u *slack) OnFailure(s *services.Service, f *failures.Failure) error {
 	message := slackMessage{
 		Service:  s,
 		Template: failingTemplate,
 		Time:     utils.Now().Unix(),
-		Issue:    f.Issue,
 	}
-	parseSlackMessage(s.Id, failingTemplate, message)
+	msg := parseSlackMessage(s.Id, failingTemplate, message)
+	return u.sendSlack(msg)
 }
 
 // OnSuccess will trigger successful service
-func (u *slack) OnSuccess(s *types.Service) {
-	if !s.Online {
-		u.ResetUniqueQueue(fmt.Sprintf("service_%v", s.Id))
-		message := slackMessage{
-			Service:  s,
-			Template: successTemplate,
-			Time:     utils.Now().Unix(),
-		}
-		parseSlackMessage(s.Id, successTemplate, message)
+func (u *slack) OnSuccess(s *services.Service) error {
+	message := slackMessage{
+		Service:  s,
+		Template: successTemplate,
+		Time:     utils.Now().Unix(),
 	}
-}
-
-// OnSave triggers when this notifier has been saved
-func (u *slack) OnSave() error {
-	message := fmt.Sprintf("Notification %v is receiving updated information.", u.Method)
-	u.AddQueue("saved", message)
-	return nil
+	msg := parseSlackMessage(s.Id, successTemplate, message)
+	return u.sendSlack(msg)
 }
