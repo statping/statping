@@ -38,7 +38,7 @@ release:
 
 test-ci: clean compile test-deps
 	SASS=`which sass` go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
-	goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS
+	goveralls -coverprofile=coverage.out -service=travis-ci -repotoken ${COVERALLS}
 	bash <(curl -s https://codecov.io/bash)
 
 test-api:
