@@ -5,10 +5,10 @@ go: 1.13.5
 go_import_path: github.com/statping/statping
 cache:
   directories:
-  - "~/.npm"
-  - "~/.cache"
-  - "$GOPATH/src/github.com/statping/statping/tmp"
-  - "$GOPATH/src/github.com/statping/statping/vendor"
+    - "~/.npm"
+    - "~/.cache"
+    - "$GOPATH/src/github.com/statping/statping/frontend/node_modules"
+    - "$GOPATH/src/github.com/statping/statping/vendor"
 sudo: required
 services:
 - docker
@@ -17,16 +17,16 @@ services:
 - mongodb
 env:
   global:
-  - PATH=$HOME/.local/bin:$PATH
-  - DB_HOST=localhost
-  - DB_USER=travis
-  - DB_PASS=
-  - DB_DATABASE=test
-  - GO_ENV=test
-  - STATPING_DIR=$GOPATH/src/github.com/statping/statping
+    - PATH=$HOME/.local/bin:$PATH
+    - DB_HOST=localhost
+    - DB_USER=travis
+    - DB_PASS=
+    - DB_DATABASE=test
+    - GO_ENV=test
+    - STATPING_DIR=$GOPATH/src/github.com/statping/statping
 matrix:
   allow_failures:
-  - go: master
+   - go: master
   fast_finish: true
 notifications:
   email: true
@@ -34,25 +34,25 @@ branches:
   only:
   - master
 install:
-- npm install -g sass
-- npm install -g newman
-- npm install -g cross-env
-- pip install --user awscli
-- go mod download
-- make install
+  - npm install -g sass
+  - npm install -g newman
+  - npm install -g cross-env
+  - pip install --user awscli
+  - go mod vendor
+  - make test-deps clean compile install
 before_script:
-- mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
-- psql -c 'create database test;' -U postgres
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
+  - psql -c 'create database test;' -U postgres
 script:
-- travis_retry make test-ci
-- if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then
-  make coverage; fi
+  - travis_retry make test-ci
+  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then
+    make coverage; fi
 after_success:
-- if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then
-  make travis-build; fi
+  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then
+    make travis-build; fi
 webhooks:
   urls:
-  - "$GITTER"
+    - "$GITTER"
   on_success: change
   on_failure: always
   on_start: never
