@@ -3,23 +3,42 @@ package groups
 import (
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/types/services"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 var example = &Group{
+	Id:     1,
 	Name:   "Example Group",
 	Public: null.NewNullBool(true),
 	Order:  1,
 }
 
+var s1 = &services.Service{
+	Name:    "Example Service",
+	Public:  null.NewNullBool(true),
+	Order:   1,
+	GroupId: 1,
+}
+
+var s2 = &services.Service{
+	Name:    "Example Service 2",
+	Public:  null.NewNullBool(true),
+	Order:   2,
+	GroupId: 1,
+}
+
 func TestInit(t *testing.T) {
 	db, err := database.OpenTester()
 	require.Nil(t, err)
-	db.CreateTable(&Group{})
+	db.CreateTable(&Group{}, &services.Service{})
 	db.Create(&example)
+	db.Create(&s1)
+	db.Create(&s2)
 	SetDB(db)
+	services.SetDB(db)
 }
 
 func TestFind(t *testing.T) {
