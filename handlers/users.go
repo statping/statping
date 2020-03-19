@@ -37,7 +37,7 @@ func getUser(r *http.Request) (*users.User, int64, error) {
 func apiUserHandler(w http.ResponseWriter, r *http.Request) {
 	user, _, err := getUser(r)
 	if err != nil {
-		sendErrorJson(err, w, r)
+		sendErrorJson(err, w, r, http.StatusNotFound)
 		return
 	}
 	user.Password = ""

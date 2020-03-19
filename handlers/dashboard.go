@@ -99,10 +99,6 @@ func apiThemeSaveHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	if err := source.SaveAsset([]byte(themes.Base), "scss/main.scss"); err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
 	if err := source.SaveAsset([]byte(themes.Variables), "scss/variables.scss"); err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -128,6 +124,7 @@ func apiThemeCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := source.CompileSASS(source.DefaultScss...); err != nil {
+		source.CopyToPublic(source.TmplBox, "css", "main.css")
 		source.CopyToPublic(source.TmplBox, "css", "base.css")
 		log.Errorln("Default 'base.css' was inserted because SASS did not work.")
 	}

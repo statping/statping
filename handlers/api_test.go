@@ -157,11 +157,36 @@ func TestMainApiRoutes(t *testing.T) {
 			},
 		},
 		{
+			Name:           "Update Core",
+			URL:            "/api/core",
+			Method:         "POST",
+			ExpectedStatus: 200,
+			Body: `{
+					"name": "Updated Core"
+				}`,
+			AfterTest: func(t *testing.T) error {
+				assert.Equal(t, "Updated Core", core.App.Name)
+				return nil
+			},
+		},
+		{
 			Name:           "404 Error Page",
 			URL:            "/api/missing_404_page",
 			Method:         "GET",
 			ExpectedStatus: 404,
-		}}
+		},
+		//{
+		//	Name:           "Prometheus Export Metrics",
+		//	URL:            "/metrics",
+		//	Method:         "GET",
+		//	ExpectedStatus: 200,
+		//	ExpectedContains: []string{
+		//		`Statping Totals`,
+		//		`total_failures`,
+		//		`Golang Metrics`,
+		//	},
+		//}
+	}
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {

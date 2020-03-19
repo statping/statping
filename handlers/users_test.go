@@ -40,6 +40,11 @@ func TestApiUsersRoutes(t *testing.T) {
 			Method:         "GET",
 			ExpectedStatus: 200,
 		}, {
+			Name:           "Statping Missing User",
+			URL:            "/api/users/9393939393",
+			Method:         "GET",
+			ExpectedStatus: 404,
+		}, {
 			Name:   "Statping Update User",
 			URL:    "/api/users/1",
 			Method: "POST",
@@ -71,6 +76,11 @@ func TestApiUsersRoutes(t *testing.T) {
 			ExpectedContains: []string{`incorrect authentication`},
 			ExpectedStatus:   200,
 			HttpHeaders:      []string{"Content-Type=application/x-www-form-urlencoded"},
+		}, {
+			Name:           "Statping Logout",
+			URL:            "/api/logout",
+			Method:         "GET",
+			ExpectedStatus: 303,
 		}}
 
 	for _, v := range tests {
