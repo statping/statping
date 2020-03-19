@@ -30,10 +30,20 @@ reup: down clean compose-build-full up
 test: clean
 	go test -v -p=4 -ldflags="-X main.VERSION=testing" -coverprofile=coverage.out ./...
 
+# build all arch's and release Statping
+release:
+	wget -O statping.gpg $(SIGN_URL)
+	gpg --import statping.gpg
+	make build-all
+
 test-ci: clean compile test-deps
 	SASS=`which sass` STATPING_DIR=${GOPATH}/src/github.com/statping/statping go test -v -covermode=count -coverprofile=coverage.out -p=4 ./...
 	goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS
 	bash <(curl -s https://codecov.io/bash)
+
+test-api:
+	DB_CONN=sqlite DB_HOST=localhost DB_DATABASE=sqlite DB_PASS=none DB_USER=none statping &
+	sleep 5000 && newman run source/tmpl/postman.json -e dev/postman_environment.json --delay-request 500
 
 test-deps:
 	go get golang.org/x/tools/cmd/cover
@@ -161,6 +171,14 @@ print_details:
 	@echo \Grafana:             http://localhost:3000  \(username: admin, password: admin\)
 
 build-all: xgo-install build-mac build-linux build-windows build-linux build-alpine compress
+
+coverage: test-deps
+	$(GOPATH)/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $(COVERALLS)
+
+# build Statping using a travis ci trigger
+travis-build: travis_s3_creds upload_to_s3
+	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(TRAVIS_BUILD_CMD) https://api.travis-ci.com/repo/statping%2Fstatping/requests
+	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
 
 download-key:
 	wget -O statping.gpg $(KEY_URL)

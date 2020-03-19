@@ -37,15 +37,13 @@ install:
 - npm install -g sass
 - npm install -g newman
 - pip install --user awscli
-- go mod vendor
-- make dev-deps
+- go mod download
 - make install
 before_script:
 - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
 - psql -c 'create database test;' -U postgres
 script:
-- travis_retry make test-all
-- make test-api
+- travis_retry make test-ci
 - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" = "false" ]]; then
   make coverage; fi
 after_success:
