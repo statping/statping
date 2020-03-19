@@ -39,7 +39,7 @@ install:
   - npm install -g cross-env
   - pip install --user awscli
   - go mod vendor
-  - make test-deps clean compile install
+  - make test-deps yarn clean compile install
 before_script:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
   - psql -c 'create database test;' -U postgres

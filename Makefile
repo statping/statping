@@ -114,6 +114,10 @@ frontend-build:
 frontend-copy:
 	cp -r source/tmpl/*.* source/dist/
 
+yarn:
+	rm -rf source/dist && rm -rf frontend/dist
+	cd frontend && yarn
+
 # compile assets using SASS and Rice. compiles scss -> css, and run rice embed-go
 compile: generate frontend-build
 	rm -f source/rice-box.go
