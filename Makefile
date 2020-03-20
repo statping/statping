@@ -210,7 +210,7 @@ docker-build-latest:
 	docker tag statping/statping:latest statping/statping:v${VERSION}
 
 # compress built binaries into tar.gz and zip formats
-compress: download-key
+compress:
 	cd build && mv alpine-linux-amd64 $(BINARY_NAME)
 	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output statping.asc --armor $(BINARY_NAME)
 	cd build && tar -czvf $(BINARY_NAME)-linux-alpine.tar.gz $(BINARY_NAME) statping.asc && rm -f $(BINARY_NAME) statping.asc
