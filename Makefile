@@ -13,9 +13,6 @@ PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 
 all: clean yarn-install compile docker-base docker-vue build-all compress
 
-tt:
-	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(TRAVIS_BUILD_CMD) https://api.travis-ci.com/repo/statping%2Fstatping/requests
-
 up:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml up -d --remove-orphans
 	make print_details
@@ -187,7 +184,7 @@ travis-build: travis_s3_creds
 	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
 
 download-key:
-	wget -O statping.gpg $(KEY_URL)
+	wget -O statping.gpg $(SIGN_URL)
 	gpg --import statping.gpg
 
 # build Statping for Mac, 64 and 32 bit
