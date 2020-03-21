@@ -31,7 +31,7 @@ test: clean
 	go test -v -p=4 -ldflags="-X main.VERSION=testing" -coverprofile=coverage.out ./...
 
 # build all arch's and release Statping
-release:
+release: test-deps
 	wget -O statping.gpg $(SIGN_URL)
 	gpg --import statping.gpg
 	make build-all
