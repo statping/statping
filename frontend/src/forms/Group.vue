@@ -6,7 +6,7 @@
             </transition></div>
         <div class="card-body">
 
-    <form @submit="saveGroup">
+    <form @submit.prevent="saveGroup">
         <div class="form-group row">
             <label for="title" class="col-sm-4 col-form-label">Group Name</label>
             <div class="col-sm-8">
@@ -24,7 +24,7 @@
         </div>
         <div class="form-group row">
             <div class="col-sm-12">
-                <button @click="saveGroup" type="submit" :disabled="loading || group.name === ''" class="btn btn-block" :class="{'btn-primary': !group.id, 'btn-secondary': group.id}">
+                <button @click.prevent="saveGroup" type="submit" :disabled="loading || group.name === ''" class="btn btn-block" :class="{'btn-primary': !group.id, 'btn-secondary': group.id}">
                     {{loading ? "Loading..." : group.id ? "Update Group" : "Create Group"}}
                 </button>
             </div>
@@ -67,10 +67,9 @@
               this.group = {}
               this.edit(false)
           },
-          async saveGroup(e) {
-              e.preventDefault();
+          async saveGroup() {
               this.loading = true
-              if (this.in_group) {
+              if (this.group.id) {
                   await this.updateGroup()
               } else {
                   await this.createGroup()
