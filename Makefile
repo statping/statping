@@ -106,7 +106,7 @@ top:
 
 frontend-build:
 	rm -rf source/dist && rm -rf frontend/dist
-	cd frontend && yarn build
+	cd frontend && yarn && yarn build
 	cp -r frontend/dist source/ && cp -r frontend/src/assets/scss source/dist/
 	cp -r source/tmpl/*.* source/dist/
 
