@@ -118,7 +118,7 @@ yarn:
 	cd frontend && yarn
 
 # compile assets using SASS and Rice. compiles scss -> css, and run rice embed-go
-compile: generate frontend-build
+compile: frontend-build
 	rm -f source/rice-box.go
 	cd source && rice embed-go
 
