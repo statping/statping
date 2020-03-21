@@ -33,7 +33,8 @@ install:
   - "npm install -g cross-env"
   - "pip install --user awscli"
   - "go get github.com/mattn/goveralls"
-  - "go mod vendor"
+  - "go mod download"
+  - "go mod verify"
   - "make test-deps yarn clean compile install"
 language: go
 matrix:
