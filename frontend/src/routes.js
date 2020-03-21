@@ -31,9 +31,13 @@ const routes = [
     meta: {
       requiresAuth: true
     },
+    beforeEnter: CheckAuth,
     children: [{
       path: '',
       component: DashboardIndex,
+      meta: {
+        requiresAuth: true
+      }
     },{
       path: 'users',
       component: DashboardUsers
@@ -86,17 +90,22 @@ const router = new VueRouter({
     routes
 })
 
-router.beforeEach((to, from, next) => {
+function CheckAuth(to, from, next) {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-      let item = localStorage.getItem("statping_user")
+    let item = localStorage.getItem("statping_user")
     if (to.path !== '/login' && !item) {
       next('/login')
       return
     }
-      next()
+    const auth = JSON.parse(item)
+    if (!auth.token) {
+      next('/login')
+      return
+    }
+    next()
   } else {
     next()
   }
-})
+}
 
 export default router
