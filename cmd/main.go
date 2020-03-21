@@ -192,7 +192,7 @@ func sigterm() {
 	<-sigs
 	fmt.Println("Shutting down Statping")
 	Close()
-	os.Exit(1)
+	os.Exit(0)
 }
 
 // mainProcess will initialize the Statping application and run the HTTP server
