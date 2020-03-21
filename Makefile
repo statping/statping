@@ -173,7 +173,7 @@ print_details:
 	@echo \==== Monitoring and IDE ====
 	@echo \Grafana:             http://localhost:3000  \(username: admin, password: admin\)
 
-build-all: xgo-install build-mac build-linux build-windows build-linux build-alpine compress
+build-all: xgo-install compile build-mac build-linux build-windows build-linux build-alpine compress
 
 coverage: test-deps
 	$(GOPATH)/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $(COVERALLS)
