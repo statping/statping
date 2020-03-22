@@ -170,7 +170,7 @@
       methods: {
           async chartHits(group) {
               const start = this.nowSubtract(84600 * 3)
-              this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), group, true)
+              this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), group, false)
 
               if (this.data.length === 0 && group !== "1h") {
                   await this.chartHits("1h")

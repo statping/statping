@@ -11,7 +11,7 @@ type TimeGroup interface {
 func (it *Db) ParseTime(t string) (time.Time, error) {
 	switch it.Type {
 	case "mysql":
-		return time.Parse("2006-01-02 15:04:05", t)
+		return time.Parse("2006-01-02T15:04:05Z", t)
 	case "postgres":
 		return time.Parse("2006-01-02T15:04:05Z", t)
 	default:
@@ -31,7 +31,7 @@ func (it *Db) FormatTime(t time.Time) string {
 }
 
 func (it *Db) SelectByTime(increment time.Duration) string {
-	seconds := int(increment.Seconds())
+	seconds := int64(increment.Seconds())
 	switch it.Type {
 	case "mysql":
 		return fmt.Sprintf("FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(created_at) / %d) * %d) AS timeframe", seconds, seconds)

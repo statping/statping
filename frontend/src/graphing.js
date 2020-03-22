@@ -17,7 +17,7 @@ class Graphing {
     }
 
     async hits(service, days, group='24h') {
-        const query = await API.service_hits(service.id, this.subtract(86400 * days), this.now(), group)
+        const query = await API.service_hits(service.id, this.subtract(86400 * days), this.now(), group, false)
         let total = 0;
         let high = 0;
         let low = 99999999;

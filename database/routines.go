@@ -14,7 +14,7 @@ import (
 
 var (
 	log               = utils.Log
-	removeRowsAfter   = types.Month * 6
+	removeRowsAfter   = types.Day * 90
 	maintenceDuration = types.Hour
 )
 

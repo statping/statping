@@ -51,7 +51,7 @@ var (
 	ByAverage = func(column string, multiplier int) By {
 		switch database.DbType() {
 		case "mysql":
-			return By(fmt.Sprintf("CAST(AVG(%s) as UNSIGNED) as amount", column))
+			return By(fmt.Sprintf("CAST(AVG(%s) as UNSIGNED INT) as amount", column))
 		case "postgres":
 			return By(fmt.Sprintf("cast(AVG(%s) as int) as amount", column))
 		default:
@@ -71,7 +71,6 @@ func (t *TimeVar) ToValues() ([]*TimeValue, error) {
 
 // GraphData will return all hits or failures
 func (g *GroupQuery) GraphData(by By) ([]*TimeValue, error) {
-
 	dbQuery := g.db.MultipleSelects(
 		g.db.SelectByTime(g.Group),
 		by.String(),
@@ -98,16 +97,18 @@ func (g *GroupQuery) ToTimeValue() (*TimeVar, error) {
 	var data []*TimeValue
 	for rows.Next() {
 		var timeframe string
-		amount := int64(0)
+		var amount int64
 		if err := rows.Scan(&timeframe, &amount); err != nil {
 			log.Error(err, timeframe)
 		}
 		trueTime, _ := g.db.ParseTime(timeframe)
 		newTs := types.FixedTime(trueTime, g.Group)
-		data = append(data, &TimeValue{
+
+		tv := &TimeValue{
 			Timeframe: newTs,
 			Amount:    amount,
-		})
+		}
+		data = append(data, tv)
 	}
 	return &TimeVar{g, data}, nil
 }

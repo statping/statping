@@ -8,6 +8,8 @@ services:
       - 80:80
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - statping
 
 #  statping_dev:
 #    container_name: statping_dev
