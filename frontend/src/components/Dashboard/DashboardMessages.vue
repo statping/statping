@@ -21,7 +21,7 @@
                 </td>
                 <td class="d-none d-md-table-cell">{{niceDate(message.start_on)}}</td>
                 <td class="text-right">
-                    <div class="btn-group">
+                    <div v-if="$store.state.admin" class="btn-group">
                         <a @click.prevent="editMessage(message, edit)" href="#" class="btn btn-outline-secondary"><i class="fas fa-exclamation-triangle"></i> Edit</a>
                         <a @click.prevent="deleteMessage(message)" href="#" class="btn btn-danger"><font-awesome-icon icon="times" /></a>
                     </div>
@@ -33,7 +33,7 @@
     </div>
         </div>
 
-            <FormMessage :edit="editChange" :in_message="message"/>
+            <FormMessage v-if="$store.state.admin" :edit="editChange" :in_message="message"/>
     </div>
 </template>
 

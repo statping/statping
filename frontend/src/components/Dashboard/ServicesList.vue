@@ -12,11 +12,11 @@
         <draggable tag="tbody" v-model="servicesList" handle=".drag_icon">
             <tr v-for="(service, index) in $store.getters.servicesInOrder" :key="service.id">
                 <td>
-                    <span class="drag_icon d-none d-md-inline">
+                    <span v-if="$store.state.admin" class="drag_icon d-none d-md-inline">
                         <font-awesome-icon icon="bars" class="mr-3"/>
                     </span> {{service.name}}
                 </td>
-                <td class="d-none d-md-table-cell">
+                <td v-if="$store.state.admin" class="d-none d-md-table-cell">
                     <ToggleSwitch v-if="service.online" :service="service"/>
                 </td>
                 <td class="d-none d-md-table-cell">
@@ -25,17 +25,19 @@
                     </span>
                 </td>
                 <td class="d-none d-md-table-cell">
-                    <div v-if="service.group_id !== 0"><span class="badge badge-secondary">{{serviceGroup(service)}}</span></div>
+                    <div v-if="service.group_id !== 0">
+                        <span class="badge badge-secondary">{{serviceGroup(service)}}</span>
+                    </div>
                 </td>
                 <td class="text-right">
                     <div class="btn-group">
-                        <router-link :to="{path: `/dashboard/edit_service/${service.id}`, params: {service: service} }" class="btn btn-outline-secondary">
+                        <router-link v-if="$store.state.admin" :to="{path: `/dashboard/edit_service/${service.id}`, params: {service: service} }" class="btn btn-outline-secondary">
                             <i class="fas fa-chart-area"></i> Edit
                         </router-link>
                         <router-link :to="{path: serviceLink(service), params: {service: service} }" class="btn btn-outline-secondary">
                             <i class="fas fa-chart-area"></i> View
                         </router-link>
-                        <a @click.prevent="deleteService(service)" href="#" class="btn btn-danger">
+                        <a v-if="$store.state.admin" @click.prevent="deleteService(service)" href="#" class="btn btn-danger">
                             <font-awesome-icon icon="times" />
                         </a>
                     </div>

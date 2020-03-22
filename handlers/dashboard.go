@@ -212,12 +212,14 @@ func apiLoginHandler(w http.ResponseWriter, r *http.Request) {
 	user, auth := users.AuthUser(username, password)
 	if auth {
 		utils.Log.Infoln(fmt.Sprintf("User %v logged in from IP %v", user.Username, r.RemoteAddr))
-		_, token := setJwtToken(user, w)
+		claim, token := setJwtToken(user, w)
 
 		resp := struct {
-			Token string `json:"token"`
+			Token   string `json:"token"`
+			IsAdmin bool   `json:"admin"`
 		}{
 			token,
+			claim.Admin,
 		}
 		returnJson(resp, w, r)
 	} else {

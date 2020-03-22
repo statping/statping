@@ -200,8 +200,8 @@ class Api {
     return localStorage.removeItem(tokenKey)
   }
 
-  saveToken(username, token) {
-    const user = {username: username, token: token}
+  saveToken(username, token, admin) {
+    const user = {username: username, token: token, admin: admin}
     localStorage.setItem(tokenKey, JSON.stringify(user));
     return user
   }

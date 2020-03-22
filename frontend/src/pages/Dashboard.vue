@@ -1,12 +1,12 @@
 <template>
     <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
-        <TopNav/>
-        <router-view/>
+        <TopNav :admin="$store.state.admin"/>
+        <router-view :admin="$store.state.admin"/>
     </div>
 </template>
 
 <script>
-    import Api from "../API"
+  import Api from "../API"
   import TopNav from "../components/Dashboard/TopNav";
 
   export default {
@@ -14,20 +14,14 @@
   components: {
     TopNav,
   },
-      async mounted() {
-          if (this.$route.path !== "/login") {
-              try {
-                  const u = await Api.users()
-              } catch (e) {
-                  this.$router.push('/logout')
-              }
-          }
-      },
   data () {
-    return {
-      authenticated: false
-    }
+      return {
+          authenticated: false,
+      }
   },
+  async mounted() {
+
+  }
 }
 </script>
 

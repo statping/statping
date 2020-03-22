@@ -60,8 +60,10 @@
               if (auth.error) {
                   this.error = true
               } else if (auth.token) {
-                  this.auth = Api.saveToken(this.username, auth.token)
+                  this.auth = Api.saveToken(this.username, auth.token, auth.admin)
                   this.$store.dispatch('loadAdmin')
+                  this.$store.commit('setAdmin', auth.admin)
+                  window.console.log(auth)
                   this.$router.push('/dashboard')
               }
               this.loading = false

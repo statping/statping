@@ -14,17 +14,16 @@
                 <li @click="navopen = !navopen" class="nav-item navbar-item">
                     <router-link to="/dashboard/services" class="nav-link">Services</router-link>
                 </li>
-                <li @click="navopen = !navopen" class="nav-item navbar-item">
+                <li v-if="$store.state.admin" @click="navopen = !navopen" class="nav-item navbar-item">
                     <router-link to="/dashboard/users" class="nav-link">Users</router-link>
                 </li>
                 <li @click="navopen = !navopen" class="nav-item navbar-item">
                     <router-link to="/dashboard/messages" class="nav-link">Messages</router-link>
                 </li>
-
-                <li @click="navopen = !navopen" class="nav-item navbar-item">
+                <li v-if="$store.state.admin" @click="navopen = !navopen" class="nav-item navbar-item">
                     <router-link to="/dashboard/settings" class="nav-link">Settings</router-link>
                 </li>
-                <li @click="navopen = !navopen" class="nav-item navbar-item">
+                <li v-if="$store.state.admin" @click="navopen = !navopen" class="nav-item navbar-item">
                     <router-link to="/dashboard/logs" class="nav-link">Logs</router-link>
                 </li>
 
@@ -47,17 +46,18 @@
   name: 'TopNav',
       data () {
           return {
-              navopen: false,
+              navopen: false
           }
       },
-  methods: {
-    async logout () {
-      await Api.logout()
-      this.$store.commit('setHasAllData', false)
-      this.$store.commit('setToken', null)
-      await this.$router.push('/')
+      methods: {
+        async logout () {
+          await Api.logout()
+          this.$store.commit('setHasAllData', false)
+          this.$store.commit('setToken', null)
+          this.$store.commit('setAdmin', false)
+          await this.$router.push('/')
+        }
     }
-  }
 }
 </script>
 

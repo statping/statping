@@ -25,7 +25,8 @@ export default new Vuex.Store({
             groups: [],
             messages: [],
             users: [],
-            notifiers: []
+            notifiers: [],
+            admin: false
         },
     getters: {
         hasAllData: state => state.hasAllData,
@@ -38,6 +39,8 @@ export default new Vuex.Store({
         incidents: state => state.incidents,
         users: state => state.users,
         notifiers: state => state.notifiers,
+
+        isAdmin: state => state.admin,
 
         servicesInOrder: state => state.services.sort((a, b) => a.order_id - b.order_id),
         groupsInOrder: state => state.groups.sort((a, b) => a.order_id - b.order_id),
@@ -106,7 +109,10 @@ export default new Vuex.Store({
         },
         setNotifiers (state, notifiers) {
             state.notifiers = notifiers
-        }
+        },
+        setAdmin (state, admin) {
+            state.admin = admin
+        },
     },
     actions: {
         async getAllServices(context) {

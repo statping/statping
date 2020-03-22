@@ -2,7 +2,7 @@
     <div class="col-12">
         <div class="card contain-card text-black-50 bg-white mb-4">
             <div class="card-header">Services
-                <router-link to="/dashboard/create_service" class="btn btn-sm btn-outline-success float-right">
+                <router-link v-if="$store.state.admin" to="/dashboard/create_service" class="btn btn-sm btn-outline-success float-right">
                 <font-awesome-icon icon="plus"/>  Create
             </router-link></div>
             <div class="card-body">
@@ -34,7 +34,7 @@
                     <span v-if="!group.public" class="badge badge-secondary">PRIVATE</span>
                 </td>
                 <td class="text-right">
-                    <div class="btn-group">
+                    <div v-if="$store.state.admin" class="btn-group">
                         <a @click.prevent="editGroup(group, edit)" href="#" class="btn btn-outline-secondary"><font-awesome-icon icon="chart-area" /> Edit</a>
                         <a @click.prevent="deleteGroup(group)" href="#" class="btn btn-danger">
                             <font-awesome-icon icon="times" />
@@ -50,7 +50,7 @@
         </div>
 
 
-        <FormGroup :edit="editChange" :in_group="group"/>
+        <FormGroup v-if="$store.state.admin" :edit="editChange" :in_group="group"/>
 
     </div>
 

@@ -3,7 +3,7 @@
 
     <div v-for="(incident, i) in incidents" class="card contain-card text-black-50 bg-white mb-4">
         <div class="card-header">Incident: {{incident.title}}
-            <button @click="deleteIncident(incident)" class="btn btn-sm btn-danger float-right">
+            <button v-if="IsAdmin()" @click="deleteIncident(incident)" class="btn btn-sm btn-danger float-right">
                 <font-awesome-icon icon="times" />  Delete
             </button></div>
                 <div class="card-body bg-light pt-1">
@@ -15,7 +15,7 @@
     </div>
 
 
-    <div class="card contain-card text-black-50 bg-white mb-5">
+    <div v-if="IsAdmin()" class="card contain-card text-black-50 bg-white mb-5">
         <div class="card-header">Create Incident for {{service.name}}</div>
         <div class="card-body">
             <form @submit.prevent="createIncident">

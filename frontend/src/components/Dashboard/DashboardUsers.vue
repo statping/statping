@@ -31,7 +31,7 @@
             </div>
         </div>
 
-                <FormUser :edit="editChange" :in_user="user"/>
+                <FormUser v-if="$store.state.admin" :edit="editChange" :in_user="user"/>
 
     </div>
 </template>

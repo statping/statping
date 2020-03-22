@@ -61,6 +61,9 @@ export default Vue.mixin({
     isInt(n) {
       return n % 1 === 0;
     },
+    isAdmin() {
+      return this.$store.state.admin
+    },
     loggedIn() {
       const core = this.$store.getters.core
       return core.logged_in === true
