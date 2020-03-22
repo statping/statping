@@ -19,8 +19,8 @@
 // Build All Binary Arch's
 //
 // To build Statping for Mac, Windows, Linux, and ARM devices, you can run xgo to build for all. xgo is an awesome
-// golang package that requires Docker. https://github.com/karalabe/xgo
-//		docker pull karalabe/xgo-latest
+// golang package that requires Docker. https://github.com/crazy-max/xgo
+//		docker pull crazy-max/xgo
 //		build-all
 //
 // More info on: https://github.com/statping/statping

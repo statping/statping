@@ -13,7 +13,7 @@
             <tr v-for="(cache, index) in cache">
                 <td>{{cache.url}}</td>
                 <td>{{cache.size}}</td>
-                <td>{{expireTime(cache.expiration)}}</td>
+                <td>{{ago(cache.expiration)}}</td>
             </tr>
 
             </tbody>
@@ -36,9 +36,6 @@ export default {
           this.cache = await Api.cache()
       },
       methods: {
-          expireTime(ex) {
-              return this.toLocal(ex)
-          },
           async clearCache() {
               await Api.clearCache()
               this.cache = []

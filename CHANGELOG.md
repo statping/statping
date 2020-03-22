@@ -1,3 +1,7 @@
+# 0.90.15
+- Fixed /dashboard authentication state to show admin tabs if your an admin. [Issue #438](https://github.com/statping/statping/issues/438)
+- Fixed Cache JS error on Dashboard
+
 # 0.90.14
 - Updated SCSS compiling, and confirmed it works.
 - Added `$container-color` SCSS variable.

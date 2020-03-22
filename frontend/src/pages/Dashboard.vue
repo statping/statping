@@ -20,7 +20,8 @@
       }
   },
   async mounted() {
-
+        const core = await Api.core()
+      this.$store.commit('setAdmin', core.admin)
   }
 }
 </script>
