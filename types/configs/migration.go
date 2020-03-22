@@ -5,7 +5,9 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/statping/statping/source"
 	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/utils"
 
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/core"
@@ -44,6 +46,22 @@ func (c *DbConfig) DatabaseChanges() error {
 			return err
 		}
 
+		if err := c.BackupAssets(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// BackupAssets is a temporary function (to version 0.90.*) to backup your customized theme
+// to a new folder called 'assets_backup'.
+func (c *DbConfig) BackupAssets() error {
+	if source.UsingAssets(utils.Directory) {
+		log.Infof("Backing up 'assets' folder to 'assets_backup'")
+		if err := utils.RenameDirectory(utils.Directory+"/assets", utils.Directory+"/assets_backup"); err != nil {
+			return err
+		}
+		log.Infof("Old assets are now stored in: " + utils.Directory + "/assets_backup")
 	}
 	return nil
 }
@@ -69,6 +87,8 @@ func (c *DbConfig) MigrateDatabase() error {
 			return tx.Error()
 		}
 	}
+
+	log.Infof("Migrating App to version: %s", core.App.Version)
 	if err := tx.Table("core").AutoMigrate(&core.Core{}); err.Error() != nil {
 		tx.Rollback()
 		log.Errorln(fmt.Sprintf("Statping Database could not be migrated: %v", tx.Error()))
@@ -78,6 +98,9 @@ func (c *DbConfig) MigrateDatabase() error {
 	if err := tx.Commit().Error(); err != nil {
 		return err
 	}
+
+	c.Db.Table("core").Model(&core.Core{}).Update("version", core.App.Version)
+
 	log.Infoln("Statping Database Tables Migrated")
 
 	if err := c.Db.Model(&hits.Hit{}).AddIndex("idx_service_hit", "service").Error(); err != nil {

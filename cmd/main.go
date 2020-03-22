@@ -19,6 +19,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/getsentry/sentry-go"
+	"github.com/statping/statping/types/core"
 	"os"
 	"os/signal"
 	"syscall"
@@ -48,10 +49,6 @@ var (
 	confgs *configs.DbConfig
 )
 
-func init() {
-
-}
-
 // parseFlags will parse the application flags
 // -ip = 0.0.0.0 IP address for outgoing HTTP server
 // -port = 8080 Port number for outgoing HTTP server
@@ -73,6 +70,11 @@ func exit(err error) {
 	log.Fatalln(err)
 	Close()
 	os.Exit(2)
+}
+
+func init() {
+	core.App = new(core.Core)
+	core.App.Version = VERSION
 }
 
 // main will run the Statping application
@@ -129,12 +131,14 @@ func main() {
 		exit(err)
 	}
 
-	exists := confgs.Db.HasTable("core")
-	if !exists {
+	if !confgs.Db.HasTable("core") {
 		var srvs int64
-		confgs.Db.Model(&services.Service{}).Count(&srvs)
-		if srvs > 0 {
-			exit(errors.Wrap(err, "there are already services setup."))
+		if confgs.Db.HasTable(&services.Service{}) {
+			confgs.Db.Model(&services.Service{}).Count(&srvs)
+			if srvs > 0 {
+				exit(errors.Wrap(err, "there are already services setup."))
+				return
+			}
 		}
 
 		if err := confgs.DropDatabase(); err != nil {

@@ -155,12 +155,6 @@ func (it *Db) MultipleSelects(args ...string) Database {
 	return it.Select(joined)
 }
 
-func OrderStatus(status []string) func(db *gorm.DB) *gorm.DB {
-	return func(db *gorm.DB) *gorm.DB {
-		return db.Scopes(AmountGreaterThan1000).Where("status IN (?)", status)
-	}
-}
-
 type Db struct {
 	Database *gorm.DB
 	Type     string
@@ -180,7 +174,21 @@ func Openw(dialect string, args ...interface{}) (db Database, err error) {
 }
 
 func OpenTester() (Database, error) {
-	newDb, err := Openw("sqlite3", fmt.Sprintf("file:%s?mode=memory&cache=shared", utils.RandomString(12)))
+	testDB := utils.Getenv("TEST_DB", "sqlite3").(string)
+	var dbParamsstring string
+	switch testDB {
+	case "mysql":
+		dbParamsstring = fmt.Sprintf("root:password123@tcp(localhost:3306)/statping?charset=utf8&parseTime=True&loc=UTC&time_zone=%%27UTC%%27")
+	case "postgres":
+		dbParamsstring = fmt.Sprintf("host=localhost port=5432 user=root dbname=statping password=password123 timezone=UTC")
+	default:
+		dbParamsstring = fmt.Sprintf("file:%s?mode=memory&cache=shared", utils.RandomString(12))
+	}
+	fmt.Println(testDB, dbParamsstring)
+	newDb, err := Openw(testDB, dbParamsstring)
+	if err != nil {
+		return nil, err
+	}
 	newDb.DB().SetMaxOpenConns(1)
 	return newDb, err
 }

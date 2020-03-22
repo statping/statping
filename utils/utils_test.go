@@ -18,8 +18,10 @@ package utils
 import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	"time"
 )
@@ -167,6 +169,14 @@ func TestRandomString(t *testing.T) {
 
 func TestDeleteDirectory(t *testing.T) {
 	assert.Nil(t, DeleteDirectory(Directory+"/logs"))
+}
+
+func TestRenameDirectory(t *testing.T) {
+	assert.Nil(t, CreateDirectory(Directory+"/example"))
+	require.DirExists(t, Directory+"/example")
+	assert.Nil(t, RenameDirectory(Directory+"/example", Directory+"/renamed_example"))
+	require.DirExists(t, Directory+"/renamed_example")
+	assert.Nil(t, os.RemoveAll(Directory+"/renamed_example"))
 }
 
 func TestHttpRequest(t *testing.T) {

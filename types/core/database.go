@@ -50,6 +50,7 @@ func (c *Core) Create() error {
 		ConfigFile:  utils.Directory + "/config.yml",
 		ApiKey:      c.ApiKey,
 		ApiSecret:   c.ApiSecret,
+		Version:     App.Version,
 		Domain:      c.Domain,
 		MigrationId: time.Now().Unix(),
 	}

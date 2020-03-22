@@ -1,7 +1,7 @@
 <template>
     <div class="container col-md-7 col-sm-12 mt-2 sm-container">
         <div class="col-12 col-md-8 offset-md-2 mb-4">
-            <img class="col-12 mt-5 mt-md-0" src="/banner.png">
+            <img class="col-12 mt-5 mt-md-0" style="max-width:680px" src="/banner.png">
         </div>
 
         <div class="col-12">

@@ -99,6 +99,9 @@ export default Vue.mixin({
       }
     },
     convertToChartData(data = [], multiplier=1, asInt=false) {
+      if (!data) {
+        return {data: []}
+      }
       let newSet = [];
       data.forEach((f) => {
         let amount = f.amount * multiplier;

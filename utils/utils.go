@@ -222,6 +222,12 @@ func DeleteFile(file string) error {
 	return os.Remove(file)
 }
 
+// RenameDirectory will attempt rename a directory to a new name
+func RenameDirectory(fromDir string, toDir string) error {
+	Log.Debugln("renaming directory: " + fromDir + "to: " + toDir)
+	return os.Rename(fromDir, toDir)
+}
+
 // DeleteDirectory will attempt to delete a directory and all contents inside
 //		DeleteDirectory("assets")
 func DeleteDirectory(directory string) error {
