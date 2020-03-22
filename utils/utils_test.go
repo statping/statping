@@ -53,10 +53,9 @@ func TestDir(t *testing.T) {
 }
 
 func TestCommand(t *testing.T) {
-	t.SkipNow()
-	in, out, err := Command("pwd")
+	in, out, err := Command("/bin/echo", "\"statping testing\"")
 	assert.Nil(t, err)
-	assert.Contains(t, in, "statping")
+	assert.Contains(t, in, "statping testing")
 	assert.Empty(t, out)
 }
 

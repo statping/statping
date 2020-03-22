@@ -73,8 +73,7 @@ func exit(err error) {
 }
 
 func init() {
-	core.App = new(core.Core)
-	core.App.Version = VERSION
+	core.New(VERSION)
 }
 
 // main will run the Statping application

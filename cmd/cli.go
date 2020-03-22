@@ -42,9 +42,9 @@ func catchCLI(args []string) error {
 	switch args[0] {
 	case "version":
 		if COMMIT != "" {
-			fmt.Printf("%v (%v)\n", VERSION, COMMIT)
+			fmt.Printf("%s (%s)\n", VERSION, COMMIT)
 		} else {
-			fmt.Printf("%v\n", VERSION)
+			fmt.Printf("%s\n", VERSION)
 		}
 		return errors.New("end")
 	case "assets":

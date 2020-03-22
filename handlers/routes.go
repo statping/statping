@@ -191,5 +191,5 @@ func resetRouter() {
 }
 
 func resetCookies() {
-	jwtKey = fmt.Sprintf("%v_%v", core.App.ApiSecret, utils.Now().Nanosecond())
+	jwtKey = fmt.Sprintf("%s_%d", core.App.ApiSecret, utils.Now().Nanosecond())
 }

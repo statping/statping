@@ -9,6 +9,11 @@ var (
 	App *Core
 )
 
+func New(version string) {
+	App = new(Core)
+	App.Version = version
+}
+
 // Core struct contains all the required fields for Statping. All application settings
 // will be saved into 1 row in the 'core' table. You can use the core.CoreApp
 // global variable to interact with the attributes to the application, such as services.

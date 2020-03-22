@@ -35,6 +35,7 @@ func init() {
 	source.Assets()
 	utils.InitLogs()
 	dir = utils.Directory
+	core.New("test")
 }
 
 //func TestResetDatabase(t *testing.T) {
