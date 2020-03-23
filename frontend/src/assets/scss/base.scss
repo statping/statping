@@ -469,7 +469,6 @@ HTML,BODY {
     margin: 0;
     font: inherit;
     overflow: auto;
-    font-family: inherit;
     display: block;
     width: 100%;
     padding: 0px;
@@ -485,7 +484,6 @@ HTML,BODY {
     /* Code Mirror Settings */
     font-family: monospace;
     position: relative;
-    overflow: hidden;
     height:80vh;
   }
 

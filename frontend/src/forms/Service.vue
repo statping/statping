@@ -139,6 +139,13 @@
             </span>
             </div>
         </div>
+        <div v-if="service.allow_notifications"  class="form-group row">
+            <label class="col-sm-4 col-form-label">Notify After Failures</label>
+            <div class="col-sm-8">
+                <input v-model="service.notify_after" type="number" name="notify_after" class="form-control" id="notify_after" autocapitalize="none">
+                <small class="form-text text-muted">Send Notification after {{service.notify_after === 0 ? 'the first Failure' : service.notify_after+' Failures'}} </small>
+            </div>
+        </div>
         <div v-if="service.allow_notifications" class="form-group row">
             <label class="col-sm-4 col-form-label">Notify All Changes</label>
             <div class="col-8 mt-1">
@@ -196,6 +203,7 @@
         verify_ssl: true,
         allow_notifications: true,
         notify_all_changes: true,
+        notify_after: 2,
         public: true,
       },
       groups: [],

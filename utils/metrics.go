@@ -8,7 +8,7 @@ func init() {
 
 var (
 	httpMetric *Metrics
-	StartTime  = time.Now()
+	StartTime  = Now()
 )
 
 type Metrics struct {

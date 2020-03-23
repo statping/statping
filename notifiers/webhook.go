@@ -65,8 +65,8 @@ var Webhook = &webhooker{&notifications.Notification{
 	}, {
 		Type:        "textarea",
 		Title:       "HTTP Body",
-		Placeholder: `{"service_id": "%s.Id", "service_name": "%s.Name"}`,
-		SmallText:   "Optional HTTP body for a POST request. You can insert variables into your body request.<br>%service.Id, %service.Name, %service.Online<br>%failure.Issue",
+		Placeholder: `{"service_id": {{.Service.Id}}", "service_name": "{{.Service.Name}"}`,
+		SmallText:   "Optional HTTP body for a POST request. You can insert variables into your body request.<br>{{.Service.Id}}, {{.Service.Name}}, {{.Service.Online}}<br>{{.Failure.Issue}}",
 		DbField:     "Var2",
 	}, {
 		Type:        "text",
@@ -94,12 +94,6 @@ func (w *webhooker) Send(msg interface{}) error {
 
 func (w *webhooker) Select() *notifications.Notification {
 	return w.Notification
-}
-
-func replaceBodyText(body string, s *services.Service, f *failures.Failure) string {
-	body = utils.ConvertInterface(body, s)
-	body = utils.ConvertInterface(body, f)
-	return body
 }
 
 func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
@@ -130,11 +124,12 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return resp, err
 }
 
 func (w *webhooker) OnTest() error {
-	body := replaceBodyText(w.Var2, nil, nil)
+	body := ReplaceVars(w.Var2, exampleService, exampleFailure)
 	resp, err := w.sendHttpWebhook(body)
 	if err != nil {
 		return err
@@ -147,7 +142,7 @@ func (w *webhooker) OnTest() error {
 
 // OnFailure will trigger failing service
 func (w *webhooker) OnFailure(s *services.Service, f *failures.Failure) error {
-	msg := replaceBodyText(w.Var2, s, f)
+	msg := ReplaceVars(w.Var2, s, f)
 	resp, err := w.sendHttpWebhook(msg)
 	defer resp.Body.Close()
 	return err
@@ -155,7 +150,7 @@ func (w *webhooker) OnFailure(s *services.Service, f *failures.Failure) error {
 
 // OnSuccess will trigger successful service
 func (w *webhooker) OnSuccess(s *services.Service) error {
-	msg := replaceBodyText(w.Var2, s, nil)
+	msg := ReplaceVars(w.Var2, s, nil)
 	resp, err := w.sendHttpWebhook(msg)
 	defer resp.Body.Close()
 	return err

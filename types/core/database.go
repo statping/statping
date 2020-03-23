@@ -35,8 +35,6 @@ func Select() (*Core, error) {
 }
 
 func (c *Core) Create() error {
-	c.ApiKey = c.ApiKey
-	c.ApiSecret = c.ApiSecret
 	apiKey := utils.Getenv("API_KEY", utils.NewSHA256Hash()).(string)
 	apiSecret := utils.Getenv("API_SECRET", utils.NewSHA256Hash()).(string)
 
@@ -65,24 +63,4 @@ func (c *Core) Update() error {
 
 func (c *Core) Delete() error {
 	return nil
-}
-
-func Sample() error {
-	apiKey := utils.Getenv("API_KEY", "samplekey")
-	apiSecret := utils.Getenv("API_SECRET", "samplesecret")
-
-	core := &Core{
-		Name:        "Statping Sample Data",
-		Description: "This data is only used to testing",
-		ApiKey:      apiKey.(string),
-		ApiSecret:   apiSecret.(string),
-		Domain:      "http://localhost:8080",
-		Version:     "test",
-		CreatedAt:   time.Now().UTC(),
-		UseCdn:      null.NewNullBool(false),
-		Footer:      null.NewNullString(""),
-	}
-
-	q := db.Create(core)
-	return q.Error()
 }

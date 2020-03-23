@@ -54,41 +54,41 @@ var Discorder = &discord{&notifications.Notification{
 }
 
 // Send will send a HTTP Post to the discord API. It accepts type: []byte
-func (u *discord) sendRequest(msg string) error {
+func (d *discord) sendRequest(msg string) error {
 	_, _, err := utils.HttpRequest(Discorder.GetValue("host"), "POST", "application/json", nil, strings.NewReader(msg), time.Duration(10*time.Second), true)
 	return err
 }
 
-func (u *discord) Select() *notifications.Notification {
-	return u.Notification
+func (d *discord) Select() *notifications.Notification {
+	return d.Notification
 }
 
 // OnFailure will trigger failing service
-func (u *discord) OnFailure(s *services.Service, f *failures.Failure) error {
-	msg := fmt.Sprintf(`{"content": "Your service '%v' is currently failing! Reason: %v"}`, s.Name, f.Issue)
-	return u.sendRequest(msg)
+func (d *discord) OnFailure(s *services.Service, f *failures.Failure) error {
+	msg := `{"content": "Your service '{{.Service.Name}}' is currently failing! Reason: {{.Failure.Issue}}"}`
+	return d.sendRequest(ReplaceVars(msg, s, f))
 }
 
 // OnSuccess will trigger successful service
-func (u *discord) OnSuccess(s *services.Service) error {
-	msg := fmt.Sprintf(`{"content": "Your service '%s' is currently online!"}`, s.Name)
-	return u.sendRequest(msg)
+func (d *discord) OnSuccess(s *services.Service) error {
+	msg := `{"content": "Your service '{{.Service.Name}}' is currently online!"}`
+	return d.sendRequest(ReplaceVars(msg, s, nil))
 }
 
 // OnSave triggers when this notifier has been saved
-func (u *discord) OnTest() error {
+func (d *discord) OnTest() error {
 	outError := errors.New("Incorrect discord URL, please confirm URL is correct")
 	message := `{"content": "Testing the discord notifier"}`
 	contents, _, err := utils.HttpRequest(Discorder.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(message)), time.Duration(10*time.Second), true)
 	if string(contents) == "" {
 		return nil
 	}
-	var d discordTestJson
-	err = json.Unmarshal(contents, &d)
+	var dtt discordTestJson
+	err = json.Unmarshal(contents, &dtt)
 	if err != nil {
 		return outError
 	}
-	if d.Code == 0 {
+	if dtt.Code == 0 {
 		return outError
 	}
 	fmt.Println("discord: ", string(contents))

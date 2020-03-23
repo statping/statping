@@ -76,23 +76,23 @@ const (
                                 <tr>
                                     <td class="content-cell" style="box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; padding: 35px; word-break: break-word;">
                                         <h1 style="box-sizing: border-box; color: #2F3133; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 19px; font-weight: bold; margin-top: 0;" align="left">
-{{ .Name }} is {{ if .Online }}Online{{else}}Offline{{end}}!
+{{ .Service.Name }} is {{ if .Service.Online }}Online{{else}}Offline{{end}}!
 </h1>
                                         <p style="box-sizing: border-box; color: #74787E; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 16px; line-height: 1.5em; margin-top: 0;" align="left">
 
-{{ if .Online }}
-Your Statping service <a target="_blank" href="{{.Domain}}">{{.Name}}</a> is back online. This service has been triggered with a HTTP status code of '{{.LastStatusCode}}' and is currently online based on your requirements. Your service was reported online at {{.CreatedAt}}. </p>
+{{ if .Service.Online }}
+Your Statping service <a target="_blank" href="{{.Service.Domain}}">{{.Service.Name}}</a> is back online. This service has been triggered with a HTTP status code of '{{.Service.LastStatusCode}}' and is currently online based on your requirements. Your service was reported online at {{.Service.CreatedAt}}. </p>
 {{ else }}
-Your Statping service <a target="_blank" href="{{.Domain}}">{{.Name}}</a> has been triggered with a HTTP status code of '{{.LastStatusCode}}' and is currently offline based on your requirements. This failure was created on {{.CreatedAt}}. </p>
+Your Statping service <a target="_blank" href="{{.Service.Domain}}">{{.Service.Name}}</a> has been triggered with a HTTP status code of '{{.Service.LastStatusCode}}' and is currently offline based on your requirements. This failure was created on {{.Service.CreatedAt}}. </p>
 {{ end }}
 
-{{if .LastResponse }}
+{{if .Service.LastResponse }}
                                         <h1 style="box-sizing: border-box; color: #2F3133; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 19px; font-weight: bold; margin-top: 0;" align="left">
 Last Response</h1>
                                         <p style="box-sizing: border-box; color: #74787E; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 16px; line-height: 1.5em; margin-top: 0;" align="left">
-{{ .LastResponse }} </p> {{end}}
+{{ .Service.LastResponse }} </p> {{end}}
                                         <table class="body-sub" style="border-top-color: #EDEFF2; border-top-style: solid; border-top-width: 1px; box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; margin-top: 25px; padding-top: 25px;">
-                                            <td style="box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; word-break: break-word;"> <a href="/service/{{.Id}}" class="button button--blue" target="_blank" style="-webkit-text-size-adjust: none; background: #3869D4; border-color: #3869d4; border-radius: 3px; border-style: solid; border-width: 10px 18px; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16); box-sizing: border-box; color: #FFF; display: inline-block; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-decoration: none;">View Service</a> </td>
+                                            <td style="box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; word-break: break-word;"> <a href="/service/{{.Service.Id}}" class="button button--blue" target="_blank" style="-webkit-text-size-adjust: none; background: #3869D4; border-color: #3869d4; border-radius: 3px; border-style: solid; border-width: 10px 18px; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16); box-sizing: border-box; color: #FFF; display: inline-block; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-decoration: none;">View Service</a> </td>
                                             <td style="box-sizing: border-box; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; word-break: break-word;"> <a href="/dashboard" class="button button--blue" target="_blank" style="-webkit-text-size-adjust: none; background: #3869D4; border-color: #3869d4; border-radius: 3px; border-style: solid; border-width: 10px 18px; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16); box-sizing: border-box; color: #FFF; display: inline-block; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; text-decoration: none;">Statping Dashboard</a> </td>
                                         </table>
                                     </td>
@@ -178,32 +178,32 @@ type emailOutgoing struct {
 }
 
 // OnFailure will trigger failing service
-func (u *emailer) OnFailure(s *services.Service, f *failures.Failure) error {
+func (e *emailer) OnFailure(s *services.Service, f *failures.Failure) error {
 	email := &emailOutgoing{
-		To:       u.Var2,
+		To:       e.Var2,
 		Subject:  fmt.Sprintf("Service %v is Failing", s.Name),
 		Template: mainEmailTemplate,
 		Data:     interface{}(s),
-		From:     u.Var1,
+		From:     e.Var1,
 	}
-	return u.dialSend(email)
+	return e.dialSend(email)
 }
 
 // OnSuccess will trigger successful service
-func (u *emailer) OnSuccess(s *services.Service) error {
+func (e *emailer) OnSuccess(s *services.Service) error {
 	msg := s.DownText
 	email := &emailOutgoing{
-		To:       u.Var2,
+		To:       e.Var2,
 		Subject:  msg,
 		Template: mainEmailTemplate,
 		Data:     interface{}(s),
-		From:     u.Var1,
+		From:     e.Var1,
 	}
-	return u.dialSend(email)
+	return e.dialSend(email)
 }
 
 // OnTest triggers when this notifier has been saved
-func (u *emailer) OnTest() error {
+func (e *emailer) OnTest() error {
 	testService := &services.Service{
 		Id:             1,
 		Name:           "Example Service",
@@ -219,21 +219,21 @@ func (u *emailer) OnTest() error {
 		CreatedAt:      utils.Now().Add(-24 * time.Hour),
 	}
 	email := &emailOutgoing{
-		To:       u.Var2,
+		To:       e.Var2,
 		Subject:  fmt.Sprintf("Service %v is Back Online", testService.Name),
 		Template: mainEmailTemplate,
 		Data:     testService,
-		From:     u.Var1,
+		From:     e.Var1,
 	}
-	return u.dialSend(email)
+	return e.dialSend(email)
 }
 
-func (u *emailer) dialSend(email *emailOutgoing) error {
-	mailer = mail.NewDialer(u.Host, u.Port, u.Username, u.Password)
+func (e *emailer) dialSend(email *emailOutgoing) error {
+	mailer = mail.NewDialer(e.Host, e.Port, e.Username, e.Password)
 	emailSource(email)
 	m := mail.NewMessage()
 	// if email setting TLS is Disabled
-	if u.ApiKey == "true" {
+	if e.ApiKey == "true" {
 		mailer.SSL = false
 	} else {
 		mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}

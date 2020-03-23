@@ -138,7 +138,7 @@
                   name: c.name, description: c.description, domain: c.domain,
                   timezone: c.timezone, using_cdn: c.using_cdn, footer: c.footer, update_notify: c.update_notify,
                   gh_client_id: c.github_clientId, gh_client_secret: c.github_clientSecret
-              }
+              };
               await Api.core_save(coreForm)
               const core = await Api.core()
               this.$store.commit('setCore', core)

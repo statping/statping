@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/statping/statping/notifiers"
+	"github.com/statping/statping/types/services"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -17,22 +18,23 @@ func TestApiNotifiersRoutes(t *testing.T) {
 			URL:            "/api/notifiers",
 			Method:         "GET",
 			ExpectedStatus: 200,
+			ResponseLen:    len(services.AllNotifiers()),
 			BeforeTest:     SetTestENV,
 			SecureRoute:    true,
 		}, {
-			Name:           "Statping Mobile Notifier",
-			URL:            "/api/notifier/mobile",
+			Name:           "Statping Slack Notifier",
+			URL:            "/api/notifier/slack",
 			Method:         "GET",
 			ExpectedStatus: 200,
 			BeforeTest:     SetTestENV,
 			SecureRoute:    true,
 		}, {
 			Name:   "Statping Update Notifier",
-			URL:    "/api/notifier/mobile",
+			URL:    "/api/notifier/slack",
 			Method: "POST",
 			Body: `{
-					"method": "mobile",
-					"var1": "ExponentPushToken[ToBadIWillError123456]",
+					"method": "slack",
+					"host": "https://slack.api/example/12345",
 					"enabled": true,
 					"limits": 55
 				}`,
@@ -40,11 +42,11 @@ func TestApiNotifiersRoutes(t *testing.T) {
 			BeforeTest:     SetTestENV,
 			SecureRoute:    true,
 		}, {
-			Name:             "Statping Mobile Notifier",
-			URL:              "/api/notifier/mobile",
+			Name:             "Statping Slack Notifier",
+			URL:              "/api/notifier/slack",
 			Method:           "GET",
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"method":"mobile"`, `"var1":"ExponentPushToken[ToBadIWillError123456]"`, `"enabled":true`, `"limits":55`},
+			ExpectedContains: []string{`"method":"slack"`},
 			BeforeTest:       SetTestENV,
 			SecureRoute:      true,
 		}}

@@ -169,7 +169,7 @@ func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *ht
 		objName = "incident_update"
 		objId = v.Id
 	default:
-		objName = "missing"
+		objName = fmt.Sprintf("%T", v)
 	}
 
 	output := apiResponse{

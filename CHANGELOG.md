@@ -1,3 +1,11 @@
+# 0.90.16
+- Added Notify After (int) field for Services. Will send notifications after x amount of failures.
+- Added new method in utils package for replacing `{{.Service.*}}` and `{{.Failure.*}}` variables from string to it's true value
+- Fixed Notifer get endpoint
+- Cleaned Notifier methods
+- Updated recommended changes from [sonarcloud.io](https://sonarcloud.io/organizations/statping/projects)
+- Organized utils package files
+
 # 0.90.15
 - Fixed /dashboard authentication state to show admin tabs if your an admin. [Issue #438](https://github.com/statping/statping/issues/438)
 - Fixed Cache JS error on Dashboard

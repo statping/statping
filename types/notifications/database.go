@@ -1,6 +1,7 @@
 package notifications
 
 import (
+	"errors"
 	"github.com/statping/statping/database"
 )
 
@@ -15,6 +16,9 @@ func SetDB(database database.Database) {
 func Find(method string) (*Notification, error) {
 	var notification Notification
 	q := db.Where("method = ?", method).Find(&notification)
+	if &notification == nil {
+		return nil, errors.New("cannot find notifier")
+	}
 	return &notification, q.Error()
 }
 

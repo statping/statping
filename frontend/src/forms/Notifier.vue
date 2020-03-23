@@ -47,7 +47,7 @@
 
             <div class="col-12 col-sm-12 mt-3">
                 <button @click.prevent="testNotifier" class="btn btn-secondary btn-block text-capitalize col-12 float-right"><i class="fa fa-vial"></i>
-                    {{loading ? "Loading..." : "Test Notifier"}}</button>
+                    {{loadingTest ? "Loading..." : "Test Notifier"}}</button>
             </div>
 
         </div>
@@ -74,6 +74,7 @@ export default {
     data() {
         return {
             loading: false,
+            loadingTest: false,
             error: null,
             saved: false,
             ok: false,
@@ -104,10 +105,11 @@ export default {
         },
         async testNotifier() {
             this.ok = false
-            this.loading = true
+            this.loadingTest = true
             let form = {}
             this.notifier.form.forEach((f) => {
-                form[f.field] = this.notifier[f.field]
+                let field = f.field.toLowerCase()
+                this.form[field] = this.notifier[field]
             });
             form.enabled = this.notifier.enabled
             form.limits = parseInt(this.notifier.limits)
@@ -118,7 +120,7 @@ export default {
             } else {
                 this.error = tested
             }
-            this.loading = false
+            this.loadingTest = false
         },
     }
 }

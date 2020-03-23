@@ -83,8 +83,7 @@ func (n *Notification) CanSend() bool {
 
 // GetValue returns the database value of a accept DbField value.
 func (n *Notification) GetValue(dbField string) string {
-	dbField = strings.ToLower(dbField)
-	switch dbField {
+	switch strings.ToLower(dbField) {
 	case "host":
 		return n.Host
 	case "port":
@@ -107,6 +106,36 @@ func (n *Notification) GetValue(dbField string) string {
 		return utils.ToString(int(n.Limits))
 	}
 	return ""
+}
+
+// ResetQueue will clear the notifiers Queue
+func (n *Notification) ResetQueue() {
+	n.Queue = nil
+}
+
+// start will start the go routine for the notifier queue
+func (n *Notification) Start() {
+	n.Running = make(chan bool)
+}
+
+// close will stop the go routine for queue
+func (n *Notification) Close() {
+	if n.IsRunning() {
+		close(n.Running)
+	}
+}
+
+// IsRunning will return true if the notifier is currently running a queue
+func (n *Notification) IsRunning() bool {
+	if n.Running == nil {
+		return false
+	}
+	select {
+	case <-n.Running:
+		return false
+	default:
+		return true
+	}
 }
 
 // Init accepts the Notifier interface to initialize the notifier
@@ -139,33 +168,3 @@ func (n *Notification) GetValue(dbField string) string {
 //
 //	return nil, err
 //}
-
-// ResetQueue will clear the notifiers Queue
-func (n *Notification) ResetQueue() {
-	n.Queue = nil
-}
-
-// start will start the go routine for the notifier queue
-func (n *Notification) Start() {
-	n.Running = make(chan bool)
-}
-
-// close will stop the go routine for queue
-func (n *Notification) Close() {
-	if n.IsRunning() {
-		close(n.Running)
-	}
-}
-
-// IsRunning will return true if the notifier is currently running a queue
-func (n *Notification) IsRunning() bool {
-	if n.Running == nil {
-		return false
-	}
-	select {
-	case <-n.Running:
-		return false
-	default:
-		return true
-	}
-}

@@ -26,17 +26,6 @@ import (
 	"time"
 )
 
-func TestConvertInterface(t *testing.T) {
-	type Service struct {
-		Name   string
-		Domain string
-	}
-	sample := `{"name": "%service.Name", "domain": "%service.Domain"}`
-	input := &Service{"Test Name", "statping.com"}
-	out := ConvertInterface(sample, input)
-	assert.Equal(t, `{"name": "Test Name", "domain": "statping.com"}`, out)
-}
-
 func TestCreateLog(t *testing.T) {
 	err := createLog(Directory)
 	assert.Nil(t, err)
@@ -59,6 +48,22 @@ func TestCommand(t *testing.T) {
 	assert.Empty(t, out)
 }
 
+func TestReplaceTemplate(t *testing.T) {
+
+	type Object struct {
+		Id      int64
+		String  string
+		Online  bool
+		Example string
+	}
+	example := &Object{
+		1, "this is an example", true, "it should work",
+	}
+
+	result := ReplaceTemplate(`{"id": {{.Object.Id}} }`, example)
+	assert.Equal(t, "{\"id\": 1 }", result)
+}
+
 func TestToInt(t *testing.T) {
 	assert.Equal(t, int64(55), ToInt("55"))
 	assert.Equal(t, int64(55), ToInt(55))
@@ -73,7 +78,7 @@ func TestToString(t *testing.T) {
 	dir, _ := time.ParseDuration("55s")
 	assert.Equal(t, "55s", ToString(dir))
 	assert.Equal(t, "true", ToString(true))
-	assert.Equal(t, time.Now().Format("Monday January _2, 2006 at 03:04PM"), ToString(time.Now()))
+	assert.Equal(t, Now().Format("Monday January _2, 2006 at 03:04PM"), ToString(Now()))
 }
 
 func ExampleToString() {
@@ -144,10 +149,6 @@ func TestTimezone(t *testing.T) {
 func TestTimestamp_Ago(t *testing.T) {
 	now := Timestamp(time.Now())
 	assert.Equal(t, "Just now", now.Ago())
-}
-
-func TestUnderScoreString(t *testing.T) {
-	assert.Equal(t, "this_is_a_test", UnderScoreString("this is a test"))
 }
 
 func TestHashPassword(t *testing.T) {

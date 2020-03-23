@@ -51,6 +51,8 @@ type Service struct {
 	Checkpoint          time.Time           `gorm:"-" json:"-"`
 	SleepDuration       time.Duration       `gorm:"-" json:"-"`
 	LastResponse        string              `gorm:"-" json:"-"`
+	NotifyAfter         int64               `gorm:"column:notify_after" json:"notify_after" scope:"user,admin"`
+	notifyAfterCount    int64               `gorm:"-" json:"-"`
 	AllowNotifications  null.NullBool       `gorm:"default:true;column:allow_notifications" json:"allow_notifications" scope:"user,admin"`
 	UserNotified        bool                `gorm:"-" json:"-"`                                                                          // True if the User was already notified about a Downtime
 	UpdateNotify        null.NullBool       `gorm:"default:true;column:notify_all_changes" json:"notify_all_changes" scope:"user,admin"` // This Variable is a simple copy of `core.CoreApp.UpdateNotify.Bool`

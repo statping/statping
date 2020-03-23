@@ -2,11 +2,12 @@ package services
 
 import (
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/utils"
 	"time"
 )
 
 func Samples() error {
-	createdOn := time.Now().Add(((-24 * 30) * 3) * time.Hour).UTC()
+	createdOn := utils.Now().Add(((-24 * 30) * 3) * time.Hour)
 	s1 := &Service{
 		Name:           "Google",
 		Domain:         "https://google.com",
@@ -19,6 +20,7 @@ func Samples() error {
 		GroupId:        1,
 		Permalink:      null.NewNullString("google"),
 		VerifySSL:      null.NewNullBool(true),
+		NotifyAfter:    3,
 		CreatedAt:      createdOn,
 	}
 	if err := s1.Create(); err != nil {
@@ -36,6 +38,7 @@ func Samples() error {
 		Order:          2,
 		Permalink:      null.NewNullString("statping_github"),
 		VerifySSL:      null.NewNullBool(true),
+		NotifyAfter:    1,
 		CreatedAt:      createdOn,
 	}
 	if err := s2.Create(); err != nil {
@@ -54,6 +57,7 @@ func Samples() error {
 		Public:         null.NewNullBool(true),
 		VerifySSL:      null.NewNullBool(true),
 		GroupId:        2,
+		NotifyAfter:    2,
 		CreatedAt:      createdOn,
 	}
 	if err := s3.Create(); err != nil {
@@ -74,6 +78,7 @@ func Samples() error {
 		Public:         null.NewNullBool(true),
 		VerifySSL:      null.NewNullBool(true),
 		GroupId:        2,
+		NotifyAfter:    3,
 		CreatedAt:      createdOn,
 	}
 	if err := s4.Create(); err != nil {

@@ -76,12 +76,12 @@ var Twilio = &twilio{&notifications.Notification{
 }
 
 // Send will send a HTTP Post to the Twilio SMS API. It accepts type: string
-func (u *twilio) sendMessage(message string) error {
-	twilioUrl := fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%v/Messages.json", u.GetValue("api_key"))
+func (t *twilio) sendMessage(message string) error {
+	twilioUrl := fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%v/Messages.json", t.GetValue("api_key"))
 
 	v := url.Values{}
-	v.Set("To", "+"+u.Var1)
-	v.Set("From", "+"+u.Var2)
+	v.Set("To", "+"+t.Var1)
+	v.Set("From", "+"+t.Var2)
 	v.Set("Body", message)
 	rb := *strings.NewReader(v.Encode())
 
@@ -96,21 +96,21 @@ func (u *twilio) sendMessage(message string) error {
 }
 
 // OnFailure will trigger failing service
-func (u *twilio) OnFailure(s *services.Service, f *failures.Failure) error {
+func (t *twilio) OnFailure(s *services.Service, f *failures.Failure) error {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
-	return u.sendMessage(msg)
+	return t.sendMessage(msg)
 }
 
 // OnSuccess will trigger successful service
-func (u *twilio) OnSuccess(s *services.Service) error {
+func (t *twilio) OnSuccess(s *services.Service) error {
 	msg := fmt.Sprintf("Your service '%v' is currently online!", s.Name)
-	return u.sendMessage(msg)
+	return t.sendMessage(msg)
 }
 
 // OnTest will test the Twilio SMS messaging
-func (u *twilio) OnTest() error {
+func (t *twilio) OnTest() error {
 	msg := fmt.Sprintf("Testing the Twilio SMS Notifier")
-	return u.sendMessage(msg)
+	return t.sendMessage(msg)
 }
 
 func twilioSuccess(res []byte) (bool, twilioResponse) {

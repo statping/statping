@@ -12,12 +12,6 @@ func DB() database.Database {
 	return db
 }
 
-func Find(id int64) (*Failure, error) {
-	var failure Failure
-	q := db.Where("id = ?", id).Find(&failure)
-	return &failure, q.Error()
-}
-
 func All() []*Failure {
 	var failures []*Failure
 	db.Find(&failures)

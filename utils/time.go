@@ -20,12 +20,6 @@ import (
 	"time"
 )
 
-const (
-	FlatpickrTime     = "2006-01-02 15:04"
-	FlatpickrDay      = "2006-01-02"
-	FlatpickrReadable = "Mon, 02 Jan 2006"
-)
-
 // Timezoner returns the time.Time with the user set timezone
 func Timezoner(t time.Time, zone float32) time.Time {
 	zoneInt := float32(3600) * zone

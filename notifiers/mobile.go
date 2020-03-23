@@ -88,7 +88,7 @@ func dataJson(s *services.Service, f *failures.Failure) map[string]interface{} {
 }
 
 // OnFailure will trigger failing service
-func (u *mobilePush) OnFailure(s *services.Service, f *failures.Failure) error {
+func (m *mobilePush) OnFailure(s *services.Service, f *failures.Failure) error {
 	data := dataJson(s, f)
 	msg := &pushArray{
 		Message: fmt.Sprintf("Your service '%v' is currently failing! Reason: %v", s.Name, f.Issue),
@@ -96,11 +96,11 @@ func (u *mobilePush) OnFailure(s *services.Service, f *failures.Failure) error {
 		Topic:   mobileIdentifier,
 		Data:    data,
 	}
-	return u.Send(msg)
+	return m.Send(msg)
 }
 
 // OnSuccess will trigger successful service
-func (u *mobilePush) OnSuccess(s *services.Service) error {
+func (m *mobilePush) OnSuccess(s *services.Service) error {
 	data := dataJson(s, nil)
 	msg := &pushArray{
 		Message: "Service is Online!",
@@ -108,17 +108,17 @@ func (u *mobilePush) OnSuccess(s *services.Service) error {
 		Topic:   mobileIdentifier,
 		Data:    data,
 	}
-	return u.Send(msg)
+	return m.Send(msg)
 }
 
 // OnTest triggers when this notifier has been saved
-func (u *mobilePush) OnTest() error {
+func (m *mobilePush) OnTest() error {
 	msg := &pushArray{
 		Message:  "Testing the Mobile Notifier",
 		Title:    "Testing Notifications",
 		Topic:    mobileIdentifier,
-		Tokens:   []string{u.Var1},
-		Platform: utils.ToInt(u.Var2),
+		Tokens:   []string{m.Var1},
+		Platform: utils.ToInt(m.Var2),
 	}
 	body, err := pushRequest(msg)
 	if err != nil {
@@ -138,9 +138,9 @@ func (u *mobilePush) OnTest() error {
 }
 
 // Send will send message to Statping push notifications endpoint
-func (u *mobilePush) Send(pushMessage *pushArray) error {
-	pushMessage.Tokens = []string{u.Var1}
-	pushMessage.Platform = utils.ToInt(u.Var2)
+func (m *mobilePush) Send(pushMessage *pushArray) error {
+	pushMessage.Tokens = []string{m.Var1}
+	pushMessage.Platform = utils.ToInt(m.Var2)
 	_, err := pushRequest(pushMessage)
 	if err != nil {
 		return err

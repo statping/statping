@@ -76,7 +76,11 @@ func Connect(configs *DbConfig, retry bool) error {
 	maxIdleConn := utils.Getenv("MAX_IDLE_CONN", 5)
 	maxLifeConn := utils.Getenv("MAX_LIFE_CONN", 2*time.Minute)
 
-	dbSession.DB().SetMaxOpenConns(maxOpenConn.(int))
+	if configs.DbConn == "sqlite3" {
+		dbSession.DB().SetMaxOpenConns(2)
+	} else {
+		dbSession.DB().SetMaxOpenConns(maxOpenConn.(int))
+	}
 	dbSession.DB().SetMaxIdleConns(maxIdleConn.(int))
 	dbSession.DB().SetConnMaxLifetime(maxLifeConn.(time.Duration))
 
@@ -84,7 +88,7 @@ func Connect(configs *DbConfig, retry bool) error {
 		if utils.VerboseMode >= 4 {
 			dbSession.LogMode(true).Debug().SetLogger(gorm.Logger{log})
 		}
-		log.Infoln(fmt.Sprintf("Database %v connection was successful.", configs.DbConn))
+		log.Infoln(fmt.Sprintf("Database %s connection was successful.", configs.DbConn))
 	}
 
 	configs.Db = dbSession

@@ -74,14 +74,16 @@ func runCommand(app string, cmd ...string) (string, string, error) {
 // OnFailure for commandLine will trigger failing service
 func (u *commandLine) OnFailure(s *services.Service, f *failures.Failure) error {
 	msg := u.GetValue("var2")
-	_, _, err := runCommand(u.Host, msg)
+	tmpl := ReplaceVars(msg, s, f)
+	_, _, err := runCommand(u.Host, tmpl)
 	return err
 }
 
 // OnSuccess for commandLine will trigger successful service
 func (u *commandLine) OnSuccess(s *services.Service) error {
 	msg := u.GetValue("var1")
-	_, _, err := runCommand(u.Host, msg)
+	tmpl := ReplaceVars(msg, s, nil)
+	_, _, err := runCommand(u.Host, tmpl)
 	return err
 }
 

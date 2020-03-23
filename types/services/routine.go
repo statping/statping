@@ -271,6 +271,7 @@ func sendSuccess(s *Service) {
 			//s.UpdateNotify.Bool
 		}
 	}
+	s.notifyAfterCount = 0
 }
 
 // recordFailure will create a new 'Failure' record in the database for a offline service
@@ -307,18 +308,22 @@ func sendFailure(s *Service, f *failures.Failure) {
 		return
 	}
 
-	for _, n := range allNotifiers {
-		notif := n.Select()
-		if notif.CanSend() {
-			log.Infof("Sending Failure notification to: %s!", notif.Method)
-			if err := n.OnFailure(s, f); err != nil {
-				log.Errorln(err)
+	if s.NotifyAfter == 0 || s.notifyAfterCount > s.NotifyAfter {
+		for _, n := range allNotifiers {
+			notif := n.Select()
+			if notif.CanSend() {
+				log.Infof("Sending Failure notification to: %s!", notif.Method)
+				if err := n.OnFailure(s, f); err != nil {
+					log.Errorln(err)
+				}
+				s.UserNotified = true
+				s.SuccessNotified = true
+				//s.UpdateNotify.Bool
 			}
-			s.UserNotified = true
-			s.SuccessNotified = true
-			//s.UpdateNotify.Bool
 		}
 	}
+
+	s.notifyAfterCount++
 }
 
 // Check will run checkHttp for HTTP services and checkTcp for TCP services

@@ -17,6 +17,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/statping/statping/types/notifications"
@@ -28,21 +29,21 @@ import (
 
 func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 	notifiers := services.AllNotifiers()
-	var notifs []*notifications.Notification
-	for _, n := range notifiers {
-		notifs = append(notifs, notifications.SelectNotifier(n.Select()))
-	}
-	returnJson(notifs, w, r)
+	returnJson(notifiers, w, r)
 }
 
 func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	notifier, err := notifications.Find(vars["notifier"])
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
+	notifier := vars["notifier"]
+	notifiers := services.AllNotifiers()
+	for _, n := range notifiers {
+		notf := n.Select()
+		if notifier == notf.Method {
+			returnJson(n, w, r)
+			return
+		}
 	}
-	returnJson(notifier, w, r)
+	sendErrorJson(errors.New("notifier not found"), w, r)
 }
 
 func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +67,7 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//notifications.OnSave(notifer.Method)
-	sendJsonAction(notifer, "update", w, r)
+	sendJsonAction(vars["notifier"], "update", w, r)
 }
 
 func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
