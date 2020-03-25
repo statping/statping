@@ -32,6 +32,13 @@ func Add(notifs ...services.ServiceNotifier) {
 	}
 }
 
+func ToMap(srv *services.Service, f *failures.Failure) map[string]interface{} {
+	m := make(map[string]interface{})
+	m["Service"] = srv
+	m["Failure"] = f
+	return m
+}
+
 func ReplaceVars(input string, s *services.Service, f *failures.Failure) string {
 	input = utils.ReplaceTemplate(input, s)
 	if f != nil {

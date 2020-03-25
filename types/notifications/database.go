@@ -32,7 +32,23 @@ func (n *Notification) Create() error {
 	return nil
 }
 
+func (n *Notification) UpdateFields(notif *Notification) *Notification {
+	n.Enabled = notif.Enabled
+	n.Host = notif.Host
+	n.Port = notif.Port
+	n.Username = notif.Username
+	n.Password = notif.Password
+	n.ApiKey = notif.ApiKey
+	n.ApiSecret = notif.ApiSecret
+	n.Var1 = notif.Var1
+	n.Var2 = notif.Var2
+	return n
+}
+
 func (n *Notification) Update() error {
+	if err := db.Update(n); err.Error() != nil {
+		return err.Error()
+	}
 	n.ResetQueue()
 	if n.Enabled.Bool {
 		n.Close()
@@ -40,8 +56,7 @@ func (n *Notification) Update() error {
 	} else {
 		n.Close()
 	}
-	err := db.Update(n)
-	return err.Error()
+	return nil
 }
 
 func loadAll() []*Notification {

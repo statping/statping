@@ -72,25 +72,25 @@ func runCommand(app string, cmd ...string) (string, string, error) {
 }
 
 // OnFailure for commandLine will trigger failing service
-func (u *commandLine) OnFailure(s *services.Service, f *failures.Failure) error {
-	msg := u.GetValue("var2")
+func (c *commandLine) OnFailure(s *services.Service, f *failures.Failure) error {
+	msg := c.GetValue("var2")
 	tmpl := ReplaceVars(msg, s, f)
-	_, _, err := runCommand(u.Host, tmpl)
+	_, _, err := runCommand(c.Host, tmpl)
 	return err
 }
 
 // OnSuccess for commandLine will trigger successful service
-func (u *commandLine) OnSuccess(s *services.Service) error {
-	msg := u.GetValue("var1")
+func (c *commandLine) OnSuccess(s *services.Service) error {
+	msg := c.GetValue("var1")
 	tmpl := ReplaceVars(msg, s, nil)
-	_, _, err := runCommand(u.Host, tmpl)
+	_, _, err := runCommand(c.Host, tmpl)
 	return err
 }
 
 // OnTest for commandLine triggers when this notifier has been saved
-func (u *commandLine) OnTest() error {
-	cmds := strings.Split(u.Var1, " ")
-	in, out, err := runCommand(u.Host, cmds...)
+func (c *commandLine) OnTest() error {
+	cmds := strings.Split(c.Var1, " ")
+	in, out, err := runCommand(c.Host, cmds...)
 	utils.Log.Infoln(in)
 	utils.Log.Infoln(out)
 	return err

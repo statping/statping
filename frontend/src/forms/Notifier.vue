@@ -92,7 +92,11 @@ export default {
             this.form.method = this.notifier.method
             this.notifier.form.forEach((f) => {
                 let field = f.field.toLowerCase()
-                this.form[field] = this.notifier[field]
+              let val = this.notifier[field]
+              if (this.isNumeric(val)) {
+                val = parseInt(val)
+              }
+                this.form[field] = val
             });
             await Api.notifier_save(this.form)
             // const notifiers = await Api.notifiers()
@@ -109,12 +113,16 @@ export default {
             let form = {}
             this.notifier.form.forEach((f) => {
                 let field = f.field.toLowerCase()
-                this.form[field] = this.notifier[field]
+              let val = this.notifier[field]
+              if (this.isNumeric(val)) {
+                val = parseInt(val)
+              }
+                this.form[field] = val
             });
-            form.enabled = this.notifier.enabled
-            form.limits = parseInt(this.notifier.limits)
-            form.method = this.notifier.method
-            const tested = await Api.notifier_test(form)
+          this.form.enabled = this.notifier.enabled
+          this.form.limits = parseInt(this.notifier.limits)
+          this.form.method = this.notifier.method
+            const tested = await Api.notifier_test(this.form)
             if (tested === 'ok') {
                 this.ok = true
             } else {

@@ -102,6 +102,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		//ApiSecret:   apiSecret.(string),
 		Domain:    "http://localhost:8080",
 		Version:   core.App.Version,
+		Started:   utils.Now(),
 		CreatedAt: utils.Now(),
 		UseCdn:    null.NewNullBool(false),
 		Footer:    null.NewNullString(""),

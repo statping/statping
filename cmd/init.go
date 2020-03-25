@@ -5,6 +5,7 @@ import (
 	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/utils"
 )
 
 func InitApp() error {
@@ -22,5 +23,6 @@ func InitApp() error {
 
 	database.StartMaintenceRoutine()
 	core.App.Setup = true
+	core.App.Started = utils.Now()
 	return nil
 }

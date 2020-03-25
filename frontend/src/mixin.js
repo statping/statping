@@ -9,6 +9,9 @@ export default Vue.mixin({
     now() {
       return new Date()
     },
+    isNumeric: function (n) {
+      return !isNaN(parseFloat(n)) && isFinite(n);
+    },
     current() {
       return parseISO(new Date())
     },

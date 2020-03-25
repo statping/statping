@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/utils"
 	"time"
 )
 
@@ -12,6 +13,7 @@ var (
 func New(version string) {
 	App = new(Core)
 	App.Version = version
+	App.Started = utils.Now()
 }
 
 // Core struct contains all the required fields for Statping. All application settings

@@ -3,6 +3,7 @@ package services
 import (
 	"bytes"
 	"fmt"
+	"github.com/statping/statping/types/core"
 	"net"
 	"net/http"
 	"net/url"
@@ -257,6 +258,12 @@ func sendSuccess(s *Service) {
 	}
 	// dont send notification if server was already previous online
 	if s.SuccessNotified {
+		return
+	}
+
+	// dont send notification if server recently started (60 seconds)
+	if core.App.Started.Add(60 * time.Second).After(utils.Now()) {
+		s.SuccessNotified = true
 		return
 	}
 	for _, n := range allNotifiers {

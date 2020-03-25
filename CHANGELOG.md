@@ -1,3 +1,8 @@
+# 0.90.17
+- Fixed notification fields for frontend
+- Fixed notification JSON form to send integer if value is an integer.
+- Added testing for notifiers
+
 # 0.90.16
 - Added Notify After (int) field for Services. Will send notifications after x amount of failures.
 - Added new method in utils package for replacing `{{.Service.*}}` and `{{.Failure.*}}` variables from string to it's true value

@@ -16,7 +16,6 @@
 package notifiers
 
 import (
-	"bytes"
 	"crypto/tls"
 	"fmt"
 	"github.com/go-mail/mail"
@@ -26,7 +25,6 @@ import (
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
-	"html/template"
 	"time"
 )
 
@@ -183,7 +181,7 @@ func (e *emailer) OnFailure(s *services.Service, f *failures.Failure) error {
 		To:       e.Var2,
 		Subject:  fmt.Sprintf("Service %v is Failing", s.Name),
 		Template: mainEmailTemplate,
-		Data:     interface{}(s),
+		Data:     ToMap(s, f),
 		From:     e.Var1,
 	}
 	return e.dialSend(email)
@@ -196,7 +194,7 @@ func (e *emailer) OnSuccess(s *services.Service) error {
 		To:       e.Var2,
 		Subject:  msg,
 		Template: mainEmailTemplate,
-		Data:     interface{}(s),
+		Data:     ToMap(s, nil),
 		From:     e.Var1,
 	}
 	return e.dialSend(email)
@@ -230,7 +228,6 @@ func (e *emailer) OnTest() error {
 
 func (e *emailer) dialSend(email *emailOutgoing) error {
 	mailer = mail.NewDialer(e.Host, e.Port, e.Username, e.Password)
-	emailSource(email)
 	m := mail.NewMessage()
 	// if email setting TLS is Disabled
 	if e.ApiKey == "true" {
@@ -241,29 +238,11 @@ func (e *emailer) dialSend(email *emailOutgoing) error {
 	m.SetHeader("From", email.From)
 	m.SetHeader("To", email.To)
 	m.SetHeader("Subject", email.Subject)
-	m.SetBody("text/html", email.Source)
+	m.SetBody("text/html", utils.ReplaceTemplate(email.Template, email.Data))
+
 	if err := mailer.DialAndSend(m); err != nil {
 		utils.Log.Errorln(fmt.Sprintf("email '%v' sent to: %v (size: %v) %v", email.Subject, email.To, len([]byte(email.Source)), err))
 		return err
 	}
 	return nil
-}
-
-func emailSource(email *emailOutgoing) {
-	source := emailTemplate(email.Template, email.Data)
-	email.Source = source
-}
-
-func emailTemplate(contents string, data interface{}) string {
-	t := template.New("email")
-	t, err := t.Parse(contents)
-	if err != nil {
-		utils.Log.Errorln(err)
-	}
-	var tpl bytes.Buffer
-	if err := t.Execute(&tpl, data); err != nil {
-		utils.Log.Warnln(err)
-	}
-	result := tpl.String()
-	return result
 }
