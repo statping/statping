@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/statping/statping/types/core"
+	"google.golang.org/grpc"
 	"net"
 	"net/http"
 	"net/url"
@@ -113,6 +114,51 @@ func CheckIcmp(s *Service, record bool) *Service {
 		return s
 	}
 	s.LastResponse = ""
+	return s
+}
+
+// CheckGrpc will check a gRPC service
+func CheckGrpc(s *Service, record bool) *Service {
+	defer s.updateLastCheck()
+
+	dnsLookup, err := dnsCheck(s)
+	if err != nil {
+		if record {
+			recordFailure(s, fmt.Sprintf("Could not get IP address for GRPC service %v, %v", s.Domain, err))
+		}
+		return s
+	}
+	s.PingTime = dnsLookup
+	t1 := utils.Now()
+	domain := fmt.Sprintf("%v", s.Domain)
+	if s.Port != 0 {
+		domain = fmt.Sprintf("%v:%v", s.Domain, s.Port)
+		if isIPv6(s.Domain) {
+			domain = fmt.Sprintf("[%v]:%v", s.Domain, s.Port)
+		}
+	}
+	conn, err := grpc.Dial(domain, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	if err != nil {
+		if record {
+			recordFailure(s, fmt.Sprintf("Dial Error %v", err))
+		}
+		return s
+	}
+	if err := conn.Close(); err != nil {
+		if record {
+			recordFailure(s, fmt.Sprintf("%v Socket Close Error %v", strings.ToUpper(s.Type), err))
+		}
+		return s
+	}
+	t2 := utils.Now()
+	s.Latency = t2.Sub(t1).Microseconds()
+	s.LastResponse = ""
+	if record {
+		recordSuccess(s)
+	}
 	return s
 }
 
@@ -341,6 +387,8 @@ func (s *Service) CheckService(record bool) {
 		CheckHttp(s, record)
 	case "tcp", "udp":
 		CheckTcp(s, record)
+	case "grpc":
+		CheckGrpc(s, record)
 	case "icmp":
 		CheckIcmp(s, record)
 	}

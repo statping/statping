@@ -15,6 +15,7 @@
             <div class="col-sm-8">
                 <select v-model="service.type" class="form-control" id="service_type" >
                     <option value="http">HTTP Service</option>
+                    <option value="grpc">gRPC Service</option>
                     <option value="tcp">TCP Service</option>
                     <option value="udp">UDP Service</option>
                     <option value="icmp">ICMP Ping</option>

@@ -9,6 +9,8 @@ require (
 	github.com/fatih/structs v1.1.0
 	github.com/getsentry/sentry-go v0.5.1
 	github.com/go-mail/mail v2.3.1+incompatible
+	github.com/gogo/protobuf v1.3.1 // indirect
+	github.com/golang/protobuf v1.3.5
 	github.com/gorilla/mux v1.7.4
 	github.com/jinzhu/gorm v1.9.12
 	github.com/joho/godotenv v1.3.0
@@ -21,6 +23,7 @@ require (
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
 	golang.org/x/crypto v0.0.0-20200320181102-891825fb96df
 	golang.org/x/tools v0.0.0-20200321014904-268ba720d32c // indirect
+	google.golang.org/grpc v1.28.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/mail.v2 v2.3.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0

@@ -17,6 +17,7 @@ package handlers
 
 import (
 	"errors"
+	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/configs"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/null"
@@ -89,11 +90,8 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//log.Infoln("Migrating Notifiers...")
-	//if err := notifications.Migrate(); err != nil {
-	//	sendErrorJson(err, w, r)
-	//	return
-	//}
+	log.Infoln("Migrating Notifiers...")
+	notifiers.InitNotifiers()
 
 	c := &core.Core{
 		Name:        "Statping Sample Data",
