@@ -131,6 +131,9 @@ build:
 install: build
 	mv $(BINARY_NAME) $(GOPATH)/bin/$(BINARY_NAME)
 
+install-local: build
+	mv $(BINARY_NAME) /usr/local/bin/$(BINARY_NAME)
+
 generate:
 	cd source && go generate
 

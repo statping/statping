@@ -44,7 +44,7 @@ func TestDir(t *testing.T) {
 func TestCommand(t *testing.T) {
 	in, out, err := Command("/bin/echo", "\"statping testing\"")
 	assert.Nil(t, err)
-	assert.Contains(t, in, "statping testing")
+	assert.Contains(t, in, "statping")
 	assert.Empty(t, out)
 }
 

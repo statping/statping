@@ -144,6 +144,9 @@ func (w *webhooker) OnTest() error {
 func (w *webhooker) OnFailure(s *services.Service, f *failures.Failure) error {
 	msg := ReplaceVars(w.Var2, s, f)
 	resp, err := w.sendHttpWebhook(msg)
+	if err != nil {
+		return err
+	}
 	defer resp.Body.Close()
 	return err
 }
@@ -152,6 +155,9 @@ func (w *webhooker) OnFailure(s *services.Service, f *failures.Failure) error {
 func (w *webhooker) OnSuccess(s *services.Service) error {
 	msg := ReplaceVars(w.Var2, s, nil)
 	resp, err := w.sendHttpWebhook(msg)
+	if err != nil {
+		return err
+	}
 	defer resp.Body.Close()
 	return err
 }
