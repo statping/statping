@@ -84,7 +84,7 @@
         <div v-if="service.type.match(/^(http)$/)" class="form-group row">
             <label for="service_response_code" class="col-sm-4 col-form-label">Expected Status Code</label>
             <div class="col-sm-8">
-                <input v-model="service.expected_status" type="number" name="expected_status" class="form-control" placeholder="200" id="service_response_code">
+                <input v-model.number="service.expected_status" type="number" name="expected_status" class="form-control" placeholder="200" id="service_response_code">
                 <small class="form-text text-muted">A status code of 200 is success, or view all the <a target="_blank" href="https://www.restapitutorial.com/httpstatuscodes.html">HTTP Status Codes</a></small>
             </div>
         </div>
@@ -104,14 +104,14 @@
         <div class="form-group row">
             <label for="service_interval" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
             <div class="col-sm-8">
-                <input v-model="service.check_interval" type="number" class="form-control" min="1" id="service_interval" required>
+                <input v-model.number="service.check_interval" type="number" class="form-control" min="1" id="service_interval" required>
                 <small id="interval" class="form-text text-muted">10,000+ will be checked in Microseconds (1 millisecond = 1000 microseconds).</small>
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Timeout in Seconds</label>
             <div class="col-sm-8">
-                <input v-model="service.timeout" type="number" name="timeout" class="form-control" placeholder="15" min="1">
+                <input v-model.number="service.timeout" type="number" name="timeout" class="form-control" placeholder="15" min="1">
                 <small class="form-text text-muted">If the endpoint does not respond within this time it will be considered to be offline</small>
             </div>
         </div>
@@ -143,7 +143,7 @@
         <div v-if="service.allow_notifications"  class="form-group row">
             <label class="col-sm-4 col-form-label">Notify After Failures</label>
             <div class="col-sm-8">
-                <input v-model="service.notify_after" type="number" name="notify_after" class="form-control" id="notify_after" autocapitalize="none">
+                <input v-model.number="service.notify_after" type="number" name="notify_after" class="form-control" id="notify_after" autocapitalize="none">
                 <small class="form-text text-muted">Send Notification after {{service.notify_after === 0 ? 'the first Failure' : service.notify_after+' Failures'}} </small>
             </div>
         </div>
@@ -236,7 +236,6 @@
       delete s.last_success
       delete s.latency
       delete s.online_24_hours
-        s.check_interval = parseInt(s.check_interval)
 
         if (s.id) {
             await this.updateService(s)
