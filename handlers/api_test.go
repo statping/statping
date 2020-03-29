@@ -23,10 +23,6 @@ import (
 	"testing"
 )
 
-const (
-	serverDomain = "http://localhost:18888"
-)
-
 var (
 	dir string
 )
@@ -180,13 +176,14 @@ func TestMainApiRoutes(t *testing.T) {
 		//	Name:           "Prometheus Export Metrics",
 		//	URL:            "/metrics",
 		//	Method:         "GET",
+		//	BeforeTest: SetTestENV,
 		//	ExpectedStatus: 200,
 		//	ExpectedContains: []string{
 		//		`Statping Totals`,
 		//		`total_failures`,
 		//		`Golang Metrics`,
 		//	},
-		//}
+		//},
 	}
 
 	for _, v := range tests {
@@ -197,6 +194,26 @@ func TestMainApiRoutes(t *testing.T) {
 		})
 	}
 }
+
+//func TestExportSettings(t *testing.T) {
+//	data, err := ExportSettings()
+//	require.Nil(t, err)
+//	assert.Len(t, data, 50)
+//
+//	var exportData ExportData
+//	err = json.Unmarshal(data, &exportData)
+//	require.Nil(t, err)
+//
+//	assert.Len(t, exportData.Services, 4)
+//	assert.Len(t, exportData.Messages, 4)
+//	assert.Len(t, exportData.Checkins, 2)
+//	assert.Len(t, exportData.Groups, 1)
+//
+//	assert.Equal(t, "Updated Core", exportData.Core.Name)
+//	assert.True(t, exportData.Core.Setup)
+//	assert.NotEmpty(t, exportData.Core.ApiKey)
+//	assert.NotEmpty(t, exportData.Core.ApiSecret)
+//}
 
 type HttpFuncTest func(*testing.T) error
 

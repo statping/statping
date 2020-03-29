@@ -93,6 +93,11 @@ func sendLog(next http.Handler) http.Handler {
 func scoped(handler func(r *http.Request) interface{}) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		data := handler(r)
+		err, ok := data.(error)
+		if ok {
+			sendErrorJson(err, w, r)
+			return
+		}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(scope{data: data, scope: ScopeName(r)})
 	})

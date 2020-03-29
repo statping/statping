@@ -39,7 +39,7 @@ func TestApiServiceRoutes(t *testing.T) {
 			Method:           "GET",
 			ExpectedContains: []string{`"name":"Google"`},
 			ExpectedStatus:   200,
-			ResponseLen:      5,
+			ResponseLen:      4,
 			BeforeTest:       UnsetTestENV,
 			FuncTest: func(t *testing.T) error {
 				count := len(services.Services())
@@ -55,14 +55,15 @@ func TestApiServiceRoutes(t *testing.T) {
 			Method:           "GET",
 			ExpectedContains: []string{`"name":"Google"`},
 			ExpectedStatus:   200,
+			BeforeTest:       UnsetTestENV,
 		},
 		{
 			Name:             "Statping Private Service 1",
-			URL:              "/api/services/1",
+			URL:              "/api/services/2",
 			Method:           "GET",
-			ExpectedContains: []string{`"name":"Google"`},
+			ExpectedContains: []string{`"error":"not authenticated"`},
 			ExpectedStatus:   200,
-			BeforeTest:       SetTestENV,
+			BeforeTest:       UnsetTestENV,
 		},
 		{
 			Name:             "Statping Service 1 with Private responses",

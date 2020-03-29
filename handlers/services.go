@@ -16,6 +16,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/statping/statping/database"
@@ -65,6 +66,10 @@ func apiServiceHandler(r *http.Request) interface{} {
 	srv, err := serviceByID(r)
 	if err != nil {
 		return err
+	}
+	user := IsUser(r)
+	if !srv.Public.Bool && !user {
+		return errors.New("not authenticated")
 	}
 	srv = srv.UpdateStats()
 	return *srv
@@ -203,7 +208,16 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllServicesHandler(r *http.Request) interface{} {
-	return services.AllInOrder()
+	user := IsUser(r)
+	fmt.Println("user: ", user)
+	var srvs []services.Service
+	for _, v := range services.AllInOrder() {
+		if !v.Public.Bool && !user {
+			continue
+		}
+		srvs = append(srvs, v)
+	}
+	return srvs
 }
 
 func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {

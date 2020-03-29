@@ -205,8 +205,11 @@ func IsUser(r *http.Request) bool {
 	if os.Getenv("GO_ENV") == "test" {
 		return true
 	}
-	_, err := getJwtToken(r)
+	tk, err := getJwtToken(r)
 	if err != nil {
+		return false
+	}
+	if err := tk.Valid(); err != nil {
 		return false
 	}
 	return true

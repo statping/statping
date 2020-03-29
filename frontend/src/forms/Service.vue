@@ -238,6 +238,8 @@
       delete s.online_24_hours
         s.check_interval = parseInt(s.check_interval)
 
+        window.console.log(s)
+
         if (s.id) {
             await this.updateService(s)
         } else {

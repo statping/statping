@@ -91,6 +91,12 @@ func TestSaveFile(t *testing.T) {
 	assert.Nil(t, SaveFile(Directory+"/test.txt", []byte("testing saving a file")))
 }
 
+func TestOpenFile(t *testing.T) {
+	f, err := OpenFile(Directory + "/test.txt")
+	require.Nil(t, err)
+	assert.Equal(t, "testing saving a file", f)
+}
+
 func TestFileExists(t *testing.T) {
 	assert.True(t, FileExists(Directory+"/test.txt"))
 	assert.False(t, FileExists(Directory+"fake.txt"))

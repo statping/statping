@@ -180,7 +180,7 @@ func removeJwtToken(w http.ResponseWriter) {
 	http.SetCookie(w, &http.Cookie{
 		Name:    cookieKey,
 		Value:   "",
-		Expires: time.Now().UTC(),
+		Expires: utils.Now(),
 	})
 }
 

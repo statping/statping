@@ -1,6 +1,9 @@
+# 0.90.19
+- Fixed private Services from showing in API (/api/services and /api/services/{id})
+- Removed unused code
+
 # 0.90.18
 - Added service type gRPC, you can now check on gRPC services. (limited)
--
 
 # 0.90.17
 - Fixed notification fields for frontend

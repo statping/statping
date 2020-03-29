@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"github.com/statping/statping/source"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/utils"
@@ -14,54 +13,9 @@ var (
 	basePath = "/"
 )
 
-type CustomResponseWriter struct {
-	body       []byte
-	statusCode int
-	header     http.Header
-}
-
-func NewCustomResponseWriter() *CustomResponseWriter {
-	return &CustomResponseWriter{
-		header: http.Header{},
-	}
-}
-
-func (w *CustomResponseWriter) Header() http.Header {
-	return w.header
-}
-
-func (w *CustomResponseWriter) Write(b []byte) (int, error) {
-	w.body = b
-	// implement it as per your requirement
-	return 0, nil
-}
-
-func (w *CustomResponseWriter) WriteHeader(statusCode int) {
-	w.statusCode = statusCode
-}
-
 func parseForm(r *http.Request) url.Values {
 	r.ParseForm()
 	return r.PostForm
-}
-
-func parseGet(r *http.Request) url.Values {
-	r.ParseForm()
-	return r.Form
-}
-
-func decodeRequest(r *http.Request, object interface{}) error {
-	decoder := json.NewDecoder(r.Body)
-	defer r.Body.Close()
-	return decoder.Decode(&object)
-}
-
-type parsedObject struct {
-	Error Error
-}
-
-func serviceFromID(r *http.Request, object interface{}) error {
-	return nil
 }
 
 var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap {
