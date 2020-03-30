@@ -11,31 +11,31 @@
             <div class="col-6">
                 <div class="form-group">
                     <label>Database Connection</label>
-                    <select @change="canSubmit" v-model="setup.db_connection" class="form-control">
+                    <select @change="canSubmit" v-model="setup.db_connection" id="db_connection" class="form-control">
                         <option value="sqlite">Sqlite</option>
                         <option value="postgres">Postgres</option>
                         <option value="mysql">MySQL</option>
                     </select>
                 </div>
-                <div v-if="setup.db_connection !== 'sqlite'" class="form-group" id="db_host">
+                <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
                     <label>Host</label>
-                    <input @keyup="canSubmit" v-model="setup.db_host" type="text" class="form-control" placeholder="localhost">
+                    <input @keyup="canSubmit" v-model="setup.db_host" id="db_host" type="text" class="form-control" placeholder="localhost">
                 </div>
-                <div v-if="setup.db_connection !== 'sqlite'" class="form-group" id="db_port">
+                <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
                     <label>Database Port</label>
-                    <input @keyup="canSubmit" v-model="setup.db_port" type="text" class="form-control" placeholder="localhost">
+                    <input @keyup="canSubmit" v-model="setup.db_port" id="db_port" type="text" class="form-control" placeholder="localhost">
                 </div>
-                <div v-if="setup.db_connection !== 'sqlite'" class="form-group" id="db_user">
+                <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
                     <label>Username</label>
-                    <input @keyup="canSubmit" v-model="setup.db_user" type="text" class="form-control" placeholder="root">
+                    <input @keyup="canSubmit" v-model="setup.db_user" id="db_user" type="text" class="form-control" placeholder="root">
                 </div>
-                <div v-if="setup.db_connection !== 'sqlite'" class="form-group" id="db_password">
+                <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
                     <label for="db_password">Password</label>
-                    <input @keyup="canSubmit" v-model="setup.db_password" type="password" class="form-control" placeholder="password123">
+                    <input @keyup="canSubmit" v-model="setup.db_password" id="db_password" type="password" class="form-control" placeholder="password123">
                 </div>
-                <div v-if="setup.db_connection !== 'sqlite'" class="form-group" id="db_database">
+                <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
                     <label for="db_database">Database</label>
-                    <input @keyup="canSubmit" v-model="setup.db_database" type="text" class="form-control" placeholder="Database name">
+                    <input @keyup="canSubmit" v-model="setup.db_database" id="db_database" type="text" class="form-control" placeholder="Database name">
                 </div>
 
             </div>
@@ -44,32 +44,32 @@
 
                 <div class="form-group">
                     <label>Project Name</label>
-                    <input @keyup="canSubmit" v-model="setup.project" type="text" class="form-control" placeholder="Great Uptime" required>
+                    <input @keyup="canSubmit" v-model="setup.project" id="project" type="text" class="form-control" placeholder="Great Uptime" required>
                 </div>
 
                 <div class="form-group">
                     <label>Project Description</label>
-                    <input @keyup="canSubmit" v-model="setup.description" type="text" class="form-control" placeholder="Great Uptime">
+                    <input @keyup="canSubmit" v-model="setup.description" id="description" type="text" class="form-control" placeholder="Great Uptime">
                 </div>
 
                 <div class="form-group">
-                    <label for="domain_input">Domain URL</label>
-                    <input @keyup="canSubmit" v-model="setup.domain" type="text" class="form-control" id="domain_input" required>
+                    <label for="domain">Domain URL</label>
+                    <input @keyup="canSubmit" v-model="setup.domain" type="text" class="form-control" id="domain" required>
                 </div>
 
                 <div class="form-group">
                     <label>Admin Username</label>
-                    <input @keyup="canSubmit" v-model="setup.username" type="text" class="form-control" placeholder="admin" required>
+                    <input @keyup="canSubmit" v-model="setup.username" id="username" type="text" class="form-control" placeholder="admin" required>
                 </div>
 
                 <div class="form-group">
                     <label>Admin Password</label>
-                    <input @keyup="canSubmit" v-model="setup.password" type="password" class="form-control" placeholder="password" required>
+                    <input @keyup="canSubmit" v-model="setup.password" id="password" type="password" class="form-control" placeholder="password" required>
                 </div>
 
                 <div class="form-group">
                     <label>Confirm Admin Password</label>
-                    <input @keyup="canSubmit" v-model="setup.confirm_password" type="password" class="form-control" placeholder="password" required>
+                    <input @keyup="canSubmit" v-model="setup.confirm_password" id="password_confirm" type="password" class="form-control" placeholder="password" required>
                 </div>
 
             </div>

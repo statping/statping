@@ -8,7 +8,9 @@
     "dev": "cross-env NODE_ENV=development webpack-dev-server --host 0.0.0.0 --port 8888 --progress",
     "lint": "vue-cli-service lint",
     "test": "cross-env NODE_ENV=development mochapack --webpack-config webpack.config.js --require test/setup.js test/**/*.spec.js",
-    "backend-test": "newman run -e ../dev/postman_environment.json --delay-request 500 ../dev/postman.json"
+    "backend-test": "newman run -e ../dev/postman_environment.json --delay-request 500 ../dev/postman.json",
+    "cypress": "cypress open",
+    "e2e": "cypress run --record --key"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free-solid": "^5.1.0-3",
@@ -37,14 +39,14 @@
     "vuex": "^3.1.2"
   },
   "devDependencies": {
-    "@babel/core": "~7.2",
+    "@babel/core": "^7.9.0",
     "@babel/plugin-proposal-class-properties": "~7.3",
     "@babel/plugin-proposal-decorators": "~7.3",
     "@babel/plugin-proposal-json-strings": "~7.2",
     "@babel/plugin-syntax-dynamic-import": "~7.2",
     "@babel/plugin-syntax-import-meta": "~7.2",
     "@babel/polyfill": "~7.2",
-    "@babel/preset-env": "~7.8.3",
+    "@babel/preset-env": "^7.9.0",
     "@vue/babel-preset-app": "^4.1.2",
     "@vue/cli-plugin-babel": "^4.1.0",
     "@vue/cli-service": "^4.2.3",
@@ -55,6 +57,7 @@
     "compression-webpack-plugin": "~2.0",
     "cross-env": "^7.0.2",
     "css-loader": "~2.1",
+    "cypress": "^4.3.0",
     "eslint": "~5.16",
     "eslint-config-standard": "~10.2",
     "eslint-friendly-formatter": "~3.0",

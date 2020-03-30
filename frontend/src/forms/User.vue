@@ -10,7 +10,7 @@
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Username</label>
             <div class="col-6 col-md-4">
-                <input v-model="user.username" type="text" class="form-control" placeholder="Username" required autocorrect="off" autocapitalize="none" v-bind:readonly="user.id">
+                <input v-model="user.username" type="text" class="form-control" id="username" placeholder="Username" required autocorrect="off" autocapitalize="none" v-bind:readonly="user.id">
             </div>
             <div class="col-6 col-md-4">
                   <span @click="user.admin = !!user.admin" class="switch">
@@ -28,18 +28,18 @@
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Password</label>
             <div class="col-sm-8">
-                <input v-model="user.password" type="password" class="form-control" placeholder="Password" required>
+                <input v-model="user.password" type="password" id="password" class="form-control" placeholder="Password" required>
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Confirm Password</label>
             <div class="col-sm-8">
-                <input v-model="user.confirm_password" type="password" class="form-control" placeholder="Confirm Password" required>
+                <input v-model="user.confirm_password" type="password" id="password_confirm" class="form-control" placeholder="Confirm Password" required>
             </div>
         </div>
         <div class="form-group row">
             <div class="col-sm-12">
-                <button @click="saveUser"
+                <button type="submit" @click="saveUser"
                         :disabled="loading || !user.username || !user.email || !user.password || !user.confirm_password || (user.password !== user.confirm_password)"
                         class="btn btn-block" :class="{'btn-primary': !user.id, 'btn-secondary': user.id}">
                     {{loading ? "Loading..." : user.id ? "Update User" : "Create User"}}

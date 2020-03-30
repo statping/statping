@@ -237,6 +237,10 @@
       delete s.latency
       delete s.online_24_hours
         s.check_interval = parseInt(s.check_interval)
+        s.timeout = parseInt(s.timeout)
+        s.port = parseInt(s.port)
+        s.notify_after = parseInt(s.notify_after)
+        s.expected_status = parseInt(s.expected_status)
 
         window.console.log(s)
 

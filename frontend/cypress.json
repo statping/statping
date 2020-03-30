@@ -1,0 +1,17 @@
+{
+  "projectId": "bi8mhr",
+  "env": {
+    "DB_HOST": "localhost",
+    "DB_USER": "root",
+    "DB_DATABASE": "root",
+    "DB_PORT": "5432",
+    "DB_PASS": "password123",
+    "GO_ENV": "production"
+  },
+  "baseUrl": "http://localhost:8888",
+  "chromeWebSecurity": false,
+  "defaultCommandTimeout": 5000,
+  "requestTimeout": 5000,
+  "watchForFileChanges": false,
+  "failOnStatusCode": false
+}

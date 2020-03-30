@@ -1,3 +1,7 @@
+# 0.90.20
+- Fixed Service Form from sending integer values as strings to API
+- Added Cypress e2e testing (working on adding more)
+
 # 0.90.19
 - Fixed private Services from showing in API (/api/services and /api/services/{id})
 - Removed unused code
