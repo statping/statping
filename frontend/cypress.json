@@ -1,5 +1,5 @@
 {
-  "projectId": "bi8mhr",
+  "projectId": "wmw54a",
   "env": {
     "DB_HOST": "localhost",
     "DB_USER": "root",
@@ -10,8 +10,8 @@
   },
   "baseUrl": "http://localhost:8888",
   "chromeWebSecurity": false,
-  "defaultCommandTimeout": 8000,
-  "requestTimeout": 8000,
+  "defaultCommandTimeout": 15000,
+  "requestTimeout": 15000,
   "watchForFileChanges": false,
   "failOnStatusCode": false
 }

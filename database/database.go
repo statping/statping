@@ -10,14 +10,7 @@ import (
 
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
-)
-
-const (
-	TIME_NANO  = "2006-01-02T15:04:05Z"
-	TIME       = "2006-01-02 15:04:05"
-	CHART_TIME = "2006-01-02T15:04:05.999999-07:00"
-	TIME_DAY   = "2006-01-02"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var database Database

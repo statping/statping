@@ -16,7 +16,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/statping/statping/database"
@@ -209,7 +208,6 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiAllServicesHandler(r *http.Request) interface{} {
 	user := IsUser(r)
-	fmt.Println("user: ", user)
 	var srvs []services.Service
 	for _, v := range services.AllInOrder() {
 		if !v.Public.Bool && !user {

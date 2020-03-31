@@ -33,3 +33,4 @@ databases
 statping
 docker
 tmp
+/frontend/cypress/screenshots/

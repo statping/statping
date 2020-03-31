@@ -4,7 +4,7 @@ import (
 	"fmt"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/statping/statping/source"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/utils"

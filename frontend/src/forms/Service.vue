@@ -182,86 +182,85 @@
   import Api from "../API";
 
   export default {
-  name: 'FormService',
-  data () {
-    return {
-        loading: false,
-      service: {
-        name: "",
-        type: "http",
-        domain: "",
-        group_id: 0,
-        method: "GET",
-        post_data: "",
-        headers: "",
-        expected: "",
-        expected_status: 200,
-        port: 80,
-        check_interval: 60,
-        timeout: 15,
-        permalink: "",
-        order: 1,
-        verify_ssl: true,
-        allow_notifications: true,
-        notify_all_changes: true,
-        notify_after: 2,
-        public: true,
+      name: 'FormService',
+      data () {
+          return {
+              loading: false,
+              service: {
+                  name: "",
+                  type: "http",
+                  domain: "",
+                  group_id: 0,
+                  method: "GET",
+                  post_data: "",
+                  headers: "",
+                  expected: "",
+                  expected_status: 200,
+                  port: 80,
+                  check_interval: 60,
+                  timeout: 15,
+                  permalink: "",
+                  order: 1,
+                  verify_ssl: true,
+                  allow_notifications: true,
+                  notify_all_changes: true,
+                  notify_after: 2,
+                  public: true,
+              },
+              groups: [],
+          }
       },
-      groups: [],
-    }
-  },
-    props: {
-      in_service: {
-        type: Object
-      }
-    },
-    watch: {
-      in_service() {
-        this.service = this.in_service
-      }
-    },
-  async mounted() {
-    if (!this.$store.getters.groups) {
-      const groups = await Api.groups()
-      this.$store.commit('setGroups', groups)
-    }
-  },
-  methods: {
-    async saveService() {
-      let s = this.service
-        this.loading = true
-      delete s.failures
-      delete s.created_at
-      delete s.updated_at
-      delete s.last_success
-      delete s.latency
-      delete s.online_24_hours
-        s.check_interval = parseInt(s.check_interval)
-        s.timeout = parseInt(s.timeout)
-        s.port = parseInt(s.port)
-        s.notify_after = parseInt(s.notify_after)
-        s.expected_status = parseInt(s.expected_status)
+      props: {
+          in_service: {
+              type: Object
+          }
+      },
+      watch: {
+          in_service () {
+              this.service = this.in_service
+          }
+      },
+      async mounted () {
+          if (!this.$store.getters.groups) {
+              const groups = await Api.groups()
+              this.$store.commit('setGroups', groups)
+          }
+      },
+      methods: {
+          async saveService () {
+              let s = this.service
+              this.loading = true
+              delete s.failures
+              delete s.created_at
+              delete s.updated_at
+              delete s.last_success
+              delete s.latency
+              delete s.online_24_hours
+              s.check_interval = parseInt(s.check_interval)
+              s.timeout = parseInt(s.timeout)
+              s.port = parseInt(s.port)
+              s.notify_after = parseInt(s.notify_after)
+              s.expected_status = parseInt(s.expected_status)
+              s.order = parseInt(s.order)
 
-        window.console.log(s)
-
-        if (s.id) {
-            await this.updateService(s)
-        } else {
-            await this.createService(s)
-        }
-        const services = await Api.services()
-        this.$store.commit('setServices', services)
-        this.loading = false
-        this.$router.push('/dashboard/services')
-    },
-    async createService(s) {
-        await Api.service_create(s)
-    },
-      async updateService(s) {
-          await Api.service_update(s)
+              if (s.id) {
+                  await this.updateService(s)
+              } else {
+                  await this.createService(s)
+              }
+              const services = await Api.services()
+              this.$store.commit('setServices', services)
+              this.loading = false
+              this.$router.push('/dashboard/services')
+          },
+          async createService (s) {
+              await Api.service_create(s)
+          },
+          async updateService (s) {
+              await Api.service_update(s)
+          }
       }
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

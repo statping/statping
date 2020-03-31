@@ -52,10 +52,16 @@ context('Groups Tests', () => {
     cy.visit('/dashboard/services')
     cy.get('.sortable_groups > tr').should('have.length', 5)
 
-    cy.get('.sortable_groups > tr').eq(0).contains('PRIVATE')
-    cy.get('.sortable_groups > tr').eq(0).contains('Test Private Group')
-    cy.get('.sortable_groups > tr').eq(1).contains('PUBLIC')
-    cy.get('.sortable_groups > tr').eq(1).contains('Test Group')
+    cy.get('.sortable_groups > tr').eq(0).contains('PUBLIC')
+    cy.get('.sortable_groups > tr').eq(0).contains('Test Group')
+    cy.get('.sortable_groups > tr').eq(1).contains('PRIVATE')
+    cy.get('.sortable_groups > tr').eq(1).contains('Test Private Group')
   })
+
+    it('should delete new groups', () => {
+        cy.get('.sortable_groups > tr').eq(0).find('.btn-danger').click()
+        cy.get('.sortable_groups > tr').eq(1).find('.btn-danger').click()
+        cy.get('.sortable_groups > tr').should('have.length', 3)
+    })
 
 })

@@ -72,15 +72,11 @@ func Connect(configs *DbConfig, retry bool) error {
 
 	log.WithFields(utils.ToFields(dbSession)).Debugln("connected to database")
 
-	maxOpenConn := utils.Getenv("MAX_OPEN_CONN", 5)
-	maxIdleConn := utils.Getenv("MAX_IDLE_CONN", 5)
-	maxLifeConn := utils.Getenv("MAX_LIFE_CONN", 2*time.Minute)
+	maxOpenConn := utils.Getenv("MAX_OPEN_CONN", 25)
+	maxIdleConn := utils.Getenv("MAX_IDLE_CONN", 25)
+	maxLifeConn := utils.Getenv("MAX_LIFE_CONN", 5*time.Minute)
 
-	if configs.DbConn == "sqlite3" {
-		dbSession.DB().SetMaxOpenConns(2)
-	} else {
-		dbSession.DB().SetMaxOpenConns(maxOpenConn.(int))
-	}
+	dbSession.DB().SetMaxOpenConns(maxOpenConn.(int))
 	dbSession.DB().SetMaxIdleConns(maxIdleConn.(int))
 	dbSession.DB().SetConnMaxLifetime(maxLifeConn.(time.Duration))
 

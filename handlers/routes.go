@@ -168,9 +168,6 @@ func Router() *mux.Router {
 	api.Handle("/api/checkin/{api}", authenticated(checkinDeleteHandler, false)).Methods("DELETE")
 	r.Handle("/checkin/{api}", http.HandlerFunc(checkinHitHandler))
 
-	//r.PathPrefix("/").Handler(http.HandlerFunc(indexHandler))
-	//r.Handle("/badge", http.HandlerFunc(badgeHandler)).Methods("GET")
-
 	// Static Files Routes
 	r.PathPrefix("/files/postman.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
 	r.PathPrefix("/files/swagger.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))

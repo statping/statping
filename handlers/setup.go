@@ -41,7 +41,9 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//sample, _ := strconv.ParseBool(r.PostForm.Get("sample_data"))
+	project := r.PostForm.Get("project")
+	description := r.PostForm.Get("description")
+	domain := r.PostForm.Get("domain")
 
 	log.WithFields(utils.ToFields(core.App, confgs)).Debugln("new configs posted")
 
@@ -94,11 +96,11 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	notifiers.InitNotifiers()
 
 	c := &core.Core{
-		Name:        "Statping Sample Data",
-		Description: "This data is only used to testing",
+		Name:        project,
+		Description: description,
 		//ApiKey:      apiKey.(string),
 		//ApiSecret:   apiSecret.(string),
-		Domain:    "http://localhost:8080",
+		Domain:    domain,
 		Version:   core.App.Version,
 		Started:   utils.Now(),
 		CreatedAt: utils.Now(),
