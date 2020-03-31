@@ -34,3 +34,4 @@ statping
 docker
 tmp
 /frontend/cypress/screenshots/
+/frontend/cypress/videos/

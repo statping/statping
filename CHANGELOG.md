@@ -1,3 +1,10 @@
+# 0.90.21
+- Fixed BASE_PATH when using a path for Statping
+- Added Cypress testing
+- Modified SQLite golang package
+- Modified SQLite connection limit, and idle limit. (defaults to 25)
+- Fixed installation to use project name and description from form post
+
 # 0.90.20
 - Fixed Service Form from sending integer values as strings to API
 - Added Cypress e2e testing (working on adding more)

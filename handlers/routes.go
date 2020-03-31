@@ -60,12 +60,12 @@ func Router() *mux.Router {
 	}
 
 	r.Use(sendLog)
+
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
 
-		r.PathPrefix("/css/").Handler(Gzip(staticAssets("css")))
-		r.PathPrefix("/font/").Handler(staticAssets("font"))
-		r.PathPrefix("/js/").Handler(Gzip(staticAssets("js")))
+		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("css"))))
+		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("js"))))
 		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, indexHandler))
 		r.PathPrefix("/favicon.ico").Handler(http.StripPrefix(basePath, indexHandler))
 		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, indexHandler))
@@ -73,10 +73,9 @@ func Router() *mux.Router {
 		tmplFileSrv := http.FileServer(source.TmplBox.HTTPBox())
 		tmplBoxHandler := http.StripPrefix(basePath, tmplFileSrv)
 
-		r.PathPrefix("/css/").Handler(Gzip(tmplFileSrv))
-		r.PathPrefix("/scss/").Handler(Gzip(tmplFileSrv))
-		r.PathPrefix("/font/").Handler(tmplFileSrv)
-		r.PathPrefix("/js/").Handler(Gzip(tmplFileSrv))
+		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
+		r.PathPrefix("/scss/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
+		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
 		r.PathPrefix("/robots.txt").Handler(tmplBoxHandler)
 		r.PathPrefix("/favicon.ico").Handler(tmplBoxHandler)
 		r.PathPrefix("/banner.png").Handler(tmplBoxHandler)
