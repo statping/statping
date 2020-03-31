@@ -119,7 +119,7 @@ func TestMainApiRoutes(t *testing.T) {
 			URL:              "/api",
 			Method:           "GET",
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"description":"This data is only used to testing"`},
+			ExpectedContains: []string{`"description":"This is an awesome test"`},
 			FuncTest: func(t *testing.T) error {
 				if !core.App.Setup {
 					return errors.New("database is not setup")
