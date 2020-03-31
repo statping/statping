@@ -54,7 +54,8 @@ context('Users Tests', () => {
 
   it('should goto users', () => {
     cy.visit('/dashboard/users')
-    cy.get('#users_table > tr >').should('have.length', 1)
+    cy.get('#users_table > tr').should('have.length', 1)
+    cy.get('#users_table > tr').eq(0).contains('admin')
   })
 
   it('should create new User', () => {
@@ -69,7 +70,9 @@ context('Users Tests', () => {
 
   it('should confirm new user', () => {
     cy.visit('/dashboard/users')
-    cy.get('#users_table > tr >').should('have.length', 2)
+    cy.get('#users_table > tr').should('have.length', 2)
+    cy.get('#users_table > tr').eq(0).contains('admin')
+    cy.get('#users_table > tr').eq(1).contains('admin2')
   })
 
 

@@ -119,4 +119,9 @@ context('Services Tests', () => {
     cy.get('button[type="submit"]').click()
   })
 
+  it('should confirm new services', () => {
+    cy.visit('/dashboard/services')
+    cy.get(':nth-child(1) > .card-body > .table > tbody > tr').should('have.length', 9)
+  })
+
 })

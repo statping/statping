@@ -17,10 +17,12 @@
 
                     <h6 class="mt-4 text-muted">Notifiers</h6>
 
-                    <a v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="`${notifier.method}_${index}`" @click.prevent="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" data-toggle="pill" v-bind:href="`#v-pills-${notifier.method.toLowerCase()}`" role="tab" v-bind:aria-controls="`v-pills-${notifier.method.toLowerCase()}`" aria-selected="false">
-                        <font-awesome-icon :icon="iconName(notifier.icon)" class="mr-2"/> {{notifier.method}}
-                        <span v-if="notifier.enabled" class="badge badge-pill float-right mt-1" :class="{'badge-success': !liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), 'badge-light': liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), 'text-dark': liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}">ON</span>
-                    </a>
+                    <div id="notifiers_tabs">
+                        <a v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="`${notifier.method}_${index}`" @click.prevent="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" data-toggle="pill" v-bind:href="`#v-pills-${notifier.method.toLowerCase()}`" role="tab" v-bind:aria-controls="`v-pills-${notifier.method.toLowerCase()}`" aria-selected="false">
+                            <font-awesome-icon :icon="iconName(notifier.icon)" class="mr-2"/> {{notifier.method}}
+                            <span v-if="notifier.enabled" class="badge badge-pill float-right mt-1" :class="{'badge-success': !liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), 'badge-light': liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), 'text-dark': liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}">ON</span>
+                        </a>
+                    </div>
 
                 </div>
             </div>
@@ -33,7 +35,7 @@
                             <div class="card-header">Statping Settings</div>
                             <div class="card-body">
 
-                                <CoreSettings/>
+                                <CoreSettings :core="core"/>
 
                             </div>
                         </div>
@@ -120,12 +122,12 @@
           this.cache = await Api.cache()
       },
       async created() {
-          const c = this.$store.getters.core
+          const c = this.$store.state.core
           this.qrurl = `statping://setup?domain=${c.domain}&api=${c.api_secret}`
           this.qrcode = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=" + encodeURI(this.qrurl)
       },
-      beforeMount() {
-
+      async beforeMount() {
+        this.core = await Api.core()
       },
       methods: {
           changeTab(e) {

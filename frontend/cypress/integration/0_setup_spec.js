@@ -40,8 +40,8 @@ context('Setup Process', () => {
     cy.get('#password_confirm').clear().type('admin')
     cy.get('button[type="submit"]').click()
 
-    cy.get('.pt-4').should('contain', 'Demo Tester')
-    cy.get('.mb-5').should('contain', 'This is a test from Crypress!')
+    cy.get('#title').should('contain', 'Demo Tester')
+    cy.get('#description').should('contain', 'This is a test from Crypress!')
     cy.get('.list-group').should('have.length', 5)
     cy.get('.card').should('have.length', 5)
   })

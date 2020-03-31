@@ -10,8 +10,8 @@
   },
   "baseUrl": "http://localhost:8888",
   "chromeWebSecurity": false,
-  "defaultCommandTimeout": 5000,
-  "requestTimeout": 5000,
+  "defaultCommandTimeout": 8000,
+  "requestTimeout": 8000,
   "watchForFileChanges": false,
   "failOnStatusCode": false
 }
