@@ -12,6 +12,14 @@ class Api {
     return axios.get('api').then(response => (response.data))
   }
 
+  async percentile_rank_update(obj) {
+    return axios.post('/api/percentileRank', obj).then(response => (response.data))
+  }
+
+  async percentile_rank() {
+    return axios.get('/api/percentileRank').then(response => (response.data))
+  }
+
   async core_save(obj) {
     return axios.post('api/core', obj).then(response => (response.data))
   }

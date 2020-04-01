@@ -168,6 +168,12 @@ func TestServices(t *testing.T) {
 		assert.Equal(t, int64(123456), item.AvgTime())
 	})
 
+	t.Run("Test Percentile", func(t *testing.T) {
+		item, err := Find(1)
+		require.Nil(t, err)
+		assert.Equal(t, float64(123456), item.Percentile())
+	})
+
 	t.Run("Test Hits Since", func(t *testing.T) {
 		item, err := Find(1)
 		require.Nil(t, err)

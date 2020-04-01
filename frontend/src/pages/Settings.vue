@@ -37,9 +37,18 @@
 
                                 <CoreSettings :core="core"/>
 
+                                 <form name="updatePercentileRank" @submit.prevent="UpdatePercentileRank">
+                                    <div class="form-group">
+                                        <label for="percentileRank">Percentile of response time</label> <br>
+                                        Current: <strong>{{this.$store.getters.percentileRank}}th percentile</strong> <br>
+                                        <input type="text" v-model="percentileRank" id="percentileRank" class="form-control"  placeholder="Percentile Rank, e.g. 95">
+                                        <br>
+                                    </div>
+                                    <button @click.prevent="UpdatePercentileRank" class="btn btn-primary btn-block">Save Percentile Rank</button>
+                                </form>
+
                             </div>
                         </div>
-
 
                         <div class="card text-black-50 bg-white mb-3">
                             <div class="card-header">Statping Settings</div>
@@ -115,7 +124,8 @@
               tab: "v-pills-home-tab",
               qrcode: "",
               qrurl: "",
-              core: this.$store.getters.core
+              core: this.$store.getters.core,
+              percentileRank: this.$store.getters.percentileRank,
           }
       },
       async mounted() {
@@ -135,7 +145,37 @@
           },
           liClass(id) {
               return this.tab === id
-          }
+          },
+        async UpdatePercentileRank() {
+            if (this.validatePercentileRankInput()) {
+                const data = { rank: parseInt(this.percentileRank) }
+                const response = await Api.percentile_rank_update(data)
+                if (response.status != 'error') {
+                    await this.$store.dispatch('loadRequired')
+                    this.$router.push('/dashboard/settings')
+                }   
+                else {
+                    alert("Percentile update failed. Error: " + response.error)
+                }
+            } 
+        },
+        validatePercentileRankInput() {
+            var input = document.getElementById("percentileRank").value;
+            if (input == "") {
+                alert("Percentile field must be filled out");
+                return false;
+            }
+            if (input < 1 || input > 100) {
+                alert("Percentile number has to be between 1 and 100.")
+                return false;
+            }
+            var onlyNumbers = new RegExp('^[0-9]+$');
+            if (!onlyNumbers.test(input)) {
+                alert("Only whole numbers are allowed")
+                return false;
+            }
+            return true;
+        },
       }
   }
 </script>

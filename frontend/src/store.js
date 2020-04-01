@@ -26,7 +26,8 @@ export default new Vuex.Store({
             messages: [],
             users: [],
             notifiers: [],
-            admin: false
+            admin: false,
+            percentileRank: 95
         },
     getters: {
         hasAllData: state => state.hasAllData,
@@ -39,6 +40,7 @@ export default new Vuex.Store({
         incidents: state => state.incidents,
         users: state => state.users,
         notifiers: state => state.notifiers,
+        percentileRank: state => state.percentileRank,
 
         isAdmin: state => state.admin,
 
@@ -113,6 +115,9 @@ export default new Vuex.Store({
         setAdmin (state, admin) {
             state.admin = admin
         },
+        setPercentileRank(state, percentileRank) {
+            state.percentileRank = percentileRank
+        },
     },
     actions: {
         async getAllServices(context) {
@@ -129,6 +134,8 @@ export default new Vuex.Store({
             const messages = await Api.messages()
             context.commit("setMessages", messages)
             context.commit("setHasPublicData", true)
+            const percentileRank = await Api.percentile_rank();
+            context.commit("setPercentileRank", percentileRank.output)
             // if (core.logged_in) {
             //     const notifiers = await Api.notifiers()
             //     context.commit("setNotifiers", notifiers);
