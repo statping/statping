@@ -28,15 +28,17 @@ env:
 go: 1.14
 go_import_path: github.com/statping/statping
 install:
-  - "npm install -g sass"
-  - "npm install -g newman"
-  - "npm install -g cross-env"
+  - "npm install -g sass newman cross-env wait-on"
   - "pip install --user awscli"
   - "go get github.com/mattn/goveralls"
   - "go mod download"
   - "go mod verify"
   - "make test-deps yarn clean compile install"
 language: go
+addons:
+  apt:
+    packages:
+      - libgconf-2-4
 matrix:
   allow_failures:
     - go: master
@@ -47,6 +49,7 @@ os:
   - linux
 script:
   - "travis_retry make clean test-ci"
+  - "travis_retry make test-cypress"
   - "if [[ \"$TRAVIS_BRANCH\" == \"master\" && \"$TRAVIS_PULL_REQUEST\" = \"false\" ]]; then make coverage; fi"
 services:
   - docker

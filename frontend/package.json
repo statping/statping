@@ -7,10 +7,11 @@
     "build": "rm -rf dist && cross-env NODE_ENV=production webpack --mode production",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --host 0.0.0.0 --port 8888 --progress",
     "lint": "vue-cli-service lint",
-    "test": "cross-env NODE_ENV=development mochapack --webpack-config webpack.config.js --require test/setup.js test/**/*.spec.js",
     "backend-test": "newman run -e ../dev/postman_environment.json --delay-request 500 ../dev/postman.json",
     "cypress:open": "cypress open",
-    "cypress:test": "cypress run --record --key 49d99e5e-04c6-46df-beef-54b68e152a4d"
+    "cypress:test": "cypress run --record --key 49d99e5e-04c6-46df-beef-54b68e152a4d",
+    "test": "start-server-and-test start http://0.0.0.0:8888/api cypress:test",
+    "start": "statping -port 8888"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free-solid": "^5.1.0-3",
@@ -80,6 +81,7 @@
     "node-sass": "^4.13.1",
     "optimize-css-assets-webpack-plugin": "~5.0",
     "sass-loader": "^8.0.2",
+    "start-server-and-test": "^1.10.11",
     "stylelint": "^13.2.1",
     "stylelint-config-sass-guidelines": "^7.0.0",
     "stylelint-config-standard": "^20.0.0",
@@ -87,6 +89,7 @@
     "vue-loader": "~15.6",
     "vue-style-loader": "~4.1",
     "vue-template-compiler": "~2.6",
+    "wait-on": "^4.0.1",
     "webpack": "~4.29",
     "webpack-bundle-analyzer": "~3.3",
     "webpack-cli": "~3.2",

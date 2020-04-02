@@ -1,34 +1,19 @@
-// Statping
-// Copyright (C) 2018.  Hunter Long and the project contributors
-// Written by Hunter Long <info@socialeck.com> and the project contributors
-//
-// https://github.com/statping/statping
-//
-// The licenses for most software and other practical works are designed
-// to take away your freedom to share and change the works.  By contrast,
-// the GNU General Public License is intended to guarantee your freedom to
-// share and change all versions of a program--to make sure it remains free
-// software for all its users.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 package main
 
 import (
 	"flag"
 	"fmt"
 	"github.com/getsentry/sentry-go"
+	"github.com/statping/statping/handlers/protos"
 	"github.com/statping/statping/types/core"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/statping/statping/source"
-
 	"github.com/pkg/errors"
 	"github.com/statping/statping/handlers"
+	"github.com/statping/statping/source"
 	"github.com/statping/statping/types/configs"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
@@ -40,6 +25,7 @@ var (
 	// COMMIT stores the git commit hash for this version of Statping
 	COMMIT      string
 	ipAddress   string
+	grpcPort    int
 	envFile     string
 	verboseMode int
 	port        int
@@ -57,10 +43,12 @@ func parseFlags() {
 	envPort := utils.Getenv("PORT", 8080).(int)
 	envIpAddress := utils.Getenv("IP", "0.0.0.0").(string)
 	envVerbose := utils.Getenv("VERBOSE", 2).(int)
+	envGrpcPort := utils.Getenv("GRPC_PORT", 0).(int)
 
 	flag.StringVar(&ipAddress, "ip", envIpAddress, "IP address to run the Statping HTTP server")
 	flag.StringVar(&envFile, "env", "", "IP address to run the Statping HTTP server")
 	flag.IntVar(&port, "port", envPort, "Port to run the HTTP server")
+	flag.IntVar(&grpcPort, "grpc", envGrpcPort, "Port to run the gRPC server")
 	flag.IntVar(&verboseMode, "verbose", envVerbose, "Run in verbose mode to see detailed logs (1 - 4)")
 	flag.Parse()
 }

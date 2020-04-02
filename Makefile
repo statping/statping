@@ -40,6 +40,14 @@ test-ci: clean compile test-deps
 	SASS=`which sass` go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
 	goveralls -coverprofile=coverage.out -service=travis-ci -repotoken ${COVERALLS}
 
+test-cypress: clean
+	echo "Statping Bin: "`which statping`
+	echo "Statping Version: "`statping version`
+	statping -port 8585 & wait-on http://localhost:8585/setup
+	cd frontend && yarn dev & wait-on http://localhost:8888
+	cd frontend && yarn cypress:test
+	killall statping
+
 test-api:
 	DB_CONN=sqlite DB_HOST=localhost DB_DATABASE=sqlite DB_PASS=none DB_USER=none statping &
 	sleep 5000 && newman run source/tmpl/postman.json -e dev/postman_environment.json --delay-request 500
@@ -48,6 +56,9 @@ test-deps:
 	go get golang.org/x/tools/cmd/cover
 	go get github.com/mattn/goveralls
 	go get github.com/GeertJohan/go.rice/rice
+
+protoc:
+	cd types/proto && protoc --gofast_out=plugins=grpc:. statping.proto
 
 yarn-serve:
 	cd frontend && yarn serve
