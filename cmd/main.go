@@ -3,34 +3,31 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/getsentry/sentry-go"
-	"github.com/statping/statping/handlers/protos"
+	"github.com/pkg/errors"
+	"github.com/statping/statping/database"
+	"github.com/statping/statping/handlers"
+	"github.com/statping/statping/notifiers"
+	"github.com/statping/statping/source"
+	"github.com/statping/statping/types/configs"
 	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/utils"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
-
-	"github.com/pkg/errors"
-	"github.com/statping/statping/handlers"
-	"github.com/statping/statping/source"
-	"github.com/statping/statping/types/configs"
-	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/utils"
 )
 
 var (
 	// VERSION stores the current version of Statping
 	VERSION string
 	// COMMIT stores the git commit hash for this version of Statping
-	COMMIT      string
-	ipAddress   string
-	grpcPort    int
+	COMMIT    string
+	ipAddress string
+	//grpcPort    int
 	envFile     string
 	verboseMode int
 	port        int
 	log         = utils.Log.WithField("type", "cmd")
-	httpServer  = make(chan bool)
 
 	confgs *configs.DbConfig
 )
@@ -43,25 +40,32 @@ func parseFlags() {
 	envPort := utils.Getenv("PORT", 8080).(int)
 	envIpAddress := utils.Getenv("IP", "0.0.0.0").(string)
 	envVerbose := utils.Getenv("VERBOSE", 2).(int)
-	envGrpcPort := utils.Getenv("GRPC_PORT", 0).(int)
+	//envGrpcPort := utils.Getenv("GRPC_PORT", 0).(int)
 
 	flag.StringVar(&ipAddress, "ip", envIpAddress, "IP address to run the Statping HTTP server")
 	flag.StringVar(&envFile, "env", "", "IP address to run the Statping HTTP server")
 	flag.IntVar(&port, "port", envPort, "Port to run the HTTP server")
-	flag.IntVar(&grpcPort, "grpc", envGrpcPort, "Port to run the gRPC server")
+	//flag.IntVar(&grpcPort, "grpc", envGrpcPort, "Port to run the gRPC server")
 	flag.IntVar(&verboseMode, "verbose", envVerbose, "Run in verbose mode to see detailed logs (1 - 4)")
 	flag.Parse()
 }
 
-func exit(err error) {
-	sentry.CaptureException(err)
-	log.Fatalln(err)
-	Close()
-	os.Exit(2)
-}
-
 func init() {
 	core.New(VERSION)
+}
+
+// exit will return an error and return an exit code 1 due to this error
+func exit(err error) {
+	utils.SentryErr(err)
+	Close()
+	log.Fatalln(err)
+}
+
+// Close will gracefully stop the database connection, and log file
+func Close() {
+	utils.CloseLogs()
+	confgs.Close()
+	fmt.Println("Shutting down Statping")
 }
 
 // main will run the Statping application
@@ -70,6 +74,8 @@ func main() {
 	go sigterm()
 
 	parseFlags()
+
+	utils.SentryInit(VERSION)
 
 	if err := source.Assets(); err != nil {
 		exit(err)
@@ -93,18 +99,10 @@ func main() {
 			exit(err)
 		}
 	}
-	log.Info(fmt.Sprintf("Starting Statping v%v", VERSION))
+	log.Info(fmt.Sprintf("Starting Statping v%s", VERSION))
 
 	if err := updateDisplay(); err != nil {
 		log.Warnln(err)
-	}
-
-	errorEnv := utils.Getenv("GO_ENV", "production").(string)
-	if err := sentry.Init(sentry.ClientOptions{
-		Dsn:         errorReporter,
-		Environment: errorEnv,
-	}); err != nil {
-		log.Errorln(err)
 	}
 
 	confgs, err = configs.LoadConfigs()
@@ -165,13 +163,6 @@ func main() {
 	}
 }
 
-// Close will gracefully stop the database connection, and log file
-func Close() {
-	sentry.Flush(3 * time.Second)
-	utils.CloseLogs()
-	confgs.Close()
-}
-
 func SetupMode() error {
 	return handlers.RunHTTPServer(ipAddress, port)
 }
@@ -181,7 +172,6 @@ func sigterm() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	<-sigs
-	fmt.Println("Shutting down Statping")
 	Close()
 	os.Exit(0)
 }
@@ -205,28 +195,25 @@ func mainProcess() error {
 	return nil
 }
 
-func StartHTTPServer() {
-	httpServer = make(chan bool)
-	go httpServerProcess(httpServer)
-}
-
-func StopHTTPServer() {
-
-}
-
-func httpServerProcess(process <-chan bool) {
-	for {
-		select {
-		case <-process:
-			fmt.Println("HTTP Server has stopped")
-			return
-		default:
-			if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
-				log.Errorln(err)
-				exit(err)
-			}
-		}
+// InitApp will start the Statping instance with a valid database connection
+// This function will gather all services in database, add/init Notifiers,
+// and start the database cleanup routine
+func InitApp() error {
+	if _, err := core.Select(); err != nil {
+		return err
 	}
-}
 
-const errorReporter = "https://2bedd272821643e1b92c774d3fdf28e7@sentry.statping.com/2"
+	if _, err := services.SelectAllServices(true); err != nil {
+		return err
+	}
+
+	go services.CheckServices()
+
+	notifiers.InitNotifiers()
+
+	core.App.Setup = true
+	core.App.Started = utils.Now()
+
+	go database.Maintenance()
+	return nil
+}

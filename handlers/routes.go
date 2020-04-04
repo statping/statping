@@ -136,7 +136,7 @@ func Router() *mux.Router {
 	api.Handle("/api/notifiers", authenticated(apiNotifiersHandler, false)).Methods("GET")
 	api.Handle("/api/notifier/{notifier}", authenticated(apiNotifierGetHandler, false)).Methods("GET")
 	api.Handle("/api/notifier/{notifier}", authenticated(apiNotifierUpdateHandler, false)).Methods("POST")
-	api.Handle("/api/notifier/{method}/test", authenticated(testNotificationHandler, false)).Methods("POST")
+	api.Handle("/api/notifier/{notifier}/test", authenticated(testNotificationHandler, false)).Methods("POST")
 
 	// API MESSAGES Routes
 	api.Handle("/api/messages", scoped(apiAllMessagesHandler)).Methods("GET")

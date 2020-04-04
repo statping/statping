@@ -112,7 +112,11 @@ func apiClearCacheHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func sendErrorJson(err error, w http.ResponseWriter, r *http.Request, statusCode ...int) {
-	log.Warnln(fmt.Errorf("sending error response for %v: %v", r.URL.String(), err.Error()))
+	log.WithField("url", r.URL.String()).
+		WithField("method", r.Method).
+		WithField("code", statusCode).
+		Errorln(fmt.Errorf("sending error response for %s: %s", r.URL.String(), err.Error()))
+
 	output := apiResponse{
 		Status: "error",
 		Error:  err.Error(),

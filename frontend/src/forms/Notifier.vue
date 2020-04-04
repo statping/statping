@@ -1,14 +1,16 @@
 <template>
-    <div class="card text-black-50 bg-white mb-5">
-        <div class="card-header text-capitalize">{{notifier.title}}</div>
-        <div class="card-body">
-    <form @submit.prevent="saveNotifier">
-
-        <div v-if="error" class="alert alert-danger col-12" role="alert">{{error}}</div>
-
-        <div v-if="ok" class="alert alert-success col-12" role="alert">
-            <i class="fa fa-smile-beam"></i> The {{notifier.method}} notifier is working correctly!
+    <div>
+    <div class="card contain-card text-black-50 bg-white mb-3">
+        <div class="card-header text-capitalize">
+            {{notifier.title}}
+            <span @click="enableToggle" class="switch switch-rd-gr float-right">
+                <input v-model="notifier.enabled" type="checkbox" class="switch-sm" :id="`enable_${notifier.method}`" v-bind:checked="notifier.enabled">
+                <label class="mb-0" :for="`enable_${notifier.method}`"></label>
+            </span>
         </div>
+        <div class="card-body">
+
+    <form @submit.prevent="saveNotifier">
 
         <p class="small text-muted" v-html="notifier.description"/>
 
@@ -20,43 +22,44 @@
         </div>
 
         <div class="row mt-4">
-            <div class="col-9 col-sm-6">
-                <div class="input-group mb-2">
-                    <div class="input-group-prepend">
-                        <div class="input-group-text">Limit</div>
-                    </div>
-                    <input v-model="notifier.limits" type="number" class="form-control" name="limits" min="1" max="60" placeholder="7">
-                    <div class="input-group-append">
-                        <div class="input-group-text">Per Minute</div>
-                    </div>
-                </div>
-            </div>
 
-            <div class="col-3 col-sm-2 mt-1">
-                <span @click="notifier.enabled = !!notifier.enabled" class="switch">
-                    <input type="checkbox" name="enabled-option" class="switch" v-model="notifier.enabled" v-bind:id="`switch-${notifier.method}`" v-bind:checked="notifier.enabled">
-                    <label v-bind:for="`switch-${notifier.method}`"></label>
-                </span>
-            </div>
-
-            <div class="col-12 col-sm-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
-                <button @click.prevent="saveNotifier" type="submit" class="btn btn-block text-capitalize" :class="{'btn-primary': !saved, 'btn-success': saved}">
-                    <i class="fa fa-check-circle"></i> {{loading ? "Loading..." : saved ? "Saved" : "Save"}}
-                </button>
-            </div>
-
-            <div class="col-12 col-sm-12 mt-3">
-                <button @click.prevent="testNotifier" class="btn btn-secondary btn-block text-capitalize col-12 float-right"><i class="fa fa-vial"></i>
-                    {{loadingTest ? "Loading..." : "Test Notifier"}}</button>
+            <div class="col-sm-12">
+                <span class="slider-info">Limit {{notifier.limits}} per hour</span>
+                <input v-model="notifier.limits" type="range" name="limits" class="slider" min="1" max="300">
+                <small class="form-text text-muted">Notifier '{{notifier.title}}' will send a maximum of {{notifier.limits}} notifications per hour.</small>
             </div>
 
         </div>
 
     </form>
         </div>
+    </div>
+
+        <div v-if="error" class="alert alert-danger col-12" role="alert">{{error}}</div>
+        <div v-if="success" class="alert alert-success col-12" role="alert">{{notifier.title}} appears to be working!</div>
+
+        <div class="card text-black-50 bg-white mb-3">
+            <div class="card-body">
+
+                <div class="row">
+                    <div class="col-6 col-sm-6 mb-2 mb-sm-0 mt-2 mt-sm-0">
+                        <button @click.prevent="saveNotifier" type="submit" class="btn btn-block text-capitalize btn-primary">
+                            <i class="fa fa-check-circle"></i> {{loading ? "Loading..." : saved ? "Saved" : "Save Settings"}}
+                        </button>
+                    </div>
+                    <div class="col-6 col-sm-6 mb-2 mb-sm-0 mt-2 mt-sm-0">
+                        <button @click.prevent="testNotifier" class="btn btn-outline-dark btn-block text-capitalize"><i class="fa fa-vial"></i>
+                            {{loadingTest ? "Loading..." : "Test Notifier"}}</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
         <span class="d-block small text-center mb-3">
             <span class="text-capitalize">{{notifier.title}}</span> Notifier created by <a :href="notifier.author_url" target="_blank">{{notifier.author}}</a>
         </span>
+
     </div>
 </template>
 
@@ -76,22 +79,27 @@ export default {
             loading: false,
             loadingTest: false,
             error: null,
+            success: false,
             saved: false,
-            ok: false,
             form: {},
         }
     },
-    mounted() {
-
-    },
     methods: {
+        async enableToggle() {
+            this.notifier.enabled = !!this.notifier.enabled
+            const form = {
+                enabled: !this.notifier.enabled,
+                method: this.notifier.method,
+            }
+            await Api.notifier_save(form)
+        },
         async saveNotifier() {
             this.loading = true
             this.form.enabled = this.notifier.enabled
             this.form.limits = parseInt(this.notifier.limits)
             this.form.method = this.notifier.method
             this.notifier.form.forEach((f) => {
-                let field = f.field.toLowerCase()
+              let field = f.field.toLowerCase()
               let val = this.notifier[field]
               if (this.isNumeric(val)) {
                 val = parseInt(val)
@@ -99,34 +107,28 @@ export default {
                 this.form[field] = val
             });
             await Api.notifier_save(this.form)
-            // const notifiers = await Api.notifiers()
-            // await this.$store.commit('setNotifiers', notifiers)
+            const notifiers = await Api.notifiers()
+            await this.$store.commit('setNotifiers', notifiers)
             this.saved = true
             this.loading = false
-            setTimeout(() => {
-                this.saved = false
-            }, 2000)
         },
         async testNotifier() {
-            this.ok = false
+            this.success = false
             this.loadingTest = true
-            let form = {}
+            this.form.method = this.notifier.method
             this.notifier.form.forEach((f) => {
                 let field = f.field.toLowerCase()
-              let val = this.notifier[field]
-              if (this.isNumeric(val)) {
-                val = parseInt(val)
-              }
+                let val = this.notifier[field]
+                if (this.isNumeric(val)) {
+                    val = parseInt(val)
+                }
                 this.form[field] = val
             });
-          this.form.enabled = this.notifier.enabled
-          this.form.limits = parseInt(this.notifier.limits)
-          this.form.method = this.notifier.method
             const tested = await Api.notifier_test(this.form)
-            if (tested === 'ok') {
-                this.ok = true
+            if (tested.success) {
+                this.success = true
             } else {
-                this.error = tested
+                this.error = tested.error
             }
             this.loadingTest = false
         },

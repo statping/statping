@@ -1,33 +1,26 @@
 <template>
     <form @submit.prevent="saveService">
         <div class="card contain-card text-black-50 bg-white mb-4">
-            <div class="card-header">Basic Information</div>
+            <div class="card-header">Service Information</div>
             <div class="card-body">
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Service Name</label>
             <div class="col-sm-8">
-                <input v-model="service.name" @keypress="service.permalink=service.name.split(' ').join('_')" type="text" name="name" class="form-control" placeholder="Name" required spellcheck="false" autocorrect="off">
+                <input v-model="service.name" @input="updatePermalink" type="text" name="name" class="form-control" placeholder="Server Name" required spellcheck="false" autocorrect="off">
                 <small class="form-text text-muted">Give your service a name you can recognize</small>
             </div>
         </div>
         <div class="form-group row">
             <label for="service_type" class="col-sm-4 col-form-label">Service Type</label>
             <div class="col-sm-8">
-                <select v-model="service.type" class="form-control" id="service_type" >
+                <select v-model="service.type" class="form-control" id="service_type">
                     <option value="http">HTTP Service</option>
-                    <option value="grpc">gRPC Service</option>
                     <option value="tcp">TCP Service</option>
                     <option value="udp">UDP Service</option>
                     <option value="icmp">ICMP Ping</option>
+                    <option value="grpc">gRPC Service</option>
                 </select>
                 <small class="form-text text-muted">Use HTTP if you are checking a website or use TCP if you are checking a server</small>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="service_url" class="col-sm-4 col-form-label">Application Endpoint (URL)</label>
-            <div class="col-sm-8">
-                <input v-model="service.domain" type="text" class="form-control" id="service_url" placeholder="https://google.com" required autocapitalize="none" spellcheck="false">
-                <small class="form-text text-muted">Statping will attempt to connect to this URL</small>
             </div>
         </div>
         <div class="form-group row">
@@ -40,26 +33,79 @@
                 <small class="form-text text-muted">Attach this service to a group</small>
             </div>
         </div>
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Permalink URL</label>
+                <div class="col-sm-8">
+                    <input v-model="service.permalink" type="text" name="permalink" class="form-control" id="permalink" autocapitalize="none" spellcheck="true" placeholder='awesome_service'>
+                    <small class="form-text text-muted">Use text for the service URL rather than the service number.</small>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Public Service</label>
+                <div class="col-8 mt-1">
+                    <span @click="service.public = !!service.public" class="switch float-left">
+                        <input v-model="service.public" type="checkbox" name="public-option" class="switch" id="switch-public" v-bind:checked="service.public">
+                        <label v-if="service.public" for="switch-public">This service will be visible for everyone</label>
+                        <label v-if="!service.public" for="switch-public">This service will only be visible for users and administrators.</label>
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="service_interval" class="col-sm-4 col-form-label">Check Interval</label>
+                <div class="col-sm-8">
+                    <span class="slider-info">{{secondsHumanize(service.check_interval)}}</span>
+                    <input v-model="service.check_interval" type="range" class="slider" id="service_interval" min="1" max="1800" :step="stepVal(service.check_interval)">
+                    <small id="interval" class="form-text text-muted">Interval to check your service state</small>
+                </div>
+            </div>
+
             </div>
         </div>
 
-        <div v-if="service.type !== 'icmp'" class="card contain-card text-black-50 bg-white mb-4">
-            <div class="card-header">Request Details</div>
+        <div class="card contain-card text-black-50 bg-white mb-4">
+            <div class="card-header">{{service.type.toUpperCase()}} Request Details</div>
             <div class="card-body">
 
-        <div v-if="service.type.match(/^(http)$/)" class="form-group row">
-            <label class="col-sm-4 col-form-label">Service Check Type</label>
+            <div class="form-group row">
+                <label for="service_url" class="col-sm-4 col-form-label">Service Endpoint {{service.type === 'http' ? "(URL)" : "(Domain)"}}</label>
+                <div class="col-sm-8">
+                    <input v-model="service.domain" type="text" class="form-control" id="service_url" :placeholder="service.type === 'http' ? 'https://google.com' : '192.168.1.1'" required autocapitalize="none" spellcheck="false">
+                    <small class="form-text text-muted">Statping will attempt to connect to this address</small>
+                </div>
+            </div>
+
+            <div v-if="service.type.match(/^(tcp|udp|grpc)$/)" class="form-group row">
+                <label class="col-sm-4 col-form-label">{{service.type.toUpperCase()}} Port</label>
+                <div class="col-sm-8">
+                    <input v-model="service.port" type="number" name="port" class="form-control" id="service_port" placeholder="8080">
+                </div>
+            </div>
+
+            <div v-if="service.type.match(/^(http)$/)" class="form-group row">
+                <label class="col-sm-4 col-form-label">Service Check Type</label>
+                <div class="col-sm-8">
+                    <select v-model="service.method" name="method" class="form-control">
+                        <option value="GET" >GET</option>
+                        <option value="POST" >POST</option>
+                        <option value="DELETE" >DELETE</option>
+                        <option value="PATCH" >PATCH</option>
+                        <option value="PUT" >PUT</option>
+                    </select>
+                    <small class="form-text text-muted">A GET request will simply request the endpoint, you can also send data with POST.</small>
+                </div>
+            </div>
+
+        <div class="form-group row">
+            <label class="col-sm-4 col-form-label">Request Timeout</label>
             <div class="col-sm-8">
-                <select v-model="service.method" name="method" class="form-control">
-                    <option value="GET" >GET</option>
-                    <option value="POST" >POST</option>
-                    <option value="DELETE" >DELETE</option>
-                    <option value="PATCH" >PATCH</option>
-                    <option value="PUT" >PUT</option>
-                </select>
-                <small class="form-text text-muted">A GET request will simply request the endpoint, you can also send data with POST.</small>
+                <span class="slider-info">{{secondsHumanize(service.timeout)}}</span>
+                <input v-model="service.timeout" type="range" name="timeout" class="slider" min="1" max="180">
+                <small class="form-text text-muted">If the endpoint does not respond within this time it will be considered to be offline</small>
             </div>
         </div>
+
         <div v-if="service.type.match(/^(http)$/) && service.method.match(/^(POST|PATCH|DELETE|PUT)$/)" class="form-group row">
             <label class="col-sm-4 col-form-label">Optional Post Data (JSON)</label>
             <div class="col-sm-8">
@@ -88,83 +134,56 @@
                 <small class="form-text text-muted">A status code of 200 is success, or view all the <a target="_blank" href="https://www.restapitutorial.com/httpstatuscodes.html">HTTP Status Codes</a></small>
             </div>
         </div>
-        <div v-if="service.type.match(/^(tcp|udp)$/)" class="form-group row">
-            <label class="col-sm-4 col-form-label">{{service.type.toUpperCase()}} Port</label>
-            <div class="col-sm-8">
-                <input v-model="service.port" type="number" name="port" class="form-control" id="service_port" placeholder="8080">
+
+        <div v-if="service.type.match(/^(http)$/)" class="form-group row">
+            <label class="col-sm-4 col-form-label">Verify SSL</label>
+            <div class="col-8 mt-1">
+                <span @click="service.verify_ssl = !!service.verify_ssl" class="switch float-left">
+                    <input v-model="service.verify_ssl" type="checkbox" name="verify_ssl-option" class="switch" id="switch-verify-ssl" v-bind:checked="service.verify_ssl">
+                    <label for="switch-verify-ssl" v-if="service.verify_ssl">Verify SSL Certificate for this service</label>
+                    <label for="switch-verify-ssl" v-if="!service.verify_ssl">Skip SSL Certificate verification for this service</label>
+                </span>
             </div>
         </div>
+
             </div>
         </div>
 
         <div class="card contain-card text-black-50 bg-white mb-4">
-            <div class="card-header">Additional Options</div>
+            <div class="card-header">Notification Options</div>
             <div class="card-body">
 
-        <div class="form-group row">
-            <label for="service_interval" class="col-sm-4 col-form-label">Check Interval (Seconds)</label>
-            <div class="col-sm-8">
-                <input v-model="service.check_interval" type="number" class="form-control" min="1" id="service_interval" required>
-                <small id="interval" class="form-text text-muted">10,000+ will be checked in Microseconds (1 millisecond = 1000 microseconds).</small>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Timeout in Seconds</label>
-            <div class="col-sm-8">
-                <input v-model="service.timeout" type="number" name="timeout" class="form-control" placeholder="15" min="1">
-                <small class="form-text text-muted">If the endpoint does not respond within this time it will be considered to be offline</small>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Permalink URL</label>
-            <div class="col-sm-8">
-                <input v-model="service.permalink" type="text" name="permalink" class="form-control" id="permalink" autocapitalize="none" spellcheck="true" placeholder='awesome_service'>
-                <small class="form-text text-muted">Use text for the service URL rather than the service number.</small>
-            </div>
-        </div>
-        <div v-if="service.type.match(/^(http)$/)" class="form-group row">
-            <label class="col-sm-4 col-form-label">Verify SSL</label>
-            <div class="col-8 mt-1">
-            <span @click="service.verify_ssl = !!service.verify_ssl" class="switch float-left">
-                <input v-model="service.verify_ssl" type="checkbox" name="verify_ssl-option" class="switch" id="switch-verify-ssl" v-bind:checked="service.verify_ssl">
-                <label for="switch-verify-ssl">Verify SSL Certificate for this service</label>
-            </span>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Notifications</label>
-            <div class="col-8 mt-1">
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Enable Notifications</label>
+                    <div class="col-8 mt-1">
             <span @click="service.allow_notifications = !!service.allow_notifications" class="switch float-left">
                 <input v-model="service.allow_notifications" type="checkbox" name="allow_notifications-option" class="switch" id="switch-notifications" v-bind:checked="service.allow_notifications">
                 <label for="switch-notifications">Allow notifications to be sent for this service</label>
             </span>
+                    </div>
+                </div>
+                <div v-if="service.allow_notifications"  class="form-group row">
+                    <label class="col-sm-4 col-form-label">Notify After Failures</label>
+                    <div class="col-sm-8">
+                        <span class="slider-info">{{service.notify_after === 0 ? "First Failure" : service.notify_after+' Failures'}}</span>
+                        <input v-model="service.notify_after" type="range" name="notify_after" class="slider" id="notify_after" min="0" max="20">
+                        <small class="form-text text-muted">Send Notification after {{service.notify_after === 0 ? 'the first Failure' : service.notify_after+' Failures'}} </small>
+                    </div>
+                </div>
+                <div v-if="service.allow_notifications" class="form-group row">
+                    <label class="col-sm-4 col-form-label">Notify All Changes</label>
+                    <div class="col-8 mt-1">
+                        <span @click="service.notify_all_changes = !!service.notify_all_changes" class="switch float-left">
+                            <input v-model="service.notify_all_changes" type="checkbox" name="notify_all-option" class="switch" id="notify_all" v-bind:checked="service.notify_all_changes">
+                            <label v-if="service.notify_all_changes" for="notify_all">Continuously send notifications when service is failing.</label>
+                            <label v-if="!service.notify_all_changes" for="notify_all">Only notify one time when service hits an error</label>
+                        </span>
+                    </div>
+                </div>
+
             </div>
         </div>
-        <div v-if="service.allow_notifications"  class="form-group row">
-            <label class="col-sm-4 col-form-label">Notify After Failures</label>
-            <div class="col-sm-8">
-                <input v-model="service.notify_after" type="number" name="notify_after" class="form-control" id="notify_after" autocapitalize="none">
-                <small class="form-text text-muted">Send Notification after {{service.notify_after === 0 ? 'the first Failure' : service.notify_after+' Failures'}} </small>
-            </div>
-        </div>
-        <div v-if="service.allow_notifications" class="form-group row">
-            <label class="col-sm-4 col-form-label">Notify All Changes</label>
-            <div class="col-8 mt-1">
-            <span @click="service.notify_all_changes = !!service.notify_all_changes" class="switch float-left">
-                <input v-model="service.notify_all_changes" type="checkbox" name="notify_all-option" class="switch" id="notify_all" v-bind:checked="service.notify_all_changes">
-                <label for="notify_all">Continuously notify when service is failing.</label>
-            </span>
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Visible</label>
-            <div class="col-8 mt-1">
-            <span @click="service.public = !!service.public" class="switch float-left">
-                <input v-model="service.public" type="checkbox" name="public-option" class="switch" id="switch-public" v-bind:checked="service.public">
-                <label for="switch-public">Show service details to the public</label>
-            </span>
-            </div>
-        </div>
+
         <div class="form-group row">
             <div class="col-12">
                 <button :disabled="loading" @click.prevent="saveService" type="submit" class="btn btn-success btn-block">
@@ -172,8 +191,7 @@
                 </button>
             </div>
         </div>
-            </div>
-        </div>
+
         <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
     </form>
 </template>
@@ -227,6 +245,30 @@
           }
       },
       methods: {
+          updatePermalink() {
+              const a = 'àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;'
+              const b = 'aaaaaaaaaacccddeeeeeeeegghiiiiiilmnnnnoooooooooprrsssssttuuuuuuuuuwxyyzzz------'
+              const p = new RegExp(a.split('').join('|'), 'g')
+
+              this.service.permalink = this.service.name.toLowerCase()
+                  .replace(/\s+/g, '-') // Replace spaces with -
+                  .replace(p, c => b.charAt(a.indexOf(c))) // Replace special characters
+                  .replace(/&/g, '-and-') // Replace & with 'and'
+                  .replace(/[^\w\-]+/g, '') // Remove all non-word characters
+                  .replace(/\-\-+/g, '-') // Replace multiple - with single -
+                  .replace(/^-+/, '') // Trim - from start of text
+                  .replace(/-+$/, '') // Trim - from end of text
+          },
+          stepVal(val) {
+              if (val > 1800) {
+                  return 300
+              } else if (val > 300) {
+                  return 60
+              } else if (val > 120) {
+                  return 10
+              }
+              return 1
+          },
           async saveService () {
               let s = this.service
               this.loading = true

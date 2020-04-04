@@ -40,12 +40,10 @@ test-ci: clean compile test-deps
 	SASS=`which sass` go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
 	goveralls -coverprofile=coverage.out -service=travis-ci -repotoken ${COVERALLS}
 
-test-cypress: clean
+cypress: clean
 	echo "Statping Bin: "`which statping`
 	echo "Statping Version: "`statping version`
-	statping -port 8585 & wait-on http://localhost:8585/setup
-	cd frontend && yarn dev & wait-on http://localhost:8888
-	cd frontend && yarn cypress:test
+	cd frontend && yarn test
 	killall statping
 
 test-api:
@@ -159,6 +157,7 @@ clean:
 	rm -rf source/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
 	rm -rf types/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
 	rm -rf utils/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	rm -rf frontend/{logs,plugins,*.db,config.yml,.sass-cache,*.log}
 	rm -rf dev/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log,test/app,plugin/*.so}
 	rm -rf {parts,prime,snap,stage}
 	rm -rf dev/test/cypress/videos
@@ -283,6 +282,10 @@ xgo-install: clean
 	go get github.com/crazy-max/xgo
 	docker pull crazymax/xgo:${GOVERSION}
 
+sentry-release:
+	sentry-cli releases new -p backend -p frontend v${VERSION}
+	sentry-cli releases set-commits --auto v${VERSION}
+	sentry-cli releases finalize v${VERSION}
 
-.PHONY: all build build-all build-alpine test-all test test-api docker frontend up down print_details lite
+.PHONY: all build build-all build-alpine test-all test test-api docker frontend up down print_details lite sentry-release
 .SILENT: travis_s3_creds

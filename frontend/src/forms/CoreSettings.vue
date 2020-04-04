@@ -69,8 +69,8 @@
         <div class="form-group row">
             <label for="switch-group-public" class="col-sm-4 col-form-label">Enabled</label>
             <div class="col-md-8 col-xs-12 mt-1">
-            <span @click="enabled = !!enabled" class="switch float-left">
-                <input v-model="enabled" type="checkbox" class="switch" id="switch-group-public" :checked="enabled">
+            <span class="switch float-left">
+                <input type="checkbox" class="switch" id="switch-group-public">
                 <label for="switch-group-public">Enabled Github Auth</label>
             </span>
             </div>

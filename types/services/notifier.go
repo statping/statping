@@ -6,19 +6,21 @@ import (
 )
 
 var (
-	allNotifiers []ServiceNotifier
+	allNotifiers = make(map[string]ServiceNotifier)
 )
 
-func AllNotifiers() []ServiceNotifier {
+func AllNotifiers() map[string]ServiceNotifier {
 	return allNotifiers
 }
 
+func ReturnNotifier(method string) ServiceNotifier {
+	return allNotifiers[method]
+}
+
 func FindNotifier(method string) *notifications.Notification {
-	for _, n := range allNotifiers {
-		notif := n.Select()
-		if notif.Method == method {
-			return notif
-		}
+	n := allNotifiers[method]
+	if n != nil {
+		return n.Select()
 	}
 	return nil
 }

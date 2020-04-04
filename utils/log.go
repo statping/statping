@@ -21,9 +21,40 @@ var (
 	LastLines   []*logRow
 	LockLines   sync.Mutex
 	VerboseMode int
+	version     string
 )
 
-const logFilePath = "/logs/statping.log"
+const (
+	logFilePath   = "/logs/statping.log"
+	errorReporter = "https://ddf2784201134d51a20c3440e222cebe@sentry.statping.com/4"
+)
+
+func SentryInit(v string) {
+	if v == "" {
+		v = "development"
+	}
+	version = v
+	errorEnv := Getenv("GO_ENV", "production").(string)
+	if err := sentry.Init(sentry.ClientOptions{
+		Dsn:         errorReporter,
+		Environment: errorEnv,
+		Release:     v,
+	}); err != nil {
+		Log.Errorln(err)
+	}
+}
+
+func SentryErr(err error) {
+	sentry.CaptureException(err)
+}
+
+func SentryLogEntry(entry *Logger.Entry) {
+	e := sentry.NewEvent()
+	e.Message = entry.Message
+	e.Release = version
+	e.Contexts = entry.Data
+	sentry.CaptureEvent(e)
+}
 
 type hook struct {
 	Entries []Logger.Entry
@@ -32,6 +63,9 @@ type hook struct {
 
 func (t *hook) Fire(e *Logger.Entry) error {
 	pushLastLine(e.Message)
+	if e.Level == Logger.ErrorLevel {
+		SentryLogEntry(e)
+	}
 	return nil
 }
 
@@ -120,8 +154,6 @@ func InitLogs() error {
 	})
 	checkVerboseMode()
 
-	sentry.CaptureMessage("It works!")
-
 	LastLines = make([]*logRow, 0)
 	return nil
 }
@@ -154,6 +186,7 @@ func CloseLogs() {
 	ljLogger.Rotate()
 	Log.Writer().Close()
 	ljLogger.Close()
+	sentry.Flush(5 * time.Second)
 }
 
 func pushLastLine(line interface{}) {

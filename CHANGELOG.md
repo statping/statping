@@ -1,3 +1,10 @@
+# 0.90.22
+- Added range input types for integer form fields
+- Modified Sentry error logging details
+- Modified form field layouts for better UX.
+- Modified Notifier form
+- Fixed Notifier Test form and logic
+
 # 0.90.21
 - Fixed BASE_PATH when using a path for Statping
 - Added Cypress testing

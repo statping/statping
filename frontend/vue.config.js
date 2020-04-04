@@ -1,4 +1,5 @@
 module.exports = {
+  baseUrl: '/',
   assetsDir: 'assets',
   filenameHashing: false,
   devServer: {

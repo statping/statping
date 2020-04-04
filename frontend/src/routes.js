@@ -40,28 +40,52 @@ const routes = [
       }
     },{
       path: 'users',
-      component: DashboardUsers
+      component: DashboardUsers,
+        meta: {
+            requiresAuth: true
+        }
     },{
       path: 'services',
-      component: DashboardServices
+      component: DashboardServices,
+        meta: {
+            requiresAuth: true
+        }
     },{
       path: 'create_service',
-      component: EditService
+      component: EditService,
+        meta: {
+            requiresAuth: true
+        }
     },{
       path: 'edit_service/:id',
-      component: EditService
+      component: EditService,
+        meta: {
+            requiresAuth: true
+        }
     },{
       path: 'messages',
-      component: DashboardMessages
+      component: DashboardMessages,
+        meta: {
+            requiresAuth: true
+        }
     },{
       path: 'settings',
-      component: Settings
+      component: Settings,
+        meta: {
+            requiresAuth: true
+        }
     },{
       path: 'logs',
-      component: Logs
+      component: Logs,
+        meta: {
+            requiresAuth: true
+        }
     },{
       path: 'help',
-      component: Logs
+      component: Logs,
+        meta: {
+            requiresAuth: true
+        }
     }]
   },
   {

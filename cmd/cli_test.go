@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"github.com/getsentry/sentry-go"
 	"github.com/rendon/testcli"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
@@ -20,14 +18,6 @@ var (
 func init() {
 	dir = utils.Directory
 	//core.SampleHits = 480
-
-	if err := sentry.Init(sentry.ClientOptions{
-		Dsn:         errorReporter,
-		Environment: "testing",
-	}); err != nil {
-		fmt.Println(err)
-	}
-
 }
 
 func TestStartServerCommand(t *testing.T) {

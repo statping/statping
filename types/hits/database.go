@@ -13,18 +13,6 @@ func SetDB(database database.Database) {
 	db = database.Model(&Hit{})
 }
 
-func Find(id int64) (*Hit, error) {
-	var group Hit
-	q := db.Where("id = ?", id).Find(&group)
-	return &group, q.Error()
-}
-
-func All() []*Hit {
-	var hits []*Hit
-	db.Find(&hits)
-	return hits
-}
-
 func (h *Hit) Create() error {
 	q := db.Create(h)
 	return q.Error()

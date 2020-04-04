@@ -15,7 +15,7 @@ func AuthUser(username, password string) (*User, bool) {
 		log.Warnln(fmt.Errorf("user %v not found", username))
 		return nil, false
 	}
-	if CheckHash(password, user.Password) {
+	if checkHash(password, user.Password) {
 		user.UpdatedAt = time.Now().UTC()
 		user.Update()
 		return user, true
@@ -23,8 +23,8 @@ func AuthUser(username, password string) (*User, bool) {
 	return nil, false
 }
 
-// CheckHash returns true if the password matches with a hashed bcrypt password
-func CheckHash(password, hash string) bool {
+// checkHash returns true if the password matches with a hashed bcrypt password
+func checkHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }

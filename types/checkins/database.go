@@ -54,8 +54,3 @@ func (c *Checkin) Delete() error {
 	q = db.Model(&Checkin{}).Delete(c)
 	return q.Error()
 }
-
-//func (c *Checkin) AfterDelete() error {
-//	//q := dbHits.Where("checkin = ?", c.Id).Delete(&CheckinHit{})
-//	return q.Error()
-//}

@@ -44,6 +44,24 @@ func init() {
 	checkVerboseMode()
 }
 
+type env struct {
+	data interface{}
+}
+
+func GetenvAs(key string, defaultValue interface{}) *env {
+	return &env{
+		data: Getenv(key, defaultValue),
+	}
+}
+
+func (e *env) Duration() time.Duration {
+	t, err := time.ParseDuration(e.data.(string))
+	if err != nil {
+		Log.Errorln(err)
+	}
+	return t
+}
+
 func Getenv(key string, defaultValue interface{}) interface{} {
 	if val, ok := os.LookupEnv(key); ok {
 		if val != "" {
@@ -216,7 +234,7 @@ func DurationReadable(d time.Duration) string {
 func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool) ([]byte, *http.Response, error) {
 	var err error
 	var req *http.Request
-	t1 := time.Now()
+	t1 := Now()
 	if req, err = http.NewRequest(method, url, body); err != nil {
 		httpMetric.Errors++
 		return nil, nil, err
@@ -275,7 +293,7 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	contents, err := ioutil.ReadAll(resp.Body)
 
 	// record HTTP metrics
-	t2 := time.Now().Sub(t1).Milliseconds()
+	t2 := Now().Sub(t1).Milliseconds()
 	httpMetric.Requests++
 	httpMetric.Milliseconds += t2 / httpMetric.Requests
 	httpMetric.Bytes += int64(len(contents))

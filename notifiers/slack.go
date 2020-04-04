@@ -31,7 +31,7 @@ func (s *slack) Select() *notifications.Notification {
 var slacker = &slack{&notifications.Notification{
 	Method:      slackMethod,
 	Title:       "slack",
-	Description: "Send notifications to your slack channel when a service is offline. Insert your Incoming webhooker URL for your channel to receive notifications. Based on the <a href=\"https://api.slack.com/incoming-webhooks\">slack API</a>.",
+	Description: "Send notifications to your slack channel when a service is offline. Insert your Incoming webhook URL for your channel to receive notifications. Based on the <a href=\"https://api.slack.com/incoming-webhooks\">Slack API</a>.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
 	Delay:       time.Duration(10 * time.Second),
@@ -40,9 +40,9 @@ var slacker = &slack{&notifications.Notification{
 	Limits:      60,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
-		Title:       "Incoming webhooker Url",
-		Placeholder: "Insert your slack Webhook URL here.",
-		SmallText:   "Incoming webhooker URL from <a href=\"https://api.slack.com/apps\" target=\"_blank\">slack Apps</a>",
+		Title:       "Incoming Webhook Url",
+		Placeholder: "Insert your Slack Webhook URL here.",
+		SmallText:   "Incoming Webhook URL from <a href=\"https://api.slack.com/apps\" target=\"_blank\">Slack Apps</a>",
 		DbField:     "Host",
 		Required:    true,
 	}}},

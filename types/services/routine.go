@@ -3,7 +3,6 @@ package services
 import (
 	"bytes"
 	"fmt"
-	"github.com/statping/statping/types/core"
 	"google.golang.org/grpc"
 	"net"
 	"net/http"
@@ -31,7 +30,7 @@ func CheckServices() {
 // CheckQueue is the main go routine for checking a service
 func ServiceCheckQueue(s *Service, record bool) {
 	s.Start()
-	s.Checkpoint = time.Now()
+	s.Checkpoint = utils.Now()
 	s.SleepDuration = (time.Duration(s.Id) * 100) * time.Millisecond
 
 CheckLoop:
@@ -56,7 +55,7 @@ CheckLoop:
 }
 
 func parseHost(s *Service) string {
-	if s.Type == "tcp" || s.Type == "udp" {
+	if s.Type == "tcp" || s.Type == "udp" || s.Type == "grpc" {
 		return s.Domain
 	} else {
 		u, err := url.Parse(s.Domain)
@@ -72,7 +71,7 @@ func dnsCheck(s *Service) (int64, error) {
 	var err error
 	t1 := utils.Now()
 	host := parseHost(s)
-	if s.Type == "tcp" {
+	if s.Type == "tcp" || s.Type == "udp" || s.Type == "grpc" {
 		_, err = net.LookupHost(host)
 	} else {
 		_, err = net.LookupIP(host)
@@ -80,7 +79,7 @@ func dnsCheck(s *Service) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	t2 := time.Now()
+	t2 := utils.Now()
 	subTime := t2.Sub(t1).Microseconds()
 	return subTime, err
 }
@@ -225,19 +224,27 @@ func CheckHttp(s *Service, record bool) *Service {
 	timeout := time.Duration(s.Timeout) * time.Second
 	var content []byte
 	var res *http.Response
-
+	var cnx string
+	var data *bytes.Buffer
 	var headers []string
+
 	if s.Headers.Valid {
 		headers = strings.Split(s.Headers.String, ",")
 	} else {
 		headers = nil
 	}
 
-	if s.Method == "POST" {
-		content, res, err = utils.HttpRequest(s.Domain, s.Method, "application/json", headers, bytes.NewBuffer([]byte(s.PostData.String)), timeout, s.VerifySSL.Bool)
+	if s.PostData.String != "" {
+		data = bytes.NewBuffer([]byte(s.PostData.String))
 	} else {
-		content, res, err = utils.HttpRequest(s.Domain, s.Method, nil, headers, nil, timeout, s.VerifySSL.Bool)
+		data = bytes.NewBuffer(nil)
 	}
+
+	if s.Method == "POST" {
+		cnx = "application/json"
+	}
+
+	content, res, err = utils.HttpRequest(s.Domain, s.Method, cnx, headers, data, timeout, s.VerifySSL.Bool)
 	if err != nil {
 		if record {
 			recordFailure(s, fmt.Sprintf("HTTP Error %v", err))
@@ -295,7 +302,8 @@ func recordSuccess(s *Service) {
 }
 
 func AddNotifier(n ServiceNotifier) {
-	allNotifiers = append(allNotifiers, n)
+	notif := n.Select()
+	allNotifiers[notif.Method] = n
 }
 
 func sendSuccess(s *Service) {
@@ -307,17 +315,12 @@ func sendSuccess(s *Service) {
 		return
 	}
 
-	// dont send notification if server recently started (60 seconds)
-	if core.App.Started.Add(60 * time.Second).After(utils.Now()) {
-		s.SuccessNotified = true
-		return
-	}
 	for _, n := range allNotifiers {
 		notif := n.Select()
 		if notif.CanSend() {
 			log.Infof("Sending notification to: %s!", notif.Method)
 			if err := n.OnSuccess(s); err != nil {
-				log.Errorln(err)
+				notif.Logger().Errorln(err)
 			}
 			s.UserNotified = true
 			s.SuccessNotified = true
@@ -367,7 +370,7 @@ func sendFailure(s *Service, f *failures.Failure) {
 			if notif.CanSend() {
 				log.Infof("Sending Failure notification to: %s!", notif.Method)
 				if err := n.OnFailure(s, f); err != nil {
-					log.Errorln(err)
+					notif.Logger().WithField("failure", f.Issue).Errorln(err)
 				}
 				s.UserNotified = true
 				s.SuccessNotified = true

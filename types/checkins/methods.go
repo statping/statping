@@ -2,12 +2,13 @@ package checkins
 
 import (
 	"fmt"
+	"github.com/statping/statping/utils"
 	"time"
 )
 
 func (c *Checkin) Expected() time.Duration {
 	last := c.LastHit()
-	now := time.Now().UTC()
+	now := utils.Now()
 	lastDir := now.Sub(last.CreatedAt)
 	sub := time.Duration(c.Period() - lastDir)
 	return sub

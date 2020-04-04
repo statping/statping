@@ -65,8 +65,7 @@ func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	err = user.Delete()
-	if err != nil {
+	if err := user.Delete(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}

@@ -3,29 +3,29 @@ package null
 import "encoding/json"
 
 // Unmarshaler for NullInt64
-func (nf *NullInt64) UnmarshalJSON(b []byte) error {
-	err := json.Unmarshal(b, &nf.Int64)
-	nf.Valid = (err == nil)
+func (i *NullInt64) UnmarshalJSON(b []byte) error {
+	err := json.Unmarshal(b, &i.Int64)
+	i.Valid = (err == nil)
 	return err
 }
 
 // Unmarshaler for NullFloat64
-func (nf *NullFloat64) UnmarshalJSON(b []byte) error {
-	err := json.Unmarshal(b, &nf.Float64)
-	nf.Valid = (err == nil)
+func (f *NullFloat64) UnmarshalJSON(b []byte) error {
+	err := json.Unmarshal(b, &f.Float64)
+	f.Valid = (err == nil)
 	return err
 }
 
 // Unmarshaler for NullBool
-func (nf *NullBool) UnmarshalJSON(b []byte) error {
-	err := json.Unmarshal(b, &nf.Bool)
-	nf.Valid = (err == nil)
+func (bb *NullBool) UnmarshalJSON(b []byte) error {
+	err := json.Unmarshal(b, &bb.Bool)
+	bb.Valid = (err == nil)
 	return err
 }
 
 // Unmarshaler for NullString
-func (nf *NullString) UnmarshalJSON(b []byte) error {
-	err := json.Unmarshal(b, &nf.String)
-	nf.Valid = (err == nil)
+func (s *NullString) UnmarshalJSON(b []byte) error {
+	err := json.Unmarshal(b, &s.String)
+	s.Valid = (err == nil)
 	return err
 }

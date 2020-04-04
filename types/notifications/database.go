@@ -14,12 +14,13 @@ func SetDB(database database.Database) {
 }
 
 func Find(method string) (*Notification, error) {
-	var notification Notification
-	q := db.Where("method = ?", method).Find(&notification)
-	if &notification == nil {
+	var n Notification
+	q := db.Where("method = ?", method).Find(&n)
+	if &n == nil {
 		return nil, errors.New("cannot find notifier")
 	}
-	return &notification, q.Error()
+	n.UpdateFields(&n)
+	return &n, q.Error()
 }
 
 func (n *Notification) Create() error {
@@ -33,6 +34,7 @@ func (n *Notification) Create() error {
 }
 
 func (n *Notification) UpdateFields(notif *Notification) *Notification {
+	n.Limits = notif.Limits
 	n.Enabled = notif.Enabled
 	n.Host = notif.Host
 	n.Port = notif.Port
@@ -46,21 +48,8 @@ func (n *Notification) UpdateFields(notif *Notification) *Notification {
 }
 
 func (n *Notification) Update() error {
-	if err := db.Update(n); err.Error() != nil {
-		return err.Error()
-	}
-	n.ResetQueue()
-	if n.Enabled.Bool {
-		n.Close()
-		n.Start()
-	} else {
-		n.Close()
+	if err := db.Update(n).Error(); err != nil {
+		return err
 	}
 	return nil
-}
-
-func loadAll() []*Notification {
-	var notifications []*Notification
-	db.Find(&notifications)
-	return notifications
 }

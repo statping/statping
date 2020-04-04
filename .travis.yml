@@ -28,7 +28,7 @@ env:
 go: 1.14
 go_import_path: github.com/statping/statping
 install:
-  - "npm install -g sass newman cross-env wait-on"
+  - "npm install -g sass newman cross-env wait-on @sentry/cli"
   - "pip install --user awscli"
   - "go get github.com/mattn/goveralls"
   - "go mod download"
@@ -49,7 +49,6 @@ os:
   - linux
 script:
   - "travis_retry make clean test-ci"
-  - "travis_retry make test-cypress"
   - "if [[ \"$TRAVIS_BRANCH\" == \"master\" && \"$TRAVIS_PULL_REQUEST\" = \"false\" ]]; then make coverage; fi"
 services:
   - docker

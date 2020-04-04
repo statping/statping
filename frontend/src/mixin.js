@@ -3,6 +3,7 @@ const { zonedTimeToUtc, utcToZonedTime, lastDayOfMonth, subSeconds, parse, getUn
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import format from 'date-fns/format'
 import parseISO from 'date-fns/parseISO'
+import addSeconds from 'date-fns/addSeconds'
 
 export default Vue.mixin({
   methods: {
@@ -15,6 +16,17 @@ export default Vue.mixin({
     current() {
       return parseISO(new Date())
     },
+      secondsHumanize (val) {
+        const t2 = addSeconds(new Date(0), val)
+          if (val >= 60) {
+              let minword = "minute"
+              if (val >= 120) {
+                  minword = "minutes"
+              }
+              return format(t2, "m '"+minword+"' s 'seconds'")
+          }
+        return format(t2, "s 'seconds'")
+      },
     utc(val) {
       return new Date.UTC(val)
     },

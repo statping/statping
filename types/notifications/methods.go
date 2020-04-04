@@ -38,22 +38,6 @@ func (n *Notification) LastSent() time.Duration {
 	return since
 }
 
-func SelectNotifier(n *Notification) *Notification {
-	notif, err := Find(n.Method)
-	if err != nil {
-		log.Errorln(err)
-		return n
-	}
-	n.Host = notif.Host
-	n.Username = notif.Username
-	n.Password = notif.Password
-	n.ApiSecret = notif.ApiSecret
-	n.ApiKey = notif.ApiKey
-	n.Var1 = notif.Var1
-	n.Host = notif.Var2
-	return n
-}
-
 func (n *Notification) CanSend() bool {
 	if !n.Enabled.Bool {
 		return false
@@ -87,13 +71,11 @@ func (n *Notification) GetValue(dbField string) string {
 	case "host":
 		return n.Host
 	case "port":
-		return fmt.Sprintf("%v", n.Port)
+		return fmt.Sprintf("%d", n.Port)
 	case "username":
 		return n.Username
 	case "password":
-		if n.Password != "" {
-			return "##########"
-		}
+		return n.Password
 	case "var1":
 		return n.Var1
 	case "var2":
@@ -104,13 +86,9 @@ func (n *Notification) GetValue(dbField string) string {
 		return n.ApiSecret
 	case "limits":
 		return utils.ToString(int(n.Limits))
+	default:
+		return ""
 	}
-	return ""
-}
-
-// ResetQueue will clear the notifiers Queue
-func (n *Notification) ResetQueue() {
-	n.Queue = nil
 }
 
 // start will start the go routine for the notifier queue
