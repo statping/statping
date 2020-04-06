@@ -108,6 +108,10 @@ func Router() *mux.Router {
 	api.Handle("/api/services/{id}/failures", authenticated(servicesDeleteFailuresHandler, false)).Methods("DELETE")
 	api.Handle("/api/services/{id}/hits", scoped(apiServiceHitsHandler)).Methods("GET")
 
+	// API PERCENTILE of response time for services
+	api.Handle("/api/percentileRank", authenticated(apiPercentileUpdateHandler, false)).Methods("POST")
+	api.Handle("/api/percentileRank", scoped(apiPercentileHandler)).Methods("GET")
+
 	// API SERVICE CHART DATA Routes
 	api.Handle("/api/services/{id}/hits_data", cached("30s", "application/json", apiServiceDataHandler)).Methods("GET")
 	api.Handle("/api/services/{id}/failure_data", cached("30s", "application/json", apiServiceFailureDataHandler)).Methods("GET")

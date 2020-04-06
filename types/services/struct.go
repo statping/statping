@@ -42,6 +42,7 @@ type Service struct {
 	UpdatedAt           time.Time           `gorm:"column:updated_at" json:"updated_at"`
 	Online              bool                `gorm:"-" json:"online"`
 	Latency             int64               `gorm:"-" json:"latency"`
+	Percentile          int64               `gorm:"-" json:"percentile"`
 	PingTime            int64               `gorm:"-" json:"ping_time"`
 	Online24Hours       float32             `gorm:"-" json:"online_24_hours"`
 	Online7Days         float32             `gorm:"-" json:"online_7_days"`

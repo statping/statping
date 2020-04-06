@@ -145,6 +145,7 @@ func (s *Service) UpdateStats() *Service {
 	s.Online24Hours = s.OnlineDaysPercent(1)
 	s.Online7Days = s.OnlineDaysPercent(7)
 	s.AvgResponse = s.AvgTime()
+	s.Percentile = s.UpdatePercentile()
 	s.FailuresLast24Hours = s.FailuresSince(utils.Now().Add(-time.Hour * 24)).Count()
 
 	if s.LastOffline.IsZero() {
@@ -165,6 +166,10 @@ func (s *Service) UpdateStats() *Service {
 // AvgTime will return the average amount of time for a service to response back successfully
 func (s *Service) AvgTime() int64 {
 	return s.AllHits().Avg()
+}
+
+func (s *Service) UpdatePercentile() int64 {
+	return s.AllHits().Percentile()
 }
 
 // OnlineDaysPercent returns the service's uptime percent within last 24 hours

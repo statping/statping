@@ -1,10 +1,19 @@
 package hits
 
 import (
-	"fmt"
+	// "github.com/statping/statping/types/services"
 	"github.com/statping/statping/database"
+	"github.com/montanaflynn/stats"
 	"time"
+	"database/sql"
+	"fmt"
 )
+
+type Percentile struct {
+	Rank int `json:"rank"`
+}
+
+var CurrentPercentile = Percentile{95} // default value
 
 type ColumnIDInterfacer interface {
 	HitsColumnID() (string, int64)
@@ -68,6 +77,21 @@ func (h Hitters) Sum() int64 {
 
 type IntResult struct {
 	Amount int64
+}
+
+func (h Hitters) Percentile() int64 {
+	var r int64
+	var latencies []float64
+	var rows *sql.Rows 
+	rows, _ = h.db.Select("latency").Rows()
+	
+	for rows.Next() {
+		rows.Scan(&r)
+		latencies = append(latencies, float64(r))
+	}
+
+	percentileValue, _ := stats.Percentile(latencies, float64(CurrentPercentile.Rank))
+	return int64(percentileValue)
 }
 
 func (h Hitters) Avg() int64 {
