@@ -96,21 +96,17 @@
                   start = new Date(start.getUTCFullYear(), start.getUTCMonth()+1, 1);
                   monthNum += 1
               }
-
-              window.console.log(monthData)
               this.series = monthData.reverse()
               this.ready = true
           },
           async heatmapData(start, end) {
-
-              window.console.log("start: ", start)
-              window.console.log("end: ", end)
-
               const data = await Api.service_failures_data(this.service.id, this.toUnix(start), this.toUnix(end), "24h", true)
-
               let dataArr = []
+                if (!data) {
+                  return {name: start.toLocaleString('en-us', { month: 'long'}), data: []}
+                }
               data.forEach((d) => {
-                  dataArr.push({x: this.parseISO(d.timeframe), y: d.amount});
+                dataArr.push({x: this.parseISO(d.timeframe), y: d.amount});
               });
 
               let date = new Date(dataArr[0].x);
