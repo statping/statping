@@ -7,8 +7,8 @@ import (
 
 func Samples() error {
 	incident1 := &Incident{
-		Title:       "Github Downtime",
-		Description: "This is an example of a incident for a service.",
+		Title:       "Github Issues",
+		Description: "There are new features for Statping, if you have any issues please visit the Github Repo.",
 		ServiceId:   2,
 	}
 	if err := incident1.Create(); err != nil {
@@ -24,16 +24,12 @@ func Samples() error {
 		return err
 	}
 
-	return nil
-}
-
-func SamplesUpdates() error {
 	t := utils.Now()
 
 	i1 := &IncidentUpdate{
-		IncidentId: 1,
-		Message:    "Github's page for Statping seems to be sending a 501 error.",
-		Type:       "Investigating",
+		IncidentId: incident1.Id,
+		Message:    "Github seems be be having an issue right now.",
+		Type:       "investigating",
 		CreatedAt:  t.Add(-60 * time.Minute),
 	}
 	if err := i1.Create(); err != nil {
@@ -41,9 +37,9 @@ func SamplesUpdates() error {
 	}
 
 	i2 := &IncidentUpdate{
-		IncidentId: 1,
-		Message:    "Problem is continuing and we are looking at the issues.",
-		Type:       "Update",
+		IncidentId: incident1.Id,
+		Message:    "Problem is continuing and we are looking at the issue.",
+		Type:       "update",
 		CreatedAt:  t.Add(-30 * time.Minute),
 	}
 	if err := i2.Create(); err != nil {
@@ -51,7 +47,7 @@ func SamplesUpdates() error {
 	}
 
 	i3 := &IncidentUpdate{
-		IncidentId: 1,
+		IncidentId: incident1.Id,
 		Message:    "Github is now back online and everything is working.",
 		Type:       "Resolved",
 		CreatedAt:  t.Add(-5 * time.Minute),
@@ -61,9 +57,9 @@ func SamplesUpdates() error {
 	}
 
 	u1 := &IncidentUpdate{
-		IncidentId: 2,
-		Message:    "Github is now back online and everything is working.",
-		Type:       "Resolved",
+		IncidentId: incident2.Id,
+		Message:    "Github is acting odd, probably getting DDOS-ed by China.",
+		Type:       "investigating",
 		CreatedAt:  t.Add(-120 * time.Minute),
 	}
 	if err := u1.Create(); err != nil {
@@ -71,13 +67,25 @@ func SamplesUpdates() error {
 	}
 
 	u2 := &IncidentUpdate{
-		IncidentId: 2,
-		Message:    "Github is now back online and everything is working.",
-		Type:       "Resolved",
+		IncidentId: incident2.Id,
+		Message:    "Still seems to be an issue",
+		Type:       "update",
 		CreatedAt:  t.Add(-60 * time.Minute),
 	}
+
 	if err := u2.Create(); err != nil {
 		return err
 	}
+
+	u3 := &IncidentUpdate{
+		IncidentId: incident2.Id,
+		Message:    "Github is now back online and everything is working.",
+		Type:       "resolved",
+		CreatedAt:  t.Add(-5 * time.Minute),
+	}
+	if err := u3.Create(); err != nil {
+		return err
+	}
+
 	return nil
 }

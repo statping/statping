@@ -57,7 +57,7 @@ func (c *Core) Create() error {
 }
 
 func (c *Core) Update() error {
-	q := db.Update(c)
+	q := db.UpdateColumns(c)
 	return q.Error()
 }
 

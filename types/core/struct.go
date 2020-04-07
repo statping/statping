@@ -20,7 +20,7 @@ func New(version string) {
 // will be saved into 1 row in the 'core' table. You can use the core.CoreApp
 // global variable to interact with the attributes to the application, such as services.
 type Core struct {
-	Name          string          `gorm:"not null;column:name" json:"name"`
+	Name          string          `gorm:"not null;column:name" json:"name,omitempty"`
 	Description   string          `gorm:"not null;column:description" json:"description,omitempty"`
 	ConfigFile    string          `gorm:"column:config" json:"-"`
 	ApiKey        string          `gorm:"column:api_key" json:"api_key" scope:"admin"`
@@ -38,16 +38,19 @@ type Core struct {
 	CreatedAt     time.Time       `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt     time.Time       `gorm:"column:updated_at" json:"updated_at"`
 	Started       time.Time       `gorm:"-" json:"started_on"`
-	Image         string          `gorm:"image" json:"started_on"`
 	Notifications []AllNotifiers  `gorm:"-" json:"-"`
 	Integrations  []Integrator    `gorm:"-" json:"-"`
 
-	GHAuth
+	OAuth `json:"oauth"`
 }
 
-type GHAuth struct {
-	GithubClientID     string `gorm:"gh_client_id" json:"gh_client_id"`
-	GithubClientSecret string `gorm:"gh_client_secret" json:"-"`
+type OAuth struct {
+	Domains            string `gorm:"column:oauth_domains" json:"oauth_domains,omitempty" scope:"admin"`
+	Providers          string `gorm:"column:oauth_providers;default:local" json:"oauth_providers,omitempty"`
+	GithubClientID     string `gorm:"column:gh_client_id" json:"gh_client_id,omitempty" scope:"admin"`
+	GithubClientSecret string `gorm:"column:gh_client_secret" json:"gh_client_secret,omitempty" scope:"admin"`
+	GoogleClientID     string `gorm:"column:google_client_id" json:"google_client_id,omitempty" scope:"admin"`
+	GoogleClientSecret string `gorm:"column:google_client_secret" json:"google_client_secret,omitempty" scope:"admin"`
 }
 
 // AllNotifiers contains all the Notifiers loaded

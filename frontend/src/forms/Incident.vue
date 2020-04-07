@@ -5,11 +5,14 @@
         <div class="card-header">Incident: {{incident.title}}
             <button @click="deleteIncident(incident)" class="btn btn-sm btn-danger float-right">
                 <font-awesome-icon icon="times" />  Delete
-            </button></div>
+            </button>
+        </div>
+
+
+
+
                 <div class="card-body bg-light pt-1">
-
                     <FormIncidentUpdates :incident="incident"/>
-
                     <span class="font-2">Created: {{niceDate(incident.created_at)}} | Last Update: {{niceDate(incident.updated_at)}}</span>
                 </div>
     </div>

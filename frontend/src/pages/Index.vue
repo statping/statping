@@ -3,6 +3,19 @@
 
         <Header/>
 
+        <div v-for="(service, i) in $store.getters.servicesNoGroup" class="col-12 full-col-12">
+            <div class="list-group online_list mb-4">
+                <a class="service_li list-group-item list-group-item-action">
+                    <router-link class="no-decoration font-3" :to="serviceLink(service)">{{service.name}}</router-link>
+                    <span class="badge float-right" :class="{'bg-success': service.online, 'bg-danger': !service.online }">{{service.online ? "ONLINE" : "OFFLINE"}}</span>
+
+                    <GroupServiceFailures :service="service"/>
+
+                    <IncidentsBlock :service="service"/>
+                </a>
+            </div>
+        </div>
+
         <div v-for="(group, index) in $store.getters.groupsInOrder" v-bind:key="index">
             <Group :group=group />
         </div>
@@ -26,11 +39,15 @@ import Group from '../components/Index/Group';
 import Header from '../components/Index/Header';
 import MessageBlock from '../components/Index/MessageBlock';
 import ServiceBlock from '../components/Service/ServiceBlock';
+import GroupServiceFailures from "../components/Index/GroupServiceFailures";
+import IncidentsBlock from "../components/Index/IncidentsBlock";
 
 
 export default {
     name: 'Index',
     components: {
+      IncidentsBlock,
+      GroupServiceFailures,
         ServiceBlock,
         MessageBlock,
         Group,

@@ -43,6 +43,7 @@ export default new Vuex.Store({
         isAdmin: state => state.admin,
 
         servicesInOrder: state => state.services.sort((a, b) => a.order_id - b.order_id),
+        servicesNoGroup: state => state.services.filter(g => g.group_id === 0).sort((a, b) => a.order_id - b.order_id),
         groupsInOrder: state => state.groups.sort((a, b) => a.order_id - b.order_id),
         groupsClean: state => state.groups.filter(g => g.name !== '').sort((a, b) => a.order_id - b.order_id),
         groupsCleanInOrder: state => state.groups.filter(g => g.name !== '').sort((a, b) => a.order_id - b.order_id).sort((a, b) => a.order_id - b.order_id),

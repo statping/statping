@@ -14,6 +14,9 @@
                     <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-cache-tab')}" id="v-pills-cache-tab" data-toggle="pill" href="#v-pills-cache" role="tab" aria-controls="v-pills-cache" aria-selected="false">
                         <font-awesome-icon icon="paperclip" class="mr-2"/> Cache
                     </a>
+                    <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-oauth-tab')}" id="v-pills-oauth-tab" data-toggle="pill" href="#v-pills-oauth" role="tab" aria-controls="v-pills-oauth" aria-selected="false">
+                        <font-awesome-icon icon="key" class="mr-2"/> OAuth <span class="mt-1 float-right badge badge-light text-dark font-1">BETA</span>
+                    </a>
 
                     <h6 class="mt-4 text-muted">Notifiers</h6>
 
@@ -42,6 +45,10 @@
                         <font-awesome-icon icon="code-branch" class="mr-3"/> Statping Github Repo
                     </a>
 
+                    <div class="row justify-content-center mt-2">
+                        <github-button href="https://github.com/statping/statping" data-icon="octicon-star" data-show-count="true" aria-label="Star Statping on GitHub">Star</github-button>
+                    </div>
+
                 </div>
 
             </div>
@@ -53,9 +60,7 @@
                         <div class="card text-black-50 bg-white mb-5">
                             <div class="card-header">Statping Settings</div>
                             <div class="card-body">
-
                                 <CoreSettings :core="core"/>
-
                             </div>
                         </div>
 
@@ -101,6 +106,10 @@
                         </div>
                     </div>
 
+                    <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-oauth-tab'), show: liClass('v-pills-oauth-tab')}" id="v-pills-oauth" role="tabpanel" aria-labelledby="v-pills-oauth-tab">
+                        <OAuth :oauth="core.oauth"/>
+                    </div>
+
                     <div v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="`${notifier.title}_${index}`" class="tab-pane fade" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), show: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" role="tabpanel" v-bind:aria-labelledby="`v-pills-${notifier.method.toLowerCase()}-tab`">
                         <Notifier :notifier="notifier"/>
                     </div>
@@ -119,10 +128,14 @@
   import Notifier from "../forms/Notifier";
   import ThemeEditor from "../components/Dashboard/ThemeEditor";
   import Cache from "@/components/Dashboard/Cache";
+  import OAuth from "../forms/OAuth";
+  import GithubButton from 'vue-github-button'
 
   export default {
       name: 'Settings',
       components: {
+        GithubButton,
+        OAuth,
           Cache,
           ThemeEditor,
           FormIntegration,

@@ -23,6 +23,9 @@
             </div>
         </div>
 
+        <a v-if="oauth.oauth_providers.split(',').includes('github')" class="btn btn-block btn-outline-dark" :href="`https://github.com/login/oauth/authorize?scope=user:email&client_id=${oauth.gh_client_id}`">Login with Github</a>
+        <a v-if="oauth.oauth_providers.split(',').includes('google')" class="btn btn-block btn-outline-secondary" :href="`https://oauth-redirect.googleusercontent.com/r/${oauth.google_client_id}`">Login with Google</a>
+
     </form>
 </template>
 
@@ -31,6 +34,11 @@
 
   export default {
       name: 'FormLogin',
+    props: {
+        oauth: {
+          type: Object
+        }
+    },
       data() {
           return {
               username: "",
@@ -38,8 +46,7 @@
               auth: {},
               loading: false,
               error: false,
-              disabled: true,
-              ghLoginURL: ""
+              disabled: true
           }
       },
       mounted() {

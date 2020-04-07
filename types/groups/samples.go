@@ -24,7 +24,7 @@ func Samples() error {
 	}
 
 	group3 := &Group{
-		Name:   "Empty Group",
+		Name:   "Private Services",
 		Public: null.NewNullBool(false),
 		Order:  3,
 	}

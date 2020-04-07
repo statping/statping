@@ -35,7 +35,6 @@ func TriggerSamples() error {
 		groups.Samples,
 		hits.Samples,
 		incidents.Samples,
-		incidents.SamplesUpdates,
 	)
 }
 

@@ -72,7 +72,6 @@ func Router() *mux.Router {
 	// API Routes
 	r.Handle("/api", scoped(apiIndexHandler))
 	r.Handle("/api/setup", http.HandlerFunc(processSetupHandler)).Methods("POST")
-	//r.Handle("/oauth/callback", http.HandlerFunc(OAuthRedirect))
 	api.Handle("/api/login", http.HandlerFunc(apiLoginHandler)).Methods("POST")
 	api.Handle("/api/logout", http.HandlerFunc(logoutHandler))
 	api.Handle("/api/renew", authenticated(apiRenewHandler, false))
@@ -160,6 +159,7 @@ func Router() *mux.Router {
 	// API Generic Routes
 	r.Handle("/metrics", readOnly(prometheusHandler, false))
 	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
+	r.Handle("/oauth/{provider}", http.HandlerFunc(oauthHandler))
 	r.Handle("/.well-known/", http.StripPrefix("/.well-known/", http.FileServer(http.Dir(dir+"/.well-known"))))
 
 	r.NotFoundHandler = http.HandlerFunc(error404Handler)
