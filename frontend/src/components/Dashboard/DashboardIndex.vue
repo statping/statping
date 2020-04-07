@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <div v-for="(service, index) in $store.getters.services" v-bind:key="index">
+        <div v-for="(service, index) in $store.getters.services" class="service_block" v-bind:key="index">
             <ServiceInfo :service=service />
         </div>
     </div>

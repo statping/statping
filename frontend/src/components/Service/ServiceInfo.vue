@@ -1,7 +1,8 @@
 <template v-if="service">
     <div class="col-12 card mb-4" style="min-height: 280px;" :class="{'offline-card': !service.online}">
         <div class="card-body p-3 p-md-1 pt-md-3 pb-md-1">
-            <h4 class="card-title mb-4"><router-link :to="serviceLink(service)">{{service.name}}</router-link>
+            <h4 class="card-title mb-4">
+                <router-link :to="serviceLink(service)">{{service.name}}</router-link>
                 <span class="badge float-right" :class="{'badge-success': service.online, 'badge-danger': !service.online}">
                     {{service.online ? "ONLINE" : "OFFLINE"}}
                 </span>
@@ -44,13 +45,13 @@
                 </div>
 
                     <div class="col-4">
-                        <button @click.prevent="Tab('incident')" class="btn btn-block btn-outline-secondary" :class="{'text-white btn-secondary': openTab==='incident'}" >Create Incident</button>
+                        <button @click.prevent="Tab('incident')" class="btn btn-block btn-outline-secondary incident" :class="{'text-white btn-secondary': openTab==='incident'}" >Incidents</button>
                     </div>
                     <div class="col-4">
-                        <button @click.prevent="Tab('message')" class="btn btn-block btn-outline-secondary" :class="{'text-white btn-secondary': openTab==='message'}">Create Announcement</button>
+                        <button @click.prevent="Tab('message')" class="btn btn-block btn-outline-secondary message" :class="{'text-white btn-secondary': openTab==='message'}">Announcements</button>
                     </div>
                     <div class="col-4">
-                        <button @click.prevent="Tab('failures')" class="btn btn-block btn-outline-secondary" :disabled="service.stats.failures === 0" :class="{'text-white btn-secondary': openTab==='failures'}">
+                        <button @click.prevent="Tab('failures')" class="btn btn-block btn-outline-secondary failures" :disabled="service.stats.failures === 0" :class="{'text-white btn-secondary': openTab==='failures'}">
                             Failures <span class="badge badge-danger float-right mt-1">{{service.stats.failures}}</span></button>
                     </div>
 
