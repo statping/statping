@@ -9,6 +9,7 @@
 
                 <GroupServiceFailures :service="service"/>
 
+                <IncidentsBlock :service="service"/>
             </a>
 
         </div>
@@ -18,10 +19,12 @@
 <script>
     import Api from '../../API';
     import GroupServiceFailures from './GroupServiceFailures';
+    import IncidentsBlock from './IncidentsBlock';
 
 export default {
   name: 'Group',
   components: {
+      IncidentsBlock,
       GroupServiceFailures
 
   },
