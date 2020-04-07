@@ -46,9 +46,11 @@
                     </span>
                     </div>
                 </div>
-                <div class="form-group">
-                    <small class="form-text text-muted">Authorized Callback URL</small>
-                    <input v-bind:value="`${$store.getters.core.domain}/oauth/github`" type="text" class="form-control" readonly>
+                <div class="form-group row">
+                    <label for="gh_callback" class="col-sm-4 col-form-label">Callback URL</label>
+                    <div class="col-sm-8">
+                        <input v-bind:value="`${$store.getters.core.domain}/oauth/github`" type="text" class="form-control" id="gh_callback" readonly>
+                    </div>
                 </div>
             </div>
         </div>
@@ -78,12 +80,57 @@
                     </span>
                     </div>
                 </div>
-                <div class="form-group">
-                    <small class="form-text text-muted">Authorized Redirect URI</small>
-                    <input v-bind:value="`${$store.getters.core.domain}/oauth/google`" type="text" class="form-control" readonly>
+                <div class="form-group row">
+                    <label for="callback" class="col-sm-4 col-form-label">Callback URL</label>
+                    <div class="col-sm-8">
+                        <input v-bind:value="`${$store.getters.core.domain}/oauth/google`" type="text" class="form-control" id="callback" readonly>
+                    </div>
                 </div>
             </div>
         </div>
+        <div class="card text-black-50 bg-white mb-3">
+            <div class="card-header">Slack Settings</div>
+            <div class="card-body">
+                <span>Go to <a href="https://console.cloud.google.com/apis/credentials">OAuth Consent Screen</a> on Google Console to create a new OAuth application.</span>
+
+                <div class="form-group row mt-3">
+                    <label for="slack_client" class="col-sm-4 col-form-label">Slack Client ID</label>
+                    <div class="col-sm-8">
+                        <input v-model="oauth.slack_client_id" type="text" class="form-control" id="slack_client" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="slack_secret" class="col-sm-4 col-form-label">Slack Client Secret</label>
+                    <div class="col-sm-8">
+                        <input v-model="oauth.slack_client_secret" type="text" class="form-control" id="slack_secret" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="slack_secret" class="col-sm-4 col-form-label">Slack Team ID</label>
+                    <div class="col-sm-8">
+                        <input v-model="oauth.slack_team" type="text" class="form-control" id="slack_team">
+                        <small>Optional</small>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="switch-slack-oauth" class="col-sm-4 col-form-label">Enable Slack Login</label>
+                    <div class="col-md-8 col-xs-12 mt-1">
+                    <span @click="slack_enabled = !!slack_enabled" class="switch float-left">
+                        <input v-model="slack_enabled" type="checkbox" class="switch" id="switch-slack-oauth" :checked="google_enabled">
+                        <label for="switch-slack-oauth"> </label>
+                    </span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="slack_callback" class="col-sm-4 col-form-label">Callback URL</label>
+                    <div class="col-sm-8">
+                        <input v-bind:value="`${$store.getters.core.domain}/oauth/slack`" type="text" class="form-control" id="slack_callback" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{providers()}}
 
         <button class="btn btn-primary btn-block" @click.prevent="saveOAuth" type="submit">
             Save OAuth Settings
@@ -106,7 +153,8 @@
           return {
             internal_enabled: this.$store.getters.core.oauth.oauth_providers.split(",").includes('local'),
             google_enabled: this.$store.getters.core.oauth.oauth_providers.split(",").includes('google'),
-            github_enabled: this.$store.getters.core.oauth.oauth_providers.split(",").includes('github')
+            github_enabled: this.$store.getters.core.oauth.oauth_providers.split(",").includes('github'),
+            slack_enabled: this.$store.getters.core.oauth.oauth_providers.split(",").includes('slack')
           }
       },
     beforeCreate() {
@@ -122,6 +170,12 @@
           }
           if (this.internal_enabled) {
             providers.push("local")
+          }
+          if (this.google_enabled) {
+            providers.push("google")
+          }
+          if (this.slack_enabled) {
+            providers.push("slack")
           }
           return providers.join(",")
         },

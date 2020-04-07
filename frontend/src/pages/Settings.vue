@@ -57,31 +57,51 @@
                 <div class="tab-content" id="v-pills-tabContent">
                     <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-home-tab'), show: liClass('v-pills-home-tab')}" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
 
-                        <div class="card text-black-50 bg-white mb-5">
+                        <div class="card text-black-50 bg-white">
                             <div class="card-header">Statping Settings</div>
                             <div class="card-body">
-                                <CoreSettings :core="core"/>
+                                <CoreSettings :in_core="core"/>
                             </div>
                         </div>
 
 
-                        <div class="card text-black-50 bg-white mb-3">
-                            <div class="card-header">Statping Settings</div>
+                        <div class="card text-black-50 bg-white mt-3">
+                            <div class="card-header">API Settings</div>
                             <div class="card-body">
-
-                        <h2 class="mt-5">Additional Settings</h2>
-                        <div v-if="core.domain !== ''" class="row">
-                            <div class="col-12">
-                                <div class="row align-content-center">
-                                    <img class="rounded text-center" width="300" height="300" :src="qrcode">
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">API Key</label>
+                                    <div class="col-sm-9">
+                                        <div class="input-group">
+                                        <input v-model="core.api_key" type="text" class="form-control" id="api_key" readonly>
+                                            <div class="input-group-append">
+                                                <button @click.prevent="copy(core.api_key)" class="btn btn-outline-secondary" type="button">Copy</button>
+                                            </div>
+                                        </div>
+                                        <small class="form-text text-muted">API Key can be used for read only routes</small>
+                                    </div>
                                 </div>
-                                <a class="btn btn-sm btn-primary" :href="qrurl">Open in Statping App</a>
-                                <a href="settings/export" class="btn btn-sm btn-secondary">Export Settings</a>
+
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">API Secret</label>
+                                    <div class="col-sm-9">
+                                        <div class="input-group">
+                                        <input v-model="core.api_secret" @focus="$event.target.select()" type="text" class="form-control select-input" id="api_secret" readonly>
+                                            <div class="input-group-append">
+                                                <button @click="copy(core.api_secret)" class="btn btn-outline-secondary" type="button">Copy</button>
+                                            </div>
+                                        </div>
+                                        <small class="form-text text-muted">API Secret is used for read, create, update and delete routes</small>
+                                        <small class="form-text text-muted">You can <a href="#" @click="renewApiKeys">Regenerate API Keys</a> if you need to.</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div v-else>
-                            Insert a domain to view QR code for the mobile app.
-                        </div>
+
+                        <div class="card text-black-50 bg-white mt-3">
+                            <div class="card-header">QR Code for Mobile App</div>
+                            <div class="card-body">
+
+                                <img class="rounded" width="300" height="300" :src="qrcode">
 
                             </div>
                         </div>
@@ -167,7 +187,16 @@
           },
           liClass(id) {
               return this.tab === id
+          },
+        async renewApiKeys() {
+          let r = confirm("Are you sure you want to reset the API keys?");
+          if (r === true) {
+            await Api.renewApiKeys()
+            const core = await Api.core()
+            this.$store.commit('setCore', core)
+            this.core = core
           }
+        },
       }
   }
 </script>

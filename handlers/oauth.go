@@ -3,12 +3,15 @@ package handlers
 import (
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/kataras/iris/v12/sessions"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/users"
+	"github.com/statping/statping/utils"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 	"golang.org/x/oauth2/google"
+	"golang.org/x/oauth2/slack"
 	"net/http"
 )
 
@@ -95,4 +98,35 @@ func googleOAuth(r *http.Request) (error, *oAuth) {
 		RefreshToken: gg.RefreshToken,
 		Valid:        gg.Valid(),
 	}
+}
+
+func slackOAuth(r *http.Request) (error, *oAuth) {
+	c := *core.App
+	code := r.URL.Query().Get("code")
+
+	config := &oauth2.Config{
+		ClientID:     c.OAuth.GithubClientID,
+		ClientSecret: c.OAuth.GithubClientSecret,
+		Endpoint:     slack.Endpoint,
+	}
+
+	gg, err := config.Exchange(r.Context(), code)
+	if err != nil {
+		return err, nil
+	}
+
+	return nil, &oAuth{
+		Token:        gg.AccessToken,
+		RefreshToken: gg.RefreshToken,
+		Valid:        gg.Valid(),
+	}
+}
+
+func secureToken(w http.ResponseWriter, r *http.Request) {
+	tk := utils.NewSHA256Hash()
+	cookie := &http.Cookie{
+		Name:  "statping_oauth",
+		Value: tk,
+	}
+	sessions.AddCookie(r.Context(), cookie, false)
 }

@@ -51,6 +51,9 @@ type OAuth struct {
 	GithubClientSecret string `gorm:"column:gh_client_secret" json:"gh_client_secret,omitempty" scope:"admin"`
 	GoogleClientID     string `gorm:"column:google_client_id" json:"google_client_id,omitempty" scope:"admin"`
 	GoogleClientSecret string `gorm:"column:google_client_secret" json:"google_client_secret,omitempty" scope:"admin"`
+	SlackClientID      string `gorm:"column:slack_client_id" json:"slack_client_id,omitempty" scope:"admin"`
+	SlackClientSecret  string `gorm:"column:slack_client_secret" json:"slack_client_secret,omitempty" scope:"admin"`
+	SlackTeam          string `gorm:"column:slack_team" json:"slack_team,omitempty" scope:"admin"`
 }
 
 // AllNotifiers contains all the Notifiers loaded

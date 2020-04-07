@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueApexCharts from 'vue-apexcharts'
 import VueObserveVisibility from 'vue-observe-visibility'
+import VueClipboard from 'vue-clipboard2'
 
 import App from '@/App.vue'
 import store from './store'
@@ -14,6 +15,7 @@ import "./icons"
 
 Vue.component('apexchart', VueApexCharts)
 
+Vue.use(VueClipboard);
 Vue.use(VueRouter);
 Vue.use(VueObserveVisibility);
 

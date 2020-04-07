@@ -33,23 +33,6 @@
 
         <button @click.prevent="saveSettings" id="save_core" type="submit" class="btn btn-primary btn-block">Save Settings</button>
 
-        <div class="form-group row mt-5">
-            <label class="col-sm-3 col-form-label">API Key</label>
-            <div class="col-sm-9">
-                <input v-model="core.api_key" @focus="$event.target.select()" type="text" class="form-control select-input" id="api_key" readonly>
-                <small class="form-text text-muted">API Key can be used for read only routes</small>
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label class="col-sm-3 col-form-label">API Secret</label>
-            <div class="col-sm-9">
-                <input v-model="core.api_secret" @focus="$event.target.select()" type="text" class="form-control select-input" id="api_secret" readonly>
-                <small class="form-text text-muted">API Secret is used for read, create, update and delete routes</small>
-                <small class="form-text text-muted">You can <a href="#" @click="renewApiKeys">Regenerate API Keys</a> if you need to.</small>
-            </div>
-        </div>
-
     </form>
 </template>
 
@@ -58,10 +41,15 @@
 
   export default {
       name: 'CoreSettings',
-    props: {
-      core: {
-        type: Object,
-        required: true,
+        props: {
+          in_core: {
+            type: Object,
+            required: true,
+          }
+        },
+    data() {
+      return {
+        core: this.in_core
       }
     },
       methods: {
@@ -71,15 +59,6 @@
               const core = await Api.core()
               this.$store.commit('setCore', core)
               this.core = core
-          },
-          async renewApiKeys() {
-              let r = confirm("Are you sure you want to reset the API keys?");
-              if (r === true) {
-                  await Api.renewApiKeys()
-                  const core = await Api.core()
-                  this.$store.commit('setCore', core)
-                  this.core = core
-              }
           },
           selectAll() {
               this.$refs.input.select();
