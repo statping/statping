@@ -114,7 +114,7 @@ class Api {
   }
 
   async incident_update_delete(update) {
-    return axios.post('api/incidents/'+incident.id+'/updates', data).then(response => (response.data))
+    return axios.delete('api/incidents/'+update.incident+'/updates/'+update.id).then(response => (response.data))
   }
 
     async incidents_service(service) {
