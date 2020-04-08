@@ -42,10 +42,10 @@ var Telegram = &telegram{&notifications.Notification{
 		Required:    true,
 	}, {
 		Type:        "text",
-		Title:       "Channel or User ID",
-		Placeholder: "789325392",
-		SmallText:   "Insert your Telegram Channel ID or User ID here.",
-		DbField:     "Var1",
+		Title:       "Channel or User",
+		Placeholder: "@statping_channel",
+		SmallText:   "Insert your Telegram Channel or User here.",
+		DbField:     "var1",
 		Required:    true,
 	}}},
 }

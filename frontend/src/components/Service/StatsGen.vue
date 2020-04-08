@@ -52,9 +52,6 @@
           let todayAmount = this.addAmounts(todayTime)
           let yesterday = this.addAmounts(fetched)
 
-          window.console.log(todayAmount)
-          window.console.log(yesterday)
-
         },
         addAmounts(data) {
           let total = 0

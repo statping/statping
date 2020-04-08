@@ -63,6 +63,12 @@ export default Vue.mixin({
     day() {
       return 3600 * 24
     },
+    copy(txt) {
+      this.$copyText(txt).then(function (e) {
+        alert('Copied: \n'+txt)
+        console.log(e)
+      });
+    },
     serviceLink(service) {
       if (!service) {
         return ""

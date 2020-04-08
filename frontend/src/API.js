@@ -56,6 +56,10 @@ class Api {
     return axios.get('api/services/' + id + '/failures?start=' + start + '&end=' + end + '&limit=' + limit+ '&offset=' + offset).then(response => (response.data))
   }
 
+  async service_failures_delete(service) {
+    return axios.delete('api/services/' + service.id + '/failures').then(response => (response.data))
+  }
+
   async service_delete(id) {
     return axios.delete('api/services/' + id).then(response => (response.data))
   }
@@ -105,9 +109,13 @@ class Api {
     return axios.post('api/incidents/'+incident.id+'/updates', data).then(response => (response.data))
   }
 
-    async incident_update_create(incident, data) {
-        return axios.post('api/incidents/'+incident.id+'/updates', data).then(response => (response.data))
-    }
+  async incident_update_create(update) {
+    return axios.post('api/incidents/'+update.incident+'/updates', update).then(response => (response.data))
+  }
+
+  async incident_update_delete(update) {
+    return axios.post('api/incidents/'+incident.id+'/updates', data).then(response => (response.data))
+  }
 
     async incidents_service(service) {
         return axios.get('api/services/'+service.id+'/incidents').then(response => (response.data))

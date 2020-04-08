@@ -248,32 +248,6 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 	}
 }
 
-// executeJSResponse will render a Javascript response
-func executeJSResponse(w http.ResponseWriter, r *http.Request, file string, data interface{}) {
-	//render, err := source.JsBox.String(file)
-	//if err != nil {
-	//	log.Errorln(err)
-	//}
-	//if usingSSL {
-	//	w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
-	//}
-	//t := template.New("charts")
-	//t.Funcs(template.FuncMap{
-	//	"safe": func(html string) template.HTML {
-	//		return template.HTML(html)
-	//	},
-	//	"Services": func() []services.ServiceInterface {
-	//		return core.CoreApp.Services
-	//	},
-	//})
-	//if _, err := t.Parse(render); err != nil {
-	//	log.Errorln(err)
-	//}
-	//if err := t.Execute(w, data); err != nil {
-	//	log.Errorln(err)
-	//}
-}
-
 func returnJson(d interface{}, w http.ResponseWriter, r *http.Request, statusCode ...int) {
 	w.Header().Set("Content-Type", "application/json")
 	if len(statusCode) != 0 {

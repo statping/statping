@@ -25,7 +25,6 @@ func init() {
 }
 
 func TestTelegramNotifier(t *testing.T) {
-	t.Skip()
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})

@@ -3,19 +3,31 @@
 
     <div v-for="(incident, i) in incidents" class="card contain-card text-black-50 bg-white mb-4">
         <div class="card-header">Incident: {{incident.title}}
-            <button v-if="IsAdmin()" @click="deleteIncident(incident)" class="btn btn-sm btn-danger float-right">
+            <button @click="deleteIncident(incident)" class="btn btn-sm btn-danger float-right">
                 <font-awesome-icon icon="times" />  Delete
-            </button></div>
-                <div class="card-body bg-light pt-1">
+            </button>
+        </div>
+                <div class="card-body bg-light pt-3">
+
+                    <div v-for="(update, i) in incident.updates" class="alert alert-light" role="alert">
+                        <span class="badge badge-pill badge-info text-uppercase">{{update.type}}</span>
+                        <span class="float-right font-2">{{ago(update.created_at)}} ago</span>
+
+                        <span class="d-block mt-2">{{update.message}}
+                        <button @click="delete_update(update)" type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </span>
+                    </div>
 
                     <FormIncidentUpdates :incident="incident"/>
 
-                    <span class="font-2">Created: {{niceDate(incident.created_at)}} | Last Update: {{niceDate(incident.updated_at)}}</span>
+                    <span class="font-2 mt-3">Created: {{niceDate(incident.created_at)}} | Last Update: {{niceDate(incident.updated_at)}}</span>
                 </div>
     </div>
 
 
-    <div v-if="IsAdmin()" class="card contain-card text-black-50 bg-white mb-5">
+    <div class="card contain-card text-black-50 bg-white mb-5">
         <div class="card-header">Create Incident for {{service.name}}</div>
         <div class="card-body">
             <form @submit.prevent="createIncident">
@@ -79,16 +91,20 @@
           await this.loadIncidents()
       },
       methods: {
-    async loadIncidents() {
-      this.incidents = await Api.incidents_service(this.service)
-    },
+        async delete_update(update) {
+          await Api.incident_update_delete(update)
+          this.incidents = await Api.incidents_service(this.service)
+        },
+            async loadIncidents() {
+              this.incidents = await Api.incidents_service(this.service)
+            },
           async createIncident() {
-              await Api.incident_create(this.service, this.incident)
+            await Api.incident_create(this.service, this.incident)
             await this.loadIncidents()
             this.incident = {
                 title: "",
-              description: "",
-              service: this.service.id,
+                description: "",
+                service: this.service.id,
             }
           },
           async deleteIncident(incident) {

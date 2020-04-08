@@ -16,7 +16,7 @@ func Samples() error {
 
 	group2 := &Group{
 		Name:   "Linked Services",
-		Public: null.NewNullBool(false),
+		Public: null.NewNullBool(true),
 		Order:  1,
 	}
 	if err := group2.Create(); err != nil {
@@ -24,7 +24,7 @@ func Samples() error {
 	}
 
 	group3 := &Group{
-		Name:   "Empty Group",
+		Name:   "Private Services",
 		Public: null.NewNullBool(false),
 		Order:  3,
 	}

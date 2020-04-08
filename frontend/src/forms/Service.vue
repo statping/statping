@@ -6,7 +6,7 @@
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Service Name</label>
             <div class="col-sm-8">
-                <input v-model="service.name" @input="updatePermalink" type="text" name="name" class="form-control" placeholder="Server Name" required spellcheck="false" autocorrect="off">
+                <input v-model="service.name" @input="updatePermalink" id="name" type="text" name="name" class="form-control" placeholder="Server Name" required spellcheck="false" autocorrect="off">
                 <small class="form-text text-muted">Give your service a name you can recognize</small>
             </div>
         </div>
@@ -101,7 +101,7 @@
             <label class="col-sm-4 col-form-label">Request Timeout</label>
             <div class="col-sm-8">
                 <span class="slider-info">{{secondsHumanize(service.timeout)}}</span>
-                <input v-model="service.timeout" type="range" name="timeout" class="slider" min="1" max="180">
+                <input v-model="service.timeout" type="range" id="timeout" name="timeout" class="slider" min="1" max="180">
                 <small class="form-text text-muted">If the endpoint does not respond within this time it will be considered to be offline</small>
             </div>
         </div>

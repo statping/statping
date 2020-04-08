@@ -18,7 +18,7 @@
                     <router-link to="/dashboard/users" class="nav-link">Users</router-link>
                 </li>
                 <li @click="navopen = !navopen" class="nav-item navbar-item">
-                    <router-link to="/dashboard/messages" class="nav-link">Messages</router-link>
+                    <router-link to="/dashboard/messages" class="nav-link">Annoucements</router-link>
                 </li>
                 <li v-if="$store.state.admin" @click="navopen = !navopen" class="nav-item navbar-item">
                     <router-link to="/dashboard/settings" class="nav-link">Settings</router-link>

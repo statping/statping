@@ -12,8 +12,10 @@ require (
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/protobuf v1.3.5
 	github.com/gorilla/mux v1.7.4
+	github.com/gorilla/sessions v1.2.0
 	github.com/jinzhu/gorm v1.9.12
 	github.com/joho/godotenv v1.3.0
+	github.com/kataras/iris/v12 v12.0.1
 	github.com/mattn/go-sqlite3 v2.0.1+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/common v0.9.1
@@ -23,6 +25,7 @@ require (
 	github.com/stretchr/testify v1.5.1
 	github.com/tatsushid/go-fastping v0.0.0-20160109021039-d7bb493dee3e
 	golang.org/x/crypto v0.0.0-20200320181102-891825fb96df
+	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
 	golang.org/x/tools v0.0.0-20200321014904-268ba720d32c // indirect
 	google.golang.org/grpc v1.28.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect

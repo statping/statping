@@ -37,7 +37,7 @@ func Samples() error {
 		Method:         "GET",
 		Timeout:        20,
 		Order:          2,
-		Public:         null.NewNullBool(false),
+		Public:         null.NewNullBool(true),
 		Permalink:      null.NewNullString("statping_github"),
 		VerifySSL:      null.NewNullBool(true),
 		NotifyAfter:    1,
@@ -100,6 +100,21 @@ func Samples() error {
 		CreatedAt: createdOn,
 	}
 	if err := s5.Create(); err != nil {
+		return err
+	}
+
+	s6 := &Service{
+		Name:      "Private Service",
+		Domain:    "https://push.statping.com",
+		Interval:  30,
+		Type:      "http",
+		Timeout:   120,
+		Order:     6,
+		Public:    null.NewNullBool(false),
+		GroupId:   3,
+		CreatedAt: createdOn,
+	}
+	if err := s6.Create(); err != nil {
 		return err
 	}
 

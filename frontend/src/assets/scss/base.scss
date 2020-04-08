@@ -14,6 +14,16 @@ HTML,BODY {
   transition: height 0.3s ease;
 }
 
+.copy-btn {
+  background-color: white;
+  margin: 6px;
+  height: 26px;
+  font-size: 10pt;
+  padding: 3px 7px;
+  border: 1px solid #a7a7a7;
+  border-radius: 4px;
+}
+
 .slider-info {
   font-size: 9pt;
   font-weight: bold;

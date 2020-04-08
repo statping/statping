@@ -1,7 +1,7 @@
 <template>
     <div class="col-12">
         <div class="card contain-card text-black-50 bg-white mb-4">
-            <div class="card-header">Messages</div>
+            <div class="card-header">Annoucements</div>
             <div class="card-body">
         <table class="table table-striped">
             <thead>

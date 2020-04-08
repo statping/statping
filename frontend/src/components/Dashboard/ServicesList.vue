@@ -3,21 +3,17 @@
         <thead>
         <tr>
             <th scope="col">Name</th>
-            <th scope="col" class="d-none d-md-table-cell"></th>
             <th scope="col" class="d-none d-md-table-cell">Visibility</th>
             <th scope="col" class="d-none d-md-table-cell">Group</th>
             <th scope="col"></th>
         </tr>
         </thead>
-        <draggable tag="tbody" v-model="servicesList" handle=".drag_icon">
+        <draggable id="services_list" tag="tbody" v-model="servicesList" handle=".drag_icon">
             <tr v-for="(service, index) in $store.getters.servicesInOrder" :key="service.id">
                 <td>
                     <span v-if="$store.state.admin" class="drag_icon d-none d-md-inline">
                         <font-awesome-icon icon="bars" class="mr-3"/>
                     </span> {{service.name}}
-                </td>
-                <td v-if="$store.state.admin" class="d-none d-md-table-cell">
-                    <ToggleSwitch v-if="service.online" :service="service"/>
                 </td>
                 <td class="d-none d-md-table-cell">
                     <span class="badge" :class="{'badge-primary': service.public, 'badge-secondary': !service.public}">
