@@ -7,13 +7,22 @@
                 <font-awesome-icon icon="times" />  Delete
             </button>
         </div>
+                <div class="card-body bg-light pt-3">
 
+                    <div v-for="(update, i) in incident.updates" class="alert alert-light" role="alert">
+                        <span class="badge badge-pill badge-info text-uppercase">{{update.type}}</span>
+                        <span class="float-right font-2">{{ago(update.created_at)}} ago</span>
 
+                        <span class="d-block mt-2">{{update.message}}
+                        <button @click="delete_update(update)" type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </span>
+                    </div>
 
-
-                <div class="card-body bg-light pt-1">
                     <FormIncidentUpdates :incident="incident"/>
-                    <span class="font-2">Created: {{niceDate(incident.created_at)}} | Last Update: {{niceDate(incident.updated_at)}}</span>
+
+                    <span class="font-2 mt-3">Created: {{niceDate(incident.created_at)}} | Last Update: {{niceDate(incident.updated_at)}}</span>
                 </div>
     </div>
 
@@ -82,6 +91,10 @@
           await this.loadIncidents()
       },
       methods: {
+        async delete_update(update) {
+          await Api.incident_update_delete(update)
+          this.incidents = await Api.incidents_service(this.service)
+        },
             async loadIncidents() {
               this.incidents = await Api.incidents_service(this.service)
             },
