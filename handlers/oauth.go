@@ -3,17 +3,18 @@ package handlers
 import (
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/kataras/iris/v12/sessions"
+	"github.com/gorilla/sessions"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/users"
-	"github.com/statping/statping/utils"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 	"golang.org/x/oauth2/google"
 	"golang.org/x/oauth2/slack"
 	"net/http"
 )
+
+var oauthSession = sessions.NewCookieStore([]byte("statping_oauth"))
 
 type oAuth struct {
 	Email        string
@@ -123,10 +124,5 @@ func slackOAuth(r *http.Request) (error, *oAuth) {
 }
 
 func secureToken(w http.ResponseWriter, r *http.Request) {
-	tk := utils.NewSHA256Hash()
-	cookie := &http.Cookie{
-		Name:  "statping_oauth",
-		Value: tk,
-	}
-	sessions.AddCookie(r.Context(), cookie, false)
+
 }

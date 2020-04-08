@@ -24,6 +24,16 @@
         </div>
 
         <div class="form-group row">
+            <label class="col-sm-4 col-form-label">Service</label>
+            <div class="col-sm-8">
+                <select v-model="message.service_id" name="service_id" class="form-control">
+                    <option :value="0">Global Announcement</option>
+                    <option v-for="(service, i) in $store.getters.services" :value="service.id" >{{service.name}}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group row">
             <label class="col-sm-4 col-form-label">Announcement Date Range</label>
             <div class="col-sm-4">
                 <flatPickr v-model="message.start_on" @on-change="startChange" :config="config" type="text" name="start_on" class="form-control form-control-plaintext" id="start_on" value="0001-01-01T00:00:00Z" required />

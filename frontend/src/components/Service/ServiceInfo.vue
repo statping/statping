@@ -48,19 +48,12 @@
                         <button @click.prevent="Tab('incident')" class="btn btn-block btn-outline-secondary incident" :class="{'text-white btn-secondary': openTab==='incident'}" >Incidents</button>
                     </div>
                     <div class="col-4">
-                        <button @click.prevent="Tab('message')" class="btn btn-block btn-outline-secondary message" :class="{'text-white btn-secondary': openTab==='message'}">Announcements</button>
-                    </div>
-                    <div class="col-4">
                         <button @click.prevent="Tab('failures')" class="btn btn-block btn-outline-secondary failures" :disabled="service.stats.failures === 0" :class="{'text-white btn-secondary': openTab==='failures'}">
                             Failures <span class="badge badge-danger float-right mt-1">{{service.stats.failures}}</span></button>
                     </div>
 
                 <div v-if="openTab === 'incident'" class="col-12 mt-4">
                     <FormIncident :service="service" />
-                </div>
-
-                <div v-if="openTab === 'message'" class="col-12 mt-4">
-                    <FormMessage :service="service"/>
                 </div>
 
                 <div v-if="openTab === 'failures'" class="col-12 mt-4">
