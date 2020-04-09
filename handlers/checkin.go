@@ -40,8 +40,7 @@ func checkinCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	checkin.ServiceId = service.Id
-	err = checkin.Create()
-	if err != nil {
+	if err := checkin.Create(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
@@ -52,7 +51,7 @@ func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	checkin, err := checkins.FindByAPI(vars["api"])
 	if err != nil {
-		sendErrorJson(fmt.Errorf("checkin %v was not found", vars["api"]), w, r)
+		sendErrorJson(fmt.Errorf("checkin %s was not found", vars["api"]), w, r)
 		return
 	}
 	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
@@ -60,15 +59,17 @@ func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
 	hit := &checkins.CheckinHit{
 		Checkin:   checkin.Id,
 		From:      ip,
-		CreatedAt: utils.Now().UTC(),
+		CreatedAt: utils.Now(),
 	}
+	log.Infof("Checking %s was requested", checkin.Name)
+
 	err = hit.Create()
 	if err != nil {
 		sendErrorJson(fmt.Errorf("checkin %v was not found", vars["api"]), w, r)
 		return
 	}
 	checkin.Failing = false
-	checkin.LastHitTime = utils.Now().UTC()
+	checkin.LastHitTime = utils.Now()
 	sendJsonAction(hit.Id, "update", w, r)
 }
 

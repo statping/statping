@@ -2,6 +2,9 @@
 - Added Incident Reporting
 - Added Cypress tests
 - Added Github and Google OAuth login (beta)
+- Added Delete All Failures
+- Added Checkin form
+- Added Pushover notifier
 
 # 0.90.22
 - Added range input types for integer form fields

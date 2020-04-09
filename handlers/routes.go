@@ -146,9 +146,9 @@ func Router() *mux.Router {
 
 	// API CHECKIN Routes
 	api.Handle("/api/checkins", authenticated(apiAllCheckinsHandler, false)).Methods("GET")
-	api.Handle("/api/checkin/{api}", authenticated(apiCheckinHandler, false)).Methods("GET")
-	api.Handle("/api/checkin", authenticated(checkinCreateHandler, false)).Methods("POST")
-	api.Handle("/api/checkin/{api}", authenticated(checkinDeleteHandler, false)).Methods("DELETE")
+	api.Handle("/api/checkins", authenticated(checkinCreateHandler, false)).Methods("POST")
+	api.Handle("/api/checkins/{api}", authenticated(apiCheckinHandler, false)).Methods("GET")
+	api.Handle("/api/checkins/{api}", authenticated(checkinDeleteHandler, false)).Methods("DELETE")
 	r.Handle("/checkin/{api}", http.HandlerFunc(checkinHitHandler))
 
 	// Static Files Routes

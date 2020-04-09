@@ -59,6 +59,10 @@
                     <FormIncident :service="service" />
                 </div>
 
+                <div v-if="openTab === 'checkin'" class="col-12 mt-4">
+                    <Checkin :service="service" />
+                </div>
+
                 <div v-if="openTab === 'failures'" class="col-12 mt-4">
                     <button @click.prevent="deleteFailures" class="btn btn-block btn-outline-secondary delete_failures" :disabled="service.stats.failures === 0">Delete Failures</button>
 
@@ -79,6 +83,7 @@
 </template>
 
 <script>
+  import Checkin from '../../forms/Checkin';
   import FormIncident from '../../forms/Incident';
   import FormMessage from '../../forms/Message';
   import ServiceFailures from './ServiceFailures';
@@ -89,6 +94,7 @@
   export default {
       name: 'ServiceInfo',
       components: {
+          Checkin,
           ServiceFailures,
           FormIncident,
           FormMessage,

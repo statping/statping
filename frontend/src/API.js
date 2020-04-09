@@ -68,6 +68,10 @@ class Api {
     return axios.post('api/reorder/services', data).then(response => (response.data))
   }
 
+    async checkins() {
+        return axios.get('api/checkins').then(response => (response.data))
+    }
+
   async groups() {
     return axios.get('api/groups').then(response => (response.data))
   }
@@ -127,6 +131,14 @@ class Api {
 
     async incident_delete(incident) {
         return axios.delete('api/incidents/'+incident.id).then(response => (response.data))
+    }
+
+    async checkin_create(data) {
+        return axios.post('api/checkins', data).then(response => (response.data))
+    }
+
+    async checkin_delete(checkin) {
+        return axios.delete('api/checkins/'+checkin.api_key).then(response => (response.data))
     }
 
   async messages() {

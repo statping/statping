@@ -26,6 +26,7 @@ export default new Vuex.Store({
             messages: [],
             users: [],
             notifiers: [],
+            checkins: [],
             admin: false
         },
     getters: {
@@ -39,6 +40,7 @@ export default new Vuex.Store({
         incidents: state => state.incidents,
         users: state => state.users,
         notifiers: state => state.notifiers,
+        checkins: state => state.checkins,
 
         isAdmin: state => state.admin,
 
@@ -48,6 +50,9 @@ export default new Vuex.Store({
         groupsClean: state => state.groups.filter(g => g.name !== '').sort((a, b) => a.order_id - b.order_id),
         groupsCleanInOrder: state => state.groups.filter(g => g.name !== '').sort((a, b) => a.order_id - b.order_id).sort((a, b) => a.order_id - b.order_id),
 
+        serviceCheckins: (state) => (id) => {
+            return state.checkins.filter(c => c.service_id === id)
+        },
         serviceByAll: (state) => (element) => {
             if (element % 1 === 0) {
                 return state.services.find(s => s.id == element)
@@ -99,6 +104,9 @@ export default new Vuex.Store({
         setServices (state, services) {
             state.services = services
         },
+        setCheckins (state, checkins) {
+            state.checkins = checkins
+        },
         setGroups (state, groups) {
             state.groups = groups
         },
@@ -147,6 +155,8 @@ export default new Vuex.Store({
             context.commit("setGroups", groups);
             const services = await Api.services()
             context.commit("setServices", services);
+            const checkins = await Api.checkins()
+            context.commit("setCheckins", checkins);
             const messages = await Api.messages()
             context.commit("setMessages", messages)
             context.commit("setHasPublicData", true)

@@ -73,7 +73,7 @@
                                     <div class="col-sm-9">
                                         <div class="input-group">
                                         <input v-model="core.api_key" type="text" class="form-control" id="api_key" readonly>
-                                            <div class="input-group-append">
+                                            <div class="input-group-append copy-btn">
                                                 <button @click.prevent="copy(core.api_key)" class="btn btn-outline-secondary" type="button">Copy</button>
                                             </div>
                                         </div>
@@ -86,7 +86,7 @@
                                     <div class="col-sm-9">
                                         <div class="input-group">
                                         <input v-model="core.api_secret" @focus="$event.target.select()" type="text" class="form-control select-input" id="api_secret" readonly>
-                                            <div class="input-group-append">
+                                            <div class="input-group-append copy-btn">
                                                 <button @click="copy(core.api_secret)" class="btn btn-outline-secondary" type="button">Copy</button>
                                             </div>
                                         </div>

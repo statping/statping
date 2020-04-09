@@ -26,10 +26,6 @@
                 <li v-if="$store.state.admin" @click="navopen = !navopen" class="nav-item navbar-item">
                     <router-link to="/dashboard/logs" class="nav-link">Logs</router-link>
                 </li>
-
-                <li @click="navopen = !navopen" class="nav-item navbar-item">
-                    <router-link to="/dashboard/help" class="nav-link">Help</router-link>
-                </li>
             </ul>
             <span class="navbar-text">
       <a href="#" class="nav-link" v-on:click="logout">Logout</a>

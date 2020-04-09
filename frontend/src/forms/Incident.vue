@@ -8,11 +8,9 @@
             </button>
         </div>
                 <div class="card-body bg-light pt-3">
-
                     <div v-for="(update, i) in incident.updates" class="alert alert-light" role="alert">
                         <span class="badge badge-pill badge-info text-uppercase">{{update.type}}</span>
                         <span class="float-right font-2">{{ago(update.created_at)}} ago</span>
-
                         <span class="d-block mt-2">{{update.message}}
                         <button @click="delete_update(update)" type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
