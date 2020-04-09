@@ -51,7 +51,7 @@
           this.$store.commit('setHasAllData', false)
           this.$store.commit('setToken', null)
           this.$store.commit('setAdmin', false)
-          await this.$router.push('/')
+          await this.$router.push('/logout')
         }
     }
 }

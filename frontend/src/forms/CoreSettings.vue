@@ -41,24 +41,17 @@
 
   export default {
       name: 'CoreSettings',
-        props: {
-          in_core: {
-            type: Object,
-            required: true,
+      computed: {
+          core() {
+              return this.$store.getters.core
           }
-        },
-    data() {
-      return {
-        core: this.in_core
-      }
-    },
+      },
       methods: {
           async saveSettings() {
               const c = this.core
               await Api.core_save(c)
               const core = await Api.core()
               this.$store.commit('setCore', core)
-              this.core = core
           },
           selectAll() {
               this.$refs.input.select();

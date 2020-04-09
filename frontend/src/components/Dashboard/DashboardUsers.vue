@@ -14,7 +14,7 @@
             </thead>
             <tbody id="users_table">
 
-            <tr v-for="(user, index) in $store.getters.users" v-bind:key="index" >
+            <tr v-for="(user, index) in users" v-bind:key="index" >
                 <td>{{user.username}}</td>
                 <td v-if="user.admin"><span class="badge badge-danger">ADMIN</span></td>
                 <td v-if="!user.admin"><span class="badge badge-primary">USER</span></td>
@@ -49,6 +49,11 @@
       user: {}
     }
   },
+      computed: {
+        users() {
+            return this.$store.getters.users
+        }
+      },
   methods: {
     editChange(v) {
       this.user = {}

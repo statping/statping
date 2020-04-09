@@ -35,11 +35,11 @@
 
   export default {
       name: 'FormLogin',
-    props: {
-        oauth: {
-          type: Object
-        }
-    },
+      computed: {
+          oauth() {
+              return this.$store.getters.core.oauth
+          }
+      },
       data() {
           return {
               username: "",

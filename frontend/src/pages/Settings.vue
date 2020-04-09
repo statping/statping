@@ -60,10 +60,9 @@
                         <div class="card text-black-50 bg-white">
                             <div class="card-header">Statping Settings</div>
                             <div class="card-body">
-                                <CoreSettings :in_core="core"/>
+                                <CoreSettings/>
                             </div>
                         </div>
-
 
                         <div class="card text-black-50 bg-white mt-3">
                             <div class="card-header">API Settings</div>
@@ -112,7 +111,7 @@
                         <div class="card text-black-50 bg-white mb-5">
                             <div class="card-header">Theme Editor</div>
                             <div class="card-body">
-                                <ThemeEditor :core="core"/>
+                                <ThemeEditor/>
                             </div>
                         </div>
                     </div>
@@ -167,19 +166,20 @@
               tab: "v-pills-home-tab",
               qrcode: "",
               qrurl: "",
-              core: this.$store.getters.core
+          }
+      },
+      computed: {
+          core() {
+              return this.$store.getters.core
           }
       },
       async mounted() {
           this.cache = await Api.cache()
       },
       async created() {
-          const c = this.$store.state.core
+          const c = this.core
           this.qrurl = `statping://setup?domain=${c.domain}&api=${c.api_secret}`
           this.qrcode = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=" + encodeURI(this.qrurl)
-      },
-      async beforeMount() {
-        this.core = await Api.core()
       },
       methods: {
           changeTab(e) {

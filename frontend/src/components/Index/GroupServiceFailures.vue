@@ -34,7 +34,7 @@ export default {
     },
     methods: {
       async lastDaysFailures() {
-          const start = this.nowSubtract(86400 * 30)
+        const start = this.nowSubtract(86400 * 30)
         this.failureData = await Api.service_failures_data(this.service.id, this.toUnix(start), this.toUnix(this.now()), "24h")
       }
     }

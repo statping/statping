@@ -20,13 +20,9 @@
       }
   },
   async mounted() {
-        const core = await Api.core()
+      const core = await Api.core()
       this.$store.commit('setAdmin', core.admin)
-    this.$store.commit('setCore', core)
-  },
-  async created() {
-    const core = await Api.core()
-    this.$store.commit('setCore', core)
+      this.$store.commit('setCore', core)
   }
 }
 </script>

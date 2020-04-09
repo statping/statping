@@ -24,7 +24,7 @@
             </thead>
 
             <draggable tag="tbody" v-model="groupsList" class="sortable_groups" handle=".drag_icon">
-            <tr v-for="(group, index) in $store.getters.groupsCleanInOrder" v-bind:key="group.id">
+            <tr v-for="(group, index) in groupsList" v-bind:key="group.id">
                 <td><span class="drag_icon d-none d-md-inline">
                     <font-awesome-icon icon="bars" class="mr-3" /></span> {{group.name}}
                 </td>
@@ -48,7 +48,6 @@
 
             </div>
         </div>
-
 
         <FormGroup v-if="$store.state.admin" :edit="editChange" :in_group="group"/>
 
@@ -93,9 +92,6 @@
               }
           }
       },
-      beforeMount() {
-
-      },
       methods: {
           editChange(v) {
               this.group = {}
@@ -104,13 +100,6 @@
           editGroup(g, mode) {
               this.group = g
               this.edit = !mode
-          },
-          reordered_services() {
-
-          },
-          saveUpdatedOrder: function (e) {
-              window.console.log("saving...");
-              window.console.log(this.myViews.array()); // this.myViews.array is not a function
           },
           async deleteGroup(g) {
               let c = confirm(`Are you sure you want to delete '${g.name}'?`)

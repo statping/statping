@@ -1,12 +1,12 @@
 <template>
     <footer>
-        <div v-if="!$store.getters.core.footer" class="footer text-center mb-4 p-2">
+        <div v-if="!core.footer" class="footer text-center mb-4 p-2">
             <a href="https://github.com/statping/statping" target="_blank">
-                Statping {{$store.getters.core.version}} made with <font-awesome-icon style="color: #d40d0d" icon="heart"/>
+                Statping {{core.version}} made with <font-awesome-icon icon="heart"/>
             </a> |
-            <router-link :to="$store.getters.core.logged_in ? '/dashboard' : '/login'">Dashboard</router-link>
+            <router-link :to="core.logged_in ? '/dashboard' : '/login'">Dashboard</router-link>
         </div>
-        <div v-else class="footer text-center mb-4 p-2" v-html="$store.getters.core.footer"></div>
+        <div v-else class="footer text-center mb-4 p-2" v-html="core.footer"></div>
     </footer>
 </template>
 
@@ -22,11 +22,11 @@
     version: String,
     logged_in: Boolean
   },
-      watch: {
-          logged_in() {
-
-          }
+  computed: {
+      core() {
+        return this.$store.getters.core
       }
+  }
 }
 </script>
 

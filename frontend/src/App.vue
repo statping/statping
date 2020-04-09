@@ -22,31 +22,32 @@
         app: null
     }
   },
+      computed: {
+          core() {
+            return this.$store.getters.core
+          }
+      },
   async created() {
       this.app = await this.$store.dispatch('loadRequired')
 
       this.app = {...this.$store.state}
 
-    if (this.$store.getters.core.logged_in) {
+    if (this.core.logged_in) {
       await this.$store.dispatch('loadAdmin')
     }
       this.loaded = true
-      if (!this.$store.getters.core.setup) {
+      if (!this.core.setup) {
         this.$router.push('/setup')
       }
-      window.console.log('finished loadRequired')
   },
     async mounted() {
           if (this.$route.path !== '/setup') {
               const tk = localStorage.getItem("statping_user")
-              if (this.$store.getters.core.logged_in) {
+              if (this.core.logged_in) {
                 this.logged_in = true
                   await this.$store.dispatch('loadAdmin')
               }
           }
-    },
-    methods: {
-
     }
 }
 </script>

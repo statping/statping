@@ -35,10 +35,12 @@
         }
       },
       async mounted() {
-          this.value = this.func.value;
-          this.title = this.func.title;
-          this.subtitle = this.func.subtitle;
-          this.chart = this.convertToChartData(this.func.chart);
+            if (this.func) {
+                this.value = this.func.value;
+                this.title = this.func.title;
+                this.subtitle = this.func.subtitle;
+                this.chart = this.convertToChartData(this.func.chart);
+            }
       },
       async latencyYesterday() {
         const todayTime = await Api.service_hits(this.service.id, this.toUnix(this.nowSubtract(86400)), this.toUnix(new Date()), this.group, false)

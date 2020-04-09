@@ -5,7 +5,7 @@
                 <img alt="Statping Login" class="col-12 mt-5 mt-md-0" style="max-width:680px" src="banner.png">
             </div>
 
-            <FormLogin :oauth="$store.getters.core.oauth"/>
+            <FormLogin/>
 
         </div>
     </div>

@@ -88,6 +88,8 @@ func (s Storage) List() map[string]Item {
 
 //Get a cached content by key
 func (s Storage) Get(key string) []byte {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	item := s.items[key]
 	if item.Expired() {
 		CacheStorage.Delete(key)

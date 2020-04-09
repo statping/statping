@@ -3,7 +3,7 @@
 
         <Header/>
 
-        <div v-for="(service, i) in $store.getters.servicesNoGroup" class="col-12 full-col-12">
+        <div v-for="(service, i) in services_no_group" class="col-12 full-col-12">
             <div class="list-group online_list mb-4">
                 <a class="service_li list-group-item list-group-item-action">
                     <router-link class="no-decoration font-3" :to="serviceLink(service)">{{service.name}}</router-link>
@@ -16,16 +16,16 @@
             </div>
         </div>
 
-        <div v-for="(group, index) in $store.getters.groupsInOrder" v-bind:key="index">
+        <div v-for="(group, index) in groups" v-bind:key="index">
             <Group :group=group />
         </div>
 
-        <div v-for="(message, index) in $store.getters.messages" v-bind:key="index" v-if="inRange(message) && message.service === 0">
+        <div v-for="(message, index) in messages" v-bind:key="index" v-if="inRange(message) && message.service === 0">
             <MessageBlock :message="message"/>
         </div>
 
         <div class="col-12 full-col-12">
-            <div v-for="(service, index) in $store.getters.servicesInOrder" :ref="service.id" v-bind:key="index">
+            <div v-for="(service, index) in services" :ref="service.id" v-bind:key="index">
                 <ServiceBlock :service=service />
             </div>
         </div>
@@ -58,6 +58,20 @@ export default {
             logged_in: false
         }
     },
+    computed: {
+        messages() {
+            return this.$store.getters.messages
+        },
+        groups() {
+            return this.$store.getters.groupsInOrder
+        },
+        services() {
+            return this.$store.getters.servicesInOrder
+        },
+        services_no_group() {
+            return this.$store.getters.servicesNoGroup
+        }
+    },
     async created() {
         this.logged_in = this.loggedIn()
     },
@@ -69,11 +83,6 @@ export default {
             const start = this.isBetween(new Date(), message.start_on)
             const end = this.isBetween(message.end_on, new Date())
             return start && end
-        },
-        clickService(s) {
-            this.$nextTick(() => {
-                this.$refs.s.scrollTop = 0;
-            });
         }
     }
 }

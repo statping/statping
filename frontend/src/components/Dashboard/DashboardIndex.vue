@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <div v-for="(service, index) in $store.getters.services" class="service_block" v-bind:key="index">
+        <div v-for="(service, index) in services" class="service_block" v-bind:key="index">
             <ServiceInfo :service=service />
         </div>
     </div>
@@ -30,10 +30,15 @@
       components: {
           ServiceInfo
       },
+      computed: {
+          services() {
+              return this.$store.getters.services
+          }
+      },
       methods: {
           failuresLast24Hours() {
               let total = 0;
-              this.$store.getters.services.map((s) => {
+              this.services.map((s) => {
                   total += s.failures_24_hours
               })
               return total

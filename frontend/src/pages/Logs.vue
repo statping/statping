@@ -12,7 +12,6 @@ import Api from "../API";
 
 export default {
     name: 'Logs',
-    components: {},
     data() {
         return {
             logs: [],

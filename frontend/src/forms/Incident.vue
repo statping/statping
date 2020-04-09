@@ -93,9 +93,9 @@
           await Api.incident_update_delete(update)
           this.incidents = await Api.incidents_service(this.service)
         },
-            async loadIncidents() {
-              this.incidents = await Api.incidents_service(this.service)
-            },
+        async loadIncidents() {
+          this.incidents = await Api.incidents_service(this.service)
+        },
           async createIncident() {
             await Api.incident_create(this.service, this.incident)
             await this.loadIncidents()
@@ -105,13 +105,13 @@
                 service: this.service.id,
             }
           },
-          async deleteIncident(incident) {
-              let c = confirm(`Are you sure you want to delete '${incident.title}'?`)
-              if (c) {
-                  await Api.incident_delete(incident)
-                await this.loadIncidents()
-              }
+      async deleteIncident(incident) {
+          let c = confirm(`Are you sure you want to delete '${incident.title}'?`)
+          if (c) {
+              await Api.incident_delete(incident)
+            await this.loadIncidents()
           }
+      }
   }
 }
 </script>

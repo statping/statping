@@ -59,10 +59,9 @@
       components: {
           codemirror
       },
-      props: {
-          core: {
-              type: Object,
-              required: true
+      computed: {
+          core() {
+              return this.$store.getters.core
           }
       },
       data () {
@@ -84,11 +83,6 @@
                   line: true,
                   colorpicker: true
               }
-          }
-      },
-      computed: {
-          codemirror () {
-
           }
       },
       async mounted () {

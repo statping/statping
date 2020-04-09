@@ -26,7 +26,6 @@ export default {
   components: {
       IncidentsBlock,
       GroupServiceFailures
-
   },
   props: {
     group: Object
