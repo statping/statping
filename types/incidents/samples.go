@@ -9,7 +9,7 @@ func Samples() error {
 	incident1 := &Incident{
 		Title:       "Github Issues",
 		Description: "There are new features for Statping, if you have any issues please visit the Github Repo.",
-		ServiceId:   2,
+		ServiceId:   4,
 	}
 	if err := incident1.Create(); err != nil {
 		return err
@@ -18,7 +18,7 @@ func Samples() error {
 	incident2 := &Incident{
 		Title:       "Recent Downtime",
 		Description: "We've noticed an issue with authentications and we're looking into it now.",
-		ServiceId:   4,
+		ServiceId:   5,
 	}
 	if err := incident2.Create(); err != nil {
 		return err
