@@ -52,7 +52,7 @@ func TestGroupAPIRoutes(t *testing.T) {
 			URL:            "/api/groups",
 			Method:         "GET",
 			ExpectedStatus: 200,
-			ResponseLen:    2,
+			ResponseLen:    3,
 			BeforeTest:     UnsetTestENV,
 		},
 		{

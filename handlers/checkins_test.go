@@ -16,7 +16,7 @@ func TestApiCheckinRoutes(t *testing.T) {
 			SecureRoute:    true,
 		}, {
 			Name:   "Statping Create Checkin",
-			URL:    "/api/checkin",
+			URL:    "/api/checkins",
 			Method: "POST",
 			Body: `{
 					"service_id": 2,
