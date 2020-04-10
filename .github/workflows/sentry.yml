@@ -10,13 +10,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@master
-      - name: Create a Sentry.io release
+      - name: Create a Sentry release
         uses: tclindner/sentry-releases-action@v1.0.0
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_URL: ${{ secrets.SENTRY_URL }}
-          SENTRY_ORG: Statping
-          SENTRY_PROJECT: golang
+          SENTRY_ORG: statping
+          SENTRY_PROJECT: backend
         with:
           tagName: ${{ github.ref }}
           environment: qa
