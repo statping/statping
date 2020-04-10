@@ -9,7 +9,7 @@
             <p class="mb-1">{{failure.issue}}</p>
         </div>
 
-        <nav v-if="total > 4" aria-label="page navigation example">
+        <nav v-if="total > 4" class="mt-3">
             <ul class="pagination justify-content-center">
                 <li class="page-item" :class="{'disabled': page===1}">
                     <a @click.prevent="gotoPage(page-1)" :disabled="page===1" class="page-link" href="#" aria-label="Previous">
@@ -17,7 +17,7 @@
                         <span class="sr-only">Previous</span>
                     </a>
                 </li>
-                <li v-for="n in Math.floor(total / limit)" class="page-item" :class="{'active': page === n}">
+                <li v-for="n in maxPages" class="page-item" :class="{'active': page === n}">
                     <a @click.prevent="gotoPage(n)" class="page-link" href="#">{{n}}</a>
                 </li>
                 <li class="page-item" :class="{'disabled': page===Math.floor(total / limit)}">
@@ -51,6 +51,19 @@ export default {
             offset: 0,
             total: this.service.stats.failures,
             page: 1
+        }
+    },
+    computed: {
+      pages() {
+          return Math.floor(this.total / this.limit)
+      },
+        maxPages() {
+          const p = Math.floor(this.total / this.limit)
+          if (p > 16) {
+              return 16
+            } else {
+              return p
+          }
         }
     },
     async mounted () {

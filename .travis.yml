@@ -10,12 +10,6 @@ before_script:
 branches:
   only:
     - master
-cache:
-  directories:
-    - ~/.npm
-    - ~/.cache
-    - $GOPATH/pkg/mod
-    - $GOPATH/src/github.com/statping/statping/frontend/node_modules
 env:
   global:
     - "PATH=$HOME/.local/bin:$PATH"
