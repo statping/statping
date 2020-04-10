@@ -1,4 +1,4 @@
-name: ReleaseWorkflow
+name: ReleaseFrontendWorkflow
 
 on:
   release:
