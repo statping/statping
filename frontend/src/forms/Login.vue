@@ -23,10 +23,6 @@
             </div>
         </div>
 
-        <a v-if="oauth.oauth_providers.split(',').includes('github')" class="btn btn-block btn-outline-dark" :href="`https://github.com/login/oauth/authorize?scope=user:email&client_id=${oauth.gh_client_id}`">Login with Github</a>
-        <a v-if="oauth.oauth_providers.split(',').includes('google')" class="btn btn-block btn-outline-secondary" :href="`https://accounts.google.com/signin/oauth?client_id=${oauth.google_client_id}&response_type=code&scope=${google_scope}&redirect_uri=${$store.getters.core.domain}/oauth/google`">Login with Google</a>
-        <a v-if="oauth.oauth_providers.split(',').includes('slack')" class="btn btn-block btn-outline-secondary" :href="`https://slack.com/oauth/v2/authorize?client_id=${oauth.slack_client_id}&team=${oauth.slack_team}&user_scope=${slack_scope}&redirect_uri=${$store.getters.core.domain}/oauth/slack`">Login with Slack</a>
-
     </form>
 </template>
 
@@ -36,6 +32,9 @@
   export default {
       name: 'FormLogin',
       computed: {
+          core() {
+              return this.$store.getters.core
+          },
           oauth() {
               return this.$store.getters.core.oauth
           }

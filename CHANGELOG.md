@@ -1,3 +1,6 @@
+# 0.90.24
+- Fixed login form from not showing
+
 # 0.90.23
 - Added Incident Reporting
 - Added Cypress tests

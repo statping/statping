@@ -49,7 +49,12 @@
                 <div class="form-group row">
                     <label for="gh_callback" class="col-sm-4 col-form-label">Callback URL</label>
                     <div class="col-sm-8">
-                        <input v-bind:value="`${$store.getters.core.domain}/oauth/github`" type="text" class="form-control" id="gh_callback" readonly>
+                        <div class="input-group">
+                            <input v-bind:value="`${core.domain}/oauth/github`" type="text" class="form-control" id="gh_callback" readonly>
+                            <div class="input-group-append copy-btn">
+                                <button @click.prevent="copy(`${core.domain}/oauth/github`)" class="btn btn-outline-secondary" type="button">Copy</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -81,9 +86,14 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="callback" class="col-sm-4 col-form-label">Callback URL</label>
+                    <label for="google_callback" class="col-sm-4 col-form-label">Callback URL</label>
                     <div class="col-sm-8">
-                        <input v-bind:value="`${$store.getters.core.domain}/oauth/google`" type="text" class="form-control" id="callback" readonly>
+                        <div class="input-group">
+                            <input v-bind:value="`${core.domain}/oauth/google`" type="text" class="form-control" id="google_callback" readonly>
+                            <div class="input-group-append copy-btn">
+                                <button @click.prevent="copy(`${core.domain}/oauth/google`)" class="btn btn-outline-secondary" type="button">Copy</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -124,7 +134,12 @@
                 <div class="form-group row">
                     <label for="slack_callback" class="col-sm-4 col-form-label">Callback URL</label>
                     <div class="col-sm-8">
-                        <input v-bind:value="`${$store.getters.core.domain}/oauth/slack`" type="text" class="form-control" id="slack_callback" readonly>
+                        <div class="input-group">
+                            <input v-bind:value="`${core.domain}/oauth/slack`" type="text" class="form-control" id="slack_callback" readonly>
+                            <div class="input-group-append copy-btn">
+                                <button @click.prevent="copy(`${core.domain}/oauth/slack`)" class="btn btn-outline-secondary" type="button">Copy</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -149,6 +164,11 @@
           type: Object
         }
     },
+      computed: {
+          core() {
+             return this.$store.getters.core
+          }
+      },
       data() {
           return {
             internal_enabled: this.$store.getters.core.oauth.oauth_providers.split(",").includes('local'),
