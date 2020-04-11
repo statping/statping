@@ -26,7 +26,7 @@ func (m *mobilePush) Select() *notifications.Notification {
 
 var Mobile = &mobilePush{&notifications.Notification{
 	Method: "mobile",
-	Title:  "Mobile Notifications",
+	Title:  "Mobile",
 	Description: `Receive push notifications on your Mobile device using the Statping App. You can scan the Authentication QR Code found in Settings to get the Mobile app setup in seconds.
 				 <p align="center"><a href="https://play.google.com/store/apps/details?id=com.statping"><img src="https://img.cjx.io/google-play.svg"></a><a href="https://itunes.apple.com/us/app/apple-store/id1445513219"><img src="https://img.cjx.io/app-store-badge.svg"></a></p>`,
 	Author:    "Hunter Long",
@@ -97,7 +97,7 @@ func (m *mobilePush) OnSuccess(s *services.Service) error {
 }
 
 // OnTest triggers when this notifier has been saved
-func (m *mobilePush) OnTest() error {
+func (m *mobilePush) OnTest() (string, error) {
 	msg := &pushArray{
 		Message:  "Testing the Mobile Notifier",
 		Title:    "Testing Notifications",
@@ -107,18 +107,18 @@ func (m *mobilePush) OnTest() error {
 	}
 	body, err := pushRequest(msg)
 	if err != nil {
-		return err
+		return "", err
 	}
 	var output mobileResponse
 	err = json.Unmarshal(body, &output)
 	if err != nil {
-		return err
+		return string(body), err
 	}
 	if len(output.Logs) == 0 {
-		return nil
+		return string(body), err
 	} else {
 		firstLog := output.Logs[0].Error
-		return fmt.Errorf("Mobile Notification error: %v", firstLog)
+		return string(body), fmt.Errorf("Mobile Notification error: %v", firstLog)
 	}
 }
 

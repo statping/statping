@@ -26,7 +26,7 @@ type webhooker struct {
 
 var Webhook = &webhooker{&notifications.Notification{
 	Method:      webhookMethod,
-	Title:       "HTTP webhooker",
+	Title:       "Webhook",
 	Description: "Send a custom HTTP request to a specific URL with your own body, headers, and parameters.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
@@ -113,16 +113,17 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 	return resp, err
 }
 
-func (w *webhooker) OnTest() error {
+func (w *webhooker) OnTest() (string, error) {
 	body := ReplaceVars(w.Var2, exampleService, exampleFailure)
 	resp, err := w.sendHttpWebhook(body)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer resp.Body.Close()
 	content, err := ioutil.ReadAll(resp.Body)
-	utils.Log.Infoln(fmt.Sprintf("Webhook notifier received: '%v'", string(content)))
-	return err
+	out := fmt.Sprintf("Webhook notifier received: '%v'", string(content))
+	utils.Log.Infoln(out)
+	return out, err
 }
 
 // OnFailure will trigger failing service

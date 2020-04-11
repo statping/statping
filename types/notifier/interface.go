@@ -9,5 +9,5 @@ import (
 type Notifier interface {
 	OnSuccess(*services.Service) error                    // OnSuccess is triggered when a service is successful
 	OnFailure(*services.Service, *failures.Failure) error // OnFailure is triggered when a service is failing
-	OnTest() error                                        // OnTest is triggered for testing
+	OnTest() (string, error)                              // OnTest is triggered for testing
 }

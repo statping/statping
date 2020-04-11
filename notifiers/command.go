@@ -22,7 +22,7 @@ func (c *commandLine) Select() *notifications.Notification {
 
 var Command = &commandLine{&notifications.Notification{
 	Method:      "command",
-	Title:       "Shell Command",
+	Title:       "Command",
 	Description: "Shell Command allows you to run a customized shell/bash Command on the local machine it's running on.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
@@ -33,35 +33,28 @@ var Command = &commandLine{&notifications.Notification{
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "Shell or Bash",
-		Placeholder: "/bin/bash",
+		Placeholder: "/usr/bin/curl",
 		DbField:     "host",
-		SmallText:   "You can use '/bin/sh', '/bin/bash' or even an absolute path for an application.",
+		SmallText:   "You can use '/bin/sh', '/bin/bash', '/usr/bin/curl' or an absolute path for an application.",
 	}, {
 		Type:        "text",
 		Title:       "Command to Run on OnSuccess",
-		Placeholder: "curl google.com",
+		Placeholder: "http://localhost:8080/health",
 		DbField:     "var1",
-		SmallText:   "This Command will run every time a service is receiving a Successful event.",
+		SmallText:   "This Command will run when a service is receiving a Successful event.",
 	}, {
 		Type:        "text",
 		Title:       "Command to Run on OnFailure",
-		Placeholder: "curl offline.com",
+		Placeholder: "http://localhost:8080/health",
 		DbField:     "var2",
-		SmallText:   "This Command will run every time a service is receiving a Failing event.",
+		SmallText:   "This Command will run when a service is receiving a Failing event.",
 	}}},
 }
 
 func runCommand(app string, cmd ...string) (string, string, error) {
+	utils.Log.Infof("Command notifier sending: %s %s", app, strings.Join(cmd, " "))
 	outStr, errStr, err := utils.Command(app, cmd...)
 	return outStr, errStr, err
-}
-
-// OnFailure for commandLine will trigger failing service
-func (c *commandLine) OnFailure(s *services.Service, f *failures.Failure) error {
-	msg := c.GetValue("var2")
-	tmpl := ReplaceVars(msg, s, f)
-	_, _, err := runCommand(c.Host, tmpl)
-	return err
 }
 
 // OnSuccess for commandLine will trigger successful service
@@ -72,11 +65,19 @@ func (c *commandLine) OnSuccess(s *services.Service) error {
 	return err
 }
 
+// OnFailure for commandLine will trigger failing service
+func (c *commandLine) OnFailure(s *services.Service, f *failures.Failure) error {
+	msg := c.GetValue("var2")
+	tmpl := ReplaceVars(msg, s, f)
+	_, _, err := runCommand(c.Host, tmpl)
+	return err
+}
+
 // OnTest for commandLine triggers when this notifier has been saved
-func (c *commandLine) OnTest() error {
-	cmds := strings.Split(c.Var1, " ")
-	in, out, err := runCommand(c.Host, cmds...)
+func (c *commandLine) OnTest() (string, error) {
+	tmpl := ReplaceVars(c.Var1, exampleService, exampleFailure)
+	in, out, err := runCommand(c.Host, tmpl)
 	utils.Log.Infoln(in)
 	utils.Log.Infoln(out)
-	return err
+	return out, err
 }

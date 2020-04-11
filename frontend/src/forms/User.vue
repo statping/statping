@@ -13,9 +13,9 @@
                 <input v-model="user.username" type="text" class="form-control" id="username" placeholder="Username" required autocorrect="off" autocapitalize="none" v-bind:readonly="user.id">
             </div>
             <div class="col-6 col-md-4">
-                  <span @click="user.admin = !!user.admin" class="switch">
-                    <input v-model="user.admin" type="checkbox" class="switch" id="switch-normal" v-bind:checked="user.admin">
-                    <label for="switch-normal">Administrator</label>
+                  <span id="admin_switch" @click="user.admin = !!user.admin" class="switch">
+                    <input v-model="user.admin" type="checkbox" class="switch" id="user_admin_switch" v-bind:checked="user.admin">
+                    <label for="user_admin_switch">Administrator</label>
                   </span>
             </div>
         </div>
@@ -39,11 +39,12 @@
         </div>
         <div class="form-group row">
             <div class="col-sm-12">
-                <button type="submit" @click="saveUser"
+                <LoadButton
+                        class="btn-primary"
                         :disabled="loading || !user.username || !user.email || !user.password || !user.confirm_password || (user.password !== user.confirm_password)"
-                        class="btn btn-block" :class="{'btn-primary': !user.id, 'btn-secondary': user.id}">
-                    {{loading ? "Loading..." : user.id ? "Update User" : "Create User"}}
-                </button>
+                        :action="saveUser"
+                        :label="user.id ? 'Update User' : 'Create User'"
+                />
             </div>
         </div>
         <div class="alert alert-danger d-none" id="alerter" role="alert"></div>
@@ -54,10 +55,12 @@
 
 <script>
   import Api from "../API";
+  import LoadButton from "@/components/Elements/LoadButton";
 
   export default {
   name: 'FormUser',
-  props: {
+    components: {LoadButton},
+    props: {
     in_user: {
       type: Object
     },
@@ -89,8 +92,7 @@
       this.user = {}
       this.edit(false)
     },
-    async saveUser(e) {
-      e.preventDefault();
+    async saveUser() {
       this.loading = true
       if (this.user.id) {
         await this.updateUser()
@@ -103,8 +105,7 @@
       let user = this.user
       delete user.confirm_password
       await Api.user_create(user)
-      const users = await Api.users()
-      this.$store.commit('setUsers', users)
+      await this.update()
       this.user = {}
     },
     async updateUser() {
@@ -114,9 +115,12 @@
       }
       delete user.confirm_password
       await Api.user_update(user)
+      await this.update()
+      this.edit(false)
+    },
+    async update() {
       const users = await Api.users()
       this.$store.commit('setUsers', users)
-      this.edit(false)
     }
   }
 }

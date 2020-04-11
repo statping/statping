@@ -186,7 +186,7 @@ func (e *emailer) OnSuccess(s *services.Service) error {
 }
 
 // OnTest triggers when this notifier has been saved
-func (e *emailer) OnTest() error {
+func (e *emailer) OnTest() (string, error) {
 	testService := &services.Service{
 		Id:             1,
 		Name:           "Example Service",
@@ -201,14 +201,16 @@ func (e *emailer) OnTest() error {
 		LastResponse:   "<html>this is an example response</html>",
 		CreatedAt:      utils.Now().Add(-24 * time.Hour),
 	}
+	subject := fmt.Sprintf("Service %v is Back Online", testService.Name)
 	email := &emailOutgoing{
 		To:       e.Var2,
-		Subject:  fmt.Sprintf("Service %v is Back Online", testService.Name),
+		Subject:  subject,
 		Template: mainEmailTemplate,
 		Data:     testService,
 		From:     e.Var1,
 	}
-	return e.dialSend(email)
+	err := e.dialSend(email)
+	return subject, err
 }
 
 func (e *emailer) dialSend(email *emailOutgoing) error {

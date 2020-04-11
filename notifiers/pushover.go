@@ -52,34 +52,37 @@ var Pushover = &pushover{&notifications.Notification{
 }
 
 // Send will send a HTTP Post to the Pushover API. It accepts type: string
-func (t *pushover) sendMessage(message string) error {
+func (t *pushover) sendMessage(message string) (string, error) {
 	v := url.Values{}
 	v.Set("token", t.ApiSecret)
 	v.Set("user", t.ApiKey)
 	v.Set("message", message)
 	rb := strings.NewReader(v.Encode())
 
-	_, _, err := utils.HttpRequest(pushoverUrl, "POST", "application/x-www-form-urlencoded", nil, rb, time.Duration(10*time.Second), true)
+	content, _, err := utils.HttpRequest(pushoverUrl, "POST", "application/x-www-form-urlencoded", nil, rb, time.Duration(10*time.Second), true)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return err
+	return string(content), err
 }
 
 // OnFailure will trigger failing service
 func (t *pushover) OnFailure(s *services.Service, f *failures.Failure) error {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
-	return t.sendMessage(msg)
+	_, err := t.sendMessage(msg)
+	return err
 }
 
 // OnSuccess will trigger successful service
 func (t *pushover) OnSuccess(s *services.Service) error {
 	msg := fmt.Sprintf("Your service '%v' is currently online!", s.Name)
-	return t.sendMessage(msg)
+	_, err := t.sendMessage(msg)
+	return err
 }
 
 // OnTest will test the Pushover SMS messaging
-func (t *pushover) OnTest() error {
+func (t *pushover) OnTest() (string, error) {
 	msg := fmt.Sprintf("Testing the Pushover Notifier")
-	return t.sendMessage(msg)
+	content, err := t.sendMessage(msg)
+	return content, err
 }

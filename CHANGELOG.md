@@ -1,3 +1,9 @@
+# 0.90.25
+- Added string response on OnTest for Notifiers
+- Modified UI to show user the response for a Notifier.
+- Modified some Notifiers title's
+- Added more Cypress e2e testing
+
 # 0.90.24
 - Fixed login form from not showing
 

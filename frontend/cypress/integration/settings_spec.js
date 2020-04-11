@@ -27,7 +27,7 @@ context('Settings Tests', () => {
 
   it('should confirm notifiers are installed', () => {
     cy.visit('/dashboard/settings')
-    cy.get('#notifiers_tabs > a').should('have.length', 9)
+    cy.get('#notifiers_tabs > a').should('have.length', 10)
 
     cy.get('#api_key').should('not.have.value', '')
     cy.get('#api_secret').should('not.have.value', '')
@@ -36,7 +36,7 @@ context('Settings Tests', () => {
   it('should update Statping settings', () => {
     cy.visit('/dashboard/settings')
 
-    cy.get('#project').clear().type('Statping Cypress Tests')
+    cy.get('#project').clear().type('Statping Updated')
     cy.get('#description').clear().type('Statping can use Cypress e2e testing to make it more stable!')
     cy.get('#domain').clear().type('http://localhost:8888')
     cy.get('#footer').clear().type('Statping Custom Footer')
@@ -46,7 +46,7 @@ context('Settings Tests', () => {
   it('should confirm Statping settings', () => {
     cy.visit('/dashboard/settings')
 
-    cy.get('#project').should('have.value', 'Statping Cypress Tests')
+    cy.get('#project').should('have.value', 'Statping Updated')
     cy.get('#description').should('have.value', 'Statping can use Cypress e2e testing to make it more stable!')
     cy.get('#domain').should('have.value', 'http://localhost:8888')
     cy.get('#footer').should('have.value', 'Statping Custom Footer')
@@ -57,6 +57,13 @@ context('Settings Tests', () => {
   it('should confirm new Footer text', () => {
     cy.visit('/dashboard/settings')
     cy.get('.footer').should('contain', 'Statping Custom Footer')
+  })
+
+  it('should regenerate API Keys', () => {
+    cy.visit('/dashboard/settings')
+    cy.get('#regenkeys').click()
+    cy.get('#api_key').should('not.have.value', '')
+    cy.get('#api_secret').should('not.have.value', '')
   })
 
   it('should create Local Assets', () => {

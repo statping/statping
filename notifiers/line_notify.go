@@ -43,28 +43,31 @@ var LineNotify = &lineNotifier{&notifications.Notification{
 }
 
 // Send will send a HTTP Post with the Authorization to the notify-api.line.me server. It accepts type: string
-func (l *lineNotifier) sendMessage(message string) error {
+func (l *lineNotifier) sendMessage(message string) (string, error) {
 	v := url.Values{}
 	v.Set("message", message)
 	headers := []string{fmt.Sprintf("Authorization=Bearer %v", l.ApiSecret)}
-	_, _, err := utils.HttpRequest("https://notify-api.line.me/api/notify", "POST", "application/x-www-form-urlencoded", headers, strings.NewReader(v.Encode()), time.Duration(10*time.Second), true)
-	return err
+	content, _, err := utils.HttpRequest("https://notify-api.line.me/api/notify", "POST", "application/x-www-form-urlencoded", headers, strings.NewReader(v.Encode()), time.Duration(10*time.Second), true)
+	return string(content), err
 }
 
 // OnFailure will trigger failing service
 func (l *lineNotifier) OnFailure(s *services.Service, f *failures.Failure) error {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
-	return l.sendMessage(msg)
+	_, err := l.sendMessage(msg)
+	return err
 }
 
 // OnSuccess will trigger successful service
 func (l *lineNotifier) OnSuccess(s *services.Service) error {
 	msg := fmt.Sprintf("Service %s is online!", s.Name)
-	return l.sendMessage(msg)
+	_, err := l.sendMessage(msg)
+	return err
 }
 
 // OnTest triggers when this notifier has been saved
-func (l *lineNotifier) OnTest() error {
+func (l *lineNotifier) OnTest() (string, error) {
 	msg := fmt.Sprintf("Testing if Line Notifier is working!")
-	return l.sendMessage(msg)
+	_, err := l.sendMessage(msg)
+	return msg, err
 }

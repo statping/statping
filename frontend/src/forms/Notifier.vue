@@ -35,8 +35,13 @@
         </div>
     </div>
 
-        <div v-if="error" class="alert alert-danger col-12" role="alert">{{error}}</div>
-        <div v-if="success" class="alert alert-success col-12" role="alert">{{notifier.title}} appears to be working!</div>
+        <div v-if="error && !success" class="alert alert-danger col-12" role="alert">
+            {{error}}<p v-if="response">Response:<br>{{response}}</p>
+        </div>
+        <div v-if="success" class="alert alert-success col-12" role="alert">
+            {{notifier.title}} appears to be working!
+            <p v-if="response">Response:<br>{{response}}</p>
+        </div>
 
         <div class="card text-black-50 bg-white mb-3">
             <div class="card-body">
@@ -79,6 +84,7 @@ export default {
             loading: false,
             loadingTest: false,
             error: null,
+            response: null,
             success: false,
             saved: false,
             form: {},
@@ -130,6 +136,7 @@ export default {
             } else {
                 this.error = tested.error
             }
+            this.response = tested.response
             this.loadingTest = false
         },
     }
