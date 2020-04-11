@@ -27,8 +27,25 @@ context('Setup Process', () => {
 
   it('should be completely setup', () => {
     cy.request(`/api`).then((response) => {
-        expect(response.body).to.have.property('setup', true)
-        expect(response.body).to.have.property('domain', 'http://localhost:8888')
+      expect(response.body).to.have.property('setup', true)
+      expect(response.body).to.have.property('domain', 'http://localhost:8888')
+    })
+  })
+
+  it('should be able to Login', () => {
+    cy.visit('/login')
+    cy.get('#username').clear().type('admin')
+    cy.get('#password').clear().type('admin')
+    cy.get('button[type="submit"]').click()
+
+    cy.get('.navbar-brand').should('contain', 'Statping')
+    cy.getCookies()
+
+    cy.getCookies().should('have.length', 1)
+
+    cy.request(`/api`).then((response) => {
+      expect(response.body).to.have.property('admin', true)
+      expect(response.body).to.have.property('logged_in', true)
     })
   })
 

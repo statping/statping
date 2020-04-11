@@ -10,8 +10,8 @@
     "backend-test": "newman run -e ../dev/postman_environment.json --delay-request 500 ../dev/postman.json",
     "cypress:open": "cypress open",
     "cypress:test": "cypress run --browser chrome --record --key $CYPRESS_KEY",
-    "test": "start-server-and-test start http://localhost:8888/api cypress:test",
-    "start": "statping -port 8888 > /dev/null 2>&1"
+    "test": "start-server-and-test start http://localhost:8080/api cypress:test",
+    "start": "statping -port 8080 > /dev/null 2>&1"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free-solid": "^5.1.0-3",
