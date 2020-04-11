@@ -17,7 +17,6 @@ env:
     - DB_USER=travis
     - DB_PASS=
     - DB_DATABASE=test
-    - GO_ENV=test
     - STATPING_DIR=$GOPATH/src/github.com/statping/statping
 go: 1.14
 go_import_path: github.com/statping/statping
