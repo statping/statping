@@ -25,4 +25,11 @@ context('Setup Process', () => {
         cy.get('.group_header').should('have.length', 2)
     })
 
+  it('should be completely setup', () => {
+    cy.request(`/api`).then((response) => {
+        expect(response.body).to.have.property('setup', true)
+        expect(response.body).to.have.property('domain', 'http://localhost:8888')
+    })
+  })
+
 })
