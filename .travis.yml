@@ -27,6 +27,9 @@ install:
   - "go mod download"
   - "go mod verify"
   - "make test-deps yarn clean compile install"
+cache:
+  directories:
+    - "$GOPATH/src/github.com/statping/statping/frontend/node_modules"
 language: go
 addons:
   apt:
