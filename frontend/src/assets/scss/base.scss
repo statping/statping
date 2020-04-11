@@ -347,6 +347,7 @@ HTML,BODY {
   .card {
     background-color: $service-background;
     border: $service-border;
+    //box-shadow: 0px 2px 11px 1px rgba(0, 0, 0, 0.13);
   }
 
   .card-body {

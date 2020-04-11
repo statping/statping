@@ -48,12 +48,12 @@
 
                 <div class="row">
                     <div class="col-6 col-sm-6 mb-2 mb-sm-0 mt-2 mt-sm-0">
-                        <button @click.prevent="saveNotifier" type="submit" class="btn btn-block text-capitalize btn-primary">
+                        <button @click.prevent="saveNotifier" type="submit" class="btn btn-block text-capitalize btn-primary save-notifier">
                             <i class="fa fa-check-circle"></i> {{loading ? "Loading..." : saved ? "Saved" : "Save Settings"}}
                         </button>
                     </div>
                     <div class="col-6 col-sm-6 mb-2 mb-sm-0 mt-2 mt-sm-0">
-                        <button @click.prevent="testNotifier" class="btn btn-outline-dark btn-block text-capitalize"><i class="fa fa-vial"></i>
+                        <button @click.prevent="testNotifier" class="btn btn-outline-dark btn-block text-capitalize test-notifier"><i class="fa fa-vial"></i>
                             {{loadingTest ? "Loading..." : "Test Notifier"}}</button>
                     </div>
                 </div>

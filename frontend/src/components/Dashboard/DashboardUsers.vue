@@ -24,10 +24,10 @@
                 <td class="d-none d-md-table-cell">{{niceDate(user.updated_at)}}</td>
                 <td class="text-right">
                     <div class="btn-group">
-                        <a @click.prevent="editUser(user, edit)" class="btn btn-outline-secondary edit-user">
+                        <a @click.prevent="editUser(user, edit)" href="#" class="btn btn-outline-secondary edit-user">
                             <font-awesome-icon icon="user" /> Edit
                         </a>
-                        <a @click.prevent="deleteUser(user)" v-if="index !== 0" class="btn btn-danger delete-user">
+                        <a @click.prevent="deleteUser(user)" v-if="index !== 0" href="#" class="btn btn-danger delete-user">
                             <font-awesome-icon icon="times" />
                         </a>
                     </div>

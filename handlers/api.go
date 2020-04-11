@@ -81,6 +81,8 @@ func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	app.OAuth = c.OAuth
 	app.UseCdn = null.NewNullBool(c.UseCdn.Bool)
+	app.AllowReports = null.NewNullBool(c.AllowReports.Bool)
+	utils.SentryInit(nil, app.AllowReports.Bool)
 	err = app.Update()
 	returnJson(core.App, w, r)
 }

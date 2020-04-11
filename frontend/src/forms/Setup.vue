@@ -162,6 +162,7 @@
         return
       }
 
+      await this.$store.dispatch('loadCore')
       await this.$store.dispatch('loadRequired')
 
       this.loading = false

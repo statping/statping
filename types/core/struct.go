@@ -35,6 +35,7 @@ type Core struct {
 	Timezone      float32         `gorm:"column:timezone;default:-8.0" json:"timezone,omitempty"`
 	LoggedIn      bool            `gorm:"-" json:"logged_in"`
 	IsAdmin       bool            `gorm:"-" json:"admin"`
+	AllowReports  null.NullBool   `gorm:"column:allow_reports;default:false" json:"allow_reports"`
 	CreatedAt     time.Time       `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt     time.Time       `gorm:"column:updated_at" json:"updated_at"`
 	Started       time.Time       `gorm:"-" json:"started_on"`

@@ -31,7 +31,20 @@
             <small class="form-text text-muted">HTML is allowed inside the footer</small>
         </div>
 
-        <button @click.prevent="saveSettings" id="save_core" type="submit" class="btn btn-primary btn-block">Save Settings</button>
+        <div class="form-group row mt-3">
+            <label class="col-sm-10 col-form-label">Enable Error Reporting</label>
+            <div class="col-sm-2 float-right">
+                <span @click="core.allow_reports = !!core.allow_reports" class="switch" id="allow_report">
+                <input v-model="core.allow_reports" type="checkbox" name="allow_report" class="switch" id="switch_allow_report" :checked="core.allow_reports">
+                <label for="switch_allow_report"></label>
+              </span>
+            </div>
+            <div class="col-12">
+                <small>Help the Statping project out by sending anonymous error logs back to our server.</small>
+            </div>
+        </div>
+
+        <button @click.prevent="saveSettings" id="save_core" type="submit" class="btn btn-primary btn-block mt-3">Save Settings</button>
 
     </form>
 </template>

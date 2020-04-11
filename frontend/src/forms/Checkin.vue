@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-for="(checkin, i) in checkins" class="col-12 alert dim" role="alert">
+        <div v-for="(checkin, i) in checkins" class="col-12 alert alert-light" role="alert">
             <span class="badge badge-pill badge-info text-uppercase">{{checkin.name}}</span>
             <span class="float-right font-2">Last checkin {{ago(checkin.last_hit)}}</span>
             <span class="float-right font-2 mr-3">Check Every {{checkin.interval}} seconds</span>
@@ -13,7 +13,7 @@
             </span>
         </div>
 
-        <div class="col-12 alert dim">
+        <div class="col-12 alert alert-light">
             <form @submit.prevent="saveCheckin">
                 <div class="form-group row">
                     <div class="col-5">

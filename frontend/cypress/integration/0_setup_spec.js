@@ -19,6 +19,8 @@ context('Setup Process', () => {
 
     it('should have sample data', () => {
         cy.visit('/')
+      cy.get('#title').should('contain', 'Demo Tester')
+      cy.get('#description').should('contain', 'This is a test from Crypress!')
         cy.get('.card').should('have.length', 5)
         cy.get('.group_header').should('have.length', 2)
     })

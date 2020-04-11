@@ -30,12 +30,18 @@
       components: {
           ServiceInfo
       },
+    data() {
+        return {
+          visible: false
+        }
+    },
       computed: {
           services() {
               return this.$store.getters.services
           }
       },
       methods: {
+
           failuresLast24Hours() {
               let total = 0;
               this.services.map((s) => {

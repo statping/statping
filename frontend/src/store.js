@@ -27,7 +27,8 @@ export default new Vuex.Store({
             users: [],
             notifiers: [],
             checkins: [],
-            admin: false
+            admin: false,
+            user: false
         },
     getters: {
         hasAllData: state => state.hasAllData,
@@ -43,6 +44,7 @@ export default new Vuex.Store({
         checkins: state => state.checkins,
 
         isAdmin: state => state.admin,
+        isUser: state => state.user,
 
         servicesInOrder: state => state.services.sort((a, b) => a.order_id - b.order_id),
         servicesNoGroup: state => state.services.filter(g => g.group_id === 0).sort((a, b) => a.order_id - b.order_id),
@@ -96,6 +98,7 @@ export default new Vuex.Store({
             state.hasPublicData = bool
         },
         setCore (state, core) {
+          window.console.log('GETTING CORE')
             state.core = core
         },
         setToken (state, token) {
@@ -122,15 +125,23 @@ export default new Vuex.Store({
         setAdmin (state, admin) {
             state.admin = admin
         },
+        setUser (state, user) {
+          state.user = user
+        },
     },
     actions: {
         async getAllServices(context) {
             const services = await Api.services()
             context.commit("setServices", services);
         },
+      async loadCore(context) {
+        const core = await Api.core()
+        context.commit("setCore", core);
+        context.commit('setAdmin', core.admin)
+        context.commit('setCore', core)
+        context.commit('setUser', core.logged_in)
+      },
         async loadRequired(context) {
-            const core = await Api.core()
-            context.commit("setCore", core);
             const groups = await Api.groups()
             context.commit("setGroups", groups);
             const services = await Api.services()
@@ -138,19 +149,9 @@ export default new Vuex.Store({
             const messages = await Api.messages()
             context.commit("setMessages", messages)
             context.commit("setHasPublicData", true)
-            // if (core.logged_in) {
-            //     const notifiers = await Api.notifiers()
-            //     context.commit("setNotifiers", notifiers);
-            //     const users = await Api.users()
-            //     context.commit("setUsers", users);
-            //     const integrations = await Api.integrations()
-            //     context.commit("setIntegrations", integrations);
-            // }
             window.console.log('finished loading required data')
         },
         async loadAdmin(context) {
-            const core = await Api.core()
-            context.commit("setCore", core);
             const groups = await Api.groups()
             context.commit("setGroups", groups);
             const services = await Api.services()

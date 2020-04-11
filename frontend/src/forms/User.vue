@@ -84,6 +84,7 @@
     in_user() {
         let u = this.in_user
         u.password = null
+        u.password_confirm = null
         this.user = u
     }
   },

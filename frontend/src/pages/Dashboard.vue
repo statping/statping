@@ -1,7 +1,7 @@
 <template>
     <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
-        <TopNav :admin="$store.state.admin"/>
-        <router-view :admin="$store.state.admin"/>
+        <TopNav :admin="admin"/>
+        <router-view :admin="admin"/>
     </div>
 </template>
 
@@ -17,14 +17,23 @@
   data () {
       return {
           authenticated: false,
+          loaded: false,
       }
   },
-  async mounted() {
-      const core = await Api.core()
-      this.$store.commit('setAdmin', core.admin)
-      this.$store.commit('setCore', core)
+    computed: {
+      admin() {
+        return this.$store.getters.admin
+      },
+      user() {
+        return this.$store.getters.user
+      }
+    },
+    mounted() {
+      // if (!this.user || !this.admin) {
+      //   this.$router.push('/login')
+      // }
+    }
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

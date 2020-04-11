@@ -98,9 +98,13 @@ context('Services Tests', () => {
 
     it('should delete new services', () => {
         cy.visit('/dashboard/services')
+      cy.get('#services_list > tr').should('have.length', 10)
         cy.get('#services_list > tr').eq(0).find('a.btn-danger').click()
+      cy.get('#services_list > tr').should('have.length', 9)
         cy.get('#services_list > tr').eq(1).find('a.btn-danger').click()
+      cy.get('#services_list > tr').should('have.length', 8)
         cy.get('#services_list > tr').eq(2).find('a.btn-danger').click()
+      cy.get('#services_list > tr').should('have.length', 7)
         cy.get('#services_list > tr').eq(3).find('a.btn-danger').click()
         cy.get('#services_list > tr').should('have.length', 6)
     })

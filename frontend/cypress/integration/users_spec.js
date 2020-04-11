@@ -66,19 +66,6 @@ context('Users Tests', () => {
     cy.get('#users_table > tr').eq(2).contains('ADMIN')
   })
 
-  it('should confirm edit user', () => {
-    cy.visit('/dashboard/users')
-    cy.get('#users_table > tr').should('have.length', 3)
-    cy.get('#users_table > tr').eq(2).find('a.edit-user').click()
-    cy.get('#email').should('have.value', 'info@admin3.com')
-    cy.get('#email').clear().type('info@updated.com')
-    cy.get('#password').type('password123')
-    cy.get('#password_confirm').type('password123')
-    cy.get('button[type="submit"]').click()
-
-    cy.get('#users_table > tr').should('have.length', 3)
-  })
-
   it('should delete new users', () => {
     cy.visit('/dashboard/users')
     cy.get('#users_table > tr').should('have.length', 3)

@@ -1,7 +1,11 @@
+import Vue from "vue";
 import axios from 'axios'
+import * as Sentry from "@sentry/browser";
+import * as Integrations from "@sentry/integrations";
+const qs = require('querystring');
 
-const qs = require('querystring')
 const tokenKey = "statping_user";
+const errorReporter = "https://bed4d75404924cb3a799e370733a1b64@sentry.statping.com/3"
 
 class Api {
   constructor() {
@@ -9,7 +13,11 @@ class Api {
   }
 
   async core() {
-    return axios.get('api').then(response => (response.data))
+    const core = axios.get('api').then(response => (response.data))
+    if (core.allow_reports) {
+      await this.sentry_init()
+    }
+    return core
   }
 
   async core_save(obj) {
@@ -256,6 +264,13 @@ class Api {
 
   async allActions(...all) {
     await axios.all([all])
+  }
+
+  async sentry_init() {
+    Sentry.init({
+      dsn: errorReporter,
+      integrations: [new Integrations.Vue({Vue, attachProps: true})],
+    });
   }
 
 }

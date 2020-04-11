@@ -28,8 +28,7 @@ var (
 	verboseMode int
 	port        int
 	log         = utils.Log.WithField("type", "cmd")
-
-	confgs *configs.DbConfig
+	confgs      *configs.DbConfig
 )
 
 // parseFlags will parse the application flags
@@ -74,8 +73,6 @@ func main() {
 	go sigterm()
 
 	parseFlags()
-
-	utils.SentryInit(VERSION)
 
 	if err := source.Assets(); err != nil {
 		exit(err)
@@ -202,18 +199,14 @@ func InitApp() error {
 	if _, err := core.Select(); err != nil {
 		return err
 	}
-
 	if _, err := services.SelectAllServices(true); err != nil {
 		return err
 	}
-
 	go services.CheckServices()
-
 	notifiers.InitNotifiers()
-
+	go database.Maintenance()
+	utils.SentryInit(&VERSION, core.App.AllowReports.Bool)
 	core.App.Setup = true
 	core.App.Started = utils.Now()
-
-	go database.Maintenance()
 	return nil
 }

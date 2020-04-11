@@ -30,7 +30,13 @@ func Select() (*Core, error) {
 		return nil, db.Error()
 	}
 	App = &c
-	App.UseCdn = null.NewNullBool(os.Getenv("USE_CDN") == "true")
+
+	if os.Getenv("USE_CDN") == "true" {
+		App.UseCdn = null.NewNullBool(true)
+	}
+	if os.Getenv("ALLOW_REPORTS") == "true" {
+		App.AllowReports = null.NewNullBool(true)
+	}
 	return App, q.Error()
 }
 

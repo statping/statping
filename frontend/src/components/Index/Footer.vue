@@ -18,10 +18,6 @@
   components: {
     Dashboard
   },
-  props: {
-    version: String,
-    logged_in: Boolean
-  },
   computed: {
       core() {
         return this.$store.getters.core
