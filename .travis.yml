@@ -42,7 +42,6 @@ notifications:
 os:
   - linux
 script:
-  - "cd frontend && yarn test"
   - "travis_retry make clean test-ci"
   - "if [[ \"$TRAVIS_BRANCH\" == \"master\" && \"$TRAVIS_PULL_REQUEST\" = \"false\" ]]; then make coverage; fi"
 services:
