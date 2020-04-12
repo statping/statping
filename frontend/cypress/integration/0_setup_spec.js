@@ -2,6 +2,12 @@
 
 context('Setup Process', () => {
 
+  it('should be not be setup yet', () => {
+    cy.request(`/api`).then((response) => {
+      expect(response.body).to.have.property('setup', false)
+    })
+  })
+
   it('should setup Statping with SQLite', () => {
     cy.visit('/setup', {failOnStatusCode: false})
     cy.get('#db_connection').select('sqlite')
