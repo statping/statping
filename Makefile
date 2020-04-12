@@ -34,7 +34,7 @@ test: clean
 release: test-deps
 	wget -O statping.gpg $(SIGN_URL)
 	gpg --import statping.gpg
-	make build-all
+	make build-all upload_to_s3
 
 test-ci: clean compile test-deps
 	SASS=`which sass` go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
@@ -260,11 +260,10 @@ publish-dev:
 publish-homebrew:
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(PUBLISH_BODY) https://api.travis-ci.com/repo/statping%2Fhomebrew-statping/requests
 
-upload_to_s3:
-	aws s3 cp ./source/css $(ASSETS_BKT) --recursive --exclude "*" --include "*.css"
-	aws s3 cp ./source/js $(ASSETS_BKT) --recursive --exclude "*" --include "*.js"
-	aws s3 cp ./source/font $(ASSETS_BKT) --recursive --exclude "*" --include "*.eot" --include "*.svg" --include "*.woff" --include "*.woff2" --include "*.ttf" --include "*.css"
-	aws s3 cp ./source/scss $(ASSETS_BKT) --recursive --exclude "*" --include "*.scss"
+upload_to_s3: travis_s3_creds
+	aws s3 cp ./source/dist/css $(ASSETS_BKT) --recursive --exclude "*" --include "*.css"
+	aws s3 cp ./source/dist/js $(ASSETS_BKT) --recursive --exclude "*" --include "*.js"
+	aws s3 cp ./source/dist/scss $(ASSETS_BKT) --recursive --exclude "*" --include "*.scss"
 	aws s3 cp ./install.sh $(ASSETS_BKT)
 
 travis_s3_creds:
