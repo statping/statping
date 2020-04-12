@@ -8,7 +8,7 @@
     "DB_PASS": "password123",
     "GO_ENV": "production"
   },
-  "baseUrl": "http://localhost:8888/",
+  "baseUrl": "http://localhost:8080/",
   "chromeWebSecurity": false,
   "defaultCommandTimeout": 30000,
   "requestTimeout": 30000,
