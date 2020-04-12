@@ -64,28 +64,20 @@ export default {
             }
         }
     },
-      data() {
-          return {
-
-          }
-      },
       methods: {
           async updateOrder(value) {
               let data = [];
               value.forEach((s, k) => {
                   data.push({ service: s.id, order: k + 1 })
               });
-              const reorder = await Api.services_reorder(data)
-              window.console.log('reorder', reorder)
-              const services = await Api.services()
-              this.$store.commit('setServices', services)
+              await Api.services_reorder(data)
+              await this.update()
           },
           async deleteService(s) {
               let c = confirm(`Are you sure you want to delete '${s.name}'?`)
               if (c) {
                   await Api.service_delete(s.id)
-                  const services = await Api.services()
-                  this.$store.commit('setServices', services)
+                  await this.update()
               }
           },
           serviceGroup(s) {
@@ -95,6 +87,10 @@ export default {
               }
               return ""
           },
+          async update() {
+              const services = await Api.services()
+              this.$store.commit('setServices', services)
+          }
       }
   }
 </script>

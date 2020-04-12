@@ -1,7 +1,11 @@
+import Vue from "vue";
 import axios from 'axios'
+import * as Sentry from "@sentry/browser";
+import * as Integrations from "@sentry/integrations";
+const qs = require('querystring');
 
-const qs = require('querystring')
 const tokenKey = "statping_user";
+const errorReporter = "https://bed4d75404924cb3a799e370733a1b64@sentry.statping.com/3"
 
 class Api {
   constructor() {
@@ -9,7 +13,11 @@ class Api {
   }
 
   async core() {
-    return axios.get('api').then(response => (response.data))
+    const core = axios.get('api').then(response => (response.data))
+    if (core.allow_reports) {
+      await this.sentry_init()
+    }
+    return core
   }
 
   async core_save(obj) {
@@ -68,6 +76,10 @@ class Api {
     return axios.post('api/reorder/services', data).then(response => (response.data))
   }
 
+    async checkins() {
+        return axios.get('api/checkins').then(response => (response.data))
+    }
+
   async groups() {
     return axios.get('api/groups').then(response => (response.data))
   }
@@ -114,7 +126,7 @@ class Api {
   }
 
   async incident_update_delete(update) {
-    return axios.post('api/incidents/'+incident.id+'/updates', data).then(response => (response.data))
+    return axios.delete('api/incidents/'+update.incident+'/updates/'+update.id).then(response => (response.data))
   }
 
     async incidents_service(service) {
@@ -127,6 +139,14 @@ class Api {
 
     async incident_delete(incident) {
         return axios.delete('api/incidents/'+incident.id).then(response => (response.data))
+    }
+
+    async checkin_create(data) {
+        return axios.post('api/checkins', data).then(response => (response.data))
+    }
+
+    async checkin_delete(checkin) {
+        return axios.delete('api/checkins/'+checkin.api_key).then(response => (response.data))
     }
 
   async messages() {
@@ -244,6 +264,13 @@ class Api {
 
   async allActions(...all) {
     await axios.all([all])
+  }
+
+  async sentry_init() {
+    Sentry.init({
+      dsn: errorReporter,
+      integrations: [new Integrations.Vue({Vue, attachProps: true})],
+    });
   }
 
 }

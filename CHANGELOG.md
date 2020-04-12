@@ -1,7 +1,19 @@
+# 0.90.25
+- Added string response on OnTest for Notifiers
+- Modified UI to show user the response for a Notifier.
+- Modified some Notifiers title's
+- Added more Cypress e2e testing
+
+# 0.90.24
+- Fixed login form from not showing
+
 # 0.90.23
 - Added Incident Reporting
 - Added Cypress tests
 - Added Github and Google OAuth login (beta)
+- Added Delete All Failures
+- Added Checkin form
+- Added Pushover notifier
 
 # 0.90.22
 - Added range input types for integer form fields

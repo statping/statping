@@ -1,4 +1,4 @@
-name: ReleaseWorkflow
+name: ReleaseFrontendWorkflow
 
 on:
   release:
@@ -10,13 +10,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@master
-      - name: Create a Sentry release
+      - name: Create a Sentry Frontend release
         uses: tclindner/sentry-releases-action@v1.0.0
         env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_FRONTEND_AUTH_TOKEN }}
           SENTRY_URL: ${{ secrets.SENTRY_URL }}
           SENTRY_ORG: statping
-          SENTRY_PROJECT: backend
+          SENTRY_PROJECT: frontend
         with:
           tagName: ${{ github.ref }}
           environment: qa

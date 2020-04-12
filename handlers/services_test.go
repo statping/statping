@@ -23,11 +23,11 @@ func TestApiServiceRoutes(t *testing.T) {
 			Method:           "GET",
 			ExpectedContains: []string{`"name":"Google"`},
 			ExpectedStatus:   200,
-			ResponseLen:      5,
+			ResponseLen:      6,
 			BeforeTest:       SetTestENV,
 			FuncTest: func(t *testing.T) error {
 				count := len(services.Services())
-				if count != 5 {
+				if count != 6 {
 					return errors.Errorf("incorrect services count: %d", count)
 				}
 				return nil
@@ -39,11 +39,11 @@ func TestApiServiceRoutes(t *testing.T) {
 			Method:           "GET",
 			ExpectedContains: []string{`"name":"Google"`},
 			ExpectedStatus:   200,
-			ResponseLen:      4,
+			ResponseLen:      5,
 			BeforeTest:       UnsetTestENV,
 			FuncTest: func(t *testing.T) error {
 				count := len(services.Services())
-				if count != 5 {
+				if count != 6 {
 					return errors.Errorf("incorrect services count: %d", count)
 				}
 				return nil
@@ -59,7 +59,7 @@ func TestApiServiceRoutes(t *testing.T) {
 		},
 		{
 			Name:             "Statping Private Service 1",
-			URL:              "/api/services/2",
+			URL:              "/api/services/6",
 			Method:           "GET",
 			ExpectedContains: []string{`"error":"not authenticated"`},
 			ExpectedStatus:   200,
@@ -105,21 +105,18 @@ func TestApiServiceRoutes(t *testing.T) {
 			Name:           "Statping Service 1 Failure Data - 24 Hour",
 			URL:            "/api/services/1/failure_data" + startEndQuery + "&group=24h",
 			Method:         "GET",
-			ResponseLen:    4,
 			ExpectedStatus: 200,
 		},
 		{
 			Name:           "Statping Service 1 Failure Data - 12 Hour",
 			URL:            "/api/services/1/failure_data" + startEndQuery + "&group=12h",
 			Method:         "GET",
-			ResponseLen:    7,
 			ExpectedStatus: 200,
 		},
 		{
 			Name:           "Statping Service 1 Failure Data - 1 Hour",
 			URL:            "/api/services/1/failure_data" + startEndQuery + "&group=1h",
 			Method:         "GET",
-			ResponseLen:    73,
 			ExpectedStatus: 200,
 		},
 		{
@@ -140,7 +137,6 @@ func TestApiServiceRoutes(t *testing.T) {
 			Name:           "Statping Service 1 Failure Data",
 			URL:            "/api/services/1/failure_data" + startEndQuery,
 			Method:         "GET",
-			ResponseLen:    73,
 			ExpectedStatus: 200,
 		},
 		{
@@ -176,7 +172,7 @@ func TestApiServiceRoutes(t *testing.T) {
 			ExpectedContains: []string{`"status":"success","type":"service","method":"create"`, `"public":false`, `"group_id":1`},
 			FuncTest: func(t *testing.T) error {
 				count := len(services.Services())
-				if count != 6 {
+				if count != 7 {
 					return errors.Errorf("incorrect services count: %d", count)
 				}
 				return nil
@@ -238,7 +234,7 @@ func TestApiServiceRoutes(t *testing.T) {
 			ExpectedContains: []string{`"status":"success"`, `"method":"delete"`},
 			FuncTest: func(t *testing.T) error {
 				count := len(services.Services())
-				if count != 5 {
+				if count != 6 {
 					return errors.Errorf("incorrect services count: %d", count)
 				}
 				return nil

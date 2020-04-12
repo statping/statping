@@ -29,7 +29,7 @@ context('Groups Tests', () => {
     cy.visit('/dashboard/services')
     cy.get('.sortable_groups > tr').should('have.length', 3)
 
-    cy.get('.sortable_groups > tr').eq(0).contains('PRIVATE')
+    cy.get('.sortable_groups > tr').eq(0).contains('PUBLIC')
     cy.get('.sortable_groups > tr').eq(1).contains('PUBLIC')
     cy.get('.sortable_groups > tr').eq(2).contains('PRIVATE')
   })
@@ -48,17 +48,28 @@ context('Groups Tests', () => {
     cy.get('button[type="submit"]').click()
   })
 
+  it('should edit Group', () => {
+    cy.visit('/dashboard/services')
+    cy.get('.sortable_groups > tr').eq(0).find('.btn-outline-secondary').click()
+    cy.get('#title').should('have.value', 'Test Group')
+    cy.get('#title').clear().type('Updated Group')
+    cy.get('button[type="submit"]').click()
+
+    cy.get('.sortable_groups > tr').eq(0).contains('Updated Group')
+  })
+
   it('should confirm new groups', () => {
     cy.visit('/dashboard/services')
     cy.get('.sortable_groups > tr').should('have.length', 5)
 
     cy.get('.sortable_groups > tr').eq(0).contains('PUBLIC')
-    cy.get('.sortable_groups > tr').eq(0).contains('Test Group')
+    cy.get('.sortable_groups > tr').eq(0).contains('Updated Group')
     cy.get('.sortable_groups > tr').eq(1).contains('PRIVATE')
     cy.get('.sortable_groups > tr').eq(1).contains('Test Private Group')
   })
 
     it('should delete new groups', () => {
+      cy.visit('/dashboard/services')
         cy.get('.sortable_groups > tr').eq(0).find('.btn-danger').click()
         cy.get('.sortable_groups > tr').eq(1).find('.btn-danger').click()
         cy.get('.sortable_groups > tr').should('have.length', 3)

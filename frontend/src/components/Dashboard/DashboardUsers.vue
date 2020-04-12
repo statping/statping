@@ -14,15 +14,22 @@
             </thead>
             <tbody id="users_table">
 
-            <tr v-for="(user, index) in $store.getters.users" v-bind:key="index" >
+            <tr v-for="(user, index) in users" v-bind:key="user.id" >
                 <td>{{user.username}}</td>
-                <td v-if="user.admin"><span class="badge badge-danger">ADMIN</span></td>
-                <td v-if="!user.admin"><span class="badge badge-primary">USER</span></td>
+                <td>
+                    <span class="badge" :class="{'badge-danger': user.admin, 'badge-primary': !user.admin}">
+                        {{user.admin ? 'ADMIN' : 'USER'}}
+                    </span>
+                </td>
                 <td class="d-none d-md-table-cell">{{niceDate(user.updated_at)}}</td>
                 <td class="text-right">
                     <div class="btn-group">
-                        <a @click.prevent="editUser(user, edit)" href="" class="btn btn-outline-secondary"><font-awesome-icon icon="user" /> Edit</a>
-                        <a @click.prevent="deleteUser(user)" v-if="index !== 0" href="" class="btn btn-danger"><font-awesome-icon icon="times" /></a>
+                        <a @click.prevent="editUser(user, edit)" href="#" class="btn btn-outline-secondary edit-user">
+                            <font-awesome-icon icon="user" /> Edit
+                        </a>
+                        <a @click.prevent="deleteUser(user)" v-if="index !== 0" href="#" class="btn btn-danger delete-user">
+                            <font-awesome-icon icon="times" />
+                        </a>
                     </div>
                 </td>
             </tr>
@@ -49,6 +56,11 @@
       user: {}
     }
   },
+      computed: {
+        users() {
+            return this.$store.getters.users
+        }
+      },
   methods: {
     editChange(v) {
       this.user = {}

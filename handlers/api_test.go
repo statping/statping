@@ -195,26 +195,6 @@ func TestMainApiRoutes(t *testing.T) {
 	}
 }
 
-//func TestExportSettings(t *testing.T) {
-//	data, err := ExportSettings()
-//	require.Nil(t, err)
-//	assert.Len(t, data, 50)
-//
-//	var exportData ExportData
-//	err = json.Unmarshal(data, &exportData)
-//	require.Nil(t, err)
-//
-//	assert.Len(t, exportData.Services, 4)
-//	assert.Len(t, exportData.Messages, 4)
-//	assert.Len(t, exportData.Checkins, 2)
-//	assert.Len(t, exportData.Groups, 1)
-//
-//	assert.Equal(t, "Updated Core", exportData.Core.Name)
-//	assert.True(t, exportData.Core.Setup)
-//	assert.NotEmpty(t, exportData.Core.ApiKey)
-//	assert.NotEmpty(t, exportData.Core.ApiSecret)
-//}
-
 type HttpFuncTest func(*testing.T) error
 
 // HTTPTest contains all the parameters for a HTTP Unit Test

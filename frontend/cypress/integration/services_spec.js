@@ -26,7 +26,7 @@ context('Services Tests', () => {
 
   it('should goto services', () => {
     cy.visit('/dashboard/services')
-    cy.get('#services_list > tr').should('have.length', 5)
+    cy.get('#services_list > tr').should('have.length', 6)
     cy.get('.sortable_groups > tr').should('have.length', 3)
   })
 
@@ -79,7 +79,7 @@ context('Services Tests', () => {
 
   it('should create new ICMP service', () => {
     cy.visit('/dashboard/create_service')
-      cy.get('#name').clear().type('ICMP Service')
+    cy.get('#name').clear().type('ICMP Service')
     cy.get('#service_type').select('icmp')
     cy.get('#service_url').clear().type('8.8.8.8')
 
@@ -93,16 +93,20 @@ context('Services Tests', () => {
 
   it('should confirm new services', () => {
     cy.visit('/dashboard/services')
-      cy.get('#services_list > tr').should('have.length', 9)
+      cy.get('#services_list > tr').should('have.length', 10)
   })
 
     it('should delete new services', () => {
         cy.visit('/dashboard/services')
-        cy.get('#services_list > tr').eq(0).find('.btn-danger').click()
-        cy.get('#services_list > tr').eq(0).find('.btn-danger').click()
-        cy.get('#services_list > tr').eq(0).find('.btn-danger').click()
-        cy.get('#services_list > tr').eq(0).find('.btn-danger').click()
-        cy.get('#services_list > tr').should('have.length', 4)
+      cy.get('#services_list > tr').should('have.length', 10)
+        cy.get('#services_list > tr').eq(0).find('a.btn-danger').click()
+      cy.get('#services_list > tr').should('have.length', 9)
+        cy.get('#services_list > tr').eq(1).find('a.btn-danger').click()
+      cy.get('#services_list > tr').should('have.length', 8)
+        cy.get('#services_list > tr').eq(2).find('a.btn-danger').click()
+      cy.get('#services_list > tr').should('have.length', 7)
+        cy.get('#services_list > tr').eq(3).find('a.btn-danger').click()
+        cy.get('#services_list > tr').should('have.length', 6)
     })
 
 })

@@ -72,16 +72,18 @@ func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	notif := services.ReturnNotifier(notifer.Method)
-	err = notif.OnTest()
+	out, err := notif.OnTest()
 
 	resp := &notifierTestResp{
-		Success: err == nil,
-		Error:   err,
+		Success:  err == nil,
+		Response: out,
+		Error:    err,
 	}
 	returnJson(resp, w, r)
 }
 
 type notifierTestResp struct {
-	Success bool  `json:"success"`
-	Error   error `json:"error,omitempty"`
+	Success  bool   `json:"success"`
+	Response string `json:"response,omitempty"`
+	Error    error  `json:"error,omitempty"`
 }

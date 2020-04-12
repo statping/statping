@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/notifier"
@@ -61,23 +60,22 @@ func (d *discord) OnSuccess(s *services.Service) error {
 }
 
 // OnSave triggers when this notifier has been saved
-func (d *discord) OnTest() error {
+func (d *discord) OnTest() (string, error) {
 	outError := errors.New("Incorrect discord URL, please confirm URL is correct")
 	message := `{"content": "Testing the discord notifier"}`
 	contents, _, err := utils.HttpRequest(Discorder.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(message)), time.Duration(10*time.Second), true)
 	if string(contents) == "" {
-		return nil
+		return "", nil
 	}
 	var dtt discordTestJson
 	err = json.Unmarshal(contents, &dtt)
 	if err != nil {
-		return outError
+		return string(contents), outError
 	}
 	if dtt.Code == 0 {
-		return outError
+		return string(contents), outError
 	}
-	fmt.Println("discord: ", string(contents))
-	return nil
+	return string(contents), nil
 }
 
 type discordTestJson struct {

@@ -6,8 +6,8 @@
                 <div class="form-group row">
                     <label for="switch-gh-oauth" class="col-sm-4 col-form-label">OAuth Login Settings</label>
                     <div class="col-md-8 col-xs-12 mt-1">
-                        <span @click="internal_enabled = !!internal_enabled" class="switch float-left">
-                            <input v-model="internal_enabled" type="checkbox" class="switch" id="switch-local-oauth" :checked="internal_enabled">
+                        <span @click="oauth.internal_enabled = !!core.oauth.internal_enabled" class="switch float-left">
+                            <input v-model="oauth.internal_enabled" type="checkbox" class="switch" id="switch-local-oauth" :checked="oauth.internal_enabled">
                             <label for="switch-local-oauth">Use email/password Authentication</label>
                         </span>
                     </div>
@@ -15,7 +15,7 @@
                 <div class="form-group row">
                     <label for="whitelist_domains" class="col-sm-4 col-form-label">Whitelist Domains</label>
                     <div class="col-sm-8">
-                        <input v-model="oauth.oauth_domains" type="text" class="form-control" placeholder="domain.com" id="whitelist_domains">
+                        <input v-model="oauth.oauth.oauth_domains" type="text" class="form-control" placeholder="domain.com" id="whitelist_domains">
                     </div>
                 </div>
             </div>
@@ -28,20 +28,20 @@
                 <div class="form-group row mt-3">
                     <label for="github_client" class="col-sm-4 col-form-label">Github Client ID</label>
                     <div class="col-sm-8">
-                        <input v-model="oauth.gh_client_id" type="text" class="form-control" id="github_client" required>
+                        <input v-model="oauth.oauth.gh_client_id" type="text" class="form-control" id="github_client" required>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="github_secret" class="col-sm-4 col-form-label">Github Client Secret</label>
                     <div class="col-sm-8">
-                        <input v-model="oauth.gh_client_secret" type="text" class="form-control" id="github_secret" required>
+                        <input v-model="oauth.oauth.gh_client_secret" type="text" class="form-control" id="github_secret" required>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="switch-gh-oauth" class="col-sm-4 col-form-label">Enable Github Login</label>
                     <div class="col-md-8 col-xs-12 mt-1">
-                    <span @click="github_enabled = !!github_enabled" class="switch float-left">
-                        <input v-model="github_enabled" type="checkbox" class="switch" id="switch-gh-oauth" :checked="github_enabled">
+                    <span @click="oauth.github_enabled = !!oauth.github_enabled" class="switch float-left">
+                        <input v-model="oauth.github_enabled" type="checkbox" class="switch" id="switch-gh-oauth" :checked="oauth.github_enabled">
                         <label for="switch-gh-oauth"> </label>
                     </span>
                     </div>
@@ -49,7 +49,12 @@
                 <div class="form-group row">
                     <label for="gh_callback" class="col-sm-4 col-form-label">Callback URL</label>
                     <div class="col-sm-8">
-                        <input v-bind:value="`${$store.getters.core.domain}/oauth/github`" type="text" class="form-control" id="gh_callback" readonly>
+                        <div class="input-group">
+                            <input v-bind:value="`${core.domain}/oauth/github`" type="text" class="form-control" id="gh_callback" readonly>
+                            <div class="input-group-append copy-btn">
+                                <button @click.prevent="copy(`${core.domain}/oauth/github`)" class="btn btn-outline-secondary" type="button">Copy</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -81,9 +86,14 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="callback" class="col-sm-4 col-form-label">Callback URL</label>
+                    <label for="google_callback" class="col-sm-4 col-form-label">Callback URL</label>
                     <div class="col-sm-8">
-                        <input v-bind:value="`${$store.getters.core.domain}/oauth/google`" type="text" class="form-control" id="callback" readonly>
+                        <div class="input-group">
+                            <input v-bind:value="`${core.domain}/oauth/google`" type="text" class="form-control" id="google_callback" readonly>
+                            <div class="input-group-append copy-btn">
+                                <button @click.prevent="copy(`${core.domain}/oauth/google`)" class="btn btn-outline-secondary" type="button">Copy</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -124,13 +134,16 @@
                 <div class="form-group row">
                     <label for="slack_callback" class="col-sm-4 col-form-label">Callback URL</label>
                     <div class="col-sm-8">
-                        <input v-bind:value="`${$store.getters.core.domain}/oauth/slack`" type="text" class="form-control" id="slack_callback" readonly>
+                        <div class="input-group">
+                            <input v-bind:value="`${core.domain}/oauth/slack`" type="text" class="form-control" id="slack_callback" readonly>
+                            <div class="input-group-append copy-btn">
+                                <button @click.prevent="copy(`${core.domain}/oauth/slack`)" class="btn btn-outline-secondary" type="button">Copy</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        {{providers()}}
 
         <button class="btn btn-primary btn-block" @click.prevent="saveOAuth" type="submit">
             Save OAuth Settings
@@ -144,25 +157,34 @@
 
   export default {
       name: 'OAuth',
-    props: {
-      oauth: {
-          type: Object
-        }
-    },
-      data() {
-          return {
-            internal_enabled: this.$store.getters.core.oauth.oauth_providers.split(",").includes('local'),
-            google_enabled: this.$store.getters.core.oauth.oauth_providers.split(",").includes('google'),
-            github_enabled: this.$store.getters.core.oauth.oauth_providers.split(",").includes('github'),
-            slack_enabled: this.$store.getters.core.oauth.oauth_providers.split(",").includes('slack')
+      computed: {
+          oauth() {
+             return this.$store.getters.core.oauth
           }
       },
+      data() {
+          return {
+            internal_enabled: this.has('local'),
+            google_enabled: this.has('google'),
+            github_enabled: this.has('github'),
+            slack_enabled: this.has('slack')
+          }
+      },
+    mounted() {
+      window.console.log(this.core.oauth)
+    },
     beforeCreate() {
       // this.github_enabled = this.$store.getters.core.oauth.oauth_providers.split(",").includes('github')
       // const c = await Api.core()
       // this.auth = c.auth
     },
     methods: {
+        has(val) {
+          if (!this.core.oauth.oauth_providers) {
+            return false
+          }
+          return this.core.oauth.oauth_providers.split(",").includes(val)
+        },
         providers() {
           let providers = [];
           if (this.github_enabled) {
@@ -186,7 +208,6 @@
             await Api.core_save(c)
             const core = await Api.core()
             this.$store.commit('setCore', core)
-            this.core = core
           }
       }
   }

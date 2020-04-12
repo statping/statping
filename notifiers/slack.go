@@ -58,16 +58,16 @@ func (s *slack) sendSlack(msg string) error {
 	return nil
 }
 
-func (s *slack) OnTest() error {
+func (s *slack) OnTest() (string, error) {
 	contents, resp, err := utils.HttpRequest(s.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(`{"text":"testing message"}`)), time.Duration(10*time.Second), true)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer resp.Body.Close()
 	if string(contents) != "ok" {
-		return errors.New("the slack response was incorrect, check the URL")
+		return string(contents), errors.New("the slack response was incorrect, check the URL")
 	}
-	return nil
+	return string(contents), nil
 }
 
 // OnFailure will trigger failing service

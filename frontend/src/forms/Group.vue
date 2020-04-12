@@ -80,17 +80,19 @@
               const g = this.group
               const data = {name: g.name, public: g.public}
               await Api.group_create(data)
-              const groups = await Api.groups()
-              this.$store.commit('setGroups', groups)
+              await this.update()
               this.group = {}
           },
           async updateGroup() {
               const g = this.group
               const data = {id: g.id, name: g.name, public: g.public}
               await Api.group_update(data)
+              await this.update()
+              this.edit(false)
+          },
+          async update() {
               const groups = await Api.groups()
               this.$store.commit('setGroups', groups)
-              this.edit(false)
           }
       }
   }

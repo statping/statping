@@ -51,7 +51,7 @@ var Telegram = &telegram{&notifications.Notification{
 }
 
 // Send will send a HTTP Post to the Telegram API. It accepts type: string
-func (t *telegram) sendMessage(message string) error {
+func (t *telegram) sendMessage(message string) (string, error) {
 	apiEndpoint := fmt.Sprintf("https://api.telegram.org/bot%v/sendMessage", t.ApiSecret)
 
 	v := url.Values{}
@@ -65,27 +65,30 @@ func (t *telegram) sendMessage(message string) error {
 	if !success {
 		errorOut := telegramError(contents)
 		out := fmt.Sprintf("Error code %v - %v", errorOut.ErrorCode, errorOut.Description)
-		return errors.New(out)
+		return string(contents), errors.New(out)
 	}
-	return err
+	return string(contents), err
 }
 
 // OnFailure will trigger failing service
 func (t *telegram) OnFailure(s *services.Service, f *failures.Failure) error {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
-	return t.sendMessage(msg)
+	_, err := t.sendMessage(msg)
+	return err
 }
 
 // OnSuccess will trigger successful service
 func (t *telegram) OnSuccess(s *services.Service) error {
 	msg := fmt.Sprintf("Your service '%v' is currently online!", s.Name)
-	return t.sendMessage(msg)
+	_, err := t.sendMessage(msg)
+	return err
 }
 
 // OnTest will test the Twilio SMS messaging
-func (t *telegram) OnTest() error {
+func (t *telegram) OnTest() (string, error) {
 	msg := fmt.Sprintf("Testing the Twilio SMS Notifier on your Statping server")
-	return t.sendMessage(msg)
+	content, err := t.sendMessage(msg)
+	return content, err
 }
 
 func telegramSuccess(res []byte) (bool, telegramResponse) {

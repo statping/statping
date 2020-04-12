@@ -8,11 +8,6 @@ import (
 	"net/http"
 )
 
-func apiAllIncidentsHandler(w http.ResponseWriter, r *http.Request) {
-	inc := incidents.All()
-	returnJson(inc, w, r)
-}
-
 func apiServiceIncidentsHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	incids := incidents.FindByService(utils.ToInt(vars["id"]))

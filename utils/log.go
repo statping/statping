@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/fatih/structs"
 	"github.com/getsentry/sentry-go"
+	"github.com/prometheus/common/log"
 	Logger "github.com/sirupsen/logrus"
 	"github.com/statping/statping/types/null"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -16,12 +17,13 @@ import (
 )
 
 var (
-	Log         = Logger.StandardLogger()
-	ljLogger    *lumberjack.Logger
-	LastLines   []*logRow
-	LockLines   sync.Mutex
-	VerboseMode int
-	version     string
+	Log          = Logger.StandardLogger()
+	ljLogger     *lumberjack.Logger
+	LastLines    []*logRow
+	LockLines    sync.Mutex
+	VerboseMode  int
+	version      string
+	allowReports bool
 )
 
 const (
@@ -29,22 +31,32 @@ const (
 	errorReporter = "https://ddf2784201134d51a20c3440e222cebe@sentry.statping.com/4"
 )
 
-func SentryInit(v string) {
-	if v == "" {
-		v = "development"
+func SentryInit(v *string, allow bool) {
+	allowReports = allow
+	if v != nil {
+		if *v == "" {
+			*v = "development"
+		}
+		version = *v
 	}
-	version = v
-	errorEnv := Getenv("GO_ENV", "production").(string)
-	if err := sentry.Init(sentry.ClientOptions{
-		Dsn:         errorReporter,
-		Environment: errorEnv,
-		Release:     v,
-	}); err != nil {
-		Log.Errorln(err)
+	goEnv := Getenv("GO_ENV", "production").(string)
+	allowReports := Getenv("ALLOW_REPORTS", false).(bool)
+	if allowReports || allow {
+		if err := sentry.Init(sentry.ClientOptions{
+			Dsn:         errorReporter,
+			Environment: goEnv,
+			Release:     version,
+		}); err != nil {
+			log.Errorln(err)
+		}
+		Log.Infoln("Error Reporting initiated, thank you!")
 	}
 }
 
 func SentryErr(err error) {
+	if !allowReports {
+		return
+	}
 	sentry.CaptureException(err)
 }
 
@@ -63,7 +75,7 @@ type hook struct {
 
 func (t *hook) Fire(e *Logger.Entry) error {
 	pushLastLine(e.Message)
-	if e.Level == Logger.ErrorLevel {
+	if e.Level == Logger.ErrorLevel && allowReports {
 		SentryLogEntry(e)
 	}
 	return nil

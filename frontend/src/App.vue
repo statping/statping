@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <router-view :app="app" :loaded="loaded"/>
-      <Footer :logged_in="logged_in" :version="version" v-if="$route.path !== '/setup'"/>
+    <router-view :loaded="loaded"/>
+      <Footer v-if="$route.path !== '/setup'"/>
   </div>
 </template>
 
@@ -18,35 +18,38 @@
     return {
       loaded: false,
         version: "",
-        logged_in: false,
-        app: null
     }
   },
-  async created() {
-      this.app = await this.$store.dispatch('loadRequired')
+      computed: {
+          core() {
+            return this.$store.getters.core
+          }
+      },
+  async beforeMount() {
+    await this.$store.dispatch('loadCore')
 
-      this.app = {...this.$store.state}
-
-    if (this.$store.getters.core.logged_in) {
-      await this.$store.dispatch('loadAdmin')
-    }
-      this.loaded = true
-      if (!this.$store.getters.core.setup) {
+      if (!this.core.setup) {
         this.$router.push('/setup')
       }
-      window.console.log('finished loadRequired')
+    if (this.$route.path !== '/setup') {
+      if (this.core.logged_in) {
+        await this.$store.dispatch('loadAdmin')
+      } else {
+        await this.$store.dispatch('loadRequired')
+      }
+      this.loaded = true
+    }
+
+
   },
     async mounted() {
           if (this.$route.path !== '/setup') {
               const tk = localStorage.getItem("statping_user")
-              if (this.$store.getters.core.logged_in) {
+              if (this.core.logged_in) {
                 this.logged_in = true
                   await this.$store.dispatch('loadAdmin')
               }
           }
-    },
-    methods: {
-
     }
 }
 </script>

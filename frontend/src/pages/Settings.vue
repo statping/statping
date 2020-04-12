@@ -21,8 +21,8 @@
                     <h6 class="mt-4 text-muted">Notifiers</h6>
 
                     <div id="notifiers_tabs">
-                        <a v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="`${notifier.method}_${index}`" @click.prevent="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" data-toggle="pill" v-bind:href="`#v-pills-${notifier.method.toLowerCase()}`" role="tab" v-bind:aria-controls="`v-pills-${notifier.method.toLowerCase()}`" aria-selected="false">
-                            <font-awesome-icon :icon="iconName(notifier.icon)" class="mr-2"/> {{notifier.method}}
+                        <a v-for="(notifier, index) in notifiers" v-bind:key="`${notifier.method}_${index}`" @click.prevent="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" data-toggle="pill" v-bind:href="`#v-pills-${notifier.method.toLowerCase()}`" role="tab" v-bind:aria-controls="`v-pills-${notifier.method.toLowerCase()}`" aria-selected="false">
+                            <font-awesome-icon :icon="iconName(notifier.icon)" class="mr-2"/> {{notifier.title}}
                             <span v-if="notifier.enabled" class="badge badge-pill float-right mt-1" :class="{'badge-success': !liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), 'badge-light': liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), 'text-dark': liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}">ON</span>
                         </a>
                     </div>
@@ -60,10 +60,9 @@
                         <div class="card text-black-50 bg-white">
                             <div class="card-header">Statping Settings</div>
                             <div class="card-body">
-                                <CoreSettings :in_core="core"/>
+                                <CoreSettings/>
                             </div>
                         </div>
-
 
                         <div class="card text-black-50 bg-white mt-3">
                             <div class="card-header">API Settings</div>
@@ -73,7 +72,7 @@
                                     <div class="col-sm-9">
                                         <div class="input-group">
                                         <input v-model="core.api_key" type="text" class="form-control" id="api_key" readonly>
-                                            <div class="input-group-append">
+                                            <div class="input-group-append copy-btn">
                                                 <button @click.prevent="copy(core.api_key)" class="btn btn-outline-secondary" type="button">Copy</button>
                                             </div>
                                         </div>
@@ -86,12 +85,12 @@
                                     <div class="col-sm-9">
                                         <div class="input-group">
                                         <input v-model="core.api_secret" @focus="$event.target.select()" type="text" class="form-control select-input" id="api_secret" readonly>
-                                            <div class="input-group-append">
+                                            <div class="input-group-append copy-btn">
                                                 <button @click="copy(core.api_secret)" class="btn btn-outline-secondary" type="button">Copy</button>
                                             </div>
                                         </div>
                                         <small class="form-text text-muted">API Secret is used for read, create, update and delete routes</small>
-                                        <small class="form-text text-muted">You can <a href="#" @click="renewApiKeys">Regenerate API Keys</a> if you need to.</small>
+                                        <small class="form-text text-muted">You can <a href="#" id="regenkeys" @click="renewApiKeys">Regenerate API Keys</a> if you need to.</small>
                                     </div>
                                 </div>
                             </div>
@@ -112,7 +111,7 @@
                         <div class="card text-black-50 bg-white mb-5">
                             <div class="card-header">Theme Editor</div>
                             <div class="card-body">
-                                <ThemeEditor :core="core"/>
+                                <ThemeEditor/>
                             </div>
                         </div>
                     </div>
@@ -127,10 +126,10 @@
                     </div>
 
                     <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-oauth-tab'), show: liClass('v-pills-oauth-tab')}" id="v-pills-oauth" role="tabpanel" aria-labelledby="v-pills-oauth-tab">
-                        <OAuth :oauth="core.oauth"/>
+                        <OAuth/>
                     </div>
 
-                    <div v-for="(notifier, index) in $store.getters.notifiers" v-bind:key="`${notifier.title}_${index}`" class="tab-pane fade" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), show: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" role="tabpanel" v-bind:aria-labelledby="`v-pills-${notifier.method.toLowerCase()}-tab`">
+                    <div v-for="(notifier, index) in notifiers" v-bind:key="`${notifier.method}_${index}`" class="tab-pane fade" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), show: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" role="tabpanel" v-bind:aria-labelledby="`v-pills-${notifier.method.toLowerCase()}-tab`">
                         <Notifier :notifier="notifier"/>
                     </div>
 
@@ -167,19 +166,23 @@
               tab: "v-pills-home-tab",
               qrcode: "",
               qrurl: "",
-              core: this.$store.getters.core
+          }
+      },
+      computed: {
+          core() {
+              return this.$store.getters.core
+          },
+          notifiers() {
+              return this.$store.getters.notifiers
           }
       },
       async mounted() {
           this.cache = await Api.cache()
       },
       async created() {
-          const c = this.$store.state.core
+          const c = this.core
           this.qrurl = `statping://setup?domain=${c.domain}&api=${c.api_secret}`
           this.qrcode = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=" + encodeURI(this.qrurl)
-      },
-      async beforeMount() {
-        this.core = await Api.core()
       },
       methods: {
           changeTab(e) {

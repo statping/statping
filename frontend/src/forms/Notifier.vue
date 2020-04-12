@@ -35,20 +35,25 @@
         </div>
     </div>
 
-        <div v-if="error" class="alert alert-danger col-12" role="alert">{{error}}</div>
-        <div v-if="success" class="alert alert-success col-12" role="alert">{{notifier.title}} appears to be working!</div>
+        <div v-if="error && !success" class="alert alert-danger col-12" role="alert">
+            {{error}}<p v-if="response">Response:<br>{{response}}</p>
+        </div>
+        <div v-if="success" class="alert alert-success col-12" role="alert">
+            {{notifier.title}} appears to be working!
+            <p v-if="response">Response:<br>{{response}}</p>
+        </div>
 
         <div class="card text-black-50 bg-white mb-3">
             <div class="card-body">
 
                 <div class="row">
                     <div class="col-6 col-sm-6 mb-2 mb-sm-0 mt-2 mt-sm-0">
-                        <button @click.prevent="saveNotifier" type="submit" class="btn btn-block text-capitalize btn-primary">
+                        <button @click.prevent="saveNotifier" type="submit" class="btn btn-block text-capitalize btn-primary save-notifier">
                             <i class="fa fa-check-circle"></i> {{loading ? "Loading..." : saved ? "Saved" : "Save Settings"}}
                         </button>
                     </div>
                     <div class="col-6 col-sm-6 mb-2 mb-sm-0 mt-2 mt-sm-0">
-                        <button @click.prevent="testNotifier" class="btn btn-outline-dark btn-block text-capitalize"><i class="fa fa-vial"></i>
+                        <button @click.prevent="testNotifier" class="btn btn-outline-dark btn-block text-capitalize test-notifier"><i class="fa fa-vial"></i>
                             {{loadingTest ? "Loading..." : "Test Notifier"}}</button>
                     </div>
                 </div>
@@ -79,6 +84,7 @@ export default {
             loading: false,
             loadingTest: false,
             error: null,
+            response: null,
             success: false,
             saved: false,
             form: {},
@@ -130,6 +136,7 @@ export default {
             } else {
                 this.error = tested.error
             }
+            this.response = tested.response
             this.loadingTest = false
         },
     }

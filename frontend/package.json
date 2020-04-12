@@ -9,9 +9,9 @@
     "lint": "vue-cli-service lint",
     "backend-test": "newman run -e ../dev/postman_environment.json --delay-request 500 ../dev/postman.json",
     "cypress:open": "cypress open",
-    "cypress:test": "cypress run --record --key 49d99e5e-04c6-46df-beef-54b68e152a4d",
-    "test": "start-server-and-test start http://0.0.0.0:8888/api cypress:test",
-    "start": "statping -port 8888 > /dev/null 2>&1"
+    "cypress:test": "cypress run --browser chrome --record false --key $CYPRESS_KEY",
+    "test": "start-server-and-test start http://localhost:8080/api cypress:test",
+    "start": "statping -port 8080"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free-solid": "^5.1.0-3",

@@ -20,6 +20,7 @@ func InitNotifiers() {
 		Twilio,
 		Webhook,
 		Mobile,
+		Pushover,
 	)
 }
 

@@ -2,7 +2,7 @@
 
 import "../support/commands"
 
-context('Messages Tests', () => {
+context('Annoucements Tests', () => {
 
 
   beforeEach(() => {
@@ -41,6 +41,12 @@ context('Messages Tests', () => {
   it('should confirm new Message', () => {
     cy.visit('/dashboard/messages')
     cy.get('tbody > tr').should('have.length', 3)
+  })
+
+  it('should confirm delete Message', () => {
+    cy.visit('/dashboard/messages')
+    cy.get('tbody > tr').eq(0).find('.btn-danger').click()
+    cy.get('tbody > tr').should('have.length', 2)
   })
 
 })

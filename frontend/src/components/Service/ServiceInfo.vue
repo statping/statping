@@ -1,23 +1,28 @@
-<template v-if="service">
-    <div class="col-12 card mb-4" style="min-height: 280px;" :class="{'offline-card': !service.online}">
-        <div class="card-body p-3 p-md-1 pt-md-3 pb-md-1">
-            <h4 class="card-title mb-4">
+<template>
+    <div class="card mb-4" :class="{'offline-card': !service.online}">
+        <div class="card-title px-4 pt-3">
+            <h4 v-observe-visibility="setVisible">
                 <router-link :to="serviceLink(service)">{{service.name}}</router-link>
                 <span class="badge float-right" :class="{'badge-success': service.online, 'badge-danger': !service.online}">
-                    {{service.online ? "ONLINE" : "OFFLINE"}}
-                </span>
+                        {{service.online ? "ONLINE" : "OFFLINE"}}
+                    </span>
             </h4>
+        </div>
+
+        <div class="card-body p-3 p-md-1 pt-md-3 pb-md-1">
 
             <transition name="fade">
-            <div v-if="loaded && service.online" class="row pb-3">
-                <div class="col-md-6 col-sm-12 mt-2 mt-md-0 mb-3">
-                    <ServiceSparkLine :title="set2_name" subtitle="Latency Last 24 Hours" :series="set2"/>
-                </div>
-                <div class="col-md-6 col-sm-12 mt-4 mt-md-0 mb-3">
-                    <ServiceSparkLine :title="set1_name" subtitle="Latency Last 7 Days" :series="set1"/>
+            <div v-if="loaded && service.online" class="col-12 pb-2">
+                <div class="row">
+                    <div class="col-md-6 col-sm-12 mt-2 mt-md-0 mb-3">
+                        <ServiceSparkLine :title="set2_name" subtitle="Latency Last 24 Hours" :series="set2"/>
+                    </div>
+                    <div class="col-md-6 col-sm-12 mt-4 mt-md-0 mb-3">
+                        <ServiceSparkLine :title="set1_name" subtitle="Latency Last 7 Days" :series="set1"/>
+                    </div>
                 </div>
 
-                <div class="d-none row col-12 mt-4 pt-1 mb-3 align-content-center">
+                <div v-if="false" class="row mt-4 pt-1 mb-3 align-content-center">
 
                     <StatsGen :service="service"
                               title="Since Yesterday"
@@ -44,19 +49,33 @@
                               group="24h" expression="latencyPercent"/>
                 </div>
 
-                    <div class="col-4">
-                        <button @click.prevent="Tab('incident')" class="btn btn-block btn-outline-secondary incident" :class="{'text-white btn-secondary': openTab==='incident'}" >Incidents</button>
-                    </div>
-                <div class="col-4">
+            </div>
+            </transition>
+        </div>
+
+        <div class="card-footer">
+            <div class="row">
+
+                <div class="col-3">
+                    <button @click.prevent="Tab('incident')" class="btn btn-block btn-outline-secondary incident" :class="{'text-white btn-secondary': openTab==='incident'}" >Incidents</button>
+                </div>
+                <div class="col-3">
                     <button @click.prevent="Tab('checkin')" class="btn btn-block btn-outline-secondary checkin" :class="{'text-white btn-secondary': openTab==='checkin'}" >Checkins</button>
                 </div>
-                <div class="col-4">
+                <div class="col-3">
                     <button @click.prevent="Tab('failures')" class="btn btn-block btn-outline-secondary failures" :disabled="service.stats.failures === 0" :class="{'text-white btn-secondary': openTab==='failures'}">
                         Failures <span class="badge badge-danger float-right mt-1">{{service.stats.failures}}</span></button>
+                </div>
+                <div class="col-3 pt-2">
+                    <span class="text-black-50 float-right">{{service.online_7_days}}% Uptime</span>
                 </div>
 
                 <div v-if="openTab === 'incident'" class="col-12 mt-4">
                     <FormIncident :service="service" />
+                </div>
+
+                <div v-if="openTab === 'checkin'" class="col-12 mt-4">
+                    <Checkin :service="service" />
                 </div>
 
                 <div v-if="openTab === 'failures'" class="col-12 mt-4">
@@ -66,8 +85,6 @@
                 </div>
 
             </div>
-            </transition>
-
         </div>
 
         <span v-for="(failure, index) in failures" v-bind:key="index" class="alert alert-light">
@@ -79,6 +96,7 @@
 </template>
 
 <script>
+  import Checkin from '../../forms/Checkin';
   import FormIncident from '../../forms/Incident';
   import FormMessage from '../../forms/Message';
   import ServiceFailures from './ServiceFailures';
@@ -89,6 +107,7 @@
   export default {
       name: 'ServiceInfo',
       components: {
+          Checkin,
           ServiceFailures,
           FormIncident,
           FormMessage,
@@ -109,17 +128,27 @@
               loaded: false,
               set1_name: "",
               set2_name: "",
-              failures: null
+              failures: null,
+            visible: false
           }
       },
-      async mounted() {
+    watch: {
+
+    },
+      methods: {
+        async setVisible(isVisible, entry) {
+          if (isVisible && !this.visible) {
+            await this.loadInfo()
+            this.visible = true
+          }
+        },
+        async loadInfo() {
           this.set1 = await this.getHits(24 * 7, "6h")
           this.set1_name = this.calc(this.set1)
           this.set2 = await this.getHits(24, "1h")
           this.set2_name = this.calc(this.set2)
           this.loaded = true
-      },
-      methods: {
+        },
         async deleteFailures() {
           const c = confirm('Are you sure you want to delete all failures?')
           if (c) {

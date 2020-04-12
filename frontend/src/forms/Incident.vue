@@ -8,11 +8,9 @@
             </button>
         </div>
                 <div class="card-body bg-light pt-3">
-
                     <div v-for="(update, i) in incident.updates" class="alert alert-light" role="alert">
                         <span class="badge badge-pill badge-info text-uppercase">{{update.type}}</span>
                         <span class="float-right font-2">{{ago(update.created_at)}} ago</span>
-
                         <span class="d-block mt-2">{{update.message}}
                         <button @click="delete_update(update)" type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -95,9 +93,9 @@
           await Api.incident_update_delete(update)
           this.incidents = await Api.incidents_service(this.service)
         },
-            async loadIncidents() {
-              this.incidents = await Api.incidents_service(this.service)
-            },
+        async loadIncidents() {
+          this.incidents = await Api.incidents_service(this.service)
+        },
           async createIncident() {
             await Api.incident_create(this.service, this.incident)
             await this.loadIncidents()
@@ -107,13 +105,13 @@
                 service: this.service.id,
             }
           },
-          async deleteIncident(incident) {
-              let c = confirm(`Are you sure you want to delete '${incident.title}'?`)
-              if (c) {
-                  await Api.incident_delete(incident)
-                await this.loadIncidents()
-              }
+      async deleteIncident(incident) {
+          let c = confirm(`Are you sure you want to delete '${incident.title}'?`)
+          if (c) {
+              await Api.incident_delete(incident)
+            await this.loadIncidents()
           }
+      }
   }
 }
 </script>
