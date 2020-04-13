@@ -2,7 +2,7 @@
 
 import "../support/commands"
 
-context('Annoucements Tests', () => {
+context('Announcements Tests', () => {
 
 
   beforeEach(() => {
