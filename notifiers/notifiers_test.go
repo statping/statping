@@ -63,7 +63,7 @@ func TestAllNotifiers(t *testing.T) {
 		err = n.Notifier.OnFailure(exampleService, exampleFailure)
 		assert.Nil(t, err)
 
-		err = n.Notifier.OnTest()
+		_, err = n.Notifier.OnTest()
 		assert.Nil(t, err)
 
 	}

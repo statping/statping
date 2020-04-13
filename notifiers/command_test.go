@@ -45,7 +45,7 @@ func TestCommandNotifier(t *testing.T) {
 	})
 
 	t.Run("Command Test", func(t *testing.T) {
-		err := Command.OnTest()
+		_, err := Command.OnTest()
 		assert.Nil(t, err)
 	})
 

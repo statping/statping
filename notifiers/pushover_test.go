@@ -54,7 +54,7 @@ func TestPushoverNotifier(t *testing.T) {
 	})
 
 	t.Run("Pushover Test", func(t *testing.T) {
-		err := Pushover.OnTest()
+		_, err := Pushover.OnTest()
 		assert.Nil(t, err)
 	})
 

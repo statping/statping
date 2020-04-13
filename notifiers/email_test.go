@@ -92,7 +92,7 @@ func TestEmailNotifier(t *testing.T) {
 	})
 
 	t.Run("email Test", func(t *testing.T) {
-		err := email.OnTest()
+		_, err := email.OnTest()
 		assert.Nil(t, err)
 	})
 
