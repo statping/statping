@@ -22,17 +22,12 @@ go: 1.14
 go_import_path: github.com/statping/statping
 install:
   - "npm install -g sass newman cross-env wait-on @sentry/cli"
-  - "pip install awscli"
+  - "pip install --user awscli"
   - "go get github.com/mattn/goveralls"
   - "go mod download"
   - "go mod verify"
   - "make test-deps yarn clean compile install"
 language: go
-addons:
-  chrome: stable
-  apt:
-    packages:
-      - libgconf-2-4
 matrix:
   allow_failures:
     - go: master
