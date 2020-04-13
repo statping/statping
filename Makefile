@@ -34,7 +34,7 @@ test: clean
 release: test-deps
 	wget -O statping.gpg $(SIGN_URL)
 	gpg --import statping.gpg
-	make build-all upload_to_s3
+	make build-all
 
 test-ci: clean compile test-deps
 	SASS=`which sass` go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
