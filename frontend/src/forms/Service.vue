@@ -156,10 +156,10 @@
                 <div class="form-group row">
                     <label class="col-sm-4 col-form-label">Enable Notifications</label>
                     <div class="col-8 mt-1">
-            <span @click="service.allow_notifications = !!service.allow_notifications" class="switch float-left">
-                <input v-model="service.allow_notifications" type="checkbox" name="allow_notifications-option" class="switch" id="switch-notifications" v-bind:checked="service.allow_notifications">
-                <label for="switch-notifications">Allow notifications to be sent for this service</label>
-            </span>
+                        <span @click="service.allow_notifications = !!service.allow_notifications" class="switch float-left">
+                            <input v-model="service.allow_notifications" type="checkbox" name="allow_notifications-option" class="switch" id="switch-notifications" v-bind:checked="service.allow_notifications">
+                            <label for="switch-notifications">Allow notifications to be sent for this service</label>
+                        </span>
                     </div>
                 </div>
                 <div v-if="service.allow_notifications"  class="form-group row">

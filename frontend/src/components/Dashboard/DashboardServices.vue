@@ -3,16 +3,17 @@
         <div class="card contain-card text-black-50 bg-white mb-4">
             <div class="card-header">Services
                 <router-link v-if="$store.state.admin" to="/dashboard/create_service" class="btn btn-sm btn-outline-success float-right">
-                <font-awesome-icon icon="plus"/>  Create
-            </router-link></div>
-            <div class="card-body">
+                    <font-awesome-icon icon="plus"/>  Create
+                </router-link>
+            </div>
+            <div class="card-body pt-0">
                 <ServicesList/>
             </div>
         </div>
 
         <div class="card contain-card text-black-50 bg-white mb-4">
             <div class="card-header">Groups</div>
-            <div class="card-body">
+            <div class="card-body pt-0">
         <table class="table">
             <thead>
             <tr>

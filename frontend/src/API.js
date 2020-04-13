@@ -56,6 +56,10 @@ class Api {
         return axios.get('api/services/' + id + '/failure_data?start=' + start + '&end=' + end + '&group=' + group + '&fill=' + fill).then(response => (response.data))
     }
 
+  async service_uptime(id) {
+    return axios.get('api/services/' + id + '/uptime_data').then(response => (response.data))
+  }
+
   async service_heatmap(id, start, end, group) {
     return axios.get('api/services/' + id + '/heatmap').then(response => (response.data))
   }
@@ -118,7 +122,7 @@ class Api {
   }
 
   async incident_updates(incident) {
-    return axios.post('api/incidents/'+incident.id+'/updates', data).then(response => (response.data))
+    return axios.get('api/incidents/'+incident.id+'/updates').then(response => (response.data))
   }
 
   async incident_update_create(update) {
@@ -129,12 +133,12 @@ class Api {
     return axios.delete('api/incidents/'+update.incident+'/updates/'+update.id).then(response => (response.data))
   }
 
-    async incidents_service(service) {
-        return axios.get('api/services/'+service.id+'/incidents').then(response => (response.data))
+    async incidents_service(id) {
+        return axios.get('api/services/'+id+'/incidents').then(response => (response.data))
     }
 
-    async incident_create(service, data) {
-        return axios.post('api/services/'+service.id+'/incidents', data).then(response => (response.data))
+    async incident_create(service_id, data) {
+        return axios.post('api/services/'+service_id+'/incidents', data).then(response => (response.data))
     }
 
     async incident_delete(incident) {

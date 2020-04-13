@@ -11,7 +11,7 @@
                         <div class="form-group">
                             <label>Database Connection</label>
                             <select @change="canSubmit" v-model="setup.db_connection" id="db_connection" class="form-control">
-                                <option value="sqlite">Sqlite</option>
+                                <option value="sqlite">SQLite</option>
                                 <option value="postgres">Postgres</option>
                                 <option value="mysql">MySQL</option>
                             </select>

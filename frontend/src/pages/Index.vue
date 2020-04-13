@@ -26,7 +26,7 @@
 
         <div class="col-12 full-col-12">
             <div v-for="(service, index) in services" :ref="service.id" v-bind:key="index">
-                <ServiceBlock :service=service />
+                <ServiceBlock :in_service=service />
             </div>
         </div>
 

@@ -1,27 +1,27 @@
 <template>
     <div class="row">
-        <div v-for="(incident, i) in incidents" class="col-12 mt-4">
-            <h5>Incident: {{incident.title}}<span class="font-2 float-right">{{niceDate(incident.created_at)}}</span></h5>
-            {{incident.description}}
-            <div class="row">
-                <div v-for="(update, i) in incident.updates.reverse()" v-bind:key="update.id" class="col-12 mt-3">
-                    <span class="col-2 badge text-uppercase" :class="badgeClass(update.type)">{{update.type}}</span>
-                    <span class="col-10">{{update.message}}</span>
-                    <span class="col-12 font-1 float-right text-black-50">{{ago(update.created_at)}} ago</span>
-                </div>
-            </div>
+        <div v-for="(incident, i) in incidents" class="col-12 mt-4 mb-3">
+            <span class="braker mt-1 mb-3"></span>
+            <h6>Incident: {{incident.title}}<span class="font-2 float-right">{{niceDate(incident.created_at)}}</span></h6>
+            <span class="font-2" v-html="incident.description"></span>
+
+            <UpdatesBlock :incident="incident"/>
+
         </div>
     </div>
 </template>
 
 <script>
 import Api from '../../API';
+import UpdatesBlock from "@/components/Index/UpdatesBlock";
 
 export default {
   name: 'IncidentsBlock',
-    props: {
+  components: {UpdatesBlock},
+  props: {
         service: {
-            type: Object
+            type: Object,
+            required: true
         }
     },
     data() {
@@ -43,9 +43,13 @@ export default {
               return "badge-danger"
           }
         },
-        async getIncidents() {
-            this.incidents = await Api.incidents_service(this.service)
-        }
+      async getIncidents() {
+        this.incidents = await Api.incidents_service(this.service.id)
+      },
+      async incident_updates(incident) {
+        await Api.incident_updates(incident).then((d) => {return d})
+        return o
+      }
     }
 }
 </script>

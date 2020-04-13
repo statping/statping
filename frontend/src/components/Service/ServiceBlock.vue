@@ -63,6 +63,7 @@
 </template>
 
 <script>
+import Api from '../../API';
 import Analytics from './Analytics';
 import ServiceChart from "./ServiceChart";
 import ServiceTopStats from "@/components/Service/ServiceTopStats";
@@ -72,13 +73,14 @@ export default {
     name: 'ServiceBlock',
     components: { Analytics, ServiceTopStats, ServiceChart},
     props: {
-        service: {
+        in_service: {
             type: Object,
             required: true
         },
     },
     data() {
         return {
+          timer_func: null,
             expanded: false,
             visible: false,
             dropDownMenu: false,
@@ -115,9 +117,21 @@ export default {
                     subtitle: "Last 7 Days",
                     value: 0,
                 }
-            }
+            },
+            track_service: null,
         }
     },
+  beforeDestroy() {
+    clearInterval(this.timer_func)
+  },
+  computed: {
+      service() {
+        return this.track_service
+      }
+  },
+  async created() {
+      this.track_service = this.in_service
+  },
     methods: {
         async showMoreStats() {
             this.expanded = !this.expanded;
@@ -142,6 +156,7 @@ export default {
             this.stats.low_ping.value = this.humanTime(pingData.low);
         },
         smallText(s) {
+          const incidents = s.incidents
             if (s.online) {
                 return `Online, last checked ${this.ago(s.last_success)}`
             } else {
@@ -155,6 +170,13 @@ export default {
         visibleChart(isVisible, entry) {
                 if (isVisible && !this.visible) {
                     this.visible = true
+
+                  if (!this.timer_func) {
+                    this.timer_func = setInterval(async () => {
+                      this.track_service = await Api.service(this.service.id)
+                      window.console.log(this.track_service.name)
+                    }, this.track_service.check_interval * 1000)
+                  }
                 }
         }
     }

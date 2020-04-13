@@ -26,7 +26,7 @@ type Service struct {
 	Domain              string              `gorm:"column:domain" json:"domain" private:"true" scope:"user,admin"`
 	Expected            null.NullString     `gorm:"column:expected" json:"expected" scope:"user,admin"`
 	ExpectedStatus      int                 `gorm:"default:200;column:expected_status" json:"expected_status" scope:"user,admin"`
-	Interval            int                 `gorm:"default:30;column:check_interval" json:"check_interval" scope:"user,admin"`
+	Interval            int                 `gorm:"default:30;column:check_interval" json:"check_interval"`
 	Type                string              `gorm:"column:check_type" json:"type" scope:"user,admin"`
 	Method              string              `gorm:"column:method" json:"method" scope:"user,admin"`
 	PostData            null.NullString     `gorm:"column:post_data" json:"post_data" scope:"user,admin"`

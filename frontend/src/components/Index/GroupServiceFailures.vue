@@ -4,8 +4,11 @@
             <div class="flex-fill service_day" v-for="(d, index) in failureData" :class="{'mini_error': d.amount > 0, 'mini_success': d.amount === 0}"></div>
         </div>
         <div class="row mt-2">
-            <div class="col-6 text-left font-2 text-muted">30 Days Ago</div>
-            <div class="col-6 text-right font-2 text-muted">Today</div>
+            <div class="col-4 text-left font-2 text-muted">30 Days Ago</div>
+            <div class="col-4 text-center font-2" :class="{'text-muted': service.online, 'text-danger': !service.online}">
+               {{service_txt}}
+            </div>
+            <div class="col-4 text-right font-2 text-muted">Today</div>
         </div>
     </div>
 </template>
@@ -28,6 +31,14 @@ export default {
           type: Object,
           required: true
       }
+  },
+  computed: {
+    service_txt() {
+      if (!this.service.online) {
+        return `Offline for ${this.ago(this.service.last_success)}`
+      }
+      return `${this.service.online_24_hours}% Uptime`
+    }
   },
     mounted () {
       this.lastDaysFailures()

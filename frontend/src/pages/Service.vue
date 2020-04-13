@@ -1,5 +1,5 @@
 <template>
-    <div v-if="service" class="container col-md-7 col-sm-12 mt-md-5 bg-light">
+    <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
 
         <div class="col-12 mb-4">
 
@@ -8,7 +8,7 @@
             </span>
 
             <h4 class="mt-2">
-                <router-link to="/" class="text-black-50 text-decoration-none">{{$store.getters.core.name}}</router-link> - <span class="text-muted">{{service.name}}</span>
+                <router-link to="/" class="text-black-50 text-decoration-none">{{core.name}}</router-link> - <span class="text-muted">{{service.name}}</span>
                 <span class="badge float-right d-none d-md-block" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
                     {{service.online ? "ONLINE" : "OFFLINE"}}
                 </span>
@@ -35,6 +35,11 @@
 
             <div class="service-chart-heatmap mt-5 mb-4">
                 <ServiceHeatmap :service="service"/>
+            </div>
+
+            <div v-if="load_timedata" class="col-12">
+
+                <apexchart width="100%" height="420" type="rangeBar" :options="timeRangeOptions" :series="rangeSeries"></apexchart>
             </div>
 
             <nav v-if="service.failures" class="nav nav-pills flex-column flex-sm-row mt-3" id="service_tabs">
@@ -132,7 +137,7 @@ export default {
     },
     data() {
         return {
-            id: this.$route.params.id,
+            id: 0,
             tab: "failures",
             authenticated: false,
             ready: true,
@@ -141,6 +146,8 @@ export default {
             failures: [],
             start_time: this.nowSubtract(84600 * 30),
             end_time: new Date(),
+            timedata: [],
+            load_timedata: false,
             dailyRangeOpts: {
                 chart: {
                     height: 500,
@@ -148,6 +155,45 @@ export default {
                     type: "area",
                 }
             },
+          timeRangeOptions: {
+            chart: {
+              height: 200,
+              type: 'rangeBar'
+            },
+            plotOptions: {
+              bar: {
+                horizontal: true,
+                distributed: true,
+                dataLabels: {
+                  hideOverflowingLabels: false
+                }
+              }
+            },
+            dataLabels: {
+              enabled: true,
+              formatter: (val, opts) => {
+                var label = opts.w.globals.labels[opts.dataPointIndex]
+                var a = this.parseISO(val[0])
+                var b = this.parseISO(val[1])
+                return label
+              },
+              style: {
+                colors: ['#f3f4f5', '#fff']
+              }
+            },
+            xaxis: {
+              type: 'datetime'
+            },
+            yaxis: {
+              show: false
+            },
+            grid: {
+              row: {
+                colors: ['#f3f4f5', '#fff'],
+                opacity: 1
+              }
+            }
+          },
             chartOptions: {
                 chart: {
                     events: {
@@ -268,24 +314,65 @@ export default {
         }
     },
     computed: {
-        service () {
-            return this.$store.getters.serviceByAll(this.id)
-        }
+      service () {
+        return this.$store.getters.serviceByAll(this.id)
+      },
+      core () {
+        return this.$store.getters.core
+      },
+      uptime_data() {
+          const data = this.timedata.series.filter(g => g.online)
+          const offData = this.timedata.series.filter(g => !g.online)
+          let arr = [];
+          data.forEach((d) => {
+            arr.push({
+              name: "Online", data: {
+                x: 'Online',
+                y: [
+                  new Date(d.start).getTime(),
+                  new Date(d.end).getTime()
+                ],
+                fillColor: '#0db407'
+              }
+            })
+          })
+          offData.forEach((d) => {
+            arr.push({
+              name: "offline", data: {
+                x: 'Offline',
+                y: [
+                  new Date(d.start).getTime(),
+                  new Date(d.end).getTime()
+                ],
+                fillColor: '#b40707'
+              }
+            })
+          })
+          return arr
+      },
+      rangeSeries() {
+        return [{data: this.time_chart_data}]
+      },
     },
     watch: {
-        service: function(n, o) {
-            this.chartHits()
-        }
+      service: function(n, o) {
+        this.chartHits()
+        this.fetchUptime()
+      },
+      load_timedata: function(n, o) {
+        this.chartHits()
+      }
     },
-    created() {
-
-    },
-    mounted() {
-
+    async created() {
+        this.id = this.$route.params.id;
     },
     methods: {
+      async fetchUptime() {
+         this.timedata = await Api.service_uptime(this.id)
+         this.load_timedata = true
+        },
         async get() {
-            const s = store.getters.serviceByAll(this.id)
+            const s = this.$store.getters.serviceByAll(this.id)
             window.console.log("service: ", s)
             this.getService(this.service)
             this.messages = this.$store.getters.serviceMessages(this.service.id)
@@ -295,13 +382,12 @@ export default {
             const end = this.isBetween(message.end_on, new Date())
             return start && end
         },
-        async getService(s) {
+        async getService() {
             await this.chartHits()
             await this.serviceFailures()
         },
         async serviceFailures() {
             let tt = this.startEndTimes()
-
             this.failures = await Api.service_failures(this.service.id, tt.start, tt.end)
         },
         async chartHits(start=0, end=99999999999, group="30m") {
