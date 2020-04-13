@@ -28,11 +28,6 @@ install:
   - "go mod verify"
   - "make test-deps yarn clean compile install"
 language: go
-addons:
-  chrome: stable
-  apt:
-    packages:
-      - libgconf-2-4
 matrix:
   allow_failures:
     - go: master
