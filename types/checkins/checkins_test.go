@@ -23,7 +23,7 @@ var testCheckin = &Checkin{
 
 var testCheckinHits = []*CheckinHit{{
 	Checkin:   1,
-	From:      "0.0.0.0.0",
+	From:      "0.0.0.0",
 	CreatedAt: utils.Now().Add(-30 * time.Second),
 }, {
 	Checkin:   2,
