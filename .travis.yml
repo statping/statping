@@ -10,6 +10,7 @@ before_script:
 branches:
   only:
     - master
+    - dev
 env:
   global:
     - "PATH=$HOME/.local/bin:$PATH"
