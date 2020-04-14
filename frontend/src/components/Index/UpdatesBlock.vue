@@ -1,9 +1,11 @@
 <template>
     <div class="row">
         <div v-for="(update, i) in updates" v-bind:key="i" class="col-12 mt-3">
-            <span class="col-2 badge text-uppercase" :class="badgeClass(update.type)">{{update.type}}</span>
-            <span class="col-10">{{update.message}}</span>
-            <span class="col-12 font-1 float-right text-black-50">{{ago(update.created_at)}} ago</span>
+            <div class="col-md-2 col-12">
+                <span class="badge text-uppercase" :class="badgeClass(update.type)">{{update.type}}</span>
+            </div>
+            <div class="col-md-12 col-12 mt-2 font-3">{{update.message}}</div>
+            <div class="col-12 font-1 float-right text-black-50 mt-2">{{ago(update.created_at)}} ago</div>
         </div>
     </div>
 </template>

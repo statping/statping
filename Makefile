@@ -27,8 +27,8 @@ lite: clean
 
 reup: down clean compose-build-full up
 
-test: clean
-	go test -v -p=4 -ldflags="-X main.VERSION=testing" -coverprofile=coverage.out ./...
+test: clean compile
+	go test -v -p=1 -ldflags="-X main.VERSION=testing" -coverprofile=coverage.out ./...
 
 # build all arch's and release Statping
 release: test-deps

@@ -76,9 +76,6 @@ func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 	if c.Domain != app.Domain {
 		app.Domain = c.Domain
 	}
-	if c.Timezone != app.Timezone {
-		app.Timezone = c.Timezone
-	}
 	app.OAuth = c.OAuth
 	app.UseCdn = null.NewNullBool(c.UseCdn.Bool)
 	app.AllowReports = null.NewNullBool(c.AllowReports.Bool)

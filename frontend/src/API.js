@@ -56,8 +56,8 @@ class Api {
         return axios.get('api/services/' + id + '/failure_data?start=' + start + '&end=' + end + '&group=' + group + '&fill=' + fill).then(response => (response.data))
     }
 
-  async service_uptime(id) {
-    return axios.get('api/services/' + id + '/uptime_data').then(response => (response.data))
+  async service_uptime(id, start, end) {
+    return axios.get('api/services/' + id + '/uptime_data?start=' + start + '&end=' + end).then(response => (response.data))
   }
 
   async service_heatmap(id, start, end, group) {

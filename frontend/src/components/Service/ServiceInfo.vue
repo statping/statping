@@ -67,23 +67,23 @@
         <div class="card-footer">
             <div class="row">
 
-                <div class="col-3">
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
                     <router-link :to="{path: `/dashboard/service/${service.id}/incidents`, params: {id: service.id} }" class="btn btn-block btn-white incident">
                         Incidents
                     </router-link>
                 </div>
-                <div class="col-3">
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
                     <router-link :to="{path: `/dashboard/service/${service.id}/checkins`, params: {id: service.id} }" class="btn btn-block btn-white checkins">
                         Checkins
                     </router-link>
                 </div>
-                <div class="col-3">
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
                     <router-link :to="{path: `/dashboard/service/${service.id}/failures`, params: {id: service.id} }" class="btn btn-block btn-white failures">
                         Failures <span class="badge badge-danger float-right mt-1">{{service.stats.failures}}</span>
                     </router-link>
                 </div>
-                <div class="col-3 pt-2">
-                    <span class="text-black-50 float-right">{{service.online_7_days}}% Uptime</span>
+                <div class="col-12 col-md-3 mb-2 mb-md-0 mt-0 mt-md-1">
+                    <span class="text-black-50 float-md-right">{{service.online_7_days}}% Uptime</span>
                 </div>
 
             </div>
@@ -155,13 +155,6 @@
           this.set2 = await this.getHits(24, "1h")
           this.set2_name = this.calc(this.set2)
           this.loaded = true
-        },
-        async deleteFailures() {
-          const c = confirm('Are you sure you want to delete all failures?')
-          if (c) {
-            await Api.service_failures_delete(this.service)
-            this.service = await Api.service(this.service.id)
-          }
         },
           Tab(name) {
               if (this.openTab === name) {

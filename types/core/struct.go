@@ -32,7 +32,6 @@ type Core struct {
 	Setup         bool            `gorm:"-" json:"setup"`
 	MigrationId   int64           `gorm:"column:migration_id" json:"migration_id,omitempty"`
 	UseCdn        null.NullBool   `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`
-	Timezone      float32         `gorm:"column:timezone;default:-8.0" json:"timezone,omitempty"`
 	LoggedIn      bool            `gorm:"-" json:"logged_in"`
 	IsAdmin       bool            `gorm:"-" json:"admin"`
 	AllowReports  null.NullBool   `gorm:"column:allow_reports;default:false" json:"allow_reports"`

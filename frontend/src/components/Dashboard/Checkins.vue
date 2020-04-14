@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import Api from "../API";
+import Api from "../../API";
 
 export default {
     name: 'Checkins',

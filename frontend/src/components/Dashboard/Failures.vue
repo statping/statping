@@ -1,8 +1,12 @@
 <template>
     <div class="col-12">
         <h2>{{service.name}} Failures
-        <span class="btn btn-outline-danger float-right">Delete All</span></h2>
+        <button v-if="failures.length>0" @click="deleteFailures" class="btn btn-outline-danger float-right">Delete All</button></h2>
     <div class="list-group mt-3 mb-4">
+
+        <div class="alert alert-info" v-if="failures.length===0">
+            You don't have any failures for {{service.name}}. Way to go!
+        </div>
 
         <div v-for="(failure, index) in failures" :key="index" class="mb-2 list-group-item list-group-item-action flex-column align-items-start">
             <div class="d-flex w-100 justify-content-between">
@@ -39,7 +43,7 @@
 </template>
 
 <script>
-import Api from "../API";
+import Api from "../../API";
 
 export default {
     name: 'Failures',
@@ -72,13 +76,21 @@ export default {
         await this.gotoPage(1)
       },
     methods: {
+      async deleteFailures() {
+        const c = confirm('Are you sure you want to delete all failures?')
+        if (c) {
+          await Api.service_failures_delete(this.service)
+          this.service = await Api.service(this.service.id)
+          this.total = 0
+          await this.load()
+        }
+      },
       async gotoPage(page) {
         this.page = page;
-
         this.offset = (page-1) * this.limit;
-
-        window.console.log('page', this.page, this.limit, this.offset);
-
+        await this.load()
+      },
+      async load() {
         this.failures = await Api.service_failures(this.service.id, 0, 9999999999, this.limit, this.offset)
       }
     }

@@ -49,12 +49,9 @@
                 </div>
 
                 <div class="col-md-4 col-6 float-right">
-                    <button v-if="!expanded" @click="showMoreStats" class="btn btn-sm float-right dyn-dark text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">View Service</button>
-                    <button v-if="expanded" @click="expanded = false" class="btn btn-sm float-right dyn-dark text-white" :class="{'btn-outline-success': service.online, 'bg-danger': !service.online}">Hide</button>
-                </div>
-
-                <div v-if="expanded" class="row">
-                    <Analytics title="Last Failure" value="417 Days ago"/>
+                    <button v-if="!expanded" @click="setService" class="btn btn-sm float-right dyn-dark text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
+                        View Service
+                    </button>
                 </div>
             </div>
 
@@ -133,6 +130,10 @@ export default {
       this.track_service = this.in_service
   },
     methods: {
+      async setService() {
+        await this.$store.commit('setService', this.service)
+        this.$router.push('/service/'+this.service.id, {props: {in_service: this.service}})
+      },
         async showMoreStats() {
             this.expanded = !this.expanded;
 
@@ -174,7 +175,6 @@ export default {
                   if (!this.timer_func) {
                     this.timer_func = setInterval(async () => {
                       this.track_service = await Api.service(this.service.id)
-                      window.console.log(this.track_service.name)
                     }, this.track_service.check_interval * 1000)
                   }
                 }

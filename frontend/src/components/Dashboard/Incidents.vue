@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import Api from "../API";
+import Api from "../../API";
 import FormIncidentUpdates from "@/forms/IncidentUpdates";
 
 export default {
