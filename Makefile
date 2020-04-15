@@ -3,7 +3,6 @@ SIGN_KEY=B76D61FAA6DB759466E83D9964B9C6AAE2D55278
 BINARY_NAME=statping
 GOBUILD=go build -a
 GOVERSION=1.14.0
-GO111MODULE="on"
 XGO=xgo -go $(GOVERSION) --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
 TRVIS_SECRET=O3/2KTOV8krv+yZ1EB/7D1RQRe6NdpFUEJNJkMS/ollYqmz3x2mCO7yIgIJKCKguLXZxjM6CxJcjlCrvUwibL+8BBp7xJe4XFIOrjkPvbbVPry4HkFZCf2GfcUK6o4AByQ+RYqsW2F17Fp9KLQ1rL3OT3eLTwCAGKx3tlY8y+an43zkmo5dN64V6sawx26fh6XTfww590ey+ltgQTjf8UPNup2wZmGvMo9Hwvh/bYR/47bR6PlBh6vhlKWyotKf2Fz1Bevbu0zc35pee5YlsrHR+oSF+/nNd/dOij34BhtqQikUR+zQVy9yty8SlmneVwD3yOENvlF+8roeKIXb6P6eZnSMHvelhWpAFTwDXq2N3d/FIgrQtLxsAFTI3nTHvZgs6OoTd6dA0wkhuIGLxaL3FOeztCdxP5J/CQ9GUcTvifh5ArGGwYxRxQU6rTgtebJcNtXFISP9CEUR6rwRtb6ax7h6f1SbjUGAdxt+r2LbEVEk4ZlwHvdJ2DtzJHT5DQtLrqq/CTUgJ8SJFMkrJMp/pPznKhzN4qvd8oQJXygSXX/gz92MvoX0xgpNeLsUdAn+PL9KketfR+QYosBz04d8k05E+aTqGaU7FUCHPTLwlOFvLD8Gbv0zsC/PWgSLXTBlcqLEz5PHwPVHTcVzspKj/IyYimXpCSbvu1YOIjyc=
@@ -161,7 +160,7 @@ build-bin:
 		do \
 			echo "Building $$os-$$arch"; \
 			mkdir -p releases/statping-$$os-$$arch/; \
-			GOOS=$$os GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-$$os-$$arch/statping ${PWD}/cmd; \
+			GO111MODULE="on" GOOS=$$os GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-$$os-$$arch/statping ${PWD}/cmd; \
 			chmod +x releases/statping-$$os-$$arch/statping; \
 			tar -czf releases/statping-$$os-$$arch.tar.gz -C releases/statping-$$os-$$arch statping; \
 		done \
@@ -174,7 +173,7 @@ build-win:
 	do \
 		echo "Building windows-$$arch"; \
 		mkdir -p releases/statping-windows-$$arch/; \
-		GOOS=windows GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-windows-$$arch/statping.exe ${PWD}/cmd; \
+		GO111MODULE="on" GOOS=windows GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-windows-$$arch/statping.exe ${PWD}/cmd; \
 		chmod +x releases/statping-windows-$$arch/statping.exe; \
 		zip -j releases/statping-windows-$$arch.zip releases/statping-windows-$$arch/statping.exe || true; \
 	done
