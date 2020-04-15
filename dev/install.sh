@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 OS=osx
 ARCH=x64
-REPO=github.com/hunterlong/statping
+REPO=github.com/statping/statping
 VERSION=$(curl -s "https://$REPO/releases/latest" | grep -o 'tag/[v.0-9]*' | awk -F/ '{print $2}')
 if [ `getconf LONG_BIT` = "64" ]
 then

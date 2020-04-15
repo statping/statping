@@ -111,6 +111,7 @@ func Router() *mux.Router {
 	api.Handle("/api/services/{id}/hits_data", cached("30s", "application/json", apiServiceDataHandler)).Methods("GET")
 	api.Handle("/api/services/{id}/failure_data", cached("30s", "application/json", apiServiceFailureDataHandler)).Methods("GET")
 	api.Handle("/api/services/{id}/ping_data", cached("30s", "application/json", apiServicePingDataHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/uptime_data", http.HandlerFunc(apiServiceTimeDataHandler)).Methods("GET")
 	//api.Handle("/api/services/{id}/heatmap", cached("30s", "application/json", apiServiceHeatmapHandler)).Methods("GET")
 
 	// API INCIDENTS Routes
@@ -120,7 +121,7 @@ func Router() *mux.Router {
 	api.Handle("/api/incidents/{id}", authenticated(apiDeleteIncidentHandler, false)).Methods("DELETE")
 
 	// API INCIDENTS UPDATES Routes
-	api.Handle("/api/incidents/{id}/updates", authenticated(apiIncidentUpdatesHandler, false)).Methods("GET")
+	api.Handle("/api/incidents/{id}/updates", http.HandlerFunc(apiIncidentUpdatesHandler)).Methods("GET")
 	api.Handle("/api/incidents/{id}/updates", authenticated(apiCreateIncidentUpdateHandler, false)).Methods("POST")
 	api.Handle("/api/incidents/{id}/updates/{uid}", authenticated(apiDeleteIncidentUpdateHandler, false)).Methods("DELETE")
 

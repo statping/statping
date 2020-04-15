@@ -1,12 +1,14 @@
 package users
 
 import (
-	"github.com/prometheus/common/log"
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/utils"
 )
 
-var db database.Database
+var (
+	db  database.Database
+	log = utils.Log.WithField("type", "user")
+)
 
 func SetDB(database database.Database) {
 	db = database.Model(&User{})

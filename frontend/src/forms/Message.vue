@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="card contain-card text-black-50 bg-white mb-5">
-        <div class="card-header">{{message.id ? `Update ${message.title}` : "Create Annoucement"}}
+        <div class="card-header">{{message.id ? `Update ${message.title}` : "Create Announcement"}}
 
             <transition name="slide-fade">
                 <button @click="removeEdit" v-if="message.id" class="btn btn-sm float-right btn-danger btn-sm">Close</button>

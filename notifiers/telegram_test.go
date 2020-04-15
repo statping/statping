@@ -64,7 +64,7 @@ func TestTelegramNotifier(t *testing.T) {
 	})
 
 	t.Run("Telegram Test", func(t *testing.T) {
-		err := Telegram.OnTest()
+		_, err := Telegram.OnTest()
 		assert.Nil(t, err)
 	})
 

@@ -2,11 +2,12 @@ package checkins
 
 import (
 	"fmt"
-	"github.com/prometheus/common/log"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/utils"
 	"time"
 )
+
+var log = utils.Log.WithField("type", "checkin")
 
 // RecheckCheckinFailure will check if a Service Checkin has been reported yet
 func (c *Checkin) RecheckCheckinFailure(guard chan struct{}) {

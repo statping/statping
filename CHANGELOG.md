@@ -1,8 +1,17 @@
+# 0.90.26 (04-13-2020)
+- Fixed Delete Failures button/function
+- Removed timezone field from Settings (core)
+- Modified CDN asset URL
+- Fixed single Service view, more complex charts
+
 # 0.90.25
 - Added string response on OnTest for Notifiers
 - Modified UI to show user the response for a Notifier.
 - Modified some Notifiers title's
 - Added more Cypress e2e testing
+- Modified Incidents form and UX.
+- Added /api/services/{id}/uptime_data API endpoint to show online/offline durations as a series for charts.
+- Modified index page to automatically refresh Service details on interval
 
 # 0.90.24
 - Fixed login form from not showing

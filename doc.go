@@ -8,7 +8,7 @@
 // the zip file from the latest releases link.
 //
 //		// MacOS using homebrew
-//		brew tap hunterlong/statping
+//		brew tap statping/statping
 //		brew install statping
 //
 //		// Linux installation
@@ -18,7 +18,7 @@
 // Docker
 //
 // Statping can be built in many way, the best way is to use Docker!
-//		docker run -it -p 8080:8080 hunterlong/statping
+//		docker run -it -p 8080:8080 statping/statping
 //
 // Enjoy Statping and tell me any issues you might be having on Github. https://github.com/hunterlong
 package statping

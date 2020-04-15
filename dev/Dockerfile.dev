@@ -7,7 +7,7 @@ RUN npm install -g yarn
 RUN curl -L -s https://assets.statping.com/sass -o /usr/local/bin/sass && \
     chmod +x /usr/local/bin/sass
 
-WORKDIR /go/src/github.com/hunterlong/statping
+WORKDIR /go/src/github.com/statping/statping
 
 ADD go.mod go.sum version.txt ./
 
@@ -22,7 +22,7 @@ ADD frontend/package.json frontend/yarn.lock ./frontend/
 RUN cd frontend && yarn install --pure-lockfile --network-timeout 1000000 && yarn cache clean
 
 ENV IS_DOCKER=true
-ENV STATPING_DIR=/go/src/github.com/hunterlong/statping
+ENV STATPING_DIR=/go/src/github.com/statping/statping
 
 EXPOSE 8585
 EXPOSE 8888

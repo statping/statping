@@ -10,6 +10,7 @@ before_script:
 branches:
   only:
     - master
+    - dev
 env:
   global:
     - "PATH=$HOME/.local/bin:$PATH"
@@ -17,6 +18,7 @@ env:
     - DB_USER=travis
     - DB_PASS=
     - DB_DATABASE=test
+    - GO_ENV=test
     - STATPING_DIR=$GOPATH/src/github.com/statping/statping
 go: 1.14
 go_import_path: github.com/statping/statping
@@ -29,7 +31,6 @@ install:
   - "make test-deps yarn clean compile install"
 language: go
 addons:
-  chrome: stable
   apt:
     packages:
       - libgconf-2-4

@@ -1,6 +1,22 @@
 <template>
-    <form class="row" @submit.prevent="createIncidentUpdate">
+    <div class="card-body bg-light pt-3">
 
+        <div v-if="updates.length===0" class="alert alert-link text-danger">
+            No updates found, create a new Incident Update below.
+        </div>
+
+        <div v-for="(update, i) in updates">
+            <div class="alert alert-light" role="alert">
+                <span class="badge badge-pill badge-info text-uppercase">{{update.type}}</span>
+                <span class="float-right font-2">{{ago(update.created_at)}} ago</span>
+                <span class="d-block mt-2">{{update.message}}
+                        <button @click="delete_update(update)" type="button" class="close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </span>
+            </div>
+        </div>
+    <form class="row" @submit.prevent="createIncidentUpdate">
         <div class="col-3">
             <select v-model="incident_update.type" class="form-control">
                 <option value="Investigating">Investigating</option>
@@ -21,6 +37,7 @@
             </button>
         </div>
     </form>
+    </div>
 </template>
 
 <script>
@@ -35,12 +52,13 @@
   },
   props: {
     incident: {
-      type: Object
+      type: Object,
+      required: true
     }
   },
   data () {
     return {
-      updates: [],
+      updates: this.incident.updates,
         incident_update: {
             incident: this.incident.id,
             message: "",
@@ -48,16 +66,23 @@
         }
     }
   },
-      async mounted () {
-          await this.loadUpdates()
+    beforeRouteUpdate (to, from, next) {
+
+    },
+    async mounted() {
+      await this.loadUpdates()
+    },
+    methods: {
+      async delete_update(update) {
+        await Api.incident_update_delete(update)
+        await this.loadUpdates()
       },
-      methods: {
-            async loadUpdates() {
-              this.updates = await Api.incident_updates(this.incident)
-            },
           async createIncidentUpdate() {
               await Api.incident_update_create(this.incident_update)
                 await this.loadUpdates()
+          },
+          async loadUpdates() {
+                this.updates = await Api.incident_updates(this.incident)
           }
   }
 }

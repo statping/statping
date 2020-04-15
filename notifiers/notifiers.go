@@ -1,13 +1,14 @@
 package notifiers
 
 import (
-	"github.com/prometheus/common/log"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"time"
 )
+
+var log = utils.Log.WithField("type", "notifier")
 
 func InitNotifiers() {
 	Add(

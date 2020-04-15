@@ -13,6 +13,9 @@ import VueRouter from "vue-router";
 import Setup from "./forms/Setup";
 
 import Api from "./API";
+import Incidents from "@/components/Dashboard/Incidents";
+import Checkins from "@/components/Dashboard/Checkins";
+import Failures from "@/components/Dashboard/Failures";
 
 const routes = [
   {
@@ -59,9 +62,27 @@ const routes = [
     },{
       path: 'edit_service/:id',
       component: EditService,
-        meta: {
-            requiresAuth: true
-        }
+      meta: {
+        requiresAuth: true
+      }
+    },{
+      path: 'service/:id/incidents',
+      component: Incidents,
+      meta: {
+        requiresAuth: true
+      }
+    },{
+      path: 'service/:id/checkins',
+      component: Checkins,
+      meta: {
+        requiresAuth: true
+      }
+    },{
+      path: 'service/:id/failures',
+      component: Failures,
+      meta: {
+        requiresAuth: true
+      }
     },{
       path: 'messages',
       component: DashboardMessages,

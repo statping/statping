@@ -7,11 +7,11 @@ import (
 
 func Samples() error {
 	checkin1 := &Checkin{
-		Name:        "Example Checkin 1",
+		Name:        "Demo Checkin 1",
 		ServiceId:   1,
 		Interval:    300,
 		GracePeriod: 300,
-		ApiKey:      utils.RandomString(7),
+		ApiKey:      "demoCheckin123",
 	}
 	if err := checkin1.Create(); err != nil {
 		return err

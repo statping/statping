@@ -3,11 +3,15 @@ package services
 import (
 	"crypto/sha1"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"github.com/statping/statping/types"
+	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/utils"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -17,6 +21,145 @@ const limitedFailures = 25
 
 func (s *Service) Duration() time.Duration {
 	return time.Duration(s.Interval) * time.Second
+}
+
+// Start will create a channel for the service checking go routine
+func (s *Service) UptimeData(hits []*hits.Hit, fails []*failures.Failure) (*UptimeSeries, error) {
+	if len(hits) == 0 {
+		return nil, errors.New("service does not have any successful hits")
+	}
+	// if theres no failures, then its been online 100%,
+	// return a series from created time, to current.
+	if len(fails) == 0 {
+		fistHit := hits[0]
+		duration := utils.Now().Sub(fistHit.CreatedAt).Milliseconds()
+		set := []series{
+			{
+				Start:    fistHit.CreatedAt,
+				End:      utils.Now(),
+				Duration: duration,
+				Online:   true,
+			},
+		}
+		out := &UptimeSeries{
+			Start:    fistHit.CreatedAt,
+			End:      utils.Now(),
+			Uptime:   duration,
+			Downtime: 0,
+			Series:   set,
+		}
+		return out, nil
+	}
+
+	tMap := make(map[time.Time]bool)
+
+	for _, v := range hits {
+		tMap[v.CreatedAt] = true
+	}
+	for _, v := range fails {
+		tMap[v.CreatedAt] = false
+	}
+
+	var servs []ser
+	for t, v := range tMap {
+		s := ser{
+			Time:   t,
+			Online: v,
+		}
+		servs = append(servs, s)
+	}
+	if len(servs) == 0 {
+		return nil, errors.New("error generating uptime data structure")
+	}
+	sort.Sort(ByTime(servs))
+
+	var allTimes []series
+	online := servs[0].Online
+	thisTime := servs[0].Time
+	for i := 0; i < len(servs); i++ {
+		v := servs[i]
+		if v.Online != online {
+			s := series{
+				Start:    thisTime,
+				End:      v.Time,
+				Duration: v.Time.Sub(thisTime).Milliseconds(),
+				Online:   online,
+			}
+			allTimes = append(allTimes, s)
+			thisTime = v.Time
+			online = v.Online
+		}
+	}
+	if len(allTimes) == 0 {
+		return nil, errors.New("error generating uptime series structure")
+	}
+
+	first := servs[0].Time
+	last := servs[len(servs)-1].Time
+	if !s.Online {
+		s := series{
+			Start:    allTimes[len(allTimes)-1].End,
+			End:      utils.Now(),
+			Duration: utils.Now().Sub(last).Milliseconds(),
+			Online:   s.Online,
+		}
+		allTimes = append(allTimes, s)
+	} else {
+		l := allTimes[len(allTimes)-1]
+		s := series{
+			Start:    l.Start,
+			End:      utils.Now(),
+			Duration: utils.Now().Sub(l.Start).Milliseconds(),
+			Online:   true,
+		}
+		allTimes = append(allTimes, s)
+	}
+
+	response := &UptimeSeries{
+		Start:    first,
+		End:      last,
+		Uptime:   addDurations(allTimes, true),
+		Downtime: addDurations(allTimes, false),
+		Series:   allTimes,
+	}
+
+	return response, nil
+}
+
+func addDurations(s []series, on bool) int64 {
+	var dur int64
+	for _, v := range s {
+		if v.Online == on {
+			dur += v.Duration
+		}
+	}
+	return dur
+}
+
+type ser struct {
+	Time   time.Time
+	Online bool
+}
+
+type UptimeSeries struct {
+	Start    time.Time `json:"start"`
+	End      time.Time `json:"end"`
+	Uptime   int64     `json:"uptime"`
+	Downtime int64     `json:"downtime"`
+	Series   []series  `json:"series"`
+}
+
+type ByTime []ser
+
+func (a ByTime) Len() int           { return len(a) }
+func (a ByTime) Less(i, j int) bool { return a[i].Time.Before(a[j].Time) }
+func (a ByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+type series struct {
+	Start    time.Time `json:"start"`
+	End      time.Time `json:"end"`
+	Duration int64     `json:"duration"`
+	Online   bool      `json:"online"`
 }
 
 // Start will create a channel for the service checking go routine

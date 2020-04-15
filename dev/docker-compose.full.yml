@@ -21,7 +21,7 @@ services:
 #        COMMIT: DEV
 #    restart: on-failure
 #    volumes:
-#      - ./:/go/src/github.com/hunterlong/statping
+#      - ./:/go/src/github.com/statping/statping
 #    environment:
 #      VIRTUAL_HOST: local.statping.com
 #      VIRTUAL_PORT: 8888

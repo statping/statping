@@ -146,6 +146,45 @@ type isObject interface {
 	Db() Database
 }
 
+func ParseRequest(r *http.Request) (*GroupQuery, error) {
+	fields := parseGet(r)
+	grouping := fields.Get("group")
+	startField := utils.ToInt(fields.Get("start"))
+	endField := utils.ToInt(fields.Get("end"))
+	limit := utils.ToInt(fields.Get("limit"))
+	offset := utils.ToInt(fields.Get("offset"))
+	fill, _ := strconv.ParseBool(fields.Get("fill"))
+	orderBy := fields.Get("order")
+	if limit == 0 {
+		limit = 10000
+	}
+
+	if grouping == "" {
+		grouping = "1h"
+	}
+	groupDur, err := time.ParseDuration(grouping)
+	if err != nil {
+		log.Errorln(err)
+		groupDur = 1 * time.Hour
+	}
+
+	query := &GroupQuery{
+		Start:     time.Unix(startField, 0).UTC(),
+		End:       time.Unix(endField, 0).UTC(),
+		Group:     groupDur,
+		Order:     orderBy,
+		Limit:     int(limit),
+		Offset:    int(offset),
+		FillEmpty: fill,
+	}
+
+	if query.Start.After(query.End) {
+		return nil, errors.New("start time is after ending time")
+	}
+
+	return query, nil
+}
+
 func ParseQueries(r *http.Request, o isObject) (*GroupQuery, error) {
 	fields := parseGet(r)
 	grouping := fields.Get("group")
@@ -168,6 +207,9 @@ func ParseQueries(r *http.Request, o isObject) (*GroupQuery, error) {
 	if err != nil {
 		log.Errorln(err)
 		groupDur = 1 * time.Hour
+	}
+	if endField == 0 {
+		endField = utils.Now().Unix()
 	}
 
 	query := &GroupQuery{

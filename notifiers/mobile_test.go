@@ -65,7 +65,7 @@ func TestMobileNotifier(t *testing.T) {
 
 	t.Run("Mobile Test", func(t *testing.T) {
 		t.SkipNow()
-		err := Mobile.OnTest()
+		_, err := Mobile.OnTest()
 		assert.Nil(t, err)
 	})
 

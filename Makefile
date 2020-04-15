@@ -5,13 +5,15 @@ GOBUILD=go build -a
 GOVERSION=1.14.0
 XGO=xgo -go $(GOVERSION) --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
-TRVIS_SECRET=lRqWSt5BoekFK6+padJF+b77YkGdispPXEUKNuD7/Hxb7yJMoI8T/n8xZrTHtCZPdjtpy7wIlJCezNoYEZB3l2GnD6Y1QEZEXF7MIxP7hwsB/uSc5/lgdGW0ZLvTBfv6lwI/GjQIklPBW/4xcKJtj4s1YBP7xvqyIb/lDN7TiOqAKF4gqRVVfsxvlkm7j4TiPCXtz17hYQfU8kKBbd+vd3PuZgdWqs//5RwKk3Ld8QR8zoo9xXQVC5NthiyVbHznzczBsHy2cRZZoWxyi7eJM1HrDw8Jn/ivJONIHNv3RgFVn2rAoKu1X8F6FyuvPO0D2hWC62mdO/e0kt4X0mn9/6xlLSKwrHir67UgNVQe3tvlH0xNKh+yNZqR5x9t0V54vNks6Pgbhas5EfLHoWn5cF4kbJzqkXeHjt1msrsqpA3HKbmtwwjJr4Slotfiu22mAhqLSOV+xWV+IxrcNnrEq/Pa+JAzU12Uyxs8swaLJGPRAlWnJwzL9HK5aOpN0sGTuSEsTwj0WxeMMRx25YEq3+LZOgwOy3fvezmeDnKuBZa6MVCoMMpx1CRxMqAOlTGZXHjj+ZPmqDUUBpzAsFSzIdVRgcnDlLy7YRiz3tVWa1G5S07l/VcBN7ZgvCwOWZ0QgOH0MxkoDfhrfoMhNO6MBFDTRKCEl4TroPEhcInmXU8=
+TRVIS_SECRET=O3/2KTOV8krv+yZ1EB/7D1RQRe6NdpFUEJNJkMS/ollYqmz3x2mCO7yIgIJKCKguLXZxjM6CxJcjlCrvUwibL+8BBp7xJe4XFIOrjkPvbbVPry4HkFZCf2GfcUK6o4AByQ+RYqsW2F17Fp9KLQ1rL3OT3eLTwCAGKx3tlY8y+an43zkmo5dN64V6sawx26fh6XTfww590ey+ltgQTjf8UPNup2wZmGvMo9Hwvh/bYR/47bR6PlBh6vhlKWyotKf2Fz1Bevbu0zc35pee5YlsrHR+oSF+/nNd/dOij34BhtqQikUR+zQVy9yty8SlmneVwD3yOENvlF+8roeKIXb6P6eZnSMHvelhWpAFTwDXq2N3d/FIgrQtLxsAFTI3nTHvZgs6OoTd6dA0wkhuIGLxaL3FOeztCdxP5J/CQ9GUcTvifh5ArGGwYxRxQU6rTgtebJcNtXFISP9CEUR6rwRtb6ax7h6f1SbjUGAdxt+r2LbEVEk4ZlwHvdJ2DtzJHT5DQtLrqq/CTUgJ8SJFMkrJMp/pPznKhzN4qvd8oQJXygSXX/gz92MvoX0xgpNeLsUdAn+PL9KketfR+QYosBz04d8k05E+aTqGaU7FUCHPTLwlOFvLD8Gbv0zsC/PWgSLXTBlcqLEz5PHwPVHTcVzspKj/IyYimXpCSbvu1YOIjyc=
 PUBLISH_BODY='{ "request": { "branch": "master", "message": "Homebrew update version v${VERSION}", "config": { "env": { "VERSION": "${VERSION}", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
-TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "merge_mode": "replace", "language": "go", "install": true, "sudo": "required", "services": ["docker"], "env": { "secure": "${TRVIS_SECRET}" }, "before_deploy": ["git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [{ "provider": "releases", "api_key": "$$TAG_TOKEN", "file_glob": true, "file": "build/*", "skip_cleanup": true, "on": { "branch": "master" } }], "before_script": ["rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install stable", "nvm install 10.17.0", "nvm use 10.17.0 --default", "npm install -g sass", "npm install -g cross-env"], "script": ["travis_wait 30 docker pull crazymax/xgo:${GOVERSION}", "make release"], "after_success": [], "after_deploy": ["make publish-homebrew"] } } }'
+TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "merge_mode": "replace", "language": "go", "go": 1.14, "install": true, "sudo": "required", "services": ["docker"], "env": { "secure": "${TRVIS_SECRET}" }, "before_deploy": ["git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [{ "provider": "releases", "api_key": "$$GITHUB_TOKEN", "file_glob": true, "file": "build/*", "skip_cleanup": true, "on": { "branch": "master" } }], "before_script": ["rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install stable", "nvm install 10.17.0", "nvm use 10.17.0 --default", "npm install -g sass yarn cross-env", "pip install --user awscli"], "script": ["make release"], "after_success": [], "after_deploy": ["make post-release"] } } }'
 TEST_DIR=$(GOPATH)/src/github.com/statping/statping
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
+OS = darwin freebsd linux openbsd
+ARCHS = 386 arm amd64 arm64
 
-all: clean yarn-install compile docker-base docker-vue build-all compress
+all: clean yarn-install compile docker-base docker-vue build-all
 
 up:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml up -d --remove-orphans
@@ -27,14 +29,14 @@ lite: clean
 
 reup: down clean compose-build-full up
 
-test: clean
-	go test -v -p=4 -ldflags="-X main.VERSION=testing" -coverprofile=coverage.out ./...
+test: clean compile
+	go test -v -p=1 -ldflags="-X main.VERSION=testing" -coverprofile=coverage.out ./...
 
 # build all arch's and release Statping
 release: test-deps
 	wget -O statping.gpg $(SIGN_URL)
 	gpg --import statping.gpg
-	make build-all upload_to_s3
+	make build-all
 
 test-ci: clean compile test-deps
 	SASS=`which sass` go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
@@ -54,6 +56,9 @@ test-deps:
 	go get golang.org/x/tools/cmd/cover
 	go get github.com/mattn/goveralls
 	go get github.com/GeertJohan/go.rice/rice
+
+deps:
+	go get -d -v -t ./...
 
 protoc:
 	cd types/proto && protoc --gofast_out=plugins=grpc:. statping.proto
@@ -146,6 +151,34 @@ install-local: build
 generate:
 	cd source && go generate
 
+build-bin:
+	mkdir build
+	export PWD=`pwd`
+	@for arch in $(ARCHS);\
+	do \
+		for os in $(OS);\
+		do \
+			echo "Building $$os-$$arch"; \
+			mkdir -p releases/statping-$$os-$$arch/; \
+			GO111MODULE="on" GOOS=$$os GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-$$os-$$arch/statping ${PWD}/cmd; \
+			chmod +x releases/statping-$$os-$$arch/statping; \
+			tar -czf releases/statping-$$os-$$arch.tar.gz -C releases/statping-$$os-$$arch statping; \
+		done \
+	done
+	find ./releases/ -name "*.tar.gz" -type f -size +1M -exec mv "{}" build/ \;
+
+build-win:
+	export PWD=`pwd`
+	@for arch in $(ARCHS);\
+	do \
+		echo "Building windows-$$arch"; \
+		mkdir -p releases/statping-windows-$$arch/; \
+		GO111MODULE="on" GOOS=windows GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-windows-$$arch/statping.exe ${PWD}/cmd; \
+		chmod +x releases/statping-windows-$$arch/statping.exe; \
+		zip -j releases/statping-windows-$$arch.zip releases/statping-windows-$$arch/statping.exe || true; \
+	done
+	find ./releases/ -name "*.zip" -type f -size +1M -exec mv "{}" build/ \;
+
 # remove files for a clean compile/build
 clean:
 	rm -rf ./{logs,assets,plugins,*.db,config.yml,.sass-cache,config.yml,statping,build,.sass-cache,index.html,vendor}
@@ -168,7 +201,7 @@ clean:
 	find . -name "*.out" -type f -delete
 	find . -name "*.cpu" -type f -delete
 	find . -name "*.mem" -type f -delete
-	rm -rf {build,tmp}
+	rm -rf {build,releases,tmp}
 
 print_details:
 	@echo \==== Statping Development Instance ====
@@ -186,75 +219,35 @@ print_details:
 	@echo \==== Monitoring and IDE ====
 	@echo \Grafana:             http://localhost:3000  \(username: admin, password: admin\)
 
-build-all: xgo-install compile build-mac build-linux build-windows build-linux build-alpine compress
+build-all: clean compile build-bin build-win
 
 coverage: test-deps
 	$(GOPATH)/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $(COVERALLS)
 
 # build Statping using a travis ci trigger
-travis-build: travis_s3_creds
+travis-build:
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(TRAVIS_BUILD_CMD) https://api.travis-ci.com/repo/statping%2Fstatping/requests
-	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
 
 download-key:
 	wget -O statping.gpg $(SIGN_URL)
 	gpg --import statping.gpg
-
-# build Statping for Mac, 64 and 32 bit
-build-mac:
-	mkdir build
-	$(XGO) $(BUILDVERSION) --targets=darwin/amd64,darwin/386 ./cmd
-
-# build Statping for Linux 64, 32 bit, arm6/arm7
-build-linux:
-	$(XGO) $(BUILDVERSION) --targets=linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64 ./cmd
-
-# build for windows 64 bit only
-build-windows:
-	$(XGO) $(BUILDVERSION) --targets=windows-6.0/amd64 ./cmd
-
-# build Alpine linux binary (used in docker images)
-build-alpine:
-	$(XGO) --targets=linux/amd64 -ldflags="-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT) -linkmode external -extldflags -static" -out alpine ./cmd
 
 # build :latest docker tag
 docker-build-latest:
 	docker build --build-arg VERSION=${VERSION} -t statping/statping:latest --no-cache -f Dockerfile .
 	docker tag statping/statping:latest statping/statping:v${VERSION}
 
-# compress built binaries into tar.gz and zip formats
-compress:
-	cd build && mv alpine-linux-amd64 $(BINARY_NAME)
-	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output statping.asc --armor $(BINARY_NAME)
-	cd build && tar -czvf $(BINARY_NAME)-linux-alpine.tar.gz $(BINARY_NAME) statping.asc && rm -f $(BINARY_NAME) statping.asc
-	cd build && mv cmd-darwin-10.6-amd64 $(BINARY_NAME)
-	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output statping.asc --armor $(BINARY_NAME)
-	cd build && tar -czvf $(BINARY_NAME)-osx-x64.tar.gz $(BINARY_NAME) statping.asc && rm -f $(BINARY_NAME) statping.asc
-	cd build && mv cmd-darwin-10.6-386 $(BINARY_NAME)
-	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output statping.asc --armor $(BINARY_NAME)
-	cd build && tar -czvf $(BINARY_NAME)-osx-x32.tar.gz $(BINARY_NAME) statping.asc && rm -f $(BINARY_NAME) statping.asc
-	cd build && mv cmd-linux-amd64 $(BINARY_NAME)
-	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output statping.asc --armor $(BINARY_NAME)
-	cd build && tar -czvf $(BINARY_NAME)-linux-x64.tar.gz $(BINARY_NAME) statping.asc && rm -f $(BINARY_NAME) statping.asc
-	cd build && mv cmd-linux-386 $(BINARY_NAME)
-	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output statping.asc --armor $(BINARY_NAME)
-	cd build && tar -czvf $(BINARY_NAME)-linux-x32.tar.gz $(BINARY_NAME) statping.asc && rm -f $(BINARY_NAME) statping.asc
-	cd build && mv cmd-windows-6.0-amd64.exe $(BINARY_NAME).exe
-	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output statping.asc --armor $(BINARY_NAME).exe
-	cd build && zip $(BINARY_NAME)-windows-x64.zip $(BINARY_NAME).exe statping.asc && rm -f $(BINARY_NAME).exe statping.asc
-	cd build && mv cmd-linux-arm-7 $(BINARY_NAME)
-	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output statping.asc --armor $(BINARY_NAME)
-	cd build && tar -czvf $(BINARY_NAME)-linux-arm7.tar.gz $(BINARY_NAME) statping.asc && rm -f $(BINARY_NAME) statping.asc
-	cd build && mv cmd-linux-arm-6 $(BINARY_NAME)
-	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output statping.asc --armor $(BINARY_NAME)
-	cd build && tar -czvf $(BINARY_NAME)-linux-arm6.tar.gz $(BINARY_NAME) statping.asc && rm -f $(BINARY_NAME) statping.asc
-	cd build && mv cmd-linux-arm64 $(BINARY_NAME)
-	cd build && gpg --default-key $(SIGN_KEY) --batch --detach-sign --output statping.asc --armor $(BINARY_NAME)
-	cd build && tar -czvf $(BINARY_NAME)-linux-arm64.tar.gz $(BINARY_NAME) statping.asc && rm -f $(BINARY_NAME) statping.asc
-
 # push the :dev docker tag using curl
 publish-dev:
 	curl -H "Content-Type: application/json" --data '{"docker_tag": "dev"}' -X POST $(DOCKER)
+
+publish-latest: publish-base
+	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
+
+publish-base:
+	curl -H "Content-Type: application/json" --data '{"docker_tag": "base"}' -X POST $(DOCKER)
+
+post-release: frontend-build upload_to_s3 publish-homebrew publish-latest
 
 # update the homebrew application to latest for mac
 publish-homebrew:
@@ -276,15 +269,25 @@ sign-all:
 valid-sign:
 	gpg --verify statping.asc
 
-# install xgo and pull the xgo docker image
-xgo-install: clean
-	go get github.com/crazy-max/xgo
-	docker pull crazymax/xgo:${GOVERSION}
-
 sentry-release:
 	sentry-cli releases new -p backend -p frontend v${VERSION}
 	sentry-cli releases set-commits --auto v${VERSION}
 	sentry-cli releases finalize v${VERSION}
 
-.PHONY: all build build-all build-alpine test-all test test-api docker frontend up down print_details lite sentry-release
+snapcraft: clean compile build-bin
+	PWD=$(shell pwd)
+	snapcraft clean statping -s pull
+	docker run --rm -v ${PWD}/build/statping-linux-amd64.tar.gz:/build/statping-linux.tar.gz -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=amd64"
+	snapcraft clean statping -s pull
+	docker run --rm -v ${PWD}/build/statping-linux-386.tar.gz:/build/statping-linux.tar.gz -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=i386"
+	snapcraft clean statping -s pull
+	docker run --rm -v ${PWD}/build/statping-linux-arm64.tar.gz:/build/statping-linux.tar.gz -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=arm64"
+	snapcraft clean statping -s pull
+	docker run --rm -v ${PWD}/build/statping-linux-arm.tar.gz:/build/statping-linux.tar.gz -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=armhf"
+	snapcraft push statping_${VERSION}_amd64.snap --release stable
+	snapcraft push statping_${VERSION}_arm64.snap --release stable
+	snapcraft push statping_${VERSION}_i386.snap --release stable
+	snapcraft push statping_${VERSION}_armhf.snap --release stable
+
+.PHONY: all build build-all build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-bin build-win build-all
 .SILENT: travis_s3_creds

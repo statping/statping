@@ -49,12 +49,9 @@
                 </div>
 
                 <div class="col-md-4 col-6 float-right">
-                    <button v-if="!expanded" @click="showMoreStats" class="btn btn-sm float-right dyn-dark text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">View Service</button>
-                    <button v-if="expanded" @click="expanded = false" class="btn btn-sm float-right dyn-dark text-white" :class="{'btn-outline-success': service.online, 'bg-danger': !service.online}">Hide</button>
-                </div>
-
-                <div v-if="expanded" class="row">
-                    <Analytics title="Last Failure" value="417 Days ago"/>
+                    <button v-if="!expanded" @click="setService" class="btn btn-sm float-right dyn-dark text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
+                        View Service
+                    </button>
                 </div>
             </div>
 
@@ -63,6 +60,7 @@
 </template>
 
 <script>
+import Api from '../../API';
 import Analytics from './Analytics';
 import ServiceChart from "./ServiceChart";
 import ServiceTopStats from "@/components/Service/ServiceTopStats";
@@ -72,13 +70,14 @@ export default {
     name: 'ServiceBlock',
     components: { Analytics, ServiceTopStats, ServiceChart},
     props: {
-        service: {
+        in_service: {
             type: Object,
             required: true
         },
     },
     data() {
         return {
+          timer_func: null,
             expanded: false,
             visible: false,
             dropDownMenu: false,
@@ -115,10 +114,26 @@ export default {
                     subtitle: "Last 7 Days",
                     value: 0,
                 }
-            }
+            },
+            track_service: null,
         }
     },
+  beforeDestroy() {
+    clearInterval(this.timer_func)
+  },
+  computed: {
+      service() {
+        return this.track_service
+      }
+  },
+  async created() {
+      this.track_service = this.in_service
+  },
     methods: {
+      async setService() {
+        await this.$store.commit('setService', this.service)
+        this.$router.push('/service/'+this.service.id, {props: {in_service: this.service}})
+      },
         async showMoreStats() {
             this.expanded = !this.expanded;
 
@@ -142,6 +157,7 @@ export default {
             this.stats.low_ping.value = this.humanTime(pingData.low);
         },
         smallText(s) {
+          const incidents = s.incidents
             if (s.online) {
                 return `Online, last checked ${this.ago(s.last_success)}`
             } else {
@@ -155,6 +171,12 @@ export default {
         visibleChart(isVisible, entry) {
                 if (isVisible && !this.visible) {
                     this.visible = true
+
+                  if (!this.timer_func) {
+                    this.timer_func = setInterval(async () => {
+                      this.track_service = await Api.service(this.service.id)
+                    }, this.track_service.check_interval * 1000)
+                  }
                 }
         }
     }

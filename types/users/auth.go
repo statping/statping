@@ -2,7 +2,6 @@ package users
 
 import (
 	"fmt"
-	"github.com/prometheus/common/log"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )

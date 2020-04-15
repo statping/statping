@@ -176,6 +176,46 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 	returnJson(objs, w, r)
 }
 
+func apiServiceTimeDataHandler(w http.ResponseWriter, r *http.Request) {
+	service, err := serviceByID(r)
+	if err != nil {
+		sendErrorJson(errors.New("service data not found"), w, r)
+		return
+	}
+
+	groupHits, err := database.ParseQueries(r, service.AllHits())
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	groupFailures, err := database.ParseQueries(r, service.AllFailures())
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	var allFailures []*failures.Failure
+	var allHits []*hits.Hit
+
+	if err := groupHits.Find(&allHits); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	if err := groupFailures.Find(&allFailures); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	uptimeData, err := service.UptimeData(allHits, allFailures)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	returnJson(uptimeData, w, r)
+}
+
 func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	service, err := serviceByID(r)
 	if err != nil {

@@ -42,6 +42,9 @@ export default Vue.mixin({
     dur(t1, t2) {
       return formatDistance(t1, t2)
     },
+    format(val, type="EEEE, MMM do h:mma") {
+      return format(val, type)
+    },
     niceDate(val) {
       return format(parseISO(val), "EEEE, MMM do h:mma")
     },
@@ -118,6 +121,13 @@ export default Vue.mixin({
         default:
           return "bars"
       }
+    },
+    toBarData(data = []) {
+      let newSet = [];
+      data.forEach((f) => {
+        newSet.push([this.toUnix(this.parseISO(f.timeframe)), f.amount])
+      })
+      return newSet
     },
     convertToChartData(data = [], multiplier=1, asInt=false) {
       if (!data) {

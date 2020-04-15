@@ -57,7 +57,7 @@ func TestDiscordNotifier(t *testing.T) {
 	})
 
 	t.Run("discord Test", func(t *testing.T) {
-		err := Discorder.OnTest()
+		_, err := Discorder.OnTest()
 		assert.Nil(t, err)
 	})
 

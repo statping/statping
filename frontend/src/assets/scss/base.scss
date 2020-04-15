@@ -28,8 +28,8 @@ HTML,BODY {
   background-color: white;
   margin: 6px;
   height: 26px;
-  font-size: 10pt;
-  padding: 3px 7px;
+  font-size: 8pt;
+  padding: 5px 7px;
   border: 1px solid #a7a7a7;
   border-radius: 4px !important;
 }
@@ -344,10 +344,33 @@ HTML,BODY {
     background-color: #ffbbbb;
   }
 
+  .btn-white {
+    background-color: white;
+    border: 1px solid #d8d8d8;
+    color: #767676;
+  }
+
+  .btn-white:hover {
+    background-color: #fcfcfc;
+    border: 1px solid #bdbdbd;
+    color: #767676;
+  }
+
+  .braker {
+    border-top: 1px solid rgba(0, 0, 0, 0.10);
+    width: 98%;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .text-dim {
+    color: #a0a0a0;
+  }
+
   .card {
     background-color: $service-background;
     border: $service-border;
-    //box-shadow: 0px 2px 11px 1px rgba(0, 0, 0, 0.13);
+    box-shadow: 0px 3px 6px 1px rgba(0, 0, 0, 0.08);
   }
 
   .card-body {

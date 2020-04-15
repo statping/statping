@@ -32,7 +32,9 @@ func All() []*Checkin {
 }
 
 func (c *Checkin) Create() error {
-	c.ApiKey = utils.RandomString(32)
+	if c.ApiKey == "" {
+		c.ApiKey = utils.RandomString(32)
+	}
 	q := db.Create(c)
 
 	c.Start()

@@ -9,10 +9,48 @@
             </h4>
         </div>
 
-        <div class="card-body p-3 p-md-1 pt-md-3 pb-md-1">
+        <div class="card-body p-3 p-md-1 pt-md-1 pb-md-1">
 
             <transition name="fade">
-            <div v-if="loaded && service.online" class="col-12 pb-2">
+            <div v-if="loaded" class="col-12 pb-2">
+
+                <div v-if="false" class="row mb-4 align-content-center">
+
+                    <div v-if="!service.online" class="col-3 text-left">
+                        <span class="text-danger font-5 font-weight-bold">okko</span>
+                        <span class="font-2 d-block">Current Downtime</span>
+                    </div>
+
+                    <div v-if="service.online" class="col-3 text-left">
+                        <span class="text-success font-5 font-weight-bold">
+                            {{service.online_24_hours.toString()}}%
+                        </span>
+                        <span class="font-2 d-block">Total Uptime</span>
+                    </div>
+
+                    <div v-if="service.online" class="col-3 text-left">
+                        <span class="text-success font-5 font-weight-bold">
+                            0
+                        </span>
+                        <span class="font-2 d-block">Downtime Today</span>
+                    </div>
+
+                    <div v-if="service.online" class="col-3 text-left">
+                        <span class="text-success font-5 font-weight-bold">
+                            {{(uptime.uptime / 10000).toFixed(0).toString()}}
+                        </span>
+                        <span class="font-2 d-block">Uptime Duration</span>
+                    </div>
+
+                    <div class="col-3 text-left">
+                        <span class="text-danger font-5 font-weight-bold">
+                            {{service.failures_24_hours}}
+                        </span>
+                        <span class="font-2 d-block">Failures last 24 hours</span>
+                    </div>
+
+                </div>
+
                 <div class="row">
                     <div class="col-md-6 col-sm-12 mt-2 mt-md-0 mb-3">
                         <ServiceSparkLine :title="set2_name" subtitle="Latency Last 24 Hours" :series="set2"/>
@@ -22,33 +60,6 @@
                     </div>
                 </div>
 
-                <div v-if="false" class="row mt-4 pt-1 mb-3 align-content-center">
-
-                    <StatsGen :service="service"
-                              title="Since Yesterday"
-                              :start="this.toUnix(this.nowSubtract(86400 * 2))"
-                              :end="this.toUnix(this.nowSubtract(86400))"
-                              group="24h" expression="latencyPercent"/>
-
-                    <StatsGen :service="service"
-                              title="7 Day Change"
-                              :start="this.toUnix(this.nowSubtract(86400 * 7))"
-                              :end="this.toUnix(this.now())"
-                              group="24h" expression="latencyPercent"/>
-
-                    <StatsGen :service="service"
-                              title="Max Latency"
-                              :start="this.toUnix(this.nowSubtract(86400 * 2))"
-                              :end="this.toUnix(this.nowSubtract(86400))"
-                              group="24h" expression="latencyPercent"/>
-
-                    <StatsGen :service="service"
-                              title="Uptime"
-                              :start="this.toUnix(this.nowSubtract(86400 * 2))"
-                              :end="this.toUnix(this.nowSubtract(86400))"
-                              group="24h" expression="latencyPercent"/>
-                </div>
-
             </div>
             </transition>
         </div>
@@ -56,32 +67,23 @@
         <div class="card-footer">
             <div class="row">
 
-                <div class="col-3">
-                    <button @click.prevent="Tab('incident')" class="btn btn-block btn-outline-secondary incident" :class="{'text-white btn-secondary': openTab==='incident'}" >Incidents</button>
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <router-link :to="{path: `/dashboard/service/${service.id}/incidents`, params: {id: service.id} }" class="btn btn-block btn-white incident">
+                        Incidents
+                    </router-link>
                 </div>
-                <div class="col-3">
-                    <button @click.prevent="Tab('checkin')" class="btn btn-block btn-outline-secondary checkin" :class="{'text-white btn-secondary': openTab==='checkin'}" >Checkins</button>
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <router-link :to="{path: `/dashboard/service/${service.id}/checkins`, params: {id: service.id} }" class="btn btn-block btn-white checkins">
+                        Checkins
+                    </router-link>
                 </div>
-                <div class="col-3">
-                    <button @click.prevent="Tab('failures')" class="btn btn-block btn-outline-secondary failures" :disabled="service.stats.failures === 0" :class="{'text-white btn-secondary': openTab==='failures'}">
-                        Failures <span class="badge badge-danger float-right mt-1">{{service.stats.failures}}</span></button>
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <router-link :to="{path: `/dashboard/service/${service.id}/failures`, params: {id: service.id} }" class="btn btn-block btn-white failures">
+                        Failures <span class="badge badge-danger float-right mt-1">{{service.stats.failures}}</span>
+                    </router-link>
                 </div>
-                <div class="col-3 pt-2">
-                    <span class="text-black-50 float-right">{{service.online_7_days}}% Uptime</span>
-                </div>
-
-                <div v-if="openTab === 'incident'" class="col-12 mt-4">
-                    <FormIncident :service="service" />
-                </div>
-
-                <div v-if="openTab === 'checkin'" class="col-12 mt-4">
-                    <Checkin :service="service" />
-                </div>
-
-                <div v-if="openTab === 'failures'" class="col-12 mt-4">
-                    <button @click.prevent="deleteFailures" class="btn btn-block btn-outline-secondary delete_failures" :disabled="service.stats.failures === 0">Delete Failures</button>
-
-                    <ServiceFailures :service="service"/>
+                <div class="col-12 col-md-3 mb-2 mb-md-0 mt-0 mt-md-1">
+                    <span class="text-black-50 float-md-right">{{service.online_7_days}}% Uptime</span>
                 </div>
 
             </div>
@@ -122,6 +124,7 @@
       },
       data() {
           return {
+              uptime: null,
               openTab: "",
               set1: [],
               set2: [],
@@ -139,8 +142,12 @@
         async setVisible(isVisible, entry) {
           if (isVisible && !this.visible) {
             await this.loadInfo()
+            await this.getUptime()
             this.visible = true
           }
+        },
+        async getUptime() {
+          this.uptime = await Api.service_uptime(this.service.id)
         },
         async loadInfo() {
           this.set1 = await this.getHits(24 * 7, "6h")
@@ -148,13 +155,6 @@
           this.set2 = await this.getHits(24, "1h")
           this.set2_name = this.calc(this.set2)
           this.loaded = true
-        },
-        async deleteFailures() {
-          const c = confirm('Are you sure you want to delete all failures?')
-          if (c) {
-            await Api.service_failures_delete(this.service)
-            this.service = await Api.service(this.service.id)
-          }
         },
           Tab(name) {
               if (this.openTab === name) {

@@ -9,7 +9,7 @@
         </tr>
         </thead>
         <draggable id="services_list" tag="tbody" v-model="servicesList" handle=".drag_icon">
-            <tr v-for="(service, index) in $store.getters.servicesInOrder" :key="service.id">
+            <tr v-for="(service, index) in servicesList" :key="service.id">
                 <td>
                     <span v-if="$store.state.admin" class="drag_icon d-none d-md-inline">
                         <font-awesome-icon icon="bars" class="mr-3"/>

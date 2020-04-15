@@ -1,5 +1,5 @@
 <template>
-    <div class="col-3 text-center">
+    <div class="col-3 text-left">
         <span class="text-success font-5 font-weight-bold">{{value}}</span>
         <span class="font-2 d-block">{{title}}</span>
     </div>
@@ -34,6 +34,9 @@
           expression: {
             type: String,
             required: true
+          },
+          in_value: {
+            required: false
           }
         },
       data() {
@@ -42,6 +45,9 @@
         }
       },
       async mounted() {
+          if (this.in_value) {
+            this.value = this.in_value
+          }
         await this.latencyYesterday();
       },
       methods: {
