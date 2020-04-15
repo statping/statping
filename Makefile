@@ -286,5 +286,28 @@ sentry-release:
 	sentry-cli releases set-commits --auto v${VERSION}
 	sentry-cli releases finalize v${VERSION}
 
+snapcraft: clean snapcraft-build snapcraft-release
+
+snapcraft-build: build-all
+	PWD=$(shell pwd)
+	cp build/$(BINARY_NAME)-linux-x64.tar.gz build/$(BINARY_NAME)-linux.tar.gz
+	snapcraft clean statping -s pull
+	docker run --rm -v ${PWD}:/build -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=amd64"
+	cp build/$(BINARY_NAME)-linux-x32.tar.gz build/$(BINARY_NAME)-linux.tar.gz
+	snapcraft clean statping -s pull
+	docker run --rm -v ${PWD}:/build -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=i386"
+	cp build/$(BINARY_NAME)-linux-arm64.tar.gz build/$(BINARY_NAME)-linux.tar.gz
+	snapcraft clean statping -s pull
+	docker run --rm -v ${PWD}:/build -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=arm64"
+	cp build/$(BINARY_NAME)-linux-arm7.tar.gz build/$(BINARY_NAME)-linux.tar.gz
+	snapcraft clean statping -s pull
+	docker run --rm -v ${PWD}:/build -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=armhf"
+	rm -f build/$(BINARY_NAME)-linux.tar.gz
+
+snapcraft-release:
+	snapcraft push statping_${VERSION}_arm64.snap --release stable
+	snapcraft push statping_${VERSION}_i386.snap --release stable
+	snapcraft push statping_${VERSION}_armhf.snap --release stable
+
 .PHONY: all build build-all build-alpine test-all test test-api docker frontend up down print_details lite sentry-release
 .SILENT: travis_s3_creds
