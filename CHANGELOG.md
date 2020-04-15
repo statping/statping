@@ -1,3 +1,9 @@
+# 0.90.26 (04-13-2020)
+- Fixed Delete Failures button/function
+- Removed timezone field from Settings (core)
+- Modified CDN asset URL
+- Fixed single Service view, more complex charts
+
 # 0.90.25
 - Added string response on OnTest for Notifiers
 - Modified UI to show user the response for a Notifier.

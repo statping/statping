@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/fatih/structs"
 	"github.com/getsentry/sentry-go"
-	"github.com/prometheus/common/log"
 	Logger "github.com/sirupsen/logrus"
 	"github.com/statping/statping/types/null"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -47,7 +46,7 @@ func SentryInit(v *string, allow bool) {
 			Environment: goEnv,
 			Release:     version,
 		}); err != nil {
-			log.Errorln(err)
+			Log.Errorln(err)
 		}
 		Log.Infoln("Error Reporting initiated, thank you!")
 	}

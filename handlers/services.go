@@ -9,8 +9,6 @@ import (
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net/http"
-	"sort"
-	"time"
 )
 
 type serviceOrder struct {
@@ -185,131 +183,37 @@ func apiServiceTimeDataHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	allFailures := service.AllFailures()
-	allHits := service.AllHits()
-
-	tMap := make(map[time.Time]bool)
-	for _, v := range allHits.List() {
-		tMap[v.CreatedAt] = true
-	}
-	for _, v := range allFailures.List() {
-		tMap[v.CreatedAt] = false
+	groupHits, err := database.ParseQueries(r, service.AllHits())
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
 	}
 
-	var servs []ser
-	for t, v := range tMap {
-		s := ser{
-			Time:   t,
-			Online: v,
-		}
-		servs = append(servs, s)
+	groupFailures, err := database.ParseQueries(r, service.AllFailures())
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
 	}
 
-	sort.Sort(ByTime(servs))
+	var allFailures []*failures.Failure
+	var allHits []*hits.Hit
 
-	var allTimes []series
-	online := servs[0].Online
-	thisTime := servs[0].Time
-	for i := 0; i < len(servs); i++ {
-		v := servs[i]
-
-		if v.Online != online {
-			s := series{
-				Start:    thisTime,
-				End:      v.Time,
-				Duration: v.Time.Sub(thisTime).Milliseconds(),
-				Online:   online,
-			}
-			allTimes = append(allTimes, s)
-			thisTime = v.Time
-			online = v.Online
-		}
+	if err := groupHits.Find(&allHits); err != nil {
+		sendErrorJson(err, w, r)
+		return
 	}
 
-	first := servs[0].Time
-	last := servs[len(servs)-1].Time
-
-	if !service.Online {
-		s := series{
-			Start:    allTimes[len(allTimes)-1].End,
-			End:      utils.Now(),
-			Duration: utils.Now().Sub(last).Milliseconds(),
-			Online:   service.Online,
-		}
-		allTimes = append(allTimes, s)
-	} else {
-		l := allTimes[len(allTimes)-1]
-		allTimes[len(allTimes)-1] = series{
-			Start:    l.Start,
-			End:      utils.Now(),
-			Duration: utils.Now().Sub(l.Start).Milliseconds(),
-			Online:   true,
-		}
+	if err := groupFailures.Find(&allFailures); err != nil {
+		sendErrorJson(err, w, r)
+		return
 	}
 
-	jj := uptimeSeries{
-		Start:    first,
-		End:      last,
-		Uptime:   addDurations(allTimes, true),
-		Downtime: addDurations(allTimes, false),
-		Series:   allTimes,
+	uptimeData, err := service.UptimeData(allHits, allFailures)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
 	}
-
-	returnJson(jj, w, r)
-}
-
-type ByTime []ser
-
-func (a ByTime) Len() int           { return len(a) }
-func (a ByTime) Less(i, j int) bool { return a[i].Time.Before(a[j].Time) }
-func (a ByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-
-func addDurations(s []series, on bool) int64 {
-	var dur int64
-	for _, v := range s {
-		if v.Online == on {
-			dur += v.Duration
-		}
-	}
-	return dur
-}
-
-type ser struct {
-	Time   time.Time
-	Online bool
-}
-
-func findNextFailure(m map[time.Time]bool, after time.Time, online bool) time.Time {
-	for k, v := range m {
-		if k.After(after) && v == online {
-			return k
-		}
-	}
-	return time.Time{}
-}
-
-//func calculateDuration(m map[time.Time]bool, on bool) time.Duration {
-//	var t time.Duration
-//	for t, v := range m {
-//		if v == on {
-//			t.
-//		}
-//	}
-//}
-
-type uptimeSeries struct {
-	Start    time.Time `json:"start"`
-	End      time.Time `json:"end"`
-	Uptime   int64     `json:"uptime"`
-	Downtime int64     `json:"downtime"`
-	Series   []series  `json:"series"`
-}
-
-type series struct {
-	Start    time.Time `json:"start"`
-	End      time.Time `json:"end"`
-	Duration int64     `json:"duration"`
-	Online   bool      `json:"online"`
+	returnJson(uptimeData, w, r)
 }
 
 func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {

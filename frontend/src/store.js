@@ -22,6 +22,7 @@ export default new Vuex.Store({
             core: {},
             token: null,
             services: [],
+            service: null,
             groups: [],
             messages: [],
             users: [],
@@ -36,6 +37,7 @@ export default new Vuex.Store({
         core: state => state.core,
         token: state => state.token,
         services: state => state.services,
+        service: state => state.service,
         groups: state => state.groups,
         messages: state => state.messages,
         incidents: state => state.incidents,
@@ -104,6 +106,9 @@ export default new Vuex.Store({
         setToken (state, token) {
             state.token = token
         },
+      setService (state, service) {
+        state.service = service
+      },
         setServices (state, services) {
             state.services = services
         },

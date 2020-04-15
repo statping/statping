@@ -36,10 +36,12 @@
                 </td>
                 <td class="text-right">
                     <div v-if="$store.state.admin" class="btn-group">
-                        <a @click.prevent="editGroup(group, edit)" href="#" class="btn btn-outline-secondary"><font-awesome-icon icon="chart-area" /> Edit</a>
-                        <a @click.prevent="deleteGroup(group)" href="#" class="btn btn-danger">
+                        <button @click.prevent="editGroup(group, edit)" href="#" class="btn btn-sm btn-outline-secondary">
+                            <font-awesome-icon icon="edit" />
+                        </button>
+                        <button @click.prevent="deleteGroup(group)" href="#" class="btn btn-sm btn-danger">
                             <font-awesome-icon icon="times" />
-                        </a>
+                        </button>
                     </div>
                 </td>
             </tr>

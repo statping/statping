@@ -13,9 +13,9 @@ import VueRouter from "vue-router";
 import Setup from "./forms/Setup";
 
 import Api from "./API";
-import Incidents from "@/pages/Incidents";
-import Checkins from "@/pages/Checkins";
-import Failures from "@/pages/Failures";
+import Incidents from "@/components/Dashboard/Incidents";
+import Checkins from "@/components/Dashboard/Checkins";
+import Failures from "@/components/Dashboard/Failures";
 
 const routes = [
   {
