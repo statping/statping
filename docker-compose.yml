@@ -4,7 +4,7 @@ services:
 
   statping:
     container_name: statping
-    image: hunterlong/statping:latest
+    image: statping/statping:latest
     restart: always
     volumes:
       - statping_data:/app

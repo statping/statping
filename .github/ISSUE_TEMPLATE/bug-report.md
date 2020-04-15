@@ -20,4 +20,4 @@ A clear and concise description of what you expected to happen.
 ### Screenshots
 If applicable, add screenshots to help explain your problem.
 
-[![Slack](https://slack.statping.com/badge.svg)](https://slack.statping.com/) [![GitHub release](https://img.shields.io/github/release/hunterlong/statping.svg)](https://github.com/statping/statping/releases/latest) [![Build Status](https://travis-ci.com/hunterlong/statping.svg?branch=master)](https://travis-ci.com/hunterlong/statping)
+[![Slack](https://slack.statping.com/badge.svg)](https://slack.statping.com/) [![GitHub release](https://img.shields.io/github/release/statping/statping.svg)](https://github.com/statping/statping/releases/latest) [![Build Status](https://travis-ci.com/statping/statping.svg?branch=master)](https://travis-ci.com/hunterlong/statping)
