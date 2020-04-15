@@ -1,3 +1,8 @@
+# 0.90.27 (04-15-2020)
+- Fixed postgres database table creation process
+- Modified go build process, additional ARCHs
+- Added 'SAMPLE_DATA' environment variable to disable example data on startup. (default: true)
+
 # 0.90.26 (04-13-2020)
 - Fixed Delete Failures button/function
 - Removed timezone field from Settings (core)

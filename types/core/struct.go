@@ -34,7 +34,7 @@ type Core struct {
 	UseCdn        null.NullBool   `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`
 	LoggedIn      bool            `gorm:"-" json:"logged_in"`
 	IsAdmin       bool            `gorm:"-" json:"admin"`
-	AllowReports  null.NullBool   `gorm:"column:allow_reports;default:false" json:"allow_reports"`
+	AllowReports  null.NullBool   `gorm:"column:allow_reports;default:false" json:"allow_reports,omitempty"`
 	CreatedAt     time.Time       `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt     time.Time       `gorm:"column:updated_at" json:"updated_at"`
 	Started       time.Time       `gorm:"-" json:"started_on"`
@@ -46,7 +46,7 @@ type Core struct {
 
 type OAuth struct {
 	Domains            string `gorm:"column:oauth_domains" json:"oauth_domains,omitempty" scope:"admin"`
-	Providers          string `gorm:"column:oauth_providers;default:local" json:"oauth_providers,omitempty"`
+	Providers          string `gorm:"column:oauth_providers;" json:"oauth_providers,omitempty"`
 	GithubClientID     string `gorm:"column:gh_client_id" json:"gh_client_id,omitempty" scope:"admin"`
 	GithubClientSecret string `gorm:"column:gh_client_secret" json:"gh_client_secret,omitempty" scope:"admin"`
 	GoogleClientID     string `gorm:"column:google_client_id" json:"google_client_id,omitempty" scope:"admin"`

@@ -135,8 +135,10 @@ func main() {
 			exit(errors.Wrap(err, "error creating default admin user"))
 		}
 
-		if err := configs.TriggerSamples(); err != nil {
-			exit(errors.Wrap(err, "error creating database"))
+		if utils.Getenv("SAMPLE_DATA", true).(bool) {
+			if err := configs.TriggerSamples(); err != nil {
+				exit(errors.Wrap(err, "error creating database"))
+			}
 		}
 
 	}

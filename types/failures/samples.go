@@ -5,10 +5,6 @@ import (
 	"github.com/statping/statping/types"
 	"github.com/statping/statping/utils"
 	"time"
-
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 var (
