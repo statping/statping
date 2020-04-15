@@ -232,22 +232,24 @@ download-key:
 	wget -O statping.gpg $(SIGN_URL)
 	gpg --import statping.gpg
 
-# build :latest docker tag
-docker-build-latest:
-	docker build --build-arg VERSION=${VERSION} -t statping/statping:latest --no-cache -f Dockerfile .
-	docker tag statping/statping:latest statping/statping:v${VERSION}
-
 # push the :dev docker tag using curl
-publish-dev:
-	curl -H "Content-Type: application/json" --data '{"docker_tag": "dev"}' -X POST $(DOCKER)
+dockerhub-dev:
+	docker build --build-arg VERSION=${VERSION} -t statping/statping:dev --no-cache -f Dockerfile.base .
+	docker push statping/statping:dev
 
-publish-latest: publish-base
-	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
+dockerhub:
+	docker build --build-arg VERSION=${VERSION} -t statping/statping:base --no-cache -f Dockerfile.base .
+	docker build --build-arg VERSION=${VERSION} -t statping/statping:latest --no-cache -f Dockerfile .
+	docker tag statping/statping statping/statping:v${VERSION}
+	docker push statping/statping:base
+	docker push statping/statping:v${VERSION}
+	docker push statping/statping
 
-publish-base:
-	curl -H "Content-Type: application/json" --data '{"docker_tag": "base"}' -X POST $(DOCKER)
+docker-build-dev:
+	docker build --build-arg VERSION=${VERSION} -t hunterlong/statping:latest --no-cache -f Dockerfile .
+	docker tag hunterlong/statping:dev hunterlong/statping:dev-v${VERSION}
 
-post-release: frontend-build upload_to_s3 publish-homebrew publish-latest
+post-release: frontend-build upload_to_s3 publish-homebrew dockerhub
 
 # update the homebrew application to latest for mac
 publish-homebrew:
