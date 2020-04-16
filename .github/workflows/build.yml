@@ -3,11 +3,18 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - '**.md'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: ./src/github.com/${{ github.repository }}
+
       - name: Install Go
         uses: actions/setup-go@v1
         with:
@@ -17,17 +24,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '10.x'
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          path: ./src/github.com/${{ github.repository }}
+      - run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
 
       - name: Frontend Dependencies
         working-directory: ./frontend
-        run: |
-          npm install -g yarn sass newman cross-env wait-on @sentry/cli
-          yarn
+        run: yarn
 
       - name: Build Statping
         run: |
