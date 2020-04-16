@@ -1,78 +1,59 @@
 package configs
 
 import (
-	"github.com/joho/godotenv"
-	"github.com/pkg/errors"
+	"fmt"
 	"github.com/statping/statping/utils"
 )
 
-func loadConfigEnvs() (*DbConfig, error) {
-	var err error
+func (d *DbConfig) ConnectionString() string {
+	var conn string
+	postgresSSL := utils.Params.GetString("POSTGRES_SSLMODE")
 
-	log.Infof("Loading configs from environment variables")
-
-	loadDotEnvs()
-
-	dbConn := utils.Getenv("DB_CONN", "").(string)
-	dbHost := utils.Getenv("DB_HOST", "").(string)
-	dbUser := utils.Getenv("DB_USER", "").(string)
-	dbPass := utils.Getenv("DB_PASS", "").(string)
-	dbData := utils.Getenv("DB_DATABASE", "").(string)
-	dbPort := utils.Getenv("DB_PORT", defaultPort(dbConn)).(int)
-	name := utils.Getenv("NAME", "Statping").(string)
-	desc := utils.Getenv("DESCRIPTION", "Statping Monitoring Sample Data").(string)
-	user := utils.Getenv("ADMIN_USER", "admin").(string)
-	password := utils.Getenv("ADMIN_PASS", "admin").(string)
-	domain := utils.Getenv("DOMAIN", "").(string)
-	sqlFile := utils.Getenv("SQL_FILE", "").(string)
-
-	if dbConn != "" && dbConn != "sqlite" {
-		if dbHost == "" {
-			return nil, errors.New("Missing DB_HOST environment variable")
+	switch d.DbConn {
+	case "sqlite", "sqlite3", "memory":
+		if d.DbConn == "memory" {
+			conn = "sqlite3"
+			d.DbConn = ":memory:"
+			return d.DbConn
+		} else {
+			conn, err := findDbFile(d)
+			if err != nil {
+				log.Errorln(err)
+			}
+			d.SqlFile = conn
+			log.Infof("SQL database file at: %s", d.SqlFile)
+			d.DbConn = "sqlite3"
+			return d.SqlFile
 		}
-		if dbPort == 0 {
-			return nil, errors.New("Missing DB_PORT environment variable")
-		}
-		if dbUser == "" {
-			return nil, errors.New("Missing DB_USER environment variable")
-		}
-		if dbPass == "" {
-			return nil, errors.New("Missing DB_PASS environment variable")
-		}
-		if dbData == "" {
-			return nil, errors.New("Missing DB_DATABASE environment variable")
-		}
+	case "mysql":
+		host := fmt.Sprintf("%v:%v", d.DbHost, d.DbPort)
+		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC&time_zone=%%27UTC%%27", d.DbUser, d.DbPass, host, d.DbData)
+		return conn
+	case "postgres":
+		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v timezone=UTC sslmode=%v", d.DbHost, d.DbPort, d.DbUser, d.DbData, d.DbPass, postgresSSL)
+		return conn
 	}
-
-	config := &DbConfig{
-		DbConn:      dbConn,
-		DbHost:      dbHost,
-		DbUser:      dbUser,
-		DbPass:      dbPass,
-		DbData:      dbData,
-		DbPort:      dbPort,
-		Project:     name,
-		Description: desc,
-		Domain:      domain,
-		Email:       "",
-		Username:    user,
-		Password:    password,
-		Error:       nil,
-		Location:    utils.Directory,
-		SqlFile:     sqlFile,
-	}
-	return config, err
+	return conn
 }
 
-// loadDotEnvs attempts to load database configs from a '.env' file in root directory
-func loadDotEnvs() {
-	err := godotenv.Overload(utils.Directory + "/" + ".env")
-	if err == nil {
-		log.Warnln("Environment file '.env' found")
-		envs, _ := godotenv.Read(utils.Directory + "/" + ".env")
-		for k, e := range envs {
-			log.Infof("Overwriting %s=%s\n", k, e)
-		}
-		log.Warnln("These environment variables will overwrite any existing")
+func loadConfigEnvs() (*DbConfig, error) {
+	log.Infof("Loading configs from environment variables")
+	p := utils.Params
+	config := &DbConfig{
+		DbConn:      p.GetString("DB_CONN"),
+		DbHost:      p.GetString("DB_HOST"),
+		DbUser:      p.GetString("DB_USER"),
+		DbPass:      p.GetString("DB_PASS"),
+		DbData:      p.GetString("DB_DATABASE"),
+		DbPort:      p.GetInt("DB_PORT"),
+		Project:     p.GetString("NAME"),
+		Description: p.GetString("DESCRIPTION"),
+		Domain:      p.GetString("DOMAIN"),
+		Email:       p.GetString("EMAIL"),
+		Username:    p.GetString("ADMIN_USER"),
+		Password:    p.GetString("ADMIN_PASS"),
+		Location:    utils.Directory,
+		SqlFile:     p.GetString("SQL_FILE"),
 	}
+	return config, nil
 }

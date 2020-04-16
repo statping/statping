@@ -83,14 +83,14 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	c := &core.Core{
 		Name:        project,
 		Description: description,
-		//ApiKey:      apiKey.(string),
-		//ApiSecret:   apiSecret.(string),
-		Domain:    domain,
-		Version:   core.App.Version,
-		Started:   utils.Now(),
-		CreatedAt: utils.Now(),
-		UseCdn:    null.NewNullBool(false),
-		Footer:    null.NewNullString(""),
+		ApiKey:      utils.Params.GetString("API_KEY"),
+		ApiSecret:   utils.Params.GetString("API_SECRET"),
+		Domain:      domain,
+		Version:     core.App.Version,
+		Started:     utils.Now(),
+		CreatedAt:   utils.Now(),
+		UseCdn:      null.NewNullBool(false),
+		Footer:      null.NewNullString(""),
 	}
 
 	log.Infoln("Creating new Core")

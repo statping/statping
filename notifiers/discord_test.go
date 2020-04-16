@@ -4,6 +4,7 @@ import (
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"os"
@@ -12,7 +13,7 @@ import (
 )
 
 var (
-	DISCORD_URL    = os.Getenv("DISCORD_URL")
+	DISCORD_URL    = utils.Params.GetString("DISCORD_URL")
 	discordMessage = `{"content": "The discord notifier on Statping has been tested!"}`
 )
 

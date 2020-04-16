@@ -34,7 +34,6 @@ func Samples() error {
 		log.Infoln(fmt.Sprintf("Adding %v Failure records to service", 400))
 
 		for fi := 0.; fi <= float64(400); fi++ {
-			createdAt = createdAt.Add(35 * time.Minute)
 			failure := &Failure{
 				Service:   i,
 				Issue:     "testing right here",
@@ -42,6 +41,7 @@ func Samples() error {
 			}
 
 			tx = tx.Create(&failure)
+			createdAt = createdAt.Add(35 * time.Minute)
 		}
 		if err := tx.Commit().Error(); err != nil {
 			log.Error(err)

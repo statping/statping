@@ -1,11 +1,11 @@
 package configs
 
 import (
-	"fmt"
 	"github.com/pkg/errors"
 	"github.com/statping/statping/utils"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var log = utils.Log
@@ -18,7 +18,6 @@ func ConnectConfigs(configs *DbConfig) error {
 	if err := configs.Save(utils.Directory); err != nil {
 		return errors.Wrap(err, "error saving configuration")
 	}
-
 	return nil
 }
 
@@ -31,8 +30,7 @@ func LoadConfigs() (*DbConfig, error) {
 		return nil, errors.Errorf("Directory %s is not writable!", utils.Directory)
 	}
 
-	dbConn := utils.Getenv("DB_CONN", "").(string)
-	if dbConn != "" {
+	if utils.Params.GetString("DB_CONN") != "" {
 		configs, err := loadConfigEnvs()
 		if err != nil {
 			return LoadConfigFile(utils.Directory)
@@ -43,30 +41,39 @@ func LoadConfigs() (*DbConfig, error) {
 	return LoadConfigFile(utils.Directory)
 }
 
-func findDbFile(configs *DbConfig) string {
+func findDbFile(configs *DbConfig) (string, error) {
+	location := utils.Directory + "/" + SqliteFilename
 	if configs == nil {
-		return findSQLin(utils.Directory)
+		file, err := findSQLin(utils.Directory)
+		if err != nil {
+			return "", err
+		}
+		location = file
 	}
-	if configs.SqlFile != "" {
-		return configs.SqlFile
+	if configs != nil && configs.SqlFile != "" {
+		return configs.SqlFile, nil
 	}
-	return utils.Directory + "/" + SqliteFilename
+	return location, nil
 }
 
-func findSQLin(path string) string {
+func findSQLin(path string) (string, error) {
 	filename := SqliteFilename
+	var found []string
 	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
 		if filepath.Ext(path) == ".db" {
-			fmt.Println("DB file is now: ", info.Name())
 			filename = info.Name()
+			found = append(found, filename)
 		}
 		return nil
 	})
 	if err != nil {
-		log.Error(err)
+		return filename, err
 	}
-	return filename
+	if len(found) > 1 {
+		return filename, errors.Errorf("found multiple database files: %s", strings.Join(found, ", "))
+	}
+	return filename, nil
 }

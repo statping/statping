@@ -291,5 +291,11 @@ snapcraft: clean compile build-bin
 	snapcraft push statping_${VERSION}_i386.snap --release stable
 	snapcraft push statping_${VERSION}_armhf.snap --release stable
 
-.PHONY: all build build-all build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-bin build-win build-all
+postman: clean
+	API_SECRET=demosecret123 statping -p=8080 > /dev/null &
+	sleep 3
+	newman run -e dev/postman_environment.json dev/postman.json
+	killall statping
+
+.PHONY: all build build-all build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-bin build-win build-all postman
 .SILENT: travis_s3_creds

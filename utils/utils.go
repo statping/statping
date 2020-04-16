@@ -25,15 +25,9 @@ var (
 
 // init will set the utils.Directory to the current running directory, or STATPING_DIR if it is set
 func init() {
-	defaultDir, err := os.Getwd()
-	if err != nil {
-		defaultDir = "."
-	}
-
-	Directory = Getenv("STATPING_DIR", defaultDir).(string)
-
+	InitCLI()
 	// check if logs are disabled
-	disableLogs = Getenv("DISABLE_LOGS", false).(bool)
+	disableLogs = Params.GetBool("DISABLE_LOGS")
 	if disableLogs {
 		Log.Out = ioutil.Discard
 	}
@@ -63,28 +57,20 @@ func (e *env) Duration() time.Duration {
 }
 
 func Getenv(key string, defaultValue interface{}) interface{} {
-	if val, ok := os.LookupEnv(key); ok {
-		if val != "" {
-			switch d := defaultValue.(type) {
-
-			case int, int64:
-				return int(ToInt(val))
-
-			case time.Duration:
-				dur, err := time.ParseDuration(val)
-				if err != nil {
-					return d
-				}
-				return dur
-			case bool:
-				ok, err := strconv.ParseBool(val)
-				if err != nil {
-					return d
-				}
-				return ok
-			default:
-				return val
-			}
+	if defaultValue != nil {
+		Params.SetDefault(key, defaultValue)
+	}
+	val := Params.Get(key)
+	if val != nil {
+		switch val.(type) {
+		case int, int64:
+			return Params.GetInt(key)
+		case time.Duration:
+			return Params.GetDuration(key)
+		case bool:
+			return Params.GetBool(key)
+		default:
+			return val
 		}
 	}
 	return defaultValue

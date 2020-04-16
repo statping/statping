@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"github.com/rendon/testcli"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"testing"
@@ -22,7 +24,6 @@ func init() {
 
 func TestStartServerCommand(t *testing.T) {
 	t.SkipNow()
-	os.Setenv("DB_CONN", "sqlite")
 	cmd := helperCommand(nil, "")
 	var got = make(chan string)
 	commandAndSleep(cmd, time.Duration(60*time.Second), got)
@@ -116,13 +117,25 @@ func TestEnvironmentVarsCommand(t *testing.T) {
 }
 
 func TestVersionCLI(t *testing.T) {
-	run := catchCLI([]string{"version"})
-	assert.EqualError(t, run, "end")
+	cmd := rootCmd
+	b := bytes.NewBufferString("")
+	cmd.SetOut(b)
+	cmd.SetArgs([]string{"version"})
+	cmd.Execute()
+	out, err := ioutil.ReadAll(b)
+	assert.Nil(t, err)
+	assert.Contains(t, string(out), VERSION)
 }
 
 func TestAssetsCLI(t *testing.T) {
-	catchCLI([]string{"assets"})
-	//assert.EqualError(t, run, "end")
+	cmd := rootCmd
+	b := bytes.NewBufferString("")
+	cmd.SetOut(b)
+	cmd.SetArgs([]string{"assets"})
+	cmd.Execute()
+	out, err := ioutil.ReadAll(b)
+	assert.Nil(t, err)
+	assert.Contains(t, string(out), VERSION)
 	assert.FileExists(t, dir+"/assets/css/main.css")
 	assert.FileExists(t, dir+"/assets/css/style.css")
 	assert.FileExists(t, dir+"/assets/css/vendor.css")
@@ -132,8 +145,9 @@ func TestAssetsCLI(t *testing.T) {
 }
 
 func TestSassCLI(t *testing.T) {
-	t.SkipNow()
-	catchCLI([]string{"sass"})
+	c := testcli.Command("statping", "assets")
+	c.Run()
+	t.Log(c.Stdout())
 	assert.FileExists(t, dir+"/assets/css/main.css")
 	assert.FileExists(t, dir+"/assets/css/style.css")
 	assert.FileExists(t, dir+"/assets/css/vendor.css")
@@ -147,22 +161,6 @@ func TestUpdateCLI(t *testing.T) {
 	gg, _ := <-got
 	t.Log(gg)
 	assert.Contains(t, gg, "version")
-}
-
-func TestHelpCLI(t *testing.T) {
-	run := catchCLI([]string{"help"})
-	assert.EqualError(t, run, "end")
-}
-
-func TestRunOnceCLI(t *testing.T) {
-	t.SkipNow()
-	run := catchCLI([]string{"run"})
-	assert.EqualError(t, run, "end")
-}
-
-func TestEnvCLI(t *testing.T) {
-	run := catchCLI([]string{"env"})
-	assert.Error(t, run)
 }
 
 func commandAndSleep(cmd *exec.Cmd, duration time.Duration, out chan<- string) {

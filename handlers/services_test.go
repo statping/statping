@@ -77,7 +77,7 @@ func TestApiServiceRoutes(t *testing.T) {
 			Name:           "Statping Service Failures",
 			URL:            "/api/services/1/failures",
 			Method:         "GET",
-			ResponseLen:    125,
+			ResponseLen:    126,
 			ExpectedStatus: 200,
 		},
 		{
@@ -123,7 +123,7 @@ func TestApiServiceRoutes(t *testing.T) {
 			Name:           "Statping Service 1 Failure Data - 15 Minute",
 			URL:            "/api/services/1/failure_data" + startEndQuery + "&group=15m",
 			Method:         "GET",
-			ResponseLen:    124,
+			ResponseLen:    125,
 			ExpectedStatus: 200,
 		},
 		{

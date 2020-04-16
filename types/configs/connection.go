@@ -17,45 +17,19 @@ import (
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/types/users"
 	"github.com/statping/statping/utils"
-	"os"
 	"time"
 )
 
 // Connect will attempt to connect to the sqlite, postgres, or mysql database
 func Connect(configs *DbConfig, retry bool) error {
-	postgresSSL := os.Getenv("POSTGRES_SSLMODE")
-	var conn string
+	conn := configs.ConnectionString()
 	var err error
 
-	switch configs.DbConn {
-	case "sqlite", "sqlite3", "memory":
-		if configs.DbConn == "memory" {
-			conn = "sqlite3"
-			configs.DbConn = ":memory:"
-		} else {
-			conn = findDbFile(configs)
-			configs.SqlFile = conn
-			log.Infof("SQL database file at: %s", configs.SqlFile)
-			configs.DbConn = "sqlite3"
-		}
-	case "mysql":
-		host := fmt.Sprintf("%v:%v", configs.DbHost, configs.DbPort)
-		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC&time_zone=%%27UTC%%27", configs.DbUser, configs.DbPass, host, configs.DbData)
-	case "postgres":
-		sslMode := "disable"
-		if postgresSSL != "" {
-			sslMode = postgresSSL
-		}
-		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v timezone=UTC sslmode=%v", configs.DbHost, configs.DbPort, configs.DbUser, configs.DbData, configs.DbPass, sslMode)
-	case "mssql":
-		host := fmt.Sprintf("%v:%v", configs.DbHost, configs.DbPort)
-		conn = fmt.Sprintf("sqlserver://%v:%v@%v?database=%v", configs.DbUser, configs.DbPass, host, configs.DbData)
-	}
 	log.WithFields(utils.ToFields(configs, conn)).Debugln("attempting to connect to database")
 
 	dbSession, err := database.Openw(configs.DbConn, conn)
 	if err != nil {
-		log.Debugln(fmt.Sprintf("Database connection error %s", err))
+		log.Errorf(fmt.Sprintf("Database connection error %s", err))
 		if retry {
 			log.Warnln(fmt.Sprintf("Database %s connection to '%s' is not available, trying again in 5 seconds...", configs.DbConn, configs.DbHost))
 			time.Sleep(5 * time.Second)
@@ -65,20 +39,20 @@ func Connect(configs *DbConfig, retry bool) error {
 		}
 	}
 
-	apiKey := utils.Getenv("API_KEY", utils.RandomString(16)).(string)
-	apiSecret := utils.Getenv("API_SECRET", utils.RandomString(16)).(string)
+	apiKey := utils.Getenv("API_KEY", utils.RandomString(24)).(string)
+	apiSecret := utils.Getenv("API_SECRET", utils.RandomString(24)).(string)
 	configs.ApiKey = apiKey
 	configs.ApiSecret = apiSecret
 
 	log.WithFields(utils.ToFields(dbSession)).Debugln("connected to database")
 
-	maxOpenConn := utils.Getenv("MAX_OPEN_CONN", 25)
-	maxIdleConn := utils.Getenv("MAX_IDLE_CONN", 25)
-	maxLifeConn := utils.Getenv("MAX_LIFE_CONN", 5*time.Minute)
+	maxOpenConn := utils.Params.GetInt("MAX_OPEN_CONN")
+	maxIdleConn := utils.Params.GetInt("MAX_IDLE_CONN")
+	maxLifeConn := utils.Params.GetDuration("MAX_LIFE_CONN")
 
-	dbSession.DB().SetMaxOpenConns(maxOpenConn.(int))
-	dbSession.DB().SetMaxIdleConns(maxIdleConn.(int))
-	dbSession.DB().SetConnMaxLifetime(maxLifeConn.(time.Duration))
+	dbSession.DB().SetMaxOpenConns(maxOpenConn)
+	dbSession.DB().SetMaxIdleConns(maxIdleConn)
+	dbSession.DB().SetConnMaxLifetime(maxLifeConn)
 
 	if dbSession.DB().Ping() == nil {
 		if utils.VerboseMode >= 4 {

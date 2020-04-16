@@ -20,33 +20,33 @@ import (
 	"github.com/statping/statping/types/users"
 )
 
-func (c *DbConfig) DatabaseChanges() error {
+func (d *DbConfig) DatabaseChanges() error {
 	var cr core.Core
-	c.Db.Model(&core.Core{}).Find(&cr)
+	d.Db.Model(&core.Core{}).Find(&cr)
 
 	if latestMigration > cr.MigrationId {
 		log.Infof("Statping database is out of date, migrating to: %d", latestMigration)
 
-		switch c.Db.DbType() {
+		switch d.Db.DbType() {
 		case "mysql":
-			if err := c.genericMigration("MODIFY", false); err != nil {
+			if err := d.genericMigration("MODIFY", false); err != nil {
 				return err
 			}
 		case "postgres":
-			if err := c.genericMigration("ALTER", true); err != nil {
+			if err := d.genericMigration("ALTER", true); err != nil {
 				return err
 			}
 		default:
-			if err := c.sqliteMigration(); err != nil {
+			if err := d.sqliteMigration(); err != nil {
 				return err
 			}
 		}
 
-		if err := c.Db.Exec(fmt.Sprintf("UPDATE core SET migration_id = %d", latestMigration)).Error(); err != nil {
+		if err := d.Db.Exec(fmt.Sprintf("UPDATE core SET migration_id = %d", latestMigration)).Error(); err != nil {
 			return err
 		}
 
-		if err := c.BackupAssets(); err != nil {
+		if err := d.BackupAssets(); err != nil {
 			return err
 		}
 	}
@@ -55,7 +55,7 @@ func (c *DbConfig) DatabaseChanges() error {
 
 // BackupAssets is a temporary function (to version 0.90.*) to backup your customized theme
 // to a new folder called 'assets_backup'.
-func (c *DbConfig) BackupAssets() error {
+func (d *DbConfig) BackupAssets() error {
 	if source.UsingAssets(utils.Directory) {
 		log.Infof("Backing up 'assets' folder to 'assets_backup'")
 		if err := utils.RenameDirectory(utils.Directory+"/assets", utils.Directory+"/assets_backup"); err != nil {
@@ -69,12 +69,12 @@ func (c *DbConfig) BackupAssets() error {
 //MigrateDatabase will migrate the database structure to current version.
 //This function will NOT remove previous records, tables or columns from the database.
 //If this function has an issue, it will ROLLBACK to the previous state.
-func (c *DbConfig) MigrateDatabase() error {
+func (d *DbConfig) MigrateDatabase() error {
 
 	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
 
 	log.Infoln("Migrating Database Tables...")
-	tx := c.Db.Begin()
+	tx := d.Db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -99,27 +99,27 @@ func (c *DbConfig) MigrateDatabase() error {
 		return err
 	}
 
-	c.Db.Table("core").Model(&core.Core{}).Update("version", core.App.Version)
+	d.Db.Table("core").Model(&core.Core{}).Update("version", core.App.Version)
 
 	log.Infoln("Statping Database Tables Migrated")
 
-	if err := c.Db.Model(&hits.Hit{}).AddIndex("idx_service_hit", "service").Error(); err != nil {
+	if err := d.Db.Model(&hits.Hit{}).AddIndex("idx_service_hit", "service").Error(); err != nil {
 		log.Errorln(err)
 	}
 
-	if err := c.Db.Model(&hits.Hit{}).AddIndex("hit_created_at", "created_at").Error(); err != nil {
+	if err := d.Db.Model(&hits.Hit{}).AddIndex("hit_created_at", "created_at").Error(); err != nil {
 		log.Errorln(err)
 	}
 
-	if err := c.Db.Model(&failures.Failure{}).AddIndex("fail_created_at", "created_at").Error(); err != nil {
+	if err := d.Db.Model(&failures.Failure{}).AddIndex("fail_created_at", "created_at").Error(); err != nil {
 		log.Errorln(err)
 	}
 
-	if err := c.Db.Model(&failures.Failure{}).AddIndex("idx_service_fail", "service").Error(); err != nil {
+	if err := d.Db.Model(&failures.Failure{}).AddIndex("idx_service_fail", "service").Error(); err != nil {
 		log.Errorln(err)
 	}
 
-	if err := c.Db.Model(&failures.Failure{}).AddIndex("idx_checkin_fail", "checkin").Error(); err != nil {
+	if err := d.Db.Model(&failures.Failure{}).AddIndex("idx_checkin_fail", "checkin").Error(); err != nil {
 		log.Errorln(err)
 	}
 	log.Infoln("Database Indexes Created")

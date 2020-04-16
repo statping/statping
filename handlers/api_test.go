@@ -48,12 +48,12 @@ func TestFailedHTTPServer(t *testing.T) {
 
 func TestSetupRoutes(t *testing.T) {
 	form := url.Values{}
-	form.Add("db_host", "")
-	form.Add("db_user", "")
-	form.Add("db_password", "")
-	form.Add("db_database", "")
-	form.Add("db_connection", "sqlite")
-	form.Add("db_port", "")
+	form.Add("db_host", utils.Params.GetString("DB_HOST"))
+	form.Add("db_user", utils.Params.GetString("DB_USER"))
+	form.Add("db_password", utils.Params.GetString("DB_PASS"))
+	form.Add("db_database", utils.Params.GetString("DB_DATABASE"))
+	form.Add("db_connection", utils.Params.GetString("DB_CONN"))
+	form.Add("db_port", utils.Params.GetString("DB_PORT"))
 	form.Add("project", "Tester")
 	form.Add("username", "admin")
 	form.Add("password", "password123")
@@ -82,7 +82,7 @@ func TestSetupRoutes(t *testing.T) {
 			Body:           form.Encode(),
 			ExpectedStatus: 200,
 			HttpHeaders:    []string{"Content-Type=application/x-www-form-urlencoded"},
-			ExpectedFiles:  []string{dir + "/config.yml", dir + "/" + "statping.db"},
+			ExpectedFiles:  []string{utils.Directory + "/config.yml"},
 			FuncTest: func(t *testing.T) error {
 				if !core.App.Setup {
 					return errors.New("core has not been setup")

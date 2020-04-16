@@ -26,14 +26,14 @@ func Router() *mux.Router {
 	CacheStorage = NewStorage()
 	r := mux.NewRouter().StrictSlash(true)
 
-	authUser := utils.Getenv("AUTH_USERNAME", "").(string)
-	authPass := utils.Getenv("AUTH_PASSWORD", "").(string)
+	authUser := utils.Params.GetString("AUTH_USERNAME")
+	authPass := utils.Params.GetString("AUTH_PASSWORD")
 
 	if authUser != "" && authPass != "" {
 		r.Use(basicAuthHandler)
 	}
 
-	bPath := utils.Getenv("BASE_PATH", "").(string)
+	bPath := utils.Params.GetString("BASE_PATH")
 	sentryHandler := sentryhttp.New(sentryhttp.Options{})
 
 	if bPath != "" {

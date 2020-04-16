@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/statping/statping/database"
@@ -31,26 +30,16 @@ var (
 	confgs      *configs.DbConfig
 )
 
-// parseFlags will parse the application flags
-// -ip = 0.0.0.0 IP address for outgoing HTTP server
-// -port = 8080 Port number for outgoing HTTP server
-// environment variables WILL overwrite flags
-func parseFlags() {
-	envPort := utils.Getenv("PORT", 8080).(int)
-	envIpAddress := utils.Getenv("IP", "0.0.0.0").(string)
-	envVerbose := utils.Getenv("VERBOSE", 2).(int)
-	//envGrpcPort := utils.Getenv("GRPC_PORT", 0).(int)
-
-	flag.StringVar(&ipAddress, "ip", envIpAddress, "IP address to run the Statping HTTP server")
-	flag.StringVar(&envFile, "env", "", "IP address to run the Statping HTTP server")
-	flag.IntVar(&port, "port", envPort, "Port to run the HTTP server")
-	//flag.IntVar(&grpcPort, "grpc", envGrpcPort, "Port to run the gRPC server")
-	flag.IntVar(&verboseMode, "verbose", envVerbose, "Run in verbose mode to see detailed logs (1 - 4)")
-	flag.Parse()
-}
-
 func init() {
 	core.New(VERSION)
+	utils.InitCLI()
+	parseFlags(rootCmd)
+	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(assetsCmd)
+	rootCmd.AddCommand(exportCmd)
+	rootCmd.AddCommand(importCmd)
+	rootCmd.AddCommand(sassCmd)
+	rootCmd.AddCommand(onceCmd)
 }
 
 // exit will return an error and return an exit code 1 due to this error
@@ -69,10 +58,13 @@ func Close() {
 
 // main will run the Statping application
 func main() {
+	Execute()
+}
+
+// main will run the Statping application
+func start() {
 	var err error
 	go sigterm()
-
-	parseFlags()
 
 	if err := source.Assets(); err != nil {
 		exit(err)
@@ -84,23 +76,11 @@ func main() {
 		log.Errorf("Statping Log Error: %v\n", err)
 	}
 
-	args := flag.Args()
-
-	if len(args) >= 1 {
-		err := catchCLI(args)
-		if err != nil {
-			if err.Error() == "end" {
-				os.Exit(0)
-				return
-			}
-			exit(err)
-		}
-	}
 	log.Info(fmt.Sprintf("Starting Statping v%s", VERSION))
 
-	if err := updateDisplay(); err != nil {
-		log.Warnln(err)
-	}
+	//if err := updateDisplay(); err != nil {
+	//	log.Warnln(err)
+	//}
 
 	confgs, err = configs.LoadConfigs()
 	if err != nil {
@@ -135,7 +115,7 @@ func main() {
 			exit(errors.Wrap(err, "error creating default admin user"))
 		}
 
-		if utils.Getenv("SAMPLE_DATA", true).(bool) {
+		if utils.Params.GetBool("SAMPLE_DATA") {
 			if err := configs.TriggerSamples(); err != nil {
 				exit(errors.Wrap(err, "error creating database"))
 			}

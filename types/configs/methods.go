@@ -1,21 +1,12 @@
 package configs
 
-import (
-	"gopkg.in/yaml.v2"
-	"io/ioutil"
-	"os"
-)
+import "github.com/statping/statping/utils"
 
 // Save will initially create the config.yml file
 func (d *DbConfig) Save(directory string) error {
-	data, err := yaml.Marshal(d)
-	if err != nil {
-		return err
+	if err := utils.Params.SafeWriteConfigAs(directory + "/config.yml"); err != nil {
+		return nil
 	}
-	if err := ioutil.WriteFile(directory+"/config.yml", data, os.ModePerm); err != nil {
-		return err
-	}
-	d.filename = directory + "/config.yml"
 	return nil
 }
 

@@ -9,7 +9,6 @@ import (
 
 func LoadConfigFile(directory string) (*DbConfig, error) {
 	var configs *DbConfig
-
 	log.Infof("Attempting to read config file at: %s/config.yml ", directory)
 	file, err := utils.OpenFile(directory + "/config.yml")
 	if err != nil {

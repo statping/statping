@@ -44,7 +44,7 @@ func RunHTTPServer(ip string, port int) error {
 		log.Infoln(fmt.Sprintf("Statping Secure HTTPS Server running on https://%v:%v", ip, 443))
 		usingSSL = true
 	} else {
-		log.Infoln("Statping HTTP Server running on http://" + host)
+		log.Infoln("Statping HTTP Server running on http://" + host + basePath)
 	}
 
 	router = Router()
@@ -172,7 +172,7 @@ func IsAdmin(r *http.Request) bool {
 	if !core.App.Setup {
 		return false
 	}
-	if utils.Getenv("GO_ENV", false).(bool) {
+	if utils.Params.GetString("GO_ENV") == "test" {
 		return true
 	}
 	claim, err := getJwtToken(r)

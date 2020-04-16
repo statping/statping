@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"github.com/statping/statping/handlers"
 	"github.com/statping/statping/source"
@@ -18,209 +17,158 @@ import (
 	"time"
 )
 
-// catchCLI will run functions based on the commands sent to Statping
-func catchCLI(args []string) error {
+func assetsCli() error {
 	dir := utils.Directory
-	runLogs := utils.InitLogs
-	runAssets := source.Assets
+	if err := utils.InitLogs(); err != nil {
+		return err
+	}
+	if err := source.Assets(); err != nil {
+		return err
+	}
+	if err := source.CreateAllAssets(dir); err != nil {
+		return err
+	}
+	return nil
+}
 
-	switch args[0] {
-	case "version":
-		if COMMIT != "" {
-			fmt.Printf("%s (%s)\n", VERSION, COMMIT)
-		} else {
-			fmt.Printf("%s\n", VERSION)
-		}
-		return errors.New("end")
-	case "assets":
-		var err error
-		if err = runLogs(); err != nil {
-			return err
-		}
-		if err = runAssets(); err != nil {
-			return err
-		}
-		if err = source.CreateAllAssets(dir); err != nil {
-			return err
-		}
-		return errors.New("end")
-	case "sass":
-		if err := runLogs(); err != nil {
-			return err
-		}
-		if err := runAssets(); err != nil {
-			return err
-		}
-		if err := source.CompileSASS(source.DefaultScss...); err != nil {
-			return err
-		}
-		return errors.New("end")
-	case "update":
-		updateDisplay()
-		return errors.New("end")
-	case "static":
-		//var err error
-		//if err = runLogs(); err != nil {
-		//	return err
-		//}
-		//if err = runAssets(); err != nil {
-		//	return err
-		//}
-		//fmt.Printf("Statping v%v Exporting Static 'index.html' page...\n", VERSION)
-		//if _, err = core.LoadConfigFile(dir); err != nil {
-		//	log.Errorln("config.yml file not found")
-		//	return err
-		//}
-		//indexSource := ExportIndexHTML()
-		////core.CloseDB()
-		//if err = utils.SaveFile(dir+"/index.html", indexSource); err != nil {
-		//	log.Errorln(err)
-		//	return err
-		//}
-		//log.Infoln("Exported Statping index page: 'index.html'")
-	case "help":
-		HelpEcho()
-		return errors.New("end")
-	case "export":
-		var err error
-		var data []byte
-		if err = runLogs(); err != nil {
-			return err
-		}
-		if err = runAssets(); err != nil {
-			return err
-		}
-		config, err := configs.LoadConfigs()
-		if err != nil {
-			return err
-		}
-		if err = configs.ConnectConfigs(config); err != nil {
-			return err
-		}
-		if _, err := services.SelectAllServices(false); err != nil {
-			return err
-		}
-		if data, err = handlers.ExportSettings(); err != nil {
-			return fmt.Errorf("could not export settings: %v", err.Error())
-		}
-		filename := fmt.Sprintf("%s/statping-%s.json", dir, time.Now().Format("01-02-2006-1504"))
-		if err = utils.SaveFile(filename, data); err != nil {
-			return fmt.Errorf("could not write file statping-export.json: %v", err.Error())
-		}
-		log.Infoln("Statping export file saved to ", filename)
-		return errors.New("end")
-	case "import":
-		var err error
-		var data []byte
-		if len(args) != 2 {
-			return fmt.Errorf("did not include a JSON file to import\nstatping import filename.json")
-		}
-		filename := args[1]
-		if data, err = ioutil.ReadFile(filename); err != nil {
-			return err
-		}
-		var exportData handlers.ExportData
-		if err = json.Unmarshal(data, &exportData); err != nil {
-			return err
-		}
-		log.Printf("=== %s ===\n", exportData.Core.Name)
-		log.Printf("Services:   %d\n", len(exportData.Services))
-		log.Printf("Checkins:   %d\n", len(exportData.Checkins))
-		log.Printf("Groups:     %d\n", len(exportData.Groups))
-		log.Printf("Messages:   %d\n", len(exportData.Messages))
-		log.Printf("Users:      %d\n", len(exportData.Users))
+func exportCli(args []string) error {
+	filename := fmt.Sprintf("%s/statping-%s.json", utils.Directory, time.Now().Format("01-02-2006-1504"))
+	if len(args) == 1 {
+		filename = fmt.Sprintf("%s/%s", utils.Directory, args)
+	}
+	var data []byte
+	if err := utils.InitLogs(); err != nil {
+		return err
+	}
+	if err := source.Assets(); err != nil {
+		return err
+	}
+	config, err := configs.LoadConfigs()
+	if err != nil {
+		return err
+	}
+	if err = configs.ConnectConfigs(config); err != nil {
+		return err
+	}
+	if _, err := services.SelectAllServices(false); err != nil {
+		return err
+	}
+	if data, err = handlers.ExportSettings(); err != nil {
+		return fmt.Errorf("could not export settings: %v", err.Error())
+	}
+	if err = utils.SaveFile(filename, data); err != nil {
+		return fmt.Errorf("could not write file statping-export.json: %v", err.Error())
+	}
+	log.Infoln("Statping export file saved to ", filename)
+	return nil
+}
 
-		config, err := configs.LoadConfigs()
-		if err != nil {
-			return err
-		}
-		if err = configs.ConnectConfigs(config); err != nil {
-			return err
-		}
-		if data, err = handlers.ExportSettings(); err != nil {
-			return fmt.Errorf("could not export settings: %v", err.Error())
-		}
+func sassCli() error {
+	if err := utils.InitLogs(); err != nil {
+		return err
+	}
+	if err := source.Assets(); err != nil {
+		return err
+	}
+	if err := source.CompileSASS(source.DefaultScss...); err != nil {
+		return err
+	}
+	return nil
+}
 
-		if ask("Import Core settings?") {
-			c := exportData.Core
-			if err := c.Update(); err != nil {
+func onceCli() error {
+	if err := utils.InitLogs(); err != nil {
+		return err
+	}
+	if err := source.Assets(); err != nil {
+		return err
+	}
+	log.Infoln("Running 1 time and saving to database...")
+	if err := runOnce(); err != nil {
+		return err
+	}
+	//core.CloseDB()
+	fmt.Println("Check is complete.")
+	return nil
+}
+
+func importCli(args []string) error {
+	var err error
+	var data []byte
+	filename := args[1]
+	if data, err = ioutil.ReadFile(filename); err != nil {
+		return err
+	}
+	var exportData handlers.ExportData
+	if err = json.Unmarshal(data, &exportData); err != nil {
+		return err
+	}
+	log.Printf("=== %s ===\n", exportData.Core.Name)
+	log.Printf("Services:   %d\n", len(exportData.Services))
+	log.Printf("Checkins:   %d\n", len(exportData.Checkins))
+	log.Printf("Groups:     %d\n", len(exportData.Groups))
+	log.Printf("Messages:   %d\n", len(exportData.Messages))
+	log.Printf("Users:      %d\n", len(exportData.Users))
+
+	config, err := configs.LoadConfigs()
+	if err != nil {
+		return err
+	}
+	if err = configs.ConnectConfigs(config); err != nil {
+		return err
+	}
+	if data, err = handlers.ExportSettings(); err != nil {
+		return fmt.Errorf("could not export settings: %v", err.Error())
+	}
+
+	if ask("Import Core settings?") {
+		c := exportData.Core
+		if err := c.Update(); err != nil {
+			return err
+		}
+	}
+	for _, s := range exportData.Groups {
+		if ask(fmt.Sprintf("Import Group '%s'?", s.Name)) {
+			s.Id = 0
+			if err := s.Create(); err != nil {
 				return err
 			}
 		}
-		for _, s := range exportData.Groups {
-			if ask(fmt.Sprintf("Import Group '%s'?", s.Name)) {
-				s.Id = 0
-				if err := s.Create(); err != nil {
-					return err
-				}
-			}
-		}
-		for _, s := range exportData.Services {
-			if ask(fmt.Sprintf("Import Service '%s'?", s.Name)) {
-				s.Id = 0
-				if err := s.Create(); err != nil {
-					return err
-				}
-			}
-		}
-		for _, s := range exportData.Checkins {
-			if ask(fmt.Sprintf("Import Checkin '%s'?", s.Name)) {
-				s.Id = 0
-				if err := s.Create(); err != nil {
-					return err
-				}
-			}
-		}
-		for _, s := range exportData.Messages {
-			if ask(fmt.Sprintf("Import Message '%s'?", s.Title)) {
-				s.Id = 0
-				if err := s.Create(); err != nil {
-					return err
-				}
-			}
-		}
-		for _, s := range exportData.Users {
-			if ask(fmt.Sprintf("Import User '%s'?", s.Username)) {
-				s.Id = 0
-				if err := s.Create(); err != nil {
-					return err
-				}
-			}
-		}
-		log.Infof("Import complete")
-		return errors.New("end")
-	case "run":
-		if err := runLogs(); err != nil {
-			return err
-		}
-		if err := runAssets(); err != nil {
-			return err
-		}
-		log.Infoln("Running 1 time and saving to database...")
-		runOnce()
-		//core.CloseDB()
-		fmt.Println("Check is complete.")
-		return errors.New("end")
-	case "env":
-		fmt.Println("Statping Environment Variable")
-		if err := runLogs(); err != nil {
-			return err
-		}
-		if err := runAssets(); err != nil {
-			return err
-		}
-		envs, err := godotenv.Read(".env")
-		if err != nil {
-			log.Errorln("No .env file found in current directory.")
-			return err
-		}
-		for k, e := range envs {
-			fmt.Printf("%v=%v\n", k, e)
-		}
-	default:
-		return nil
 	}
-	return errors.New("end")
+	for _, s := range exportData.Services {
+		if ask(fmt.Sprintf("Import Service '%s'?", s.Name)) {
+			s.Id = 0
+			if err := s.Create(); err != nil {
+				return err
+			}
+		}
+	}
+	for _, s := range exportData.Checkins {
+		if ask(fmt.Sprintf("Import Checkin '%s'?", s.Name)) {
+			s.Id = 0
+			if err := s.Create(); err != nil {
+				return err
+			}
+		}
+	}
+	for _, s := range exportData.Messages {
+		if ask(fmt.Sprintf("Import Message '%s'?", s.Title)) {
+			s.Id = 0
+			if err := s.Create(); err != nil {
+				return err
+			}
+		}
+	}
+	for _, s := range exportData.Users {
+		if ask(fmt.Sprintf("Import User '%s'?", s.Username)) {
+			s.Id = 0
+			if err := s.Create(); err != nil {
+				return err
+			}
+		}
+	}
+	log.Infof("Import complete")
+	return nil
 }
 
 func ask(format string) bool {
