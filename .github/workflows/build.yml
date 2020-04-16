@@ -15,6 +15,10 @@ jobs:
         with:
           go-version: '1.14.x'
 
+      - name: Add GOBIN to PATH
+        run: echo "::add-path::$(go env GOPATH)/bin"
+        shell: bash
+
       - name: Install Node
         uses: actions/setup-node@v1
         with:
@@ -26,11 +30,29 @@ jobs:
       - name: Checkout Statping
         uses: actions/checkout@v2
 
+      - uses: actions/cache@v1
+        id: nodecache
+        with:
+          path: ./frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Download Frontend Dependencies
+        if: steps.nodecache.outputs.cache-hit != 'true'
         working-directory: ./frontend
         run: yarn
 
+      - uses: actions/cache@v1
+        id: golangcache
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
       - name: Download Go mods
+        if: steps.golangcache.outputs.cache-hit != 'true'
         run: |
           go mod download
           go mod verify
