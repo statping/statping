@@ -70,10 +70,15 @@ jobs:
       - name: Test Statping
         env:
           DB_CONN: sqlite3
+          STATPING_DIR: /home/runner/work/statping/statping
+          API_KEY: demopassword123
         run: SASS=`which sass` go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
 
       - name: Build Binaries
         run: make build-bin build-win
+
+#      - name: Build Binaries
+#        run: goveralls -coverprofile=coverage.out -service=travis -repotoken $(COVERALLS)
 
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2.0.0
