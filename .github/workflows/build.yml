@@ -62,7 +62,10 @@ jobs:
         run: make clean compile
 
       - name: Install Statping
-        run: make install
+        run: |
+          make build
+          chmod +x statping
+          mv statping $(go env GOPATH)/bin/
 
       - name: Test Statping
         env:
