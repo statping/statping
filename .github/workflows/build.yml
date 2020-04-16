@@ -7,7 +7,7 @@ on:
       - '**.md'
 
 jobs:
-  build:
+  build-binary:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -19,16 +19,17 @@ jobs:
         uses: actions/setup-go@v1
         with:
           go-version: '1.14.x'
+        run: |
+          go mod download
+          go mod verify
 
       - name: Install Node
         uses: actions/setup-node@v1
         with:
           node-version: '10.x'
-      - run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
-
-      - name: Frontend Dependencies
-        working-directory: ./frontend
-        run: yarn
+        run: |
+          npm install -g yarn sass newman cross-env wait-on @sentry/cli
+          cd frontend && yarn && yarn build
 
       - name: Build Statping
         run: |
