@@ -293,7 +293,7 @@ snapcraft: clean compile build-bin
 	snapcraft push statping_${VERSION}_armhf.snap --release stable
 
 postman: clean
-	API_SECRET=demosecret123 statping -p=8080 > /dev/null &
+	API_SECRET=demosecret123 statping --port=8080 > /dev/null &
 	sleep 3
 	newman run -e dev/postman_environment.json dev/postman.json
 	killall statping
