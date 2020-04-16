@@ -30,14 +30,6 @@ func LoadConfigs() (*DbConfig, error) {
 		return nil, errors.Errorf("Directory %s is not writable!", utils.Directory)
 	}
 
-	if utils.Params.GetString("DB_CONN") != "" {
-		configs, err := loadConfigEnvs()
-		if err != nil {
-			return LoadConfigFile(utils.Directory)
-		}
-		return configs, nil
-	}
-
 	return LoadConfigFile(utils.Directory)
 }
 

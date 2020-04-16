@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/statping/statping/types"
@@ -9,12 +10,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
 )
 
 func TestApiServiceRoutes(t *testing.T) {
-
 	since := utils.Now().Add(-30 * types.Day)
-	startEndQuery := fmt.Sprintf("?start=%d&end=%d", since.Unix(), utils.Now().Unix())
+	end := utils.Now().Add(-30 * time.Minute)
+	startEndQuery := fmt.Sprintf("?start=%d&end=%d", since.Unix(), end.Unix()+15)
 
 	tests := []HTTPTest{
 		{
@@ -75,9 +77,23 @@ func TestApiServiceRoutes(t *testing.T) {
 		},
 		{
 			Name:           "Statping Service Failures",
-			URL:            "/api/services/1/failures",
+			URL:            "/api/services/1/failures" + startEndQuery,
 			Method:         "GET",
-			ResponseLen:    126,
+			GreaterThan:    120,
+			ExpectedStatus: 200,
+		},
+		{
+			Name:           "Statping Service 1 Hits",
+			URL:            "/api/services/1/hits" + startEndQuery,
+			Method:         "GET",
+			GreaterThan:    8580,
+			ExpectedStatus: 200,
+		},
+		{
+			Name:           "Statping Service 2 Hits",
+			URL:            "/api/services/2/hits" + startEndQuery,
+			Method:         "GET",
+			GreaterThan:    8580,
 			ExpectedStatus: 200,
 		},
 		{
@@ -88,55 +104,73 @@ func TestApiServiceRoutes(t *testing.T) {
 			ExpectedStatus: 200,
 		},
 		{
-			Name:           "Statping Service 1 Data",
+			Name:           "Statping Service 1 Hits Data",
 			URL:            "/api/services/1/hits_data" + startEndQuery,
 			Method:         "GET",
-			ResponseLen:    73,
+			GreaterThan:    70,
 			ExpectedStatus: 200,
 		},
 		{
 			Name:           "Statping Service 1 Ping Data",
 			URL:            "/api/services/1/ping_data" + startEndQuery,
 			Method:         "GET",
-			ResponseLen:    73,
 			ExpectedStatus: 200,
+			GreaterThan:    70,
 		},
 		{
 			Name:           "Statping Service 1 Failure Data - 24 Hour",
 			URL:            "/api/services/1/failure_data" + startEndQuery + "&group=24h",
 			Method:         "GET",
 			ExpectedStatus: 200,
+			GreaterThan:    4,
 		},
 		{
 			Name:           "Statping Service 1 Failure Data - 12 Hour",
 			URL:            "/api/services/1/failure_data" + startEndQuery + "&group=12h",
 			Method:         "GET",
 			ExpectedStatus: 200,
+			GreaterThan:    7,
 		},
 		{
 			Name:           "Statping Service 1 Failure Data - 1 Hour",
 			URL:            "/api/services/1/failure_data" + startEndQuery + "&group=1h",
 			Method:         "GET",
 			ExpectedStatus: 200,
+			GreaterThan:    70,
 		},
 		{
 			Name:           "Statping Service 1 Failure Data - 15 Minute",
 			URL:            "/api/services/1/failure_data" + startEndQuery + "&group=15m",
 			Method:         "GET",
-			ResponseLen:    125,
+			GreaterThan:    120,
 			ExpectedStatus: 200,
 		},
 		{
 			Name:           "Statping Service 1 Hits",
 			URL:            "/api/services/1/hits_data" + startEndQuery,
 			Method:         "GET",
-			ResponseLen:    73,
+			GreaterThan:    70,
 			ExpectedStatus: 200,
+		},
+		{
+			Name:           "Statping Service 1 Uptime",
+			URL:            "/api/services/1/uptime_data" + startEndQuery,
+			Method:         "GET",
+			ExpectedStatus: 200,
+			ResponseFunc: func(t *testing.T, resp []byte) error {
+				var uptime *services.UptimeSeries
+				if err := json.Unmarshal(resp, &uptime); err != nil {
+					return err
+				}
+				assert.GreaterOrEqual(t, uptime.Uptime, int64(259100000))
+				return nil
+			},
 		},
 		{
 			Name:           "Statping Service 1 Failure Data",
 			URL:            "/api/services/1/failure_data" + startEndQuery,
 			Method:         "GET",
+			GreaterThan:    70,
 			ExpectedStatus: 200,
 		},
 		{
@@ -169,7 +203,7 @@ func TestApiServiceRoutes(t *testing.T) {
 					"order_id": 0
 				}`,
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"status":"success","type":"service","method":"create"`, `"public":false`, `"group_id":1`},
+			ExpectedContains: []string{Success, `"type":"service","method":"create"`, `"public":false`, `"group_id":1`},
 			FuncTest: func(t *testing.T) error {
 				count := len(services.Services())
 				if count != 7 {
@@ -198,7 +232,7 @@ func TestApiServiceRoutes(t *testing.T) {
 					"order_id": 0
 				}`,
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"status":"success"`, `"name":"Updated New Service"`, `"method":"update"`},
+			ExpectedContains: []string{Success, `"name":"Updated New Service"`, `"method":"update"`},
 			FuncTest: func(t *testing.T) error {
 				item, err := services.Find(1)
 				require.Nil(t, err)
@@ -214,7 +248,7 @@ func TestApiServiceRoutes(t *testing.T) {
 			URL:              "/api/services/1/failures",
 			Method:           "DELETE",
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"status":"success"`, `"method":"delete_failures"`},
+			ExpectedContains: []string{Success, `"method":"delete_failures"`},
 			FuncTest: func(t *testing.T) error {
 				item, err := services.Find(1)
 				require.Nil(t, err)
@@ -231,7 +265,7 @@ func TestApiServiceRoutes(t *testing.T) {
 			URL:              "/api/services/1",
 			Method:           "DELETE",
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"status":"success"`, `"method":"delete"`},
+			ExpectedContains: []string{Success, `"method":"delete"`},
 			FuncTest: func(t *testing.T) error {
 				count := len(services.Services())
 				if count != 6 {

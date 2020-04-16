@@ -60,10 +60,6 @@ func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 	PrometheusKeyValue("total_services", len(services.Services()))
 	PrometheusKeyValue("seconds_online", secondsOnline)
 
-	if secondsOnline < 5 {
-		return
-	}
-
 	for _, ser := range services.AllInOrder() {
 		online := 1
 		if !ser.Online {

@@ -131,12 +131,6 @@ func start() {
 		exit(err)
 	}
 
-	//log.Infoln("Migrating Notifiers...")
-	//if err := notifier.Migrate(); err != nil {
-	//	exit(errors.Wrap(err, "error migrating notifiers"))
-	//}
-	//log.Infoln("Notifiers Migrated")
-
 	if err := mainProcess(); err != nil {
 		exit(err)
 	}

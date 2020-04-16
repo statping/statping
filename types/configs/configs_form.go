@@ -10,18 +10,19 @@ func LoadConfigForm(r *http.Request) (*DbConfig, error) {
 	if err := r.ParseForm(); err != nil {
 		return nil, err
 	}
-	dbHost := r.PostForm.Get("db_host")
-	dbUser := r.PostForm.Get("db_user")
-	dbPass := r.PostForm.Get("db_password")
-	dbDatabase := r.PostForm.Get("db_database")
-	dbConn := r.PostForm.Get("db_connection")
-	dbPort := utils.ToInt(r.PostForm.Get("db_port"))
-	project := r.PostForm.Get("project")
-	username := r.PostForm.Get("username")
-	password := r.PostForm.Get("password")
-	description := r.PostForm.Get("description")
-	domain := r.PostForm.Get("domain")
-	email := r.PostForm.Get("email")
+	g := r.PostForm.Get
+	dbHost := g("db_host")
+	dbUser := g("db_user")
+	dbPass := g("db_password")
+	dbDatabase := g("db_database")
+	dbConn := g("db_connection")
+	dbPort := utils.ToInt(g("db_port"))
+	project := g("project")
+	username := g("username")
+	password := g("password")
+	description := g("description")
+	domain := g("domain")
+	email := g("email")
 
 	if project == "" || username == "" || password == "" {
 		err := errors.New("Missing required elements on setup form")

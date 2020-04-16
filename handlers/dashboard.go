@@ -17,15 +17,6 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, basePath, http.StatusSeeOther)
 }
 
-func helpHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsUser(r) {
-		http.Redirect(w, r, basePath, http.StatusSeeOther)
-		return
-	}
-	help := source.HelpMarkdown()
-	ExecuteResponse(w, r, "help.gohtml", help, nil)
-}
-
 func logsHandler(w http.ResponseWriter, r *http.Request) {
 	utils.LockLines.Lock()
 	logs := make([]string, 0)

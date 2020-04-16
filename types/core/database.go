@@ -39,12 +39,16 @@ func Select() (*Core, error) {
 }
 
 func (c *Core) Create() error {
+	secret := utils.Params.GetString("API_SECRET")
+	if secret == "" {
+		secret = utils.RandomString(32)
+	}
 	newCore := &Core{
 		Name:        c.Name,
 		Description: c.Description,
 		ConfigFile:  utils.Directory + "/config.yml",
-		ApiKey:      utils.Params.GetString("API_KEY"),
-		ApiSecret:   utils.Params.GetString("API_SECRET"),
+		ApiKey:      utils.RandomString(32),
+		ApiSecret:   secret,
 		Version:     App.Version,
 		Domain:      c.Domain,
 		MigrationId: utils.Now().Unix(),

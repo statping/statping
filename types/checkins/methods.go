@@ -15,7 +15,7 @@ func (c *Checkin) Expected() time.Duration {
 }
 
 func (c *Checkin) Period() time.Duration {
-	duration, _ := time.ParseDuration(fmt.Sprintf("%vs", c.Interval))
+	duration, _ := time.ParseDuration(fmt.Sprintf("%ds", c.Interval))
 	return duration
 }
 

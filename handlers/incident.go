@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/statping/statping/types/incidents"
+	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net/http"
 )
@@ -45,13 +46,20 @@ func apiCreateIncidentUpdateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiCreateIncidentHandler(w http.ResponseWriter, r *http.Request) {
-	var incident *incidents.Incident
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&incident)
+	vars := mux.Vars(r)
+	service, err := services.Find(utils.ToInt(vars["id"]))
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
+
+	var incident *incidents.Incident
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&incident); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	incident.ServiceId = service.Id
 	err = incident.Create()
 	if err != nil {
 		sendErrorJson(err, w, r)

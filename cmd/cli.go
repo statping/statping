@@ -7,9 +7,13 @@ import (
 	"github.com/pkg/errors"
 	"github.com/statping/statping/handlers"
 	"github.com/statping/statping/source"
+	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/configs"
 	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/groups"
+	"github.com/statping/statping/types/messages"
 	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/types/users"
 	"github.com/statping/statping/utils"
 	"io/ioutil"
 	"os"
@@ -53,7 +57,7 @@ func exportCli(args []string) error {
 	if _, err := services.SelectAllServices(false); err != nil {
 		return err
 	}
-	if data, err = handlers.ExportSettings(); err != nil {
+	if data, err = ExportSettings(); err != nil {
 		return fmt.Errorf("could not export settings: %v", err.Error())
 	}
 	if err = utils.SaveFile(filename, data); err != nil {
@@ -99,7 +103,7 @@ func importCli(args []string) error {
 	if data, err = ioutil.ReadFile(filename); err != nil {
 		return err
 	}
-	var exportData handlers.ExportData
+	var exportData ExportData
 	if err = json.Unmarshal(data, &exportData); err != nil {
 		return err
 	}
@@ -384,4 +388,42 @@ type gitUploader struct {
 	ReceivedEventsURL string `json:"received_events_url"`
 	Type              string `json:"type"`
 	SiteAdmin         bool   `json:"site_admin"`
+}
+
+// ExportChartsJs renders the charts for the index page
+
+type ExportData struct {
+	Core      *core.Core          `json:"core"`
+	Services  []services.Service  `json:"services"`
+	Messages  []*messages.Message `json:"messages"`
+	Checkins  []*checkins.Checkin `json:"checkins"`
+	Users     []*users.User       `json:"users"`
+	Groups    []*groups.Group     `json:"groups"`
+	Notifiers []core.AllNotifiers `json:"notifiers"`
+}
+
+// ExportSettings will export a JSON file containing all of the settings below:
+// - Core
+// - Notifiers
+// - Checkins
+// - Users
+// - Services
+// - Groups
+// - Messages
+func ExportSettings() ([]byte, error) {
+	c, err := core.Select()
+	if err != nil {
+		return nil, err
+	}
+	data := ExportData{
+		Core: c,
+		//Notifiers: notifications.All(),
+		Checkins: checkins.All(),
+		Users:    users.All(),
+		Services: services.AllInOrder(),
+		Groups:   groups.All(),
+		Messages: messages.All(),
+	}
+	export, err := json.Marshal(data)
+	return export, err
 }

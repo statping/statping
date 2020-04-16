@@ -48,8 +48,6 @@ func setDefaults() {
 	Params.SetDefault("MAX_OPEN_CONN", 25)
 	Params.SetDefault("MAX_IDLE_CONN", 25)
 	Params.SetDefault("MAX_LIFE_CONN", 5*time.Minute)
-	Params.SetDefault("API_KEY", RandomString(32))
-	Params.SetDefault("API_SECRET", RandomString(32))
 	Params.SetDefault("SAMPLE_DATA", true)
 	Params.SetDefault("USE_CDN", false)
 	Params.SetDefault("ALLOW_REPORTS", false)

@@ -34,13 +34,6 @@ func init() {
 	core.New("test")
 }
 
-//func TestResetDatabase(t *testing.T) {
-//	err := core.TmpRecords("handlers.db")
-//	t.Log(err)
-//	require.Nil(t, err)
-//	require.NotNil(t, core.CoreApp)
-//}
-
 func TestFailedHTTPServer(t *testing.T) {
 	err := RunHTTPServer("missinghost", 0)
 	assert.Error(t, err)
@@ -113,6 +106,7 @@ func TestSetupRoutes(t *testing.T) {
 }
 
 func TestMainApiRoutes(t *testing.T) {
+	date := utils.Now().Format("2006-01-02")
 	tests := []HTTPTest{
 		{
 			Name:             "Statping Details",
@@ -134,6 +128,15 @@ func TestMainApiRoutes(t *testing.T) {
 			ExpectedStatus: 200,
 			BeforeTest:     SetTestENV,
 			SecureRoute:    true,
+		},
+		{
+			Name:           "Statping View Cache",
+			URL:            "/api/cache",
+			Method:         "GET",
+			ExpectedStatus: 200,
+			BeforeTest:     SetTestENV,
+			SecureRoute:    true,
+			ResponseLen:    0,
 		},
 		{
 			Name:           "Statping Clear Cache",
@@ -172,18 +175,40 @@ func TestMainApiRoutes(t *testing.T) {
 			Method:         "GET",
 			ExpectedStatus: 404,
 		},
-		//{
-		//	Name:           "Prometheus Export Metrics",
-		//	URL:            "/metrics",
-		//	Method:         "GET",
-		//	BeforeTest: SetTestENV,
-		//	ExpectedStatus: 200,
-		//	ExpectedContains: []string{
-		//		`Statping Totals`,
-		//		`total_failures`,
-		//		`Golang Metrics`,
-		//	},
-		//},
+		{
+			Name:             "Health Check endpoint",
+			URL:              "/health",
+			Method:           "GET",
+			ExpectedStatus:   200,
+			ExpectedContains: []string{`"online":true`, `"setup":true`},
+		},
+		{
+			Name:             "Logs endpoint",
+			URL:              "/api/logs",
+			Method:           "GET",
+			ExpectedStatus:   200,
+			GreaterThan:      50,
+			ExpectedContains: []string{date},
+		},
+		{
+			Name:             "Logs Last Line endpoint",
+			URL:              "/api/logs/last",
+			Method:           "GET",
+			ExpectedStatus:   200,
+			ExpectedContains: []string{date},
+		},
+		{
+			Name:           "Prometheus Export Metrics",
+			URL:            "/metrics",
+			Method:         "GET",
+			BeforeTest:     SetTestENV,
+			ExpectedStatus: 200,
+			ExpectedContains: []string{
+				`Statping Totals`,
+				`total_failures`,
+				`Golang Metrics`,
+			},
+		},
 	}
 
 	for _, v := range tests {
@@ -196,6 +221,8 @@ func TestMainApiRoutes(t *testing.T) {
 }
 
 type HttpFuncTest func(*testing.T) error
+
+type ResponseFunc func(*testing.T, []byte) error
 
 // HTTPTest contains all the parameters for a HTTP Unit Test
 type HTTPTest struct {
@@ -211,8 +238,11 @@ type HTTPTest struct {
 	FuncTest            HttpFuncTest
 	BeforeTest          HttpFuncTest
 	AfterTest           HttpFuncTest
+	ResponseFunc        ResponseFunc
 	ResponseLen         int
+	GreaterThan         int
 	SecureRoute         bool
+	Skip                bool
 }
 
 func logTest(t *testing.T, err error) error {
@@ -228,6 +258,9 @@ func logTest(t *testing.T, err error) error {
 
 // RunHTTPTest accepts a HTTPTest type to execute the HTTP request
 func RunHTTPTest(test HTTPTest, t *testing.T) (string, *testing.T, error) {
+	if test.Skip {
+		t.SkipNow()
+	}
 	if test.BeforeTest != nil {
 		if err := test.BeforeTest(t); err != nil {
 			return "", t, logTest(t, err)
@@ -271,21 +304,24 @@ func RunHTTPTest(test HTTPTest, t *testing.T) (string, *testing.T, error) {
 		err := test.FuncTest(t)
 		assert.Nil(t, err)
 	}
+	if test.ResponseFunc != nil {
+		err := test.ResponseFunc(t, body)
+		assert.Nil(t, err)
+	}
+
 	if test.ResponseLen != 0 {
 		var respArray []interface{}
 		err := json.Unmarshal(body, &respArray)
 		assert.Nil(t, err)
 		assert.Equal(t, test.ResponseLen, len(respArray))
 	}
-	//if test.SecureRoute {
-	//	UnsetTestENV()
-	//	rec, err := Request(test)
-	//	if err != nil {
-	//		return "", t, logTest(t, err)
-	//	}
-	//	defer rec.Result().Body.Close()
-	//	assert.Equal(t, http.StatusUnauthorized, rec.Result().StatusCode)
-	//}
+
+	if test.GreaterThan != 0 {
+		var respArray []interface{}
+		err := json.Unmarshal(body, &respArray)
+		assert.Nil(t, err)
+		assert.GreaterOrEqual(t, len(respArray), test.GreaterThan)
+	}
 
 	if test.AfterTest != nil {
 		if err := test.AfterTest(t); err != nil {
@@ -325,3 +361,7 @@ func StopServices(t *testing.T) error {
 	}
 	return nil
 }
+
+var (
+	Success = `"status":"success"`
+)

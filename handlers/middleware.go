@@ -162,3 +162,13 @@ func cached(duration, contentType string, handler func(w http.ResponseWriter, r 
 		}
 	})
 }
+
+func DecodeJSON(r *http.Request, obj interface{}) error {
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&obj)
+	if err != nil {
+		return err
+	}
+	defer r.Body.Close()
+	return nil
+}

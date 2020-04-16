@@ -31,7 +31,7 @@ func Samples() error {
 }
 
 func SamplesChkHits() error {
-	checkTime := time.Now().UTC().Add(-24 * time.Hour)
+	checkTime := utils.Now().Add(-3 * time.Minute)
 
 	for i := int64(1); i <= 2; i++ {
 		checkHit := &CheckinHit{
@@ -44,7 +44,7 @@ func SamplesChkHits() error {
 			return err
 		}
 
-		checkTime = checkTime.Add(10 * time.Minute)
+		checkTime = checkTime.Add(1 * time.Minute)
 	}
 
 	return nil

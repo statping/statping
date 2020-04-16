@@ -36,10 +36,12 @@ func (d *DbConfig) ConnectionString() string {
 	return conn
 }
 
-func loadConfigEnvs() (*DbConfig, error) {
-	log.Infof("Loading configs from environment variables")
+func LoadConfigFile(directory string) (*DbConfig, error) {
 	p := utils.Params
-	config := &DbConfig{
+	log.Infof("Attempting to read config file at: %s/config.yml ", directory)
+	utils.Params.SetConfigFile(directory + "/config.yml")
+
+	configs := &DbConfig{
 		DbConn:      p.GetString("DB_CONN"),
 		DbHost:      p.GetString("DB_HOST"),
 		DbUser:      p.GetString("DB_USER"),
@@ -55,5 +57,7 @@ func loadConfigEnvs() (*DbConfig, error) {
 		Location:    utils.Directory,
 		SqlFile:     p.GetString("SQL_FILE"),
 	}
-	return config, nil
+
+	log.WithFields(utils.ToFields(configs)).Debugln("read config file: " + directory + "/config.yml")
+	return configs, nil
 }
