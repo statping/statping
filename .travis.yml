@@ -43,7 +43,6 @@ notifications:
 os:
   - linux
 script:
-  - "make clean postman"
   - "if [[ \"$TRAVIS_BRANCH\" == \"dev\" && \"$TRAVIS_PULL_REQUEST\" = \"false\" ]]; then make dockerhub-dev; fi"
   - "travis_retry make clean test-ci"
   - "if [[ \"$TRAVIS_BRANCH\" == \"master\" && \"$TRAVIS_PULL_REQUEST\" = \"false\" ]]; then make coverage; fi"

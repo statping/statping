@@ -1,0 +1,44 @@
+name: Statping Build and Deploy
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.14.x'
+
+      - name: Install Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '10.x'
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: ./src/github.com/${{ github.repository }}
+
+      - name: Frontend Dependencies
+        working-directory: ./frontend
+        run: |
+          npm install -g yarn sass newman cross-env wait-on @sentry/cli
+          yarn
+
+      - name: Build Statping
+        run: |
+          go mod download
+          go mod verify
+          make clean compile
+
+      - name: Install Statping
+        run: make install
+
+      - name: Test Statping
+        env:
+          DB_CONN: sqlite3
+        run: SASS=`which sass` go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
