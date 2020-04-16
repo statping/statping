@@ -34,6 +34,7 @@ jobs:
         run: |
           go mod download
           go mod verify
+          make test-deps
 
       - name: Build Frontend Statping
         run: make clean compile
@@ -48,3 +49,10 @@ jobs:
 
       - name: Build Binaries
         run: make build-bin build-win
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2.0.0
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_URL }}
+          SLACK_CHANNEL: dev
+          SLACK_USERNAME: Github
