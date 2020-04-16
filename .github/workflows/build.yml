@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-go@v1
         with:
           go-version: '1.14.x'
-        run: |
+      - run: |
           go mod download
           go mod verify
 
@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '10.x'
-        run: |
+      - run: |
           npm install -g yarn sass newman cross-env wait-on @sentry/cli
           cd frontend && yarn && yarn build
 
