@@ -187,7 +187,7 @@ func TestMainApiRoutes(t *testing.T) {
 			URL:              "/api/logs",
 			Method:           "GET",
 			ExpectedStatus:   200,
-			GreaterThan:      50,
+			GreaterThan:      20,
 			ExpectedContains: []string{date},
 		},
 		{
