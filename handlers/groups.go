@@ -8,9 +8,12 @@ import (
 	"net/http"
 )
 
-func selectGroup(r *http.Request) (*groups.Group, error) {
+func findGroup(r *http.Request) (*groups.Group, error) {
 	vars := mux.Vars(r)
 	id := utils.ToInt(vars["id"])
+	if id == 0 {
+		return nil, errors.New("missing group id")
+	}
 	g, err := groups.Find(id)
 	if err != nil {
 		return nil, err
@@ -26,7 +29,7 @@ func apiAllGroupHandler(r *http.Request) interface{} {
 
 // apiGroupHandler will show a single group
 func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
-	group, err := selectGroup(r)
+	group, err := findGroup(r)
 	if err != nil {
 		sendErrorJson(errors.Wrap(err, "group not found"), w, r, http.StatusNotFound)
 		return
@@ -36,7 +39,7 @@ func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 // apiGroupUpdateHandler will update a group
 func apiGroupUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	group, err := selectGroup(r)
+	group, err := findGroup(r)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		sendErrorJson(errors.Wrap(err, "group not found"), w, r)
@@ -74,7 +77,7 @@ func apiCreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 // apiGroupDeleteHandler accepts a DELETE method to delete groups
 func apiGroupDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	group, err := selectGroup(r)
+	group, err := findGroup(r)
 	if err != nil {
 		sendErrorJson(errors.Wrap(err, "group not found"), w, r)
 		return

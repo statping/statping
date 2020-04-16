@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func getUser(r *http.Request) (*users.User, int64, error) {
+func findUser(r *http.Request) (*users.User, int64, error) {
 	vars := mux.Vars(r)
 	num := utils.ToInt(vars["id"])
 	user, err := users.Find(num)
@@ -20,7 +20,7 @@ func getUser(r *http.Request) (*users.User, int64, error) {
 }
 
 func apiUserHandler(w http.ResponseWriter, r *http.Request) {
-	user, _, err := getUser(r)
+	user, _, err := findUser(r)
 	if err != nil {
 		sendErrorJson(err, w, r, http.StatusNotFound)
 		return
@@ -30,7 +30,7 @@ func apiUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	user, id, err := getUser(r)
+	user, id, err := findUser(r)
 	if err != nil {
 		sendErrorJson(fmt.Errorf("user #%d was not found", id), w, r)
 		return
@@ -60,7 +60,7 @@ func apiUserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(errors.New("cannot delete the last user"), w, r)
 		return
 	}
-	user, _, err := getUser(r)
+	user, _, err := findUser(r)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return

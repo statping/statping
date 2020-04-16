@@ -102,12 +102,10 @@ func (d *DbConfig) CreateDatabase() error {
 
 	log.Infoln("Creating Database Tables...")
 	for _, table := range DbModels {
-		log.Infof("Creating table '%T'", table)
 		if err := d.Db.CreateTable(table); err.Error() != nil {
 			return errors.Wrap(err.Error(), fmt.Sprintf("error creating '%T' table", table))
 		}
 	}
-	log.Infof("Creating table 'core'")
 	if err := d.Db.Table("core").CreateTable(&core.Core{}); err.Error() != nil {
 		return errors.Wrap(err.Error(), fmt.Sprintf("error creating 'core' table"))
 	}

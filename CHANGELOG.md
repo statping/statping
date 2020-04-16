@@ -3,6 +3,7 @@
 - Added postman (newman) API testing
 - Added Viper and Cobra config/env parsing package
 - Added more golang tests
+- Modified handlers to use a more generic find method
 
 # 0.90.27 (04-15-2020)
 - Fixed postgres database table creation process

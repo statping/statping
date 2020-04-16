@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/statping/statping/handlers"
 	"github.com/statping/statping/source"
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/configs"
@@ -121,7 +120,7 @@ func importCli(args []string) error {
 	if err = configs.ConnectConfigs(config); err != nil {
 		return err
 	}
-	if data, err = handlers.ExportSettings(); err != nil {
+	if data, err = ExportSettings(); err != nil {
 		return fmt.Errorf("could not export settings: %v", err.Error())
 	}
 

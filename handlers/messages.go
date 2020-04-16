@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func getMessageByID(r *http.Request) (*messages.Message, int64, error) {
+func findMessage(r *http.Request) (*messages.Message, int64, error) {
 	vars := mux.Vars(r)
 	num := utils.ToInt(vars["id"])
 	message, err := messages.Find(num)
@@ -37,7 +37,7 @@ func apiMessageCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiMessageGetHandler(r *http.Request) interface{} {
-	message, id, err := getMessageByID(r)
+	message, id, err := findMessage(r)
 	if err != nil {
 		return fmt.Errorf("message #%d was not found", id)
 	}
@@ -45,7 +45,7 @@ func apiMessageGetHandler(r *http.Request) interface{} {
 }
 
 func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	message, id, err := getMessageByID(r)
+	message, id, err := findMessage(r)
 	if err != nil {
 		sendErrorJson(fmt.Errorf("message #%d was not found", id), w, r)
 		return
@@ -59,7 +59,7 @@ func apiMessageDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiMessageUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	message, id, err := getMessageByID(r)
+	message, id, err := findMessage(r)
 	if err != nil {
 		sendErrorJson(fmt.Errorf("message #%d was not found", id), w, r)
 		return

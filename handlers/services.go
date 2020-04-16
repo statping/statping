@@ -16,7 +16,7 @@ type serviceOrder struct {
 	Order int   `json:"order"`
 }
 
-func serviceByID(r *http.Request) (*services.Service, error) {
+func findService(r *http.Request) (*services.Service, error) {
 	vars := mux.Vars(r)
 	id := utils.ToInt(vars["id"])
 	servicer, err := services.Find(id)
@@ -47,7 +47,7 @@ func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceHandler(r *http.Request) interface{} {
-	srv, err := serviceByID(r)
+	srv, err := findService(r)
 	if err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	service, err := serviceByID(r)
+	service, err := findService(r)
 	if err != nil {
 		sendErrorJson(err, w, r, http.StatusNotFound)
 		return
@@ -96,7 +96,7 @@ func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceRunningHandler(w http.ResponseWriter, r *http.Request) {
-	service, err := serviceByID(r)
+	service, err := findService(r)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -155,7 +155,7 @@ func apiServiceFailureDataHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
-	service, err := serviceByID(r)
+	service, err := findService(r)
 	if err != nil {
 		sendErrorJson(errors.New("service data not found"), w, r)
 		return
@@ -177,7 +177,7 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceTimeDataHandler(w http.ResponseWriter, r *http.Request) {
-	service, err := serviceByID(r)
+	service, err := findService(r)
 	if err != nil {
 		sendErrorJson(errors.New("service data not found"), w, r)
 		return
@@ -217,7 +217,7 @@ func apiServiceTimeDataHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	service, err := serviceByID(r)
+	service, err := findService(r)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -244,7 +244,7 @@ func apiAllServicesHandler(r *http.Request) interface{} {
 }
 
 func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
-	service, err := serviceByID(r)
+	service, err := findService(r)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
