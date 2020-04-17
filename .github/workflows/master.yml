@@ -237,12 +237,23 @@ jobs:
       - name: Checkout Statping Repo
         uses: actions/checkout@v2
 
-      - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2.0.0
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_URL }}
-          SLACK_CHANNEL: dev
-          SLACK_USERNAME: StatpingDev
+      - name: Base Docker Image
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: statping/statping
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          dockerfile: Dockerfile.base
+          tags: "base"
+
+      - name: Latest/Version Docker Image
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: statping/statping
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          dockerfile: Dockerfile
+          tags: "latest,v${{ env.VERSION }}"
 
       - name: Sentry Backend Release
         uses: tclindner/sentry-releases-action@v1.0.0
@@ -265,3 +276,10 @@ jobs:
         with:
           tagName: v${{ env.VERSION }}
           environment: production
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2.0.0
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_URL }}
+          SLACK_CHANNEL: dev
+          SLACK_USERNAME: StatpingDev
