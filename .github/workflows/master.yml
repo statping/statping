@@ -191,17 +191,17 @@ jobs:
           path: /home/runner/work/statping/statping/build/*
 
       - name: Create Release
-          id: create_release
-          uses: actions/create-release@latest
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            VERSION: $(cat version.txt)
-          with:
-            tag_name: v$(cat version.txt)
-            release_name: Release v$(cat version.txt)
-            body: Statping v$(cat version.txt)
-            draft: false
-            prerelease: false
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: $(cat version.txt)
+        with:
+          tag_name: v$(cat version.txt)
+          release_name: Release v$(cat version.txt)
+          body: Statping v$(cat version.txt)
+          draft: false
+          prerelease: false
 
   post-release:
     runs-on: ubuntu-latest
