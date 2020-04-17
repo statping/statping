@@ -191,12 +191,13 @@ func TestHttpRequest(t *testing.T) {
 }
 
 func TestConfigLoad(t *testing.T) {
-	Params.Set("DB_CONN", "sqlite")
 	InitCLI()
 	setDefaults()
 
 	s := Params.GetString
 	b := Params.GetBool
+
+	Params.Set("DB_CONN", "sqlite")
 
 	assert.Equal(t, "sqlite", s("DB_CONN"))
 	assert.Equal(t, Directory, s("STATPING_DIR"))
