@@ -23,7 +23,7 @@ func TestInitLogs(t *testing.T) {
 }
 
 func TestDir(t *testing.T) {
-	assert.Contains(t, Directory, "github.com/statping/statping")
+	assert.Contains(t, Directory, "statping/statping")
 }
 
 func TestCommand(t *testing.T) {
@@ -191,7 +191,7 @@ func TestHttpRequest(t *testing.T) {
 }
 
 func TestConfigLoad(t *testing.T) {
-	os.Setenv("DB_CONN", "sqlite")
+	Params.Set("DB_CONN", "sqlite")
 	InitCLI()
 	setDefaults()
 
