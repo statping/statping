@@ -159,7 +159,7 @@ build-bin:
 	do \
 		for os in $(OS);\
 		do \
-			echo "Building $$os-$$arch"; \
+			echo "Building $$VERSION $$os-$$arch"; \
 			mkdir -p releases/statping-$$os-$$arch/; \
 			GO111MODULE="on" GOOS=$$os GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-$$os-$$arch/statping ${PWD}/cmd; \
 			chmod +x releases/statping-$$os-$$arch/statping; \

@@ -122,7 +122,7 @@ jobs:
 
       - name: Install Statping
         env:
-            VERSION: $VERSION
+            VERSION: ${{ env.VERSION }}
         run: |
           make build
           chmod +x statping
@@ -131,7 +131,7 @@ jobs:
       - name: Go Tests
         run: SASS=`which sass` go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
         env:
-          VERSION: $VERSION
+          VERSION: ${{ env.VERSION }}
           DB_CONN: sqlite3
           STATPING_DIR: /home/runner/work/statping/statping
           API_KEY: demopassword123
@@ -198,34 +198,37 @@ jobs:
 
       - name: Build Binaries
         env:
-          VERSION: $VERSION
+          VERSION: ${{ env.VERSION }}
           COMMIT: $GITHUB_SHA
         run: make build-bin build-win
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@latest
+      - name: Upload Release
+        id: upload-release-asset
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: $VERSION
+          VERSION: ${{ env.VERSION }}
         with:
-          tag_name: v$VERSION
-          release_name: Statping v$VERSION
-          body: Version v$VERSION
+          tag_name: v${{ env.VERSION }}
           draft: false
           prerelease: false
-
-      - name: Upload Release Binaries
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: $VERSION
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          pattern: |
-            "build/*.tar.gz"
-            "build/*.zip"
+          files: |
+            build/statping-darwin-386.tar.gz
+            build/statping-darwin-amd64.tar.gz
+            build/statping-freebsd-386.tar.gz
+            build/statping-freebsd-amd64.tar.gz
+            build/statping-freebsd-arm.tar.gz
+            build/statping-linux-386.tar.gz
+            build/statping-linux-amd64.tar.gz
+            build/statping-linux-arm.tar.gz
+            build/statping-linux-arm64.tar.gz
+            build/statping-openbsd-386.tar.gz
+            build/statping-openbsd-amd64.tar.gz
+            build/statping-openbsd-arm.tar.gz
+            build/statping-openbsd-arm64.tar.gz
+            build/statping-windows-386.zip
+            build/statping-windows-amd64.zip
+            build/statping-windows-arm.zip
 
   post-release:
     needs: build
@@ -249,7 +252,7 @@ jobs:
           SENTRY_ORG: statping
           SENTRY_PROJECT: backend
         with:
-          tagName: v$VERSION
+          tagName: v${{ env.VERSION }}
           environment: production
 
       - name: Sentry Frontend Release
@@ -260,5 +263,5 @@ jobs:
           SENTRY_ORG: statping
           SENTRY_PROJECT: frontend
         with:
-          tagName: v$VERSION
+          tagName: v${{ env.VERSION }}
           environment: production
