@@ -25,7 +25,7 @@ jobs:
           node-version: '10.x'
 
       - name: Install Global Dependencies
-        run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
+        run: npm install -g yarn sass cross-env
 
       - name: Checkout Statping Repo
         uses: actions/checkout@v2
@@ -84,6 +84,14 @@ jobs:
       - name: Add GOBIN to PATH
         run: echo "::add-path::$(go env GOPATH)/bin"
         shell: bash
+
+      - name: Install Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '10.x'
+
+      - name: Install Global Dependencies
+        run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
 
       - uses: actions/cache@v1
         id: golangcache
