@@ -61,15 +61,13 @@ jobs:
           make test-deps
 
       - name: Build Frontend Statping
-        run: make clean compile
+        run: make clean frontend-build
 
       - name: Upload Compiled Frontend
         uses: actions/upload-artifact@v1
         with:
           name: static-frontend
-          path: |
-            /home/runner/work/statping/statping/source/dist
-            /home/runner/work/statping/statping/source/rice-box.go
+          path: /home/runner/work/statping/statping/source/dist
 
   test:
     needs: compile
@@ -116,9 +114,7 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: static-frontend
-          path: |
-            /home/runner/work/statping/statping/source/dist
-            /home/runner/work/statping/statping/source/rice-box.go
+          path: /home/runner/work/statping/statping/source/dist
 
       - name: Install Statping
         run: |
@@ -190,9 +186,7 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: static-frontend
-          path: |
-            /home/runner/work/statping/statping/source/dist
-            /home/runner/work/statping/statping/source/rice-box.go
+          path: /home/runner/work/statping/statping/source/dist
 
       - name: Build Binaries
         env:

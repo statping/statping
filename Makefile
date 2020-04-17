@@ -194,7 +194,7 @@ clean:
 	rm -rf frontend/{logs,plugins,*.db,config.yml,.sass-cache,*.log}
 	rm -rf dev/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log,test/app,plugin/*.so}
 	rm -rf {parts,prime,snap,stage}
-	rm -rf dev/test/cypress/videos
+	rm -rf frontend/cypress/videos
 	rm -f coverage.* sass
 	rm -f source/rice-box.go
 	rm -rf **/*.db-journal
