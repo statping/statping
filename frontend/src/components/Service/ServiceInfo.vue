@@ -104,7 +104,6 @@
   import ServiceFailures from './ServiceFailures';
   import ServiceSparkLine from "./ServiceSparkLine";
   import Api from "../../API";
-  import StatsGen from "./StatsGen";
 
   export default {
       name: 'ServiceInfo',
@@ -113,7 +112,6 @@
           ServiceFailures,
           FormIncident,
           FormMessage,
-          StatsGen,
           ServiceSparkLine
       },
       props: {

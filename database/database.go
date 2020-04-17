@@ -159,6 +159,9 @@ func Openw(dialect string, args ...interface{}) (db Database, err error) {
 	gorm.NowFunc = func() time.Time {
 		return utils.Now()
 	}
+	if dialect == "sqlite" {
+		dialect = "sqlite3"
+	}
 	gormdb, err := gorm.Open(dialect, args...)
 	if err != nil {
 		return nil, err

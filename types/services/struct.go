@@ -4,6 +4,7 @@ import (
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/utils"
 	"time"
 )
 
@@ -81,8 +82,8 @@ type Stats struct {
 // BeforeCreate for Service will set CreatedAt to UTC
 func (s *Service) BeforeCreate() (err error) {
 	if s.CreatedAt.IsZero() {
-		s.CreatedAt = time.Now().UTC()
-		s.UpdatedAt = time.Now().UTC()
+		s.CreatedAt = utils.Now()
+		s.UpdatedAt = utils.Now()
 	}
 	return
 }

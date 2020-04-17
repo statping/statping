@@ -154,7 +154,6 @@ export default new Vuex.Store({
             const messages = await Api.messages()
             context.commit("setMessages", messages)
             context.commit("setHasPublicData", true)
-            window.console.log('finished loading required data')
         },
         async loadAdmin(context) {
             const groups = await Api.groups()

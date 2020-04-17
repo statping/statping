@@ -198,7 +198,7 @@ class Api {
   }
 
   async logs() {
-    return axios.get('api/logs').then(response => (response.data))
+    return axios.get('api/logs').then(response => (response.data)) || []
   }
 
   async logs_last() {
