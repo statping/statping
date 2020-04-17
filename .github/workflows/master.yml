@@ -46,9 +46,9 @@ jobs:
       - uses: actions/cache@v1
         id: golangcache
         with:
-          path:
-            - ~/go/pkg/mod
-            - ~/go/bin
+          path: |
+            ~/go/pkg/mod
+            ~/go/bin
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
@@ -87,9 +87,9 @@ jobs:
       - uses: actions/cache@v1
         id: golangcache
         with:
-          path:
-            - ~/go/pkg/mod
-            - ~/go/bin
+          path: |
+            ~/go/pkg/mod
+            ~/go/bin
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
@@ -161,9 +161,9 @@ jobs:
       - uses: actions/cache@v1
         id: golangcache
         with:
-          path:
-            - ~/go/pkg/mod
-            - ~/go/bin
+          path: |
+            ~/go/pkg/mod
+            ~/go/bin
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
