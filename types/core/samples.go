@@ -6,14 +6,19 @@ import (
 )
 
 func Samples() error {
-	apiKey := utils.Getenv("API_KEY", utils.RandomString(16))
-	apiSecret := utils.Getenv("API_SECRET", utils.RandomString(16))
+	apiKey := utils.Params.GetString("API_KEY")
+	apiSecret := utils.Params.GetString("API_SECRET")
+
+	if apiKey == "" || apiSecret == "" {
+		apiKey = utils.RandomString(32)
+		apiSecret = utils.RandomString(32)
+	}
 
 	core := &Core{
 		Name:        "Statping Sample Data",
 		Description: "This data is only used to testing",
-		ApiKey:      apiKey.(string),
-		ApiSecret:   apiSecret.(string),
+		ApiKey:      apiKey,
+		ApiSecret:   apiSecret,
 		Domain:      "http://localhost:8080",
 		CreatedAt:   utils.Now(),
 		UseCdn:      null.NewNullBool(false),

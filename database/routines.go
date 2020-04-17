@@ -17,8 +17,8 @@ var (
 // Maintenance will automatically delete old records from 'failures' and 'hits'
 // this function is currently set to delete records 7+ days old every 60 minutes
 func Maintenance() {
-	dur := utils.GetenvAs("REMOVE_AFTER", "2160h").Duration()
-	interval := utils.GetenvAs("CLEANUP_INTERVAL", "1h").Duration()
+	dur := utils.Params.GetDuration("REMOVE_AFTER")
+	interval := utils.Params.GetDuration("CLEANUP_INTERVAL")
 
 	log.Infof("Database Cleanup runs every %s and will remove records older than %s", interval.String(), dur.String())
 	ticker := interval

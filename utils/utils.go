@@ -47,38 +47,12 @@ func NotNumber(val string) bool {
 	return err != nil
 }
 
-func GetenvAs(key string, defaultValue interface{}) *env {
-	return &env{
-		data: Getenv(key, defaultValue),
-	}
-}
-
 func (e *env) Duration() time.Duration {
 	t, err := time.ParseDuration(e.data.(string))
 	if err != nil {
 		Log.Errorln(err)
 	}
 	return t
-}
-
-func Getenv(key string, defaultValue interface{}) interface{} {
-	if defaultValue != nil {
-		Params.SetDefault(key, defaultValue)
-	}
-	val := Params.Get(key)
-	if val != nil {
-		switch val.(type) {
-		case int, int64:
-			return Params.GetInt(key)
-		case time.Duration:
-			return Params.GetDuration(key)
-		case bool:
-			return Params.GetBool(key)
-		default:
-			return val
-		}
-	}
-	return defaultValue
 }
 
 // ToInt converts a int to a string

@@ -39,8 +39,8 @@ func Connect(configs *DbConfig, retry bool) error {
 		}
 	}
 
-	apiKey := utils.Getenv("API_KEY", utils.RandomString(24)).(string)
-	apiSecret := utils.Getenv("API_SECRET", utils.RandomString(24)).(string)
+	apiKey := utils.Params.GetString("API_KEY")
+	apiSecret := utils.Params.GetString("API_SECRET")
 	configs.ApiKey = apiKey
 	configs.ApiSecret = apiSecret
 
@@ -85,8 +85,8 @@ func CreateAdminUser(configs *DbConfig) error {
 	log.Infoln(fmt.Sprintf("Core database does not exist, creating now!"))
 
 	if configs.Username == "" && configs.Password == "" {
-		configs.Username = utils.Getenv("ADMIN_USER", "admin").(string)
-		configs.Password = utils.Getenv("ADMIN_PASSWORD", "admin").(string)
+		configs.Username = utils.Params.GetString("ADMIN_USER")
+		configs.Password = utils.Params.GetString("ADMIN_PASSWORD")
 	}
 
 	admin := &users.User{

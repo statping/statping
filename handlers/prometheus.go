@@ -40,7 +40,7 @@ func hex2int(hexStr string) uint64 {
 
 func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 	promValues = []string{}
-	prefix = utils.Getenv("PREFIX", "").(string)
+	prefix = utils.Params.GetString("PREFIX")
 	if prefix != "" {
 		prefix = prefix + "_"
 	}

@@ -75,7 +75,7 @@ func UsingAssets(folder string) bool {
 	if _, err := os.Stat(folder + "/assets"); err == nil {
 		return true
 	} else {
-		useAssets := utils.Getenv("USE_ASSETS", false).(bool)
+		useAssets := utils.Params.GetBool("USE_ASSETS")
 
 		if useAssets {
 			log.Infoln("Environment variable USE_ASSETS was found.")
