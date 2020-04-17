@@ -79,6 +79,61 @@ func sassCli() error {
 	return nil
 }
 
+func resetCli() error {
+	d := utils.Directory
+	fmt.Println("Statping directory: ", d)
+	assets := d + "/assets"
+	if utils.FolderExists(assets) {
+		fmt.Printf("Deleting %s folder.\n", assets)
+		if err := utils.DeleteDirectory(assets); err != nil {
+			return err
+		}
+	} else {
+		fmt.Printf("Assets folder does not exist %s\n", assets)
+	}
+
+	logDir := d + "/logs"
+	if utils.FolderExists(logDir) {
+		fmt.Printf("Deleting %s directory.\n", logDir)
+		if err := utils.DeleteDirectory(logDir); err != nil {
+			return err
+		}
+	} else {
+		fmt.Printf("Logs folder does not exist %s\n", logDir)
+	}
+
+	c := d + "/config.yml"
+	if utils.FileExists(c) {
+		fmt.Printf("Deleting %s file.\n", c)
+		if err := utils.DeleteFile(c); err != nil {
+			return err
+		}
+	} else {
+		fmt.Printf("Config file does not exist %s\n", c)
+	}
+
+	dbFile := d + "/statping.db"
+	if utils.FileExists(dbFile) {
+		fmt.Printf("Backuping up %s file.\n", dbFile)
+		if err := utils.RenameDirectory(dbFile, d+"/statping.db.backup"); err != nil {
+			return err
+		}
+	} else {
+		fmt.Printf("Statping SQL Database file does not exist %s\n", dbFile)
+	}
+
+	fmt.Println("Statping has been reset")
+	return nil
+}
+
+func envCli() error {
+	fmt.Println("Statping Configuration")
+	for k, v := range utils.Params.AllSettings() {
+		fmt.Printf("%s=%v\n", strings.ToUpper(k), v)
+	}
+	return nil
+}
+
 func onceCli() error {
 	if err := utils.InitLogs(); err != nil {
 		return err
@@ -181,21 +236,6 @@ func ask(format string) bool {
 	text = strings.Replace(text, "\n", "", -1)
 	return strings.ToLower(text) == "y"
 }
-
-// ExportIndexHTML returns the HTML of the index page as a string
-//func ExportIndexHTML() []byte {
-//	source.Assets()
-//	core.CoreApp.Connect(core.CoreApp., utils.Directory)
-//	core.SelectAllServices(false)
-//	core.CoreApp.UseCdn = types.NewNullBool(true)
-//	for _, srv := range core.Services() {
-//		core.CheckService(srv, true)
-//	}
-//	w := httptest.NewRecorder()
-//	r := httptest.NewRequest("GET", "/", nil)
-//	handlers.ExecuteResponse(w, r, "index.gohtml", nil, nil)
-//	return w.Body.Bytes()
-//}
 
 func updateDisplay() error {
 	gitCurrent, err := checkGithubUpdates()
@@ -426,3 +466,18 @@ func ExportSettings() ([]byte, error) {
 	export, err := json.Marshal(data)
 	return export, err
 }
+
+// ExportIndexHTML returns the HTML of the index page as a string
+//func ExportIndexHTML() []byte {
+//	source.Assets()
+//	core.CoreApp.Connect(core.CoreApp., utils.Directory)
+//	core.SelectAllServices(false)
+//	core.CoreApp.UseCdn = types.NewNullBool(true)
+//	for _, srv := range core.Services() {
+//		core.CheckService(srv, true)
+//	}
+//	w := httptest.NewRecorder()
+//	r := httptest.NewRequest("GET", "/", nil)
+//	handlers.ExecuteResponse(w, r, "index.gohtml", nil, nil)
+//	return w.Body.Bytes()
+//}

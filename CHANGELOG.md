@@ -4,6 +4,10 @@
 - Added Viper and Cobra config/env parsing package
 - Added more golang tests
 - Modified handlers to use a more generic find method
+- Added 'env' command to show variables used in config
+- Added 'reset' command that will delete files and backup .db file for a fresh install
+- Added error type that has common errors with http status code based on error
+
 
 # 0.90.27 (04-15-2020)
 - Fixed postgres database table creation process

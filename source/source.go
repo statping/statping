@@ -42,7 +42,7 @@ func scssRendered(name string) string {
 
 // CompileSASS will attempt to compile the SASS files into CSS
 func CompileSASS(files ...string) error {
-	sassBin := utils.Getenv("SASS", "sass").(string)
+	sassBin := utils.Params.GetString("SASS")
 
 	for _, file := range files {
 		scssFile := fmt.Sprintf("%v/assets/%v", utils.Directory, file)

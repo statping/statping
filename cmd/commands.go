@@ -50,6 +50,22 @@ var sassCmd = &cobra.Command{
 	},
 }
 
+var envCmd = &cobra.Command{
+	Use:   "env",
+	Short: "Return the configs that will be ran",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return envCli()
+	},
+}
+
+var resetCmd = &cobra.Command{
+	Use:   "reset",
+	Short: "Start a fresh copy of Statping",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return resetCli()
+	},
+}
+
 var onceCmd = &cobra.Command{
 	Use:   "once",
 	Short: "Check all services 1 time and then quit",

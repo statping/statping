@@ -92,6 +92,7 @@ type Database interface {
 
 	// extra
 	Error() error
+	Status() int
 	RowsAffected() int64
 
 	Since(time.Time) Database
@@ -502,6 +503,34 @@ func (it *Db) RowsAffected() int64 {
 
 func (it *Db) Error() error {
 	return it.Database.Error
+}
+
+func (it *Db) Status() int {
+	switch it.Database.Error {
+	case gorm.ErrRecordNotFound:
+		return 404
+	case gorm.ErrCantStartTransaction:
+		return 422
+	case gorm.ErrInvalidSQL:
+		return 500
+	case gorm.ErrUnaddressable:
+		return 500
+	default:
+		return 500
+	}
+}
+
+func (it *Db) Loggable() bool {
+	switch it.Database.Error {
+	case gorm.ErrCantStartTransaction:
+		return true
+	case gorm.ErrInvalidSQL:
+		return true
+	case gorm.ErrUnaddressable:
+		return true
+	default:
+		return false
+	}
 }
 
 func (it *Db) Since(ago time.Time) Database {

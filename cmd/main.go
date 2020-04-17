@@ -32,14 +32,16 @@ var (
 
 func init() {
 	core.New(VERSION)
-	utils.InitCLI()
-	parseFlags(rootCmd)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(assetsCmd)
 	rootCmd.AddCommand(exportCmd)
 	rootCmd.AddCommand(importCmd)
 	rootCmd.AddCommand(sassCmd)
 	rootCmd.AddCommand(onceCmd)
+	rootCmd.AddCommand(envCmd)
+	rootCmd.AddCommand(resetCmd)
+	utils.InitCLI()
+	parseFlags(rootCmd)
 }
 
 // exit will return an error and return an exit code 1 due to this error

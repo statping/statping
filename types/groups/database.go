@@ -2,6 +2,7 @@ package groups
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/errors"
 	"sort"
 )
 
@@ -14,6 +15,9 @@ func SetDB(database database.Database) {
 func Find(id int64) (*Group, error) {
 	var group Group
 	q := db.Where("id = ?", id).Find(&group)
+	if q.Error() != nil {
+		return nil, errors.Missing(group, id)
+	}
 	return &group, q.Error()
 }
 

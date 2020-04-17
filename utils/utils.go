@@ -42,6 +42,11 @@ type env struct {
 	data interface{}
 }
 
+func NotNumber(val string) bool {
+	_, err := strconv.ParseInt(val, 10, 64)
+	return err != nil
+}
+
 func GetenvAs(key string, defaultValue interface{}) *env {
 	return &env{
 		data: Getenv(key, defaultValue),

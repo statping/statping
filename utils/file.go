@@ -24,7 +24,7 @@ func CreateDirectory(directory string) error {
 
 // FolderExists will return true if the folder exists
 func FolderExists(folder string) bool {
-	if _, err := os.Stat(folder); os.IsExist(err) {
+	if stat, err := os.Stat(folder); err == nil && stat.IsDir() {
 		return true
 	}
 	return false
@@ -45,13 +45,13 @@ func FileExists(name string) bool {
 // DeleteFile will attempt to delete a file
 //		DeleteFile("newfile.json")
 func DeleteFile(file string) error {
-	Log.Debugln("deleting file: " + file)
+	Log.Warn("deleting file: " + file)
 	return os.Remove(file)
 }
 
 // RenameDirectory will attempt rename a directory to a new name
 func RenameDirectory(fromDir string, toDir string) error {
-	Log.Debugln("renaming directory: " + fromDir + "to: " + toDir)
+	Log.Warn("renaming directory: " + fromDir + "to: " + toDir)
 	return os.Rename(fromDir, toDir)
 }
 

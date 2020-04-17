@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/types/services"
@@ -21,7 +21,11 @@ func findService(r *http.Request) (*services.Service, error) {
 	id := utils.ToInt(vars["id"])
 	servicer, err := services.Find(id)
 	if err != nil {
-		return nil, errors.Errorf("service %d not found", id)
+		return nil, err
+	}
+	user := IsUser(r)
+	if !servicer.Public.Bool && !user {
+		return nil, errors.NotAuthenticated
 	}
 	return servicer, nil
 }
@@ -37,7 +41,7 @@ func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
 	for _, s := range newOrder {
 		service, err := services.Find(s.Id)
 		if err != nil {
-			sendErrorJson(errors.Errorf("service %d not found", s.Id), w, r)
+			sendErrorJson(err, w, r)
 			return
 		}
 		service.Order = s.Order
@@ -50,10 +54,6 @@ func apiServiceHandler(r *http.Request) interface{} {
 	srv, err := findService(r)
 	if err != nil {
 		return err
-	}
-	user := IsUser(r)
-	if !srv.Public.Bool && !user {
-		return errors.New("not authenticated")
 	}
 	srv = srv.UpdateStats()
 	return *srv
@@ -78,11 +78,11 @@ func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	service, err := findService(r)
 	if err != nil {
-		sendErrorJson(err, w, r, http.StatusNotFound)
+		sendErrorJson(err, w, r)
 		return
 	}
 	if err := DecodeJSON(r, &service); err != nil {
-		sendErrorJson(err, w, r, http.StatusBadRequest)
+		sendErrorJson(err, w, r)
 		return
 	}
 
@@ -110,10 +110,9 @@ func apiServiceRunningHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	service, err := services.Find(utils.ToInt(vars["id"]))
+	service, err := findService(r)
 	if err != nil {
-		sendErrorJson(errors.New("service data not found"), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
 
@@ -132,10 +131,9 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceFailureDataHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	service, err := services.Find(utils.ToInt(vars["id"]))
+	service, err := findService(r)
 	if err != nil {
-		sendErrorJson(errors.New("service data not found"), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
 
@@ -157,7 +155,7 @@ func apiServiceFailureDataHandler(w http.ResponseWriter, r *http.Request) {
 func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 	service, err := findService(r)
 	if err != nil {
-		sendErrorJson(errors.New("service data not found"), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
 
@@ -179,7 +177,7 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 func apiServiceTimeDataHandler(w http.ResponseWriter, r *http.Request) {
 	service, err := findService(r)
 	if err != nil {
-		sendErrorJson(errors.New("service data not found"), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
 
@@ -258,12 +256,10 @@ func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceFailuresHandler(r *http.Request) interface{} {
-	vars := mux.Vars(r)
-	service, err := services.Find(utils.ToInt(vars["id"]))
+	service, err := findService(r)
 	if err != nil {
-		return errors.New("service not found")
+		return err
 	}
-
 	var fails []*failures.Failure
 	query, err := database.ParseQueries(r, service.AllFailures())
 	if err != nil {
@@ -274,12 +270,10 @@ func apiServiceFailuresHandler(r *http.Request) interface{} {
 }
 
 func apiServiceHitsHandler(r *http.Request) interface{} {
-	vars := mux.Vars(r)
-	service, err := services.Find(utils.ToInt(vars["id"]))
+	service, err := findService(r)
 	if err != nil {
-		return errors.New("service not found")
+		return err
 	}
-
 	var hts []*hits.Hit
 	query, err := database.ParseQueries(r, service.AllHits())
 	if err != nil {

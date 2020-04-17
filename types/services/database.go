@@ -1,9 +1,9 @@
 package services
 
 import (
-	"errors"
 	"fmt"
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/utils"
 	"sort"
 )
@@ -20,7 +20,7 @@ func SetDB(database database.Database) {
 func Find(id int64) (*Service, error) {
 	srv := allServices[id]
 	if srv == nil {
-		return nil, errors.New("service not found")
+		return nil, errors.Missing(&Service{}, id)
 	}
 	return srv, nil
 }

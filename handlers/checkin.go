@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/statping/statping/types/checkins"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net"
@@ -13,14 +13,15 @@ import (
 
 func findCheckin(r *http.Request) (*checkins.Checkin, string, error) {
 	vars := mux.Vars(r)
-	if vars["api"] == "" {
-		return nil, "", errors.New("missing checkin API in URL")
+	id := vars["api"]
+	if id == "" {
+		return nil, "", errors.IDMissing
 	}
-	checkin, err := checkins.FindByAPI(vars["api"])
+	checkin, err := checkins.FindByAPI(id)
 	if err != nil {
-		return nil, vars["api"], err
+		return nil, id, errors.Missing(checkins.Checkin{}, id)
 	}
-	return checkin, vars["api"], nil
+	return checkin, id, nil
 }
 
 func apiAllCheckinsHandler(w http.ResponseWriter, r *http.Request) {
@@ -29,9 +30,9 @@ func apiAllCheckinsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
-	checkin, id, err := findCheckin(r)
+	checkin, _, err := findCheckin(r)
 	if err != nil {
-		sendErrorJson(fmt.Errorf("checkin %v was not found", id), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
 	returnJson(checkin, w, r)

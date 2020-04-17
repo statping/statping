@@ -73,6 +73,20 @@ func TestApiCheckinRoutes(t *testing.T) {
 			BeforeTest:       SetTestENV,
 			Skip:             true,
 		},
+		{
+			Name:           "Statping Missing Trigger Checkin",
+			URL:            "/checkin/" + apiToken,
+			Method:         "GET",
+			BeforeTest:     SetTestENV,
+			ExpectedStatus: 404,
+		},
+		{
+			Name:           "Statping Missing Checkin",
+			URL:            "/api/checkins/missing123",
+			Method:         "GET",
+			BeforeTest:     SetTestENV,
+			ExpectedStatus: 404,
+		},
 	}
 
 	for _, v := range tests {

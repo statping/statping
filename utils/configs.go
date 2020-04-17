@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"github.com/prometheus/common/log"
 	"github.com/spf13/viper"
 	"os"
 	"time"
@@ -13,35 +12,34 @@ var (
 
 func InitCLI() {
 	Params = viper.New()
+	Params.AutomaticEnv()
+	Directory = Params.GetString("STATPING_DIR")
+	//Params.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	setDefaults()
 	Params.SetConfigName("config")
 	Params.SetConfigType("yml")
-	Params.AddConfigPath(".")
-	err := Params.ReadInConfig()
-	if err != nil {
-		log.Debugf("config.yml Fatal error config file: %s", err)
-	}
+	Params.AddConfigPath(Directory)
 
-	Params.AddConfigPath(".")
+	Params.ReadInConfig()
+
+	Params.AddConfigPath(Directory)
 	Params.SetConfigFile(".env")
-	err = Params.ReadInConfig()
-	if err != nil {
-		log.Debugf(".env Fatal error config file: %s", err)
-	}
+	Params.ReadInConfig()
 
-	Params.AutomaticEnv()
-	if err != nil {
-		log.Debugf("No environment variables found: %s", err)
-	}
+	Params.Set("VERSION", version)
 }
 
 func setDefaults() {
-	defaultDir, err := os.Getwd()
-	if err != nil {
-		defaultDir = "."
+	if Directory == "" {
+		defaultDir, err := os.Getwd()
+		if err != nil {
+			defaultDir = "."
+		}
+		Params.SetDefault("STATPING_DIR", defaultDir)
+		Directory = defaultDir
 	}
-	Params.SetDefault("STATPING_DIR", defaultDir)
 	Directory = Params.GetString("STATPING_DIR")
+	Params.SetDefault("STATPING_DIR", Directory)
 	Params.SetDefault("GO_ENV", "")
 	Params.SetDefault("DISABLE_LOGS", false)
 	Params.SetDefault("BASE_PATH", "")
@@ -51,9 +49,8 @@ func setDefaults() {
 	Params.SetDefault("SAMPLE_DATA", true)
 	Params.SetDefault("USE_CDN", false)
 	Params.SetDefault("ALLOW_REPORTS", false)
-	Params.SetDefault("AUTH_USERNAME", "")
-	Params.SetDefault("AUTH_PASSWORD", "")
 	Params.SetDefault("POSTGRES_SSLMODE", "disable")
+	Params.SetDefault("SASS", "sass")
 
 	dbConn := Params.GetString("DB_CONN")
 	dbInt := Params.GetInt("DB_PORT")

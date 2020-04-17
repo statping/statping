@@ -72,6 +72,8 @@ jobs:
           DB_CONN: sqlite3
           STATPING_DIR: /home/runner/work/statping/statping
           API_KEY: demopassword123
+          DISABLE_LOGS: true
+          ALLOW_REPORTS: true
           DISCORD_URL: ${{ secrets.DISCORD_URL }}
           EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
@@ -90,7 +92,7 @@ jobs:
           TWILIO_SECRET: ${{ secrets.TWILIO_SECRET }}
           TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
           TWILIO_TO: ${{ secrets.TWILIO_TO }}
-        run: SASS=`which sass` go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
+        run: go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
 
       - name: Build Binaries
         run: make build-bin build-win

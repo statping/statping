@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/incidents"
 	"github.com/statping/statping/utils"
 	"net/http"
@@ -10,13 +10,16 @@ import (
 
 func findIncident(r *http.Request) (*incidents.Incident, int64, error) {
 	vars := mux.Vars(r)
+	if utils.NotNumber(vars["id"]) {
+		return nil, 0, errors.NotNumber
+	}
 	id := utils.ToInt(vars["id"])
 	if id == 0 {
-		return nil, id, errors.New("missing checkin API in URL")
+		return nil, id, errors.IDMissing
 	}
 	checkin, err := incidents.Find(id)
 	if err != nil {
-		return nil, id, err
+		return nil, id, errors.Missing(&incidents.Incident{}, id)
 	}
 	return checkin, id, nil
 }

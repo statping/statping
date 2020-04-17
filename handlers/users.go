@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/users"
 	"github.com/statping/statping/utils"
 	"net/http"
@@ -11,10 +11,13 @@ import (
 
 func findUser(r *http.Request) (*users.User, int64, error) {
 	vars := mux.Vars(r)
+	if utils.NotNumber(vars["id"]) {
+		return nil, 0, errors.NotNumber
+	}
 	num := utils.ToInt(vars["id"])
 	user, err := users.Find(num)
 	if err != nil {
-		return nil, num, err
+		return nil, num, errors.Missing(&users.User{}, num)
 	}
 	return user, num, nil
 }
@@ -22,7 +25,7 @@ func findUser(r *http.Request) (*users.User, int64, error) {
 func apiUserHandler(w http.ResponseWriter, r *http.Request) {
 	user, _, err := findUser(r)
 	if err != nil {
-		sendErrorJson(err, w, r, http.StatusNotFound)
+		sendErrorJson(err, w, r)
 		return
 	}
 	user.Password = ""
@@ -30,15 +33,15 @@ func apiUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiUserUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	user, id, err := findUser(r)
+	user, _, err := findUser(r)
 	if err != nil {
-		sendErrorJson(fmt.Errorf("user #%d was not found", id), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
 
 	err = DecodeJSON(r, &user)
 	if err != nil {
-		sendErrorJson(fmt.Errorf("user #%d was not found", id), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
 

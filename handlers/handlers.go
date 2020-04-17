@@ -4,10 +4,10 @@ import (
 	"crypto/subtle"
 	"crypto/tls"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/errors"
 	"html/template"
 	"net/http"
 	"os"
@@ -248,12 +248,14 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 	}
 }
 
-func returnJson(d interface{}, w http.ResponseWriter, r *http.Request, statusCode ...int) {
+func returnJson(d interface{}, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if len(statusCode) != 0 {
-		code := statusCode[0]
-		w.WriteHeader(code)
+	if e, ok := d.(errors.Error); ok {
+		w.WriteHeader(e.Status())
+		json.NewEncoder(w).Encode(e)
+		return
 	}
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(d)
 }
 
@@ -263,5 +265,5 @@ func error404Handler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
 	}
 	w.WriteHeader(http.StatusNotFound)
-	ExecuteResponse(w, r, "index.html", nil, nil)
+	ExecuteResponse(w, r, "base.gohtml", nil, nil)
 }

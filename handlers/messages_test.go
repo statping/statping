@@ -29,7 +29,7 @@ func TestMessagesApiRoutes(t *testing.T) {
 					"notify_before_scale": "hour"
 				}`,
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"status":"success"`, `"type":"message"`, `"method":"create"`, `"title":"API Message"`},
+			ExpectedContains: []string{Success, `"type":"message"`, `"method":"create"`, `"title":"API Message"`},
 			BeforeTest:       SetTestENV,
 			AfterTest:        UnsetTestENV,
 			SecureRoute:      true,
@@ -40,7 +40,8 @@ func TestMessagesApiRoutes(t *testing.T) {
 			Method:           "GET",
 			ExpectedStatus:   200,
 			ExpectedContains: []string{`"title":"Routine Downtime"`},
-		}, {
+		},
+		{
 			Name:   "Statping Update Message",
 			URL:    "/api/messages/1",
 			Method: "POST",
@@ -68,7 +69,14 @@ func TestMessagesApiRoutes(t *testing.T) {
 			ExpectedContains: []string{`"status":"success"`, `"method":"delete"`},
 			BeforeTest:       SetTestENV,
 			SecureRoute:      true,
-		}}
+		},
+		{
+			Name:           "Statping Missing Message",
+			URL:            "/api/messages/999999",
+			Method:         "GET",
+			ExpectedStatus: 404,
+		},
+	}
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {

@@ -60,12 +60,19 @@ func TestApiServiceRoutes(t *testing.T) {
 			BeforeTest:       UnsetTestENV,
 		},
 		{
-			Name:             "Statping Private Service 1",
+			Name:             "Statping Private Service 6",
 			URL:              "/api/services/6",
 			Method:           "GET",
-			ExpectedContains: []string{`"error":"not authenticated"`},
-			ExpectedStatus:   200,
+			ExpectedContains: []string{`"error":"user not authenticated"`},
+			ExpectedStatus:   401,
 			BeforeTest:       UnsetTestENV,
+		},
+		{
+			Name:           "Statping Authenticated Private Service 6",
+			URL:            "/api/services/6",
+			Method:         "GET",
+			ExpectedStatus: 200,
+			BeforeTest:     SetTestENV,
 		},
 		{
 			Name:             "Statping Service 1 with Private responses",
@@ -122,14 +129,14 @@ func TestApiServiceRoutes(t *testing.T) {
 			URL:            "/api/services/1/failure_data" + startEndQuery + "&group=24h",
 			Method:         "GET",
 			ExpectedStatus: 200,
-			GreaterThan:    4,
+			GreaterThan:    3,
 		},
 		{
 			Name:           "Statping Service 1 Failure Data - 12 Hour",
 			URL:            "/api/services/1/failure_data" + startEndQuery + "&group=12h",
 			Method:         "GET",
 			ExpectedStatus: 200,
-			GreaterThan:    7,
+			GreaterThan:    6,
 		},
 		{
 			Name:           "Statping Service 1 Failure Data - 1 Hour",
@@ -162,7 +169,7 @@ func TestApiServiceRoutes(t *testing.T) {
 				if err := json.Unmarshal(resp, &uptime); err != nil {
 					return err
 				}
-				assert.GreaterOrEqual(t, uptime.Uptime, int64(259100000))
+				assert.GreaterOrEqual(t, uptime.Uptime, int64(200000000))
 				return nil
 			},
 		},

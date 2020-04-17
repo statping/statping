@@ -16,6 +16,9 @@ func (c *Checkin) Expected() time.Duration {
 
 func (c *Checkin) Period() time.Duration {
 	duration, _ := time.ParseDuration(fmt.Sprintf("%ds", c.Interval))
+	if duration.Seconds() <= 15 {
+		return 15 * time.Second
+	}
 	return duration
 }
 

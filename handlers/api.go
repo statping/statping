@@ -1,11 +1,10 @@
 package handlers
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/groups"
 	"github.com/statping/statping/types/incidents"
 	"github.com/statping/statping/types/messages"
@@ -22,7 +21,7 @@ type apiResponse struct {
 	Status string      `json:"status"`
 	Object string      `json:"type,omitempty"`
 	Method string      `json:"method,omitempty"`
-	Error  string      `json:"error,omitempty"`
+	Error  error       `json:"error,omitempty"`
 	Id     int64       `json:"id,omitempty"`
 	Output interface{} `json:"output,omitempty"`
 }
@@ -54,8 +53,7 @@ func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 	var c *core.Core
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&c)
+	err := DecodeJSON(r, &c)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -111,17 +109,18 @@ func apiClearCacheHandler(w http.ResponseWriter, r *http.Request) {
 	returnJson(output, w, r)
 }
 
-func sendErrorJson(err error, w http.ResponseWriter, r *http.Request, statusCode ...int) {
+func sendErrorJson(err error, w http.ResponseWriter, r *http.Request) {
+	errCode := 0
+	e, ok := err.(errors.Error)
+	if ok {
+		errCode = e.Status()
+	}
 	log.WithField("url", r.URL.String()).
 		WithField("method", r.Method).
-		WithField("code", statusCode).
+		WithField("code", errCode).
 		Errorln(fmt.Errorf("sending error response for %s: %s", r.URL.String(), err.Error()))
 
-	output := apiResponse{
-		Status: "error",
-		Error:  err.Error(),
-	}
-	returnJson(output, w, r, statusCode...)
+	returnJson(err, w, r)
 }
 
 func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *http.Request) {
@@ -173,11 +172,6 @@ func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *ht
 }
 
 func sendUnauthorizedJson(w http.ResponseWriter, r *http.Request) {
-	output := apiResponse{
-		Status: "error",
-		Error:  errors.New("not authorized").Error(),
-	}
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusUnauthorized)
-	returnJson(output, w, r)
+	returnJson(errors.NotAuthenticated, w, r)
 }
