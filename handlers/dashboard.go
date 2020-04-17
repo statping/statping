@@ -92,7 +92,7 @@ func apiThemeSaveHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiThemeCreateHandler(w http.ResponseWriter, r *http.Request) {
-	dir := utils.Directory
+	dir := utils.Params.GetString("STATPING_DIR")
 	utils.Log.Infof("creating assets in folder: %s/%s", dir, "assets")
 	if err := source.CreateAllAssets(dir); err != nil {
 		log.Errorln(err)
