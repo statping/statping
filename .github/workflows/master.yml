@@ -152,7 +152,7 @@ jobs:
           TWILIO_TO: ${{ secrets.TWILIO_TO }}
 
       - name: Coveralls Testing Coverage
-        run: goveralls -coverprofile=coverage.out -service=travis -repotoken $COVERALLS
+        run: goveralls -coverprofile=coverage.out -repotoken $COVERALLS
         env:
           COVERALLS: ${{ secrets.COVERALLS }}
 
@@ -194,12 +194,6 @@ jobs:
           COMMIT: $GITHUB_SHA
         run: make build-bin build-win
 
-      - name: Upload Compiled Binaries
-        uses: actions/upload-artifact@v1
-        with:
-          name: statping-bins
-          path: /home/runner/work/statping/statping/build/*
-
       - name: Create Release
         id: create_release
         uses: actions/create-release@latest
@@ -208,10 +202,21 @@ jobs:
           VERSION: $(cat version.txt)
         with:
           tag_name: v$(cat version.txt)
-          release_name: Release v$(cat version.txt)
-          body: Statping v$(cat version.txt)
+          release_name: Statping v$(cat version.txt)
+          body: Version v$(cat version.txt)
           draft: false
           prerelease: false
+
+      - name: Upload Release Binaries
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          pattern: |
+            "build/*.tar.gz"
+            "build/*.zip"
 
   post-release:
     needs: build
