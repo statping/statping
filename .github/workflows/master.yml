@@ -16,7 +16,9 @@ jobs:
           go-version: '1.14.x'
 
       - name: Add GOBIN to PATH
-        run: echo "::add-path::$(go env GOPATH)/bin"
+        run: |
+          echo "::add-path::$(go env GOPATH)/bin"
+          echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
       - name: Install Node
@@ -81,8 +83,10 @@ jobs:
         with:
           go-version: '1.14.x'
 
-      - name: Add GOBIN to PATH
-        run: echo "::add-path::$(go env GOPATH)/bin"
+      - name: Setting ENV's
+        run: |
+          echo "::add-path::$(go env GOPATH)/bin"
+          echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
       - name: Install Node
@@ -117,6 +121,8 @@ jobs:
           path: /home/runner/work/statping/statping/source/dist
 
       - name: Install Statping
+        env:
+            VERSION: $VERSION
         run: |
           make build
           chmod +x statping
@@ -125,12 +131,12 @@ jobs:
       - name: Go Tests
         run: SASS=`which sass` go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
         env:
+          VERSION: $VERSION
           DB_CONN: sqlite3
           STATPING_DIR: /home/runner/work/statping/statping
           API_KEY: demopassword123
           DISABLE_LOGS: true
           ALLOW_REPORTS: true
-          VERSION: $(cat version.txt)
           COVERALLS: ${{ secrets.COVERALLS }}
           DISCORD_URL: ${{ secrets.DISCORD_URL }}
           EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
@@ -178,8 +184,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
-      - name: Add GOBIN to PATH
-        run: echo "::add-path::$(go env GOPATH)/bin"
+      - name: Setting ENV's
+        run: |
+          echo "::add-path::$(go env GOPATH)/bin"
+          echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
       - name: Download Compiled Frontend
@@ -190,7 +198,7 @@ jobs:
 
       - name: Build Binaries
         env:
-          VERSION: $(cat version.txt)
+          VERSION: $VERSION
           COMMIT: $GITHUB_SHA
         run: make build-bin build-win
 
@@ -199,11 +207,11 @@ jobs:
         uses: actions/create-release@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: $(cat version.txt)
+          VERSION: $VERSION
         with:
-          tag_name: v$(cat version.txt)
-          release_name: Statping v$(cat version.txt)
-          body: Version v$(cat version.txt)
+          tag_name: v$VERSION
+          release_name: Statping v$VERSION
+          body: Version v$VERSION
           draft: false
           prerelease: false
 
@@ -212,6 +220,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: $VERSION
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
           pattern: |
@@ -240,7 +249,7 @@ jobs:
           SENTRY_ORG: statping
           SENTRY_PROJECT: backend
         with:
-          tagName: v$(cat version.txt)
+          tagName: v$VERSION
           environment: production
 
       - name: Sentry Frontend Release
@@ -251,5 +260,5 @@ jobs:
           SENTRY_ORG: statping
           SENTRY_PROJECT: frontend
         with:
-          tagName: v$(cat version.txt)
+          tagName: v$VERSION
           environment: production
