@@ -45,7 +45,7 @@ func CompileSASS(files ...string) error {
 	sassBin := utils.Params.GetString("SASS")
 
 	for _, file := range files {
-		scssFile := fmt.Sprintf("%v/assets/%v", utils.Directory, file)
+		scssFile := fmt.Sprintf("%v/assets/%v", utils.Params.GetString("STATPING_DIR"), file)
 
 		log.Infoln(fmt.Sprintf("Compiling SASS %v into %v", scssFile, scssRendered(scssFile)))
 
@@ -57,10 +57,10 @@ func CompileSASS(files ...string) error {
 			return errors.Wrapf(err, "failed to compile assets, %s %s %s", err, stdout, stderr)
 		}
 
-		if stdout != "" || stderr != "" {
-			log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v %v %v", err, stdout, stderr))
-			return errors.Wrap(err, "failed to capture stdout or stderr")
-		}
+		//if stdout != "" || stderr != "" {
+		//	log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v %v %v", err, stdout, stderr))
+		//	return errors.Wrap(err, "failed to capture stdout or stderr")
+		//}
 
 		if stdout != "" || stderr != "" {
 			log.Infoln(fmt.Sprintf("out: %v | error: %v", stdout, stderr))
