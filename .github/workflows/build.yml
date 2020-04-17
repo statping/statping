@@ -92,7 +92,7 @@ jobs:
           TWILIO_SECRET: ${{ secrets.TWILIO_SECRET }}
           TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
           TWILIO_TO: ${{ secrets.TWILIO_TO }}
-        run: go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
+        run: SASS=`which sass` go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
 
       - name: Build Binaries
         run: make build-bin build-win
