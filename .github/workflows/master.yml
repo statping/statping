@@ -70,6 +70,7 @@ jobs:
           path: /home/runner/work/statping/statping/source/rice-box.go
 
   test:
+    needs: compile
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -148,6 +149,7 @@ jobs:
           COVERALLS: ${{ secrets.COVERALLS }}
 
   build:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -204,6 +206,7 @@ jobs:
           prerelease: false
 
   post-release:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
