@@ -17,7 +17,7 @@ func TestThemeRoutes(t *testing.T) {
 			ExpectedContains: []string{`"status":"success"`},
 			BeforeTest:       SetTestENV,
 			AfterTest: func(t *testing.T) error {
-				assert.True(t, source.UsingAssets(utils.Directory))
+				assert.True(t, source.UsingAssets(utils.Params.GetString("STATPING_DIR")))
 				return nil
 			},
 		},

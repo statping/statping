@@ -16,6 +16,7 @@ func init() {
 	utils.InitLogs()
 	Assets()
 	utils.DeleteDirectory(dir + "/assets")
+	dir = utils.Params.GetString("STATPING_DIR")
 }
 
 func TestCore_UsingAssets(t *testing.T) {
