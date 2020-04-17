@@ -202,5 +202,5 @@ func TestConfigLoad(t *testing.T) {
 	assert.Equal(t, "sqlite", s("DB_CONN"))
 	assert.Equal(t, Directory, s("STATPING_DIR"))
 	assert.True(t, b("SAMPLE_DATA"))
-	assert.False(t, b("ALLOW_REPORTS"))
+	assert.True(t, b("ALLOW_REPORTS"))
 }

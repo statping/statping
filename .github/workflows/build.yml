@@ -24,10 +24,10 @@ jobs:
         with:
           node-version: '10.x'
 
-      - name: Install Dependencies
+      - name: Install Global Dependencies
         run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
 
-      - name: Checkout Statping
+      - name: Checkout Statping Repo
         uses: actions/checkout@v2
 
       - uses: actions/cache@v1
