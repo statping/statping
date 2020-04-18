@@ -245,6 +245,10 @@ jobs:
       - name: Checkout Statping Repo
         uses: actions/checkout@v2
 
+      - name: Setting ENV's
+        run: echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
       - name: Base Docker Image
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
