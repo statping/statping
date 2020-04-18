@@ -128,8 +128,13 @@ jobs:
           chmod +x statping
           mv statping $(go env GOPATH)/bin/
 
-      - name: Cypress E2E Testing
-        uses: cypress-io/github-action@v1
+#      - name: Cypress E2E Testing
+#        uses: cypress-io/github-action@v1
+#        with:
+#          start: npm start
+#          wait-on: http://localhost:3030
+#          record: false
+#          parallel: false
 
       - name: Go Tests
         run: SASS=`which sass` go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
