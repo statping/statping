@@ -323,7 +323,6 @@ func HelpEcho() {
 	fmt.Println("     DOMAIN                    - Set a URL for the Statping status page")
 	fmt.Println("     ADMIN_USER                - Username for administrator account (default: admin)")
 	fmt.Println("     ADMIN_PASS                - Password for administrator account (default: admin)")
-	fmt.Println("     SASS                      - Set the absolute path to the sass binary location")
 	fmt.Println("     USE_ASSETS                - Automatically use assets from 'assets folder' (true/false)")
 	fmt.Println("     HTTP_PROXY                - Use a HTTP Proxy for HTTP Requests")
 	fmt.Println("     AUTH_USERNAME             - HTTP Basic Authentication username")

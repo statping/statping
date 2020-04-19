@@ -234,6 +234,10 @@ func CheckHttp(s *Service, record bool) *Service {
 		headers = nil
 	}
 
+	if s.Redirect.Bool {
+		headers = append(headers, "Redirect=true")
+	}
+
 	if s.PostData.String != "" {
 		data = bytes.NewBuffer([]byte(s.PostData.String))
 	} else {

@@ -137,7 +137,7 @@ jobs:
 #          parallel: false
 
       - name: Go Tests
-        run: SASS=`which sass` go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
+        run: go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
         env:
           VERSION: ${{ env.VERSION }}
           DB_CONN: sqlite3

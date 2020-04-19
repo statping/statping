@@ -38,7 +38,8 @@ func findDbFile(configs *DbConfig) (string, error) {
 	if configs == nil {
 		file, err := findSQLin(utils.Directory)
 		if err != nil {
-			return "", err
+			log.Errorln(err)
+			return location, nil
 		}
 		location = file
 	}

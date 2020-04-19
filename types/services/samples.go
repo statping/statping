@@ -21,6 +21,7 @@ func Samples() error {
 		Public:         null.NewNullBool(true),
 		Permalink:      null.NewNullString("google"),
 		VerifySSL:      null.NewNullBool(true),
+		Redirect:       null.NewNullBool(true),
 		NotifyAfter:    3,
 		CreatedAt:      createdOn,
 	}
@@ -79,6 +80,7 @@ func Samples() error {
 		Order:          4,
 		Public:         null.NewNullBool(true),
 		VerifySSL:      null.NewNullBool(true),
+		Redirect:       null.NewNullBool(true),
 		GroupId:        2,
 		NotifyAfter:    3,
 		CreatedAt:      createdOn,
@@ -111,6 +113,7 @@ func Samples() error {
 		Timeout:   120,
 		Order:     6,
 		Public:    null.NewNullBool(false),
+		Redirect:  null.NewNullBool(true),
 		GroupId:   3,
 		CreatedAt: createdOn,
 	}

@@ -136,6 +136,16 @@
         </div>
 
         <div v-if="service.type.match(/^(http)$/)" class="form-group row">
+            <label class="col-sm-4 col-form-label">Follow HTTP Redirects</label>
+            <div class="col-8 mt-1">
+                <span @click="service.redirect = !!service.redirect" class="switch float-left">
+                    <input v-model="service.redirect" type="checkbox" name="redirect-option" class="switch" id="switch-redirect" v-bind:checked="service.redirect">
+                    <label for="switch-redirect">Follow HTTP Redirects if server attempts</label>
+                </span>
+            </div>
+        </div>
+
+        <div v-if="service.type.match(/^(http)$/)" class="form-group row">
             <label class="col-sm-4 col-form-label">Verify SSL</label>
             <div class="col-8 mt-1">
                 <span @click="service.verify_ssl = !!service.verify_ssl" class="switch float-left">
@@ -220,6 +230,7 @@
                   permalink: "",
                   order: 1,
                   verify_ssl: true,
+                  redirect: true,
                   allow_notifications: true,
                   notify_all_changes: true,
                   notify_after: 2,

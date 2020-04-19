@@ -10,21 +10,19 @@ func (d *DbConfig) ConnectionString() string {
 	postgresSSL := utils.Params.GetString("POSTGRES_SSLMODE")
 
 	switch d.DbConn {
-	case "sqlite", "sqlite3", "memory":
-		if d.DbConn == "memory" {
-			conn = "sqlite3"
-			d.DbConn = ":memory:"
-			return d.DbConn
-		} else {
-			conn, err := findDbFile(d)
-			if err != nil {
-				log.Errorln(err)
-			}
-			d.SqlFile = conn
-			log.Infof("SQL database file at: %s", d.SqlFile)
-			d.DbConn = "sqlite3"
-			return d.SqlFile
+	case "memory", ":memory:":
+		conn = "sqlite3"
+		d.DbConn = ":memory:"
+		return d.DbConn
+	case "sqlite", "sqlite3":
+		conn, err := findDbFile(d)
+		if err != nil {
+			log.Errorln(err)
 		}
+		d.SqlFile = conn
+		log.Infof("SQL database file at: %s", d.SqlFile)
+		d.DbConn = "sqlite3"
+		return d.SqlFile
 	case "mysql":
 		host := fmt.Sprintf("%v:%v", d.DbHost, d.DbPort)
 		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC&time_zone=%%27UTC%%27", d.DbUser, d.DbPass, host, d.DbData)

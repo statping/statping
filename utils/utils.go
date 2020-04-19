@@ -250,6 +250,13 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 		Timeout:   timeout,
 	}
 
+	if req.Header.Get("Redirect") != "true" {
+		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		}
+		req.Header.Del("Redirect")
+	}
+
 	if resp, err = client.Do(req); err != nil {
 		httpMetric.Errors++
 		return nil, resp, err

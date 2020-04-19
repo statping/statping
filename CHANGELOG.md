@@ -1,3 +1,10 @@
+# 0.90.29 (04-19-2020)
+- Added HTTP Redirects for services
+- Removed use of SASS environment variable, now finds path or sends error
+- Modified Makefile to create new snapcraft versions
+- Fixed issue when logs are not initiated yet. Issue #502
+- Fixed issue when SQLite (statping.db) is not found Issue #499
+
 # 0.90.28 (04-16-2020)
 - Fixed postgres timestamp grouping
 - Added postman (newman) API testing

@@ -39,8 +39,7 @@ release: test-deps
 	make build-all
 
 test-ci: clean compile test-deps
-	DB_CONN=sqlite SASS=`which sass` \
-		go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
+	DB_CONN=sqlite go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
 	goveralls -coverprofile=coverage.out -service=travis-ci -repotoken ${COVERALLS}
 
 cypress: clean
@@ -153,7 +152,7 @@ generate:
 	cd source && go generate
 
 build-bin:
-	mkdir build
+	mkdir build || true
 	export PWD=`pwd`
 	@for arch in $(ARCHS);\
 	do \
@@ -202,7 +201,7 @@ clean:
 	find . -name "*.out" -type f -delete
 	find . -name "*.cpu" -type f -delete
 	find . -name "*.mem" -type f -delete
-	rm -rf {build,releases,tmp,source/build}
+	rm -rf {build,releases,tmp,source/build,snap}
 
 print_details:
 	@echo \==== Statping Development Instance ====
@@ -278,19 +277,21 @@ sentry-release:
 	sentry-cli releases finalize v${VERSION}
 
 snapcraft: clean compile build-bin
+	mkdir snap
+	mv snapcraft.yaml snap/
 	PWD=$(shell pwd)
-	snapcraft clean statping -s pull
+	snapcraft clean statping
 	docker run --rm -v ${PWD}/build/statping-linux-amd64.tar.gz:/build/statping-linux.tar.gz -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=amd64"
-	snapcraft clean statping -s pull
+	snapcraft clean statping
 	docker run --rm -v ${PWD}/build/statping-linux-386.tar.gz:/build/statping-linux.tar.gz -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=i386"
-	snapcraft clean statping -s pull
+	snapcraft clean statping
 	docker run --rm -v ${PWD}/build/statping-linux-arm64.tar.gz:/build/statping-linux.tar.gz -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=arm64"
-	snapcraft clean statping -s pull
-	docker run --rm -v ${PWD}/build/statping-linux-arm.tar.gz:/build/statping-linux.tar.gz -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=armhf"
+	snapcraft clean statping
+	docker run --rm -v ${PWD}/build/statping-linux-arm.tar.gz:/build/statping-linux.tar.gz -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=arm"
 	snapcraft push statping_${VERSION}_amd64.snap --release stable
 	snapcraft push statping_${VERSION}_arm64.snap --release stable
 	snapcraft push statping_${VERSION}_i386.snap --release stable
-	snapcraft push statping_${VERSION}_armhf.snap --release stable
+	snapcraft push statping_${VERSION}_arm.snap --release stable
 
 postman: clean
 	API_SECRET=demosecret123 statping --port=8080 > /dev/null &
