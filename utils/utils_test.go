@@ -16,6 +16,32 @@ func TestCreateLog(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestToFields(t *testing.T) {
+	example := struct {
+		Id  int64
+		Str string
+	}{
+		Id:  1,
+		Str: "example input",
+	}
+	fields := ToFields(example)
+
+	assert.Equal(t, "", fields)
+}
+
+func TestGetLastLine(t *testing.T) {
+	last := GetLastLine()
+	require.NotNil(t, last)
+	assert.Equal(t, "", last.lineAsString())
+}
+
+func TestReplaceValue(t *testing.T) {
+	assert.Equal(t, true, replaceVal(true))
+	assert.Equal(t, 42, replaceVal(42))
+	assert.Equal(t, "hello world", replaceVal("hello world"))
+	assert.Equal(t, "5s", replaceVal(time.Duration(5*time.Second)))
+}
+
 func TestInitLogs(t *testing.T) {
 	assert.Nil(t, InitLogs())
 	Log.Infoln("this is a test")

@@ -91,7 +91,7 @@ func start() {
 		}
 	}
 
-	if err = configs.ConnectConfigs(confgs); err != nil {
+	if err = configs.ConnectConfigs(confgs, true); err != nil {
 		exit(err)
 	}
 

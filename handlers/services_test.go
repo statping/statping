@@ -13,6 +13,40 @@ import (
 	"time"
 )
 
+func TestUnAuthenticatedServicesRoutes(t *testing.T) {
+	tests := []HTTPTest{
+		{
+			Name:           "No Authentication - New Service",
+			URL:            "/api/services",
+			Method:         "POST",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "No Authentication - Update Service",
+			URL:            "/api/services/1",
+			Method:         "POST",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "No Authentication - Delete Service",
+			URL:            "/api/services/1",
+			Method:         "DELETE",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+	}
+
+	for _, v := range tests {
+		t.Run(v.Name, func(t *testing.T) {
+			str, t, err := RunHTTPTest(v, t)
+			t.Logf("Test %s: \n %v\n", v.Name, str)
+			assert.Nil(t, err)
+		})
+	}
+}
+
 func TestApiServiceRoutes(t *testing.T) {
 	since := utils.Now().Add(-30 * types.Day)
 	end := utils.Now().Add(-30 * time.Minute)
@@ -239,7 +273,7 @@ func TestApiServiceRoutes(t *testing.T) {
 					"order_id": 0
 				}`,
 			ExpectedStatus:   200,
-			ExpectedContains: []string{Success, `"name":"Updated New Service"`, `"method":"update"`},
+			ExpectedContains: []string{Success, `"name":"Updated New Service"`, MethodUpdate},
 			FuncTest: func(t *testing.T) error {
 				item, err := services.Find(1)
 				require.Nil(t, err)
@@ -272,7 +306,7 @@ func TestApiServiceRoutes(t *testing.T) {
 			URL:              "/api/services/1",
 			Method:           "DELETE",
 			ExpectedStatus:   200,
-			ExpectedContains: []string{Success, `"method":"delete"`},
+			ExpectedContains: []string{Success, MethodDelete},
 			FuncTest: func(t *testing.T) error {
 				count := len(services.Services())
 				if count != 6 {
@@ -281,7 +315,17 @@ func TestApiServiceRoutes(t *testing.T) {
 				return nil
 			},
 			SecureRoute: true,
-		}}
+		},
+		{
+			Name:             "Incorrect JSON POST",
+			URL:              "/api/services",
+			Body:             BadJSON,
+			ExpectedContains: []string{BadJSONResponse},
+			BeforeTest:       SetTestENV,
+			Method:           "POST",
+			ExpectedStatus:   422,
+		},
+	}
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {

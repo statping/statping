@@ -5,6 +5,40 @@ import (
 	"testing"
 )
 
+func TestUnAuthenticatedMessageRoutes(t *testing.T) {
+	tests := []HTTPTest{
+		{
+			Name:           "No Authentication - New Message",
+			URL:            "/api/messages",
+			Method:         "POST",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "No Authentication - Update Message",
+			URL:            "/api/messages/1",
+			Method:         "POST",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "No Authentication - Delete Message",
+			URL:            "/api/messages/1",
+			Method:         "DELETE",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+	}
+
+	for _, v := range tests {
+		t.Run(v.Name, func(t *testing.T) {
+			str, t, err := RunHTTPTest(v, t)
+			t.Logf("Test %s: \n %v\n", v.Name, str)
+			assert.Nil(t, err)
+		})
+	}
+}
+
 func TestMessagesApiRoutes(t *testing.T) {
 	tests := []HTTPTest{
 		{
@@ -57,7 +91,7 @@ func TestMessagesApiRoutes(t *testing.T) {
 					"notify_before_scale": "hour"
 				}`,
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"status":"success"`, `"type":"message"`, `"method":"update"`},
+			ExpectedContains: []string{Success, `"type":"message"`, MethodUpdate},
 			BeforeTest:       SetTestENV,
 			SecureRoute:      true,
 		},
@@ -66,7 +100,7 @@ func TestMessagesApiRoutes(t *testing.T) {
 			URL:              "/api/messages/1",
 			Method:           "DELETE",
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"status":"success"`, `"method":"delete"`},
+			ExpectedContains: []string{Success, MethodDelete},
 			BeforeTest:       SetTestENV,
 			SecureRoute:      true,
 		},
@@ -75,6 +109,15 @@ func TestMessagesApiRoutes(t *testing.T) {
 			URL:            "/api/messages/999999",
 			Method:         "GET",
 			ExpectedStatus: 404,
+		},
+		{
+			Name:             "Incorrect JSON POST",
+			URL:              "/api/messages",
+			Body:             BadJSON,
+			ExpectedContains: []string{BadJSONResponse},
+			BeforeTest:       SetTestENV,
+			Method:           "POST",
+			ExpectedStatus:   422,
 		},
 	}
 

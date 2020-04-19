@@ -5,6 +5,54 @@ import (
 	"testing"
 )
 
+func TestUnAuthenticatedIncidentRoutes(t *testing.T) {
+	tests := []HTTPTest{
+		{
+			Name:           "No Authentication - New Incident",
+			URL:            "/api/services/1/incidents",
+			Method:         "POST",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "No Authentication - New Incident Update",
+			URL:            "/api/incidents/updates",
+			Method:         "POST",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "No Authentication - Update Incident",
+			URL:            "/api/incidents/1",
+			Method:         "POST",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "No Authentication - Delete Incident",
+			URL:            "/api/incidents/1",
+			Method:         "DELETE",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "No Authentication - Delete Incident Update",
+			URL:            "/api/incidents/1/updates/1",
+			Method:         "DELETE",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+	}
+
+	for _, v := range tests {
+		t.Run(v.Name, func(t *testing.T) {
+			str, t, err := RunHTTPTest(v, t)
+			t.Logf("Test %s: \n %v\n", v.Name, str)
+			assert.Nil(t, err)
+		})
+	}
+}
+
 func TestIncidentsAPIRoutes(t *testing.T) {
 	tests := []HTTPTest{
 		{
@@ -64,6 +112,15 @@ func TestIncidentsAPIRoutes(t *testing.T) {
 			ExpectedContains: []string{Success},
 		},
 		{
+			Name:             "Incorrect Checkin JSON POST",
+			URL:              "/api/incidents/1/updates",
+			Body:             BadJSON,
+			ExpectedContains: []string{BadJSONResponse},
+			BeforeTest:       SetTestENV,
+			Method:           "POST",
+			ExpectedStatus:   422,
+		},
+		{
 			Name:             "Statping Delete Incident Update",
 			URL:              "/api/incidents/1/updates/1",
 			Method:           "DELETE",
@@ -78,6 +135,14 @@ func TestIncidentsAPIRoutes(t *testing.T) {
 			ExpectedStatus:   200,
 			BeforeTest:       SetTestENV,
 			ExpectedContains: []string{Success},
+		},
+		{
+			Name:             "Incorrect JSON POST",
+			URL:              "/api/services/1/incidents",
+			Body:             BadJSON,
+			ExpectedContains: []string{BadJSONResponse},
+			Method:           "POST",
+			ExpectedStatus:   422,
 		},
 	}
 

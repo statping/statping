@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/errors"
@@ -47,7 +46,7 @@ func checkinCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	service, err := services.Find(checkin.ServiceId)
 	if err != nil {
-		sendErrorJson(fmt.Errorf("missing service_id field"), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
 	checkin.ServiceId = service.Id
@@ -59,9 +58,9 @@ func checkinCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
-	checkin, id, err := findCheckin(r)
+	checkin, _, err := findCheckin(r)
 	if err != nil {
-		sendErrorJson(fmt.Errorf("checkin %s was not found", id), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
 	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
@@ -75,7 +74,7 @@ func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = hit.Create()
 	if err != nil {
-		sendErrorJson(fmt.Errorf("checkin %v was not found", id), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
 	checkin.Failing = false
@@ -84,9 +83,9 @@ func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func checkinDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	checkin, id, err := findCheckin(r)
+	checkin, _, err := findCheckin(r)
 	if err != nil {
-		sendErrorJson(fmt.Errorf("checkin %v was not found", id), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
 

@@ -10,8 +10,8 @@ import (
 
 var log = utils.Log
 
-func ConnectConfigs(configs *DbConfig) error {
-	err := Connect(configs, true)
+func ConnectConfigs(configs *DbConfig, retry bool) error {
+	err := Connect(configs, retry)
 	if err != nil {
 		return errors.Wrap(err, "error connecting to database")
 	}

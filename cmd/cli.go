@@ -50,7 +50,7 @@ func exportCli(args []string) error {
 	if err != nil {
 		return err
 	}
-	if err = configs.ConnectConfigs(config); err != nil {
+	if err = configs.ConnectConfigs(config, false); err != nil {
 		return err
 	}
 	if _, err := services.SelectAllServices(false); err != nil {
@@ -172,7 +172,7 @@ func importCli(args []string) error {
 	if err != nil {
 		return err
 	}
-	if err = configs.ConnectConfigs(config); err != nil {
+	if err = configs.ConnectConfigs(config, false); err != nil {
 		return err
 	}
 	if data, err = ExportSettings(); err != nil {
@@ -262,7 +262,7 @@ func runOnce() error {
 	if err != nil {
 		return errors.Wrap(err, "config.yml file not found")
 	}
-	err = configs.ConnectConfigs(config)
+	err = configs.ConnectConfigs(config, false)
 	if err != nil {
 		return errors.Wrap(err, "issue connecting to database")
 	}

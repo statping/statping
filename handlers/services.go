@@ -95,20 +95,6 @@ func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonAction(service, "update", w, r)
 }
 
-func apiServiceRunningHandler(w http.ResponseWriter, r *http.Request) {
-	service, err := findService(r)
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
-	if service.IsRunning() {
-		service.Close()
-	} else {
-		service.Start()
-	}
-	sendJsonAction(service, "running", w, r)
-}
-
 func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 	service, err := findService(r)
 	if err != nil {

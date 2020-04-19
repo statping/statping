@@ -7,6 +7,47 @@ import (
 	"testing"
 )
 
+func TestUnAuthenticatedThemeRoutes(t *testing.T) {
+	tests := []HTTPTest{
+		{
+			Name:           "No Authentication - Create Themes",
+			URL:            "/api/theme/create",
+			Method:         "GET",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "No Authentication - View Themes",
+			URL:            "/api/theme",
+			Method:         "GET",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "No Authentication - Update Themes",
+			URL:            "/api/theme",
+			Method:         "POST",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "No Authentication - Delete Themes",
+			URL:            "/api/theme",
+			Method:         "DELETE",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+	}
+
+	for _, v := range tests {
+		t.Run(v.Name, func(t *testing.T) {
+			str, t, err := RunHTTPTest(v, t)
+			t.Logf("Test %s: \n %v\n", v.Name, str)
+			assert.Nil(t, err)
+		})
+	}
+}
+
 func TestThemeRoutes(t *testing.T) {
 	tests := []HTTPTest{
 		{

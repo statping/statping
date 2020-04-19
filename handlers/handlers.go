@@ -10,7 +10,6 @@ import (
 	"github.com/statping/statping/types/errors"
 	"html/template"
 	"net/http"
-	"os"
 	"path"
 	"strings"
 	"time"
@@ -110,7 +109,7 @@ func IsReadAuthenticated(r *http.Request) bool {
 // IsFullAuthenticated returns true if the HTTP request is authenticated. You can set the environment variable GO_ENV=test
 // to bypass the admin authenticate to the dashboard features.
 func IsFullAuthenticated(r *http.Request) bool {
-	if os.Getenv("GO_ENV") == "test" {
+	if utils.Params.Get("GO_ENV") == "test" {
 		return true
 	}
 	if core.App == nil {
@@ -187,7 +186,7 @@ func IsUser(r *http.Request) bool {
 	if !core.App.Setup {
 		return false
 	}
-	if os.Getenv("GO_ENV") == "test" {
+	if utils.Params.Get("GO_ENV") == "test" {
 		return true
 	}
 	tk, err := getJwtToken(r)
@@ -253,6 +252,11 @@ func returnJson(d interface{}, w http.ResponseWriter, r *http.Request) {
 	if e, ok := d.(errors.Error); ok {
 		w.WriteHeader(e.Status())
 		json.NewEncoder(w).Encode(e)
+		return
+	}
+	if e, ok := d.(error); ok {
+		w.WriteHeader(500)
+		json.NewEncoder(w).Encode(errors.New(e.Error()))
 		return
 	}
 	w.WriteHeader(http.StatusOK)

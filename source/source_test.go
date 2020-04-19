@@ -23,6 +23,15 @@ func TestCore_UsingAssets(t *testing.T) {
 	assert.False(t, UsingAssets(dir))
 }
 
+func TestCore_UsingAssetsTrue(t *testing.T) {
+	utils.Params.Set("USE_ASSETS", true)
+	assert.False(t, UsingAssets(dir))
+	assert.DirExists(t, dir+"/assets")
+	utils.Params.Set("USE_ASSETS", false)
+	err := utils.DeleteDirectory(dir + "/assets")
+	assert.Nil(t, err)
+}
+
 func TestCreateAssets(t *testing.T) {
 	assert.Nil(t, CreateAllAssets(dir))
 	assert.True(t, UsingAssets(dir))
