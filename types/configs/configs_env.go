@@ -2,6 +2,7 @@ package configs
 
 import (
 	"fmt"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/utils"
 )
 
@@ -54,6 +55,10 @@ func LoadConfigFile(directory string) (*DbConfig, error) {
 		Password:    p.GetString("ADMIN_PASS"),
 		Location:    utils.Directory,
 		SqlFile:     p.GetString("SQL_FILE"),
+	}
+
+	if !utils.FileExists(directory + "/config.yml") {
+		return nil, errors.New(fmt.Sprintf("%s/config.yml does not exist", directory))
 	}
 
 	log.WithFields(utils.ToFields(configs)).Debugln("read config file: " + directory + "/config.yml")

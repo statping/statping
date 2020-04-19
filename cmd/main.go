@@ -86,6 +86,7 @@ func start() {
 
 	confgs, err = configs.LoadConfigs()
 	if err != nil {
+		log.Infoln("Starting in Setup Mode")
 		if err := SetupMode(); err != nil {
 			exit(err)
 		}

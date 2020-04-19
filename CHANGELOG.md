@@ -4,6 +4,8 @@
 - Modified Makefile to create new snapcraft versions
 - Fixed issue when logs are not initiated yet. Issue #502
 - Fixed issue when SQLite (statping.db) is not found Issue #499
+- Modified port flag in Docker image
+- Fixed issue on startup without config.yml file not starting in setup mode
 
 # 0.90.28 (04-16-2020)
 - Fixed postgres timestamp grouping
@@ -14,7 +16,6 @@
 - Added 'env' command to show variables used in config
 - Added 'reset' command that will delete files and backup .db file for a fresh install
 - Added error type that has common errors with http status code based on error
-
 
 # 0.90.27 (04-15-2020)
 - Fixed postgres database table creation process

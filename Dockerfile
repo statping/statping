@@ -18,5 +18,5 @@ EXPOSE $PORT
 
 HEALTHCHECK --interval=60s --timeout=10s --retries=3 CMD curl -s "http://localhost:$PORT/health" | jq -r -e ".online==true"
 
-CMD statping -port $PORT
+CMD statping --port $PORT
 
