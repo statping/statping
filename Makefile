@@ -202,7 +202,7 @@ clean:
 	find . -name "*.out" -type f -delete
 	find . -name "*.cpu" -type f -delete
 	find . -name "*.mem" -type f -delete
-	rm -rf {build,releases,tmp}
+	rm -rf {build,releases,tmp,source/build}
 
 print_details:
 	@echo \==== Statping Development Instance ====
