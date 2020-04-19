@@ -1,4 +1,4 @@
-name: Statping Build and Deploy
+name: Master Release
 on:
   push:
     branches:
@@ -237,6 +237,17 @@ jobs:
             build/statping-windows-386.zip
             build/statping-windows-amd64.zip
             build/statping-windows-arm.zip
+
+#      - name: Upload Assets to S3
+#        uses: jakejarvis/s3-sync-action@master
+#        with:
+#          args: --acl public-read --follow-symlinks --delete
+#        env:
+#          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          AWS_REGION: 'us-west-1'
+#          SOURCE_DIR: 'source/dist'
 
   post-release:
     needs: build
