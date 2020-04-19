@@ -194,9 +194,11 @@ func checkVerboseMode() {
 
 // CloseLogs will close the log file correctly on shutdown
 func CloseLogs() {
-	ljLogger.Rotate()
-	Log.Writer().Close()
-	ljLogger.Close()
+	if ljLogger != nil {
+		ljLogger.Rotate()
+		Log.Writer().Close()
+		ljLogger.Close()
+	}
 	sentry.Flush(5 * time.Second)
 }
 
