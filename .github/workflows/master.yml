@@ -86,6 +86,7 @@ jobs:
       - name: Setting ENV's
         run: |
           echo "::add-path::$(go env GOPATH)/bin"
+          echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
