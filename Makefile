@@ -160,9 +160,9 @@ build-linux:
 		do \
 			echo "Building $$VERSION $$os-$$arch"; \
 			mkdir -p releases/statping-$$os-$$arch/; \
-			GO111MODULE="on" GOOS=$$os GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-$$os-$$arch/statping ${PWD}/cmd; \
-			chmod +x releases/statping-$$os-$$arch/statping; \
-			tar -czf releases/statping-$$os-$$arch.tar.gz -C releases/statping-$$os-$$arch statping; \
+			GO111MODULE="on" GOOS=$$os GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-$$os-$$arch/statping ${PWD}/cmd || true; \
+			chmod +x releases/statping-$$os-$$arch/statping || true; \
+			tar -czf releases/statping-$$os-$$arch.tar.gz -C releases/statping-$$os-$$arch statping || true; \
 		done \
 	done
 	find ./releases/ -name "*.tar.gz" -type f -size +1M -exec mv "{}" build/ \;
@@ -174,9 +174,9 @@ build-mac:
 	do \
 		echo "Building darwin-$$VERSION darwin-$$arch"; \
 		mkdir -p releases/statping-darwin-$$arch/; \
-		GO111MODULE="on" GOOS=darwin GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-darwin-$$arch/statping ${PWD}/cmd; \
-		chmod +x releases/statping-darwin-$$arch/statping; \
-		tar -czf releases/statping-darwin-$$arch.tar.gz -C releases/statping-darwin-$$arch statping; \
+		GO111MODULE="on" GOOS=darwin GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-darwin-$$arch/statping ${PWD}/cmd || true; \
+		chmod +x releases/statping-darwin-$$arch/statping || true; \
+		tar -czf releases/statping-darwin-$$arch.tar.gz -C releases/statping-darwin-$$arch statping || true; \
 	done
 	find ./releases/ -name "*.tar.gz" -type f -size +1M -exec mv "{}" build/ \;
 
@@ -186,8 +186,8 @@ build-win:
 	do \
 		echo "Building windows-$$arch"; \
 		mkdir -p releases/statping-windows-$$arch/; \
-		GO111MODULE="on" GOOS=windows GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-windows-$$arch/statping.exe ${PWD}/cmd; \
-		chmod +x releases/statping-windows-$$arch/statping.exe; \
+		GO111MODULE="on" GOOS=windows GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-windows-$$arch/statping.exe ${PWD}/cmd || true; \
+		chmod +x releases/statping-windows-$$arch/statping.exe || true; \
 		zip -j releases/statping-windows-$$arch.zip releases/statping-windows-$$arch/statping.exe || true; \
 	done
 	find ./releases/ -name "*.zip" -type f -size +1M -exec mv "{}" build/ \;
