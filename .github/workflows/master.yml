@@ -126,14 +126,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
-          with:
-            go-version: '1.14.2'
+        with:
+          go-version: '1.14.2'
       - name: Setting ENV's
-          run: |
-            echo "::add-path::$(go env GOPATH)/bin"
-            echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
-            echo ::set-env name=VERSION::$(cat version.txt)
-          shell: bash
+        run: |
+          echo "::add-path::$(go env GOPATH)/bin"
+          echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
+          echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
 
       - name: Download Compiled Frontend (rice-box.go)
         uses: actions/download-artifact@v1
@@ -161,9 +161,10 @@ jobs:
           start: yarn start
           wait-on: 'http://localhost:8080/api'
           config: pageLoadTimeout=100000,watchForFileChanges=false
+          browser: chrome
 
   build-mac:
-    needs: test
+    needs: compile
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-go@v2
@@ -212,7 +213,7 @@ jobs:
             build/statping-darwin-amd64.tar.gz
 
   build-linux:
-    needs: test
+    needs: compile
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-go@v2
@@ -270,7 +271,7 @@ jobs:
             build/statping-openbsd-arm64.tar.gz
 
   build-windows:
-    needs: test
+    needs: compile
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-go@v2
@@ -320,7 +321,7 @@ jobs:
             build/statping-windows-arm.zip
 
   docker-release:
-    needs: [cypress-tests, build-linux, build-mac, build-windows]
+    needs: [test, cypress-tests, build-linux, build-mac, build-windows]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -349,7 +350,7 @@ jobs:
           tags: "latest,v${{ env.VERSION }}"
 
   sentry-release:
-    needs: [build-linux, build-mac, build-windows]
+    needs: [test, cypress-tests, build-linux, build-mac, build-windows]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -382,7 +383,7 @@ jobs:
           environment: production
 
   homebrew-release:
-    needs: [build-linux, build-mac, build-windows]
+    needs: [test, cypress-tests, build-linux, build-mac, build-windows]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -399,7 +400,7 @@ jobs:
         run: make publish-homebrew
 
   slack-update:
-    needs: [build-linux, build-mac, build-windows]
+    needs: [test, cypress-tests, build-linux, build-mac, build-windows]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
