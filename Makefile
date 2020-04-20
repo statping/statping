@@ -10,7 +10,7 @@ PUBLISH_BODY='{ "request": { "branch": "master", "message": "Homebrew update ver
 TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "merge_mode": "replace", "language": "go", "go": 1.14, "install": true, "sudo": "required", "services": ["docker"], "env": { "secure": "${TRVIS_SECRET}" }, "before_deploy": ["git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [{ "provider": "releases", "api_key": "$$GITHUB_TOKEN", "file_glob": true, "file": "build/*", "skip_cleanup": true, "on": { "branch": "master" } }], "before_script": ["rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install stable", "nvm install 10.17.0", "nvm use 10.17.0 --default", "npm install -g sass yarn cross-env", "pip install --user awscli"], "script": ["make release"], "after_success": [], "after_deploy": ["make post-release"] } } }'
 TEST_DIR=$(GOPATH)/src/github.com/statping/statping
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
-OS = darwin freebsd linux openbsd
+OS = freebsd linux openbsd
 ARCHS = 386 arm amd64 arm64
 
 all: clean yarn-install compile docker-base docker-vue build-all
@@ -151,7 +151,7 @@ install-local: build
 generate:
 	cd source && go generate
 
-build-bin:
+build-linux:
 	mkdir build || true
 	export PWD=`pwd`
 	@for arch in $(ARCHS);\
@@ -164,6 +164,19 @@ build-bin:
 			chmod +x releases/statping-$$os-$$arch/statping; \
 			tar -czf releases/statping-$$os-$$arch.tar.gz -C releases/statping-$$os-$$arch statping; \
 		done \
+	done
+	find ./releases/ -name "*.tar.gz" -type f -size +1M -exec mv "{}" build/ \;
+
+build-mac:
+	mkdir build || true
+	export PWD=`pwd`
+	@for arch in $(ARCHS);\
+	do \
+		echo "Building darwin-$$VERSION darwin-$$arch"; \
+		mkdir -p releases/statping-darwin-$$arch/; \
+		GO111MODULE="on" GOOS=darwin GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-darwin-$$arch/statping ${PWD}/cmd; \
+		chmod +x releases/statping-darwin-$$arch/statping; \
+		tar -czf releases/statping-darwin-$$arch.tar.gz -C releases/statping-darwin-$$arch statping; \
 	done
 	find ./releases/ -name "*.tar.gz" -type f -size +1M -exec mv "{}" build/ \;
 
@@ -218,7 +231,7 @@ print_details:
 	@echo \==== Monitoring and IDE ====
 	@echo \Grafana:             http://localhost:3000  \(username: admin, password: admin\)
 
-build-all: clean compile build-bin build-win
+build-all: clean compile build-linux build-mac build-win
 
 coverage: test-deps
 	$(GOPATH)/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $(COVERALLS)
@@ -275,7 +288,7 @@ sentry-release:
 	sentry-cli releases set-commits --auto v${VERSION}
 	sentry-cli releases finalize v${VERSION}
 
-snapcraft: clean compile build-bin
+snapcraft: clean compile build-linux
 	mkdir snap
 	mv snapcraft.yaml snap/
 	PWD=$(shell pwd)
@@ -298,5 +311,5 @@ postman: clean
 	newman run -e dev/postman_environment.json dev/postman.json
 	killall statping
 
-.PHONY: all build build-all build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-bin build-win build-all postman
+.PHONY: all build build-all build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds

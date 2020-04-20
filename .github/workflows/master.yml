@@ -89,7 +89,7 @@ jobs:
         env:
           VERSION: ${{ env.VERSION }}
           DB_CONN: sqlite3
-          STATPING_DIR: /home/runner/work/statping/statping
+          STATPING_DIR: ${{ github.workspace }}
           API_KEY: demopassword123
           DISABLE_LOGS: true
           ALLOW_REPORTS: true
@@ -153,7 +153,7 @@ jobs:
         env:
           VERSION: ${{ env.VERSION }}
           COMMIT: $GITHUB_SHA
-        run: make build-bin build-win
+        run: make build-linux build-mac build-win
 
       - name: Upload Release
         id: upload-release-asset
