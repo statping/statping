@@ -52,52 +52,56 @@ import Api from "../../API";
 import FormIncidentUpdates from "@/forms/IncidentUpdates";
 
 export default {
-    name: 'Incidents',
+  name: 'Incidents',
   components: {FormIncidentUpdates},
   data() {
-        return {
-            service_id: 0,
-              ready: false,
-              incidents: [],
-              incident: {
-                title: "",
-                description: "",
-                service: 0,
-              }
-        }
-    },
-  computed:{
-    theID() {
-      return this.$route.params.id
-    }
-  },
-  async mounted() {
-    await this.loadIncidents()
-  },
-  methods: {
-      async getIncidents() {
-        return await Api.incidents_service(this.theID)
-      },
-      async deleteIncident(incident) {
-        let c = confirm(`Are you sure you want to delete '${incident.title}'?`)
-        if (c) {
-          await Api.incident_delete(incident)
-          await this.loadIncidents()
-        }
-      },
-      async loadIncidents() {
-        this.incidents = await Api.incidents_service(this.service_id)
-      },
-      async createIncident() {
-        await Api.incident_create(this.theID, this.incident)
-        await this.loadIncidents()
-        this.incident = {
-          title: "",
-          description: "",
-          service: this.service_id,
-        }
+      return {
+          serviceID: 0,
+          incidents: [],
+          incident: {
+              title: "",
+              description: "",
+              service: 0,
+          },
       }
-    }
+  },
+
+  created() {
+      this.serviceID = Number(this.$route.params.id);
+      this.incident.service = Number(this.$route.params.id);
+  },
+
+  async mounted() {
+      await this.loadIncidents()
+  },
+
+  methods: {
+      //async getIncidents() {
+      //    return await Api.incidents_service(this.serviceID)
+      //},
+
+      async deleteIncident(incident) {
+          let c = confirm(`Are you sure you want to delete '${incident.title}'?`)
+          if (c) {
+              await Api.incident_delete(incident)
+              await this.loadIncidents()
+          }
+      },
+
+      async loadIncidents() {
+          this.incidents = await Api.incidents_service(this.serviceID)
+      },
+
+      async createIncident() {
+          await Api.incident_create(this.serviceID, this.incident)
+          await this.loadIncidents()
+          this.incident = {
+              title: "",
+              description: "",
+              service: this.serviceID,
+          }
+      }
+  }
 }
 </script>
 
