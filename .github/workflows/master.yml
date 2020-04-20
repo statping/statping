@@ -120,6 +120,48 @@ jobs:
         env:
           COVERALLS: ${{ secrets.COVERALLS }}
 
+  cypress-tests:
+    needs: compile
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+          with:
+            go-version: '1.14.2'
+      - name: Setting ENV's
+          run: |
+            echo "::add-path::$(go env GOPATH)/bin"
+            echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
+            echo ::set-env name=VERSION::$(cat version.txt)
+          shell: bash
+
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
+
+      - name: Install Statping
+        env:
+          VERSION: ${{ env.VERSION }}
+        run: |
+          make build
+          chmod +x statping
+          mv statping $(go env GOPATH)/bin/
+
+      - name: Cypress E2E Testing
+        uses: cypress-io/github-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          record: false
+          parallel: false
+          build: yarn
+          working-directory: ./frontend
+          start: yarn start
+          wait-on: 'http://localhost:8080/api'
+          config: pageLoadTimeout=100000,watchForFileChanges=false
+
   build-mac:
     needs: test
     runs-on: ubuntu-latest
@@ -278,7 +320,7 @@ jobs:
             build/statping-windows-arm.zip
 
   docker-release:
-    needs: [build-linux, build-mac, build-windows]
+    needs: [cypress-tests, build-linux, build-mac, build-windows]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
