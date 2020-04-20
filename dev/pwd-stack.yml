@@ -4,7 +4,7 @@ services:
 
   statping:
     hostname: statping
-    build: https://github.com/statping/statping.git
+    image: statping/statping
     ports:
       - 8080:8080
     environment:

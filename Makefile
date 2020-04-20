@@ -158,7 +158,7 @@ build-linux:
 	do \
 		for os in $(OS);\
 		do \
-			echo "Building v$$VERSION $$os-$$arch"; \
+			echo "Building v$$VERSION for $$os-$$arch"; \
 			mkdir -p releases/statping-$$os-$$arch/; \
 			GO111MODULE="on" GOOS=$$os GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-$$os-$$arch/statping ${PWD}/cmd || true; \
 			chmod +x releases/statping-$$os-$$arch/statping || true; \
@@ -172,7 +172,7 @@ build-mac:
 	export PWD=`pwd`
 	@for arch in $(ARCHS);\
 	do \
-		echo "Building v$$VERSION darwin-$$arch"; \
+		echo "Building v$$VERSION for darwin-$$arch"; \
 		mkdir -p releases/statping-darwin-$$arch/; \
 		GO111MODULE="on" GOOS=darwin GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-darwin-$$arch/statping ${PWD}/cmd || true; \
 		chmod +x releases/statping-darwin-$$arch/statping || true; \
@@ -185,7 +185,7 @@ build-win:
 	export PWD=`pwd`
 	@for arch in $(ARCHS);\
 	do \
-		echo "Building v$$VERSION windows-$$arch"; \
+		echo "Building v$$VERSION for windows-$$arch"; \
 		mkdir -p releases/statping-windows-$$arch/; \
 		GO111MODULE="on" GOOS=windows GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-windows-$$arch/statping.exe ${PWD}/cmd || true; \
 		chmod +x releases/statping-windows-$$arch/statping.exe || true; \
