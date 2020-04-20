@@ -144,7 +144,9 @@ jobs:
           TWILIO_TO: ${{ secrets.TWILIO_TO }}
 
       - name: Coveralls Testing Coverage
-        run: goveralls -coverprofile=coverage.out -repotoken $COVERALLS
+        run: |
+          go get github.com/mattn/goveralls
+          goveralls -coverprofile=coverage.out -repotoken $COVERALLS
         env:
           COVERALLS: ${{ secrets.COVERALLS }}
 
