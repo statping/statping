@@ -120,7 +120,7 @@ jobs:
         env:
           COVERALLS: ${{ secrets.COVERALLS }}
 
-  build-linux:
+  build:
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -153,7 +153,7 @@ jobs:
         env:
           VERSION: ${{ env.VERSION }}
           COMMIT: $GITHUB_SHA
-        run: make build-linux
+        run: make build-linux build-mac build-win
 
       - name: Upload Release
         id: upload-release-asset
@@ -177,106 +177,14 @@ jobs:
             build/statping-openbsd-amd64.tar.gz
             build/statping-openbsd-arm.tar.gz
             build/statping-openbsd-arm64.tar.gz
-
-  build-mac:
-    needs: test
-    runs-on: macos-latest
-    steps:
-      - uses: actions/setup-go@v2
-        with:
-          go-version: '1.14.2'
-      - uses: actions/checkout@v2
-
-      - name: Setting ENV's
-        run: |
-          echo "::add-path::$(go env GOPATH)/bin"
-          echo ::set-env name=VERSION::$(cat version.txt)
-        shell: bash
-
-      - name: Download Go mods
-        if: steps.golangcache.outputs.cache-hit != 'true'
-        run: |
-          go mod download
-          go mod verify
-          make test-deps
-
-      - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v1
-        with:
-          name: static-rice-box
-          path: ./source
-
-      - name: Build Binaries
-        env:
-          VERSION: ${{ env.VERSION }}
-          COMMIT: $GITHUB_SHA
-        run: make build-mac
-
-      - name: Upload Release
-        id: upload-release-asset
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ env.VERSION }}
-        with:
-          tag_name: v${{ env.VERSION }}
-          draft: false
-          prerelease: false
-          files: |
             build/statping-darwin-386.tar.gz
             build/statping-darwin-amd64.tar.gz
-
-  build-windows:
-    needs: test
-    runs-on: windows-latest
-    steps:
-      - uses: actions/setup-go@v2
-        with:
-          go-version: '1.14.2'
-      - uses: actions/checkout@v2
-
-      - name: Setting ENV's
-        run: |
-          echo "::add-path::$(go env GOPATH)/bin"
-          echo ::set-env name=VERSION::$(cat version.txt)
-        shell: bash
-
-      - name: Download Go mods
-        if: steps.golangcache.outputs.cache-hit != 'true'
-        run: |
-          go mod download
-          go mod verify
-          make test-deps
-
-      - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v1
-        with:
-          name: static-rice-box
-          path: ./source
-
-      - name: Build Binaries
-        env:
-          VERSION: ${{ env.VERSION }}
-          COMMIT: $GITHUB_SHA
-        run: make build-windows
-
-      - name: Upload Release
-        id: upload-release-asset
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ env.VERSION }}
-        with:
-          tag_name: v${{ env.VERSION }}
-          draft: false
-          prerelease: false
-          files: |
             build/statping-windows-386.zip
             build/statping-windows-amd64.zip
             build/statping-windows-arm.zip
 
-  post-release:
-    needs: [build-linux, build-mac, build-windows]
+  docker-release:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -304,6 +212,17 @@ jobs:
           dockerfile: Dockerfile
           tags: "latest,v${{ env.VERSION }}"
 
+  sentry-release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Statping Repo
+        uses: actions/checkout@v2
+
+      - name: Setting ENV's
+        run: echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
       - name: Sentry Backend Release
         uses: tclindner/sentry-releases-action@v1.0.0
         env:
@@ -326,11 +245,33 @@ jobs:
           tagName: v${{ env.VERSION }}
           environment: production
 
+  homebrew-release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Statping Repo
+        uses: actions/checkout@v2
+
+      - name: Setting ENV's
+        run: echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
       - name: Update Homebrew Package
         env:
           VERSION: ${{ env.VERSION }}
           TRAVIS_API: ${{ secrets.TRAVIS_API }}
         run: make publish-homebrew
+
+  slack-update:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Statping Repo
+        uses: actions/checkout@v2
+
+      - name: Setting ENV's
+        run: echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
 
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2.0.0

@@ -1,3 +1,6 @@
+# 0.90.30 (04-19-2020)
+- Attempt to fix Github Actions build process
+
 # 0.90.29 (04-19-2020)
 - Added HTTP Redirects for services
 - Removed use of SASS environment variable, now finds path or sends error

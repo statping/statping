@@ -15,6 +15,8 @@ An easy to use Status Page for your websites and applications. Statping will aut
 <img align="left" width="320" height="235" src="https://img.cjx.io/statupsiterun.gif">
 <h2>A Future-Proof Status Page</h2>
 Statping strives to remain future-proof and remain intact if a failure is created. Your Statping service should not be running on the same instance you're trying to monitor. If your server crashes your Status Page should still remaining online to notify your users of downtime.
+
+<a href="https://labs.play-with-docker.com/?stack=https://raw.githubusercontent.com/statping/statping/master/pwd-stack.yml"><img src="https://assets.statping.com/docker-pwd.png"></a>
 <br><br><br><br><br>
 
 <h2>No Requirements</h2>
