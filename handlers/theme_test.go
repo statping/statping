@@ -8,6 +8,7 @@ import (
 )
 
 func TestUnAuthenticatedThemeRoutes(t *testing.T) {
+	t.SkipNow()
 	tests := []HTTPTest{
 		{
 			Name:           "No Authentication - Create Themes",
@@ -49,6 +50,7 @@ func TestUnAuthenticatedThemeRoutes(t *testing.T) {
 }
 
 func TestThemeRoutes(t *testing.T) {
+	t.SkipNow()
 	tests := []HTTPTest{
 		{
 			Name:             "Create Theme Assets",
