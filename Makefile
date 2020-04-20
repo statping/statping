@@ -195,7 +195,6 @@ clean:
 	rm -rf {parts,prime,snap,stage}
 	rm -rf frontend/cypress/videos
 	rm -f coverage.* sass
-	rm -f source/rice-box.go
 	rm -rf **/*.db-journal
 	rm -rf *.snap
 	find . -name "*.out" -type f -delete

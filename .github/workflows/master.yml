@@ -162,6 +162,16 @@ jobs:
           node-version: '10.x'
       - uses: actions/checkout@v2
 
+      - name: Install Global Dependencies
+        run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
+
+      - name: Setting ENV's
+        run: |
+          echo "::add-path::$(go env GOPATH)/bin"
+          echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
+          echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
       - uses: actions/cache@v1
         id: golangcache
         with:
@@ -179,12 +189,6 @@ jobs:
           go mod verify
           make test-deps
 
-      - name: Setting ENV's
-        run: |
-          echo "::add-path::$(go env GOPATH)/bin"
-          echo ::set-env name=VERSION::$(cat version.txt)
-        shell: bash
-
       - name: Download Compiled Frontend
         uses: actions/download-artifact@v1
         with:
@@ -201,7 +205,7 @@ jobs:
         env:
           VERSION: ${{ env.VERSION }}
           COMMIT: $GITHUB_SHA
-        run: make build-bin build-win
+        run: make clean compile build-bin build-win
 
       - name: Upload Release
         id: upload-release-asset
