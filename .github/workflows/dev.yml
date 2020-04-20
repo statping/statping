@@ -2,9 +2,7 @@ name: Master Release
 on:
   push:
     branches:
-      - master
-    paths-ignore:
-      - '**.md'
+      - dev
 
 jobs:
   compile:
@@ -63,13 +61,13 @@ jobs:
           make test-deps
 
       - name: Build Frontend Statping
-        run: make clean compile
+        run: make clean frontend-build
 
       - name: Upload Compiled Frontend
         uses: actions/upload-artifact@v1
         with:
           name: static-frontend
-          path: /home/runner/work/statping/statping/source/rice-box.go
+          path: /home/runner/work/statping/statping/source/dist
 
   test:
     needs: compile
@@ -119,7 +117,7 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: static-frontend
-          path: /home/runner/work/statping/statping/source/rice-box.go
+          path: /home/runner/work/statping/statping/source/dist
 
       - name: Install Statping
         env:
@@ -162,140 +160,3 @@ jobs:
         run: goveralls -coverprofile=coverage.out -repotoken $COVERALLS
         env:
           COVERALLS: ${{ secrets.COVERALLS }}
-
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Statping Repo
-        uses: actions/checkout@v2
-
-      - name: Install Go
-        uses: actions/setup-go@v1
-        with:
-          go-version: '1.14.x'
-
-      - uses: actions/cache@v1
-        id: golangcache
-        with:
-          path: |
-            ~/go/pkg/mod
-            ~/go/bin
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Setting ENV's
-        run: |
-          echo "::add-path::$(go env GOPATH)/bin"
-          echo ::set-env name=VERSION::$(cat version.txt)
-        shell: bash
-
-      - name: Download Compiled Frontend
-        uses: actions/download-artifact@v1
-        with:
-          name: static-frontend
-          path: /home/runner/work/statping/statping/source/rice-box.go
-
-      - name: Build Binaries
-        env:
-          VERSION: ${{ env.VERSION }}
-          COMMIT: $GITHUB_SHA
-        run: make build-bin build-win
-
-      - name: Upload Release
-        id: upload-release-asset
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ env.VERSION }}
-        with:
-          tag_name: v${{ env.VERSION }}
-          draft: false
-          prerelease: false
-          files: |
-            build/statping-darwin-386.tar.gz
-            build/statping-darwin-amd64.tar.gz
-            build/statping-freebsd-386.tar.gz
-            build/statping-freebsd-amd64.tar.gz
-            build/statping-freebsd-arm.tar.gz
-            build/statping-linux-386.tar.gz
-            build/statping-linux-amd64.tar.gz
-            build/statping-linux-arm.tar.gz
-            build/statping-linux-arm64.tar.gz
-            build/statping-openbsd-386.tar.gz
-            build/statping-openbsd-amd64.tar.gz
-            build/statping-openbsd-arm.tar.gz
-            build/statping-openbsd-arm64.tar.gz
-            build/statping-windows-386.zip
-            build/statping-windows-amd64.zip
-            build/statping-windows-arm.zip
-
-#      - name: Upload Assets to S3
-#        uses: jakejarvis/s3-sync-action@master
-#        with:
-#          args: --acl public-read --follow-symlinks --delete
-#        env:
-#          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          AWS_REGION: 'us-west-1'
-#          SOURCE_DIR: 'source/dist'
-
-  post-release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Statping Repo
-        uses: actions/checkout@v2
-
-      - name: Setting ENV's
-        run: echo ::set-env name=VERSION::$(cat version.txt)
-        shell: bash
-
-      - name: Base Docker Image
-        uses: elgohr/Publish-Docker-Github-Action@master
-        with:
-          name: statping/statping
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          dockerfile: Dockerfile.base
-          tags: "base"
-
-      - name: Latest/Version Docker Image
-        uses: elgohr/Publish-Docker-Github-Action@master
-        with:
-          name: statping/statping
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          dockerfile: Dockerfile
-          tags: "latest,v${{ env.VERSION }}"
-
-      - name: Sentry Backend Release
-        uses: tclindner/sentry-releases-action@v1.0.0
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_URL: ${{ secrets.SENTRY_URL }}
-          SENTRY_ORG: statping
-          SENTRY_PROJECT: backend
-        with:
-          tagName: v${{ env.VERSION }}
-          environment: production
-
-      - name: Sentry Frontend Release
-        uses: tclindner/sentry-releases-action@v1.0.0
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_URL: ${{ secrets.SENTRY_URL }}
-          SENTRY_ORG: statping
-          SENTRY_PROJECT: frontend
-        with:
-          tagName: v${{ env.VERSION }}
-          environment: production
-
-      - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2.0.0
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_URL }}
-          SLACK_CHANNEL: dev
-          SLACK_USERNAME: StatpingDev

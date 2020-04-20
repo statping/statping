@@ -180,9 +180,6 @@
       this.google_enabled = this.has('google')
       this.slack_enabled = this.has('slack')
     },
-    beforeCreate() {
-
-    },
     methods: {
       providers() {
         let providers = [];
