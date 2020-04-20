@@ -1,4 +1,5 @@
 <template>
+    <div>
     <form @submit.prevent="login" autocomplete="on">
         <div class="form-group row">
             <label for="username" class="col-sm-2 col-form-label">Username</label>
@@ -22,8 +23,21 @@
                 </button>
             </div>
         </div>
-
     </form>
+
+        <a v-if="oauth.gh_client_id" :href="GHlogin()" class="btn btn-block">
+            Github Login
+        </a>
+
+        <a v-if="oauth.slack_client_id" :href="Slacklogin()" class="btn btn-block">
+            Slack Login
+        </a>
+
+        <a v-if="oauth.google_client_id" :href="Googlelogin()" class="btn btn-block">
+            Google Login
+        </a>
+
+    </div>
 </template>
 
 <script>
@@ -32,12 +46,12 @@
   export default {
       name: 'FormLogin',
       computed: {
-          core() {
-              return this.$store.getters.core
-          },
-          oauth() {
-              return this.$store.getters.core.oauth
-          }
+        core() {
+          return this.$store.getters.core
+        },
+        oauth() {
+          return this.$store.getters.oauth
+        }
       },
       data() {
           return {
@@ -50,9 +64,6 @@
             google_scope: "https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email",
             slack_scope: "identity.email,identity.basic"
           }
-      },
-      mounted() {
-          this.GHlogin()
       },
       methods: {
           checkForm() {
@@ -76,10 +87,15 @@
               }
               this.loading = false
           },
-          async GHlogin() {
-              const core = this.$store.getters.core;
-              this.ghLoginURL = `https://github.com/login/oauth/authorize?client_id=${core.gh_client_id}&redirect_uri=${core.domain}/oauth/callback&scope=user,repo`
-          }
+        GHlogin() {
+          return `https://github.com/login/oauth/authorize?client_id=${this.oauth.gh_client_id}&redirect_uri=${this.core.domain}/api/oauth/github&scope=user,repo`
+        },
+        Slacklogin() {
+          return `https://slack.com/oauth/authorize?client_id=${this.oauth.slack_client_id}&redirect_uri=${this.core.domain}/api/oauth/slack&scope=users.profile:read,users:read.email`
+        },
+        Googlelogin() {
+          return `https://accounts.google.com/signin/oauth?client_id=${this.oauth.google_client_id}&redirect_uri=${this.core.domain}/api/oauth/google&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email`
+        }
       }
   }
 </script>

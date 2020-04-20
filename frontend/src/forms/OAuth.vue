@@ -1,13 +1,14 @@
 <template>
     <form @submit.prevent="saveOAuth">
+        {{core.oauth}}
         <div class="card text-black-50 bg-white mb-3">
             <div class="card-header">Internal Login</div>
             <div class="card-body">
                 <div class="form-group row">
                     <label for="switch-gh-oauth" class="col-sm-4 col-form-label">OAuth Login Settings</label>
                     <div class="col-md-8 col-xs-12 mt-1">
-                        <span @click="oauth.internal_enabled = !!core.oauth.internal_enabled" class="switch float-left">
-                            <input v-model="oauth.internal_enabled" type="checkbox" class="switch" id="switch-local-oauth" :checked="oauth.internal_enabled">
+                        <span @click="local_enabled = !!local_enabled" class="switch float-left">
+                            <input v-model="local_enabled" type="checkbox" class="switch" id="switch-local-oauth" :checked="local_enabled">
                             <label for="switch-local-oauth">Use email/password Authentication</label>
                         </span>
                     </div>
@@ -15,7 +16,7 @@
                 <div class="form-group row">
                     <label for="whitelist_domains" class="col-sm-4 col-form-label">Whitelist Domains</label>
                     <div class="col-sm-8">
-                        <input v-model="oauth.oauth.oauth_domains" type="text" class="form-control" placeholder="domain.com" id="whitelist_domains">
+                        <input v-model="oauth.oauth_domains" type="text" class="form-control" placeholder="domain.com" id="whitelist_domains">
                     </div>
                 </div>
             </div>
@@ -28,20 +29,20 @@
                 <div class="form-group row mt-3">
                     <label for="github_client" class="col-sm-4 col-form-label">Github Client ID</label>
                     <div class="col-sm-8">
-                        <input v-model="oauth.oauth.gh_client_id" type="text" class="form-control" id="github_client" required>
+                        <input v-model="oauth.gh_client_id" type="text" class="form-control" id="github_client" required>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="github_secret" class="col-sm-4 col-form-label">Github Client Secret</label>
                     <div class="col-sm-8">
-                        <input v-model="oauth.oauth.gh_client_secret" type="text" class="form-control" id="github_secret" required>
+                        <input v-model="oauth.gh_client_secret" type="text" class="form-control" id="github_secret" required>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="switch-gh-oauth" class="col-sm-4 col-form-label">Enable Github Login</label>
                     <div class="col-md-8 col-xs-12 mt-1">
-                    <span @click="oauth.github_enabled = !!oauth.github_enabled" class="switch float-left">
-                        <input v-model="oauth.github_enabled" type="checkbox" class="switch" id="switch-gh-oauth" :checked="oauth.github_enabled">
+                    <span @click="github_enabled = !!github_enabled" class="switch float-left">
+                        <input v-model="github_enabled" type="checkbox" class="switch" id="switch-gh-oauth" :checked="github_enabled">
                         <label for="switch-gh-oauth"> </label>
                     </span>
                     </div>
@@ -50,7 +51,7 @@
                     <label for="gh_callback" class="col-sm-4 col-form-label">Callback URL</label>
                     <div class="col-sm-8">
                         <div class="input-group">
-                            <input v-bind:value="`${core.domain}/oauth/github`" type="text" class="form-control" id="gh_callback" readonly>
+                            <input v-bind:value="`${core.domain}/api/oauth/github`" type="text" class="form-control" id="gh_callback" readonly>
                             <div class="input-group-append copy-btn">
                                 <button @click.prevent="copy(`${core.domain}/oauth/github`)" class="btn btn-outline-secondary" type="button">Copy</button>
                             </div>
@@ -89,7 +90,7 @@
                     <label for="google_callback" class="col-sm-4 col-form-label">Callback URL</label>
                     <div class="col-sm-8">
                         <div class="input-group">
-                            <input v-bind:value="`${core.domain}/oauth/google`" type="text" class="form-control" id="google_callback" readonly>
+                            <input v-bind:value="`${core.domain}/api/oauth/google`" type="text" class="form-control" id="google_callback" readonly>
                             <div class="input-group-append copy-btn">
                                 <button @click.prevent="copy(`${core.domain}/oauth/google`)" class="btn btn-outline-secondary" type="button">Copy</button>
                             </div>
@@ -126,7 +127,7 @@
                     <label for="switch-slack-oauth" class="col-sm-4 col-form-label">Enable Slack Login</label>
                     <div class="col-md-8 col-xs-12 mt-1">
                     <span @click="slack_enabled = !!slack_enabled" class="switch float-left">
-                        <input v-model="slack_enabled" type="checkbox" class="switch" id="switch-slack-oauth" :checked="google_enabled">
+                        <input v-model="slack_enabled" type="checkbox" class="switch" id="switch-slack-oauth" :checked="slack_enabled">
                         <label for="switch-slack-oauth"> </label>
                     </span>
                     </div>
@@ -135,7 +136,7 @@
                     <label for="slack_callback" class="col-sm-4 col-form-label">Callback URL</label>
                     <div class="col-sm-8">
                         <div class="input-group">
-                            <input v-bind:value="`${core.domain}/oauth/slack`" type="text" class="form-control" id="slack_callback" readonly>
+                            <input v-bind:value="`${core.domain}/api/oauth/slack`" type="text" class="form-control" id="slack_callback" readonly>
                             <div class="input-group-append copy-btn">
                                 <button @click.prevent="copy(`${core.domain}/oauth/slack`)" class="btn btn-outline-secondary" type="button">Copy</button>
                             </div>
@@ -158,56 +159,58 @@
   export default {
       name: 'OAuth',
       computed: {
-          oauth() {
-             return this.$store.getters.core.oauth
-          }
+        core() {
+          return this.$store.getters.core
+        },
+        oauth() {
+          return this.$store.getters.oauth
+        }
       },
       data() {
           return {
-            internal_enabled: this.has('local'),
-            google_enabled: this.has('google'),
-            github_enabled: this.has('github'),
-            slack_enabled: this.has('slack')
+            google_enabled: false,
+            slack_enabled: false,
+            github_enabled: false,
+            local_enabled: false
           }
       },
     mounted() {
-      window.console.log(this.core.oauth)
-    },
-    beforeCreate() {
-      // this.github_enabled = this.$store.getters.core.oauth.oauth_providers.split(",").includes('github')
-      // const c = await Api.core()
-      // this.auth = c.auth
+      this.local_enabled = this.has('local')
+      this.github_enabled = this.has('github')
+      this.google_enabled = this.has('google')
+      this.slack_enabled = this.has('slack')
     },
     methods: {
+      providers() {
+        let providers = [];
+        if (this.github_enabled) {
+          providers.push("github")
+        }
+        if (this.local_enabled) {
+          providers.push("local")
+        }
+        if (this.google_enabled) {
+          providers.push("google")
+        }
+        if (this.slack_enabled) {
+          providers.push("slack")
+        }
+        return providers.join(",")
+      },
         has(val) {
-          if (!this.core.oauth.oauth_providers) {
+          if (!this.oauth.oauth_providers) {
             return false
           }
-          return this.core.oauth.oauth_providers.split(",").includes(val)
-        },
-        providers() {
-          let providers = [];
-          if (this.github_enabled) {
-            providers.push("github")
-          }
-          if (this.internal_enabled) {
-            providers.push("local")
-          }
-          if (this.google_enabled) {
-            providers.push("google")
-          }
-          if (this.slack_enabled) {
-            providers.push("slack")
-          }
-          return providers.join(",")
+          return this.oauth.oauth_providers.split(",").includes(val)
         },
           async saveOAuth() {
-            let c = this.$store.getters.core
+            let c = this.core
             c.oauth = this.oauth
             c.oauth.oauth_providers = this.providers()
             await Api.core_save(c)
             const core = await Api.core()
             this.$store.commit('setCore', core)
+            this.$store.commit('setOAuth', c.oauth)
           }
       }
   }
