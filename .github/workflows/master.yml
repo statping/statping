@@ -120,6 +120,48 @@ jobs:
         env:
           COVERALLS: ${{ secrets.COVERALLS }}
 
+  postman-tests:
+    needs: compile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.14.2'
+
+      - name: Setting ENV's
+        run: |
+          echo "::add-path::$(go env GOPATH)/bin"
+          echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
+          echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
+
+      - name: Install Statping
+        env:
+          VERSION: ${{ env.VERSION }}
+        run: |
+          make build
+          chmod +x statping
+          mv statping $(go env GOPATH)/bin/
+
+      - name: Run Statping
+        run: API_SECRET=demosecret123 statping --port 8080 > /dev/null 2>&1
+
+      - name: Postman Tests
+        uses: matt-ball/newman-action@master
+        with:
+          postmanApiKey: ${{ secrets.POSTMAN_API }}
+          collection: ./dev/postman.json
+          environment: ./dev/postman_environment.json
+          timeoutRequest: 15000
+          delayRequest: 1000
+
   cypress-tests:
     needs: compile
     runs-on: ubuntu-16.04
