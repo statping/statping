@@ -120,7 +120,7 @@ jobs:
         env:
           COVERALLS: ${{ secrets.COVERALLS }}
 
-  build:
+  build-linux:
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -153,7 +153,64 @@ jobs:
         env:
           VERSION: ${{ env.VERSION }}
           COMMIT: $GITHUB_SHA
-        run: make build-linux build-mac build-win
+        run: make build-linux
+
+      - name: Upload Release
+        id: upload-release-asset
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ env.VERSION }}
+        with:
+          tag_name: v${{ env.VERSION }}
+          draft: false
+          prerelease: false
+          files: |
+            build/statping-freebsd-386.tar.gz
+            build/statping-freebsd-amd64.tar.gz
+            build/statping-freebsd-arm.tar.gz
+            build/statping-linux-386.tar.gz
+            build/statping-linux-amd64.tar.gz
+            build/statping-linux-arm.tar.gz
+            build/statping-linux-arm64.tar.gz
+            build/statping-openbsd-386.tar.gz
+            build/statping-openbsd-amd64.tar.gz
+            build/statping-openbsd-arm.tar.gz
+            build/statping-openbsd-arm64.tar.gz
+
+  build-mac:
+    needs: test
+    runs-on: macos-latest
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.14.x'
+      - uses: actions/checkout@v2
+
+      - name: Setting ENV's
+        run: |
+          echo "::add-path::$(go env GOPATH)/bin"
+          echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
+      - name: Download Go mods
+        if: steps.golangcache.outputs.cache-hit != 'true'
+        run: |
+          go mod download
+          go mod verify
+          make test-deps
+
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
+
+      - name: Build Binaries
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: $GITHUB_SHA
+        run: make build-mac
 
       - name: Upload Release
         id: upload-release-asset
@@ -168,17 +225,52 @@ jobs:
           files: |
             build/statping-darwin-386.tar.gz
             build/statping-darwin-amd64.tar.gz
-            build/statping-freebsd-386.tar.gz
-            build/statping-freebsd-amd64.tar.gz
-            build/statping-freebsd-arm.tar.gz
-            build/statping-linux-386.tar.gz
-            build/statping-linux-amd64.tar.gz
-            build/statping-linux-arm.tar.gz
-            build/statping-linux-arm64.tar.gz
-            build/statping-openbsd-386.tar.gz
-            build/statping-openbsd-amd64.tar.gz
-            build/statping-openbsd-arm.tar.gz
-            build/statping-openbsd-arm64.tar.gz
+
+  build-windows:
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.14.x'
+      - uses: actions/checkout@v2
+
+      - name: Setting ENV's
+        run: |
+          echo "::add-path::$(go env GOPATH)/bin"
+          echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
+      - name: Download Go mods
+        if: steps.golangcache.outputs.cache-hit != 'true'
+        run: |
+          go mod download
+          go mod verify
+          make test-deps
+
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
+
+      - name: Build Binaries
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: $GITHUB_SHA
+        run: make build-linux
+
+      - name: Upload Release
+        id: upload-release-asset
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ env.VERSION }}
+        with:
+          tag_name: v${{ env.VERSION }}
+          draft: false
+          prerelease: false
+          files: |
             build/statping-windows-386.zip
             build/statping-windows-amd64.zip
             build/statping-windows-arm.zip
