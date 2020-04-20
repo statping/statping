@@ -10,7 +10,7 @@ jobs:
   compile:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v1
+      - uses: actions/setup-go@v2
         with:
           go-version: '1.14.x'
       - uses: actions/setup-node@v1
@@ -76,7 +76,7 @@ jobs:
     needs: compile
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v1
+      - uses: actions/setup-go@v2
         with:
           go-version: '1.14.x'
       - uses: actions/setup-node@v1
@@ -152,7 +152,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v1
+      - uses: actions/setup-go@v2
         with:
           go-version: '1.14.x'
       - uses: actions/setup-node@v1
