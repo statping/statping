@@ -141,9 +141,6 @@ func CreateAllAssets(folder string) error {
 	CopyToPublic(TmplBox, "", "robots.txt")
 	CopyToPublic(TmplBox, "", "banner.png")
 	CopyToPublic(TmplBox, "", "favicon.ico")
-	CopyToPublic(TmplBox, "files", "swagger.json")
-	CopyToPublic(TmplBox, "files", "postman.json")
-	CopyToPublic(TmplBox, "files", "grafana.json")
 	log.Infoln("Compiling CSS from SCSS style...")
 	err := CompileSASS(DefaultScss...)
 	log.Infoln("Statping assets have been inserted")
@@ -165,11 +162,8 @@ func DeleteAllAssets(folder string) error {
 func CopyAllToPublic(box *rice.Box) error {
 
 	exclude := map[string]bool{
-		"base.gohtml":  true,
-		"index.html":   true,
-		"swagger.json": true,
-		"postman.json": true,
-		"grafana.json": true,
+		"base.gohtml": true,
+		"index.html":  true,
 	}
 
 	err := box.Walk("/", func(path string, info os.FileInfo, err error) error {

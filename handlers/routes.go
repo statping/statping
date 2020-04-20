@@ -151,11 +151,6 @@ func Router() *mux.Router {
 	api.Handle("/api/checkins/{api}", authenticated(checkinDeleteHandler, false)).Methods("DELETE")
 	r.Handle("/checkin/{api}", http.HandlerFunc(checkinHitHandler))
 
-	// Static Files Routes
-	r.PathPrefix("/files/postman.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
-	r.PathPrefix("/files/swagger.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
-	r.PathPrefix("/files/grafana.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
-
 	// API Generic Routes
 	r.Handle("/metrics", readOnly(prometheusHandler, false))
 	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
