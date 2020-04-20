@@ -278,7 +278,7 @@ jobs:
             build/statping-windows-arm.zip
 
   docker-release:
-    needs: build
+    needs: [build-linux, build-mac, build-windows]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -307,7 +307,7 @@ jobs:
           tags: "latest,v${{ env.VERSION }}"
 
   sentry-release:
-    needs: build
+    needs: [build-linux, build-mac, build-windows]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -340,7 +340,7 @@ jobs:
           environment: production
 
   homebrew-release:
-    needs: build
+    needs: [build-linux, build-mac, build-windows]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -357,7 +357,7 @@ jobs:
         run: make publish-homebrew
 
   slack-update:
-    needs: build
+    needs: [build-linux, build-mac, build-windows]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
