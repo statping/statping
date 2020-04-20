@@ -276,7 +276,7 @@ jobs:
             build/statping-windows-arm.zip
 
   post-release:
-    needs: build
+    needs: [build-linux, build-mac, build-windows]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -325,6 +325,12 @@ jobs:
         with:
           tagName: v${{ env.VERSION }}
           environment: production
+
+      - name: Update Homebrew Package
+        env:
+          VERSION: ${{ env.VERSION }}
+          TRAVIS_API: ${{ secrets.TRAVIS_API }}
+        run: make publish-homebrew
 
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2.0.0
