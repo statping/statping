@@ -190,6 +190,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
+      - name: Download Go mods
+        if: steps.golangcache.outputs.cache-hit != 'true'
+        run: |
+          go mod download
+          go mod verify
+          make test-deps
+
       - name: Setting ENV's
         run: |
           echo "::add-path::$(go env GOPATH)/bin"
