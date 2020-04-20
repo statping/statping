@@ -69,7 +69,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: static-frontend
-          path: /home/runner/work/statping/statping/source/rice-box.go
+          path: /home/runner/work/statping/statping/source/dist
 
   test:
     needs: compile
@@ -119,7 +119,7 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: static-frontend
-          path: /home/runner/work/statping/statping/source/rice-box.go
+          path: /home/runner/work/statping/statping/source/dist
 
       - name: Install Statping
         env:
@@ -175,6 +175,11 @@ jobs:
         with:
           go-version: '1.14.x'
 
+      - name: Install Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '10.x'
+
       - uses: actions/cache@v1
         id: golangcache
         with:
@@ -195,13 +200,13 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: static-frontend
-          path: /home/runner/work/statping/statping/source/rice-box.go
+          path: /home/runner/work/statping/statping/source/dist
 
       - name: Build Binaries
         env:
           VERSION: ${{ env.VERSION }}
           COMMIT: $GITHUB_SHA
-        run: make build-bin build-win
+        run: make build-all
 
       - name: Upload Release
         id: upload-release-asset
