@@ -65,7 +65,7 @@ jobs:
       - name: Build Frontend Statping
         run: make clean compile
 
-      - name: Upload Compiled Frontend
+      - name: Upload Compiled Frontend (rice-box.go)
         uses: actions/upload-artifact@v1
         with:
           name: static-frontend
