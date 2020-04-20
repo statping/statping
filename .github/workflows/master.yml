@@ -46,7 +46,7 @@ jobs:
         uses: actions/upload-artifact@v2-preview
         with:
           name: static-rice-box
-          path: ./source/rice-box.go
+          path: ./source
 
   test:
     needs: compile
@@ -74,7 +74,7 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: static-rice-box
-          path: ./source/rice-box.go
+          path: ./source
 
       - name: Install Statping
         env:
@@ -147,7 +147,7 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: static-rice-box
-          path: ./source/rice-box.go
+          path: ./source
 
       - name: Build Binaries
         env:
