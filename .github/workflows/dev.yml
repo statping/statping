@@ -1,4 +1,4 @@
-name: Master Release
+name: Dev Release
 on:
   push:
     branches:
