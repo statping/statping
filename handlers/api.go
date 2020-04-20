@@ -51,6 +51,11 @@ func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 	returnJson(output, w, r)
 }
 
+func apiOAuthHandler(r *http.Request) interface{} {
+	app := core.App
+	return app.OAuth
+}
+
 func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 	var c *core.Core
 	err := DecodeJSON(r, &c)

@@ -34,10 +34,13 @@ func oauthHandler(w http.ResponseWriter, r *http.Request) {
 		err, oauth = googleOAuth(r)
 	case "github":
 		err, oauth = githubOAuth(r)
+	case "slack":
+		err, oauth = slackOAuth(r)
 	}
 
 	if err != nil {
 		log.Error(err)
+		sendErrorJson(err, w, r)
 		return
 	}
 
@@ -45,6 +48,7 @@ func oauthHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func oauthLogin(oauth *oAuth, w http.ResponseWriter, r *http.Request) {
+	log.Infoln(oauth)
 	user := &users.User{
 		Id:       0,
 		Username: oauth.Email,
@@ -80,7 +84,7 @@ func githubOAuth(r *http.Request) (error, *oAuth) {
 }
 
 func googleOAuth(r *http.Request) (error, *oAuth) {
-	c := *core.App
+	c := core.App
 	code := r.URL.Query().Get("code")
 
 	config := &oauth2.Config{

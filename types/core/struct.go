@@ -41,19 +41,19 @@ type Core struct {
 	Notifications []AllNotifiers  `gorm:"-" json:"-"`
 	Integrations  []Integrator    `gorm:"-" json:"-"`
 
-	OAuth `json:"oauth"`
+	OAuth `json:"-"`
 }
 
 type OAuth struct {
-	Domains            string `gorm:"column:oauth_domains" json:"oauth_domains,omitempty" scope:"admin"`
-	Providers          string `gorm:"column:oauth_providers;" json:"oauth_providers,omitempty"`
-	GithubClientID     string `gorm:"column:gh_client_id" json:"gh_client_id,omitempty" scope:"admin"`
-	GithubClientSecret string `gorm:"column:gh_client_secret" json:"gh_client_secret,omitempty" scope:"admin"`
-	GoogleClientID     string `gorm:"column:google_client_id" json:"google_client_id,omitempty" scope:"admin"`
-	GoogleClientSecret string `gorm:"column:google_client_secret" json:"google_client_secret,omitempty" scope:"admin"`
-	SlackClientID      string `gorm:"column:slack_client_id" json:"slack_client_id,omitempty" scope:"admin"`
-	SlackClientSecret  string `gorm:"column:slack_client_secret" json:"slack_client_secret,omitempty" scope:"admin"`
-	SlackTeam          string `gorm:"column:slack_team" json:"slack_team,omitempty" scope:"admin"`
+	Domains            string `gorm:"column:oauth_domains" json:"oauth_domains" scope:"admin"`
+	Providers          string `gorm:"column:oauth_providers;" json:"oauth_providers"`
+	GithubClientID     string `gorm:"column:gh_client_id" json:"gh_client_id"`
+	GithubClientSecret string `gorm:"column:gh_client_secret" json:"gh_client_secret" scope:"admin"`
+	GoogleClientID     string `gorm:"column:google_client_id" json:"google_client_id"`
+	GoogleClientSecret string `gorm:"column:google_client_secret" json:"google_client_secret" scope:"admin"`
+	SlackClientID      string `gorm:"column:slack_client_id" json:"slack_client_id"`
+	SlackClientSecret  string `gorm:"column:slack_client_secret" json:"slack_client_secret" scope:"admin"`
+	SlackTeam          string `gorm:"column:slack_team" json:"slack_team"`
 }
 
 // AllNotifiers contains all the Notifiers loaded
