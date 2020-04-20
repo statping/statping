@@ -43,7 +43,7 @@ jobs:
         run: make clean compile
 
       - name: Upload Compiled Frontend (rice-box.go)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v2-preview
         with:
           name: static-rice-box
           path: ./source/rice-box.go
