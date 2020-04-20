@@ -30,6 +30,14 @@ func LoadConfigForm(r *http.Request) (*DbConfig, error) {
 	}
 
 	p := utils.Params
+	p.Set("DB_CONN", dbConn)
+	p.Set("DB_HOST", dbHost)
+	p.Set("DB_USER", dbUser)
+	p.Set("DB_PORT", dbPort)
+	p.Set("DB_PASS", dbPass)
+	p.Set("DB_DATABASE", dbDatabase)
+	p.Set("NAME", project)
+	p.Set("DESCRIPTION", description)
 
 	confg := &DbConfig{
 		DbConn:      dbConn,
@@ -46,15 +54,6 @@ func LoadConfigForm(r *http.Request) (*DbConfig, error) {
 		Email:       email,
 		Location:    utils.Directory,
 	}
-
-	p.Set("DB_CONN", dbConn)
-	p.Set("DB_HOST", dbHost)
-	p.Set("DB_USER", dbUser)
-	p.Set("DB_PORT", dbPort)
-	p.Set("DB_PASS", dbPass)
-	p.Set("DB_DATABASE", dbDatabase)
-	p.Set("NAME", project)
-	p.Set("DESCRIPTION", description)
 
 	return confg, nil
 

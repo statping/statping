@@ -41,6 +41,7 @@ func setDefaults() {
 	Directory = Params.GetString("STATPING_DIR")
 	Params.SetDefault("STATPING_DIR", Directory)
 	Params.SetDefault("GO_ENV", "")
+	Params.SetDefault("DB_CONN", "")
 	Params.SetDefault("DISABLE_LOGS", false)
 	Params.SetDefault("USE_ASSETS", false)
 	Params.SetDefault("BASE_PATH", "")

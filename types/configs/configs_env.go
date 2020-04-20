@@ -56,11 +56,10 @@ func LoadConfigFile(directory string) (*DbConfig, error) {
 		Location:    utils.Directory,
 		SqlFile:     p.GetString("SQL_FILE"),
 	}
-
-	if !utils.FileExists(directory + "/config.yml") {
-		return nil, errors.New(fmt.Sprintf("%s/config.yml does not exist", directory))
-	}
-
 	log.WithFields(utils.ToFields(configs)).Debugln("read config file: " + directory + "/config.yml")
+
+	if configs.DbConn == "" {
+		return configs, errors.New("Starting in setup mode")
+	}
 	return configs, nil
 }
