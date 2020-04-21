@@ -193,6 +193,11 @@ jobs:
           chmod +x statping
           mv statping $(go env GOPATH)/bin/
 
+      - name: Run Statping
+        run: |
+          API_SECRET=demosecret123 statping --port=8080 > /dev/null &
+          sleep 3
+
       - name: Cypress E2E Testing
         uses: cypress-io/github-action@v1
         env:
@@ -200,9 +205,7 @@ jobs:
         with:
           record: false
           parallel: false
-          build: yarn
           working-directory: ./frontend
-          start: yarn start
           wait-on: 'http://localhost:8080/api'
           config: pageLoadTimeout=100000,watchForFileChanges=false
           browser: chrome
