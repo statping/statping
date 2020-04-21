@@ -306,7 +306,7 @@ snapcraft: clean compile build-linux
 	snapcraft push statping_${VERSION}_i386.snap --release stable
 	snapcraft push statping_${VERSION}_arm.snap --release stable
 
-postman: clean
+postman: clean compile
 	API_SECRET=demosecret123 statping --port=8080 > /dev/null &
 	sleep 3
 	newman run -e dev/postman_environment.json dev/postman.json

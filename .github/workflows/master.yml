@@ -151,7 +151,9 @@ jobs:
           mv statping $(go env GOPATH)/bin/
 
       - name: Run Statping
-        run: API_SECRET=demosecret123 statping --port 8080 > /dev/null 2>&1
+        run: |
+          API_SECRET=demosecret123 statping --port=8080 > /dev/null &
+          sleep 3
 
       - name: Postman Tests
         uses: matt-ball/newman-action@master
