@@ -164,52 +164,6 @@ jobs:
           timeoutRequest: 15000
           delayRequest: 1000
 
-  cypress-tests:
-    needs: compile
-    runs-on: ubuntu-16.04
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
-        with:
-          go-version: '1.14.2'
-      - name: Setting ENV's
-        run: |
-          echo "::add-path::$(go env GOPATH)/bin"
-          echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
-          echo ::set-env name=VERSION::$(cat version.txt)
-        shell: bash
-
-      - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v1
-        with:
-          name: static-rice-box
-          path: ./source
-
-      - name: Install Statping
-        env:
-          VERSION: ${{ env.VERSION }}
-        run: |
-          make build
-          chmod +x statping
-          mv statping $(go env GOPATH)/bin/
-
-      - name: Run Statping
-        run: |
-          API_SECRET=demosecret123 statping --port=8080 > /dev/null &
-          sleep 3
-
-      - name: Cypress E2E Testing
-        uses: cypress-io/github-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          record: false
-          parallel: false
-          working-directory: ./frontend
-          wait-on: 'http://localhost:8080/api'
-          config: pageLoadTimeout=100000,watchForFileChanges=false
-          browser: chrome
-
   build-mac:
     needs: compile
     runs-on: ubuntu-latest
