@@ -51,6 +51,29 @@ jobs:
   test:
     needs: compile
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:10.8
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password123
+          POSTGRES_DB: statping
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+      mariadb:
+        image: mariadb:latest
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_USER: root
+          MYSQL_PASSWORD: password123
+          MYSQL_DATABASE: statping
+          MYSQL_ROOT_PASSWORD: password123
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+
     steps:
       - uses: actions/setup-go@v2
         with:
@@ -343,12 +366,30 @@ jobs:
 
       - name: Latest/Version Docker Image
         uses: elgohr/Publish-Docker-Github-Action@master
+        env:
+          VERSION: ${{ env.VERSION }}
+          ARCH: amd64
+          DOCKER_CLI_EXPERIMENTAL: enabled
         with:
           name: statping/statping
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           dockerfile: Dockerfile
           tags: "latest,v${{ env.VERSION }}"
+          buildargs: VERSION,ARCH
+
+      - name: ARM Docker Image
+        uses: elgohr/Publish-Docker-Github-Action@master
+        env:
+          VERSION: ${{ env.VERSION }}
+          ARCH: arm
+        with:
+          name: statping/statping
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          dockerfile: Dockerfile
+          tags: "arm"
+          buildargs: VERSION,ARCH
 
   sentry-release:
     needs: [test, build-linux, build-mac, build-windows]

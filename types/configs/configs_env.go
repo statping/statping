@@ -39,6 +39,11 @@ func LoadConfigFile(directory string) (*DbConfig, error) {
 	p := utils.Params
 	log.Infof("Attempting to read config file at: %s/config.yml ", directory)
 	utils.Params.SetConfigFile(directory + "/config.yml")
+	utils.Params.SetConfigType("yaml")
+
+	if utils.FileExists(directory + "/config.yml") {
+		utils.Params.ReadInConfig()
+	}
 
 	configs := &DbConfig{
 		DbConn:      p.GetString("DB_CONN"),
