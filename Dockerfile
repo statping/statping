@@ -1,4 +1,5 @@
 FROM alpine:latest
+LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG VERSION
 ARG ARCH
 
