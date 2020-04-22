@@ -311,7 +311,7 @@ jobs:
           path: ./build
 
   upload-release:
-    needs: [test, build-linux, build-mac, build-windows]
+    needs: [test, postman-tests, build-linux, build-mac, build-windows]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -394,7 +394,7 @@ jobs:
             windows/statping-windows-arm.zip
 
   docker-release:
-    needs: [test, build-linux, build-mac, build-windows]
+    needs: upload-release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -428,7 +428,7 @@ jobs:
           buildargs: VERSION,ARCH
 
   sentry-release:
-    needs: [test, build-linux, build-mac, build-windows]
+    needs: upload-release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -461,7 +461,7 @@ jobs:
           environment: production
 
   homebrew-release:
-    needs: [test, build-linux, build-mac, build-windows]
+    needs: upload-release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -478,7 +478,7 @@ jobs:
         run: make publish-homebrew
 
   slack-update:
-    needs: [test, build-linux, build-mac, build-windows]
+    needs: upload-release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
