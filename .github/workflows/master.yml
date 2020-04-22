@@ -63,16 +63,14 @@ jobs:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
-      mariadb:
-        image: mariadb:latest
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: password123
+          MYSQL_DATABASE: statping
         ports:
           - 3306:3306
-        env:
-          MYSQL_USER: root
-          MYSQL_PASSWORD: password123
-          MYSQL_DATABASE: statping
-          MYSQL_ROOT_PASSWORD: password123
-        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
       - uses: actions/setup-go@v2
@@ -224,19 +222,11 @@ jobs:
           COMMIT: $GITHUB_SHA
         run: make build-mac
 
-      - name: Upload Release
-        id: upload-release-asset
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ env.VERSION }}
+      - name: Upload MacOSX Builds
+        uses: actions/upload-artifact@v1
         with:
-          tag_name: v${{ env.VERSION }}
-          draft: false
-          prerelease: false
-          files: |
-            build/statping-darwin-386.tar.gz
-            build/statping-darwin-amd64.tar.gz
+          name: darwin-builds
+          path: ./build
 
   build-linux:
     needs: compile
@@ -273,28 +263,11 @@ jobs:
           COMMIT: $GITHUB_SHA
         run: make build-linux
 
-      - name: Upload Release
-        id: upload-release-asset
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ env.VERSION }}
+      - name: Upload Linux Builds
+        uses: actions/upload-artifact@v1
         with:
-          tag_name: v${{ env.VERSION }}
-          draft: false
-          prerelease: false
-          files: |
-            build/statping-freebsd-386.tar.gz
-            build/statping-freebsd-amd64.tar.gz
-            build/statping-freebsd-arm.tar.gz
-            build/statping-linux-386.tar.gz
-            build/statping-linux-amd64.tar.gz
-            build/statping-linux-arm.tar.gz
-            build/statping-linux-arm64.tar.gz
-            build/statping-openbsd-386.tar.gz
-            build/statping-openbsd-amd64.tar.gz
-            build/statping-openbsd-arm.tar.gz
-            build/statping-openbsd-arm64.tar.gz
+          name: linux-builds
+          path: ./build
 
   build-windows:
     needs: compile
@@ -331,8 +304,45 @@ jobs:
           COMMIT: $GITHUB_SHA
         run: make build-win
 
-      - name: Upload Release
-        id: upload-release-asset
+      - name: Upload Windows Builds
+        uses: actions/upload-artifact@v1
+        with:
+          name: windows-builds
+          path: ./build
+
+  upload-release:
+    needs: [test, build-linux, build-mac, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setting ENV's
+        run: |
+          echo "::add-path::$(go env GOPATH)/bin"
+          echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
+          echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
+      - name: Download Linux Builds
+        uses: actions/download-artifact@v1
+        with:
+          name: linux-builds
+          path: ./linux
+
+      - name: Download MacOSX Builds
+        uses: actions/download-artifact@v1
+        with:
+          name: darwin-builds
+          path: ./darwin
+
+      - name: Download Windows Builds
+        uses: actions/download-artifact@v1
+        with:
+          name: windows-builds
+          path: ./windows
+
+      - name: Upload Linux Release
+        id: upload-linux-asset
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -342,9 +352,46 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            build/statping-windows-386.zip
-            build/statping-windows-amd64.zip
-            build/statping-windows-arm.zip
+            linux/statping-freebsd-386.tar.gz
+            linux/statping-freebsd-amd64.tar.gz
+            linux/statping-freebsd-arm.tar.gz
+            linux/statping-linux-386.tar.gz
+            linux/statping-linux-amd64.tar.gz
+            linux/statping-linux-arm.tar.gz
+            linux/statping-linux-arm64.tar.gz
+            linux/statping-openbsd-386.tar.gz
+            linux/statping-openbsd-amd64.tar.gz
+            linux/statping-openbsd-arm.tar.gz
+            linux/statping-openbsd-arm64.tar.gz
+
+      - name: Upload MaxOSX Release
+        id: upload-darwin-asset
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ env.VERSION }}
+        with:
+          tag_name: v${{ env.VERSION }}
+          draft: false
+          prerelease: false
+          files: |
+            darwin/statping-darwin-386.tar.gz
+            darwin/statping-darwin-amd64.tar.gz
+
+      - name: Upload Windows Release
+        id: upload-windows-asset
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ env.VERSION }}
+        with:
+          tag_name: v${{ env.VERSION }}
+          draft: false
+          prerelease: false
+          files: |
+            windows/statping-windows-386.zip
+            windows/statping-windows-amd64.zip
+            windows/statping-windows-arm.zip
 
   docker-release:
     needs: [test, build-linux, build-mac, build-windows]
@@ -378,19 +425,6 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           dockerfile: Dockerfile
           tags: "latest,v${{ env.VERSION }}"
-          buildargs: VERSION,ARCH
-
-      - name: ARM Docker Image
-        uses: elgohr/Publish-Docker-Github-Action@master
-        env:
-          VERSION: ${{ env.VERSION }}
-          ARCH: arm
-        with:
-          name: statping/statping
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          dockerfile: Dockerfile
-          tags: "arm"
           buildargs: VERSION,ARCH
 
   sentry-release:
