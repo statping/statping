@@ -240,7 +240,7 @@ jobs:
       - name: Install Libraries
         run: |
           sudo apt update
-          sudo apt install libc-dev gcc-multilib build-essential musl-dev gcc -y
+          sudo apt install libc-dev gcc-multilib build-essential musl-dev gcc g++ -y
 
       - name: Setting ENV's
         run: |

@@ -157,7 +157,15 @@ docker-manifest:
 		docker build -t statping/statping:v${VERSION}-$$arch --build-arg VERSION=${VERSION} --build-arg ARCH=$$arch .; \
 		docker push statping/statping:v${VERSION}-$$arch; \
 	done
-	docker manifest create statping/statping:latest statping/statping:v${VERSION}-amd64 statping/statping:v${VERSION}-386 statping/statping:v${VERSION}-arm statping/statping:v${VERSION}-arm64
+	docker manifest create statping/statping:v${VERSION} statping/statping:v${VERSION}-amd64 statping/statping:v${VERSION}-386 statping/statping:v${VERSION}-arm statping/statping:v${VERSION}-arm64
+	for arch in $(ARCHS);\
+	do \
+		echo "Docker Manifest v${VERSION} for linux-$$arch"; \
+		docker manifest annotate --os linux --arch $$arch statping/statping:v${VERSION}-$$arch; \
+	done
+	docker manifest push statping/statping:v${VERSION}
+    docker manifest create statping/statping:latest statping/statping:v${VERSION}-amd64 statping/statping:v${VERSION}-386 statping/statping:v${VERSION}-arm statping/statping:v${VERSION}-arm64
+	for arch in $(ARCHS);\
 	do \
 		echo "Docker Manifest v${VERSION} for linux-$$arch"; \
 		docker manifest annotate --os linux --arch $$arch statping/statping:v${VERSION}-$$arch; \
