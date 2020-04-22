@@ -108,7 +108,9 @@ jobs:
           mv statping $(go env GOPATH)/bin/
 
       - name: Go Tests
-        run: go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
+        run: |
+          go get gotest.tools/gotestsum
+          gotestsum --no-summary=skipped --format dots -- -covermode=count -coverprofile=coverage.out -p=1 ./...
         env:
           VERSION: ${{ env.VERSION }}
           DB_CONN: sqlite3
