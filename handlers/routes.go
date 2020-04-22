@@ -157,7 +157,6 @@ func Router() *mux.Router {
 	api.Handle("/api/oauth/{provider}", http.HandlerFunc(oauthHandler))
 	r.Handle("/.well-known/", http.StripPrefix("/.well-known/", http.FileServer(http.Dir(dir+"/.well-known"))))
 	r.NotFoundHandler = http.HandlerFunc(error404Handler)
-	r.Handle("/", http.HandlerFunc(indexHandler))
 	return r
 }
 
