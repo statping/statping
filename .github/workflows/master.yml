@@ -238,7 +238,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install Libraries
-        run: sudo apt install libc-dev gcc -y
+        run: sudo apt install libc-dev gcc gcc-multilib -y
 
       - name: Setting ENV's
         run: |
