@@ -81,17 +81,17 @@ func initModels(db database.Database) {
 	groups.SetDB(db)
 }
 
-func CreateAdminUser(configs *DbConfig) error {
+func CreateAdminUser(c *DbConfig) error {
 	log.Infoln(fmt.Sprintf("Core database does not exist, creating now!"))
 
-	if configs.Username == "" && configs.Password == "" {
-		configs.Username = utils.Params.GetString("ADMIN_USER")
-		configs.Password = utils.Params.GetString("ADMIN_PASSWORD")
+	if c.Username == "" || c.Password == "" {
+		c.Username = utils.Params.GetString("ADMIN_USER")
+		c.Password = utils.Params.GetString("ADMIN_PASSWORD")
 	}
 
 	admin := &users.User{
-		Username: configs.Username,
-		Password: configs.Password,
+		Username: c.Username,
+		Password: c.Password,
 		Email:    "info@admin.com",
 		Admin:    null.NewNullBool(true),
 	}
