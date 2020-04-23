@@ -1,16 +1,17 @@
 <template>
     <div class="col-12">
-        <div v-for="(incident, i) in incidents" class="card contain-card text-black-50 bg-white mb-4">
+
+        <div v-for="incident in incidents" :key="incident.id" class="card contain-card text-black-50 bg-white mb-4">
             <div class="card-header">Incident: {{incident.title}}
                 <button @click="deleteIncident(incident)" class="btn btn-sm btn-danger float-right">
                     <font-awesome-icon icon="times" />  Delete
                 </button>
             </div>
 
-                <FormIncidentUpdates :incident="incident"/>
+            <FormIncidentUpdates :incident="incident"/>
 
-                <span class="font-2 p-2 pl-3">Created: {{niceDate(incident.created_at)}} | Last Update: {{niceDate(incident.updated_at)}}</span>
-            </div>
+            <span class="font-2 p-2 pl-3">Created: {{niceDate(incident.created_at)}} | Last Update: {{niceDate(incident.updated_at)}}</span>
+        </div>
 
 
         <div class="card contain-card text-black-50 bg-white">
@@ -44,59 +45,70 @@
                 </form>
             </div>
         </div>
+        
     </div>
 </template>
 
 <script>
-import Api from "../../API";
-import FormIncidentUpdates from "@/forms/IncidentUpdates";
+    import Api from "../../API";
+    import FormIncidentUpdates from "@/forms/IncidentUpdates";
 
-export default {
-    name: 'Incidents',
-  components: {FormIncidentUpdates},
-  data() {
-        return {
-            service_id: 0,
-              ready: false,
-              incidents: [],
-              incident: {
+    export default {
+        name: 'Incidents',
+        components: {FormIncidentUpdates},
+        data() {
+            return {
+                serviceID: 0,
+                incidents: [],
+                incident: {
+                    title: "",
+                    description: "",
+                    service: 0,
+                  }
+              }
+          },
+
+    created() {
+        this.serviceID = Number(this.$route.params.id);
+        this.incident.service = Number(this.$route.params.id);
+    },
+
+    async mounted() {
+        await this.loadIncidents()
+    },
+
+    methods: {
+
+        async deleteIncident(incident) {
+            let c = confirm(`Are you sure you want to delete '${incident.title}'?`)
+            if (c) {
+                this.res = await Api.incident_delete(incident)
+                if (this.res.status === "success") {
+                    this.incidents = this.incidents.filter(obj => obj.id !== incident.id); // this is better in terms of not having to querry the db to get a fresh copy of all updates
+                    //await this.loadIncidents()
+                } // TODO: further error checking here... maybe alert user it failed with modal or so
+            }
+        },
+
+        async createIncident() {
+            this.res = await Api.incident_create(this.serviceID, this.incident)
+            if (this.res.status === "success") {
+                this.incidents.push(this.res.output) // this is better in terms of not having to querry the db to get a fresh copy of all updates
+                //await this.loadIncidents()
+            } // TODO: further error checking here... maybe alert user it failed with modal or so
+
+            // reset the form data
+            this.incident = {
                 title: "",
                 description: "",
-                service: 0,
-              }
+                service: this.serviceID,
+            }
+        },
+
+        async loadIncidents() {
+            this.incidents = await Api.incidents_service(this.serviceID)
         }
-    },
-  computed:{
-    theID() {
-      return this.$route.params.id
-    }
-  },
-  async mounted() {
-    await this.loadIncidents()
-  },
-  methods: {
-      async getIncidents() {
-        return await Api.incidents_service(this.theID)
-      },
-      async deleteIncident(incident) {
-        let c = confirm(`Are you sure you want to delete '${incident.title}'?`)
-        if (c) {
-          await Api.incident_delete(incident)
-          await this.loadIncidents()
-        }
-      },
-      async loadIncidents() {
-        this.incidents = await Api.incidents_service(this.service_id)
-      },
-      async createIncident() {
-        await Api.incident_create(this.theID, this.incident)
-        await this.loadIncidents()
-        this.incident = {
-          title: "",
-          description: "",
-          service: this.service_id,
-        }
-      }
+
     }
 }
 </script>
