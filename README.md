@@ -64,9 +64,8 @@ Statping will allow you to completely customize your Status Page using SASS styl
 Statping includes email notification via SMTP and Slack integration using [Incoming Webhook](https://api.slack.com/incoming-webhooks). Insert the webhook URL into the Settings page in Statping and enable the Slack integration. Anytime a service fails, you're channel that you specified on Slack will receive a message.
 <br><br><br><br>
 
-<h2>User Created Notifiers</h2>
+## User Created Notifiers
 View the [Plugin Wiki](https://github.com/statping/statping/wiki/Statping-Plugins) to see detailed information about Golang Plugins. Statping isn't just another Status Page for your applications, it's a framework that allows you to create your own plugins to interact with every element of your status page. [Notifier's](https://github.com/statping/statping/wiki/Notifiers) can also be create with only 1 golang file.
-<br><br><br><br>
 
 <img align="center" width="100%" height="250" src="https://img.cjx.io/statupsc2.png">
 
