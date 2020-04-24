@@ -12,7 +12,7 @@ func (d *DbConfig) Save(directory string) error {
 	if err != nil {
 		return err
 	}
-	if err := utils.SaveFile(directory+"/configs.yml", c); err != nil {
+	if err := utils.SaveFile(directory+"/config.yml", c); err != nil {
 		return nil
 	}
 	return nil

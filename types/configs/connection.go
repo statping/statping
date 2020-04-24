@@ -23,6 +23,7 @@ import (
 // Connect will attempt to connect to the sqlite, postgres, or mysql database
 func Connect(configs *DbConfig, retry bool) error {
 	conn := configs.ConnectionString()
+	p := utils.Params
 	var err error
 
 	log.WithFields(utils.ToFields(configs, conn)).Debugln("attempting to connect to database")
@@ -39,16 +40,16 @@ func Connect(configs *DbConfig, retry bool) error {
 		}
 	}
 
-	apiKey := utils.Params.GetString("API_KEY")
-	apiSecret := utils.Params.GetString("API_SECRET")
+	apiKey := p.GetString("API_KEY")
+	apiSecret := p.GetString("API_SECRET")
 	configs.ApiKey = apiKey
 	configs.ApiSecret = apiSecret
 
 	log.WithFields(utils.ToFields(dbSession)).Debugln("connected to database")
 
-	maxOpenConn := utils.Params.GetInt("MAX_OPEN_CONN")
-	maxIdleConn := utils.Params.GetInt("MAX_IDLE_CONN")
-	maxLifeConn := utils.Params.GetDuration("MAX_LIFE_CONN")
+	maxOpenConn := p.GetInt("MAX_OPEN_CONN")
+	maxIdleConn := p.GetInt("MAX_IDLE_CONN")
+	maxLifeConn := p.GetDuration("MAX_LIFE_CONN")
 
 	dbSession.DB().SetMaxOpenConns(maxOpenConn)
 	dbSession.DB().SetMaxIdleConns(maxIdleConn)

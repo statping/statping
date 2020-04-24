@@ -4,26 +4,28 @@ import (
 	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/utils"
 	"gopkg.in/yaml.v2"
+	"os"
 )
 
 func LoadConfigFile(directory string) (*DbConfig, error) {
 	p := utils.Params
 	log.Infof("Attempting to read config file at: %s/config.yml ", directory)
-	utils.Params.SetConfigFile(directory + "/config.yml")
-	utils.Params.SetConfigType("yaml")
+	p.SetConfigFile(directory + "/config.yml")
+	p.SetConfigType("yaml")
+	p.ReadInConfig()
 
-	if utils.FileExists(directory + "/config.yml") {
-		utils.Params.ReadInConfig()
+	db := new(DbConfig)
+	content, err := utils.OpenFile(directory + "/config.yml")
+	if err == nil {
+		if err := yaml.Unmarshal([]byte(content), &db); err != nil {
+			return nil, err
+		}
 	}
 
-	var db *DbConfig
-	content, err := utils.OpenFile(directory + "config.yml")
-	if err != nil {
-		return nil, err
+	if os.Getenv("DB_CONN") == "sqlite" || os.Getenv("DB_CONN") == "sqlite3" {
+		db.DbConn = "sqlite3"
 	}
-	if err := yaml.Unmarshal([]byte(content), &db); err != nil {
-		return nil, err
-	}
+
 	if db.DbConn != "" {
 		p.Set("DB_CONN", db.DbConn)
 	}
@@ -41,6 +43,15 @@ func LoadConfigFile(directory string) (*DbConfig, error) {
 	}
 	if db.DbData != "" {
 		p.Set("DB_DATABASE", db.DbData)
+	}
+	if db.Location != "" {
+		p.Set("LOCATION", db.Location)
+	}
+	if db.ApiKey != "" {
+		p.Set("API_KEY", db.ApiKey)
+	}
+	if db.ApiSecret != "" {
+		p.Set("API_SECRET", db.ApiSecret)
 	}
 
 	configs := &DbConfig{
