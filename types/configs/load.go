@@ -25,7 +25,6 @@ func LoadConfigFile(directory string) (*DbConfig, error) {
 	if os.Getenv("DB_CONN") == "sqlite" || os.Getenv("DB_CONN") == "sqlite3" {
 		db.DbConn = "sqlite3"
 	}
-
 	if db.DbConn != "" {
 		p.Set("DB_CONN", db.DbConn)
 	}
