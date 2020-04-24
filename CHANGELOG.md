@@ -1,3 +1,9 @@
+# 0.90.32 (04-23-2020)
+- Modified the saving and loading process config.yml
+
+# 0.90.31 (04-21-2020)
+- Version bump for github actions
+
 # 0.90.30 (04-19-2020)
 - Attempt to fix Github Actions build process
 - Fix for empty database connection string, and not starting in setup mode

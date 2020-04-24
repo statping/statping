@@ -82,16 +82,19 @@ func initModels(db database.Database) {
 }
 
 func CreateAdminUser(c *DbConfig) error {
-	log.Infoln(fmt.Sprintf("Core database does not exist, creating now!"))
+	log.Infoln(fmt.Sprintf("Default Admininstrator user does not exist, creating now! (admin/admin)"))
 
-	if c.Username == "" || c.Password == "" {
-		c.Username = utils.Params.GetString("ADMIN_USER")
-		c.Password = utils.Params.GetString("ADMIN_PASSWORD")
+	adminUser := utils.Params.GetString("ADMIN_USER")
+	adminPass := utils.Params.GetString("ADMIN_PASSWORD")
+
+	if adminUser == "" || adminPass == "" {
+		adminUser = "admin"
+		adminPass = "admin"
 	}
 
 	admin := &users.User{
-		Username: c.Username,
-		Password: c.Password,
+		Username: adminUser,
+		Password: adminPass,
 		Email:    "info@admin.com",
 		Admin:    null.NewNullBool(true),
 	}

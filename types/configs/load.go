@@ -1,39 +1,10 @@
 package configs
 
 import (
-	"fmt"
 	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/utils"
+	"gopkg.in/yaml.v2"
 )
-
-func (d *DbConfig) ConnectionString() string {
-	var conn string
-	postgresSSL := utils.Params.GetString("POSTGRES_SSLMODE")
-
-	switch d.DbConn {
-	case "memory", ":memory:":
-		conn = "sqlite3"
-		d.DbConn = ":memory:"
-		return d.DbConn
-	case "sqlite", "sqlite3":
-		conn, err := findDbFile(d)
-		if err != nil {
-			log.Errorln(err)
-		}
-		d.SqlFile = conn
-		log.Infof("SQL database file at: %s", d.SqlFile)
-		d.DbConn = "sqlite3"
-		return d.SqlFile
-	case "mysql":
-		host := fmt.Sprintf("%v:%v", d.DbHost, d.DbPort)
-		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC&time_zone=%%27UTC%%27", d.DbUser, d.DbPass, host, d.DbData)
-		return conn
-	case "postgres":
-		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v timezone=UTC sslmode=%v", d.DbHost, d.DbPort, d.DbUser, d.DbData, d.DbPass, postgresSSL)
-		return conn
-	}
-	return conn
-}
 
 func LoadConfigFile(directory string) (*DbConfig, error) {
 	p := utils.Params
@@ -43,6 +14,33 @@ func LoadConfigFile(directory string) (*DbConfig, error) {
 
 	if utils.FileExists(directory + "/config.yml") {
 		utils.Params.ReadInConfig()
+	}
+
+	var db *DbConfig
+	content, err := utils.OpenFile(directory + "config.yml")
+	if err != nil {
+		return nil, err
+	}
+	if err := yaml.Unmarshal([]byte(content), &db); err != nil {
+		return nil, err
+	}
+	if db.DbConn != "" {
+		p.Set("DB_CONN", db.DbConn)
+	}
+	if db.DbHost != "" {
+		p.Set("DB_HOST", db.DbHost)
+	}
+	if db.DbPort != 0 {
+		p.Set("DB_PORT", db.DbPort)
+	}
+	if db.DbPass != "" {
+		p.Set("DB_PASS", db.DbPort)
+	}
+	if db.DbUser != "" {
+		p.Set("DB_USER", db.DbUser)
+	}
+	if db.DbData != "" {
+		p.Set("DB_DATABASE", db.DbData)
 	}
 
 	configs := &DbConfig{
