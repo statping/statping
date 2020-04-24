@@ -266,7 +266,9 @@ jobs:
         env:
           VERSION: ${{ env.VERSION }}
           COMMIT: $GITHUB_SHA
-        run: make build-linux
+        run: |
+          go env
+          make build-linux
 
       - name: Upload Linux Builds
         uses: actions/upload-artifact@v1

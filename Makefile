@@ -55,6 +55,7 @@ test-deps:
 	go get golang.org/x/tools/cmd/cover
 	go get github.com/mattn/goveralls
 	go get github.com/GeertJohan/go.rice/rice
+	go install github.com/mattn/go-sqlite3
 
 deps:
 	go get -d -v -t ./...
@@ -179,7 +180,7 @@ build-linux:
 	do \
 		echo "Building v${VERSION} for linux-$$arch"; \
 		mkdir -p releases/statping-linux-$$arch/; \
-		GO111MODULE="on" GOOS=linux GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -linkmode external -extldflags -static" -o releases/statping-linux-$$arch/statping ${PWD}/cmd || true; \
+		GO111MODULE="on" GOOS=linux GOARCH=$$arch go build -a -tags netgo -ldflags "-X main.VERSION=${VERSION} -linkmode external -extldflags -static" -o releases/statping-linux-$$arch/statping ${PWD}/cmd || true; \
 		chmod +x releases/statping-linux-$$arch/statping || true; \
 		tar -czf releases/statping-linux-$$arch.tar.gz -C releases/statping-linux-$$arch statping || true; \
 	done
@@ -192,7 +193,7 @@ build-mac:
 	do \
 		echo "Building v${VERSION} for darwin-$$arch"; \
 		mkdir -p releases/statping-darwin-$$arch/; \
-		GO111MODULE="on" GOOS=darwin GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION}" -o releases/statping-darwin-$$arch/statping ${PWD}/cmd || true; \
+		GO111MODULE="on" GOOS=darwin GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -linkmode external -extldflags -static" -o releases/statping-darwin-$$arch/statping ${PWD}/cmd || true; \
 		chmod +x releases/statping-darwin-$$arch/statping || true; \
 		tar -czf releases/statping-darwin-$$arch.tar.gz -C releases/statping-darwin-$$arch statping || true; \
 	done
@@ -205,7 +206,7 @@ build-win:
 	do \
 		echo "Building v${VERSION} for windows-$$arch"; \
 		mkdir -p releases/statping-windows-$$arch/; \
-		GO111MODULE="on" GOOS=windows GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION}" -o releases/statping-windows-$$arch/statping.exe ${PWD}/cmd || true; \
+		GO111MODULE="on" GOOS=windows GOARCH=$$arch go build -a -tags netgo -ldflags "-X main.VERSION=${VERSION} -linkmode external -extldflags -static" -o releases/statping-windows-$$arch/statping.exe ${PWD}/cmd || true; \
 		chmod +x releases/statping-windows-$$arch/statping.exe || true; \
 		zip -j releases/statping-windows-$$arch.zip releases/statping-windows-$$arch/statping.exe || true; \
 	done
