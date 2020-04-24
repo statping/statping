@@ -35,7 +35,7 @@ func LoadConfigFile(directory string) (*DbConfig, error) {
 		p.Set("DB_PORT", db.DbPort)
 	}
 	if db.DbPass != "" {
-		p.Set("DB_PASS", db.DbPort)
+		p.Set("DB_PASS", db.DbPass)
 	}
 	if db.DbUser != "" {
 		p.Set("DB_USER", db.DbUser)

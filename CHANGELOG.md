@@ -1,3 +1,6 @@
+# 0.90.33 (04-24-2020)
+- Fixed config loading method
+
 # 0.90.32 (04-23-2020)
 - Modified the saving and loading process config.yml
 
