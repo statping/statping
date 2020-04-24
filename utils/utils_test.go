@@ -16,6 +16,13 @@ func TestCreateLog(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestReplaceValue(t *testing.T) {
+	assert.Equal(t, true, replaceVal(true))
+	assert.Equal(t, 42, replaceVal(42))
+	assert.Equal(t, "hello world", replaceVal("hello world"))
+	assert.Equal(t, "5s", replaceVal(time.Duration(5*time.Second)))
+}
+
 func TestInitLogs(t *testing.T) {
 	assert.Nil(t, InitLogs())
 	Log.Infoln("this is a test")
@@ -23,7 +30,7 @@ func TestInitLogs(t *testing.T) {
 }
 
 func TestDir(t *testing.T) {
-	assert.Contains(t, Directory, "github.com/statping/statping")
+	assert.Contains(t, Directory, "statping/statping")
 }
 
 func TestCommand(t *testing.T) {
@@ -188,4 +195,19 @@ func TestHttpRequest(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, []byte("OK"), body)
 	assert.Equal(t, resp.StatusCode, 200)
+}
+
+func TestConfigLoad(t *testing.T) {
+	InitCLI()
+	setDefaults()
+
+	s := Params.GetString
+	b := Params.GetBool
+
+	Params.Set("DB_CONN", "sqlite")
+
+	assert.Equal(t, "sqlite", s("DB_CONN"))
+	assert.Equal(t, Directory, s("STATPING_DIR"))
+	assert.True(t, b("SAMPLE_DATA"))
+	assert.True(t, b("ALLOW_REPORTS"))
 }

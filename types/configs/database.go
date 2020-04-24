@@ -1,6 +1,8 @@
 package configs
 
 import (
+	"fmt"
+	"github.com/pkg/errors"
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/core"
@@ -101,11 +103,11 @@ func (d *DbConfig) CreateDatabase() error {
 	log.Infoln("Creating Database Tables...")
 	for _, table := range DbModels {
 		if err := d.Db.CreateTable(table); err.Error() != nil {
-			return err.Error()
+			return errors.Wrap(err.Error(), fmt.Sprintf("error creating '%T' table", table))
 		}
 	}
 	if err := d.Db.Table("core").CreateTable(&core.Core{}); err.Error() != nil {
-		return err.Error()
+		return errors.Wrap(err.Error(), fmt.Sprintf("error creating 'core' table"))
 	}
 	log.Infoln("Statping Database Created")
 

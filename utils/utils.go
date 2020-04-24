@@ -26,15 +26,9 @@ var (
 
 // init will set the utils.Directory to the current running directory, or STATPING_DIR if it is set
 func init() {
-	defaultDir, err := os.Getwd()
-	if err != nil {
-		defaultDir = "."
-	}
-
-	Directory = Getenv("STATPING_DIR", defaultDir).(string)
-
+	InitCLI()
 	// check if logs are disabled
-	disableLogs = Getenv("DISABLE_LOGS", false).(bool)
+	disableLogs = Params.GetBool("DISABLE_LOGS")
 	if disableLogs {
 		Log.Out = ioutil.Discard
 	}
@@ -49,10 +43,9 @@ type env struct {
 	data interface{}
 }
 
-func GetenvAs(key string, defaultValue interface{}) *env {
-	return &env{
-		data: Getenv(key, defaultValue),
-	}
+func NotNumber(val string) bool {
+	_, err := strconv.ParseInt(val, 10, 64)
+	return err != nil
 }
 
 func (e *env) Duration() time.Duration {
@@ -61,34 +54,6 @@ func (e *env) Duration() time.Duration {
 		Log.Errorln(err)
 	}
 	return t
-}
-
-func Getenv(key string, defaultValue interface{}) interface{} {
-	if val, ok := os.LookupEnv(key); ok {
-		if val != "" {
-			switch d := defaultValue.(type) {
-
-			case int, int64:
-				return int(ToInt(val))
-
-			case time.Duration:
-				dur, err := time.ParseDuration(val)
-				if err != nil {
-					return d
-				}
-				return dur
-			case bool:
-				ok, err := strconv.ParseBool(val)
-				if err != nil {
-					return d
-				}
-				return ok
-			default:
-				return val
-			}
-		}
-	}
-	return defaultValue
 }
 
 // ToInt converts a int to a string
@@ -153,7 +118,7 @@ func (t Timestamp) Ago() string {
 // Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings
 //		in, out, err := Command("sass assets/scss assets/css/base.css")
 func Command(name string, args ...string) (string, string, error) {
-	Log.Debugln("running command: " + name + strings.Join(args, " "))
+	Log.Info("running command: " + name + strings.Join(args, " "))
 	testCmd := exec.Command(name, args...)
 	var stdout, stderr []byte
 	var errStdout, errStderr error
@@ -285,6 +250,13 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	client := &http.Client{
 		Transport: transport,
 		Timeout:   timeout,
+	}
+
+	if req.Header.Get("Redirect") != "true" {
+		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		}
+		req.Header.Del("Redirect")
 	}
 
 	if resp, err = client.Do(req); err != nil {

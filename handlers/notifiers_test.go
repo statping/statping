@@ -11,6 +11,40 @@ func TestAttachment(t *testing.T) {
 	notifiers.InitNotifiers()
 }
 
+func TestUnAuthenticatedNotifierRoutes(t *testing.T) {
+	tests := []HTTPTest{
+		{
+			Name:           "No Authentication - View All Notifiers",
+			URL:            "/api/notifiers",
+			Method:         "GET",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "No Authentication - View Notifier",
+			URL:            "/api/notifier/slack",
+			Method:         "GET",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "No Authentication - Update Notifier",
+			URL:            "/api/notifier/slack",
+			Method:         "POST",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+	}
+
+	for _, v := range tests {
+		t.Run(v.Name, func(t *testing.T) {
+			str, t, err := RunHTTPTest(v, t)
+			t.Logf("Test %s: \n %v\n", v.Name, str)
+			assert.Nil(t, err)
+		})
+	}
+}
+
 func TestApiNotifiersRoutes(t *testing.T) {
 	tests := []HTTPTest{
 		{
@@ -49,7 +83,17 @@ func TestApiNotifiersRoutes(t *testing.T) {
 			ExpectedContains: []string{`"method":"slack"`},
 			BeforeTest:       SetTestENV,
 			SecureRoute:      true,
-		}}
+		},
+		{
+			Name:             "Incorrect JSON POST",
+			URL:              "/api/notifier/slack",
+			Body:             BadJSON,
+			ExpectedContains: []string{BadJSONResponse},
+			BeforeTest:       SetTestENV,
+			Method:           "POST",
+			ExpectedStatus:   422,
+		},
+	}
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {

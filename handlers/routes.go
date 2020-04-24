@@ -26,14 +26,14 @@ func Router() *mux.Router {
 	CacheStorage = NewStorage()
 	r := mux.NewRouter().StrictSlash(true)
 
-	authUser := utils.Getenv("AUTH_USERNAME", "").(string)
-	authPass := utils.Getenv("AUTH_PASSWORD", "").(string)
+	authUser := utils.Params.GetString("AUTH_USERNAME")
+	authPass := utils.Params.GetString("AUTH_PASSWORD")
 
 	if authUser != "" && authPass != "" {
 		r.Use(basicAuthHandler)
 	}
 
-	bPath := utils.Getenv("BASE_PATH", "").(string)
+	bPath := utils.Params.GetString("BASE_PATH")
 	sentryHandler := sentryhttp.New(sentryhttp.Options{})
 
 	if bPath != "" {
@@ -78,6 +78,7 @@ func Router() *mux.Router {
 	api.Handle("/api/cache", authenticated(apiCacheHandler, false)).Methods("GET")
 	api.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
 	api.Handle("/api/core", authenticated(apiCoreHandler, false)).Methods("POST")
+	api.Handle("/api/oauth", scoped(apiOAuthHandler)).Methods("GET")
 	api.Handle("/api/logs", authenticated(logsHandler, false)).Methods("GET")
 	api.Handle("/api/logs/last", authenticated(logsLineHandler, false)).Methods("GET")
 
@@ -100,7 +101,6 @@ func Router() *mux.Router {
 	api.Handle("/api/services", authenticated(apiCreateServiceHandler, false)).Methods("POST")
 	api.Handle("/api/services/{id}", scoped(apiServiceHandler)).Methods("GET")
 	api.Handle("/api/reorder/services", authenticated(reorderServiceHandler, false)).Methods("POST")
-	api.Handle("/api/services/{id}/running", authenticated(apiServiceRunningHandler, false)).Methods("POST")
 	api.Handle("/api/services/{id}", authenticated(apiServiceUpdateHandler, false)).Methods("POST")
 	api.Handle("/api/services/{id}", authenticated(apiServiceDeleteHandler, false)).Methods("DELETE")
 	api.Handle("/api/services/{id}/failures", scoped(apiServiceFailuresHandler)).Methods("GET")
@@ -112,7 +112,6 @@ func Router() *mux.Router {
 	api.Handle("/api/services/{id}/failure_data", cached("30s", "application/json", apiServiceFailureDataHandler)).Methods("GET")
 	api.Handle("/api/services/{id}/ping_data", cached("30s", "application/json", apiServicePingDataHandler)).Methods("GET")
 	api.Handle("/api/services/{id}/uptime_data", http.HandlerFunc(apiServiceTimeDataHandler)).Methods("GET")
-	//api.Handle("/api/services/{id}/heatmap", cached("30s", "application/json", apiServiceHeatmapHandler)).Methods("GET")
 
 	// API INCIDENTS Routes
 	api.Handle("/api/services/{id}/incidents", http.HandlerFunc(apiServiceIncidentsHandler)).Methods("GET")
@@ -152,17 +151,11 @@ func Router() *mux.Router {
 	api.Handle("/api/checkins/{api}", authenticated(checkinDeleteHandler, false)).Methods("DELETE")
 	r.Handle("/checkin/{api}", http.HandlerFunc(checkinHitHandler))
 
-	// Static Files Routes
-	r.PathPrefix("/files/postman.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
-	r.PathPrefix("/files/swagger.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
-	r.PathPrefix("/files/grafana.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
-
 	// API Generic Routes
 	r.Handle("/metrics", readOnly(prometheusHandler, false))
 	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
-	r.Handle("/oauth/{provider}", http.HandlerFunc(oauthHandler))
+	api.Handle("/api/oauth/{provider}", http.HandlerFunc(oauthHandler))
 	r.Handle("/.well-known/", http.StripPrefix("/.well-known/", http.FileServer(http.Dir(dir+"/.well-known"))))
-
 	r.NotFoundHandler = http.HandlerFunc(error404Handler)
 	return r
 }

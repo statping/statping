@@ -20,6 +20,7 @@ export default new Vuex.Store({
             hasAllData: false,
             hasPublicData: false,
             core: {},
+            oauth: {},
             token: null,
             services: [],
             service: null,
@@ -35,6 +36,7 @@ export default new Vuex.Store({
         hasAllData: state => state.hasAllData,
         hasPublicData: state => state.hasPublicData,
         core: state => state.core,
+        oauth: state => state.oauth,
         token: state => state.token,
         services: state => state.services,
         service: state => state.service,
@@ -130,9 +132,12 @@ export default new Vuex.Store({
         setAdmin (state, admin) {
             state.admin = admin
         },
-        setUser (state, user) {
-          state.user = user
-        },
+      setUser (state, user) {
+        state.user = user
+      },
+      setOAuth (state, oauth) {
+        state.oauth = oauth
+      },
     },
     actions: {
         async getAllServices(context) {
@@ -153,8 +158,9 @@ export default new Vuex.Store({
             context.commit("setServices", services);
             const messages = await Api.messages()
             context.commit("setMessages", messages)
+            const oauth = await Api.oauth()
+            context.commit("setOAuth", oauth);
             context.commit("setHasPublicData", true)
-            window.console.log('finished loading required data')
         },
         async loadAdmin(context) {
             const groups = await Api.groups()
@@ -168,8 +174,10 @@ export default new Vuex.Store({
             context.commit("setHasPublicData", true)
             const notifiers = await Api.notifiers()
             context.commit("setNotifiers", notifiers);
-            const users = await Api.users()
-            context.commit("setUsers", users);
+          const users = await Api.users()
+          context.commit("setUsers", users);
+          const oauth = await Api.oauth()
+          context.commit("setOAuth", oauth);
         }
     }
 });

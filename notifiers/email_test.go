@@ -8,7 +8,6 @@ import (
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"os"
 	"testing"
 	"time"
 )
@@ -25,12 +24,12 @@ var (
 var testEmail *emailOutgoing
 
 func init() {
-	EMAIL_HOST = os.Getenv("EMAIL_HOST")
-	EMAIL_USER = os.Getenv("EMAIL_USER")
-	EMAIL_PASS = os.Getenv("EMAIL_PASS")
-	EMAIL_OUTGOING = os.Getenv("EMAIL_OUTGOING")
-	EMAIL_SEND_TO = os.Getenv("EMAIL_SEND_TO")
-	EMAIL_PORT = utils.ToInt(os.Getenv("EMAIL_PORT"))
+	EMAIL_HOST = utils.Params.GetString("EMAIL_HOST")
+	EMAIL_USER = utils.Params.GetString("EMAIL_USER")
+	EMAIL_PASS = utils.Params.GetString("EMAIL_PASS")
+	EMAIL_OUTGOING = utils.Params.GetString("EMAIL_OUTGOING")
+	EMAIL_SEND_TO = utils.Params.GetString("EMAIL_SEND_TO")
+	EMAIL_PORT = utils.ToInt(utils.Params.GetString("EMAIL_PORT"))
 }
 
 func TestEmailNotifier(t *testing.T) {

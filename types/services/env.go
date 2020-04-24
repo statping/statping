@@ -19,7 +19,7 @@ func findServiceByHash(hash string) *Service {
 }
 
 func ServicesFromEnvFile() error {
-	servicesEnv := utils.Getenv("SERVICES_FILE", "").(string)
+	servicesEnv := utils.Params.GetString("SERVICES_FILE")
 	if servicesEnv == "" {
 		return nil
 	}

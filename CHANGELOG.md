@@ -1,3 +1,40 @@
+# 0.90.33 (04-24-2020)
+- Fixed config loading method
+
+# 0.90.32 (04-23-2020)
+- Modified the saving and loading process config.yml
+
+# 0.90.31 (04-21-2020)
+- Version bump for github actions
+
+# 0.90.30 (04-19-2020)
+- Attempt to fix Github Actions build process
+- Fix for empty database connection string, and not starting in setup mode
+
+# 0.90.29 (04-19-2020)
+- Added HTTP Redirects for services
+- Removed use of SASS environment variable, now finds path or sends error
+- Modified Makefile to create new snapcraft versions
+- Fixed issue when logs are not initiated yet. Issue #502
+- Fixed issue when SQLite (statping.db) is not found Issue #499
+- Modified port flag in Docker image
+- Fixed issue on startup without config.yml file not starting in setup mode
+
+# 0.90.28 (04-16-2020)
+- Fixed postgres timestamp grouping
+- Added postman (newman) API testing
+- Added Viper and Cobra config/env parsing package
+- Added more golang tests
+- Modified handlers to use a more generic find method
+- Added 'env' command to show variables used in config
+- Added 'reset' command that will delete files and backup .db file for a fresh install
+- Added error type that has common errors with http status code based on error
+
+# 0.90.27 (04-15-2020)
+- Fixed postgres database table creation process
+- Modified go build process, additional ARCHs
+- Added 'SAMPLE_DATA' environment variable to disable example data on startup. (default: true)
+
 # 0.90.26 (04-13-2020)
 - Fixed Delete Failures button/function
 - Removed timezone field from Settings (core)

@@ -16,6 +16,7 @@ func init() {
 	utils.InitLogs()
 	Assets()
 	utils.DeleteDirectory(dir + "/assets")
+	dir = utils.Params.GetString("STATPING_DIR")
 }
 
 func TestCore_UsingAssets(t *testing.T) {
@@ -23,7 +24,7 @@ func TestCore_UsingAssets(t *testing.T) {
 }
 
 func TestCreateAssets(t *testing.T) {
-	assert.Nil(t, CreateAllAssets(dir))
+	CreateAllAssets(dir)
 	assert.True(t, UsingAssets(dir))
 	assert.Nil(t, CompileSASS(DefaultScss...))
 	assert.FileExists(t, dir+"/assets/css/main.css")

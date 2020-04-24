@@ -5,8 +5,6 @@ import (
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/utils"
-	"os"
-	"time"
 )
 
 var db database.Database
@@ -31,32 +29,29 @@ func Select() (*Core, error) {
 	}
 	App = &c
 
-	if os.Getenv("USE_CDN") == "true" {
+	if utils.Params.GetBool("USE_CDN") {
 		App.UseCdn = null.NewNullBool(true)
 	}
-	if os.Getenv("ALLOW_REPORTS") == "true" {
+	if utils.Params.GetBool("ALLOW_REPORTS") {
 		App.AllowReports = null.NewNullBool(true)
 	}
 	return App, q.Error()
 }
 
 func (c *Core) Create() error {
-	apiKey := utils.Getenv("API_KEY", utils.NewSHA256Hash()).(string)
-	apiSecret := utils.Getenv("API_SECRET", utils.NewSHA256Hash()).(string)
-
-	if c.ApiKey == "" || c.ApiSecret == "" {
-		c.ApiSecret = apiSecret
-		c.ApiKey = apiKey
+	secret := utils.Params.GetString("API_SECRET")
+	if secret == "" {
+		secret = utils.RandomString(32)
 	}
 	newCore := &Core{
 		Name:        c.Name,
 		Description: c.Description,
 		ConfigFile:  utils.Directory + "/config.yml",
-		ApiKey:      c.ApiKey,
-		ApiSecret:   c.ApiSecret,
+		ApiKey:      utils.RandomString(32),
+		ApiSecret:   secret,
 		Version:     App.Version,
 		Domain:      c.Domain,
-		MigrationId: time.Now().Unix(),
+		MigrationId: utils.Now().Unix(),
 	}
 	q := db.Create(&newCore)
 	return q.Error()

@@ -9,13 +9,15 @@
 # Statping - Status Page & Monitoring Server
 An easy to use Status Page for your websites and applications. Statping will automatically fetch the application and render a beautiful status page with tons of features for you to build an even better status page. This Status Page generator allows you to use MySQL, Postgres, or SQLite on multiple operating systems.
 
-[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/statping/statping) [![Slack](https://slack.statping.com/badge.svg)](https://slack.statping.com) [![](https://images.microbadger.com/badges/image/statping/statping.svg)](https://microbadger.com/images/statping/statping) [![Docker Pulls](https://img.shields.io/docker/pulls/statping/statping.svg)](https://hub.docker.com/r/statping/statping/builds/)
+[![Latest](https://github.com/statping/statping/workflows/Master%20Release/badge.svg)](https://github.com/statping/statping/actions) [![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/statping/statping) [![Slack](https://slack.statping.com/badge.svg)](https://slack.statping.com) [![](https://images.microbadger.com/badges/image/statping/statping.svg)](https://microbadger.com/images/statping/statping) [![Docker Pulls](https://img.shields.io/docker/pulls/statping/statping.svg)](https://hub.docker.com/r/statping/statping/builds/)
 
 <br><br>
 <img align="left" width="320" height="235" src="https://img.cjx.io/statupsiterun.gif">
 <h2>A Future-Proof Status Page</h2>
 Statping strives to remain future-proof and remain intact if a failure is created. Your Statping service should not be running on the same instance you're trying to monitor. If your server crashes your Status Page should still remaining online to notify your users of downtime.
-<br><br><br><br><br>
+
+<br><a href="https://labs.play-with-docker.com/?stack=https://raw.githubusercontent.com/statping/statping/master/dev/pwd-stack.yml"><img height=25 src="https://assets.statping.com/docker-pwd.png"></a> (dashboard login is `admin`, password `admin`)
+<br><br><br>
 
 <h2>No Requirements</h2>
 Statping is built in Go Language so all you need is the precompile binary based on your operating system. You won't need to install anything extra once you have the Statping binary installed. You can even run Statping on a Raspberry Pi.
@@ -38,7 +40,7 @@ The Status binary for all other OS's is ~17Mb at most.
 
 <img align="left" width="320" height="235" src="https://img.cjx.io/statping_iphone_bk.png">
 <h2>Mobile App is Gorgeous</h2>
-The Statping app is available on the App Store and Google Play for free. The app will allow you to view services, receive notifications when a service is offline, update groups, users, services, messages, and more! Start your own Statping server and then connect it to the app by scanning the QR code in settings. 
+The Statping app is available on the App Store and Google Play for free. The app will allow you to view services, receive notifications when a service is offline, update groups, users, services, messages, and more! Start your own Statping server and then connect it to the app by scanning the QR code in settings.
 
 <p align="center">
 <a href="https://play.google.com/store/apps/details?id=com.statping"><img src="https://img.cjx.io/google-play.svg"></a>

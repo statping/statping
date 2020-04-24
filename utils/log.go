@@ -38,9 +38,9 @@ func SentryInit(v *string, allow bool) {
 		}
 		version = *v
 	}
-	goEnv := Getenv("GO_ENV", "production").(string)
-	allowReports := Getenv("ALLOW_REPORTS", false).(bool)
-	if allowReports || allow {
+	goEnv := Params.GetString("GO_ENV")
+	allowReports := Params.GetBool("ALLOW_REPORTS")
+	if allowReports || allow || goEnv == "test" {
 		if err := sentry.Init(sentry.ClientOptions{
 			Dsn:         errorReporter,
 			Environment: goEnv,
@@ -194,9 +194,11 @@ func checkVerboseMode() {
 
 // CloseLogs will close the log file correctly on shutdown
 func CloseLogs() {
-	ljLogger.Rotate()
-	Log.Writer().Close()
-	ljLogger.Close()
+	if ljLogger != nil {
+		ljLogger.Rotate()
+		Log.Writer().Close()
+		ljLogger.Close()
+	}
 	sentry.Flush(5 * time.Second)
 }
 

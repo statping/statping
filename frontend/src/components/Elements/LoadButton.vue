@@ -1,5 +1,5 @@
 <template>
-    <button v-html="loading ? loadLabel : label" @click.prevent="runAction" type="submit" :disabled="loading || disabled" class="btn btn-block" :class="{class: !loading, 'btn-outline-light': loading}">
+    <button v-html="loading ? loadLabel : label" @click.prevent="runAction" type="submit" :disabled="loading || disabled" class="btn btn-block" :class="{'btn-outline-light': loading}">
     </button>
 </template>
 
@@ -14,10 +14,6 @@
         label: {
           type: String,
           required: true
-        },
-        class: {
-          type: String,
-          default: "btn-primary"
         },
         disabled: {
           type: Boolean,

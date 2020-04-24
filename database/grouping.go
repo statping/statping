@@ -74,7 +74,7 @@ func (g *GroupQuery) GraphData(by By) ([]*TimeValue, error) {
 	dbQuery := g.db.MultipleSelects(
 		g.db.SelectByTime(g.Group),
 		by.String(),
-	).Group("timeframe")
+	).Group("timeframe").Order("timeframe", true)
 
 	g.db = dbQuery
 

@@ -4,9 +4,9 @@ import (
 	"compress/gzip"
 	"crypto/subtle"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/utils"
 	"io"
 	"net/http"
@@ -161,4 +161,14 @@ func cached(duration, contentType string, handler func(w http.ResponseWriter, r 
 			}
 		}
 	})
+}
+
+func DecodeJSON(r *http.Request, obj interface{}) error {
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&obj)
+	if err != nil {
+		return errors.DecodeJSON
+	}
+	defer r.Body.Close()
+	return nil
 }

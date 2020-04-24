@@ -38,18 +38,17 @@ CheckinLoop:
 			c.Failing = false
 			break CheckinLoop
 		case <-time.After(reCheck):
-			log.Infoln(fmt.Sprintf("Checkin %v is expected at %v, checking every %v", c.Name, utils.FormatDuration(c.Expected()), utils.FormatDuration(c.Period())))
+			log.Infoln(fmt.Sprintf("Checkin '%s' expects a request every %v", c.Name, utils.FormatDuration(c.Period())))
 			if c.Expected() <= 0 {
-				issue := fmt.Sprintf("Checkin %v is failing, no request since %v", c.Name, lastHit.CreatedAt)
-				log.Errorln(issue)
+				issue := fmt.Sprintf("Checkin '%s' is failing, no request since %v", c.Name, lastHit.CreatedAt)
+				//log.Errorln(issue)
 
 				fail := &failures.Failure{
-					Issue:     issue,
-					Method:    "checkin",
-					Service:   c.ServiceId,
-					Checkin:   c.Id,
-					PingTime:  c.Expected().Milliseconds(),
-					CreatedAt: time.Time{},
+					Issue:    issue,
+					Method:   "checkin",
+					Service:  c.ServiceId,
+					Checkin:  c.Id,
+					PingTime: c.Expected().Milliseconds(),
 				}
 
 				c.CreateFailure(fail)

@@ -17,15 +17,6 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, basePath, http.StatusSeeOther)
 }
 
-func helpHandler(w http.ResponseWriter, r *http.Request) {
-	if !IsUser(r) {
-		http.Redirect(w, r, basePath, http.StatusSeeOther)
-		return
-	}
-	help := source.HelpMarkdown()
-	ExecuteResponse(w, r, "help.gohtml", help, nil)
-}
-
 func logsHandler(w http.ResponseWriter, r *http.Request) {
 	utils.LockLines.Lock()
 	logs := make([]string, 0)
@@ -101,7 +92,7 @@ func apiThemeSaveHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiThemeCreateHandler(w http.ResponseWriter, r *http.Request) {
-	dir := utils.Directory
+	dir := utils.Params.GetString("STATPING_DIR")
 	utils.Log.Infof("creating assets in folder: %s/%s", dir, "assets")
 	if err := source.CreateAllAssets(dir); err != nil {
 		log.Errorln(err)
@@ -194,6 +185,7 @@ func apiLoginHandler(w http.ResponseWriter, r *http.Request) {
 	form := parseForm(r)
 	username := form.Get("username")
 	password := form.Get("password")
+
 	user, auth := users.AuthUser(username, password)
 	if auth {
 		utils.Log.Infoln(fmt.Sprintf("User %v logged in from IP %v", user.Username, r.RemoteAddr))

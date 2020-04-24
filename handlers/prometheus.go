@@ -40,7 +40,7 @@ func hex2int(hexStr string) uint64 {
 
 func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 	promValues = []string{}
-	prefix = utils.Getenv("PREFIX", "").(string)
+	prefix = utils.Params.GetString("PREFIX")
 	if prefix != "" {
 		prefix = prefix + "_"
 	}
@@ -59,10 +59,6 @@ func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 	PrometheusKeyValue("total_failures", len(allFails))
 	PrometheusKeyValue("total_services", len(services.Services()))
 	PrometheusKeyValue("seconds_online", secondsOnline)
-
-	if secondsOnline < 5 {
-		return
-	}
 
 	for _, ser := range services.AllInOrder() {
 		online := 1

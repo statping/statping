@@ -9,6 +9,7 @@ import (
 	"github.com/russross/blackfriday/v2"
 	"github.com/statping/statping/utils"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -42,10 +43,13 @@ func scssRendered(name string) string {
 
 // CompileSASS will attempt to compile the SASS files into CSS
 func CompileSASS(files ...string) error {
-	sassBin := utils.Getenv("SASS", "sass").(string)
+	sassBin, err := exec.LookPath("sass")
+	if err != nil {
+		return err
+	}
 
 	for _, file := range files {
-		scssFile := fmt.Sprintf("%v/assets/%v", utils.Directory, file)
+		scssFile := fmt.Sprintf("%v/assets/%v", utils.Params.GetString("STATPING_DIR"), file)
 
 		log.Infoln(fmt.Sprintf("Compiling SASS %v into %v", scssFile, scssRendered(scssFile)))
 
@@ -57,10 +61,10 @@ func CompileSASS(files ...string) error {
 			return errors.Wrapf(err, "failed to compile assets, %s %s %s", err, stdout, stderr)
 		}
 
-		if stdout != "" || stderr != "" {
-			log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v %v %v", err, stdout, stderr))
-			return errors.Wrap(err, "failed to capture stdout or stderr")
-		}
+		//if stdout != "" || stderr != "" {
+		//	log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v %v %v", err, stdout, stderr))
+		//	return errors.Wrap(err, "failed to capture stdout or stderr")
+		//}
 
 		if stdout != "" || stderr != "" {
 			log.Infoln(fmt.Sprintf("out: %v | error: %v", stdout, stderr))
@@ -75,7 +79,7 @@ func UsingAssets(folder string) bool {
 	if _, err := os.Stat(folder + "/assets"); err == nil {
 		return true
 	} else {
-		useAssets := utils.Getenv("USE_ASSETS", false).(bool)
+		useAssets := utils.Params.GetBool("USE_ASSETS")
 
 		if useAssets {
 			log.Infoln("Environment variable USE_ASSETS was found.")
@@ -137,9 +141,6 @@ func CreateAllAssets(folder string) error {
 	CopyToPublic(TmplBox, "", "robots.txt")
 	CopyToPublic(TmplBox, "", "banner.png")
 	CopyToPublic(TmplBox, "", "favicon.ico")
-	CopyToPublic(TmplBox, "files", "swagger.json")
-	CopyToPublic(TmplBox, "files", "postman.json")
-	CopyToPublic(TmplBox, "files", "grafana.json")
 	log.Infoln("Compiling CSS from SCSS style...")
 	err := CompileSASS(DefaultScss...)
 	log.Infoln("Statping assets have been inserted")
@@ -161,11 +162,8 @@ func DeleteAllAssets(folder string) error {
 func CopyAllToPublic(box *rice.Box) error {
 
 	exclude := map[string]bool{
-		"base.gohtml":  true,
-		"index.html":   true,
-		"swagger.json": true,
-		"postman.json": true,
-		"grafana.json": true,
+		"base.gohtml": true,
+		"index.html":  true,
 	}
 
 	err := box.Walk("/", func(path string, info os.FileInfo, err error) error {

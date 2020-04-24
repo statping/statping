@@ -10,7 +10,7 @@ PUBLISH_BODY='{ "request": { "branch": "master", "message": "Homebrew update ver
 TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "merge_mode": "replace", "language": "go", "go": 1.14, "install": true, "sudo": "required", "services": ["docker"], "env": { "secure": "${TRVIS_SECRET}" }, "before_deploy": ["git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [{ "provider": "releases", "api_key": "$$GITHUB_TOKEN", "file_glob": true, "file": "build/*", "skip_cleanup": true, "on": { "branch": "master" } }], "before_script": ["rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install stable", "nvm install 10.17.0", "nvm use 10.17.0 --default", "npm install -g sass yarn cross-env", "pip install --user awscli"], "script": ["make release"], "after_success": [], "after_deploy": ["make post-release"] } } }'
 TEST_DIR=$(GOPATH)/src/github.com/statping/statping
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
-OS = darwin freebsd linux openbsd
+OS = freebsd linux openbsd
 ARCHS = 386 arm amd64 arm64
 
 all: clean yarn-install compile docker-base docker-vue build-all
@@ -39,7 +39,7 @@ release: test-deps
 	make build-all
 
 test-ci: clean compile test-deps
-	SASS=`which sass` go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
+	DB_CONN=sqlite go test -v -covermode=count -coverprofile=coverage.out -p=1 ./...
 	goveralls -coverprofile=coverage.out -service=travis-ci -repotoken ${COVERALLS}
 
 cypress: clean
@@ -85,7 +85,7 @@ db-up:
 	docker-compose -f dev/docker-compose.db.yml up -d --remove-orphans
 
 db-down:
-	docker-compose -f dev/docker-compose.full.yml down --remove-orphans
+	docker-compose -f dev/docker-compose.db.yml down --volumes --remove-orphans
 
 console:
 	docker exec -t -i statping /bin/sh
@@ -151,30 +151,44 @@ install-local: build
 generate:
 	cd source && go generate
 
-build-bin:
-	mkdir build
+build-linux:
+	mkdir build || true
 	export PWD=`pwd`
 	@for arch in $(ARCHS);\
 	do \
 		for os in $(OS);\
 		do \
-			echo "Building $$os-$$arch"; \
+			echo "Building v$$VERSION for $$os-$$arch"; \
 			mkdir -p releases/statping-$$os-$$arch/; \
-			GO111MODULE="on" GOOS=$$os GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-$$os-$$arch/statping ${PWD}/cmd; \
-			chmod +x releases/statping-$$os-$$arch/statping; \
-			tar -czf releases/statping-$$os-$$arch.tar.gz -C releases/statping-$$os-$$arch statping; \
+			GO111MODULE="on" GOOS=$$os GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-$$os-$$arch/statping ${PWD}/cmd || true; \
+			chmod +x releases/statping-$$os-$$arch/statping || true; \
+			tar -czf releases/statping-$$os-$$arch.tar.gz -C releases/statping-$$os-$$arch statping || true; \
 		done \
 	done
 	find ./releases/ -name "*.tar.gz" -type f -size +1M -exec mv "{}" build/ \;
 
-build-win:
+build-mac:
+	mkdir build || true
 	export PWD=`pwd`
 	@for arch in $(ARCHS);\
 	do \
-		echo "Building windows-$$arch"; \
+		echo "Building v$$VERSION for darwin-$$arch"; \
+		mkdir -p releases/statping-darwin-$$arch/; \
+		GO111MODULE="on" GOOS=darwin GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-darwin-$$arch/statping ${PWD}/cmd || true; \
+		chmod +x releases/statping-darwin-$$arch/statping || true; \
+		tar -czf releases/statping-darwin-$$arch.tar.gz -C releases/statping-darwin-$$arch statping || true; \
+	done
+	find ./releases/ -name "*.tar.gz" -type f -size +1M -exec mv "{}" build/ \;
+
+build-win:
+	mkdir build || true
+	export PWD=`pwd`
+	@for arch in $(ARCHS);\
+	do \
+		echo "Building v$$VERSION for windows-$$arch"; \
 		mkdir -p releases/statping-windows-$$arch/; \
-		GO111MODULE="on" GOOS=windows GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-windows-$$arch/statping.exe ${PWD}/cmd; \
-		chmod +x releases/statping-windows-$$arch/statping.exe; \
+		GO111MODULE="on" GOOS=windows GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-windows-$$arch/statping.exe ${PWD}/cmd || true; \
+		chmod +x releases/statping-windows-$$arch/statping.exe || true; \
 		zip -j releases/statping-windows-$$arch.zip releases/statping-windows-$$arch/statping.exe || true; \
 	done
 	find ./releases/ -name "*.zip" -type f -size +1M -exec mv "{}" build/ \;
@@ -193,15 +207,14 @@ clean:
 	rm -rf frontend/{logs,plugins,*.db,config.yml,.sass-cache,*.log}
 	rm -rf dev/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log,test/app,plugin/*.so}
 	rm -rf {parts,prime,snap,stage}
-	rm -rf dev/test/cypress/videos
+	rm -rf frontend/cypress/videos
 	rm -f coverage.* sass
-	rm -f source/rice-box.go
 	rm -rf **/*.db-journal
 	rm -rf *.snap
 	find . -name "*.out" -type f -delete
 	find . -name "*.cpu" -type f -delete
 	find . -name "*.mem" -type f -delete
-	rm -rf {build,releases,tmp}
+	rm -rf {build,releases,tmp,source/build,snap}
 
 print_details:
 	@echo \==== Statping Development Instance ====
@@ -219,7 +232,7 @@ print_details:
 	@echo \==== Monitoring and IDE ====
 	@echo \Grafana:             http://localhost:3000  \(username: admin, password: admin\)
 
-build-all: clean compile build-bin build-win
+build-all: clean compile build-linux build-mac build-win
 
 coverage: test-deps
 	$(GOPATH)/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $(COVERALLS)
@@ -232,22 +245,24 @@ download-key:
 	wget -O statping.gpg $(SIGN_URL)
 	gpg --import statping.gpg
 
-# build :latest docker tag
-docker-build-latest:
-	docker build --build-arg VERSION=${VERSION} -t statping/statping:latest --no-cache -f Dockerfile .
-	docker tag statping/statping:latest statping/statping:v${VERSION}
-
 # push the :dev docker tag using curl
-publish-dev:
-	curl -H "Content-Type: application/json" --data '{"docker_tag": "dev"}' -X POST $(DOCKER)
+dockerhub-dev:
+	docker build --build-arg VERSION=${VERSION} -t statping/statping:dev --no-cache -f Dockerfile.base .
+	docker push statping/statping:dev
 
-publish-latest: publish-base
-	curl -H "Content-Type: application/json" --data '{"docker_tag": "latest"}' -X POST $(DOCKER)
+dockerhub:
+	docker build --build-arg VERSION=${VERSION} -t statping/statping:base --no-cache -f Dockerfile.base .
+	docker build --build-arg VERSION=${VERSION} -t statping/statping:latest --no-cache -f Dockerfile .
+	docker tag statping/statping statping/statping:v${VERSION}
+	docker push statping/statping:base
+	docker push statping/statping:v${VERSION}
+	docker push statping/statping
 
-publish-base:
-	curl -H "Content-Type: application/json" --data '{"docker_tag": "base"}' -X POST $(DOCKER)
+docker-build-dev:
+	docker build --build-arg VERSION=${VERSION} -t hunterlong/statping:latest --no-cache -f Dockerfile .
+	docker tag hunterlong/statping:dev hunterlong/statping:dev-v${VERSION}
 
-post-release: frontend-build upload_to_s3 publish-homebrew publish-latest
+post-release: frontend-build upload_to_s3 publish-homebrew dockerhub
 
 # update the homebrew application to latest for mac
 publish-homebrew:
@@ -274,20 +289,28 @@ sentry-release:
 	sentry-cli releases set-commits --auto v${VERSION}
 	sentry-cli releases finalize v${VERSION}
 
-snapcraft: clean compile build-bin
+snapcraft: clean compile build-linux
+	mkdir snap
+	mv snapcraft.yaml snap/
 	PWD=$(shell pwd)
-	snapcraft clean statping -s pull
+	snapcraft clean statping
 	docker run --rm -v ${PWD}/build/statping-linux-amd64.tar.gz:/build/statping-linux.tar.gz -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=amd64"
-	snapcraft clean statping -s pull
+	snapcraft clean statping
 	docker run --rm -v ${PWD}/build/statping-linux-386.tar.gz:/build/statping-linux.tar.gz -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=i386"
-	snapcraft clean statping -s pull
+	snapcraft clean statping
 	docker run --rm -v ${PWD}/build/statping-linux-arm64.tar.gz:/build/statping-linux.tar.gz -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=arm64"
-	snapcraft clean statping -s pull
-	docker run --rm -v ${PWD}/build/statping-linux-arm.tar.gz:/build/statping-linux.tar.gz -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=armhf"
+	snapcraft clean statping
+	docker run --rm -v ${PWD}/build/statping-linux-arm.tar.gz:/build/statping-linux.tar.gz -w /build --env VERSION=${VERSION} snapcore/snapcraft bash -c "apt update && snapcraft --target-arch=arm"
 	snapcraft push statping_${VERSION}_amd64.snap --release stable
 	snapcraft push statping_${VERSION}_arm64.snap --release stable
 	snapcraft push statping_${VERSION}_i386.snap --release stable
-	snapcraft push statping_${VERSION}_armhf.snap --release stable
+	snapcraft push statping_${VERSION}_arm.snap --release stable
 
-.PHONY: all build build-all build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-bin build-win build-all
+postman: clean compile
+	API_SECRET=demosecret123 statping --port=8080 > /dev/null &
+	sleep 3
+	newman run -e dev/postman_environment.json dev/postman.json
+	killall statping
+
+.PHONY: all build build-all build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds

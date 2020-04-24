@@ -1,9 +1,45 @@
 package handlers
 
 import (
+	"github.com/statping/statping/types/groups"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
+
+func TestUnAuthenticatedGroupRoutes(t *testing.T) {
+	tests := []HTTPTest{
+		{
+			Name:           "No Authentication - New Group",
+			URL:            "/api/groups",
+			Method:         "POST",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "No Authentication - Update Group",
+			URL:            "/api/groups/1",
+			Method:         "POST",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "No Authentication - Delete Group",
+			URL:            "/api/groups/1",
+			Method:         "DELETE",
+			ExpectedStatus: 401,
+			BeforeTest:     UnsetTestENV,
+		},
+	}
+
+	for _, v := range tests {
+		t.Run(v.Name, func(t *testing.T) {
+			str, t, err := RunHTTPTest(v, t)
+			t.Logf("Test %s: \n %v\n", v.Name, str)
+			assert.Nil(t, err)
+		})
+	}
+}
 
 func TestGroupAPIRoutes(t *testing.T) {
 	tests := []HTTPTest{
@@ -48,6 +84,14 @@ func TestGroupAPIRoutes(t *testing.T) {
 			ExpectedStatus: 200,
 		},
 		{
+			Name:             "Incorrect JSON POST",
+			URL:              "/api/groups",
+			Body:             BadJSON,
+			ExpectedContains: []string{BadJSONResponse},
+			Method:           "POST",
+			ExpectedStatus:   422,
+		},
+		{
 			Name:           "Statping Public and Private Groups",
 			URL:            "/api/groups",
 			Method:         "GET",
@@ -87,13 +131,34 @@ func TestGroupAPIRoutes(t *testing.T) {
 			ExpectedStatus: 404,
 		},
 		{
-			Name:           "Statping Delete Group",
-			URL:            "/api/groups/1",
-			Method:         "DELETE",
-			ExpectedStatus: 200,
-			AfterTest:      UnsetTestENV,
-			SecureRoute:    true,
-		}}
+			Name:   "Statping Update Group",
+			URL:    "/api/groups/1",
+			Method: "POST",
+			Body: `{
+					"name": "Updated Group",
+					"public": false
+					}`,
+			ExpectedStatus:   200,
+			ExpectedContains: []string{Success, MethodUpdate},
+			BeforeTest:       SetTestENV,
+			SecureRoute:      true,
+			AfterTest: func(t *testing.T) error {
+				g, err := groups.Find(1)
+				require.Nil(t, err)
+				assert.Equal(t, "Updated Group", g.Name)
+				return nil
+			},
+		},
+		{
+			Name:             "Statping Delete Group",
+			URL:              "/api/groups/1",
+			Method:           "DELETE",
+			ExpectedStatus:   200,
+			ExpectedContains: []string{Success, MethodDelete},
+			AfterTest:        UnsetTestENV,
+			SecureRoute:      true,
+		},
+	}
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {

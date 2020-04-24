@@ -2,18 +2,29 @@ package handlers
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/groups"
 	"github.com/statping/statping/utils"
 	"net/http"
 )
 
-func selectGroup(r *http.Request) (*groups.Group, error) {
+func findGroup(r *http.Request) (*groups.Group, error) {
 	vars := mux.Vars(r)
+	if utils.NotNumber(vars["id"]) {
+		return nil, errors.NotNumber
+	}
 	id := utils.ToInt(vars["id"])
+	if id == 0 {
+		return nil, errors.IDMissing
+	}
 	g, err := groups.Find(id)
 	if err != nil {
 		return nil, err
+	}
+	if !g.Public.Bool {
+		if !IsReadAuthenticated(r) {
+			return nil, errors.NotAuthenticated
+		}
 	}
 	return g, nil
 }
@@ -26,9 +37,9 @@ func apiAllGroupHandler(r *http.Request) interface{} {
 
 // apiGroupHandler will show a single group
 func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
-	group, err := selectGroup(r)
+	group, err := findGroup(r)
 	if err != nil {
-		sendErrorJson(errors.Wrap(err, "group not found"), w, r, http.StatusNotFound)
+		sendErrorJson(err, w, r)
 		return
 	}
 	returnJson(group, w, r)
@@ -36,10 +47,9 @@ func apiGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 // apiGroupUpdateHandler will update a group
 func apiGroupUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	group, err := selectGroup(r)
+	group, err := findGroup(r)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		sendErrorJson(errors.Wrap(err, "group not found"), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
 
@@ -74,9 +84,9 @@ func apiCreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 // apiGroupDeleteHandler accepts a DELETE method to delete groups
 func apiGroupDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	group, err := selectGroup(r)
+	group, err := findGroup(r)
 	if err != nil {
-		sendErrorJson(errors.Wrap(err, "group not found"), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
 

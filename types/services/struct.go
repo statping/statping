@@ -4,6 +4,7 @@ import (
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/utils"
 	"time"
 )
 
@@ -38,6 +39,7 @@ type Service struct {
 	GroupId             int                 `gorm:"default:0;column:group_id" json:"group_id"`
 	Headers             null.NullString     `gorm:"column:headers" json:"headers" scope:"user,admin"`
 	Permalink           null.NullString     `gorm:"column:permalink" json:"permalink"`
+	Redirect            null.NullBool       `gorm:"default:false;column:redirect" json:"redirect" scope:"user,admin"`
 	CreatedAt           time.Time           `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt           time.Time           `gorm:"column:updated_at" json:"updated_at"`
 	Online              bool                `gorm:"-" json:"online"`
@@ -81,8 +83,8 @@ type Stats struct {
 // BeforeCreate for Service will set CreatedAt to UTC
 func (s *Service) BeforeCreate() (err error) {
 	if s.CreatedAt.IsZero() {
-		s.CreatedAt = time.Now().UTC()
-		s.UpdatedAt = time.Now().UTC()
+		s.CreatedAt = utils.Now()
+		s.UpdatedAt = utils.Now()
 	}
 	return
 }

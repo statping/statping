@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/services"
@@ -41,12 +40,11 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	decoder := json.NewDecoder(r.Body)
-	err = decoder.Decode(&notifer)
-	if err != nil {
+	if err := DecodeJSON(r, &notifer); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
+
 	err = notifer.Update()
 	if err != nil {
 		sendErrorJson(err, w, r)
@@ -64,9 +62,7 @@ func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	decoder := json.NewDecoder(r.Body)
-	err = decoder.Decode(&notifer)
-	if err != nil {
+	if err := DecodeJSON(r, &notifer); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}

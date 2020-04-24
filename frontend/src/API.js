@@ -12,6 +12,11 @@ class Api {
 
   }
 
+  async oauth() {
+    const oauth = axios.get('api/oauth').then(response => (response.data))
+    return oauth
+  }
+
   async core() {
     const core = axios.get('api').then(response => (response.data))
     if (core.allow_reports) {
@@ -198,7 +203,7 @@ class Api {
   }
 
   async logs() {
-    return axios.get('api/logs').then(response => (response.data))
+    return axios.get('api/logs').then(response => (response.data)) || []
   }
 
   async logs_last() {

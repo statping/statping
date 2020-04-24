@@ -92,6 +92,7 @@ type Database interface {
 
 	// extra
 	Error() error
+	Status() int
 	RowsAffected() int64
 
 	Since(time.Time) Database
@@ -156,7 +157,10 @@ type Db struct {
 // Openw is a drop-in replacement for Open()
 func Openw(dialect string, args ...interface{}) (db Database, err error) {
 	gorm.NowFunc = func() time.Time {
-		return time.Now().UTC()
+		return utils.Now()
+	}
+	if dialect == "sqlite" {
+		dialect = "sqlite3"
 	}
 	gormdb, err := gorm.Open(dialect, args...)
 	if err != nil {
@@ -167,22 +171,36 @@ func Openw(dialect string, args ...interface{}) (db Database, err error) {
 }
 
 func OpenTester() (Database, error) {
-	testDB := utils.Getenv("TEST_DB", "sqlite3").(string)
-	var dbParamsstring string
+	testDB := utils.Params.GetString("DB_CONN")
+	var dbString string
+
 	switch testDB {
 	case "mysql":
-		dbParamsstring = fmt.Sprintf("root:password123@tcp(localhost:3306)/statping?charset=utf8&parseTime=True&loc=UTC&time_zone=%%27UTC%%27")
+		dbString = fmt.Sprintf("%s:%s@tcp(%s:%v)/%s?charset=utf8&parseTime=True&loc=UTC&time_zone=%%27UTC%%27",
+			utils.Params.GetString("DB_HOST"),
+			utils.Params.GetString("DB_PASS"),
+			utils.Params.GetString("DB_HOST"),
+			utils.Params.GetInt("DB_PORT"),
+			utils.Params.GetString("DB_DATABASE"),
+		)
 	case "postgres":
-		dbParamsstring = fmt.Sprintf("host=localhost port=5432 user=root dbname=statping password=password123 timezone=UTC")
+		dbString = fmt.Sprintf("host=%s port=%v user=%s dbname=%s password=%s sslmode=disable timezone=UTC",
+			utils.Params.GetString("DB_HOST"),
+			utils.Params.GetInt("DB_PORT"),
+			utils.Params.GetString("DB_USER"),
+			utils.Params.GetString("DB_DATABASE"),
+			utils.Params.GetString("DB_PASS"))
 	default:
-		dbParamsstring = fmt.Sprintf("file:%s?mode=memory&cache=shared", utils.RandomString(12))
+		dbString = fmt.Sprintf("file:%s?mode=memory&cache=shared", utils.RandomString(12))
 	}
-	fmt.Println(testDB, dbParamsstring)
-	newDb, err := Openw(testDB, dbParamsstring)
+	newDb, err := Openw(testDB, dbString)
 	if err != nil {
 		return nil, err
 	}
 	newDb.DB().SetMaxOpenConns(1)
+	if testDB != "sqlite3" {
+		newDb.DB().SetMaxOpenConns(25)
+	}
 	return newDb, err
 }
 
@@ -488,6 +506,34 @@ func (it *Db) RowsAffected() int64 {
 
 func (it *Db) Error() error {
 	return it.Database.Error
+}
+
+func (it *Db) Status() int {
+	switch it.Database.Error {
+	case gorm.ErrRecordNotFound:
+		return 404
+	case gorm.ErrCantStartTransaction:
+		return 422
+	case gorm.ErrInvalidSQL:
+		return 500
+	case gorm.ErrUnaddressable:
+		return 500
+	default:
+		return 500
+	}
+}
+
+func (it *Db) Loggable() bool {
+	switch it.Database.Error {
+	case gorm.ErrCantStartTransaction:
+		return true
+	case gorm.ErrInvalidSQL:
+		return true
+	case gorm.ErrUnaddressable:
+		return true
+	default:
+		return false
+	}
 }
 
 func (it *Db) Since(ago time.Time) Database {

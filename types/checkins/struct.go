@@ -32,6 +32,8 @@ type CheckinHit struct {
 }
 
 func (c *Checkin) BeforeCreate() (err error) {
-	c.ApiKey = utils.RandomString(7)
+	if c.ApiKey == "" {
+		c.ApiKey = utils.RandomString(7)
+	}
 	return nil
 }

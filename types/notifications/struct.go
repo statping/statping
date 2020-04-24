@@ -23,7 +23,7 @@ type Notification struct {
 	Var2        string        `gorm:"not null;column:var2" json:"var2,omitempty"`
 	ApiKey      string        `gorm:"not null;column:api_key" json:"api_key,omitempty"`
 	ApiSecret   string        `gorm:"not null;column:api_secret" json:"api_secret,omitempty"`
-	Enabled     null.NullBool `gorm:"column:enabled;type:boolean;default:false" json:"enabled"`
+	Enabled     null.NullBool `gorm:"column:enabled;type:boolean;default:false" json:"enabled,omitempty"`
 	Limits      int           `gorm:"not null;column:limits" json:"limits"`
 	Removable   bool          `gorm:"column:removable" json:"removable"`
 	CreatedAt   time.Time     `gorm:"column:created_at" json:"created_at"`

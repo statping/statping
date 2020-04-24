@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/getsentry/sentry-go"
@@ -18,7 +19,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"os"
 	"strings"
 	"testing"
 )
@@ -34,13 +34,6 @@ func init() {
 	core.New("test")
 }
 
-//func TestResetDatabase(t *testing.T) {
-//	err := core.TmpRecords("handlers.db")
-//	t.Log(err)
-//	require.Nil(t, err)
-//	require.NotNil(t, core.CoreApp)
-//}
-
 func TestFailedHTTPServer(t *testing.T) {
 	err := RunHTTPServer("missinghost", 0)
 	assert.Error(t, err)
@@ -48,12 +41,12 @@ func TestFailedHTTPServer(t *testing.T) {
 
 func TestSetupRoutes(t *testing.T) {
 	form := url.Values{}
-	form.Add("db_host", "")
-	form.Add("db_user", "")
-	form.Add("db_password", "")
-	form.Add("db_database", "")
-	form.Add("db_connection", "sqlite")
-	form.Add("db_port", "")
+	form.Add("db_host", utils.Params.GetString("DB_HOST"))
+	form.Add("db_user", utils.Params.GetString("DB_USER"))
+	form.Add("db_password", utils.Params.GetString("DB_PASS"))
+	form.Add("db_database", utils.Params.GetString("DB_DATABASE"))
+	form.Add("db_connection", utils.Params.GetString("DB_CONN"))
+	form.Add("db_port", utils.Params.GetString("DB_PORT"))
 	form.Add("project", "Tester")
 	form.Add("username", "admin")
 	form.Add("password", "password123")
@@ -61,6 +54,21 @@ func TestSetupRoutes(t *testing.T) {
 	form.Add("description", "This is an awesome test")
 	form.Add("domain", "http://localhost:8080")
 	form.Add("email", "info@statping.com")
+
+	badForm := url.Values{}
+	badForm.Add("db_host", "badconnection")
+	badForm.Add("db_user", utils.Params.GetString("DB_USER"))
+	badForm.Add("db_password", utils.Params.GetString("DB_PASS"))
+	badForm.Add("db_database", utils.Params.GetString("DB_DATABASE"))
+	badForm.Add("db_connection", "mysql")
+	badForm.Add("db_port", utils.Params.GetString("DB_PORT"))
+	badForm.Add("project", "Tester")
+	badForm.Add("username", "admin")
+	badForm.Add("password", "password123")
+	badForm.Add("sample_data", "on")
+	badForm.Add("description", "This is an awesome test")
+	badForm.Add("domain", "http://localhost:8080")
+	badForm.Add("email", "info@statping.com")
 
 	tests := []HTTPTest{
 		{
@@ -76,13 +84,22 @@ func TestSetupRoutes(t *testing.T) {
 			},
 		},
 		{
-			Name:           "Statping Run Setup",
-			URL:            "/api/setup",
-			Method:         "POST",
-			Body:           form.Encode(),
-			ExpectedStatus: 200,
-			HttpHeaders:    []string{"Content-Type=application/x-www-form-urlencoded"},
-			ExpectedFiles:  []string{dir + "/config.yml", dir + "/" + "statping.db"},
+			Name:             "Statping Error Setup",
+			URL:              "/api/setup",
+			Method:           "POST",
+			Body:             badForm.Encode(),
+			ExpectedStatus:   500,
+			ExpectedContains: []string{BadJSONDatabase},
+			HttpHeaders:      []string{"Content-Type=application/x-www-form-urlencoded"},
+		},
+		{
+			Name:   "Statping Run Setup",
+			URL:    "/api/setup",
+			Method: "POST",
+			Body:   form.Encode(),
+			//ExpectedStatus: 200,
+			HttpHeaders:   []string{"Content-Type=application/x-www-form-urlencoded"},
+			ExpectedFiles: []string{utils.Directory + "/config.yml"},
 			FuncTest: func(t *testing.T) error {
 				if !core.App.Setup {
 					return errors.New("core has not been setup")
@@ -99,7 +116,8 @@ func TestSetupRoutes(t *testing.T) {
 				return nil
 			},
 			AfterTest: StopServices,
-		}}
+		},
+	}
 
 	for _, v := range tests {
 		t.Run(v.Name, func(t *testing.T) {
@@ -113,6 +131,7 @@ func TestSetupRoutes(t *testing.T) {
 }
 
 func TestMainApiRoutes(t *testing.T) {
+	date := utils.Now().Format("2006-01")
 	tests := []HTTPTest{
 		{
 			Name:             "Statping Details",
@@ -134,6 +153,15 @@ func TestMainApiRoutes(t *testing.T) {
 			ExpectedStatus: 200,
 			BeforeTest:     SetTestENV,
 			SecureRoute:    true,
+		},
+		{
+			Name:           "Statping View Cache",
+			URL:            "/api/cache",
+			Method:         "GET",
+			ExpectedStatus: 200,
+			BeforeTest:     SetTestENV,
+			SecureRoute:    true,
+			ResponseLen:    0,
 		},
 		{
 			Name:           "Statping Clear Cache",
@@ -172,18 +200,48 @@ func TestMainApiRoutes(t *testing.T) {
 			Method:         "GET",
 			ExpectedStatus: 404,
 		},
-		//{
-		//	Name:           "Prometheus Export Metrics",
-		//	URL:            "/metrics",
-		//	Method:         "GET",
-		//	BeforeTest: SetTestENV,
-		//	ExpectedStatus: 200,
-		//	ExpectedContains: []string{
-		//		`Statping Totals`,
-		//		`total_failures`,
-		//		`Golang Metrics`,
-		//	},
-		//},
+		{
+			Name:             "Health Check endpoint",
+			URL:              "/health",
+			Method:           "GET",
+			ExpectedStatus:   200,
+			ExpectedContains: []string{`"online":true`, `"setup":true`},
+		},
+		{
+			Name:             "Logs endpoint",
+			URL:              "/api/logs",
+			Method:           "GET",
+			ExpectedStatus:   200,
+			GreaterThan:      20,
+			ExpectedContains: []string{date},
+		},
+		{
+			Name:             "Logs endpoint",
+			URL:              "/api/logs",
+			Method:           "GET",
+			ExpectedStatus:   200,
+			GreaterThan:      20,
+			ExpectedContains: []string{date},
+		},
+		{
+			Name:             "Logs Last Line endpoint",
+			URL:              "/api/logs/last",
+			Method:           "GET",
+			ExpectedStatus:   200,
+			ExpectedContains: []string{date},
+		},
+		{
+			Name:           "Prometheus Export Metrics",
+			URL:            "/metrics",
+			Method:         "GET",
+			BeforeTest:     SetTestENV,
+			ExpectedStatus: 200,
+			ExpectedContains: []string{
+				`Statping Totals`,
+				`total_failures`,
+				`Golang Metrics`,
+			},
+		},
 	}
 
 	for _, v := range tests {
@@ -196,6 +254,8 @@ func TestMainApiRoutes(t *testing.T) {
 }
 
 type HttpFuncTest func(*testing.T) error
+
+type ResponseFunc func(*testing.T, []byte) error
 
 // HTTPTest contains all the parameters for a HTTP Unit Test
 type HTTPTest struct {
@@ -211,8 +271,11 @@ type HTTPTest struct {
 	FuncTest            HttpFuncTest
 	BeforeTest          HttpFuncTest
 	AfterTest           HttpFuncTest
+	ResponseFunc        ResponseFunc
 	ResponseLen         int
+	GreaterThan         int
 	SecureRoute         bool
+	Skip                bool
 }
 
 func logTest(t *testing.T, err error) error {
@@ -228,6 +291,9 @@ func logTest(t *testing.T, err error) error {
 
 // RunHTTPTest accepts a HTTPTest type to execute the HTTP request
 func RunHTTPTest(test HTTPTest, t *testing.T) (string, *testing.T, error) {
+	if test.Skip {
+		t.SkipNow()
+	}
 	if test.BeforeTest != nil {
 		if err := test.BeforeTest(t); err != nil {
 			return "", t, logTest(t, err)
@@ -240,6 +306,13 @@ func RunHTTPTest(test HTTPTest, t *testing.T) (string, *testing.T, error) {
 	}
 	defer rr.Result().Body.Close()
 
+	if test.ExpectedStatus != 0 {
+		if test.ExpectedStatus != rr.Result().StatusCode {
+			assert.Equal(t, test.ExpectedStatus, rr.Result().StatusCode)
+			return "", t, fmt.Errorf("status code %v does not match %v", rr.Result().StatusCode, test.ExpectedStatus)
+		}
+	}
+
 	body, err := ioutil.ReadAll(rr.Result().Body)
 	if err != nil {
 		assert.Nil(t, err)
@@ -248,10 +321,6 @@ func RunHTTPTest(test HTTPTest, t *testing.T) (string, *testing.T, error) {
 
 	stringBody := string(body)
 
-	if test.ExpectedStatus != rr.Result().StatusCode {
-		assert.Equal(t, test.ExpectedStatus, rr.Result().StatusCode)
-		return stringBody, t, fmt.Errorf("status code %v does not match %v", rr.Result().StatusCode, test.ExpectedStatus)
-	}
 	if len(test.ExpectedContains) != 0 {
 		for _, v := range test.ExpectedContains {
 			assert.Contains(t, stringBody, v)
@@ -271,21 +340,24 @@ func RunHTTPTest(test HTTPTest, t *testing.T) (string, *testing.T, error) {
 		err := test.FuncTest(t)
 		assert.Nil(t, err)
 	}
+	if test.ResponseFunc != nil {
+		err := test.ResponseFunc(t, body)
+		assert.Nil(t, err)
+	}
+
 	if test.ResponseLen != 0 {
 		var respArray []interface{}
 		err := json.Unmarshal(body, &respArray)
 		assert.Nil(t, err)
 		assert.Equal(t, test.ResponseLen, len(respArray))
 	}
-	//if test.SecureRoute {
-	//	UnsetTestENV()
-	//	rec, err := Request(test)
-	//	if err != nil {
-	//		return "", t, logTest(t, err)
-	//	}
-	//	defer rec.Result().Body.Close()
-	//	assert.Equal(t, http.StatusUnauthorized, rec.Result().StatusCode)
-	//}
+
+	if test.GreaterThan != 0 {
+		var respArray []interface{}
+		err := json.Unmarshal(body, &respArray)
+		assert.Nil(t, err)
+		assert.GreaterOrEqual(t, len(respArray), test.GreaterThan)
+	}
 
 	if test.AfterTest != nil {
 		if err := test.AfterTest(t); err != nil {
@@ -312,11 +384,13 @@ func Request(test HTTPTest) (*httptest.ResponseRecorder, error) {
 }
 
 func SetTestENV(t *testing.T) error {
-	return os.Setenv("GO_ENV", "test")
+	utils.Params.Set("GO_ENV", "test")
+	return nil
 }
 
 func UnsetTestENV(t *testing.T) error {
-	return os.Setenv("GO_ENV", "production")
+	utils.Params.Set("GO_ENV", "production")
+	return nil
 }
 
 func StopServices(t *testing.T) error {
@@ -325,3 +399,20 @@ func StopServices(t *testing.T) error {
 	}
 	return nil
 }
+
+func basicAuth(username, password string) string {
+	auth := username + ":" + password
+	return base64.StdEncoding.EncodeToString([]byte(auth))
+}
+
+var (
+	Success = `"status":"success"`
+
+	MethodCreate = `"method":"create"`
+	MethodUpdate = `"method":"update"`
+	MethodDelete = `"method":"delete"`
+
+	BadJSON         = `{incorrect: JSON %%% formatting, [&]}`
+	BadJSONResponse = `{"error":"could not decode incoming JSON"}`
+	BadJSONDatabase = `{"error":"error connecting to database`
+)
