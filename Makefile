@@ -11,6 +11,7 @@ TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master 
 TEST_DIR=$(GOPATH)/src/github.com/statping/statping
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 ARCHS = 386 arm amd64 arm64
+ARM_ARCHS = arm arm64
 
 all: clean yarn-install compile docker-base docker-vue build-all
 
@@ -181,6 +182,19 @@ build-linux:
 		echo "Building v${VERSION} for linux-$$arch"; \
 		mkdir -p releases/statping-linux-$$arch/; \
 		GO111MODULE="on" GOOS=linux GOARCH=$$arch go build -a -tags "osusergo netgo" -ldflags "-X main.VERSION=${VERSION} -linkmode external -extldflags -static" -buildmode=pie -o releases/statping-linux-$$arch/statping ${PWD}/cmd || true; \
+		chmod +x releases/statping-linux-$$arch/statping || true; \
+		tar -czf releases/statping-linux-$$arch.tar.gz -C releases/statping-linux-$$arch statping || true; \
+	done
+	find ./releases/ -name "*.tar.gz" -type f -size +1M -exec mv "{}" build/ \;
+
+build-linux-arm:
+	mkdir build || true
+	export PWD=`pwd`
+	@for arch in $(ARM_ARCHS);\
+	do \
+		echo "Building v${VERSION} for linux-$$arch"; \
+		mkdir -p releases/statping-linux-$$arch/; \
+		GO111MODULE="on" GOOS=linux GOARCH=$$arch go build -a -ldflags -buildmode=pie -o releases/statping-linux-$$arch/statping ${PWD}/cmd || true; \
 		chmod +x releases/statping-linux-$$arch/statping || true; \
 		tar -czf releases/statping-linux-$$arch.tar.gz -C releases/statping-linux-$$arch statping || true; \
 	done

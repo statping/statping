@@ -268,7 +268,7 @@ jobs:
           COMMIT: $GITHUB_SHA
         run: |
           go env
-          make build-linux
+          make build-linux build-linux-arm
 
       - name: Upload Linux Builds
         uses: actions/upload-artifact@v1
