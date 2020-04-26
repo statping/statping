@@ -48,7 +48,7 @@ jobs:
           name: static-rice-box
           path: ./source
 
-  test:
+  pr-test:
     needs: compile
     runs-on: ubuntu-latest
 
@@ -116,8 +116,9 @@ jobs:
           API_KEY: demopassword123
           DISABLE_LOGS: true
           ALLOW_REPORTS: true
+          PUSH_REQUEST: true
 
-  test-postman:
+  pr-test-postman:
     needs: compile
     runs-on: ubuntu-latest
     steps:
