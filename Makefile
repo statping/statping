@@ -10,6 +10,7 @@ PUBLISH_BODY='{ "request": { "branch": "master", "message": "Homebrew update ver
 TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "merge_mode": "replace", "language": "go", "go": 1.14, "install": true, "sudo": "required", "services": ["docker"], "env": { "secure": "${TRVIS_SECRET}" }, "before_deploy": ["git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [{ "provider": "releases", "api_key": "$$GITHUB_TOKEN", "file_glob": true, "file": "build/*", "skip_cleanup": true, "on": { "branch": "master" } }], "before_script": ["rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install stable", "nvm install 10.17.0", "nvm use 10.17.0 --default", "npm install -g sass yarn cross-env", "pip install --user awscli"], "script": ["make release"], "after_success": [], "after_deploy": ["make post-release"] } } }'
 TEST_DIR=$(GOPATH)/src/github.com/statping/statping
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
+OS = freebsd linux openbsd
 ARCHS = 386 arm amd64 arm64
 
 all: clean yarn-install compile docker-base docker-vue build-all
@@ -150,38 +151,19 @@ install-local: build
 generate:
 	cd source && go generate
 
-#docker-manifest:
-#	for arch in $(ARCHS);\
-#	do \
-#		echo "Docker build v${VERSION} for linux-$$arch"; \
-#		docker build -t statping/statping:v${VERSION}-$$arch --build-arg VERSION=${VERSION} --build-arg ARCH=$$arch .; \
-#		docker push statping/statping:v${VERSION}-$$arch; \
-#	done
-#	docker manifest create statping/statping:v${VERSION} statping/statping:v${VERSION}-amd64 statping/statping:v${VERSION}-386 statping/statping:v${VERSION}-arm statping/statping:v${VERSION}-arm64
-#	for arch in $(ARCHS);\
-#	do \
-#		echo "Docker Manifest v${VERSION} for linux-$$arch"; \
-#		docker manifest annotate --os linux --arch $$arch statping/statping:v${VERSION}-$$arch; \
-#	done
-#	docker manifest push statping/statping:v${VERSION}
-#    docker manifest create statping/statping:latest statping/statping:v${VERSION}-amd64 statping/statping:v${VERSION}-386 statping/statping:v${VERSION}-arm statping/statping:v${VERSION}-arm64
-#	for arch in $(ARCHS);\
-#	do \
-#		echo "Docker Manifest v${VERSION} for linux-$$arch"; \
-#		docker manifest annotate --os linux --arch $$arch statping/statping:v${VERSION}-$$arch; \
-#	done
-#	docker manifest push statping/statping:latest
-
 build-linux:
 	mkdir build || true
 	export PWD=`pwd`
 	@for arch in $(ARCHS);\
 	do \
-		echo "Building v${VERSION} for linux-$$arch"; \
-		mkdir -p releases/statping-linux-$$arch/; \
-		GO111MODULE="on" GOOS=linux GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -linkmode external -extldflags -static" -o releases/statping-linux-$$arch/statping ${PWD}/cmd || true; \
-		chmod +x releases/statping-linux-$$arch/statping || true; \
-		tar -czf releases/statping-linux-$$arch.tar.gz -C releases/statping-linux-$$arch statping || true; \
+		for os in $(OS);\
+		do \
+			echo "Building v$$VERSION for $$os-$$arch"; \
+			mkdir -p releases/statping-$$os-$$arch/; \
+			GO111MODULE="on" GOOS=$$os GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-$$os-$$arch/statping ${PWD}/cmd || true; \
+			chmod +x releases/statping-$$os-$$arch/statping || true; \
+			tar -czf releases/statping-$$os-$$arch.tar.gz -C releases/statping-$$os-$$arch statping || true; \
+		done \
 	done
 	find ./releases/ -name "*.tar.gz" -type f -size +1M -exec mv "{}" build/ \;
 
@@ -190,9 +172,9 @@ build-mac:
 	export PWD=`pwd`
 	@for arch in $(ARCHS);\
 	do \
-		echo "Building v${VERSION} for darwin-$$arch"; \
+		echo "Building v$$VERSION for darwin-$$arch"; \
 		mkdir -p releases/statping-darwin-$$arch/; \
-		GO111MODULE="on" GOOS=darwin GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION}" -o releases/statping-darwin-$$arch/statping ${PWD}/cmd || true; \
+		GO111MODULE="on" GOOS=darwin GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-darwin-$$arch/statping ${PWD}/cmd || true; \
 		chmod +x releases/statping-darwin-$$arch/statping || true; \
 		tar -czf releases/statping-darwin-$$arch.tar.gz -C releases/statping-darwin-$$arch statping || true; \
 	done
@@ -203,9 +185,9 @@ build-win:
 	export PWD=`pwd`
 	@for arch in $(ARCHS);\
 	do \
-		echo "Building v${VERSION} for windows-$$arch"; \
+		echo "Building v$$VERSION for windows-$$arch"; \
 		mkdir -p releases/statping-windows-$$arch/; \
-		GO111MODULE="on" GOOS=windows GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION}" -o releases/statping-windows-$$arch/statping.exe ${PWD}/cmd || true; \
+		GO111MODULE="on" GOOS=windows GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-windows-$$arch/statping.exe ${PWD}/cmd || true; \
 		chmod +x releases/statping-windows-$$arch/statping.exe || true; \
 		zip -j releases/statping-windows-$$arch.zip releases/statping-windows-$$arch/statping.exe || true; \
 	done

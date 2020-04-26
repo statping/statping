@@ -28,7 +28,7 @@ func Samples() error {
 }
 
 func createHitsAt(db database.Database, serviceID int64) database.Database {
-	log.Infoln(fmt.Sprintf("Adding Sample records to service #%d", serviceID))
+	log.Infoln(fmt.Sprintf("Adding Sample records to service #%d...", serviceID))
 
 	createdAt := utils.Now().Add(-3 * types.Day)
 	p := utils.NewPerlin(2, 2, 5, utils.Now().UnixNano())

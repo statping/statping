@@ -185,6 +185,7 @@ func apiLoginHandler(w http.ResponseWriter, r *http.Request) {
 	form := parseForm(r)
 	username := form.Get("username")
 	password := form.Get("password")
+
 	user, auth := users.AuthUser(username, password)
 	if auth {
 		utils.Log.Infoln(fmt.Sprintf("User %v logged in from IP %v", user.Username, r.RemoteAddr))
