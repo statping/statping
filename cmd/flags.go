@@ -6,12 +6,12 @@ import (
 )
 
 func parseFlags(cmd *cobra.Command) {
-	cmd.PersistentFlags().StringVarP(&ipAddress, "ip", "s", "0.0.0.0", "server port")
+	cmd.PersistentFlags().StringVarP(&ipAddress, "ip", "s", "0.0.0.0", "server run on host")
 	viper.BindPFlag("ip", cmd.PersistentFlags().Lookup("ip"))
 
 	cmd.PersistentFlags().IntVarP(&port, "port", "p", 8080, "server port")
 	viper.BindPFlag("port", cmd.PersistentFlags().Lookup("port"))
 
-	cmd.PersistentFlags().IntVarP(&verboseMode, "verbose", "v", 2, "server port")
+	cmd.PersistentFlags().IntVarP(&verboseMode, "verbose", "v", 2, "verbose logging")
 	viper.BindPFlag("verbose", cmd.PersistentFlags().Lookup("verbose"))
 }

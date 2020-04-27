@@ -23,7 +23,6 @@ var (
 	COMMIT    string
 	ipAddress string
 	//grpcPort    int
-	envFile     string
 	verboseMode int
 	port        int
 	log         = utils.Log.WithField("type", "cmd")
