@@ -129,8 +129,6 @@ func CreateAllAssets(folder string) error {
 	MakePublicFolder(fp(folder, "assets", "js"))
 	MakePublicFolder(fp(folder, "assets", "css"))
 	MakePublicFolder(fp(folder, "assets", "scss"))
-	MakePublicFolder(fp(folder, "assets", "font"))
-	MakePublicFolder(fp(folder, "assets", "files"))
 	log.Infoln("Inserting scss, css, and javascript files into assets folder")
 
 	if err := CopyAllToPublic(TmplBox); err != nil {

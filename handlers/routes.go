@@ -51,6 +51,7 @@ func Router() *mux.Router {
 
 		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("css"))))
 		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("js"))))
+		r.PathPrefix("/scss/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("scss"))))
 		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, indexHandler))
 		r.PathPrefix("/favicon.ico").Handler(http.StripPrefix(basePath, indexHandler))
 		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, indexHandler))
