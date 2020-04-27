@@ -1,3 +1,6 @@
+# Upcoming
+- Fixed incomplete Alert mail ([#471](https://github.com/statping/statping/issues/472))
+
 # 0.90.33 (04-24-2020)
 - Fixed config loading method
 
