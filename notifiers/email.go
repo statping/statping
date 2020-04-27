@@ -155,9 +155,14 @@ type emailOutgoing struct {
 	Subject  string
 	Template string
 	From     string
-	Data     interface{}
+	Data     emailData
 	Source   string
 	Sent     bool
+}
+
+type emailData struct {
+	Service services.Service
+	Failure failures.Failure
 }
 
 // OnFailure will trigger failing service
@@ -166,8 +171,11 @@ func (e *emailer) OnFailure(s *services.Service, f *failures.Failure) error {
 		To:       e.Var2,
 		Subject:  fmt.Sprintf("Service %v is Failing", s.Name),
 		Template: mainEmailTemplate,
-		Data:     ToMap(s, f),
-		From:     e.Var1,
+		Data: emailData{
+			Service: *s,
+			Failure: *f,
+		},
+		From: e.Var1,
 	}
 	return e.dialSend(email)
 }
@@ -179,15 +187,18 @@ func (e *emailer) OnSuccess(s *services.Service) error {
 		To:       e.Var2,
 		Subject:  msg,
 		Template: mainEmailTemplate,
-		Data:     ToMap(s, nil),
-		From:     e.Var1,
+		Data: emailData{
+			Service: *s,
+			Failure: failures.Failure{},
+		},
+		From: e.Var1,
 	}
 	return e.dialSend(email)
 }
 
 // OnTest triggers when this notifier has been saved
 func (e *emailer) OnTest() (string, error) {
-	testService := &services.Service{
+	testService := services.Service{
 		Id:             1,
 		Name:           "Example Service",
 		Domain:         "https://www.youtube.com/watch?v=-u6DvRyyKGU",
@@ -206,8 +217,11 @@ func (e *emailer) OnTest() (string, error) {
 		To:       e.Var2,
 		Subject:  subject,
 		Template: mainEmailTemplate,
-		Data:     testService,
-		From:     e.Var1,
+		Data: emailData{
+			Service: testService,
+			Failure: failures.Failure{},
+		},
+		From: e.Var1,
 	}
 	err := e.dialSend(email)
 	return subject, err
