@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"github.com/ararog/timeago"
 	"io"
 	"io/ioutil"
 	"net"
@@ -15,6 +14,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/ararog/timeago"
 )
 
 var (
@@ -234,6 +235,7 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: !verifySSL,
 			ServerName:         verifyHost,
+			Renegotiation:      tls.RenegotiateOnceAsClient,
 		},
 		DisableKeepAlives:     true,
 		ResponseHeaderTimeout: timeout,
