@@ -1,7 +1,6 @@
 version: '2.3'
 
 services:
-
   statping:
     container_name: statping
     image: statping/statping:latest
@@ -12,3 +11,6 @@ services:
       DB_CONN: sqlite
     ports:
       - 8080:8080
+
+volumes:
+  statping_data:
