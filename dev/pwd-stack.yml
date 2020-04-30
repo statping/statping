@@ -7,14 +7,43 @@ services:
     image: statping/statping
     ports:
       - 8080:8080
+    networks:
+      - backend
+    volumes:
+      - /root/statping:/app
     environment:
       PORT: 8080
-      SERVICES: '[{"name": "Local Statping", "type": "http", "domain": "http://localhost:8585", "interval": 30}]'
-      DB_CONN: sqlite
-      API_KEY: exampleapikey
       API_SECRET: exampleapisecret
       NAME: Statping on SQLite
       DOMAIN: http://localhost:8080
       DESCRIPTION: This is a dev environment on SQLite!
       ADMIN_USER: admin
       ADMIN_PASS: admin
+
+  postgres:
+    hostname: postgres
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: statping
+      POSTGRES_USER: root
+    networks:
+      - backend
+    volumes:
+      - /root/postgres:/var/lib/postgresql/data
+
+  mysql:
+    hostname: mysql
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: password123
+      MYSQL_DATABASE: statping
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password123
+    networks:
+      - backend
+    volumes:
+      - /root/mysql:/var/lib/mysql
+
+networks:
+  backend:

@@ -40,9 +40,7 @@ func Connect(configs *DbConfig, retry bool) error {
 		}
 	}
 
-	apiKey := p.GetString("API_KEY")
 	apiSecret := p.GetString("API_SECRET")
-	configs.ApiKey = apiKey
 	configs.ApiSecret = apiSecret
 
 	log.WithFields(utils.ToFields(dbSession)).Debugln("connected to database")

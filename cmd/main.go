@@ -153,15 +153,11 @@ func sigterm() {
 
 // mainProcess will initialize the Statping application and run the HTTP server
 func mainProcess() error {
-	if err := services.ServicesFromEnvFile(); err != nil {
-		errStr := "error 'SERVICE' environment variable"
-		log.Errorln(errStr)
-		return errors.Wrap(err, errStr)
-	}
-
 	if err := InitApp(); err != nil {
 		return err
 	}
+
+	services.LoadServicesYaml()
 
 	if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
 		log.Fatalln(err)

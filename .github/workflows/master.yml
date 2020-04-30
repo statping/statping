@@ -113,7 +113,7 @@ jobs:
           VERSION: ${{ env.VERSION }}
           DB_CONN: sqlite3
           STATPING_DIR: ${{ github.workspace }}
-          API_KEY: demopassword123
+          API_SECRET: demopassword123
           DISABLE_LOGS: true
           ALLOW_REPORTS: true
           COVERALLS: ${{ secrets.COVERALLS }}

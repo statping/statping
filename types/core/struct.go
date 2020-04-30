@@ -23,7 +23,6 @@ type Core struct {
 	Name          string          `gorm:"not null;column:name" json:"name,omitempty"`
 	Description   string          `gorm:"not null;column:description" json:"description,omitempty"`
 	ConfigFile    string          `gorm:"column:config" json:"-"`
-	ApiKey        string          `gorm:"column:api_key" json:"api_key" scope:"admin"`
 	ApiSecret     string          `gorm:"column:api_secret" json:"api_secret" scope:"admin"`
 	Style         string          `gorm:"not null;column:style" json:"style,omitempty"`
 	Footer        null.NullString `gorm:"column:footer" json:"footer"`

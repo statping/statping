@@ -30,7 +30,6 @@ context('Notifier Tests', () => {
     cy.visit('/dashboard/settings')
     cy.get('#notifiers_tabs > a').should('have.length', 10)
 
-    cy.get('#api_key').should('not.have.value', '')
     cy.get('#api_secret').should('not.have.value', '')
   })
 

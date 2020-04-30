@@ -80,6 +80,7 @@ func Router() *mux.Router {
 	api.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
 	api.Handle("/api/core", authenticated(apiCoreHandler, false)).Methods("POST")
 	api.Handle("/api/oauth", scoped(apiOAuthHandler)).Methods("GET")
+	api.Handle("/api/oauth/{provider}", http.HandlerFunc(oauthHandler))
 	api.Handle("/api/logs", authenticated(logsHandler, false)).Methods("GET")
 	api.Handle("/api/logs/last", authenticated(logsLineHandler, false)).Methods("GET")
 
