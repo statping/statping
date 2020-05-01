@@ -16,7 +16,7 @@ var (
 )
 
 func staticAssets(src string) http.Handler {
-	return http.StripPrefix(basePath+src+"/", http.FileServer(http.Dir(utils.Directory+"/assets/"+src)))
+	return http.StripPrefix(src+"/", http.FileServer(http.Dir(utils.Directory+"/assets/"+src)))
 }
 
 // Router returns all of the routes used in Statping.

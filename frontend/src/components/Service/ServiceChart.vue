@@ -176,7 +176,6 @@
             }
               this.data = await Api.service_hits(this.service.id, start, end, group, false)
 
-            window.console.log(this.data === null && group !== "5m")
               if (this.data === null && group !== "5m") {
                   await this.chartHits("10m")
               }
