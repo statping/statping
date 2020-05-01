@@ -17,7 +17,6 @@ func Samples() error {
 	core := &Core{
 		Name:        "Statping Sample Data",
 		Description: "This data is only used to testing",
-		ApiKey:      apiKey,
 		ApiSecret:   apiSecret,
 		Domain:      "http://localhost:8080",
 		CreatedAt:   utils.Now(),

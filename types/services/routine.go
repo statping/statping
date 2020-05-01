@@ -232,8 +232,6 @@ func CheckHttp(s *Service, record bool) *Service {
 		headers = strings.Split(s.Headers.String, ",")
 	} else {
 		headers = nil
-		log.Warnf("Custom set Headers are not valid for Server '%s'!\n",
-			s.Name)
 	}
 
 	// check if 'Content-Type' header was defined

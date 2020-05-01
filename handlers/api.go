@@ -38,7 +38,6 @@ func apiIndexHandler(r *http.Request) interface{} {
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
-	core.App.ApiKey = utils.NewSHA256Hash()
 	core.App.ApiSecret = utils.NewSHA256Hash()
 	err = core.App.Update()
 	if err != nil {
