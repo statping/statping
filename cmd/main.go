@@ -121,6 +121,10 @@ func start() {
 			if err := configs.TriggerSamples(); err != nil {
 				exit(errors.Wrap(err, "error creating database"))
 			}
+		} else {
+			if err := core.Samples(); err != nil {
+				exit(errors.Wrap(err, "error added core details"))
+			}
 		}
 
 	}

@@ -159,12 +159,15 @@ export default {
         smallText(s) {
           const incidents = s.incidents
             if (s.online) {
-                return `Online, last checked ${this.ago(s.last_success)}`
+                return `Checked ${this.ago(s.last_success)} ago and responded in ${this.humanTime(s.latency)}`
             } else {
                 const last = s.last_failure
                 if (last) {
                     return `Offline, last error: ${last} ${this.ago(last.created_at)}`
                 }
+              if (!this.toUnix(s.last_success)) {
+                return `Service has never been online`
+              }
                 return `Offline`
             }
         },

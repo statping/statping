@@ -6,30 +6,35 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type ServicesYaml struct {
-	Services []Service `yaml:"services,flow"`
+type yamlFile struct {
+	Services []*Service `yaml:"services,flow"`
 }
 
 // LoadServicesYaml will attempt to load the 'services.yml' file for Service Auto Creation on startup.
-func LoadServicesYaml() (*ServicesYaml, error) {
-	f, err := utils.OpenFile("services.yml")
+func LoadServicesYaml() (*yamlFile, error) {
+	f, err := utils.OpenFile(utils.Directory + "/services.yml")
 	if err != nil {
 		return nil, err
 	}
 
-	var svrs *ServicesYaml
+	var svrs *yamlFile
 	if err := yaml.Unmarshal([]byte(f), &svrs); err != nil {
+		log.Errorln("Unable to parse the services.yml file", err)
 		return nil, err
 	}
 
+	log.Infof("Found %d services inside services.yml file", len(svrs.Services))
+
 	for _, svr := range svrs.Services {
+		log.Infof("Service %s %d, hash: %s", svr.Name, svr.Id, svr.Hash())
 		if findServiceByHash(svr.Hash()) == nil {
 			if err := svr.Create(); err != nil {
 				return nil, errors.Wrapf(err, "could not create service %s", svr.Name)
 			}
 			log.Infof("Automatically created service '%s' checking %s", svr.Name, svr.Domain)
-		}
 
+			go ServiceCheckQueue(svr, true)
+		}
 	}
 
 	return svrs, nil

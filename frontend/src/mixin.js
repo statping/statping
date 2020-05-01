@@ -73,11 +73,11 @@ export default Vue.mixin({
       });
     },
     serviceLink(service) {
-      if (!service) {
-        return ""
+      if (service.permalink) {
+        service = this.$store.getters.serviceByPermalink(service)
       }
-      if (!service.id) {
-        service = this.$store.getters.serviceById(service)
+      if (service===undefined) {
+        return `/service/0`
       }
       let link = service.permalink ? service.permalink : service.id
       return `/service/${link}`
