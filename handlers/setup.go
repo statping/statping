@@ -78,7 +78,6 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	c := &core.Core{
 		Name:        project,
 		Description: description,
-		ApiKey:      utils.Params.GetString("API_KEY"),
 		ApiSecret:   utils.Params.GetString("API_SECRET"),
 		Domain:      domain,
 		Version:     core.App.Version,

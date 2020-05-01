@@ -29,7 +29,6 @@ context('Settings Tests', () => {
     cy.visit('/dashboard/settings')
     cy.get('#notifiers_tabs > a').should('have.length', 10)
 
-    cy.get('#api_key').should('not.have.value', '')
     cy.get('#api_secret').should('not.have.value', '')
   })
 
@@ -50,7 +49,6 @@ context('Settings Tests', () => {
     cy.get('#description').should('have.value', 'Statping can use Cypress e2e testing to make it more stable!')
     cy.get('#domain').should('have.value', 'http://localhost:8888')
     cy.get('#footer').should('have.value', 'Statping Custom Footer')
-    cy.get('#api_key').should('not.have.value', '')
     cy.get('#api_secret').should('not.have.value', '')
   })
 

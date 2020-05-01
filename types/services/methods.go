@@ -8,12 +8,9 @@ import (
 	"github.com/statping/statping/types"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
-	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/utils"
-	"net/url"
 	"sort"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -231,57 +228,6 @@ func SelectAllServices(start bool) (map[int64]*Service, error) {
 	}
 
 	return allServices, nil
-}
-
-func ValidateService(line string) (*Service, error) {
-	p, err := url.Parse(line)
-	if err != nil {
-		return nil, err
-	}
-	newService := new(Service)
-
-	domain := p.Host
-	newService.Name = niceDomainName(domain, p.Path)
-	if p.Port() != "" {
-		newService.Port = int(utils.ToInt(p.Port()))
-		if p.Scheme != "http" && p.Scheme != "https" {
-			domain = strings.ReplaceAll(domain, ":"+p.Port(), "")
-		}
-	}
-	newService.Domain = domain
-
-	switch p.Scheme {
-	case "http", "https":
-		newService.Type = "http"
-		newService.Method = "get"
-		if p.Scheme == "https" {
-			newService.VerifySSL = null.NewNullBool(true)
-		}
-	default:
-		newService.Type = p.Scheme
-	}
-	return newService, nil
-}
-
-func niceDomainName(domain string, paths string) string {
-	domain = strings.ReplaceAll(domain, "www.", "")
-	splitPath := strings.Split(paths, "/")
-	if len(splitPath) == 1 {
-		return domain
-	}
-	var addedName []string
-	for k, p := range splitPath {
-		if k > 2 {
-			break
-		}
-		if len(p) > 16 {
-			addedName = append(addedName, p+"...")
-			break
-		} else {
-			addedName = append(addedName, p)
-		}
-	}
-	return domain + strings.Join(addedName, "/")
 }
 
 func (s *Service) UpdateStats() *Service {

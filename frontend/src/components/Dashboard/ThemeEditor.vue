@@ -9,28 +9,15 @@
                 </div>
         </div>
     <form v-if="loaded && directory" @submit.prevent="saveAssets" :disabled="pending">
-        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-            <li class="nav-item col text-center">
-                <a @click.prevent="changeTab('vars')" class="nav-link" :class="{active: tab === 'vars'}" id="pills-vars-tab" data-toggle="pill" href="#pills-vars" role="tab" aria-controls="pills-vars" aria-selected="true">Variables</a>
-            </li>
-            <li class="nav-item col text-center">
-                <a @click.prevent="changeTab('base')" class="nav-link" :class="{active: tab === 'base'}" id="pills-base-tab" data-toggle="pill" href="#pills-base" role="tab" aria-controls="pills-base" aria-selected="false">Base Theme</a>
-            </li>
-            <li class="nav-item col text-center">
-                <a @click.prevent="changeTab('mobile')" class="nav-link" :class="{active: tab === 'mobile'}" id="pills-mobile-tab" data-toggle="pill" href="#pills-mobile" role="tab" aria-controls="pills-mobile" aria-selected="false">Mobile</a>
-            </li>
-        </ul>
-        <div class="tab-content" id="pills-tabContent">
-            <div class="tab-pane show" :class="{active: tab === 'vars'}" id="pills-vars" role="tabpanel" aria-labelledby="pills-vars-tab">
-                <codemirror v-if="loaded && tab === 'vars'" v-model="vars" ref="vars" :options="cmOptions" class="codemirrorInput"/>
-            </div>
-            <div class="tab-pane show" :class="{active: tab === 'base'}" id="pills-base" role="tabpanel" aria-labelledby="pills-base-tab">
-                <codemirror v-if="loaded && tab === 'base'" v-model="base" ref="base" :options="cmOptions" class="codemirrorInput"/>
-            </div>
-            <div class="tab-pane show" :class="{active: tab === 'mobile'}" id="pills-mobile" role="tabpanel" aria-labelledby="pills-mobile-tab">
-                <codemirror v-if="loaded && tab === 'mobile'" v-model="mobile" ref="mobile" :options="cmOptions" class="codemirrorInput"/>
-            </div>
-        </div>
+        <h3>Variables</h3>
+        <codemirror v-show="loaded" v-model="vars" ref="vars" :options="cmOptions" class="codemirrorInput"/>
+
+        <h3 class="mt-3">Base Theme</h3>
+        <codemirror v-show="loaded" v-model="base" ref="base" :options="cmOptions" class="codemirrorInput"/>
+
+        <h3 class="mt-3">Mobile Overwrites</h3>
+        <codemirror v-show="loaded" v-model="mobile" ref="mobile" :options="cmOptions" class="codemirrorInput"/>
+
         <div v-if="error" class="alert alert-danger mt-3" style="white-space: pre-line;">{{error}}</div>
 
         <button id="save_assets" @submit.prevent="saveAssets" type="submit" class="btn btn-primary btn-block mt-2" :disabled="pending">{{pending ? "Saving..." : "Save Style"}}</button>
@@ -66,16 +53,16 @@
       },
       data () {
           return {
-              base: "",
-              vars: "",
-              mobile: "",
+              base: null,
+              vars: null,
+              mobile: null,
               error: null,
               directory: null,
               tab: "vars",
               loaded: false,
               pending: false,
               cmOptions: {
-                  height: 600,
+                  height: 700,
                   tabSize: 4,
                   lineNumbers: true,
                   matchBrackets: true,

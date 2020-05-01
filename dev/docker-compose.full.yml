@@ -27,7 +27,6 @@ services:
 #      VIRTUAL_PORT: 8888
 #      GO_ENV: test
 #      DB_CONN: sqlite
-#      API_KEY: exampleapikey
 #      API_SECRET: exampleapisecret
 #      NAME: Statping on SQLite
 #      DOMAIN: http://localhost:4000
@@ -59,7 +58,6 @@ services:
       VIRTUAL_HOST: sqlite.dev.statping.com
       VIRTUAL_PORT: 8080
       DB_CONN: sqlite
-      API_KEY: exampleapikey
       API_SECRET: exampleapisecret
       NAME: Statping on SQLite
       DOMAIN: http://localhost:4000
@@ -96,7 +94,6 @@ services:
       DB_DATABASE: statping
       DB_USER: root
       DB_PASS: password123
-      API_KEY: exampleapikey
       API_SECRET: exampleapisecret
       NAME: Statping on MySQL
       DOMAIN: http://localhost:4005
@@ -134,7 +131,6 @@ services:
       DB_DATABASE: statping
       DB_USER: root
       DB_PASS: password123
-      API_KEY: exampleapikey
       API_SECRET: exampleapisecret
       NAME: Statping on Postgres
       DOMAIN: http://localhost:4010

@@ -113,7 +113,7 @@ jobs:
           VERSION: ${{ env.VERSION }}
           DB_CONN: sqlite3
           STATPING_DIR: ${{ github.workspace }}
-          API_KEY: demopassword123
+          API_SECRET: demopassword123
           DISABLE_LOGS: true
           ALLOW_REPORTS: true
           COVERALLS: ${{ secrets.COVERALLS }}
@@ -182,7 +182,7 @@ jobs:
         uses: matt-ball/newman-action@master
         with:
           postmanApiKey: ${{ secrets.POSTMAN_API }}
-          collection: ./dev/postman.json
+          collection: 1898229-94807b85-ef65-4370-9144-b1a74e04cb0e
           environment: ./dev/postman_environment.json
           timeoutRequest: 15000
           delayRequest: 1000

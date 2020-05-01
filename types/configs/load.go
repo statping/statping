@@ -46,9 +46,6 @@ func LoadConfigFile(directory string) (*DbConfig, error) {
 	if db.Location != "" {
 		p.Set("LOCATION", db.Location)
 	}
-	if db.ApiKey != "" {
-		p.Set("API_KEY", db.ApiKey)
-	}
 	if db.ApiSecret != "" {
 		p.Set("API_SECRET", db.ApiSecret)
 	}

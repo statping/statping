@@ -1,5 +1,7 @@
 # Upcoming
 - Added missing information to Mail notification ([#472](https://github.com/statping/statping/issues/472))
+- Added service.yml file to auto create services (https://github.com/statping/statping/wiki/services.yml)
+- Removed Core API_KEY, (unused code, use API_SECRET)
 
 # 0.90.33 (04-24-2020)
 - Fixed config loading method

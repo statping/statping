@@ -169,11 +169,15 @@
       },
       methods: {
           async chartHits(group) {
-              const start = this.nowSubtract(84600 * 3)
-              this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), group, false)
+              const start = this.toUnix(this.nowSubtract(84600 * 3))
+              const end = this.toUnix(new Date())
+            if (end-start < 283800) {
+              group = "5m"
+            }
+              this.data = await Api.service_hits(this.service.id, start, end, group, false)
 
-              if (this.data.length === 0 && group !== "1h") {
-                  await this.chartHits("1h")
+              if (this.data === null && group !== "5m") {
+                  await this.chartHits("10m")
               }
               this.series = [{
                   name: this.service.name,

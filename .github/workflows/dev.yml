@@ -116,7 +116,7 @@ jobs:
           VERSION: ${{ env.VERSION }}
           DB_CONN: sqlite3
           STATPING_DIR: ${{ github.workspace }}
-          API_KEY: demopassword123
+          API_SECRET: demopassword123
           DISABLE_LOGS: true
           ALLOW_REPORTS: true
           PUSH_REQUEST: true
@@ -160,25 +160,7 @@ jobs:
         uses: matt-ball/newman-action@master
         with:
           postmanApiKey: ${{ secrets.POSTMAN_API }}
-          collection: ./dev/postman.json
+          collection: 1898229-94807b85-ef65-4370-9144-b1a74e04cb0e
           environment: ./dev/postman_environment.json
           timeoutRequest: 15000
           delayRequest: 1000
-
-  pr-slack-update:
-    needs: [pr-test, pr-test-postman]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Statping Repo
-        uses: actions/checkout@v2
-
-      - name: Setting ENV's
-        run: echo ::set-env name=VERSION::$(cat version.txt)
-        shell: bash
-
-      - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2.0.0
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_URL }}
-          SLACK_CHANNEL: pull-requests
-          SLACK_USERNAME: StatpingDev

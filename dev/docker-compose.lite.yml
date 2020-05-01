@@ -19,7 +19,6 @@ services:
       - ./utils:/go/src/github.com/statping/statping/utils/
     environment:
       DB_CONN: sqlite
-      API_KEY: exampleapikey
       API_SECRET: exampleapisecret
       NAME: Statping
       DOMAIN: http://localhost:8585

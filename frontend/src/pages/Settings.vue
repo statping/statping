@@ -68,19 +68,6 @@
                             <div class="card-header">API Settings</div>
                             <div class="card-body">
                                 <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">API Key</label>
-                                    <div class="col-sm-9">
-                                        <div class="input-group">
-                                        <input v-model="core.api_key" type="text" class="form-control" id="api_key" readonly>
-                                            <div class="input-group-append copy-btn">
-                                                <button @click.prevent="copy(core.api_key)" class="btn btn-outline-secondary" type="button">Copy</button>
-                                            </div>
-                                        </div>
-                                        <small class="form-text text-muted">API Key can be used for read only routes</small>
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
                                     <label class="col-sm-3 col-form-label">API Secret</label>
                                     <div class="col-sm-9">
                                         <div class="input-group">

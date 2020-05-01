@@ -8,13 +8,13 @@ import (
 func ReplaceTemplate(tmpl string, data interface{}) string {
 	buf := new(bytes.Buffer)
 
-	slackTemp, err := template.New("replacement").Parse(tmpl)
+	tmp, err := template.New("replacement").Parse(tmpl)
 	if err != nil {
 		Log.Error(err)
 		return err.Error()
 	}
 
-	err = slackTemp.Execute(buf, data)
+	err = tmp.Execute(buf, data)
 	if err != nil {
 		Log.Error(err)
 		return err.Error()
