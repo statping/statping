@@ -37,7 +37,7 @@ func (s NullString) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s.String)
 }
 
-// MarshalJSON for NullInt64
+// MarshalYAML for NullInt64
 func (i NullInt64) MarshalYAML() (interface{}, error) {
 	if !i.Valid {
 		return 0, nil
@@ -45,7 +45,7 @@ func (i NullInt64) MarshalYAML() (interface{}, error) {
 	return yaml.Marshal(i.Int64)
 }
 
-// MarshalJSON for NullFloat64
+// MarshalYAML for NullFloat64
 func (f NullFloat64) MarshalYAML() (interface{}, error) {
 	if !f.Valid {
 		return 0.0, nil
@@ -53,7 +53,7 @@ func (f NullFloat64) MarshalYAML() (interface{}, error) {
 	return yaml.Marshal(f.Float64)
 }
 
-// MarshalJSON for NullBool
+// MarshalYAML for NullBool
 func (bb NullBool) MarshalYAML() (interface{}, error) {
 	if !bb.Valid {
 		return false, nil
@@ -61,7 +61,7 @@ func (bb NullBool) MarshalYAML() (interface{}, error) {
 	return yaml.Marshal(bb.Bool)
 }
 
-// MarshalJSON for NullString
+// MarshalYAML for NullString
 func (s NullString) MarshalYAML() (interface{}, error) {
 	if !s.Valid {
 		return "", nil

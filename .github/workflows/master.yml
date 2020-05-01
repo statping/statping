@@ -182,7 +182,7 @@ jobs:
         uses: matt-ball/newman-action@master
         with:
           postmanApiKey: ${{ secrets.POSTMAN_API }}
-          collection: ./dev/postman.json
+          collection: 1898229-94807b85-ef65-4370-9144-b1a74e04cb0e
           environment: ./dev/postman_environment.json
           timeoutRequest: 15000
           delayRequest: 1000
