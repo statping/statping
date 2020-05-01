@@ -38,7 +38,7 @@ type Service struct {
 	Public              null.NullBool       `gorm:"default:true;column:public" json:"public" yaml:"public"`
 	GroupId             int                 `gorm:"default:0;column:group_id" json:"group_id" yaml:"group_id"`
 	Headers             null.NullString     `gorm:"column:headers" json:"headers" scope:"user,admin" yaml:"headers"`
-	Permalink           null.NullString     `gorm:"column:permalink" json:"permalink" yaml:"permalink"`
+	Permalink           null.NullString     `gorm:"column:permalink;unique;" json:"permalink" yaml:"permalink"`
 	Redirect            null.NullBool       `gorm:"default:false;column:redirect" json:"redirect" scope:"user,admin" yaml:"redirect"`
 	CreatedAt           time.Time           `gorm:"column:created_at" json:"created_at" yaml:"-"`
 	UpdatedAt           time.Time           `gorm:"column:updated_at" json:"updated_at" yaml:"-"`

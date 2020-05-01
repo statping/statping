@@ -41,18 +41,16 @@ func TestCommand(t *testing.T) {
 }
 
 func TestReplaceTemplate(t *testing.T) {
-
 	type Object struct {
 		Id      int64
 		String  string
 		Online  bool
 		Example string
 	}
-	example := &Object{
+	ex := &Object{
 		1, "this is an example", true, "it should work",
 	}
-
-	result := ReplaceTemplate(`{"id": {{.Object.Id}} }`, example)
+	result := ReplaceTemplate(`{"id": {{.Id}} }`, ex)
 	assert.Equal(t, "{\"id\": 1 }", result)
 }
 
