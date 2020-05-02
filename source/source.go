@@ -43,14 +43,14 @@ func scssRendered(name string) string {
 
 // CompileSASS will attempt to compile the SASS files into CSS
 func CompileSASS(files ...string) error {
-	sassBin, err := exec.LookPath("sass")
-	if err != nil {
-		log.Warnf("could not find sass executable in PATH: ", err)
-		return err
-	}
-	sassEnv := utils.Params.GetString("SASS")
-	if sassEnv != "" {
-		sassBin = sassEnv
+	sassBin := utils.Params.GetString("SASS")
+	if sassBin == "" {
+		bin, err := exec.LookPath("sass")
+		if err != nil {
+			log.Warnf("could not find sass executable in PATH: %s", err)
+			return err
+		}
+		sassBin = bin
 	}
 
 	for _, file := range files {
