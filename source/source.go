@@ -66,11 +66,6 @@ func CompileSASS(files ...string) error {
 			return errors.Wrapf(err, "failed to compile assets, %s %s %s", err, stdout, stderr)
 		}
 
-		//if stdout != "" || stderr != "" {
-		//	log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v %v %v", err, stdout, stderr))
-		//	return errors.Wrap(err, "failed to capture stdout or stderr")
-		//}
-
 		if stdout != "" || stderr != "" {
 			log.Infoln(fmt.Sprintf("out: %v | error: %v", stdout, stderr))
 		}
