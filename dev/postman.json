@@ -2,12 +2,12 @@
 	"info": {
 		"_postman_id": "94807b85-ef65-4370-9144-b1a74e04cb0e",
 		"name": "Statping",
-		"description": "Statping API Requests",
+		"description": "The Statping API allows you to programmatically access data on your Statping server.\n\nThe easiest way to get started with the API is by running your own Docker or local instance of the Statping server.\n\n<img width=\"100%\" src=\"https://img.cjx.io/statuptokenbalance.gif\">\n\n# Authentication\n\nAn API Key is required to be sent as part of every request to the Statping API, by using the `Authorization` and the API Secret Key as a header.\n\n> If you do not have an API Secret Key, you can find it on the Settings page.\n\nYou can Authenticate by implementing the following...\n- Using the `Authorization` header with API Secret Key\n- Setting `GO_ENV` to `test` to bypass all authentication\n- Adding `?api=<keyhere>` URL Query along with the API Secret Key\n- Being logged into Statping as an admin (using JWT sessions/cookies)\n\n# Environment Variables\nStatping includes many environment variables that can give you more control over your instance. Please view the [Environment Variables Wiki](https://github.com/statping/statping/wiki/Environment-Variables) page to view a complete list. Below are a couple important ones...\n- `STATPING_DIR` - Statping's working directory. By default, this will be set to the current working directory. This path will contain the `config.yml` file, `logs`, and `assets` folder. \n- `SASS` - Absolute path to the `sass` executable. By default it will attempt to find `sass` in your `$PATH`. \n\n# Demo\nYou can checkout the Statping Demo instance at [https://demo.statping.com](https://demo.statping.com). All features are available for you to experiment with. The API Secret Key is `demoapisecret123`. Since this instance is public, it will be reset with sample data **every 90 minutes**.\n",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Miscellaneous",
+			"name": "Setup",
 			"item": [
 				{
 					"name": "Statping Setup",
@@ -17,6 +17,10 @@
 							"script": {
 								"id": "08b8f487-2318-44b9-bdb8-f1f1041e9462",
 								"exec": [
+									"var tm = Math.round(new Date().getTime()/1000);",
+									"pm.globals.set(\"start_time\", tm-259200);",
+									"pm.globals.set(\"end_time\", tm);",
+									"",
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
@@ -46,8 +50,8 @@
 							{
 								"key": "Content-Type",
 								"name": "Content-Type",
-								"value": "application/x-www-form-urlencoded",
-								"type": "text"
+								"type": "text",
+								"value": "application/x-www-form-urlencoded"
 							}
 						],
 						"body": {
@@ -133,10 +137,39 @@
 								"setup"
 							]
 						},
-						"description": "The root API endpoint to view basic Statping configuration including Name, URL, database type, and other useful fields."
+						"description": "This endpoint will setup the database, users, sample data, and all other elements for a brand new installation of Statping. By default, the admin login is `admin` `admin`, if you don't include a username/password.\n\n###### If the server has already been setup, this endpoint will return an error.\n```json\n{\n    \"error\": \"Statping has already been setup\"\n}\n```\n\n### Database Fields\n- `db_connection` - Database connection type. (sqlite, mysql, postgres)\n- `db_user` - Username for database\n- `db_password` - Password for database\n- `db_database` - Database name for Statping\n- `db_port` - Port number for the database\n- `db_host` - Hostname or IP for the running database server"
 					},
 					"response": []
+				}
+			],
+			"description": "If your Statping instance is not setup yet, then you can set it up by going to `http://localhost:8080/setup` or by using this API endpoint. Once your instance has already been setup successfully, this endpoint will return an error. \n\n<img src=\"https://img.cjx.io/statping-setup.png\">",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3faca200-30d4-4daf-8edf-059bf6b6fbf0",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "a72027a1-280f-4ebf-887d-a19e9866d0ab",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Miscellaneous",
+			"item": [
 				{
 					"name": "Statping Details",
 					"event": [
@@ -184,10 +217,191 @@
 						},
 						"description": "The root API endpoint to view basic Statping configuration including Name, URL, database type, and other useful fields."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Statping Details",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint}}/api",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "398"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 01:06:09 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"admin\": false,\n    \"allow_reports\": false,\n    \"created_at\": \"2020-05-02T01:00:07.885973685Z\",\n    \"description\": \"This data is only used to testing\",\n    \"domain\": \"http://localhost:8080\",\n    \"footer\": null,\n    \"logged_in\": false,\n    \"migration_id\": 1588381207,\n    \"name\": \"Statping Sample Data\",\n    \"setup\": true,\n    \"started_on\": \"2020-05-02T01:00:14.255837864Z\",\n    \"updated_at\": \"2020-05-02T01:00:12.731269305Z\",\n    \"using_cdn\": false,\n    \"version\": \"0.90.34\"\n}"
+						}
+					]
 				},
 				{
-					"name": "Statping Clear Cache",
+					"name": "Health Check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "987cc831-4a88-45ea-a9d5-494d86887fc6",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Check Health\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.online).to.eql(true);",
+									"    pm.expect(jsonData.setup).to.eql(true);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint}}/health",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Check the status of your Statping instance. If everything is healthy, it will return a status code of 200 with the following JSON response."
+					},
+					"response": [
+						{
+							"name": "Statping Health Check",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint}}/health",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"health"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "42"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 01:03:29 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"online\": true,\n    \"services\": 6,\n    \"setup\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "Prometheus Metrics",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2f977982-ef22-4cee-9c38-89ad4777d3e0",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint}}/metrics",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"metrics"
+							]
+						},
+						"description": "Point your Prometheus endpoint to `/metrics`, it will include most data from all elements including golang processes. View more information by checking out the [Prometheus Wiki](https://github.com/statping/statping/wiki/Prometheus-Exporter)."
+					},
+					"response": [
+						{
+							"name": "Prometheus Metrics",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint}}/metrics",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"metrics"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "text/plain; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 01:05:53 GMT"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "# Statping Prometheus Exporter\n\n# Statping Totals\nstatping_total_failures 1617\nstatping_total_services 6\nstatping_seconds_online 347.8779\n\n# Service #1 'Google':\nstatping_service_failures{id=\"1\" name=\"Google\"} 404\nstatping_service_latency{id=\"1\" name=\"Google\"} 115217\nstatping_service_online{id=\"1\" name=\"Google\"} 1\nstatping_service_status_code{id=\"1\" name=\"Google\"} 200\nstatping_service_response_length{id=\"1\" name=\"Google\"} 14366\nstatping_service_ping_time{id=\"1\" name=\"Google\"} 13604\nstatping_service_last_latency{id=\"1\" name=\"Google\"} 115217\nstatping_service_last_lookup{id=\"1\" name=\"Google\"} 13604\nstatping_service_last_check{id=\"1\" name=\"Google\"} 9074\n\n# Service #2 'Statping Github':\nstatping_service_failures{id=\"2\" name=\"Statping Github\"} 407\nstatping_service_latency{id=\"2\" name=\"Statping Github\"} 121795\nstatping_service_online{id=\"2\" name=\"Statping Github\"} 1\nstatping_service_status_code{id=\"2\" name=\"Statping Github\"} 200\nstatping_service_response_length{id=\"2\" name=\"Statping Github\"} 154781\nstatping_service_ping_time{id=\"2\" name=\"Statping Github\"} 14089\nstatping_service_last_latency{id=\"2\" name=\"Statping Github\"} 121795\nstatping_service_last_lookup{id=\"2\" name=\"Statping Github\"} 14089\nstatping_service_last_check{id=\"2\" name=\"Statping Github\"} 8799\n\n# Service #3 'JSON Users Test':\nstatping_service_failures{id=\"3\" name=\"JSON Users Test\"} 403\nstatping_service_latency{id=\"3\" name=\"JSON Users Test\"} 43900\nstatping_service_online{id=\"3\" name=\"JSON Users Test\"} 1\nstatping_service_status_code{id=\"3\" name=\"JSON Users Test\"} 200\nstatping_service_response_length{id=\"3\" name=\"JSON Users Test\"} 5645\nstatping_service_ping_time{id=\"3\" name=\"JSON Users Test\"} 11100\nstatping_service_last_latency{id=\"3\" name=\"JSON Users Test\"} 43900\nstatping_service_last_lookup{id=\"3\" name=\"JSON Users Test\"} 11100\nstatping_service_last_check{id=\"3\" name=\"JSON Users Test\"} 38637\n\n# Service #4 'JSON API Tester':\nstatping_service_failures{id=\"4\" name=\"JSON API Tester\"} 403\nstatping_service_latency{id=\"4\" name=\"JSON API Tester\"} 875234\nstatping_service_online{id=\"4\" name=\"JSON API Tester\"} 1\nstatping_service_status_code{id=\"4\" name=\"JSON API Tester\"} 201\nstatping_service_response_length{id=\"4\" name=\"JSON API Tester\"} 74\nstatping_service_ping_time{id=\"4\" name=\"JSON API Tester\"} 11204\nstatping_service_last_latency{id=\"4\" name=\"JSON API Tester\"} 875234\nstatping_service_last_lookup{id=\"4\" name=\"JSON API Tester\"} 11204\nstatping_service_last_check{id=\"4\" name=\"JSON API Tester\"} 7556\n\n# Service #5 'Google DNS':\nstatping_service_failures{id=\"5\" name=\"Google DNS\"} 0\nstatping_service_latency{id=\"5\" name=\"Google DNS\"} 779\nstatping_service_online{id=\"5\" name=\"Google DNS\"} 1\nstatping_service_status_code{id=\"5\" name=\"Google DNS\"} 0\nstatping_service_response_length{id=\"5\" name=\"Google DNS\"} 0\nstatping_service_ping_time{id=\"5\" name=\"Google DNS\"} 4\nstatping_service_last_latency{id=\"5\" name=\"Google DNS\"} 779\nstatping_service_last_lookup{id=\"5\" name=\"Google DNS\"} 4\nstatping_service_last_check{id=\"5\" name=\"Google DNS\"} 18187\n\n# Service #6 'Private Service':\nstatping_service_failures{id=\"6\" name=\"Private Service\"} 0\nstatping_service_latency{id=\"6\" name=\"Private Service\"} 28960\nstatping_service_online{id=\"6\" name=\"Private Service\"} 1\nstatping_service_status_code{id=\"6\" name=\"Private Service\"} 200\nstatping_service_response_length{id=\"6\" name=\"Private Service\"} 43\nstatping_service_ping_time{id=\"6\" name=\"Private Service\"} 11312\nstatping_service_last_latency{id=\"6\" name=\"Private Service\"} 28960\nstatping_service_last_lookup{id=\"6\" name=\"Private Service\"} 11312\nstatping_service_last_check{id=\"6\" name=\"Private Service\"} 9416\n\n# HTTP Metrics\nstatping_http_errors 0\nstatping_http_requests 0\nstatping_http_bytes 0\nstatping_http_request_milliseconds 0\n\n# Golang Metrics\nstatping_go_heap_allocated 3055024\nstatping_go_total_allocated 471694440\nstatping_go_heap_in_use 5545984\nstatping_go_heap_objects 27102\nstatping_go_heap_idle 60448768\nstatping_go_heap_released 58499072\nstatping_go_heap_frees 8677374\nstatping_go_lookups 0\nstatping_go_system 74531072\nstatping_go_number_gc 186\nstatping_go_number_gc_forced 0\nstatping_go_goroutines 19"
+						}
+					]
+				},
+				{
+					"name": "Clear Cache",
 					"event": [
 						{
 							"listen": "test",
@@ -226,6 +440,183 @@
 							]
 						},
 						"description": "This endpoint will clear all the cache files in your Statping instance. This includes chart data and service views."
+					},
+					"response": [
+						{
+							"name": "Clear Cache",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint}}/api/clear_cache",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"clear_cache"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "21"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 01:06:43 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\"\n}"
+						}
+					]
+				},
+				{
+					"name": "List Cache",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "08b8f487-2318-44b9-bdb8-f1f1041e9462",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint}}/api/cache",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"cache"
+							]
+						},
+						"description": "This endpoint will return all cached API endpoints."
+					},
+					"response": [
+						{
+							"name": "List Cache",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint}}/api/cache",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"cache"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "1631"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 01:06:32 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"url\": \"/api/services/1/failure_data?start=1585789587&end=1588381587&group=24h&fill=true\",\n        \"expiration\": \"2020-05-02T01:06:57.511702322Z\",\n        \"size\": 1541\n    },\n    {\n        \"url\": \"/api/services/1/hits_data?start=1588127787&end=1588381587&group=5m&fill=false\",\n        \"expiration\": \"2020-05-02T01:06:57.808458203Z\",\n        \"size\": 45223\n    },\n    {\n        \"url\": \"/api/services/2/hits_data?start=1588127787&end=1588381587&group=5m&fill=false\",\n        \"expiration\": \"2020-05-02T01:06:57.873815975Z\",\n        \"size\": 45224\n    },\n    {\n        \"url\": \"/api/services/3/hits_data?start=1588127787&end=1588381587&group=5m&fill=false\",\n        \"expiration\": \"2020-05-02T01:06:57.909984136Z\",\n        \"size\": 45088\n    },\n    {\n        \"url\": \"/api/services/2/failure_data?start=1585789587&end=1588381587&group=24h&fill=true\",\n        \"expiration\": \"2020-05-02T01:06:57.48592429Z\",\n        \"size\": 1538\n    },\n    {\n        \"url\": \"/api/services/4/failure_data?start=1585789587&end=1588381587&group=24h&fill=true\",\n        \"expiration\": \"2020-05-02T01:06:57.493425593Z\",\n        \"size\": 1538\n    },\n    {\n        \"url\": \"/api/services/3/failure_data?start=1585789587&end=1588381587&group=24h&fill=true\",\n        \"expiration\": \"2020-05-02T01:06:57.493554858Z\",\n        \"size\": 1538\n    },\n    {\n        \"url\": \"/api/services/5/failure_data?start=1585789587&end=1588381587&group=24h&fill=true\",\n        \"expiration\": \"2020-05-02T01:06:57.511424891Z\",\n        \"size\": 1538\n    },\n    {\n        \"url\": \"/api/services/5/hits_data?start=1588127788&end=1588381588&group=5m&fill=false\",\n        \"expiration\": \"2020-05-02T01:06:58.377413844Z\",\n        \"size\": 45193\n    },\n    {\n        \"url\": \"/api/services/4/hits_data?start=1588127788&end=1588381588&group=5m&fill=false\",\n        \"expiration\": \"2020-05-02T01:06:58.380229692Z\",\n        \"size\": 45198\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Shields.io Badge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9b94f2ee-0918-4bc0-84a2-3b148b76126b",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://img.shields.io/badge/dynamic/json?color=blue&label=Statping Uptime 24/hr&query=$.online_24_hours&url=https://demo.statping.com/api/services/1&suffix=%",
+							"protocol": "https",
+							"host": [
+								"img",
+								"shields",
+								"io"
+							],
+							"path": [
+								"badge",
+								"dynamic",
+								"json"
+							],
+							"query": [
+								{
+									"key": "color",
+									"value": "blue"
+								},
+								{
+									"key": "label",
+									"value": "Statping Uptime 24/hr"
+								},
+								{
+									"key": "query",
+									"value": "$.online_24_hours"
+								},
+								{
+									"key": "url",
+									"value": "https://demo.statping.com/api/services/1"
+								},
+								{
+									"key": "suffix",
+									"value": "%"
+								}
+							]
+						},
+						"description": "You can create custom badges with dynamic information by using [Shields.io](https://shields.io/) and parsing JSON fields with [JSONPath](http://jsonpath.com/). \n\n## Examples\n\n#### Service Uptime Percent\n<img src=\"https://img.shields.io/badge/dynamic/json?color=blue&label=%20Statping%20Uptime&query=%24.online_24_hours&url=https%3A%2F%2Fdemo.statping.com%2Fapi%2Fservices%2F2&suffix=%\">\n\n- URL: [https://demo.statping.com/api/services/2](https://demo.statping.com/api/services/2)\n- JSON Path: `$.online_24_hours`\n- Suffix: `%`\n\n```\nhttps://img.shields.io/badge/dynamic/json?color=blue&label=%20Statping%20Uptime&query=%24.online_24_hours&url=https%3A%2F%2Fdemo.statping.com%2Fapi%2Fservices%2F2&suffix=%\n```\n\n#### Count Services\n<img src=\"https://img.shields.io/badge/dynamic/json?color=purple&label=Demo%20Site&query=%24.services&url=https://demo.statping.com/health&suffix=%20services\">\n\n- URL: [https://demo.statping.com/health](https://demo.statping.com/health)\n- JSON Path: `$.services`\n- Suffix: ` services`\n\n```\nhttps://img.shields.io/badge/dynamic/json?color=purple&label=Demo%20Site&query=%24.services&url=https://demo.statping.com/health&suffix=%20services\n```"
 					},
 					"response": []
 				}
@@ -313,7 +704,44 @@
 						},
 						"description": "View an array of all Services added to your Statping instance."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "All Services",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint}}/api/services",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"services"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 01:07:00 GMT"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"avg_response\": 1234129,\n        \"check_interval\": 10,\n        \"created_at\": \"2020-02-02T01:00:08.103271859Z\",\n        \"failures_24_hours\": 321,\n        \"group_id\": 1,\n        \"id\": 1,\n        \"last_error\": \"2020-05-08T18:20:08.881632603Z\",\n        \"last_success\": \"2020-05-02T01:06:54.035553551Z\",\n        \"latency\": 119927,\n        \"name\": \"Google\",\n        \"online\": true,\n        \"online_24_hours\": 95.35,\n        \"online_7_days\": 95.35,\n        \"order_id\": 1,\n        \"permalink\": \"google\",\n        \"ping_time\": 11034,\n        \"public\": true,\n        \"stats\": {\n            \"failures\": 404,\n            \"hits\": 8683,\n            \"first_hit\": \"2020-04-29T01:00:10.245169916Z\"\n        },\n        \"status_code\": 200,\n        \"updated_at\": \"2020-05-02T01:00:08.103367884Z\"\n    },\n    {\n        \"avg_response\": 1158576,\n        \"check_interval\": 30,\n        \"created_at\": \"2020-02-02T01:00:08.103271859Z\",\n        \"failures_24_hours\": 408,\n        \"group_id\": 0,\n        \"id\": 2,\n        \"last_error\": \"2020-05-02T01:06:44.254597647Z\",\n        \"last_success\": \"2020-05-02T01:06:14.289921794Z\",\n        \"latency\": 88378,\n        \"name\": \"Statping Github\",\n        \"online\": false,\n        \"online_24_hours\": 95.28,\n        \"online_7_days\": 95.28,\n        \"order_id\": 2,\n        \"permalink\": \"statping_github\",\n        \"ping_time\": 11554,\n        \"public\": true,\n        \"stats\": {\n            \"failures\": 408,\n            \"hits\": 8651,\n            \"first_hit\": \"2020-04-29T01:00:10.587232314Z\"\n        },\n        \"status_code\": 406,\n        \"updated_at\": \"2020-05-02T01:00:08.161946425Z\"\n    },\n    {\n        \"avg_response\": 977729,\n        \"check_interval\": 60,\n        \"created_at\": \"2020-02-02T01:00:08.103271859Z\",\n        \"failures_24_hours\": 403,\n        \"group_id\": 2,\n        \"id\": 3,\n        \"last_error\": \"2020-05-28T06:10:08.881632603Z\",\n        \"last_success\": \"2020-05-02T01:06:14.457520734Z\",\n        \"latency\": 41615,\n        \"name\": \"JSON Users Test\",\n        \"online\": true,\n        \"online_24_hours\": 95.34,\n        \"online_7_days\": 95.34,\n        \"order_id\": 3,\n        \"permalink\": null,\n        \"ping_time\": 11150,\n        \"public\": true,\n        \"stats\": {\n            \"failures\": 403,\n            \"hits\": 8649,\n            \"first_hit\": \"2020-04-29T01:00:10.929333549Z\"\n        },\n        \"status_code\": 200,\n        \"updated_at\": \"2020-05-02T01:00:08.212206993Z\"\n    },\n    {\n        \"avg_response\": 1301894,\n        \"check_interval\": 30,\n        \"created_at\": \"2020-02-02T01:00:08.103271859Z\",\n        \"failures_24_hours\": 403,\n        \"group_id\": 2,\n        \"id\": 4,\n        \"last_error\": \"2020-06-07T00:05:08.881632603Z\",\n        \"last_success\": \"2020-05-02T01:06:45.53496799Z\",\n        \"latency\": 869091,\n        \"name\": \"JSON API Tester\",\n        \"online\": true,\n        \"online_24_hours\": 95.34,\n        \"online_7_days\": 95.34,\n        \"order_id\": 4,\n        \"permalink\": null,\n        \"ping_time\": 10980,\n        \"public\": true,\n        \"stats\": {\n            \"failures\": 403,\n            \"hits\": 8656,\n            \"first_hit\": \"2020-04-29T01:00:11.279703666Z\"\n        },\n        \"status_code\": 201,\n        \"updated_at\": \"2020-05-02T01:00:08.270923495Z\"\n    },\n    {\n        \"avg_response\": 1182385,\n        \"check_interval\": 20,\n        \"created_at\": \"2020-02-02T01:00:08.103271859Z\",\n        \"failures_24_hours\": 0,\n        \"group_id\": 1,\n        \"id\": 5,\n        \"last_error\": \"0001-01-01T00:00:00Z\",\n        \"last_success\": \"2020-05-02T01:06:54.905566976Z\",\n        \"latency\": 591,\n        \"name\": \"Google DNS\",\n        \"online\": true,\n        \"online_24_hours\": 100,\n        \"online_7_days\": 100,\n        \"order_id\": 5,\n        \"permalink\": null,\n        \"ping_time\": 5,\n        \"public\": true,\n        \"stats\": {\n            \"failures\": 0,\n            \"hits\": 8663,\n            \"first_hit\": \"2020-04-29T01:00:11.689163285Z\"\n        },\n        \"status_code\": 0,\n        \"updated_at\": \"2020-05-02T01:00:08.337836008Z\"\n    }\n]"
+						}
+					]
 				},
 				{
 					"name": "View Service",
@@ -399,20 +827,20 @@
 							"_postman_previewlanguage": "json",
 							"header": [
 								{
+									"key": "Content-Length",
+									"value": "534"
+								},
+								{
 									"key": "Content-Type",
 									"value": "application/json"
 								},
 								{
 									"key": "Date",
-									"value": "Mon, 10 Dec 2018 19:31:19 GMT"
-								},
-								{
-									"key": "Content-Length",
-									"value": "482"
+									"value": "Sat, 02 May 2020 01:07:16 GMT"
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"id\": 1,\n    \"name\": \"Google\",\n    \"domain\": \"https://google.com\",\n    \"expected\": null,\n    \"expected_status\": 200,\n    \"check_interval\": 10,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": null,\n    \"port\": 0,\n    \"timeout\": 10,\n    \"order_id\": 1,\n    \"allow_notifications\": false,\n    \"created_at\": \"2018-12-10T11:15:42.24769-08:00\",\n    \"updated_at\": \"2018-12-10T11:15:42.247837-08:00\",\n    \"online\": true,\n    \"latency\": 0.190599816,\n    \"ping_time\": 0.00476598,\n    \"online_24_hours\": 0,\n    \"avg_response\": \"\",\n    \"status_code\": 200,\n    \"last_success\": \"2018-12-10T11:31:13.511139-08:00\"\n}"
+							"body": "{\n    \"avg_response\": 1233870,\n    \"check_interval\": 10,\n    \"created_at\": \"2020-02-02T01:00:08.103271859Z\",\n    \"failures_24_hours\": 321,\n    \"group_id\": 1,\n    \"id\": 1,\n    \"last_error\": \"2020-05-08T18:20:08.881632603Z\",\n    \"last_success\": \"2020-05-02T01:07:14.027666715Z\",\n    \"latency\": 111427,\n    \"name\": \"Google\",\n    \"online\": true,\n    \"online_24_hours\": 95.35,\n    \"online_7_days\": 95.35,\n    \"order_id\": 1,\n    \"permalink\": \"google\",\n    \"ping_time\": 11580,\n    \"public\": true,\n    \"stats\": {\n        \"failures\": 404,\n        \"hits\": 8685,\n        \"first_hit\": \"2020-04-29T01:00:10.245169916Z\"\n    },\n    \"status_code\": 200,\n    \"updated_at\": \"2020-05-02T01:00:08.103367884Z\"\n}"
 						}
 					]
 				},
@@ -453,7 +881,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{endpoint}}/api/services/1/hits_data?start=0&end=5973064434&group=12h",
+							"raw": "{{endpoint}}/api/services/1/hits_data?start={{start_time}}&end={{end_time}}&group=1h",
 							"host": [
 								"{{endpoint}}"
 							],
@@ -466,24 +894,91 @@
 							"query": [
 								{
 									"key": "start",
-									"value": "0",
+									"value": "{{start_time}}",
 									"description": "Starting from time (unix timestamp)"
 								},
 								{
 									"key": "end",
-									"value": "5973064434",
+									"value": "{{end_time}}",
 									"description": "End on time (unix timestamp)"
 								},
 								{
 									"key": "group",
-									"value": "12h",
+									"value": "1h",
 									"description": "Increment grouping (minute, hour, day)"
 								}
 							]
 						},
-						"description": "View the chart data for the service's latency. The response returns an array of objects as `x` for timestamp, and `y` for value in ascending order."
+						"description": "View the chart data for the service's latency. The response returns an array of objects as `timeframe` for timestamp, and `amount` for value in ascending order.\n\n## Grouping Data\nYou can group the chart data by using the `group` parameter. For example, if you want to group hits in 12 hours, you could use `12h`. You can also group by minutes like `15m` for 15 minutes."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "View Service Chart Data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{endpoint}}/api/services/1/hits_data?start=0&end=99999999999&group=1h",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"services",
+										"1",
+										"hits_data"
+									],
+									"query": [
+										{
+											"key": "start",
+											"value": "0",
+											"description": "Starting from time (unix timestamp)"
+										},
+										{
+											"key": "end",
+											"value": "99999999999",
+											"description": "End on time (unix timestamp)"
+										},
+										{
+											"key": "group",
+											"value": "1h",
+											"description": "Increment grouping (minute, hour, day)"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 01 May 2020 23:35:21 GMT"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"timeframe\": \"2020-04-28T23:00:00Z\",\n        \"amount\": 2821357\n    },\n    {\n        \"timeframe\": \"2020-04-29T00:00:00Z\",\n        \"amount\": 3948440\n    },\n    {\n        \"timeframe\": \"2020-04-29T01:00:00Z\",\n        \"amount\": 2561839\n    },\n    {\n        \"timeframe\": \"2020-04-29T02:00:00Z\",\n        \"amount\": 298890\n    },\n    {\n        \"timeframe\": \"2020-04-29T03:00:00Z\",\n        \"amount\": 595086\n    },\n    {\n        \"timeframe\": \"2020-04-29T04:00:00Z\",\n        \"amount\": 3353651\n    },\n    {\n        \"timeframe\": \"2020-04-29T05:00:00Z\",\n        \"amount\": 3816639\n    },\n    {\n        \"timeframe\": \"2020-04-29T06:00:00Z\",\n        \"amount\": 2479045\n    },\n    {\n        \"timeframe\": \"2020-04-29T07:00:00Z\",\n        \"amount\": 730765\n    },\n    {\n        \"timeframe\": \"2020-04-29T08:00:00Z\",\n        \"amount\": 742941\n    },\n    {\n        \"timeframe\": \"2020-04-29T09:00:00Z\",\n        \"amount\": 299063\n    },\n    {\n        \"timeframe\": \"2020-04-29T10:00:00Z\",\n        \"amount\": 136331\n    },\n    {\n        \"timeframe\": \"2020-04-29T11:00:00Z\",\n        \"amount\": 319792\n    },\n    {\n        \"timeframe\": \"2020-04-29T12:00:00Z\",\n        \"amount\": 1146633\n    },\n    {\n        \"timeframe\": \"2020-04-29T13:00:00Z\",\n        \"amount\": 186369\n    },\n    {\n        \"timeframe\": \"2020-04-29T14:00:00Z\",\n        \"amount\": 751189\n    },\n    {\n        \"timeframe\": \"2020-04-29T15:00:00Z\",\n        \"amount\": 299781\n    },\n    {\n        \"timeframe\": \"2020-04-29T16:00:00Z\",\n        \"amount\": 725325\n    },\n    {\n        \"timeframe\": \"2020-04-29T17:00:00Z\",\n        \"amount\": 786672\n    },\n    {\n        \"timeframe\": \"2020-04-29T18:00:00Z\",\n        \"amount\": 809931\n    },\n    {\n        \"timeframe\": \"2020-04-29T19:00:00Z\",\n        \"amount\": 758894\n    },\n    {\n        \"timeframe\": \"2020-04-29T20:00:00Z\",\n        \"amount\": 1612743\n    },\n    {\n        \"timeframe\": \"2020-04-29T21:00:00Z\",\n        \"amount\": 1918771\n    },\n    {\n        \"timeframe\": \"2020-04-29T22:00:00Z\",\n        \"amount\": 1959122\n    },\n    {\n        \"timeframe\": \"2020-04-29T23:00:00Z\",\n        \"amount\": 703709\n    },\n    {\n        \"timeframe\": \"2020-04-30T00:00:00Z\",\n        \"amount\": 348894\n    },\n    {\n        \"timeframe\": \"2020-04-30T01:00:00Z\",\n        \"amount\": 247846\n    },\n    {\n        \"timeframe\": \"2020-04-30T02:00:00Z\",\n        \"amount\": 876778\n    },\n    {\n        \"timeframe\": \"2020-04-30T03:00:00Z\",\n        \"amount\": 516935\n    },\n    {\n        \"timeframe\": \"2020-04-30T04:00:00Z\",\n        \"amount\": 148509\n    },\n    {\n        \"timeframe\": \"2020-04-30T05:00:00Z\",\n        \"amount\": 248569\n    },\n    {\n        \"timeframe\": \"2020-04-30T06:00:00Z\",\n        \"amount\": 177620\n    },\n    {\n        \"timeframe\": \"2020-04-30T07:00:00Z\",\n        \"amount\": 670146\n    },\n    {\n        \"timeframe\": \"2020-04-30T08:00:00Z\",\n        \"amount\": 168823\n    },\n    {\n        \"timeframe\": \"2020-04-30T09:00:00Z\",\n        \"amount\": 756748\n    },\n    {\n        \"timeframe\": \"2020-04-30T10:00:00Z\",\n        \"amount\": 730129\n    },\n    {\n        \"timeframe\": \"2020-04-30T11:00:00Z\",\n        \"amount\": 389544\n    },\n    {\n        \"timeframe\": \"2020-04-30T12:00:00Z\",\n        \"amount\": 133279\n    },\n    {\n        \"timeframe\": \"2020-04-30T13:00:00Z\",\n        \"amount\": 1257221\n    },\n    {\n        \"timeframe\": \"2020-04-30T14:00:00Z\",\n        \"amount\": 1095851\n    },\n    {\n        \"timeframe\": \"2020-04-30T15:00:00Z\",\n        \"amount\": 1086126\n    },\n    {\n        \"timeframe\": \"2020-04-30T16:00:00Z\",\n        \"amount\": 532353\n    },\n    {\n        \"timeframe\": \"2020-04-30T17:00:00Z\",\n        \"amount\": 1321025\n    },\n    {\n        \"timeframe\": \"2020-04-30T18:00:00Z\",\n        \"amount\": 498795\n    },\n    {\n        \"timeframe\": \"2020-04-30T19:00:00Z\",\n        \"amount\": 1334088\n    },\n    {\n        \"timeframe\": \"2020-04-30T20:00:00Z\",\n        \"amount\": 670188\n    },\n    {\n        \"timeframe\": \"2020-04-30T21:00:00Z\",\n        \"amount\": 157049\n    },\n    {\n        \"timeframe\": \"2020-04-30T22:00:00Z\",\n        \"amount\": 501978\n    },\n    {\n        \"timeframe\": \"2020-04-30T23:00:00Z\",\n        \"amount\": 490371\n    },\n    {\n        \"timeframe\": \"2020-05-01T00:00:00Z\",\n        \"amount\": 459638\n    },\n    {\n        \"timeframe\": \"2020-05-01T01:00:00Z\",\n        \"amount\": 435766\n    },\n    {\n        \"timeframe\": \"2020-05-01T02:00:00Z\",\n        \"amount\": 1019118\n    },\n    {\n        \"timeframe\": \"2020-05-01T03:00:00Z\",\n        \"amount\": 473220\n    },\n    {\n        \"timeframe\": \"2020-05-01T04:00:00Z\",\n        \"amount\": 773802\n    },\n    {\n        \"timeframe\": \"2020-05-01T05:00:00Z\",\n        \"amount\": 169785\n    },\n    {\n        \"timeframe\": \"2020-05-01T06:00:00Z\",\n        \"amount\": 161522\n    },\n    {\n        \"timeframe\": \"2020-05-01T07:00:00Z\",\n        \"amount\": 2188049\n    },\n    {\n        \"timeframe\": \"2020-05-01T08:00:00Z\",\n        \"amount\": 1953334\n    },\n    {\n        \"timeframe\": \"2020-05-01T09:00:00Z\",\n        \"amount\": 464254\n    },\n    {\n        \"timeframe\": \"2020-05-01T10:00:00Z\",\n        \"amount\": 1122877\n    },\n    {\n        \"timeframe\": \"2020-05-01T11:00:00Z\",\n        \"amount\": 1451397\n    },\n    {\n        \"timeframe\": \"2020-05-01T12:00:00Z\",\n        \"amount\": 880588\n    },\n    {\n        \"timeframe\": \"2020-05-01T13:00:00Z\",\n        \"amount\": 302396\n    },\n    {\n        \"timeframe\": \"2020-05-01T14:00:00Z\",\n        \"amount\": 239921\n    },\n    {\n        \"timeframe\": \"2020-05-01T15:00:00Z\",\n        \"amount\": 891828\n    },\n    {\n        \"timeframe\": \"2020-05-01T16:00:00Z\",\n        \"amount\": 999550\n    },\n    {\n        \"timeframe\": \"2020-05-01T17:00:00Z\",\n        \"amount\": 566471\n    },\n    {\n        \"timeframe\": \"2020-05-01T18:00:00Z\",\n        \"amount\": 399267\n    },\n    {\n        \"timeframe\": \"2020-05-01T19:00:00Z\",\n        \"amount\": 348657\n    },\n    {\n        \"timeframe\": \"2020-05-01T20:00:00Z\",\n        \"amount\": 202352\n    },\n    {\n        \"timeframe\": \"2020-05-01T21:00:00Z\",\n        \"amount\": 703166\n    },\n    {\n        \"timeframe\": \"2020-05-01T22:00:00Z\",\n        \"amount\": 1713541\n    },\n    {\n        \"timeframe\": \"2020-05-01T23:00:00Z\",\n        \"amount\": 125889\n    }\n]"
+						}
+					]
 				},
 				{
 					"name": "View Service Ping Data",
@@ -522,7 +1017,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{endpoint}}/api/services/1/ping_data?start=0&end=9973064434&group=12h",
+							"raw": "{{endpoint}}/api/services/1/ping_data?start={{start_time}}&end={{end_time}}&group=12h",
 							"host": [
 								"{{endpoint}}"
 							],
@@ -535,12 +1030,12 @@
 							"query": [
 								{
 									"key": "start",
-									"value": "0",
+									"value": "{{start_time}}",
 									"description": "Starting from time (unix timestamp)"
 								},
 								{
 									"key": "end",
-									"value": "9973064434",
+									"value": "{{end_time}}",
 									"description": "End on time (unix timestamp)"
 								},
 								{
@@ -550,9 +1045,76 @@
 								}
 							]
 						},
-						"description": "View the chart data for the service's ping response time. The response returns an array of objects as `x` for timestamp, and `y` for value in ascending order."
+						"description": "View the chart data for the service's ping response time. The response returns an array of objects as `timeframe` for timestamp, and `amount` for value in ascending order.\n\n## Grouping Data\nYou can group the chart data by using the `group` parameter. For example, if you want to group hits in 12 hours, you could use `12h`. You can also group by minutes like `15m` for 15 minutes."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "View Service Ping Data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{endpoint}}/api/services/1/ping_data?start=0&end=999999999999&group=12h",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"services",
+										"1",
+										"ping_data"
+									],
+									"query": [
+										{
+											"key": "start",
+											"value": "0",
+											"description": "Starting from time (unix timestamp)"
+										},
+										{
+											"key": "end",
+											"value": "999999999999",
+											"description": "End on time (unix timestamp)"
+										},
+										{
+											"key": "group",
+											"value": "12h",
+											"description": "Increment grouping (minute, hour, day)"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Length",
+									"value": "374"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 01 May 2020 23:36:34 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"timeframe\": \"2020-04-28T12:00:00Z\",\n        \"amount\": 1410678\n    },\n    {\n        \"timeframe\": \"2020-04-29T00:00:00Z\",\n        \"amount\": 803436\n    },\n    {\n        \"timeframe\": \"2020-04-29T12:00:00Z\",\n        \"amount\": 485797\n    },\n    {\n        \"timeframe\": \"2020-04-30T00:00:00Z\",\n        \"amount\": 220022\n    },\n    {\n        \"timeframe\": \"2020-04-30T12:00:00Z\",\n        \"amount\": 378263\n    },\n    {\n        \"timeframe\": \"2020-05-01T00:00:00Z\",\n        \"amount\": 444698\n    },\n    {\n        \"timeframe\": \"2020-05-01T12:00:00Z\",\n        \"amount\": 285061\n    }\n]"
+						}
+					]
 				},
 				{
 					"name": "View Service Failure Data",
@@ -591,7 +1153,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{endpoint}}/api/services/1/failure_data?start=0&end=2973064434&group=12h",
+							"raw": "{{endpoint}}/api/services/1/failure_data?start={{start_time}}&end={{end_time}}&group=12h",
 							"host": [
 								"{{endpoint}}"
 							],
@@ -604,21 +1166,91 @@
 							"query": [
 								{
 									"key": "start",
-									"value": "0"
+									"value": "{{start_time}}",
+									"description": "Starting from time (unix timestamp)"
 								},
 								{
 									"key": "end",
-									"value": "2973064434"
+									"value": "{{end_time}}",
+									"description": "End on time (unix timestamp)"
 								},
 								{
 									"key": "group",
-									"value": "12h"
+									"value": "12h",
+									"description": "Increment grouping (minute, hour, day)"
 								}
 							]
 						},
-						"description": "View the data service failures in a heatmap. The field `x` is the day of the month, and `y` is the amount of failures the service had."
+						"description": "View the data service failures in a heatmap. The response returns an array of objects as `timeframe` for timestamp, and `amount` for value in ascending order.\n\n## Grouping Data\nYou can group the chart data by using the `group` parameter. For example, if you want to group hits in 12 hours, you could use `12h`. You can also group by minutes like `15m` for 15 minutes."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "View Service Failure Data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{endpoint}}/api/services/1/failure_data?start=0&end=999999999999&group=12h",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"services",
+										"1",
+										"failure_data"
+									],
+									"query": [
+										{
+											"key": "start",
+											"value": "0",
+											"description": "Starting from time (unix timestamp)"
+										},
+										{
+											"key": "end",
+											"value": "999999999999",
+											"description": "End on time (unix timestamp)"
+										},
+										{
+											"key": "group",
+											"value": "12h",
+											"description": "Increment grouping (minute, hour, day)"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Length",
+									"value": "344"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 01 May 2020 23:39:38 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"timeframe\": \"2020-04-28T12:00:00Z\",\n        \"amount\": 2\n    },\n    {\n        \"timeframe\": \"2020-04-29T00:00:00Z\",\n        \"amount\": 21\n    },\n    {\n        \"timeframe\": \"2020-04-29T12:00:00Z\",\n        \"amount\": 20\n    },\n    {\n        \"timeframe\": \"2020-04-30T00:00:00Z\",\n        \"amount\": 21\n    },\n    {\n        \"timeframe\": \"2020-04-30T12:00:00Z\",\n        \"amount\": 20\n    },\n    {\n        \"timeframe\": \"2020-05-01T00:00:00Z\",\n        \"amount\": 21\n    },\n    {\n        \"timeframe\": \"2020-05-01T12:00:00Z\",\n        \"amount\": 29\n    }\n]"
+						}
+					]
 				},
 				{
 					"name": "View Service Failures",
@@ -657,7 +1289,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{endpoint}}/api/services/1/failures?start=0&end=99999999999",
+							"raw": "{{endpoint}}/api/services/1/failures?start={{start_time}}&end={{end_time}}",
 							"host": [
 								"{{endpoint}}"
 							],
@@ -670,11 +1302,13 @@
 							"query": [
 								{
 									"key": "start",
-									"value": "0"
+									"value": "{{start_time}}",
+									"description": "Starting from time (unix timestamp)"
 								},
 								{
 									"key": "end",
-									"value": "99999999999"
+									"value": "{{end_time}}",
+									"description": "End on time (unix timestamp)"
 								}
 							]
 						},
@@ -724,7 +1358,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{endpoint}}/api/services/1/hits?start=0&end=99999999999",
+							"raw": "{{endpoint}}/api/services/1/hits?start={{start_time}}&end={{end_time}}",
 							"host": [
 								"{{endpoint}}"
 							],
@@ -737,11 +1371,13 @@
 							"query": [
 								{
 									"key": "start",
-									"value": "0"
+									"value": "{{start_time}}",
+									"description": "Starting from time (unix timestamp)"
 								},
 								{
 									"key": "end",
-									"value": "99999999999"
+									"value": "{{end_time}}",
+									"description": "End on time (unix timestamp)"
 								}
 							]
 						},
@@ -1693,7 +2329,7 @@
 					]
 				}
 			],
-			"description": "Statping allows you to group multiple services with a unique name for better viewablity. You can reorder the groups to make your status page a little more organized if you have tons of services.",
+			"description": "Statping allows you to group multiple services with a unique name for better viewablity. You can reorder the groups to make your status page a little more organized if you have tons of services.\n\n# Group Fields\n- `name` - **(required)** Group name to contain multiple services\n- `public` - Allow non-users to view this group and services inside it (default false)",
 			"auth": {
 				"type": "bearer",
 				"bearer": [
@@ -1725,13 +2361,14 @@
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Users",
 			"item": [
 				{
-					"name": "Statping Login",
+					"name": "Login",
 					"event": [
 						{
 							"listen": "test",
@@ -1753,14 +2390,7 @@
 					],
 					"request": {
 						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{api_key}}",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "POST",
 						"header": [
@@ -1799,7 +2429,117 @@
 								"login"
 							]
 						},
-						"description": "The root API endpoint to view basic Statping configuration including Name, URL, database type, and other useful fields."
+						"description": "This endpoint will login a user and set a JWT token for future requests."
+					},
+					"response": [
+						{
+							"name": "Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "username",
+											"value": "admin",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "admin",
+											"type": "text"
+										}
+									],
+									"options": {
+										"urlencoded": {}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/login",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "174"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 00:56:17 GMT"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "statping_auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiYWRtaW4iOnRydWUsImV4cCI6MTU4ODY0MDE3N30.tf399_LfAphSGlKMtgphg6qpPrn-_w92XfCrK5FwbZY; Expires=Tue, 05 May 2020 00:56:17 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiYWRtaW4iOnRydWUsImV4cCI6MTU4ODY0MDE3N30.tf399_LfAphSGlKMtgphg6qpPrn-_w92XfCrK5FwbZY\",\n    \"admin\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f6848835-443c-4dfa-abb9-ddea712cd0d1",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [],
+							"options": {
+								"urlencoded": {}
+							}
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/logout",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"logout"
+							]
+						},
+						"description": "This endpoint will logout a user and redirect to the index page."
 					},
 					"response": []
 				},
@@ -1950,7 +2690,53 @@
 						},
 						"description": "Create a new Statping user"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Create User",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"adminuser2\",\n    \"email\": \"info@adminemail.com\",\n    \"password\": \"passsword123\",\n    \"admin\": true\n}"
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/users",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "468"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 01:08:07 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"user\",\n    \"method\": \"create\",\n    \"id\": 2,\n    \"output\": {\n        \"id\": 2,\n        \"username\": \"adminuser2\",\n        \"password\": \"$2a$14$gIGeiN8bLYTGtkTwhSDS7us5gGXJ3tpcxMEY9ynX.VnpCKDFVG3nO\",\n        \"email\": \"info@adminemail.com\",\n        \"api_key\": \"acbed53aec11c0a0a555eaae6ce73501c059215bf4bb6ae4b0fc0eb2765780a1\",\n        \"api_secret\": \"3699ae08cb15ee85b6529f6895bd104a3be00f823b1aa3c810a6582676d55ba7\",\n        \"admin\": true,\n        \"created_at\": \"2020-05-02T01:08:06.971716991Z\",\n        \"updated_at\": \"2020-05-02T01:08:06.971716991Z\"\n    }\n}"
+						}
+					]
 				},
 				{
 					"name": "View User",
@@ -2249,7 +3035,7 @@
 					]
 				}
 			],
-			"description": "You can create new users with different permissions to allow for read only API access, and super admin abilities. ",
+			"description": "You can create new users with different permissions to allow for read only API access, and super admin abilities. \n\n# User Fields\n- `username` - **(required)** Unique username for the user to sign in as\n- `email` - **(required)** Unique email address for this user\n- `password` - **(required)** User password in plain text (will be encrypted)\n- `admin` - Set user as admin (default false)",
 			"auth": {
 				"type": "bearer",
 				"bearer": [
@@ -2281,7 +3067,8 @@
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Notifiers",
@@ -2313,7 +3100,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "R1T2Cyugjjzw63km",
+									"value": "{{api_key}}",
 									"type": "string"
 								}
 							]
@@ -2332,7 +3119,44 @@
 						},
 						"description": "View an array of all the Notifiers including all details about the notifier."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "All Notifiers",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint}}/api/notifiers",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"notifiers"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 01:08:49 GMT"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"method\": \"slack\",\n        \"host\": \"https://webhooksurl.slack.com/***\",\n        \"enabled\": false,\n        \"limits\": 60,\n        \"removable\": false,\n        \"created_at\": \"2020-05-02T01:00:13.404253878Z\",\n        \"updated_at\": \"2020-05-02T01:00:13.404253878Z\",\n        \"title\": \"slack\",\n        \"description\": \"Send notifications to your slack channel when a service is offline. Insert your Incoming webhook URL for your channel to receive notifications. Based on the <a href=\\\"https://api.slack.com/incoming-webhooks\\\">Slack API</a>.\",\n        \"author\": \"Hunter Long\",\n        \"author_url\": \"https://github.com/hunterlong\",\n        \"icon\": \"fab fa-slack\",\n        \"delay\": \"10000000000\",\n        \"form\": [\n            {\n                \"type\": \"text\",\n                \"title\": \"Incoming Webhook Url\",\n                \"placeholder\": \"Insert your Slack Webhook URL here.\",\n                \"field\": \"Host\",\n                \"small_text\": \"Incoming Webhook URL from <a href=\\\"https://api.slack.com/apps\\\" target=\\\"_blank\\\">Slack Apps</a>\",\n                \"required\": true,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            }\n        ]\n    },\n    {\n        \"id\": 2,\n        \"method\": \"command\",\n        \"host\": \"/bin/bash\",\n        \"enabled\": false,\n        \"limits\": 60,\n        \"removable\": false,\n        \"created_at\": \"2020-05-02T01:00:13.495166024Z\",\n        \"updated_at\": \"2020-05-02T01:00:13.495166024Z\",\n        \"title\": \"Command\",\n        \"description\": \"Shell Command allows you to run a customized shell/bash Command on the local machine it's running on.\",\n        \"author\": \"Hunter Long\",\n        \"author_url\": \"https://github.com/hunterlong\",\n        \"icon\": \"fas fa-terminal\",\n        \"delay\": \"1000000000\",\n        \"form\": [\n            {\n                \"type\": \"text\",\n                \"title\": \"Shell or Bash\",\n                \"placeholder\": \"/usr/bin/curl\",\n                \"field\": \"host\",\n                \"small_text\": \"You can use '/bin/sh', '/bin/bash', '/usr/bin/curl' or an absolute path for an application.\",\n                \"required\": false,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"text\",\n                \"title\": \"Command to Run on OnSuccess\",\n                \"placeholder\": \"http://localhost:8080/health\",\n                \"field\": \"var1\",\n                \"small_text\": \"This Command will run when a service is receiving a Successful event.\",\n                \"required\": false,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"text\",\n                \"title\": \"Command to Run on OnFailure\",\n                \"placeholder\": \"http://localhost:8080/health\",\n                \"field\": \"var2\",\n                \"small_text\": \"This Command will run when a service is receiving a Failing event.\",\n                \"required\": false,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            }\n        ]\n    },\n    {\n        \"id\": 3,\n        \"method\": \"discord\",\n        \"host\": \"https://discordapp.com/api/webhooks/****/*****\",\n        \"enabled\": false,\n        \"limits\": 60,\n        \"removable\": false,\n        \"created_at\": \"2020-05-02T01:00:13.578783367Z\",\n        \"updated_at\": \"2020-05-02T01:00:13.578783367Z\",\n        \"title\": \"discord\",\n        \"description\": \"Send notifications to your discord channel using discord webhooks. Insert your discord channel Webhook URL to receive notifications. Based on the <a href=\\\"https://discordapp.com/developers/docs/resources/Webhook\\\">discord webhooker API</a>.\",\n        \"author\": \"Hunter Long\",\n        \"author_url\": \"https://github.com/hunterlong\",\n        \"icon\": \"fab fa-discord\",\n        \"delay\": \"5000000000\",\n        \"form\": [\n            {\n                \"type\": \"text\",\n                \"title\": \"discord webhooker URL\",\n                \"placeholder\": \"Insert your Webhook URL here\",\n                \"field\": \"host\",\n                \"small_text\": \"\",\n                \"required\": false,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            }\n        ]\n    },\n    {\n        \"id\": 4,\n        \"method\": \"email\",\n        \"enabled\": false,\n        \"limits\": 30,\n        \"removable\": false,\n        \"created_at\": \"2020-05-02T01:00:13.662437032Z\",\n        \"updated_at\": \"2020-05-02T01:00:13.662437032Z\",\n        \"title\": \"email\",\n        \"description\": \"Send emails via SMTP when services are online or offline.\",\n        \"author\": \"Hunter Long\",\n        \"author_url\": \"https://github.com/hunterlong\",\n        \"icon\": \"far fa-envelope\",\n        \"delay\": \"0\",\n        \"form\": [\n            {\n                \"type\": \"text\",\n                \"title\": \"SMTP Host\",\n                \"placeholder\": \"Insert your SMTP Host here.\",\n                \"field\": \"Host\",\n                \"small_text\": \"\",\n                \"required\": false,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"text\",\n                \"title\": \"SMTP Username\",\n                \"placeholder\": \"Insert your SMTP Username here.\",\n                \"field\": \"Username\",\n                \"small_text\": \"\",\n                \"required\": false,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"password\",\n                \"title\": \"SMTP Password\",\n                \"placeholder\": \"Insert your SMTP Password here.\",\n                \"field\": \"Password\",\n                \"small_text\": \"\",\n                \"required\": false,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"number\",\n                \"title\": \"SMTP Port\",\n                \"placeholder\": \"Insert your SMTP Port here.\",\n                \"field\": \"Port\",\n                \"small_text\": \"\",\n                \"required\": false,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"text\",\n                \"title\": \"Outgoing Email Address\",\n                \"placeholder\": \"outgoing@email.com\",\n                \"field\": \"Var1\",\n                \"small_text\": \"\",\n                \"required\": false,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"email\",\n                \"title\": \"Send Alerts To\",\n                \"placeholder\": \"sendto@email.com\",\n                \"field\": \"Var2\",\n                \"small_text\": \"\",\n                \"required\": false,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"text\",\n                \"title\": \"Disable TLS/SSL\",\n                \"placeholder\": \"\",\n                \"field\": \"api_key\",\n                \"small_text\": \"To Disable TLS/SSL insert 'true'\",\n                \"required\": false,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            }\n        ]\n    },\n    {\n        \"id\": 5,\n        \"method\": \"line_notify\",\n        \"enabled\": false,\n        \"limits\": 60,\n        \"removable\": false,\n        \"created_at\": \"2020-05-02T01:00:13.762720435Z\",\n        \"updated_at\": \"2020-05-02T01:00:13.762720435Z\",\n        \"title\": \"LINE Notify\",\n        \"description\": \"LINE Notify will send notifications to your LINE Notify account when services are offline or online. Based on the <a href=\\\"https://notify-bot.line.me/doc/en/\\\">LINE Notify API</a>.\",\n        \"author\": \"Kanin Peanviriyakulkit\",\n        \"author_url\": \"https://github.com/dogrocker\",\n        \"icon\": \"far fa-bell\",\n        \"delay\": \"0\",\n        \"form\": [\n            {\n                \"type\": \"text\",\n                \"title\": \"Access Token\",\n                \"placeholder\": \"Insert your Line Notify Access Token here.\",\n                \"field\": \"api_secret\",\n                \"small_text\": \"\",\n                \"required\": false,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            }\n        ]\n    },\n    {\n        \"id\": 6,\n        \"method\": \"telegram\",\n        \"enabled\": false,\n        \"limits\": 60,\n        \"removable\": false,\n        \"created_at\": \"2020-05-02T01:00:13.863052768Z\",\n        \"updated_at\": \"2020-05-02T01:00:13.863052768Z\",\n        \"title\": \"Telegram\",\n        \"description\": \"Receive notifications on your Telegram channel when a service has an issue. You must get a Telegram API token from the /botfather. Review the <a target=\\\"_blank\\\" href=\\\"http://techthoughts.info/how-to-create-a-telegram-bot-and-send-messages-via-api\\\">Telegram API Tutorial</a> to learn how to generate a new API Token.\",\n        \"author\": \"Hunter Long\",\n        \"author_url\": \"https://github.com/hunterlong\",\n        \"icon\": \"fab fa-telegram-plane\",\n        \"delay\": \"5000000000\",\n        \"form\": [\n            {\n                \"type\": \"text\",\n                \"title\": \"Telegram API Token\",\n                \"placeholder\": \"383810182:EEx829dtCeufeQYXG7CUdiQopqdmmxBPO7-s\",\n                \"field\": \"api_secret\",\n                \"small_text\": \"Enter the API Token given to you from the /botfather chat.\",\n                \"required\": true,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"text\",\n                \"title\": \"Channel or User\",\n                \"placeholder\": \"@statping_channel\",\n                \"field\": \"var1\",\n                \"small_text\": \"Insert your Telegram Channel or User here.\",\n                \"required\": true,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            }\n        ]\n    },\n    {\n        \"id\": 7,\n        \"method\": \"twilio\",\n        \"enabled\": false,\n        \"limits\": 15,\n        \"removable\": false,\n        \"created_at\": \"2020-05-02T01:00:13.929911704Z\",\n        \"updated_at\": \"2020-05-02T01:00:13.929911704Z\",\n        \"title\": \"Twilio\",\n        \"description\": \"Receive SMS text messages directly to your cellphone when a service is offline. You can use a Twilio test account with limits. This notifier uses the <a href=\\\"https://www.twilio.com/docs/usage/api\\\">Twilio API</a>.\",\n        \"author\": \"Hunter Long\",\n        \"author_url\": \"https://github.com/hunterlong\",\n        \"icon\": \"far fa-comment-alt\",\n        \"delay\": \"10000000000\",\n        \"form\": [\n            {\n                \"type\": \"text\",\n                \"title\": \"Account SID\",\n                \"placeholder\": \"Insert your Twilio Account SID\",\n                \"field\": \"api_key\",\n                \"small_text\": \"\",\n                \"required\": true,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"text\",\n                \"title\": \"Account Token\",\n                \"placeholder\": \"Insert your Twilio Account Token\",\n                \"field\": \"api_secret\",\n                \"small_text\": \"\",\n                \"required\": true,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"text\",\n                \"title\": \"SMS to Phone Number\",\n                \"placeholder\": \"18555555555\",\n                \"field\": \"Var1\",\n                \"small_text\": \"\",\n                \"required\": true,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"text\",\n                \"title\": \"From Phone Number\",\n                \"placeholder\": \"18555555555\",\n                \"field\": \"Var2\",\n                \"small_text\": \"\",\n                \"required\": true,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            }\n        ]\n    },\n    {\n        \"id\": 8,\n        \"method\": \"webhook\",\n        \"enabled\": false,\n        \"limits\": 180,\n        \"removable\": false,\n        \"created_at\": \"2020-05-02T01:00:14.022113554Z\",\n        \"updated_at\": \"2020-05-02T01:00:14.022113554Z\",\n        \"title\": \"Webhook\",\n        \"description\": \"Send a custom HTTP request to a specific URL with your own body, headers, and parameters.\",\n        \"author\": \"Hunter Long\",\n        \"author_url\": \"https://github.com/hunterlong\",\n        \"icon\": \"fas fa-code-branch\",\n        \"delay\": \"1000000000\",\n        \"form\": [\n            {\n                \"type\": \"text\",\n                \"title\": \"HTTP Endpoint\",\n                \"placeholder\": \"http://webhookurl.com/JW2MCP4SKQP\",\n                \"field\": \"Host\",\n                \"small_text\": \"Insert the URL for your HTTP Requests.\",\n                \"required\": true,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"text\",\n                \"title\": \"HTTP Method\",\n                \"placeholder\": \"POST\",\n                \"field\": \"Var1\",\n                \"small_text\": \"Choose a HTTP method for example: GET, POST, DELETE, or PATCH.\",\n                \"required\": true,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"textarea\",\n                \"title\": \"HTTP Body\",\n                \"placeholder\": \"{\\\"service_id\\\": {{.Service.Id}}\\\", \\\"service_name\\\": \\\"{{.Service.Name}\\\"}\",\n                \"field\": \"Var2\",\n                \"small_text\": \"Optional HTTP body for a POST request. You can insert variables into your body request.<br>{{.Service.Id}}, {{.Service.Name}}, {{.Service.Online}}<br>{{.Failure.Issue}}\",\n                \"required\": false,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"text\",\n                \"title\": \"Content Type\",\n                \"placeholder\": \"application/json\",\n                \"field\": \"api_key\",\n                \"small_text\": \"Optional content type for example: application/json or text/plain\",\n                \"required\": false,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"text\",\n                \"title\": \"Header\",\n                \"placeholder\": \"Authorization=Token12345\",\n                \"field\": \"api_secret\",\n                \"small_text\": \"Optional Headers for request use format: KEY=Value,Key=Value\",\n                \"required\": false,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            }\n        ]\n    },\n    {\n        \"id\": 9,\n        \"method\": \"mobile\",\n        \"enabled\": false,\n        \"limits\": 30,\n        \"removable\": false,\n        \"created_at\": \"2020-05-02T01:00:14.088815317Z\",\n        \"updated_at\": \"2020-05-02T01:00:14.088815317Z\",\n        \"title\": \"Mobile\",\n        \"description\": \"Receive push notifications on your Mobile device using the Statping App. You can scan the Authentication QR Code found in Settings to get the Mobile app setup in seconds.\\n\\t\\t\\t\\t <p align=\\\"center\\\"><a href=\\\"https://play.google.com/store/apps/details?id=com.statping\\\"><img src=\\\"https://img.cjx.io/google-play.svg\\\"></a><a href=\\\"https://itunes.apple.com/us/app/apple-store/id1445513219\\\"><img src=\\\"https://img.cjx.io/app-store-badge.svg\\\"></a></p>\",\n        \"author\": \"Hunter Long\",\n        \"author_url\": \"https://github.com/hunterlong\",\n        \"icon\": \"fas fa-mobile-alt\",\n        \"delay\": \"5000000000\",\n        \"form\": [\n            {\n                \"type\": \"text\",\n                \"title\": \"Device Identifiers\",\n                \"placeholder\": \"A list of your Mobile device push notification ID's.\",\n                \"field\": \"var1\",\n                \"small_text\": \"\",\n                \"required\": false,\n                \"hidden\": true,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"number\",\n                \"title\": \"Array of device numbers\",\n                \"placeholder\": \"1 for iphone 2 for android\",\n                \"field\": \"var2\",\n                \"small_text\": \"\",\n                \"required\": false,\n                \"hidden\": true,\n                \"list\": false,\n                \"switch\": false\n            }\n        ]\n    },\n    {\n        \"id\": 10,\n        \"method\": \"pushover\",\n        \"enabled\": false,\n        \"limits\": 60,\n        \"removable\": false,\n        \"created_at\": \"2020-05-02T01:00:14.172478892Z\",\n        \"updated_at\": \"2020-05-02T01:00:14.172478892Z\",\n        \"title\": \"Pushover\",\n        \"description\": \"Use Pushover to receive push notifications. You will need to create a <a href=\\\"https://pushover.net/apps/build\\\">New Application</a> on Pushover before using this notifier.\",\n        \"author\": \"Hunter Long\",\n        \"author_url\": \"https://github.com/hunterlong\",\n        \"icon\": \"fa dot-circle\",\n        \"delay\": \"10000000000\",\n        \"form\": [\n            {\n                \"type\": \"text\",\n                \"title\": \"User Token\",\n                \"placeholder\": \"Insert your device's Pushover Token\",\n                \"field\": \"api_key\",\n                \"small_text\": \"\",\n                \"required\": true,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            },\n            {\n                \"type\": \"text\",\n                \"title\": \"Application API Key\",\n                \"placeholder\": \"Create an Application and insert the API Key here\",\n                \"field\": \"api_secret\",\n                \"small_text\": \"\",\n                \"required\": true,\n                \"hidden\": false,\n                \"list\": false,\n                \"switch\": false\n            }\n        ]\n    }\n]"
+						}
+					]
 				},
 				{
 					"name": "View Notifier",
@@ -2344,6 +3168,12 @@
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Notifier Fields\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.method).to.eql(\"slack\");",
+									"    pm.expect(jsonData.enabled).to.eql(false);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2356,7 +3186,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "e351393306ea245de5f9588cbe8627c74db007c6",
+									"value": "{{api_key}}",
 									"type": "string"
 								}
 							]
@@ -2376,7 +3206,45 @@
 						},
 						"description": "View a specific notifier and it's details."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "View Notifier",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint}}/api/notifier/slack",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"notifier",
+										"slack"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "297"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 01:09:06 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"method\": \"slack\",\n    \"host\": \"https://webhooksurl.slack.com/***\",\n    \"enabled\": false,\n    \"limits\": 60,\n    \"removable\": false,\n    \"created_at\": \"2020-05-02T01:09:06.326407831Z\",\n    \"updated_at\": \"2020-05-02T01:09:06.326408155Z\",\n    \"title\": \"\",\n    \"description\": \"\",\n    \"author\": \"\",\n    \"author_url\": \"\",\n    \"icon\": \"\",\n    \"delay\": \"0\",\n    \"form\": null\n}"
+						}
+					]
 				},
 				{
 					"name": "Update Notifier",
@@ -2386,10 +3254,15 @@
 							"script": {
 								"id": "d714d71d-4d6a-4b2e-a6ea-16c34dec3041",
 								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"pm.test(\"Update Notifier\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.status).to.eql(\"success\");",
 									"    pm.expect(jsonData.output).to.eql(\"slack\");",
+									"    pm.expect(jsonData.method).to.eql(\"update\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -2402,7 +3275,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "e351393306ea245de5f9588cbe8627c74db007c6",
+									"value": "{{api_key}}",
 									"type": "string"
 								}
 							]
@@ -2418,7 +3291,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"method\": \"slack\",\n    \"host\": \"https://hooks.slack.com/services/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\",\n    \"enabled\": true,\n    \"limits\": 55\n}"
+							"raw": "{\n    \"method\": \"slack\",\n    \"host\": \"https://hooks.slack.com/services/EXAMPLEIDHERE/BV33WKP0C/MtKw3Kc8BFylTv4pohKqHtXX\",\n    \"enabled\": true,\n    \"limits\": 55\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/notifier/slack",
@@ -2433,16 +3306,65 @@
 						},
 						"description": "Update a notifier to change it's values."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Update Notifier",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"method\": \"slack\",\n    \"host\": \"https://hooks.slack.com/services/EXAMPLEIDHERE/BV33WKP0C/MtKw3Kc8BFylTv4pohKqHtXX\",\n    \"enabled\": true,\n    \"limits\": 55\n}"
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/notifier/slack",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"notifier",
+										"slack"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "72"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 01:09:45 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"string\",\n    \"method\": \"update\",\n    \"output\": \"slack\"\n}"
+						}
+					]
 				}
 			],
-			"description": "Statping contains multiple notifiers that will send you a notification whenever a service become offline, or online. You can create your own 3rd party notifier by reading more on the [Notifiers Wiki](https://github.com/hunterlong/statping/wiki/Notifiers) on the Github repo.",
+			"description": "Statping contains multiple notifiers that will send you a notification whenever a service become offline, or online. You can create your own 3rd party notifier by reading more on the [Notifiers Wiki](https://github.com/statping/statping/wiki/Notifiers) on the Github repo.",
 			"auth": {
 				"type": "bearer",
 				"bearer": [
 					{
 						"key": "token",
-						"value": "e351393306ea245de5f9588cbe8627c74db007c6",
+						"value": "{{api_key}}",
 						"type": "string"
 					}
 				]
@@ -2468,7 +3390,8 @@
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Messages",
@@ -2495,6 +3418,9 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -2923,7 +3849,17 @@
 					]
 				}
 			],
-			"description": "Messages allows you to create an alert for a service for a scheduled downtime, or a simple message letting users know a service might be having internal issues. ",
+			"description": "Messages allows you to create an alert for a service for a scheduled downtime, or a simple message letting users know a service might be having internal issues. \n\n\n# Message Fields\n- `title` - **(required)** Group name to contain multiple services\n- `description` - **(required)** More detailed description of message\n- `service` - Service ID to affiliate message, global message if empty\n- `start_on` - Timestamp to make this message visible on frontend\n- `end_on` - Timestamp to remove this message on frontend",
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{api_key}}",
+						"type": "string"
+					}
+				]
+			},
 			"event": [
 				{
 					"listen": "prerequest",
@@ -2945,7 +3881,8 @@
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Checkins",
@@ -3400,6 +4337,16 @@
 				}
 			],
 			"description": "A Checkin is when a service communicates to your Statping instance rather than Statping attempting to hit your service. Checkin's have a scheduled interval that waits for your service to notify Statping, if your service does not hit the Checkin URL during the interval you set, it will result in a service failing notification.",
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{api_key}}",
+						"type": "string"
+					}
+				]
+			},
 			"event": [
 				{
 					"listen": "prerequest",
@@ -3421,7 +4368,298 @@
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Theme",
+			"item": [
+				{
+					"name": "Create Assets",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cf003eb2-e18e-46f0-bee2-2a9915525651",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint}}/api/theme/create",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"theme",
+								"create"
+							]
+						},
+						"description": "This endpoint will create the `assets` folder and dump all css, js, and image assets into that folder. If assets have already been created, it will return an error.\n\n```json\n{\n  \"error\": \"assets have already been created\"\n}\n```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get SASS Files",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8520bcc3-1176-4eb9-b22e-31169e093568",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint}}/api/theme",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"theme"
+							]
+						},
+						"description": "This endpoint will return the path where the assets are stored, and the raw data for each sass files. \n- base.scss\n- variables.scss\n- mobile.scss"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Theme",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d9665e36-02b4-4c9f-b155-aded33b3936e",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"base\": \"\",\n    \"variables\": \"\",\n    \"mobile\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/theme",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"theme"
+							]
+						},
+						"description": "This endpoint will update the sass files and compile sass into css."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Assets",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "22213939-d2be-47fb-8c76-b8b4c4956b81",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint}}/api/theme",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"theme"
+							]
+						},
+						"description": "This endpoint will delete the `assets` folder."
+					},
+					"response": [
+						{
+							"name": "Delete Assets",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint}}/api/theme",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"theme"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "79"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 01:15:10 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"string\",\n    \"method\": \"deleted\",\n    \"output\": \"/app/assets\"\n}"
+						}
+					]
+				}
+			],
+			"description": "You can edit the SASS files to create a custom theme for your Statping Instance. For you to use themes, you must have [sass](https://sass-lang.com/) installed on your location system. \n\n> You will need to have `sass` installed and available in your `$PATH`. \n\n## Asset Files\n- `variables.scss` - SASS variables \n- `base.scss` - Main theme for Statping\n- `mobile.scss` - Custom mobile designs using viewports",
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{api_key}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cb6d709c-85c1-4dc3-9434-04f817db23ea",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "88b7bef2-103e-455c-a8f8-bce15c73d6d7",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{api_key}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "e37b4946-9995-4fb5-88a9-39adb191d076",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "8fa9bd45-c197-4751-baa6-c58143156aea",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }

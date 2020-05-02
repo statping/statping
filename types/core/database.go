@@ -53,6 +53,7 @@ func (c *Core) Create() error {
 		MigrationId: utils.Now().Unix(),
 	}
 	q := db.Create(&newCore)
+	utils.Log.Infof("API Key created: %s", secret)
 	return q.Error()
 }
 

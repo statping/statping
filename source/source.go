@@ -43,9 +43,14 @@ func scssRendered(name string) string {
 
 // CompileSASS will attempt to compile the SASS files into CSS
 func CompileSASS(files ...string) error {
-	sassBin, err := exec.LookPath("sass")
-	if err != nil {
-		return err
+	sassBin := utils.Params.GetString("SASS")
+	if sassBin == "" {
+		bin, err := exec.LookPath("sass")
+		if err != nil {
+			log.Warnf("could not find sass executable in PATH: %s", err)
+			return err
+		}
+		sassBin = bin
 	}
 
 	for _, file := range files {
@@ -60,11 +65,6 @@ func CompileSASS(files ...string) error {
 			log.Errorln(fmt.Sprintf("%s %s %s", sassBin, scssFile, scssRendered(scssFile)))
 			return errors.Wrapf(err, "failed to compile assets, %s %s %s", err, stdout, stderr)
 		}
-
-		//if stdout != "" || stderr != "" {
-		//	log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v %v %v", err, stdout, stderr))
-		//	return errors.Wrap(err, "failed to capture stdout or stderr")
-		//}
 
 		if stdout != "" || stderr != "" {
 			log.Infoln(fmt.Sprintf("out: %v | error: %v", stdout, stderr))
@@ -125,10 +125,18 @@ func CreateAllAssets(folder string) error {
 	log.Infoln(fmt.Sprintf("Dump Statping assets into %v/assets", folder))
 	fp := filepath.Join
 
-	MakePublicFolder(fp(folder, "/assets"))
-	MakePublicFolder(fp(folder, "assets", "js"))
-	MakePublicFolder(fp(folder, "assets", "css"))
-	MakePublicFolder(fp(folder, "assets", "scss"))
+	if err := MakePublicFolder(fp(folder, "/assets")); err != nil {
+		return err
+	}
+	if err := MakePublicFolder(fp(folder, "assets", "js")); err != nil {
+		return err
+	}
+	if err := MakePublicFolder(fp(folder, "assets", "css")); err != nil {
+		return err
+	}
+	if err := MakePublicFolder(fp(folder, "assets", "scss")); err != nil {
+		return err
+	}
 	log.Infoln("Inserting scss, css, and javascript files into assets folder")
 
 	if err := CopyAllToPublic(TmplBox); err != nil {

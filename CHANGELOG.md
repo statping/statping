@@ -1,4 +1,9 @@
-# Upcoming
+# 0.90.35 (05-01-2020)
+- Fixed issue with API endpoints cannot accepting Authorization header
+- Fixed issue with sass executable not being found, SASS environment var re-implemented
+- Added additional Postman API doc endpoints
+
+# 0.90.34 (04-28-2020)
 - Added missing information to Mail notification ([#472](https://github.com/statping/statping/issues/472))
 - Added service.yml file to auto create services (https://github.com/statping/statping/wiki/services.yml)
 - Removed Core API_KEY, (unused code, use API_SECRET)

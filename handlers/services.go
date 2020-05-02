@@ -23,8 +23,7 @@ func findService(r *http.Request) (*services.Service, error) {
 	if err != nil {
 		return nil, err
 	}
-	user := IsUser(r)
-	if !servicer.Public.Bool && !user {
+	if !servicer.Public.Bool && !IsReadAuthenticated(r) {
 		return nil, errors.NotAuthenticated
 	}
 	return servicer, nil
@@ -216,10 +215,9 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllServicesHandler(r *http.Request) interface{} {
-	user := IsUser(r)
 	var srvs []services.Service
 	for _, v := range services.AllInOrder() {
-		if !v.Public.Bool && !user {
+		if !v.Public.Bool && !IsUser(r) {
 			continue
 		}
 		srvs = append(srvs, v)

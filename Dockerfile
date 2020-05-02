@@ -11,6 +11,7 @@ COPY --from=base /usr/local/share/ca-certificates /usr/local/share/
 WORKDIR /app
 
 ENV IS_DOCKER=true
+ENV SASS=/usr/local/bin/sass
 ENV STATPING_DIR=/app
 ENV PORT=8080
 

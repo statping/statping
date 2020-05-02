@@ -26,14 +26,16 @@ func LoadServicesYaml() (*yamlFile, error) {
 	log.Infof("Found %d services inside services.yml file", len(svrs.Services))
 
 	for _, svr := range svrs.Services {
-		log.Infof("Service %s %d, hash: %s", svr.Name, svr.Id, svr.Hash())
-		if findServiceByHash(svr.Hash()) == nil {
+		serviceByHash := findServiceByHash(svr.Hash())
+		if serviceByHash == nil {
 			if err := svr.Create(); err != nil {
 				return nil, errors.Wrapf(err, "could not create service %s", svr.Name)
 			}
-			log.Infof("Automatically created service '%s' checking %s", svr.Name, svr.Domain)
+			log.Infof("Automatically creating service '%s' checking %s", svr.Name, svr.Domain)
 
 			go ServiceCheckQueue(svr, true)
+		} else {
+			log.Infof("Service %s #%d, already inserted", svr.Name, serviceByHash.Id)
 		}
 	}
 

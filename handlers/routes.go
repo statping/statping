@@ -80,12 +80,12 @@ func Router() *mux.Router {
 	api.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
 	api.Handle("/api/core", authenticated(apiCoreHandler, false)).Methods("POST")
 	api.Handle("/api/oauth", scoped(apiOAuthHandler)).Methods("GET")
-	api.Handle("/api/oauth/{provider}", http.HandlerFunc(oauthHandler))
+	api.Handle("/oauth/{provider}", http.HandlerFunc(oauthHandler))
 	api.Handle("/api/logs", authenticated(logsHandler, false)).Methods("GET")
 	api.Handle("/api/logs/last", authenticated(logsLineHandler, false)).Methods("GET")
 
 	// API SCSS and ASSETS Routes
-	api.Handle("/api/theme", authenticated(apiThemeHandler, false)).Methods("GET")
+	api.Handle("/api/theme", authenticated(apiThemeViewHandler, false)).Methods("GET")
 	api.Handle("/api/theme", authenticated(apiThemeSaveHandler, false)).Methods("POST")
 	api.Handle("/api/theme/create", authenticated(apiThemeCreateHandler, false)).Methods("GET")
 	api.Handle("/api/theme", authenticated(apiThemeRemoveHandler, false)).Methods("DELETE")
