@@ -85,9 +85,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install Global Dependencies
-        run: |
-          go get gotest.tools/gotestsum
-          npm install -g yarn sass newman cross-env wait-on @sentry/cli
+        run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
 
       - name: Setting ENV's
         run: |
@@ -112,7 +110,8 @@ jobs:
 
       - name: Go Tests
         run: |
-          SASS=`which sass` gotestsum --no-summary=skipped --format dots -- -covermode=count -coverprofile=coverage.out -p=1 ./...
+          go get gotest.tools/gotestsum
+          gotestsum --no-summary=skipped --format dots -- -covermode=count -coverprofile=coverage.out -p=1 ./...
         env:
           VERSION: ${{ env.VERSION }}
           DB_CONN: sqlite3

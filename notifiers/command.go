@@ -32,7 +32,7 @@ var Command = &commandLine{&notifications.Notification{
 	Limits:      60,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
-		Title:       "Executable Path",
+		Title:       "Shell or Bash",
 		Placeholder: "/usr/bin/curl",
 		DbField:     "host",
 		SmallText:   "You can use '/bin/sh', '/bin/bash', '/usr/bin/curl' or an absolute path for an application.",
@@ -41,13 +41,13 @@ var Command = &commandLine{&notifications.Notification{
 		Title:       "Command to Run on OnSuccess",
 		Placeholder: "http://localhost:8080/health",
 		DbField:     "var1",
-		SmallText:   "<b>Accepts Variables</b> This Command will run when a service is receiving a Successful event.",
+		SmallText:   "This Command will run when a service is receiving a Successful event.",
 	}, {
 		Type:        "text",
 		Title:       "Command to Run on OnFailure",
 		Placeholder: "http://localhost:8080/health",
 		DbField:     "var2",
-		SmallText:   "<b>Accepts Variables</b> This Command will run when a service is receiving a Failing event.",
+		SmallText:   "This Command will run when a service is receiving a Failing event.",
 	}}},
 }
 

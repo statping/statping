@@ -1,6 +1,3 @@
-# 0.90.36 (05-02-2020)
-- Fixed Notifier golang templating func to use correct variables
-
 # 0.90.35 (05-01-2020)
 - Fixed issue with API endpoints cannot accepting Authorization header
 - Fixed issue with sass executable not being found, SASS environment var re-implemented

@@ -40,6 +40,20 @@ func TestCommand(t *testing.T) {
 	assert.Contains(t, out, "statping")
 }
 
+func TestReplaceTemplate(t *testing.T) {
+	type Object struct {
+		Id      int64
+		String  string
+		Online  bool
+		Example string
+	}
+	ex := &Object{
+		1, "this is an example", true, "it should work",
+	}
+	result := ReplaceTemplate(`{"id": {{.Id}} }`, ex)
+	assert.Equal(t, "{\"id\": 1 }", result)
+}
+
 func TestToInt(t *testing.T) {
 	assert.Equal(t, int64(55), ToInt("55"))
 	assert.Equal(t, int64(55), ToInt(55))
