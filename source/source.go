@@ -45,7 +45,12 @@ func scssRendered(name string) string {
 func CompileSASS(files ...string) error {
 	sassBin, err := exec.LookPath("sass")
 	if err != nil {
+		log.Warnf("could not find sass executable in PATH: ", err)
 		return err
+	}
+	sassEnv := utils.Params.GetString("SASS")
+	if sassEnv != "" {
+		sassBin = sassEnv
 	}
 
 	for _, file := range files {
@@ -125,10 +130,18 @@ func CreateAllAssets(folder string) error {
 	log.Infoln(fmt.Sprintf("Dump Statping assets into %v/assets", folder))
 	fp := filepath.Join
 
-	MakePublicFolder(fp(folder, "/assets"))
-	MakePublicFolder(fp(folder, "assets", "js"))
-	MakePublicFolder(fp(folder, "assets", "css"))
-	MakePublicFolder(fp(folder, "assets", "scss"))
+	if err := MakePublicFolder(fp(folder, "/assets")); err != nil {
+		return err
+	}
+	if err := MakePublicFolder(fp(folder, "assets", "js")); err != nil {
+		return err
+	}
+	if err := MakePublicFolder(fp(folder, "assets", "css")); err != nil {
+		return err
+	}
+	if err := MakePublicFolder(fp(folder, "assets", "scss")); err != nil {
+		return err
+	}
 	log.Infoln("Inserting scss, css, and javascript files into assets folder")
 
 	if err := CopyAllToPublic(TmplBox); err != nil {

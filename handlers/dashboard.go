@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/statping/statping/source"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/users"
 	"github.com/statping/statping/utils"
 	"net/http"
@@ -36,7 +37,7 @@ type themeApi struct {
 	Mobile    string `json:"mobile"`
 }
 
-func apiThemeHandler(w http.ResponseWriter, r *http.Request) {
+func apiThemeViewHandler(w http.ResponseWriter, r *http.Request) {
 	var base, variables, mobile, dir string
 	assets := utils.Directory + "/assets"
 
@@ -93,6 +94,12 @@ func apiThemeSaveHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiThemeCreateHandler(w http.ResponseWriter, r *http.Request) {
 	dir := utils.Params.GetString("STATPING_DIR")
+	if source.UsingAssets(dir) {
+		err := errors.New("assets have already been created")
+		log.Errorln(err)
+		sendErrorJson(err, w, r)
+		return
+	}
 	utils.Log.Infof("creating assets in folder: %s/%s", dir, "assets")
 	if err := source.CreateAllAssets(dir); err != nil {
 		log.Errorln(err)
