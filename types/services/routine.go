@@ -379,7 +379,7 @@ func sendFailure(s *Service, f *failures.Failure) {
 		return
 	}
 
-	if s.NotifyAfter == 0 || s.notifyAfterCount > s.NotifyAfter {
+	if s.notifyAfterCount > s.NotifyAfter {
 		for _, n := range allNotifiers {
 			notif := n.Select()
 			if notif.CanSend() {

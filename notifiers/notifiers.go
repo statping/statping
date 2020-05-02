@@ -1,14 +1,23 @@
 package notifiers
 
 import (
+	"bytes"
+	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
+	"html/template"
 	"time"
 )
 
 var log = utils.Log.WithField("type", "notifier")
+
+type replacer struct {
+	Core    *core.Core
+	Service *services.Service
+	Failure *failures.Failure
+}
 
 func InitNotifiers() {
 	Add(
@@ -25,6 +34,21 @@ func InitNotifiers() {
 	)
 }
 
+func ReplaceTemplate(tmpl string, data replacer) string {
+	buf := new(bytes.Buffer)
+	tmp, err := template.New("replacement").Parse(tmpl)
+	if err != nil {
+		log.Error(err)
+		return err.Error()
+	}
+	err = tmp.Execute(buf, data)
+	if err != nil {
+		log.Error(err)
+		return err.Error()
+	}
+	return buf.String()
+}
+
 func Add(notifs ...services.ServiceNotifier) {
 	for _, n := range notifs {
 		services.AddNotifier(n)
@@ -34,19 +58,8 @@ func Add(notifs ...services.ServiceNotifier) {
 	}
 }
 
-func ToMap(srv *services.Service, f *failures.Failure) map[string]interface{} {
-	m := make(map[string]interface{})
-	m["Service"] = srv
-	m["Failure"] = f
-	return m
-}
-
 func ReplaceVars(input string, s *services.Service, f *failures.Failure) string {
-	input = utils.ReplaceTemplate(input, s)
-	if f != nil {
-		input = utils.ReplaceTemplate(input, f)
-	}
-	return input
+	return ReplaceTemplate(input, replacer{Service: s, Failure: f, Core: core.App})
 }
 
 var exampleService = &services.Service{
@@ -86,6 +99,7 @@ var exampleService = &services.Service{
 	LastOffline:         utils.Now().Add(-10 * time.Minute),
 	SecondsOnline:       4500,
 	SecondsOffline:      300,
+	Redirect:            null.NewNullBool(true),
 }
 
 var exampleFailure = &failures.Failure{
