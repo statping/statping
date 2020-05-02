@@ -90,6 +90,9 @@ func sendLog(next http.Handler) http.Handler {
 	})
 }
 
+// scoped is a middleware handler that will remove private fields based on struct tags
+// this will look for the `scope:"user,admin"` tag and remove the JSON field from response
+// if user is not authenticated based on the scope.
 func scoped(handler func(r *http.Request) interface{}) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		data := handler(r)

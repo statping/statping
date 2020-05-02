@@ -21,10 +21,8 @@ func findGroup(r *http.Request) (*groups.Group, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !g.Public.Bool {
-		if !IsReadAuthenticated(r) {
-			return nil, errors.NotAuthenticated
-		}
+	if !g.Public.Bool && !IsReadAuthenticated(r) {
+		return nil, errors.NotAuthenticated
 	}
 	return g, nil
 }

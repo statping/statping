@@ -215,10 +215,9 @@ func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiAllServicesHandler(r *http.Request) interface{} {
-	user := IsUser(r)
 	var srvs []services.Service
 	for _, v := range services.AllInOrder() {
-		if !v.Public.Bool && !user {
+		if !v.Public.Bool && !IsUser(r) {
 			continue
 		}
 		srvs = append(srvs, v)

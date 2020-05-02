@@ -1,17 +1,14 @@
 package handlers
 
 import (
-	"crypto/subtle"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/errors"
 	"html/template"
 	"net/http"
 	"path"
-	"strings"
 	"time"
 
 	"github.com/statping/statping/source"
@@ -86,22 +83,14 @@ func RunHTTPServer(ip string, port int) error {
 
 // IsReadAuthenticated will allow Read Only authentication for some routes
 func IsReadAuthenticated(r *http.Request) bool {
-	if !core.App.Setup {
-		return false
-	}
-	var token string
-	query := r.URL.Query()
-	key := query.Get("api")
-	if subtle.ConstantTimeCompare([]byte(key), []byte(core.App.ApiSecret)) == 1 {
+	if ok := hasSetupEnv(); ok {
 		return true
 	}
-	tokens, ok := r.Header["Authorization"]
-	if ok && len(tokens) >= 1 {
-		token = tokens[0]
-		token = strings.TrimPrefix(token, "Bearer ")
-		if subtle.ConstantTimeCompare([]byte(token), []byte(core.App.ApiSecret)) == 1 {
-			return true
-		}
+	if ok := hasAPIQuery(r); ok {
+		return true
+	}
+	if ok := hasAuthorizationHeader(r); ok {
+		return true
 	}
 	return IsFullAuthenticated(r)
 }
@@ -109,23 +98,14 @@ func IsReadAuthenticated(r *http.Request) bool {
 // IsFullAuthenticated returns true if the HTTP request is authenticated. You can set the environment variable GO_ENV=test
 // to bypass the admin authenticate to the dashboard features.
 func IsFullAuthenticated(r *http.Request) bool {
-	if utils.Params.Get("GO_ENV") == "test" {
+	if ok := hasSetupEnv(); ok {
 		return true
 	}
-	if core.App == nil {
+	if ok := hasAPIQuery(r); ok {
 		return true
 	}
-	if !core.App.Setup {
-		return false
-	}
-	var token string
-	tokens, ok := r.Header["Authorization"]
-	if ok && len(tokens) >= 1 {
-		token = tokens[0]
-		token = strings.TrimPrefix(token, "Bearer ")
-		if subtle.ConstantTimeCompare([]byte(token), []byte(core.App.ApiSecret)) == 1 {
-			return true
-		}
+	if ok := hasAuthorizationHeader(r); ok {
+		return true
 	}
 	return IsAdmin(r)
 }
@@ -155,7 +135,15 @@ func getJwtToken(r *http.Request) (JwtClaim, error) {
 	return claims, err
 }
 
+// ScopeName will show private JSON fields in the API.
+// It will return "admin" if request has valid admin authentication.
 func ScopeName(r *http.Request) string {
+	if ok := hasAPIQuery(r); ok {
+		return "admin"
+	}
+	if ok := hasAuthorizationHeader(r); ok {
+		return "admin"
+	}
 	claim, err := getJwtToken(r)
 	if err != nil {
 		return ""
@@ -168,12 +156,6 @@ func ScopeName(r *http.Request) string {
 
 // IsAdmin returns true if the user session is an administrator
 func IsAdmin(r *http.Request) bool {
-	if !core.App.Setup {
-		return false
-	}
-	if utils.Params.GetString("GO_ENV") == "test" {
-		return true
-	}
 	claim, err := getJwtToken(r)
 	if err != nil {
 		return false
@@ -183,10 +165,7 @@ func IsAdmin(r *http.Request) bool {
 
 // IsUser returns true if the user is registered
 func IsUser(r *http.Request) bool {
-	if !core.App.Setup {
-		return false
-	}
-	if utils.Params.Get("GO_ENV") == "test" {
+	if ok := hasSetupEnv(); ok {
 		return true
 	}
 	tk, err := getJwtToken(r)
