@@ -41,8 +41,7 @@ func TestCreateAssets(t *testing.T) {
 //}
 
 func TestCompileSASS(t *testing.T) {
-	err := CompileSASS(DefaultScss...)
-	require.Nil(t, err)
+	CompileSASS(DefaultScss...)
 	assert.True(t, UsingAssets(dir))
 }
 
