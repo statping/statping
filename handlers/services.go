@@ -23,8 +23,7 @@ func findService(r *http.Request) (*services.Service, error) {
 	if err != nil {
 		return nil, err
 	}
-	user := IsUser(r)
-	if !servicer.Public.Bool && !user {
+	if !servicer.Public.Bool && !IsReadAuthenticated(r) {
 		return nil, errors.NotAuthenticated
 	}
 	return servicer, nil
