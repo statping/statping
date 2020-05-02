@@ -1,4 +1,4 @@
-name: Issues
+name: Stalebot
 on:
   schedule:
     - cron: "0 0 * * *"
@@ -12,6 +12,7 @@ jobs:
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         stale-issue-message: "This issue hasn't had any updates in a while. If this is still a problem, please create a new issue."
+        stale-issue-label: "stale"
         days-before-stale: 30
-        days-before-close: 5
+        days-before-close: 7
         exempt-issue-labels: "bug,urgent,feature,pinned,locked"

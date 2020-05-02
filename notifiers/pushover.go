@@ -68,21 +68,21 @@ func (t *pushover) sendMessage(message string) (string, error) {
 
 // OnFailure will trigger failing service
 func (t *pushover) OnFailure(s *services.Service, f *failures.Failure) error {
-	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
+	msg := fmt.Sprintf("Your service '%s' is currently offline!", s.Name)
 	_, err := t.sendMessage(msg)
 	return err
 }
 
 // OnSuccess will trigger successful service
 func (t *pushover) OnSuccess(s *services.Service) error {
-	msg := fmt.Sprintf("Your service '%v' is currently online!", s.Name)
+	msg := fmt.Sprintf("Your service '%s' is currently online!", s.Name)
 	_, err := t.sendMessage(msg)
 	return err
 }
 
 // OnTest will test the Pushover SMS messaging
 func (t *pushover) OnTest() (string, error) {
-	msg := fmt.Sprintf("Testing the Pushover Notifier")
+	msg := fmt.Sprintf("Testing the Pushover Notifier, Your service '%s' is currently offline! Error: %s", exampleService.Name, exampleFailure.Issue)
 	content, err := t.sendMessage(msg)
 	return content, err
 }

@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	humanize "github.com/dustin/go-humanize"
 	"github.com/statping/statping/types/failures"
 	"strings"
 	"time"
@@ -18,6 +19,14 @@ func (s *Service) AllFailures() failures.Failurer {
 func (s *Service) FailuresSince(t time.Time) failures.Failurer {
 	fails := failures.Since(t, s)
 	return fails
+}
+
+func (s *Service) DowntimeAgo() string {
+	last := s.LastOnline
+	if last.IsZero() {
+		return "Never been online"
+	}
+	return humanize.Time(last)
 }
 
 func (s *Service) DowntimeText() string {
