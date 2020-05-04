@@ -15,7 +15,9 @@ import (
 
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	removeJwtToken(w)
-	http.Redirect(w, r, basePath, http.StatusSeeOther)
+	out := make(map[string]string)
+	out["status"] = "success"
+	returnJson(out, w, r)
 }
 
 func logsHandler(w http.ResponseWriter, r *http.Request) {
@@ -163,7 +165,7 @@ func removeJwtToken(w http.ResponseWriter) {
 	http.SetCookie(w, &http.Cookie{
 		Name:    cookieKey,
 		Value:   "",
-		Expires: utils.Now(),
+		Expires: time.Now(),
 	})
 }
 
@@ -178,8 +180,10 @@ func setJwtToken(user *users.User, w http.ResponseWriter) (JwtClaim, string) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaim)
 	tokenString, err := token.SignedString([]byte(jwtKey))
 	if err != nil {
-		utils.Log.Errorln("error setting token: ", err)
+		log.Errorln("error setting token: ", err)
 	}
+	user.Token = tokenString
+	// set cookies
 	http.SetCookie(w, &http.Cookie{
 		Name:    cookieKey,
 		Value:   tokenString,
@@ -195,9 +199,8 @@ func apiLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, auth := users.AuthUser(username, password)
 	if auth {
-		utils.Log.Infoln(fmt.Sprintf("User %v logged in from IP %v", user.Username, r.RemoteAddr))
+		log.Infoln(fmt.Sprintf("User %v logged in from IP %v", user.Username, r.RemoteAddr))
 		claim, token := setJwtToken(user, w)
-
 		resp := struct {
 			Token   string `json:"token"`
 			IsAdmin bool   `json:"admin"`

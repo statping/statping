@@ -102,7 +102,6 @@ export default new Vuex.Store({
             state.hasPublicData = bool
         },
         setCore (state, core) {
-          window.console.log('GETTING CORE')
             state.core = core
         },
         setToken (state, token) {
@@ -146,10 +145,11 @@ export default new Vuex.Store({
         },
       async loadCore(context) {
         const core = await Api.core()
+        const token = await Api.token()
         context.commit("setCore", core);
-        context.commit('setAdmin', core.admin)
+        context.commit('setAdmin', token.admin)
         context.commit('setCore', core)
-        context.commit('setUser', core.logged_in)
+        context.commit('setUser', token.token!==undefined)
       },
         async loadRequired(context) {
             const groups = await Api.groups()

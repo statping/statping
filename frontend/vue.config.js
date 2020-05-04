@@ -10,7 +10,7 @@ module.exports = {
       },
       '/oauth': {
         logLevel: 'debug',
-        target: 'http://0.0.0.0:8585'
+        target: 'http://0.0.0.0:8585/oauth/'
       }
     }
   }

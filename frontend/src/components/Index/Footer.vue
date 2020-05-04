@@ -4,7 +4,7 @@
             <a href="https://github.com/statping/statping" target="_blank">
                 Statping {{core.version}} made with <font-awesome-icon icon="heart"/>
             </a> |
-            <router-link :to="core.logged_in ? '/dashboard' : '/login'">Dashboard</router-link>
+            <router-link :to="$store.state.admin ? '/dashboard' : '/login'">Dashboard</router-link>
         </div>
         <div v-else class="footer text-center mb-4 p-2" v-html="core.footer"></div>
     </footer>

@@ -28,7 +28,7 @@
                 </li>
             </ul>
             <span class="navbar-text">
-      <a href="#" class="nav-link" v-on:click="logout">Logout</a>
+      <a href="#" class="nav-link" @click.prevent="logout">Logout</a>
     </span>
         </div>
     </nav>
@@ -37,6 +37,7 @@
 
 <script>
   import Api from "../../API"
+  import Vue from "vue";
 
   export default {
   name: 'TopNav',
@@ -51,6 +52,7 @@
           this.$store.commit('setHasAllData', false)
           this.$store.commit('setToken', null)
           this.$store.commit('setAdmin', false)
+          this.$cookies.remove("statping_auth")
           await this.$router.push('/logout')
         }
     }

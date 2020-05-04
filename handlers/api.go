@@ -27,13 +27,7 @@ type apiResponse struct {
 }
 
 func apiIndexHandler(r *http.Request) interface{} {
-	coreClone := *core.App
-	_, err := getJwtToken(r)
-	if err == nil {
-		coreClone.LoggedIn = true
-		coreClone.IsAdmin = IsAdmin(r)
-	}
-	return coreClone
+	return core.App
 }
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
@@ -48,6 +42,18 @@ func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 		Status: "success",
 	}
 	returnJson(output, w, r)
+}
+
+func apiUpdateOAuthHandler(w http.ResponseWriter, r *http.Request) {
+	var c core.OAuth
+	err := DecodeJSON(r, &c)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	app := core.App
+	app.OAuth = c
+	sendJsonAction(app.OAuth, "update", w, r)
 }
 
 func apiOAuthHandler(r *http.Request) interface{} {
@@ -78,7 +84,6 @@ func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 	if c.Domain != app.Domain {
 		app.Domain = c.Domain
 	}
-	app.OAuth = c.OAuth
 	app.UseCdn = null.NewNullBool(c.UseCdn.Bool)
 	app.AllowReports = null.NewNullBool(c.AllowReports.Bool)
 	utils.SentryInit(nil, app.AllowReports.Bool)
