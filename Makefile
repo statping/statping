@@ -2,7 +2,7 @@ VERSION=$(shell cat version.txt)
 SIGN_KEY=B76D61FAA6DB759466E83D9964B9C6AAE2D55278
 BINARY_NAME=statping
 GOBUILD=go build -a
-GOVERSION=1.14.0
+GOVERSION=1.14.2
 XGO=xgo -go $(GOVERSION) --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
 TRVIS_SECRET=O3/2KTOV8krv+yZ1EB/7D1RQRe6NdpFUEJNJkMS/ollYqmz3x2mCO7yIgIJKCKguLXZxjM6CxJcjlCrvUwibL+8BBp7xJe4XFIOrjkPvbbVPry4HkFZCf2GfcUK6o4AByQ+RYqsW2F17Fp9KLQ1rL3OT3eLTwCAGKx3tlY8y+an43zkmo5dN64V6sawx26fh6XTfww590ey+ltgQTjf8UPNup2wZmGvMo9Hwvh/bYR/47bR6PlBh6vhlKWyotKf2Fz1Bevbu0zc35pee5YlsrHR+oSF+/nNd/dOij34BhtqQikUR+zQVy9yty8SlmneVwD3yOENvlF+8roeKIXb6P6eZnSMHvelhWpAFTwDXq2N3d/FIgrQtLxsAFTI3nTHvZgs6OoTd6dA0wkhuIGLxaL3FOeztCdxP5J/CQ9GUcTvifh5ArGGwYxRxQU6rTgtebJcNtXFISP9CEUR6rwRtb6ax7h6f1SbjUGAdxt+r2LbEVEk4ZlwHvdJ2DtzJHT5DQtLrqq/CTUgJ8SJFMkrJMp/pPznKhzN4qvd8oQJXygSXX/gz92MvoX0xgpNeLsUdAn+PL9KketfR+QYosBz04d8k05E+aTqGaU7FUCHPTLwlOFvLD8Gbv0zsC/PWgSLXTBlcqLEz5PHwPVHTcVzspKj/IyYimXpCSbvu1YOIjyc=
@@ -152,46 +152,40 @@ generate:
 	cd source && go generate
 
 build-linux:
-	mkdir build || true
-	export PWD=`pwd`
-	@for arch in $(ARCHS);\
+	LINUX_ARCHS = 386 amd64 arm-7 arm-6 arm64 arm
+	xgo -go $(GOVERSION) --dest=build -ldflags "-X main.VERSION=${VERSION}" --targets=linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64,linux/arm -out statping ./cmd
+	@for arch in $(LINUX_ARCHS);\
 	do \
-		for os in $(OS);\
-		do \
-			echo "Building v$$VERSION for $$os-$$arch"; \
-			mkdir -p releases/statping-$$os-$$arch/; \
-			CGO_ENABLED=1 GO111MODULE="on" GOOS=$$os GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION}" -o releases/statping-$$os-$$arch/statping ${PWD}/cmd || true; \
-			chmod +x releases/statping-$$os-$$arch/statping || true; \
-			tar -czf releases/statping-$$os-$$arch.tar.gz -C releases/statping-$$os-$$arch statping || true; \
-		done \
+		echo "Releasing v$$VERSION for linux-$$arch"; \
+		mkdir -p build/statping-linux-$$arch/; \
+		chmod +x build/statping-linux-$$arch; \
+		mv build/statping-linux-$$arch build/statping-linux-$$arch/statping; \
+		tar -czf build/statping-linux-$$arch.tar.gz -C build/statping-linux-$$arch statping; \
 	done
-	find ./releases/ -name "*.tar.gz" -type f -size +1M -exec mv "{}" build/ \;
 
 build-mac:
-	mkdir build || true
-	export PWD=`pwd`
-	@for arch in $(ARCHS);\
+	OSX_ARCHS = 386 amd64
+	xgo -go $(GOVERSION) --dest=build -ldflags "-X main.VERSION=${VERSION}" --targets=darwin/amd64,darwin/386 -out statping ./cmd
+	@for arch in $(OSX_ARCHS);\
 	do \
-		echo "Building v$$VERSION for darwin-$$arch"; \
-		mkdir -p releases/statping-darwin-$$arch/; \
-		CGO_ENABLED=1 GO111MODULE="on" GOOS=darwin GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION}" -o releases/statping-darwin-$$arch/statping ${PWD}/cmd || true; \
-		chmod +x releases/statping-darwin-$$arch/statping || true; \
-		tar -czf releases/statping-darwin-$$arch.tar.gz -C releases/statping-darwin-$$arch statping || true; \
+		echo "Releasing v$$VERSION for darwin-$$arch"; \
+		mkdir -p build/statping-darwin-$$arch/; \
+		chmod +x build/statping-darwin-10.6-$$arch; \
+		mv build/statping-darwin-10.6-$$arch build/statping-darwin-$$arch/statping; \
+		tar -czf build/statping-darwin-$$arch.tar.gz -C build/statping-darwin-$$arch statping; \
 	done
-	find ./releases/ -name "*.tar.gz" -type f -size +1M -exec mv "{}" build/ \;
 
 build-win:
-	mkdir build || true
-	export PWD=`pwd`
-	@for arch in $(ARCHS);\
+	WIN_ARCHS = 386 amd64 arm arm64
+	xgo -go $(GOVERSION) --dest=build -ldflags "-X main.VERSION=${VERSION}" --targets=windows-6.0/amd64,windows-6.0/386,windows-6.0/arm,windows-6.0/arm64 -out statping ./cmd
+	@for arch in $(WIN_ARCHS);\
 	do \
-		echo "Building v$$VERSION for windows-$$arch"; \
-		mkdir -p releases/statping-windows-$$arch/; \
-		CGO_ENABLED=1 GO111MODULE="on" GOOS=windows GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION}" -o releases/statping-windows-$$arch/statping.exe ${PWD}/cmd || true; \
-		chmod +x releases/statping-windows-$$arch/statping.exe || true; \
-		zip -j releases/statping-windows-$$arch.zip releases/statping-windows-$$arch/statping.exe || true; \
+		echo "Releasing v$$VERSION for windows-6.0-$$arch"; \
+		mkdir -p build/statping-windows-6.0-$$arch/; \
+		chmod +x build/statping-windows-6.0-$$arch; \
+		mv build/statping-windows-6.0-$$arch build/statping-windows-$$arch/statping; \
+		tar -czf build/statping-windows-$$arch.tar.gz -C build/statping-windows-$$arch statping; \
 	done
-	find ./releases/ -name "*.zip" -type f -size +1M -exec mv "{}" build/ \;
 
 # remove files for a clean compile/build
 clean:

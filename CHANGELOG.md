@@ -1,3 +1,7 @@
+# 0.90.37 (05-04-2020)
+- Fixed authentication issues dealing with cookies
+- Modified build process, arm/arm64 couldnt run sqlite
+
 # 0.90.36 (05-02-2020)
 - Fixed Notifier golang templating func to use correct variables
 
