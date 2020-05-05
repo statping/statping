@@ -11,7 +11,9 @@ TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master 
 TEST_DIR=$(GOPATH)/src/github.com/statping/statping
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 OS = freebsd linux openbsd
-ARCHS = 386 arm amd64 arm64
+WIN_ARCHS = 386 amd64 arm arm64
+LINUX_ARCHS = 386 amd64 arm-7 arm-6 arm64 arm
+OSX_ARCHS = 386 amd64
 
 all: clean yarn-install compile docker-base docker-vue build-all
 
@@ -152,7 +154,6 @@ generate:
 	cd source && go generate
 
 build-linux:
-	export LINUX_ARCHS = 386 amd64 arm-7 arm-6 arm64 arm
 	xgo -go $(GOVERSION) --dest=build -ldflags "-X main.VERSION=${VERSION}" --targets=linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64,linux/arm -out statping ./cmd
 	@for arch in $(LINUX_ARCHS);\
 	do \
@@ -164,7 +165,6 @@ build-linux:
 	done
 
 build-mac:
-	export OSX_ARCHS = 386 amd64
 	xgo -go $(GOVERSION) --dest=build -ldflags "-X main.VERSION=${VERSION}" --targets=darwin/amd64,darwin/386 -out statping ./cmd
 	@for arch in $(OSX_ARCHS);\
 	do \
@@ -176,7 +176,6 @@ build-mac:
 	done
 
 build-win:
-	export WIN_ARCHS = 386 amd64 arm arm64
 	xgo -go $(GOVERSION) --dest=build -ldflags "-X main.VERSION=${VERSION}" --targets=windows-6.0/amd64,windows-6.0/386,windows-6.0/arm,windows-6.0/arm64 -out statping ./cmd
 	@for arch in $(WIN_ARCHS);\
 	do \
