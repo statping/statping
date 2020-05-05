@@ -11,9 +11,8 @@ TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master 
 TEST_DIR=$(GOPATH)/src/github.com/statping/statping
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 OS = freebsd linux openbsd
-WIN_ARCHS = 386 amd64 arm arm64
 LINUX_ARCHS = 386 amd64 arm-7 arm-6 arm64 arm
-OSX_ARCHS = 386 amd64
+BASIC_ARCHS = 386 amd64
 
 all: clean yarn-install compile docker-base docker-vue build-all
 
@@ -58,6 +57,7 @@ test-deps:
 	go get golang.org/x/tools/cmd/cover
 	go get github.com/mattn/goveralls
 	go get github.com/GeertJohan/go.rice/rice
+	go get github.com/crazy-max/xgo
 
 deps:
 	go get -d -v -t ./...
@@ -153,38 +153,38 @@ install-local: build
 generate:
 	cd source && go generate
 
-build-linux:
-	xgo -go $(GOVERSION) --dest=build -ldflags "-X main.VERSION=${VERSION}" --targets=linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64,linux/arm -out statping ./cmd
+compress:
+	mkdir releases || true;
 	@for arch in $(LINUX_ARCHS);\
 	do \
-		echo "Releasing v$$VERSION for linux-$$arch"; \
+		echo "Compressing v$$VERSION for linux-$$arch"; \
 		mkdir -p build/statping-linux-$$arch/; \
-		chmod +x build/statping-linux-$$arch; \
-		mv build/statping-linux-$$arch build/statping-linux-$$arch/statping; \
-		tar -czf build/statping-linux-$$arch.tar.gz -C build/statping-linux-$$arch statping; \
+		chmod +x build/statping-linux-$$arch && mv build/statping-linux-$$arch build/statping-linux-$$arch/statping; \
+		tar -czf releases/statping-linux-$$arch.tar.gz -C build/statping-linux-$$arch statping; \
 	done
+	@for arch in $(BASIC_ARCHS);\
+	do \
+		echo "Compressing v$$VERSION for darwin-$$arch"; \
+		mkdir -p build/statping-darwin-$$arch/; \
+		chmod +x build/statping-darwin-10.6-$$arch && mv build/statping-darwin-10.6-$$arch build/statping-darwin-$$arch/statping; \
+		tar -czf releases/statping-darwin-$$arch.tar.gz -C build/statping-darwin-$$arch statping; \
+	done
+	@for arch in $(BASIC_ARCHS);\
+	do \
+		echo "Compressing v$$VERSION for windows-$$arch"; \
+		mkdir -p build/statping-windows-$$arch/; \
+		chmod +x build/statping-windows-6.0-$$arch.exe && mv build/statping-windows-6.0-$$arch.exe build/statping-windows-$$arch/statping.exe; \
+		zip -j releases/statping-windows-$$arch.zip build/statping-windows-$$arch/statping.exe; \
+	done
+
+build-linux:
+	xgo -go $(GOVERSION) --dest=build -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" --targets=linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64,linux/arm -out statping ./cmd
 
 build-mac:
-	xgo -go $(GOVERSION) --dest=build -ldflags "-X main.VERSION=${VERSION}" --targets=darwin/amd64,darwin/386 -out statping ./cmd
-	@for arch in $(OSX_ARCHS);\
-	do \
-		echo "Releasing v$$VERSION for darwin-$$arch"; \
-		mkdir -p build/statping-darwin-$$arch/; \
-		chmod +x build/statping-darwin-10.6-$$arch; \
-		mv build/statping-darwin-10.6-$$arch build/statping-darwin-$$arch/statping; \
-		tar -czf build/statping-darwin-$$arch.tar.gz -C build/statping-darwin-$$arch statping; \
-	done
+	xgo -go $(GOVERSION) --dest=build -ldflags "-s -w -X main.VERSION=${VERSION}" --targets=darwin/amd64,darwin/386 -out statping ./cmd
 
 build-win:
-	xgo -go $(GOVERSION) --dest=build -ldflags "-X main.VERSION=${VERSION}" --targets=windows-6.0/amd64,windows-6.0/386,windows-6.0/arm,windows-6.0/arm64 -out statping ./cmd
-	@for arch in $(WIN_ARCHS);\
-	do \
-		echo "Releasing v$$VERSION for windows-6.0-$$arch"; \
-		mkdir -p build/statping-windows-6.0-$$arch/; \
-		chmod +x build/statping-windows-6.0-$$arch; \
-		mv build/statping-windows-6.0-$$arch build/statping-windows-$$arch/statping; \
-		tar -czf build/statping-windows-$$arch.tar.gz -C build/statping-windows-$$arch statping; \
-	done
+	xgo -go $(GOVERSION) --dest=build -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" --targets=windows-6.0/amd64,windows-6.0/386 -out statping ./cmd
 
 # remove files for a clean compile/build
 clean:
@@ -225,7 +225,7 @@ print_details:
 	@echo \==== Monitoring and IDE ====
 	@echo \Grafana:             http://localhost:3000  \(username: admin, password: admin\)
 
-build-all: clean compile build-linux build-mac build-win
+build-all: clean compile build-linux build-mac build-win compress
 
 coverage: test-deps
 	$(GOPATH)/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $(COVERALLS)

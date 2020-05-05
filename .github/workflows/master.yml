@@ -204,10 +204,7 @@ jobs:
         shell: bash
 
       - name: Download Go mods
-        if: steps.golangcache.outputs.cache-hit != 'true'
         run: |
-          go mod download
-          go mod verify
           make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
@@ -216,11 +213,17 @@ jobs:
           name: static-rice-box
           path: ./source
 
-      - name: Build Binaries
-        env:
-          VERSION: ${{ env.VERSION }}
-          COMMIT: $GITHUB_SHA
-        run: make build-mac
+      - name: Build with xgo
+        uses: crazy-max/ghaction-xgo@v1
+        with:
+          xgo_version: latest
+          go_version: 1.14.2
+          dest: build
+          prefix: statping
+          targets: darwin/386,darwin/amd64
+          v: true
+          x: false
+          ldflags: -s -w -X main.VERSION=$VERSION
 
       - name: Upload MacOSX Builds
         uses: actions/upload-artifact@v1
@@ -237,11 +240,6 @@ jobs:
           go-version: '1.14.2'
       - uses: actions/checkout@v2
 
-      - name: Install Libraries
-        run: |
-          sudo apt update
-          sudo apt install libc-dev gcc-multilib build-essential musl-dev gcc g++ -y
-
       - name: Setting ENV's
         run: |
           echo "::add-path::$(go env GOPATH)/bin"
@@ -250,10 +248,7 @@ jobs:
         shell: bash
 
       - name: Download Go mods
-        if: steps.golangcache.outputs.cache-hit != 'true'
         run: |
-          go mod download
-          go mod verify
           make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
@@ -262,13 +257,17 @@ jobs:
           name: static-rice-box
           path: ./source
 
-      - name: Build Binaries
-        env:
-          VERSION: ${{ env.VERSION }}
-          COMMIT: $GITHUB_SHA
-        run: |
-          go env
-          make build-linux
+      - name: Build with xgo
+        uses: crazy-max/ghaction-xgo@v1
+        with:
+          xgo_version: latest
+          go_version: 1.14.2
+          dest: build
+          prefix: statping
+          targets: linux/386,linux/amd64,linux/arm-6,linux/arm-7,linux/arm,linux/arm64
+          v: true
+          x: false
+          ldflags: -s -w -extldflags -static -X main.VERSION=$VERSION
 
       - name: Upload Linux Builds
         uses: actions/upload-artifact@v1
@@ -293,10 +292,7 @@ jobs:
         shell: bash
 
       - name: Download Go mods
-        if: steps.golangcache.outputs.cache-hit != 'true'
         run: |
-          go mod download
-          go mod verify
           make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
@@ -305,11 +301,17 @@ jobs:
           name: static-rice-box
           path: ./source
 
-      - name: Build Binaries
-        env:
-          VERSION: ${{ env.VERSION }}
-          COMMIT: $GITHUB_SHA
-        run: make build-win
+      - name: Build with xgo
+        uses: crazy-max/ghaction-xgo@v1
+        with:
+          xgo_version: latest
+          go_version: 1.14.2
+          dest: build
+          prefix: statping
+          targets: windows/386,windows/amd64
+          v: true
+          x: false
+          ldflags: -s -w -extldflags -static -X main.VERSION=$VERSION
 
       - name: Upload Windows Builds
         uses: actions/upload-artifact@v1
@@ -348,6 +350,14 @@ jobs:
           name: windows-builds
           path: ./windows
 
+      - name: Compress Files
+        run: |
+          mkdir build
+          mv windows/*.* ./build/
+          mv linux/*.* ./build/
+          mv darwin/*.* ./build/
+          make compress
+
       - name: Upload Linux Release
         id: upload-linux-asset
         uses: softprops/action-gh-release@v1
@@ -359,17 +369,12 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            linux/statping-freebsd-386.tar.gz
-            linux/statping-freebsd-amd64.tar.gz
-            linux/statping-freebsd-arm.tar.gz
-            linux/statping-linux-386.tar.gz
-            linux/statping-linux-amd64.tar.gz
-            linux/statping-linux-arm.tar.gz
-            linux/statping-linux-arm64.tar.gz
-            linux/statping-openbsd-386.tar.gz
-            linux/statping-openbsd-amd64.tar.gz
-            linux/statping-openbsd-arm.tar.gz
-            linux/statping-openbsd-arm64.tar.gz
+            build/statping-linux-386.tar.gz
+            build/statping-linux-amd64.tar.gz
+            build/statping-linux-arm.tar.gz
+            build/statping-linux-arm64.tar.gz
+            build/statping-linux-arm-7.tar.gz
+            build/statping-linux-arm-6.tar.gz
 
       - name: Upload MaxOSX Release
         id: upload-darwin-asset
@@ -382,8 +387,8 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            darwin/statping-darwin-386.tar.gz
-            darwin/statping-darwin-amd64.tar.gz
+            build/statping-darwin-386.tar.gz
+            build/statping-darwin-amd64.tar.gz
 
       - name: Upload Windows Release
         id: upload-windows-asset
@@ -396,9 +401,8 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            windows/statping-windows-386.zip
-            windows/statping-windows-amd64.zip
-            windows/statping-windows-arm.zip
+            build/statping-windows-386.zip
+            build/statping-windows-amd64.zip
 
   docker-release:
     needs: upload-release
