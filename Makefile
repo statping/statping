@@ -11,7 +11,7 @@ TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master 
 TEST_DIR=$(GOPATH)/src/github.com/statping/statping
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 OS = freebsd linux openbsd
-LINUX_ARCHS = 386 amd64 arm-7 arm-6 arm64 a
+LINUX_ARCHS = 386 amd64 arm-7 arm-6 arm64 arm-5
 BASIC_ARCHS = 386 amd64
 
 all: clean yarn-install compile docker-base docker-vue build-all
