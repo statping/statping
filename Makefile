@@ -152,7 +152,7 @@ generate:
 	cd source && go generate
 
 build-linux:
-	LINUX_ARCHS = 386 amd64 arm-7 arm-6 arm64 arm
+	export LINUX_ARCHS = 386 amd64 arm-7 arm-6 arm64 arm
 	xgo -go $(GOVERSION) --dest=build -ldflags "-X main.VERSION=${VERSION}" --targets=linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64,linux/arm -out statping ./cmd
 	@for arch in $(LINUX_ARCHS);\
 	do \
@@ -164,7 +164,7 @@ build-linux:
 	done
 
 build-mac:
-	OSX_ARCHS = 386 amd64
+	export OSX_ARCHS = 386 amd64
 	xgo -go $(GOVERSION) --dest=build -ldflags "-X main.VERSION=${VERSION}" --targets=darwin/amd64,darwin/386 -out statping ./cmd
 	@for arch in $(OSX_ARCHS);\
 	do \
@@ -176,7 +176,7 @@ build-mac:
 	done
 
 build-win:
-	WIN_ARCHS = 386 amd64 arm arm64
+	export WIN_ARCHS = 386 amd64 arm arm64
 	xgo -go $(GOVERSION) --dest=build -ldflags "-X main.VERSION=${VERSION}" --targets=windows-6.0/amd64,windows-6.0/386,windows-6.0/arm,windows-6.0/arm64 -out statping ./cmd
 	@for arch in $(WIN_ARCHS);\
 	do \
