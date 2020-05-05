@@ -11,7 +11,7 @@ TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master 
 TEST_DIR=$(GOPATH)/src/github.com/statping/statping
 PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
 OS = freebsd linux openbsd
-LINUX_ARCHS = 386 amd64 arm-7 arm-6 arm64 arm-5
+LINUX_ARCHS = 386 amd64 arm-7 arm-6 arm64 a
 BASIC_ARCHS = 386 amd64
 
 all: clean yarn-install compile docker-base docker-vue build-all
@@ -254,6 +254,31 @@ dockerhub:
 docker-build-dev:
 	docker build --build-arg VERSION=${VERSION} -t hunterlong/statping:latest --no-cache -f Dockerfile .
 	docker tag hunterlong/statping:dev hunterlong/statping:dev-v${VERSION}
+
+docker:
+	@for arch in $(LINUX_ARCHS);\
+	do \
+		echo "Docker build v${VERSION} statping/statping:$$arch-latest"; \
+		docker build --build-arg VERSION=${VERSION} --build-arg ARCH=$$arch -t statping/statping:$$arch-latest --no-cache -f Dockerfile . > /dev/null; \
+		docker push statping/statping:$$arch-latest; \
+	done
+
+docker-manifest: docker
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create statping/statping:latest \
+		--amend statping/statping:amd64-latest \
+		--amend statping/statping:386-latest \
+		--amend statping/statping:arm-5-latest \
+		--amend statping/statping:arm-6-latest \
+		--amend statping/statping:arm-7-latest \
+		--amend statping/statping:arm64-latest
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate statping/statping:latest statping/statping:amd64-latest --arch amd64 --os linux
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate statping/statping:latest statping/statping:386-latest --arch 386 --os linux
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate statping/statping:latest statping/statping:arm-5-latest --arch arm --variant v5 --os linux
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate statping/statping:latest statping/statping:arm-6-latest --arch arm --variant v6 --os linux
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate statping/statping:latest statping/statping:arm-7-latest --arch arm --variant v7 --os linux
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate statping/statping:latest statping/statping:arm64-latest --arch arm64 --variant v8 --os linux
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect statping/statping:latest
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push --purge statping/statping:latest
 
 post-release: frontend-build upload_to_s3 publish-homebrew dockerhub
 

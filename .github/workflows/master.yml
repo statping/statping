@@ -336,10 +336,10 @@ jobs:
           files: |
             releases/statping-linux-386.tar.gz
             releases/statping-linux-amd64.tar.gz
-            releases/statping-linux-arm.tar.gz
             releases/statping-linux-arm64.tar.gz
             releases/statping-linux-arm-7.tar.gz
             releases/statping-linux-arm-6.tar.gz
+            releases/statping-linux-arm-5.tar.gz
 
       - name: Upload MaxOSX Release
         id: upload-darwin-asset
@@ -389,19 +389,8 @@ jobs:
           dockerfile: Dockerfile.base
           tags: "base"
 
-      - name: Latest/Version Docker Image
-        uses: elgohr/Publish-Docker-Github-Action@master
-        env:
-          VERSION: ${{ env.VERSION }}
-          ARCH: amd64
-          DOCKER_CLI_EXPERIMENTAL: enabled
-        with:
-          name: statping/statping
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          dockerfile: Dockerfile
-          tags: "latest,v${{ env.VERSION }}"
-          buildargs: VERSION,ARCH
+      - name: Release Docker images
+        run: make docker-manifest
 
   sentry-release:
     needs: upload-release

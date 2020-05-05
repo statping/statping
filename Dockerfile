@@ -1,22 +1,24 @@
-FROM statping/statping:base AS base
-
-# Statping main Docker image that contains all required libraries
 FROM alpine:latest
-RUN apk --no-cache add libgcc libstdc++ ca-certificates curl jq && update-ca-certificates
+MAINTAINER "Hunter Long (https://github.com/hunterlong)"
+ARG VERSION
+ARG ARCH
 
-COPY --from=base /go/bin/statping /usr/local/bin/
-COPY --from=base /usr/local/bin/sass /usr/local/bin/
-COPY --from=base /usr/local/share/ca-certificates /usr/local/share/
+RUN apk --no-cache add curl jq
+
+RUN curl -L -s https://assets.statping.com/sass -o /usr/local/bin/sass && \
+    chmod +x /usr/local/bin/sass
+
+RUN curl -L -O https://github.com/statping/statping/releases/download/v$VERSION/statping-linux-$ARCH.tar.gz && \
+    tar -xzf statping-linux-$ARCH.tar.gz && mv statping /usr/local/bin/ && rm -f statping-linux-$ARCH.tar.gz
 
 WORKDIR /app
+VOLUME /app
 
-ENV IS_DOCKER=true
-ENV SASS=/usr/local/bin/sass
-ENV STATPING_DIR=/app
 ENV PORT=8080
+ENV STATPING_DIR=/app
 
 EXPOSE $PORT
 
-HEALTHCHECK --interval=60s --timeout=10s --retries=3 CMD curl -s "http://localhost:$PORT/health" | jq -r -e ".online==true"
+HEALTHCHECK --interval=30s --timeout=5s --retries=5 CMD curl -s "http://localhost:$PORT/health" | jq -r -e ".online==true"
 
 CMD statping --port $PORT
