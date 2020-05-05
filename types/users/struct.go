@@ -16,4 +16,5 @@ type User struct {
 	Admin     null.NullBool `gorm:"column:administrator" json:"admin,omitempty"`
 	CreatedAt time.Time     `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt time.Time     `gorm:"column:updated_at" json:"updated_at"`
+	Token     string        `gorm:"-" json:"token"`
 }

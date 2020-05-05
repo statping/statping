@@ -24,6 +24,7 @@ func staticAssets(src string) http.Handler {
 func Router() *mux.Router {
 	dir := utils.Directory
 	CacheStorage = NewStorage()
+
 	r := mux.NewRouter().StrictSlash(true)
 
 	authUser := utils.Params.GetString("AUTH_USERNAME")
@@ -74,15 +75,18 @@ func Router() *mux.Router {
 	r.Handle("/api", scoped(apiIndexHandler))
 	r.Handle("/api/setup", http.HandlerFunc(processSetupHandler)).Methods("POST")
 	api.Handle("/api/login", http.HandlerFunc(apiLoginHandler)).Methods("POST")
-	api.Handle("/api/logout", http.HandlerFunc(logoutHandler))
+	api.Handle("/api/logout", authenticated(logoutHandler, false))
 	api.Handle("/api/renew", authenticated(apiRenewHandler, false))
 	api.Handle("/api/cache", authenticated(apiCacheHandler, false)).Methods("GET")
 	api.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
 	api.Handle("/api/core", authenticated(apiCoreHandler, false)).Methods("POST")
-	api.Handle("/api/oauth", scoped(apiOAuthHandler)).Methods("GET")
-	api.Handle("/oauth/{provider}", http.HandlerFunc(oauthHandler))
 	api.Handle("/api/logs", authenticated(logsHandler, false)).Methods("GET")
 	api.Handle("/api/logs/last", authenticated(logsLineHandler, false)).Methods("GET")
+
+	// API OAUTH Routes
+	api.Handle("/api/oauth", scoped(apiOAuthHandler)).Methods("GET")
+	api.Handle("/api/oauth", authenticated(apiUpdateOAuthHandler, false)).Methods("POST")
+	api.Handle("/oauth/{provider}", http.HandlerFunc(oauthHandler))
 
 	// API SCSS and ASSETS Routes
 	api.Handle("/api/theme", authenticated(apiThemeViewHandler, false)).Methods("GET")

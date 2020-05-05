@@ -34,7 +34,18 @@ const routes = [
     meta: {
       requiresAuth: true
     },
-    beforeEnter: CheckAuth,
+    beforeEnter: async (to, from, next) => {
+      if (to.matched.some(record => record.meta.requiresAuth)) {
+        let tk = await Api.token()
+        if (to.path !== '/login' && !tk.admin) {
+          next('/login')
+          return
+        }
+        next()
+      } else {
+        next()
+      }
+    },
     children: [{
       path: '',
       component: DashboardIndex,
@@ -135,9 +146,10 @@ const router = new VueRouter({
     routes
 })
 
-function CheckAuth(to, from, next) {
+let CheckAuth = (to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    let item = localStorage.getItem("statping_user")
+    let item = this.$cookies.get("statping_auth")
+    window.console.log(item)
     if (to.path !== '/login' && !item) {
       next('/login')
       return

@@ -25,16 +25,16 @@
         </div>
     </form>
 
-        <a v-if="oauth.gh_client_id" :href="GHlogin()" class="btn btn-block">
-            Github Login
+        <a v-if="oauth.gh_client_id" @click.prevent="GHlogin" href="#" class="btn btn-block btn-outline-dark">
+            <font-awesome-icon :icon="['fab', 'github']" /> Login with Github
         </a>
 
-        <a v-if="oauth.slack_client_id" :href="Slacklogin()" class="btn btn-block">
-            Slack Login
+        <a v-if="oauth.slack_client_id" @click.prevent="Slacklogin" href="#" class="btn btn-block btn-outline-dark">
+            <font-awesome-icon :icon="['fab', 'slack']" /> Login with Slack
         </a>
 
-        <a v-if="oauth.google_client_id" :href="Googlelogin()" class="btn btn-block">
-            Google Login
+        <a v-if="oauth.google_client_id" @click.prevent="Googlelogin" href="#" class="btn btn-block btn-outline-dark">
+            <font-awesome-icon :icon="['fab', 'google']" /> Login with Google
         </a>
 
     </div>
@@ -80,7 +80,8 @@
               if (auth.error) {
                   this.error = true
               } else if (auth.token) {
-                  this.auth = Api.saveToken(this.username, auth.token, auth.admin)
+                const u = {username: this.username, admin: auth.admin, token: auth.token}
+                this.$cookies.set("statping_auth", JSON.stringify(u))
                   this.$store.dispatch('loadAdmin')
                   this.$store.commit('setAdmin', auth.admin)
                   this.$router.push('/dashboard')
@@ -88,13 +89,13 @@
               this.loading = false
           },
         GHlogin() {
-          return `https://github.com/login/oauth/authorize?client_id=${this.oauth.gh_client_id}&redirect_uri=${this.core.domain}/api/oauth/github&scope=user,repo`
+            window.location = `https://github.com/login/oauth/authorize?client_id=${this.oauth.gh_client_id}&redirect_uri=${this.core.domain}/oauth/github&scope=user,repo`
         },
         Slacklogin() {
-          return `https://slack.com/oauth/authorize?client_id=${this.oauth.slack_client_id}&redirect_uri=${this.core.domain}/api/oauth/slack&scope=users.profile:read,users:read.email`
+          window.location = `https://slack.com/oauth/authorize?client_id=${this.oauth.slack_client_id}&redirect_uri=${this.core.domain}/oauth/slack&scope=identity.basic`
         },
         Googlelogin() {
-          return `https://accounts.google.com/signin/oauth?client_id=${this.oauth.google_client_id}&redirect_uri=${this.core.domain}/api/oauth/google&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email`
+          window.location = `https://accounts.google.com/signin/oauth?client_id=${this.oauth.google_client_id}&redirect_uri=${this.core.domain}/oauth/google&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email`
         }
       }
   }

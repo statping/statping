@@ -32,22 +32,19 @@
         this.$router.push('/setup')
       }
     if (this.$route.path !== '/setup') {
-      if (this.core.logged_in) {
+      if (this.$store.state.admin) {
         await this.$store.dispatch('loadAdmin')
       } else {
         await this.$store.dispatch('loadRequired')
       }
       this.loaded = true
     }
-
-
   },
     async mounted() {
           if (this.$route.path !== '/setup') {
-              const tk = localStorage.getItem("statping_user")
-              if (this.core.logged_in) {
+            if (this.$store.state.admin) {
                 this.logged_in = true
-                  await this.$store.dispatch('loadAdmin')
+                  // await this.$store.dispatch('loadAdmin')
               }
           }
     }

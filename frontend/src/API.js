@@ -4,7 +4,7 @@ import * as Sentry from "@sentry/browser";
 import * as Integrations from "@sentry/integrations";
 const qs = require('querystring');
 
-const tokenKey = "statping_user";
+const tokenKey = "statping_auth";
 const errorReporter = "https://bed4d75404924cb3a799e370733a1b64@sentry.statping.com/3"
 
 class Api {
@@ -27,6 +27,10 @@ class Api {
 
   async core_save(obj) {
     return axios.post('api/core', obj).then(response => (response.data))
+  }
+
+  async oauth_save(obj) {
+    return axios.post('api/oauth', obj).then(response => (response.data))
   }
 
   async setup_save(data) {
@@ -228,19 +232,11 @@ class Api {
 
   async login(username, password) {
     const f = {username: username, password: password}
-    return axios.post('api/login', qs.stringify(f))
-        .then(response => (response.data))
+    return axios.post('api/login', qs.stringify(f)).then(response => (response.data))
   }
 
   async logout() {
-    await axios.get('api/logout').then(response => (response.data))
-    return localStorage.removeItem(tokenKey)
-  }
-
-  saveToken(username, token, admin) {
-    const user = {username: username, token: token, admin: admin}
-    localStorage.setItem(tokenKey, JSON.stringify(user));
-    return user
+    return axios.get('api/logout').then(response => (response.data))
   }
 
   async scss_base() {
@@ -255,17 +251,17 @@ class Api {
   }
 
   token() {
-    const tk = localStorage.getItem(tokenKey)
+    const tk = $cookies.get(tokenKey)
     if (!tk) {
-      return {};
+      return {admin: false};
     }
-    return JSON.parse(tk);
+    return tk;
   }
 
   authToken() {
-    let user = JSON.parse(localStorage.getItem(tokenKey));
-    if (user && user.token) {
-      return {'Authorization': 'Bearer ' + user.token};
+    const tk = $cookies.get(tokenKey)
+    if (tk.token) {
+      return {'Authorization': 'Bearer ' + tk.token};
     } else {
       return {};
     }

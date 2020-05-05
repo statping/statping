@@ -160,7 +160,7 @@ build-linux:
 		do \
 			echo "Building v$$VERSION for $$os-$$arch"; \
 			mkdir -p releases/statping-$$os-$$arch/; \
-			GO111MODULE="on" GOOS=$$os GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-$$os-$$arch/statping ${PWD}/cmd || true; \
+			CGO_ENABLED=1 GO111MODULE="on" GOOS=$$os GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION}" -o releases/statping-$$os-$$arch/statping ${PWD}/cmd || true; \
 			chmod +x releases/statping-$$os-$$arch/statping || true; \
 			tar -czf releases/statping-$$os-$$arch.tar.gz -C releases/statping-$$os-$$arch statping || true; \
 		done \
@@ -174,7 +174,7 @@ build-mac:
 	do \
 		echo "Building v$$VERSION for darwin-$$arch"; \
 		mkdir -p releases/statping-darwin-$$arch/; \
-		GO111MODULE="on" GOOS=darwin GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-darwin-$$arch/statping ${PWD}/cmd || true; \
+		CGO_ENABLED=1 GO111MODULE="on" GOOS=darwin GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION}" -o releases/statping-darwin-$$arch/statping ${PWD}/cmd || true; \
 		chmod +x releases/statping-darwin-$$arch/statping || true; \
 		tar -czf releases/statping-darwin-$$arch.tar.gz -C releases/statping-darwin-$$arch statping || true; \
 	done
@@ -187,7 +187,7 @@ build-win:
 	do \
 		echo "Building v$$VERSION for windows-$$arch"; \
 		mkdir -p releases/statping-windows-$$arch/; \
-		GO111MODULE="on" GOOS=windows GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)" -o releases/statping-windows-$$arch/statping.exe ${PWD}/cmd || true; \
+		CGO_ENABLED=1 GO111MODULE="on" GOOS=windows GOARCH=$$arch go build -a -ldflags "-X main.VERSION=${VERSION}" -o releases/statping-windows-$$arch/statping.exe ${PWD}/cmd || true; \
 		chmod +x releases/statping-windows-$$arch/statping.exe || true; \
 		zip -j releases/statping-windows-$$arch.zip releases/statping-windows-$$arch/statping.exe || true; \
 	done

@@ -162,7 +162,7 @@
         core() {
           return this.$store.getters.core
         },
-        oauth() {
+        auth() {
           return this.$store.getters.oauth
         }
       },
@@ -171,10 +171,22 @@
             google_enabled: false,
             slack_enabled: false,
             github_enabled: false,
-            local_enabled: false
+            local_enabled: false,
+            oauth: {
+              gh_client_id: "",
+              gh_client_secret: "",
+              google_client_id: "",
+              google_client_secret: "",
+              oauth_domains: "",
+              oauth_providers: "",
+              slack_client_id: "",
+              slack_client_secret: "",
+              slack_team: ""
+            }
           }
       },
     mounted() {
+        this.oauth = this.auth
       this.local_enabled = this.has('local')
       this.github_enabled = this.has('github')
       this.google_enabled = this.has('google')
@@ -207,10 +219,9 @@
             let c = this.core
             c.oauth = this.oauth
             c.oauth.oauth_providers = this.providers()
-            await Api.core_save(c)
-            const core = await Api.core()
-            this.$store.commit('setCore', core)
-            this.$store.commit('setOAuth', c.oauth)
+            await Api.oauth_save(c)
+            const oauth = await Api.oauth()
+            this.$store.commit('setOAuth', oauth)
           }
       }
   }

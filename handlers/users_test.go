@@ -148,9 +148,8 @@ func TestApiUsersRoutes(t *testing.T) {
 			Name:           "Statping Logout",
 			URL:            "/api/logout",
 			Method:         "GET",
-			ExpectedStatus: 303,
-		},
-		{
+			ExpectedStatus: 200,
+		}, {
 			Name:             "Incorrect JSON POST",
 			URL:              "/api/users",
 			Body:             BadJSON,
