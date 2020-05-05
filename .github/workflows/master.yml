@@ -204,8 +204,7 @@ jobs:
         shell: bash
 
       - name: Download Go mods
-        run: |
-          make test-deps
+        run: make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
         uses: actions/download-artifact@v1
@@ -214,17 +213,7 @@ jobs:
           path: ./source
 
       - name: Build with xgo
-        uses: crazy-max/ghaction-xgo@v1
-        with:
-          xgo_version: latest
-          go_version: 1.14.2
-          dest: build
-          pkg: cmd
-          prefix: statping
-          targets: darwin/386,darwin/amd64
-          v: true
-          x: false
-          ldflags: -s -w -X main.VERSION=$VERSION
+        run: make build-mac
 
       - name: Upload MacOSX Builds
         uses: actions/upload-artifact@v1
@@ -249,8 +238,7 @@ jobs:
         shell: bash
 
       - name: Download Go mods
-        run: |
-          make test-deps
+        run: make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
         uses: actions/download-artifact@v1
@@ -259,17 +247,7 @@ jobs:
           path: ./source
 
       - name: Build with xgo
-        uses: crazy-max/ghaction-xgo@v1
-        with:
-          xgo_version: latest
-          go_version: 1.14.2
-          dest: build
-          pkg: cmd
-          prefix: statping
-          targets: linux/386,linux/amd64,linux/arm-6,linux/arm-7,linux/arm,linux/arm64
-          v: true
-          x: false
-          ldflags: -s -w -extldflags -static -X main.VERSION=$VERSION
+        run: make build-linux
 
       - name: Upload Linux Builds
         uses: actions/upload-artifact@v1
@@ -294,8 +272,7 @@ jobs:
         shell: bash
 
       - name: Download Go mods
-        run: |
-          make test-deps
+        run: make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
         uses: actions/download-artifact@v1
@@ -304,17 +281,7 @@ jobs:
           path: ./source
 
       - name: Build with xgo
-        uses: crazy-max/ghaction-xgo@v1
-        with:
-          xgo_version: latest
-          go_version: 1.14.2
-          dest: build
-          pkg: cmd
-          prefix: statping
-          targets: windows/386,windows/amd64
-          v: true
-          x: false
-          ldflags: -s -w -extldflags -static -X main.VERSION=$VERSION
+        run: make build-win
 
       - name: Upload Windows Builds
         uses: actions/upload-artifact@v1
