@@ -303,31 +303,25 @@ jobs:
         shell: bash
 
       - name: Download Linux Builds
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: linux-builds
-          path: ./linux
+          path: ./build
 
       - name: Download MacOSX Builds
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: darwin-builds
-          path: ./darwin
+          path: ./build
 
       - name: Download Windows Builds
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: windows-builds
-          path: ./windows
+          path: ./build
 
       - name: Compress Files
-        run: |
-          cd /home/runner/work/statping/statping
-          mkdir build
-          mv windows/*.zip ./build/
-          mv linux/*.tar.gz ./build/
-          mv darwin/*.tar.gz ./build/
-          make compress
+        run: make compress
 
       - name: Upload Linux Release
         id: upload-linux-asset
