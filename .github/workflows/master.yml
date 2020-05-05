@@ -219,6 +219,7 @@ jobs:
           xgo_version: latest
           go_version: 1.14.2
           dest: build
+          pkg: cmd
           prefix: statping
           targets: darwin/386,darwin/amd64
           v: true
@@ -263,6 +264,7 @@ jobs:
           xgo_version: latest
           go_version: 1.14.2
           dest: build
+          pkg: cmd
           prefix: statping
           targets: linux/386,linux/amd64,linux/arm-6,linux/arm-7,linux/arm,linux/arm64
           v: true
@@ -307,6 +309,7 @@ jobs:
           xgo_version: latest
           go_version: 1.14.2
           dest: build
+          pkg: cmd
           prefix: statping
           targets: windows/386,windows/amd64
           v: true
@@ -352,6 +355,7 @@ jobs:
 
       - name: Compress Files
         run: |
+          cd /home/runner/work/statping/statping
           mkdir build
           mv windows/*.* ./build/
           mv linux/*.* ./build/
