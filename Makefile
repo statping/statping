@@ -57,7 +57,7 @@ test-deps:
 	go get golang.org/x/tools/cmd/cover
 	go get github.com/mattn/goveralls
 	go get github.com/GeertJohan/go.rice/rice
-	go get github.com/crazy-max/xgo
+	go get -u github.com/crazy-max/xgo
 
 deps:
 	go get -d -v -t ./...
