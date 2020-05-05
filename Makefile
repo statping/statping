@@ -157,24 +157,24 @@ compress:
 	mkdir releases || true;
 	@for arch in $(LINUX_ARCHS);\
 	do \
-		echo "Compressing v$$VERSION for linux-$$arch"; \
-		mkdir -p build/statping-linux-$$arch/; \
-		chmod +x build/statping-linux-$$arch && mv build/statping-linux-$$arch build/statping-linux-$$arch/statping; \
-		tar -czf releases/statping-linux-$$arch.tar.gz -C build/statping-linux-$$arch statping; \
+		echo "Compressing v${VERSION} for linux-$$arch"; \
+		mkdir -p build/statping-linux-$$arch-bin/; \
+		chmod +x build/statping-linux-$$arch && mv build/statping-linux-$$arch build/statping-linux-$$arch-bin/statping; \
+		tar -czf releases/statping-linux-$$arch.tar.gz -C build/statping-linux-$$arch-bin statping; \
 	done
 	@for arch in $(BASIC_ARCHS);\
 	do \
-		echo "Compressing v$$VERSION for darwin-$$arch"; \
-		mkdir -p build/statping-darwin-$$arch/; \
-		chmod +x build/statping-darwin-10.6-$$arch && mv build/statping-darwin-10.6-$$arch build/statping-darwin-$$arch/statping; \
-		tar -czf releases/statping-darwin-$$arch.tar.gz -C build/statping-darwin-$$arch statping; \
+		echo "Compressing v${VERSION} for darwin-$$arch"; \
+		mkdir -p build/statping-darwin-$$arch-bin/; \
+		chmod +x build/statping-darwin-10.6-$$arch && mv build/statping-darwin-10.6-$$arch build/statping-darwin-$$arch-bin/statping; \
+		tar -czf releases/statping-darwin-$$arch.tar.gz -C build/statping-darwin-$$arch-bin statping; \
 	done
 	@for arch in $(BASIC_ARCHS);\
 	do \
-		echo "Compressing v$$VERSION for windows-$$arch"; \
-		mkdir -p build/statping-windows-$$arch/; \
-		chmod +x build/statping-windows-6.0-$$arch.exe && mv build/statping-windows-6.0-$$arch.exe build/statping-windows-$$arch/statping.exe; \
-		zip -j releases/statping-windows-$$arch.zip build/statping-windows-$$arch/statping.exe; \
+		echo "Compressing v${VERSION} for windows-$$arch"; \
+		mkdir -p build/statping-windows-$$arch-bin/; \
+		chmod +x build/statping-windows-6.0-$$arch.exe && mv build/statping-windows-6.0-$$arch.exe build/statping-windows-$$arch-bin/statping.exe; \
+		zip -j releases/statping-windows-$$arch.zip build/statping-windows-$$arch-bin/statping.exe; \
 	done
 
 build-linux:

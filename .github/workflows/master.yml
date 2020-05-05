@@ -357,9 +357,9 @@ jobs:
         run: |
           cd /home/runner/work/statping/statping
           mkdir build
-          mv windows/*.* ./build/
-          mv linux/*.* ./build/
-          mv darwin/*.* ./build/
+          mv windows/*.zip ./build/
+          mv linux/*.tar.gz ./build/
+          mv darwin/*.tar.gz ./build/
           make compress
 
       - name: Upload Linux Release
@@ -373,12 +373,12 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            build/statping-linux-386.tar.gz
-            build/statping-linux-amd64.tar.gz
-            build/statping-linux-arm.tar.gz
-            build/statping-linux-arm64.tar.gz
-            build/statping-linux-arm-7.tar.gz
-            build/statping-linux-arm-6.tar.gz
+            releases/statping-linux-386.tar.gz
+            releases/statping-linux-amd64.tar.gz
+            releases/statping-linux-arm.tar.gz
+            releases/statping-linux-arm64.tar.gz
+            releases/statping-linux-arm-7.tar.gz
+            releases/statping-linux-arm-6.tar.gz
 
       - name: Upload MaxOSX Release
         id: upload-darwin-asset
@@ -391,8 +391,8 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            build/statping-darwin-386.tar.gz
-            build/statping-darwin-amd64.tar.gz
+            releases/statping-darwin-386.tar.gz
+            releases/statping-darwin-amd64.tar.gz
 
       - name: Upload Windows Release
         id: upload-windows-asset
@@ -405,8 +405,8 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            build/statping-windows-386.zip
-            build/statping-windows-amd64.zip
+            releases/statping-windows-386.zip
+            releases/statping-windows-amd64.zip
 
   docker-release:
     needs: upload-release
