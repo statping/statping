@@ -95,7 +95,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./source/
+          path: ./source/rice-box.go
 
       - name: Install Statping
         env:
@@ -163,7 +163,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./source/
+          path: ./source/rice-box.go
 
       - name: Install Statping
         env:
@@ -210,7 +210,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./source/
+          path: ./source/rice-box.go
 
       - name: Build with xgo
         run: make build-mac
@@ -245,7 +245,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./source/
+          path: ./source/rice-box.go
 
       - name: Build with xgo
         run: make build-linux
@@ -280,7 +280,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./source/
+          path: ./source/rice-box.go
 
       - name: Build with xgo
         run: make build-win
