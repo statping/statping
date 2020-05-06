@@ -282,6 +282,7 @@ docker-manifest: docker
 
 post-release: frontend-build upload_to_s3 publish-homebrew dockerhub
 
+
 # update the homebrew application to latest for mac
 publish-homebrew:
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(PUBLISH_BODY) https://api.travis-ci.com/repo/statping%2Fhomebrew-statping/requests
