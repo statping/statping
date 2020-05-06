@@ -108,7 +108,7 @@ jobs:
           cd ./go/src/github.com/${{ github.repository }}
           make build
           chmod +x statping
-          mv statping $(go env GOPATH)/bin/
+          mv statping ./go/bin/
 
       - name: Go Tests
         run: |
