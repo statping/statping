@@ -80,9 +80,6 @@ jobs:
         with:
           node-version: '10.x'
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
-          path: ./go/src/github.com/${{ github.repository }}
 
       - name: Install Global Dependencies
         run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
@@ -95,16 +92,15 @@ jobs:
         shell: bash
 
       - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./go/src/github.com/${{ github.repository }}/source
+          path: ./source
 
       - name: Install Statping
         env:
           VERSION: ${{ env.VERSION }}
         run: |
-          cd ./go/src/github.com/${{ github.repository }}
           make build
           chmod +x statping
           mv statping $(go env GOPATH)/bin/
@@ -152,10 +148,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
-          path: ./go/src/github.com/${{ github.repository }}
-
       - uses: actions/setup-go@v2
         with:
           go-version: '1.14.2'
@@ -168,16 +160,15 @@ jobs:
         shell: bash
 
       - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./go/src/github.com/${{ github.repository }}/source
+          path: ./source
 
       - name: Install Statping
         env:
           VERSION: ${{ env.VERSION }}
         run: |
-          cd ./go/src/github.com/${{ github.repository }}
           make build
           chmod +x statping
           mv statping $(go env GOPATH)/bin/
@@ -204,40 +195,31 @@ jobs:
         with:
           go-version: '1.14.2'
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
-          path: ./go/src/github.com/${{ github.repository }}
 
       - name: Setting ENV's
         run: |
-          echo "::set-env name=GOPATH::${{ github.workspace }}/go"
           echo "::add-path::$(go env GOPATH)/bin"
           echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
       - name: Download Go mods
-        run: |
-          cd ./go/src/github.com/${{ github.repository }}
-          make test-deps
+        run: make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./go/src/github.com/${{ github.repository }}/source
+          path: ./source
 
       - name: Build with xgo
-        run: |
-          pwd && ls
-          cd ./go/src/github.com/${{ github.repository }}
-          make build-mac
+        run: make build-mac
 
       - name: Upload MacOSX Builds
         uses: actions/upload-artifact@v2
         with:
           name: darwin-builds
-          path: ./go/src/github.com/${{ github.repository }}/build
+          path: ./build
 
   build-linux:
     needs: compile
@@ -246,41 +228,33 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '1.14.2'
+
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
-          path: go/src/github.com/${{ github.repository }}
 
       - name: Setting ENV's
         run: |
-          echo "::set-env name=GOPATH::${{ github.workspace }}/go"
           echo "::add-path::$(go env GOPATH)/bin"
           echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
       - name: Download Go mods
-        run: |
-          cd ./go/src/github.com/${{ github.repository }}
-          make test-deps
+        run: make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./go/src/github.com/${{ github.repository }}/source
+          path: ./source
 
       - name: Build with xgo
-        run: |
-          pwd && ls
-          cd ./go/src/github.com/${{ github.repository }}
-          make build-linux
+        run: make build-linux
 
       - name: Upload Linux Builds
         uses: actions/upload-artifact@v2
         with:
           name: linux-builds
-          path: ./go/src/github.com/${{ github.repository }}/build
+          path: ./build
 
   build-windows:
     needs: compile
@@ -289,41 +263,33 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '1.14.2'
+
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
-          path: go/src/github.com/${{ github.repository }}
 
       - name: Setting ENV's
         run: |
-          echo "::set-env name=GOPATH::${{ github.workspace }}/go"
           echo "::add-path::$(go env GOPATH)/bin"
           echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
       - name: Download Go mods
-        run: |
-          cd ./go/src/github.com/${{ github.repository }}
-          make test-deps
+        run: make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./go/src/github.com/${{ github.repository }}/source
+          path: ./source
 
       - name: Build with xgo
-        run: |
-          pwd && ls
-          cd ./go/src/github.com/${{ github.repository }}
-          make build-win
+        run: make build-win
 
       - name: Upload Windows Builds
         uses: actions/upload-artifact@v2
         with:
           name: windows-builds
-          path: ./go/src/github.com/${{ github.repository }}/build
+          path: ./build
 
   upload-release:
     needs: [test, test-postman, build-linux, build-mac, build-windows]
@@ -424,14 +390,14 @@ jobs:
       - name: Release Docker images
         run: make docker-manifest
 
-#      - name: Base Docker Image
-#        uses: elgohr/Publish-Docker-Github-Action@master
-#        with:
-#          name: statping/statping
-#          username: ${{ secrets.DOCKER_USERNAME }}
-#          password: ${{ secrets.DOCKER_PASSWORD }}
-#          dockerfile: Dockerfile.base
-#          tags: "base"
+      - name: Base Docker Image
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: statping/statping
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          dockerfile: Dockerfile.base
+          tags: "base"
 
   sentry-release:
     needs: upload-release
