@@ -104,7 +104,6 @@ jobs:
         env:
           VERSION: ${{ env.VERSION }}
         run: |
-          echo $(go env GOPATH)
           cd ./go/src/github.com/${{ github.repository }}
           make build
           chmod +x statping
