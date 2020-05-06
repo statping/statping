@@ -89,7 +89,7 @@ jobs:
 
       - name: Setting ENV's
         run: |
-          echo "::set-env name=GOPATH::${{ github.workspace }}/go"
+          echo "::set-env name=GOPATH::/home/runner/work/go"
           echo "::add-path::$(go env GOPATH)/bin"
           echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
@@ -108,7 +108,7 @@ jobs:
           cd ./go/src/github.com/${{ github.repository }}
           make build
           chmod +x statping
-          mv statping ./go/bin/
+          mv statping /home/runner/work/go/bin/
 
       - name: Go Tests
         run: |
