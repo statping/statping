@@ -195,9 +195,13 @@ jobs:
         with:
           go-version: '1.14.2'
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          path: go/src/github.com/${{ github.repository }}
 
       - name: Setting ENV's
         run: |
+          echo "::set-env name=GOPATH::${{ github.workspace }}/go"
           echo "::add-path::$(go env GOPATH)/bin"
           echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
@@ -210,16 +214,19 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: static-rice-box
-          path: ./source
+          path: ./go/src/github.com/${{ github.repository }}/source
 
       - name: Build with xgo
-        run: make build-mac
+        run: |
+          pwd && ls
+          cd ./go/src/github.com/${{ github.repository }}
+          make build-mac
 
       - name: Upload MacOSX Builds
         uses: actions/upload-artifact@v2
         with:
           name: darwin-builds
-          path: ./build
+          path: ./go/src/github.com/${{ github.repository }}/build
 
   build-linux:
     needs: compile
@@ -230,9 +237,13 @@ jobs:
           go-version: '1.14.2'
 
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          path: go/src/github.com/${{ github.repository }}
 
       - name: Setting ENV's
         run: |
+          echo "::set-env name=GOPATH::${{ github.workspace }}/go"
           echo "::add-path::$(go env GOPATH)/bin"
           echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
@@ -245,16 +256,19 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: static-rice-box
-          path: ./source
+          path: ./go/src/github.com/${{ github.repository }}/source
 
       - name: Build with xgo
-        run: make build-linux
+        run: |
+          pwd && ls
+          cd ./go/src/github.com/${{ github.repository }}
+          make build-linux
 
       - name: Upload Linux Builds
         uses: actions/upload-artifact@v2
         with:
           name: linux-builds
-          path: ./build
+          path: ./go/src/github.com/${{ github.repository }}/build
 
   build-windows:
     needs: compile
@@ -265,9 +279,13 @@ jobs:
           go-version: '1.14.2'
 
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          path: go/src/github.com/${{ github.repository }}
 
       - name: Setting ENV's
         run: |
+          echo "::set-env name=GOPATH::${{ github.workspace }}/go"
           echo "::add-path::$(go env GOPATH)/bin"
           echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
@@ -280,16 +298,19 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: static-rice-box
-          path: ./source
+          path: ./go/src/github.com/${{ github.repository }}/source
 
       - name: Build with xgo
-        run: make build-win
+        run: |
+          pwd && ls
+          cd ./go/src/github.com/${{ github.repository }}
+          make build-win
 
       - name: Upload Windows Builds
         uses: actions/upload-artifact@v2
         with:
           name: windows-builds
-          path: ./build
+          path: ./go/src/github.com/${{ github.repository }}/build
 
   upload-release:
     needs: [test, test-postman, build-linux, build-mac, build-windows]
