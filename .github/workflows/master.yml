@@ -43,10 +43,10 @@ jobs:
         run: make clean compile
 
       - name: Upload Compiled Frontend (rice-box.go)
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: static-rice-box
-          path: ./source
+          path: ./source/rice-box.go
 
   test:
     needs: compile
@@ -95,7 +95,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./source
+          path: ./source/
 
       - name: Install Statping
         env:
@@ -163,7 +163,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./source
+          path: ./source/
 
       - name: Install Statping
         env:
@@ -210,13 +210,13 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./source
+          path: ./source/
 
       - name: Build with xgo
         run: make build-mac
 
       - name: Upload MacOSX Builds
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: darwin-builds
           path: ./build
@@ -245,13 +245,13 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./source
+          path: ./source/
 
       - name: Build with xgo
         run: make build-linux
 
       - name: Upload Linux Builds
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: linux-builds
           path: ./build
@@ -280,13 +280,13 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./source
+          path: ./source/
 
       - name: Build with xgo
         run: make build-win
 
       - name: Upload Windows Builds
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: windows-builds
           path: ./build
