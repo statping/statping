@@ -92,7 +92,7 @@ jobs:
         shell: bash
 
       - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v1
         with:
           name: static-rice-box
           path: ./source
@@ -160,7 +160,7 @@ jobs:
         shell: bash
 
       - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v1
         with:
           name: static-rice-box
           path: ./source
@@ -207,7 +207,7 @@ jobs:
         run: make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v1
         with:
           name: static-rice-box
           path: ./source
@@ -242,7 +242,7 @@ jobs:
         run: make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v1
         with:
           name: static-rice-box
           path: ./source
@@ -277,7 +277,7 @@ jobs:
         run: make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v1
         with:
           name: static-rice-box
           path: ./source
@@ -390,14 +390,14 @@ jobs:
       - name: Release Docker images
         run: make docker-manifest
 
-      - name: Base Docker Image
-        uses: elgohr/Publish-Docker-Github-Action@master
-        with:
-          name: statping/statping
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          dockerfile: Dockerfile.base
-          tags: "base"
+#      - name: Base Docker Image
+#        uses: elgohr/Publish-Docker-Github-Action@master
+#        with:
+#          name: statping/statping
+#          username: ${{ secrets.DOCKER_USERNAME }}
+#          password: ${{ secrets.DOCKER_PASSWORD }}
+#          dockerfile: Dockerfile.base
+#          tags: "base"
 
   sentry-release:
     needs: upload-release
