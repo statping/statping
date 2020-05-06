@@ -43,7 +43,7 @@ jobs:
         run: make clean compile
 
       - name: Upload Compiled Frontend (rice-box.go)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v1
         with:
           name: static-rice-box
           path: ./source
@@ -92,7 +92,7 @@ jobs:
         shell: bash
 
       - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v1
         with:
           name: static-rice-box
           path: ./source
@@ -160,7 +160,7 @@ jobs:
         shell: bash
 
       - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v1
         with:
           name: static-rice-box
           path: ./source
@@ -204,21 +204,26 @@ jobs:
         shell: bash
 
       - name: Download Go mods
-        run: make test-deps
+        if: steps.golangcache.outputs.cache-hit != 'true'
+        run: |
+          go mod download
+          go mod verify
+          make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v1
         with:
           name: static-rice-box
           path: ./source
 
-      - name: Build with xgo
-        run: |
-          [ ! -d "source/dist" ] && exit 2
-          make build-mac
+      - name: Build Binaries
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: $GITHUB_SHA
+        run: make build-mac
 
       - name: Upload MacOSX Builds
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v1
         with:
           name: darwin-builds
           path: ./build
@@ -230,8 +235,12 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '1.14.2'
-
       - uses: actions/checkout@v2
+
+      - name: Install Libraries
+        run: |
+          sudo apt update
+          sudo apt install libc-dev gcc-multilib build-essential musl-dev gcc g++ -y
 
       - name: Setting ENV's
         run: |
@@ -241,21 +250,28 @@ jobs:
         shell: bash
 
       - name: Download Go mods
-        run: make test-deps
+        if: steps.golangcache.outputs.cache-hit != 'true'
+        run: |
+          go mod download
+          go mod verify
+          make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v1
         with:
           name: static-rice-box
           path: ./source
 
-      - name: Build with xgo
+      - name: Build Binaries
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: $GITHUB_SHA
         run: |
-          [ ! -d "source/dist" ] && exit 2
+          go env
           make build-linux
 
       - name: Upload Linux Builds
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v1
         with:
           name: linux-builds
           path: ./build
@@ -267,7 +283,6 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '1.14.2'
-
       - uses: actions/checkout@v2
 
       - name: Setting ENV's
@@ -278,21 +293,26 @@ jobs:
         shell: bash
 
       - name: Download Go mods
-        run: make test-deps
+        if: steps.golangcache.outputs.cache-hit != 'true'
+        run: |
+          go mod download
+          go mod verify
+          make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v1
         with:
           name: static-rice-box
           path: ./source
 
-      - name: Build with xgo
-        run: |
-          [ ! -d "source/dist" ] && exit 2
-          make build-win
+      - name: Build Binaries
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: $GITHUB_SHA
+        run: make build-win
 
       - name: Upload Windows Builds
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v1
         with:
           name: windows-builds
           path: ./build
@@ -311,25 +331,22 @@ jobs:
         shell: bash
 
       - name: Download Linux Builds
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v1
         with:
           name: linux-builds
-          path: ./build
+          path: ./linux
 
       - name: Download MacOSX Builds
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v1
         with:
           name: darwin-builds
-          path: ./build
+          path: ./darwin
 
       - name: Download Windows Builds
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v1
         with:
           name: windows-builds
-          path: ./build
-
-      - name: Compress Files
-        run: make compress
+          path: ./windows
 
       - name: Upload Linux Release
         id: upload-linux-asset
@@ -342,12 +359,17 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            releases/statping-linux-386.tar.gz
-            releases/statping-linux-amd64.tar.gz
-            releases/statping-linux-arm64.tar.gz
-            releases/statping-linux-arm-7.tar.gz
-            releases/statping-linux-arm-6.tar.gz
-            releases/statping-linux-arm-5.tar.gz
+            linux/statping-freebsd-386.tar.gz
+            linux/statping-freebsd-amd64.tar.gz
+            linux/statping-freebsd-arm.tar.gz
+            linux/statping-linux-386.tar.gz
+            linux/statping-linux-amd64.tar.gz
+            linux/statping-linux-arm.tar.gz
+            linux/statping-linux-arm64.tar.gz
+            linux/statping-openbsd-386.tar.gz
+            linux/statping-openbsd-amd64.tar.gz
+            linux/statping-openbsd-arm.tar.gz
+            linux/statping-openbsd-arm64.tar.gz
 
       - name: Upload MaxOSX Release
         id: upload-darwin-asset
@@ -360,8 +382,8 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            releases/statping-darwin-386.tar.gz
-            releases/statping-darwin-amd64.tar.gz
+            darwin/statping-darwin-386.tar.gz
+            darwin/statping-darwin-amd64.tar.gz
 
       - name: Upload Windows Release
         id: upload-windows-asset
@@ -374,8 +396,9 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            releases/statping-windows-386.zip
-            releases/statping-windows-amd64.zip
+            windows/statping-windows-386.zip
+            windows/statping-windows-amd64.zip
+            windows/statping-windows-arm.zip
 
   docker-release:
     needs: upload-release
@@ -388,14 +411,6 @@ jobs:
         run: echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
-      - uses: azure/docker-login@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Release Docker images
-        run: make docker-manifest
-
       - name: Base Docker Image
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
@@ -404,6 +419,20 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           dockerfile: Dockerfile.base
           tags: "base"
+
+      - name: Latest/Version Docker Image
+        uses: elgohr/Publish-Docker-Github-Action@master
+        env:
+          VERSION: ${{ env.VERSION }}
+          ARCH: amd64
+          DOCKER_CLI_EXPERIMENTAL: enabled
+        with:
+          name: statping/statping
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          dockerfile: Dockerfile
+          tags: "latest,v${{ env.VERSION }}"
+          buildargs: VERSION,ARCH
 
   sentry-release:
     needs: upload-release
