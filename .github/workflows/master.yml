@@ -195,6 +195,8 @@ jobs:
         with:
           go-version: '1.14.2'
       - uses: actions/checkout@v2
+        with:
+          path: $(go env GOPATH)/src/github.com/${{ github.repository }}
 
       - name: Setting ENV's
         run: |
@@ -204,22 +206,26 @@ jobs:
         shell: bash
 
       - name: Download Go mods
-        run: make test-deps
+        run: |
+          cd $(go env GOPATH)/src/github.com/${{ github.repository }}
+          make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
         uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./source
+          path: $(go env GOPATH)/src/github.com/${{ github.repository }}/source
 
       - name: Build with xgo
-        run: make build-mac
+        run: |
+          cd $(go env GOPATH)/src/github.com/${{ github.repository }}
+          make build-mac
 
       - name: Upload MacOSX Builds
         uses: actions/upload-artifact@v2
         with:
           name: darwin-builds
-          path: ./build
+          path: $(go env GOPATH)/src/github.com/${{ github.repository }}/build
 
   build-linux:
     needs: compile
@@ -230,6 +236,8 @@ jobs:
           go-version: '1.14.2'
 
       - uses: actions/checkout@v2
+        with:
+          path: $(go env GOPATH)/src/github.com/${{ github.repository }}
 
       - name: Setting ENV's
         run: |
@@ -239,22 +247,26 @@ jobs:
         shell: bash
 
       - name: Download Go mods
-        run: make test-deps
+        run: |
+          cd $(go env GOPATH)/src/github.com/${{ github.repository }}
+          make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
         uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./source
+          path: $(go env GOPATH)/src/github.com/${{ github.repository }}/source
 
       - name: Build with xgo
-        run: make build-linux
+        run: |
+          cd $(go env GOPATH)/src/github.com/${{ github.repository }}
+          make build-linux
 
       - name: Upload Linux Builds
         uses: actions/upload-artifact@v2
         with:
           name: linux-builds
-          path: ./build
+          path: $(go env GOPATH)/src/github.com/${{ github.repository }}/build
 
   build-windows:
     needs: compile
@@ -265,6 +277,8 @@ jobs:
           go-version: '1.14.2'
 
       - uses: actions/checkout@v2
+        with:
+          path: $(go env GOPATH)/src/github.com/${{ github.repository }}
 
       - name: Setting ENV's
         run: |
@@ -274,22 +288,26 @@ jobs:
         shell: bash
 
       - name: Download Go mods
-        run: make test-deps
+        run: |
+          cd $(go env GOPATH)/src/github.com/${{ github.repository }}
+          make test-deps
 
       - name: Download Compiled Frontend (rice-box.go)
         uses: actions/download-artifact@v2
         with:
           name: static-rice-box
-          path: ./source
+          path: $(go env GOPATH)/src/github.com/${{ github.repository }}/source
 
       - name: Build with xgo
-        run: make build-win
+        run: |
+          cd $(go env GOPATH)/src/github.com/${{ github.repository }}
+          make build-win
 
       - name: Upload Windows Builds
         uses: actions/upload-artifact@v2
         with:
           name: windows-builds
-          path: ./build
+          path: $(go env GOPATH)/src/github.com/${{ github.repository }}/build
 
   upload-release:
     needs: [test, test-postman, build-linux, build-mac, build-windows]
