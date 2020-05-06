@@ -194,13 +194,7 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '1.14.2'
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '10.x'
       - uses: actions/checkout@v2
-
-      - name: Install Global Dependencies
-        run: npm install -g yarn sass
 
       - name: Setting ENV's
         run: |
@@ -212,8 +206,16 @@ jobs:
       - name: Download Go mods
         run: make test-deps
 
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v2
+        with:
+          name: static-rice-box
+          path: ./source
+
       - name: Build with xgo
-        run: make clean compile build-mac
+        run: |
+          [ ! -d "source/dist" ] && exit 2
+          make build-mac
 
       - name: Upload MacOSX Builds
         uses: actions/upload-artifact@v2
@@ -228,13 +230,8 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '1.14.2'
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '10.x'
-      - uses: actions/checkout@v2
 
-      - name: Install Global Dependencies
-        run: npm install -g yarn sass
+      - uses: actions/checkout@v2
 
       - name: Setting ENV's
         run: |
@@ -246,8 +243,16 @@ jobs:
       - name: Download Go mods
         run: make test-deps
 
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v2
+        with:
+          name: static-rice-box
+          path: ./source
+
       - name: Build with xgo
-        run: make clean compile build-linux
+        run: |
+          [ ! -d "source/dist" ] && exit 2
+          make build-linux
 
       - name: Upload Linux Builds
         uses: actions/upload-artifact@v2
@@ -262,13 +267,8 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '1.14.2'
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '10.x'
-      - uses: actions/checkout@v2
 
-      - name: Install Global Dependencies
-        run: npm install -g yarn sass
+      - uses: actions/checkout@v2
 
       - name: Setting ENV's
         run: |
@@ -280,8 +280,16 @@ jobs:
       - name: Download Go mods
         run: make test-deps
 
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v2
+        with:
+          name: static-rice-box
+          path: ./source
+
       - name: Build with xgo
-        run: make clean compile build-win
+        run: |
+          [ ! -d "source/dist" ] && exit 2
+          make build-win
 
       - name: Upload Windows Builds
         uses: actions/upload-artifact@v2

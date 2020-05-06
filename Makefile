@@ -179,13 +179,13 @@ compress:
 	done
 
 build-linux:
-	xgo -go=$(GOVERSION) -dest=build -pkg=cmd -ldflags="-s -w -extldflags -static -X main.VERSION=${VERSION}" -targets="linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64,linux/arm" -out=statping .
+	xgo -go=$(GOVERSION) -dest=build -pkg=cmd -ldflags="-s -w -extldflags -static -X main.VERSION=${VERSION}" -targets="linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64,linux/arm" -out=statping ./
 
 build-mac:
-	xgo -go=$(GOVERSION) -dest=build -pkg=cmd -ldflags="-s -w -X main.VERSION=${VERSION}" -targets="darwin/amd64,darwin/386" -out=statping .
+	xgo -go=$(GOVERSION) -dest=build -pkg=cmd -ldflags="-s -w -X main.VERSION=${VERSION}" -targets="darwin/amd64,darwin/386" -out=statping ./
 
 build-win:
-	xgo -go=$(GOVERSION) -dest=build -pkg=cmd -ldflags="-s -w -extldflags -static -X main.VERSION=${VERSION}" -targets="windows-6.0/amd64,windows-6.0/386" -out=statping .
+	xgo -go=$(GOVERSION) -dest=build -pkg=cmd -ldflags="-s -w -extldflags -static -X main.VERSION=${VERSION}" -targets="windows-6.0/amd64,windows-6.0/386" -out=statping ./
 
 # remove files for a clean compile/build
 clean:
