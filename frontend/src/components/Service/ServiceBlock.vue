@@ -35,10 +35,10 @@
                 <div class="col-md-8 col-6">
                     <div class="dropup" :class="{show: dropDownMenu}">
                         <button style="font-size: 10pt;" @click.prevent="openMenu('timeframe')" type="button" class="col-4 float-left btn btn-sm float-right btn-block text-white dropdown-toggle service_scale pr-2">
-                            {{timepick.text}}
+                            {{timeframepick.text}}
                         </button>
                         <div class="service-tm-menu" :class="{'d-none': !dropDownMenu}">
-                            <a v-for="(timeframe, i) in timeframes" @click.prevent="changeTimeframe(timeframe)" class="dropdown-item" href="#" :class="{'active': timeframe.picked}">{{timeframe.text}}</a>
+                            <a v-for="(timeframe, i) in timeframes" @click.prevent="changeTimeframe(timeframe)" class="dropdown-item" href="#" :class="{'active': timeframepick === timeframe}">{{timeframe.text}}</a>
                         </div>
                     </div>
 
@@ -47,7 +47,7 @@
                             {{intervalpick.text}}
                         </button>
                         <div class="service-tm-menu" :class="{'d-none': !intervalMenu}">
-                            <a v-for="(interval, i) in intervals" @click.prevent="changeInterval(interval)" class="dropdown-item" href="#" :class="{'active': interval.picked}">{{interval.text}}</a>
+                            <a v-for="(interval, i) in intervals" @click.prevent="changeInterval(interval)" class="dropdown-item" href="#" :class="{'active': intervalpick === interval, 'disabled': disabled_interval(interval)}">{{interval.text}}</a>
                         </div>
 
                         <span class="d-none float-left d-md-inline">
@@ -89,7 +89,7 @@ export default {
     service() {
       return this.track_service
     },
-    timepick() {
+    timeframepick() {
       return this.timeframes.find(s => s.value === this.timeframe_val)
     },
     intervalpick() {
@@ -109,30 +109,30 @@ export default {
           interval_val: "60m",
           timeframe_val: this.timeset(259200),
           timeframes: [
-            {value: this.timeset(1800), text: "30 Minutes"},
-            {value: this.timeset(3600), text: "1 Hour"},
-            {value: this.timeset(21600), text: "6 Hours"},
-            {value: this.timeset(43200), text: "12 Hours"},
-            {value: this.timeset(86400), text: "1 Day"},
-            {value: this.timeset(259200), text: "3 Days"},
-            {value: this.timeset(604800), text: "7 Days"},
-            {value: this.timeset(1209600), text: "14 Days"},
-            {value: this.timeset(2592000), text: "1 Month"},
-            {value: this.timeset(7776000), text: "3 Months"},
+            {value: this.timeset(1800), text: "30 Minutes", set: 1},
+            {value: this.timeset(3600), text: "1 Hour", set: 2},
+            {value: this.timeset(21600), text: "6 Hours", set: 3},
+            {value: this.timeset(43200), text: "12 Hours", set: 4},
+            {value: this.timeset(86400), text: "1 Day", set: 5},
+            {value: this.timeset(259200), text: "3 Days", set: 6},
+            {value: this.timeset(604800), text: "7 Days", set: 7},
+            {value: this.timeset(1209600), text: "14 Days", set: 8},
+            {value: this.timeset(2592000), text: "1 Month", set: 9},
+            {value: this.timeset(7776000), text: "3 Months", set: 10},
             {value: 0, text: "All Records"},
           ],
           intervals: [
-            {value: "1m", text: "1/min"},
-            {value: "5m", text: "5/min"},
-            {value: "15m", text: "15/min"},
-            {value: "30m", text: "30/min" },
-            {value: "60m", text: "1/hr" },
-            {value: "180m", text: "3/hr" },
-            {value: "360m", text: "6/hr" },
-            {value: "720m", text: "12/hr" },
-            {value: "1440m", text: "1/day" },
-            {value: "4320m", text: "3/day" },
-            {value: "10080m", text: "7/day" },
+            {value: "1m", text: "1/min", set: 1},
+            {value: "5m", text: "5/min", set: 2},
+            {value: "15m", text: "15/min", set: 3},
+            {value: "30m", text: "30/min", set: 4 },
+            {value: "60m", text: "1/hr", set: 5 },
+            {value: "180m", text: "3/hr", set: 6 },
+            {value: "360m", text: "6/hr", set: 7 },
+            {value: "720m", text: "12/hr", set: 8 },
+            {value: "1440m", text: "1/day", set: 9 },
+            {value: "4320m", text: "3/day", set: 10 },
+            {value: "10080m", text: "7/day", set: 11 },
           ],
             stats: {
                 total_failures: {
@@ -171,6 +171,10 @@ export default {
       this.track_service = this.in_service
   },
     methods: {
+      disabled_interval(interval) {
+        let min = this.timeframepick.set - interval.set - 1;
+        return min >= interval.set;
+      },
       timeset (seconds) {
         return this.toUnix(this.nowSubtract(seconds))
       },
@@ -228,10 +232,7 @@ export default {
                 if (last) {
                     return `Offline, last error: ${last} ${this.ago(last.created_at)}`
                 }
-              if (!s.online) {
-                return `Service is offline`
-              }
-                return `Offline`
+                return `Service is offline for ${this.ago(s.last_success)}`
             }
         },
         visibleChart(isVisible, entry) {

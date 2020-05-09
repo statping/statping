@@ -3,7 +3,7 @@
 </p>
 <p align="center">
     <b>Statping - Web and App Status Monitoring for Any Type of Project</b><br>
-<a href="https://github.com/statping/statping/wiki">View Wiki</a> | <a href="https://demo.statping.com">Demo</a> | <a href="https://itunes.apple.com/us/app/apple-store/id1445513219">iPhone</a> | <a href="https://play.google.com/store/apps/details?id=com.statping">Android</a> <br> <a href="https://github.com/statping/statping/wiki/API">API</a> | <a href="https://github.com/statping/statping/wiki/Docker">Docker</a> | <a href="https://github.com/statping/statping/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/statping/statping/wiki/Mac">Mac</a> | <a href="https://github.com/statping/statping/wiki/Linux">Linux</a> | <a href="https://github.com/statping/statping/wiki/Windows">Windows</a>
+<a href="https://github.com/statping/statping/wiki">View Wiki</a> | <a href="https://demo.statping.com">Demo</a> | <a href="https://itunes.apple.com/us/app/apple-store/id1445513219">iPhone</a> | <a href="https://play.google.com/store/apps/details?id=com.statping">Android</a> <br> <a href="https://documenter.getpostman.com/view/1898229/SzmfXwi4?version=latest">API</a> | <a href="https://github.com/statping/statping/wiki/Docker">Docker</a> | <a href="https://github.com/statping/statping/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/statping/statping/wiki/Mac">Mac</a> | <a href="https://github.com/statping/statping/wiki/Linux">Linux</a> | <a href="https://github.com/statping/statping/wiki/Windows">Windows</a>
 </p>
 
 # Statping - Status Page & Monitoring Server

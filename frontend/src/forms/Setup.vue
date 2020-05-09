@@ -137,7 +137,7 @@
                   return
               }
           }
-          if (!s.project || !s.description || !s.domain || !s.username || !s.password || !s.confirm_password) {
+          if (!s.project || !s.domain || !s.username || !s.password || !s.confirm_password) {
               this.disabled = true
               return
           }
