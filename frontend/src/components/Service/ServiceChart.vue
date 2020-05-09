@@ -37,7 +37,11 @@
           visible: {
               type: Boolean,
               required: true
-          }
+          },
+        chart_timeframe: {
+          type: Object,
+          required: true
+        },
       },
       data() {
           return {
@@ -160,24 +164,25 @@
           }
       },
       watch: {
-          visible: function(newVal, oldVal) {
-              if (newVal && !this.showing) {
-                  this.showing = true
-                  this.chartHits("1h")
-              }
+        visible: function(newVal, oldVal) {
+          if (newVal && !this.showing) {
+            this.showing = true
+            this.chartHits(this.chart_timeframe)
           }
+        },
+        chart_timeframe: function(newVal, oldVal) {
+          if (newVal) {
+            this.chartHits(newVal)
+          }
+        }
       },
       methods: {
-          async chartHits(group) {
-              const start = this.toUnix(this.nowSubtract(84600 * 3))
+          async chartHits(val) {
+              const start = val.start_time
               const end = this.toUnix(new Date())
-            if (end-start < 283800) {
-              group = "5m"
-            }
-              this.data = await Api.service_hits(this.service.id, start, end, group, false)
-
-              if (this.data === null && group !== "5m") {
-                  await this.chartHits("10m")
+              this.data = await Api.service_hits(this.service.id, start, end, val.interval, false)
+              if (this.data === null && val.interval !== "5m") {
+                  await this.chartHits({start_time: val.start_time, interval: "5m"})
               }
               this.series = [{
                   name: this.service.name,
