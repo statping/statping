@@ -107,9 +107,9 @@ export default new Vuex.Store({
         setToken (state, token) {
             state.token = token
         },
-      setService (state, service) {
-        state.service = service
-      },
+        setService (state, service) {
+          state.service = service
+        },
         setServices (state, services) {
             state.services = services
         },

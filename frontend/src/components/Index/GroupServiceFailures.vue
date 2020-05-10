@@ -34,11 +34,12 @@ export default {
   },
   computed: {
     service_txt() {
-      if (!this.service.online) {
-        if (!this.toUnix(this.service.last_success)) {
+      const s = this.service
+      if (!s.online) {
+        if (!this.toUnix(this.parseISO(s.last_success))) {
           return `Always Offline`
         }
-        return `Offline for ${this.ago(this.service.last_success)}`
+        return `Offline for ${this.ago(s.last_success)}`
       }
       return `${this.service.online_24_hours}% Uptime`
     }

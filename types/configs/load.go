@@ -7,15 +7,15 @@ import (
 	"os"
 )
 
-func LoadConfigFile(directory string) (*DbConfig, error) {
+func LoadConfigFile(configFile string) (*DbConfig, error) {
 	p := utils.Params
-	log.Infof("Attempting to read config file at: %s/config.yml ", directory)
-	p.SetConfigFile(directory + "/config.yml")
+	log.Infof("Attempting to read config file at: %s", configFile)
+	p.SetConfigFile(configFile)
 	p.SetConfigType("yaml")
 	p.ReadInConfig()
 
 	db := new(DbConfig)
-	content, err := utils.OpenFile(directory + "/config.yml")
+	content, err := utils.OpenFile(configFile)
 	if err == nil {
 		if err := yaml.Unmarshal([]byte(content), &db); err != nil {
 			return nil, err
@@ -66,7 +66,7 @@ func LoadConfigFile(directory string) (*DbConfig, error) {
 		Location:    utils.Directory,
 		SqlFile:     p.GetString("SQL_FILE"),
 	}
-	log.WithFields(utils.ToFields(configs)).Debugln("read config file: " + directory + "/config.yml")
+	log.WithFields(utils.ToFields(configs)).Debugln("read config file: " + configFile)
 
 	if configs.DbConn == "" {
 		return configs, errors.New("Starting in setup mode")
