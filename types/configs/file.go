@@ -21,7 +21,7 @@ func ConnectConfigs(configs *DbConfig, retry bool) error {
 	return nil
 }
 
-func LoadConfigs() (*DbConfig, error) {
+func LoadConfigs(cfgFile string) (*DbConfig, error) {
 	writeAble, err := utils.DirWritable(utils.Directory)
 	if err != nil {
 		return nil, err
@@ -30,7 +30,7 @@ func LoadConfigs() (*DbConfig, error) {
 		return nil, errors.Errorf("Directory %s is not writable!", utils.Directory)
 	}
 
-	return LoadConfigFile(utils.Directory)
+	return LoadConfigFile(cfgFile)
 }
 
 func findDbFile(configs *DbConfig) (string, error) {

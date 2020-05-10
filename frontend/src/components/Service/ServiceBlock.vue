@@ -232,7 +232,7 @@ export default {
                 if (last) {
                     return `Offline, last error: ${last} ${this.ago(last.created_at)}`
                 }
-                return `Service is offline for ${this.ago(s.last_success)}`
+                return `Service has been offline for ${this.ago(s.last_success)}`
             }
         },
         visibleChart(isVisible, entry) {

@@ -46,7 +46,7 @@ func exportCli(args []string) error {
 	if err := source.Assets(); err != nil {
 		return err
 	}
-	config, err := configs.LoadConfigs()
+	config, err := configs.LoadConfigs(configFile)
 	if err != nil {
 		return err
 	}
@@ -168,7 +168,7 @@ func importCli(args []string) error {
 	log.Printf("Messages:   %d\n", len(exportData.Messages))
 	log.Printf("Users:      %d\n", len(exportData.Users))
 
-	config, err := configs.LoadConfigs()
+	config, err := configs.LoadConfigs(configFile)
 	if err != nil {
 		return err
 	}
@@ -258,7 +258,7 @@ func updateDisplay() error {
 
 // runOnce will initialize the Statping application and check each service 1 time, will not run HTTP server
 func runOnce() error {
-	config, err := configs.LoadConfigs()
+	config, err := configs.LoadConfigs(configFile)
 	if err != nil {
 		return errors.Wrap(err, "config.yml file not found")
 	}

@@ -295,15 +295,23 @@
               return this.$store.getters.notifiers
           }
       },
-      async mounted() {
-          this.cache = await Api.cache()
+    mounted() {
+        this.update()
       },
-      async created() {
-          const c = this.core
-          this.qrurl = `statping://setup?domain=${c.domain}&api=${c.api_secret}`
-          this.qrcode = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=" + encodeURI(this.qrurl)
+    created() {
+          this.update()
       },
       methods: {
+        async update() {
+          const c = await Api.core()
+          this.$store.commit('setCore', c)
+          const n = await Api.notifiers()
+          this.$store.commit('setNotifiers', n)
+
+          this.qrurl = `statping://setup?domain=${c.domain}&api=${c.api_secret}`
+          this.qrcode = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=" + encodeURI(this.qrurl)
+          this.cache = await Api.cache()
+        },
           changeTab(e) {
               this.tab = e.target.id
           },

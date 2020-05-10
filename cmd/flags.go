@@ -3,6 +3,14 @@ package main
 import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/statping/statping/utils"
+)
+
+var (
+	ipAddress   string
+	configFile  string
+	verboseMode int
+	port        int
 )
 
 func parseFlags(cmd *cobra.Command) {
@@ -14,4 +22,7 @@ func parseFlags(cmd *cobra.Command) {
 
 	cmd.PersistentFlags().IntVarP(&verboseMode, "verbose", "v", 2, "verbose logging")
 	viper.BindPFlag("verbose", cmd.PersistentFlags().Lookup("verbose"))
+
+	cmd.PersistentFlags().StringVarP(&configFile, "config", "c", utils.Directory+"/config.yml", "path to config.yml file")
+	viper.BindPFlag("config", cmd.PersistentFlags().Lookup("config"))
 }

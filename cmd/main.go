@@ -20,13 +20,9 @@ var (
 	// VERSION stores the current version of Statping
 	VERSION string
 	// COMMIT stores the git commit hash for this version of Statping
-	COMMIT    string
-	ipAddress string
-	//grpcPort    int
-	verboseMode int
-	port        int
-	log         = utils.Log.WithField("type", "cmd")
-	confgs      *configs.DbConfig
+	COMMIT string
+	log    = utils.Log.WithField("type", "cmd")
+	confgs *configs.DbConfig
 )
 
 func init() {
@@ -83,7 +79,7 @@ func start() {
 	//	log.Warnln(err)
 	//}
 
-	confgs, err = configs.LoadConfigs()
+	confgs, err = configs.LoadConfigs(configFile)
 	if err != nil {
 		log.Infoln("Starting in Setup Mode")
 		if err := SetupMode(); err != nil {
