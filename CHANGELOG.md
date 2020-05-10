@@ -1,3 +1,8 @@
+# 0.90.38 (05-10-2020)
+- Added service timeframe/interval on index charts
+- Added --config flag to specify config.yml file
+- Modified multiple files for simple UX fixes
+
 # 0.90.37 (05-04-2020)
 - Fixed authentication issues dealing with cookies
 - Modified build process, arm/arm64 couldnt run sqlite
