@@ -237,6 +237,11 @@ jobs:
           go-version: '1.14.2'
       - uses: actions/checkout@v2
 
+      - name: Install cross compiling libraries
+        run: sudo apt-get install libc6-armel-cross libc6-dev-armel-cross \
+          binutils-arm-linux-gnueabi libncurses5-dev gcc-arm-linux-gnueabihf \
+          g++-arm-linux-gnueabihf gcc-arm-linux-gnueabi g++-arm-linux-gnueabi -y
+
       - name: Install Libraries
         run: |
           sudo apt update

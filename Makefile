@@ -151,16 +151,62 @@ install-local: build
 generate:
 	cd source && go generate
 
+# cross compile build for darwin, windows, linux, and ARM archictures.
+build-bins: build-folders
+	GO111MODULE="on" GOOS=windows GOARCH=amd64 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-amd64/statping.exe ./cmd
+	GO111MODULE="on" GOOS=windows GOARCH=386 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-amd64/statping.exe ./cmd
+	GO111MODULE="on" GOOS=darwin GOARCH=amd64 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-darwin-amd64/statping ./cmd
+	GO111MODULE="on" GOOS=darwin GOARCH=386 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-darwin-386/statping ./cmd
+	GO111MODULE="on" GOOS=linux GOARCH=amd64 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping ./cmd
+	GO111MODULE="on" GOOS=linux GOARCH=386 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping ./cmd
+	CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=7 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm/statping ./cmd
+	CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ GO111MODULE="on" GOOS=linux GOARCH=arm64 GOARM=8 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm64/statping ./cmd
+
+build-folders:
+	mkdir build || true
+	for os in windows darwin linux;\
+    do \
+        for arch in 386 amd64 arm arm64;\
+        do \
+            mkdir -p releases/statping-$$os-$$arch/; \
+        done \
+    done
+
+compress-folders:
+	mkdir build || true
+	for os in darwin linux;\
+    do \
+        for arch in 386 amd64 arm arm64;\
+		do \
+			chmod +x releases/statping-$$os-$$arch/statping || true; \
+			tar -czf releases/statping-$$os-$$arch.tar.gz -C releases/statping-$$os-$$arch statping || true; \
+		done \
+	done
+	chmod +x releases/statping-windows-386/statping.exe || true
+	chmod +x releases/statping-windows-amd64/statping.exe || true
+	zip -j releases/statping-windows-386.zip releases/statping-windows-386/statping.exe || true; \
+	zip -j releases/statping-windows-amd64.zip releases/statping-windows-amd64/statping.exe || true; \
+	find ./releases/ -name "*.tar.gz" -type f -size +1M -exec mv "{}" build/ \;
+	find ./releases/ -name "*.zip" -type f -size +1M -exec mv "{}" build/ \;
+
 build-linux:
 	mkdir build || true
 	export PWD=`pwd`
-	@for arch in $(ARCHS);\
+	@for arch in 386 amd64;\
 	do \
 		echo "Building v${VERSION} for linux-$$arch"; \
-		mkdir -p releases/statping-$$os-$$arch/; \
-		GO111MODULE="on" GOOS=$$os GOARCH=$$arch go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-$$os-$$arch/statping ${PWD}/cmd || true; \
-		chmod +x releases/statping-$$os-$$arch/statping || true; \
-		tar -czf releases/statping-$$os-$$arch.tar.gz -C releases/statping-$$os-$$arch statping || true; \
+		mkdir -p releases/statping-linux-$$arch/; \
+		GO111MODULE="on" GOOS=linux GOARCH=$$arch go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-$$arch/statping ${PWD}/cmd || true; \
+		chmod +x releases/statping-linux-$$arch/statping || true; \
+		tar -czf releases/statping-linux-$$arch.tar.gz -C releases/statping-linux-$$arch statping || true; \
+	done
+	@for arch in arm arm64;\
+	do \
+		echo "Building v${VERSION} for linux-$$arch"; \
+		mkdir -p releases/statping-linux-$$arch/; \
+		CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ GO111MODULE="on" GOOS=linux GOARCH=$$arch go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-$$arch/statping ${PWD}/cmd || true; \
+		chmod +x releases/statping-linux-$$arch/statping || true; \
+		tar -czf releases/statping-linux-$$arch.tar.gz -C releases/statping-linux-$$arch statping || true; \
 	done
 	find ./releases/ -name "*.tar.gz" -type f -size +1M -exec mv "{}" build/ \;
 
