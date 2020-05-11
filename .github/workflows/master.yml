@@ -237,15 +237,15 @@ jobs:
           go-version: '1.14.2'
       - uses: actions/checkout@v2
 
-      - name: Install cross compiling libraries
-        run: sudo apt-get install libc6-armel-cross libc6-dev-armel-cross \
-          binutils-arm-linux-gnueabi libncurses5-dev gcc-arm-linux-gnueabihf \
-          g++-arm-linux-gnueabihf gcc-arm-linux-gnueabi g++-arm-linux-gnueabi -y
-
       - name: Install Libraries
         run: |
           sudo apt update
           sudo apt install libc-dev gcc-multilib build-essential musl-dev gcc g++ -y
+
+      - name: Install cross compiling libraries
+        run: sudo apt-get install libc6-armel-cross libc6-dev-armel-cross \
+          binutils-arm-linux-gnueabi libncurses5-dev gcc-arm-linux-gnueabihf \
+          g++-arm-linux-gnueabihf gcc-arm-linux-gnueabi g++-arm-linux-gnueabi -y
 
       - name: Setting ENV's
         run: |
@@ -364,17 +364,10 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            linux/statping-freebsd-386.tar.gz
-            linux/statping-freebsd-amd64.tar.gz
-            linux/statping-freebsd-arm.tar.gz
             linux/statping-linux-386.tar.gz
             linux/statping-linux-amd64.tar.gz
             linux/statping-linux-arm.tar.gz
             linux/statping-linux-arm64.tar.gz
-            linux/statping-openbsd-386.tar.gz
-            linux/statping-openbsd-amd64.tar.gz
-            linux/statping-openbsd-arm.tar.gz
-            linux/statping-openbsd-arm64.tar.gz
 
       - name: Upload MaxOSX Release
         id: upload-darwin-asset
@@ -403,7 +396,6 @@ jobs:
           files: |
             windows/statping-windows-386.zip
             windows/statping-windows-amd64.zip
-            windows/statping-windows-arm.zip
 
   docker-release:
     needs: upload-release
