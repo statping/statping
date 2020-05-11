@@ -242,11 +242,6 @@ jobs:
           sudo apt update
           sudo apt install libc-dev gcc-multilib build-essential musl-dev gcc g++ -y
 
-      - name: Install cross compiling libraries
-        run: sudo apt-get install libc6-armel-cross libc6-dev-armel-cross \
-          binutils-arm-linux-gnueabi libncurses5-dev gcc-arm-linux-gnueabihf \
-          g++-arm-linux-gnueabihf gcc-arm-linux-gnueabi g++-arm-linux-gnueabi -y
-
       - name: Setting ENV's
         run: |
           echo "::add-path::$(go env GOPATH)/bin"
@@ -266,6 +261,9 @@ jobs:
         with:
           name: static-rice-box
           path: ./source
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v2
 
       - name: Build Binaries
         env:
