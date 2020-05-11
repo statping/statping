@@ -174,20 +174,20 @@ compress-folders:
 	find ./releases/ -name "*.tar.gz" -type f -size +1M -exec mv "{}" build/ \;
 
 build-linux: build-folders
-	GO111MODULE="on" GOOS=linux GOARCH=amd64 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping ./cmd
-	GO111MODULE="on" GOOS=linux GOARCH=386 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping ./cmd
-	CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=7 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm/statping ./cmd
-	CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ GO111MODULE="on" GOOS=linux GOARCH=arm64 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm64/statping ./cmd
+	GO111MODULE="on" CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping ./cmd
+	GO111MODULE="on" CGO_ENABLED=1 GOOS=linux GOARCH=386 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping ./cmd
+	CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ GO111MODULE="on" CGO_ENABLED=1 GOOS=linux GOARCH=arm GOARM=7 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm/statping ./cmd
+	CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ GO111MODULE="on" CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm64/statping ./cmd
 	make compress-folders
 
 build-mac: build-folders
-	GO111MODULE="on" GOOS=darwin GOARCH=amd64 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-darwin-amd64/statping ./cmd
-	GO111MODULE="on" GOOS=darwin GOARCH=386 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-darwin-386/statping ./cmd
+	GO111MODULE="on" CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-darwin-amd64/statping ./cmd
+	GO111MODULE="on" CGO_ENABLED=1 GOOS=darwin GOARCH=386 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-darwin-386/statping ./cmd
 	make compress-folders
 
 build-win: build-folders
-	GO111MODULE="on" GOOS=windows GOARCH=amd64 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-amd64/statping.exe ./cmd
-	GO111MODULE="on" GOOS=windows GOARCH=386 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-386/statping.exe ./cmd
+	GO111MODULE="on" CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-amd64/statping.exe ./cmd
+	GO111MODULE="on" CGO_ENABLED=1 GOOS=windows GOARCH=386 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-386/statping.exe ./cmd
 	chmod +x releases/statping-windows-386/statping.exe || true
 	chmod +x releases/statping-windows-amd64/statping.exe || true
 	zip -j releases/statping-windows-386.zip releases/statping-windows-386/statping.exe || true; \
