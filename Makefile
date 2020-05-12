@@ -158,12 +158,12 @@ build-win:
 	CGO_ENABLED=1 CC=i686-w64-mingw32-gcc-posix CXX=i686-w64-mingw32-g++-posix GO111MODULE="on" GOOS=windows GOARCH=386 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-386/statping.exe ./cmd
 
 build-darwin:
-	CGO_ENABLED=1 GO111MODULE="on" GOOS=darwin GOARCH=amd64 go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-amd64/statping --tags "libsqlite3 darwin" ./cmd
-	CGO_ENABLED=1 GO111MODULE="on" GOOS=darwin GOARCH=386 go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-386/statping --tags "libsqlite3 darwin" ./cmd
+	CGO_ENABLED=1 GO111MODULE="on" GOOS=darwin GOARCH=amd64 go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-amd64/statping --tags "darwin" ./cmd
+	CGO_ENABLED=1 GO111MODULE="on" GOOS=darwin GOARCH=386 go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-386/statping --tags "darwin" ./cmd
 
 build-linux:
-	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=amd64 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "libsqlite3 linux" ./cmd
-	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=386 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "libsqlite3 linux" ./cmd
+	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=amd64 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "linux" ./cmd
+	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=386 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "linux" ./cmd
 
 build-linux-arm:
 	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc-6 CXX=arm-linux-gnueabihf-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=7 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm/statping ./cmd
