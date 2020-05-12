@@ -2,7 +2,7 @@ VERSION=$(shell cat version.txt)
 SIGN_KEY=B76D61FAA6DB759466E83D9964B9C6AAE2D55278
 BINARY_NAME=statping
 GOBUILD=go build -a
-GOVERSION=1.14.2
+GOVERSION=1.14.0
 XGO=xgo -go $(GOVERSION) --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
 TRVIS_SECRET=O3/2KTOV8krv+yZ1EB/7D1RQRe6NdpFUEJNJkMS/ollYqmz3x2mCO7yIgIJKCKguLXZxjM6CxJcjlCrvUwibL+8BBp7xJe4XFIOrjkPvbbVPry4HkFZCf2GfcUK6o4AByQ+RYqsW2F17Fp9KLQ1rL3OT3eLTwCAGKx3tlY8y+an43zkmo5dN64V6sawx26fh6XTfww590ey+ltgQTjf8UPNup2wZmGvMo9Hwvh/bYR/47bR6PlBh6vhlKWyotKf2Fz1Bevbu0zc35pee5YlsrHR+oSF+/nNd/dOij34BhtqQikUR+zQVy9yty8SlmneVwD3yOENvlF+8roeKIXb6P6eZnSMHvelhWpAFTwDXq2N3d/FIgrQtLxsAFTI3nTHvZgs6OoTd6dA0wkhuIGLxaL3FOeztCdxP5J/CQ9GUcTvifh5ArGGwYxRxQU6rTgtebJcNtXFISP9CEUR6rwRtb6ax7h6f1SbjUGAdxt+r2LbEVEk4ZlwHvdJ2DtzJHT5DQtLrqq/CTUgJ8SJFMkrJMp/pPznKhzN4qvd8oQJXygSXX/gz92MvoX0xgpNeLsUdAn+PL9KketfR+QYosBz04d8k05E+aTqGaU7FUCHPTLwlOFvLD8Gbv0zsC/PWgSLXTBlcqLEz5PHwPVHTcVzspKj/IyYimXpCSbvu1YOIjyc=
@@ -151,6 +151,24 @@ install-local: build
 generate:
 	cd source && go generate
 
+build-all: clean compile build-folders build-linux build-linux-arm build-darwin build-win compress-folders
+
+build-win:
+	CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc-posix CXX=x86_64-w64-mingw32-g++-posix GO111MODULE="on" GOOS=windows GOARCH=amd64 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-amd64/statping.exe ./cmd
+	CGO_ENABLED=1 CC=i686-w64-mingw32-gcc-posix CXX=i686-w64-mingw32-g++-posix GO111MODULE="on" GOOS=windows GOARCH=386 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-386/statping.exe ./cmd
+
+build-darwin:
+	CGO_ENABLED=1 GO111MODULE="on" GOOS=darwin GOARCH=amd64 go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-amd64/statping --tags "libsqlite3 darwin" ./cmd
+	CGO_ENABLED=1 GO111MODULE="on" GOOS=darwin GOARCH=386 go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-386/statping --tags "libsqlite3 darwin" ./cmd
+
+build-linux:
+	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=amd64 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "libsqlite3 linux" ./cmd
+	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=386 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "libsqlite3 linux" ./cmd
+
+build-linux-arm:
+	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc-6 CXX=arm-linux-gnueabihf-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=7 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm/statping ./cmd
+	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc-6 CXX=aarch64-linux-gnu-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm64 go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm64/statping ./cmd
+
 build-folders:
 	mkdir build || true
 	for os in windows darwin linux;\
@@ -171,32 +189,13 @@ compress-folders:
 			tar -czf releases/statping-$$os-$$arch.tar.gz -C releases/statping-$$os-$$arch statping || true; \
 		done \
 	done
+	chmod +x releases/statping-windows-386/statping.exe || true
+	chmod +x releases/statping-windows-amd64/statping.exe || true
+	chmod +x releases/statping-windows-arm/statping.exe || true
+	zip -j releases/statping-windows-386.zip releases/statping-windows-386/statping.exe || true; \
+	zip -j releases/statping-windows-amd64.zip releases/statping-windows-amd64/statping.exe || true; \
+	zip -j releases/statping-windows-arm.zip releases/statping-windows-arm/statping.exe || true; \
 	find ./releases/ -name "*.tar.gz" -type f -size +1M -exec mv "{}" build/ \;
-
-build-linux:
-	xgo --go $(GOVERSION) --dest=build --out statping --ldflags="-s -w -extldflags -static -X main.VERSION=${VERSION}" --targets="linux/amd64,linux/386,linux/arm-7,linux/arm64" --pkg cmd .
-	for arch in 386 amd64 arm-7 arm64;\
-	do \
-		chmod +x build/statping-linux-$$arch && mv build/statping-linux-$$arch build/statping; \
-		tar -czf build/statping-linux-$$arch.tar.gz -C build statping; \
-		rm -f build/statping; \
-	done
-
-build-mac:
-	xgo --go $(GOVERSION) --dest=build --out statping --ldflags="-s -w -extldflags -static -X main.VERSION=${VERSION}" --targets="darwin-10.11/386,darwin-10.11/amd64" --pkg cmd .
-	for arch in 386 amd64;\
-	do \
-		chmod +x build/statping-darwin-10.11-$$arch && mv build/statping-darwin-10.11-$$arch build/statping; \
-		tar -czf build/statping-darwin-10.11-$$arch.tar.gz -C build statping; \
-		rm -f build/statping; \
-	done
-
-build-win:
-	xgo --go $(GOVERSION) --dest=build --out statping --ldflags="-s -w -extldflags -static -X main.VERSION=${VERSION}" --targets="windows-6.0/386,windows-6.0/amd64" --pkg cmd .
-	chmod +x build/statping-windows-6.0-amd64.exe
-	chmod +x build/statping-windows-6.0-386.exe
-	mv build/statping-windows-6.0-amd64.exe build/statping.exe && zip -j build/statping-windows-amd64.zip build/statping.exe && rm -f build/statping.exe; \
-	mv build/statping-windows-6.0-386.exe build/statping.exe && zip -j build/statping-windows-386.zip build/statping.exe && rm -f build/statping.exe; \
 	find ./releases/ -name "*.zip" -type f -size +1M -exec mv "{}" build/ \;
 
 # remove files for a clean compile/build
@@ -237,8 +236,6 @@ print_details:
 	@echo \Prometheus:          http://localhost:7050  \(Prometheus Web UI\)
 	@echo \==== Monitoring and IDE ====
 	@echo \Grafana:             http://localhost:3000  \(username: admin, password: admin\)
-
-build-all: clean compile build-linux build-mac build-win
 
 coverage: test-deps
 	$(GOPATH)/bin/goveralls -coverprofile=coverage.out -service=travis -repotoken $(COVERALLS)
