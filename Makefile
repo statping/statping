@@ -168,7 +168,7 @@ build-darwin:
 build-linux:
 	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=amd64 \
 		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "linux" ./cmd
-	GO111MODULE="on" GOOS=linux GOARCH=386 \
+	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=386 \
 		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "linux" ./cmd
 
 build-linux-arm:
