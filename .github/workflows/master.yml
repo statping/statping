@@ -240,14 +240,15 @@ jobs:
       - name: Download Go mods
         run: |
           make test-deps
-          go get github.com/crazy-max/xgo
-          docker pull crazymax/xgo:latest
 
       - name: Download Compiled Frontend (rice-box.go)
         uses: actions/download-artifact@v1
         with:
           name: static-rice-box
           path: ./source
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v2
 
       - name: Build Binaries
         env:
