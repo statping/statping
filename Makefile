@@ -162,10 +162,8 @@ build-win:
 		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-386/statping.exe ./cmd
 
 build-darwin:
-	CGO_ENABLED=1 GO111MODULE="on" GOOS=darwin GOARCH=amd64 \
-		go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-amd64/statping --tags "darwin" ./cmd
-	CGO_ENABLED=1 GO111MODULE="on" GOOS=darwin GOARCH=386 \
-		go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-386/statping --tags "darwin" ./cmd
+	CGO_ENABLED=1 GO111MODULE="on" GOOS=darwin GOARCH=amd64 go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-amd64/statping --tags "darwin" ./cmd
+	# CGO_ENABLED=1 GO111MODULE="on" GOOS=darwin GOARCH=386 go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-386/statping --tags "darwin" ./cmd
 
 build-linux:
 	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=amd64 \

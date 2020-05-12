@@ -220,8 +220,18 @@ jobs:
           make xz-utils cpio wget zip unzip p7zip git mercurial bzr texinfo help2man cmake --no-install-recommends
           sudo ln -s /usr/include/asm-generic/ /usr/include/asm
 
+#      - name: Install MacOSX compiler
+#        run: |
+#          cd /
+#          git clone https://github.com/tpoechtrager/osxcross.git
+#          cd osxcross && git checkout 88cb6e8d0d7675cae7c8a2d66c11f58237101df0 && cd ../
+#          wget https://s3.dockerproject.org/darwin/v2/MacOSX10.11.sdk.tar.xz
+#          mv MacOSX10.11.sdk.tar.xz /osxcross/tarballs/
+#          OSX_VERSION_MIN=10.10 UNATTENDED=1 LD_LIBRARY_PATH=/osxcross/target/lib /osxcross/build.sh
+
       - name: Setting ENV's
         run: |
+          echo "::add-path::/osxcross/target/bin"
           echo "::add-path::$(go env GOPATH)/bin"
           echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
@@ -236,9 +246,6 @@ jobs:
         with:
           name: static-rice-box
           path: ./source
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v2
 
       - name: Build Binaries
         env:
@@ -286,7 +293,6 @@ jobs:
             builds/statping-linux-amd64.tar.gz
             builds/statping-linux-arm.tar.gz
             builds/statping-linux-arm64.tar.gz
-            builds/statping-darwin-386.tar.gz
             builds/statping-darwin-amd64.tar.gz
             builds/statping-windows-386.zip
             builds/statping-windows-amd64.zip
