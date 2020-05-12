@@ -247,9 +247,6 @@ jobs:
           name: static-rice-box
           path: ./source
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v2
-
       - name: Build Binaries
         env:
           VERSION: ${{ env.VERSION }}
