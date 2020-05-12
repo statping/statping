@@ -249,9 +249,6 @@ jobs:
           name: static-rice-box
           path: ./source
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v2
-
       - name: Build Binaries
         env:
           VERSION: ${{ env.VERSION }}
@@ -299,6 +296,7 @@ jobs:
             builds/statping-linux-arm.tar.gz
             builds/statping-linux-arm64.tar.gz
             builds/statping-darwin-amd64.tar.gz
+            builds/statping-darwin-386.tar.gz
             builds/statping-windows-386.zip
             builds/statping-windows-amd64.zip
             builds/statping-windows-arm.zip
