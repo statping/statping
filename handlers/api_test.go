@@ -235,12 +235,28 @@ func TestMainApiRoutes(t *testing.T) {
 			URL:            "/metrics",
 			Method:         "GET",
 			BeforeTest:     SetTestENV,
+			AfterTest:      UnsetTestENV,
 			ExpectedStatus: 200,
 			ExpectedContains: []string{
 				`Statping Totals`,
 				`total_failures`,
 				`Golang Metrics`,
 			},
+		},
+		{
+			Name:           "Test API Key Authentication",
+			URL:            "/metrics?api=" + core.App.ApiSecret,
+			Method:         "GET",
+			BeforeTest:     UnsetTestENV,
+			ExpectedStatus: 200,
+		},
+		{
+			Name:           "Test API Header Authentication",
+			URL:            "/metrics",
+			Method:         "GET",
+			HttpHeaders:    []string{"Authorization=" + core.App.ApiSecret},
+			BeforeTest:     UnsetTestENV,
+			ExpectedStatus: 200,
 		},
 	}
 
