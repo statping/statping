@@ -32,7 +32,7 @@
             </div>
 
             <div class="row lower_canvas full-col-12 text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
-                <div class="col-md-8 col-6">
+                <div class="col-md-10 col-6">
                     <div class="dropup" :class="{show: dropDownMenu}">
                         <button style="font-size: 10pt;" @click.prevent="openMenu('timeframe')" type="button" class="col-4 float-left btn btn-sm float-right btn-block text-white dropdown-toggle service_scale pr-2">
                             {{timeframepick.text}}
@@ -58,7 +58,7 @@
                 </div>
 
 
-                <div class="col-md-4 col-6 float-right">
+                <div class="col-md-2 col-6 float-right">
                     <button v-if="!expanded" @click="setService" class="btn btn-sm float-right dyn-dark text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
                         View Service
                     </button>

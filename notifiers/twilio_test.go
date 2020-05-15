@@ -21,29 +21,25 @@ var (
 func init() {
 	TWILIO_SID = os.Getenv("TWILIO_SID")
 	TWILIO_SECRET = os.Getenv("TWILIO_SECRET")
-	TWILIO_FROM = os.Getenv("TWILIO_FROM")
-	TWILIO_TO = os.Getenv("TWILIO_TO")
 }
 
 func TestTwilioNotifier(t *testing.T) {
-	t.SkipNow()
-
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
 	notifications.SetDB(db)
 
-	if TWILIO_SID == "" || TWILIO_SECRET == "" || TWILIO_FROM == "" {
-		t.Log("twilio notifier testing skipped, missing TWILIO_SID environment variable")
+	if TWILIO_SID == "" || TWILIO_SECRET == "" {
+		t.Log("twilio notifier testing skipped, missing TWILIO_SID and TWILIO_SECRET environment variable")
 		t.SkipNow()
 	}
 
 	t.Run("Load Twilio", func(t *testing.T) {
 		Twilio.ApiKey = TWILIO_SID
 		Twilio.ApiSecret = TWILIO_SECRET
-		Twilio.Var1 = TWILIO_TO
-		Twilio.Var2 = TWILIO_FROM
-		Twilio.Delay = time.Duration(100 * time.Millisecond)
+		Twilio.Var1 = "15005550006"
+		Twilio.Var2 = "15005550006"
+		Twilio.Delay = 100 * time.Millisecond
 		Twilio.Enabled = null.NewNullBool(true)
 
 		Add(Twilio)

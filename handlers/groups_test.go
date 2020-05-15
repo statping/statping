@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/groups"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -112,6 +113,21 @@ func TestGroupAPIRoutes(t *testing.T) {
 			Method:         "GET",
 			ExpectedStatus: 200,
 			BeforeTest:     SetTestENV,
+		},
+		{
+			Name:           "Statping View Private Group with API Key",
+			URL:            "/api/groups/2?api=" + core.App.ApiSecret,
+			Method:         "GET",
+			ExpectedStatus: 200,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "Statping View Private Group with API Header",
+			URL:            "/api/groups/2",
+			Method:         "GET",
+			HttpHeaders:    []string{"Authorization=" + core.App.ApiSecret},
+			ExpectedStatus: 200,
+			BeforeTest:     UnsetTestENV,
 		},
 		{
 			Name:           "Statping Reorder Groups",

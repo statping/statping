@@ -235,6 +235,7 @@ func TestMainApiRoutes(t *testing.T) {
 			URL:            "/metrics",
 			Method:         "GET",
 			BeforeTest:     SetTestENV,
+			AfterTest:      UnsetTestENV,
 			ExpectedStatus: 200,
 			ExpectedContains: []string{
 				`Statping Totals`,

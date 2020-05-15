@@ -1,5 +1,5 @@
 import Vue from "vue";
-const { zonedTimeToUtc, utcToZonedTime, lastDayOfMonth, subSeconds, parse, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance } = require('date-fns')
+const { zonedTimeToUtc, utcToZonedTime, startOfToday, lastDayOfMonth, subSeconds, parse, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance } = require('date-fns')
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import format from 'date-fns/format'
 import parseISO from 'date-fns/parseISO'
@@ -15,6 +15,9 @@ export default Vue.mixin({
     },
     current() {
       return parseISO(new Date())
+    },
+    startToday() {
+      return startOfToday()
     },
       secondsHumanize (val) {
         const t2 = addSeconds(new Date(0), val)

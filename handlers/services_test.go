@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/statping/statping/types"
+	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
@@ -107,6 +108,21 @@ func TestApiServiceRoutes(t *testing.T) {
 			Method:         "GET",
 			ExpectedStatus: 200,
 			BeforeTest:     SetTestENV,
+		},
+		{
+			Name:           "Statping Private Service with API Key",
+			URL:            "/api/services/6?api=" + core.App.ApiSecret,
+			Method:         "GET",
+			ExpectedStatus: 200,
+			BeforeTest:     UnsetTestENV,
+		},
+		{
+			Name:           "Statping Private Service with API Header",
+			URL:            "/api/services/6?api=" + core.App.ApiSecret,
+			Method:         "GET",
+			HttpHeaders:    []string{"Authorization=" + core.App.ApiSecret},
+			ExpectedStatus: 200,
+			BeforeTest:     UnsetTestENV,
 		},
 		{
 			Name:             "Statping Service 1 with Private responses",
