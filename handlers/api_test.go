@@ -243,21 +243,6 @@ func TestMainApiRoutes(t *testing.T) {
 				`Golang Metrics`,
 			},
 		},
-		{
-			Name:           "Test API Key Authentication",
-			URL:            "/metrics?api=" + core.App.ApiSecret,
-			Method:         "GET",
-			BeforeTest:     UnsetTestENV,
-			ExpectedStatus: 200,
-		},
-		{
-			Name:           "Test API Header Authentication",
-			URL:            "/metrics",
-			Method:         "GET",
-			HttpHeaders:    []string{"Authorization=" + core.App.ApiSecret},
-			BeforeTest:     UnsetTestENV,
-			ExpectedStatus: 200,
-		},
 	}
 
 	for _, v := range tests {

@@ -1,3 +1,7 @@
+# 0.90.39 (05-15-2020)
+- Modified some SCSS designs for services failures in group
+- Fixed Twilio notifier and tests
+
 # 0.90.38 (05-10-2020)
 - Added service timeframe/interval on index charts
 - Added --config flag to specify config.yml file
