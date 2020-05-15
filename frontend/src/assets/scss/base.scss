@@ -168,6 +168,22 @@ HTML,BODY {
     background-color: #efefef;
 }
 
+.service_day {
+  height: 20px;
+  margin-right: 2px;
+  border-radius: 4px;
+  max-width: 25px;
+}
+
+.service_day SPAN {
+  font-size: 6pt;
+  color: white;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+
   .service_scale {
     width: 60pt;
     float: left !important;
