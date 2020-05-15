@@ -558,24 +558,14 @@
   "templating": {
     "list": [
       {
-        "allValue": null,
-        "current": {},
-        "datasource": "${DS_PROMETHEUS}",
         "hide": 0,
-        "includeAll": false,
-        "label": "service",
-        "multi": false,
-        "name": "service",
+        "label": "datasource",
+        "name": "DS_PROMETHEUS",
         "options": [],
-        "query": "label_values(statup_service_latency, name)",
+        "query": "prometheus",
         "refresh": 1,
         "regex": "",
-        "sort": 0,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
+        "type": "datasource"
       }
     ]
   },
