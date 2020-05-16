@@ -26,9 +26,9 @@
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Service</label>
             <div class="col-sm-8">
-                <select v-model="message.service_id" name="service_id" class="form-control">
+                <select v-model="message.service" name="service_id" class="form-control">
                     <option :value="0">Global Announcement</option>
-                    <option v-for="(service, i) in $store.getters.services" :value="service.id" >{{service.name}}</option>
+                    <option v-for="service in $store.getters.services" :value="service.id" v-bind:key="service.id" >{{service.name}}</option>
                 </select>
             </div>
         </div>
@@ -46,9 +46,9 @@
         <div v-show="this.service === null" class="form-group row">
             <label for="service_id" class="col-sm-4 col-form-label">Service</label>
             <div class="col-sm-8">
-                <select v-model="message.service_id" class="form-control" name="service" id="service_id">
+                <select v-model="message.service" class="form-control" name="service" id="service_id">
                     <option :value="0">Global Message</option>
-                    <option v-for="(service, index) in $store.getters.services" :value="service.id" v-bind:key="index" >{{service.name}}</option>
+                    <option v-for="service in $store.getters.services" :value="service.id" v-bind:key="service.id">{{service.name}}</option>
                 </select>
             </div>
         </div>

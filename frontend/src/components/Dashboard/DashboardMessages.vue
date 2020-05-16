@@ -14,10 +14,10 @@
             </thead>
             <tbody>
 
-            <tr v-for="(message, index) in $store.getters.messages" v-bind:key="index">
+            <tr v-for="message in $store.getters.messages" v-bind:key="message.id">
                 <td>{{message.title}}</td>
                 <td class="d-none d-md-table-cell">
-                    <router-link :to="serviceLink(message.service)">{{service(message.service)}}</router-link>
+                  <router-link :to="serviceLink(service(message.service))">{{serviceName(service(message.service))}}</router-link>
                 </td>
                 <td class="d-none d-md-table-cell">{{niceDate(message.start_on)}}</td>
                 <td class="text-right">
@@ -60,8 +60,10 @@
       this.edit = !mode
     },
     service (id) {
-      const s = this.$store.getters.serviceById(id) || {}
-      return s.name || "Global Message"
+      return this.$store.getters.serviceById(id) || {}
+    },
+    serviceName (service) {
+      return service.name || "Global Message"
     },
     async deleteMessage(m) {
       let c = confirm(`Are you sure you want to delete message '${m.title}'?`)
