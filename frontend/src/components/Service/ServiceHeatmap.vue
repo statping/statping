@@ -82,18 +82,16 @@
       },
       methods: {
           async chartHeatmap() {
-              let start = new Date(new Date().getUTCFullYear(), new Date().getUTCMonth()-2, 1);
+              let start = new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth()-2, 1));
               let monthData = [];
               let monthNum = start.getUTCMonth()
 
               for (let i=1; i<=3; i++) {
-                  let end = this.lastDayOfMonth(monthNum)
-
-                  window.console.log("getting: ",start, end)
+                  let end = this.lastDayOfMonth(start)
 
                   const inputdata = await this.heatmapData(start, end)
                   monthData.push(inputdata)
-                  start = new Date(start.getUTCFullYear(), start.getUTCMonth()+1, 1);
+                  start = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth()+1, 1));
                   monthNum += 1
               }
               this.series = monthData.reverse()
