@@ -13,6 +13,10 @@ version: '2.3'
 #  Prometheus     =>    http://localhost:7050
 #  Grafana        =>    http://localhost:3000
 #
+#  MySQL        =>    http://localhost:3306
+#  Postgres     =>    http://localhost:5432
+#  MariaDB      =>    http://localhost:3307
+#
 ###############################################
 
 services:
@@ -24,6 +28,7 @@ services:
     restart: on-failure
     volumes:
       - ./docker/statping/sqlite:/app
+      - ./services.yml:/app/services.yml
     environment:
       DB_CONN: sqlite
       API_SECRET: exampleapisecret
@@ -32,6 +37,7 @@ services:
       DESCRIPTION: This is a dev environment on SQLite!
       ADMIN_USER: admin
       ADMIN_PASS: admin
+      SAMPLE_DATA: 'false'
     ports:
       - 8080:8080
     networks:
@@ -50,6 +56,7 @@ services:
     restart: on-failure
     volumes:
       - ./docker/statping/mysql:/app
+      - ./services.yml:/app/services.yml
     environment:
       DB_CONN: mysql
       DB_HOST: mysql
@@ -59,10 +66,11 @@ services:
       DB_PORT: 3306
       API_SECRET: exampleapisecret
       NAME: Statping MySQL
-      DOMAIN: http://localhost:8080
+      DOMAIN: http://localhost:8081
       DESCRIPTION: This is a dev environment on MySQL!
       ADMIN_USER: admin
       ADMIN_PASS: admin
+      SAMPLE_DATA: 'false'
     ports:
       - 8081:8080
     networks:
@@ -84,6 +92,7 @@ services:
     restart: on-failure
     volumes:
       - ./docker/statping/mysql:/app
+      - ./services.yml:/app/services.yml
     environment:
       DB_CONN: postgres
       DB_HOST: postgres
@@ -93,10 +102,11 @@ services:
       DB_PORT: 5432
       API_SECRET: exampleapisecret
       NAME: Statping Postgres
-      DOMAIN: http://localhost:8080
+      DOMAIN: http://localhost:8082
       DESCRIPTION: This is a dev environment on Postgres!
       ADMIN_USER: admin
       ADMIN_PASS: admin
+      SAMPLE_DATA: 'false'
     ports:
       - 8082:8080
     networks:
@@ -118,6 +128,7 @@ services:
     restart: on-failure
     volumes:
       - ./docker/statping/mariadb:/app
+      - ./services.yml:/app/services.yml
     environment:
       DB_CONN: mysql
       DB_HOST: mariadb
@@ -127,10 +138,11 @@ services:
       DB_PORT: 3306
       API_SECRET: exampleapisecret
       NAME: Statping MariaDB
-      DOMAIN: http://localhost:8080
+      DOMAIN: http://localhost:8083
       DESCRIPTION: This is a dev environment on MariaDB!
       ADMIN_USER: admin
       ADMIN_PASS: admin
+      SAMPLE_DATA: 'false'
     ports:
       - 8083:8080
     networks:

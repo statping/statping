@@ -54,6 +54,9 @@ func setDefaults() {
 	Params.SetDefault("USE_CDN", false)
 	Params.SetDefault("ALLOW_REPORTS", false)
 	Params.SetDefault("POSTGRES_SSLMODE", "disable")
+	Params.SetDefault("NAME", "Statping Sample Data")
+	Params.SetDefault("DOMAIN", "http://localhost:8080")
+	Params.SetDefault("DESCRIPTION", "This status page has sample data included")
 	Params.SetDefault("REMOVE_AFTER", 2160*time.Hour)
 	Params.SetDefault("CLEANUP_INTERVAL", 1*time.Hour)
 
