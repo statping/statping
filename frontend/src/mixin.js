@@ -1,5 +1,5 @@
 import Vue from "vue";
-const { zonedTimeToUtc, utcToZonedTime, startOfToday, lastDayOfMonth, subSeconds, parse, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance, isWithinInterval } = require('date-fns')
+const { startOfToday, lastDayOfMonth, subSeconds, getUnixTime, fromUnixTime, formatDistance, isWithinInterval } = require('date-fns')
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import format from 'date-fns/format'
 import parseISO from 'date-fns/parseISO'
