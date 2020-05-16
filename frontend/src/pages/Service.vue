@@ -16,8 +16,8 @@
 
             <ServiceTopStats :service="service"/>
 
-            <div v-for="(message, index) in $store.getters.serviceMessages(service.id)" v-if="messageInRange(message)">
-                <MessageBlock :message="message"/>
+            <div>
+                <MessageBlock v-for="message in messagesInRange" v-bind:key="message.id" :message="message"/>
             </div>
 
             <div class="row mt-5 mb-4">
@@ -348,7 +348,10 @@ export default {
           name: this.service.name,
           ...this.convertToChartData(this.data)
         }]
-      }
+      },
+      messagesInRange() {
+        return this.$store.getters.serviceMessages(this.service.id).filter(m => this.inRange(m))
+      },
     },
     watch: {
       service: function(n, o) {
@@ -412,11 +415,9 @@ export default {
         }
         return [{data: arr}]
       },
-        messageInRange(message) {
-            const start = this.isBetween(new Date(), message.start_on)
-            const end = this.isBetween(message.end_on, new Date())
-            return start && end
-        },
+      inRange(message) {
+        return this.isBetween(this.now(), message.start_on, message.start_on === message.end_on ? this.maxDate().toISOString() : message.end_on)
+      },
         async getService() {
             await this.chartHits()
             await this.serviceFailures()

@@ -3,8 +3,8 @@
 
         <Header/>
 
-        <div v-for="(service, i) in services_no_group" class="col-12 full-col-12">
-            <div class="list-group online_list mb-4">
+        <div class="col-12 full-col-12">
+            <div v-for="service in services_no_group" v-bind:key="service.id" class="list-group online_list mb-4">
                 <a class="service_li list-group-item list-group-item-action">
                     <router-link class="no-decoration font-3" :to="serviceLink(service)">{{service.name}}</router-link>
                     <span class="badge float-right" :class="{'bg-success': service.online, 'bg-danger': !service.online }">{{service.online ? "ONLINE" : "OFFLINE"}}</span>
@@ -16,16 +16,16 @@
             </div>
         </div>
 
-        <div v-for="(group, index) in groups" v-bind:key="index">
-            <Group :group=group />
-        </div>
-
-        <div v-for="(message, index) in messages" v-bind:key="index" v-if="inRange(message) && message.service === 0">
-            <MessageBlock :message="message"/>
+        <div>
+            <Group v-for="group in groups" v-bind:key="group.id" :group=group />
         </div>
 
         <div class="col-12 full-col-12">
-            <div v-for="(service, index) in services" :ref="service.id" v-bind:key="index">
+            <MessageBlock v-for="message in messages" v-bind:key="message.id" :message="message" />
+        </div>
+
+        <div class="col-12 full-col-12">
+            <div v-for="service in services" :ref="service.id" v-bind:key="service.id">
                 <ServiceBlock :in_service=service />
             </div>
         </div>
@@ -60,7 +60,7 @@ export default {
     },
     computed: {
         messages() {
-            return this.$store.getters.messages
+            return this.$store.getters.messages.filter(m => this.inRange(m) && m.service === 0)
         },
         groups() {
             return this.$store.getters.groupsInOrder
@@ -80,9 +80,7 @@ export default {
     },
     methods: {
         inRange(message) {
-            const start = this.isBetween(new Date(), message.start_on)
-            const end = this.isBetween(message.end_on, new Date())
-            return start && end
+            return this.isBetween(this.now(), message.start_on, message.start_on === message.end_on ? this.maxDate().toISOString() : message.end_on)
         }
     }
 }
