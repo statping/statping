@@ -181,7 +181,7 @@ jobs:
       - name: Postman SQLite Tests
         uses: matt-ball/newman-action@master
         with:
-          postmanApiKey: ${{ secrets.POSTMAN_API }}
+          apiKey: ${{ secrets.POSTMAN_API }}
           collection: ./dev/postman.json
           environment: ./dev/postman_env_sqlite.json
           timeoutRequest: 15000
@@ -236,7 +236,7 @@ jobs:
       - name: Postman MySQL Tests
         uses: matt-ball/newman-action@master
         with:
-          postmanApiKey: ${{ secrets.POSTMAN_API }}
+          apiKey: ${{ secrets.POSTMAN_API }}
           collection: ./dev/postman.json
           environment: ./dev/postman_env_mysql.json
           timeoutRequest: 15000
@@ -292,7 +292,7 @@ jobs:
       - name: Postman Postgres Tests
         uses: matt-ball/newman-action@master
         with:
-          postmanApiKey: ${{ secrets.POSTMAN_API }}
+          apiKey: ${{ secrets.POSTMAN_API }}
           collection: ./dev/postman.json
           environment: ./dev/postman_env_postgres.json
           timeoutRequest: 15000
