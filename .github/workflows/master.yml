@@ -380,7 +380,7 @@ jobs:
           path: ./build
 
   upload-release:
-    needs: [test, test-postman, build-binaries]
+    needs: [test, test-postman-sqlite, test-postman-mysql, test-postman-postgres, build-binaries]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
