@@ -184,9 +184,10 @@ jobs:
           postmanApiKey: ${{ secrets.POSTMAN_API }}
           collection: 1898229-3c6a7841-0b39-4878-a3a6-1c76832b7679
           globals:
-            - endpoint: http://127.0.0.1:8080
-            - api_key: demosecret123
-            - db_connection: sqlite
+            - values:
+              endpoint: http://127.0.0.1:8080
+              api_key: demosecret123
+              db_connection: sqlite
           timeoutRequest: 15000
           delayRequest: 500
 
@@ -242,14 +243,15 @@ jobs:
           postmanApiKey: ${{ secrets.POSTMAN_API }}
           collection: 1898229-3c6a7841-0b39-4878-a3a6-1c76832b7679
           globals:
-            - endpoint: http://127.0.0.1:8080
-            - api_key: demosecret123
-            - db_connection: mysql
-            - db_host: localhost
-            - db_user: root
-            - db_password: password123
-            - db_database: statping
-            - db_port: 3306
+            - values:
+              endpoint: http://127.0.0.1:8080
+              api_key: demosecret123
+              db_connection: mysql
+              db_host: localhost
+              db_user: root
+              db_password: password123
+              db_database: statping
+              db_port: 3306
           timeoutRequest: 15000
           delayRequest: 500
 
@@ -306,14 +308,15 @@ jobs:
           postmanApiKey: ${{ secrets.POSTMAN_API }}
           collection: 1898229-3c6a7841-0b39-4878-a3a6-1c76832b7679
           globals:
-            - endpoint: http://127.0.0.1:8080
-            - api_key: demosecret123
-            - db_connection: postgres
-            - db_host: localhost
-            - db_user: root
-            - db_password: password123
-            - db_database: statping
-            - db_port: 5432
+            - values:
+              endpoint: http://127.0.0.1:8080
+              api_key: demosecret123
+              db_connection: postgres
+              db_host: localhost
+              db_user: root
+              db_password: password123
+              db_database: statping
+              db_port: 5432
           timeoutRequest: 15000
           delayRequest: 500
 
