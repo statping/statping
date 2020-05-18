@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "94807b85-ef65-4370-9144-b1a74e04cb0e",
+		"_postman_id": "3c6a7841-0b39-4878-a3a6-1c76832b7679",
 		"name": "Statping",
-		"description": "The Statping API allows you to programmatically access data on your Statping server.\n\nThe easiest way to get started with the API is by running your own Docker or local instance of the Statping server.\n\n<img width=\"100%\" src=\"https://img.cjx.io/statuptokenbalance.gif\">\n\n# Authentication\n\nAn API Key is required to be sent as part of every request to the Statping API, by using the `Authorization` and the API Secret Key as a header.\n\n> If you do not have an API Secret Key, you can find it on the Settings page.\n\nYou can Authenticate by implementing the following...\n- Using the `Authorization` header with API Secret Key\n- Setting `GO_ENV` to `test` to bypass all authentication\n- Adding `?api=<keyhere>` URL Query along with the API Secret Key\n- Being logged into Statping as an admin (using JWT sessions/cookies)\n\n# Environment Variables\nStatping includes many environment variables that can give you more control over your instance. Please view the [Environment Variables Wiki](https://github.com/statping/statping/wiki/Environment-Variables) page to view a complete list. Below are a couple important ones...\n- `STATPING_DIR` - Statping's working directory. By default, this will be set to the current working directory. This path will contain the `config.yml` file, `logs`, and `assets` folder. \n- `SASS` - Absolute path to the `sass` executable. By default it will attempt to find `sass` in your `$PATH`. \n\n# Demo\nYou can checkout the Statping Demo instance at [https://demo.statping.com](https://demo.statping.com). All features are available for you to experiment with. The API Secret Key is `demoapisecret123`. Since this instance is public, it will be reset with sample data **every 90 minutes**.\n",
+		"description": "The Statping API allows you to programmatically access data on your Statping server.\n\nThe easiest way to get started with the API is by running your own Docker or local instance of the Statping server.\n\n<img width=\"100%\" src=\"https://img.cjx.io/statuptokenbalance.gif\">\n\n# Authentication\n\nAn API Key is required to be sent as part of every request to the Statping API, by using the `Authorization` and the API Secret Key as a header.\n\n> If you do not have an API Secret Key, you can find it on the Settings page.\n\nYou can Authenticate by implementing the following...\n- Using the `Authorization` header with API Secret Key\n- Setting `GO_ENV` to `test` to bypass all authentication\n- Adding `?api=<keyhere>` URL Query along with the API Secret Key\n- Being logged into Statping as an admin (using JWT sessions/cookies)\n\n> Authentication will create a cookie named `statping_auth`.\n\n# Environment Variables\nStatping includes many environment variables that can give you more control over your instance. Please view the [Environment Variables Wiki](https://github.com/statping/statping/wiki/Environment-Variables) page to view a complete list. Below are a couple important ones...\n- `STATPING_DIR` - Statping's working directory. By default, this will be set to the current working directory. This path will contain the `config.yml` file, `logs`, and `assets` folder. \n- `SASS` - Absolute path to the `sass` executable. By default it will attempt to find `sass` in your `$PATH`. \n\n# Demo\nYou can checkout the Statping Demo instance at [https://demo.statping.com](https://demo.statping.com). All features are available for you to experiment with. The API Secret Key is `demoapisecret123`. Since this instance is public, it will be reset with sample data **every 90 minutes**.\n",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -15,7 +15,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "08b8f487-2318-44b9-bdb8-f1f1041e9462",
+								"id": "29b5dc8d-60c1-4f70-853d-49114af6b254",
 								"exec": [
 									"var tm = Math.round(new Date().getTime()/1000);",
 									"pm.globals.set(\"start_time\", tm-259200);",
@@ -29,6 +29,16 @@
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.config.connection).to.eql(\"sqlite3\");",
 									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e5e9ea08-21d1-48d6-b019-9b4f93e813e5",
+								"exec": [
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -64,27 +74,27 @@
 								},
 								{
 									"key": "db_user",
-									"value": "root",
+									"value": "{{db_user}}",
 									"type": "text"
 								},
 								{
 									"key": "db_password",
-									"value": "password123",
+									"value": "{{db_password}}",
 									"type": "text"
 								},
 								{
 									"key": "db_database",
-									"value": "statping",
+									"value": "{{db_database}}",
 									"type": "text"
 								},
 								{
 									"key": "db_connection",
-									"value": "sqlite",
+									"value": "{{db_connection}}",
 									"type": "text"
 								},
 								{
 									"key": "db_port",
-									"value": "3306",
+									"value": "{{db_port}}",
 									"type": "text"
 								},
 								{
@@ -147,7 +157,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "3faca200-30d4-4daf-8edf-059bf6b6fbf0",
+						"id": "ee74f82f-761a-46ae-a183-044b3d17c416",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -157,7 +167,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "a72027a1-280f-4ebf-887d-a19e9866d0ab",
+						"id": "99e1ad44-98bc-431c-bec6-d5b4ea3b94ac",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -176,7 +186,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "08b8f487-2318-44b9-bdb8-f1f1041e9462",
+								"id": "fb5b5fcf-86a0-4d22-9f4c-cc6955eb414a",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -186,7 +196,6 @@
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.name).to.eql(\"Statping Monitoring Sample Data\");",
 									"    pm.expect(jsonData.using_cdn).to.eql(false);",
-									"    pm.expect(jsonData.admin).to.eql(false);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -256,12 +265,170 @@
 					]
 				},
 				{
+					"name": "Logs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a694b786-796e-4d54-87fc-1848525bba65",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint}}/api/logs",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"logs"
+							]
+						},
+						"description": "This endpoint will return a list of the last 1,000 logs."
+					},
+					"response": [
+						{
+							"name": "Statping Details",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint}}/api",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "398"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 01:06:09 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"admin\": false,\n    \"allow_reports\": false,\n    \"created_at\": \"2020-05-02T01:00:07.885973685Z\",\n    \"description\": \"This data is only used to testing\",\n    \"domain\": \"http://localhost:8080\",\n    \"footer\": null,\n    \"logged_in\": false,\n    \"migration_id\": 1588381207,\n    \"name\": \"Statping Sample Data\",\n    \"setup\": true,\n    \"started_on\": \"2020-05-02T01:00:14.255837864Z\",\n    \"updated_at\": \"2020-05-02T01:00:12.731269305Z\",\n    \"using_cdn\": false,\n    \"version\": \"0.90.34\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Logs Last Line",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "21501cae-bea0-4b6a-87cc-32a7f6da0771",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint}}/api/logs",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"logs"
+							]
+						},
+						"description": "This endpoint will return the last line in the logs."
+					},
+					"response": [
+						{
+							"name": "Statping Details",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint}}/api",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "398"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 01:06:09 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"admin\": false,\n    \"allow_reports\": false,\n    \"created_at\": \"2020-05-02T01:00:07.885973685Z\",\n    \"description\": \"This data is only used to testing\",\n    \"domain\": \"http://localhost:8080\",\n    \"footer\": null,\n    \"logged_in\": false,\n    \"migration_id\": 1588381207,\n    \"name\": \"Statping Sample Data\",\n    \"setup\": true,\n    \"started_on\": \"2020-05-02T01:00:14.255837864Z\",\n    \"updated_at\": \"2020-05-02T01:00:12.731269305Z\",\n    \"using_cdn\": false,\n    \"version\": \"0.90.34\"\n}"
+						}
+					]
+				},
+				{
 					"name": "Health Check",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "987cc831-4a88-45ea-a9d5-494d86887fc6",
+								"id": "1259b7bb-a330-4716-ae7c-386f96224a14",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -338,7 +505,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "2f977982-ef22-4cee-9c38-89ad4777d3e0",
+								"id": "04a41c9d-0659-44f8-9efb-d04fff1af6e3",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -406,7 +573,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "08b8f487-2318-44b9-bdb8-f1f1041e9462",
+								"id": "dbabc164-5030-441d-90f7-b29c7fe794df",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -486,7 +653,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "08b8f487-2318-44b9-bdb8-f1f1041e9462",
+								"id": "992ce59d-3cce-43f1-9c3d-895c55a3e0a1",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -566,7 +733,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "9b94f2ee-0918-4bc0-84a2-3b148b76126b",
+								"id": "8ee8bf21-4243-4f15-8a03-2189224360c7",
 								"exec": [
 									""
 								],
@@ -636,7 +803,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "883519e8-7c7d-49c0-9812-d988d0179907",
+						"id": "00ffb460-8bfc-4221-af12-b155a34c11fc",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -646,14 +813,15 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "7a0738e6-2fc4-45cb-9f1a-1cd57fb76b66",
+						"id": "ffe44bf8-4bf3-4175-bb4b-3c3910c674c3",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Services",
@@ -664,7 +832,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d87f8a4e-7640-45b8-9d45-4f6e6f2463ee",
+								"id": "e89a245a-8ee6-4f3b-8cbc-5d7c3bbf687a",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -749,7 +917,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
+								"id": "7c3e8784-0494-4957-ac45-b09c26580b40",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -850,7 +1018,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
+								"id": "860fa275-aed7-481d-967f-11b481df49e0",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -986,7 +1154,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
+								"id": "d89562d5-6742-447a-ae95-1ad044123f70",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -1122,7 +1290,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
+								"id": "e5af74ef-3ae5-45ef-ac0c-30ec1ed006c3",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -1258,7 +1426,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
+								"id": "b21c7e93-24a7-4c0a-90fa-89d3e34f0029",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -1322,7 +1490,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
+								"id": "c6f024c5-f81d-4aca-92e8-b93bf9ac9068",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -1391,7 +1559,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b5a67a19-fd08-40b0-a961-3e9474ab78c6",
+								"id": "cf487420-5c74-4572-b512-29fe6de72761",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -1494,7 +1662,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d4eb16fe-8495-40e5-9ca3-be20951e5133",
+								"id": "7f96b2ec-11e5-44ab-b353-c2b4fa034f80",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -1602,7 +1770,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b5a67a19-fd08-40b0-a961-3e9474ab78c6",
+								"id": "8f497902-ca10-45cb-bb98-96db1604b276",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -1714,7 +1882,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "dd4d721d-d874-448b-abc9-59c1afceb58e",
+								"id": "ea18e56c-382d-42c4-9bc7-477da1d760fe",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -1763,7 +1931,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "dd4d721d-d874-448b-abc9-59c1afceb58e",
+								"id": "c8b61f71-2f28-42a5-9ca1-e80038767fbe",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -1795,7 +1963,10 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/services/{{service_id}}",
@@ -1870,7 +2041,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "4cd2ab82-e60d-45cd-9b74-cb4b5d893f4d",
+						"id": "2d965d82-4d9e-4c37-a3d2-286c75ae00de",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -1880,14 +2051,670 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c7cb2b6d-289a-4073-b291-202bbec8cb44",
+						"id": "f3cd55c0-923e-43fa-ab6b-e26df9f20e0a",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Incidents",
+			"item": [
+				{
+					"name": "View Service Incidents",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "575ede33-53ac-4e8b-9dbf-3560409b6d1f",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{endpoint}}/api/services/1/incidents",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"services",
+								"1",
+								"incidents"
+							]
+						},
+						"description": "View all incidents for a single service."
+					},
+					"response": [
+						{
+							"name": "View Service Incidents",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{endpoint}}/api/services/1/incidents",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"services",
+										"1",
+										"incidents"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 04 May 2020 03:13:44 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "136"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"title\": \"Service Downtime\",\n        \"service\": 1,\n        \"created_at\": \"2020-05-04T03:11:51.752374Z\",\n        \"updated_at\": \"2020-05-04T03:11:51.752374Z\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Create Incident",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6252ebad-26a9-481d-a233-e097306fc598",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Incidents JSON\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.method).to.eql(\"create\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"title\": \"Service Downtime\",\n\t\"description\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/services/1/incidents",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"services",
+								"1",
+								"incidents"
+							]
+						},
+						"description": "Create an incident for a service."
+					},
+					"response": [
+						{
+							"name": "Create Incident",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"title\": \"Service Downtime\",\n\t\"description\": \"\",\n\t\"service\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/services/1/incidents",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"services",
+										"1",
+										"incidents"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 04 May 2020 03:11:51 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "207"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"incident\",\n    \"method\": \"create\",\n    \"id\": 1,\n    \"output\": {\n        \"id\": 1,\n        \"title\": \"Service Downtime\",\n        \"service\": 1,\n        \"created_at\": \"2020-05-04T03:11:51.752374Z\",\n        \"updated_at\": \"2020-05-04T03:11:51.752374Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Service Incident",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "42cd68de-5bd4-4d4e-b687-fa0bafc1d61a",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"title\": \"Updated Downtime\",\n\t\"description\": \"This is an update for an incident\"\n}"
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/incidents/1",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"incidents",
+								"1"
+							]
+						},
+						"description": "View all incidents for a single service."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Incident",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c6735dbe-86e8-4b42-9b04-6fc1fea949df",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{endpoint}}/api/incidents/1",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"incidents",
+								"1"
+							]
+						},
+						"description": "View all incidents for a single service."
+					},
+					"response": [
+						{
+							"name": "Delete Incident",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{endpoint}}/api/incidents/2",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"incidents",
+										"2"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 04 May 2020 03:31:48 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "207"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"incident\",\n    \"method\": \"delete\",\n    \"id\": 2,\n    \"output\": {\n        \"id\": 2,\n        \"title\": \"Service Downtime\",\n        \"service\": 1,\n        \"created_at\": \"2020-05-04T03:18:24.818629Z\",\n        \"updated_at\": \"2020-05-04T03:18:24.818629Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Incident Updates",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e2e7d38f-efae-44d1-9361-cd301547feb3",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{endpoint}}/api/incidents/2/updates",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"incidents",
+								"2",
+								"updates"
+							]
+						},
+						"description": "View all incidents for a single service."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Incident Update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4478e35f-8da6-4f74-9100-0bb92ac6466e",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"message\": \"Website is loading very slowly, looking into this.\",\n\t\"type\": \"Investigating\"\n}"
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/incidents/2/updates",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"incidents",
+								"2",
+								"updates"
+							]
+						},
+						"description": "View all incidents for a single service."
+					},
+					"response": [
+						{
+							"name": "Create Incident Update",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"message\": \"Website is loading very slowly, looking into this.\",\n\t\"type\": \"Investigating\"\n}"
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/incidents/2/updates",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"incidents",
+										"2",
+										"updates"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 04 May 2020 03:20:05 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "261"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"incident_update\",\n    \"method\": \"create\",\n    \"id\": 1,\n    \"output\": {\n        \"id\": 1,\n        \"message\": \"Website is loading very slowly, looking into this.\",\n        \"type\": \"Investigating\",\n        \"created_at\": \"2020-05-04T03:20:05.102435Z\",\n        \"updated_at\": \"2020-05-04T03:20:05.102435Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Incident Update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4578b229-5a85-4d3c-acdc-360ad50a35f2",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{endpoint}}/api/incidents/2/updates/1",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"incidents",
+								"2",
+								"updates",
+								"1"
+							]
+						},
+						"description": "View all incidents for a single service."
+					},
+					"response": [
+						{
+							"name": "Delete Incident Update",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{endpoint}}/api/incidents/2/updates/1",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"incidents",
+										"2",
+										"updates",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 04 May 2020 03:23:00 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "261"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"incident_update\",\n    \"method\": \"delete\",\n    \"id\": 1,\n    \"output\": {\n        \"id\": 1,\n        \"message\": \"Website is loading very slowly, looking into this.\",\n        \"type\": \"Investigating\",\n        \"created_at\": \"2020-05-04T03:20:05.102435Z\",\n        \"updated_at\": \"2020-05-04T03:20:05.102435Z\"\n    }\n}"
+						}
+					]
+				}
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Groups",
@@ -1898,7 +2725,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d87f8a4e-7640-45b8-9d45-4f6e6f2463ee",
+								"id": "e83ac60d-3683-441e-a78b-d15b6c2b704d",
 								"exec": [
 									"pm.test(\"View All Groups\", function () {",
 									"    var jsonData = pm.response.json();",
@@ -1979,7 +2806,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "023c5643-6cb1-4cd0-b775-566f232d68f8",
+								"id": "d2bba501-9674-4143-a51d-33721eb4785f",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -2080,7 +2907,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d4eb16fe-8495-40e5-9ca3-be20951e5133",
+								"id": "6ea60d3a-b601-41a8-8b5e-734f3946d34c",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -2184,7 +3011,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b5a67a19-fd08-40b0-a961-3e9474ab78c6",
+								"id": "4efd65bf-6e56-4600-91af-36cb82ffb125",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -2214,7 +3041,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[{\"group\":1,\"order\":1},{\"group\":2,\"order\":2}]"
+							"raw": "[{\"group\":1,\"order\":1},{\"group\":2,\"order\":2}]",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/reorder/groups",
@@ -2237,7 +3067,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "dd4d721d-d874-448b-abc9-59c1afceb58e",
+								"id": "ec903995-c37b-436a-b554-c9e4ee5ff52a",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -2344,7 +3174,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "4cd2ab82-e60d-45cd-9b74-cb4b5d893f4d",
+						"id": "abe8dbf2-9e63-49b5-b5d3-7a50217c87a3",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -2354,7 +3184,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c7cb2b6d-289a-4073-b291-202bbec8cb44",
+						"id": "de397a38-c190-4928-92f0-393ab85e5342",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -2373,7 +3203,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "08b8f487-2318-44b9-bdb8-f1f1041e9462",
+								"id": "eaec5a14-dd31-4e9c-9e30-8999591514c3",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -2505,7 +3335,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "f6848835-443c-4dfa-abb9-ddea712cd0d1",
+								"id": "f858d94a-6534-452b-9197-99c64d7b4009",
 								"exec": [
 									""
 								],
@@ -2549,7 +3379,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "9a2977fe-9689-4039-bdcb-eaa34abee958",
+								"id": "20b79651-9175-4a30-98f3-4666ebf9ab05",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -2638,7 +3468,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "1913466d-83b2-4d5b-ac48-89c9abdd0c8d",
+								"id": "fd7e8b36-70c2-4060-bb50-5d87e663dea3",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -2744,7 +3574,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "555b7ba4-bb36-4e86-a541-fa5a5008f951",
+								"id": "925d3cea-fa59-42db-9d4e-154021cfbd37",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -2834,7 +3664,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "d23b1822-d1de-4545-9a82-3cf4719a7e82",
+								"id": "2802ca86-12c2-41ce-947d-e086fcb7c753",
 								"exec": [
 									""
 								],
@@ -2844,7 +3674,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b0d22bbd-a428-4df3-8295-b40542bfa21f",
+								"id": "19f750c7-1df2-4a03-b0f0-b487d80d4917",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -2949,7 +3779,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "bd8c3425-a97f-4f8c-b849-71b65dd543ee",
+								"id": "d94974c7-7c6f-4298-8ab7-6bd7a789020f",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -3050,7 +3880,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "9720db1a-bc4c-4e05-94ea-2782aaafb793",
+						"id": "8cef4ad5-1c96-46e8-8fc9-9e9e044730dc",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -3060,7 +3890,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c667ae2d-41f3-4dea-ab62-3b544e2bc8f9",
+						"id": "872da99f-a57d-4a54-bd5e-18b5529c715f",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -3079,7 +3909,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e9105618-6db8-4a57-ae7f-782989842f4a",
+								"id": "9f3e4a3e-a690-4dcb-897f-fdfa8503d79f",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -3164,7 +3994,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "acac30b6-3caa-46c9-89be-1efbadf89f22",
+								"id": "7a42a113-8bdb-47dd-a914-36bc2aa65aba",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -3252,7 +4082,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d714d71d-4d6a-4b2e-a6ea-16c34dec3041",
+								"id": "2a8a1a62-57ea-4a7a-9f0a-713ac548c151",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -3291,7 +4121,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"method\": \"slack\",\n    \"host\": \"https://hooks.slack.com/services/EXAMPLEIDHERE/BV33WKP0C/MtKw3Kc8BFylTv4pohKqHtXX\",\n    \"enabled\": true,\n    \"limits\": 55\n}"
+							"raw": "{\n    \"method\": \"slack\",\n    \"host\": \"https://hooks.slack.com/services/EXAMPLEIDHERE/BV33WKP0C/MtKw3Kc8BFylTv4pohKqHtXX\",\n    \"enabled\": true,\n    \"limits\": 55\n}",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/notifier/slack",
@@ -3356,6 +4189,127 @@
 							"body": "{\n    \"status\": \"success\",\n    \"type\": \"string\",\n    \"method\": \"update\",\n    \"output\": \"slack\"\n}"
 						}
 					]
+				},
+				{
+					"name": "Test Notifier",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "198374af-ccbc-4e2e-8af2-df58622379d4",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Test Notifier\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.eql(false);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"method\": \"slack\",\n    \"host\": \"https://hooks.slack.com/services/EXAMPLEIDHERE/BV33WKP0C/MtKw3Kc8BFylTv4pohKqHtXX\",\n    \"enabled\": true,\n    \"limits\": 55\n}",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/notifier/slack/test",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"notifier",
+								"slack",
+								"test"
+							]
+						},
+						"description": "Update a notifier to change it's values."
+					},
+					"response": [
+						{
+							"name": "Test Notifier",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"method\": \"slack\",\n    \"host\": \"https://hooks.slack.com/services/EXAMPLEIDHERE/BV33WKP0C/MtKw3Kc8BFylTv4pohKqHtXX\",\n    \"enabled\": true,\n    \"limits\": 55\n}",
+									"options": {
+										"raw": {}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/notifier/slack/test",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"notifier",
+										"slack",
+										"test"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 04 May 2020 03:25:07 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"success\": false,\n    \"response\": \"<!DOCTYPE html><html lang=\\\"en-US\\\" class=\\\"\\\"><head><script type=\\\"text/javascript\\\" src=\\\"https://a.slack-edge.com/bv1-8-8cacda2/webpack.manifest.d77c617fb8f0095d9c13.min.js\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"></script><script>window.ts_endpoint_url = \\\"https:\\\\/\\\\/slack.com\\\\/beacon\\\\/timing\\\";(function(e) {\\n\\tvar n=Date.now?Date.now():+new Date,r=e.performance||{},t=[],a={},i=function(e,n){for(var r=0,a=t.length,i=[];a>r;r++)t[r][e]==n&&i.push(t[r]);return i},o=function(e,n){for(var r,a=t.length;a--;)r=t[a],r.entryType!=e||void 0!==n&&r.name!=n||t.splice(a,1)};r.now||(r.now=r.webkitNow||r.mozNow||r.msNow||function(){return(Date.now?Date.now():+new Date)-n}),r.mark||(r.mark=r.webkitMark||function(e){var n={name:e,entryType:\\\"mark\\\",startTime:r.now(),duration:0};t.push(n),a[e]=n}),r.measure||(r.measure=r.webkitMeasure||function(e,n,r){n=a[n].startTime,r=a[r].startTime,t.push({name:e,entryType:\\\"measure\\\",startTime:n,duration:r-n})}),r.getEntriesByType||(r.getEntriesByType=r.webkitGetEntriesByType||function(e){return i(\\\"entryType\\\",e)}),r.getEntriesByName||(r.getEntriesByName=r.webkitGetEntriesByName||function(e){return i(\\\"name\\\",e)}),r.clearMarks||(r.clearMarks=r.webkitClearMarks||function(e){o(\\\"mark\\\",e)}),r.clearMeasures||(r.clearMeasures=r.webkitClearMeasures||function(e){o(\\\"measure\\\",e)}),e.performance=r,\\\"function\\\"==typeof define&&(define.amd||define.ajs)&&define(\\\"performance\\\",[],function(){return r}) // eslint-disable-line\\n})(window);</script><script>\\n\\n(function () {\\n\\t\\n\\twindow.TSMark = function (mark_label) {\\n\\t\\tif (!window.performance || !window.performance.mark) return;\\n\\t\\tperformance.mark(mark_label);\\n\\t};\\n\\twindow.TSMark('start_load');\\n\\n\\t\\n\\twindow.TSMeasureAndBeacon = function (measure_label, start_mark_label) {\\n\\t\\tif (!window.performance || !window.performance.mark || !window.performance.measure) {\\n\\t\\t\\treturn;\\n\\t\\t}\\n\\n\\t\\tperformance.mark(start_mark_label + '_end');\\n\\n\\t\\ttry {\\n\\t\\t\\tperformance.measure(measure_label, start_mark_label, start_mark_label + '_end');\\n\\t\\t\\twindow.TSBeacon(measure_label, performance.getEntriesByName(measure_label)[0].duration);\\n\\t\\t} catch (e) {\\n\\t\\t\\t\\n\\t\\t}\\n\\t};\\n\\n\\t\\n\\tif ('sendBeacon' in navigator) {\\n\\t\\twindow.TSBeacon = function (label, value) {\\n\\t\\t\\tvar endpoint_url = window.ts_endpoint_url || 'https://slack.com/beacon/timing';\\n\\t\\t\\tnavigator.sendBeacon(\\n\\t\\t\\t\\tendpoint_url + '?data=' + encodeURIComponent(label + ':' + value),\\n\\t\\t\\t\\t''\\n\\t\\t\\t);\\n\\t\\t};\\n\\t} else {\\n\\t\\twindow.TSBeacon = function (label, value) {\\n\\t\\t\\tvar endpoint_url = window.ts_endpoint_url || 'https://slack.com/beacon/timing';\\n\\t\\t\\tnew Image().src = endpoint_url + '?data=' + encodeURIComponent(label + ':' + value);\\n\\t\\t};\\n\\t}\\n})();\\n</script><script>window.TSMark('step_load');</script><noscript><meta http-equiv=\\\"refresh\\\" content=\\\"0; URL=/***?nojsmode=1\\\"></noscript><script type=\\\"text/javascript\\\">var safe_hosts = ['app.optimizely.com', 'tinyspeck.dev.slack.com'];\\n\\nif (self !== top && safe_hosts.indexOf(top.location.host) === -1) {\\n\\twindow.document.write(\\n\\t\\t'\\\\u003Cstyle>body * {display:none !important;}\\\\u003C/style>\\\\u003Ca href=\\\"#\\\" onclick=' +\\n\\t\\t\\t'\\\"top.location.href=window.location.href\\\" style=\\\"display:block !important;padding:10px\\\">Go to Slack.com\\\\u003C/a>'\\n\\t);\\n}\\n\\n(function() {\\n\\tvar timer;\\n\\tif (self !== top && safe_hosts.indexOf(top.location.host) === -1) {\\n\\t\\ttimer = window.setInterval(function() {\\n\\t\\t\\tif (window) {\\n\\t\\t\\t\\ttry {\\n\\t\\t\\t\\t\\tvar pageEl = document.getElementById('page');\\n\\t\\t\\t\\t\\tvar clientEl = document.getElementById('client-ui');\\n\\t\\t\\t\\t\\tvar sectionEls = document.querySelectorAll('nav, header, section');\\n\\n\\t\\t\\t\\t\\tpageEl.parentNode.removeChild(pageEl);\\n\\t\\t\\t\\t\\tclientEl.parentNode.removeChild(clientEl);\\n\\t\\t\\t\\t\\tfor (var i = 0; i < sectionEls.length; i++) {\\n\\t\\t\\t\\t\\t\\tsectionEls[i].parentNode.removeChild(sectionEls[i]);\\n\\t\\t\\t\\t\\t}\\n\\t\\t\\t\\t\\twindow.TS = null;\\n\\t\\t\\t\\t\\twindow.TD = null;\\n\\t\\t\\t\\t\\twindow.clearInterval(timer);\\n\\t\\t\\t\\t} catch (e) {}\\t\\n\\t\\t\\t}\\n\\t\\t}, 200);\\n\\t}\\n})();</script><script type=\\\"text/javascript\\\">\\nwindow.dataLayer = window.dataLayer || [];\\nwindow.dataLayer.push({\\n\\t'gtm.start': Date.now(),\\n\\t'event' : 'gtm.js',\\n\\t'secure_page' : false,\\n});\\nvar firstScript = document.getElementsByTagName('script')[0];\\nvar thisScript = document.createElement('script');\\nthisScript.async = true;\\nthisScript.src = '//www.googletagmanager.com/gtm.js?id=GTM-KH2LPK';\\nfirstScript.parentNode.insertBefore(thisScript, firstScript);\\n</script><script type=\\\"text/javascript\\\">\\ndocument.addEventListener(\\\"DOMContentLoaded\\\", function(e) {\\n\\tvar gtmDataLayer = window.dataLayer || [];\\n\\tvar gtmTags = document.querySelectorAll('*[data-gtm-click]');\\n\\tvar gtmClickHandler = function(c) {\\n\\t\\tvar gtm_events = this.getAttribute('data-gtm-click');\\n\\t\\tif (!gtm_events) return;\\n\\t\\tvar gtm_events_arr = gtm_events.split(\\\",\\\");\\n\\t\\tfor(var e=0; e < gtm_events_arr.length; e++) {\\n\\t\\t\\tvar ev = gtm_events_arr[e].trim();\\n\\t\\t\\tgtmDataLayer.push({ 'event': ev });\\n\\t\\t}\\n\\t};\\n\\tfor(var g=0; g < gtmTags.length; g++){\\n\\t\\tvar elem = gtmTags[g];\\n\\t\\telem.addEventListener('click', gtmClickHandler);\\n\\t}\\n});\\n</script><script type=\\\"text/javascript\\\">\\n(function(e,c,b,f,d,g,a){e.SlackBeaconObject=d;\\ne[d]=e[d]||function(){(e[d].q=e[d].q||[]).push([1*new Date(),arguments])};\\ne[d].l=1*new Date();g=c.createElement(b);a=c.getElementsByTagName(b)[0];\\ng.async=1;g.src=f;a.parentNode.insertBefore(g,a)\\n})(window,document,\\\"script\\\",\\\"https://a.slack-edge.com/bv1-8-8cacda2/slack_beacon.5256c1f252f9ae885071.min.js\\\",\\\"sb\\\");\\nwindow.sb('set', 'token', '3307f436963e02d4f9eb85ce5159744c');\\nwindow.sb('track', 'pageview');\\n</script><meta name=\\\"referrer\\\" content=\\\"no-referrer\\\"><meta name=\\\"superfish\\\" content=\\\"nofish\\\"><script type=\\\"text/javascript\\\">var TS_last_log_date = null;\\nvar TSMakeLogDate = function() {\\n\\tvar date = new Date();\\n\\n\\tvar y = date.getFullYear();\\n\\tvar mo = date.getMonth()+1;\\n\\tvar d = date.getDate();\\n\\n\\tvar time = {\\n\\t  h: date.getHours(),\\n\\t  mi: date.getMinutes(),\\n\\t  s: date.getSeconds(),\\n\\t  ms: date.getMilliseconds()\\n\\t};\\n\\n\\tObject.keys(time).map(function(moment, index) {\\n\\t\\tif (moment == 'ms') {\\n\\t\\t\\tif (time[moment] < 10) {\\n\\t\\t\\t\\ttime[moment] = time[moment]+'00';\\n\\t\\t\\t} else if (time[moment] < 100) {\\n\\t\\t\\t\\ttime[moment] = time[moment]+'0';\\n\\t\\t\\t}\\n\\t\\t} else if (time[moment] < 10) {\\n\\t\\t\\ttime[moment] = '0' + time[moment];\\n\\t\\t}\\n\\t});\\n\\n\\tvar str = y + '/' + mo + '/' + d + ' ' + time.h + ':' + time.mi + ':' + time.s + '.' + time.ms;\\n\\tif (TS_last_log_date) {\\n\\t\\tvar diff = date-TS_last_log_date;\\n\\t\\t//str+= ' ('+diff+'ms)';\\n\\t}\\n\\tTS_last_log_date = date;\\n\\treturn str+' ';\\n}\\n\\nvar parseDeepLinkRequest = function(code) {\\n\\tvar m = code.match(/\\\"id\\\":\\\"([CDG][A-Z0-9]{8,})\\\"/);\\n\\tvar id = m ? m[1] : null;\\n\\n\\tm = code.match(/\\\"team\\\":\\\"(T[A-Z0-9]{8,})\\\"/);\\n\\tvar team = m ? m[1] : null;\\n\\n\\tm = code.match(/\\\"message\\\":\\\"([0-9]+\\\\.[0-9]+)\\\"/);\\n\\tvar message = m ? m[1] : null;\\n\\n\\treturn { id: id, team: team, message: message };\\n}\\n\\nif ('rendererEvalAsync' in window) {\\n\\tvar origRendererEvalAsync = window.rendererEvalAsync;\\n\\twindow.rendererEvalAsync = function(blob) {\\n\\t\\ttry {\\n\\t\\t\\tvar data = JSON.parse(decodeURIComponent(atob(blob)));\\n\\t\\t\\tif (data.code.match(/handleDeepLink/)) {\\n\\t\\t\\t\\tvar request = parseDeepLinkRequest(data.code);\\n\\t\\t\\t\\tif (!request.id || !request.team || !request.message) return;\\n\\n\\t\\t\\t\\trequest.cmd = 'channel';\\n\\t\\t\\t\\tTSSSB.handleDeepLinkWithArgs(JSON.stringify(request));\\n\\t\\t\\t\\treturn;\\n\\t\\t\\t} else {\\n\\t\\t\\t\\torigRendererEvalAsync(blob);\\n\\t\\t\\t}\\n\\t\\t} catch (e) {\\n\\t\\t}\\n\\t}\\n}</script><script type=\\\"text/javascript\\\">var TSSSB = {\\n\\tcall: function() {\\n\\t\\treturn false;\\n\\t}\\n};</script><script type=\\\"text/javascript\\\">window.addEventListener('load', function() {\\n\\tvar was_TS = window.TS;\\n\\tdelete window.TS;\\n\\tif (was_TS) window.TS = was_TS;\\n});</script><title>There's been a glitch… | Slack</title><link href=\\\"https://a.slack-edge.com/e33f3/style/rollup-slack_kit_legacy_adapters.css\\\" rel=\\\"stylesheet\\\" type=\\\"text/css\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"><link href=\\\"https://a.slack-edge.com/72b2/style/rollup-plastic.css\\\" rel=\\\"stylesheet\\\" type=\\\"text/css\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"><link href=\\\"https://a.slack-edge.com/bv1-8-8cacda2/modern.vendor.624e5ce.min.css\\\" rel=\\\"stylesheet\\\" type=\\\"text/css\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"><link href=\\\"https://a.slack-edge.com/bv1-8-8cacda2/application.9edb3a3.min.css\\\" rel=\\\"stylesheet\\\" type=\\\"text/css\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"><link href=\\\"https://a.slack-edge.com/8f662/style/rollup-slack_kit_helpers.css\\\" rel=\\\"stylesheet\\\" id=\\\"slack_kit_helpers_stylesheet\\\" type=\\\"text/css\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"><link href=\\\"https://a.slack-edge.com/3f5fd/style/404.css\\\" rel=\\\"stylesheet\\\" type=\\\"text/css\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"><link href=\\\"https://a.slack-edge.com/c74a7/style/sticky_nav.css\\\" rel=\\\"stylesheet\\\" type=\\\"text/css\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"><link href=\\\"https://a.slack-edge.com/b9c9/style/footer.css\\\" rel=\\\"stylesheet\\\" type=\\\"text/css\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"><link href=\\\"https://a.slack-edge.com/77a4d/style/libs/lato-2-compressed.css\\\" rel=\\\"stylesheet\\\" type=\\\"text/css\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"><meta property=\\\"og:type\\\" content=\\\"website\\\"><meta property=\\\"og:site_name\\\" content=\\\"Slack\\\"><meta property=\\\"og:title\\\" content=\\\"There's been a glitch…\\\"><meta property=\\\"og:image\\\" content=\\\"https://a.slack-edge.com/80588/img/404/404-meta-thumb.jpg\\\"><meta property=\\\"og:description\\\" content=\\\"We're not quite sure what went wrong. You can go back, or try looking on our &lt;a href=&quot;http://get.slack.help&quot; target=&quot;_blank&quot;&gt;Help Center&lt;/a&gt; if you need a hand.\\\"><meta property=\\\"og:url\\\" content=\\\"https://slack.com/***\\\"><link id=\\\"favicon\\\" rel=\\\"shortcut icon\\\" href=\\\"https://a.slack-edge.com/80588/marketing/img/meta/favicon-32.png\\\" sizes=\\\"16x16 32x32 48x48\\\" type=\\\"image/png\\\"></head><body class=\\\" deprecated\\\"><script>var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);\\nif (w > 1440) document.querySelector('body').classList.add('widescreen');</script><nav class=\\\"top persistent\\\"><a href=\\\"https://slack.com/\\\" class=\\\"logo\\\" data-qa=\\\"logo\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=logo\\\" aria-label=\\\"Slack homepage\\\"></a><ul><li><a href=\\\"https://slack.com/is\\\" data-qa=\\\"product\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=nav_product\\\">Product</a></li><li><a href=\\\"https://slack.com/pricing?ui_step=55&ui_element=5\\\" data-qa=\\\"pricing\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=nav_pricing\\\">Pricing</a></li><li><a href=\\\"https://get.slack.help/hc/en-us\\\" data-qa=\\\"support\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=nav_support\\\">Support</a></li><li class=\\\"mobile_btn download_slack\\\"><a href=\\\"/get\\\" data-qa=\\\"download_slack\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=nav_download\\\">Download Slack</a></li><li><a data-gtm-click=\\\"SignUp,optout_nav_create_team\\\" href=\\\"https://slack.com/create\\\" class=\\\"\\\" data-qa=\\\"create_team\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=nav_create_team\\\">Create a new workspace</a></li><li><a href=\\\"https://slack.com/get-started\\\" data-gtm-click=\\\"optout_nav_find_team\\\" data-qa=\\\"find_team\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=nav_find_team\\\">Find your workspace</a></li><li class=\\\"sign_in hide_on_mobile\\\"><a data-gtm-click=\\\"optout_nav_signin\\\" href=\\\"https://slack.com/signin\\\" class=\\\"btn_sticky btn_filled\\\" data-qa=\\\"sign_in\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=nav_sign_in\\\">Sign in</a></li><li class=\\\"mobile_btn mobile_menu_btn\\\"><a href=\\\"#\\\" class=\\\"btn_sticky\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=nav_mobile_menu_btn\\\">Menu</a></li></ul></nav><nav class=\\\"mobile_menu loading menu_scroll\\\" aria-hidden=\\\"true\\\"><div class=\\\"mobile_menu_wrapper\\\"><div class=\\\"mobile_menu_header\\\"><a href=\\\"https://slack.com/\\\" class=\\\"logo\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=nav_logo\\\"></a><a href=\\\"#\\\" class=\\\"close\\\" aria-label=\\\"close\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=nav_menu_close\\\"><ts-icon class=\\\"ts_icon ts_icon_times\\\"></ts-icon></a></div><ul><li><a href=\\\"https://slack.com/is\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=nav_product\\\">Product</a></li><li><a href=\\\"https://slack.com/pricing?ui_step=55&ui_element=5\\\" class=\\\"mobile_nav_pricing\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=nav_pricing\\\">Pricing</a></li><li><a href=\\\"https://get.slack.help/hc/en-us\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=nav_support\\\">Support</a></li><li><a href=\\\"/get\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=nav_download\\\">Download <span class=\\\"optional_desktop_nav_message\\\">the Slack app</span></a></li></ul><ul class=\\\"mobile_menu_footer\\\"><li><a href=\\\"https://slack.com/signin\\\" data-gtm-click=\\\"optout_nav_signin\\\" target=\\\"_blank\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=nav_sign_in\\\"><ts-icon class=\\\"ts_icon small float_none team_icon ts_icon_plus default signup_icon\\\"></ts-icon><span class=\\\"switcher_label\\\">Sign in</span></a></li><li><a data-gtm-click=\\\"SignUp,optout_nav_create_team\\\" href=\\\"https://slack.com/get-started#/create\\\" class=\\\"\\\" target=\\\"_blank\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=nav_create_team\\\"><ts-icon class=\\\"ts_icon small float_none team_icon c-icon--slack default signup_icon\\\"></ts-icon><span class=\\\"switcher_label\\\">Create a new workspace</span></a></li></ul></div></nav><div id=\\\"page\\\" class=\\\"\\\"><div id=\\\"page_contents\\\" data-qa=\\\"page_contents\\\" class=\\\"\\\"><div id=\\\"preload\\\"></div><div id=\\\"content\\\" data-background=\\\"https://a.slack-edge.com/80588/img/404/marrakesh-meadow-80.jpg\\\"><img id=\\\"background\\\" src=\\\"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7\\\"><div id=\\\"sprite-wrapper\\\"><div class=\\\"sprite piggy piggy_chewing\\\"></div><div class=\\\"sprite chicken chicken_walk_lr\\\"><div class=\\\"sub_sprite\\\"></div></div><div class=\\\"sprite chicken chicken_peck_2x flipped\\\"></div><div class=\\\"sprite piggy piggy_walk piggy_walk_lr\\\"></div><div class=\\\"sprite chicken chicken_walk_rl flipped\\\"><div class=\\\"sub_sprite\\\"></div></div><div class=\\\"sprite piggy piggy_walk flipped piggy_walk_rl\\\"></div><div class=\\\"sprite butterfly butterfly_angle butterfly_angle_lr\\\"></div><div class=\\\"sprite butterfly butterfly_angle_1 butterfly_angle_1_lr\\\"></div><div class=\\\"sprite butterfly butterfly_rooked butterfly_rooked_lr\\\"></div><div class=\\\"sprite butterfly butterfly_side butterfly_side_lr\\\"></div><div class=\\\"sprite butterfly butterfly_angle flipped butterfly_angle_rl bottom\\\"></div><div class=\\\"sprite butterfly butterfly_angle_1 flipped butterfly_angle_1_rl bottom\\\"></div><div class=\\\"sprite butterfly butterfly_rooked flipped butterfly_rooked_rl bottom\\\"></div><div class=\\\"sprite butterfly butterfly_side flipped butterfly_side_rl bottom\\\"></div></div></div><div id=\\\"loader\\\"><?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\"?><svg width=\\\"32px\\\" height=\\\"32px\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\" viewBox=\\\"0 0 100 100\\\" preserveAspectRatio=\\\"xMidYMid\\\" class=\\\"uil-heart\\\"><rect x=\\\"0\\\" y=\\\"0\\\" width=100 height=100 fill=\\\"none\\\" class=\\\"bk\\\"></rect><g transform=\\\"translate(50 50)\\\"><g><g transform=\\\"translate(-50 -50)\\\"><path d=\\\"M90,30.2c0-11-9-20.1-20-20.1s-20,9.1-20,20.2c0,0.2,0-0.3,0,0.7H50c0-1,0-0.6,0-0.8c0-11-9-20.1-20-20.1s-20,9.1-20,20.2 c0,0.2,0-0.3,0,0.7h0c0.3,20,30,39.5,40,55c10-15.5,39.7-35,40-55h0C90,30,90,30.4,90,30.2z\\\" fill=\\\"#f02\\\"></path></g><animateTransform attributeName=\\\"transform\\\" type=\\\"scale\\\" from=\\\"1.3\\\" to=\\\"0.9\\\" dur=\\\"1s\\\" repeatCount=\\\"indefinite\\\" calcMode=\\\"spline\\\" values=\\\"1.3;0.9;1.1;0.9\\\" keyTimes=\\\"0;0.3;0.301;1\\\" keySplines=\\\"0 0.75 0.25 1;0 1 0 1;0 .75 .25 1\\\"></animateTransform></g></g></svg></div><div class=\\\"card\\\"><h1><i class=\\\"ts_icon ts_icon_warning mustard_yellow\\\"></i>There’s been a glitch…</h1><p>We’re not quite sure what went wrong. You can go back, or try looking on our <a href=\\\"http://get.slack.help/hc/en-us\\\" target=\\\"_blank\\\">Help Center</a> if you need a hand.</p></div><noscript><style>#loader {\\n\\t\\t\\t\\t\\t\\tdisplay: none;\\n\\t\\t\\t\\t\\t}</style></noscript><script>\\n// fire 404\\nwindow.dataLayer = window.dataLayer || [];\\nwindow.dataLayer.push({\\n\\t'event' : 'Error404',\\n});\\n\\n(function() {\\n\\t// quick hack: 8-bit alpha-friendly logo\\n\\tvar logo = document.getElementById('header_logo');\\n\\tvar alt_src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAABICAMAAAD/Eoi4AAAC+lBMVEUAAAAoFScqIjEoJTMrLDQrMjg1MDk7MzgqOD09NTo/OD1COj9EPEFFPUNIPUhNPEm9HylJQUbPF1xMREliPVFdP1CwJ1q8KSpPR0zMIVfLIVuRM1SrK1kwUk6LNliGOFcsVVHBLSdTSk/PJl5VTVIzWE/NK06/NCjRK2ZZUVbCNyrNM0UyYFVcVFnPNkxfVlwuZlrQNWhhWF7JPjZkW2HUOnHJRTfFSCpnX2RqYmdsZGnVRHXIUShuZWtxaG7MVTLJWCx1bHFLeW4ajHR4cHXaUoN0cnZggDVegDs7h2t8c3kzi24hkHhogjeAdnzbWoZ7eX10hjYjmHh7hjjScCyHfoQ0mHl/iTQumoCFiDV4i0GDgYWGiTbQdC1HlXzgZo58j0WHhYlAnXiJh4vgbZLUeT8tpX7UfCp+kk46o33gb5mMio4+po2jkTXfdZuQjpLWhCuSkJSnlDA4roaulDI5r4eVk5c8sYlDrZ+HoGfjf6OZlpqDom5BtY2cmZ7jhqeCqX+fnaGAqobcmS7OnitSuZGioKTVni5QvZvmj62lo6fgoSuppqpfwJ9nvarepjbol7NsvbGtqq92vbNyvrmwrbLiqkJtw6RpwchvwcKyr7RwxqbrobptxczhsU62tLhvx856x89+yqzltVm6uLzsqcB+y9TnuGK+u8DkumKIz7juscblvWvBv8OPztLEwcbJw8KV1L7qw3fvuszIxsrMx8WX1dnMyc7tx4HuyYmj2sXRzMrxwtPPzdGj2d/Uzs3T0NXj0Z/s0JSo3uTY0tGx38zzy9rX1Nnv1J6y3+bc19Xo2Ky44eK84tDb2Nzx2Kff2djz09+85trl3bzf3OHz3LHj3tzF5unm4N/I6uDI6ezl4uf34r3q5OP54Orp5uv55sfU7fLV7+b56M/t6u/w6unb8O/66PD77drh8+zw7vL38Nvm8/T28O/w8u/57/X28/j09vPu+PP69uf+9u7z+Pv89vX6+e/4+vf8+f72+/7/+vn6/Pn8/vvegv1uAAAAAXRSTlMAQObYZgAACgdJREFUeAHl2gV4E2kex/H/6ntpsabrvqUrSA6Htlx7G9zdYd0XyXal2SO40xT3LmlwD1q5WyS4ux/dXnHbSoqUaUme56aZyZv/ZN7JNJAT6OfxfbDvzi9vM5NAKbmgLLm0fJJ50vrrUEa41pvdJp2CsmG72eN3KAv+MFMpTigD9pq9/hOjtvdtp4+JiW2XCcGQ1SomOio6Jm4IPLClKHgVBF8UESRDMAwnoqKgBE+6B0FXlwimQjCYiCgXHtTfzf/ZTdcggiQIhvhAgl3H1y1Yd9wFUr+b5Zu+e27fjoM5EBQ6IhgDwWAgoiug6uIEY4kJF0HCOcln03fPpFvc0u9CEFQhguEQDH1LH3xjsFEw2Kd4vRk5wNdSS4JRHEkEQ4IbnA0qnOOMHhOUNj32p+6fWLAd8PAighr8ORFlgop/Gr2OszbN1zZv0aLtdAt2N3jBpuAGnwUV61DwAt9N87U9+doSgyzYBXhoL/1ngk+DigUoeDAH2Imf+oi1vF4W7FzwghOCG3wSVKwwsjddfC59TtsWXs2n4eAceGjhRBAf3OCjoOI4Dl7grZ3HZ32CgiWbXg3BCzb8l4M5I8Z5a3nDUC/e9PwceHhhQQ3uS0T7Qf1FjBwSawUKm55/FYIY3De4wXsggE3//G0/vhb5pgXyN4vbvB13IQBO+5hWdSPKh1WJbjZ8Y6F68OWN1hlJybaduaDs8h7b1MQZi/Y7GME7Acu2HXXKNj1YrP2qU+PGjefgXvmm56WfK4YAOMZEEESjtxX5CXbZDd5frvvUzv4faIgkHrXj9/gNtoYQEho33M5JN01reb+gXNmmZbVqUl8ivsKnOsGtPBF8DiIu0fdXR6WBL1sVIlVjkVMSvBW8ZhBR+eGSTdNaXg+L0qa7/7QNApRIWGpclgR/CoJlkUTO5ATsZDSRq3sU3y2hWUwlVFegii+kt2mMzLZgI8Tazj+MMpuXQmCshC2BEcx1JUwdAEkrR1hC0wDi5cFJaCoF9OftlvkWSw8czNh05/58bYl7EIjLoYTNKg921CYKxgCVrCFssQAJRLSZMa+64umWw9eW+AX1yjbdka/1OAKB6E3Ywjl5cCpRdBhEyr9mhjwY99bIgxKuHfQyol7pOb3k4AkzEtCmuVBaOPxoQVHezqlxkjt+zzx7A4/TERY86ithRIGOQ8+0NoLbGNR7E9xor2zTtDYHwDkTF98GdbILUuUKHbkpjJCwAkYwbPW8Hpslpq5dliAeTviGD/+niE+TFiUPaVLec1FRcIZS7wWay9z0kh056FlewJvGm0oFr4IxsctAGtwVPZQKH5MLgv0xxGO476Cr2EDgtMWJrwkczO6FLSh4tnTTfO1VF4jO4+CFD/JYrQCYyqNgYdShQxxAcbFEFOdzgfX4D9yoq+IA3hAiSlPohSUoWLrpid5aeIhN95WOTC0YzpquAJZFRKGcMHlRVBFgnJA/HAUze2GehbnpTl/9/Kuf59N7H+CzgPJW9WA5dE1PAzqFNZn+/7ZU3Fs7F4B5hWfTWiPvFmCXmJu+/6988G8RoSITNhcEHtwbT6QuwWecHK1ci3rr5oHXQQvWg9bydgHmkm/62tymlbXaWuP9NjtCCFalQ6K9SD2Yy95v33+Wk7wmrAC5xGOzyhEZQagoByDF81HvvCnf/mikfDb9D+mm8+e214oaXgvsjUeofhHnL3hn3xoacRMdrHl90ZutnUQUwgFTEpEJdYDEVVrM3wQ5BxsR5U2P/LL9K1qvhvdBWW44kQtL4pSC02oTNhPAGvqqBJVgZBFI5Wxx3+CeuYue5fnd9MguDV6s9K4WWwx+7AkjDDWymcEcHoTsZiMZvW1mmkrkQo+Cj+KcnGL0PN7vpkd+yNfy6mix9uBPZjRheClLfACAg7kYohyMLmAT1WAkIhcU+d00reVV1WL11I5q1kxjXShYPHa7EmXxAFa1KzyDsMQ5gcn/pgtX/pWvpSSbbghq9piiNcSHTRacIZlAVLPevWM0+AqnEZEO2JIVxyHjf9OFG76orK2PeqWb/g5KoTDDFBMquwEKw7eHUcSj9piT4pnXAf2r9xORJlf9YcNUtG9bQJsuKqnlVUO90k1vglLi7J+W9x7VvsHZtGeqCzyWoVO6kF7vNapvc5IA9MSjfGapN83Xvi9mvYwnjTf9BQQgtx3x4NAnD5/iV+BUVoMJv8/UqwUPB4DLYcSjLleqTc/aNICvpeowN1158n0ISDMiykbBn6NvaLzkZB28Q/DtH7EDJptDM9+Fx4MC12j6PL7l60++QGNlm35PPK/GXwP/1vS2ogB8D5eHPj3si85oPSAGfM32eI+0K4DsTyyAEjafY6oJoTb63/TPrd968oknnnhOK/G2z6brDT0GavZr+EFtBCSOCELAJ9hzPlUBL0cEemuJ74cjT4OHM0lDYjjgrcX7l446wqG4ab72Hb62xLO0Vb7p+qhWmUu4wYlZUyS7hYvG3wAw4Ju/bPAoiCMeie65ECrEIPwybpHOPWInfiBikh/bXYHN9dE7Tz1BvabF/kxr3/7g+xRQhUcW1jUp9fRR2/Aq+BzFweinaA0HCDIiifSXu6IIomtn+FRfDp0CGegFLxt1KjAcG1qvAq2Vb/o9d+2LH3xv5v0RyFcL5crfxMEJAHBTQ0RhJvvpzLVDqhABOrqzyhMlVoDN+AUvG3Uuo5aPehMHyzf94l++Ngu2gzqOKEqUf6mlHfEjGf3kYWoHsFUWjH/9pyCxqaEQ9Yr4+mVumq+lSrVpPVGg5+Tf08ouR5RZWTcISEQmOsXHANWBsB8bDKBVkk0/r6Uqf7yyMMWMlGbTnIEwRTlY38SzaeQdsvtaWwizNxsAjuL5iHJfIh5VOKAma6k3WJt+pf3KfPz9eJVNIxujiJyBA4FO+i+0+V5jU6b0/TB+Wo31vgm80+iEo1LxpzEe+egJhmzTfO3ifHC7joNToHTsTTQ+c7aDRw2fd5NXWkl2kAqXiWgtfjOjIxLRW8EtEwfLHhWHx6WBx2KaK99007n5QKU80PPpwlRD3XDxANYPzwSv5No1dDpdjajT4HE2oa5GuGMybAZe3ybN9PpmTbpeAex0YmyoeNpHJ2WDyNk7LiaaF3cYEK5J3Q4m69Y81itYtuk/NboGmGTTlyAQzsv7j2Y7XKCOy9p/9DIHahxZOzeedUDgpMFo08/U/MxovAHYdWnwI2uyFqv4BO/pmt2MJX4DDG96khMeWdcq4+BXn3i6ejeFrxOfMlPr4RE2Hj+TG/qREZFu2rnQLJp5Bx5lA8XaWgN3u/C3iWWbvrdQ7L0Ej7Zj3zWs1XTgpvvAu4iDJ4CU88jCSeaU7U54nIxmbRpxwmNGsunj8PiTbPoQlAF40xehDPjNSI2GsoAbjR/HlwUXB4u9K6CMuPGre8+7XFBm3Lpx45YTHiv/BouYSK9YTTTnAAAAAElFTkSuQmCC';\\n\\tif (logo) {\\n\\t\\tlogo = logo.getElementsByTagName('img')[0];\\n\\t\\tif (!logo) return;\\n\\t\\tlogo.src = alt_src;\\n\\t}\\n}());\\n</script></div><div id=\\\"overlay\\\"></div></div><footer data-qa=\\\"footer\\\"><section class=\\\"links\\\"><div class=\\\"grid\\\"><div class=\\\"col span_1_of_4 nav_col\\\"><ul><li class=\\\"cat_1\\\">Using Slack</li><li><a href=\\\"https://slack.com/is\\\" data-qa=\\\"product_footer\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_product\\\">Product</a></li><li><a href=\\\"https://slack.com/enterprise\\\" data-qa=\\\"enterprise_footer\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_enterprise\\\">Enterprise</a></li><li><a href=\\\"https://slack.com/pricing?ui_step=28&ui_element=5\\\" data-qa=\\\"pricing_footer\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_pricing\\\">Pricing</a></li><li><a href=\\\"https://get.slack.help/hc/en-us\\\" data-qa=\\\"support_footer\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_support\\\">Support</a></li><li><a href=\\\"https://slack.com/guides\\\" data-qa=\\\"getting_started\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_getting_started\\\">Slack Guides</a></li><li><a href=\\\"https://slack.com/apps\\\" data-qa=\\\"app_directory\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_app_directory\\\">App Directory</a></li><li><a href=\\\"https://api.slack.com/\\\" data-qa=\\\"api\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_api\\\">API</a></li></ul></div><div class=\\\"col span_1_of_4 nav_col\\\"><ul><li class=\\\"cat_2\\\">Slack <ts-icon class=\\\"ts_icon_heart\\\"></ts-icon></li><li><a href=\\\"https://slack.com/jobs\\\" data-qa=\\\"jobs\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_jobs\\\">Jobs</a></li><li><a href=\\\"https://slack.com/customers\\\" data-qa=\\\"customers\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_customers\\\">Customers</a></li><li><a href=\\\"https://slack.com/developers\\\" data-qa=\\\"developers\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_developers\\\">Developers</a></li><li><a href=\\\"https://slack.com/events\\\" data-qa=\\\"events\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_events\\\">Events</a></li><li><a href=\\\"https://slackhq.com/\\\" data-qa=\\\"blog_footer\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_blog\\\">Blog</a></li></ul></div><div class=\\\"col span_1_of_4 nav_col\\\"><ul><li class=\\\"cat_3\\\">Legal</li><li><a href=\\\"https://slack.com/privacy-policy\\\" data-qa=\\\"privacy\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_privacy\\\">Privacy</a></li><li><a href=\\\"https://slack.com/security\\\" data-qa=\\\"security\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_security\\\">Security</a></li><li><a href=\\\"https://slack.com/terms-of-service\\\" data-qa=\\\"tos\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_tos\\\">Terms of Service</a></li><li><a href=\\\"https://slack.com/policies\\\" data-qa=\\\"policies\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_policies\\\">Policies</a></li></ul></div><div class=\\\"col span_1_of_4 nav_col\\\"><ul><li class=\\\"cat_4\\\">Handy Links</li><li><a href=\\\"https://slack.com/downloads\\\" data-qa=\\\"downloads\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_downloads\\\">Download desktop app</a></li><li><a href=\\\"https://slack.com/downloads\\\" data-qa=\\\"downloads_mobile\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_downloads_mobile\\\">Download mobile app</a></li><li><a href=\\\"https://slack.com/brand-guidelines\\\" data-qa=\\\"brand_guidelines\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_brand_guidelines\\\">Brand Guidelines</a></li><li><a href=\\\"https://slackatwork.com\\\" data-qa=\\\"slack_at_work\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_slack_at_work\\\">Slack at Work</a></li><li><a href=\\\"https://status.slack.com/\\\" data-qa=\\\"status\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_status\\\">Status</a></li></ul></div></div></section><div class=\\\"footnote\\\"><section><a href=\\\"https://slack.com\\\" aria-label=\\\"Slack homepage\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_slack_icon\\\"><ts-icon class=\\\"c-icon--slack\\\" aria-hidden></ts-icon></a><ul><li><a href=\\\"https://slack.com/help/contact\\\" data-qa=\\\"contact_us\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_contact_us\\\">Contact Us</a></li><li><a href=\\\"https://twitter.com/SlackHQ\\\" data-qa=\\\"slack_twitter\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_slack_twitter\\\" aria-label=\\\"Slack on Twitter\\\"><ts-icon class=\\\"ts_icon_twitter\\\" aria-hidden></ts-icon></a></li><li class=\\\"yt\\\"><a href=\\\"https://www.youtube.com/channel/UCY3YECgeBcLCzIrFLP4gblw\\\" data-qa=\\\"slack_youtube\\\" data-clog-event=\\\"WEBSITE_CLICK\\\" data-clog-params=\\\"click_target=footer_slack_youtube\\\" aria-label=\\\"Slack on YouTube\\\"><ts-icon class=\\\"ts_icon_youtube\\\" aria-hidden></ts-icon></a></li></ul></section></div></footer><script type=\\\"text/javascript\\\">\\n/**\\n * A placeholder function that the build script uses to\\n * replace file paths with their CDN versions.\\n *\\n * @param {String} file_path - File path\\n * @returns {String}\\n */\\nfunction vvv(file_path) {\\n\\t\\t var vvv_warning = 'You cannot use vvv on dynamic values. Please make sure you only pass in static file paths.'; if (window.TS && window.TS.warn) { window.TS.warn(vvv_warning); } else { console.warn(vvv_warning); } \\n\\treturn file_path;\\n}\\n\\nvar cdn_url = \\\"https:\\\\/\\\\/a.slack-edge.com\\\";\\nvar vvv_abs_url = \\\"https:\\\\/\\\\/slack.com\\\\/\\\";\\nvar inc_js_setup_data = {\\n\\temoji_sheets: {\\n\\t\\tapple: 'https://a.slack-edge.com/80588/img/emoji_2017_12_06/sheet_apple_64_indexed_256.png',\\n\\t\\tgoogle: 'https://a.slack-edge.com/80588/img/emoji_2017_12_06/sheet_google_64_indexed_256.png',\\n\\t},\\n};\\n</script><script type=\\\"text/javascript\\\">\\t// common boot_data\\n\\tvar boot_data = {\\\"api_url\\\":\\\"\\\\/api\\\\/\\\",\\\"app\\\":\\\"web\\\",\\\"user_id\\\":null,\\\"team_id\\\":\\\"T00000000\\\",\\\"visitor_uid\\\":\\\"b3ro1ob8djsb8j5hrwjx4zyyk\\\",\\\"no_login\\\":true,\\\"version_ts\\\":\\\"1588375643\\\",\\\"version_uid\\\":\\\"030422ae301a654fd7f1a5b5714a4a5f4dabb997\\\",\\\"cache_version\\\":\\\"v21-nomad\\\",\\\"cache_ts_version\\\":\\\"v2-bunny\\\",\\\"redir_domain\\\":\\\"slack-redir.net\\\",\\\"signin_url\\\":\\\"https:\\\\/\\\\/slack.com\\\\/signin\\\",\\\"abs_root_url\\\":\\\"https:\\\\/\\\\/slack.com\\\\/\\\",\\\"team_url\\\":\\\"\\\",\\\"image_proxy_url\\\":\\\"https:\\\\/\\\\/slack-imgs.com\\\\/\\\",\\\"beacon_timing_url\\\":\\\"https:\\\\/\\\\/slack.com\\\\/beacon\\\\/timing\\\",\\\"beacon_error_url\\\":\\\"https:\\\\/\\\\/slack.com\\\\/beacon\\\\/error\\\",\\\"clog_url\\\":\\\"clog\\\\/track\\\\/\\\",\\\"api_token\\\":\\\"\\\",\\\"vvv_paths\\\":{\\\"lz_string\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/bv1-8-8cacda2\\\\/lz-string-1.4.4.worker.8de1b00d670ff3dc706a0.js\\\",\\\"codemirror\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/bv1-8-8cacda2\\\\/codemirror.min.68c6a0612abccc6b8859.min.js\\\",\\\"codemirror_addon_simple\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/bv1-8-8cacda2\\\\/codemirror_simple.993fc5f8ddd401f632aa.min.js\\\",\\\"codemirror_load\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/bv1-8-8cacda2\\\\/codemirror_load.75a3613ca829216f1033.min.js\\\",\\\"codemirror_files\\\":{\\\"javascript\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/bv1-8-8cacda2\\\\/codemirror_lang_javascript.ac1833e9e239d532b5a9.min.js\\\"}},\\\"notification_sounds\\\":[{\\\"value\\\":\\\"b2.mp3\\\",\\\"label\\\":\\\"Ding\\\",\\\"url\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/7e91\\\\/sounds\\\\/push\\\\/b2.mp3\\\",\\\"url_ogg\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/46ebb\\\\/sounds\\\\/push\\\\/b2.ogg\\\"},{\\\"value\\\":\\\"animal_stick.mp3\\\",\\\"label\\\":\\\"Boing\\\",\\\"url\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/7e91\\\\/sounds\\\\/push\\\\/animal_stick.mp3\\\",\\\"url_ogg\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/46ebb\\\\/sounds\\\\/push\\\\/animal_stick.ogg\\\"},{\\\"value\\\":\\\"been_tree.mp3\\\",\\\"label\\\":\\\"Drop\\\",\\\"url\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/7e91\\\\/sounds\\\\/push\\\\/been_tree.mp3\\\",\\\"url_ogg\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/46ebb\\\\/sounds\\\\/push\\\\/been_tree.ogg\\\"},{\\\"value\\\":\\\"complete_quest_requirement.mp3\\\",\\\"label\\\":\\\"Ta-da\\\",\\\"url\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/7e91\\\\/sounds\\\\/push\\\\/complete_quest_requirement.mp3\\\",\\\"url_ogg\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/46ebb\\\\/sounds\\\\/push\\\\/complete_quest_requirement.ogg\\\"},{\\\"value\\\":\\\"confirm_delivery.mp3\\\",\\\"label\\\":\\\"Plink\\\",\\\"url\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/7e91\\\\/sounds\\\\/push\\\\/confirm_delivery.mp3\\\",\\\"url_ogg\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/46ebb\\\\/sounds\\\\/push\\\\/confirm_delivery.ogg\\\"},{\\\"value\\\":\\\"flitterbug.mp3\\\",\\\"label\\\":\\\"Wow\\\",\\\"url\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/7e91\\\\/sounds\\\\/push\\\\/flitterbug.mp3\\\",\\\"url_ogg\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/46ebb\\\\/sounds\\\\/push\\\\/flitterbug.ogg\\\"},{\\\"value\\\":\\\"here_you_go_lighter.mp3\\\",\\\"label\\\":\\\"Here you go\\\",\\\"url\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/7e91\\\\/sounds\\\\/push\\\\/here_you_go_lighter.mp3\\\",\\\"url_ogg\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/46ebb\\\\/sounds\\\\/push\\\\/here_you_go_lighter.ogg\\\"},{\\\"value\\\":\\\"hi_flowers_hit.mp3\\\",\\\"label\\\":\\\"Hi\\\",\\\"url\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/7e91\\\\/sounds\\\\/push\\\\/hi_flowers_hit.mp3\\\",\\\"url_ogg\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/46ebb\\\\/sounds\\\\/push\\\\/hi_flowers_hit.ogg\\\"},{\\\"value\\\":\\\"knock_brush.mp3\\\",\\\"label\\\":\\\"Knock Brush\\\",\\\"url\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/7e91\\\\/sounds\\\\/push\\\\/knock_brush.mp3\\\",\\\"url_ogg\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/46ebb\\\\/sounds\\\\/push\\\\/knock_brush.ogg\\\"},{\\\"value\\\":\\\"save_and_checkout.mp3\\\",\\\"label\\\":\\\"Whoa!\\\",\\\"url\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/7e91\\\\/sounds\\\\/push\\\\/save_and_checkout.mp3\\\",\\\"url_ogg\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/46ebb\\\\/sounds\\\\/push\\\\/save_and_checkout.ogg\\\"},{\\\"value\\\":\\\"item_pickup.mp3\\\",\\\"label\\\":\\\"Yoink\\\",\\\"url\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/7e91\\\\/sounds\\\\/push\\\\/item_pickup.mp3\\\",\\\"url_ogg\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/46ebb\\\\/sounds\\\\/push\\\\/item_pickup.ogg\\\"},{\\\"value\\\":\\\"hummus.mp3\\\",\\\"label\\\":\\\"Hummus\\\",\\\"url\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/7fa9\\\\/sounds\\\\/push\\\\/hummus.mp3\\\",\\\"url_ogg\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/46ebb\\\\/sounds\\\\/push\\\\/hummus.ogg\\\"},{\\\"value\\\":\\\"none\\\",\\\"label\\\":\\\"None\\\"}],\\\"alert_sounds\\\":[{\\\"value\\\":\\\"frog.mp3\\\",\\\"label\\\":\\\"Frog\\\",\\\"url\\\":\\\"https:\\\\/\\\\/slack.global.ssl.fastly.net\\\\/a34a\\\\/sounds\\\\/frog.mp3\\\"}],\\\"call_sounds\\\":[{\\\"value\\\":\\\"call\\\\/alert_v2.mp3\\\",\\\"label\\\":\\\"Alert\\\",\\\"url\\\":\\\"https:\\\\/\\\\/slack.global.ssl.fastly.net\\\\/08f7\\\\/sounds\\\\/call\\\\/alert_v2.mp3\\\"},{\\\"value\\\":\\\"call\\\\/incoming_ring_v2.mp3\\\",\\\"label\\\":\\\"Incoming ring\\\",\\\"url\\\":\\\"https:\\\\/\\\\/slack.global.ssl.fastly.net\\\\/08f7\\\\/sounds\\\\/call\\\\/incoming_ring_v2.mp3\\\"},{\\\"value\\\":\\\"call\\\\/outgoing_ring_v2.mp3\\\",\\\"label\\\":\\\"Outgoing ring\\\",\\\"url\\\":\\\"https:\\\\/\\\\/slack.global.ssl.fastly.net\\\\/08f7\\\\/sounds\\\\/call\\\\/outgoing_ring_v2.mp3\\\"},{\\\"value\\\":\\\"call\\\\/pop_v2.mp3\\\",\\\"label\\\":\\\"Incoming reaction\\\",\\\"url\\\":\\\"https:\\\\/\\\\/slack.global.ssl.fastly.net\\\\/08f7\\\\/sounds\\\\/call\\\\/pop_v2.mp3\\\"},{\\\"value\\\":\\\"call\\\\/they_left_call_v2.mp3\\\",\\\"label\\\":\\\"They left call\\\",\\\"url\\\":\\\"https:\\\\/\\\\/slack.global.ssl.fastly.net\\\\/08f7\\\\/sounds\\\\/call\\\\/they_left_call_v2.mp3\\\"},{\\\"value\\\":\\\"call\\\\/you_left_call_v2.mp3\\\",\\\"label\\\":\\\"You left call\\\",\\\"url\\\":\\\"https:\\\\/\\\\/slack.global.ssl.fastly.net\\\\/08f7\\\\/sounds\\\\/call\\\\/you_left_call_v2.mp3\\\"},{\\\"value\\\":\\\"call\\\\/they_joined_call_v2.mp3\\\",\\\"label\\\":\\\"They joined call\\\",\\\"url\\\":\\\"https:\\\\/\\\\/slack.global.ssl.fastly.net\\\\/08f7\\\\/sounds\\\\/call\\\\/they_joined_call_v2.mp3\\\"},{\\\"value\\\":\\\"call\\\\/you_joined_call_v2.mp3\\\",\\\"label\\\":\\\"You joined call\\\",\\\"url\\\":\\\"https:\\\\/\\\\/slack.global.ssl.fastly.net\\\\/08f7\\\\/sounds\\\\/call\\\\/you_joined_call_v2.mp3\\\"},{\\\"value\\\":\\\"call\\\\/confirmation_v2.mp3\\\",\\\"label\\\":\\\"Confirmation\\\",\\\"url\\\":\\\"https:\\\\/\\\\/slack.global.ssl.fastly.net\\\\/08f7\\\\/sounds\\\\/call\\\\/confirmation_v2.mp3\\\"}],\\\"call_sounds_version\\\":\\\"v2\\\",\\\"img\\\":{\\\"app_icon\\\":\\\"https:\\\\/\\\\/a.slack-edge.com\\\\/80588\\\\/img\\\\/slack_growl_icon_vogue.png\\\"},\\\"page_needs_enterprise\\\":false,\\\"page_needs_custom_emoji\\\":false,\\\"is_deprecated_webclient_browser\\\":false,\\\"is_unsupported_webclient_browser\\\":true,\\\"default_tz\\\":\\\"America\\\\/Los_Angeles\\\",\\\"feature_edu88\\\":false,\\\"feature_builder_allow_custom_time_scheduled_trigger\\\":true,\\\"feature_builder_scheduled_trigger\\\":true,\\\"feature_component_animation_wrapper\\\":true,\\\"feature_builder_message_button_helper_text\\\":false,\\\"feature_builder_getting_started_i18n\\\":true,\\\"feature_builder_creation_org_policy\\\":true,\\\"feature_builder_extensions\\\":false,\\\"feature_keyboard_key_tooltip\\\":false,\\\"feature_builder_webhook_admin\\\":true,\\\"feature_builder_webhook_trigger\\\":true,\\\"feature_ally_bugbash\\\":false,\\\"feature_help_menu_i18n\\\":true,\\\"feature_builder_feedback_button\\\":false,\\\"feature_builder_message_step_rich_text\\\":false,\\\"feature_app_views_v1\\\":true,\\\"feature_audit_logs_view\\\":false,\\\"feature_audit_logs_view_workspace\\\":false,\\\"feature_data_location_new_translations\\\":false,\\\"feature_sk_i18n\\\":false,\\\"feature_org_dash_exports_part1\\\":false,\\\"feature_sso_combine_config_preferences\\\":true,\\\"feature_default_browser_control_v2\\\":true,\\\"feature_accessible_selects\\\":false,\\\"feature_slack_kit_neue\\\":false,\\\"feature_builder_disable_global_triggers\\\":true,\\\"feature_workflow_builder_enabled_org_setting\\\":true,\\\"feature_builder_can_access\\\":false,\\\"feature_always_show_archive_channel_option\\\":true,\\\"feature_granular_dnd\\\":false,\\\"feature_custom_dnd_translations\\\":false,\\\"feature_context_bar_tz_issues\\\":false,\\\"feature_multi_file_layout\\\":true,\\\"feature_newxp_3266\\\":true,\\\"feature_newxp_3848\\\":true,\\\"feature_add_people_emails\\\":false,\\\"feature_fyt_copy_day1\\\":true,\\\"feature_team_creation_fix_copy\\\":false,\\\"feature_setup_page_i18n\\\":true,\\\"feature_setup_page_i18n_two\\\":false,\\\"feature_copy_joiner_flow\\\":true,\\\"feature_newxp_3279\\\":true,\\\"feature_newxp_4160\\\":true,\\\"feature_newxp_4014\\\":true,\\\"feature_newxp_4153\\\":true,\\\"feature_newxp_4202\\\":true,\\\"feature_tinyspeck\\\":false,\\\"feature_org_level_user_groups_phase_2_frontend\\\":false,\\\"feature_data_table_in_org_level_user_groups\\\":false,\\\"feature_use_new_list_teams_response\\\":true,\\\"feature_desktop_copy_text\\\":false,\\\"feature_ssb_q319_deprecation\\\":true,\\\"feature_ssb_q319_deprecation_dark\\\":false,\\\"feature_ssb_q319_deprecation_modal\\\":false,\\\"feature_ssb_q319_deprecation_modal_store_override\\\":false,\\\"feature_ssb_q319_deprecation_block\\\":true,\\\"feature_deprecate_get_member_by_name\\\":false,\\\"feature_unknown_files\\\":true,\\\"feature_unknown_messages\\\":true,\\\"feature_add_message_perf\\\":false,\\\"feature_fix_custom_emoji_errors\\\":true,\\\"feature_modern_delete_file\\\":true,\\\"feature_copy_channel_link\\\":true,\\\"feature_collapse_reactions\\\":false,\\\"feature_ia_status_button\\\":true,\\\"feature_full_profile_link\\\":true,\\\"feature_email_workflow\\\":false,\\\"feature_message_kit_in_message_pane\\\":true,\\\"feature_ia_education\\\":true,\\\"feature_threads_view_dragndrop\\\":false,\\\"feature_channel_details_membership_list\\\":false,\\\"feature_bye_slackbot_help\\\":false,\\\"feature_all_dm_mute_bots\\\":false,\\\"feature_file_threads\\\":true,\\\"feature_broadcast_indicator\\\":true,\\\"feature_new_replies_after_bcast\\\":true,\\\"feature_sonic_emoji\\\":false,\\\"feature_emoji_12\\\":false,\\\"feature_emoji_search_keywords_in_autocomplete\\\":false,\\\"feature_email_ingestion\\\":false,\\\"feature_attachments_inline\\\":false,\\\"feature_fix_files\\\":true,\\\"feature_aaa_admin_apis\\\":true,\\\"feature_app_action_picker_frecency\\\":true,\\\"feature_shortcuts_speedbump\\\":true,\\\"feature_pad_1383\\\":false,\\\"feature_pad_1384\\\":false,\\\"feature_shortcuts_in_quickswitcher\\\":true,\\\"feature_app_launcher_banners\\\":false,\\\"feature_app_launcher_filters\\\":true,\\\"feature_help_test_primer\\\":true,\\\"feature_channel_shortcut_heading_update\\\":true,\\\"feature_shortcuts_menu_height_tweak\\\":false,\\\"feature_channel_sidebar_drafts_section\\\":true,\\\"feature_navigate_history\\\":true,\\\"feature_wysiwyg_unlink\\\":false,\\\"feature_custom_status_modal_updates\\\":false,\\\"feature_convert_wrapped_whitespace\\\":true,\\\"feature_compose_flow\\\":false,\\\"feature_always_show_send_button\\\":false,\\\"feature_compose_flow_xws\\\":false,\\\"feature_temp_channel_subscriptions\\\":false,\\\"feature_faster_count_all_unreads\\\":true,\\\"feature_sonic_user_groups\\\":false,\\\"feature_channel_selector_for_team_guests_update\\\":false,\\\"feature_admin_member_csv_update\\\":false,\\\"feature_ccm_sk_data_table_integration\\\":true,\\\"feature_sk_data_table_a11y\\\":false,\\\"feature_desktop_symptom_events\\\":false,\\\"feature_data_residency_debugging\\\":false,\\\"feature_ent_admin_approved_apps_v2\\\":true,\\\"feature_dashboard_sortable_lists\\\":false,\\\"feature_sk_loading_button_motions\\\":true,\\\"feature_sk_base_icon\\\":false,\\\"feature_sk_basic_select_arialabel\\\":false,\\\"feature_ce_eng_search_demo\\\":false,\\\"feature_ce_eng_contact_huck_gold\\\":true,\\\"feature_ce_eng_contact_purple_peruvian\\\":false,\\\"feature_ce_eng_contact_high_volume_banner\\\":true,\\\"feature_shared_channels_reconnect\\\":false,\\\"feature_shared_channels_multi_org\\\":false,\\\"feature_shared_channels_multi_org_mpim\\\":false,\\\"feature_chat_mpim_open_refactor_log_verbose\\\":false,\\\"feature_chat_mpim_open_refactor_diff_only\\\":false,\\\"feature_chat_mpim_open_refactor_full\\\":false,\\\"feature_calls_shared_channel_invite\\\":false,\\\"feature_external_orgs_section_channel_details\\\":true,\\\"feature_multi_org_disconnect_messages_copy\\\":true,\\\"feature_enable_multi_org_disconnect_fe\\\":true,\\\"feature_find_an_admin_disconnect_explainer\\\":false,\\\"feature_multi_org_disconnect_in_msc\\\":false,\\\"feature_shared_channels_multi_org_invites_be\\\":false,\\\"feature_multi_org_join_messages_copy\\\":false,\\\"feature_multi_org_invites_messages_copy\\\":false,\\\"feature_enable_multi_org_invites_fe\\\":true,\\\"feature_multi_org_additional_options_alert_copy\\\":false,\\\"feature_multi_org_accept_flow_copy\\\":true,\\\"feature_multi_org_share_dialog\\\":true,\\\"feature_manage_sc_channel_card\\\":false,\\\"feature_shared_channels_multi_org_qa_limit_override\\\":false,\\\"feature_remove_double_rings\\\":false,\\\"feature_remove_double_diamonds\\\":false,\\\"feature_remove_pending_connections\\\":false,\\\"feature_create_private_c_channels\\\":false,\\\"feature_gdpr_user_join_tos\\\":true,\\\"feature_user_invite_tos_april_2018\\\":true,\\\"feature_org_private_channel_mgmt\\\":false,\\\"feature_channel_mgmt_phase_three\\\":false,\\\"feature_channel_mgmt_filters_two\\\":false,\\\"feature_incremental_unread_counts\\\":false,\\\"feature_neue_type\\\":false,\\\"feature_cust_acq_i18n_tweaks\\\":false,\\\"feature_contact_sales_form_revamp\\\":true,\\\"feature_remote_work_enterprise\\\":true,\\\"feature_data_residency_australia_banner\\\":true,\\\"feature_whats_new_shortcuts_gtm\\\":true,\\\"feature_data_residency_uk_banner\\\":true,\\\"feature_banner_jp_golden_week_2020\\\":true,\\\"feature_whitelist_zendesk_chat_widget\\\":false,\\\"feature_live_support_free_plan\\\":false,\\\"feature_offline_mode\\\":false,\\\"feature_force_ls_compression\\\":false,\\\"feature_use_imgproxy_resizing\\\":true,\\\"feature_share_mention_comment_cleanup\\\":false,\\\"feature_reaction_toast_tooltip\\\":false,\\\"feature_new_locale_toast\\\":true,\\\"feature_channel_exports\\\":false,\\\"feature_docs_mentions_and_channels\\\":false,\\\"feature_vacation_delight\\\":true,\\\"feature_threads_unread_translations\\\":false,\\\"feature_calls_esc_ui\\\":true,\\\"feature_calls_survey_request_response\\\":true,\\\"feature_remote_files_api\\\":true,\\\"feature_token_ip_whitelist\\\":true,\\\"feature_sidebar_theme_undo\\\":true,\\\"feature_hide_on_startup\\\":true,\\\"feature_allow_intra_word_formatting\\\":true,\\\"feature_i18n_channels_validate_emoji\\\":true,\\\"feature_fw_eng_normalization\\\":true,\\\"feature_slim_scrollbar\\\":false,\\\"feature_primary_search\\\":false,\\\"feature_modern_sounds\\\":false,\\\"feature_quick_copy_code_blocks\\\":false,\\\"feature_sli_channel_archive_suggestions\\\":true,\\\"feature_steeple_church\\\":true,\\\"feature_steeple_church_link\\\":true,\\\"feature_steeple_church_ext\\\":true,\\\"feature_strollers_to_perch\\\":true,\\\"feature_fantail_nurture\\\":true,\\\"feature_pourover\\\":false,\\\"feature_people_search\\\":false,\\\"feature_parc_extension\\\":false,\\\"feature_react_messages\\\":true,\\\"feature_edge_upload_proxy_check\\\":false,\\\"feature_legacy_file_upload_analytics\\\":true,\\\"feature_sonic_find_more_wksps\\\":false,\\\"feature_sonic_inputs\\\":false,\\\"feature_threaded_slack_owned_plugins\\\":true,\\\"feature_app_popouts_i18n\\\":false,\\\"feature_snippet_modes_i18n\\\":false,\\\"feature_gdrive_do_not_install_by_default\\\":true,\\\"feature_ekm_backfill_add_sleep\\\":false,\\\"feature_ekm_message_revocation_polling_test\\\":false,\\\"feature_team_admins_list_api\\\":true,\\\"feature_ms_latest\\\":true,\\\"feature_esc_retention_threshold_message\\\":true,\\\"feature_esc_retention\\\":true,\\\"feature_esc_retention_live\\\":true,\\\"feature_guests_use_entitlements\\\":true,\\\"feature_app_canvases\\\":false,\\\"feature_rooms_join_api\\\":false,\\\"feature_rooms_join_url\\\":false,\\\"feature_calls_org_apps_copy\\\":false,\\\"feature_calls_sip_integration_labels\\\":false,\\\"feature_tasks_v1_copy\\\":false,\\\"feature_app_home_admin_pages\\\":false,\\\"feature_app_actions_admin_pages\\\":true,\\\"feature_app_views_reminders\\\":true,\\\"feature_reminders_org_shard\\\":false,\\\"feature_reminders_grid_migrations_org_shard\\\":true,\\\"feature_blocks_reminders_list\\\":false,\\\"feature_message_blocks\\\":false,\\\"feature_silence_app_dms\\\":false,\\\"feature_set_tz_automatically\\\":true,\\\"feature_confirm_clear_all_unreads_pref\\\":true,\\\"feature_block_mounts\\\":true,\\\"feature_attachments_v2\\\":true,\\\"feature_block_kit_expandable_block\\\":false,\\\"feature_group_block\\\":false,\\\"feature_block_kit_deep_links\\\":true,\\\"feature_show_block_kit_in_share_dialogs\\\":false,\\\"feature_block_kit_event_block\\\":false,\\\"feature_block_kit_user_block\\\":false,\\\"feature_block_kit_radio_buttons\\\":true,\\\"feature_mrkdwn_on_radio_button\\\":true,\\\"feature_block_kit_table\\\":false,\\\"feature_block_kit_range_datepicker\\\":false,\\\"feature_block_kit_timepicker\\\":false,\\\"feature_block_kit_timepicker_remind\\\":false,\\\"feature_block_kit_datepicker_input\\\":false,\\\"feature_add_app_home_team_name\\\":false,\\\"feature_beacon_js_errors\\\":false,\\\"feature_beacon_js_admin_errors\\\":false,\\\"feature_user_app_disable_speed_bump\\\":true,\\\"feature_tractor_shared_invite_link\\\":true,\\\"feature_newxp_2119\\\":true,\\\"feature_tractor_backup_channelname_copy\\\":true,\\\"feature_degraded_rtm_always_fails\\\":false,\\\"feature_apps_manage_permissions_scope_changes\\\":true,\\\"feature_reminder_cross_workspace\\\":true,\\\"feature_p2p\\\":false,\\\"feature_global_nav\\\":false,\\\"feature_global_nav_rollback\\\":false,\\\"feature_classic_nav\\\":false,\\\"feature_new_reactions\\\":true,\\\"feature_pages_example\\\":false,\\\"feature_sonic_pins\\\":false,\\\"feature_sonic_video_placeholder\\\":true,\\\"feature_iap1\\\":false,\\\"feature_ia_ga\\\":true,\\\"feature_ia_debug_off\\\":false,\\\"feature_ia_i18n\\\":false,\\\"feature_ia_themes\\\":true,\\\"feature_sonic_hard_reload\\\":true,\\\"feature_workspace_scim_management\\\":false,\\\"feature_unified_member\\\":false,\\\"feature_turn_mpdm_notifs_on\\\":true,\\\"feature_dolores\\\":false,\\\"feature_desktop_force_production_channel\\\":false,\\\"feature_desktop_logs_upload\\\":false,\\\"feature_macos_disable_hw\\\":true,\\\"feature_quill_cjk_code_block\\\":false,\\\"feature_emoji_packs_translations\\\":false,\\\"feature_bots_not_members\\\":true,\\\"feature_wta_stop_creation\\\":true,\\\"feature_m11n_channel_details\\\":false,\\\"feature_channel_actions\\\":true,\\\"feature_channel_actions_client\\\":true,\\\"feature_shortcuts_prompt\\\":true,\\\"feature_accessible_dialogs\\\":true,\\\"feature_calls_clipboard_broadcasting_optin\\\":true,\\\"feature_screen_share_needs_aero\\\":false,\\\"feature_sli_trending_dashboard\\\":false,\\\"feature_accessible_fs_dialogs\\\":true,\\\"feature_channel_header_labels\\\":false,\\\"feature_trap_kb_within_fs_modals\\\":true,\\\"feature_modern_image_viewer\\\":true,\\\"feature_emoji_by_id\\\":true,\\\"feature_mc_migration_banner\\\":true,\\\"feature_aria_application_mode\\\":false,\\\"feature_update_multiworkspace_channel_modal\\\":true,\\\"feature_modern_request_workspace_dialog\\\":false,\\\"feature_workspace_apps_manage_gantry\\\":false,\\\"feature_app_settings_gantry\\\":false,\\\"feature_modern_profile_flexpane\\\":false,\\\"feature_scg_conversion_channels\\\":true,\\\"feature_reduce_unexpected_uninstalls\\\":true,\\\"feature_enterprise_retention_allow_override_on_org_level_channels\\\":false,\\\"feature_track_time_spent\\\":true,\\\"feature_channel_invite_tokenization\\\":true,\\\"feature_imports_cancel\\\":true,\\\"feature_email_workobject_ui\\\":false,\\\"feature_email_notify\\\":false,\\\"feature_email_private\\\":true,\\\"feature_office_directory\\\":false,\\\"feature_calendar_simple_agenda_view\\\":false,\\\"feature_analytics_enable_division\\\":false,\\\"feature_enterprise_analytics_apps_tab\\\":false,\\\"feature_enterprise_analytics_2019_q1_update\\\":true,\\\"feature_insights_allow_access_to_app\\\":false,\\\"feature_insights_comms_impact_message_stats\\\":true,\\\"feature_insights_message_activity_admin\\\":true,\\\"feature_insights_message_activity_a11y\\\":true,\\\"feature_insights_message_activity_demo\\\":false,\\\"feature_team_themes\\\":false,\\\"feature_unfurl_metadata\\\":false,\\\"feature_plus_menu_add_apps_link\\\":false,\\\"feature_recent_files_omnipicker\\\":false,\\\"feature_link_protocol_beta\\\":false,\\\"feature_stripe_billing\\\":true,\\\"feature_stripe_billing_renewal\\\":true,\\\"feature_stripe_invoices\\\":true,\\\"feature_stripe_billing_dunning\\\":true,\\\"feature_stripe_light\\\":true,\\\"feature_stripe_light_rest_of_world\\\":true,\\\"feature_checkout_force_into_legacy\\\":false,\\\"feature_tax_refactor\\\":false,\\\"feature_modernize_channel_create_modal\\\":true,\\\"feature_sonic_placeholder_labels\\\":false,\\\"feature_sonic_esc_creation\\\":false,\\\"feature_dangerously_guard_ia_translations\\\":false,\\\"feature_ia_context_menus\\\":false,\\\"feature_ia_layout\\\":false,\\\"feature_platform_calls_api\\\":true,\\\"feature_threaded_call_block\\\":false,\\\"feature_trigger_id_scope\\\":false,\\\"feature_slack_message_attachment_tooltip\\\":false,\\\"feature_enterprise_mobile_device_check\\\":true,\\\"feature_newxp_4125\\\":true,\\\"feature_newxp_4127\\\":true,\\\"feature_newxp_4233\\\":false,\\\"feature_newxp_4101\\\":false,\\\"feature_shared_channels_custom_emojis_url\\\":false,\\\"feature_shared_channels_custom_emojis_url_client\\\":false,\\\"feature_new_copy_for_identity_basic\\\":false,\\\"feature_sonic_leave_workspace_dialog\\\":false,\\\"feature_shared_channels_new_user_trial\\\":true,\\\"feature_shared_channels_inviter_trial\\\":false,\\\"feature_shared_channels_inviter_trial_baby_teams\\\":false,\\\"feature_shared_channels_email_invite\\\":true,\\\"feature_shared_channels_shortcut\\\":false,\\\"feature_shared_channels_90_day_trial\\\":true,\\\"feature_shared_channels_90_day_trial_inviter\\\":false,\\\"feature_shared_invite_acceptance_eligibility_v2_api\\\":false,\\\"feature_shared_channels_skip_choose_team\\\":true,\\\"feature_shared_channels_invites_internal\\\":false,\\\"feature_shared_channel_invites_v2\\\":true,\\\"feature_better_invites_call_v2_api\\\":true,\\\"feature_paid_onboarding_pageupdate\\\":true,\\\"feature_trace_webapp_init\\\":true,\\\"feature_trace_jq_init\\\":false,\\\"feature_stripe_completely_down_banner\\\":false,\\\"feature_sidebar_onboarding_invite_prompt\\\":true,\\\"feature_malaysia_tax_email\\\":true,\\\"feature_malaysia_tax_assessment\\\":true,\\\"feature_japan_tax_billing_statements\\\":true,\\\"feature_singapore_tax_email\\\":true,\\\"feature_singapore_tax_assessment\\\":true,\\\"feature_checkout_v2_product_switch_checkout_review\\\":true,\\\"feature_checkout_v2_product_switch_checkout_form\\\":true,\\\"feature_checkout_v2_disallow_ie_ach\\\":true,\\\"feature_enterprise_analytics_2019_q3_enhancements\\\":false,\\\"feature_org_level_apps\\\":false,\\\"feature_sso_validate_audience\\\":false,\\\"feature_channel_sections\\\":true,\\\"feature_channel_sections_sidebar_behavior_ui\\\":false,\\\"feature_global_actions_v0\\\":false,\\\"feature_search_limit_team_filter\\\":true,\\\"feature_analytics_scim_fields_paid\\\":false,\\\"feature_team_users_domains_dev_only\\\":false,\\\"feature_google_directory_invites\\\":false,\\\"feature_migrate_google_directory_apis\\\":true,\\\"feature_help_center_incident_banner\\\":true,\\\"feature_scg_error_message\\\":true,\\\"feature_search_results_virtualized\\\":false,\\\"feature_show_email_forwarded_by\\\":false,\\\"feature_new_enough_periodic_reloads\\\":false,\\\"feature_iap1_downloads\\\":true,\\\"feature_jump_to_date_divider\\\":false,\\\"feature_builder_display_export_form_csv\\\":true,\\\"feature_builder_workflow_activity\\\":false,\\\"feature_builder_export_form_csv_admin\\\":true,\\\"feature_new_billing_emails_translations\\\":true,\\\"feature_new_billing_emails_translations_part_two\\\":true,\\\"feature_channel_mgmt_phase_one\\\":false,\\\"feature_channel_mgmt_phase_two\\\":false,\\\"feature_deactivate_member_alert_msg\\\":false,\\\"feature_creators_login_with_google\\\":true,\\\"feature_rate_limit_app_creation\\\":true,\\\"feature_giphy_modals\\\":false,\\\"feature_giphy_shortcut\\\":false,\\\"feature_shared_channels_home_reminders\\\":true,\\\"feature_shared_channels_away_reminders\\\":true,\\\"feature_feat_say_my_name\\\":false,\\\"feature_put_a_mention_on_it\\\":true,\\\"feature_builder_fe_ekm_enabled\\\":false,\\\"feature_mobile_min_app_version_frontend\\\":false,\\\"feature_covid_contact\\\":true,\\\"feature_chat_availability_message\\\":true,\\\"feature_browser_picker\\\":false,\\\"feature_focus_transition_manager\\\":false,\\\"feature_edu_101\\\":false,\\\"feature_contact_form_default_subject\\\":false,\\\"feature_desktop_windows_notification_improvements\\\":false,\\\"client_logs\\\":{\\\"0\\\":{\\\"numbers\\\":[\\\"0\\\"],\\\"user_facing\\\":false},\\\"2\\\":{\\\"numbers\\\":[\\\"2\\\"],\\\"user_facing\\\":false},\\\"4\\\":{\\\"numbers\\\":[\\\"4\\\"],\\\"user_facing\\\":false},\\\"5\\\":{\\\"numbers\\\":[\\\"5\\\"],\\\"user_facing\\\":false},\\\"23\\\":{\\\"numbers\\\":[\\\"23\\\"],\\\"user_facing\\\":false},\\\"sounds\\\":{\\\"name\\\":\\\"sounds\\\",\\\"numbers\\\":[\\\"37\\\"]},\\\"37\\\":{\\\"name\\\":\\\"sounds\\\",\\\"numbers\\\":[\\\"37\\\"],\\\"user_facing\\\":true},\\\"47\\\":{\\\"numbers\\\":[\\\"47\\\"],\\\"user_facing\\\":false},\\\"48\\\":{\\\"numbers\\\":[\\\"48\\\"],\\\"user_facing\\\":false},\\\"Message History\\\":{\\\"name\\\":\\\"Message History\\\",\\\"numbers\\\":[\\\"58\\\"]},\\\"58\\\":{\\\"name\\\":\\\"Message History\\\",\\\"numbers\\\":[\\\"58\\\"],\\\"user_facing\\\":true},\\\"67\\\":{\\\"numbers\\\":[\\\"67\\\"],\\\"user_facing\\\":false},\\\"72\\\":{\\\"numbers\\\":[\\\"72\\\"],\\\"user_facing\\\":false},\\\"73\\\":{\\\"numbers\\\":[\\\"73\\\"],\\\"user_facing\\\":false},\\\"82\\\":{\\\"numbers\\\":[\\\"82\\\"],\\\"user_facing\\\":false},\\\"88\\\":{\\\"numbers\\\":[\\\"88\\\"],\\\"user_facing\\\":false},\\\"91\\\":{\\\"numbers\\\":[\\\"91\\\"],\\\"user_facing\\\":false},\\\"93\\\":{\\\"numbers\\\":[\\\"93\\\"],\\\"user_facing\\\":false},\\\"96\\\":{\\\"numbers\\\":[\\\"96\\\"],\\\"user_facing\\\":false},\\\"99\\\":{\\\"numbers\\\":[\\\"99\\\"],\\\"user_facing\\\":false},\\\"Channel Marking (MS)\\\":{\\\"name\\\":\\\"Channel Marking (MS)\\\",\\\"numbers\\\":[\\\"141\\\"]},\\\"141\\\":{\\\"name\\\":\\\"Channel Marking (MS)\\\",\\\"numbers\\\":[\\\"141\\\"],\\\"user_facing\\\":true},\\\"Channel Marking (Client)\\\":{\\\"name\\\":\\\"Channel Marking (Client)\\\",\\\"numbers\\\":[\\\"142\\\"]},\\\"142\\\":{\\\"name\\\":\\\"Channel Marking (Client)\\\",\\\"numbers\\\":[\\\"142\\\"],\\\"user_facing\\\":true},\\\"Close Old IMs (Client)\\\":{\\\"name\\\":\\\"Close Old IMs (Client)\\\",\\\"numbers\\\":[\\\"221\\\"]},\\\"221\\\":{\\\"name\\\":\\\"Close Old IMs (Client)\\\",\\\"numbers\\\":[\\\"221\\\"],\\\"user_facing\\\":true},\\\"365\\\":{\\\"numbers\\\":[\\\"365\\\"],\\\"user_facing\\\":false},\\\"389\\\":{\\\"numbers\\\":[\\\"389\\\"],\\\"user_facing\\\":false},\\\"438\\\":{\\\"numbers\\\":[\\\"438\\\"],\\\"user_facing\\\":false},\\\"444\\\":{\\\"numbers\\\":[\\\"444\\\"],\\\"user_facing\\\":false},\\\"481\\\":{\\\"numbers\\\":[\\\"481\\\"],\\\"user_facing\\\":false},\\\"488\\\":{\\\"numbers\\\":[\\\"488\\\"],\\\"user_facing\\\":false},\\\"529\\\":{\\\"numbers\\\":[\\\"529\\\"],\\\"user_facing\\\":false},\\\"552\\\":{\\\"numbers\\\":[\\\"552\\\"],\\\"user_facing\\\":false},\\\"dashboard\\\":{\\\"name\\\":\\\"dashboard\\\",\\\"numbers\\\":[\\\"666\\\"]},\\\"666\\\":{\\\"name\\\":\\\"dashboard\\\",\\\"numbers\\\":[\\\"666\\\"],\\\"user_facing\\\":false},\\\"667\\\":{\\\"numbers\\\":[\\\"667\\\"],\\\"user_facing\\\":false},\\\"773\\\":{\\\"numbers\\\":[\\\"773\\\"],\\\"user_facing\\\":false},\\\"777\\\":{\\\"numbers\\\":[\\\"777\\\"],\\\"user_facing\\\":false},\\\"794\\\":{\\\"numbers\\\":[\\\"794\\\"],\\\"user_facing\\\":false},\\\"Client Responsiveness\\\":{\\\"name\\\":\\\"Client Responsiveness\\\",\\\"user_facing\\\":false,\\\"numbers\\\":[\\\"808\\\"]},\\\"808\\\":{\\\"name\\\":\\\"Client Responsiveness\\\",\\\"user_facing\\\":false,\\\"numbers\\\":[\\\"808\\\"]},\\\"Message Pane Scrolling\\\":{\\\"name\\\":\\\"Message Pane Scrolling\\\",\\\"numbers\\\":[\\\"888\\\"]},\\\"888\\\":{\\\"name\\\":\\\"Message Pane Scrolling\\\",\\\"numbers\\\":[\\\"888\\\"],\\\"user_facing\\\":true},\\\"Unread banner and divider\\\":{\\\"name\\\":\\\"Unread banner and divider\\\",\\\"numbers\\\":[\\\"999\\\"]},\\\"999\\\":{\\\"name\\\":\\\"Unread banner and divider\\\",\\\"numbers\\\":[\\\"999\\\"],\\\"user_facing\\\":true},\\\"1000\\\":{\\\"numbers\\\":[\\\"1000\\\"],\\\"user_facing\\\":false},\\\"Duplicate badges (desktop app icons)\\\":{\\\"name\\\":\\\"Duplicate badges (desktop app icons)\\\",\\\"numbers\\\":[\\\"1701\\\"]},\\\"1701\\\":{\\\"name\\\":\\\"Duplicate badges (desktop app icons)\\\",\\\"numbers\\\":[\\\"1701\\\"],\\\"user_facing\\\":true},\\\"Members\\\":{\\\"name\\\":\\\"Members\\\",\\\"numbers\\\":[\\\"1975\\\"]},\\\"1975\\\":{\\\"name\\\":\\\"Members\\\",\\\"numbers\\\":[\\\"1975\\\"],\\\"user_facing\\\":true},\\\"lazy loading\\\":{\\\"name\\\":\\\"lazy loading\\\",\\\"numbers\\\":[\\\"1989\\\"]},\\\"1989\\\":{\\\"name\\\":\\\"lazy loading\\\",\\\"numbers\\\":[\\\"1989\\\"],\\\"user_facing\\\":true},\\\"thin_channel_membership\\\":{\\\"name\\\":\\\"thin_channel_membership\\\",\\\"numbers\\\":[\\\"1990\\\"]},\\\"1990\\\":{\\\"name\\\":\\\"thin_channel_membership\\\",\\\"numbers\\\":[\\\"1990\\\"],\\\"user_facing\\\":true},\\\"stats\\\":{\\\"name\\\":\\\"stats\\\",\\\"numbers\\\":[\\\"1991\\\"]},\\\"1991\\\":{\\\"name\\\":\\\"stats\\\",\\\"numbers\\\":[\\\"1991\\\"],\\\"user_facing\\\":true},\\\"ms\\\":{\\\"name\\\":\\\"ms\\\",\\\"numbers\\\":[\\\"1996\\\"]},\\\"1996\\\":{\\\"name\\\":\\\"ms\\\",\\\"numbers\\\":[\\\"1996\\\"],\\\"user_facing\\\":true},\\\"shared_channels_connection\\\":{\\\"name\\\":\\\"shared_channels_connection\\\",\\\"numbers\\\":[\\\"1999\\\"]},\\\"1999\\\":{\\\"name\\\":\\\"shared_channels_connection\\\",\\\"numbers\\\":[\\\"1999\\\"],\\\"user_facing\\\":false},\\\"dnd\\\":{\\\"name\\\":\\\"dnd\\\",\\\"numbers\\\":[\\\"2002\\\"]},\\\"2002\\\":{\\\"name\\\":\\\"dnd\\\",\\\"numbers\\\":[\\\"2002\\\"],\\\"user_facing\\\":true},\\\"2003\\\":{\\\"numbers\\\":[\\\"2003\\\"],\\\"user_facing\\\":false},\\\"Threads\\\":{\\\"name\\\":\\\"Threads\\\",\\\"numbers\\\":[\\\"2004\\\"]},\\\"2004\\\":{\\\"name\\\":\\\"Threads\\\",\\\"numbers\\\":[\\\"2004\\\"],\\\"user_facing\\\":true},\\\"2005\\\":{\\\"numbers\\\":[\\\"2005\\\"],\\\"user_facing\\\":false},\\\"Reactions\\\":{\\\"name\\\":\\\"Reactions\\\",\\\"numbers\\\":[\\\"2006\\\"]},\\\"2006\\\":{\\\"name\\\":\\\"Reactions\\\",\\\"numbers\\\":[\\\"2006\\\"],\\\"user_facing\\\":true},\\\"TSSSB.focusTabAndSwitchToChannel\\\":{\\\"name\\\":\\\"TSSSB.focusTabAndSwitchToChannel\\\",\\\"numbers\\\":[\\\"2007\\\"]},\\\"2007\\\":{\\\"name\\\":\\\"TSSSB.focusTabAndSwitchToChannel\\\",\\\"numbers\\\":[\\\"2007\\\"],\\\"user_facing\\\":false},\\\"Presence Detection\\\":{\\\"name\\\":\\\"Presence Detection\\\",\\\"numbers\\\":[\\\"2017\\\"]},\\\"2017\\\":{\\\"name\\\":\\\"Presence Detection\\\",\\\"numbers\\\":[\\\"2017\\\"],\\\"user_facing\\\":true},\\\"mc_sibs\\\":{\\\"name\\\":\\\"mc_sibs\\\",\\\"numbers\\\":[\\\"9999\\\"]},\\\"9999\\\":{\\\"name\\\":\\\"mc_sibs\\\",\\\"numbers\\\":[\\\"9999\\\"],\\\"user_facing\\\":false},\\\"Member searching\\\":{\\\"name\\\":\\\"Member searching\\\",\\\"numbers\\\":[\\\"90211\\\"]},\\\"90211\\\":{\\\"name\\\":\\\"Member searching\\\",\\\"numbers\\\":[\\\"90211\\\"],\\\"user_facing\\\":true},\\\"98765\\\":{\\\"numbers\\\":[\\\"98765\\\"],\\\"user_facing\\\":false},\\\"8675309\\\":{\\\"numbers\\\":[\\\"8675309\\\"],\\\"user_facing\\\":false}}};\\n\\tboot_data.start_ms = Date.now();\\n</script><script type=\\\"text/javascript\\\" src=\\\"https://a.slack-edge.com/bv1-8-8cacda2/rollup-core_required_libs.3b7cd3343701f6149f5c.min.js\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"></script><script type=\\\"text/javascript\\\" src=\\\"https://a.slack-edge.com/bv1-8-8cacda2/modern.vendor.72e937a78f5cd8e8019d.min.js\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"></script><script type=\\\"text/javascript\\\" src=\\\"https://a.slack-edge.com/bv1-8-8cacda2/application.6caededeb68ade0bb663.min.js\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"></script><script type=\\\"text/javascript\\\" src=\\\"https://a.slack-edge.com/bv1-8-8cacda2/rollup-core_required_ts.0c8eea39c684c9714e05.min.js\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"></script><script type=\\\"text/javascript\\\" src=\\\"https://a.slack-edge.com/bv1-8-8cacda2/TS.web.3473e19197c6426241e4.min.js\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"></script><script type=\\\"text/javascript\\\" src=\\\"https://a.slack-edge.com/bv1-8-8cacda2/signals.b4a822b19cea7e9ea864.min.js\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"></script><script type=\\\"text/javascript\\\" src=\\\"https://a.slack-edge.com/bv1-8-8cacda2/rollup-core_web.a025bcc6e116a256764c.min.js\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"></script><script type=\\\"text/javascript\\\" src=\\\"https://a.slack-edge.com/bv1-8-8cacda2/rollup-secondary_a_required.00a94c7e4e1b7bcaca38.min.js\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"></script><script type=\\\"text/javascript\\\" src=\\\"https://a.slack-edge.com/bv1-8-8cacda2/rollup-secondary_b_required.9c7ddf0decba73a80a0e.min.js\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"></script><script type=\\\"text/javascript\\\">TS.boot(boot_data);</script><script type=\\\"text/javascript\\\" src=\\\"https://a.slack-edge.com/bv1-8-8cacda2/TS.web._404.ad2f058c5714cd4af8ca.min.js\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"></script><script type=\\\"text/javascript\\\" src=\\\"https://a.slack-edge.com/bv1-8-8cacda2/sticky_nav.5b92c0838ae0e1ac0a12.min.js\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"></script><script type=\\\"text/javascript\\\" src=\\\"https://a.slack-edge.com/bv1-8-8cacda2/footer.ad848be41523edd5f492.min.js\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"></script><script type=\\\"text/javascript\\\" src=\\\"https://a.slack-edge.com/bv1-8-8cacda2/TS.mc_auth_footer.f38f1301e8e494bced3c.min.js\\\" onload=\\\"window._cdn ? _cdn.ok(this, arguments) : null\\\" onerror=\\\"window._cdn ? _cdn.failed(this, arguments) : null\\\" crossorigin=\\\"anonymous\\\"></script><script type=\\\"text/javascript\\\">boot_data.no_login = true;</script><style>.color_9f69e7:not(.nuc) {color:#9F69E7;}.color_4bbe2e:not(.nuc) {color:#4BBE2E;}.color_e7392d:not(.nuc) {color:#E7392D;}.color_3c989f:not(.nuc) {color:#3C989F;}.color_674b1b:not(.nuc) {color:#674B1B;}.color_e96699:not(.nuc) {color:#E96699;}.color_e0a729:not(.nuc) {color:#E0A729;}.color_684b6c:not(.nuc) {color:#684B6C;}.color_5b89d5:not(.nuc) {color:#5B89D5;}.color_2b6836:not(.nuc) {color:#2B6836;}.color_99a949:not(.nuc) {color:#99A949;}.color_df3dc0:not(.nuc) {color:#DF3DC0;}.color_4cc091:not(.nuc) {color:#4CC091;}.color_9b3b45:not(.nuc) {color:#9B3B45;}.color_d58247:not(.nuc) {color:#D58247;}.color_bb86b7:not(.nuc) {color:#BB86B7;}.color_5a4592:not(.nuc) {color:#5A4592;}.color_db3150:not(.nuc) {color:#DB3150;}.color_235e5b:not(.nuc) {color:#235E5B;}.color_9e3997:not(.nuc) {color:#9E3997;}.color_53b759:not(.nuc) {color:#53B759;}.color_c386df:not(.nuc) {color:#C386DF;}.color_385a86:not(.nuc) {color:#385A86;}.color_a63024:not(.nuc) {color:#A63024;}.color_5870dd:not(.nuc) {color:#5870DD;}.color_ea2977:not(.nuc) {color:#EA2977;}.color_50a0cf:not(.nuc) {color:#50A0CF;}.color_d55aef:not(.nuc) {color:#D55AEF;}.color_d1707d:not(.nuc) {color:#D1707D;}.color_43761b:not(.nuc) {color:#43761B;}.color_e06b56:not(.nuc) {color:#E06B56;}.color_8f4a2b:not(.nuc) {color:#8F4A2B;}.color_902d59:not(.nuc) {color:#902D59;}.color_de5f24:not(.nuc) {color:#DE5F24;}.color_a2a5dc:not(.nuc) {color:#A2A5DC;}.color_827327:not(.nuc) {color:#827327;}.color_3c8c69:not(.nuc) {color:#3C8C69;}.color_8d4b84:not(.nuc) {color:#8D4B84;}.color_84b22f:not(.nuc) {color:#84B22F;}.color_4ec0d6:not(.nuc) {color:#4EC0D6;}.color_e23f99:not(.nuc) {color:#E23F99;}.color_e475df:not(.nuc) {color:#E475DF;}.color_619a4f:not(.nuc) {color:#619A4F;}.color_a72f79:not(.nuc) {color:#A72F79;}.color_7d414c:not(.nuc) {color:#7D414C;}.color_aba727:not(.nuc) {color:#ABA727;}.color_965d1b:not(.nuc) {color:#965D1B;}.color_4d5e26:not(.nuc) {color:#4D5E26;}.color_dd8527:not(.nuc) {color:#DD8527;}.color_bd9336:not(.nuc) {color:#BD9336;}.color_e85d72:not(.nuc) {color:#E85D72;}.color_dc7dbb:not(.nuc) {color:#DC7DBB;}.color_bc3663:not(.nuc) {color:#BC3663;}.color_9d8eee:not(.nuc) {color:#9D8EEE;}.color_8469bc:not(.nuc) {color:#8469BC;}.color_73769d:not(.nuc) {color:#73769D;}.color_b14cbc:not(.nuc) {color:#B14CBC;}</style>\\n\\n<!-- slack-www-hhvm-main-iad-wbpk/ 2020-05-03 20:25:06/ v030422ae301a654fd7f1a5b5714a4a5f4dabb997/ B:H -->\\n\\n</body></html>\",\n    \"error\": {}\n}"
+						}
+					]
 				}
 			],
 			"description": "Statping contains multiple notifiers that will send you a notification whenever a service become offline, or online. You can create your own 3rd party notifier by reading more on the [Notifiers Wiki](https://github.com/statping/statping/wiki/Notifiers) on the Github repo.",
@@ -3373,7 +4327,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "bd5d8232-7ed7-4607-ab7c-14de85c3a033",
+						"id": "8f3b2e75-ce23-4294-b5bb-05b1248b9ef3",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -3383,7 +4337,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "ef420ba0-37dc-4ffc-b38f-a43ccca76606",
+						"id": "06653dbc-888b-4016-8964-82d25e0273e3",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -3402,7 +4356,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3c484d1b-6e77-4084-b844-3ca77dc50108",
+								"id": "b2374cab-1ce8-4f9e-a2fa-f92477936cd4",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -3480,7 +4434,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "12caf74a-61d7-4f6e-89b5-fca2f65464c4",
+								"id": "66307d95-1833-4786-a29a-40fc05153d09",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -3583,7 +4537,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c30cc333-53f4-4e9a-9c32-958c905ec163",
+								"id": "7e17e9cb-6750-411a-8a9a-335ece3b3cda",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -3661,7 +4615,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e9dd78cc-0f38-4516-bf82-38dd3451b2e7",
+								"id": "c89210ce-dfce-4acf-8bf5-f601f53d353e",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -3693,7 +4647,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Updated Message\",\n    \"description\": \"This message was updated\",\n    \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n    \"service\": 1,\n    \"notify_users\": true,\n    \"notify_method\": \"email\",\n    \"notify_before\": 3,\n    \"notify_before_scale\": \"hour\"\n}"
+							"raw": "{\n    \"title\": \"Updated Message\",\n    \"description\": \"This message was updated\",\n    \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n    \"service\": 1,\n    \"notify_users\": true,\n    \"notify_method\": \"email\",\n    \"notify_before\": 3,\n    \"notify_before_scale\": \"hour\"\n}",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/messages/{{message_id}}",
@@ -3765,7 +4722,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "6cb2527f-41c2-4feb-9573-1e4d59efa116",
+								"id": "61a55ba9-d524-4509-a93f-679b5574182a",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -3864,7 +4821,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "8d24599b-f157-475b-9e30-06c1171c85bc",
+						"id": "b2160e12-ca83-4454-be33-7eac6f32e16b",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -3874,7 +4831,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "497c2428-fe8a-42c2-bf6f-8f2cdf959771",
+						"id": "a140fc05-3ec2-40dc-a5c5-93d055242995",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -3893,7 +4850,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "54bded63-de27-4839-8783-25874c35c3ea",
+								"id": "e94a6ff9-bbea-4947-9360-6302a29bdddd",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -3972,7 +4929,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "af07a95b-1bf5-42c7-bd3f-a32f3ab2a264",
+								"id": "4d656189-d860-43d5-b9b9-d526c6d52338",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -4015,7 +4972,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"service_id\": 2,\n    \"name\": \"Server Checkin\",\n    \"interval\": 900,\n    \"grace\": 60\n}"
+							"raw": "{\n    \"service_id\": 2,\n    \"name\": \"Server Checkin\",\n    \"interval\": 900,\n    \"grace\": 60\n}",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/checkins",
@@ -4085,7 +5045,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "652a1c5b-5379-43c2-9cd8-ebd8f8dad0f6",
+								"id": "cb89fcee-0ae4-4496-a159-c214238965ab",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -4161,7 +5121,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "93ff6b86-368b-406f-9d75-07338714ebca",
+								"id": "25998408-3f55-4d42-ac4f-b6163c1fc0a5",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -4242,7 +5202,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d3fdc6b9-d8ca-4634-a735-af8db0f31cef",
+								"id": "0ddca6d9-b1f9-49db-be8d-75fcab4cab0d",
 								"exec": [
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -4276,7 +5236,10 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/checkins/{{checkin_id}}",
@@ -4351,7 +5314,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "fefe9fc9-8020-41ec-b20f-dd2c5ad951e9",
+						"id": "d880b73c-1edd-40d7-aac5-6ef0d2e2704b",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -4361,7 +5324,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "4a611b52-8ec2-4e26-8ed8-51f2729f93a1",
+						"id": "adf70343-e8f3-4162-8eeb-6fb71784ef57",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -4380,11 +5343,9 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "cf003eb2-e18e-46f0-bee2-2a9915525651",
+								"id": "11f52299-58b7-4a57-9842-252e2d8e139e",
 								"exec": [
-									"pm.test(\"Response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -4424,11 +5385,9 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "8520bcc3-1176-4eb9-b22e-31169e093568",
+								"id": "8dace46e-1e0d-4d7c-90f0-c5a29cd2f0c0",
 								"exec": [
-									"pm.test(\"Response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -4467,11 +5426,9 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d9665e36-02b4-4c9f-b155-aded33b3936e",
+								"id": "b18f4b1d-3019-4b96-8203-d1876deab89f",
 								"exec": [
-									"pm.test(\"Response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -4519,11 +5476,9 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "22213939-d2be-47fb-8c76-b8b4c4956b81",
+								"id": "5e59d318-3e11-44be-9d78-85398d35e9be",
 								"exec": [
-									"pm.test(\"Response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -4609,7 +5564,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "cb6d709c-85c1-4dc3-9434-04f817db23ea",
+						"id": "8512f9f2-50af-4c7c-90af-4feb43908ac9",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -4619,7 +5574,311 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "88b7bef2-103e-455c-a8f8-bce15c73d6d7",
+						"id": "f28d8c39-84fa-4e20-9bd9-e8f8a0158919",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "oAuth",
+			"item": [
+				{
+					"name": "Set Keys",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "3b2cf616-7e7d-4e11-beee-7027e0ed6dd2",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"update check\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.method).to.eql(\"update\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"gh_client_id\": \"githubid\",\n    \"gh_client_secret\": \"githubsecret\",\n    \"google_client_id\": \"googleid\",\n    \"google_client_secret\": \"googlesecret\",\n    \"oauth_domains\": \"gmail.com,yahoo.com,socialeck.com\",\n    \"oauth_providers\": \"local,slack,google,github\",\n    \"slack_client_id\": \"936045034737.1044972172659\",\n    \"slack_client_secret\": \"05dd514efb382971e538a5561981e54a\",\n    \"slack_team\": \"dev\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/oauth",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"oauth"
+							]
+						},
+						"description": "This endpoint will return the last line in the logs."
+					},
+					"response": [
+						{
+							"name": "Statping Details",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint}}/api",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "398"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 01:06:09 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"admin\": false,\n    \"allow_reports\": false,\n    \"created_at\": \"2020-05-02T01:00:07.885973685Z\",\n    \"description\": \"This data is only used to testing\",\n    \"domain\": \"http://localhost:8080\",\n    \"footer\": null,\n    \"logged_in\": false,\n    \"migration_id\": 1588381207,\n    \"name\": \"Statping Sample Data\",\n    \"setup\": true,\n    \"started_on\": \"2020-05-02T01:00:14.255837864Z\",\n    \"updated_at\": \"2020-05-02T01:00:12.731269305Z\",\n    \"using_cdn\": false,\n    \"version\": \"0.90.34\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Keys",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a3dd164d-56dc-43c9-80ae-ad42ced9542f",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"correct values\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.gh_client_id).to.eql(\"githubid\");",
+									"    pm.expect(jsonData.gh_client_secret).to.eql(\"githubsecret\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint}}/api/oauth",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"oauth"
+							]
+						},
+						"description": "This endpoint will return the last line in the logs."
+					},
+					"response": [
+						{
+							"name": "Statping Details",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint}}/api",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "398"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 01:06:09 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"admin\": false,\n    \"allow_reports\": false,\n    \"created_at\": \"2020-05-02T01:00:07.885973685Z\",\n    \"description\": \"This data is only used to testing\",\n    \"domain\": \"http://localhost:8080\",\n    \"footer\": null,\n    \"logged_in\": false,\n    \"migration_id\": 1588381207,\n    \"name\": \"Statping Sample Data\",\n    \"setup\": true,\n    \"started_on\": \"2020-05-02T01:00:14.255837864Z\",\n    \"updated_at\": \"2020-05-02T01:00:12.731269305Z\",\n    \"using_cdn\": false,\n    \"version\": \"0.90.34\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Authenticate token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2d5f11de-4041-4667-b094-4e1934195649",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									"",
+									"pm.test(\"missing values\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.error).to.eql(\"oauth2: server response missing access_token\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "code",
+									"value": "936045034737.1125195726608.7440bec1a519b713bd3c39c4aaed46f5a4891878c1616d1a6ac2be3bc0cc9867",
+									"type": "text"
+								},
+								{
+									"key": "state",
+									"value": "0",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{endpoint}}/oauth/slack",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"oauth",
+								"slack"
+							]
+						},
+						"description": "This endpoint will return the last line in the logs."
+					},
+					"response": [
+						{
+							"name": "Statping Details",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint}}/api",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "398"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 02 May 2020 01:06:09 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"admin\": false,\n    \"allow_reports\": false,\n    \"created_at\": \"2020-05-02T01:00:07.885973685Z\",\n    \"description\": \"This data is only used to testing\",\n    \"domain\": \"http://localhost:8080\",\n    \"footer\": null,\n    \"logged_in\": false,\n    \"migration_id\": 1588381207,\n    \"name\": \"Statping Sample Data\",\n    \"setup\": true,\n    \"started_on\": \"2020-05-02T01:00:14.255837864Z\",\n    \"updated_at\": \"2020-05-02T01:00:12.731269305Z\",\n    \"using_cdn\": false,\n    \"version\": \"0.90.34\"\n}"
+						}
+					]
+				}
+			],
+			"description": "You can allow other users to login through other services by using OAuth.\n\n- [Google OAuth](https://developers.google.com/identity/protocols/oauth2)\n- [Slack OAuth](https://api.slack.com/legacy/oauth)\n- [Github OAuth](https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/)\n\n### Redirect URL\nEach OAuth service has a dedicated redirect URL: `/oauth/{provider}`. Replace `{provider}` with google, slack, or github depending on which service you're using.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "2792fd81-5e3a-434b-8f51-992bea3a2b49",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "467bdaac-344d-451e-a4b4-825aec80ceef",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -4644,7 +5903,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "e37b4946-9995-4fb5-88a9-39adb191d076",
+				"id": "a88caffc-d042-4f68-9757-3b5b3e628737",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -4654,12 +5913,13 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "8fa9bd45-c197-4751-baa6-c58143156aea",
+				"id": "dc71e455-8623-429d-890b-0cfc3bb9f8d1",
 				"type": "text/javascript",
 				"exec": [
 					""
 				]
 			}
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

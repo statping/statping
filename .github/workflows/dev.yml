@@ -160,8 +160,7 @@ jobs:
       - name: Postman Tests
         uses: matt-ball/newman-action@master
         with:
-          postmanApiKey: ${{ secrets.POSTMAN_API }}
-          collection: 1898229-94807b85-ef65-4370-9144-b1a74e04cb0e
-          environment: ./dev/postman_environment.json
+          collection: ./dev/postman.json
+          environment: ./dev/postman_environment_sqlite.json
           timeoutRequest: 15000
-          delayRequest: 1000
+          delayRequest: 500
