@@ -36,7 +36,7 @@ services:
       DOMAIN: http://localhost:8080
       DESCRIPTION: This is a dev environment on SQLite!
       ADMIN_USER: admin
-      ADMIN_PASS: admin
+      ADMIN_PASSWORD: admin
       SAMPLE_DATA: 'false'
     ports:
       - 8080:8080
@@ -69,7 +69,7 @@ services:
       DOMAIN: http://localhost:8081
       DESCRIPTION: This is a dev environment on MySQL!
       ADMIN_USER: admin
-      ADMIN_PASS: admin
+      ADMIN_PASSWORD: admin
       SAMPLE_DATA: 'false'
     ports:
       - 8081:8080
@@ -105,7 +105,7 @@ services:
       DOMAIN: http://localhost:8082
       DESCRIPTION: This is a dev environment on Postgres!
       ADMIN_USER: admin
-      ADMIN_PASS: admin
+      ADMIN_PASSWORD: admin
       SAMPLE_DATA: 'false'
     ports:
       - 8082:8080
@@ -141,7 +141,7 @@ services:
       DOMAIN: http://localhost:8083
       DESCRIPTION: This is a dev environment on MariaDB!
       ADMIN_USER: admin
-      ADMIN_PASS: admin
+      ADMIN_PASSWORD: admin
       SAMPLE_DATA: 'false'
     ports:
       - 8083:8080
