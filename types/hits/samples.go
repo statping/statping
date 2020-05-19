@@ -16,7 +16,7 @@ var SampleHits = 99900.
 func Samples() error {
 	for i := int64(1); i <= 5; i++ {
 		records := createHitsAt(i)
-		if err := gormbulk.BulkInsert(db.GormDB(), records, 3000); err != nil {
+		if err := gormbulk.BulkInsert(db.GormDB(), records, db.ChunkSize()); err != nil {
 			log.Error(err)
 			return err
 		}

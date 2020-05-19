@@ -42,7 +42,7 @@ func Samples() error {
 			records = append(records, failure)
 			createdAt = createdAt.Add(35 * time.Minute)
 		}
-		if err := gormbulk.BulkInsert(db.GormDB(), records, 3000); err != nil {
+		if err := gormbulk.BulkInsert(db.GormDB(), records, db.ChunkSize()); err != nil {
 			log.Error(err)
 			return err
 		}

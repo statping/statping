@@ -105,6 +105,18 @@ type Database interface {
 	ParseTime(t string) (time.Time, error)
 	DbType() string
 	GormDB() *gorm.DB
+	ChunkSize() int
+}
+
+func (it *Db) ChunkSize() int {
+	switch it.Database.Dialect().GetName() {
+	case "mysql":
+		return 3000
+	case "postgres":
+		return 3000
+	default:
+		return 100
+	}
 }
 
 func (it *Db) GormDB() *gorm.DB {
