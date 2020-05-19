@@ -1,3 +1,8 @@
+# 0.90.40 (05-18-2020)
+- Fixed issues with MySQL and Postgres taking forever to insert sample data (now run in bulk)
+- Removed API Authentication for /api/logout route
+- Modified Core Sample/Upstart row to include NAME, DESCRIPTION, and DOMAIN environment vars (also added default values)
+
 # 0.90.39 (05-15-2020)
 - Modified some SCSS designs for services failures in group
 - Fixed Twilio notifier and tests
