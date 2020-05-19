@@ -17,17 +17,17 @@
 							"script": {
 								"id": "29b5dc8d-60c1-4f70-853d-49114af6b254",
 								"exec": [
-									"var tm = Math.round(new Date().getTime()/1000);",
-									"pm.globals.set(\"start_time\", tm-259200);",
+									"var tm = Math.round(new Date().getTime() / 1000);",
+									"pm.globals.set(\"start_time\", tm - 259200);",
 									"pm.globals.set(\"end_time\", tm);",
 									"",
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"Check Core API Route\", function () {",
+									"pm.test(\"Check Setup\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.config.connection).to.eql(\"sqlite3\");",
+									"    pm.expect(jsonData.message).to.eql(\"success\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -46,14 +46,7 @@
 					],
 					"request": {
 						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{api_key}}",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "POST",
 						"header": [
@@ -69,7 +62,7 @@
 							"urlencoded": [
 								{
 									"key": "db_host",
-									"value": "localhost",
+									"value": "{{db_host}}",
 									"type": "text"
 								},
 								{
