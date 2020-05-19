@@ -21,6 +21,8 @@
 									"pm.globals.set(\"start_time\", tm - 259200);",
 									"pm.globals.set(\"end_time\", tm);",
 									"",
+									"var connection = pm.environment.get(\"db_connection\");",
+									"",
 									"pm.test(\"Response is ok\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
