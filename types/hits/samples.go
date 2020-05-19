@@ -5,9 +5,9 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/statping/statping/database"
 	"github.com/statping/statping/types"
 	"github.com/statping/statping/utils"
+	gormbulk "github.com/t-tiger/gorm-bulk-insert/v2"
 	"time"
 )
 
@@ -15,24 +15,22 @@ var SampleHits = 99900.
 
 func Samples() error {
 	for i := int64(1); i <= 5; i++ {
-		tx := db.Begin()
-		tx = createHitsAt(tx, i)
-
-		if err := tx.Commit().Error(); err != nil {
+		records := createHitsAt(i)
+		if err := gormbulk.BulkInsert(db.GormDB(), records, 3000); err != nil {
 			log.Error(err)
 			return err
 		}
 	}
-
 	return nil
 }
 
-func createHitsAt(db database.Database, serviceID int64) database.Database {
+func createHitsAt(serviceID int64) []interface{} {
 	log.Infoln(fmt.Sprintf("Adding Sample records to service #%d...", serviceID))
 
 	createdAt := utils.Now().Add(-3 * types.Day)
 	p := utils.NewPerlin(2, 2, 5, utils.Now().UnixNano())
 
+	var records []interface{}
 	for hi := 0.; hi <= SampleHits; hi++ {
 		latency := p.Noise1D(hi / 500)
 
@@ -43,7 +41,7 @@ func createHitsAt(db database.Database, serviceID int64) database.Database {
 			CreatedAt: createdAt,
 		}
 
-		db = db.Create(&hit)
+		records = append(records, hit)
 
 		if createdAt.After(utils.Now()) {
 			break
@@ -51,5 +49,5 @@ func createHitsAt(db database.Database, serviceID int64) database.Database {
 		createdAt = createdAt.Add(30 * time.Second)
 	}
 
-	return db
+	return records
 }

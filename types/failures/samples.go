@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/statping/statping/types"
 	"github.com/statping/statping/utils"
+	gormbulk "github.com/t-tiger/gorm-bulk-insert/v2"
 	"time"
 )
 
@@ -15,8 +16,6 @@ func Samples() error {
 	createdAt := utils.Now().Add(-3 * types.Day)
 
 	for i := int64(1); i <= 4; i++ {
-		tx := db.Begin()
-
 		f1 := &Failure{
 			Service:   i,
 			Issue:     "Server failure",
@@ -33,21 +32,20 @@ func Samples() error {
 
 		log.Infoln(fmt.Sprintf("Adding %v Failure records to service", 400))
 
+		var records []interface{}
 		for fi := 0.; fi <= float64(400); fi++ {
 			failure := &Failure{
 				Service:   i,
 				Issue:     "testing right here",
 				CreatedAt: createdAt.UTC(),
 			}
-
-			tx = tx.Create(&failure)
+			records = append(records, failure)
 			createdAt = createdAt.Add(35 * time.Minute)
 		}
-		if err := tx.Commit().Error(); err != nil {
+		if err := gormbulk.BulkInsert(db.GormDB(), records, 3000); err != nil {
 			log.Error(err)
 			return err
 		}
 	}
-
 	return nil
 }

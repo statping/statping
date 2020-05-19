@@ -104,6 +104,11 @@ type Database interface {
 	FormatTime(t time.Time) string
 	ParseTime(t string) (time.Time, error)
 	DbType() string
+	GormDB() *gorm.DB
+}
+
+func (it *Db) GormDB() *gorm.DB {
+	return it.Database
 }
 
 func (it *Db) DbType() string {
