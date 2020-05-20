@@ -50,7 +50,7 @@ var slacker = &slack{&notifications.Notification{
 
 // Send will send a HTTP Post to the slack webhooker API. It accepts type: string
 func (s *slack) sendSlack(msg string) error {
-	_, resp, err := utils.HttpRequest(s.Host, "POST", "application/json", nil, strings.NewReader(msg), time.Duration(10*time.Second), true)
+	_, resp, err := utils.HttpRequest(s.Host, "POST", "application/json", nil, strings.NewReader(msg), time.Duration(10*time.Second), true, nil)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func (s *slack) sendSlack(msg string) error {
 
 func (s *slack) OnTest() (string, error) {
 	testMsg := ReplaceVars(failingTemplate, exampleService, exampleFailure)
-	contents, resp, err := utils.HttpRequest(s.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(testMsg)), time.Duration(10*time.Second), true)
+	contents, resp, err := utils.HttpRequest(s.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(testMsg)), time.Duration(10*time.Second), true, nil)
 	if err != nil {
 		return "", err
 	}

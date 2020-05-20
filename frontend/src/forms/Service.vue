@@ -156,6 +156,41 @@
             </div>
         </div>
 
+        <div v-if="service.type.match(/^(tcp|http)$/)" class="form-group row">
+            <label class="col-sm-4 col-form-label">Use TLS Certificate</label>
+            <div class="col-8 mt-1">
+                <span @click="service.use_tls = !!service.use_tls" class="switch float-left">
+                    <input v-model="service.use_tls" type="checkbox" name="verify_ssl-option" class="switch" id="switch-use-tls" v-bind:checked="service.use_tls">
+                    <label for="switch-use-tls" v-if="service.use_tls">Custom TLS Certificates for mTLS services</label>
+                    <label for="switch-use-tls" v-if="!service.use_tls">Ignore TLS Certificates</label>
+                </span>
+            </div>
+        </div>
+
+                <div v-if="service.use_tls" class="form-group row">
+                    <label for="service_tls_cert" class="col-sm-4 col-form-label">TLS Client Certificate</label>
+                    <div class="col-sm-8">
+                        <textarea v-model="service.tls_cert" name="tls_cert" class="form-control" id="service_tls_cert"></textarea>
+                        <small class="form-text text-muted">Absolute path to TLS Client Certificate file or in PEM format</small>
+                    </div>
+                </div>
+
+                <div v-if="service.use_tls" class="form-group row">
+                    <label for="service_tls_cert_key" class="col-sm-4 col-form-label">TLS Client Key</label>
+                    <div class="col-sm-8">
+                        <textarea v-model="service.tls_cert_key" name="tls_cert_key" class="form-control" id="service_tls_cert_key"></textarea>
+                        <small class="form-text text-muted">Absolute path to TLS Client Key file or in PEM format</small>
+                    </div>
+                </div>
+
+                <div v-if="service.use_tls" class="form-group row">
+                    <label for="service_tls_cert_chain" class="col-sm-4 col-form-label">Root CA</label>
+                    <div class="col-sm-8">
+                        <textarea v-model="service.tls_cert_root" name="tls_cert_key" class="form-control" id="service_tls_cert_chain"></textarea>
+                        <small class="form-text text-muted">Absolute path to Root CA file or in PEM format (optional)</small>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -235,6 +270,10 @@
                   notify_all_changes: true,
                   notify_after: 2,
                   public: true,
+                  use_tls: false,
+                tls_cert: "",
+                tls_cert_key: "",
+                tls_cert_root: "",
               },
               groups: [],
           }
@@ -247,12 +286,15 @@
       watch: {
           in_service () {
               this.service = this.in_service
+                if (this.service.tls_cert) {
+                  this.service.use_tls = true
+                }
           }
       },
       async mounted () {
           if (!this.$store.getters.groups) {
-              const groups = await Api.groups()
-              this.$store.commit('setGroups', groups)
+            const groups = await Api.groups()
+            this.$store.commit('setGroups', groups)
           }
       },
       methods: {
@@ -289,6 +331,7 @@
               delete s.last_success
               delete s.latency
               delete s.online_24_hours
+              delete s.use_tls
               s.check_interval = parseInt(s.check_interval)
               s.timeout = parseInt(s.timeout)
               s.port = parseInt(s.port)

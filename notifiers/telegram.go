@@ -59,7 +59,7 @@ func (t *telegram) sendMessage(message string) (string, error) {
 	v.Set("text", message)
 	rb := *strings.NewReader(v.Encode())
 
-	contents, _, err := utils.HttpRequest(apiEndpoint, "GET", "application/x-www-form-urlencoded", nil, &rb, time.Duration(10*time.Second), true)
+	contents, _, err := utils.HttpRequest(apiEndpoint, "GET", "application/x-www-form-urlencoded", nil, &rb, time.Duration(10*time.Second), true, nil)
 
 	success, _ := telegramSuccess(contents)
 	if !success {

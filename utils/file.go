@@ -3,6 +3,7 @@ package utils
 import (
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 // DeleteDirectory will attempt to delete a directory and all contents inside
@@ -28,6 +29,15 @@ func FolderExists(folder string) bool {
 		return true
 	}
 	return false
+}
+
+// FileExtension returns the file extension based on a file path
+func FileExtension(path string) string {
+	s := strings.Split(path, ".")
+	if len(s) == 0 {
+		return ""
+	}
+	return s[len(s)-1]
 }
 
 // FileExists returns true if a file exists

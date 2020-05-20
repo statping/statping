@@ -2,19 +2,59 @@ package services
 
 import (
 	"crypto/sha1"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"github.com/statping/statping/types"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/utils"
+	"io/ioutil"
 	"sort"
 	"strconv"
 	"time"
 )
 
 const limitedFailures = 25
+
+func (s *Service) LoadTLSCert() (*tls.Config, error) {
+	if !s.TLSCert.Valid && !s.TLSCertKey.Valid {
+		return nil, nil
+	}
+
+	// load TLS cert and key from file path or PEM format
+	var cert tls.Certificate
+	var err error
+	tlsCertExtension := utils.FileExtension(s.TLSCert.String)
+	tlsCertKeyExtension := utils.FileExtension(s.TLSCertKey.String)
+	if tlsCertExtension == "" && tlsCertKeyExtension == "" {
+		cert, err = tls.X509KeyPair([]byte(s.TLSCert.String), []byte(s.TLSCertKey.String))
+	} else {
+		cert, err = tls.LoadX509KeyPair(s.TLSCert.String, s.TLSCertKey.String)
+	}
+	if err != nil {
+		return nil, errors.Wrap(err, "issue loading X509KeyPair")
+	}
+
+	// create Root CA pool or use Root CA provided
+	chainFile := s.TLSCert.String
+	if s.TLSCertRoot.String != "" {
+		chainFile = s.TLSCertRoot.String
+	}
+	caCert, err := ioutil.ReadFile(chainFile)
+	if err != nil {
+		return nil, errors.Wrap(err, "issue reading cert file: "+chainFile)
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+
+	return &tls.Config{
+		RootCAs:      caCertPool,
+		Certificates: []tls.Certificate{cert},
+	}, nil
+}
 
 func (s *Service) Duration() time.Duration {
 	return time.Duration(s.Interval) * time.Second

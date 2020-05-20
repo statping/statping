@@ -322,5 +322,13 @@ postman: clean compile
 	newman run -e dev/postman_environment.json dev/postman.json
 	killall statping
 
+certs:
+	openssl req -newkey rsa:2048 \
+	  -new -nodes -x509 \
+	  -days 3650 \
+	  -out cert.pem \
+	  -keyout key.pem \
+	  -subj "/C=US/ST=California/L=Santa Monica/O=Statping/OU=Development/CN=localhost"
+
 .PHONY: all build build-all build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds

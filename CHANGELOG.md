@@ -1,3 +1,7 @@
+# 0.90.41 (05-20-2020)
+- Added TLS Client Cert/Key feature for HTTP and TCP/UDP services
+- Replaced environment variable ADMIN_PASS to ADMIN_PASSWORD.
+
 # 0.90.40 (05-18-2020)
 - Fixed issues with MySQL and Postgres taking forever to insert sample data (now run in bulk)
 - Removed API Authentication for /api/logout route
