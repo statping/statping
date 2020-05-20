@@ -143,7 +143,7 @@ func slackOAuth(r *http.Request) (*oAuth, error) {
 // slackIdentity will query the Slack API to fetch the users ID, username, and email address.
 func (a *oAuth) slackIdentity() (*oAuth, error) {
 	url := fmt.Sprintf("https://slack.com/api/users.identity?token=%s", a.Token)
-	out, resp, err := utils.HttpRequest(url, "GET", "application/x-www-form-urlencoded", nil, nil, 10*time.Second, true)
+	out, resp, err := utils.HttpRequest(url, "GET", "application/x-www-form-urlencoded", nil, nil, 10*time.Second, true, nil)
 	if err != nil {
 		return a, err
 	}

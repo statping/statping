@@ -258,8 +258,12 @@ func CheckHttp(s *Service, record bool) *Service {
 		contentType = "application/json"
 	}
 
-	content, res, err = utils.HttpRequest(s.Domain, s.Method, contentType,
-		headers, data, timeout, s.VerifySSL.Bool)
+	customTLS, err := s.LoadTLSCert()
+	if err != nil {
+		log.Errorln(err)
+	}
+
+	content, res, err = utils.HttpRequest(s.Domain, s.Method, contentType, headers, data, timeout, s.VerifySSL.Bool, customTLS)
 	if err != nil {
 		if record {
 			recordFailure(s, fmt.Sprintf("HTTP Error %v", err))

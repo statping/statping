@@ -197,7 +197,7 @@ func DurationReadable(d time.Duration) string {
 // // body - The body or form data to send with HTTP request
 // // timeout - Specific duration to timeout on. time.Duration(30 * time.Seconds)
 // // You can use a HTTP Proxy if you HTTP_PROXY environment variable
-func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool) ([]byte, *http.Response, error) {
+func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool, customTLS *tls.Config) ([]byte, *http.Response, error) {
 	var err error
 	var req *http.Request
 	t1 := Now()
@@ -246,6 +246,10 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 			addr = strings.Split(req.URL.Host, ":")[0] + addr[strings.LastIndex(addr, ":"):]
 			return dialer.DialContext(ctx, network, addr)
 		},
+	}
+	if customTLS != nil {
+		transport.TLSClientConfig.RootCAs = customTLS.RootCAs
+		transport.TLSClientConfig.Certificates = customTLS.Certificates
 	}
 	client := &http.Client{
 		Transport: transport,

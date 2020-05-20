@@ -59,7 +59,7 @@ func (t *pushover) sendMessage(message string) (string, error) {
 	v.Set("message", message)
 	rb := strings.NewReader(v.Encode())
 
-	content, _, err := utils.HttpRequest(pushoverUrl, "POST", "application/x-www-form-urlencoded", nil, rb, time.Duration(10*time.Second), true)
+	content, _, err := utils.HttpRequest(pushoverUrl, "POST", "application/x-www-form-urlencoded", nil, rb, time.Duration(10*time.Second), true, nil)
 	if err != nil {
 		return "", err
 	}

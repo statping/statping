@@ -72,7 +72,7 @@ func (t *twilio) sendMessage(message string) (string, error) {
 
 	authHeader := utils.Base64(fmt.Sprintf("%s:%s", t.ApiKey, t.ApiSecret))
 
-	contents, _, err := utils.HttpRequest(twilioUrl, "POST", "application/x-www-form-urlencoded", []string{"Authorization=Basic " + authHeader}, rb, 10*time.Second, true)
+	contents, _, err := utils.HttpRequest(twilioUrl, "POST", "application/x-www-form-urlencoded", []string{"Authorization=Basic " + authHeader}, rb, 10*time.Second, true, nil)
 	success, _ := twilioSuccess(contents)
 	if !success {
 		errorOut := twilioError(contents)
