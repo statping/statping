@@ -156,25 +156,29 @@ generate:
 build-all: clean compile build-folders build-linux build-linux-arm build-darwin build-win compress-folders
 
 build-win:
-	CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc-posix CXX=x86_64-w64-mingw32-g++-posix GO111MODULE="on" GOOS=windows GOARCH=amd64 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-amd64/statping.exe ./cmd
-	CGO_ENABLED=1 CC=i686-w64-mingw32-gcc-posix CXX=i686-w64-mingw32-g++-posix GO111MODULE="on" GOOS=windows GOARCH=386 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-386/statping.exe ./cmd
+	xgo --go=1.14.2 --dest=build --targets="windows-6.0/386,windows-6.0/amd64" -out statping -ldflags="-s -w -extldflags -static -X main.VERSION=${VERSION}" --pkg cmd /home/runner/work/statping/statping
+#	CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc-posix CXX=x86_64-w64-mingw32-g++-posix GO111MODULE="on" GOOS=windows GOARCH=amd64 \
+#		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-amd64/statping.exe ./cmd
+#	CGO_ENABLED=1 CC=i686-w64-mingw32-gcc-posix CXX=i686-w64-mingw32-g++-posix GO111MODULE="on" GOOS=windows GOARCH=386 \
+#		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-386/statping.exe ./cmd
 
 build-darwin:
-	GO111MODULE="on" GOOS=darwin GOARCH=amd64 go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-amd64/statping --tags "darwin" ./cmd
+	xgo --go=1.14.2 --dest=build --targets="darwin/386,darwin/amd64" -out statping -ldflags="-s -w -X main.VERSION=${VERSION}" --pkg cmd /home/runner/work/statping/statping
+#	GO111MODULE="on" GOOS=darwin GOARCH=amd64 go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-amd64/statping --tags "darwin" ./cmd
 
 build-linux:
-	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=amd64 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "linux" ./cmd
-	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=386 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "linux" ./cmd
+	xgo --go=1.14.2 --dest=build --targets="linux/386,linux/amd64" -out statping -ldflags="-s -w -extldflags -static -X main.VERSION=${VERSION}" --pkg cmd /home/runner/work/statping/statping
+#	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=amd64 \
+#		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "linux" ./cmd
+#	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=386 \
+#		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "linux" ./cmd
 
 build-linux-arm:
-	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc-6 CXX=arm-linux-gnueabihf-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=7 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm/statping ./cmd
-	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc-6 CXX=aarch64-linux-gnu-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm64 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm64/statping ./cmd
+	xgo --go=1.14.2 --dest=build --targets="linux/arm-7,linux/arm64" -out statping -ldflags="-s -w -extldflags -static -X main.VERSION=${VERSION}" --pkg cmd /home/runner/work/statping/statping
+#	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc-6 CXX=arm-linux-gnueabihf-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=7 \
+#		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm/statping ./cmd
+#	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc-6 CXX=aarch64-linux-gnu-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm64 \
+#		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm64/statping ./cmd
 
 build-folders:
 	mkdir build || true
