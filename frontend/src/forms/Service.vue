@@ -156,7 +156,7 @@
             </div>
         </div>
 
-        <div v-if="service.type.match(/^(http)$/)" class="form-group row">
+        <div v-if="service.type.match(/^(tcp|http)$/)" class="form-group row">
             <label class="col-sm-4 col-form-label">Use TLS Certificate</label>
             <div class="col-8 mt-1">
                 <span @click="service.use_tls = !!service.use_tls" class="switch float-left">

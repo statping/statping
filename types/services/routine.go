@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"google.golang.org/grpc"
 	"net"
@@ -181,7 +182,18 @@ func CheckTcp(s *Service, record bool) *Service {
 			domain = fmt.Sprintf("[%v]:%v", s.Domain, s.Port)
 		}
 	}
-	conn, err := net.DialTimeout(s.Type, domain, time.Duration(s.Timeout)*time.Second)
+
+	tlsConfig, err := s.LoadTLSCert()
+	if err != nil {
+		log.Errorln(err)
+	}
+
+	dialer := &net.Dialer{
+		KeepAlive: time.Duration(s.Timeout) * time.Second,
+		Timeout:   time.Duration(s.Timeout) * time.Second,
+	}
+
+	conn, err := tls.DialWithDialer(dialer, s.Type, domain, tlsConfig)
 	if err != nil {
 		if record {
 			recordFailure(s, fmt.Sprintf("Dial Error %v", err))
