@@ -328,9 +328,10 @@ jobs:
         uses: crazy-max/ghaction-xgo@v1
         with:
           xgo_version: latest
-          go_version: ${{ matrix.go_version }}
+          go_version: 1.14.2
           dest: build
           prefix: statping
+          pkg: cmd
           targets: linux/386,linux/amd64
           v: true
           x: false
@@ -341,9 +342,10 @@ jobs:
         uses: crazy-max/ghaction-xgo@v1
         with:
           xgo_version: latest
-          go_version: ${{ matrix.go_version }}
+          go_version: 1.14.2
           dest: build
           prefix: statping
+          pkg: cmd
           targets: linux/arm-7,linux/arm64
           v: true
           x: false
@@ -382,13 +384,14 @@ jobs:
           name: static-rice-box
           path: ./source
 
-      - name: Build Linux ARM XGO
+      - name: Build Windows XGO
         uses: crazy-max/ghaction-xgo@v1
         with:
           xgo_version: latest
-          go_version: ${{ matrix.go_version }}
+          go_version: 1.14.2
           dest: build
           prefix: statping
+          pkg: cmd
           targets: windows-6.0/386,windows-6.0/amd64
           v: true
           x: false
@@ -427,13 +430,14 @@ jobs:
           name: static-rice-box
           path: ./source
 
-      - name: Build MacOSX ARM XGO
+      - name: Build MacOSX XGO
         uses: crazy-max/ghaction-xgo@v1
         with:
           xgo_version: latest
-          go_version: ${{ matrix.go_version }}
+          go_version: 1.14.2
           dest: build
           prefix: statping
+          pkg: cmd
           targets: darwin/386,darwin/amd64
           v: true
           x: false
