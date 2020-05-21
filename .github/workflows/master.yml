@@ -101,7 +101,7 @@ jobs:
         env:
           VERSION: ${{ env.VERSION }}
         run: |
-          make build
+          make build certs
           chmod +x statping
           mv statping $(go env GOPATH)/bin/
 

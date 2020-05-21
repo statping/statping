@@ -20,7 +20,7 @@ import (
 const limitedFailures = 25
 
 func (s *Service) LoadTLSCert() (*tls.Config, error) {
-	if !s.TLSCert.Valid && !s.TLSCertKey.Valid {
+	if s.TLSCert.String == "" || s.TLSCertKey.String == "" {
 		return nil, nil
 	}
 
@@ -38,22 +38,27 @@ func (s *Service) LoadTLSCert() (*tls.Config, error) {
 		return nil, errors.Wrap(err, "issue loading X509KeyPair")
 	}
 
-	// create Root CA pool or use Root CA provided
-	chainFile := s.TLSCert.String
-	if s.TLSCertRoot.String != "" {
-		chainFile = s.TLSCertRoot.String
+	config := &tls.Config{
+		Certificates:       []tls.Certificate{cert},
+		InsecureSkipVerify: s.TLSCertRoot.String == "",
 	}
-	caCert, err := ioutil.ReadFile(chainFile)
+
+	if s.TLSCertRoot.String == "" {
+		return config, nil
+	}
+
+	// create Root CA pool or use Root CA provided
+	rootCA := s.TLSCertRoot.String
+	caCert, err := ioutil.ReadFile(rootCA)
 	if err != nil {
-		return nil, errors.Wrap(err, "issue reading cert file: "+chainFile)
+		return nil, errors.Wrap(err, "issue reading root CA file: "+rootCA)
 	}
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(caCert)
 
-	return &tls.Config{
-		RootCAs:      caCertPool,
-		Certificates: []tls.Certificate{cert},
-	}, nil
+	config.RootCAs = caCertPool
+
+	return config, nil
 }
 
 func (s *Service) Duration() time.Duration {

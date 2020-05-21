@@ -1,7 +1,10 @@
 package services
 
 import (
+	"context"
+	"crypto/tls"
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/failures"
@@ -10,6 +13,10 @@ import (
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc"
+	pb "google.golang.org/grpc/examples/route_guide/routeguide"
+	"net"
+	"net/http"
 	"testing"
 	"time"
 )
@@ -77,6 +84,83 @@ var fail2 = &failures.Failure{
 	CreatedAt: utils.Now().Add(-5 * time.Second),
 }
 
+type exampleGRPC struct {
+	pb.UnimplementedRouteGuideServer
+}
+
+func (s *exampleGRPC) GetFeature(ctx context.Context, point *pb.Point) (*pb.Feature, error) {
+	return &pb.Feature{Location: point}, nil
+}
+
+func TestStartExampleEndpoints(t *testing.T) {
+	// root CA for Linux:  /etc/ssl/certs/ca-certificates.crt
+	// root CA for MacOSX: /opt/local/share/curl/curl-ca-bundle.crt
+
+	tlsCert := utils.Params.GetString("STATPING_DIR") + "/cert.pem"
+	tlsCertKey := utils.Params.GetString("STATPING_DIR") + "/key.pem"
+
+	require.FileExists(t, tlsCert)
+	require.FileExists(t, tlsCertKey)
+
+	h := func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	}
+
+	r := mux.NewRouter()
+	r.HandleFunc("/", h)
+
+	// start example HTTP server
+	go func(t *testing.T) {
+		require.Nil(t, http.ListenAndServe(":15000", r))
+	}(t)
+
+	// start example TLS HTTP server
+	go func(t *testing.T) {
+		require.Nil(t, http.ListenAndServeTLS(":15001", tlsCert, tlsCertKey, r))
+	}(t)
+
+	tcpHandle := func(conn net.Conn) {
+		defer conn.Close()
+		conn.Write([]byte("ok"))
+	}
+
+	// start TCP server
+	go func(t *testing.T, hdl func(conn net.Conn)) {
+		ln, err := net.Listen("tcp", ":15002")
+		require.Nil(t, err)
+		for {
+			conn, err := ln.Accept()
+			require.Nil(t, err)
+			go hdl(conn)
+		}
+	}(t, tcpHandle)
+
+	// start TLS TCP server
+	go func(t *testing.T, hdl func(conn net.Conn)) {
+		cer, err := tls.LoadX509KeyPair(tlsCert, tlsCertKey)
+		require.Nil(t, err)
+		ln, err := tls.Listen("tcp", ":15003", &tls.Config{Certificates: []tls.Certificate{cer}})
+		require.Nil(t, err)
+		for {
+			conn, err := ln.Accept()
+			require.Nil(t, err)
+			go hdl(conn)
+		}
+	}(t, tcpHandle)
+
+	// start GRPC server
+	go func(t *testing.T) {
+		list, err := net.Listen("tcp", ":15004")
+		require.Nil(t, err)
+		grpcServer := grpc.NewServer()
+		pb.RegisterRouteGuideServer(grpcServer, &exampleGRPC{})
+		require.Nil(t, grpcServer.Serve(list))
+	}(t)
+
+	time.Sleep(15 * time.Second)
+}
+
 func TestServices(t *testing.T) {
 	db, err := database.OpenTester()
 	require.Nil(t, err)
@@ -93,6 +177,9 @@ func TestServices(t *testing.T) {
 	hits.SetDB(db)
 	SetDB(db)
 
+	tlsCert := utils.Params.GetString("STATPING_DIR") + "/cert.pem"
+	tlsCertKey := utils.Params.GetString("STATPING_DIR") + "/key.pem"
+
 	t.Run("Test Find service", func(t *testing.T) {
 		item, err := Find(1)
 		require.Nil(t, err)
@@ -100,6 +187,146 @@ func TestServices(t *testing.T) {
 		assert.NotZero(t, item.LastOnline)
 		assert.NotZero(t, item.LastOffline)
 		assert.NotZero(t, item.LastCheck)
+	})
+
+	t.Run("Test HTTP Check", func(t *testing.T) {
+		e := &Service{
+			Name:           "Example HTTP",
+			Domain:         "http://localhost:15000",
+			ExpectedStatus: 200,
+			Type:           "http",
+			Method:         "GET",
+			Timeout:        5,
+			VerifySSL:      null.NewNullBool(false),
+		}
+		e, err = CheckHttp(e, false)
+		require.Nil(t, err)
+		assert.True(t, e.Online)
+		assert.False(t, e.LastCheck.IsZero())
+		assert.NotEqual(t, 0, e.PingTime)
+		assert.NotEqual(t, 0, e.Latency)
+	})
+
+	t.Run("Test Load TLS Certificates", func(t *testing.T) {
+		e := &Service{
+			Name:           "Example TLS",
+			Domain:         "http://localhost:15001",
+			ExpectedStatus: 200,
+			Type:           "http",
+			Method:         "GET",
+			Timeout:        5,
+			VerifySSL:      null.NewNullBool(false),
+			TLSCert:        null.NewNullString(tlsCert),
+			TLSCertKey:     null.NewNullString(tlsCertKey),
+		}
+		customTLS, err := e.LoadTLSCert()
+		require.Nil(t, err)
+
+		require.NotNil(t, customTLS)
+		assert.Nil(t, customTLS.RootCAs)
+		assert.NotNil(t, customTLS.Certificates)
+		assert.Equal(t, 1, len(customTLS.Certificates))
+	})
+
+	t.Run("Test TLS HTTP Check", func(t *testing.T) {
+		e := &Service{
+			Name:           "Example TLS HTTP",
+			Domain:         "https://localhost:15001",
+			ExpectedStatus: 200,
+			Type:           "http",
+			Method:         "GET",
+			Timeout:        15,
+			VerifySSL:      null.NewNullBool(false),
+			TLSCert:        null.NewNullString(tlsCert),
+			TLSCertKey:     null.NewNullString(tlsCertKey),
+		}
+		e, err = CheckHttp(e, false)
+		require.Nil(t, err)
+		assert.True(t, e.Online)
+		assert.False(t, e.LastCheck.IsZero())
+		assert.NotEqual(t, 0, e.PingTime)
+		assert.NotEqual(t, 0, e.Latency)
+	})
+
+	t.Run("Test TCP Check", func(t *testing.T) {
+		e := &Service{
+			Name:    "Example TCP",
+			Domain:  "localhost",
+			Port:    15002,
+			Type:    "tcp",
+			Timeout: 5,
+		}
+		e, err = CheckTcp(e, false)
+		require.Nil(t, err)
+		assert.True(t, e.Online)
+		assert.False(t, e.LastCheck.IsZero())
+		assert.NotEqual(t, 0, e.PingTime)
+		assert.NotEqual(t, 0, e.Latency)
+	})
+
+	t.Run("Test TLS TCP Check", func(t *testing.T) {
+		e := &Service{
+			Name:       "Example TLS TCP",
+			Domain:     "localhost",
+			Port:       15003,
+			Type:       "tcp",
+			Timeout:    15,
+			TLSCert:    null.NewNullString(tlsCert),
+			TLSCertKey: null.NewNullString(tlsCertKey),
+		}
+		e, err = CheckTcp(e, false)
+		require.Nil(t, err)
+		assert.True(t, e.Online)
+		assert.False(t, e.LastCheck.IsZero())
+		assert.NotEqual(t, 0, e.PingTime)
+		assert.NotEqual(t, 0, e.Latency)
+	})
+
+	t.Run("Test UDP Check", func(t *testing.T) {
+		e := &Service{
+			Name:    "Example UDP",
+			Domain:  "localhost",
+			Port:    15003,
+			Type:    "udp",
+			Timeout: 5,
+		}
+		e, err = CheckTcp(e, false)
+		require.Nil(t, err)
+		assert.True(t, e.Online)
+		assert.False(t, e.LastCheck.IsZero())
+		assert.NotEqual(t, 0, e.PingTime)
+		assert.NotEqual(t, 0, e.Latency)
+	})
+
+	t.Run("Test gRPC Check", func(t *testing.T) {
+		e := &Service{
+			Name:    "Example gRPC",
+			Domain:  "localhost",
+			Port:    15004,
+			Type:    "grpc",
+			Timeout: 5,
+		}
+		e, err = CheckGrpc(e, false)
+		require.Nil(t, err)
+		assert.True(t, e.Online)
+		assert.False(t, e.LastCheck.IsZero())
+		assert.NotEqual(t, 0, e.PingTime)
+		assert.NotEqual(t, 0, e.Latency)
+	})
+
+	t.Run("Test ICMP Check", func(t *testing.T) {
+		e := &Service{
+			Name:    "Example ICMP",
+			Domain:  "localhost",
+			Type:    "icmp",
+			Timeout: 5,
+		}
+		e, err = CheckIcmp(e, false)
+		require.Nil(t, err)
+		assert.True(t, e.Online)
+		assert.False(t, e.LastCheck.IsZero())
+		assert.NotEqual(t, 0, e.PingTime)
+		assert.NotEqual(t, 0, e.Latency)
 	})
 
 	t.Run("Test All", func(t *testing.T) {

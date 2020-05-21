@@ -15,7 +15,6 @@ import (
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/utils"
-	"github.com/tatsushid/go-fastping"
 )
 
 // checkServices will start the checking go routine for each service
@@ -90,35 +89,23 @@ func isIPv6(address string) bool {
 }
 
 // checkIcmp will send a ICMP ping packet to the service
-func CheckIcmp(s *Service, record bool) *Service {
+func CheckIcmp(s *Service, record bool) (*Service, error) {
 	defer s.updateLastCheck()
 
-	p := fastping.NewPinger()
-	resolveIP := "ip4:icmp"
-	if isIPv6(s.Domain) {
-		resolveIP = "ip6:icmp"
-	}
-	ra, err := net.ResolveIPAddr(resolveIP, s.Domain)
+	err := utils.Ping(s.Domain, s.Timeout)
 	if err != nil {
-		recordFailure(s, fmt.Sprintf("Could not send ICMP to service %v, %v", s.Domain, err))
-		return s
-	}
-	p.AddIPAddr(ra)
-	p.OnRecv = func(addr *net.IPAddr, rtt time.Duration) {
-		s.Latency = rtt.Microseconds()
-		recordSuccess(s)
-	}
-	err = p.Run()
-	if err != nil {
-		recordFailure(s, fmt.Sprintf("Issue running ICMP to service %v, %v", s.Domain, err))
-		return s
+		if record {
+			recordFailure(s, fmt.Sprintf("Could not send ICMP to service %v, %v", s.Domain, err))
+		}
+		return s, err
 	}
 	s.LastResponse = ""
-	return s
+	s.Online = true
+	return s, nil
 }
 
 // CheckGrpc will check a gRPC service
-func CheckGrpc(s *Service, record bool) *Service {
+func CheckGrpc(s *Service, record bool) (*Service, error) {
 	defer s.updateLastCheck()
 
 	dnsLookup, err := dnsCheck(s)
@@ -126,7 +113,7 @@ func CheckGrpc(s *Service, record bool) *Service {
 		if record {
 			recordFailure(s, fmt.Sprintf("Could not get IP address for GRPC service %v, %v", s.Domain, err))
 		}
-		return s
+		return s, err
 	}
 	s.PingTime = dnsLookup
 	t1 := utils.Now()
@@ -145,25 +132,26 @@ func CheckGrpc(s *Service, record bool) *Service {
 		if record {
 			recordFailure(s, fmt.Sprintf("Dial Error %v", err))
 		}
-		return s
+		return s, err
 	}
 	if err := conn.Close(); err != nil {
 		if record {
 			recordFailure(s, fmt.Sprintf("%v Socket Close Error %v", strings.ToUpper(s.Type), err))
 		}
-		return s
+		return s, err
 	}
 	t2 := utils.Now()
 	s.Latency = t2.Sub(t1).Microseconds()
 	s.LastResponse = ""
+	s.Online = true
 	if record {
 		recordSuccess(s)
 	}
-	return s
+	return s, nil
 }
 
 // checkTcp will check a TCP service
-func CheckTcp(s *Service, record bool) *Service {
+func CheckTcp(s *Service, record bool) (*Service, error) {
 	defer s.updateLastCheck()
 
 	dnsLookup, err := dnsCheck(s)
@@ -171,7 +159,7 @@ func CheckTcp(s *Service, record bool) *Service {
 		if record {
 			recordFailure(s, fmt.Sprintf("Could not get IP address for TCP service %v, %v", s.Domain, err))
 		}
-		return s
+		return s, err
 	}
 	s.PingTime = dnsLookup
 	t1 := utils.Now()
@@ -188,22 +176,28 @@ func CheckTcp(s *Service, record bool) *Service {
 		log.Errorln(err)
 	}
 
+	// test TCP connection if there is no TLS Certificate set
 	if s.TLSCert.String == "" {
-		conn, err := net.Dial(s.Type, domain)
+		conn, err := net.DialTimeout(s.Type, domain, time.Duration(s.Timeout)*time.Second)
 		if err != nil {
 			if record {
 				recordFailure(s, fmt.Sprintf("Dial Error: %v", err))
 			}
-			return s
+			return s, err
 		}
 		defer conn.Close()
 	} else {
-		conn, err := tls.DialWithDialer(&net.Dialer{Timeout: time.Duration(s.Timeout) * time.Second}, s.Type, domain, tlsConfig)
+		// test TCP connection if TLS Certificate was set
+		dialer := &net.Dialer{
+			KeepAlive: time.Duration(s.Timeout) * time.Second,
+			Timeout:   time.Duration(s.Timeout) * time.Second,
+		}
+		conn, err := tls.DialWithDialer(dialer, s.Type, domain, tlsConfig)
 		if err != nil {
 			if record {
 				recordFailure(s, fmt.Sprintf("Dial Error: %v", err))
 			}
-			return s
+			return s, err
 		}
 		defer conn.Close()
 	}
@@ -211,10 +205,11 @@ func CheckTcp(s *Service, record bool) *Service {
 	t2 := utils.Now()
 	s.Latency = t2.Sub(t1).Microseconds()
 	s.LastResponse = ""
+	s.Online = true
 	if record {
 		recordSuccess(s)
 	}
-	return s
+	return s, nil
 }
 
 func (s *Service) updateLastCheck() {
@@ -222,7 +217,7 @@ func (s *Service) updateLastCheck() {
 }
 
 // checkHttp will check a HTTP service
-func CheckHttp(s *Service, record bool) *Service {
+func CheckHttp(s *Service, record bool) (*Service, error) {
 	defer s.updateLastCheck()
 
 	dnsLookup, err := dnsCheck(s)
@@ -230,7 +225,7 @@ func CheckHttp(s *Service, record bool) *Service {
 		if record {
 			recordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
 		}
-		return s
+		return s, err
 	}
 	s.PingTime = dnsLookup
 	t1 := utils.Now()
@@ -282,7 +277,7 @@ func CheckHttp(s *Service, record bool) *Service {
 		if record {
 			recordFailure(s, fmt.Sprintf("HTTP Error %v", err))
 		}
-		return s
+		return s, err
 	}
 	t2 := utils.Now()
 	s.Latency = t2.Sub(t1).Microseconds()
@@ -298,19 +293,20 @@ func CheckHttp(s *Service, record bool) *Service {
 			if record {
 				recordFailure(s, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
 			}
-			return s
+			return s, err
 		}
 	}
 	if s.ExpectedStatus != res.StatusCode {
 		if record {
 			recordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", res.StatusCode, s.ExpectedStatus))
 		}
-		return s
+		return s, err
 	}
 	if record {
 		recordSuccess(s)
 	}
-	return s
+	s.Online = true
+	return s, err
 }
 
 // recordSuccess will create a new 'hit' record in the database for a successful/online service

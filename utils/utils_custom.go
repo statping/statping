@@ -4,8 +4,10 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"os"
-	"syscall"
+	"os/exec"
+	"strings"
 )
 
 func DirWritable(path string) (bool, error) {
@@ -22,13 +24,20 @@ func DirWritable(path string) (bool, error) {
 		return false, errors.New("write permission bit is not set on this file for user")
 	}
 
-	var stat syscall.Stat_t
-	if err = syscall.Stat(path, &stat); err != nil {
-		return false, errors.New("unable to get stat")
-	}
-
-	if uint32(os.Geteuid()) != stat.Uid {
-		return false, errors.New("user doesn't have permission to write to this directory")
-	}
 	return true, nil
+}
+
+func Ping(address string, secondsTimeout int) error {
+	ping, err := exec.LookPath("ping")
+	if err != nil {
+		return err
+	}
+	out, _, err := Command(ping, address, "-c 1", fmt.Sprintf("-W %v", secondsTimeout))
+	if err != nil {
+		return err
+	}
+	if strings.Contains(out, "Destination Host Unreachable") {
+		return errors.New("destination host unreachable")
+	}
+	return nil
 }
