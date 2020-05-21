@@ -50,14 +50,13 @@ cypress: clean
 
 test-api:
 	DB_CONN=sqlite DB_HOST=localhost DB_DATABASE=sqlite DB_PASS=none DB_USER=none statping &
-	sleep 5000 && newman run dev/postman.json -e dev/postman_environment_sqlite.json --delay-request 500
+	sleep 5000 && newman run source/tmpl/postman.json -e dev/postman_environment.json --delay-request 500
 
 test-deps:
 	go get golang.org/x/tools/cmd/cover
 	go get github.com/mattn/goveralls
 	go get github.com/GeertJohan/go.rice/rice
 	go get github.com/mattn/go-sqlite3
-	go get github.com/crazy-max/xgo
 	go install github.com/mattn/go-sqlite3
 
 deps:
@@ -157,29 +156,25 @@ generate:
 build-all: clean compile build-folders build-linux build-linux-arm build-darwin build-win compress-folders
 
 build-win:
-	xgo --go=1.14.2 --dest=build --targets="windows-6.0/386,windows-6.0/amd64" -out statping -ldflags="-s -w -extldflags -static -X main.VERSION=${VERSION}" --pkg cmd /home/runner/work/statping/statping
-#	CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc-posix CXX=x86_64-w64-mingw32-g++-posix GO111MODULE="on" GOOS=windows GOARCH=amd64 \
-#		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-amd64/statping.exe ./cmd
-#	CGO_ENABLED=1 CC=i686-w64-mingw32-gcc-posix CXX=i686-w64-mingw32-g++-posix GO111MODULE="on" GOOS=windows GOARCH=386 \
-#		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-386/statping.exe ./cmd
+	CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc-posix CXX=x86_64-w64-mingw32-g++-posix GO111MODULE="on" GOOS=windows GOARCH=amd64 \
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-amd64/statping.exe ./cmd
+	CGO_ENABLED=1 CC=i686-w64-mingw32-gcc-posix CXX=i686-w64-mingw32-g++-posix GO111MODULE="on" GOOS=windows GOARCH=386 \
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-386/statping.exe ./cmd
 
 build-darwin:
-	xgo --go=1.14.2 --dest=build --targets="darwin/386,darwin/amd64" -out statping -ldflags="-s -w -X main.VERSION=${VERSION}" --pkg cmd /home/runner/work/statping/statping
-#	GO111MODULE="on" GOOS=darwin GOARCH=amd64 go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-amd64/statping --tags "darwin" ./cmd
+	GO111MODULE="on" GOOS=darwin GOARCH=amd64 go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-amd64/statping --tags "darwin" ./cmd
 
 build-linux:
-	xgo --go=1.14.2 --dest=build --targets="linux/386,linux/amd64" -out statping -ldflags="-s -w -extldflags -static -X main.VERSION=${VERSION}" --pkg cmd /home/runner/work/statping/statping
-#	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=amd64 \
-#		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "linux" ./cmd
-#	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=386 \
-#		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "linux" ./cmd
+	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=amd64 \
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "linux" ./cmd
+	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=386 \
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "linux" ./cmd
 
 build-linux-arm:
-	xgo --go=1.14.2 --dest=build --targets="linux/arm-7,linux/arm64" -out statping -ldflags="-s -w -extldflags -static -X main.VERSION=${VERSION}" --pkg cmd /home/runner/work/statping/statping
-#	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc-6 CXX=arm-linux-gnueabihf-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=7 \
-#		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm/statping ./cmd
-#	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc-6 CXX=aarch64-linux-gnu-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm64 \
-#		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm64/statping ./cmd
+	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc-6 CXX=arm-linux-gnueabihf-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=7 \
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm/statping ./cmd
+	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc-6 CXX=aarch64-linux-gnu-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm64 \
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm64/statping ./cmd
 
 build-folders:
 	mkdir build || true

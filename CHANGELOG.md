@@ -1,3 +1,6 @@
+# 0.90.42 (05-20-2020)
+- Fixed TCP services that dont use TLS.
+
 # 0.90.41 (05-20-2020)
 - Added TLS Client Cert/Key feature for HTTP and TCP/UDP services
 - Replaced environment variable ADMIN_PASS to ADMIN_PASSWORD.

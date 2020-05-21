@@ -188,24 +188,26 @@ func CheckTcp(s *Service, record bool) *Service {
 		log.Errorln(err)
 	}
 
-	dialer := &net.Dialer{
-		KeepAlive: time.Duration(s.Timeout) * time.Second,
-		Timeout:   time.Duration(s.Timeout) * time.Second,
+	if s.TLSCert.String == "" {
+		conn, err := net.Dial(s.Type, domain)
+		if err != nil {
+			if record {
+				recordFailure(s, fmt.Sprintf("Dial Error: %v", err))
+			}
+			return s
+		}
+		defer conn.Close()
+	} else {
+		conn, err := tls.DialWithDialer(&net.Dialer{Timeout: time.Duration(s.Timeout) * time.Second}, s.Type, domain, tlsConfig)
+		if err != nil {
+			if record {
+				recordFailure(s, fmt.Sprintf("Dial Error: %v", err))
+			}
+			return s
+		}
+		defer conn.Close()
 	}
 
-	conn, err := tls.DialWithDialer(dialer, s.Type, domain, tlsConfig)
-	if err != nil {
-		if record {
-			recordFailure(s, fmt.Sprintf("Dial Error %v", err))
-		}
-		return s
-	}
-	if err := conn.Close(); err != nil {
-		if record {
-			recordFailure(s, fmt.Sprintf("%v Socket Close Error %v", strings.ToUpper(s.Type), err))
-		}
-		return s
-	}
 	t2 := utils.Now()
 	s.Latency = t2.Sub(t1).Microseconds()
 	s.LastResponse = ""
