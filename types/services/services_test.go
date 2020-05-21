@@ -399,10 +399,10 @@ func TestServices(t *testing.T) {
 		item, err := Find(1)
 		require.Nil(t, err)
 
-		count := item.HitsSince(utils.Now().Add(-30 * time.Second))
+		count := item.HitsSince(utils.Now().Add(-60 * time.Second))
 		assert.Equal(t, 1, count.Count())
 
-		count = item.HitsSince(utils.Now().Add(-180 * time.Second))
+		count = item.HitsSince(utils.Now().Add(-360 * time.Second))
 		assert.Equal(t, 3, count.Count())
 	})
 
@@ -432,7 +432,7 @@ func TestServices(t *testing.T) {
 		item, err := Find(1)
 		require.Nil(t, err)
 
-		count := item.FailuresSince(utils.Now().Add(-6 * time.Second))
+		count := item.FailuresSince(utils.Now().Add(-30 * time.Second))
 		assert.Equal(t, 1, count.Count())
 
 		count = item.FailuresSince(utils.Now().Add(-180 * time.Second))

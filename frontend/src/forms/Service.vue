@@ -271,9 +271,9 @@
                   notify_after: 2,
                   public: true,
                   use_tls: false,
-                tls_cert: "",
-                tls_cert_key: "",
-                tls_cert_root: "",
+                  tls_cert: "",
+                  tls_cert_key: "",
+                  tls_cert_root: "",
               },
               groups: [],
           }
@@ -284,11 +284,10 @@
           }
       },
       watch: {
-          in_service () {
-              this.service = this.in_service
-                if (this.service.tls_cert) {
-                  this.service.use_tls = true
-                }
+          in_service: function(n, o) {
+            if (this.service.tls_cert) {
+              this.service.use_tls = true
+            }
           }
       },
       async mounted () {
@@ -296,8 +295,9 @@
             const groups = await Api.groups()
             this.$store.commit('setGroups', groups)
           }
+          this.service = this.in_service
       },
-      methods: {
+    methods: {
           updatePermalink() {
               const a = 'àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;'
               const b = 'aaaaaaaaaacccddeeeeeeeegghiiiiiilmnnnnoooooooooprrsssssttuuuuuuuuuwxyyzzz------'
