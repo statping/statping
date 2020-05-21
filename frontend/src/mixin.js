@@ -20,6 +20,9 @@ export default Vue.mixin({
       return startOfToday()
     },
       secondsHumanize (val) {
+      if (!Number.isInteger(val)) {
+        return "0 seconds"
+      }
         const t2 = addSeconds(new Date(0), val)
           if (val >= 60) {
               let minword = "minute"

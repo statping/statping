@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="saveService">
+    <form v-if="service.type" @submit.prevent="saveService">
         <div class="card contain-card text-black-50 bg-white mb-4">
             <div class="card-header">Service Information</div>
             <div class="card-body">
@@ -65,7 +65,7 @@
         </div>
 
         <div class="card contain-card text-black-50 bg-white mb-4">
-            <div class="card-header">{{service.type.toUpperCase()}} Request Details</div>
+            <div class="card-header">Request Details</div>
             <div class="card-body">
 
             <div class="form-group row">
@@ -77,7 +77,7 @@
             </div>
 
             <div v-if="service.type.match(/^(tcp|udp|grpc)$/)" class="form-group row">
-                <label class="col-sm-4 col-form-label">{{service.type.toUpperCase()}} Port</label>
+                <label class="col-sm-4 col-form-label">Port</label>
                 <div class="col-sm-8">
                     <input v-model="service.port" type="number" name="port" class="form-control" id="service_port" placeholder="8080">
                 </div>
@@ -100,7 +100,7 @@
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Request Timeout</label>
             <div class="col-sm-8">
-                <span class="slider-info">{{secondsHumanize(service.timeout)}}</span>
+                <span v-if="service.timeout >= 0" class="slider-info">{{secondsHumanize(service.timeout)}}</span>
                 <input v-model="service.timeout" type="range" id="timeout" name="timeout" class="slider" min="1" max="180">
                 <small class="form-text text-muted">If the endpoint does not respond within this time it will be considered to be offline</small>
             </div>
@@ -159,15 +159,15 @@
         <div v-if="service.type.match(/^(tcp|http)$/)" class="form-group row">
             <label class="col-sm-4 col-form-label">Use TLS Certificate</label>
             <div class="col-8 mt-1">
-                <span @click="service.use_tls = !!service.use_tls" class="switch float-left">
-                    <input v-model="service.use_tls" type="checkbox" name="verify_ssl-option" class="switch" id="switch-use-tls" v-bind:checked="service.use_tls">
-                    <label for="switch-use-tls" v-if="service.use_tls">Custom TLS Certificates for mTLS services</label>
-                    <label for="switch-use-tls" v-if="!service.use_tls">Ignore TLS Certificates</label>
+                <span @click="use_tls = !!use_tls" class="switch float-left">
+                    <input v-model="use_tls" type="checkbox" name="verify_ssl-option" class="switch" id="switch-use-tls" v-bind:checked="use_tls">
+                    <label for="switch-use-tls" v-if="use_tls">Custom TLS Certificates for mTLS services</label>
+                    <label for="switch-use-tls" v-if="!use_tls">Ignore TLS Certificates</label>
                 </span>
             </div>
         </div>
 
-                <div v-if="service.use_tls" class="form-group row">
+                <div v-if="use_tls" class="form-group row">
                     <label for="service_tls_cert" class="col-sm-4 col-form-label">TLS Client Certificate</label>
                     <div class="col-sm-8">
                         <textarea v-model="service.tls_cert" name="tls_cert" class="form-control" id="service_tls_cert"></textarea>
@@ -175,7 +175,7 @@
                     </div>
                 </div>
 
-                <div v-if="service.use_tls" class="form-group row">
+                <div v-if="use_tls" class="form-group row">
                     <label for="service_tls_cert_key" class="col-sm-4 col-form-label">TLS Client Key</label>
                     <div class="col-sm-8">
                         <textarea v-model="service.tls_cert_key" name="tls_cert_key" class="form-control" id="service_tls_cert_key"></textarea>
@@ -183,7 +183,7 @@
                     </div>
                 </div>
 
-                <div v-if="service.use_tls" class="form-group row">
+                <div v-if="use_tls" class="form-group row">
                     <label for="service_tls_cert_chain" class="col-sm-4 col-form-label">Root CA</label>
                     <div class="col-sm-8">
                         <textarea v-model="service.tls_cert_root" name="tls_cert_key" class="form-control" id="service_tls_cert_chain"></textarea>
@@ -270,11 +270,11 @@
                   notify_all_changes: true,
                   notify_after: 2,
                   public: true,
-                  use_tls: false,
                   tls_cert: "",
                   tls_cert_key: "",
                   tls_cert_root: "",
               },
+              use_tls: false,
               groups: [],
           }
       },
@@ -284,10 +284,9 @@
           }
       },
       watch: {
-          in_service: function(n, o) {
-            if (this.service.tls_cert) {
-              this.service.use_tls = true
-            }
+          in_service: function(svr) {
+            this.service = svr
+            this.use_tls = svr.tls_cert
           }
       },
       async mounted () {
@@ -295,9 +294,18 @@
             const groups = await Api.groups()
             this.$store.commit('setGroups', groups)
           }
-          this.service = this.in_service
+        this.update()
       },
+    created () {
+        this.update()
+    },
     methods: {
+        update() {
+          if (this.in_service) {
+            this.service = this.in_service
+          }
+          this.use_tls = this.service.tls_cert
+        },
           updatePermalink() {
               const a = 'àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;'
               const b = 'aaaaaaaaaacccddeeeeeeeegghiiiiiilmnnnnoooooooooprrsssssttuuuuuuuuuwxyyzzz------'
@@ -331,7 +339,6 @@
               delete s.last_success
               delete s.latency
               delete s.online_24_hours
-              delete s.use_tls
               s.check_interval = parseInt(s.check_interval)
               s.timeout = parseInt(s.timeout)
               s.port = parseInt(s.port)

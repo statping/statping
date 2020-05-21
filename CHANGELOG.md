@@ -1,5 +1,5 @@
 # 0.90.43 (05-21-2020)
-- Fixed service form loading
+- Fixed service TLS checkbox form for edit and create
 
 # 0.90.42 (05-20-2020)
 - Fixed TCP services that dont use TLS.
