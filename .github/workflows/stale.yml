@@ -15,4 +15,4 @@ jobs:
         stale-issue-label: "stale"
         days-before-stale: 30
         days-before-close: 7
-        exempt-issue-labels: "bug,urgent,feature,pinned,locked"
+        exempt-issue-label: "bug,urgent,feature,pinned,locked"
