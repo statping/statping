@@ -2,7 +2,10 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"os/exec"
+	"strings"
 )
 
 func DirWritable(path string) (bool, error) {
@@ -19,14 +22,6 @@ func DirWritable(path string) (bool, error) {
 		return false, errors.New("write permission bit is not set on this file for user")
 	}
 
-	var stat syscall.Stat_t
-	if err = syscall.Stat(path, &stat); err != nil {
-		return false, errors.New("unable to get stat")
-	}
-
-	if uint32(os.Geteuid()) != stat.Uid {
-		return false, errors.New("user doesn't have permission to write to this directory")
-	}
 	return true, nil
 }
 

@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 )
 
 func DirWritable(path string) (bool, error) {
@@ -24,6 +25,14 @@ func DirWritable(path string) (bool, error) {
 		return false, errors.New("write permission bit is not set on this file for user")
 	}
 
+	var stat syscall.Stat_t
+	if err = syscall.Stat(path, &stat); err != nil {
+		return false, errors.New("unable to get stat")
+	}
+
+	if uint32(os.Geteuid()) != stat.Uid {
+		return false, errors.New("user doesn't have permission to write to this directory")
+	}
 	return true, nil
 }
 
@@ -36,7 +45,10 @@ func Ping(address string, secondsTimeout int) error {
 	if err != nil {
 		return err
 	}
-	if strings.Contains(out, "Destination Host Unreachable") {
+	if strings.Contains(out, "Unknown host") {
+		return errors.New("unknown host")
+	}
+	if strings.Contains(out, "100.0% packet loss") {
 		return errors.New("destination host unreachable")
 	}
 	return nil
