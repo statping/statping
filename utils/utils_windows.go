@@ -30,7 +30,7 @@ func Ping(address string, secondsTimeout int) error {
 	if err != nil {
 		return err
 	}
-	out, _, err := Command(ping, address, "-n 1", fmt.Sprintf("-w %v", timeout*1000))
+	out, _, err := Command(ping, address, "-n 1", fmt.Sprintf("-w %v", secondsTimeout*1000))
 	if err != nil {
 		return err
 	}
