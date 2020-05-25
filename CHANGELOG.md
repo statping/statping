@@ -1,5 +1,6 @@
 # 0.90.43 (05-21-2020)
 - Fixed service TLS checkbox form for edit and create
+- Modified ICMP ping's to use system's "ping" command (doesn't need root access)
 
 # 0.90.42 (05-20-2020)
 - Fixed TCP services that dont use TLS.
