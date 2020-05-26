@@ -3,9 +3,13 @@ package messages
 import (
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/errors"
+	"github.com/statping/statping/utils"
 )
 
-var db database.Database
+var (
+	db  database.Database
+	log = utils.Log.WithField("type", "message")
+)
 
 func SetDB(database database.Database) {
 	db = database.Model(&Message{})

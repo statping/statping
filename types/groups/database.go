@@ -3,10 +3,14 @@ package groups
 import (
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/errors"
+	"github.com/statping/statping/utils"
 	"sort"
 )
 
-var db database.Database
+var (
+	db  database.Database
+	log = utils.Log.WithField("type", "group")
+)
 
 func SetDB(database database.Database) {
 	db = database.Model(&Group{})

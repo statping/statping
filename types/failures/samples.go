@@ -9,10 +9,11 @@ import (
 )
 
 var (
-	log = utils.Log
+	log = utils.Log.WithField("type", "failure")
 )
 
 func Samples() error {
+	log.Infoln("Inserting Sample Service Failures...")
 	createdAt := utils.Now().Add(-3 * types.Day)
 
 	for i := int64(1); i <= 4; i++ {

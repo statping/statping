@@ -5,6 +5,7 @@ import (
 )
 
 func Samples() error {
+	log.Infoln("Inserting Sample Messages...")
 	m1 := &Message{
 		Title:       "Routine Downtime",
 		Description: "This is an example a upcoming message for a service!",

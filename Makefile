@@ -162,13 +162,13 @@ build-win:
 		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-386/statping.exe ./cmd
 
 build-darwin:
-	GO111MODULE="on" GOOS=darwin GOARCH=amd64 go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-amd64/statping --tags "darwin" ./cmd
+	GO111MODULE="on" GOOS=darwin GOARCH=amd64 go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-amd64/statping --tags "netgo darwin" ./cmd
 
 build-linux:
 	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=amd64 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "linux" ./cmd
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "netgo linux" ./cmd
 	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=386 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "linux" ./cmd
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "netgo linux" ./cmd
 
 build-linux-arm:
 	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc-6 CXX=arm-linux-gnueabihf-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=7 \

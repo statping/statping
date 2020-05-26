@@ -5,6 +5,7 @@ import (
 )
 
 func Samples() error {
+	log.Infoln("Inserting Sample Users...")
 	u2 := &User{
 		Username: "testadmin",
 		Password: "password123",

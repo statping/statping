@@ -1,3 +1,6 @@
+# 0.90.44 (05-25-2020)
+- Modified Makefile to include "netgo" tag during golang build
+
 # 0.90.43 (05-21-2020)
 - Fixed service TLS checkbox form for edit and create
 - Modified ICMP ping's to use system's "ping" command (doesn't need root access)

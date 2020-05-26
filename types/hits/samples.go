@@ -14,6 +14,7 @@ import (
 var SampleHits = 99900.
 
 func Samples() error {
+	log.Infoln("Inserting Sample Service Hits...")
 	for i := int64(1); i <= 5; i++ {
 		records := createHitsAt(i)
 		if err := gormbulk.BulkInsert(db.GormDB(), records, db.ChunkSize()); err != nil {

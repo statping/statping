@@ -6,6 +6,7 @@ import (
 )
 
 func Samples() error {
+	log.Infoln("Inserting Sample Checkins...")
 	checkin1 := &Checkin{
 		Name:        "Demo Checkin 1",
 		ServiceId:   1,
@@ -31,6 +32,7 @@ func Samples() error {
 }
 
 func SamplesChkHits() error {
+	log.Infoln("Inserting Sample Checkins Hits...")
 	checkTime := utils.Now().Add(-3 * time.Minute)
 
 	for i := int64(1); i <= 2; i++ {
