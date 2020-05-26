@@ -9,6 +9,7 @@ COPY --from=base /usr/local/bin/sass /usr/local/bin/
 COPY --from=base /usr/local/share/ca-certificates /usr/local/share/
 
 WORKDIR /app
+VOLUME /app
 
 ENV IS_DOCKER=true
 ENV SASS=/usr/local/bin/sass
