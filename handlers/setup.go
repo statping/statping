@@ -140,7 +140,7 @@ func registerNews(email, domain string) error {
 	v.Set("timezone", "UTC")
 	rb := strings.NewReader(v.Encode())
 
-	_, _, err := utils.HttpRequest("https://news.statping.com", "POST", nil, nil, rb, 10*time.Second, true, nil)
+	_, _, err := utils.HttpRequest("https://news.statping.com/new", "POST", nil, nil, rb, 10*time.Second, true, nil)
 	if err != nil {
 		return err
 	}
