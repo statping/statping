@@ -71,6 +71,22 @@
                             <input @keyup="canSubmit" v-model="setup.confirm_password" id="password_confirm" type="password" class="form-control" placeholder="password" required>
                         </div>
 
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-8">
+                                    <label>Email Address</label>
+                                    <input @keyup="canSubmit" v-model="setup.email" id="email" type="text" class="form-control" placeholder="myemail@domain.com">
+                                </div>
+                                <div class="col-4">
+                                    <label class="d-none d-sm-block">Newsletter</label>
+                                    <span @click="setup.newsletter = !!setup.newsletter" class="switch">
+                                      <input v-model="setup.newsletter" type="checkbox" name="using_cdn" class="switch" id="send_newsletter" :checked="setup.newsletter">
+                                      <label for="send_newsletter"></label>
+                                    </span>
+                                </div>
+                            </div>
+                            <small>We will not share your email, emails are only for major updates.</small>
+                        </div>
                     </div>
 
                     <div v-if="error" class="col-12 alert alert-danger">
@@ -111,7 +127,9 @@
         username: "",
         password: "",
         confirm_password: "",
-        sample_data: true
+        sample_data: true,
+        newsletter: true,
+        email: "",
       }
     }
   },
