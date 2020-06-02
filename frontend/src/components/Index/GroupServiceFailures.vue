@@ -6,11 +6,11 @@
             </div>
         </div>
         <div class="row mt-2">
-            <div class="col-4 text-left font-2 text-muted">30 Days Ago</div>
-            <div class="col-4 text-center font-2" :class="{'text-muted': service.online, 'text-danger': !service.online}">
+            <div class="col-3 text-left font-2 text-muted">30 Days Ago</div>
+            <div class="col-6 text-center font-2" :class="{'text-muted': service.online, 'text-danger': !service.online}">
                {{service_txt}}
             </div>
-            <div class="col-4 text-right font-2 text-muted">Today</div>
+            <div class="col-3 text-right font-2 text-muted">Today</div>
         </div>
     </div>
 </template>
@@ -36,14 +36,7 @@ export default {
   },
   computed: {
     service_txt() {
-      const s = this.service
-      if (!s.online) {
-        if (!this.toUnix(this.parseISO(s.last_success))) {
-          return `Always Offline`
-        }
-        return `Offline for ${this.ago(s.last_success)}`
-      }
-      return `${this.service.online_24_hours}% Uptime`
+      return this.smallText(this.service)
     }
   },
     mounted () {

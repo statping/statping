@@ -29,10 +29,6 @@ type oAuth struct {
 func oauthHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	provider := vars["provider"]
-	code := r.URL.Query().Get("code")
-	fmt.Println("code: ", code)
-	fmt.Println("client: ", core.App.OAuth.SlackClientID)
-	fmt.Println("secret: ", core.App.OAuth.SlackClientSecret)
 
 	var err error
 	var oauth *oAuth

@@ -50,6 +50,7 @@ func (c *Core) Create() error {
 		ApiSecret:   secret,
 		Version:     App.Version,
 		Domain:      c.Domain,
+		Language:    "en",
 		MigrationId: utils.Now().Unix(),
 	}
 	q := db.Create(&newCore)

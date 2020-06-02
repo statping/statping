@@ -6,7 +6,6 @@
 </template>
 
 <script>
-  import Api from './API';
   import Footer from "./components/Index/Footer";
 
   export default {
@@ -27,6 +26,9 @@
       },
   async beforeMount() {
     await this.$store.dispatch('loadCore')
+
+    this.$i18n.locale = this.core.language || "en";
+    // this.$i18n.locale = "ru";
 
       if (!this.core.setup) {
         this.$router.push('/setup')
