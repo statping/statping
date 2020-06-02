@@ -1,3 +1,6 @@
+# 0.90.45 (06-01-2020)
+- Merged PR [#612](https://github.com/statping/statping/pull/612) for edit/create service issue.
+
 # 0.90.44 (05-25-2020)
 - Modified Makefile to include "netgo" tag during golang build
 
