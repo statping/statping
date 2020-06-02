@@ -9,6 +9,9 @@ import (
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -29,6 +32,8 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	project := r.PostForm.Get("project")
 	description := r.PostForm.Get("description")
 	domain := r.PostForm.Get("domain")
+	newsletter := r.PostForm.Get("newsletter")
+	sendNews, _ := strconv.ParseBool(newsletter)
 
 	log.WithFields(utils.ToFields(core.App, confgs)).Debugln("new configs posted")
 
@@ -96,6 +101,13 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	core.App = c
 
+	if sendNews {
+		log.Infof("Sending email address %s to newsletter server", confgs.Email)
+		if err := registerNews(confgs.Email, confgs.Domain); err != nil {
+			log.Errorln(err)
+		}
+	}
+
 	log.Infoln("Initializing new Statping instance")
 
 	if _, err := services.SelectAllServices(true); err != nil {
@@ -110,7 +122,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	CacheStorage.Delete("/")
 	resetCookies()
-	time.Sleep(1 * time.Second)
+	time.Sleep(2 * time.Second)
 	out := struct {
 		Message string            `json:"message"`
 		Config  *configs.DbConfig `json:"config"`
@@ -119,4 +131,17 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		confgs,
 	}
 	returnJson(out, w, r)
+}
+
+func registerNews(email, domain string) error {
+	v := url.Values{}
+	v.Set("email", email)
+	v.Set("domain", domain)
+	v.Set("timezone", "UTC")
+	rb := strings.NewReader(v.Encode())
+	resp, err := http.Post("https://news.statping.com/new", "application/x-www-form-urlencoded", rb)
+	if err != nil {
+		return err
+	}
+	return resp.Body.Close()
 }
