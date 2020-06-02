@@ -102,7 +102,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	core.App = c
 
 	if sendNews {
-		log.Infoln("Sending email address to newsletter server")
+		log.Infof("Sending email address %s to newsletter server", confgs.Email)
 		if err := registerNews(confgs.Email, confgs.Domain); err != nil {
 			log.Errorln(err)
 		}
@@ -122,7 +122,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	CacheStorage.Delete("/")
 	resetCookies()
-	time.Sleep(1 * time.Second)
+	time.Sleep(2 * time.Second)
 	out := struct {
 		Message string            `json:"message"`
 		Config  *configs.DbConfig `json:"config"`
@@ -139,10 +139,9 @@ func registerNews(email, domain string) error {
 	v.Set("domain", domain)
 	v.Set("timezone", "UTC")
 	rb := strings.NewReader(v.Encode())
-
-	_, _, err := utils.HttpRequest("https://news.statping.com/new", "POST", nil, nil, rb, 10*time.Second, true, nil)
+	resp, err := http.Post("https://news.statping.com/new", "application/x-www-form-urlencoded", rb)
 	if err != nil {
 		return err
 	}
-	return nil
+	return resp.Body.Close()
 }
