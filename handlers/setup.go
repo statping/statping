@@ -90,6 +90,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:   utils.Now(),
 		UseCdn:      null.NewNullBool(false),
 		Footer:      null.NewNullString(""),
+		Language:    confgs.Language,
 	}
 
 	log.Infoln("Creating new Core")
