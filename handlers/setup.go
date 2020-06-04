@@ -90,6 +90,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:   utils.Now(),
 		UseCdn:      null.NewNullBool(false),
 		Footer:      null.NewNullString(""),
+		Language:    confgs.Language,
 	}
 
 	log.Infoln("Creating new Core")
@@ -134,6 +135,9 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func registerNews(email, domain string) error {
+	if email == "" {
+		return nil
+	}
 	v := url.Values{}
 	v.Set("email", email)
 	v.Set("domain", domain)

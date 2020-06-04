@@ -56,6 +56,7 @@ func setDefaults() {
 	Params.SetDefault("DESCRIPTION", "This status page has sample data included")
 	Params.SetDefault("REMOVE_AFTER", 2160*time.Hour)
 	Params.SetDefault("CLEANUP_INTERVAL", 1*time.Hour)
+	Params.SetDefault("LANGUAGE", "en")
 
 	dbConn := Params.GetString("DB_CONN")
 	dbInt := Params.GetInt("DB_PORT")

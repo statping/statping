@@ -223,18 +223,6 @@ export default {
             this.stats.low_ping.chart = pingData.chart;
             this.stats.low_ping.value = this.humanTime(pingData.low);
         },
-        smallText(s) {
-          const incidents = s.incidents
-            if (s.online) {
-                return `Checked ${this.ago(s.last_success)} ago`
-            } else {
-                const last = s.last_failure
-                if (last) {
-                    return `Offline, last error: ${last} ${this.ago(last.created_at)}`
-                }
-                return `Service has been offline for ${this.ago(s.last_success)}`
-            }
-        },
         visibleChart(isVisible, entry) {
                 if (isVisible && !this.visible) {
                     this.visible = true

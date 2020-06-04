@@ -54,10 +54,13 @@
 
             <div class="form-group row">
                 <label for="service_interval" class="col-sm-4 col-form-label">Check Interval</label>
-                <div class="col-sm-8">
+                <div class="col-sm-6">
                     <span class="slider-info">{{secondsHumanize(service.check_interval)}}</span>
-                    <input v-model="service.check_interval" type="range" class="slider" id="service_interval" min="1" max="1800" :step="stepVal(service.check_interval)">
+                    <input v-model="service.check_interval" type="range" class="slider" id="service_interval" min="1" max="1800" :step="1">
                     <small id="interval" class="form-text text-muted">Interval to check your service state</small>
+                </div>
+                <div class="col-sm-2">
+                    <input v-model="service.check_interval" type="text" name="check_interval" class="form-control">
                 </div>
             </div>
 
@@ -99,11 +102,16 @@
 
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Request Timeout</label>
-            <div class="col-sm-8">
+            <div class="col-sm-6">
                 <span v-if="service.timeout >= 0" class="slider-info">{{secondsHumanize(service.timeout)}}</span>
                 <input v-model="service.timeout" type="range" id="timeout" name="timeout" class="slider" min="1" max="180">
                 <small class="form-text text-muted">If the endpoint does not respond within this time it will be considered to be offline</small>
             </div>
+
+            <div class="col-sm-2">
+                <input v-model="service.timeout" type="text" name="service_timeout" class="form-control">
+            </div>
+
         </div>
 
         <div v-if="service.type.match(/^(http)$/) && service.method.match(/^(POST|PATCH|DELETE|PUT)$/)" class="form-group row">

@@ -31,6 +31,18 @@
             <small class="form-text text-muted">HTML is allowed inside the footer</small>
         </div>
 
+        <div class="form-group">
+            <label>Language</label>
+            <select v-model="core.language" class="form-control">
+                <option value="en">English</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                <option value="ru">Russian</option>
+                <option value="de">German</option>
+            </select>
+            <small class="form-text text-muted">HTML is allowed inside the footer</small>
+        </div>
+
         <div class="form-group row mt-3">
             <label class="col-sm-10 col-form-label">Enable Error Reporting</label>
             <div class="col-sm-2 float-right">
