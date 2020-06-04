@@ -1,5 +1,5 @@
 import Vue from "vue";
-const { zonedTimeToUtc, utcToZonedTime, startOfToday, lastDayOfMonth, subSeconds, parse, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance } = require('date-fns')
+const { startOfToday, lastDayOfMonth, subSeconds, getUnixTime, fromUnixTime, formatDistance, isWithinInterval } = require('date-fns')
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import format from 'date-fns/format'
 import parseISO from 'date-fns/parseISO'
@@ -28,9 +28,9 @@ export default Vue.mixin({
     ago(t1) {
       return formatDistanceToNow(parseISO(t1))
     },
-      daysInMonth(t1) {
-          return lastDayOfMonth(t1)
-      },
+    daysInMonth(t1) {
+        return lastDayOfMonth(t1)
+    },
     nowSubtract(seconds) {
       return subSeconds(new Date(), seconds)
     },
@@ -70,14 +70,17 @@ export default Vue.mixin({
     fromUnix(val) {
       return fromUnixTime(val)
     },
-    isBetween(t1, t2) {
-      return differenceInSeconds(parseISO(t1), parseISO(t2)) >= 0
+    isBetween(t, start, end) {
+      return isWithinInterval(t, {start: parseISO(start), end: parseISO(end)})
     },
     hour() {
       return 3600
     },
     day() {
       return 3600 * 24
+    },
+    maxDate() {
+      return new Date(8640000000000000)
     },
     copy(txt) {
       this.$copyText(txt).then(function (e) {
@@ -159,12 +162,12 @@ export default Vue.mixin({
       })
       return {data: newSet}
     },
-      humanTime(val) {
-        if (val >= 10000) {
-            return Math.floor(val / 10000) + "ms"
-        }
-          return Math.floor(val / 1000) + "μs"
-      },
+    humanTime(val) {
+      if (val >= 10000) {
+          return Math.floor(val / 10000) + "ms"
+      }
+        return Math.floor(val / 1000) + "μs"
+    },
     lastDayOfMonth(month) {
       return new Date(Date.UTC(new Date().getUTCFullYear(), month + 1, 0))
     },
