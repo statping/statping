@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/ararog/timeago"
@@ -129,14 +130,18 @@ func Command(name string, args ...string) (string, string, error) {
 		return "", "", err
 	}
 
+	var wg sync.WaitGroup
+
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		stdout, errStdout = copyAndCapture(os.Stdout, stdoutIn)
 	}()
 
-	go func() {
-		stderr, errStderr = copyAndCapture(os.Stderr, stderrIn)
-	}()
+	stderr, errStderr = copyAndCapture(os.Stderr, stderrIn)
 
+	// call testCmd.Wait() only after reads from all pipes have completed
+	wg.Wait()
 	err = testCmd.Wait()
 	if err != nil {
 		return string(stdout), string(stderr), err
