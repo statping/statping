@@ -25,15 +25,15 @@
         </div>
     </form>
 
-        <a v-if="oauth.gh_client_id" @click.prevent="GHlogin" href="#" class="btn btn-block btn-outline-dark">
+        <a v-if="oauth && oauth.gh_client_id" @click.prevent="GHlogin" href="#" class="btn btn-block btn-outline-dark">
             <font-awesome-icon :icon="['fab', 'github']" /> Login with Github
         </a>
 
-        <a v-if="oauth.slack_client_id" @click.prevent="Slacklogin" href="#" class="btn btn-block btn-outline-dark">
+        <a v-if="oauth && oauth.slack_client_id" @click.prevent="Slacklogin" href="#" class="btn btn-block btn-outline-dark">
             <font-awesome-icon :icon="['fab', 'slack']" /> Login with Slack
         </a>
 
-        <a v-if="oauth.google_client_id" @click.prevent="Googlelogin" href="#" class="btn btn-block btn-outline-dark">
+        <a v-if="oauth && oauth.google_client_id" @click.prevent="Googlelogin" href="#" class="btn btn-block btn-outline-dark">
             <font-awesome-icon :icon="['fab', 'google']" /> Login with Google
         </a>
 
