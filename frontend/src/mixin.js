@@ -1,5 +1,5 @@
 import Vue from "vue";
-const { startOfToday, lastDayOfMonth, subSeconds, getUnixTime, fromUnixTime, formatDistance, isWithinInterval } = require('date-fns')
+const { startOfToday, startOfMonth, lastDayOfMonth, subSeconds, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance, addMonths, isWithinInterval } = require('date-fns')
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import format from 'date-fns/format'
 import parseISO from 'date-fns/parseISO'
@@ -168,11 +168,14 @@ export default Vue.mixin({
       }
         return Math.floor(val / 1000) + "μs"
     },
-    lastDayOfMonth(month) {
-      return new Date(Date.UTC(new Date().getUTCFullYear(), month + 1, 0))
+    firstDayOfMonth(date) {
+      return startOfMonth(date)
     },
-    firstDayOfMonth(month) {
-      return new Date(Date.UTC(new Date().getUTCFullYear(), month, 1)).getUTCDate()
+    lastDayOfMonth(month) {
+      return lastDayOfMonth(date)
+    },
+    addMonths(date, amount) {
+      return addMonths(date, amount)
     }
   }
 });
