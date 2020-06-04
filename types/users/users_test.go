@@ -3,6 +3,7 @@ package users
 import (
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -16,6 +17,8 @@ var example = &User{
 }
 
 func TestInit(t *testing.T) {
+	err := utils.InitLogs()
+	require.Nil(t, err)
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.CreateTable(&User{})

@@ -146,6 +146,7 @@ func createLog(dir string) error {
 
 // InitLogs will create the '/logs' directory and creates a file '/logs/statup.log' for application logging
 func InitLogs() error {
+	initCLI()
 	if Params.GetBool("DISABLE_LOGS") {
 		return nil
 	}
@@ -154,9 +155,9 @@ func InitLogs() error {
 	}
 	ljLogger = &lumberjack.Logger{
 		Filename:   Directory + logFilePath,
-		MaxSize:    16,
-		MaxBackups: 5,
-		MaxAge:     28,
+		MaxSize:    Params.GetInt("LOGS_MAX_SIZE"),
+		MaxBackups: Params.GetInt("LOGS_MAX_COUNT"),
+		MaxAge:     Params.GetInt("LOGS_MAX_AGE"),
 	}
 
 	mw := io.MultiWriter(os.Stdout, ljLogger)

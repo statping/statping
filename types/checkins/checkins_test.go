@@ -34,6 +34,8 @@ var testCheckinHits = []*CheckinHit{{
 var testApiKey string
 
 func TestInit(t *testing.T) {
+	err := utils.InitLogs()
+	require.Nil(t, err)
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&Checkin{}, &CheckinHit{}, &failures.Failure{})

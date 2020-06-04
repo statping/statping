@@ -14,7 +14,7 @@ var (
 )
 
 func init() {
-	utils.InitCLI()
+	utils.InitLogs()
 }
 
 func TestStatpingDirectory(t *testing.T) {

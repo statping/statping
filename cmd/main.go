@@ -35,7 +35,7 @@ func init() {
 	rootCmd.AddCommand(onceCmd)
 	rootCmd.AddCommand(envCmd)
 	rootCmd.AddCommand(resetCmd)
-	utils.InitCLI()
+	utils.InitLogs()
 	parseFlags(rootCmd)
 }
 

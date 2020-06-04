@@ -93,6 +93,9 @@ func (s *exampleGRPC) GetFeature(ctx context.Context, point *pb.Point) (*pb.Feat
 }
 
 func TestStartExampleEndpoints(t *testing.T) {
+	err := utils.InitLogs()
+	require.Nil(t, err)
+
 	// root CA for Linux:  /etc/ssl/certs/ca-certificates.crt
 	// root CA for MacOSX: /opt/local/share/curl/curl-ca-bundle.crt
 

@@ -12,7 +12,7 @@ var (
 	configLog = Log.WithField("type", "configs")
 )
 
-func InitCLI() {
+func initCLI() {
 	Params = viper.New()
 	Params.AutomaticEnv()
 	setDefaults()
@@ -43,6 +43,7 @@ func InitCLI() {
 }
 
 func setDefaults() {
+	var err error
 	defaultDir, err := os.Getwd()
 	if err != nil {
 		configLog.Errorln(err)
@@ -69,6 +70,9 @@ func setDefaults() {
 	Params.SetDefault("REMOVE_AFTER", 2160*time.Hour)
 	Params.SetDefault("CLEANUP_INTERVAL", 1*time.Hour)
 	Params.SetDefault("LANGUAGE", "en")
+	Params.SetDefault("LOGS_MAX_COUNT", 5)
+	Params.SetDefault("LOGS_MAX_AGE", 28)
+	Params.SetDefault("LOGS_MAX_SIZE", 16)
 
 	dbConn := Params.GetString("DB_CONN")
 	dbInt := Params.GetInt("DB_PORT")

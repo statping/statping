@@ -1,9 +1,14 @@
 package configs
 
 import (
+	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
+
+func init() {
+	utils.InitLogs()
+}
 
 func TestSQLiteConfig(t *testing.T) {
 	sqlite := &DbConfig{

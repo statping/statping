@@ -126,6 +126,11 @@
 									"key": "sample_data",
 									"value": "true",
 									"type": "text"
+								},
+								{
+									"key": "newletter",
+									"value": "true",
+									"type": "text"
 								}
 							],
 							"options": {
@@ -256,6 +261,121 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"admin\": false,\n    \"allow_reports\": false,\n    \"created_at\": \"2020-05-02T01:00:07.885973685Z\",\n    \"description\": \"This data is only used to testing\",\n    \"domain\": \"http://localhost:8080\",\n    \"footer\": null,\n    \"logged_in\": false,\n    \"migration_id\": 1588381207,\n    \"name\": \"Statping Sample Data\",\n    \"setup\": true,\n    \"started_on\": \"2020-05-02T01:00:14.255837864Z\",\n    \"updated_at\": \"2020-05-02T01:00:12.731269305Z\",\n    \"using_cdn\": false,\n    \"version\": \"0.90.34\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Newletter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7caef526-8b4b-4dbe-a36c-98ce06c77309",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "example@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "domain",
+									"value": "http://localhost:8080",
+									"type": "text"
+								},
+								{
+									"key": "timezone",
+									"value": "PST",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://news.statping.com/new",
+							"protocol": "https",
+							"host": [
+								"news",
+								"statping",
+								"com"
+							],
+							"path": [
+								"new"
+							]
+						},
+						"description": "The API endpoint for users to add their email to the Statping newsletter."
+					},
+					"response": [
+						{
+							"name": "Newletter",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "email",
+											"value": "example@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "domain",
+											"value": "http://localhost:8080",
+											"type": "text"
+										},
+										{
+											"key": "timezone",
+											"value": "PST",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://news.statping.com/new",
+									"protocol": "https",
+									"host": [
+										"news",
+										"statping",
+										"com"
+									],
+									"path": [
+										"new"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "27"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 29 May 2020 22:01:45 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"id\": \"Q21FaAQvH\"\n    }\n}"
 						}
 					]
 				},

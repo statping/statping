@@ -25,6 +25,9 @@ func TestReplaceValue(t *testing.T) {
 
 func TestInitLogs(t *testing.T) {
 	assert.Nil(t, InitLogs())
+	require.NotEmpty(t, Params.GetString("STATPING_DIR"))
+	require.False(t, Params.GetBool("DISABLE_LOGS"))
+
 	Log.Infoln("this is a test")
 	assert.FileExists(t, Directory+"/logs/statping.log")
 }
@@ -182,7 +185,7 @@ func TestHttpRequest(t *testing.T) {
 }
 
 func TestConfigLoad(t *testing.T) {
-	InitCLI()
+	initCLI()
 	setDefaults()
 
 	s := Params.GetString
