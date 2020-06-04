@@ -24,21 +24,6 @@ var (
 	disableLogs bool
 )
 
-// init will set the utils.Directory to the current running directory, or STATPING_DIR if it is set
-func init() {
-	InitCLI()
-	// check if logs are disabled
-	disableLogs = Params.GetBool("DISABLE_LOGS")
-	if disableLogs {
-		Log.Out = ioutil.Discard
-	}
-
-	Log.Debugln("current working directory: ", Directory)
-	Log.AddHook(new(hook))
-	Log.SetNoLock()
-	checkVerboseMode()
-}
-
 type env struct {
 	data interface{}
 }

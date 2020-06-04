@@ -8,7 +8,7 @@ const english = {
     project_description: "Project Description",
     domain: "Domain URL",
     username: "Admin Username",
-    password: "Admin Username",
+    password: "Admin Password",
     password_confirm: "Confirm Admin Username",
     newsletter: "Newsletter",
     newsletter_note: "We will not share your email, emails are only for major updates.",

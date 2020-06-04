@@ -2,6 +2,7 @@ package utils
 
 import (
 	"github.com/spf13/viper"
+	"io/ioutil"
 	"os"
 	"time"
 )
@@ -28,6 +29,17 @@ func InitCLI() {
 	Params.ReadInConfig()
 
 	Params.Set("VERSION", version)
+
+	// check if logs are disabled
+	disableLogs = Params.GetBool("DISABLE_LOGS")
+	if disableLogs {
+		Log.Out = ioutil.Discard
+	}
+
+	Log.Debugln("current working directory: ", Directory)
+	Log.AddHook(new(hook))
+	Log.SetNoLock()
+	checkVerboseMode()
 }
 
 func setDefaults() {

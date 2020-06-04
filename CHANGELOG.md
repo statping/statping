@@ -1,3 +1,9 @@
+# 0.90.46 (06-04-2020)
+- Add i18n language translations for frontend
+- Added PR for heatmap https://github.com/statping/statping/pull/589
+- Added Statping newsletter option during /setup mode
+- Fix for disabling logs with `DISABLE_LOGS` env
+
 # 0.90.45 (06-01-2020)
 - Merged PR [#612](https://github.com/statping/statping/pull/612) for edit/create service issue.
 

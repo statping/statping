@@ -8,6 +8,7 @@ import (
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/utils"
 	"net/http"
+	"net/http/pprof"
 )
 
 var (
@@ -29,7 +30,6 @@ func Router() *mux.Router {
 
 	authUser := utils.Params.GetString("AUTH_USERNAME")
 	authPass := utils.Params.GetString("AUTH_PASSWORD")
-
 	if authUser != "" && authPass != "" {
 		r.Use(basicAuthHandler)
 	}
@@ -45,7 +45,22 @@ func Router() *mux.Router {
 		r.Handle("/", sentryHandler.Handle(http.HandlerFunc(indexHandler)))
 	}
 
-	r.Use(sendLog)
+	if !utils.Params.GetBool("DISABLE_LOGS") {
+		r.Use(sendLog)
+	}
+
+	if utils.Params.GetString("GO_ENV") == "test" {
+		go func() {
+			log.Infoln("Starting pprof web server on http://0.0.0.0:9090")
+			r := http.NewServeMux()
+			r.HandleFunc("/debug/pprof/", pprof.Index)
+			r.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+			r.HandleFunc("/debug/pprof/profile", pprof.Profile)
+			r.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+			r.HandleFunc("/debug/pprof/trace", pprof.Trace)
+			http.ListenAndServe(":9090", r)
+		}()
+	}
 
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
