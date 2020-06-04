@@ -1,7 +1,6 @@
 package notifiers
 
 import (
-	"fmt"
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
@@ -55,17 +54,6 @@ func TestEmailNotifier(t *testing.T) {
 		Add(email)
 		assert.Equal(t, "Hunter Long", email.Author)
 		assert.Equal(t, EMAIL_HOST, email.Host)
-
-		testEmail = &emailOutgoing{
-			To:       email.GetValue("var2"),
-			Subject:  fmt.Sprintf("Service %v is Failing", exampleService.Name),
-			Template: mainEmailTemplate,
-			Data: replacer{
-				Service: exampleService,
-				Failure: exampleFailure,
-			},
-			From: email.GetValue("var1"),
-		}
 	})
 
 	t.Run("email Within Limits", func(t *testing.T) {

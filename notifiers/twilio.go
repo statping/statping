@@ -62,7 +62,7 @@ var Twilio = &twilio{&notifications.Notification{
 
 // Send will send a HTTP Post to the Twilio SMS API. It accepts type: string
 func (t *twilio) sendMessage(message string) (string, error) {
-	twilioUrl := fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%v/Messages.json", t.ApiKey)
+	twilioUrl := fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%s/Messages.json", t.ApiKey)
 
 	v := url.Values{}
 	v.Set("To", "+"+t.Var1)
@@ -76,7 +76,10 @@ func (t *twilio) sendMessage(message string) (string, error) {
 	success, _ := twilioSuccess(contents)
 	if !success {
 		errorOut := twilioError(contents)
-		out := fmt.Sprintf("Error code %v - %v", errorOut.Code, errorOut.Message)
+		if errorOut.Code == 0 {
+			return string(contents), nil
+		}
+		out := fmt.Sprintf("Error code %v - %s", errorOut.Code, errorOut.Message)
 		return string(contents), errors.New(out)
 	}
 	return string(contents), err
