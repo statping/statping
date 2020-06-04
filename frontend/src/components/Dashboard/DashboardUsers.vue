@@ -67,6 +67,8 @@
       this.edit = v
     },
     editUser(u, mode) {
+      delete(u.password)
+      delete(u.confirm_password)
       this.user = u
       this.edit = !mode
     },

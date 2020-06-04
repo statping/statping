@@ -18,7 +18,7 @@ services:
       DOMAIN: http://localhost:8080
       DESCRIPTION: This is a dev environment on SQLite!
       ADMIN_USER: admin
-      ADMIN_PASS: admin
+      ADMIN_PASSWORD: admin
 
   postgres:
     hostname: postgres

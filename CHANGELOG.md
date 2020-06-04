@@ -1,3 +1,25 @@
+# 0.90.45 (06-01-2020)
+- Merged PR [#612](https://github.com/statping/statping/pull/612) for edit/create service issue.
+
+# 0.90.44 (05-25-2020)
+- Modified Makefile to include "netgo" tag during golang build
+
+# 0.90.43 (05-21-2020)
+- Fixed service TLS checkbox form for edit and create
+- Modified ICMP ping's to use system's "ping" command (doesn't need root access)
+
+# 0.90.42 (05-20-2020)
+- Fixed TCP services that dont use TLS.
+
+# 0.90.41 (05-20-2020)
+- Added TLS Client Cert/Key feature for HTTP and TCP/UDP services
+- Replaced environment variable ADMIN_PASS to ADMIN_PASSWORD.
+
+# 0.90.40 (05-18-2020)
+- Fixed issues with MySQL and Postgres taking forever to insert sample data (now run in bulk)
+- Removed API Authentication for /api/logout route
+- Modified Core Sample/Upstart row to include NAME, DESCRIPTION, and DOMAIN environment vars (also added default values)
+
 # 0.90.39 (05-15-2020)
 - Modified some SCSS designs for services failures in group
 - Fixed Twilio notifier and tests

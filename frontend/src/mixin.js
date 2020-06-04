@@ -1,5 +1,5 @@
 import Vue from "vue";
-const { startOfToday, startOfMonth, lastDayOfMonth, subSeconds, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance, addMonths } = require('date-fns')
+const { startOfToday, startOfMonth, lastDayOfMonth, subSeconds, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance, addMonths, isWithinInterval } = require('date-fns')
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import format from 'date-fns/format'
 import parseISO from 'date-fns/parseISO'
@@ -19,19 +19,17 @@ export default Vue.mixin({
     startToday() {
       return startOfToday()
     },
-    secondsHumanize (val) {
-      const t2 = addSeconds(new Date(0), val)
-        if (val >= 60) {
-            let minword = "minute"
-            if (val >= 120) {
-                minword = "minutes"
-            }
-            return format(t2, "m '"+minword+"' s 'seconds'")
-        }
-      return format(t2, "s 'seconds'")
+      secondsHumanize (val) {
+        return `${val} seconds`
+      },
+    utc(val) {
+      return new Date.UTC(val)
     },
     ago(t1) {
       return formatDistanceToNow(parseISO(t1))
+    },
+    daysInMonth(t1) {
+        return lastDayOfMonth(t1)
     },
     nowSubtract(seconds) {
       return subSeconds(new Date(), seconds)
@@ -45,8 +43,26 @@ export default Vue.mixin({
     niceDate(val) {
       return format(parseISO(val), "EEEE, MMM do h:mma")
     },
-    parseISO(v) {
-      return parseISO(v)
+      parseISO(v) {
+        return parseISO(v)
+      },
+    isZero(val) {
+      return getUnixTime(parseISO(val)) <= 0
+    },
+    smallText(s) {
+      const incidents = s.incidents
+      if (s.online) {
+        return `Online, checked ${this.ago(s.last_success)} ago`
+      } else {
+        const last = s.last_failure
+        if (last) {
+          return `Offline, last error: ${last} ${this.ago(last.created_at)}`
+        }
+        if (this.isZero(s.last_success)) {
+          return `Service has never been online`
+        }
+        return `Service has been offline for ${this.ago(s.last_success)}`
+      }
     },
     toUnix(val) {
       return getUnixTime(val)
@@ -54,14 +70,17 @@ export default Vue.mixin({
     fromUnix(val) {
       return fromUnixTime(val)
     },
-    isBetween(t1, t2) {
-      return differenceInSeconds(parseISO(t1), parseISO(t2)) >= 0
+    isBetween(t, start, end) {
+      return isWithinInterval(t, {start: parseISO(start), end: parseISO(end)})
     },
     hour() {
       return 3600
     },
     day() {
       return 3600 * 24
+    },
+    maxDate() {
+      return new Date(8640000000000000)
     },
     copy(txt) {
       this.$copyText(txt).then(function (e) {
@@ -152,7 +171,7 @@ export default Vue.mixin({
     firstDayOfMonth(date) {
       return startOfMonth(date)
     },
-    lastDayOfMonth(date) {
+    lastDayOfMonth(month) {
       return lastDayOfMonth(date)
     },
     addMonths(date, amount) {

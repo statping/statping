@@ -22,7 +22,12 @@ const webpackConfig = {
       {
         test: /\.vue$/,
         loader: 'vue-loader',
-        include: [ helpers.root('src') ]
+        include: [ helpers.root('src') ],
+        options: {
+          loaders: {
+            i18n: '@kazupon/vue-i18n-loader'
+          }
+        }
       },
       {
         test: /\.js$/,

@@ -23,6 +23,7 @@ func LoadConfigForm(r *http.Request) (*DbConfig, error) {
 	description := g("description")
 	domain := g("domain")
 	email := g("email")
+	language := g("language")
 
 	if project == "" || username == "" || password == "" {
 		err := errors.New("Missing required elements on setup form")
@@ -38,6 +39,7 @@ func LoadConfigForm(r *http.Request) (*DbConfig, error) {
 	p.Set("DB_DATABASE", dbDatabase)
 	p.Set("NAME", project)
 	p.Set("DESCRIPTION", description)
+	p.Set("LANGUAGE", language)
 
 	confg := &DbConfig{
 		DbConn:      dbConn,
@@ -53,6 +55,7 @@ func LoadConfigForm(r *http.Request) (*DbConfig, error) {
 		Password:    password,
 		Email:       email,
 		Location:    utils.Directory,
+		Language:    language,
 	}
 
 	return confg, nil

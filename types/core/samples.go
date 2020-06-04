@@ -13,10 +13,10 @@ func Samples() error {
 	}
 
 	core := &Core{
-		Name:        "Statping Sample Data",
-		Description: "This data is only used to testing",
+		Name:        utils.Params.GetString("NAME"),
+		Description: utils.Params.GetString("DESCRIPTION"),
 		ApiSecret:   apiSecret,
-		Domain:      "http://localhost:8080",
+		Domain:      utils.Params.GetString("DOMAIN"),
 		CreatedAt:   utils.Now(),
 		UseCdn:      null.NewNullBool(false),
 		Footer:      null.NewNullString(""),

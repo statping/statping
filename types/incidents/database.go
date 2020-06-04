@@ -1,10 +1,14 @@
 package incidents
 
-import "github.com/statping/statping/database"
+import (
+	"github.com/statping/statping/database"
+	"github.com/statping/statping/utils"
+)
 
 var (
 	db       database.Database
 	dbUpdate database.Database
+	log      = utils.Log.WithField("type", "service")
 )
 
 func SetDB(database database.Database) {

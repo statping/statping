@@ -4,7 +4,10 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"os/exec"
+	"strings"
 	"syscall"
 )
 
@@ -31,4 +34,22 @@ func DirWritable(path string) (bool, error) {
 		return false, errors.New("user doesn't have permission to write to this directory")
 	}
 	return true, nil
+}
+
+func Ping(address string, secondsTimeout int) error {
+	ping, err := exec.LookPath("ping")
+	if err != nil {
+		return err
+	}
+	out, _, err := Command(ping, address, "-c 1", fmt.Sprintf("-W %v", secondsTimeout))
+	if err != nil {
+		return err
+	}
+	if strings.Contains(out, "Unknown host") {
+		return errors.New("unknown host")
+	}
+	if strings.Contains(out, "100.0% packet loss") {
+		return errors.New("destination host unreachable")
+	}
+	return nil
 }

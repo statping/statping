@@ -37,6 +37,9 @@ type Service struct {
 	VerifySSL           null.NullBool       `gorm:"default:false;column:verify_ssl" json:"verify_ssl" scope:"user,admin" yaml:"verify_ssl"`
 	Public              null.NullBool       `gorm:"default:true;column:public" json:"public" yaml:"public"`
 	GroupId             int                 `gorm:"default:0;column:group_id" json:"group_id" yaml:"group_id"`
+	TLSCert             null.NullString     `gorm:"column:tls_cert" json:"tls_cert" scope:"user,admin" yaml:"tls_cert"`
+	TLSCertKey          null.NullString     `gorm:"column:tls_cert_key" json:"tls_cert_key" scope:"user,admin" yaml:"tls_cert_key"`
+	TLSCertRoot         null.NullString     `gorm:"column:tls_cert_root" json:"tls_cert_root" scope:"user,admin" yaml:"tls_cert_root"`
 	Headers             null.NullString     `gorm:"column:headers" json:"headers" scope:"user,admin" yaml:"headers"`
 	Permalink           null.NullString     `gorm:"column:permalink;unique;" json:"permalink" yaml:"permalink"`
 	Redirect            null.NullBool       `gorm:"default:false;column:redirect" json:"redirect" scope:"user,admin" yaml:"redirect"`
