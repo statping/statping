@@ -16,6 +16,8 @@ var (
 )
 
 func TestSlackNotifier(t *testing.T) {
+	err := utils.InitLogs()
+	require.Nil(t, err)
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})

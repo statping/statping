@@ -4,6 +4,7 @@ import (
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"os"
@@ -24,6 +25,8 @@ func init() {
 
 func TestMobileNotifier(t *testing.T) {
 	t.SkipNow()
+	err := utils.InitLogs()
+	require.Nil(t, err)
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
