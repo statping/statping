@@ -31,15 +31,14 @@ func initCLI() {
 	Params.Set("VERSION", version)
 
 	// check if logs are disabled
-	disableLogs = Params.GetBool("DISABLE_LOGS")
-	if disableLogs {
+	if !Params.GetBool("DISABLE_LOGS") {
 		Log.Out = ioutil.Discard
-	}
 
-	Log.Debugln("current working directory: ", Directory)
-	Log.AddHook(new(hook))
-	Log.SetNoLock()
-	checkVerboseMode()
+		Log.Debugln("current working directory: ", Directory)
+		Log.AddHook(new(hook))
+		Log.SetNoLock()
+		checkVerboseMode()
+	}
 }
 
 func setDefaults() {

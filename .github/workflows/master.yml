@@ -114,7 +114,7 @@ jobs:
           DB_CONN: sqlite3
           STATPING_DIR: ${{ github.workspace }}
           API_SECRET: demopassword123
-          DISABLE_LOGS: true
+          DISABLE_LOGS: false
           ALLOW_REPORTS: true
           COVERALLS: ${{ secrets.COVERALLS }}
           DISCORD_URL: ${{ secrets.DISCORD_URL }}
