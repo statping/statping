@@ -7,7 +7,6 @@ import (
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"os"
 	"testing"
 	"time"
 )
@@ -15,19 +14,17 @@ import (
 var (
 	telegramToken   string
 	telegramChannel string
-	telegramMessage = "The Telegram notifier on Statping has been tested!"
 )
-
-func init() {
-	telegramToken = os.Getenv("TELEGRAM_TOKEN")
-	telegramChannel = os.Getenv("TELEGRAM_CHANNEL")
-	Telegram.ApiSecret = telegramToken
-	Telegram.Var1 = telegramChannel
-}
 
 func TestTelegramNotifier(t *testing.T) {
 	err := utils.InitLogs()
 	require.Nil(t, err)
+
+	telegramToken = utils.Params.GetString("TELEGRAM_TOKEN")
+	telegramChannel = utils.Params.GetString("TELEGRAM_CHANNEL")
+	Telegram.ApiSecret = telegramToken
+	Telegram.Var1 = telegramChannel
+
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})

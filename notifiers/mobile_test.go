@@ -17,16 +17,15 @@ var (
 	MOBILE_NUMBER string
 )
 
-func init() {
-	MOBILE_ID = os.Getenv("MOBILE_ID")
-	MOBILE_NUMBER = os.Getenv("MOBILE_NUMBER")
-	Mobile.Var1 = MOBILE_ID
-}
-
 func TestMobileNotifier(t *testing.T) {
 	t.SkipNow()
 	err := utils.InitLogs()
 	require.Nil(t, err)
+
+	MOBILE_ID = utils.Params.GetString("MOBILE_ID")
+	MOBILE_NUMBER = utils.Params.GetString("MOBILE_NUMBER")
+	Mobile.Var1 = MOBILE_ID
+
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})

@@ -7,23 +7,19 @@ import (
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"os"
 	"testing"
 	"time"
 )
 
 var (
-	DISCORD_URL    = utils.Params.GetString("DISCORD_URL")
-	discordMessage = `{"content": "The discord notifier on Statping has been tested!"}`
+	DISCORD_URL string
 )
-
-func init() {
-	DISCORD_URL = os.Getenv("DISCORD_URL")
-}
 
 func TestDiscordNotifier(t *testing.T) {
 	err := utils.InitLogs()
 	require.Nil(t, err)
+	DISCORD_URL = utils.Params.GetString("DISCORD_URL")
+
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})

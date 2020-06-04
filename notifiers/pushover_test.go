@@ -7,18 +7,21 @@ import (
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"os"
 	"testing"
 )
 
 var (
-	PUSHOVER_TOKEN = os.Getenv("PUSHOVER_TOKEN")
-	PUSHOVER_API   = os.Getenv("PUSHOVER_API")
+	PUSHOVER_TOKEN string
+	PUSHOVER_API   string
 )
 
 func TestPushoverNotifier(t *testing.T) {
 	err := utils.InitLogs()
 	require.Nil(t, err)
+
+	PUSHOVER_TOKEN = utils.Params.GetString("PUSHOVER_TOKEN")
+	PUSHOVER_API = utils.Params.GetString("PUSHOVER_API")
+
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})

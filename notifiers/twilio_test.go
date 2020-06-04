@@ -7,26 +7,22 @@ import (
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"os"
 	"testing"
 	"time"
 )
 
 var (
-	TWILIO_SID    = os.Getenv("TWILIO_SID")
-	TWILIO_SECRET = os.Getenv("TWILIO_SECRET")
-	TWILIO_FROM   = os.Getenv("TWILIO_FROM")
-	TWILIO_TO     = os.Getenv("TWILIO_TO")
+	TWILIO_SID    string
+	TWILIO_SECRET string
 )
-
-func init() {
-	TWILIO_SID = os.Getenv("TWILIO_SID")
-	TWILIO_SECRET = os.Getenv("TWILIO_SECRET")
-}
 
 func TestTwilioNotifier(t *testing.T) {
 	err := utils.InitLogs()
 	require.Nil(t, err)
+
+	TWILIO_SID = utils.Params.GetString("TWILIO_SID")
+	TWILIO_SECRET = utils.Params.GetString("TWILIO_SECRET")
+
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})

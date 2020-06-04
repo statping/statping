@@ -21,20 +21,17 @@ var (
 	EMAIL_PORT     int64
 )
 
-var testEmail *emailOutgoing
+func TestEmailNotifier(t *testing.T) {
+	err := utils.InitLogs()
+	require.Nil(t, err)
 
-func init() {
 	EMAIL_HOST = utils.Params.GetString("EMAIL_HOST")
 	EMAIL_USER = utils.Params.GetString("EMAIL_USER")
 	EMAIL_PASS = utils.Params.GetString("EMAIL_PASS")
 	EMAIL_OUTGOING = utils.Params.GetString("EMAIL_OUTGOING")
 	EMAIL_SEND_TO = utils.Params.GetString("EMAIL_SEND_TO")
 	EMAIL_PORT = utils.ToInt(utils.Params.GetString("EMAIL_PORT"))
-}
 
-func TestEmailNotifier(t *testing.T) {
-	err := utils.InitLogs()
-	require.Nil(t, err)
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
