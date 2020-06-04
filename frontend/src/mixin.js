@@ -92,11 +92,14 @@ export default Vue.mixin({
       if (service.permalink) {
         service = this.$store.getters.serviceByPermalink(service.permalink)
       }
-      if (service===undefined) {
+      if (service===undefined || this.isEmptyObject(service)) {
         return `/service/0`
       }
       let link = service.permalink ? service.permalink : service.id
       return `/service/${link}`
+    },
+    isEmptyObject(obj) {
+      return Object.keys(obj).length === 0 && obj.constructor === Object
     },
     isInt(n) {
       return n % 1 === 0;
