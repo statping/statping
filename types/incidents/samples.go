@@ -6,6 +6,7 @@ import (
 )
 
 func Samples() error {
+	log.Infoln("Inserting Sample Incidents...")
 	incident1 := &Incident{
 		Title:       "Github Issues",
 		Description: "There are new features for Statping, if you have any issues please visit the Github Repo.",

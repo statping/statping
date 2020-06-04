@@ -7,6 +7,7 @@ import (
 )
 
 func Samples() error {
+	log.Infoln("Inserting Sample Services...")
 	createdOn := utils.Now().Add(((-24 * 30) * 3) * time.Hour)
 	s1 := &Service{
 		Name:           "Google",

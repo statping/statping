@@ -29,10 +29,6 @@ type oAuth struct {
 func oauthHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	provider := vars["provider"]
-	code := r.URL.Query().Get("code")
-	fmt.Println("code: ", code)
-	fmt.Println("client: ", core.App.OAuth.SlackClientID)
-	fmt.Println("secret: ", core.App.OAuth.SlackClientSecret)
 
 	var err error
 	var oauth *oAuth
@@ -143,7 +139,7 @@ func slackOAuth(r *http.Request) (*oAuth, error) {
 // slackIdentity will query the Slack API to fetch the users ID, username, and email address.
 func (a *oAuth) slackIdentity() (*oAuth, error) {
 	url := fmt.Sprintf("https://slack.com/api/users.identity?token=%s", a.Token)
-	out, resp, err := utils.HttpRequest(url, "GET", "application/x-www-form-urlencoded", nil, nil, 10*time.Second, true)
+	out, resp, err := utils.HttpRequest(url, "GET", "application/x-www-form-urlencoded", nil, nil, 10*time.Second, true, nil)
 	if err != nil {
 		return a, err
 	}

@@ -7,6 +7,8 @@ about: If you're having an issue or see an error
 ### Describe the bug
 A clear and concise description of what the bug is.
 
+You can set the environment variable `ALLOW_REPORTS` to `true` to allow errors to be sent to our error reporting server.
+
 ### To Reproduce
 Steps to reproduce the behavior:
 1. Go to '...'

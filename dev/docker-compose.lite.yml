@@ -24,7 +24,7 @@ services:
       DOMAIN: http://localhost:8585
       DESCRIPTION: This is a dev environment with auto reloading!
       ADMIN_USER: admin
-      ADMIN_PASS: admin
+      ADMIN_PASSWORD: admin
       PORT: 8585
     ports:
       - 8888:8888

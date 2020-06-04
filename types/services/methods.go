@@ -2,19 +2,64 @@ package services
 
 import (
 	"crypto/sha1"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"github.com/statping/statping/types"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/utils"
+	"io/ioutil"
 	"sort"
 	"strconv"
 	"time"
 )
 
 const limitedFailures = 25
+
+func (s *Service) LoadTLSCert() (*tls.Config, error) {
+	if s.TLSCert.String == "" || s.TLSCertKey.String == "" {
+		return nil, nil
+	}
+
+	// load TLS cert and key from file path or PEM format
+	var cert tls.Certificate
+	var err error
+	tlsCertExtension := utils.FileExtension(s.TLSCert.String)
+	tlsCertKeyExtension := utils.FileExtension(s.TLSCertKey.String)
+	if tlsCertExtension == "" && tlsCertKeyExtension == "" {
+		cert, err = tls.X509KeyPair([]byte(s.TLSCert.String), []byte(s.TLSCertKey.String))
+	} else {
+		cert, err = tls.LoadX509KeyPair(s.TLSCert.String, s.TLSCertKey.String)
+	}
+	if err != nil {
+		return nil, errors.Wrap(err, "issue loading X509KeyPair")
+	}
+
+	config := &tls.Config{
+		Certificates:       []tls.Certificate{cert},
+		InsecureSkipVerify: s.TLSCertRoot.String == "",
+	}
+
+	if s.TLSCertRoot.String == "" {
+		return config, nil
+	}
+
+	// create Root CA pool or use Root CA provided
+	rootCA := s.TLSCertRoot.String
+	caCert, err := ioutil.ReadFile(rootCA)
+	if err != nil {
+		return nil, errors.Wrap(err, "issue reading root CA file: "+rootCA)
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+
+	config.RootCAs = caCertPool
+
+	return config, nil
+}
 
 func (s *Service) Duration() time.Duration {
 	return time.Duration(s.Interval) * time.Second

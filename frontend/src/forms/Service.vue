@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="saveService">
+    <form v-if="service.type" @submit.prevent="saveService">
         <div class="card contain-card text-black-50 bg-white mb-4">
             <div class="card-header">Service Information</div>
             <div class="card-body">
@@ -54,10 +54,13 @@
 
             <div class="form-group row">
                 <label for="service_interval" class="col-sm-4 col-form-label">Check Interval</label>
-                <div class="col-sm-8">
+                <div class="col-sm-6">
                     <span class="slider-info">{{secondsHumanize(service.check_interval)}}</span>
-                    <input v-model="service.check_interval" type="range" class="slider" id="service_interval" min="1" max="1800" :step="stepVal(service.check_interval)">
+                    <input v-model="service.check_interval" type="range" class="slider" id="service_interval" min="1" max="1800" :step="1">
                     <small id="interval" class="form-text text-muted">Interval to check your service state</small>
+                </div>
+                <div class="col-sm-2">
+                    <input v-model="service.check_interval" type="text" name="check_interval" class="form-control">
                 </div>
             </div>
 
@@ -65,7 +68,7 @@
         </div>
 
         <div class="card contain-card text-black-50 bg-white mb-4">
-            <div class="card-header">{{service.type.toUpperCase()}} Request Details</div>
+            <div class="card-header">Request Details</div>
             <div class="card-body">
 
             <div class="form-group row">
@@ -77,7 +80,7 @@
             </div>
 
             <div v-if="service.type.match(/^(tcp|udp|grpc)$/)" class="form-group row">
-                <label class="col-sm-4 col-form-label">{{service.type.toUpperCase()}} Port</label>
+                <label class="col-sm-4 col-form-label">Port</label>
                 <div class="col-sm-8">
                     <input v-model="service.port" type="number" name="port" class="form-control" id="service_port" placeholder="8080">
                 </div>
@@ -99,11 +102,16 @@
 
         <div class="form-group row">
             <label class="col-sm-4 col-form-label">Request Timeout</label>
-            <div class="col-sm-8">
-                <span class="slider-info">{{secondsHumanize(service.timeout)}}</span>
+            <div class="col-sm-6">
+                <span v-if="service.timeout >= 0" class="slider-info">{{secondsHumanize(service.timeout)}}</span>
                 <input v-model="service.timeout" type="range" id="timeout" name="timeout" class="slider" min="1" max="180">
                 <small class="form-text text-muted">If the endpoint does not respond within this time it will be considered to be offline</small>
             </div>
+
+            <div class="col-sm-2">
+                <input v-model="service.timeout" type="text" name="service_timeout" class="form-control">
+            </div>
+
         </div>
 
         <div v-if="service.type.match(/^(http)$/) && service.method.match(/^(POST|PATCH|DELETE|PUT)$/)" class="form-group row">
@@ -155,6 +163,41 @@
                 </span>
             </div>
         </div>
+
+        <div v-if="service.type.match(/^(tcp|http)$/)" class="form-group row">
+            <label class="col-sm-4 col-form-label">Use TLS Certificate</label>
+            <div class="col-8 mt-1">
+                <span @click="use_tls = !!use_tls" class="switch float-left">
+                    <input v-model="use_tls" type="checkbox" name="verify_ssl-option" class="switch" id="switch-use-tls" v-bind:checked="use_tls">
+                    <label for="switch-use-tls" v-if="use_tls">Custom TLS Certificates for mTLS services</label>
+                    <label for="switch-use-tls" v-if="!use_tls">Ignore TLS Certificates</label>
+                </span>
+            </div>
+        </div>
+
+                <div v-if="use_tls" class="form-group row">
+                    <label for="service_tls_cert" class="col-sm-4 col-form-label">TLS Client Certificate</label>
+                    <div class="col-sm-8">
+                        <textarea v-model="service.tls_cert" name="tls_cert" class="form-control" id="service_tls_cert"></textarea>
+                        <small class="form-text text-muted">Absolute path to TLS Client Certificate file or in PEM format</small>
+                    </div>
+                </div>
+
+                <div v-if="use_tls" class="form-group row">
+                    <label for="service_tls_cert_key" class="col-sm-4 col-form-label">TLS Client Key</label>
+                    <div class="col-sm-8">
+                        <textarea v-model="service.tls_cert_key" name="tls_cert_key" class="form-control" id="service_tls_cert_key"></textarea>
+                        <small class="form-text text-muted">Absolute path to TLS Client Key file or in PEM format</small>
+                    </div>
+                </div>
+
+                <div v-if="use_tls" class="form-group row">
+                    <label for="service_tls_cert_chain" class="col-sm-4 col-form-label">Root CA</label>
+                    <div class="col-sm-8">
+                        <textarea v-model="service.tls_cert_root" name="tls_cert_key" class="form-control" id="service_tls_cert_chain"></textarea>
+                        <small class="form-text text-muted">Absolute path to Root CA file or in PEM format (optional)</small>
+                    </div>
+                </div>
 
             </div>
         </div>
@@ -235,7 +278,11 @@
                   notify_all_changes: true,
                   notify_after: 2,
                   public: true,
+                  tls_cert: "",
+                  tls_cert_key: "",
+                  tls_cert_root: "",
               },
+              use_tls: false,
               groups: [],
           }
       },
@@ -245,17 +292,28 @@
           }
       },
       watch: {
-          in_service () {
-              this.service = this.in_service
+          in_service: function(svr) {
+            this.service = svr
+            this.use_tls = svr.tls_cert
           }
       },
       async mounted () {
           if (!this.$store.getters.groups) {
-              const groups = await Api.groups()
-              this.$store.commit('setGroups', groups)
+            const groups = await Api.groups()
+            this.$store.commit('setGroups', groups)
           }
+        this.update()
       },
-      methods: {
+    created () {
+        this.update()
+    },
+    methods: {
+        update() {
+          if (this.in_service) {
+            this.service = this.in_service
+          }
+          this.use_tls = this.service.tls_cert
+        },
           updatePermalink() {
               const a = 'àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;'
               const b = 'aaaaaaaaaacccddeeeeeeeegghiiiiiilmnnnnoooooooooprrsssssttuuuuuuuuuwxyyzzz------'

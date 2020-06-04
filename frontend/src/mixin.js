@@ -19,17 +19,9 @@ export default Vue.mixin({
     startToday() {
       return startOfToday()
     },
-    secondsHumanize (val) {
-      const t2 = addSeconds(new Date(0), val)
-        if (val >= 60) {
-            let minword = "minute"
-            if (val >= 120) {
-                minword = "minutes"
-            }
-            return format(t2, "m '"+minword+"' s 'seconds'")
-        }
-      return format(t2, "s 'seconds'")
-    },
+      secondsHumanize (val) {
+        return `${val} seconds`
+      },
     utc(val) {
       return new Date.UTC(val)
     },
@@ -51,8 +43,26 @@ export default Vue.mixin({
     niceDate(val) {
       return format(parseISO(val), "EEEE, MMM do h:mma")
     },
-    parseISO(v) {
-      return parseISO(v)
+      parseISO(v) {
+        return parseISO(v)
+      },
+    isZero(val) {
+      return getUnixTime(parseISO(val)) <= 0
+    },
+    smallText(s) {
+      const incidents = s.incidents
+      if (s.online) {
+        return `Online, checked ${this.ago(s.last_success)} ago`
+      } else {
+        const last = s.last_failure
+        if (last) {
+          return `Offline, last error: ${last} ${this.ago(last.created_at)}`
+        }
+        if (this.isZero(s.last_success)) {
+          return `Service has never been online`
+        }
+        return `Service has been offline for ${this.ago(s.last_success)}`
+      }
     },
     toUnix(val) {
       return getUnixTime(val)

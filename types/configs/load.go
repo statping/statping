@@ -62,7 +62,7 @@ func LoadConfigFile(configFile string) (*DbConfig, error) {
 		Domain:      p.GetString("DOMAIN"),
 		Email:       p.GetString("EMAIL"),
 		Username:    p.GetString("ADMIN_USER"),
-		Password:    p.GetString("ADMIN_PASS"),
+		Password:    p.GetString("ADMIN_PASSWORD"),
 		Location:    utils.Directory,
 		SqlFile:     p.GetString("SQL_FILE"),
 	}

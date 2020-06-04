@@ -28,6 +28,7 @@ type Core struct {
 	Footer        null.NullString `gorm:"column:footer" json:"footer"`
 	Domain        string          `gorm:"not null;column:domain" json:"domain"`
 	Version       string          `gorm:"column:version" json:"version"`
+	Language      string          `gorm:"column:language" json:"language"`
 	Setup         bool            `gorm:"-" json:"setup"`
 	MigrationId   int64           `gorm:"column:migration_id" json:"migration_id,omitempty"`
 	UseCdn        null.NullBool   `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`

@@ -7,15 +7,16 @@ import (
 )
 
 var (
-	Params *viper.Viper
+	Params    *viper.Viper
+	configLog = Log.WithField("type", "configs")
 )
 
 func InitCLI() {
 	Params = viper.New()
 	Params.AutomaticEnv()
+	setDefaults()
 	Directory = Params.GetString("STATPING_DIR")
 	//Params.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
-	setDefaults()
 	Params.SetConfigName("config")
 	Params.SetConfigType("yml")
 	Params.AddConfigPath(Directory)
@@ -30,16 +31,12 @@ func InitCLI() {
 }
 
 func setDefaults() {
-	if Directory == "" {
-		defaultDir, err := os.Getwd()
-		if err != nil {
-			defaultDir = "."
-		}
-		Params.SetDefault("STATPING_DIR", defaultDir)
-		Directory = defaultDir
+	defaultDir, err := os.Getwd()
+	if err != nil {
+		configLog.Errorln(err)
+		defaultDir = "."
 	}
-	Directory = Params.GetString("STATPING_DIR")
-	Params.SetDefault("STATPING_DIR", Directory)
+	Params.SetDefault("STATPING_DIR", defaultDir)
 	Params.SetDefault("GO_ENV", "")
 	Params.SetDefault("DB_CONN", "")
 	Params.SetDefault("DISABLE_LOGS", false)
@@ -54,8 +51,12 @@ func setDefaults() {
 	Params.SetDefault("USE_CDN", false)
 	Params.SetDefault("ALLOW_REPORTS", false)
 	Params.SetDefault("POSTGRES_SSLMODE", "disable")
+	Params.SetDefault("NAME", "Statping Sample Data")
+	Params.SetDefault("DOMAIN", "http://localhost:8080")
+	Params.SetDefault("DESCRIPTION", "This status page has sample data included")
 	Params.SetDefault("REMOVE_AFTER", 2160*time.Hour)
 	Params.SetDefault("CLEANUP_INTERVAL", 1*time.Hour)
+	Params.SetDefault("LANGUAGE", "en")
 
 	dbConn := Params.GetString("DB_CONN")
 	dbInt := Params.GetInt("DB_PORT")

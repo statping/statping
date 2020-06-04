@@ -1,0 +1,33 @@
+const english = {
+  setup: {
+    language: "Language",
+    connection: "Database Connection",
+    host: "Host",
+    database: "Database",
+    project_name: "Project Name",
+    project_description: "Project Description",
+    domain: "Domain URL",
+    username: "Admin Username",
+    password: "Admin Username",
+    password_confirm: "Confirm Admin Username",
+    newsletter: "Newsletter",
+    newsletter_note: "We will not share your email, emails are only for major updates.",
+  },
+  email: "Email Address",
+  port: "Database Port",
+  username: "Username",
+  password: 'password',
+  service: 'service',
+  online: 'online',
+  offline: 'offline',
+  incident: 'incident',
+  group: 'group',
+  message: 'message',
+  logout: 'logout',
+  sample_data: 'Sample Data',
+  today: 'Today',
+  day: 'day',
+  hour: 'hour',
+}
+
+export default english

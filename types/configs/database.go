@@ -28,9 +28,8 @@ type Sampler interface {
 func TriggerSamples() error {
 	return createSamples(
 		core.Samples,
-		//users.Samples,
-		messages.Samples,
 		services.Samples,
+		messages.Samples,
 		checkins.Samples,
 		checkins.SamplesChkHits,
 		failures.Samples,

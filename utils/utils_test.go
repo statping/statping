@@ -174,7 +174,7 @@ func TestHttpRequest(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	body, resp, err := HttpRequest(server.URL, "GET", "application/json", []string{"aaa=bbbb=", "ccc=ddd"}, nil, 2*time.Second, false)
+	body, resp, err := HttpRequest(server.URL, "GET", "application/json", []string{"aaa=bbbb=", "ccc=ddd"}, nil, 2*time.Second, false, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, []byte("OK"), body)

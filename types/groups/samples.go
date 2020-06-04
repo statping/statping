@@ -5,6 +5,7 @@ import (
 )
 
 func Samples() error {
+	log.Infoln("Inserting Sample Groups...")
 	group1 := &Group{
 		Name:   "Main Services",
 		Public: null.NewNullBool(true),

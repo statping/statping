@@ -114,8 +114,9 @@ func start() {
 		}
 
 		if utils.Params.GetBool("SAMPLE_DATA") {
+			log.Infoln("Adding Sample Data")
 			if err := configs.TriggerSamples(); err != nil {
-				exit(errors.Wrap(err, "error creating database"))
+				exit(errors.Wrap(err, "error adding sample data"))
 			}
 		} else {
 			if err := core.Samples(); err != nil {
