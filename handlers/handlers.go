@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
@@ -26,12 +25,23 @@ var (
 	usingSSL   bool
 	mainTmpl   = `{{define "main" }} {{ template "base" . }} {{ end }}`
 	templates  = []string{"base.gohtml"}
+	httpError  chan error
 )
 
-// RunHTTPServer will start a HTTP server on a specific IP and port
-func RunHTTPServer(ip string, port int) error {
-	host := fmt.Sprintf("%v:%v", ip, port)
+func StopHTTPServer(err error) {
+	log.Infoln("Stopping HTTP Server")
+	httpError <- err
+	close(httpError)
+}
 
+// RunHTTPServer will start a HTTP server on a specific IP and port
+func RunHTTPServer() error {
+	if utils.Params.GetBool("DISABLE_HTTP") {
+		return nil
+	}
+
+	ip := utils.Params.GetString("HOST")
+	host := fmt.Sprintf("%v:%v", ip, utils.Params.GetInt64("PORT"))
 	key := utils.FileExists(utils.Directory + "/server.key")
 	cert := utils.FileExists(utils.Directory + "/server.crt")
 
@@ -47,37 +57,18 @@ func RunHTTPServer(ip string, port int) error {
 	resetCookies()
 
 	if usingSSL {
-		cfg := &tls.Config{
-			MinVersion:               tls.VersionTLS12,
-			CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
-			PreferServerCipherSuites: true,
-			CipherSuites: []uint16{
-				tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-				tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-				tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
-				tls.TLS_RSA_WITH_AES_256_CBC_SHA,
-			},
-		}
-		srv := &http.Server{
-			Addr:         fmt.Sprintf("%v:%v", ip, 443),
-			Handler:      router,
-			TLSConfig:    cfg,
-			TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
-			WriteTimeout: timeout,
-			ReadTimeout:  timeout,
-			IdleTimeout:  timeout,
-		}
-		return srv.ListenAndServeTLS(utils.Directory+"/server.crt", utils.Directory+"/server.key")
+		go startSSLServer(ip)
 	} else {
-		httpServer = &http.Server{
-			Addr:         host,
-			WriteTimeout: timeout,
-			ReadTimeout:  timeout,
-			IdleTimeout:  timeout,
-			Handler:      router,
+		go startServer(host)
+	}
+
+	for {
+		select {
+		case err := <-httpError:
+			return err
+		default:
+
 		}
-		httpServer.SetKeepAlivesEnabled(false)
-		return httpServer.ListenAndServe()
 	}
 }
 

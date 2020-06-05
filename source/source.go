@@ -22,6 +22,9 @@ var (
 
 // Assets will load the Rice boxes containing the CSS, SCSS, JS, and HTML files.
 func Assets() error {
+	if utils.Params.GetBool("DISABLE_HTTP") {
+		return nil
+	}
 	var err error
 	TmplBox, err = rice.FindBox("dist")
 	return err

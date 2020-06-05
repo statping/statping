@@ -254,11 +254,12 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	}
 	defer resp.Body.Close()
 	contents, err := ioutil.ReadAll(resp.Body)
-
+	if err != nil {
+		return nil, resp, err
+	}
 	// record HTTP metrics
-	t2 := Now().Sub(t1).Milliseconds()
 	httpMetric.Requests++
-	httpMetric.Milliseconds += t2 / httpMetric.Requests
+	httpMetric.Milliseconds += Now().Sub(t1).Milliseconds() / httpMetric.Requests
 	httpMetric.Bytes += int64(len(contents))
 
 	return contents, resp, err

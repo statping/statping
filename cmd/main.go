@@ -20,12 +20,14 @@ var (
 	// VERSION stores the current version of Statping
 	VERSION string
 	// COMMIT stores the git commit hash for this version of Statping
-	COMMIT string
-	log    = utils.Log.WithField("type", "cmd")
-	confgs *configs.DbConfig
+	COMMIT  string
+	log     = utils.Log.WithField("type", "cmd")
+	confgs  *configs.DbConfig
+	process chan struct{}
 )
 
 func init() {
+	process = make(chan struct{})
 	core.New(VERSION)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(assetsCmd)
@@ -42,8 +44,8 @@ func init() {
 // exit will return an error and return an exit code 1 due to this error
 func exit(err error) {
 	utils.SentryErr(err)
-	Close()
 	log.Fatalln(err)
+	close(process)
 }
 
 // Close will gracefully stop the database connection, and log file
@@ -55,14 +57,15 @@ func Close() {
 
 // main will run the Statping application
 func main() {
-	Execute()
+	go Execute()
+	<-process
+	Close()
 }
 
 // main will run the Statping application
 func start() {
-	var err error
 	go sigterm()
-
+	var err error
 	if err := source.Assets(); err != nil {
 		exit(err)
 	}
@@ -75,14 +78,10 @@ func start() {
 
 	log.Info(fmt.Sprintf("Starting Statping v%s", VERSION))
 
-	//if err := updateDisplay(); err != nil {
-	//	log.Warnln(err)
-	//}
-
 	confgs, err = configs.LoadConfigs(configFile)
 	if err != nil {
 		log.Infoln("Starting in Setup Mode")
-		if err := SetupMode(); err != nil {
+		if err = handlers.RunHTTPServer(); err != nil {
 			exit(err)
 		}
 	}
@@ -139,16 +138,12 @@ func start() {
 	}
 }
 
-func SetupMode() error {
-	return handlers.RunHTTPServer(ipAddress, port)
-}
-
 // sigterm will attempt to close the database connections gracefully
 func sigterm() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	<-sigs
-	Close()
+	close(process)
 	os.Exit(0)
 }
 
@@ -160,7 +155,7 @@ func mainProcess() error {
 
 	services.LoadServicesYaml()
 
-	if err := handlers.RunHTTPServer(ipAddress, port); err != nil {
+	if err := handlers.RunHTTPServer(); err != nil {
 		log.Fatalln(err)
 		return errors.Wrap(err, "http server")
 	}

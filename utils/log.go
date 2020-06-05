@@ -146,7 +146,7 @@ func createLog(dir string) error {
 
 // InitLogs will create the '/logs' directory and creates a file '/logs/statup.log' for application logging
 func InitLogs() error {
-	initCLI()
+	initEnvs()
 	if Params.GetBool("DISABLE_LOGS") {
 		return nil
 	}
@@ -164,8 +164,8 @@ func InitLogs() error {
 	Log.SetOutput(mw)
 
 	Log.SetFormatter(&Logger.TextFormatter{
-		ForceColors:   true,
-		DisableColors: false,
+		ForceColors:   !Params.GetBool("DISABLE_COLORS"),
+		DisableColors: Params.GetBool("DISABLE_COLORS"),
 	})
 	checkVerboseMode()
 	return nil

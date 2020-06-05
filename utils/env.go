@@ -8,46 +8,23 @@ import (
 )
 
 var (
-	Params    *viper.Viper
-	configLog = Log.WithField("type", "configs")
+	Params *viper.Viper
 )
 
-func initCLI() {
+func initEnvs() {
 	Params = viper.New()
 	Params.AutomaticEnv()
-	setDefaults()
-	Directory = Params.GetString("STATPING_DIR")
-	//Params.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
-	Params.SetConfigName("config")
-	Params.SetConfigType("yml")
-	Params.AddConfigPath(Directory)
 
-	Params.ReadInConfig()
-
-	Params.AddConfigPath(Directory)
-	Params.SetConfigFile(".env")
-	Params.ReadInConfig()
-
-	Params.Set("VERSION", version)
-
-	// check if logs are disabled
-	if !Params.GetBool("DISABLE_LOGS") {
-		Log.Out = ioutil.Discard
-
-		Log.Debugln("current working directory: ", Directory)
-		Log.AddHook(new(hook))
-		Log.SetNoLock()
-		checkVerboseMode()
-	}
-}
-
-func setDefaults() {
 	var err error
 	defaultDir, err := os.Getwd()
 	if err != nil {
-		configLog.Errorln(err)
+		Log.Errorln(err)
 		defaultDir = "."
 	}
+	Params.Set("VERSION", version)
+	Params.SetDefault("PORT", 8080)
+	Params.SetDefault("HOST", "0.0.0.0")
+	Params.SetDefault("DISABLE_HTTP", false)
 	Params.SetDefault("STATPING_DIR", defaultDir)
 	Params.SetDefault("GO_ENV", "")
 	Params.SetDefault("DB_CONN", "")
@@ -72,6 +49,7 @@ func setDefaults() {
 	Params.SetDefault("LOGS_MAX_COUNT", 5)
 	Params.SetDefault("LOGS_MAX_AGE", 28)
 	Params.SetDefault("LOGS_MAX_SIZE", 16)
+	Params.SetDefault("DISABLE_COLORS", false)
 
 	dbConn := Params.GetString("DB_CONN")
 	dbInt := Params.GetInt("DB_PORT")
@@ -83,4 +61,25 @@ func setDefaults() {
 			Params.SetDefault("DB_PORT", 3306)
 		}
 	}
+
+	Directory = Params.GetString("STATPING_DIR")
+	//Params.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
+	Params.SetConfigName("config")
+	Params.SetConfigType("yml")
+	Params.AddConfigPath(Directory)
+	Params.ReadInConfig()
+
+	Params.AddConfigPath(Directory)
+	Params.SetConfigFile(".env")
+	Params.ReadInConfig()
+
+	// check if logs are disabled
+	if Params.GetBool("DISABLE_LOGS") {
+		Log.Out = ioutil.Discard
+		return
+	}
+	Log.Debugln("current working directory: ", Directory)
+	Log.AddHook(new(hook))
+	Log.SetNoLock()
+	checkVerboseMode()
 }
