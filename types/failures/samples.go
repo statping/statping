@@ -22,14 +22,18 @@ func Samples() error {
 			Issue:     "Server failure",
 			CreatedAt: utils.Now().Add(-time.Duration(3*i) * 86400),
 		}
-		f1.Create()
+		if err := f1.Create(); err != nil {
+			return err
+		}
 
 		f2 := &Failure{
 			Service:   i,
 			Issue:     "Server failure",
 			CreatedAt: utils.Now().Add(-time.Duration(5*i) * 12400),
 		}
-		f2.Create()
+		if err := f2.Create(); err != nil {
+			return err
+		}
 
 		log.Infoln(fmt.Sprintf("Adding %v Failure records to service", 400))
 

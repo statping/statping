@@ -17,8 +17,7 @@ func (s *Service) AllFailures() failures.Failurer {
 }
 
 func (s *Service) FailuresSince(t time.Time) failures.Failurer {
-	fails := failures.Since(t, s)
-	return fails
+	return failures.Since(t, s)
 }
 
 func (s *Service) DowntimeAgo() string {

@@ -122,15 +122,6 @@ func ExampleStringInt() {
 	// Output: 42
 }
 
-func TestTimezone(t *testing.T) {
-	zone := float32(-4.0)
-	loc, _ := time.LoadLocation("America/Los_Angeles")
-	timestamp := time.Date(2018, 1, 1, 10, 0, 0, 0, loc)
-	timezone := Timezoner(timestamp, zone)
-	assert.Equal(t, "2018-01-01 10:00:00 -0800 PST", timestamp.String())
-	assert.Equal(t, "2018-01-01 18:00:00 +0000 UTC", timezone.UTC().String())
-}
-
 func TestTimestamp_Ago(t *testing.T) {
 	now := Timestamp(time.Now())
 	assert.Equal(t, "Just now", now.Ago())

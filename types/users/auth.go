@@ -2,7 +2,7 @@ package users
 
 import (
 	"fmt"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/statping/statping/utils"
 	"time"
 )
 
@@ -14,16 +14,10 @@ func AuthUser(username, password string) (*User, bool) {
 		log.Warnln(fmt.Errorf("user %v not found", username))
 		return nil, false
 	}
-	if checkHash(password, user.Password) {
+	if utils.CheckHash(password, user.Password) {
 		user.UpdatedAt = time.Now().UTC()
 		user.Update()
 		return user, true
 	}
 	return nil, false
-}
-
-// checkHash returns true if the password matches with a hashed bcrypt password
-func checkHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
 }

@@ -9,9 +9,18 @@ import (
 )
 
 var (
-	db  database.Database
-	log = utils.Log.WithField("type", "service")
+	db          database.Database
+	log         = utils.Log.WithField("type", "service")
+	allServices map[int64]*Service
 )
+
+func init() {
+	allServices = make(map[int64]*Service)
+}
+
+func Services() map[int64]*Service {
+	return allServices
+}
 
 func SetDB(database database.Database) {
 	db = database.Model(&Service{})
@@ -54,30 +63,13 @@ func (s *Service) Create() error {
 	return nil
 }
 
-func (s *Service) AfterCreate() error {
-	allServices[s.Id] = s
-	return nil
-}
-
 func (s *Service) Update() error {
 	q := db.Update(s)
-	allServices[s.Id] = s
-	s.Close()
-	s.SleepDuration = s.Duration()
-	go ServiceCheckQueue(allServices[s.Id], true)
 	return q.Error()
 }
 
 func (s *Service) Delete() error {
-	s.Close()
-	if err := s.DeleteFailures(); err != nil {
-		return err
-	}
-	if err := s.DeleteHits(); err != nil {
-		return err
-	}
-	delete(allServices, s.Id)
-	q := db.Model(&Service{}).Delete(s)
+	q := db.Delete(s)
 	return q.Error()
 }
 

@@ -66,11 +66,6 @@ func (d *DbConfig) Update() error {
 	return nil
 }
 
-// Save will initially create the config.yml file
-func (d *DbConfig) Delete() error {
-	return os.Remove(d.filename)
-}
-
 // DropDatabase will DROP each table Statping created
 func (d *DbConfig) DropDatabase() error {
 	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}

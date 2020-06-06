@@ -139,7 +139,7 @@ func replaceVal(d interface{}) interface{} {
 // createLog will create the '/logs' directory based on a directory
 func createLog(dir string) error {
 	if !FolderExists(dir + "/logs") {
-		CreateDirectory(dir + "/logs")
+		return CreateDirectory(dir + "/logs")
 	}
 	return nil
 }
