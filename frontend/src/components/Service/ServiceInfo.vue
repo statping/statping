@@ -186,7 +186,7 @@
                       total += parseInt(f.y)
                   });
                   total = total / data.length
-                  return total.toFixed(0) + "ms"
+                  return Math.round(total) + " ms"
               } else {
                   return "Offline"
               }
