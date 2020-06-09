@@ -131,9 +131,9 @@
                 const dt = new Date(ts).toLocaleDateString("en-us", timeoptions)
                 let val = series[seriesIndex][dataPointIndex];
                 if (val >= 1000) {
-                  val = (val / 1000).toFixed(0) + " milliseconds"
+                  val = (val / 1000).toFixed(0) + " ms"
                 } else {
-                  val = (val).toFixed(0) + " microseconds"
+                  val = (val).toFixed(0) + " μs"
                 }
                 return `<div class="chartmarker"><span>Response Time: </span><span class="font-3">${val}</span><span>${dt}</span></div>`
               },
