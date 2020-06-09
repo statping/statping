@@ -25,6 +25,9 @@ func (c *Checkin) RecheckCheckinFailure(guard chan struct{}) {
 
 // checkinRoutine for checking if the last Checkin was within its interval
 func (c *Checkin) checkinRoutine() {
+	if c == nil {
+		return
+	}
 	lastHit := c.LastHit()
 	if lastHit == nil {
 		return
