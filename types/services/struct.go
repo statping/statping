@@ -28,7 +28,7 @@ type Service struct {
 	TLSCertKey          null.NullString     `gorm:"column:tls_cert_key" json:"tls_cert_key" scope:"user,admin" yaml:"tls_cert_key"`
 	TLSCertRoot         null.NullString     `gorm:"column:tls_cert_root" json:"tls_cert_root" scope:"user,admin" yaml:"tls_cert_root"`
 	Headers             null.NullString     `gorm:"column:headers" json:"headers" scope:"user,admin" yaml:"headers"`
-	Permalink           null.NullString     `gorm:"column:permalink;unique;" json:"permalink" yaml:"permalink"`
+	Permalink           null.NullString     `gorm:"column:permalink" json:"permalink" yaml:"permalink"`
 	Redirect            null.NullBool       `gorm:"default:false;column:redirect" json:"redirect" scope:"user,admin" yaml:"redirect"`
 	CreatedAt           time.Time           `gorm:"column:created_at" json:"created_at" yaml:"-"`
 	UpdatedAt           time.Time           `gorm:"column:updated_at" json:"updated_at" yaml:"-"`

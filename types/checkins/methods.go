@@ -31,6 +31,7 @@ func (c *Checkin) Grace() time.Duration {
 // Start will create a channel for the checkin checking go routine
 func (c *Checkin) Start() {
 	c.Running = make(chan bool)
+	go c.checkinRoutine()
 }
 
 // Close will stop the checkin routine

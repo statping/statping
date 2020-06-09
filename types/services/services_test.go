@@ -165,6 +165,8 @@ func TestStartExampleEndpoints(t *testing.T) {
 }
 
 func TestServices(t *testing.T) {
+	err := utils.InitLogs()
+	require.Nil(t, err)
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&Service{}, &hits.Hit{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &failures.Failure{})

@@ -21,6 +21,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 )
 
 var (
@@ -28,15 +29,22 @@ var (
 )
 
 func init() {
-	source.Assets()
 	utils.InitLogs()
+	source.Assets()
 	dir = utils.Directory
 	core.New("test")
 }
 
 func TestFailedHTTPServer(t *testing.T) {
-	err := RunHTTPServer("missinghost", 0)
-	assert.Error(t, err)
+	var err error
+	go func(err error) {
+		err = RunHTTPServer()
+	}(err)
+	go func() {
+		time.Sleep(3 * time.Second)
+		StopHTTPServer(nil)
+	}()
+	assert.Nil(t, err)
 }
 
 func TestSetupRoutes(t *testing.T) {

@@ -12,6 +12,7 @@ import (
 )
 
 func TestCreateLog(t *testing.T) {
+	Directory = os.Getenv("STATPING_DIR")
 	err := createLog(Directory)
 	assert.Nil(t, err)
 }
@@ -20,7 +21,7 @@ func TestReplaceValue(t *testing.T) {
 	assert.Equal(t, true, replaceVal(true))
 	assert.Equal(t, 42, replaceVal(42))
 	assert.Equal(t, "hello world", replaceVal("hello world"))
-	assert.Equal(t, "5s", replaceVal(time.Duration(5*time.Second)))
+	assert.Equal(t, "5s", replaceVal(5*time.Second))
 }
 
 func TestInitLogs(t *testing.T) {
@@ -176,8 +177,8 @@ func TestHttpRequest(t *testing.T) {
 }
 
 func TestConfigLoad(t *testing.T) {
-	initCLI()
-	setDefaults()
+	InitLogs()
+	initEnvs()
 
 	s := Params.GetString
 	b := Params.GetBool

@@ -11,7 +11,6 @@ func (c *Checkin) BeforeCreate() error {
 
 func (c *Checkin) AfterCreate() error {
 	c.Start()
-	go c.CheckinRoutine()
 	return nil
 }
 
