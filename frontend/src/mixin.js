@@ -169,7 +169,7 @@ export default Vue.mixin({
       if (val >= 1000) {
           return Math.round(val / 1000) + " ms"
       }
-        return Math.round(val) + " μs"
+        return val + " μs"
     },
     firstDayOfMonth(date) {
       return startOfMonth(date)

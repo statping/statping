@@ -55,10 +55,10 @@
             let ts = w.globals.seriesX[seriesIndex][dataPointIndex];
             const dt = new Date(ts).toLocaleDateString("en-us", timeoptions)
             let val = series[seriesIndex][dataPointIndex];
-            if (val >= 1000) {
-              val = (val / 1000).toFixed(0) + " ms"
+            if (val >= 10000) {
+              val = Math.round(val / 1000) + " ms"
             } else {
-              val = (val).toFixed(0) + " μs"
+              val = val + " μs"
             }
             return `<div class="chartmarker"><span>Average Response Time: </span><span class="font-3">${val}</span><span>${dt}</span></div>`
           },
