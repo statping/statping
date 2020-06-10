@@ -146,7 +146,7 @@ func createLog(dir string) error {
 
 // InitLogs will create the '/logs' directory and creates a file '/logs/statup.log' for application logging
 func InitLogs() error {
-	initEnvs()
+	InitEnvs()
 	if Params.GetBool("DISABLE_LOGS") {
 		return nil
 	}

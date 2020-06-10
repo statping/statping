@@ -8,7 +8,6 @@ import (
 )
 
 func startServer(host string) {
-	httpError = make(chan error)
 	httpServer = &http.Server{
 		Addr:         host,
 		WriteTimeout: timeout,
@@ -23,7 +22,6 @@ func startServer(host string) {
 }
 
 func startSSLServer(ip string) {
-	httpError = make(chan error)
 	cfg := &tls.Config{
 		MinVersion:               tls.VersionTLS12,
 		CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},

@@ -29,6 +29,8 @@ var (
 func init() {
 	process = make(chan struct{})
 	core.New(VERSION)
+	utils.InitEnvs()
+
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(assetsCmd)
 	rootCmd.AddCommand(exportCmd)
@@ -37,7 +39,7 @@ func init() {
 	rootCmd.AddCommand(onceCmd)
 	rootCmd.AddCommand(envCmd)
 	rootCmd.AddCommand(resetCmd)
-	utils.InitLogs()
+
 	parseFlags(rootCmd)
 }
 
@@ -57,6 +59,7 @@ func Close() {
 
 // main will run the Statping application
 func main() {
+	utils.InitLogs()
 	go Execute()
 	<-process
 	Close()

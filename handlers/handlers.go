@@ -41,7 +41,7 @@ func RunHTTPServer() error {
 	}
 
 	ip := utils.Params.GetString("HOST")
-	host := fmt.Sprintf("%v:%v", ip, utils.Params.GetInt64("PORT"))
+	host := fmt.Sprintf("%v:%v", ip, utils.Params.GetInt("PORT"))
 	key := utils.FileExists(utils.Directory + "/server.key")
 	cert := utils.FileExists(utils.Directory + "/server.crt")
 
@@ -55,6 +55,7 @@ func RunHTTPServer() error {
 
 	router = Router()
 	resetCookies()
+	httpError = make(chan error)
 
 	if usingSSL {
 		go startSSLServer(ip)

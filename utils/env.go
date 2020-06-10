@@ -11,7 +11,10 @@ var (
 	Params *viper.Viper
 )
 
-func initEnvs() {
+func InitEnvs() {
+	if Params != nil {
+		return
+	}
 	Params = viper.New()
 	Params.AutomaticEnv()
 
