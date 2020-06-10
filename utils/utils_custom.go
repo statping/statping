@@ -4,9 +4,9 @@ package utils
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"syscall"
 )
@@ -41,7 +41,7 @@ func Ping(address string, secondsTimeout int) error {
 	if err != nil {
 		return err
 	}
-	out, _, err := Command(ping, address, "-c 1", fmt.Sprintf("-W %v", secondsTimeout))
+	out, _, err := Command(ping, address, "-c", "1", "-W", strconv.Itoa(secondsTimeout))
 	if err != nil {
 		return err
 	}
