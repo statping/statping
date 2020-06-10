@@ -170,6 +170,11 @@ func TestServices(t *testing.T) {
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&Service{}, &hits.Hit{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &failures.Failure{})
+	checkins.SetDB(db)
+	failures.SetDB(db)
+	hits.SetDB(db)
+	SetDB(db)
+
 	db.Create(&example)
 	db.Create(&hit1)
 	db.Create(&hit2)
@@ -177,10 +182,6 @@ func TestServices(t *testing.T) {
 	db.Create(&exmapleCheckin)
 	db.Create(&fail1)
 	db.Create(&fail2)
-	checkins.SetDB(db)
-	failures.SetDB(db)
-	hits.SetDB(db)
-	SetDB(db)
 
 	tlsCert := utils.Params.GetString("STATPING_DIR") + "/cert.pem"
 	tlsCertKey := utils.Params.GetString("STATPING_DIR") + "/key.pem"

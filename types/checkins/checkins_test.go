@@ -38,6 +38,7 @@ func TestInit(t *testing.T) {
 	require.Nil(t, err)
 	db, err := database.OpenTester()
 	require.Nil(t, err)
+	SetDB(db)
 	db.AutoMigrate(&Checkin{}, &CheckinHit{}, &failures.Failure{})
 	db.Create(&testCheckin)
 	for _, v := range testCheckinHits {
@@ -46,7 +47,6 @@ func TestInit(t *testing.T) {
 	assert.True(t, db.HasTable(&Checkin{}))
 	assert.True(t, db.HasTable(&CheckinHit{}))
 	assert.True(t, db.HasTable(&failures.Failure{}))
-	SetDB(db)
 
 	t.Run("Test Checkin", func(t *testing.T) {
 		item, err := Find(1)
