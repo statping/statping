@@ -2,6 +2,7 @@ package checkins
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/utils"
 )
 
 var db database.Database
@@ -31,7 +32,13 @@ func All() []*Checkin {
 }
 
 func (c *Checkin) Create() error {
+	if c.ApiKey == "" {
+		c.ApiKey = utils.RandomString(32)
+	}
 	q := db.Create(c)
+
+	c.Start()
+	go c.checkinRoutine()
 	return q.Error()
 }
 
@@ -41,6 +48,11 @@ func (c *Checkin) Update() error {
 }
 
 func (c *Checkin) Delete() error {
-	q := db.Delete(c)
+	c.Close()
+	q := dbHits.Where("checkin = ?", c.Id).Delete(&CheckinHit{})
+	if err := q.Error(); err != nil {
+		return err
+	}
+	q = db.Model(&Checkin{}).Delete(c)
 	return q.Error()
 }

@@ -63,13 +63,30 @@ func (s *Service) Create() error {
 	return nil
 }
 
+func (s *Service) AfterCreate() error {
+	allServices[s.Id] = s
+	return nil
+}
+
 func (s *Service) Update() error {
 	q := db.Update(s)
+	allServices[s.Id] = s
+	s.Close()
+	s.SleepDuration = s.Duration()
+	go ServiceCheckQueue(allServices[s.Id], true)
 	return q.Error()
 }
 
 func (s *Service) Delete() error {
-	q := db.Delete(s)
+	s.Close()
+	if err := s.DeleteFailures(); err != nil {
+		return err
+	}
+	if err := s.DeleteHits(); err != nil {
+		return err
+	}
+	delete(allServices, s.Id)
+	q := db.Model(&Service{}).Delete(s)
 	return q.Error()
 }
 

@@ -88,7 +88,6 @@ func TestInit(t *testing.T) {
 		err = i.Update()
 		require.Nil(t, err)
 		assert.Equal(t, "Updated", i.Name)
-		i.Close()
 	})
 
 	t.Run("Test Expected Time", func(t *testing.T) {
@@ -115,6 +114,7 @@ func TestInit(t *testing.T) {
 
 	t.Run("Test Checkin", func(t *testing.T) {
 		assert.Nil(t, db.Close())
+		assert.Nil(t, dbHits.Close())
 	})
 
 }

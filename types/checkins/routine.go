@@ -25,9 +25,6 @@ func (c *Checkin) RecheckCheckinFailure(guard chan struct{}) {
 
 // checkinRoutine for checking if the last Checkin was within its interval
 func (c *Checkin) checkinRoutine() {
-	if c == nil {
-		return
-	}
 	lastHit := c.LastHit()
 	if lastHit == nil {
 		return
@@ -37,7 +34,7 @@ CheckinLoop:
 	for {
 		select {
 		case <-c.Running:
-			log.Infoln(fmt.Sprintf("Stopping checkin routine: %v", c.Name))
+			log.Infoln(fmt.Sprintf("Stopping checkin routine: %s", c.Name))
 			c.Failing = false
 			break CheckinLoop
 		case <-time.After(reCheck):
@@ -58,6 +55,5 @@ CheckinLoop:
 			}
 			reCheck = c.Period()
 		}
-		continue
 	}
 }
