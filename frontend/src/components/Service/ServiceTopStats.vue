@@ -5,11 +5,11 @@
             <span class="font-1 subtitle">Average Response</span>
         </div>
         <div class="col-4">
-            <span class="font-5 d-block font-weight-bold">{{service.online_24_hours}}%</span>
+            <span class="font-5 d-block font-weight-bold">{{service.online_24_hours}} %</span>
             <span class="font-1 subtitle">Uptime last 24 Hours</span>
         </div>
         <div class="col-4">
-            <span class="font-5 d-block font-weight-bold">{{service.online_7_days}}%</span>
+            <span class="font-5 d-block font-weight-bold">{{service.online_7_days}} %</span>
             <span class="font-1 subtitle">Uptime last 7 Days</span>
         </div>
     </div>

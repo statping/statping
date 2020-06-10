@@ -23,7 +23,7 @@
 
                     <div v-if="service.online" class="col-3 text-left">
                         <span class="text-success font-5 font-weight-bold">
-                            {{service.online_24_hours.toString()}}%
+                            {{service.online_24_hours.toString()}} %
                         </span>
                         <span class="font-2 d-block">Total Uptime</span>
                     </div>
@@ -83,7 +83,7 @@
                     </router-link>
                 </div>
                 <div class="col-12 col-md-3 mb-2 mb-md-0 mt-0 mt-md-1">
-                    <span class="text-black-50 float-md-right">{{service.online_7_days}}% Uptime</span>
+                    <span class="text-black-50 float-md-right">{{service.online_7_days}} % Uptime</span>
                 </div>
 
             </div>
@@ -186,7 +186,7 @@
                       total += parseInt(f.y)
                   });
                   total = total / data.length
-                  return total.toFixed(0) + "ms"
+                  return Math.round(total) + " ms"
               } else {
                   return "Offline"
               }

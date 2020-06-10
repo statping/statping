@@ -166,10 +166,10 @@ export default Vue.mixin({
       return {data: newSet}
     },
     humanTime(val) {
-      if (val >= 10000) {
-          return Math.floor(val / 10000) + "ms"
+      if (val >= 1000) {
+          return Math.round(val / 1000) + " ms"
       }
-        return Math.floor(val / 1000) + "μs"
+        return val + " μs"
     },
     firstDayOfMonth(date) {
       return startOfMonth(date)

@@ -113,12 +113,12 @@
                           let ts = w.globals.seriesX[seriesIndex][dataPointIndex];
                           const dt = new Date(ts).toLocaleDateString("en-us", timeoptions)
                           let val = series[seriesIndex][dataPointIndex];
-                          let humanVal = this.humanTime(val);
-                          return `<div class="chartmarker">
-                                        <span>Average Response Time: </span>
-                                        <span class="font-3">${humanVal}</span>
-                                        <span>${dt}</span>
-                                    </div>`
+                          if (val >= 10000) {
+                            val = Math.round(val / 1000) + " ms"
+                          } else {
+                            val = val + " μs"
+                          }
+                          return `<div class="chartmarker"><span>Average Response Time: </span><span class="font-3">${val}</span><span>${dt}</span></div>`
                       },
                       fixed: {
                           enabled: true,
@@ -130,7 +130,7 @@
                           show: false,
                       },
                     y: {
-                      formatter: (value) => { return value + "%" },
+                      formatter: (value) => { return value + " %" },
                     },
                   },
                   legend: {
