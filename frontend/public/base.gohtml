@@ -3,7 +3,10 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>{{CoreApp.Name}}</title>
+    <title>{{CoreApp.Name}} - Service Monitoring</title>
+    <meta name="title" content="{{CoreApp.Name}} - Service Monitoring">
+    <meta name="description" content="{{CoreApp.Description}} {{CoreApp.Name}}">
+
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, shrink-to-fit=no">
     <meta name="description" content="{{CoreApp.Description}}">
@@ -25,6 +28,18 @@
     <meta name="msapplication-TileImage" content="https://assets.statping.com/favicon/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
     <link rel="icon" type="image/x-icon" href="https://assets.statping.com/favicon/favicon.ico" />
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{CoreApp.Domain}}">
+    <meta property="og:title" content="{{CoreApp.Name}} Service Monitoring">
+    <meta property="og:description" content="{{CoreApp.Description}} {{CoreApp.Name}}">
+    <meta property="og:image" content="https://assets.statping.com/statping_social.png">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{CoreApp.Domain}}">
+    <meta property="twitter:title" content="{{CoreApp.Name}} Service Monitoring">
+    <meta property="twitter:description" content="{{CoreApp.Description}} {{CoreApp.Name}}">
+    <meta property="twitter:image" content="https://assets.statping.com/statping_social.png">
 
     <base href="{{BasePath}}">
     {{if USE_CDN}}
