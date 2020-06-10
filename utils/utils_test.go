@@ -178,7 +178,7 @@ func TestHttpRequest(t *testing.T) {
 
 func TestConfigLoad(t *testing.T) {
 	InitLogs()
-	initEnvs()
+	InitEnvs()
 
 	s := Params.GetString
 	b := Params.GetBool

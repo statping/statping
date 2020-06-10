@@ -265,7 +265,112 @@
 					]
 				},
 				{
-					"name": "Newletter",
+					"name": "Send Push Notification",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0150c3e2-c95a-4bc8-9bc5-e14e2bcb8831",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"notifications\": [\n        {\n            \"tokens\": [\n                \"dxKL1ccptUzsgk78l9rj7v:APA91bEwMOlR0kQnsjARwQpFLrq_Hk6JPQqQQhYmB4u_p-6sBqVVASyd8BzvmoT1AF3-RN05Pc9OJzeHHOm2lWGt83Y60tMsV6Dimdb7Y1OUPXCj4Se-1cufjSnZHh8b5uAIaAQ-udFP\"\n            ],\n            \"platform\": 2,\n            \"title\": \"Server is Offline\",\n            \"message\": \"Just to let you know, your server google.com is currently offline.\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://push.statping.com/api/push",
+							"protocol": "https",
+							"host": [
+								"push",
+								"statping",
+								"com"
+							],
+							"path": [
+								"api",
+								"push"
+							]
+						},
+						"description": "The API endpoint for users to add their email to the Statping newsletter."
+					},
+					"response": [
+						{
+							"name": "Newletter",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "email",
+											"value": "example@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "domain",
+											"value": "http://localhost:8080",
+											"type": "text"
+										},
+										{
+											"key": "timezone",
+											"value": "PST",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://news.statping.com/new",
+									"protocol": "https",
+									"host": [
+										"news",
+										"statping",
+										"com"
+									],
+									"path": [
+										"new"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "27"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 29 May 2020 22:01:45 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"id\": \"Q21FaAQvH\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Newletter Subscribe",
 					"event": [
 						{
 							"listen": "test",
@@ -289,7 +394,7 @@
 							"urlencoded": [
 								{
 									"key": "email",
-									"value": "example@gmail.com",
+									"value": "info@statping.com",
 									"type": "text"
 								},
 								{
@@ -317,6 +422,107 @@
 							]
 						},
 						"description": "The API endpoint for users to add their email to the Statping newsletter."
+					},
+					"response": [
+						{
+							"name": "Newletter",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "email",
+											"value": "example@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "domain",
+											"value": "http://localhost:8080",
+											"type": "text"
+										},
+										{
+											"key": "timezone",
+											"value": "PST",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://news.statping.com/new",
+									"protocol": "https",
+									"host": [
+										"news",
+										"statping",
+										"com"
+									],
+									"path": [
+										"new"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "27"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 29 May 2020 22:01:45 GMT"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"id\": \"Q21FaAQvH\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Newsletter Unsubscribe",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4dab5c33-9859-4bfa-9b53-8d59756bfb1d",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://news.statping.com/remove?email=info@statping.com",
+							"protocol": "https",
+							"host": [
+								"news",
+								"statping",
+								"com"
+							],
+							"path": [
+								"remove"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "info@statping.com"
+								}
+							]
+						},
+						"description": "The API endpoint for users remove their email from the Statping newsletter."
 					},
 					"response": [
 						{
