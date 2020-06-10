@@ -18,6 +18,7 @@ var (
 )
 
 func TestWebhookNotifier(t *testing.T) {
+	t.SkipNow()
 	err := utils.InitLogs()
 	require.Nil(t, err)
 	db, err := database.OpenTester()

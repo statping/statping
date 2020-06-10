@@ -2,7 +2,6 @@ package checkins
 
 import (
 	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/utils"
 	"time"
 )
 
@@ -29,11 +28,4 @@ type CheckinHit struct {
 	Checkin   int64     `gorm:"index;column:checkin" json:"-"`
 	From      string    `gorm:"column:from_location" json:"from"`
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
-}
-
-func (c *Checkin) BeforeCreate() (err error) {
-	if c.ApiKey == "" {
-		c.ApiKey = utils.RandomString(7)
-	}
-	return nil
 }

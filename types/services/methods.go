@@ -252,26 +252,18 @@ func SelectAllServices(start bool) (map[int64]*Service, error) {
 	if len(allServices) > 0 {
 		return allServices, nil
 	}
-
 	for _, s := range all() {
-
 		if start {
 			CheckinProcess(s)
 		}
-
-		fails := s.AllFailures().LastAmount(limitedFailures)
-		s.Failures = fails
-
+		s.Failures = s.AllFailures().LastAmount(limitedFailures)
 		for _, c := range s.Checkins() {
 			s.AllCheckins = append(s.AllCheckins, c)
 		}
-
 		// collect initial service stats
 		s.UpdateStats()
-
 		allServices[s.Id] = s
 	}
-
 	return allServices, nil
 }
 
@@ -281,15 +273,16 @@ func (s *Service) UpdateStats() *Service {
 	s.AvgResponse = s.AvgTime()
 	s.FailuresLast24Hours = s.FailuresSince(utils.Now().Add(-time.Hour * 24)).Count()
 
+	allFails := s.AllFailures()
 	if s.LastOffline.IsZero() {
-		lastFail := s.AllFailures().Last()
+		lastFail := allFails.Last()
 		if lastFail != nil {
 			s.LastOffline = lastFail.CreatedAt
 		}
 	}
 
 	s.Stats = &Stats{
-		Failures: s.AllFailures().Count(),
+		Failures: allFails.Count(),
 		Hits:     s.AllHits().Count(),
 		FirstHit: s.FirstHit().CreatedAt,
 	}
@@ -309,11 +302,8 @@ func (s *Service) OnlineDaysPercent(days int) float32 {
 
 // OnlineSince accepts a time since parameter to return the percent of a service's uptime.
 func (s *Service) OnlineSince(ago time.Time) float32 {
-	failed := s.FailuresSince(ago)
-	failsList := failed.Count()
-
-	total := s.HitsSince(ago)
-	hitsList := total.Count()
+	failsList := s.FailuresSince(ago).Count()
+	hitsList := s.HitsSince(ago).Count()
 
 	if failsList == 0 {
 		s.Online24Hours = 100.00
@@ -348,3 +338,11 @@ func (s *Service) Downtime() time.Duration {
 
 	return fail.CreatedAt.Sub(hit.CreatedAt)
 }
+
+// ServiceOrder will reorder the services based on 'order_id' (Order)
+type ServiceOrder []Service
+
+// Sort interface for resroting the Services in order
+func (c ServiceOrder) Len() int           { return len(c) }
+func (c ServiceOrder) Swap(i, j int)      { c[int64(i)], c[int64(j)] = c[int64(j)], c[int64(i)] }
+func (c ServiceOrder) Less(i, j int) bool { return c[i].Order < c[j].Order }

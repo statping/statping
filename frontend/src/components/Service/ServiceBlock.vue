@@ -85,6 +85,9 @@ export default {
             required: true
         },
     },
+  watch: {
+
+  },
   computed: {
     service() {
       return this.track_service
@@ -230,7 +233,7 @@ export default {
                   if (!this.timer_func) {
                     this.timer_func = setInterval(async () => {
                       this.track_service = await Api.service(this.service.id)
-                    }, this.track_service.check_interval * 1000)
+                    }, this.track_service.check_interval * 100)
                   }
                 }
         }

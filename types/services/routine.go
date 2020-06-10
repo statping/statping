@@ -21,7 +21,6 @@ import (
 func CheckServices() {
 	log.Infoln(fmt.Sprintf("Starting monitoring process for %v Services", len(allServices)))
 	for _, s := range allServices {
-		//go CheckinRoutine()
 		time.Sleep(250 * time.Millisecond)
 		go ServiceCheckQueue(s, true)
 	}
@@ -43,14 +42,14 @@ CheckLoop:
 			s.CheckService(record)
 			s.UpdateStats()
 			s.Checkpoint = s.Checkpoint.Add(s.Duration())
-			sleep := s.Checkpoint.Sub(time.Now())
 			if !s.Online {
 				s.SleepDuration = s.Duration()
 			} else {
-				s.SleepDuration = sleep
+				s.SleepDuration = s.Checkpoint.Sub(time.Now())
 			}
+		default:
+
 		}
-		continue
 	}
 }
 
@@ -79,9 +78,7 @@ func dnsCheck(s *Service) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	t2 := utils.Now()
-	subTime := t2.Sub(t1).Microseconds()
-	return subTime, err
+	return utils.Now().Sub(t1).Microseconds(), err
 }
 
 func isIPv6(address string) bool {
@@ -92,8 +89,7 @@ func isIPv6(address string) bool {
 func CheckIcmp(s *Service, record bool) (*Service, error) {
 	defer s.updateLastCheck()
 
-	err := utils.Ping(s.Domain, s.Timeout)
-	if err != nil {
+	if err := utils.Ping(s.Domain, s.Timeout); err != nil {
 		if record {
 			recordFailure(s, fmt.Sprintf("Could not send ICMP to service %v, %v", s.Domain, err))
 		}
@@ -140,8 +136,7 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 		}
 		return s, err
 	}
-	t2 := utils.Now()
-	s.Latency = t2.Sub(t1).Microseconds()
+	s.Latency = utils.Now().Sub(t1).Microseconds()
 	s.LastResponse = ""
 	s.Online = true
 	if record {
@@ -202,8 +197,7 @@ func CheckTcp(s *Service, record bool) (*Service, error) {
 		defer conn.Close()
 	}
 
-	t2 := utils.Now()
-	s.Latency = t2.Sub(t1).Microseconds()
+	s.Latency = utils.Now().Sub(t1).Microseconds()
 	s.LastResponse = ""
 	s.Online = true
 	if record {
@@ -279,8 +273,7 @@ func CheckHttp(s *Service, record bool) (*Service, error) {
 		}
 		return s, err
 	}
-	t2 := utils.Now()
-	s.Latency = t2.Sub(t1).Microseconds()
+	s.Latency = utils.Now().Sub(t1).Microseconds()
 	s.LastResponse = string(content)
 	s.LastStatusCode = res.StatusCode
 

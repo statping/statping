@@ -4,21 +4,8 @@ import (
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/null"
-	"github.com/statping/statping/utils"
 	"time"
 )
-
-var (
-	allServices map[int64]*Service
-)
-
-func init() {
-	allServices = make(map[int64]*Service)
-}
-
-func Services() map[int64]*Service {
-	return allServices
-}
 
 // Service is the main struct for Services
 type Service struct {
@@ -41,7 +28,7 @@ type Service struct {
 	TLSCertKey          null.NullString     `gorm:"column:tls_cert_key" json:"tls_cert_key" scope:"user,admin" yaml:"tls_cert_key"`
 	TLSCertRoot         null.NullString     `gorm:"column:tls_cert_root" json:"tls_cert_root" scope:"user,admin" yaml:"tls_cert_root"`
 	Headers             null.NullString     `gorm:"column:headers" json:"headers" scope:"user,admin" yaml:"headers"`
-	Permalink           null.NullString     `gorm:"column:permalink;unique;" json:"permalink" yaml:"permalink"`
+	Permalink           null.NullString     `gorm:"column:permalink" json:"permalink" yaml:"permalink"`
 	Redirect            null.NullBool       `gorm:"default:false;column:redirect" json:"redirect" scope:"user,admin" yaml:"redirect"`
 	CreatedAt           time.Time           `gorm:"column:created_at" json:"created_at" yaml:"-"`
 	UpdatedAt           time.Time           `gorm:"column:updated_at" json:"updated_at" yaml:"-"`
@@ -82,20 +69,3 @@ type Stats struct {
 	Hits     int       `gorm:"-" json:"hits"`
 	FirstHit time.Time `gorm:"-" json:"first_hit"`
 }
-
-// BeforeCreate for Service will set CreatedAt to UTC
-func (s *Service) BeforeCreate() (err error) {
-	if s.CreatedAt.IsZero() {
-		s.CreatedAt = utils.Now()
-		s.UpdatedAt = utils.Now()
-	}
-	return
-}
-
-// ServiceOrder will reorder the services based on 'order_id' (Order)
-type ServiceOrder []Service
-
-// Sort interface for resroting the Services in order
-func (c ServiceOrder) Len() int           { return len(c) }
-func (c ServiceOrder) Swap(i, j int)      { c[int64(i)], c[int64(j)] = c[int64(j)], c[int64(i)] }
-func (c ServiceOrder) Less(i, j int) bool { return c[i].Order < c[j].Order }

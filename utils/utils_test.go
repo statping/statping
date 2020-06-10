@@ -12,6 +12,7 @@ import (
 )
 
 func TestCreateLog(t *testing.T) {
+	Directory = os.Getenv("STATPING_DIR")
 	err := createLog(Directory)
 	assert.Nil(t, err)
 }
@@ -20,7 +21,7 @@ func TestReplaceValue(t *testing.T) {
 	assert.Equal(t, true, replaceVal(true))
 	assert.Equal(t, 42, replaceVal(42))
 	assert.Equal(t, "hello world", replaceVal("hello world"))
-	assert.Equal(t, "5s", replaceVal(time.Duration(5*time.Second)))
+	assert.Equal(t, "5s", replaceVal(5*time.Second))
 }
 
 func TestInitLogs(t *testing.T) {
@@ -122,15 +123,6 @@ func ExampleStringInt() {
 	// Output: 42
 }
 
-func TestTimezone(t *testing.T) {
-	zone := float32(-4.0)
-	loc, _ := time.LoadLocation("America/Los_Angeles")
-	timestamp := time.Date(2018, 1, 1, 10, 0, 0, 0, loc)
-	timezone := Timezoner(timestamp, zone)
-	assert.Equal(t, "2018-01-01 10:00:00 -0800 PST", timestamp.String())
-	assert.Equal(t, "2018-01-01 18:00:00 +0000 UTC", timezone.UTC().String())
-}
-
 func TestTimestamp_Ago(t *testing.T) {
 	now := Timestamp(time.Now())
 	assert.Equal(t, "Just now", now.Ago())
@@ -185,8 +177,8 @@ func TestHttpRequest(t *testing.T) {
 }
 
 func TestConfigLoad(t *testing.T) {
-	initCLI()
-	setDefaults()
+	InitLogs()
+	initEnvs()
 
 	s := Params.GetString
 	b := Params.GetBool

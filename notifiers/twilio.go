@@ -1,6 +1,7 @@
 package notifiers
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -70,7 +71,7 @@ func (t *twilio) sendMessage(message string) (string, error) {
 	v.Set("Body", message)
 	rb := strings.NewReader(v.Encode())
 
-	authHeader := utils.Base64(fmt.Sprintf("%s:%s", t.ApiKey, t.ApiSecret))
+	authHeader := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", t.ApiKey, t.ApiSecret)))
 
 	contents, _, err := utils.HttpRequest(twilioUrl, "POST", "application/x-www-form-urlencoded", []string{"Authorization=Basic " + authHeader}, rb, 10*time.Second, true, nil)
 	success, _ := twilioSuccess(contents)

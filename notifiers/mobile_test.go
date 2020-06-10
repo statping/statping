@@ -7,14 +7,12 @@ import (
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"os"
 	"testing"
 	"time"
 )
 
 var (
-	MOBILE_ID     string
-	MOBILE_NUMBER string
+	mobileToken string
 )
 
 func TestMobileNotifier(t *testing.T) {
@@ -22,25 +20,22 @@ func TestMobileNotifier(t *testing.T) {
 	err := utils.InitLogs()
 	require.Nil(t, err)
 
-	MOBILE_ID = utils.Params.GetString("MOBILE_ID")
-	MOBILE_NUMBER = utils.Params.GetString("MOBILE_NUMBER")
-	Mobile.Var1 = MOBILE_ID
+	mobileToken = utils.Params.GetString("MOBILE_TOKEN")
+	Mobile.Var1 = mobileToken
 
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
 	notifications.SetDB(db)
 
-	Mobile.Var1 = MOBILE_ID
-	Mobile.Var2 = os.Getenv("MOBILE_NUMBER")
-	if MOBILE_ID == "" {
+	Mobile.Var1 = mobileToken
+	if mobileToken == "" {
 		t.Log("Mobile notifier testing skipped, missing MOBILE_ID environment variable")
 		t.SkipNow()
 	}
 
 	t.Run("Load Mobile", func(t *testing.T) {
-		Mobile.Var1 = MOBILE_ID
-		Mobile.Var2 = MOBILE_NUMBER
+		Mobile.Var1 = mobileToken
 		Mobile.Delay = time.Duration(100 * time.Millisecond)
 		Mobile.Limits = 10
 		Mobile.Enabled = null.NewNullBool(true)
@@ -48,8 +43,7 @@ func TestMobileNotifier(t *testing.T) {
 		Add(Mobile)
 
 		assert.Equal(t, "Hunter Long", Mobile.Author)
-		assert.Equal(t, MOBILE_ID, Mobile.Var1)
-		assert.Equal(t, MOBILE_NUMBER, Mobile.Var2)
+		assert.Equal(t, mobileToken, Mobile.Var1)
 	})
 
 	t.Run("Mobile Notifier Tester", func(t *testing.T) {
@@ -67,7 +61,6 @@ func TestMobileNotifier(t *testing.T) {
 	})
 
 	t.Run("Mobile Test", func(t *testing.T) {
-		t.SkipNow()
 		_, err := Mobile.OnTest()
 		assert.Nil(t, err)
 	})

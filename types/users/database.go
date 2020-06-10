@@ -52,10 +52,3 @@ func (u *User) Delete() error {
 	}
 	return q.Error()
 }
-
-func (u *User) BeforeCreate() error {
-	u.Password = utils.HashPassword(u.Password)
-	u.ApiKey = utils.NewSHA256Hash()
-	u.ApiSecret = utils.NewSHA256Hash()
-	return nil
-}

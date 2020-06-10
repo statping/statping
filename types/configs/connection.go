@@ -23,8 +23,6 @@ import (
 // Connect will attempt to connect to the sqlite, postgres, or mysql database
 func Connect(configs *DbConfig, retry bool) error {
 	conn := configs.ConnectionString()
-	p := utils.Params
-	var err error
 
 	log.WithFields(utils.ToFields(configs, conn)).Debugln("attempting to connect to database")
 
@@ -40,20 +38,16 @@ func Connect(configs *DbConfig, retry bool) error {
 		}
 	}
 
-	apiSecret := p.GetString("API_SECRET")
-	configs.ApiSecret = apiSecret
+	configs.ApiSecret = utils.Params.GetString("API_SECRET")
 
 	log.WithFields(utils.ToFields(dbSession)).Debugln("connected to database")
 
-	maxOpenConn := p.GetInt("MAX_OPEN_CONN")
-	maxIdleConn := p.GetInt("MAX_IDLE_CONN")
-	maxLifeConn := p.GetDuration("MAX_LIFE_CONN")
+	db := dbSession.DB()
+	db.SetMaxOpenConns(utils.Params.GetInt("MAX_OPEN_CONN"))
+	db.SetMaxIdleConns(utils.Params.GetInt("MAX_IDLE_CONN"))
+	db.SetConnMaxLifetime(utils.Params.GetDuration("MAX_LIFE_CONN"))
 
-	dbSession.DB().SetMaxOpenConns(maxOpenConn)
-	dbSession.DB().SetMaxIdleConns(maxIdleConn)
-	dbSession.DB().SetConnMaxLifetime(maxLifeConn)
-
-	if dbSession.DB().Ping() == nil {
+	if db.Ping() == nil {
 		if utils.VerboseMode >= 4 {
 			dbSession.LogMode(true).Debug().SetLogger(gorm.Logger{log})
 		}

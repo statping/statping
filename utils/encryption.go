@@ -2,7 +2,6 @@ package utils
 
 import (
 	"crypto/sha256"
-	"encoding/base64"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"math/rand"
@@ -15,16 +14,18 @@ func HashPassword(password string) string {
 	return string(bytes)
 }
 
+// CheckHash returns true if the password matches with a hashed bcrypt password
+func CheckHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
 // NewSHA1Hash returns a random SHA1 hash based on a specific length
 func NewSHA256Hash() string {
 	d := make([]byte, 10)
 	rand.Seed(Now().UnixNano())
 	rand.Read(d)
 	return fmt.Sprintf("%x", sha256.Sum256(d))
-}
-
-func Base64(s string) string {
-	return base64.StdEncoding.EncodeToString([]byte(s))
 }
 
 var characterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")

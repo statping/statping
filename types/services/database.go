@@ -9,9 +9,18 @@ import (
 )
 
 var (
-	db  database.Database
-	log = utils.Log.WithField("type", "service")
+	db          database.Database
+	log         = utils.Log.WithField("type", "service")
+	allServices map[int64]*Service
 )
+
+func init() {
+	allServices = make(map[int64]*Service)
+}
+
+func Services() map[int64]*Service {
+	return allServices
+}
 
 func SetDB(database database.Database) {
 	db = database.Model(&Service{})

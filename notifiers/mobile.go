@@ -14,8 +14,6 @@ import (
 
 var _ notifier.Notifier = (*mobilePush)(nil)
 
-const mobileIdentifier = "com.statping"
-
 type mobilePush struct {
 	*notifications.Notification
 }
@@ -78,7 +76,6 @@ func (m *mobilePush) OnFailure(s *services.Service, f *failures.Failure) error {
 	msg := &pushArray{
 		Message: fmt.Sprintf("Your service '%v' is currently failing! Reason: %v", s.Name, f.Issue),
 		Title:   "Service Offline",
-		Topic:   mobileIdentifier,
 		Data:    data,
 	}
 	return m.Send(msg)
@@ -88,10 +85,10 @@ func (m *mobilePush) OnFailure(s *services.Service, f *failures.Failure) error {
 func (m *mobilePush) OnSuccess(s *services.Service) error {
 	data := dataJson(s, nil)
 	msg := &pushArray{
-		Message: "Service is Online!",
-		Title:   "Service Online",
-		Topic:   mobileIdentifier,
-		Data:    data,
+		Message:  "Service is Online!",
+		Title:    "Service Online",
+		Data:     data,
+		Platform: 2,
 	}
 	return m.Send(msg)
 }
@@ -101,9 +98,8 @@ func (m *mobilePush) OnTest() (string, error) {
 	msg := &pushArray{
 		Message:  "Testing the Mobile Notifier",
 		Title:    "Testing Notifications",
-		Topic:    mobileIdentifier,
 		Tokens:   []string{m.Var1},
-		Platform: utils.ToInt(m.Var2),
+		Platform: 2,
 	}
 	body, err := pushRequest(msg)
 	if err != nil {
@@ -134,9 +130,6 @@ func (m *mobilePush) Send(pushMessage *pushArray) error {
 }
 
 func pushRequest(msg *pushArray) ([]byte, error) {
-	if msg.Platform == 1 {
-		msg.Title = ""
-	}
 	body, err := json.Marshal(&PushNotification{[]*pushArray{msg}})
 	if err != nil {
 		return nil, err

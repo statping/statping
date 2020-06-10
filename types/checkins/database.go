@@ -38,7 +38,7 @@ func (c *Checkin) Create() error {
 	q := db.Create(c)
 
 	c.Start()
-	go c.CheckinRoutine()
+	go c.checkinRoutine()
 	return q.Error()
 }
 

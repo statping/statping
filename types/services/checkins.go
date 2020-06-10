@@ -8,7 +8,6 @@ import (
 func CheckinProcess(s *Service) {
 	for _, c := range s.Checkins() {
 		c.Start()
-		go c.CheckinRoutine()
 	}
 }
 
