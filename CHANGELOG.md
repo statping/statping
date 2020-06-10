@@ -1,3 +1,18 @@
+# 0.90.47 (06-10-2020)
+- Modified HTTP server, now in it's own go routine/channel
+- Added pprof golang debugging http server if `GO_ENV` == "test"
+- Added `HOST` env variable (hostname for http server)
+- Added `DISABLE_HTTP` env variable (defaults to false, disables the http server)
+- Added `DISABLE_COLORS` env variable (default to false, disables color encoding for logs)
+- Added `LOGS_MAX_COUNT`
+- Added `LOGS_MAX_AGE`
+- Added `LOGS_MAX_SIZE`
+- Confirmed `DISABLE_LOGS` is working
+- Modified Mobile Notifier to fit new push notification server endpoint
+- PR Merged: Fix time conversion in overview and charts #645
+- PR Merged: Wait for cmd reads to complete before calling Wait() #626
+- PR Merged: separate command options and option arguments #623
+
 # 0.90.46 (06-04-2020)
 - Add i18n language translations for frontend
 - Added PR for heatmap https://github.com/statping/statping/pull/589
