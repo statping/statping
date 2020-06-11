@@ -5916,15 +5916,7 @@
 							"script": {
 								"id": "3b2cf616-7e7d-4e11-beee-7027e0ed6dd2",
 								"exec": [
-									"pm.test(\"Response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"update check\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.status).to.eql(\"success\");",
-									"    pm.expect(jsonData.method).to.eql(\"update\");",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -6010,16 +6002,7 @@
 							"script": {
 								"id": "a3dd164d-56dc-43c9-80ae-ad42ced9542f",
 								"exec": [
-									"pm.test(\"Response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"",
-									"pm.test(\"correct values\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.gh_client_id).to.eql(\"githubid\");",
-									"    pm.expect(jsonData.gh_client_secret).to.eql(\"githubsecret\");",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -6096,14 +6079,7 @@
 							"script": {
 								"id": "2d5f11de-4041-4667-b094-4e1934195649",
 								"exec": [
-									"pm.test(\"Response is ok\", function () {",
-									"    pm.response.to.have.status(500);",
-									"});",
-									"",
-									"pm.test(\"missing values\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.error).to.eql(\"oauth2: server response missing access_token\");",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
