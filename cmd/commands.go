@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 var rootCmd = &cobra.Command{
@@ -23,6 +24,7 @@ var versionCmd = &cobra.Command{
 		} else {
 			fmt.Printf("%s\n", VERSION)
 		}
+		os.Exit(0)
 	},
 }
 
@@ -30,7 +32,11 @@ var assetsCmd = &cobra.Command{
 	Use:   "assets",
 	Short: "Dump all assets used locally to be edited",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return assetsCli()
+		if err := assetsCli(); err != nil {
+			return err
+		}
+		os.Exit(0)
+		return nil
 	},
 }
 
@@ -38,7 +44,11 @@ var exportCmd = &cobra.Command{
 	Use:   "export",
 	Short: "Exports your Statping settings to a 'statping-export.json' file.",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return exportCli(args)
+		if err := exportCli(args); err != nil {
+			return err
+		}
+		os.Exit(0)
+		return nil
 	},
 }
 
@@ -46,7 +56,11 @@ var sassCmd = &cobra.Command{
 	Use:   "sass",
 	Short: "Compile .scss files into the css directory",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return sassCli()
+		if err := sassCli(); err != nil {
+			return err
+		}
+		os.Exit(0)
+		return nil
 	},
 }
 
@@ -54,7 +68,11 @@ var envCmd = &cobra.Command{
 	Use:   "env",
 	Short: "Return the configs that will be ran",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return envCli()
+		if err := envCli(); err != nil {
+			return err
+		}
+		os.Exit(0)
+		return nil
 	},
 }
 
@@ -62,7 +80,11 @@ var resetCmd = &cobra.Command{
 	Use:   "reset",
 	Short: "Start a fresh copy of Statping",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return resetCli()
+		if err := resetCli(); err != nil {
+			return err
+		}
+		os.Exit(0)
+		return nil
 	},
 }
 
@@ -70,7 +92,11 @@ var onceCmd = &cobra.Command{
 	Use:   "once",
 	Short: "Check all services 1 time and then quit",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return onceCli()
+		if err := onceCli(); err != nil {
+			return err
+		}
+		os.Exit(0)
+		return nil
 	},
 }
 
@@ -78,7 +104,11 @@ var importCmd = &cobra.Command{
 	Use:   "import [.json file]",
 	Short: "Imports settings from a previously saved JSON file.",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return importCli(args)
+		if err := importCli(args); err != nil {
+			return err
+		}
+		os.Exit(0)
+		return nil
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {

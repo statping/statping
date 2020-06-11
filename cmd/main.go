@@ -23,11 +23,11 @@ var (
 	COMMIT  string
 	log     = utils.Log.WithField("type", "cmd")
 	confgs  *configs.DbConfig
-	process chan struct{}
+	stopped chan bool
 )
 
 func init() {
-	process = make(chan struct{})
+	stopped = make(chan bool, 1)
 	core.New(VERSION)
 	utils.InitEnvs()
 
@@ -47,7 +47,7 @@ func init() {
 func exit(err error) {
 	utils.SentryErr(err)
 	log.Fatalln(err)
-	close(process)
+	os.Exit(1)
 }
 
 // Close will gracefully stop the database connection, and log file
@@ -59,9 +59,8 @@ func Close() {
 
 // main will run the Statping application
 func main() {
-	utils.InitLogs()
 	go Execute()
-	<-process
+	<-stopped
 	Close()
 }
 
@@ -146,8 +145,7 @@ func sigterm() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	<-sigs
-	close(process)
-	os.Exit(0)
+	stopped <- true
 }
 
 // mainProcess will initialize the Statping application and run the HTTP server
@@ -169,15 +167,21 @@ func mainProcess() error {
 // This function will gather all services in database, add/init Notifiers,
 // and start the database cleanup routine
 func InitApp() error {
+	// fetch Core row information about this instance.
 	if _, err := core.Select(); err != nil {
 		return err
 	}
+	// select all services in database and store services in a mapping of Service pointers
 	if _, err := services.SelectAllServices(true); err != nil {
 		return err
 	}
+	// start routines for each service checking process
 	services.CheckServices()
+	// connect each notifier, added them into database if needed
 	notifiers.InitNotifiers()
+	// start routine to delete old records (failures, hits)
 	go database.Maintenance()
+	// init Sentry error monitoring (its useful)
 	utils.SentryInit(&VERSION, core.App.AllowReports.Bool)
 	core.App.Setup = true
 	core.App.Started = utils.Now()
