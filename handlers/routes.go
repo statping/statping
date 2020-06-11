@@ -49,7 +49,7 @@ func Router() *mux.Router {
 		r.Use(sendLog)
 	}
 
-	if utils.Params.GetString("GO_ENV") == "test" {
+	if utils.Params.GetBool("DEBUG") {
 		go func() {
 			log.Infoln("Starting pprof web server on http://0.0.0.0:9090")
 			r := http.NewServeMux()

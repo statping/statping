@@ -67,8 +67,6 @@ func RunHTTPServer() error {
 		select {
 		case err := <-httpError:
 			return err
-		default:
-
 		}
 	}
 }

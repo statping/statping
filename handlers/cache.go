@@ -34,12 +34,12 @@ CacheRoutine:
 		case <-s.running:
 			break CacheRoutine
 		case <-time.After(duration):
-			duration = 5 * time.Second
 			for k, v := range s.List() {
 				if v.Expired() {
 					s.Delete(k)
 				}
 			}
+			duration = 5 * time.Second
 		}
 	}
 }

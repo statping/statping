@@ -1,4 +1,5 @@
 # 0.90.47 (06-10-2020)
+- Fixed Urgent bug taking 100% of CPU (Timer)
 - Modified HTTP server, now in it's own go routine/channel
 - Fixed Service form for editing
 - Added pprof golang debugging http server if `GO_ENV` == "test"
@@ -8,6 +9,7 @@
 - Added `LOGS_MAX_COUNT`
 - Added `LOGS_MAX_AGE`
 - Added `LOGS_MAX_SIZE`
+- Added `DEBUG` (starts a pprof golang debugging http server on port 9090, defaults to false)
 - Confirmed `DISABLE_LOGS` is working
 - Modified Mobile Notifier to fit new push notification server endpoint
 - PR Merged: Fix time conversion in overview and charts #645

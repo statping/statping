@@ -47,8 +47,6 @@ CheckLoop:
 			} else {
 				s.SleepDuration = s.Checkpoint.Sub(time.Now())
 			}
-		default:
-
 		}
 	}
 }
