@@ -1,3 +1,7 @@
+# 0.90.48 (06-11-2020)
+- Modified shutdown routine to make command exit with code 0
+- Modified install.sh for correct installation
+
 # 0.90.47 (06-10-2020)
 - Fixed Urgent bug taking 100% of CPU (Timer)
 - Modified HTTP server, now in it's own go routine/channel

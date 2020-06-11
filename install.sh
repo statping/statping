@@ -34,11 +34,9 @@ statping_get_tarball() {
     fi
     printf "$green> Installing to $DEST/statping\n"
     mv "$temp"/statping "$DEST"
-    newversion=`$DEST/statping version`
     rm -rf "$temp"
     rm $tarball_tmp*
     printf "$cyan> Statping is now installed! $reset\n"
-    printf "$white>   Version:  $newversion $reset\n"
     printf "$white>   Repo:     $repo $reset\n"
     printf "$white>   Wiki:     $repo/wiki $reset\n"
     printf "$white>   Issues:   $repo/issues $reset\n"
@@ -71,11 +69,7 @@ statping_install() {
   printf "${white}Installing Statping!$reset\n"
   getOS
   getArch
-  if [ "$OS" == "darwin" ]; then
-      statping_brew_install
-    else
-      statping_get_tarball $OS $ARCH
-  fi
+  statping_get_tarball $OS $ARCH
   statping_reset
 }
 
@@ -140,7 +134,7 @@ getArch() {
       ARCH="amd64"
     elif [ ${MACHINE_TYPE} == 'arm' ]; then
       ARCH="arm"
-    elif [ ${MACHINE_TYPE} == 'arm64' ] || [ ${MACHINE_TYPE} == 'aarch64' ] || [ ${MACHINE_TYPE} == 'armv8b' ] || [ ${MACHINE_TYPE} == 'armv8l' ] || [ ${MACHINE_TYPE} == 'aarch64_be' ]; then
+    elif [ ${MACHINE_TYPE} == 'arm64' ]; then
       ARCH="arm64"
     else
       ARCH="386"
