@@ -175,7 +175,7 @@ func InitApp() error {
 	if _, err := services.SelectAllServices(true); err != nil {
 		return err
 	}
-	go services.CheckServices()
+	services.CheckServices()
 	notifiers.InitNotifiers()
 	go database.Maintenance()
 	utils.SentryInit(&VERSION, core.App.AllowReports.Bool)

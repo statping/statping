@@ -117,7 +117,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go services.CheckServices()
+	services.CheckServices()
 
 	core.App.Setup = true
 

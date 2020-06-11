@@ -21,7 +21,7 @@ import (
 func CheckServices() {
 	log.Infoln(fmt.Sprintf("Starting monitoring process for %v Services", len(allServices)))
 	for _, s := range allServices {
-		time.Sleep(250 * time.Millisecond)
+		time.Sleep(50 * time.Millisecond)
 		go ServiceCheckQueue(s, true)
 	}
 }
