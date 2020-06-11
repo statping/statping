@@ -330,5 +330,6 @@ certs:
 	  -keyout key.pem \
 	  -subj "/C=US/ST=California/L=Santa Monica/O=Statping/OU=Development/CN=localhost"
 
+
 .PHONY: all build build-all build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds
