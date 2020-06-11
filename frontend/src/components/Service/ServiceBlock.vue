@@ -168,7 +168,7 @@ export default {
         }
     },
   beforeDestroy() {
-    clearInterval(this.timer_func)
+    // clearInterval(this.timer_func)
   },
   async created() {
       this.track_service = this.in_service
@@ -230,11 +230,11 @@ export default {
                 if (isVisible && !this.visible) {
                     this.visible = true
 
-                  if (!this.timer_func) {
-                    this.timer_func = setInterval(async () => {
-                      this.track_service = await Api.service(this.service.id)
-                    }, this.track_service.check_interval * 100)
-                  }
+                  // if (!this.timer_func) {
+                  //   this.timer_func = setInterval(async () => {
+                  //     this.track_service = await Api.service(this.service.id)
+                  //   }, this.track_service.check_interval * 100)
+                  // }
                 }
         }
     }
