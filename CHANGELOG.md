@@ -1,5 +1,6 @@
 # 0.90.47 (06-10-2020)
 - Modified HTTP server, now in it's own go routine/channel
+- Fixed Service form for editing
 - Added pprof golang debugging http server if `GO_ENV` == "test"
 - Added `HOST` env variable (hostname for http server)
 - Added `DISABLE_HTTP` env variable (defaults to false, disables the http server)

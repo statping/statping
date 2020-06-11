@@ -1,21 +1,21 @@
-import Index from "./pages/Index";
-import Dashboard from "./pages/Dashboard";
-import DashboardIndex from "./components/Dashboard/DashboardIndex";
-import DashboardUsers from "./components/Dashboard/DashboardUsers";
-import DashboardServices from "./components/Dashboard/DashboardServices";
-import EditService from "./components/Dashboard/EditService";
-import DashboardMessages from "./components/Dashboard/DashboardMessages";
-import Logs from './pages/Logs';
-import Settings from "./pages/Settings";
-import Login from "./pages/Login";
-import Service from "./pages/Service";
-import VueRouter from "vue-router";
-import Setup from "./forms/Setup";
+const Index = () => import('@/pages/Index')
+const Dashboard = () => import('@/pages/Dashboard')
+const DashboardIndex = () => import('@/components/Dashboard/DashboardIndex')
+const DashboardUsers = () => import('@/components/Dashboard/DashboardUsers')
+const DashboardServices = () => import('@/components/Dashboard/DashboardServices')
+const DashboardMessages = () => import('@/components/Dashboard/DashboardMessages')
+const EditService = () => import('@/components/Dashboard/EditService')
+const Logs = () => import('@/pages/Logs')
+const Settings = () => import('@/pages/Settings')
+const Login = () => import('@/pages/Login')
+const Service = () => import('@/pages/Service')
+const Setup = () => import('@/forms/Setup')
+const Incidents = () => import('@/components/Dashboard/Incidents')
+const Checkins = () => import('@/components/Dashboard/Checkins')
+const Failures = () => import('@/components/Dashboard/Failures')
 
+import VueRouter from "vue-router";
 import Api from "./API";
-import Incidents from "@/components/Dashboard/Incidents";
-import Checkins from "@/components/Dashboard/Checkins";
-import Failures from "@/components/Dashboard/Failures";
 
 const routes = [
   {

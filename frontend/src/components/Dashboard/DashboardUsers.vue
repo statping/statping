@@ -45,7 +45,7 @@
 
 <script>
   import Api from "../../API"
-  import FormUser from "../../forms/User";
+  const FormUser = () => import('@/forms/User')
 
   export default {
   name: 'DashboardUsers',

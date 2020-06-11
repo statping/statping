@@ -292,7 +292,7 @@
           }
       },
       watch: {
-          in_service: function(svr) {
+          in_service(svr, old) {
             this.service = svr
             this.use_tls = svr.tls_cert
           }
@@ -312,7 +312,7 @@
           if (this.in_service) {
             this.service = this.in_service
           }
-          this.use_tls = this.service.tls_cert
+          this.use_tls = this.service.tls_cert !== ""
         },
           updatePermalink() {
               const a = 'àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;'

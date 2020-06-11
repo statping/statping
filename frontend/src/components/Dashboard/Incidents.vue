@@ -45,13 +45,13 @@
                 </form>
             </div>
         </div>
-        
+
     </div>
 </template>
 
 <script>
     import Api from "../../API";
-    import FormIncidentUpdates from "@/forms/IncidentUpdates";
+    const FormIncidentUpdates = () => import('@/forms/IncidentUpdates')
 
     export default {
         name: 'Incidents',

@@ -56,7 +56,9 @@
             </div>
         </div>
 
-        <button @click.prevent="saveSettings" id="save_core" type="submit" class="btn btn-primary btn-block mt-3">Save Settings</button>
+        <button @click.prevent="saveSettings" id="save_core" type="submit" class="btn btn-primary btn-block mt-3" v-bind:disabled="loading">
+            <font-awesome-icon v-if="loading" icon="circle-notch" class="mr-2" spin/>Save Settings
+        </button>
 
     </form>
 </template>
@@ -66,6 +68,11 @@
 
   export default {
       name: 'CoreSettings',
+    data () {
+      return {
+        loading: false
+      }
+    },
       computed: {
           core() {
               return this.$store.getters.core
@@ -73,10 +80,12 @@
       },
       methods: {
           async saveSettings() {
+            this.loading = true
               const c = this.core
               await Api.core_save(c)
               const core = await Api.core()
               this.$store.commit('setCore', core)
+            setInterval(() => { this.loading = false }, 1500)
           },
           selectAll() {
               this.$refs.input.select();

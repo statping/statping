@@ -6,8 +6,7 @@
 </template>
 
 <script>
-  import Api from "../API"
-  import TopNav from "../components/Dashboard/TopNav";
+  const TopNav = () => import('@/components/Dashboard/TopNav')
 
   export default {
   name: 'Dashboard',

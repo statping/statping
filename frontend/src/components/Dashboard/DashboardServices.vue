@@ -59,11 +59,11 @@
 </template>
 
 <script>
-  import FormGroup from "../../forms/Group";
+  const FormGroup = () => import('@/forms/Group')
+  const ToggleSwitch = () => import('@/forms/ToggleSwitch')
+  const ServicesList = () => import('@/components/Dashboard/ServicesList')
   import Api from "../../API";
-  import ToggleSwitch from "../../forms/ToggleSwitch";
   import draggable from 'vuedraggable'
-  import ServicesList from './ServicesList';
 
   export default {
       name: 'DashboardServices',

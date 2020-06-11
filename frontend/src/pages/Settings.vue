@@ -261,13 +261,14 @@
 
 <script>
   import Api from '../API';
-  import CoreSettings from '../forms/CoreSettings';
-  import FormIntegration from '../forms/Integration';
-  import Notifier from "../forms/Notifier";
-  import ThemeEditor from "../components/Dashboard/ThemeEditor";
-  import Cache from "@/components/Dashboard/Cache";
-  import OAuth from "../forms/OAuth";
   import GithubButton from 'vue-github-button'
+
+  const CoreSettings = () => import('@/forms/CoreSettings')
+  const FormIntegration = () => import('@/forms/Integration')
+  const Notifier = () => import('@/forms/Notifier')
+  const OAuth = () => import('@/forms/OAuth')
+  const ThemeEditor = () => import('@/components/Dashboard/ThemeEditor')
+  const Cache = () => import('@/components/Dashboard/Cache')
 
   export default {
       name: 'Settings',

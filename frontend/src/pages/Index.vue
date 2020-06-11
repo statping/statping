@@ -34,14 +34,12 @@
 </template>
 
 <script>
-import Api from '../API';
-import Group from '../components/Index/Group';
-import Header from '../components/Index/Header';
-import MessageBlock from '../components/Index/MessageBlock';
-import ServiceBlock from '../components/Service/ServiceBlock';
-import GroupServiceFailures from "../components/Index/GroupServiceFailures";
-import IncidentsBlock from "../components/Index/IncidentsBlock";
-
+const Group = () => import('@/components/Index/Group')
+const Header = () => import('@/components/Index/Header')
+const MessageBlock = () => import('@/components/Index/MessageBlock')
+const ServiceBlock = () => import('@/components/Service/ServiceBlock')
+const GroupServiceFailures = () => import('@/components/Index/GroupServiceFailures')
+const IncidentsBlock = () => import('@/components/Index/IncidentsBlock')
 
 export default {
     name: 'Index',

@@ -64,15 +64,15 @@
 
 <script>
   import Api from "../API"
-  import MessageBlock from '../components/Index/MessageBlock';
-  import ServiceFailures from '../components/Service/ServiceFailures';
-  import Checkin from "../forms/Checkin";
-  import ServiceHeatmap from "@/components/Service/ServiceHeatmap";
-  import ServiceTopStats from "@/components/Service/ServiceTopStats";
-  import store from '../store'
+  const MessageBlock = () => import('@/components/Index/MessageBlock')
+  const ServiceFailures = () => import('@/components/Service/ServiceFailures')
+  const Checkin = () => import('@/forms/Checkin')
+  const ServiceHeatmap = () => import('@/components/Service/ServiceHeatmap')
+  const ServiceTopStats = () => import('@/components/Service/ServiceTopStats')
+  const AdvancedChart = () => import('@/components/Service/AdvancedChart')
+
   import flatPickr from 'vue-flatpickr-component';
   import 'flatpickr/dist/flatpickr.css';
-  import AdvancedChart from "@/components/Service/AdvancedChart";
   const timeoptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
 
   const axisOptions = {

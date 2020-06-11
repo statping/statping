@@ -10,8 +10,7 @@
 </template>
 
 <script>
-  import Api from "../API";
-  import FormLogin from '../forms/Login';
+  const FormLogin = () => import('@/forms/Login')
 
   export default {
   name: 'Login',
