@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"github.com/statping/statping/types/metrics"
 	"google.golang.org/grpc"
 	"net"
 	"net/http"
@@ -272,6 +273,7 @@ func CheckHttp(s *Service, record bool) (*Service, error) {
 		return s, err
 	}
 	s.Latency = utils.Now().Sub(t1).Microseconds()
+	metrics.Histo("latency", utils.Now().Sub(t1).Seconds(), s.Id)
 	s.LastResponse = string(content)
 	s.LastStatusCode = res.StatusCode
 

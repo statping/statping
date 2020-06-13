@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
@@ -38,7 +39,11 @@ func hex2int(hexStr string) uint64 {
 	return uint64(result)
 }
 
-func prometheusHandler(w http.ResponseWriter, r *http.Request) {
+func prometheusHandler() http.Handler {
+	return promhttp.Handler()
+}
+
+func prometheusOldHandler(w http.ResponseWriter, r *http.Request) {
 	promValues = []string{}
 	prefix = utils.Params.GetString("PREFIX")
 	if prefix != "" {
@@ -50,8 +55,6 @@ func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
-
-	httpMetrics := utils.GetHttpMetrics()
 
 	promValues = append(promValues, "# Statping Prometheus Exporter")
 
@@ -101,13 +104,8 @@ func prometheusHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	PrometheusComment("HTTP Metrics")
-	PrometheusKeyValue("http_errors", httpMetrics.Errors)
-	PrometheusKeyValue("http_requests", httpMetrics.Requests)
-	PrometheusKeyValue("http_bytes", httpMetrics.Bytes)
-	PrometheusKeyValue("http_request_milliseconds", httpMetrics.Milliseconds)
-
 	// https://golang.org/pkg/runtime/#MemStats
+
 	PrometheusComment("Golang Metrics")
 	PrometheusKeyValue("go_heap_allocated", m.Alloc)
 	PrometheusKeyValue("go_total_allocated", m.TotalAlloc)
