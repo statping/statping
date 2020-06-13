@@ -191,6 +191,9 @@ func DurationReadable(d time.Duration) string {
 func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool, customTLS *tls.Config) ([]byte, *http.Response, error) {
 	var err error
 	var req *http.Request
+	if method == "" {
+		method = "GET"
+	}
 	t1 := Now()
 	if req, err = http.NewRequest(method, url, body); err != nil {
 		return nil, nil, err
