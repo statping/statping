@@ -2,6 +2,7 @@ package hits
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/metrics"
 	"github.com/statping/statping/utils"
 )
 
@@ -11,6 +12,10 @@ var db database.Database
 
 func SetDB(database database.Database) {
 	db = database.Model(&Hit{})
+}
+
+func (h *Hit) AfterCreate() {
+	metrics.Inc("success", h.Service)
 }
 
 func (h *Hit) Create() error {

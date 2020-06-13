@@ -5,6 +5,9 @@ import (
 	"crypto/subtle"
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/utils"
@@ -16,8 +19,12 @@ import (
 )
 
 var (
-	authUser string
-	authPass string
+	authUser     string
+	authPass     string
+	httpDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
+		Name: "http_duration_seconds",
+		Help: "Duration of HTTP requests.",
+	}, []string{"path"})
 )
 
 // Gzip Compression
@@ -122,7 +129,7 @@ func authenticated(handler func(w http.ResponseWriter, r *http.Request), redirec
 }
 
 // readOnly is a middleware function to check if user is a User before running original request
-func readOnly(handler func(w http.ResponseWriter, r *http.Request), redirect bool) http.Handler {
+func readOnly(handler http.Handler, redirect bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !IsReadAuthenticated(r) {
 			if redirect {
@@ -132,7 +139,7 @@ func readOnly(handler func(w http.ResponseWriter, r *http.Request), redirect boo
 			}
 			return
 		}
-		handler(w, r)
+		handler.ServeHTTP(w, r)
 	})
 }
 
@@ -163,6 +170,17 @@ func cached(duration, contentType string, handler func(w http.ResponseWriter, r 
 				go CacheStorage.Set(r.RequestURI, content, d)
 			}
 		}
+	})
+}
+
+// prometheusMiddleware implements mux.MiddlewareFunc.
+func prometheusMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		route := mux.CurrentRoute(r)
+		path, _ := route.GetPathTemplate()
+		timer := prometheus.NewTimer(httpDuration.WithLabelValues(path))
+		next.ServeHTTP(w, r)
+		timer.ObserveDuration()
 	})
 }
 

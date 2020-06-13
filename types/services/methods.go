@@ -253,6 +253,7 @@ func SelectAllServices(start bool) (map[int64]*Service, error) {
 		return allServices, nil
 	}
 	for _, s := range all() {
+
 		if start {
 			CheckinProcess(s)
 		}

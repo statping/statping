@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"github.com/statping/statping/types/metrics"
 	"io"
 	"io/ioutil"
 	"net"
@@ -190,9 +191,11 @@ func DurationReadable(d time.Duration) string {
 func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool, customTLS *tls.Config) ([]byte, *http.Response, error) {
 	var err error
 	var req *http.Request
+	if method == "" {
+		method = "GET"
+	}
 	t1 := Now()
 	if req, err = http.NewRequest(method, url, body); err != nil {
-		httpMetric.Errors++
 		return nil, nil, err
 	}
 	req.Header.Set("User-Agent", "Statping")
@@ -254,7 +257,6 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	}
 
 	if resp, err = client.Do(req); err != nil {
-		httpMetric.Errors++
 		return nil, resp, err
 	}
 	defer resp.Body.Close()
@@ -262,10 +264,10 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	if err != nil {
 		return nil, resp, err
 	}
+
 	// record HTTP metrics
-	httpMetric.Requests++
-	httpMetric.Milliseconds += Now().Sub(t1).Milliseconds() / httpMetric.Requests
-	httpMetric.Bytes += int64(len(contents))
+	metrics.Histo("bytes", float64(len(contents)), url, method)
+	metrics.Histo("duration", Now().Sub(t1).Seconds(), url, method)
 
 	return contents, resp, err
 }

@@ -4,11 +4,14 @@ import (
 	"fmt"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/statping/statping/source"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/utils"
 	"net/http"
 	"net/http/pprof"
+
+	_ "github.com/statping/statping/types/metrics"
 )
 
 var (
@@ -27,6 +30,7 @@ func Router() *mux.Router {
 	CacheStorage = NewStorage()
 
 	r := mux.NewRouter().StrictSlash(true)
+	r.Use(prometheusMiddleware)
 
 	authUser := utils.Params.GetString("AUTH_USERNAME")
 	authPass := utils.Params.GetString("AUTH_PASSWORD")
@@ -86,6 +90,7 @@ func Router() *mux.Router {
 
 	api := r.NewRoute().Subrouter()
 	api.Use(apiMiddleware)
+	api.Use(prometheusMiddleware)
 
 	// API Routes
 	r.Handle("/api", scoped(apiIndexHandler))
@@ -113,7 +118,7 @@ func Router() *mux.Router {
 	// API GROUPS Routes
 	api.Handle("/api/groups", scoped(apiAllGroupHandler)).Methods("GET")
 	api.Handle("/api/groups", authenticated(apiCreateGroupHandler, false)).Methods("POST")
-	api.Handle("/api/groups/{id}", readOnly(apiGroupHandler, false)).Methods("GET")
+	api.Handle("/api/groups/{id}", readOnly(http.HandlerFunc(apiGroupHandler), false)).Methods("GET")
 	api.Handle("/api/groups/{id}", authenticated(apiGroupUpdateHandler, false)).Methods("POST")
 	api.Handle("/api/groups/{id}", authenticated(apiGroupDeleteHandler, false)).Methods("DELETE")
 	api.Handle("/api/reorder/groups", authenticated(apiGroupReorderHandler, false)).Methods("POST")
@@ -174,7 +179,7 @@ func Router() *mux.Router {
 	r.Handle("/checkin/{api}", http.HandlerFunc(checkinHitHandler))
 
 	// API Generic Routes
-	r.Handle("/metrics", readOnly(prometheusHandler, false))
+	r.Handle("/metrics", readOnly(promhttp.Handler(), false))
 	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
 	r.Handle("/.well-known/", http.StripPrefix("/.well-known/", http.FileServer(http.Dir(dir+"/.well-known"))))
 	r.NotFoundHandler = http.HandlerFunc(error404Handler)

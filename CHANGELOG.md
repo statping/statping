@@ -1,3 +1,6 @@
+# 0.90.49 (06-12-2020)
+- Added additional prometheus /metrics for better debugging
+
 # 0.90.48 (06-11-2020)
 - Modified shutdown routine to make command exit with code 0
 - Modified install.sh for correct installation

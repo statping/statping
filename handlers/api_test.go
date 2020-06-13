@@ -246,9 +246,11 @@ func TestMainApiRoutes(t *testing.T) {
 			AfterTest:      UnsetTestENV,
 			ExpectedStatus: 200,
 			ExpectedContains: []string{
-				`Statping Totals`,
-				`total_failures`,
-				`Golang Metrics`,
+				`go_goroutines`,
+				`go_memstats_alloc_bytes`,
+				`http_duration_seconds_count`,
+				`http_response_bytes_count`,
+				`service_request_duration_count`,
 			},
 		},
 	}

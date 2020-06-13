@@ -1,6 +1,9 @@
 package failures
 
-import "github.com/statping/statping/database"
+import (
+	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/metrics"
+)
 
 var db database.Database
 
@@ -16,6 +19,10 @@ func All() []*Failure {
 	var failures []*Failure
 	db.Find(&failures)
 	return failures
+}
+
+func (f *Failure) AfterCreate() {
+	metrics.Inc("failure", f.Service)
 }
 
 func (f *Failure) Create() error {
