@@ -143,6 +143,7 @@ func removeJwtToken(w http.ResponseWriter) {
 		Name:    cookieKey,
 		Value:   "",
 		Expires: time.Now(),
+		MaxAge:  -1,
 	})
 }
 

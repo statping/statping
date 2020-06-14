@@ -1,3 +1,7 @@
+# 0.90.50 (06-13-2020)
+- Removed PORT, replaced with SERVER_PORT
+- Removed HOST/IP, replaced with SERVER_IP
+
 # 0.90.49 (06-12-2020)
 - Added additional prometheus /metrics for better debugging
 

@@ -80,6 +80,9 @@ func start() {
 
 	log.Info(fmt.Sprintf("Starting Statping v%s", VERSION))
 
+	utils.Params.Set("SERVER_IP", ipAddress)
+	utils.Params.Set("SERVER_PORT", port)
+
 	confgs, err = configs.LoadConfigs(configFile)
 	if err != nil {
 		log.Infoln("Starting in Setup Mode")
