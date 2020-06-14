@@ -40,8 +40,8 @@ func RunHTTPServer() error {
 		return nil
 	}
 
-	ip := utils.Params.GetString("HOST")
-	host := fmt.Sprintf("%v:%v", ip, utils.Params.GetInt("PORT"))
+	ip := utils.Params.GetString("SERVER_IP")
+	host := fmt.Sprintf("%v:%v", ip, utils.Params.GetInt("SERVER_PORT"))
 	key := utils.FileExists(utils.Directory + "/server.key")
 	cert := utils.FileExists(utils.Directory + "/server.crt")
 

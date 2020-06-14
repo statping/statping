@@ -20,8 +20,16 @@ func parseFlags(cmd *cobra.Command) {
 	utils.Params.BindPFlag("port", cmd.PersistentFlags().Lookup("port"))
 
 	cmd.PersistentFlags().IntVarP(&verboseMode, "verbose", "v", 2, "verbose logging")
-	utils.Params.BindPFlag("VERBOSE", cmd.PersistentFlags().Lookup("verbose"))
+	utils.Params.BindPFlag("verbose", cmd.PersistentFlags().Lookup("verbose"))
 
 	cmd.PersistentFlags().StringVarP(&configFile, "config", "c", utils.Directory+"/config.yml", "path to config.yml file")
 	utils.Params.BindPFlag("config", cmd.PersistentFlags().Lookup("config"))
+
+	if utils.Params.GetString("SERVER_IP") != ipAddress {
+		utils.Params.Set("SERVER_IP", ipAddress)
+	}
+
+	if utils.Params.GetInt("SERVER_PORT") != port {
+		utils.Params.Set("SERVER_PORT", port)
+	}
 }
