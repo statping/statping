@@ -6,38 +6,6 @@ import (
 )
 
 var (
-	serviceOnline = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "service_online",
-			Help: "How many failures occur for a service",
-		},
-		[]string{"service"},
-	)
-
-	serviceFailures = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "service_failures",
-			Help: "How many failures occur for a service",
-		},
-		[]string{"service"},
-	)
-
-	serviceSuccess = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "service_success",
-			Help: "How many successful requests for a service",
-		},
-		[]string{"service"},
-	)
-
-	serviceLatencyDuration = prometheus.NewHistogramVec(
-		prometheus.HistogramOpts{
-			Name: "service_request_duration",
-			Help: "How many successful requests for a service",
-		},
-		[]string{"service"},
-	)
-
 	utilsHttpRequestDur = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
 			Name: "http_requests_duration",
@@ -60,6 +28,7 @@ func init() {
 		serviceOnline,
 		serviceFailures,
 		serviceSuccess,
+		serviceStatusCode,
 		serviceLatencyDuration,
 		utilsHttpRequestDur,
 		utilsHttpRequestBytes,
@@ -74,6 +43,15 @@ func Histo(method string, value float64, labels ...interface{}) {
 		utilsHttpRequestDur.WithLabelValues(convert(labels)...).Observe(value)
 	case "bytes":
 		utilsHttpRequestBytes.WithLabelValues(convert(labels)...).Observe(value)
+	}
+}
+
+func Gauge(method string, value float64, labels ...interface{}) {
+	switch method {
+	case "service":
+		serviceStatusCode.WithLabelValues(convert(labels)...).Set(value)
+	case "online":
+		serviceOnline.WithLabelValues(convert(labels)...).Set(value)
 	}
 }
 

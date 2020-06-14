@@ -276,6 +276,7 @@ func CheckHttp(s *Service, record bool) (*Service, error) {
 	metrics.Histo("latency", utils.Now().Sub(t1).Seconds(), s.Id)
 	s.LastResponse = string(content)
 	s.LastStatusCode = res.StatusCode
+	metrics.Gauge("service", float64(res.StatusCode), s.Id)
 
 	if s.Expected.String != "" {
 		match, err := regexp.MatchString(s.Expected.String, string(content))
@@ -321,6 +322,7 @@ func recordSuccess(s *Service) {
 	s.LastLatency = hit.Latency
 	sendSuccess(s)
 	s.SuccessNotified = true
+	metrics.Gauge("online", 1., s.Id)
 }
 
 func AddNotifier(n ServiceNotifier) {
@@ -373,6 +375,7 @@ func recordFailure(s *Service, issue string) {
 	s.SuccessNotified = false
 	s.DownText = s.DowntimeText()
 	sendFailure(s, fail)
+	metrics.Gauge("online", 0., s.Id)
 }
 
 func sendFailure(s *Service, f *failures.Failure) {
