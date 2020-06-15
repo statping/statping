@@ -26,8 +26,8 @@ type Notification struct {
 	Enabled     null.NullBool `gorm:"column:enabled;type:boolean;default:false" json:"enabled,omitempty"`
 	Limits      int           `gorm:"not null;column:limits" json:"limits"`
 	Removable   bool          `gorm:"column:removable" json:"removable"`
-	SuccessData string        `gorm:"not null;column:success_data" json:"success_data,omitempty"`
-	FailureData string        `gorm:"not null;column:failure_data" json:"failure_data,omitempty"`
+	SuccessData string        `gorm:"type:text;not null;column:success_data" json:"success_data,omitempty"`
+	FailureData string        `gorm:"type:text;not null;column:failure_data" json:"failure_data,omitempty"`
 	DataType    string        `gorm:"-" json:"data_type,omitempty"`
 	RequestInfo string        `gorm:"-" json:"request_info,omitempty"`
 	CreatedAt   time.Time     `gorm:"column:created_at" json:"created_at"`
@@ -40,13 +40,9 @@ type Notification struct {
 	Delay       time.Duration `gorm:"-" json:"delay,string"`
 	Running     chan bool     `gorm:"-" json:"-"`
 
-	Form  []NotificationForm `gorm:"-" json:"form"`
-	Queue []RunFunc          `gorm:"-" json:"-"`
-
-	lastSent      time.Time `gorm:"-" json:"-"`
-	lastSentCount int       `gorm:"-" json:"-"`
-
-	Hits notificationHits `gorm:"-" json:"-"`
+	Form          []NotificationForm `gorm:"-" json:"form"`
+	lastSent      time.Time          `gorm:"-" json:"-"`
+	lastSentCount int                `gorm:"-" json:"-"`
 }
 
 func (n *Notification) Logger() *logrus.Logger {
@@ -57,15 +53,14 @@ type RunFunc func(interface{}) error
 
 // NotificationForm contains the HTML fields for each variable/input you want the notifier to accept.
 type NotificationForm struct {
-	Type        string `json:"type"`        // the html input type (text, password, email)
-	Title       string `json:"title"`       // include a title for ease of use
-	Placeholder string `json:"placeholder"` // add a placeholder for the input
-	DbField     string `json:"field"`       // true variable key for input
-	SmallText   string `json:"small_text"`  // insert small text under a html input
-	Required    bool   `json:"required"`    // require this input on the html form
-	IsHidden    bool   `json:"hidden"`      // hide this form element from end user
-	IsList      bool   `json:"list"`        // make this form element a comma separated list
-	IsSwitch    bool   `json:"switch"`      // make the notifier a boolean true/false switch
+	Type        string   `json:"type"`        // the html input type (text, password, email)
+	Title       string   `json:"title"`       // include a title for ease of use
+	Placeholder string   `json:"placeholder"` // add a placeholder for the input
+	DbField     string   `json:"field"`       // true variable key for input
+	SmallText   string   `json:"small_text"`  // insert small text under a html input
+	Required    bool     `json:"required"`    // require this input on the html form
+	IsHidden    bool     `json:"hidden"`      // hide this form element from end user
+	ListOptions []string `json:"list_options,omitempty"`
 }
 
 type notificationHits struct {

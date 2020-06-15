@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -145,8 +144,7 @@ func registerNews(email, domain string) error {
 	v.Set("email", email)
 	v.Set("domain", domain)
 	v.Set("timezone", "UTC")
-	rb := strings.NewReader(v.Encode())
-	resp, err := http.Post("https://news.statping.com/new", "application/x-www-form-urlencoded", rb)
+	resp, err := http.PostForm("https://news.statping.com/new", v)
 	if err != nil {
 		return err
 	}
