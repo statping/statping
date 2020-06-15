@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/GeertJohan/go.rice"
 	"github.com/pkg/errors"
-	"github.com/russross/blackfriday/v2"
 	"github.com/statping/statping/utils"
 	"os"
 	"os/exec"
@@ -28,12 +27,6 @@ func Assets() error {
 	var err error
 	TmplBox, err = rice.FindBox("dist")
 	return err
-}
-
-// HelpMarkdown will return the Markdown of help.md into HTML
-func HelpMarkdown() string {
-	output := blackfriday.Run(CompiledWiki)
-	return string(output)
 }
 
 func scssRendered(name string) string {
@@ -135,6 +128,9 @@ func CreateAllAssets(folder string) error {
 		return err
 	}
 	if err := MakePublicFolder(fp(folder, "assets", "css")); err != nil {
+		return err
+	}
+	if err := MakePublicFolder(fp(folder, "assets", "favicon")); err != nil {
 		return err
 	}
 	if err := MakePublicFolder(fp(folder, "assets", "scss")); err != nil {

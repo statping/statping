@@ -28,6 +28,7 @@
     "codemirror-colorpicker": "^1.9.66",
     "core-js": "^3.4.4",
     "date-fns": "^2.9.0",
+    "js-beautify": "^1.11.0",
     "querystring": "^0.2.0",
     "vue": "^2.6.11",
     "vue-apexcharts": "^1.5.2",

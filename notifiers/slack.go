@@ -15,7 +15,10 @@ import (
 var _ notifier.Notifier = (*slack)(nil)
 
 const (
-	slackMethod     = "slack"
+	slackMethod = "slack"
+)
+
+var (
 	failingTemplate = `{ "blocks": [ { "type": "section", "text": { "type": "mrkdwn", "text": ":warning: The service {{.Service.Name}} is currently offline! :warning:" } }, { "type": "divider" }, { "type": "section", "fields": [ { "type": "mrkdwn", "text": "*Service:*\n{{.Service.Name}}" }, { "type": "mrkdwn", "text": "*URL:*\n{{.Service.Domain}}" }, { "type": "mrkdwn", "text": "*Status Code:*\n{{.Service.LastStatusCode}}" }, { "type": "mrkdwn", "text": "*When:*\n{{.Failure.CreatedAt}}" }, { "type": "mrkdwn", "text": "*Downtime:*\n{{.Service.DowntimeAgo}}" }, { "type": "plain_text", "text": "*Error:*\n{{.Failure.Issue}}" } ] }, { "type": "divider" }, { "type": "actions", "elements": [ { "type": "button", "text": { "type": "plain_text", "text": "View Offline Service", "emoji": true }, "style": "danger", "url": "{{.Core.Domain}}/service/{{.Service.Id}}" }, { "type": "button", "text": { "type": "plain_text", "text": "Go to Statping", "emoji": true }, "url": "{{.Core.Domain}}" } ] } ] }`
 	successTemplate = `{ "blocks": [ { "type": "section", "text": { "type": "mrkdwn", "text": "The service {{.Service.Name}} is back online." } }, { "type": "actions", "elements": [ { "type": "button", "text": { "type": "plain_text", "text": "View Service", "emoji": true }, "style": "primary", "url": "{{.Core.Domain}}/service/{{.Service.Id}}" }, { "type": "button", "text": { "type": "plain_text", "text": "Go to Statping", "emoji": true }, "url": "{{.Core.Domain}}" } ] } ] }`
 )
@@ -37,6 +40,10 @@ var slacker = &slack{&notifications.Notification{
 	Delay:       time.Duration(10 * time.Second),
 	Host:        "https://webhooksurl.slack.com/***",
 	Icon:        "fab fa-slack",
+	SuccessData: successTemplate,
+	FailureData: failingTemplate,
+	DataType:    "json",
+	RequestInfo: "Slack allows you to customize your own messages with many complex components. Checkout the <a target=\"_blank\" href=\"https://api.slack.com/reference/surfaces/formatting\">Slack Message API</a> to learn how you can create your own.",
 	Limits:      60,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
@@ -49,17 +56,17 @@ var slacker = &slack{&notifications.Notification{
 }
 
 // Send will send a HTTP Post to the slack webhooker API. It accepts type: string
-func (s *slack) sendSlack(msg string) error {
-	_, resp, err := utils.HttpRequest(s.Host, "POST", "application/json", nil, strings.NewReader(msg), time.Duration(10*time.Second), true, nil)
+func (s *slack) sendSlack(msg string) (string, error) {
+	resp, _, err := utils.HttpRequest(s.Host, "POST", "application/json", nil, strings.NewReader(msg), time.Duration(10*time.Second), true, nil)
 	if err != nil {
-		return err
+		return "", err
 	}
-	defer resp.Body.Close()
-	return nil
+	return string(resp), nil
 }
 
 func (s *slack) OnTest() (string, error) {
-	testMsg := ReplaceVars(failingTemplate, exampleService, exampleFailure)
+	example := services.Example(true)
+	testMsg := ReplaceVars(failingTemplate, example, nil)
 	contents, resp, err := utils.HttpRequest(s.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(testMsg)), time.Duration(10*time.Second), true, nil)
 	if err != nil {
 		return "", err
@@ -72,13 +79,15 @@ func (s *slack) OnTest() (string, error) {
 }
 
 // OnFailure will trigger failing service
-func (s *slack) OnFailure(srv *services.Service, f *failures.Failure) error {
+func (s *slack) OnFailure(srv *services.Service, f *failures.Failure) (string, error) {
 	msg := ReplaceVars(failingTemplate, srv, f)
-	return s.sendSlack(msg)
+	out, err := s.sendSlack(msg)
+	return out, err
 }
 
 // OnSuccess will trigger successful service
-func (s *slack) OnSuccess(srv *services.Service) error {
+func (s *slack) OnSuccess(srv *services.Service) (string, error) {
 	msg := ReplaceVars(successTemplate, srv, nil)
-	return s.sendSlack(msg)
+	out, err := s.sendSlack(msg)
+	return out, err
 }

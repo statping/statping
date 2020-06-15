@@ -53,12 +53,12 @@ func TestTelegramNotifier(t *testing.T) {
 	})
 
 	t.Run("Telegram OnFailure", func(t *testing.T) {
-		err := Telegram.OnFailure(exampleService, exampleFailure)
+		_, err := Telegram.OnFailure(exampleService, exampleFailure)
 		assert.Nil(t, err)
 	})
 
 	t.Run("Telegram OnSuccess", func(t *testing.T) {
-		err := Telegram.OnSuccess(exampleService)
+		_, err := Telegram.OnSuccess(exampleService)
 		assert.Nil(t, err)
 	})
 

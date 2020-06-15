@@ -26,8 +26,8 @@ func FindNotifier(method string) *notifications.Notification {
 }
 
 type ServiceNotifier interface {
-	OnSuccess(*Service) error                    // OnSuccess is triggered when a service is successful
-	OnFailure(*Service, *failures.Failure) error // OnFailure is triggered when a service is failing
-	OnTest() (string, error)                     // OnTest is triggered for testing
-	Select() *notifications.Notification         // OnTest is triggered for testing
+	OnSuccess(*Service) (string, error)                    // OnSuccess is triggered when a service is successful
+	OnFailure(*Service, *failures.Failure) (string, error) // OnFailure is triggered when a service is failing
+	OnTest() (string, error)                               // OnTest is triggered for testing
+	Select() *notifications.Notification                   // OnTest is triggered for testing
 }

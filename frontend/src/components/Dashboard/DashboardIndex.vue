@@ -4,15 +4,15 @@
         <div class="row stats_area mb-5">
             <div class="col-4">
                 <span class="font-6 font-weight-bold d-block">{{$store.getters.services.length}}</span>
-                <span class="font-2">Total Services</span>
+                <span class="font-2">{{ $t('dashboard.total_services') }}</span>
             </div>
             <div class="col-4">
                 <span class="font-6 font-weight-bold d-block">{{failuresLast24Hours()}}</span>
-                <span class="font-2">Failures last 24 Hours</span>
+                <span class="font-2">{{ $t('dashboard.failures_24_hours') }}</span>
             </div>
             <div class="col-4">
                 <span class="font-6 font-weight-bold d-block">{{$store.getters.onlineServices(true).length}}</span>
-                <span class="font-2">Online Services</span>
+                <span class="font-2">{{ $t('dashboard.online_services') }}</span>
             </div>
         </div>
 

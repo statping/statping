@@ -6,6 +6,61 @@ import (
 	"time"
 )
 
+func Example(online bool) *Service {
+	return &Service{
+		Id:                  6283,
+		Name:                "Statping Example",
+		Domain:              "https://localhost:8080",
+		Expected:            null.NewNullString(""),
+		ExpectedStatus:      200,
+		Interval:            int(time.Duration(15 * time.Second).Seconds()),
+		Type:                "http",
+		Method:              "get",
+		PostData:            null.NullString{},
+		Port:                0,
+		Timeout:             int(time.Duration(2 * time.Second).Seconds()),
+		Order:               0,
+		VerifySSL:           null.NewNullBool(true),
+		Public:              null.NewNullBool(true),
+		GroupId:             0,
+		TLSCert:             null.NullString{},
+		TLSCertKey:          null.NullString{},
+		TLSCertRoot:         null.NullString{},
+		Headers:             null.NullString{},
+		Permalink:           null.NewNullString("example-service"),
+		Redirect:            null.NewNullBool(true),
+		CreatedAt:           utils.Now().Add(-23 * time.Hour),
+		UpdatedAt:           utils.Now().Add(-23 * time.Hour),
+		Online:              online,
+		Latency:             393443,
+		PingTime:            83526,
+		Online24Hours:       0.98,
+		Online7Days:         0.99,
+		AvgResponse:         303443,
+		FailuresLast24Hours: 2,
+		Checkpoint:          time.Time{},
+		SleepDuration:       5 * time.Second,
+		LastResponse:        "The example service is hitting this page",
+		NotifyAfter:         0,
+		notifyAfterCount:    0,
+		AllowNotifications:  null.NewNullBool(true),
+		UserNotified:        false,
+		UpdateNotify:        null.NewNullBool(true),
+		DownText:            "The service ws responding with 500 status code",
+		SuccessNotified:     false,
+		LastStatusCode:      200,
+		Failures:            nil,
+		AllCheckins:         nil,
+		LastLookupTime:      4600,
+		LastLatency:         124399,
+		LastCheck:           utils.Now().Add(-37 * time.Second),
+		LastOnline:          utils.Now().Add(-37 * time.Second),
+		LastOffline:         utils.Now().Add((-14 * 24) * time.Hour),
+		SecondsOnline:       int64(utils.Now().Add(-24 * time.Hour).Second()),
+		SecondsOffline:      int64(utils.Now().Add(-150 * time.Second).Second()),
+	}
+}
+
 func Samples() error {
 	log.Infoln("Inserting Sample Services...")
 	createdOn := utils.Now().Add(((-24 * 30) * 3) * time.Hour)

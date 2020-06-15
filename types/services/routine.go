@@ -276,6 +276,7 @@ func CheckHttp(s *Service, record bool) (*Service, error) {
 	metrics.Histo("latency", utils.Now().Sub(t1).Seconds(), s.Id)
 	s.LastResponse = string(content)
 	s.LastStatusCode = res.StatusCode
+	metrics.Gauge("service", float64(res.StatusCode), s.Id)
 
 	if s.Expected.String != "" {
 		match, err := regexp.MatchString(s.Expected.String, string(content))
@@ -321,6 +322,7 @@ func recordSuccess(s *Service) {
 	s.LastLatency = hit.Latency
 	sendSuccess(s)
 	s.SuccessNotified = true
+	metrics.Gauge("online", 1., s.Id)
 }
 
 func AddNotifier(n ServiceNotifier) {
@@ -341,7 +343,7 @@ func sendSuccess(s *Service) {
 		notif := n.Select()
 		if notif.CanSend() {
 			log.Infof("Sending notification to: %s!", notif.Method)
-			if err := n.OnSuccess(s); err != nil {
+			if _, err := n.OnSuccess(s); err != nil {
 				notif.Logger().Errorln(err)
 			}
 			s.UserNotified = true
@@ -373,6 +375,7 @@ func recordFailure(s *Service, issue string) {
 	s.SuccessNotified = false
 	s.DownText = s.DowntimeText()
 	sendFailure(s, fail)
+	metrics.Gauge("online", 0., s.Id)
 }
 
 func sendFailure(s *Service, f *failures.Failure) {
@@ -391,7 +394,7 @@ func sendFailure(s *Service, f *failures.Failure) {
 			notif := n.Select()
 			if notif.CanSend() {
 				log.Infof("Sending Failure notification to: %s!", notif.Method)
-				if err := n.OnFailure(s, f); err != nil {
+				if _, err := n.OnFailure(s, f); err != nil {
 					notif.Logger().WithField("failure", f.Issue).Errorln(err)
 				}
 				s.UserNotified = true

@@ -8,9 +8,7 @@
                 <a class="service_li list-group-item list-group-item-action">
                     <router-link class="no-decoration font-3" :to="serviceLink(service)">{{service.name}}</router-link>
                     <span class="badge float-right" :class="{'bg-success': service.online, 'bg-danger': !service.online }">{{service.online ? "ONLINE" : "OFFLINE"}}</span>
-
                     <GroupServiceFailures :service="service"/>
-
                     <IncidentsBlock :service="service"/>
                 </a>
             </div>

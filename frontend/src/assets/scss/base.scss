@@ -395,6 +395,30 @@ HTML,BODY {
     color: #a0a0a0;
   }
 
+  .service_block {
+    min-height: 340px;
+  }
+
+  .json-field {
+    font-size: 10pt;
+  }
+
+  .cm-bracketer {
+    color: #a011c9;
+    font-weight: bold;
+  }
+
+.cm-var-highlight {
+  color: #0fa50f;
+  font-weight: bold;
+}
+
+.cm-var-sub-highlight {
+  color: #b40727;
+  font-weight: bold;
+}
+
+
   .card {
     background-color: $service-background;
     border: $service-border;

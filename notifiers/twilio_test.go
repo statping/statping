@@ -53,12 +53,12 @@ func TestTwilioNotifier(t *testing.T) {
 	})
 
 	t.Run("Twilio OnFailure", func(t *testing.T) {
-		err := Twilio.OnFailure(exampleService, exampleFailure)
+		_, err := Twilio.OnFailure(exampleService, exampleFailure)
 		assert.Nil(t, err)
 	})
 
 	t.Run("Twilio OnSuccess", func(t *testing.T) {
-		err := Twilio.OnSuccess(exampleService)
+		_, err := Twilio.OnSuccess(exampleService)
 		assert.Nil(t, err)
 	})
 

@@ -51,12 +51,12 @@ func TestMobileNotifier(t *testing.T) {
 	})
 
 	t.Run("Mobile OnFailure", func(t *testing.T) {
-		err := Mobile.OnFailure(exampleService, exampleFailure)
+		_, err := Mobile.OnFailure(exampleService, exampleFailure)
 		assert.Nil(t, err)
 	})
 
 	t.Run("Mobile OnSuccess", func(t *testing.T) {
-		err := Mobile.OnSuccess(exampleService)
+		_, err := Mobile.OnSuccess(exampleService)
 		assert.Nil(t, err)
 	})
 

@@ -12,6 +12,20 @@ var (
 	log = utils.Log.WithField("type", "failure")
 )
 
+func Example() *Failure {
+	return &Failure{
+		Id:        48533,
+		Issue:     "Response did not response a 200 status code",
+		Method:    "",
+		MethodId:  0,
+		ErrorCode: 404,
+		Service:   1,
+		Checkin:   0,
+		PingTime:  48309,
+		CreatedAt: utils.Now(),
+	}
+}
+
 func Samples() error {
 	log.Infoln("Inserting Sample Service Failures...")
 	createdAt := utils.Now().Add(-3 * types.Day)

@@ -12,6 +12,7 @@ import (
 )
 
 var log = utils.Log.WithField("type", "notifier")
+var exampleService = services.Example(true)
 
 type replacer struct {
 	Core    *core.Core
@@ -62,7 +63,7 @@ func ReplaceVars(input string, s *services.Service, f *failures.Failure) string 
 	return ReplaceTemplate(input, replacer{Service: s, Failure: f, Core: core.App})
 }
 
-var exampleService = &services.Service{
+var ExampleService = &services.Service{
 	Id:                  1,
 	Name:                "Statping",
 	Domain:              "https://statping.com",

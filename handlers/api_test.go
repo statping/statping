@@ -250,7 +250,7 @@ func TestMainApiRoutes(t *testing.T) {
 				`go_memstats_alloc_bytes`,
 				`http_duration_seconds_count`,
 				`http_response_bytes_count`,
-				`service_request_duration_count`,
+				`service_success`,
 			},
 		},
 	}

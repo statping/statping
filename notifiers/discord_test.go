@@ -46,12 +46,12 @@ func TestDiscordNotifier(t *testing.T) {
 	})
 
 	t.Run("discord OnFailure", func(t *testing.T) {
-		err := Discorder.OnFailure(exampleService, exampleFailure)
+		_, err := Discorder.OnFailure(exampleService, exampleFailure)
 		assert.Nil(t, err)
 	})
 
 	t.Run("discord OnSuccess", func(t *testing.T) {
-		err := Discorder.OnSuccess(exampleService)
+		_, err := Discorder.OnSuccess(exampleService)
 		assert.Nil(t, err)
 	})
 

@@ -125,6 +125,7 @@ frontend-build:
 	cd frontend && yarn && yarn build
 	cp -r frontend/dist source/ && cp -r frontend/src/assets/scss source/dist/
 	cp -r source/tmpl/*.* source/dist/
+	cp -r frontend/public/favicon source/dist/
 
 frontend-copy:
 	cp -r source/tmpl/*.* source/dist/

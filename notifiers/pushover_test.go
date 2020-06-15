@@ -49,12 +49,12 @@ func TestPushoverNotifier(t *testing.T) {
 	})
 
 	t.Run("Pushover OnFailure", func(t *testing.T) {
-		err := Pushover.OnFailure(exampleService, exampleFailure)
+		_, err := Pushover.OnFailure(exampleService, exampleFailure)
 		assert.Nil(t, err)
 	})
 
 	t.Run("Pushover OnSuccess", func(t *testing.T) {
-		err := Pushover.OnSuccess(exampleService)
+		_, err := Pushover.OnSuccess(exampleService)
 		assert.Nil(t, err)
 	})
 

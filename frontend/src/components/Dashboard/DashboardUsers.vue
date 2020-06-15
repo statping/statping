@@ -6,9 +6,9 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th scope="col">Username</th>
-                    <th scope="col">Type</th>
-                    <th scope="col" class="d-none d-md-table-cell">Last Login</th>
+                    <th scope="col">{{$t('username')}}</th>
+                    <th scope="col">{{$t('type')}}</th>
+                    <th scope="col" class="d-none d-md-table-cell">{{ $t('last_login') }}</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -17,15 +17,15 @@
             <tr v-for="(user, index) in users" v-bind:key="user.id" >
                 <td>{{user.username}}</td>
                 <td>
-                    <span class="badge" :class="{'badge-danger': user.admin, 'badge-primary': !user.admin}">
-                        {{user.admin ? 'ADMIN' : 'USER'}}
+                    <span class="badge text-uppercase" :class="{'badge-danger': user.admin, 'badge-primary': !user.admin}">
+                        {{user.admin ? $t('admin') : $t('user')}}
                     </span>
                 </td>
                 <td class="d-none d-md-table-cell">{{niceDate(user.updated_at)}}</td>
                 <td class="text-right">
                     <div class="btn-group">
                         <a @click.prevent="editUser(user, edit)" href="#" class="btn btn-outline-secondary edit-user">
-                            <font-awesome-icon icon="user" /> Edit
+                            <font-awesome-icon icon="user" /> {{$t('edit') }}
                         </a>
                         <a @click.prevent="deleteUser(user)" v-if="index !== 0" href="#" class="btn btn-danger delete-user">
                             <font-awesome-icon icon="times" />

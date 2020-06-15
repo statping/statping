@@ -35,6 +35,9 @@ var Pushover = &pushover{&notifications.Notification{
 	Icon:        "fa dot-circle",
 	Delay:       time.Duration(10 * time.Second),
 	Limits:      60,
+	SuccessData: `Your service '{{.Service.Name}}' is currently online!`,
+	FailureData: `Your service '{{.Service.Name}}' is currently offline!`,
+	DataType:    "text",
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "User Token",
@@ -67,22 +70,23 @@ func (t *pushover) sendMessage(message string) (string, error) {
 }
 
 // OnFailure will trigger failing service
-func (t *pushover) OnFailure(s *services.Service, f *failures.Failure) error {
-	msg := fmt.Sprintf("Your service '%s' is currently offline!", s.Name)
-	_, err := t.sendMessage(msg)
-	return err
+func (t *pushover) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
+	message := ReplaceVars(t.FailureData, s, f)
+	out, err := t.sendMessage(message)
+	return out, err
 }
 
 // OnSuccess will trigger successful service
-func (t *pushover) OnSuccess(s *services.Service) error {
-	msg := fmt.Sprintf("Your service '%s' is currently online!", s.Name)
-	_, err := t.sendMessage(msg)
-	return err
+func (t *pushover) OnSuccess(s *services.Service) (string, error) {
+	message := ReplaceVars(t.SuccessData, s, nil)
+	out, err := t.sendMessage(message)
+	return out, err
 }
 
 // OnTest will test the Pushover SMS messaging
 func (t *pushover) OnTest() (string, error) {
-	msg := fmt.Sprintf("Testing the Pushover Notifier, Your service '%s' is currently offline! Error: %s", exampleService.Name, exampleFailure.Issue)
+	example := services.Example(true)
+	msg := fmt.Sprintf("Testing the Pushover Notifier, Your service '%s' is currently offline! Error: %s", example.Name, exampleFailure.Issue)
 	content, err := t.sendMessage(msg)
 	return content, err
 }

@@ -32,6 +32,9 @@ var Telegram = &telegram{&notifications.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "fab fa-telegram-plane",
 	Delay:       time.Duration(5 * time.Second),
+	SuccessData: "Your service '{{.Service.Name}}' is currently online!",
+	FailureData: "Your service '{{.Service.Name}}' is currently offline!",
+	DataType:    "text",
 	Limits:      60,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
@@ -71,17 +74,17 @@ func (t *telegram) sendMessage(message string) (string, error) {
 }
 
 // OnFailure will trigger failing service
-func (t *telegram) OnFailure(s *services.Service, f *failures.Failure) error {
-	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
-	_, err := t.sendMessage(msg)
-	return err
+func (t *telegram) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
+	msg := ReplaceVars(t.FailureData, s, f)
+	out, err := t.sendMessage(msg)
+	return out, err
 }
 
 // OnSuccess will trigger successful service
-func (t *telegram) OnSuccess(s *services.Service) error {
-	msg := fmt.Sprintf("Your service '%v' is currently online!", s.Name)
-	_, err := t.sendMessage(msg)
-	return err
+func (t *telegram) OnSuccess(s *services.Service) (string, error) {
+	msg := ReplaceVars(t.SuccessData, s, nil)
+	out, err := t.sendMessage(msg)
+	return out, err
 }
 
 // OnTest will test the Twilio SMS messaging

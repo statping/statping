@@ -3,14 +3,12 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/statping/statping/source"
 	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/users"
 	"github.com/statping/statping/utils"
 	"net/http"
 	"os"
-	"time"
 )
 
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
@@ -130,44 +128,6 @@ func logsLineHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(lastLine.FormatForHtml()))
 	}
-}
-
-type JwtClaim struct {
-	Username string `json:"username"`
-	Admin    bool   `json:"admin"`
-	jwt.StandardClaims
-}
-
-func removeJwtToken(w http.ResponseWriter) {
-	http.SetCookie(w, &http.Cookie{
-		Name:    cookieKey,
-		Value:   "",
-		Expires: time.Now(),
-		MaxAge:  -1,
-	})
-}
-
-func setJwtToken(user *users.User, w http.ResponseWriter) (JwtClaim, string) {
-	expirationTime := time.Now().Add(72 * time.Hour)
-	jwtClaim := JwtClaim{
-		Username: user.Username,
-		Admin:    user.Admin.Bool,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-		}}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaim)
-	tokenString, err := token.SignedString([]byte(jwtKey))
-	if err != nil {
-		log.Errorln("error setting token: ", err)
-	}
-	user.Token = tokenString
-	// set cookies
-	http.SetCookie(w, &http.Cookie{
-		Name:    cookieKey,
-		Value:   tokenString,
-		Expires: expirationTime,
-	})
-	return jwtClaim, tokenString
 }
 
 func apiLoginHandler(w http.ResponseWriter, r *http.Request) {

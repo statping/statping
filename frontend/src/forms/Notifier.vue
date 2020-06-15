@@ -1,5 +1,6 @@
 <template>
     <div>
+        <form @submit.prevent="saveNotifier">
     <div class="card contain-card text-black-50 bg-white mb-3">
         <div class="card-header text-capitalize">
             {{notifier.title}}
@@ -9,9 +10,6 @@
             </span>
         </div>
         <div class="card-body">
-
-    <form @submit.prevent="saveNotifier">
-
         <p class="small text-muted" v-html="notifier.description"/>
 
         <div v-for="(form, index) in notifier.form" v-bind:key="index" class="form-group">
@@ -30,31 +28,73 @@
             </div>
 
         </div>
-
-    </form>
         </div>
     </div>
 
-        <div v-if="error && !success" class="alert alert-danger col-12" role="alert">
-            {{error}}<p v-if="response">Response:<br>{{response}}</p>
+        <div v-if="notifier.data_type" class="card text-black-50 bg-white mb-3">
+            <div class="card-header text-capitalize">
+                {{notifier.title}} Outgoing Request
+                <span class="badge badge-dark float-right text-uppercase mt-1">{{notifier.data_type}}</span>
+            </div>
+            <div class="card-body">
+                <span class="text-muted d-block mb-3" v-if="notifier.request_info" v-html="notifier.request_info"></span>
+
+        <div class="row" v-observe-visibility="visible">
+            <div class="col-12">
+                <h5 class="text-capitalize">Success Data</h5>
+                <codemirror v-model="success_data"
+                            ref="cmsuccess"
+                            :options="cmOptions"
+                            @ready="onCmSuccessReady"/>
+            </div>
         </div>
-        <div v-if="success" class="alert alert-success col-12" role="alert">
-            {{notifier.title}} appears to be working!
-            <p v-if="response">Response:<br>{{response}}</p>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <h5 class="text-capitalize">Failure Data</h5>
+                <codemirror v-model="failure_data"
+                            ref="cmfailure"
+                            :options="cmOptions"
+                            @ready="onCmFailureReady"/>
+            </div>
+        </div>
+
+            </div>
+        </div>
+
+    </form>
+
+        <div v-if="error || success" class="card text-black-50 bg-white mb-3">
+            <div class="card-body">
+
+            <div v-if="error && !success" class="alert alert-danger col-12" role="alert">
+                {{error}}
+            </div>
+            <div v-if="success" class="alert alert-success col-12" role="alert">
+                <span class="text-capitalize">{{notifier.title}}</span> appears to be working!
+            </div>
+
+                <h5>Response</h5>
+                <codemirror :value="response"/>
+
+            </div>
         </div>
 
         <div class="card text-black-50 bg-white mb-3">
             <div class="card-body">
-
                 <div class="row">
-                    <div class="col-6 col-sm-6 mb-2 mb-sm-0 mt-2 mt-sm-0">
+                    <div class="col-4 col-sm-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
                         <button @click.prevent="saveNotifier" type="submit" class="btn btn-block text-capitalize btn-primary save-notifier">
                             <i class="fa fa-check-circle"></i> {{loading ? "Loading..." : saved ? "Saved" : "Save Settings"}}
                         </button>
                     </div>
-                    <div class="col-6 col-sm-6 mb-2 mb-sm-0 mt-2 mt-sm-0">
-                        <button @click.prevent="testNotifier" class="btn btn-outline-dark btn-block text-capitalize test-notifier"><i class="fa fa-vial"></i>
-                            {{loadingTest ? "Loading..." : "Test Notifier"}}</button>
+                    <div class="col-4 col-md-4">
+                        <button @click.prevent="testNotifier('success')" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
+                            <i class="fa fa-vial"></i>{{loadingTest ? "Loading..." : "Test Success"}}</button>
+                    </div>
+                    <div class="col-4 col-md-4">
+                        <button @click.prevent="testNotifier('failure')" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
+                            <i class="fa fa-vial"></i>{{loadingTest ? "Loading..." : "Test Failure"}}</button>
                     </div>
                 </div>
 
@@ -69,28 +109,81 @@
 </template>
 
 <script>
-import Api from "../API";
+  import Api from "../API";
+
+  const beautify = require('js-beautify').js
+
+  // require component
+  import { codemirror } from 'vue-codemirror'
+  import 'codemirror/mode/javascript/javascript.js'
+  import 'codemirror/lib/codemirror.css'
+  import 'codemirror/theme/neat.css'
+  import '../codemirror_json'
 
 export default {
     name: 'Notifier',
+  components: {
+    codemirror
+  },
     props: {
         notifier: {
             type: Object,
             required: true
         }
     },
+  watch: {
+
+  },
     data() {
         return {
             loading: false,
             loadingTest: false,
             error: null,
             response: null,
+            request: null,
             success: false,
             saved: false,
+          success_data: null,
+          failure_data: null,
             form: {},
+              cmOptions: {
+                height: 700,
+                tabSize: 2,
+                lineNumbers: true,
+                line: true,
+                class: "json-field",
+                theme: 'neat',
+                mode: "mymode",
+                lineWrapping: true,
+                json: true,
+                autoRefresh: true,
+                mime: this.notifier.data_type === "json" ? "application/json" : "text/plain"
+              },
+          beautifySettings: { indent_size: 2, space_in_empty_paren: true },
         }
     },
+      computed: {
+
+      },
     methods: {
+      visible(isVisible, entry) {
+        if (isVisible) {
+          this.$refs.cmfailure.codemirror.refresh()
+          this.$refs.cmsuccess.codemirror.refresh()
+        }
+      },
+      onCmSuccessReady(cm) {
+        this.success_data = beautify(this.notifier.success_data, this.beautifySettings)
+        setTimeout(function() {
+          cm.refresh();
+        },1);
+      },
+      onCmFailureReady(cm) {
+        this.failure_data = beautify(this.notifier.failure_data, this.beautifySettings)
+        setTimeout(function() {
+          cm.refresh();
+        },1);
+      },
         async enableToggle() {
             this.notifier.enabled = !!this.notifier.enabled
             const form = {
@@ -112,13 +205,15 @@ export default {
               }
                 this.form[field] = val
             });
+          this.form.success_data = this.success_data
+          this.form.failure_data = this.failure_data
             await Api.notifier_save(this.form)
             const notifiers = await Api.notifiers()
             await this.$store.commit('setNotifiers', notifiers)
             this.saved = true
             this.loading = false
         },
-        async testNotifier() {
+        async testNotifier(method="success") {
             this.success = false
             this.loadingTest = true
             this.form.method = this.notifier.method
@@ -130,7 +225,11 @@ export default {
                 }
                 this.form[field] = val
             });
-            const tested = await Api.notifier_test(this.form)
+            let req = {
+              notifier: this.form,
+              method: method,
+            }
+            const tested = await Api.notifier_test(req, this.notifier.method)
             if (tested.success) {
                 this.success = true
             } else {
@@ -142,7 +241,10 @@ export default {
     }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+    .CodeMirror {
+        border: 1px solid #eee;
+        height: 550px;
+        font-size: 9pt;
+    }
 </style>
