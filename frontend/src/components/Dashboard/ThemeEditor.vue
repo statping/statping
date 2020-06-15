@@ -1,4 +1,4 @@
-<template >
+<template>
     <div>
             <div v-if="loaded && !directory" class="jumbotron jumbotron-fluid">
                 <div class="text-center col-12">
@@ -8,7 +8,7 @@
                     </p></span>
                 </div>
         </div>
-    <form v-if="loaded && directory" @submit.prevent="saveAssets" :disabled="pending">
+    <form v-observe-visibility="visible" v-if="loaded && directory" @submit.prevent="saveAssets" :disabled="pending">
         <h3>Variables</h3>
         <codemirror v-show="loaded" v-model="vars" ref="vars" :options="cmOptions" class="codemirrorInput"/>
 
@@ -77,6 +77,13 @@
           this.changeTab('vars')
       },
       methods: {
+        visible(isVisible, entry) {
+          if (isVisible) {
+            this.$refs.vars.codemirror.refresh()
+            this.$refs.base.codemirror.refresh()
+            this.$refs.mobile.codemirror.refresh()
+          }
+        },
           async fetchTheme() {
               this.loaded = true
               this.pending = true

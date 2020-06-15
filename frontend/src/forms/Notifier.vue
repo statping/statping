@@ -68,7 +68,7 @@
             <div class="card-body">
 
             <div v-if="error && !success" class="alert alert-danger col-12" role="alert">
-                {{error}}<p v-if="response">Response:<br>{{response}}</p>
+                {{error}}
             </div>
             <div v-if="success" class="alert alert-success col-12" role="alert">
                 <span class="text-capitalize">{{notifier.title}}</span> appears to be working!
@@ -174,7 +174,6 @@ export default {
       },
       onCmSuccessReady(cm) {
         this.success_data = beautify(this.notifier.success_data, this.beautifySettings)
-        console.log('the editor is ready!', cm)
         setTimeout(function() {
           cm.refresh();
         },1);
