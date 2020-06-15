@@ -49,22 +49,22 @@ func runCommand(app string, cmd ...string) (string, string, error) {
 }
 
 // OnSuccess for commandLine will trigger successful service
-func (c *commandLine) OnSuccess(s *services.Service) error {
+func (c *commandLine) OnSuccess(s *services.Service) (string, error) {
 	tmpl := ReplaceVars(c.SuccessData, s, nil)
-	_, _, err := runCommand(c.Host, tmpl)
-	return err
+	out, _, err := runCommand(c.Host, tmpl)
+	return out, err
 }
 
 // OnFailure for commandLine will trigger failing service
-func (c *commandLine) OnFailure(s *services.Service, f *failures.Failure) error {
+func (c *commandLine) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
 	tmpl := ReplaceVars(c.FailureData, s, f)
-	_, _, err := runCommand(c.Host, tmpl)
-	return err
+	_, ouerr, err := runCommand(c.Host, tmpl)
+	return ouerr, err
 }
 
 // OnTest for commandLine triggers when this notifier has been saved
 func (c *commandLine) OnTest() (string, error) {
-	tmpl := ReplaceVars(c.Var1, exampleService, exampleFailure)
+	tmpl := ReplaceVars(c.Var1, services.Example(true), exampleFailure)
 	in, out, err := runCommand(c.Host, tmpl)
 	utils.Log.Infoln(in)
 	utils.Log.Infoln(out)

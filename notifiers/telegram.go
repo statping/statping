@@ -74,17 +74,17 @@ func (t *telegram) sendMessage(message string) (string, error) {
 }
 
 // OnFailure will trigger failing service
-func (t *telegram) OnFailure(s *services.Service, f *failures.Failure) error {
+func (t *telegram) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
 	msg := ReplaceVars(t.FailureData, s, f)
-	_, err := t.sendMessage(msg)
-	return err
+	out, err := t.sendMessage(msg)
+	return out, err
 }
 
 // OnSuccess will trigger successful service
-func (t *telegram) OnSuccess(s *services.Service) error {
+func (t *telegram) OnSuccess(s *services.Service) (string, error) {
 	msg := ReplaceVars(t.SuccessData, s, nil)
-	_, err := t.sendMessage(msg)
-	return err
+	out, err := t.sendMessage(msg)
+	return out, err
 }
 
 // OnTest will test the Twilio SMS messaging

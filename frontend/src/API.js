@@ -190,8 +190,8 @@ class Api {
     return axios.post('api/notifier/' + data.method, data).then(response => (response.data))
   }
 
-  async notifier_test(data) {
-    return axios.post('api/notifier/' + data.method + '/test', data).then(response => (response.data))
+  async notifier_test(data, notifier) {
+    return axios.post('api/notifier/' + notifier + '/test', data).then(response => (response.data))
   }
 
   async renewApiKeys() {

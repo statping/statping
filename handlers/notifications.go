@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/services"
 	"net/http"
@@ -56,21 +57,33 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonAction(vars["notifier"], "update", w, r)
 }
 
+type testNotificationReq struct {
+	Method       string                     `json:"method"`
+	Notification notifications.Notification `json:"notifier"`
+}
+
 func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	notifer, err := notifications.Find(vars["notifier"])
+	_, err := notifications.Find(vars["notifier"])
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
 
-	if err := DecodeJSON(r, &notifer); err != nil {
+	var req testNotificationReq
+	if err := DecodeJSON(r, &req); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
 
-	notif := services.ReturnNotifier(notifer.Method)
-	out, err := notif.OnTest()
+	notif := services.ReturnNotifier(req.Notification.Method)
+
+	var out string
+	if req.Method == "success" {
+		out, err = notif.OnSuccess(services.Example(true))
+	} else {
+		out, err = notif.OnFailure(services.Example(false), failures.Example())
+	}
 
 	resp := &notifierTestResp{
 		Success:  err == nil,

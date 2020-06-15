@@ -62,12 +62,12 @@ func TestEmailNotifier(t *testing.T) {
 	})
 
 	t.Run("email OnFailure", func(t *testing.T) {
-		err := email.OnFailure(exampleService, exampleFailure)
+		_, err := email.OnFailure(exampleService, exampleFailure)
 		assert.Nil(t, err)
 	})
 
 	t.Run("email OnSuccess", func(t *testing.T) {
-		err := email.OnSuccess(exampleService)
+		_, err := email.OnSuccess(exampleService)
 		assert.Nil(t, err)
 	})
 
@@ -76,7 +76,7 @@ func TestEmailNotifier(t *testing.T) {
 	})
 
 	t.Run("email OnSuccess Again", func(t *testing.T) {
-		err := email.OnSuccess(exampleService)
+		_, err := email.OnSuccess(exampleService)
 		assert.Nil(t, err)
 	})
 

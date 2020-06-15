@@ -90,17 +90,15 @@ func (t *twilio) sendMessage(message string) (string, error) {
 }
 
 // OnFailure will trigger failing service
-func (t *twilio) OnFailure(s *services.Service, f *failures.Failure) error {
+func (t *twilio) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
 	msg := ReplaceVars(t.FailureData, s, f)
-	_, err := t.sendMessage(msg)
-	return err
+	return t.sendMessage(msg)
 }
 
 // OnSuccess will trigger successful service
-func (t *twilio) OnSuccess(s *services.Service) error {
+func (t *twilio) OnSuccess(s *services.Service) (string, error) {
 	msg := ReplaceVars(t.SuccessData, s, nil)
-	_, err := t.sendMessage(msg)
-	return err
+	return t.sendMessage(msg)
 }
 
 // OnTest will test the Twilio SMS messaging

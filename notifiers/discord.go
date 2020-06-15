@@ -41,9 +41,9 @@ var Discorder = &discord{&notifications.Notification{
 }
 
 // Send will send a HTTP Post to the discord API. It accepts type: []byte
-func (d *discord) sendRequest(msg string) error {
-	_, _, err := utils.HttpRequest(Discorder.GetValue("host"), "POST", "application/json", nil, strings.NewReader(msg), time.Duration(10*time.Second), true, nil)
-	return err
+func (d *discord) sendRequest(msg string) (string, error) {
+	out, _, err := utils.HttpRequest(Discorder.GetValue("host"), "POST", "application/json", nil, strings.NewReader(msg), time.Duration(10*time.Second), true, nil)
+	return string(out), err
 }
 
 func (d *discord) Select() *notifications.Notification {
@@ -51,15 +51,17 @@ func (d *discord) Select() *notifications.Notification {
 }
 
 // OnFailure will trigger failing service
-func (d *discord) OnFailure(s *services.Service, f *failures.Failure) error {
+func (d *discord) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
 	msg := `{"content": "Your service '{{.Service.Name}}' is currently failing! Reason: {{.Failure.Issue}}"}`
-	return d.sendRequest(ReplaceVars(msg, s, f))
+	out, err := d.sendRequest(ReplaceVars(msg, s, f))
+	return out, err
 }
 
 // OnSuccess will trigger successful service
-func (d *discord) OnSuccess(s *services.Service) error {
+func (d *discord) OnSuccess(s *services.Service) (string, error) {
 	msg := `{"content": "Your service '{{.Service.Name}}' is currently online!"}`
-	return d.sendRequest(ReplaceVars(msg, s, nil))
+	out, err := d.sendRequest(ReplaceVars(msg, s, nil))
+	return out, err
 }
 
 // OnSave triggers when this notifier has been saved

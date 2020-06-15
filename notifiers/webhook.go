@@ -111,7 +111,9 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 }
 
 func (w *webhooker) OnTest() (string, error) {
-	body := ReplaceVars(w.SuccessData, exampleService, exampleFailure)
+	f := failures.Example()
+	s := services.Example(false)
+	body := ReplaceVars(w.SuccessData, s, f)
 	resp, err := w.sendHttpWebhook(body)
 	if err != nil {
 		return "", err
@@ -124,23 +126,25 @@ func (w *webhooker) OnTest() (string, error) {
 }
 
 // OnFailure will trigger failing service
-func (w *webhooker) OnFailure(s *services.Service, f *failures.Failure) error {
+func (w *webhooker) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
 	msg := ReplaceVars(w.FailureData, s, f)
 	resp, err := w.sendHttpWebhook(msg)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer resp.Body.Close()
-	return err
+	content, err := ioutil.ReadAll(resp.Body)
+	return string(content), err
 }
 
 // OnSuccess will trigger successful service
-func (w *webhooker) OnSuccess(s *services.Service) error {
+func (w *webhooker) OnSuccess(s *services.Service) (string, error) {
 	msg := ReplaceVars(w.SuccessData, s, nil)
 	resp, err := w.sendHttpWebhook(msg)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer resp.Body.Close()
-	return err
+	content, err := ioutil.ReadAll(resp.Body)
+	return string(content), err
 }

@@ -10,7 +10,6 @@
             </span>
         </div>
         <div class="card-body">
-
         <p class="small text-muted" v-html="notifier.description"/>
 
         <div v-for="(form, index) in notifier.form" v-bind:key="index" class="form-group">
@@ -65,23 +64,24 @@
 
     </form>
 
-        <div v-if="error && !success" class="card text-black-50 bg-white mb-3">
+        <div v-if="error || success" class="card text-black-50 bg-white mb-3">
             <div class="card-body">
 
             <div v-if="error && !success" class="alert alert-danger col-12" role="alert">
                 {{error}}<p v-if="response">Response:<br>{{response}}</p>
             </div>
             <div v-if="success" class="alert alert-success col-12" role="alert">
-                {{notifier.title}} appears to be working!
-                <p v-if="response">Response:<br>{{response}}</p>
+                <span class="text-capitalize">{{notifier.title}}</span> appears to be working!
             </div>
+
+                <h5>Response</h5>
+                <codemirror :value="response"/>
 
             </div>
         </div>
 
         <div class="card text-black-50 bg-white mb-3">
             <div class="card-body">
-
                 <div class="row">
                     <div class="col-4 col-sm-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
                         <button @click.prevent="saveNotifier" type="submit" class="btn btn-block text-capitalize btn-primary save-notifier">
@@ -89,11 +89,11 @@
                         </button>
                     </div>
                     <div class="col-4 col-md-4">
-                        <button @click.prevent="testNotifier" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
+                        <button @click.prevent="testNotifier('success')" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
                             <i class="fa fa-vial"></i>{{loadingTest ? "Loading..." : "Test Success"}}</button>
                     </div>
                     <div class="col-4 col-md-4">
-                        <button @click.prevent="testNotifier" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
+                        <button @click.prevent="testNotifier('failure')" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
                             <i class="fa fa-vial"></i>{{loadingTest ? "Loading..." : "Test Failure"}}</button>
                     </div>
                 </div>
@@ -140,6 +140,7 @@ export default {
             loadingTest: false,
             error: null,
             response: null,
+            request: null,
             success: false,
             saved: false,
           success_data: null,
@@ -184,13 +185,6 @@ export default {
           cm.refresh();
         },1);
       },
-      onCmFocus(cm) {
-        console.log('the editor is focused!', cm)
-      },
-      onCmCodeChange(newCode) {
-        console.log('this is new code', newCode)
-        this.success_data = newCode
-      },
         async enableToggle() {
             this.notifier.enabled = !!this.notifier.enabled
             const form = {
@@ -214,14 +208,13 @@ export default {
             });
           this.form.success_data = this.success_data
           this.form.failure_data = this.failure_data
-          window.console.log(this.form)
             await Api.notifier_save(this.form)
             const notifiers = await Api.notifiers()
             await this.$store.commit('setNotifiers', notifiers)
             this.saved = true
             this.loading = false
         },
-        async testNotifier() {
+        async testNotifier(method="success") {
             this.success = false
             this.loadingTest = true
             this.form.method = this.notifier.method
@@ -233,7 +226,11 @@ export default {
                 }
                 this.form[field] = val
             });
-            const tested = await Api.notifier_test(this.form)
+            let req = {
+              notifier: this.form,
+              method: method,
+            }
+            const tested = await Api.notifier_test(req, this.notifier.method)
             if (tested.success) {
                 this.success = true
             } else {

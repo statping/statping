@@ -56,17 +56,17 @@ var slacker = &slack{&notifications.Notification{
 }
 
 // Send will send a HTTP Post to the slack webhooker API. It accepts type: string
-func (s *slack) sendSlack(msg string) error {
-	_, resp, err := utils.HttpRequest(s.Host, "POST", "application/json", nil, strings.NewReader(msg), time.Duration(10*time.Second), true, nil)
+func (s *slack) sendSlack(msg string) (string, error) {
+	resp, _, err := utils.HttpRequest(s.Host, "POST", "application/json", nil, strings.NewReader(msg), time.Duration(10*time.Second), true, nil)
 	if err != nil {
-		return err
+		return "", err
 	}
-	defer resp.Body.Close()
-	return nil
+	return string(resp), nil
 }
 
 func (s *slack) OnTest() (string, error) {
-	testMsg := ReplaceVars(failingTemplate, exampleService, exampleFailure)
+	example := services.Example(true)
+	testMsg := ReplaceVars(failingTemplate, example, nil)
 	contents, resp, err := utils.HttpRequest(s.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(testMsg)), time.Duration(10*time.Second), true, nil)
 	if err != nil {
 		return "", err
@@ -79,13 +79,15 @@ func (s *slack) OnTest() (string, error) {
 }
 
 // OnFailure will trigger failing service
-func (s *slack) OnFailure(srv *services.Service, f *failures.Failure) error {
+func (s *slack) OnFailure(srv *services.Service, f *failures.Failure) (string, error) {
 	msg := ReplaceVars(failingTemplate, srv, f)
-	return s.sendSlack(msg)
+	out, err := s.sendSlack(msg)
+	return out, err
 }
 
 // OnSuccess will trigger successful service
-func (s *slack) OnSuccess(srv *services.Service) error {
+func (s *slack) OnSuccess(srv *services.Service) (string, error) {
 	msg := ReplaceVars(successTemplate, srv, nil)
-	return s.sendSlack(msg)
+	out, err := s.sendSlack(msg)
+	return out, err
 }

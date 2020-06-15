@@ -52,17 +52,17 @@ func (l *lineNotifier) sendMessage(message string) (string, error) {
 }
 
 // OnFailure will trigger failing service
-func (l *lineNotifier) OnFailure(s *services.Service, f *failures.Failure) error {
+func (l *lineNotifier) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
 	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
-	_, err := l.sendMessage(msg)
-	return err
+	out, err := l.sendMessage(msg)
+	return out, err
 }
 
 // OnSuccess will trigger successful service
-func (l *lineNotifier) OnSuccess(s *services.Service) error {
+func (l *lineNotifier) OnSuccess(s *services.Service) (string, error) {
 	msg := fmt.Sprintf("Service %s is online!", s.Name)
-	_, err := l.sendMessage(msg)
-	return err
+	out, err := l.sendMessage(msg)
+	return out, err
 }
 
 // OnTest triggers when this notifier has been saved

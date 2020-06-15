@@ -39,12 +39,12 @@ func TestCommandNotifier(t *testing.T) {
 	})
 
 	t.Run("Command OnFailure", func(t *testing.T) {
-		err := Command.OnFailure(exampleService, exampleFailure)
+		_, err := Command.OnFailure(exampleService, exampleFailure)
 		assert.Nil(t, err)
 	})
 
 	t.Run("Command OnSuccess", func(t *testing.T) {
-		err := Command.OnSuccess(exampleService)
+		_, err := Command.OnSuccess(exampleService)
 		assert.Nil(t, err)
 	})
 

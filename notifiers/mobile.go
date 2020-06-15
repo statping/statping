@@ -71,18 +71,18 @@ func dataJson(s *services.Service, f *failures.Failure) map[string]interface{} {
 }
 
 // OnFailure will trigger failing service
-func (m *mobilePush) OnFailure(s *services.Service, f *failures.Failure) error {
+func (m *mobilePush) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
 	data := dataJson(s, f)
 	msg := &pushArray{
 		Message: fmt.Sprintf("Your service '%v' is currently failing! Reason: %v", s.Name, f.Issue),
 		Title:   "Service Offline",
 		Data:    data,
 	}
-	return m.Send(msg)
+	return "notification sent", m.Send(msg)
 }
 
 // OnSuccess will trigger successful service
-func (m *mobilePush) OnSuccess(s *services.Service) error {
+func (m *mobilePush) OnSuccess(s *services.Service) (string, error) {
 	data := dataJson(s, nil)
 	msg := &pushArray{
 		Message:  "Service is Online!",
@@ -90,7 +90,7 @@ func (m *mobilePush) OnSuccess(s *services.Service) error {
 		Data:     data,
 		Platform: 2,
 	}
-	return m.Send(msg)
+	return "notification sent", m.Send(msg)
 }
 
 // OnTest triggers when this notifier has been saved

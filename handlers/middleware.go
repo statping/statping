@@ -190,6 +190,5 @@ func DecodeJSON(r *http.Request, obj interface{}) error {
 	if err != nil {
 		return errors.DecodeJSON
 	}
-	defer r.Body.Close()
-	return nil
+	return r.Body.Close()
 }

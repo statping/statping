@@ -164,7 +164,7 @@ type emailOutgoing struct {
 }
 
 // OnFailure will trigger failing service
-func (e *emailer) OnFailure(s *services.Service, f *failures.Failure) error {
+func (e *emailer) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
 	subject := fmt.Sprintf("Service %s is Offline", s.Name)
 	email := &emailOutgoing{
 		To:       e.Var2,
@@ -176,11 +176,11 @@ func (e *emailer) OnFailure(s *services.Service, f *failures.Failure) error {
 		},
 		From: e.Var1,
 	}
-	return e.dialSend(email)
+	return "email failed", e.dialSend(email)
 }
 
 // OnSuccess will trigger successful service
-func (e *emailer) OnSuccess(s *services.Service) error {
+func (e *emailer) OnSuccess(s *services.Service) (string, error) {
 	subject := fmt.Sprintf("Service %s is Back Online", s.Name)
 	email := &emailOutgoing{
 		To:       e.Var2,
@@ -192,7 +192,7 @@ func (e *emailer) OnSuccess(s *services.Service) error {
 		},
 		From: e.Var1,
 	}
-	return e.dialSend(email)
+	return "email sent", e.dialSend(email)
 }
 
 // OnTest triggers when this notifier has been saved

@@ -47,12 +47,12 @@ func TestSlackNotifier(t *testing.T) {
 	})
 
 	t.Run("slack OnFailure", func(t *testing.T) {
-		err := slacker.OnFailure(exampleService, exampleFailure)
+		_, err := slacker.OnFailure(exampleService, exampleFailure)
 		assert.Nil(t, err)
 	})
 
 	t.Run("slack OnSuccess", func(t *testing.T) {
-		err := slacker.OnSuccess(exampleService)
+		_, err := slacker.OnSuccess(exampleService)
 		assert.Nil(t, err)
 	})
 
