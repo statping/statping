@@ -1,3 +1,10 @@
+# 0.90.51 (06-15-2020)
+- Fix Theme Editor codemirror inputs to show on load
+- Added favicon folder for local assets can be used without remote access
+- Modified Notifier's to return the response as a string for the frontend
+- Modified Notifiers so they can use custom data for their request
+- Added Notifier OnSuccess and onFailure custom data on frontend
+
 # 0.90.50 (06-13-2020)
 - Removed PORT, replaced with SERVER_PORT
 - Removed HOST/IP, replaced with SERVER_IP
