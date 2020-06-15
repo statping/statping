@@ -14,6 +14,7 @@ type DbConfig struct {
 	DbPort      int    `yaml:"port" json:"-"`
 	ApiSecret   string `yaml:"api_secret" json:"-"`
 	Language    string `yaml:"language" json:"language"`
+	SendReports bool   `yaml:"send_reports" json:"send_reports"`
 	Project     string `yaml:"-" json:"-"`
 	Description string `yaml:"-" json:"-"`
 	Domain      string `yaml:"-" json:"-"`

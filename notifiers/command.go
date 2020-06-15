@@ -29,6 +29,9 @@ var Command = &commandLine{&notifications.Notification{
 	Delay:       time.Duration(1 * time.Second),
 	Icon:        "fas fa-terminal",
 	Host:        "/bin/bash",
+	SuccessData: "curl -L http://localhost:8080",
+	FailureData: "curl -L http://localhost:8080",
+	DataType:    "text",
 	Limits:      60,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
@@ -36,18 +39,6 @@ var Command = &commandLine{&notifications.Notification{
 		Placeholder: "/usr/bin/curl",
 		DbField:     "host",
 		SmallText:   "You can use '/bin/sh', '/bin/bash', '/usr/bin/curl' or an absolute path for an application.",
-	}, {
-		Type:        "text",
-		Title:       "Command to Run on OnSuccess",
-		Placeholder: "http://localhost:8080/health",
-		DbField:     "var1",
-		SmallText:   "<b>Accepts Variables</b> This Command will run when a service is receiving a Successful event.",
-	}, {
-		Type:        "text",
-		Title:       "Command to Run on OnFailure",
-		Placeholder: "http://localhost:8080/health",
-		DbField:     "var2",
-		SmallText:   "<b>Accepts Variables</b> This Command will run when a service is receiving a Failing event.",
 	}}},
 }
 
@@ -59,16 +50,14 @@ func runCommand(app string, cmd ...string) (string, string, error) {
 
 // OnSuccess for commandLine will trigger successful service
 func (c *commandLine) OnSuccess(s *services.Service) error {
-	msg := c.GetValue("var1")
-	tmpl := ReplaceVars(msg, s, nil)
+	tmpl := ReplaceVars(c.SuccessData, s, nil)
 	_, _, err := runCommand(c.Host, tmpl)
 	return err
 }
 
 // OnFailure for commandLine will trigger failing service
 func (c *commandLine) OnFailure(s *services.Service, f *failures.Failure) error {
-	msg := c.GetValue("var2")
-	tmpl := ReplaceVars(msg, s, f)
+	tmpl := ReplaceVars(c.FailureData, s, f)
 	_, _, err := runCommand(c.Host, tmpl)
 	return err
 }

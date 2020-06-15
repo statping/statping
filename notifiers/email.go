@@ -110,6 +110,9 @@ var email = &emailer{&notifications.Notification{
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "far fa-envelope",
+	SuccessData: "Service {{.Service.Name}} is Back Online",
+	FailureData: "Service {{.Service.Name}} is Offline",
+	DataType:    "text",
 	Limits:      30,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
@@ -232,6 +235,7 @@ func (e *emailer) dialSend(email *emailOutgoing) error {
 	} else {
 		mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	}
+
 	m.SetHeader("From", email.From)
 	m.SetHeader("To", email.To)
 	m.SetHeader("Subject", email.Subject)

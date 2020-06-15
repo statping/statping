@@ -4,6 +4,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/statping/statping/utils"
 	"net/http"
+	"strconv"
 )
 
 func LoadConfigForm(r *http.Request) (*DbConfig, error) {
@@ -24,6 +25,7 @@ func LoadConfigForm(r *http.Request) (*DbConfig, error) {
 	domain := g("domain")
 	email := g("email")
 	language := g("language")
+	reports, _ := strconv.ParseBool(g("send_reports"))
 
 	if project == "" || username == "" || password == "" {
 		err := errors.New("Missing required elements on setup form")
@@ -40,6 +42,7 @@ func LoadConfigForm(r *http.Request) (*DbConfig, error) {
 	p.Set("NAME", project)
 	p.Set("DESCRIPTION", description)
 	p.Set("LANGUAGE", language)
+	p.Set("ALLOW_REPORTS", reports)
 
 	confg := &DbConfig{
 		DbConn:      dbConn,
@@ -56,8 +59,8 @@ func LoadConfigForm(r *http.Request) (*DbConfig, error) {
 		Email:       email,
 		Location:    utils.Directory,
 		Language:    language,
+		SendReports: reports,
 	}
 
 	return confg, nil
-
 }

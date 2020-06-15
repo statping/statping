@@ -33,6 +33,9 @@ var Twilio = &twilio{&notifications.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "far fa-comment-alt",
 	Delay:       time.Duration(10 * time.Second),
+	SuccessData: "Your service '{{.Service.Name}}' is currently online!",
+	FailureData: "Your service '{{.Service.Name}}' is currently offline!",
+	DataType:    "text",
 	Limits:      15,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
@@ -88,14 +91,14 @@ func (t *twilio) sendMessage(message string) (string, error) {
 
 // OnFailure will trigger failing service
 func (t *twilio) OnFailure(s *services.Service, f *failures.Failure) error {
-	msg := fmt.Sprintf("Your service '%v' is currently offline!", s.Name)
+	msg := ReplaceVars(t.FailureData, s, f)
 	_, err := t.sendMessage(msg)
 	return err
 }
 
 // OnSuccess will trigger successful service
 func (t *twilio) OnSuccess(s *services.Service) error {
-	msg := fmt.Sprintf("Your service '%v' is currently online!", s.Name)
+	msg := ReplaceVars(t.SuccessData, s, nil)
 	_, err := t.sendMessage(msg)
 	return err
 }

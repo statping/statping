@@ -1,17 +1,17 @@
 <template>
     <form v-if="service.type" @submit.prevent="saveService">
         <div class="card contain-card text-black-50 bg-white mb-4">
-            <div class="card-header">Service Information</div>
+            <div class="card-header">{{ $t('service.info') }}</div>
             <div class="card-body">
         <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Service Name</label>
+            <label class="col-sm-4 col-form-label">{{ $t('service.name') }}</label>
             <div class="col-sm-8">
                 <input v-model="service.name" @input="updatePermalink" id="name" type="text" name="name" class="form-control" placeholder="Server Name" required spellcheck="false" autocorrect="off">
                 <small class="form-text text-muted">Give your service a name you can recognize</small>
             </div>
         </div>
         <div class="form-group row">
-            <label for="service_type" class="col-sm-4 col-form-label">Service Type</label>
+            <label for="service_type" class="col-sm-4 col-form-label">{{ $t('service.type') }}</label>
             <div class="col-sm-8">
                 <select v-model="service.type" class="form-control" id="service_type">
                     <option value="http">HTTP Service</option>
@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="form-group row">
-            <label for="service_type" class="col-sm-4 col-form-label">Group</label>
+            <label for="service_type" class="col-sm-4 col-form-label">{{ $t('group') }}</label>
             <div class="col-sm-8">
                 <select v-model="service.group_id" class="form-control">
                     <option value="0" >No Group</option>

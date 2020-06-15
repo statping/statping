@@ -121,20 +121,18 @@
           },
           changeTab (v) {
               this.tab = v
-              if (v === 'base') {
-                  this.$refs.base.codemirror.refresh();
-              } else if (v === 'vars') {
-                  this.$refs.vars.codemirror.refresh();
-              } else if (v === 'mobile') {
-                  this.$refs.mobile.codemirror.refresh();
-              }
+              // if (v === 'base') {
+              //     this.$refs.base.codemirror.refresh();
+              // } else if (v === 'vars') {
+              //     this.$refs.vars.codemirror.refresh();
+              // } else if (v === 'mobile') {
+              //     this.$refs.mobile.codemirror.refresh();
+              // }
           }
       }
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
+<style scoped>
     .CodeMirror {
         border: 1px solid #eee;
         height: 550px;

@@ -34,6 +34,8 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	domain := r.PostForm.Get("domain")
 	newsletter := r.PostForm.Get("newsletter")
 	sendNews, _ := strconv.ParseBool(newsletter)
+	reports := r.PostForm.Get("send_reports")
+	sendReports, _ := strconv.ParseBool(reports)
 
 	log.WithFields(utils.ToFields(core.App, confgs)).Debugln("new configs posted")
 
@@ -81,16 +83,17 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	notifiers.InitNotifiers()
 
 	c := &core.Core{
-		Name:        project,
-		Description: description,
-		ApiSecret:   utils.Params.GetString("API_SECRET"),
-		Domain:      domain,
-		Version:     core.App.Version,
-		Started:     utils.Now(),
-		CreatedAt:   utils.Now(),
-		UseCdn:      null.NewNullBool(false),
-		Footer:      null.NewNullString(""),
-		Language:    confgs.Language,
+		Name:         project,
+		Description:  description,
+		ApiSecret:    utils.Params.GetString("API_SECRET"),
+		Domain:       domain,
+		Version:      core.App.Version,
+		Started:      utils.Now(),
+		CreatedAt:    utils.Now(),
+		UseCdn:       null.NewNullBool(false),
+		Footer:       null.NewNullString(""),
+		Language:     confgs.Language,
+		AllowReports: null.NewNullBool(sendReports),
 	}
 
 	log.Infoln("Creating new Core")

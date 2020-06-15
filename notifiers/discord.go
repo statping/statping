@@ -19,6 +19,11 @@ type discord struct {
 	*notifications.Notification
 }
 
+var (
+	successData = `{"content": "Your service '{{.Service.Name}}' is currently online!"}`
+	failureData = `{"content": "Your service '{{.Service.Name}}' is currently failing! Reason: {{.Failure.Issue}}"}`
+)
+
 var Discorder = &discord{&notifications.Notification{
 	Method:      "discord",
 	Title:       "discord",
@@ -28,6 +33,9 @@ var Discorder = &discord{&notifications.Notification{
 	Delay:       time.Duration(5 * time.Second),
 	Host:        "https://discordapp.com/api/webhooks/****/*****",
 	Icon:        "fab fa-discord",
+	SuccessData: successData,
+	FailureData: failureData,
+	DataType:    "json",
 	Limits:      60,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",

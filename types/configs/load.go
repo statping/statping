@@ -49,6 +49,12 @@ func LoadConfigFile(configFile string) (*DbConfig, error) {
 	if db.ApiSecret != "" {
 		p.Set("API_SECRET", db.ApiSecret)
 	}
+	if db.Language != "" {
+		p.Set("LANGUAGE", "en")
+	}
+	if db.SendReports {
+		p.Set("ALLOW_REPORTS", true)
+	}
 
 	configs := &DbConfig{
 		DbConn:      p.GetString("DB_CONN"),
@@ -65,6 +71,8 @@ func LoadConfigFile(configFile string) (*DbConfig, error) {
 		Password:    p.GetString("ADMIN_PASSWORD"),
 		Location:    utils.Directory,
 		SqlFile:     p.GetString("SQL_FILE"),
+		Language:    p.GetString("LANGUAGE"),
+		SendReports: p.GetBool("ALLOW_REPORTS"),
 	}
 	log.WithFields(utils.ToFields(configs)).Debugln("read config file: " + configFile)
 

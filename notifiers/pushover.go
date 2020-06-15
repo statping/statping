@@ -35,6 +35,9 @@ var Pushover = &pushover{&notifications.Notification{
 	Icon:        "fa dot-circle",
 	Delay:       time.Duration(10 * time.Second),
 	Limits:      60,
+	SuccessData: `Your service '{{.Service.Name}}' is currently online!`,
+	FailureData: `Your service '{{.Service.Name}}' is currently offline!`,
+	DataType:    "text",
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "User Token",
@@ -68,15 +71,15 @@ func (t *pushover) sendMessage(message string) (string, error) {
 
 // OnFailure will trigger failing service
 func (t *pushover) OnFailure(s *services.Service, f *failures.Failure) error {
-	msg := fmt.Sprintf("Your service '%s' is currently offline!", s.Name)
-	_, err := t.sendMessage(msg)
+	message := ReplaceVars(t.FailureData, s, f)
+	_, err := t.sendMessage(message)
 	return err
 }
 
 // OnSuccess will trigger successful service
 func (t *pushover) OnSuccess(s *services.Service) error {
-	msg := fmt.Sprintf("Your service '%s' is currently online!", s.Name)
-	_, err := t.sendMessage(msg)
+	message := ReplaceVars(t.SuccessData, s, nil)
+	_, err := t.sendMessage(message)
 	return err
 }
 

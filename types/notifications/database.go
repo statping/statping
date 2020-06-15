@@ -24,9 +24,17 @@ func Find(method string) (*Notification, error) {
 }
 
 func (n *Notification) Create() error {
-	q := db.Where("method = ?", n.Method).Find(n)
+	var p Notification
+	q := db.Where("method = ?", n.Method).Find(&p)
 	if q.RecordNotFound() {
 		if err := db.Create(n).Error(); err != nil {
+			return err
+		}
+	}
+	if p.FailureData == "" || p.SuccessData == "" {
+		p.SuccessData = n.SuccessData
+		p.FailureData = n.FailureData
+		if err := p.Update(); err != nil {
 			return err
 		}
 	}
@@ -44,6 +52,8 @@ func (n *Notification) UpdateFields(notif *Notification) *Notification {
 	n.ApiSecret = notif.ApiSecret
 	n.Var1 = notif.Var1
 	n.Var2 = notif.Var2
+	n.SuccessData = notif.SuccessData
+	n.FailureData = notif.FailureData
 	return n
 }
 

@@ -45,6 +45,8 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Infof("Updating %s Notifier", notifer.Title)
+
 	err = notifer.Update()
 	if err != nil {
 		sendErrorJson(err, w, r)

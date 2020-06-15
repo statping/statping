@@ -32,6 +32,9 @@ var Webhook = &webhooker{&notifications.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "fas fa-code-branch",
 	Delay:       time.Duration(1 * time.Second),
+	SuccessData: `{"id": {{.Service.Id}}, "online": true}`,
+	FailureData: `{"id": {{.Service.Id}}, "online": false}`,
+	DataType:    "json",
 	Limits:      180,
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
@@ -47,12 +50,6 @@ var Webhook = &webhooker{&notifications.Notification{
 		SmallText:   "Choose a HTTP method for example: GET, POST, DELETE, or PATCH.",
 		DbField:     "Var1",
 		Required:    true,
-	}, {
-		Type:        "textarea",
-		Title:       "HTTP Body",
-		Placeholder: `{"service_id": {{.Service.Id}}", "service_name": "{{.Service.Name}"}`,
-		SmallText:   "Optional HTTP body for a POST request. You can insert variables into your body request.<br>{{.Service.Id}}, {{.Service.Name}}, {{.Service.Online}}<br>{{.Failure.Issue}}",
-		DbField:     "Var2",
 	}, {
 		Type:        "text",
 		Title:       "Content Type",
@@ -114,7 +111,7 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 }
 
 func (w *webhooker) OnTest() (string, error) {
-	body := ReplaceVars(w.Var2, exampleService, exampleFailure)
+	body := ReplaceVars(w.SuccessData, exampleService, exampleFailure)
 	resp, err := w.sendHttpWebhook(body)
 	if err != nil {
 		return "", err
@@ -128,7 +125,7 @@ func (w *webhooker) OnTest() (string, error) {
 
 // OnFailure will trigger failing service
 func (w *webhooker) OnFailure(s *services.Service, f *failures.Failure) error {
-	msg := ReplaceVars(w.Var2, s, f)
+	msg := ReplaceVars(w.FailureData, s, f)
 	resp, err := w.sendHttpWebhook(msg)
 	if err != nil {
 		return err
@@ -139,7 +136,7 @@ func (w *webhooker) OnFailure(s *services.Service, f *failures.Failure) error {
 
 // OnSuccess will trigger successful service
 func (w *webhooker) OnSuccess(s *services.Service) error {
-	msg := ReplaceVars(w.Var2, s, nil)
+	msg := ReplaceVars(w.SuccessData, s, nil)
 	resp, err := w.sendHttpWebhook(msg)
 	if err != nil {
 		return err

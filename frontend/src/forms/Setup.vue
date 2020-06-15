@@ -26,13 +26,19 @@
                                 <option value="mysql">MySQL</option>
                             </select>
                         </div>
-                        <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
-                            <label class="text-capitalize">{{ $t('setup.host') }}</label>
-                            <input @keyup="canSubmit" v-model="setup.db_host" id="db_host" type="text" class="form-control" placeholder="localhost">
-                        </div>
-                        <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
-                            <label class="text-capitalize">{{ $t('port') }}</label>
-                            <input @keyup="canSubmit" v-model="setup.db_port" id="db_port" type="text" class="form-control" placeholder="localhost">
+                        <div class="row">
+                            <div class="col-6">
+                                <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
+                                    <label class="text-capitalize">{{ $t('setup.host') }}</label>
+                                    <input @keyup="canSubmit" v-model="setup.db_host" id="db_host" type="text" class="form-control" placeholder="localhost">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
+                                    <label class="text-capitalize">{{ $t('port') }}</label>
+                                    <input @keyup="canSubmit" v-model="setup.db_port" id="db_port" type="number" class="form-control" placeholder="5432">
+                                </div>
+                            </div>
                         </div>
                         <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
                             <label class="text-capitalize">{{ $t('username') }}</label>
@@ -45,6 +51,21 @@
                         <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
                             <label for="db_database" class="text-capitalize">{{ $t('database') }}</label>
                             <input @keyup="canSubmit" v-model="setup.db_database" id="db_database" type="text" class="form-control" placeholder="Database name">
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <div class="row">
+                                <div class="col-9">
+                                    <span class="text-left text-capitalize">{{ $t('setup.send_reports') }}</span>
+                                </div>
+                                <div class="col-3 text-right">
+                                    <span @click="setup.send_reports = !!setup.send_reports" class="switch">
+                                      <input v-model="setup.send_reports" type="checkbox" name="send_reports" class="switch" id="send_reports" :checked="setup.send_reports">
+                                      <label for="send_reports"></label>
+                                    </span>
+                                </div>
+                            </div>
+
                         </div>
 
                     </div>
@@ -72,7 +93,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="text-capitalize">{{ $t('setup.username') }}</label>
+                            <label class="text-capitalize">{{ $t('setup.password') }}</label>
                             <input @keyup="canSubmit" v-model="setup.password" id="password" type="password" class="form-control" placeholder="password" required>
                         </div>
 
@@ -90,7 +111,7 @@
                                 <div class="col-4">
                                     <label class="d-none d-sm-block text-capitalize text-capitalize">{{ $t('setup.newsletter') }}</label>
                                     <span @click="setup.newsletter = !!setup.newsletter" class="switch">
-                                      <input v-model="setup.newsletter" type="checkbox" name="using_cdn" class="switch" id="send_newsletter" :checked="setup.newsletter">
+                                      <input v-model="setup.newsletter" type="checkbox" name="send_newsletter" class="switch" id="send_newsletter" :checked="setup.newsletter">
                                       <label for="send_newsletter"></label>
                                     </span>
                                 </div>
@@ -140,6 +161,7 @@
         confirm_password: "",
         sample_data: true,
         newsletter: true,
+        send_reports: true,
         email: "",
       }
     }

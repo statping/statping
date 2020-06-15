@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/statping/statping/types/errors"
 	"html/template"
 	"net/http"
@@ -15,8 +14,8 @@ import (
 )
 
 const (
-	cookieKey = "statping_auth"
-	timeout   = time.Second * 30
+	cookieName = "statping_auth"
+	timeout    = time.Second * 30
 )
 
 var (
@@ -98,31 +97,6 @@ func IsFullAuthenticated(r *http.Request) bool {
 		return true
 	}
 	return IsAdmin(r)
-}
-
-func getJwtToken(r *http.Request) (JwtClaim, error) {
-	c, err := r.Cookie(cookieKey)
-	if err != nil {
-		if err == http.ErrNoCookie {
-			return JwtClaim{}, err
-		}
-		return JwtClaim{}, err
-	}
-	tknStr := c.Value
-	var claims JwtClaim
-	tkn, err := jwt.ParseWithClaims(tknStr, &claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(jwtKey), nil
-	})
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			return JwtClaim{}, err
-		}
-		return JwtClaim{}, err
-	}
-	if !tkn.Valid {
-		return claims, errors.New("token is not valid")
-	}
-	return claims, err
 }
 
 // ScopeName will show private JSON fields in the API.
