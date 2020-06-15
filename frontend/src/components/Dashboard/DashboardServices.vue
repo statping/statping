@@ -31,8 +31,8 @@
                 </td>
                 <td>{{$store.getters.servicesInGroup(group.id).length}}</td>
                 <td>
-                    <span v-if="group.public" class="badge badge-primary">PUBLIC</span>
-                    <span v-if="!group.public" class="badge badge-secondary">PRIVATE</span>
+                    <span v-if="group.public" class="badge badge-primary text-uppercase">{{ $t('public') }}</span>
+                    <span v-if="!group.public" class="badge badge-secondary text-uppercase">{{ $t('private') }}</span>
                 </td>
                 <td class="text-right">
                     <div v-if="$store.state.admin" class="btn-group">

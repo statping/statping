@@ -30,13 +30,16 @@ func (n *Notification) Create() error {
 		if err := db.Create(n).Error(); err != nil {
 			return err
 		}
+		return nil
 	}
-	if p.FailureData == "" || p.SuccessData == "" {
-		p.SuccessData = n.SuccessData
+	if p.FailureData == "" {
 		p.FailureData = n.FailureData
-		if err := p.Update(); err != nil {
-			return err
-		}
+	}
+	if p.SuccessData == "" {
+		p.SuccessData = n.SuccessData
+	}
+	if err := p.Update(); err != nil {
+		return err
 	}
 	return nil
 }

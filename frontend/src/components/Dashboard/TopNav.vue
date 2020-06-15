@@ -28,7 +28,7 @@
                 </li>
             </ul>
             <span class="navbar-text">
-      <a href="#" class="nav-link" @click.prevent="logout">Logout</a>
+      <a href="#" class="nav-link" @click.prevent="logout">{{ $t('top_nav.logout') }}</a>
     </span>
         </div>
     </nav>

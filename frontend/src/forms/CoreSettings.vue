@@ -33,7 +33,7 @@
 
         <div class="form-group">
             <label>{{ $t('setup.language') }}</label>
-            <select v-model="core.language" class="form-control">
+            <select v-model="core.language" v-bind:value="core.language" class="form-control">
                 <option value="en">English</option>
                 <option value="es">Spanish</option>
                 <option value="fr">French</option>

@@ -4,7 +4,7 @@
         <tr>
             <th scope="col">Name</th>
             <th scope="col" class="d-none d-md-table-cell">Visibility</th>
-            <th scope="col" class="d-none d-md-table-cell">Group</th>
+            <th scope="col" class="d-none d-md-table-cell">{{ $t('group') }}</th>
             <th scope="col"></th>
         </tr>
         </thead>
@@ -17,7 +17,7 @@
                 </td>
                 <td class="d-none d-md-table-cell">
                     <span class="badge" :class="{'badge-primary': service.public, 'badge-secondary': !service.public}">
-                        {{service.public ? "PUBLIC" : "PRIVATE"}}
+                        {{service.public ? $t('public') : $t('private')}}
                     </span>
                 </td>
                 <td class="d-none d-md-table-cell">

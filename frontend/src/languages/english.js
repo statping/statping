@@ -6,6 +6,7 @@ const english = {
     announcements: "Announcements",
     settings: "Settings",
     logs: "Logs",
+    logout: 'Logout',
   },
   setup: {
     language: "Language",
@@ -49,15 +50,22 @@ const english = {
   services: 'Services',
   domain: 'Domain',
   online: 'online',
+  public: 'Public',
+  private: 'Private',
+  admin: 'Admin',
+  user: 'User',
   offline: 'offline',
   incident: 'incident',
   group: 'Group',
   message: 'message',
-  logout: 'logout',
+  edit: 'Edit',
+  type: 'Type',
   sample_data: 'Sample Data',
   today: 'Today',
+  last_login: 'Last Login',
   day: 'day',
   hour: 'hour',
+  uptime: '{0} Uptime',
 }
 
 export default english

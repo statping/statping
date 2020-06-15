@@ -21,6 +21,7 @@ func Samples() error {
 		UseCdn:      null.NewNullBool(false),
 		Footer:      null.NewNullString(""),
 		MigrationId: utils.Now().Unix(),
+		Language:    utils.Params.GetString("LANGUAGE"),
 	}
 
 	return core.Create()

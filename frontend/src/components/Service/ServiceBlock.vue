@@ -47,7 +47,9 @@
                             {{intervalpick.text}}
                         </button>
                         <div class="service-tm-menu" :class="{'d-none': !intervalMenu}">
-                            <a v-for="(interval, i) in intervals" @click.prevent="changeInterval(interval)" class="dropdown-item" href="#" :class="{'active': intervalpick === interval, 'disabled': disabled_interval(interval)}">{{interval.text}}</a>
+                            <a v-for="(interval, i) in intervals" @click.prevent="changeInterval(interval)" class="dropdown-item" href="#" :class="{'active': intervalpick === interval, 'disabled': disabled_interval(interval)}">
+                                {{interval.text}}
+                            </a>
                         </div>
 
                         <span class="d-none float-left d-md-inline">
