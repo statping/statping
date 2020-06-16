@@ -26,7 +26,7 @@ type scope struct {
 	scope string
 }
 
-// MarshalJSON for Scopr
+// TODO: make a better way to parse
 func (s scope) MarshalJSON() ([]byte, error) {
 	svc := reflect.ValueOf(s.data)
 	if svc.Kind() == reflect.Slice {
@@ -40,6 +40,7 @@ func (s scope) MarshalJSON() ([]byte, error) {
 	return json.Marshal(SafeJson(svc, s.scope))
 }
 
+// TODO: make a better way to parse
 func SafeJson(val reflect.Value, scope string) map[string]interface{} {
 	thisData := make(map[string]interface{})
 	if val.Kind() == reflect.Interface && !val.IsNil() {
@@ -89,6 +90,7 @@ func SafeJson(val reflect.Value, scope string) map[string]interface{} {
 	return thisData
 }
 
+// TODO: make a better way to parse
 func forTag(tags []string, scope string) bool {
 	for _, v := range tags {
 		if v == scope {
