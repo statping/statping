@@ -15,14 +15,27 @@ func DB() database.Database {
 	return db
 }
 
-func All() []*Failure {
-	var failures []*Failure
-	db.Find(&failures)
-	return failures
+func (f *Failure) AfterFind() {
+	metrics.Query("failure", "find")
+}
+
+func (f *Failure) AfterUpdate() {
+	metrics.Query("failure", "update")
+}
+
+func (f *Failure) AfterDelete() {
+	metrics.Query("failure", "delete")
 }
 
 func (f *Failure) AfterCreate() {
 	metrics.Inc("failure", f.Service)
+	metrics.Query("failure", "create")
+}
+
+func All() []*Failure {
+	var failures []*Failure
+	db.Find(&failures)
+	return failures
 }
 
 func (f *Failure) Create() error {

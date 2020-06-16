@@ -2,6 +2,7 @@ package users
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/metrics"
 	"github.com/statping/statping/utils"
 )
 
@@ -12,6 +13,22 @@ var (
 
 func SetDB(database database.Database) {
 	db = database.Model(&User{})
+}
+
+func (u *User) AfterFind() {
+	metrics.Query("user", "find")
+}
+
+func (u *User) AfterCreate() {
+	metrics.Query("user", "create")
+}
+
+func (u *User) AfterUpdate() {
+	metrics.Query("user", "update")
+}
+
+func (u *User) AfterDelete() {
+	metrics.Query("user", "delete")
 }
 
 func Find(id int64) (*User, error) {

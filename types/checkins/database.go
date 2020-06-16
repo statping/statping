@@ -2,6 +2,7 @@ package checkins
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/metrics"
 	"github.com/statping/statping/utils"
 )
 
@@ -11,6 +12,10 @@ var dbHits database.Database
 func SetDB(database database.Database) {
 	db = database.Model(&Checkin{})
 	dbHits = database.Model(&CheckinHit{})
+}
+
+func (c *Checkin) AfterFind() {
+	metrics.Query("checkin", "find")
 }
 
 func Find(id int64) (*Checkin, error) {

@@ -2,6 +2,7 @@ package incidents
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/metrics"
 	"github.com/statping/statping/utils"
 )
 
@@ -14,6 +15,38 @@ var (
 func SetDB(database database.Database) {
 	db = database.Model(&Incident{})
 	dbUpdate = database.Model(&IncidentUpdate{})
+}
+
+func (i *Incident) AfterFind() {
+	metrics.Query("incident", "find")
+}
+
+func (i *Incident) AfterCreate() {
+	metrics.Query("incident", "create")
+}
+
+func (i *Incident) AfterUpdate() {
+	metrics.Query("incident", "update")
+}
+
+func (i *Incident) AfterDelete() {
+	metrics.Query("incident", "delete")
+}
+
+func (i *IncidentUpdate) AfterFind() {
+	metrics.Query("incident_update", "find")
+}
+
+func (i *IncidentUpdate) AfterCreate() {
+	metrics.Query("incident_update", "create")
+}
+
+func (i *IncidentUpdate) AfterUpdate() {
+	metrics.Query("incident_update", "update")
+}
+
+func (i *IncidentUpdate) AfterDelete() {
+	metrics.Query("incident_update", "delete")
 }
 
 func FindUpdate(uid int64) (*IncidentUpdate, error) {

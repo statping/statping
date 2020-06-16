@@ -126,11 +126,7 @@ func Routine() {
 			time.Sleep(5 * time.Second)
 			continue
 		}
-		stats := database.DB().Stats()
-		metrics.Database("connections", float64(stats.OpenConnections))
-		metrics.Database("in_use", float64(stats.InUse))
-		metrics.Database("idle", float64(stats.Idle))
-
+		metrics.CollectDatabase(database.DB().Stats())
 		time.Sleep(5 * time.Second)
 	}
 }

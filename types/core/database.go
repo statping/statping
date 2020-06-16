@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/pkg/errors"
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/metrics"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/utils"
 )
@@ -11,6 +12,10 @@ var db database.Database
 
 func SetDB(database database.Database) {
 	db = database.Model(&Core{})
+}
+
+func (c *Core) AfterFind() {
+	metrics.Query("core", "find")
 }
 
 func Select() (*Core, error) {

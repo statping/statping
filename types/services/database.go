@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/errors"
+	"github.com/statping/statping/types/metrics"
 	"github.com/statping/statping/utils"
 	"sort"
 )
@@ -13,6 +14,18 @@ var (
 	log         = utils.Log.WithField("type", "service")
 	allServices map[int64]*Service
 )
+
+func (s *Service) AfterFind() {
+	metrics.Query("service", "find")
+}
+
+func (s *Service) AfterUpdate() {
+	metrics.Query("service", "update")
+}
+
+func (s *Service) AfterDelete() {
+	metrics.Query("service", "delete")
+}
 
 func init() {
 	allServices = make(map[int64]*Service)
@@ -65,6 +78,7 @@ func (s *Service) Create() error {
 
 func (s *Service) AfterCreate() error {
 	allServices[s.Id] = s
+	metrics.Query("service", "create")
 	return nil
 }
 

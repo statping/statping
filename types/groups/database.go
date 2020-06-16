@@ -3,6 +3,7 @@ package groups
 import (
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/errors"
+	"github.com/statping/statping/types/metrics"
 	"github.com/statping/statping/utils"
 	"sort"
 )
@@ -14,6 +15,22 @@ var (
 
 func SetDB(database database.Database) {
 	db = database.Model(&Group{})
+}
+
+func (g *Group) AfterFind() {
+	metrics.Query("group", "find")
+}
+
+func (g *Group) AfterUpdate() {
+	metrics.Query("group", "update")
+}
+
+func (g *Group) AfterDelete() {
+	metrics.Query("group", "delete")
+}
+
+func (g *Group) AfterCreate() {
+	metrics.Query("group", "create")
 }
 
 func Find(id int64) (*Group, error) {

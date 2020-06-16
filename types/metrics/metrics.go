@@ -42,7 +42,8 @@ func InitMetrics() {
 		utilsHttpRequestDur,
 		utilsHttpRequestBytes,
 		httpDuration,
-		databaseConnections,
+		databaseStats,
+		queryStats,
 	)
 }
 
