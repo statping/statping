@@ -1,3 +1,8 @@
+# 0.90.53 (06-16-2020)
+- Modified most of the key's for prometheus metrics
+- Added Database Stats in prometheus metrics
+- Added object query counts in prometheus metrics
+
 # 0.90.52 (06-15-2020)
 - Fixed NOT NULL sql field
 
