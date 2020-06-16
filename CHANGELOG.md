@@ -1,3 +1,6 @@
+# 0.90.52 (06-15-2020)
+- Fixed NOT NULL sql field
+
 # 0.90.51 (06-15-2020)
 - Fix Theme Editor codemirror inputs to show on load
 - Added favicon folder for local assets can be used without remote access

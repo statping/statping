@@ -26,8 +26,8 @@ type Notification struct {
 	Enabled     null.NullBool `gorm:"column:enabled;type:boolean;default:false" json:"enabled,omitempty"`
 	Limits      int           `gorm:"not null;column:limits" json:"limits"`
 	Removable   bool          `gorm:"column:removable" json:"removable"`
-	SuccessData string        `gorm:"type:text;not null;column:success_data" json:"success_data,omitempty"`
-	FailureData string        `gorm:"type:text;not null;column:failure_data" json:"failure_data,omitempty"`
+	SuccessData string        `gorm:"type:text;column:success_data" json:"success_data,omitempty"`
+	FailureData string        `gorm:"type:text;column:failure_data" json:"failure_data,omitempty"`
 	DataType    string        `gorm:"-" json:"data_type,omitempty"`
 	RequestInfo string        `gorm:"-" json:"request_info,omitempty"`
 	CreatedAt   time.Time     `gorm:"column:created_at" json:"created_at"`
