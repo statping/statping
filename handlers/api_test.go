@@ -248,9 +248,9 @@ func TestMainApiRoutes(t *testing.T) {
 			ExpectedContains: []string{
 				`go_goroutines`,
 				`go_memstats_alloc_bytes`,
-				`statping_service_success`,
-				`statping_http_duration_seconds`,
-				`statping_service_duration_count`,
+				`process_cpu_seconds_total`,
+				`promhttp_metric_handler_requests_total`,
+				`go_threads`,
 			},
 		},
 	}
