@@ -2,19 +2,21 @@
     <div class="card contain-card text-black-50 bg-white mb-3">
         <div class="card-header">{{group.id ? `Update ${group.name}` : "Create Group"}}
             <transition name="slide-fade">
-                <button @click="removeEdit" v-if="group.id" class="btn float-right btn-danger btn-sm">Close</button>
+                <button @click="removeEdit" v-if="group.id" class="btn float-right btn-danger btn-sm">
+                    {{ $t('close') }}
+                </button>
             </transition></div>
         <div class="card-body">
 
     <form @submit.prevent="saveGroup">
         <div class="form-group row">
-            <label for="title" class="col-sm-4 col-form-label">Group Name</label>
+            <label for="title" class="col-sm-4 col-form-label">{{ $t('dashboard.group') }} {{ $t('dashboard.name') }}</label>
             <div class="col-sm-8">
                 <input v-model="group.name" type="text" class="form-control" id="title" placeholder="Group Name" required>
             </div>
         </div>
         <div class="form-group row">
-            <label for="switch-group-public" class="col-sm-4 col-form-label">Public Group</label>
+            <label for="switch-group-public" class="col-sm-4 col-form-label text-capitalize">{{ $t('public') }} {{ $t('dashboard.group') }}</label>
             <div class="col-md-8 col-xs-12 mt-1">
             <span @click="group.public = !!group.public" class="switch float-left">
                 <input v-model="group.public" type="checkbox" class="switch" id="switch-group-public" :checked="group.public">

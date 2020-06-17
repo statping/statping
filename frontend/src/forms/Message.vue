@@ -3,13 +3,15 @@
     <div class="card contain-card text-black-50 bg-white mb-5">
       <div class="card-header">{{message.id ? `Update ${message.title}` : "Create Announcement"}}
         <transition name="slide-fade">
-          <button @click="removeEdit" v-if="message.id" class="btn btn-sm float-right btn-danger btn-sm">Close</button>
+          <button @click="removeEdit" v-if="message.id" class="btn btn-sm float-right btn-danger btn-sm">
+              {{ $t('close') }}
+          </button>
         </transition>
       </div>
       <div class="card-body">
         <form @submit="saveMessage">
           <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Title</label>
+            <label class="col-sm-4 col-form-label">{{ $t('dashboard.title') }}</label>
             <div class="col-sm-8">
               <input v-model="message.title" type="text" name="title" class="form-control" id="title" placeholder="Announcement Title" required>
             </div>

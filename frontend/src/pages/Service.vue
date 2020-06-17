@@ -3,22 +3,20 @@
 
         <div class="col-12 mb-4">
 
-            <span class="mt-3 mb-3 text-white d-md-none btn d-block d-md-none" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
-                {{service.online ? "ONLINE" : "OFFLINE"}}
+            <span class="mt-3 mb-3 text-white d-md-none btn d-block d-md-none text-uppercase" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
+                {{service.online ? $t('online') : $t('offline')}}
             </span>
 
             <h4 class="mt-2">
                 <router-link to="/" class="text-black-50 text-decoration-none">{{core.name}}</router-link> - <span class="text-muted">{{service.name}}</span>
-                <span class="badge float-right d-none d-md-block" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
-                    {{service.online ? "ONLINE" : "OFFLINE"}}
+                <span class="badge float-right d-none d-md-block text-uppercase" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
+                    {{service.online ? $t('online') : $t('offline')}}
                 </span>
             </h4>
 
             <ServiceTopStats :service="service"/>
 
-            <div>
-                <MessageBlock v-for="message in messagesInRange" v-bind:key="message.id" :message="message"/>
-            </div>
+            <MessageBlock v-for="message in messagesInRange" v-bind:key="message.id" :message="message"/>
 
             <div class="row mt-5 mb-4">
                 <div class="col-12 col-md-5 font-2 mb-3 mb-md-0">

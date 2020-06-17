@@ -16,7 +16,7 @@
                     </span> {{service.name}}
                 </td>
                 <td class="d-none d-md-table-cell">
-                    <span class="badge" :class="{'badge-primary': service.public, 'badge-secondary': !service.public}">
+                    <span class="badge text-uppercase" :class="{'badge-primary': service.public, 'badge-secondary': !service.public}">
                         {{service.public ? $t('public') : $t('private')}}
                     </span>
                 </td>
@@ -27,15 +27,16 @@
                 </td>
                 <td class="text-right">
                     <div class="btn-group">
-                        <router-link v-if="$store.state.admin" :to="{path: `/dashboard/edit_service/${service.id}`, params: {service: service} }" class="btn btn-outline-secondary">
-                            <i class="fas fa-chart-area"></i> Edit
-                        </router-link>
-                        <router-link :to="{path: serviceLink(service), params: {service: service} }" class="btn btn-outline-secondary">
-                            <i class="fas fa-chart-area"></i> View
-                        </router-link>
-                        <a v-if="$store.state.admin" @click.prevent="deleteService(service)" href="#" class="btn btn-danger">
-                            <font-awesome-icon icon="times" />
-                        </a>
+                        <button v-if="$store.state.admin" @click.prevent="goto({path: `/dashboard/edit_service/${service.id}`, params: {service: service} })" class="btn btn-sm btn-outline-secondary">
+                            <font-awesome-icon icon="edit" />
+                        </button>
+                        <button @click.prevent="goto({path: serviceLink(service), params: {service: service} })" class="btn btn-sm btn-outline-secondary">
+                            <font-awesome-icon icon="chart-area" />
+                        </button>
+                        <button v-if="$store.state.admin" @click.prevent="deleteService(service)" href="#" class="btn btn-sm btn-danger">
+                            <font-awesome-icon v-if="!loading" icon="times" />
+                            <font-awesome-icon v-if="loading" icon="circle-notch" spin/>
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -54,6 +55,11 @@ export default {
         ToggleSwitch,
           draggable
     },
+      data() {
+        return {
+          loading: false,
+        }
+      },
     computed: {
         servicesList: {
             get () {
@@ -65,6 +71,9 @@ export default {
         }
     },
       methods: {
+        goto(to) {
+          this.$router.push(to)
+        },
           async updateOrder(value) {
               let data = [];
               value.forEach((s, k) => {
@@ -76,8 +85,10 @@ export default {
           async deleteService(s) {
               let c = confirm(`Are you sure you want to delete '${s.name}'?`)
               if (c) {
+                this.loading = true
                   await Api.service_delete(s.id)
                   await this.update()
+                this.loading = false
               }
           },
           serviceGroup(s) {

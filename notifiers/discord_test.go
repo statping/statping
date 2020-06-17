@@ -2,8 +2,10 @@ package notifiers
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -46,12 +48,12 @@ func TestDiscordNotifier(t *testing.T) {
 	})
 
 	t.Run("discord OnFailure", func(t *testing.T) {
-		_, err := Discorder.OnFailure(exampleService, exampleFailure)
+		_, err := Discorder.OnFailure(services.Example(false), failures.Example())
 		assert.Nil(t, err)
 	})
 
 	t.Run("discord OnSuccess", func(t *testing.T) {
-		_, err := Discorder.OnSuccess(exampleService)
+		_, err := Discorder.OnSuccess(services.Example(true))
 		assert.Nil(t, err)
 	})
 

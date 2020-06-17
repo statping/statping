@@ -3,9 +3,9 @@
         <div class="card-title px-4 pt-3">
             <h4 v-observe-visibility="setVisible">
                 <router-link :to="serviceLink(service)">{{service.name}}</router-link>
-                <span class="badge float-right" :class="{'badge-success': service.online, 'badge-danger': !service.online}">
-                        {{service.online ? "ONLINE" : "OFFLINE"}}
-                    </span>
+                <span class="badge float-right text-uppercase" :class="{'badge-success': service.online, 'badge-danger': !service.online}">
+                    {{service.online ? $t('online') : $t('offline')}}
+                </span>
             </h4>
         </div>
 
@@ -68,22 +68,24 @@
             <div class="row">
 
                 <div class="col-12 col-md-3 mb-2 mb-md-0">
-                    <router-link :to="{path: `/dashboard/service/${service.id}/incidents`, params: {id: service.id} }" class="btn btn-block btn-white incident">
-                        Incidents
+                    <router-link :to="{path: `/dashboard/service/${service.id}/incidents`, params: {id: service.id} }" class="btn btn-block btn-white text-capitalize incident">
+                        {{$tc('incident', 2)}}
                     </router-link>
                 </div>
                 <div class="col-12 col-md-3 mb-2 mb-md-0">
-                    <router-link :to="{path: `/dashboard/service/${service.id}/checkins`, params: {id: service.id} }" class="btn btn-block btn-white checkins">
-                        Checkins
+                    <router-link :to="{path: `/dashboard/service/${service.id}/checkins`, params: {id: service.id} }" class="btn btn-block btn-white text-capitalize checkins">
+                        {{$tc('checkin', 2)}}
                     </router-link>
                 </div>
                 <div class="col-12 col-md-3 mb-2 mb-md-0">
-                    <router-link :to="{path: `/dashboard/service/${service.id}/failures`, params: {id: service.id} }" class="btn btn-block btn-white failures">
-                        Failures <span class="badge badge-danger float-right mt-1">{{service.stats.failures}}</span>
+                    <router-link :to="{path: `/dashboard/service/${service.id}/failures`, params: {id: service.id} }" class="btn btn-block btn-white text-capitalize failures">
+                        {{$tc('failure', 2)}} <span class="badge badge-danger float-right mt-1">{{service.stats.failures}}</span>
                     </router-link>
                 </div>
                 <div class="col-12 col-md-3 mb-2 mb-md-0 mt-0 mt-md-1">
-                    <span class="text-black-50 float-md-right">{{service.online_7_days}} % Uptime</span>
+                    <span class="text-black-50 float-md-right">
+                        {{$t('uptime', [service.online_7_days])}}
+                    </span>
                 </div>
 
             </div>

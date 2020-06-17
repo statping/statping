@@ -32,7 +32,7 @@
             </div>
         </div>
         <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Confirm Password</label>
+            <label class="col-sm-4 col-form-label">{{ $t('close') }}</label>
             <div class="col-sm-8">
                 <input v-model="user.confirm_password" type="password" id="password_confirm" class="form-control" placeholder="Confirm Password" required>
             </div>

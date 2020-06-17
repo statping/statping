@@ -1,7 +1,7 @@
 <template>
     <div class="col-12">
         <div class="card contain-card text-black-50 bg-white mb-4">
-            <div class="card-header">Services
+            <div class="card-header">{{ $t('top_nav.services') }}
                 <router-link v-if="$store.state.admin" to="/dashboard/create_service" class="btn btn-sm btn-outline-success float-right">
                     <font-awesome-icon icon="plus"/>  Create
                 </router-link>
@@ -12,14 +12,14 @@
         </div>
 
         <div class="card contain-card text-black-50 bg-white mb-4">
-            <div class="card-header">Groups</div>
+            <div class="card-header">{{ $t('top_nav.groups') }}</div>
             <div class="card-body pt-0">
         <table class="table">
             <thead>
             <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Services</th>
-                <th scope="col">Visibility</th>
+                <th scope="col">{{ $t('dashboard.name') }}</th>
+                <th scope="col">{{ $tc('dashboard.service', 2) }}</th>
+                <th scope="col">{{ $t('dashboard.visibility') }}</th>
                 <th scope="col"></th>
             </tr>
             </thead>
@@ -31,8 +31,9 @@
                 </td>
                 <td>{{$store.getters.servicesInGroup(group.id).length}}</td>
                 <td>
-                    <span v-if="group.public" class="badge badge-primary text-uppercase">{{ $t('public') }}</span>
-                    <span v-if="!group.public" class="badge badge-secondary text-uppercase">{{ $t('private') }}</span>
+                    <span class="badge text-uppercase" :class="{'badge-primary': group.public, 'badge-secondary': !group.public}">
+                        {{group.public ? $t('public') : $t('private')}}
+                    </span>
                 </td>
                 <td class="text-right">
                     <div v-if="$store.state.admin" class="btn-group">

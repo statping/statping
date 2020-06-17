@@ -1,6 +1,7 @@
 <template>
     <div>
-        <table class="table">
+        <span v-if="!cache" class="text-muted">There are no cached pages yet!</span>
+        <table v-if="cache" class="table">
             <thead>
             <tr>
                 <th scope="col">URL</th>
@@ -18,7 +19,7 @@
 
             </tbody>
         </table>
-        <button @click.prevent="clearCache" class="btn btn-danger btn-block">Clear Cache</button>
+        <button v-if="cache" @click.prevent="clearCache" class="btn btn-danger btn-block">Clear Cache</button>
     </div>
 </template>
 

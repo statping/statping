@@ -64,7 +64,7 @@ func (c *commandLine) OnFailure(s *services.Service, f *failures.Failure) (strin
 
 // OnTest for commandLine triggers when this notifier has been saved
 func (c *commandLine) OnTest() (string, error) {
-	tmpl := ReplaceVars(c.Var1, services.Example(true), exampleFailure)
+	tmpl := ReplaceVars(c.Var1, services.Example(true), failures.Example())
 	in, out, err := runCommand(c.Host, tmpl)
 	utils.Log.Infoln(in)
 	utils.Log.Infoln(out)

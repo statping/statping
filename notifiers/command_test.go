@@ -2,8 +2,10 @@ package notifiers
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -39,12 +41,12 @@ func TestCommandNotifier(t *testing.T) {
 	})
 
 	t.Run("Command OnFailure", func(t *testing.T) {
-		_, err := Command.OnFailure(exampleService, exampleFailure)
+		_, err := Command.OnFailure(services.Example(false), failures.Example())
 		assert.Nil(t, err)
 	})
 
 	t.Run("Command OnSuccess", func(t *testing.T) {
-		_, err := Command.OnSuccess(exampleService)
+		_, err := Command.OnSuccess(services.Example(true))
 		assert.Nil(t, err)
 	})
 
