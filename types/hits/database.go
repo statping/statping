@@ -14,8 +14,21 @@ func SetDB(database database.Database) {
 	db = database.Model(&Hit{})
 }
 
+func (h *Hit) AfterFind() {
+	metrics.Query("hit", "find")
+}
+
+func (h *Hit) AfterUpdate() {
+	metrics.Query("hit", "update")
+}
+
+func (h *Hit) AfterDelete() {
+	metrics.Query("hit", "delete")
+}
+
 func (h *Hit) AfterCreate() {
 	metrics.Inc("success", h.Service)
+	metrics.Query("hit", "create")
 }
 
 func (h *Hit) Create() error {

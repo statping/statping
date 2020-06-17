@@ -9,6 +9,7 @@ import (
 	"github.com/statping/statping/source"
 	"github.com/statping/statping/types/configs"
 	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/metrics"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"os"
@@ -174,6 +175,8 @@ func InitApp() error {
 	if _, err := core.Select(); err != nil {
 		return err
 	}
+	// init prometheus metrics
+	metrics.InitMetrics()
 	// select all services in database and store services in a mapping of Service pointers
 	if _, err := services.SelectAllServices(true); err != nil {
 		return err

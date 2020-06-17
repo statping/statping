@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"github.com/statping/statping/types/metrics"
 	"github.com/statping/statping/utils"
 	"strings"
 	"time"
@@ -119,6 +120,17 @@ func (it *Db) ChunkSize() int {
 	}
 }
 
+func Routine() {
+	for {
+		if database.DB() == nil {
+			time.Sleep(5 * time.Second)
+			continue
+		}
+		metrics.CollectDatabase(database.DB().Stats())
+		time.Sleep(5 * time.Second)
+	}
+}
+
 func (it *Db) GormDB() *gorm.DB {
 	return it.Database
 }
@@ -184,6 +196,7 @@ func Openw(dialect string, args ...interface{}) (db Database, err error) {
 		return nil, err
 	}
 	database = Wrap(gormdb)
+	go Routine()
 	return database, err
 }
 

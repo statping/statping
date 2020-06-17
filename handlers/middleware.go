@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/errors"
+	"github.com/statping/statping/types/metrics"
 	"github.com/statping/statping/utils"
 	"io"
 	"net/http"
@@ -19,12 +19,8 @@ import (
 )
 
 var (
-	authUser     string
-	authPass     string
-	httpDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
-		Name: "http_duration_seconds",
-		Help: "Duration of HTTP requests.",
-	}, []string{"path"})
+	authUser string
+	authPass string
 )
 
 // Gzip Compression
@@ -178,7 +174,7 @@ func prometheusMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		route := mux.CurrentRoute(r)
 		path, _ := route.GetPathTemplate()
-		timer := prometheus.NewTimer(httpDuration.WithLabelValues(path))
+		timer := prometheus.NewTimer(metrics.Timer(path))
 		next.ServeHTTP(w, r)
 		timer.ObserveDuration()
 	})
