@@ -1,14 +1,14 @@
 <template>
   <div class="col-12">
     <div class="card contain-card text-black-50 bg-white mb-4">
-      <div class="card-header">Announcements</div>
+      <div class="card-header">{{ $t('top_nav.announcements') }}</div>
       <div class="card-body pt-0">
         <table class="table table-striped">
           <thead>
             <tr>
-                <th scope="col">Title</th>
-                <th scope="col" class="d-none d-md-table-cell">Service</th>
-                <th scope="col" class="d-none d-md-table-cell">Begins</th>
+                <th scope="col">{{ $t('dashboard.title') }}</th>
+                <th scope="col" class="d-none d-md-table-cell">{{ $tc('dashboard.service', 1) }}</th>
+                <th scope="col" class="d-none d-md-table-cell">{{ $t('dashboard.begins') }}</th>
                 <th scope="col"></th>
             </tr>
           </thead>
@@ -21,8 +21,12 @@
               <td class="d-none d-md-table-cell">{{niceDate(message.start_on)}}</td>
               <td class="text-right">
                 <div v-if="$store.state.admin" class="btn-group">
-                  <a @click.prevent="editMessage(message, edit)" href="#" class="btn btn-outline-secondary"><i class="fas fa-exclamation-triangle"></i> Edit</a>
-                  <a @click.prevent="deleteMessage(message)" href="#" class="btn btn-danger"><font-awesome-icon icon="times" /></a>
+                  <button @click.prevent="editMessage(message, edit)" href="#" class="btn btn-sm btn-outline-secondary">
+                      <font-awesome-icon icon="edit" />
+                  </button>
+                  <button @click.prevent="deleteMessage(message)" href="#" class="btn btn-sm btn-danger">
+                      <font-awesome-icon icon="times" />
+                  </button>
                 </div>
               </td>
             </tr>
@@ -48,6 +52,9 @@
     }
   },
   methods: {
+    goto(to) {
+      this.$router.push(to)
+    },
     editChange(v) {
       this.message = {}
       this.edit = v

@@ -42,9 +42,10 @@ func SentryInit(v *string, allow bool) {
 	allowReports := Params.GetBool("ALLOW_REPORTS")
 	if allowReports || allow || goEnv == "test" {
 		if err := sentry.Init(sentry.ClientOptions{
-			Dsn:         errorReporter,
-			Environment: goEnv,
-			Release:     version,
+			Dsn:              errorReporter,
+			Environment:      goEnv,
+			Release:          version,
+			AttachStacktrace: true,
 		}); err != nil {
 			Log.Errorln(err)
 		}

@@ -2,8 +2,10 @@ package notifiers
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -62,21 +64,21 @@ func TestEmailNotifier(t *testing.T) {
 	})
 
 	t.Run("email OnFailure", func(t *testing.T) {
-		_, err := email.OnFailure(exampleService, exampleFailure)
+		_, err := email.OnFailure(services.Example(false), failures.Example())
 		assert.Nil(t, err)
 	})
 
 	t.Run("email OnSuccess", func(t *testing.T) {
-		_, err := email.OnSuccess(exampleService)
+		_, err := email.OnSuccess(services.Example(false))
 		assert.Nil(t, err)
 	})
 
 	t.Run("email Check Back Online", func(t *testing.T) {
-		assert.True(t, exampleService.Online)
+		assert.True(t, services.Example(true).Online)
 	})
 
 	t.Run("email OnSuccess Again", func(t *testing.T) {
-		_, err := email.OnSuccess(exampleService)
+		_, err := email.OnSuccess(services.Example(true))
 		assert.Nil(t, err)
 	})
 

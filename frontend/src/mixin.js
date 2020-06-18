@@ -20,7 +20,7 @@ export default Vue.mixin({
       return startOfToday()
     },
       secondsHumanize (val) {
-        return `${val} seconds`
+        return `${val} ${this.$t('second', val)}`
       },
     utc(val) {
       return new Date.UTC(val)
@@ -175,7 +175,7 @@ export default Vue.mixin({
       return startOfMonth(date)
     },
     lastDayOfMonth(month) {
-      return lastDayOfMonth(date)
+      return lastDayOfMonth(month)
     },
     addMonths(date, amount) {
       return addMonths(date, amount)

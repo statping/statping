@@ -3,19 +3,19 @@
         <div class="row">
             <div class="col-md-3 col-sm-12 mb-4 mb-md-0">
                 <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                    <h6 class="text-muted">Main Settings</h6>
+                    <h6 class="text-muted">{{ $t('settings.main') }}</h6>
 
                     <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-home-tab')}" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">
-                        <font-awesome-icon icon="cog" class="mr-2"/> Settings
+                        <font-awesome-icon icon="cog" class="mr-2"/> {{ $t('setting') }}
                     </a>
                     <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-style-tab')}" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false">
-                        <font-awesome-icon icon="image" class="mr-2"/> Theme Editor
+                        <font-awesome-icon icon="image" class="mr-2"/> {{ $t('settings.theme') }}
                     </a>
                     <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-cache-tab')}" id="v-pills-cache-tab" data-toggle="pill" href="#v-pills-cache" role="tab" aria-controls="v-pills-cache" aria-selected="false">
-                        <font-awesome-icon icon="paperclip" class="mr-2"/> Cache
+                        <font-awesome-icon icon="paperclip" class="mr-2"/> {{ $t('settings.cache') }}
                     </a>
                     <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-oauth-tab')}" id="v-pills-oauth-tab" data-toggle="pill" href="#v-pills-oauth" role="tab" aria-controls="v-pills-oauth" aria-selected="false">
-                        <font-awesome-icon icon="key" class="mr-2"/> OAuth <span class="mt-1 float-right badge badge-light text-dark font-1">BETA</span>
+                        <font-awesome-icon icon="key" class="mr-2"/> {{ $t('settings.oauth') }} <span class="mt-1 float-right badge badge-light text-dark font-1">{{ $t('settings.beta') }}</span>
                     </a>
 
                     <h6 class="mt-4 text-muted">Notifiers</h6>
@@ -33,19 +33,19 @@
                     <h6 class="mt-4 mb-3 text-muted">Statping Links</h6>
 
                     <a href="https://github.com/statping/statping/wiki" class="mb-2 font-2 text-decoration-none text-muted">
-                        <font-awesome-icon icon="question" class="mr-3"/> Documentation
+                        <font-awesome-icon icon="question" class="mr-3"/> {{$t('settings.docs')}}
                     </a>
 
                     <a href="https://github.com/statping/statping/wiki/API" class="mb-2 font-2 text-decoration-none text-muted">
-                        <font-awesome-icon icon="laptop" class="mr-2"/> API Documentation
+                        <font-awesome-icon icon="laptop" class="mr-2"/> API {{$t('settings.docs')}}
                     </a>
 
                     <a href="https://raw.githubusercontent.com/statping/statping/master/CHANGELOG.md" class="mb-2 font-2 text-decoration-none text-muted">
-                        <font-awesome-icon icon="book" class="mr-3"/> Changelog
+                        <font-awesome-icon icon="book" class="mr-3"/> {{$t('settings.changelog')}}
                     </a>
 
                     <a href="https://github.com/statping/statping" class="mb-2 font-2 text-decoration-none text-muted">
-                        <font-awesome-icon icon="code-branch" class="mr-3"/> Statping Github Repo
+                        <font-awesome-icon icon="code-branch" class="mr-3"/> {{$t('settings.repo')}}
                     </a>
 
                     <div class="row justify-content-center mt-2">
@@ -89,30 +89,18 @@
                         <div class="card text-black-50 bg-white mt-3">
                             <div class="card-header">QR Code for Mobile App</div>
                             <div class="card-body">
-
                                 <img class="rounded" width="300" height="300" :src="qrcode">
-
                             </div>
                         </div>
 
                     </div>
 
                     <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-style-tab'), show: liClass('v-pills-style-tab')}" id="v-pills-style" role="tabpanel" aria-labelledby="v-pills-style-tab">
-                        <div class="card text-black-50 bg-white mb-5">
-                            <div class="card-header">Theme Editor</div>
-                            <div class="card-body">
-                                <ThemeEditor/>
-                            </div>
-                        </div>
+                        <ThemeEditor/>
                     </div>
 
                     <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-cache-tab'), show: liClass('v-pills-cache-tab')}" id="v-pills-cache" role="tabpanel" aria-labelledby="v-pills-cache-tab">
-                        <div class="card text-black-50 bg-white mb-5">
-                            <div class="card-header">Cache</div>
-                            <div class="card-body">
-                                <Cache/>
-                            </div>
-                        </div>
+                        <Cache/>
                     </div>
 
                     <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-oauth-tab'), show: liClass('v-pills-oauth-tab')}" id="v-pills-oauth" role="tabpanel" aria-labelledby="v-pills-oauth-tab">
@@ -120,132 +108,7 @@
                     </div>
 
                     <div class="tab-pane fade" v-bind:class="{active: liClass(`v-pills-notifier-docs-tab`), show: liClass(`v-pills-notifier-docs-tab`)}" v-bind:id="`v-pills-notifier-docs-tab`" role="tabpanel" v-bind:aria-labelledby="`v-pills-notifier-docs-tab`">
-                        <h2>Notifier Variables</h2>
-                        You can insert dynamic fields within the notifier payloads for some notifiers.
-
-                        <p class="mt-2">
-                        Checkout the <a href="https://github.com/statping/statping/blob/master/types/services/struct.go">Service struct</a> and the <a href="https://github.com/statping/statping/blob/master/types/failures/struct.go">Failures struct</a> and create variables in golang template format.
-                        </p>
-
-                        <p class="mt-2">
-                            For example, if you have <b>{{"\{\{.Service.Name\}\}"}}</b> it will return the service name.
-                        </p>
-
-                        <h2 class="mt-3">Service Variables</h2>
-
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th scope="col">Variable</th>
-                                <th scope="col">True Value</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td><kbd>{{"\{\{.Service.Id\}\}"}}</kbd></td>
-                                <td>1</td>
-                            </tr>
-                            <tr>
-                                <td><kbd>{{"\{\{.Service.Name\}\}"}}</kbd></td>
-                                <td>Example Service</td>
-                            </tr>
-                            <tr>
-                                <td><kbd>{{"\{\{.Service.Domain\}\}"}}</kbd></td>
-                                <td>https://statping.com</td>
-                            </tr>
-                            <tr>
-                                <td><kbd>{{"\{\{.Service.Port\}\}"}}</kbd></td>
-                                <td>8080</td>
-                            </tr>
-                            <tr>
-                                <td><kbd>{{"\{\{.Service.DowntimeAgo\}\}"}}</kbd></td>
-                                <td>35 minutes ago</td>
-                            </tr>
-                            <tr>
-                                <td><kbd>{{"\{\{.Service.LastStatusCode\}\}"}}</kbd></td>
-                                <td>404</td>
-                            </tr>
-                            <tr>
-                                <td><kbd>{{"\{\{.Service.FailuresLast24Hours\}\}"}}</kbd></td>
-                                <td>38</td>
-                            </tr>
-                            </tbody>
-                            <small>Additional variables within the Service struct</small>
-                        </table>
-
-                        <h2 class="mt-3">Failure Variables</h2>
-
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th scope="col">Variable</th>
-                                <th scope="col">True Value</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td><kbd>{{"\{\{.Failure.Issue\}\}"}}</kbd></td>
-                                <td>Received 404 status code</td>
-                            </tr>
-                            <tr>
-                                <td><kbd>{{"\{\{.Failure.ErrorCode\}\}"}}</kbd></td>
-                                <td>404</td>
-                            </tr>
-                            <tr>
-                                <td><kbd>{{"\{\{.Failure.Service\}\}"}}</kbd></td>
-                                <td>1</td>
-                            </tr>
-                            <tr>
-                                <td><kbd>{{"\{\{.Failure.PingTime\}\}"}}</kbd></td>
-                                <td>12482 (microseconds)</td>
-                            </tr>
-                            <tr>
-                                <td><kbd>{{"\{\{.Failure.DowntimeAgo\}\}"}}</kbd></td>
-                                <td>35 minutes ago</td>
-                            </tr>
-                            <tr>
-                                <td><kbd>{{"\{\{.Failure.CreatedAt\}\}"}}</kbd></td>
-                                <td>2020-05-02 09:14:43.66381 +0000 UTC</td>
-                            </tr>
-                            </tbody>
-                            <small>Additional variables within the Failures struct</small>
-                        </table>
-
-                        <h2 class="mt-3">Core Variables</h2>
-
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th scope="col">Variable</th>
-                                <th scope="col">True Value</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td><kbd>{{"\{\{.Core.Domain\}\}"}}</kbd></td>
-                                <td>http://localhost:8080</td>
-                            </tr>
-                            <tr>
-                                <td><kbd>{{"\{\{.Core.Name\}\}"}}</kbd></td>
-                                <td>Statping Demo</td>
-                            </tr>
-                            <tr>
-                                <td><kbd>{{"\{\{.Core.Description\}\}"}}</kbd></td>
-                                <td>Statping will monitor your stuff!</td>
-                            </tr>
-                            <tr>
-                                <td><kbd>{{"\{\{.Core.Version\}\}"}}</kbd></td>
-                                <td>v0.90.34</td>
-                            </tr>
-                            <tr>
-                                <td><kbd>{{"\{\{.Core.Started\}\}"}}</kbd></td>
-                                <td>2020-05-02 09:14:43.66381 +0000 UTC</td>
-                            </tr>
-                            </tbody>
-                            <small>Additional variables within the Core struct</small>
-                        </table>
-
-
+                        <Variables/>
                     </div>
 
                     <div v-for="(notifier, index) in notifiers" v-bind:key="`${notifier.method}_${index}`" class="tab-pane fade" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), show: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" role="tabpanel" v-bind:aria-labelledby="`v-pills-${notifier.method.toLowerCase()}-tab`">
@@ -262,6 +125,7 @@
 <script>
   import Api from '../API';
   import GithubButton from 'vue-github-button'
+  import Variables from "@/components/Dashboard/Variables";
 
   const CoreSettings = () => import('@/forms/CoreSettings')
   const FormIntegration = () => import('@/forms/Integration')
@@ -273,6 +137,7 @@
   export default {
       name: 'Settings',
       components: {
+        Variables,
         GithubButton,
         OAuth,
           Cache,

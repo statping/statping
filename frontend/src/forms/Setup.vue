@@ -49,7 +49,7 @@
                             <input @keyup="canSubmit" v-model="setup.db_password" id="db_password" type="password" class="form-control" placeholder="password123">
                         </div>
                         <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
-                            <label for="db_database" class="text-capitalize">{{ $t('database') }}</label>
+                            <label for="db_database" class="text-capitalize">{{ $t('setup.database') }}</label>
                             <input @keyup="canSubmit" v-model="setup.db_database" id="db_database" type="text" class="form-control" placeholder="Database name">
                         </div>
 
@@ -125,7 +125,7 @@
                     </div>
 
                     <button @click.prevent="saveSetup" v-bind:disabled="disabled || loading" type="submit" class="btn btn-primary btn-block" :class="{'btn-primary': !loading, 'btn-default': loading}">
-                       {{loading ? "Loading..." : "Save Settings"}}
+                        <font-awesome-icon v-if="loading" icon="circle-notch" class="mr-2" spin/>{{loading ? "Loading..." : "Save Settings"}}
                     </button>
                 </div>
             </form>
@@ -176,6 +176,7 @@
     }
   },
   mounted() {
+    this.changeLanguages()
     this.setup.domain = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":"+window.location.port : "")
   },
   methods: {
@@ -203,13 +204,12 @@
       },
     async saveSetup() {
       this.loading = true
-      const s = this.setup
-      if (s.password !== s.confirm_password) {
-        alert('Passwords do not match!')
-        this.loading = false
-        return
+      let resp
+      try {
+        resp = await Api.setup_save(this.setup)
+      } catch(e) {
+        resp = {status: 'error', error: e.response.data.error}
       }
-      const resp = await Api.setup_save(s)
       if (resp.status === 'error') {
         this.error = resp.error
         this.loading = false

@@ -2,8 +2,10 @@ package notifiers
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -45,12 +47,12 @@ func TestWebhookNotifier(t *testing.T) {
 	})
 
 	t.Run("webhooker OnFailure", func(t *testing.T) {
-		_, err := Webhook.OnFailure(exampleService, exampleFailure)
+		_, err := Webhook.OnFailure(services.Example(false), failures.Example())
 		assert.Nil(t, err)
 	})
 
 	t.Run("webhooker OnSuccess", func(t *testing.T) {
-		_, err := Webhook.OnSuccess(exampleService)
+		_, err := Webhook.OnSuccess(services.Example(true))
 		assert.Nil(t, err)
 	})
 

@@ -2,8 +2,10 @@ package notifiers
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -53,12 +55,12 @@ func TestTwilioNotifier(t *testing.T) {
 	})
 
 	t.Run("Twilio OnFailure", func(t *testing.T) {
-		_, err := Twilio.OnFailure(exampleService, exampleFailure)
+		_, err := Twilio.OnFailure(services.Example(false), failures.Example())
 		assert.Nil(t, err)
 	})
 
 	t.Run("Twilio OnSuccess", func(t *testing.T) {
-		_, err := Twilio.OnSuccess(exampleService)
+		_, err := Twilio.OnSuccess(services.Example(true))
 		assert.Nil(t, err)
 	})
 

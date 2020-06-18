@@ -167,11 +167,17 @@ export default new Vuex.Store({
             context.commit("setGroups", groups);
             const services = await Api.services()
             context.commit("setServices", services);
-            const checkins = await Api.checkins()
-            context.commit("setCheckins", checkins);
-            const messages = await Api.messages()
-            context.commit("setMessages", messages)
-            context.commit("setHasPublicData", true)
+          const messages = await Api.messages()
+          context.commit("setMessages", messages)
+          context.commit("setHasPublicData", true)
+            try {
+              const checkins = await Api.checkins()
+              context.commit("setCheckins", checkins);
+            } catch(e) {
+            window.console.error(e)
+              await Api.logout()
+              return
+            }
             const notifiers = await Api.notifiers()
             context.commit("setNotifiers", notifiers);
           const users = await Api.users()

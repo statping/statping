@@ -40,6 +40,9 @@ func Select() (*Core, error) {
 	if utils.Params.GetBool("ALLOW_REPORTS") {
 		App.AllowReports = null.NewNullBool(true)
 	}
+	if utils.Params.GetString("LANGUAGE") != "" {
+		App.Language = utils.Params.GetString("LANGUAGE")
+	}
 	return App, q.Error()
 }
 

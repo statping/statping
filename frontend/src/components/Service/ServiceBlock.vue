@@ -62,7 +62,7 @@
 
                 <div class="col-md-2 col-6 float-right">
                     <button v-if="!expanded" @click="setService" class="btn btn-sm float-right dyn-dark text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
-                        View Service
+                        {{$t('service.view')}}
                     </button>
                 </div>
             </div>

@@ -2,13 +2,13 @@
     <div>
     <form @submit.prevent="login" autocomplete="on">
         <div class="form-group row">
-            <label for="username" class="col-sm-2 col-form-label">Username</label>
+            <label for="username" class="col-sm-2 col-form-label">{{$t('username')}}</label>
             <div class="col-sm-10">
                 <input @keyup="checkForm" type="text" v-model="username" name="username" class="form-control" id="username" placeholder="Username" autocorrect="off" autocapitalize="none">
             </div>
         </div>
         <div class="form-group row">
-            <label for="password" class="col-sm-2 col-form-label">Password</label>
+            <label for="password" class="col-sm-2 col-form-label">{{$t('password')}}</label>
             <div class="col-sm-10">
                 <input @keyup="checkForm" type="password" v-model="password" name="password" class="form-control" id="password" placeholder="Password">
             </div>
@@ -16,10 +16,10 @@
         <div class="form-group row">
             <div class="col-sm-12">
                 <div v-if="error" class="alert alert-danger" role="alert">
-                    Incorrect username or password
+                    {{$t('dashboard.wrong_login')}}
                 </div>
                 <button @click.prevent="login" type="submit" class="btn btn-block mb-3 btn-primary" :disabled="disabled || loading">
-                    {{loading ? "Loading" : "Sign in"}}
+                    {{loading ? $t('dashboard.loading') : $t('dashboard.sign_in')}}
                 </button>
             </div>
         </div>
