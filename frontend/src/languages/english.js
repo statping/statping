@@ -33,7 +33,11 @@ const english = {
     title: 'Title',
     begins: 'Begins',
     name: 'Name',
-    visibility: 'Visibility'
+    loading: 'Loading',
+    login: 'Login',
+    sign_in: "Sign In",
+    visibility: 'Visibility',
+    wrong_login: 'Incorrect username or password'
   },
   settings: {
     name: "Project Name",
@@ -42,12 +46,23 @@ const english = {
     footer_notes: "HTML is allowed inside the footer",
     error_reporting: "Enable Error Reporting",
     error_reporting_notes: "Help the Statping project out by sending anonymous error logs back to our server.",
-    save: "Save Settings"
+    save: "Save Settings",
+    main: "Main Settings",
+    theme: "Theme Editor",
+    cache: "Cache",
+    oauth: "OAuth",
+    beta: "BETA",
+    changelog: "Changelog",
+    repo: "Statping Github Repo",
+    docs: "Documentation",
   },
   service: {
     name: "Service Name",
     type: "Service Type",
-    info: "Service Information"
+    info: "Service Information",
+    view: "View Service",
+    average: "Average Response",
+    last_uptime: "Uptime last {0} {1}",
   },
   email: "Email Address",
   port: "Database Port",

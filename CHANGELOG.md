@@ -1,3 +1,7 @@
+# 0.90.54 (06-17-2020)
+- Fixed Slack Notifier's failure/success data saving issue
+- Added additional i18n Languages (help needed!)
+
 # 0.90.53 (06-16-2020)
 - Modified most of the key's for prometheus metrics
 - Added Database Stats in prometheus metrics

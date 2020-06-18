@@ -17,7 +17,7 @@
                 <div v-if="false" class="row mb-4 align-content-center">
 
                     <div v-if="!service.online" class="col-3 text-left">
-                        <span class="text-danger font-5 font-weight-bold">okko</span>
+                        <span class="text-danger font-5 font-weight-bold"></span>
                         <span class="font-2 d-block">Current Downtime</span>
                     </div>
 

@@ -1,5 +1,7 @@
 <template>
-    <div>
+    <div class="card text-black-50 bg-white mb-5">
+        <div class="card-header">Cache</div>
+        <div class="card-body">
         <span v-if="!cache" class="text-muted">There are no cached pages yet!</span>
         <table v-if="cache" class="table">
             <thead>
@@ -20,6 +22,7 @@
             </tbody>
         </table>
         <button v-if="cache" @click.prevent="clearCache" class="btn btn-danger btn-block">Clear Cache</button>
+    </div>
     </div>
 </template>
 
