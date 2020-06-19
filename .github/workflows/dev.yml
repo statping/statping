@@ -299,7 +299,7 @@ jobs:
           delayRequest: 600
 
   docker-release:
-    needs: upload-release
+    needs: [test, test-postman-sqlite, test-postman-mysql, test-postman-postgres]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
