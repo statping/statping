@@ -16,6 +16,7 @@ type replacer struct {
 	Core    *core.Core
 	Service *services.Service
 	Failure *failures.Failure
+	Custom  map[string]string
 }
 
 func InitNotifiers() {

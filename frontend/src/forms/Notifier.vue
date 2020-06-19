@@ -89,12 +89,12 @@
                         </button>
                     </div>
                     <div class="col-4 col-md-4">
-                        <button @click.prevent="testNotifier('success')" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
-                            <i class="fa fa-vial"></i>{{loadingTest ? "Loading..." : "Test Success"}}</button>
+                        <button @click.prevent="testNotifier('success')" :disabled="loadingTest" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
+                            <font-awesome-icon v-if="loadingTest" icon="circle-notch" class="mr-2" spin/>{{loadingTest ? "Loading..." : "Test Success"}}</button>
                     </div>
                     <div class="col-4 col-md-4">
-                        <button @click.prevent="testNotifier('failure')" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
-                            <i class="fa fa-vial"></i>{{loadingTest ? "Loading..." : "Test Failure"}}</button>
+                        <button @click.prevent="testNotifier('failure')" :disabled="loadingTest" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
+                            <font-awesome-icon v-if="loadingTest" icon="circle-notch" class="mr-2" spin/>{{loadingTest ? "Loading..." : "Test Failure"}}</button>
                     </div>
                 </div>
 

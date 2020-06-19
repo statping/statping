@@ -19,7 +19,7 @@
                     {{$t('dashboard.wrong_login')}}
                 </div>
                 <button @click.prevent="login" type="submit" class="btn btn-block mb-3 btn-primary" :disabled="disabled || loading">
-                    {{loading ? $t('dashboard.loading') : $t('dashboard.sign_in')}}
+                    <font-awesome-icon v-if="loading" icon="circle-notch" class="mr-2" spin/>{{loading ? $t('dashboard.loading') : $t('dashboard.sign_in')}}
                 </button>
             </div>
         </div>
