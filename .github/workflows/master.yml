@@ -388,7 +388,7 @@ jobs:
         with:
           tag_name: v${{ env.VERSION }}
           draft: false
-          prerelease: false
+          prerelease: true
           files: |
             builds/statping-linux-386.tar.gz
             builds/statping-linux-amd64.tar.gz
