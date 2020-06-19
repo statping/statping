@@ -13,6 +13,7 @@ const Setup = () => import('@/forms/Setup')
 const Incidents = () => import('@/components/Dashboard/Incidents')
 const Checkins = () => import('@/components/Dashboard/Checkins')
 const Failures = () => import('@/components/Dashboard/Failures')
+const NotFound = () => import('@/pages/NotFound')
 
 import VueRouter from "vue-router";
 import Api from "./API";
@@ -131,6 +132,11 @@ const routes = [
     name: 'Service',
     component: Service,
     props: true
+  },
+  {
+    path: '*',
+    component: NotFound,
+    name: 'NotFound',
   }
 ];
 

@@ -7,7 +7,7 @@ about: If you're having an issue or see an error
 ### Describe the bug
 Try to explain what issue your'e having in detail. You can copy and paste the issue from the log file in your root directory `/logs/statping.log`.
 
-You can set the environment variable `ALLOW_REPORTS` to `true` to allow errors to be sent to our error reporting server.
+You can set the environment variable `ALLOW_REPORTS` to `true` to allow errors to be sent to our error reporting server. It's super helpful.
 
 ### To Reproduce
 Steps to reproduce the behavior:
