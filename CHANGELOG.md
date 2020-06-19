@@ -1,3 +1,7 @@
+# 0.90.55 (06-18-2020)
+- Added 404 page
+- Modified Statping's PR process, dev -> master
+
 # 0.90.54 (06-17-2020)
 - Fixed Slack Notifier's failure/success data saving issue
 - Added additional i18n Languages (help needed!)
