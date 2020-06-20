@@ -31,6 +31,7 @@ func InitNotifiers() {
 		Webhook,
 		Mobile,
 		Pushover,
+		statpingMailer,
 	)
 }
 
