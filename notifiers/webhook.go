@@ -148,3 +148,8 @@ func (w *webhooker) OnSuccess(s *services.Service) (string, error) {
 	content, err := ioutil.ReadAll(resp.Body)
 	return string(content), err
 }
+
+// OnSave will trigger when this notifier is saved
+func (w *webhooker) OnSave() (string, error) {
+	return "", nil
+}

@@ -129,6 +129,11 @@ func (m *mobilePush) Send(pushMessage *pushArray) error {
 	return nil
 }
 
+// OnSave will trigger when this notifier is saved
+func (m *mobilePush) OnSave() (string, error) {
+	return "", nil
+}
+
 func pushRequest(msg *pushArray) ([]byte, error) {
 	body, err := json.Marshal(&PushNotification{[]*pushArray{msg}})
 	if err != nil {

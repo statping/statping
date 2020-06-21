@@ -150,7 +150,6 @@
           return {
               tab: "v-pills-home-tab",
               qrcode: "",
-              qrurl: "",
           }
       },
       computed: {
@@ -174,8 +173,8 @@
           const n = await Api.notifiers()
           this.$store.commit('setNotifiers', n)
 
-          this.qrurl = `statping://setup?domain=${c.domain}&api=${c.api_secret}`
-          this.qrcode = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=" + encodeURI(this.qrurl)
+          const u = `statping://setup?domain=${c.domain}&api=${c.api_secret}`
+          this.qrcode = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=" + encodeURIComponent(u)
           this.cache = await Api.cache()
         },
           changeTab(e) {

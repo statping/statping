@@ -10,14 +10,14 @@ func Example(online bool) *Service {
 	return &Service{
 		Id:                  6283,
 		Name:                "Statping Example",
-		Domain:              "https://localhost:8080",
+		Domain:              "https://statping.com",
 		Expected:            null.NewNullString(""),
 		ExpectedStatus:      200,
 		Interval:            int(time.Duration(15 * time.Second).Seconds()),
 		Type:                "http",
 		Method:              "get",
 		PostData:            null.NullString{},
-		Port:                0,
+		Port:                443,
 		Timeout:             int(time.Duration(2 * time.Second).Seconds()),
 		Order:               0,
 		VerifySSL:           null.NewNullBool(true),
@@ -46,7 +46,7 @@ func Example(online bool) *Service {
 		AllowNotifications:  null.NewNullBool(true),
 		UserNotified:        false,
 		UpdateNotify:        null.NewNullBool(true),
-		DownText:            "The service ws responding with 500 status code",
+		DownText:            "The service was responding with 500 status code",
 		SuccessNotified:     false,
 		LastStatusCode:      200,
 		Failures:            nil,
@@ -55,9 +55,7 @@ func Example(online bool) *Service {
 		LastLatency:         124399,
 		LastCheck:           utils.Now().Add(-37 * time.Second),
 		LastOnline:          utils.Now().Add(-37 * time.Second),
-		LastOffline:         utils.Now().Add((-14 * 24) * time.Hour),
-		SecondsOnline:       int64(utils.Now().Add(-24 * time.Hour).Second()),
-		SecondsOffline:      int64(utils.Now().Add(-150 * time.Second).Second()),
+		LastOffline:         utils.Now().Add(-75 * time.Second),
 	}
 }
 

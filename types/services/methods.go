@@ -326,18 +326,13 @@ func (s *Service) OnlineSince(ago time.Time) float32 {
 	return s.Online24Hours
 }
 
-// Downtime returns the amount of time of a offline service
-func (s *Service) Downtime() time.Duration {
-	hit := s.LastHit()
-	fail := s.AllFailures().Last()
-	if hit == nil {
-		return time.Duration(0)
-	}
-	if fail == nil {
-		return utils.Now().Sub(hit.CreatedAt)
-	}
+func (s *Service) Uptime() utils.Duration {
+	return utils.Duration{Duration: utils.Now().Sub(s.LastOffline)}
+}
 
-	return fail.CreatedAt.Sub(hit.CreatedAt)
+// Downtime returns the amount of time of a offline service
+func (s *Service) Downtime() utils.Duration {
+	return utils.Duration{Duration: utils.Now().Sub(s.LastOnline)}
 }
 
 // ServiceOrder will reorder the services based on 'order_id' (Order)

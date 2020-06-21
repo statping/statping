@@ -70,3 +70,8 @@ func (c *commandLine) OnTest() (string, error) {
 	utils.Log.Infoln(out)
 	return out, err
 }
+
+// OnSave will trigger when this notifier is saved
+func (c *commandLine) OnSave() (string, error) {
+	return "", nil
+}

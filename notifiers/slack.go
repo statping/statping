@@ -86,3 +86,8 @@ func (s *slack) OnSuccess(srv *services.Service) (string, error) {
 	out, err := s.sendSlack(msg)
 	return out, err
 }
+
+// OnSave will trigger when this notifier is saved
+func (s *slack) OnSave() (string, error) {
+	return "", nil
+}

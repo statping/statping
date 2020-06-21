@@ -59,9 +59,6 @@ type Service struct {
 	LastOnline          time.Time           `gorm:"-" json:"last_success" yaml:"-"`
 	LastOffline         time.Time           `gorm:"-" json:"last_error" yaml:"-"`
 	Stats               *Stats              `gorm:"-" json:"stats,omitempty" yaml:"-"`
-
-	SecondsOnline  int64 `gorm:"-" json:"-" yaml:"-"`
-	SecondsOffline int64 `gorm:"-" json:"-" yaml:"-"`
 }
 
 type Stats struct {

@@ -135,6 +135,7 @@ jobs:
           TWILIO_SECRET: ${{ secrets.TWILIO_SECRET }}
           TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
           TWILIO_TO: ${{ secrets.TWILIO_TO }}
+          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
 
       - name: Coveralls Testing Coverage
         run: |
@@ -388,7 +389,7 @@ jobs:
         with:
           tag_name: v${{ env.VERSION }}
           draft: false
-          prerelease: false
+          prerelease: true
           files: |
             builds/statping-linux-386.tar.gz
             builds/statping-linux-amd64.tar.gz

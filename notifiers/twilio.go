@@ -107,6 +107,11 @@ func (t *twilio) OnTest() (string, error) {
 	return t.sendMessage(msg)
 }
 
+// OnSave will trigger when this notifier is saved
+func (t *twilio) OnSave() (string, error) {
+	return "", nil
+}
+
 func twilioSuccess(res []byte) (bool, twilioResponse) {
 	var obj twilioResponse
 	json.Unmarshal(res, &obj)
