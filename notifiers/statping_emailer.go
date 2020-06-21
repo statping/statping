@@ -29,7 +29,7 @@ func (s *statpingEmailer) Select() *notifications.Notification {
 
 var statpingMailer = &statpingEmailer{&notifications.Notification{
 	Method:      statpingEmailerName,
-	Title:       "Statping Emailer",
+	Title:       "Email",
 	Description: "Send an email when a service becomes offline or back online using Statping's email service. You will need to verify your email address.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",

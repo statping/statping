@@ -30,7 +30,7 @@ func (e *emailer) Select() *notifications.Notification {
 
 var email = &emailer{&notifications.Notification{
 	Method:      "email",
-	Title:       "email",
+	Title:       "SMTP Mail",
 	Description: "Send emails via SMTP when services are online or offline.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
