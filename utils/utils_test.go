@@ -89,9 +89,9 @@ func TestDeleteFile(t *testing.T) {
 
 func TestFormatDuration(t *testing.T) {
 	dur, _ := time.ParseDuration("158s")
-	assert.Equal(t, "3 minutes", FormatDuration(dur))
+	assert.Equal(t, "2 minutes 38 seconds", FormatDuration(dur))
 	dur, _ = time.ParseDuration("-65s")
-	assert.Equal(t, "1 minute", FormatDuration(dur))
+	assert.Equal(t, "-1 minute 5 seconds", FormatDuration(dur))
 	dur, _ = time.ParseDuration("3s")
 	assert.Equal(t, "3 seconds", FormatDuration(dur))
 	dur, _ = time.ParseDuration("48h")

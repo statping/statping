@@ -52,15 +52,13 @@ func (d *discord) Select() *notifications.Notification {
 
 // OnFailure will trigger failing service
 func (d *discord) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
-	msg := `{"content": "Your service '{{.Service.Name}}' is currently failing! Reason: {{.Failure.Issue}}"}`
-	out, err := d.sendRequest(ReplaceVars(msg, s, f))
+	out, err := d.sendRequest(ReplaceVars(d.FailureData, s, f))
 	return out, err
 }
 
 // OnSuccess will trigger successful service
 func (d *discord) OnSuccess(s *services.Service) (string, error) {
-	msg := `{"content": "Your service '{{.Service.Name}}' is currently online!"}`
-	out, err := d.sendRequest(ReplaceVars(msg, s, nil))
+	out, err := d.sendRequest(ReplaceVars(d.SuccessData, s, nil))
 	return out, err
 }
 
@@ -81,6 +79,11 @@ func (d *discord) OnTest() (string, error) {
 		return string(contents), outError
 	}
 	return string(contents), nil
+}
+
+// OnSave will trigger when this notifier is saved
+func (d *discord) OnSave() (string, error) {
+	return "", nil
 }
 
 type discordTestJson struct {

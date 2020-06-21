@@ -71,3 +71,8 @@ func (l *lineNotifier) OnTest() (string, error) {
 	_, err := l.sendMessage(msg)
 	return msg, err
 }
+
+// OnSave will trigger when this notifier is saved
+func (l *lineNotifier) OnSave() (string, error) {
+	return "", nil
+}

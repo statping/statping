@@ -94,6 +94,11 @@ func (t *telegram) OnTest() (string, error) {
 	return content, err
 }
 
+// OnSave will trigger when this notifier is saved
+func (t *telegram) OnSave() (string, error) {
+	return "", nil
+}
+
 func telegramSuccess(res []byte) (bool, telegramResponse) {
 	var obj telegramResponse
 	json.Unmarshal(res, &obj)

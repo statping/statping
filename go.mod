@@ -15,6 +15,7 @@ require (
 	github.com/golang/protobuf v1.3.5 // indirect
 	github.com/gorilla/mux v1.7.4
 	github.com/gorilla/securecookie v1.1.1
+	github.com/hako/durafmt v0.0.0-20200605151348-3a43fc422dd9
 	github.com/jinzhu/gorm v1.9.12
 	github.com/magiconair/properties v1.8.1
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
