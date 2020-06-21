@@ -81,6 +81,11 @@ func (d *discord) OnTest() (string, error) {
 	return string(contents), nil
 }
 
+// OnSave will trigger when this notifier is saved
+func (d *discord) OnSave() (string, error) {
+	return "", nil
+}
+
 type discordTestJson struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`

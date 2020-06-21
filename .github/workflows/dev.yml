@@ -135,6 +135,7 @@ jobs:
           TWILIO_SECRET: ${{ secrets.TWILIO_SECRET }}
           TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
           TWILIO_TO: ${{ secrets.TWILIO_TO }}
+          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
 
       - name: Coveralls Testing Coverage
         run: |

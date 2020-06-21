@@ -29,5 +29,6 @@ type ServiceNotifier interface {
 	OnSuccess(*Service) (string, error)                    // OnSuccess is triggered when a service is successful
 	OnFailure(*Service, *failures.Failure) (string, error) // OnFailure is triggered when a service is failing
 	OnTest() (string, error)                               // OnTest is triggered for testing
+	OnSave() (string, error)                               // OnSave is triggered for testing
 	Select() *notifications.Notification                   // OnTest is triggered for testing
 }

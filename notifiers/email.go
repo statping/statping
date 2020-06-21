@@ -148,6 +148,11 @@ func (e *emailer) OnTest() (string, error) {
 	return subject, e.dialSend(email)
 }
 
+// OnSave will trigger when this notifier is saved
+func (e *emailer) OnSave() (string, error) {
+	return "", nil
+}
+
 func (e *emailer) dialSend(email *emailOutgoing) error {
 	mailer = mail.NewDialer(e.Host, e.Port, e.Username, e.Password)
 	m := mail.NewMessage()

@@ -90,3 +90,8 @@ func (t *pushover) OnTest() (string, error) {
 	content, err := t.sendMessage(msg)
 	return content, err
 }
+
+// OnSave will trigger when this notifier is saved
+func (t *pushover) OnSave() (string, error) {
+	return "", nil
+}

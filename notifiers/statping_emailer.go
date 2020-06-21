@@ -3,7 +3,6 @@ package notifiers
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
@@ -35,8 +34,7 @@ var statpingMailer = &statpingEmailer{&notifications.Notification{
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
 	Delay:       time.Duration(10 * time.Second),
-	Icon:        "fab fa-slack",
-	RequestInfo: "Slack allows you to customize your own messages with many complex components. Checkout the <a target=\"_blank\" href=\"https://api.slack.com/reference/surfaces/formatting\">Slack Message API</a> to learn how you can create your own.",
+	Icon:        "fas envelope-square",
 	Limits:      60,
 	Form: []notifications.NotificationForm{{
 		Type:        "email",
@@ -58,23 +56,13 @@ func (s *statpingEmailer) sendStatpingEmail(msg statpingMail) (string, error) {
 }
 
 func (s *statpingEmailer) OnTest() (string, error) {
-	example := services.Example(true)
-	testMsg := ReplaceVars(s.SuccessData, example, nil)
-	contents, resp, err := utils.HttpRequest(s.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(testMsg)), time.Duration(10*time.Second), true, nil)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-	if string(contents) != "ok" {
-		return string(contents), errors.New("the slack response was incorrect, check the URL")
-	}
-	return string(contents), nil
+	return "", nil
 }
 
 type statpingMail struct {
 	Email   string            `json:"email"`
-	Core    *core.Core        `json:"core"`
-	Service *services.Service `json:"service"`
+	Core    *core.Core        `json:"core,omitempty"`
+	Service *services.Service `json:"service,omitempty"`
 	Failure *failures.Failure `json:"failure,omitempty"`
 }
 
@@ -86,8 +74,7 @@ func (s *statpingEmailer) OnFailure(srv *services.Service, f *failures.Failure) 
 		Service: srv,
 		Failure: f,
 	}
-	out, err := s.sendStatpingEmail(ee)
-	return out, err
+	return s.sendStatpingEmail(ee)
 }
 
 // OnSuccess will trigger successful service
@@ -98,6 +85,18 @@ func (s *statpingEmailer) OnSuccess(srv *services.Service) (string, error) {
 		Service: srv,
 		Failure: nil,
 	}
+	return s.sendStatpingEmail(ee)
+}
+
+// OnSave will trigger when this notifier is saved
+func (s *statpingEmailer) OnSave() (string, error) {
+	ee := statpingMail{
+		Email:   s.Host,
+		Core:    core.App,
+		Service: nil,
+		Failure: nil,
+	}
 	out, err := s.sendStatpingEmail(ee)
+	log.Println("statping emailer response", out)
 	return out, err
 }
