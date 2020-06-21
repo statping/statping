@@ -432,7 +432,7 @@ func TestServices(t *testing.T) {
 		item, err := Find(1)
 		require.Nil(t, err)
 		amount := item.Downtime().Seconds()
-		assert.Equal(t, "25", fmt.Sprintf("%0.f", amount))
+		assert.Equal(t, "75", fmt.Sprintf("%0.f", amount))
 	})
 
 	t.Run("Test Failures Since", func(t *testing.T) {
