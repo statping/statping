@@ -74,12 +74,12 @@
 
                         <div class="form-group">
                             <label class="text-capitalize">{{ $t('setup.project_name') }}</label>
-                            <input @keyup="canSubmit" v-model="setup.project" id="project" type="text" class="form-control" placeholder="Great Uptime" required>
+                            <input @keyup="canSubmit" v-model="setup.project" id="project" type="text" class="form-control" placeholder="Work Servers" required>
                         </div>
 
                         <div class="form-group">
                             <label class="text-capitalize">{{ $t('setup.project_description') }}</label>
-                            <input @keyup="canSubmit" v-model="setup.description" id="description" type="text" class="form-control" placeholder="Great Uptime">
+                            <input @keyup="canSubmit" v-model="setup.description" id="description" type="text" class="form-control" placeholder="Monitors all of my work services">
                         </div>
 
                         <div class="form-group">
@@ -100,6 +100,7 @@
                         <div class="form-group">
                             <label class="text-capitalize">{{ $t('setup.password_confirm') }}</label>
                             <input @keyup="canSubmit" v-model="setup.confirm_password" id="password_confirm" type="password" class="form-control" placeholder="password" required>
+                            <span v-if="passnomatch" class="small text-danger">Both passwords should match</span>
                         </div>
 
                         <div class="form-group">
@@ -108,7 +109,7 @@
                                     <label class="text-capitalize">{{ $t('email') }}</label>
                                     <input @keyup="canSubmit" v-model="setup.email" id="email" type="text" class="form-control" placeholder="myemail@domain.com">
                                 </div>
-                                <div class="col-4">
+                                <div class="col-4 text-right">
                                     <label class="d-none d-sm-block text-capitalize text-capitalize">{{ $t('setup.newsletter') }}</label>
                                     <span @click="setup.newsletter = !!setup.newsletter" class="switch">
                                       <input v-model="setup.newsletter" type="checkbox" name="send_newsletter" class="switch" id="send_newsletter" :checked="setup.newsletter">
@@ -145,6 +146,7 @@
       error: null,
       loading: false,
       disabled: true,
+      passnomatch: false,
       setup: {
         language: "en",
         db_connection: "sqlite",
@@ -186,6 +188,11 @@
       canSubmit() {
           this.error = null
           const s = this.setup
+        if (s.confirm_password.length > 0 && s.confirm_password !== s.password) {
+          this.passnomatch = true
+        } else {
+          this.passnomatch = false
+        }
           if (s.db_connection !== 'sqlite') {
               if (!s.db_host || !s.db_port || !s.db_user || !s.db_password || !s.db_database) {
                   this.disabled = true

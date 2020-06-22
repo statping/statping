@@ -14,7 +14,16 @@
 
         <div v-for="(form, index) in notifier.form" v-bind:key="index" class="form-group">
             <label class="text-capitalize">{{form.title}}</label>
-            <input v-if="form.type === 'text' || 'number' || 'password'" v-model="notifier[form.field.toLowerCase()]" :type="form.type" class="form-control" :placeholder="form.placeholder" >
+            <input v-if="formVisible(['text', 'number', 'password', 'email'], form)" v-model="notifier[form.field.toLowerCase()]" :type="form.type" class="form-control" :placeholder="form.placeholder" >
+
+            <select v-if="formVisible(['list'], form)" v-model="notifier[form.field.toLowerCase()]" class="form-control">
+                <option v-for="(val, k) in form.list_options" :value="val">{{val}}</option>
+            </select>
+
+            <span v-if="formVisible(['switch'], form)" @click="notifier[form.field.toLowerCase()] = !!notifier[form.field.toLowerCase()]" class="switch switch-rd-gr float-right mt-2">
+                <input v-model="notifier[form.field.toLowerCase()]" type="checkbox" class="switch-sm" :id="`switch_${notifier.name}_${form.field}`" v-bind:checked="notifier[form.field.toLowerCase()]">
+                <label class="mb-0" :for="`switch_${notifier.name}_${form.field}`"></label>
+            </span>
 
             <small class="form-text text-muted" v-html="form.small_text"></small>
         </div>
@@ -155,7 +164,7 @@ export default {
                 theme: 'neat',
                 mode: "mymode",
                 lineWrapping: true,
-                json: true,
+                json: this.notifier.data_type === "json",
                 autoRefresh: true,
                 mime: this.notifier.data_type === "json" ? "application/json" : "text/plain"
               },
@@ -166,6 +175,9 @@ export default {
 
       },
     methods: {
+      formVisible(want, form) {
+        return !!want.includes(form.type);
+      },
       visible(isVisible, entry) {
         if (isVisible) {
           this.$refs.cmfailure.codemirror.refresh()
@@ -173,13 +185,19 @@ export default {
         }
       },
       onCmSuccessReady(cm) {
-        this.success_data = beautify(this.notifier.success_data, this.beautifySettings)
+        this.success_data = this.notifier.success_data
+        if (this.notifier.data_type === "json") {
+          this.success_data = beautify(this.notifier.success_data, this.beautifySettings)
+        }
         setTimeout(function() {
           cm.refresh();
         },1);
       },
       onCmFailureReady(cm) {
-        this.failure_data = beautify(this.notifier.failure_data, this.beautifySettings)
+        this.failure_data = this.notifier.failure_data
+        if (this.notifier.data_type === "json") {
+          this.failure_data = beautify(this.notifier.failure_data, this.beautifySettings)
+        }
         setTimeout(function() {
           cm.refresh();
         },1);

@@ -41,7 +41,7 @@ var Pushover = &pushover{&notifications.Notification{
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "User Token",
-		Placeholder: "Insert your device's Pushover Token",
+		Placeholder: "Insert your Pushover User Token",
 		DbField:     "api_key",
 		Required:    true,
 	}, {
@@ -50,6 +50,20 @@ var Pushover = &pushover{&notifications.Notification{
 		Placeholder: "Create an Application and insert the API Key here",
 		DbField:     "api_secret",
 		Required:    true,
+	}, {
+		Type:        "list",
+		Title:       "Priority",
+		Placeholder: "Set the notification priority level",
+		DbField:     "Var1",
+		Required:    true,
+		ListOptions: []string{"Lowest", "Low", "Normal", "High", "Emergency"},
+	}, {
+		Type:        "list",
+		Title:       "Notification Sound",
+		Placeholder: "Choose a sound for this Pushover notification",
+		DbField:     "Var2",
+		Required:    true,
+		ListOptions: []string{"none", "pushover", "bike", "bugle", "cashregister", "classical", "cosmic", "falling", "gamelan", "incoming", "intermissioon", "magic", "mechanical", "painobar", "siren", "spacealarm", "tugboat", "alien", "climb", "persistent", "echo", "updown"},
 	},
 	}},
 }

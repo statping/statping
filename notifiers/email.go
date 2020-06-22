@@ -70,7 +70,7 @@ var email = &emailer{&notifications.Notification{
 		Type:        "switch",
 		Title:       "Disable TLS/SSL",
 		Placeholder: "",
-		SmallText:   "To Disable TLS/SSL insert 'true'",
+		SmallText:   "Enabling this will set Insecure Skip Verify to true",
 		DbField:     "api_key",
 	}}},
 }

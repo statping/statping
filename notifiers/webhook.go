@@ -44,12 +44,13 @@ var Webhook = &webhooker{&notifications.Notification{
 		DbField:     "Host",
 		Required:    true,
 	}, {
-		Type:        "text",
+		Type:        "list",
 		Title:       "HTTP Method",
 		Placeholder: "POST",
 		SmallText:   "Choose a HTTP method for example: GET, POST, DELETE, or PATCH.",
 		DbField:     "Var1",
 		Required:    true,
+		ListOptions: []string{"GET", "POST", "PATCH", "DELETE"},
 	}, {
 		Type:        "text",
 		Title:       "Content Type",
