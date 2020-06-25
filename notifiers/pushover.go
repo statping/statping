@@ -68,12 +68,33 @@ var Pushover = &pushover{&notifications.Notification{
 	}},
 }
 
+func priority(val string) string {
+	switch strings.ToLower(val) {
+	case "lowest":
+		return "-2"
+	case "low":
+		return "-1"
+	case "normal":
+		return "0"
+	case "high":
+		return "1"
+	case "emergency":
+		return "2"
+	default:
+		return "1"
+	}
+}
+
 // Send will send a HTTP Post to the Pushover API. It accepts type: string
 func (t *pushover) sendMessage(message string) (string, error) {
 	v := url.Values{}
 	v.Set("token", t.ApiSecret)
 	v.Set("user", t.ApiKey)
 	v.Set("message", message)
+	v.Set("priority", priority(t.Var1))
+	if t.Var2 != "" {
+		v.Set("sound", t.Var2)
+	}
 	rb := strings.NewReader(v.Encode())
 
 	content, _, err := utils.HttpRequest(pushoverUrl, "POST", "application/x-www-form-urlencoded", nil, rb, time.Duration(10*time.Second), true, nil)

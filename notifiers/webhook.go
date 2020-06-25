@@ -31,9 +31,9 @@ var Webhook = &webhooker{&notifications.Notification{
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "fas fa-code-branch",
-	Delay:       time.Duration(1 * time.Second),
-	SuccessData: `{"id": {{.Service.Id}}, "online": true}`,
-	FailureData: `{"id": {{.Service.Id}}, "online": false}`,
+	Delay:       time.Duration(3 * time.Second),
+	SuccessData: `{"id": "{{.Service.Id}}", "online": true}`,
+	FailureData: `{"id": "{{.Service.Id}}", "online": false}`,
 	DataType:    "json",
 	Limits:      180,
 	Form: []notifications.NotificationForm{{
@@ -83,8 +83,7 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 	utils.Log.Infoln(fmt.Sprintf("sending body: '%v' to %v as a %v request", body, w.Host, w.Var1))
 	client := new(http.Client)
 	client.Timeout = time.Duration(10 * time.Second)
-	var buf *bytes.Buffer
-	buf = bytes.NewBuffer(nil)
+	buf := bytes.NewBuffer(nil)
 	if w.Var2 != "" {
 		buf = bytes.NewBuffer([]byte(body))
 	}
@@ -103,6 +102,7 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 		req.Header.Add("Content-Type", w.ApiKey)
 	}
 	req.Header.Set("User-Agent", "Statping")
+	req.Header.Set("Statping-Version", utils.Version)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err

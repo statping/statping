@@ -12,7 +12,12 @@
         <div class="card-body">
         <p class="small text-muted" v-html="notifier.description"/>
 
-        <div v-for="(form, index) in notifier.form" v-bind:key="index" class="form-group">
+            <div v-if="notifier.method==='mobile'" class="col-6 offset-3">
+                <img :src="qrcode" class="img-thumbnail">
+                <span class="text-muted small center">Scan this QR Code on the Statping Mobile App for quick setup</span>
+            </div>
+
+        <div v-if="notifier.method!=='mobile'" v-for="(form, index) in notifier.form" v-bind:key="index" class="form-group">
             <label class="text-capitalize">{{form.title}}</label>
             <input v-if="formVisible(['text', 'number', 'password', 'email'], form)" v-model="notifier[form.field.toLowerCase()]" :type="form.type" class="form-control" :placeholder="form.placeholder" >
 
@@ -171,9 +176,15 @@ export default {
           beautifySettings: { indent_size: 2, space_in_empty_paren: true },
         }
     },
-      computed: {
-
-      },
+  computed: {
+    core() {
+      return this.$store.getters.core
+    },
+    qrcode() {
+      const u = `statping://setup?domain=${this.core.domain}&api=${this.core.api_secret}`
+      return "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=" + encodeURIComponent(u)
+    }
+  },
     methods: {
       formVisible(want, form) {
         return !!want.includes(form.type);
