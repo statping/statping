@@ -12,8 +12,8 @@ var (
 	log = utils.Log.WithField("type", "failure")
 )
 
-func Example() *Failure {
-	return &Failure{
+func Example() Failure {
+	return Failure{
 		Id:        48533,
 		Issue:     "Response did not response a 200 status code",
 		Method:    "",

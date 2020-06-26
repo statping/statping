@@ -7,6 +7,10 @@
 - Added error if Theme Editor returns an error from API
 - Added Pushover priority and sounds
 - Added HTTP headers for outgoing requests (includes User-Agent=Statping and Statping-Version=0.90.55)
+- Fixed Google oAuth handling
+- Added Google oAuth email/domain user restrictions
+- Modified notifiers to use dereferenced services and failures
+- Added core.Example() function for testing
 
 # 0.90.55 (06-18-2020)
 - Added 404 page

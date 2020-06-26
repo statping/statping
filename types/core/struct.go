@@ -43,7 +43,6 @@ type Core struct {
 }
 
 type OAuth struct {
-	Domains            string `gorm:"column:oauth_domains" json:"oauth_domains" scope:"admin"`
 	Providers          string `gorm:"column:oauth_providers;" json:"oauth_providers"`
 	GithubClientID     string `gorm:"column:gh_client_id" json:"gh_client_id"`
 	GithubClientSecret string `gorm:"column:gh_client_secret" json:"gh_client_secret" scope:"admin"`
@@ -55,6 +54,7 @@ type OAuth struct {
 	SlackClientID      string `gorm:"column:slack_client_id" json:"slack_client_id"`
 	SlackClientSecret  string `gorm:"column:slack_client_secret" json:"slack_client_secret" scope:"admin"`
 	SlackTeam          string `gorm:"column:slack_team" json:"slack_team" scope:"admin"`
+	SlackUsers         string `gorm:"column:slack_users" json:"slack_users" scope:"admin"`
 }
 
 // AllNotifiers contains all the Notifiers loaded

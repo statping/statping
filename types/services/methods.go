@@ -61,12 +61,12 @@ func (s *Service) LoadTLSCert() (*tls.Config, error) {
 	return config, nil
 }
 
-func (s *Service) Duration() time.Duration {
+func (s Service) Duration() time.Duration {
 	return time.Duration(s.Interval) * time.Second
 }
 
 // Start will create a channel for the service checking go routine
-func (s *Service) UptimeData(hits []*hits.Hit, fails []*failures.Failure) (*UptimeSeries, error) {
+func (s Service) UptimeData(hits []*hits.Hit, fails []*failures.Failure) (*UptimeSeries, error) {
 	if len(hits) == 0 {
 		return nil, errors.New("service does not have any successful hits")
 	}
@@ -291,12 +291,12 @@ func (s *Service) UpdateStats() *Service {
 }
 
 // AvgTime will return the average amount of time for a service to response back successfully
-func (s *Service) AvgTime() int64 {
+func (s Service) AvgTime() int64 {
 	return s.AllHits().Avg()
 }
 
 // OnlineDaysPercent returns the service's uptime percent within last 24 hours
-func (s *Service) OnlineDaysPercent(days int) float32 {
+func (s Service) OnlineDaysPercent(days int) float32 {
 	ago := utils.Now().Add(-time.Duration(days) * types.Day)
 	return s.OnlineSince(ago)
 }
@@ -326,12 +326,12 @@ func (s *Service) OnlineSince(ago time.Time) float32 {
 	return s.Online24Hours
 }
 
-func (s *Service) Uptime() utils.Duration {
+func (s Service) Uptime() utils.Duration {
 	return utils.Duration{Duration: utils.Now().Sub(s.LastOffline)}
 }
 
 // Downtime returns the amount of time of a offline service
-func (s *Service) Downtime() utils.Duration {
+func (s Service) Downtime() utils.Duration {
 	return utils.Duration{Duration: utils.Now().Sub(s.LastOnline)}
 }
 

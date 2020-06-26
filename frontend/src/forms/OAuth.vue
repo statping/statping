@@ -4,18 +4,13 @@
             <div class="card-header">Internal Login</div>
             <div class="card-body">
                 <div class="form-group row">
-                    <label for="switch-gh-oauth" class="col-sm-4 col-form-label">OAuth Login Settings</label>
-                    <div class="col-md-8 col-xs-12 mt-1">
+                    <label for="switch-gh-oauth" class="col-sm-6 col-form-label">Statping Authentication</label>
+                    <div class="col-md-6 col-xs-12 mt-1">
                         <span @click="local_enabled = !!local_enabled" class="switch float-left">
                             <input v-model="local_enabled" type="checkbox" class="switch" id="switch-local-oauth" :checked="local_enabled">
-                            <label for="switch-local-oauth">Use email/password Authentication</label>
+                            <label for="switch-local-oauth"></label>
+                            <span class="small d-block">Use email/password Authentication</span>
                         </span>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="whitelist_domains" class="col-sm-4 col-form-label">Whitelist Domains</label>
-                    <div class="col-sm-8">
-                        <input v-model="oauth.oauth_domains" type="text" class="form-control" placeholder="domain.com" id="whitelist_domains">
                     </div>
                 </div>
             </div>
@@ -38,24 +33,26 @@
                     </div>
                 </div>
                 <div class="form-group row">
+                    <label for="github_secret" class="col-sm-4 col-form-label">Restrict Users</label>
+                    <div class="col-sm-8">
+                        <input v-model="oauth.gh_users" type="text" class="form-control" id="github_users" placeholder="octocat,hunterlong,jimbo123">
+                        <small>Optional comma delimited list of usernames</small>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="github_secret" class="col-sm-4 col-form-label">Restrict Organizations</label>
+                    <div class="col-sm-8">
+                        <input v-model="oauth.gh_orgs" type="text" class="form-control" id="github_orgs" placeholder="statping,github">
+                        <small>Optional comma delimited list of Github Organizations</small>
+                    </div>
+                </div>
+                <div class="form-group row">
                     <label for="switch-gh-oauth" class="col-sm-4 col-form-label">Enable Github Login</label>
                     <div class="col-md-8 col-xs-12 mt-1">
                     <span @click="github_enabled = !!github_enabled" class="switch float-left">
                         <input v-model="github_enabled" type="checkbox" class="switch" id="switch-gh-oauth" :checked="github_enabled">
                         <label for="switch-gh-oauth"> </label>
                     </span>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="github_secret" class="col-sm-4 col-form-label">Github Restrict Users</label>
-                    <div class="col-sm-8">
-                        <input v-model="oauth.gh_users" type="text" class="form-control" id="github_users">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="github_secret" class="col-sm-4 col-form-label">Github Restrict Organizations</label>
-                    <div class="col-sm-8">
-                        <input v-model="oauth.gh_orgs" type="text" class="form-control" id="github_orgs">
                     </div>
                 </div>
                 <div class="form-group row">
@@ -74,7 +71,7 @@
         <div class="card text-black-50 bg-white mb-3">
             <div class="card-header">Google Settings</div>
             <div class="card-body">
-                <span>Go to <a href="https://console.cloud.google.com/apis/credentials">OAuth Consent Screen</a> on Google Console to create a new OAuth application.</span>
+                <span>Go to <a href="https://console.cloud.google.com/apis/credentials">OAuth Consent Screen</a> on Google Console to create a new "Web Application" OAuth application. </span>
 
                 <div class="form-group row mt-3">
                     <label for="github_client" class="col-sm-4 col-form-label">Google Client ID</label>
@@ -86,6 +83,13 @@
                     <label for="github_secret" class="col-sm-4 col-form-label">Google Client Secret</label>
                     <div class="col-sm-8">
                         <input v-model="oauth.google_client_secret" type="text" class="form-control" id="google_secret" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="github_secret" class="col-sm-4 col-form-label">Restrict Users</label>
+                    <div class="col-sm-8">
+                        <input v-model="oauth.google_users" type="text" class="form-control" id="google_users" placeholder="info@gmail.com,example.com">
+                        <small>Optional comma delimited list of emails and/or domains</small>
                     </div>
                 </div>
                 <div class="form-group row">
@@ -113,7 +117,7 @@
         <div class="card text-black-50 bg-white mb-3">
             <div class="card-header">Slack Settings</div>
             <div class="card-body">
-                <span>Go to <a href="https://console.cloud.google.com/apis/credentials">OAuth Consent Screen</a> on Google Console to create a new OAuth application.</span>
+                <span>Go to <a href="https://api.slack.com/apps">Slack Apps</a> and create a new Application.</span>
 
                 <div class="form-group row mt-3">
                     <label for="slack_client" class="col-sm-4 col-form-label">Slack Client ID</label>
@@ -128,10 +132,17 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="slack_secret" class="col-sm-4 col-form-label">Slack Team ID</label>
+                    <label for="slack_secret" class="col-sm-4 col-form-label">Team ID</label>
                     <div class="col-sm-8">
                         <input v-model="oauth.slack_team" type="text" class="form-control" id="slack_team">
-                        <small>Optional</small>
+                        <small>Optional Slack Team ID</small>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="slack_secret" class="col-sm-4 col-form-label">Restrict Users</label>
+                    <div class="col-sm-8">
+                        <input v-model="oauth.slack_users" type="text" class="form-control" id="slack_users" placeholder="info@example.com,info@domain.net">
+                        <small>Optional comma delimited list of email addresses</small>
                     </div>
                 </div>
                 <div class="form-group row">
@@ -188,11 +199,12 @@
               gh_orgs: "",
               google_client_id: "",
               google_client_secret: "",
-              oauth_domains: "",
+              google_users: "",
               oauth_providers: "",
               slack_client_id: "",
               slack_client_secret: "",
-              slack_team: ""
+              slack_team: "",
+              slack_users: ""
             }
           }
       },

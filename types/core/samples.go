@@ -5,6 +5,22 @@ import (
 	"github.com/statping/statping/utils"
 )
 
+func Example() *Core {
+	core := &Core{
+		Name:        "Statping Testing",
+		Description: "This is a instance that runs for tests",
+		ApiSecret:   "exampleapisecret",
+		Domain:      "http://localhost:8080",
+		CreatedAt:   utils.Now(),
+		UseCdn:      null.NewNullBool(false),
+		Footer:      null.NewNullString(""),
+		MigrationId: utils.Now().Unix(),
+		Language:    "en",
+	}
+	App = core
+	return App
+}
+
 func Samples() error {
 	apiSecret := utils.Params.GetString("API_SECRET")
 

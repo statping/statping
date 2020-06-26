@@ -353,7 +353,7 @@ func sendSuccess(s *Service) {
 		notif := n.Select()
 		if notif.CanSend() {
 			log.Infof("Sending notification to: %s!", notif.Method)
-			if _, err := n.OnSuccess(s); err != nil {
+			if _, err := n.OnSuccess(*s); err != nil {
 				notif.Logger().Errorln(err)
 			}
 			s.UserNotified = true
@@ -405,7 +405,7 @@ func sendFailure(s *Service, f *failures.Failure) {
 			notif := n.Select()
 			if notif.CanSend() {
 				log.Infof("Sending Failure notification to: %s!", notif.Method)
-				if _, err := n.OnFailure(s, f); err != nil {
+				if _, err := n.OnFailure(*s, *f); err != nil {
 					notif.Logger().WithField("failure", f.Issue).Errorln(err)
 				}
 				s.UserNotified = true

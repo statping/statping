@@ -81,7 +81,7 @@ func priority(val string) string {
 	case "emergency":
 		return "2"
 	default:
-		return "1"
+		return "0"
 	}
 }
 
@@ -105,15 +105,15 @@ func (t *pushover) sendMessage(message string) (string, error) {
 }
 
 // OnFailure will trigger failing service
-func (t *pushover) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
+func (t *pushover) OnFailure(s services.Service, f failures.Failure) (string, error) {
 	message := ReplaceVars(t.FailureData, s, f)
 	out, err := t.sendMessage(message)
 	return out, err
 }
 
 // OnSuccess will trigger successful service
-func (t *pushover) OnSuccess(s *services.Service) (string, error) {
-	message := ReplaceVars(t.SuccessData, s, nil)
+func (t *pushover) OnSuccess(s services.Service) (string, error) {
+	message := ReplaceVars(t.SuccessData, s, failures.Failure{})
 	out, err := t.sendMessage(message)
 	return out, err
 }

@@ -74,15 +74,15 @@ func (t *telegram) sendMessage(message string) (string, error) {
 }
 
 // OnFailure will trigger failing service
-func (t *telegram) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
+func (t *telegram) OnFailure(s services.Service, f failures.Failure) (string, error) {
 	msg := ReplaceVars(t.FailureData, s, f)
 	out, err := t.sendMessage(msg)
 	return out, err
 }
 
 // OnSuccess will trigger successful service
-func (t *telegram) OnSuccess(s *services.Service) (string, error) {
-	msg := ReplaceVars(t.SuccessData, s, nil)
+func (t *telegram) OnSuccess(s services.Service) (string, error) {
+	msg := ReplaceVars(t.SuccessData, s, failures.Failure{})
 	out, err := t.sendMessage(msg)
 	return out, err
 }

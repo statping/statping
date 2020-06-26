@@ -13,18 +13,22 @@ import (
 )
 
 func githubOAuth(r *http.Request) (*oAuth, error) {
-	c := *core.App
+	auth := core.App.OAuth
 	code := r.URL.Query().Get("code")
 
 	config := &oauth2.Config{
-		ClientID:     c.OAuth.GithubClientID,
-		ClientSecret: c.OAuth.GithubClientSecret,
+		ClientID:     auth.GithubClientID,
+		ClientSecret: auth.GithubClientSecret,
 		Endpoint:     github.Endpoint,
 	}
 
 	gg, err := config.Exchange(r.Context(), code)
 	if err != nil {
 		return nil, err
+	}
+
+	if !gg.Valid() {
+		return nil, errors.New("oauth token is not valid")
 	}
 
 	user, err := returnGithubUser(gg.AccessToken)
@@ -37,17 +41,14 @@ func githubOAuth(r *http.Request) (*oAuth, error) {
 		return nil, err
 	}
 
-	if allowed := validateGithub(user, orgs); !allowed {
+	if !validateGithub(user, orgs) {
 		return nil, errors.New("github user is not allowed to login")
 	}
 
 	return &oAuth{
-		Token:        gg.AccessToken,
-		RefreshToken: gg.RefreshToken,
-		Valid:        gg.Valid(),
-		Username:     strings.ToLower(user.Name),
-		Email:        strings.ToLower(user.Email),
-		Type:         "github",
+		Token:    gg,
+		Username: strings.ToLower(user.Name),
+		Email:    strings.ToLower(user.Email),
 	}, nil
 }
 
