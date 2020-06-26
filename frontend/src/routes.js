@@ -38,7 +38,7 @@ const routes = [
     beforeEnter: async (to, from, next) => {
       if (to.matched.some(record => record.meta.requiresAuth)) {
         let tk = await Api.token()
-        if (to.path !== '/login' && !tk.admin) {
+        if (to.path !== '/login' && !tk) {
           next('/login')
           return
         }

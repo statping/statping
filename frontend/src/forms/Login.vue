@@ -80,9 +80,8 @@
               if (auth.error) {
                   this.error = true
               } else if (auth.token) {
-                const u = {username: this.username, admin: auth.admin, token: auth.token}
-                this.$cookies.set("statping_auth", JSON.stringify(u))
-                  this.$store.dispatch('loadAdmin')
+                // this.$cookies.set("statping_auth", auth.token)
+                  await this.$store.dispatch('loadAdmin')
                   this.$store.commit('setAdmin', auth.admin)
                   this.$router.push('/dashboard')
               }
