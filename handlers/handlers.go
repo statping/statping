@@ -19,7 +19,7 @@ const (
 )
 
 var (
-	jwtKey     string
+	jwtKey     []byte
 	httpServer *http.Server
 	usingSSL   bool
 	mainTmpl   = `{{define "main" }} {{ template "base" . }} {{ end }}`
@@ -96,7 +96,11 @@ func IsFullAuthenticated(r *http.Request) bool {
 	if ok := hasAuthorizationHeader(r); ok {
 		return true
 	}
-	return IsAdmin(r)
+	claim, err := getJwtToken(r)
+	if err != nil {
+		return false
+	}
+	return claim.Admin
 }
 
 // ScopeName will show private JSON fields in the API.

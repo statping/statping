@@ -28,7 +28,6 @@ func (f *Failure) AfterDelete() {
 }
 
 func (f *Failure) AfterCreate() {
-	metrics.Inc("failure", f.Service)
 	metrics.Query("failure", "create")
 }
 

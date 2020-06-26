@@ -50,13 +50,13 @@ var Twilio = &twilio{&notifications.Notification{
 		DbField:     "api_secret",
 		Required:    true,
 	}, {
-		Type:        "text",
+		Type:        "number",
 		Title:       "SMS to Phone Number",
 		Placeholder: "18555555555",
 		DbField:     "Var1",
 		Required:    true,
 	}, {
-		Type:        "text",
+		Type:        "number",
 		Title:       "From Phone Number",
 		Placeholder: "18555555555",
 		DbField:     "Var2",

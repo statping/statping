@@ -9,7 +9,6 @@ import (
 	"github.com/statping/statping/types/users"
 	"github.com/statping/statping/utils"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/github"
 	"golang.org/x/oauth2/google"
 	"golang.org/x/oauth2/slack"
 	"net/http"
@@ -51,40 +50,18 @@ func oauthHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func oauthLogin(oauth *oAuth, w http.ResponseWriter, r *http.Request) {
-	log.Infoln(oauth)
 	user := &users.User{
 		Id:       0,
 		Username: oauth.Username,
 		Email:    oauth.Email,
 		Admin:    null.NewNullBool(true),
 	}
-	log.Infoln(fmt.Sprintf("OAuth User %s logged in from IP %s", oauth.Email, r.RemoteAddr))
+	log.Infoln(fmt.Sprintf("OAuth %s User %s logged in from IP %s", oauth.Type, oauth.Email, r.RemoteAddr))
+
 	setJwtToken(user, w)
 
 	//returnJson(user, w, r)
-	http.Redirect(w, r, core.App.Domain, http.StatusPermanentRedirect)
-}
-
-func githubOAuth(r *http.Request) (*oAuth, error) {
-	c := *core.App
-	code := r.URL.Query().Get("code")
-
-	config := &oauth2.Config{
-		ClientID:     c.OAuth.GithubClientID,
-		ClientSecret: c.OAuth.GithubClientSecret,
-		Endpoint:     github.Endpoint,
-	}
-
-	gg, err := config.Exchange(r.Context(), code)
-	if err != nil {
-		return nil, err
-	}
-
-	return &oAuth{
-		Token:        gg.AccessToken,
-		RefreshToken: gg.RefreshToken,
-		Valid:        gg.Valid(),
-	}, nil
+	http.Redirect(w, r, core.App.Domain+"/dashboard", http.StatusPermanentRedirect)
 }
 
 func googleOAuth(r *http.Request) (*oAuth, error) {

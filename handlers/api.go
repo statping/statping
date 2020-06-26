@@ -46,13 +46,20 @@ func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiUpdateOAuthHandler(w http.ResponseWriter, r *http.Request) {
 	var c core.OAuth
-	err := DecodeJSON(r, &c)
-	if err != nil {
+	if err := DecodeJSON(r, &c); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
+
 	app := core.App
 	app.OAuth = c
+	if err := app.Update(); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	fmt.Println(app)
+
 	sendJsonAction(app.OAuth, "update", w, r)
 }
 

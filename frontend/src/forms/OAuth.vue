@@ -1,6 +1,5 @@
 <template>
     <form @submit.prevent="saveOAuth">
-        {{core.oauth}}
         <div class="card text-black-50 bg-white mb-3">
             <div class="card-header">Internal Login</div>
             <div class="card-body">
@@ -146,8 +145,8 @@
             </div>
         </div>
 
-        <button class="btn btn-primary btn-block" @click.prevent="saveOAuth" type="submit">
-            Save OAuth Settings
+        <button class="btn btn-primary btn-block" @click.prevent="saveOAuth" type="submit" :disabled="loading">
+            <font-awesome-icon v-if="loading" icon="circle-notch" class="mr-2" spin/> Save OAuth Settings
         </button>
 
     </form>
@@ -162,9 +161,6 @@
         core() {
           return this.$store.getters.core
         },
-        auth() {
-          return this.$store.getters.oauth
-        }
       },
       data() {
           return {
@@ -172,6 +168,7 @@
             slack_enabled: false,
             github_enabled: false,
             local_enabled: false,
+            loading: false,
             oauth: {
               gh_client_id: "",
               gh_client_secret: "",
@@ -185,8 +182,8 @@
             }
           }
       },
-    mounted() {
-        this.oauth = this.auth
+    async mounted() {
+        this.oauth = await Api.oauth()
       this.local_enabled = this.has('local')
       this.github_enabled = this.has('github')
       this.google_enabled = this.has('google')
@@ -216,12 +213,12 @@
           return this.oauth.oauth_providers.split(",").includes(val)
         },
           async saveOAuth() {
-            let c = this.core
-            c.oauth = this.oauth
-            c.oauth.oauth_providers = this.providers()
-            await Api.oauth_save(c)
+            this.loading = true
+            this.oauth.oauth_providers = this.providers()
+            await Api.oauth_save(this.oauth)
             const oauth = await Api.oauth()
             this.$store.commit('setOAuth', oauth)
+            this.loading = false
           }
       }
   }
