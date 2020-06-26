@@ -28,6 +28,8 @@ func Samples() error {
 		apiSecret = utils.RandomString(32)
 	}
 
+	oauth := OAuth{Providers: "local"}
+
 	core := &Core{
 		Name:        utils.Params.GetString("NAME"),
 		Description: utils.Params.GetString("DESCRIPTION"),
@@ -38,6 +40,7 @@ func Samples() error {
 		Footer:      null.NewNullString(""),
 		MigrationId: utils.Now().Unix(),
 		Language:    utils.Params.GetString("LANGUAGE"),
+		OAuth:       oauth,
 	}
 
 	return core.Create()

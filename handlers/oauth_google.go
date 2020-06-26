@@ -20,7 +20,7 @@ func googleOAuth(r *http.Request) (*oAuth, error) {
 		ClientID:     auth.GoogleClientID,
 		ClientSecret: auth.GoogleClientSecret,
 		Endpoint:     google.Endpoint,
-		RedirectURL:  core.App.Domain + "/oauth/google",
+		RedirectURL:  core.App.Domain + basePath + "oauth/google",
 	}
 
 	gg, err := config.Exchange(r.Context(), code)

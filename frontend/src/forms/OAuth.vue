@@ -168,6 +168,70 @@
             </div>
         </div>
 
+        <div class="card text-black-50 bg-white mb-3">
+            <div class="card-header">Custom oAuth Settings</div>
+            <div class="card-body">
+                <div class="form-group row mt-3">
+                    <label for="custom_name" class="col-sm-4 col-form-label">Custom Name</label>
+                    <div class="col-sm-8">
+                        <input v-model="oauth.custom_name" type="text" class="form-control" id="custom_name" required>
+                    </div>
+                </div>
+                <div class="form-group row mt-3">
+                    <label for="custom_client" class="col-sm-4 col-form-label">Client ID</label>
+                    <div class="col-sm-8">
+                        <input v-model="oauth.custom_client_id" type="text" class="form-control" id="custom_client" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="custom_secret" class="col-sm-4 col-form-label">Client Secret</label>
+                    <div class="col-sm-8">
+                        <input v-model="oauth.custom_client_secret" type="text" class="form-control" id="custom_secret" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="custom_endpoint" class="col-sm-4 col-form-label">Auth Endpoint</label>
+                    <div class="col-sm-8">
+                        <input v-model="oauth.custom_endpoint_auth" type="text" class="form-control" id="custom_endpoint" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="custom_endpoint_token" class="col-sm-4 col-form-label">Token Endpoint</label>
+                    <div class="col-sm-8">
+                        <input v-model="oauth.custom_endpoint_token" type="text" class="form-control" id="custom_endpoint_token" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="custom_scopes" class="col-sm-4 col-form-label">Scopes</label>
+                    <div class="col-sm-8">
+                        <input v-model="oauth.custom_scopes" type="text" class="form-control" id="custom_scopes">
+                        <small>Optional comma delimited list of oauth scopes</small>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="switch-custom-oauth" class="col-sm-4 col-form-label">Enable Custom Login</label>
+                    <div class="col-md-8 col-xs-12 mt-1">
+                    <span @click="custom_enabled = !!custom_enabled" class="switch float-left">
+                        <input v-model="custom_enabled" type="checkbox" class="switch" id="switch-custom-oauth" :checked="custom_enabled">
+                        <label for="switch-custom-oauth"> </label>
+                    </span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="slack_callback" class="col-sm-4 col-form-label">Callback URL</label>
+                    <div class="col-sm-8">
+                        <div class="input-group">
+                            <input v-bind:value="`${core.domain}/oauth/custom`" type="text" class="form-control" id="custom_callback" readonly>
+                            <div class="input-group-append copy-btn">
+                                <button @click.prevent="copy(`${core.domain}/oauth/custom`)" class="btn btn-outline-secondary" type="button">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <button class="btn btn-primary btn-block" @click.prevent="saveOAuth" type="submit" :disabled="loading">
             <font-awesome-icon v-if="loading" icon="circle-notch" class="mr-2" spin/> Save OAuth Settings
         </button>
@@ -191,6 +255,7 @@
             slack_enabled: false,
             github_enabled: false,
             local_enabled: false,
+            custom_enabled: false,
             loading: false,
             oauth: {
               gh_client_id: "",
@@ -204,7 +269,13 @@
               slack_client_id: "",
               slack_client_secret: "",
               slack_team: "",
-              slack_users: ""
+              slack_users: "",
+              custom_name: "",
+              custom_client_id: "",
+              custom_client_secret: "",
+              custom_endpoint_auth: "",
+              custom_endpoint_token: "",
+              custom_scopes: "",
             }
           }
       },
@@ -214,6 +285,7 @@
       this.github_enabled = this.has('github')
       this.google_enabled = this.has('google')
       this.slack_enabled = this.has('slack')
+      this.custom_enabled = this.has('custom')
     },
     methods: {
       providers() {
@@ -229,6 +301,9 @@
         }
         if (this.slack_enabled) {
           providers.push("slack")
+        }
+        if (this.custom_enabled) {
+          providers.push("custom")
         }
         return providers.join(",")
       },

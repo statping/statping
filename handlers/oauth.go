@@ -29,6 +29,8 @@ func oauthHandler(w http.ResponseWriter, r *http.Request) {
 		oauth, err = githubOAuth(r)
 	case "slack":
 		oauth, err = slackOAuth(r)
+	case "custom":
+		oauth, err = customOAuth(r)
 	}
 
 	if err != nil {

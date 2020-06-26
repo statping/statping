@@ -20,6 +20,7 @@ func githubOAuth(r *http.Request) (*oAuth, error) {
 		ClientID:     auth.GithubClientID,
 		ClientSecret: auth.GithubClientSecret,
 		Endpoint:     github.Endpoint,
+		RedirectURL:  core.App.Domain + basePath + "oauth/github",
 	}
 
 	gg, err := config.Exchange(r.Context(), code)

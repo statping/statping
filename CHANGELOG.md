@@ -11,6 +11,7 @@
 - Added Google oAuth email/domain user restrictions
 - Modified notifiers to use dereferenced services and failures
 - Added core.Example() function for testing
+- Added Custom oAuth Authentication method
 
 # 0.90.55 (06-18-2020)
 - Added 404 page
