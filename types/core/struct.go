@@ -47,11 +47,14 @@ type OAuth struct {
 	Providers          string `gorm:"column:oauth_providers;" json:"oauth_providers"`
 	GithubClientID     string `gorm:"column:gh_client_id" json:"gh_client_id"`
 	GithubClientSecret string `gorm:"column:gh_client_secret" json:"gh_client_secret" scope:"admin"`
+	GithubUsers        string `gorm:"column:gh_users" json:"gh_users" scope:"admin"`
+	GithubOrgs         string `gorm:"column:gh_orgs" json:"gh_orgs" scope:"admin"`
 	GoogleClientID     string `gorm:"column:google_client_id" json:"google_client_id"`
 	GoogleClientSecret string `gorm:"column:google_client_secret" json:"google_client_secret" scope:"admin"`
+	GoogleUsers        string `gorm:"column:google_users" json:"google_users" scope:"admin"`
 	SlackClientID      string `gorm:"column:slack_client_id" json:"slack_client_id"`
 	SlackClientSecret  string `gorm:"column:slack_client_secret" json:"slack_client_secret" scope:"admin"`
-	SlackTeam          string `gorm:"column:slack_team" json:"slack_team"`
+	SlackTeam          string `gorm:"column:slack_team" json:"slack_team" scope:"admin"`
 }
 
 // AllNotifiers contains all the Notifiers loaded

@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/utils"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
@@ -26,19 +27,18 @@ func githubOAuth(r *http.Request) (*oAuth, error) {
 		return nil, err
 	}
 
-	headers := []string{
-		"Accept=application/vnd.github.machine-man-preview+json",
-		"Authorization=token " + gg.AccessToken,
-	}
-
-	resp, _, err := utils.HttpRequest("https://api.github.com/user", "GET", nil, headers, nil, 10*time.Second, true, nil)
+	user, err := returnGithubUser(gg.AccessToken)
 	if err != nil {
 		return nil, err
 	}
 
-	var user githubUser
-	if err := json.Unmarshal(resp, &user); err != nil {
+	orgs, err := returnGithubOrganizations(gg.AccessToken, user.Login)
+	if err != nil {
 		return nil, err
+	}
+
+	if allowed := validateGithub(user, orgs); !allowed {
+		return nil, errors.New("github user is not allowed to login")
 	}
 
 	return &oAuth{
@@ -49,6 +49,80 @@ func githubOAuth(r *http.Request) (*oAuth, error) {
 		Email:        strings.ToLower(user.Email),
 		Type:         "github",
 	}, nil
+}
+
+func returnGithubUser(token string) (githubUser, error) {
+	headers := []string{
+		"Accept=application/vnd.github.machine-man-preview+json",
+		"Authorization=token " + token,
+	}
+	resp, _, err := utils.HttpRequest("https://api.github.com/user", "GET", nil, headers, nil, 10*time.Second, true, nil)
+	if err != nil {
+		return githubUser{}, err
+	}
+	var user githubUser
+	if err := json.Unmarshal(resp, &user); err != nil {
+		return githubUser{}, err
+	}
+	return user, nil
+}
+
+func returnGithubOrganizations(token, username string) ([]githubOrgs, error) {
+	headers := []string{
+		"Accept=application/vnd.github.machine-man-preview+json",
+		"Authorization=token " + token,
+	}
+	resp, _, err := utils.HttpRequest("https://api.github.com/users/"+username+"/orgs", "GET", nil, headers, nil, 10*time.Second, true, nil)
+	if err != nil {
+		return nil, err
+	}
+	var orgs []githubOrgs
+	if err := json.Unmarshal(resp, &orgs); err != nil {
+		return nil, err
+	}
+	return orgs, nil
+}
+
+func validateGithub(ghUser githubUser, orgs []githubOrgs) bool {
+	auth := core.App.OAuth
+	if auth.GithubUsers == "" && auth.GithubOrgs == "" {
+		return true
+	}
+
+	if auth.GithubUsers != "" {
+		users := strings.Split(auth.GithubUsers, ",")
+		for _, u := range users {
+			if strings.ToLower(ghUser.Login) == strings.ToLower(u) {
+				return true
+			}
+		}
+	}
+	if auth.GithubOrgs != "" {
+		orgsAllowed := strings.Split(auth.GithubOrgs, ",")
+		for _, o := range orgsAllowed {
+			for _, org := range orgs {
+				if strings.ToLower(o) == strings.ToLower(org.Login) {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+type githubOrgs struct {
+	Login            string `json:"login"`
+	ID               int    `json:"id"`
+	NodeID           string `json:"node_id"`
+	URL              string `json:"url"`
+	ReposURL         string `json:"repos_url"`
+	EventsURL        string `json:"events_url"`
+	HooksURL         string `json:"hooks_url"`
+	IssuesURL        string `json:"issues_url"`
+	MembersURL       string `json:"members_url"`
+	PublicMembersURL string `json:"public_members_url"`
+	AvatarURL        string `json:"avatar_url"`
+	Description      string `json:"description"`
 }
 
 type githubUser struct {

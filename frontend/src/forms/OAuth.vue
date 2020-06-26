@@ -47,6 +47,18 @@
                     </div>
                 </div>
                 <div class="form-group row">
+                    <label for="github_secret" class="col-sm-4 col-form-label">Github Restrict Users</label>
+                    <div class="col-sm-8">
+                        <input v-model="oauth.gh_users" type="text" class="form-control" id="github_users">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="github_secret" class="col-sm-4 col-form-label">Github Restrict Organizations</label>
+                    <div class="col-sm-8">
+                        <input v-model="oauth.gh_orgs" type="text" class="form-control" id="github_orgs">
+                    </div>
+                </div>
+                <div class="form-group row">
                     <label for="gh_callback" class="col-sm-4 col-form-label">Callback URL</label>
                     <div class="col-sm-8">
                         <div class="input-group">
@@ -172,6 +184,8 @@
             oauth: {
               gh_client_id: "",
               gh_client_secret: "",
+              gh_users: "",
+              gh_orgs: "",
               google_client_id: "",
               google_client_secret: "",
               oauth_domains: "",
