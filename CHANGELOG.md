@@ -12,6 +12,7 @@
 - Modified notifiers to use dereferenced services and failures
 - Added core.Example() function for testing
 - Added Custom oAuth Authentication method
+- Fixed setup form not creating user from values inputted in form
 
 # 0.90.55 (06-18-2020)
 - Added 404 page

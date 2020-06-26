@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/users"
 	"golang.org/x/oauth2"
@@ -31,6 +32,8 @@ func oauthHandler(w http.ResponseWriter, r *http.Request) {
 		oauth, err = slackOAuth(r)
 	case "custom":
 		oauth, err = customOAuth(r)
+	default:
+		err = errors.New("unknown oauth provider")
 	}
 
 	if err != nil {
