@@ -5,9 +5,10 @@ on:
       - '*'         # matches every branch
       - '*/*'       # matches every branch containing a single '/'
       - '!master'   # excludes master
+      - '!dev'      # excludes dev
   pull_request:
     branches:
-      - dev
+      - master
 
 jobs:
   compile:

@@ -51,14 +51,14 @@ func (d *discord) Select() *notifications.Notification {
 }
 
 // OnFailure will trigger failing service
-func (d *discord) OnFailure(s services.Service, f failures.Failure) (string, error) {
+func (d *discord) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
 	out, err := d.sendRequest(ReplaceVars(d.FailureData, s, f))
 	return out, err
 }
 
 // OnSuccess will trigger successful service
-func (d *discord) OnSuccess(s services.Service) (string, error) {
-	out, err := d.sendRequest(ReplaceVars(d.SuccessData, s, failures.Failure{}))
+func (d *discord) OnSuccess(s *services.Service) (string, error) {
+	out, err := d.sendRequest(ReplaceVars(d.SuccessData, s, nil))
 	return out, err
 }
 

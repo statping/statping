@@ -24,7 +24,7 @@ func InitEnvs() {
 		Log.Errorln(err)
 		defaultDir = "."
 	}
-	Params.Set("VERSION", Version)
+	Params.Set("VERSION", version)
 	Params.SetDefault("DISABLE_HTTP", false)
 	Params.SetDefault("STATPING_DIR", defaultDir)
 	Params.SetDefault("GO_ENV", "production")
@@ -35,7 +35,6 @@ func InitEnvs() {
 	Params.SetDefault("BASE_PATH", "")
 	Params.SetDefault("ADMIN_USER", "admin")
 	Params.SetDefault("ADMIN_PASSWORD", "admin")
-	Params.SetDefault("ADMIN_EMAIL", "info@admin.com")
 	Params.SetDefault("MAX_OPEN_CONN", 25)
 	Params.SetDefault("MAX_IDLE_CONN", 25)
 	Params.SetDefault("MAX_LIFE_CONN", 5*time.Minute)

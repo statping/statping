@@ -88,7 +88,7 @@ func isIPv6(address string) bool {
 // checkIcmp will send a ICMP ping packet to the service
 func CheckIcmp(s *Service, record bool) (*Service, error) {
 	defer s.updateLastCheck()
-	timer := prometheus.NewTimer(metrics.ServiceTimer(s.Name))
+	timer := prometheus.NewTimer(metrics.ServiceTimer(s.Id))
 	defer timer.ObserveDuration()
 
 	if err := utils.Ping(s.Domain, s.Timeout); err != nil {
@@ -105,7 +105,7 @@ func CheckIcmp(s *Service, record bool) (*Service, error) {
 // CheckGrpc will check a gRPC service
 func CheckGrpc(s *Service, record bool) (*Service, error) {
 	defer s.updateLastCheck()
-	timer := prometheus.NewTimer(metrics.ServiceTimer(s.Name))
+	timer := prometheus.NewTimer(metrics.ServiceTimer(s.Id))
 	defer timer.ObserveDuration()
 
 	dnsLookup, err := dnsCheck(s)
@@ -152,7 +152,7 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 // checkTcp will check a TCP service
 func CheckTcp(s *Service, record bool) (*Service, error) {
 	defer s.updateLastCheck()
-	timer := prometheus.NewTimer(metrics.ServiceTimer(s.Name))
+	timer := prometheus.NewTimer(metrics.ServiceTimer(s.Id))
 	defer timer.ObserveDuration()
 
 	dnsLookup, err := dnsCheck(s)
@@ -219,7 +219,7 @@ func (s *Service) updateLastCheck() {
 // checkHttp will check a HTTP service
 func CheckHttp(s *Service, record bool) (*Service, error) {
 	defer s.updateLastCheck()
-	timer := prometheus.NewTimer(metrics.ServiceTimer(s.Name))
+	timer := prometheus.NewTimer(metrics.ServiceTimer(s.Id))
 	defer timer.ObserveDuration()
 
 	dnsLookup, err := dnsCheck(s)
@@ -285,7 +285,7 @@ func CheckHttp(s *Service, record bool) (*Service, error) {
 	s.LastResponse = string(content)
 	s.LastStatusCode = res.StatusCode
 
-	metrics.Gauge("status_code", float64(res.StatusCode), s.Name)
+	metrics.Gauge("status_code", float64(res.StatusCode), s.Id)
 
 	if s.Expected.String != "" {
 		match, err := regexp.MatchString(s.Expected.String, string(content))
@@ -329,8 +329,7 @@ func recordSuccess(s *Service) {
 		fmt.Sprintf("Service #%d '%v' Successful Response: %s | Lookup in: %s | Online: %v | Interval: %d seconds", s.Id, s.Name, humanMicro(hit.Latency), humanMicro(hit.PingTime), s.Online, s.Interval))
 	s.LastLookupTime = hit.PingTime
 	s.LastLatency = hit.Latency
-	metrics.Gauge("online", 1., s.Name, s.Type)
-	metrics.Inc("success", s.Name)
+	metrics.Gauge("online", 1., s.Id, s.Name, s.Type)
 	sendSuccess(s)
 	s.SuccessNotified = true
 }
@@ -353,7 +352,7 @@ func sendSuccess(s *Service) {
 		notif := n.Select()
 		if notif.CanSend() {
 			log.Infof("Sending notification to: %s!", notif.Method)
-			if _, err := n.OnSuccess(*s); err != nil {
+			if _, err := n.OnSuccess(s); err != nil {
 				notif.Logger().Errorln(err)
 			}
 			s.UserNotified = true
@@ -384,8 +383,7 @@ func recordFailure(s *Service, issue string) {
 	s.Online = false
 	s.SuccessNotified = false
 	s.DownText = s.DowntimeText()
-	metrics.Gauge("online", 0., s.Name, s.Type)
-	metrics.Inc("failure", s.Name)
+	metrics.Gauge("online", 0., s.Id, s.Name, s.Type)
 	sendFailure(s, fail)
 }
 
@@ -405,7 +403,7 @@ func sendFailure(s *Service, f *failures.Failure) {
 			notif := n.Select()
 			if notif.CanSend() {
 				log.Infof("Sending Failure notification to: %s!", notif.Method)
-				if _, err := n.OnFailure(*s, *f); err != nil {
+				if _, err := n.OnFailure(s, f); err != nil {
 					notif.Logger().WithField("failure", f.Issue).Errorln(err)
 				}
 				s.UserNotified = true
