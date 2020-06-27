@@ -4,15 +4,17 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/statping/statping/types/metrics"
-	"google.golang.org/grpc"
 	"net"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/statping/statping/types/metrics"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
@@ -115,6 +117,19 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 	timer := prometheus.NewTimer(metrics.ServiceTimer(s.Name))
 	defer timer.ObserveDuration()
 
+	// Strip URL scheme if present. Eg: https:// , http://
+	if strings.Contains(s.Domain, "://") {
+		u, err := url.Parse(s.Domain)
+		if err != nil {
+			// Unable to parse.
+			log.Warnln(fmt.Sprintf("GRPC Service: '%s', Unable to parse URL: '%v'", s.Name, s.Domain))
+		}
+
+		// Set domain as hostname without port number.
+		s.Domain = u.Hostname()
+	}
+
+	// Calculate DNS check time
 	dnsLookup, err := dnsCheck(s)
 	if err != nil {
 		if record {
@@ -122,6 +137,18 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 		}
 		return s, err
 	}
+
+	// Connect to grpc service without TLS certs.
+	grpcOption := grpc.WithInsecure()
+
+	// Check if TLS is enabled
+	// Upgrade GRPC connection if using TLS
+	// Force to connect on HTTP2 with TLS. Needed when using a reverse proxy such as nginx.
+	if s.VerifySSL.Bool {
+		h2creds := credentials.NewTLS(&tls.Config{NextProtos: []string{"h2"}})
+		grpcOption = grpc.WithTransportCredentials(h2creds)
+	}
+
 	s.PingTime = dnsLookup
 	t1 := utils.Now()
 	domain := fmt.Sprintf("%v", s.Domain)
@@ -131,7 +158,8 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 			domain = fmt.Sprintf("[%v]:%v", s.Domain, s.Port)
 		}
 	}
-	conn, err := grpc.Dial(domain, grpc.WithInsecure(), grpc.WithBlock())
+
+	conn, err := grpc.Dial(domain, grpcOption, grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
@@ -147,6 +175,7 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 		}
 		return s, err
 	}
+
 	s.Latency = utils.Now().Sub(t1).Microseconds()
 	s.LastResponse = ""
 	s.Online = true
