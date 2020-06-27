@@ -70,7 +70,7 @@ var email = &emailer{&notifications.Notification{
 		Type:        "switch",
 		Title:       "Disable TLS/SSL",
 		Placeholder: "",
-		SmallText:   "Enabling this will set Insecure Skip Verify to true",
+		SmallText:   "To Disable TLS/SSL insert 'true'",
 		DbField:     "api_key",
 	}}},
 }
@@ -86,7 +86,7 @@ type emailOutgoing struct {
 }
 
 // OnFailure will trigger failing service
-func (e *emailer) OnFailure(s services.Service, f failures.Failure) (string, error) {
+func (e *emailer) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
 	subject := fmt.Sprintf("Service %s is Offline", s.Name)
 	tmpl := renderEmail(s, f)
 	email := &emailOutgoing{
@@ -99,9 +99,9 @@ func (e *emailer) OnFailure(s services.Service, f failures.Failure) (string, err
 }
 
 // OnSuccess will trigger successful service
-func (e *emailer) OnSuccess(s services.Service) (string, error) {
+func (e *emailer) OnSuccess(s *services.Service) (string, error) {
 	subject := fmt.Sprintf("Service %s is Back Online", s.Name)
-	tmpl := renderEmail(s, failures.Failure{})
+	tmpl := renderEmail(s, nil)
 	email := &emailOutgoing{
 		To:       e.Var2,
 		Subject:  subject,
@@ -111,7 +111,7 @@ func (e *emailer) OnSuccess(s services.Service) (string, error) {
 	return tmpl, e.dialSend(email)
 }
 
-func renderEmail(s services.Service, f failures.Failure) string {
+func renderEmail(s *services.Service, f *failures.Failure) string {
 	wr := bytes.NewBuffer(nil)
 	tmpl := template.New("email")
 	tmpl, err := tmpl.Parse(emailBase)
@@ -121,7 +121,7 @@ func renderEmail(s services.Service, f failures.Failure) string {
 	}
 
 	data := replacer{
-		Core:    *core.App,
+		Core:    core.App,
 		Service: s,
 		Failure: f,
 		Custom:  nil,

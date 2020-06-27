@@ -2,7 +2,6 @@ package notifiers
 
 import (
 	"github.com/statping/statping/database"
-	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
@@ -30,7 +29,6 @@ func TestTwilioNotifier(t *testing.T) {
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
 	notifications.SetDB(db)
-	core.Example()
 
 	if TWILIO_SID == "" || TWILIO_SECRET == "" {
 		t.Log("twilio notifier testing skipped, missing TWILIO_SID and TWILIO_SECRET environment variable")
@@ -54,11 +52,6 @@ func TestTwilioNotifier(t *testing.T) {
 
 	t.Run("Twilio Within Limits", func(t *testing.T) {
 		assert.True(t, Twilio.CanSend())
-	})
-
-	t.Run("Twilio OnSave", func(t *testing.T) {
-		_, err := Twilio.OnSave()
-		assert.Nil(t, err)
 	})
 
 	t.Run("Twilio OnFailure", func(t *testing.T) {

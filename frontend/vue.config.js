@@ -3,23 +3,14 @@ module.exports = {
   assetsDir: 'assets',
   filenameHashing: false,
   devServer: {
-    disableHostCheck: true,
-    proxyTable: {
+    proxy: {
       '/api': {
         logLevel: 'debug',
-        target: 'http://0.0.0.0:8585',
-        changeOrigin: true,
-        pathRewrite: {
-          '^/api': ''
-        }
+        target: 'http://0.0.0.0:8585'
       },
       '/oauth': {
         logLevel: 'debug',
-        target: 'http://0.0.0.0:8585',
-        changeOrigin: true,
-        pathRewrite: {
-          '^/oauth': ''
-        }
+        target: 'http://0.0.0.0:8585/oauth/'
       }
     }
   }

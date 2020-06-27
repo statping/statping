@@ -21,7 +21,7 @@ var (
 	LastLines    []*logRow
 	LockLines    sync.Mutex
 	VerboseMode  int
-	Version      string
+	version      string
 	allowReports bool
 )
 
@@ -36,7 +36,7 @@ func SentryInit(v *string, allow bool) {
 		if *v == "" {
 			*v = "development"
 		}
-		Version = *v
+		version = *v
 	}
 	goEnv := Params.GetString("GO_ENV")
 	allowReports := Params.GetBool("ALLOW_REPORTS")
@@ -44,7 +44,7 @@ func SentryInit(v *string, allow bool) {
 		if err := sentry.Init(sentry.ClientOptions{
 			Dsn:              errorReporter,
 			Environment:      goEnv,
-			Release:          Version,
+			Release:          version,
 			AttachStacktrace: true,
 		}); err != nil {
 			Log.Errorln(err)
@@ -63,7 +63,7 @@ func SentryErr(err error) {
 func SentryLogEntry(entry *Logger.Entry) {
 	e := sentry.NewEvent()
 	e.Message = entry.Message
-	e.Release = Version
+	e.Release = version
 	e.Contexts = entry.Data
 	sentry.CaptureEvent(e)
 }

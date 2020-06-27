@@ -9,7 +9,7 @@ const errorReporter = "https://bed4d75404924cb3a799e370733a1b64@sentry.statping.
 
 class Api {
   constructor() {
-    axios.defaults.withCredentials = true
+
   }
 
   async oauth() {
@@ -251,13 +251,17 @@ class Api {
   }
 
   token() {
-    return $cookies.get(tokenKey);
+    const tk = $cookies.get(tokenKey)
+    if (!tk) {
+      return {admin: false};
+    }
+    return tk;
   }
 
   authToken() {
     const tk = $cookies.get(tokenKey)
-    if (tk) {
-      return {'Authorization': 'Bearer ' + tk};
+    if (tk.token) {
+      return {'Authorization': 'Bearer ' + tk.token};
     } else {
       return {};
     }
