@@ -20,14 +20,15 @@ func (s *Service) FailuresSince(t time.Time) failures.Failurer {
 	return failures.Since(t, s)
 }
 
-func (s Service) DowntimeAgo() string {
-	if s.LastOnline.IsZero() {
+func (s *Service) DowntimeAgo() string {
+	last := s.LastOnline
+	if last.IsZero() {
 		return "Never been online"
 	}
-	return humanize.Time(s.LastOnline)
+	return humanize.Time(last)
 }
 
-func (s Service) DowntimeText() string {
+func (s *Service) DowntimeText() string {
 	last := s.AllFailures().Last()
 	if last == nil {
 		return ""

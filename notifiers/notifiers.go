@@ -13,9 +13,9 @@ import (
 var log = utils.Log.WithField("type", "notifier")
 
 type replacer struct {
-	Core    core.Core
-	Service services.Service
-	Failure failures.Failure
+	Core    *core.Core
+	Service *services.Service
+	Failure *failures.Failure
 	Custom  map[string]string
 }
 
@@ -59,8 +59,8 @@ func Add(notifs ...services.ServiceNotifier) {
 	}
 }
 
-func ReplaceVars(input string, s services.Service, f failures.Failure) string {
-	return ReplaceTemplate(input, replacer{Service: s, Failure: f, Core: *core.App})
+func ReplaceVars(input string, s *services.Service, f *failures.Failure) string {
+	return ReplaceTemplate(input, replacer{Service: s, Failure: f, Core: core.App})
 }
 
 var exampleFailure = &failures.Failure{

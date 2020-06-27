@@ -70,7 +70,7 @@ type testNotificationReq struct {
 
 func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	n, err := notifications.Find(vars["notifier"])
+	_, err := notifications.Find(vars["notifier"])
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -82,7 +82,7 @@ func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	notif := services.ReturnNotifier(n.Method)
+	notif := services.ReturnNotifier(req.Notification.Method)
 
 	var out string
 	if req.Method == "success" {

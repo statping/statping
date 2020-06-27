@@ -16,7 +16,6 @@
 - Fixed issues with Telegram Notifier
 - Modified notifier test handler to return notifier based on URL, not JSON payload
 
-
 # 0.90.55 (06-18-2020)
 - Added 404 page
 - Modified Statping's PR process, dev -> master

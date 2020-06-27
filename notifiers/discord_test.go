@@ -2,7 +2,6 @@ package notifiers
 
 import (
 	"github.com/statping/statping/database"
-	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
@@ -27,7 +26,6 @@ func TestDiscordNotifier(t *testing.T) {
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
 	notifications.SetDB(db)
-	core.Example()
 
 	if DISCORD_URL == "" {
 		t.Log("discord notifier testing skipped, missing DISCORD_URL environment variable")
@@ -47,11 +45,6 @@ func TestDiscordNotifier(t *testing.T) {
 
 	t.Run("discord Notifier Tester", func(t *testing.T) {
 		assert.True(t, Discorder.CanSend())
-	})
-
-	t.Run("discord Notifier Tester OnSave", func(t *testing.T) {
-		_, err := Discorder.OnSave()
-		assert.Nil(t, err)
 	})
 
 	t.Run("discord OnFailure", func(t *testing.T) {
