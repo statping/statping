@@ -50,13 +50,13 @@ var Twilio = &twilio{&notifications.Notification{
 		DbField:     "api_secret",
 		Required:    true,
 	}, {
-		Type:        "text",
+		Type:        "number",
 		Title:       "SMS to Phone Number",
 		Placeholder: "18555555555",
 		DbField:     "Var1",
 		Required:    true,
 	}, {
-		Type:        "text",
+		Type:        "number",
 		Title:       "From Phone Number",
 		Placeholder: "18555555555",
 		DbField:     "Var2",
@@ -90,14 +90,14 @@ func (t *twilio) sendMessage(message string) (string, error) {
 }
 
 // OnFailure will trigger failing service
-func (t *twilio) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
+func (t *twilio) OnFailure(s services.Service, f failures.Failure) (string, error) {
 	msg := ReplaceVars(t.FailureData, s, f)
 	return t.sendMessage(msg)
 }
 
 // OnSuccess will trigger successful service
-func (t *twilio) OnSuccess(s *services.Service) (string, error) {
-	msg := ReplaceVars(t.SuccessData, s, nil)
+func (t *twilio) OnSuccess(s services.Service) (string, error) {
+	msg := ReplaceVars(t.SuccessData, s, failures.Failure{})
 	return t.sendMessage(msg)
 }
 

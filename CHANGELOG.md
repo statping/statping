@@ -1,3 +1,21 @@
+# 0.90.56 (06-25-2020)
+- Modified metrics now include service name for each service metric
+- Added switch for true/false notifier values
+- Added list for notifiers that have static values (in drop down)
+- Fixed oAuth form saving
+- Fixed some HTTP Cookie issues
+- Added error if Theme Editor returns an error from API
+- Added Pushover priority and sounds
+- Added HTTP headers for outgoing requests (includes User-Agent=Statping and Statping-Version=0.90.55)
+- Fixed Google oAuth handling
+- Added Google oAuth email/domain user restrictions
+- Modified notifiers to use dereferenced services and failures
+- Added core.Example() function for testing
+- Added Custom oAuth Authentication method
+- Fixed setup form not creating user from values inputted in form
+- Fixed issues with Telegram Notifier
+- Modified notifier test handler to return notifier based on URL, not JSON payload
+
 # 0.90.55 (06-18-2020)
 - Added 404 page
 - Modified Statping's PR process, dev -> master

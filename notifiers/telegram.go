@@ -45,9 +45,9 @@ var Telegram = &telegram{&notifications.Notification{
 		Required:    true,
 	}, {
 		Type:        "text",
-		Title:       "Channel or User",
+		Title:       "Channel",
 		Placeholder: "@statping_channel",
-		SmallText:   "Insert your Telegram Channel or User here.",
+		SmallText:   "Insert your Telegram Channel including the @ symbol. The bot will need to be an administrator of this channel.",
 		DbField:     "var1",
 		Required:    true,
 	}}},
@@ -60,9 +60,8 @@ func (t *telegram) sendMessage(message string) (string, error) {
 	v := url.Values{}
 	v.Set("chat_id", t.Var1)
 	v.Set("text", message)
-	rb := *strings.NewReader(v.Encode())
 
-	contents, _, err := utils.HttpRequest(apiEndpoint, "GET", "application/x-www-form-urlencoded", nil, &rb, time.Duration(10*time.Second), true, nil)
+	contents, _, err := utils.HttpRequest(apiEndpoint, "POST", "application/x-www-form-urlencoded", nil, strings.NewReader(v.Encode()), time.Duration(10*time.Second), true, nil)
 
 	success, _ := telegramSuccess(contents)
 	if !success {
@@ -74,29 +73,29 @@ func (t *telegram) sendMessage(message string) (string, error) {
 }
 
 // OnFailure will trigger failing service
-func (t *telegram) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
+func (t *telegram) OnFailure(s services.Service, f failures.Failure) (string, error) {
 	msg := ReplaceVars(t.FailureData, s, f)
 	out, err := t.sendMessage(msg)
 	return out, err
 }
 
 // OnSuccess will trigger successful service
-func (t *telegram) OnSuccess(s *services.Service) (string, error) {
-	msg := ReplaceVars(t.SuccessData, s, nil)
+func (t *telegram) OnSuccess(s services.Service) (string, error) {
+	msg := ReplaceVars(t.SuccessData, s, failures.Failure{})
 	out, err := t.sendMessage(msg)
 	return out, err
 }
 
 // OnTest will test the Twilio SMS messaging
 func (t *telegram) OnTest() (string, error) {
-	msg := fmt.Sprintf("Testing the Twilio SMS Notifier on your Statping server")
-	content, err := t.sendMessage(msg)
-	return content, err
+	msg := fmt.Sprintf("Testing the Telegram Notifier on your Statping server")
+	return t.sendMessage(msg)
 }
 
 // OnSave will trigger when this notifier is saved
 func (t *telegram) OnSave() (string, error) {
-	return "", nil
+	msg := fmt.Sprintf("The Telegram Notifier on your Statping server was just saved")
+	return t.sendMessage(msg)
 }
 
 func telegramSuccess(res []byte) (bool, telegramResponse) {

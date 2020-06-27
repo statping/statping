@@ -2,6 +2,7 @@ package notifiers
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
@@ -24,6 +25,7 @@ func TestSlackNotifier(t *testing.T) {
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
 	notifications.SetDB(db)
+	core.Example()
 
 	SLACK_URL = utils.Params.GetString("SLACK_URL")
 	slacker.Host = SLACK_URL
@@ -46,6 +48,11 @@ func TestSlackNotifier(t *testing.T) {
 	t.Run("slack Within Limits", func(t *testing.T) {
 		ok := slacker.CanSend()
 		assert.True(t, ok)
+	})
+
+	t.Run("slack OnSave", func(t *testing.T) {
+		_, err := slacker.OnSave()
+		assert.Nil(t, err)
 	})
 
 	t.Run("slack OnFailure", func(t *testing.T) {
