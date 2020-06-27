@@ -2,7 +2,6 @@ package notifiers
 
 import (
 	"github.com/statping/statping/database"
-	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
@@ -32,7 +31,6 @@ func TestTelegramNotifier(t *testing.T) {
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
 	notifications.SetDB(db)
-	core.Example()
 
 	if telegramToken == "" || telegramChannel == "" {
 		t.Log("Telegram notifier testing skipped, missing TELEGRAM_TOKEN and TELEGRAM_CHANNEL environment variable")
@@ -54,11 +52,6 @@ func TestTelegramNotifier(t *testing.T) {
 
 	t.Run("Telegram Within Limits", func(t *testing.T) {
 		assert.True(t, Telegram.CanSend())
-	})
-
-	t.Run("Telegram OnSave", func(t *testing.T) {
-		_, err := Telegram.OnSave()
-		assert.Nil(t, err)
 	})
 
 	t.Run("Telegram OnFailure", func(t *testing.T) {

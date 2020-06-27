@@ -2,7 +2,6 @@ package notifiers
 
 import (
 	"github.com/statping/statping/database"
-	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
@@ -25,7 +24,6 @@ func TestStatpingEmailerNotifier(t *testing.T) {
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
 	notifications.SetDB(db)
-	core.Example()
 
 	testEmail = utils.Params.GetString("TEST_EMAIL")
 	statpingMailer.Host = testEmail
@@ -48,11 +46,6 @@ func TestStatpingEmailerNotifier(t *testing.T) {
 	t.Run("statping emailer Within Limits", func(t *testing.T) {
 		ok := statpingMailer.CanSend()
 		assert.True(t, ok)
-	})
-
-	t.Run("statping emailer OnSave", func(t *testing.T) {
-		_, err := statpingMailer.OnSave()
-		assert.Nil(t, err)
 	})
 
 	t.Run("statping emailer OnFailure", func(t *testing.T) {
