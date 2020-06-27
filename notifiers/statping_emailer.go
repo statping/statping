@@ -60,17 +60,17 @@ func (s *statpingEmailer) OnTest() (string, error) {
 }
 
 type statpingMail struct {
-	Email   string           `json:"email"`
-	Core    core.Core        `json:"core,omitempty"`
-	Service services.Service `json:"service,omitempty"`
-	Failure failures.Failure `json:"failure,omitempty"`
+	Email   string            `json:"email"`
+	Core    *core.Core        `json:"core,omitempty"`
+	Service *services.Service `json:"service,omitempty"`
+	Failure *failures.Failure `json:"failure,omitempty"`
 }
 
 // OnFailure will trigger failing service
-func (s *statpingEmailer) OnFailure(srv services.Service, f failures.Failure) (string, error) {
+func (s *statpingEmailer) OnFailure(srv *services.Service, f *failures.Failure) (string, error) {
 	ee := statpingMail{
 		Email:   s.Host,
-		Core:    *core.App,
+		Core:    core.App,
 		Service: srv,
 		Failure: f,
 	}
@@ -78,12 +78,12 @@ func (s *statpingEmailer) OnFailure(srv services.Service, f failures.Failure) (s
 }
 
 // OnSuccess will trigger successful service
-func (s *statpingEmailer) OnSuccess(srv services.Service) (string, error) {
+func (s *statpingEmailer) OnSuccess(srv *services.Service) (string, error) {
 	ee := statpingMail{
 		Email:   s.Host,
-		Core:    *core.App,
+		Core:    core.App,
 		Service: srv,
-		Failure: failures.Failure{},
+		Failure: nil,
 	}
 	return s.sendStatpingEmail(ee)
 }
@@ -92,9 +92,9 @@ func (s *statpingEmailer) OnSuccess(srv services.Service) (string, error) {
 func (s *statpingEmailer) OnSave() (string, error) {
 	ee := statpingMail{
 		Email:   s.Host,
-		Core:    *core.App,
-		Service: services.Service{},
-		Failure: failures.Failure{},
+		Core:    core.App,
+		Service: nil,
+		Failure: nil,
 	}
 	out, err := s.sendStatpingEmail(ee)
 	log.Println("statping emailer response", out)

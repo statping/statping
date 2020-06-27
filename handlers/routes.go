@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"fmt"
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/statping/statping/source"
+	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/utils"
 	"net/http"
 	"net/http/pprof"
@@ -190,5 +192,5 @@ func resetRouter() {
 }
 
 func resetCookies() {
-	jwtKey = []byte(utils.NewSHA256Hash())
+	jwtKey = fmt.Sprintf("%s_%d", core.App.ApiSecret, utils.Now().Nanosecond())
 }

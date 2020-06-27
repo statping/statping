@@ -33,7 +33,7 @@ func setJwtToken(user *users.User, w http.ResponseWriter) (JwtClaim, string) {
 			ExpiresAt: expirationTime.Unix(),
 		}}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaim)
-	tokenString, err := token.SignedString(jwtKey)
+	tokenString, err := token.SignedString([]byte(jwtKey))
 	if err != nil {
 		log.Errorln("error setting token: ", err)
 	}
@@ -44,7 +44,6 @@ func setJwtToken(user *users.User, w http.ResponseWriter) (JwtClaim, string) {
 		Value:   tokenString,
 		Expires: expirationTime,
 		MaxAge:  int(time.Duration(72 * time.Hour).Seconds()),
-		Path:    "/",
 	})
 	return jwtClaim, tokenString
 }
@@ -57,12 +56,11 @@ func getJwtToken(r *http.Request) (JwtClaim, error) {
 		}
 		return JwtClaim{}, err
 	}
-
+	tknStr := c.Value
 	var claims JwtClaim
-	tkn, err := jwt.ParseWithClaims(c.Value, &claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
+	tkn, err := jwt.ParseWithClaims(tknStr, &claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(jwtKey), nil
 	})
-
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
 			return JwtClaim{}, err

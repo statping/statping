@@ -27,6 +27,7 @@ func (h *Hit) AfterDelete() {
 }
 
 func (h *Hit) AfterCreate() {
+	metrics.Inc("success", h.Service)
 	metrics.Query("hit", "create")
 }
 
