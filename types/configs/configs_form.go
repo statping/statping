@@ -43,6 +43,9 @@ func LoadConfigForm(r *http.Request) (*DbConfig, error) {
 	p.Set("DESCRIPTION", description)
 	p.Set("LANGUAGE", language)
 	p.Set("ALLOW_REPORTS", reports)
+	p.Set("ADMIN_USER", username)
+	p.Set("ADMIN_PASSWORD", password)
+	p.Set("ADMIN_EMAIL", email)
 
 	confg := &DbConfig{
 		DbConn:      dbConn,
