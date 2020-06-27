@@ -107,14 +107,9 @@
           },
           async createAssets() {
               this.pending = true
-            let resp
-            try {
-              resp = await Api.theme_generate(true)
-            } catch(e) {
-                this.error = e.response.data.error
-            }
+              const resp = await Api.theme_generate(true)
               this.pending = false
-            await this.fetchTheme()
+              await this.fetchTheme()
           },
           async deleteAssets() {
               this.pending = true

@@ -2,7 +2,6 @@ package notifiers
 
 import (
 	"github.com/statping/statping/database"
-	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
@@ -22,7 +21,6 @@ func TestCommandNotifier(t *testing.T) {
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
 	notifications.SetDB(db)
-	core.Example()
 
 	t.Run("Load Command", func(t *testing.T) {
 		Command.Host = "/bin/echo"
@@ -40,11 +38,6 @@ func TestCommandNotifier(t *testing.T) {
 
 	t.Run("Command Notifier Tester", func(t *testing.T) {
 		assert.True(t, Command.CanSend())
-	})
-
-	t.Run("Command OnSave", func(t *testing.T) {
-		_, err := Command.OnSave()
-		assert.Nil(t, err)
 	})
 
 	t.Run("Command OnFailure", func(t *testing.T) {

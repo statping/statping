@@ -45,19 +45,15 @@ func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiUpdateOAuthHandler(w http.ResponseWriter, r *http.Request) {
-	var oauth core.OAuth
-	if err := DecodeJSON(r, &oauth); err != nil {
+	var c core.OAuth
+	err := DecodeJSON(r, &c)
+	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-
-	core.App.OAuth = oauth
-	if err := core.App.Update(); err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
-
-	sendJsonAction(core.App.OAuth, "update", w, r)
+	app := core.App
+	app.OAuth = c
+	sendJsonAction(app.OAuth, "update", w, r)
 }
 
 func apiOAuthHandler(r *http.Request) interface{} {
