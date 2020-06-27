@@ -147,9 +147,9 @@ export default new Vuex.Store({
         const core = await Api.core()
         const token = await Api.token()
         context.commit("setCore", core);
-        context.commit('setAdmin', token.admin)
+        context.commit('setAdmin', token)
         context.commit('setCore', core)
-        context.commit('setUser', token.token!==undefined)
+        context.commit('setUser', token!==undefined)
       },
         async loadRequired(context) {
             const groups = await Api.groups()
@@ -170,14 +170,8 @@ export default new Vuex.Store({
           const messages = await Api.messages()
           context.commit("setMessages", messages)
           context.commit("setHasPublicData", true)
-            try {
-              const checkins = await Api.checkins()
-              context.commit("setCheckins", checkins);
-            } catch(e) {
-            window.console.error(e)
-              await Api.logout()
-              return
-            }
+          const checkins = await Api.checkins()
+          context.commit("setCheckins", checkins);
             const notifiers = await Api.notifiers()
             context.commit("setNotifiers", notifiers);
           const users = await Api.users()

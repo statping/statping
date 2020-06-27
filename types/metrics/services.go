@@ -10,7 +10,7 @@ var (
 			Name:      "service_online",
 			Help:      "If service is online",
 		},
-		[]string{"service", "name", "type"},
+		[]string{"service", "type"},
 	)
 
 	// service failures

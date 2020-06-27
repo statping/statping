@@ -2,6 +2,7 @@ package notifiers
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
@@ -28,6 +29,7 @@ func TestPushoverNotifier(t *testing.T) {
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
 	notifications.SetDB(db)
+	core.Example()
 
 	if PUSHOVER_TOKEN == "" || PUSHOVER_API == "" {
 		t.Log("Pushover notifier testing skipped, missing PUSHOVER_TOKEN and PUSHOVER_API environment variable")
@@ -37,6 +39,8 @@ func TestPushoverNotifier(t *testing.T) {
 	t.Run("Load Pushover", func(t *testing.T) {
 		Pushover.ApiKey = PUSHOVER_TOKEN
 		Pushover.ApiSecret = PUSHOVER_API
+		Pushover.Var1 = "Normal"
+		Pushover.Var2 = "vibrate"
 		Pushover.Enabled = null.NewNullBool(true)
 
 		Add(Pushover)
@@ -48,6 +52,11 @@ func TestPushoverNotifier(t *testing.T) {
 
 	t.Run("Pushover Within Limits", func(t *testing.T) {
 		assert.True(t, Pushover.CanSend())
+	})
+
+	t.Run("Pushover OnSave", func(t *testing.T) {
+		_, err := Pushover.OnSave()
+		assert.Nil(t, err)
 	})
 
 	t.Run("Pushover OnFailure", func(t *testing.T) {

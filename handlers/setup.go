@@ -31,10 +31,8 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	project := r.PostForm.Get("project")
 	description := r.PostForm.Get("description")
 	domain := r.PostForm.Get("domain")
-	newsletter := r.PostForm.Get("newsletter")
-	sendNews, _ := strconv.ParseBool(newsletter)
-	reports := r.PostForm.Get("send_reports")
-	sendReports, _ := strconv.ParseBool(reports)
+	sendNews, _ := strconv.ParseBool(r.PostForm.Get("newsletter"))
+	sendReports, _ := strconv.ParseBool(r.PostForm.Get("send_reports"))
 
 	log.WithFields(utils.ToFields(core.App, confgs)).Debugln("new configs posted")
 

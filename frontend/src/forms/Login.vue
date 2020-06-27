@@ -37,6 +37,10 @@
             <font-awesome-icon :icon="['fab', 'google']" /> Login with Google
         </a>
 
+        <a v-if="oauth && oauth.custom_client_id" @click.prevent="Customlogin" href="#" class="btn btn-block btn-outline-dark">
+            <font-awesome-icon :icon="['fas', 'address-card']" /> Login with {{oauth.custom_name}}
+        </a>
+
     </div>
 </template>
 
@@ -80,9 +84,8 @@
               if (auth.error) {
                   this.error = true
               } else if (auth.token) {
-                const u = {username: this.username, admin: auth.admin, token: auth.token}
-                this.$cookies.set("statping_auth", JSON.stringify(u))
-                  this.$store.dispatch('loadAdmin')
+                // this.$cookies.set("statping_auth", auth.token)
+                  await this.$store.dispatch('loadAdmin')
                   this.$store.commit('setAdmin', auth.admin)
                   this.$router.push('/dashboard')
               }
@@ -96,6 +99,9 @@
         },
         Googlelogin() {
           window.location = `https://accounts.google.com/signin/oauth?client_id=${this.oauth.google_client_id}&redirect_uri=${this.core.domain}/oauth/google&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email`
+        },
+        Customlogin() {
+          window.location = `${this.oauth.custom_endpoint_auth}?client_id=${this.oauth.custom_client_id}&redirect_uri=${this.core.domain}/oauth/custom${this.oauth.custom_scopes !== "" ? "&scope="+this.oauth.custom_scopes : "" }`
         }
       }
   }
