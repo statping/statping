@@ -41,7 +41,7 @@ var Pushover = &pushover{&notifications.Notification{
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
 		Title:       "User Token",
-		Placeholder: "Insert your device's Pushover Token",
+		Placeholder: "Insert your Pushover User Token",
 		DbField:     "api_key",
 		Required:    true,
 	}, {
@@ -50,8 +50,39 @@ var Pushover = &pushover{&notifications.Notification{
 		Placeholder: "Create an Application and insert the API Key here",
 		DbField:     "api_secret",
 		Required:    true,
+	}, {
+		Type:        "list",
+		Title:       "Priority",
+		Placeholder: "Set the notification priority level",
+		DbField:     "Var1",
+		Required:    true,
+		ListOptions: []string{"Lowest", "Low", "Normal", "High", "Emergency"},
+	}, {
+		Type:        "list",
+		Title:       "Notification Sound",
+		Placeholder: "Choose a sound for this Pushover notification",
+		DbField:     "Var2",
+		Required:    true,
+		ListOptions: []string{"none", "pushover", "bike", "bugle", "cashregister", "classical", "cosmic", "falling", "gamelan", "incoming", "intermissioon", "magic", "mechanical", "painobar", "siren", "spacealarm", "tugboat", "alien", "climb", "persistent", "echo", "updown"},
 	},
 	}},
+}
+
+func priority(val string) string {
+	switch strings.ToLower(val) {
+	case "lowest":
+		return "-2"
+	case "low":
+		return "-1"
+	case "normal":
+		return "0"
+	case "high":
+		return "1"
+	case "emergency":
+		return "2"
+	default:
+		return "0"
+	}
 }
 
 // Send will send a HTTP Post to the Pushover API. It accepts type: string
@@ -60,6 +91,10 @@ func (t *pushover) sendMessage(message string) (string, error) {
 	v.Set("token", t.ApiSecret)
 	v.Set("user", t.ApiKey)
 	v.Set("message", message)
+	v.Set("priority", priority(t.Var1))
+	if t.Var2 != "" {
+		v.Set("sound", t.Var2)
+	}
 	rb := strings.NewReader(v.Encode())
 
 	content, _, err := utils.HttpRequest(pushoverUrl, "POST", "application/x-www-form-urlencoded", nil, rb, time.Duration(10*time.Second), true, nil)
@@ -70,15 +105,15 @@ func (t *pushover) sendMessage(message string) (string, error) {
 }
 
 // OnFailure will trigger failing service
-func (t *pushover) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
+func (t *pushover) OnFailure(s services.Service, f failures.Failure) (string, error) {
 	message := ReplaceVars(t.FailureData, s, f)
 	out, err := t.sendMessage(message)
 	return out, err
 }
 
 // OnSuccess will trigger successful service
-func (t *pushover) OnSuccess(s *services.Service) (string, error) {
-	message := ReplaceVars(t.SuccessData, s, nil)
+func (t *pushover) OnSuccess(s services.Service) (string, error) {
+	message := ReplaceVars(t.SuccessData, s, failures.Failure{})
 	out, err := t.sendMessage(message)
 	return out, err
 }

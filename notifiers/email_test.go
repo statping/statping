@@ -2,6 +2,7 @@ package notifiers
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
@@ -37,6 +38,7 @@ func TestEmailNotifier(t *testing.T) {
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
 	notifications.SetDB(db)
+	core.Example()
 
 	if EMAIL_HOST == "" || EMAIL_USER == "" || EMAIL_PASS == "" {
 		t.Log("email notifier testing skipped, missing EMAIL_ environment variables")
@@ -61,6 +63,11 @@ func TestEmailNotifier(t *testing.T) {
 	t.Run("email Within Limits", func(t *testing.T) {
 		ok := email.CanSend()
 		assert.True(t, ok)
+	})
+
+	t.Run("email OnSave", func(t *testing.T) {
+		_, err := email.OnSave()
+		assert.Nil(t, err)
 	})
 
 	t.Run("email OnFailure", func(t *testing.T) {

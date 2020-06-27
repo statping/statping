@@ -47,19 +47,14 @@ var Mobile = &mobilePush{&notifications.Notification{
 	}}},
 }
 
-func dataJson(s *services.Service, f *failures.Failure) map[string]interface{} {
+func dataJson(s services.Service, f failures.Failure) map[string]interface{} {
 	serviceId := "0"
-	if s != nil {
-		serviceId = utils.ToString(s.Id)
-	}
+	serviceId = utils.ToString(s.Id)
 	online := "online"
 	if !s.Online {
 		online = "offline"
 	}
-	issue := ""
-	if f != nil {
-		issue = f.Issue
-	}
+	issue := f.Issue
 	link := fmt.Sprintf("statping://service?id=%v", serviceId)
 	out := map[string]interface{}{
 		"status": online,
@@ -71,7 +66,7 @@ func dataJson(s *services.Service, f *failures.Failure) map[string]interface{} {
 }
 
 // OnFailure will trigger failing service
-func (m *mobilePush) OnFailure(s *services.Service, f *failures.Failure) (string, error) {
+func (m *mobilePush) OnFailure(s services.Service, f failures.Failure) (string, error) {
 	data := dataJson(s, f)
 	msg := &pushArray{
 		Message: fmt.Sprintf("Your service '%v' is currently failing! Reason: %v", s.Name, f.Issue),
@@ -82,8 +77,8 @@ func (m *mobilePush) OnFailure(s *services.Service, f *failures.Failure) (string
 }
 
 // OnSuccess will trigger successful service
-func (m *mobilePush) OnSuccess(s *services.Service) (string, error) {
-	data := dataJson(s, nil)
+func (m *mobilePush) OnSuccess(s services.Service) (string, error) {
+	data := dataJson(s, failures.Failure{})
 	msg := &pushArray{
 		Message:  "Service is Online!",
 		Title:    "Service Online",
