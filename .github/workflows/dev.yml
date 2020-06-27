@@ -319,7 +319,7 @@ jobs:
           dockerfile: Dockerfile.base
           tags: "base"
 
-      - name: Latest/Version Docker Image
+      - name: Dev Docker Image
         uses: elgohr/Publish-Docker-Github-Action@master
         env:
           VERSION: ${{ env.VERSION }}

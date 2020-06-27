@@ -61,7 +61,7 @@ func (s *slack) sendSlack(msg string) (string, error) {
 
 func (s *slack) OnTest() (string, error) {
 	example := services.Example(true)
-	testMsg := ReplaceVars(s.SuccessData, example, nil)
+	testMsg := ReplaceVars(s.SuccessData, example, failures.Failure{})
 	contents, resp, err := utils.HttpRequest(s.Host, "POST", "application/json", nil, bytes.NewBuffer([]byte(testMsg)), time.Duration(10*time.Second), true, nil)
 	if err != nil {
 		return "", err
@@ -74,15 +74,15 @@ func (s *slack) OnTest() (string, error) {
 }
 
 // OnFailure will trigger failing service
-func (s *slack) OnFailure(srv *services.Service, f *failures.Failure) (string, error) {
+func (s *slack) OnFailure(srv services.Service, f failures.Failure) (string, error) {
 	msg := ReplaceVars(s.FailureData, srv, f)
 	out, err := s.sendSlack(msg)
 	return out, err
 }
 
 // OnSuccess will trigger successful service
-func (s *slack) OnSuccess(srv *services.Service) (string, error) {
-	msg := ReplaceVars(s.SuccessData, srv, nil)
+func (s *slack) OnSuccess(srv services.Service) (string, error) {
+	msg := ReplaceVars(s.SuccessData, srv, failures.Failure{})
 	out, err := s.sendSlack(msg)
 	return out, err
 }

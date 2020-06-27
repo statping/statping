@@ -2,6 +2,7 @@ package notifiers
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
@@ -29,6 +30,7 @@ func TestMobileNotifier(t *testing.T) {
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
 	notifications.SetDB(db)
+	core.Example()
 
 	Mobile.Var1 = mobileToken
 	if mobileToken == "" {
@@ -50,6 +52,11 @@ func TestMobileNotifier(t *testing.T) {
 
 	t.Run("Mobile Notifier Tester", func(t *testing.T) {
 		assert.True(t, Mobile.CanSend())
+	})
+
+	t.Run("Mobile OnSave", func(t *testing.T) {
+		_, err := Mobile.OnSave()
+		assert.Nil(t, err)
 	})
 
 	t.Run("Mobile OnFailure", func(t *testing.T) {

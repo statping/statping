@@ -7,16 +7,15 @@ import (
 	"time"
 )
 
-func (n *Notification) Name() string {
+func (n Notification) Name() string {
 	newName := strings.ToLower(n.Method)
 	newName = strings.ReplaceAll(newName, " ", "_")
 	return newName
 }
 
 // LastSent returns a time.Duration of the last sent notification for the notifier
-func (n *Notification) LastSent() time.Duration {
-	since := time.Since(n.lastSent)
-	return since
+func (n Notification) LastSent() time.Duration {
+	return time.Since(n.lastSent)
 }
 
 func (n *Notification) CanSend() bool {

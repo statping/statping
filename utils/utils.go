@@ -217,6 +217,10 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 			}
 		}
 	}
+
+	req.Header.Set("User-Agent", "Statping")
+	req.Header.Set("Statping-Version", Version)
+
 	var resp *http.Response
 
 	dialer := &net.Dialer{
