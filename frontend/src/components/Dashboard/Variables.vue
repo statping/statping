@@ -38,16 +38,8 @@
             <td>8080</td>
         </tr>
         <tr>
-            <td><kbd>{{"\{\{.Service.Downtime.Human\}\}"}}</kbd></td>
-            <td>2 minutes</td>
-        </tr>
-        <tr>
-            <td><kbd>{{"\{\{.Service.Uptime.Human\}\}"}}</kbd></td>
-            <td>13 hours</td>
-        </tr>
-        <tr>
-            <td><kbd>{{"\{\{.Service.Online\}\}"}}</kbd></td>
-            <td>true/false</td>
+            <td><kbd>{{"\{\{.Service.DowntimeAgo\}\}"}}</kbd></td>
+            <td>35 minutes ago</td>
         </tr>
         <tr>
             <td><kbd>{{"\{\{.Service.LastStatusCode\}\}"}}</kbd></td>
@@ -56,22 +48,6 @@
         <tr>
             <td><kbd>{{"\{\{.Service.FailuresLast24Hours\}\}"}}</kbd></td>
             <td>38</td>
-        </tr>
-        <tr>
-            <td><kbd>{{"\{\{.Service.LastOnline\}\}"}}</kbd></td>
-            <td>2020-11-05T13:15:30Z</td>
-        </tr>
-        <tr>
-            <td><kbd>{{"\{\{.Service.LastOffline\}\}"}}</kbd></td>
-            <td>2020-10-01T13:15:30Z</td>
-        </tr>
-        <tr>
-            <td><kbd>{{"\{\{.Service.Online24Hours\}\}"}}</kbd></td>
-            <td>0.99</td>
-        </tr>
-        <tr>
-            <td><kbd>{{"\{\{.Service.Online7Days\}\}"}}</kbd></td>
-            <td>0.97</td>
         </tr>
         </tbody>
         <small>Additional variables within the Service struct</small>

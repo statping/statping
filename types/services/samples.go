@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-func Example(online bool) Service {
-	return Service{
+func Example(online bool) *Service {
+	return &Service{
 		Id:                  6283,
 		Name:                "Statping Example",
 		Domain:              "https://statping.com",
