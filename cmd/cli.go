@@ -398,14 +398,19 @@ func ExportSettings() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	var srvs []services.Service
+	for _, s := range services.AllInOrder() {
+		s.Failures = nil
+		srvs = append(srvs, s)
+	}
 	data := ExportData{
-		Core: c,
-		//Notifiers: notifications.All(),
-		Checkins: checkins.All(),
-		Users:    users.All(),
-		Services: services.AllInOrder(),
-		Groups:   groups.All(),
-		Messages: messages.All(),
+		Core:      c,
+		Notifiers: core.App.Notifications,
+		Checkins:  checkins.All(),
+		Users:     users.All(),
+		Services:  srvs,
+		Groups:    groups.All(),
+		Messages:  messages.All(),
 	}
 	export, err := json.Marshal(data)
 	return export, err

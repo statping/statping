@@ -689,7 +689,7 @@ HTML,BODY {
     transition: 0.2s all;
   }
   .switch-rd-gr input:checked + label::before {
-    background-color: #cd141b;
+    background-color: #29b10c !important;
   }
   .switch input:checked + label::before {
     background-color: #08d;

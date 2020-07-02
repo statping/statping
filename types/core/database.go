@@ -47,22 +47,8 @@ func Select() (*Core, error) {
 }
 
 func (c *Core) Create() error {
-	secret := utils.Params.GetString("API_SECRET")
-	if secret == "" {
-		secret = utils.RandomString(32)
-	}
-	newCore := &Core{
-		Name:        c.Name,
-		Description: c.Description,
-		ConfigFile:  utils.Directory + "/config.yml",
-		ApiSecret:   secret,
-		Version:     App.Version,
-		Domain:      c.Domain,
-		Language:    c.Language,
-		MigrationId: utils.Now().Unix(),
-	}
-	q := db.Create(&newCore)
-	utils.Log.Infof("API Key created: %s", secret)
+	q := db.Create(c)
+	utils.Log.Infof("API Key created: %s", c.ApiSecret)
 	return q.Error()
 }
 

@@ -88,6 +88,7 @@ func CreateAdminUser(c *DbConfig) error {
 		Username: adminUser,
 		Password: adminPass,
 		Email:    adminEmail,
+		Scopes:   "admin",
 		Admin:    null.NewNullBool(true),
 	}
 

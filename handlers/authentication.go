@@ -3,6 +3,7 @@ package handlers
 import (
 	"crypto/subtle"
 	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/users"
 	"github.com/statping/statping/utils"
 	"net/http"
 	"strings"
@@ -31,6 +32,14 @@ func hasAPIQuery(r *http.Request) bool {
 		return false
 	}
 	if subtle.ConstantTimeCompare([]byte(key), []byte(core.App.ApiSecret)) == 1 {
+		return true
+	}
+	// find user with API key
+	user, err := users.FindByAPIKey(key)
+	if err != nil {
+		return false
+	}
+	if subtle.ConstantTimeCompare([]byte(key), []byte(user.ApiKey)) == 1 {
 		return true
 	}
 	return false

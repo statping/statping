@@ -41,6 +41,7 @@ func Samples() error {
 		MigrationId: utils.Now().Unix(),
 		Language:    utils.Params.GetString("LANGUAGE"),
 		OAuth:       oauth,
+		Version:     utils.Version,
 	}
 
 	return core.Create()

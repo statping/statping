@@ -3,13 +3,14 @@ import axios from 'axios'
 import * as Sentry from "@sentry/browser";
 import * as Integrations from "@sentry/integrations";
 const qs = require('querystring');
+axios.defaults.withCredentials = true
 
 const tokenKey = "statping_auth";
 const errorReporter = "https://bed4d75404924cb3a799e370733a1b64@sentry.statping.com/3"
 
 class Api {
   constructor() {
-    axios.defaults.withCredentials = true
+
   }
 
   async oauth() {

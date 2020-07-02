@@ -1,23 +1,27 @@
 <template>
     <form @submit.prevent="saveOAuth">
         <div class="card text-black-50 bg-white mb-3">
-            <div class="card-header">Internal Login</div>
+            <div class="card-header">
+                Internal Login
+                <span @click="local_enabled = !!local_enabled" class="switch switch-sm switch-rd-gr float-right">
+                    <input v-model="local_enabled" type="checkbox" id="switch-internal-oauth" :checked="local_enabled">
+                    <label for="switch-internal-oauth" class="mb-0"> </label>
+                </span>
+            </div>
             <div class="card-body">
-                <div class="form-group row">
-                    <label for="switch-gh-oauth" class="col-sm-6 col-form-label">Statping Authentication</label>
-                    <div class="col-md-6 col-xs-12 mt-1">
-                        <span @click="local_enabled = !!local_enabled" class="switch float-left">
-                            <input v-model="local_enabled" type="checkbox" class="switch" id="switch-local-oauth" :checked="local_enabled">
-                            <label for="switch-local-oauth"></label>
-                            <span class="small d-block">Use email/password Authentication</span>
-                        </span>
-                    </div>
-                </div>
+                Use Statping's default authentication to allow users you've created to login.
             </div>
         </div>
         <div class="card text-black-50 bg-white mb-3">
-            <div class="card-header">Github Settings</div>
-            <div class="card-body">
+            <div class="card-header text-capitalize">
+                <font-awesome-icon @click="expanded.github = !expanded.github" :icon="expanded.github ? 'minus' : 'plus'" class="mr-2 pointer"/>
+                Github Settings
+                <span @click="github_enabled = !!github_enabled" class="switch switch-sm switch-rd-gr float-right">
+                    <input v-model="github_enabled" type="checkbox" id="switch-gh-oauth" :checked="github_enabled">
+                    <label class="mb-0" for="switch-gh-oauth"> </label>
+                </span>
+            </div>
+            <div class="card-body" :class="{'d-none': !expanded.github}">
                 <span>You will need to create a new <a href="https://github.com/settings/developers">OAuth App</a> within Github.</span>
 
                 <div class="form-group row mt-3">
@@ -47,12 +51,9 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="switch-gh-oauth" class="col-sm-4 col-form-label">Enable Github Login</label>
+                    <label class="col-sm-4 col-form-label">Enable Github Login</label>
                     <div class="col-md-8 col-xs-12 mt-1">
-                    <span @click="github_enabled = !!github_enabled" class="switch float-left">
-                        <input v-model="github_enabled" type="checkbox" class="switch" id="switch-gh-oauth" :checked="github_enabled">
-                        <label for="switch-gh-oauth"> </label>
-                    </span>
+
                     </div>
                 </div>
                 <div class="form-group row">
@@ -69,8 +70,15 @@
             </div>
         </div>
         <div class="card text-black-50 bg-white mb-3">
-            <div class="card-header">Google Settings</div>
-            <div class="card-body">
+            <div class="card-header">
+                <font-awesome-icon @click="expanded.google = !expanded.google" :icon="expanded.google ? 'minus' : 'plus'" class="mr-2 pointer"/>
+                Google Settings
+                <span @click="google_enabled = !!google_enabled" class="switch switch-sm switch-rd-gr float-right">
+                    <input v-model="google_enabled" type="checkbox" id="switch-google-oauth" :checked="google_enabled">
+                    <label for="switch-google-oauth" class="mb-0"> </label>
+                </span>
+            </div>
+            <div class="card-body" :class="{'d-none': !expanded.google}">
                 <span>Go to <a href="https://console.cloud.google.com/apis/credentials">OAuth Consent Screen</a> on Google Console to create a new "Web Application" OAuth application. </span>
 
                 <div class="form-group row mt-3">
@@ -93,15 +101,6 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="switch-google-oauth" class="col-sm-4 col-form-label">Enable Google Login</label>
-                    <div class="col-md-8 col-xs-12 mt-1">
-                    <span @click="google_enabled = !!google_enabled" class="switch float-left">
-                        <input v-model="google_enabled" type="checkbox" class="switch" id="switch-google-oauth" :checked="google_enabled">
-                        <label for="switch-google-oauth"> </label>
-                    </span>
-                    </div>
-                </div>
-                <div class="form-group row">
                     <label for="google_callback" class="col-sm-4 col-form-label">Callback URL</label>
                     <div class="col-sm-8">
                         <div class="input-group">
@@ -115,8 +114,15 @@
             </div>
         </div>
         <div class="card text-black-50 bg-white mb-3">
-            <div class="card-header">Slack Settings</div>
-            <div class="card-body">
+            <div class="card-header">
+                <font-awesome-icon @click="expanded.slack = !expanded.slack" :icon="expanded.slack ? 'minus' : 'plus'" class="mr-2 pointer"/>
+                Slack Settings
+                <span @click="slack_enabled = !!slack_enabled" class="switch switch-sm switch-rd-gr float-right">
+                    <input v-model="slack_enabled" type="checkbox" id="switch-slack-oauth" :checked="slack_enabled">
+                    <label for="switch-slack-oauth" class="mb-0"> </label>
+                </span>
+            </div>
+            <div class="card-body" :class="{'d-none': !expanded.slack}">
                 <span>Go to <a href="https://api.slack.com/apps">Slack Apps</a> and create a new Application.</span>
 
                 <div class="form-group row mt-3">
@@ -146,15 +152,6 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="switch-slack-oauth" class="col-sm-4 col-form-label">Enable Slack Login</label>
-                    <div class="col-md-8 col-xs-12 mt-1">
-                    <span @click="slack_enabled = !!slack_enabled" class="switch float-left">
-                        <input v-model="slack_enabled" type="checkbox" class="switch" id="switch-slack-oauth" :checked="slack_enabled">
-                        <label for="switch-slack-oauth"> </label>
-                    </span>
-                    </div>
-                </div>
-                <div class="form-group row">
                     <label for="slack_callback" class="col-sm-4 col-form-label">Callback URL</label>
                     <div class="col-sm-8">
                         <div class="input-group">
@@ -169,8 +166,15 @@
         </div>
 
         <div class="card text-black-50 bg-white mb-3">
-            <div class="card-header">Custom oAuth Settings</div>
-            <div class="card-body">
+            <div class="card-header">
+                <font-awesome-icon @click="expanded.custom = !expanded.custom" :icon="expanded.custom ? 'minus' : 'plus'" class="mr-2 pointer"/>
+                Custom oAuth Settings
+                <span @click="custom_enabled = !!custom_enabled" class="switch switch-sm switch-rd-gr float-right">
+                    <input v-model="custom_enabled" type="checkbox" id="switch-custom-oauth" :checked="custom_enabled">
+                    <label for="switch-custom-oauth" class="mb-0"> </label>
+                </span>
+            </div>
+            <div class="card-body" :class="{'d-none': !expanded.custom}">
                 <div class="form-group row mt-3">
                     <label for="custom_name" class="col-sm-4 col-form-label">Custom Name</label>
                     <div class="col-sm-8">
@@ -209,15 +213,6 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="switch-custom-oauth" class="col-sm-4 col-form-label">Enable Custom Login</label>
-                    <div class="col-md-8 col-xs-12 mt-1">
-                    <span @click="custom_enabled = !!custom_enabled" class="switch float-left">
-                        <input v-model="custom_enabled" type="checkbox" class="switch" id="switch-custom-oauth" :checked="custom_enabled">
-                        <label for="switch-custom-oauth"> </label>
-                    </span>
-                    </div>
-                </div>
-                <div class="form-group row">
                     <label for="slack_callback" class="col-sm-4 col-form-label">Callback URL</label>
                     <div class="col-sm-8">
                         <div class="input-group">
@@ -230,7 +225,6 @@
                 </div>
             </div>
         </div>
-
 
         <button class="btn btn-primary btn-block" @click.prevent="saveOAuth" type="submit" :disabled="loading">
             <font-awesome-icon v-if="loading" icon="circle-notch" class="mr-2" spin/> Save OAuth Settings
@@ -257,6 +251,13 @@
             local_enabled: false,
             custom_enabled: false,
             loading: false,
+            expanded: {
+              github: false,
+              google: false,
+              slack: false,
+              custom: false,
+              openid: false,
+            },
             oauth: {
               gh_client_id: "",
               gh_client_secret: "",

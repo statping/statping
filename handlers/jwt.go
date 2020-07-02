@@ -11,6 +11,7 @@ import (
 type JwtClaim struct {
 	Username string `json:"username"`
 	Admin    bool   `json:"admin"`
+	Scopes   string `json:"scopes"`
 	jwt.StandardClaims
 }
 
@@ -29,6 +30,7 @@ func setJwtToken(user *users.User, w http.ResponseWriter) (JwtClaim, string) {
 	jwtClaim := JwtClaim{
 		Username: user.Username,
 		Admin:    user.Admin.Bool,
+		Scopes:   user.Scopes,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		}}
