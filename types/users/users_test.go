@@ -31,7 +31,6 @@ func TestFind(t *testing.T) {
 	require.Nil(t, err)
 	assert.Equal(t, "example_user", item.Username)
 	assert.NotEmpty(t, item.ApiKey)
-	assert.NotEmpty(t, item.ApiSecret)
 	assert.NotEqual(t, "password123", item.Password)
 	assert.True(t, item.Admin.Bool)
 }
@@ -41,7 +40,6 @@ func TestFindByUsername(t *testing.T) {
 	require.Nil(t, err)
 	assert.Equal(t, "example_user", item.Username)
 	assert.NotEmpty(t, item.ApiKey)
-	assert.NotEmpty(t, item.ApiSecret)
 	assert.NotEqual(t, "password123", item.Password)
 	assert.True(t, item.Admin.Bool)
 }
@@ -64,7 +62,6 @@ func TestCreate(t *testing.T) {
 	assert.NotEqual(t, "password12345", example.Password)
 	assert.NotZero(t, example.CreatedAt)
 	assert.NotEmpty(t, example.ApiKey)
-	assert.NotEmpty(t, example.ApiSecret)
 }
 
 func TestUpdate(t *testing.T) {
