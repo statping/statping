@@ -1,3 +1,6 @@
+# 0.90.57 (07-04-2020)
+- Fixed login issue
+
 # 0.90.56 (06-25-2020)
 - Modified metrics now include service name for each service metric
 - Added switch for true/false notifier values
