@@ -264,7 +264,7 @@ func TestMainApiRoutes(t *testing.T) {
 
 type HttpFuncTest func(*testing.T) error
 
-type ResponseFunc func(*testing.T, []byte) error
+type ResponseFunc func(*httptest.ResponseRecorder, *testing.T, []byte) error
 
 // HTTPTest contains all the parameters for a HTTP Unit Test
 type HTTPTest struct {
@@ -350,7 +350,7 @@ func RunHTTPTest(test HTTPTest, t *testing.T) (string, *testing.T, error) {
 		assert.Nil(t, err)
 	}
 	if test.ResponseFunc != nil {
-		err := test.ResponseFunc(t, body)
+		err := test.ResponseFunc(rr, t, body)
 		assert.Nil(t, err)
 	}
 

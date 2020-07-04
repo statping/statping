@@ -39,7 +39,7 @@ var statpingMailer = &statpingEmailer{&notifications.Notification{
 	Form: []notifications.NotificationForm{{
 		Type:        "email",
 		Title:       "Send to Email Address",
-		Placeholder: "Insert your email address",
+		Placeholder: "info@statping.com",
 		DbField:     "Host",
 		Required:    true,
 	}}},

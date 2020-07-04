@@ -15,7 +15,7 @@
                         <font-awesome-icon icon="paperclip" class="mr-2"/> {{ $t('settings.cache') }}
                     </a>
                     <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-oauth-tab')}" id="v-pills-oauth-tab" data-toggle="pill" href="#v-pills-oauth" role="tab" aria-controls="v-pills-oauth" aria-selected="false">
-                        <font-awesome-icon icon="key" class="mr-2"/> {{ $t('settings.oauth') }} <span class="mt-1 float-right badge badge-light text-dark font-1">{{ $t('settings.beta') }}</span>
+                        <font-awesome-icon icon="key" class="mr-2"/> {{ $t('settings.oauth') }}
                     </a>
 
                     <h6 class="mt-4 text-muted">Notifiers</h6>
@@ -86,13 +86,6 @@
                             </div>
                         </div>
 
-                        <div class="card text-black-50 bg-white mt-3">
-                            <div class="card-header">QR Code for Mobile App</div>
-                            <div class="card-body">
-                                <img class="rounded" width="300" height="300" :src="qrcode">
-                            </div>
-                        </div>
-
                     </div>
 
                     <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-style-tab'), show: liClass('v-pills-style-tab')}" id="v-pills-style" role="tabpanel" aria-labelledby="v-pills-style-tab">
@@ -149,7 +142,6 @@
       data() {
           return {
               tab: "v-pills-home-tab",
-              qrcode: "",
           }
       },
       computed: {
@@ -172,9 +164,6 @@
           this.$store.commit('setCore', c)
           const n = await Api.notifiers()
           this.$store.commit('setNotifiers', n)
-
-          const u = `statping://setup?domain=${c.domain}&api=${c.api_secret}`
-          this.qrcode = "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=" + encodeURIComponent(u)
           this.cache = await Api.cache()
         },
           changeTab(e) {

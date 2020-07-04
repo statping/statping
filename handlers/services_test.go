@@ -10,6 +10,7 @@ import (
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"net/http/httptest"
 	"testing"
 	"time"
 )
@@ -214,7 +215,7 @@ func TestApiServiceRoutes(t *testing.T) {
 			URL:            "/api/services/1/uptime_data" + startEndQuery,
 			Method:         "GET",
 			ExpectedStatus: 200,
-			ResponseFunc: func(t *testing.T, resp []byte) error {
+			ResponseFunc: func(req *httptest.ResponseRecorder, t *testing.T, resp []byte) error {
 				var uptime *services.UptimeSeries
 				if err := json.Unmarshal(resp, &uptime); err != nil {
 					return err

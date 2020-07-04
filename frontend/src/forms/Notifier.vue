@@ -4,17 +4,41 @@
     <div class="card contain-card text-black-50 bg-white mb-3">
         <div class="card-header text-capitalize">
             {{notifier.title}}
-            <span @click="enableToggle" class="switch switch-rd-gr float-right">
-                <input v-model="notifier.enabled" type="checkbox" class="switch-sm" :id="`enable_${notifier.method}`" v-bind:checked="notifier.enabled">
+            <span @click="enableToggle" class="switch switch-sm switch-rd-gr float-right">
+                <input v-model="notifier.enabled" type="checkbox" :id="`enable_${notifier.method}`" v-bind:checked="notifier.enabled">
                 <label class="mb-0" :for="`enable_${notifier.method}`"></label>
             </span>
         </div>
         <div class="card-body">
         <p class="small text-muted" v-html="notifier.description"/>
 
-            <div v-if="notifier.method==='mobile'" class="col-6 offset-3">
-                <img :src="qrcode" class="img-thumbnail">
-                <span class="text-muted small center">Scan this QR Code on the Statping Mobile App for quick setup</span>
+            <div v-if="notifier.method==='mobile'">
+                <div class="form-group row mt-3">
+                    <label for="domain" class="col-sm-4 col-form-label">Statping Domain</label>
+                    <div class="col-sm-8">
+                        <div class="input-group">
+                            <input v-bind:value="$store.getters.core.domain" type="text" class="form-control" id="domain" readonly>
+                            <div class="input-group-append copy-btn">
+                                <button @click.prevent="copy($store.getters.core.domain)" class="btn btn-outline-secondary" type="button">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <div class="form-group row mt-3">
+                <label for="apisecret" class="col-sm-4 col-form-label">API Secret</label>
+                <div class="col-sm-8">
+                    <div class="input-group">
+                        <input v-bind:value="$store.getters.core.api_secret" type="text" class="form-control" id="apisecret" readonly>
+                        <div class="input-group-append copy-btn">
+                            <button @click.prevent="copy($store.getters.core.api_secret)" class="btn btn-outline-secondary" type="button">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <div class="col-12 col-md-6 offset-0 offset-md-3">
+                    <img :src="qrcode" class="img-thumbnail">
+                    <span class="text-muted small center">Scan this QR Code on the Statping Mobile App for quick setup</span>
+                </div>
             </div>
 
         <div v-if="notifier.method!=='mobile'" v-for="(form, index) in notifier.form" v-bind:key="index" class="form-group">
@@ -47,10 +71,11 @@
 
         <div v-if="notifier.data_type" class="card text-black-50 bg-white mb-3">
             <div class="card-header text-capitalize">
+                <font-awesome-icon @click="expanded = !expanded" :icon="expanded ? 'minus' : 'plus'" class="mr-2 pointer"/>
                 {{notifier.title}} Outgoing Request
                 <span class="badge badge-dark float-right text-uppercase mt-1">{{notifier.data_type}}</span>
             </div>
-            <div class="card-body">
+            <div class="card-body" :class="{'d-none': !expanded}">
                 <span class="text-muted d-block mb-3" v-if="notifier.request_info" v-html="notifier.request_info"></span>
 
         <div class="row" v-observe-visibility="visible">
@@ -97,16 +122,16 @@
         <div class="card text-black-50 bg-white mb-3">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-4 col-sm-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
-                        <button @click.prevent="saveNotifier" type="submit" class="btn btn-block text-capitalize btn-primary save-notifier">
-                            <i class="fa fa-check-circle"></i> {{loading ? "Loading..." : saved ? "Saved" : "Save Settings"}}
+                    <div class="col-12 col-sm-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
+                        <button @click.prevent="saveNotifier" :disabled="loading" type="submit" class="btn btn-block text-capitalize btn-primary save-notifier">
+                            <font-awesome-icon v-if="loading" icon="circle-notch" class="mr-2" spin/> {{loading ? "Loading..." : saved ? "Saved" : "Save"}}
                         </button>
                     </div>
-                    <div class="col-4 col-md-4">
+                    <div class="col-12 col-md-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
                         <button @click.prevent="testNotifier('success')" :disabled="loadingTest" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
                             <font-awesome-icon v-if="loadingTest" icon="circle-notch" class="mr-2" spin/>{{loadingTest ? "Loading..." : "Test Success"}}</button>
                     </div>
-                    <div class="col-4 col-md-4">
+                    <div class="col-12 col-md-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
                         <button @click.prevent="testNotifier('failure')" :disabled="loadingTest" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
                             <font-awesome-icon v-if="loadingTest" icon="circle-notch" class="mr-2" spin/>{{loadingTest ? "Loading..." : "Test Failure"}}</button>
                     </div>
@@ -157,6 +182,7 @@ export default {
             request: null,
             success: false,
             saved: false,
+          expanded: false,
           success_data: null,
           failure_data: null,
             form: {},
@@ -226,14 +252,16 @@ export default {
             this.form.enabled = this.notifier.enabled
             this.form.limits = parseInt(this.notifier.limits)
             this.form.method = this.notifier.method
-            this.notifier.form.forEach((f) => {
-              let field = f.field.toLowerCase()
-              let val = this.notifier[field]
-              if (this.isNumeric(val)) {
-                val = parseInt(val)
+              if (this.notifier.form) {
+                this.notifier.form.forEach((f) => {
+                  let field = f.field.toLowerCase()
+                  let val = this.notifier[field]
+                  if (this.isNumeric(val)) {
+                    val = parseInt(val)
+                  }
+                  this.form[field] = val
+                });
               }
-                this.form[field] = val
-            });
           this.form.success_data = this.success_data
           this.form.failure_data = this.failure_data
             await Api.notifier_save(this.form)
@@ -246,14 +274,16 @@ export default {
             this.success = false
             this.loadingTest = true
             this.form.method = this.notifier.method
+          if (this.notifier.form) {
             this.notifier.form.forEach((f) => {
-                let field = f.field.toLowerCase()
-                let val = this.notifier[field]
-                if (this.isNumeric(val)) {
-                    val = parseInt(val)
-                }
-                this.form[field] = val
+              let field = f.field.toLowerCase()
+              let val = this.notifier[field]
+              if (this.isNumeric(val)) {
+                val = parseInt(val)
+              }
+              this.form[field] = val
             });
+          }
             let req = {
               notifier: this.form,
               method: method,

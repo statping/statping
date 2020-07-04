@@ -32,9 +32,20 @@
             </div>
         </div>
         <div class="form-group row">
-            <label class="col-sm-4 col-form-label">{{ $t('close') }}</label>
+            <label class="col-sm-4 col-form-label">Confirm Password</label>
             <div class="col-sm-8">
                 <input v-model="user.confirm_password" type="password" id="password_confirm" class="form-control" placeholder="Confirm Password" required>
+            </div>
+        </div>
+        <div v-if="user.api_key" class="form-group row">
+            <label for="user_key_key" class="col-sm-4 col-form-label">API Key</label>
+            <div class="col-sm-8">
+                <div class="input-group">
+                    <input v-bind:value="user.api_key" type="text" class="form-control" id="user_key_key" readonly>
+                    <div class="input-group-append copy-btn">
+                        <button @click.prevent="copy(user.api_key)" class="btn btn-outline-secondary" type="button">Copy</button>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="form-group row">
@@ -76,7 +87,8 @@
         admin: false,
         email: "",
         password: "",
-        confirm_password: ""
+        confirm_password: "",
+        api_key: "",
       }
     }
   },
