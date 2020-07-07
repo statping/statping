@@ -82,12 +82,8 @@ func (w *webhooker) Select() *notifications.Notification {
 func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 	utils.Log.Infoln(fmt.Sprintf("sending body: '%v' to %v as a %v request", body, w.Host, w.Var1))
 	client := new(http.Client)
-	client.Timeout = time.Duration(10 * time.Second)
-	buf := bytes.NewBuffer(nil)
-	if w.Var2 != "" {
-		buf = bytes.NewBuffer([]byte(body))
-	}
-	req, err := http.NewRequest(w.Var1, w.Host, buf)
+	client.Timeout = 10 * time.Second
+	req, err := http.NewRequest(w.Var1, w.Host, bytes.NewBufferString(body))
 	if err != nil {
 		return nil, err
 	}
@@ -100,6 +96,8 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 	}
 	if w.ApiKey != "" {
 		req.Header.Add("Content-Type", w.ApiKey)
+	} else {
+		req.Header.Add("Content-Type", "application/json")
 	}
 	req.Header.Set("User-Agent", "Statping")
 	req.Header.Set("Statping-Version", utils.Version)
