@@ -88,10 +88,15 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 		return nil, err
 	}
 	if w.ApiSecret != "" {
-		splitArray := strings.Split(w.ApiSecret, ",")
-		for _, a := range splitArray {
-			split := strings.Split(a, "=")
-			req.Header.Add(split[0], split[1])
+		keyVal := strings.SplitN(w.ApiSecret, "=", 2)
+		if len(keyVal) == 2 {
+			if keyVal[0] != "" && keyVal[1] != "" {
+				if strings.ToLower(keyVal[0]) == "host" {
+					req.Host = strings.TrimSpace(keyVal[1])
+				} else {
+					req.Header.Set(keyVal[0], keyVal[1])
+				}
+			}
 		}
 	}
 	if w.ApiKey != "" {

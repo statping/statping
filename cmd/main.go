@@ -96,39 +96,8 @@ func start() {
 		exit(err)
 	}
 
-	if !confgs.Db.HasTable("core") {
-		var srvs int64
-		if confgs.Db.HasTable(&services.Service{}) {
-			confgs.Db.Model(&services.Service{}).Count(&srvs)
-			if srvs > 0 {
-				exit(errors.Wrap(err, "there are already services setup."))
-				return
-			}
-		}
-
-		if err := confgs.DropDatabase(); err != nil {
-			exit(errors.Wrap(err, "error dropping database"))
-		}
-
-		if err := confgs.CreateDatabase(); err != nil {
-			exit(errors.Wrap(err, "error creating database"))
-		}
-
-		if err := configs.CreateAdminUser(confgs); err != nil {
-			exit(errors.Wrap(err, "error creating default admin user"))
-		}
-
-		if utils.Params.GetBool("SAMPLE_DATA") {
-			log.Infoln("Adding Sample Data")
-			if err := configs.TriggerSamples(); err != nil {
-				exit(errors.Wrap(err, "error adding sample data"))
-			}
-		} else {
-			if err := core.Samples(); err != nil {
-				exit(errors.Wrap(err, "error added core details"))
-			}
-		}
-
+	if err = confgs.ResetCore(); err != nil {
+		exit(err)
 	}
 
 	if err = confgs.DatabaseChanges(); err != nil {
