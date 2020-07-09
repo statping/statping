@@ -14,7 +14,7 @@
 
 <script>
     import MiniSparkLine from './MiniSparkLine';
-    import ServiceSparkLine from './ServiceSparkLine';
+    import ServiceSparkLine from '../Dashboard/ServiceSparkLine';
 
     export default {
         name: 'Analytics',

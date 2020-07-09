@@ -82,24 +82,27 @@ func (w *webhooker) Select() *notifications.Notification {
 func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 	utils.Log.Infoln(fmt.Sprintf("sending body: '%v' to %v as a %v request", body, w.Host, w.Var1))
 	client := new(http.Client)
-	client.Timeout = time.Duration(10 * time.Second)
-	buf := bytes.NewBuffer(nil)
-	if w.Var2 != "" {
-		buf = bytes.NewBuffer([]byte(body))
-	}
-	req, err := http.NewRequest(w.Var1, w.Host, buf)
+	client.Timeout = 10 * time.Second
+	req, err := http.NewRequest(w.Var1, w.Host, bytes.NewBufferString(body))
 	if err != nil {
 		return nil, err
 	}
 	if w.ApiSecret != "" {
-		splitArray := strings.Split(w.ApiSecret, ",")
-		for _, a := range splitArray {
-			split := strings.Split(a, "=")
-			req.Header.Add(split[0], split[1])
+		keyVal := strings.SplitN(w.ApiSecret, "=", 2)
+		if len(keyVal) == 2 {
+			if keyVal[0] != "" && keyVal[1] != "" {
+				if strings.ToLower(keyVal[0]) == "host" {
+					req.Host = strings.TrimSpace(keyVal[1])
+				} else {
+					req.Header.Set(keyVal[0], keyVal[1])
+				}
+			}
 		}
 	}
 	if w.ApiKey != "" {
 		req.Header.Add("Content-Type", w.ApiKey)
+	} else {
+		req.Header.Add("Content-Type", "application/json")
 	}
 	req.Header.Set("User-Agent", "Statping")
 	req.Header.Set("Statping-Version", utils.Version)

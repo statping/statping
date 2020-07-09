@@ -10,20 +10,6 @@
 
                     <ServiceTopStats :service="service"/>
 
-                        <div v-if="expanded" class="row">
-                            <Analytics title="Last Failure" :func="stats.total_failures"/>
-                            <Analytics title="Total Failures" :func="stats.total_failures"/>
-                            <Analytics title="Highest Latency" :func="stats.high_latency"/>
-                            <Analytics title="Lowest Latency" :func="stats.lowest_latency"/>
-                            <Analytics title="Total Uptime" :func="stats.high_ping"/>
-                            <Analytics title="Total Downtime" :func="stats.low_ping"/>
-
-                            <div class="col-12">
-                                <router-link :to="serviceLink(service)" class="btn btn-block btn-outline-success mt-4" :class="{'btn-outline-success': service.online, 'btn-outline-danger': !service.online}">
-                                    View More Details
-                                </router-link>
-                            </div>
-                         </div>
                 </div>
             </div>
 

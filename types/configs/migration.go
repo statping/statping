@@ -5,6 +5,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/pkg/errors"
 	"github.com/statping/statping/source"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/utils"
@@ -19,6 +20,39 @@ import (
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/types/users"
 )
+
+func (d *DbConfig) ResetCore() error {
+	if d.Db.HasTable("core") {
+		return nil
+	}
+	var srvs int64
+	if d.Db.HasTable(&services.Service{}) {
+		d.Db.Model(&services.Service{}).Count(&srvs)
+		if srvs > 0 {
+			return errors.New("there are already services setup.")
+		}
+	}
+	if err := d.DropDatabase(); err != nil {
+		return errors.Wrap(err, "error dropping database")
+	}
+	if err := d.CreateDatabase(); err != nil {
+		return errors.Wrap(err, "error creating database")
+	}
+	if err := CreateAdminUser(d); err != nil {
+		return errors.Wrap(err, "error creating default admin user")
+	}
+	if utils.Params.GetBool("SAMPLE_DATA") {
+		log.Infoln("Adding Sample Data")
+		if err := TriggerSamples(); err != nil {
+			return errors.Wrap(err, "error adding sample data")
+		}
+	} else {
+		if err := core.Samples(); err != nil {
+			return errors.Wrap(err, "error added core details")
+		}
+	}
+	return nil
+}
 
 func (d *DbConfig) DatabaseChanges() error {
 	var cr core.Core

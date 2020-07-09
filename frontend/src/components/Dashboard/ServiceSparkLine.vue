@@ -65,7 +65,7 @@
             offsetY: 0,
           },
           x: {
-            show: false,
+            show: true,
           },
           y: {
             formatter: (value) => { return value + " %" },

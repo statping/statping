@@ -1,21 +1,28 @@
 package configs
 
 import (
-	"github.com/statping/statping/types/errors"
+	"errors"
 	"github.com/statping/statping/utils"
 	"gopkg.in/yaml.v2"
 	"os"
 )
 
-func LoadConfigFile(configFile string) (*DbConfig, error) {
+func LoadConfigs(cfgFile string) (*DbConfig, error) {
+	writeAble, err := utils.DirWritable(utils.Directory)
+	if err != nil {
+		return nil, err
+	}
+	if !writeAble {
+		return nil, errors.New("Directory %s is not writable: " + utils.Directory)
+	}
 	p := utils.Params
-	log.Infof("Attempting to read config file at: %s", configFile)
-	p.SetConfigFile(configFile)
+	log.Infof("Attempting to read config file at: %s", cfgFile)
+	p.SetConfigFile(cfgFile)
 	p.SetConfigType("yaml")
 	p.ReadInConfig()
 
 	db := new(DbConfig)
-	content, err := utils.OpenFile(configFile)
+	content, err := utils.OpenFile(cfgFile)
 	if err == nil {
 		if err := yaml.Unmarshal([]byte(content), &db); err != nil {
 			return nil, err
@@ -74,7 +81,7 @@ func LoadConfigFile(configFile string) (*DbConfig, error) {
 		Language:    p.GetString("LANGUAGE"),
 		SendReports: p.GetBool("ALLOW_REPORTS"),
 	}
-	log.WithFields(utils.ToFields(configs)).Debugln("read config file: " + configFile)
+	log.WithFields(utils.ToFields(configs)).Debugln("read config file: " + cfgFile)
 
 	if configs.DbConn == "" {
 		return configs, errors.New("Starting in setup mode")
