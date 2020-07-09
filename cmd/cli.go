@@ -189,9 +189,9 @@ func importCli(args []string) error {
 
 	if exportData.Config != nil {
 		if ask("Create config.yml file from Configs?") {
-			log.Printf("Database User:   %d\n", exportData.Config.DbUser)
-			log.Printf("Database Password:   %d\n", exportData.Config.DbPass)
-			log.Printf("Database Host:   %d\n", exportData.Config.DbHost)
+			log.Printf("Database User:   %s\n", exportData.Config.DbUser)
+			log.Printf("Database Password:   %s\n", exportData.Config.DbPass)
+			log.Printf("Database Host:   %s\n", exportData.Config.DbHost)
 			log.Printf("Database Port:   %d\n", exportData.Config.DbPort)
 			if err := exportData.Config.Save(utils.Directory); err != nil {
 				return err
