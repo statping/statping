@@ -29,14 +29,14 @@ func DirWritable(path string) (bool, error) {
 func Ping(address string, secondsTimeout int) (int64, error) {
 	ping, err := exec.LookPath("ping")
 	if err != nil {
-		return err
+		return 0, err
 	}
 	out, _, err := Command(ping, address, "-n", "1", "-w", strconv.Itoa(secondsTimeout*1000))
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if strings.Contains(out, "Destination Host Unreachable") {
-		return errors.New("destination host unreachable")
+		return 0, errors.New("destination host unreachable")
 	}
 	r := regexp.MustCompile(`Average = (.*)ms`)
 	strs := r.FindStringSubmatch(out)
