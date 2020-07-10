@@ -136,6 +136,8 @@ jobs:
           TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
           TWILIO_TO: ${{ secrets.TWILIO_TO }}
           TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+          GOTIFY_URL: ${{ secrets.GOTIFY_URL }}
+          GOTIFY_TOKEN: ${{ secrets.GOTIFY_TOKEN }}
 
       - name: Coveralls Testing Coverage
         run: |
