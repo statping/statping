@@ -1,5 +1,8 @@
 name: Deploy Master Release
-on: deployment
+on:
+  push:
+    tags:
+      - 'v*.*.*'
 
 jobs:
   docker-release:
