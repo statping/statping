@@ -3917,7 +3917,7 @@
 									"",
 									"pm.test(\"View All Notifiers\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.length).to.eql(11);",
+									"    pm.expect(jsonData.length).to.eql(12);",
 									"});"
 								],
 								"type": "text/javascript"
