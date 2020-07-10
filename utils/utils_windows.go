@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -25,7 +26,7 @@ func DirWritable(path string) (bool, error) {
 	return true, nil
 }
 
-func Ping(address string, secondsTimeout int) error {
+func Ping(address string, secondsTimeout int) (int64, error) {
 	ping, err := exec.LookPath("ping")
 	if err != nil {
 		return err
@@ -37,5 +38,11 @@ func Ping(address string, secondsTimeout int) error {
 	if strings.Contains(out, "Destination Host Unreachable") {
 		return errors.New("destination host unreachable")
 	}
-	return nil
+	r := regexp.MustCompile(`Average = (.*)ms`)
+	strs := r.FindStringSubmatch(out)
+	if len(strs) < 2 {
+		return 0, errors.New("could not parse ping duration")
+	}
+	f, _ := strconv.ParseFloat(strs[1], 64)
+	return int64(f * 1000), nil
 }
