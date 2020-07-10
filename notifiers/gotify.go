@@ -27,7 +27,7 @@ var Gotify = &gotify{&notifications.Notification{
 	Description: "Use Gotify to receive push notifications. Add your Gotify URL and App Token to receive notifications.",
 	Author:      "Hugo van Rijswijk",
 	AuthorUrl:   "https://github.com/hugo-vrijswijk",
-	Icon:        "fa dot-circle",
+	Icon:        "broadcast-tower",
 	Delay:       time.Duration(5 * time.Second),
 	Limits:      60,
 	SuccessData: `{"title": "{{.Service.Name}}", "message": "Your service '{{.Service.Name}}' is currently online!", "priority": 2}`,

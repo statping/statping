@@ -123,6 +123,8 @@ export default Vue.mixin({
           return "bell"
         case "fas fa-mobile-alt":
           return "mobile"
+        case "fa dot-circle":
+          return ["fa", "dot-circle"]
         case "fas envelope-square":
           return ["fas", "envelope-square"]
         case "fab fa-slack":
