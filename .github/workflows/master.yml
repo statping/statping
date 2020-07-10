@@ -429,7 +429,7 @@ jobs:
       - name: Docker Buildx (push)
         run: |
           docker buildx create --use
-          docker buildx build --tag=statping/statping:latest,statping/statping:v${VERSION} --build-arg=VERSION=${VERSION} --platform=linux/amd64,linux/386,linux/arm64,linux/arm/v7 --output type=image,name=docker.io/statping/statping,push=true .
+          docker buildx build --tag=statping/statping:latest --tag=statping/statping:v${VERSION} --build-arg=VERSION=${VERSION} --platform=linux/amd64,linux/386,linux/arm64,linux/arm/v7 --output type=image,name=docker.io/statping/statping,push=true .
 
   sentry-release:
     needs: upload-release

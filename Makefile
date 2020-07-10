@@ -333,7 +333,7 @@ certs:
 
 buildx:
 	docker buildx create --use
-	docker buildx build --tag=statping/statping:dev --build-arg=VERSION=${VERSION} --platform=linux/amd64,linux/386,linux/arm64,linux/arm/v7 --output type=image,name=docker.io/statping/statping,push=true .
+	docker buildx build --tag=statping/statping:latest --tag=statping/statping:v${VERSION} --build-arg=VERSION=${VERSION} --platform=linux/amd64,linux/386,linux/arm64,linux/arm/v7 --output type=image,name=docker.io/statping/statping,push=true .
 
 .PHONY: all build build-all buildx build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds
