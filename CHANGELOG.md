@@ -1,3 +1,9 @@
+# 0.90.58 (07-09-2020)
+- Fixed ICMP latency/ping durations
+- Fixed webhook notifier
+- Modified file structure for Vue admin dashboard components.
+- Added Gotify notifier
+
 # 0.90.57 (07-04-2020)
 - Fixed login issue
 

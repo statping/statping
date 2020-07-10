@@ -21,18 +21,6 @@ func ConnectConfigs(configs *DbConfig, retry bool) error {
 	return nil
 }
 
-func LoadConfigs(cfgFile string) (*DbConfig, error) {
-	writeAble, err := utils.DirWritable(utils.Directory)
-	if err != nil {
-		return nil, err
-	}
-	if !writeAble {
-		return nil, errors.Errorf("Directory %s is not writable!", utils.Directory)
-	}
-
-	return LoadConfigFile(cfgFile)
-}
-
 func findDbFile(configs *DbConfig) (string, error) {
 	location := utils.Directory + "/" + SqliteFilename
 	if configs == nil {

@@ -23,7 +23,7 @@
 </template>
 
 <script>
-  const ServiceInfo = () => import('@/components/Service/ServiceInfo')
+  const ServiceInfo = () => import('@/components/Dashboard/ServiceInfo')
 
   export default {
       name: 'DashboardIndex',

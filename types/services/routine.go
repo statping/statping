@@ -91,14 +91,21 @@ func CheckIcmp(s *Service, record bool) (*Service, error) {
 	timer := prometheus.NewTimer(metrics.ServiceTimer(s.Name))
 	defer timer.ObserveDuration()
 
-	if err := utils.Ping(s.Domain, s.Timeout); err != nil {
+	dur, err := utils.Ping(s.Domain, s.Timeout)
+	if err != nil {
 		if record {
 			recordFailure(s, fmt.Sprintf("Could not send ICMP to service %v, %v", s.Domain, err))
 		}
 		return s, err
 	}
+
+	s.PingTime = dur
+	s.Latency = dur
 	s.LastResponse = ""
 	s.Online = true
+	if record {
+		recordSuccess(s)
+	}
 	return s, nil
 }
 

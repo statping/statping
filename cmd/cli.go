@@ -153,8 +153,10 @@ func onceCli() error {
 func importCli(args []string) error {
 	var err error
 	var data []byte
-	filename := args[1]
-	if data, err = ioutil.ReadFile(filename); err != nil {
+	if len(args) < 1 {
+		return errors.New("invalid command arguments")
+	}
+	if data, err = ioutil.ReadFile(args[0]); err != nil {
 		return err
 	}
 	var exportData ExportData
@@ -162,11 +164,40 @@ func importCli(args []string) error {
 		return err
 	}
 	log.Printf("=== %s ===\n", exportData.Core.Name)
-	log.Printf("Services:   %d\n", len(exportData.Services))
-	log.Printf("Checkins:   %d\n", len(exportData.Checkins))
-	log.Printf("Groups:     %d\n", len(exportData.Groups))
-	log.Printf("Messages:   %d\n", len(exportData.Messages))
-	log.Printf("Users:      %d\n", len(exportData.Users))
+	if exportData.Config != nil {
+		log.Printf("Configs:     %s\n", exportData.Config.DbConn)
+		if exportData.Config.DbUser != "" {
+			log.Printf("   - Host:   %s\n", exportData.Config.DbHost)
+			log.Printf("   - User:   %s\n", exportData.Config.DbUser)
+		}
+	}
+	if len(exportData.Services) > 0 {
+		log.Printf("Services:   %d\n", len(exportData.Services))
+	}
+	if len(exportData.Checkins) > 0 {
+		log.Printf("Checkins:   %d\n", len(exportData.Checkins))
+	}
+	if len(exportData.Groups) > 0 {
+		log.Printf("Groups:     %d\n", len(exportData.Groups))
+	}
+	if len(exportData.Messages) > 0 {
+		log.Printf("Messages:   %d\n", len(exportData.Messages))
+	}
+	if len(exportData.Users) > 0 {
+		log.Printf("Users:      %d\n", len(exportData.Users))
+	}
+
+	if exportData.Config != nil {
+		if ask("Create config.yml file from Configs?") {
+			log.Printf("Database Host:   	%s\n", exportData.Config.DbHost)
+			log.Printf("Database Port:   	%d\n", exportData.Config.DbPort)
+			log.Printf("Database User:   	%s\n", exportData.Config.DbUser)
+			log.Printf("Database Password:   %s\n", exportData.Config.DbPass)
+			if err := exportData.Config.Save(utils.Directory); err != nil {
+				return err
+			}
+		}
+	}
 
 	config, err := configs.LoadConfigs(configFile)
 	if err != nil {
@@ -175,8 +206,10 @@ func importCli(args []string) error {
 	if err = configs.ConnectConfigs(config, false); err != nil {
 		return err
 	}
-	if data, err = ExportSettings(); err != nil {
-		return fmt.Errorf("could not export settings: %v", err.Error())
+	if ask("Create database rows and sample data?") {
+		if err := config.ResetCore(); err != nil {
+			return err
+		}
 	}
 
 	if ask("Import Core settings?") {
@@ -221,7 +254,7 @@ func importCli(args []string) error {
 		if ask(fmt.Sprintf("Import User '%s'?", s.Username)) {
 			s.Id = 0
 			if err := s.Create(); err != nil {
-				return err
+				log.Errorln(err)
 			}
 		}
 	}
@@ -376,6 +409,7 @@ type gitUploader struct {
 // ExportChartsJs renders the charts for the index page
 
 type ExportData struct {
+	Config    *configs.DbConfig   `json:"config"`
 	Core      *core.Core          `json:"core"`
 	Services  []services.Service  `json:"services"`
 	Messages  []*messages.Message `json:"messages"`
@@ -403,7 +437,14 @@ func ExportSettings() ([]byte, error) {
 		s.Failures = nil
 		srvs = append(srvs, s)
 	}
+
+	cfg, err := configs.LoadConfigs(configFile)
+	if err != nil {
+		return nil, err
+	}
+
 	data := ExportData{
+		Config:    cfg,
 		Core:      c,
 		Notifiers: core.App.Notifications,
 		Checkins:  checkins.All(),

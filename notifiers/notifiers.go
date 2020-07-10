@@ -32,6 +32,7 @@ func InitNotifiers() {
 		Mobile,
 		Pushover,
 		statpingMailer,
+		Gotify,
 	)
 }
 

@@ -1,0 +1,29 @@
+name: Deploy Master Release
+on: deployment
+
+jobs:
+  docker-release:
+    needs: upload-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Statping Repo
+        uses: actions/checkout@v2
+
+      - name: Setting ENV's
+        run: echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
+      - name: Set up Docker Buildx
+        uses: crazy-max/ghaction-docker-buildx@v3
+
+      - name: Docker Login
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
+
+      - name: Docker Buildx (push)
+        run: |
+          docker buildx create --use
+          docker buildx build --tag=statping/statping,statping/statping:v${VERSION} --build-arg=VERSION=${VERSION} --platform=linux/amd64,linux/386,linux/arm64,linux/arm/v7 --output type=image,name=docker.io/statping/statping,push=true .
+
