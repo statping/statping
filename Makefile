@@ -345,8 +345,7 @@ buildx-dev:
 buildx-base:
 	docker buildx create --name statping-base
 	docker buildx use statping-base
-	docker buildx build --file=Dockerfile.base --tag=statping/statping:base --build-arg=VERSION=${VERSION} --build-arg=NODEIMAGE=node:${NODE_VERSION}-alpine --platform=linux/amd64,linux/arm/v7,linux/arm64 .
-	docker buildx build --file=Dockerfile.base --tag=statping/statping:base --build-arg=VERSION=${VERSION} --build-arg=NODEIMAGE=i386/node:${NODE_VERSION}-alpine --platform=linux/386 --push .
+	docker buildx build --file=Dockerfile.base --tag=statping/statping:base --build-arg=VERSION=${VERSION} --build-arg=NODEIMAGE=node:${NODE_VERSION}-alpine --platform=linux/amd64,linux/arm/v7,linux/arm64 --push .
 
-.PHONY: all build build-all buildx build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
+.PHONY: all build build-all buildx-base buildx-dev buildx-master build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds
