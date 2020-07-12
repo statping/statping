@@ -329,4 +329,6 @@ jobs:
       - name: Docker Buildx (push)
         run: |
           docker buildx create --use
+          docker buildx build --file=Dockerfile.base --tag=statping/statping:base --build-arg=VERSION=${VERSION} --build-arg=NODEIMAGE=node:10.17.0-alpine --platform=linux/arm64,linux/amd64,linux/arm/v7 --output type=image,name=docker.io/statping/statping,push=false --no-cache .
+          docker buildx build --file=Dockerfile.base --tag=statping/statping:base --build-arg=VERSION=${VERSION} --build-arg=NODEIMAGE=i386/node:10.17.0-alpine --platform=linux/386 --output type=image,name=docker.io/statping/statping,push=false --no-cache .
           docker buildx build --tag=statping/statping:dev --build-arg=VERSION=${VERSION} --platform=linux/amd64,linux/386,linux/arm64,linux/arm/v7 --output type=image,name=docker.io/statping/statping,push=true .
