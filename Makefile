@@ -334,9 +334,9 @@ certs:
 
 buildx:
 	docker buildx create --use
-	docker buildx build --file=Dockerfile.base --tag=statping/statping:base --build-arg=VERSION=${VERSION} --build-arg=NODEIMAGE=node:${NODE_VERSION}-alpine --platform=linux/arm64,linux/amd64,linux/arm/v7 --output type=image,name=docker.io/statping/statping,push=true --no-cache .
-	docker buildx build --file=Dockerfile.base --tag=statping/statping:base --build-arg=VERSION=${VERSION} --build-arg=NODEIMAGE=i386/node:${NODE_VERSION}-alpine --platform=linux/386 --output type=image,name=docker.io/statping/statping,push=true --no-cache .
-	docker buildx build --tag=statping/statping:latest --tag=statping/statping:v${VERSION} --tag=statping/statping:dev --build-arg=VERSION=${VERSION} --platform=linux/amd64,linux/386,linux/arm64,linux/arm/v7 --output type=image,name=docker.io/statping/statping,push=true .
+	docker buildx build --file=Dockerfile.base --tag=statping/statping:base --build-arg=VERSION=${VERSION} --build-arg=NODEIMAGE=node:${NODE_VERSION}-alpine --platform=linux/arm64,linux/amd64,linux/arm/v7 --output type=image,name=docker.io/statping/statping --push --no-cache .
+	docker buildx build --file=Dockerfile.base --tag=statping/statping:base --build-arg=VERSION=${VERSION} --build-arg=NODEIMAGE=i386/node:${NODE_VERSION}-alpine --platform=linux/386 --output type=image,name=docker.io/statping/statping --push --no-cache .
+	docker buildx build --tag=statping/statping:latest --tag=statping/statping:v${VERSION} --tag=statping/statping:dev --build-arg=VERSION=${VERSION} --platform=linux/amd64,linux/386,linux/arm64,linux/arm/v7 --output type=image,name=docker.io/statping/statping --push .
 
 .PHONY: all build build-all buildx build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds
