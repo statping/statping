@@ -335,17 +335,17 @@ certs:
 buildx-master:
 	docker buildx create --name statping-master
 	docker buildx use statping-master
-	docker buildx build --tag=statping/statping:latest --tag=statping/statping:v${VERSION} --tag=statping/statping:dev --build-arg=VERSION=${VERSION} --platform=linux/amd64,linux/386,linux/arm64,linux/arm/v7 --push .
+	docker buildx build --tag=statping/statping:latest --tag=statping/statping:v${VERSION} --tag=statping/statping:dev --build-arg=VERSION=${VERSION} --platform=linux/amd64,linux/386,linux/arm64,linux/arm/v7 --push --driver=docker-container .
 
 buildx-dev:
 	docker buildx create --name statping-dev
 	docker buildx use statping-dev
-	docker buildx build --tag=statping/statping:dev --build-arg=VERSION=${VERSION} --platform=linux/amd64,linux/386,linux/arm64,linux/arm/v7 --push .
+	docker buildx build --tag=statping/statping:dev --build-arg=VERSION=${VERSION} --platform=linux/amd64,linux/386,linux/arm64,linux/arm/v7 --push --driver=docker-container .
 
 buildx-base:
 	docker buildx create --name statping-base
 	docker buildx use statping-base
-	docker buildx build --file=Dockerfile.base --tag=statping/statping:base --build-arg=VERSION=${VERSION} --build-arg=NODEIMAGE=node:${NODE_VERSION}-alpine --platform=linux/amd64,linux/arm/v7,linux/arm64 --push .
+	docker buildx build --file=Dockerfile.base --tag=statping/statping:base --build-arg=VERSION=${VERSION} --build-arg=NODEIMAGE=node:${NODE_VERSION}-alpine --platform=linux/amd64,linux/arm/v7,linux/arm64 --push --driver=docker-container .
 
 .PHONY: all build build-all buildx-base buildx-dev buildx-master build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds
