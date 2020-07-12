@@ -1,4 +1,7 @@
-FROM node:10.17.0 AS frontend
+ARG NODEIMAGE=node:10.17.0-alpine
+FROM --platform=$BUILDPLATFORM $NODEIMAGE AS frontend
+LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
+ARG BUILDPLATFORM
 RUN npm install yarn -g
 WORKDIR /statping
 COPY ./frontend/package.json .
@@ -7,12 +10,12 @@ RUN yarn install --pure-lockfile --network-timeout 1000000
 COPY ./frontend .
 RUN yarn build && yarn cache clean
 
-
 # Statping Golang BACKEND building from source
 # Creates "/go/bin/statping" and "/usr/local/bin/sass" for copying
-FROM golang:1.14-alpine AS backend
+FROM --platform=$BUILDPLATFORM golang:1.14-alpine AS backend
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG VERSION
+ARG BUILDPLATFORM
 RUN apk add --update --no-cache libstdc++ gcc g++ make git ca-certificates linux-headers wget curl jq && \
     update-ca-certificates
 RUN curl -L -s https://assets.statping.com/sass -o /usr/local/bin/sass && \

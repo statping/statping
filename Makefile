@@ -3,6 +3,7 @@ SIGN_KEY=B76D61FAA6DB759466E83D9964B9C6AAE2D55278
 BINARY_NAME=statping
 GOBUILD=go build -a
 GOVERSION=1.14.0
+NODE_VERSION=10.17.0
 XGO=xgo -go $(GOVERSION) --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
 TRVIS_SECRET=O3/2KTOV8krv+yZ1EB/7D1RQRe6NdpFUEJNJkMS/ollYqmz3x2mCO7yIgIJKCKguLXZxjM6CxJcjlCrvUwibL+8BBp7xJe4XFIOrjkPvbbVPry4HkFZCf2GfcUK6o4AByQ+RYqsW2F17Fp9KLQ1rL3OT3eLTwCAGKx3tlY8y+an43zkmo5dN64V6sawx26fh6XTfww590ey+ltgQTjf8UPNup2wZmGvMo9Hwvh/bYR/47bR6PlBh6vhlKWyotKf2Fz1Bevbu0zc35pee5YlsrHR+oSF+/nNd/dOij34BhtqQikUR+zQVy9yty8SlmneVwD3yOENvlF+8roeKIXb6P6eZnSMHvelhWpAFTwDXq2N3d/FIgrQtLxsAFTI3nTHvZgs6OoTd6dA0wkhuIGLxaL3FOeztCdxP5J/CQ9GUcTvifh5ArGGwYxRxQU6rTgtebJcNtXFISP9CEUR6rwRtb6ax7h6f1SbjUGAdxt+r2LbEVEk4ZlwHvdJ2DtzJHT5DQtLrqq/CTUgJ8SJFMkrJMp/pPznKhzN4qvd8oQJXygSXX/gz92MvoX0xgpNeLsUdAn+PL9KketfR+QYosBz04d8k05E+aTqGaU7FUCHPTLwlOFvLD8Gbv0zsC/PWgSLXTBlcqLEz5PHwPVHTcVzspKj/IyYimXpCSbvu1YOIjyc=
@@ -333,7 +334,9 @@ certs:
 
 buildx:
 	docker buildx create --use
-	docker buildx build --tag=statping/statping:latest --tag=statping/statping:v${VERSION} --build-arg=VERSION=${VERSION} --platform=linux/amd64,linux/386,linux/arm64,linux/arm/v7 --output type=image,name=docker.io/statping/statping,push=true .
+	docker buildx build --file=Dockerfile.base --tag=statping/statping:base --build-arg=VERSION=${VERSION} --build-arg=NODEIMAGE=node:${NODE_VERSION}-alpine --platform=linux/arm64,linux/amd64,linux/arm/v7 --output type=image,name=docker.io/statping/statping,push=true --no-cache .
+	docker buildx build --file=Dockerfile.base --tag=statping/statping:base --build-arg=VERSION=${VERSION} --build-arg=NODEIMAGE=i386/node:${NODE_VERSION}-alpine --platform=linux/386 --output type=image,name=docker.io/statping/statping,push=true --no-cache .
+	docker buildx build --tag=statping/statping:latest --tag=statping/statping:v${VERSION} --tag=statping/statping:dev --build-arg=VERSION=${VERSION} --platform=linux/amd64,linux/386,linux/arm64,linux/arm/v7 --output type=image,name=docker.io/statping/statping,push=true .
 
 .PHONY: all build build-all buildx build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds
