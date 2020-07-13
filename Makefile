@@ -335,19 +335,19 @@ certs:
 buildx-master: buildx-base
 	docker buildx create --name statping-latest
 	docker buildx inspect --builder statping-latest --bootstrap
-	docker buildx build --builder statping-latest --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7 -f Dockerfile -t statping/statping:latest -t statping/statping:v${VERSION} --build-arg=VERSION=${VERSION} .
+	docker buildx build --builder statping-latest --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t statping/statping:latest -t statping/statping:v${VERSION} --build-arg=VERSION=${VERSION} .
 	docker buildx rm statping-latest
 
 buildx-dev: buildx-base
 	docker buildx create --name statping-dev
 	docker buildx inspect --builder statping-dev --bootstrap
-	docker buildx build --builder statping-dev --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7 -f Dockerfile -t statping/statping:dev --build-arg=VERSION=${VERSION} .
+	docker buildx build --builder statping-dev --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t statping/statping:dev --build-arg=VERSION=${VERSION} .
 	docker buildx rm statping-dev
 
 buildx-base: multiarch
 	docker buildx create --name statping-base
 	docker buildx inspect --builder statping-base --bootstrap
-	docker buildx build --builder statping-base --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7 -f Dockerfile.base -t statping/statping:base --build-arg=VERSION=${VERSION} .
+	docker buildx build --builder statping-base --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile.base -t statping/statping:base --build-arg=VERSION=${VERSION} .
 	docker buildx rm statping-base
 
 multiarch:

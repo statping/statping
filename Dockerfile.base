@@ -1,4 +1,3 @@
-ARG NODEIMAGE=node:10.17.0-alpine
 FROM node:10.17.0-alpine AS frontend
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG BUILDPLATFORM

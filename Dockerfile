@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM statping/statping:base AS base
+FROM statping/statping:base AS base
 ARG BUILDPLATFORM
 # Statping main Docker image that contains all required libraries
 FROM --platform=$BUILDPLATFORM alpine:latest
