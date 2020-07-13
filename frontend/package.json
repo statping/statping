@@ -64,7 +64,6 @@
     "compression-webpack-plugin": "~2.0",
     "cross-env": "^7.0.2",
     "css-loader": "~2.1",
-    "cypress": "^4.3.0",
     "eslint": "~5.16",
     "eslint-config-standard": "~10.2",
     "eslint-friendly-formatter": "~3.0",

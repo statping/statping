@@ -1,5 +1,5 @@
 ARG NODEIMAGE=node:10.17.0-alpine
-FROM --platform=$BUILDPLATFORM $NODEIMAGE AS frontend
+FROM node:10.17.0-alpine AS frontend
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG BUILDPLATFORM
 RUN npm install yarn -g
@@ -12,7 +12,7 @@ RUN yarn build && yarn cache clean
 
 # Statping Golang BACKEND building from source
 # Creates "/go/bin/statping" and "/usr/local/bin/sass" for copying
-FROM --platform=$BUILDPLATFORM golang:1.14-alpine AS backend
+FROM golang:1.14-alpine AS backend
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG VERSION
 ARG BUILDPLATFORM
