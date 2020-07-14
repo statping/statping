@@ -332,13 +332,13 @@ certs:
 	  -keyout key.pem \
 	  -subj "/C=US/ST=California/L=Santa Monica/O=Statping/OU=Development/CN=localhost"
 
-buildx-master: buildx-base
+buildx-latest: multiarch
 	docker buildx create --name statping-latest
 	docker buildx inspect --builder statping-latest --bootstrap
 	docker buildx build --builder statping-latest --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t statping/statping:latest -t statping/statping:v${VERSION} --build-arg=VERSION=${VERSION} .
 	docker buildx rm statping-latest
 
-buildx-dev: buildx-base
+buildx-dev: multiarch
 	docker buildx create --name statping-dev
 	docker buildx inspect --builder statping-dev --bootstrap
 	docker buildx build --builder statping-dev --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t statping/statping:dev --build-arg=VERSION=${VERSION} .
@@ -353,5 +353,5 @@ buildx-base: multiarch
 multiarch:
 	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
-.PHONY: all build multiarch build-all buildx-base buildx-dev buildx-master build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
+.PHONY: all build multiarch build-all buildx-base buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds

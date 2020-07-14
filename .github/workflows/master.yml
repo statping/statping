@@ -426,8 +426,11 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
 
-      - name: Docker Buildx (push)
-        run: make buildx-master
+      - name: Docker Build :base
+        run: make buildx-base
+
+      - name: Docker Build :lastest
+        run: make buildx-latest
 
   sentry-release:
     needs: upload-release
