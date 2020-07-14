@@ -83,7 +83,7 @@
                     </router-link>
                 </div>
                 <div class="col-12 col-md-3 mb-2 mb-md-0 mt-0 mt-md-1">
-                    <span class="text-black-50 float-md-right">
+                    <span class="float-md-right">
                         {{$t('uptime', [service.online_7_days])}}
                     </span>
                 </div>
@@ -147,7 +147,8 @@
           }
         },
         async getUptime() {
-          this.uptime = await Api.service_uptime(this.service.id)
+          const start = this.nowSubtract(3 * 86400)
+          this.uptime = await Api.service_uptime(this.service.id, this.toUnix(start), this.toUnix(this.now()))
         },
         async loadInfo() {
           this.set1 = await this.getHits(24 * 7, "6h")

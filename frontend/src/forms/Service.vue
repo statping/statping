@@ -1,6 +1,6 @@
 <template>
     <form v-if="service.type" @submit.prevent="saveService">
-        <div class="card contain-card text-black-50 bg-white mb-4">
+        <div class="card contain-card mb-4">
             <div class="card-header">{{ $t('service.info') }}</div>
             <div class="card-body">
         <div class="form-group row">
@@ -67,7 +67,7 @@
             </div>
         </div>
 
-        <div class="card contain-card text-black-50 bg-white mb-4">
+        <div class="card contain-card mb-4">
             <div class="card-header">Request Details</div>
             <div class="card-body">
 
@@ -202,7 +202,7 @@
             </div>
         </div>
 
-        <div class="card contain-card text-black-50 bg-white mb-4">
+        <div class="card contain-card mb-4">
             <div class="card-header">Notification Options</div>
             <div class="card-body">
 

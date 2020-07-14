@@ -1,6 +1,6 @@
 <template>
     <form @submit.prevent="saveOAuth">
-        <div class="card text-black-50 bg-white mb-3">
+        <div class="card mb-3">
             <div class="card-header">
                 Internal Login
                 <span @click="local_enabled = !!local_enabled" class="switch switch-sm switch-rd-gr float-right">
@@ -12,7 +12,7 @@
                 Use Statping's default authentication to allow users you've created to login.
             </div>
         </div>
-        <div class="card text-black-50 bg-white mb-3">
+        <div class="card mb-3">
             <div class="card-header text-capitalize">
                 <font-awesome-icon @click="expanded.github = !expanded.github" :icon="expanded.github ? 'minus' : 'plus'" class="mr-2 pointer"/>
                 Github Settings
@@ -69,7 +69,7 @@
                 </div>
             </div>
         </div>
-        <div class="card text-black-50 bg-white mb-3">
+        <div class="card mb-3">
             <div class="card-header">
                 <font-awesome-icon @click="expanded.google = !expanded.google" :icon="expanded.google ? 'minus' : 'plus'" class="mr-2 pointer"/>
                 Google Settings
@@ -113,7 +113,7 @@
                 </div>
             </div>
         </div>
-        <div class="card text-black-50 bg-white mb-3">
+        <div class="card mb-3">
             <div class="card-header">
                 <font-awesome-icon @click="expanded.slack = !expanded.slack" :icon="expanded.slack ? 'minus' : 'plus'" class="mr-2 pointer"/>
                 Slack Settings
@@ -165,7 +165,7 @@
             </div>
         </div>
 
-        <div class="card text-black-50 bg-white mb-3">
+        <div class="card mb-3">
             <div class="card-header">
                 <font-awesome-icon @click="expanded.custom = !expanded.custom" :icon="expanded.custom ? 'minus' : 'plus'" class="mr-2 pointer"/>
                 Custom oAuth Settings

@@ -1,5 +1,5 @@
 <template>
-    <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
+    <div class="container col-md-7 col-sm-12 mt-md-5">
         <TopNav :admin="admin"/>
         <router-view :admin="admin"/>
     </div>

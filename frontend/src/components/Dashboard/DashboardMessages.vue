@@ -1,6 +1,6 @@
 <template>
   <div class="col-12">
-    <div class="card contain-card text-black-50 bg-white mb-4">
+    <div class="card contain-card mb-4">
       <div class="card-header">{{ $t('top_nav.announcements') }}</div>
       <div class="card-body pt-0">
         <table class="table table-striped">

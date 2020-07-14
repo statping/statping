@@ -1,5 +1,5 @@
 <template>
-    <div class="card-body bg-light pt-3">
+    <div class="card-body pt-3">
 
         <div v-if="updates.length===0" class="alert alert-link text-danger">
             No updates found, create a new Incident Update below.

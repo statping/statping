@@ -53,7 +53,9 @@ export default {
             name: "",
             interval: 60,
             grace: 60,
-            service_id: 0
+            service_id: 0,
+            hits: [],
+            failures: []
           }
         }
     },
