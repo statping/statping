@@ -3,6 +3,7 @@ snap
 prime
 stage
 parts
+certs
 releases
 core/rice-box.go
 config.yml

@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/statping/statping/source"
+	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/utils"
 	"net/http"
 	"net/http/pprof"
@@ -190,5 +191,9 @@ func resetRouter() {
 }
 
 func resetCookies() {
-	jwtKey = []byte(utils.NewSHA256Hash())
+	if core.App == nil {
+		jwtKey = []byte(utils.NewSHA256Hash())
+		return
+	}
+	jwtKey = []byte(utils.Sha256Hash(core.App.ApiSecret))
 }

@@ -9,10 +9,11 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fatih/structs v1.1.0
+	github.com/foomo/simplecert v1.7.5
+	github.com/foomo/tlsconfig v0.0.0-20180418120404-b67861b076c9
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/getsentry/sentry-go v0.5.1
 	github.com/go-mail/mail v2.3.1+incompatible
-	github.com/golang/protobuf v1.3.5 // indirect
 	github.com/gorilla/mux v1.7.4
 	github.com/gorilla/securecookie v1.1.1
 	github.com/hako/durafmt v0.0.0-20200605151348-3a43fc422dd9
@@ -22,9 +23,9 @@ require (
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/pelletier/go-toml v1.7.0 // indirect
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v0.9.3
+	github.com/prometheus/client_golang v1.1.0
 	github.com/russross/blackfriday/v2 v2.0.1
-	github.com/sirupsen/logrus v1.4.2
+	github.com/sirupsen/logrus v1.5.0
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/cobra v1.0.0
@@ -33,12 +34,10 @@ require (
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.5.1
 	github.com/t-tiger/gorm-bulk-insert/v2 v2.0.1
-	golang.org/x/crypto v0.0.0-20200406173513-056763e48d71
-	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b // indirect
-	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
-	golang.org/x/sys v0.0.0-20200413165638-669c56c373c4 // indirect
+	golang.org/x/crypto v0.0.0-20200420201142-3c4aac89819a
+	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/text v0.3.2 // indirect
-	google.golang.org/grpc v1.28.0
+	google.golang.org/grpc v1.28.1
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/ini.v1 v1.55.0 // indirect
 	gopkg.in/mail.v2 v2.3.1 // indirect
