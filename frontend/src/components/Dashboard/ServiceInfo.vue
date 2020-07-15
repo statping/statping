@@ -147,7 +147,8 @@
           }
         },
         async getUptime() {
-          this.uptime = await Api.service_uptime(this.service.id)
+          const start = this.nowSubtract(3 * 86400)
+          this.uptime = await Api.service_uptime(this.service.id, this.toUnix(start), this.toUnix(this.now()))
         },
         async loadInfo() {
           this.set1 = await this.getHits(24 * 7, "6h")
