@@ -52,6 +52,7 @@ func InitEnvs() {
 	Params.SetDefault("LETSENCRYPT_HOST", "")
 	Params.SetDefault("LETSENCRYPT_EMAIL", "")
 	Params.SetDefault("LETSENCRYPT_LOCAL", false)
+	Params.SetDefault("LETSENCRYPT_ENABLE", false)
 	Params.SetDefault("LOGS_MAX_COUNT", 5)
 	Params.SetDefault("LOGS_MAX_AGE", 28)
 	Params.SetDefault("LOGS_MAX_SIZE", 16)

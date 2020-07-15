@@ -1,3 +1,6 @@
+# 0.90.60 (07-15-2020)
+- Added LETSENCRYPT_ENABLE (boolean) env to enable/disable letsencrypt SSL
+
 # 0.90.59 (07-14-2020)
 - Added LetsEncrypt SSL Generator by using LETSENCRYPT_HOST and LETSENCRYPT_EMAIL envs.
 - Modified JWT token key to be sha256 of API Secret
