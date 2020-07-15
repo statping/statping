@@ -1,10 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"io"
 	"os"
+	"os/exec"
 )
 
 var rootCmd = &cobra.Command{
@@ -12,6 +15,45 @@ var rootCmd = &cobra.Command{
 	Short: "A simple Application Status Monitor that is opensource and lightweight.",
 	Run: func(cmd *cobra.Command, args []string) {
 		start()
+	},
+}
+
+var updateCmd = &cobra.Command{
+	Use:   "update",
+	Short: "Update to the latest version",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		log.Infoln("Updating Statping to the latest version...")
+		curl, err := exec.LookPath("curl")
+		if err != nil {
+			return err
+		}
+		bash, err := exec.LookPath("bash")
+		if err != nil {
+			return err
+		}
+
+		ree := bytes.NewBuffer(nil)
+
+		c1 := exec.Command(curl, "-o-", "-L", "https://statping.com/install.sh")
+		c2 := exec.Command(bash)
+
+		r, w := io.Pipe()
+		c1.Stdout = w
+		c2.Stdin = r
+
+		var b2 bytes.Buffer
+		c2.Stdout = &b2
+
+		c1.Start()
+		c2.Start()
+		c1.Wait()
+		w.Close()
+		c2.Wait()
+		io.Copy(ree, &b2)
+
+		log.Infoln(ree.String())
+		os.Exit(0)
+		return nil
 	},
 }
 

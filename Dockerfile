@@ -1,7 +1,7 @@
 FROM statping/statping:base AS base
-
+ARG BUILDPLATFORM
 # Statping main Docker image that contains all required libraries
-FROM alpine:latest
+FROM --platform=$BUILDPLATFORM alpine:latest
 RUN apk --no-cache add libgcc libstdc++ ca-certificates curl jq && update-ca-certificates
 
 COPY --from=base /go/bin/statping /usr/local/bin/
