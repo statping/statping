@@ -398,7 +398,8 @@ jobs:
           files: |
             builds/statping-linux-386.tar.gz
             builds/statping-linux-amd64.tar.gz
-            builds/statping-linux-arm.tar.gz
+            builds/statping-linux-arm6.tar.gz
+            builds/statping-linux-arm7.tar.gz
             builds/statping-linux-arm64.tar.gz
             builds/statping-darwin-amd64.tar.gz
             builds/statping-darwin-386.tar.gz

@@ -173,16 +173,18 @@ build-linux:
 		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "netgo linux" ./cmd
 
 build-linux-arm:
+	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc-6 CXX=arm-linux-gnueabihf-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=6 \
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm6/statping --tags "netgo linux" ./cmd
 	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc-6 CXX=arm-linux-gnueabihf-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=7 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm/statping ./cmd
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm7/statping --tags "netgo linux" ./cmd
 	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc-6 CXX=aarch64-linux-gnu-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm64 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm64/statping ./cmd
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm64/statping --tags "netgo linux" ./cmd
 
 build-folders:
 	mkdir build || true
 	for os in windows darwin linux;\
     do \
-        for arch in 386 amd64 arm arm64;\
+        for arch in 386 amd64 arm6 arm7 arm64;\
         do \
             mkdir -p releases/statping-$$os-$$arch/; \
         done \
@@ -192,7 +194,7 @@ compress-folders:
 	mkdir build || true
 	for os in darwin linux;\
     do \
-        for arch in 386 amd64 arm arm64;\
+        for arch in 386 amd64 arm6 arm7 arm64;\
 		do \
 			chmod +x releases/statping-$$os-$$arch/statping || true; \
 			tar -czf releases/statping-$$os-$$arch.tar.gz -C releases/statping-$$os-$$arch statping || true; \
