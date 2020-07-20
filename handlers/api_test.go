@@ -251,6 +251,12 @@ func TestMainApiRoutes(t *testing.T) {
 				`go_threads`,
 			},
 		},
+		{
+			Name:           "Index Page",
+			URL:            "/",
+			Method:         "GET",
+			ExpectedStatus: 200,
+		},
 	}
 
 	for _, v := range tests {

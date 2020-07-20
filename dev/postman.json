@@ -4911,8 +4911,7 @@
 									"    var first = jsonData[0];",
 									"    var id = pm.globals.get(\"checkin_id\");",
 									"    pm.expect(first.name).to.eql(\"Demo Checkin 1\");",
-									"    pm.expect(first.grace).to.eql(300);",
-									"    pm.expect(first.interval).to.eql(300);",
+									"    pm.expect(first.interval).to.eql(1);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -4990,8 +4989,7 @@
 									"    pm.expect(jsonData.status).to.eql(\"success\");",
 									"    pm.expect(jsonData.type).to.eql(\"checkin\");",
 									"    pm.expect(jsonData.output.name).to.eql(\"Server Checkin\");",
-									"    pm.expect(jsonData.output.grace).to.eql(60);",
-									"    pm.expect(jsonData.output.interval).to.eql(900);",
+									"    pm.expect(jsonData.output.interval).to.eql(3);",
 									"    var id = jsonData.output.api_key;",
 									"    pm.globals.set(\"checkin_id\", id);",
 									"});"
@@ -5022,7 +5020,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"service_id\": 2,\n    \"name\": \"Server Checkin\",\n    \"interval\": 900,\n    \"grace\": 60\n}",
+							"raw": "{\n    \"service_id\": 2,\n    \"name\": \"Server Checkin\",\n    \"interval\": 3\n}",
 							"options": {
 								"raw": {}
 							}
@@ -5182,8 +5180,7 @@
 									"    var id = pm.globals.get(\"checkin_id\");",
 									"    pm.expect(jsonData.name).to.eql(\"Server Checkin\");",
 									"    pm.expect(jsonData.api_key).to.eql(id);",
-									"    pm.expect(jsonData.grace).to.eql(60);",
-									"    pm.expect(jsonData.interval).to.eql(900);",
+									"    pm.expect(jsonData.interval).to.eql(3);",
 									"});"
 								],
 								"type": "text/javascript"
