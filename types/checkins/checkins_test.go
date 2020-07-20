@@ -13,8 +13,7 @@ import (
 var testCheckin = &Checkin{
 	ServiceId:   1,
 	Name:        "Test Checkin",
-	Interval:    60,
-	GracePeriod: 10,
+	Interval:    3,
 	ApiKey:      "tHiSiSaTeStXXX",
 	CreatedAt:   utils.Now(),
 	UpdatedAt:   utils.Now(),

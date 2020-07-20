@@ -18,41 +18,51 @@
 
             <MessageBlock v-for="message in messagesInRange" v-bind:key="message.id" :message="message"/>
 
-            <div class="row mt-5 mb-4">
-                <div class="col-12 col-md-5 font-2 mb-3 mb-md-0">
-                    <flatPickr :disabled="loading" @on-change="onnn" v-model="start_time" :config="{ enableTime: true, altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date() }" type="text" class="btn btn-white text-left" required />
-                    <small class="d-block">From {{this.format(new Date(start_time))}}</small>
-                </div>
-                <div class="col-12 col-md-5 font-2 mb-3 mb-md-0">
-                    <flatPickr :disabled="loading" @on-change="onnn" v-model="end_time" :config="{ enableTime: true, altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date()}" type="text" class="btn btn-white text-left" required />
-                    <small class="d-block">To {{this.format(new Date(end_time))}}</small>
-                </div>
-                <div class="col-12 col-md-2">
-                    <select :disabled="loading" @change="chartHits" v-model="group" class="form-control">
-                        <option value="1m">1 Minute</option>
-                        <option value="5m">5 Minutes</option>
-                        <option value="15m">15 Minute</option>
-                        <option value="30m">30 Minutes</option>
-                        <option value="1h">1 Hour</option>
-                        <option value="3h">3 Hours</option>
-                        <option value="6h">6 Hours</option>
-                        <option value="12h">12 Hours</option>
-                        <option value="24h">1 Day</option>
-                        <option value="168h">7 Days</option>
-                        <option value="360h">15 Days</option>
-                    </select>
-                    <small class="d-block d-md-none d-block">Increment Timeframe</small>
+            <div class="card text-black-50 bg-white mt-3">
+                <div class="card-header text-capitalize">Timeframe</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 col-md-4 font-2">
+                            <flatPickr :disabled="loading" @on-change="onnn" v-model="start_time" :config="{ enableTime: true, altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date() }" type="text" class="btn btn-white text-left" required />
+                            <small class="d-block">From {{this.format(new Date(start_time))}}</small>
+                        </div>
+                        <div class="col-12 col-md-4 font-2">
+                            <flatPickr :disabled="loading" @on-change="onnn" v-model="end_time" :config="{ enableTime: true, altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date()}" type="text" class="btn btn-white text-left" required />
+                            <small class="d-block">To {{this.format(new Date(end_time))}}</small>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <select :disabled="loading" @change="chartHits" v-model="group" class="form-control">
+                                <option value="1m">1 Minute</option>
+                                <option value="5m">5 Minutes</option>
+                                <option value="15m">15 Minute</option>
+                                <option value="30m">30 Minutes</option>
+                                <option value="1h">1 Hour</option>
+                                <option value="3h">3 Hours</option>
+                                <option value="6h">6 Hours</option>
+                                <option value="12h">12 Hours</option>
+                                <option value="24h">1 Day</option>
+                                <option value="168h">7 Days</option>
+                                <option value="360h">15 Days</option>
+                            </select>
+                            <small class="d-block d-md-none d-block">Increment Timeframe</small>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <AdvancedChart :group="group" :updated="updated_chart" :start="start_time.toString()" :end="end_time.toString()" :service="service"/>
 
-            <div v-if="!loading" class="col-12">
+            <div v-if="!loading" class="row">
                 <apexchart width="100%" height="120" type="rangeBar" :options="timeRangeOptions" :series="uptime_data"></apexchart>
             </div>
 
-            <div class="service-chart-heatmap mt-5 mb-4">
-                <ServiceHeatmap :service="service"/>
+            <div class="card text-black-50 bg-white mb-3">
+                <div class="card-header text-capitalize">Service Failures</div>
+                <div class="card-body">
+                    <div class="service-chart-heatmap mt-5 mb-4">
+                        <ServiceHeatmap :service="service"/>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -378,7 +388,7 @@ export default {
         this.loading = false
       },
       async fetchUptime() {
-         const uptime = await Api.service_uptime(this.id, this.params.start, this.params.end)
+         const uptime = await Api.service_uptime(this.service.id, this.params.start, this.params.end)
         window.console.log(uptime)
         this.uptime_data = this.parse_uptime(uptime)
       },

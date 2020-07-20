@@ -61,11 +61,10 @@ var hit3 = &hits.Hit{
 }
 
 var exmapleCheckin = &checkins.Checkin{
-	ServiceId:   1,
-	Name:        "Example Checkin",
-	Interval:    60,
-	GracePeriod: 30,
-	ApiKey:      "wdededede",
+	ServiceId: 1,
+	Name:      "Example Checkin",
+	Interval:  3,
+	ApiKey:    "wdededede",
 }
 
 var fail1 = &failures.Failure{
