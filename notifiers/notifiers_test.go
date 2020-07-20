@@ -1,9 +1,9 @@
 package notifiers
 
 import (
-	"github.com/magiconair/properties/assert"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/services"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 

@@ -6,6 +6,10 @@
             {{error}}
         </div>
 
+            <h6 v-if="directory" id="assets_dir" class="text-muted text-monospace text-sm-center font-1 mb-4">
+                Asset Directory: {{directory}}
+            </h6>
+
             <div v-if="loaded && !directory" class="jumbotron jumbotron-fluid">
                 <div class="text-center col-12">
                     <h1 class="display-5">Enable Local Assets</h1>
@@ -24,17 +28,31 @@
         <h3 class="mt-3">Base Theme</h3>
         <codemirror v-show="loaded" v-model="base" ref="base" :options="cmOptions" class="codemirrorInput"/>
 
+        <h3 class="mt-3">Layout Theme</h3>
+        <codemirror v-show="loaded" v-model="layout" ref="layout" :options="cmOptions" class="codemirrorInput"/>
+
+        <h3 class="mt-3">Forms Theme</h3>
+        <codemirror v-show="loaded" v-model="forms" ref="forms" :options="cmOptions" class="codemirrorInput"/>
+
+        <h3 class="mt-3">Mixins</h3>
+        <codemirror v-show="loaded" v-model="mixins" ref="mixins" :options="cmOptions" class="codemirrorInput"/>
+
         <h3 class="mt-3">Mobile Overwrites</h3>
         <codemirror v-show="loaded" v-model="mobile" ref="mobile" :options="cmOptions" class="codemirrorInput"/>
 
-        <button id="save_assets" @submit.prevent="saveAssets" type="submit" class="btn btn-primary btn-block mt-2" :disabled="pending">{{pending ? "Saving..." : "Save Style"}}</button>
-        <button id="delete_assets" v-if="directory" @click.prevent="deleteAssets" href="#" class="btn btn-danger btn-block confirm-btn" :disabled="pending">Delete Local Assets</button>
-
-        <h6 id="assets_dir" class="text-muted text-monospace text-sm-center font-1 mt-3">
-            Asset Directory: {{directory}}
-        </h6>
     </form>
     </div>
+
+        <div class="card-footer">
+            <div class="row">
+                <div class="col-6">
+                    <button id="save_assets" @click.prevent="saveAssets" type="submit" class="btn btn-primary btn-block" :disabled="pending">{{pending ? "Saving..." : "Save Styles"}}</button>
+                </div>
+                <div class="col-6">
+                    <button id="delete_assets" v-if="directory" @click.prevent="deleteAssets" class="btn btn-danger btn-block confirm-btn" :disabled="pending">Delete Local Assets</button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -62,6 +80,9 @@
       data () {
           return {
               base: null,
+              layout: null,
+              forms: null,
+              mixins: null,
               vars: null,
               mobile: null,
               error: null,
@@ -90,6 +111,9 @@
             this.$refs.vars.codemirror.refresh()
             this.$refs.base.codemirror.refresh()
             this.$refs.mobile.codemirror.refresh()
+            this.$refs.layout.codemirror.refresh()
+            this.$refs.forms.codemirror.refresh()
+            this.$refs.mixins.codemirror.refresh()
           }
         },
           async fetchTheme() {
@@ -101,6 +125,9 @@
                   this.base = theme.base
                   this.vars = theme.variables
                   this.mobile = theme.mobile
+                  this.layout = theme.layout
+                  this.forms = theme.forms
+                  this.mixins = theme.mixins
               }
               this.pending = false
               this.loaded = true
@@ -127,7 +154,14 @@
           },
           async saveAssets() {
               this.pending = true
-              const data = {base: this.base, variables: this.vars, mobile: this.mobile}
+              const data = {
+                base: this.base,
+                layout: this.layout,
+                forms: this.forms,
+                mixins: this.mixins,
+                variables: this.vars,
+                mobile: this.mobile
+              }
             let resp
             try {
               resp = await Api.theme_save(data)

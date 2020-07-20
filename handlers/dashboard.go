@@ -33,12 +33,15 @@ func logsHandler(w http.ResponseWriter, r *http.Request) {
 type themeApi struct {
 	Directory string `json:"directory,omitempty"`
 	Base      string `json:"base"`
-	Variables string `json:"variables"`
+	Forms     string `json:"forms"`
+	Layout    string `json:"layout"`
+	Mixins    string `json:"mixins"`
 	Mobile    string `json:"mobile"`
+	Variables string `json:"variables"`
 }
 
 func apiThemeViewHandler(w http.ResponseWriter, r *http.Request) {
-	var base, variables, mobile, dir string
+	var base, forms, layout, mixins, variables, mobile, dir string
 	assets := utils.Directory + "/assets"
 
 	if _, err := os.Stat(assets); err == nil {
@@ -49,10 +52,16 @@ func apiThemeViewHandler(w http.ResponseWriter, r *http.Request) {
 		base, _ = utils.OpenFile(dir + "/scss/base.scss")
 		variables, _ = utils.OpenFile(dir + "/scss/variables.scss")
 		mobile, _ = utils.OpenFile(dir + "/scss/mobile.scss")
+		layout, _ = utils.OpenFile(dir + "/scss/layout.scss")
+		forms, _ = utils.OpenFile(dir + "/scss/forms.scss")
+		mixins, _ = utils.OpenFile(dir + "/scss/mixin.scss")
 	} else {
 		base, _ = source.TmplBox.String("scss/base.scss")
 		variables, _ = source.TmplBox.String("scss/variables.scss")
 		mobile, _ = source.TmplBox.String("scss/mobile.scss")
+		layout, _ = source.TmplBox.String("scss/layout.scss")
+		forms, _ = source.TmplBox.String("scss/forms.scss")
+		mixins, _ = source.TmplBox.String("scss/mixin.scss")
 	}
 
 	resp := &themeApi{
@@ -60,6 +69,9 @@ func apiThemeViewHandler(w http.ResponseWriter, r *http.Request) {
 		Base:      base,
 		Variables: variables,
 		Mobile:    mobile,
+		Layout:    layout,
+		Forms:     forms,
+		Mixins:    mixins,
 	}
 	returnJson(resp, w, r)
 }
