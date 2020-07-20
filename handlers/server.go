@@ -64,8 +64,6 @@ func letsEncryptCert() (*tls.Config, error) {
 }
 
 func startLetsEncryptServer(ip string) {
-	log.Infoln("Starting SSL with LetsEncrypt")
-
 	log.Infoln("Starting LetEncrypt redirect server on port 80")
 	go http.ListenAndServe(":80", http.HandlerFunc(simplecert.Redirect))
 

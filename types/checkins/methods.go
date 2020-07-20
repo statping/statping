@@ -10,22 +10,11 @@ func (c *Checkin) Expected() time.Duration {
 	last := c.LastHit()
 	now := utils.Now()
 	lastDir := now.Sub(last.CreatedAt)
-	sub := time.Duration(c.Period() - lastDir)
-	return sub
+	return c.Period() - lastDir
 }
 
 func (c *Checkin) Period() time.Duration {
-	duration, _ := time.ParseDuration(fmt.Sprintf("%ds", c.Interval))
-	if duration.Seconds() <= 15 {
-		return 15 * time.Second
-	}
-	return duration
-}
-
-// Grace will return the duration of the Checkin Grace Period (after service hasn't responded, wait a bit for a response)
-func (c *Checkin) Grace() time.Duration {
-	duration, _ := time.ParseDuration(fmt.Sprintf("%vs", c.GracePeriod))
-	return duration
+	return time.Duration(c.Interval) * time.Minute
 }
 
 // Start will create a channel for the checkin checking go routine

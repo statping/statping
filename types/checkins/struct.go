@@ -11,7 +11,6 @@ type Checkin struct {
 	ServiceId   int64               `gorm:"index;column:service" json:"service_id"`
 	Name        string              `gorm:"column:name" json:"name"`
 	Interval    int64               `gorm:"column:check_interval" json:"interval"`
-	GracePeriod int64               `gorm:"column:grace_period"  json:"grace"`
 	ApiKey      string              `gorm:"column:api_key"  json:"api_key"`
 	CreatedAt   time.Time           `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt   time.Time           `gorm:"column:updated_at" json:"updated_at"`

@@ -85,7 +85,6 @@ export default Vue.mixin({
     copy(txt) {
       this.$copyText(txt).then(function (e) {
         alert('Copied: \n'+txt)
-        console.log(e)
       });
     },
     serviceLink(service) {

@@ -253,10 +253,6 @@ func SelectAllServices(start bool) (map[int64]*Service, error) {
 		return allServices, nil
 	}
 	for _, s := range all() {
-
-		if start {
-			CheckinProcess(s)
-		}
 		s.Failures = s.AllFailures().LastAmount(limitedFailures)
 		for _, c := range s.Checkins() {
 			s.AllCheckins = append(s.AllCheckins, c)
@@ -264,6 +260,9 @@ func SelectAllServices(start bool) (map[int64]*Service, error) {
 		// collect initial service stats
 		s.UpdateStats()
 		allServices[s.Id] = s
+		if start {
+			CheckinProcess(s)
+		}
 	}
 	return allServices, nil
 }

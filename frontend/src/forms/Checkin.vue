@@ -21,8 +21,8 @@
                         <input v-model="checkin.name" type="text" name="name" class="form-control" id="checkin_name" placeholder="New Checkin">
                     </div>
                     <div class="col-2">
-                        <label for="checkin_interval" class="col-form-label">Interval</label>
-                        <input v-model="checkin.interval" type="number" name="interval" class="form-control" id="checkin_interval" placeholder="60">
+                        <label for="checkin_interval" class="col-form-label">Interval (minutes)</label>
+                        <input v-model="checkin.interval" type="number" name="interval" class="form-control" id="checkin_interval" placeholder="1" min="1">
                     </div>
                     <div class="col-2">
                         <label for="grace_period" class="col-form-label">Grace Period</label>

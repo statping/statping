@@ -1,8 +1,12 @@
+# 0.90.60 (07-15-2020)
+- Added LETSENCRYPT_ENABLE (boolean) env to enable/disable letsencrypt SSL
+
 # 0.90.59 (07-14-2020)
 - Added LetsEncrypt SSL Generator by using LETSENCRYPT_HOST and LETSENCRYPT_EMAIL envs.
 - Modified JWT token key to be sha256 of API Secret
 - Modified github actions to build multi-arch Docker images
 - Added "update" command to install latest version
+- Fixed dashboard uptime_data API request to request correct start/time timestamp
 
 # 0.90.58 (07-09-2020)
 - Fixed ICMP latency/ping durations
