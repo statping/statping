@@ -4911,7 +4911,7 @@
 									"    var first = jsonData[0];",
 									"    var id = pm.globals.get(\"checkin_id\");",
 									"    pm.expect(first.name).to.eql(\"Demo Checkin 1\");",
-									"    pm.expect(first.interval).to.eql(1);",
+									"    pm.expect(first.interval).to.eql(3);",
 									"});"
 								],
 								"type": "text/javascript"
