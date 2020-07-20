@@ -43,12 +43,3 @@ func (c *Checkin) IsRunning() bool {
 		return true
 	}
 }
-
-// String will return a Checkin API string
-func (c *Checkin) String() string {
-	return c.ApiKey
-}
-
-func (c *Checkin) Link() string {
-	return fmt.Sprintf("%v/checkin/%v", "DOMAINHERE", c.ApiKey)
-}

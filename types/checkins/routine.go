@@ -9,20 +9,6 @@ import (
 
 var log = utils.Log.WithField("type", "checkin")
 
-// RecheckCheckinFailure will check if a Service Checkin has been reported yet
-func (c *Checkin) RecheckCheckinFailure(guard chan struct{}) {
-	between := utils.Now().Sub(utils.Now()).Seconds()
-	if between > float64(c.Interval) {
-		fmt.Println("rechecking every 15 seconds!")
-		time.Sleep(15 * time.Second)
-		guard <- struct{}{}
-		c.RecheckCheckinFailure(guard)
-	} else {
-		fmt.Println("i recovered!!")
-	}
-	<-guard
-}
-
 // checkinRoutine for checking if the last Checkin was within its interval
 func (c *Checkin) checkinRoutine() {
 	reCheck := c.Period()

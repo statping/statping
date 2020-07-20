@@ -129,7 +129,14 @@ func TestTimestamp_Ago(t *testing.T) {
 }
 
 func TestHashPassword(t *testing.T) {
-	assert.Equal(t, 60, len(HashPassword("password123")))
+	pass := HashPassword("password123")
+	assert.Equal(t, 60, len(pass))
+	assert.True(t, CheckHash("password123", pass))
+	assert.False(t, CheckHash("wrongpasswd", pass))
+}
+
+func TestSha256Hash(t *testing.T) {
+	assert.Equal(t, "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f", Sha256Hash("password123"))
 }
 
 func TestNewSHA1Hash(t *testing.T) {
@@ -189,4 +196,13 @@ func TestConfigLoad(t *testing.T) {
 	assert.Equal(t, Directory, s("STATPING_DIR"))
 	assert.True(t, b("SAMPLE_DATA"))
 	assert.True(t, b("ALLOW_REPORTS"))
+}
+
+func TestPerlin(t *testing.T) {
+	p := NewPerlin(2, 2, 5, Now().UnixNano())
+	require.NotNil(t, p)
+
+	for hi := 1.; hi <= 100.; hi++ {
+		assert.NotZero(t, p.Noise1D(hi/500))
+	}
 }

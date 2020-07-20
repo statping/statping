@@ -503,6 +503,62 @@ func TestServices(t *testing.T) {
 		assert.Len(t, all, 1)
 	})
 
+	t.Run("Test Load services.yml", func(t *testing.T) {
+
+		file := `x-tcpservice: &tcpservice
+  type: tcp
+  check_interval: 60
+  timeout: 15
+  allow_notifications: true
+  notify_after: 0
+  notify_all_changes: true
+  public: true
+  redirect: true
+
+x-httpservice: &httpservice
+  type: http
+  method: GET
+  check_interval: 45
+  timeout: 10
+  expected_status: 200
+  allow_notifications: true
+  notify_after: 2
+  notify_all_changes: true
+  public: true
+  redirect: true
+
+services:
+
+  - name: Statping Demo
+    domain: https://demo.statping.com
+    <<: *httpservice
+
+  - name: Portainer
+    domain: portainer
+    port: 9000
+    <<: *tcpservice
+
+  - name: Statping Github
+    domain: https://github.com/statping/statping
+    <<: *httpservice`
+
+		err := utils.SaveFile(utils.Directory+"/services.yml", []byte(file))
+		require.Nil(t, err)
+
+		assert.FileExists(t, utils.Directory+"/services.yml")
+
+		srvs, err := LoadServicesYaml()
+		require.Nil(t, err)
+		require.Equal(t, 3, len(srvs.Services))
+
+		assert.Equal(t, "Statping Demo", srvs.Services[0].Name)
+		assert.Equal(t, 45, srvs.Services[0].Interval)
+		assert.Equal(t, "https://demo.statping.com", srvs.Services[0].Domain)
+
+		err = utils.DeleteFile(utils.Directory + "/services.yml")
+		require.Nil(t, err)
+	})
+
 	t.Run("Test Close", func(t *testing.T) {
 		assert.Nil(t, db.Close())
 	})

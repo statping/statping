@@ -16,7 +16,7 @@ func SetDB(database database.Database) {
 
 func (c *Checkin) AfterFind() {
 	c.AllHits = c.Hits()
-	c.AllFailures = c.Failures().LastAmount(64)
+	c.AllFailures = c.Failures().LastAmount(32)
 	if last := c.LastHit(); last != nil {
 		c.LastHitTime = last.CreatedAt
 	}
