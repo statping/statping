@@ -5,7 +5,7 @@
                 <span class="badge text-uppercase" :class="badgeClass(update.type)">{{update.type}}</span>
             </div>
             <div class="col-md-12 col-12 mt-2 font-3">{{update.message}}</div>
-            <div class="col-12 font-1 float-right text-black-50 mt-2">{{ago(update.created_at)}} ago</div>
+            <div class="col-12 font-1 float-right mt-2">{{ago(update.created_at)}} ago</div>
         </div>
     </div>
 </template>

@@ -35,7 +35,7 @@
                 </li>
             </ul>
             <div class="text-center">
-             <span class="text-black-50">{{total}} Total</span>
+             <span>{{total}} Failures</span>
             </div>
         </nav>
     </div>
@@ -50,7 +50,7 @@ export default {
     data() {
         return {
             service: {},
-          failures: [],
+          fails: [],
           limit: 10,
           offset: 0,
           total: 0,
@@ -58,6 +58,9 @@ export default {
         }
     },
       computed: {
+        failures() {
+          return this.fails.sort(function(a,b) {return b.id - a.id;});
+        },
         pages() {
           return Math.floor(this.total / this.limit)
         },
@@ -91,7 +94,7 @@ export default {
         await this.load()
       },
       async load() {
-        this.failures = await Api.service_failures(this.service.id, 0, 9999999999, this.limit, this.offset)
+        this.fails = await Api.service_failures(this.service.id, 0, 9999999999, this.limit, this.offset)
       }
     }
 }

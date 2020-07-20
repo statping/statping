@@ -1,5 +1,5 @@
 <template>
-    <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
+    <div class="container col-md-7 col-sm-12 mt-md-5">
 
         <div class="col-12 mb-4">
 
@@ -388,8 +388,7 @@ export default {
         this.loading = false
       },
       async fetchUptime() {
-         const uptime = await Api.service_uptime(this.service.id, this.params.start, this.params.end)
-        window.console.log(uptime)
+        const uptime = await Api.service_uptime(this.service.id, this.params.start, this.params.end)
         this.uptime_data = this.parse_uptime(uptime)
       },
       parse_uptime(timedata) {

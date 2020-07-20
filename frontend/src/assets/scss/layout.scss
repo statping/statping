@@ -1,0 +1,113 @@
+@import 'variables';
+@import 'mixin';
+
+HTML,BODY {
+  background-color: $background-color;
+  color: $text-color;
+}
+
+A {
+  color: $text-color;
+}
+
+A:HOVER {
+  color: lighten($text-color, 12%) !important;
+}
+
+.text-muted {
+  color: darken($text-color, 30%) !important;
+}
+
+.contain-card {
+
+  .card-header {
+    font-size: 1.15rem;
+  }
+
+  .dropdown-menu {
+    background-color: rgba(239, 239, 239, 0.65);
+  }
+
+}
+
+.navbar {
+  margin-bottom: 30px;
+  color: $navbar-color;
+  background-color: $navbar-background;
+}
+
+.table {
+  color: $text-color;
+}
+
+.nav-pills {
+  border-radius: $global-border-radius;
+}
+
+.nav-link {
+  color: $navbar-color;
+}
+
+.form-control {
+  border-radius: $global-border-radius;
+}
+
+.card {
+  background-color: $card-background;
+  border: $card-border;
+  box-shadow: $card-shadow;
+}
+
+.card-body {
+  overflow: hidden;
+}
+
+.card-body H4 A {
+  color: $service-title;
+  text-decoration: none;
+}
+
+.card-title A {
+  color: $service-title;
+  text-decoration: none;
+}
+
+.card-body .badge {
+  color: #fff;
+}
+
+.list-group-item {
+  min-height: 85pt;
+  background-color: $group-list-background;
+}
+
+.list-group-item:HOVER {
+  background-color: darken($group-list-background, 12%) !important;
+}
+
+.list-group-item A {
+  color: $group-list-title;
+}
+
+.container {
+  padding-top: 20px;
+  padding-bottom: 25px;
+  max-width: $max-width;
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  min-height: 98vh;
+  background-color: $container-color;
+}
+
+.footer {
+  text-decoration: none;
+  margin-top: 20px;
+}
+
+.footer A {
+  color: $footer-text-color;
+  text-decoration: none;
+}
+
+.footer A:HOVER {
+  color: #6d6d6d;
+}

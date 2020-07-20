@@ -96,6 +96,8 @@ export default {
             name: "",
             interval: 1,
             service_id: 0,
+            hits: [],
+            failures: []
           }
         }
     },

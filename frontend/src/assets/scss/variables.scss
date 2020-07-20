@@ -1,16 +1,25 @@
 /*    Index Page      */
-$background-color: #fcfcfc;
-$container-color: #fcfcfc;
+$background-color: #313131;
+$container-color: #494949;
+$text-color: #e3e3e3;
 $max-width: 860px;
-$title-color: #464646;
-$description-color: #939393;
+$title-color: #ffffff;
+$description-color: #d2d2d2;
 $subtitle-color: #747474;
 $mobile-card-shadow: 2px 3px 10px #b7b7b7;
+$group-list-background: #282828;
+$group-list-title: #ea8114;
+$navbar-color: #ea8114;
+$navbar-background: #323232;
+$input-background: #323232;
+$input-color: #f5821c;
+$input-border: 1px solid #e78033;
 
 /*    Status Container   */
-$service-background: #ffffff;
-$service-border: 1px solid rgba(0,0,0,.125);
-$service-title: #444444;
+$card-background: #2a2a2a;
+$card-border: 1px solid rgba(0,0,0,.125);
+$card-shadow: 0px 3px 6px 1px rgba(0, 0, 0, 0.08);
+$service-title: #f17833;
 $service-title-size: 1.8rem;
 $service-stats-color: #4f4f4f;
 $service-description-color: #fff;
