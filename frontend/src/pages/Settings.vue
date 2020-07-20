@@ -60,12 +60,7 @@
                 <div class="tab-content" id="v-pills-tabContent">
                     <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-home-tab'), show: liClass('v-pills-home-tab')}" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
 
-                        <div class="card">
-                            <div class="card-header">Statping Settings</div>
-                            <div class="card-body">
-                                <CoreSettings/>
-                            </div>
-                        </div>
+                        <CoreSettings/>
 
                         <div class="card mt-3">
                             <div class="card-header">API Settings</div>
@@ -82,9 +77,11 @@
                                         <small class="form-text text-muted">API Secret is used for read, create, update and delete routes</small>
                                         <small class="form-text text-muted">You can Regenerate API Keys if you need to.</small>
 
-                                        <button id="regenkeys" @click="renewApiKeys" class="btn btn-sm btn-danger mt-2">Regenerate API Keys</button>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="card-footer">
+                                <button id="regenkeys" @click="renewApiKeys" class="btn btn-sm btn-danger float-right">Regenerate API Keys</button>
                             </div>
                         </div>
 

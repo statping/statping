@@ -840,7 +840,7 @@
 									"",
 									"pm.test(\"View All Services\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.length).to.eql(5);",
+									"    pm.expect(jsonData.length).to.eql(6);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1714,7 +1714,7 @@
 								"services"
 							]
 						},
-						"description": "Create a new service and begin monitoring."
+						"description": "View a specific service, this will include the service's failures and checkins.\n\n#### Service Type Field\n- `http` - HTTP Service\n- `tcp` - TCP Service\n- `udp` - UDP Service\n- `icmp` - ICMP Service\n- `grpc` - gRPC Service\n- `static` - Static Service"
 					},
 					"response": [
 						{
@@ -1877,6 +1877,69 @@
 					]
 				},
 				{
+					"name": "Update Static Service",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "18cfae1e-4025-4338-a734-a552c8ac85ca",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Update Service\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"success\");",
+									"    pm.expect(jsonData.output.type).to.eql(\"static\");",
+									"    pm.expect(jsonData.output.online).to.eql(false);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"online\": false,\n    \"latency\": 30500,\n    \"issue\": \"This is a failure string you can create\"\n}",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/services/7",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"services",
+								"7"
+							]
+						},
+						"description": "Update a Static Service by setting it's online status to true or false. If false, you can include a issue string in the `issue` JSON field."
+					},
+					"response": []
+				},
+				{
 					"name": "Delete Service Failures",
 					"event": [
 						{
@@ -2026,7 +2089,7 @@
 					]
 				}
 			],
-			"description": "With the Statping API, you can add, remove, edit all your services fields from the API directly. This includes viewing Service chart data for latency/up-time, and even viewing a log of failures. ",
+			"description": "With the Statping API, you can add, remove, edit all your services fields from the API directly. This includes viewing Service chart data for latency/up-time, and even viewing a log of failures. \n\n### HTTP Services\nA HTTP service is a basic service that sends a HTTP request (GET, POST, PATCH, DELETE, etc) to check if that web service is online or not. You can expect a specific status code, and response body (including regex). \n\n### TCP and UDP Services\nTCP and UDP Services will send a request to the hostname and port of your choice.\n\n### ICMP Ping Services\nICMP Services will send a ICMP (ping) packet to your server to test if it's online.\n\n### gRPC Services\ngRPC Services will request your gRPC server and check the response\n\n### Static Services\nA Static Service is a \"fake\" service that is set online/offline by you.\n",
 			"auth": {
 				"type": "bearer",
 				"bearer": [

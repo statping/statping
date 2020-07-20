@@ -4,6 +4,10 @@
 - Modified Service View page to show data inside cards
 - Fixed issue with uptime_data sending incorrect start/end timestamps
 - Modified http cache to bypass if url has a "v" query param
+- Added "Static Services" (a fake service that requires you to update the online/offline status)
+- Added Update Static Service PATCH route (/api/services/{id})
+- Modified SASS api endpoints (base, layout, forms, mixins, mobile, variables)
+- Added additional testing
 
 # 0.90.60 (07-15-2020)
 - Added LETSENCRYPT_ENABLE (boolean) env to enable/disable letsencrypt SSL

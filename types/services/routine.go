@@ -94,7 +94,7 @@ func CheckIcmp(s *Service, record bool) (*Service, error) {
 	dur, err := utils.Ping(s.Domain, s.Timeout)
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("Could not send ICMP to service %v, %v", s.Domain, err))
+			RecordFailure(s, fmt.Sprintf("Could not send ICMP to service %v, %v", s.Domain, err))
 		}
 		return s, err
 	}
@@ -104,7 +104,7 @@ func CheckIcmp(s *Service, record bool) (*Service, error) {
 	s.LastResponse = ""
 	s.Online = true
 	if record {
-		recordSuccess(s)
+		RecordSuccess(s)
 	}
 	return s, nil
 }
@@ -118,7 +118,7 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 	dnsLookup, err := dnsCheck(s)
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("Could not get IP address for GRPC service %v, %v", s.Domain, err))
+			RecordFailure(s, fmt.Sprintf("Could not get IP address for GRPC service %v, %v", s.Domain, err))
 		}
 		return s, err
 	}
@@ -137,13 +137,13 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 	}
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("Dial Error %v", err))
+			RecordFailure(s, fmt.Sprintf("Dial Error %v", err))
 		}
 		return s, err
 	}
 	if err := conn.Close(); err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("%v Socket Close Error %v", strings.ToUpper(s.Type), err))
+			RecordFailure(s, fmt.Sprintf("%v Socket Close Error %v", strings.ToUpper(s.Type), err))
 		}
 		return s, err
 	}
@@ -151,7 +151,7 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 	s.LastResponse = ""
 	s.Online = true
 	if record {
-		recordSuccess(s)
+		RecordSuccess(s)
 	}
 	return s, nil
 }
@@ -165,7 +165,7 @@ func CheckTcp(s *Service, record bool) (*Service, error) {
 	dnsLookup, err := dnsCheck(s)
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("Could not get IP address for TCP service %v, %v", s.Domain, err))
+			RecordFailure(s, fmt.Sprintf("Could not get IP address for TCP service %v, %v", s.Domain, err))
 		}
 		return s, err
 	}
@@ -189,7 +189,7 @@ func CheckTcp(s *Service, record bool) (*Service, error) {
 		conn, err := net.DialTimeout(s.Type, domain, time.Duration(s.Timeout)*time.Second)
 		if err != nil {
 			if record {
-				recordFailure(s, fmt.Sprintf("Dial Error: %v", err))
+				RecordFailure(s, fmt.Sprintf("Dial Error: %v", err))
 			}
 			return s, err
 		}
@@ -203,7 +203,7 @@ func CheckTcp(s *Service, record bool) (*Service, error) {
 		conn, err := tls.DialWithDialer(dialer, s.Type, domain, tlsConfig)
 		if err != nil {
 			if record {
-				recordFailure(s, fmt.Sprintf("Dial Error: %v", err))
+				RecordFailure(s, fmt.Sprintf("Dial Error: %v", err))
 			}
 			return s, err
 		}
@@ -214,7 +214,7 @@ func CheckTcp(s *Service, record bool) (*Service, error) {
 	s.LastResponse = ""
 	s.Online = true
 	if record {
-		recordSuccess(s)
+		RecordSuccess(s)
 	}
 	return s, nil
 }
@@ -232,7 +232,7 @@ func CheckHttp(s *Service, record bool) (*Service, error) {
 	dnsLookup, err := dnsCheck(s)
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
+			RecordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
 		}
 		return s, err
 	}
@@ -284,7 +284,7 @@ func CheckHttp(s *Service, record bool) (*Service, error) {
 	content, res, err = utils.HttpRequest(s.Domain, s.Method, contentType, headers, data, timeout, s.VerifySSL.Bool, customTLS)
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("HTTP Error %v", err))
+			RecordFailure(s, fmt.Sprintf("HTTP Error %v", err))
 		}
 		return s, err
 	}
@@ -301,26 +301,26 @@ func CheckHttp(s *Service, record bool) (*Service, error) {
 		}
 		if !match {
 			if record {
-				recordFailure(s, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
+				RecordFailure(s, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
 			}
 			return s, err
 		}
 	}
 	if s.ExpectedStatus != res.StatusCode {
 		if record {
-			recordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", res.StatusCode, s.ExpectedStatus))
+			RecordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", res.StatusCode, s.ExpectedStatus))
 		}
 		return s, err
 	}
 	if record {
-		recordSuccess(s)
+		RecordSuccess(s)
 	}
 	s.Online = true
 	return s, err
 }
 
-// recordSuccess will create a new 'hit' record in the database for a successful/online service
-func recordSuccess(s *Service) {
+// RecordSuccess will create a new 'hit' record in the database for a successful/online service
+func RecordSuccess(s *Service) {
 	s.LastOnline = utils.Now()
 	s.Online = true
 	hit := &hits.Hit{
@@ -371,8 +371,8 @@ func sendSuccess(s *Service) {
 	s.notifyAfterCount = 0
 }
 
-// recordFailure will create a new 'Failure' record in the database for a offline service
-func recordFailure(s *Service, issue string) {
+// RecordFailure will create a new 'Failure' record in the database for a offline service
+func RecordFailure(s *Service, issue string) {
 	s.LastOffline = utils.Now()
 
 	fail := &failures.Failure{
