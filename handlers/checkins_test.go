@@ -45,8 +45,7 @@ func TestApiCheckinRoutes(t *testing.T) {
 			Body: `{
 						"name": "Example Checkin",
 						"service_id": 1,
-						"checkin_interval": 300,
-						"grace_period": 60,
+						"interval": 300,
 						"api_key": "example"
 					}`,
 		},

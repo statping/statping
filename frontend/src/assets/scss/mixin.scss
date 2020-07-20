@@ -1,0 +1,29 @@
+@mixin dynamic-color-hov($color) {
+  &.dyn-dark {
+    background-color: darken($color, 12%) !important;
+    border-color: darken($color, 17%) !important;
+  }
+  &.dyn-dark:HOVER {
+    background-color: darken($color, 17%) !important;
+    border-color: darken($color, 20%) !important;
+  }
+  &.dyn-light {
+    background-color: lighten($color, 12%) !important;
+    border-color: lighten($color, 17%) !important;
+  }
+  &.dyn-light:HOVER {
+    background-color: lighten($color, 17%) !important;
+    border-color: lighten($color, 20%) !important;
+  }
+}
+
+@mixin dynamic-color($color) {
+  &.dyn-dark {
+    background-color: darken($color, 12%) !important;
+    border-color: darken($color, 17%) !important;
+  }
+  &.dyn-light {
+    background-color: lighten($color, 12%) !important;
+    border-color: lighten($color, 17%) !important;
+  }
+}

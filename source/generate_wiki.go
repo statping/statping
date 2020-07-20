@@ -67,7 +67,7 @@ func die(err error) {
 }
 
 var packageTemplate = template.Must(template.New("").Parse(`<template>
-    <div class="col-12 bg-white p-4" v-html={{printf "%q" .Compiled}}></div>
+    <div class="col-12 p-4" v-html={{printf "%q" .Compiled}}></div>
 </template>
 
 <script>

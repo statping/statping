@@ -1,7 +1,10 @@
 <template>
-    <div>
-        <div class="service-chart-container">
-            <apexchart width="100%" height="420" type="area" :options="main_chart_options" :series="main_chart"></apexchart>
+    <div class="card text-black-50 bg-white mt-3 mb-3">
+        <div class="card-header text-capitalize">Service Latency</div>
+        <div class="card-body">
+            <div class="service-chart-container">
+                <apexchart width="100%" height="420" type="area" :options="main_chart_options" :series="main_chart"></apexchart>
+            </div>
         </div>
     </div>
 </template>

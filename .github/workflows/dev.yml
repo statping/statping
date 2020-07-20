@@ -328,12 +328,12 @@ jobs:
 
       - name: Cache Docker layers
         uses: actions/cache@v2
-        id: cache
+        id: buildx-docker-master
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          key: buildx-docker-master
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            buildx-docker-master
 
       - name: Docker Build :base
         run: make buildx-base

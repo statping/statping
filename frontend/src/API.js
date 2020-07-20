@@ -155,6 +155,10 @@ class Api {
         return axios.delete('api/incidents/'+incident.id).then(response => (response.data))
     }
 
+  async checkin(api) {
+    return axios.get('api/checkins/'+api).then(response => (response.data))
+  }
+
     async checkin_create(data) {
         return axios.post('api/checkins', data).then(response => (response.data))
     }

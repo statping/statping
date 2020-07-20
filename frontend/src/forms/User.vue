@@ -1,5 +1,5 @@
 <template>
-    <div class="card contain-card text-black-50 bg-white mb-3">
+    <div class="card contain-card mb-3">
         <div class="card-header"> {{user.id ? `Update ${user.username}` : "Create User"}}
             <transition name="slide-fade">
                 <button @click.prevent="removeEdit" v-if="user.id" class="btn btn-sm float-right btn-danger btn-sm">Close</button>

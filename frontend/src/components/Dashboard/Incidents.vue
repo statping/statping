@@ -1,7 +1,7 @@
 <template>
     <div class="col-12">
 
-        <div v-for="incident in incidents" :key="incident.id" class="card contain-card text-black-50 bg-white mb-4">
+        <div v-for="incident in incidents" :key="incident.id" class="card contain-card mb-4">
             <div class="card-header">Incident: {{incident.title}}
                 <button @click="deleteIncident(incident)" class="btn btn-sm btn-danger float-right">
                     <font-awesome-icon icon="times" />  Delete
@@ -14,7 +14,7 @@
         </div>
 
 
-        <div class="card contain-card text-black-50 bg-white">
+        <div class="card contain-card">
             <div class="card-header">Create Incident</div>
             <div class="card-body">
                 <form @submit.prevent="createIncident">

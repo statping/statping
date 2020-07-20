@@ -1,5 +1,5 @@
 <template>
-    <div class="card text-black-50 bg-white mb-5">
+    <div class="card mb-5">
         <div class="card-header">Theme Editor</div>
         <div class="card-body">
         <div v-if="error" class="alert alert-danger mt-3" style="white-space: pre-line;">

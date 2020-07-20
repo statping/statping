@@ -353,5 +353,5 @@ buildx-base: multiarch
 multiarch:
 	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
-.PHONY: all build multiarch build-all buildx-base buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
+.PHONY: all build certs multiarch build-all buildx-base buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds

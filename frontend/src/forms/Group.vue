@@ -1,5 +1,5 @@
 <template>
-    <div class="card contain-card text-black-50 bg-white mb-3">
+    <div class="card contain-card mb-3">
         <div class="card-header">{{group.id ? `Update ${group.name}` : "Create Group"}}
             <transition name="slide-fade">
                 <button @click="removeEdit" v-if="group.id" class="btn float-right btn-danger btn-sm">

@@ -1,5 +1,5 @@
 <template>
-    <div class="col-12 bg-white p-4">
+    <div class="col-12 p-4">
         <p v-if="logs.length === 0" class="text-monospace sm">
             Loading Logs...
         </p>

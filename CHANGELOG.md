@@ -1,3 +1,10 @@
+# 0.90.61 (07-19-2020)
+- Modified sass layouts, organized and split up sections
+- Modified Checkins to seconds rather than milliseconds (for cronjob)
+- Modified Service View page to show data inside cards
+- Fixed issue with uptime_data sending incorrect start/end timestamps
+- Modified http cache to bypass if url has a "v" query param
+
 # 0.90.60 (07-15-2020)
 - Added LETSENCRYPT_ENABLE (boolean) env to enable/disable letsencrypt SSL
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="card text-black-50 bg-white mb-5">
+    <div class="card mb-5">
         <div class="card-header">Cache</div>
         <div class="card-body">
         <span v-if="!cache" class="text-muted">There are no cached pages yet!</span>

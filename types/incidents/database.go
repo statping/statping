@@ -79,16 +79,13 @@ func All() []*Incident {
 }
 
 func (i *Incident) Create() error {
-	q := db.Create(i)
-	return q.Error()
+	return db.Create(i).Error()
 }
 
 func (i *Incident) Update() error {
-	q := db.Update(i)
-	return q.Error()
+	return db.Update(i).Error()
 }
 
 func (i *Incident) Delete() error {
-	q := db.Delete(i)
-	return q.Error()
+	return db.Delete(i).Error()
 }
