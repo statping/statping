@@ -1,25 +1,28 @@
 /*    Index Page      */
-$background-color: #313131;
-$container-color: #494949;
-$text-color: #e3e3e3;
+$background-color: #f5f5f5;
+$container-color: #ffffff;
+$text-color: #1d1d1d;
 $max-width: 860px;
-$title-color: #ffffff;
-$description-color: #d2d2d2;
+$title-color: #4e4e4e;
+$description-color: #828282;
 $subtitle-color: #747474;
 $mobile-card-shadow: 2px 3px 10px #b7b7b7;
-$group-list-background: #282828;
-$group-list-title: #ea8114;
-$navbar-color: #ea8114;
-$navbar-background: #323232;
-$input-background: #323232;
-$input-color: #f5821c;
-$input-border: 1px solid #e78033;
+
+$group-list-background: #fafafa;
+$group-list-title: #474747;
+$navbar-color: #1c1c1c;
+$navbar-background: #ffffff;
+$input-background: #fdfdfd;
+$input-color: #4e4e4e;
+$input-border: 1px solid #c9c9c9;
+$day-success-background: #18ce08;
+$day-error-background: #d50a0a;
 
 /*    Status Container   */
-$card-background: #2a2a2a;
-$card-border: 1px solid rgba(0,0,0,.125);
+$card-background: #fcfcfc;
+$card-border: 1px solid rgba(76, 76, 76, 0.12);
 $card-shadow: 0px 3px 6px 1px rgba(0, 0, 0, 0.08);
-$service-title: #f17833;
+$service-title: #3e3e3e;
 $service-title-size: 1.8rem;
 $service-stats-color: #4f4f4f;
 $service-description-color: #fff;

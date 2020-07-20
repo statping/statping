@@ -128,11 +128,11 @@
                         </button>
                     </div>
                     <div class="col-12 col-md-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
-                        <button @click.prevent="testNotifier('success')" :disabled="loadingTest" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
+                        <button @click.prevent="testNotifier('success')" :disabled="loadingTest" class="btn btn-secondary btn-block text-capitalize test-notifier">
                             <font-awesome-icon v-if="loadingTest" icon="circle-notch" class="mr-2" spin/>{{loadingTest ? "Loading..." : "Test Success"}}</button>
                     </div>
                     <div class="col-12 col-md-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
-                        <button @click.prevent="testNotifier('failure')" :disabled="loadingTest" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
+                        <button @click.prevent="testNotifier('failure')" :disabled="loadingTest" class="btn btn-secondary btn-block text-capitalize test-notifier">
                             <font-awesome-icon v-if="loadingTest" icon="circle-notch" class="mr-2" spin/>{{loadingTest ? "Loading..." : "Test Failure"}}</button>
                     </div>
                 </div>

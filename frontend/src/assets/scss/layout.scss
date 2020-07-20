@@ -18,6 +18,22 @@ A:HOVER {
   color: darken($text-color, 30%) !important;
 }
 
+.day-success {
+  background-color: $day-success-background;
+}
+
+.day-success:HOVER {
+  background-color: lighten($day-success-background, 2%) !important;
+}
+
+.day-error {
+  background-color: $day-error-background;
+}
+
+.day-error:HOVER {
+  background-color: lighten($day-error-background, 2%) !important;
+}
+
 .contain-card {
 
   .card-header {
@@ -82,7 +98,7 @@ A:HOVER {
 }
 
 .list-group-item:HOVER {
-  background-color: darken($group-list-background, 12%) !important;
+  background-color: lighten($group-list-background, 2%) !important;
 }
 
 .list-group-item A {
