@@ -168,9 +168,9 @@ build-darwin:
 
 build-linux:
 	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=amd64 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "netgo linux" ./cmd
+		go build -a -v -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "netgo linux" ./cmd
 	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=386 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "netgo linux" ./cmd
+		go build -a -v -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "netgo linux" ./cmd
 
 build-linux-arm:
 	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=6 \
