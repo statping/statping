@@ -3,7 +3,14 @@
     <div class="card contain-card mb-4">
       <div class="card-header">{{ $t('top_nav.announcements') }}</div>
       <div class="card-body pt-0">
-        <table class="table table-striped">
+
+          <div v-if="messages.length === 0">
+              <div class="alert alert-dark d-block mt-3 mb-0">
+                  You currently don't have any Announcements! Create one using the form below.
+              </div>
+          </div>
+
+        <table v-else class="table table-striped">
           <thead>
             <tr>
                 <th scope="col">{{ $t('dashboard.title') }}</th>
@@ -13,7 +20,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="message in $store.getters.messages" v-bind:key="message.id">
+            <tr v-for="message in messages" v-bind:key="message.id">
               <td>{{message.title}}</td>
               <td class="d-none d-md-table-cell">
                 <router-link :to="serviceLink(service(message.service))">{{serviceName(service(message.service))}}</router-link>
@@ -51,6 +58,11 @@
       message: {}
     }
   },
+    computed: {
+        messages() {
+          return this.$store.getters.messages
+        }
+    },
   methods: {
     goto(to) {
       this.$router.push(to)

@@ -99,6 +99,9 @@ func (s *Service) Delete() error {
 	if err := s.DeleteHits(); err != nil {
 		return err
 	}
+	if err := s.DeleteCheckins(); err != nil {
+		return err
+	}
 	delete(allServices, s.Id)
 	q := db.Model(&Service{}).Delete(s)
 	return q.Error()

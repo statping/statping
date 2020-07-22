@@ -47,7 +47,7 @@ func TestPushoverNotifier(t *testing.T) {
 
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", Pushover.Author)
-		assert.Equal(t, PUSHOVER_TOKEN, Pushover.ApiKey)
+		assert.Equal(t, PUSHOVER_TOKEN, Pushover.ApiKey.String)
 	})
 
 	t.Run("Pushover Within Limits", func(t *testing.T) {

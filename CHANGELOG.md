@@ -1,4 +1,4 @@
-# 0.90.61 (07-19-2020)
+# 0.90.61 (07-22-2020)
 - Modified sass layouts, organized and split up sections
 - Modified Checkins to seconds rather than milliseconds (for cronjob)
 - Modified Service View page to show data inside cards
@@ -10,6 +10,7 @@
 - Added additional testing
 - Modified node version from 10.x to 12.18.2
 - Modified Notifier's struct values to be NullString and NullInt to allow empty values
+- Added Search ability to Logs in UI
 
 # 0.90.60 (07-15-2020)
 - Added LETSENCRYPT_ENABLE (boolean) env to enable/disable letsencrypt SSL
