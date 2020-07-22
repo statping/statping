@@ -1,7 +1,6 @@
 FROM node:12.18.2-alpine AS frontend
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG BUILDPLATFORM
-RUN npm install yarn -g
 WORKDIR /statping
 COPY ./frontend/package.json .
 COPY ./frontend/yarn.lock .
