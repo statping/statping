@@ -1,6 +1,7 @@
 package notifiers
 
 import (
+	"github.com/statping/statping/types/null"
 	"strings"
 	"time"
 
@@ -30,8 +31,8 @@ var Gotify = &gotify{&notifications.Notification{
 	Icon:        "broadcast-tower",
 	Delay:       time.Duration(5 * time.Second),
 	Limits:      60,
-	SuccessData: `{"title": "{{.Service.Name}}", "message": "Your service '{{.Service.Name}}' is currently online!", "priority": 2}`,
-	FailureData: `{"title": "{{.Service.Name}}", "message": "Your service '{{.Service.Name}}' is currently failing! Reason: {{.Failure.Issue}}", "priority": 5}`,
+	SuccessData: null.NewNullString(`{"title": "{{.Service.Name}}", "message": "Your service '{{.Service.Name}}' is currently online!", "priority": 2}`),
+	FailureData: null.NewNullString(`{"title": "{{.Service.Name}}", "message": "Your service '{{.Service.Name}}' is currently failing! Reason: {{.Failure.Issue}}", "priority": 5}`),
 	DataType:    "json",
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
@@ -53,13 +54,13 @@ var Gotify = &gotify{&notifications.Notification{
 // Send will send a HTTP Post to the Gotify API. It accepts type: string
 func (g *gotify) sendMessage(msg string) (string, error) {
 	var url string
-	if strings.HasSuffix(g.Host, "/") {
-		url = g.Host + "message"
+	if strings.HasSuffix(g.Host.String, "/") {
+		url = g.Host.String + "message"
 	} else {
-		url = g.Host + "/message"
+		url = g.Host.String + "/message"
 	}
 
-	headers := []string{"X-Gotify-Key=" + g.ApiKey}
+	headers := []string{"X-Gotify-Key=" + g.ApiKey.String}
 
 	content, _, err := utils.HttpRequest(url, "POST", "application/json", headers, strings.NewReader(msg), time.Duration(10*time.Second), true, nil)
 
@@ -68,13 +69,13 @@ func (g *gotify) sendMessage(msg string) (string, error) {
 
 // OnFailure will trigger failing service
 func (g *gotify) OnFailure(s services.Service, f failures.Failure) (string, error) {
-	out, err := g.sendMessage(ReplaceVars(g.FailureData, s, f))
+	out, err := g.sendMessage(ReplaceVars(g.FailureData.String, s, f))
 	return out, err
 }
 
 // OnSuccess will trigger successful service
 func (g *gotify) OnSuccess(s services.Service) (string, error) {
-	out, err := g.sendMessage(ReplaceVars(g.SuccessData, s, failures.Failure{}))
+	out, err := g.sendMessage(ReplaceVars(g.SuccessData.String, s, failures.Failure{}))
 	return out, err
 }
 

@@ -38,10 +38,10 @@ func TestTwilioNotifier(t *testing.T) {
 	}
 
 	t.Run("Load Twilio", func(t *testing.T) {
-		Twilio.ApiKey = TWILIO_SID
-		Twilio.ApiSecret = TWILIO_SECRET
-		Twilio.Var1 = "15005550006"
-		Twilio.Var2 = "15005550006"
+		Twilio.ApiKey = null.NewNullString(TWILIO_SID)
+		Twilio.ApiSecret = null.NewNullString(TWILIO_SECRET)
+		Twilio.Var1 = null.NewNullString("15005550006")
+		Twilio.Var2 = null.NewNullString("15005550006")
 		Twilio.Delay = 100 * time.Millisecond
 		Twilio.Enabled = null.NewNullBool(true)
 
@@ -49,7 +49,7 @@ func TestTwilioNotifier(t *testing.T) {
 
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", Twilio.Author)
-		assert.Equal(t, TWILIO_SID, Twilio.ApiKey)
+		assert.Equal(t, TWILIO_SID, Twilio.ApiKey.String)
 	})
 
 	t.Run("Twilio Within Limits", func(t *testing.T) {

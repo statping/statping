@@ -37,10 +37,10 @@ func TestPushoverNotifier(t *testing.T) {
 	}
 
 	t.Run("Load Pushover", func(t *testing.T) {
-		Pushover.ApiKey = PUSHOVER_TOKEN
-		Pushover.ApiSecret = PUSHOVER_API
-		Pushover.Var1 = "Normal"
-		Pushover.Var2 = "vibrate"
+		Pushover.ApiKey = null.NewNullString(PUSHOVER_TOKEN)
+		Pushover.ApiSecret = null.NewNullString(PUSHOVER_API)
+		Pushover.Var1 = null.NewNullString("Normal")
+		Pushover.Var2 = null.NewNullString("vibrate")
 		Pushover.Enabled = null.NewNullBool(true)
 
 		Add(Pushover)

@@ -90,10 +90,10 @@ func (e *emailer) OnFailure(s services.Service, f failures.Failure) (string, err
 	subject := fmt.Sprintf("Service %s is Offline", s.Name)
 	tmpl := renderEmail(s, f)
 	email := &emailOutgoing{
-		To:       e.Var2,
+		To:       e.Var2.String,
 		Subject:  subject,
 		Template: tmpl,
-		From:     e.Var1,
+		From:     e.Var1.String,
 	}
 	return tmpl, e.dialSend(email)
 }
@@ -103,10 +103,10 @@ func (e *emailer) OnSuccess(s services.Service) (string, error) {
 	subject := fmt.Sprintf("Service %s is Back Online", s.Name)
 	tmpl := renderEmail(s, failures.Failure{})
 	email := &emailOutgoing{
-		To:       e.Var2,
+		To:       e.Var2.String,
 		Subject:  subject,
 		Template: tmpl,
-		From:     e.Var1,
+		From:     e.Var1.String,
 	}
 	return tmpl, e.dialSend(email)
 }
@@ -140,10 +140,10 @@ func (e *emailer) OnTest() (string, error) {
 	service := services.Example(true)
 	subject := fmt.Sprintf("Service %v is Back Online", service.Name)
 	email := &emailOutgoing{
-		To:       e.Var2,
+		To:       e.Var2.String,
 		Subject:  subject,
 		Template: renderEmail(service, failures.Example()),
-		From:     e.Var1,
+		From:     e.Var1.String,
 	}
 	return subject, e.dialSend(email)
 }
@@ -154,10 +154,10 @@ func (e *emailer) OnSave() (string, error) {
 }
 
 func (e *emailer) dialSend(email *emailOutgoing) error {
-	mailer = mail.NewDialer(e.Host, e.Port, e.Username, e.Password)
+	mailer = mail.NewDialer(e.Host.String, int(e.Port.Int64), e.Username.String, e.Password.String)
 	m := mail.NewMessage()
 	// if email setting TLS is Disabled
-	if e.ApiKey == "true" {
+	if e.ApiKey.String == "true" {
 		mailer.SSL = false
 	} else {
 		mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}

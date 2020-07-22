@@ -42,14 +42,14 @@ func TestGotifyNotifier(t *testing.T) {
 	}
 
 	t.Run("Load gotify", func(t *testing.T) {
-		Gotify.Host = GOTIFY_URL
+		Gotify.Host = null.NewNullString(GOTIFY_URL)
 		Gotify.Delay = time.Duration(100 * time.Millisecond)
 		Gotify.Enabled = null.NewNullBool(true)
 
 		Add(Gotify)
 
 		assert.Equal(t, "Hugo van Rijswijk", Gotify.Author)
-		assert.Equal(t, GOTIFY_URL, Gotify.Host)
+		assert.Equal(t, GOTIFY_URL, Gotify.Host.String)
 	})
 
 	t.Run("gotify Notifier Tester", func(t *testing.T) {

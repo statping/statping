@@ -9,6 +9,7 @@
 - Modified SASS api endpoints (base, layout, forms, mixins, mobile, variables)
 - Added additional testing
 - Modified node version from 10.x to 12.18.2
+- Modified Notifier's struct values to be NullString and NullInt to allow empty values
 
 # 0.90.60 (07-15-2020)
 - Added LETSENCRYPT_ENABLE (boolean) env to enable/disable letsencrypt SSL

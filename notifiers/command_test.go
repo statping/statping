@@ -25,9 +25,9 @@ func TestCommandNotifier(t *testing.T) {
 	core.Example()
 
 	t.Run("Load Command", func(t *testing.T) {
-		Command.Host = "/bin/echo"
-		Command.Var1 = "service {{.Service.Domain}} is online"
-		Command.Var2 = "service {{.Service.Domain}} is offline"
+		Command.Host = null.NewNullString("/bin/echo")
+		Command.Var1 = null.NewNullString("service {{.Service.Domain}} is online")
+		Command.Var2 = null.NewNullString("service {{.Service.Domain}} is offline")
 		Command.Delay = time.Duration(100 * time.Millisecond)
 		Command.Limits = 99
 		Command.Enabled = null.NewNullBool(true)

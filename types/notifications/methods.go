@@ -45,21 +45,21 @@ func (n *Notification) CanSend() bool {
 func (n *Notification) GetValue(dbField string) string {
 	switch strings.ToLower(dbField) {
 	case "host":
-		return n.Host
+		return n.Host.String
 	case "port":
-		return fmt.Sprintf("%d", n.Port)
+		return fmt.Sprintf("%d", n.Port.Int64)
 	case "username":
-		return n.Username
+		return n.Username.String
 	case "password":
-		return n.Password
+		return n.Password.String
 	case "var1":
-		return n.Var1
+		return n.Var1.String
 	case "var2":
-		return n.Var2
+		return n.Var2.String
 	case "api_key":
-		return n.ApiKey
+		return n.ApiKey.String
 	case "api_secret":
-		return n.ApiSecret
+		return n.ApiSecret.String
 	case "limits":
 		return utils.ToString(n.Limits)
 	default:

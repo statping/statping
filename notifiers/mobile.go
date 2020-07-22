@@ -93,7 +93,7 @@ func (m *mobilePush) OnTest() (string, error) {
 	msg := &pushArray{
 		Message:  "Testing the Mobile Notifier",
 		Title:    "Testing Notifications",
-		Tokens:   []string{m.Var1},
+		Tokens:   []string{m.Var1.String},
 		Platform: 2,
 	}
 	body, err := pushRequest(msg)
@@ -115,7 +115,7 @@ func (m *mobilePush) OnTest() (string, error) {
 
 // Send will send message to Statping push notifications endpoint
 func (m *mobilePush) Send(pushMessage *pushArray) error {
-	pushMessage.Tokens = []string{m.Var1}
+	pushMessage.Tokens = []string{m.Var1.String}
 	pushMessage.Platform = utils.ToInt(m.Var2)
 	_, err := pushRequest(pushMessage)
 	if err != nil {
