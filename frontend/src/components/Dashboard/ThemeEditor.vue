@@ -43,13 +43,13 @@
     </form>
     </div>
 
-        <div class="card-footer">
+        <div v-if="directory" class="card-footer">
             <div class="row">
                 <div class="col-6">
                     <button id="save_assets" @click.prevent="saveAssets" type="submit" class="btn btn-primary btn-block" :disabled="pending">{{pending ? "Saving..." : "Save Styles"}}</button>
                 </div>
                 <div class="col-6">
-                    <button id="delete_assets" v-if="directory" @click.prevent="deleteAssets" class="btn btn-danger btn-block confirm-btn" :disabled="pending">Delete Local Assets</button>
+                    <button id="delete_assets" @click.prevent="deleteAssets" class="btn btn-danger btn-block confirm-btn" :disabled="pending">Delete Local Assets</button>
                 </div>
             </div>
         </div>
