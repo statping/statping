@@ -173,9 +173,9 @@ build-win:
 		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-386/statping.exe ./cmd
 
 build-linux:
-	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=amd64 \
+	CGO_ENABLED=1 GO111MODULE="on" CC=gcc CXX=g++ GOOS=linux GOARCH=amd64 \
 		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "netgo linux" ./cmd
-	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=386 \
+	CGO_ENABLED=1 GO111MODULE="on" CC=gcc CXX=g++ GOOS=linux GOARCH=386 \
 		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "netgo linux" ./cmd
 
 build-linux-arm:

@@ -314,8 +314,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y automake autogen build-essential ca-certificates libsqlite3-dev \
-          libc6-armel-cross libc6-dev-armel-cross gcc-aarch64-linux-gnu binutils-arm-linux-gnueabi \
-          libncurses5-dev build-essential bison flex libssl-dev bc gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf \
+          libc6-armel-cross libc6-dev-armel-cross libc6-dev-i386 gcc-aarch64-linux-gnu binutils-arm-linux-gnueabi \
+          libncurses5-dev build-essential libsystemd-dev gcc-multilib bison flex libssl-dev bc gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf \
           gcc-arm-linux-gnueabi g++-arm-linux-gnueabi libsqlite3-dev gcc-mingw-w64 gcc-mingw-w64-x86-64
 
       - name: Setting ENV's
