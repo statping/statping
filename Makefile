@@ -183,7 +183,7 @@ build-linux-arm:
 		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm6/statping --tags "netgo linux" ./cmd
 	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=7 \
 		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm7/statping --tags "netgo linux" ./cmd
-	CGO_ENABLED=1 CC=gcc CXX=g++ GO111MODULE="on" GOOS=linux GOARCH=arm64 \
+	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ GO111MODULE="on" GOOS=linux GOARCH=arm64 \
 		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm64/statping --tags "netgo linux" ./cmd
 
 build-folders:
