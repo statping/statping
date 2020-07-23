@@ -3,14 +3,14 @@ SIGN_KEY=B76D61FAA6DB759466E83D9964B9C6AAE2D55278
 BINARY_NAME=statping
 GOBUILD=go build -a
 GOVERSION=1.14.0
-NODE_VERSION=10.17.0
+NODE_VERSION=12.18.2
 XGO=xgo -go $(GOVERSION) --dest=build
 BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
 TRVIS_SECRET=O3/2KTOV8krv+yZ1EB/7D1RQRe6NdpFUEJNJkMS/ollYqmz3x2mCO7yIgIJKCKguLXZxjM6CxJcjlCrvUwibL+8BBp7xJe4XFIOrjkPvbbVPry4HkFZCf2GfcUK6o4AByQ+RYqsW2F17Fp9KLQ1rL3OT3eLTwCAGKx3tlY8y+an43zkmo5dN64V6sawx26fh6XTfww590ey+ltgQTjf8UPNup2wZmGvMo9Hwvh/bYR/47bR6PlBh6vhlKWyotKf2Fz1Bevbu0zc35pee5YlsrHR+oSF+/nNd/dOij34BhtqQikUR+zQVy9yty8SlmneVwD3yOENvlF+8roeKIXb6P6eZnSMHvelhWpAFTwDXq2N3d/FIgrQtLxsAFTI3nTHvZgs6OoTd6dA0wkhuIGLxaL3FOeztCdxP5J/CQ9GUcTvifh5ArGGwYxRxQU6rTgtebJcNtXFISP9CEUR6rwRtb6ax7h6f1SbjUGAdxt+r2LbEVEk4ZlwHvdJ2DtzJHT5DQtLrqq/CTUgJ8SJFMkrJMp/pPznKhzN4qvd8oQJXygSXX/gz92MvoX0xgpNeLsUdAn+PL9KketfR+QYosBz04d8k05E+aTqGaU7FUCHPTLwlOFvLD8Gbv0zsC/PWgSLXTBlcqLEz5PHwPVHTcVzspKj/IyYimXpCSbvu1YOIjyc=
 PUBLISH_BODY='{ "request": { "branch": "master", "message": "Homebrew update version v${VERSION}", "config": { "env": { "VERSION": "${VERSION}", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
 TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "merge_mode": "replace", "language": "go", "go": 1.14, "install": true, "sudo": "required", "services": ["docker"], "env": { "secure": "${TRVIS_SECRET}" }, "before_deploy": ["git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [{ "provider": "releases", "api_key": "$$GITHUB_TOKEN", "file_glob": true, "file": "build/*", "skip_cleanup": true, "on": { "branch": "master" } }], "before_script": ["rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install stable", "nvm install 10.17.0", "nvm use 10.17.0 --default", "npm install -g sass yarn cross-env", "pip install --user awscli"], "script": ["make release"], "after_success": [], "after_deploy": ["make post-release"] } } }'
 TEST_DIR=$(GOPATH)/src/github.com/statping/statping
-PATH:=/usr/local/bin:$(GOPATH)/bin:$(PATH)
+PATH:=$(GOPATH)/bin:$(PATH)
 OS = freebsd linux openbsd
 ARCHS = 386 arm amd64 arm64
 
@@ -157,33 +157,34 @@ generate:
 
 build-all: clean compile build-folders build-linux build-linux-arm build-darwin build-win compress-folders
 
-build-win:
-	CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ GO111MODULE="on" GOOS=windows GOARCH=amd64 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-amd64/statping.exe ./cmd
-	CGO_ENABLED=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ GO111MODULE="on" GOOS=windows GOARCH=386 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-386/statping.exe ./cmd
-
 build-deps:
 	apt install libc6-armel-cross libc6-dev-armel-cross binutils-arm-linux-gnueabi \
 	libncurses5-dev build-essential bison flex libssl-dev bc gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf \
 	gcc-arm-linux-gnueabi g++-arm-linux-gnueabi libsqlite3-dev gcc-mingw-w64 gcc-mingw-w64-x86-64
 
 build-darwin:
-	GO111MODULE="on" GOOS=darwin GOARCH=amd64 go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-amd64/statping --tags "netgo darwin" ./cmd
+	GO111MODULE="on" GOOS=darwin GOARCH=amd64 \
+		go build -a -ldflags "-s -w -X main.VERSION=${VERSION}" -o releases/statping-darwin-amd64/statping --tags "netgo darwin" ./cmd
+
+build-win:
+	CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ GO111MODULE="on" GOOS=windows GOARCH=amd64 \
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-amd64/statping.exe ./cmd
+	CGO_ENABLED=1 CC=i686-w64-mingw32-gcc CXX=i686-w64-mingw32-g++ GO111MODULE="on" GOOS=windows GOARCH=386 \
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-386/statping.exe ./cmd
 
 build-linux:
 	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=amd64 \
-		go build -a -v -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "netgo linux" ./cmd
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "netgo linux" ./cmd
 	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=386 \
-		go build -a -v -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "netgo linux" ./cmd
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "netgo linux" ./cmd
 
 build-linux-arm:
 	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=6 \
-		go build -v -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm6/statping --tags "netgo linux" ./cmd
-	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=7 \
-		go build -v -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm7/statping --tags "netgo linux" ./cmd
-	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ GO111MODULE="on" GOOS=linux GOARCH=arm64 \
-		go build -v -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm64/statping --tags "netgo linux" ./cmd
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm6/statping --tags "netgo linux" ./cmd
+	CGO_ENABLED=1 CC=gcc-aarch64-linux-gnu CXX=gcc-aarch64-linux-g++ GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=7 \
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm7/statping --tags "netgo linux" ./cmd
+	CGO_ENABLED=1 CC=gcc-aarch64-linux-gnu CXX=gcc-aarch64-linux-g++ GO111MODULE="on" GOOS=linux GOARCH=arm64 \
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm64/statping --tags "netgo linux" ./cmd
 
 build-folders:
 	mkdir build || true
@@ -308,7 +309,18 @@ sentry-release:
 	sentry-cli releases set-commits --auto v${VERSION}
 	sentry-cli releases finalize v${VERSION}
 
-snapcraft: clean compile build-linux
+download-bins: clean
+	mkdir build || true
+	wget "https://github.com/statping/statping/releases/download/v${VERSION}/statping-linux-386.tar.gz"
+	wget "https://github.com/statping/statping/releases/download/v${VERSION}/statping-linux-amd64.tar.gz"
+	wget "https://github.com/statping/statping/releases/download/v${VERSION}/statping-linux-arm.tar.gz"
+	wget "https://github.com/statping/statping/releases/download/v${VERSION}/statping-linux-arm64.tar.gz"
+	mv statping-linux-386.tar.gz build/
+	mv statping-linux-amd64.tar.gz build/
+	mv statping-linux-arm.tar.gz build/
+	mv statping-linux-arm64.tar.gz build/
+
+snapcraft: download-bins
 	mkdir snap
 	mv snapcraft.yaml snap/
 	PWD=$(shell pwd)
@@ -361,5 +373,12 @@ multiarch:
 	mkdir /tmp/.buildx-cache || true
 	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
-.PHONY: all build certs multiarch build-all buildx-base buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
+check:
+	@echo "Checking the programs required for the build are installed..."
+	@node --version >/dev/null 2>&1 || (echo "ERROR: node 12.x is required."; exit 1)
+	@yarn --version >/dev/null 2>&1 || (echo "ERROR: yarn is required."; exit 1)
+	@which rice >/dev/null 2>&1 || (echo "ERROR: github.com/GeertJohan/go.rice is required."; exit 1)
+	@echo "All required programs are installed!"
+
+.PHONY: all check build certs multiarch build-all buildx-base buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds
