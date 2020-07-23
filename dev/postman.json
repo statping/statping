@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "3c6a7841-0b39-4878-a3a6-1c76832b7679",
 		"name": "Statping",
-		"description": "The Statping API allows you to programmatically access data on your Statping server.\n\nThe easiest way to get started with the API is by running your own Docker or local instance of the Statping server.\n\n<img width=\"100%\" src=\"https://img.cjx.io/statuptokenbalance.gif\">\n\n# Authentication\n\nAn API Key is required to be sent as part of every request to the Statping API, by using the `Authorization` and the API Secret Key as a header.\n\n> If you do not have an API Secret Key, you can find it on the Settings page.\n\nYou can Authenticate by implementing the following...\n- Using the `Authorization` header with API Secret Key\n- Setting `GO_ENV` to `test` to bypass all authentication\n- Adding `?api=<keyhere>` URL Query along with the API Secret Key\n- Being logged into Statping as an admin (using JWT sessions/cookies)\n\n> Authentication will create a cookie named `statping_auth`.\n\n# Environment Variables\nStatping includes many environment variables that can give you more control over your instance. Please view the [Environment Variables Wiki](https://github.com/statping/statping/wiki/Environment-Variables) page to view a complete list. Below are a couple important ones...\n- `STATPING_DIR` - Statping's working directory. By default, this will be set to the current working directory. This path will contain the `config.yml` file, `logs`, and `assets` folder. \n- `SASS` - Absolute path to the `sass` executable. By default it will attempt to find `sass` in your `$PATH`. \n\n# Demo\nYou can checkout the Statping Demo instance at [https://demo.statping.com](https://demo.statping.com). All features are available for you to experiment with. The API Secret Key is `demoapisecret123`. Since this instance is public, it will be reset with sample data **every 90 minutes**.\n",
+		"description": "The Statping API allows you to programmatically access data on your Statping server.\n\nThe easiest way to get started with the API is by running your own Docker or local instance of the Statping server.\n\n<img width=\"100%\" src=\"https://img.cjx.io/statuptokenbalance.gif\">\n\n# Authentication\n\nAn API Key is required to be sent as part of every request to the Statping API, by using the `Authorization` and the API Secret Key as a header.\n\n> If you do not have an API Secret Key, you can find it on the Settings page.\n\nYou can Authenticate by implementing the following...\n- Using the `Authorization` header with API Secret Key\n- Setting `GO_ENV` to `test` to bypass all authentication\n- Adding `?api=<keyhere>` URL Query along with the API Secret Key\n- Adding `?api=<userkey>` URL Query along with the API Key for a user\n- Being logged into Statping as an admin (using JWT sessions/cookies)\n\n> Authentication will create a cookie named `statping_auth`.\n\n# Environment Variables\nStatping includes many environment variables that can give you more control over your instance. Please view the [Environment Variables Wiki](https://github.com/statping/statping/wiki/Environment-Variables) page to view a complete list. Below are a couple important ones...\n- `STATPING_DIR` - Statping's working directory. By default, this will be set to the current working directory. This path will contain the `config.yml` file, `logs`, and `assets` folder. \n- `SASS` - Absolute path to the `sass` executable. By default it will attempt to find `sass` in your `$PATH`. \n\n# Demo\nYou can checkout the Statping Demo instance at [https://demo.statping.com](https://demo.statping.com). All features are available for you to experiment with. The API Secret Key is `demoapisecret123`. Since this instance is public, it will be reset with sample data **every 90 minutes**.\n",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -2281,14 +2281,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/services/1/incidents",
+							"raw": "{{endpoint}}/api/services/3/incidents",
 							"host": [
 								"{{endpoint}}"
 							],
 							"path": [
 								"api",
 								"services",
-								"1",
+								"3",
 								"incidents"
 							]
 						},
@@ -2354,213 +2354,6 @@
 							"body": "{\n    \"status\": \"success\",\n    \"type\": \"incident\",\n    \"method\": \"create\",\n    \"id\": 1,\n    \"output\": {\n        \"id\": 1,\n        \"title\": \"Service Downtime\",\n        \"service\": 1,\n        \"created_at\": \"2020-05-04T03:11:51.752374Z\",\n        \"updated_at\": \"2020-05-04T03:11:51.752374Z\"\n    }\n}"
 						}
 					]
-				},
-				{
-					"name": "Update Service Incident",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "42cd68de-5bd4-4d4e-b687-fa0bafc1d61a",
-								"exec": [
-									"pm.test(\"Response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{api_key}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"title\": \"Updated Downtime\",\n\t\"description\": \"This is an update for an incident\"\n}"
-						},
-						"url": {
-							"raw": "{{endpoint}}/api/incidents/1",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"api",
-								"incidents",
-								"1"
-							]
-						},
-						"description": "View all incidents for a single service."
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Incident",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "c6735dbe-86e8-4b42-9b04-6fc1fea949df",
-								"exec": [
-									"pm.test(\"Response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{api_key}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{endpoint}}/api/incidents/1",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"api",
-								"incidents",
-								"1"
-							]
-						},
-						"description": "View all incidents for a single service."
-					},
-					"response": [
-						{
-							"name": "Delete Incident",
-							"originalRequest": {
-								"method": "DELETE",
-								"header": [
-									{
-										"key": "Content-Type",
-										"name": "Content-Type",
-										"type": "text",
-										"value": "application/json"
-									}
-								],
-								"url": {
-									"raw": "{{endpoint}}/api/incidents/2",
-									"host": [
-										"{{endpoint}}"
-									],
-									"path": [
-										"api",
-										"incidents",
-										"2"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								},
-								{
-									"key": "Date",
-									"value": "Mon, 04 May 2020 03:31:48 GMT"
-								},
-								{
-									"key": "Content-Length",
-									"value": "207"
-								},
-								{
-									"key": "Connection",
-									"value": "close"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"status\": \"success\",\n    \"type\": \"incident\",\n    \"method\": \"delete\",\n    \"id\": 2,\n    \"output\": {\n        \"id\": 2,\n        \"title\": \"Service Downtime\",\n        \"service\": 1,\n        \"created_at\": \"2020-05-04T03:18:24.818629Z\",\n        \"updated_at\": \"2020-05-04T03:18:24.818629Z\"\n    }\n}"
-						}
-					]
-				},
-				{
-					"name": "Incident Updates",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "e2e7d38f-efae-44d1-9361-cd301547feb3",
-								"exec": [
-									"pm.test(\"Response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{api_key}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{endpoint}}/api/incidents/2/updates",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"api",
-								"incidents",
-								"2",
-								"updates"
-							]
-						},
-						"description": "View all incidents for a single service."
-					},
-					"response": []
 				},
 				{
 					"name": "Create Incident Update",
@@ -2673,6 +2466,113 @@
 					]
 				},
 				{
+					"name": "Incident Updates",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e2e7d38f-efae-44d1-9361-cd301547feb3",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{endpoint}}/api/incidents/2/updates",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"incidents",
+								"2",
+								"updates"
+							]
+						},
+						"description": "View all incidents for a single service."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Service Incident",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "42cd68de-5bd4-4d4e-b687-fa0bafc1d61a",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"title\": \"Updated Downtime\",\n\t\"description\": \"This is an update for an incident\"\n}"
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/incidents/1",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"incidents",
+								"1"
+							]
+						},
+						"description": "View all incidents for a single service."
+					},
+					"response": []
+				},
+				{
 					"name": "Delete Incident Update",
 					"event": [
 						{
@@ -2773,6 +2673,106 @@
 							],
 							"cookie": [],
 							"body": "{\n    \"status\": \"success\",\n    \"type\": \"incident_update\",\n    \"method\": \"delete\",\n    \"id\": 1,\n    \"output\": {\n        \"id\": 1,\n        \"message\": \"Website is loading very slowly, looking into this.\",\n        \"type\": \"Investigating\",\n        \"created_at\": \"2020-05-04T03:20:05.102435Z\",\n        \"updated_at\": \"2020-05-04T03:20:05.102435Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Incident",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c6735dbe-86e8-4b42-9b04-6fc1fea949df",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{endpoint}}/api/incidents/1",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"incidents",
+								"1"
+							]
+						},
+						"description": "View all incidents for a single service."
+					},
+					"response": [
+						{
+							"name": "Delete Incident",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{endpoint}}/api/incidents/2",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"incidents",
+										"2"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 04 May 2020 03:31:48 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "207"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"type\": \"incident\",\n    \"method\": \"delete\",\n    \"id\": 2,\n    \"output\": {\n        \"id\": 2,\n        \"title\": \"Service Downtime\",\n        \"service\": 1,\n        \"created_at\": \"2020-05-04T03:18:24.818629Z\",\n        \"updated_at\": \"2020-05-04T03:18:24.818629Z\"\n    }\n}"
 						}
 					]
 				}
