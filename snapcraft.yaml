@@ -18,8 +18,6 @@ architectures:
   - build-on: armhf
   - build-on: arm64
 
-adopt-info: statping
-
 apps:
   statping:
     command: statping
