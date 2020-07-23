@@ -29,18 +29,14 @@ apps:
 
 parts:
   statping:
-  plugin: git
-    source: https://github.com/statping/statping.git
-    source-type: git
-    override-pull: |
-      snapcraftctl set-version "$(cat version.txt)"
-    override-build: |
-      export GOPATH=$PWD
-      cd src/github.com/statping/statping
-      GOOS=linux go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=$(cat version.txt)" -o statping --tags "netgo linux" ./cmd
+    plugin: go
+    source: .
+    go-importpath: statping
     build-snaps:
       - go
     build-packages:
       - git
+      - gcc
+      - make
       - sed
 
