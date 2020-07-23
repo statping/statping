@@ -306,6 +306,46 @@ jobs:
           timeoutRequest: 30000
           delayRequest: 600
 
+  build-binaries:
+    needs: compile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.14.2'
+      - uses: actions/checkout@v2
+
+      - name: Install cross compiling libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y automake autogen build-essential ca-certificates libsqlite3-dev \
+          libc6-armel-cross libc6-dev-armel-cross binutils-arm-linux-gnueabi \
+          libncurses5-dev build-essential bison flex libssl-dev bc gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf \
+          gcc-arm-linux-gnueabi g++-arm-linux-gnueabi libsqlite3-dev gcc-mingw-w64 gcc-mingw-w64-x86-64
+
+      - name: Setting ENV's
+        run: |
+          echo "::add-path::$(go env GOPATH)/bin"
+          echo "::add-path::/opt/hostedtoolcache/node/12.18.2/x64/bin"
+          echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
+      - name: Download Go mods
+        run: |
+          make test-deps
+
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
+
+      - name: Build Binaries
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: $GITHUB_SHA
+        run: make build-folders build-linux build-linux-arm build-darwin build-win compress-folders
+
   docker-release:
     needs: [test, test-postman-sqlite, test-postman-mysql, test-postman-postgres]
     runs-on: ubuntu-latest

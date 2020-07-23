@@ -12,16 +12,35 @@ description: >
 type: app
 confinement: strict
 grade: stable
+architectures:
+  - build-on: amd64
+  - build-on: armhf
+  - build-on: arm64
 
-parts:
-  statping:
-    plugin: dump
-    source: ./build/statping-linux.tar.gz
+adopt-info: statping
 
 apps:
   statping:
     command: statping
     plugs:
       - home
-      - network-bind
       - network
+      - network-bind
+
+parts:
+  statping:
+  plugin: git
+    source: https://github.com/statping/statping.git
+    source-type: git
+    override-pull: |
+      snapcraftctl set-version "$(cat version.txt)"
+    override-build: |
+      export GOPATH=$PWD
+      cd src/github.com/statping/statping
+      GOOS=linux go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=$(cat version.txt)" -o statping --tags "netgo linux" ./cmd
+    build-snaps:
+      - go
+    build-packages:
+      - git
+      - sed
+
