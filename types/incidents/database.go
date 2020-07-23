@@ -87,5 +87,10 @@ func (i *Incident) Update() error {
 }
 
 func (i *Incident) Delete() error {
+	for _, u := range i.Updates() {
+		if err := u.Delete(); err != nil {
+			return err
+		}
+	}
 	return db.Delete(i).Error()
 }

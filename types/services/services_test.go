@@ -9,6 +9,7 @@ import (
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
+	"github.com/statping/statping/types/incidents"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
@@ -81,6 +82,20 @@ var fail2 = &failures.Failure{
 	Service:   1,
 	PingTime:  123456,
 	CreatedAt: utils.Now().Add(-5 * time.Second),
+}
+
+var incident1 = &incidents.Incident{
+	Title:       "Theres something going on",
+	Description: "this is an example",
+	ServiceId:   1,
+	CreatedAt:   utils.Now().Add(-30 * time.Second),
+}
+
+var incidentUpdate1 = &incidents.IncidentUpdate{
+	IncidentId: 1,
+	Message:    "This is an update",
+	Type:       "pending",
+	CreatedAt:  utils.Now().Add(-5 * time.Second),
 }
 
 type exampleGRPC struct {
@@ -168,9 +183,10 @@ func TestServices(t *testing.T) {
 	require.Nil(t, err)
 	db, err := database.OpenTester()
 	require.Nil(t, err)
-	db.AutoMigrate(&Service{}, &hits.Hit{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &failures.Failure{})
+	db.AutoMigrate(&Service{}, &hits.Hit{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &failures.Failure{}, &incidents.Incident{}, &incidents.IncidentUpdate{})
 	checkins.SetDB(db)
 	failures.SetDB(db)
+	incidents.SetDB(db)
 	hits.SetDB(db)
 	SetDB(db)
 
@@ -181,6 +197,8 @@ func TestServices(t *testing.T) {
 	db.Create(&exmapleCheckin)
 	db.Create(&fail1)
 	db.Create(&fail2)
+	db.Create(&incident1)
+	db.Create(&incidentUpdate1)
 
 	tlsCert := utils.Params.GetString("STATPING_DIR") + "/cert.pem"
 	tlsCertKey := utils.Params.GetString("STATPING_DIR") + "/key.pem"
@@ -498,6 +516,22 @@ func TestServices(t *testing.T) {
 
 		err = item.Delete()
 		require.Nil(t, err)
+
+		checkin := item.Checkins()
+		assert.Len(t, checkin, 0)
+		for _, c := range checkin {
+			assert.Len(t, c.Failures().List(), 0)
+			assert.Len(t, c.Hits(), 0)
+		}
+
+		assert.Len(t, item.AllFailures().List(), 0)
+		assert.Len(t, item.AllHits().List(), 0)
+
+		inc := item.Incidents()
+		assert.Len(t, inc, 0)
+		for _, i := range inc {
+			assert.Len(t, i.Updates(), 0)
+		}
 
 		all = All()
 		assert.Len(t, all, 1)

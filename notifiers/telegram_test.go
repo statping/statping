@@ -20,6 +20,10 @@ var (
 )
 
 func TestTelegramNotifier(t *testing.T) {
+	t.Parallel()
+
+	telegramToken = utils.Params.GetString("TELEGRAM_TOKEN")
+	telegramChannel = utils.Params.GetString("TELEGRAM_CHANNEL")
 	if telegramToken == "" || telegramChannel == "" {
 		t.Log("Telegram notifier testing skipped, missing TELEGRAM_TOKEN and TELEGRAM_CHANNEL environment variable")
 		t.SkipNow()
@@ -28,8 +32,6 @@ func TestTelegramNotifier(t *testing.T) {
 	err := utils.InitLogs()
 	require.Nil(t, err)
 
-	telegramToken = utils.Params.GetString("TELEGRAM_TOKEN")
-	telegramChannel = utils.Params.GetString("TELEGRAM_CHANNEL")
 	Telegram.ApiSecret = null.NewNullString(telegramToken)
 	Telegram.Var1 = null.NewNullString(telegramChannel)
 

@@ -19,6 +19,7 @@ var (
 )
 
 func TestSlackNotifier(t *testing.T) {
+	t.Parallel()
 	err := utils.InitLogs()
 	require.Nil(t, err)
 	db, err := database.OpenTester()

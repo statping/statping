@@ -11,6 +11,7 @@
 - Modified node version from 10.x to 12.18.2
 - Modified Notifier's struct values to be NullString and NullInt to allow empty values
 - Added Search ability to Logs in UI
+- Fixed issue with Incidents and Checkins not being deleted once service is deleted
 
 # 0.90.60 (07-15-2020)
 - Added LETSENCRYPT_ENABLE (boolean) env to enable/disable letsencrypt SSL

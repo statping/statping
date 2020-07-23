@@ -20,6 +20,8 @@ var (
 )
 
 func TestTwilioNotifier(t *testing.T) {
+	t.Parallel()
+
 	err := utils.InitLogs()
 	require.Nil(t, err)
 

@@ -21,6 +21,7 @@ var (
 )
 
 func TestGotifyNotifier(t *testing.T) {
+	t.Parallel()
 	err := utils.InitLogs()
 	require.Nil(t, err)
 	GOTIFY_URL = utils.Params.GetString("GOTIFY_URL")

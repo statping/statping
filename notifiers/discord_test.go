@@ -19,6 +19,7 @@ var (
 )
 
 func TestDiscordNotifier(t *testing.T) {
+	t.Parallel()
 	err := utils.InitLogs()
 	require.Nil(t, err)
 	DISCORD_URL = utils.Params.GetString("DISCORD_URL")

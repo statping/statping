@@ -8,6 +8,7 @@ import (
 )
 
 func TestReplaceTemplate(t *testing.T) {
+	t.Parallel()
 	temp := `{"id":{{.Service.Id}},"name":"{{.Service.Name}}"}`
 	replaced := ReplaceTemplate(temp, replacer{Service: services.Example(true)})
 	assert.Equal(t, `{"id":6283,"name":"Statping Example"}`, replaced)
