@@ -14,12 +14,12 @@ PATH:=$(GOPATH)/bin:$(PATH)
 OS = freebsd linux openbsd
 ARCHS = 386 arm amd64 arm64
 
-all: check build-deps compile install test build
+all: build-deps compile install test build
 
-test: check clean compile
+test: clean compile
 	go test -v -p=1 -ldflags="-X main.VERSION=0.99.99" -coverprofile=coverage.out ./...
 
-build: check clean compile
+build: clean compile
 	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o statping --tags "netgo" ./cmd
 
 up:
