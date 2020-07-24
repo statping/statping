@@ -19,7 +19,7 @@ all: build-deps compile install test build
 test: clean compile
 	go test -v -p=1 -ldflags="-X main.VERSION=0.99.99" -coverprofile=coverage.out ./...
 
-build: clean compile
+build: clean
 	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o statping --tags "netgo" ./cmd
 
 up:
