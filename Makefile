@@ -176,18 +176,18 @@ build-win:
 		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-windows-386/statping.exe ./cmd
 
 build-linux:
-	CGO_ENABLED=1 GO111MODULE="on" CC=gcc CXX=g++ GOOS=linux GOARCH=amd64 \
+	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=amd64 \
 		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "netgo linux" ./cmd
-	CGO_ENABLED=1 GO111MODULE="on" CC=x86_64-linux-gnu CXX=x86_64-linux-g++ GOOS=linux GOARCH=386 \
+	CGO_ENABLED=1 GO111MODULE="on" GOOS=linux GOARCH=386 \
 		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "netgo linux" ./cmd
 
 build-linux-arm:
-	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=6 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm6/statping --tags "netgo linux" ./cmd
-	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++ GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=7 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm7/statping --tags "netgo linux" ./cmd
-	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ GO111MODULE="on" GOOS=linux GOARCH=arm64 \
-		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm64/statping --tags "netgo linux" ./cmd
+	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc-6 CXX=arm-linux-gnueabihf-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=6 \
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm6/statping --tags "netgo" ./cmd
+	CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc-6 CXX=arm-linux-gnueabihf-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm GOARM=7 \
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm7/statping --tags "netgo" ./cmd
+	CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc-6 CXX=aarch64-linux-gnu-g++-6 GO111MODULE="on" GOOS=linux GOARCH=arm64 \
+		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-arm64/statping --tags "netgo" ./cmd
 
 build-folders:
 	mkdir build || true
