@@ -16,10 +16,10 @@ ARCHS = 386 arm amd64 arm64
 
 all: check build-deps compile install test build
 
-test: clean compile
+test: check clean compile
 	go test -v -p=1 -ldflags="-X main.VERSION=0.99.99" -coverprofile=coverage.out ./...
 
-build: clean compile
+build: check clean compile
 	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o statping --tags "netgo" ./cmd
 
 up:
@@ -381,8 +381,6 @@ check:
 	@echo "go:     $(shell go version) - $(shell which go)" && go version >/dev/null 2>&1 || (echo "ERROR: go 1.14 is required."; exit 1)
 	@echo "node:   $(shell node --version) - $(shell which node)" && node --version >/dev/null 2>&1 || (echo "ERROR: node 12.x is required."; exit 1)
 	@echo "yarn:   $(shell yarn --version) - $(shell which yarn)" && yarn --version >/dev/null 2>&1 || (echo "ERROR: yarn is required."; exit 1)
-	@echo "docker: $(shell which docker)" && docker version >/dev/null 2>&1 || (echo "ERROR: Docker is required."; exit 1)
-	@which rice >/dev/null 2>&1 || (echo "ERROR: github.com/GeertJohan/go.rice is required."; exit 1)
 	@echo "All required programs are installed!"
 
 .PHONY: all check build certs multiarch build-all buildx-base buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
