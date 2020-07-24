@@ -34,6 +34,11 @@ func assetsCli() error {
 	return nil
 }
 
+func systemctlCli() error {
+	fmt.Println("still in the works...")
+	return nil
+}
+
 func exportCli(args []string) error {
 	filename := fmt.Sprintf("%s/statping-%s.json", utils.Directory, time.Now().Format("01-02-2006-1504"))
 	if len(args) == 1 {

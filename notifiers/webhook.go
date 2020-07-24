@@ -81,7 +81,7 @@ func (w *webhooker) Select() *notifications.Notification {
 }
 
 func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
-	utils.Log.Infoln(fmt.Sprintf("sending body: '%v' to %v as a %v request", body, w.Host, w.Var1))
+	utils.Log.Infoln(fmt.Sprintf("sending body: '%v' to %v as a %v request", body, w.Host.String, w.Var1.String))
 	client := new(http.Client)
 	client.Timeout = 10 * time.Second
 	req, err := http.NewRequest(w.Var1.String, w.Host.String, bytes.NewBufferString(body))

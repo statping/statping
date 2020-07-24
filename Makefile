@@ -5,7 +5,7 @@ GOBUILD=go build -a
 GOVERSION=1.14.0
 NODE_VERSION=12.18.2
 XGO=xgo -go $(GOVERSION) --dest=build
-BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=$(TRAVIS_COMMIT)"
+BUILDVERSION=-ldflags "-X main.VERSION=${VERSION}"
 TRVIS_SECRET=O3/2KTOV8krv+yZ1EB/7D1RQRe6NdpFUEJNJkMS/ollYqmz3x2mCO7yIgIJKCKguLXZxjM6CxJcjlCrvUwibL+8BBp7xJe4XFIOrjkPvbbVPry4HkFZCf2GfcUK6o4AByQ+RYqsW2F17Fp9KLQ1rL3OT3eLTwCAGKx3tlY8y+an43zkmo5dN64V6sawx26fh6XTfww590ey+ltgQTjf8UPNup2wZmGvMo9Hwvh/bYR/47bR6PlBh6vhlKWyotKf2Fz1Bevbu0zc35pee5YlsrHR+oSF+/nNd/dOij34BhtqQikUR+zQVy9yty8SlmneVwD3yOENvlF+8roeKIXb6P6eZnSMHvelhWpAFTwDXq2N3d/FIgrQtLxsAFTI3nTHvZgs6OoTd6dA0wkhuIGLxaL3FOeztCdxP5J/CQ9GUcTvifh5ArGGwYxRxQU6rTgtebJcNtXFISP9CEUR6rwRtb6ax7h6f1SbjUGAdxt+r2LbEVEk4ZlwHvdJ2DtzJHT5DQtLrqq/CTUgJ8SJFMkrJMp/pPznKhzN4qvd8oQJXygSXX/gz92MvoX0xgpNeLsUdAn+PL9KketfR+QYosBz04d8k05E+aTqGaU7FUCHPTLwlOFvLD8Gbv0zsC/PWgSLXTBlcqLEz5PHwPVHTcVzspKj/IyYimXpCSbvu1YOIjyc=
 PUBLISH_BODY='{ "request": { "branch": "master", "message": "Homebrew update version v${VERSION}", "config": { "env": { "VERSION": "${VERSION}", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
 TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "merge_mode": "replace", "language": "go", "go": 1.14, "install": true, "sudo": "required", "services": ["docker"], "env": { "secure": "${TRVIS_SECRET}" }, "before_deploy": ["git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [{ "provider": "releases", "api_key": "$$GITHUB_TOKEN", "file_glob": true, "file": "build/*", "skip_cleanup": true, "on": { "branch": "master" } }], "before_script": ["rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install stable", "nvm install 10.17.0", "nvm use 10.17.0 --default", "npm install -g sass yarn cross-env", "pip install --user awscli"], "script": ["make release"], "after_success": [], "after_deploy": ["make post-release"] } } }'
@@ -14,7 +14,13 @@ PATH:=$(GOPATH)/bin:$(PATH)
 OS = freebsd linux openbsd
 ARCHS = 386 arm amd64 arm64
 
-all: clean yarn-install compile docker-base docker-vue build-all
+all: check build-deps compile install test build
+
+test: clean compile
+	go test -v -p=1 -ldflags="-X main.VERSION=0.99.99" -coverprofile=coverage.out ./...
+
+build: clean compile
+	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o statping --tags "netgo" ./cmd
 
 up:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml up -d --remove-orphans
@@ -29,9 +35,6 @@ lite: clean
 	docker-compose -f dev/docker-compose.lite.yml up --remove-orphans
 
 reup: down clean compose-build-full up
-
-test: clean compile
-	go test -v -p=1 -ldflags="-X main.VERSION=testing" -coverprofile=coverage.out ./...
 
 # build all arch's and release Statping
 release: test-deps
@@ -122,11 +125,14 @@ top:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml top
 
 frontend-build:
-	rm -rf source/dist && rm -rf frontend/dist
+	@echo "Removing old frontend distributions..."
+	@rm -rf source/dist && rm -rf frontend/dist
+	@echo "yarn install and build static frontend"
 	cd frontend && yarn && yarn build
-	cp -r frontend/dist source/ && cp -r frontend/src/assets/scss source/dist/
-	cp -r source/tmpl/*.* source/dist/
-	cp -r frontend/public/favicon source/dist/
+	@cp -r frontend/dist source/ && cp -r frontend/src/assets/scss source/dist/
+	@cp -r source/tmpl/*.* source/dist/
+	@cp -r frontend/public/favicon source/dist/
+	@echo "Frontend build complete at ./source/dist"
 
 frontend-copy:
 	cp -r source/tmpl/*.* source/dist/
@@ -143,9 +149,6 @@ compile: frontend-build
 embed:
 	cd source && rice embed-go
 
-build:
-	$(GOBUILD) $(BUILDVERSION) -o $(BINARY_NAME) ./cmd
-
 install: build
 	mv $(BINARY_NAME) $(GOPATH)/bin/$(BINARY_NAME)
 
@@ -158,7 +161,7 @@ generate:
 build-all: clean compile build-folders build-linux build-linux-arm build-darwin build-win compress-folders
 
 build-deps:
-	apt install libc6-armel-cross libc6-dev-armel-cross binutils-arm-linux-gnueabi \
+	apt install -y libc6-armel-cross libc6-dev-armel-cross binutils-arm-linux-gnueabi \
 	libncurses5-dev build-essential bison flex libssl-dev bc gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf \
 	gcc-arm-linux-gnueabi g++-arm-linux-gnueabi libsqlite3-dev gcc-mingw-w64 gcc-mingw-w64-x86-64
 
@@ -175,7 +178,7 @@ build-win:
 build-linux:
 	CGO_ENABLED=1 GO111MODULE="on" CC=gcc CXX=g++ GOOS=linux GOARCH=amd64 \
 		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-amd64/statping --tags "netgo linux" ./cmd
-	CGO_ENABLED=1 GO111MODULE="on" CC=gcc CXX=g++ GOOS=linux GOARCH=386 \
+	CGO_ENABLED=1 GO111MODULE="on" CC=x86_64-linux-gnu CXX=x86_64-linux-g++ GOOS=linux GOARCH=386 \
 		go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o releases/statping-linux-386/statping --tags "netgo linux" ./cmd
 
 build-linux-arm:
@@ -217,26 +220,26 @@ compress-folders:
 
 # remove files for a clean compile/build
 clean:
-	rm -rf ./{logs,assets,plugins,*.db,config.yml,.sass-cache,config.yml,statping,build,.sass-cache,index.html,vendor}
-	rm -rf cmd/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log,*.html,*.json}
-	rm -rf core/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
-	rm -rf types/notifications/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
-	rm -rf handlers/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
-	rm -rf notifiers/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
-	rm -rf source/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
-	rm -rf types/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
-	rm -rf utils/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
-	rm -rf frontend/{logs,plugins,*.db,config.yml,.sass-cache,*.log}
-	rm -rf dev/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log,test/app,plugin/*.so}
-	rm -rf {parts,prime,snap,stage}
-	rm -rf frontend/cypress/videos
-	rm -f coverage.* sass
-	rm -rf **/*.db-journal
-	rm -rf *.snap
-	find . -name "*.out" -type f -delete
-	find . -name "*.cpu" -type f -delete
-	find . -name "*.mem" -type f -delete
-	rm -rf {build,releases,tmp,source/build,snap}
+	@echo "Cleaning temporary and build folders..."
+	@rm -rf ./{logs,assets,plugins,*.db,config.yml,.sass-cache,config.yml,statping,build,.sass-cache,index.html,vendor}
+	@rm -rf cmd/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log,*.html,*.json}
+	@rm -rf core/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	@rm -rf types/notifications/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	@rm -rf handlers/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	@rm -rf notifiers/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	@rm -rf source/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	@rm -rf types/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	@rm -rf utils/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log}
+	@rm -rf frontend/{logs,plugins,*.db,config.yml,.sass-cache,*.log}
+	@rm -rf dev/{logs,assets,plugins,*.db,config.yml,.sass-cache,*.log,test/app,plugin/*.so}
+	@rm -rf frontend/cypress/videos
+	@rm -f coverage.* sass
+	@rm -rf **/*.db-journal
+	@find . -name "*.out" -type f -delete
+	@find . -name "*.cpu" -type f -delete
+	@find . -name "*.mem" -type f -delete
+	@rm -rf {build,releases,tmp,source/build,snap,parts,prime,snap,stage}
+	@echo "Finished removing temporary and build folders"
 
 print_details:
 	@echo \==== Statping Development Instance ====
@@ -375,8 +378,10 @@ multiarch:
 
 check:
 	@echo "Checking the programs required for the build are installed..."
-	@node --version >/dev/null 2>&1 || (echo "ERROR: node 12.x is required."; exit 1)
-	@yarn --version >/dev/null 2>&1 || (echo "ERROR: yarn is required."; exit 1)
+	@echo "go:     $(shell go version) - $(shell which go)" && go version >/dev/null 2>&1 || (echo "ERROR: go 1.14 is required."; exit 1)
+	@echo "node:   $(shell node --version) - $(shell which node)" && node --version >/dev/null 2>&1 || (echo "ERROR: node 12.x is required."; exit 1)
+	@echo "yarn:   $(shell yarn --version) - $(shell which yarn)" && yarn --version >/dev/null 2>&1 || (echo "ERROR: yarn is required."; exit 1)
+	@echo "docker: $(shell which docker)" && docker version >/dev/null 2>&1 || (echo "ERROR: Docker is required."; exit 1)
 	@which rice >/dev/null 2>&1 || (echo "ERROR: github.com/GeertJohan/go.rice is required."; exit 1)
 	@echo "All required programs are installed!"
 

@@ -70,6 +70,24 @@ var versionCmd = &cobra.Command{
 	},
 }
 
+var systemctlCmd = &cobra.Command{
+	Use:   "systemctl [install/uninstall]",
+	Short: "Install or Uninstall systemctl links",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := systemctlCli(); err != nil {
+			return err
+		}
+		os.Exit(0)
+		return nil
+	},
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 1 {
+			return errors.New("requires 'install' or 'uninstall' as arguments")
+		}
+		return nil
+	},
+}
+
 var assetsCmd = &cobra.Command{
 	Use:   "assets",
 	Short: "Dump all assets used locally to be edited",

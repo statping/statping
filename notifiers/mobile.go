@@ -69,7 +69,7 @@ func dataJson(s services.Service, f failures.Failure) map[string]interface{} {
 func (m *mobilePush) OnFailure(s services.Service, f failures.Failure) (string, error) {
 	data := dataJson(s, f)
 	msg := &pushArray{
-		Message: fmt.Sprintf("Your service '%v' is currently failing! Reason: %v", s.Name, f.Issue),
+		Message: fmt.Sprintf("%s is currently failing! Reason: %v", s.Name, f.Issue),
 		Title:   "Service Offline",
 		Data:    data,
 	}
@@ -80,7 +80,7 @@ func (m *mobilePush) OnFailure(s services.Service, f failures.Failure) (string, 
 func (m *mobilePush) OnSuccess(s services.Service) (string, error) {
 	data := dataJson(s, failures.Failure{})
 	msg := &pushArray{
-		Message:  "Service is Online!",
+		Message:  fmt.Sprintf("%s is currently online!", s.Name),
 		Title:    "Service Online",
 		Data:     data,
 		Platform: 2,
