@@ -20,7 +20,7 @@ test: clean compile
 	go test -v -p=1 -ldflags="-X main.VERSION=0.99.99" -coverprofile=coverage.out ./...
 
 build: clean
-	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o statping --tags "netgo" ./cmd
+	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o statping --tags "netgo linux" ./cmd
 
 up:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml up -d --remove-orphans
