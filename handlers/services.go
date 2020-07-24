@@ -74,6 +74,46 @@ func apiCreateServiceHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonAction(service, "create", w, r)
 }
 
+type servicePatchReq struct {
+	Online  bool   `json:"online"`
+	Issue   string `json:"issue,omitempty"`
+	Latency int64  `json:"latency,omitempty"`
+}
+
+func apiServicePatchHandler(w http.ResponseWriter, r *http.Request) {
+	service, err := findService(r)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	var req servicePatchReq
+	if err := DecodeJSON(r, &req); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	service.Online = req.Online
+	service.Latency = req.Latency
+
+	issueDefault := "Service was triggered to be offline"
+	if req.Issue != "" {
+		issueDefault = req.Issue
+	}
+
+	if !req.Online {
+		services.RecordFailure(service, issueDefault)
+	} else {
+		services.RecordSuccess(service)
+	}
+
+	if err := service.Update(); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	sendJsonAction(service, "update", w, r)
+}
+
 func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	service, err := findService(r)
 	if err != nil {
@@ -84,9 +124,7 @@ func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-
-	err = service.Update()
-	if err != nil {
+	if err := service.Update(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}

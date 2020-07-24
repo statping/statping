@@ -19,6 +19,7 @@ var (
 )
 
 func TestDiscordNotifier(t *testing.T) {
+	t.Parallel()
 	err := utils.InitLogs()
 	require.Nil(t, err)
 	DISCORD_URL = utils.Params.GetString("DISCORD_URL")
@@ -35,14 +36,14 @@ func TestDiscordNotifier(t *testing.T) {
 	}
 
 	t.Run("Load discord", func(t *testing.T) {
-		Discorder.Host = DISCORD_URL
+		Discorder.Host = null.NewNullString(DISCORD_URL)
 		Discorder.Delay = time.Duration(100 * time.Millisecond)
 		Discorder.Enabled = null.NewNullBool(true)
 
 		Add(Discorder)
 
 		assert.Equal(t, "Hunter Long", Discorder.Author)
-		assert.Equal(t, DISCORD_URL, Discorder.Host)
+		assert.Equal(t, DISCORD_URL, Discorder.Host.String)
 	})
 
 	t.Run("discord Notifier Tester", func(t *testing.T) {

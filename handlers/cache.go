@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/statping/statping/utils"
+	"net/url"
 	"sync"
 	"time"
 )
@@ -106,6 +107,13 @@ func (s Storage) Delete(key string) {
 func (s Storage) Set(key string, content []byte, duration time.Duration) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	u, err := url.Parse(key)
+	if err != nil {
+		return
+	}
+	if u.Query().Get("v") != "" {
+		return
+	}
 	s.items[key] = Item{
 		Content:    content,
 		Expiration: utils.Now().Add(duration).UnixNano(),

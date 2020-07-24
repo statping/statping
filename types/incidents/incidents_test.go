@@ -32,8 +32,10 @@ func TestInit(t *testing.T) {
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&Incident{}, &IncidentUpdate{})
-	db.Create(&example)
 	SetDB(db)
+	db.Create(&example)
+	db.Create(&update1)
+	db.Create(&update2)
 }
 
 func TestFind(t *testing.T) {

@@ -7,6 +7,7 @@ import (
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/notifier"
+	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net/url"
@@ -32,8 +33,8 @@ var Telegram = &telegram{&notifications.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "fab fa-telegram-plane",
 	Delay:       time.Duration(5 * time.Second),
-	SuccessData: "Your service '{{.Service.Name}}' is currently online!",
-	FailureData: "Your service '{{.Service.Name}}' is currently offline!",
+	SuccessData: null.NewNullString("Your service '{{.Service.Name}}' is currently online!"),
+	FailureData: null.NewNullString("Your service '{{.Service.Name}}' is currently offline!"),
 	DataType:    "text",
 	Limits:      60,
 	Form: []notifications.NotificationForm{{
@@ -55,10 +56,10 @@ var Telegram = &telegram{&notifications.Notification{
 
 // Send will send a HTTP Post to the Telegram API. It accepts type: string
 func (t *telegram) sendMessage(message string) (string, error) {
-	apiEndpoint := fmt.Sprintf("https://api.telegram.org/bot%v/sendMessage", t.ApiSecret)
+	apiEndpoint := fmt.Sprintf("https://api.telegram.org/bot%v/sendMessage", t.ApiSecret.String)
 
 	v := url.Values{}
-	v.Set("chat_id", t.Var1)
+	v.Set("chat_id", t.Var1.String)
 	v.Set("text", message)
 
 	contents, _, err := utils.HttpRequest(apiEndpoint, "POST", "application/x-www-form-urlencoded", nil, strings.NewReader(v.Encode()), time.Duration(10*time.Second), true, nil)
@@ -74,16 +75,14 @@ func (t *telegram) sendMessage(message string) (string, error) {
 
 // OnFailure will trigger failing service
 func (t *telegram) OnFailure(s services.Service, f failures.Failure) (string, error) {
-	msg := ReplaceVars(t.FailureData, s, f)
-	out, err := t.sendMessage(msg)
-	return out, err
+	msg := ReplaceVars(t.FailureData.String, s, f)
+	return t.sendMessage(msg)
 }
 
 // OnSuccess will trigger successful service
 func (t *telegram) OnSuccess(s services.Service) (string, error) {
-	msg := ReplaceVars(t.SuccessData, s, failures.Failure{})
-	out, err := t.sendMessage(msg)
-	return out, err
+	msg := ReplaceVars(t.SuccessData.String, s, failures.Failure{})
+	return t.sendMessage(msg)
 }
 
 // OnTest will test the Twilio SMS messaging

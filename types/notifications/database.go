@@ -32,10 +32,10 @@ func (n *Notification) Create() error {
 		}
 		return nil
 	}
-	if p.FailureData == "" {
+	if p.FailureData.String == "" {
 		p.FailureData = n.FailureData
 	}
-	if p.SuccessData == "" {
+	if p.SuccessData.String == "" {
 		p.SuccessData = n.SuccessData
 	}
 	if err := p.Update(); err != nil {

@@ -16,7 +16,7 @@ jobs:
           go-version: '1.14.2'
       - uses: actions/setup-node@v1
         with:
-          node-version: '10.x'
+          node-version: '12.18.2'
       - uses: actions/checkout@v2
 
       - name: Add GOBIN to PATH
@@ -79,7 +79,7 @@ jobs:
           go-version: '1.14.2'
       - uses: actions/setup-node@v1
         with:
-          node-version: '10.x'
+          node-version: '12.18.2'
       - uses: actions/checkout@v2
 
       - name: Install Global Dependencies
@@ -90,7 +90,7 @@ jobs:
       - name: Setting ENV's
         run: |
           echo "::add-path::$(go env GOPATH)/bin"
-          echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
+          echo "::add-path::/opt/hostedtoolcache/node/12.18.2/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
@@ -132,7 +132,7 @@ jobs:
       - name: Setting ENV's
         run: |
           echo "::add-path::$(go env GOPATH)/bin"
-          echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
+          echo "::add-path::/opt/hostedtoolcache/node/12.18.2/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 

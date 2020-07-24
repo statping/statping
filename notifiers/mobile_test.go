@@ -19,12 +19,18 @@ var (
 )
 
 func TestMobileNotifier(t *testing.T) {
+	t.Parallel()
 	t.SkipNow()
 	err := utils.InitLogs()
 	require.Nil(t, err)
 
 	mobileToken = utils.Params.GetString("MOBILE_TOKEN")
-	Mobile.Var1 = mobileToken
+	if mobileToken == "" {
+		t.Log("Mobile notifier testing skipped, missing MOBILE_ID environment variable")
+		t.SkipNow()
+	}
+
+	Mobile.Var1 = null.NewNullString(mobileToken)
 
 	db, err := database.OpenTester()
 	require.Nil(t, err)
@@ -32,14 +38,8 @@ func TestMobileNotifier(t *testing.T) {
 	notifications.SetDB(db)
 	core.Example()
 
-	Mobile.Var1 = mobileToken
-	if mobileToken == "" {
-		t.Log("Mobile notifier testing skipped, missing MOBILE_ID environment variable")
-		t.SkipNow()
-	}
-
 	t.Run("Load Mobile", func(t *testing.T) {
-		Mobile.Var1 = mobileToken
+		Mobile.Var1 = null.NewNullString(mobileToken)
 		Mobile.Delay = time.Duration(100 * time.Millisecond)
 		Mobile.Limits = 10
 		Mobile.Enabled = null.NewNullBool(true)

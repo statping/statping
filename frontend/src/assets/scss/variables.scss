@@ -1,16 +1,28 @@
 /*    Index Page      */
-$background-color: #fcfcfc;
-$container-color: #fcfcfc;
+$background-color: #f5f5f5;
+$container-color: #ffffff;
+$text-color: #1d1d1d;
 $max-width: 860px;
-$title-color: #464646;
-$description-color: #939393;
+$title-color: #4e4e4e;
+$description-color: #828282;
 $subtitle-color: #747474;
 $mobile-card-shadow: 2px 3px 10px #b7b7b7;
 
+$group-list-background: #fafafa;
+$group-list-title: #474747;
+$navbar-color: #1c1c1c;
+$navbar-background: #ffffff;
+$input-background: #fdfdfd;
+$input-color: #4e4e4e;
+$input-border: 1px solid #c9c9c9;
+$day-success-background: #18ce08;
+$day-error-background: #d50a0a;
+
 /*    Status Container   */
-$service-background: #ffffff;
-$service-border: 1px solid rgba(0,0,0,.125);
-$service-title: #444444;
+$card-background: #fcfcfc;
+$card-border: 1px solid rgba(76, 76, 76, 0.12);
+$card-shadow: 0px 3px 6px 1px rgba(0, 0, 0, 0.08);
+$service-title: #3e3e3e;
 $service-title-size: 1.8rem;
 $service-stats-color: #4f4f4f;
 $service-description-color: #fff;

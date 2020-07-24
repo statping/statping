@@ -8,22 +8,20 @@ import (
 func Samples() error {
 	log.Infoln("Inserting Sample Checkins...")
 	checkin1 := &Checkin{
-		Name:        "Demo Checkin 1",
-		ServiceId:   1,
-		Interval:    300,
-		GracePeriod: 300,
-		ApiKey:      "demoCheckin123",
+		Name:      "Demo Checkin 1",
+		ServiceId: 1,
+		Interval:  3,
+		ApiKey:    "demoCheckin123",
 	}
 	if err := checkin1.Create(); err != nil {
 		return err
 	}
 
 	checkin2 := &Checkin{
-		Name:        "Example Checkin 2",
-		ServiceId:   2,
-		Interval:    900,
-		GracePeriod: 300,
-		ApiKey:      utils.RandomString(7),
+		Name:      "Example Checkin 2",
+		ServiceId: 2,
+		Interval:  1,
+		ApiKey:    utils.RandomString(7),
 	}
 	if err := checkin2.Create(); err != nil {
 		return err

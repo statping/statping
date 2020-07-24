@@ -1,5 +1,11 @@
 <template>
-    <table class="table">
+    <div>
+        <div v-if="servicesList.length === 0">
+            <div class="alert alert-dark d-block mt-3 mb-0">
+                You currently don't have any services!
+            </div>
+        </div>
+    <table v-else class="table">
         <thead>
         <tr>
             <th scope="col">Name</th>
@@ -42,6 +48,7 @@
             </tr>
         </draggable>
     </table>
+    </div>
 </template>
 
 <script>

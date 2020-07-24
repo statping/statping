@@ -20,7 +20,7 @@ jobs:
           go-version: '1.14.2'
       - uses: actions/setup-node@v1
         with:
-          node-version: '10.x'
+          node-version: '12.18.2'
       - uses: actions/checkout@v2
 
       - name: Add GOBIN to PATH
@@ -83,7 +83,7 @@ jobs:
           go-version: '1.14.2'
       - uses: actions/setup-node@v1
         with:
-          node-version: '10.x'
+          node-version: '12.18.2'
       - uses: actions/checkout@v2
 
       - name: Install Global Dependencies
@@ -92,7 +92,7 @@ jobs:
       - name: Setting ENV's
         run: |
           echo "::add-path::$(go env GOPATH)/bin"
-          echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
+          echo "::add-path::/opt/hostedtoolcache/node/12.18.2/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
@@ -163,7 +163,7 @@ jobs:
       - name: Setting ENV's
         run: |
           echo "::add-path::$(go env GOPATH)/bin"
-          echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
+          echo "::add-path::/opt/hostedtoolcache/node/12.18.2/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
@@ -218,7 +218,7 @@ jobs:
       - name: Setting ENV's
         run: |
           echo "::add-path::$(go env GOPATH)/bin"
-          echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
+          echo "::add-path::/opt/hostedtoolcache/node/12.18.2/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
@@ -274,7 +274,7 @@ jobs:
       - name: Setting ENV's
         run: |
           echo "::add-path::$(go env GOPATH)/bin"
-          echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
+          echo "::add-path::/opt/hostedtoolcache/node/12.18.2/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
@@ -306,6 +306,62 @@ jobs:
           timeoutRequest: 30000
           delayRequest: 600
 
+  build-binaries:
+    needs: compile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.14.2'
+      - uses: actions/checkout@v2
+
+      - name: Install cross compiling libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y automake autogen build-essential ca-certificates libsqlite3-dev \
+          gcc-5-arm-linux-gnueabi g++-5-arm-linux-gnueabi libc6-dev-armel-cross linux-headers-generic \
+          gcc-5-arm-linux-gnueabihf g++-5-arm-linux-gnueabihf libc6-dev-armhf-cross            \
+          gcc-5-aarch64-linux-gnu g++-5-aarch64-linux-gnu libc6-dev-arm64-cross                \
+          gcc-5-mips-linux-gnu g++-5-mips-linux-gnu libc6-dev-mips-cross                       \
+          gcc-5-mipsel-linux-gnu g++-5-mipsel-linux-gnu libc6-dev-mipsel-cross                 \
+          gcc-5-mips64-linux-gnuabi64 g++-5-mips64-linux-gnuabi64 libc6-dev-mips64-cross       \
+          gcc-5-mips64el-linux-gnuabi64 g++-5-mips64el-linux-gnuabi64 libc6-dev-mips64el-cross \
+          gcc-5-multilib g++-5-multilib gcc-mingw-w64 g++-mingw-w64 clang llvm-dev             \
+          gcc-6-arm-linux-gnueabi g++-6-arm-linux-gnueabi libc6-dev-armel-cross                \
+          gcc-6-arm-linux-gnueabihf g++-6-arm-linux-gnueabihf libc6-dev-armhf-cross            \
+          gcc-6-aarch64-linux-gnu g++-6-aarch64-linux-gnu libc6-dev-arm64-cross                \
+          gcc-6-mips-linux-gnu g++-6-mips-linux-gnu libc6-dev-mips-cross                       \
+          gcc-6-mipsel-linux-gnu g++-6-mipsel-linux-gnu libc6-dev-mipsel-cross                 \
+          gcc-6-mips64-linux-gnuabi64 g++-6-mips64-linux-gnuabi64 libc6-dev-mips64-cross       \
+          gcc-6-mips64el-linux-gnuabi64 g++-6-mips64el-linux-gnuabi64 libc6-dev-mips64el-cross \
+          gcc-6-multilib gcc-7-multilib g++-6-multilib gcc-mingw-w64 g++-mingw-w64 clang llvm-dev \
+          libtool libxml2-dev uuid-dev libssl-dev swig openjdk-8-jdk pkg-config patch \
+          make xz-utils cpio wget zip unzip p7zip git mercurial bzr texinfo help2man cmake --no-install-recommends
+          sudo ln -s /usr/include/asm-generic/ /usr/include/asm
+
+      - name: Setting ENV's
+        run: |
+          echo "::add-path::$(go env GOPATH)/bin"
+          echo "::add-path::/opt/hostedtoolcache/node/12.18.2/x64/bin"
+          echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
+      - name: Download Go mods
+        run: |
+          make test-deps
+
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
+
+      - name: Build Binaries
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: $GITHUB_SHA
+        run: make build-folders build-linux build-linux-arm build-darwin build-win compress-folders
+
   docker-release:
     needs: [test, test-postman-sqlite, test-postman-mysql, test-postman-postgres]
     runs-on: ubuntu-latest
@@ -328,12 +384,12 @@ jobs:
 
       - name: Cache Docker layers
         uses: actions/cache@v2
-        id: cache
+        id: buildx-docker-master
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          key: buildx-docker-master
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            buildx-docker-master
 
       - name: Docker Build :base
         run: make buildx-base

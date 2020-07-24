@@ -16,6 +16,15 @@
             </div>
         </div>
 
+        <div class="col-12" v-if="services.length === 0">
+            <div class="alert alert-dark d-block">
+                You currently don't have any services!
+                <router-link v-if="$store.state.admin" to="/dashboard/create_service" class="btn btn-sm btn-success float-right">
+                    <font-awesome-icon icon="plus"/>  Create
+                </router-link>
+            </div>
+        </div>
+
         <div v-for="(service, index) in services" class="service_block" v-bind:key="index">
             <ServiceInfo :service=service />
         </div>

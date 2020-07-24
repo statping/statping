@@ -69,7 +69,7 @@ type statpingMail struct {
 // OnFailure will trigger failing service
 func (s *statpingEmailer) OnFailure(srv services.Service, f failures.Failure) (string, error) {
 	ee := statpingMail{
-		Email:   s.Host,
+		Email:   s.Host.String,
 		Core:    *core.App,
 		Service: srv,
 		Failure: f,
@@ -80,7 +80,7 @@ func (s *statpingEmailer) OnFailure(srv services.Service, f failures.Failure) (s
 // OnSuccess will trigger successful service
 func (s *statpingEmailer) OnSuccess(srv services.Service) (string, error) {
 	ee := statpingMail{
-		Email:   s.Host,
+		Email:   s.Host.String,
 		Core:    *core.App,
 		Service: srv,
 		Failure: failures.Failure{},
@@ -91,7 +91,7 @@ func (s *statpingEmailer) OnSuccess(srv services.Service) (string, error) {
 // OnSave will trigger when this notifier is saved
 func (s *statpingEmailer) OnSave() (string, error) {
 	ee := statpingMail{
-		Email:   s.Host,
+		Email:   s.Host.String,
 		Core:    *core.App,
 		Service: services.Service{},
 		Failure: failures.Failure{},

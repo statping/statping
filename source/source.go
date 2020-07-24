@@ -16,7 +16,7 @@ import (
 var (
 	log         = utils.Log.WithField("type", "source")
 	TmplBox     *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
-	DefaultScss = []string{"scss/main.scss", "scss/base.scss", "scss/mobile.scss"}
+	DefaultScss = []string{"scss/base.scss", "scss/layout.scss", "scss/main.scss", "scss/mixin.scss", "scss/mobile.scss", "scss/variables.scss"}
 )
 
 // Assets will load the Rice boxes containing the CSS, SCSS, JS, and HTML files.

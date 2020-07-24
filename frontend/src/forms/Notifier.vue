@@ -1,7 +1,7 @@
 <template>
     <div>
         <form @submit.prevent="saveNotifier">
-    <div class="card contain-card text-black-50 bg-white mb-3">
+    <div class="card contain-card mb-3">
         <div class="card-header text-capitalize">
             {{notifier.title}}
             <span @click="enableToggle" class="switch switch-sm switch-rd-gr float-right">
@@ -69,7 +69,7 @@
         </div>
     </div>
 
-        <div v-if="notifier.data_type" class="card text-black-50 bg-white mb-3">
+        <div v-if="notifier.data_type" class="card mb-3">
             <div class="card-header text-capitalize">
                 <font-awesome-icon @click="expanded = !expanded" :icon="expanded ? 'minus' : 'plus'" class="mr-2 pointer"/>
                 {{notifier.title}} Outgoing Request
@@ -103,7 +103,7 @@
 
     </form>
 
-        <div v-if="error || success" class="card text-black-50 bg-white mb-3">
+        <div v-if="error || success" class="card mb-3">
             <div class="card-body">
 
             <div v-if="error && !success" class="alert alert-danger col-12" role="alert">
@@ -119,7 +119,7 @@
             </div>
         </div>
 
-        <div class="card text-black-50 bg-white mb-3">
+        <div class="card mb-3">
             <div class="card-body">
                 <div class="row">
                     <div class="col-12 col-sm-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
@@ -128,11 +128,11 @@
                         </button>
                     </div>
                     <div class="col-12 col-md-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
-                        <button @click.prevent="testNotifier('success')" :disabled="loadingTest" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
+                        <button @click.prevent="testNotifier('success')" :disabled="loadingTest" class="btn btn-secondary btn-block text-capitalize test-notifier">
                             <font-awesome-icon v-if="loadingTest" icon="circle-notch" class="mr-2" spin/>{{loadingTest ? "Loading..." : "Test Success"}}</button>
                     </div>
                     <div class="col-12 col-md-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
-                        <button @click.prevent="testNotifier('failure')" :disabled="loadingTest" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
+                        <button @click.prevent="testNotifier('failure')" :disabled="loadingTest" class="btn btn-secondary btn-block text-capitalize test-notifier">
                             <font-awesome-icon v-if="loadingTest" icon="circle-notch" class="mr-2" spin/>{{loadingTest ? "Loading..." : "Test Failure"}}</button>
                     </div>
                 </div>

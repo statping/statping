@@ -19,6 +19,7 @@ var (
 )
 
 func TestStatpingEmailerNotifier(t *testing.T) {
+	t.Parallel()
 	err := utils.InitLogs()
 	require.Nil(t, err)
 	db, err := database.OpenTester()
@@ -28,7 +29,7 @@ func TestStatpingEmailerNotifier(t *testing.T) {
 	core.Example()
 
 	testEmail = utils.Params.GetString("TEST_EMAIL")
-	statpingMailer.Host = testEmail
+	statpingMailer.Host = null.NewNullString(testEmail)
 	statpingMailer.Enabled = null.NewNullBool(true)
 
 	if testEmail == "" {
@@ -37,12 +38,12 @@ func TestStatpingEmailerNotifier(t *testing.T) {
 	}
 
 	t.Run("Load statping emailer", func(t *testing.T) {
-		statpingMailer.Host = testEmail
+		statpingMailer.Host = null.NewNullString(testEmail)
 		statpingMailer.Delay = time.Duration(100 * time.Millisecond)
 		statpingMailer.Limits = 3
 		Add(statpingMailer)
 		assert.Equal(t, "Hunter Long", statpingMailer.Author)
-		assert.Equal(t, testEmail, statpingMailer.Host)
+		assert.Equal(t, testEmail, statpingMailer.Host.String)
 	})
 
 	t.Run("statping emailer Within Limits", func(t *testing.T) {

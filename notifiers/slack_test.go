@@ -19,6 +19,7 @@ var (
 )
 
 func TestSlackNotifier(t *testing.T) {
+	t.Parallel()
 	err := utils.InitLogs()
 	require.Nil(t, err)
 	db, err := database.OpenTester()
@@ -28,21 +29,21 @@ func TestSlackNotifier(t *testing.T) {
 	core.Example()
 
 	SLACK_URL = utils.Params.GetString("SLACK_URL")
-	slacker.Host = SLACK_URL
-	slacker.Enabled = null.NewNullBool(true)
-
 	if SLACK_URL == "" {
 		t.Log("slack notifier testing skipped, missing SLACK_URL environment variable")
 		t.SkipNow()
 	}
 
+	slacker.Host = null.NewNullString(SLACK_URL)
+	slacker.Enabled = null.NewNullBool(true)
+
 	t.Run("Load slack", func(t *testing.T) {
-		slacker.Host = SLACK_URL
+		slacker.Host = null.NewNullString(SLACK_URL)
 		slacker.Delay = time.Duration(100 * time.Millisecond)
 		slacker.Limits = 3
 		Add(slacker)
 		assert.Equal(t, "Hunter Long", slacker.Author)
-		assert.Equal(t, SLACK_URL, slacker.Host)
+		assert.Equal(t, SLACK_URL, slacker.Host.String)
 	})
 
 	t.Run("slack Within Limits", func(t *testing.T) {

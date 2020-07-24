@@ -176,5 +176,16 @@ func Samples() error {
 		return err
 	}
 
+	s7 := &Service{
+		Name:      "Static Service",
+		Type:      "static",
+		Order:     7,
+		Public:    null.NewNullBool(true),
+		CreatedAt: createdOn,
+	}
+	if err := s7.Create(); err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -40,6 +40,7 @@ func init() {
 	rootCmd.AddCommand(sassCmd)
 	rootCmd.AddCommand(onceCmd)
 	rootCmd.AddCommand(envCmd)
+	rootCmd.AddCommand(systemctlCmd)
 	rootCmd.AddCommand(resetCmd)
 
 	parseFlags(rootCmd)

@@ -1,6 +1,6 @@
 <template>
     <form v-if="service.type" @submit.prevent="saveService">
-        <div class="card contain-card text-black-50 bg-white mb-4">
+        <div class="card contain-card mb-4">
             <div class="card-header">{{ $t('service.info') }}</div>
             <div class="card-body">
         <div class="form-group row">
@@ -19,6 +19,7 @@
                     <option value="udp">UDP Service</option>
                     <option value="icmp">ICMP Ping</option>
                     <option value="grpc">gRPC Service</option>
+                    <option value="static">Static Service</option>
                 </select>
                 <small class="form-text text-muted">Use HTTP if you are checking a website or use TCP if you are checking a server</small>
             </div>
@@ -52,7 +53,7 @@
                 </div>
             </div>
 
-            <div class="form-group row">
+            <div v-if="service.type !== 'static'" class="form-group row">
                 <label for="service_interval" class="col-sm-4 col-form-label">Check Interval</label>
                 <div class="col-sm-6">
                     <span class="slider-info">{{secondsHumanize(service.check_interval)}}</span>
@@ -67,7 +68,7 @@
             </div>
         </div>
 
-        <div class="card contain-card text-black-50 bg-white mb-4">
+        <div v-if="service.type !== 'static'" class="card contain-card mb-4">
             <div class="card-header">Request Details</div>
             <div class="card-body">
 
@@ -202,7 +203,7 @@
             </div>
         </div>
 
-        <div class="card contain-card text-black-50 bg-white mb-4">
+        <div class="card contain-card mb-4">
             <div class="card-header">Notification Options</div>
             <div class="card-body">
 

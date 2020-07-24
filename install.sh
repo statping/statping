@@ -136,6 +136,8 @@ getArch() {
       ARCH="arm"
     elif [ ${MACHINE_TYPE} == 'arm64' ]; then
       ARCH="arm64"
+    elif [ ${MACHINE_TYPE} == 'aarch64' ]; then
+      ARCH="arm64"
     else
       ARCH="386"
     fi

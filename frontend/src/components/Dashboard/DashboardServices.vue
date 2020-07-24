@@ -1,8 +1,8 @@
 <template>
     <div class="col-12">
-        <div class="card contain-card text-black-50 bg-white mb-4">
+        <div class="card contain-card mb-4">
             <div class="card-header">{{ $t('top_nav.services') }}
-                <router-link v-if="$store.state.admin" to="/dashboard/create_service" class="btn btn-sm btn-outline-success float-right">
+                <router-link v-if="$store.state.admin" to="/dashboard/create_service" class="btn btn-sm btn-success float-right">
                     <font-awesome-icon icon="plus"/>  Create
                 </router-link>
             </div>
@@ -11,10 +11,17 @@
             </div>
         </div>
 
-        <div class="card contain-card text-black-50 bg-white mb-4">
+        <div class="card contain-card mb-4">
             <div class="card-header">{{ $t('top_nav.groups') }}</div>
             <div class="card-body pt-0">
-        <table class="table">
+
+                <div v-if="groupsList.length === 0">
+                    <div class="alert alert-dark d-block mt-3 mb-0">
+                        You currently don't have any groups! Create one using the form below.
+                    </div>
+                </div>
+
+        <table v-else class="table">
             <thead>
             <tr>
                 <th scope="col">{{ $t('dashboard.name') }}</th>
