@@ -16,6 +16,12 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.18.2'
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
       - uses: actions/checkout@v2
 
       - name: Add GOBIN to PATH
@@ -47,6 +53,16 @@ jobs:
         with:
           name: static-rice-box
           path: ./source
+
+      - name: Upload Assets to S3
+        run: |
+          tar -czvf source.tar.gz source/
+          aws s3 cp source.tar.gz s3://assets.statping.com/
+          rm -rf source.tar.gz
+          aws s3 cp source/dist/css/ s3://assets.statping.com/css/ --recursive --exclude "*" --include "*.css"
+          aws s3 cp source/dist/js/ s3://assets.statping.com/js/ --recursive --exclude "*" --include "*.js"
+          aws s3 cp source/dist/scss/ s3://assets.statping.com/scss/ --recursive --exclude "*" --include "*.scss"
+          aws s3 cp install.sh s3://assets.statping.com/
 
       - name: Upload frontend assets to CDN
         uses: jakejarvis/s3-sync-action@master
