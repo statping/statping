@@ -53,7 +53,7 @@ jobs:
             name: static-rice-box
             path: ./source
 
-      - name: Upload frontend assets to CDN
+      - name: Upload frontend CSS to CDN
         uses: jakejarvis/s3-sync-action@master
           with:
             args: --acl public-read --follow-symlinks
@@ -62,7 +62,20 @@ jobs:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_REGION: 'us-west-2'
-            SOURCE_DIR: 'source/dist'
+            SOURCE_DIR: 'source/dist/css'
+            DEST_DIR: 'css'
+
+      - name: Upload frontend JS to CDN
+        uses: jakejarvis/s3-sync-action@master
+          with:
+            args: --acl public-read --follow-symlinks
+          env:
+            AWS_S3_BUCKET: assets.statping.com
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_REGION: 'us-west-2'
+            SOURCE_DIR: 'source/dist/js'
+            DEST_DIR: 'js'
 
       - name: Compress frontend source
         run: tar -czvf frontend-dev.tar.gz source
