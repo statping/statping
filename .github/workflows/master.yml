@@ -56,7 +56,6 @@ jobs:
           AWS_S3_BUCKET: assets.statping.com
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: 'us-west-2'
           SOURCE_DIR: 'source/dist'
 
       - name: Compress frontend source
@@ -72,7 +71,6 @@ jobs:
           AWS_S3_BUCKET: assets.statping.com
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: 'us-west-2'
           SOURCE_DIR: 'frontend.tar.gz'
 
       - name: Upload frontend current version to S3
@@ -83,8 +81,7 @@ jobs:
           AWS_S3_BUCKET: assets.statping.com
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-west-2
-          DEST_DIR: source
+          DEST_DIR: 'source'
           SOURCE_DIR: frontend-${VERSION}.tar.gz
 
   test:
