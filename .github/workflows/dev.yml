@@ -49,10 +49,10 @@ jobs:
 
       - name: Upload Compiled Frontend (rice-box.go)
         uses: actions/upload-artifact@v1
-        with:
-          name: static-rice-box
-          path: ./source
-          
+          with:
+            name: static-rice-box
+            path: ./source
+
       - name: Upload frontend assets to CDN
         uses: jakejarvis/s3-sync-action@master
           with:
