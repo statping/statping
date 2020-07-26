@@ -50,14 +50,14 @@ jobs:
 
       - name: Upload frontend assets to CDN
         uses: jakejarvis/s3-sync-action@master
-          with:
-            args: --acl public-read --follow-symlinks
-          env:
-            AWS_S3_BUCKET: assets.statping.com
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_REGION: 'us-west-2'
-            SOURCE_DIR: 'source/dist'
+        with:
+          args: --acl public-read --follow-symlinks
+        env:
+          AWS_S3_BUCKET: assets.statping.com
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-west-2'
+          SOURCE_DIR: 'source/dist'
 
       - name: Compress frontend source
         run: |
@@ -66,26 +66,26 @@ jobs:
 
       - name: Upload frontend dist to S3
         uses: jakejarvis/s3-sync-action@master
-          with:
-            args: --acl public-read --follow-symlinks
-          env:
-            AWS_S3_BUCKET: assets.statping.com
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_REGION: 'us-west-2'
-            SOURCE_DIR: 'frontend.tar.gz'
+        with:
+          args: --acl public-read --follow-symlinks
+        env:
+          AWS_S3_BUCKET: assets.statping.com
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-west-2'
+          SOURCE_DIR: 'frontend.tar.gz'
 
       - name: Upload frontend current version to S3
         uses: jakejarvis/s3-sync-action@master
-          with:
-            args: --acl public-read --follow-symlinks
-          env:
-            AWS_S3_BUCKET: assets.statping.com
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_REGION: us-west-2
-            DEST_DIR: source
-            SOURCE_DIR: frontend-${VERSION}.tar.gz
+        with:
+          args: --acl public-read --follow-symlinks
+        env:
+          AWS_S3_BUCKET: assets.statping.com
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-west-2
+          DEST_DIR: source
+          SOURCE_DIR: frontend-${VERSION}.tar.gz
 
   test:
     needs: compile
