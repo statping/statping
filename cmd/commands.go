@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/statping/statping/utils"
 	"io"
 	"os"
 	"os/exec"
@@ -72,17 +73,26 @@ var versionCmd = &cobra.Command{
 
 var systemctlCmd = &cobra.Command{
 	Use:   "systemctl [install/uninstall]",
-	Short: "Install or Uninstall systemctl links",
+	Short: "Install or Uninstall systemctl services",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if err := systemctlCli(); err != nil {
+		if args[1] == "install" {
+			if len(args) < 3 {
+				return errors.New("requires 'install <working_path> <port>'")
+			}
+		}
+		port := utils.ToInt(args[2])
+		if port == 0 {
+			port = 80
+		}
+		if err := systemctlCli(args[1], args[0] == "uninstall", port); err != nil {
 			return err
 		}
 		os.Exit(0)
 		return nil
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) < 1 {
-			return errors.New("requires 'install' or 'uninstall' as arguments")
+		if len(args) < 2 {
+			return errors.New("requires 'install <working_path>' or 'uninstall' as arguments")
 		}
 		return nil
 	},

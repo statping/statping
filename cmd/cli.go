@@ -34,8 +34,65 @@ func assetsCli() error {
 	return nil
 }
 
-func systemctlCli() error {
-	fmt.Println("still in the works...")
+func systemctlCli(dir string, uninstall bool, port int64) error {
+	location := "/etc/systemd/system/statping.service"
+
+	if uninstall {
+		if _, _, err := utils.Command("systemctl", "stop", "statping"); err != nil {
+			log.Errorln(err)
+		}
+		if _, _, err := utils.Command("systemctl", "disable", "statping"); err != nil {
+			log.Errorln(err)
+		}
+		if err := utils.DeleteFile(location); err != nil {
+			log.Errorln(err)
+		}
+		return nil
+	}
+	if ok := utils.FolderExists(dir); !ok {
+		return errors.New("directory does not exist: " + dir)
+	}
+
+	binPath, err := os.Executable()
+	if err != nil {
+		return err
+	}
+
+	config := []byte(`[Unit]
+Description=Statping Server
+After=network.target
+After=systemd-user-sessions.service
+After=network-online.target
+
+[Service]
+Type=simple
+Restart=always
+Environment=STATPING_DIR=` + dir + `
+Environment=ALLOW_REPORTS=true
+ExecStart=` + binPath + ` --port=` + utils.ToString(port) + `
+WorkingDirectory=` + dir + `
+
+[Install]
+WantedBy=multi-user.target"
+`)
+	fmt.Println("Saving systemctl service to: ", location)
+	fmt.Printf("Using directory %s for Statping data\n", dir)
+	fmt.Printf("Running on port %d\n", port)
+	if err := utils.SaveFile(location, config); err != nil {
+		return err
+	}
+	if _, _, err := utils.Command("systemctl", "daemon-reload"); err != nil {
+		return err
+	}
+	if _, _, err := utils.Command("systemctl", "enable", "statping.service"); err != nil {
+		return err
+	}
+	if _, _, err := utils.Command("systemctl", "start", "statping"); err != nil {
+		return err
+	}
+	fmt.Println("Statping was will auto start on reboots")
+	fmt.Println("systemctl service: /etc/systemd/system/statping.service")
+
 	return nil
 }
 

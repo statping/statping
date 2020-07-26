@@ -1,0 +1,19 @@
+{
+  "id": "com.statping",
+  "title": "Statping",
+  "author": "Hunter Long <info@statping.com>",
+  "description": "Monitor your web services and remote servers",
+  "tagline": "Server Monitoring",
+  "version": "0.90.61",
+  "healthCheckPath": "/health",
+  "httpPort": 8080,
+  "addons": {
+    "localstorage": {}
+  },
+  "manifestVersion": 2,
+  "website": "https://github.com/statping/statping",
+  "contactEmail": "info@statping.com",
+  "icon": "https://assets.statping.com/icon.png",
+  "tags": [ "monitoring", "uptime" ],
+  "mediaLinks": [ "https://assets.statping.com/cloudron.png" ]
+}s
