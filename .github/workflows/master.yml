@@ -48,6 +48,20 @@ jobs:
           name: static-rice-box
           path: ./source
 
+      - name: Compress frontend source
+        run: tar -czvf frontend.tar.gz source
+
+      - name: Upload frontend dist to S3
+        uses: jakejarvis/s3-sync-action@master
+          with:
+            args: --acl public-read --follow-symlinks --delete
+          env:
+            AWS_S3_BUCKET: assets.statping.com
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_REGION: 'us-west-2'
+            SOURCE_DIR: 'frontend.tar.gz'
+
   test:
     needs: compile
     runs-on: ubuntu-latest
