@@ -19,10 +19,10 @@ var (
 )
 
 func TestPushoverNotifier(t *testing.T) {
-	t.Parallel()
 	err := utils.InitLogs()
 	require.Nil(t, err)
 
+	t.Parallel()
 	PUSHOVER_TOKEN = utils.Params.GetString("PUSHOVER_TOKEN")
 	PUSHOVER_API = utils.Params.GetString("PUSHOVER_API")
 

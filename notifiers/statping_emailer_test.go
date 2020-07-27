@@ -19,9 +19,10 @@ var (
 )
 
 func TestStatpingEmailerNotifier(t *testing.T) {
-	t.Parallel()
 	err := utils.InitLogs()
 	require.Nil(t, err)
+
+	t.Parallel()
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})

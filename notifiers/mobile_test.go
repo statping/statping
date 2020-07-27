@@ -19,10 +19,11 @@ var (
 )
 
 func TestMobileNotifier(t *testing.T) {
-	t.Parallel()
-	t.SkipNow()
 	err := utils.InitLogs()
 	require.Nil(t, err)
+
+	t.Parallel()
+	t.SkipNow()
 
 	mobileToken = utils.Params.GetString("MOBILE_TOKEN")
 	if mobileToken == "" {

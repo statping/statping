@@ -57,48 +57,15 @@ jobs:
       - name: Upload Assets to S3
         run: |
           tar -czvf source.tar.gz source/
+          cp source.tar.gz source-${VERSION}.tar.gz
           aws s3 cp source.tar.gz s3://assets.statping.com/
+          aws s3 cp source-${VERSION}.tar.gz s3://assets.statping.com/
           rm -rf source.tar.gz
-          aws s3 cp source/dist/css/ s3://assets.statping.com/css/ --recursive --exclude "*" --include "*.css"
-          aws s3 cp source/dist/js/ s3://assets.statping.com/js/ --recursive --exclude "*" --include "*.js"
-          aws s3 cp source/dist/scss/ s3://assets.statping.com/scss/ --recursive --exclude "*" --include "*.scss"
+          rm -rf source-${VERSION}.tar.gz
+          aws s3 cp source/dist/css/ s3://assets.statping.com/css/ --recursive
+          aws s3 cp source/dist/js/ s3://assets.statping.com/js/ --recursive
+          aws s3 cp source/dist/scss/ s3://assets.statping.com/scss/ --recursive
           aws s3 cp install.sh s3://assets.statping.com/
-
-      - name: Upload frontend assets to CDN
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --acl public-read --follow-symlinks
-        env:
-          AWS_S3_BUCKET: 'assets.statping.com'
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          SOURCE_DIR: 'source/dist'
-
-      - name: Compress frontend source
-        run: |
-          tar -czvf frontend.tar.gz source
-          cp frontend.tar.gz frontend-${VERSION}.tar.gz
-
-      - name: Upload frontend dist to S3
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --acl public-read --follow-symlinks
-        env:
-          AWS_S3_BUCKET: 'assets.statping.com'
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          SOURCE_DIR: 'frontend.tar.gz'
-
-      - name: Upload frontend current version to S3
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --acl public-read --follow-symlinks
-        env:
-          AWS_S3_BUCKET: 'assets.statping.com'
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          DEST_DIR: 'source'
-          SOURCE_DIR: frontend-${VERSION}.tar.gz
 
   test:
     needs: compile
