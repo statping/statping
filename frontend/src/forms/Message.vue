@@ -39,7 +39,7 @@
             <div class="col-sm-4">
               <flatPickr v-model="message.start_on" @on-change="startChange" :config="config" type="text" name="start_on" class="form-control form-control-plaintext" id="start_on" value="0001-01-01T00:00:00Z" required />
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-4 mt-3 mt-md-0">
               <flatPickr v-model="message.end_on" @on-change="endChange" :config="config" type="text" name="end_on" class="form-control form-control-plaintext" id="end_on" value="0001-01-01T00:00:00Z" required />
             </div>
           </div>

@@ -1,3 +1,10 @@
+# 0.90.62 (07-30-2020)
+- Added Notification logs
+- Fixed issues with notifications
+- Updated Incident UI
+- Added additional testing for notifications
+-
+
 # 0.90.61 (07-22-2020)
 - Modified sass layouts, organized and split up sections
 - Modified Checkins to seconds rather than milliseconds (for cronjob)

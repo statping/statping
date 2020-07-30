@@ -7,12 +7,12 @@
                 {{service.online ? $t('online') : $t('offline')}}
             </span>
 
-            <h4 class="mt-2">
+            <span class="mt-2 font-3">
                 <router-link to="/" class="text-black-50 text-decoration-none">{{core.name}}</router-link> - <span class="text-muted">{{service.name}}</span>
                 <span class="badge float-right d-none d-md-block text-uppercase" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
                     {{service.online ? $t('online') : $t('offline')}}
                 </span>
-            </h4>
+            </span>
 
             <ServiceTopStats :service="service"/>
 
@@ -20,17 +20,17 @@
 
             <div class="card text-black-50 bg-white mt-3">
                 <div class="card-header text-capitalize">Timeframe</div>
-                <div class="card-body">
+                <div class="card-body pb-4">
                     <div class="row">
-                        <div class="col-12 col-md-4 font-2">
-                            <flatPickr :disabled="loading" @on-change="onnn" v-model="start_time" :config="{ enableTime: true, altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date() }" type="text" class="btn btn-white text-left" required />
+                        <div class="col-12 col-md-4 font-2 mb-3 mb-md-0">
+                            <flatPickr :disabled="loading" @on-change="reload" v-model="start_time" :config="{ enableTime: true, altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date() }" type="text" class="form-control text-left d-block" required />
                             <small class="d-block">From {{this.format(new Date(start_time))}}</small>
                         </div>
-                        <div class="col-12 col-md-4 font-2">
-                            <flatPickr :disabled="loading" @on-change="onnn" v-model="end_time" :config="{ enableTime: true, altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date()}" type="text" class="btn btn-white text-left" required />
+                        <div class="col-12 col-md-4 font-2 mb-3 mb-md-0">
+                            <flatPickr :disabled="loading" @on-change="reload" v-model="end_time" :config="{ enableTime: true, altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date()}" type="text" class="form-control text-left" required />
                             <small class="d-block">To {{this.format(new Date(end_time))}}</small>
                         </div>
-                        <div class="col-12 col-md-4">
+                        <div class="col-12 col-md-4 mb-1 mb-md-0">
                             <select :disabled="loading" @change="chartHits" v-model="group" class="form-control">
                                 <option value="1m">1 Minute</option>
                                 <option value="5m">5 Minutes</option>
@@ -50,10 +50,14 @@
                 </div>
             </div>
 
-            <AdvancedChart :group="group" :updated="updated_chart" :start="start_time.toString()" :end="end_time.toString()" :service="service"/>
-
-            <div v-if="!loading" class="row">
-                <apexchart width="100%" height="120" type="rangeBar" :options="timeRangeOptions" :series="uptime_data"></apexchart>
+            <div class="card text-black-50 bg-white mt-3 mb-3">
+                <div class="card-header text-capitalize">Service Latency</div>
+                <div class="card-body">
+                    <AdvancedChart :group="group" :updated="updated_chart" :start="start_time.toString()" :end="end_time.toString()" :service="service"/>
+                    <div v-if="!loading" class="row">
+                        <apexchart width="100%" height="120" type="rangeBar" :options="timeRangeOptions" :series="uptime_data"></apexchart>
+                    </div>
+                </div>
             </div>
 
             <div class="card text-black-50 bg-white mb-3">
@@ -362,11 +366,12 @@ export default {
       },
     },
     watch: {
+      '$route': 'reload',
       service: function(n, o) {
-        this.onnn()
+        this.reload()
       },
       load_timedata: function(n, o) {
-        this.onnn()
+        this.reload()
       }
     },
   async mounted() {
@@ -381,7 +386,7 @@ export default {
         this.end_time = end
         this.loading = false
       },
-      async onnn() {
+      async reload() {
         this.loading = true
         await this.chartHits()
         await this.fetchUptime()

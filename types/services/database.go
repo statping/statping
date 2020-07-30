@@ -19,6 +19,13 @@ func (s *Service) AfterFind() {
 	metrics.Query("service", "find")
 }
 
+func (s *Service) AfterCreate() error {
+	s.prevOnline = true
+	allServices[s.Id] = s
+	metrics.Query("service", "create")
+	return nil
+}
+
 func (s *Service) AfterUpdate() {
 	metrics.Query("service", "update")
 }
@@ -73,12 +80,6 @@ func (s *Service) Create() error {
 		log.Errorln(fmt.Sprintf("Failed to create service %v #%v: %v", s.Name, s.Id, err))
 		return err.Error()
 	}
-	return nil
-}
-
-func (s *Service) AfterCreate() error {
-	allServices[s.Id] = s
-	metrics.Query("service", "create")
 	return nil
 }
 

@@ -18,6 +18,10 @@ const NotFound = () => import('@/pages/NotFound')
 import VueRouter from "vue-router";
 import Api from "./API";
 
+const Loading = {
+  template: '<div class="jumbotron">LOADING</div>'
+}
+
 const routes = [
   {
     path: '/setup',
@@ -56,6 +60,7 @@ const routes = [
     },{
       path: 'users',
       component: DashboardUsers,
+      loading: Loading,
         meta: {
             requiresAuth: true
         }

@@ -14,30 +14,26 @@ func (n Notification) Name() string {
 }
 
 // LastSent returns a time.Duration of the last sent notification for the notifier
-func (n Notification) LastSent() time.Duration {
-	return time.Since(n.lastSent)
+func (n Notification) LastSentDur() time.Duration {
+	return time.Since(n.LastSent)
 }
 
 func (n *Notification) CanSend() bool {
 	if !n.Enabled.Bool {
 		return false
 	}
-
 	// the last sent notification was past 1 minute (limit per minute)
-	if n.lastSent.Add(60 * time.Minute).Before(utils.Now()) {
-		if n.lastSentCount != 0 {
-			n.lastSentCount--
+	if n.LastSent.Add(60 * time.Minute).Before(utils.Now()) {
+		if n.LastSentCount != 0 {
+			n.LastSentCount--
 		}
 	}
 
 	// dont send if already beyond the notifier's limit
-	if n.lastSentCount >= n.Limits {
+	if n.LastSentCount >= n.Limits {
 		return false
 	}
 
-	// action to do since notifier is able to send
-	n.lastSentCount++
-	n.lastSent = utils.Now()
 	return true
 }
 
@@ -64,30 +60,5 @@ func (n *Notification) GetValue(dbField string) string {
 		return utils.ToString(n.Limits)
 	default:
 		return ""
-	}
-}
-
-// start will start the go routine for the notifier queue
-func (n *Notification) Start() {
-	n.Running = make(chan bool)
-}
-
-// close will stop the go routine for queue
-func (n *Notification) Close() {
-	if n.IsRunning() {
-		close(n.Running)
-	}
-}
-
-// IsRunning will return true if the notifier is currently running a queue
-func (n *Notification) IsRunning() bool {
-	if n.Running == nil {
-		return false
-	}
-	select {
-	case <-n.Running:
-		return false
-	default:
-		return true
 	}
 }

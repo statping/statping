@@ -17,10 +17,17 @@ ARCHS = 386 arm amd64 arm64
 all: build-deps compile install test build
 
 test: clean compile
-	go test -v -p=1 -ldflags="-X main.VERSION=0.99.99" -coverprofile=coverage.out ./...
+	go test -v -p=1 -ldflags="-X main.VERSION=${VERSION}" -coverprofile=coverage.out ./...
 
 build: clean
 	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o statping --tags "netgo linux" ./cmd
+
+go-build: clean
+	rm -rf source/dist
+	rm -rf source/rice-box.go
+	wget https://assets.statping.com/source.tar.gz
+	tar -xvf source.tar.gz
+	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o statping --tags "netgo" ./cmd
 
 up:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml up -d --remove-orphans
@@ -291,11 +298,14 @@ post-release: frontend-build upload_to_s3 publish-homebrew dockerhub
 publish-homebrew:
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(PUBLISH_BODY) https://api.travis-ci.com/repo/statping%2Fhomebrew-statping/requests
 
-upload_to_s3: travis_s3_creds
-	aws s3 cp ./source/dist/css $(ASSETS_BKT) --recursive --exclude "*" --include "*.css"
-	aws s3 cp ./source/dist/js $(ASSETS_BKT) --recursive --exclude "*" --include "*.js"
-	aws s3 cp ./source/dist/scss $(ASSETS_BKT) --recursive --exclude "*" --include "*.scss"
-	aws s3 cp ./install.sh $(ASSETS_BKT)
+upload_to_s3:
+	tar -czvf source.tar.gz source/
+	aws s3 cp source.tar.gz s3://assets.statping.com/
+	rm -rf source.tar.gz
+	aws s3 cp source/dist/css/ s3://assets.statping.com/css/ --recursive --exclude "*" --include "*.css"
+	aws s3 cp source/dist/js/ s3://assets.statping.com/js/ --recursive --exclude "*" --include "*.js"
+	aws s3 cp source/dist/scss/ s3://assets.statping.com/scss/ --recursive --exclude "*" --include "*.scss"
+	aws s3 cp install.sh s3://assets.statping.com/
 
 travis_s3_creds:
 	mkdir -p ~/.aws
@@ -376,6 +386,10 @@ multiarch:
 	mkdir /tmp/.buildx-cache || true
 	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
+delve:
+	go build -gcflags "all=-N -l" -o statping ./cmd
+	dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient exec ./statping
+
 check:
 	@echo "Checking the programs required for the build are installed..."
 	@echo "go:     $(shell go version) - $(shell which go)" && go version >/dev/null 2>&1 || (echo "ERROR: go 1.14 is required."; exit 1)
@@ -383,5 +397,5 @@ check:
 	@echo "yarn:   $(shell yarn --version) - $(shell which yarn)" && yarn --version >/dev/null 2>&1 || (echo "ERROR: yarn is required."; exit 1)
 	@echo "All required programs are installed!"
 
-.PHONY: all check build certs multiarch build-all buildx-base buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
+.PHONY: all check build certs multiarch go-build build-all buildx-base buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds

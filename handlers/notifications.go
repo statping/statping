@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/services"
@@ -25,12 +26,11 @@ func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	notif := services.FindNotifier(vars["notifier"])
-	notifer, err := notifications.Find(notif.Method)
-	if err != nil {
-		sendErrorJson(err, w, r)
+	if notif == nil {
+		sendErrorJson(errors.New("could not find notifier"), w, r)
 		return
 	}
-	returnJson(notifer, w, r)
+	returnJson(notif, w, r)
 }
 
 func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {

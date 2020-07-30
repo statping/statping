@@ -4,7 +4,7 @@
         <div v-for="incident in incidents" :key="incident.id" class="card contain-card mb-4">
             <div class="card-header">Incident: {{incident.title}}
                 <button @click="deleteIncident(incident)" class="btn btn-sm btn-danger float-right">
-                    <font-awesome-icon icon="times" />  Delete
+                    <font-awesome-icon icon="times" />
                 </button>
             </div>
 

@@ -107,8 +107,7 @@ func (s *exampleGRPC) GetFeature(ctx context.Context, point *pb.Point) (*pb.Feat
 }
 
 func TestStartExampleEndpoints(t *testing.T) {
-	err := utils.InitLogs()
-	require.Nil(t, err)
+	startupDb(t)
 
 	// root CA for Linux:  /etc/ssl/certs/ca-certificates.crt
 	// root CA for MacOSX: /opt/local/share/curl/curl-ca-bundle.crt
@@ -178,7 +177,7 @@ func TestStartExampleEndpoints(t *testing.T) {
 	time.Sleep(15 * time.Second)
 }
 
-func TestServices(t *testing.T) {
+func startupDb(t *testing.T) {
 	err := utils.InitLogs()
 	require.Nil(t, err)
 	db, err := database.OpenTester()
@@ -199,6 +198,9 @@ func TestServices(t *testing.T) {
 	db.Create(&fail2)
 	db.Create(&incident1)
 	db.Create(&incidentUpdate1)
+}
+
+func TestServices(t *testing.T) {
 
 	tlsCert := utils.Params.GetString("STATPING_DIR") + "/cert.pem"
 	tlsCertKey := utils.Params.GetString("STATPING_DIR") + "/key.pem"
@@ -222,7 +224,7 @@ func TestServices(t *testing.T) {
 			Timeout:        5,
 			VerifySSL:      null.NewNullBool(false),
 		}
-		e, err = CheckHttp(e, false)
+		e, err := CheckHttp(e, false)
 		require.Nil(t, err)
 		assert.True(t, e.Online)
 		assert.False(t, e.LastCheck.IsZero())
@@ -263,7 +265,7 @@ func TestServices(t *testing.T) {
 			TLSCert:        null.NewNullString(tlsCert),
 			TLSCertKey:     null.NewNullString(tlsCertKey),
 		}
-		e, err = CheckHttp(e, false)
+		e, err := CheckHttp(e, false)
 		require.Nil(t, err)
 		assert.True(t, e.Online)
 		assert.False(t, e.LastCheck.IsZero())
@@ -279,7 +281,7 @@ func TestServices(t *testing.T) {
 			Type:    "tcp",
 			Timeout: 5,
 		}
-		e, err = CheckTcp(e, false)
+		e, err := CheckTcp(e, false)
 		require.Nil(t, err)
 		assert.True(t, e.Online)
 		assert.False(t, e.LastCheck.IsZero())
@@ -297,7 +299,7 @@ func TestServices(t *testing.T) {
 			TLSCert:    null.NewNullString(tlsCert),
 			TLSCertKey: null.NewNullString(tlsCertKey),
 		}
-		e, err = CheckTcp(e, false)
+		e, err := CheckTcp(e, false)
 		require.Nil(t, err)
 		assert.True(t, e.Online)
 		assert.False(t, e.LastCheck.IsZero())
@@ -313,7 +315,7 @@ func TestServices(t *testing.T) {
 			Type:    "udp",
 			Timeout: 5,
 		}
-		e, err = CheckTcp(e, false)
+		e, err := CheckTcp(e, false)
 		require.Nil(t, err)
 		assert.True(t, e.Online)
 		assert.False(t, e.LastCheck.IsZero())
@@ -329,7 +331,7 @@ func TestServices(t *testing.T) {
 			Type:    "grpc",
 			Timeout: 5,
 		}
-		e, err = CheckGrpc(e, false)
+		e, err := CheckGrpc(e, false)
 		require.Nil(t, err)
 		assert.True(t, e.Online)
 		assert.False(t, e.LastCheck.IsZero())
@@ -338,14 +340,13 @@ func TestServices(t *testing.T) {
 	})
 
 	t.Run("Test ICMP Check", func(t *testing.T) {
-		t.SkipNow()
 		e := &Service{
 			Name:    "Example ICMP",
 			Domain:  "localhost",
 			Type:    "icmp",
 			Timeout: 5,
 		}
-		e, err = CheckIcmp(e, false)
+		e, err := CheckIcmp(e, false)
 		require.Nil(t, err)
 		assert.True(t, e.Online)
 		assert.False(t, e.LastCheck.IsZero())
@@ -522,6 +523,7 @@ func TestServices(t *testing.T) {
 		for _, c := range checkin {
 			assert.Len(t, c.Failures().List(), 0)
 			assert.Len(t, c.Hits(), 0)
+			assert.False(t, c.IsRunning())
 		}
 
 		assert.Len(t, item.AllFailures().List(), 0)
@@ -591,10 +593,6 @@ services:
 
 		err = utils.DeleteFile(utils.Directory + "/services.yml")
 		require.Nil(t, err)
+		assert.NoFileExists(t, utils.Directory+"/services.yml")
 	})
-
-	t.Run("Test Close", func(t *testing.T) {
-		assert.Nil(t, db.Close())
-	})
-
 }

@@ -24,10 +24,9 @@ func TestCore_UsingAssets(t *testing.T) {
 }
 
 func TestCreateAssets(t *testing.T) {
-	CreateAllAssets(dir)
+	assert.Nil(t, CreateAllAssets(dir))
 	assert.True(t, UsingAssets(dir))
-	CompileSASS(DefaultScss...)
-	assert.FileExists(t, dir+"/assets/css/main.css")
+	assert.Nil(t, CompileSASS(DefaultScss...))
 	assert.FileExists(t, dir+"/assets/css/style.css")
 	assert.FileExists(t, dir+"/assets/css/vendor.css")
 	assert.FileExists(t, dir+"/assets/scss/base.scss")
@@ -35,10 +34,10 @@ func TestCreateAssets(t *testing.T) {
 	assert.FileExists(t, dir+"/assets/scss/variables.scss")
 }
 
-//func TestCopyAllToPublic(t *testing.T) {
-//	err := CopyAllToPublic(TmplBox)
-//	require.Nil(t, err)
-//}
+func TestCopyAllToPublic(t *testing.T) {
+	err := CopyAllToPublic(TmplBox)
+	require.Nil(t, err)
+}
 
 func TestCompileSASS(t *testing.T) {
 	CompileSASS(DefaultScss...)

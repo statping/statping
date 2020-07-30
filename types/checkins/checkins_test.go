@@ -33,6 +33,7 @@ var testCheckinHits = []*CheckinHit{{
 var testApiKey string
 
 func TestInit(t *testing.T) {
+	t.Parallel()
 	err := utils.InitLogs()
 	require.Nil(t, err)
 	db, err := database.OpenTester()

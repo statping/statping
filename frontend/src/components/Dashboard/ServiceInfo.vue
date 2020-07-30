@@ -1,6 +1,6 @@
 <template>
     <div class="card mb-4" :class="{'offline-card': !service.online}">
-        <div class="card-title px-4 pt-3">
+        <div class="card-header pb-1">
             <h4 v-observe-visibility="setVisible">
                 <router-link :to="serviceLink(service)">{{service.name}}</router-link>
                 <span class="badge float-right text-uppercase" :class="{'badge-success': service.online, 'badge-danger': !service.online}">
@@ -9,8 +9,7 @@
             </h4>
         </div>
 
-        <div class="card-body p-3 p-md-1 pt-md-1 pb-md-1">
-
+        <div class="card-body p-3 p-md-1 pt-md-3 pb-md-1">
             <transition name="fade">
             <div v-if="loaded" class="col-12 pb-2">
 

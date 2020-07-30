@@ -41,8 +41,18 @@ type Notification struct {
 	Running     chan bool       `gorm:"-" json:"-"`
 
 	Form          []NotificationForm `gorm:"-" json:"form"`
-	lastSent      time.Time          `gorm:"-" json:"-"`
-	lastSentCount int                `gorm:"-" json:"-"`
+	LastSent      time.Time          `gorm:"-" json:"-"`
+	LastSentCount int                `gorm:"-" json:"-"`
+	sentCount     int                `gorm:"-" json:"-"`
+	Logs          []*NotificationLog `gorm:"-" json:"logs,omitempty"`
+}
+
+type NotificationLog struct {
+	Message   string    `gorm:"-" json:"message"`
+	Error     error     `gorm:"-" json:"error,omitempty"`
+	Success   bool      `gorm:"-" json:"success"`
+	Service   int64     `gorm:"-" json:"service"`
+	CreatedAt time.Time `gorm:"-" json:"created_at"`
 }
 
 func (n *Notification) Logger() *logrus.Logger {

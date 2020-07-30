@@ -41,13 +41,11 @@ func Example(online bool) Service {
 		Checkpoint:          time.Time{},
 		SleepDuration:       5 * time.Second,
 		LastResponse:        "The example service is hitting this page",
-		NotifyAfter:         0,
+		NotifyAfter:         2,
 		notifyAfterCount:    0,
 		AllowNotifications:  null.NewNullBool(true),
-		UserNotified:        false,
 		UpdateNotify:        null.NewNullBool(true),
 		DownText:            "The service was responding with 500 status code",
-		SuccessNotified:     false,
 		LastStatusCode:      200,
 		Failures:            nil,
 		AllCheckins:         nil,
@@ -56,6 +54,7 @@ func Example(online bool) Service {
 		LastCheck:           utils.Now().Add(-37 * time.Second),
 		LastOnline:          utils.Now().Add(-37 * time.Second),
 		LastOffline:         utils.Now().Add(-75 * time.Second),
+		prevOnline:          true,
 	}
 }
 

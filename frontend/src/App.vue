@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <router-view :loaded="loaded"/>
-      <Footer v-if="$route.path !== '/setup'"/>
+    <Footer v-if="$route.path !== '/setup'"/>
   </div>
 </template>
 
@@ -55,5 +55,8 @@
 
 <style lang="scss">
     @import "./assets/css/bootstrap.min.css";
-    @import "./assets/scss/main";
+    @import "./assets/scss/base";
+    @import "./assets/scss/layout";
+    @import "./assets/scss/forms";
+    @import "./assets/scss/mobile";
 </style>

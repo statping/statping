@@ -44,12 +44,9 @@ type Service struct {
 	SleepDuration       time.Duration       `gorm:"-" json:"-" yaml:"-"`
 	LastResponse        string              `gorm:"-" json:"-" yaml:"-"`
 	NotifyAfter         int64               `gorm:"column:notify_after" json:"notify_after" yaml:"notify_after" scope:"user,admin"`
-	notifyAfterCount    int64               `gorm:"-" json:"-" yaml:"-"`
 	AllowNotifications  null.NullBool       `gorm:"default:true;column:allow_notifications" json:"allow_notifications" yaml:"allow_notifications" scope:"user,admin"`
-	UserNotified        bool                `gorm:"-" json:"-" yaml:"-"`                                                                                           // True if the User was already notified about a Downtime
 	UpdateNotify        null.NullBool       `gorm:"default:true;column:notify_all_changes" json:"notify_all_changes" yaml:"notify_all_changes" scope:"user,admin"` // This Variable is a simple copy of `core.CoreApp.UpdateNotify.Bool`
-	DownText            string              `gorm:"-" json:"-" yaml:"-"`                                                                                           // Contains the current generated Downtime Text
-	SuccessNotified     bool                `gorm:"-" json:"-" yaml:"-"`                                                                                           // Is 'true' if the user has already be informed that the Services now again available
+	DownText            string              `gorm:"-" json:"-" yaml:"-"`                                                                                           // Contains the current generated Downtime Text 	// Is 'true' if the user has already be informed that the Services now again available // Is 'true' if the user has already be informed that the Services now again available
 	LastStatusCode      int                 `gorm:"-" json:"status_code" yaml:"-"`
 	Failures            []*failures.Failure `gorm:"-" json:"failures,omitempty" yaml:"-" scope:"user,admin"`
 	AllCheckins         []*checkins.Checkin `gorm:"-" json:"checkins,omitempty" yaml:"-" scope:"user,admin"`
@@ -59,10 +56,47 @@ type Service struct {
 	LastOnline          time.Time           `gorm:"-" json:"last_success" yaml:"-"`
 	LastOffline         time.Time           `gorm:"-" json:"last_error" yaml:"-"`
 	Stats               *Stats              `gorm:"-" json:"stats,omitempty" yaml:"-"`
+
+	notifyAfterCount int64 `gorm:"-" json:"-" yaml:"-"`
+	prevOnline       bool  `gorm:"-" json:"-" yaml:"-"`
 }
+
+// ServiceOrder will reorder the services based on 'order_id' (Order)
+type ServiceOrder []Service
+
+// Sort interface for resroting the Services in order
+func (c ServiceOrder) Len() int           { return len(c) }
+func (c ServiceOrder) Swap(i, j int)      { c[int64(i)], c[int64(j)] = c[int64(j)], c[int64(i)] }
+func (c ServiceOrder) Less(i, j int) bool { return c[i].Order < c[j].Order }
 
 type Stats struct {
 	Failures int       `gorm:"-" json:"failures"`
 	Hits     int       `gorm:"-" json:"hits"`
 	FirstHit time.Time `gorm:"-" json:"first_hit"`
+}
+
+type ser struct {
+	Time   time.Time
+	Online bool
+}
+
+type UptimeSeries struct {
+	Start    time.Time `json:"start"`
+	End      time.Time `json:"end"`
+	Uptime   int64     `json:"uptime"`
+	Downtime int64     `json:"downtime"`
+	Series   []series  `json:"series"`
+}
+
+type ByTime []ser
+
+func (a ByTime) Len() int           { return len(a) }
+func (a ByTime) Less(i, j int) bool { return a[i].Time.Before(a[j].Time) }
+func (a ByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+type series struct {
+	Start    time.Time `json:"start"`
+	End      time.Time `json:"end"`
+	Duration int64     `json:"duration"`
+	Online   bool      `json:"online"`
 }

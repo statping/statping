@@ -16,7 +16,7 @@ import (
 var (
 	log         = utils.Log.WithField("type", "source")
 	TmplBox     *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
-	DefaultScss = []string{"scss/base.scss", "scss/layout.scss", "scss/main.scss", "scss/mixin.scss", "scss/mobile.scss", "scss/variables.scss"}
+	DefaultScss = []string{"scss/base.scss", "scss/layout.scss", "scss/forms.scss", "scss/mixin.scss", "scss/mobile.scss", "scss/variables.scss"}
 )
 
 // Assets will load the Rice boxes containing the CSS, SCSS, JS, and HTML files.
@@ -34,7 +34,7 @@ func scssRendered(name string) string {
 	path := spl[:len(spl)-2]
 	file := spl[len(spl)-1]
 	splFile := strings.Split(file, ".")
-	return fmt.Sprintf("%s/css/%s.css", strings.Join(path, "/"), splFile[len(splFile)-2])
+	return filepath.Join(strings.Join(path, "/"), "css", splFile[len(splFile)-2]+".css")
 }
 
 // CompileSASS will attempt to compile the SASS files into CSS
@@ -50,12 +50,10 @@ func CompileSASS(files ...string) error {
 	}
 
 	for _, file := range files {
-		scssFile := fmt.Sprintf("%v/assets/%v", utils.Params.GetString("STATPING_DIR"), file)
-
+		scssFile := filepath.Join(utils.Params.GetString("STATPING_DIR"), "assets", file)
 		log.Infoln(fmt.Sprintf("Compiling SASS %v into %v", scssFile, scssRendered(scssFile)))
 
 		stdout, stderr, err := utils.Command(sassBin, scssFile, scssRendered(scssFile))
-
 		if err != nil {
 			log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v", err))
 			log.Errorln(fmt.Sprintf("%s %s %s", sassBin, scssFile, scssRendered(scssFile)))
@@ -75,9 +73,7 @@ func UsingAssets(folder string) bool {
 	if _, err := os.Stat(folder + "/assets"); err == nil {
 		return true
 	} else {
-		useAssets := utils.Params.GetBool("USE_ASSETS")
-
-		if useAssets {
+		if utils.Params.GetBool("USE_ASSETS") {
 			log.Infoln("Environment variable USE_ASSETS was found.")
 			if err := CreateAllAssets(folder); err != nil {
 				log.Warnln(err)
@@ -96,7 +92,7 @@ func UsingAssets(folder string) bool {
 
 // SaveAsset will save an asset to the '/assets/' folder.
 func SaveAsset(data []byte, path string) error {
-	path = fmt.Sprintf("%s/assets/%s", utils.Directory, path)
+	path = filepath.Join(utils.Directory, "assets", path)
 	err := utils.SaveFile(path, data)
 	if err != nil {
 		log.Errorln(fmt.Sprintf("Failed to save %v, %v", path, err))
@@ -143,9 +139,15 @@ func CreateAllAssets(folder string) error {
 		return errors.Wrap(err, "copying all to public")
 	}
 
-	CopyToPublic(TmplBox, "", "robots.txt")
-	CopyToPublic(TmplBox, "", "banner.png")
-	CopyToPublic(TmplBox, "", "favicon.ico")
+	if err := CopyToPublic(TmplBox, "", "robots.txt"); err != nil {
+		return err
+	}
+	if err := CopyToPublic(TmplBox, "", "banner.png"); err != nil {
+		return err
+	}
+	if err := CopyToPublic(TmplBox, "", "favicon.ico"); err != nil {
+		return err
+	}
 	log.Infoln("Compiling CSS from SCSS style...")
 	err := CompileSASS(DefaultScss...)
 	log.Infoln("Statping assets have been inserted")
@@ -165,13 +167,12 @@ func DeleteAllAssets(folder string) error {
 
 // CopyAllToPublic will copy all the files in a rice box into a local folder
 func CopyAllToPublic(box *rice.Box) error {
-
 	exclude := map[string]bool{
 		"base.gohtml": true,
 		"index.html":  true,
 	}
 
-	err := box.Walk("/", func(path string, info os.FileInfo, err error) error {
+	return box.Walk("/", func(path string, info os.FileInfo, err error) error {
 		if info.Name() == "" {
 			return nil
 		}
@@ -181,14 +182,12 @@ func CopyAllToPublic(box *rice.Box) error {
 		if info.IsDir() {
 			return nil
 		}
-		utils.Log.Infoln(path)
 		file, err := box.Bytes(path)
 		if err != nil {
 			return err
 		}
 		return SaveAsset(file, path)
 	})
-	return err
 }
 
 // CopyToPublic will create a file from a rice Box to the '/assets' directory
