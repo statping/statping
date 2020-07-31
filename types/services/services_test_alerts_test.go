@@ -15,6 +15,7 @@ func TestServiceNotifications(t *testing.T) {
 		allNotifiers[notification.Method] = notification
 
 		service := Example(true)
+		service.prevOnline = true // set online during startup
 		failure := failures.Example()
 
 		service.UpdateNotify = null.NewNullBool(true)
@@ -70,6 +71,7 @@ func TestServiceNotifications(t *testing.T) {
 		allNotifiers[notification.Method] = notification
 
 		service := Example(true)
+		service.prevOnline = true // set online during startup
 		failure := failures.Example()
 		notif := notification
 
@@ -141,7 +143,7 @@ func TestServiceNotifications(t *testing.T) {
 		service := Example(false)
 		failure := failures.Example()
 		notif := notification
-		service.prevOnline = false
+		service.prevOnline = false // set offline
 
 		service.UpdateNotify = null.NewNullBool(false)
 		service.NotifyAfter = 2
@@ -208,6 +210,7 @@ func TestServiceNotifications(t *testing.T) {
 	t.Run("Strategy #4 - Disabled - [online, notifications are disabled", func(t *testing.T) {
 		allNotifiers[notification.Method] = notification
 		service := Example(false)
+		service.prevOnline = true // set online during startup
 		service.AllowNotifications = null.NewNullBool(false)
 		failure := failures.Example()
 		notif := notification

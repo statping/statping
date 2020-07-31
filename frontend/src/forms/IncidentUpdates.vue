@@ -5,9 +5,11 @@
             No updates found, create a new Incident Update below.
         </div>
 
-        <div v-for="update in updates" :key="update.id">
-            <IncidentUpdate :update="update" :admin="true"/>
-        </div>
+        <transition-group name="fade" tag="div">
+            <div v-for="update in updates.reverse()" :key="update.id">
+                <IncidentUpdate :update="update" :onUpdate="loadUpdates" :admin="true"/>
+            </div>
+        </transition-group>
 
         <form class="row" @submit.prevent="createIncidentUpdate">
             <div class="col-12 col-md-3 mb-3 mb-md-0">
@@ -19,7 +21,7 @@
                 </select>
             </div>
             <div class="col-12 col-md-7 mb-3 mb-md-0">
-                <input v-model="incident_update.message" rows="5" name="description" class="form-control" id="message" required>
+                <input v-model="incident_update.message" name="description" class="form-control" id="message" required>
             </div>
 
             <div class="col-12 col-md-2">
@@ -36,8 +38,6 @@
 
 <script>
     import Api from "../API";
-    import flatPickr from 'vue-flatpickr-component';
-    import 'flatpickr/dist/flatpickr.css';
     import IncidentUpdate from "@/components/Elements/IncidentUpdate";
 
     export default {

@@ -6,7 +6,6 @@
                 <span class="font-2 float-right">{{niceDate(incident.created_at)}}</span>
             </h6>
             <div class="font-2 mb-3" v-html="incident.description"></div>
-
                 <IncidentUpdate v-for="(update, i) in incident.updates" v-bind:key="i" :update="update" :admin="false"/>
         </div>
     </div>
@@ -18,7 +17,9 @@ import IncidentUpdate from "@/components/Elements/IncidentUpdate";
 
 export default {
   name: 'IncidentsBlock',
-  components: {IncidentUpdate},
+  components: {
+    IncidentUpdate
+  },
   props: {
         service: {
             type: Object,

@@ -21,13 +21,16 @@
       },
       admin: {
         required: true
+      },
+      onUpdate: {
+        required: false
       }
     },
     methods: {
       async delete_update(update) {
         this.res = await Api.incident_update_delete(update)
         if (this.res.status === "success") {
-          await this.loadUpdates()
+         this.onUpdate()
         }
       },
     }

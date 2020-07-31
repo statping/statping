@@ -20,7 +20,6 @@ func (c *Core) AfterFind() {
 
 func Select() (*Core, error) {
 	var c Core
-	// SelectCore will return the CoreApp global variable and the settings/configs for Statping
 	if err := db.DB().Ping(); err != nil {
 		return nil, errors.New("database has not been initiated yet.")
 	}
@@ -47,6 +46,9 @@ func Select() (*Core, error) {
 }
 
 func (c *Core) Create() error {
+	if c.ApiSecret == "" {
+		c.ApiSecret = utils.RandomString(16)
+	}
 	q := db.Create(c)
 	utils.Log.Infof("API Key created: %s", c.ApiSecret)
 	return q.Error()

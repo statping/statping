@@ -112,6 +112,9 @@ func TestSetupRoutes(t *testing.T) {
 				if !core.App.Setup {
 					return errors.New("core has not been setup")
 				}
+				if core.App.ApiSecret == "" {
+					return errors.New("API Key has not been set")
+				}
 				if len(services.AllInOrder()) == 0 {
 					return errors.New("no services where found")
 				}

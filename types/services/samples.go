@@ -41,7 +41,7 @@ func Example(online bool) Service {
 		Checkpoint:          time.Time{},
 		SleepDuration:       5 * time.Second,
 		LastResponse:        "The example service is hitting this page",
-		NotifyAfter:         2,
+		NotifyAfter:         0,
 		notifyAfterCount:    0,
 		AllowNotifications:  null.NewNullBool(true),
 		UpdateNotify:        null.NewNullBool(true),
@@ -54,7 +54,7 @@ func Example(online bool) Service {
 		LastCheck:           utils.Now().Add(-37 * time.Second),
 		LastOnline:          utils.Now().Add(-37 * time.Second),
 		LastOffline:         utils.Now().Add(-75 * time.Second),
-		prevOnline:          true,
+		prevOnline:          false,
 	}
 }
 

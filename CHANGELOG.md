@@ -1,9 +1,9 @@
 # 0.90.62 (07-30-2020)
 - Added Notification logs
-- Fixed issues with notifications
+- Fixed issues with Notifer After (x) failures for notifications
+- Modified notifications to not send on initial startup
 - Updated Incident UI
 - Added additional testing for notifications
--
 
 # 0.90.61 (07-22-2020)
 - Modified sass layouts, organized and split up sections
