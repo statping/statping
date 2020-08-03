@@ -61,6 +61,17 @@ func (n *Notification) Logger() *logrus.Logger {
 
 type RunFunc func(interface{}) error
 
+type Values struct {
+	Host      string
+	Port      int64
+	Username  string
+	Password  string
+	Var1      string
+	Var2      string
+	ApiKey    string
+	ApiSecret string
+}
+
 // NotificationForm contains the HTML fields for each variable/input you want the notifier to accept.
 type NotificationForm struct {
 	Type        string   `json:"type"`        // the html input type (text, password, email)

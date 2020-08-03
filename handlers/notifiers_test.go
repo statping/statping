@@ -5,6 +5,7 @@ import (
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ func TestAttachment(t *testing.T) {
 	notifiers.InitNotifiers()
 }
 
-func TestUnAuthenticatedNotifierRoutes(t *testing.T) {
+func TestAuthenticatedNotifierRoutes(t *testing.T) {
 	slackWebhookUrl := utils.Params.GetString("SLACK_URL")
 
 	tests := []HTTPTest{
@@ -42,7 +43,12 @@ func TestUnAuthenticatedNotifierRoutes(t *testing.T) {
 			URL:            "/api/notifier/slack",
 			Method:         "GET",
 			ExpectedStatus: 200,
-			BeforeTest:     SetTestENV,
+			BeforeTest: func(t *testing.T) error {
+				notif := services.FindNotifier("slack")
+				require.NotNil(t, notif)
+				assert.Equal(t, "slack", notif.Method)
+				return SetTestENV(t)
+			},
 		},
 		{
 			Name:   "No Authentication - Update Notifier",
@@ -68,7 +74,20 @@ func TestUnAuthenticatedNotifierRoutes(t *testing.T) {
 					"limits": 55
 				}`,
 			ExpectedStatus: 200,
-			BeforeTest:     SetTestENV,
+			BeforeTest: func(t *testing.T) error {
+				notif := services.FindNotifier("slack")
+				require.NotNil(t, notif)
+				assert.Equal(t, "slack", notif.Method)
+				assert.False(t, notif.Enabled.Bool)
+				return SetTestENV(t)
+			},
+			AfterTest: func(t *testing.T) error {
+				notif := services.FindNotifier("slack")
+				require.NotNil(t, notif)
+				assert.Equal(t, "slack", notif.Method)
+				assert.True(t, notif.Enabled.Bool)
+				return UnsetTestENV(t)
+			},
 		},
 		{
 			Name:   "Test Notifier (OnSuccess)",
@@ -154,7 +173,7 @@ func TestApiNotifiersRoutes(t *testing.T) {
 			URL:              "/api/notifier/slack",
 			Method:           "GET",
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"method":"slack"`},
+			ExpectedContains: []string{`"method":"slack"`, `"host":"https://slack.api/example/12345"`},
 			BeforeTest:       SetTestENV,
 			SecureRoute:      true,
 		},

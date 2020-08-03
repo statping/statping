@@ -10,6 +10,7 @@ import (
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/types/incidents"
+	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
@@ -182,10 +183,11 @@ func startupDb(t *testing.T) {
 	require.Nil(t, err)
 	db, err := database.OpenTester()
 	require.Nil(t, err)
-	db.AutoMigrate(&Service{}, &hits.Hit{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &failures.Failure{}, &incidents.Incident{}, &incidents.IncidentUpdate{})
+	db.AutoMigrate(&Service{}, &notifications.Notification{}, &hits.Hit{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &failures.Failure{}, &incidents.Incident{}, &incidents.IncidentUpdate{})
 	checkins.SetDB(db)
 	failures.SetDB(db)
 	incidents.SetDB(db)
+	notifications.SetDB(db)
 	hits.SetDB(db)
 	SetDB(db)
 
@@ -197,6 +199,7 @@ func startupDb(t *testing.T) {
 	db.Create(&fail1)
 	db.Create(&fail2)
 	db.Create(&incident1)
+	db.Create(&incidentUpdate1)
 	db.Create(&incidentUpdate1)
 }
 

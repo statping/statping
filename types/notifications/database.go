@@ -1,7 +1,6 @@
 package notifications
 
 import (
-	"errors"
 	"github.com/statping/statping/database"
 )
 
@@ -16,11 +15,10 @@ func SetDB(database database.Database) {
 func Find(method string) (*Notification, error) {
 	var n Notification
 	q := db.Where("method = ?", method).Find(&n)
-	if &n == nil {
-		return nil, errors.New("cannot find notifier")
+	if q.Error() != nil {
+		return nil, q.Error()
 	}
-	n.UpdateFields(&n)
-	return &n, q.Error()
+	return &n, nil
 }
 
 func (n *Notification) Create() error {
@@ -45,6 +43,7 @@ func (n *Notification) Create() error {
 }
 
 func (n *Notification) UpdateFields(notif *Notification) *Notification {
+	n.Id = notif.Id
 	n.Limits = notif.Limits
 	n.Enabled = notif.Enabled
 	n.Host = notif.Host

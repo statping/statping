@@ -25,6 +25,10 @@ func (t *telegram) Select() *notifications.Notification {
 	return t.Notification
 }
 
+func (t *telegram) Valid(values notifications.Values) error {
+	return nil
+}
+
 var Telegram = &telegram{&notifications.Notification{
 	Method:      "telegram",
 	Title:       "Telegram",

@@ -22,6 +22,10 @@ func (g *gotify) Select() *notifications.Notification {
 	return g.Notification
 }
 
+func (g *gotify) Valid(values notifications.Values) error {
+	return nil
+}
+
 var Gotify = &gotify{&notifications.Notification{
 	Method:      "gotify",
 	Title:       "Gotify",

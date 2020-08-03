@@ -28,6 +28,10 @@ func (e *emailer) Select() *notifications.Notification {
 	return e.Notification
 }
 
+func (e *emailer) Valid(values notifications.Values) error {
+	return nil
+}
+
 var email = &emailer{&notifications.Notification{
 	Method:      "email",
 	Title:       "SMTP Mail",

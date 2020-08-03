@@ -91,3 +91,7 @@ func (s *slack) OnSuccess(srv services.Service) (string, error) {
 func (s *slack) OnSave() (string, error) {
 	return "", nil
 }
+
+func (s *slack) Valid(values notifications.Values) error {
+	return nil
+}

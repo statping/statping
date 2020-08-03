@@ -27,6 +27,10 @@ func (s *statpingEmailer) Select() *notifications.Notification {
 	return s.Notification
 }
 
+func (s *statpingEmailer) Valid(values notifications.Values) error {
+	return nil
+}
+
 var statpingMailer = &statpingEmailer{&notifications.Notification{
 	Method:      statpingEmailerName,
 	Title:       "Email",

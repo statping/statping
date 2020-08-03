@@ -322,3 +322,7 @@ func (e *exampleNotifier) OnTest() (string, error) {
 	e.tests++
 	return "", nil
 }
+
+func (e *exampleNotifier) Valid(form notifications.Values) error {
+	return nil
+}

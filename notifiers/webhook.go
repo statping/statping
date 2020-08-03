@@ -80,6 +80,10 @@ func (w *webhooker) Select() *notifications.Notification {
 	return w.Notification
 }
 
+func (w *webhooker) Valid(values notifications.Values) error {
+	return nil
+}
+
 func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 	utils.Log.Infoln(fmt.Sprintf("sending body: '%v' to %v as a %v request", body, w.Host.String, w.Var1.String))
 	client := new(http.Client)

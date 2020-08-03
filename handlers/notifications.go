@@ -12,12 +12,10 @@ import (
 
 func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 	var notifs []notifications.Notification
-	notifiers := services.AllNotifiers()
-	for _, n := range notifiers {
-		notif := n.Select()
-		notifer, _ := notifications.Find(notif.Method)
-		notif.UpdateFields(notifer)
-		notifs = append(notifs, *notif)
+	for _, n := range services.AllNotifiers() {
+		no := n.Select()
+		notif, _ := notifications.Find(no.Method)
+		notifs = append(notifs, *no.UpdateFields(notif))
 	}
 	sort.Sort(notifications.NotificationOrder(notifs))
 	returnJson(notifs, w, r)
@@ -25,12 +23,12 @@ func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	notif := services.FindNotifier(vars["notifier"])
-	if notif == nil {
+	notifer := services.FindNotifier(vars["notifier"])
+	if notifer == nil {
 		sendErrorJson(errors.New("could not find notifier"), w, r)
 		return
 	}
-	returnJson(notif, w, r)
+	returnJson(notifer, w, r)
 }
 
 func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -48,8 +46,7 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Infof("Updating %s Notifier", notifer.Title)
 
-	err = notifer.Update()
-	if err != nil {
+	if err := notifer.Update(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}

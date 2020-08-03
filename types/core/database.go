@@ -48,6 +48,10 @@ func Select() (*Core, error) {
 func (c *Core) Create() error {
 	if c.ApiSecret == "" {
 		c.ApiSecret = utils.RandomString(16)
+		apiEnv := utils.Params.GetString("API_SECRET")
+		if apiEnv != "" {
+			c.ApiSecret = apiEnv
+		}
 	}
 	q := db.Create(c)
 	utils.Log.Infof("API Key created: %s", c.ApiSecret)

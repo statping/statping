@@ -26,6 +26,10 @@ func (t *twilio) Select() *notifications.Notification {
 	return t.Notification
 }
 
+func (t *twilio) Valid(values notifications.Values) error {
+	return nil
+}
+
 var Twilio = &twilio{&notifications.Notification{
 	Method:      "twilio",
 	Title:       "Twilio",
