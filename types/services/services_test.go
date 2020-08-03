@@ -200,7 +200,7 @@ func startupDb(t *testing.T) {
 	db.Create(&fail2)
 	db.Create(&incident1)
 	db.Create(&incidentUpdate1)
-	db.Create(&incidentUpdate1)
+	db.Create(&notification.Notification)
 }
 
 func TestServices(t *testing.T) {

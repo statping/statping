@@ -21,7 +21,11 @@ func FindNotifier(method string) *notifications.Notification {
 	n := allNotifiers[method]
 	if n != nil {
 		notif := n.Select()
-		no, _ := notifications.Find(notif.Method)
+		no, err := notifications.Find(notif.Method)
+		if err != nil {
+			log.Error(err)
+			return nil
+		}
 		return notif.UpdateFields(no)
 	}
 	return nil
