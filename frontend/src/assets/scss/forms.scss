@@ -31,7 +31,7 @@
 
 .form-control[readonly] {
   background-color: lighten($background-color, 12%) !important;
-  color: lighten($input-color, 40%) !important;
+  color: lighten($input-color, 30%) !important;
 }
 
 /* The slider itself */

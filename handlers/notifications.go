@@ -67,9 +67,9 @@ type testNotificationReq struct {
 
 func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	n, err := notifications.Find(vars["notifier"])
-	if err != nil {
-		sendErrorJson(err, w, r)
+	n := services.FindNotifier(vars["notifier"])
+	if n == nil {
+		sendErrorJson(errors.New("unknown notifier"), w, r)
 		return
 	}
 
@@ -82,6 +82,7 @@ func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	notif := services.ReturnNotifier(n.Method)
 
 	var out string
+	var err error
 	if req.Method == "success" {
 		out, err = notif.OnSuccess(services.Example(true))
 	} else {

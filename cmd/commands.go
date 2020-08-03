@@ -12,16 +12,18 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "statping",
-	Short: "A simple Application Status Monitor that is opensource and lightweight.",
+	Use:     "statping",
+	Version: VERSION,
+	Short:   "A simple Application Status Monitor that is opensource and lightweight.",
 	Run: func(cmd *cobra.Command, args []string) {
 		start()
 	},
 }
 
 var updateCmd = &cobra.Command{
-	Use:   "update",
-	Short: "Update to the latest version",
+	Use:     "update",
+	Example: "statping update",
+	Short:   "Update to the latest version",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		log.Infoln("Updating Statping to the latest version...")
 		curl, err := exec.LookPath("curl")
@@ -59,8 +61,9 @@ var updateCmd = &cobra.Command{
 }
 
 var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Print the version number of Statping",
+	Use:     "version",
+	Example: "statping version",
+	Short:   "Print the version number of Statping",
 	Run: func(cmd *cobra.Command, args []string) {
 		if COMMIT != "" {
 			fmt.Printf("%s (%s)\n", VERSION, COMMIT)
@@ -72,8 +75,9 @@ var versionCmd = &cobra.Command{
 }
 
 var systemctlCmd = &cobra.Command{
-	Use:   "systemctl [install/uninstall]",
-	Short: "Install or Uninstall systemctl services",
+	Use:     "systemctl [install/uninstall]",
+	Example: "statping systemctl install",
+	Short:   "Install or Uninstall systemctl services",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if args[1] == "install" {
 			if len(args) < 3 {
@@ -99,8 +103,9 @@ var systemctlCmd = &cobra.Command{
 }
 
 var assetsCmd = &cobra.Command{
-	Use:   "assets",
-	Short: "Dump all assets used locally to be edited",
+	Use:     "assets",
+	Example: "statping assets",
+	Short:   "Dump all assets used locally to be edited",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := assetsCli(); err != nil {
 			return err
@@ -111,8 +116,9 @@ var assetsCmd = &cobra.Command{
 }
 
 var exportCmd = &cobra.Command{
-	Use:   "export",
-	Short: "Exports your Statping settings to a 'statping-export.json' file.",
+	Use:     "export",
+	Example: "statping export",
+	Short:   "Exports your Statping settings to a 'statping-export.json' file.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := exportCli(args); err != nil {
 			return err
@@ -123,8 +129,9 @@ var exportCmd = &cobra.Command{
 }
 
 var sassCmd = &cobra.Command{
-	Use:   "sass",
-	Short: "Compile .scss files into the css directory",
+	Use:     "sass",
+	Example: "statping sass",
+	Short:   "Compile .scss files into the css directory",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := sassCli(); err != nil {
 			return err
@@ -135,8 +142,9 @@ var sassCmd = &cobra.Command{
 }
 
 var envCmd = &cobra.Command{
-	Use:   "env",
-	Short: "Return the configs that will be ran",
+	Use:     "env",
+	Example: "statping env",
+	Short:   "Return the configs that will be ran",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := envCli(); err != nil {
 			return err
@@ -147,8 +155,9 @@ var envCmd = &cobra.Command{
 }
 
 var resetCmd = &cobra.Command{
-	Use:   "reset",
-	Short: "Start a fresh copy of Statping",
+	Use:     "reset",
+	Example: "statping reset",
+	Short:   "Start a fresh copy of Statping",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := resetCli(); err != nil {
 			return err
@@ -159,8 +168,9 @@ var resetCmd = &cobra.Command{
 }
 
 var onceCmd = &cobra.Command{
-	Use:   "once",
-	Short: "Check all services 1 time and then quit",
+	Use:     "once",
+	Example: "statping once",
+	Short:   "Check all services 1 time and then quit",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := onceCli(); err != nil {
 			return err
@@ -171,8 +181,9 @@ var onceCmd = &cobra.Command{
 }
 
 var importCmd = &cobra.Command{
-	Use:   "import [.json file]",
-	Short: "Imports settings from a previously saved JSON file.",
+	Use:     "import [.json file]",
+	Example: "statping import backup.json",
+	Short:   "Imports settings from a previously saved JSON file.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := importCli(args); err != nil {
 			return err

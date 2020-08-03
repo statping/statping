@@ -8,26 +8,7 @@ import (
 )
 
 var (
-	dir           string
-	requiredFiles = []string{
-		"css/style.css",
-		"css/style.css.gz",
-		"css/main.css",
-		"scss/main.scss",
-		"scss/base.scss",
-		"scss/forms.scss",
-		"scss/layout.scss",
-		"scss/mixin.scss",
-		"scss/mobile.scss",
-		"scss/variables.scss",
-		"js/bundle.js",
-		"js/main.chunk.js",
-		"js/polyfill.chunk.js",
-		"js/style.chunk.js",
-		"banner.png",
-		"favicon.ico",
-		"robots.txt",
-	}
+	dir string
 )
 
 func init() {
@@ -38,8 +19,8 @@ func init() {
 	dir = utils.Params.GetString("STATPING_DIR")
 }
 
-func assetFiles(t *testing.T, exist bool) {
-	for _, f := range requiredFiles {
+func assertFiles(t *testing.T, exist bool) {
+	for _, f := range RequiredFiles {
 		if exist {
 			assert.FileExists(t, dir+"/assets/"+f)
 		} else {
@@ -50,54 +31,65 @@ func assetFiles(t *testing.T, exist bool) {
 
 func TestCore_UsingAssets(t *testing.T) {
 	assert.False(t, UsingAssets(dir))
-	assetFiles(t, false)
+	assertFiles(t, false)
 }
 
 func TestCreateAssets(t *testing.T) {
 	assert.Nil(t, CreateAllAssets(dir))
 	assert.True(t, UsingAssets(dir))
 	assert.Nil(t, CompileSASS())
-	assetFiles(t, true)
+	assertFiles(t, true)
 }
 
 func TestCopyAllToPublic(t *testing.T) {
 	err := CopyAllToPublic(TmplBox)
 	require.Nil(t, err)
-	assetFiles(t, true)
+	assertFiles(t, true)
 }
 
 func TestCompileSASS(t *testing.T) {
 	err := CompileSASS()
 	require.Nil(t, err)
 	assert.True(t, UsingAssets(dir))
-	assetFiles(t, true)
+	assertFiles(t, true)
 }
 
 func TestSaveAndCompileAsset(t *testing.T) {
-	scssData := "$bodycolor: #333; BODY { color: $bodycolor; }"
+	vars := OpenAsset("scss/variables.scss")
+	vars += "$testingcolor: #b1b2b3;"
 
-	err := SaveAsset([]byte(scssData), "scss/base.scss")
+	err := SaveAsset([]byte(vars), "scss/variables.scss")
+	require.Nil(t, err)
+	assert.FileExists(t, dir+"/assets/scss/variables.scss")
+
+	scssData := OpenAsset("scss/base.scss")
+	scssData += "BODY { color: $testingcolor; }"
+	err = SaveAsset([]byte(scssData), "scss/base.scss")
 	require.Nil(t, err)
 	assert.FileExists(t, dir+"/assets/scss/base.scss")
 
-	asset := OpenAsset("scss/base.scss")
+	asset := OpenAsset("scss/variables.scss")
+	assert.NotEmpty(t, asset)
+	assert.Equal(t, vars, asset)
+
+	asset = OpenAsset("scss/base.scss")
 	assert.NotEmpty(t, asset)
 	assert.Equal(t, scssData, asset)
 
 	err = CompileSASS()
 	require.Nil(t, err)
-	assert.FileExists(t, dir+"/assets/css/main.css")
+	assertFiles(t, true)
 
 	themeCSS, err := utils.OpenFile(dir + "/assets/css/main.css")
 	require.Nil(t, err)
 
-	assert.Contains(t, themeCSS, `color: #333;`)
+	assert.Contains(t, themeCSS, `color: #b1b2b3;`)
 }
 
 func TestOpenAsset(t *testing.T) {
-	for _, f := range requiredFiles {
-		asset := OpenAsset(f)
-		assert.NotEmpty(t, asset)
+	for _, f := range RequiredFiles {
+		assert.FileExists(t, dir+"/assets/"+f)
+		assert.NotEmpty(t, OpenAsset(f))
 	}
 }
 
@@ -105,6 +97,7 @@ func TestDeleteAssets(t *testing.T) {
 	assert.True(t, UsingAssets(dir))
 	assert.Nil(t, DeleteAllAssets(dir))
 	assert.False(t, UsingAssets(dir))
+	assertFiles(t, false)
 }
 
 func ExampleSaveAsset() {

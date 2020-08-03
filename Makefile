@@ -164,6 +164,10 @@ install: build
 install-local: build
 	mv $(BINARY_NAME) /usr/local/bin/$(BINARY_NAME)
 
+install-darwin:
+	go build -a -ldflags "-X main.VERSION=${VERSION}" -o statping --tags "netgo darwin" ./cmd
+	mv $(BINARY_NAME) /usr/local/bin/$(BINARY_NAME)
+
 generate:
 	cd source && go generate
 
@@ -399,5 +403,5 @@ check:
 	@echo "yarn:   $(shell yarn --version) - $(shell which yarn)" && yarn --version >/dev/null 2>&1 || (echo "ERROR: yarn is required."; exit 1)
 	@echo "All required programs are installed!"
 
-.PHONY: all check build certs multiarch go-build build-all buildx-base buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
+.PHONY: all check build certs multiarch install-darwin go-build build-all buildx-base buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds

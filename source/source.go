@@ -14,8 +14,27 @@ import (
 )
 
 var (
-	log     = utils.Log.WithField("type", "source")
-	TmplBox *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
+	log           = utils.Log.WithField("type", "source")
+	TmplBox       *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
+	RequiredFiles = []string{
+		"css/style.css",
+		"css/style.css.gz",
+		"css/main.css",
+		"scss/main.scss",
+		"scss/base.scss",
+		"scss/forms.scss",
+		"scss/layout.scss",
+		"scss/mixin.scss",
+		"scss/mobile.scss",
+		"scss/variables.scss",
+		"js/bundle.js",
+		"js/main.chunk.js",
+		"js/polyfill.chunk.js",
+		"js/style.chunk.js",
+		"banner.png",
+		"favicon.ico",
+		"robots.txt",
+	}
 )
 
 // Assets will load the Rice boxes containing the CSS, SCSS, JS, and HTML files.

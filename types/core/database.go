@@ -12,6 +12,18 @@ var db database.Database
 
 func SetDB(database database.Database) {
 	db = database.Model(&Core{})
+	c, err := Select()
+	if err != nil {
+		utils.Log.Errorln(err)
+		return
+	}
+	apiEnv := utils.Params.GetString("API_SECRET")
+	if c.ApiSecret != apiEnv && apiEnv != "" {
+		c.ApiSecret = apiEnv
+		if err := c.Update(); err != nil {
+			utils.Log.Errorln(err)
+		}
+	}
 }
 
 func (c *Core) AfterFind() {
@@ -41,6 +53,9 @@ func Select() (*Core, error) {
 	}
 	if utils.Params.GetString("LANGUAGE") != "" {
 		App.Language = utils.Params.GetString("LANGUAGE")
+	}
+	if utils.Params.GetString("API_SECRET") != "" {
+		App.ApiSecret = utils.Params.GetString("API_SECRET")
 	}
 	return App, q.Error()
 }

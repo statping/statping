@@ -16,6 +16,7 @@ import (
 	"github.com/statping/statping/utils"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -67,8 +68,8 @@ After=network-online.target
 [Service]
 Type=simple
 Restart=always
-Environment=STATPING_DIR=` + dir + `
-Environment=ALLOW_REPORTS=true
+Environment="STATPING_DIR=` + dir + `"
+Environment="ALLOW_REPORTS=true"
 ExecStart=` + binPath + ` --port=` + utils.ToString(port) + `
 WorkingDirectory=` + dir + `
 
@@ -97,7 +98,7 @@ WantedBy=multi-user.target"
 }
 
 func exportCli(args []string) error {
-	filename := fmt.Sprintf("%s/statping-%s.json", utils.Directory, time.Now().Format("01-02-2006-1504"))
+	filename := filepath.Join(utils.Directory, time.Now().Format("01-02-2006-1504")+".json")
 	if len(args) == 1 {
 		filename = fmt.Sprintf("%s/%s", utils.Directory, args)
 	}

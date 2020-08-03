@@ -20,8 +20,6 @@
 
                     <h6 class="mt-4 text-muted">Notifiers</h6>
 
-                  {{notifiers}}
-
                     <div id="notifiers_tabs">
                         <a v-for="(notifier, index) in notifiers" v-bind:key="`${notifier.method}`" @click.prevent="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" data-toggle="pill" v-bind:href="`#v-pills-${notifier.method.toLowerCase()}`" role="tab" v-bind:aria-controls="`v-pills-${notifier.method.toLowerCase()}`" aria-selected="false">
                             <font-awesome-icon :icon="iconName(notifier.icon)" class="mr-2"/> {{notifier.title}}
