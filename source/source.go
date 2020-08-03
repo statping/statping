@@ -14,9 +14,8 @@ import (
 )
 
 var (
-	log         = utils.Log.WithField("type", "source")
-	TmplBox     *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
-	DefaultScss = []string{"scss/base.scss", "scss/layout.scss", "scss/forms.scss", "scss/mixin.scss", "scss/mobile.scss", "scss/variables.scss"}
+	log     = utils.Log.WithField("type", "source")
+	TmplBox *rice.Box // HTML and other small files from the 'source/tmpl' directory, this will be loaded into '/assets'
 )
 
 // Assets will load the Rice boxes containing the CSS, SCSS, JS, and HTML files.
@@ -38,7 +37,7 @@ func scssRendered(name string) string {
 }
 
 // CompileSASS will attempt to compile the SASS files into CSS
-func CompileSASS(files ...string) error {
+func CompileSASS() error {
 	sassBin := utils.Params.GetString("SASS")
 	if sassBin == "" {
 		bin, err := exec.LookPath("sass")
@@ -77,8 +76,7 @@ func UsingAssets(folder string) bool {
 			if err := CreateAllAssets(folder); err != nil {
 				log.Warnln(err)
 			}
-			err := CompileSASS(DefaultScss...)
-			if err != nil {
+			if err := CompileSASS(); err != nil {
 				//CopyToPublic(CssBox, folder+"/css", "base.css")
 				log.Warnln("Default 'base.css' was insert because SASS did not work.")
 				return true
@@ -148,9 +146,11 @@ func CreateAllAssets(folder string) error {
 		return err
 	}
 	log.Infoln("Compiling CSS from SCSS style...")
-	err := CompileSASS(DefaultScss...)
+	if err := CompileSASS(); err != nil {
+		return err
+	}
 	log.Infoln("Statping assets have been inserted")
-	return err
+	return nil
 }
 
 // DeleteAllAssets will delete the '/assets' folder

@@ -135,7 +135,7 @@ func sassCli() error {
 	if err := source.Assets(); err != nil {
 		return err
 	}
-	if err := source.CompileSASS(source.DefaultScss...); err != nil {
+	if err := source.CompileSASS(); err != nil {
 		return err
 	}
 	return nil

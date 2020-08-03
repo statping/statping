@@ -71,8 +71,8 @@ func Router() *mux.Router {
 
 		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("css"))))
 		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("js"))))
-		r.PathPrefix("/scss/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("scss"))))
-		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("favicon"))))
+		r.PathPrefix("/scss/").Handler(http.StripPrefix(basePath, staticAssets("scss")))
+		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, staticAssets("favicon")))
 		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, indexHandler))
 		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, indexHandler))
 	} else {
@@ -80,9 +80,9 @@ func Router() *mux.Router {
 		tmplBoxHandler := http.StripPrefix(basePath, tmplFileSrv)
 
 		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
-		r.PathPrefix("/scss/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
+		r.PathPrefix("/scss/").Handler(http.StripPrefix(basePath, tmplFileSrv))
 		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
-		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
+		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, tmplFileSrv))
 		r.PathPrefix("/robots.txt").Handler(tmplBoxHandler)
 		r.PathPrefix("/banner.png").Handler(tmplBoxHandler)
 	}
