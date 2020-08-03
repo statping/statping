@@ -25,12 +25,16 @@ func TestCore_UsingAssets(t *testing.T) {
 
 func TestCreateAssets(t *testing.T) {
 	assert.Nil(t, CreateAllAssets(dir))
+	assert.FileExists(t, dir+"/assets/js/bundle.js")
 	assert.True(t, UsingAssets(dir))
 	assert.Nil(t, CompileSASS(DefaultScss...))
 	assert.FileExists(t, dir+"/assets/css/style.css")
-	assert.FileExists(t, dir+"/assets/css/vendor.css")
+	assert.FileExists(t, dir+"/assets/css/main.css")
+	assert.FileExists(t, dir+"/assets/scss/main.scss")
 	assert.FileExists(t, dir+"/assets/scss/base.scss")
+	assert.FileExists(t, dir+"/assets/scss/forms.scss")
 	assert.FileExists(t, dir+"/assets/scss/mobile.scss")
+	assert.FileExists(t, dir+"/assets/scss/layout.scss")
 	assert.FileExists(t, dir+"/assets/scss/variables.scss")
 }
 

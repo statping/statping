@@ -49,21 +49,20 @@ func CompileSASS(files ...string) error {
 		sassBin = bin
 	}
 
-	for _, file := range files {
-		scssFile := filepath.Join(utils.Params.GetString("STATPING_DIR"), "assets", file)
-		log.Infoln(fmt.Sprintf("Compiling SASS %v into %v", scssFile, scssRendered(scssFile)))
+	scssFile := filepath.Join(utils.Params.GetString("STATPING_DIR"), "assets", "scss", "main.scss")
+	log.Infoln(fmt.Sprintf("Compiling SASS %v into %v", scssFile, scssRendered(scssFile)))
 
-		stdout, stderr, err := utils.Command(sassBin, scssFile, scssRendered(scssFile))
-		if err != nil {
-			log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v", err))
-			log.Errorln(fmt.Sprintf("%s %s %s", sassBin, scssFile, scssRendered(scssFile)))
-			return errors.Wrapf(err, "failed to compile assets, %s %s %s", err, stdout, stderr)
-		}
-
-		if stdout != "" || stderr != "" {
-			log.Infoln(fmt.Sprintf("out: %v | error: %v", stdout, stderr))
-		}
+	stdout, stderr, err := utils.Command(sassBin, scssFile, scssRendered(scssFile))
+	if err != nil {
+		log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v", err))
+		log.Errorln(fmt.Sprintf("%s %s %s", sassBin, scssFile, scssRendered(scssFile)))
+		return errors.Wrapf(err, "failed to compile assets, %s %s %s", err, stdout, stderr)
 	}
+
+	if stdout != "" || stderr != "" {
+		log.Infoln(fmt.Sprintf("out: %v | error: %v", stdout, stderr))
+	}
+
 	log.Infoln("SASS Compiling is complete!")
 	return nil
 }
@@ -103,10 +102,10 @@ func SaveAsset(data []byte, path string) error {
 
 // OpenAsset returns a file's contents as a string
 func OpenAsset(path string) string {
-	path = fmt.Sprintf("%s/assets/%s", utils.Directory, path)
+	path = filepath.Join(utils.Directory, "assets", path)
 	data, err := utils.OpenFile(path)
 	if err != nil {
-		log.Errorln(fmt.Sprintf("Failed to open %v, %v", path, err))
+		log.Errorln(fmt.Sprintf("Failed to open %s, %v", path, err))
 		return ""
 	}
 	return data
@@ -114,7 +113,7 @@ func OpenAsset(path string) string {
 
 // CreateAllAssets will dump HTML, CSS, SCSS, and JS assets into the '/assets' directory
 func CreateAllAssets(folder string) error {
-	log.Infoln(fmt.Sprintf("Dump Statping assets into %v/assets", folder))
+	log.Infoln(fmt.Sprintf("Dump Statping assets into %s/assets", folder))
 	fp := filepath.Join
 
 	if err := MakePublicFolder(fp(folder, "/assets")); err != nil {
