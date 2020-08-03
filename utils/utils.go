@@ -177,6 +177,10 @@ func HttpRequest(endpoint, method string, content interface{}, headers []string,
 		req.Header.Set("Content-Type", content.(string))
 	}
 
+	// set default headers so end user can overwrite them if needed
+	req.Header.Set("User-Agent", "Statping")
+	req.Header.Set("Statping-Version", Version)
+
 	verifyHost := req.URL.Hostname()
 	for _, h := range headers {
 		keyVal := strings.SplitN(h, "=", 2)
@@ -191,9 +195,6 @@ func HttpRequest(endpoint, method string, content interface{}, headers []string,
 			}
 		}
 	}
-
-	req.Header.Set("User-Agent", "Statping")
-	req.Header.Set("Statping-Version", Version)
 
 	var resp *http.Response
 
