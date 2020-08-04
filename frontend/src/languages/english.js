@@ -40,8 +40,8 @@ const english = {
     wrong_login: 'Incorrect username or password'
   },
   settings: {
-    name: "Project Name",
-    description: "Project Name",
+    name: "Site Name",
+    description: "Site Description",
     footer: "Custom Footer",
     footer_notes: "HTML is allowed inside the footer",
     error_reporting: "Enable Error Reporting",

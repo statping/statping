@@ -1,8 +1,6 @@
 <template>
     <div class="container col-md-7 col-sm-12 mt-md-5">
-
         <div class="col-12 mb-4">
-
             <span class="mt-3 mb-3 text-white d-md-none btn d-block d-md-none text-uppercase" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
                 {{service.online ? $t('online') : $t('offline')}}
             </span>
@@ -14,24 +12,24 @@
                 </span>
             </span>
 
-            <ServiceTopStats :service="service"/>
+            <ServiceTopStats v-if="loaded" :service="service"/>
 
-            <MessageBlock v-for="message in messagesInRange" v-bind:key="message.id" :message="message"/>
+            <MessageBlock v-if="loaded" v-for="message in messagesInRange" v-bind:key="message.id" :message="message"/>
 
             <div class="card text-black-50 bg-white mt-3">
                 <div class="card-header text-capitalize">Timeframe</div>
                 <div class="card-body pb-4">
                     <div class="row">
                         <div class="col-12 col-md-4 font-2 mb-3 mb-md-0">
-                            <flatPickr :disabled="loading" @on-change="reload" v-model="start_time" :config="{ enableTime: true, altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date() }" type="text" class="form-control text-left d-block" required />
+                            <flatPickr :disabled="!loaded" @on-change="reload" v-model="start_time" :config="{ enableTime: true, altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date() }" type="text" class="form-control text-left d-block" required />
                             <small class="d-block">From {{this.format(new Date(start_time))}}</small>
                         </div>
                         <div class="col-12 col-md-4 font-2 mb-3 mb-md-0">
-                            <flatPickr :disabled="loading" @on-change="reload" v-model="end_time" :config="{ enableTime: true, altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date()}" type="text" class="form-control text-left" required />
+                            <flatPickr :disabled="!loaded" @on-change="reload" v-model="end_time" :config="{ enableTime: true, altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date()}" type="text" class="form-control text-left" required />
                             <small class="d-block">To {{this.format(new Date(end_time))}}</small>
                         </div>
                         <div class="col-12 col-md-4 mb-1 mb-md-0">
-                            <select :disabled="loading" @change="chartHits" v-model="group" class="form-control">
+                            <select :disabled="!loaded" @change="chartHits" v-model="group" class="form-control">
                                 <option value="1m">1 Minute</option>
                                 <option value="5m">5 Minutes</option>
                                 <option value="15m">15 Minute</option>
@@ -52,10 +50,12 @@
 
             <div class="card text-black-50 bg-white mt-3 mb-3">
                 <div class="card-header text-capitalize">Service Latency</div>
-                <div class="card-body">
-                    <AdvancedChart :group="group" :updated="updated_chart" :start="start_time.toString()" :end="end_time.toString()" :service="service"/>
-                    <div v-if="!loading" class="row">
-                        <apexchart width="100%" height="120" type="rangeBar" :options="timeRangeOptions" :series="uptime_data"></apexchart>
+                <div v-if="loaded" class="card-body">
+                    <div class="row mb-5">
+                      <AdvancedChart :group="group" :updated="updated_chart" :start="start_time.toString()" :end="end_time.toString()" :service="service"/>
+                    </div>
+                    <div class="row mt-5">
+                        <apexchart height="220" type="rangeBar" :options="timeRangeOptions" :series="uptime_data"></apexchart>
                     </div>
                 </div>
             </div>
@@ -124,13 +124,14 @@ export default {
     },
     data() {
         return {
+            service: null,
             tab: "failures",
             authenticated: false,
             ready: true,
             group: "1h",
             data: null,
             uptime_data: null,
-            loading: true,
+            loaded: false,
             messages: [],
             failures: [],
             start_time: this.nowSubtract(84600 * 30),
@@ -148,6 +149,7 @@ export default {
             chart: {
               id: 'uptime',
               height: 120,
+              width: "100%",
               type: 'rangeBar',
               toolbar: {
                 show: false
@@ -340,9 +342,6 @@ export default {
         }
     },
     computed: {
-      service () {
-        return this.$store.getters.serviceByAll(this.id)
-      },
       core () {
         return this.$store.getters.core
       },
@@ -367,30 +366,35 @@ export default {
     },
     watch: {
       '$route': 'reload',
-      service: function(n, o) {
-        this.reload()
-      },
-      load_timedata: function(n, o) {
-        this.reload()
+    },
+    created() {
+      this.reload()
+    },
+    async mounted() {
+      if (!this.$store.getters.service) {
+        // const s = await Api.service(this.id)
+        // this.$store.commit('setService', s)
       }
     },
-  async mounted() {
-    if (!this.$store.getters.service) {
-      const s = await Api.service(this.id)
-      this.$store.commit('setService', s)
-    }
-  },
     methods: {
       async updated_chart(start, end) {
+        this.loaded = false
         this.start_time = start
         this.end_time = end
-        this.loading = false
+        this.loaded = true
       },
       async reload() {
-        this.loading = true
+        this.loaded = false
+        const services = await Api.services()
+        this.$store.commit("setServices", services)
+        if (this.isNumeric(this.$route.params.id)) {
+          this.service = this.$store.getters.serviceById(this.$route.params.id)
+        } else {
+          this.service = this.$store.getters.serviceByPermalink(this.$route.params.id)
+        }
         await this.chartHits()
         await this.fetchUptime()
-        this.loading = false
+        this.loaded = true
       },
       async fetchUptime() {
         const uptime = await Api.service_uptime(this.service.id, this.params.start, this.params.end)
@@ -400,7 +404,6 @@ export default {
         const data = timedata.series.filter((g) => g.online) || []
         const offData = timedata.series.filter((g) => !g.online) || []
         let arr = [];
-        window.console.log(data)
         if (data) {
           data.forEach((d) => {
             arr.push({

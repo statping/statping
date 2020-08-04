@@ -178,6 +178,7 @@
       },
       methods: {
           async chartHits(val) {
+              this.ready = false
               const start = val.start_time
               const end = this.toUnix(new Date())
               this.data = await Api.service_hits(this.service.id, start, end, val.interval, false)
