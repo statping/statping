@@ -18,6 +18,7 @@ func SetDB(database database.Database) {
 }
 
 func (i *Incident) AfterFind() {
+	db.Model(i).Related(&i.Updates).Order("DESC")
 	metrics.Query("incident", "find")
 }
 
@@ -64,11 +65,6 @@ func Find(id int64) (*Incident, error) {
 func FindByService(id int64) []*Incident {
 	var incidents []*Incident
 	db.Where("service = ?", id).Find(&incidents)
-	for _, i := range incidents {
-		var updates []*IncidentUpdate
-		dbUpdate.Where("incident = ?", id).Find(&updates)
-		i.AllUpdates = updates
-	}
 	return incidents
 }
 
@@ -87,7 +83,7 @@ func (i *Incident) Update() error {
 }
 
 func (i *Incident) Delete() error {
-	for _, u := range i.Updates() {
+	for _, u := range i.Updates {
 		if err := u.Delete(); err != nil {
 			return err
 		}

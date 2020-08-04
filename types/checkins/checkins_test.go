@@ -114,6 +114,11 @@ func TestInit(t *testing.T) {
 		assert.Len(t, all, 1)
 	})
 
+	t.Run("Test Samples", func(t *testing.T) {
+		require.Nil(t, Samples())
+		assert.Len(t, All(), 2)
+	})
+
 	t.Run("Test Checkin", func(t *testing.T) {
 		assert.Nil(t, db.Close())
 		assert.Nil(t, dbHits.Close())

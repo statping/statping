@@ -26,6 +26,7 @@ var updateCmd = &cobra.Command{
 	Short:   "Update to the latest version",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		log.Infoln("Updating Statping to the latest version...")
+		log.Infoln("curl -o- -L https://statping.com/install.sh | bash")
 		curl, err := exec.LookPath("curl")
 		if err != nil {
 			return err

@@ -1,9 +1,66 @@
 package null
 
 import (
+	"encoding/json"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"gopkg.in/yaml.v2"
 	"testing"
 )
+
+func TestJSONMarshal(t *testing.T) {
+	tests := []struct {
+		Input        interface{}
+		ExpectedJSON string
+	}{
+		{
+			Input:        NewNullBool(true),
+			ExpectedJSON: `true`,
+		},
+		{
+			Input:        NewNullBool(false),
+			ExpectedJSON: `false`,
+		},
+		{
+			Input:        NewNullFloat64(0.994),
+			ExpectedJSON: `0.994`,
+		},
+		{
+			Input:        NewNullFloat64(0),
+			ExpectedJSON: `0`,
+		},
+		{
+			Input:        NewNullInt64(42),
+			ExpectedJSON: `42`,
+		},
+		{
+			Input:        NewNullInt64(0),
+			ExpectedJSON: `0`,
+		},
+		{
+			Input:        NewNullString("test"),
+			ExpectedJSON: `"test"`,
+		},
+		{
+			Input:        NewNullString(""),
+			ExpectedJSON: `""`,
+		},
+	}
+
+	for _, test := range tests {
+		str, err := json.Marshal(test.Input)
+		require.Nil(t, err)
+		assert.Equal(t, test.ExpectedJSON, string(str))
+
+		str, err = yaml.Marshal(yamlStruct{test.Input})
+		require.Nil(t, err)
+		assert.Equal(t, test.ExpectedJSON, string(str))
+	}
+}
+
+type yamlStruct struct {
+	Value interface{} `json:"value" yaml:"value"`
+}
 
 func TestNewNullBool(t *testing.T) {
 	val := NewNullBool(true)

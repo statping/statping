@@ -73,6 +73,16 @@ func TestUpdate(t *testing.T) {
 	assert.Equal(t, "updated_user", item.Username)
 }
 
+func TestAuthUser(t *testing.T) {
+	u, err := AuthUser("updated_user", "admin")
+	require.Nil(t, err)
+	assert.Equal(t, "admin", u.Username)
+
+	u, err = AuthUser("updated_user", "wrongpass")
+	assert.NotNil(t, err)
+	assert.Nil(t, u)
+}
+
 func TestDelete(t *testing.T) {
 	all := All()
 	assert.Len(t, all, 2)
@@ -85,6 +95,11 @@ func TestDelete(t *testing.T) {
 
 	all = All()
 	assert.Len(t, all, 1)
+}
+
+func TestSamples(t *testing.T) {
+	require.Nil(t, Samples())
+	assert.Len(t, All(), 3)
 }
 
 func TestClose(t *testing.T) {

@@ -45,7 +45,7 @@ func apiIncidentUpdatesHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	returnJson(incid.Updates(), w, r)
+	returnJson(incid.Updates, w, r)
 }
 
 func apiCreateIncidentUpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -100,8 +100,7 @@ func apiIncidentUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updates := incident.Updates()
-	sendJsonAction(updates, "update", w, r)
+	sendJsonAction(incident.Updates, "update", w, r)
 }
 
 func apiDeleteIncidentHandler(w http.ResponseWriter, r *http.Request) {

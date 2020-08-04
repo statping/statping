@@ -39,12 +39,15 @@ func systemctlCli(dir string, uninstall bool, port int64) error {
 	location := "/etc/systemd/system/statping.service"
 
 	if uninstall {
+		fmt.Println("systemctl stop statping")
 		if _, _, err := utils.Command("systemctl", "stop", "statping"); err != nil {
 			log.Errorln(err)
 		}
+		fmt.Println("systemctl disable statping")
 		if _, _, err := utils.Command("systemctl", "disable", "statping"); err != nil {
 			log.Errorln(err)
 		}
+		fmt.Println("Deleting systemctl: ", location)
 		if err := utils.DeleteFile(location); err != nil {
 			log.Errorln(err)
 		}
@@ -79,20 +82,24 @@ WantedBy=multi-user.target"
 	fmt.Println("Saving systemctl service to: ", location)
 	fmt.Printf("Using directory %s for Statping data\n", dir)
 	fmt.Printf("Running on port %d\n", port)
+	fmt.Printf("\n\n%s\n\n", string(config))
 	if err := utils.SaveFile(location, config); err != nil {
 		return err
 	}
+	fmt.Println("systemctl daemon-reload")
 	if _, _, err := utils.Command("systemctl", "daemon-reload"); err != nil {
 		return err
 	}
+	fmt.Println("systemctl enable statping")
 	if _, _, err := utils.Command("systemctl", "enable", "statping.service"); err != nil {
 		return err
 	}
+	fmt.Println("systemctl start statping")
 	if _, _, err := utils.Command("systemctl", "start", "statping"); err != nil {
 		return err
 	}
 	fmt.Println("Statping was will auto start on reboots")
-	fmt.Println("systemctl service: /etc/systemd/system/statping.service")
+	fmt.Println("systemctl service: ", location)
 
 	return nil
 }

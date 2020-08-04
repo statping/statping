@@ -6,6 +6,7 @@ import (
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
 )
@@ -249,6 +250,11 @@ func TestServiceNotifications(t *testing.T) {
 		}
 
 		runNotifyTests(t, notif, tests...)
+	})
+
+	t.Run("Test Samples", func(t *testing.T) {
+		require.Nil(t, Samples())
+		assert.Len(t, All(), 11)
 	})
 
 	t.Run("Test Close", func(t *testing.T) {

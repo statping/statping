@@ -119,8 +119,19 @@ func apiThemeCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := source.CompileSASS(); err != nil {
-		source.CopyToPublic(source.TmplBox, "css", "main.css")
-		source.CopyToPublic(source.TmplBox, "css", "base.css")
+		if err := source.CopyToPublic(source.TmplBox, "css", "style.css"); err != nil {
+			log.Errorln(err)
+			sendErrorJson(err, w, r)
+			return
+		}
+		jsFiles := []string{"bundle.js", "main.chunk.js", "polyfill.chunk.js", "style.chunk.js"}
+		for _, f := range jsFiles {
+			if err := source.CopyToPublic(source.TmplBox, "js", f); err != nil {
+				log.Errorln(err)
+				sendErrorJson(err, w, r)
+				return
+			}
+		}
 		log.Errorln("Default 'base.css' was inserted because SASS did not work.")
 	}
 	resetRouter()

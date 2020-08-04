@@ -7,7 +7,7 @@ import (
 )
 
 // AuthUser will return the User and a boolean if authentication was correct.
-// AuthUser accepts username, and password as a string
+// accepts username, and password as a string
 func AuthUser(username, password string) (*User, bool) {
 	user, err := FindByUsername(username)
 	if err != nil {
