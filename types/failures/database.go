@@ -31,12 +31,6 @@ func (f *Failure) AfterCreate() {
 	metrics.Query("failure", "create")
 }
 
-func All() []*Failure {
-	var failures []*Failure
-	db.Find(&failures)
-	return failures
-}
-
 func (f *Failure) Create() error {
 	q := db.Create(f)
 	return q.Error()

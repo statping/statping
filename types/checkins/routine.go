@@ -27,7 +27,7 @@ CheckinLoop:
 			log.Infoln(fmt.Sprintf("Checkin '%s' expects a request every %s last request was %s ago", c.Name, c.Period(), utils.DurationReadable(ago)))
 
 			if ago.Seconds() > c.Period().Seconds() {
-				issue := fmt.Sprintf("Checkin expects a request every %d seconds", c.Interval)
+				issue := fmt.Sprintf("Checkin expects a request every %d minutes", c.Interval)
 				log.Warnln(issue)
 
 				fail := &failures.Failure{

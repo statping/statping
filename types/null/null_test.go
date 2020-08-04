@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/yaml.v2"
 	"testing"
 )
 
@@ -51,15 +50,7 @@ func TestJSONMarshal(t *testing.T) {
 		str, err := json.Marshal(test.Input)
 		require.Nil(t, err)
 		assert.Equal(t, test.ExpectedJSON, string(str))
-
-		str, err = yaml.Marshal(yamlStruct{test.Input})
-		require.Nil(t, err)
-		assert.Equal(t, test.ExpectedJSON, string(str))
 	}
-}
-
-type yamlStruct struct {
-	Value interface{} `json:"value" yaml:"value"`
 }
 
 func TestNewNullBool(t *testing.T) {

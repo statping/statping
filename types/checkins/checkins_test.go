@@ -116,7 +116,7 @@ func TestInit(t *testing.T) {
 
 	t.Run("Test Samples", func(t *testing.T) {
 		require.Nil(t, Samples())
-		assert.Len(t, All(), 2)
+		assert.Len(t, All(), 3)
 	})
 
 	t.Run("Test Checkin", func(t *testing.T) {

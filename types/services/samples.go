@@ -48,7 +48,6 @@ func Example(online bool) Service {
 		DownText:            "The service was responding with 500 status code",
 		LastStatusCode:      200,
 		Failures:            nil,
-		AllCheckins:         nil,
 		LastLookupTime:      4600,
 		LastLatency:         124399,
 		LastCheck:           utils.Now().Add(-37 * time.Second),

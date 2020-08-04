@@ -228,9 +228,6 @@ func SelectAllServices(start bool) (map[int64]*Service, error) {
 	}
 	for _, s := range all() {
 		s.Failures = s.AllFailures().LastAmount(limitedFailures)
-		for _, c := range s.Checkins() {
-			s.AllCheckins = append(s.AllCheckins, c)
-		}
 		s.prevOnline = true
 		// collect initial service stats
 		s.UpdateStats()

@@ -75,7 +75,7 @@ func TestDelete(t *testing.T) {
 
 func TestSamples(t *testing.T) {
 	require.Nil(t, Samples())
-	assert.Len(t, All(), 2)
+	assert.Len(t, All(), 3)
 }
 
 func TestClose(t *testing.T) {

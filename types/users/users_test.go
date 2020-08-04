@@ -35,6 +35,16 @@ func TestFind(t *testing.T) {
 	assert.True(t, item.Admin.Bool)
 }
 
+func TestAuthUser(t *testing.T) {
+	u, err := AuthUser("example_user", "password12345")
+	require.Nil(t, err)
+	assert.Equal(t, "example_user", u.Username)
+
+	u, err = AuthUser("exampleuser2", "wrongpass")
+	assert.NotNil(t, err)
+	assert.Nil(t, u)
+}
+
 func TestFindByUsername(t *testing.T) {
 	item, err := FindByUsername("example_user")
 	require.Nil(t, err)
@@ -71,16 +81,6 @@ func TestUpdate(t *testing.T) {
 	err = item.Update()
 	require.Nil(t, err)
 	assert.Equal(t, "updated_user", item.Username)
-}
-
-func TestAuthUser(t *testing.T) {
-	u, err := AuthUser("updated_user", "admin")
-	require.Nil(t, err)
-	assert.Equal(t, "admin", u.Username)
-
-	u, err = AuthUser("updated_user", "wrongpass")
-	assert.NotNil(t, err)
-	assert.Nil(t, u)
 }
 
 func TestDelete(t *testing.T) {

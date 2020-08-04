@@ -16,6 +16,7 @@ var (
 )
 
 func (s *Service) AfterFind() {
+	db.Model(s).Related(&s.Incidents).Related(&s.Messages).Related(&s.Checkins)
 	metrics.Query("service", "find")
 }
 
@@ -51,6 +52,7 @@ func Find(id int64) (*Service, error) {
 	if srv == nil {
 		return nil, errors.Missing(&Service{}, id)
 	}
+	db.First(&srv, id)
 	return srv, nil
 }
 
@@ -120,7 +122,7 @@ func (s *Service) DeleteHits() error {
 }
 
 func (s *Service) DeleteCheckins() error {
-	for _, c := range s.Checkins() {
+	for _, c := range s.Checkins {
 		if err := c.Delete(); err != nil {
 			return err
 		}
