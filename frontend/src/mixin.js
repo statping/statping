@@ -112,6 +112,8 @@ export default Vue.mixin({
           return "terminal"
         case "fab fa-discord":
           return ["fab", "discord"]
+        case "dingtalk":
+          return ["fas", "coffee"]
         case "far fa-envelope":
           return "envelope"
         case "far fa-bell":

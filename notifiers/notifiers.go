@@ -33,6 +33,7 @@ func InitNotifiers() {
 		Pushover,
 		statpingMailer,
 		Gotify,
+		Dingtalker,
 	)
 }
 
