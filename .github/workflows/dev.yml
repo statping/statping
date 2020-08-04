@@ -155,6 +155,7 @@ jobs:
           TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
           GOTIFY_URL: ${{ secrets.GOTIFY_URL }}
           GOTIFY_TOKEN: ${{ secrets.GOTIFY_TOKEN }}
+          DINGTALK_URL: ${{ secrets.DINGTALK_URL }}
 
       - name: Coveralls Testing Coverage
         run: |
