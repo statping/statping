@@ -3275,6 +3275,8 @@
 									"pm.test(\"Check Login JWT Token\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData).to.have.property('token');",
+									"    pm.expect(jsonData).to.have.property('admin');",
+									"    pm.globals.set(\"token\", jsonData.token);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -3371,24 +3373,141 @@
 							"_postman_previewlanguage": "json",
 							"header": [
 								{
-									"key": "Content-Length",
-									"value": "174"
+									"key": "Content-Type",
+									"value": "application/json"
 								},
+								{
+									"key": "Set-Cookie",
+									"value": "statping_auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiYWRtaW4iOnRydWUsInNjb3BlcyI6ImFkbWluIiwiZXhwIjoxNTk2NzQzMDUzfQ.dQQGgUDhFEjCL2Gi-Seg0hBp_sqVsDn3cXB0GpSorJI; Path=/; Expires=Thu, 06 Aug 2020 19:44:13 GMT; Max-Age=259200"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 03 Aug 2020 19:44:13 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "197"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiYWRtaW4iOnRydWUsInNjb3BlcyI6ImFkbWluIiwiZXhwIjoxNTk2NzQzMDUzfQ.dQQGgUDhFEjCL2Gi-Seg0hBp_sqVsDn3cXB0GpSorJI\",\n    \"admin\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "Check User Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "560e439b-d588-4a2f-a8a6-a0607531d74c",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"View Token Response\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.username).to.eql(\"admin\");",
+									"    pm.expect(jsonData.admin).to.eql(true);",
+									"    pm.expect(jsonData.scopes).to.eql(\"admin\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/users/token",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"token"
+							]
+						},
+						"description": "Send your JWT token from login to this endpoint to return the JSON values."
+					},
+					"response": [
+						{
+							"name": "Check User Token",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{endpoint}}/api/users/token",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"token"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
 								{
 									"key": "Content-Type",
 									"value": "application/json"
 								},
 								{
 									"key": "Date",
-									"value": "Sat, 02 May 2020 00:56:17 GMT"
+									"value": "Mon, 03 Aug 2020 19:47:23 GMT"
 								},
 								{
-									"key": "Set-Cookie",
-									"value": "statping_auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiYWRtaW4iOnRydWUsImV4cCI6MTU4ODY0MDE3N30.tf399_LfAphSGlKMtgphg6qpPrn-_w92XfCrK5FwbZY; Expires=Tue, 05 May 2020 00:56:17 GMT"
+									"key": "Content-Length",
+									"value": "68"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiYWRtaW4iOnRydWUsImV4cCI6MTU4ODY0MDE3N30.tf399_LfAphSGlKMtgphg6qpPrn-_w92XfCrK5FwbZY\",\n    \"admin\": true\n}"
+							"body": "{\n    \"username\": \"admin\",\n    \"admin\": true,\n    \"scopes\": \"admin\",\n    \"exp\": 1596743053\n}"
 						}
 					]
 				},

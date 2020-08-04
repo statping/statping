@@ -7,6 +7,7 @@
 - Modified SCSS/SASS files to be generated from 1, main.scss to main.css
 - Modified index page to use /assets directory for assets, (main.css, style.css)
 - Modified index page to use CDN asset paths
+- Fixed New Checkin form
 
 # 0.90.61 (07-22-2020)
 - Modified sass layouts, organized and split up sections

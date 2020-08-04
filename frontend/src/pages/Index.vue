@@ -32,6 +32,9 @@
 </template>
 
 <script>
+import Api from "@/API";
+import store from "@/store";
+
 const Group = () => import('@/components/Index/Group')
 const Header = () => import('@/components/Index/Header')
 const MessageBlock = () => import('@/components/Index/MessageBlock')
@@ -44,10 +47,10 @@ export default {
     components: {
       IncidentsBlock,
       GroupServiceFailures,
-        ServiceBlock,
-        MessageBlock,
-        Group,
-        Header
+      ServiceBlock,
+      MessageBlock,
+      Group,
+      Header
     },
     data() {
         return {
@@ -68,13 +71,23 @@ export default {
             return this.$store.getters.servicesNoGroup
         }
     },
-    async created() {
-        this.logged_in = this.loggedIn()
-    },
-    async mounted() {
-
-    },
     methods: {
+        async checkLogin() {
+          const token = this.$cookies.get('statping_auth')
+          if (!token) {
+            this.$store.commit('setLoggedIn', false)
+            return
+          }
+          try {
+            const jwt = await Api.check_token(token)
+            this.$store.commit('setAdmin', jwt.admin)
+            if (jwt.username) {
+              this.$store.commit('setLoggedIn', true)
+            }
+          } catch (e) {
+            console.error(e)
+          }
+        },
         inRange(message) {
             return this.isBetween(this.now(), message.start_on, message.start_on === message.end_on ? this.maxDate().toISOString() : message.end_on)
         }

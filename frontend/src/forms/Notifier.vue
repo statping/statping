@@ -14,10 +14,10 @@
 
             <div v-if="notifier.method==='mobile'">
                 <div class="form-group row mt-3">
-                    <label for="domain" class="col-sm-4 col-form-label">Statping Domain</label>
+                    <label for="statping_domain" class="col-sm-4 col-form-label">Statping Domain</label>
                     <div class="col-sm-8">
                         <div class="input-group">
-                            <input v-bind:value="$store.getters.core.domain" type="text" class="form-control" id="domain" readonly>
+                            <input v-bind:value="$store.getters.core.domain" type="text" class="form-control" id="statping_domain" readonly>
                             <div class="input-group-append copy-btn">
                                 <button @click.prevent="copy($store.getters.core.domain)" class="btn btn-outline-secondary" type="button">Copy</button>
                             </div>

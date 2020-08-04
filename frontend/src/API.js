@@ -235,6 +235,11 @@ class Api {
     return axios.post('api/theme', data).then(response => (response.data))
   }
 
+  async check_token(token) {
+    const f = {token: token}
+    return axios.post('api/users/token', qs.stringify(f)).then(response => (response.data))
+  }
+
   async login(username, password) {
     const f = {username: username, password: password}
     return axios.post('api/login', qs.stringify(f)).then(response => (response.data))

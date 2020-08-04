@@ -22,7 +22,10 @@
 
     }
   },
-  methods: {
+    mounted() {
+
+    },
+    methods: {
 
   }
 }

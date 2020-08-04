@@ -30,7 +30,8 @@ export default new Vuex.Store({
             notifiers: [],
             checkins: [],
             admin: false,
-            user: false
+            user: false,
+            loggedIn: false
         },
     getters: {
         hasAllData: state => state.hasAllData,
@@ -46,6 +47,7 @@ export default new Vuex.Store({
         users: state => state.users,
         notifiers: state => state.notifiers,
         checkins: state => state.checkins,
+        loggedIn: state => state.loggedIn,
 
         isAdmin: state => state.admin,
         isUser: state => state.user,
@@ -131,6 +133,9 @@ export default new Vuex.Store({
         setAdmin (state, admin) {
             state.admin = admin
         },
+      setLoggedIn (state, loggedIn) {
+        state.loggedIn = loggedIn
+      },
       setUser (state, user) {
         state.user = user
       },

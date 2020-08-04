@@ -5,11 +5,9 @@
             No updates found, create a new Incident Update below.
         </div>
 
-        <transition-group name="fade" tag="div">
-            <div v-for="update in updates.reverse()" :key="update.id">
-                <IncidentUpdate :update="update" :onUpdate="loadUpdates" :admin="true"/>
-            </div>
-        </transition-group>
+        <div v-for="update in updates.reverse()" :key="update.id">
+            <IncidentUpdate :update="update" :onUpdate="loadUpdates" :admin="true"/>
+        </div>
 
         <form class="row" @submit.prevent="createIncidentUpdate">
             <div class="col-12 col-md-3 mb-3 mb-md-0">
@@ -51,7 +49,7 @@
         },
         data () {
             return {
-                updates: [],
+                updates: null,
                 incident_update: {
                     incident: this.incident.id,
                     message: "",

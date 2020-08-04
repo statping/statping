@@ -9,7 +9,6 @@
                 <button @click="deleteCheckin(checkin)" class="btn btn-sm small btn-danger float-right text-uppercase">Delete</button>
             </div>
             <div class="card-body">
-
                 <div class="input-group">
                     <input type="text" class="form-control" :value="`${core.domain}/checkin/${checkin.api_key}`" readonly>
                     <div class="input-group-append copy-btn">
@@ -137,6 +136,9 @@ export default {
       },
       last_record(checkin) {
         const r = this.records(checkin)
+        if (r.length === 0) {
+          return {success: false}
+        }
         return r[0]
       },
       fixInts() {
