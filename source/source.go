@@ -97,7 +97,7 @@ func UsingAssets(folder string) bool {
 			}
 			if err := CompileSASS(); err != nil {
 				//CopyToPublic(CssBox, folder+"/css", "base.css")
-				log.Warnln("Default 'base.css' was insert because SASS did not work.")
+				log.Warn(errors.Wrap(err, "Default 'base.css' was insert because SASS did not work."))
 				return true
 			}
 			return true

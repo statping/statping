@@ -58,6 +58,12 @@
                         <apexchart height="220" type="rangeBar" :options="timeRangeOptions" :series="uptime_data"></apexchart>
                     </div>
                 </div>
+              <div v-else class="row mt-3 mb-3">
+                <div class="col-12 text-center">
+                  <font-awesome-icon icon="circle-notch" size="3x" spin/>
+                </div>
+              </div>
+
             </div>
 
             <div class="card text-black-50 bg-white mb-3">

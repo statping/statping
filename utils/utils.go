@@ -172,14 +172,12 @@ func HttpRequest(endpoint, method string, content interface{}, headers []string,
 	if req, err = http.NewRequest(method, endpoint, body); err != nil {
 		return nil, nil, err
 	}
-	req.Header.Set("User-Agent", "Statping")
-	if content != nil {
-		req.Header.Set("Content-Type", content.(string))
-	}
-
 	// set default headers so end user can overwrite them if needed
 	req.Header.Set("User-Agent", "Statping")
 	req.Header.Set("Statping-Version", Version)
+	if content != nil {
+		req.Header.Set("Content-Type", content.(string))
+	}
 
 	verifyHost := req.URL.Hostname()
 	for _, h := range headers {
@@ -197,7 +195,6 @@ func HttpRequest(endpoint, method string, content interface{}, headers []string,
 	}
 
 	var resp *http.Response
-
 	dialer := &net.Dialer{
 		Timeout:   timeout,
 		KeepAlive: timeout,
@@ -219,7 +216,7 @@ func HttpRequest(endpoint, method string, content interface{}, headers []string,
 			return dialer.DialContext(ctx, network, addr)
 		},
 	}
-	if Params.IsSet("HTTP_PROXY") {
+	if Params.GetString("HTTP_PROXY") != "" {
 		proxyUrl, err := url.Parse(Params.GetString("HTTP_PROXY"))
 		if err != nil {
 			return nil, nil, err
