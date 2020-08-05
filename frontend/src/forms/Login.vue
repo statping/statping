@@ -46,7 +46,6 @@
 
 <script>
   import Api from "../API";
-  import store from "@/store";
 
   export default {
       name: 'FormLogin',

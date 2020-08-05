@@ -62,13 +62,13 @@
 
 {{if USE_CDN}}
 <script src="https://assets.statping.com/js/bundle.js"></script>
-<script src="https://assets.statping.com/js/polyfill.chunk.js"></script>
 <script src="https://assets.statping.com/js/style.chunk.js"></script>
+<script src="https://assets.statping.com/js/polyfill.chunk.js"></script>
 <script src="https://assets.statping.com/js/main.chunk.js"></script>
 {{else if USING_ASSETS }}
 <script src="js/bundle.js"></script>
-<script src="js/polyfill.chunk.js"></script>
 <script src="js/style.chunk.js"></script>
+<script src="js/polyfill.chunk.js"></script>
 <script src="js/main.chunk.js"></script>
 {{else}}
 <% _.each(htmlWebpackPlugin.tags.bodyTags, function(bodyTag) { %>

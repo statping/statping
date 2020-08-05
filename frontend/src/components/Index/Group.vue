@@ -20,9 +20,8 @@
 </template>
 
 <script>
-    import Api from '../../API';
-    import GroupServiceFailures from './GroupServiceFailures';
-    import IncidentsBlock from './IncidentsBlock';
+    const GroupServiceFailures = () => import(/* webpackChunkName: "index" */ './GroupServiceFailures');
+    const IncidentsBlock = () => import(/* webpackChunkName: "index" */ './IncidentsBlock');
 
 export default {
   name: 'Group',

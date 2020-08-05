@@ -365,7 +365,7 @@ func TestServices(t *testing.T) {
 	t.Run("Test Checkins", func(t *testing.T) {
 		item, err := Find(1)
 		require.Nil(t, err)
-		assert.Len(t, item.Checkins(), 1)
+		assert.Len(t, item.Checkins, 1)
 	})
 
 	t.Run("Test All Hits", func(t *testing.T) {
@@ -521,7 +521,7 @@ func TestServices(t *testing.T) {
 		err = item.Delete()
 		require.Nil(t, err)
 
-		checkin := item.Checkins()
+		checkin := item.Checkins
 		assert.Len(t, checkin, 0)
 		for _, c := range checkin {
 			assert.Len(t, c.Failures().List(), 0)
@@ -532,10 +532,10 @@ func TestServices(t *testing.T) {
 		assert.Len(t, item.AllFailures().List(), 0)
 		assert.Len(t, item.AllHits().List(), 0)
 
-		inc := item.Incidents()
+		inc := item.Incidents
 		assert.Len(t, inc, 0)
 		for _, i := range inc {
-			assert.Len(t, i.Updates(), 0)
+			assert.Len(t, i.Updates, 0)
 		}
 
 		all = All()

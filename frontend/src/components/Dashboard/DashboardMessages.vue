@@ -47,7 +47,7 @@
 
 <script>
   import Api from "../../API"
-  import FormMessage from "../../forms/Message";
+  const FormMessage = () => import(/* webpackChunkName: "dashboard" */ "../../forms/Message");
 
   export default {
   name: 'DashboardMessages',

@@ -82,12 +82,12 @@
 
 <script>
   import Api from "../API"
-  const MessageBlock = () => import('@/components/Index/MessageBlock')
-  const ServiceFailures = () => import('@/components/Service/ServiceFailures')
-  const Checkin = () => import('@/forms/Checkin')
-  const ServiceHeatmap = () => import('@/components/Service/ServiceHeatmap')
-  const ServiceTopStats = () => import('@/components/Service/ServiceTopStats')
-  const AdvancedChart = () => import('@/components/Service/AdvancedChart')
+  const MessageBlock = () => import(/* webpackChunkName: "index" */ '@/components/Index/MessageBlock')
+  const ServiceFailures = () => import(/* webpackChunkName: "service" */ '@/components/Service/ServiceFailures')
+  const Checkin = () => import(/* webpackChunkName: "dashboard" */ '@/forms/Checkin')
+  const ServiceHeatmap = () => import(/* webpackChunkName: "service" */ '@/components/Service/ServiceHeatmap')
+  const ServiceTopStats = () => import(/* webpackChunkName: "service" */ '@/components/Service/ServiceTopStats')
+  const AdvancedChart = () => import(/* webpackChunkName: "service" */ '@/components/Service/AdvancedChart')
 
   import flatPickr from 'vue-flatpickr-component';
   import 'flatpickr/dist/flatpickr.css';

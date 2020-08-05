@@ -67,11 +67,11 @@
 </template>
 
 <script>
-  const FormGroup = () => import('@/forms/Group')
-  const ToggleSwitch = () => import('@/forms/ToggleSwitch')
-  const ServicesList = () => import('@/components/Dashboard/ServicesList')
+  const FormGroup = () => import(/* webpackChunkName: "dashboard" */ '@/forms/Group')
+  const ToggleSwitch = () => import(/* webpackChunkName: "dashboard" */ '@/forms/ToggleSwitch')
+  const ServicesList = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/ServicesList')
   import Api from "../../API";
-  import draggable from 'vuedraggable'
+  const draggable = () => import(/* webpackChunkName: "dashboard" */ 'vuedraggable')
 
   export default {
       name: 'DashboardServices',

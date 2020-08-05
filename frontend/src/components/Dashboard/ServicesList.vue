@@ -53,8 +53,8 @@
 
 <script>
 import Api from "../../API";
-import draggable from 'vuedraggable'
-import ToggleSwitch from '../../forms/ToggleSwitch';
+const draggable = () => import(/* webpackChunkName: "dashboard" */ 'vuedraggable')
+const ToggleSwitch = () => import(/* webpackChunkName: "dashboard" */ '../../forms/ToggleSwitch');
 
 export default {
       name: 'ServicesList',

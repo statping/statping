@@ -36,7 +36,7 @@
 
 <script>
     import Api from "../API";
-    import IncidentUpdate from "@/components/Elements/IncidentUpdate";
+    const IncidentUpdate = () => import(/* webpackChunkName: "index" */ "@/components/Elements/IncidentUpdate");
 
     export default {
         name: 'FormIncidentUpdates',

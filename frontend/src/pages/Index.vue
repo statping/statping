@@ -33,14 +33,12 @@
 
 <script>
 import Api from "@/API";
-import store from "@/store";
-
-const Group = () => import('@/components/Index/Group')
-const Header = () => import('@/components/Index/Header')
-const MessageBlock = () => import('@/components/Index/MessageBlock')
-const ServiceBlock = () => import('@/components/Service/ServiceBlock')
-const GroupServiceFailures = () => import('@/components/Index/GroupServiceFailures')
-const IncidentsBlock = () => import('@/components/Index/IncidentsBlock')
+const Group = () => import(/* webpackChunkName: "index" */ '@/components/Index/Group')
+const Header = () => import(/* webpackChunkName: "index" */ '@/components/Index/Header')
+const MessageBlock = () => import(/* webpackChunkName: "index" */ '@/components/Index/MessageBlock')
+const ServiceBlock = () => import(/* webpackChunkName: "index" */ '@/components/Service/ServiceBlock')
+const GroupServiceFailures = () => import(/* webpackChunkName: "index" */ '@/components/Index/GroupServiceFailures')
+const IncidentsBlock = () => import(/* webpackChunkName: "index" */ '@/components/Index/IncidentsBlock')
 
 export default {
     name: 'Index',
@@ -94,13 +92,3 @@ export default {
     }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-    .fade-enter-active, .fade-leave-active {
-        transition: opacity .5s;
-    }
-    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-        opacity: 0;
-    }
-</style>

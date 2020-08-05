@@ -177,12 +177,11 @@
 
   const beautify = require('js-beautify').js
 
-  // require component
-  import { codemirror } from 'vue-codemirror'
-  import 'codemirror/mode/javascript/javascript.js'
-  import 'codemirror/lib/codemirror.css'
-  import 'codemirror/theme/neat.css'
-  import '../codemirror_json'
+  /* webpackChunkName: "codemirror" */ import { codemirror } from 'vue-codemirror'
+  /* webpackChunkName: "codemirror" */ import 'codemirror/mode/javascript/javascript.js'
+  /* webpackChunkName: "codemirror" */ import 'codemirror/lib/codemirror.css'
+  /* webpackChunkName: "codemirror" */ import 'codemirror/theme/neat.css'
+  /* webpackChunkName: "codemirror" */ import '../codemirror_json'
 
 export default {
     name: 'Notifier',

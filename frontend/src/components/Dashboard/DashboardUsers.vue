@@ -45,7 +45,7 @@
 
 <script>
   import Api from "../../API"
-  const FormUser = () => import('@/forms/User')
+  const FormUser = () => import(/* webpackChunkName: "dashboard" */ '@/forms/User')
 
   export default {
   name: 'DashboardUsers',

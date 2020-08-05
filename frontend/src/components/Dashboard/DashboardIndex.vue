@@ -32,7 +32,7 @@
 </template>
 
 <script>
-  const ServiceInfo = () => import('@/components/Dashboard/ServiceInfo')
+  const ServiceInfo = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/ServiceInfo')
 
   export default {
       name: 'DashboardIndex',

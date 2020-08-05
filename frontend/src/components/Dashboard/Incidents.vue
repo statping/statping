@@ -51,7 +51,7 @@
 
 <script>
     import Api from "../../API";
-    const FormIncidentUpdates = () => import('@/forms/IncidentUpdates')
+    const FormIncidentUpdates = () => import(/* webpackChunkName: "dashboard" */ '@/forms/IncidentUpdates')
 
     export default {
         name: 'Incidents',

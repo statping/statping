@@ -70,13 +70,12 @@
 </template>
 
 <script>
-  import Checkin from '../../forms/Checkin';
-  import FormIncident from '../../forms/Incident';
-  import FormMessage from '../../forms/Message';
-  import ServiceFailures from '../Service/ServiceFailures';
-  import ServiceSparkLine from "./ServiceSparkLine";
+  const Checkin = () => import(/* webpackChunkName: "dashboard" */ '../../forms/Checkin');
+  const FormMessage = () => import(/* webpackChunkName: "dashboard" */ '../../forms/Message');
+  const ServiceFailures = () => import(/* webpackChunkName: "dashboard" */ '../Service/ServiceFailures');
+  const ServiceSparkLine = () => import(/* webpackChunkName: "dashboard" */ "./ServiceSparkLine");
   import Api from "../../API";
-  import ServiceEvents from "@/components/Dashboard/ServiceEvents";
+  const ServiceEvents = () => import(/* webpackChunkName: "dashboard" */ "@/components/Dashboard/ServiceEvents");
 
   export default {
       name: 'ServiceInfo',
@@ -84,7 +83,6 @@
         ServiceEvents,
           Checkin,
           ServiceFailures,
-          FormIncident,
           FormMessage,
           ServiceSparkLine
       },

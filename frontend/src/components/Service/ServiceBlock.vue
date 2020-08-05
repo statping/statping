@@ -58,11 +58,10 @@
 </template>
 
 <script>
-import Api from '../../API';
-import Analytics from './Analytics';
-import ServiceChart from "./ServiceChart";
-import ServiceTopStats from "@/components/Service/ServiceTopStats";
-import Graphing from '../../graphing'
+const Analytics = () => import(/* webpackChunkName: "service" */ './Analytics');
+const ServiceChart  = () => import(/* webpackChunkName: "service" */ "./ServiceChart");
+const ServiceTopStats = () => import(/* webpackChunkName: "service" */ "@/components/Service/ServiceTopStats");
+const Graphing  = () => import(/* webpackChunkName: "service" */ '../../graphing');
 
 export default {
     name: 'ServiceBlock',
@@ -228,7 +227,3 @@ export default {
     }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

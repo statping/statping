@@ -28,7 +28,7 @@
 
 <script>
 import Api from "../../API";
-import Loading from "@/components/Elements/Loading";
+const Loading = () => import(/* webpackChunkName: "index" */ "@/components/Elements/Loading");
 
 export default {
 name: "ServiceEvents",
