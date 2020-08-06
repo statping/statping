@@ -35,16 +35,6 @@ func TestFind(t *testing.T) {
 	assert.True(t, item.Admin.Bool)
 }
 
-func TestAuthUser(t *testing.T) {
-	u, ok := AuthUser("example_user", utils.HashPassword("password123"))
-	assert.True(t, ok)
-	assert.Equal(t, "example_user", u.Username)
-
-	u, ok = AuthUser("exampleuser2", "wrongpass")
-	assert.False(t, ok)
-	assert.Nil(t, u)
-}
-
 func TestFindByUsername(t *testing.T) {
 	item, err := FindByUsername("example_user")
 	require.Nil(t, err)
@@ -72,6 +62,16 @@ func TestCreate(t *testing.T) {
 	assert.NotEqual(t, "password12345", example.Password)
 	assert.NotZero(t, example.CreatedAt)
 	assert.NotEmpty(t, example.ApiKey)
+}
+
+func TestAuthUser(t *testing.T) {
+	u, ok := AuthUser("exampleuser2", utils.HashPassword("password12345"))
+	require.True(t, ok)
+	assert.Equal(t, "exampleuser2", u.Username)
+
+	u, ok = AuthUser("exampleuser2", "wrongpass")
+	assert.False(t, ok)
+	assert.Nil(t, u)
 }
 
 func TestUpdate(t *testing.T) {

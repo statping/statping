@@ -142,7 +142,7 @@ const emailFailureMJML = `<mjml>
         
     <mj-section padding="0" background-url="https://assets.statping.com/offlinebanner.png" background-color="#a30911">
       <mj-column>
-        <mj-image width="250px" href="https://www.sphero.com" src="https://assets.statping.com/statpingcom.png" align="center"></mj-image>
+        <mj-image width="250px" href="https://statping.com" src="https://assets.statping.com/statpingcom.png" align="center"></mj-image>
       </mj-column>
     </mj-section>
         
@@ -166,8 +166,6 @@ const emailFailureMJML = `<mjml>
               <a class="footer-link" href="https://github.com/statping/statping">Github</a>&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;
               
               <a class="footer-link" href="https://statping.com/privacy">Privacy</a>&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;
-              
-              <a class="footer-link" href="https://news.statping.com/delete?email={{.Email}}">Unsubscribe</a>
             </mj-text>
           </mj-column>
         </mj-group>
@@ -236,7 +234,7 @@ const emailSuccessMJML = `<mjml>
         
     <mj-section padding="0" background-url="https://assets.statping.com/greenbackground.png" background-color="#12ab0c">
       <mj-column>
-        <mj-image width="250px" href="https://www.sphero.com" src="https://assets.statping.com/statpingcom.png" align="center"></mj-image>
+        <mj-image width="250px" href="https://statping.com" src="https://assets.statping.com/statpingcom.png" align="center"></mj-image>
       </mj-column>
     </mj-section>
         
@@ -260,8 +258,6 @@ const emailSuccessMJML = `<mjml>
               <a class="footer-link" href="https://github.com/statping/statping">Github</a>&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;
               
               <a class="footer-link" href="https://statping.com/privacy">Privacy</a>&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;
-              
-              <a class="footer-link" href="https://news.statping.com/delete?email={{.Email}}">Unsubscribe</a>
             </mj-text>
           </mj-column>
         </mj-group>
