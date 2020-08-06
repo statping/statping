@@ -52,4 +52,3 @@ const emailFailure = `<!doctype html><html xmlns=http://www.w3.org/1999/xhtml xm
 <a class=footer-link href=https://github.com/statping/statping>Github</a>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
 <a class=footer-link href=https://statping.com/privacy>Privacy</a>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
 <a class=footer-link href="https://news.statping.com/delete?email={{.Email}}">Unsubscribe</a></div></table></table></div></div></table></div></table></div></table></div></div>`
-

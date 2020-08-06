@@ -16,6 +16,7 @@ const VERSION                   = process.env.VERSION;
 
 const webpackConfig = merge(commonConfig, {
     mode: 'production',
+    productionSourceMap: true,
     output: {
         path: helpers.root('dist'),
         publicPath: '',
