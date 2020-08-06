@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/statping/statping/utils"
+	"github.com/tdewolff/minify/v2"
 	"github.com/tdewolff/minify/v2/html"
 	"os"
 	"time"
