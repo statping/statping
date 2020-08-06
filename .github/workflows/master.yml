@@ -30,6 +30,13 @@ jobs:
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
+      - name: Font Awesome authentication
+        env:
+          FONTAWESOME_TOKEN: ${{ secrets.FONTAWESOME_TOKEN }}
+        run: |
+          npm config set "@fortawesome:registry" https://npm.fontawesome.com/
+          npm config set "//npm.fontawesome.com/:_authToken" $FONTAWESOME_TOKEN
+
       - name: Install Global Dependencies
         run: npm install -g yarn sass cross-env
 

@@ -65,7 +65,7 @@ func TestCreate(t *testing.T) {
 }
 
 func TestAuthUser(t *testing.T) {
-        t.SkipNow()
+	t.SkipNow()
 	u, ok := AuthUser("exampleuser2", utils.HashPassword("password12345"))
 	require.True(t, ok)
 	assert.Equal(t, "exampleuser2", u.Username)

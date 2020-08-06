@@ -14,6 +14,7 @@
     "start": "statping --port 8080 > /dev/null"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.14.0",
     "@fortawesome/fontawesome-free-solid": "^5.1.0-3",
     "@fortawesome/fontawesome-svg-core": "^1.2.26",
     "@fortawesome/free-brands-svg-icons": "^5.12.1",
