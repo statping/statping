@@ -10,6 +10,7 @@ import (
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/types/incidents"
+	"github.com/statping/statping/types/messages"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/utils"
@@ -99,6 +100,20 @@ var incidentUpdate1 = &incidents.IncidentUpdate{
 	CreatedAt:  utils.Now().Add(-5 * time.Second),
 }
 
+var message1 = &messages.Message{
+	Title:             "Example Message",
+	Description:       "Used for testing",
+	StartOn:           utils.Now().Add(15 * time.Minute),
+	EndOn:             utils.Now().Add(30 * time.Minute),
+	ServiceId:         1,
+	NotifyUsers:       null.NewNullBool(false),
+	NotifyMethod:      "",
+	NotifyBefore:      null.NewNullInt64(0),
+	NotifyBeforeScale: "",
+	CreatedAt:         utils.Now(),
+	UpdatedAt:         utils.Now(),
+}
+
 type exampleGRPC struct {
 	pb.UnimplementedRouteGuideServer
 }
@@ -183,11 +198,12 @@ func startupDb(t *testing.T) {
 	require.Nil(t, err)
 	db, err := database.OpenTester()
 	require.Nil(t, err)
-	db.AutoMigrate(&Service{}, &notifications.Notification{}, &hits.Hit{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &failures.Failure{}, &incidents.Incident{}, &incidents.IncidentUpdate{})
+	db.AutoMigrate(&Service{}, &notifications.Notification{}, &messages.Message{}, &hits.Hit{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &failures.Failure{}, &incidents.Incident{}, &incidents.IncidentUpdate{})
 	checkins.SetDB(db)
 	failures.SetDB(db)
 	incidents.SetDB(db)
 	notifications.SetDB(db)
+	messages.SetDB(db)
 	hits.SetDB(db)
 	SetDB(db)
 
@@ -201,6 +217,7 @@ func startupDb(t *testing.T) {
 	db.Create(&incident1)
 	db.Create(&incidentUpdate1)
 	db.Create(&notification.Notification)
+	db.Create(&message1)
 }
 
 func TestServices(t *testing.T) {
@@ -521,6 +538,10 @@ func TestServices(t *testing.T) {
 		err = item.Delete()
 		require.Nil(t, err)
 
+		// after deleted service, make sure checkins, failures, hits, and incidents are also delete
+		assert.Len(t, item.AllFailures().List(), 0)
+		assert.Len(t, item.AllHits().List(), 0)
+
 		checkin := item.Checkins
 		assert.Len(t, checkin, 0)
 		for _, c := range checkin {
@@ -528,9 +549,6 @@ func TestServices(t *testing.T) {
 			assert.Len(t, c.Hits(), 0)
 			assert.False(t, c.IsRunning())
 		}
-
-		assert.Len(t, item.AllFailures().List(), 0)
-		assert.Len(t, item.AllHits().List(), 0)
 
 		inc := item.Incidents
 		assert.Len(t, inc, 0)

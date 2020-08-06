@@ -6,5 +6,6 @@ func (s *Service) DeleteIncidents() error {
 			return err
 		}
 	}
+	db.Model(s).Association("Updates").Clear()
 	return nil
 }

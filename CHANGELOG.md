@@ -8,6 +8,8 @@
 - Modified index page to use /assets directory for assets, (main.css, style.css)
 - Modified index page to use CDN asset paths
 - Fixed New Checkin form
+- Modified email notifier template to be rendered from MJML
+- Modified database relationships with services using gorm
 
 # 0.90.61 (07-22-2020)
 - Modified sass layouts, organized and split up sections

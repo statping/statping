@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+//go:generate go run generate/main.go
+
 var log = utils.Log.WithField("type", "notifier")
 
 type replacer struct {

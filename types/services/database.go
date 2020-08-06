@@ -16,7 +16,7 @@ var (
 )
 
 func (s *Service) AfterFind() {
-	db.Model(s).Related(&s.Incidents).Related(&s.Messages).Related(&s.Checkins)
+	db.Model(s).Related(&s.Incidents).Related(&s.Messages).Related(&s.Checkins).Related(&s.Incidents)
 	metrics.Query("service", "find")
 }
 
@@ -87,8 +87,8 @@ func (s *Service) Create() error {
 
 func (s *Service) Update() error {
 	q := db.Update(s)
-	allServices[s.Id] = s
 	s.Close()
+	allServices[s.Id] = s
 	s.SleepDuration = s.Duration()
 	go ServiceCheckQueue(allServices[s.Id], true)
 	return q.Error()
@@ -96,29 +96,38 @@ func (s *Service) Update() error {
 
 func (s *Service) Delete() error {
 	s.Close()
-	if err := s.DeleteFailures(); err != nil {
+	if err := s.AllFailures().DeleteAll(); err != nil {
 		return err
 	}
-	if err := s.DeleteHits(); err != nil {
+	if err := s.AllHits().DeleteAll(); err != nil {
 		return err
 	}
 	if err := s.DeleteCheckins(); err != nil {
 		return err
 	}
+	db.Model(s).Association("Checkins").Clear()
 	if err := s.DeleteIncidents(); err != nil {
 		return err
 	}
+	db.Model(s).Association("Incidents").Clear()
+	if err := s.DeleteMessages(); err != nil {
+		return err
+	}
+	db.Model(s).Association("Messages").Clear()
+
 	delete(allServices, s.Id)
 	q := db.Model(&Service{}).Delete(s)
 	return q.Error()
 }
 
-func (s *Service) DeleteFailures() error {
-	return s.AllFailures().DeleteAll()
-}
-
-func (s *Service) DeleteHits() error {
-	return s.AllHits().DeleteAll()
+func (s *Service) DeleteMessages() error {
+	for _, m := range s.Messages {
+		if err := m.Delete(); err != nil {
+			return err
+		}
+	}
+	db.Model(s).Association("messages").Clear()
+	return nil
 }
 
 func (s *Service) DeleteCheckins() error {
@@ -127,5 +136,6 @@ func (s *Service) DeleteCheckins() error {
 			return err
 		}
 	}
+	db.Model(s).Association("checkins").Clear()
 	return nil
 }

@@ -269,8 +269,7 @@ func servicesDeleteFailuresHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	err = service.DeleteFailures()
-	if err != nil {
+	if err := service.AllFailures().DeleteAll(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}

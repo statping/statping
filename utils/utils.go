@@ -162,7 +162,7 @@ func DurationReadable(d time.Duration) string {
 // // body - The body or form data to send with HTTP request
 // // timeout - Specific duration to timeout on. time.Duration(30 * time.Seconds)
 // // You can use a HTTP Proxy if you HTTP_PROXY environment variable
-func HttpRequest(endpoint, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool, customTLS *tls.Config) ([]byte, *http.Response, error) {
+func HttpRequest(endpoint, method string, contentType interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool, customTLS *tls.Config) ([]byte, *http.Response, error) {
 	var err error
 	var req *http.Request
 	if method == "" {
@@ -175,8 +175,8 @@ func HttpRequest(endpoint, method string, content interface{}, headers []string,
 	// set default headers so end user can overwrite them if needed
 	req.Header.Set("User-Agent", "Statping")
 	req.Header.Set("Statping-Version", Version)
-	if content != nil {
-		req.Header.Set("Content-Type", content.(string))
+	if contentType != nil {
+		req.Header.Set("Content-Type", contentType.(string))
 	}
 
 	verifyHost := req.URL.Hostname()

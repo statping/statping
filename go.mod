@@ -17,7 +17,6 @@ require (
 	github.com/hako/durafmt v0.0.0-20200605151348-3a43fc422dd9
 	github.com/jinzhu/gorm v1.9.12
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
-	github.com/pavius/impi v0.0.3 // indirect
 	github.com/pelletier/go-toml v1.7.0 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.1.0
@@ -30,14 +29,15 @@ require (
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.5.1
 	github.com/t-tiger/gorm-bulk-insert/v2 v2.0.1
+	github.com/tdewolff/minify/v2 v2.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	golang.org/x/net v0.0.0-20200625001655-4c5254603344 // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	golang.org/x/tools v0.0.0-20200804011535-6c149bb5ef0d // indirect
+	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208 // indirect
+	golang.org/x/sys v0.0.0-20200724161237-0e2f3a69832c // indirect
 	google.golang.org/grpc v1.28.1
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/mail.v2 v2.3.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gopkg.in/yaml.v2 v2.2.8
-	mvdan.cc/lint v0.0.0-20170908181259-adc824a0674b // indirect
-	mvdan.cc/unindent v0.0.0-20170829200357-ff6a34147cea // indirect
 )
