@@ -8,8 +8,9 @@
 - Modified index page to use /assets directory for assets, (main.css, style.css)
 - Modified index page to use CDN asset paths
 - Fixed New Checkin form
-- Modified email notifier template to be rendered from MJML
+- Modified email notifier template to be rendered from MJML (using go generate)
 - Modified database relationships with services using gorm
+- Modified "statping env" command to show user/group ID
 
 # 0.90.61 (07-22-2020)
 - Modified sass layouts, organized and split up sections
