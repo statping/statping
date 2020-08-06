@@ -36,7 +36,7 @@ func TestFind(t *testing.T) {
 }
 
 func TestAuthUser(t *testing.T) {
-	u, ok := AuthUser("example_user", utils.HashPassword("password12345"))
+	u, ok := AuthUser("example_user", utils.HashPassword("password123"))
 	assert.True(t, ok)
 	assert.Equal(t, "example_user", u.Username)
 
