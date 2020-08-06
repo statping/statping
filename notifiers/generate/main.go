@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/statping/statping/utils"
-	"github.com/tdewolff/minify/v2"
 	"github.com/tdewolff/minify/v2/html"
 	"os"
 	"time"
@@ -24,7 +23,12 @@ func main() {
 	mjmlApplication = os.Getenv("MJML_APP")
 	mjmlPrivate = os.Getenv("MJML_PRIVATE")
 
-	fmt.Println(mjmlApplication)
+	if mjmlApplication == "" || mjmlPrivate == "" {
+		fmt.Println("skipping email MJML template render, missing MJML_APP and MJML_PRIVATE")
+		return
+	}
+
+	fmt.Println("Generating success/failure email templates from MJML to a HTML golang constant")
 
 	success := convertMJML(emailSuccessMJML)
 	fail := convertMJML(emailFailureMJML)
@@ -38,9 +42,9 @@ const emailFailure = ` + minimize(fail) + `
 
 `
 
-	fmt.Println(htmlOut)
-
 	utils.SaveFile("email_rendered.go", []byte(htmlOut))
+
+	fmt.Println("Email MJML to HTML const saved: notifiers/email_rendered.go")
 }
 
 type mjmlInput struct {

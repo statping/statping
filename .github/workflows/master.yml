@@ -245,6 +245,8 @@ jobs:
       - name: Install Statping
         env:
           VERSION: ${{ env.VERSION }}
+          MJML_APP: ${{ secrets.MJML_APP }}
+          MJML_PRIVATE: ${{ secrets.MJML_PRIVATE }}
         run: |
           make build
           chmod +x statping
@@ -374,6 +376,8 @@ jobs:
         env:
           VERSION: ${{ env.VERSION }}
           COMMIT: $GITHUB_SHA
+          MJML_APP: ${{ secrets.MJML_APP }}
+          MJML_PRIVATE: ${{ secrets.MJML_PRIVATE }}
         run: make build-folders build-linux build-linux-arm build-darwin build-win compress-folders
 
       - name: Upload Builds
