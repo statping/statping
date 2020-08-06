@@ -8,9 +8,10 @@ import VueI18n from 'vue-i18n'
 import router from './routes'
 import "./mixin"
 import "./icons"
-const App = () => import('@/App.vue')
 import store from './store'
 import language from './languages'
+
+const App = () => import(/* webpackChunkName: "index" */ '@/App.vue')
 
 Vue.component('apexchart', VueApexCharts)
 

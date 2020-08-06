@@ -75,6 +75,7 @@
   const ServiceFailures = () => import(/* webpackChunkName: "dashboard" */ '../Service/ServiceFailures');
   const ServiceSparkLine = () => import(/* webpackChunkName: "dashboard" */ "./ServiceSparkLine");
   import Api from "../../API";
+
   const ServiceEvents = () => import(/* webpackChunkName: "dashboard" */ "@/components/Dashboard/ServiceEvents");
 
   export default {
@@ -167,16 +168,3 @@
       }
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-    .offline-card {
-        background-color: #fff5f5;
-    }
-    .fade-enter-active, .fade-leave-active {
-        transition: opacity .75s;
-    }
-    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-        opacity: 0;
-    }
-</style>

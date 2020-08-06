@@ -144,7 +144,6 @@ frontend-build:
 	cd frontend && yarn && yarn build
 	@cp -r frontend/dist source/
 	@cp -r frontend/src/assets/scss source/dist/
-	@cp -r frontend/public/main.scss source/dist/scss/
 	@cp frontend/public/favicon.ico source/dist/
 	@cp frontend/public/robots.txt source/dist/
 	@cp frontend/public/banner.png source/dist/
@@ -159,9 +158,10 @@ yarn:
 	cd frontend && yarn
 
 # compile assets using SASS and Rice. compiles scss -> css, and run rice embed-go
-compile: generate frontend-build
+compile: frontend-build
 	rm -f source/rice-box.go
 	cd source && rice embed-go
+	make generate
 
 embed:
 	cd source && rice embed-go

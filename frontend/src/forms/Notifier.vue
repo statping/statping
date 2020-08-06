@@ -173,15 +173,19 @@
 </template>
 
 <script>
-  import Api from "../API";
+import Api from "../API";
+/* webpackChunkName: "codemirror" */
+import {codemirror} from 'vue-codemirror'
+/* webpackChunkName: "codemirror" */
+import 'codemirror/mode/javascript/javascript.js'
+/* webpackChunkName: "codemirror" */
+import 'codemirror/lib/codemirror.css'
+/* webpackChunkName: "codemirror" */
+import 'codemirror/theme/neat.css'
+/* webpackChunkName: "codemirror" */
+import '../codemirror_json'
 
-  const beautify = require('js-beautify').js
-
-  /* webpackChunkName: "codemirror" */ import { codemirror } from 'vue-codemirror'
-  /* webpackChunkName: "codemirror" */ import 'codemirror/mode/javascript/javascript.js'
-  /* webpackChunkName: "codemirror" */ import 'codemirror/lib/codemirror.css'
-  /* webpackChunkName: "codemirror" */ import 'codemirror/theme/neat.css'
-  /* webpackChunkName: "codemirror" */ import '../codemirror_json'
+const beautify = require('js-beautify').js
 
 export default {
     name: 'Notifier',
@@ -325,10 +329,3 @@ export default {
     }
 }
 </script>
-<style scoped>
-    .CodeMirror {
-        border: 1px solid #eee;
-        height: 550px;
-        font-size: 9pt;
-    }
-</style>

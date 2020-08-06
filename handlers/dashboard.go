@@ -84,11 +84,27 @@ func apiThemeSaveHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
+	defer r.Body.Close()
+
+	fmt.Println(themes.Variables)
+
 	if err := source.SaveAsset([]byte(themes.Base), "scss/base.scss"); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
+	if err := source.SaveAsset([]byte(themes.Layout), "scss/layout.scss"); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
 	if err := source.SaveAsset([]byte(themes.Variables), "scss/variables.scss"); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	if err := source.SaveAsset([]byte(themes.Forms), "scss/forms.scss"); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	if err := source.SaveAsset([]byte(themes.Mixins), "scss/mixin.scss"); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}

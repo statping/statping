@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-//go:generate go run generate/main.go
+//go:generate go run generate.go
 
 var log = utils.Log.WithField("type", "notifier")
 

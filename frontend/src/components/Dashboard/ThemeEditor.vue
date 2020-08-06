@@ -57,15 +57,16 @@
 </template>
 
 <script>
-  import Api from "../../API";
+import Api from "../../API";
 
-  // require component
-  import { codemirror } from 'vue-codemirror'
-  import 'codemirror/mode/css/css.js'
+// require component
+import {codemirror} from 'vue-codemirror'
 
-  import 'codemirror/lib/codemirror.css'
-  import 'codemirror-colorpicker/dist/codemirror-colorpicker.css'
-  import 'codemirror-colorpicker'
+import('codemirror/mode/css/css.js')
+
+  import('codemirror/lib/codemirror.css')
+  import('codemirror-colorpicker/dist/codemirror-colorpicker.css')
+  import('codemirror-colorpicker')
 
   export default {
       name: 'ThemeEditor',
@@ -191,9 +192,3 @@
       }
   }
 </script>
-<style scoped>
-    .CodeMirror {
-        border: 1px solid #eee;
-        height: 550px;
-    }
-</style>

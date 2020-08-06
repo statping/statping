@@ -80,7 +80,7 @@ func TestSaveAndCompileAsset(t *testing.T) {
 	require.Nil(t, err)
 	assertFiles(t, true)
 
-	themeCSS, err := utils.OpenFile(dir + "/assets/css/main.css")
+	themeCSS, err := utils.OpenFile(dir + "/assets/css/index.css")
 	require.Nil(t, err)
 
 	assert.Contains(t, themeCSS, `color: #b1b2b3;`)

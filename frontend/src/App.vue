@@ -55,8 +55,5 @@
 
 <style lang="scss">
     @import "./assets/css/bootstrap.min.css";
-    @import "./assets/scss/base";
-    @import "./assets/scss/layout";
-    @import "./assets/scss/forms";
-    @import "./assets/scss/mobile";
+    @import "./assets/scss/index";
 </style>

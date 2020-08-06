@@ -1,4 +1,4 @@
-// DO NOT EDIT ** This file was generated with go generate on 2020-08-06 04:13:25.078006 +0000 UTC ** DO NOT EDIT //
+// DO NOT EDIT ** This file was generated with go generate on 2020-08-06 07:54:20.364299 +0000 UTC ** DO NOT EDIT //
 package notifiers
 
 const emailSuccess = `<!doctype html><html xmlns=http://www.w3.org/1999/xhtml xmlns:v=urn:schemas-microsoft-com:vml xmlns:o=urn:schemas-microsoft-com:office:office><title>Statping Service Notification</title><meta http-equiv=x-ua-compatible content="IE=edge"><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><style type=text/css>
@@ -52,3 +52,4 @@ const emailFailure = `<!doctype html><html xmlns=http://www.w3.org/1999/xhtml xm
 <a class=footer-link href=https://github.com/statping/statping>Github</a>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
 <a class=footer-link href=https://statping.com/privacy>Privacy</a>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
 <a class=footer-link href="https://news.statping.com/delete?email={{.Email}}">Unsubscribe</a></div></table></table></div></div></table></div></table></div></table></div></div>`
+

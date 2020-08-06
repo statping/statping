@@ -1,7 +1,5 @@
 package source
 
-//go:generate go run generate_wiki.go
-
 import (
 	"fmt"
 	"github.com/GeertJohan/go.rice"
@@ -19,8 +17,8 @@ var (
 	RequiredFiles = []string{
 		"css/style.css",
 		"css/style.css.gz",
-		"css/main.css",
-		"scss/main.scss",
+		"css/index.css",
+		"scss/index.scss",
 		"scss/base.scss",
 		"scss/forms.scss",
 		"scss/layout.scss",
@@ -44,6 +42,10 @@ func Assets() error {
 	}
 	var err error
 	TmplBox, err = rice.FindBox("dist")
+	if err != nil {
+		return err
+	}
+
 	return err
 }
 
@@ -67,7 +69,7 @@ func CompileSASS() error {
 		sassBin = bin
 	}
 
-	scssFile := filepath.Join(utils.Params.GetString("STATPING_DIR"), "assets", "scss", "main.scss")
+	scssFile := filepath.Join(utils.Params.GetString("STATPING_DIR"), "assets", "scss", "index.scss")
 	log.Infoln(fmt.Sprintf("Compiling SASS %v into %v", scssFile, scssRendered(scssFile)))
 
 	stdout, stderr, err := utils.Command(sassBin, scssFile, scssRendered(scssFile))
