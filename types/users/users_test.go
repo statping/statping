@@ -36,12 +36,12 @@ func TestFind(t *testing.T) {
 }
 
 func TestAuthUser(t *testing.T) {
-	u, err := AuthUser("example_user", utils.HashPassword("password12345"))
-	require.Nil(t, err)
+	u, ok := AuthUser("example_user", utils.HashPassword("password12345"))
+	assert.True(t, ok)
 	assert.Equal(t, "example_user", u.Username)
 
-	u, err = AuthUser("exampleuser2", "wrongpass")
-	assert.NotNil(t, err)
+	u, ok = AuthUser("exampleuser2", "wrongpass")
+	assert.False(t, ok)
 	assert.Nil(t, u)
 }
 
