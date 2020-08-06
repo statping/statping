@@ -198,6 +198,10 @@ func resetCli() error {
 
 func envCli() error {
 	fmt.Println("Statping Configuration")
+	fmt.Printf("Process ID:          %d\n", os.Getpid())
+	fmt.Printf("Running as user id:  %d\n", os.Getuid())
+	fmt.Printf("Running as group id: %d\n", os.Getgid())
+	fmt.Printf("Statping Directory:  %s\n", utils.Directory)
 	for k, v := range utils.Params.AllSettings() {
 		fmt.Printf("%s=%v\n", strings.ToUpper(k), v)
 	}
