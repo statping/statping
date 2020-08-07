@@ -68,7 +68,7 @@ cypress: clean
 
 test-api:
 	DB_CONN=sqlite DB_HOST=localhost DB_DATABASE=sqlite DB_PASS=none DB_USER=none statping &
-	sleep 5000 && newman run source/tmpl/postman.json -e dev/postman_environment.json --delay-request 500
+	sleep 5000 && newman run dev/postman.json -e dev/postman_environment.json --delay-request 500
 
 test-deps:
 	go get golang.org/x/tools/cmd/cover
@@ -150,9 +150,6 @@ frontend-build:
 	@cp frontend/public/banner.png source/dist/
 	@cp -r frontend/public/favicon source/dist/
 	@echo "Frontend build complete at ./source/dist"
-
-frontend-copy:
-	cp -r source/tmpl/*.* source/dist/
 
 yarn:
 	rm -rf source/dist && rm -rf frontend/dist
