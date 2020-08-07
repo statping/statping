@@ -135,6 +135,7 @@ jobs:
           gotestsum --no-summary=skipped --format dots -- -covermode=count -coverprofile=coverage.out -p=1 ./...
         env:
           VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
           DB_CONN: sqlite3
           STATPING_DIR: ${{ github.workspace }}
           API_SECRET: demopassword123
@@ -308,6 +309,7 @@ jobs:
       - name: Install Statping
         env:
           VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
         run: |
           make build
           chmod +x statping
@@ -380,7 +382,7 @@ jobs:
       - name: Build Binaries
         env:
           VERSION: ${{ env.VERSION }}
-          COMMIT: $GITHUB_SHA
+          COMMIT: ${{ github.sha }}
           MJML_APP: ${{ secrets.MJML_APP }}
           MJML_PRIVATE: ${{ secrets.MJML_PRIVATE }}
         run: make build-folders build-linux build-linux-arm build-darwin build-win compress-folders
@@ -415,7 +417,13 @@ jobs:
             buildx-docker-master
 
       - name: Docker Build :base
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
         run: make buildx-base
 
       - name: Docker Build :dev
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
         run: make buildx-dev

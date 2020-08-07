@@ -464,9 +464,15 @@ jobs:
             buildx-docker
 
       - name: Docker Build :base
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
         run: make buildx-base
 
       - name: Docker Build :lastest
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
         run: make buildx-latest
 
   sentry-release:
