@@ -38,6 +38,7 @@ RUN go get github.com/stretchr/testify/assert && \
 COPY . .
 COPY --from=frontend /statping/dist/ ./source/dist/
 RUN make clean generate embed
+RUN if [ "$GOARCH" = "arm" ] ; then export GOARM=6; fi
 RUN go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -o statping --tags "netgo linux" ./cmd
 RUN chmod a+x statping && mv statping /go/bin/statping
 # /go/bin/statping - statping binary
