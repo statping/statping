@@ -11,6 +11,7 @@
 - Modified email notifier template to be rendered from MJML (using go generate)
 - Modified database relationships with services using gorm
 - Modified "statping env" command to show user/group ID
+- Removed "js" folder when exporting assets, js files are always version of release, not static JS files
 
 # 0.90.61 (07-22-2020)
 - Modified sass layouts, organized and split up sections
