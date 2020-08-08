@@ -1,4 +1,4 @@
-# 0.90.62 (07-30-2020)
+# 0.90.62 (08-07-2020)
 - Added Notification logs
 - Fixed issues with Notifer After (x) failures for notifications
 - Modified notifications to not send on initial startup
