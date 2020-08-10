@@ -20,6 +20,19 @@ import (
 	"time"
 )
 
+func initModels(db database.Database) {
+	core.SetDB(db)
+	services.SetDB(db)
+	hits.SetDB(db)
+	failures.SetDB(db)
+	checkins.SetDB(db)
+	notifications.SetDB(db)
+	incidents.SetDB(db)
+	users.SetDB(db)
+	messages.SetDB(db)
+	groups.SetDB(db)
+}
+
 // Connect will attempt to connect to the sqlite, postgres, or mysql database
 func Connect(configs *DbConfig, retry bool) error {
 	conn := configs.ConnectionString()
@@ -59,19 +72,6 @@ func Connect(configs *DbConfig, retry bool) error {
 	initModels(configs.Db)
 
 	return err
-}
-
-func initModels(db database.Database) {
-	core.SetDB(db)
-	services.SetDB(db)
-	hits.SetDB(db)
-	failures.SetDB(db)
-	checkins.SetDB(db)
-	notifications.SetDB(db)
-	incidents.SetDB(db)
-	users.SetDB(db)
-	messages.SetDB(db)
-	groups.SetDB(db)
 }
 
 func CreateAdminUser(c *DbConfig) error {

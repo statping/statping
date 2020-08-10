@@ -64,6 +64,17 @@ func TestCreate(t *testing.T) {
 	assert.NotEmpty(t, example.ApiKey)
 }
 
+func TestAuthUser(t *testing.T) {
+	t.SkipNow()
+	u, ok := AuthUser("exampleuser2", utils.HashPassword("password12345"))
+	require.True(t, ok)
+	assert.Equal(t, "exampleuser2", u.Username)
+
+	u, ok = AuthUser("exampleuser2", "wrongpass")
+	assert.False(t, ok)
+	assert.Nil(t, u)
+}
+
 func TestUpdate(t *testing.T) {
 	item, err := Find(1)
 	require.Nil(t, err)
@@ -85,6 +96,11 @@ func TestDelete(t *testing.T) {
 
 	all = All()
 	assert.Len(t, all, 1)
+}
+
+func TestSamples(t *testing.T) {
+	require.Nil(t, Samples())
+	assert.Len(t, All(), 3)
 }
 
 func TestClose(t *testing.T) {

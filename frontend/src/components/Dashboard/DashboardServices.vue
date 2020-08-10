@@ -25,7 +25,7 @@
             <thead>
             <tr>
                 <th scope="col">{{ $t('dashboard.name') }}</th>
-                <th scope="col">{{ $tc('dashboard.service', 2) }}</th>
+                <th scope="col" class="d-none d-md-table-cell">{{ $tc('dashboard.service', 2) }}</th>
                 <th scope="col">{{ $t('dashboard.visibility') }}</th>
                 <th scope="col"></th>
             </tr>
@@ -36,7 +36,7 @@
                 <td><span class="drag_icon d-none d-md-inline">
                     <font-awesome-icon icon="bars" class="mr-3" /></span> {{group.name}}
                 </td>
-                <td>{{$store.getters.servicesInGroup(group.id).length}}</td>
+                <td class="d-none d-md-table-cell">{{$store.getters.servicesInGroup(group.id).length}}</td>
                 <td>
                     <span class="badge text-uppercase" :class="{'badge-primary': group.public, 'badge-secondary': !group.public}">
                         {{group.public ? $t('public') : $t('private')}}
@@ -67,11 +67,11 @@
 </template>
 
 <script>
-  const FormGroup = () => import('@/forms/Group')
-  const ToggleSwitch = () => import('@/forms/ToggleSwitch')
-  const ServicesList = () => import('@/components/Dashboard/ServicesList')
+  const FormGroup = () => import(/* webpackChunkName: "dashboard" */ '@/forms/Group')
+  const ToggleSwitch = () => import(/* webpackChunkName: "dashboard" */ '@/forms/ToggleSwitch')
+  const ServicesList = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/ServicesList')
   import Api from "../../API";
-  import draggable from 'vuedraggable'
+  const draggable = () => import(/* webpackChunkName: "dashboard" */ 'vuedraggable')
 
   export default {
       name: 'DashboardServices',

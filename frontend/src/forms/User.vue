@@ -66,7 +66,7 @@
 
 <script>
   import Api from "../API";
-  import LoadButton from "@/components/Elements/LoadButton";
+  const LoadButton = () => import(/* webpackChunkName: "index" */ "@/components/Elements/LoadButton");
 
   export default {
   name: 'FormUser',

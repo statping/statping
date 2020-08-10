@@ -5,12 +5,12 @@
 
         <div class="col-12 full-col-12">
             <div v-for="service in services_no_group" v-bind:key="service.id" class="list-group online_list mb-4">
-                <a class="service_li list-group-item list-group-item-action">
+                <div class="service_li list-group-item list-group-item-action">
                     <router-link class="no-decoration font-3" :to="serviceLink(service)">{{service.name}}</router-link>
                     <span class="badge float-right" :class="{'bg-success': service.online, 'bg-danger': !service.online }">{{service.online ? "ONLINE" : "OFFLINE"}}</span>
                     <GroupServiceFailures :service="service"/>
                     <IncidentsBlock :service="service"/>
-                </a>
+                </div>
             </div>
         </div>
 
@@ -32,22 +32,23 @@
 </template>
 
 <script>
-const Group = () => import('@/components/Index/Group')
-const Header = () => import('@/components/Index/Header')
-const MessageBlock = () => import('@/components/Index/MessageBlock')
-const ServiceBlock = () => import('@/components/Service/ServiceBlock')
-const GroupServiceFailures = () => import('@/components/Index/GroupServiceFailures')
-const IncidentsBlock = () => import('@/components/Index/IncidentsBlock')
+import Api from "@/API";
+const Group = () => import(/* webpackChunkName: "index" */ '@/components/Index/Group')
+const Header = () => import(/* webpackChunkName: "index" */ '@/components/Index/Header')
+const MessageBlock = () => import(/* webpackChunkName: "index" */ '@/components/Index/MessageBlock')
+const ServiceBlock = () => import(/* webpackChunkName: "index" */ '@/components/Service/ServiceBlock')
+const GroupServiceFailures = () => import(/* webpackChunkName: "index" */ '@/components/Index/GroupServiceFailures')
+const IncidentsBlock = () => import(/* webpackChunkName: "index" */ '@/components/Index/IncidentsBlock')
 
 export default {
     name: 'Index',
     components: {
       IncidentsBlock,
       GroupServiceFailures,
-        ServiceBlock,
-        MessageBlock,
-        Group,
-        Header
+      ServiceBlock,
+      MessageBlock,
+      Group,
+      Header
     },
     data() {
         return {
@@ -68,26 +69,26 @@ export default {
             return this.$store.getters.servicesNoGroup
         }
     },
-    async created() {
-        this.logged_in = this.loggedIn()
-    },
-    async mounted() {
-
-    },
     methods: {
+        async checkLogin() {
+          const token = this.$cookies.get('statping_auth')
+          if (!token) {
+            this.$store.commit('setLoggedIn', false)
+            return
+          }
+          try {
+            const jwt = await Api.check_token(token)
+            this.$store.commit('setAdmin', jwt.admin)
+            if (jwt.username) {
+              this.$store.commit('setLoggedIn', true)
+            }
+          } catch (e) {
+            console.error(e)
+          }
+        },
         inRange(message) {
             return this.isBetween(this.now(), message.start_on, message.start_on === message.end_on ? this.maxDate().toISOString() : message.end_on)
         }
     }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-    .fade-enter-active, .fade-leave-active {
-        transition: opacity .5s;
-    }
-    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-        opacity: 0;
-    }
-</style>

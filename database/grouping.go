@@ -39,7 +39,7 @@ type GroupQuery struct {
 }
 
 func (b GroupQuery) Find(data interface{}) error {
-	return b.db.Find(data).Error()
+	return b.db.Order("id DESC").Find(data).Error()
 }
 
 func (b GroupQuery) Database() Database {

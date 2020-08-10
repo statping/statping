@@ -84,7 +84,15 @@ func apiThemeSaveHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
+	defer r.Body.Close()
+
+	fmt.Println(themes.Variables)
+
 	if err := source.SaveAsset([]byte(themes.Base), "scss/base.scss"); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	if err := source.SaveAsset([]byte(themes.Layout), "scss/layout.scss"); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
@@ -92,11 +100,19 @@ func apiThemeSaveHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
+	if err := source.SaveAsset([]byte(themes.Forms), "scss/forms.scss"); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	if err := source.SaveAsset([]byte(themes.Mixins), "scss/mixin.scss"); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
 	if err := source.SaveAsset([]byte(themes.Mobile), "scss/mobile.scss"); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	if err := source.CompileSASS(source.DefaultScss...); err != nil {
+	if err := source.CompileSASS(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
@@ -114,14 +130,14 @@ func apiThemeCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	utils.Log.Infof("creating assets in folder: %s/%s", dir, "assets")
 	if err := source.CreateAllAssets(dir); err != nil {
-		log.Errorln(err)
-		sendErrorJson(err, w, r)
-		return
-	}
-	if err := source.CompileSASS(source.DefaultScss...); err != nil {
-		source.CopyToPublic(source.TmplBox, "css", "main.css")
-		source.CopyToPublic(source.TmplBox, "css", "base.css")
-		log.Errorln("Default 'base.css' was inserted because SASS did not work.")
+		if err := source.CopyToPublic(source.TmplBox, "css", "style.css"); err != nil {
+			log.Errorln(err)
+			sendErrorJson(err, w, r)
+			return
+		} else {
+			log.Errorln(err)
+			sendErrorJson(err, w, r)
+		}
 	}
 	resetRouter()
 	sendJsonAction(dir+"/assets", "created", w, r)

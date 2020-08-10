@@ -28,6 +28,10 @@ func (e *emailer) Select() *notifications.Notification {
 	return e.Notification
 }
 
+func (e *emailer) Valid(values notifications.Values) error {
+	return nil
+}
+
 var email = &emailer{&notifications.Notification{
 	Method:      "email",
 	Title:       "SMTP Mail",
@@ -88,7 +92,7 @@ type emailOutgoing struct {
 // OnFailure will trigger failing service
 func (e *emailer) OnFailure(s services.Service, f failures.Failure) (string, error) {
 	subject := fmt.Sprintf("Service %s is Offline", s.Name)
-	tmpl := renderEmail(s, f)
+	tmpl := renderEmail(s, f, emailFailure)
 	email := &emailOutgoing{
 		To:       e.Var2.String,
 		Subject:  subject,
@@ -101,7 +105,7 @@ func (e *emailer) OnFailure(s services.Service, f failures.Failure) (string, err
 // OnSuccess will trigger successful service
 func (e *emailer) OnSuccess(s services.Service) (string, error) {
 	subject := fmt.Sprintf("Service %s is Back Online", s.Name)
-	tmpl := renderEmail(s, failures.Failure{})
+	tmpl := renderEmail(s, failures.Failure{}, emailSuccess)
 	email := &emailOutgoing{
 		To:       e.Var2.String,
 		Subject:  subject,
@@ -111,13 +115,13 @@ func (e *emailer) OnSuccess(s services.Service) (string, error) {
 	return tmpl, e.dialSend(email)
 }
 
-func renderEmail(s services.Service, f failures.Failure) string {
+func renderEmail(s services.Service, f failures.Failure, emailData string) string {
 	wr := bytes.NewBuffer(nil)
 	tmpl := template.New("email")
-	tmpl, err := tmpl.Parse(emailBase)
+	tmpl, err := tmpl.Parse(emailData)
 	if err != nil {
 		log.Errorln(err)
-		return emailBase
+		return emailData
 	}
 
 	data := replacer{
@@ -129,7 +133,7 @@ func renderEmail(s services.Service, f failures.Failure) string {
 
 	if err = tmpl.ExecuteTemplate(wr, "email", data); err != nil {
 		log.Errorln(err)
-		return emailBase
+		return emailData
 	}
 
 	return wr.String()
@@ -142,7 +146,7 @@ func (e *emailer) OnTest() (string, error) {
 	email := &emailOutgoing{
 		To:       e.Var2.String,
 		Subject:  subject,
-		Template: renderEmail(service, failures.Example()),
+		Template: renderEmail(service, failures.Example(), emailFailure),
 		From:     e.Var1.String,
 	}
 	return subject, e.dialSend(email)

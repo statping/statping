@@ -6,7 +6,7 @@
 </template>
 
 <script>
-  const TopNav = () => import('@/components/Dashboard/TopNav')
+  const TopNav = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/TopNav')
 
   export default {
   name: 'Dashboard',
@@ -35,6 +35,3 @@
   }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

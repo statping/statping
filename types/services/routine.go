@@ -339,36 +339,11 @@ func RecordSuccess(s *Service) {
 	metrics.Gauge("online", 1., s.Name, s.Type)
 	metrics.Inc("success", s.Name)
 	sendSuccess(s)
-	s.SuccessNotified = true
 }
 
 func AddNotifier(n ServiceNotifier) {
 	notif := n.Select()
 	allNotifiers[notif.Method] = n
-}
-
-func sendSuccess(s *Service) {
-	if !s.AllowNotifications.Bool {
-		return
-	}
-	// dont send notification if server was already previous online
-	if s.SuccessNotified {
-		return
-	}
-
-	for _, n := range allNotifiers {
-		notif := n.Select()
-		if notif.CanSend() {
-			log.Infof("Sending notification to: %s!", notif.Method)
-			if _, err := n.OnSuccess(*s); err != nil {
-				notif.Logger().Errorln(err)
-			}
-			s.UserNotified = true
-			s.SuccessNotified = true
-			//s.UpdateNotify.Bool
-		}
-	}
-	s.notifyAfterCount = 0
 }
 
 // RecordFailure will create a new 'Failure' record in the database for a offline service
@@ -389,40 +364,10 @@ func RecordFailure(s *Service, issue string) {
 		log.Error(err)
 	}
 	s.Online = false
-	s.SuccessNotified = false
 	s.DownText = s.DowntimeText()
 	metrics.Gauge("online", 0., s.Name, s.Type)
 	metrics.Inc("failure", s.Name)
 	sendFailure(s, fail)
-}
-
-func sendFailure(s *Service, f *failures.Failure) {
-	if !s.AllowNotifications.Bool {
-		return
-	}
-
-	// ignore failure if user was already notified and
-	// they have "continuous notifications" switched off.
-	if s.UserNotified && !s.UpdateNotify.Bool {
-		return
-	}
-
-	if s.notifyAfterCount > s.NotifyAfter {
-		for _, n := range allNotifiers {
-			notif := n.Select()
-			if notif.CanSend() {
-				log.Infof("Sending Failure notification to: %s!", notif.Method)
-				if _, err := n.OnFailure(*s, *f); err != nil {
-					notif.Logger().WithField("failure", f.Issue).Errorln(err)
-				}
-				s.UserNotified = true
-				s.SuccessNotified = true
-				//s.UpdateNotify.Bool
-			}
-		}
-	}
-
-	s.notifyAfterCount++
 }
 
 // Check will run checkHttp for HTTP services and checkTcp for TCP services

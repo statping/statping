@@ -51,12 +51,6 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-4 col-form-label">Enable Github Login</label>
-                    <div class="col-md-8 col-xs-12 mt-1">
-
-                    </div>
-                </div>
-                <div class="form-group row">
                     <label for="gh_callback" class="col-sm-4 col-form-label">Callback URL</label>
                     <div class="col-sm-8">
                         <div class="input-group">

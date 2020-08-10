@@ -10,6 +10,8 @@ import (
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/types/incidents"
+	"github.com/statping/statping/types/messages"
+	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
@@ -98,6 +100,20 @@ var incidentUpdate1 = &incidents.IncidentUpdate{
 	CreatedAt:  utils.Now().Add(-5 * time.Second),
 }
 
+var message1 = &messages.Message{
+	Title:             "Example Message",
+	Description:       "Used for testing",
+	StartOn:           utils.Now().Add(15 * time.Minute),
+	EndOn:             utils.Now().Add(30 * time.Minute),
+	ServiceId:         1,
+	NotifyUsers:       null.NewNullBool(false),
+	NotifyMethod:      "",
+	NotifyBefore:      null.NewNullInt64(0),
+	NotifyBeforeScale: "",
+	CreatedAt:         utils.Now(),
+	UpdatedAt:         utils.Now(),
+}
+
 type exampleGRPC struct {
 	pb.UnimplementedRouteGuideServer
 }
@@ -107,8 +123,7 @@ func (s *exampleGRPC) GetFeature(ctx context.Context, point *pb.Point) (*pb.Feat
 }
 
 func TestStartExampleEndpoints(t *testing.T) {
-	err := utils.InitLogs()
-	require.Nil(t, err)
+	startupDb(t)
 
 	// root CA for Linux:  /etc/ssl/certs/ca-certificates.crt
 	// root CA for MacOSX: /opt/local/share/curl/curl-ca-bundle.crt
@@ -178,15 +193,17 @@ func TestStartExampleEndpoints(t *testing.T) {
 	time.Sleep(15 * time.Second)
 }
 
-func TestServices(t *testing.T) {
+func startupDb(t *testing.T) {
 	err := utils.InitLogs()
 	require.Nil(t, err)
 	db, err := database.OpenTester()
 	require.Nil(t, err)
-	db.AutoMigrate(&Service{}, &hits.Hit{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &failures.Failure{}, &incidents.Incident{}, &incidents.IncidentUpdate{})
+	db.AutoMigrate(&Service{}, &notifications.Notification{}, &messages.Message{}, &hits.Hit{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &failures.Failure{}, &incidents.Incident{}, &incidents.IncidentUpdate{})
 	checkins.SetDB(db)
 	failures.SetDB(db)
 	incidents.SetDB(db)
+	notifications.SetDB(db)
+	messages.SetDB(db)
 	hits.SetDB(db)
 	SetDB(db)
 
@@ -199,6 +216,11 @@ func TestServices(t *testing.T) {
 	db.Create(&fail2)
 	db.Create(&incident1)
 	db.Create(&incidentUpdate1)
+	db.Create(&notification.Notification)
+	db.Create(&message1)
+}
+
+func TestServices(t *testing.T) {
 
 	tlsCert := utils.Params.GetString("STATPING_DIR") + "/cert.pem"
 	tlsCertKey := utils.Params.GetString("STATPING_DIR") + "/key.pem"
@@ -222,7 +244,7 @@ func TestServices(t *testing.T) {
 			Timeout:        5,
 			VerifySSL:      null.NewNullBool(false),
 		}
-		e, err = CheckHttp(e, false)
+		e, err := CheckHttp(e, false)
 		require.Nil(t, err)
 		assert.True(t, e.Online)
 		assert.False(t, e.LastCheck.IsZero())
@@ -263,7 +285,7 @@ func TestServices(t *testing.T) {
 			TLSCert:        null.NewNullString(tlsCert),
 			TLSCertKey:     null.NewNullString(tlsCertKey),
 		}
-		e, err = CheckHttp(e, false)
+		e, err := CheckHttp(e, false)
 		require.Nil(t, err)
 		assert.True(t, e.Online)
 		assert.False(t, e.LastCheck.IsZero())
@@ -279,7 +301,7 @@ func TestServices(t *testing.T) {
 			Type:    "tcp",
 			Timeout: 5,
 		}
-		e, err = CheckTcp(e, false)
+		e, err := CheckTcp(e, false)
 		require.Nil(t, err)
 		assert.True(t, e.Online)
 		assert.False(t, e.LastCheck.IsZero())
@@ -297,7 +319,7 @@ func TestServices(t *testing.T) {
 			TLSCert:    null.NewNullString(tlsCert),
 			TLSCertKey: null.NewNullString(tlsCertKey),
 		}
-		e, err = CheckTcp(e, false)
+		e, err := CheckTcp(e, false)
 		require.Nil(t, err)
 		assert.True(t, e.Online)
 		assert.False(t, e.LastCheck.IsZero())
@@ -313,7 +335,7 @@ func TestServices(t *testing.T) {
 			Type:    "udp",
 			Timeout: 5,
 		}
-		e, err = CheckTcp(e, false)
+		e, err := CheckTcp(e, false)
 		require.Nil(t, err)
 		assert.True(t, e.Online)
 		assert.False(t, e.LastCheck.IsZero())
@@ -329,7 +351,7 @@ func TestServices(t *testing.T) {
 			Type:    "grpc",
 			Timeout: 5,
 		}
-		e, err = CheckGrpc(e, false)
+		e, err := CheckGrpc(e, false)
 		require.Nil(t, err)
 		assert.True(t, e.Online)
 		assert.False(t, e.LastCheck.IsZero())
@@ -338,14 +360,13 @@ func TestServices(t *testing.T) {
 	})
 
 	t.Run("Test ICMP Check", func(t *testing.T) {
-		t.SkipNow()
 		e := &Service{
 			Name:    "Example ICMP",
 			Domain:  "localhost",
 			Type:    "icmp",
 			Timeout: 5,
 		}
-		e, err = CheckIcmp(e, false)
+		e, err := CheckIcmp(e, false)
 		require.Nil(t, err)
 		assert.True(t, e.Online)
 		assert.False(t, e.LastCheck.IsZero())
@@ -361,7 +382,7 @@ func TestServices(t *testing.T) {
 	t.Run("Test Checkins", func(t *testing.T) {
 		item, err := Find(1)
 		require.Nil(t, err)
-		assert.Len(t, item.Checkins(), 1)
+		assert.Len(t, item.Checkins, 1)
 	})
 
 	t.Run("Test All Hits", func(t *testing.T) {
@@ -517,20 +538,22 @@ func TestServices(t *testing.T) {
 		err = item.Delete()
 		require.Nil(t, err)
 
-		checkin := item.Checkins()
+		// after deleted service, make sure checkins, failures, hits, and incidents are also delete
+		assert.Len(t, item.AllFailures().List(), 0)
+		assert.Len(t, item.AllHits().List(), 0)
+
+		checkin := item.Checkins
 		assert.Len(t, checkin, 0)
 		for _, c := range checkin {
 			assert.Len(t, c.Failures().List(), 0)
 			assert.Len(t, c.Hits(), 0)
+			assert.False(t, c.IsRunning())
 		}
 
-		assert.Len(t, item.AllFailures().List(), 0)
-		assert.Len(t, item.AllHits().List(), 0)
-
-		inc := item.Incidents()
+		inc := item.Incidents
 		assert.Len(t, inc, 0)
 		for _, i := range inc {
-			assert.Len(t, i.Updates(), 0)
+			assert.Len(t, i.Updates, 0)
 		}
 
 		all = All()
@@ -591,10 +614,6 @@ services:
 
 		err = utils.DeleteFile(utils.Directory + "/services.yml")
 		require.Nil(t, err)
+		assert.NoFileExists(t, utils.Directory+"/services.yml")
 	})
-
-	t.Run("Test Close", func(t *testing.T) {
-		assert.Nil(t, db.Close())
-	})
-
 }

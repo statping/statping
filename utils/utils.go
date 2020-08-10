@@ -162,7 +162,7 @@ func DurationReadable(d time.Duration) string {
 // // body - The body or form data to send with HTTP request
 // // timeout - Specific duration to timeout on. time.Duration(30 * time.Seconds)
 // // You can use a HTTP Proxy if you HTTP_PROXY environment variable
-func HttpRequest(endpoint, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool, customTLS *tls.Config) ([]byte, *http.Response, error) {
+func HttpRequest(endpoint, method string, contentType interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool, customTLS *tls.Config) ([]byte, *http.Response, error) {
 	var err error
 	var req *http.Request
 	if method == "" {
@@ -172,9 +172,11 @@ func HttpRequest(endpoint, method string, content interface{}, headers []string,
 	if req, err = http.NewRequest(method, endpoint, body); err != nil {
 		return nil, nil, err
 	}
+	// set default headers so end user can overwrite them if needed
 	req.Header.Set("User-Agent", "Statping")
-	if content != nil {
-		req.Header.Set("Content-Type", content.(string))
+	req.Header.Set("Statping-Version", Version)
+	if contentType != nil {
+		req.Header.Set("Content-Type", contentType.(string))
 	}
 
 	verifyHost := req.URL.Hostname()
@@ -192,11 +194,7 @@ func HttpRequest(endpoint, method string, content interface{}, headers []string,
 		}
 	}
 
-	req.Header.Set("User-Agent", "Statping")
-	req.Header.Set("Statping-Version", Version)
-
 	var resp *http.Response
-
 	dialer := &net.Dialer{
 		Timeout:   timeout,
 		KeepAlive: timeout,
@@ -218,7 +216,7 @@ func HttpRequest(endpoint, method string, content interface{}, headers []string,
 			return dialer.DialContext(ctx, network, addr)
 		},
 	}
-	if Params.IsSet("HTTP_PROXY") {
+	if Params.GetString("HTTP_PROXY") != "" {
 		proxyUrl, err := url.Parse(Params.GetString("HTTP_PROXY"))
 		if err != nil {
 			return nil, nil, err

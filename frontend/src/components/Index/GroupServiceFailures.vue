@@ -2,7 +2,7 @@
     <div>
         <div class="d-flex mt-3 mb-2">
             <div class="flex-fill service_day" v-for="(d, index) in failureData" :class="{'day-error': d.amount > 0, 'day-success': d.amount === 0}">
-                <span v-if="d.amount != 0" class="small">{{d.amount}}</span>
+                <span v-if="d.amount !== 0" class="d-none d-md-block text-center small">{{d.amount}}</span>
             </div>
         </div>
         <div class="row mt-2">

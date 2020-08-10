@@ -1,12 +1,9 @@
-import Vue from "vue";
 import axios from 'axios'
-import * as Sentry from "@sentry/browser";
-import * as Integrations from "@sentry/integrations";
+
 const qs = require('querystring');
 axios.defaults.withCredentials = true
 
 const tokenKey = "statping_auth";
-const errorReporter = "https://bed4d75404924cb3a799e370733a1b64@sentry.statping.com/3"
 
 class Api {
   constructor() {
@@ -235,6 +232,11 @@ class Api {
     return axios.post('api/theme', data).then(response => (response.data))
   }
 
+  async check_token(token) {
+    const f = {token: token}
+    return axios.post('api/users/token', qs.stringify(f)).then(response => (response.data))
+  }
+
   async login(username, password) {
     const f = {username: username, password: password}
     return axios.post('api/login', qs.stringify(f)).then(response => (response.data))
@@ -270,13 +272,6 @@ class Api {
 
   async allActions(...all) {
     await axios.all([all])
-  }
-
-  async sentry_init() {
-    Sentry.init({
-      dsn: errorReporter,
-      integrations: [new Integrations.Vue({Vue, attachProps: true})],
-    });
   }
 
 }

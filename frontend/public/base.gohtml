@@ -43,18 +43,10 @@
     <meta property="twitter:image" content="favicon/social.png">
 
     {{if USE_CDN}}
-    <link rel="stylesheet" href="https://assets.statping.com/vendor.css">
-    <link rel="stylesheet" href="https://assets.statping.com/style.css">
-    <link rel="stylesheet" href="https://assets.statping.com/main.css">
-    {{else}}
-    {{if USING_ASSETS}}
-    <link href="css/vendor.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-    <link href="css/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://assets.statping.com/css/vendor.css">
     {{else}}
     <% _.each(htmlWebpackPlugin.tags.headTags, function(headTag) { %>
     <%= headTag %> <% }) %>
-    {{end}}
     {{end}}
 </head>
 <body>
@@ -65,11 +57,10 @@
 <div id="app" class="statping_container"></div>
 
 {{if USE_CDN}}
-<script src="https://assets.statping.com/bundle.js"></script>
-<script src="https://assets.statping.com/vendor.chunk.js"></script>
-<script src="https://assets.statping.com/polyfill.chunk.js"></script>
-<script src="https://assets.statping.com/style.chunk.js"></script>
-<script src="https://assets.statping.com/main.chunk.js"></script>
+<script src="https://assets.statping.com/js/bundle.js"></script>
+<script src="https://assets.statping.com/js/vendor.chunk.js"></script>
+<script src="https://assets.statping.com/js/polyfill.chunk.js"></script>
+<script src="https://assets.statping.com/js/main.chunk.js"></script>
 {{else}}
 <% _.each(htmlWebpackPlugin.tags.bodyTags, function(bodyTag) { %>
 <%= bodyTag %> <% }) %>

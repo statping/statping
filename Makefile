@@ -1,11 +1,12 @@
 VERSION=$(shell cat version.txt)
+COMMIT=$(shell git rev-parse HEAD)
 SIGN_KEY=B76D61FAA6DB759466E83D9964B9C6AAE2D55278
 BINARY_NAME=statping
 GOBUILD=go build -a
 GOVERSION=1.14.0
 NODE_VERSION=12.18.2
 XGO=xgo -go $(GOVERSION) --dest=build
-BUILDVERSION=-ldflags "-X main.VERSION=${VERSION}"
+BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}"
 TRVIS_SECRET=O3/2KTOV8krv+yZ1EB/7D1RQRe6NdpFUEJNJkMS/ollYqmz3x2mCO7yIgIJKCKguLXZxjM6CxJcjlCrvUwibL+8BBp7xJe4XFIOrjkPvbbVPry4HkFZCf2GfcUK6o4AByQ+RYqsW2F17Fp9KLQ1rL3OT3eLTwCAGKx3tlY8y+an43zkmo5dN64V6sawx26fh6XTfww590ey+ltgQTjf8UPNup2wZmGvMo9Hwvh/bYR/47bR6PlBh6vhlKWyotKf2Fz1Bevbu0zc35pee5YlsrHR+oSF+/nNd/dOij34BhtqQikUR+zQVy9yty8SlmneVwD3yOENvlF+8roeKIXb6P6eZnSMHvelhWpAFTwDXq2N3d/FIgrQtLxsAFTI3nTHvZgs6OoTd6dA0wkhuIGLxaL3FOeztCdxP5J/CQ9GUcTvifh5ArGGwYxRxQU6rTgtebJcNtXFISP9CEUR6rwRtb6ax7h6f1SbjUGAdxt+r2LbEVEk4ZlwHvdJ2DtzJHT5DQtLrqq/CTUgJ8SJFMkrJMp/pPznKhzN4qvd8oQJXygSXX/gz92MvoX0xgpNeLsUdAn+PL9KketfR+QYosBz04d8k05E+aTqGaU7FUCHPTLwlOFvLD8Gbv0zsC/PWgSLXTBlcqLEz5PHwPVHTcVzspKj/IyYimXpCSbvu1YOIjyc=
 PUBLISH_BODY='{ "request": { "branch": "master", "message": "Homebrew update version v${VERSION}", "config": { "env": { "VERSION": "${VERSION}", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
 TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "merge_mode": "replace", "language": "go", "go": 1.14, "install": true, "sudo": "required", "services": ["docker"], "env": { "secure": "${TRVIS_SECRET}" }, "before_deploy": ["git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [{ "provider": "releases", "api_key": "$$GITHUB_TOKEN", "file_glob": true, "file": "build/*", "skip_cleanup": true, "on": { "branch": "master" } }], "before_script": ["rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install stable", "nvm install 10.17.0", "nvm use 10.17.0 --default", "npm install -g sass yarn cross-env", "pip install --user awscli"], "script": ["make release"], "after_success": [], "after_deploy": ["make post-release"] } } }'
@@ -17,10 +18,23 @@ ARCHS = 386 arm amd64 arm64
 all: build-deps compile install test build
 
 test: clean compile
-	go test -v -p=1 -ldflags="-X main.VERSION=0.99.99" -coverprofile=coverage.out ./...
+	go test -v -p=1 -ldflags="-X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -coverprofile=coverage.out ./...
 
 build: clean
-	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o statping --tags "netgo linux" ./cmd
+	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -o statping --tags "netgo linux" ./cmd
+
+go-build: clean
+	rm -rf source/dist
+	rm -rf source/rice-box.go
+	wget https://assets.statping.com/source.tar.gz
+	tar -xvf source.tar.gz
+	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -o statping --tags "netgo" ./cmd
+
+lint:
+	go fmt ./...
+	golint ./...
+	impi --local github.com/statping/statping/ --scheme stdLocalThirdParty ./...
+	goimports ./...
 
 up:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml up -d --remove-orphans
@@ -54,7 +68,7 @@ cypress: clean
 
 test-api:
 	DB_CONN=sqlite DB_HOST=localhost DB_DATABASE=sqlite DB_PASS=none DB_USER=none statping &
-	sleep 5000 && newman run source/tmpl/postman.json -e dev/postman_environment.json --delay-request 500
+	sleep 5000 && newman run dev/postman.json -e dev/postman_environment.json --delay-request 500
 
 test-deps:
 	go get golang.org/x/tools/cmd/cover
@@ -129,13 +143,13 @@ frontend-build:
 	@rm -rf source/dist && rm -rf frontend/dist
 	@echo "yarn install and build static frontend"
 	cd frontend && yarn && yarn build
-	@cp -r frontend/dist source/ && cp -r frontend/src/assets/scss source/dist/
-	@cp -r source/tmpl/*.* source/dist/
+	@cp -r frontend/dist source/
+	@cp -r frontend/src/assets/scss source/dist/
+	@cp frontend/public/favicon.ico source/dist/
+	@cp frontend/public/robots.txt source/dist/
+	@cp frontend/public/banner.png source/dist/
 	@cp -r frontend/public/favicon source/dist/
 	@echo "Frontend build complete at ./source/dist"
-
-frontend-copy:
-	cp -r source/tmpl/*.* source/dist/
 
 yarn:
 	rm -rf source/dist && rm -rf frontend/dist
@@ -145,6 +159,7 @@ yarn:
 compile: frontend-build
 	rm -f source/rice-box.go
 	cd source && rice embed-go
+	make generate
 
 embed:
 	cd source && rice embed-go
@@ -155,8 +170,12 @@ install: build
 install-local: build
 	mv $(BINARY_NAME) /usr/local/bin/$(BINARY_NAME)
 
+install-darwin:
+	go build -a -ldflags "-X main.VERSION=${VERSION}" -o statping --tags "netgo darwin" ./cmd
+	mv $(BINARY_NAME) /usr/local/bin/$(BINARY_NAME)
+
 generate:
-	cd source && go generate
+	go generate ./...
 
 build-all: clean compile build-folders build-linux build-linux-arm build-darwin build-win compress-folders
 
@@ -291,11 +310,14 @@ post-release: frontend-build upload_to_s3 publish-homebrew dockerhub
 publish-homebrew:
 	curl -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "Travis-API-Version: 3" -H "Authorization: token $(TRAVIS_API)" -d $(PUBLISH_BODY) https://api.travis-ci.com/repo/statping%2Fhomebrew-statping/requests
 
-upload_to_s3: travis_s3_creds
-	aws s3 cp ./source/dist/css $(ASSETS_BKT) --recursive --exclude "*" --include "*.css"
-	aws s3 cp ./source/dist/js $(ASSETS_BKT) --recursive --exclude "*" --include "*.js"
-	aws s3 cp ./source/dist/scss $(ASSETS_BKT) --recursive --exclude "*" --include "*.scss"
-	aws s3 cp ./install.sh $(ASSETS_BKT)
+upload_to_s3:
+	tar -czvf source.tar.gz source/
+	aws s3 cp source.tar.gz s3://assets.statping.com/
+	rm -rf source.tar.gz
+	aws s3 cp source/dist/css/ s3://assets.statping.com/css/ --recursive --exclude "*" --include "*.css"
+	aws s3 cp source/dist/js/ s3://assets.statping.com/js/ --recursive --exclude "*" --include "*.js"
+	aws s3 cp source/dist/scss/ s3://assets.statping.com/scss/ --recursive --exclude "*" --include "*.scss"
+	aws s3 cp install.sh s3://assets.statping.com/
 
 travis_s3_creds:
 	mkdir -p ~/.aws
@@ -357,24 +379,28 @@ certs:
 buildx-latest: multiarch
 	docker buildx create --name statping-latest
 	docker buildx inspect --builder statping-latest --bootstrap
-	docker buildx build --builder statping-latest --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t statping/statping:latest -t statping/statping:v${VERSION} --build-arg=VERSION=${VERSION} .
+	docker buildx build --builder statping-latest --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t statping/statping:latest -t statping/statping:v${VERSION} --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
 	docker buildx rm statping-latest
 
 buildx-dev: multiarch
 	docker buildx create --name statping-dev
 	docker buildx inspect --builder statping-dev --bootstrap
-	docker buildx build --builder statping-dev --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t statping/statping:dev --build-arg=VERSION=${VERSION} .
+	docker buildx build --builder statping-dev --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t statping/statping:dev --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
 	docker buildx rm statping-dev
 
 buildx-base: multiarch
 	docker buildx create --name statping-base
 	docker buildx inspect --builder statping-base --bootstrap
-	docker buildx build --builder statping-base --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile.base -t statping/statping:base --build-arg=VERSION=${VERSION} .
+	docker buildx build --builder statping-base --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile.base -t statping/statping:base --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
 	docker buildx rm statping-base
 
 multiarch:
 	mkdir /tmp/.buildx-cache || true
 	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+delve:
+	go build -gcflags "all=-N -l" -o statping ./cmd
+	dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient exec ./statping
 
 check:
 	@echo "Checking the programs required for the build are installed..."
@@ -383,5 +409,5 @@ check:
 	@echo "yarn:   $(shell yarn --version) - $(shell which yarn)" && yarn --version >/dev/null 2>&1 || (echo "ERROR: yarn is required."; exit 1)
 	@echo "All required programs are installed!"
 
-.PHONY: all check build certs multiarch build-all buildx-base buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
+.PHONY: all check build certs multiarch install-darwin go-build build-all buildx-base buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds

@@ -21,6 +21,12 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.18.2'
+      - name: Configure AWS credentials from account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
       - uses: actions/checkout@v2
 
       - name: Add GOBIN to PATH
@@ -28,6 +34,13 @@ jobs:
           echo "::add-path::$(go env GOPATH)/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
+
+      - name: Font Awesome authentication
+        env:
+          FONTAWESOME_TOKEN: ${{ secrets.FONTAWESOME_TOKEN }}
+        run: |
+          npm config set "@fortawesome:registry" https://npm.fontawesome.com/
+          npm config set "//npm.fontawesome.com/:_authToken" $FONTAWESOME_TOKEN
 
       - name: Install Global Dependencies
         run: npm install -g yarn sass cross-env
@@ -52,6 +65,12 @@ jobs:
         with:
           name: static-rice-box
           path: ./source
+
+      - name: Upload Assets to S3
+        run: |
+          tar -czvf source.tar.gz source/
+          aws s3 cp source.tar.gz s3://assets.statping.com/
+          rm -rf source.tar.gz
 
   test:
     needs: compile
@@ -116,6 +135,7 @@ jobs:
           gotestsum --no-summary=skipped --format dots -- -covermode=count -coverprofile=coverage.out -p=1 ./...
         env:
           VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
           DB_CONN: sqlite3
           STATPING_DIR: ${{ github.workspace }}
           API_SECRET: demopassword123
@@ -231,6 +251,8 @@ jobs:
       - name: Install Statping
         env:
           VERSION: ${{ env.VERSION }}
+          MJML_APP: ${{ secrets.MJML_APP }}
+          MJML_PRIVATE: ${{ secrets.MJML_PRIVATE }}
         run: |
           make build
           chmod +x statping
@@ -287,6 +309,7 @@ jobs:
       - name: Install Statping
         env:
           VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
         run: |
           make build
           chmod +x statping
@@ -359,7 +382,9 @@ jobs:
       - name: Build Binaries
         env:
           VERSION: ${{ env.VERSION }}
-          COMMIT: $GITHUB_SHA
+          COMMIT: ${{ github.sha }}
+          MJML_APP: ${{ secrets.MJML_APP }}
+          MJML_PRIVATE: ${{ secrets.MJML_PRIVATE }}
         run: make build-folders build-linux build-linux-arm build-darwin build-win compress-folders
 
   docker-release:
@@ -392,7 +417,13 @@ jobs:
             buildx-docker-master
 
       - name: Docker Build :base
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
         run: make buildx-base
 
       - name: Docker Build :dev
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
         run: make buildx-dev

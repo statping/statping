@@ -33,13 +33,13 @@
                 </td>
                 <td class="text-right">
                     <div class="btn-group">
-                        <button v-if="$store.state.admin" @click.prevent="goto({path: `/dashboard/edit_service/${service.id}`, params: {service: service} })" class="btn btn-sm btn-outline-secondary">
+                        <button :disabled="loading" v-if="$store.state.admin" @click.prevent="goto({path: `/dashboard/edit_service/${service.id}`, params: {service: service} })" class="btn btn-sm btn-outline-secondary">
                             <font-awesome-icon icon="edit" />
                         </button>
-                        <button @click.prevent="goto({path: serviceLink(service), params: {service: service} })" class="btn btn-sm btn-outline-secondary">
+                        <button :disabled="loading" @click.prevent="goto({path: serviceLink(service), params: {service: service} })" class="btn btn-sm btn-outline-secondary">
                             <font-awesome-icon icon="chart-area" />
                         </button>
-                        <button v-if="$store.state.admin" @click.prevent="deleteService(service)" href="#" class="btn btn-sm btn-danger">
+                        <button :disabled="loading" v-if="$store.state.admin" @click.prevent="deleteService(service)" class="btn btn-sm btn-danger">
                             <font-awesome-icon v-if="!loading" icon="times" />
                             <font-awesome-icon v-if="loading" icon="circle-notch" spin/>
                         </button>
@@ -53,8 +53,8 @@
 
 <script>
 import Api from "../../API";
-import draggable from 'vuedraggable'
-import ToggleSwitch from '../../forms/ToggleSwitch';
+const draggable = () => import(/* webpackChunkName: "dashboard" */ 'vuedraggable')
+const ToggleSwitch = () => import(/* webpackChunkName: "dashboard" */ '../../forms/ToggleSwitch');
 
 export default {
       name: 'ServicesList',

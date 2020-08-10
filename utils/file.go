@@ -17,7 +17,7 @@ func DeleteDirectory(directory string) error {
 //		CreateDirectory("assets")
 func CreateDirectory(directory string) error {
 	Log.Debugln("creating directory: " + directory)
-	if err := os.Mkdir(directory, os.ModePerm); err != os.ErrExist {
+	if err := os.Mkdir(directory, os.FileMode(0755)); err != os.ErrExist {
 		return err
 	}
 	return nil
@@ -68,7 +68,7 @@ func RenameDirectory(fromDir string, toDir string) error {
 // SaveFile will create a new file with data inside it
 //		SaveFile("newfile.json", []byte('{"data": "success"}')
 func SaveFile(filename string, data []byte) error {
-	err := ioutil.WriteFile(filename, data, os.ModePerm)
+	err := ioutil.WriteFile(filename, data, os.FileMode(0755))
 	return err
 }
 

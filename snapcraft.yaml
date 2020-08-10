@@ -17,6 +17,7 @@ architectures:
   - build-on: amd64
   - build-on: armhf
   - build-on: arm64
+  - build-on: i386
 
 apps:
   statping:
@@ -34,6 +35,7 @@ parts:
       apt-get update
       apt-get install -y curl
       curl -o- -L https://statping.com/install.sh | bash
+      mv /usr/local/bin/statping ./
     build-packages:
       - git
       - gcc

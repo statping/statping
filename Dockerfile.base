@@ -13,6 +13,7 @@ RUN yarn build && yarn cache clean
 FROM golang:1.14-alpine AS backend
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG VERSION
+ARG COMMIT
 ARG BUILDPLATFORM
 ARG TARGETARCH
 RUN apk add --update --no-cache libstdc++ gcc g++ make git autoconf \
@@ -36,8 +37,8 @@ RUN go get github.com/stretchr/testify/assert && \
 	go get github.com/crazy-max/xgo
 COPY . .
 COPY --from=frontend /statping/dist/ ./source/dist/
-RUN make clean frontend-copy generate embed
-RUN GOOS=linux GOARCH=$TARGETARCH go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION}" -o statping --tags "netgo linux" ./cmd
+RUN make clean generate embed
+RUN go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -o statping --tags "netgo linux" ./cmd
 RUN chmod a+x statping && mv statping /go/bin/statping
 # /go/bin/statping - statping binary
 # /root/sassc/bin/sassc - sass binary

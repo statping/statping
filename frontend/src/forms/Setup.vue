@@ -7,7 +7,7 @@
         <div class="col-12">
             <form @submit.prevent="saveSetup">
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-12 col-md-6">
                         <div class="form-group">
                             <label class="text-capitalize">{{ $t('setup.language') }}</label>
                             <select @change="changeLanguages" v-model="setup.language" id="language" class="form-control">
@@ -27,13 +27,13 @@
                             </select>
                         </div>
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-7 col-md-6">
                                 <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
                                     <label class="text-capitalize">{{ $t('setup.host') }}</label>
                                     <input @keyup="canSubmit" v-model="setup.db_host" id="db_host" type="text" class="form-control" placeholder="localhost">
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-5 col-md-6">
                                 <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
                                     <label class="text-capitalize">{{ $t('port') }}</label>
                                     <input @keyup="canSubmit" v-model="setup.db_port" id="db_port" type="number" class="form-control" placeholder="5432">
@@ -65,12 +65,11 @@
                                     </span>
                                 </div>
                             </div>
-
                         </div>
 
                     </div>
 
-                    <div class="col-6">
+                    <div class="col-12 col-md-6">
 
                         <div class="form-group">
                             <label class="text-capitalize">{{ $t('setup.project_name') }}</label>
@@ -125,9 +124,11 @@
                         {{error}}
                     </div>
 
-                    <button @click.prevent="saveSetup" v-bind:disabled="disabled || loading" type="submit" class="btn btn-primary btn-block" :class="{'btn-primary': !loading, 'btn-default': loading}">
-                        <font-awesome-icon v-if="loading" icon="circle-notch" class="mr-2" spin/>{{loading ? "Loading..." : "Save Settings"}}
-                    </button>
+                    <div class="col-12">
+                        <button @click.prevent="saveSetup" v-bind:disabled="disabled || loading" type="submit" class="btn btn-primary btn-block" :class="{'btn-primary': !loading, 'btn-default': loading}">
+                            <font-awesome-icon v-if="loading" icon="circle-notch" class="mr-2" spin/>{{loading ? "Loading..." : "Save Settings"}}
+                        </button>
+                    </div>
                 </div>
             </form>
 
@@ -137,7 +138,6 @@
 
 <script>
   import Api from "../API";
-  import Index from "../pages/Index";
 
   export default {
   name: 'Setup',

@@ -10,7 +10,7 @@
 </template>
 
 <script>
-  const FormLogin = () => import('@/forms/Login')
+  const FormLogin = () => import(/* webpackChunkName: "index" */ '@/forms/Login')
 
   export default {
   name: 'Login',
@@ -22,7 +22,10 @@
 
     }
   },
-  methods: {
+    mounted() {
+
+    },
+    methods: {
 
   }
 }

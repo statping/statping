@@ -4,7 +4,7 @@
         <div v-for="incident in incidents" :key="incident.id" class="card contain-card mb-4">
             <div class="card-header">Incident: {{incident.title}}
                 <button @click="deleteIncident(incident)" class="btn btn-sm btn-danger float-right">
-                    <font-awesome-icon icon="times" />  Delete
+                    <font-awesome-icon icon="times" />
                 </button>
             </div>
 
@@ -50,8 +50,9 @@
 </template>
 
 <script>
-    import Api from "../../API";
-    const FormIncidentUpdates = () => import('@/forms/IncidentUpdates')
+import Api from "../../API";
+
+const FormIncidentUpdates = () => import(/* webpackChunkName: "dashboard" */ '@/forms/IncidentUpdates')
 
     export default {
         name: 'Incidents',
@@ -112,10 +113,3 @@
     }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-    .sm {
-        font-size: 8pt;
-    }
-</style>

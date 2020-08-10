@@ -61,7 +61,6 @@ func (h Hitters) DeleteAll() error {
 
 func (h Hitters) Sum() int64 {
 	var r IntResult
-
 	h.db.Select("CAST(SUM(latency) as INT) as amount").Scan(&r)
 	return r.Amount
 }

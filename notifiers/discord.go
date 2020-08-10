@@ -51,6 +51,10 @@ func (d *discord) Select() *notifications.Notification {
 	return d.Notification
 }
 
+func (d *discord) Valid(values notifications.Values) error {
+	return nil
+}
+
 // OnFailure will trigger failing service
 func (d *discord) OnFailure(s services.Service, f failures.Failure) (string, error) {
 	out, err := d.sendRequest(ReplaceVars(d.FailureData.String, s, f))

@@ -27,6 +27,10 @@ func (t *pushover) Select() *notifications.Notification {
 	return t.Notification
 }
 
+func (t *pushover) Valid(values notifications.Values) error {
+	return nil
+}
+
 var Pushover = &pushover{&notifications.Notification{
 	Method:      "pushover",
 	Title:       "Pushover",

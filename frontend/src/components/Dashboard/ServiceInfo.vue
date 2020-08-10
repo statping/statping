@@ -1,6 +1,6 @@
 <template>
     <div class="card mb-4" :class="{'offline-card': !service.online}">
-        <div class="card-title px-4 pt-3">
+        <div class="card-header pb-1">
             <h4 v-observe-visibility="setVisible">
                 <router-link :to="serviceLink(service)">{{service.name}}</router-link>
                 <span class="badge float-right text-uppercase" :class="{'badge-success': service.online, 'badge-danger': !service.online}">
@@ -9,61 +9,31 @@
             </h4>
         </div>
 
-        <div class="card-body p-3 p-md-1 pt-md-1 pb-md-1">
-
+        <div class="card-body">
             <transition name="fade">
-            <div v-if="loaded" class="col-12 pb-2">
-
-                <div v-if="false" class="row mb-4 align-content-center">
-
-                    <div v-if="!service.online" class="col-3 text-left">
-                        <span css="text-danger font-5 font-weight-bold"></span>
-                        <span class="font-2 d-block">Current Downtime</span>
-                    </div>
-
-                    <div v-if="service.online" class="col-3 text-left">
-                        <span class="text-success font-5 font-weight-bold">
-                            {{service.online_24_hours.toString()}} %
-                        </span>
-                        <span class="font-2 d-block">Total Uptime</span>
-                    </div>
-
-                    <div v-if="service.online" class="col-3 text-left">
-                        <span class="text-success font-5 font-weight-bold">
-                            0
-                        </span>
-                        <span class="font-2 d-block">Downtime Today</span>
-                    </div>
-
-                    <div v-if="service.online" class="col-3 text-left">
-                        <span class="text-success font-5 font-weight-bold">
-                            {{(uptime.uptime / 10000).toFixed(0).toString()}}
-                        </span>
-                        <span class="font-2 d-block">Uptime Duration</span>
-                    </div>
-
-                    <div class="col-3 text-left">
-                        <span class="text-danger font-5 font-weight-bold">
-                            {{service.failures_24_hours}}
-                        </span>
-                        <span class="font-2 d-block">Failures last 24 hours</span>
-                    </div>
-
-                </div>
-
-                <div class="row">
+            <div v-if="loaded" class="row pl-2 pr-2">
                     <div class="col-md-6 col-sm-12 mt-2 mt-md-0 mb-3">
                         <ServiceSparkLine :title="set2_name" subtitle="Latency Last 24 Hours" :series="set2"/>
                     </div>
                     <div class="col-md-6 col-sm-12 mt-4 mt-md-0 mb-3">
                         <ServiceSparkLine :title="set1_name" subtitle="Latency Last 7 Days" :series="set1"/>
                     </div>
-                </div>
+
+              <div class="col-12 mt-2 mt-md-0 mb-3">
+                  <ServiceEvents :service="service"/>
+              </div>
 
             </div>
+              <div v-else class="row mt-5 mb-5 pt-5 pb-5">
+                <div class="col-6 text-center text-muted">
+                  <font-awesome-icon icon="circle-notch" size="3x" spin/>
+                </div>
+                <div class="col-6 text-center text-muted">
+                  <font-awesome-icon icon="circle-notch" size="3x" spin/>
+                </div>
+              </div>
             </transition>
         </div>
-
         <div class="card-footer">
             <div class="row">
 
@@ -100,19 +70,20 @@
 </template>
 
 <script>
-  import Checkin from '../../forms/Checkin';
-  import FormIncident from '../../forms/Incident';
-  import FormMessage from '../../forms/Message';
-  import ServiceFailures from '../Service/ServiceFailures';
-  import ServiceSparkLine from "./ServiceSparkLine";
+  const Checkin = () => import(/* webpackChunkName: "dashboard" */ '../../forms/Checkin');
+  const FormMessage = () => import(/* webpackChunkName: "dashboard" */ '../../forms/Message');
+  const ServiceFailures = () => import(/* webpackChunkName: "dashboard" */ '../Service/ServiceFailures');
+  const ServiceSparkLine = () => import(/* webpackChunkName: "dashboard" */ "./ServiceSparkLine");
   import Api from "../../API";
+
+  const ServiceEvents = () => import(/* webpackChunkName: "dashboard" */ "@/components/Dashboard/ServiceEvents");
 
   export default {
       name: 'ServiceInfo',
       components: {
+        ServiceEvents,
           Checkin,
           ServiceFailures,
-          FormIncident,
           FormMessage,
           ServiceSparkLine
       },
@@ -197,16 +168,3 @@
       }
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-    .offline-card {
-        background-color: #fff5f5;
-    }
-    .fade-enter-active, .fade-leave-active {
-        transition: opacity .75s;
-    }
-    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-        opacity: 0;
-    }
-</style>

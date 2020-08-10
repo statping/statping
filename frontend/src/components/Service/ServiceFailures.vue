@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import ServiceChart from "./ServiceChart";
+const ServiceChart = () => import(/* webpackChunkName: "service" */ "./ServiceChart");
 import Api from "../../API";
 
 export default {

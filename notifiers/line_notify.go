@@ -26,6 +26,10 @@ func (l *lineNotifier) Select() *notifications.Notification {
 	return l.Notification
 }
 
+func (l *lineNotifier) Valid(values notifications.Values) error {
+	return nil
+}
+
 var LineNotify = &lineNotifier{&notifications.Notification{
 	Method:      lineNotifyMethod,
 	Title:       "LINE Notify",

@@ -22,6 +22,10 @@ func (m *mobilePush) Select() *notifications.Notification {
 	return m.Notification
 }
 
+func (m *mobilePush) Valid(values notifications.Values) error {
+	return nil
+}
+
 var Mobile = &mobilePush{&notifications.Notification{
 	Method: "mobile",
 	Title:  "Mobile",

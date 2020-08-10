@@ -4,13 +4,13 @@
         <div class="form-group row">
             <label for="username" class="col-sm-2 col-form-label">{{$t('username')}}</label>
             <div class="col-sm-10">
-                <input @keyup="checkForm" type="text" v-model="username" name="username" class="form-control" id="username" placeholder="Username" autocorrect="off" autocapitalize="none">
+                <input @keyup="checkForm" type="text" v-model="username" autocomplete="username" name="username" class="form-control" id="username" placeholder="Username" autocorrect="off" autocapitalize="none">
             </div>
         </div>
         <div class="form-group row">
             <label for="password" class="col-sm-2 col-form-label">{{$t('password')}}</label>
             <div class="col-sm-10">
-                <input @keyup="checkForm" type="password" v-model="password" name="password" class="form-control" id="password" placeholder="Password">
+                <input @keyup="checkForm" type="password" v-model="password" autocomplete="current-password" name="password" class="form-control" id="password" placeholder="Password">
             </div>
         </div>
         <div class="form-group row">
@@ -59,17 +59,20 @@
       },
       data() {
           return {
-              username: "",
-              password: "",
-              auth: {},
-              loading: false,
-              error: false,
-              disabled: true,
+            username: "",
+            password: "",
+            auth: {},
+            loading: false,
+            error: false,
+            disabled: true,
             google_scope: "https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email",
             slack_scope: "identity.email,identity.basic"
           }
       },
-      methods: {
+    mounted() {
+      this.$cookies.remove("statping_auth")
+    },
+    methods: {
           checkForm() {
               if (!this.username || !this.password) {
                   this.disabled = true
@@ -84,9 +87,10 @@
               if (auth.error) {
                   this.error = true
               } else if (auth.token) {
-                // this.$cookies.set("statping_auth", auth.token)
+                  this.$cookies.set("statping_auth", auth.token)
                   await this.$store.dispatch('loadAdmin')
                   this.$store.commit('setAdmin', auth.admin)
+                  this.$store.commit('setLoggedIn', true)
                   this.$router.push('/dashboard')
               }
               this.loading = false

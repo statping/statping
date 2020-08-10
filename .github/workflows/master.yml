@@ -16,6 +16,12 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.18.2'
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
       - uses: actions/checkout@v2
 
       - name: Add GOBIN to PATH
@@ -23,6 +29,13 @@ jobs:
           echo "::add-path::$(go env GOPATH)/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
+
+      - name: Font Awesome authentication
+        env:
+          FONTAWESOME_TOKEN: ${{ secrets.FONTAWESOME_TOKEN }}
+        run: |
+          npm config set "@fortawesome:registry" https://npm.fontawesome.com/
+          npm config set "//npm.fontawesome.com/:_authToken" $FONTAWESOME_TOKEN
 
       - name: Install Global Dependencies
         run: npm install -g yarn sass cross-env
@@ -47,6 +60,19 @@ jobs:
         with:
           name: static-rice-box
           path: ./source
+
+      - name: Upload Assets to S3
+        run: |
+          tar -czvf source.tar.gz source/
+          cp source.tar.gz source-${VERSION}.tar.gz
+          aws s3 cp source.tar.gz s3://assets.statping.com/
+          aws s3 cp source-${VERSION}.tar.gz s3://assets.statping.com/
+          rm -rf source.tar.gz
+          rm -rf source-${VERSION}.tar.gz
+          aws s3 cp source/dist/css/ s3://assets.statping.com/css/ --recursive
+          aws s3 cp source/dist/js/ s3://assets.statping.com/js/ --recursive
+          aws s3 cp source/dist/scss/ s3://assets.statping.com/scss/ --recursive
+          aws s3 cp install.sh s3://assets.statping.com/
 
   test:
     needs: compile
@@ -226,6 +252,8 @@ jobs:
       - name: Install Statping
         env:
           VERSION: ${{ env.VERSION }}
+          MJML_APP: ${{ secrets.MJML_APP }}
+          MJML_PRIVATE: ${{ secrets.MJML_PRIVATE }}
         run: |
           make build
           chmod +x statping
@@ -355,6 +383,8 @@ jobs:
         env:
           VERSION: ${{ env.VERSION }}
           COMMIT: $GITHUB_SHA
+          MJML_APP: ${{ secrets.MJML_APP }}
+          MJML_PRIVATE: ${{ secrets.MJML_PRIVATE }}
         run: make build-folders build-linux build-linux-arm build-darwin build-win compress-folders
 
       - name: Upload Builds
@@ -434,9 +464,15 @@ jobs:
             buildx-docker
 
       - name: Docker Build :base
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
         run: make buildx-base
 
       - name: Docker Build :lastest
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
         run: make buildx-latest
 
   sentry-release:

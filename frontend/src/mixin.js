@@ -106,10 +106,6 @@ export default Vue.mixin({
     isAdmin() {
       return this.$store.state.admin
     },
-    loggedIn() {
-      const core = this.$store.getters.core
-      return core.logged_in === true
-    },
     iconName(name) {
       switch (name) {
         case "fas fa-terminal":

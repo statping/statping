@@ -6,10 +6,9 @@
         <div v-for="(checkin, i) in checkins" class="card text-black-50 bg-white mt-3">
             <div class="card-header text-capitalize">
                 {{checkin.name}}
-                <button @click="deleteCheckin(checkin)" class="btn btn-sm btn-danger float-right text-uppercase">Delete</button>
+                <button @click="deleteCheckin(checkin)" class="btn btn-sm small btn-danger float-right text-uppercase">Delete</button>
             </div>
             <div class="card-body">
-
                 <div class="input-group">
                     <input type="text" class="form-control" :value="`${core.domain}/checkin/${checkin.api_key}`" readonly>
                     <div class="input-group-append copy-btn">
@@ -18,8 +17,8 @@
                 </div>
 
                 <span class="small">Send a GET request to this URL every {{checkin.interval}} minutes</span>
-                <span class="small float-right mt-1">Requested {{ago(checkin.last_hit)}} ago</span>
-                <span class="small float-right mt-1 mr-3">Request expected every {{checkin.interval}} minutes</span>
+                <span class="small float-right mt-1 mr-3 d-none d-md-block">Requested {{ago(checkin.last_hit)}} ago</span>
+                <span class="small float-right mt-1 mr-3 d-none d-md-block">Request expected every {{checkin.interval}} minutes</span>
 
                 <div class="card text-black-50 bg-white mt-3">
                     <div class="card-header text-capitalize">
@@ -62,15 +61,15 @@
             <div class="card-body">
             <form @submit.prevent="saveCheckin">
                 <div class="form-group row">
-                    <div class="col-5">
+                    <div class="col-7 col-md-5">
                         <label for="checkin_interval" class="col-form-label">Checkin Name</label>
                         <input v-model="checkin.name" type="text" name="name" class="form-control" id="checkin_name" placeholder="New Checkin">
                     </div>
-                    <div class="col-3">
+                    <div class="col-5 col-md-3">
                         <label for="checkin_interval" class="col-form-label">Interval (minutes)</label>
                         <input v-model="checkin.interval" type="number" name="interval" class="form-control" id="checkin_interval" placeholder="1" min="1">
                     </div>
-                    <div class="col-3">
+                    <div class="col-12 col-md-4">
                         <label class="col-form-label"></label>
                         <button :disabled="btn_disabled" @click.prevent="saveCheckin" type="submit" id="submit" class="btn btn-primary d-block mt-2">Save Checkin</button>
                     </div>
@@ -137,6 +136,9 @@ export default {
       },
       last_record(checkin) {
         const r = this.records(checkin)
+        if (r.length === 0) {
+          return {success: false}
+        }
         return r[0]
       },
       fixInts() {
@@ -161,10 +163,3 @@ export default {
     }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-    .sm {
-        font-size: 8pt;
-    }
-</style>

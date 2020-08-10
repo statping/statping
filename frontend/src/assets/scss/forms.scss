@@ -31,7 +31,7 @@
 
 .form-control[readonly] {
   background-color: lighten($background-color, 12%) !important;
-  color: darken($background-color, 5%) !important;
+  color: lighten($input-color, 30%) !important;
 }
 
 /* The slider itself */
@@ -266,6 +266,10 @@ input.inputTags-field:focus {
 
 .nav-pills A {
   color: $text-color;
+}
+
+.nav-link.active A:HOVER {
+  color: white !important;
 }
 
 .nav-pills I {

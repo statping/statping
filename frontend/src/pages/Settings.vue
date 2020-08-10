@@ -119,12 +119,12 @@
   import GithubButton from 'vue-github-button'
   import Variables from "@/components/Dashboard/Variables";
 
-  const CoreSettings = () => import('@/forms/CoreSettings')
-  const FormIntegration = () => import('@/forms/Integration')
-  const Notifier = () => import('@/forms/Notifier')
-  const OAuth = () => import('@/forms/OAuth')
-  const ThemeEditor = () => import('@/components/Dashboard/ThemeEditor')
-  const Cache = () => import('@/components/Dashboard/Cache')
+  const CoreSettings = () => import(/* webpackChunkName: "dashboard" */ '@/forms/CoreSettings')
+  const FormIntegration = () => import(/* webpackChunkName: "dashboard" */ '@/forms/Integration')
+  const Notifier = () => import(/* webpackChunkName: "dashboard" */ '@/forms/Notifier')
+  const OAuth = () => import(/* webpackChunkName: "dashboard" */ '@/forms/OAuth')
+  const ThemeEditor = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/ThemeEditor')
+  const Cache = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Cache')
 
   export default {
       name: 'Settings',
@@ -152,10 +152,10 @@
           }
       },
     mounted() {
-        this.update()
+
       },
     created() {
-          this.update()
+      this.update()
       },
       methods: {
         async update() {

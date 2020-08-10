@@ -1,17 +1,23 @@
 package messages
 
 import (
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/metrics"
-	"github.com/statping/statping/utils"
 )
 
-// BeforeCreate for Message will set CreatedAt to UTC
-func (m *Message) BeforeCreate() (err error) {
-	if m.CreatedAt.IsZero() {
-		m.CreatedAt = utils.Now()
-		m.UpdatedAt = utils.Now()
+func (m *Message) Validate() error {
+	if m.Title == "" {
+		return errors.New("missing message title")
 	}
-	return
+	return nil
+}
+
+func (m *Message) BeforeUpdate() error {
+	return m.Validate()
+}
+
+func (m *Message) BeforeCreate() error {
+	return m.Validate()
 }
 
 func (m *Message) AfterFind() {

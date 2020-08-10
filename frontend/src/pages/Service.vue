@@ -1,37 +1,35 @@
 <template>
     <div class="container col-md-7 col-sm-12 mt-md-5">
-
         <div class="col-12 mb-4">
-
             <span class="mt-3 mb-3 text-white d-md-none btn d-block d-md-none text-uppercase" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
                 {{service.online ? $t('online') : $t('offline')}}
             </span>
 
-            <h4 class="mt-2">
+            <span class="mt-2 font-3">
                 <router-link to="/" class="text-black-50 text-decoration-none">{{core.name}}</router-link> - <span class="text-muted">{{service.name}}</span>
                 <span class="badge float-right d-none d-md-block text-uppercase" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
                     {{service.online ? $t('online') : $t('offline')}}
                 </span>
-            </h4>
+            </span>
 
-            <ServiceTopStats :service="service"/>
+            <ServiceTopStats v-if="loaded" :service="service"/>
 
-            <MessageBlock v-for="message in messagesInRange" v-bind:key="message.id" :message="message"/>
+            <MessageBlock v-if="loaded" v-for="message in messagesInRange" v-bind:key="message.id" :message="message"/>
 
             <div class="card text-black-50 bg-white mt-3">
                 <div class="card-header text-capitalize">Timeframe</div>
-                <div class="card-body">
+                <div class="card-body pb-4">
                     <div class="row">
-                        <div class="col-12 col-md-4 font-2">
-                            <flatPickr :disabled="loading" @on-change="onnn" v-model="start_time" :config="{ enableTime: true, altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date() }" type="text" class="btn btn-white text-left" required />
+                        <div class="col-12 col-md-4 font-2 mb-3 mb-md-0">
+                            <flatPickr :disabled="!loaded" @on-change="reload" v-model="start_time" :config="{ enableTime: true, altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date() }" type="text" class="form-control text-left d-block" required />
                             <small class="d-block">From {{this.format(new Date(start_time))}}</small>
                         </div>
-                        <div class="col-12 col-md-4 font-2">
-                            <flatPickr :disabled="loading" @on-change="onnn" v-model="end_time" :config="{ enableTime: true, altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date()}" type="text" class="btn btn-white text-left" required />
+                        <div class="col-12 col-md-4 font-2 mb-3 mb-md-0">
+                            <flatPickr :disabled="!loaded" @on-change="reload" v-model="end_time" :config="{ enableTime: true, altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date()}" type="text" class="form-control text-left" required />
                             <small class="d-block">To {{this.format(new Date(end_time))}}</small>
                         </div>
-                        <div class="col-12 col-md-4">
-                            <select :disabled="loading" @change="chartHits" v-model="group" class="form-control">
+                        <div class="col-12 col-md-4 mb-1 mb-md-0">
+                            <select :disabled="!loaded" @change="chartHits" v-model="group" class="form-control">
                                 <option value="1m">1 Minute</option>
                                 <option value="5m">5 Minutes</option>
                                 <option value="15m">15 Minute</option>
@@ -50,10 +48,22 @@
                 </div>
             </div>
 
-            <AdvancedChart :group="group" :updated="updated_chart" :start="start_time.toString()" :end="end_time.toString()" :service="service"/>
+            <div class="card text-black-50 bg-white mt-3 mb-3">
+                <div class="card-header text-capitalize">Service Latency</div>
+                <div v-if="loaded" class="card-body">
+                    <div class="row mb-5">
+                      <AdvancedChart :group="group" :updated="updated_chart" :start="start_time.toString()" :end="end_time.toString()" :service="service"/>
+                    </div>
+                    <div class="row mt-5">
+                        <apexchart height="220" type="rangeBar" :options="timeRangeOptions" :series="uptime_data"></apexchart>
+                    </div>
+                </div>
+              <div v-else class="row mt-3 mb-3">
+                <div class="col-12 text-center">
+                  <font-awesome-icon icon="circle-notch" size="3x" spin/>
+                </div>
+              </div>
 
-            <div v-if="!loading" class="row">
-                <apexchart width="100%" height="120" type="rangeBar" :options="timeRangeOptions" :series="uptime_data"></apexchart>
             </div>
 
             <div class="card text-black-50 bg-white mb-3">
@@ -72,12 +82,12 @@
 
 <script>
   import Api from "../API"
-  const MessageBlock = () => import('@/components/Index/MessageBlock')
-  const ServiceFailures = () => import('@/components/Service/ServiceFailures')
-  const Checkin = () => import('@/forms/Checkin')
-  const ServiceHeatmap = () => import('@/components/Service/ServiceHeatmap')
-  const ServiceTopStats = () => import('@/components/Service/ServiceTopStats')
-  const AdvancedChart = () => import('@/components/Service/AdvancedChart')
+  const MessageBlock = () => import(/* webpackChunkName: "index" */ '@/components/Index/MessageBlock')
+  const ServiceFailures = () => import(/* webpackChunkName: "service" */ '@/components/Service/ServiceFailures')
+  const Checkin = () => import(/* webpackChunkName: "dashboard" */ '@/forms/Checkin')
+  const ServiceHeatmap = () => import(/* webpackChunkName: "service" */ '@/components/Service/ServiceHeatmap')
+  const ServiceTopStats = () => import(/* webpackChunkName: "service" */ '@/components/Service/ServiceTopStats')
+  const AdvancedChart = () => import(/* webpackChunkName: "service" */ '@/components/Service/AdvancedChart')
 
   import flatPickr from 'vue-flatpickr-component';
   import 'flatpickr/dist/flatpickr.css';
@@ -120,13 +130,14 @@ export default {
     },
     data() {
         return {
+            service: null,
             tab: "failures",
             authenticated: false,
             ready: true,
             group: "1h",
             data: null,
             uptime_data: null,
-            loading: true,
+            loaded: false,
             messages: [],
             failures: [],
             start_time: this.nowSubtract(84600 * 30),
@@ -144,6 +155,7 @@ export default {
             chart: {
               id: 'uptime',
               height: 120,
+              width: "100%",
               type: 'rangeBar',
               toolbar: {
                 show: false
@@ -336,9 +348,6 @@ export default {
         }
     },
     computed: {
-      service () {
-        return this.$store.getters.serviceByAll(this.id)
-      },
       core () {
         return this.$store.getters.core
       },
@@ -362,30 +371,36 @@ export default {
       },
     },
     watch: {
-      service: function(n, o) {
-        this.onnn()
-      },
-      load_timedata: function(n, o) {
-        this.onnn()
+      '$route': 'reload',
+    },
+    created() {
+      this.reload()
+    },
+    async mounted() {
+      if (!this.$store.getters.service) {
+        // const s = await Api.service(this.id)
+        // this.$store.commit('setService', s)
       }
     },
-  async mounted() {
-    if (!this.$store.getters.service) {
-      const s = await Api.service(this.id)
-      this.$store.commit('setService', s)
-    }
-  },
     methods: {
       async updated_chart(start, end) {
+        this.loaded = false
         this.start_time = start
         this.end_time = end
-        this.loading = false
+        this.loaded = true
       },
-      async onnn() {
-        this.loading = true
+      async reload() {
+        this.loaded = false
+        const services = await Api.services()
+        this.$store.commit("setServices", services)
+        if (this.isNumeric(this.$route.params.id)) {
+          this.service = this.$store.getters.serviceById(this.$route.params.id)
+        } else {
+          this.service = this.$store.getters.serviceByPermalink(this.$route.params.id)
+        }
         await this.chartHits()
         await this.fetchUptime()
-        this.loading = false
+        this.loaded = true
       },
       async fetchUptime() {
         const uptime = await Api.service_uptime(this.service.id, this.params.start, this.params.end)
@@ -395,7 +410,6 @@ export default {
         const data = timedata.series.filter((g) => g.online) || []
         const offData = timedata.series.filter((g) => !g.online) || []
         let arr = [];
-        window.console.log(data)
         if (data) {
           data.forEach((d) => {
             arr.push({

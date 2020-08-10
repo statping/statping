@@ -5,7 +5,6 @@
 <script>
   const timeoptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
 
-
   export default {
   name: 'ServiceSparkLine',
   props: {

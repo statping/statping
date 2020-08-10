@@ -22,6 +22,10 @@ func (c *commandLine) Select() *notifications.Notification {
 	return c.Notification
 }
 
+func (c *commandLine) Valid(values notifications.Values) error {
+	return nil
+}
+
 var Command = &commandLine{&notifications.Notification{
 	Method:      "command",
 	Title:       "Command",

@@ -1,3 +1,18 @@
+# 0.90.62 (08-07-2020)
+- Added Notification logs
+- Fixed issues with Notifer After (x) failures for notifications
+- Modified notifications to not send on initial startup
+- Updated Incident UI
+- Added additional testing for notifications
+- Modified SCSS/SASS files to be generated from 1, main.scss to main.css
+- Modified index page to use /assets directory for assets, (main.css, style.css)
+- Modified index page to use CDN asset paths
+- Fixed New Checkin form
+- Modified email notifier template to be rendered from MJML (using go generate)
+- Modified database relationships with services using gorm
+- Modified "statping env" command to show user/group ID
+- Removed "js" folder when exporting assets, js files are always version of release, not static JS files
+
 # 0.90.61 (07-22-2020)
 - Modified sass layouts, organized and split up sections
 - Modified Checkins to seconds rather than milliseconds (for cronjob)

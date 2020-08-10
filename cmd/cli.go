@@ -16,6 +16,7 @@ import (
 	"github.com/statping/statping/utils"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -34,13 +35,77 @@ func assetsCli() error {
 	return nil
 }
 
-func systemctlCli() error {
-	fmt.Println("still in the works...")
+func systemctlCli(dir string, uninstall bool, port int64) error {
+	location := "/etc/systemd/system/statping.service"
+
+	if uninstall {
+		fmt.Println("systemctl stop statping")
+		if _, _, err := utils.Command("systemctl", "stop", "statping"); err != nil {
+			log.Errorln(err)
+		}
+		fmt.Println("systemctl disable statping")
+		if _, _, err := utils.Command("systemctl", "disable", "statping"); err != nil {
+			log.Errorln(err)
+		}
+		fmt.Println("Deleting systemctl: ", location)
+		if err := utils.DeleteFile(location); err != nil {
+			log.Errorln(err)
+		}
+		return nil
+	}
+	if ok := utils.FolderExists(dir); !ok {
+		return errors.New("directory does not exist: " + dir)
+	}
+
+	binPath, err := os.Executable()
+	if err != nil {
+		return err
+	}
+
+	config := []byte(`[Unit]
+Description=Statping Server
+After=network.target
+After=systemd-user-sessions.service
+After=network-online.target
+
+[Service]
+Type=simple
+Restart=always
+Environment="STATPING_DIR=` + dir + `"
+Environment="ALLOW_REPORTS=true"
+ExecStart=` + binPath + ` --port=` + utils.ToString(port) + `
+WorkingDirectory=` + dir + `
+
+[Install]
+WantedBy=multi-user.target"
+`)
+	fmt.Println("Saving systemctl service to: ", location)
+	fmt.Printf("Using directory %s for Statping data\n", dir)
+	fmt.Printf("Running on port %d\n", port)
+	fmt.Printf("\n\n%s\n\n", string(config))
+	if err := utils.SaveFile(location, config); err != nil {
+		return err
+	}
+	fmt.Println("systemctl daemon-reload")
+	if _, _, err := utils.Command("systemctl", "daemon-reload"); err != nil {
+		return err
+	}
+	fmt.Println("systemctl enable statping")
+	if _, _, err := utils.Command("systemctl", "enable", "statping.service"); err != nil {
+		return err
+	}
+	fmt.Println("systemctl start statping")
+	if _, _, err := utils.Command("systemctl", "start", "statping"); err != nil {
+		return err
+	}
+	fmt.Println("Statping was will auto start on reboots")
+	fmt.Println("systemctl service: ", location)
+
 	return nil
 }
 
 func exportCli(args []string) error {
-	filename := fmt.Sprintf("%s/statping-%s.json", utils.Directory, time.Now().Format("01-02-2006-1504"))
+	filename := filepath.Join(utils.Directory, time.Now().Format("01-02-2006-1504")+".json")
 	if len(args) == 1 {
 		filename = fmt.Sprintf("%s/%s", utils.Directory, args)
 	}
@@ -78,7 +143,7 @@ func sassCli() error {
 	if err := source.Assets(); err != nil {
 		return err
 	}
-	if err := source.CompileSASS(source.DefaultScss...); err != nil {
+	if err := source.CompileSASS(); err != nil {
 		return err
 	}
 	return nil
@@ -133,6 +198,10 @@ func resetCli() error {
 
 func envCli() error {
 	fmt.Println("Statping Configuration")
+	fmt.Printf("Process ID:          %d\n", os.Getpid())
+	fmt.Printf("Running as user id:  %d\n", os.Getuid())
+	fmt.Printf("Running as group id: %d\n", os.Getgid())
+	fmt.Printf("Statping Directory:  %s\n", utils.Directory)
 	for k, v := range utils.Params.AllSettings() {
 		fmt.Printf("%s=%v\n", strings.ToUpper(k), v)
 	}

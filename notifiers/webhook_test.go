@@ -21,10 +21,12 @@ var (
 )
 
 func TestWebhookNotifier(t *testing.T) {
-	t.Parallel()
-	t.SkipNow()
 	err := utils.InitLogs()
 	require.Nil(t, err)
+
+	t.Parallel()
+	t.SkipNow()
+
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})

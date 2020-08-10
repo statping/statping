@@ -28,7 +28,6 @@ type DbConfig struct {
 	LetsEncryptEmail  string `yaml:"letsencrypt_email,omitempty" json:"letsencrypt_email"`
 	LetsEncryptEnable bool   `yaml:"letsencrypt_enable" json:"letsencrypt_enable"`
 	LocalIP           string `yaml:"-" json:"-"`
-	filename          string `yaml:"-" json:"-"`
 
 	Db database.Database `yaml:"-" json:"-"`
 }

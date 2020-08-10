@@ -22,3 +22,8 @@ func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	returnJson(health, w, r)
 }
+
+func notFoundHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+	ExecuteResponse(w, r, "base.gohtml", core.App, nil)
+}

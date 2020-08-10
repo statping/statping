@@ -69,23 +69,21 @@ func Router() *mux.Router {
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
 
-		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("css"))))
-		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("js"))))
-		r.PathPrefix("/scss/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("scss"))))
-		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("favicon"))))
+		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, staticAssets("css")))
+		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, staticAssets("favicon")))
 		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, indexHandler))
 		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, indexHandler))
 	} else {
 		tmplFileSrv := http.FileServer(source.TmplBox.HTTPBox())
 		tmplBoxHandler := http.StripPrefix(basePath, tmplFileSrv)
 
-		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
-		r.PathPrefix("/scss/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
-		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
-		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
+		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, tmplFileSrv))
+		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, tmplFileSrv))
 		r.PathPrefix("/robots.txt").Handler(tmplBoxHandler)
 		r.PathPrefix("/banner.png").Handler(tmplBoxHandler)
 	}
+
+	r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
 
 	api := r.NewRoute().Subrouter()
 	api.Use(apiMiddleware)
@@ -154,6 +152,7 @@ func Router() *mux.Router {
 	// API USER Routes
 	api.Handle("/api/users", authenticated(apiAllUsersHandler, false)).Methods("GET")
 	api.Handle("/api/users", authenticated(apiCreateUsersHandler, false)).Methods("POST")
+	api.Handle("/api/users/token", http.HandlerFunc(apiCheckUserTokenHandler)).Methods("POST")
 	api.Handle("/api/users/{id}", authenticated(apiUserHandler, false)).Methods("GET")
 	api.Handle("/api/users/{id}", authenticated(apiUserUpdateHandler, false)).Methods("POST")
 	api.Handle("/api/users/{id}", authenticated(apiUserDeleteHandler, false)).Methods("DELETE")
@@ -181,11 +180,12 @@ func Router() *mux.Router {
 	// API Generic Routes
 	r.Handle("/metrics", readOnly(promhttp.Handler(), false))
 	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
-	r.NotFoundHandler = http.HandlerFunc(error404Handler)
+	r.NotFoundHandler = http.HandlerFunc(notFoundHandler)
 	return r
 }
 
 func resetRouter() {
+	log.Infoln("Restarting HTTP Router")
 	router = Router()
 	httpServer.Handler = router
 }

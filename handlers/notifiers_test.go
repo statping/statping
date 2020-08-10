@@ -5,6 +5,7 @@ import (
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ func TestAttachment(t *testing.T) {
 	notifiers.InitNotifiers()
 }
 
-func TestUnAuthenticatedNotifierRoutes(t *testing.T) {
+func TestAuthenticatedNotifierRoutes(t *testing.T) {
 	slackWebhookUrl := utils.Params.GetString("SLACK_URL")
 
 	tests := []HTTPTest{
@@ -42,7 +43,12 @@ func TestUnAuthenticatedNotifierRoutes(t *testing.T) {
 			URL:            "/api/notifier/slack",
 			Method:         "GET",
 			ExpectedStatus: 200,
-			BeforeTest:     SetTestENV,
+			BeforeTest: func(t *testing.T) error {
+				notif := services.FindNotifier("slack")
+				require.NotNil(t, notif)
+				assert.Equal(t, "slack", notif.Method)
+				return SetTestENV(t)
+			},
 		},
 		{
 			Name:   "No Authentication - Update Notifier",
@@ -68,7 +74,20 @@ func TestUnAuthenticatedNotifierRoutes(t *testing.T) {
 					"limits": 55
 				}`,
 			ExpectedStatus: 200,
-			BeforeTest:     SetTestENV,
+			BeforeTest: func(t *testing.T) error {
+				notif := services.FindNotifier("slack")
+				require.NotNil(t, notif)
+				assert.Equal(t, "slack", notif.Method)
+				assert.False(t, notif.Enabled.Bool)
+				return SetTestENV(t)
+			},
+			AfterTest: func(t *testing.T) error {
+				notif := services.FindNotifier("slack")
+				require.NotNil(t, notif)
+				assert.Equal(t, "slack", notif.Method)
+				assert.True(t, notif.Enabled.Bool)
+				return UnsetTestENV(t)
+			},
 		},
 		{
 			Name:   "Test Notifier (OnSuccess)",
@@ -82,7 +101,7 @@ func TestUnAuthenticatedNotifierRoutes(t *testing.T) {
 					"method": "slack",
 					"host": "` + slackWebhookUrl + `",
 					"success_data": "{\n  \"blocks\": [{\n    \"type\": \"section\",\n    \"text\": {\n      \"type\": \"mrkdwn\",\n      \"text\": \"The service {{.Service.Name}} is back online.\"\n    }\n  }, {\n    \"type\": \"actions\",\n    \"elements\": [{\n      \"type\": \"button\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"View Service\",\n        \"emoji\": true\n      },\n      \"style\": \"primary\",\n      \"url\": \"{{.Core.Domain}}/service/{{.Service.Id}}\"\n    }, {\n      \"type\": \"button\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"Go to Statping\",\n        \"emoji\": true\n      },\n      \"url\": \"{{.Core.Domain}}\"\n    }]\n  }]\n}",
-					"failure_data": "{\n  \"blocks\": [{\n    \"type\": \"section\",\n    \"text\": {\n      \"type\": \"mrkdwn\",\n      \"text\": \":warning: The service {{.Service.Name}} is currently offline! :warning:\"\n    }\n  }, {\n    \"type\": \"divider\"\n  }, {\n    \"type\": \"section\",\n    \"fields\": [{\n      \"type\": \"mrkdwn\",\n      \"text\": \"*Service:*\\n{{.Service.Name}}\"\n    }, {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*URL:*\\n{{.Service.Domain}}\"\n    }, {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*Status Code:*\\n{{.Service.LastStatusCode}}\"\n    }, {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*When:*\\n{{.Failure.CreatedAt}}\"\n    }, {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*Downtime:*\\n{{.Service.DowntimeAgo}}\"\n    }, {\n      \"type\": \"plain_text\",\n      \"text\": \"*Error:*\\n{{.Failure.Issue}}\"\n    }]\n  }, {\n    \"type\": \"divider\"\n  }, {\n    \"type\": \"actions\",\n    \"elements\": [{\n      \"type\": \"button\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"View Offline Service\",\n        \"emoji\": true\n      },\n      \"style\": \"danger\",\n      \"url\": \"{{.Core.Domain}}/service/{{.Service.Id}}\"\n    }, {\n      \"type\": \"button\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"Go to Statping\",\n        \"emoji\": true\n      },\n      \"url\": \"{{.Core.Domain}}\"\n    }]\n  }]\n}"
+					"failure_data": "{\n  \"blocks\": [{\n    \"type\": \"section\",\n    \"text\": {\n      \"type\": \"mrkdwn\",\n      \"text\": \":warning: The service {{.Service.Name}} is currently offline! :warning:\"\n    }\n  }, {\n    \"type\": \"divider\"\n  }, {\n    \"type\": \"section\",\n    \"fields\": [{\n      \"type\": \"mrkdwn\",\n      \"text\": \"*Service:*\\n{{.Service.Name}}\"\n    }, {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*URL:*\\n{{.Service.Domain}}\"\n    }, {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*Status Code:*\\n{{.Service.LastStatusCode}}\"\n    }, {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*When:*\\n{{.Failure.CreatedAt}}\"\n    }, {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*Downtime:*\\n{{.Service.Downtime.Human}}\"\n    }, {\n      \"type\": \"plain_text\",\n      \"text\": \"*Error:*\\n{{.Failure.Issue}}\"\n    }]\n  }, {\n    \"type\": \"divider\"\n  }, {\n    \"type\": \"actions\",\n    \"elements\": [{\n      \"type\": \"button\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"View Offline Service\",\n        \"emoji\": true\n      },\n      \"style\": \"danger\",\n      \"url\": \"{{.Core.Domain}}/service/{{.Service.Id}}\"\n    }, {\n      \"type\": \"button\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"Go to Statping\",\n        \"emoji\": true\n      },\n      \"url\": \"{{.Core.Domain}}\"\n    }]\n  }]\n}"
 				}
 			}`,
 			ExpectedStatus:   200,
@@ -101,7 +120,7 @@ func TestUnAuthenticatedNotifierRoutes(t *testing.T) {
 					"method": "slack",
 					"host": "` + slackWebhookUrl + `",
 					"success_data": "{\n  \"blocks\": [{\n    \"type\": \"section\",\n    \"text\": {\n      \"type\": \"mrkdwn\",\n      \"text\": \"The service {{.Service.Name}} is back online.\"\n    }\n  }, {\n    \"type\": \"actions\",\n    \"elements\": [{\n      \"type\": \"button\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"View Service\",\n        \"emoji\": true\n      },\n      \"style\": \"primary\",\n      \"url\": \"{{.Core.Domain}}/service/{{.Service.Id}}\"\n    }, {\n      \"type\": \"button\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"Go to Statping\",\n        \"emoji\": true\n      },\n      \"url\": \"{{.Core.Domain}}\"\n    }]\n  }]\n}",
-					"failure_data": "{\n  \"blocks\": [{\n    \"type\": \"section\",\n    \"text\": {\n      \"type\": \"mrkdwn\",\n      \"text\": \":warning: The service {{.Service.Name}} is currently offline! :warning:\"\n    }\n  }, {\n    \"type\": \"divider\"\n  }, {\n    \"type\": \"section\",\n    \"fields\": [{\n      \"type\": \"mrkdwn\",\n      \"text\": \"*Service:*\\n{{.Service.Name}}\"\n    }, {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*URL:*\\n{{.Service.Domain}}\"\n    }, {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*Status Code:*\\n{{.Service.LastStatusCode}}\"\n    }, {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*When:*\\n{{.Failure.CreatedAt}}\"\n    }, {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*Downtime:*\\n{{.Service.DowntimeAgo}}\"\n    }, {\n      \"type\": \"plain_text\",\n      \"text\": \"*Error:*\\n{{.Failure.Issue}}\"\n    }]\n  }, {\n    \"type\": \"divider\"\n  }, {\n    \"type\": \"actions\",\n    \"elements\": [{\n      \"type\": \"button\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"View Offline Service\",\n        \"emoji\": true\n      },\n      \"style\": \"danger\",\n      \"url\": \"{{.Core.Domain}}/service/{{.Service.Id}}\"\n    }, {\n      \"type\": \"button\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"Go to Statping\",\n        \"emoji\": true\n      },\n      \"url\": \"{{.Core.Domain}}\"\n    }]\n  }]\n}"
+					"failure_data": "{\n  \"blocks\": [{\n    \"type\": \"section\",\n    \"text\": {\n      \"type\": \"mrkdwn\",\n      \"text\": \":warning: The service {{.Service.Name}} is currently offline! :warning:\"\n    }\n  }, {\n    \"type\": \"divider\"\n  }, {\n    \"type\": \"section\",\n    \"fields\": [{\n      \"type\": \"mrkdwn\",\n      \"text\": \"*Service:*\\n{{.Service.Name}}\"\n    }, {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*URL:*\\n{{.Service.Domain}}\"\n    }, {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*Status Code:*\\n{{.Service.LastStatusCode}}\"\n    }, {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*When:*\\n{{.Failure.CreatedAt}}\"\n    }, {\n      \"type\": \"mrkdwn\",\n      \"text\": \"*Downtime:*\\n{{.Service.Downtime.Human}}\"\n    }, {\n      \"type\": \"plain_text\",\n      \"text\": \"*Error:*\\n{{.Failure.Issue}}\"\n    }]\n  }, {\n    \"type\": \"divider\"\n  }, {\n    \"type\": \"actions\",\n    \"elements\": [{\n      \"type\": \"button\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"View Offline Service\",\n        \"emoji\": true\n      },\n      \"style\": \"danger\",\n      \"url\": \"{{.Core.Domain}}/service/{{.Service.Id}}\"\n    }, {\n      \"type\": \"button\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"Go to Statping\",\n        \"emoji\": true\n      },\n      \"url\": \"{{.Core.Domain}}\"\n    }]\n  }]\n}"
 				}
 			}`,
 			ExpectedStatus:   200,
@@ -154,7 +173,7 @@ func TestApiNotifiersRoutes(t *testing.T) {
 			URL:              "/api/notifier/slack",
 			Method:           "GET",
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"method":"slack"`},
+			ExpectedContains: []string{`"method":"slack"`, `"host":"https://slack.api/example/12345"`},
 			BeforeTest:       SetTestENV,
 			SecureRoute:      true,
 		},

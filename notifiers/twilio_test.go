@@ -20,19 +20,19 @@ var (
 )
 
 func TestTwilioNotifier(t *testing.T) {
-	t.Parallel()
-
 	err := utils.InitLogs()
 	require.Nil(t, err)
 
-	TWILIO_SID = utils.Params.GetString("TWILIO_SID")
-	TWILIO_SECRET = utils.Params.GetString("TWILIO_SECRET")
+	t.Parallel()
 
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
 	notifications.SetDB(db)
 	core.Example()
+
+	TWILIO_SID = utils.Params.GetString("TWILIO_SID")
+	TWILIO_SECRET = utils.Params.GetString("TWILIO_SECRET")
 
 	if TWILIO_SID == "" || TWILIO_SECRET == "" {
 		t.Log("twilio notifier testing skipped, missing TWILIO_SID and TWILIO_SECRET environment variable")

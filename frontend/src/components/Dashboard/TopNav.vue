@@ -37,7 +37,6 @@
 
 <script>
   import Api from "../../API"
-  import Vue from "vue";
 
   export default {
   name: 'TopNav',

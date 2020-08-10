@@ -60,6 +60,9 @@ const webpackConfig = merge(commonConfig, {
     plugins: [
         new webpack.EnvironmentPlugin(environment),
         new CleanWebpackPlugin(),
+        // new webpack.optimize.LimitChunkCountPlugin({
+        //   maxChunks: 1
+        // }),
         new MiniCSSExtractPlugin({
             filename: 'css/[name].css',
             chunkFilename: 'css/[name].css'

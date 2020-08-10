@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"time"
 )
 
 func processSetupHandler(w http.ResponseWriter, r *http.Request) {
@@ -123,7 +122,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	CacheStorage.Delete("/")
 	resetCookies()
-	time.Sleep(2 * time.Second)
+
 	out := struct {
 		Message string            `json:"message"`
 		Config  *configs.DbConfig `json:"config"`

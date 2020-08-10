@@ -28,7 +28,7 @@
             <label class="col-sm-4 col-form-label">Service</label>
             <div class="col-sm-8">
               <select v-model="message.service" name="service_id" class="form-control">
-                <option :value="0">Global Announcement</option>
+                <option v-bind:value="0">Global Announcement</option>
                 <option v-for="service in $store.getters.services" :value="service.id" v-bind:key="service.id" >{{service.name}}</option>
               </select>
             </div>
@@ -39,7 +39,7 @@
             <div class="col-sm-4">
               <flatPickr v-model="message.start_on" @on-change="startChange" :config="config" type="text" name="start_on" class="form-control form-control-plaintext" id="start_on" value="0001-01-01T00:00:00Z" required />
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-4 mt-3 mt-md-0">
               <flatPickr v-model="message.end_on" @on-change="endChange" :config="config" type="text" name="end_on" class="form-control form-control-plaintext" id="end_on" value="0001-01-01T00:00:00Z" required />
             </div>
           </div>
@@ -48,7 +48,7 @@
             <label for="service_id" class="col-sm-4 col-form-label">Service</label>
             <div class="col-sm-8">
               <select v-model="message.service" class="form-control" name="service" id="service_id">
-                <option :value="0">Global Message</option>
+                <option v-bind:value="0">Global Message</option>
                 <option v-for="service in $store.getters.services" :value="service.id" v-bind:key="service.id">{{service.name}}</option>
               </select>
             </div>
@@ -130,6 +130,7 @@
         start_on: new Date(),
         end_on: new Date(),
         service_id: 0,
+        service: 0,
         notify_method: "",
         notify: false,
         notify_before: 0,

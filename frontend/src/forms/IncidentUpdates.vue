@@ -5,20 +5,12 @@
             No updates found, create a new Incident Update below.
         </div>
 
-        <div v-for="update in updates" :key="update.id">
-            <div class="alert alert-light" role="alert">
-                <span class="badge badge-pill badge-info text-uppercase">{{update.type}}</span>
-                <span class="float-right font-2">{{ago(update.created_at)}} ago</span>
-                <span class="d-block mt-2">{{update.message}}
-                    <button @click="delete_update(update)" type="button" class="close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </span>
-            </div>
+        <div v-for="update in updates.reverse()" :key="update.id">
+            <IncidentUpdate :update="update" :onUpdate="loadUpdates" :admin="true"/>
         </div>
 
         <form class="row" @submit.prevent="createIncidentUpdate">
-            <div class="col-3">
+            <div class="col-12 col-md-3 mb-3 mb-md-0">
                 <select v-model="incident_update.type" class="form-control">
                     <option value="Investigating">Investigating</option>
                     <option value="Update">Update</option>
@@ -26,11 +18,11 @@
                     <option value="Resolved">Resolved</option>
                 </select>
             </div>
-            <div class="col-7">
-                <input v-model="incident_update.message" rows="5" name="description" class="form-control" id="message" required>
+            <div class="col-12 col-md-7 mb-3 mb-md-0">
+                <input v-model="incident_update.message" name="description" class="form-control" id="message" required>
             </div>
 
-            <div class="col-2">
+            <div class="col-12 col-md-2">
                 <button @click.prevent="createIncidentUpdate"
                         :disabled="!incident_update.message"
                         type="submit" class="btn btn-block btn-primary">
@@ -44,12 +36,11 @@
 
 <script>
     import Api from "../API";
-    import flatPickr from 'vue-flatpickr-component';
-    import 'flatpickr/dist/flatpickr.css';
+    const IncidentUpdate = () => import(/* webpackChunkName: "index" */ "@/components/Elements/IncidentUpdate");
 
     export default {
         name: 'FormIncidentUpdates',
-        components: {},
+        components: {IncidentUpdate},
         props: {
             incident: {
                 type: Object,
@@ -58,7 +49,7 @@
         },
         data () {
             return {
-                updates: [],
+                updates: null,
                 incident_update: {
                     incident: this.incident.id,
                     message: "",
@@ -72,15 +63,6 @@
         },
 
         methods: {
-
-            async delete_update(update) {
-                this.res = await Api.incident_update_delete(update)
-                if (this.res.status === "success") {
-                    this.updates = this.updates.filter(obj => obj.id !== update.id); // this is better in terms of not having to querry the db to get a fresh copy of all updates
-                    //await this.loadUpdates()
-                }
-            },
-
             async createIncidentUpdate() {
                 this.res = await Api.incident_update_create(this.incident_update)
                 if (this.res.status === "success") {
