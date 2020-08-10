@@ -176,6 +176,7 @@ func Samples() error {
 
 	s7 := &Service{
 		Name:      "Static Service",
+		Domain:    "none",
 		Type:      "static",
 		Order:     7,
 		Public:    null.NewNullBool(true),

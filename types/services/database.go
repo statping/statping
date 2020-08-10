@@ -18,11 +18,11 @@ var (
 func (s *Service) Validate() error {
 	if s.Name == "" {
 		return errors.New("missing service name")
-	} else if s.Domain == "" {
+	} else if s.Domain == "" && s.Type != "static" {
 		return errors.New("missing domain name")
 	} else if s.Type == "" {
 		return errors.New("missing service type")
-	} else if s.Interval == 0 {
+	} else if s.Interval == 0 && s.Type != "static" {
 		return errors.New("missing check interval")
 	}
 	return nil
