@@ -498,15 +498,17 @@ jobs:
           environment: production
 
       - name: Sentry Frontend Release
-        uses: tclindner/sentry-releases-action@v1.0.0
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_URL: ${{ secrets.SENTRY_URL }}
-          SENTRY_ORG: statping
-          SENTRY_PROJECT: frontend
+        uses: mathrix-education/setup-sentry-cli@master
         with:
-          tagName: v${{ env.VERSION }}
-          environment: production
+          version: latest
+          url: ${{ secrets.SENTRY_URL }}
+          token: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          organization: statping
+          project: frontend
+        run: |
+          sentry-cli releases new -p frontend v$VERSION
+          sentry-cli releases set-commits --auto v$VERSION
+          sentry-cli releases files v$VERSION upload-sourcemaps source/dist
 
   homebrew-release:
     needs: upload-release
@@ -537,7 +539,7 @@ jobs:
         shell: bash
 
       - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2.0.0
+        uses: rtCamp/action-slack-notify@master
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_URL }}
           SLACK_CHANNEL: dev
