@@ -52,6 +52,11 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	notif := services.ReturnNotifier(notifer.Method)
+	if err := notif.Valid(notifer.Values()); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
 	if _, err := notif.OnSave(); err != nil {
 		sendErrorJson(err, w, r)
 		return

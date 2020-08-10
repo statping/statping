@@ -15,6 +15,27 @@ var (
 	allServices map[int64]*Service
 )
 
+func (s *Service) Validate() error {
+	if s.Name == "" {
+		return errors.New("missing service name")
+	} else if s.Domain == "" {
+		return errors.New("missing domain name")
+	} else if s.Type == "" {
+		return errors.New("missing service type")
+	} else if s.Interval == 0 {
+		return errors.New("missing check interval")
+	}
+	return nil
+}
+
+func (s *Service) BeforeCreate() error {
+	return s.Validate()
+}
+
+func (s *Service) BeforeUpdate() error {
+	return s.Validate()
+}
+
 func (s *Service) AfterFind() {
 	db.Model(s).Related(&s.Incidents).Related(&s.Messages).Related(&s.Checkins).Related(&s.Incidents)
 	metrics.Query("service", "find")

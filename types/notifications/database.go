@@ -12,6 +12,19 @@ func SetDB(database database.Database) {
 	db = database.Model(&Notification{})
 }
 
+func (n *Notification) Values() Values {
+	return Values{
+		Host:      n.Host.String,
+		Port:      n.Port.Int64,
+		Username:  n.Username.String,
+		Password:  n.Password.String,
+		Var1:      n.Var1.String,
+		Var2:      n.Var2.String,
+		ApiKey:    n.ApiKey.String,
+		ApiSecret: n.ApiSecret.String,
+	}
+}
+
 func Find(method string) (*Notification, error) {
 	var n Notification
 	q := db.Where("method = ?", method).Find(&n)

@@ -141,7 +141,7 @@ func TestGroupAPIRoutes(t *testing.T) {
 		},
 		{
 			Name:           "Statping View Unknown Group",
-			URL:            "/api/groups/8383883838",
+			URL:            "/api/groups/38383",
 			Method:         "GET",
 			BeforeTest:     SetTestENV,
 			ExpectedStatus: 404,
