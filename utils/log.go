@@ -40,7 +40,7 @@ func SentryInit(v *string, allow bool) {
 	}
 	goEnv := Params.GetString("GO_ENV")
 	allowReports := Params.GetBool("ALLOW_REPORTS")
-	if allowReports || allow || goEnv == "test" {
+	if allow || goEnv == "test" || allowReports {
 		if err := sentry.Init(sentry.ClientOptions{
 			Dsn:              errorReporter,
 			Environment:      goEnv,

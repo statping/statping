@@ -330,9 +330,11 @@ valid-sign:
 	gpg --verify statping.asc
 
 sentry-release:
-	sentry-cli releases new -p backend -p frontend v${VERSION}
-	sentry-cli releases set-commits --auto v${VERSION}
-	sentry-cli releases finalize v${VERSION}
+	sentry-cli releases --org statping new -p backend -p frontend v${VERSION}
+	sentry-cli releases --org statping set-commits v${VERSION} --auto
+	sentry-cli releases --org statping --project frontend files v${VERSION} upload ./frontend/dist
+	sentry-cli releases --org statping --project frontend files v${VERSION} upload-sourcemaps ./frontend/dist --no-sourcemap-reference
+	sentry-cli releases --org statping finalize v${VERSION}
 
 download-bins: clean
 	mkdir build || true
@@ -376,6 +378,9 @@ certs:
 	  -keyout key.pem \
 	  -subj "/C=US/ST=California/L=Santa Monica/O=Statping/OU=Development/CN=localhost"
 
+xgo-latest:
+	xgo --go $(GOVERSION) --targets=linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64,windows/386,windows/amd64,darwin/386,darwin/amd64 --out='statping' --pkg='cmd' --dest=build --tags 'netgo' --ldflags='-X main.VERSION=${VERSION} -X main.COMMIT=$(COMMIT) -linkmode external -extldflags "-static"' .
+
 buildx-latest: multiarch
 	docker buildx create --name statping-latest
 	docker buildx inspect --builder statping-latest --bootstrap
@@ -408,6 +413,11 @@ check:
 	@echo "node:   $(shell node --version) - $(shell which node)" && node --version >/dev/null 2>&1 || (echo "ERROR: node 12.x is required."; exit 1)
 	@echo "yarn:   $(shell yarn --version) - $(shell which yarn)" && yarn --version >/dev/null 2>&1 || (echo "ERROR: yarn is required."; exit 1)
 	@echo "All required programs are installed!"
+
+#sentry-release:
+#	sentry-cli releases new -p $SENTRY_PROJECT $VERSION
+#	sentry-cli releases set-commits --auto $VERSION
+#	sentry-cli releases files $VERSION upload-sourcemaps dist
 
 .PHONY: all check build certs multiarch install-darwin go-build build-all buildx-base buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds
