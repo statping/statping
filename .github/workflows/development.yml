@@ -66,18 +66,20 @@ jobs:
 
       - name: Build with xgo
         uses: crazy-max/ghaction-xgo@v1
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ env.GITHUB_SHA }}
         with:
           xgo_version: latest
-          go_version: 1.15.x
+          go_version: 1.14.x
           dest: build
           prefix: statping
-          targets: linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64,windows/386,windows/amd64,darwin/386,darwin/amd64
+          targets: linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64,windows-6.0/386,windows-6.0/amd64,darwin-10.6/386,darwin-10.6/amd64
           v: false
           x: false
           pkg: cmd
           buildmode: pie
-          tags: netgo osusergo static_build
-          ldflags: -s -w -X main.VERSION=${VERSION} -X main.COMMIT=${github.sha} -extldflags -static
+          ldflags: -s -w -tags netgo osusergo static_build -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} -extldflags -static
 
       - name: check files
         run: pwd && ls && cd build && ls
