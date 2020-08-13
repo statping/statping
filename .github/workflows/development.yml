@@ -79,7 +79,7 @@ jobs:
           x: false
           pkg: cmd
           buildmode: pie
-          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} --tags='netgo osusergo linux static_build' -extldflags -static
+          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} -extldflags -static
 
       - name: Build windows xgo
         uses: crazy-max/ghaction-xgo@v1
@@ -96,7 +96,7 @@ jobs:
           x: false
           pkg: cmd
           buildmode: pie
-          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} --tags='netgo osusergo static_build' -extldflags -static
+          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} -extldflags -static
 
       - name: Build darwin xgo
         uses: crazy-max/ghaction-xgo@v1
@@ -113,7 +113,7 @@ jobs:
           x: false
           pkg: cmd
           buildmode: exe
-          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} --tags='netgo osusergo static_build darwin'
+          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }}
 
 
       - name: check files
