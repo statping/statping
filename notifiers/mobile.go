@@ -42,13 +42,8 @@ var Mobile = &mobilePush{&notifications.Notification{
 		Placeholder: "A list of your Mobile device push notification ID's.",
 		DbField:     "var1",
 		IsHidden:    true,
-	}, {
-		Type:        "number",
-		Title:       "Array of device numbers",
-		Placeholder: "1 for iphone 2 for android",
-		DbField:     "var2",
-		IsHidden:    true,
-	}}},
+	},
+	}},
 }
 
 func dataJson(s services.Service, f failures.Failure) map[string]interface{} {
@@ -120,7 +115,7 @@ func (m *mobilePush) OnTest() (string, error) {
 // Send will send message to Statping push notifications endpoint
 func (m *mobilePush) Send(pushMessage *pushArray) error {
 	pushMessage.Tokens = []string{m.Var1.String}
-	pushMessage.Platform = utils.ToInt(m.Var2)
+	pushMessage.Platform = 2
 	_, err := pushRequest(pushMessage)
 	if err != nil {
 		return err
@@ -138,8 +133,7 @@ func pushRequest(msg *pushArray) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	url := "https://push.statping.com/api/push"
-	body, _, err = utils.HttpRequest(url, "POST", "application/json", nil, bytes.NewBuffer(body), time.Duration(20*time.Second), false, nil)
+	body, _, err = utils.HttpRequest("https://push.statping.com/api/push", "POST", "application/json", nil, bytes.NewBuffer(body), time.Duration(20*time.Second), false, nil)
 	return body, err
 }
 
