@@ -91,7 +91,7 @@ jobs:
         shell: bash
 
       - name: Set Build Flags
-        if: matrix.platform != darwin
+        if: matrix.platform != 'darwin'
         run: echo ::set-env name=BUILD_FLAGS::'-extldflags -static'
         shell: bash
 
