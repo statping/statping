@@ -489,7 +489,6 @@ jobs:
           url: ${{ secrets.SENTRY_URL }}
           token: ${{ secrets.SENTRY_AUTH_TOKEN }}
           organization: statping
-          project: frontend
 
       - name: Setting ENV's
         run: echo ::set-env name=VERSION::$(cat version.txt)
