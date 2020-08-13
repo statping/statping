@@ -62,7 +62,7 @@ jobs:
       - name: Upload Assets to S3
         run: |
           tar -czvf source.tar.gz source/
-          aws s3 cp source.tar.gz s3://assets.statping.com/${{ env.GITHUB_SHA }}
+          aws s3 cp source.tar.gz s3://assets.statping.com/${{ env.GITHUB_SHA }}/
           rm -rf source.tar.gz
 
   test:
