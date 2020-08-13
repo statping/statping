@@ -68,6 +68,7 @@ jobs:
         uses: crazy-max/ghaction-xgo@v1
         env:
           VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
         with:
           xgo_version: latest
           go_version: 1.15.x
@@ -78,43 +79,52 @@ jobs:
           x: false
           pkg: cmd
           buildmode: pie
-          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ github.sha }} -extldflags -static
+          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} -extldflags -static
 
       - name: Build windows xgo
         uses: crazy-max/ghaction-xgo@v1
         env:
           VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
         with:
           xgo_version: latest
           go_version: 1.15.x
           dest: build
           prefix: statping
-          targets: windows-6.0/386,windows-6.0/amd64
+          targets: windows/386,windows/amd64
           v: false
           x: false
           pkg: cmd
           buildmode: pie
-          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ github.sha }} -extldflags -static
+          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} -extldflags -static
 
       - name: Build darwin xgo
         uses: crazy-max/ghaction-xgo@v1
         env:
           VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
         with:
           xgo_version: latest
           go_version: 1.15.x
           dest: build
           prefix: statping
-          targets: darwin-10.6/386,darwin-10.6/amd64
+          targets: darwin/386,darwin/amd64
           v: false
           x: false
           pkg: cmd
           buildmode: exe
-          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ github.sha }}
-
+          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }}
 
       - name: check files
         run: pwd && ls && cd build && ls
+
+      - name: Rename Binaries
+        run: |
+          mv build/statping-darwin-10.6-amd64 build/statping-darwin-amd64
+          mv build/statping-windows-4.0-amd64.exe build/statping-windows-amd64.exe
+
+      - name: Compress Binaries
+        run: cd build && for i in *; do tar -czf $i.tar.gz $i; done
 
       - name: Upload Releases
         id: upload-assets
@@ -127,10 +137,10 @@ jobs:
           draft: true
           prerelease: true
           files: |
-            build/statping-linux-amd64
-            build/statping-linux-arm-6
-            build/statping-linux-arm-7
-            build/statping-linux-arm64
-            build/statping-windows-6.0-386.exe
-            build/statping-windows-6.0-amd64.exe
+            build/statping-darwin-amd64.tar.gz
+            build/statping-linux-amd64.tar.gz
+            build/statping-linux-arm-6.tar.gz
+            build/statping-linux-arm-7.tar.gz
+            build/statping-linux-arm64.tar.gz
+            build/statping-windows-amd64.exe.tar.gz
 
