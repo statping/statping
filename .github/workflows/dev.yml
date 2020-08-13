@@ -35,13 +35,6 @@ jobs:
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
-      - name: Font Awesome authentication
-        env:
-          FONTAWESOME_TOKEN: ${{ secrets.FONTAWESOME_TOKEN }}
-        run: |
-          npm config set "@fortawesome:registry" https://npm.fontawesome.com/
-          npm config set "//npm.fontawesome.com/:_authToken" $FONTAWESOME_TOKEN
-
       - name: Install Global Dependencies
         run: npm install -g yarn sass cross-env
 
@@ -69,7 +62,7 @@ jobs:
       - name: Upload Assets to S3
         run: |
           tar -czvf source.tar.gz source/
-          aws s3 cp source.tar.gz s3://assets.statping.com/
+          aws s3 cp source.tar.gz s3://assets.statping.com/${{ env.GITHUB_SHA }}
           rm -rf source.tar.gz
 
   test:
@@ -124,6 +117,7 @@ jobs:
       - name: Install Statping
         env:
           VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ env.GITHUB_SHA }}
         run: |
           make build certs
           chmod +x statping
@@ -135,7 +129,7 @@ jobs:
           gotestsum --no-summary=skipped --format dots -- -covermode=count -coverprofile=coverage.out -p=1 ./...
         env:
           VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ github.sha }}
+          COMMIT: ${{ env.GITHUB_SHA }}
           DB_CONN: sqlite3
           STATPING_DIR: ${{ github.workspace }}
           API_SECRET: demopassword123
@@ -196,6 +190,7 @@ jobs:
       - name: Install Statping
         env:
           VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ env.GITHUB_SHA }}
         run: |
           make build
           chmod +x statping
@@ -251,6 +246,7 @@ jobs:
       - name: Install Statping
         env:
           VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ env.GITHUB_SHA }}
           MJML_APP: ${{ secrets.MJML_APP }}
           MJML_PRIVATE: ${{ secrets.MJML_PRIVATE }}
         run: |
@@ -309,7 +305,7 @@ jobs:
       - name: Install Statping
         env:
           VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ github.sha }}
+          COMMIT: ${{ env.GITHUB_SHA }}
         run: |
           make build
           chmod +x statping
@@ -382,7 +378,7 @@ jobs:
       - name: Build Binaries
         env:
           VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ github.sha }}
+          COMMIT: ${{ env.GITHUB_SHA }}
           MJML_APP: ${{ secrets.MJML_APP }}
           MJML_PRIVATE: ${{ secrets.MJML_PRIVATE }}
         run: make build-folders build-linux build-linux-arm build-darwin build-win compress-folders
@@ -460,11 +456,11 @@ jobs:
       - name: Docker Build :base
         env:
           VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ github.sha }}
+          COMMIT: ${{ env.GITHUB_SHA }}
         run: make buildx-base
 
       - name: Docker Build :dev
         env:
           VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ github.sha }}
+          COMMIT: ${{ env.GITHUB_SHA }}
         run: make buildx-dev
