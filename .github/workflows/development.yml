@@ -79,7 +79,7 @@ jobs:
           x: false
           pkg: cmd
           buildmode: pie
-          ldflags: -s -w -tags netgo osusergo static_build -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} -extldflags -static
+          ldflags: -s -w -tags 'netgo osusergo static_build' -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} -extldflags -static
 
       - name: check files
         run: pwd && ls && cd build && ls
