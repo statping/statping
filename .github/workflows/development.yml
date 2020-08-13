@@ -70,3 +70,6 @@ jobs:
           buildmode: default
           ldflags: -s -w -X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT} -linkmode external -extldflags -static
 
+      - name: check files
+        run: pwd && ls && cd build && ls
+
