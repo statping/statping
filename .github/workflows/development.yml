@@ -64,22 +64,57 @@ jobs:
       - name: check source
         run: cd source && ls && cd dist && ls
 
-      - name: Build with xgo
+      - name: Build linux xgo
         uses: crazy-max/ghaction-xgo@v1
         env:
           VERSION: ${{ env.VERSION }}
           COMMIT: ${{ env.GITHUB_SHA }}
         with:
           xgo_version: latest
-          go_version: 1.14.x
+          go_version: 1.15.x
           dest: build
           prefix: statping
-          targets: linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64,windows-6.0/386,windows-6.0/amd64,darwin-10.6/386,darwin-10.6/amd64
+          targets: linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64
           v: false
           x: false
           pkg: cmd
           buildmode: pie
-          ldflags: -s -w -tags 'netgo osusergo static_build' -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} -extldflags -static
+          ldflags: -s -w -tags 'netgo osusergo linux static_build' -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} -extldflags -static
+
+      - name: Build windows xgo
+        uses: crazy-max/ghaction-xgo@v1
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ env.GITHUB_SHA }}
+        with:
+          xgo_version: latest
+          go_version: 1.15.x
+          dest: build
+          prefix: statping
+          targets: windows-6.0/386,windows-6.0
+          v: false
+          x: false
+          pkg: cmd
+          buildmode: exe
+          ldflags: -s -w -tags 'netgo osusergo static_build' -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }}
+
+      - name: Build darwin xgo
+        uses: crazy-max/ghaction-xgo@v1
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ env.GITHUB_SHA }}
+        with:
+          xgo_version: latest
+          go_version: 1.15.x
+          dest: build
+          prefix: statping
+          targets: darwin-10.6/386,darwin-10.6/amd64
+          v: false
+          x: false
+          pkg: cmd
+          buildmode: pie
+          ldflags: -s -w -tags 'netgo osusergo static_build darwin' -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} -extldflags -static
+
 
       - name: check files
         run: pwd && ls && cd build && ls
@@ -99,6 +134,6 @@ jobs:
             build/statping-linux-arm-6
             build/statping-linux-arm-7
             build/statping-linux-arm64
-            build/statping-windows-4.0-386.exe
-            build/statping-windows-4.0-amd64.exe
+            build/statping-windows-6.0-386.exe
+            build/statping-windows-6.0-amd64.exe
 
