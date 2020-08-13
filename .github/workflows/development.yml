@@ -68,7 +68,6 @@ jobs:
         uses: crazy-max/ghaction-xgo@v1
         env:
           VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ env.GITHUB_SHA }}
         with:
           xgo_version: latest
           go_version: 1.15.x
@@ -79,30 +78,28 @@ jobs:
           x: false
           pkg: cmd
           buildmode: pie
-          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} -extldflags -static
+          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ github.sha }} -extldflags -static
 
       - name: Build windows xgo
         uses: crazy-max/ghaction-xgo@v1
         env:
           VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ env.GITHUB_SHA }}
         with:
           xgo_version: latest
           go_version: 1.15.x
           dest: build
           prefix: statping
-          targets: windows-6.0/386,windows-6.0
+          targets: windows-6.0/386,windows-6.0/amd64
           v: false
           x: false
           pkg: cmd
           buildmode: pie
-          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} -extldflags -static
+          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ github.sha }} -extldflags -static
 
       - name: Build darwin xgo
         uses: crazy-max/ghaction-xgo@v1
         env:
           VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ env.GITHUB_SHA }}
         with:
           xgo_version: latest
           go_version: 1.15.x
@@ -113,7 +110,7 @@ jobs:
           x: false
           pkg: cmd
           buildmode: exe
-          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }}
+          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ github.sha }}
 
 
       - name: check files
