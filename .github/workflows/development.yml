@@ -1,9 +1,14 @@
-name: XGO Build Attempt
-on: [push]
+name: Development Build
+on:
+  push:
+    branches:
+      - dev
+    paths-ignore:
+      - '**.md'
 
 jobs:
 
-  compile:
+  compile-frontend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -24,18 +29,19 @@ jobs:
         run: npm install -g yarn sass cross-env
 
       - name: Download Frontend Dependencies
-        if: steps.nodecache.outputs.cache-hit != 'true'
         working-directory: ./frontend
         run: yarn
 
       - name: Download Go mods
-        if: steps.golangcache.outputs.cache-hit != 'true'
         run: |
           go mod download
           go mod verify
           make test-deps
 
       - name: Build Frontend Statping
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
         run: make clean compile
 
       - name: Upload Compiled Frontend (rice-box.go)
@@ -44,9 +50,32 @@ jobs:
           name: static-rice-box
           path: ./source
 
-  xgo-build:
+      - name: Configure AWS credentials for Asset uploads
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
+      - name: Upload Static Assets to S3
+        run: |
+          tar -czvf source.tar.gz source/
+          aws s3 cp source.tar.gz s3://assets.statping.com/commit/${{ github.sha }}/
+          rm -rf source.tar.gz
+
+  compile-binaries:
     needs: compile
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [windows, linux, darwin]
+        arch: [386, amd64, arm-7, arm-6, arm64]
+      exclude:
+        - platform: darwin
+          arch: [386, arm-7, arm-6, arm64]
+        - platform: windows
+          arch: [arm-7, arm-6, arm64]
+
     steps:
       - uses: actions/checkout@v2
 
@@ -61,8 +90,10 @@ jobs:
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
-      - name: check source
-        run: cd source && ls && cd dist && ls
+      - name: Set Build Flags
+        if: matrix.platform != darwin
+        run: echo ::set-env name=BUILD_FLAGS::'-extldflags -static'
+        shell: bash
 
       - name: Build linux xgo
         uses: crazy-max/ghaction-xgo@v1
@@ -74,73 +105,56 @@ jobs:
           go_version: 1.15.x
           dest: build
           prefix: statping
-          targets: linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64
+          targets: ${{ matrix.platform }}/${{ matrix.arch }}
           v: false
           x: false
           pkg: cmd
           buildmode: pie
-          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} -extldflags -static
+          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} ${{ env.BUILD_FLAGS }}
 
-      - name: Build windows xgo
-        uses: crazy-max/ghaction-xgo@v1
-        env:
-          VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ github.sha }}
+      - name: Upload Compiled Statping Binary
+        uses: actions/upload-artifact@v1
         with:
-          xgo_version: latest
-          go_version: 1.15.x
-          dest: build
-          prefix: statping
-          targets: windows/386,windows/amd64
-          v: false
-          x: false
-          pkg: cmd
-          buildmode: pie
-          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} -extldflags -static
-
-      - name: Build darwin xgo
-        uses: crazy-max/ghaction-xgo@v1
-        env:
-          VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ github.sha }}
-        with:
-          xgo_version: latest
-          go_version: 1.15.x
-          dest: build
-          prefix: statping
-          targets: darwin/386,darwin/amd64
-          v: false
-          x: false
-          pkg: cmd
-          buildmode: exe
-          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }}
+          name: statping-${{ matrix.platform }}-${{ matrix.arch }}
+          path: ./build
 
       - name: check files
         run: pwd && ls && cd build && ls
 
-      - name: Rename Binaries
-        run: |
-          mv build/statping-darwin-10.6-amd64 build/statping-darwin-amd64
-          mv build/statping-windows-4.0-amd64.exe build/statping-windows-amd64.exe
-
-      - name: Compress Binaries
-        run: cd build && for i in *; do tar -czf $i.tar.gz $i; done
-
-      - name: Upload Releases
-        id: upload-assets
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ env.VERSION }}
-        with:
-          tag_name: dev-v${{ env.VERSION }}
-          draft: true
-          prerelease: true
-          files: |
-            build/statping-darwin-amd64.tar.gz
-            build/statping-linux-amd64.tar.gz
-            build/statping-linux-arm-6.tar.gz
-            build/statping-linux-arm-7.tar.gz
-            build/statping-linux-arm64.tar.gz
-            build/statping-windows-amd64.exe.tar.gz
+#      - name: Production Ready Binaries
+#        run: |
+#          cd build && chmod +x *
+#          mv statping-darwin-10.6-amd64 statping && tar -czvf statping-darwin-amd64.tar.gz statping && rm -f statping
+#          mv statping-linux-386 statping && tar -czvf statping-linux-386.tar.gz statping && rm -f statping
+#          mv statping-linux-amd64 statping && tar -czvf statping-linux-amd64.tar.gz statping && rm -f statping
+#          mv statping-linux-386 statping && tar -czvf statping-linux-386.tar.gz statping && rm -f statping
+#          mv statping-linux-arm-7 statping && tar -czvf statping-linux-arm-7.tar.gz statping && rm -f statping
+#          mv statping-linux-arm-6 statping && tar -czvf statping-linux-arm-6.tar.gz statping && rm -f statping
+#          mv statping-linux-arm64 statping && tar -czvf statping-linux-arm64.tar.gz statping && rm -f statping
+#          mv statping-windows-4.0-386.exe statping.exe && zip statping-windows-386.zip statping.exe && rm -f statping.exe
+#          mv statping-windows-4.0-amd64.exe statping.exe && zip statping-windows-amd64.zip statping.exe && rm -f statping.exe
+#
+#      - name: Upload Releases
+#        id: upload-assets
+#        uses: softprops/action-gh-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          VERSION: ${{ env.VERSION }}
+#        with:
+#          tag_name: dev-v${{ env.VERSION }}
+#          draft: true
+#          prerelease: true
+#          files: |
+#            build/statping-darwin-amd64.tar.gz
+#            build/statping-linux-386.tar.gz
+#            build/statping-linux-amd64.tar.gz
+#            build/statping-linux-arm-6.tar.gz
+#            build/statping-linux-arm-7.tar.gz
+#            build/statping-linux-arm64.tar.gz
+#            build/statping-windows-386.zip
+#            build/statping-windows-amd64.zip
+#
+#      - name: Upload Compiled Binaries to S3
+#        run: |
+#          aws s3 cp build/*.* s3://assets.statping.com/commit/${{ github.sha }}/
 
