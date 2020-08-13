@@ -70,11 +70,11 @@ jobs:
       matrix:
         platform: [windows, linux, darwin]
         arch: [386, amd64, arm-7, arm-6, arm64]
-      exclude:
-        - platform: darwin
-          arch: [386, arm-7, arm-6, arm64]
-        - platform: windows
-          arch: [arm-7, arm-6, arm64]
+        exclude:
+          - platform: darwin
+            arch: [386, arm-7, arm-6, arm64]
+          - platform: windows
+            arch: [arm-7, arm-6, arm64]
 
     steps:
       - uses: actions/checkout@v2
