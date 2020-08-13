@@ -75,8 +75,9 @@ jobs:
           v: false
           x: false
           pkg: cmd
-          buildmode: default
-          ldflags: -s -w -X main.VERSION=${VERSION} -X main.COMMIT=${{github.sha}} -linkmode external -extldflags -static
+          buildmode: pie
+          tags: netgo osusergo static_build
+          ldflags: -s -w -X main.VERSION=${VERSION} -X main.COMMIT=${github.sha} -extldflags -static
 
       - name: check files
         run: pwd && ls && cd build && ls
@@ -92,10 +93,10 @@ jobs:
           draft: true
           prerelease: true
           files: |
-            builds/statping-linux-amd64
-            builds/statping-linux-arm-6
-            builds/statping-linux-arm-7
-            builds/statping-linux-arm64
-            builds/statping-windows-4.0-386.exe
-            builds/statping-windows-4.0-amd64.ex
+            build/statping-linux-amd64
+            build/statping-linux-arm-6
+            build/statping-linux-arm-7
+            build/statping-linux-arm64
+            build/statping-windows-4.0-386.exe
+            build/statping-windows-4.0-amd64.exe
 
