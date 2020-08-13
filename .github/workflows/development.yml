@@ -56,6 +56,14 @@ jobs:
           name: static-rice-box
           path: ./source
 
+      - name: Add GOBIN to PATH
+        run: |
+          echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
+      - name: check source
+        run: cd source && ls && cd dist && ls
+
       - name: Build with xgo
         uses: crazy-max/ghaction-xgo@v1
         with:
@@ -63,13 +71,31 @@ jobs:
           go_version: 1.15.x
           dest: build
           prefix: statping
-          targets: linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64,windows/386,windows/amd64,windows/arm64,darwin/386,darwin/amd64
-          v: true
+          targets: linux/amd64,linux/386,linux/arm-7,linux/arm-6,linux/arm64,windows/386,windows/amd64,darwin/386,darwin/amd64
+          v: false
           x: false
           pkg: cmd
           buildmode: default
-          ldflags: -s -w -X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT} -linkmode external -extldflags -static
+          ldflags: -s -w -X main.VERSION=${VERSION} -X main.COMMIT=${{github.sha}} -linkmode external -extldflags -static
 
       - name: check files
         run: pwd && ls && cd build && ls
+
+      - name: Upload Releases
+        id: upload-assets
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ env.VERSION }}
+        with:
+          tag_name: dev-v${{ env.VERSION }}
+          draft: true
+          prerelease: true
+          files: |
+            builds/statping-linux-amd64
+            builds/statping-linux-arm-6
+            builds/statping-linux-arm-7
+            builds/statping-linux-arm64
+            builds/statping-windows-4.0-386.exe
+            builds/statping-windows-4.0-amd64.ex
 
