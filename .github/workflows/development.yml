@@ -64,7 +64,7 @@ jobs:
           rm -rf source.tar.gz
 
   compile-binaries:
-    needs: compile
+    needs: compile-frontend
     runs-on: ubuntu-latest
     strategy:
       matrix:
