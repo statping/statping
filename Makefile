@@ -330,11 +330,14 @@ valid-sign:
 	gpg --verify statping.asc
 
 sentry-release:
-	sentry-cli releases --org statping new -p backend -p frontend v${VERSION}
-	sentry-cli releases --org statping set-commits v${VERSION} --auto
+	sentry-cli releases --org statping --project backend new v${VERSION}
+	sentry-cli releases --org statping --project backend set-commits v${VERSION} --auto
+	sentry-cli releases --org statping --project backend finalize v${VERSION}
+	sentry-cli releases --org statping --project frontend new v${VERSION}
+	sentry-cli releases --org statping --project frontend set-commits v${VERSION} --auto
 	sentry-cli releases --org statping --project frontend files v${VERSION} upload ./frontend/dist
 	sentry-cli releases --org statping --project frontend files v${VERSION} upload-sourcemaps ./frontend/dist --no-sourcemap-reference
-	sentry-cli releases --org statping finalize v${VERSION}
+	sentry-cli releases --org statping --project frontend finalize v${VERSION}
 
 download-bins: clean
 	mkdir build || true

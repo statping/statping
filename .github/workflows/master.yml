@@ -482,22 +482,7 @@ jobs:
       - name: Checkout Statping Repo
         uses: actions/checkout@v2
 
-      - name: Setting ENV's
-        run: echo ::set-env name=VERSION::$(cat version.txt)
-        shell: bash
-
-      - name: Sentry Backend Release
-        uses: tclindner/sentry-releases-action@v1.0.0
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_URL: ${{ secrets.SENTRY_URL }}
-          SENTRY_ORG: statping
-          SENTRY_PROJECT: backend
-        with:
-          tagName: v${{ env.VERSION }}
-          environment: production
-
-      - name: Sentry Frontend Release
+      - name: Setup Sentry CLI
         uses: mathrix-education/setup-sentry-cli@master
         with:
           version: latest
@@ -505,10 +490,13 @@ jobs:
           token: ${{ secrets.SENTRY_AUTH_TOKEN }}
           organization: statping
           project: frontend
-        run: |
-          sentry-cli releases new -p frontend v$VERSION
-          sentry-cli releases set-commits --auto v$VERSION
-          sentry-cli releases files v$VERSION upload-sourcemaps source/dist
+
+      - name: Setting ENV's
+        run: echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
+      - name: Sentry Release
+        run: make sentry-release
 
   homebrew-release:
     needs: upload-release
