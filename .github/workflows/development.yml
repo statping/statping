@@ -129,19 +129,19 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Set correct darwin platform name
-        if: matrix.platform == 'macos-latest'
+        if: matrix.platform == macos-latest
         run: echo ::set-env name=PLATFORM::darwin
         shell: bash
       - name: Set correct linux platform name
-        if: matrix.platform == 'ubuntu-latest'
+        if: matrix.platform == ubuntu-latest
         run: echo ::set-env name=PLATFORM::linux
         shell: bash
       - name: Set correct windows name
-        if: matrix.platform == 'windows-latest'
+        if: matrix.platform == windows-latest
         run: echo ::set-env name=PLATFORM::windows
         shell: bash
 
-      - name: Download Compiled Frontend (rice-box.go)
+      - name: Download Statping
         uses: actions/download-artifact@v1
         with:
           name: statping-${{ env.PLATFORM }}-amd64
