@@ -148,8 +148,8 @@ jobs:
       - name: Fix statping permissions
         run: |
           mv bin/statping-${{ env.PLATFORM }}-amd64 bin/statping
-          chmod +x statping
-          mv statping /usr/local/bin/
+          chmod +x bin/statping
+          mv bin/statping /usr/local/bin/statping
 
       - name: Run 'statping version'
         run: statping version
