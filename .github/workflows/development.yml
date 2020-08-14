@@ -133,6 +133,9 @@ jobs:
       - name: Download All Binaries
         uses: actions/download-artifact@v2
 
+      - name: Contents
+        run: ls -R
+
       - name: Production Ready Binaries
         run: |
           cd build && chmod +x *
