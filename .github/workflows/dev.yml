@@ -15,6 +15,7 @@ jobs:
   compile:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
           go-version: '1.14.2'
@@ -27,7 +28,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
-      - uses: actions/checkout@v2
 
       - name: Add GOBIN to PATH
         run: |
@@ -90,13 +90,13 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
+      - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
           go-version: '1.14.2'
       - uses: actions/setup-node@v1
         with:
           node-version: '12.18.2'
-      - uses: actions/checkout@v2
 
       - name: Install Global Dependencies
         run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
