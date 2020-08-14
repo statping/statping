@@ -121,6 +121,47 @@ jobs:
       - name: check files
         run: pwd && ls && cd build && ls
 
+  test-binary-on-platform:
+    needs: compile-binaries
+    strategy:
+      matrix:
+        os: [macos-latest,ubuntu-latest,windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Set correct darwin platform name
+        if: matrix.platform == 'macos-latest'
+        run: echo ::set-env name=PLATFORM::darwin
+        shell: bash
+      - name: Set correct linux platform name
+        if: matrix.platform == 'ubuntu-latest'
+        run: echo ::set-env name=PLATFORM::linux
+        shell: bash
+      - name: Set correct windows name
+        if: matrix.platform == 'windows-latest'
+        run: echo ::set-env name=PLATFORM::windows
+        shell: bash
+
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v1
+        with:
+          name: statping-${{ env.PLATFORM }}-amd64
+          path: ./
+
+      - name: Fix statping permissions
+        run: |
+          mv statping-${{ env.PLATFORM }}-amd64 statping
+          chmod +x statping
+
+      - name: Run 'statping version'
+        run: ./statping version
+
+      - name: Run Statping on port 80
+        env:
+          DB_CONN: sqlite
+          API_SECRET: demoapisecret123
+        run: ./statping --port 80
+
+
 #      - name: Production Ready Binaries
 #        run: |
 #          cd build && chmod +x *
