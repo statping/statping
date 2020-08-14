@@ -132,6 +132,8 @@ jobs:
 
       - name: Download All Binaries
         uses: actions/download-artifact@v2
+        with:
+          path: ./build
 
       - name: Contents
         run: ls -R
