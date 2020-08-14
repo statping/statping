@@ -145,8 +145,8 @@ jobs:
           mv statping-linux-386 statping && tar -czvf statping-linux-386.tar.gz statping && rm -f statping
           mv statping-linux-amd64 statping && tar -czvf statping-linux-amd64.tar.gz statping && rm -f statping
           mv statping-linux-386 statping && tar -czvf statping-linux-386.tar.gz statping && rm -f statping
-          mv statping-linux-arm-7 statping && tar -czvf statping-linux-arm-7.tar.gz statping && rm -f statping
-          mv statping-linux-arm-6 statping && tar -czvf statping-linux-arm-6.tar.gz statping && rm -f statping
+          mv statping-linux-arm-7 statping && tar -czvf statping-linux-arm7.tar.gz statping && rm -f statping
+          mv statping-linux-arm-6 statping && tar -czvf statping-linux-arm6.tar.gz statping && rm -f statping
           mv statping-linux-arm64 statping && tar -czvf statping-linux-arm64.tar.gz statping && rm -f statping
           mv statping-windows-4.0-386.exe statping.exe && zip statping-windows-386.zip statping.exe && rm -f statping.exe
           mv statping-windows-4.0-amd64.exe statping.exe && zip statping-windows-amd64.zip statping.exe && rm -f statping.exe
@@ -165,8 +165,8 @@ jobs:
             build/statping-darwin-amd64.tar.gz
             build/statping-linux-386.tar.gz
             build/statping-linux-amd64.tar.gz
-            build/statping-linux-arm-6.tar.gz
-            build/statping-linux-arm-7.tar.gz
+            build/statping-linux-arm6.tar.gz
+            build/statping-linux-arm7.tar.gz
             build/statping-linux-arm64.tar.gz
             build/statping-windows-386.zip
             build/statping-windows-amd64.zip
