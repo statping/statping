@@ -116,85 +116,52 @@ jobs:
           name: statping-${{ matrix.platform }}-${{ matrix.arch }}
           path: ./build
 
-      - name: check files
-        run: pwd && ls && cd build && ls
 
-  test-binary-on-platform:
+  package:
     needs: build
-    strategy:
-      matrix:
-        os: [macos-latest,ubuntu-latest,windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
-      - name: Set correct darwin platform name
-        if: matrix.os == 'macos-latest'
-        run: echo ::set-env name=PLATFORM::darwin
-        shell: bash
-      - name: Set correct linux platform name
-        if: matrix.os == 'ubuntu-latest'
-        run: echo ::set-env name=PLATFORM::linux
-        shell: bash
-      - name: Set correct windows name
-        if: matrix.os == 'windows-latest'
-        run: echo ::set-env name=PLATFORM::windows
-        shell: bash
+      - uses: actions/checkout@v2
 
-      - name: Download Statping
-        uses: actions/download-artifact@v1
+      - name: Download All Binaries
+        uses: actions/download-artifact@v2
         with:
-          name: statping-${{ env.PLATFORM }}-amd64
-          path: ./bin
+          path: ./build
 
-      - name: Fix statping permissions
+      - name: Production Ready Binaries
         run: |
-          mv bin/statping-${{ env.PLATFORM }}-amd64 bin/statping
-          chmod +x bin/statping
-          mv bin/statping /usr/local/bin/statping
+          cd build && chmod +x *
+          mv statping-darwin-10.6-amd64 statping && tar -czvf statping-darwin-amd64.tar.gz statping && rm -f statping
+          mv statping-linux-386 statping && tar -czvf statping-linux-386.tar.gz statping && rm -f statping
+          mv statping-linux-amd64 statping && tar -czvf statping-linux-amd64.tar.gz statping && rm -f statping
+          mv statping-linux-386 statping && tar -czvf statping-linux-386.tar.gz statping && rm -f statping
+          mv statping-linux-arm-7 statping && tar -czvf statping-linux-arm-7.tar.gz statping && rm -f statping
+          mv statping-linux-arm-6 statping && tar -czvf statping-linux-arm-6.tar.gz statping && rm -f statping
+          mv statping-linux-arm64 statping && tar -czvf statping-linux-arm64.tar.gz statping && rm -f statping
+          mv statping-windows-4.0-386.exe statping.exe && zip statping-windows-386.zip statping.exe && rm -f statping.exe
+          mv statping-windows-4.0-amd64.exe statping.exe && zip statping-windows-amd64.zip statping.exe && rm -f statping.exe
 
-      - name: Run 'statping version'
-        run: statping version
-
-      - name: Run Statping on port 80
+      - name: Upload Releases
+        id: upload-assets
+        uses: softprops/action-gh-release@v1
         env:
-          DB_CONN: sqlite
-          API_SECRET: demoapisecret123
-        run: statping --port 80
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ env.VERSION }}
+        with:
+          tag_name: dev-v${{ env.VERSION }}
+          draft: true
+          prerelease: true
+          files: |
+            build/statping-darwin-amd64.tar.gz
+            build/statping-linux-386.tar.gz
+            build/statping-linux-amd64.tar.gz
+            build/statping-linux-arm-6.tar.gz
+            build/statping-linux-arm-7.tar.gz
+            build/statping-linux-arm64.tar.gz
+            build/statping-windows-386.zip
+            build/statping-windows-amd64.zip
 
-
-#      - name: Production Ready Binaries
-#        run: |
-#          cd build && chmod +x *
-#          mv statping-darwin-10.6-amd64 statping && tar -czvf statping-darwin-amd64.tar.gz statping && rm -f statping
-#          mv statping-linux-386 statping && tar -czvf statping-linux-386.tar.gz statping && rm -f statping
-#          mv statping-linux-amd64 statping && tar -czvf statping-linux-amd64.tar.gz statping && rm -f statping
-#          mv statping-linux-386 statping && tar -czvf statping-linux-386.tar.gz statping && rm -f statping
-#          mv statping-linux-arm-7 statping && tar -czvf statping-linux-arm-7.tar.gz statping && rm -f statping
-#          mv statping-linux-arm-6 statping && tar -czvf statping-linux-arm-6.tar.gz statping && rm -f statping
-#          mv statping-linux-arm64 statping && tar -czvf statping-linux-arm64.tar.gz statping && rm -f statping
-#          mv statping-windows-4.0-386.exe statping.exe && zip statping-windows-386.zip statping.exe && rm -f statping.exe
-#          mv statping-windows-4.0-amd64.exe statping.exe && zip statping-windows-amd64.zip statping.exe && rm -f statping.exe
-#
-#      - name: Upload Releases
-#        id: upload-assets
-#        uses: softprops/action-gh-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          VERSION: ${{ env.VERSION }}
-#        with:
-#          tag_name: dev-v${{ env.VERSION }}
-#          draft: true
-#          prerelease: true
-#          files: |
-#            build/statping-darwin-amd64.tar.gz
-#            build/statping-linux-386.tar.gz
-#            build/statping-linux-amd64.tar.gz
-#            build/statping-linux-arm-6.tar.gz
-#            build/statping-linux-arm-7.tar.gz
-#            build/statping-linux-arm64.tar.gz
-#            build/statping-windows-386.zip
-#            build/statping-windows-amd64.zip
-#
-#      - name: Upload Compiled Binaries to S3
-#        run: |
-#          aws s3 cp build/*.* s3://assets.statping.com/commit/${{ github.sha }}/
+      - name: Upload Compiled Binaries to S3
+        run: |
+          aws s3 cp build/*.* s3://assets.statping.com/commit/${{ github.sha }}/
 
