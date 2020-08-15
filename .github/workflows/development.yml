@@ -63,105 +63,6 @@ jobs:
           aws s3 cp source.tar.gz s3://assets.statping.com/commit/${{ github.sha }}/
           rm -rf source.tar.gz
 
-  test:
-    needs: frontend
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:10.8
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: password123
-          POSTGRES_DB: statping
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: password123
-          MYSQL_DATABASE: statping
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
-        with:
-          go-version: 1.15.x
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12.18.2
-
-      - name: Install Global Dependencies
-        run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
-
-      - name: Setting ENV's
-        run: |
-          echo "::add-path::$(go env GOPATH)/bin"
-          echo "::add-path::/opt/hostedtoolcache/node/12.18.2/x64/bin"
-          echo ::set-env name=VERSION::$(cat version.txt)
-        shell: bash
-
-      - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v1
-        with:
-          name: static-rice-box
-          path: ./source
-
-      - name: Install Statping
-        env:
-          VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ github.sha }}
-        run: |
-          make build certs
-          chmod +x statping
-          mv statping $(go env GOPATH)/bin/
-
-      - name: Go Tests
-        run: |
-          go get gotest.tools/gotestsum
-          gotestsum --no-summary=skipped --format dots -- -covermode=count -coverprofile=coverage.out -p=1 ./...
-        env:
-          VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ github.sha }}
-          DB_CONN: sqlite3
-          STATPING_DIR: ${{ github.workspace }}
-          API_SECRET: demopassword123
-          DISABLE_LOGS: false
-          ALLOW_REPORTS: true
-          COVERALLS: ${{ secrets.COVERALLS }}
-          DISCORD_URL: ${{ secrets.DISCORD_URL }}
-          EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
-          EMAIL_USER: ${{ secrets.EMAIL_USER }}
-          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
-          EMAIL_OUTGOING: ${{ secrets.EMAIL_OUTGOING }}
-          EMAIL_SEND_TO: ${{ secrets.EMAIL_SEND_TO }}
-          EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
-          MOBILE_ID: ${{ secrets.MOBILE_ID }}
-          MOBILE_NUMBER: ${{ secrets.MOBILE_NUMBER }}
-          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
-          PUSHOVER_API: ${{ secrets.PUSHOVER_API }}
-          SLACK_URL: ${{ secrets.SLACK_URL }}
-          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
-          TWILIO_SID: ${{ secrets.TWILIO_SID }}
-          TWILIO_SECRET: ${{ secrets.TWILIO_SECRET }}
-          TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
-          TWILIO_TO: ${{ secrets.TWILIO_TO }}
-          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
-          GOTIFY_URL: ${{ secrets.GOTIFY_URL }}
-          GOTIFY_TOKEN: ${{ secrets.GOTIFY_TOKEN }}
-
-      - name: Coveralls Testing Coverage
-        run: |
-          go get github.com/mattn/goveralls
-          goveralls -coverprofile=coverage.out -repotoken $COVERALLS
-        env:
-          COVERALLS: ${{ secrets.COVERALLS }}
-
   build:
     needs: frontend
     runs-on: ubuntu-latest
@@ -267,6 +168,106 @@ jobs:
         run: |
           aws s3 cp build/${{ env.compressed }} s3://assets.statping.com/commit/${{ github.sha }}/
 
+  test:
+    needs: frontend
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:10.8
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password123
+          POSTGRES_DB: statping
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: password123
+          MYSQL_DATABASE: statping
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.15.x
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.18.2
+
+      - name: Install Global Dependencies
+        run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
+
+      - name: Setting ENV's
+        run: |
+          echo "::add-path::$(go env GOPATH)/bin"
+          echo "::add-path::/opt/hostedtoolcache/node/12.18.2/x64/bin"
+          echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
+
+      - name: Install Statping
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          make build certs
+          chmod +x statping
+          mv statping $(go env GOPATH)/bin/
+
+      - name: Go Tests
+        run: |
+          go get gotest.tools/gotestsum
+          gotestsum --no-summary=skipped --format dots -- -covermode=count -coverprofile=coverage.out -p=1 ./...
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
+          DB_CONN: sqlite3
+          STATPING_DIR: ${{ github.workspace }}
+          API_SECRET: demopassword123
+          DISABLE_LOGS: false
+          ALLOW_REPORTS: true
+          COVERALLS: ${{ secrets.COVERALLS }}
+          DISCORD_URL: ${{ secrets.DISCORD_URL }}
+          EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          EMAIL_OUTGOING: ${{ secrets.EMAIL_OUTGOING }}
+          EMAIL_SEND_TO: ${{ secrets.EMAIL_SEND_TO }}
+          EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+          MOBILE_ID: ${{ secrets.MOBILE_ID }}
+          MOBILE_NUMBER: ${{ secrets.MOBILE_NUMBER }}
+          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
+          PUSHOVER_API: ${{ secrets.PUSHOVER_API }}
+          SLACK_URL: ${{ secrets.SLACK_URL }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
+          TWILIO_SID: ${{ secrets.TWILIO_SID }}
+          TWILIO_SECRET: ${{ secrets.TWILIO_SECRET }}
+          TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
+          TWILIO_TO: ${{ secrets.TWILIO_TO }}
+          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+          GOTIFY_URL: ${{ secrets.GOTIFY_URL }}
+          GOTIFY_TOKEN: ${{ secrets.GOTIFY_TOKEN }}
+
+      - name: Coveralls Testing Coverage
+        run: |
+          go get github.com/mattn/goveralls
+          goveralls -coverprofile=coverage.out -repotoken $COVERALLS
+        env:
+          COVERALLS: ${{ secrets.COVERALLS }}
+
+
   test-postman:
     needs: [frontend, build]
     runs-on: ubuntu-latest
@@ -279,15 +280,15 @@ jobs:
       - name: Download Statping
         uses: actions/download-artifact@v1
         with:
-          name: wiiwiwoiwjjiwji90828!!@)
-          path: ./source
+          name: statping-linux-amd64
+          path: ./build
 
       - name: Install Statping
         env:
           VERSION: ${{ env.VERSION }}
           COMMIT: ${{ github.sha }}
         run: |
-          make build
+          ls -R
           chmod +x statping
           mv statping $(go env GOPATH)/bin/
 
