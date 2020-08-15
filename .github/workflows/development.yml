@@ -14,10 +14,10 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
-          go-version: '1.14.2'
+          go-version: 1.15.x
       - uses: actions/setup-node@v1
         with:
-          node-version: '12.18.2'
+          node-version: 12.18.2
 
       - name: Set Version
         run: |
@@ -245,9 +245,6 @@ jobs:
           tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
           echo ::set-env name=compressed::statping-darwin-${{ matrix.arch }}.tar.gz
 
-        id: compress
-
-
       - name: Upload Compiled Statping Binary
         uses: actions/upload-artifact@v1
         with:
@@ -268,7 +265,7 @@ jobs:
 
       - name: Upload Compiled Binaries to S3
         run: |
-          aws s3 cp build/${{ steps.vars.outputs.compressed }} s3://assets.statping.com/commit/${{ github.sha }}/
+          aws s3 cp build/${{ env.compressed }} s3://assets.statping.com/commit/${{ github.sha }}/
 
   test-postman:
     needs: [frontend, build]
