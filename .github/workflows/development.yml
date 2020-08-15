@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: '12.18.2'
 
-      - name: Add GOBIN to PATH
+      - name: Set Version
         run: |
           echo "::add-path::$(go env GOPATH)/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
@@ -63,18 +63,40 @@ jobs:
           aws s3 cp source.tar.gz s3://assets.statping.com/commit/${{ github.sha }}/
           rm -rf source.tar.gz
 
-  test-postman:
+  test:
     needs: frontend
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        platform: [postman_env_sqlite.json, postman_env_postgres.json, postman_env_mysql.json]
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:10.8
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password123
+          POSTGRES_DB: statping
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: password123
+          MYSQL_DATABASE: statping
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
           go-version: 1.15.x
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.18.2
+
+      - name: Install Global Dependencies
+        run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
 
       - name: Setting ENV's
         run: |
@@ -94,23 +116,51 @@ jobs:
           VERSION: ${{ env.VERSION }}
           COMMIT: ${{ github.sha }}
         run: |
-          make build
+          make build certs
           chmod +x statping
           mv statping $(go env GOPATH)/bin/
 
-      - name: Run Statping
+      - name: Go Tests
         run: |
-          API_SECRET=demosecret123 statping --port=8585 > /dev/null &
-          sleep 5
+          go get gotest.tools/gotestsum
+          gotestsum --no-summary=skipped --format dots -- -covermode=count -coverprofile=coverage.out -p=1 ./...
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
+          DB_CONN: sqlite3
+          STATPING_DIR: ${{ github.workspace }}
+          API_SECRET: demopassword123
+          DISABLE_LOGS: false
+          ALLOW_REPORTS: true
+          COVERALLS: ${{ secrets.COVERALLS }}
+          DISCORD_URL: ${{ secrets.DISCORD_URL }}
+          EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          EMAIL_OUTGOING: ${{ secrets.EMAIL_OUTGOING }}
+          EMAIL_SEND_TO: ${{ secrets.EMAIL_SEND_TO }}
+          EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+          MOBILE_ID: ${{ secrets.MOBILE_ID }}
+          MOBILE_NUMBER: ${{ secrets.MOBILE_NUMBER }}
+          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
+          PUSHOVER_API: ${{ secrets.PUSHOVER_API }}
+          SLACK_URL: ${{ secrets.SLACK_URL }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
+          TWILIO_SID: ${{ secrets.TWILIO_SID }}
+          TWILIO_SECRET: ${{ secrets.TWILIO_SECRET }}
+          TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
+          TWILIO_TO: ${{ secrets.TWILIO_TO }}
+          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+          GOTIFY_URL: ${{ secrets.GOTIFY_URL }}
+          GOTIFY_TOKEN: ${{ secrets.GOTIFY_TOKEN }}
 
-      - name: Postman Tests
-        uses: matt-ball/newman-action@master
-        with:
-          apiKey: ${{ secrets.POSTMAN_API }}
-          collection: ./dev/postman.json
-          environment: ./dev/${{ matrix.platform }}
-          timeoutRequest: 30000
-          delayRequest: 600
+      - name: Coveralls Testing Coverage
+        run: |
+          go get github.com/mattn/goveralls
+          goveralls -coverprofile=coverage.out -repotoken $COVERALLS
+        env:
+          COVERALLS: ${{ secrets.COVERALLS }}
 
   build:
     needs: frontend
@@ -175,7 +225,7 @@ jobs:
           mv statping-linux-${{ matrix.arch }} statping
           chmod +x statping
           tar -czvf statping-linux-${{ matrix.arch }}.tar.gz statping
-          echo ::set-output name=compressed::statping-linux-${{ matrix.arch }}.tar.gz
+          echo ::set-env name=compressed::statping-linux-${{ matrix.arch }}.tar.gz
 
       - name: Compress Windows Builds
         if: matrix.platform == 'windows'
@@ -184,7 +234,7 @@ jobs:
           mv statping-windows-4.0-${{ matrix.arch }}.exe statping.exe
           chmod +x statping.exe
           zip statping-windows-${{ matrix.arch }}.zip statping.exe
-          echo ::set-output name=compressed::statping-windows-${{ matrix.arch }}.zip
+          echo ::set-env name=compressed::statping-windows-${{ matrix.arch }}.zip
 
       - name: Compress Darwin Builds
         if: matrix.platform == 'darwin'
@@ -193,10 +243,13 @@ jobs:
           mv statping-darwin-10.6-${{ matrix.arch }} statping
           chmod +x statping
           tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
-          echo ::set-output name=compressed::statping-darwin-${{ matrix.arch }}.tar.gz
+          echo ::set-env name=compressed::statping-darwin-${{ matrix.arch }}.tar.gz
+
+        id: compress
+
 
       - name: Upload Compiled Statping Binary
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v1
         with:
           name: statping-${{ matrix.platform }}-${{ matrix.arch }}
           path: ./build
@@ -211,8 +264,46 @@ jobs:
           tag_name: dev-v${{ env.VERSION }}
           draft: true
           prerelease: true
-          files: build/${{ steps.vars.outputs.compressed }}
+          files: build/${{ env.compressed }}
 
       - name: Upload Compiled Binaries to S3
         run: |
           aws s3 cp build/${{ steps.vars.outputs.compressed }} s3://assets.statping.com/commit/${{ github.sha }}/
+
+  test-postman:
+    needs: [frontend, build]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [postman_env_sqlite.json, postman_env_postgres.json, postman_env_mysql.json]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download Statping
+        uses: actions/download-artifact@v1
+        with:
+          name: wiiwiwoiwjjiwji90828!!@)
+          path: ./source
+
+      - name: Install Statping
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          make build
+          chmod +x statping
+          mv statping $(go env GOPATH)/bin/
+
+      - name: Run Statping
+        run: |
+          API_SECRET=demosecret123 statping --port=8585 > /dev/null &
+          sleep 5
+
+      - name: Postman Tests
+        uses: matt-ball/newman-action@master
+        with:
+          apiKey: ${{ secrets.POSTMAN_API }}
+          collection: ./dev/postman.json
+          environment: ./dev/${{ matrix.platform }}
+          timeoutRequest: 30000
+          delayRequest: 600
