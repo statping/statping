@@ -85,17 +85,24 @@ jobs:
           name: static-rice-box
           path: ./source
 
+      - name: Configure AWS credentials for Asset uploads
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
       - name: Add GOBIN to PATH
         run: |
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
-      - name: Set Build Flags
+      - name: Set Linux Build Flags
         if: matrix.platform != 'darwin'
         run: echo ::set-env name=BUILD_FLAGS::'-extldflags -static'
         shell: bash
 
-      - name: Build linux xgo
+      - name: Build ${{ matrix.platform }}/${{ matrix.arch }}
         uses: crazy-max/ghaction-xgo@v1
         env:
           VERSION: ${{ env.VERSION }}
@@ -112,43 +119,38 @@ jobs:
           buildmode: pie
           ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} ${{ env.BUILD_FLAGS }}
 
+      - name: Compress Linux Builds
+        if: matrix.platform == 'linux'
+        run: |
+          cd build
+          mv statping-linux-${{ matrix.arch }} statping
+          chmod +x statping
+          tar -czvf statping-linux-${{ matrix.arch }}.tar.gz statping
+          echo ::set-output name=compressed::statping-linux-${{ matrix.arch }}.tar.gz
+
+      - name: Compress Windows Builds
+        if: matrix.platform == 'windows'
+        run: |
+          cd build
+          mv statping-windows-4.0-${{ matrix.arch }}.exe statping.exe
+          chmod +x statping.exe
+          zip statping-windows-${{ matrix.arch }}.zip statping.exe
+          echo ::set-output name=compressed::statping-windows-${{ matrix.arch }}.zip
+
+      - name: Compress Darwin Builds
+        if: matrix.platform == 'darwin'
+        run: |
+          cd build
+          mv statping-darwin-10.6-${{ matrix.arch }} statping
+          chmod +x statping
+          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
+          echo ::set-output name=compressed::statping-darwin-${{ matrix.arch }}.tar.gz
+
       - name: Upload Compiled Statping Binary
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: statping-${{ matrix.platform }}-${{ matrix.arch }}
           path: ./build
-
-
-  package:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set Version
-        run: |
-          echo ::set-env name=VERSION::$(cat version.txt)
-        shell: bash
-
-      - name: Download All Binaries
-        uses: actions/download-artifact@v2
-        with:
-          path: ./build
-
-      - name: Contents
-        run: ls -R
-
-      - name: Production Ready Binaries
-        run: |
-          cd build && chmod +x *
-          mv statping-darwin-amd64 statping && tar -czvf statping-darwin-amd64.tar.gz statping && rm -f statping
-          mv statping-linux-amd64 statping && tar -czvf statping-linux-amd64.tar.gz statping && rm -f statping
-          mv statping-linux-386 statping && tar -czvf statping-linux-386.tar.gz statping && rm -f statping
-          mv statping-linux-arm-7 statping && tar -czvf statping-linux-arm7.tar.gz statping && rm -f statping
-          mv statping-linux-arm-6 statping && tar -czvf statping-linux-arm6.tar.gz statping && rm -f statping
-          mv statping-linux-arm64 statping && tar -czvf statping-linux-arm64.tar.gz statping && rm -f statping
-          mv statping-windows-4.0-386.exe statping.exe && zip statping-windows-386.zip statping.exe && rm -f statping.exe
-          mv statping-windows-amd64.exe statping.exe && zip statping-windows-amd64.zip statping.exe && rm -f statping.exe
 
       - name: Upload Releases
         id: upload-assets
@@ -160,17 +162,8 @@ jobs:
           tag_name: dev-v${{ env.VERSION }}
           draft: true
           prerelease: true
-          files: |
-            build/statping-darwin-amd64.tar.gz
-            build/statping-linux-386.tar.gz
-            build/statping-linux-amd64.tar.gz
-            build/statping-linux-arm6.tar.gz
-            build/statping-linux-arm7.tar.gz
-            build/statping-linux-arm64.tar.gz
-            build/statping-windows-386.zip
-            build/statping-windows-amd64.zip
+          files: build/${{ steps.vars.outputs.compressed }}
 
       - name: Upload Compiled Binaries to S3
         run: |
-          aws s3 cp build/*.* s3://assets.statping.com/commit/${{ github.sha }}/
-
+          aws s3 cp build/${{ steps.vars.outputs.compressed }} s3://assets.statping.com/commit/${{ github.sha }}/
