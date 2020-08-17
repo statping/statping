@@ -424,6 +424,40 @@ jobs:
           timeoutRequest: 30000
           delayRequest: 600
 
+  docker-release:
+    needs: [test, build, test-postman-sqlite, test-postman-mysql, test-postman-postgres]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Statping Repo
+        uses: actions/checkout@v2
+
+      - name: Setting ENV's
+        run: echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
+      - name: Set up Docker Buildx
+        uses: crazy-max/ghaction-docker-buildx@v3
+
+      - name: Docker Login
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        id: buildx-docker-master
+        with:
+          path: /tmp/.buildx-cache
+          key: buildx-docker-master
+          restore-keys: |
+            buildx-docker-master
+      - name: Docker Build :base
+        run: make buildx-base
+
+      - name: Docker Build :dev
+        run: make buildx-dev
+
   sentry-release:
     needs: [test, test-postman-sqlite, test-postman-postgres, test-postman-mysql]
     runs-on: ubuntu-latest
