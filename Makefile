@@ -335,8 +335,8 @@ sentry-release:
 	sentry-cli releases --org statping --project backend finalize v${VERSION}
 	sentry-cli releases --org statping --project frontend new v${VERSION}
 	sentry-cli releases --org statping --project frontend set-commits v${VERSION} --auto
-	sentry-cli releases --org statping --project frontend files v${VERSION} upload ./frontend/dist
-	sentry-cli releases --org statping --project frontend files v${VERSION} upload-sourcemaps ./frontend/dist --no-sourcemap-reference
+	sentry-cli releases --org statping --project frontend files v${VERSION} upload ./source/dist
+	sentry-cli releases --org statping --project frontend files v${VERSION} upload-sourcemaps ./source/dist --no-sourcemap-reference
 	sentry-cli releases --org statping --project frontend finalize v${VERSION}
 
 download-bins: clean
