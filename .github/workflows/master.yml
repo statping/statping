@@ -254,64 +254,8 @@ jobs:
         env:
           COVERALLS: ${{ secrets.COVERALLS }}
 
-
-  test-postman:
-    needs: [frontend, build]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        platform: [postman_env_sqlite.json, postman_env_postgres.json, postman_env_mysql.json]
-    services:
-      postgres:
-        image: postgres:10.8
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: password123
-          POSTGRES_DB: statping
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: password123
-          MYSQL_DATABASE: statping
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Download Statping
-        uses: actions/download-artifact@v1
-        with:
-          name: statping-linux-amd64
-          path: ./build
-
-      - name: Install Statping
-        env:
-          VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ github.sha }}
-        run: |
-          cd build && tar -xvf statping-linux-amd64.tar.gz
-          mv statping ../
-
-      - name: Run Statping
-        run: |
-          API_SECRET=demosecret123 ./statping --ip=0.0.0.0 --port=8585 > /dev/null &
-          sleep 15
-
-      - name: Postman Tests
-        uses: matt-ball/newman-action@master
-        with:
-          apiKey: ${{ secrets.POSTMAN_API }}
-          collection: ./dev/postman.json
-          environment: ./dev/${{ matrix.platform }}
-          timeoutRequest: 30000
-          delayRequest: 600
-
   release:
-    needs: [build, test, test-postman]
+    needs: [build, test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
