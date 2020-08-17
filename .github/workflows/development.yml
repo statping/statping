@@ -276,7 +276,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        platform: [postman_env_sqlite.json, postman_env_postgres.json, postman_env_mysql.json]
+        platform: [postman_env_sqlite.json]
+#        platform: [postman_env_sqlite.json, postman_env_postgres.json, postman_env_mysql.json]
     services:
       postgres:
         image: postgres:10.8
@@ -314,8 +315,8 @@ jobs:
 
       - name: Run Statping
         run: |
-          API_SECRET=demosecret123 ./statping --port=8585 > /dev/null &
-          sleep 5
+          API_SECRET=demosecret123 ./statping --ip=0.0.0.0 --port=8585 > /dev/null &
+          sleep 15
 
       - name: Postman Tests
         uses: matt-ball/newman-action@master

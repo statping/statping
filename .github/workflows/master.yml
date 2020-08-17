@@ -155,22 +155,6 @@ jobs:
           name: statping-${{ matrix.platform }}-${{ matrix.arch }}
           path: ./build
 
-      - name: Upload Releases
-        id: upload-assets
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ env.VERSION }}
-        with:
-          tag_name: dev-v${{ env.VERSION }}
-          draft: true
-          prerelease: true
-          files: build/${{ env.compressed }}
-
-      - name: Upload Compiled Binaries to S3
-        run: |
-          aws s3 cp build/${{ env.compressed }} s3://assets.statping.com/commit/${{ github.sha }}/
-
   test:
     needs: frontend
     runs-on: ubuntu-latest
@@ -314,8 +298,8 @@ jobs:
 
       - name: Run Statping
         run: |
-          API_SECRET=demosecret123 ./statping --port=8585 > /dev/null &
-          sleep 5
+          API_SECRET=demosecret123 ./statping --ip=0.0.0.0 --port=8585 > /dev/null &
+          sleep 15
 
       - name: Postman Tests
         uses: matt-ball/newman-action@master
@@ -326,8 +310,40 @@ jobs:
           timeoutRequest: 30000
           delayRequest: 600
 
+  release:
+    needs: [build, test, test-postman]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get Version
+        run: |
+          echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
+      - name: Download Compiled Binaries
+        uses: actions/download-artifact@v1
+        with:
+          path: ./build
+
+      - name: Upload Releases
+        id: upload-assets
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ env.VERSION }}
+        with:
+          tag_name: v${{ env.VERSION }}
+          draft: false
+          prerelease: true
+          files: build/${{ env.compressed }}
+
+      - name: Upload Compiled Binaries to S3
+        run: |
+          aws s3 cp build/*.* s3://assets.statping.com/commit/${{ github.sha }}/
+
   sentry-release:
-    needs: [test, test-postman]
+    needs: release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -349,7 +365,7 @@ jobs:
         run: make sentry-release
 
   homebrew-release:
-    needs: [frontend, build, test, test-postman]
+    needs: release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -366,7 +382,7 @@ jobs:
         run: make publish-homebrew
 
   slack-update:
-    needs: [frontend, build, test, test-postman]
+    needs: [release]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
