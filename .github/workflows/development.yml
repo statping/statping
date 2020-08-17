@@ -309,9 +309,8 @@ jobs:
           VERSION: ${{ env.VERSION }}
           COMMIT: ${{ github.sha }}
         run: |
-          ls -R
           cd build && tar -xvf statping-linux-amd64.tar.gz
-          mv statping /usr/local/bin/
+          mv statping ../
 
       - name: Run Statping
         run: |
@@ -326,3 +325,26 @@ jobs:
           environment: ./dev/${{ matrix.platform }}
           timeoutRequest: 30000
           delayRequest: 600
+
+
+  sentry-release:
+    needs: [test, test-postman]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Statping Repo
+        uses: actions/checkout@v2
+
+      - name: Setup Sentry CLI
+        uses: mathrix-education/setup-sentry-cli@master
+        with:
+          version: latest
+          url: ${{ secrets.SENTRY_URL }}
+          token: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          organization: statping
+
+      - name: Setting ENV's
+        run: echo ::set-env name=VERSION::$(cat version.txt)
+        shell: bash
+
+      - name: Sentry Release
+        run: make sentry-release
