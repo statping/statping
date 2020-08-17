@@ -305,12 +305,12 @@ jobs:
           path: ./build
 
       - name: Install Statping
-        env:
-          VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ github.sha }}
         run: |
           cd build && tar -xvf statping-linux-amd64.tar.gz
           mv statping ../
+
+      - name: Get Statping Version
+        run: ./statping version
 
       - name: Run Statping
         run: |
@@ -323,7 +323,7 @@ jobs:
           apiKey: ${{ secrets.POSTMAN_API }}
           collection: ./dev/postman.json
           environment: ./dev/${{ matrix.platform }}
-          timeoutRequest: 30000
+          timeoutRequest: 60000
           delayRequest: 600
 
   sentry-release:
