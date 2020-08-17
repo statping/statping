@@ -314,7 +314,7 @@ jobs:
 
       - name: Run Statping
         run: |
-          API_SECRET=demosecret123 statping --port=8585 > /dev/null &
+          API_SECRET=demosecret123 ./statping --port=8585 > /dev/null &
           sleep 5
 
       - name: Postman Tests
