@@ -60,9 +60,16 @@ func SentryErr(err error) {
 	sentry.CaptureException(err)
 }
 
+func sentryTags() map[string]string {
+	val := make(map[string]string)
+	val["database"] = Params.GetString("DB_CONN")
+	return val
+}
+
 func SentryLogEntry(entry *Logger.Entry) {
 	e := sentry.NewEvent()
 	e.Message = entry.Message
+	e.Tags = sentryTags()
 	e.Release = Version
 	e.Contexts = entry.Data
 	sentry.CaptureEvent(e)

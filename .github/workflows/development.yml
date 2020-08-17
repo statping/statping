@@ -326,7 +326,6 @@ jobs:
           timeoutRequest: 30000
           delayRequest: 600
 
-
   sentry-release:
     needs: [test, test-postman]
     runs-on: ubuntu-latest
