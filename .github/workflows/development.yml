@@ -126,6 +126,7 @@ jobs:
           mv statping-linux-${{ matrix.arch }} statping
           chmod +x statping
           tar -czvf statping-linux-${{ matrix.arch }}.tar.gz statping
+          rm -rf statping
           echo ::set-env name=compressed::statping-linux-${{ matrix.arch }}.tar.gz
 
       - name: Compress Windows Builds
@@ -135,6 +136,7 @@ jobs:
           mv statping-windows-4.0-${{ matrix.arch }}.exe statping.exe
           chmod +x statping.exe
           zip statping-windows-${{ matrix.arch }}.zip statping.exe
+          rm -rf statping.exe
           echo ::set-env name=compressed::statping-windows-${{ matrix.arch }}.zip
 
       - name: Compress Darwin Builds
@@ -144,6 +146,7 @@ jobs:
           mv statping-darwin-10.6-${{ matrix.arch }} statping
           chmod +x statping
           tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
+          rm -rf statping
           echo ::set-env name=compressed::statping-darwin-${{ matrix.arch }}.tar.gz
 
       - name: Upload Compiled Statping Binary
@@ -274,6 +277,24 @@ jobs:
     strategy:
       matrix:
         platform: [postman_env_sqlite.json, postman_env_postgres.json, postman_env_mysql.json]
+    services:
+      postgres:
+        image: postgres:10.8
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password123
+          POSTGRES_DB: statping
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: password123
+          MYSQL_DATABASE: statping
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - uses: actions/checkout@v2
 
@@ -289,8 +310,8 @@ jobs:
           COMMIT: ${{ github.sha }}
         run: |
           ls -R
-          chmod +x statping
-          mv statping $(go env GOPATH)/bin/
+          cd build && tar -xvf statping-linux-amd64.tar.gz
+          mv statping /usr/local/bin/
 
       - name: Run Statping
         run: |
