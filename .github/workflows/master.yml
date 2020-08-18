@@ -459,7 +459,7 @@ jobs:
         run: make buildx-latest
 
   sentry-release:
-    needs: [test, test-postman-sqlite, test-postman-postgres, test-postman-mysql]
+    needs: docker-release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -481,7 +481,7 @@ jobs:
         run: make sentry-release
 
   homebrew-release:
-    needs: release
+    needs: docker-release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
@@ -498,7 +498,7 @@ jobs:
         run: make publish-homebrew
 
   slack-update:
-    needs: [release]
+    needs: docker-release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Statping Repo
