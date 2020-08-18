@@ -21,6 +21,11 @@ import (
 	"github.com/statping/statping/types/users"
 )
 
+var (
+	Version string
+	Commit  string
+)
+
 func (d *DbConfig) ResetCore() error {
 	if d.Db.HasTable("core") {
 		return nil
@@ -121,7 +126,7 @@ func (d *DbConfig) MigrateDatabase() error {
 		}
 	}
 
-	log.Infof("Migrating App to version: %s", core.App.Version)
+	log.Infof("Migrating App to version: %s (%s)", Version, Commit)
 	if err := tx.Table("core").AutoMigrate(&core.Core{}); err.Error() != nil {
 		tx.Rollback()
 		log.Errorln(fmt.Sprintf("Statping Database could not be migrated: %v", tx.Error()))
@@ -132,7 +137,7 @@ func (d *DbConfig) MigrateDatabase() error {
 		return err
 	}
 
-	d.Db.Table("core").Model(&core.Core{}).Update("version", core.App.Version)
+	d.Db.Table("core").Model(&core.Core{}).Update("version", Version)
 
 	log.Infoln("Statping Database Tables Migrated")
 
