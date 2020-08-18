@@ -1,9 +1,10 @@
 import Vue from "vue";
-const { startOfToday, startOfMonth, lastDayOfMonth, subSeconds, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance, addMonths, isWithinInterval } = require('date-fns')
+const { startOfToday, startOfMonth, lastDayOfMonth, subSeconds, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance, addMonths, addSeconds, isWithinInterval } = require('date-fns')
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import format from 'date-fns/format'
 import parseISO from 'date-fns/parseISO'
-import addSeconds from 'date-fns/addSeconds'
+import isBefore from 'date-fns/isBefore'
+import isAfter from 'date-fns/isAfter'
 
 export default Vue.mixin({
   methods: {
@@ -19,9 +20,9 @@ export default Vue.mixin({
     startToday() {
       return startOfToday()
     },
-      secondsHumanize (val) {
-        return `${val} ${this.$t('second', val)}`
-      },
+    secondsHumanize(val) {
+      return `${val} ${this.$t('second', val)}`
+    },
     utc(val) {
       return new Date.UTC(val)
     },
@@ -29,23 +30,29 @@ export default Vue.mixin({
       return formatDistanceToNow(parseISO(t1))
     },
     daysInMonth(t1) {
-        return lastDayOfMonth(t1)
+      return lastDayOfMonth(t1)
     },
     nowSubtract(seconds) {
       return subSeconds(new Date(), seconds)
     },
+    isAfter(date, compare) {
+      return isAfter(date, parseISO(compare))
+    },
+    isBefore(date, compare) {
+      return isBefore(date, parseISO(compare))
+    },
     dur(t1, t2) {
       return formatDistance(t1, t2)
     },
-    format(val, type="EEEE, MMM do h:mma") {
+    format(val, type = "EEEE, MMM do h:mma") {
       return format(val, type)
     },
     niceDate(val) {
       return format(parseISO(val), "EEEE, MMM do h:mma")
     },
-      parseISO(v) {
-        return parseISO(v)
-      },
+    parseISO(v) {
+      return parseISO(v)
+    },
     isZero(val) {
       return getUnixTime(parseISO(val)) <= 0
     },
@@ -84,14 +91,14 @@ export default Vue.mixin({
     },
     copy(txt) {
       this.$copyText(txt).then(function (e) {
-        alert('Copied: \n'+txt)
+        alert('Copied: \n' + txt)
       });
     },
     serviceLink(service) {
       if (service.permalink) {
         service = this.$store.getters.serviceByPermalink(service.permalink)
       }
-      if (service===undefined || this.isEmptyObject(service)) {
+      if (service === undefined || this.isEmptyObject(service)) {
         return `/service/0`
       }
       let link = service.permalink ? service.permalink : service.id
@@ -147,7 +154,7 @@ export default Vue.mixin({
       })
       return newSet
     },
-    convertToChartData(data = [], multiplier=1, asInt=false) {
+    convertToChartData(data = [], multiplier = 1, asInt = false) {
       if (!data) {
         return {data: []}
       }
@@ -166,9 +173,9 @@ export default Vue.mixin({
     },
     humanTime(val) {
       if (val >= 1000) {
-          return Math.round(val / 1000) + " ms"
+        return Math.round(val / 1000) + " ms"
       }
-        return val + " μs"
+      return val + " μs"
     },
     firstDayOfMonth(date) {
       return startOfMonth(date)
@@ -178,6 +185,9 @@ export default Vue.mixin({
     },
     addMonths(date, amount) {
       return addMonths(date, amount)
+    },
+    addSeconds(date, amount) {
+      return addSeconds(date, amount)
     }
   }
 });

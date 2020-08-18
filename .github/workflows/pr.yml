@@ -6,6 +6,13 @@ on:
       - '*/*'       # matches every branch containing a single '/'
       - '!master'   # excludes master
       - '!dev'      # excludes dev
+  pull_request:
+    branches:
+      - '*'         # matches every branch
+      - '*/*'       # matches every branch containing a single '/'
+      - '!master'   # excludes master
+      - '!dev'      # excludes dev
+
 
 jobs:
   compile:
@@ -24,13 +31,6 @@ jobs:
           echo "::add-path::$(go env GOPATH)/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
-
-      - name: Font Awesome authentication
-        env:
-          FONTAWESOME_TOKEN: ${{ secrets.FONTAWESOME_TOKEN }}
-        run: |
-          npm config set "@fortawesome:registry" https://npm.fontawesome.com/
-          npm config set "//npm.fontawesome.com/:_authToken" $FONTAWESOME_TOKEN
 
       - name: Install Global Dependencies
         run: npm install -g yarn sass cross-env
@@ -83,10 +83,10 @@ jobs:
     steps:
       - uses: actions/setup-go@v2
         with:
-          go-version: '1.14.2'
+          go-version: 1.15.x
       - uses: actions/setup-node@v1
         with:
-          node-version: '12.18.2'
+          node-version: 12.18.2
       - uses: actions/checkout@v2
 
       - name: Install Global Dependencies
@@ -120,6 +120,7 @@ jobs:
           SASS=`which sass` gotestsum --no-summary=skipped --format dots -- -covermode=count -coverprofile=coverage.out -p=1 ./...
         env:
           VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
           DB_CONN: sqlite3
           STATPING_DIR: ${{ github.workspace }}
           API_SECRET: demopassword123
@@ -152,6 +153,7 @@ jobs:
       - name: Install Statping
         env:
           VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
         run: |
           make build
           chmod +x statping

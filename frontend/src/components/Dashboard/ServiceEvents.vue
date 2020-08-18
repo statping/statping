@@ -9,7 +9,7 @@
         <span class="d-block text-dim float-right small mt-3 mb-1">Failure #{{failure.id}}</span>
       </code>
     </div>
-    <div v-if="loaded" v-for="message in messages" class="bg-light shadow-sm p-3 pr-4 pl-4 col-12 mt-3">
+    <div v-if="loaded" v-for="message in $store.getters.serviceMessages(service.id)" class="bg-light shadow-sm p-3 pr-4 pl-4 col-12 mt-3">
       <font-awesome-icon icon="calendar" class="mr-3" size="1x"/> {{message.description}}
       <span class="d-block small text-muted mt-3">
         Starts at <strong>{{niceDate(message.start_on)}}</strong> till <strong>{{niceDate(message.end_on)}}</strong>
@@ -44,7 +44,6 @@ name: "ServiceEvents",
   },
   data() {
     return {
-      messages: null,
       incidents: null,
       failure: null,
       loaded: false,
@@ -52,6 +51,11 @@ name: "ServiceEvents",
   },
   mounted() {
    this.load()
+  },
+  computed: {
+    messages() {
+      return this.$store.getters.serviceMessages(this.service.id)
+    }
   },
   methods: {
     async load() {
@@ -64,7 +68,7 @@ name: "ServiceEvents",
       this.loaded = true
     },
     async getMessages() {
-      this.messages = await Api.messages()
+      // this.messages = this.$store.getters.serviceMessages(this.service.id)
     },
     async getFailure() {
       const f = await Api.service_failures(this.service.id, null, null, 1)
@@ -76,7 +80,3 @@ name: "ServiceEvents",
   }
 }
 </script>
-
-<style scoped>
-
-</style>

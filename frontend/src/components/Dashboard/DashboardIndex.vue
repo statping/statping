@@ -25,6 +25,15 @@
             </div>
         </div>
 
+      <div v-for="message in messagesInRange" class="bg-light shadow-sm p-3 pr-4 pl-4 col-12 mb-4">
+        <font-awesome-icon icon="calendar" class="mr-3" size="1x"/> {{message.description}}
+        <span class="d-block small text-muted mt-3">
+        Starts at <strong>{{niceDate(message.start_on)}}</strong> till <strong>{{niceDate(message.end_on)}}</strong>
+        ({{dur(parseISO(message.start_on), parseISO(message.end_on))}})
+      </span>
+      </div>
+
+
         <div v-for="(service, index) in services" class="service_block" v-bind:key="index">
             <ServiceInfo :service=service />
         </div>
@@ -32,6 +41,10 @@
 </template>
 
 <script>
+  import isAfter from "date-fns/isAfter";
+  import parseISO from "date-fns/parseISO";
+  import isBefore from "date-fns/isBefore";
+
   const ServiceInfo = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/ServiceInfo')
 
   export default {
@@ -45,6 +58,9 @@
         }
     },
       computed: {
+        messagesInRange() {
+          return this.$store.getters.globalMessages.filter(m => this.isAfter(this.now(), m.start_on) && this.isBefore(this.now(), m.end_on))
+        },
           services() {
               return this.$store.getters.services
           }

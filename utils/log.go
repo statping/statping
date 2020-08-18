@@ -40,7 +40,7 @@ func SentryInit(v *string, allow bool) {
 	}
 	goEnv := Params.GetString("GO_ENV")
 	allowReports := Params.GetBool("ALLOW_REPORTS")
-	if allowReports || allow || goEnv == "test" {
+	if allow || goEnv == "test" || allowReports {
 		if err := sentry.Init(sentry.ClientOptions{
 			Dsn:              errorReporter,
 			Environment:      goEnv,
@@ -60,9 +60,16 @@ func SentryErr(err error) {
 	sentry.CaptureException(err)
 }
 
+func sentryTags() map[string]string {
+	val := make(map[string]string)
+	val["database"] = Params.GetString("DB_CONN")
+	return val
+}
+
 func SentryLogEntry(entry *Logger.Entry) {
 	e := sentry.NewEvent()
 	e.Message = entry.Message
+	e.Tags = sentryTags()
 	e.Release = Version
 	e.Contexts = entry.Data
 	sentry.CaptureEvent(e)

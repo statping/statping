@@ -1,3 +1,7 @@
+# 0.90.63 (08-17-2020)
+- Modified build process to use xgo for all arch builds
+- Modified Statping's Push Notifications server notifier to match with Firebase/gorush params
+
 # 0.90.62 (08-07-2020)
 - Added Notification logs
 - Fixed issues with Notifer After (x) failures for notifications
