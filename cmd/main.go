@@ -31,6 +31,8 @@ func init() {
 	stopped = make(chan bool, 1)
 	core.New(VERSION)
 	utils.InitEnvs()
+	configs.Version = VERSION
+	configs.Commit = COMMIT
 
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(updateCmd)
