@@ -6,6 +6,7 @@ const DashboardServices = () => import(/* webpackChunkName: "dashboard" */ '@/co
 const DashboardMessages = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/DashboardMessages')
 const EditService = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/EditService')
 const Logs = () => import(/* webpackChunkName: "dashboard" */ '@/pages/Logs')
+const Help = () => import(/* webpackChunkName: "dashboard" */ '@/pages/Help')
 const Settings = () => import(/* webpackChunkName: "dashboard" */ '@/pages/Settings')
 const Login = () => import(/* webpackChunkName: "index" */ '@/pages/Login')
 const Service = () => import(/* webpackChunkName: "index" */ '@/pages/Service')
@@ -158,7 +159,7 @@ const routes = [
         }
     },{
       path: 'help',
-      component: Logs,
+      component: Help,
         meta: {
             requiresAuth: true,
           title: 'Statping - Help',

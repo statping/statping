@@ -270,6 +270,10 @@ class Api {
     }
   }
 
+  async github_release() {
+    return fetch('https://api.github.com/repos/statping/statping/releases/latest').then(response => response.json())
+  }
+
   async allActions(...all) {
     await axios.all([all])
   }

@@ -38,3 +38,4 @@ tmp
 /frontend/cypress/screenshots/
 /frontend/cypress/videos/
 services.yml
+statping.wiki

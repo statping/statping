@@ -2,11 +2,6 @@ package failures
 
 import "time"
 
-const (
-	limitedFailures = 32
-	limitedHits     = 32
-)
-
 // Failure is a failed attempt to check a service. Any a service does not meet the expected requirements,
 // a new Failure will be inserted into Db.
 type Failure struct {
@@ -18,6 +13,7 @@ type Failure struct {
 	Service   int64     `gorm:"index;column:service" json:"-"`
 	Checkin   int64     `gorm:"index;column:checkin" json:"-"`
 	PingTime  int64     `gorm:"column:ping_time"  json:"ping"`
+	Reason    string    `gorm:"column:reason" json:"reason,omitempty"`
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 }
 

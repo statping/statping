@@ -29,10 +29,10 @@ var (
 
 func init() {
 	stopped = make(chan bool, 1)
-	core.New(VERSION)
+	core.New(VERSION, COMMIT)
 	utils.InitEnvs()
-	configs.Version = VERSION
-	configs.Commit = COMMIT
+	utils.Params.Set("VERSION", VERSION)
+	utils.Params.Set("COMMIT", COMMIT)
 
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(updateCmd)
@@ -161,7 +161,7 @@ func InitApp() error {
 	// start routine to delete old records (failures, hits)
 	go database.Maintenance()
 	// init Sentry error monitoring (its useful)
-	utils.SentryInit(&VERSION, core.App.AllowReports.Bool)
+	utils.SentryInit(core.App.AllowReports.Bool)
 	core.App.Setup = true
 	core.App.Started = utils.Now()
 	return nil

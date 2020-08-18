@@ -110,7 +110,7 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 		req.Header.Add("Content-Type", "application/json")
 	}
 	req.Header.Set("User-Agent", "Statping")
-	req.Header.Set("Statping-Version", utils.Version)
+	req.Header.Set("Statping-Version", utils.Params.GetString("VERSION"))
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err

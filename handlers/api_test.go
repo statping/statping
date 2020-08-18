@@ -32,7 +32,7 @@ func init() {
 	utils.InitLogs()
 	source.Assets()
 	dir = utils.Directory
-	core.New("test")
+	core.New("test", "testcommithere")
 }
 
 func TestFailedHTTPServer(t *testing.T) {

@@ -71,12 +71,10 @@ func (t *TimeVar) ToValues() ([]*TimeValue, error) {
 
 // GraphData will return all hits or failures
 func (g *GroupQuery) GraphData(by By) ([]*TimeValue, error) {
-	dbQuery := g.db.MultipleSelects(
+	g.db = g.db.MultipleSelects(
 		g.db.SelectByTime(g.Group),
 		by.String(),
 	).Group("timeframe").Order("timeframe", true)
-
-	g.db = dbQuery
 
 	caller, err := g.ToTimeValue()
 	if err != nil {
@@ -116,27 +114,26 @@ func (g *GroupQuery) ToTimeValue() (*TimeVar, error) {
 func (t *TimeVar) FillMissing(current, end time.Time) ([]*TimeValue, error) {
 	timeMap := make(map[string]int64)
 	var validSet []*TimeValue
-	dur := t.g.Group
 	for _, v := range t.data {
 		timeMap[v.Timeframe] = v.Amount
 	}
 
-	currentStr := types.FixedTime(current, t.g.Group)
-
 	for {
+		currentStr := types.FixedTime(current, t.g.Group)
+
 		var amount int64
 		if timeMap[currentStr] != 0 {
 			amount = timeMap[currentStr]
 		}
+
 		validSet = append(validSet, &TimeValue{
 			Timeframe: currentStr,
 			Amount:    amount,
 		})
+		current = current.Add(t.g.Group)
 		if current.After(end) {
 			break
 		}
-		current = current.Add(dur)
-		currentStr = types.FixedTime(current, t.g.Group)
 	}
 
 	return validSet, nil

@@ -9,6 +9,7 @@
                     <th scope="col">{{$t('username')}}</th>
                     <th scope="col">{{$t('type')}}</th>
                     <th scope="col" class="d-none d-md-table-cell">{{ $t('last_login') }}</th>
+                    <th scope="col" class="d-none d-md-table-cell">Scopes</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -21,7 +22,8 @@
                         {{user.admin ? $t('admin') : $t('user')}}
                     </span>
                 </td>
-                <td class="d-none d-md-table-cell">{{niceDate(user.updated_at)}}</td>
+              <td class="d-none d-md-table-cell">{{niceDate(user.updated_at)}}</td>
+              <td class="d-none d-md-table-cell">{{user.scopes}}</td>
                 <td class="text-right">
                     <div class="btn-group">
                         <a @click.prevent="editUser(user, edit)" href="#" class="btn btn-outline-secondary edit-user">

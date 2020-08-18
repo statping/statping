@@ -174,7 +174,7 @@ func HttpRequest(endpoint, method string, contentType interface{}, headers []str
 	}
 	// set default headers so end user can overwrite them if needed
 	req.Header.Set("User-Agent", "Statping")
-	req.Header.Set("Statping-Version", Version)
+	req.Header.Set("Statping-Version", Params.GetString("VERSION"))
 	if contentType != nil {
 		req.Header.Set("Content-Type", contentType.(string))
 	}
