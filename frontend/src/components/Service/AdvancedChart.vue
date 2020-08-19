@@ -1,6 +1,6 @@
 <template>
     <div class="service-chart-container">
-        <apexchart width="100%" type="area" :options="main_chart_options" :series="main_chart"></apexchart>
+        <apexchart width="100%" height="350" type="area" :options="main_chart_options" :series="main_chart"></apexchart>
     </div>
 </template>
 
@@ -36,6 +36,7 @@
         return {
           loading: true,
           main_data: null,
+          ping_data: null,
           expanded_data: null,
           main_chart_options: {
             noData: {
@@ -51,6 +52,7 @@
             },
             chart: {
               id: 'mainchart',
+              stacked: true,
               events: {
                 dataPointSelection: (event, chartContext, config) => {
                   window.console.log('slect')
@@ -110,7 +112,9 @@
             },
             yaxis: {
               labels: {
-                show: true
+                formatter: (value) => {
+                  return this.humanTime(value)
+                }
               },
             },
             markers: {
@@ -165,15 +169,15 @@
               show: false
             },
             fill: {
-              colors: ["#48d338"],
+              colors: ["#f1771f", "#48d338"],
               opacity: 1,
               type: 'solid'
             },
             stroke: {
               show: true,
-              curve: 'smooth',
+              curve: 'stepline',
               lineCap: 'butt',
-              colors: ["#3aa82d"],
+              colors: ["#f1771f", "#48d338"],
               width: 2,
             }
           },
@@ -227,8 +231,11 @@
       computed: {
         main_chart () {
           return [{
-            name: this.service.name,
+            name: "latency",
             ...this.convertToChartData(this.main_data)
+          },{
+            name: "ping",
+            ...this.convertToChartData(this.ping_data)
           }]
         },
         expanded_chart () {
@@ -261,9 +268,13 @@
         },
         async chartHits() {
           this.main_data = await this.load_hits()
+          this.ping_data = await this.load_ping()
         },
         async load_hits(start=this.params.start, end=this.params.end, group=this.group) {
           return await Api.service_hits(this.service.id, start, end, group, false)
+        },
+        async load_ping(start=this.params.start, end=this.params.end, group=this.group) {
+          return await Api.service_ping(this.service.id, start, end, group, false)
         }
       }
     }

@@ -96,7 +96,7 @@ export default Vue.mixin({
     },
     serviceLink(service) {
       if (service.permalink) {
-        service = this.$store.getters.serviceByPermalink(service.permalink)
+        service = this.$store.getters.serviceById(service.permalink)
       }
       if (service === undefined || this.isEmptyObject(service)) {
         return `/service/0`
@@ -176,6 +176,12 @@ export default Vue.mixin({
         return Math.round(val / 1000) + " ms"
       }
       return val + " μs"
+    },
+    humanTimeNum(val) {
+      if (val >= 1000) {
+        return Math.round(val / 1000)
+      }
+      return val
     },
     firstDayOfMonth(date) {
       return startOfMonth(date)

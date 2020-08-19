@@ -7,13 +7,13 @@
         </div>
         <div class="row mt-2">
           <div class="col-12 no-select">
-          <p class="divided">
-            <span class="font-2 text-muted">90 Days Ago</span>
-            <span class="divider"></span>
-            <span class="text-center font-2" :class="{'text-muted': service.online, 'text-danger': !service.online}">{{service_txt}}</span>
-            <span class="divider"></span>
-            <span class="font-2 text-muted">Today</span>
-          </p>
+            <p class="divided">
+              <span class="font-2 text-muted">90 Days Ago</span>
+              <span class="divider"></span>
+              <span class="text-center font-2" :class="{'text-muted': service.online, 'text-danger': !service.online}">{{service_txt}}</span>
+              <span class="divider"></span>
+              <span class="font-2 text-muted">Today</span>
+            </p>
           </div>
         </div>
       <div class="daily-failures small text-right text-dim">{{hover_text}}</div>
