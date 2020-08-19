@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <div v-for="(incident, i) in incidents" class="col-12">
+        <div v-for="(incident, i) in incidents" class="col-12 mt-2">
             <span class="braker mt-1 mb-3"></span>
             <h6>{{incident.title}}
                 <span class="font-2 float-right">{{niceDate(incident.created_at)}}</span>

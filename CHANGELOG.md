@@ -5,6 +5,7 @@
 - Added Version and Github Commit hash to left navigation on Settings page
 - Added "reason" for failures (will be used for more custom notification messages) [regex, lookup, timeout, connection, close, status_code]
 - Added Help page that is generated from Statping's Wiki repo on build
+- Modified Service Group failures on index page to show 90 days of failures
 
 # 0.90.63 (08-17-2020)
 - Modified build process to use xgo for all arch builds

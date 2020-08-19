@@ -36,6 +36,7 @@ export default new Vuex.Store({
   getters: {
     hasAllData: state => state.hasAllData,
     hasPublicData: state => state.hasPublicData,
+    admin: state => state.admin,
     core: state => state.core,
     oauth: state => state.oauth,
     token: state => state.token,

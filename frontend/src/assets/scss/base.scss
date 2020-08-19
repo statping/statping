@@ -103,11 +103,33 @@
     background-color: #efefef;
 }
 
+.divided {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.divider {
+  flex-grow: 1;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  margin: 0 20px 0 20px;
+}
+
+.daily-failures {
+  position: absolute;
+  padding-top: 3px;
+  top: 10px;
+  right: 100px;
+  width: 300px;
+  height: 25px;
+}
+
 .service_day {
   height: 20px;
   margin-right: 2px;
-  border-radius: 4px;
-  max-width: 25px;
+  border-radius: 2px;
+  max-width: 30px;
+  cursor: pointer;
 }
 
 .service_day SPAN {
