@@ -7,6 +7,7 @@ const spanish = {
     announcements: "Announcements",
     settings: "Settings",
     logs: "Logs",
+    help: "Help",
     logout: 'Logout',
   },
   setup: {

@@ -4,7 +4,7 @@
 - Added "Update Available" alert on the top of Settings if new version is available
 - Added Version and Github Commit hash to left navigation on Settings page
 - Added "reason" for failures (will be used for more custom notification messages) [regex, lookup, timeout, connection, close, status_code]
-- Added Help page that will be generated from Statping's Wiki repo
+- Added Help page that is generated from Statping's Wiki repo on build
 
 # 0.90.63 (08-17-2020)
 - Modified build process to use xgo for all arch builds

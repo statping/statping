@@ -420,5 +420,13 @@ check:
 #	sentry-cli releases set-commits --auto $VERSION
 #	sentry-cli releases files $VERSION upload-sourcemaps dist
 
+gen_help:
+	for file in ./statping.wiki/*.md
+	  do
+		# convert each file to html and place it in the html directory
+		# --gfm == use github flavoured markdown
+		marked -o html/$file.html $file --gfm
+	done
+
 .PHONY: all check build certs multiarch install-darwin go-build build-all buildx-base buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds
