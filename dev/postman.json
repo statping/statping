@@ -786,6 +786,105 @@
 						"description": "You can create custom badges with dynamic information by using [Shields.io](https://shields.io/) and parsing JSON fields with [JSONPath](http://jsonpath.com/). \n\n## Examples\n\n#### Service Uptime Percent\n<img src=\"https://img.shields.io/badge/dynamic/json?color=blue&label=%20Statping%20Uptime&query=%24.online_24_hours&url=https%3A%2F%2Fdemo.statping.com%2Fapi%2Fservices%2F2&suffix=%\">\n\n- URL: [https://demo.statping.com/api/services/2](https://demo.statping.com/api/services/2)\n- JSON Path: `$.online_24_hours`\n- Suffix: `%`\n\n```\nhttps://img.shields.io/badge/dynamic/json?color=blue&label=%20Statping%20Uptime&query=%24.online_24_hours&url=https%3A%2F%2Fdemo.statping.com%2Fapi%2Fservices%2F2&suffix=%\n```\n\n#### Count Services\n<img src=\"https://img.shields.io/badge/dynamic/json?color=purple&label=Demo%20Site&query=%24.services&url=https://demo.statping.com/health&suffix=%20services\">\n\n- URL: [https://demo.statping.com/health](https://demo.statping.com/health)\n- JSON Path: `$.services`\n- Suffix: ` services`\n\n```\nhttps://img.shields.io/badge/dynamic/json?color=purple&label=Demo%20Site&query=%24.services&url=https://demo.statping.com/health&suffix=%20services\n```"
 					},
 					"response": []
+				},
+				{
+					"name": "Send Push Notification",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "11fe392f-3636-4d2d-84e9-1119b351d8ee",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"notifications\": [\n    {\n      \"tokens\": [\"dBLB1WvTJkiWl3ZPjP0-BS:APA91bGXUbKy65CaN1XqExHXZ892jik2k9XORXSiqdUyXhcQ5RDiJ6LfXrckuH3StYJFcma4UCDr_N038YUtxYsRIHYx_8vWZ6D2uq3199LegWXGl5tz-9zk3M4WZGX8WGxIRUJ31QtW\"],\n      \"platform\": 2,\n      \"message\": \"This notification will go to iOS and Android platform via Firebase!\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://push.statping.com/api/push",
+							"protocol": "https",
+							"host": [
+								"push",
+								"statping",
+								"com"
+							],
+							"path": [
+								"api",
+								"push"
+							]
+						},
+						"description": "Send a push notification to the Statping mobile app using your Firebase device identifier."
+					},
+					"response": [
+						{
+							"name": "Send Push Notification",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"notifications\": [\n    {\n      \"tokens\": [\"dBLB1WvTJkiWl3ZPjP0-BS:APA91bGXUbKy65CaN1XqExHXZ892jik2k9XORXSiqdUyXhcQ5RDiJ6LfXrckuH3StYJFcma4UCDr_N038YUtxYsRIHYx_8vWZ6D2uq3199LegWXGl5tz-9zk3M4WZGX8WGxIRUJ31QtW\"],\n      \"platform\": 2,\n      \"message\": \"This notification will go to iOS and Android Statping App\"\n    }\n  ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://push.statping.com/api/push",
+									"protocol": "https",
+									"host": [
+										"push",
+										"statping",
+										"com"
+									],
+									"path": [
+										"api",
+										"push"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Length",
+									"value": "37"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 13 Aug 2020 02:24:17 GMT"
+								},
+								{
+									"key": "X-Gorush-Version",
+									"value": "No Version Provided"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"counts\": 1,\n    \"logs\": [],\n    \"success\": \"ok\"\n}"
+						}
+					]
 				}
 			],
 			"description": "This is for Statping's miscellaneous API endpoints that aren't a part of another category.",
@@ -4099,7 +4198,7 @@
 									"",
 									"pm.test(\"View All Notifiers\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.length).to.eql(12);",
+									"    pm.expect(jsonData.length).to.eql(13);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -4303,7 +4402,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"method\": \"slack\",\n    \"host\": \"https://hooks.slack.com/services/EXAMPLEIDHERE/BV33WKP0C/MtKw3Kc8BFylTv4pohKqHtXX\",\n    \"enabled\": true,\n    \"limits\": 55\n}",
+							"raw": "{\n    \"method\": \"slack\",\n    \"host\": \"https://hooks.slack.com/services/TTJ1B90DP/RENU20O9M/9uI823SUnYBuGcxYlpSimD6H\",\n    \"enabled\": true,\n    \"limits\": 55\n}",
 							"options": {
 								"raw": {}
 							}
@@ -4415,7 +4514,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"method\": \"success\",\n    \"notifier\": {\n        \"enabled\": false,\n        \"limits\": 60,\n        \"method\": \"slack\",\n        \"host\": \"https://webhooksurl.slack.com/***\",\n        \"success_data\": \"{\\n  \\\"blocks\\\": [{\\n    \\\"type\\\": \\\"section\\\",\\n    \\\"text\\\": {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"The service {{.Service.Name}} is back online.\\\"\\n    }\\n  }, {\\n    \\\"type\\\": \\\"actions\\\",\\n    \\\"elements\\\": [{\\n      \\\"type\\\": \\\"button\\\",\\n      \\\"text\\\": {\\n        \\\"type\\\": \\\"plain_text\\\",\\n        \\\"text\\\": \\\"View Service\\\",\\n        \\\"emoji\\\": true\\n      },\\n      \\\"style\\\": \\\"primary\\\",\\n      \\\"url\\\": \\\"{{.Core.Domain}}/service/{{.Service.Id}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"button\\\",\\n      \\\"text\\\": {\\n        \\\"type\\\": \\\"plain_text\\\",\\n        \\\"text\\\": \\\"Go to Statping\\\",\\n        \\\"emoji\\\": true\\n      },\\n      \\\"url\\\": \\\"{{.Core.Domain}}\\\"\\n    }]\\n  }]\\n}\",\n        \"failure_data\": \"{\\n  \\\"blocks\\\": [{\\n    \\\"type\\\": \\\"section\\\",\\n    \\\"text\\\": {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\":warning: The service {{.Service.Name}} is currently offline! :warning:\\\"\\n    }\\n  }, {\\n    \\\"type\\\": \\\"divider\\\"\\n  }, {\\n    \\\"type\\\": \\\"section\\\",\\n    \\\"fields\\\": [{\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*Service:*\\\\n{{.Service.Name}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*URL:*\\\\n{{.Service.Domain}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*Status Code:*\\\\n{{.Service.LastStatusCode}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*When:*\\\\n{{.Failure.CreatedAt}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*Downtime:*\\\\n{{.Service.DowntimeAgo}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"plain_text\\\",\\n      \\\"text\\\": \\\"*Error:*\\\\n{{.Failure.Issue}}\\\"\\n    }]\\n  }, {\\n    \\\"type\\\": \\\"divider\\\"\\n  }, {\\n    \\\"type\\\": \\\"actions\\\",\\n    \\\"elements\\\": [{\\n      \\\"type\\\": \\\"button\\\",\\n      \\\"text\\\": {\\n        \\\"type\\\": \\\"plain_text\\\",\\n        \\\"text\\\": \\\"View Offline Service\\\",\\n        \\\"emoji\\\": true\\n      },\\n      \\\"style\\\": \\\"danger\\\",\\n      \\\"url\\\": \\\"{{.Core.Domain}}/service/{{.Service.Id}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"button\\\",\\n      \\\"text\\\": {\\n        \\\"type\\\": \\\"plain_text\\\",\\n        \\\"text\\\": \\\"Go to Statping\\\",\\n        \\\"emoji\\\": true\\n      },\\n      \\\"url\\\": \\\"{{.Core.Domain}}\\\"\\n    }]\\n  }]\\n}\"\n    }\n}",
+							"raw": "{\n    \"method\": \"success\",\n    \"notifier\": {\n        \"enabled\": false,\n        \"limits\": 60,\n        \"method\": \"slack\",\n        \"host\": \"https://webhooksurl.slack.com/***\",\n        \"success_data\": \"{\\n  \\\"blocks\\\": [{\\n    \\\"type\\\": \\\"section\\\",\\n    \\\"text\\\": {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"The service {{.Service.Name}} is back online.\\\"\\n    }\\n  }, {\\n    \\\"type\\\": \\\"actions\\\",\\n    \\\"elements\\\": [{\\n      \\\"type\\\": \\\"button\\\",\\n      \\\"text\\\": {\\n        \\\"type\\\": \\\"plain_text\\\",\\n        \\\"text\\\": \\\"View Service\\\",\\n        \\\"emoji\\\": true\\n      },\\n      \\\"style\\\": \\\"primary\\\",\\n      \\\"url\\\": \\\"{{.Core.Domain}}/service/{{.Service.Id}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"button\\\",\\n      \\\"text\\\": {\\n        \\\"type\\\": \\\"plain_text\\\",\\n        \\\"text\\\": \\\"Go to Statping\\\",\\n        \\\"emoji\\\": true\\n      },\\n      \\\"url\\\": \\\"{{.Core.Domain}}\\\"\\n    }]\\n  }]\\n}\",\n        \"failure_data\": \"{\\n  \\\"blocks\\\": [{\\n    \\\"type\\\": \\\"section\\\",\\n    \\\"text\\\": {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\":warning: The service {{.Service.Name}} is currently offline! :warning:\\\"\\n    }\\n  }, {\\n    \\\"type\\\": \\\"divider\\\"\\n  }, {\\n    \\\"type\\\": \\\"section\\\",\\n    \\\"fields\\\": [{\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*Service:*\\\\n{{.Service.Name}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*URL:*\\\\n{{.Service.Domain}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*Status Code:*\\\\n{{.Service.LastStatusCode}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*When:*\\\\n{{.Failure.CreatedAt}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*Downtime:*\\\\n{{.Service.Downtime.Human}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"plain_text\\\",\\n      \\\"text\\\": \\\"*Error:*\\\\n{{.Failure.Issue}}\\\"\\n    }]\\n  }, {\\n    \\\"type\\\": \\\"divider\\\"\\n  }, {\\n    \\\"type\\\": \\\"actions\\\",\\n    \\\"elements\\\": [{\\n      \\\"type\\\": \\\"button\\\",\\n      \\\"text\\\": {\\n        \\\"type\\\": \\\"plain_text\\\",\\n        \\\"text\\\": \\\"View Offline Service\\\",\\n        \\\"emoji\\\": true\\n      },\\n      \\\"style\\\": \\\"danger\\\",\\n      \\\"url\\\": \\\"{{.Core.Domain}}/service/{{.Service.Id}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"button\\\",\\n      \\\"text\\\": {\\n        \\\"type\\\": \\\"plain_text\\\",\\n        \\\"text\\\": \\\"Go to Statping\\\",\\n        \\\"emoji\\\": true\\n      },\\n      \\\"url\\\": \\\"{{.Core.Domain}}\\\"\\n    }]\\n  }]\\n}\"\n    }\n}",
 							"options": {
 								"raw": {}
 							}
