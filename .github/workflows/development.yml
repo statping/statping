@@ -42,7 +42,9 @@ jobs:
         env:
           VERSION: ${{ env.VERSION }}
           COMMIT: ${{ github.sha }}
-        run: make clean compile
+          MJML_APP: ${{ secrets.MJML_APP }}
+          MJML_PRIVATE: ${{ secrets.MJML_PRIVATE }}
+        run: make clean generate compile
 
       - name: Upload Compiled Frontend (rice-box.go)
         uses: actions/upload-artifact@v1
