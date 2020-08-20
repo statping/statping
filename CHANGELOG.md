@@ -8,6 +8,7 @@
 - Modified Service Group failures on index page to show 90 days of failures
 - Modified Service view page, updated Latency and Ping charts, added failures below
 - Modified Service chart on index page to show ping data along with latency
+- Added AWS SNS Notifier
 
 # 0.90.63 (08-17-2020)
 - Modified build process to use xgo for all arch builds

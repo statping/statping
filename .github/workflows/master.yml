@@ -262,6 +262,10 @@ jobs:
           TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
           GOTIFY_URL: ${{ secrets.GOTIFY_URL }}
           GOTIFY_TOKEN: ${{ secrets.GOTIFY_TOKEN }}
+          SNS_TOKEN: ${{ secrets.SNS_TOKEN }}
+          SNS_SECRET: ${{ secrets.SNS_SECRET }}
+          SNS_REGION: ${{ secrets.SNS_REGION }}
+          SNS_TOPIC: ${{ secrets.SNS_TOPIC }}
 
       - name: Coveralls Testing Coverage
         run: |

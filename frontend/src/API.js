@@ -4,11 +4,16 @@ const qs = require('querystring');
 axios.defaults.withCredentials = true
 
 const tokenKey = "statping_auth";
+const version = "0.90.64";
+const commit = "8b54ceb16f0e2ca6c4f5b8f0fe3b5cc2598dc594";
 
 class Api {
   constructor() {
 
   }
+
+  version = () => version
+  commit = () => commit
 
   async oauth() {
     const oauth = axios.get('api/oauth').then(response => (response.data))

@@ -100,6 +100,7 @@ type Render struct {
 }
 
 func main() {
+	fmt.Println("RUNNING: ./source/generate_help.go")
 	fmt.Println("\n\nGenerating Help.vue from Statping's Wiki")
 	fmt.Println("Cloning ", wikiUrl)
 	cmd := exec.Command("git", "clone", wikiUrl)
