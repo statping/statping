@@ -12,8 +12,8 @@ import (
 	"strings"
 )
 
-const replace = `const version = "[0-9]\.[0-9]{2}\.[0-9]{2}";`
-const replaceCommit = `const commit = \"[a-z0-9]{40}\"\;`
+const replace = `this\.version = "[0-9]\.[0-9]{2}\.[0-9]{2}";`
+const replaceCommit = `this\.commit = \"[a-z0-9]{40}\"\;`
 
 func main() {
 	fmt.Println("RUNNING: ./source/generate_version.go")
@@ -28,8 +28,8 @@ func main() {
 
 	fmt.Println("git commit: ", gitCommit)
 
-	replaceWith := `const version = "` + strings.TrimSpace(string(version)) + `";`
-	replaceCommitWith := `const commit = "` + gitCommit + `";`
+	replaceWith := `this.version = "` + strings.TrimSpace(string(version)) + `";`
+	replaceCommitWith := `this.commit = "` + gitCommit + `";`
 
 	vRex := regexp.MustCompile(replace)
 	newApiFile := vRex.ReplaceAllString(string(apiJsFile), replaceWith)
