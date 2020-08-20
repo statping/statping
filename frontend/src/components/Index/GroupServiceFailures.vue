@@ -1,5 +1,12 @@
 <template>
     <div>
+      <div v-observe-visibility="{callback: visibleChart, once: true}" v-if="!loaded" class="row">
+        <div class="col-12 text-center mt-3">
+          <font-awesome-icon icon="circle-notch" class="text-dim" size="1x" spin/>
+        </div>
+      </div>
+      <transition name="fade">
+        <div v-if="loaded">
         <div class="d-flex mt-3">
             <div class="flex-fill service_day" v-for="(d, index) in failureData" @mouseover="mouseover(d)" @mouseout="mouseout" :class="{'day-error': d.amount > 0, 'day-success': d.amount === 0}">
                 <span v-if="d.amount !== 0" class="d-none d-md-block text-center small"></span>
@@ -17,6 +24,8 @@
           </div>
         </div>
       <div class="daily-failures small text-right text-dim">{{hover_text}}</div>
+      </div>
+  </transition>
     </div>
 </template>
 
@@ -31,7 +40,9 @@ export default {
     data() {
         return {
             failureData: [],
-          hover_text: ""
+          hover_text: "",
+          loaded: false,
+          visible: false,
         }
     },
   props: {
@@ -45,10 +56,16 @@ export default {
       return this.smallText(this.service)
     }
   },
-    mounted () {
-      this.lastDaysFailures()
+  mounted () {
+
     },
     methods: {
+      visibleChart(isVisible, entry) {
+        if (isVisible && !this.visible) {
+          this.visible = true
+          this.lastDaysFailures().then(() =>  this.loaded = true)
+        }
+      },
       mouseout() {
         this.hover_text = ""
       },

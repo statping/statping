@@ -57,7 +57,6 @@ export default Vue.mixin({
       return getUnixTime(parseISO(val)) <= 0
     },
     smallText(s) {
-      const incidents = s.incidents
       if (s.online) {
         return `Online, checked ${this.ago(s.last_success)} ago`
       } else {

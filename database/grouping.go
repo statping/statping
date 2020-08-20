@@ -87,6 +87,9 @@ func (g *GroupQuery) GraphData(by By) ([]*TimeValue, error) {
 	return caller.ToValues()
 }
 
+// ToTimeValue will format the SQL rows into a JSON format for the API.
+// [{"timestamp": "2006-01-02T15:04:05Z", "amount": 468293}]
+// TODO redo this entire function, use better SQL query to group by time
 func (g *GroupQuery) ToTimeValue() (*TimeVar, error) {
 	rows, err := g.db.Rows()
 	if err != nil {

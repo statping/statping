@@ -13,7 +13,7 @@
                 </div>
             </div>
 
-            <div v-show="!expanded" v-observe-visibility="visibleChart" class="chart-container">
+            <div v-show="!expanded" v-observe-visibility="{callback: visibleChart, throttle: 200}" class="chart-container">
                 <ServiceChart :service="service" :visible="visible" :chart_timeframe="chartTimeframe"/>
             </div>
 
@@ -67,18 +67,12 @@ export default {
     name: 'ServiceBlock',
     components: { Analytics, ServiceTopStats, ServiceChart},
     props: {
-        in_service: {
+        service: {
             type: Object,
             required: true
         },
     },
-  watch: {
-
-  },
   computed: {
-    service() {
-      return this.track_service
-    },
     timeframepick() {
       return this.timeframes.find(s => s.value === this.timeframe_val)
     },
@@ -124,7 +118,7 @@ export default {
             {value: "4320m", text: "3/day", set: 10 },
             {value: "10080m", text: "7/day", set: 11 },
           ],
-            stats: {
+          stats: {
                 total_failures: {
                     title: "Total Failures",
                     subtitle: "Last 7 Days",
@@ -151,14 +145,13 @@ export default {
                     value: 0,
                 }
             },
-            track_service: null,
         }
     },
   beforeDestroy() {
     // clearInterval(this.timer_func)
   },
-  async created() {
-      this.track_service = this.in_service
+  created() {
+
   },
     methods: {
       disabled_interval(interval) {
@@ -189,30 +182,8 @@ export default {
       },
       async setService() {
         await this.$store.commit('setService', this.service)
-        this.$router.push('/service/'+this.service.id, {props: {in_service: this.service}})
+        this.$router.push('/service/'+this.service.id, {props: {service: this.service}})
       },
-        async showMoreStats() {
-            this.expanded = !this.expanded;
-
-            const failData = await Graphing.failures(this.service, 7)
-            this.stats.total_failures.chart = failData.data;
-            this.stats.total_failures.value = failData.total;
-
-            const hitsData = await Graphing.hits(this.service, 7)
-
-            this.stats.high_latency.chart = hitsData.chart;
-            this.stats.high_latency.value = this.humanTime(hitsData.high);
-
-            this.stats.lowest_latency.chart = hitsData.chart;
-            this.stats.lowest_latency.value = this.humanTime(hitsData.low);
-
-            const pingData = await Graphing.pings(this.service, 7)
-            this.stats.high_ping.chart = pingData.chart;
-            this.stats.high_ping.value = this.humanTime(pingData.high);
-
-            this.stats.low_ping.chart = pingData.chart;
-            this.stats.low_ping.value = this.humanTime(pingData.low);
-        },
         visibleChart(isVisible, entry) {
                 if (isVisible && !this.visible) {
                     this.visible = true

@@ -19,7 +19,6 @@ var (
 )
 
 func TestMobileNotifier(t *testing.T) {
-	t.SkipNow()
 	err := utils.InitLogs()
 	require.Nil(t, err)
 

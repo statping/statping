@@ -173,10 +173,6 @@
       },
       methods: {
         async update() {
-          const c = await Api.core()
-          this.$store.commit('setCore', c)
-          const n = await Api.notifiers()
-          this.$store.commit('setNotifiers', n)
           this.cache = await Api.cache()
           await this.getGithub()
         },
@@ -194,19 +190,24 @@
               return this.tab === id
           },
         async renewApiKeys() {
-          let r = confirm("Are you sure you want to reset the API keys?");
+          let r = confirm("Are you sure you want to reset the API keys? You will be logged out.");
           if (r === true) {
             await Api.renewApiKeys()
             const core = await Api.core()
             this.$store.commit('setCore', core)
             this.core = core
+            await this.logout()
           }
         },
+        async logout () {
+          await Api.logout()
+          this.$store.commit('setHasAllData', false)
+          this.$store.commit('setToken', null)
+          this.$store.commit('setAdmin', false)
+          this.$store.commit('setUser', false)
+          // this.$cookies.remove("statping_auth")
+          await this.$router.push('/logout')
+        }
       }
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-
-</style>

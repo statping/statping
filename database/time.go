@@ -19,10 +19,9 @@ func (it *Db) ParseTime(t string) (time.Time, error) {
 	}
 }
 
+// FormatTime returns the timestamp in the same format as the DATETIME column in database
 func (it *Db) FormatTime(t time.Time) string {
 	switch it.Type {
-	case "mysql":
-		return t.Format("2006-01-02 15:04:05")
 	case "postgres":
 		return t.Format("2006-01-02 15:04:05.999999999")
 	default:
@@ -30,6 +29,7 @@ func (it *Db) FormatTime(t time.Time) string {
 	}
 }
 
+// SelectByTime returns an SQL query that will group "created_at" column by x seconds and returns as "timeframe"
 func (it *Db) SelectByTime(increment time.Duration) string {
 	seconds := int64(increment.Seconds())
 	switch it.Type {
@@ -40,34 +40,4 @@ func (it *Db) SelectByTime(increment time.Duration) string {
 	default:
 		return fmt.Sprintf("datetime((strftime('%%s', created_at) / %d) * %d, 'unixepoch') as timeframe", seconds, seconds)
 	}
-}
-
-func (it *Db) correctTimestamp(increment string) string {
-	var timestamper string
-	switch increment {
-	case "second":
-		timestamper = "%Y-%m-%d %H:%M:%S"
-	case "minute":
-		timestamper = "%Y-%m-%d %H:%M:00"
-	case "hour":
-		timestamper = "%Y-%m-%d %H:00:00"
-	case "day":
-		timestamper = "%Y-%m-%d 00:00:00"
-	case "month":
-		timestamper = "%Y-%m-01 00:00:00"
-	case "year":
-		timestamper = "%Y-01-01 00:00:00"
-	default:
-		timestamper = "%Y-%m-%d 00:00:00"
-	}
-
-	switch it.Type {
-	case "mysql":
-	case "second":
-		timestamper = "%Y-%m-%d %H:%i:%S"
-	case "minute":
-		timestamper = "%Y-%m-%d %H:%i:00"
-	}
-
-	return timestamper
 }
