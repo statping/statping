@@ -98,8 +98,22 @@ jobs:
         shell: bash
 
       - name: Set Linux Build Flags
-        if: matrix.platform != 'darwin'
-        run: echo ::set-env name=BUILD_FLAGS::'-extldflags -static'
+        if: matrix.platform == 'linux'
+        run: |
+          echo ::set-env name=BUILD_FLAGS::'-extldflags -static'
+          echo ::set-env name=XGO_TAGS::'netgo,osusergo,linux,sqlite_omit_load_extension'
+        shell: bash
+
+      - name: Set Darwin Build Flags
+        if: matrix.platform == 'darwin'
+        run: echo ::set-env name=XGO_TAGS::'netgo,osusergo,darwin,sqlite_omit_load_extension'
+        shell: bash
+
+      - name: Set Windows Build Flags
+        if: matrix.platform == 'windows'
+        run: |
+          echo ::set-env name=BUILD_FLAGS::'-extldflags -static'
+          echo ::set-env name=XGO_TAGS::'netgo,osusergo,sqlite_omit_load_extension'
         shell: bash
 
       - name: Build ${{ matrix.platform }}/${{ matrix.arch }}
@@ -117,6 +131,7 @@ jobs:
           x: false
           pkg: cmd
           buildmode: pie
+          tags: ${{ env.XGO_TAGS }}
           ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} ${{ env.BUILD_FLAGS }}
 
       - name: Compress Linux Builds
