@@ -20,6 +20,7 @@ require (
 	github.com/pelletier/go-toml v1.7.0 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.1.0
+	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.5.0
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
@@ -30,6 +31,7 @@ require (
 	github.com/stretchr/testify v1.5.1
 	github.com/t-tiger/gorm-bulk-insert/v2 v2.0.1
 	github.com/wellington/go-libsass v0.9.2
+	github.com/wellington/sass v0.0.0-20160911051022-cab90b3986d6
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/net v0.0.0-20200625001655-4c5254603344 // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d

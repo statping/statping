@@ -4,13 +4,12 @@ package source
 //go:generate go run generate_version.go
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/GeertJohan/go.rice"
 	"github.com/pkg/errors"
 	"github.com/statping/statping/utils"
-	"github.com/wellington/go-libsass"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -59,28 +58,30 @@ func scssRendered(name string) string {
 
 // CompileSASS will attempt to compile the SASS files into CSS
 func CompileSASS() error {
-	scssFile := filepath.Join(utils.Params.GetString("STATPING_DIR"), "assets", "scss", "index.scss")
-	indexCSS := filepath.Join(utils.Params.GetString("STATPING_DIR"), "assets", "scss", "index.css")
-	partials := filepath.Join(utils.Params.GetString("STATPING_DIR"), "assets", "scss")
+	sassBin := utils.Params.GetString("SASS")
+	if sassBin == "" {
+		bin, err := exec.LookPath("sass")
+		if err != nil {
+			log.Warnf("could not find sass executable in PATH: %s", err)
+			return err
+		}
+		sassBin = bin
+	}
 
-	index, err := utils.OpenFile(scssFile)
+	scssFile := filepath.Join(utils.Params.GetString("STATPING_DIR"), "assets", "scss", "index.scss")
+	log.Infoln(fmt.Sprintf("Compiling SASS %v into %v", scssFile, scssRendered(scssFile)))
+
+	stdout, stderr, err := utils.Command(sassBin, scssFile, scssRendered(scssFile))
 	if err != nil {
-		return err
+		log.Errorln(fmt.Sprintf("Failed to compile assets with SASS %v", err))
+		log.Errorln(fmt.Sprintf("%s %s %s", sassBin, scssFile, scssRendered(scssFile)))
+		return errors.Wrapf(err, "failed to compile assets, %s %s %s", err, stdout, stderr)
 	}
-	w := bytes.NewBuffer(nil)
-	comp, err := libsass.New(w, bytes.NewBufferString(index))
-	if err != nil {
-		return err
+
+	if stdout != "" || stderr != "" {
+		log.Infoln(fmt.Sprintf("out: %v | error: %v", stdout, stderr))
 	}
-	if err = comp.Option(libsass.IncludePaths([]string{partials})); err != nil {
-		return err
-	}
-	if err := comp.Run(); err != nil {
-		return err
-	}
-	if err := utils.SaveFile(indexCSS, w.Bytes()); err != nil {
-		return err
-	}
+
 	log.Infoln("SASS Compiling is complete!")
 	return nil
 }

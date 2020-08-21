@@ -20,6 +20,11 @@ RUN apk add --update --no-cache libstdc++ gcc g++ make git autoconf \
     libtool ca-certificates linux-headers wget curl jq && \
     update-ca-certificates
 
+WORKDIR /root
+RUN git clone https://github.com/sass/sassc.git
+RUN . sassc/script/bootstrap && make -C sassc -j4
+# sassc binary: /root/sassc/bin/sassc
+
 WORKDIR /go/src/github.com/statping/statping
 ADD go.mod go.sum ./
 RUN go mod download
@@ -36,4 +41,5 @@ RUN make clean generate embed
 RUN go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -o statping --tags "netgo linux" ./cmd
 RUN chmod a+x statping && mv statping /go/bin/statping
 # /go/bin/statping - statping binary
+# /root/sassc/bin/sassc - sass binary
 # /statping - Vue frontend (from frontend)
