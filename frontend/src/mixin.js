@@ -1,5 +1,5 @@
 import Vue from "vue";
-const { endOfTomorrow, endOfToday, endOfDay, startOfToday, startOfMonth, lastDayOfMonth, subSeconds, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance, addMonths, addSeconds, isWithinInterval } = require('date-fns')
+const { startOfDay, startOfWeek, endOfMonth, startOfToday, startOfTomorrow, startOfYesterday, endOfYesterday, endOfTomorrow, endOfToday, endOfDay, startOfMonth, lastDayOfMonth, subSeconds, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance, addMonths, addSeconds, isWithinInterval } = require('date-fns')
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import format from 'date-fns/format'
 import parseISO from 'date-fns/parseISO'
@@ -34,7 +34,7 @@ export default Vue.mixin({
       return lastDayOfMonth(t1)
     },
     nowSubtract(seconds) {
-      return subSeconds(new Date(), seconds)
+      return subSeconds(this.now(), seconds)
     },
     isAfter(date, compare) {
       return isAfter(date, parseISO(compare))
@@ -65,6 +65,27 @@ export default Vue.mixin({
           return endOfToday()
         case "tomorrow":
           return endOfTomorrow()
+        case "yesterday":
+          return endOfYesterday()
+        case "month":
+          return endOfMonth(val)
+      }
+      return roundToNearestMinutes(val)
+    },
+    beginningOf(method, val) {
+      switch (val) {
+        case "day":
+          return startOfDay(val)
+        case "today":
+          return startOfToday()
+        case "tomorrow":
+          return startOfTomorrow()
+        case "yesterday":
+          return startOfYesterday()
+        case "week":
+          return startOfWeek()
+        case "month":
+          return startOfMonth(val)
       }
       return roundToNearestMinutes(val)
     },

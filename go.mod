@@ -13,6 +13,8 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/getsentry/sentry-go v0.5.1
 	github.com/go-mail/mail v2.3.1+incompatible
+	github.com/golang/protobuf v1.4.0
+	github.com/gomarkdown/markdown v0.0.0-20200820230800-3724143f5294 // indirect
 	github.com/gorilla/mux v1.7.4
 	github.com/hako/durafmt v0.0.0-20200605151348-3a43fc422dd9
 	github.com/jinzhu/gorm v1.9.12
@@ -30,6 +32,7 @@ require (
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.5.1
 	github.com/t-tiger/gorm-bulk-insert/v2 v2.0.1
+	github.com/tdewolff/minify/v2 v2.8.0 // indirect
 	github.com/wellington/go-libsass v0.9.2
 	github.com/wellington/sass v0.0.0-20160911051022-cab90b3986d6
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9

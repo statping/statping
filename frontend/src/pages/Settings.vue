@@ -159,10 +159,10 @@
             return this.$store.getters.notifiers
           },
         version_below() {
-            if (!this.github) {
+            if (!this.github || !this.core.version) {
               return false
             }
-            return semver.gt(semver.coerce(this.github.tag_name), this.core.version)
+            return semver.gt(semver.coerce(this.github.tag_name), semver.coerce(this.core.version))
         }
       },
     mounted() {

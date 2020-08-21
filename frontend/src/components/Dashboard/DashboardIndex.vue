@@ -34,8 +34,14 @@
       </div>
 
       <div class="row">
-          <ServiceInfo v-for="(service, index) in services" v-bind:key="index" :service="service" />
+        <ServiceInfo v-for="(service, index) in services_no_group" v-bind:key="index" :service="service" />
       </div>
+
+      <div class="row" v-for="group in groups">
+        <h4 class="h4 col-12 mb-3 mt-2 text-dim"><font-awesome-icon icon="minus" class="mr-3"/> {{group.name}}</h4>
+        <ServiceInfo v-if="group_services(group.id)" v-for="(service, index) in group_services(group.id)" v-bind:key="index" :service="service" />
+      </div>
+
     </div>
 </template>
 
@@ -62,10 +68,18 @@
         },
           services() {
               return this.$store.getters.services
-          }
+          },
+        services_no_group() {
+          return this.$store.getters.servicesNoGroup
+        },
+        groups() {
+          return this.$store.getters.groupsInOrder
+        },
       },
       methods: {
-
+        group_services(id) {
+          return this.$store.getters.servicesInGroup(id)
+        },
           failuresLast24Hours() {
               let total = 0;
               this.services.map((s) => {

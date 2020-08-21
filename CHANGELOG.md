@@ -10,6 +10,7 @@
 - Modified Service chart on index page to show ping data along with latency
 - Added AWS SNS Notifier
 - Modified dashboard services UI
+- Modified service.Failures API to include 32 failures (max)
 
 # 0.90.63 (08-17-2020)
 - Modified build process to use xgo for all arch builds

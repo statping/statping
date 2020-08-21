@@ -5,7 +5,7 @@
 
       <div v-if="!loaded" class="row mt-5 mb-5">
         <div class="col-12 mt-5 mb-2 text-center">
-          <font-awesome-icon icon="circle-notch" class="text-dim" size="3x" spin/>
+          <font-awesome-icon icon="circle-notch" class="text-dim" size="2x" spin/>
         </div>
         <div class="col-12 text-center mt-3 mb-3">
           <span class="text-dim">{{loading_text}}</span>
