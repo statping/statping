@@ -1,64 +1,59 @@
 <template>
-    <div class="card mb-4" :class="{'offline-card': !service.online}">
+  <div class="col-4">
+    <div class="dashboard_card card mb-4" :class="{'offline-card': !service.online}">
         <div class="card-header pb-1">
-            <h4 v-observe-visibility="setVisible">
+            <h6 v-observe-visibility="setVisible">
                 <router-link :to="serviceLink(service)">{{service.name}}</router-link>
                 <span class="badge float-right text-uppercase" :class="{'badge-success': service.online, 'badge-danger': !service.online}">
                     {{service.online ? $t('online') : $t('offline')}}
                 </span>
-            </h4>
+            </h6>
         </div>
 
         <div class="card-body">
             <transition name="fade">
             <div v-if="loaded" class="row pl-2 pr-2">
-                    <div class="col-md-6 col-sm-12 mt-2 mt-md-0 mb-3">
-                        <ServiceSparkLine :title="set2_name" subtitle="Latency Last 24 Hours" :series="set2"/>
-                    </div>
-                    <div class="col-md-6 col-sm-12 mt-4 mt-md-0 mb-3">
-                        <ServiceSparkLine :title="set1_name" subtitle="Latency Last 7 Days" :series="set1"/>
-                    </div>
-
-              <div class="col-12 mt-2 mt-md-0 mb-3">
-                  <ServiceEvents :service="service"/>
+              <div class="col-md-6 col-sm-12 mt-2 mt-md-0 mb-3 pl-0 pr-0">
+                  <ServiceSparkLine :title="set2_name" subtitle="Latency Last 24 Hours" :series="set2"/>
               </div>
-
+              <div class="col-md-6 col-sm-12 mt-4 mt-md-0 mb-3">
+                  <ServiceSparkLine :title="set1_name" subtitle="Latency Last 7 Days" :series="set1"/>
+              </div>
+              <ServiceEvents :service="service"/>
             </div>
-              <div v-else class="row mt-5 mb-5 pt-5 pb-5">
-                <div class="col-6 text-center text-muted">
-                  <font-awesome-icon icon="circle-notch" size="3x" spin/>
+              <div v-else class="row mb-5 pt-5 pb-5">
+                <div class="col-6 text-center">
+                  <font-awesome-icon icon="circle-notch" class="text-dim" size="3x" spin/>
                 </div>
-                <div class="col-6 text-center text-muted">
-                  <font-awesome-icon icon="circle-notch" size="3x" spin/>
+                <div class="col-6 text-center text-dim">
+                  <font-awesome-icon icon="circle-notch" class="text-dim" size="3x" spin/>
                 </div>
               </div>
             </transition>
         </div>
         <div class="card-footer">
-            <div class="row">
 
-                <div class="col-12 col-md-3 mb-2 mb-md-0">
-                    <router-link :to="{path: `/dashboard/service/${service.id}/incidents`, params: {id: service.id} }" class="btn btn-block btn-white text-capitalize incident">
-                        {{$tc('incident', 2)}}
-                    </router-link>
-                </div>
-                <div class="col-12 col-md-3 mb-2 mb-md-0">
-                    <router-link :to="{path: `/dashboard/service/${service.id}/checkins`, params: {id: service.id} }" class="btn btn-block btn-white text-capitalize checkins">
-                        {{$tc('checkin', 2)}}
-                    </router-link>
-                </div>
-                <div class="col-12 col-md-3 mb-2 mb-md-0">
-                    <router-link :to="{path: `/dashboard/service/${service.id}/failures`, params: {id: service.id} }" class="btn btn-block btn-white text-capitalize failures">
-                        {{$tc('failure', 2)}} <span class="badge badge-danger float-right mt-1">{{service.stats.failures}}</span>
-                    </router-link>
-                </div>
-                <div class="col-12 col-md-3 mb-2 mb-md-0 mt-0 mt-md-1">
-                    <span class="float-md-right">
-                        {{$t('uptime', [service.online_7_days])}}
-                    </span>
-                </div>
+          <div class="row">
+          <div class="col-5 pr-0">
+              <span class="small text-dim"> {{ hoverbtn }}</span>
+          </div>
 
+            <div class="col-7 pr-2 pl-0">
+              <div class="btn-group float-right">
+                  <button @click="$router.push({path: `/dashboard/service/${service.id}/incidents`, params: {id: service.id}})" @mouseleave="unsetHover" @mouseover="setHover('Incidents')" class="btn btn-sm btn-white incident">
+                    <font-awesome-icon icon="bullhorn"/>
+                  </button>
+                  <button @click="$router.push({path: `/dashboard/service/${service.id}/checkins`, params: {id: service.id}})" @mouseleave="unsetHover" @mouseover="setHover('Checkins')" class="btn btn-sm btn-white checkins">
+                    <font-awesome-icon icon="calendar-check"/>
+                  </button>
+                  <button @click="$router.push({path: `/dashboard/service/${service.id}/failures`, params: {id: service.id}})" @mouseleave="unsetHover" @mouseover="setHover('Failures')" class="btn btn-sm btn-white failures">
+                    <font-awesome-icon icon="exclamation-triangle"/> <span v-if="service.stats.failures !== 0" class="badge badge-danger ml-1">{{service.stats.failures}}</span>
+                  </button>
+              </div>
             </div>
+
+          </div>
+
         </div>
 
         <span v-for="(failure, index) in failures" v-bind:key="index" class="alert alert-light">
@@ -67,6 +62,7 @@
         </span>
 
     </div>
+  </div>
 </template>
 
 <script>
@@ -96,6 +92,8 @@
       data() {
           return {
               uptime: null,
+              hovered: false,
+              hoverbtn: "",
               openTab: "",
               set1: [],
               set2: [],
@@ -109,7 +107,16 @@
     watch: {
 
     },
-      methods: {
+    mounted() {
+      this.unsetHover()
+    },
+    methods: {
+      setHover(name) {
+        this.hoverbtn = name
+      },
+        unsetHover() {
+          this.hoverbtn = this.$t('uptime', [this.service.online_7_days])
+        },
         async setVisible(isVisible, entry) {
           if (isVisible && !this.visible) {
             await this.loadInfo()

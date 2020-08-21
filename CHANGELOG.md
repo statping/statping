@@ -9,6 +9,8 @@
 - Modified Service view page, updated Latency and Ping charts, added failures below
 - Modified Service chart on index page to show ping data along with latency
 - Added AWS SNS Notifier
+- Modified dashboard services UI
+- Removed sass dependency, now generates css from scss directly from go
 
 # 0.90.63 (08-17-2020)
 - Modified build process to use xgo for all arch builds

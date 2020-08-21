@@ -30,13 +30,12 @@
         <span class="d-block small text-muted mt-3">
         Starts at <strong>{{niceDate(message.start_on)}}</strong> till <strong>{{niceDate(message.end_on)}}</strong>
         ({{dur(parseISO(message.start_on), parseISO(message.end_on))}})
-      </span>
+        </span>
       </div>
 
-
-        <div v-for="(service, index) in services" class="service_block" v-bind:key="index">
-            <ServiceInfo :service=service />
-        </div>
+      <div class="row">
+          <ServiceInfo v-for="(service, index) in services" v-bind:key="index" :service="service" />
+      </div>
     </div>
 </template>
 

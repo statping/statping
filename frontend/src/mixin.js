@@ -1,10 +1,11 @@
 import Vue from "vue";
-const { startOfToday, startOfMonth, lastDayOfMonth, subSeconds, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance, addMonths, addSeconds, isWithinInterval } = require('date-fns')
+const { endOfTomorrow, endOfToday, endOfDay, startOfToday, startOfMonth, lastDayOfMonth, subSeconds, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance, addMonths, addSeconds, isWithinInterval } = require('date-fns')
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import format from 'date-fns/format'
 import parseISO from 'date-fns/parseISO'
 import isBefore from 'date-fns/isBefore'
 import isAfter from 'date-fns/isAfter'
+import { roundToNearestMinutes } from 'date-fns'
 
 export default Vue.mixin({
   methods: {
@@ -52,6 +53,20 @@ export default Vue.mixin({
     },
     parseISO(v) {
       return parseISO(v)
+    },
+    round(minutes) {
+      return roundToNearestMinutes(minutes)
+    },
+    endOf(method, val) {
+      switch (val) {
+        case "day":
+          return endOfDay(val)
+        case "today":
+          return endOfToday()
+        case "tomorrow":
+          return endOfTomorrow()
+      }
+      return roundToNearestMinutes(val)
     },
     isZero(val) {
       return getUnixTime(parseISO(val)) <= 0

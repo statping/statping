@@ -92,13 +92,34 @@ A:HOVER {
   color: #fff;
 }
 
+.dashboard_card {
+  background-color: $group-list-background;
+  box-shadow: rgba(0,0,0,.05) 0px 2px 3px 1px;
+}
+
+.dashboard_card:HOVER {
+  background-color: lighten($group-list-background, 2%) !important;
+  box-shadow: rgba(0,0,0,.05) 0px 1px 5px 3px;
+  -webkit-transition-duration: 300ms;
+  -moz-transition-duration: 300ms;
+  -o-transition-duration: 300ms;
+  transition-duration: 300ms;
+}
+
 .list-group-item {
   min-height: 85pt;
   background-color: $group-list-background;
 }
 
 .list-group-item:HOVER {
-  background-color: lighten($group-list-background, 2%) !important;
+  background-color: lighten($group-list-background, 5%) !important;
+  box-shadow: #00000014 0px 4px 4px 2px;
+  -webkit-transition-duration: 300ms;
+  -moz-transition-duration: 300ms;
+  -o-transition-duration: 300ms;
+  transition-duration: 300ms;
+  margin-top: -1px;
+  margin-bottom: 1px;
 }
 
 .list-group-item A {
@@ -118,18 +139,33 @@ A:HOVER {
   background-color: $container-color;
 }
 
+.login_container {
+  border-radius: 5px;
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  background-color: $container-color;
+}
+
 .footer {
   text-decoration: none;
   margin-top: 20px;
 }
 
-.footer A {
+.footer .links {
   color: $footer-text-color;
   text-decoration: none;
 }
 
-.footer A:HOVER {
-  color: #6d6d6d;
+.footer .links:HOVER {
+  color: #8c8c8c;
+}
+
+.footer .statping {
+  color: lighten($footer-text-color, 10%);
+  text-decoration: none;
+}
+.footer .statping:HOVER {
+  color: lighten($footer-text-color, 0%);
+  text-decoration: none;
 }
 
 .no-select {

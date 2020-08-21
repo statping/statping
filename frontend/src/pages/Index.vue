@@ -14,7 +14,7 @@
 
         <div class="col-12 full-col-12">
             <div v-for="service in services_no_group" v-bind:key="service.id" class="list-group online_list mb-4">
-                <div class="service_li list-group-item list-group-item-action">
+                <div class="list-group-item list-group-item-action">
                     <router-link class="no-decoration font-3" :to="serviceLink(service)">{{service.name}}</router-link>
                     <span class="badge float-right" :class="{'bg-success': service.online, 'bg-danger': !service.online }">{{service.online ? "ONLINE" : "OFFLINE"}}</span>
                     <GroupServiceFailures :service="service"/>

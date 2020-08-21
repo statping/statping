@@ -3,7 +3,7 @@
         <h4 v-if="group.name !== 'Empty Group'" class="group_header mb-3 mt-4">{{group.name}}</h4>
         <div class="list-group online_list mb-4">
 
-            <div v-for="(service, index) in services" v-bind:key="index" class="service_li list-group-item list-group-item-action">
+            <div v-for="(service, index) in services" v-bind:key="index" class="list-group-item list-group-item-action">
                 <router-link class="no-decoration font-3" :to="serviceLink(service)">{{service.name}}</router-link>
                 <span class="badge text-uppercase float-right" :class="{'bg-success': service.online, 'bg-danger': !service.online }">
                     {{service.online ? $t('online') : $t('offline')}}

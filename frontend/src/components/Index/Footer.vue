@@ -3,11 +3,11 @@
         <div v-if="!core.footer" class="footer text-center mb-4 p-2">
           <div class="d-block text-dim">
           <div class="mb-3">
-            <router-link :to="admin ? '/dashboard' : '/login'">{{$t('top_nav.dashboard')}}</router-link>
+            <router-link class="links" :to="admin ? '/dashboard' : '/login'">{{$t('top_nav.dashboard')}}</router-link>
           </div>
-            <span class="text-muted font-1 mt-3">
-            <a href="https://github.com/statping/statping" target="_blank">Statping v{{core.version}}
-              made with <font-awesome-icon icon="heart" class="font-1 text-danger"/></a>
+            <span class="font-1 mt-3">
+            <a href="https://github.com/statping/statping" class="statping" target="_blank">
+              Statping v{{core.version}} made with <font-awesome-icon icon="heart" class="hlight font-1"/></a>
             </span>
           </div>
         </div>
@@ -37,6 +37,8 @@
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.hlight {
+  color: #f6cbcb;
+}
 </style>
