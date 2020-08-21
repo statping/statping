@@ -47,9 +47,9 @@
 
 
                 <div class="col-md-2 col-6 float-right">
-                    <button v-if="!expanded" @click="setService" class="btn btn-sm float-right dyn-dark text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
+                    <router-link tag="button" v-if="!expanded" :to="serviceLink(service)" class="btn btn-sm float-right dyn-dark text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
                         {{$t('service.view')}}
-                    </button>
+                    </router-link>
                 </div>
             </div>
 
@@ -179,10 +179,6 @@ export default {
         this.timeframe_val = tm.value
         this.dropDownMenu = false
         this.intervalMenu = false
-      },
-      async setService() {
-        await this.$store.commit('setService', this.service)
-        this.$router.push('/service/'+this.service.id, {props: {service: this.service}})
       },
         visibleChart(isVisible, entry) {
                 if (isVisible && !this.visible) {
