@@ -206,12 +206,6 @@ func TestMainApiRoutes(t *testing.T) {
 			},
 		},
 		{
-			Name:           "404 Error Page",
-			URL:            "/api/missing_404_page",
-			Method:         "GET",
-			ExpectedStatus: 404,
-		},
-		{
 			Name:             "Health Check endpoint",
 			URL:              "/health",
 			Method:           "GET",

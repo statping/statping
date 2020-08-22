@@ -47,6 +47,12 @@ name: "GroupedServices",
   methods: {
     toggle() {
       this.expanded = !this.expanded
+    },
+    dashboard_cookies() {
+      const data = [{group: 5, show: false}]
+      if (!this.$cookies.isKey("statping_layout")) {
+        this.$cookies.set("statping_layout", JSON.stringify(data))
+      }
     }
   }
 }
