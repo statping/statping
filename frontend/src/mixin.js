@@ -58,7 +58,7 @@ export default Vue.mixin({
       return roundToNearestMinutes(minutes)
     },
     endOf(method, val) {
-      switch (val) {
+      switch (method) {
         case "day":
           return endOfDay(val)
         case "today":
@@ -73,7 +73,7 @@ export default Vue.mixin({
       return roundToNearestMinutes(val)
     },
     beginningOf(method, val) {
-      switch (val) {
+      switch (method) {
         case "day":
           return startOfDay(val)
         case "today":
@@ -104,6 +104,24 @@ export default Vue.mixin({
           return `Service has never been online`
         }
         return `Service has been offline for ${this.ago(s.last_success)}`
+      }
+    },
+    round_time(frame, val) {
+      switch(frame) {
+        case "15m":
+          return roundToNearestMinutes(val, {nearestTo: 60 * 15})
+        case "30m":
+          return roundToNearestMinutes(val, {nearestTo: 60 * 30})
+        case "1h":
+          return roundToNearestMinutes(val, {nearestTo: 3600})
+        case "3h":
+          return roundToNearestMinutes(val, {nearestTo: 3600 * 3})
+        case "6h":
+          return roundToNearestMinutes(val, {nearestTo: 3600 * 6})
+        case "12h":
+          return roundToNearestMinutes(val, {nearestTo: 3600 * 12})
+        case "24h":
+          return roundToNearestMinutes(val, {nearestTo: 3600 * 24})
       }
     },
     toUnix(val) {

@@ -1,5 +1,4 @@
 <template>
-  <div class="col-4">
     <div class="dashboard_card card mb-4" :class="{'offline-card': !service.online}">
         <div class="card-header pb-1">
             <h6 v-observe-visibility="setVisible">
@@ -11,25 +10,23 @@
         </div>
 
         <div class="card-body">
-            <transition name="fade">
-            <div v-if="loaded" class="row pl-2 pr-2">
-              <div class="col-md-6 col-sm-12 mt-2 mt-md-0 mb-3 pl-0 pr-0">
+            <div v-if="loaded" class="row pl-2">
+              <div class="col-md-6 col-sm-12 pl-2 mt-2 mt-md-0 mb-3">
                   <ServiceSparkLine :title="set2_name" subtitle="Latency Last 24 Hours" :series="set2"/>
               </div>
-              <div class="col-md-6 col-sm-12 mt-4 mt-md-0 mb-3">
+              <div class="col-md-6 col-sm-12 pl-0 mt-4 mt-md-0 mb-3">
                   <ServiceSparkLine :title="set1_name" subtitle="Latency Last 7 Days" :series="set1"/>
               </div>
               <ServiceEvents :service="service"/>
             </div>
-              <div v-else class="row mb-5 pt-5 pb-5">
-                <div class="col-6 text-center">
-                  <font-awesome-icon icon="circle-notch" class="text-dim" size="3x" spin/>
+              <div v-else class="row mb-5">
+                <div class="col-12 col-md-6 text-center">
+                  <font-awesome-icon icon="circle-notch" class="text-dim" size="2x" spin/>
                 </div>
-                <div class="col-6 text-center text-dim">
-                  <font-awesome-icon icon="circle-notch" class="text-dim" size="3x" spin/>
+                <div class="col-12 col-md-6 text-center text-dim">
+                  <font-awesome-icon icon="circle-notch" class="text-dim" size="2x" spin/>
                 </div>
               </div>
-            </transition>
         </div>
         <div class="card-footer">
 
@@ -62,7 +59,6 @@
         </span>
 
     </div>
-  </div>
 </template>
 
 <script>

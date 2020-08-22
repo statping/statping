@@ -1,26 +1,27 @@
 <template>
-  <div>
+  <div class="row p-2">
     <Loading :loading="!loaded"/>
-    <div v-if="loaded && last_failure && failureBefore" class="text-danger font-2 p-0 m-0 mb-2">
+    <div v-if="loaded && last_failure && failureBefore" class="col-12 text-danger font-2 m-0 mb-2">
       <font-awesome-icon icon="exclamation" class="mr-1 text-danger" size="1x"/> Recent Failure<br>
       <span class="font-italic d-inline-block text-dim" style="max-width: 270px">
       Last failure was {{ago(service.last_error)}} ago. {{last_failure.issue}}
       </span>
     </div>
 
-    <div v-if="loaded" v-for="message in messages" class="font-2 p-0 m-0 mb-2">
+    <div v-if="loaded" v-for="message in messages" class="col-12 font-2 m-0 mb-2">
       <font-awesome-icon icon="calendar" class="mr-1" size="1x"/> Upcoming Announcement<br>
       <span class="font-italic font-weight-light text-dim">{{message.description}}</span>
       <span class="font-0 text-dim float-right font-weight-light mt-1">@ <strong>{{niceDate(message.start_on)}}</strong>
       </span>
     </div>
-    <div v-if="loaded" v-for="incident in incidents" class="font-2 p-0 m-0 mb-2">
+
+    <div v-if="loaded" v-for="incident in incidents" class="col-12 font-2 m-0 mb-2">
       <font-awesome-icon icon="bullhorn" class="mr-1" size="1x"/>Recent Incident<br>
       <span class="font-italic d-inline-block text-dim" style="max-width: 270px">{{incident.title}} - {{incident.description}}</span>
       <span class="font-0 text-dim float-right font-weight-light mt-1">@ <strong>{{niceDate(incident.created_at)}}</strong></span>
     </div>
 
-    <div v-if="success_event && !failureBefore" class="font-2 p-0 m-0 mt-1 mb-3">
+    <div v-if="success_event && !failureBefore" class="col-12 font-2 m-0 mb-2">
       <span class="text-success"><font-awesome-icon icon="check" class="mr-1" size="1x"/>No New Events</span>
       <span class="font-italic d-inline-block text-truncate text-dim" style="max-width: 270px">
         Last failure was {{ago(service.last_error)}} ago.

@@ -113,7 +113,7 @@ A:HOVER {
 
 .list-group-item:HOVER {
   background-color: lighten($group-list-background, 5%) !important;
-  box-shadow: #00000014 0px 4px 4px 2px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px 1px;
   -webkit-transition-duration: 300ms;
   -moz-transition-duration: 300ms;
   -o-transition-duration: 300ms;

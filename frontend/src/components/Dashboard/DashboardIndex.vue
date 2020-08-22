@@ -1,6 +1,5 @@
 <template>
     <div class="col-12 mt-4 mt-md-3">
-
         <div class="row stats_area mb-5">
             <div class="col-4">
                 <span class="font-6 font-weight-bold d-block">{{$store.getters.services.length}}</span>
@@ -34,27 +33,26 @@
       </div>
 
       <div class="row">
-        <ServiceInfo v-for="(service, index) in services_no_group" v-bind:key="index" :service="service" />
+        <div v-for="(service, index) in services_no_group" class="col-12 col-md-4">
+          <ServiceInfo :service="service" />
+        </div>
       </div>
 
-      <div class="row" v-for="group in groups">
-        <h4 class="h4 col-12 mb-3 mt-2 text-dim"><font-awesome-icon icon="minus" class="mr-3"/> {{group.name}}</h4>
-        <ServiceInfo v-if="group_services(group.id)" v-for="(service, index) in group_services(group.id)" v-bind:key="index" :service="service" />
+      <div v-for="group in groups">
+        <GroupedServices :group="group"/>
       </div>
 
     </div>
 </template>
 
 <script>
-  import isAfter from "date-fns/isAfter";
-  import parseISO from "date-fns/parseISO";
-  import isBefore from "date-fns/isBefore";
-
+  import GroupedServices from "@/components/Dashboard/GroupedServices";
   const ServiceInfo = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/ServiceInfo')
 
   export default {
       name: 'DashboardIndex',
       components: {
+        GroupedServices,
           ServiceInfo
       },
     data() {
@@ -77,9 +75,6 @@
         },
       },
       methods: {
-        group_services(id) {
-          return this.$store.getters.servicesInGroup(id)
-        },
           failuresLast24Hours() {
               let total = 0;
               this.services.map((s) => {

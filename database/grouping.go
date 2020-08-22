@@ -233,10 +233,6 @@ func ParseQueries(r *http.Request, o isObject) (*GroupQuery, error) {
 	if endField == 0 {
 		query.End = utils.Now()
 	}
-	if query.End.After(utils.Now()) {
-		query.End = utils.Now()
-	}
-
 	if query.Limit != 0 {
 		q = q.Limit(query.Limit)
 	}
