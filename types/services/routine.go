@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net"
@@ -19,6 +20,7 @@ import (
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/utils"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
 // checkServices will start the checking go routine for each service
@@ -169,6 +171,24 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 		}
 		return s, err
 	}
+
+	// Context will cancel the request when timeout is exceeded.
+	// Cancel the context when request is served within the timeout limit.
+	timeout := time.Duration(s.Timeout) * time.Second
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	// Create a new health check client
+	c := healthpb.NewHealthClient(conn)
+	in := &healthpb.HealthCheckRequest{}
+	res, err := c.Check(ctx, in)
+	if err != nil {
+		if record {
+			recordFailure(s, fmt.Sprintf("GRPC Error %v", err))
+		}
+		return s, nil
+	}
+
 	if err := conn.Close(); err != nil {
 		if record {
 			RecordFailure(s, fmt.Sprintf("%v Socket Close Error %v", strings.ToUpper(s.Type), err), "close")
@@ -176,12 +196,34 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 		return s, err
 	}
 
+	// Record latency and response
 	s.Latency = utils.Now().Sub(t1).Microseconds()
 	s.LastResponse = ""
 	s.Online = true
+	s.LastResponse = res.String()
+	s.LastStatusCode = int(res.GetStatus())
+	s.ExpectedStatus = 1
+	s.Expected.String = "status:SERVING"
+
+	if !(s.Expected.String == strings.TrimSpace(s.LastResponse)) {
+		log.Warnln(fmt.Sprintf("GRPC Service: '%s', Response: expected '%v', got '%v'", s.Name, s.LastResponse, s.Expected.String))
+		if record {
+			recordFailure(s, fmt.Sprintf("GRPC Response Body did not match '%v'", s.Expected.String))
+		}
+		return s, nil
+	}
+
+	if s.ExpectedStatus != int(res.Status) {
+		if record {
+			recordFailure(s, fmt.Sprintf("GRPC Service: '%s', Status Code: expected '%v', got '%v'", s.Name, res.Status, healthpb.HealthCheckResponse_ServingStatus(s.ExpectedStatus)))
+		}
+		return s, nil
+	}
+
 	if record {
 		RecordSuccess(s)
 	}
+
 	return s, nil
 }
 
