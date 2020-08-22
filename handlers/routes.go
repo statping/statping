@@ -181,7 +181,7 @@ func Router() *mux.Router {
 	// API Generic Routes
 	r.Handle("/metrics", readOnly(promhttp.Handler(), false))
 	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
-	r.NotFoundHandler = http.HandlerFunc(indexHandler)
+	r.NotFoundHandler = http.HandlerFunc(baseHandler)
 	return r
 }
 
