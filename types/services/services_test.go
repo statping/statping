@@ -469,7 +469,7 @@ func TestServices(t *testing.T) {
 		item, err := Find(1)
 		require.Nil(t, err)
 		amount := item.Downtime().Seconds()
-		assert.GreaterOrEqual(t, float64(75), amount)
+		assert.GreaterOrEqual(t, int64(75), int64(amount))
 	})
 
 	t.Run("Test Failures Since", func(t *testing.T) {
