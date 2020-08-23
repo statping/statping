@@ -19,7 +19,6 @@ var (
 )
 
 func TestMobileNotifier(t *testing.T) {
-	t.SkipNow()
 	err := utils.InitLogs()
 	require.Nil(t, err)
 
@@ -48,7 +47,7 @@ func TestMobileNotifier(t *testing.T) {
 		Add(Mobile)
 
 		assert.Equal(t, "Hunter Long", Mobile.Author)
-		assert.Equal(t, mobileToken, Mobile.Var1)
+		assert.Equal(t, mobileToken, Mobile.Var1.String)
 	})
 
 	t.Run("Mobile Notifier Tester", func(t *testing.T) {

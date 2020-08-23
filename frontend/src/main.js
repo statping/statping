@@ -37,7 +37,10 @@ Sentry.init({
   integrations: [new Integrations.Vue({Vue, attachProps: true, logErrors: true})],
 });
 
-Vue.config.productionTip = false
+Vue.config.productionTip = process.env.NODE_ENV !== 'production'
+Vue.config.devtools = process.env.NODE_ENV !== 'production'
+Vue.config.performance = process.env.NODE_ENV !== 'production'
+
 new Vue({
   router,
   store,

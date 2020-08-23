@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"crypto/tls"
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/checkins"
@@ -470,7 +469,7 @@ func TestServices(t *testing.T) {
 		item, err := Find(1)
 		require.Nil(t, err)
 		amount := item.Downtime().Seconds()
-		assert.Equal(t, "75", fmt.Sprintf("%0.f", amount))
+		assert.GreaterOrEqual(t, int64(75), int64(amount))
 	})
 
 	t.Run("Test Failures Since", func(t *testing.T) {

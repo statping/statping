@@ -2,15 +2,15 @@
     <div>
     <form @submit.prevent="login" autocomplete="on">
         <div class="form-group row">
-            <label for="username" class="col-sm-2 col-form-label">{{$t('username')}}</label>
-            <div class="col-sm-10">
-                <input @keyup="checkForm" type="text" v-model="username" autocomplete="username" name="username" class="form-control" id="username" placeholder="Username" autocorrect="off" autocapitalize="none">
+            <label for="username" class="col-4 col-form-label">{{$t('username')}}</label>
+            <div class="col-8">
+                <input @keyup="checkForm" type="text" v-model="username" autocomplete="username" name="username" class="form-control" id="username" placeholder="admin" autocorrect="off" autocapitalize="none">
             </div>
         </div>
         <div class="form-group row">
-            <label for="password" class="col-sm-2 col-form-label">{{$t('password')}}</label>
-            <div class="col-sm-10">
-                <input @keyup="checkForm" type="password" v-model="password" autocomplete="current-password" name="password" class="form-control" id="password" placeholder="Password">
+            <label for="password" class="col-4 col-form-label">{{$t('password')}}</label>
+            <div class="col-8">
+                <input @keyup="checkForm" type="password" v-model="password" autocomplete="current-password" name="password" class="form-control" id="password" placeholder="password123">
             </div>
         </div>
         <div class="form-group row">
@@ -18,14 +18,14 @@
                 <div v-if="error" class="alert alert-danger" role="alert">
                     {{$t('dashboard.wrong_login')}}
                 </div>
-                <button @click.prevent="login" type="submit" class="btn btn-block mb-3 btn-primary" :disabled="disabled || loading">
+                <button @click.prevent="login" type="submit" class="btn btn-block btn-primary" :disabled="disabled || loading">
                     <font-awesome-icon v-if="loading" icon="circle-notch" class="mr-2" spin/>{{loading ? $t('dashboard.loading') : $t('dashboard.sign_in')}}
                 </button>
             </div>
         </div>
     </form>
 
-        <a v-if="oauth && oauth.gh_client_id" @click.prevent="GHlogin" href="#" class="btn btn-block btn-outline-dark">
+        <a v-if="oauth && oauth.gh_client_id" @click.prevent="GHlogin" href="#" class="mt-4 btn btn-block btn-outline-dark">
             <font-awesome-icon :icon="['fab', 'github']" /> Login with Github
         </a>
 

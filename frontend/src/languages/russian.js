@@ -7,6 +7,7 @@ const russian = {
     announcements: "Announcements",
     settings: "Settings",
     logs: "Logs",
+    help: "Help",
     logout: 'Logout',
   },
   setup: {

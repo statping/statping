@@ -24,11 +24,11 @@ func InitEnvs() {
 		Log.Errorln(err)
 		defaultDir = "."
 	}
-	Params.Set("VERSION", Version)
 	Params.SetDefault("DISABLE_HTTP", false)
 	Params.SetDefault("STATPING_DIR", defaultDir)
 	Params.SetDefault("GO_ENV", "production")
 	Params.SetDefault("DEBUG", false)
+	Params.SetDefault("DEMO_MODE", false)
 	Params.SetDefault("DB_CONN", "")
 	Params.SetDefault("DISABLE_LOGS", false)
 	Params.SetDefault("USE_ASSETS", false)

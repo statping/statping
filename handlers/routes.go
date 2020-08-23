@@ -9,6 +9,7 @@ import (
 	"github.com/statping/statping/utils"
 	"net/http"
 	"net/http/pprof"
+	"time"
 
 	_ "github.com/statping/statping/types/metrics"
 )
@@ -38,7 +39,7 @@ func Router() *mux.Router {
 	}
 
 	bPath := utils.Params.GetString("BASE_PATH")
-	sentryHandler := sentryhttp.New(sentryhttp.Options{})
+	sentryHandler := sentryhttp.New(sentryhttp.Options{Timeout: 5 * time.Second})
 
 	if bPath != "" {
 		basePath = "/" + bPath + "/"
@@ -180,7 +181,7 @@ func Router() *mux.Router {
 	// API Generic Routes
 	r.Handle("/metrics", readOnly(promhttp.Handler(), false))
 	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
-	r.NotFoundHandler = http.HandlerFunc(notFoundHandler)
+	r.NotFoundHandler = http.HandlerFunc(baseHandler)
 	return r
 }
 

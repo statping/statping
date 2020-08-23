@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const limitFailures = 32
+
 func (s *Service) FailuresColumnID() (string, int64) {
 	return "service", s.Id
 }

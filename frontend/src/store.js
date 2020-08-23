@@ -36,6 +36,7 @@ export default new Vuex.Store({
   getters: {
     hasAllData: state => state.hasAllData,
     hasPublicData: state => state.hasPublicData,
+    admin: state => state.admin,
     core: state => state.core,
     oauth: state => state.oauth,
     token: state => state.token,
@@ -69,10 +70,7 @@ export default new Vuex.Store({
       }
     },
     serviceById: (state) => (id) => {
-      return state.services.find(s => s.id === id)
-    },
-    serviceByPermalink: (state) => (permalink) => {
-      return state.services.find(s => s.permalink === permalink)
+      return state.services.find(s => s.permalink === id || s.id === id)
     },
     servicesInGroup: (state) => (id) => {
       return state.services.filter(s => s.group_id === id).sort((a, b) => a.order_id - b.order_id)

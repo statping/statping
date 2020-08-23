@@ -32,7 +32,7 @@ func init() {
 	utils.InitLogs()
 	source.Assets()
 	dir = utils.Directory
-	core.New("test")
+	core.New("test", "testcommithere")
 }
 
 func TestFailedHTTPServer(t *testing.T) {
@@ -204,12 +204,6 @@ func TestMainApiRoutes(t *testing.T) {
 				assert.Equal(t, "Updated Core", core.App.Name)
 				return nil
 			},
-		},
-		{
-			Name:           "404 Error Page",
-			URL:            "/api/missing_404_page",
-			Method:         "GET",
-			ExpectedStatus: 404,
 		},
 		{
 			Name:             "Health Check endpoint",

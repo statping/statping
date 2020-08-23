@@ -161,7 +161,7 @@ func TestApiNotifiersRoutes(t *testing.T) {
 			Method: "POST",
 			Body: `{
 					"method": "slack",
-					"host": "https://slack.api/example/12345",
+					"host": "https://hooks.slack.com/services/TTJ1B49DP/XBNU09O9M/9uI2123SUnYBuGcxLopZomz9H",
 					"enabled": true,
 					"limits": 55
 				}`,
@@ -173,7 +173,7 @@ func TestApiNotifiersRoutes(t *testing.T) {
 			URL:              "/api/notifier/slack",
 			Method:           "GET",
 			ExpectedStatus:   200,
-			ExpectedContains: []string{`"method":"slack"`, `"host":"https://slack.api/example/12345"`},
+			ExpectedContains: []string{`"method":"slack"`, `"host":"https://hooks.slack.com/services/TTJ1B49DP/XBNU09O9M/9uI2123SUnYBuGcxLopZomz9H"`},
 			BeforeTest:       SetTestENV,
 			SecureRoute:      true,
 		},

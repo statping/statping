@@ -3,13 +3,13 @@
         <div class="card contain-card mb-4">
             <div class="card-header">{{ $t('service.info') }}</div>
             <div class="card-body">
-        <div class="form-group row">
-            <label class="col-sm-4 col-form-label">{{ $t('service.name') }}</label>
-            <div class="col-sm-8">
-                <input v-model="service.name" @input="updatePermalink" id="name" type="text" name="name" class="form-control" placeholder="Server Name" required spellcheck="false" autocorrect="off">
-                <small class="form-text text-muted">Give your service a name you can recognize</small>
+            <div class="form-group row">
+                <label class="col-sm-4 col-form-label">{{ $t('service.name') }}</label>
+                <div class="col-sm-8">
+                    <input v-model="service.name" @input="updatePermalink" id="name" type="text" name="name" class="form-control" placeholder="Server Name" required spellcheck="false" autocorrect="off">
+                    <small class="form-text text-muted">Give your service a name you can recognize</small>
+                </div>
             </div>
-        </div>
         <div class="form-group row">
             <label for="service_type" class="col-sm-4 col-form-label">{{ $t('service.type') }}</label>
             <div class="col-sm-8">
@@ -61,7 +61,7 @@
                     <small id="interval" class="form-text text-muted">Interval to check your service state</small>
                 </div>
                 <div class="col-sm-2">
-                    <input v-model="service.check_interval" type="text" name="check_interval" class="form-control">
+                    <input v-model="service.check_interval" type="number" name="check_interval" class="form-control">
                 </div>
             </div>
 
@@ -73,9 +73,11 @@
             <div class="card-body">
 
             <div class="form-group row">
-                <label for="service_url" class="col-sm-4 col-form-label">Service Endpoint {{service.type === 'http' ? "(URL)" : "(Domain)"}}</label>
+                <label for="service_url" class="col-sm-4 col-form-label">
+                  Service Endpoint {{service.type === 'http' ? "(URL)" : "(Domain)"}}
+                </label>
                 <div class="col-sm-8">
-                    <input v-model="service.domain" type="text" class="form-control" id="service_url" :placeholder="service.type === 'http' ? 'https://google.com' : '192.168.1.1'" required autocapitalize="none" spellcheck="false">
+                    <input v-model="service.domain" type="url" class="form-control" id="service_url" :placeholder="service.type === 'http' ? 'https://google.com' : '192.168.1.1'" required autocapitalize="none" spellcheck="false">
                     <small class="form-text text-muted">Statping will attempt to connect to this address</small>
                 </div>
             </div>
@@ -110,7 +112,7 @@
             </div>
 
             <div class="col-sm-2">
-                <input v-model="service.timeout" type="text" name="service_timeout" class="form-control">
+                <input v-model="service.timeout" type="number" name="service_timeout" class="form-control">
             </div>
 
         </div>

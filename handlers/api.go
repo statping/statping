@@ -90,7 +90,7 @@ func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	app.UseCdn = null.NewNullBool(c.UseCdn.Bool)
 	app.AllowReports = null.NewNullBool(c.AllowReports.Bool)
-	utils.SentryInit(nil, app.AllowReports.Bool)
+	utils.SentryInit(app.AllowReports.Bool)
 	err = app.Update()
 	returnJson(core.App, w, r)
 }

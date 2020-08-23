@@ -14,18 +14,21 @@
                 <li @click="navopen = !navopen" class="nav-item navbar-item">
                     <router-link to="/dashboard/services" class="nav-link">{{ $t('top_nav.services') }}</router-link>
                 </li>
-                <li v-if="$store.state.admin" @click="navopen = !navopen" class="nav-item navbar-item">
+                <li v-if="admin" @click="navopen = !navopen" class="nav-item navbar-item">
                     <router-link to="/dashboard/users" class="nav-link">{{ $t('top_nav.users') }}</router-link>
                 </li>
                 <li @click="navopen = !navopen" class="nav-item navbar-item">
                     <router-link to="/dashboard/messages" class="nav-link">{{ $t('top_nav.announcements') }}</router-link>
                 </li>
-                <li v-if="$store.state.admin" @click="navopen = !navopen" class="nav-item navbar-item">
+                <li v-if="admin" @click="navopen = !navopen" class="nav-item navbar-item">
                     <router-link to="/dashboard/settings" class="nav-link">{{ $t('top_nav.settings') }}</router-link>
                 </li>
-                <li v-if="$store.state.admin" @click="navopen = !navopen" class="nav-item navbar-item">
-                    <router-link to="/dashboard/logs" class="nav-link">{{ $t('top_nav.logs') }}</router-link>
-                </li>
+              <li v-if="admin" @click="navopen = !navopen" class="nav-item navbar-item">
+                <router-link to="/dashboard/logs" class="nav-link">{{ $t('top_nav.logs') }}</router-link>
+              </li>
+              <li v-if="admin" @click="navopen = !navopen" class="nav-item navbar-item">
+                <router-link to="/dashboard/help" class="nav-link">{{ $t('top_nav.help') }}</router-link>
+              </li>
             </ul>
             <span class="navbar-text">
       <a href="#" class="nav-link" @click.prevent="logout">{{ $t('top_nav.logout') }}</a>
@@ -45,6 +48,11 @@
               navopen: false
           }
       },
+    computed: {
+      admin() {
+        return this.$store.state.admin
+      }
+    },
       methods: {
         async logout () {
           await Api.logout()
@@ -57,7 +65,3 @@
     }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

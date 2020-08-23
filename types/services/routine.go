@@ -94,7 +94,7 @@ func CheckIcmp(s *Service, record bool) (*Service, error) {
 	dur, err := utils.Ping(s.Domain, s.Timeout)
 	if err != nil {
 		if record {
-			RecordFailure(s, fmt.Sprintf("Could not send ICMP to service %v, %v", s.Domain, err))
+			RecordFailure(s, fmt.Sprintf("Could not send ICMP to service %v, %v", s.Domain, err), "lookup")
 		}
 		return s, err
 	}
@@ -118,7 +118,7 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 	dnsLookup, err := dnsCheck(s)
 	if err != nil {
 		if record {
-			RecordFailure(s, fmt.Sprintf("Could not get IP address for GRPC service %v, %v", s.Domain, err))
+			RecordFailure(s, fmt.Sprintf("Could not get IP address for GRPC service %v, %v", s.Domain, err), "lookup")
 		}
 		return s, err
 	}
@@ -137,13 +137,13 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 	}
 	if err != nil {
 		if record {
-			RecordFailure(s, fmt.Sprintf("Dial Error %v", err))
+			RecordFailure(s, fmt.Sprintf("Dial Error %v", err), "connection")
 		}
 		return s, err
 	}
 	if err := conn.Close(); err != nil {
 		if record {
-			RecordFailure(s, fmt.Sprintf("%v Socket Close Error %v", strings.ToUpper(s.Type), err))
+			RecordFailure(s, fmt.Sprintf("%v Socket Close Error %v", strings.ToUpper(s.Type), err), "close")
 		}
 		return s, err
 	}
@@ -165,7 +165,7 @@ func CheckTcp(s *Service, record bool) (*Service, error) {
 	dnsLookup, err := dnsCheck(s)
 	if err != nil {
 		if record {
-			RecordFailure(s, fmt.Sprintf("Could not get IP address for TCP service %v, %v", s.Domain, err))
+			RecordFailure(s, fmt.Sprintf("Could not get IP address for TCP service %v, %v", s.Domain, err), "lookup")
 		}
 		return s, err
 	}
@@ -189,7 +189,7 @@ func CheckTcp(s *Service, record bool) (*Service, error) {
 		conn, err := net.DialTimeout(s.Type, domain, time.Duration(s.Timeout)*time.Second)
 		if err != nil {
 			if record {
-				RecordFailure(s, fmt.Sprintf("Dial Error: %v", err))
+				RecordFailure(s, fmt.Sprintf("Dial Error: %v", err), "tls")
 			}
 			return s, err
 		}
@@ -203,7 +203,7 @@ func CheckTcp(s *Service, record bool) (*Service, error) {
 		conn, err := tls.DialWithDialer(dialer, s.Type, domain, tlsConfig)
 		if err != nil {
 			if record {
-				RecordFailure(s, fmt.Sprintf("Dial Error: %v", err))
+				RecordFailure(s, fmt.Sprintf("Dial Error: %v", err), "tls")
 			}
 			return s, err
 		}
@@ -232,7 +232,7 @@ func CheckHttp(s *Service, record bool) (*Service, error) {
 	dnsLookup, err := dnsCheck(s)
 	if err != nil {
 		if record {
-			RecordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
+			RecordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err), "lookup")
 		}
 		return s, err
 	}
@@ -284,7 +284,7 @@ func CheckHttp(s *Service, record bool) (*Service, error) {
 	content, res, err = utils.HttpRequest(s.Domain, s.Method, contentType, headers, data, timeout, s.VerifySSL.Bool, customTLS)
 	if err != nil {
 		if record {
-			RecordFailure(s, fmt.Sprintf("HTTP Error %v", err))
+			RecordFailure(s, fmt.Sprintf("HTTP Error %v", err), "request")
 		}
 		return s, err
 	}
@@ -301,14 +301,14 @@ func CheckHttp(s *Service, record bool) (*Service, error) {
 		}
 		if !match {
 			if record {
-				RecordFailure(s, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
+				RecordFailure(s, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected), "regex")
 			}
 			return s, err
 		}
 	}
 	if s.ExpectedStatus != res.StatusCode {
 		if record {
-			RecordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", res.StatusCode, s.ExpectedStatus))
+			RecordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", res.StatusCode, s.ExpectedStatus), "status_code")
 		}
 		return s, err
 	}
@@ -341,13 +341,8 @@ func RecordSuccess(s *Service) {
 	sendSuccess(s)
 }
 
-func AddNotifier(n ServiceNotifier) {
-	notif := n.Select()
-	allNotifiers[notif.Method] = n
-}
-
 // RecordFailure will create a new 'Failure' record in the database for a offline service
-func RecordFailure(s *Service, issue string) {
+func RecordFailure(s *Service, issue, reason string) {
 	s.LastOffline = utils.Now()
 
 	fail := &failures.Failure{
@@ -356,6 +351,7 @@ func RecordFailure(s *Service, issue string) {
 		PingTime:  s.PingTime,
 		CreatedAt: utils.Now(),
 		ErrorCode: s.LastStatusCode,
+		Reason:    reason,
 	}
 	log.WithFields(utils.ToFields(fail, s)).
 		Warnln(fmt.Sprintf("Service %v Failing: %v | Lookup in: %v", s.Name, issue, humanMicro(fail.PingTime)))
@@ -365,6 +361,14 @@ func RecordFailure(s *Service, issue string) {
 	}
 	s.Online = false
 	s.DownText = s.DowntimeText()
+
+	limitOffset := len(s.Failures)
+	if len(s.Failures) >= limitFailures {
+		limitOffset = limitFailures - 1
+	}
+
+	s.Failures = append([]*failures.Failure{fail}, s.Failures[:limitOffset]...)
+
 	metrics.Gauge("online", 0., s.Name, s.Type)
 	metrics.Inc("failure", s.Name)
 	sendFailure(s, fail)

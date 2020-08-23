@@ -79,7 +79,7 @@ func (m *mobilePush) OnFailure(s services.Service, f failures.Failure) (string, 
 func (m *mobilePush) OnSuccess(s services.Service) (string, error) {
 	data := dataJson(s, failures.Failure{})
 	msg := &pushArray{
-		Message:  fmt.Sprintf("%s is currently online!", s.Name),
+		Message:  fmt.Sprintf("%s is back online and was down for %s", s.Name, s.Downtime().Human()),
 		Title:    "Service Online",
 		Data:     data,
 		Platform: 2,

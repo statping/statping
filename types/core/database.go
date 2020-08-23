@@ -57,6 +57,8 @@ func Select() (*Core, error) {
 	if utils.Params.GetString("API_SECRET") != "" {
 		App.ApiSecret = utils.Params.GetString("API_SECRET")
 	}
+	App.Version = utils.Params.GetString("VERSION")
+	App.Commit = utils.Params.GetString("COMMIT")
 	return App, q.Error()
 }
 

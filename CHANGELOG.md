@@ -1,3 +1,17 @@
+# 0.90.64 (08-18-2020)
+- Modified max-width for container to 1012px, larger UI
+- Added failure sparklines in the Services list view
+- Added "Update Available" alert on the top of Settings if new version is available
+- Added Version and Github Commit hash to left navigation on Settings page
+- Added "reason" for failures (will be used for more custom notification messages) [regex, lookup, timeout, connection, close, status_code]
+- Added Help page that is generated from Statping's Wiki repo on build
+- Modified Service Group failures on index page to show 90 days of failures
+- Modified Service view page, updated Latency and Ping charts, added failures below
+- Modified Service chart on index page to show ping data along with latency
+- Added AWS SNS Notifier
+- Modified dashboard services UI
+- Modified service.Failures API to include 32 failures (max)
+
 # 0.90.63 (08-17-2020)
 - Modified build process to use xgo for all arch builds
 - Modified Statping's Push Notifications server notifier to match with Firebase/gorush params

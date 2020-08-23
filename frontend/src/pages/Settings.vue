@@ -3,6 +3,13 @@
         <div class="row">
             <div class="col-md-3 col-sm-12 mb-4 mb-md-0">
                 <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+
+                    <div v-if="version_below" class="alert small text-center mt-0 pt-0 pb-0">
+                      Update {{github.tag_name}} Available
+                      <a href="https://github.com/statping/statping/releases/latest" class="btn btn-sm text-success mt-2">Download</a>
+                      <a href="https://github.com/statping/statping/blob/master/CHANGELOG.md" class="btn btn-sm text-dim mt-2">Changelog</a>
+                    </div>
+
                     <h6 class="text-muted">{{ $t('settings.main') }}</h6>
 
                     <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-home-tab')}" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">
@@ -48,9 +55,10 @@
                         <font-awesome-icon icon="code-branch" class="mr-3"/> {{$t('settings.repo')}}
                     </a>
 
-                    <div class="row justify-content-center mt-2">
-                        <github-button href="https://github.com/statping/statping" data-icon="octicon-star" data-show-count="true" aria-label="Star Statping on GitHub">Star</github-button>
-                    </div>
+                  <span class="small text-dim text-center mt-5">Statping v{{core.version}}<br>
+                    <a class="small text-muted no-decoration" v-if="core.commit" v-bind:href="`https://github.com/statping/statping/commit/${core.commit}`">{{core.commit.slice(0,8)}}</a>
+                  </span>
+
 
                 </div>
 
@@ -116,8 +124,8 @@
 
 <script>
   import Api from '../API';
-  import GithubButton from 'vue-github-button'
   import Variables from "@/components/Dashboard/Variables";
+  const semver = require('semver')
 
   const CoreSettings = () => import(/* webpackChunkName: "dashboard" */ '@/forms/CoreSettings')
   const FormIntegration = () => import(/* webpackChunkName: "dashboard" */ '@/forms/Integration')
@@ -130,7 +138,6 @@
       name: 'Settings',
       components: {
         Variables,
-        GithubButton,
         OAuth,
           Cache,
           ThemeEditor,
@@ -141,6 +148,7 @@
       data() {
           return {
               tab: "v-pills-home-tab",
+            github: null,
           }
       },
       computed: {
@@ -148,8 +156,14 @@
               return this.$store.getters.core
           },
           notifiers() {
-              return this.$store.getters.notifiers
-          }
+            return this.$store.getters.notifiers
+          },
+        version_below() {
+            if (!this.github || !this.core.version) {
+              return false
+            }
+            return semver.gt(semver.coerce(this.github.tag_name), semver.coerce(this.core.version))
+        }
       },
     mounted() {
 
@@ -159,11 +173,15 @@
       },
       methods: {
         async update() {
-          const c = await Api.core()
-          this.$store.commit('setCore', c)
-          const n = await Api.notifiers()
-          this.$store.commit('setNotifiers', n)
           this.cache = await Api.cache()
+          await this.getGithub()
+        },
+        async getGithub() {
+          try {
+            this.github = await Api.github_release()
+          } catch(e) {
+            console.error(e)
+          }
         },
           changeTab(e) {
               this.tab = e.target.id
@@ -172,19 +190,24 @@
               return this.tab === id
           },
         async renewApiKeys() {
-          let r = confirm("Are you sure you want to reset the API keys?");
+          let r = confirm("Are you sure you want to reset the API keys? You will be logged out.");
           if (r === true) {
             await Api.renewApiKeys()
             const core = await Api.core()
             this.$store.commit('setCore', core)
             this.core = core
+            await this.logout()
           }
         },
+        async logout () {
+          await Api.logout()
+          this.$store.commit('setHasAllData', false)
+          this.$store.commit('setToken', null)
+          this.$store.commit('setAdmin', false)
+          this.$store.commit('setUser', false)
+          // this.$cookies.remove("statping_auth")
+          await this.$router.push('/logout')
+        }
       }
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-
-</style>

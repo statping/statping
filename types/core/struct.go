@@ -10,9 +10,10 @@ var (
 	App *Core
 )
 
-func New(version string) {
+func New(version, commit string) {
 	App = new(Core)
 	App.Version = version
+	App.Commit = commit
 	App.Started = utils.Now()
 }
 
@@ -28,6 +29,7 @@ type Core struct {
 	Footer        null.NullString `gorm:"column:footer" json:"footer"`
 	Domain        string          `gorm:"not null;column:domain" json:"domain"`
 	Version       string          `gorm:"column:version" json:"version"`
+	Commit        string          `gorm:"-" json:"commit"`
 	Language      string          `gorm:"column:language" json:"language"`
 	Setup         bool            `gorm:"-" json:"setup"`
 	MigrationId   int64           `gorm:"column:migration_id" json:"migration_id,omitempty"`

@@ -21,14 +21,14 @@ test: clean compile
 	go test -v -p=1 -ldflags="-X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -coverprofile=coverage.out ./...
 
 build: clean
-	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -o statping --tags "netgo linux" ./cmd
+	CGO_ENABLED=1 go build -a -ldflags "-s -w -X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -o statping --tags "netgo osusergo" ./cmd
 
 go-build: clean
 	rm -rf source/dist
 	rm -rf source/rice-box.go
 	wget https://assets.statping.com/source.tar.gz
 	tar -xvf source.tar.gz
-	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -o statping --tags "netgo" ./cmd
+	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -o statping --tags "netgo osusergo" ./cmd
 
 lint:
 	go fmt ./...
@@ -76,6 +76,7 @@ test-deps:
 	go get github.com/GeertJohan/go.rice/rice
 	go get github.com/mattn/go-sqlite3
 	go install github.com/mattn/go-sqlite3
+	go install github.com/wellington/go-libsass
 
 deps:
 	go get -d -v -t ./...
@@ -419,6 +420,14 @@ check:
 #	sentry-cli releases new -p $SENTRY_PROJECT $VERSION
 #	sentry-cli releases set-commits --auto $VERSION
 #	sentry-cli releases files $VERSION upload-sourcemaps dist
+
+gen_help:
+	for file in ./statping.wiki/*.md
+	  do
+		# convert each file to html and place it in the html directory
+		# --gfm == use github flavoured markdown
+		marked -o html/$file.html $file --gfm
+	done
 
 .PHONY: all check build certs multiarch install-darwin go-build build-all buildx-base buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds

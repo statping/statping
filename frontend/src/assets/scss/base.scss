@@ -83,13 +83,13 @@
 }
 
 .chartmarker {
-  padding: 5px;
-  width: 240px;
+  padding: 0px;
+  width: 200px;
   text-align: right;
 }
 
 .chartmarker SPAN {
-  font-size: 9pt;
+  font-size: 4pt;
   display: block;
   color: #8b8b8b;
 }
@@ -103,11 +103,33 @@
     background-color: #efefef;
 }
 
+.divided {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.divider {
+  flex-grow: 1;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  margin: 0 20px 0 20px;
+}
+
+.daily-failures {
+  position: absolute;
+  padding-top: 3px;
+  top: 10px;
+  right: 100px;
+  width: 300px;
+  height: 25px;
+}
+
 .service_day {
   height: 20px;
   margin-right: 2px;
-  border-radius: 4px;
-  max-width: 25px;
+  border-radius: 2px;
+  max-width: 30px;
+  cursor: pointer;
 }
 
 .service_day SPAN {
@@ -152,10 +174,6 @@
   .online_list .badge {
     font-size: 8pt;
     padding: 5px 7px;
-  }
-
-  .service_li {
-    min-height: 115px !important;
   }
 
   .btn-sm {
@@ -287,10 +305,6 @@
 
   .text-dim {
     color: #a0a0a0;
-  }
-
-  .service_block {
-    min-height: 340px;
   }
 
   .json-field {

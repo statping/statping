@@ -35,6 +35,7 @@ func InitNotifiers() {
 		Pushover,
 		statpingMailer,
 		Gotify,
+		AmazonSNS,
 	)
 }
 
