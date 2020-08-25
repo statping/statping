@@ -1,0 +1,15 @@
+{
+  "type": 1,
+  "title": "Statping",
+  "description": "Service monitoring with a easy to use status page and mobile app",
+  "logo": "https://assets.statping.com/icon.png",
+  "image": "statping/statping:latest",
+  "ports": [
+    "8080:8080/tcp"
+  ],
+  "volumes": [
+    {
+      "container": "/app"
+    }
+  ]
+}
