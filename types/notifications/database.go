@@ -56,6 +56,9 @@ func (n *Notification) Create() error {
 }
 
 func (n *Notification) UpdateFields(notif *Notification) *Notification {
+	if notif == nil {
+		return n
+	}
 	n.Id = notif.Id
 	n.Limits = notif.Limits
 	n.Enabled = notif.Enabled
