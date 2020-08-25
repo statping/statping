@@ -1,3 +1,6 @@
+# 0.90.65 (08-24-2020)
+- Fixed issue with dashboard not logging in (notifier panic)
+
 # 0.90.64 (08-18-2020)
 - Modified max-width for container to 1012px, larger UI
 - Added failure sparklines in the Services list view

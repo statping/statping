@@ -8,7 +8,7 @@ func (c *Checkin) LastHit() *CheckinHit {
 
 func (c *Checkin) Hits() []*CheckinHit {
 	var hits []*CheckinHit
-	dbHits.Where("checkin = ?", c.Id).Order("DESC").Find(&hits)
+	dbHits.Where("checkin = ?", c.Id).Order("id DESC").Find(&hits)
 	c.AllHits = hits
 	return hits
 }
