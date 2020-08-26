@@ -13,7 +13,9 @@ import (
 func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 	var notifs []notifications.Notification
 	for _, n := range services.AllNotifiers() {
+		log.Warningln(n)
 		no := n.Select()
+		log.Warningln(no.Method)
 		notif, err := notifications.Find(no.Method)
 		if err != nil {
 			log.Errorln(err)

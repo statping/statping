@@ -1,5 +1,7 @@
 # 0.90.65 (08-24-2020)
 - Fixed issue with dashboard not logging in (notifier panic)
+- Modified static email templates to github.com/statping/emails
+- Modified Regenerate API function to keep API_SECRET env
 
 # 0.90.64 (08-18-2020)
 - Modified max-width for container to 1012px, larger UI

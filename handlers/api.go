@@ -31,10 +31,12 @@ func apiIndexHandler(r *http.Request) interface{} {
 }
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
-	var err error
-	core.App.ApiSecret = utils.NewSHA256Hash()
-	err = core.App.Update()
-	if err != nil {
+	newApi := utils.Params.GetString("API_SECRET")
+	if newApi == "" {
+		newApi = utils.NewSHA256Hash()
+	}
+	core.App.ApiSecret = newApi
+	if err := core.App.Update(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}

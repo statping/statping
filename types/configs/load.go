@@ -59,7 +59,7 @@ func LoadConfigs(cfgFile string) (*DbConfig, error) {
 	if db.Language != "" {
 		p.Set("LANGUAGE", db.Language)
 	}
-	if db.SendReports {
+	if db.AllowReports {
 		p.Set("ALLOW_REPORTS", true)
 	}
 	if db.LetsEncryptEmail != "" {
@@ -88,7 +88,7 @@ func LoadConfigs(cfgFile string) (*DbConfig, error) {
 		Location:          utils.Directory,
 		SqlFile:           p.GetString("SQL_FILE"),
 		Language:          p.GetString("LANGUAGE"),
-		SendReports:       p.GetBool("ALLOW_REPORTS"),
+		AllowReports:      p.GetBool("ALLOW_REPORTS"),
 		LetsEncryptEnable: p.GetBool("LETSENCRYPT_ENABLE"),
 		LetsEncryptHost:   p.GetString("LETSENCRYPT_HOST"),
 		LetsEncryptEmail:  p.GetString("LETSENCRYPT_EMAIL"),

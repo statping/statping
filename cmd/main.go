@@ -148,20 +148,20 @@ func InitApp() error {
 	if _, err := core.Select(); err != nil {
 		return err
 	}
+	// init Sentry error monitoring (its useful)
+	utils.SentryInit(core.App.AllowReports.Bool)
 	// init prometheus metrics
 	metrics.InitMetrics()
+	// connect each notifier, added them into database if needed
+	notifiers.InitNotifiers()
 	// select all services in database and store services in a mapping of Service pointers
 	if _, err := services.SelectAllServices(true); err != nil {
 		return err
 	}
 	// start routines for each service checking process
 	services.CheckServices()
-	// connect each notifier, added them into database if needed
-	notifiers.InitNotifiers()
 	// start routine to delete old records (failures, hits)
 	go database.Maintenance()
-	// init Sentry error monitoring (its useful)
-	utils.SentryInit(core.App.AllowReports.Bool)
 	core.App.Setup = true
 	core.App.Started = utils.Now()
 	return nil

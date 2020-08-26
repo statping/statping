@@ -48,21 +48,21 @@ func LoadConfigForm(r *http.Request) (*DbConfig, error) {
 	p.Set("ADMIN_EMAIL", email)
 
 	confg := &DbConfig{
-		DbConn:      dbConn,
-		DbHost:      dbHost,
-		DbUser:      dbUser,
-		DbPass:      dbPass,
-		DbData:      dbDatabase,
-		DbPort:      int(dbPort),
-		Project:     project,
-		Description: description,
-		Domain:      domain,
-		Username:    username,
-		Password:    password,
-		Email:       email,
-		Location:    utils.Directory,
-		Language:    language,
-		SendReports: reports,
+		DbConn:       dbConn,
+		DbHost:       dbHost,
+		DbUser:       dbUser,
+		DbPass:       dbPass,
+		DbData:       dbDatabase,
+		DbPort:       int(dbPort),
+		Project:      project,
+		Description:  description,
+		Domain:       domain,
+		Username:     username,
+		Password:     password,
+		Email:        email,
+		Location:     utils.Directory,
+		Language:     language,
+		AllowReports: reports,
 	}
 
 	return confg, nil

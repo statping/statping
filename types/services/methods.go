@@ -226,6 +226,7 @@ func SelectAllServices(start bool) (map[int64]*Service, error) {
 	if len(allServices) > 0 {
 		return allServices, nil
 	}
+	log.Infof("Preparing to monitor %d services...\n", len(allServices))
 	for _, s := range all() {
 		s.Failures = s.AllFailures().LastAmount(limitedFailures)
 		s.prevOnline = true

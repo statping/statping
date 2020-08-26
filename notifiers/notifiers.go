@@ -56,10 +56,11 @@ func ReplaceTemplate(tmpl string, data replacer) string {
 
 func Add(notifs ...services.ServiceNotifier) {
 	for _, n := range notifs {
-		services.AddNotifier(n)
-		if err := n.Select().Create(); err != nil {
+		notif := n.Select()
+		if err := notif.Create(); err != nil {
 			log.Error(err)
 		}
+		services.AddNotifier(n)
 	}
 }
 
