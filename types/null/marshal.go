@@ -1,9 +1,21 @@
 package null
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"gopkg.in/yaml.v2"
 )
+
+func (s NullString) Scan(value interface{}) error {
+	if s.Valid {
+		s.String = value.(string)
+	}
+	return nil
+}
+
+func (s NullString) Value() (driver.Value, error) {
+	return s.String, nil
+}
 
 // MarshalJSON for NullInt64
 func (i NullInt64) MarshalJSON() ([]byte, error) {
@@ -32,7 +44,7 @@ func (bb NullBool) MarshalJSON() ([]byte, error) {
 // MarshalJSON for NullString
 func (s NullString) MarshalJSON() ([]byte, error) {
 	if !s.Valid {
-		return []byte("null"), nil
+		return json.Marshal(nil)
 	}
 	return json.Marshal(s.String)
 }

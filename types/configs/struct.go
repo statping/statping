@@ -29,11 +29,11 @@ type DbConfig struct {
 	LetsEncryptEnable bool   `yaml:"letsencrypt_enable,omitempty" json:"letsencrypt_enable"`
 	LocalIP           string `yaml:"-" json:"-"`
 
-	DisableHTTP bool `yaml:"disable_http" json:"disable_http"`
-	DemoMode    bool `yaml:"demo_mode" json:"demo_mode"`
-	DisableLogs bool `yaml:"disable_logs" json:"disable_logs"`
-	UseAssets   bool `yaml:"use_assets" json:"use_assets"`
-	BasePath    bool `yaml:"base_path" json:"base_path"`
+	DisableHTTP bool   `yaml:"disable_http" json:"disable_http"`
+	DemoMode    bool   `yaml:"demo_mode" json:"demo_mode"`
+	DisableLogs bool   `yaml:"disable_logs" json:"disable_logs"`
+	UseAssets   bool   `yaml:"use_assets" json:"use_assets"`
+	BasePath    string `yaml:"base_path" json:"base_path"`
 
 	AdminUser     string `yaml:"admin_user" json:"admin_user"`
 	AdminPassword string `yaml:"admin_password" json:"admin_password"`

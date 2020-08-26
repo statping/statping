@@ -2,7 +2,6 @@ package notifications
 
 import (
 	"github.com/statping/statping/database"
-	"github.com/statping/statping/types/null"
 )
 
 var (
@@ -35,25 +34,11 @@ func Find(method string) (*Notification, error) {
 	return &n, nil
 }
 
-// BeforeCreate is a NULL constraint fix for postgres
-func (n *Notification) BeforeCreate() error {
-	n.Host = null.NewNullString("")
-	n.Port = null.NewNullInt64(0)
-	n.Username = null.NewNullString("")
-	n.Password = null.NewNullString("")
-	n.Var1 = null.NewNullString("")
-	n.Var2 = null.NewNullString("")
-	n.ApiKey = null.NewNullString("")
-	n.ApiSecret = null.NewNullString("")
-	return nil
-}
-
 func (n *Notification) Create() error {
 	var p Notification
 	q := db.Where("method = ?", n.Method).Find(&p)
 	if q.RecordNotFound() {
-		log.Infof("Notifier %s was not found, adding into database...\n", n.Method)
-		log.Infoln(n.Method, n.Id, n.Title, n.Host.String)
+		log.Infof("Notifier '%s' was not found, adding into database...\n", n.Method)
 		if err := db.Create(n).Error(); err != nil {
 			return err
 		}
