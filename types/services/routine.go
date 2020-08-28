@@ -184,7 +184,7 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 	res, err := c.Check(ctx, in)
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("GRPC Error %v", err))
+			RecordFailure(s, fmt.Sprintf("GRPC Error %v", err), "healthcheck")
 		}
 		return s, nil
 	}
@@ -208,14 +208,14 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 	if !(s.Expected.String == strings.TrimSpace(s.LastResponse)) {
 		log.Warnln(fmt.Sprintf("GRPC Service: '%s', Response: expected '%v', got '%v'", s.Name, s.LastResponse, s.Expected.String))
 		if record {
-			recordFailure(s, fmt.Sprintf("GRPC Response Body did not match '%v'", s.Expected.String))
+			RecordFailure(s, fmt.Sprintf("GRPC Response Body did not match '%v'", s.Expected.String), "response_body")
 		}
 		return s, nil
 	}
 
 	if s.ExpectedStatus != int(res.Status) {
 		if record {
-			recordFailure(s, fmt.Sprintf("GRPC Service: '%s', Status Code: expected '%v', got '%v'", s.Name, res.Status, healthpb.HealthCheckResponse_ServingStatus(s.ExpectedStatus)))
+			RecordFailure(s, fmt.Sprintf("GRPC Service: '%s', Status Code: expected '%v', got '%v'", s.Name, res.Status, healthpb.HealthCheckResponse_ServingStatus(s.ExpectedStatus)), "response_code")
 		}
 		return s, nil
 	}
