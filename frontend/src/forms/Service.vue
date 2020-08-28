@@ -156,7 +156,7 @@
             </div>
         </div>
 
-        <div v-if="service.type.match(/^(http)$/)" class="form-group row">
+        <div v-if="service.type.match(/^(http|grpc)$/)" class="form-group row">
             <label class="col-12 col-md-4 col-form-label">Verify SSL</label>
             <div class="col-12 col-md-8 mt-1 mb-2 mb-md-0">
                 <span @click="service.verify_ssl = !!service.verify_ssl" class="switch float-left">
