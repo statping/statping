@@ -93,6 +93,7 @@ func LoadConfigs(cfgFile string) (*DbConfig, error) {
 		LetsEncryptHost:   p.GetString("LETSENCRYPT_HOST"),
 		LetsEncryptEmail:  p.GetString("LETSENCRYPT_EMAIL"),
 		ApiSecret:         p.GetString("API_SECRET"),
+		SampleData:        p.GetBool("SAMPLE_DATA"),
 	}
 	log.WithFields(utils.ToFields(configs)).Debugln("read config file: " + cfgFile)
 
