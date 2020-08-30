@@ -6,13 +6,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func (s NullString) Scan(value interface{}) error {
-	if s.Valid {
-		s.String = value.(string)
-	}
-	return nil
-}
-
 func (s NullString) Value() (driver.Value, error) {
 	return s.String, nil
 }

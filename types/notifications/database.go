@@ -25,6 +25,15 @@ func (n *Notification) Values() Values {
 	}
 }
 
+func All() []*Notification {
+	var n []*Notification
+	q := db.Find(&n)
+	if q.Error() != nil {
+		return nil
+	}
+	return n
+}
+
 func Find(method string) (*Notification, error) {
 	var n Notification
 	q := db.Where("method = ?", method).Find(&n)

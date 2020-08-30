@@ -37,6 +37,8 @@ func InitNotifiers() {
 		Gotify,
 		AmazonSNS,
 	)
+
+	services.UpdateNotifiers()
 }
 
 func ReplaceTemplate(tmpl string, data replacer) string {
