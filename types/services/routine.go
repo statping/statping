@@ -163,9 +163,6 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 
 	conn, err := grpc.Dial(domain, grpcOption, grpc.WithBlock())
 	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
-	if err != nil {
 		if record {
 			RecordFailure(s, fmt.Sprintf("Dial Error %v", err), "connection")
 		}
