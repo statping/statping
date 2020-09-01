@@ -161,19 +161,19 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 		}
 	}
 
-	conn, err := grpc.Dial(domain, grpcOption, grpc.WithBlock())
+	// Context will cancel the request when timeout is exceeded.
+	// Cancel the context when request is served within the timeout limit.
+	timeout := time.Duration(s.Timeout) * time.Second
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	conn, err := grpc.DialContext(ctx, domain, grpcOption, grpc.WithBlock())
 	if err != nil {
 		if record {
 			RecordFailure(s, fmt.Sprintf("Dial Error %v", err), "connection")
 		}
 		return s, err
 	}
-
-	// Context will cancel the request when timeout is exceeded.
-	// Cancel the context when request is served within the timeout limit.
-	timeout := time.Duration(s.Timeout) * time.Second
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
 
 	// Create a new health check client
 	c := healthpb.NewHealthClient(conn)
