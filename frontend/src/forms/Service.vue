@@ -168,7 +168,7 @@
         </div>
 
         <div v-if="service.type.match(/^(grpc)$/)" class="form-group row">
-            <label class="col-12 col-md-4 col-form-label">GRPC Health Check</label>
+            <label class="col-12 col-md-4 col-form-label"><a href="https://github.com/grpc/grpc/blob/master/doc/health-checking.md#grpc-health-checking-protocol">GRPC Health Check</a></label>
             <div class="col-12 col-md-8 mt-1 mb-2 mb-md-0">
                 <span @click="service.grpc_health_check = !!service.grpc_health_check" class="switch float-left">
                     <input v-model="service.grpc_health_check" type="checkbox" name="grpc_health_check-option" class="switch" id="switch-grpc-health-check" v-bind:checked="service.grpc_health_check">
