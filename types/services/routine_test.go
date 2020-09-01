@@ -15,7 +15,7 @@ import (
 
 // grpcServerDef is function type.
 // Consumed by Test data.
-type grpcServerDef func(int) *grpc.Server
+type grpcServerDef func(int, bool) *grpc.Server
 
 // Test Data: Simulates testing scenarios
 var testdata = []struct {
@@ -23,38 +23,40 @@ var testdata = []struct {
 	clientChecker *Service
 }{
 	{
-		grpcService: func(port int) *grpc.Server {
-			return grpcServer(port, true)
+		grpcService: func(port int, enableHealthCheck bool) *grpc.Server {
+			return grpcServer(port, enableHealthCheck)
 		},
 		clientChecker: &Service{
-			Name:           "GRPC Server with Health check",
-			Domain:         "localhost",
-			Port:           50053,
-			Expected:       null.NewNullString("status:SERVING"),
-			ExpectedStatus: 1,
-			Type:           "grpc",
-			Timeout:        3,
-			VerifySSL:      null.NewNullBool(false),
+			Name:            "GRPC Server with Health check",
+			Domain:          "localhost",
+			Port:            50053,
+			Expected:        null.NewNullString("status:SERVING"),
+			ExpectedStatus:  1,
+			Type:            "grpc",
+			Timeout:         3,
+			VerifySSL:       null.NewNullBool(false),
+			GrpcHealthCheck: null.NewNullBool(true),
 		},
 	},
 	{
-		grpcService: func(port int) *grpc.Server {
-			return grpcServer(port, true)
+		grpcService: func(port int, enableHealthCheck bool) *grpc.Server {
+			return grpcServer(port, enableHealthCheck)
 		},
 		clientChecker: &Service{
-			Name:           "Check TLS endpoint on GRPC Server with TLS disabled",
-			Domain:         "localhost",
-			Port:           50054,
-			Expected:       null.NewNullString(""),
-			ExpectedStatus: 0,
-			Type:           "grpc",
-			Timeout:        1,
-			VerifySSL:      null.NewNullBool(true),
+			Name:            "Check TLS endpoint on GRPC Server with TLS disabled",
+			Domain:          "localhost",
+			Port:            50054,
+			Expected:        null.NewNullString(""),
+			ExpectedStatus:  0,
+			Type:            "grpc",
+			Timeout:         1,
+			VerifySSL:       null.NewNullBool(true),
+			GrpcHealthCheck: null.NewNullBool(true),
 		},
 	},
 	{
-		grpcService: func(port int) *grpc.Server {
-			return grpcServer(port, false)
+		grpcService: func(port int, enableHealthCheck bool) *grpc.Server {
+			return grpcServer(port, enableHealthCheck)
 		},
 		clientChecker: &Service{
 			Name:           "Check GRPC Server without Health check endpoint",
@@ -68,68 +70,72 @@ var testdata = []struct {
 		},
 	},
 	{
-		grpcService: func(port int) *grpc.Server {
-			return grpcServer(50056, true)
+		grpcService: func(port int, enableHealthCheck bool) *grpc.Server {
+			return grpcServer(50056, enableHealthCheck)
 		},
 		clientChecker: &Service{
-			Name:           "Check where no GRPC Server exists",
-			Domain:         "localhost",
-			Port:           1000,
-			Expected:       null.NewNullString(""),
-			ExpectedStatus: 0,
-			Type:           "grpc",
-			Timeout:        1,
-			VerifySSL:      null.NewNullBool(false),
+			Name:            "Check where no GRPC Server exists",
+			Domain:          "localhost",
+			Port:            1000,
+			Expected:        null.NewNullString(""),
+			ExpectedStatus:  0,
+			Type:            "grpc",
+			Timeout:         1,
+			VerifySSL:       null.NewNullBool(false),
+			GrpcHealthCheck: null.NewNullBool(true),
 		},
 	},
 	{
-		grpcService: func(port int) *grpc.Server {
-			return grpcServer(50057, true)
+		grpcService: func(port int, enableHealthCheck bool) *grpc.Server {
+			return grpcServer(50057, enableHealthCheck)
 		},
 		clientChecker: &Service{
-			Name:           "Check where no GRPC Server exists (Verify TLS)",
-			Domain:         "localhost",
-			Port:           1000,
-			Expected:       null.NewNullString(""),
-			ExpectedStatus: 0,
-			Type:           "grpc",
-			Timeout:        1,
-			VerifySSL:      null.NewNullBool(true),
+			Name:            "Check where no GRPC Server exists (Verify TLS)",
+			Domain:          "localhost",
+			Port:            1000,
+			Expected:        null.NewNullString(""),
+			ExpectedStatus:  0,
+			Type:            "grpc",
+			Timeout:         1,
+			VerifySSL:       null.NewNullBool(true),
+			GrpcHealthCheck: null.NewNullBool(true),
 		},
 	},
 	{
-		grpcService: func(port int) *grpc.Server {
-			return grpcServer(port, true)
+		grpcService: func(port int, enableHealthCheck bool) *grpc.Server {
+			return grpcServer(port, enableHealthCheck)
 		},
 		clientChecker: &Service{
-			Name:           "Check GRPC Server with http:// url",
-			Domain:         "http://localhost",
-			Port:           50058,
-			Expected:       null.NewNullString("status:SERVING"),
-			ExpectedStatus: 1,
-			Type:           "grpc",
-			Timeout:        1,
-			VerifySSL:      null.NewNullBool(false),
+			Name:            "Check GRPC Server with url",
+			Domain:          "http://localhost",
+			Port:            50058,
+			Expected:        null.NewNullString("status:SERVING"),
+			ExpectedStatus:  1,
+			Type:            "grpc",
+			Timeout:         1,
+			VerifySSL:       null.NewNullBool(false),
+			GrpcHealthCheck: null.NewNullBool(true),
 		},
 	},
 	{
-		grpcService: func(port int) *grpc.Server {
-			return grpcServer(port, true)
+		grpcService: func(port int, enableHealthCheck bool) *grpc.Server {
+			return grpcServer(port, enableHealthCheck)
 		},
 		clientChecker: &Service{
-			Name:           "Unparseable Url Error",
-			Domain:         "http://local//host",
-			Port:           50059,
-			Expected:       null.NewNullString(""),
-			ExpectedStatus: 0,
-			Type:           "grpc",
-			Timeout:        1,
-			VerifySSL:      null.NewNullBool(false),
+			Name:            "Unparseable Url Error",
+			Domain:          "http://local//host",
+			Port:            50059,
+			Expected:        null.NewNullString(""),
+			ExpectedStatus:  0,
+			Type:            "grpc",
+			Timeout:         1,
+			VerifySSL:       null.NewNullBool(false),
+			GrpcHealthCheck: null.NewNullBool(true),
 		},
 	},
 	{
-		grpcService: func(port int) *grpc.Server {
-			return grpcServer(50060, true)
+		grpcService: func(port int, enableHealthCheck bool) *grpc.Server {
+			return grpcServer(50060, enableHealthCheck)
 		},
 		clientChecker: &Service{
 			Name:           "Check GRPC on HTTP server",
@@ -140,6 +146,22 @@ var testdata = []struct {
 			Type:           "grpc",
 			Timeout:        1,
 			VerifySSL:      null.NewNullBool(false),
+		},
+	},
+	{
+		grpcService: func(port int, enableHealthCheck bool) *grpc.Server {
+			return grpcServer(port, true)
+		},
+		clientChecker: &Service{
+			Name:            "GRPC HealthCheck where health check endpoint is not implemented",
+			Domain:          "http://localhost",
+			Port:            50061,
+			Expected:        null.NewNullString(""),
+			ExpectedStatus:  0,
+			Type:            "grpc",
+			Timeout:         1,
+			VerifySSL:       null.NewNullBool(false),
+			GrpcHealthCheck: null.NewNullBool(false),
 		},
 	},
 }
@@ -169,7 +191,7 @@ func TestCheckGrpc(t *testing.T) {
 		v := testscenario
 		t.Run(v.clientChecker.Name, func(t *testing.T) {
 			t.Parallel()
-			server := v.grpcService(v.clientChecker.Port)
+			server := v.grpcService(v.clientChecker.Port, v.clientChecker.GrpcHealthCheck.Bool)
 			defer server.Stop()
 			v.clientChecker.CheckService(false)
 			if v.clientChecker.LastStatusCode != v.clientChecker.ExpectedStatus || strings.TrimSpace(v.clientChecker.LastResponse) != v.clientChecker.Expected.String {

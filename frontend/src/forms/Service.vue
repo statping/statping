@@ -167,6 +167,17 @@
             </div>
         </div>
 
+        <div v-if="service.type.match(/^(grpc)$/)" class="form-group row">
+            <label class="col-12 col-md-4 col-form-label">GRPC Health Check</label>
+            <div class="col-12 col-md-8 mt-1 mb-2 mb-md-0">
+                <span @click="service.grpc_health_check = !!service.grpc_health_check" class="switch float-left">
+                    <input v-model="service.grpc_health_check" type="checkbox" name="grpc_health_check-option" class="switch" id="switch-grpc-health-check" v-bind:checked="service.grpc_health_check">
+                    <label for="switch-grpc-health-check" v-if="service.grpc_health_check">Check against GRPC health check endpoint.</label>
+                    <label for="switch-grpc-health-check" v-if="!service.grpc_health_check">Only checks if GRPC connection can be established.</label>
+                </span>
+            </div>
+        </div>
+
         <div v-if="service.type.match(/^(tcp|http)$/)" class="form-group row">
             <label class="col-12 col-md-4 col-form-label">Use TLS Certificate</label>
             <div class="col-12 col-md-8 mt-1 mb-2 mb-md-0">
@@ -276,6 +287,7 @@
                   permalink: "",
                   order: 1,
                   verify_ssl: true,
+                  grpc_health_check: false,
                   redirect: true,
                   allow_notifications: true,
                   notify_all_changes: true,

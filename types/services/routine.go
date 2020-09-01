@@ -14,6 +14,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/statping/statping/types/metrics"
+	"github.com/statping/statping/types/null"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
@@ -178,15 +179,23 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 		return s, err
 	}
 
-	// Create a new health check client
-	c := healthpb.NewHealthClient(conn)
-	in := &healthpb.HealthCheckRequest{}
-	res, err := c.Check(ctx, in)
-	if err != nil {
-		if record {
-			RecordFailure(s, fmt.Sprintf("GRPC Error %v", err), "healthcheck")
+	if s.GrpcHealthCheck.Bool {
+		// Create a new health check client
+		c := healthpb.NewHealthClient(conn)
+		in := &healthpb.HealthCheckRequest{}
+		res, err := c.Check(ctx, in)
+		if err != nil {
+			if record {
+				RecordFailure(s, fmt.Sprintf("GRPC Error %v", err), "healthcheck")
+			}
+			return s, nil
 		}
-		return s, nil
+
+		// Record responses
+		s.ExpectedStatus = 1
+		s.Expected = null.NewNullString("status:SERVING")
+		s.LastResponse = res.String()
+		s.LastStatusCode = int(res.GetStatus())
 	}
 
 	if err := conn.Close(); err != nil {
@@ -196,28 +205,25 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 		return s, err
 	}
 
-	// Record latency and response
+	// Record latency
 	s.Latency = utils.Now().Sub(t1).Microseconds()
-	s.LastResponse = ""
 	s.Online = true
-	s.LastResponse = res.String()
-	s.LastStatusCode = int(res.GetStatus())
-	s.ExpectedStatus = 1
-	s.Expected.String = "status:SERVING"
 
-	if !(s.Expected.String == strings.TrimSpace(s.LastResponse)) {
-		log.Warnln(fmt.Sprintf("GRPC Service: '%s', Response: expected '%v', got '%v'", s.Name, s.LastResponse, s.Expected.String))
-		if record {
-			RecordFailure(s, fmt.Sprintf("GRPC Response Body did not match '%v'", s.Expected.String), "response_body")
+	if s.GrpcHealthCheck.Bool {
+		if s.ExpectedStatus != s.LastStatusCode {
+			if record {
+				RecordFailure(s, fmt.Sprintf("GRPC Service: '%s', Status Code: expected '%v', got '%v'", s.Name, s.ExpectedStatus, s.LastStatusCode), "response_code")
+			}
+			return s, nil
 		}
-		return s, nil
-	}
 
-	if s.ExpectedStatus != int(res.Status) {
-		if record {
-			RecordFailure(s, fmt.Sprintf("GRPC Service: '%s', Status Code: expected '%v', got '%v'", s.Name, res.Status, healthpb.HealthCheckResponse_ServingStatus(s.ExpectedStatus)), "response_code")
+		if s.Expected.String != strings.TrimSpace(s.LastResponse) {
+			log.Warnln(fmt.Sprintf("GRPC Service: '%s', Response: expected '%v', got '%v'", s.Name, s.Expected.String, s.LastResponse))
+			if record {
+				RecordFailure(s, fmt.Sprintf("GRPC Response Body '%v' did not match '%v'", s.LastResponse, s.Expected.String), "response_body")
+			}
+			return s, nil
 		}
-		return s, nil
 	}
 
 	if record {
