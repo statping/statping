@@ -125,6 +125,9 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 		if err != nil {
 			// Unable to parse.
 			log.Warnln(fmt.Sprintf("GRPC Service: '%s', Unable to parse URL: '%v'", s.Name, s.Domain))
+			if record {
+				RecordFailure(s, fmt.Sprintf("Unable to parse GRPC domain %v, %v", s.Domain, err), "parse_domain")
+			}
 		}
 
 		// Set domain as hostname without port number.

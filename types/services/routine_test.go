@@ -97,6 +97,51 @@ var testdata = []struct {
 			VerifySSL:      null.NewNullBool(true),
 		},
 	},
+	{
+		grpcService: func(port int) *grpc.Server {
+			return grpcServer(port, true)
+		},
+		clientChecker: &Service{
+			Name:           "Check GRPC Server with http:// url",
+			Domain:         "http://localhost",
+			Port:           50058,
+			Expected:       null.NewNullString("status:SERVING"),
+			ExpectedStatus: 1,
+			Type:           "grpc",
+			Timeout:        1,
+			VerifySSL:      null.NewNullBool(false),
+		},
+	},
+	{
+		grpcService: func(port int) *grpc.Server {
+			return grpcServer(port, true)
+		},
+		clientChecker: &Service{
+			Name:           "Unparseable Url Error",
+			Domain:         "http://local//host",
+			Port:           50059,
+			Expected:       null.NewNullString(""),
+			ExpectedStatus: 0,
+			Type:           "grpc",
+			Timeout:        1,
+			VerifySSL:      null.NewNullBool(false),
+		},
+	},
+	{
+		grpcService: func(port int) *grpc.Server {
+			return grpcServer(50060, true)
+		},
+		clientChecker: &Service{
+			Name:           "Check GRPC on HTTP server",
+			Domain:         "https://google.com",
+			Port:           443,
+			Expected:       null.NewNullString(""),
+			ExpectedStatus: 0,
+			Type:           "grpc",
+			Timeout:        1,
+			VerifySSL:      null.NewNullBool(false),
+		},
+	},
 }
 
 // grpcServer creates grpc Service with optional parameters.
@@ -128,7 +173,7 @@ func TestCheckGrpc(t *testing.T) {
 			defer server.Stop()
 			v.clientChecker.CheckService(false)
 			if v.clientChecker.LastStatusCode != v.clientChecker.ExpectedStatus || strings.TrimSpace(v.clientChecker.LastResponse) != v.clientChecker.Expected.String {
-				t.Errorf("Expected message: '%v', Got message: '%v' , Expected Status: '%v', Got Status: '%v'", v.clientChecker.Expected, v.clientChecker.LastResponse, v.clientChecker.ExpectedStatus, v.clientChecker.LastStatusCode)
+				t.Errorf("Expected message: '%v', Got message: '%v' , Expected Status: '%v', Got Status: '%v'", v.clientChecker.Expected.String, v.clientChecker.LastResponse, v.clientChecker.ExpectedStatus, v.clientChecker.LastStatusCode)
 			}
 		})
 	}
