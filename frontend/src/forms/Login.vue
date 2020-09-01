@@ -10,7 +10,7 @@
         <div class="form-group row">
             <label for="password" class="col-4 col-form-label">{{$t('password')}}</label>
             <div class="col-8">
-                <input @keyup="checkForm" type="password" v-model="password" autocomplete="current-password" name="password" class="form-control" id="password" placeholder="password123">
+                <input @keyup="checkForm" type="password" v-model="password" autocomplete="current-password" name="password" class="form-control" id="password" placeholder="************">
             </div>
         </div>
         <div class="form-group row">

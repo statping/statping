@@ -3,6 +3,7 @@
 - Modified static email templates to github.com/statping/emails
 - Modified Regenerate API function to keep API_SECRET env
 - Added DEMO_MODE env variable, if true, 'admin' cannot be deleted
+- Modified Service sparklines on Dashboard
 
 # 0.90.64 (08-18-2020)
 - Modified max-width for container to 1012px, larger UI

@@ -23,9 +23,7 @@
             </div>
         </div>
 
-      <div v-if="loaded">
-        <Group v-for="group in groups" v-bind:key="group.id" :group=group />
-      </div>
+      <Group v-for="group in groups" v-bind:key="group.id" :group=group />
 
         <div class="col-12 full-col-12">
             <MessageBlock v-for="message in messages" v-bind:key="message.id" :message="message" />

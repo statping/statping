@@ -57,13 +57,13 @@
             let ts = w.globals.seriesX[seriesIndex][dataPointIndex];
             const dt = new Date(ts).toLocaleDateString("en-us", timeoptions)
             let val = series[seriesIndex][dataPointIndex];
-            return `<div class="chartmarker"><span>Average Response Time: </span><span class="font-3">${this.humanTime(val)}</span><span>${dt}</span></div>`
+            return `<div class="chartmarker"><span class="font-3">Average Response Time:  ${this.humanTime(val)}</span><span>${dt}</span></div>`
           },
           fixed: {
             enabled: true,
-            position: 'topRight',
+            position: 'bottomLeft',
             offsetX: 0,
-            offsetY: 0,
+            offsetY: -30,
           },
           x: {
             show: true,
@@ -94,7 +94,3 @@
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

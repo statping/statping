@@ -32,7 +32,7 @@
 
           <div class="row">
           <div class="col-5 pr-0">
-              <span class="small text-dim"> {{ hoverbtn }}</span>
+              <span class="small text-dim">{{ hoverbtn }}</span>
           </div>
 
             <div class="col-7 pr-2 pl-0">
@@ -125,9 +125,9 @@
           this.uptime = await Api.service_uptime(this.service.id, this.toUnix(start), this.toUnix(this.now()))
         },
         async loadInfo() {
-          this.set1 = await this.getHits(24 * 7, "6h")
+          this.set1 = await this.getHits(24 * 7, "720m")
           this.set1_name = this.calc(this.set1)
-          this.set2 = await this.getHits(24, "1h")
+          this.set2 = await this.getHits(24, "60m")
           this.set2_name = this.calc(this.set2)
           this.loaded = true
         },
@@ -147,7 +147,7 @@
         },
           async getHits(hours, group) {
               const start = this.nowSubtract(3600 * hours)
-              const fetched = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(this.now()), group, false)
+              const fetched = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(this.now()), group, true)
 
               const data = this.convertToChartData(fetched, 0.001, true)
 
