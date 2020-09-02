@@ -81,13 +81,21 @@
     serviceName (service) {
       return service.name || "Global Message"
     },
+    async delete(m) {
+      await Api.message_delete(m.id)
+      const messages = await Api.messages()
+      this.$store.commit('setMessages', messages)
+    },
     async deleteMessage(m) {
-      let c = confirm(`Are you sure you want to delete message '${m.title}'?`)
-      if (c) {
-        await Api.message_delete(m.id)
-        const messages = await Api.messages()
-        this.$store.commit('setMessages', messages)
+      const modal = {
+        visible: true,
+        title: "Delete Announcement",
+        body: `Are you sure you want to delete Announcement ${m.title}?`,
+        btnColor: "btn-danger",
+        btnText: "Delete Announcement",
+        func: () => this.delete(m),
       }
+      this.$store.commit("setModal", modal)
     }
   }
 }

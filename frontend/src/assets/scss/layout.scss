@@ -14,6 +14,34 @@ A:HOVER {
   color: lighten($text-color, 12%) !important;
 }
 
+.modal-backdrop {
+  top: 0;
+  left: 0;
+  position: absolute;
+  display: block;
+  z-index: 10000;
+  width: 100%;
+  height: 100%;
+  background-color: #00000073;
+}
+
+.modal {
+  z-index: 999999 !important;
+  display: block;
+}
+
+.modal-dialog {
+  top: 20%;
+}
+
+.modal-header {
+  padding: 0.5rem 1rem;
+}
+
+.modal-footer {
+  padding: 0.5rem 1rem;
+}
+
 .text-muted {
   color: lighten($text-color, 30%) !important;
 }

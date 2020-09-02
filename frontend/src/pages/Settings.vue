@@ -189,15 +189,23 @@
           liClass(id) {
               return this.tab === id
           },
+        async renew() {
+          await Api.renewApiKeys()
+          const core = await Api.core()
+          this.$store.commit('setCore', core)
+          this.core = core
+          await this.logout()
+        },
         async renewApiKeys() {
-          let r = confirm("Are you sure you want to reset the API keys? You will be logged out.");
-          if (r === true) {
-            await Api.renewApiKeys()
-            const core = await Api.core()
-            this.$store.commit('setCore', core)
-            this.core = core
-            await this.logout()
+          const modal = {
+            visible: true,
+            title: "Reset API Key",
+            body: `Are you sure you want to reset the API keys? You will be logged out.`,
+            btnColor: "btn-danger",
+            btnText: "Reset",
+            func: () => this.renew(),
           }
+          this.$store.commit("setModal", modal)
         },
         async logout () {
           await Api.logout()

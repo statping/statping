@@ -149,11 +149,11 @@
 
                 <div v-for="(log, i) in notifier.logs.reverse()" class="alert" :class="{'alert-danger': log.error, 'alert-dark': !log.success && !log.error, 'alert-success': log.success && !log.error}">
                         <span class="d-block">
-                            Service '{{$store.getters.serviceById(log.service).name}}'
+                            Service {{log.service}}
                             {{log.success ? "Success Triggered" : "Failure Triggered"}}
                         </span>
 
-                    <div class="bg-white p-3 small mt-2">
+                    <div v-if="log.message !== ''" class="bg-white p-3 small mt-2">
                         <code>{{log.message}}</code>
                     </div>
 

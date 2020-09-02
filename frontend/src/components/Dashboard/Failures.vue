@@ -151,14 +151,22 @@ export default {
         await this.gotoPage(1)
       },
     methods: {
+      async delete() {
+        await Api.service_failures_delete(this.service)
+        this.service = await Api.service(this.service.id)
+        this.total = 0
+        await this.load()
+      },
       async deleteFailures() {
-        const c = confirm('Are you sure you want to delete all failures?')
-        if (c) {
-          await Api.service_failures_delete(this.service)
-          this.service = await Api.service(this.service.id)
-          this.total = 0
-          await this.load()
+        const modal = {
+          visible: true,
+          title: "Delete All Failures",
+          body: `Are you sure you want to delete all Failures for service ${this.service.title}?`,
+          btnColor: "btn-danger",
+          btnText: "Delete Failures",
+          func: () => this.delete(),
         }
+        this.$store.commit("setModal", modal)
       },
       async gotoPage(page) {
         this.page = page;

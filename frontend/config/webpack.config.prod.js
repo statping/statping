@@ -74,7 +74,7 @@ const webpackConfig = merge(commonConfig, {
             threshold: 10240,
             minRatio: 0.8
         }),
-        new webpack.HashedModuleIdsPlugin(),
+        // new webpack.HashedModuleIdsPlugin(),
         new HtmlPlugin({
             template: 'public/base.gohtml',
             filename: 'base.gohtml',
