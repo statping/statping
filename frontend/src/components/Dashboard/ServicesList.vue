@@ -72,12 +72,14 @@
 <script>
 import Api from "../../API";
 import ServiceSparkList from "@/components/Service/ServiceSparkList";
+import Modal from "@/components/Elements/Modal";
 const draggable = () => import(/* webpackChunkName: "dashboard" */ 'vuedraggable')
 const ToggleSwitch = () => import(/* webpackChunkName: "dashboard" */ '../../forms/ToggleSwitch');
 
 export default {
       name: 'ServicesList',
     components: {
+      Modal,
       ServiceSparkList,
         ToggleSwitch,
           draggable
@@ -159,14 +161,25 @@ export default {
               await Api.services_reorder(data)
               await this.update()
           },
+        tester(s) {
+          console.log(s)
+        },
+        async delete(s) {
+          this.loading = true
+          await Api.service_delete(s.id)
+          await this.update()
+          this.loading = false
+        },
           async deleteService(s) {
-              let c = confirm(`Are you sure you want to delete '${s.name}'?`)
-              if (c) {
-                this.loading = true
-                  await Api.service_delete(s.id)
-                  await this.update()
-                this.loading = false
-              }
+            const modal = {
+              visible: true,
+              title: "Delete Service",
+              body: `Are you sure you want to delete service ${s.name}? This will also delete all failures, checkins, and incidents for this service.`,
+              btnColor: "btn-danger",
+              btnText: "Delete Service",
+              func: () => this.delete(s),
+            }
+            this.$store.commit("setModal", modal)
           },
           serviceGroup(s) {
               let group = this.$store.getters.groupById(s.group_id)

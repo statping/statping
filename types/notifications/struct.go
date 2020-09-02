@@ -38,12 +38,10 @@ type Notification struct {
 	AuthorUrl   string          `gorm:"-" json:"author_url"`
 	Icon        string          `gorm:"-" json:"icon"`
 	Delay       time.Duration   `gorm:"-" json:"delay,string"`
-	Running     chan bool       `gorm:"-" json:"-"`
 
 	Form          []NotificationForm `gorm:"-" json:"form"`
 	LastSent      time.Time          `gorm:"-" json:"-"`
 	LastSentCount int                `gorm:"-" json:"-"`
-	sentCount     int                `gorm:"-" json:"-"`
 	Logs          []*NotificationLog `gorm:"-" json:"logs,omitempty"`
 }
 
@@ -58,8 +56,6 @@ type NotificationLog struct {
 func (n *Notification) Logger() *logrus.Logger {
 	return log.WithField("notifier", n.Method).Logger
 }
-
-type RunFunc func(interface{}) error
 
 type Values struct {
 	Host      string

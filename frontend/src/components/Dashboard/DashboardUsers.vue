@@ -74,13 +74,21 @@
       this.user = u
       this.edit = !mode
     },
+    async delete(u) {
+      await Api.user_delete(u.id)
+      const users = await Api.users()
+      this.$store.commit('setUsers', users)
+    },
     async deleteUser(u) {
-      let c = confirm(`Are you sure you want to delete user '${u.username}'?`)
-      if (c) {
-        await Api.user_delete(u.id)
-        const users = await Api.users()
-        this.$store.commit('setUsers', users)
+      const modal = {
+        visible: true,
+        title: "Delete User",
+        body: `Are you sure you want to delete user ${u.username}?`,
+        btnColor: "btn-danger",
+        btnText: "Delete User",
+        func: () => this.delete(u),
       }
+      this.$store.commit("setModal", modal)
     }
   }
 }

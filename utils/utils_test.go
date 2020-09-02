@@ -192,7 +192,8 @@ func TestHttpRequest(t *testing.T) {
 }
 
 func TestConfigLoad(t *testing.T) {
-	InitLogs()
+	err := InitLogs()
+	require.Nil(t, err)
 	InitEnvs()
 
 	s := Params.GetString

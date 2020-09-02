@@ -144,14 +144,22 @@ import('codemirror/mode/css/css.js')
               this.pending = false
             await this.fetchTheme()
           },
+        async delete() {
+          this.pending = true
+          const resp = await Api.theme_generate(false)
+          await this.fetchTheme()
+          this.pending = false
+        },
           async deleteAssets() {
-              this.pending = true
-              let c = confirm('Are you sure you want to delete all local assets?')
-              if (c) {
-                  const resp = await Api.theme_generate(false)
-                  await this.fetchTheme()
-              }
-              this.pending = false
+            const modal = {
+              visible: true,
+              title: "Delete Local Assets",
+              body: `Are you sure you want to delete all local assets?`,
+              btnColor: "btn-danger",
+              btnText: "Delete",
+              func: () => this.delete(),
+            }
+            this.$store.commit("setModal", modal)
           },
           async saveAssets() {
               this.pending = true

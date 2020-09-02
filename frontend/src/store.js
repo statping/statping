@@ -31,7 +31,15 @@ export default new Vuex.Store({
     checkins: [],
     admin: false,
     user: false,
-    loggedIn: false
+    loggedIn: false,
+    modal: {
+      visible: false,
+      title: "Modal Header",
+      body: "This is the content for the modal body",
+      btnText: "Save Changes",
+      btnColor: "btn-primary",
+      func: null,
+    }
   },
   getters: {
     hasAllData: state => state.hasAllData,
@@ -49,6 +57,7 @@ export default new Vuex.Store({
     notifiers: state => state.notifiers,
     checkins: state => state.checkins,
     loggedIn: state => state.loggedIn,
+    modal: state => state.modal,
 
     isAdmin: state => state.admin,
     isUser: state => state.user,
@@ -139,6 +148,9 @@ export default new Vuex.Store({
     },
     setOAuth(state, oauth) {
       state.oauth = oauth
+    },
+    setModal(state, modal) {
+      state.modal = modal
     },
   },
   actions: {

@@ -157,7 +157,8 @@ export default {
     },
     async loadFailures() {
       this.loaded = false
-      const data = await Api.service_failures_data(this.service.id, this.toUnix(this.parseISO(this.start)), this.toUnix(this.parseISO(this.end)), this.group, true)
+      const startEnd = this.startEndParams(this.parseISO(this.start), this.parseISO(this.end), this.group)
+      const data = await Api.service_failures_data(this.service.id, startEnd.start, startEnd.end, this.group, true)
       this.loaded = true
       this.data = [{data: this.convertChartData(data)}]
     }

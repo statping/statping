@@ -64,7 +64,7 @@ var AmazonSNS = &amazonSNS{&notifications.Notification{
 		Type:        "text",
 		Title:       "SNS Topic ARN",
 		SmallText:   "The ARN of the Topic",
-		DbField:     "host",
+		DbField:     "Host",
 		Placeholder: "arn:aws:sns:us-west-2:123456789012:YourTopic",
 		Required:    true,
 	}}},

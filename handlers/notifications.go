@@ -13,9 +13,14 @@ import (
 func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 	var notifs []notifications.Notification
 	for _, n := range services.AllNotifiers() {
-		no := n.Select()
-		notif, _ := notifications.Find(no.Method)
-		notifs = append(notifs, *no.UpdateFields(notif))
+		notif := n.Select()
+		no, err := notifications.Find(notif.Method)
+		if err != nil {
+			log.Error(err)
+			sendErrorJson(err, w, r)
+		}
+		notif.UpdateFields(no)
+		notifs = append(notifs, *notif)
 	}
 	sort.Sort(notifications.NotificationOrder(notifs))
 	returnJson(notifs, w, r)

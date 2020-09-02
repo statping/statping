@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <h5 v-if="group.name" class="h5 col-12 mb-3 mt-2 text-dim">
+    <h5 v-if="group.name && group_services" class="h5 col-12 mb-3 mt-2 text-dim">
       <font-awesome-icon @click="toggle" :icon="expanded ? 'minus' : 'plus'" class="pointer mr-3"/> {{group.name}}
       <span class="badge badge-success text-uppercase float-right ml-2">{{services_online.length}} online</span>
       <span v-if="services_online.services_offline > 0" class="badge badge-danger text-uppercase float-right">

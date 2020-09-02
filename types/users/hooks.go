@@ -14,6 +14,15 @@ func (u *User) Validate() error {
 	return nil
 }
 
+func (u *User) BeforeDelete() error {
+	if utils.Params.GetBool("DEMO_MODE") {
+		if u.Username == "admin" {
+			return errors.New("cannot delete admin in DEMO_MODE")
+		}
+	}
+	return nil
+}
+
 func (u *User) BeforeCreate() error {
 	if err := u.Validate(); err != nil {
 		return err

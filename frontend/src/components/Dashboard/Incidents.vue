@@ -80,15 +80,23 @@ const FormIncidentUpdates = () => import(/* webpackChunkName: "dashboard" */ '@/
 
     methods: {
 
+      async delete(i) {
+        this.res = await Api.incident_delete(i)
+        if (this.res.status === "success") {
+          this.incidents = this.incidents.filter(obj => obj.id !== i.id);
+          //await this.loadIncidents()
+        }
+      },
         async deleteIncident(incident) {
-            let c = confirm(`Are you sure you want to delete '${incident.title}'?`)
-            if (c) {
-                this.res = await Api.incident_delete(incident)
-                if (this.res.status === "success") {
-                    this.incidents = this.incidents.filter(obj => obj.id !== incident.id); // this is better in terms of not having to querry the db to get a fresh copy of all updates
-                    //await this.loadIncidents()
-                } // TODO: further error checking here... maybe alert user it failed with modal or so
-            }
+          const modal = {
+            visible: true,
+            title: "Delete Incident",
+            body: `Are you sure you want to delete Incident ${incident.title}?`,
+            btnColor: "btn-danger",
+            btnText: "Delete Incident",
+            func: () => this.delete(incident),
+          }
+          this.$store.commit("setModal", modal)
         },
 
         async createIncident() {

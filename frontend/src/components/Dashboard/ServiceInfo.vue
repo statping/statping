@@ -32,7 +32,7 @@
 
           <div class="row">
           <div class="col-5 pr-0">
-              <span class="small text-dim"> {{ hoverbtn }}</span>
+              <span class="small text-dim">{{ hoverbtn }}</span>
           </div>
 
             <div class="col-7 pr-2 pl-0">
@@ -121,13 +121,14 @@
           }
         },
         async getUptime() {
-          const start = this.nowSubtract(3 * 86400)
-          this.uptime = await Api.service_uptime(this.service.id, this.toUnix(start), this.toUnix(this.now()))
+          const end = this.endOf("day", this.now())
+          const start = this.beginningOf("day", this.nowSubtract(3 * 86400))
+          this.uptime = await Api.service_uptime(this.service.id, this.toUnix(start), this.toUnix(end))
         },
         async loadInfo() {
-          this.set1 = await this.getHits(24 * 7, "6h")
+          this.set1 = await this.getHits(86400 * 7, "12h")
           this.set1_name = this.calc(this.set1)
-          this.set2 = await this.getHits(24, "1h")
+          this.set2 = await this.getHits(86400, "60m")
           this.set2_name = this.calc(this.set2)
           this.loaded = true
         },
@@ -145,14 +146,13 @@
           });
           total = total / data.length
         },
-          async getHits(hours, group) {
-              const start = this.nowSubtract(3600 * hours)
-              const fetched = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(this.now()), group, false)
-
+          async getHits(seconds, group) {
+              let start = this.nowSubtract(seconds)
+              let end = this.endOf("today")
+              const startEnd = this.startEndParams(start, end, group)
+              const fetched = await Api.service_hits(this.service.id, startEnd.start, startEnd.end, group, true)
               const data = this.convertToChartData(fetched, 0.001, true)
-
               return [{name: "Latency", ...data}]
-
           },
           calc(s) {
               let data = s[0].data

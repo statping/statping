@@ -257,6 +257,7 @@ jobs:
           API_SECRET: demopassword123
           DISABLE_LOGS: false
           ALLOW_REPORTS: true
+          SAMPLE_DATA: true
           COVERALLS: ${{ secrets.COVERALLS }}
           DISCORD_URL: ${{ secrets.DISCORD_URL }}
           EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
