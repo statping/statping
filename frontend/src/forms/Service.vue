@@ -13,7 +13,7 @@
         <div class="form-group row">
             <label for="service_type" class="col-sm-4 col-form-label">{{ $t('service.type') }}</label>
             <div class="col-sm-8">
-                <select v-model="service.type" class="form-control" id="service_type">
+                <select v-model="service.type" @change="updateDefaultValues()" class="form-control" id="service_type">
                     <option value="http">HTTP Service</option>
                     <option value="tcp">TCP Service</option>
                     <option value="udp">UDP Service</option>
@@ -178,6 +178,22 @@
             </div>
         </div>
 
+        <div v-if="service.grpc_health_check" class="form-group row">
+            <label class="col-sm-4 col-form-label">Expected Response</label>
+            <div class="col-sm-8">
+                <textarea v-model="service.expected" class="form-control" rows="3" autocapitalize="none" spellcheck="false" placeholder='status:SERVING'></textarea>
+                <small class="form-text text-muted">Check <a target="_blank" href="https://pkg.go.dev/google.golang.org/grpc/health/grpc_health_v1?tab=doc#pkg-variables">GPRC health check response codes</a> for more information.</small>
+            </div>
+        </div>
+
+        <div v-if="service.grpc_health_check" class="form-group row">
+            <label for="service_response_code" class="col-sm-4 col-form-label">Expected Status Code</label>
+            <div class="col-sm-8">
+                <input v-model="service.expected_status" type="number" name="expected_status" class="form-control" placeholder="1" id="service_response_code">
+                <small class="form-text text-muted">A status code of 1 is success, or view all the <a target="_blank" href="https://pkg.go.dev/google.golang.org/grpc/health/grpc_health_v1?tab=doc#HealthCheckResponse_ServingStatus">GRPC Status Codes</a></small>
+            </div>
+        </div>
+
         <div v-if="service.type.match(/^(tcp|http)$/)" class="form-group row">
             <label class="col-12 col-md-4 col-form-label">Use TLS Certificate</label>
             <div class="col-12 col-md-8 mt-1 mb-2 mb-md-0">
@@ -328,6 +344,19 @@
             this.service = this.in_service
           }
           this.use_tls = this.service.tls_cert !== ""
+        },
+        updateDefaultValues() {
+            if (this.service.type === "grpc") {
+                this.service.expected_status = 1
+                this.service.expected = "status:SERVING"
+                this.service.port = 50051
+                this.service.verify_ssl = false
+            } else {
+                this.service.expected_status = 200
+                this.service.expected = ""
+                this.service.port = 80
+                this.service.verify_ssl = true
+            }
         },
           updatePermalink() {
               const a = 'àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;'

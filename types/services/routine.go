@@ -14,7 +14,6 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/statping/statping/types/metrics"
-	"github.com/statping/statping/types/null"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
@@ -192,9 +191,7 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 		}
 
 		// Record responses
-		s.ExpectedStatus = 1
-		s.Expected = null.NewNullString("status:SERVING")
-		s.LastResponse = res.String()
+		s.LastResponse = strings.TrimSpace(res.String())
 		s.LastStatusCode = int(res.GetStatus())
 	}
 
@@ -217,7 +214,7 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 			return s, nil
 		}
 
-		if s.Expected.String != strings.TrimSpace(s.LastResponse) {
+		if s.Expected.String != s.LastResponse {
 			log.Warnln(fmt.Sprintf("GRPC Service: '%s', Response: expected '%v', got '%v'", s.Name, s.Expected.String, s.LastResponse))
 			if record {
 				RecordFailure(s, fmt.Sprintf("GRPC Response Body '%v' did not match '%v'", s.LastResponse, s.Expected.String), "response_body")
