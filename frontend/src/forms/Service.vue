@@ -351,11 +351,13 @@
                 this.service.expected = "status:SERVING"
                 this.service.port = 50051
                 this.service.verify_ssl = false
+                this.service.method = ""
             } else {
                 this.service.expected_status = 200
                 this.service.expected = ""
                 this.service.port = 80
                 this.service.verify_ssl = true
+                this.service.method = "GET"
             }
         },
           updatePermalink() {
