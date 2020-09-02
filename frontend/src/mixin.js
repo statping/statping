@@ -1,5 +1,5 @@
 import Vue from "vue";
-const { startOfDay, startOfWeek, endOfMonth, startOfToday, startOfTomorrow, startOfYesterday, endOfYesterday, endOfTomorrow, endOfToday, endOfDay, startOfMonth, lastDayOfMonth, subSeconds, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance, addMonths, addSeconds, isWithinInterval } = require('date-fns')
+const { startOfDay, startOfHour, startOfWeek, endOfMonth, endOfHour, startOfToday, startOfTomorrow, startOfYesterday, endOfYesterday, endOfTomorrow, endOfToday, endOfDay, startOfMonth, lastDayOfMonth, subSeconds, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance, addMonths, addSeconds, isWithinInterval } = require('date-fns')
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import format from 'date-fns/format'
 import parseISO from 'date-fns/parseISO'
@@ -59,6 +59,8 @@ export default Vue.mixin({
     },
     endOf(method, val) {
       switch (method) {
+        case "hour":
+          return endOfHour(val)
         case "day":
           return endOfDay(val)
         case "today":
@@ -70,10 +72,17 @@ export default Vue.mixin({
         case "month":
           return endOfMonth(val)
       }
-      return roundToNearestMinutes(val)
+      return val
+    },
+    startEndParams(start, end, group) {
+      start = this.beginningOf("hour", start)
+      end = this.endOf("hour", end)
+      return {start: this.toUnix(start), end: this.toUnix(end), group: group}
     },
     beginningOf(method, val) {
       switch (method) {
+        case "hour":
+          return startOfHour(val)
         case "day":
           return startOfDay(val)
         case "today":
@@ -83,11 +92,11 @@ export default Vue.mixin({
         case "yesterday":
           return startOfYesterday()
         case "week":
-          return startOfWeek()
+          return startOfWeek(val)
         case "month":
           return startOfMonth(val)
       }
-      return roundToNearestMinutes(val)
+      return val
     },
     isZero(val) {
       return getUnixTime(parseISO(val)) <= 0

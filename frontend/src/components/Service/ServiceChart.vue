@@ -195,17 +195,14 @@
       methods: {
           async chartHits(val) {
               this.ready = false
-              const start = val.start_time
-              const end = this.toUnix(new Date())
-              this.data = await Api.service_hits(this.service.id, start, end, val.interval, false)
-              if (this.data === null && val.interval !== "5m") {
-                  await this.chartHits({start_time: val.start_time, interval: "5m"})
-              }
-            this.ping_data = await Api.service_ping(this.service.id, start, end, val.interval, false)
+            const end = this.endOf("hour", this.now())
+            const start = this.beginningOf("hour", this.fromUnix(val.start_time))
+              this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(end), val.interval, false)
+              this.ping_data = await Api.service_ping(this.service.id, this.toUnix(start), this.toUnix(end), val.interval, false)
 
             this.series = [
                 {name: "Latency", ...this.convertToChartData(this.data)},
-              {name: "Ping", ...this.convertToChartData(this.ping_data)},
+                {name: "Ping", ...this.convertToChartData(this.ping_data)},
                 ]
             this.ready = true
           }
