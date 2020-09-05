@@ -3,6 +3,7 @@ snap
 prime
 stage
 parts
+assets_backup
 certs
 releases
 core/rice-box.go

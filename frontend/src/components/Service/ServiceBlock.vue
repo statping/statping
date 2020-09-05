@@ -61,7 +61,6 @@
 const Analytics = () => import(/* webpackChunkName: "service" */ './Analytics');
 const ServiceChart  = () => import(/* webpackChunkName: "service" */ "./ServiceChart");
 const ServiceTopStats = () => import(/* webpackChunkName: "service" */ "@/components/Service/ServiceTopStats");
-const Graphing  = () => import(/* webpackChunkName: "service" */ '../../graphing');
 
 export default {
     name: 'ServiceBlock',

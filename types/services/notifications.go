@@ -6,6 +6,18 @@ import (
 	"github.com/statping/statping/utils"
 )
 
+func AddNotifier(n ServiceNotifier) {
+	notif := n.Select()
+	allNotifiers[notif.Method] = n
+}
+
+func UpdateNotifiers() {
+	for _, n := range notifications.All() {
+		notifier := allNotifiers[n.Method]
+		notifier.Select().UpdateFields(n)
+	}
+}
+
 func sendSuccess(s *Service) {
 	if !s.AllowNotifications.Bool {
 		return

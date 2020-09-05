@@ -1,3 +1,10 @@
+# 0.90.65 (09-01-2020)
+- Fixed issue with dashboard not logging in (notifier panic)
+- Modified static email templates to github.com/statping/emails
+- Modified Regenerate API function to keep API_SECRET env
+- Added DEMO_MODE env variable, if true, 'admin' cannot be deleted
+- Modified Service sparklines on Dashboard
+
 # 0.90.64 (08-18-2020)
 - Modified max-width for container to 1012px, larger UI
 - Added failure sparklines in the Services list view
@@ -10,7 +17,7 @@
 - Modified Service chart on index page to show ping data along with latency
 - Added AWS SNS Notifier
 - Modified dashboard services UI
-- Removed sass dependency, now generates css from scss directly from go
+- Modified service.Failures API to include 32 failures (max)
 
 # 0.90.63 (08-17-2020)
 - Modified build process to use xgo for all arch builds

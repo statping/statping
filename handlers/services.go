@@ -237,6 +237,19 @@ func apiServiceTimeDataHandler(w http.ResponseWriter, r *http.Request) {
 	returnJson(uptimeData, w, r)
 }
 
+func apiServiceHitsDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	service, err := findService(r)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	if err := service.AllHits().DeleteAll(); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	sendJsonAction(service, "delete", w, r)
+}
+
 func apiServiceDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	service, err := findService(r)
 	if err != nil {

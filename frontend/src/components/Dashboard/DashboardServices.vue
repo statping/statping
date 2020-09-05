@@ -1,5 +1,6 @@
 <template>
     <div class="col-12">
+
         <div class="card contain-card mb-4">
             <div class="card-header">{{ $t('top_nav.services') }}
                 <router-link v-if="$store.state.admin" to="/dashboard/create_service" class="btn btn-sm btn-success float-right">
@@ -67,6 +68,7 @@
 </template>
 
 <script>
+  const Modal = () => import(/* webpackChunkName: "dashboard" */ "@/components/Elements/Modal")
   const FormGroup = () => import(/* webpackChunkName: "dashboard" */ '@/forms/Group')
   const ToggleSwitch = () => import(/* webpackChunkName: "dashboard" */ '@/forms/ToggleSwitch')
   const ServicesList = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/ServicesList')
@@ -76,6 +78,7 @@
   export default {
       name: 'DashboardServices',
       components: {
+        Modal,
           ServicesList,
           ToggleSwitch,
           FormGroup,
@@ -112,13 +115,24 @@
               this.group = g
               this.edit = !mode
           },
+        confirm_delete(service) {
+
+        },
+        async delete(g) {
+          await Api.group_delete(g.id)
+          const groups = await Api.groups()
+          this.$store.commit('setGroups', groups)
+        },
           async deleteGroup(g) {
-              let c = confirm(`Are you sure you want to delete '${g.name}'?`)
-              if (c) {
-                  await Api.group_delete(g.id)
-                  const groups = await Api.groups()
-                  this.$store.commit('setGroups', groups)
-              }
+            const modal = {
+              visible: true,
+              title: "Delete Group",
+              body: `Are you sure you want to delete group ${g.name}? All services attached will be removed from this group.`,
+              btnColor: "btn-danger",
+              btnText: "Delete Group",
+              func: () => this.delete(g),
+            }
+            this.$store.commit("setModal", modal)
           }
       }
   }

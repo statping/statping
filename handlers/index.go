@@ -14,6 +14,10 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	ExecuteResponse(w, r, "base.gohtml", core.App, nil)
 }
 
+func baseHandler(w http.ResponseWriter, r *http.Request) {
+	ExecuteResponse(w, r, "base.gohtml", core.App, nil)
+}
+
 func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	health := map[string]interface{}{
 		"services": len(services.All()),

@@ -70,19 +70,19 @@ func (t *TimeVar) ToValues() ([]*TimeValue, error) {
 }
 
 // GraphData will return all hits or failures
-func (g *GroupQuery) GraphData(by By) ([]*TimeValue, error) {
-	g.db = g.db.MultipleSelects(
-		g.db.SelectByTime(g.Group),
+func (b *GroupQuery) GraphData(by By) ([]*TimeValue, error) {
+	b.db = b.db.MultipleSelects(
+		b.db.SelectByTime(b.Group),
 		by.String(),
 	).Group("timeframe").Order("timeframe", true)
 
-	caller, err := g.ToTimeValue()
+	caller, err := b.ToTimeValue()
 	if err != nil {
 		return nil, err
 	}
 
-	if g.FillEmpty {
-		return caller.FillMissing(g.Start, g.End)
+	if b.FillEmpty {
+		return caller.FillMissing(b.Start, b.End)
 	}
 	return caller.ToValues()
 }
@@ -90,8 +90,8 @@ func (g *GroupQuery) GraphData(by By) ([]*TimeValue, error) {
 // ToTimeValue will format the SQL rows into a JSON format for the API.
 // [{"timestamp": "2006-01-02T15:04:05Z", "amount": 468293}]
 // TODO redo this entire function, use better SQL query to group by time
-func (g *GroupQuery) ToTimeValue() (*TimeVar, error) {
-	rows, err := g.db.Rows()
+func (b *GroupQuery) ToTimeValue() (*TimeVar, error) {
+	rows, err := b.db.Rows()
 	if err != nil {
 		return nil, err
 	}
@@ -102,8 +102,8 @@ func (g *GroupQuery) ToTimeValue() (*TimeVar, error) {
 		if err := rows.Scan(&timeframe, &amount); err != nil {
 			log.Error(err, timeframe)
 		}
-		trueTime, _ := g.db.ParseTime(timeframe)
-		newTs := types.FixedTime(trueTime, g.Group)
+		trueTime, _ := b.db.ParseTime(timeframe)
+		newTs := types.FixedTime(trueTime, b.Group)
 
 		tv := &TimeValue{
 			Timeframe: newTs,
@@ -111,7 +111,7 @@ func (g *GroupQuery) ToTimeValue() (*TimeVar, error) {
 		}
 		data = append(data, tv)
 	}
-	return &TimeVar{g, data}, nil
+	return &TimeVar{b, data}, nil
 }
 
 func (t *TimeVar) FillMissing(current, end time.Time) ([]*TimeValue, error) {
@@ -233,10 +233,6 @@ func ParseQueries(r *http.Request, o isObject) (*GroupQuery, error) {
 	if endField == 0 {
 		query.End = utils.Now()
 	}
-	if query.End.After(utils.Now()) {
-		query.End = utils.Now()
-	}
-
 	if query.Limit != 0 {
 		q = q.Limit(query.Limit)
 	}

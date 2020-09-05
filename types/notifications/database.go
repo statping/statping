@@ -25,6 +25,15 @@ func (n *Notification) Values() Values {
 	}
 }
 
+func All() []*Notification {
+	var n []*Notification
+	q := db.Find(&n)
+	if q.Error() != nil {
+		return nil
+	}
+	return n
+}
+
 func Find(method string) (*Notification, error) {
 	var n Notification
 	q := db.Where("method = ?", method).Find(&n)
@@ -38,6 +47,7 @@ func (n *Notification) Create() error {
 	var p Notification
 	q := db.Where("method = ?", n.Method).Find(&p)
 	if q.RecordNotFound() {
+		log.Infof("Notifier '%s' was not found, adding into database...\n", n.Method)
 		if err := db.Create(n).Error(); err != nil {
 			return err
 		}
@@ -56,6 +66,9 @@ func (n *Notification) Create() error {
 }
 
 func (n *Notification) UpdateFields(notif *Notification) *Notification {
+	if notif == nil {
+		return n
+	}
 	n.Id = notif.Id
 	n.Limits = notif.Limits
 	n.Enabled = notif.Enabled

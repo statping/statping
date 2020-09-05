@@ -5,7 +5,7 @@
 
       <div v-if="!loaded" class="row mt-5 mb-5">
         <div class="col-12 mt-5 mb-2 text-center">
-          <font-awesome-icon icon="circle-notch" class="text-dim" size="3x" spin/>
+          <font-awesome-icon icon="circle-notch" class="text-dim" size="2x" spin/>
         </div>
         <div class="col-12 text-center mt-3 mb-3">
           <span class="text-dim">{{loading_text}}</span>
@@ -23,10 +23,7 @@
             </div>
         </div>
 
-      <div v-if="loaded">
-        <Group v-for="group in groups" v-bind:key="group.id" :group=group />
-      </div>
-
+      <Group v-for="group in groups" v-bind:key="group.id" :group=group />
         <div class="col-12 full-col-12">
             <MessageBlock v-for="message in messages" v-bind:key="message.id" :message="message" />
         </div>
@@ -66,20 +63,18 @@ export default {
     },
     computed: {
       loading_text() {
-        if (this.core == null) {
+        if (!this.$store.getters.core.version) {
           return "Loading Core"
-        } else if (this.groups == null) {
+        } else if (this.$store.getters.groups.length === 0) {
           return "Loading Groups"
-        } else if (this.services == null) {
+        } else if (this.$store.getters.services.length === 0) {
           return "Loading Services"
-        } else if (this.messages == null) {
+        } else if (this.$store.getters.messages == null) {
           return "Loading Announcements"
-        } else {
-          return "Completed"
         }
       },
       loaded() {
-        return this.core !== null && this.groups !== null && this.services !== null
+        return this.$store.getters.core.version && this.$store.getters.services.length !== 0
       },
         core() {
           return this.$store.getters.core

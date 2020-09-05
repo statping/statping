@@ -1,7 +1,7 @@
 <template>
-    <div class="offset-md-3 offset-0 col-md-6 mt-5">
+    <div class="offset-md-3 offset-lg-4 offset-0 col-lg-4 col-md-6 mt-5">
 
-      <div class="offset-1 col-10 mb-4 mb-md-3">
+      <div class="offset-1 offset-lg-2 col-lg-8 col-10 mb-4 mb-md-3">
         <img alt="Statping Login" class="embed-responsive" src="banner.png">
       </div>
 

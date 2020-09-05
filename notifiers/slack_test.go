@@ -40,7 +40,7 @@ func TestSlackNotifier(t *testing.T) {
 
 	t.Run("Load slack", func(t *testing.T) {
 		slacker.Host = null.NewNullString(SLACK_URL)
-		slacker.Delay = time.Duration(100 * time.Millisecond)
+		slacker.Delay = 100 * time.Millisecond
 		slacker.Limits = 3
 		Add(slacker)
 		assert.Equal(t, "Hunter Long", slacker.Author)

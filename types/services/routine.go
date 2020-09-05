@@ -341,11 +341,6 @@ func RecordSuccess(s *Service) {
 	sendSuccess(s)
 }
 
-func AddNotifier(n ServiceNotifier) {
-	notif := n.Select()
-	allNotifiers[notif.Method] = n
-}
-
 // RecordFailure will create a new 'Failure' record in the database for a offline service
 func RecordFailure(s *Service, issue, reason string) {
 	s.LastOffline = utils.Now()
@@ -366,6 +361,14 @@ func RecordFailure(s *Service, issue, reason string) {
 	}
 	s.Online = false
 	s.DownText = s.DowntimeText()
+
+	limitOffset := len(s.Failures)
+	if len(s.Failures) >= limitFailures {
+		limitOffset = limitFailures - 1
+	}
+
+	s.Failures = append([]*failures.Failure{fail}, s.Failures[:limitOffset]...)
+
 	metrics.Gauge("online", 0., s.Name, s.Type)
 	metrics.Inc("failure", s.Name)
 	sendFailure(s, fail)

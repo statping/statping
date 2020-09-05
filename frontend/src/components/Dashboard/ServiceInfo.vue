@@ -1,9 +1,8 @@
 <template>
-  <div class="col-4">
     <div class="dashboard_card card mb-4" :class="{'offline-card': !service.online}">
         <div class="card-header pb-1">
             <h6 v-observe-visibility="setVisible">
-                <router-link :to="serviceLink(service)">{{service.name}}</router-link>
+                <router-link :to="serviceLink(service)" class="no-decoration">{{service.name}}</router-link>
                 <span class="badge float-right text-uppercase" :class="{'badge-success': service.online, 'badge-danger': !service.online}">
                     {{service.online ? $t('online') : $t('offline')}}
                 </span>
@@ -11,31 +10,29 @@
         </div>
 
         <div class="card-body">
-            <transition name="fade">
-            <div v-if="loaded" class="row pl-2 pr-2">
-              <div class="col-md-6 col-sm-12 mt-2 mt-md-0 mb-3 pl-0 pr-0">
+            <div v-if="loaded" class="row pl-2">
+              <div class="col-md-6 col-sm-12 pl-2 mt-2 mt-md-0 mb-3">
                   <ServiceSparkLine :title="set2_name" subtitle="Latency Last 24 Hours" :series="set2"/>
               </div>
-              <div class="col-md-6 col-sm-12 mt-4 mt-md-0 mb-3">
+              <div class="col-md-6 col-sm-12 pl-0 mt-4 mt-md-0 mb-3">
                   <ServiceSparkLine :title="set1_name" subtitle="Latency Last 7 Days" :series="set1"/>
               </div>
               <ServiceEvents :service="service"/>
             </div>
-              <div v-else class="row mb-5 pt-5 pb-5">
-                <div class="col-6 text-center">
-                  <font-awesome-icon icon="circle-notch" class="text-dim" size="3x" spin/>
+              <div v-else class="row mb-5">
+                <div class="col-12 col-md-6 text-center">
+                  <font-awesome-icon icon="circle-notch" class="text-dim" size="2x" spin/>
                 </div>
-                <div class="col-6 text-center text-dim">
-                  <font-awesome-icon icon="circle-notch" class="text-dim" size="3x" spin/>
+                <div class="col-12 col-md-6 text-center text-dim">
+                  <font-awesome-icon icon="circle-notch" class="text-dim" size="2x" spin/>
                 </div>
               </div>
-            </transition>
         </div>
         <div class="card-footer">
 
           <div class="row">
           <div class="col-5 pr-0">
-              <span class="small text-dim"> {{ hoverbtn }}</span>
+              <span class="small text-dim">{{ hoverbtn }}</span>
           </div>
 
             <div class="col-7 pr-2 pl-0">
@@ -62,7 +59,6 @@
         </span>
 
     </div>
-  </div>
 </template>
 
 <script>
@@ -125,13 +121,14 @@
           }
         },
         async getUptime() {
-          const start = this.nowSubtract(3 * 86400)
-          this.uptime = await Api.service_uptime(this.service.id, this.toUnix(start), this.toUnix(this.now()))
+          const end = this.endOf("day", this.now())
+          const start = this.beginningOf("day", this.nowSubtract(3 * 86400))
+          this.uptime = await Api.service_uptime(this.service.id, this.toUnix(start), this.toUnix(end))
         },
         async loadInfo() {
-          this.set1 = await this.getHits(24 * 7, "6h")
+          this.set1 = await this.getHits(86400 * 7, "12h")
           this.set1_name = this.calc(this.set1)
-          this.set2 = await this.getHits(24, "1h")
+          this.set2 = await this.getHits(86400, "60m")
           this.set2_name = this.calc(this.set2)
           this.loaded = true
         },
@@ -149,14 +146,13 @@
           });
           total = total / data.length
         },
-          async getHits(hours, group) {
-              const start = this.nowSubtract(3600 * hours)
-              const fetched = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(this.now()), group, false)
-
+          async getHits(seconds, group) {
+              let start = this.nowSubtract(seconds)
+              let end = this.endOf("today")
+              const startEnd = this.startEndParams(start, end, group)
+              const fetched = await Api.service_hits(this.service.id, startEnd.start, startEnd.end, group, true)
               const data = this.convertToChartData(fetched, 0.001, true)
-
               return [{name: "Latency", ...data}]
-
           },
           calc(s) {
               let data = s[0].data

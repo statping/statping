@@ -2,7 +2,7 @@
     <div>
       <div v-observe-visibility="{callback: visibleChart, once: true}" v-if="!loaded" class="row">
         <div class="col-12 text-center mt-3">
-          <font-awesome-icon icon="circle-notch" class="text-dim" size="1x" spin/>
+          <font-awesome-icon icon="circle-notch" class="text-dim" size="2x" spin/>
         </div>
       </div>
       <transition name="fade">
@@ -77,8 +77,9 @@ export default {
       this.hover_text = `${e.date.toLocaleDateString()} - ${txt}`
     },
       async lastDaysFailures() {
-        const start = this.nowSubtract(86400 * 90)
-        const data = await Api.service_failures_data(this.service.id, this.toUnix(start), this.toUnix(this.now()), "24h", true)
+        const start = this.beginningOf('day', this.nowSubtract(86400 * 90))
+        const end = this.endOf('tomorrow')
+        const data = await Api.service_failures_data(this.service.id, this.toUnix(start), this.toUnix(end), "24h", true)
         data.forEach((d) => {
           let date = this.parseISO(d.timeframe)
           this.failureData.push({month: date.getMonth(), day: date.getDate(), date: date, amount: d.amount})

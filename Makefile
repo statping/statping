@@ -21,14 +21,14 @@ test: clean compile
 	go test -v -p=1 -ldflags="-X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -coverprofile=coverage.out ./...
 
 build: clean
-	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -o statping --tags "netgo linux" ./cmd
+	CGO_ENABLED=1 go build -a -ldflags "-s -w -X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -o statping --tags "netgo osusergo" ./cmd
 
 go-build: clean
 	rm -rf source/dist
 	rm -rf source/rice-box.go
 	wget https://assets.statping.com/source.tar.gz
 	tar -xvf source.tar.gz
-	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -o statping --tags "netgo" ./cmd
+	go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -o statping --tags "netgo osusergo" ./cmd
 
 lint:
 	go fmt ./...
@@ -76,6 +76,7 @@ test-deps:
 	go get github.com/GeertJohan/go.rice/rice
 	go get github.com/mattn/go-sqlite3
 	go install github.com/mattn/go-sqlite3
+	go install github.com/wellington/go-libsass
 
 deps:
 	go get -d -v -t ./...

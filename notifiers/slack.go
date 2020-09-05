@@ -9,7 +9,6 @@ import (
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
-	"regexp"
 	"strings"
 	"time"
 )
@@ -94,10 +93,5 @@ func (s *slack) OnSave() (string, error) {
 }
 
 func (s *slack) Valid(values notifications.Values) error {
-	regex := `https\:\/\/hooks\.slack\.com/services/[A-Z0-9]{7,11}/[A-Z0-9]{7,11}/[a-zA-Z0-9]{20,22}`
-	r := regexp.MustCompile(regex)
-	if !r.MatchString(values.Host) {
-		return errors.New("slack webhook does not match with expected regex " + regex)
-	}
 	return nil
 }

@@ -132,6 +132,7 @@ func Router() *mux.Router {
 	api.Handle("/api/services/{id}/failures", scoped(apiServiceFailuresHandler)).Methods("GET")
 	api.Handle("/api/services/{id}/failures", authenticated(servicesDeleteFailuresHandler, false)).Methods("DELETE")
 	api.Handle("/api/services/{id}/hits", scoped(apiServiceHitsHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/hits", authenticated(apiServiceHitsDeleteHandler, false)).Methods("DELETE")
 
 	// API SERVICE CHART DATA Routes
 	api.Handle("/api/services/{id}/hits_data", cached("30s", "application/json", apiServiceDataHandler)).Methods("GET")
@@ -181,7 +182,7 @@ func Router() *mux.Router {
 	// API Generic Routes
 	r.Handle("/metrics", readOnly(promhttp.Handler(), false))
 	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
-	r.NotFoundHandler = http.HandlerFunc(indexHandler)
+	r.NotFoundHandler = http.HandlerFunc(baseHandler)
 	return r
 }
 
