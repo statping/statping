@@ -1,5 +1,6 @@
 # 0.90.66 (09-08-2020)
 - Added Import and Export views in Dashboard
+- Modified services list sparkline to use start/end of day timestamp
 
 # 0.90.65 (09-01-2020)
 - Fixed issue with dashboard not logging in (notifier panic)
