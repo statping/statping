@@ -9,12 +9,15 @@ import (
 	_ "github.com/statping/statping/notifiers"
 	"github.com/statping/statping/source"
 	"github.com/statping/statping/types"
+	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/groups"
+	"github.com/statping/statping/types/messages"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/types/users"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -253,6 +256,26 @@ func TestMainApiRoutes(t *testing.T) {
 			URL:            "/",
 			Method:         "GET",
 			ExpectedStatus: 200,
+		},
+		{
+			Name:           "Export Settings",
+			URL:            "/api/settings/export",
+			Method:         "GET",
+			ExpectedStatus: 200,
+			BeforeTest:     SetTestENV,
+			AfterTest:      UnsetTestENV,
+			ResponseFunc: func(r *httptest.ResponseRecorder, t *testing.T, bytes []byte) error {
+				var data ExportData
+				err := json.Unmarshal(r.Body.Bytes(), &data)
+				require.Nil(t, err)
+				assert.Len(t, data.Services, len(services.All()))
+				assert.Len(t, data.Groups, len(groups.All()))
+				assert.Len(t, data.Notifiers, len(services.AllNotifiers()))
+				assert.Len(t, data.Users, len(users.All()))
+				assert.Len(t, data.Messages, len(messages.All()))
+				assert.Len(t, data.Checkins, len(checkins.All()))
+				return nil
+			},
 		},
 	}
 

@@ -218,6 +218,7 @@ func settingsImportHandler(w http.ResponseWriter, r *http.Request) {
 
 	if exportData.Groups != nil {
 		for _, s := range exportData.Groups {
+			s.Id = 0
 			if err := s.Create(); err != nil {
 				sendErrorJson(err, w, r)
 				return
@@ -227,6 +228,7 @@ func settingsImportHandler(w http.ResponseWriter, r *http.Request) {
 
 	if exportData.Services != nil {
 		for _, s := range exportData.Services {
+			s.Id = 0
 			if err := s.Create(); err != nil {
 				sendErrorJson(err, w, r)
 				return
@@ -236,6 +238,7 @@ func settingsImportHandler(w http.ResponseWriter, r *http.Request) {
 
 	if exportData.Users != nil {
 		for _, s := range exportData.Users {
+			s.Id = 0
 			if err := s.Create(); err != nil {
 				sendErrorJson(err, w, r)
 				return
