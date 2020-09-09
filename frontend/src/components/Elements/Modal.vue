@@ -1,5 +1,5 @@
 <template>
-    <div v-if="modal.visible" class="modal d-block" tabindex="-1">
+    <div v-if="modal.visible" class="modal d-block mt-5 pt-5" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">

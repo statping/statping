@@ -7,8 +7,8 @@ const tokenKey = "statping_auth";
 
 class Api {
   constructor() {
-    this.version = "0.90.65";
-    this.commit = "5bc10fcc8536a08ce7a099a0b4cbceb2dc9fc35b";
+    this.version = "0.90.66";
+    this.commit = "eb9792d18480736630f4811caf56add31b78c3c2";
   }
 
   async oauth() {
@@ -97,7 +97,6 @@ class Api {
   }
 
   async groups_reorder(data) {
-    window.console.log('api/reorder/groups', data)
     return axios.post('api/reorder/groups', data).then(response => (response.data))
   }
 
@@ -231,6 +230,10 @@ class Api {
 
   async theme_save(data) {
     return axios.post('api/theme', data).then(response => (response.data))
+  }
+
+  async import(data) {
+    return axios.post('api/settings/import', data).then(response => (response.data))
   }
 
   async check_token(token) {

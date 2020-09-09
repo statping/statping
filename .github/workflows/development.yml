@@ -26,7 +26,7 @@ jobs:
         shell: bash
 
       - name: Install Global Dependencies
-        run: npm install -g yarn sass cross-env
+        run: npm install -g yarn sass cross-env mjml
 
       - name: Download Frontend Dependencies
         working-directory: ./frontend

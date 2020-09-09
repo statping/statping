@@ -52,6 +52,8 @@ const english = {
     theme: "Theme Editor",
     cache: "Cache",
     oauth: "OAuth",
+    import: "Import & Export",
+    export: "Export",
     beta: "BETA",
     changelog: "Changelog",
     repo: "Statping Github Repo",

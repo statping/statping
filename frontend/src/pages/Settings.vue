@@ -21,9 +21,12 @@
                     <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-cache-tab')}" id="v-pills-cache-tab" data-toggle="pill" href="#v-pills-cache" role="tab" aria-controls="v-pills-cache" aria-selected="false">
                         <font-awesome-icon icon="paperclip" class="mr-2"/> {{ $t('settings.cache') }}
                     </a>
-                    <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-oauth-tab')}" id="v-pills-oauth-tab" data-toggle="pill" href="#v-pills-oauth" role="tab" aria-controls="v-pills-oauth" aria-selected="false">
-                        <font-awesome-icon icon="key" class="mr-2"/> {{ $t('settings.oauth') }}
-                    </a>
+                  <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-oauth-tab')}" id="v-pills-oauth-tab" data-toggle="pill" href="#v-pills-oauth" role="tab" aria-controls="v-pills-oauth" aria-selected="false">
+                    <font-awesome-icon icon="key" class="mr-2"/> {{ $t('settings.oauth') }}
+                  </a>
+                  <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-import-tab')}" id="v-pills-import-tab" data-toggle="pill" href="#v-pills-import" role="tab" aria-controls="v-pills-import" aria-selected="false">
+                    <font-awesome-icon icon="cloud-download-alt" class="mr-2"/> {{ $t('settings.import') }}
+                  </a>
 
                     <h6 class="mt-4 text-muted">Notifiers</h6>
 
@@ -107,6 +110,10 @@
                         <OAuth/>
                     </div>
 
+                  <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-import-tab'), show: liClass('v-pills-import-tab')}" id="v-pills-import" role="tabpanel" aria-labelledby="v-pills-import-tab">
+                    <Importer/>
+                  </div>
+
                     <div class="tab-pane fade" v-bind:class="{active: liClass(`v-pills-notifier-docs-tab`), show: liClass(`v-pills-notifier-docs-tab`)}" v-bind:id="`v-pills-notifier-docs-tab`" role="tabpanel" v-bind:aria-labelledby="`v-pills-notifier-docs-tab`">
                         <Variables/>
                     </div>
@@ -124,7 +131,6 @@
 
 <script>
   import Api from '../API';
-  import Variables from "@/components/Dashboard/Variables";
   const semver = require('semver')
 
   const CoreSettings = () => import(/* webpackChunkName: "dashboard" */ '@/forms/CoreSettings')
@@ -133,10 +139,13 @@
   const OAuth = () => import(/* webpackChunkName: "dashboard" */ '@/forms/OAuth')
   const ThemeEditor = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/ThemeEditor')
   const Cache = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Cache')
+  const Importer = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Importer')
+  const Variables = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Variables')
 
   export default {
       name: 'Settings',
       components: {
+        Importer,
         Variables,
         OAuth,
           Cache,
