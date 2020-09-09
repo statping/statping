@@ -75,7 +75,7 @@
             <label for="notify_before" class="col-sm-4 col-form-label">Notify Before</label>
             <div class="col-sm-8">
               <div class="form-inline">
-                <input v-model="message.notify_before" type="number" name="notify_before" class="col-4 form-control" id="notify_before">
+                <input v-model.number="message.notify_before" type="number" name="notify_before" class="col-4 form-control" id="notify_before">
                 <select v-model="message.notify_before_scale" class="ml-2 col-7 form-control" name="notify_before_scale" id="notify_before_scale">
                   <option value="minute">Minutes</option>
                   <option value="hour">Hours</option>
