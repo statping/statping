@@ -85,8 +85,7 @@
                                                 <button @click="copy(core.api_secret)" class="btn btn-outline-secondary" type="button">{{$t('copy')}}</button>
                                             </div>
                                         </div>
-                                        <small class="form-text text-muted">API Secret is used for read, create, update and delete routes</small>
-                                        <small class="form-text text-muted">You can Regenerate API Keys if you need to.</small>
+                                        <small class="form-text text-muted">{{$t('regen_desc')}}</small>
 
                                     </div>
                                 </div>

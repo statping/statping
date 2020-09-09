@@ -37,13 +37,13 @@
 
             <div class="col-7 pr-2 pl-0">
               <div class="btn-group float-right">
-                  <button @click="$router.push({path: `/dashboard/service/${service.id}/incidents`, params: {id: service.id}})" @mouseleave="unsetHover" @mouseover="setHover('Incidents')" class="btn btn-sm btn-white incident">
+                  <button @click="$router.push({path: `/dashboard/service/${service.id}/incidents`, params: {id: service.id}})" @mouseleave="unsetHover" @mouseover="setHover($t('incidents'))" class="btn btn-sm btn-white incident">
                     <font-awesome-icon icon="bullhorn"/>
                   </button>
-                  <button @click="$router.push({path: `/dashboard/service/${service.id}/checkins`, params: {id: service.id}})" @mouseleave="unsetHover" @mouseover="setHover('Checkins')" class="btn btn-sm btn-white checkins">
+                  <button @click="$router.push({path: `/dashboard/service/${service.id}/checkins`, params: {id: service.id}})" @mouseleave="unsetHover" @mouseover="setHover($t('checkins'))" class="btn btn-sm btn-white checkins">
                     <font-awesome-icon icon="calendar-check"/>
                   </button>
-                  <button @click="$router.push({path: `/dashboard/service/${service.id}/failures`, params: {id: service.id}})" @mouseleave="unsetHover" @mouseover="setHover('Failures')" class="btn btn-sm btn-white failures">
+                  <button @click="$router.push({path: `/dashboard/service/${service.id}/failures`, params: {id: service.id}})" @mouseleave="unsetHover" @mouseover="setHover($t('failures'))" class="btn btn-sm btn-white failures">
                     <font-awesome-icon icon="exclamation-triangle"/> <span v-if="service.stats.failures !== 0" class="badge badge-danger ml-1">{{service.stats.failures}}</span>
                   </button>
               </div>

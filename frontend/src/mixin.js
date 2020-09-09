@@ -103,7 +103,7 @@ export default Vue.mixin({
     },
     smallText(s) {
       if (s.online) {
-        return `Online, checked ${this.ago(s.last_success)} ago`
+        return `${this.$t('service_online_check')} ${this.ago(s.last_success)} ago`
       } else {
         const last = s.last_failure
         if (last) {
@@ -112,7 +112,7 @@ export default Vue.mixin({
         if (this.isZero(s.last_success)) {
           return this.$t('service_never_online')
         }
-        return `Service has been offline for ${this.ago(s.last_success)}`
+        return `${this.$t('service_offline_time')} ${this.ago(s.last_success)}`
       }
     },
     round_time(frame, val) {

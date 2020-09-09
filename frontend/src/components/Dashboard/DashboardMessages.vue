@@ -1,7 +1,7 @@
 <template>
   <div class="col-12">
     <div class="card contain-card mb-4">
-      <div class="card-header">{{ $t('top_nav.announcements') }}</div>
+      <div class="card-header">{{ $t('announcements') }}</div>
       <div class="card-body pt-0">
 
           <div v-if="messages.length === 0">
@@ -13,9 +13,9 @@
         <table v-else class="table table-striped">
           <thead>
             <tr>
-                <th scope="col">{{ $t('dashboard.title') }}</th>
-                <th scope="col" class="d-none d-md-table-cell">{{ $tc('dashboard.service', 1) }}</th>
-                <th scope="col" class="d-none d-md-table-cell">{{ $t('dashboard.begins') }}</th>
+                <th scope="col">{{ $t('title') }}</th>
+                <th scope="col" class="d-none d-md-table-cell">{{ $tc('service', 1) }}</th>
+                <th scope="col" class="d-none d-md-table-cell">{{ $t('begins') }}</th>
                 <th scope="col"></th>
             </tr>
           </thead>

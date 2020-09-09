@@ -106,7 +106,7 @@ func main() {
 		line++
 	}
 
-	CreateGo(translations)
+	//CreateGo(translations)
 
 	CreateJS("english", translations)
 	CreateJS("russian", translations)
