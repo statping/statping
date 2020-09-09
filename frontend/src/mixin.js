@@ -110,7 +110,7 @@ export default Vue.mixin({
           return `Offline, last error: ${last} ${this.ago(last.created_at)}`
         }
         if (this.isZero(s.last_success)) {
-          return `Service has never been online`
+          return this.$t('service_never_online')
         }
         return `Service has been offline for ${this.ago(s.last_success)}`
       }

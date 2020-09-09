@@ -54,7 +54,7 @@
         </div>
 
         <span v-for="(failure, index) in failures" v-bind:key="index" class="alert alert-light">
-            Failed {{failure.created_at}}<br>
+            {{ $t('failed') }} {{failure.created_at}}<br>
             {{failure.issue}}
         </span>
 

@@ -1,0 +1,74 @@
+key,en
+settings,Settings
+dashboard,Dashboard
+services,Services
+service,Service
+failures,Failures
+users,Users
+login,Login
+logout,Logout
+online,Online
+offline,Offline
+username,Username
+password,Password
+email,Email
+confirm_password,Confirm Password
+uptime,Uptime
+name,Name
+copy,Copy
+secret,Secret
+regen_api,Regenerate API Keys
+visibility,Visibility
+group,Group
+groups,Groups
+no_group,No Group
+public,Public
+private,Private
+announcements,Announcements
+notifiers,Notifiers
+logs,Logs
+help,Help
+type,Type
+edit,Edit
+create,Create
+view,View
+save,Save
+status,Status
+total_services,Total Services
+online_services,Online Services
+request_timeout,Request Timeout
+service_never_online,Service has never been online
+days_ago,Days Ago
+today,Today
+failures_24_hours,Failures last 24 hours
+no_services,You currently don't have any services!
+theme,Theme
+cache,Cache
+authentication,Authentication
+import,Import
+main_settings,Main Settings
+variables,Variables
+docs,Documentation
+links,Links
+changelog,Change Log
+repo,Repository
+language,Language
+db_connection,Database Connection
+db_host,Database Host
+db_port,Database Port
+db_username,Database Username
+db_password,Database Password
+db_database,Database Name
+send_reports,Send Error Reports
+project_name,Status Page Name
+description,Description
+domain,Domain
+newsletter,Newsletter
+newsletter_note,We will only send you an email for major changes
+loading,Loading
+save_settings,Save Settings
+average_response,Average Response
+last_uptime,Uptime last
+sign_in,Sign In
+failed,Failed
+wrong_login,Incorrect username or password

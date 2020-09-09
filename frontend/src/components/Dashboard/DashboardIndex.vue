@@ -3,23 +3,23 @@
         <div class="row stats_area mb-5">
             <div class="col-4">
                 <span class="font-6 font-weight-bold d-block">{{$store.getters.services.length}}</span>
-                <span class="font-2">{{ $t('dashboard.total_services') }}</span>
+                <span class="font-2">{{ $t('total_services') }}</span>
             </div>
             <div class="col-4">
                 <span class="font-6 font-weight-bold d-block">{{failuresLast24Hours()}}</span>
-                <span class="font-2">{{ $t('dashboard.failures_24_hours') }}</span>
+                <span class="font-2">{{ $t('failures_24_hours') }}</span>
             </div>
             <div class="col-4">
                 <span class="font-6 font-weight-bold d-block">{{$store.getters.onlineServices(true).length}}</span>
-                <span class="font-2">{{ $t('dashboard.online_services') }}</span>
+                <span class="font-2">{{ $t('online_services') }}</span>
             </div>
         </div>
 
         <div class="col-12" v-if="services.length === 0">
             <div class="alert alert-dark d-block">
-                You currently don't have any services!
+                {{$t('no_services')}}
                 <router-link v-if="$store.state.admin" to="/dashboard/create_service" class="btn btn-sm btn-success float-right">
-                    <font-awesome-icon icon="plus"/>  Create
+                    <font-awesome-icon icon="plus"/>  {{ $t('create') }}
                 </router-link>
             </div>
         </div>
