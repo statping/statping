@@ -2,9 +2,9 @@
     <div class="col-12">
 
         <div class="card contain-card mb-4">
-            <div class="card-header">{{ $t('top_nav.services') }}
+            <div class="card-header">{{ $t('services') }}
                 <router-link v-if="$store.state.admin" to="/dashboard/create_service" class="btn btn-sm btn-success float-right">
-                    <font-awesome-icon icon="plus"/>  Create
+                    <font-awesome-icon icon="plus"/>  {{$t('create')}}
                 </router-link>
             </div>
             <div class="card-body pt-0">
@@ -13,7 +13,7 @@
         </div>
 
         <div class="card contain-card mb-4">
-            <div class="card-header">{{ $t('top_nav.groups') }}</div>
+            <div class="card-header">{{ $t('groups') }}</div>
             <div class="card-body pt-0">
 
                 <div v-if="groupsList.length === 0">
@@ -25,9 +25,9 @@
         <table v-else class="table">
             <thead>
             <tr>
-                <th scope="col">{{ $t('dashboard.name') }}</th>
-                <th scope="col" class="d-none d-md-table-cell">{{ $tc('dashboard.service', 2) }}</th>
-                <th scope="col">{{ $t('dashboard.visibility') }}</th>
+                <th scope="col">{{ $t('name') }}</th>
+                <th scope="col" class="d-none d-md-table-cell">{{ $tc('service', 2) }}</th>
+                <th scope="col">{{ $t('visibility') }}</th>
                 <th scope="col"></th>
             </tr>
             </thead>

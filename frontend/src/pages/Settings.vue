@@ -10,22 +10,25 @@
                       <a href="https://github.com/statping/statping/blob/master/CHANGELOG.md" class="btn btn-sm text-dim mt-2">Changelog</a>
                     </div>
 
-                    <h6 class="text-muted">{{ $t('settings.main') }}</h6>
+                    <h6 class="text-muted">{{ $t('main_settings') }}</h6>
 
                     <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-home-tab')}" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">
-                        <font-awesome-icon icon="cog" class="mr-2"/> {{ $t('setting') }}
+                        <font-awesome-icon icon="cog" class="mr-2"/> {{ $t('settings') }}
                     </a>
                     <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-style-tab')}" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false">
-                        <font-awesome-icon icon="image" class="mr-2"/> {{ $t('settings.theme') }}
+                        <font-awesome-icon icon="image" class="mr-2"/> {{ $t('theme') }}
                     </a>
                     <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-cache-tab')}" id="v-pills-cache-tab" data-toggle="pill" href="#v-pills-cache" role="tab" aria-controls="v-pills-cache" aria-selected="false">
-                        <font-awesome-icon icon="paperclip" class="mr-2"/> {{ $t('settings.cache') }}
+                        <font-awesome-icon icon="paperclip" class="mr-2"/> {{ $t('cache') }}
                     </a>
-                    <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-oauth-tab')}" id="v-pills-oauth-tab" data-toggle="pill" href="#v-pills-oauth" role="tab" aria-controls="v-pills-oauth" aria-selected="false">
-                        <font-awesome-icon icon="key" class="mr-2"/> {{ $t('settings.oauth') }}
-                    </a>
+                  <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-oauth-tab')}" id="v-pills-oauth-tab" data-toggle="pill" href="#v-pills-oauth" role="tab" aria-controls="v-pills-oauth" aria-selected="false">
+                    <font-awesome-icon icon="key" class="mr-2"/> {{ $t('authentication') }}
+                  </a>
+                  <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-import-tab')}" id="v-pills-import-tab" data-toggle="pill" href="#v-pills-import" role="tab" aria-controls="v-pills-import" aria-selected="false">
+                    <font-awesome-icon icon="cloud-download-alt" class="mr-2"/> {{ $t('import') }}
+                  </a>
 
-                    <h6 class="mt-4 text-muted">Notifiers</h6>
+                    <h6 class="mt-4 text-muted">{{$t('notifiers')}}</h6>
 
                     <div id="notifiers_tabs">
                         <a v-for="(notifier, index) in notifiers" v-bind:key="`${notifier.method}`" @click.prevent="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}" v-bind:id="`v-pills-${notifier.method.toLowerCase()}-tab`" data-toggle="pill" v-bind:href="`#v-pills-${notifier.method.toLowerCase()}`" role="tab" v-bind:aria-controls="`v-pills-${notifier.method.toLowerCase()}`" aria-selected="false">
@@ -33,26 +36,26 @@
                             <span v-if="notifier.enabled" class="badge badge-pill float-right mt-1" :class="{'badge-success': !liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), 'badge-light': liClass(`v-pills-${notifier.method.toLowerCase()}-tab`), 'text-dark': liClass(`v-pills-${notifier.method.toLowerCase()}-tab`)}">ON</span>
                         </a>
                         <a @click.prevent="changeTab" class="nav-link text-capitalize" v-bind:class="{active: liClass(`v-pills-notifier-docs-tab`)}" v-bind:id="`v-pills-notifier-docs-tab`" data-toggle="pill" v-bind:href="`#v-pills-notifier-docs`" role="tab" v-bind:aria-controls="`v-pills-notifier-docs`" aria-selected="false">
-                            <font-awesome-icon icon="question" class="mr-2"/> Variables
+                            <font-awesome-icon icon="question" class="mr-2"/> {{$t('variables')}}
                         </a>
                     </div>
 
-                    <h6 class="mt-4 mb-3 text-muted">Statping Links</h6>
+                    <h6 class="mt-4 mb-3 text-muted">Statping {{$t('links')}}</h6>
 
                     <a href="https://github.com/statping/statping/wiki" class="mb-2 font-2 text-decoration-none text-muted">
-                        <font-awesome-icon icon="question" class="mr-3"/> {{$t('settings.docs')}}
+                        <font-awesome-icon icon="question" class="mr-3"/> {{$t('docs')}}
                     </a>
 
                     <a href="https://github.com/statping/statping/wiki/API" class="mb-2 font-2 text-decoration-none text-muted">
-                        <font-awesome-icon icon="laptop" class="mr-2"/> API {{$t('settings.docs')}}
+                        <font-awesome-icon icon="laptop" class="mr-2"/> API {{$t('docs')}}
                     </a>
 
                     <a href="https://raw.githubusercontent.com/statping/statping/master/CHANGELOG.md" class="mb-2 font-2 text-decoration-none text-muted">
-                        <font-awesome-icon icon="book" class="mr-3"/> {{$t('settings.changelog')}}
+                        <font-awesome-icon icon="book" class="mr-3"/> {{$t('changelog')}}
                     </a>
 
                     <a href="https://github.com/statping/statping" class="mb-2 font-2 text-decoration-none text-muted">
-                        <font-awesome-icon icon="code-branch" class="mr-3"/> {{$t('settings.repo')}}
+                        <font-awesome-icon icon="code-branch" class="mr-3"/> {{$t('repo')}}
                     </a>
 
                   <span class="small text-dim text-center mt-5">Statping v{{core.version}}<br>
@@ -71,25 +74,24 @@
                         <CoreSettings/>
 
                         <div class="card mt-3">
-                            <div class="card-header">API Settings</div>
+                            <div class="card-header">API {{$t('settings')}}</div>
                             <div class="card-body">
                                 <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">API Secret</label>
+                                    <label class="col-sm-3 col-form-label">API {{$t('secret')}}</label>
                                     <div class="col-sm-9">
                                         <div class="input-group">
                                         <input v-model="core.api_secret" @focus="$event.target.select()" type="text" class="form-control select-input" id="api_secret" readonly>
                                             <div class="input-group-append copy-btn">
-                                                <button @click="copy(core.api_secret)" class="btn btn-outline-secondary" type="button">Copy</button>
+                                                <button @click="copy(core.api_secret)" class="btn btn-outline-secondary" type="button">{{$t('copy')}}</button>
                                             </div>
                                         </div>
-                                        <small class="form-text text-muted">API Secret is used for read, create, update and delete routes</small>
-                                        <small class="form-text text-muted">You can Regenerate API Keys if you need to.</small>
+                                        <small class="form-text text-muted">{{$t('regen_desc')}}</small>
 
                                     </div>
                                 </div>
                             </div>
                             <div class="card-footer">
-                                <button id="regenkeys" @click="renewApiKeys" class="btn btn-sm btn-danger float-right">Regenerate API Keys</button>
+                                <button id="regenkeys" @click="renewApiKeys" class="btn btn-sm btn-danger float-right">{{$t('regen_api')}}</button>
                             </div>
                         </div>
 
@@ -106,6 +108,10 @@
                     <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-oauth-tab'), show: liClass('v-pills-oauth-tab')}" id="v-pills-oauth" role="tabpanel" aria-labelledby="v-pills-oauth-tab">
                         <OAuth/>
                     </div>
+
+                  <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-import-tab'), show: liClass('v-pills-import-tab')}" id="v-pills-import" role="tabpanel" aria-labelledby="v-pills-import-tab">
+                    <Importer/>
+                  </div>
 
                     <div class="tab-pane fade" v-bind:class="{active: liClass(`v-pills-notifier-docs-tab`), show: liClass(`v-pills-notifier-docs-tab`)}" v-bind:id="`v-pills-notifier-docs-tab`" role="tabpanel" v-bind:aria-labelledby="`v-pills-notifier-docs-tab`">
                         <Variables/>
@@ -124,7 +130,6 @@
 
 <script>
   import Api from '../API';
-  import Variables from "@/components/Dashboard/Variables";
   const semver = require('semver')
 
   const CoreSettings = () => import(/* webpackChunkName: "dashboard" */ '@/forms/CoreSettings')
@@ -133,10 +138,13 @@
   const OAuth = () => import(/* webpackChunkName: "dashboard" */ '@/forms/OAuth')
   const ThemeEditor = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/ThemeEditor')
   const Cache = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Cache')
+  const Importer = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Importer')
+  const Variables = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Variables')
 
   export default {
       name: 'Settings',
       components: {
+        Importer,
         Variables,
         OAuth,
           Cache,

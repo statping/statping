@@ -15,11 +15,11 @@
         <div class="row mt-2">
           <div class="col-12 no-select">
             <p class="divided">
-              <span class="font-2 text-muted">90 Days Ago</span>
+              <span class="font-2 text-muted">90 {{$t('days_ago')}}</span>
               <span class="divider"></span>
               <span class="text-center font-2" :class="{'text-muted': service.online, 'text-danger': !service.online}">{{service_txt}}</span>
               <span class="divider"></span>
-              <span class="font-2 text-muted">Today</span>
+              <span class="font-2 text-muted">{{$t('today')}}</span>
             </p>
           </div>
         </div>

@@ -17,7 +17,7 @@ func DeleteDirectory(directory string) error {
 //		CreateDirectory("assets")
 func CreateDirectory(directory string) error {
 	Log.Debugln("creating directory: " + directory)
-	if err := os.Mkdir(directory, os.FileMode(0755)); err != os.ErrExist {
+	if err := os.Mkdir(directory, os.ModePerm); err != os.ErrExist {
 		return err
 	}
 	return nil

@@ -1,10 +1,10 @@
 <template>
     <form v-if="service.type" @submit.prevent="saveService">
         <div class="card contain-card mb-4">
-            <div class="card-header">{{ $t('service.info') }}</div>
+            <div class="card-header">{{ $t('service_info') }}</div>
             <div class="card-body">
             <div class="form-group row">
-                <label class="col-sm-4 col-form-label">{{ $t('service.name') }}</label>
+                <label class="col-sm-4 col-form-label">{{ $t('service_name') }}</label>
                 <div class="col-sm-8">
                     <input v-model="service.name" @input="updatePermalink" id="name" type="text" name="name" class="form-control" placeholder="Server Name" required spellcheck="false" autocorrect="off">
                     <small class="form-text text-muted">Give your service a name you can recognize</small>
