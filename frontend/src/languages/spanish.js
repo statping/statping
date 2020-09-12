@@ -110,7 +110,24 @@ const spanish = {
     user_update: "Actualizar usuario",
     administrator: "Administrador",
     checkins: "Checkins",
-    incidents: "Incidentes"
+    incidents: "Incidentes",
+    service_info: "Información de servicio",
+    service_name: "Nombre del servicio",
+    service_type: "Tipo de servicio",
+    permalink: "URL de enlace permanente",
+    service_public: "Servicio Público",
+    check_interval: "Intervalo Comprobar",
+    service_endpoint: "Punto final de servicio",
+    service_check: "Tipo de comprobación de servicio",
+    service_timeout: "Tiempo de espera de solicitud",
+    expected_resp: "Respuesta esperada",
+    expected_code: "Código de estado esperado",
+    follow_redir: "Seguir redirecciones",
+    verify_ssl: "Verificar SSL",
+    tls_cert: "Usar Cert TLS",
+    notifications_enable: "Habilitar notificaciones",
+    notify_after: "Notificar después de errores",
+    notify_all: "Notificar todos los cambios"
 }
 
 export default spanish

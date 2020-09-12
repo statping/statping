@@ -92,8 +92,8 @@
             this.loading = true
               const c = this.core
               await Api.core_save(c)
-              const core = await Api.core()
-              this.$store.commit('setCore', core)
+              this.$store.commit('setCore', c)
+            this.$i18n.locale = c.language || "en";
             this.loading = false
           },
           selectAll() {

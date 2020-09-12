@@ -110,7 +110,24 @@ const french = {
     user_update: "Mise à jour utilisateur",
     administrator: "Administrateur",
     checkins: "Checkins",
-    incidents: "Incidents"
+    incidents: "Incidents",
+    service_info: "Informations sur le service",
+    service_name: "Nom du service",
+    service_type: "Type de service",
+    permalink: "URL Permalien",
+    service_public: "Fonction publique",
+    check_interval: "Période de vérification",
+    service_endpoint: "Point de terminaison de service",
+    service_check: "Type de vérification de service",
+    service_timeout: "Délai d'attente de",
+    expected_resp: "Réponse attendue",
+    expected_code: "Code d'état attendu",
+    follow_redir: "Suivre les redirections",
+    verify_ssl: "Vérifier SSL",
+    tls_cert: "Utiliser le certificat TLS",
+    notifications_enable: "Activer les notifications",
+    notify_after: "Notification après les échecs",
+    notify_all: "Notifier toutes les modifications"
 }
 
 export default french

@@ -110,7 +110,24 @@ const korean = {
     user_update: "사용자 업데이트",
     administrator: "관리자",
     checkins: "체크인",
-    incidents: "인시던트"
+    incidents: "인시던트",
+    service_info: "서비스 정보",
+    service_name: "서비스 이름",
+    service_type: "서비스 유형",
+    permalink: "영구 링크 URL",
+    service_public: "공공 서비스",
+    check_interval: "확인 간격",
+    service_endpoint: "서비스 엔드포인트",
+    service_check: "서비스 검사 유형",
+    service_timeout: "요청 시간 초과",
+    expected_resp: "예상 응답",
+    expected_code: "예상 상태 코드",
+    follow_redir: "리다이렉트 따르기",
+    verify_ssl: "SSL 확인",
+    tls_cert: "TLS 인증서 사용",
+    notifications_enable: "알림 활성화",
+    notify_after: "실패 후 알림",
+    notify_all: "모든 변경 사항 알림"
 }
 
 export default korean

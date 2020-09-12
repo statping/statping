@@ -110,7 +110,24 @@ const japanese = {
     user_update: "ユーザーの更新",
     administrator: "管理者",
     checkins: "チェックイン",
-    incidents: "事変"
+    incidents: "事変",
+    service_info: "サービス情報",
+    service_name: "サービス名",
+    service_type: "サービスタイプ",
+    permalink: "パーマリンクURL",
+    service_public: "公共サービス",
+    check_interval: "チェック間隔",
+    service_endpoint: "サービスエンドポイント",
+    service_check: "サービス・チェック・タイプ",
+    service_timeout: "リクエストのタイムアウト",
+    expected_resp: "期待される応答",
+    expected_code: "予想されるステータスコード",
+    follow_redir: "リダイレクトに従う",
+    verify_ssl: "SSL の確認",
+    tls_cert: "TLS 証明書を使用",
+    notifications_enable: "通知を有効にする",
+    notify_after: "障害発生後に通知する",
+    notify_all: "すべての変更を通知"
 }
 
 export default japanese
