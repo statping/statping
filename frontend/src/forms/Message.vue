@@ -75,7 +75,7 @@
             <label for="notify_before" class="col-sm-4 col-form-label">{{ $t('notify_before') }}</label>
             <div class="col-sm-8">
               <div class="form-inline">
-                <input v-model="message.notify_before" type="number" name="notify_before" class="col-4 form-control" id="notify_before">
+                <input v-model.number="message.notify_before" type="number" name="notify_before" class="col-4 form-control" id="notify_before">
                 <select v-model="message.notify_before_scale" class="ml-2 col-7 form-control" name="notify_before_scale" id="notify_before_scale">
                   <option value="minute">{{ $t('minutes') }}</option>
                   <option value="hour">{{ $t('hours') }}</option>
