@@ -8,12 +8,12 @@
     <table v-else class="table">
         <thead>
         <tr>
-            <th scope="col">Name</th>
-            <th scope="col" class="d-none d-md-table-cell">Status</th>
-            <th scope="col" class="d-none d-md-table-cell">Visibility</th>
+            <th scope="col">{{$t('name')}}</th>
+            <th scope="col" class="d-none d-md-table-cell">{{$t('status')}}</th>
+            <th scope="col" class="d-none d-md-table-cell">{{$t('visibility')}}</th>
             <th scope="col" class="d-none d-md-table-cell">{{ $t('group') }}</th>
             <th scope="col" class="d-none d-md-table-cell" style="width: 130px">
-              Failures
+              {{$t('failures')}}
               <div class="btn-group float-right" role="group">
                 <a @click="list_timeframe='3h'" type="button" class="small" :class="{'text-success': list_timeframe==='3h', 'text-muted': list_timeframe!=='3h'}">3h</a>
                 <a @click="list_timeframe='12h'" type="button" class="small" :class="{'text-success': list_timeframe==='12h', 'text-muted': list_timeframe!=='12h'}">12h</a>

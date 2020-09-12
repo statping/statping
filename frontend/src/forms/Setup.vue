@@ -9,17 +9,21 @@
                 <div class="row">
                     <div class="col-12 col-md-6">
                         <div class="form-group">
-                            <label class="text-capitalize">{{ $t('setup.language') }}</label>
+                            <label class="text-capitalize">{{ $t('language') }}</label>
                             <select @change="changeLanguages" v-model="setup.language" id="language" class="form-control">
                                 <option value="en">English</option>
                                 <option value="es">Spanish</option>
                                 <option value="fr">French</option>
                                 <option value="ru">Russian</option>
                                 <option value="de">German</option>
+                                <option value="ja">Japanese</option>
+                                <option value="ko">Korean</option>
+                                <option value="it">Italian</option>
+                                <option value="zh">Chinese</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="text-capitalize">{{ $t('setup.connection') }}</label>
+                            <label class="text-capitalize">{{ $t('db_connection') }}</label>
                             <select @change="canSubmit" v-model="setup.db_connection" id="db_connection" class="form-control">
                                 <option value="sqlite">SQLite</option>
                                 <option value="postgres">Postgres</option>
@@ -29,34 +33,34 @@
                         <div class="row">
                             <div class="col-7 col-md-6">
                                 <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
-                                    <label class="text-capitalize">{{ $t('setup.host') }}</label>
+                                    <label class="text-capitalize">{{ $t('db_host') }}</label>
                                     <input @keyup="canSubmit" v-model="setup.db_host" id="db_host" type="text" class="form-control" placeholder="localhost">
                                 </div>
                             </div>
                             <div class="col-5 col-md-6">
                                 <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
-                                    <label class="text-capitalize">{{ $t('port') }}</label>
+                                    <label class="text-capitalize">{{ $t('db_port') }}</label>
                                     <input @keyup="canSubmit" v-model="setup.db_port" id="db_port" type="number" class="form-control" placeholder="5432">
                                 </div>
                             </div>
                         </div>
                         <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
-                            <label class="text-capitalize">{{ $t('username') }}</label>
+                            <label class="text-capitalize">{{ $t('db_username') }}</label>
                             <input @keyup="canSubmit" v-model="setup.db_user" id="db_user" type="text" class="form-control" placeholder="root">
                         </div>
                         <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
-                            <label for="db_password" class="text-capitalize">{{ $t('password') }}</label>
+                            <label for="db_password" class="text-capitalize">{{ $t('db_password') }}</label>
                             <input @keyup="canSubmit" v-model="setup.db_password" id="db_password" type="password" class="form-control" placeholder="password123">
                         </div>
                         <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
-                            <label for="db_database" class="text-capitalize">{{ $t('setup.database') }}</label>
+                            <label for="db_database" class="text-capitalize">{{ $t('db_database') }}</label>
                             <input @keyup="canSubmit" v-model="setup.db_database" id="db_database" type="text" class="form-control" placeholder="Database name">
                         </div>
 
                         <div class="form-group mt-3">
                             <div class="row">
                                 <div class="col-9">
-                                    <span class="text-left text-capitalize">{{ $t('setup.send_reports') }}</span>
+                                    <span class="text-left text-capitalize">{{ $t('send_reports') }}</span>
                                 </div>
                                 <div class="col-3 text-right">
                                     <span @click="setup.send_reports = !!setup.send_reports" class="switch">
@@ -72,32 +76,32 @@
                     <div class="col-12 col-md-6">
 
                         <div class="form-group">
-                            <label class="text-capitalize">{{ $t('setup.project_name') }}</label>
+                            <label class="text-capitalize">{{ $t('project_name') }}</label>
                             <input @keyup="canSubmit" v-model="setup.project" id="project" type="text" class="form-control" placeholder="Work Servers" required>
                         </div>
 
                         <div class="form-group">
-                            <label class="text-capitalize">{{ $t('setup.project_description') }}</label>
+                            <label class="text-capitalize">{{ $t('description') }}</label>
                             <input @keyup="canSubmit" v-model="setup.description" id="description" type="text" class="form-control" placeholder="Monitors all of my work services">
                         </div>
 
                         <div class="form-group">
-                            <label class="text-capitalize" for="domain">{{ $t('setup.domain') }}</label>
+                            <label class="text-capitalize" for="domain">{{ $t('domain') }}</label>
                             <input @keyup="canSubmit" v-model="setup.domain" type="text" class="form-control" id="domain" required>
                         </div>
 
                         <div class="form-group">
-                            <label class="text-capitalize">{{ $t('setup.username') }}</label>
+                            <label class="text-capitalize">{{ $t('username') }}</label>
                             <input @keyup="canSubmit" v-model="setup.username" id="username" type="text" class="form-control" placeholder="admin" required>
                         </div>
 
                         <div class="form-group">
-                            <label class="text-capitalize">{{ $t('setup.password') }}</label>
+                            <label class="text-capitalize">{{ $t('password') }}</label>
                             <input @keyup="canSubmit" v-model="setup.password" id="password" type="password" class="form-control" placeholder="password" required>
                         </div>
 
                         <div class="form-group">
-                            <label class="text-capitalize">{{ $t('setup.password_confirm') }}</label>
+                            <label class="text-capitalize">{{ $t('confirm_password') }}</label>
                             <input @keyup="canSubmit" v-model="setup.confirm_password" id="password_confirm" type="password" class="form-control" placeholder="password" required>
                             <span v-if="passnomatch" class="small text-danger">Both passwords should match</span>
                         </div>
@@ -109,14 +113,14 @@
                                     <input @keyup="canSubmit" v-model="setup.email" id="email" type="text" class="form-control" placeholder="myemail@domain.com">
                                 </div>
                                 <div class="col-4 text-right">
-                                    <label class="d-none d-sm-block text-capitalize text-capitalize">{{ $t('setup.newsletter') }}</label>
+                                    <label class="d-none d-sm-block text-capitalize text-capitalize">{{ $t('newsletter') }}</label>
                                     <span @click="setup.newsletter = !!setup.newsletter" class="switch">
                                       <input v-model="setup.newsletter" type="checkbox" name="send_newsletter" class="switch" id="send_newsletter" :checked="setup.newsletter">
                                       <label for="send_newsletter"></label>
                                     </span>
                                 </div>
                             </div>
-                            <small>{{ $t('setup.newsletter_note') }}</small>
+                            <small>{{ $t('newsletter_note') }}</small>
                         </div>
                     </div>
 
@@ -126,7 +130,7 @@
 
                     <div class="col-12">
                         <button @click.prevent="saveSetup" v-bind:disabled="disabled || loading" type="submit" class="btn btn-primary btn-block" :class="{'btn-primary': !loading, 'btn-default': loading}">
-                            <font-awesome-icon v-if="loading" icon="circle-notch" class="mr-2" spin/>{{loading ? "Loading..." : "Save Settings"}}
+                            <font-awesome-icon v-if="loading" icon="circle-notch" class="mr-2" spin/>{{loading ? $t('loading') : $t('save_settings')}}
                         </button>
                     </div>
                 </div>

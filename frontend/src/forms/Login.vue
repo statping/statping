@@ -16,10 +16,10 @@
         <div class="form-group row">
             <div class="col-sm-12">
                 <div v-if="error" class="alert alert-danger" role="alert">
-                    {{$t('dashboard.wrong_login')}}
+                    {{$t('wrong_login')}}
                 </div>
                 <button @click.prevent="login" type="submit" class="btn btn-block btn-primary" :disabled="disabled || loading">
-                    <font-awesome-icon v-if="loading" icon="circle-notch" class="mr-2" spin/>{{loading ? $t('dashboard.loading') : $t('dashboard.sign_in')}}
+                    <font-awesome-icon v-if="loading" icon="circle-notch" class="mr-2" spin/>{{loading ? $t('loading') : $t('sign_in')}}
                 </button>
             </div>
         </div>

@@ -1,21 +1,21 @@
 <template>
     <div class="card mb-5">
-        <div class="card-header">Theme Editor</div>
+        <div class="card-header">{{$t('theme_editor')}}</div>
         <div class="card-body">
         <div v-if="error" class="alert alert-danger mt-3" style="white-space: pre-line;">
             {{error}}
         </div>
 
             <h6 v-if="directory" id="assets_dir" class="text-muted text-monospace text-sm-center font-1 mb-4">
-                Asset Directory: {{directory}}
+                {{$t('assets_dir')}}: {{directory}}
             </h6>
 
             <div v-if="loaded && !directory" class="jumbotron jumbotron-fluid">
                 <div class="text-center col-12">
-                    <h1 class="display-5">Enable Local Assets</h1>
-                    <span class="lead">Customize your status page design by enabling local assets. This will create a 'assets' directory containing all CSS.<p>
+                    <h1 class="display-5">{{$t('enable_assets')}}</h1>
+                    <span class="lead">{{$t('assets_desc')}}<p>
                         <button id="enable_assets" @click.prevent="createAssets" :disabled="pending" href="#" class="btn btn-primary mt-3">
-                            <font-awesome-icon v-if="pending" icon="circle-notch" class="mr-2" spin/>{{pending ? "Creating Assets" : "Enable Local Assets"}}
+                            <font-awesome-icon v-if="pending" icon="circle-notch" class="mr-2" spin/>{{pending ? $t('assets_loading') : $t('assets_btn')}}
                         </button>
                     </p></span>
                 </div>
@@ -25,13 +25,13 @@
         <h3>Variables</h3>
         <codemirror v-show="loaded" v-model="vars" ref="vars" :options="cmOptions" class="codemirrorInput"/>
 
-        <h3 class="mt-3">Base Theme</h3>
+        <h3 class="mt-3">Base {{$t('theme')}}</h3>
         <codemirror v-show="loaded" v-model="base" ref="base" :options="cmOptions" class="codemirrorInput"/>
 
-        <h3 class="mt-3">Layout Theme</h3>
+        <h3 class="mt-3">Layout {{$t('theme')}}</h3>
         <codemirror v-show="loaded" v-model="layout" ref="layout" :options="cmOptions" class="codemirrorInput"/>
 
-        <h3 class="mt-3">Forms Theme</h3>
+        <h3 class="mt-3">Forms {{$t('theme')}}</h3>
         <codemirror v-show="loaded" v-model="forms" ref="forms" :options="cmOptions" class="codemirrorInput"/>
 
         <h3 class="mt-3">Mixins</h3>
