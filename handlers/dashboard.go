@@ -1,12 +1,22 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/statping/statping/source"
+	"github.com/statping/statping/types/checkins"
+	"github.com/statping/statping/types/configs"
+	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/errors"
+	"github.com/statping/statping/types/groups"
+	"github.com/statping/statping/types/messages"
+	"github.com/statping/statping/types/notifications"
+	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/types/users"
 	"github.com/statping/statping/utils"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 )
@@ -148,6 +158,122 @@ func apiThemeRemoveHandler(w http.ResponseWriter, r *http.Request) {
 		log.Errorln(fmt.Errorf("error deleting all assets %v", err))
 	}
 	sendJsonAction(utils.Directory+"/assets", "deleted", w, r)
+}
+
+type ExportData struct {
+	Config    *configs.DbConfig            `json:"config,omitempty"`
+	Core      *core.Core                   `json:"core"`
+	Services  []services.Service           `json:"services"`
+	Messages  []*messages.Message          `json:"messages"`
+	Checkins  []*checkins.Checkin          `json:"checkins"`
+	Users     []*users.User                `json:"users"`
+	Groups    []*groups.Group              `json:"groups"`
+	Notifiers []notifications.Notification `json:"notifiers"`
+}
+
+func (e *ExportData) JSON() []byte {
+	d, _ := json.Marshal(e)
+	return d
+}
+
+func ExportSettings() (*ExportData, error) {
+	var notifiers []notifications.Notification
+	for _, n := range services.AllNotifiers() {
+		notifiers = append(notifiers, *n.Select())
+	}
+
+	data := &ExportData{
+		Core:      core.App,
+		Notifiers: notifiers,
+		Checkins:  checkins.All(),
+		Users:     users.All(),
+		Services:  services.AllInOrder(),
+		Groups:    groups.All(),
+		Messages:  messages.All(),
+	}
+	return data, nil
+}
+
+func settingsImportHandler(w http.ResponseWriter, r *http.Request) {
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	defer r.Body.Close()
+
+	var exportData *ExportData
+	if err := json.Unmarshal(data, &exportData); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	if exportData.Core != nil {
+		core.App = exportData.Core
+		if err := core.App.Update(); err != nil {
+			sendErrorJson(err, w, r)
+			return
+		}
+	}
+
+	if exportData.Groups != nil {
+		for _, s := range exportData.Groups {
+			s.Id = 0
+			if err := s.Create(); err != nil {
+				sendErrorJson(err, w, r)
+				return
+			}
+		}
+	}
+
+	if exportData.Services != nil {
+		for _, s := range exportData.Services {
+			s.Id = 0
+			if err := s.Create(); err != nil {
+				sendErrorJson(err, w, r)
+				return
+			}
+		}
+	}
+
+	if exportData.Users != nil {
+		for _, s := range exportData.Users {
+			s.Id = 0
+			if err := s.Create(); err != nil {
+				sendErrorJson(err, w, r)
+				return
+			}
+		}
+	}
+
+	if exportData.Notifiers != nil {
+		for _, s := range exportData.Notifiers {
+			notif := services.ReturnNotifier(s.Method)
+			n := notif.Select().UpdateFields(&s)
+			if err := n.Update(); err != nil {
+				sendErrorJson(err, w, r)
+				return
+			}
+		}
+	}
+
+	sendJsonAction(exportData, "import", w, r)
+}
+
+func settingsExportHandler(w http.ResponseWriter, r *http.Request) {
+	exported, err := ExportSettings()
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	file := bytes.NewBuffer(exported.JSON())
+
+	w.Header().Set("Content-Disposition", "attachment; filename=statping.json")
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Length", utils.ToString(len(exported.JSON())))
+
+	io.Copy(w, file)
 }
 
 func logsLineHandler(w http.ResponseWriter, r *http.Request) {

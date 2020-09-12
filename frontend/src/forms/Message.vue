@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="card contain-card mb-5">
-      <div class="card-header">{{message.id ? `Update ${message.title}` : "Create Announcement"}}
+      <div class="card-header">{{message.id ? `${$t('update')} ${message.title}` : $t('message_create')}}
         <transition name="slide-fade">
           <button @click="removeEdit" v-if="message.id" class="btn btn-sm float-right btn-danger btn-sm">
               {{ $t('close') }}
@@ -11,31 +11,31 @@
       <div class="card-body">
         <form @submit="saveMessage">
           <div class="form-group row">
-            <label class="col-sm-4 col-form-label">{{ $t('dashboard.title') }}</label>
+            <label class="col-sm-4 col-form-label">{{ $t('title') }}</label>
             <div class="col-sm-8">
               <input v-model="message.title" type="text" name="title" class="form-control" id="title" placeholder="Announcement Title" required>
             </div>
           </div>
 
           <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Description</label>
+            <label class="col-sm-4 col-form-label">{{ $t('description') }}</label>
             <div class="col-sm-8">
               <textarea v-model="message.description" rows="5" name="description" class="form-control" id="description" required></textarea>
             </div>
           </div>
 
           <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Service</label>
+            <label class="col-sm-4 col-form-label">{{ $t('service') }}</label>
             <div class="col-sm-8">
               <select v-model="message.service" name="service_id" class="form-control">
-                <option v-bind:value="0">Global Announcement</option>
+                <option v-bind:value="0">{{ $t('global_announcement') }}</option>
                 <option v-for="service in $store.getters.services" :value="service.id" v-bind:key="service.id" >{{service.name}}</option>
               </select>
             </div>
           </div>
 
           <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Announcement Date Range</label>
+            <label class="col-sm-4 col-form-label">{{ $t('announcement_date') }}</label>
             <div class="col-sm-4">
               <flatPickr v-model="message.start_on" @on-change="startChange" :config="config" type="text" name="start_on" class="form-control form-control-plaintext" id="start_on" value="0001-01-01T00:00:00Z" required />
             </div>
@@ -45,41 +45,41 @@
           </div>
 
           <div v-show="this.service === null" class="form-group row">
-            <label for="service_id" class="col-sm-4 col-form-label">Service</label>
+            <label for="service_id" class="col-sm-4 col-form-label">{{ $t('service') }}</label>
             <div class="col-sm-8">
               <select v-model="message.service" class="form-control" name="service" id="service_id">
-                <option v-bind:value="0">Global Message</option>
+                <option v-bind:value="0">{{ $t('global_announcement') }}</option>
                 <option v-for="service in $store.getters.services" :value="service.id" v-bind:key="service.id">{{service.name}}</option>
               </select>
             </div>
           </div>
 
           <div class="form-group row">
-            <label for="notify_method" class="col-sm-4 col-form-label">Notify Users</label>
+            <label for="notify_method" class="col-sm-4 col-form-label">{{ $t('notify_users') }}</label>
             <div class="col-sm-8">
               <span @click="message.notify = !!message.notify" class="switch">
                 <input v-model="message.notify" type="checkbox" class="switch" id="switch-normal">
-                <label for="switch-normal">Notify Users Before Scheduled Time</label>
+                <label for="switch-normal">{{ $t('notify_desc') }}</label>
               </span>
             </div>
           </div>
 
           <div v-if="message.notify" class="form-group row">
-            <label for="notify_method" class="col-sm-4 col-form-label">Notification Method</label>
+            <label for="notify_method" class="col-sm-4 col-form-label">{{ $t('notify_method') }}</label>
             <div class="col-sm-8">
               <input v-model="message.notify_method" type="text" name="notify_method" class="form-control" id="notify_method" value="" placeholder="email">
             </div>
           </div>
 
           <div v-if="message.notify" class="form-group row">
-            <label for="notify_before" class="col-sm-4 col-form-label">Notify Before</label>
+            <label for="notify_before" class="col-sm-4 col-form-label">{{ $t('notify_before') }}</label>
             <div class="col-sm-8">
               <div class="form-inline">
-                <input v-model="message.notify_before" type="number" name="notify_before" class="col-4 form-control" id="notify_before">
+                <input v-model.number="message.notify_before" type="number" name="notify_before" class="col-4 form-control" id="notify_before">
                 <select v-model="message.notify_before_scale" class="ml-2 col-7 form-control" name="notify_before_scale" id="notify_before_scale">
-                  <option value="minute">Minutes</option>
-                  <option value="hour">Hours</option>
-                  <option value="day">Days</option>
+                  <option value="minute">{{ $t('minutes') }}</option>
+                  <option value="hour">{{ $t('hours') }}</option>
+                  <option value="day">{{ $t('days') }}</option>
                 </select>
               </div>
             </div>
@@ -90,7 +90,7 @@
               <button @click="saveMessage"
                       :disabled="!message.title || !message.description"
                       type="submit" class="btn btn-block" :class="{'btn-primary': !message.id, 'btn-secondary': message.id}">
-                  {{message.id ? "Edit Message" : "Create Message"}}
+                  {{message.id ? $t('message_edit') : $t('message_create')}}
               </button>
             </div>
           </div>

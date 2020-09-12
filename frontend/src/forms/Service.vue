@@ -1,25 +1,25 @@
 <template>
     <form v-if="service.type" @submit.prevent="saveService">
         <div class="card contain-card mb-4">
-            <div class="card-header">{{ $t('service.info') }}</div>
+            <div class="card-header">{{ $t('service_info') }}</div>
             <div class="card-body">
             <div class="form-group row">
-                <label class="col-sm-4 col-form-label">{{ $t('service.name') }}</label>
+                <label class="col-sm-4 col-form-label">{{ $t('service_name') }}</label>
                 <div class="col-sm-8">
                     <input v-model="service.name" @input="updatePermalink" id="name" type="text" name="name" class="form-control" placeholder="Server Name" required spellcheck="false" autocorrect="off">
                     <small class="form-text text-muted">Give your service a name you can recognize</small>
                 </div>
             </div>
         <div class="form-group row">
-            <label for="service_type" class="col-sm-4 col-form-label">{{ $t('service.type') }}</label>
+            <label for="service_type" class="col-sm-4 col-form-label">{{ $t('service_type') }}</label>
             <div class="col-sm-8">
                 <select v-model="service.type" class="form-control" id="service_type">
-                    <option value="http">HTTP Service</option>
-                    <option value="tcp">TCP Service</option>
-                    <option value="udp">UDP Service</option>
+                    <option value="http">HTTP {{ $t('service') }}</option>
+                    <option value="tcp">TCP {{ $t('service') }}</option>
+                    <option value="udp">UDP {{ $t('service') }}</option>
                     <option value="icmp">ICMP Ping</option>
-                    <option value="grpc">gRPC Service</option>
-                    <option value="static">Static Service</option>
+                    <option value="grpc">gRPC {{ $t('service') }}</option>
+                    <option value="static">Static {{ $t('service') }}</option>
                 </select>
                 <small class="form-text text-muted">Use HTTP if you are checking a website or use TCP if you are checking a server</small>
             </div>
@@ -35,7 +35,7 @@
             </div>
         </div>
             <div class="form-group row">
-                <label class="col-sm-4 col-form-label">Permalink URL</label>
+                <label class="col-sm-4 col-form-label">{{ $t('permalink') }}</label>
                 <div class="col-sm-8">
                     <input v-model="service.permalink" type="text" name="permalink" class="form-control" id="permalink" autocapitalize="none" spellcheck="true" placeholder='awesome_service'>
                     <small class="form-text text-muted">Use text for the service URL rather than the service number.</small>
@@ -43,7 +43,7 @@
             </div>
 
             <div class="form-group row">
-                <label class="col-sm-4 col-form-label">Public Service</label>
+                <label class="col-sm-4 col-form-label">{{ $t('service_public') }}</label>
                 <div class="col-12 col-md-8 mt-1 mb-2">
                     <span @click="service.public = !!service.public" class="switch float-left">
                         <input v-model="service.public" type="checkbox" name="public-option" class="switch" id="switch-public" v-bind:checked="service.public">
@@ -54,7 +54,7 @@
             </div>
 
             <div v-if="service.type !== 'static'" class="form-group row">
-                <label for="service_interval" class="col-sm-4 col-form-label">Check Interval</label>
+                <label for="service_interval" class="col-sm-4 col-form-label">{{ $t('check_interval') }}</label>
                 <div class="col-sm-6">
                     <span class="slider-info">{{secondsHumanize(service.check_interval)}}</span>
                     <input v-model="service.check_interval" type="range" class="slider" id="service_interval" min="1" max="1800" :step="1">
@@ -74,7 +74,7 @@
 
             <div class="form-group row">
                 <label for="service_url" class="col-sm-4 col-form-label">
-                  Service Endpoint {{service.type === 'http' ? "(URL)" : "(Domain)"}}
+                  {{ $t('service_endpoint') }} {{service.type === 'http' ? "(URL)" : "(Domain)"}}
                 </label>
                 <div class="col-sm-8">
                     <input v-model="service.domain" type="url" class="form-control" id="service_url" :placeholder="service.type === 'http' ? 'https://google.com' : '192.168.1.1'" required autocapitalize="none" spellcheck="false">
@@ -90,7 +90,7 @@
             </div>
 
             <div v-if="service.type.match(/^(http)$/)" class="form-group row">
-                <label class="col-sm-4 col-form-label">Service Check Type</label>
+                <label class="col-sm-4 col-form-label">{{ $t('service_check') }}</label>
                 <div class="col-sm-8">
                     <select v-model="service.method" name="method" class="form-control">
                         <option value="GET" >GET</option>
@@ -104,7 +104,7 @@
             </div>
 
         <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Request Timeout</label>
+            <label class="col-sm-4 col-form-label">{{ $t('service_timeout') }}</label>
             <div class="col-sm-6">
                 <span v-if="service.timeout >= 0" class="slider-info">{{secondsHumanize(service.timeout)}}</span>
                 <input v-model="service.timeout" type="range" id="timeout" name="timeout" class="slider" min="1" max="180">
@@ -132,14 +132,14 @@
             </div>
         </div>
         <div v-if="service.type.match(/^(http)$/)" class="form-group row">
-            <label class="col-sm-4 col-form-label">Expected Response (Regex)</label>
+            <label class="col-sm-4 col-form-label">{{ $t('expected_resp') }} (Regex)</label>
             <div class="col-sm-8">
                 <textarea v-model="service.expected" class="form-control" rows="3" autocapitalize="none" spellcheck="false" placeholder='(method)": "((\\"|[success])*)"'></textarea>
                 <small class="form-text text-muted">You can use plain text or insert <a target="_blank" href="https://regex101.com/r/I5bbj9/1">Regex</a> to validate the response</small>
             </div>
         </div>
         <div v-if="service.type.match(/^(http)$/)" class="form-group row">
-            <label for="service_response_code" class="col-sm-4 col-form-label">Expected Status Code</label>
+            <label for="service_response_code" class="col-sm-4 col-form-label">{{ $t('expected_code') }}</label>
             <div class="col-sm-8">
                 <input v-model="service.expected_status" type="number" name="expected_status" class="form-control" placeholder="200" id="service_response_code">
                 <small class="form-text text-muted">A status code of 200 is success, or view all the <a target="_blank" href="https://www.restapitutorial.com/httpstatuscodes.html">HTTP Status Codes</a></small>
@@ -147,7 +147,7 @@
         </div>
 
         <div v-if="service.type.match(/^(http)$/)" class="form-group row">
-            <label class="col-12 col-md-4 col-form-label">Follow HTTP Redirects</label>
+            <label class="col-12 col-md-4 col-form-label">{{ $t('follow_redir') }}</label>
             <div class="col-12 col-md-8 mt-1 mb-2 mb-md-0">
                 <span @click="service.redirect = !!service.redirect" class="switch float-left">
                     <input v-model="service.redirect" type="checkbox" name="redirect-option" class="switch" id="switch-redirect" v-bind:checked="service.redirect">
@@ -157,7 +157,7 @@
         </div>
 
         <div v-if="service.type.match(/^(http)$/)" class="form-group row">
-            <label class="col-12 col-md-4 col-form-label">Verify SSL</label>
+            <label class="col-12 col-md-4 col-form-label">{{ $t('verify_ssl') }}</label>
             <div class="col-12 col-md-8 mt-1 mb-2 mb-md-0">
                 <span @click="service.verify_ssl = !!service.verify_ssl" class="switch float-left">
                     <input v-model="service.verify_ssl" type="checkbox" name="verify_ssl-option" class="switch" id="switch-verify-ssl" v-bind:checked="service.verify_ssl">
@@ -168,7 +168,7 @@
         </div>
 
         <div v-if="service.type.match(/^(tcp|http)$/)" class="form-group row">
-            <label class="col-12 col-md-4 col-form-label">Use TLS Certificate</label>
+            <label class="col-12 col-md-4 col-form-label">{{ $t('tls_cert') }}</label>
             <div class="col-12 col-md-8 mt-1 mb-2 mb-md-0">
                 <span @click="use_tls = !!use_tls" class="switch float-left">
                     <input v-model="use_tls" type="checkbox" name="verify_ssl-option" class="switch" id="switch-use-tls" v-bind:checked="use_tls">
@@ -206,11 +206,11 @@
         </div>
 
         <div class="card contain-card mb-4">
-            <div class="card-header">Notification Options</div>
+            <div class="card-header">{{ $t('notification_opts') }}</div>
             <div class="card-body">
 
                 <div class="form-group row">
-                    <label class="col-sm-4 col-form-label">Enable Notifications</label>
+                    <label class="col-sm-4 col-form-label">{{ $t('notifications_enable') }}</label>
                     <div class="col-12 col-md-8 mt-1 mb-2 mb-md-0">
                         <span @click="service.allow_notifications = !!service.allow_notifications" class="switch float-left">
                             <input v-model="service.allow_notifications" type="checkbox" name="allow_notifications-option" class="switch" id="switch-notifications" v-bind:checked="service.allow_notifications">
@@ -219,7 +219,7 @@
                     </div>
                 </div>
                 <div v-if="service.allow_notifications"  class="form-group row">
-                    <label class="col-sm-4 col-form-label">Notify After Failures</label>
+                    <label class="col-sm-4 col-form-label">{{ $t('notify_after') }}</label>
                     <div class="col-sm-8">
                         <span class="slider-info">{{service.notify_after === 0 ? "First Failure" : service.notify_after+' Failures'}}</span>
                         <input v-model="service.notify_after" type="range" name="notify_after" class="slider" id="notify_after" min="0" max="20">
@@ -227,7 +227,7 @@
                     </div>
                 </div>
                 <div v-if="service.allow_notifications" class="form-group row">
-                    <label class="col-sm-4 col-form-label">Notify All Changes</label>
+                    <label class="col-sm-4 col-form-label">{{ $t('notify_all') }}</label>
                     <div class="col-12 col-md-8 mt-1">
                         <span @click="service.notify_all_changes = !!service.notify_all_changes" class="switch float-left">
                             <input v-model="service.notify_all_changes" type="checkbox" name="notify_all-option" class="switch" id="notify_all" v-bind:checked="service.notify_all_changes">
@@ -243,7 +243,7 @@
         <div class="form-group row">
             <div class="col-12">
                 <button :disabled="loading" @click.prevent="saveService" type="submit" class="btn btn-success btn-block">
-                    {{service.id ? "Update Service" : "Create Service"}}
+                    {{service.id ? $t('service_update') : $t('service_create')}}
                 </button>
             </div>
         </div>

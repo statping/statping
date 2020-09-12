@@ -153,7 +153,10 @@ export default {
         group = "24h"
       }
 
-      const data = await Api.service_failures_data(this.service.id, this.toUnix(this.nowSubtract(start)), this.toUnix(this.now()), group, true)
+      const startTime = this.beginningOf("day", this.nowSubtract(start))
+      const endTime = this.endOf("day", this.now())
+
+      const data = await Api.service_failures_data(this.service.id, this.toUnix(startTime), this.toUnix(endTime), group, true)
       this.loaded = true
       this.data = [{data: this.convertChartData(data)}]
     }

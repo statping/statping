@@ -5,14 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/statping/statping/handlers"
 	"github.com/statping/statping/source"
-	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/configs"
 	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/types/groups"
-	"github.com/statping/statping/types/messages"
 	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/types/users"
 	"github.com/statping/statping/utils"
 	"io/ioutil"
 	"os"
@@ -109,7 +106,7 @@ func exportCli(args []string) error {
 	if len(args) == 1 {
 		filename = fmt.Sprintf("%s/%s", utils.Directory, args)
 	}
-	var data []byte
+	var data *handlers.ExportData
 	if err := utils.InitLogs(); err != nil {
 		return err
 	}
@@ -126,10 +123,10 @@ func exportCli(args []string) error {
 	if _, err := services.SelectAllServices(false); err != nil {
 		return err
 	}
-	if data, err = ExportSettings(); err != nil {
+	if data, err = handlers.ExportSettings(); err != nil {
 		return fmt.Errorf("could not export settings: %v", err.Error())
 	}
-	if err = utils.SaveFile(filename, data); err != nil {
+	if err = utils.SaveFile(filename, data.JSON()); err != nil {
 		return fmt.Errorf("could not write file statping-export.json: %v", err.Error())
 	}
 	log.Infoln("Statping export file saved to ", filename)
@@ -233,7 +230,7 @@ func importCli(args []string) error {
 	if data, err = ioutil.ReadFile(args[0]); err != nil {
 		return err
 	}
-	var exportData ExportData
+	var exportData handlers.ExportData
 	if err = json.Unmarshal(data, &exportData); err != nil {
 		return err
 	}
@@ -285,7 +282,6 @@ func importCli(args []string) error {
 			return err
 		}
 	}
-
 	if ask("Import Core settings?") {
 		c := exportData.Core
 		if err := c.Update(); err != nil {
@@ -482,16 +478,16 @@ type gitUploader struct {
 
 // ExportChartsJs renders the charts for the index page
 
-type ExportData struct {
-	Config    *configs.DbConfig   `json:"config"`
-	Core      *core.Core          `json:"core"`
-	Services  []services.Service  `json:"services"`
-	Messages  []*messages.Message `json:"messages"`
-	Checkins  []*checkins.Checkin `json:"checkins"`
-	Users     []*users.User       `json:"users"`
-	Groups    []*groups.Group     `json:"groups"`
-	Notifiers []core.AllNotifiers `json:"notifiers"`
-}
+//type ExportData struct {
+//	Config    *configs.DbConfig   `json:"config"`
+//	Core      *core.Core          `json:"core"`
+//	Services  []services.Service  `json:"services"`
+//	Messages  []*messages.Message `json:"messages"`
+//	Checkins  []*checkins.Checkin `json:"checkins"`
+//	Users     []*users.User       `json:"users"`
+//	Groups    []*groups.Group     `json:"groups"`
+//	Notifiers []core.AllNotifiers `json:"notifiers"`
+//}
 
 // ExportSettings will export a JSON file containing all of the settings below:
 // - Core
@@ -501,35 +497,35 @@ type ExportData struct {
 // - Services
 // - Groups
 // - Messages
-func ExportSettings() ([]byte, error) {
-	c, err := core.Select()
-	if err != nil {
-		return nil, err
-	}
-	var srvs []services.Service
-	for _, s := range services.AllInOrder() {
-		s.Failures = nil
-		srvs = append(srvs, s)
-	}
-
-	cfg, err := configs.LoadConfigs(configFile)
-	if err != nil {
-		return nil, err
-	}
-
-	data := ExportData{
-		Config:    cfg,
-		Core:      c,
-		Notifiers: core.App.Notifications,
-		Checkins:  checkins.All(),
-		Users:     users.All(),
-		Services:  srvs,
-		Groups:    groups.All(),
-		Messages:  messages.All(),
-	}
-	export, err := json.Marshal(data)
-	return export, err
-}
+//func ExportSettings() ([]byte, error) {
+//	c, err := core.Select()
+//	if err != nil {
+//		return nil, err
+//	}
+//	var srvs []services.Service
+//	for _, s := range services.AllInOrder() {
+//		s.Failures = nil
+//		srvs = append(srvs, s)
+//	}
+//
+//	cfg, err := configs.LoadConfigs(configFile)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	data := ExportData{
+//		Config:    cfg,
+//		Core:      c,
+//		Notifiers: core.App.Notifications,
+//		Checkins:  checkins.All(),
+//		Users:     users.All(),
+//		Services:  srvs,
+//		Groups:    groups.All(),
+//		Messages:  messages.All(),
+//	}
+//	export, err := json.Marshal(data)
+//	return export, err
+//}
 
 // ExportIndexHTML returns the HTML of the index page as a string
 //func ExportIndexHTML() []byte {

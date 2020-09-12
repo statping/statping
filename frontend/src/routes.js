@@ -15,6 +15,7 @@ const Incidents = () => import(/* webpackChunkName: "dashboard" */ '@/components
 const Checkins = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Checkins')
 const Failures = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Failures')
 const NotFound = () => import(/* webpackChunkName: "index" */ '@/pages/NotFound')
+const Importer = () => import(/* webpackChunkName: "index" */ '@/components/Dashboard/Importer')
 
 import VueRouter from "vue-router";
 import Api from "./API";
@@ -164,6 +165,13 @@ const routes = [
             requiresAuth: true,
           title: 'Statping - Help',
         }
+    },{
+      path: 'import',
+      component: Importer,
+      meta: {
+        requiresAuth: true,
+        title: 'Statping - Import',
+      }
     }]
   },
   {
