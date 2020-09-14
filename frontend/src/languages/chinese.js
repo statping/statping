@@ -50,6 +50,11 @@ const chinese = {
     service_offline_time: "服务已脱机",
     days_ago: "天前",
     today: "今天",
+    week: "周",
+    month: "月份",
+    day: "日",
+    hour: "小时",
+    minute: "分钟",
     failures_24_hours: "过去 24 小时失败",
     no_services: "您目前没有任何服务！",
     theme: "主题",
@@ -125,9 +130,12 @@ const chinese = {
     follow_redir: "跟随重定向",
     verify_ssl: "验证 SSL",
     tls_cert: "使用 TLS 证书",
+    notification_opts: "通知选项",
     notifications_enable: "启用通知",
     notify_after: "故障后通知",
-    notify_all: "通知所有更改"
+    notify_all: "通知所有更改",
+    service_update: "更新服务",
+    service_create: "创建服务"
 }
 
 export default chinese

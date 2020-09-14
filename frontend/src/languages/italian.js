@@ -50,6 +50,11 @@ const italian = {
     service_offline_time: "Il servizio è stato offline per",
     days_ago: "Giorni fa",
     today: "Oggi",
+    week: "Settimana",
+    month: "Mese",
+    day: "Giorno",
+    hour: "Ora",
+    minute: "Minuti",
     failures_24_hours: "Errori nelle ultime 24 ore",
     no_services: "Al momento non hai alcun servizio!",
     theme: "Tema",
@@ -125,9 +130,12 @@ const italian = {
     follow_redir: "Segui i reindirizzamenti",
     verify_ssl: "Verifica SSL",
     tls_cert: "Usa certificato TLS",
+    notification_opts: "Opzioni di notifica",
     notifications_enable: "Abilita notifiche",
     notify_after: "Notify dopo gli errori",
-    notify_all: "Notifichi tutte le modifiche"
+    notify_all: "Notifichi tutte le modifiche",
+    service_update: "Servizio di aggiornamento",
+    service_create: "Crea servizio"
 }
 
 export default italian

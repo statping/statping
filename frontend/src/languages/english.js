@@ -50,6 +50,11 @@ const english = {
     service_offline_time: "Service has been offline for",
     days_ago: "Days Ago",
     today: "Today",
+    week: "Week",
+    month: "Month",
+    day: "Day",
+    hour: "Hour",
+    minute: "Minute",
     failures_24_hours: "Failures last 24 hours",
     no_services: "You currently don't have any services!",
     theme: "Theme",
@@ -125,9 +130,12 @@ const english = {
     follow_redir: "Follow Redirects",
     verify_ssl: "Verify SSL",
     tls_cert: "Use TLS Cert",
+    notification_opts: "Notification Options",
     notifications_enable: "Enable Notifications",
     notify_after: "Notify After Failures",
-    notify_all: "Notify All Changes"
+    notify_all: "Notify All Changes",
+    service_update: "Update Service",
+    service_create: "Create Service"
 }
 
 export default english

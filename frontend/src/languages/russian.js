@@ -50,6 +50,11 @@ const russian = {
     service_offline_time: "Служба была отключена для",
     days_ago: "Дней назад",
     today: "Сегодня",
+    week: "Недели",
+    month: "Месяц",
+    day: "День",
+    hour: "Час",
+    minute: "Минута",
     failures_24_hours: "Сбои за 24 часа",
     no_services: "В настоящее время у вас нет услуг!",
     theme: "Тема",
@@ -125,9 +130,12 @@ const russian = {
     follow_redir: "Следуйте за перенаправленными",
     verify_ssl: "Проверить SSL",
     tls_cert: "Использовать сертификат TLS",
+    notification_opts: "Параметры уведомления",
     notifications_enable: "Включить уведомления",
     notify_after: "Уведомлять после сбоев",
-    notify_all: "Уведомлять обо всех изменениях"
+    notify_all: "Уведомлять обо всех изменениях",
+    service_update: "Обновить службу",
+    service_create: "Создать службу"
 }
 
 export default russian

@@ -1,3 +1,7 @@
+# 0.90.67 (09-14-2020)
+- Modified core settings to update config.yml on save
+- Modified Theme Editor to restart the HTTP router on create/delete (fixing 404's)
+
 # 0.90.66 (09-08-2020)
 - Added Import and Export views in Dashboard
 - Modified services list sparkline to use start/end of day timestamp

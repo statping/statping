@@ -7,6 +7,37 @@ import (
 	"os"
 )
 
+func Save() error {
+	p := utils.Params
+	configs := &DbConfig{
+		DbConn:             p.GetString("DB_CONN"),
+		DbHost:             p.GetString("DB_HOST"),
+		DbUser:             p.GetString("DB_USER"),
+		DbPass:             p.GetString("DB_PASS"),
+		DbData:             p.GetString("DB_DATABASE"),
+		DbPort:             p.GetInt("DB_PORT"),
+		Project:            p.GetString("NAME"),
+		Description:        p.GetString("DESCRIPTION"),
+		Domain:             p.GetString("DOMAIN"),
+		Email:              p.GetString("EMAIL"),
+		Username:           p.GetString("ADMIN_USER"),
+		Password:           p.GetString("ADMIN_PASSWORD"),
+		Location:           utils.Directory,
+		SqlFile:            p.GetString("SQL_FILE"),
+		Language:           p.GetString("LANGUAGE"),
+		AllowReports:       p.GetBool("ALLOW_REPORTS"),
+		LetsEncryptEnable:  p.GetBool("LETSENCRYPT_ENABLE"),
+		LetsEncryptHost:    p.GetString("LETSENCRYPT_HOST"),
+		LetsEncryptEmail:   p.GetString("LETSENCRYPT_EMAIL"),
+		ApiSecret:          p.GetString("API_SECRET"),
+		SampleData:         p.GetBool("SAMPLE_DATA"),
+		MaxOpenConnections: p.GetInt("MAX_OPEN_CONN"),
+		MaxIdleConnections: p.GetInt("MAX_IDLE_CONN"),
+		MaxLifeConnections: int(p.GetDuration("MAX_LIFE_CONN").Seconds()),
+	}
+	return configs.Save(utils.Directory)
+}
+
 func LoadConfigs(cfgFile string) (*DbConfig, error) {
 	writeAble, err := utils.DirWritable(utils.Directory)
 	if err != nil {
