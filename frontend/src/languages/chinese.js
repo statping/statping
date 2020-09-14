@@ -110,7 +110,24 @@ const chinese = {
     user_update: "更新用户",
     administrator: "管理员",
     checkins: "车臣金斯",
-    incidents: "事件"
+    incidents: "事件",
+    service_info: "服务信息",
+    service_name: "服务名称",
+    service_type: "服务类型",
+    permalink: "永久链接 URL",
+    service_public: "公共服务",
+    check_interval: "检查间隔",
+    service_endpoint: "服务终端节点",
+    service_check: "服务检查类型",
+    service_timeout: "请求超时",
+    expected_resp: "预期响应",
+    expected_code: "预期状态代码",
+    follow_redir: "跟随重定向",
+    verify_ssl: "验证 SSL",
+    tls_cert: "使用 TLS 证书",
+    notifications_enable: "启用通知",
+    notify_after: "故障后通知",
+    notify_all: "通知所有更改"
 }
 
 export default chinese

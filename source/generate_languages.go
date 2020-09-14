@@ -34,41 +34,13 @@ type Text struct {
 	It  string
 }
 
-func Translate(val, language string) string {
-	input := &translate.TextInput{
-		SourceLanguageCode: aws.String("en"),
-		TargetLanguageCode: aws.String(language),
-		Text:               aws.String(val),
-	}
-	req, out := tr.TextRequest(input)
-	if err := req.Send(); err != nil {
-		panic(req.Error)
-	}
-	return *out.TranslatedText
-}
-
-func TranslateAll(key, en string) *Text {
-	return &Text{
-		Key: key,
-		En:  en,
-		Fr:  Translate(en, "fr"),
-		De:  Translate(en, "de"),
-		Ru:  Translate(en, "ru"),
-		Sp:  Translate(en, "es"),
-		Jp:  Translate(en, "ja"),
-		Cn:  Translate(en, "zh"),
-		Ko:  Translate(en, "ko"),
-		It:  Translate(en, "it"),
-	}
-}
-
 func main() {
 	fmt.Println("RUNNING: ./source/generate_languages.go")
 	awsKey = os.Getenv("AWS_ACCESS_KEY_ID")
 	awsSecret = os.Getenv("AWS_SECRET_ACCESS_KEY")
 	if awsKey == "" || awsSecret == "" {
 		fmt.Println("AWS_ACCESS_KEY_ID or AWS_SECRET_ACCESS_KEY not set")
-		os.Exit(1)
+		os.Exit(0)
 		return
 	}
 
@@ -117,6 +89,34 @@ func main() {
 	CreateJS("chinese", translations)
 	CreateJS("italian", translations)
 	CreateJS("korean", translations)
+}
+
+func Translate(val, language string) string {
+	input := &translate.TextInput{
+		SourceLanguageCode: aws.String("en"),
+		TargetLanguageCode: aws.String(language),
+		Text:               aws.String(val),
+	}
+	req, out := tr.TextRequest(input)
+	if err := req.Send(); err != nil {
+		panic(req.Error)
+	}
+	return *out.TranslatedText
+}
+
+func TranslateAll(key, en string) *Text {
+	return &Text{
+		Key: key,
+		En:  en,
+		Fr:  Translate(en, "fr"),
+		De:  Translate(en, "de"),
+		Ru:  Translate(en, "ru"),
+		Sp:  Translate(en, "es"),
+		Jp:  Translate(en, "ja"),
+		Cn:  Translate(en, "zh"),
+		Ko:  Translate(en, "ko"),
+		It:  Translate(en, "it"),
+	}
 }
 
 func (t *Text) String(lang string) string {

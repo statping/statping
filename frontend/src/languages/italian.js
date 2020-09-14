@@ -110,7 +110,24 @@ const italian = {
     user_update: "Aggiorna utente",
     administrator: "Amministratore",
     checkins: "Check-ins",
-    incidents: "Incidenti"
+    incidents: "Incidenti",
+    service_info: "Info servizio",
+    service_name: "Nome servizio",
+    service_type: "Tipo di servizio",
+    permalink: "URL Permalink",
+    service_public: "Servizio pubblico",
+    check_interval: "Intervallo controllo",
+    service_endpoint: "Endpoint servizio",
+    service_check: "Tipo di controllo del servizio",
+    service_timeout: "Timeout richiesta",
+    expected_resp: "Risposta prevista",
+    expected_code: "Codice di stato previsto",
+    follow_redir: "Segui i reindirizzamenti",
+    verify_ssl: "Verifica SSL",
+    tls_cert: "Usa certificato TLS",
+    notifications_enable: "Abilita notifiche",
+    notify_after: "Notify dopo gli errori",
+    notify_all: "Notifichi tutte le modifiche"
 }
 
 export default italian

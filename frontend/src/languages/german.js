@@ -110,7 +110,24 @@ const german = {
     user_update: "Benutzer aktualisieren",
     administrator: "Administrator",
     checkins: "Checkins",
-    incidents: "Vorfälle"
+    incidents: "Vorfälle",
+    service_info: "Service-Info",
+    service_name: "Dienstname",
+    service_type: "Service-Art",
+    permalink: "Permalink-URL",
+    service_public: "Öffentlicher Dienst",
+    check_interval: "Intervall prüfen",
+    service_endpoint: "Service-Endpunkt",
+    service_check: "Service-Prüfungstyp",
+    service_timeout: "Zeitüberschreitung anfordern",
+    expected_resp: "Erwartete Antwort",
+    expected_code: "Erwarteter Statuscode",
+    follow_redir: "Weiterleitungen folgen",
+    verify_ssl: "SSL verifizieren",
+    tls_cert: "TLS-Zertifikat verwenden",
+    notifications_enable: "Benachrichtigungen aktivieren",
+    notify_after: "Benachrichtigung nach Fehlern",
+    notify_all: "Alle Änderungen benachrichtigen"
 }
 
 export default german

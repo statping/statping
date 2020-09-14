@@ -110,7 +110,24 @@ const russian = {
     user_update: "Обновить пользователя",
     administrator: "Администратора",
     checkins: "Чеккинс",
-    incidents: "Инциденты"
+    incidents: "Инциденты",
+    service_info: "Информация о сервисе",
+    service_name: "Имя службы",
+    service_type: "Тип услуги",
+    permalink: "URL-адрес Постоянной ссылки",
+    service_public: "Государственная служба",
+    check_interval: "Интервал проверки",
+    service_endpoint: "Конечная точка службы",
+    service_check: "Тип проверки службы",
+    service_timeout: "Тайм-аут запроса",
+    expected_resp: "Ожидаемый ответ",
+    expected_code: "Код ожидаемого состояния",
+    follow_redir: "Следуйте за перенаправленными",
+    verify_ssl: "Проверить SSL",
+    tls_cert: "Использовать сертификат TLS",
+    notifications_enable: "Включить уведомления",
+    notify_after: "Уведомлять после сбоев",
+    notify_all: "Уведомлять обо всех изменениях"
 }
 
 export default russian
