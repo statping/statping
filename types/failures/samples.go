@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/statping/statping/types"
 	"github.com/statping/statping/utils"
-	gormbulk "github.com/t-tiger/gorm-bulk-insert/v2"
 	"time"
 )
 
@@ -64,10 +63,10 @@ func Samples() error {
 			records = append(records, failure)
 			createdAt = createdAt.Add(35 * time.Minute)
 		}
-		if err := gormbulk.BulkInsert(db.GormDB(), records, db.ChunkSize()); err != nil {
-			log.Error(err)
-			return err
-		}
+		//if err := gormbulk.BulkInsert(db.GormDB(), records, db.ChunkSize()); err != nil {
+		//	log.Error(err)
+		//	return err
+		//}
 	}
 	return nil
 }

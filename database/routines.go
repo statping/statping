@@ -16,7 +16,7 @@ var (
 
 // Maintenance will automatically delete old records from 'failures' and 'hits'
 // this function is currently set to delete records 7+ days old every 60 minutes
-func Maintenance() {
+func Maintenance(db *Database) {
 	dur := utils.Params.GetDuration("REMOVE_AFTER")
 	interval := utils.Params.GetDuration("CLEANUP_INTERVAL")
 
@@ -29,10 +29,10 @@ func Maintenance() {
 			deleteAfter := utils.Now().Add(-dur)
 
 			log.Infof("Deleting failures older than %s", deleteAfter.String())
-			deleteAllSince("failures", deleteAfter)
+			deleteAllSince(db, "failures", deleteAfter)
 
 			log.Infof("Deleting hits older than %s", deleteAfter.String())
-			deleteAllSince("hits", deleteAfter)
+			deleteAllSince(db, "hits", deleteAfter)
 
 			ticker = interval
 		}
@@ -41,10 +41,10 @@ func Maintenance() {
 }
 
 // deleteAllSince will delete a specific table's records based on a time.
-func deleteAllSince(table string, date time.Time) {
-	sql := fmt.Sprintf("DELETE FROM %s WHERE created_at < '%s'", table, database.FormatTime(date))
+func deleteAllSince(db *Database, table string, date time.Time) {
+	sql := fmt.Sprintf("DELETE FROM %s WHERE created_at < '%s'", table, db.FormatTime(date))
 	log.Info(sql)
-	if err := database.Exec(sql).Error(); err != nil {
+	if err := db.Exec(sql).Error; err != nil {
 		log.WithField("query", sql).Errorln(err)
 	}
 }

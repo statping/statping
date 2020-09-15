@@ -71,8 +71,8 @@ func (d *DbConfig) DropDatabase() error {
 	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
 	log.Infoln("Dropping Database Tables...")
 	for _, t := range DbModels {
-		if err := d.Db.DropTableIfExists(t); err != nil {
-			return err.Error()
+		if err := d.Db.Migrator().DropTable(t); err != nil {
+			return err
 		}
 		log.Infof("Dropped table: %T\n", t)
 	}
@@ -95,13 +95,16 @@ func (d *DbConfig) CreateDatabase() error {
 	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
 
 	log.Infoln("Creating Database Tables...")
+
+	mig := d.Db.Migrator()
+
 	for _, table := range DbModels {
-		if err := d.Db.CreateTable(table); err.Error() != nil {
-			return errors.Wrap(err.Error(), fmt.Sprintf("error creating '%T' table", table))
+		if err := mig.CreateTable(table); err != nil {
+			return errors.Wrap(err, fmt.Sprintf("error creating '%T' table", table))
 		}
 	}
-	if err := d.Db.Table("core").CreateTable(&core.Core{}); err.Error() != nil {
-		return errors.Wrap(err.Error(), fmt.Sprintf("error creating 'core' table"))
+	if err := d.Db.Table("core").Migrator().CreateTable(&core.Core{}); err != nil {
+		return errors.Wrap(err, fmt.Sprintf("error creating 'core' table"))
 	}
 	log.Infoln("Statping Database Created")
 

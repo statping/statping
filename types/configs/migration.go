@@ -22,11 +22,11 @@ import (
 )
 
 func (d *DbConfig) ResetCore() error {
-	if d.Db.HasTable("core") {
+	if d.Db.Migrator().HasTable("core") {
 		return nil
 	}
 	var srvs int64
-	if d.Db.HasTable(&services.Service{}) {
+	if d.Db.Migrator().HasTable(&services.Service{}) {
 		d.Db.Model(&services.Service{}).Count(&srvs)
 		if srvs > 0 {
 			return errors.New("there are already services setup.")
@@ -61,7 +61,7 @@ func (d *DbConfig) DatabaseChanges() error {
 	if latestMigration > cr.MigrationId {
 		log.Infof("Statping database is out of date, migrating to: %d", latestMigration)
 
-		switch d.Db.DbType() {
+		switch d.Db.Dialector.Name() {
 		case "mysql":
 			if err := d.genericMigration("MODIFY", false); err != nil {
 				return err
@@ -76,7 +76,7 @@ func (d *DbConfig) DatabaseChanges() error {
 			}
 		}
 
-		if err := d.Db.Exec(fmt.Sprintf("UPDATE core SET migration_id = %d", latestMigration)).Error(); err != nil {
+		if err := d.Db.Exec(fmt.Sprintf("UPDATE core SET migration_id = %d", latestMigration)).Error; err != nil {
 			return err
 		}
 
@@ -104,31 +104,28 @@ func (d *DbConfig) BackupAssets() error {
 //This function will NOT remove previous records, tables or columns from the database.
 //If this function has an issue, it will ROLLBACK to the previous state.
 func (d *DbConfig) MigrateDatabase() error {
+	log.Infof("Migrating App to version: %s (%s)", utils.Params.GetString("VERSION"), utils.Params.GetString("COMMIT"))
 	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
-
-	log.Infoln("Migrating Database Tables...")
-	tx := d.Db.Begin()
+	tx := d.Db
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
 		}
 	}()
 	for _, table := range DbModels {
-		tx = tx.AutoMigrate(table)
-		if tx.Error() != nil {
-			log.Errorln(tx.Error())
-			return tx.Error()
+		if err := tx.AutoMigrate(table); err != nil {
+			log.Errorln(tx.Error)
+			return tx.Error
 		}
 	}
 
-	log.Infof("Migrating App to version: %s (%s)", utils.Params.GetString("VERSION"), utils.Params.GetString("COMMIT"))
-	if err := tx.Table("core").AutoMigrate(&core.Core{}); err.Error() != nil {
+	if err := tx.Table("core").AutoMigrate(&core.Core{}); err != nil {
 		tx.Rollback()
-		log.Errorln(fmt.Sprintf("Statping Database could not be migrated: %v", tx.Error()))
-		return tx.Error()
+		log.Errorln(fmt.Sprintf("Statping Database could not be migrated: %v", tx.Error))
+		return tx.Error
 	}
 
-	if err := tx.Commit().Error(); err != nil {
+	if err := tx.Commit().Error; err != nil {
 		return err
 	}
 
@@ -136,23 +133,23 @@ func (d *DbConfig) MigrateDatabase() error {
 
 	log.Infoln("Statping Database Tables Migrated")
 
-	if err := d.Db.Model(&hits.Hit{}).AddIndex("idx_service_hit", "service").Error(); err != nil {
+	if err := d.Db.Model(&hits.Hit{}).Migrator().CreateIndex("idx_service_hit", "service"); err != nil {
 		log.Errorln(err)
 	}
 
-	if err := d.Db.Model(&hits.Hit{}).AddIndex("hit_created_at", "created_at").Error(); err != nil {
+	if err := d.Db.Model(&hits.Hit{}).Migrator().CreateIndex("hit_created_at", "created_at"); err != nil {
 		log.Errorln(err)
 	}
 
-	if err := d.Db.Model(&failures.Failure{}).AddIndex("fail_created_at", "created_at").Error(); err != nil {
+	if err := d.Db.Model(&failures.Failure{}).Migrator().CreateIndex("fail_created_at", "created_at"); err != nil {
 		log.Errorln(err)
 	}
 
-	if err := d.Db.Model(&failures.Failure{}).AddIndex("idx_service_fail", "service").Error(); err != nil {
+	if err := d.Db.Model(&failures.Failure{}).Migrator().CreateIndex("idx_service_fail", "service"); err != nil {
 		log.Errorln(err)
 	}
 
-	if err := d.Db.Model(&failures.Failure{}).AddIndex("idx_checkin_fail", "checkin").Error(); err != nil {
+	if err := d.Db.Model(&failures.Failure{}).Migrator().CreateIndex("idx_checkin_fail", "checkin"); err != nil {
 		log.Errorln(err)
 	}
 	log.Infoln("Database Indexes Created")

@@ -40,7 +40,7 @@ type Service struct {
 	Online24Hours       float32               `gorm:"-" json:"online_24_hours" yaml:"-"`
 	Online7Days         float32               `gorm:"-" json:"online_7_days" yaml:"-"`
 	AvgResponse         int64                 `gorm:"-" json:"avg_response" yaml:"-"`
-	FailuresLast24Hours int                   `gorm:"-" json:"failures_24_hours" yaml:"-"`
+	FailuresLast24Hours int64                 `gorm:"-" json:"failures_24_hours" yaml:"-"`
 	Running             chan bool             `gorm:"-" json:"-" yaml:"-"`
 	Checkpoint          time.Time             `gorm:"-" json:"-" yaml:"-"`
 	SleepDuration       time.Duration         `gorm:"-" json:"-" yaml:"-"`
@@ -74,8 +74,8 @@ func (c ServiceOrder) Swap(i, j int)      { c[int64(i)], c[int64(j)] = c[int64(j
 func (c ServiceOrder) Less(i, j int) bool { return c[i].Order < c[j].Order }
 
 type Stats struct {
-	Failures int       `gorm:"-" json:"failures"`
-	Hits     int       `gorm:"-" json:"hits"`
+	Failures int64     `gorm:"-" json:"failures"`
+	Hits     int64     `gorm:"-" json:"hits"`
 	FirstHit time.Time `gorm:"-" json:"first_hit"`
 }
 

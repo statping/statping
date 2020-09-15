@@ -15,15 +15,15 @@ func (c *Checkin) Hits() []*CheckinHit {
 
 func (c *CheckinHit) Create() error {
 	q := dbHits.Create(c)
-	return q.Error()
+	return q.Error
 }
 
 func (c *CheckinHit) Update() error {
-	q := dbHits.Update(c)
-	return q.Error()
+	q := dbHits.Save(c)
+	return q.Error
 }
 
 func (c *CheckinHit) Delete() error {
 	q := dbHits.Delete(c)
-	return q.Error()
+	return q.Error
 }

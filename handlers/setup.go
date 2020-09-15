@@ -47,7 +47,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exists := confgs.Db.HasTable("core")
+	exists := confgs.Db.Migrator().HasTable("core")
 	if !exists {
 		if err := confgs.DropDatabase(); err != nil {
 			sendErrorJson(err, w, r)

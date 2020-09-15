@@ -11,10 +11,10 @@ type ColumnIDInterfacer interface {
 }
 
 type Hitters struct {
-	db database.Database
+	db *database.Database
 }
 
-func (h Hitters) Db() database.Database {
+func (h Hitters) Db() *database.Database {
 	return h.db
 }
 
@@ -48,15 +48,15 @@ func (h Hitters) LastAmount(amount int) []*Hit {
 	return hits
 }
 
-func (h Hitters) Count() int {
-	var count int
+func (h Hitters) Count() int64 {
+	var count int64
 	h.db.Count(&count)
 	return count
 }
 
 func (h Hitters) DeleteAll() error {
 	q := h.db.Delete(&Hit{})
-	return q.Error()
+	return q.Error
 }
 
 func (h Hitters) Sum() int64 {
@@ -71,16 +71,16 @@ type IntResult struct {
 
 func (h Hitters) Avg() int64 {
 	var r IntResult
-	var q database.Database
-	switch h.db.DbType() {
+	var q *database.Database
+	switch h.db.Dialector.Name() {
 	case "mysql":
-		q = h.db.Select("CAST(AVG(latency) as UNSIGNED INTEGER) as amount")
+		q = database.Wrap(h.db.Select("CAST(AVG(latency) as UNSIGNED INTEGER) as amount"))
 	case "postgres":
-		q = h.db.Select("CAST(AVG(latency) as bigint) as amount")
+		q = database.Wrap(h.db.Select("CAST(AVG(latency) as bigint) as amount"))
 	default:
-		q = h.db.Select("CAST(AVG(latency) as INT) as amount")
+		q = database.Wrap(h.db.Select("CAST(AVG(latency) as INT) as amount"))
 	}
-	if err := q.Scan(&r).Error(); err != nil {
+	if err := q.Scan(&r).Error; err != nil {
 		log.Errorln(err)
 	}
 	return r.Amount
@@ -88,11 +88,11 @@ func (h Hitters) Avg() int64 {
 
 func AllHits(obj ColumnIDInterfacer) Hitters {
 	column, id := obj.HitsColumnID()
-	return Hitters{db.Where(fmt.Sprintf("%s = ?", column), id)}
+	return Hitters{database.Wrap(db.Where(fmt.Sprintf("%s = ?", column), id))}
 }
 
 func Since(t time.Time, obj ColumnIDInterfacer) Hitters {
 	column, id := obj.HitsColumnID()
 	timestamp := db.FormatTime(t)
-	return Hitters{db.Where(fmt.Sprintf("%s = ? AND created_at > ?", column), id, timestamp)}
+	return Hitters{database.Wrap(db.Where(fmt.Sprintf("%s = ? AND created_at > ?", column), id, timestamp))}
 }

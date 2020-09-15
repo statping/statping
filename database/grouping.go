@@ -35,21 +35,21 @@ type GroupQuery struct {
 	Offset    int
 	FillEmpty bool
 
-	db Database
+	db *Database
 }
 
 func (b GroupQuery) Find(data interface{}) error {
-	return b.db.Order("id DESC").Find(data).Error()
+	return b.db.Order("id DESC").Find(data).Error
 }
 
-func (b GroupQuery) Database() Database {
+func (b GroupQuery) Database() *Database {
 	return b.db
 }
 
 var (
 	ByCount   = By("COUNT(id) as amount")
 	ByAverage = func(column string, multiplier int) By {
-		switch database.DbType() {
+		switch utils.Params.GetString("DB_CONN") {
 		case "mysql":
 			return By(fmt.Sprintf("CAST(AVG(%s) as UNSIGNED INT) as amount", column))
 		case "postgres":
@@ -59,6 +59,11 @@ var (
 		}
 	}
 )
+
+type TimeValue struct {
+	Timeframe string `json:"timeframe"`
+	Amount    int64  `json:"amount"`
+}
 
 type TimeVar struct {
 	g    *GroupQuery
@@ -71,10 +76,10 @@ func (t *TimeVar) ToValues() ([]*TimeValue, error) {
 
 // GraphData will return all hits or failures
 func (b *GroupQuery) GraphData(by By) ([]*TimeValue, error) {
-	b.db = b.db.MultipleSelects(
+	b.db = Wrap(b.db.MultipleSelects(
 		b.db.SelectByTime(b.Group),
 		by.String(),
-	).Group("timeframe").Order("timeframe", true)
+	).Group("timeframe").Order("timeframe"))
 
 	caller, err := b.ToTimeValue()
 	if err != nil {
@@ -143,7 +148,7 @@ func (t *TimeVar) FillMissing(current, end time.Time) ([]*TimeValue, error) {
 }
 
 type isObject interface {
-	Db() Database
+	Db() *Database
 }
 
 func ParseRequest(r *http.Request) (*GroupQuery, error) {
@@ -234,16 +239,16 @@ func ParseQueries(r *http.Request, o isObject) (*GroupQuery, error) {
 		query.End = utils.Now()
 	}
 	if query.Limit != 0 {
-		q = q.Limit(query.Limit)
+		q.Limit(query.Limit)
 	}
 	if query.Offset > 0 {
-		q = q.Offset(query.Offset)
+		q.Offset(query.Offset)
 	}
 
-	q = q.Where("created_at BETWEEN ? AND ?", q.FormatTime(query.Start), q.FormatTime(query.End))
+	q.Where("created_at BETWEEN ? AND ?", q.FormatTime(query.Start), q.FormatTime(query.End))
 
 	if query.Order != "" {
-		q = q.Order(query.Order)
+		q.Order(query.Order)
 	}
 	query.db = q
 

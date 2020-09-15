@@ -11,8 +11,7 @@ import (
 var log = utils.Log
 
 func ConnectConfigs(configs *DbConfig, retry bool) error {
-	err := Connect(configs, retry)
-	if err != nil {
+	if err := Connect(configs, retry); err != nil {
 		return errors.Wrap(err, "error connecting to database")
 	}
 	if err := configs.Save(utils.Directory); err != nil {

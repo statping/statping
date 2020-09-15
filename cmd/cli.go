@@ -365,8 +365,7 @@ func runOnce() error {
 	if err != nil {
 		return errors.Wrap(err, "config.yml file not found")
 	}
-	err = configs.ConnectConfigs(config, false)
-	if err != nil {
+	if err := configs.ConnectConfigs(config, false); err != nil {
 		return errors.Wrap(err, "issue connecting to database")
 	}
 	c, err := core.Select()

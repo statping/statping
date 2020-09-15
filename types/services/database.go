@@ -6,11 +6,12 @@ import (
 	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/metrics"
 	"github.com/statping/statping/utils"
+	"gorm.io/gorm"
 	"sort"
 )
 
 var (
-	db          database.Database
+	db          *database.Database
 	log         = utils.Log.WithField("type", "service")
 	allServices map[int64]*Service
 )
@@ -28,32 +29,43 @@ func (s *Service) Validate() error {
 	return nil
 }
 
-func (s *Service) BeforeCreate() error {
+func (s *Service) BeforeCreate(*gorm.DB) error {
 	return s.Validate()
 }
 
-func (s *Service) BeforeUpdate() error {
+func (s *Service) BeforeUpdate(*gorm.DB) error {
 	return s.Validate()
 }
 
-func (s *Service) AfterFind() {
-	db.Model(s).Related(&s.Incidents).Related(&s.Messages).Related(&s.Checkins).Related(&s.Incidents)
+func (s *Service) AfterFind(*gorm.DB) error {
+	if err := db.Model(s).Association("incidents").Find(&s.Incidents); err != nil {
+		return err
+	}
+	if err := db.Model(s).Association("messages").Find(&s.Messages); err != nil {
+		return err
+	}
+	if err := db.Model(s).Association("checkins").Find(&s.Checkins); err != nil {
+		return err
+	}
 	metrics.Query("service", "find")
+	return nil
 }
 
-func (s *Service) AfterCreate() error {
+func (s *Service) AfterCreate(*gorm.DB) error {
 	s.prevOnline = true
 	allServices[s.Id] = s
 	metrics.Query("service", "create")
 	return nil
 }
 
-func (s *Service) AfterUpdate() {
+func (s *Service) AfterUpdate(*gorm.DB) error {
 	metrics.Query("service", "update")
+	return nil
 }
 
-func (s *Service) AfterDelete() {
+func (s *Service) AfterDelete(*gorm.DB) error {
 	metrics.Query("service", "delete")
+	return nil
 }
 
 func init() {
@@ -64,8 +76,8 @@ func Services() map[int64]*Service {
 	return allServices
 }
 
-func SetDB(database database.Database) {
-	db = database.Model(&Service{})
+func SetDB(dbz *database.Database) {
+	db = database.Wrap(dbz.Model(&Service{}))
 }
 
 func Find(id int64) (*Service, error) {
@@ -99,20 +111,20 @@ func AllInOrder() []Service {
 
 func (s *Service) Create() error {
 	err := db.Create(s)
-	if err.Error() != nil {
+	if err.Error != nil {
 		log.Errorln(fmt.Sprintf("Failed to create service %v #%v: %v", s.Name, s.Id, err))
-		return err.Error()
+		return err.Error
 	}
 	return nil
 }
 
 func (s *Service) Update() error {
-	q := db.Update(s)
+	q := db.Save(s)
 	s.Close()
 	allServices[s.Id] = s
 	s.SleepDuration = s.Duration()
 	go ServiceCheckQueue(allServices[s.Id], true)
-	return q.Error()
+	return q.Error
 }
 
 func (s *Service) Delete() error {
@@ -138,7 +150,7 @@ func (s *Service) Delete() error {
 
 	delete(allServices, s.Id)
 	q := db.Model(&Service{}).Delete(s)
-	return q.Error()
+	return q.Error
 }
 
 func (s *Service) DeleteMessages() error {

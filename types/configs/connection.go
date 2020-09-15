@@ -2,7 +2,6 @@ package configs
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/checkins"
@@ -20,7 +19,7 @@ import (
 	"time"
 )
 
-func initModels(db database.Database) {
+func initModels(db *database.Database) {
 	core.SetDB(db)
 	services.SetDB(db)
 	hits.SetDB(db)
@@ -39,7 +38,7 @@ func Connect(configs *DbConfig, retry bool) error {
 
 	log.WithFields(utils.ToFields(configs, conn)).Debugln("attempting to connect to database")
 
-	dbSession, err := database.Openw(configs.DbConn, conn)
+	dbSession, err := database.Open(configs.DbConn, conn)
 	if err != nil {
 		log.Errorf(fmt.Sprintf("Database connection error %s", err))
 		if retry {
@@ -55,14 +54,17 @@ func Connect(configs *DbConfig, retry bool) error {
 
 	log.WithFields(utils.ToFields(dbSession)).Debugln("connected to database")
 
-	db := dbSession.DB()
+	db, err := dbSession.DB.DB()
+	if err != nil {
+		return err
+	}
 	db.SetMaxOpenConns(utils.Params.GetInt("MAX_OPEN_CONN"))
 	db.SetMaxIdleConns(utils.Params.GetInt("MAX_IDLE_CONN"))
 	db.SetConnMaxLifetime(utils.Params.GetDuration("MAX_LIFE_CONN"))
 
 	if db.Ping() == nil {
 		if utils.VerboseMode >= 4 {
-			dbSession.LogMode(true).Debug().SetLogger(gorm.Logger{log})
+			//db.LogMode(true).Debug().SetLogger(gorm.Logger{log})
 		}
 		log.Infoln(fmt.Sprintf("Database %s connection was successful.", configs.DbConn))
 	}

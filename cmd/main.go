@@ -112,7 +112,7 @@ func start() {
 		exit(err)
 	}
 
-	if err := mainProcess(); err != nil {
+	if err := mainProcess(confgs); err != nil {
 		exit(err)
 	}
 }
@@ -126,8 +126,8 @@ func sigterm() {
 }
 
 // mainProcess will initialize the Statping application and run the HTTP server
-func mainProcess() error {
-	if err := InitApp(); err != nil {
+func mainProcess(confgs *configs.DbConfig) error {
+	if err := InitApp(confgs); err != nil {
 		return err
 	}
 
@@ -143,7 +143,7 @@ func mainProcess() error {
 // InitApp will start the Statping instance with a valid database connection
 // This function will gather all services in database, add/init Notifiers,
 // and start the database cleanup routine
-func InitApp() error {
+func InitApp(confgs *configs.DbConfig) error {
 	// fetch Core row information about this instance.
 	if _, err := core.Select(); err != nil {
 		return err
@@ -161,7 +161,7 @@ func InitApp() error {
 	// start routines for each service checking process
 	services.CheckServices()
 	// start routine to delete old records (failures, hits)
-	go database.Maintenance()
+	go database.Maintenance(confgs.Db)
 	core.App.Setup = true
 	core.App.Started = utils.Now()
 	return nil

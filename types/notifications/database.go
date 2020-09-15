@@ -1,15 +1,16 @@
 package notifications
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/statping/statping/database"
 )
 
 var (
-	db database.Database
+	db *database.Database
 )
 
-func SetDB(database database.Database) {
-	db = database.Model(&Notification{})
+func SetDB(dbz *database.Database) {
+	db = database.Wrap(dbz.Model(&Notification{}))
 }
 
 func (n *Notification) Values() Values {
@@ -28,7 +29,7 @@ func (n *Notification) Values() Values {
 func All() []*Notification {
 	var n []*Notification
 	q := db.Find(&n)
-	if q.Error() != nil {
+	if q.Error != nil {
 		return nil
 	}
 	return n
@@ -37,8 +38,8 @@ func All() []*Notification {
 func Find(method string) (*Notification, error) {
 	var n Notification
 	q := db.Where("method = ?", method).Find(&n)
-	if q.Error() != nil {
-		return nil, q.Error()
+	if q.Error != nil {
+		return nil, q.Error
 	}
 	return &n, nil
 }
@@ -46,9 +47,9 @@ func Find(method string) (*Notification, error) {
 func (n *Notification) Create() error {
 	var p Notification
 	q := db.Where("method = ?", n.Method).Find(&p)
-	if q.RecordNotFound() {
+	if gorm.IsRecordNotFoundError(q.Error) {
 		log.Infof("Notifier '%s' was not found, adding into database...\n", n.Method)
-		if err := db.Create(n).Error(); err != nil {
+		if err := db.Create(n).Error; err != nil {
 			return err
 		}
 		return nil
@@ -86,7 +87,7 @@ func (n *Notification) UpdateFields(notif *Notification) *Notification {
 }
 
 func (n *Notification) Update() error {
-	if err := db.Update(n).Error(); err != nil {
+	if err := db.Save(n).Error; err != nil {
 		return err
 	}
 	return nil

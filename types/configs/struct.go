@@ -49,5 +49,5 @@ type DbConfig struct {
 
 	PostgresSSLMode string `yaml:"postgres_ssl" json:"postgres_ssl"`
 
-	Db database.Database `yaml:"-" json:"-"`
+	Db *database.Database `yaml:"-" json:"-"`
 }

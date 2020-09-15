@@ -7,21 +7,21 @@ import (
 )
 
 var (
-	db  database.Database
+	db  *database.Database
 	log = utils.Log.WithField("type", "message")
 )
 
-func SetDB(database database.Database) {
-	db = database.Model(&Message{})
+func SetDB(dbz *database.Database) {
+	db = database.Wrap(dbz.Model(&Message{}))
 }
 
 func Find(id int64) (*Message, error) {
 	var message Message
 	q := db.Where("id = ?", id).Find(&message)
-	if q.Error() != nil {
+	if q.Error != nil {
 		return nil, errors.Missing(message, id)
 	}
-	return &message, q.Error()
+	return &message, q.Error
 }
 
 func All() []*Message {
@@ -32,15 +32,15 @@ func All() []*Message {
 
 func (m *Message) Create() error {
 	q := db.Create(m)
-	return q.Error()
+	return q.Error
 }
 
 func (m *Message) Update() error {
-	q := db.Update(m)
-	return q.Error()
+	q := db.Save(m)
+	return q.Error
 }
 
 func (m *Message) Delete() error {
 	q := db.Delete(m)
-	return q.Error()
+	return q.Error
 }

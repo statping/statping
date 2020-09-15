@@ -7,7 +7,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/statping/statping/types"
 	"github.com/statping/statping/utils"
-	gormbulk "github.com/t-tiger/gorm-bulk-insert/v2"
 	"time"
 )
 
@@ -16,11 +15,11 @@ var SampleHits = 99900.
 func Samples() error {
 	log.Infoln("Inserting Sample Service Hits...")
 	for i := int64(1); i <= 5; i++ {
-		records := createHitsAt(i)
-		if err := gormbulk.BulkInsert(db.GormDB(), records, db.ChunkSize()); err != nil {
-			log.Error(err)
-			return err
-		}
+		//records := createHitsAt(i)
+		//if err := gormbulk.BulkInsert(db.GormDB(), records, db.ChunkSize()); err != nil {
+		//	log.Error(err)
+		//	return err
+		//}
 	}
 	return nil
 }

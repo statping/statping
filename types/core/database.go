@@ -6,12 +6,16 @@ import (
 	"github.com/statping/statping/types/metrics"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/utils"
+	"gorm.io/gorm"
 )
 
-var db database.Database
+var (
+	db  *database.Database
+	log = utils.Log.WithField("type", "core")
+)
 
-func SetDB(database database.Database) {
-	db = database.Model(&Core{})
+func SetDB(dbz *database.Database) {
+	db = database.Wrap(dbz.Model(&Core{}))
 	c, err := Select()
 	if err != nil {
 		utils.Log.Errorln(err)
@@ -26,22 +30,28 @@ func SetDB(database database.Database) {
 	}
 }
 
-func (c *Core) AfterFind() {
+func (c *Core) AfterFind(*gorm.DB) error {
 	metrics.Query("core", "find")
+	return nil
 }
 
 func Select() (*Core, error) {
 	var c Core
-	if err := db.DB().Ping(); err != nil {
+	d, err := db.DB.DB()
+	if err != nil {
 		return nil, errors.New("database has not been initiated yet.")
 	}
-	exists := db.HasTable("core")
+	if err := d.Ping(); err != nil {
+		return nil, errors.New("database has not been initiated yet.")
+	}
+
+	exists := db.Migrator().HasTable("core")
 	if !exists {
 		return nil, errors.New("core database has not been setup yet.")
 	}
 	q := db.Find(&c)
-	if q.Error() != nil {
-		return nil, db.Error()
+	if q.Error != nil {
+		return nil, db.Error
 	}
 	App = &c
 
@@ -59,7 +69,7 @@ func Select() (*Core, error) {
 	}
 	App.Version = utils.Params.GetString("VERSION")
 	App.Commit = utils.Params.GetString("COMMIT")
-	return App, q.Error()
+	return App, q.Error
 }
 
 func (c *Core) Create() error {
@@ -72,12 +82,12 @@ func (c *Core) Create() error {
 	}
 	q := db.Create(c)
 	utils.Log.Infof("API Key created: %s", c.ApiSecret)
-	return q.Error()
+	return q.Error
 }
 
 func (c *Core) Update() error {
 	q := db.UpdateColumns(c)
-	return q.Error()
+	return q.Error
 }
 
 func (c *Core) Delete() error {

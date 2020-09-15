@@ -8,15 +8,15 @@ package incidents
 
 func (i *IncidentUpdate) Create() error {
 	q := dbUpdate.Create(i)
-	return q.Error()
+	return q.Error
 }
 
 func (i *IncidentUpdate) Update() error {
-	q := dbUpdate.Update(i)
-	return q.Error()
+	q := dbUpdate.Save(i)
+	return q.Error
 }
 
 func (i *IncidentUpdate) Delete() error {
 	q := dbUpdate.Delete(i)
-	return q.Error()
+	return q.Error
 }

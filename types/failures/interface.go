@@ -11,10 +11,10 @@ type ColumnIDInterfacer interface {
 }
 
 type Failurer struct {
-	db database.Database
+	db *database.Database
 }
 
-func (f Failurer) Db() database.Database {
+func (f Failurer) Db() *database.Database {
 	return f.db
 }
 
@@ -48,24 +48,24 @@ func (f Failurer) Since(t time.Time) []*Failure {
 	return fails
 }
 
-func (f Failurer) Count() int {
-	var amount int
+func (f Failurer) Count() int64 {
+	var amount int64
 	f.db.Count(&amount)
 	return amount
 }
 
 func (f Failurer) DeleteAll() error {
 	q := f.db.Delete(&Failure{})
-	return q.Error()
+	return q.Error
 }
 
 func AllFailures(obj ColumnIDInterfacer) Failurer {
 	column, id := obj.FailuresColumnID()
-	return Failurer{db.Where(fmt.Sprintf("%s = ?", column), id)}
+	return Failurer{database.Wrap(db.Where(fmt.Sprintf("%s = ?", column), id))}
 }
 
 func Since(t time.Time, obj ColumnIDInterfacer) Failurer {
 	column, id := obj.FailuresColumnID()
 	timestamp := db.FormatTime(t)
-	return Failurer{db.Where(fmt.Sprintf("%s = ? AND created_at > ?", column), id, timestamp)}
+	return Failurer{database.Wrap(db.Where(fmt.Sprintf("%s = ? AND created_at > ?", column), id, timestamp))}
 }
