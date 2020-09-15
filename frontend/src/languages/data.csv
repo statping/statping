@@ -50,6 +50,11 @@ service_online_check,Online checked
 service_offline_time,Service has been offline for
 days_ago,Days Ago
 today,Today
+week,Week
+month,Month
+day,Day
+hour,Hour
+minute,Minute
 failures_24_hours,Failures last 24 hours
 no_services,You currently don't have any services!
 theme,Theme

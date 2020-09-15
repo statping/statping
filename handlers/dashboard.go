@@ -157,6 +157,7 @@ func apiThemeRemoveHandler(w http.ResponseWriter, r *http.Request) {
 	if err := source.DeleteAllAssets(utils.Directory); err != nil {
 		log.Errorln(fmt.Errorf("error deleting all assets %v", err))
 	}
+	resetRouter()
 	sendJsonAction(utils.Directory+"/assets", "deleted", w, r)
 }
 

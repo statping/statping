@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"github.com/statping/statping/types/checkins"
+	"github.com/statping/statping/types/configs"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/groups"
@@ -90,10 +91,22 @@ func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 	if c.Domain != app.Domain {
 		app.Domain = c.Domain
 	}
+	if c.Language != app.Language {
+		app.Language = c.Language
+	}
+	utils.Params.Set("LANGUAGE", app.Language)
 	app.UseCdn = null.NewNullBool(c.UseCdn.Bool)
 	app.AllowReports = null.NewNullBool(c.AllowReports.Bool)
 	utils.SentryInit(app.AllowReports.Bool)
-	err = app.Update()
+	if err := app.Update(); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	if err := configs.Save(); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
 	returnJson(core.App, w, r)
 }
 
