@@ -1,3 +1,7 @@
+# 0.90.68 (09-15-2020)
+- Added DB_DSN env for mysql, postgres or sqlite DSN database connection string
+- Added READ_ONLY env for a read only connection to the database
+
 # 0.90.67 (09-14-2020)
 - Modified core settings to update config.yml on save
 - Modified Theme Editor to restart the HTTP router on create/delete (fixing 404's)
