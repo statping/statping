@@ -4,10 +4,16 @@
             <div class="col-md-3 col-sm-12 mb-4 mb-md-0">
                 <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
 
-                    <div v-if="version_below" class="alert small text-center mt-0 pt-0 pb-0">
+                    <div v-if="version_below" class="col-12 small text-center mt-0 pt-0 pb-0 mb-3">
                       Update {{github.tag_name}} Available
-                      <a href="https://github.com/statping/statping/releases/latest" class="btn btn-sm text-success mt-2">Download</a>
-                      <a href="https://github.com/statping/statping/blob/master/CHANGELOG.md" class="btn btn-sm text-dim mt-2">Changelog</a>
+                      <div class="row">
+                        <div class="col-6">
+                          <a href="https://github.com/statping/statping/releases/latest" class="btn btn-sm text-success mt-2">Download</a>
+                        </div>
+                        <div class="col-6">
+                          <a href="https://github.com/statping/statping/blob/master/CHANGELOG.md" class="btn btn-sm text-dim mt-2">Changelog</a>
+                        </div>
+                      </div>
                     </div>
 
                     <h6 class="text-muted">{{ $t('main_settings') }}</h6>
@@ -26,6 +32,9 @@
                   </a>
                   <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-import-tab')}" id="v-pills-import-tab" data-toggle="pill" href="#v-pills-import" role="tab" aria-controls="v-pills-import" aria-selected="false">
                     <font-awesome-icon icon="cloud-download-alt" class="mr-2"/> {{ $t('import') }}
+                  </a>
+                  <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-configs-tab')}" id="v-pills-configs-tab" data-toggle="pill" href="#v-pills-configs" role="tab" aria-controls="v-pills-configs" aria-selected="false">
+                    <font-awesome-icon icon="cloud-download-alt" class="mr-2"/> {{ $t('configs') }}
                   </a>
 
                     <h6 class="mt-4 text-muted">{{$t('notifiers')}}</h6>
@@ -105,9 +114,13 @@
                         <Cache/>
                     </div>
 
-                    <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-oauth-tab'), show: liClass('v-pills-oauth-tab')}" id="v-pills-oauth" role="tabpanel" aria-labelledby="v-pills-oauth-tab">
-                        <OAuth/>
-                    </div>
+                  <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-oauth-tab'), show: liClass('v-pills-oauth-tab')}" id="v-pills-oauth" role="tabpanel" aria-labelledby="v-pills-oauth-tab">
+                    <OAuth/>
+                  </div>
+
+                  <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-configs-tab'), show: liClass('v-pills-configs-tab')}" id="v-pills-configs" role="tabpanel" aria-labelledby="v-pills-configs-tab">
+                    <Configs/>
+                  </div>
 
                   <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-import-tab'), show: liClass('v-pills-import-tab')}" id="v-pills-import" role="tabpanel" aria-labelledby="v-pills-import-tab">
                     <Importer/>
@@ -140,10 +153,12 @@
   const Cache = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Cache')
   const Importer = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Importer')
   const Variables = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Variables')
+  const Configs = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Configs')
 
   export default {
       name: 'Settings',
       components: {
+        Configs,
         Importer,
         Variables,
         OAuth,

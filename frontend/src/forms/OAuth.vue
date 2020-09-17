@@ -168,8 +168,8 @@
                     <label for="switch-custom-oauth" class="mb-0"> </label>
                 </span>
             </div>
-            <div class="card-body" :class="{'d-none': !expanded.custom}">
-                <div class="form-group row mt-3">
+            <div class="card-body" :class="{'d-none': !expanded.custom || !custom_enabled}">
+                <div class="form-group row">
                     <label for="custom_name" class="col-sm-4 col-form-label">Custom Name</label>
                     <div class="col-sm-8">
                         <input v-model="oauth.custom_name" type="text" class="form-control" id="custom_name" required>
@@ -199,13 +199,24 @@
                         <input v-model="oauth.custom_endpoint_token" type="text" class="form-control" id="custom_endpoint_token" required>
                     </div>
                 </div>
-                <div class="form-group row">
-                    <label for="custom_scopes" class="col-sm-4 col-form-label">Scopes</label>
-                    <div class="col-sm-8">
-                        <input v-model="oauth.custom_scopes" type="text" class="form-control" id="custom_scopes">
-                        <small>Optional comma delimited list of oauth scopes</small>
-                    </div>
+              <div class="form-group row">
+                <label for="custom_scopes" class="col-sm-4 col-form-label">Scopes</label>
+                <div class="col-sm-8">
+                  <input v-model="oauth.custom_scopes" type="text" class="form-control" id="custom_scopes">
+                  <small>Optional comma delimited list of oauth scopes</small>
                 </div>
+              </div>
+              <div class="form-group row">
+                <label for="custom_scopes" class="col-sm-4 col-form-label">Open ID</label>
+                <div class="col-sm-8">
+                  <span @click="oauth.custom_open_id = !!oauth.custom_open_id" class="switch switch-rd-gr float-right">
+                    <input v-model="oauth.custom_open_id" type="checkbox" id="switch-custom-openid" :checked="oauth.custom_open_id">
+                    <label for="switch-custom-openid" class="mb-0"> </label>
+                </span>
+                  <small>Enable if provider is OpenID</small>
+                </div>
+              </div>
+
                 <div class="form-group row">
                     <label for="slack_callback" class="col-sm-4 col-form-label">Callback URL</label>
                     <div class="col-sm-8">
@@ -271,6 +282,7 @@
               custom_endpoint_auth: "",
               custom_endpoint_token: "",
               custom_scopes: "",
+              custom_open_id: false,
             }
           }
       },

@@ -6,6 +6,7 @@ go 1.14
 require (
 	github.com/GeertJohan/go.rice v1.0.0
 	github.com/aws/aws-sdk-go v1.30.20
+	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/structs v1.1.0
 	github.com/foomo/simplecert v1.7.5
@@ -17,12 +18,13 @@ require (
 	github.com/jinzhu/gorm v1.9.12
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/pkg/errors v0.9.1
+	github.com/pquerna/cachecontrol v0.0.0-20200819021114-67c6ae64274f // indirect
 	github.com/prometheus/client_golang v1.1.0
 	github.com/sirupsen/logrus v1.5.0
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.6.3
 	github.com/statping/emails v1.0.0
-	github.com/stretchr/testify v1.5.1
+	github.com/stretchr/testify v1.6.1
 	github.com/t-tiger/gorm-bulk-insert/v2 v2.0.1
 	github.com/tensorflow/tensorflow v2.3.0+incompatible // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9

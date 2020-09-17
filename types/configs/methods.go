@@ -18,6 +18,15 @@ func (d *DbConfig) Save(directory string) error {
 	return nil
 }
 
+func (d *DbConfig) ToYAML() []byte {
+	c, err := yaml.Marshal(d)
+	if err != nil {
+		log.Errorln(err)
+		return nil
+	}
+	return c
+}
+
 func (d *DbConfig) ConnectionString() string {
 	var conn string
 	postgresSSL := utils.Params.GetString("POSTGRES_SSLMODE")

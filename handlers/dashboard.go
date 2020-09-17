@@ -261,6 +261,19 @@ func settingsImportHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonAction(exportData, "import", w, r)
 }
 
+func configsSaveHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func configsViewHandler(w http.ResponseWriter, r *http.Request) {
+	db, err := configs.LoadConfigs(utils.Directory + "/configs.yml")
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	w.Write(db.ToYAML())
+}
+
 func settingsExportHandler(w http.ResponseWriter, r *http.Request) {
 	exported, err := ExportSettings()
 	if err != nil {
