@@ -22,7 +22,7 @@ type discord struct {
 
 var Discorder = &discord{&notifications.Notification{
 	Method:      "discord",
-	Title:       "discord",
+	Title:       "Discord",
 	Description: "Send notifications to your discord channel using discord webhooks. Insert your discord channel Webhook URL to receive notifications. Based on the <a href=\"https://discordapp.com/developers/docs/resources/Webhook\">discord webhooker API</a>.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",

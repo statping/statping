@@ -59,7 +59,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if err := configs.CreateAdminUser(confgs); err != nil {
+		if err := configs.CreateAdminUser(); err != nil {
 			sendErrorJson(err, w, r)
 			return
 		}

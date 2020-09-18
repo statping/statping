@@ -9,6 +9,7 @@ const japanese = {
     logout: "ログアウト",
     online: "オンライン",
     offline: "オフライン",
+    configs: "構成",
     username: "ユーザ名",
     password: "パスワード",
     email: "Eメール",

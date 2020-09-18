@@ -9,6 +9,7 @@ const spanish = {
     logout: "Cerrar sesión",
     online: "En línea",
     offline: "Offline",
+    configs: "Configuración",
     username: "Nombre de usuario",
     password: "Contraseña",
     email: "Correo",

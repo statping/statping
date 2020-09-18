@@ -1545,8 +1545,8 @@ systemctl start statping
 <p>You can even run Statping on your Raspberry Pi by installing the precompiled binary from <a href="https://github.com/statping/statping/releases/latest" target="_blank">Latest Releases</a>. For the Raspberry Pi 3 you&rsquo;ll want to download the <code>statping-linux-arm7.tar.gz</code> file. Be sure to change <code>VERSION</code> to the latest version in Releases, and include the &lsquo;v&rsquo;.</p>
 
 <pre><code>VERSION=$(curl -sL &quot;https://github.com/statping/statping/releases/latest&quot; | grep -o 'tag/[v.0-9]*' | awk -F/ '{print $2}' | head -n1)
-wget https://github.com/statping/statping/releases/download/$VERSION/statping-linux-arm7.tar.gz
-tar -xvzf statping-linux-arm7.tar.gz
+wget https://github.com/statping/statping/releases/download/$VERSION/statping-linux-arm-7.tar.gz
+tar -xvzf statping-linux-arm-7.tar.gz
 chmod +x statping
 mv statping /usr/local/bin/statping
 
@@ -2275,7 +2275,7 @@ OluFxewsEO0QNDrfFb+0gnjYlnGqOFcZjUMXbDdY5oLSPtXohynuTK1qyQ==
 </div>
 
 <div class="text-center small text-dim" v-pre>
-Automatically generated from Statping's Wiki on 2020-09-09 01:24:21.649582 &#43;0000 UTC
+Automatically generated from Statping's Wiki on 2020-09-15 19:09:14.703237 &#43;0000 UTC
 </div>
 
 </div>

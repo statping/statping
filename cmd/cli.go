@@ -18,6 +18,10 @@ import (
 	"time"
 )
 
+var (
+	importAll *bool
+)
+
 func assetsCli() error {
 	dir := utils.Directory
 	if err := utils.InitLogs(); err != nil {
@@ -254,6 +258,9 @@ func importCli(args []string) error {
 	if len(exportData.Messages) > 0 {
 		log.Printf("Messages:   %d\n", len(exportData.Messages))
 	}
+	if len(exportData.Incidents) > 0 {
+		log.Printf("Incidents:  %d\n", len(exportData.Incidents))
+	}
 	if len(exportData.Users) > 0 {
 		log.Printf("Users:      %d\n", len(exportData.Users))
 	}
@@ -285,14 +292,14 @@ func importCli(args []string) error {
 	if ask("Import Core settings?") {
 		c := exportData.Core
 		if err := c.Update(); err != nil {
-			return err
+			log.Errorln(err)
 		}
 	}
 	for _, s := range exportData.Groups {
 		if ask(fmt.Sprintf("Import Group '%s'?", s.Name)) {
 			s.Id = 0
 			if err := s.Create(); err != nil {
-				return err
+				log.Errorln(err)
 			}
 		}
 	}
@@ -300,7 +307,7 @@ func importCli(args []string) error {
 		if ask(fmt.Sprintf("Import Service '%s'?", s.Name)) {
 			s.Id = 0
 			if err := s.Create(); err != nil {
-				return err
+				log.Errorln(err)
 			}
 		}
 	}
@@ -308,7 +315,7 @@ func importCli(args []string) error {
 		if ask(fmt.Sprintf("Import Checkin '%s'?", s.Name)) {
 			s.Id = 0
 			if err := s.Create(); err != nil {
-				return err
+				log.Errorln(err)
 			}
 		}
 	}
@@ -316,7 +323,7 @@ func importCli(args []string) error {
 		if ask(fmt.Sprintf("Import Message '%s'?", s.Title)) {
 			s.Id = 0
 			if err := s.Create(); err != nil {
-				return err
+				log.Errorln(err)
 			}
 		}
 	}
@@ -333,6 +340,7 @@ func importCli(args []string) error {
 }
 
 func ask(format string) bool {
+
 	fmt.Printf(fmt.Sprintf(format + " [y/N]: "))
 	reader := bufio.NewReader(os.Stdin)
 	text, _ := reader.ReadString('\n')

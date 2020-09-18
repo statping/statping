@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: statping
+spec:
+  ports:
+    - port: 8080
+  selector:
+    app: statping
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: statping
+spec:
+  selector:
+    matchLabels:
+      app: statping
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: statping
+    spec:
+      containers:
+        - image: statping/statping
+          name: statping
+          env:
+            - name: ALLOW_REPORTS
+              value: "true"
+          ports:
+            - containerPort: 8080
+              name: statping
+          volumeMounts:
+            - name: statping-storage
+              mountPath: /app
+      volumes:
+        - name: statping-storage
+          persistentVolumeClaim:
+            claimName: statping-claim

@@ -103,6 +103,8 @@ func Router() *mux.Router {
 	api.Handle("/api/logs/last", authenticated(logsLineHandler, false)).Methods("GET")
 	api.Handle("/api/settings/import", authenticated(settingsImportHandler, false)).Methods("POST")
 	api.Handle("/api/settings/export", authenticated(settingsExportHandler, false)).Methods("GET")
+	api.Handle("/api/settings/configs", authenticated(configsViewHandler, false)).Methods("GET")
+	api.Handle("/api/settings/configs", authenticated(configsSaveHandler, false)).Methods("POST")
 
 	// API OAUTH Routes
 	api.Handle("/api/oauth", scoped(apiOAuthHandler)).Methods("GET")

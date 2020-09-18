@@ -7,8 +7,8 @@ const tokenKey = "statping_auth";
 
 class Api {
   constructor() {
-    this.version = "0.90.66";
-    this.commit = "a3ce4124f654b13c7f2af88b8410f998bd57fcef";
+    this.version = "0.90.67";
+    this.commit = "7e121335791d2143a2eefd404dbcce83b8f46f61";
   }
 
   async oauth() {
@@ -259,6 +259,14 @@ class Api {
       const reader = new window.FileReader();
       return reader.readAsText(response.data)
     })
+  }
+
+  async configs() {
+    return axios.get('api/settings/configs').then(response => (response.data)) || []
+  }
+
+  async configs_save(data) {
+    return axios.post('api/settings/configs', data).then(response => (response.data)) || []
   }
 
   token() {

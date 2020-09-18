@@ -10,10 +10,6 @@ A {
   color: $text-color;
 }
 
-A:HOVER {
-  color: lighten($text-color, 12%) !important;
-}
-
 .modal-backdrop {
   position: absolute;
   top: 0;

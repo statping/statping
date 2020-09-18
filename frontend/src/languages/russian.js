@@ -9,6 +9,7 @@ const russian = {
     logout: "Выход из системы",
     online: "Онлайн",
     offline: "Оффлайн",
+    configs: "Конфигурация",
     username: "Имя пользователя",
     password: "Пароль",
     email: "Электронная почта",

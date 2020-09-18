@@ -9,6 +9,7 @@ const french = {
     logout: "Déconnexion",
     online: "En ligne",
     offline: "Offline",
+    configs: "Configuration",
     username: "Nom d'utilisateur",
     password: "mot de passe",
     email: "Email",

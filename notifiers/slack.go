@@ -29,7 +29,7 @@ func (s *slack) Select() *notifications.Notification {
 
 var slacker = &slack{&notifications.Notification{
 	Method:      slackMethod,
-	Title:       "slack",
+	Title:       "Slack",
 	Description: "Send notifications to your slack channel when a service is offline. Insert your Incoming webhook URL for your channel to receive notifications. Based on the <a href=\"https://api.slack.com/incoming-webhooks\">Slack API</a>.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
