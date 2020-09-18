@@ -5,6 +5,7 @@
 
   <codemirror v-show="loaded" v-model="configs" ref="configs" :options="cmOptions" class="mt-4 codemirrorInput"/>
 
+  <button @click.prevent="save" class="btn col-12 btn-primary mt-3">Save</button>
 </div>
 </template>
 
@@ -23,7 +24,7 @@ name: "Configs",
   data() {
     return {
       loaded: false,
-      configs: "okkoko: okokoko",
+      configs: null,
       cmOptions: {
         height: 700,
         tabSize: 4,
@@ -35,14 +36,27 @@ name: "Configs",
     }
   },
   mounted() {
+    this.loaded = false
     this.update()
+    this.loaded = true
+  },
+  watch: {
+    "configs" () {
+      this.$refs.configs.codemirror.refresh()
+    }
   },
   methods: {
     async update() {
-      this.loaded = false
       this.configs = await Api.configs()
-      this.loaded = true
+      this.$refs.configs.codemirror.value = this.configs
       this.$refs.configs.codemirror.refresh()
+    },
+    async save() {
+      try {
+        await Api.configs_save(this.configs)
+      } catch(e) {
+        window.console.error(e)
+      }
     }
   }
 }

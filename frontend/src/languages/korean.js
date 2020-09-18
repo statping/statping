@@ -9,6 +9,7 @@ const korean = {
     logout: "로그아웃",
     online: "온라인",
     offline: "오프라인",
+    configs: "구성",
     username: "사용자 이름",
     password: "비밀번호",
     email: "이메일",

@@ -34,7 +34,7 @@
                     <font-awesome-icon icon="cloud-download-alt" class="mr-2"/> {{ $t('import') }}
                   </a>
                   <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-configs-tab')}" id="v-pills-configs-tab" data-toggle="pill" href="#v-pills-configs" role="tab" aria-controls="v-pills-configs" aria-selected="false">
-                    <font-awesome-icon icon="cloud-download-alt" class="mr-2"/> {{ $t('configs') }}
+                    <font-awesome-icon icon="cogs" class="mr-2"/> {{ $t('configs') }}
                   </a>
 
                     <h6 class="mt-4 text-muted">{{$t('notifiers')}}</h6>

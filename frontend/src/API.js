@@ -265,6 +265,10 @@ class Api {
     return axios.get('api/settings/configs').then(response => (response.data)) || []
   }
 
+  async configs_save(data) {
+    return axios.post('api/settings/configs', data).then(response => (response.data)) || []
+  }
+
   token() {
     return $cookies.get(tokenKey);
   }

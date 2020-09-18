@@ -6,15 +6,15 @@ const SqliteFilename = "statping.db"
 
 // DbConfig struct is used for the Db connection and creates the 'config.yml' file
 type DbConfig struct {
-	DbConn            string `yaml:"connection" json:"connection"`
+	DbConn            string `yaml:"connection,omitempty" json:"connection"`
 	DbHost            string `yaml:"host,omitempty" json:"-"`
 	DbUser            string `yaml:"user,omitempty" json:"-"`
 	DbPass            string `yaml:"password,omitempty" json:"-"`
 	DbData            string `yaml:"database,omitempty" json:"-"`
 	DbPort            int    `yaml:"port,omitempty" json:"-"`
-	ApiSecret         string `yaml:"api_secret" json:"-"`
-	Language          string `yaml:"language" json:"language"`
-	AllowReports      bool   `yaml:"allow_reports" json:"allow_reports"`
+	ApiSecret         string `yaml:"api_secret,omitempty" json:"-"`
+	Language          string `yaml:"language,omitempty" json:"language"`
+	AllowReports      bool   `yaml:"allow_reports,omitempty" json:"allow_reports"`
 	Project           string `yaml:"-" json:"-"`
 	Description       string `yaml:"-" json:"-"`
 	Domain            string `yaml:"-" json:"-"`
@@ -22,7 +22,7 @@ type DbConfig struct {
 	Password          string `yaml:"-" json:"-"`
 	Email             string `yaml:"-" json:"-"`
 	Error             error  `yaml:"-" json:"-"`
-	Location          string `yaml:"location" json:"-"`
+	Location          string `yaml:"location,omitempty" json:"-"`
 	SqlFile           string `yaml:"sqlfile,omitempty" json:"-"`
 	LetsEncryptHost   string `yaml:"letsencrypt_host,omitempty" json:"letsencrypt_host"`
 	LetsEncryptEmail  string `yaml:"letsencrypt_email,omitempty" json:"letsencrypt_email"`

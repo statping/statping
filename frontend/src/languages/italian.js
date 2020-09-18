@@ -9,6 +9,7 @@ const italian = {
     logout: "Disconnetti",
     online: "Online",
     offline: "Offline",
+    configs: "Configurazione",
     username: "Nome utente",
     password: "Password",
     email: "E-mail",

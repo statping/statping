@@ -1,4 +1,4 @@
-# 0.90.68 (09-15-2020)
+# 0.90.68 (09-17-2020)
 - Added DB_DSN env for mysql, postgres or sqlite DSN database connection string
 - Added READ_ONLY env for a read only connection to the database
 - Added Custom OAuth OpenID toggle switch in settings (appends 'openid' in scope)

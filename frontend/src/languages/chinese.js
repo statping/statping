@@ -9,6 +9,7 @@ const chinese = {
     logout: "注销",
     online: "在线",
     offline: "离线",
+    configs: "配置",
     username: "用户名",
     password: "密码",
     email: "电子邮件",

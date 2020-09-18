@@ -9,6 +9,7 @@ const german = {
     logout: "Abmelden",
     online: "Online",
     offline: "Offline",
+    configs: "Konfiguration",
     username: "Benutzername",
     password: "Kennwort",
     email: "Mail",
