@@ -72,8 +72,8 @@ export default new Vuex.Store({
       return state.checkins.filter(c => c.service_id === id)
     },
     serviceByAll: (state) => (element) => {
-      if (element % 1 === 0) {
-        return state.services.find(s => s.id === element)
+      if (!isNaN(parseFloat(element)) && isFinite(element)) {
+        return state.services.find(s => s.id === parseInt(element))
       } else {
         return state.services.find(s => s.permalink === element)
       }

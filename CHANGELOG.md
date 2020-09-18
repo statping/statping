@@ -1,3 +1,6 @@
+# 0.90.69 (09-18-2020)
+- Fixed issue with service view not loading. #808 #811 #800
+
 # 0.90.68 (09-17-2020)
 - Added DB_DSN env for mysql, postgres or sqlite DSN database connection string
 - Added READ_ONLY env for a read only connection to the database
