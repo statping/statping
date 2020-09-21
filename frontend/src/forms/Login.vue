@@ -95,17 +95,31 @@
               }
               this.loading = false
           },
+      encode(val) {
+            return encodeURI(val)
+      },
+      custom_scopes() {
+        let scopes = []
+        if (this.oauth.custom_open_id) {
+          scopes.push("openid")
+        }
+        scopes.push(this.oauth.custom_scopes.split(","))
+        if (scopes.length !== 0) {
+          return "&scopes="+scopes.join(",")
+        }
+        return ""
+      },
         GHlogin() {
-            window.location = `https://github.com/login/oauth/authorize?client_id=${this.oauth.gh_client_id}&redirect_uri=${this.core.domain}/oauth/github&scope=user,repo`
+            window.location = `https://github.com/login/oauth/authorize?client_id=${this.oauth.gh_client_id}&redirect_uri=${this.encode(this.core.domain+"/oauth/github")}&scope=user,repo`
         },
         Slacklogin() {
-          window.location = `https://slack.com/oauth/authorize?client_id=${this.oauth.slack_client_id}&redirect_uri=${this.core.domain}/oauth/slack&scope=identity.basic`
+          window.location = `https://slack.com/oauth/authorize?client_id=${this.oauth.slack_client_id}&redirect_uri=${this.encode(this.core.domain+"/oauth/slack")}&scope=identity.basic`
         },
         Googlelogin() {
-          window.location = `https://accounts.google.com/signin/oauth?client_id=${this.oauth.google_client_id}&redirect_uri=${this.core.domain}/oauth/google&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email`
+          window.location = `https://accounts.google.com/signin/oauth?client_id=${this.oauth.google_client_id}&redirect_uri=${this.encode(this.core.domain+"/oauth/google")}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email`
         },
         Customlogin() {
-          window.location = `${this.oauth.custom_endpoint_auth}?client_id=${this.oauth.custom_client_id}&redirect_uri=${this.core.domain}/oauth/custom${this.oauth.custom_scopes !== "" ? "&scope="+this.oauth.custom_scopes : "" }`
+          window.location = `${this.oauth.custom_endpoint_auth}?client_id=${this.oauth.custom_client_id}&redirect_uri=${this.encode(this.core.domain+"/oauth/custom")}&response_type=code${this.custom_scopes()}`
         }
       }
   }

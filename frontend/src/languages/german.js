@@ -9,6 +9,7 @@ const german = {
     logout: "Abmelden",
     online: "Online",
     offline: "Offline",
+    configs: "Konfiguration",
     username: "Benutzername",
     password: "Kennwort",
     email: "Mail",
@@ -50,6 +51,11 @@ const german = {
     service_offline_time: "Dienst war offline für",
     days_ago: "Vor Tagen",
     today: "Heute",
+    week: "Woche",
+    month: "Monat",
+    day: "Tag",
+    hour: "Stunde",
+    minute: "Minute",
     failures_24_hours: "Ausfälle dauern 24 Stunden",
     no_services: "Sie haben derzeit keine Dienste!",
     theme: "Thema",
@@ -125,9 +131,12 @@ const german = {
     follow_redir: "Weiterleitungen folgen",
     verify_ssl: "SSL verifizieren",
     tls_cert: "TLS-Zertifikat verwenden",
+    notification_opts: "Benachrichtigungsoptionen",
     notifications_enable: "Benachrichtigungen aktivieren",
     notify_after: "Benachrichtigung nach Fehlern",
-    notify_all: "Alle Änderungen benachrichtigen"
+    notify_all: "Alle Änderungen benachrichtigen",
+    service_update: "Dienst aktualisieren",
+    service_create: "Dienst erstellen"
 }
 
 export default german

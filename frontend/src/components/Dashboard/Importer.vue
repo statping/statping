@@ -6,14 +6,16 @@
   </p>
 
   <div v-if="!loaded" class="mt-4 row">
-    <div class="col-6 custom-file">
-      <input @change="onFileChange" type="file" class="custom-file-input" id="customFile" accept=".json,application/json">
+    <div class="col-8 custom-file">
+      <input @change="onFileChange" type="file" class="custom-file-input pointer" id="customFile" accept=".json,application/json">
       <label class="custom-file-label" for="customFile">Choose exported Statping JSON file</label>
     </div>
-    <a class="ml-2 col-2 btn btn-light btn-outline-secondary" href="/api/settings/export">Export</a>
+    <div class="col-4">
+      <a class="btn btn-block btn-light btn-outline-secondary" href="/api/settings/export">Export</a>
+    </div>
   </div>
 
-  <div v-if="loaded" class="col-12 mb-3">
+  <div v-if="loaded" class="col-12 mb-4">
     <h3>Core Settings
       <span @click="file.core.enabled = !!file.core.enabled" class="switch switch-sm float-right">
             <input @change="update" v-model="file.core.enabled" type="checkbox" class="switch" :id="`switch-core`">
@@ -21,13 +23,13 @@
           </span>
     </h3>
 
-    <div class="row"><span class="col-4">Name</span><span class="col-8 text-right font-weight-bold">{{file.core.name}}</span></div>
-    <div class="row"><span class="col-4">Description</span><span class="col-8 text-right font-weight-bold">{{file.core.description}}</span></div>
-    <div class="row"><span class="col-4">Domain</span><span class="col-8 text-right font-weight-bold">{{file.core.domain}}</span></div>
+    <div class="row mb-2"><span class="col-4">Name</span><span class="col-8 text-right font-weight-bold">{{file.core.name}}</span></div>
+    <div class="row mb-2"><span class="col-4">Description</span><span class="col-8 text-right font-weight-bold">{{file.core.description}}</span></div>
+    <div class="row mb-2"><span class="col-4">Domain</span><span class="col-8 text-right font-weight-bold">{{file.core.domain}}</span></div>
 
   </div>
 
-  <div v-if="loaded" class="col-12 mb-3">
+  <div v-if="loaded" class="col-12 mb-4">
     <h3>Users
       <button @click.prevent="toggle_all(file.users)" class="btn btn-sm btn-outline-dark float-right mt-1">Select All</button>
     </h3>
@@ -51,7 +53,7 @@
   </div>
 
 
-  <div v-if="loaded" class="col-12 mb-3">
+  <div v-if="loaded" class="col-12 mb-4">
     <h3>Checkins
       <button @click.prevent="toggle_all(file.checkins)" class="btn btn-sm btn-outline-dark float-right mt-1">Select All</button>
     </h3>
@@ -60,10 +62,10 @@
     </div>
     <div v-for="checkin in file.checkins" v-bind:key="checkin.id" class="row">
       <div class="col-4 font-weight-bold">
-        {{checkin.id}}
+        {{checkin.name}}
       </div>
       <div class="col-6">
-        {{checkin.service_id}}
+        Service #{{checkin.service_id}}
       </div>
       <div class="col-2 text-right">
           <span @click="checkin.enabled = !!checkin.enabled" class="switch switch-sm">
@@ -74,7 +76,7 @@
     </div>
   </div>
 
-  <div v-if="loaded" class="col-12 mb-3">
+  <div v-if="loaded" class="col-12 mb-4">
     <h3>Services
       <button @click.prevent="toggle_all(file.services)" class="btn btn-sm btn-outline-dark float-right mt-1">Select All</button>
     </h3>
@@ -97,7 +99,7 @@
     </div>
   </div>
 
-  <div v-if="loaded" class="col-12 mb-3">
+  <div v-if="loaded" class="col-12 mb-4">
     <h3>Groups
       <button @click.prevent="toggle_all(file.groups)" class="btn btn-sm btn-outline-dark float-right mt-1">Select All</button>
     </h3>
@@ -112,6 +114,26 @@
           <span @click="group.enabled = !!group.enabled" class="switch switch-sm">
             <input @change="update" v-model="group.enabled" type="checkbox" class="switch" :id="`switch-group-${group.id}`">
             <label :for="`switch-group-${group.id}`"></label>
+          </span>
+      </div>
+    </div>
+  </div>
+
+  <div v-if="loaded" class="col-12 mb-4">
+    <h3>Incidents
+      <button @click.prevent="toggle_all(file.incidents)" class="btn btn-sm btn-outline-dark float-right mt-1">Select All</button>
+    </h3>
+    <div v-if="!file.incidents" class="alert alert-link">
+      No Incidents in file
+    </div>
+    <div v-for="incident in file.incidents" v-bind:key="incident.id" class="row">
+      <div class="col-4 font-weight-bold">
+        {{incident.name}}
+      </div>
+      <div class="col-8 text-right">
+          <span @click="incident.enabled = !!incident.enabled" class="switch switch-sm">
+            <input @change="update" v-model="incident.enabled" type="checkbox" class="switch" :id="`switch-incident-${incident.id}`">
+            <label :for="`switch-incident-${incident.id}`"></label>
           </span>
       </div>
     </div>
@@ -141,7 +163,9 @@
     {{error}}
   </div>
 
-  <button v-if="loaded" @click.prevent="import_all" class="btn btn-success">Import</button>
+  <div class="col-12">
+    <button v-if="loaded" @click.prevent="import_all" class="btn btn-block btn-success">Import</button>
+  </div>
 
 </div>
 </template>

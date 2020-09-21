@@ -11,9 +11,7 @@ import (
 func customOAuth(r *http.Request) (*oAuth, error) {
 	auth := core.App.OAuth
 	code := r.URL.Query().Get("code")
-
 	scopes := strings.Split(auth.CustomScopes, ",")
-
 	config := &oauth2.Config{
 		ClientID:     auth.CustomClientID,
 		ClientSecret: auth.CustomClientSecret,

@@ -38,7 +38,7 @@ func (d *DbConfig) ResetCore() error {
 	if err := d.CreateDatabase(); err != nil {
 		return errors.Wrap(err, "error creating database")
 	}
-	if err := CreateAdminUser(d); err != nil {
+	if err := CreateAdminUser(); err != nil {
 		return errors.Wrap(err, "error creating default admin user")
 	}
 	if utils.Params.GetBool("SAMPLE_DATA") {

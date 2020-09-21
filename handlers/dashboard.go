@@ -10,11 +10,13 @@ import (
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/groups"
+	"github.com/statping/statping/types/incidents"
 	"github.com/statping/statping/types/messages"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/types/users"
 	"github.com/statping/statping/utils"
+	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -157,18 +159,21 @@ func apiThemeRemoveHandler(w http.ResponseWriter, r *http.Request) {
 	if err := source.DeleteAllAssets(utils.Directory); err != nil {
 		log.Errorln(fmt.Errorf("error deleting all assets %v", err))
 	}
+	resetRouter()
 	sendJsonAction(utils.Directory+"/assets", "deleted", w, r)
 }
 
 type ExportData struct {
-	Config    *configs.DbConfig            `json:"config,omitempty"`
-	Core      *core.Core                   `json:"core"`
-	Services  []services.Service           `json:"services"`
-	Messages  []*messages.Message          `json:"messages"`
-	Checkins  []*checkins.Checkin          `json:"checkins"`
-	Users     []*users.User                `json:"users"`
-	Groups    []*groups.Group              `json:"groups"`
-	Notifiers []notifications.Notification `json:"notifiers"`
+	Config          *configs.DbConfig            `json:"config,omitempty"`
+	Core            *core.Core                   `json:"core"`
+	Services        []services.Service           `json:"services"`
+	Messages        []*messages.Message          `json:"messages"`
+	Incidents       []*incidents.Incident        `json:"incidents"`
+	IncidentUpdates []*incidents.IncidentUpdate  `json:"incident_updates"`
+	Checkins        []*checkins.Checkin          `json:"checkins"`
+	Users           []*users.User                `json:"users"`
+	Groups          []*groups.Group              `json:"groups"`
+	Notifiers       []notifications.Notification `json:"notifiers"`
 }
 
 func (e *ExportData) JSON() []byte {
@@ -258,6 +263,44 @@ func settingsImportHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sendJsonAction(exportData, "import", w, r)
+}
+
+func configsSaveHandler(w http.ResponseWriter, r *http.Request) {
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	defer r.Body.Close()
+
+	var cfg *configs.DbConfig
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	oldCfg, err := configs.LoadConfigs(utils.Directory + "/configs.yml")
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	newCfg := cfg.Merge(oldCfg)
+	if err := newCfg.Save(utils.Directory); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	sendJsonAction(newCfg.Clean(), "updated", w, r)
+}
+
+func configsViewHandler(w http.ResponseWriter, r *http.Request) {
+	db, err := configs.LoadConfigs(utils.Directory + "/configs.yml")
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	w.Write(db.Clean().ToYAML())
 }
 
 func settingsExportHandler(w http.ResponseWriter, r *http.Request) {

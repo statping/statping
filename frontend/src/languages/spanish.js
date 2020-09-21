@@ -9,6 +9,7 @@ const spanish = {
     logout: "Cerrar sesión",
     online: "En línea",
     offline: "Offline",
+    configs: "Configuración",
     username: "Nombre de usuario",
     password: "Contraseña",
     email: "Correo",
@@ -50,6 +51,11 @@ const spanish = {
     service_offline_time: "El servicio ha estado desconectado para",
     days_ago: "Hace días",
     today: "Hoy",
+    week: "Semana",
+    month: "Mes",
+    day: "Día",
+    hour: "Hora",
+    minute: "Minuto",
     failures_24_hours: "Fallos de las últimas 24 horas",
     no_services: "¡Actualmente no tienes ningún servicio!",
     theme: "Tema",
@@ -125,9 +131,12 @@ const spanish = {
     follow_redir: "Seguir redirecciones",
     verify_ssl: "Verificar SSL",
     tls_cert: "Usar Cert TLS",
+    notification_opts: "Opciones de notificación",
     notifications_enable: "Habilitar notificaciones",
     notify_after: "Notificar después de errores",
-    notify_all: "Notificar todos los cambios"
+    notify_all: "Notificar todos los cambios",
+    service_update: "Servicio de actualización",
+    service_create: "Crear servicio"
 }
 
 export default spanish

@@ -1,3 +1,17 @@
+# 0.90.69 (09-18-2020)
+- Fixed issue with service view not loading. #808 #811 #800
+
+# 0.90.68 (09-17-2020)
+- Added DB_DSN env for mysql, postgres or sqlite DSN database connection string
+- Added READ_ONLY env for a read only connection to the database
+- Added Custom OAuth OpenID toggle switch in settings (appends 'openid' in scope)
+- Fixed Custom OAuth response_type issue
+- Added Configs tab in Settings to edit the config.yml from frontend
+
+# 0.90.67 (09-14-2020)
+- Modified core settings to update config.yml on save
+- Modified Theme Editor to restart the HTTP router on create/delete (fixing 404's)
+
 # 0.90.66 (09-08-2020)
 - Added Import and Export views in Dashboard
 - Modified services list sparkline to use start/end of day timestamp

@@ -1,6 +1,5 @@
 <template>
     <div class="container col-md-7 col-sm-12 mt-md-5">
-
       <div v-if="!ready" class="row mt-5">
         <div class="col-12 text-center">
           <font-awesome-icon icon="circle-notch" size="3x" spin/>
@@ -10,7 +9,7 @@
         </div>
       </div>
 
-        <div v-if="ready" class="col-12 mb-4">
+        <div v-if="ready && service" class="col-12 mb-4">
             <span class="mt-3 mb-3 text-white d-md-none btn d-block d-md-none text-uppercase" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
                 {{service.online ? $t('online') : $t('offline')}}
             </span>
@@ -31,11 +30,11 @@
                 <div class="card-body pb-4">
                     <div class="row">
                         <div class="col">
-                            <flatPickr :disabled="!loaded" @on-change="reload" v-model="start_time" :config="{ wrap: true, allowInput: true, enableTime: true, dateFormat: 'Z', altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date() }" type="text" class="form-control text-left" required />
+                            <flatPickr :disabled="!loaded" @on-change="reload" v-model="start_time" :config="{ wrap: true, allowInput: true, enableTime: true, dateFormat: 'Z', altInput: true, altFormat: 'Y-m-d h:i K', maxDate: this.endOf('today') }" type="text" class="form-control text-left" required />
                             <small class="d-block">From {{this.format(new Date(start_time))}}</small>
                         </div>
                         <div class="col">
-                            <flatPickr :disabled="!loaded" @on-change="reload" v-model="end_time" :config="{ wrap: true, allowInput: true, enableTime: true, dateFormat: 'Z', altInput: true, altFormat: 'Y-m-d h:i K', maxDate: new Date() }" type="text" class="form-control text-left" required />
+                            <flatPickr :disabled="!loaded" @on-change="reload" v-model="end_time" :config="{ wrap: true, allowInput: true, enableTime: true, dateFormat: 'Z', altInput: true, altFormat: 'Y-m-d h:i K', maxDate: this.endOf('today') }" type="text" class="form-control text-left" required />
                             <small class="d-block">To {{this.format(new Date(end_time))}}</small>
                         </div>
                         <div class="col">
@@ -55,6 +54,7 @@
                             <small class="d-block d-md-none d-block">Increment Timeframe</small>
                         </div>
                     </div>
+
                 </div>
             </div>
 
@@ -99,10 +99,11 @@
   const ServiceHeatmap = () => import(/* webpackChunkName: "service" */ '@/components/Service/ServiceHeatmap')
   const ServiceTopStats = () => import(/* webpackChunkName: "service" */ '@/components/Service/ServiceTopStats')
   const AdvancedChart = () => import(/* webpackChunkName: "service" */ '@/components/Service/AdvancedChart')
+  const FailuresBarChart = () => import(/* webpackChunkName: "service" */ '@/components/Service/FailuresBarChart')
 
   import flatPickr from 'vue-flatpickr-component';
   import 'flatpickr/dist/flatpickr.css';
-  import FailuresBarChart from "@/components/Service/FailuresBarChart";
+
   const timeoptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
 
   const axisOptions = {
@@ -149,13 +150,12 @@ export default {
             ready: false,
             group: "15m",
             data: null,
-            service: null,
             uptime_data: null,
             loaded: false,
             messages: [],
             failures: [],
-            start_time: this.nowSubtract(84600 * 30),
-            end_time: this.nowSubtract(0),
+            start_time: this.beginningOf('day', this.nowSubtract(259200 * 3)),
+            end_time: this.endOf('today'),
             timedata: null,
             load_timedata: false,
             dailyRangeOpts: {
@@ -232,7 +232,7 @@ export default {
                         window.console.log(event)
                       },
                       updated: (chartContext, config) => {
-                        window.console.log('updated')
+                        window.console.log('updated chart')
                       },
                         beforeZoom: (chartContext, { xaxis }) => {
                             const start = (xaxis.min / 1000).toFixed(0)
@@ -368,6 +368,9 @@ export default {
       core () {
         return this.$store.getters.core
       },
+      service() {
+        return this.$store.getters.serviceByAll(this.$route.params.id)
+      },
       params () {
         return {start: this.toUnix(new Date(this.start_time)), end: this.toUnix(new Date(this.end_time))}
       },
@@ -388,20 +391,25 @@ export default {
       this.fetchData()
     },
     mounted() {
-
+      this.fetchData()
     },
     methods: {
-      async fetchData () {
+      fetchData () {
         if (!this.$route.params.id) {
           this.ready = false
           return
         }
-        this.services = await Api.services()
-        await this.$store.commit("setServices", this.services)
-
-        this.service = await Api.service(this.$route.params.id)
-        await this.reload()
+        this.reload()
         this.ready = true
+        this.loaded = true
+      },
+      async reload() {
+        if (!this.ready || !this.service) {
+          return
+        }
+        await this.chartHits()
+        await this.chartFailures()
+        await this.fetchUptime()
       },
       async updated_chart(start, end) {
         this.loaded = false
@@ -409,20 +417,14 @@ export default {
         this.end_time = end
         this.loaded = true
       },
-      async reload() {
-        await this.chartHits()
-        await this.chartFailures()
-        await this.fetchUptime()
-        this.loaded = true
-      },
-      async fetchUptime(service) {
-        if (service) {
-          return
-        }
+      async fetchUptime() {
         const uptime = await Api.service_uptime(this.service.id, this.params.start, this.params.end)
         this.uptime_data = this.parse_uptime(uptime)
       },
       parse_uptime(timedata) {
+        if (!timedata.series) {
+          return []
+        }
         const data = timedata.series.filter((g) => g.online) || []
         const offData = timedata.series.filter((g) => !g.online) || []
         let arr = [];
@@ -456,18 +458,10 @@ export default {
         return this.isBetween(this.now(), message.start_on, message.start_on === message.end_on ? this.maxDate().toISOString() : message.end_on)
       },
       async chartHits(start=0, end=99999999999) {
-        if (!this.service) {
-          return
-        }
         this.data = await Api.service_hits(this.service.id, this.params.start, this.params.end, this.group, false)
-        this.ready = true
       },
       async chartFailures(start=0, end=99999999999) {
-        if (!this.service) {
-          return
-        }
         this.failures_data = await Api.service_failures_data(this.service.id, this.params.start, this.params.end, this.group, true)
-        this.ready = true
       }
     }
 }

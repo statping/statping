@@ -9,6 +9,7 @@ const japanese = {
     logout: "ログアウト",
     online: "オンライン",
     offline: "オフライン",
+    configs: "構成",
     username: "ユーザ名",
     password: "パスワード",
     email: "Eメール",
@@ -50,6 +51,11 @@ const japanese = {
     service_offline_time: "のサービスがオフラインになりました",
     days_ago: "日前",
     today: "今日",
+    week: "週数",
+    month: "月",
+    day: "日",
+    hour: "アワー",
+    minute: "分",
     failures_24_hours: "過去 24 時間の障害",
     no_services: "現在、サービスをお持ちになりません。",
     theme: "テーマ",
@@ -125,9 +131,12 @@ const japanese = {
     follow_redir: "リダイレクトに従う",
     verify_ssl: "SSL の確認",
     tls_cert: "TLS 証明書を使用",
+    notification_opts: "通知オプション",
     notifications_enable: "通知を有効にする",
     notify_after: "障害発生後に通知する",
-    notify_all: "すべての変更を通知"
+    notify_all: "すべての変更を通知",
+    service_update: "サービスの更新",
+    service_create: "サービスの作成"
 }
 
 export default japanese

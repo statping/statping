@@ -9,6 +9,7 @@ const korean = {
     logout: "로그아웃",
     online: "온라인",
     offline: "오프라인",
+    configs: "구성",
     username: "사용자 이름",
     password: "비밀번호",
     email: "이메일",
@@ -50,6 +51,11 @@ const korean = {
     service_offline_time: "서비스가 에 대해 오프라인되었습니다.",
     days_ago: "일 전",
     today: "오늘",
+    week: "주",
+    month: "월",
+    day: "일",
+    hour: "시간",
+    minute: "분",
     failures_24_hours: "지난 24시간 동안 장애 발생",
     no_services: "현재 서비스가 없습니다!",
     theme: "테마",
@@ -125,9 +131,12 @@ const korean = {
     follow_redir: "리다이렉트 따르기",
     verify_ssl: "SSL 확인",
     tls_cert: "TLS 인증서 사용",
+    notification_opts: "알림 옵션",
     notifications_enable: "알림 활성화",
     notify_after: "실패 후 알림",
-    notify_all: "모든 변경 사항 알림"
+    notify_all: "모든 변경 사항 알림",
+    service_update: "서비스 업데이트",
+    service_create: "서비스 만들기"
 }
 
 export default korean

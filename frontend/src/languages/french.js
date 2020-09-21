@@ -9,6 +9,7 @@ const french = {
     logout: "Déconnexion",
     online: "En ligne",
     offline: "Offline",
+    configs: "Configuration",
     username: "Nom d'utilisateur",
     password: "mot de passe",
     email: "Email",
@@ -50,6 +51,11 @@ const french = {
     service_offline_time: "Le service a été hors ligne pour",
     days_ago: "Il y a jours",
     today: "Aujourd'hui",
+    week: "Semaine",
+    month: "Mois",
+    day: "Jour",
+    hour: "Heure",
+    minute: "Minute",
     failures_24_hours: "Les échecs durent 24 heures",
     no_services: "Vous n'avez actuellement aucun service !",
     theme: "Thème",
@@ -125,9 +131,12 @@ const french = {
     follow_redir: "Suivre les redirections",
     verify_ssl: "Vérifier SSL",
     tls_cert: "Utiliser le certificat TLS",
+    notification_opts: "Options de notification",
     notifications_enable: "Activer les notifications",
     notify_after: "Notification après les échecs",
-    notify_all: "Notifier toutes les modifications"
+    notify_all: "Notifier toutes les modifications",
+    service_update: "Mise à jour Service",
+    service_create: "Créer un service"
 }
 
 export default french
