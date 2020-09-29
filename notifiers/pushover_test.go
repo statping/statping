@@ -22,6 +22,7 @@ func TestPushoverNotifier(t *testing.T) {
 	err := utils.InitLogs()
 	require.Nil(t, err)
 
+	t.Parallel()
 	PUSHOVER_TOKEN = utils.Params.GetString("PUSHOVER_TOKEN")
 	PUSHOVER_API = utils.Params.GetString("PUSHOVER_API")
 
@@ -37,17 +38,17 @@ func TestPushoverNotifier(t *testing.T) {
 	}
 
 	t.Run("Load Pushover", func(t *testing.T) {
-		Pushover.ApiKey = PUSHOVER_TOKEN
-		Pushover.ApiSecret = PUSHOVER_API
-		Pushover.Var1 = "Normal"
-		Pushover.Var2 = "vibrate"
+		Pushover.ApiKey = null.NewNullString(PUSHOVER_TOKEN)
+		Pushover.ApiSecret = null.NewNullString(PUSHOVER_API)
+		Pushover.Var1 = null.NewNullString("Normal")
+		Pushover.Var2 = null.NewNullString("vibrate")
 		Pushover.Enabled = null.NewNullBool(true)
 
 		Add(Pushover)
 
 		assert.Nil(t, err)
 		assert.Equal(t, "Hunter Long", Pushover.Author)
-		assert.Equal(t, PUSHOVER_TOKEN, Pushover.ApiKey)
+		assert.Equal(t, PUSHOVER_TOKEN, Pushover.ApiKey.String)
 	})
 
 	t.Run("Pushover Within Limits", func(t *testing.T) {

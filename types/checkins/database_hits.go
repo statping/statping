@@ -2,13 +2,13 @@ package checkins
 
 func (c *Checkin) LastHit() *CheckinHit {
 	var hit CheckinHit
-	dbHits.Where("checkin = ?", c.Id).Limit(1).Find(&hit)
+	dbHits.Where("checkin = ?", c.Id).Last(&hit)
 	return &hit
 }
 
 func (c *Checkin) Hits() []*CheckinHit {
 	var hits []*CheckinHit
-	dbHits.Where("checkin = ?", c.Id).Find(&hits)
+	dbHits.Where("checkin = ?", c.Id).Order("id DESC").Find(&hits)
 	c.AllHits = hits
 	return hits
 }

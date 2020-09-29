@@ -1,16 +1,18 @@
 <template>
-    <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
-        <div class="col-10 offset-1 col-md-8 offset-md-2 mt-md-2">
-            <div class="col-12 col-md-8 offset-md-2 mb-4">
-                <img alt="Statping Login" class="col-12 mt-5 mt-md-0" style="max-width:650px" src="banner.png">
-            </div>
+    <div class="offset-md-3 offset-lg-4 offset-0 col-lg-4 col-md-6 mt-5">
+
+      <div class="offset-1 offset-lg-2 col-lg-8 col-10 mb-4 mb-md-3">
+        <img alt="Statping Login" class="embed-responsive" src="banner.png">
+      </div>
+
+      <div class="login_container col-12 p-4">
             <FormLogin/>
         </div>
     </div>
 </template>
 
 <script>
-  const FormLogin = () => import('@/forms/Login')
+  const FormLogin = () => import(/* webpackChunkName: "index" */ '@/forms/Login')
 
   export default {
   name: 'Login',
@@ -22,7 +24,10 @@
 
     }
   },
-  methods: {
+    mounted() {
+
+    },
+    methods: {
 
   }
 }

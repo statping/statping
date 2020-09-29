@@ -1,9 +1,10 @@
 <template>
     <div class="col-12">
-        <div class="card contain-card text-black-50 bg-white mb-4">
-            <div class="card-header">{{ $t('top_nav.services') }}
-                <router-link v-if="$store.state.admin" to="/dashboard/create_service" class="btn btn-sm btn-outline-success float-right">
-                    <font-awesome-icon icon="plus"/>  Create
+
+        <div class="card contain-card mb-4">
+            <div class="card-header">{{ $t('services') }}
+                <router-link v-if="$store.state.admin" to="/dashboard/create_service" class="btn btn-sm btn-success float-right">
+                    <font-awesome-icon icon="plus"/>  {{$t('create')}}
                 </router-link>
             </div>
             <div class="card-body pt-0">
@@ -11,15 +12,22 @@
             </div>
         </div>
 
-        <div class="card contain-card text-black-50 bg-white mb-4">
-            <div class="card-header">{{ $t('top_nav.groups') }}</div>
+        <div class="card contain-card mb-4">
+            <div class="card-header">{{ $t('groups') }}</div>
             <div class="card-body pt-0">
-        <table class="table">
+
+                <div v-if="groupsList.length === 0">
+                    <div class="alert alert-dark d-block mt-3 mb-0">
+                        You currently don't have any groups! Create one using the form below.
+                    </div>
+                </div>
+
+        <table v-else class="table">
             <thead>
             <tr>
-                <th scope="col">{{ $t('dashboard.name') }}</th>
-                <th scope="col">{{ $tc('dashboard.service', 2) }}</th>
-                <th scope="col">{{ $t('dashboard.visibility') }}</th>
+                <th scope="col">{{ $t('name') }}</th>
+                <th scope="col" class="d-none d-md-table-cell">{{ $tc('service', 2) }}</th>
+                <th scope="col">{{ $t('visibility') }}</th>
                 <th scope="col"></th>
             </tr>
             </thead>
@@ -29,7 +37,7 @@
                 <td><span class="drag_icon d-none d-md-inline">
                     <font-awesome-icon icon="bars" class="mr-3" /></span> {{group.name}}
                 </td>
-                <td>{{$store.getters.servicesInGroup(group.id).length}}</td>
+                <td class="d-none d-md-table-cell">{{$store.getters.servicesInGroup(group.id).length}}</td>
                 <td>
                     <span class="badge text-uppercase" :class="{'badge-primary': group.public, 'badge-secondary': !group.public}">
                         {{group.public ? $t('public') : $t('private')}}
@@ -60,15 +68,17 @@
 </template>
 
 <script>
-  const FormGroup = () => import('@/forms/Group')
-  const ToggleSwitch = () => import('@/forms/ToggleSwitch')
-  const ServicesList = () => import('@/components/Dashboard/ServicesList')
+  const Modal = () => import(/* webpackChunkName: "dashboard" */ "@/components/Elements/Modal")
+  const FormGroup = () => import(/* webpackChunkName: "dashboard" */ '@/forms/Group')
+  const ToggleSwitch = () => import(/* webpackChunkName: "dashboard" */ '@/forms/ToggleSwitch')
+  const ServicesList = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/ServicesList')
   import Api from "../../API";
-  import draggable from 'vuedraggable'
+  const draggable = () => import(/* webpackChunkName: "dashboard" */ 'vuedraggable')
 
   export default {
       name: 'DashboardServices',
       components: {
+        Modal,
           ServicesList,
           ToggleSwitch,
           FormGroup,
@@ -105,13 +115,24 @@
               this.group = g
               this.edit = !mode
           },
+        confirm_delete(service) {
+
+        },
+        async delete(g) {
+          await Api.group_delete(g.id)
+          const groups = await Api.groups()
+          this.$store.commit('setGroups', groups)
+        },
           async deleteGroup(g) {
-              let c = confirm(`Are you sure you want to delete '${g.name}'?`)
-              if (c) {
-                  await Api.group_delete(g.id)
-                  const groups = await Api.groups()
-                  this.$store.commit('setGroups', groups)
-              }
+            const modal = {
+              visible: true,
+              title: "Delete Group",
+              body: `Are you sure you want to delete group ${g.name}? All services attached will be removed from this group.`,
+              btnColor: "btn-danger",
+              btnText: "Delete Group",
+              func: () => this.delete(g),
+            }
+            this.$store.commit("setModal", modal)
           }
       }
   }

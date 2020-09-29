@@ -1,6 +1,6 @@
 <template>
-    <div class="card contain-card text-black-50 bg-white mb-3">
-        <div class="card-header">{{group.id ? `Update ${group.name}` : "Create Group"}}
+    <div class="card contain-card mb-3">
+        <div class="card-header">{{group.id ? `${$t('update')} ${group.name}` : $t('group_create')}}
             <transition name="slide-fade">
                 <button @click="removeEdit" v-if="group.id" class="btn float-right btn-danger btn-sm">
                     {{ $t('close') }}
@@ -10,24 +10,24 @@
 
     <form @submit.prevent="saveGroup">
         <div class="form-group row">
-            <label for="title" class="col-sm-4 col-form-label">{{ $t('dashboard.group') }} {{ $t('dashboard.name') }}</label>
+            <label for="title" class="col-sm-4 col-form-label">{{ $t('group') }} {{ $t('name') }}</label>
             <div class="col-sm-8">
                 <input v-model="group.name" type="text" class="form-control" id="title" placeholder="Group Name" required>
             </div>
         </div>
         <div class="form-group row">
-            <label for="switch-group-public" class="col-sm-4 col-form-label text-capitalize">{{ $t('public') }} {{ $t('dashboard.group') }}</label>
+            <label for="switch-group-public" class="col-sm-4 col-form-label text-capitalize">{{ $t('public') }} {{ $t('group') }}</label>
             <div class="col-md-8 col-xs-12 mt-1">
             <span @click="group.public = !!group.public" class="switch float-left">
                 <input v-model="group.public" type="checkbox" class="switch" id="switch-group-public" :checked="group.public">
-                <label for="switch-group-public">Show group services to the public</label>
+                <label for="switch-group-public">{{$t('group_public_desc')}}</label>
             </span>
             </div>
         </div>
         <div class="form-group row">
             <div class="col-sm-12">
                 <button @click.prevent="saveGroup" type="submit" :disabled="loading || group.name === ''" class="btn btn-block" :class="{'btn-primary': !group.id, 'btn-secondary': group.id}">
-                    {{loading ? "Loading..." : group.id ? "Update Group" : "Create Group"}}
+                    {{loading ? "Loading..." : group.id ? $t('group_update') : $t('group_create')}}
                 </button>
             </div>
         </div>

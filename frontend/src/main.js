@@ -5,12 +5,17 @@ import VueObserveVisibility from 'vue-observe-visibility'
 import VueClipboard from 'vue-clipboard2'
 import VueCookies from 'vue-cookies'
 import VueI18n from 'vue-i18n'
+import * as Sentry from "@sentry/browser";
+import * as Integrations from "@sentry/integrations";
 import router from './routes'
 import "./mixin"
 import "./icons"
-const App = () => import('@/App.vue')
 import store from './store'
 import language from './languages'
+
+const errorReporter = "https://bed4d75404924cb3a799e370733a1b64@sentry.statping.com/3"
+
+const App = () => import(/* webpackChunkName: "index" */ '@/App.vue')
 
 Vue.component('apexchart', VueApexCharts)
 
@@ -27,7 +32,15 @@ const i18n = new VueI18n({
 
 Vue.$cookies.config('3d')
 
-Vue.config.productionTip = false
+Sentry.init({
+  dsn: errorReporter,
+  integrations: [new Integrations.Vue({Vue, attachProps: true, logErrors: true})],
+});
+
+Vue.config.productionTip = process.env.NODE_ENV !== 'production'
+Vue.config.devtools = process.env.NODE_ENV !== 'production'
+Vue.config.performance = process.env.NODE_ENV !== 'production'
+
 new Vue({
   router,
   store,

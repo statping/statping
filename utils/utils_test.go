@@ -123,13 +123,28 @@ func ExampleStringInt() {
 	// Output: 42
 }
 
-func TestTimestamp_Ago(t *testing.T) {
-	now := Timestamp(time.Now())
-	assert.Equal(t, "Just now", now.Ago())
+func TestHashPassword(t *testing.T) {
+	pass := HashPassword("password123")
+	assert.Equal(t, 60, len(pass))
+	assert.True(t, CheckHash("password123", pass))
+	assert.False(t, CheckHash("wrongpasswd", pass))
 }
 
-func TestHashPassword(t *testing.T) {
-	assert.Equal(t, 60, len(HashPassword("password123")))
+func TestHuman(t *testing.T) {
+	assert.Equal(t, "10 seconds", Duration{10 * time.Second}.Human())
+	assert.Equal(t, "1 day 12 hours", Duration{36 * time.Hour}.Human())
+	assert.Equal(t, "45 minutes", Duration{45 * time.Minute}.Human())
+}
+
+func TestSha256Hash(t *testing.T) {
+	assert.Equal(t, "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f", Sha256Hash("password123"))
+}
+
+func TestNotNumbber(t *testing.T) {
+	assert.True(t, NotNumber("notint"))
+	assert.True(t, NotNumber("1293notanint922"))
+	assert.False(t, NotNumber("0"))
+	assert.False(t, NotNumber("5"))
 }
 
 func TestNewSHA1Hash(t *testing.T) {
@@ -177,7 +192,8 @@ func TestHttpRequest(t *testing.T) {
 }
 
 func TestConfigLoad(t *testing.T) {
-	InitLogs()
+	err := InitLogs()
+	require.Nil(t, err)
 	InitEnvs()
 
 	s := Params.GetString
@@ -189,4 +205,13 @@ func TestConfigLoad(t *testing.T) {
 	assert.Equal(t, Directory, s("STATPING_DIR"))
 	assert.True(t, b("SAMPLE_DATA"))
 	assert.True(t, b("ALLOW_REPORTS"))
+}
+
+func TestPerlin(t *testing.T) {
+	p := NewPerlin(2, 2, 5, Now().UnixNano())
+	require.NotNil(t, p)
+
+	for hi := 1.; hi <= 100.; hi++ {
+		assert.NotZero(t, p.Noise1D(hi/500))
+	}
 }

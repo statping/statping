@@ -1,0 +1,230 @@
+@import 'variables';
+@import 'mixin';
+
+HTML,BODY {
+  background-color: $background-color;
+  color: $text-color;
+}
+
+A {
+  color: $text-color;
+}
+
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal {
+  z-index: 999999 !important;
+  display: block;
+}
+
+.modal-dialog {
+  top: 20%;
+}
+
+.modal-header {
+  padding: 0.5rem 1rem;
+}
+
+.modal-footer {
+  padding: 0.5rem 1rem;
+}
+
+.text-muted {
+  color: lighten($text-color, 30%) !important;
+}
+
+.day-success {
+  background-color: $day-success-background;
+}
+
+.day-success:HOVER {
+  background-color: lighten($day-success-background, 2%) !important;
+}
+
+.day-error {
+  background-color: $day-error-background;
+}
+
+.day-error:HOVER {
+  background-color: lighten($day-error-background, 2%) !important;
+}
+
+.contain-card {
+
+  .card-header {
+    font-size: 1.15rem;
+  }
+
+  .dropdown-menu {
+    background-color: rgba(239, 239, 239, 0.65);
+  }
+
+}
+
+.navbar {
+  margin-bottom: 30px;
+  color: $navbar-color;
+  background-color: $navbar-background;
+}
+
+.table {
+  color: $text-color;
+}
+
+.nav-pills {
+  border-radius: $global-border-radius;
+}
+
+.nav-link {
+  color: $navbar-color;
+}
+
+.form-control {
+  border-radius: $global-border-radius;
+}
+
+.card {
+  background-color: $card-background;
+  border: $card-border;
+  box-shadow: $card-shadow;
+}
+
+.card-body {
+  overflow: hidden;
+}
+
+.card-body H4 A {
+  color: $service-title;
+  text-decoration: none;
+}
+
+.card-title A {
+  color: $service-title;
+  text-decoration: none;
+}
+
+.card-body .badge {
+  color: #fff;
+}
+
+.dashboard_card {
+  background-color: $group-list-background;
+  box-shadow: rgba(0,0,0,.05) 0px 2px 3px 1px;
+}
+
+.dashboard_card:HOVER {
+  background-color: lighten($group-list-background, 2%) !important;
+  box-shadow: rgba(0,0,0,.05) 0px 1px 5px 3px;
+  -webkit-transition-duration: 300ms;
+  -moz-transition-duration: 300ms;
+  -o-transition-duration: 300ms;
+  transition-duration: 300ms;
+}
+
+.list-group-item {
+  min-height: 85pt;
+  background-color: $group-list-background;
+}
+
+.list-group-item:HOVER {
+  background-color: lighten($group-list-background, 5%) !important;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px 1px;
+  -webkit-transition-duration: 300ms;
+  -moz-transition-duration: 300ms;
+  -o-transition-duration: 300ms;
+  transition-duration: 300ms;
+  margin-top: -1px;
+  margin-bottom: 1px;
+}
+
+.list-group-item A {
+  color: $group-list-title;
+}
+
+.chart_list_tooltip {
+  height: 30px;
+  font-size: 6pt;
+}
+
+.container {
+  padding-top: 20px;
+  padding-bottom: 25px;
+  max-width: $max-width;
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  background-color: $container-color;
+}
+
+.login_container {
+  border-radius: 5px;
+  box-shadow: 0 .5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  background-color: $container-color;
+}
+
+.footer {
+  text-decoration: none;
+  margin-top: 20px;
+}
+
+.footer .links {
+  color: $footer-text-color;
+  text-decoration: none;
+}
+
+.footer .links:HOVER {
+  color: #8c8c8c;
+}
+
+.footer .statping {
+  color: lighten($footer-text-color, 10%);
+  text-decoration: none;
+}
+.footer .statping:HOVER {
+  color: lighten($footer-text-color, 0%);
+  text-decoration: none;
+}
+
+.no-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.dates{
+  padding:10px 0px;
+  margin:10px 20px;
+  font-weight:600;
+  overflow:auto;
+  color: darken($card-background, 45%);
+  font-size: 22px;
+}
+.dates div{
+  float:left;
+  width:50%;
+  text-align:center;
+  position:relative;
+}
+.dates strong {
+  display:block;
+  color: darken($card-background, 20%);
+  font-size:20px;
+  font-weight:700;
+}
+.dates span{
+  width:1px;
+  height:60px;
+  position:absolute;
+  right:0;
+  top:0;
+  background: darken($card-background, 10%);
+}

@@ -28,6 +28,11 @@ func NewSHA256Hash() string {
 	return fmt.Sprintf("%x", sha256.Sum256(d))
 }
 
+// NewSHA1Hash returns a random SHA1 hash based on a specific length
+func Sha256Hash(val string) string {
+	return fmt.Sprintf("%x", sha256.Sum256([]byte(val)))
+}
+
 var characterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
 // RandomString generates a random string of n length

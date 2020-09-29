@@ -1,16 +1,20 @@
 <template>
-    <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
+    <div class="container col-md-7 col-sm-12 mt-md-5">
+      <div v-if="modal" class="modal-backdrop"></div>
+      <Modal/>
         <TopNav :admin="admin"/>
         <router-view :admin="admin"/>
     </div>
 </template>
 
 <script>
-  const TopNav = () => import('@/components/Dashboard/TopNav')
+  import Modal from "@/components/Elements/Modal";
+  const TopNav = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/TopNav')
 
   export default {
   name: 'Dashboard',
   components: {
+    Modal,
     TopNav,
   },
   data () {
@@ -20,6 +24,9 @@
       }
   },
     computed: {
+      modal() {
+        return this.$store.getters.modal.visible
+      },
       admin() {
         return this.$store.getters.admin
       },
@@ -35,6 +42,3 @@
   }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

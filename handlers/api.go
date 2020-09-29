@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"github.com/statping/statping/types/checkins"
+	"github.com/statping/statping/types/configs"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/groups"
@@ -31,10 +32,12 @@ func apiIndexHandler(r *http.Request) interface{} {
 }
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
-	var err error
-	core.App.ApiSecret = utils.NewSHA256Hash()
-	err = core.App.Update()
-	if err != nil {
+	newApi := utils.Params.GetString("API_SECRET")
+	if newApi == "" {
+		newApi = utils.NewSHA256Hash()
+	}
+	core.App.ApiSecret = newApi
+	if err := core.App.Update(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
@@ -88,10 +91,22 @@ func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 	if c.Domain != app.Domain {
 		app.Domain = c.Domain
 	}
+	if c.Language != app.Language {
+		app.Language = c.Language
+	}
+	utils.Params.Set("LANGUAGE", app.Language)
 	app.UseCdn = null.NewNullBool(c.UseCdn.Bool)
 	app.AllowReports = null.NewNullBool(c.AllowReports.Bool)
-	utils.SentryInit(nil, app.AllowReports.Bool)
-	err = app.Update()
+	utils.SentryInit(app.AllowReports.Bool)
+	if err := app.Update(); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	if err := configs.Save(); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
 	returnJson(core.App, w, r)
 }
 

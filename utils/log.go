@@ -21,7 +21,6 @@ var (
 	LastLines    []*logRow
 	LockLines    sync.Mutex
 	VerboseMode  int
-	Version      string
 	allowReports bool
 )
 
@@ -30,21 +29,15 @@ const (
 	errorReporter = "https://ddf2784201134d51a20c3440e222cebe@sentry.statping.com/4"
 )
 
-func SentryInit(v *string, allow bool) {
+func SentryInit(allow bool) {
 	allowReports = allow
-	if v != nil {
-		if *v == "" {
-			*v = "development"
-		}
-		Version = *v
-	}
 	goEnv := Params.GetString("GO_ENV")
 	allowReports := Params.GetBool("ALLOW_REPORTS")
-	if allowReports || allow || goEnv == "test" {
+	if allow || goEnv == "test" || allowReports {
 		if err := sentry.Init(sentry.ClientOptions{
 			Dsn:              errorReporter,
 			Environment:      goEnv,
-			Release:          Version,
+			Release:          Params.GetString("VERSION"),
 			AttachStacktrace: true,
 		}); err != nil {
 			Log.Errorln(err)
@@ -60,10 +53,17 @@ func SentryErr(err error) {
 	sentry.CaptureException(err)
 }
 
+func sentryTags() map[string]string {
+	val := make(map[string]string)
+	val["database"] = Params.GetString("DB_CONN")
+	return val
+}
+
 func SentryLogEntry(entry *Logger.Entry) {
 	e := sentry.NewEvent()
 	e.Message = entry.Message
-	e.Release = Version
+	e.Tags = sentryTags()
+	e.Release = Params.GetString("VERSION")
 	e.Contexts = entry.Data
 	sentry.CaptureEvent(e)
 }

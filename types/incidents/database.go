@@ -2,6 +2,7 @@ package incidents
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/metrics"
 	"github.com/statping/statping/utils"
 )
@@ -17,7 +18,23 @@ func SetDB(database database.Database) {
 	dbUpdate = database.Model(&IncidentUpdate{})
 }
 
+func (i *Incident) Validate() error {
+	if i.Title == "" {
+		return errors.New("missing title")
+	}
+	return nil
+}
+
+func (i *Incident) BeforeUpdate() error {
+	return i.Validate()
+}
+
+func (i *Incident) BeforeCreate() error {
+	return i.Validate()
+}
+
 func (i *Incident) AfterFind() {
+	db.Model(i).Related(&i.Updates).Order("id DESC")
 	metrics.Query("incident", "find")
 }
 
@@ -31,6 +48,21 @@ func (i *Incident) AfterUpdate() {
 
 func (i *Incident) AfterDelete() {
 	metrics.Query("incident", "delete")
+}
+
+func (i *IncidentUpdate) Validate() error {
+	if i.Message == "" {
+		return errors.New("missing incident update title")
+	}
+	return nil
+}
+
+func (i *IncidentUpdate) BeforeUpdate() error {
+	return i.Validate()
+}
+
+func (i *IncidentUpdate) BeforeCreate() error {
+	return i.Validate()
 }
 
 func (i *IncidentUpdate) AfterFind() {
@@ -64,11 +96,6 @@ func Find(id int64) (*Incident, error) {
 func FindByService(id int64) []*Incident {
 	var incidents []*Incident
 	db.Where("service = ?", id).Find(&incidents)
-	for _, i := range incidents {
-		var updates []*IncidentUpdate
-		dbUpdate.Where("incident = ?", id).Find(&updates)
-		i.AllUpdates = updates
-	}
 	return incidents
 }
 
@@ -79,16 +106,18 @@ func All() []*Incident {
 }
 
 func (i *Incident) Create() error {
-	q := db.Create(i)
-	return q.Error()
+	return db.Create(i).Error()
 }
 
 func (i *Incident) Update() error {
-	q := db.Update(i)
-	return q.Error()
+	return db.Update(i).Error()
 }
 
 func (i *Incident) Delete() error {
-	q := db.Delete(i)
-	return q.Error()
+	for _, u := range i.Updates {
+		if err := u.Delete(); err != nil {
+			return err
+		}
+	}
+	return db.Delete(i).Error()
 }

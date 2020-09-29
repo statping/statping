@@ -1,7 +1,7 @@
 <template>
     <div class="col-12">
-        <div class="card contain-card text-black-50 bg-white mb-4">
-            <div class="card-header">{{ $t('top_nav.users') }}</div>
+        <div class="card contain-card mb-4">
+            <div class="card-header">{{ $t('users') }}</div>
             <div class="card-body pt-0">
         <table class="table table-striped">
             <thead>
@@ -9,6 +9,7 @@
                     <th scope="col">{{$t('username')}}</th>
                     <th scope="col">{{$t('type')}}</th>
                     <th scope="col" class="d-none d-md-table-cell">{{ $t('last_login') }}</th>
+                    <th scope="col" class="d-none d-md-table-cell">Scopes</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -21,7 +22,8 @@
                         {{user.admin ? $t('admin') : $t('user')}}
                     </span>
                 </td>
-                <td class="d-none d-md-table-cell">{{niceDate(user.updated_at)}}</td>
+              <td class="d-none d-md-table-cell">{{niceDate(user.updated_at)}}</td>
+              <td class="d-none d-md-table-cell">{{user.scopes}}</td>
                 <td class="text-right">
                     <div class="btn-group">
                         <a @click.prevent="editUser(user, edit)" href="#" class="btn btn-outline-secondary edit-user">
@@ -45,7 +47,7 @@
 
 <script>
   import Api from "../../API"
-  const FormUser = () => import('@/forms/User')
+  const FormUser = () => import(/* webpackChunkName: "dashboard" */ '@/forms/User')
 
   export default {
   name: 'DashboardUsers',
@@ -72,13 +74,21 @@
       this.user = u
       this.edit = !mode
     },
+    async delete(u) {
+      await Api.user_delete(u.id)
+      const users = await Api.users()
+      this.$store.commit('setUsers', users)
+    },
     async deleteUser(u) {
-      let c = confirm(`Are you sure you want to delete user '${u.username}'?`)
-      if (c) {
-        await Api.user_delete(u.id)
-        const users = await Api.users()
-        this.$store.commit('setUsers', users)
+      const modal = {
+        visible: true,
+        title: "Delete User",
+        body: `Are you sure you want to delete user ${u.username}?`,
+        btnColor: "btn-danger",
+        btnText: "Delete User",
+        func: () => this.delete(u),
       }
+      this.$store.commit("setModal", modal)
     }
   }
 }

@@ -178,32 +178,6 @@ func addDurations(s []series, on bool) int64 {
 	return dur
 }
 
-type ser struct {
-	Time   time.Time
-	Online bool
-}
-
-type UptimeSeries struct {
-	Start    time.Time `json:"start"`
-	End      time.Time `json:"end"`
-	Uptime   int64     `json:"uptime"`
-	Downtime int64     `json:"downtime"`
-	Series   []series  `json:"series"`
-}
-
-type ByTime []ser
-
-func (a ByTime) Len() int           { return len(a) }
-func (a ByTime) Less(i, j int) bool { return a[i].Time.Before(a[j].Time) }
-func (a ByTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-
-type series struct {
-	Start    time.Time `json:"start"`
-	End      time.Time `json:"end"`
-	Duration int64     `json:"duration"`
-	Online   bool      `json:"online"`
-}
-
 // Start will create a channel for the service checking go routine
 func (s *Service) Start() {
 	if s.IsRunning() {
@@ -253,17 +227,14 @@ func SelectAllServices(start bool) (map[int64]*Service, error) {
 		return allServices, nil
 	}
 	for _, s := range all() {
-
-		if start {
-			CheckinProcess(s)
-		}
 		s.Failures = s.AllFailures().LastAmount(limitedFailures)
-		for _, c := range s.Checkins() {
-			s.AllCheckins = append(s.AllCheckins, c)
-		}
+		s.prevOnline = true
 		// collect initial service stats
 		s.UpdateStats()
 		allServices[s.Id] = s
+		if start {
+			CheckinProcess(s)
+		}
 	}
 	return allServices, nil
 }
@@ -326,19 +297,12 @@ func (s *Service) OnlineSince(ago time.Time) float32 {
 	return s.Online24Hours
 }
 
+// Uptime returns the duration of how long the service was online
 func (s Service) Uptime() utils.Duration {
 	return utils.Duration{Duration: utils.Now().Sub(s.LastOffline)}
 }
 
-// Downtime returns the amount of time of a offline service
+// Downtime returns the duration of how long the service has been offline
 func (s Service) Downtime() utils.Duration {
 	return utils.Duration{Duration: utils.Now().Sub(s.LastOnline)}
 }
-
-// ServiceOrder will reorder the services based on 'order_id' (Order)
-type ServiceOrder []Service
-
-// Sort interface for resroting the Services in order
-func (c ServiceOrder) Len() int           { return len(c) }
-func (c ServiceOrder) Swap(i, j int)      { c[int64(i)], c[int64(j)] = c[int64(j)], c[int64(i)] }
-func (c ServiceOrder) Less(i, j int) bool { return c[i].Order < c[j].Order }

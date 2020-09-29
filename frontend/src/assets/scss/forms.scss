@@ -1,0 +1,299 @@
+@import 'variables';
+@import 'mixin';
+
+.copy-btn {
+  position: absolute;
+  right: 0;
+  z-index: 995;
+}
+
+.copy-btn BUTTON {
+  background-color: white;
+  margin: 6px;
+  height: 26px;
+  font-size: 8pt;
+  padding: 5px 7px;
+  border: 1px solid #a7a7a7;
+  border-radius: 4px !important;
+}
+
+.form-control {
+  background-color: $input-background;
+  border: $input-border;
+  color: $input-color;
+}
+
+.form-control:FOCUS {
+  background-color: lighten($input-background, 4%) !important;
+  border: $input-border;
+  color: $input-color;
+}
+
+.form-control[readonly] {
+  background-color: lighten($background-color, 12%) !important;
+  color: lighten($input-color, 30%) !important;
+}
+
+/* The slider itself */
+.slider {
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: 100%; /* Full-width */
+  height: 5px; /* Specified height */
+  background: #d3d3d3; /* Grey background */
+  outline: none; /* Remove outline */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+}
+
+/* Mouse-over effects */
+.slider:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  border-radius: 50%;
+  width: 20px; /* Set a specific slider handle width */
+  height: 20px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.slider::-moz-range-thumb {
+  width: 15px; /* Set a specific slider handle width */
+  height: 15px; /* Slider handle height */
+  background: #4CAF50; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+
+.inputTags-field {
+  border: 0;
+  background-color: transparent;
+  padding-top: .13rem;
+}
+
+input.inputTags-field:focus {
+  outline-width: 0;
+}
+
+.inputTags-list {
+  display: block;
+  width: 100%;
+  min-height: calc(2.25rem + 2px);
+  padding: .2rem .35rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.inputTags-item {
+  background-color: #3aba39;
+  margin-right: 5px;
+  padding: 5px 8px;
+  font-size: 10pt;
+  color: white;
+  border-radius: 4px;
+}
+
+.inputTags-item .close-item {
+  margin-left: 6px;
+  font-size: 13pt;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.switch {
+  font-size: 1rem;
+  position: relative;
+}
+.switch input {
+  position: absolute;
+  height: 1px;
+  width: 1px;
+  background: none;
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  overflow: hidden;
+  padding: 0;
+}
+.switch input + label {
+  position: relative;
+  min-width: calc(calc(2.375rem * .8) * 2);
+  border-radius: calc(2.375rem * .8);
+  height: calc(2.375rem * .8);
+  line-height: calc(2.375rem * .8);
+  display: inline-block;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  vertical-align: middle;
+  text-indent: calc(calc(calc(2.375rem * .8) * 2) + .5rem);
+}
+.switch input + label::before,
+.switch input + label::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(calc(2.375rem * .8) * 2);
+  bottom: 0;
+  display: block;
+}
+.switch input + label::before {
+  right: 0;
+  background-color: #dee2e6;
+  border-radius: calc(2.375rem * .8);
+  transition: 0.2s all;
+}
+.switch input + label::after {
+  top: 2px;
+  left: 2px;
+  width: calc(calc(2.375rem * .8) - calc(2px * 2));
+  height: calc(calc(2.375rem * .8) - calc(2px * 2));
+  border-radius: 50%;
+  background-color: white;
+  transition: 0.2s all;
+}
+.switch-rd-gr input:checked + label::before {
+  background-color: #29b10c !important;
+}
+.switch input:checked + label::before {
+  background-color: #08d;
+}
+.switch input:checked + label::after {
+  margin-left: calc(2.375rem * .8);
+}
+.switch input:focus + label::before {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(0, 136, 221, 0.25);
+}
+.switch input:disabled + label {
+  color: #868e96;
+  cursor: not-allowed;
+}
+.switch input:disabled + label::before {
+  background-color: #e9ecef;
+}
+.switch.switch-sm {
+  font-size: 0.875rem;
+}
+.switch.switch-sm input + label {
+  min-width: calc(calc(1.9375rem * .8) * 2);
+  height: calc(1.9375rem * .8);
+  line-height: calc(1.9375rem * .8);
+  text-indent: calc(calc(calc(1.9375rem * .8) * 2) + .5rem);
+}
+.switch.switch-sm input + label::before {
+  width: calc(calc(1.9375rem * .8) * 2);
+}
+.switch.switch-sm input + label::after {
+  width: calc(calc(1.9375rem * .8) - calc(2px * 2));
+  height: calc(calc(1.9375rem * .8) - calc(2px * 2));
+}
+.switch.switch-sm input:checked + label::after {
+  margin-left: calc(1.9375rem * .8);
+}
+.switch.switch-lg {
+  font-size: 1.25rem;
+}
+.switch.switch-lg input + label {
+  min-width: calc(calc(3rem * .8) * 2);
+  height: calc(3rem * .8);
+  line-height: calc(3rem * .8);
+  text-indent: calc(calc(calc(3rem * .8) * 2) + .5rem);
+}
+.switch.switch-lg input + label::before {
+  width: calc(calc(3rem * .8) * 2);
+}
+.switch.switch-lg input + label::after {
+  width: calc(calc(3rem * .8) - calc(2px * 2));
+  height: calc(calc(3rem * .8) - calc(2px * 2));
+}
+.switch.switch-lg input:checked + label::after {
+  margin-left: calc(3rem * .8);
+}
+.switch + .switch {
+  margin-left: 1rem;
+}
+
+
+.CodeMirror {
+  /* Bootstrap Settings */
+  box-sizing: border-box;
+  margin: 0;
+  font: inherit;
+  overflow: auto;
+  display: block;
+  width: 100%;
+  padding: 0px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+  /* Code Mirror Settings */
+  font-family: monospace;
+  position: relative;
+  height:80vh;
+}
+
+.CodeMirror-focused {
+  /* Bootstrap Settings */
+  border-color: #66afe9;
+  outline: 0;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+  background-color: $nav-tab-color;
+}
+
+.nav-pills A {
+  color: $text-color;
+}
+
+.nav-link.active A:HOVER {
+  color: white !important;
+}
+
+.nav-pills I {
+  margin-right: 10px;
+}
+
+
+.drag_icon {
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+  width: 25px;
+  height: 25px;
+  display: inline-block;
+  margin-right: 5px;
+  margin-left: -10px;
+  text-align: center;
+  color: #b1b1b1;
+}
+
+/* (Optional) Apply a "closed-hand" cursor during drag operation. */
+.drag_icon:active {
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}

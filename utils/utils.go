@@ -10,37 +10,23 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/ararog/timeago"
 )
 
 var (
 	// Directory returns the current path or the STATPING_DIR environment variable
-	Directory   string
-	disableLogs bool
+	Directory string
 )
-
-type env struct {
-	data interface{}
-}
 
 func NotNumber(val string) bool {
 	_, err := strconv.ParseInt(val, 10, 64)
 	return err != nil
-}
-
-func (e *env) Duration() time.Duration {
-	t, err := time.ParseDuration(e.data.(string))
-	if err != nil {
-		Log.Errorln(err)
-	}
-	return t
 }
 
 // ToInt converts a int to a string
@@ -91,21 +77,9 @@ func ToString(s interface{}) string {
 	}
 }
 
-type Timestamp time.Time
-type Timestamper interface {
-	Ago() string
-}
-
-// Ago returns a human readable timestamp based on the Timestamp (time.Time) interface
-func (t Timestamp) Ago() string {
-	got, _ := timeago.TimeAgoWithTime(time.Now(), time.Time(t))
-	return got
-}
-
 // Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings
 //		in, out, err := Command("sass assets/scss assets/css/base.css")
 func Command(name string, args ...string) (string, string, error) {
-	Log.Info("Running command: " + name + " " + strings.Join(args, " "))
 	testCmd := exec.Command(name, args...)
 	var stdout, stderr []byte
 	var errStdout, errStderr error
@@ -188,19 +162,21 @@ func DurationReadable(d time.Duration) string {
 // // body - The body or form data to send with HTTP request
 // // timeout - Specific duration to timeout on. time.Duration(30 * time.Seconds)
 // // You can use a HTTP Proxy if you HTTP_PROXY environment variable
-func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool, customTLS *tls.Config) ([]byte, *http.Response, error) {
+func HttpRequest(endpoint, method string, contentType interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool, customTLS *tls.Config) ([]byte, *http.Response, error) {
 	var err error
 	var req *http.Request
 	if method == "" {
 		method = "GET"
 	}
 	t1 := Now()
-	if req, err = http.NewRequest(method, url, body); err != nil {
+	if req, err = http.NewRequest(method, endpoint, body); err != nil {
 		return nil, nil, err
 	}
+	// set default headers so end user can overwrite them if needed
 	req.Header.Set("User-Agent", "Statping")
-	if content != nil {
-		req.Header.Set("Content-Type", content.(string))
+	req.Header.Set("Statping-Version", Params.GetString("VERSION"))
+	if contentType != nil {
+		req.Header.Set("Content-Type", contentType.(string))
 	}
 
 	verifyHost := req.URL.Hostname()
@@ -218,11 +194,7 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 		}
 	}
 
-	req.Header.Set("User-Agent", "Statping")
-	req.Header.Set("Statping-Version", Version)
-
 	var resp *http.Response
-
 	dialer := &net.Dialer{
 		Timeout:   timeout,
 		KeepAlive: timeout,
@@ -243,6 +215,13 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 			addr = strings.Split(req.URL.Host, ":")[0] + addr[strings.LastIndex(addr, ":"):]
 			return dialer.DialContext(ctx, network, addr)
 		},
+	}
+	if Params.GetString("HTTP_PROXY") != "" {
+		proxyUrl, err := url.Parse(Params.GetString("HTTP_PROXY"))
+		if err != nil {
+			return nil, nil, err
+		}
+		transport.Proxy = http.ProxyURL(proxyUrl)
 	}
 	if customTLS != nil {
 		transport.TLSClientConfig.RootCAs = customTLS.RootCAs
@@ -270,8 +249,8 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 	}
 
 	// record HTTP metrics
-	metrics.Histo("bytes", float64(len(contents)), url, method)
-	metrics.Histo("duration", Now().Sub(t1).Seconds(), url, method)
+	metrics.Histo("bytes", float64(len(contents)), endpoint, method)
+	metrics.Histo("duration", Now().Sub(t1).Seconds(), endpoint, method)
 
 	return contents, resp, err
 }

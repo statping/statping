@@ -68,7 +68,7 @@ func RenameDirectory(fromDir string, toDir string) error {
 // SaveFile will create a new file with data inside it
 //		SaveFile("newfile.json", []byte('{"data": "success"}')
 func SaveFile(filename string, data []byte) error {
-	err := ioutil.WriteFile(filename, data, os.ModePerm)
+	err := ioutil.WriteFile(filename, data, os.FileMode(0755))
 	return err
 }
 

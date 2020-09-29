@@ -169,10 +169,6 @@ func Available(db Database) bool {
 	return true
 }
 
-func AmountGreaterThan1000(db *gorm.DB) *gorm.DB {
-	return db.Where("service = ?", 1000)
-}
-
 func (it *Db) MultipleSelects(args ...string) Database {
 	joined := strings.Join(args, ", ")
 	return it.Select(joined)
@@ -181,6 +177,7 @@ func (it *Db) MultipleSelects(args ...string) Database {
 type Db struct {
 	Database *gorm.DB
 	Type     string
+	ReadOnly bool
 }
 
 // Openw is a drop-in replacement for Open()
@@ -223,6 +220,9 @@ func OpenTester() (Database, error) {
 	default:
 		dbString = fmt.Sprintf("file:%s?mode=memory&cache=shared", utils.RandomString(12))
 	}
+	if utils.Params.IsSet("DB_DSN") {
+		dbString = utils.Params.GetString("DB_DSN")
+	}
 	newDb, err := Openw(testDB, dbString)
 	if err != nil {
 		return nil, err
@@ -239,6 +239,7 @@ func Wrap(db *gorm.DB) Database {
 	return &Db{
 		Database: db,
 		Type:     db.Dialect().GetName(),
+		ReadOnly: utils.Params.GetBool("READ_ONLY"),
 	}
 }
 
@@ -379,14 +380,26 @@ func (it *Db) Related(value interface{}, foreignKeys ...string) Database {
 }
 
 func (it *Db) FirstOrInit(out interface{}, where ...interface{}) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.FirstOrInit(out, where...))
 }
 
 func (it *Db) FirstOrCreate(out interface{}, where ...interface{}) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.FirstOrCreate(out, where...))
 }
 
 func (it *Db) Update(attrs ...interface{}) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.Update(attrs...))
 }
 
@@ -395,22 +408,42 @@ func (it *Db) Updates(values interface{}, ignoreProtectedAttrs ...bool) Database
 }
 
 func (it *Db) UpdateColumn(attrs ...interface{}) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.UpdateColumn(attrs...))
 }
 
 func (it *Db) UpdateColumns(values interface{}) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.UpdateColumns(values))
 }
 
 func (it *Db) Save(value interface{}) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.Save(value))
 }
 
 func (it *Db) Create(value interface{}) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.Create(value))
 }
 
 func (it *Db) Delete(value interface{}, where ...interface{}) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.Delete(value, where...))
 }
 
@@ -435,14 +468,26 @@ func (it *Db) Debug() Database {
 }
 
 func (it *Db) Begin() Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.Begin())
 }
 
 func (it *Db) Commit() Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.Commit())
 }
 
 func (it *Db) Rollback() Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.Rollback())
 }
 
@@ -455,14 +500,26 @@ func (it *Db) RecordNotFound() bool {
 }
 
 func (it *Db) CreateTable(values ...interface{}) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.CreateTable(values...))
 }
 
 func (it *Db) DropTable(values ...interface{}) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.DropTable(values...))
 }
 
 func (it *Db) DropTableIfExists(values ...interface{}) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.DropTableIfExists(values...))
 }
 
@@ -471,26 +528,50 @@ func (it *Db) HasTable(value interface{}) bool {
 }
 
 func (it *Db) AutoMigrate(values ...interface{}) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.AutoMigrate(values...))
 }
 
 func (it *Db) ModifyColumn(column string, typ string) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.ModifyColumn(column, typ))
 }
 
 func (it *Db) DropColumn(column string) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.DropColumn(column))
 }
 
 func (it *Db) AddIndex(indexName string, columns ...string) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.AddIndex(indexName, columns...))
 }
 
 func (it *Db) AddUniqueIndex(indexName string, columns ...string) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.AddUniqueIndex(indexName, columns...))
 }
 
 func (it *Db) RemoveIndex(indexName string) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.RemoveIndex(indexName))
 }
 
@@ -519,6 +600,10 @@ func (it *Db) SetJoinTableHandler(source interface{}, column string, handler gor
 }
 
 func (it *Db) AddForeignKey(field string, dest string, onDelete string, onUpdate string) Database {
+	if it.ReadOnly {
+		it.Database.Error = nil
+		return Wrap(it.Database)
+	}
 	return Wrap(it.Database.AddForeignKey(field, dest, onDelete, onUpdate))
 }
 

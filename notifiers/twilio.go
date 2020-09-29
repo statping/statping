@@ -8,6 +8,7 @@ import (
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/notifier"
+	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net/url"
@@ -25,6 +26,10 @@ func (t *twilio) Select() *notifications.Notification {
 	return t.Notification
 }
 
+func (t *twilio) Valid(values notifications.Values) error {
+	return nil
+}
+
 var Twilio = &twilio{&notifications.Notification{
 	Method:      "twilio",
 	Title:       "Twilio",
@@ -33,8 +38,8 @@ var Twilio = &twilio{&notifications.Notification{
 	AuthorUrl:   "https://github.com/hunterlong",
 	Icon:        "far fa-comment-alt",
 	Delay:       time.Duration(10 * time.Second),
-	SuccessData: "Your service '{{.Service.Name}}' is currently online!",
-	FailureData: "Your service '{{.Service.Name}}' is currently offline!",
+	SuccessData: null.NewNullString("Your service '{{.Service.Name}}' is currently online!"),
+	FailureData: null.NewNullString("Your service '{{.Service.Name}}' is currently offline!"),
 	DataType:    "text",
 	Limits:      15,
 	Form: []notifications.NotificationForm{{
@@ -66,15 +71,15 @@ var Twilio = &twilio{&notifications.Notification{
 
 // Send will send a HTTP Post to the Twilio SMS API. It accepts type: string
 func (t *twilio) sendMessage(message string) (string, error) {
-	twilioUrl := fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%s/Messages.json", t.ApiKey)
+	twilioUrl := fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%s/Messages.json", t.ApiKey.String)
 
 	v := url.Values{}
-	v.Set("To", "+"+t.Var1)
-	v.Set("From", "+"+t.Var2)
+	v.Set("To", "+"+t.Var1.String)
+	v.Set("From", "+"+t.Var2.String)
 	v.Set("Body", message)
 	rb := strings.NewReader(v.Encode())
 
-	authHeader := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", t.ApiKey, t.ApiSecret)))
+	authHeader := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", t.ApiKey.String, t.ApiSecret.String)))
 
 	contents, _, err := utils.HttpRequest(twilioUrl, "POST", "application/x-www-form-urlencoded", []string{"Authorization=Basic " + authHeader}, rb, 10*time.Second, true, nil)
 	success, _ := twilioSuccess(contents)
@@ -91,13 +96,13 @@ func (t *twilio) sendMessage(message string) (string, error) {
 
 // OnFailure will trigger failing service
 func (t *twilio) OnFailure(s services.Service, f failures.Failure) (string, error) {
-	msg := ReplaceVars(t.FailureData, s, f)
+	msg := ReplaceVars(t.FailureData.String, s, f)
 	return t.sendMessage(msg)
 }
 
 // OnSuccess will trigger successful service
 func (t *twilio) OnSuccess(s services.Service) (string, error) {
-	msg := ReplaceVars(t.SuccessData, s, failures.Failure{})
+	msg := ReplaceVars(t.SuccessData.String, s, failures.Failure{})
 	return t.sendMessage(msg)
 }
 

@@ -5,19 +5,21 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/statping/statping/handlers"
 	"github.com/statping/statping/source"
-	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/configs"
 	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/types/groups"
-	"github.com/statping/statping/types/messages"
 	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/types/users"
 	"github.com/statping/statping/utils"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
+)
+
+var (
+	importAll *bool
 )
 
 func assetsCli() error {
@@ -34,12 +36,81 @@ func assetsCli() error {
 	return nil
 }
 
+func systemctlCli(dir string, uninstall bool, port int64) error {
+	location := "/etc/systemd/system/statping.service"
+
+	if uninstall {
+		fmt.Println("systemctl stop statping")
+		if _, _, err := utils.Command("systemctl", "stop", "statping"); err != nil {
+			log.Errorln(err)
+		}
+		fmt.Println("systemctl disable statping")
+		if _, _, err := utils.Command("systemctl", "disable", "statping"); err != nil {
+			log.Errorln(err)
+		}
+		fmt.Println("Deleting systemctl: ", location)
+		if err := utils.DeleteFile(location); err != nil {
+			log.Errorln(err)
+		}
+		return nil
+	}
+	if ok := utils.FolderExists(dir); !ok {
+		return errors.New("directory does not exist: " + dir)
+	}
+
+	binPath, err := os.Executable()
+	if err != nil {
+		return err
+	}
+
+	config := []byte(`[Unit]
+Description=Statping Server
+After=network.target
+After=systemd-user-sessions.service
+After=network-online.target
+
+[Service]
+Type=simple
+Restart=always
+Environment="STATPING_DIR=` + dir + `"
+Environment="ALLOW_REPORTS=true"
+ExecStart=` + binPath + ` --port=` + utils.ToString(port) + `
+WorkingDirectory=` + dir + `
+
+[Install]
+WantedBy=multi-user.target"
+`)
+	fmt.Println("Saving systemctl service to: ", location)
+	fmt.Printf("Using directory %s for Statping data\n", dir)
+	fmt.Printf("Running on port %d\n", port)
+	fmt.Printf("\n\n%s\n\n", string(config))
+	if err := utils.SaveFile(location, config); err != nil {
+		return err
+	}
+	fmt.Println("systemctl daemon-reload")
+	if _, _, err := utils.Command("systemctl", "daemon-reload"); err != nil {
+		return err
+	}
+	fmt.Println("systemctl enable statping")
+	if _, _, err := utils.Command("systemctl", "enable", "statping.service"); err != nil {
+		return err
+	}
+	fmt.Println("systemctl start statping")
+	if _, _, err := utils.Command("systemctl", "start", "statping"); err != nil {
+		return err
+	}
+	fmt.Println("Statping was will auto start on reboots")
+	fmt.Println("systemctl service: ", location)
+
+	return nil
+}
+
 func exportCli(args []string) error {
-	filename := fmt.Sprintf("%s/statping-%s.json", utils.Directory, time.Now().Format("01-02-2006-1504"))
+	filename := filepath.Join(utils.Directory, time.Now().Format("01-02-2006-1504")+".json")
 	if len(args) == 1 {
 		filename = fmt.Sprintf("%s/%s", utils.Directory, args)
 	}
-	var data []byte
+	var data *handlers.ExportData
 	if err := utils.InitLogs(); err != nil {
 		return err
 	}
@@ -56,10 +127,10 @@ func exportCli(args []string) error {
 	if _, err := services.SelectAllServices(false); err != nil {
 		return err
 	}
-	if data, err = ExportSettings(); err != nil {
+	if data, err = handlers.ExportSettings(); err != nil {
 		return fmt.Errorf("could not export settings: %v", err.Error())
 	}
-	if err = utils.SaveFile(filename, data); err != nil {
+	if err = utils.SaveFile(filename, data.JSON()); err != nil {
 		return fmt.Errorf("could not write file statping-export.json: %v", err.Error())
 	}
 	log.Infoln("Statping export file saved to ", filename)
@@ -73,7 +144,7 @@ func sassCli() error {
 	if err := source.Assets(); err != nil {
 		return err
 	}
-	if err := source.CompileSASS(source.DefaultScss...); err != nil {
+	if err := source.CompileSASS(); err != nil {
 		return err
 	}
 	return nil
@@ -128,6 +199,10 @@ func resetCli() error {
 
 func envCli() error {
 	fmt.Println("Statping Configuration")
+	fmt.Printf("Process ID:          %d\n", os.Getpid())
+	fmt.Printf("Running as user id:  %d\n", os.Getuid())
+	fmt.Printf("Running as group id: %d\n", os.Getgid())
+	fmt.Printf("Statping Directory:  %s\n", utils.Directory)
 	for k, v := range utils.Params.AllSettings() {
 		fmt.Printf("%s=%v\n", strings.ToUpper(k), v)
 	}
@@ -153,20 +228,54 @@ func onceCli() error {
 func importCli(args []string) error {
 	var err error
 	var data []byte
-	filename := args[1]
-	if data, err = ioutil.ReadFile(filename); err != nil {
+	if len(args) < 1 {
+		return errors.New("invalid command arguments")
+	}
+	if data, err = ioutil.ReadFile(args[0]); err != nil {
 		return err
 	}
-	var exportData ExportData
+	var exportData handlers.ExportData
 	if err = json.Unmarshal(data, &exportData); err != nil {
 		return err
 	}
 	log.Printf("=== %s ===\n", exportData.Core.Name)
-	log.Printf("Services:   %d\n", len(exportData.Services))
-	log.Printf("Checkins:   %d\n", len(exportData.Checkins))
-	log.Printf("Groups:     %d\n", len(exportData.Groups))
-	log.Printf("Messages:   %d\n", len(exportData.Messages))
-	log.Printf("Users:      %d\n", len(exportData.Users))
+	if exportData.Config != nil {
+		log.Printf("Configs:     %s\n", exportData.Config.DbConn)
+		if exportData.Config.DbUser != "" {
+			log.Printf("   - Host:   %s\n", exportData.Config.DbHost)
+			log.Printf("   - User:   %s\n", exportData.Config.DbUser)
+		}
+	}
+	if len(exportData.Services) > 0 {
+		log.Printf("Services:   %d\n", len(exportData.Services))
+	}
+	if len(exportData.Checkins) > 0 {
+		log.Printf("Checkins:   %d\n", len(exportData.Checkins))
+	}
+	if len(exportData.Groups) > 0 {
+		log.Printf("Groups:     %d\n", len(exportData.Groups))
+	}
+	if len(exportData.Messages) > 0 {
+		log.Printf("Messages:   %d\n", len(exportData.Messages))
+	}
+	if len(exportData.Incidents) > 0 {
+		log.Printf("Incidents:  %d\n", len(exportData.Incidents))
+	}
+	if len(exportData.Users) > 0 {
+		log.Printf("Users:      %d\n", len(exportData.Users))
+	}
+
+	if exportData.Config != nil {
+		if ask("Create config.yml file from Configs?") {
+			log.Printf("Database Host:   	%s\n", exportData.Config.DbHost)
+			log.Printf("Database Port:   	%d\n", exportData.Config.DbPort)
+			log.Printf("Database User:   	%s\n", exportData.Config.DbUser)
+			log.Printf("Database Password:   %s\n", exportData.Config.DbPass)
+			if err := exportData.Config.Save(utils.Directory); err != nil {
+				return err
+			}
+		}
+	}
 
 	config, err := configs.LoadConfigs(configFile)
 	if err != nil {
@@ -175,21 +284,22 @@ func importCli(args []string) error {
 	if err = configs.ConnectConfigs(config, false); err != nil {
 		return err
 	}
-	if data, err = ExportSettings(); err != nil {
-		return fmt.Errorf("could not export settings: %v", err.Error())
+	if ask("Create database rows and sample data?") {
+		if err := config.ResetCore(); err != nil {
+			return err
+		}
 	}
-
 	if ask("Import Core settings?") {
 		c := exportData.Core
 		if err := c.Update(); err != nil {
-			return err
+			log.Errorln(err)
 		}
 	}
 	for _, s := range exportData.Groups {
 		if ask(fmt.Sprintf("Import Group '%s'?", s.Name)) {
 			s.Id = 0
 			if err := s.Create(); err != nil {
-				return err
+				log.Errorln(err)
 			}
 		}
 	}
@@ -197,7 +307,7 @@ func importCli(args []string) error {
 		if ask(fmt.Sprintf("Import Service '%s'?", s.Name)) {
 			s.Id = 0
 			if err := s.Create(); err != nil {
-				return err
+				log.Errorln(err)
 			}
 		}
 	}
@@ -205,7 +315,7 @@ func importCli(args []string) error {
 		if ask(fmt.Sprintf("Import Checkin '%s'?", s.Name)) {
 			s.Id = 0
 			if err := s.Create(); err != nil {
-				return err
+				log.Errorln(err)
 			}
 		}
 	}
@@ -213,7 +323,7 @@ func importCli(args []string) error {
 		if ask(fmt.Sprintf("Import Message '%s'?", s.Title)) {
 			s.Id = 0
 			if err := s.Create(); err != nil {
-				return err
+				log.Errorln(err)
 			}
 		}
 	}
@@ -221,7 +331,7 @@ func importCli(args []string) error {
 		if ask(fmt.Sprintf("Import User '%s'?", s.Username)) {
 			s.Id = 0
 			if err := s.Create(); err != nil {
-				return err
+				log.Errorln(err)
 			}
 		}
 	}
@@ -230,6 +340,7 @@ func importCli(args []string) error {
 }
 
 func ask(format string) bool {
+
 	fmt.Printf(fmt.Sprintf(format + " [y/N]: "))
 	reader := bufio.NewReader(os.Stdin)
 	text, _ := reader.ReadString('\n')
@@ -375,15 +486,16 @@ type gitUploader struct {
 
 // ExportChartsJs renders the charts for the index page
 
-type ExportData struct {
-	Core      *core.Core          `json:"core"`
-	Services  []services.Service  `json:"services"`
-	Messages  []*messages.Message `json:"messages"`
-	Checkins  []*checkins.Checkin `json:"checkins"`
-	Users     []*users.User       `json:"users"`
-	Groups    []*groups.Group     `json:"groups"`
-	Notifiers []core.AllNotifiers `json:"notifiers"`
-}
+//type ExportData struct {
+//	Config    *configs.DbConfig   `json:"config"`
+//	Core      *core.Core          `json:"core"`
+//	Services  []services.Service  `json:"services"`
+//	Messages  []*messages.Message `json:"messages"`
+//	Checkins  []*checkins.Checkin `json:"checkins"`
+//	Users     []*users.User       `json:"users"`
+//	Groups    []*groups.Group     `json:"groups"`
+//	Notifiers []core.AllNotifiers `json:"notifiers"`
+//}
 
 // ExportSettings will export a JSON file containing all of the settings below:
 // - Core
@@ -393,28 +505,35 @@ type ExportData struct {
 // - Services
 // - Groups
 // - Messages
-func ExportSettings() ([]byte, error) {
-	c, err := core.Select()
-	if err != nil {
-		return nil, err
-	}
-	var srvs []services.Service
-	for _, s := range services.AllInOrder() {
-		s.Failures = nil
-		srvs = append(srvs, s)
-	}
-	data := ExportData{
-		Core:      c,
-		Notifiers: core.App.Notifications,
-		Checkins:  checkins.All(),
-		Users:     users.All(),
-		Services:  srvs,
-		Groups:    groups.All(),
-		Messages:  messages.All(),
-	}
-	export, err := json.Marshal(data)
-	return export, err
-}
+//func ExportSettings() ([]byte, error) {
+//	c, err := core.Select()
+//	if err != nil {
+//		return nil, err
+//	}
+//	var srvs []services.Service
+//	for _, s := range services.AllInOrder() {
+//		s.Failures = nil
+//		srvs = append(srvs, s)
+//	}
+//
+//	cfg, err := configs.LoadConfigs(configFile)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	data := ExportData{
+//		Config:    cfg,
+//		Core:      c,
+//		Notifiers: core.App.Notifications,
+//		Checkins:  checkins.All(),
+//		Users:     users.All(),
+//		Services:  srvs,
+//		Groups:    groups.All(),
+//		Messages:  messages.All(),
+//	}
+//	export, err := json.Marshal(data)
+//	return export, err
+//}
 
 // ExportIndexHTML returns the HTML of the index page as a string
 //func ExportIndexHTML() []byte {

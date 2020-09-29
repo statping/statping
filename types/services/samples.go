@@ -44,18 +44,16 @@ func Example(online bool) Service {
 		NotifyAfter:         0,
 		notifyAfterCount:    0,
 		AllowNotifications:  null.NewNullBool(true),
-		UserNotified:        false,
 		UpdateNotify:        null.NewNullBool(true),
 		DownText:            "The service was responding with 500 status code",
-		SuccessNotified:     false,
 		LastStatusCode:      200,
 		Failures:            nil,
-		AllCheckins:         nil,
 		LastLookupTime:      4600,
 		LastLatency:         124399,
 		LastCheck:           utils.Now().Add(-37 * time.Second),
 		LastOnline:          utils.Now().Add(-37 * time.Second),
 		LastOffline:         utils.Now().Add(-75 * time.Second),
+		prevOnline:          false,
 	}
 }
 
@@ -173,6 +171,18 @@ func Samples() error {
 		CreatedAt: createdOn,
 	}
 	if err := s6.Create(); err != nil {
+		return err
+	}
+
+	s7 := &Service{
+		Name:      "Static Service",
+		Domain:    "none",
+		Type:      "static",
+		Order:     7,
+		Public:    null.NewNullBool(true),
+		CreatedAt: createdOn,
+	}
+	if err := s7.Create(); err != nil {
 		return err
 	}
 

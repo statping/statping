@@ -21,9 +21,12 @@ var (
 )
 
 func TestWebhookNotifier(t *testing.T) {
-	t.SkipNow()
 	err := utils.InitLogs()
 	require.Nil(t, err)
+
+	t.Parallel()
+	t.SkipNow()
+
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
@@ -31,10 +34,10 @@ func TestWebhookNotifier(t *testing.T) {
 	core.Example()
 
 	t.Run("Load webhooker", func(t *testing.T) {
-		Webhook.Host = webhookTestUrl
-		Webhook.Var1 = "POST"
-		Webhook.Var2 = webhookMessage
-		Webhook.ApiKey = "application/json"
+		Webhook.Host = null.NewNullString(webhookTestUrl)
+		Webhook.Var1 = null.NewNullString("POST")
+		Webhook.Var2 = null.NewNullString(webhookMessage)
+		Webhook.ApiKey = null.NewNullString("application/json")
 		Webhook.Enabled = null.NewNullBool(true)
 
 		Add(Webhook)

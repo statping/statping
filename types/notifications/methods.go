@@ -14,30 +14,26 @@ func (n Notification) Name() string {
 }
 
 // LastSent returns a time.Duration of the last sent notification for the notifier
-func (n Notification) LastSent() time.Duration {
-	return time.Since(n.lastSent)
+func (n Notification) LastSentDur() time.Duration {
+	return time.Since(n.LastSent)
 }
 
 func (n *Notification) CanSend() bool {
 	if !n.Enabled.Bool {
 		return false
 	}
-
 	// the last sent notification was past 1 minute (limit per minute)
-	if n.lastSent.Add(60 * time.Minute).Before(utils.Now()) {
-		if n.lastSentCount != 0 {
-			n.lastSentCount--
+	if n.LastSent.Add(60 * time.Minute).Before(utils.Now()) {
+		if n.LastSentCount != 0 {
+			n.LastSentCount--
 		}
 	}
 
 	// dont send if already beyond the notifier's limit
-	if n.lastSentCount >= n.Limits {
+	if n.LastSentCount >= n.Limits {
 		return false
 	}
 
-	// action to do since notifier is able to send
-	n.lastSentCount++
-	n.lastSent = utils.Now()
 	return true
 }
 
@@ -45,49 +41,24 @@ func (n *Notification) CanSend() bool {
 func (n *Notification) GetValue(dbField string) string {
 	switch strings.ToLower(dbField) {
 	case "host":
-		return n.Host
+		return n.Host.String
 	case "port":
-		return fmt.Sprintf("%d", n.Port)
+		return fmt.Sprintf("%d", n.Port.Int64)
 	case "username":
-		return n.Username
+		return n.Username.String
 	case "password":
-		return n.Password
+		return n.Password.String
 	case "var1":
-		return n.Var1
+		return n.Var1.String
 	case "var2":
-		return n.Var2
+		return n.Var2.String
 	case "api_key":
-		return n.ApiKey
+		return n.ApiKey.String
 	case "api_secret":
-		return n.ApiSecret
+		return n.ApiSecret.String
 	case "limits":
 		return utils.ToString(n.Limits)
 	default:
 		return ""
-	}
-}
-
-// start will start the go routine for the notifier queue
-func (n *Notification) Start() {
-	n.Running = make(chan bool)
-}
-
-// close will stop the go routine for queue
-func (n *Notification) Close() {
-	if n.IsRunning() {
-		close(n.Running)
-	}
-}
-
-// IsRunning will return true if the notifier is currently running a queue
-func (n *Notification) IsRunning() bool {
-	if n.Running == nil {
-		return false
-	}
-	select {
-	case <-n.Running:
-		return false
-	default:
-		return true
 	}
 }

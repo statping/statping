@@ -1,19 +1,26 @@
 <template>
   <div class="col-12">
-    <div class="card contain-card text-black-50 bg-white mb-4">
-      <div class="card-header">{{ $t('top_nav.announcements') }}</div>
+    <div class="card contain-card mb-4">
+      <div class="card-header">{{ $t('announcements') }}</div>
       <div class="card-body pt-0">
-        <table class="table table-striped">
+
+          <div v-if="messages.length === 0">
+              <div class="alert alert-dark d-block mt-3 mb-0">
+                  You currently don't have any Announcements! Create one using the form below.
+              </div>
+          </div>
+
+        <table v-else class="table table-striped">
           <thead>
             <tr>
-                <th scope="col">{{ $t('dashboard.title') }}</th>
-                <th scope="col" class="d-none d-md-table-cell">{{ $tc('dashboard.service', 1) }}</th>
-                <th scope="col" class="d-none d-md-table-cell">{{ $t('dashboard.begins') }}</th>
+                <th scope="col">{{ $t('title') }}</th>
+                <th scope="col" class="d-none d-md-table-cell">{{ $tc('service', 1) }}</th>
+                <th scope="col" class="d-none d-md-table-cell">{{ $t('begins') }}</th>
                 <th scope="col"></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="message in $store.getters.messages" v-bind:key="message.id">
+            <tr v-for="message in messages" v-bind:key="message.id">
               <td>{{message.title}}</td>
               <td class="d-none d-md-table-cell">
                 <router-link :to="serviceLink(service(message.service))">{{serviceName(service(message.service))}}</router-link>
@@ -40,7 +47,7 @@
 
 <script>
   import Api from "../../API"
-  import FormMessage from "../../forms/Message";
+  const FormMessage = () => import(/* webpackChunkName: "dashboard" */ "../../forms/Message");
 
   export default {
   name: 'DashboardMessages',
@@ -51,6 +58,11 @@
       message: {}
     }
   },
+    computed: {
+        messages() {
+          return this.$store.getters.messages
+        }
+    },
   methods: {
     goto(to) {
       this.$router.push(to)
@@ -69,13 +81,21 @@
     serviceName (service) {
       return service.name || "Global Message"
     },
+    async delete(m) {
+      await Api.message_delete(m.id)
+      const messages = await Api.messages()
+      this.$store.commit('setMessages', messages)
+    },
     async deleteMessage(m) {
-      let c = confirm(`Are you sure you want to delete message '${m.title}'?`)
-      if (c) {
-        await Api.message_delete(m.id)
-        const messages = await Api.messages()
-        this.$store.commit('setMessages', messages)
+      const modal = {
+        visible: true,
+        title: "Delete Announcement",
+        body: `Are you sure you want to delete Announcement ${m.title}?`,
+        btnColor: "btn-danger",
+        btnText: "Delete Announcement",
+        func: () => this.delete(m),
       }
+      this.$store.commit("setModal", modal)
     }
   }
 }

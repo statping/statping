@@ -13,11 +13,11 @@
 </template>
 
 <script>
-  import FormGroup from "../../forms/Group";
+  const FormGroup = () => import(/* webpackChunkName: "dashboard" */ "../../forms/Group");
   import Api from "../../API";
-  import ToggleSwitch from "../../forms/ToggleSwitch";
-  import draggable from 'vuedraggable'
-  import FormService from "../../forms/Service";
+  const ToggleSwitch = () => import(/* webpackChunkName: "dashboard" */ "../../forms/ToggleSwitch");
+  const draggable = () => import(/* webpackChunkName: "dashboard" */ 'vuedraggable')
+  const FormService = () => import(/* webpackChunkName: "dashboard" */ "../../forms/Service");
 
   export default {
     name: 'EditService',

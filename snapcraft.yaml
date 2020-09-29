@@ -13,15 +13,31 @@ type: app
 confinement: strict
 grade: stable
 
-parts:
-  statping:
-    plugin: dump
-    source: ./build/statping-linux.tar.gz
+architectures:
+  - build-on: amd64
+  - build-on: armhf
+  - build-on: arm64
+  - build-on: i386
 
 apps:
   statping:
     command: statping
     plugs:
       - home
-      - network-bind
       - network
+      - network-bind
+
+parts:
+  statping:
+    source: .
+    plugin: nil
+    override-build: |
+      apt-get update
+      apt-get install -y curl
+      curl -o- -L https://statping.com/install.sh | bash
+      mv /usr/local/bin/statping ./
+    build-packages:
+      - git
+      - gcc
+      - make
+      - sed

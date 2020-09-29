@@ -29,16 +29,20 @@ var (
 
 func init() {
 	stopped = make(chan bool, 1)
-	core.New(VERSION)
+	core.New(VERSION, COMMIT)
 	utils.InitEnvs()
+	utils.Params.Set("VERSION", VERSION)
+	utils.Params.Set("COMMIT", COMMIT)
 
 	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(updateCmd)
 	rootCmd.AddCommand(assetsCmd)
 	rootCmd.AddCommand(exportCmd)
 	rootCmd.AddCommand(importCmd)
 	rootCmd.AddCommand(sassCmd)
 	rootCmd.AddCommand(onceCmd)
 	rootCmd.AddCommand(envCmd)
+	rootCmd.AddCommand(systemctlCmd)
 	rootCmd.AddCommand(resetCmd)
 
 	parseFlags(rootCmd)
@@ -96,39 +100,8 @@ func start() {
 		exit(err)
 	}
 
-	if !confgs.Db.HasTable("core") {
-		var srvs int64
-		if confgs.Db.HasTable(&services.Service{}) {
-			confgs.Db.Model(&services.Service{}).Count(&srvs)
-			if srvs > 0 {
-				exit(errors.Wrap(err, "there are already services setup."))
-				return
-			}
-		}
-
-		if err := confgs.DropDatabase(); err != nil {
-			exit(errors.Wrap(err, "error dropping database"))
-		}
-
-		if err := confgs.CreateDatabase(); err != nil {
-			exit(errors.Wrap(err, "error creating database"))
-		}
-
-		if err := configs.CreateAdminUser(confgs); err != nil {
-			exit(errors.Wrap(err, "error creating default admin user"))
-		}
-
-		if utils.Params.GetBool("SAMPLE_DATA") {
-			log.Infoln("Adding Sample Data")
-			if err := configs.TriggerSamples(); err != nil {
-				exit(errors.Wrap(err, "error adding sample data"))
-			}
-		} else {
-			if err := core.Samples(); err != nil {
-				exit(errors.Wrap(err, "error added core details"))
-			}
-		}
-
+	if err = confgs.ResetCore(); err != nil {
+		exit(err)
 	}
 
 	if err = confgs.DatabaseChanges(); err != nil {
@@ -175,20 +148,20 @@ func InitApp() error {
 	if _, err := core.Select(); err != nil {
 		return err
 	}
+	// init Sentry error monitoring (its useful)
+	utils.SentryInit(core.App.AllowReports.Bool)
 	// init prometheus metrics
 	metrics.InitMetrics()
+	// connect each notifier, added them into database if needed
+	notifiers.InitNotifiers()
 	// select all services in database and store services in a mapping of Service pointers
 	if _, err := services.SelectAllServices(true); err != nil {
 		return err
 	}
 	// start routines for each service checking process
 	services.CheckServices()
-	// connect each notifier, added them into database if needed
-	notifiers.InitNotifiers()
 	// start routine to delete old records (failures, hits)
 	go database.Maintenance()
-	// init Sentry error monitoring (its useful)
-	utils.SentryInit(&VERSION, core.App.AllowReports.Bool)
 	core.App.Setup = true
 	core.App.Started = utils.Now()
 	return nil

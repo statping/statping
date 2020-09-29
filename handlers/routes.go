@@ -5,9 +5,11 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/statping/statping/source"
+	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/utils"
 	"net/http"
 	"net/http/pprof"
+	"time"
 
 	_ "github.com/statping/statping/types/metrics"
 )
@@ -37,7 +39,7 @@ func Router() *mux.Router {
 	}
 
 	bPath := utils.Params.GetString("BASE_PATH")
-	sentryHandler := sentryhttp.New(sentryhttp.Options{})
+	sentryHandler := sentryhttp.New(sentryhttp.Options{Timeout: 5 * time.Second})
 
 	if bPath != "" {
 		basePath = "/" + bPath + "/"
@@ -68,23 +70,21 @@ func Router() *mux.Router {
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
 
-		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("css"))))
-		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("js"))))
-		r.PathPrefix("/scss/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("scss"))))
-		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("favicon"))))
+		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, staticAssets("css")))
+		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, staticAssets("favicon")))
 		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, indexHandler))
 		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, indexHandler))
 	} else {
 		tmplFileSrv := http.FileServer(source.TmplBox.HTTPBox())
 		tmplBoxHandler := http.StripPrefix(basePath, tmplFileSrv)
 
-		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
-		r.PathPrefix("/scss/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
-		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
-		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
+		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, tmplFileSrv))
+		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, tmplFileSrv))
 		r.PathPrefix("/robots.txt").Handler(tmplBoxHandler)
 		r.PathPrefix("/banner.png").Handler(tmplBoxHandler)
 	}
+
+	r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
 
 	api := r.NewRoute().Subrouter()
 	api.Use(apiMiddleware)
@@ -101,6 +101,10 @@ func Router() *mux.Router {
 	api.Handle("/api/core", authenticated(apiCoreHandler, false)).Methods("POST")
 	api.Handle("/api/logs", authenticated(logsHandler, false)).Methods("GET")
 	api.Handle("/api/logs/last", authenticated(logsLineHandler, false)).Methods("GET")
+	api.Handle("/api/settings/import", authenticated(settingsImportHandler, false)).Methods("POST")
+	api.Handle("/api/settings/export", authenticated(settingsExportHandler, false)).Methods("GET")
+	api.Handle("/api/settings/configs", authenticated(configsViewHandler, false)).Methods("GET")
+	api.Handle("/api/settings/configs", authenticated(configsSaveHandler, false)).Methods("POST")
 
 	// API OAUTH Routes
 	api.Handle("/api/oauth", scoped(apiOAuthHandler)).Methods("GET")
@@ -127,10 +131,12 @@ func Router() *mux.Router {
 	api.Handle("/api/services/{id}", scoped(apiServiceHandler)).Methods("GET")
 	api.Handle("/api/reorder/services", authenticated(reorderServiceHandler, false)).Methods("POST")
 	api.Handle("/api/services/{id}", authenticated(apiServiceUpdateHandler, false)).Methods("POST")
+	api.Handle("/api/services/{id}", authenticated(apiServicePatchHandler, false)).Methods("PATCH")
 	api.Handle("/api/services/{id}", authenticated(apiServiceDeleteHandler, false)).Methods("DELETE")
 	api.Handle("/api/services/{id}/failures", scoped(apiServiceFailuresHandler)).Methods("GET")
 	api.Handle("/api/services/{id}/failures", authenticated(servicesDeleteFailuresHandler, false)).Methods("DELETE")
 	api.Handle("/api/services/{id}/hits", scoped(apiServiceHitsHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/hits", authenticated(apiServiceHitsDeleteHandler, false)).Methods("DELETE")
 
 	// API SERVICE CHART DATA Routes
 	api.Handle("/api/services/{id}/hits_data", cached("30s", "application/json", apiServiceDataHandler)).Methods("GET")
@@ -152,6 +158,7 @@ func Router() *mux.Router {
 	// API USER Routes
 	api.Handle("/api/users", authenticated(apiAllUsersHandler, false)).Methods("GET")
 	api.Handle("/api/users", authenticated(apiCreateUsersHandler, false)).Methods("POST")
+	api.Handle("/api/users/token", http.HandlerFunc(apiCheckUserTokenHandler)).Methods("POST")
 	api.Handle("/api/users/{id}", authenticated(apiUserHandler, false)).Methods("GET")
 	api.Handle("/api/users/{id}", authenticated(apiUserUpdateHandler, false)).Methods("POST")
 	api.Handle("/api/users/{id}", authenticated(apiUserDeleteHandler, false)).Methods("DELETE")
@@ -179,16 +186,20 @@ func Router() *mux.Router {
 	// API Generic Routes
 	r.Handle("/metrics", readOnly(promhttp.Handler(), false))
 	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
-	r.Handle("/.well-known/", http.StripPrefix("/.well-known/", http.FileServer(http.Dir(dir+"/.well-known"))))
-	r.NotFoundHandler = http.HandlerFunc(error404Handler)
+	r.NotFoundHandler = http.HandlerFunc(baseHandler)
 	return r
 }
 
 func resetRouter() {
+	log.Infoln("Restarting HTTP Router")
 	router = Router()
 	httpServer.Handler = router
 }
 
 func resetCookies() {
-	jwtKey = []byte(utils.NewSHA256Hash())
+	if core.App == nil {
+		jwtKey = []byte(utils.NewSHA256Hash())
+		return
+	}
+	jwtKey = []byte(utils.Sha256Hash(core.App.ApiSecret))
 }

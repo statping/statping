@@ -1,7 +1,7 @@
 <template>
     <div>
         <form @submit.prevent="saveNotifier">
-    <div class="card contain-card text-black-50 bg-white mb-3">
+    <div class="card contain-card mb-3">
         <div class="card-header text-capitalize">
             {{notifier.title}}
             <span @click="enableToggle" class="switch switch-sm switch-rd-gr float-right">
@@ -14,10 +14,10 @@
 
             <div v-if="notifier.method==='mobile'">
                 <div class="form-group row mt-3">
-                    <label for="domain" class="col-sm-4 col-form-label">Statping Domain</label>
+                    <label for="statping_domain" class="col-sm-4 col-form-label">Statping Domain</label>
                     <div class="col-sm-8">
                         <div class="input-group">
-                            <input v-bind:value="$store.getters.core.domain" type="text" class="form-control" id="domain" readonly>
+                            <input v-bind:value="$store.getters.core.domain" type="text" class="form-control" id="statping_domain" readonly>
                             <div class="input-group-append copy-btn">
                                 <button @click.prevent="copy($store.getters.core.domain)" class="btn btn-outline-secondary" type="button">Copy</button>
                             </div>
@@ -69,7 +69,7 @@
         </div>
     </div>
 
-        <div v-if="notifier.data_type" class="card text-black-50 bg-white mb-3">
+                    <div v-if="notifier.data_type" class="card mb-3">
             <div class="card-header text-capitalize">
                 <font-awesome-icon @click="expanded = !expanded" :icon="expanded ? 'minus' : 'plus'" class="mr-2 pointer"/>
                 {{notifier.title}} Outgoing Request
@@ -103,7 +103,7 @@
 
     </form>
 
-        <div v-if="error || success" class="card text-black-50 bg-white mb-3">
+        <div v-if="error || success" class="card mb-3">
             <div class="card-body">
 
             <div v-if="error && !success" class="alert alert-danger col-12" role="alert">
@@ -119,7 +119,7 @@
             </div>
         </div>
 
-        <div class="card text-black-50 bg-white mb-3">
+        <div class="card mb-3">
             <div class="card-body">
                 <div class="row">
                     <div class="col-12 col-sm-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
@@ -128,12 +128,37 @@
                         </button>
                     </div>
                     <div class="col-12 col-md-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
-                        <button @click.prevent="testNotifier('success')" :disabled="loadingTest" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
+                        <button @click.prevent="testNotifier('success')" :disabled="loadingTest" class="btn btn-secondary btn-block text-capitalize test-notifier">
                             <font-awesome-icon v-if="loadingTest" icon="circle-notch" class="mr-2" spin/>{{loadingTest ? "Loading..." : "Test Success"}}</button>
                     </div>
                     <div class="col-12 col-md-4 mb-2 mb-sm-0 mt-2 mt-sm-0">
-                        <button @click.prevent="testNotifier('failure')" :disabled="loadingTest" class="btn btn-outline-dark btn-block text-capitalize test-notifier">
+                        <button @click.prevent="testNotifier('failure')" :disabled="loadingTest" class="btn btn-secondary btn-block text-capitalize test-notifier">
                             <font-awesome-icon v-if="loadingTest" icon="circle-notch" class="mr-2" spin/>{{loadingTest ? "Loading..." : "Test Failure"}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="notifier.logs" class="card mb-3">
+            <div class="card-header text-capitalize">
+                <font-awesome-icon @click="expanded_logs = !expanded_logs" :icon="expanded_logs ? 'minus' : 'plus'" class="mr-2 pointer"/>
+                {{notifier.title}} Logs
+                <span class="badge badge-info float-right text-uppercase mt-1">{{notifier.logs.length}}</span>
+            </div>
+            <div class="card-body" :class="{'d-none': !expanded_logs}">
+
+                <div v-for="(log, i) in notifier.logs.reverse()" class="alert" :class="{'alert-danger': log.error, 'alert-dark': !log.success && !log.error, 'alert-success': log.success && !log.error}">
+                        <span class="d-block">
+                            Service {{log.service}}
+                            {{log.success ? "Success Triggered" : "Failure Triggered"}}
+                        </span>
+
+                    <div v-if="log.message !== ''" class="bg-white p-3 small mt-2">
+                        <code>{{log.message}}</code>
+                    </div>
+
+                    <div class="row mt-2">
+                        <span class="col-6 small">{{niceDate(log.created_at)}}</span>
                     </div>
                 </div>
 
@@ -148,16 +173,19 @@
 </template>
 
 <script>
-  import Api from "../API";
+import Api from "../API";
+/* webpackChunkName: "codemirror" */
+import {codemirror} from 'vue-codemirror'
+/* webpackChunkName: "codemirror" */
+import 'codemirror/mode/javascript/javascript.js'
+/* webpackChunkName: "codemirror" */
+import 'codemirror/lib/codemirror.css'
+/* webpackChunkName: "codemirror" */
+import 'codemirror/theme/neat.css'
+/* webpackChunkName: "codemirror" */
+import '../codemirror_json'
 
-  const beautify = require('js-beautify').js
-
-  // require component
-  import { codemirror } from 'vue-codemirror'
-  import 'codemirror/mode/javascript/javascript.js'
-  import 'codemirror/lib/codemirror.css'
-  import 'codemirror/theme/neat.css'
-  import '../codemirror_json'
+const beautify = require('js-beautify').js
 
 export default {
     name: 'Notifier',
@@ -183,6 +211,7 @@ export default {
             success: false,
             saved: false,
           expanded: false,
+          expanded_logs: false,
           success_data: null,
           failure_data: null,
             form: {},
@@ -300,10 +329,3 @@ export default {
     }
 }
 </script>
-<style scoped>
-    .CodeMirror {
-        border: 1px solid #eee;
-        height: 550px;
-        font-size: 9pt;
-    }
-</style>

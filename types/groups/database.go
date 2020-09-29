@@ -17,6 +17,13 @@ func SetDB(database database.Database) {
 	db = database.Model(&Group{})
 }
 
+func (g *Group) Validate() error {
+	if g.Name == "" {
+		return errors.New("group name is empty")
+	}
+	return nil
+}
+
 func (g *Group) AfterFind() {
 	metrics.Query("group", "find")
 }
@@ -27,6 +34,14 @@ func (g *Group) AfterUpdate() {
 
 func (g *Group) AfterDelete() {
 	metrics.Query("group", "delete")
+}
+
+func (g *Group) BeforeUpdate() error {
+	return g.Validate()
+}
+
+func (g *Group) BeforeCreate() error {
+	return g.Validate()
 }
 
 func (g *Group) AfterCreate() {

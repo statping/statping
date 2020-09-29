@@ -1,3 +1,97 @@
+# 0.90.69 (09-18-2020)
+- Fixed issue with service view not loading. #808 #811 #800
+
+# 0.90.68 (09-17-2020)
+- Added DB_DSN env for mysql, postgres or sqlite DSN database connection string
+- Added READ_ONLY env for a read only connection to the database
+- Added Custom OAuth OpenID toggle switch in settings (appends 'openid' in scope)
+- Fixed Custom OAuth response_type issue
+- Added Configs tab in Settings to edit the config.yml from frontend
+
+# 0.90.67 (09-14-2020)
+- Modified core settings to update config.yml on save
+- Modified Theme Editor to restart the HTTP router on create/delete (fixing 404's)
+
+# 0.90.66 (09-08-2020)
+- Added Import and Export views in Dashboard
+- Modified services list sparkline to use start/end of day timestamp
+- Modified i18n language files, added go generate script to automatically translate
+
+# 0.90.65 (09-01-2020)
+- Fixed issue with dashboard not logging in (notifier panic)
+- Modified static email templates to github.com/statping/emails
+- Modified Regenerate API function to keep API_SECRET env
+- Added DEMO_MODE env variable, if true, 'admin' cannot be deleted
+- Modified Service sparklines on Dashboard
+- Added modal popup for UI deletes/edits
+
+# 0.90.64 (08-18-2020)
+- Modified max-width for container to 1012px, larger UI
+- Added failure sparklines in the Services list view
+- Added "Update Available" alert on the top of Settings if new version is available
+- Added Version and Github Commit hash to left navigation on Settings page
+- Added "reason" for failures (will be used for more custom notification messages) [regex, lookup, timeout, connection, close, status_code]
+- Added Help page that is generated from Statping's Wiki repo on build
+- Modified Service Group failures on index page to show 90 days of failures
+- Modified Service view page, updated Latency and Ping charts, added failures below
+- Modified Service chart on index page to show ping data along with latency
+- Added AWS SNS Notifier
+- Modified dashboard services UI
+- Modified service.Failures API to include 32 failures (max)
+
+# 0.90.63 (08-17-2020)
+- Modified build process to use xgo for all arch builds
+- Modified Statping's Push Notifications server notifier to match with Firebase/gorush params
+
+# 0.90.62 (08-07-2020)
+- Added Notification logs
+- Fixed issues with Notifer After (x) failures for notifications
+- Modified notifications to not send on initial startup
+- Updated Incident UI
+- Added additional testing for notifications
+- Modified SCSS/SASS files to be generated from 1, main.scss to main.css
+- Modified index page to use /assets directory for assets, (main.css, style.css)
+- Modified index page to use CDN asset paths
+- Fixed New Checkin form
+- Modified email notifier template to be rendered from MJML (using go generate)
+- Modified database relationships with services using gorm
+- Modified "statping env" command to show user/group ID
+- Removed "js" folder when exporting assets, js files are always version of release, not static JS files
+
+# 0.90.61 (07-22-2020)
+- Modified sass layouts, organized and split up sections
+- Modified Checkins to seconds rather than milliseconds (for cronjob)
+- Modified Service View page to show data inside cards
+- Fixed issue with uptime_data sending incorrect start/end timestamps
+- Modified http cache to bypass if url has a "v" query param
+- Added "Static Services" (a fake service that requires you to update the online/offline status)
+- Added Update Static Service PATCH route (/api/services/{id})
+- Modified SASS api endpoints (base, layout, forms, mixins, mobile, variables)
+- Added additional testing
+- Modified node version from 10.x to 12.18.2
+- Modified Notifier's struct values to be NullString and NullInt to allow empty values
+- Added Search ability to Logs in UI
+- Fixed issue with Incidents and Checkins not being deleted once service is deleted
+
+# 0.90.60 (07-15-2020)
+- Added LETSENCRYPT_ENABLE (boolean) env to enable/disable letsencrypt SSL
+
+# 0.90.59 (07-14-2020)
+- Added LetsEncrypt SSL Generator by using LETSENCRYPT_HOST and LETSENCRYPT_EMAIL envs.
+- Modified JWT token key to be sha256 of API Secret
+- Modified github actions to build multi-arch Docker images
+- Added "update" command to install latest version
+- Fixed dashboard uptime_data API request to request correct start/time timestamp
+
+# 0.90.58 (07-09-2020)
+- Fixed ICMP latency/ping durations
+- Fixed webhook notifier
+- Modified file structure for Vue admin dashboard components.
+- Added Gotify notifier
+
+# 0.90.57 (07-04-2020)
+- Fixed login issue
+
 # 0.90.56 (06-25-2020)
 - Modified metrics now include service name for each service metric
 - Added switch for true/false notifier values

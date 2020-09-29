@@ -26,7 +26,16 @@ func findIncident(r *http.Request) (*incidents.Incident, int64, error) {
 
 func apiServiceIncidentsHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	incids := incidents.FindByService(utils.ToInt(vars["id"]))
+	id := vars["id"]
+	if utils.NotNumber(id) {
+		sendErrorJson(errors.NotNumber, w, r)
+		return
+	}
+	incids := incidents.FindByService(utils.ToInt(id))
+	if incids == nil {
+		sendErrorJson(errors.Missing(&incidents.Incident{}, id), w, r)
+		return
+	}
 	returnJson(incids, w, r)
 }
 
@@ -36,7 +45,7 @@ func apiIncidentUpdatesHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	returnJson(incid.Updates(), w, r)
+	returnJson(incid.Updates, w, r)
 }
 
 func apiCreateIncidentUpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -54,8 +63,7 @@ func apiCreateIncidentUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	update.IncidentId = incid.Id
 
-	err = update.Create()
-	if err != nil {
+	if err := update.Create(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
@@ -74,8 +82,7 @@ func apiCreateIncidentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	incident.ServiceId = service.Id
-	err = incident.Create()
-	if err != nil {
+	if err := incident.Create(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
@@ -93,8 +100,7 @@ func apiIncidentUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updates := incident.Updates()
-	sendJsonAction(updates, "update", w, r)
+	sendJsonAction(incident.Updates, "update", w, r)
 }
 
 func apiDeleteIncidentHandler(w http.ResponseWriter, r *http.Request) {
@@ -103,8 +109,7 @@ func apiDeleteIncidentHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	err = incident.Delete()
-	if err != nil {
+	if err := incident.Delete(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
@@ -118,8 +123,7 @@ func apiDeleteIncidentUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
-	err = update.Delete()
-	if err != nil {
+	if err := update.Delete(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}

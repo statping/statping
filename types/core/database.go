@@ -12,6 +12,18 @@ var db database.Database
 
 func SetDB(database database.Database) {
 	db = database.Model(&Core{})
+	c, err := Select()
+	if err != nil {
+		utils.Log.Errorln(err)
+		return
+	}
+	apiEnv := utils.Params.GetString("API_SECRET")
+	if c.ApiSecret != apiEnv && apiEnv != "" {
+		c.ApiSecret = apiEnv
+		if err := c.Update(); err != nil {
+			utils.Log.Errorln(err)
+		}
+	}
 }
 
 func (c *Core) AfterFind() {
@@ -20,7 +32,6 @@ func (c *Core) AfterFind() {
 
 func Select() (*Core, error) {
 	var c Core
-	// SelectCore will return the CoreApp global variable and the settings/configs for Statping
 	if err := db.DB().Ping(); err != nil {
 		return nil, errors.New("database has not been initiated yet.")
 	}
@@ -43,10 +54,22 @@ func Select() (*Core, error) {
 	if utils.Params.GetString("LANGUAGE") != "" {
 		App.Language = utils.Params.GetString("LANGUAGE")
 	}
+	if utils.Params.GetString("API_SECRET") != "" {
+		App.ApiSecret = utils.Params.GetString("API_SECRET")
+	}
+	App.Version = utils.Params.GetString("VERSION")
+	App.Commit = utils.Params.GetString("COMMIT")
 	return App, q.Error()
 }
 
 func (c *Core) Create() error {
+	if c.ApiSecret == "" {
+		c.ApiSecret = utils.RandomString(16)
+		apiEnv := utils.Params.GetString("API_SECRET")
+		if apiEnv != "" {
+			c.ApiSecret = apiEnv
+		}
+	}
 	q := db.Create(c)
 	utils.Log.Infof("API Key created: %s", c.ApiSecret)
 	return q.Error()

@@ -26,6 +26,10 @@ func (l *lineNotifier) Select() *notifications.Notification {
 	return l.Notification
 }
 
+func (l *lineNotifier) Valid(values notifications.Values) error {
+	return nil
+}
+
 var LineNotify = &lineNotifier{&notifications.Notification{
 	Method:      lineNotifyMethod,
 	Title:       "LINE Notify",
@@ -46,7 +50,7 @@ var LineNotify = &lineNotifier{&notifications.Notification{
 func (l *lineNotifier) sendMessage(message string) (string, error) {
 	v := url.Values{}
 	v.Set("message", message)
-	headers := []string{fmt.Sprintf("Authorization=Bearer %v", l.ApiSecret)}
+	headers := []string{fmt.Sprintf("Authorization=Bearer %v", l.ApiSecret.String)}
 	content, _, err := utils.HttpRequest("https://notify-api.line.me/api/notify", "POST", "application/x-www-form-urlencoded", headers, strings.NewReader(v.Encode()), time.Duration(10*time.Second), true, nil)
 	return string(content), err
 }

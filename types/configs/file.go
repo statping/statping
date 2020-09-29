@@ -8,8 +8,9 @@ import (
 	"strings"
 )
 
-var log = utils.Log
+var log = utils.Log.WithField("type", "configs")
 
+// ConnectConfigs will connect to the database and save the config.yml file
 func ConnectConfigs(configs *DbConfig, retry bool) error {
 	err := Connect(configs, retry)
 	if err != nil {
@@ -21,18 +22,8 @@ func ConnectConfigs(configs *DbConfig, retry bool) error {
 	return nil
 }
 
-func LoadConfigs(cfgFile string) (*DbConfig, error) {
-	writeAble, err := utils.DirWritable(utils.Directory)
-	if err != nil {
-		return nil, err
-	}
-	if !writeAble {
-		return nil, errors.Errorf("Directory %s is not writable!", utils.Directory)
-	}
-
-	return LoadConfigFile(cfgFile)
-}
-
+// findDbFile will attempt to find the "statping.db" database file in the current
+// working directory, or from STATPING_DIR env.
 func findDbFile(configs *DbConfig) (string, error) {
 	location := utils.Directory + "/" + SqliteFilename
 	if configs == nil {
@@ -49,6 +40,7 @@ func findDbFile(configs *DbConfig) (string, error) {
 	return location, nil
 }
 
+// findSQLin walks the current walking directory for statping.db
 func findSQLin(path string) (string, error) {
 	filename := SqliteFilename
 	var found []string

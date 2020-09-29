@@ -56,7 +56,9 @@ func RunHTTPServer() error {
 	resetCookies()
 	httpError = make(chan error)
 
-	if usingSSL {
+	if utils.Params.GetBool("LETSENCRYPT_ENABLE") {
+		go startLetsEncryptServer(ip)
+	} else if usingSSL {
 		go startSSLServer(ip)
 	} else {
 		go startServer(host)

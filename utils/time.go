@@ -22,7 +22,3 @@ func (d Duration) Human() string {
 func FormatDuration(d time.Duration) string {
 	return durafmt.ParseShort(d).LimitFirstN(3).String()
 }
-
-func rev(f float64) float64 {
-	return f * -1
-}

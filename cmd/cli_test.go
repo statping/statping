@@ -2,10 +2,12 @@ package main
 
 import (
 	"bytes"
+	"github.com/statping/statping/source"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -18,16 +20,15 @@ func init() {
 }
 
 func TestStatpingDirectory(t *testing.T) {
-	dir := utils.Directory
-	require.NotContains(t, dir, "/cmd")
-	require.NotEmpty(t, dir)
-
 	dir = utils.Params.GetString("STATPING_DIR")
 	require.NotContains(t, dir, "/cmd")
 	require.NotEmpty(t, dir)
 }
 
 func TestEnvCLI(t *testing.T) {
+	os.Setenv("API_SECRET", "demoapisecret123")
+	os.Setenv("SASS", "/usr/local/bin/sass")
+
 	cmd := rootCmd
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
@@ -39,6 +40,12 @@ func TestEnvCLI(t *testing.T) {
 	assert.Contains(t, string(out), VERSION)
 	assert.Contains(t, utils.Directory, string(out))
 	assert.Contains(t, "SAMPLE_DATA=true", string(out))
+	assert.Contains(t, "API_SECRET=demoapisecret123", string(out))
+	assert.Contains(t, "STATPING_DIR="+dir, string(out))
+	assert.Contains(t, "SASS=/usr/local/bin/sass", string(out))
+
+	os.Unsetenv("API_SECRET")
+	os.Unsetenv("SASS")
 }
 
 func TestVersionCLI(t *testing.T) {
@@ -58,16 +65,26 @@ func TestAssetsCLI(t *testing.T) {
 	b := bytes.NewBufferString("")
 	cmd.SetOut(b)
 	cmd.SetArgs([]string{"assets"})
-	cmd.Execute()
+	err := cmd.Execute()
+	require.Nil(t, err)
 	out, err := ioutil.ReadAll(b)
 	assert.Nil(t, err)
 	assert.Contains(t, string(out), VERSION)
-	assert.FileExists(t, utils.Directory+"/assets/css/main.css")
-	assert.FileExists(t, utils.Directory+"/assets/css/style.css")
-	assert.FileExists(t, utils.Directory+"/assets/css/vendor.css")
-	assert.FileExists(t, utils.Directory+"/assets/scss/base.scss")
-	assert.FileExists(t, utils.Directory+"/assets/scss/mobile.scss")
-	assert.FileExists(t, utils.Directory+"/assets/scss/variables.scss")
+	for _, f := range source.RequiredFiles {
+		assert.FileExists(t, utils.Directory+"/assets/"+f)
+	}
+}
+
+func TestUpdateCLI(t *testing.T) {
+	cmd := rootCmd
+	b := bytes.NewBufferString("")
+	cmd.SetOut(b)
+	cmd.SetArgs([]string{"update"})
+	err := cmd.Execute()
+	require.Nil(t, err)
+	out, err := ioutil.ReadAll(b)
+	require.Nil(t, err)
+	assert.Contains(t, string(out), VERSION)
 }
 
 func TestHelpCLI(t *testing.T) {

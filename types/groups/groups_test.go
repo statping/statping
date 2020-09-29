@@ -106,6 +106,11 @@ func TestDelete(t *testing.T) {
 	assert.Len(t, all, 1)
 }
 
+func TestSamples(t *testing.T) {
+	require.Nil(t, Samples())
+	assert.Len(t, All(), 4)
+}
+
 func TestClose(t *testing.T) {
 	assert.Nil(t, db.Close())
 }

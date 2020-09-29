@@ -39,7 +39,7 @@ type GroupQuery struct {
 }
 
 func (b GroupQuery) Find(data interface{}) error {
-	return b.db.Find(data).Error()
+	return b.db.Order("id DESC").Find(data).Error()
 }
 
 func (b GroupQuery) Database() Database {
@@ -70,27 +70,28 @@ func (t *TimeVar) ToValues() ([]*TimeValue, error) {
 }
 
 // GraphData will return all hits or failures
-func (g *GroupQuery) GraphData(by By) ([]*TimeValue, error) {
-	dbQuery := g.db.MultipleSelects(
-		g.db.SelectByTime(g.Group),
+func (b *GroupQuery) GraphData(by By) ([]*TimeValue, error) {
+	b.db = b.db.MultipleSelects(
+		b.db.SelectByTime(b.Group),
 		by.String(),
 	).Group("timeframe").Order("timeframe", true)
 
-	g.db = dbQuery
-
-	caller, err := g.ToTimeValue()
+	caller, err := b.ToTimeValue()
 	if err != nil {
 		return nil, err
 	}
 
-	if g.FillEmpty {
-		return caller.FillMissing(g.Start, g.End)
+	if b.FillEmpty {
+		return caller.FillMissing(b.Start, b.End)
 	}
 	return caller.ToValues()
 }
 
-func (g *GroupQuery) ToTimeValue() (*TimeVar, error) {
-	rows, err := g.db.Rows()
+// ToTimeValue will format the SQL rows into a JSON format for the API.
+// [{"timestamp": "2006-01-02T15:04:05Z", "amount": 468293}]
+// TODO redo this entire function, use better SQL query to group by time
+func (b *GroupQuery) ToTimeValue() (*TimeVar, error) {
+	rows, err := b.db.Rows()
 	if err != nil {
 		return nil, err
 	}
@@ -101,8 +102,8 @@ func (g *GroupQuery) ToTimeValue() (*TimeVar, error) {
 		if err := rows.Scan(&timeframe, &amount); err != nil {
 			log.Error(err, timeframe)
 		}
-		trueTime, _ := g.db.ParseTime(timeframe)
-		newTs := types.FixedTime(trueTime, g.Group)
+		trueTime, _ := b.db.ParseTime(timeframe)
+		newTs := types.FixedTime(trueTime, b.Group)
 
 		tv := &TimeValue{
 			Timeframe: newTs,
@@ -110,33 +111,32 @@ func (g *GroupQuery) ToTimeValue() (*TimeVar, error) {
 		}
 		data = append(data, tv)
 	}
-	return &TimeVar{g, data}, nil
+	return &TimeVar{b, data}, nil
 }
 
 func (t *TimeVar) FillMissing(current, end time.Time) ([]*TimeValue, error) {
 	timeMap := make(map[string]int64)
 	var validSet []*TimeValue
-	dur := t.g.Group
 	for _, v := range t.data {
 		timeMap[v.Timeframe] = v.Amount
 	}
 
-	currentStr := types.FixedTime(current, t.g.Group)
-
 	for {
+		currentStr := types.FixedTime(current, t.g.Group)
+
 		var amount int64
 		if timeMap[currentStr] != 0 {
 			amount = timeMap[currentStr]
 		}
+
 		validSet = append(validSet, &TimeValue{
 			Timeframe: currentStr,
 			Amount:    amount,
 		})
+		current = current.Add(t.g.Group)
 		if current.After(end) {
 			break
 		}
-		current = current.Add(dur)
-		currentStr = types.FixedTime(current, t.g.Group)
 	}
 
 	return validSet, nil
@@ -233,10 +233,6 @@ func ParseQueries(r *http.Request, o isObject) (*GroupQuery, error) {
 	if endField == 0 {
 		query.End = utils.Now()
 	}
-	if query.End.After(utils.Now()) {
-		query.End = utils.Now()
-	}
-
 	if query.Limit != 0 {
 		q = q.Limit(query.Limit)
 	}

@@ -5,9 +5,14 @@ on:
       - '*'         # matches every branch
       - '*/*'       # matches every branch containing a single '/'
       - '!master'   # excludes master
+      - '!dev'      # excludes dev
   pull_request:
     branches:
-      - dev
+      - '*'         # matches every branch
+      - '*/*'       # matches every branch containing a single '/'
+      - '!master'   # excludes master
+      - '!dev'      # excludes dev
+
 
 jobs:
   compile:
@@ -18,7 +23,7 @@ jobs:
           go-version: '1.14.2'
       - uses: actions/setup-node@v1
         with:
-          node-version: '10.x'
+          node-version: '12.18.2'
       - uses: actions/checkout@v2
 
       - name: Add GOBIN to PATH
@@ -78,10 +83,10 @@ jobs:
     steps:
       - uses: actions/setup-go@v2
         with:
-          go-version: '1.14.2'
+          go-version: 1.15.x
       - uses: actions/setup-node@v1
         with:
-          node-version: '10.x'
+          node-version: 12.18.2
       - uses: actions/checkout@v2
 
       - name: Install Global Dependencies
@@ -92,7 +97,7 @@ jobs:
       - name: Setting ENV's
         run: |
           echo "::add-path::$(go env GOPATH)/bin"
-          echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
+          echo "::add-path::/opt/hostedtoolcache/node/12.18.2/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
@@ -115,6 +120,7 @@ jobs:
           SASS=`which sass` gotestsum --no-summary=skipped --format dots -- -covermode=count -coverprofile=coverage.out -p=1 ./...
         env:
           VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
           DB_CONN: sqlite3
           STATPING_DIR: ${{ github.workspace }}
           API_SECRET: demopassword123
@@ -134,7 +140,7 @@ jobs:
       - name: Setting ENV's
         run: |
           echo "::add-path::$(go env GOPATH)/bin"
-          echo "::add-path::/opt/hostedtoolcache/node/10.20.1/x64/bin"
+          echo "::add-path::/opt/hostedtoolcache/node/12.18.2/x64/bin"
           echo ::set-env name=VERSION::$(cat version.txt)
         shell: bash
 
@@ -147,6 +153,7 @@ jobs:
       - name: Install Statping
         env:
           VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
         run: |
           make build
           chmod +x statping

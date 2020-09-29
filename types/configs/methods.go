@@ -18,6 +18,37 @@ func (d *DbConfig) Save(directory string) error {
 	return nil
 }
 
+// Merge will merge the database connection info into the input
+func (d *DbConfig) Merge(newCfg *DbConfig) *DbConfig {
+	d.DbConn = newCfg.DbConn
+	d.DbHost = newCfg.DbHost
+	d.DbPort = newCfg.DbPort
+	d.DbData = newCfg.DbData
+	d.DbUser = newCfg.DbUser
+	d.DbPass = newCfg.DbPass
+	return d
+}
+
+// Clean hides all sensitive database information for API requests
+func (d *DbConfig) Clean() *DbConfig {
+	d.DbConn = ""
+	d.DbHost = ""
+	d.DbPort = 0
+	d.DbData = ""
+	d.DbUser = ""
+	d.DbPass = ""
+	return d
+}
+
+func (d *DbConfig) ToYAML() []byte {
+	c, err := yaml.Marshal(d)
+	if err != nil {
+		log.Errorln(err)
+		return nil
+	}
+	return c
+}
+
 func (d *DbConfig) ConnectionString() string {
 	var conn string
 	postgresSSL := utils.Params.GetString("POSTGRES_SSLMODE")

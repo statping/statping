@@ -23,10 +23,17 @@ func TestTelegramNotifier(t *testing.T) {
 	err := utils.InitLogs()
 	require.Nil(t, err)
 
+	t.Parallel()
+
 	telegramToken = utils.Params.GetString("TELEGRAM_TOKEN")
 	telegramChannel = utils.Params.GetString("TELEGRAM_CHANNEL")
-	Telegram.ApiSecret = telegramToken
-	Telegram.Var1 = telegramChannel
+	if telegramToken == "" || telegramChannel == "" {
+		t.Log("Telegram notifier testing skipped, missing TELEGRAM_TOKEN and TELEGRAM_CHANNEL environment variable")
+		t.SkipNow()
+	}
+
+	Telegram.ApiSecret = null.NewNullString(telegramToken)
+	Telegram.Var1 = null.NewNullString(telegramChannel)
 
 	db, err := database.OpenTester()
 	require.Nil(t, err)
@@ -34,22 +41,17 @@ func TestTelegramNotifier(t *testing.T) {
 	notifications.SetDB(db)
 	core.Example()
 
-	if telegramToken == "" || telegramChannel == "" {
-		t.Log("Telegram notifier testing skipped, missing TELEGRAM_TOKEN and TELEGRAM_CHANNEL environment variable")
-		t.SkipNow()
-	}
-
 	t.Run("Load Telegram", func(t *testing.T) {
-		Telegram.ApiSecret = telegramToken
-		Telegram.Var1 = telegramChannel
+		Telegram.ApiSecret = null.NewNullString(telegramToken)
+		Telegram.Var1 = null.NewNullString(telegramChannel)
 		Telegram.Delay = time.Duration(1 * time.Second)
 		Telegram.Enabled = null.NewNullBool(true)
 
 		Add(Telegram)
 
 		assert.Equal(t, "Hunter Long", Telegram.Author)
-		assert.Equal(t, telegramToken, Telegram.ApiSecret)
-		assert.Equal(t, telegramChannel, Telegram.Var1)
+		assert.Equal(t, telegramToken, Telegram.ApiSecret.String)
+		assert.Equal(t, telegramChannel, Telegram.Var1.String)
 	})
 
 	t.Run("Telegram Within Limits", func(t *testing.T) {

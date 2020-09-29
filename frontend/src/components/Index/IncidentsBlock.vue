@@ -1,25 +1,25 @@
 <template>
     <div class="row">
-        <div v-for="(incident, i) in incidents" class="col-12 mt-4 mb-3">
+        <div v-for="(incident, i) in incidents" class="col-12 mt-2">
             <span class="braker mt-1 mb-3"></span>
-            <h6>Incident: {{incident.title}}
+            <h6>{{incident.title}}
                 <span class="font-2 float-right">{{niceDate(incident.created_at)}}</span>
             </h6>
-            <span class="font-2" v-html="incident.description"></span>
-
-            <UpdatesBlock :incident="incident"/>
-
+            <div class="font-2 mb-3" v-html="incident.description"></div>
+                <IncidentUpdate v-for="(update, i) in incident.updates" v-bind:key="i" :update="update" :admin="false"/>
         </div>
     </div>
 </template>
 
 <script>
 import Api from '../../API';
-import UpdatesBlock from "@/components/Index/UpdatesBlock";
+import IncidentUpdate from "@/components/Elements/IncidentUpdate";
 
 export default {
   name: 'IncidentsBlock',
-  components: {UpdatesBlock},
+  components: {
+    IncidentUpdate
+  },
   props: {
         service: {
             type: Object,
@@ -49,8 +49,7 @@ export default {
         this.incidents = await Api.incidents_service(this.service.id)
       },
       async incident_updates(incident) {
-        await Api.incident_updates(incident).then((d) => {return d})
-        return o
+        return await Api.incident_updates(incident)
       }
     }
 }

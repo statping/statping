@@ -2,11 +2,12 @@ package services
 
 import (
 	"fmt"
-	humanize "github.com/dustin/go-humanize"
 	"github.com/statping/statping/types/failures"
 	"strings"
 	"time"
 )
+
+const limitFailures = 32
 
 func (s *Service) FailuresColumnID() (string, int64) {
 	return "service", s.Id
@@ -18,13 +19,6 @@ func (s *Service) AllFailures() failures.Failurer {
 
 func (s *Service) FailuresSince(t time.Time) failures.Failurer {
 	return failures.Since(t, s)
-}
-
-func (s Service) DowntimeAgo() string {
-	if s.LastOnline.IsZero() {
-		return "Never been online"
-	}
-	return humanize.Time(s.LastOnline)
 }
 
 func (s Service) DowntimeText() string {

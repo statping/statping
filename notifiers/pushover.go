@@ -5,6 +5,7 @@ import (
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/notifier"
+	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net/url"
@@ -26,6 +27,10 @@ func (t *pushover) Select() *notifications.Notification {
 	return t.Notification
 }
 
+func (t *pushover) Valid(values notifications.Values) error {
+	return nil
+}
+
 var Pushover = &pushover{&notifications.Notification{
 	Method:      "pushover",
 	Title:       "Pushover",
@@ -35,8 +40,8 @@ var Pushover = &pushover{&notifications.Notification{
 	Icon:        "fa dot-circle",
 	Delay:       time.Duration(10 * time.Second),
 	Limits:      60,
-	SuccessData: `Your service '{{.Service.Name}}' is currently online!`,
-	FailureData: `Your service '{{.Service.Name}}' is currently offline!`,
+	SuccessData: null.NewNullString(`Your service '{{.Service.Name}}' is currently online!`),
+	FailureData: null.NewNullString(`Your service '{{.Service.Name}}' is currently offline!`),
 	DataType:    "text",
 	Form: []notifications.NotificationForm{{
 		Type:        "text",
@@ -88,12 +93,12 @@ func priority(val string) string {
 // Send will send a HTTP Post to the Pushover API. It accepts type: string
 func (t *pushover) sendMessage(message string) (string, error) {
 	v := url.Values{}
-	v.Set("token", t.ApiSecret)
-	v.Set("user", t.ApiKey)
+	v.Set("token", t.ApiSecret.String)
+	v.Set("user", t.ApiKey.String)
 	v.Set("message", message)
-	v.Set("priority", priority(t.Var1))
-	if t.Var2 != "" {
-		v.Set("sound", t.Var2)
+	v.Set("priority", priority(t.Var1.String))
+	if t.Var2.String != "" {
+		v.Set("sound", t.Var2.String)
 	}
 	rb := strings.NewReader(v.Encode())
 
@@ -106,14 +111,14 @@ func (t *pushover) sendMessage(message string) (string, error) {
 
 // OnFailure will trigger failing service
 func (t *pushover) OnFailure(s services.Service, f failures.Failure) (string, error) {
-	message := ReplaceVars(t.FailureData, s, f)
+	message := ReplaceVars(t.FailureData.String, s, f)
 	out, err := t.sendMessage(message)
 	return out, err
 }
 
 // OnSuccess will trigger successful service
 func (t *pushover) OnSuccess(s services.Service) (string, error) {
-	message := ReplaceVars(t.SuccessData, s, failures.Failure{})
+	message := ReplaceVars(t.SuccessData.String, s, failures.Failure{})
 	out, err := t.sendMessage(message)
 	return out, err
 }

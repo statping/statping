@@ -24,6 +24,7 @@ var (
 )
 
 func TestEmailNotifier(t *testing.T) {
+	t.Parallel()
 	err := utils.InitLogs()
 	require.Nil(t, err)
 
@@ -46,18 +47,18 @@ func TestEmailNotifier(t *testing.T) {
 	}
 
 	t.Run("New email", func(t *testing.T) {
-		email.Host = EMAIL_HOST
-		email.Username = EMAIL_USER
-		email.Password = EMAIL_PASS
-		email.Var1 = EMAIL_OUTGOING
-		email.Var2 = EMAIL_SEND_TO
-		email.Port = int(EMAIL_PORT)
+		email.Host = null.NewNullString(EMAIL_HOST)
+		email.Username = null.NewNullString(EMAIL_USER)
+		email.Password = null.NewNullString(EMAIL_PASS)
+		email.Var1 = null.NewNullString(EMAIL_OUTGOING)
+		email.Var2 = null.NewNullString(EMAIL_SEND_TO)
+		email.Port = null.NewNullInt64(EMAIL_PORT)
 		email.Delay = time.Duration(100 * time.Millisecond)
 		email.Enabled = null.NewNullBool(true)
 
 		Add(email)
 		assert.Equal(t, "Hunter Long", email.Author)
-		assert.Equal(t, EMAIL_HOST, email.Host)
+		assert.Equal(t, EMAIL_HOST, email.Host.String)
 	})
 
 	t.Run("email Within Limits", func(t *testing.T) {

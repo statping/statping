@@ -91,14 +91,21 @@ func CheckIcmp(s *Service, record bool) (*Service, error) {
 	timer := prometheus.NewTimer(metrics.ServiceTimer(s.Name))
 	defer timer.ObserveDuration()
 
-	if err := utils.Ping(s.Domain, s.Timeout); err != nil {
+	dur, err := utils.Ping(s.Domain, s.Timeout)
+	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("Could not send ICMP to service %v, %v", s.Domain, err))
+			RecordFailure(s, fmt.Sprintf("Could not send ICMP to service %v, %v", s.Domain, err), "lookup")
 		}
 		return s, err
 	}
+
+	s.PingTime = dur
+	s.Latency = dur
 	s.LastResponse = ""
 	s.Online = true
+	if record {
+		RecordSuccess(s)
+	}
 	return s, nil
 }
 
@@ -111,7 +118,7 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 	dnsLookup, err := dnsCheck(s)
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("Could not get IP address for GRPC service %v, %v", s.Domain, err))
+			RecordFailure(s, fmt.Sprintf("Could not get IP address for GRPC service %v, %v", s.Domain, err), "lookup")
 		}
 		return s, err
 	}
@@ -130,13 +137,13 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 	}
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("Dial Error %v", err))
+			RecordFailure(s, fmt.Sprintf("Dial Error %v", err), "connection")
 		}
 		return s, err
 	}
 	if err := conn.Close(); err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("%v Socket Close Error %v", strings.ToUpper(s.Type), err))
+			RecordFailure(s, fmt.Sprintf("%v Socket Close Error %v", strings.ToUpper(s.Type), err), "close")
 		}
 		return s, err
 	}
@@ -144,7 +151,7 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 	s.LastResponse = ""
 	s.Online = true
 	if record {
-		recordSuccess(s)
+		RecordSuccess(s)
 	}
 	return s, nil
 }
@@ -158,7 +165,7 @@ func CheckTcp(s *Service, record bool) (*Service, error) {
 	dnsLookup, err := dnsCheck(s)
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("Could not get IP address for TCP service %v, %v", s.Domain, err))
+			RecordFailure(s, fmt.Sprintf("Could not get IP address for TCP service %v, %v", s.Domain, err), "lookup")
 		}
 		return s, err
 	}
@@ -182,7 +189,7 @@ func CheckTcp(s *Service, record bool) (*Service, error) {
 		conn, err := net.DialTimeout(s.Type, domain, time.Duration(s.Timeout)*time.Second)
 		if err != nil {
 			if record {
-				recordFailure(s, fmt.Sprintf("Dial Error: %v", err))
+				RecordFailure(s, fmt.Sprintf("Dial Error: %v", err), "tls")
 			}
 			return s, err
 		}
@@ -196,7 +203,7 @@ func CheckTcp(s *Service, record bool) (*Service, error) {
 		conn, err := tls.DialWithDialer(dialer, s.Type, domain, tlsConfig)
 		if err != nil {
 			if record {
-				recordFailure(s, fmt.Sprintf("Dial Error: %v", err))
+				RecordFailure(s, fmt.Sprintf("Dial Error: %v", err), "tls")
 			}
 			return s, err
 		}
@@ -207,7 +214,7 @@ func CheckTcp(s *Service, record bool) (*Service, error) {
 	s.LastResponse = ""
 	s.Online = true
 	if record {
-		recordSuccess(s)
+		RecordSuccess(s)
 	}
 	return s, nil
 }
@@ -225,7 +232,7 @@ func CheckHttp(s *Service, record bool) (*Service, error) {
 	dnsLookup, err := dnsCheck(s)
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err))
+			RecordFailure(s, fmt.Sprintf("Could not get IP address for domain %v, %v", s.Domain, err), "lookup")
 		}
 		return s, err
 	}
@@ -277,7 +284,7 @@ func CheckHttp(s *Service, record bool) (*Service, error) {
 	content, res, err = utils.HttpRequest(s.Domain, s.Method, contentType, headers, data, timeout, s.VerifySSL.Bool, customTLS)
 	if err != nil {
 		if record {
-			recordFailure(s, fmt.Sprintf("HTTP Error %v", err))
+			RecordFailure(s, fmt.Sprintf("HTTP Error %v", err), "request")
 		}
 		return s, err
 	}
@@ -294,26 +301,26 @@ func CheckHttp(s *Service, record bool) (*Service, error) {
 		}
 		if !match {
 			if record {
-				recordFailure(s, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected))
+				RecordFailure(s, fmt.Sprintf("HTTP Response Body did not match '%v'", s.Expected), "regex")
 			}
 			return s, err
 		}
 	}
 	if s.ExpectedStatus != res.StatusCode {
 		if record {
-			recordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", res.StatusCode, s.ExpectedStatus))
+			RecordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", res.StatusCode, s.ExpectedStatus), "status_code")
 		}
 		return s, err
 	}
 	if record {
-		recordSuccess(s)
+		RecordSuccess(s)
 	}
 	s.Online = true
 	return s, err
 }
 
-// recordSuccess will create a new 'hit' record in the database for a successful/online service
-func recordSuccess(s *Service) {
+// RecordSuccess will create a new 'hit' record in the database for a successful/online service
+func RecordSuccess(s *Service) {
 	s.LastOnline = utils.Now()
 	s.Online = true
 	hit := &hits.Hit{
@@ -332,40 +339,10 @@ func recordSuccess(s *Service) {
 	metrics.Gauge("online", 1., s.Name, s.Type)
 	metrics.Inc("success", s.Name)
 	sendSuccess(s)
-	s.SuccessNotified = true
 }
 
-func AddNotifier(n ServiceNotifier) {
-	notif := n.Select()
-	allNotifiers[notif.Method] = n
-}
-
-func sendSuccess(s *Service) {
-	if !s.AllowNotifications.Bool {
-		return
-	}
-	// dont send notification if server was already previous online
-	if s.SuccessNotified {
-		return
-	}
-
-	for _, n := range allNotifiers {
-		notif := n.Select()
-		if notif.CanSend() {
-			log.Infof("Sending notification to: %s!", notif.Method)
-			if _, err := n.OnSuccess(*s); err != nil {
-				notif.Logger().Errorln(err)
-			}
-			s.UserNotified = true
-			s.SuccessNotified = true
-			//s.UpdateNotify.Bool
-		}
-	}
-	s.notifyAfterCount = 0
-}
-
-// recordFailure will create a new 'Failure' record in the database for a offline service
-func recordFailure(s *Service, issue string) {
+// RecordFailure will create a new 'Failure' record in the database for a offline service
+func RecordFailure(s *Service, issue, reason string) {
 	s.LastOffline = utils.Now()
 
 	fail := &failures.Failure{
@@ -374,6 +351,7 @@ func recordFailure(s *Service, issue string) {
 		PingTime:  s.PingTime,
 		CreatedAt: utils.Now(),
 		ErrorCode: s.LastStatusCode,
+		Reason:    reason,
 	}
 	log.WithFields(utils.ToFields(fail, s)).
 		Warnln(fmt.Sprintf("Service %v Failing: %v | Lookup in: %v", s.Name, issue, humanMicro(fail.PingTime)))
@@ -382,40 +360,18 @@ func recordFailure(s *Service, issue string) {
 		log.Error(err)
 	}
 	s.Online = false
-	s.SuccessNotified = false
 	s.DownText = s.DowntimeText()
+
+	limitOffset := len(s.Failures)
+	if len(s.Failures) >= limitFailures {
+		limitOffset = limitFailures - 1
+	}
+
+	s.Failures = append([]*failures.Failure{fail}, s.Failures[:limitOffset]...)
+
 	metrics.Gauge("online", 0., s.Name, s.Type)
 	metrics.Inc("failure", s.Name)
 	sendFailure(s, fail)
-}
-
-func sendFailure(s *Service, f *failures.Failure) {
-	if !s.AllowNotifications.Bool {
-		return
-	}
-
-	// ignore failure if user was already notified and
-	// they have "continuous notifications" switched off.
-	if s.UserNotified && !s.UpdateNotify.Bool {
-		return
-	}
-
-	if s.notifyAfterCount > s.NotifyAfter {
-		for _, n := range allNotifiers {
-			notif := n.Select()
-			if notif.CanSend() {
-				log.Infof("Sending Failure notification to: %s!", notif.Method)
-				if _, err := n.OnFailure(*s, *f); err != nil {
-					notif.Logger().WithField("failure", f.Issue).Errorln(err)
-				}
-				s.UserNotified = true
-				s.SuccessNotified = true
-				//s.UpdateNotify.Bool
-			}
-		}
-	}
-
-	s.notifyAfterCount++
 }
 
 // Check will run checkHttp for HTTP services and checkTcp for TCP services

@@ -1,8 +1,5 @@
 @import 'variables';
-
-HTML,BODY {
-    background-color: $background-color;
-}
+@import 'mixin';
 
 .index-chart {
   height: $service-card-height;
@@ -26,24 +23,9 @@ HTML,BODY {
   box-shadow: 0px 3px 6px 1px rgba(0,0,0,0.08);
 }
 
-.copy-btn {
-  position: absolute;
-  right: 0;
-}
-
 .btn-xs {
   font-size: 8pt;
   padding: 2px 6px;
-}
-
-.copy-btn BUTTON {
-  background-color: white;
-  margin: 6px;
-  height: 26px;
-  font-size: 8pt;
-  padding: 5px 7px;
-  border: 1px solid #a7a7a7;
-  border-radius: 4px !important;
 }
 
 .dim {
@@ -53,41 +35,6 @@ HTML,BODY {
 .slider-info {
   font-size: 9pt;
   font-weight: bold;
-}
-
-/* The slider itself */
-.slider {
-  -webkit-appearance: none;  /* Override default CSS styles */
-  appearance: none;
-  width: 100%; /* Full-width */
-  height: 5px; /* Specified height */
-  background: #d3d3d3; /* Grey background */
-  outline: none; /* Remove outline */
-  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
-  transition: opacity .2s;
-}
-
-/* Mouse-over effects */
-.slider:hover {
-  opacity: 1; /* Fully shown on mouse-over */
-}
-
-/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
-.slider::-webkit-slider-thumb {
-  -webkit-appearance: none; /* Override default look */
-  appearance: none;
-  border-radius: 50%;
-  width: 20px; /* Set a specific slider handle width */
-  height: 20px; /* Slider handle height */
-  background: #4CAF50; /* Green background */
-  cursor: pointer; /* Cursor on hover */
-}
-
-.slider::-moz-range-thumb {
-  width: 15px; /* Set a specific slider handle width */
-  height: 15px; /* Slider handle height */
-  background: #4CAF50; /* Green background */
-  cursor: pointer; /* Cursor on hover */
 }
 
 @-o-keyframes fadeIt {
@@ -136,31 +83,19 @@ HTML,BODY {
 }
 
 .chartmarker {
-  padding: 5px;
-  width: 240px;
-  text-align: right;
+  padding: 0px;
+  width: 200px;
+  text-align: left;
 }
 
 .chartmarker SPAN {
-  font-size: 9pt;
+  font-size: 4pt;
   display: block;
-  color: #8b8b8b;
+  color: #b1b1b1;
 }
 
 .apexcharts-tooltip {
   box-shadow: none;
-}
-
-.contain-card {
-
-  .card-header {
-    font-size: 1.15rem;
-  }
-
-  .dropdown-menu {
-    background-color: rgba(239, 239, 239, 0.65);
-  }
-
 }
 
 .dropup .dropdown-menu {
@@ -168,11 +103,33 @@ HTML,BODY {
     background-color: #efefef;
 }
 
+.divided {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.divider {
+  flex-grow: 1;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  margin: 0 20px 0 20px;
+}
+
+.daily-failures {
+  position: absolute;
+  padding-top: 3px;
+  top: 10px;
+  right: 100px;
+  width: 300px;
+  height: 25px;
+}
+
 .service_day {
   height: 20px;
   margin-right: 2px;
-  border-radius: 4px;
-  max-width: 25px;
+  border-radius: 2px;
+  max-width: 30px;
+  cursor: pointer;
 }
 
 .service_day SPAN {
@@ -202,13 +159,6 @@ HTML,BODY {
     opacity: 0;
   }
 
-  .container {
-    padding-top: 20px;
-    padding-bottom: 25px;
-    max-width: $max-width;
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
-  }
-
   .header-title {
     color: $title-color;
   }
@@ -224,10 +174,6 @@ HTML,BODY {
   .online_list .badge {
     font-size: 8pt;
     padding: 5px 7px;
-  }
-
-  .navbar {
-    margin-bottom: 30px;
   }
 
   .btn-sm {
@@ -272,20 +218,6 @@ HTML,BODY {
   .lower_canvas SPAN {
     font-size: 1rem;
     color: $service-description-color
-  }
-
-  .footer {
-    text-decoration: none;
-    margin-top: 20px;
-  }
-
-  .footer A {
-    color: $footer-text-color;
-    text-decoration: none;
-  }
-
-  .footer A:HOVER {
-    color: #6d6d6d;
   }
 
   .font-0 {
@@ -342,22 +274,6 @@ HTML,BODY {
     }
   }
 
-  .card-body .badge {
-    color: #fff;
-  }
-
-  .nav-pills .nav-link {
-    border-radius: $global-border-radius;
-  }
-
-  .form-control {
-    border-radius: $global-border-radius;
-  }
-
-  .mini_success {
-    background-color: #f3f3f3;
-  }
-
   .no-decoration {
     color: black;
     text-decoration: none;
@@ -366,10 +282,6 @@ HTML,BODY {
   .no-decoration:HOVER {
     color: #2b2b2b;
     text-decoration: none;
-  }
-
-  .mini_error {
-    background-color: #ffbbbb;
   }
 
   .btn-white {
@@ -395,10 +307,6 @@ HTML,BODY {
     color: #a0a0a0;
   }
 
-  .service_block {
-    min-height: 340px;
-  }
-
   .json-field {
     font-size: 10pt;
   }
@@ -418,27 +326,6 @@ HTML,BODY {
   font-weight: bold;
 }
 
-
-  .card {
-    background-color: $service-background;
-    border: $service-border;
-    box-shadow: 0px 3px 6px 1px rgba(0, 0, 0, 0.08);
-  }
-
-  .card-body {
-    overflow: hidden;
-  }
-
-  .card-body H4 A {
-    color: $service-title;
-    text-decoration: none;
-  }
-
-  .card-title A {
-    color: $service-title;
-    text-decoration: none;
-  }
-
   .chart-container {
     position: relative;
     height: 240px;
@@ -457,79 +344,6 @@ HTML,BODY {
     height: 180px;
     width: 100%;
   }
-
-  .inputTags-field {
-    border: 0;
-    background-color: transparent;
-    padding-top: .13rem;
-  }
-
-  input.inputTags-field:focus {
-    outline-width: 0;
-  }
-
-  .inputTags-list {
-    display: block;
-    width: 100%;
-    min-height: calc(2.25rem + 2px);
-    padding: .2rem .35rem;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
-    color: #495057;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 1px solid #ced4da;
-    border-radius: .25rem;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-  }
-
-  .inputTags-item {
-    background-color: #3aba39;
-    margin-right: 5px;
-    padding: 5px 8px;
-    font-size: 10pt;
-    color: white;
-    border-radius: 4px;
-  }
-
-  .inputTags-item .close-item {
-    margin-left: 6px;
-    font-size: 13pt;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  @mixin dynamic-color-hov($color) {
-    &.dyn-dark {
-      background-color: darken($color, 12%) !important;
-      border-color: darken($color, 17%) !important;
-    }
-    &.dyn-dark:HOVER {
-      background-color: darken($color, 17%) !important;
-      border-color: darken($color, 20%) !important;
-    }
-    &.dyn-light {
-      background-color: lighten($color, 12%) !important;
-      border-color: lighten($color, 17%) !important;
-    }
-    &.dyn-light:HOVER {
-      background-color: lighten($color, 17%) !important;
-      border-color: lighten($color, 20%) !important;
-    }
-  }
-
-  @mixin dynamic-color($color) {
-    &.dyn-dark {
-      background-color: darken($color, 12%) !important;
-      border-color: darken($color, 17%) !important;
-    }
-    &.dyn-light {
-      background-color: lighten($color, 12%) !important;
-      border-color: lighten($color, 17%) !important;
-    }
-  }
-
 
   .btn-primary {
     background-color: $primary-color;
@@ -564,18 +378,6 @@ HTML,BODY {
     background-color: darken($danger-color, 10%) !important;
   }
 
-  .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
-    background-color: $nav-tab-color;
-  }
-
-  .nav-pills A {
-    color: #424242;
-  }
-
-  .nav-pills I {
-    margin-right: 10px;
-  }
-
   @keyframes fadeInOut {
     0%   { opacity:1; }
     50%  { opacity:0.3; }
@@ -600,179 +402,11 @@ HTML,BODY {
     -webkit-animation: fadeInOut 1s infinite;
     -moz-animation: fadeInOut 1s infinite;
     -o-animation: fadeInOut 1s infinite;
-    animation: fadeInOut 21 infinite;
-  }
-
-  .CodeMirror {
-    /* Bootstrap Settings */
-    box-sizing: border-box;
-    margin: 0;
-    font: inherit;
-    overflow: auto;
-    display: block;
-    width: 100%;
-    padding: 0px;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #555;
-    background-color: #fff;
-    background-image: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-    /* Code Mirror Settings */
-    font-family: monospace;
-    position: relative;
-    height:80vh;
-  }
-
-  .CodeMirror-focused {
-    /* Bootstrap Settings */
-    border-color: #66afe9;
-    outline: 0;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
-    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-  }
-
-  .switch {
-    font-size: 1rem;
-    position: relative;
-  }
-  .switch input {
-    position: absolute;
-    height: 1px;
-    width: 1px;
-    background: none;
-    border: 0;
-    clip: rect(0 0 0 0);
-    clip-path: inset(50%);
-    overflow: hidden;
-    padding: 0;
-  }
-  .switch input + label {
-    position: relative;
-    min-width: calc(calc(2.375rem * .8) * 2);
-    border-radius: calc(2.375rem * .8);
-    height: calc(2.375rem * .8);
-    line-height: calc(2.375rem * .8);
-    display: inline-block;
-    cursor: pointer;
-    outline: none;
-    user-select: none;
-    vertical-align: middle;
-    text-indent: calc(calc(calc(2.375rem * .8) * 2) + .5rem);
-  }
-  .switch input + label::before,
-  .switch input + label::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: calc(calc(2.375rem * .8) * 2);
-    bottom: 0;
-    display: block;
-  }
-  .switch input + label::before {
-    right: 0;
-    background-color: #dee2e6;
-    border-radius: calc(2.375rem * .8);
-    transition: 0.2s all;
-  }
-  .switch input + label::after {
-    top: 2px;
-    left: 2px;
-    width: calc(calc(2.375rem * .8) - calc(2px * 2));
-    height: calc(calc(2.375rem * .8) - calc(2px * 2));
-    border-radius: 50%;
-    background-color: white;
-    transition: 0.2s all;
-  }
-  .switch-rd-gr input:checked + label::before {
-    background-color: #29b10c !important;
-  }
-  .switch input:checked + label::before {
-    background-color: #08d;
-  }
-  .switch input:checked + label::after {
-    margin-left: calc(2.375rem * .8);
-  }
-  .switch input:focus + label::before {
-    outline: none;
-    box-shadow: 0 0 0 0.2rem rgba(0, 136, 221, 0.25);
-  }
-  .switch input:disabled + label {
-    color: #868e96;
-    cursor: not-allowed;
-  }
-  .switch input:disabled + label::before {
-    background-color: #e9ecef;
-  }
-  .switch.switch-sm {
-    font-size: 0.875rem;
-  }
-  .switch.switch-sm input + label {
-    min-width: calc(calc(1.9375rem * .8) * 2);
-    height: calc(1.9375rem * .8);
-    line-height: calc(1.9375rem * .8);
-    text-indent: calc(calc(calc(1.9375rem * .8) * 2) + .5rem);
-  }
-  .switch.switch-sm input + label::before {
-    width: calc(calc(1.9375rem * .8) * 2);
-  }
-  .switch.switch-sm input + label::after {
-    width: calc(calc(1.9375rem * .8) - calc(2px * 2));
-    height: calc(calc(1.9375rem * .8) - calc(2px * 2));
-  }
-  .switch.switch-sm input:checked + label::after {
-    margin-left: calc(1.9375rem * .8);
-  }
-  .switch.switch-lg {
-    font-size: 1.25rem;
-  }
-  .switch.switch-lg input + label {
-    min-width: calc(calc(3rem * .8) * 2);
-    height: calc(3rem * .8);
-    line-height: calc(3rem * .8);
-    text-indent: calc(calc(calc(3rem * .8) * 2) + .5rem);
-  }
-  .switch.switch-lg input + label::before {
-    width: calc(calc(3rem * .8) * 2);
-  }
-  .switch.switch-lg input + label::after {
-    width: calc(calc(3rem * .8) - calc(2px * 2));
-    height: calc(calc(3rem * .8) - calc(2px * 2));
-  }
-  .switch.switch-lg input:checked + label::after {
-    margin-left: calc(3rem * .8);
-  }
-  .switch + .switch {
-    margin-left: 1rem;
+    animation: fadeInOut 1s infinite;
   }
 
   .sortable_drag {
     background-color: #0000000f;
-  }
-
-  .drag_icon {
-    cursor: move; /* fallback if grab cursor is unsupported */
-    cursor: grab;
-    cursor: -moz-grab;
-    cursor: -webkit-grab;
-    width: 25px;
-    height: 25px;
-    display: inline-block;
-    margin-right: 5px;
-    margin-left: -10px;
-    text-align: center;
-    color: #b1b1b1;
-  }
-
-  /* (Optional) Apply a "closed-hand" cursor during drag operation. */
-  .drag_icon:active {
-    cursor: grabbing;
-    cursor: -moz-grabbing;
-    cursor: -webkit-grabbing;
   }
 
   .switch_btn {
@@ -799,7 +433,7 @@ HTML,BODY {
   }
 
   .jumbotron {
-    background-color: white;
+    background-color: rgba(0,0,0,0);
   }
 
   .toggle-service {
@@ -807,19 +441,6 @@ HTML,BODY {
     float: left;
     margin: 2px 3px 0 0;
     cursor: pointer;
-  }
-
-  .list-group-item {
-    min-height: 85pt;
-  }
-
-  .list-group-item:HOVER {
-    background-color: #fff;
-  }
-
-  .index_container {
-    min-height: 980pt;
-    background-color: $container-color;
   }
 
   /* Enter and leave animations can use different */

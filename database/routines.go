@@ -16,6 +16,8 @@ var (
 
 // Maintenance will automatically delete old records from 'failures' and 'hits'
 // this function is currently set to delete records 7+ days old every 60 minutes
+// env: REMOVE_AFTER - golang duration parsed time for deleting records older than REMOVE_AFTER duration from now
+// env: CLEANUP_INTERVAL - golang duration parsed time for checking old records routine
 func Maintenance() {
 	dur := utils.Params.GetDuration("REMOVE_AFTER")
 	interval := utils.Params.GetDuration("CLEANUP_INTERVAL")

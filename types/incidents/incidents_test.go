@@ -32,8 +32,10 @@ func TestInit(t *testing.T) {
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&Incident{}, &IncidentUpdate{})
-	db.Create(&example)
 	SetDB(db)
+	db.Create(&example)
+	db.Create(&update1)
+	db.Create(&update2)
 }
 
 func TestFind(t *testing.T) {
@@ -79,6 +81,11 @@ func TestDelete(t *testing.T) {
 
 	all = All()
 	assert.Len(t, all, 1)
+}
+
+func TestSamples(t *testing.T) {
+	require.Nil(t, Samples())
+	assert.Len(t, All(), 3)
 }
 
 func TestClose(t *testing.T) {

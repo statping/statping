@@ -1,17 +1,16 @@
 package notifiers
 
 import (
-	"bytes"
 	"crypto/tls"
 	"fmt"
 	"github.com/go-mail/mail"
+	"github.com/statping/emails"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/notifier"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
-	"html/template"
 )
 
 var _ notifier.Notifier = (*emailer)(nil)
@@ -26,6 +25,10 @@ type emailer struct {
 
 func (e *emailer) Select() *notifications.Notification {
 	return e.Notification
+}
+
+func (e *emailer) Valid(values notifications.Values) error {
+	return nil
 }
 
 var email = &emailer{&notifications.Notification{
@@ -88,12 +91,12 @@ type emailOutgoing struct {
 // OnFailure will trigger failing service
 func (e *emailer) OnFailure(s services.Service, f failures.Failure) (string, error) {
 	subject := fmt.Sprintf("Service %s is Offline", s.Name)
-	tmpl := renderEmail(s, f)
+	tmpl := renderEmail(s, f, emails.Failure)
 	email := &emailOutgoing{
-		To:       e.Var2,
+		To:       e.Var2.String,
 		Subject:  subject,
 		Template: tmpl,
-		From:     e.Var1,
+		From:     e.Var1.String,
 	}
 	return tmpl, e.dialSend(email)
 }
@@ -101,38 +104,29 @@ func (e *emailer) OnFailure(s services.Service, f failures.Failure) (string, err
 // OnSuccess will trigger successful service
 func (e *emailer) OnSuccess(s services.Service) (string, error) {
 	subject := fmt.Sprintf("Service %s is Back Online", s.Name)
-	tmpl := renderEmail(s, failures.Failure{})
+	tmpl := renderEmail(s, failures.Failure{}, emails.Success)
 	email := &emailOutgoing{
-		To:       e.Var2,
+		To:       e.Var2.String,
 		Subject:  subject,
 		Template: tmpl,
-		From:     e.Var1,
+		From:     e.Var1.String,
 	}
 	return tmpl, e.dialSend(email)
 }
 
-func renderEmail(s services.Service, f failures.Failure) string {
-	wr := bytes.NewBuffer(nil)
-	tmpl := template.New("email")
-	tmpl, err := tmpl.Parse(emailBase)
-	if err != nil {
-		log.Errorln(err)
-		return emailBase
-	}
-
+func renderEmail(s services.Service, f failures.Failure, emailData string) string {
 	data := replacer{
 		Core:    *core.App,
 		Service: s,
 		Failure: f,
 		Custom:  nil,
 	}
-
-	if err = tmpl.ExecuteTemplate(wr, "email", data); err != nil {
+	output, err := emails.Parse(emailData, data)
+	if err != nil {
 		log.Errorln(err)
-		return emailBase
+		return emailData
 	}
-
-	return wr.String()
+	return output
 }
 
 // OnTest triggers when this notifier has been saved
@@ -140,10 +134,10 @@ func (e *emailer) OnTest() (string, error) {
 	service := services.Example(true)
 	subject := fmt.Sprintf("Service %v is Back Online", service.Name)
 	email := &emailOutgoing{
-		To:       e.Var2,
+		To:       e.Var2.String,
 		Subject:  subject,
-		Template: renderEmail(service, failures.Example()),
-		From:     e.Var1,
+		Template: renderEmail(service, failures.Example(), emailFailure),
+		From:     e.Var1.String,
 	}
 	return subject, e.dialSend(email)
 }
@@ -154,10 +148,10 @@ func (e *emailer) OnSave() (string, error) {
 }
 
 func (e *emailer) dialSend(email *emailOutgoing) error {
-	mailer = mail.NewDialer(e.Host, e.Port, e.Username, e.Password)
+	mailer = mail.NewDialer(e.Host.String, int(e.Port.Int64), e.Username.String, e.Password.String)
 	m := mail.NewMessage()
 	// if email setting TLS is Disabled
-	if e.ApiKey == "true" {
+	if e.ApiKey.String == "true" {
 		mailer.SSL = false
 	} else {
 		mailer.TLSConfig = &tls.Config{InsecureSkipVerify: true}

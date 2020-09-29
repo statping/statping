@@ -2,6 +2,6 @@
   "name": "Statping",
   "description": "Statping Server Monitoring with Status Page",
   "repository": "https://github.com/statping/statping",
-  "logo": "https://raw.githubusercontent.com/statping/statping/master/source/tmpl/banner.png",
+  "logo": "https://assets.statping.com/banner.png",
   "keywords": ["statping", "server", "monitoring", "status page","golang", "go"]
 }

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/services"
@@ -11,11 +12,14 @@ import (
 
 func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 	var notifs []notifications.Notification
-	notifiers := services.AllNotifiers()
-	for _, n := range notifiers {
+	for _, n := range services.AllNotifiers() {
 		notif := n.Select()
-		notifer, _ := notifications.Find(notif.Method)
-		notif.UpdateFields(notifer)
+		no, err := notifications.Find(notif.Method)
+		if err != nil {
+			log.Error(err)
+			sendErrorJson(err, w, r)
+		}
+		notif.UpdateFields(no)
 		notifs = append(notifs, *notif)
 	}
 	sort.Sort(notifications.NotificationOrder(notifs))
@@ -24,10 +28,9 @@ func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	notif := services.FindNotifier(vars["notifier"])
-	notifer, err := notifications.Find(notif.Method)
-	if err != nil {
-		sendErrorJson(err, w, r)
+	notifer := services.FindNotifier(vars["notifier"])
+	if notifer == nil {
+		sendErrorJson(errors.New("could not find notifier"), w, r)
 		return
 	}
 	returnJson(notifer, w, r)
@@ -48,13 +51,17 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Infof("Updating %s Notifier", notifer.Title)
 
-	err = notifer.Update()
-	if err != nil {
+	if err := notifer.Update(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
 
 	notif := services.ReturnNotifier(notifer.Method)
+	if err := notif.Valid(notifer.Values()); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
 	if _, err := notif.OnSave(); err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -70,9 +77,9 @@ type testNotificationReq struct {
 
 func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	n, err := notifications.Find(vars["notifier"])
-	if err != nil {
-		sendErrorJson(err, w, r)
+	n := services.FindNotifier(vars["notifier"])
+	if n == nil {
+		sendErrorJson(errors.New("unknown notifier"), w, r)
 		return
 	}
 
@@ -85,6 +92,7 @@ func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	notif := services.ReturnNotifier(n.Method)
 
 	var out string
+	var err error
 	if req.Method == "success" {
 		out, err = notif.OnSuccess(services.Example(true))
 	} else {

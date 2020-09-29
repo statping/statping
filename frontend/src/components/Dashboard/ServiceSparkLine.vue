@@ -1,10 +1,9 @@
 <template v-if="series.length">
-    <apexchart width="100%" height="180" type="bar" :options="chartOpts" :series="series"></apexchart>
+    <apexchart width="100%" height="100" type="bar" :options="chartOpts" :series="series"></apexchart>
 </template>
 
 <script>
   const timeoptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-
 
   export default {
   name: 'ServiceSparkLine',
@@ -38,6 +37,9 @@
             enabled: true
           },
         },
+        showPoint: false,
+        fullWidth:true,
+        chartPadding: {top: 0,right: 0,bottom: 0,left: 0},
         stroke: {
           curve: 'straight'
         },
@@ -51,21 +53,20 @@
         tooltip: {
           theme: false,
           enabled: true,
-          custom: function({series, seriesIndex, dataPointIndex, w}) {
+          custom: ({series, seriesIndex, dataPointIndex, w}) => {
             let ts = w.globals.seriesX[seriesIndex][dataPointIndex];
             const dt = new Date(ts).toLocaleDateString("en-us", timeoptions)
             let val = series[seriesIndex][dataPointIndex];
-            val = val + " ms"
-            return `<div class="chartmarker"><span>Average Response Time: </span><span class="font-3">${val}</span><span>${dt}</span></div>`
+            return `<div class="chartmarker"><span class="font-3">Average Response Time:  ${this.humanTime(val)}</span><span>${dt}</span></div>`
           },
           fixed: {
             enabled: true,
-            position: 'topRight',
+            position: 'bottomLeft',
             offsetX: 0,
-            offsetY: 0,
+            offsetY: -30,
           },
           x: {
-            show: false,
+            show: true,
           },
           y: {
             formatter: (value) => { return value + " %" },
@@ -75,15 +76,16 @@
           text: this.title,
           offsetX: 0,
           style: {
-            fontSize: '28px',
+            fontSize: '18px',
             cssClass: 'apexcharts-yaxis-title'
           }
         },
         subtitle: {
           text: this.subtitle,
           offsetX: 0,
+          offsetY: 20,
           style: {
-            fontSize: '14px',
+            fontSize: '9px',
             cssClass: 'apexcharts-yaxis-title'
           }
         }
@@ -92,7 +94,3 @@
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

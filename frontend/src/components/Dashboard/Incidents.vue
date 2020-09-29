@@ -1,10 +1,10 @@
 <template>
     <div class="col-12">
 
-        <div v-for="incident in incidents" :key="incident.id" class="card contain-card text-black-50 bg-white mb-4">
+        <div v-for="incident in incidents" :key="incident.id" class="card contain-card mb-4">
             <div class="card-header">Incident: {{incident.title}}
                 <button @click="deleteIncident(incident)" class="btn btn-sm btn-danger float-right">
-                    <font-awesome-icon icon="times" />  Delete
+                    <font-awesome-icon icon="times" />
                 </button>
             </div>
 
@@ -14,7 +14,7 @@
         </div>
 
 
-        <div class="card contain-card text-black-50 bg-white">
+        <div class="card contain-card">
             <div class="card-header">Create Incident</div>
             <div class="card-body">
                 <form @submit.prevent="createIncident">
@@ -50,8 +50,9 @@
 </template>
 
 <script>
-    import Api from "../../API";
-    const FormIncidentUpdates = () => import('@/forms/IncidentUpdates')
+import Api from "../../API";
+
+const FormIncidentUpdates = () => import(/* webpackChunkName: "dashboard" */ '@/forms/IncidentUpdates')
 
     export default {
         name: 'Incidents',
@@ -79,15 +80,23 @@
 
     methods: {
 
+      async delete(i) {
+        this.res = await Api.incident_delete(i)
+        if (this.res.status === "success") {
+          this.incidents = this.incidents.filter(obj => obj.id !== i.id);
+          //await this.loadIncidents()
+        }
+      },
         async deleteIncident(incident) {
-            let c = confirm(`Are you sure you want to delete '${incident.title}'?`)
-            if (c) {
-                this.res = await Api.incident_delete(incident)
-                if (this.res.status === "success") {
-                    this.incidents = this.incidents.filter(obj => obj.id !== incident.id); // this is better in terms of not having to querry the db to get a fresh copy of all updates
-                    //await this.loadIncidents()
-                } // TODO: further error checking here... maybe alert user it failed with modal or so
-            }
+          const modal = {
+            visible: true,
+            title: "Delete Incident",
+            body: `Are you sure you want to delete Incident ${incident.title}?`,
+            btnColor: "btn-danger",
+            btnText: "Delete Incident",
+            func: () => this.delete(incident),
+          }
+          this.$store.commit("setModal", modal)
         },
 
         async createIncident() {
@@ -112,10 +121,3 @@
     }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-    .sm {
-        font-size: 8pt;
-    }
-</style>
