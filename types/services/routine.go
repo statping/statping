@@ -2,11 +2,9 @@ package services
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/statping/statping/types/metrics"
-	"google.golang.org/grpc"
 	"net"
 	"net/http"
 	"net/url"
@@ -14,9 +12,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/statping/statping/types/metrics"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/utils"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
 // checkServices will start the checking go routine for each service
@@ -115,6 +119,22 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 	timer := prometheus.NewTimer(metrics.ServiceTimer(s.Name))
 	defer timer.ObserveDuration()
 
+	// Strip URL scheme if present. Eg: https:// , http://
+	if strings.Contains(s.Domain, "://") {
+		u, err := url.Parse(s.Domain)
+		if err != nil {
+			// Unable to parse.
+			log.Warnln(fmt.Sprintf("GRPC Service: '%s', Unable to parse URL: '%v'", s.Name, s.Domain))
+			if record {
+				RecordFailure(s, fmt.Sprintf("Unable to parse GRPC domain %v, %v", s.Domain, err), "parse_domain")
+			}
+		}
+
+		// Set domain as hostname without port number.
+		s.Domain = u.Hostname()
+	}
+
+	// Calculate DNS check time
 	dnsLookup, err := dnsCheck(s)
 	if err != nil {
 		if record {
@@ -122,6 +142,18 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 		}
 		return s, err
 	}
+
+	// Connect to grpc service without TLS certs.
+	grpcOption := grpc.WithInsecure()
+
+	// Check if TLS is enabled
+	// Upgrade GRPC connection if using TLS
+	// Force to connect on HTTP2 with TLS. Needed when using a reverse proxy such as nginx.
+	if s.VerifySSL.Bool {
+		h2creds := credentials.NewTLS(&tls.Config{NextProtos: []string{"h2"}})
+		grpcOption = grpc.WithTransportCredentials(h2creds)
+	}
+
 	s.PingTime = dnsLookup
 	t1 := utils.Now()
 	domain := fmt.Sprintf("%v", s.Domain)
@@ -131,28 +163,70 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 			domain = fmt.Sprintf("[%v]:%v", s.Domain, s.Port)
 		}
 	}
-	conn, err := grpc.Dial(domain, grpc.WithInsecure(), grpc.WithBlock())
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
+
+	// Context will cancel the request when timeout is exceeded.
+	// Cancel the context when request is served within the timeout limit.
+	timeout := time.Duration(s.Timeout) * time.Second
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	conn, err := grpc.DialContext(ctx, domain, grpcOption, grpc.WithBlock())
 	if err != nil {
 		if record {
 			RecordFailure(s, fmt.Sprintf("Dial Error %v", err), "connection")
 		}
 		return s, err
 	}
+
+	if s.GrpcHealthCheck.Bool {
+		// Create a new health check client
+		c := healthpb.NewHealthClient(conn)
+		in := &healthpb.HealthCheckRequest{}
+		res, err := c.Check(ctx, in)
+		if err != nil {
+			if record {
+				RecordFailure(s, fmt.Sprintf("GRPC Error %v", err), "healthcheck")
+			}
+			return s, nil
+		}
+
+		// Record responses
+		s.LastResponse = strings.TrimSpace(res.String())
+		s.LastStatusCode = int(res.GetStatus())
+	}
+
 	if err := conn.Close(); err != nil {
 		if record {
 			RecordFailure(s, fmt.Sprintf("%v Socket Close Error %v", strings.ToUpper(s.Type), err), "close")
 		}
 		return s, err
 	}
+
+	// Record latency
 	s.Latency = utils.Now().Sub(t1).Microseconds()
-	s.LastResponse = ""
 	s.Online = true
+
+	if s.GrpcHealthCheck.Bool {
+		if s.ExpectedStatus != s.LastStatusCode {
+			if record {
+				RecordFailure(s, fmt.Sprintf("GRPC Service: '%s', Status Code: expected '%v', got '%v'", s.Name, s.ExpectedStatus, s.LastStatusCode), "response_code")
+			}
+			return s, nil
+		}
+
+		if s.Expected.String != s.LastResponse {
+			log.Warnln(fmt.Sprintf("GRPC Service: '%s', Response: expected '%v', got '%v'", s.Name, s.Expected.String, s.LastResponse))
+			if record {
+				RecordFailure(s, fmt.Sprintf("GRPC Response Body '%v' did not match '%v'", s.LastResponse, s.Expected.String), "response_body")
+			}
+			return s, nil
+		}
+	}
+
 	if record {
 		RecordSuccess(s)
 	}
+
 	return s, nil
 }
 

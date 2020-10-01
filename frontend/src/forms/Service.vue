@@ -13,7 +13,7 @@
         <div class="form-group row">
             <label for="service_type" class="col-sm-4 col-form-label">{{ $t('service_type') }}</label>
             <div class="col-sm-8">
-                <select v-model="service.type" class="form-control" id="service_type">
+                <select v-model="service.type" @change="updateDefaultValues()" class="form-control" id="service_type">
                     <option value="http">HTTP {{ $t('service') }}</option>
                     <option value="tcp">TCP {{ $t('service') }}</option>
                     <option value="udp">UDP {{ $t('service') }}</option>
@@ -155,8 +155,7 @@
                 </span>
             </div>
         </div>
-
-        <div v-if="service.type.match(/^(http)$/)" class="form-group row">
+        <div v-if="service.type.match(/^(http|grpc)$/)" class="form-group row">
             <label class="col-12 col-md-4 col-form-label">{{ $t('verify_ssl') }}</label>
             <div class="col-12 col-md-8 mt-1 mb-2 mb-md-0">
                 <span @click="service.verify_ssl = !!service.verify_ssl" class="switch float-left">
@@ -164,6 +163,33 @@
                     <label for="switch-verify-ssl" v-if="service.verify_ssl">Verify SSL Certificate for this service</label>
                     <label for="switch-verify-ssl" v-if="!service.verify_ssl">Skip SSL Certificate verification for this service</label>
                 </span>
+            </div>
+        </div>
+
+        <div v-if="service.type.match(/^(grpc)$/)" class="form-group row">
+            <label class="col-12 col-md-4 col-form-label"><a href="https://github.com/grpc/grpc/blob/master/doc/health-checking.md#grpc-health-checking-protocol">GRPC Health Check</a></label>
+            <div class="col-12 col-md-8 mt-1 mb-2 mb-md-0">
+                <span @click="service.grpc_health_check = !!service.grpc_health_check" class="switch float-left">
+                    <input v-model="service.grpc_health_check" type="checkbox" name="grpc_health_check-option" class="switch" id="switch-grpc-health-check" v-bind:checked="service.grpc_health_check">
+                    <label for="switch-grpc-health-check" v-if="service.grpc_health_check">Check against GRPC health check endpoint.</label>
+                    <label for="switch-grpc-health-check" v-if="!service.grpc_health_check">Only checks if GRPC connection can be established.</label>
+                </span>
+            </div>
+        </div>
+
+        <div v-if="service.grpc_health_check" class="form-group row">
+            <label class="col-sm-4 col-form-label">Expected Response</label>
+            <div class="col-sm-8">
+                <textarea v-model="service.expected" class="form-control" rows="3" autocapitalize="none" spellcheck="false" placeholder='status:SERVING'></textarea>
+                <small class="form-text text-muted">Check <a target="_blank" href="https://pkg.go.dev/google.golang.org/grpc/health/grpc_health_v1?tab=doc#pkg-variables">GPRC health check response codes</a> for more information.</small>
+            </div>
+        </div>
+
+        <div v-if="service.grpc_health_check" class="form-group row">
+            <label for="service_response_code" class="col-sm-4 col-form-label">Expected Status Code</label>
+            <div class="col-sm-8">
+                <input v-model="service.expected_status" type="number" name="expected_status" class="form-control" placeholder="1" id="service_response_code">
+                <small class="form-text text-muted">A status code of 1 is success, or view all the <a target="_blank" href="https://pkg.go.dev/google.golang.org/grpc/health/grpc_health_v1?tab=doc#HealthCheckResponse_ServingStatus">GRPC Status Codes</a></small>
             </div>
         </div>
 
@@ -276,6 +302,7 @@
                   permalink: "",
                   order: 1,
                   verify_ssl: true,
+                  grpc_health_check: false,
                   redirect: true,
                   allow_notifications: true,
                   notify_all_changes: true,
@@ -316,6 +343,21 @@
             this.service = this.in_service
           }
           this.use_tls = this.service.tls_cert !== ""
+        },
+        updateDefaultValues() {
+            if (this.service.type === "grpc") {
+                this.service.expected_status = 1
+                this.service.expected = "status:SERVING"
+                this.service.port = 50051
+                this.service.verify_ssl = false
+                this.service.method = ""
+            } else {
+                this.service.expected_status = 200
+                this.service.expected = ""
+                this.service.port = 80
+                this.service.verify_ssl = true
+                this.service.method = "GET"
+            }
         },
           updatePermalink() {
               const a = 'àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;'
