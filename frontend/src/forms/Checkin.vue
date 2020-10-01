@@ -8,7 +8,7 @@
             <span class="d-block mt-2">
                 <input type="text" class="form-control" :value="`${core.domain}/checkin/${checkin.api_key}`" readonly>
                 <span class="small">Send a GET request to this URL every {{checkin.interval}} seconds
-                    <button @click="deleteCheckin(checkin)" type="button" class="btn btn-danger btn-xs float-right mt-1">Delete</button>
+                    <button @click.prevent="deleteCheckin(checkin)" type="button" class="btn btn-danger btn-xs float-right mt-1">Delete</button>
                 </span>
             </span>
         </div>
@@ -22,7 +22,7 @@
                     </div>
                     <div class="col-12 col-md-5">
                         <label for="checkin_interval" class="col-form-label">Interval (minutes)</label>
-                        <input v-model="checkin.interval" type="number" name="interval" class="form-control" id="checkin_interval" placeholder="1" min="1">
+                        <input v-model.number="checkin.interval" type="number" name="interval" class="form-control" id="checkin_interval" placeholder="1" min="1">
                     </div>
                     <div class="col-12 col-md-5">
                         <label class="col-form-label"></label>
