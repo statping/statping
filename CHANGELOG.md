@@ -1,3 +1,7 @@
+# 0.90.70 (10-1-2020)
+- Merged PR #806 - Enhance GRPC Monitoring
+- Modified multiple Vue forms to use number models for integer inputs
+
 # 0.90.69 (09-18-2020)
 - Fixed issue with service view not loading. #808 #811 #800
 

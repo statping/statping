@@ -27,7 +27,7 @@
           <div class="form-group row">
             <label class="col-sm-4 col-form-label">{{ $t('service') }}</label>
             <div class="col-sm-8">
-              <select v-model="message.service" name="service_id" class="form-control">
+              <select v-model.number="message.service" name="service_id" class="form-control">
                 <option v-bind:value="0">{{ $t('global_announcement') }}</option>
                 <option v-for="service in $store.getters.services" :value="service.id" v-bind:key="service.id" >{{service.name}}</option>
               </select>
@@ -41,16 +41,6 @@
             </div>
             <div class="col-sm-4 mt-3 mt-md-0">
               <flatPickr v-model="message.end_on" @on-change="endChange" :config="config" type="text" name="end_on" class="form-control form-control-plaintext" id="end_on" value="0001-01-01T00:00:00Z" required />
-            </div>
-          </div>
-
-          <div v-show="this.service === null" class="form-group row">
-            <label for="service_id" class="col-sm-4 col-form-label">{{ $t('service') }}</label>
-            <div class="col-sm-8">
-              <select v-model="message.service" class="form-control" name="service" id="service_id">
-                <option v-bind:value="0">{{ $t('global_announcement') }}</option>
-                <option v-for="service in $store.getters.services" :value="service.id" v-bind:key="service.id">{{service.name}}</option>
-              </select>
             </div>
           </div>
 

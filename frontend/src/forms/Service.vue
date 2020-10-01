@@ -27,7 +27,7 @@
         <div class="form-group row">
             <label for="service_type" class="col-sm-4 col-form-label">{{ $t('group') }}</label>
             <div class="col-sm-8">
-                <select v-model="service.group_id" class="form-control">
+                <select v-model.number="service.group_id" class="form-control">
                     <option value="0" >No Group</option>
                     <option v-for="(group, index) in $store.getters.cleanGroups()" :value="group.id">{{group.name}}</option>
                 </select>
@@ -57,11 +57,11 @@
                 <label for="service_interval" class="col-sm-4 col-form-label">{{ $t('check_interval') }}</label>
                 <div class="col-sm-6">
                     <span class="slider-info">{{secondsHumanize(service.check_interval)}}</span>
-                    <input v-model="service.check_interval" type="range" class="slider" id="service_interval" min="1" max="1800" :step="1">
+                    <input v-model.number="service.check_interval" type="range" class="slider" id="service_interval" min="1" max="1800" :step="1">
                     <small id="interval" class="form-text text-muted">Interval to check your service state</small>
                 </div>
                 <div class="col-sm-2">
-                    <input v-model="service.check_interval" type="number" name="check_interval" class="form-control">
+                    <input v-model.number="service.check_interval" type="number" name="check_interval" class="form-control">
                 </div>
             </div>
 
@@ -85,7 +85,7 @@
             <div v-if="service.type.match(/^(tcp|udp|grpc)$/)" class="form-group row">
                 <label class="col-sm-4 col-form-label">Port</label>
                 <div class="col-sm-8">
-                    <input v-model="service.port" type="number" name="port" class="form-control" id="service_port" placeholder="8080">
+                    <input v-model.number="service.port" type="number" name="port" class="form-control" id="service_port" placeholder="8080">
                 </div>
             </div>
 
@@ -107,12 +107,12 @@
             <label class="col-sm-4 col-form-label">{{ $t('service_timeout') }}</label>
             <div class="col-sm-6">
                 <span v-if="service.timeout >= 0" class="slider-info">{{secondsHumanize(service.timeout)}}</span>
-                <input v-model="service.timeout" type="range" id="timeout" name="timeout" class="slider" min="1" max="180">
+                <input v-model.number="service.timeout" type="range" id="timeout" name="timeout" class="slider" min="1" max="180">
                 <small class="form-text text-muted">If the endpoint does not respond within this time it will be considered to be offline</small>
             </div>
 
             <div class="col-sm-2">
-                <input v-model="service.timeout" type="number" name="service_timeout" class="form-control">
+                <input v-model.number="service.timeout" type="number" name="service_timeout" class="form-control">
             </div>
 
         </div>

@@ -61,7 +61,7 @@
 
             <div class="col-sm-12">
                 <span class="slider-info">Limit {{notifier.limits}} per hour</span>
-                <input v-model="notifier.limits" type="range" name="limits" class="slider" min="1" max="300">
+                <input v-model.number="notifier.limits" type="range" name="limits" class="slider" min="1" max="300">
                 <small class="form-text text-muted">Notifier '{{notifier.title}}' will send a maximum of {{notifier.limits}} notifications per hour.</small>
             </div>
 
@@ -146,7 +146,6 @@
                 <span class="badge badge-info float-right text-uppercase mt-1">{{notifier.logs.length}}</span>
             </div>
             <div class="card-body" :class="{'d-none': !expanded_logs}">
-
                 <div v-for="(log, i) in notifier.logs.reverse()" class="alert" :class="{'alert-danger': log.error, 'alert-dark': !log.success && !log.error, 'alert-success': log.success && !log.error}">
                         <span class="d-block">
                             Service {{log.service}}
