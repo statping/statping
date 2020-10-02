@@ -5,7 +5,7 @@
             No updates found, create a new Incident Update below.
         </div>
 
-        <div v-for="update in updates.reverse()" :key="update.id">
+        <div v-for="update in updates" :key="update.id">
             <IncidentUpdate :update="update" :onUpdate="loadUpdates" :admin="true"/>
         </div>
 
@@ -49,7 +49,7 @@
         },
         data () {
             return {
-                updates: null,
+                updates: [],
                 incident_update: {
                     incident: this.incident.id,
                     message: "",

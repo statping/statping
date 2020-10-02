@@ -250,7 +250,7 @@ jobs:
       - name: Go Tests
         run: |
           go get gotest.tools/gotestsum
-          gotestsum --no-summary=skipped --format testname -- -covermode=count -coverprofile=coverage.out -race -p=1 ./...
+          gotestsum --no-summary=skipped --format testname -- -covermode=count -coverprofile=coverage.out -p=1 ./...
         env:
           VERSION: ${{ env.VERSION }}
           COMMIT: ${{ github.sha }}
