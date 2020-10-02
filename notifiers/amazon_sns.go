@@ -35,7 +35,7 @@ var AmazonSNS = &amazonSNS{&notifications.Notification{
 	Description: "Use amazonSNS to receive push notifications. Add your amazonSNS URL and App Token to receive notifications.",
 	Author:      "Hunter Long",
 	AuthorUrl:   "https://github.com/hunterlong",
-	Icon:        "amazon",
+	Icon:        "fab fa-amazon",
 	Delay:       5 * time.Second,
 	Limits:      60,
 	SuccessData: null.NewNullString(`{{.Service.Name}} is back online and was down for {{.Service.Downtime.Human}}`),

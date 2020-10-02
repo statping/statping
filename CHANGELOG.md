@@ -1,5 +1,6 @@
 # 0.90.70 (10-1-2020)
 - Merged PR #806 - Enhance GRPC Monitoring
+- Merged PR #692 - When login fields are autofilled the sign in button should be enabled
 - Modified multiple Vue forms to use number models for integer inputs
 
 # 0.90.69 (09-18-2020)
