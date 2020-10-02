@@ -27,7 +27,7 @@ type Item struct {
 
 // cleanRoutine is a go routine to automatically remove expired caches that haven't been hit recently
 func cleanRoutine(s *Storage) {
-	duration := 5 * time.Second
+	duration := 60 * time.Second
 
 CacheRoutine:
 	for {
@@ -40,7 +40,7 @@ CacheRoutine:
 					s.Delete(k)
 				}
 			}
-			duration = 5 * time.Second
+			duration = 60 * time.Second
 		}
 	}
 }
@@ -89,6 +89,8 @@ func (s Storage) List() map[string]Item {
 
 //Get a cached content by key
 func (s Storage) Get(key string) []byte {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	item := s.items[key]
 	if item.Expired() {
 		CacheStorage.Delete(key)
