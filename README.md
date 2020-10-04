@@ -103,7 +103,8 @@ There are multiple ways to startup a Statping server. You want to make sure Stat
 
 ## Docker Compose
 
-In this folder there is a standard docker-compose file.
+In this folder there is just a standard [docker-compose file](docker-compose.yml) with a standalone container.  
+In the [Wiki](https://github.com/statping/statping/wiki/Docker-Compose) are multiple examples on how to configure a docker-compose file with Postgres, Proxy (with SSL) or Grafana/Prometheus.
 
 ```bash
 docker-compose up -d
