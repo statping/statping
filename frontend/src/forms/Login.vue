@@ -4,13 +4,13 @@
         <div class="form-group row">
             <label for="username" class="col-4 col-form-label">{{$t('username')}}</label>
             <div class="col-8">
-                <input @keyup="checkForm" type="text" v-model="username" autocomplete="username" name="username" class="form-control" id="username" placeholder="admin" autocorrect="off" autocapitalize="none">
+                <input @keyup="checkForm" @change="checkForm" type="text" v-model="username" autocomplete="username" name="username" class="form-control" id="username" placeholder="admin" autocorrect="off" autocapitalize="none">
             </div>
         </div>
         <div class="form-group row">
             <label for="password" class="col-4 col-form-label">{{$t('password')}}</label>
             <div class="col-8">
-                <input @keyup="checkForm" type="password" v-model="password" autocomplete="current-password" name="password" class="form-control" id="password" placeholder="************">
+                <input @keyup="checkForm" @change="checkForm" type="password" v-model="password" autocomplete="current-password" name="password" class="form-control" id="password" placeholder="************">
             </div>
         </div>
         <div class="form-group row">

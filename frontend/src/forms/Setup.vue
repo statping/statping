@@ -40,7 +40,7 @@
                             <div class="col-5 col-md-6">
                                 <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
                                     <label class="text-capitalize">{{ $t('db_port') }}</label>
-                                    <input @keyup="canSubmit" v-model="setup.db_port" id="db_port" type="number" class="form-control" placeholder="5432">
+                                    <input @keyup="canSubmit" v-model.number="setup.db_port" id="db_port" type="number" class="form-control" placeholder="5432">
                                 </div>
                             </div>
                         </div>

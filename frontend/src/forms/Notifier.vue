@@ -61,7 +61,7 @@
 
             <div class="col-sm-12">
                 <span class="slider-info">Limit {{notifier.limits}} per hour</span>
-                <input v-model="notifier.limits" type="range" name="limits" class="slider" min="1" max="300">
+                <input v-model.number="notifier.limits" type="range" name="limits" class="slider" min="1" max="300">
                 <small class="form-text text-muted">Notifier '{{notifier.title}}' will send a maximum of {{notifier.limits}} notifications per hour.</small>
             </div>
 
@@ -146,8 +146,7 @@
                 <span class="badge badge-info float-right text-uppercase mt-1">{{notifier.logs.length}}</span>
             </div>
             <div class="card-body" :class="{'d-none': !expanded_logs}">
-
-                <div v-for="(log, i) in notifier.logs.reverse()" class="alert" :class="{'alert-danger': log.error, 'alert-dark': !log.success && !log.error, 'alert-success': log.success && !log.error}">
+                <div v-for="(log, i) in notifier.logs" class="alert" :class="{'alert-danger': log.error, 'alert-dark': !log.success && !log.error, 'alert-success': log.success && !log.error}">
                         <span class="d-block">
                             Service {{log.service}}
                             {{log.success ? "Success Triggered" : "Failure Triggered"}}
@@ -188,49 +187,47 @@ import '../codemirror_json'
 const beautify = require('js-beautify').js
 
 export default {
-    name: 'Notifier',
+  name: 'Notifier',
   components: {
     codemirror
   },
-    props: {
-        notifier: {
-            type: Object,
-            required: true
-        }
-    },
-  watch: {
-
+  props: {
+    notifier: {
+      type: Object,
+      required: true
+    }
   },
-    data() {
-        return {
-            loading: false,
-            loadingTest: false,
-            error: null,
-            response: null,
-            request: null,
-            success: false,
-            saved: false,
-          expanded: false,
-          expanded_logs: false,
-          success_data: null,
-          failure_data: null,
-            form: {},
-              cmOptions: {
-                height: 700,
-                tabSize: 2,
-                lineNumbers: true,
-                line: true,
-                class: "json-field",
-                theme: 'neat',
-                mode: "mymode",
-                lineWrapping: true,
-                json: this.notifier.data_type === "json",
-                autoRefresh: true,
-                mime: this.notifier.data_type === "json" ? "application/json" : "text/plain"
-              },
-          beautifySettings: { indent_size: 2, space_in_empty_paren: true },
-        }
-    },
+  watch: {},
+  data() {
+    return {
+      loading: false,
+      loadingTest: false,
+      error: null,
+      response: null,
+      request: null,
+      success: false,
+      saved: false,
+      expanded: false,
+      expanded_logs: false,
+      success_data: null,
+      failure_data: null,
+      form: {},
+      cmOptions: {
+        height: 700,
+        tabSize: 2,
+        lineNumbers: true,
+        line: true,
+        class: "json-field",
+        theme: 'neat',
+        mode: "mymode",
+        lineWrapping: true,
+        json: this.notifier.data_type === "json",
+        autoRefresh: true,
+        mime: this.notifier.data_type === "json" ? "application/json" : "text/plain"
+      },
+      beautifySettings: {indent_size: 2, space_in_empty_paren: true},
+    }
+  },
   computed: {
     core() {
       return this.$store.getters.core
@@ -240,92 +237,92 @@ export default {
       return "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=" + encodeURIComponent(u)
     }
   },
-    methods: {
-      formVisible(want, form) {
-        return !!want.includes(form.type);
-      },
-      visible(isVisible, entry) {
-        if (isVisible) {
-          this.$refs.cmfailure.codemirror.refresh()
-          this.$refs.cmsuccess.codemirror.refresh()
-        }
-      },
-      onCmSuccessReady(cm) {
-        this.success_data = this.notifier.success_data
-        if (this.notifier.data_type === "json") {
-          this.success_data = beautify(this.notifier.success_data, this.beautifySettings)
-        }
-        setTimeout(function() {
-          cm.refresh();
-        },1);
-      },
-      onCmFailureReady(cm) {
-        this.failure_data = this.notifier.failure_data
-        if (this.notifier.data_type === "json") {
-          this.failure_data = beautify(this.notifier.failure_data, this.beautifySettings)
-        }
-        setTimeout(function() {
-          cm.refresh();
-        },1);
-      },
-        async enableToggle() {
-            this.notifier.enabled = !!this.notifier.enabled
-            const form = {
-                enabled: !this.notifier.enabled,
-                method: this.notifier.method,
-            }
-            await Api.notifier_save(form)
-        },
-        async saveNotifier() {
-            this.loading = true
-            this.form.enabled = this.notifier.enabled
-            this.form.limits = parseInt(this.notifier.limits)
-            this.form.method = this.notifier.method
-              if (this.notifier.form) {
-                this.notifier.form.forEach((f) => {
-                  let field = f.field.toLowerCase()
-                  let val = this.notifier[field]
-                  if (this.isNumeric(val)) {
-                    val = parseInt(val)
-                  }
-                  this.form[field] = val
-                });
-              }
-          this.form.success_data = this.success_data
-          this.form.failure_data = this.failure_data
-            await Api.notifier_save(this.form)
-            const notifiers = await Api.notifiers()
-            await this.$store.commit('setNotifiers', notifiers)
-            this.saved = true
-            this.loading = false
-        },
-        async testNotifier(method="success") {
-            this.success = false
-            this.loadingTest = true
-            this.form.method = this.notifier.method
-          if (this.notifier.form) {
-            this.notifier.form.forEach((f) => {
-              let field = f.field.toLowerCase()
-              let val = this.notifier[field]
-              if (this.isNumeric(val)) {
-                val = parseInt(val)
-              }
-              this.form[field] = val
-            });
+  methods: {
+    formVisible(want, form) {
+      return !!want.includes(form.type);
+    },
+    visible(isVisible, entry) {
+      if (isVisible) {
+        this.$refs.cmfailure.codemirror.refresh()
+        this.$refs.cmsuccess.codemirror.refresh()
+      }
+    },
+    onCmSuccessReady(cm) {
+      this.success_data = this.notifier.success_data
+      if (this.notifier.data_type === "json") {
+        this.success_data = beautify(this.notifier.success_data, this.beautifySettings)
+      }
+      setTimeout(function () {
+        cm.refresh();
+      }, 1);
+    },
+    onCmFailureReady(cm) {
+      this.failure_data = this.notifier.failure_data
+      if (this.notifier.data_type === "json") {
+        this.failure_data = beautify(this.notifier.failure_data, this.beautifySettings)
+      }
+      setTimeout(function () {
+        cm.refresh();
+      }, 1);
+    },
+    async enableToggle() {
+      this.notifier.enabled = !!this.notifier.enabled
+      const form = {
+        enabled: !this.notifier.enabled,
+        method: this.notifier.method,
+      }
+      await Api.notifier_save(form)
+    },
+    async saveNotifier() {
+      this.loading = true
+      this.form.enabled = this.notifier.enabled
+      this.form.limits = parseInt(this.notifier.limits)
+      this.form.method = this.notifier.method
+      if (this.notifier.form) {
+        this.notifier.form.forEach((f) => {
+          let field = f.field.toLowerCase()
+          let val = this.notifier[field]
+          if (this.isNumeric(val)) {
+            val = parseInt(val)
           }
-            let req = {
-              notifier: this.form,
-              method: method,
-            }
-            const tested = await Api.notifier_test(req, this.notifier.method)
-            if (tested.success) {
-                this.success = true
-            } else {
-                this.error = tested.error
-            }
-            this.response = tested.response
-            this.loadingTest = false
-        },
-    }
+          this.form[field] = val
+        });
+      }
+      this.form.success_data = this.success_data
+      this.form.failure_data = this.failure_data
+      await Api.notifier_save(this.form)
+      const notifiers = await Api.notifiers()
+      await this.$store.commit('setNotifiers', notifiers)
+      this.saved = true
+      this.loading = false
+    },
+    async testNotifier(method = "success") {
+      this.success = false
+      this.loadingTest = true
+      this.form.method = this.notifier.method
+      if (this.notifier.form) {
+        this.notifier.form.forEach((f) => {
+          let field = f.field.toLowerCase()
+          let val = this.notifier[field]
+          if (this.isNumeric(val)) {
+            val = parseInt(val)
+          }
+          this.form[field] = val
+        });
+      }
+      let req = {
+        notifier: this.form,
+        method: method,
+      }
+      const tested = await Api.notifier_test(req, this.notifier.method)
+      if (tested.success) {
+        this.success = true
+      } else {
+        this.error = tested.error
+      }
+      this.response = tested.response
+      this.loadingTest = false
+    },
+  }
 }
 </script>
