@@ -58,7 +58,7 @@ const german = {
     minute: "Minute",
     failures_24_hours: "Ausfälle dauern 24 Stunden",
     no_services: "Sie haben derzeit keine Dienste!",
-    theme: "Design",
+    theme: "Theme",
     cache: "Cache",
     authentication: "Authentifikation",
     import: "Importieren",
