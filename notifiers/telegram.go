@@ -4,15 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
+	"strings"
+	"time"
+
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/notifier"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
-	"net/url"
-	"strings"
-	"time"
 )
 
 var _ notifier.Notifier = (*telegram)(nil)

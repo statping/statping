@@ -6,11 +6,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/statping/statping/utils"
 	"github.com/tdewolff/minify/v2"
 	"github.com/tdewolff/minify/v2/html"
-	"os"
-	"time"
 )
 
 var (
@@ -110,7 +111,7 @@ const emailFailureMJML = `<mjml>
         <mj-column>
           <mj-text font-color="#d50d0d" align="center" font-size="20px" color="#626262">Offline for {{.Service.Downtime.Human}}</mj-text>
           
-          <mj-button border-radius="4px" background-color="#cb121c" href="{{.Core.Domain}}/service/{{.Service.Id}}">View Dashboard</mj-button>
+          <mj-button border-radius="4px" background-color="#cb121c" href="{{.Core .Domain}}/service/{{.Service .Id}}">View Dashboard</mj-button>
           
     </mj-column>
   </mj-section>
@@ -202,7 +203,7 @@ const emailSuccessMJML = `<mjml>
         <mj-column>
           <mj-text font-color="#d50d0d" align="center" font-size="20px" color="#626262">Offline for {{.Service.Downtime.Human}}</mj-text>
           
-          <mj-button border-radius="4px" background-color="#4caf50" href="{{.Core.Domain}}/service/{{.Service.Id}}">View Dashboard</mj-button>
+          <mj-button border-radius="4px" background-color="#4caf50" href="{{.Core .Domain}}/service/{{.Service .Id}}">View Dashboard</mj-button>
           
     </mj-column>
   </mj-section>

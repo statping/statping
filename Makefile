@@ -302,8 +302,8 @@ dockerhub:
 	docker push statping/statping
 
 docker-build-dev:
-	docker build --build-arg VERSION=${VERSION} -t hunterlong/statping:latest --no-cache -f Dockerfile .
-	docker tag hunterlong/statping:dev hunterlong/statping:dev-v${VERSION}
+	docker build --build-arg VERSION=${VERSION} -t statping/statping:latest --no-cache -f Dockerfile .
+	docker tag statping/statping:dev statping/statping:dev-v${VERSION}
 
 post-release: frontend-build upload_to_s3 publish-homebrew dockerhub
 
