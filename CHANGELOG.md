@@ -1,3 +1,6 @@
+# 0.90.71 (10-13-2020)
+- Reverted Docker user in Dockerfile
+
 # 0.90.70 (10-1-2020)
 - Merged PR #806 - Enhance GRPC Monitoring
 - Merged PR #692 - When login fields are autofilled the sign in button should be enabled
