@@ -14,7 +14,7 @@ const german = {
     password: "Kennwort",
     email: "Mail",
     confirm_password: "Passwort bestätigen",
-    uptime: "Laufzeit",
+    uptime: "Uptime",
     name: "Name",
     copy: "Kopie",
     close: "Schließen",
