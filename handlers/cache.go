@@ -1,10 +1,11 @@
 package handlers
 
 import (
-	"github.com/statping/statping/utils"
 	"net/url"
 	"sync"
 	"time"
+
+	"github.com/statping/statping/utils"
 )
 
 var CacheStorage Cacher
@@ -92,7 +93,7 @@ func (s Storage) Get(key string) []byte {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	item := s.items[key]
-	if item.Expired() {
+	if s.items[key].Expired() {
 		CacheStorage.Delete(key)
 		return nil
 	}
