@@ -1,3 +1,6 @@
+# 0.90.72 (10-28-2020)
+- Fixed issue with graphs becoming stuck on reload
+
 # 0.90.71 (10-13-2020)
 - Reverted Docker user in Dockerfile
 
