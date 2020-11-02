@@ -303,7 +303,7 @@ dockerhub:
 
 docker-build-dev:
 	docker build --build-arg VERSION=${VERSION} -t statping/statping:latest --no-cache -f Dockerfile .
-	docker tag hunterlong/statping:dev hunterlong/statping:dev-v${VERSION}
+	docker tag statping/statping:latest statping/statping:dev-v${VERSION}
 
 post-release: frontend-build upload_to_s3 publish-homebrew dockerhub
 
