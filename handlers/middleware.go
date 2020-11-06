@@ -161,6 +161,7 @@ func cached(duration, contentType string, handler func(w http.ResponseWriter, r 
 				w.Write(content)
 				return
 			}
+			w.WriteHeader(result.StatusCode)
 			w.Write(content)
 			if d, err := time.ParseDuration(duration); err == nil {
 				go CacheStorage.Set(r.RequestURI, content, d)
