@@ -212,6 +212,27 @@ func returnJson(d interface{}, w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(d)
 }
 
+func returnResponseCode(d interface{}, w http.ResponseWriter, r *http.Request) {
+	if e, ok := d.(errors.Error); ok {
+		w.WriteHeader(e.Status())
+		json.NewEncoder(w).Encode(e)
+		return
+	}
+	if e, ok := d.(error); ok {
+		w.WriteHeader(500)
+		json.NewEncoder(w).Encode(errors.New(e.Error()))
+		return
+	}
+	
+	// https://golang.org/src/net/http/server.go?s=3003:5866#L150
+	// Go does not currently
+	// support sending user-defined 1xx informational headers,
+	// with the exception of 100-continue response header that the
+	// Server sends automatically when the Request.Body is read.
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(d)
+}
+
 // error404Handler is a HTTP handler for 404 error pages
 func error404Handler(w http.ResponseWriter, r *http.Request) {
 	if usingSSL {
