@@ -137,7 +137,7 @@ func Router() *mux.Router {
 	api.Handle("/api/services/{id}/failures", authenticated(servicesDeleteFailuresHandler, false)).Methods("DELETE")
 	api.Handle("/api/services/{id}/hits", scoped(apiServiceHitsHandler)).Methods("GET")
 	api.Handle("/api/services/{id}/hits", authenticated(apiServiceHitsDeleteHandler, false)).Methods("DELETE")
-	api.Handle("/api/services/{id}/responsecode", scoped(apiServiceResponseCodeHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/responsecode", authenticated(apiServiceResponseCodeHandler, false)).Methods("GET")
 	
 	// API SERVICE CHART DATA Routes
 	api.Handle("/api/services/{id}/hits_data", cached("30s", "application/json", apiServiceDataHandler)).Methods("GET")
