@@ -316,3 +316,13 @@ func apiServiceHitsHandler(r *http.Request) interface{} {
 	query.Find(&hts)
 	return hts
 }
+
+func apiServiceResponseCodeHandler(w http.ResponseWriter, r *http.Request) interface{} {
+
+	service, err := findService(r)
+	if err != nil {
+		return err
+	}
+	
+	return returnResponseCode(service, w, r)
+}
