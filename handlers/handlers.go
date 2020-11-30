@@ -213,7 +213,7 @@ func returnJson(d interface{}, w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(d)
 }
 
-func returnResponseCode(s *services.Service, w http.ResponseWriter, r *http.Request) {
+func returnLastResponse(s *services.Service, w http.ResponseWriter, r *http.Request) {
 	// Go does not currently
 	// support sending user-defined 1xx informational headers,
 	// with the exception of 100-continue response header that the

@@ -318,7 +318,7 @@ func apiServiceHitsHandler(r *http.Request) interface{} {
 	return hts
 }
 
-func apiServiceResponseCodeHandler(w http.ResponseWriter, r *http.Request) {
+func apiServiceLastResponseHandler(w http.ResponseWriter, r *http.Request) {
 
 	service, err := findService(r)
 	if err != nil {
@@ -326,5 +326,5 @@ func apiServiceResponseCodeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	returnResponseCode(service, w, r)
+	returnLastResponse(service, w, r)
 }

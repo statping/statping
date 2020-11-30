@@ -1,15 +1,16 @@
 package handlers
 
 import (
+	"net/http"
+	"net/http/pprof"
+	"time"
+
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/statping/statping/source"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/utils"
-	"net/http"
-	"net/http/pprof"
-	"time"
 
 	_ "github.com/statping/statping/types/metrics"
 )
@@ -137,8 +138,8 @@ func Router() *mux.Router {
 	api.Handle("/api/services/{id}/failures", authenticated(servicesDeleteFailuresHandler, false)).Methods("DELETE")
 	api.Handle("/api/services/{id}/hits", scoped(apiServiceHitsHandler)).Methods("GET")
 	api.Handle("/api/services/{id}/hits", authenticated(apiServiceHitsDeleteHandler, false)).Methods("DELETE")
-	api.Handle("/api/services/{id}/responsecode", authenticated(apiServiceResponseCodeHandler, false)).Methods("GET")
-	
+	api.Handle("/api/services/{id}/lastresponse", authenticated(apiServiceLastResponseHandler, false)).Methods("GET")
+
 	// API SERVICE CHART DATA Routes
 	api.Handle("/api/services/{id}/hits_data", cached("30s", "application/json", apiServiceDataHandler)).Methods("GET")
 	api.Handle("/api/services/{id}/failure_data", cached("30s", "application/json", apiServiceFailureDataHandler)).Methods("GET")
