@@ -3,13 +3,14 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/statping/statping/types/errors"
 	"html/template"
 	"net/http"
 	"path"
 	"time"
 
 	"github.com/statping/statping/source"
+	"github.com/statping/statping/types/errors"
+	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 )
 
@@ -212,18 +213,19 @@ func returnJson(d interface{}, w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(d)
 }
 
-func returnResponseCode(s *Service, w http.ResponseWriter, r *http.Request) {
+func returnResponseCode(s *services.Service, w http.ResponseWriter, r *http.Request) {
 	// Go does not currently
 	// support sending user-defined 1xx informational headers,
 	// with the exception of 100-continue response header that the
 	// Server sends automatically when the Request.Body is read.
 	// https://golang.org/src/net/http/server.go?s=3003:5866#L150
-	if LastStatusCode >= 100 {
+
+	if s.LastStatusCode >= 100 {
 		w.WriteHeader(s.LastStatusCode)
 		w.Write([]byte(s.DownText))
 		return
 	}
-	
+
 	w.WriteHeader(http.StatusTeapot)
 	w.Write([]byte("☄ Last Status Code Not Set!"))
 }
