@@ -213,17 +213,6 @@ func returnJson(d interface{}, w http.ResponseWriter, r *http.Request) {
 }
 
 func returnResponseCode(s *Service, w http.ResponseWriter, r *http.Request) {
-	if e, ok := d.(errors.Error); ok {
-		w.WriteHeader(e.Status())
-		json.NewEncoder(w).Encode(e)
-		return
-	}
-	if e, ok := d.(error); ok {
-		w.WriteHeader(500)
-		json.NewEncoder(w).Encode(errors.New(e.Error()))
-		return
-	}
-	
 	// Go does not currently
 	// support sending user-defined 1xx informational headers,
 	// with the exception of 100-continue response header that the
@@ -231,8 +220,12 @@ func returnResponseCode(s *Service, w http.ResponseWriter, r *http.Request) {
 	// https://golang.org/src/net/http/server.go?s=3003:5866#L150
 	if LastStatusCode >= 100 {
 		w.WriteHeader(s.LastStatusCode)
+		w.Write([]byte(s.DownText))
+		return
 	}
-	return w.WriteHeader(http.StatusTeapot)
+	
+	w.WriteHeader(http.StatusTeapot)
+	w.Write([]byte("☄ Last Status Code Not Set!"))
 }
 
 // error404Handler is a HTTP handler for 404 error pages
