@@ -91,8 +91,8 @@ func (s Storage) List() map[string]Item {
 //Get a cached content by key
 func (s Storage) Get(key string) []byte {
 	item := s.items[key]
-	if s.items[key].Expired() {
-		CacheStorage.Delete(key)
+	if item.Expired() {
+		s.Delete(key)
 		return nil
 	}
 	return item.Content
