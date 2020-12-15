@@ -98,7 +98,7 @@ jobs:
 
       - name: Add GOBIN to PATH
         run: |
-          echo ::set-env name=VERSION::$(cat version.txt)
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
         shell: bash
 
       - name: Set Linux Build Flags
