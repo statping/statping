@@ -104,20 +104,20 @@ jobs:
       - name: Set Linux Build Flags
         if: matrix.platform == 'linux'
         run: |
-          echo "BUILD_FLAGS='-extldflags -static'" >> $GITHUB_ENV
-          echo "XGO_TAGS='-netgo,osusergo,linux,sqlite_omit_load_extension'" >> $GITHUB_ENV
+          echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
+          echo "XGO_TAGS=netgo osusergo linux sqlite_omit_load_extension" >> $GITHUB_ENV
         shell: bash
 
       - name: Set Darwin Build Flags
         if: matrix.platform == 'darwin'
-        run: echo "XGO_TAGS='netgo,osusergo,darwin,sqlite_omit_load_extension'" >> $GITHUB_ENV
+        run: echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
         shell: bash
 
       - name: Set Windows Build Flags
         if: matrix.platform == 'windows'
         run: |
-          echo "BUILD_FLAGS='-extldflags -static'" >> $GITHUB_ENV
-          echo "XGO_TAGS='netgo,osusergo,sqlite_omit_load_extension'" >> $GITHUB_ENV
+          echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
+          echo "XGO_TAGS=netgo osusergo sqlite_omit_load_extension" >> $GITHUB_ENV
         shell: bash
 
       - name: Build ${{ matrix.platform }}/${{ matrix.arch }}
