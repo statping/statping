@@ -21,6 +21,8 @@
     "@fortawesome/vue-fontawesome": "^0.1.9",
     "@sentry/browser": "^5.20.1",
     "@sentry/integrations": "^5.20.1",
+    "@sentry/tracing": "^5.29.0",
+    "@sentry/vue": "^5.29.0",
     "apexcharts": "^3.6.6",
     "axios": "^0.19.1",
     "codemirror-colorpicker": "^1.9.66",

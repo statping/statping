@@ -200,14 +200,6 @@ class Api {
     return axios.get('api/renew').then(response => (response.data))
   }
 
-  async cache() {
-    return axios.get('api/cache').then(response => (response.data))
-  }
-
-  async clearCache() {
-    return axios.get('api/clear_cache').then(response => (response.data))
-  }
-
   async logs() {
     return axios.get('api/logs').then(response => (response.data)) || []
   }

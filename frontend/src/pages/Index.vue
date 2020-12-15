@@ -39,6 +39,7 @@
 
 <script>
 import Api from "@/API";
+
 const Group = () => import(/* webpackChunkName: "index" */ '@/components/Index/Group')
 const Header = () => import(/* webpackChunkName: "index" */ '@/components/Index/Header')
 const MessageBlock = () => import(/* webpackChunkName: "index" */ '@/components/Index/MessageBlock')
@@ -63,9 +64,7 @@ export default {
     },
     computed: {
       loading_text() {
-        if (!this.$store.getters.core.version) {
-          return "Loading Core"
-        } else if (this.$store.getters.groups.length === 0) {
+        if (this.$store.getters.groups.length === 0) {
           return "Loading Groups"
         } else if (this.$store.getters.services.length === 0) {
           return "Loading Services"
@@ -74,7 +73,7 @@ export default {
         }
       },
       loaded() {
-        return this.$store.getters.core.version && this.$store.getters.services.length !== 0
+        return this.$store.getters.services.length !== 0
       },
         core() {
           return this.$store.getters.core

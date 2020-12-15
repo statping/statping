@@ -234,6 +234,7 @@ func apiServiceTimeDataHandler(w http.ResponseWriter, r *http.Request) {
 		sendErrorJson(err, w, r)
 		return
 	}
+
 	returnJson(uptimeData, w, r)
 }
 

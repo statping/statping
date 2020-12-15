@@ -116,27 +116,6 @@ type cacheJson struct {
 	Size       int       `json:"size"`
 }
 
-func apiCacheHandler(w http.ResponseWriter, r *http.Request) {
-	var cacheList []cacheJson
-	for k, v := range CacheStorage.List() {
-		cacheList = append(cacheList, cacheJson{
-			URL:        k,
-			Expiration: time.Unix(0, v.Expiration).UTC(),
-			Size:       len(v.Content),
-		})
-	}
-	returnJson(cacheList, w, r)
-}
-
-func apiClearCacheHandler(w http.ResponseWriter, r *http.Request) {
-	CacheStorage.StopRoutine()
-	CacheStorage = NewStorage()
-	output := apiResponse{
-		Status: "success",
-	}
-	returnJson(output, w, r)
-}
-
 func sendErrorJson(err error, w http.ResponseWriter, r *http.Request) {
 	errCode := 0
 	e, ok := err.(errors.Error)
