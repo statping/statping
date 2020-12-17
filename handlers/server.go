@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func startServer(host string) {
+func startServer(host string) error {
 	httpServer = &http.Server{
 		Addr:         host,
 		WriteTimeout: timeout,
@@ -19,9 +19,7 @@ func startServer(host string) {
 		Handler:      router,
 	}
 	httpServer.SetKeepAlivesEnabled(false)
-	if err := httpServer.ListenAndServe(); err != nil {
-		httpError <- err
-	}
+	return httpServer.ListenAndServe()
 }
 
 func letsEncryptCert() (*tls.Config, error) {
@@ -63,14 +61,13 @@ func letsEncryptCert() (*tls.Config, error) {
 	return tlsconf, nil
 }
 
-func startLetsEncryptServer(ip string) {
+func startLetsEncryptServer(ip string) error {
 	log.Infoln("Starting LetEncrypt redirect server on port 80")
 	go http.ListenAndServe(":80", http.HandlerFunc(simplecert.Redirect))
 
 	cfg, err := letsEncryptCert()
 	if err != nil {
-		httpError <- err
-		return
+		return err
 	}
 
 	srv := &http.Server{
@@ -82,12 +79,10 @@ func startLetsEncryptServer(ip string) {
 		IdleTimeout:  timeout,
 	}
 
-	if err := srv.ListenAndServeTLS("", ""); err != nil {
-		httpError <- err
-	}
+	return srv.ListenAndServeTLS("", "")
 }
 
-func startSSLServer(ip string) {
+func startSSLServer(ip string) error {
 	cfg := &tls.Config{
 		MinVersion:               tls.VersionTLS12,
 		CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
@@ -112,7 +107,5 @@ func startSSLServer(ip string) {
 	certFile := utils.Directory + "/server.crt"
 	keyFile := utils.Directory + "/server.key"
 
-	if err := srv.ListenAndServeTLS(certFile, keyFile); err != nil {
-		httpError <- err
-	}
+	return srv.ListenAndServeTLS(certFile, keyFile)
 }

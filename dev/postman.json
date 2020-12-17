@@ -344,6 +344,146 @@
 					]
 				},
 				{
+					"name": "View Configuration",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "557dd7ef-fa5a-4f3d-98b3-4bca5e3ce154",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint}}/api/settings/configs",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"settings",
+								"configs"
+							]
+						},
+						"description": "This endpoint will return the config.yml configuration without database credentials."
+					},
+					"response": [
+						{
+							"name": "View Configuration",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint}}/api/settings/configs",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api",
+										"settings",
+										"configs"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 18 Sep 2020 03:41:34 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "256"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/plain; charset=utf-8"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "api_secret: demoapisecret123\nlanguage: en\nallow_reports: true\nlocation: /root/go/src/github.com/statping/statping\ndisable_http: false\ndemo_mode: false\ndisable_logs: false\nuse_assets: false\nsample_data: true\nuse_cdn: false\ndisable_colors: false\n"
+						}
+					]
+				},
+				{
+					"name": "Update Configuration",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5074172f-5689-4471-aced-50b0a0b6b2b4",
+								"exec": [
+									"pm.test(\"Response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{api_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "api_secret: demoapisecret123\nlanguage: en\nallow_reports: true\nlocation: /root/go/src/github.com/statping/statping\ndisable_http: false\ndemo_mode: false\ndisable_logs: false\nuse_assets: false\nsample_data: true\nuse_cdn: false\ndisable_colors: false\n",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "{{endpoint}}/api/settings/configs",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"settings",
+								"configs"
+							]
+						},
+						"description": "This endpoint will update the config.yml configuration."
+					},
+					"response": []
+				},
+				{
 					"name": "Logs Last Line",
 					"event": [
 						{
@@ -564,166 +704,6 @@
 							],
 							"cookie": [],
 							"body": "# Statping Prometheus Exporter\n\n# Statping Totals\nstatping_total_failures 1617\nstatping_total_services 6\nstatping_seconds_online 347.8779\n\n# Service #1 'Google':\nstatping_service_failures{id=\"1\" name=\"Google\"} 404\nstatping_service_latency{id=\"1\" name=\"Google\"} 115217\nstatping_service_online{id=\"1\" name=\"Google\"} 1\nstatping_service_status_code{id=\"1\" name=\"Google\"} 200\nstatping_service_response_length{id=\"1\" name=\"Google\"} 14366\nstatping_service_ping_time{id=\"1\" name=\"Google\"} 13604\nstatping_service_last_latency{id=\"1\" name=\"Google\"} 115217\nstatping_service_last_lookup{id=\"1\" name=\"Google\"} 13604\nstatping_service_last_check{id=\"1\" name=\"Google\"} 9074\n\n# Service #2 'Statping Github':\nstatping_service_failures{id=\"2\" name=\"Statping Github\"} 407\nstatping_service_latency{id=\"2\" name=\"Statping Github\"} 121795\nstatping_service_online{id=\"2\" name=\"Statping Github\"} 1\nstatping_service_status_code{id=\"2\" name=\"Statping Github\"} 200\nstatping_service_response_length{id=\"2\" name=\"Statping Github\"} 154781\nstatping_service_ping_time{id=\"2\" name=\"Statping Github\"} 14089\nstatping_service_last_latency{id=\"2\" name=\"Statping Github\"} 121795\nstatping_service_last_lookup{id=\"2\" name=\"Statping Github\"} 14089\nstatping_service_last_check{id=\"2\" name=\"Statping Github\"} 8799\n\n# Service #3 'JSON Users Test':\nstatping_service_failures{id=\"3\" name=\"JSON Users Test\"} 403\nstatping_service_latency{id=\"3\" name=\"JSON Users Test\"} 43900\nstatping_service_online{id=\"3\" name=\"JSON Users Test\"} 1\nstatping_service_status_code{id=\"3\" name=\"JSON Users Test\"} 200\nstatping_service_response_length{id=\"3\" name=\"JSON Users Test\"} 5645\nstatping_service_ping_time{id=\"3\" name=\"JSON Users Test\"} 11100\nstatping_service_last_latency{id=\"3\" name=\"JSON Users Test\"} 43900\nstatping_service_last_lookup{id=\"3\" name=\"JSON Users Test\"} 11100\nstatping_service_last_check{id=\"3\" name=\"JSON Users Test\"} 38637\n\n# Service #4 'JSON API Tester':\nstatping_service_failures{id=\"4\" name=\"JSON API Tester\"} 403\nstatping_service_latency{id=\"4\" name=\"JSON API Tester\"} 875234\nstatping_service_online{id=\"4\" name=\"JSON API Tester\"} 1\nstatping_service_status_code{id=\"4\" name=\"JSON API Tester\"} 201\nstatping_service_response_length{id=\"4\" name=\"JSON API Tester\"} 74\nstatping_service_ping_time{id=\"4\" name=\"JSON API Tester\"} 11204\nstatping_service_last_latency{id=\"4\" name=\"JSON API Tester\"} 875234\nstatping_service_last_lookup{id=\"4\" name=\"JSON API Tester\"} 11204\nstatping_service_last_check{id=\"4\" name=\"JSON API Tester\"} 7556\n\n# Service #5 'Google DNS':\nstatping_service_failures{id=\"5\" name=\"Google DNS\"} 0\nstatping_service_latency{id=\"5\" name=\"Google DNS\"} 779\nstatping_service_online{id=\"5\" name=\"Google DNS\"} 1\nstatping_service_status_code{id=\"5\" name=\"Google DNS\"} 0\nstatping_service_response_length{id=\"5\" name=\"Google DNS\"} 0\nstatping_service_ping_time{id=\"5\" name=\"Google DNS\"} 4\nstatping_service_last_latency{id=\"5\" name=\"Google DNS\"} 779\nstatping_service_last_lookup{id=\"5\" name=\"Google DNS\"} 4\nstatping_service_last_check{id=\"5\" name=\"Google DNS\"} 18187\n\n# Service #6 'Private Service':\nstatping_service_failures{id=\"6\" name=\"Private Service\"} 0\nstatping_service_latency{id=\"6\" name=\"Private Service\"} 28960\nstatping_service_online{id=\"6\" name=\"Private Service\"} 1\nstatping_service_status_code{id=\"6\" name=\"Private Service\"} 200\nstatping_service_response_length{id=\"6\" name=\"Private Service\"} 43\nstatping_service_ping_time{id=\"6\" name=\"Private Service\"} 11312\nstatping_service_last_latency{id=\"6\" name=\"Private Service\"} 28960\nstatping_service_last_lookup{id=\"6\" name=\"Private Service\"} 11312\nstatping_service_last_check{id=\"6\" name=\"Private Service\"} 9416\n\n# HTTP Metrics\nstatping_http_errors 0\nstatping_http_requests 0\nstatping_http_bytes 0\nstatping_http_request_milliseconds 0\n\n# Golang Metrics\nstatping_go_heap_allocated 3055024\nstatping_go_total_allocated 471694440\nstatping_go_heap_in_use 5545984\nstatping_go_heap_objects 27102\nstatping_go_heap_idle 60448768\nstatping_go_heap_released 58499072\nstatping_go_heap_frees 8677374\nstatping_go_lookups 0\nstatping_go_system 74531072\nstatping_go_number_gc 186\nstatping_go_number_gc_forced 0\nstatping_go_goroutines 19"
-						}
-					]
-				},
-				{
-					"name": "Clear Cache",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "dbabc164-5030-441d-90f7-b29c7fe794df",
-								"exec": [
-									"pm.test(\"Response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{api_key}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{endpoint}}/api/clear_cache",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"api",
-								"clear_cache"
-							]
-						},
-						"description": "This endpoint will clear all the cache files in your Statping instance. This includes chart data and service views."
-					},
-					"response": [
-						{
-							"name": "Clear Cache",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{endpoint}}/api/clear_cache",
-									"host": [
-										"{{endpoint}}"
-									],
-									"path": [
-										"api",
-										"clear_cache"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Length",
-									"value": "21"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								},
-								{
-									"key": "Date",
-									"value": "Sat, 02 May 2020 01:06:43 GMT"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"status\": \"success\"\n}"
-						}
-					]
-				},
-				{
-					"name": "List Cache",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "992ce59d-3cce-43f1-9c3d-895c55a3e0a1",
-								"exec": [
-									"pm.test(\"Response is ok\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{api_key}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{endpoint}}/api/cache",
-							"host": [
-								"{{endpoint}}"
-							],
-							"path": [
-								"api",
-								"cache"
-							]
-						},
-						"description": "This endpoint will return all cached API endpoints."
-					},
-					"response": [
-						{
-							"name": "List Cache",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{endpoint}}/api/cache",
-									"host": [
-										"{{endpoint}}"
-									],
-									"path": [
-										"api",
-										"cache"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "Content-Length",
-									"value": "1631"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								},
-								{
-									"key": "Date",
-									"value": "Sat, 02 May 2020 01:06:32 GMT"
-								}
-							],
-							"cookie": [],
-							"body": "[\n    {\n        \"url\": \"/api/services/1/failure_data?start=1585789587&end=1588381587&group=24h&fill=true\",\n        \"expiration\": \"2020-05-02T01:06:57.511702322Z\",\n        \"size\": 1541\n    },\n    {\n        \"url\": \"/api/services/1/hits_data?start=1588127787&end=1588381587&group=5m&fill=false\",\n        \"expiration\": \"2020-05-02T01:06:57.808458203Z\",\n        \"size\": 45223\n    },\n    {\n        \"url\": \"/api/services/2/hits_data?start=1588127787&end=1588381587&group=5m&fill=false\",\n        \"expiration\": \"2020-05-02T01:06:57.873815975Z\",\n        \"size\": 45224\n    },\n    {\n        \"url\": \"/api/services/3/hits_data?start=1588127787&end=1588381587&group=5m&fill=false\",\n        \"expiration\": \"2020-05-02T01:06:57.909984136Z\",\n        \"size\": 45088\n    },\n    {\n        \"url\": \"/api/services/2/failure_data?start=1585789587&end=1588381587&group=24h&fill=true\",\n        \"expiration\": \"2020-05-02T01:06:57.48592429Z\",\n        \"size\": 1538\n    },\n    {\n        \"url\": \"/api/services/4/failure_data?start=1585789587&end=1588381587&group=24h&fill=true\",\n        \"expiration\": \"2020-05-02T01:06:57.493425593Z\",\n        \"size\": 1538\n    },\n    {\n        \"url\": \"/api/services/3/failure_data?start=1585789587&end=1588381587&group=24h&fill=true\",\n        \"expiration\": \"2020-05-02T01:06:57.493554858Z\",\n        \"size\": 1538\n    },\n    {\n        \"url\": \"/api/services/5/failure_data?start=1585789587&end=1588381587&group=24h&fill=true\",\n        \"expiration\": \"2020-05-02T01:06:57.511424891Z\",\n        \"size\": 1538\n    },\n    {\n        \"url\": \"/api/services/5/hits_data?start=1588127788&end=1588381588&group=5m&fill=false\",\n        \"expiration\": \"2020-05-02T01:06:58.377413844Z\",\n        \"size\": 45193\n    },\n    {\n        \"url\": \"/api/services/4/hits_data?start=1588127788&end=1588381588&group=5m&fill=false\",\n        \"expiration\": \"2020-05-02T01:06:58.380229692Z\",\n        \"size\": 45198\n    }\n]"
 						}
 					]
 				},
@@ -1801,7 +1781,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"New Service\",\n    \"domain\": \"https://statping.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 30,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 30,\n    \"order_id\": 0\n}"
+							"raw": "{\n    \"name\": \"New Service\",\n    \"domain\": \"https://statping.com\",\n    \"expected\": \"\",\n    \"expected_status\": 200,\n    \"check_interval\": 30,\n    \"type\": \"http\",\n    \"method\": \"GET\",\n    \"post_data\": \"\",\n    \"port\": 0,\n    \"timeout\": 30,\n    \"order_id\": 0\n}",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/services",
@@ -2069,7 +2052,10 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/services/{{service_id}}/failures",
@@ -2492,7 +2478,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"message\": \"Website is loading very slowly, looking into this.\",\n\t\"type\": \"Investigating\"\n}"
+							"raw": "{\n\t\"message\": \"Website is loading very slowly, looking into this.\",\n\t\"type\": \"Investigating\"\n}",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/incidents/2/updates",
@@ -2654,7 +2643,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"title\": \"Updated Downtime\",\n\t\"description\": \"This is an update for an incident\"\n}"
+							"raw": "{\n\t\"title\": \"Updated Downtime\",\n\t\"description\": \"This is an update for an incident\"\n}",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/incidents/1",
@@ -3105,7 +3097,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"New Group\",\n    \"public\": true\n}"
+							"raw": "{\n    \"name\": \"New Group\",\n    \"public\": true\n}",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/groups",
@@ -3261,7 +3256,10 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/groups/{{group_id}}",
@@ -3541,7 +3539,10 @@
 									"value": "{{token}}",
 									"type": "text"
 								}
-							]
+							],
+							"options": {
+								"urlencoded": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/users/token",
@@ -3787,7 +3788,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"adminuser2\",\n    \"email\": \"info@adminemail.com\",\n    \"password\": \"passsword123\",\n    \"admin\": true\n}"
+							"raw": "{\n    \"username\": \"adminuser2\",\n    \"email\": \"info@adminemail.com\",\n    \"password\": \"passsword123\",\n    \"admin\": true\n}",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/users",
@@ -3990,7 +3994,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"adminupdated\",\n    \"email\": \"info@email.com\",\n    \"password\": \"password12345\",\n    \"admin\": true\n}"
+							"raw": "{\n    \"username\": \"adminupdated\",\n    \"email\": \"info@email.com\",\n    \"password\": \"password12345\",\n    \"admin\": true\n}",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/users/{{user_id}}",
@@ -4514,7 +4521,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"method\": \"success\",\n    \"notifier\": {\n        \"enabled\": false,\n        \"limits\": 60,\n        \"method\": \"slack\",\n        \"host\": \"https://webhooksurl.slack.com/***\",\n        \"success_data\": \"{\\n  \\\"blocks\\\": [{\\n    \\\"type\\\": \\\"section\\\",\\n    \\\"text\\\": {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"The service {{.Service.Name}} is back online.\\\"\\n    }\\n  }, {\\n    \\\"type\\\": \\\"actions\\\",\\n    \\\"elements\\\": [{\\n      \\\"type\\\": \\\"button\\\",\\n      \\\"text\\\": {\\n        \\\"type\\\": \\\"plain_text\\\",\\n        \\\"text\\\": \\\"View Service\\\",\\n        \\\"emoji\\\": true\\n      },\\n      \\\"style\\\": \\\"primary\\\",\\n      \\\"url\\\": \\\"{{.Core.Domain}}/service/{{.Service.Id}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"button\\\",\\n      \\\"text\\\": {\\n        \\\"type\\\": \\\"plain_text\\\",\\n        \\\"text\\\": \\\"Go to Statping\\\",\\n        \\\"emoji\\\": true\\n      },\\n      \\\"url\\\": \\\"{{.Core.Domain}}\\\"\\n    }]\\n  }]\\n}\",\n        \"failure_data\": \"{\\n  \\\"blocks\\\": [{\\n    \\\"type\\\": \\\"section\\\",\\n    \\\"text\\\": {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\":warning: The service {{.Service.Name}} is currently offline! :warning:\\\"\\n    }\\n  }, {\\n    \\\"type\\\": \\\"divider\\\"\\n  }, {\\n    \\\"type\\\": \\\"section\\\",\\n    \\\"fields\\\": [{\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*Service:*\\\\n{{.Service.Name}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*URL:*\\\\n{{.Service.Domain}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*Status Code:*\\\\n{{.Service.LastStatusCode}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*When:*\\\\n{{.Failure.CreatedAt}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*Downtime:*\\\\n{{.Service.Downtime.Human}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"plain_text\\\",\\n      \\\"text\\\": \\\"*Error:*\\\\n{{.Failure.Issue}}\\\"\\n    }]\\n  }, {\\n    \\\"type\\\": \\\"divider\\\"\\n  }, {\\n    \\\"type\\\": \\\"actions\\\",\\n    \\\"elements\\\": [{\\n      \\\"type\\\": \\\"button\\\",\\n      \\\"text\\\": {\\n        \\\"type\\\": \\\"plain_text\\\",\\n        \\\"text\\\": \\\"View Offline Service\\\",\\n        \\\"emoji\\\": true\\n      },\\n      \\\"style\\\": \\\"danger\\\",\\n      \\\"url\\\": \\\"{{.Core.Domain}}/service/{{.Service.Id}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"button\\\",\\n      \\\"text\\\": {\\n        \\\"type\\\": \\\"plain_text\\\",\\n        \\\"text\\\": \\\"Go to Statping\\\",\\n        \\\"emoji\\\": true\\n      },\\n      \\\"url\\\": \\\"{{.Core.Domain}}\\\"\\n    }]\\n  }]\\n}\"\n    }\n}",
+							"raw": "{\n    \"method\": \"success\",\n    \"notifier\": {\n        \"enabled\": false,\n        \"limits\": 60,\n        \"method\": \"slack\",\n        \"host\": \"https://hooks.slack.com/services/TTJ1B49DP/XBNU09O9M/9uI2123SUnYBuGcxLopZomz9H\",\n        \"success_data\": \"{\\n  \\\"blocks\\\": [{\\n    \\\"type\\\": \\\"section\\\",\\n    \\\"text\\\": {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"The service {{.Service.Name}} is back online.\\\"\\n    }\\n  }, {\\n    \\\"type\\\": \\\"actions\\\",\\n    \\\"elements\\\": [{\\n      \\\"type\\\": \\\"button\\\",\\n      \\\"text\\\": {\\n        \\\"type\\\": \\\"plain_text\\\",\\n        \\\"text\\\": \\\"View Service\\\",\\n        \\\"emoji\\\": true\\n      },\\n      \\\"style\\\": \\\"primary\\\",\\n      \\\"url\\\": \\\"{{.Core.Domain}}/service/{{.Service.Id}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"button\\\",\\n      \\\"text\\\": {\\n        \\\"type\\\": \\\"plain_text\\\",\\n        \\\"text\\\": \\\"Go to Statping\\\",\\n        \\\"emoji\\\": true\\n      },\\n      \\\"url\\\": \\\"{{.Core.Domain}}\\\"\\n    }]\\n  }]\\n}\",\n        \"failure_data\": \"{\\n  \\\"blocks\\\": [{\\n    \\\"type\\\": \\\"section\\\",\\n    \\\"text\\\": {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\":warning: The service {{.Service.Name}} is currently offline! :warning:\\\"\\n    }\\n  }, {\\n    \\\"type\\\": \\\"divider\\\"\\n  }, {\\n    \\\"type\\\": \\\"section\\\",\\n    \\\"fields\\\": [{\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*Service:*\\\\n{{.Service.Name}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*URL:*\\\\n{{.Service.Domain}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*Status Code:*\\\\n{{.Service.LastStatusCode}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*When:*\\\\n{{.Failure.CreatedAt}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"mrkdwn\\\",\\n      \\\"text\\\": \\\"*Downtime:*\\\\n{{.Service.Downtime.Human}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"plain_text\\\",\\n      \\\"text\\\": \\\"*Error:*\\\\n{{.Failure.Issue}}\\\"\\n    }]\\n  }, {\\n    \\\"type\\\": \\\"divider\\\"\\n  }, {\\n    \\\"type\\\": \\\"actions\\\",\\n    \\\"elements\\\": [{\\n      \\\"type\\\": \\\"button\\\",\\n      \\\"text\\\": {\\n        \\\"type\\\": \\\"plain_text\\\",\\n        \\\"text\\\": \\\"View Offline Service\\\",\\n        \\\"emoji\\\": true\\n      },\\n      \\\"style\\\": \\\"danger\\\",\\n      \\\"url\\\": \\\"{{.Core.Domain}}/service/{{.Service.Id}}\\\"\\n    }, {\\n      \\\"type\\\": \\\"button\\\",\\n      \\\"text\\\": {\\n        \\\"type\\\": \\\"plain_text\\\",\\n        \\\"text\\\": \\\"Go to Statping\\\",\\n        \\\"emoji\\\": true\\n      },\\n      \\\"url\\\": \\\"{{.Core.Domain}}\\\"\\n    }]\\n  }]\\n}\"\n    }\n}",
 							"options": {
 								"raw": {}
 							}
@@ -4798,7 +4805,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"API Message\",\n    \"description\": \"This is an example a upcoming message for a service!\",\n    \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n    \"service\": 1,\n    \"notify_users\": true,\n    \"notify_method\": \"email\",\n    \"notify_before\": 6,\n    \"notify_before_scale\": \"hour\"\n}"
+							"raw": "{\n    \"title\": \"API Message\",\n    \"description\": \"This is an example a upcoming message for a service!\",\n    \"start_on\": \"2022-11-17T03:28:16.323797-08:00\",\n    \"end_on\": \"2022-11-17T05:13:16.323798-08:00\",\n    \"service\": 1,\n    \"notify_users\": true,\n    \"notify_method\": \"email\",\n    \"notify_before\": 6,\n    \"notify_before_scale\": \"hour\"\n}",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/messages",
@@ -5077,7 +5087,10 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/messages/{{message_id}}",
@@ -6114,7 +6127,10 @@
 									"value": "0",
 									"type": "text"
 								}
-							]
+							],
+							"options": {
+								"formdata": {}
+							}
 						},
 						"url": {
 							"raw": "{{endpoint}}/oauth/slack",
