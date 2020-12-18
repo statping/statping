@@ -78,7 +78,7 @@ func main() {
 		fmt.Printf("%s | English: %s | French: %s | German: %s | Russian: %s\n", translated.Key, translated.En, translated.Fr, translated.De, translated.Ru)
 		line++
 
-		time.Sleep(1 * time.Second)
+		time.Sleep(250 * time.Millisecond)
 	}
 
 	//CreateGo(translations)

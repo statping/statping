@@ -8,7 +8,6 @@ import (
 	"github.com/statping/statping/utils"
 	"net/http"
 	"net/http/pprof"
-	"time"
 
 	_ "github.com/statping/statping/types/metrics"
 )
