@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/getsentry/sentry-go"
 	"github.com/pkg/errors"
 	_ "github.com/statping/statping/notifiers"
 	"github.com/statping/statping/source"
@@ -286,13 +285,6 @@ type HTTPTest struct {
 }
 
 func logTest(t *testing.T, err error) error {
-	e := sentry.NewEvent()
-	e.Environment = "testing"
-	e.Timestamp = utils.Now().Unix()
-	e.Message = fmt.Sprintf("failed test %s", t.Name())
-	e.Transaction = t.Name()
-	sentry.CaptureEvent(e)
-	sentry.CaptureException(err)
 	return err
 }
 

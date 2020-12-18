@@ -97,7 +97,7 @@ func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 	utils.Params.Set("LANGUAGE", app.Language)
 	app.UseCdn = null.NewNullBool(c.UseCdn.Bool)
 	app.AllowReports = null.NewNullBool(c.AllowReports.Bool)
-	utils.SentryInit(app.AllowReports.Bool)
+
 	if err := app.Update(); err != nil {
 		sendErrorJson(err, w, r)
 		return

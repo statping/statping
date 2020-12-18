@@ -196,7 +196,7 @@ func CopyAllToPublic(box *rice.Box) error {
 		if exclude[info.Name()] {
 			return nil
 		}
-		if strings.Contains(path, "js") {
+		if strings.Contains(path, "/js") {
 			return nil
 		}
 		if info.IsDir() {
