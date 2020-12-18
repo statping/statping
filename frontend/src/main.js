@@ -32,14 +32,6 @@ const i18n = new VueI18n({
 
 Vue.$cookies.config('3d')
 
-Sentry.init({
-  Vue: Vue,
-  dsn: errorReporter,
-  integrations: [new TracingIntegrations.BrowserTracing()],
-  tracesSampleRate: 0.2,
-  environment: process.env.NODE_ENV === 'production' ? 'production' : 'development',
-});
-
 Vue.config.productionTip = process.env.NODE_ENV !== 'production'
 Vue.config.devtools = process.env.NODE_ENV !== 'production'
 Vue.config.performance = process.env.NODE_ENV !== 'production'

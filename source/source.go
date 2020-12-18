@@ -1,5 +1,9 @@
 package source
 
+//go:generate go run generate_help.go
+//go:generate go run generate_version.go
+//go:generate go run generate_languages.go
+
 import (
 	"fmt"
 	"github.com/GeertJohan/go.rice"
