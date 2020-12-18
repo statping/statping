@@ -1,12 +1,13 @@
 package handlers
 
 import (
+	"testing"
+
 	"github.com/statping/statping/notifiers"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestAttachment(t *testing.T) {

@@ -15,7 +15,8 @@ import (
 
 const (
 	cookieName = "statping_auth"
-	timeout    = time.Second * 30
+
+	timeout = time.Second * 30
 )
 
 var (
@@ -24,13 +25,10 @@ var (
 	usingSSL   bool
 	mainTmpl   = `{{define "main" }} {{ template "base" . }} {{ end }}`
 	templates  = []string{"base.gohtml"}
-	httpError  chan error
 )
 
 func StopHTTPServer(err error) {
 	log.Infoln("Stopping HTTP Server")
-	httpError <- err
-	close(httpError)
 }
 
 // RunHTTPServer will start a HTTP server on a specific IP and port
@@ -54,21 +52,13 @@ func RunHTTPServer() error {
 
 	router = Router()
 	resetCookies()
-	httpError = make(chan error)
 
 	if utils.Params.GetBool("LETSENCRYPT_ENABLE") {
-		go startLetsEncryptServer(ip)
+		return startLetsEncryptServer(ip)
 	} else if usingSSL {
-		go startSSLServer(ip)
+		return startSSLServer(ip)
 	} else {
-		go startServer(host)
-	}
-
-	for {
-		select {
-		case err := <-httpError:
-			return err
-		}
+		return startServer(host)
 	}
 }
 

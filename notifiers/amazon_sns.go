@@ -2,12 +2,13 @@ package notifiers
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/statping/statping/types/null"
-	"time"
 
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"

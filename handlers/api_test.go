@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 	_ "github.com/statping/statping/notifiers"
 	"github.com/statping/statping/source"
-	"github.com/statping/statping/types"
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/groups"
@@ -167,33 +166,6 @@ func TestMainApiRoutes(t *testing.T) {
 			ExpectedStatus: 200,
 			BeforeTest:     SetTestENV,
 			SecureRoute:    true,
-		},
-		{
-			Name:           "Statping View Cache",
-			URL:            "/api/cache",
-			Method:         "GET",
-			ExpectedStatus: 200,
-			BeforeTest:     SetTestENV,
-			SecureRoute:    true,
-			ResponseLen:    0,
-		},
-		{
-			Name:           "Statping Clear Cache",
-			URL:            "/api/clear_cache",
-			Method:         "POST",
-			ExpectedStatus: 200,
-			SecureRoute:    true,
-			BeforeTest: func(t *testing.T) error {
-				CacheStorage.Set("test", []byte("data here"), types.Day)
-				list := CacheStorage.List()
-				assert.Len(t, list, 1)
-				return nil
-			},
-			AfterTest: func(t *testing.T) error {
-				list := CacheStorage.List()
-				assert.Len(t, list, 0)
-				return nil
-			},
 		},
 		{
 			Name:           "Update Core",

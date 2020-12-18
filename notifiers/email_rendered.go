@@ -1,4 +1,4 @@
-// DO NOT EDIT ** This file was generated with go generate on 2020-08-21 21:37:06.638898 +0000 UTC ** DO NOT EDIT //
+// DO NOT EDIT ** This file was generated with go generate on 2020-10-13 00:26:28.325328 +0000 UTC ** DO NOT EDIT //
 package notifiers
 
 const emailSuccess = `<!doctype html><html xmlns=http://www.w3.org/1999/xhtml xmlns:v=urn:schemas-microsoft-com:vml xmlns:o=urn:schemas-microsoft-com:office:office><title>Statping Service Notification</title><meta http-equiv=x-ua-compatible content="IE=edge"><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><style type=text/css>

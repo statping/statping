@@ -25,18 +25,12 @@ func findIncident(r *http.Request) (*incidents.Incident, int64, error) {
 }
 
 func apiServiceIncidentsHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-	if utils.NotNumber(id) {
-		sendErrorJson(errors.NotNumber, w, r)
+	service, err := findService(r)
+	if err != nil {
+		sendErrorJson(err, w, r)
 		return
 	}
-	incids := incidents.FindByService(utils.ToInt(id))
-	if incids == nil {
-		sendErrorJson(errors.Missing(&incidents.Incident{}, id), w, r)
-		return
-	}
-	returnJson(incids, w, r)
+	returnJson(service.Incidents, w, r)
 }
 
 func apiIncidentUpdatesHandler(w http.ResponseWriter, r *http.Request) {

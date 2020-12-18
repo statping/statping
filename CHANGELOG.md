@@ -1,3 +1,13 @@
+# 0.90.73 (12-15-2020)
+- Removed complexity in code for http server
+- Removed internal cache functionality (not useful, needs refactor)
+- Merged PR https://github.com/statping/statping/pull/909
+- Merged PR https://github.com/statping/statping/pull/880
+- Merged PR https://github.com/statping/statping/pull/859
+
+# 0.90.72 (10-28-2020)
+- Fixed issue with graphs becoming stuck on reload
+
 # 0.90.71 (10-13-2020)
 - Reverted Docker user in Dockerfile
 

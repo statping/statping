@@ -3,7 +3,7 @@ version: '2.3'
 services:
   statping:
     container_name: statping
-    image: statping/statping:latest
+    image: statping/statping:dev
     restart: always
     volumes:
       - statping_data:/app
