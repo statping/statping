@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/statping/statping/source"
@@ -38,14 +37,13 @@ func Router() *mux.Router {
 	}
 
 	bPath := utils.Params.GetString("BASE_PATH")
-	sentryHandler := sentryhttp.New(sentryhttp.Options{Timeout: 5 * time.Second})
 
 	if bPath != "" {
 		basePath = "/" + bPath + "/"
 		r = r.PathPrefix("/" + bPath).Subrouter()
-		r.Handle("", sentryHandler.Handle(http.HandlerFunc(indexHandler)))
+		r.Handle("", http.HandlerFunc(indexHandler))
 	} else {
-		r.Handle("/", sentryHandler.Handle(http.HandlerFunc(indexHandler)))
+		r.Handle("/", http.HandlerFunc(indexHandler))
 	}
 
 	if !utils.Params.GetBool("DISABLE_LOGS") {

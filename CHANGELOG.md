@@ -1,3 +1,8 @@
+# 0.90.74 (12-18-2020)
+- Fixed issue with favicon/manifest.json throwing 404 errors
+- Modified language go:generate script to slowdown for 429 errors
+- Removed Sentry error logging functionality
+
 # 0.90.73 (12-15-2020)
 - Removed complexity in code for http server
 - Removed internal cache functionality (not useful, needs refactor)
