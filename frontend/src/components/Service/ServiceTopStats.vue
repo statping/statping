@@ -10,7 +10,7 @@
         </div>
         <div class="col-4">
             <span class="font-5 d-block font-weight-bold">{{service.online_7_days}} %</span>
-            <span class="font-1 subtitle">{{$t('last_uptime')}} 7 {{$tc('day', 24)}}</span>
+            <span class="font-1 subtitle">{{$t('last_uptime')}} 7 {{$tc('day', 7)}}</span>
         </div>
     </div>
 </template>
