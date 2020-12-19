@@ -140,19 +140,18 @@ aws ec2 run-instances \
     --key-name MYKEYHERE \
     --security-group-ids sg-7e8b830f
 ```
-##### Create EC2 with Automatic SSL Certification
-The AWS-CLI command below will automatically create an EC2 server and create an SSL certificate from Lets Encrypt, for free.
-```bash
-wget https://raw.githubusercontent.com/statping/statping/master/servers/ec2-ssl.sh
-# Edit ec2-ssl.sh and insert your domain you want to use, then run command below.
-# Use the Security Group ID that you used above for --security-group-ids
 
-aws ec2 run-instances \
-    --user-data file://ec2-ssl.sh \
-    --image-id ami-7be8a103 \
-    --count 1 --instance-type t2.nano \
-    --key-name MYKEYHERE \
-    --security-group-ids sg-7e8b830f
+##### Add HTTPS To A Current Install
+The below steps will convert an EC2 install without SSL to one with working SSL
+```bash
+    -add server.crt and server.key to /statping
+    -stop container docker stop <name>
+    -stop docker service systemctl stop docker
+    -go to directory /var/lib/docker/containers/hash of container
+    -edit file hostconfig.json, change port 8080 and 80 to 443
+    -edit file config.v2.json, change port 8080 to 443
+    -start docker service systemctl start docker
+    *Contributed by @vinaykapadia
 ```
 
 ## Contributing
