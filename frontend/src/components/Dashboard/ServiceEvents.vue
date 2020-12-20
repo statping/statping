@@ -23,7 +23,7 @@
 
     <div v-if="success_event && !failureBefore" class="col-12 font-2 m-0 mb-2">
       <span class="text-success"><font-awesome-icon icon="check" class="mr-1" size="1x"/>No New Events</span>
-      <span class="font-italic d-inline-block text-truncate text-dim mt-1" style="max-width: 270px">
+      <span v-if="!this.isZero(service.last_error)" class="font-italic d-inline-block text-truncate text-dim mt-1" style="max-width: 270px">
         Last failure was {{ago(service.last_error)}} ago.
       </span>
     </div>

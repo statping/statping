@@ -9,21 +9,15 @@
             </h6>
         </div>
 
-        <div class="card-body">
+        <div class="card-body pb-1">
             <div v-if="loaded" class="row pl-2">
-              <div class="col-md-6 col-sm-12 pl-2 mt-2 mt-md-0 mb-3">
+              <div class="col-md-12 col-sm-12 pl-2 mt-2 mt-md-0 mb-3">
                   <ServiceSparkLine :title="set2_name" subtitle="Latency Last 24 Hours" :series="set2"/>
-              </div>
-              <div class="col-md-6 col-sm-12 pl-0 mt-4 mt-md-0 mb-3">
-                  <ServiceSparkLine :title="set1_name" subtitle="Latency Last 7 Days" :series="set1"/>
               </div>
               <ServiceEvents :service="service"/>
             </div>
               <div v-else class="row mb-5">
-                <div class="col-12 col-md-6 text-center">
-                  <font-awesome-icon icon="circle-notch" class="text-dim" size="2x" spin/>
-                </div>
-                <div class="col-12 col-md-6 text-center text-dim">
+                <div class="col-12 col-md-12 text-center">
                   <font-awesome-icon icon="circle-notch" class="text-dim" size="2x" spin/>
                 </div>
               </div>
@@ -44,7 +38,8 @@
                     <font-awesome-icon icon="calendar-check"/>
                   </button>
                   <button @click="$router.push({path: `/dashboard/service/${service.id}/failures`, params: {id: service.id}})" @mouseleave="unsetHover" @mouseover="setHover($t('failures'))" class="btn btn-sm btn-white failures">
-                    <font-awesome-icon icon="exclamation-triangle"/> <span v-if="service.stats.failures !== 0" class="badge badge-danger ml-1">{{service.stats.failures}}</span>
+                    <font-awesome-icon icon="exclamation-triangle"/>
+                    <span v-if="service.stats.failures !== 0" class="badge badge-danger ml-1">{{service.stats.failures}}</span>
                   </button>
               </div>
             </div>
@@ -91,10 +86,8 @@
               hovered: false,
               hoverbtn: "",
               openTab: "",
-              set1: [],
               set2: [],
               loaded: false,
-              set1_name: "",
               set2_name: "",
               failures: null,
             visible: false
@@ -111,7 +104,7 @@
         this.hoverbtn = name
       },
         unsetHover() {
-          this.hoverbtn = this.$t('uptime', [this.service.online_7_days])
+          this.hoverbtn = this.$t('uptime') + " "+ this.service.online_7_days + "%"
         },
         async setVisible(isVisible, entry) {
           if (isVisible && !this.visible) {
@@ -126,9 +119,7 @@
           this.uptime = await Api.service_uptime(this.service.id, this.toUnix(start), this.toUnix(end))
         },
         async loadInfo() {
-          this.set1 = await this.getHits(86400 * 7, "12h")
-          this.set1_name = this.calc(this.set1)
-          this.set2 = await this.getHits(86400, "60m")
+          this.set2 = await this.getHits(86400 * 3, "60m")
           this.set2_name = this.calc(this.set2)
           this.loaded = true
         },
