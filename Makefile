@@ -146,10 +146,7 @@ frontend-build:
 	cd frontend && yarn && yarn build
 	@cp -r frontend/dist source/
 	@cp -r frontend/src/assets/scss source/dist/
-	@cp frontend/public/favicon.ico source/dist/
 	@cp frontend/public/robots.txt source/dist/
-	@cp frontend/public/banner.png source/dist/
-	@cp -r frontend/public/favicon source/dist/
 	@echo "Frontend build complete at ./source/dist"
 
 yarn:
