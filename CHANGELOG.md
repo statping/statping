@@ -1,3 +1,7 @@
+# 0.90.75 (12-20-2020)
+- Removed favicons and PNG files from assets, now using base64 images
+- Cleaned up some issues with UI
+
 # 0.90.74 (12-18-2020)
 - Fixed issue with favicon/manifest.json throwing 404 errors
 - Modified language go:generate script to slowdown for 429 errors

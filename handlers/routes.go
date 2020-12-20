@@ -67,17 +67,13 @@ func Router() *mux.Router {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
 
 		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, staticAssets("css")))
-		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, staticAssets("favicon")))
 		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, indexHandler))
-		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, indexHandler))
 	} else {
 		tmplFileSrv := http.FileServer(source.TmplBox.HTTPBox())
 		tmplBoxHandler := http.StripPrefix(basePath, tmplFileSrv)
 
 		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, tmplFileSrv))
-		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, tmplFileSrv))
 		r.PathPrefix("/robots.txt").Handler(tmplBoxHandler)
-		r.PathPrefix("/banner.png").Handler(tmplBoxHandler)
 	}
 
 	r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
