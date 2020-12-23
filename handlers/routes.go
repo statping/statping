@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/statping/statping/source"
@@ -9,7 +8,6 @@ import (
 	"github.com/statping/statping/utils"
 	"net/http"
 	"net/http/pprof"
-	"time"
 
 	_ "github.com/statping/statping/types/metrics"
 )
@@ -38,14 +36,13 @@ func Router() *mux.Router {
 	}
 
 	bPath := utils.Params.GetString("BASE_PATH")
-	sentryHandler := sentryhttp.New(sentryhttp.Options{Timeout: 5 * time.Second})
 
 	if bPath != "" {
 		basePath = "/" + bPath + "/"
 		r = r.PathPrefix("/" + bPath).Subrouter()
-		r.Handle("", sentryHandler.Handle(http.HandlerFunc(indexHandler)))
+		r.Handle("", http.HandlerFunc(indexHandler))
 	} else {
-		r.Handle("/", sentryHandler.Handle(http.HandlerFunc(indexHandler)))
+		r.Handle("/", http.HandlerFunc(indexHandler))
 	}
 
 	if !utils.Params.GetBool("DISABLE_LOGS") {
@@ -70,17 +67,13 @@ func Router() *mux.Router {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
 
 		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, staticAssets("css")))
-		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, staticAssets("favicon")))
 		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, indexHandler))
-		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, indexHandler))
 	} else {
 		tmplFileSrv := http.FileServer(source.TmplBox.HTTPBox())
 		tmplBoxHandler := http.StripPrefix(basePath, tmplFileSrv)
 
 		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, tmplFileSrv))
-		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, tmplFileSrv))
 		r.PathPrefix("/robots.txt").Handler(tmplBoxHandler)
-		r.PathPrefix("/banner.png").Handler(tmplBoxHandler)
 	}
 
 	r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))

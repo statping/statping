@@ -57,13 +57,13 @@
             let ts = w.globals.seriesX[seriesIndex][dataPointIndex];
             const dt = new Date(ts).toLocaleDateString("en-us", timeoptions)
             let val = series[seriesIndex][dataPointIndex];
-            return `<div class="chartmarker"><span class="font-3">Average Response Time:  ${this.humanTime(val)}</span><span>${dt}</span></div>`
+            return `<div class="chartmarker"><span class="">Average Response Time:  ${this.humanTime(val)}</span><span>${dt}</span></div>`
           },
           fixed: {
             enabled: true,
             position: 'bottomLeft',
             offsetX: 0,
-            offsetY: -30,
+            offsetY: -15,
           },
           x: {
             show: true,

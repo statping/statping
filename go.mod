@@ -6,13 +6,11 @@ go 1.14
 require (
 	github.com/GeertJohan/go.rice v1.0.0
 	github.com/aws/aws-sdk-go v1.30.20
-	github.com/cweill/gotests v1.5.3 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/structs v1.1.0
 	github.com/foomo/simplecert v1.7.5
 	github.com/foomo/tlsconfig v0.0.0-20180418120404-b67861b076c9
 	github.com/getsentry/sentry-go v0.5.1
-	github.com/go-delve/delve v1.5.0 // indirect
 	github.com/go-mail/mail v2.3.1+incompatible
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/google/go-cmp v0.5.1 // indirect
@@ -20,12 +18,8 @@ require (
 	github.com/hako/durafmt v0.0.0-20200605151348-3a43fc422dd9
 	github.com/jinzhu/gorm v1.9.12
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
-	github.com/mattn/goveralls v0.0.7 // indirect
-	github.com/mdempsky/gocode v0.0.0-20200405233807-4acdcbdea79d // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.1.0
-	github.com/ramya-rao-a/go-outline v0.0.0-20200117021646-2a048b4510eb // indirect
-	github.com/rogpeppe/godef v1.1.2 // indirect
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.6.3
@@ -40,7 +34,6 @@ require (
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/tools v0.0.0-20201012192620-5bd05386311b // indirect
-	golang.org/x/tools/gopls v0.5.1 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
 	google.golang.org/grpc v1.28.1
 	google.golang.org/protobuf v1.25.0 // indirect

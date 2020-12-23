@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"time"
 )
 
 var (
@@ -76,6 +77,8 @@ func main() {
 
 		fmt.Printf("%s | English: %s | French: %s | German: %s | Russian: %s\n", translated.Key, translated.En, translated.Fr, translated.De, translated.Ru)
 		line++
+
+		time.Sleep(250 * time.Millisecond)
 	}
 
 	//CreateGo(translations)
