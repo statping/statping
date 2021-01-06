@@ -13,6 +13,8 @@
 		
 			<a @click.prevent='tab="Notifiers"' class="d-block mb-1 text-link" href="#">Notifiers</a>
 		
+			<a @click.prevent='tab="Issues and Solutions"' class="d-block mb-1 text-link" href="#">Issues and Solutions</a>
+		
 			<a @click.prevent='tab="Bulk Import Services"' class="d-block mb-1 text-link" href="#">Bulk Import Services</a>
 		
 			<a @click.prevent='tab="Environment Variables"' class="d-block mb-1 text-link" href="#">Environment Variables</a>
@@ -326,6 +328,44 @@ func AttachNotifiers() error {
 		</div>
 	</div>
 
+	<div class="col-12" v-if='tab === "Issues and Solutions"'>
+		<h1 class="h1 mt-5 mb-5 text-muted">Issues and Solutions</h1>
+		<span class="spacer"></span>
+		<div v-pre>
+				<p>If you have issues with your Statping instance, this page will help you solve them. Before doing anything, I recommend updating to the latest version of Statping.</p>
+
+<h2>Update to Latest Version</h2>
+
+<p>Updating Statping is very simple, you can choose one of the options below:
+- Run command: <code>statping update</code> (you may need to run sudo depending on your server)
+- or Run command: <code>curl -o- -L https://statping.com/install.sh | bash</code>
+- or download tar.gz file from <a href="https://github.com/statping/statping/releases/latest" target="_blank">Latest Releases</a> and extract for <code>statping</code>.</p>
+
+<h2>Blank/White Page</h2>
+
+<p>If your Statping instance is only showing a blank white page, this means there&rsquo;s an issue with CSS or JS assets.
+- Update to the latest version of Statping
+- Delete the <code>assets</code> folder if you have one
+- Restart Statping instance</p>
+
+<h2>Database Migration Errors</h2>
+
+<p>If you notice a database error during migration, you can reset your Statping instance while keeping previous data so you won&rsquo;t have to re-input.
+- In your Statping directory (contains config.yml) run command: <code>statping export</code>. This will export all elements into a timestamped JSON file. This file will not include previous hits or failures.
+- Delete <code>assets</code> folder if you have one.
+- Delete and Recreate MySQL, Postgres database, or delete <code>statping.db</code>.
+- Import previous data by running: <code>statping import backup.json</code> (replace backup.json with your exported filename)</p>
+
+<h2>Deleting Old Records</h2>
+
+<ul>
+<li><code>DELETE FROM hits WHERE created_at &lt; '2020-02-21 00:00:00';</code> // Delete hits older than</li>
+<li><code>DELETE FROM failures WHERE created_at &lt; '2020-02-21 00:00:00';</code> // Delete failures older than</li>
+</ul>
+
+		</div>
+	</div>
+
 	<div class="col-12" v-if='tab === "Bulk Import Services"'>
 		<h1 class="h1 mt-5 mb-5 text-muted">Bulk Import Services</h1>
 		<span class="spacer"></span>
@@ -422,10 +462,12 @@ services:
 <li><code>DB_PASS</code>                   - Database password</li>
 <li><code>DB_PORT</code>                   - Database port (5432, 3306, &hellip;)</li>
 <li><code>DB_DATABASE</code>               - Database connection&rsquo;s database name</li>
+<li><code>DB_DSN</code>                    - Database DSN string (<a href="https://www.php.net/manual/en/ref.pdo-pgsql.connection.php" target="_blank">postgres</a>, <a href="https://github.com/go-sql-driver/mysql#dsn-data-source-name" target="_blank">mysql</a>, <a href="https://www.sqlite.org/inmemorydb.html" target="_blank">sqlite</a>)</li>
+<li><code>READ_ONLY</code>                 - Run in a read only mode, this will not create, update, or delete records (false)</li>
 <li><code>POSTGRES_SSLMODE</code>          - Enable <a href="https://www.postgresql.org/docs/9.1/libpq-ssl.html" target="_blank">Postgres SSL Mode</a> &lsquo;ssl_mode=VALUE&rsquo; (enable/disable/verify-full/verify-ca)</li>
 <li><code>MAX_OPEN_CONN</code>             - Set <a href="https://golang.org/pkg/database/sql/#DB.SetMaxOpenConns" target="_blank">Maximum Open Connections</a> for database server (default: 25)</li>
 <li><code>MAX_IDLE_CONN</code>             - Set <a href="https://golang.org/pkg/database/sql/#DB.SetMaxIdleConns" target="_blank">Maximum Idle Connections</a> for database server (default: 25)</li>
-<li><code>MAX_LIFE_CONN</code>             - Set <a href="https://golang.org/pkg/database/sql/#DB.SetConnMaxLifetime" target="_blank">Maximum Life Connections</a> for database server (default: 25)</li>
+<li><code>MAX_LIFE_CONN</code>             - Set <a href="https://golang.org/pkg/database/sql/#DB.SetConnMaxLifetime" target="_blank">Maximum Life Connections</a> for database server (default: 5 minutes)</li>
 <li><code>PREFIX</code> - Add a prefix string to each Prometheus metric (default is empty)</li>
 </ul>
 
@@ -454,7 +496,7 @@ services:
 
 <li><p><code>LOGS_MAX_SIZE</code>             - Maximum size for log files (defaults to 16 MB)</p></li>
 
-<li><p><code>LANGUAGE</code>                  - Language to use (en, fr, ru, more to come&hellip;)</p>
+<li><p><code>LANGUAGE</code>                  - Language to use (en, fr, it, ru, zh, de, ko, ja)</p>
 
 <h3>Assets</h3></li>
 
@@ -462,6 +504,10 @@ services:
 
 <li><p><code>USE_ASSETS</code>                - Automatically use assets from &lsquo;assets folder&rsquo; (true/false)</p></li>
 </ul>
+
+<blockquote>
+<p>If you have issues with Statping not loading frontend files, delete the assets folder and reboot.</p>
+</blockquote>
 
 <h3>Automatic Fills</h3>
 
@@ -2275,7 +2321,7 @@ OluFxewsEO0QNDrfFb+0gnjYlnGqOFcZjUMXbDdY5oLSPtXohynuTK1qyQ==
 </div>
 
 <div class="text-center small text-dim" v-pre>
-Automatically generated from Statping's Wiki on 2020-09-15 19:09:14.703237 &#43;0000 UTC
+Automatically generated from Statping's Wiki on 2020-12-20 10:21:49.484474 &#43;0000 UTC
 </div>
 
 </div>

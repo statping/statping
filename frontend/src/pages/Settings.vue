@@ -24,9 +24,6 @@
                     <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-style-tab')}" id="v-pills-style-tab" data-toggle="pill" href="#v-pills-style" role="tab" aria-controls="v-pills-style" aria-selected="false">
                         <font-awesome-icon icon="image" class="mr-2"/> {{ $t('theme') }}
                     </a>
-                    <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-cache-tab')}" id="v-pills-cache-tab" data-toggle="pill" href="#v-pills-cache" role="tab" aria-controls="v-pills-cache" aria-selected="false">
-                        <font-awesome-icon icon="paperclip" class="mr-2"/> {{ $t('cache') }}
-                    </a>
                   <a @click.prevent="changeTab" class="nav-link" v-bind:class="{active: liClass('v-pills-oauth-tab')}" id="v-pills-oauth-tab" data-toggle="pill" href="#v-pills-oauth" role="tab" aria-controls="v-pills-oauth" aria-selected="false">
                     <font-awesome-icon icon="key" class="mr-2"/> {{ $t('authentication') }}
                   </a>
@@ -110,10 +107,6 @@
                         <ThemeEditor/>
                     </div>
 
-                    <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-cache-tab'), show: liClass('v-pills-cache-tab')}" id="v-pills-cache" role="tabpanel" aria-labelledby="v-pills-cache-tab">
-                        <Cache/>
-                    </div>
-
                   <div class="tab-pane fade" v-bind:class="{active: liClass('v-pills-oauth-tab'), show: liClass('v-pills-oauth-tab')}" id="v-pills-oauth" role="tabpanel" aria-labelledby="v-pills-oauth-tab">
                     <OAuth/>
                   </div>
@@ -150,7 +143,6 @@
   const Notifier = () => import(/* webpackChunkName: "dashboard" */ '@/forms/Notifier')
   const OAuth = () => import(/* webpackChunkName: "dashboard" */ '@/forms/OAuth')
   const ThemeEditor = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/ThemeEditor')
-  const Cache = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Cache')
   const Importer = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Importer')
   const Variables = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Variables')
   const Configs = () => import(/* webpackChunkName: "dashboard" */ '@/components/Dashboard/Configs')
@@ -162,7 +154,6 @@
         Importer,
         Variables,
         OAuth,
-          Cache,
           ThemeEditor,
           FormIntegration,
           Notifier,
@@ -196,7 +187,6 @@
       },
       methods: {
         async update() {
-          this.cache = await Api.cache()
           await this.getGithub()
         },
         async getGithub() {

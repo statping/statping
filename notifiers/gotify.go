@@ -1,9 +1,10 @@
 package notifiers
 
 import (
-	"github.com/statping/statping/types/null"
 	"strings"
 	"time"
+
+	"github.com/statping/statping/types/null"
 
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"

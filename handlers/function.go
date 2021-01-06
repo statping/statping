@@ -39,5 +39,8 @@ var handlerFuncs = func(w http.ResponseWriter, r *http.Request) template.FuncMap
 		"BasePath": func() string {
 			return basePath
 		},
+		"Icon": func() string {
+			return basePath
+		},
 	}
 }

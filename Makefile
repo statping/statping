@@ -146,10 +146,7 @@ frontend-build:
 	cd frontend && yarn && yarn build
 	@cp -r frontend/dist source/
 	@cp -r frontend/src/assets/scss source/dist/
-	@cp frontend/public/favicon.ico source/dist/
 	@cp frontend/public/robots.txt source/dist/
-	@cp frontend/public/banner.png source/dist/
-	@cp -r frontend/public/favicon source/dist/
 	@echo "Frontend build complete at ./source/dist"
 
 yarn:
@@ -302,8 +299,8 @@ dockerhub:
 	docker push statping/statping
 
 docker-build-dev:
-	docker build --build-arg VERSION=${VERSION} -t hunterlong/statping:latest --no-cache -f Dockerfile .
-	docker tag hunterlong/statping:dev hunterlong/statping:dev-v${VERSION}
+	docker build --build-arg VERSION=${VERSION} -t statping/statping:latest --no-cache -f Dockerfile .
+	docker tag statping/statping:latest statping/statping:dev-v${VERSION}
 
 post-release: frontend-build upload_to_s3 publish-homebrew dockerhub
 

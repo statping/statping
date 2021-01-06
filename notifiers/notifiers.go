@@ -2,12 +2,13 @@ package notifiers
 
 import (
 	"bytes"
+	"html/template"
+	"time"
+
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
-	"html/template"
-	"time"
 )
 
 //go:generate go run generate.go
@@ -18,6 +19,7 @@ type replacer struct {
 	Core    core.Core
 	Service services.Service
 	Failure failures.Failure
+	Email   string
 	Custom  map[string]string
 }
 

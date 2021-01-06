@@ -29,13 +29,11 @@ var (
 		"scss/mixin.scss",
 		"scss/mobile.scss",
 		"scss/variables.scss",
-		"banner.png",
-		"favicon.ico",
 		"robots.txt",
 	}
 )
 
-// Assets will load the Rice boxes containing the CSS, SCSS, favicon, and HTML files.
+// Assets will load the Rice boxes containing the CSS, SCSS, and HTML files.
 func Assets() error {
 	if utils.Params.GetBool("DISABLE_HTTP") {
 		return nil
@@ -130,7 +128,7 @@ func OpenAsset(path string) string {
 	return data
 }
 
-// CreateAllAssets will dump HTML, CSS, SCSS, and favicon assets into the '/assets' directory
+// CreateAllAssets will dump HTML, CSS, and SCSS assets into the '/assets' directory
 func CreateAllAssets(folder string) error {
 	log.Infoln(fmt.Sprintf("Dump Statping assets into %s/assets", folder))
 	fp := filepath.Join
@@ -141,13 +139,10 @@ func CreateAllAssets(folder string) error {
 	if err := MakePublicFolder(fp(folder, "assets", "css")); err != nil {
 		return err
 	}
-	if err := MakePublicFolder(fp(folder, "assets", "favicon")); err != nil {
-		return err
-	}
 	if err := MakePublicFolder(fp(folder, "assets", "scss")); err != nil {
 		return err
 	}
-	log.Infoln("Inserting scss, css, and favicon files into assets folder")
+	log.Infoln("Inserting scss, and css files into assets folder")
 
 	if err := CopyAllToPublic(TmplBox); err != nil {
 		log.Errorln(err)
@@ -155,12 +150,6 @@ func CreateAllAssets(folder string) error {
 	}
 
 	if err := CopyToPublic(TmplBox, "", "robots.txt"); err != nil {
-		return err
-	}
-	if err := CopyToPublic(TmplBox, "", "banner.png"); err != nil {
-		return err
-	}
-	if err := CopyToPublic(TmplBox, "", "favicon.ico"); err != nil {
 		return err
 	}
 	log.Infoln("Compiling CSS from SCSS style...")
@@ -196,7 +185,7 @@ func CopyAllToPublic(box *rice.Box) error {
 		if exclude[info.Name()] {
 			return nil
 		}
-		if strings.Contains(path, "js") {
+		if strings.Contains(path, "/js") {
 			return nil
 		}
 		if info.IsDir() {

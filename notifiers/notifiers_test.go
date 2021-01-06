@@ -1,10 +1,11 @@
 package notifiers
 
 import (
+	"testing"
+
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/services"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestReplaceTemplate(t *testing.T) {

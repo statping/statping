@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/statping/statping/source"
@@ -9,7 +8,6 @@ import (
 	"github.com/statping/statping/utils"
 	"net/http"
 	"net/http/pprof"
-	"time"
 
 	_ "github.com/statping/statping/types/metrics"
 )
@@ -27,7 +25,6 @@ func staticAssets(src string) http.Handler {
 // Server will use static assets if the 'assets' directory is found in the root directory.
 func Router() *mux.Router {
 	dir := utils.Directory
-	CacheStorage = NewStorage()
 
 	r := mux.NewRouter().StrictSlash(true)
 	r.Use(prometheusMiddleware)
@@ -39,14 +36,13 @@ func Router() *mux.Router {
 	}
 
 	bPath := utils.Params.GetString("BASE_PATH")
-	sentryHandler := sentryhttp.New(sentryhttp.Options{Timeout: 5 * time.Second})
 
 	if bPath != "" {
 		basePath = "/" + bPath + "/"
 		r = r.PathPrefix("/" + bPath).Subrouter()
-		r.Handle("", sentryHandler.Handle(http.HandlerFunc(indexHandler)))
+		r.Handle("", http.HandlerFunc(indexHandler))
 	} else {
-		r.Handle("/", sentryHandler.Handle(http.HandlerFunc(indexHandler)))
+		r.Handle("/", http.HandlerFunc(indexHandler))
 	}
 
 	if !utils.Params.GetBool("DISABLE_LOGS") {
@@ -71,17 +67,13 @@ func Router() *mux.Router {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
 
 		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, staticAssets("css")))
-		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, staticAssets("favicon")))
 		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, indexHandler))
-		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, indexHandler))
 	} else {
 		tmplFileSrv := http.FileServer(source.TmplBox.HTTPBox())
 		tmplBoxHandler := http.StripPrefix(basePath, tmplFileSrv)
 
 		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, tmplFileSrv))
-		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, tmplFileSrv))
 		r.PathPrefix("/robots.txt").Handler(tmplBoxHandler)
-		r.PathPrefix("/banner.png").Handler(tmplBoxHandler)
 	}
 
 	r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
@@ -96,8 +88,6 @@ func Router() *mux.Router {
 	api.Handle("/api/login", http.HandlerFunc(apiLoginHandler)).Methods("POST")
 	api.Handle("/api/logout", http.HandlerFunc(logoutHandler))
 	api.Handle("/api/renew", authenticated(apiRenewHandler, false))
-	api.Handle("/api/cache", authenticated(apiCacheHandler, false)).Methods("GET")
-	api.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
 	api.Handle("/api/core", authenticated(apiCoreHandler, false)).Methods("POST")
 	api.Handle("/api/logs", authenticated(logsHandler, false)).Methods("GET")
 	api.Handle("/api/logs/last", authenticated(logsLineHandler, false)).Methods("GET")
@@ -139,9 +129,9 @@ func Router() *mux.Router {
 	api.Handle("/api/services/{id}/hits", authenticated(apiServiceHitsDeleteHandler, false)).Methods("DELETE")
 
 	// API SERVICE CHART DATA Routes
-	api.Handle("/api/services/{id}/hits_data", cached("30s", "application/json", apiServiceDataHandler)).Methods("GET")
-	api.Handle("/api/services/{id}/failure_data", cached("30s", "application/json", apiServiceFailureDataHandler)).Methods("GET")
-	api.Handle("/api/services/{id}/ping_data", cached("30s", "application/json", apiServicePingDataHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/hits_data", http.HandlerFunc(apiServiceDataHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/failure_data", http.HandlerFunc(apiServiceFailureDataHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/ping_data", http.HandlerFunc(apiServicePingDataHandler)).Methods("GET")
 	api.Handle("/api/services/{id}/uptime_data", http.HandlerFunc(apiServiceTimeDataHandler)).Methods("GET")
 
 	// API INCIDENTS Routes
