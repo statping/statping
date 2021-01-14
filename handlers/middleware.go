@@ -13,9 +13,7 @@ import (
 	"github.com/statping/statping/utils"
 	"io"
 	"net/http"
-	"net/http/httptest"
 	"strings"
-	"time"
 )
 
 var (
@@ -136,36 +134,6 @@ func readOnly(handler http.Handler, redirect bool) http.Handler {
 			return
 		}
 		handler.ServeHTTP(w, r)
-	})
-}
-
-// cached is a middleware function that accepts a duration and content type and will cache the response of the original request
-func cached(duration, contentType string, handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		content := CacheStorage.Get(r.RequestURI)
-		w.Header().Set("Content-Type", contentType)
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		if !core.App.Setup {
-			handler(w, r)
-			return
-		}
-		if content != nil {
-			w.Write(content)
-		} else {
-			c := httptest.NewRecorder()
-			handler(c, r)
-			content := c.Body.Bytes()
-			result := c.Result()
-			if result.StatusCode != 200 {
-				w.WriteHeader(result.StatusCode)
-				w.Write(content)
-				return
-			}
-			w.Write(content)
-			if d, err := time.ParseDuration(duration); err == nil {
-				go CacheStorage.Set(r.RequestURI, content, d)
-			}
-		}
 	})
 }
 

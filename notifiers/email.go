@@ -3,6 +3,7 @@ package notifiers
 import (
 	"crypto/tls"
 	"fmt"
+
 	"github.com/go-mail/mail"
 	"github.com/statping/emails"
 	"github.com/statping/statping/types/core"
@@ -90,8 +91,9 @@ type emailOutgoing struct {
 
 // OnFailure will trigger failing service
 func (e *emailer) OnFailure(s services.Service, f failures.Failure) (string, error) {
+	subscriber := e.Var2.String
 	subject := fmt.Sprintf("Service %s is Offline", s.Name)
-	tmpl := renderEmail(s, f, emails.Failure)
+	tmpl := renderEmail(s, subscriber, f, emails.Failure)
 	email := &emailOutgoing{
 		To:       e.Var2.String,
 		Subject:  subject,
@@ -103,8 +105,9 @@ func (e *emailer) OnFailure(s services.Service, f failures.Failure) (string, err
 
 // OnSuccess will trigger successful service
 func (e *emailer) OnSuccess(s services.Service) (string, error) {
+	subscriber := e.Var2.String
 	subject := fmt.Sprintf("Service %s is Back Online", s.Name)
-	tmpl := renderEmail(s, failures.Failure{}, emails.Success)
+	tmpl := renderEmail(s, subscriber, failures.Failure{}, emails.Success)
 	email := &emailOutgoing{
 		To:       e.Var2.String,
 		Subject:  subject,
@@ -114,11 +117,12 @@ func (e *emailer) OnSuccess(s services.Service) (string, error) {
 	return tmpl, e.dialSend(email)
 }
 
-func renderEmail(s services.Service, f failures.Failure, emailData string) string {
+func renderEmail(s services.Service, subscriber string, f failures.Failure, emailData string) string {
 	data := replacer{
 		Core:    *core.App,
 		Service: s,
 		Failure: f,
+		Email:   subscriber,
 		Custom:  nil,
 	}
 	output, err := emails.Parse(emailData, data)
@@ -131,12 +135,13 @@ func renderEmail(s services.Service, f failures.Failure, emailData string) strin
 
 // OnTest triggers when this notifier has been saved
 func (e *emailer) OnTest() (string, error) {
+	subscriber := e.Var2.String
 	service := services.Example(true)
 	subject := fmt.Sprintf("Service %v is Back Online", service.Name)
 	email := &emailOutgoing{
 		To:       e.Var2.String,
 		Subject:  subject,
-		Template: renderEmail(service, failures.Example(), emailFailure),
+		Template: renderEmail(service, subscriber, failures.Example(), emailFailure),
 		From:     e.Var1.String,
 	}
 	return subject, e.dialSend(email)

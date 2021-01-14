@@ -1,6 +1,9 @@
 package notifiers
 
 import (
+	"testing"
+	"time"
+
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
@@ -10,8 +13,6 @@ import (
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
 )
 
 func TestCommandNotifier(t *testing.T) {

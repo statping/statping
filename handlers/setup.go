@@ -120,7 +120,6 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	core.App.Setup = true
 
-	CacheStorage.Delete("/")
 	resetCookies()
 
 	out := struct {

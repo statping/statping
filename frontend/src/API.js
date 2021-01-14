@@ -7,8 +7,8 @@ const tokenKey = "statping_auth";
 
 class Api {
   constructor() {
-    this.version = "0.90.67";
-    this.commit = "7e121335791d2143a2eefd404dbcce83b8f46f61";
+    this.version = "0.90.74";
+    this.commit = "df8e1f73d9f7fdf218bc5c26130d7d8a6af6719a";
   }
 
   async oauth() {
@@ -198,14 +198,6 @@ class Api {
 
   async renewApiKeys() {
     return axios.get('api/renew').then(response => (response.data))
-  }
-
-  async cache() {
-    return axios.get('api/cache').then(response => (response.data))
-  }
-
-  async clearCache() {
-    return axios.get('api/clear_cache').then(response => (response.data))
   }
 
   async logs() {
