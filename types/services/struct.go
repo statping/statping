@@ -26,6 +26,10 @@ type Service struct {
 	Order               int                   `gorm:"default:0;column:order_id" json:"order_id" yaml:"order_id"`
 	VerifySSL           null.NullBool         `gorm:"default:false;column:verify_ssl" json:"verify_ssl" scope:"user,admin" yaml:"verify_ssl"`
 	GrpcHealthCheck     null.NullBool         `gorm:"default:false;column:grpc_health_check" json:"grpc_health_check" scope:"user,admin" yaml:"grpc_health_check"`
+	Username            string                `gorm:"column:username" json:"username" yaml:"username" scope:"user,admin"`
+	Password            string                `gorm:"column:password" json:"password" yaml:"password" scope:"user,admin"`
+	CheckCommand        string                `gorm:"column:check_command" json:"check_command" yaml:"check_command" scope:"user,admin"`
+	SshHealthCheck      null.NullBool         `gorm:"default:false;column:ssh_health_check" json:"ssh_health_check" scope:"user,admin" yaml:"ssh_health_check"`
 	Public              null.NullBool         `gorm:"default:true;column:public" json:"public" yaml:"public"`
 	GroupId             int                   `gorm:"default:0;column:group_id" json:"group_id" yaml:"group_id"`
 	TLSCert             null.NullString       `gorm:"column:tls_cert" json:"tls_cert" scope:"user,admin" yaml:"tls_cert"`
