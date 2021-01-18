@@ -208,9 +208,9 @@ func CheckGrpc(s *Service, record bool) (*Service, error) {
 	s.Online = true
 
 	if s.GrpcHealthCheck.Bool {
-		if s.ExpectedStatus != s.LastStatusCode {
+		if *s.ExpectedStatus != s.LastStatusCode {
 			if record {
-				RecordFailure(s, fmt.Sprintf("GRPC Service: '%s', Status Code: expected '%v', got '%v'", s.Name, s.ExpectedStatus, s.LastStatusCode), "response_code")
+				RecordFailure(s, fmt.Sprintf("GRPC Service: '%s', Status Code: expected '%v', got '%v'", s.Name, *s.ExpectedStatus, s.LastStatusCode), "response_code")
 			}
 			return s, nil
 		}
@@ -381,9 +381,9 @@ func CheckHttp(s *Service, record bool) (*Service, error) {
 			return s, err
 		}
 	}
-	if s.ExpectedStatus != res.StatusCode {
+	if *s.ExpectedStatus != res.StatusCode {
 		if record {
-			RecordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", res.StatusCode, s.ExpectedStatus), "status_code")
+			RecordFailure(s, fmt.Sprintf("HTTP Status Code %v did not match %v", res.StatusCode, *s.ExpectedStatus), "status_code")
 		}
 		return s, err
 	}
@@ -462,9 +462,9 @@ func CheckSsh(s *Service, record bool) (*Service, error) {
 	s.Online = true
 
 	if s.SshHealthCheck.Bool {
-		if s.ExpectedStatus != s.LastStatusCode {
+		if *s.ExpectedStatus != s.LastStatusCode {
 			if record {
-				RecordFailure(s, fmt.Sprintf("SSH Service: '%s', Exit Code: expected '%v', got '%v'", s.Name, s.ExpectedStatus, s.LastStatusCode), "response_code")
+				RecordFailure(s, fmt.Sprintf("SSH Service: '%s', Exit Code: expected '%v', got '%v'", s.Name, *s.ExpectedStatus, s.LastStatusCode), "response_code")
 			}
 			return s, nil
 		}
