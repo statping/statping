@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"net/http"
+	"net/http/pprof"
 
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
