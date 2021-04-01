@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/errors"
@@ -8,7 +10,6 @@ import (
 	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
-	"net/http"
 )
 
 type serviceOrder struct {
@@ -316,4 +317,15 @@ func apiServiceHitsHandler(r *http.Request) interface{} {
 	}
 	query.Find(&hts)
 	return hts
+}
+
+func apiServiceLastResponseHandler(w http.ResponseWriter, r *http.Request) {
+
+	service, err := findService(r)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	returnLastResponse(service, w, r)
 }
