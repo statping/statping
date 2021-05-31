@@ -558,24 +558,14 @@
   "templating": {
     "list": [
       {
-        "allValue": null,
-        "current": {},
-        "datasource": "${DS_PROMETHEUS}",
         "hide": 0,
-        "includeAll": false,
-        "label": "service",
-        "multi": false,
-        "name": "service",
+        "label": "datasource",
+        "name": "DS_PROMETHEUS",
         "options": [],
-        "query": "label_values(statup_service_latency, name)",
+        "query": "prometheus",
         "refresh": 1,
         "regex": "",
-        "sort": 0,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
+        "type": "datasource"
       }
     ]
   },
@@ -612,5 +602,5 @@
   "title": "Statping",
   "uid": "6BzRjddmz",
   "version": 25,
-  "description": "Monitor your websites and applications using Statping service. View more information at https://github.com/hunterlong/statping"
+  "description": "Monitor your websites and applications using Statping service. View more information at https://github.com/statping/statping"
 }

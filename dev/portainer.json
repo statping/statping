@@ -1,0 +1,21 @@
+[
+  {
+    "type": 1,
+    "title": "Statping",
+    "restart_policy": "unless-stopped",
+    "description": "Service monitoring with an easy to use status page and mobile app",
+    "logo": "https://assets.statping.com/icon.png",
+    "image": "statping/statping:latest",
+    "platform": "linux",
+    "categories": ["monitoring"],
+    "administrator_only": false,
+    "ports": [
+      "8080:8080/tcp"
+    ],
+    "volumes": [
+      {
+        "container": "/app"
+      }
+    ]
+  }
+]

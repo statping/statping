@@ -8,9 +8,13 @@ import (
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if !core.App.Setup {
-		http.Redirect(w, r, "/setup", http.StatusSeeOther)
+		ExecuteResponse(w, r, "base.gohtml", core.App, "setup")
 		return
 	}
+	ExecuteResponse(w, r, "base.gohtml", core.App, nil)
+}
+
+func baseHandler(w http.ResponseWriter, r *http.Request) {
 	ExecuteResponse(w, r, "base.gohtml", core.App, nil)
 }
 

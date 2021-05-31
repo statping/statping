@@ -9,7 +9,8 @@ import (
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net/http"
-	"time"
+	"net/url"
+	"strconv"
 )
 
 func processSetupHandler(w http.ResponseWriter, r *http.Request) {
@@ -29,16 +30,13 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	project := r.PostForm.Get("project")
 	description := r.PostForm.Get("description")
 	domain := r.PostForm.Get("domain")
+	sendNews, _ := strconv.ParseBool(r.PostForm.Get("newsletter"))
+	sendReports, _ := strconv.ParseBool(r.PostForm.Get("send_reports"))
 
 	log.WithFields(utils.ToFields(core.App, confgs)).Debugln("new configs posted")
 
-	if err = configs.ConnectConfigs(confgs); err != nil {
+	if err = configs.ConnectConfigs(confgs, false); err != nil {
 		log.Errorln(err)
-		if err := confgs.Delete(); err != nil {
-			log.Errorln(err)
-			sendErrorJson(err, w, r)
-			return
-		}
 		sendErrorJson(err, w, r)
 		return
 	}
@@ -61,7 +59,7 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if err := configs.CreateAdminUser(confgs); err != nil {
+		if err := configs.CreateAdminUser(); err != nil {
 			sendErrorJson(err, w, r)
 			return
 		}
@@ -81,16 +79,17 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 	notifiers.InitNotifiers()
 
 	c := &core.Core{
-		Name:        project,
-		Description: description,
-		//ApiKey:      apiKey.(string),
-		//ApiSecret:   apiSecret.(string),
-		Domain:    domain,
-		Version:   core.App.Version,
-		Started:   utils.Now(),
-		CreatedAt: utils.Now(),
-		UseCdn:    null.NewNullBool(false),
-		Footer:    null.NewNullString(""),
+		Name:         project,
+		Description:  description,
+		ApiSecret:    utils.Params.GetString("API_SECRET"),
+		Domain:       domain,
+		Version:      core.App.Version,
+		Started:      utils.Now(),
+		CreatedAt:    utils.Now(),
+		UseCdn:       null.NewNullBool(false),
+		Footer:       null.NewNullString(""),
+		Language:     confgs.Language,
+		AllowReports: null.NewNullBool(sendReports),
 	}
 
 	log.Infoln("Creating new Core")
@@ -102,6 +101,13 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 
 	core.App = c
 
+	if sendNews {
+		log.Infof("Sending email address %s to newsletter server", confgs.Email)
+		if err := registerNews(confgs.Email, confgs.Domain); err != nil {
+			log.Errorln(err)
+		}
+	}
+
 	log.Infoln("Initializing new Statping instance")
 
 	if _, err := services.SelectAllServices(true); err != nil {
@@ -110,13 +116,12 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go services.CheckServices()
+	services.CheckServices()
 
 	core.App.Setup = true
 
-	CacheStorage.Delete("/")
 	resetCookies()
-	time.Sleep(1 * time.Second)
+
 	out := struct {
 		Message string            `json:"message"`
 		Config  *configs.DbConfig `json:"config"`
@@ -125,4 +130,19 @@ func processSetupHandler(w http.ResponseWriter, r *http.Request) {
 		confgs,
 	}
 	returnJson(out, w, r)
+}
+
+func registerNews(email, domain string) error {
+	if email == "" {
+		return nil
+	}
+	v := url.Values{}
+	v.Set("email", email)
+	v.Set("domain", domain)
+	v.Set("timezone", "UTC")
+	resp, err := http.PostForm("https://news.statping.com/new", v)
+	if err != nil {
+		return err
+	}
+	return resp.Body.Close()
 }

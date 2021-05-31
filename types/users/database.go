@@ -1,15 +1,34 @@
 package users
 
 import (
-	"github.com/prometheus/common/log"
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/metrics"
 	"github.com/statping/statping/utils"
 )
 
-var db database.Database
+var (
+	db  database.Database
+	log = utils.Log.WithField("type", "user")
+)
 
 func SetDB(database database.Database) {
 	db = database.Model(&User{})
+}
+
+func (u *User) AfterFind() {
+	metrics.Query("user", "find")
+}
+
+func (u *User) AfterCreate() {
+	metrics.Query("user", "create")
+}
+
+func (u *User) AfterUpdate() {
+	metrics.Query("user", "update")
+}
+
+func (u *User) AfterDelete() {
+	metrics.Query("user", "delete")
 }
 
 func Find(id int64) (*User, error) {
@@ -21,6 +40,12 @@ func Find(id int64) (*User, error) {
 func FindByUsername(username string) (*User, error) {
 	var user User
 	q := db.Where("username = ?", username).Find(&user)
+	return &user, q.Error()
+}
+
+func FindByAPIKey(key string) (*User, error) {
+	var user User
+	q := db.Where("api_key = ?", key).Find(&user)
 	return &user, q.Error()
 }
 
@@ -49,11 +74,4 @@ func (u *User) Delete() error {
 		log.Warnf("User #%d (%s) has been deleted", u.Id, u.Username)
 	}
 	return q.Error()
-}
-
-func (u *User) BeforeCreate() error {
-	u.Password = utils.HashPassword(u.Password)
-	u.ApiKey = utils.NewSHA256Hash()
-	u.ApiSecret = utils.NewSHA256Hash()
-	return nil
 }

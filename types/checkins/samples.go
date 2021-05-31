@@ -6,23 +6,22 @@ import (
 )
 
 func Samples() error {
+	log.Infoln("Inserting Sample Checkins...")
 	checkin1 := &Checkin{
-		Name:        "Example Checkin 1",
-		ServiceId:   1,
-		Interval:    300,
-		GracePeriod: 300,
-		ApiKey:      utils.RandomString(7),
+		Name:      "Demo Checkin 1",
+		ServiceId: 1,
+		Interval:  3,
+		ApiKey:    "demoCheckin123",
 	}
 	if err := checkin1.Create(); err != nil {
 		return err
 	}
 
 	checkin2 := &Checkin{
-		Name:        "Example Checkin 2",
-		ServiceId:   2,
-		Interval:    900,
-		GracePeriod: 300,
-		ApiKey:      utils.RandomString(7),
+		Name:      "Example Checkin 2",
+		ServiceId: 2,
+		Interval:  1,
+		ApiKey:    utils.RandomString(7),
 	}
 	if err := checkin2.Create(); err != nil {
 		return err
@@ -31,7 +30,8 @@ func Samples() error {
 }
 
 func SamplesChkHits() error {
-	checkTime := time.Now().UTC().Add(-24 * time.Hour)
+	log.Infoln("Inserting Sample Checkins Hits...")
+	checkTime := utils.Now().Add(-3 * time.Minute)
 
 	for i := int64(1); i <= 2; i++ {
 		checkHit := &CheckinHit{
@@ -44,7 +44,7 @@ func SamplesChkHits() error {
 			return err
 		}
 
-		checkTime = checkTime.Add(10 * time.Minute)
+		checkTime = checkTime.Add(1 * time.Minute)
 	}
 
 	return nil

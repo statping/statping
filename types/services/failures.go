@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const limitFailures = 32
+
 func (s *Service) FailuresColumnID() (string, int64) {
 	return "service", s.Id
 }
@@ -16,11 +18,10 @@ func (s *Service) AllFailures() failures.Failurer {
 }
 
 func (s *Service) FailuresSince(t time.Time) failures.Failurer {
-	fails := failures.Since(t, s)
-	return fails
+	return failures.Since(t, s)
 }
 
-func (s *Service) DowntimeText() string {
+func (s Service) DowntimeText() string {
 	last := s.AllFailures().Last()
 	if last == nil {
 		return ""

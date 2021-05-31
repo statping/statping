@@ -1,13 +1,15 @@
 package handlers
 
 import (
-	"fmt"
-	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/statping/statping/source"
 	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/utils"
 	"net/http"
+	"net/http/pprof"
+
+	_ "github.com/statping/statping/types/metrics"
 )
 
 var (
@@ -16,58 +18,73 @@ var (
 )
 
 func staticAssets(src string) http.Handler {
-	return http.StripPrefix(basePath+src+"/", http.FileServer(http.Dir(utils.Directory+"/assets/"+src)))
+	return http.StripPrefix(src+"/", http.FileServer(http.Dir(utils.Directory+"/assets/"+src)))
 }
 
 // Router returns all of the routes used in Statping.
 // Server will use static assets if the 'assets' directory is found in the root directory.
 func Router() *mux.Router {
 	dir := utils.Directory
-	CacheStorage = NewStorage()
+
 	r := mux.NewRouter().StrictSlash(true)
+	r.Use(prometheusMiddleware)
 
-	authUser := utils.Getenv("AUTH_USERNAME", "").(string)
-	authPass := utils.Getenv("AUTH_PASSWORD", "").(string)
-
+	authUser := utils.Params.GetString("AUTH_USERNAME")
+	authPass := utils.Params.GetString("AUTH_PASSWORD")
 	if authUser != "" && authPass != "" {
 		r.Use(basicAuthHandler)
 	}
 
-	bPath := utils.Getenv("BASE_PATH", "").(string)
-	sentryHandler := sentryhttp.New(sentryhttp.Options{})
+	bPath := utils.Params.GetString("BASE_PATH")
 
 	if bPath != "" {
 		basePath = "/" + bPath + "/"
 		r = r.PathPrefix("/" + bPath).Subrouter()
-		r.Handle("", sentryHandler.Handle(http.HandlerFunc(indexHandler)))
+		r.Handle("", http.HandlerFunc(indexHandler))
 	} else {
-		r.Handle("/", sentryHandler.Handle(http.HandlerFunc(indexHandler)))
+		r.Handle("/", http.HandlerFunc(indexHandler))
 	}
 
-	r.Use(sendLog)
+	if !utils.Params.GetBool("DISABLE_LOGS") {
+		r.Use(sendLog)
+	}
+
+	if utils.Params.GetBool("DEBUG") {
+		go func() {
+			log.Infoln("Starting pprof web server on http://0.0.0.0:9090")
+			r := http.NewServeMux()
+			r.HandleFunc("/debug/pprof/", pprof.Index)
+			r.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+			r.HandleFunc("/debug/pprof/profile", pprof.Profile)
+			r.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+			r.HandleFunc("/debug/pprof/trace", pprof.Trace)
+			http.ListenAndServe(":9090", r)
+			// pprof -http=:9000 http://localhost:9090/debug/pprof/heap?debug=1
+		}()
+	}
 
 	if source.UsingAssets(dir) {
 		indexHandler := http.FileServer(http.Dir(dir + "/assets/"))
 
-		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("css"))))
-		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, Gzip(staticAssets("js"))))
+		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, staticAssets("css")))
+		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, staticAssets("favicon")))
 		r.PathPrefix("/robots.txt").Handler(http.StripPrefix(basePath, indexHandler))
-		r.PathPrefix("/favicon.ico").Handler(http.StripPrefix(basePath, indexHandler))
 		r.PathPrefix("/banner.png").Handler(http.StripPrefix(basePath, indexHandler))
 	} else {
 		tmplFileSrv := http.FileServer(source.TmplBox.HTTPBox())
 		tmplBoxHandler := http.StripPrefix(basePath, tmplFileSrv)
 
-		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
-		r.PathPrefix("/scss/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
-		r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, Gzip(tmplFileSrv)))
+		r.PathPrefix("/css/").Handler(http.StripPrefix(basePath, tmplFileSrv))
+		r.PathPrefix("/favicon/").Handler(http.StripPrefix(basePath, tmplFileSrv))
 		r.PathPrefix("/robots.txt").Handler(tmplBoxHandler)
-		r.PathPrefix("/favicon.ico").Handler(tmplBoxHandler)
 		r.PathPrefix("/banner.png").Handler(tmplBoxHandler)
 	}
 
+	r.PathPrefix("/js/").Handler(http.StripPrefix(basePath, http.FileServer(source.TmplBox.HTTPBox())))
+
 	api := r.NewRoute().Subrouter()
 	api.Use(apiMiddleware)
+	api.Use(prometheusMiddleware)
 
 	// API Routes
 	r.Handle("/api", scoped(apiIndexHandler))
@@ -75,14 +92,21 @@ func Router() *mux.Router {
 	api.Handle("/api/login", http.HandlerFunc(apiLoginHandler)).Methods("POST")
 	api.Handle("/api/logout", http.HandlerFunc(logoutHandler))
 	api.Handle("/api/renew", authenticated(apiRenewHandler, false))
-	api.Handle("/api/cache", authenticated(apiCacheHandler, false)).Methods("GET")
-	api.Handle("/api/clear_cache", authenticated(apiClearCacheHandler, false))
 	api.Handle("/api/core", authenticated(apiCoreHandler, false)).Methods("POST")
 	api.Handle("/api/logs", authenticated(logsHandler, false)).Methods("GET")
 	api.Handle("/api/logs/last", authenticated(logsLineHandler, false)).Methods("GET")
+	api.Handle("/api/settings/import", authenticated(settingsImportHandler, false)).Methods("POST")
+	api.Handle("/api/settings/export", authenticated(settingsExportHandler, false)).Methods("GET")
+	api.Handle("/api/settings/configs", authenticated(configsViewHandler, false)).Methods("GET")
+	api.Handle("/api/settings/configs", authenticated(configsSaveHandler, false)).Methods("POST")
+
+	// API OAUTH Routes
+	api.Handle("/api/oauth", scoped(apiOAuthHandler)).Methods("GET")
+	api.Handle("/api/oauth", authenticated(apiUpdateOAuthHandler, false)).Methods("POST")
+	api.Handle("/oauth/{provider}", http.HandlerFunc(oauthHandler))
 
 	// API SCSS and ASSETS Routes
-	api.Handle("/api/theme", authenticated(apiThemeHandler, false)).Methods("GET")
+	api.Handle("/api/theme", authenticated(apiThemeViewHandler, false)).Methods("GET")
 	api.Handle("/api/theme", authenticated(apiThemeSaveHandler, false)).Methods("POST")
 	api.Handle("/api/theme/create", authenticated(apiThemeCreateHandler, false)).Methods("GET")
 	api.Handle("/api/theme", authenticated(apiThemeRemoveHandler, false)).Methods("DELETE")
@@ -90,7 +114,7 @@ func Router() *mux.Router {
 	// API GROUPS Routes
 	api.Handle("/api/groups", scoped(apiAllGroupHandler)).Methods("GET")
 	api.Handle("/api/groups", authenticated(apiCreateGroupHandler, false)).Methods("POST")
-	api.Handle("/api/groups/{id}", readOnly(apiGroupHandler, false)).Methods("GET")
+	api.Handle("/api/groups/{id}", readOnly(http.HandlerFunc(apiGroupHandler), false)).Methods("GET")
 	api.Handle("/api/groups/{id}", authenticated(apiGroupUpdateHandler, false)).Methods("POST")
 	api.Handle("/api/groups/{id}", authenticated(apiGroupDeleteHandler, false)).Methods("DELETE")
 	api.Handle("/api/reorder/groups", authenticated(apiGroupReorderHandler, false)).Methods("POST")
@@ -100,19 +124,19 @@ func Router() *mux.Router {
 	api.Handle("/api/services", authenticated(apiCreateServiceHandler, false)).Methods("POST")
 	api.Handle("/api/services/{id}", scoped(apiServiceHandler)).Methods("GET")
 	api.Handle("/api/reorder/services", authenticated(reorderServiceHandler, false)).Methods("POST")
-	api.Handle("/api/services/{id}/running", authenticated(apiServiceRunningHandler, false)).Methods("POST")
 	api.Handle("/api/services/{id}", authenticated(apiServiceUpdateHandler, false)).Methods("POST")
+	api.Handle("/api/services/{id}", authenticated(apiServicePatchHandler, false)).Methods("PATCH")
 	api.Handle("/api/services/{id}", authenticated(apiServiceDeleteHandler, false)).Methods("DELETE")
 	api.Handle("/api/services/{id}/failures", scoped(apiServiceFailuresHandler)).Methods("GET")
 	api.Handle("/api/services/{id}/failures", authenticated(servicesDeleteFailuresHandler, false)).Methods("DELETE")
 	api.Handle("/api/services/{id}/hits", scoped(apiServiceHitsHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/hits", authenticated(apiServiceHitsDeleteHandler, false)).Methods("DELETE")
 
 	// API SERVICE CHART DATA Routes
-	api.Handle("/api/services/{id}/hits_data", cached("30s", "application/json", apiServiceDataHandler)).Methods("GET")
-	api.Handle("/api/services/{id}/failure_data", cached("30s", "application/json", apiServiceFailureDataHandler)).Methods("GET")
-	api.Handle("/api/services/{id}/ping_data", cached("30s", "application/json", apiServicePingDataHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/hits_data", http.HandlerFunc(apiServiceDataHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/failure_data", http.HandlerFunc(apiServiceFailureDataHandler)).Methods("GET")
+	api.Handle("/api/services/{id}/ping_data", http.HandlerFunc(apiServicePingDataHandler)).Methods("GET")
 	api.Handle("/api/services/{id}/uptime_data", http.HandlerFunc(apiServiceTimeDataHandler)).Methods("GET")
-	//api.Handle("/api/services/{id}/heatmap", cached("30s", "application/json", apiServiceHeatmapHandler)).Methods("GET")
 
 	// API INCIDENTS Routes
 	api.Handle("/api/services/{id}/incidents", http.HandlerFunc(apiServiceIncidentsHandler)).Methods("GET")
@@ -128,6 +152,7 @@ func Router() *mux.Router {
 	// API USER Routes
 	api.Handle("/api/users", authenticated(apiAllUsersHandler, false)).Methods("GET")
 	api.Handle("/api/users", authenticated(apiCreateUsersHandler, false)).Methods("POST")
+	api.Handle("/api/users/token", http.HandlerFunc(apiCheckUserTokenHandler)).Methods("POST")
 	api.Handle("/api/users/{id}", authenticated(apiUserHandler, false)).Methods("GET")
 	api.Handle("/api/users/{id}", authenticated(apiUserUpdateHandler, false)).Methods("POST")
 	api.Handle("/api/users/{id}", authenticated(apiUserDeleteHandler, false)).Methods("DELETE")
@@ -152,26 +177,23 @@ func Router() *mux.Router {
 	api.Handle("/api/checkins/{api}", authenticated(checkinDeleteHandler, false)).Methods("DELETE")
 	r.Handle("/checkin/{api}", http.HandlerFunc(checkinHitHandler))
 
-	// Static Files Routes
-	r.PathPrefix("/files/postman.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
-	r.PathPrefix("/files/swagger.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
-	r.PathPrefix("/files/grafana.json").Handler(http.StripPrefix("/files/", http.FileServer(source.TmplBox.HTTPBox())))
-
 	// API Generic Routes
-	r.Handle("/metrics", readOnly(prometheusHandler, false))
+	r.Handle("/metrics", readOnly(promhttp.Handler(), false))
 	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
-	r.Handle("/oauth/{provider}", http.HandlerFunc(oauthHandler))
-	r.Handle("/.well-known/", http.StripPrefix("/.well-known/", http.FileServer(http.Dir(dir+"/.well-known"))))
-
-	r.NotFoundHandler = http.HandlerFunc(error404Handler)
+	r.NotFoundHandler = http.HandlerFunc(baseHandler)
 	return r
 }
 
 func resetRouter() {
+	log.Infoln("Restarting HTTP Router")
 	router = Router()
 	httpServer.Handler = router
 }
 
 func resetCookies() {
-	jwtKey = fmt.Sprintf("%s_%d", core.App.ApiSecret, utils.Now().Nanosecond())
+	if core.App == nil {
+		jwtKey = []byte(utils.NewSHA256Hash())
+		return
+	}
+	jwtKey = []byte(utils.Sha256Hash(core.App.ApiSecret))
 }

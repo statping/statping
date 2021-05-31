@@ -8,7 +8,7 @@
             <span class="d-block mt-2">
                 <input type="text" class="form-control" :value="`${core.domain}/checkin/${checkin.api_key}`" readonly>
                 <span class="small">Send a GET request to this URL every {{checkin.interval}} seconds
-                    <button @click="deleteCheckin(checkin)" type="button" class="btn btn-danger btn-xs float-right mt-1">Delete</button>
+                    <button @click.prevent="deleteCheckin(checkin)" type="button" class="btn btn-danger btn-xs float-right mt-1">Delete</button>
                 </span>
             </span>
         </div>
@@ -16,19 +16,15 @@
         <div class="col-12 alert alert-light">
             <form @submit.prevent="saveCheckin">
                 <div class="form-group row">
-                    <div class="col-5">
+                    <div class="col-12 col-md-5">
                         <label for="checkin_interval" class="col-form-label">Checkin Name</label>
                         <input v-model="checkin.name" type="text" name="name" class="form-control" id="checkin_name" placeholder="New Checkin">
                     </div>
-                    <div class="col-2">
-                        <label for="checkin_interval" class="col-form-label">Interval</label>
-                        <input v-model="checkin.interval" type="number" name="interval" class="form-control" id="checkin_interval" placeholder="60">
+                    <div class="col-12 col-md-5">
+                        <label for="checkin_interval" class="col-form-label">Interval (minutes)</label>
+                        <input v-model.number="checkin.interval" type="number" name="interval" class="form-control" id="checkin_interval" placeholder="1" min="1">
                     </div>
-                    <div class="col-2">
-                        <label for="grace_period" class="col-form-label">Grace Period</label>
-                        <input v-model="checkin.grace" type="number" name="grace" class="form-control" id="grace_period" placeholder="10">
-                    </div>
-                    <div class="col-3">
+                    <div class="col-12 col-md-5">
                         <label class="col-form-label"></label>
                         <button @click.prevent="saveCheckin" type="submit" id="submit" class="btn btn-success d-block mt-2">Save Checkin</button>
                     </div>
@@ -54,7 +50,6 @@
               checkin: {
                   name: "",
                   interval: 60,
-                  grace: 60,
                   service_id: this.service.id
               }
           }

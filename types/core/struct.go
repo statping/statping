@@ -10,9 +10,10 @@ var (
 	App *Core
 )
 
-func New(version string) {
+func New(version, commit string) {
 	App = new(Core)
 	App.Version = version
+	App.Commit = commit
 	App.Started = utils.Now()
 }
 
@@ -23,38 +24,46 @@ type Core struct {
 	Name          string          `gorm:"not null;column:name" json:"name,omitempty"`
 	Description   string          `gorm:"not null;column:description" json:"description,omitempty"`
 	ConfigFile    string          `gorm:"column:config" json:"-"`
-	ApiKey        string          `gorm:"column:api_key" json:"api_key" scope:"admin"`
 	ApiSecret     string          `gorm:"column:api_secret" json:"api_secret" scope:"admin"`
 	Style         string          `gorm:"not null;column:style" json:"style,omitempty"`
 	Footer        null.NullString `gorm:"column:footer" json:"footer"`
 	Domain        string          `gorm:"not null;column:domain" json:"domain"`
 	Version       string          `gorm:"column:version" json:"version"`
+	Commit        string          `gorm:"-" json:"commit"`
+	Language      string          `gorm:"column:language" json:"language"`
 	Setup         bool            `gorm:"-" json:"setup"`
 	MigrationId   int64           `gorm:"column:migration_id" json:"migration_id,omitempty"`
 	UseCdn        null.NullBool   `gorm:"column:use_cdn;default:false" json:"using_cdn,omitempty"`
-	Timezone      float32         `gorm:"column:timezone;default:-8.0" json:"timezone,omitempty"`
-	LoggedIn      bool            `gorm:"-" json:"logged_in"`
-	IsAdmin       bool            `gorm:"-" json:"admin"`
-	AllowReports  null.NullBool   `gorm:"column:allow_reports;default:false" json:"allow_reports"`
+	AllowReports  null.NullBool   `gorm:"column:allow_reports;default:false" json:"allow_reports,omitempty"`
 	CreatedAt     time.Time       `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt     time.Time       `gorm:"column:updated_at" json:"updated_at"`
 	Started       time.Time       `gorm:"-" json:"started_on"`
 	Notifications []AllNotifiers  `gorm:"-" json:"-"`
 	Integrations  []Integrator    `gorm:"-" json:"-"`
 
-	OAuth `json:"oauth"`
+	OAuth `json:"-"`
 }
 
 type OAuth struct {
-	Domains            string `gorm:"column:oauth_domains" json:"oauth_domains,omitempty" scope:"admin"`
-	Providers          string `gorm:"column:oauth_providers;default:local" json:"oauth_providers,omitempty"`
-	GithubClientID     string `gorm:"column:gh_client_id" json:"gh_client_id,omitempty" scope:"admin"`
-	GithubClientSecret string `gorm:"column:gh_client_secret" json:"gh_client_secret,omitempty" scope:"admin"`
-	GoogleClientID     string `gorm:"column:google_client_id" json:"google_client_id,omitempty" scope:"admin"`
-	GoogleClientSecret string `gorm:"column:google_client_secret" json:"google_client_secret,omitempty" scope:"admin"`
-	SlackClientID      string `gorm:"column:slack_client_id" json:"slack_client_id,omitempty" scope:"admin"`
-	SlackClientSecret  string `gorm:"column:slack_client_secret" json:"slack_client_secret,omitempty" scope:"admin"`
-	SlackTeam          string `gorm:"column:slack_team" json:"slack_team,omitempty" scope:"admin"`
+	Providers           string        `gorm:"column:oauth_providers;" json:"oauth_providers"`
+	GithubClientID      string        `gorm:"column:gh_client_id" json:"gh_client_id"`
+	GithubClientSecret  string        `gorm:"column:gh_client_secret" json:"gh_client_secret" scope:"admin"`
+	GithubUsers         string        `gorm:"column:gh_users" json:"gh_users" scope:"admin"`
+	GithubOrgs          string        `gorm:"column:gh_orgs" json:"gh_orgs" scope:"admin"`
+	GoogleClientID      string        `gorm:"column:google_client_id" json:"google_client_id"`
+	GoogleClientSecret  string        `gorm:"column:google_client_secret" json:"google_client_secret" scope:"admin"`
+	GoogleUsers         string        `gorm:"column:google_users" json:"google_users" scope:"admin"`
+	SlackClientID       string        `gorm:"column:slack_client_id" json:"slack_client_id"`
+	SlackClientSecret   string        `gorm:"column:slack_client_secret" json:"slack_client_secret" scope:"admin"`
+	SlackTeam           string        `gorm:"column:slack_team" json:"slack_team" scope:"admin"`
+	SlackUsers          string        `gorm:"column:slack_users" json:"slack_users" scope:"admin"`
+	CustomName          string        `gorm:"column:custom_name" json:"custom_name"`
+	CustomClientID      string        `gorm:"column:custom_client_id" json:"custom_client_id"`
+	CustomClientSecret  string        `gorm:"column:custom_client_secret" json:"custom_client_secret" scope:"admin"`
+	CustomEndpointAuth  string        `gorm:"column:custom_endpoint_auth" json:"custom_endpoint_auth"`
+	CustomEndpointToken string        `gorm:"column:custom_endpoint_token" json:"custom_endpoint_token" scope:"admin"`
+	CustomScopes        string        `gorm:"column:custom_scopes" json:"custom_scopes"`
+	CustomIsOpenID      null.NullBool `gorm:"column:custom_open_id" json:"custom_open_id"`
 }
 
 // AllNotifiers contains all the Notifiers loaded

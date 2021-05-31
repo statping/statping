@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"github.com/statping/statping/handlers"
 	"github.com/statping/statping/source"
@@ -14,237 +13,340 @@ import (
 	"github.com/statping/statping/utils"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
 
-// catchCLI will run functions based on the commands sent to Statping
-func catchCLI(args []string) error {
+var (
+	importAll *bool
+)
+
+func assetsCli() error {
 	dir := utils.Directory
-	runLogs := utils.InitLogs
-	runAssets := source.Assets
+	if err := utils.InitLogs(); err != nil {
+		return err
+	}
+	if err := source.Assets(); err != nil {
+		return err
+	}
+	if err := source.CreateAllAssets(dir); err != nil {
+		return err
+	}
+	return nil
+}
 
-	switch args[0] {
-	case "version":
-		if COMMIT != "" {
-			fmt.Printf("%s (%s)\n", VERSION, COMMIT)
-		} else {
-			fmt.Printf("%s\n", VERSION)
+func systemctlCli(dir string, uninstall bool, port int64) error {
+	location := "/etc/systemd/system/statping.service"
+
+	if uninstall {
+		fmt.Println("systemctl stop statping")
+		if _, _, err := utils.Command("systemctl", "stop", "statping"); err != nil {
+			log.Errorln(err)
 		}
-		return errors.New("end")
-	case "assets":
-		var err error
-		if err = runLogs(); err != nil {
+		fmt.Println("systemctl disable statping")
+		if _, _, err := utils.Command("systemctl", "disable", "statping"); err != nil {
+			log.Errorln(err)
+		}
+		fmt.Println("Deleting systemctl: ", location)
+		if err := utils.DeleteFile(location); err != nil {
+			log.Errorln(err)
+		}
+		return nil
+	}
+	if ok := utils.FolderExists(dir); !ok {
+		return errors.New("directory does not exist: " + dir)
+	}
+
+	binPath, err := os.Executable()
+	if err != nil {
+		return err
+	}
+
+	config := []byte(`[Unit]
+Description=Statping Server
+After=network.target
+After=systemd-user-sessions.service
+After=network-online.target
+
+[Service]
+Type=simple
+Restart=always
+Environment="STATPING_DIR=` + dir + `"
+Environment="ALLOW_REPORTS=true"
+ExecStart=` + binPath + ` --port=` + utils.ToString(port) + `
+WorkingDirectory=` + dir + `
+
+[Install]
+WantedBy=multi-user.target"
+`)
+	fmt.Println("Saving systemctl service to: ", location)
+	fmt.Printf("Using directory %s for Statping data\n", dir)
+	fmt.Printf("Running on port %d\n", port)
+	fmt.Printf("\n\n%s\n\n", string(config))
+	if err := utils.SaveFile(location, config); err != nil {
+		return err
+	}
+	fmt.Println("systemctl daemon-reload")
+	if _, _, err := utils.Command("systemctl", "daemon-reload"); err != nil {
+		return err
+	}
+	fmt.Println("systemctl enable statping")
+	if _, _, err := utils.Command("systemctl", "enable", "statping.service"); err != nil {
+		return err
+	}
+	fmt.Println("systemctl start statping")
+	if _, _, err := utils.Command("systemctl", "start", "statping"); err != nil {
+		return err
+	}
+	fmt.Println("Statping was will auto start on reboots")
+	fmt.Println("systemctl service: ", location)
+
+	return nil
+}
+
+func exportCli(args []string) error {
+	filename := filepath.Join(utils.Directory, time.Now().Format("01-02-2006-1504")+".json")
+	if len(args) == 1 {
+		filename = fmt.Sprintf("%s/%s", utils.Directory, args)
+	}
+	var data *handlers.ExportData
+	if err := utils.InitLogs(); err != nil {
+		return err
+	}
+	if err := source.Assets(); err != nil {
+		return err
+	}
+	config, err := configs.LoadConfigs(configFile)
+	if err != nil {
+		return err
+	}
+	if err = configs.ConnectConfigs(config, false); err != nil {
+		return err
+	}
+	if _, err := services.SelectAllServices(false); err != nil {
+		return err
+	}
+	if data, err = handlers.ExportSettings(); err != nil {
+		return fmt.Errorf("could not export settings: %v", err.Error())
+	}
+	if err = utils.SaveFile(filename, data.JSON()); err != nil {
+		return fmt.Errorf("could not write file statping-export.json: %v", err.Error())
+	}
+	log.Infoln("Statping export file saved to ", filename)
+	return nil
+}
+
+func sassCli() error {
+	if err := utils.InitLogs(); err != nil {
+		return err
+	}
+	if err := source.Assets(); err != nil {
+		return err
+	}
+	if err := source.CompileSASS(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func resetCli() error {
+	d := utils.Directory
+	fmt.Println("Statping directory: ", d)
+	assets := d + "/assets"
+	if utils.FolderExists(assets) {
+		fmt.Printf("Deleting %s folder.\n", assets)
+		if err := utils.DeleteDirectory(assets); err != nil {
 			return err
 		}
-		if err = runAssets(); err != nil {
+	} else {
+		fmt.Printf("Assets folder does not exist %s\n", assets)
+	}
+
+	logDir := d + "/logs"
+	if utils.FolderExists(logDir) {
+		fmt.Printf("Deleting %s directory.\n", logDir)
+		if err := utils.DeleteDirectory(logDir); err != nil {
 			return err
 		}
-		if err = source.CreateAllAssets(dir); err != nil {
+	} else {
+		fmt.Printf("Logs folder does not exist %s\n", logDir)
+	}
+
+	c := d + "/config.yml"
+	if utils.FileExists(c) {
+		fmt.Printf("Deleting %s file.\n", c)
+		if err := utils.DeleteFile(c); err != nil {
 			return err
 		}
-		return errors.New("end")
-	case "sass":
-		if err := runLogs(); err != nil {
+	} else {
+		fmt.Printf("Config file does not exist %s\n", c)
+	}
+
+	dbFile := d + "/statping.db"
+	if utils.FileExists(dbFile) {
+		fmt.Printf("Backuping up %s file.\n", dbFile)
+		if err := utils.RenameDirectory(dbFile, d+"/statping.db.backup"); err != nil {
 			return err
 		}
-		if err := runAssets(); err != nil {
-			return err
+	} else {
+		fmt.Printf("Statping SQL Database file does not exist %s\n", dbFile)
+	}
+
+	fmt.Println("Statping has been reset")
+	return nil
+}
+
+func envCli() error {
+	fmt.Println("Statping Configuration")
+	fmt.Printf("Process ID:          %d\n", os.Getpid())
+	fmt.Printf("Running as user id:  %d\n", os.Getuid())
+	fmt.Printf("Running as group id: %d\n", os.Getgid())
+	fmt.Printf("Statping Directory:  %s\n", utils.Directory)
+	for k, v := range utils.Params.AllSettings() {
+		fmt.Printf("%s=%v\n", strings.ToUpper(k), v)
+	}
+	return nil
+}
+
+func onceCli() error {
+	if err := utils.InitLogs(); err != nil {
+		return err
+	}
+	if err := source.Assets(); err != nil {
+		return err
+	}
+	log.Infoln("Running 1 time and saving to database...")
+	if err := runOnce(); err != nil {
+		return err
+	}
+	//core.CloseDB()
+	fmt.Println("Check is complete.")
+	return nil
+}
+
+func importCli(args []string) error {
+	var err error
+	var data []byte
+	if len(args) < 1 {
+		return errors.New("invalid command arguments")
+	}
+	if data, err = ioutil.ReadFile(args[0]); err != nil {
+		return err
+	}
+	var exportData handlers.ExportData
+	if err = json.Unmarshal(data, &exportData); err != nil {
+		return err
+	}
+	log.Printf("=== %s ===\n", exportData.Core.Name)
+	if exportData.Config != nil {
+		log.Printf("Configs:     %s\n", exportData.Config.DbConn)
+		if exportData.Config.DbUser != "" {
+			log.Printf("   - Host:   %s\n", exportData.Config.DbHost)
+			log.Printf("   - User:   %s\n", exportData.Config.DbUser)
 		}
-		if err := source.CompileSASS(source.DefaultScss...); err != nil {
-			return err
-		}
-		return errors.New("end")
-	case "update":
-		updateDisplay()
-		return errors.New("end")
-	case "static":
-		//var err error
-		//if err = runLogs(); err != nil {
-		//	return err
-		//}
-		//if err = runAssets(); err != nil {
-		//	return err
-		//}
-		//fmt.Printf("Statping v%v Exporting Static 'index.html' page...\n", VERSION)
-		//if _, err = core.LoadConfigFile(dir); err != nil {
-		//	log.Errorln("config.yml file not found")
-		//	return err
-		//}
-		//indexSource := ExportIndexHTML()
-		////core.CloseDB()
-		//if err = utils.SaveFile(dir+"/index.html", indexSource); err != nil {
-		//	log.Errorln(err)
-		//	return err
-		//}
-		//log.Infoln("Exported Statping index page: 'index.html'")
-	case "help":
-		HelpEcho()
-		return errors.New("end")
-	case "export":
-		var err error
-		var data []byte
-		if err = runLogs(); err != nil {
-			return err
-		}
-		if err = runAssets(); err != nil {
-			return err
-		}
-		config, err := configs.LoadConfigs()
-		if err != nil {
-			return err
-		}
-		if err = configs.ConnectConfigs(config); err != nil {
-			return err
-		}
-		if _, err := services.SelectAllServices(false); err != nil {
-			return err
-		}
-		if data, err = handlers.ExportSettings(); err != nil {
-			return fmt.Errorf("could not export settings: %v", err.Error())
-		}
-		filename := fmt.Sprintf("%s/statping-%s.json", dir, time.Now().Format("01-02-2006-1504"))
-		if err = utils.SaveFile(filename, data); err != nil {
-			return fmt.Errorf("could not write file statping-export.json: %v", err.Error())
-		}
-		log.Infoln("Statping export file saved to ", filename)
-		return errors.New("end")
-	case "import":
-		var err error
-		var data []byte
-		if len(args) != 2 {
-			return fmt.Errorf("did not include a JSON file to import\nstatping import filename.json")
-		}
-		filename := args[1]
-		if data, err = ioutil.ReadFile(filename); err != nil {
-			return err
-		}
-		var exportData handlers.ExportData
-		if err = json.Unmarshal(data, &exportData); err != nil {
-			return err
-		}
-		log.Printf("=== %s ===\n", exportData.Core.Name)
+	}
+	if len(exportData.Services) > 0 {
 		log.Printf("Services:   %d\n", len(exportData.Services))
+	}
+	if len(exportData.Checkins) > 0 {
 		log.Printf("Checkins:   %d\n", len(exportData.Checkins))
+	}
+	if len(exportData.Groups) > 0 {
 		log.Printf("Groups:     %d\n", len(exportData.Groups))
+	}
+	if len(exportData.Messages) > 0 {
 		log.Printf("Messages:   %d\n", len(exportData.Messages))
+	}
+	if len(exportData.Incidents) > 0 {
+		log.Printf("Incidents:  %d\n", len(exportData.Incidents))
+	}
+	if len(exportData.Users) > 0 {
 		log.Printf("Users:      %d\n", len(exportData.Users))
+	}
 
-		config, err := configs.LoadConfigs()
-		if err != nil {
-			return err
-		}
-		if err = configs.ConnectConfigs(config); err != nil {
-			return err
-		}
-		if data, err = handlers.ExportSettings(); err != nil {
-			return fmt.Errorf("could not export settings: %v", err.Error())
-		}
-
-		if ask("Import Core settings?") {
-			c := exportData.Core
-			if err := c.Update(); err != nil {
+	if exportData.Config != nil {
+		if ask("Create config.yml file from Configs?") {
+			log.Printf("Database Host:   	%s\n", exportData.Config.DbHost)
+			log.Printf("Database Port:   	%d\n", exportData.Config.DbPort)
+			log.Printf("Database User:   	%s\n", exportData.Config.DbUser)
+			log.Printf("Database Password:   %s\n", exportData.Config.DbPass)
+			if err := exportData.Config.Save(utils.Directory); err != nil {
 				return err
 			}
 		}
-		for _, s := range exportData.Groups {
-			if ask(fmt.Sprintf("Import Group '%s'?", s.Name)) {
-				s.Id = 0
-				if err := s.Create(); err != nil {
-					return err
-				}
-			}
-		}
-		for _, s := range exportData.Services {
-			if ask(fmt.Sprintf("Import Service '%s'?", s.Name)) {
-				s.Id = 0
-				if err := s.Create(); err != nil {
-					return err
-				}
-			}
-		}
-		for _, s := range exportData.Checkins {
-			if ask(fmt.Sprintf("Import Checkin '%s'?", s.Name)) {
-				s.Id = 0
-				if err := s.Create(); err != nil {
-					return err
-				}
-			}
-		}
-		for _, s := range exportData.Messages {
-			if ask(fmt.Sprintf("Import Message '%s'?", s.Title)) {
-				s.Id = 0
-				if err := s.Create(); err != nil {
-					return err
-				}
-			}
-		}
-		for _, s := range exportData.Users {
-			if ask(fmt.Sprintf("Import User '%s'?", s.Username)) {
-				s.Id = 0
-				if err := s.Create(); err != nil {
-					return err
-				}
-			}
-		}
-		log.Infof("Import complete")
-		return errors.New("end")
-	case "run":
-		if err := runLogs(); err != nil {
-			return err
-		}
-		if err := runAssets(); err != nil {
-			return err
-		}
-		log.Infoln("Running 1 time and saving to database...")
-		runOnce()
-		//core.CloseDB()
-		fmt.Println("Check is complete.")
-		return errors.New("end")
-	case "env":
-		fmt.Println("Statping Environment Variable")
-		if err := runLogs(); err != nil {
-			return err
-		}
-		if err := runAssets(); err != nil {
-			return err
-		}
-		envs, err := godotenv.Read(".env")
-		if err != nil {
-			log.Errorln("No .env file found in current directory.")
-			return err
-		}
-		for k, e := range envs {
-			fmt.Printf("%v=%v\n", k, e)
-		}
-	default:
-		return nil
 	}
-	return errors.New("end")
+
+	config, err := configs.LoadConfigs(configFile)
+	if err != nil {
+		return err
+	}
+	if err = configs.ConnectConfigs(config, false); err != nil {
+		return err
+	}
+	if ask("Create database rows and sample data?") {
+		if err := config.ResetCore(); err != nil {
+			return err
+		}
+	}
+	if ask("Import Core settings?") {
+		c := exportData.Core
+		if err := c.Update(); err != nil {
+			log.Errorln(err)
+		}
+	}
+	for _, s := range exportData.Groups {
+		if ask(fmt.Sprintf("Import Group '%s'?", s.Name)) {
+			s.Id = 0
+			if err := s.Create(); err != nil {
+				log.Errorln(err)
+			}
+		}
+	}
+	for _, s := range exportData.Services {
+		if ask(fmt.Sprintf("Import Service '%s'?", s.Name)) {
+			s.Id = 0
+			if err := s.Create(); err != nil {
+				log.Errorln(err)
+			}
+		}
+	}
+	for _, s := range exportData.Checkins {
+		if ask(fmt.Sprintf("Import Checkin '%s'?", s.Name)) {
+			s.Id = 0
+			if err := s.Create(); err != nil {
+				log.Errorln(err)
+			}
+		}
+	}
+	for _, s := range exportData.Messages {
+		if ask(fmt.Sprintf("Import Message '%s'?", s.Title)) {
+			s.Id = 0
+			if err := s.Create(); err != nil {
+				log.Errorln(err)
+			}
+		}
+	}
+	for _, s := range exportData.Users {
+		if ask(fmt.Sprintf("Import User '%s'?", s.Username)) {
+			s.Id = 0
+			if err := s.Create(); err != nil {
+				log.Errorln(err)
+			}
+		}
+	}
+	log.Infof("Import complete")
+	return nil
 }
 
 func ask(format string) bool {
+
 	fmt.Printf(fmt.Sprintf(format + " [y/N]: "))
 	reader := bufio.NewReader(os.Stdin)
 	text, _ := reader.ReadString('\n')
 	text = strings.Replace(text, "\n", "", -1)
 	return strings.ToLower(text) == "y"
 }
-
-// ExportIndexHTML returns the HTML of the index page as a string
-//func ExportIndexHTML() []byte {
-//	source.Assets()
-//	core.CoreApp.Connect(core.CoreApp., utils.Directory)
-//	core.SelectAllServices(false)
-//	core.CoreApp.UseCdn = types.NewNullBool(true)
-//	for _, srv := range core.Services() {
-//		core.CheckService(srv, true)
-//	}
-//	w := httptest.NewRecorder()
-//	r := httptest.NewRequest("GET", "/", nil)
-//	handlers.ExecuteResponse(w, r, "index.gohtml", nil, nil)
-//	return w.Body.Bytes()
-//}
 
 func updateDisplay() error {
 	gitCurrent, err := checkGithubUpdates()
@@ -267,11 +369,11 @@ func updateDisplay() error {
 
 // runOnce will initialize the Statping application and check each service 1 time, will not run HTTP server
 func runOnce() error {
-	config, err := configs.LoadConfigs()
+	config, err := configs.LoadConfigs(configFile)
 	if err != nil {
 		return errors.Wrap(err, "config.yml file not found")
 	}
-	err = configs.ConnectConfigs(config)
+	err = configs.ConnectConfigs(config, false)
 	if err != nil {
 		return errors.Wrap(err, "issue connecting to database")
 	}
@@ -292,65 +394,9 @@ func runOnce() error {
 	return nil
 }
 
-// HelpEcho prints out available commands and flags for Statping
-func HelpEcho() {
-	fmt.Printf("Statping v%v - Statping.com\n", VERSION)
-	fmt.Printf("A simple Application Status Monitor that is opensource and lightweight.\n")
-	fmt.Printf("Commands:\n")
-	fmt.Println("     statping                    - Main command to run Statping server")
-	fmt.Println("     statping version            - Returns the current version of Statping")
-	fmt.Println("     statping run                - Check all services 1 time and then quit")
-	fmt.Println("     statping assets             - Dump all assets used locally to be edited.")
-	//fmt.Println("     statping static             - Creates a static HTML file of the index page")
-	fmt.Println("     statping sass               - Compile .scss files into the css directory")
-	fmt.Println("     statping env                - Show all environment variables being used for Statping")
-	fmt.Println("     statping update             - Attempts to update to the latest version")
-	fmt.Println("     statping export             - Exports your Statping settings to a 'statping-export.json' file.")
-	fmt.Println("     statping import <file>      - Imports settings from a previously saved JSON file.")
-	fmt.Println("     statping help               - Shows the user basic information about Statping")
-	fmt.Printf("Flags:\n")
-	fmt.Println("     -ip 127.0.0.1             - Run HTTP server on specific IP address (default: localhost)")
-	fmt.Println("     -port 8080                - Run HTTP server on Port (default: 8080)")
-	fmt.Println("     -verbose 1                - Verbose mode levels 1 - 4 (default: 1)")
-	fmt.Println("     -env path/debug.env       - Optional .env file to set as environment variables while running server")
-	fmt.Printf("Environment Variables:\n")
-	fmt.Println("     PORT                      - Set the outgoing port for the HTTP server (or use -port)")
-	fmt.Println("     IP                        - Bind a specific IP address to the HTTP server (or use -ip)")
-	fmt.Println("     VERBOSE                   - Display more logs in verbose mode. (1 - 4)")
-	fmt.Println("     STATPING_DIR              - Set a absolute path for the root path of Statping server (logs, assets, SQL db)")
-	fmt.Println("     DB_CONN                   - Automatic Database connection (sqlite, postgres, mysql)")
-	fmt.Println("     DB_HOST                   - Database hostname or IP address")
-	fmt.Println("     DB_USER                   - Database username")
-	fmt.Println("     DB_PASS                   - Database password")
-	fmt.Println("     DB_PORT                   - Database port (5432, 3306, ...)")
-	fmt.Println("     DB_DATABASE               - Database connection's database name")
-	fmt.Println("     POSTGRES_SSLMODE          - Enable Postgres SSL Mode 'ssl_mode=VALUE' (enable/disable/verify-full/verify-ca)")
-	fmt.Println("     DISABLE_LOGS              - Disable viewing and writing to the log file (default is false)")
-	fmt.Println("     GO_ENV                    - Run Statping in testmode, will bypass HTTP authentication (if set as 'test')")
-	fmt.Println("     NAME                      - Set a name for the Statping status page")
-	fmt.Println("     DESCRIPTION               - Set a description for the Statping status page")
-	fmt.Println("     DOMAIN                    - Set a URL for the Statping status page")
-	fmt.Println("     ADMIN_USER                - Username for administrator account (default: admin)")
-	fmt.Println("     ADMIN_PASS                - Password for administrator account (default: admin)")
-	fmt.Println("     SASS                      - Set the absolute path to the sass binary location")
-	fmt.Println("     USE_ASSETS                - Automatically use assets from 'assets folder' (true/false)")
-	fmt.Println("     HTTP_PROXY                - Use a HTTP Proxy for HTTP Requests")
-	fmt.Println("     AUTH_USERNAME             - HTTP Basic Authentication username")
-	fmt.Println("     AUTH_PASSWORD             - HTTP Basic Authentication password")
-	fmt.Println("     BASE_PATH                 - Set the base URL prefix (set to 'monitor' if URL is domain.com/monitor)")
-	fmt.Println("     PREFIX                    - A Prefix for each value in Prometheus /metric exporter")
-	fmt.Println("     API_KEY                   - Set a custom API Key for Statping")
-	fmt.Println("     API_SECRET                - Set a custom API Secret for API Authentication")
-	fmt.Println("     MAX_OPEN_CONN             - Set Maximum Open Connections for database server (default: 5)")
-	fmt.Println("     MAX_IDLE_CONN             - Set Maximum Idle Connections for database server")
-	fmt.Println("     MAX_LIFE_CONN             - Set Maximum Life Connections for database server")
-	fmt.Println("   * You can insert environment variables into a '.env' file in root directory.")
-	fmt.Println("Give Statping a Star at https://github.com/statping/statping")
-}
-
 func checkGithubUpdates() (githubResponse, error) {
-	url := "https://api.github.com/repos/hunterlong/statping/releases/latest"
-	contents, _, err := utils.HttpRequest(url, "GET", nil, nil, nil, time.Duration(2*time.Second), true)
+	url := "https://api.github.com/repos/statping/statping/releases/latest"
+	contents, _, err := utils.HttpRequest(url, "GET", nil, nil, nil, time.Duration(2*time.Second), true, nil)
 	if err != nil {
 		return githubResponse{}, err
 	}
@@ -437,3 +483,69 @@ type gitUploader struct {
 	Type              string `json:"type"`
 	SiteAdmin         bool   `json:"site_admin"`
 }
+
+// ExportChartsJs renders the charts for the index page
+
+//type ExportData struct {
+//	Config    *configs.DbConfig   `json:"config"`
+//	Core      *core.Core          `json:"core"`
+//	Services  []services.Service  `json:"services"`
+//	Messages  []*messages.Message `json:"messages"`
+//	Checkins  []*checkins.Checkin `json:"checkins"`
+//	Users     []*users.User       `json:"users"`
+//	Groups    []*groups.Group     `json:"groups"`
+//	Notifiers []core.AllNotifiers `json:"notifiers"`
+//}
+
+// ExportSettings will export a JSON file containing all of the settings below:
+// - Core
+// - Notifiers
+// - Checkins
+// - Users
+// - Services
+// - Groups
+// - Messages
+//func ExportSettings() ([]byte, error) {
+//	c, err := core.Select()
+//	if err != nil {
+//		return nil, err
+//	}
+//	var srvs []services.Service
+//	for _, s := range services.AllInOrder() {
+//		s.Failures = nil
+//		srvs = append(srvs, s)
+//	}
+//
+//	cfg, err := configs.LoadConfigs(configFile)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	data := ExportData{
+//		Config:    cfg,
+//		Core:      c,
+//		Notifiers: core.App.Notifications,
+//		Checkins:  checkins.All(),
+//		Users:     users.All(),
+//		Services:  srvs,
+//		Groups:    groups.All(),
+//		Messages:  messages.All(),
+//	}
+//	export, err := json.Marshal(data)
+//	return export, err
+//}
+
+// ExportIndexHTML returns the HTML of the index page as a string
+//func ExportIndexHTML() []byte {
+//	source.Assets()
+//	core.CoreApp.Connect(core.CoreApp., utils.Directory)
+//	core.SelectAllServices(false)
+//	core.CoreApp.UseCdn = types.NewNullBool(true)
+//	for _, srv := range core.Services() {
+//		core.CheckService(srv, true)
+//	}
+//	w := httptest.NewRecorder()
+//	r := httptest.NewRequest("GET", "/", nil)
+//	handlers.ExecuteResponse(w, r, "index.gohtml", nil, nil)
+//	return w.Body.Bytes()
+//}

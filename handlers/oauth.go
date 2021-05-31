@@ -3,24 +3,18 @@ package handlers
 import (
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/sessions"
 	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/users"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/github"
-	"golang.org/x/oauth2/google"
-	"golang.org/x/oauth2/slack"
 	"net/http"
 )
 
-var oauthSession = sessions.NewCookieStore([]byte("statping_oauth"))
-
 type oAuth struct {
-	Email        string
-	Token        string
-	RefreshToken string
-	Valid        bool
+	Email    string
+	Username string
+	*oauth2.Token
 }
 
 func oauthHandler(w http.ResponseWriter, r *http.Request) {
@@ -31,13 +25,20 @@ func oauthHandler(w http.ResponseWriter, r *http.Request) {
 	var oauth *oAuth
 	switch provider {
 	case "google":
-		err, oauth = googleOAuth(r)
+		oauth, err = googleOAuth(r)
 	case "github":
-		err, oauth = githubOAuth(r)
+		oauth, err = githubOAuth(r)
+	case "slack":
+		oauth, err = slackOAuth(r)
+	case "custom":
+		oauth, err = customOAuth(r)
+	default:
+		err = errors.New("unknown oauth provider")
 	}
 
 	if err != nil {
 		log.Error(err)
+		sendErrorJson(err, w, r)
 		return
 	}
 
@@ -47,82 +48,12 @@ func oauthHandler(w http.ResponseWriter, r *http.Request) {
 func oauthLogin(oauth *oAuth, w http.ResponseWriter, r *http.Request) {
 	user := &users.User{
 		Id:       0,
-		Username: oauth.Email,
+		Username: oauth.Username,
 		Email:    oauth.Email,
 		Admin:    null.NewNullBool(true),
 	}
-	log.Infoln(fmt.Sprintf("OAuth User %v logged in from IP %v", oauth.Email, r.RemoteAddr))
+	log.Infoln(fmt.Sprintf("OAuth %s User %s logged in from IP %s", oauth.Type(), oauth.Email, r.RemoteAddr))
 	setJwtToken(user, w)
 
-	http.Redirect(w, r, basePath+"dashboard", http.StatusSeeOther)
-}
-
-func githubOAuth(r *http.Request) (error, *oAuth) {
-	c := *core.App
-	code := r.URL.Query().Get("code")
-
-	config := &oauth2.Config{
-		ClientID:     c.OAuth.GithubClientID,
-		ClientSecret: c.OAuth.GithubClientSecret,
-		Endpoint:     github.Endpoint,
-	}
-
-	gg, err := config.Exchange(r.Context(), code)
-	if err != nil {
-		return err, nil
-	}
-
-	return nil, &oAuth{
-		Token:        gg.AccessToken,
-		RefreshToken: gg.RefreshToken,
-		Valid:        gg.Valid(),
-	}
-}
-
-func googleOAuth(r *http.Request) (error, *oAuth) {
-	c := *core.App
-	code := r.URL.Query().Get("code")
-
-	config := &oauth2.Config{
-		ClientID:     c.OAuth.GithubClientID,
-		ClientSecret: c.OAuth.GithubClientSecret,
-		Endpoint:     google.Endpoint,
-	}
-
-	gg, err := config.Exchange(r.Context(), code)
-	if err != nil {
-		return err, nil
-	}
-
-	return nil, &oAuth{
-		Token:        gg.AccessToken,
-		RefreshToken: gg.RefreshToken,
-		Valid:        gg.Valid(),
-	}
-}
-
-func slackOAuth(r *http.Request) (error, *oAuth) {
-	c := *core.App
-	code := r.URL.Query().Get("code")
-
-	config := &oauth2.Config{
-		ClientID:     c.OAuth.GithubClientID,
-		ClientSecret: c.OAuth.GithubClientSecret,
-		Endpoint:     slack.Endpoint,
-	}
-
-	gg, err := config.Exchange(r.Context(), code)
-	if err != nil {
-		return err, nil
-	}
-
-	return nil, &oAuth{
-		Token:        gg.AccessToken,
-		RefreshToken: gg.RefreshToken,
-		Valid:        gg.Valid(),
-	}
-}
-
-func secureToken(w http.ResponseWriter, r *http.Request) {
-
+	http.Redirect(w, r, core.App.Domain+"/dashboard", http.StatusPermanentRedirect)
 }

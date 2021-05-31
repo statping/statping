@@ -1,15 +1,31 @@
 <template>
     <div>
-        <div class="d-flex mt-3 mb-2">
-            <div class="flex-fill service_day" v-for="(d, index) in failureData" :class="{'mini_error': d.amount > 0, 'mini_success': d.amount === 0}"></div>
+      <div v-observe-visibility="{callback: visibleChart, once: true}" v-if="!loaded" class="row">
+        <div class="col-12 text-center mt-3">
+          <font-awesome-icon icon="circle-notch" class="text-dim" size="2x" spin/>
+        </div>
+      </div>
+      <transition name="fade">
+        <div v-if="loaded">
+        <div class="d-flex mt-3">
+            <div class="flex-fill service_day" v-for="(d, index) in failureData" @mouseover="mouseover(d)" @mouseout="mouseout" :class="{'day-error': d.amount > 0, 'day-success': d.amount === 0}">
+                <span v-if="d.amount !== 0" class="d-none d-md-block text-center small"></span>
+            </div>
         </div>
         <div class="row mt-2">
-            <div class="col-4 text-left font-2 text-muted">30 Days Ago</div>
-            <div class="col-4 text-center font-2" :class="{'text-muted': service.online, 'text-danger': !service.online}">
-               {{service_txt}}
-            </div>
-            <div class="col-4 text-right font-2 text-muted">Today</div>
+          <div class="col-12 no-select">
+            <p class="divided">
+              <span class="font-2 text-muted">90 {{$t('days_ago')}}</span>
+              <span class="divider"></span>
+              <span class="text-center font-2" :class="{'text-muted': service.online, 'text-danger': !service.online}">{{service_txt}}</span>
+              <span class="divider"></span>
+              <span class="font-2 text-muted">{{$t('today')}}</span>
+            </p>
+          </div>
         </div>
+      <div class="daily-failures small text-right text-dim">{{hover_text}}</div>
+      </div>
+  </transition>
     </div>
 </template>
 
@@ -23,7 +39,10 @@ export default {
   },
     data() {
         return {
-            failureData: null,
+            failureData: [],
+          hover_text: "",
+          loaded: false,
+          visible: false,
         }
     },
   props: {
@@ -34,83 +53,38 @@ export default {
   },
   computed: {
     service_txt() {
-      if (!this.service.online) {
-        return `Offline for ${this.ago(this.service.last_success)}`
-      }
-      return `${this.service.online_24_hours}% Uptime`
+      return this.smallText(this.service)
     }
   },
-    mounted () {
-      this.lastDaysFailures()
+  mounted () {
+
     },
     methods: {
+      visibleChart(isVisible, entry) {
+        if (isVisible && !this.visible) {
+          this.visible = true
+          this.lastDaysFailures().then(() =>  this.loaded = true)
+        }
+      },
+      mouseout() {
+        this.hover_text = ""
+      },
+    mouseover(e) {
+      let txt = `${e.amount} Failures`
+      if (e.amount === 0) {
+        txt = `No Issues`
+      }
+      this.hover_text = `${e.date.toLocaleDateString()} - ${txt}`
+    },
       async lastDaysFailures() {
-        const start = this.nowSubtract(86400 * 30)
-        this.failureData = await Api.service_failures_data(this.service.id, this.toUnix(start), this.toUnix(this.now()), "24h")
+        const start = this.beginningOf('day', this.nowSubtract(86400 * 90))
+        const end = this.endOf('tomorrow')
+        const data = await Api.service_failures_data(this.service.id, this.toUnix(start), this.toUnix(end), "24h", true)
+        data.forEach((d) => {
+          let date = this.parseISO(d.timeframe)
+          this.failureData.push({month: date.getMonth(), day: date.getDate(), date: date, amount: d.amount})
+        })
       }
     }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-    .service_day {
-        height: 20px;
-        margin-right: 2px;
-        border-radius: 4px;
-    }
-
-    @keyframes pulse_animation {
-        0% { transform: scale(1); }
-        30% { transform: scale(1); }
-        40% { transform: scale(1.02); }
-        50% { transform: scale(1); }
-        60% { transform: scale(1); }
-        70% { transform: scale(1.05); }
-        80% { transform: scale(1); }
-        100% { transform: scale(1); }
-    }
-
-    .pulse {
-        animation-name: pulse_animation;
-        animation-duration: 1500ms;
-        transform-origin:70% 70%;
-        animation-iteration-count: infinite;
-        animation-timing-function: linear;
-    }
-
-
-    @keyframes glow-grow {
-        0% {
-            opacity: 0;
-            transform: scale(1);
-        }
-        80% {
-            opacity: 1;
-        }
-        100% {
-            transform: scale(2);
-            opacity: 0;
-        }
-    }
-    .pulse-glow {
-        animation-name: glow-grown;
-        animation-duration: 100ms;
-        transform-origin: 70% 30%;
-        animation-iteration-count: infinite;
-        animation-timing-function: linear;
-    }
-
-    .pulse-glow:before,
-    .pulse-glow:after {
-        position: absolute;
-        content: "";
-        height: 0.4rem;
-        width: 1.7rem;
-        top: 1.3rem;
-        right: 2.15rem;
-        border-radius: 0;
-        box-shadow: 0 0 6px #47d337;
-        animation: glow-grow 2s ease-out infinite;
-    }
-</style>

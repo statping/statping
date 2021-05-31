@@ -13,8 +13,7 @@ import (
 var testCheckin = &Checkin{
 	ServiceId:   1,
 	Name:        "Test Checkin",
-	Interval:    60,
-	GracePeriod: 10,
+	Interval:    3,
 	ApiKey:      "tHiSiSaTeStXXX",
 	CreatedAt:   utils.Now(),
 	UpdatedAt:   utils.Now(),
@@ -23,7 +22,7 @@ var testCheckin = &Checkin{
 
 var testCheckinHits = []*CheckinHit{{
 	Checkin:   1,
-	From:      "0.0.0.0.0",
+	From:      "0.0.0.0",
 	CreatedAt: utils.Now().Add(-30 * time.Second),
 }, {
 	Checkin:   2,
@@ -34,17 +33,22 @@ var testCheckinHits = []*CheckinHit{{
 var testApiKey string
 
 func TestInit(t *testing.T) {
+	t.Parallel()
+	err := utils.InitLogs()
+	require.Nil(t, err)
 	db, err := database.OpenTester()
 	require.Nil(t, err)
+	SetDB(db)
+	failures.SetDB(db)
 	db.AutoMigrate(&Checkin{}, &CheckinHit{}, &failures.Failure{})
 	db.Create(&testCheckin)
 	for _, v := range testCheckinHits {
-		db.Create(&v)
+		err := db.Create(&v).Error()
+		require.Nil(t, err)
 	}
 	assert.True(t, db.HasTable(&Checkin{}))
 	assert.True(t, db.HasTable(&CheckinHit{}))
 	assert.True(t, db.HasTable(&failures.Failure{}))
-	SetDB(db)
 
 	t.Run("Test Checkin", func(t *testing.T) {
 		item, err := Find(1)
@@ -86,7 +90,6 @@ func TestInit(t *testing.T) {
 		err = i.Update()
 		require.Nil(t, err)
 		assert.Equal(t, "Updated", i.Name)
-		i.Close()
 	})
 
 	t.Run("Test Expected Time", func(t *testing.T) {
@@ -111,8 +114,14 @@ func TestInit(t *testing.T) {
 		assert.Len(t, all, 1)
 	})
 
+	t.Run("Test Samples", func(t *testing.T) {
+		require.Nil(t, Samples())
+		assert.Len(t, All(), 3)
+	})
+
 	t.Run("Test Checkin", func(t *testing.T) {
 		assert.Nil(t, db.Close())
+		assert.Nil(t, dbHits.Close())
 	})
 
 }

@@ -3,6 +3,7 @@ package users
 import (
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -16,6 +17,8 @@ var example = &User{
 }
 
 func TestInit(t *testing.T) {
+	err := utils.InitLogs()
+	require.Nil(t, err)
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.CreateTable(&User{})
@@ -28,7 +31,6 @@ func TestFind(t *testing.T) {
 	require.Nil(t, err)
 	assert.Equal(t, "example_user", item.Username)
 	assert.NotEmpty(t, item.ApiKey)
-	assert.NotEmpty(t, item.ApiSecret)
 	assert.NotEqual(t, "password123", item.Password)
 	assert.True(t, item.Admin.Bool)
 }
@@ -38,7 +40,6 @@ func TestFindByUsername(t *testing.T) {
 	require.Nil(t, err)
 	assert.Equal(t, "example_user", item.Username)
 	assert.NotEmpty(t, item.ApiKey)
-	assert.NotEmpty(t, item.ApiSecret)
 	assert.NotEqual(t, "password123", item.Password)
 	assert.True(t, item.Admin.Bool)
 }
@@ -61,7 +62,17 @@ func TestCreate(t *testing.T) {
 	assert.NotEqual(t, "password12345", example.Password)
 	assert.NotZero(t, example.CreatedAt)
 	assert.NotEmpty(t, example.ApiKey)
-	assert.NotEmpty(t, example.ApiSecret)
+}
+
+func TestAuthUser(t *testing.T) {
+	t.SkipNow()
+	u, ok := AuthUser("exampleuser2", utils.HashPassword("password12345"))
+	require.True(t, ok)
+	assert.Equal(t, "exampleuser2", u.Username)
+
+	u, ok = AuthUser("exampleuser2", "wrongpass")
+	assert.False(t, ok)
+	assert.Nil(t, u)
 }
 
 func TestUpdate(t *testing.T) {
@@ -85,6 +96,11 @@ func TestDelete(t *testing.T) {
 
 	all = All()
 	assert.Len(t, all, 1)
+}
+
+func TestSamples(t *testing.T) {
+	require.Nil(t, Samples())
+	assert.Len(t, All(), 3)
 }
 
 func TestClose(t *testing.T) {

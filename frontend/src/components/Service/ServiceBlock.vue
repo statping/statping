@@ -10,51 +10,46 @@
 
                     <ServiceTopStats :service="service"/>
 
-                        <div v-if="expanded" class="row">
-                            <Analytics title="Last Failure" :func="stats.total_failures"/>
-                            <Analytics title="Total Failures" :func="stats.total_failures"/>
-                            <Analytics title="Highest Latency" :func="stats.high_latency"/>
-                            <Analytics title="Lowest Latency" :func="stats.lowest_latency"/>
-                            <Analytics title="Total Uptime" :func="stats.high_ping"/>
-                            <Analytics title="Total Downtime" :func="stats.low_ping"/>
-
-                            <div class="col-12">
-                            <router-link :to="serviceLink(service)" class="btn btn-block btn-outline-success mt-4" :class="{'btn-outline-success': service.online, 'btn-outline-danger': !service.online}">
-                                View More Details
-                            </router-link>
-                            </div>
-                         </div>
-
                 </div>
             </div>
 
-            <div v-show="!expanded" v-observe-visibility="visibleChart" class="chart-container">
-                <ServiceChart :service="service" :visible="visible"/>
+            <div v-show="!expanded" v-observe-visibility="{callback: visibleChart, throttle: 200}" class="chart-container">
+                <ServiceChart :service="service" :visible="visible" :chart_timeframe="chartTimeframe"/>
             </div>
 
             <div class="row lower_canvas full-col-12 text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
-                <div class="col-md-8 col-6">
-                        <div class="dropup" :class="{show: dropDownMenu}">
-                              <button style="font-size: 10pt;" @focusout="dropDownMenu = false"  @click="dropDownMenu = !dropDownMenu" type="button" class="d-none col-4 float-left btn btn-sm float-right btn-block text-white dropdown-toggle service_scale" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                  24 Hours
-                              </button>
-                              <div class="dropdown-menu" :class="{show: dropDownMenu}">
-                                <a v-for="(timeframe, i) in timeframes" @click="timeframe.picked = true" class="dropdown-item" href="#">{{timeframe.text}}</a>
-                              </div>
-
-                            <span class="d-none float-left d-md-inline">
-                                {{smallText(service)}}
-                            </span>
+                <div class="col-md-10 col-6">
+                    <div class="dropup" :class="{show: dropDownMenu}">
+                        <button style="font-size: 10pt;" @click.prevent="openMenu('timeframe')" type="button" class="col-4 float-left btn btn-sm float-right btn-block text-white dropdown-toggle service_scale pr-2">
+                            {{timeframepick.text}}
+                        </button>
+                        <div class="service-tm-menu" :class="{'d-none': !dropDownMenu}">
+                            <a v-for="(timeframe, i) in timeframes" @click.prevent="changeTimeframe(timeframe)" class="dropdown-item" href="#" :class="{'active': timeframepick === timeframe}">{{timeframe.text}}</a>
                         </div>
+                    </div>
+
+                    <div class="dropup" :class="{show: intervalMenu}">
+                        <button style="font-size: 10pt;" @click.prevent="openMenu('interval')" type="button" class="col-4 float-left btn btn-sm float-right btn-block text-white dropdown-toggle service_scale pr-2">
+                            {{intervalpick.text}}
+                        </button>
+                        <div class="service-tm-menu" :class="{'d-none': !intervalMenu}">
+                            <a v-for="(interval, i) in intervals" @click.prevent="changeInterval(interval)" class="dropdown-item" href="#" :class="{'active': intervalpick === interval, 'disabled': disabled_interval(interval)}">
+                                {{interval.text}}
+                            </a>
+                        </div>
+
+                        <span class="d-none float-left d-md-inline">
+                            {{smallText(service)}}
+                        </span>
+                    </div>
+
                 </div>
 
-                <div class="col-md-4 col-6 float-right">
-                    <button v-if="!expanded" @click="showMoreStats" class="btn btn-sm float-right dyn-dark text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">View Service</button>
-                    <button v-if="expanded" @click="expanded = false" class="btn btn-sm float-right dyn-dark text-white" :class="{'btn-outline-success': service.online, 'bg-danger': !service.online}">Hide</button>
-                </div>
 
-                <div v-if="expanded" class="row">
-                    <Analytics title="Last Failure" value="417 Days ago"/>
+                <div class="col-md-2 col-6 float-right">
+                    <button v-if="!expanded" @click="setService" class="btn btn-sm float-right dyn-dark text-white" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
+                        {{$t('view')}}
+                    </button>
                 </div>
             </div>
 
@@ -63,35 +58,66 @@
 </template>
 
 <script>
-import Api from '../../API';
-import Analytics from './Analytics';
-import ServiceChart from "./ServiceChart";
-import ServiceTopStats from "@/components/Service/ServiceTopStats";
-import Graphing from '../../graphing'
+const Analytics = () => import(/* webpackChunkName: "service" */ './Analytics');
+const ServiceChart  = () => import(/* webpackChunkName: "service" */ "./ServiceChart");
+const ServiceTopStats = () => import(/* webpackChunkName: "service" */ "@/components/Service/ServiceTopStats");
 
 export default {
     name: 'ServiceBlock',
     components: { Analytics, ServiceTopStats, ServiceChart},
     props: {
-        in_service: {
+        service: {
             type: Object,
             required: true
         },
     },
+  computed: {
+    timeframepick() {
+      return this.timeframes.find(s => s.value === this.timeframe_val)
+    },
+    intervalpick() {
+      return this.intervals.find(s => s.value === this.interval_val)
+    },
+    chartTimeframe() {
+      return {start_time: this.timeframe_val, interval: this.interval_val}
+    }
+  },
     data() {
         return {
           timer_func: null,
             expanded: false,
             visible: false,
             dropDownMenu: false,
-            timeframes: [
-                {value: "72h", text: "3 Days", picked: true },
-                {value: "24h", text: "Since Yesterday" },
-                {value: "3", text: "3 Hours" },
-                {value: "1m", text: "1 Month" },
-                {value: "3", text: "Last 3 Months" },
-            ],
-            stats: {
+            intervalMenu: false,
+          interval_val: "60m",
+          timeframe_val: this.timeset(259200),
+          timeframes: [
+            {value: this.timeset(1800), text: "30 Minutes", set: 1},
+            {value: this.timeset(3600), text: "1 Hour", set: 2},
+            {value: this.timeset(21600), text: "6 Hours", set: 3},
+            {value: this.timeset(43200), text: "12 Hours", set: 4},
+            {value: this.timeset(86400), text: "1 Day", set: 5},
+            {value: this.timeset(259200), text: "3 Days", set: 6},
+            {value: this.timeset(604800), text: "7 Days", set: 7},
+            {value: this.timeset(1209600), text: "14 Days", set: 8},
+            {value: this.timeset(2592000), text: "1 Month", set: 9},
+            {value: this.timeset(7776000), text: "3 Months", set: 10},
+            {value: 0, text: "All Records"},
+          ],
+          intervals: [
+            {value: "1m", text: "1/min", set: 1},
+            {value: "5m", text: "5/min", set: 2},
+            {value: "15m", text: "15/min", set: 3},
+            {value: "30m", text: "30/min", set: 4 },
+            {value: "60m", text: "1/hr", set: 5 },
+            {value: "180m", text: "3/hr", set: 6 },
+            {value: "360m", text: "6/hr", set: 7 },
+            {value: "720m", text: "12/hr", set: 8 },
+            {value: "1440m", text: "1/day", set: 9 },
+            {value: "4320m", text: "3/day", set: 10 },
+            {value: "10080m", text: "7/day", set: 11 },
+          ],
+          stats: {
                 total_failures: {
                     title: "Total Failures",
                     subtitle: "Last 7 Days",
@@ -118,71 +144,56 @@ export default {
                     value: 0,
                 }
             },
-            track_service: null,
         }
     },
   beforeDestroy() {
-    clearInterval(this.timer_func)
+    // clearInterval(this.timer_func)
   },
-  computed: {
-      service() {
-        return this.track_service
-      }
-  },
-  async created() {
-      this.track_service = this.in_service
+  created() {
+
   },
     methods: {
-        async showMoreStats() {
-            this.expanded = !this.expanded;
-
-            const failData = await Graphing.failures(this.service, 7)
-            this.stats.total_failures.chart = failData.data;
-            this.stats.total_failures.value = failData.total;
-
-            const hitsData = await Graphing.hits(this.service, 7)
-
-            this.stats.high_latency.chart = hitsData.chart;
-            this.stats.high_latency.value = this.humanTime(hitsData.high);
-
-            this.stats.lowest_latency.chart = hitsData.chart;
-            this.stats.lowest_latency.value = this.humanTime(hitsData.low);
-
-            const pingData = await Graphing.pings(this.service, 7)
-            this.stats.high_ping.chart = pingData.chart;
-            this.stats.high_ping.value = this.humanTime(pingData.high);
-
-            this.stats.low_ping.chart = pingData.chart;
-            this.stats.low_ping.value = this.humanTime(pingData.low);
-        },
-        smallText(s) {
-          const incidents = s.incidents
-            if (s.online) {
-                return `Online, last checked ${this.ago(s.last_success)}`
-            } else {
-                const last = s.last_failure
-                if (last) {
-                    return `Offline, last error: ${last} ${this.ago(last.created_at)}`
-                }
-                return `Offline`
-            }
-        },
+      disabled_interval(interval) {
+        let min = this.timeframepick.set - interval.set - 1;
+        return min >= interval.set;
+      },
+      timeset (seconds) {
+        return this.toUnix(this.nowSubtract(seconds))
+      },
+      openMenu(tm) {
+        if (tm === "interval") {
+          this.intervalMenu = !this.intervalMenu
+          this.dropDownMenu = false
+        } else if (tm === "timeframe") {
+          this.dropDownMenu = !this.dropDownMenu
+          this.intervalMenu = false
+        }
+      },
+      changeInterval(tm) {
+        this.interval_val = tm.value
+        this.intervalMenu = false
+        this.dropDownMenu = false
+      },
+      changeTimeframe(tm) {
+        this.timeframe_val = tm.value
+        this.dropDownMenu = false
+        this.intervalMenu = false
+      },
+      async setService() {
+        await this.$store.commit('setService', this.service)
+        this.$router.push('/service/'+this.service.id, {props: {service: this.service}})
+      },
         visibleChart(isVisible, entry) {
                 if (isVisible && !this.visible) {
                     this.visible = true
 
-                  if (!this.timer_func) {
-                    this.timer_func = setInterval(async () => {
-                      this.track_service = await Api.service(this.service.id)
-                      window.console.log(this.track_service.name)
-                    }, this.track_service.check_interval * 1000)
-                  }
+                  // if (!this.timer_func) {
+                  //   this.timer_func = setInterval(async () => {
+                  //     this.track_service = await Api.service(this.service.id)
+                  //   }, this.track_service.check_interval * 100)
+                  // }
                 }
         }
     }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

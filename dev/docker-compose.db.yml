@@ -5,8 +5,6 @@ services:
   postgres:
     container_name: postgres
     image: postgres
-    volumes:
-      - ../docker/databases/postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: password123
       POSTGRES_DB: statping
@@ -22,8 +20,6 @@ services:
   mysql:
     container_name: mysql
     image: mysql:5.7
-    volumes:
-      - ../docker/databases/mysql:/var/lib/mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: password123
@@ -46,7 +42,7 @@ services:
       mysql:
         condition: service_healthy
     ports:
-      - 5050:80
+      - "127.0.0.1:5050:80"
     links:
       - mysql:db
     environment:
@@ -62,7 +58,7 @@ services:
     restart: on-failure
     command: sqlite_web -H 0.0.0.0 -r -x /data/statping.db
     ports:
-      - 6050:8080
+      - "127.0.0.1:6050:8080"
     volumes:
       - ../docker/statping/sqlite/statping.db:/data/statping.db:ro
     environment:
@@ -75,11 +71,8 @@ services:
     environment:
       DEFAULT_USER: admin@admin.com
       DEFAULT_PASSWORD: admin
-    depends_on:
-      postgres:
-        condition: service_healthy
     ports:
-      - 7000:5050
+      - "127.0.0.1:7000:5050"
     links:
       - postgres:postgres
 
@@ -91,7 +84,7 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - ../docker/databases/prometheus:/prometheus
     ports:
-      - 7050:9090
+      - "127.0.0.1:7050:9090"
     healthcheck:
       test: "/bin/wget -q -Y off http://localhost:9090/status -O /dev/null > /dev/null 2>&1"
       interval: 10s

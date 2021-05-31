@@ -1,0 +1,49 @@
+{
+  "id": "0ff1dcd6-54f3-44a7-9c18-cc3c8e7df357",
+  "name": "Local Statping",
+  "values": [
+    {
+      "key": "endpoint",
+      "value": "http://0.0.0.0:8585",
+      "enabled": true
+    },
+    {
+      "key": "api_key",
+      "value": "demosecret123",
+      "enabled": true
+    },
+    {
+      "key": "db_connection",
+      "value": "mysql",
+      "enabled": true
+    },
+    {
+      "key": "db_host",
+      "value": "localhost",
+      "enabled": true
+    },
+    {
+      "key": "db_user",
+      "value": "root",
+      "enabled": true
+    },
+    {
+      "key": "db_password",
+      "value": "password123",
+      "enabled": true
+    },
+    {
+      "key": "db_database",
+      "value": "statping",
+      "enabled": true
+    },
+    {
+      "key": "db_port",
+      "value": "3306",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2020-05-18T20:44:05.571Z",
+  "_postman_exported_using": "Postman/7.24.0"
+}

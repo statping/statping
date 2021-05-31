@@ -1,0 +1,173 @@
+name: Push Request Testing
+on:
+  push:
+    branches:
+      - '*'         # matches every branch
+      - '*/*'       # matches every branch containing a single '/'
+      - '!master'   # excludes master
+      - '!dev'      # excludes dev
+  pull_request:
+    branches:
+      - '*'         # matches every branch
+      - '*/*'       # matches every branch containing a single '/'
+      - '!master'   # excludes master
+      - '!dev'      # excludes dev
+
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.14.2'
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.18.2'
+      - uses: actions/checkout@v2
+
+      - name: Add GOBIN to PATH
+        run: |
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Install Global Dependencies
+        run: npm install -g yarn sass cross-env
+
+      - name: Download Frontend Dependencies
+        if: steps.nodecache.outputs.cache-hit != 'true'
+        working-directory: ./frontend
+        run: yarn
+
+      - name: Download Go mods
+        if: steps.golangcache.outputs.cache-hit != 'true'
+        run: |
+          go mod download
+          go mod verify
+          make test-deps
+
+      - name: Build Frontend Statping
+        run: make clean compile
+
+      - name: Upload Compiled Frontend (rice-box.go)
+        uses: actions/upload-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
+
+  pr-test:
+    needs: compile
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:10.8
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password123
+          POSTGRES_DB: statping
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: password123
+          MYSQL_DATABASE: statping
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.15.x
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.18.2
+      - uses: actions/checkout@v2
+
+      - name: Install Global Dependencies
+        run: |
+          go get gotest.tools/gotestsum
+          npm install -g yarn sass newman cross-env wait-on @sentry/cli
+
+      - name: Setting ENV's
+        run: |
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
+
+      - name: Install Statping
+        env:
+          VERSION: ${{ env.VERSION }}
+        run: |
+          make build certs
+          chmod +x statping
+          mv statping $(go env GOPATH)/bin/
+
+      - name: Go Tests
+        run: |
+          SASS=`which sass` gotestsum --no-summary=skipped --format testname -- -covermode=count -coverprofile=coverage.out -p=1 ./...
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
+          DB_CONN: sqlite3
+          STATPING_DIR: ${{ github.workspace }}
+          API_SECRET: demopassword123
+          DISABLE_LOGS: false
+          ALLOW_REPORTS: true
+          PUSH_REQUEST: true
+
+  pr-test-postman:
+    needs: compile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.15.x
+
+      - name: Setting ENV's
+        run: |
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
+
+      - name: Install Statping
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          make build
+          chmod +x statping
+          mv statping $(go env GOPATH)/bin/
+
+      - name: Run Statping
+        run: |
+          API_SECRET=demosecret123 statping --port=8080 > /dev/null &
+          sleep 3
+
+      - name: Postman Tests
+        uses: matt-ball/newman-action@master
+        with:
+          collection: ./dev/postman.json
+          environment: ./dev/postman_environment_sqlite.json
+          timeoutRequest: 15000
+          delayRequest: 500

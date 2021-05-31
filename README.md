@@ -3,19 +3,21 @@
 </p>
 <p align="center">
     <b>Statping - Web and App Status Monitoring for Any Type of Project</b><br>
-<a href="https://github.com/statping/statping/wiki">View Wiki</a> | <a href="https://demo.statping.com">Demo</a> | <a href="https://itunes.apple.com/us/app/apple-store/id1445513219">iPhone</a> | <a href="https://play.google.com/store/apps/details?id=com.statping">Android</a> <br> <a href="https://github.com/statping/statping/wiki/API">API</a> | <a href="https://github.com/statping/statping/wiki/Docker">Docker</a> | <a href="https://github.com/statping/statping/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/statping/statping/wiki/Mac">Mac</a> | <a href="https://github.com/statping/statping/wiki/Linux">Linux</a> | <a href="https://github.com/statping/statping/wiki/Windows">Windows</a>
+<a href="https://github.com/statping/statping/wiki">View Wiki</a> | <a href="https://demo.statping.com">Demo</a> | <a href="https://itunes.apple.com/us/app/apple-store/id1445513219">iPhone</a> | <a href="https://play.google.com/store/apps/details?id=com.statping">Android</a> <br> <a href="http://docs.statping.com">API</a> | <a href="https://github.com/statping/statping/wiki/Docker">Docker</a> | <a href="https://github.com/statping/statping/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/statping/statping/wiki/Mac">Mac</a> | <a href="https://github.com/statping/statping/wiki/Linux">Linux</a> | <a href="https://github.com/statping/statping/wiki/Windows">Windows</a>
 </p>
 
 # Statping - Status Page & Monitoring Server
 An easy to use Status Page for your websites and applications. Statping will automatically fetch the application and render a beautiful status page with tons of features for you to build an even better status page. This Status Page generator allows you to use MySQL, Postgres, or SQLite on multiple operating systems.
 
-[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/statping/statping) [![Slack](https://slack.statping.com/badge.svg)](https://slack.statping.com) [![](https://images.microbadger.com/badges/image/statping/statping.svg)](https://microbadger.com/images/statping/statping) [![Docker Pulls](https://img.shields.io/docker/pulls/statping/statping.svg)](https://hub.docker.com/r/statping/statping/builds/)
+![Master Release](https://github.com/statping/statping/workflows/Master%20Release/badge.svg?branch=master) [![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/statping/statping) [![Slack](https://slack.statping.com/badge.svg)](https://slack.statping.com) [![](https://images.microbadger.com/badges/image/statping/statping.svg)](https://microbadger.com/images/statping/statping) [![Docker Pulls](https://img.shields.io/docker/pulls/statping/statping.svg)](https://hub.docker.com/r/statping/statping/builds/)
 
 <br><br>
 <img align="left" width="320" height="235" src="https://img.cjx.io/statupsiterun.gif">
 <h2>A Future-Proof Status Page</h2>
 Statping strives to remain future-proof and remain intact if a failure is created. Your Statping service should not be running on the same instance you're trying to monitor. If your server crashes your Status Page should still remaining online to notify your users of downtime.
-<br><br><br><br><br>
+
+<br><a href="https://labs.play-with-docker.com/?stack=https://raw.githubusercontent.com/statping/statping/master/dev/pwd-stack.yml"><img height=25 src="https://assets.statping.com/docker-pwd.png"></a> (dashboard login is `admin`, password `admin`)
+<br><br><br>
 
 <h2>No Requirements</h2>
 Statping is built in Go Language so all you need is the precompile binary based on your operating system. You won't need to install anything extra once you have the Statping binary installed. You can even run Statping on a Raspberry Pi.
@@ -38,7 +40,7 @@ The Status binary for all other OS's is ~17Mb at most.
 
 <img align="left" width="320" height="235" src="https://img.cjx.io/statping_iphone_bk.png">
 <h2>Mobile App is Gorgeous</h2>
-The Statping app is available on the App Store and Google Play for free. The app will allow you to view services, receive notifications when a service is offline, update groups, users, services, messages, and more! Start your own Statping server and then connect it to the app by scanning the QR code in settings. 
+The Statping app is available on the App Store and Google Play for free. The app will allow you to view services, receive notifications when a service is offline, update groups, users, services, messages, and more! Start your own Statping server and then connect it to the app by scanning the QR code in settings.
 
 <p align="center">
 <a href="https://play.google.com/store/apps/details?id=com.statping"><img src="https://img.cjx.io/google-play.svg"></a>
@@ -154,8 +156,9 @@ aws ec2 run-instances \
 ```
 
 ## Contributing
-Statping accepts Push Requests! Feel free to add your own features and notifiers. You probably want to checkout the [Notifier Wiki](https://github.com/statping/statping/wiki/Notifiers) to get a better understanding on how to create your own notification methods for failing/successful services. Testing on Statping will test each function on MySQL, Postgres, and SQLite. I recommend you run a MySQL and a Postgres Docker image for testing.
+Statping accepts Push Requests to the `dev` branch! Feel free to add your own features and notifiers. You probably want to checkout the [Notifier Wiki](https://github.com/statping/statping/wiki/Notifiers) to get a better understanding on how to create your own notification methods for failing/successful services. Testing on Statping will test each function on MySQL, Postgres, and SQLite. I recommend running MySQL and Postgres Docker containers for testing. You can find multiple docker-compose files in the dev directory. 
 
+![Dev Release](https://github.com/statping/statping/workflows/Dev%20Release/badge.svg?branch=dev)
 [![Go Report Card](https://goreportcard.com/badge/github.com/statping/statping)](https://goreportcard.com/report/github.com/statping/statping)
 [![Build Status](https://travis-ci.com/statping/statping.svg?branch=master)](https://travis-ci.com/statping/statping) [![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://dashboard.cypress.io/#/projects/bi8mhr/runs)
 [![Docker Pulls](https://img.shields.io/docker/pulls/statping/statping.svg)](https://hub.docker.com/r/statping/statping/builds/) [![Godoc](https://godoc.org/github.com/statping/statping?status.svg)](https://godoc.org/github.com/statping/statping)[![Coverage Status](https://coveralls.io/repos/github/statping/statping/badge.svg?branch=master)](https://coveralls.io/github/statping/statping?branch=master)

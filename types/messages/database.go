@@ -1,8 +1,15 @@
 package messages
 
-import "github.com/statping/statping/database"
+import (
+	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/errors"
+	"github.com/statping/statping/utils"
+)
 
-var db database.Database
+var (
+	db  database.Database
+	log = utils.Log.WithField("type", "message")
+)
 
 func SetDB(database database.Database) {
 	db = database.Model(&Message{})
@@ -11,6 +18,9 @@ func SetDB(database database.Database) {
 func Find(id int64) (*Message, error) {
 	var message Message
 	q := db.Where("id = ?", id).Find(&message)
+	if q.Error() != nil {
+		return nil, errors.Missing(message, id)
+	}
 	return &message, q.Error()
 }
 

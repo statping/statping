@@ -1,26 +1,36 @@
 package handlers
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/statping/statping/types/checkins"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net"
 	"net/http"
 )
 
+func findCheckin(r *http.Request) (*checkins.Checkin, string, error) {
+	vars := mux.Vars(r)
+	id := vars["api"]
+	if id == "" {
+		return nil, "", errors.IDMissing
+	}
+	checkin, err := checkins.FindByAPI(id)
+	if err != nil {
+		return nil, id, errors.Missing(checkins.Checkin{}, id)
+	}
+	return checkin, id, nil
+}
+
 func apiAllCheckinsHandler(w http.ResponseWriter, r *http.Request) {
-	chks := checkins.All()
-	returnJson(chks, w, r)
+	returnJson(checkins.All(), w, r)
 }
 
 func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	checkin, err := checkins.FindByAPI(vars["api"])
+	checkin, _, err := findCheckin(r)
 	if err != nil {
-		sendErrorJson(fmt.Errorf("checkin %v was not found", vars["api"]), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
 	returnJson(checkin, w, r)
@@ -28,15 +38,13 @@ func apiCheckinHandler(w http.ResponseWriter, r *http.Request) {
 
 func checkinCreateHandler(w http.ResponseWriter, r *http.Request) {
 	var checkin *checkins.Checkin
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&checkin)
-	if err != nil {
+	if err := DecodeJSON(r, &checkin); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
 	service, err := services.Find(checkin.ServiceId)
 	if err != nil {
-		sendErrorJson(fmt.Errorf("missing service_id field"), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
 	checkin.ServiceId = service.Id
@@ -48,36 +56,39 @@ func checkinCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func checkinHitHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	checkin, err := checkins.FindByAPI(vars["api"])
+	checkin, _, err := findCheckin(r)
 	if err != nil {
-		sendErrorJson(fmt.Errorf("checkin %s was not found", vars["api"]), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
+	log.Infof("Checking %s was requested", checkin.Name)
+
 	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+
+	if last := checkin.LastHit(); last == nil {
+		checkin.Start()
+	}
 
 	hit := &checkins.CheckinHit{
 		Checkin:   checkin.Id,
 		From:      ip,
 		CreatedAt: utils.Now(),
 	}
-	log.Infof("Checking %s was requested", checkin.Name)
 
-	err = hit.Create()
-	if err != nil {
-		sendErrorJson(fmt.Errorf("checkin %v was not found", vars["api"]), w, r)
+	if err := hit.Create(); err != nil {
+		sendErrorJson(err, w, r)
 		return
 	}
 	checkin.Failing = false
 	checkin.LastHitTime = utils.Now()
+
 	sendJsonAction(hit.Id, "update", w, r)
 }
 
 func checkinDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	checkin, err := checkins.FindByAPI(vars["api"])
+	checkin, _, err := findCheckin(r)
 	if err != nil {
-		sendErrorJson(fmt.Errorf("checkin %v was not found", vars["api"]), w, r)
+		sendErrorJson(err, w, r)
 		return
 	}
 

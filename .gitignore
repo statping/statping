@@ -3,6 +3,9 @@ snap
 prime
 stage
 parts
+assets_backup
+certs
+releases
 core/rice-box.go
 config.yml
 *.db
@@ -35,3 +38,5 @@ docker
 tmp
 /frontend/cypress/screenshots/
 /frontend/cypress/videos/
+services.yml
+statping.wiki

@@ -18,6 +18,8 @@ var example = &Message{
 }
 
 func TestInit(t *testing.T) {
+	err := utils.InitLogs()
+	require.Nil(t, err)
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.CreateTable(&Message{})
@@ -69,6 +71,11 @@ func TestDelete(t *testing.T) {
 
 	all = All()
 	assert.Len(t, all, 1)
+}
+
+func TestSamples(t *testing.T) {
+	require.Nil(t, Samples())
+	assert.Len(t, All(), 3)
 }
 
 func TestClose(t *testing.T) {

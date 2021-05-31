@@ -1,6 +1,8 @@
 package configs
 
 import (
+	"fmt"
+	"github.com/pkg/errors"
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/core"
@@ -26,9 +28,8 @@ type Sampler interface {
 func TriggerSamples() error {
 	return createSamples(
 		core.Samples,
-		//users.Samples,
-		messages.Samples,
 		services.Samples,
+		messages.Samples,
 		checkins.Samples,
 		checkins.SamplesChkHits,
 		failures.Samples,
@@ -65,11 +66,6 @@ func (d *DbConfig) Update() error {
 	return nil
 }
 
-// Save will initially create the config.yml file
-func (d *DbConfig) Delete() error {
-	return os.Remove(d.filename)
-}
-
 // DropDatabase will DROP each table Statping created
 func (d *DbConfig) DropDatabase() error {
 	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
@@ -101,11 +97,11 @@ func (d *DbConfig) CreateDatabase() error {
 	log.Infoln("Creating Database Tables...")
 	for _, table := range DbModels {
 		if err := d.Db.CreateTable(table); err.Error() != nil {
-			return err.Error()
+			return errors.Wrap(err.Error(), fmt.Sprintf("error creating '%T' table", table))
 		}
 	}
 	if err := d.Db.Table("core").CreateTable(&core.Core{}); err.Error() != nil {
-		return err.Error()
+		return errors.Wrap(err.Error(), fmt.Sprintf("error creating 'core' table"))
 	}
 	log.Infoln("Statping Database Created")
 

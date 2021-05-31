@@ -20,14 +20,22 @@ func ReturnNotifier(method string) ServiceNotifier {
 func FindNotifier(method string) *notifications.Notification {
 	n := allNotifiers[method]
 	if n != nil {
-		return n.Select()
+		notif := n.Select()
+		no, err := notifications.Find(notif.Method)
+		if err != nil {
+			log.Error(err)
+			return nil
+		}
+		return notif.UpdateFields(no)
 	}
 	return nil
 }
 
 type ServiceNotifier interface {
-	OnSuccess(*Service) error                    // OnSuccess is triggered when a service is successful
-	OnFailure(*Service, *failures.Failure) error // OnFailure is triggered when a service is failing
-	OnTest() (string, error)                     // OnTest is triggered for testing
-	Select() *notifications.Notification         // OnTest is triggered for testing
+	OnSuccess(Service) (string, error)                   // OnSuccess is triggered when a service is successful
+	OnFailure(Service, failures.Failure) (string, error) // OnFailure is triggered when a service is failing
+	OnTest() (string, error)                             // OnTest is triggered for testing
+	OnSave() (string, error)                             // OnSave is triggered for testing
+	Select() *notifications.Notification                 // OnTest is triggered for testing
+	Valid(notifications.Values) error                    // Valid checks your form values
 }

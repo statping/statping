@@ -5,89 +5,28 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"github.com/ararog/timeago"
+	"github.com/statping/statping/types/metrics"
 	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
 var (
 	// Directory returns the current path or the STATPING_DIR environment variable
-	Directory   string
-	disableLogs bool
+	Directory string
 )
 
-// init will set the utils.Directory to the current running directory, or STATPING_DIR if it is set
-func init() {
-	defaultDir, err := os.Getwd()
-	if err != nil {
-		defaultDir = "."
-	}
-
-	Directory = Getenv("STATPING_DIR", defaultDir).(string)
-
-	// check if logs are disabled
-	disableLogs = Getenv("DISABLE_LOGS", false).(bool)
-	if disableLogs {
-		Log.Out = ioutil.Discard
-	}
-
-	Log.Debugln("current working directory: ", Directory)
-	Log.AddHook(new(hook))
-	Log.SetNoLock()
-	checkVerboseMode()
-}
-
-type env struct {
-	data interface{}
-}
-
-func GetenvAs(key string, defaultValue interface{}) *env {
-	return &env{
-		data: Getenv(key, defaultValue),
-	}
-}
-
-func (e *env) Duration() time.Duration {
-	t, err := time.ParseDuration(e.data.(string))
-	if err != nil {
-		Log.Errorln(err)
-	}
-	return t
-}
-
-func Getenv(key string, defaultValue interface{}) interface{} {
-	if val, ok := os.LookupEnv(key); ok {
-		if val != "" {
-			switch d := defaultValue.(type) {
-
-			case int, int64:
-				return int(ToInt(val))
-
-			case time.Duration:
-				dur, err := time.ParseDuration(val)
-				if err != nil {
-					return d
-				}
-				return dur
-			case bool:
-				ok, err := strconv.ParseBool(val)
-				if err != nil {
-					return d
-				}
-				return ok
-			default:
-				return val
-			}
-		}
-	}
-	return defaultValue
+func NotNumber(val string) bool {
+	_, err := strconv.ParseInt(val, 10, 64)
+	return err != nil
 }
 
 // ToInt converts a int to a string
@@ -138,21 +77,9 @@ func ToString(s interface{}) string {
 	}
 }
 
-type Timestamp time.Time
-type Timestamper interface {
-	Ago() string
-}
-
-// Ago returns a human readable timestamp based on the Timestamp (time.Time) interface
-func (t Timestamp) Ago() string {
-	got, _ := timeago.TimeAgoWithTime(time.Now(), time.Time(t))
-	return got
-}
-
 // Command will run a terminal command with 'sh -c COMMAND' and return stdout and errOut as strings
 //		in, out, err := Command("sass assets/scss assets/css/base.css")
 func Command(name string, args ...string) (string, string, error) {
-	Log.Debugln("running command: " + name + strings.Join(args, " "))
 	testCmd := exec.Command(name, args...)
 	var stdout, stderr []byte
 	var errStdout, errStderr error
@@ -163,14 +90,18 @@ func Command(name string, args ...string) (string, string, error) {
 		return "", "", err
 	}
 
+	var wg sync.WaitGroup
+
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		stdout, errStdout = copyAndCapture(os.Stdout, stdoutIn)
 	}()
 
-	go func() {
-		stderr, errStderr = copyAndCapture(os.Stderr, stderrIn)
-	}()
+	stderr, errStderr = copyAndCapture(os.Stderr, stderrIn)
 
+	// call testCmd.Wait() only after reads from all pipes have completed
+	wg.Wait()
 	err = testCmd.Wait()
 	if err != nil {
 		return string(stdout), string(stderr), err
@@ -231,17 +162,21 @@ func DurationReadable(d time.Duration) string {
 // // body - The body or form data to send with HTTP request
 // // timeout - Specific duration to timeout on. time.Duration(30 * time.Seconds)
 // // You can use a HTTP Proxy if you HTTP_PROXY environment variable
-func HttpRequest(url, method string, content interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool) ([]byte, *http.Response, error) {
+func HttpRequest(endpoint, method string, contentType interface{}, headers []string, body io.Reader, timeout time.Duration, verifySSL bool, customTLS *tls.Config) ([]byte, *http.Response, error) {
 	var err error
 	var req *http.Request
+	if method == "" {
+		method = "GET"
+	}
 	t1 := Now()
-	if req, err = http.NewRequest(method, url, body); err != nil {
-		httpMetric.Errors++
+	if req, err = http.NewRequest(method, endpoint, body); err != nil {
 		return nil, nil, err
 	}
+	// set default headers so end user can overwrite them if needed
 	req.Header.Set("User-Agent", "Statping")
-	if content != nil {
-		req.Header.Set("Content-Type", content.(string))
+	req.Header.Set("Statping-Version", Params.GetString("VERSION"))
+	if contentType != nil {
+		req.Header.Set("Content-Type", contentType.(string))
 	}
 
 	verifyHost := req.URL.Hostname()
@@ -258,8 +193,8 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 			}
 		}
 	}
-	var resp *http.Response
 
+	var resp *http.Response
 	dialer := &net.Dialer{
 		Timeout:   timeout,
 		KeepAlive: timeout,
@@ -269,6 +204,7 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: !verifySSL,
 			ServerName:         verifyHost,
+			Renegotiation:      tls.RenegotiateOnceAsClient,
 		},
 		DisableKeepAlives:     true,
 		ResponseHeaderTimeout: timeout,
@@ -280,23 +216,41 @@ func HttpRequest(url, method string, content interface{}, headers []string, body
 			return dialer.DialContext(ctx, network, addr)
 		},
 	}
+	if Params.GetString("HTTP_PROXY") != "" {
+		proxyUrl, err := url.Parse(Params.GetString("HTTP_PROXY"))
+		if err != nil {
+			return nil, nil, err
+		}
+		transport.Proxy = http.ProxyURL(proxyUrl)
+	}
+	if customTLS != nil {
+		transport.TLSClientConfig.RootCAs = customTLS.RootCAs
+		transport.TLSClientConfig.Certificates = customTLS.Certificates
+	}
 	client := &http.Client{
 		Transport: transport,
 		Timeout:   timeout,
 	}
 
+	if req.Header.Get("Redirect") != "true" {
+		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		}
+		req.Header.Del("Redirect")
+	}
+
 	if resp, err = client.Do(req); err != nil {
-		httpMetric.Errors++
 		return nil, resp, err
 	}
 	defer resp.Body.Close()
 	contents, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, resp, err
+	}
 
 	// record HTTP metrics
-	t2 := Now().Sub(t1).Milliseconds()
-	httpMetric.Requests++
-	httpMetric.Milliseconds += t2 / httpMetric.Requests
-	httpMetric.Bytes += int64(len(contents))
+	metrics.Histo("bytes", float64(len(contents)), endpoint, method)
+	metrics.Histo("duration", Now().Sub(t1).Seconds(), endpoint, method)
 
 	return contents, resp, err
 }

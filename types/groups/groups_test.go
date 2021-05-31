@@ -4,6 +4,7 @@ import (
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -31,6 +32,8 @@ var s2 = &services.Service{
 }
 
 func TestInit(t *testing.T) {
+	err := utils.InitLogs()
+	require.Nil(t, err)
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.CreateTable(&Group{}, &services.Service{})
@@ -101,6 +104,11 @@ func TestDelete(t *testing.T) {
 
 	all = All()
 	assert.Len(t, all, 1)
+}
+
+func TestSamples(t *testing.T) {
+	require.Nil(t, Samples())
+	assert.Len(t, All(), 4)
 }
 
 func TestClose(t *testing.T) {

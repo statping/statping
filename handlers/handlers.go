@@ -1,18 +1,12 @@
 package handlers
 
 import (
-	"crypto/subtle"
-	"crypto/tls"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/errors"
 	"html/template"
 	"net/http"
-	"os"
 	"path"
-	"strings"
 	"time"
 
 	"github.com/statping/statping/source"
@@ -20,22 +14,31 @@ import (
 )
 
 const (
-	cookieKey = "statping_auth"
-	timeout   = time.Second * 30
+	cookieName = "statping_auth"
+
+	timeout = time.Second * 30
 )
 
 var (
-	jwtKey     string
+	jwtKey     []byte
 	httpServer *http.Server
 	usingSSL   bool
 	mainTmpl   = `{{define "main" }} {{ template "base" . }} {{ end }}`
 	templates  = []string{"base.gohtml"}
 )
 
-// RunHTTPServer will start a HTTP server on a specific IP and port
-func RunHTTPServer(ip string, port int) error {
-	host := fmt.Sprintf("%v:%v", ip, port)
+func StopHTTPServer(err error) {
+	log.Infoln("Stopping HTTP Server")
+}
 
+// RunHTTPServer will start a HTTP server on a specific IP and port
+func RunHTTPServer() error {
+	if utils.Params.GetBool("DISABLE_HTTP") {
+		return nil
+	}
+
+	ip := utils.Params.GetString("SERVER_IP")
+	host := fmt.Sprintf("%v:%v", ip, utils.Params.GetInt("SERVER_PORT"))
 	key := utils.FileExists(utils.Directory + "/server.key")
 	cert := utils.FileExists(utils.Directory + "/server.crt")
 
@@ -44,65 +47,31 @@ func RunHTTPServer(ip string, port int) error {
 		log.Infoln(fmt.Sprintf("Statping Secure HTTPS Server running on https://%v:%v", ip, 443))
 		usingSSL = true
 	} else {
-		log.Infoln("Statping HTTP Server running on http://" + host)
+		log.Infoln("Statping HTTP Server running on http://" + host + basePath)
 	}
 
 	router = Router()
 	resetCookies()
 
-	if usingSSL {
-		cfg := &tls.Config{
-			MinVersion:               tls.VersionTLS12,
-			CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
-			PreferServerCipherSuites: true,
-			CipherSuites: []uint16{
-				tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-				tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-				tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
-				tls.TLS_RSA_WITH_AES_256_CBC_SHA,
-			},
-		}
-		srv := &http.Server{
-			Addr:         fmt.Sprintf("%v:%v", ip, 443),
-			Handler:      router,
-			TLSConfig:    cfg,
-			TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
-			WriteTimeout: timeout,
-			ReadTimeout:  timeout,
-			IdleTimeout:  timeout,
-		}
-		return srv.ListenAndServeTLS(utils.Directory+"/server.crt", utils.Directory+"/server.key")
+	if utils.Params.GetBool("LETSENCRYPT_ENABLE") {
+		return startLetsEncryptServer(ip)
+	} else if usingSSL {
+		return startSSLServer(ip)
 	} else {
-		httpServer = &http.Server{
-			Addr:         host,
-			WriteTimeout: timeout,
-			ReadTimeout:  timeout,
-			IdleTimeout:  timeout,
-			Handler:      router,
-		}
-		httpServer.SetKeepAlivesEnabled(false)
-		return httpServer.ListenAndServe()
+		return startServer(host)
 	}
 }
 
 // IsReadAuthenticated will allow Read Only authentication for some routes
 func IsReadAuthenticated(r *http.Request) bool {
-	if !core.App.Setup {
-		return false
-	}
-	var token string
-	query := r.URL.Query()
-	key := query.Get("api")
-	if subtle.ConstantTimeCompare([]byte(key), []byte(core.App.ApiSecret)) == 1 {
+	if ok := hasSetupEnv(); ok {
 		return true
 	}
-	tokens, ok := r.Header["Authorization"]
-	if ok && len(tokens) >= 1 {
-		token = tokens[0]
-		token = strings.TrimPrefix(token, "Bearer ")
-		if subtle.ConstantTimeCompare([]byte(token), []byte(core.App.ApiSecret)) == 1 {
-			return true
-		}
+	if ok := hasAPIQuery(r); ok {
+		return true
+	}
+	if ok := hasAuthorizationHeader(r); ok {
+		return true
 	}
 	return IsFullAuthenticated(r)
 }
@@ -110,53 +79,31 @@ func IsReadAuthenticated(r *http.Request) bool {
 // IsFullAuthenticated returns true if the HTTP request is authenticated. You can set the environment variable GO_ENV=test
 // to bypass the admin authenticate to the dashboard features.
 func IsFullAuthenticated(r *http.Request) bool {
-	if os.Getenv("GO_ENV") == "test" {
+	if ok := hasSetupEnv(); ok {
 		return true
 	}
-	if core.App == nil {
+	if ok := hasAPIQuery(r); ok {
 		return true
 	}
-	if !core.App.Setup {
+	if ok := hasAuthorizationHeader(r); ok {
+		return true
+	}
+	claim, err := getJwtToken(r)
+	if err != nil {
 		return false
 	}
-	var token string
-	tokens, ok := r.Header["Authorization"]
-	if ok && len(tokens) >= 1 {
-		token = tokens[0]
-		token = strings.TrimPrefix(token, "Bearer ")
-		if subtle.ConstantTimeCompare([]byte(token), []byte(core.App.ApiSecret)) == 1 {
-			return true
-		}
-	}
-	return IsAdmin(r)
+	return claim.Admin
 }
 
-func getJwtToken(r *http.Request) (JwtClaim, error) {
-	c, err := r.Cookie(cookieKey)
-	if err != nil {
-		if err == http.ErrNoCookie {
-			return JwtClaim{}, err
-		}
-		return JwtClaim{}, err
-	}
-	tknStr := c.Value
-	var claims JwtClaim
-	tkn, err := jwt.ParseWithClaims(tknStr, &claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(jwtKey), nil
-	})
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			return JwtClaim{}, err
-		}
-		return JwtClaim{}, err
-	}
-	if !tkn.Valid {
-		return claims, errors.New("token is not valid")
-	}
-	return claims, err
-}
-
+// ScopeName will show private JSON fields in the API.
+// It will return "admin" if request has valid admin authentication.
 func ScopeName(r *http.Request) string {
+	if ok := hasAPIQuery(r); ok {
+		return "admin"
+	}
+	if ok := hasAuthorizationHeader(r); ok {
+		return "admin"
+	}
 	claim, err := getJwtToken(r)
 	if err != nil {
 		return ""
@@ -169,12 +116,6 @@ func ScopeName(r *http.Request) string {
 
 // IsAdmin returns true if the user session is an administrator
 func IsAdmin(r *http.Request) bool {
-	if !core.App.Setup {
-		return false
-	}
-	if utils.Getenv("GO_ENV", false).(bool) {
-		return true
-	}
 	claim, err := getJwtToken(r)
 	if err != nil {
 		return false
@@ -184,10 +125,7 @@ func IsAdmin(r *http.Request) bool {
 
 // IsUser returns true if the user is registered
 func IsUser(r *http.Request) bool {
-	if !core.App.Setup {
-		return false
-	}
-	if os.Getenv("GO_ENV") == "test" {
+	if ok := hasSetupEnv(); ok {
 		return true
 	}
 	tk, err := getJwtToken(r)
@@ -248,12 +186,19 @@ func ExecuteResponse(w http.ResponseWriter, r *http.Request, file string, data i
 	}
 }
 
-func returnJson(d interface{}, w http.ResponseWriter, r *http.Request, statusCode ...int) {
+func returnJson(d interface{}, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if len(statusCode) != 0 {
-		code := statusCode[0]
-		w.WriteHeader(code)
+	if e, ok := d.(errors.Error); ok {
+		w.WriteHeader(e.Status())
+		json.NewEncoder(w).Encode(e)
+		return
 	}
+	if e, ok := d.(error); ok {
+		w.WriteHeader(500)
+		json.NewEncoder(w).Encode(errors.New(e.Error()))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(d)
 }
 
@@ -263,5 +208,5 @@ func error404Handler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
 	}
 	w.WriteHeader(http.StatusNotFound)
-	ExecuteResponse(w, r, "index.html", nil, nil)
+	ExecuteResponse(w, r, "base.gohtml", nil, nil)
 }

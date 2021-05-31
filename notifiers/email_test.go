@@ -1,14 +1,15 @@
 package notifiers
 
 import (
-	"fmt"
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"os"
 	"testing"
 	"time"
 )
@@ -22,22 +23,23 @@ var (
 	EMAIL_PORT     int64
 )
 
-var testEmail *emailOutgoing
-
-func init() {
-	EMAIL_HOST = os.Getenv("EMAIL_HOST")
-	EMAIL_USER = os.Getenv("EMAIL_USER")
-	EMAIL_PASS = os.Getenv("EMAIL_PASS")
-	EMAIL_OUTGOING = os.Getenv("EMAIL_OUTGOING")
-	EMAIL_SEND_TO = os.Getenv("EMAIL_SEND_TO")
-	EMAIL_PORT = utils.ToInt(os.Getenv("EMAIL_PORT"))
-}
-
 func TestEmailNotifier(t *testing.T) {
+	t.Parallel()
+	err := utils.InitLogs()
+	require.Nil(t, err)
+
+	EMAIL_HOST = utils.Params.GetString("EMAIL_HOST")
+	EMAIL_USER = utils.Params.GetString("EMAIL_USER")
+	EMAIL_PASS = utils.Params.GetString("EMAIL_PASS")
+	EMAIL_OUTGOING = utils.Params.GetString("EMAIL_OUTGOING")
+	EMAIL_SEND_TO = utils.Params.GetString("EMAIL_SEND_TO")
+	EMAIL_PORT = utils.ToInt(utils.Params.GetString("EMAIL_PORT"))
+
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
 	notifications.SetDB(db)
+	core.Example()
 
 	if EMAIL_HOST == "" || EMAIL_USER == "" || EMAIL_PASS == "" {
 		t.Log("email notifier testing skipped, missing EMAIL_ environment variables")
@@ -45,26 +47,18 @@ func TestEmailNotifier(t *testing.T) {
 	}
 
 	t.Run("New email", func(t *testing.T) {
-		email.Host = EMAIL_HOST
-		email.Username = EMAIL_USER
-		email.Password = EMAIL_PASS
-		email.Var1 = EMAIL_OUTGOING
-		email.Var2 = EMAIL_SEND_TO
-		email.Port = int(EMAIL_PORT)
+		email.Host = null.NewNullString(EMAIL_HOST)
+		email.Username = null.NewNullString(EMAIL_USER)
+		email.Password = null.NewNullString(EMAIL_PASS)
+		email.Var1 = null.NewNullString(EMAIL_OUTGOING)
+		email.Var2 = null.NewNullString(EMAIL_SEND_TO)
+		email.Port = null.NewNullInt64(EMAIL_PORT)
 		email.Delay = time.Duration(100 * time.Millisecond)
 		email.Enabled = null.NewNullBool(true)
 
 		Add(email)
 		assert.Equal(t, "Hunter Long", email.Author)
-		assert.Equal(t, EMAIL_HOST, email.Host)
-
-		testEmail = &emailOutgoing{
-			To:       email.GetValue("var2"),
-			Subject:  fmt.Sprintf("Service %v is Failing", exampleService.Name),
-			Template: mainEmailTemplate,
-			Data:     exampleService,
-			From:     email.GetValue("var1"),
-		}
+		assert.Equal(t, EMAIL_HOST, email.Host.String)
 	})
 
 	t.Run("email Within Limits", func(t *testing.T) {
@@ -72,22 +66,27 @@ func TestEmailNotifier(t *testing.T) {
 		assert.True(t, ok)
 	})
 
+	t.Run("email OnSave", func(t *testing.T) {
+		_, err := email.OnSave()
+		assert.Nil(t, err)
+	})
+
 	t.Run("email OnFailure", func(t *testing.T) {
-		err := email.OnFailure(exampleService, exampleFailure)
+		_, err := email.OnFailure(services.Example(false), failures.Example())
 		assert.Nil(t, err)
 	})
 
 	t.Run("email OnSuccess", func(t *testing.T) {
-		err := email.OnSuccess(exampleService)
+		_, err := email.OnSuccess(services.Example(false))
 		assert.Nil(t, err)
 	})
 
 	t.Run("email Check Back Online", func(t *testing.T) {
-		assert.True(t, exampleService.Online)
+		assert.True(t, services.Example(true).Online)
 	})
 
 	t.Run("email OnSuccess Again", func(t *testing.T) {
-		err := email.OnSuccess(exampleService)
+		_, err := email.OnSuccess(services.Example(true))
 		assert.Nil(t, err)
 	})
 

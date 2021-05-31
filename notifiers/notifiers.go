@@ -1,13 +1,27 @@
 package notifiers
 
 import (
-	"github.com/prometheus/common/log"
+	"bytes"
+	"html/template"
+	"time"
+
+	"github.com/statping/statping/types/core"
 	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
-	"time"
 )
+
+//go:generate go run generate.go
+
+var log = utils.Log.WithField("type", "notifier")
+
+type replacer struct {
+	Core    core.Core
+	Service services.Service
+	Failure failures.Failure
+	Email   string
+	Custom  map[string]string
+}
 
 func InitNotifiers() {
 	Add(
@@ -21,70 +35,41 @@ func InitNotifiers() {
 		Webhook,
 		Mobile,
 		Pushover,
+		statpingMailer,
+		Gotify,
+		AmazonSNS,
 	)
+
+	services.UpdateNotifiers()
+}
+
+func ReplaceTemplate(tmpl string, data replacer) string {
+	buf := new(bytes.Buffer)
+	tmp, err := template.New("replacement").Parse(tmpl)
+	if err != nil {
+		log.Error(err)
+		return err.Error()
+	}
+	err = tmp.Execute(buf, data)
+	if err != nil {
+		log.Error(err)
+		return err.Error()
+	}
+	return buf.String()
 }
 
 func Add(notifs ...services.ServiceNotifier) {
 	for _, n := range notifs {
-		services.AddNotifier(n)
-		if err := n.Select().Create(); err != nil {
+		notif := n.Select()
+		if err := notif.Create(); err != nil {
 			log.Error(err)
 		}
+		services.AddNotifier(n)
 	}
 }
 
-func ToMap(srv *services.Service, f *failures.Failure) map[string]interface{} {
-	m := make(map[string]interface{})
-	m["Service"] = srv
-	m["Failure"] = f
-	return m
-}
-
-func ReplaceVars(input string, s *services.Service, f *failures.Failure) string {
-	input = utils.ReplaceTemplate(input, s)
-	if f != nil {
-		input = utils.ReplaceTemplate(input, f)
-	}
-	return input
-}
-
-var exampleService = &services.Service{
-	Id:                  1,
-	Name:                "Statping",
-	Domain:              "https://statping.com",
-	Expected:            null.NewNullString("a better response"),
-	ExpectedStatus:      200,
-	Interval:            60,
-	Type:                "http",
-	Method:              "get",
-	Timeout:             10,
-	Order:               2,
-	VerifySSL:           null.NewNullBool(true),
-	Public:              null.NewNullBool(true),
-	GroupId:             0,
-	Permalink:           null.NewNullString("statping"),
-	Online:              true,
-	Latency:             324399,
-	PingTime:            18399,
-	Online24Hours:       99.2,
-	Online7Days:         99.8,
-	AvgResponse:         300233,
-	FailuresLast24Hours: 4,
-	Checkpoint:          utils.Now().Add(-10 * time.Minute),
-	SleepDuration:       55,
-	LastResponse:        "returning from a response",
-	AllowNotifications:  null.NewNullBool(true),
-	UserNotified:        false,
-	UpdateNotify:        null.NewNullBool(true),
-	SuccessNotified:     false,
-	LastStatusCode:      200,
-	LastLookupTime:      5233,
-	LastLatency:         270233,
-	LastCheck:           utils.Now().Add(-15 * time.Second),
-	LastOnline:          utils.Now().Add(-15 * time.Second),
-	LastOffline:         utils.Now().Add(-10 * time.Minute),
-	SecondsOnline:       4500,
-	SecondsOffline:      300,
+func ReplaceVars(input string, s services.Service, f failures.Failure) string {
+	return ReplaceTemplate(input, replacer{Service: s, Failure: f, Core: *core.App})
 }
 
 var exampleFailure = &failures.Failure{

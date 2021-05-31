@@ -37,149 +37,174 @@
           visible: {
               type: Boolean,
               required: true
-          }
+          },
+        chart_timeframe: {
+          type: Object,
+          required: true
+        },
       },
       data() {
           return {
               ready: false,
               showing: false,
-              data: [],
-              chartOptions: {
-                  noData: {
-                      text: 'Loading...'
-                  },
-                  chart: {
-                      height: "100%",
-                      width: "100%",
-                      type: "area",
-                      animations: {
-                          enabled: true,
-                          initialAnimation: {
-                              enabled: true
-                          }
-                      },
-                      selection: {
-                          enabled: false
-                      },
-                      zoom: {
-                          enabled: false
-                      },
-                      toolbar: {
-                          show: false
-                      },
-                  },
-                  grid: {
-                      show: false,
-                      padding: {
-                          top: 0,
-                          right: 0,
-                          bottom: 0,
-                          left: -10,
-                      }
-                  },
-                  dropShadow: {
-                      enabled: false,
-                  },
-                  xaxis: {
-                      type: "datetime",
-                      labels: {
-                          show: false
-                      },
-                    tooltip: {
-                      enabled: false
-                    }
-                  },
-                  yaxis: {
-                      labels: {
-                          show: false
-                      },
-                  },
-                markers: {
-                  size: 0,
-                  strokeWidth: 0,
-                  hover: {
-                    size: undefined,
-                    sizeOffset: 0
-                  }
-                },
-                  tooltip: {
-                      theme: false,
-                      enabled: true,
-                      custom: ({series, seriesIndex, dataPointIndex, w}) => {
-                          let ts = w.globals.seriesX[seriesIndex][dataPointIndex];
-                          const dt = new Date(ts).toLocaleDateString("en-us", timeoptions)
-                          let val = series[seriesIndex][dataPointIndex];
-                          let humanVal = this.humanTime(val);
-                          return `<div class="chartmarker">
-                                        <span>Average Response Time: </span>
-                                        <span class="font-3">${humanVal}</span>
-                                        <span>${dt}</span>
-                                    </div>`
-                      },
-                      fixed: {
-                          enabled: true,
-                          position: 'topRight',
-                          offsetX: -30,
-                          offsetY: 0,
-                      },
-                      x: {
-                          show: false,
-                      },
-                    y: {
-                      formatter: (value) => { return value + "%" },
-                    },
-                  },
-                  legend: {
-                      show: false,
-                  },
-                  dataLabels: {
-                      enabled: false
-                  },
-                  floating: true,
-                  axisTicks: {
-                      show: false
-                  },
-                  axisBorder: {
-                      show: false
-                  },
-                  fill: {
-                      colors: [this.service.online ? "#48d338" : "#dd3545"],
-                      opacity: 1,
-                      type: 'solid'
-                  },
-                  stroke: {
-                      show: false,
-                      curve: 'smooth',
-                      lineCap: 'butt',
-                      colors: [this.service.online ? "#3aa82d" : "#dd3545"],
-                  }
-              },
-              series: [{
-                  data: []
-              }]
+              data: null,
+              ping_data: null,
+              series: null,
           }
       },
-      watch: {
-          visible: function(newVal, oldVal) {
-              if (newVal && !this.showing) {
-                  this.showing = true
-                  this.chartHits("1h")
-              }
+    computed: {
+      chartOptions() {
+        return {
+          noData: {
+            text: 'Loading...'
+          },
+          chart: {
+            height: "100%",
+            width: "100%",
+            type: "area",
+            animations: {
+              enabled: true,
+              easing: 'easeinout',
+              speed: 800,
+              animateGradually: {
+                enabled: false,
+                delay: 400,
+              },
+              dynamicAnimation: {
+                enabled: true,
+                speed: 500
+              },
+              hover: {
+                animationDuration: 0, // duration of animations when hovering an item
+              },
+              responsiveAnimationDuration: 0,
+            },
+            selection: {
+              enabled: false
+            },
+            zoom: {
+              enabled: false
+            },
+            toolbar: {
+              show: false
+            },
+          },
+          grid: {
+            show: false,
+            padding: {
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: -10,
+            }
+          },
+          dropShadow: {
+            enabled: false,
+          },
+          xaxis: {
+            type: "datetime",
+            labels: {
+              show: false
+            },
+            tooltip: {
+              enabled: false
+            }
+          },
+          yaxis: {
+            labels: {
+              show: false
+            },
+          },
+          markers: {
+            size: 0,
+            strokeWidth: 0,
+            hover: {
+              size: undefined,
+              sizeOffset: 0
+            }
+          },
+          tooltip: {
+            theme: false,
+            enabled: true,
+            custom: ({series, seriesIndex, dataPointIndex, w}) => {
+              let ts = w.globals.seriesX[seriesIndex][dataPointIndex];
+              const dt = new Date(ts).toLocaleDateString("en-us", timeoptions)
+              let val = series[0][dataPointIndex];
+              let pingVal = series[1][dataPointIndex];
+              return `<div class="chartmarker">
+<span>Average Response Time: ${this.humanTime(val)}/${this.chart_timeframe.interval}</span>
+<span>Average Ping: ${this.humanTime(pingVal)}/${this.chart_timeframe.interval}</span>
+<span>${dt}</span>
+</div>`
+            },
+            fixed: {
+              enabled: true,
+              position: 'topRight',
+              offsetX: -30,
+              offsetY: 0,
+            },
+            x: {
+              show: false,
+            },
+            y: {
+              formatter: (value) => {
+                return value + " %"
+              },
+            },
+          },
+          legend: {
+            show: false,
+          },
+          dataLabels: {
+            enabled: false
+          },
+          floating: true,
+          axisTicks: {
+            show: false
+          },
+          axisBorder: {
+            show: false
+          },
+          fill: {
+            colors: this.service.online ? ["#3dc82f", "#48d338"] : ["#c60f20", "#dd3545"],
+            opacity: 1,
+            type: 'solid',
+          },
+          stroke: {
+            show: false,
+            curve: 'smooth',
+            lineCap: 'butt',
+            colors: this.service.online ? ["#38bc2a", "#48d338"] : ["#c60f20", "#dd3545"],
           }
+        }
+      }
+    },
+      watch: {
+        visible: function(newVal, oldVal) {
+          if (newVal && !this.showing) {
+            this.showing = true
+            this.chartHits(this.chart_timeframe)
+          }
+        },
+        chart_timeframe: function(newVal, oldVal) {
+          if (newVal) {
+            this.chartHits(newVal)
+          }
+        }
       },
       methods: {
-          async chartHits(group) {
-              const start = this.nowSubtract(84600 * 3)
-              this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(new Date()), group, false)
+          async chartHits(val) {
+              this.ready = false
+            const end = this.endOf("hour", this.now())
+            const start = this.beginningOf("hour", this.fromUnix(val.start_time))
+              this.data = await Api.service_hits(this.service.id, this.toUnix(start), this.toUnix(end), val.interval, false)
+              this.ping_data = await Api.service_ping(this.service.id, this.toUnix(start), this.toUnix(end), val.interval, false)
 
-              if (this.data.length === 0 && group !== "1h") {
-                  await this.chartHits("1h")
-              }
-              this.series = [{
-                  name: this.service.name,
-                  ...this.convertToChartData(this.data)
-              }]
-              this.ready = true
+            this.series = [
+                {name: "Latency", ...this.convertToChartData(this.data)},
+                {name: "Ping", ...this.convertToChartData(this.ping_data)},
+                ]
+            this.ready = true
           }
       }
   }

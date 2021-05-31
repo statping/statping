@@ -7,6 +7,8 @@ const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 const helpers              = require('./helpers');
 const commonConfig         = require('./webpack.config.common');
 const environment          = require('./dev.env');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
 
 const webpackConfig = merge(commonConfig, {
   mode: 'development',
@@ -29,9 +31,12 @@ const webpackConfig = merge(commonConfig, {
     new webpack.EnvironmentPlugin(environment),
     new webpack.HotModuleReplacementPlugin(),
     new FriendlyErrorsPlugin(),
-      new HtmlPlugin({
-          template: 'public/index.html',
-      })
+    new HtmlPlugin({
+        template: 'public/index.html',
+    }),
+    new BundleAnalyzerPlugin({
+      analyzerPort: 9090
+    })
   ],
   devServer: {
     compress: true,

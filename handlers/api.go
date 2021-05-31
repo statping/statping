@@ -1,11 +1,11 @@
 package handlers
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/statping/statping/types/checkins"
+	"github.com/statping/statping/types/configs"
 	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/groups"
 	"github.com/statping/statping/types/incidents"
 	"github.com/statping/statping/types/messages"
@@ -22,27 +22,22 @@ type apiResponse struct {
 	Status string      `json:"status"`
 	Object string      `json:"type,omitempty"`
 	Method string      `json:"method,omitempty"`
-	Error  string      `json:"error,omitempty"`
+	Error  error       `json:"error,omitempty"`
 	Id     int64       `json:"id,omitempty"`
 	Output interface{} `json:"output,omitempty"`
 }
 
 func apiIndexHandler(r *http.Request) interface{} {
-	coreClone := *core.App
-	_, err := getJwtToken(r)
-	if err == nil {
-		coreClone.LoggedIn = true
-		coreClone.IsAdmin = IsAdmin(r)
-	}
-	return coreClone
+	return core.App
 }
 
 func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
-	var err error
-	core.App.ApiKey = utils.NewSHA256Hash()
-	core.App.ApiSecret = utils.NewSHA256Hash()
-	err = core.App.Update()
-	if err != nil {
+	newApi := utils.Params.GetString("API_SECRET")
+	if newApi == "" {
+		newApi = utils.NewSHA256Hash()
+	}
+	core.App.ApiSecret = newApi
+	if err := core.App.Update(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
@@ -52,10 +47,30 @@ func apiRenewHandler(w http.ResponseWriter, r *http.Request) {
 	returnJson(output, w, r)
 }
 
+func apiUpdateOAuthHandler(w http.ResponseWriter, r *http.Request) {
+	var oauth core.OAuth
+	if err := DecodeJSON(r, &oauth); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	core.App.OAuth = oauth
+	if err := core.App.Update(); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	sendJsonAction(core.App.OAuth, "update", w, r)
+}
+
+func apiOAuthHandler(r *http.Request) interface{} {
+	app := core.App
+	return app.OAuth
+}
+
 func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 	var c *core.Core
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&c)
+	err := DecodeJSON(r, &c)
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -76,14 +91,22 @@ func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 	if c.Domain != app.Domain {
 		app.Domain = c.Domain
 	}
-	if c.Timezone != app.Timezone {
-		app.Timezone = c.Timezone
+	if c.Language != app.Language {
+		app.Language = c.Language
 	}
-	app.OAuth = c.OAuth
+	utils.Params.Set("LANGUAGE", app.Language)
 	app.UseCdn = null.NewNullBool(c.UseCdn.Bool)
 	app.AllowReports = null.NewNullBool(c.AllowReports.Bool)
-	utils.SentryInit(nil, app.AllowReports.Bool)
-	err = app.Update()
+
+	if err := app.Update(); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	if err := configs.Save(); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
 	returnJson(core.App, w, r)
 }
 
@@ -93,38 +116,18 @@ type cacheJson struct {
 	Size       int       `json:"size"`
 }
 
-func apiCacheHandler(w http.ResponseWriter, r *http.Request) {
-	var cacheList []cacheJson
-	for k, v := range CacheStorage.List() {
-		cacheList = append(cacheList, cacheJson{
-			URL:        k,
-			Expiration: time.Unix(0, v.Expiration).UTC(),
-			Size:       len(v.Content),
-		})
+func sendErrorJson(err error, w http.ResponseWriter, r *http.Request) {
+	errCode := 0
+	e, ok := err.(errors.Error)
+	if ok {
+		errCode = e.Status()
 	}
-	returnJson(cacheList, w, r)
-}
-
-func apiClearCacheHandler(w http.ResponseWriter, r *http.Request) {
-	CacheStorage.StopRoutine()
-	CacheStorage = NewStorage()
-	output := apiResponse{
-		Status: "success",
-	}
-	returnJson(output, w, r)
-}
-
-func sendErrorJson(err error, w http.ResponseWriter, r *http.Request, statusCode ...int) {
 	log.WithField("url", r.URL.String()).
 		WithField("method", r.Method).
-		WithField("code", statusCode).
+		WithField("code", errCode).
 		Errorln(fmt.Errorf("sending error response for %s: %s", r.URL.String(), err.Error()))
 
-	output := apiResponse{
-		Status: "error",
-		Error:  err.Error(),
-	}
-	returnJson(output, w, r, statusCode...)
+	returnJson(err, w, r)
 }
 
 func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *http.Request) {
@@ -176,11 +179,6 @@ func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *ht
 }
 
 func sendUnauthorizedJson(w http.ResponseWriter, r *http.Request) {
-	output := apiResponse{
-		Status: "error",
-		Error:  errors.New("not authorized").Error(),
-	}
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusUnauthorized)
-	returnJson(output, w, r)
+	returnJson(errors.NotAuthenticated, w, r)
 }

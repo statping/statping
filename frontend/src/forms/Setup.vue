@@ -1,85 +1,138 @@
 <template>
     <div class="container col-md-7 col-sm-12 mt-2 sm-container">
-        <div class="col-12 col-md-8 offset-md-2 mb-4">
-            <img alt="Statping Setup" class="col-12 mt-5 mt-md-0" style="max-width:680px" src="banner.png">
+        <div class="col-12 col-md-6 offset-md-3 mb-4">
+            <img alt="Statping Setup" class="img-fluid mt-5 mt-md-0" src="banner.png">
         </div>
 
         <div class="col-12">
             <form @submit.prevent="saveSetup">
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-12 col-md-6">
                         <div class="form-group">
-                            <label>Database Connection</label>
+                            <label class="text-capitalize">{{ $t('language') }}</label>
+                            <select @change="changeLanguages" v-model="setup.language" id="language" class="form-control">
+                                <option value="en">English</option>
+                                <option value="es">Spanish</option>
+                                <option value="fr">French</option>
+                                <option value="ru">Russian</option>
+                                <option value="de">German</option>
+                                <option value="ja">Japanese</option>
+                                <option value="ko">Korean</option>
+                                <option value="it">Italian</option>
+                                <option value="zh">Chinese</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="text-capitalize">{{ $t('db_connection') }}</label>
                             <select @change="canSubmit" v-model="setup.db_connection" id="db_connection" class="form-control">
                                 <option value="sqlite">SQLite</option>
                                 <option value="postgres">Postgres</option>
                                 <option value="mysql">MySQL</option>
                             </select>
                         </div>
-                        <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
-                            <label>Host</label>
-                            <input @keyup="canSubmit" v-model="setup.db_host" id="db_host" type="text" class="form-control" placeholder="localhost">
+                        <div class="row">
+                            <div class="col-7 col-md-6">
+                                <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
+                                    <label class="text-capitalize">{{ $t('db_host') }}</label>
+                                    <input @keyup="canSubmit" v-model="setup.db_host" id="db_host" type="text" class="form-control" placeholder="localhost">
+                                </div>
+                            </div>
+                            <div class="col-5 col-md-6">
+                                <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
+                                    <label class="text-capitalize">{{ $t('db_port') }}</label>
+                                    <input @keyup="canSubmit" v-model.number="setup.db_port" id="db_port" type="number" class="form-control" placeholder="5432">
+                                </div>
+                            </div>
                         </div>
                         <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
-                            <label>Database Port</label>
-                            <input @keyup="canSubmit" v-model="setup.db_port" id="db_port" type="text" class="form-control" placeholder="localhost">
-                        </div>
-                        <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
-                            <label>Username</label>
+                            <label class="text-capitalize">{{ $t('db_username') }}</label>
                             <input @keyup="canSubmit" v-model="setup.db_user" id="db_user" type="text" class="form-control" placeholder="root">
                         </div>
                         <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
-                            <label for="db_password">Password</label>
+                            <label for="db_password" class="text-capitalize">{{ $t('db_password') }}</label>
                             <input @keyup="canSubmit" v-model="setup.db_password" id="db_password" type="password" class="form-control" placeholder="password123">
                         </div>
                         <div v-if="setup.db_connection !== 'sqlite'" class="form-group">
-                            <label for="db_database">Database</label>
+                            <label for="db_database" class="text-capitalize">{{ $t('db_database') }}</label>
                             <input @keyup="canSubmit" v-model="setup.db_database" id="db_database" type="text" class="form-control" placeholder="Database name">
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <div class="row">
+                                <div class="col-9">
+                                    <span class="text-left text-capitalize">{{ $t('send_reports') }}</span>
+                                </div>
+                                <div class="col-3 text-right">
+                                    <span @click="setup.send_reports = !!setup.send_reports" class="switch">
+                                      <input v-model="setup.send_reports" type="checkbox" name="send_reports" class="switch" id="send_reports" :checked="setup.send_reports">
+                                      <label for="send_reports"></label>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
 
-                    <div class="col-6">
+                    <div class="col-12 col-md-6">
 
                         <div class="form-group">
-                            <label>Project Name</label>
-                            <input @keyup="canSubmit" v-model="setup.project" id="project" type="text" class="form-control" placeholder="Great Uptime" required>
+                            <label class="text-capitalize">{{ $t('project_name') }}</label>
+                            <input @keyup="canSubmit" v-model="setup.project" id="project" type="text" class="form-control" placeholder="Work Servers" required>
                         </div>
 
                         <div class="form-group">
-                            <label>Project Description</label>
-                            <input @keyup="canSubmit" v-model="setup.description" id="description" type="text" class="form-control" placeholder="Great Uptime">
+                            <label class="text-capitalize">{{ $t('description') }}</label>
+                            <input @keyup="canSubmit" v-model="setup.description" id="description" type="text" class="form-control" placeholder="Monitors all of my work services">
                         </div>
 
                         <div class="form-group">
-                            <label for="domain">Domain URL</label>
+                            <label class="text-capitalize" for="domain">{{ $t('domain') }}</label>
                             <input @keyup="canSubmit" v-model="setup.domain" type="text" class="form-control" id="domain" required>
                         </div>
 
                         <div class="form-group">
-                            <label>Admin Username</label>
+                            <label class="text-capitalize">{{ $t('username') }}</label>
                             <input @keyup="canSubmit" v-model="setup.username" id="username" type="text" class="form-control" placeholder="admin" required>
                         </div>
 
                         <div class="form-group">
-                            <label>Admin Password</label>
+                            <label class="text-capitalize">{{ $t('password') }}</label>
                             <input @keyup="canSubmit" v-model="setup.password" id="password" type="password" class="form-control" placeholder="password" required>
                         </div>
 
                         <div class="form-group">
-                            <label>Confirm Admin Password</label>
+                            <label class="text-capitalize">{{ $t('confirm_password') }}</label>
                             <input @keyup="canSubmit" v-model="setup.confirm_password" id="password_confirm" type="password" class="form-control" placeholder="password" required>
+                            <span v-if="passnomatch" class="small text-danger">Both passwords should match</span>
                         </div>
 
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-8">
+                                    <label class="text-capitalize">{{ $t('email') }}</label>
+                                    <input @keyup="canSubmit" v-model="setup.email" id="email" type="text" class="form-control" placeholder="myemail@domain.com">
+                                </div>
+                                <div class="col-4 text-right">
+                                    <label class="d-none d-sm-block text-capitalize text-capitalize">{{ $t('newsletter') }}</label>
+                                    <span @click="setup.newsletter = !!setup.newsletter" class="switch">
+                                      <input v-model="setup.newsletter" type="checkbox" name="send_newsletter" class="switch" id="send_newsletter" :checked="setup.newsletter">
+                                      <label for="send_newsletter"></label>
+                                    </span>
+                                </div>
+                            </div>
+                            <small>{{ $t('newsletter_note') }}</small>
+                        </div>
                     </div>
 
                     <div v-if="error" class="col-12 alert alert-danger">
                         {{error}}
                     </div>
 
-                    <button @click.prevent="saveSetup" v-bind:disabled="disabled || loading" type="submit" class="btn btn-primary btn-block" :class="{'btn-primary': !loading, 'btn-default': loading}">
-                       {{loading ? "Loading..." : "Save Settings"}}
-                    </button>
+                    <div class="col-12">
+                        <button @click.prevent="saveSetup" v-bind:disabled="disabled || loading" type="submit" class="btn btn-primary btn-block" :class="{'btn-primary': !loading, 'btn-default': loading}">
+                            <font-awesome-icon v-if="loading" icon="circle-notch" class="mr-2" spin/>{{loading ? $t('loading') : $t('save_settings')}}
+                        </button>
+                    </div>
                 </div>
             </form>
 
@@ -89,7 +142,6 @@
 
 <script>
   import Api from "../API";
-  import Index from "../pages/Index";
 
   export default {
   name: 'Setup',
@@ -98,7 +150,9 @@
       error: null,
       loading: false,
       disabled: true,
+      passnomatch: false,
       setup: {
+        language: "en",
         db_connection: "sqlite",
         db_host: "",
         db_port: "",
@@ -111,7 +165,10 @@
         username: "",
         password: "",
         confirm_password: "",
-        sample_data: true
+        sample_data: true,
+        newsletter: true,
+        send_reports: true,
+        email: "",
       }
     }
   },
@@ -125,19 +182,28 @@
     }
   },
   mounted() {
+    this.changeLanguages()
     this.setup.domain = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":"+window.location.port : "")
   },
   methods: {
+    changeLanguages() {
+      this.$i18n.locale = this.setup.language
+    },
       canSubmit() {
           this.error = null
           const s = this.setup
+        if (s.confirm_password.length > 0 && s.confirm_password !== s.password) {
+          this.passnomatch = true
+        } else {
+          this.passnomatch = false
+        }
           if (s.db_connection !== 'sqlite') {
               if (!s.db_host || !s.db_port || !s.db_user || !s.db_password || !s.db_database) {
                   this.disabled = true
                   return
               }
           }
-          if (!s.project || !s.description || !s.domain || !s.username || !s.password || !s.confirm_password) {
+          if (!s.project || !s.domain || !s.username || !s.password || !s.confirm_password) {
               this.disabled = true
               return
           }
@@ -149,13 +215,12 @@
       },
     async saveSetup() {
       this.loading = true
-      const s = this.setup
-      if (s.password !== s.confirm_password) {
-        alert('Passwords do not match!')
-        this.loading = false
-        return
+      let resp
+      try {
+        resp = await Api.setup_save(this.setup)
+      } catch(e) {
+        resp = {status: 'error', error: e.response.data.error}
       }
-      const resp = await Api.setup_save(s)
       if (resp.status === 'error') {
         this.error = resp.error
         this.loading = false

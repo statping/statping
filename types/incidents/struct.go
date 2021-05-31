@@ -10,7 +10,7 @@ type Incident struct {
 	ServiceId   int64             `gorm:"index;column:service" json:"service"`
 	CreatedAt   time.Time         `gorm:"column:created_at" json:"created_at" json:"created_at"`
 	UpdatedAt   time.Time         `gorm:"column:updated_at" json:"updated_at" json:"updated_at"`
-	AllUpdates  []*IncidentUpdate `gorm:"-" json:"updates,omitempty"`
+	Updates     []*IncidentUpdate `gorm:"foreignkey:incident;association_foreignkey:id" json:"updates,omitempty"`
 }
 
 // IncidentUpdate contains updates based on a Incident

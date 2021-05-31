@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/fatih/structs"
 	"github.com/getsentry/sentry-go"
-	"github.com/prometheus/common/log"
 	Logger "github.com/sirupsen/logrus"
 	"github.com/statping/statping/types/null"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -22,34 +21,29 @@ var (
 	LastLines    []*logRow
 	LockLines    sync.Mutex
 	VerboseMode  int
-	version      string
 	allowReports bool
 )
 
 const (
 	logFilePath   = "/logs/statping.log"
-	errorReporter = "https://ddf2784201134d51a20c3440e222cebe@sentry.statping.com/4"
+	errorReporter = "https://518d5b04a52b4130bbbbd5b9e70cb7ba@sentry.statping.com/2"
 )
 
-func SentryInit(v *string, allow bool) {
+func SentryInit(allow bool) {
 	allowReports = allow
-	if v != nil {
-		if *v == "" {
-			*v = "development"
-		}
-		version = *v
-	}
-	goEnv := Getenv("GO_ENV", "production").(string)
-	allowReports := Getenv("ALLOW_REPORTS", false).(bool)
-	if allowReports || allow {
+	goEnv := Params.GetString("GO_ENV")
+	allowReports := Params.GetBool("ALLOW_REPORTS")
+	if allow || goEnv == "test" || allowReports {
 		if err := sentry.Init(sentry.ClientOptions{
-			Dsn:         errorReporter,
-			Environment: goEnv,
-			Release:     version,
+			Dsn:              errorReporter,
+			Environment:      goEnv,
+			Release:          Params.GetString("VERSION"),
+			AttachStacktrace: true,
 		}); err != nil {
-			log.Errorln(err)
+			Log.Errorln(err)
 		}
 		Log.Infoln("Error Reporting initiated, thank you!")
+		sentry.CaptureMessage("sentry connected")
 	}
 }
 
@@ -60,10 +54,17 @@ func SentryErr(err error) {
 	sentry.CaptureException(err)
 }
 
+func sentryTags() map[string]string {
+	val := make(map[string]string)
+	val["database"] = Params.GetString("DB_CONN")
+	return val
+}
+
 func SentryLogEntry(entry *Logger.Entry) {
 	e := sentry.NewEvent()
 	e.Message = entry.Message
-	e.Release = version
+	e.Tags = sentryTags()
+	e.Release = Params.GetString("VERSION")
 	e.Contexts = entry.Data
 	sentry.CaptureEvent(e)
 }
@@ -140,33 +141,35 @@ func replaceVal(d interface{}) interface{} {
 // createLog will create the '/logs' directory based on a directory
 func createLog(dir string) error {
 	if !FolderExists(dir + "/logs") {
-		CreateDirectory(dir + "/logs")
+		return CreateDirectory(dir + "/logs")
 	}
 	return nil
 }
 
 // InitLogs will create the '/logs' directory and creates a file '/logs/statup.log' for application logging
 func InitLogs() error {
+	InitEnvs()
+	if Params.GetBool("DISABLE_LOGS") {
+		return nil
+	}
 	if err := createLog(Directory); err != nil {
 		return err
 	}
 	ljLogger = &lumberjack.Logger{
 		Filename:   Directory + logFilePath,
-		MaxSize:    16,
-		MaxBackups: 5,
-		MaxAge:     28,
+		MaxSize:    Params.GetInt("LOGS_MAX_SIZE"),
+		MaxBackups: Params.GetInt("LOGS_MAX_COUNT"),
+		MaxAge:     Params.GetInt("LOGS_MAX_AGE"),
 	}
 
 	mw := io.MultiWriter(os.Stdout, ljLogger)
 	Log.SetOutput(mw)
 
 	Log.SetFormatter(&Logger.TextFormatter{
-		ForceColors:   true,
-		DisableColors: false,
+		ForceColors:   !Params.GetBool("DISABLE_COLORS"),
+		DisableColors: Params.GetBool("DISABLE_COLORS"),
 	})
 	checkVerboseMode()
-
-	LastLines = make([]*logRow, 0)
 	return nil
 }
 
@@ -195,9 +198,11 @@ func checkVerboseMode() {
 
 // CloseLogs will close the log file correctly on shutdown
 func CloseLogs() {
-	ljLogger.Rotate()
-	Log.Writer().Close()
-	ljLogger.Close()
+	if ljLogger != nil {
+		ljLogger.Rotate()
+		Log.Writer().Close()
+		ljLogger.Close()
+	}
 	sentry.Flush(5 * time.Second)
 }
 

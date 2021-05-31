@@ -1,0 +1,546 @@
+name: Master Build
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+
+jobs:
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.15.x
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.18.2
+
+      - name: Set Version
+        run: |
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Install Global Dependencies
+        run: npm install -g yarn sass cross-env mjml
+
+      - name: Download Frontend Dependencies
+        working-directory: ./frontend
+        run: yarn
+
+      - name: Download Go mods
+        run: |
+          go mod download
+          go mod verify
+          make test-deps
+
+      - name: Build Frontend Statping
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
+          MJML_APP: ${{ secrets.MJML_APP }}
+          MJML_PRIVATE: ${{ secrets.MJML_PRIVATE }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: make clean generate compile
+
+      - name: Upload Compiled Frontend (rice-box.go)
+        uses: actions/upload-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
+
+      - name: Configure AWS credentials for Asset uploads
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
+      - name: Upload Static Assets to S3
+        run: |
+          tar -czvf source.tar.gz source/
+          aws s3 cp source.tar.gz s3://assets.statping.com/commit/${{ github.sha }}/
+          rm -rf source.tar.gz
+
+  build:
+    needs: frontend
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [linux]
+        arch: [386, amd64, arm-7, arm-6, arm64]
+        include:
+          - platform: darwin
+            arch: amd64
+          - platform: windows
+            arch: amd64
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
+
+      - name: Configure AWS credentials for Asset uploads
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
+      - name: Add GOBIN to PATH
+        run: |
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Set Linux Build Flags
+        if: matrix.platform == 'linux'
+        run: |
+          echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
+          echo "XGO_TAGS=netgo osusergo linux sqlite_omit_load_extension" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Set Darwin Build Flags
+        if: matrix.platform == 'darwin'
+        run: echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Set Windows Build Flags
+        if: matrix.platform == 'windows'
+        run: |
+          echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
+          echo "XGO_TAGS=netgo osusergo sqlite_omit_load_extension" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Build ${{ matrix.platform }}/${{ matrix.arch }}
+        uses: crazy-max/ghaction-xgo@v1
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
+        with:
+          xgo_version: latest
+          go_version: 1.15.x
+          dest: build
+          prefix: statping
+          targets: ${{ matrix.platform }}/${{ matrix.arch }}
+          v: false
+          x: false
+          pkg: cmd
+          buildmode: pie
+          tags: ${{ env.XGO_TAGS }}
+          ldflags: -s -w -X main.VERSION=${{ env.VERSION }} -X main.COMMIT=${{ env.COMMIT }} ${{ env.BUILD_FLAGS }}
+
+      - name: Compress Linux Builds
+        if: matrix.platform == 'linux'
+        run: |
+          cd build
+          mv statping-linux-${{ matrix.arch }} statping
+          chmod +x statping
+          tar -czvf statping-linux-${{ matrix.arch }}.tar.gz statping
+          rm -rf statping
+          echo "compressed=statping-linux-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
+
+      - name: Compress Windows Builds
+        if: matrix.platform == 'windows'
+        run: |
+          cd build
+          mv statping-windows-4.0-${{ matrix.arch }}.exe statping.exe
+          chmod +x statping.exe
+          zip statping-windows-${{ matrix.arch }}.zip statping.exe
+          rm -rf statping.exe
+          echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
+
+      - name: Compress Darwin Builds
+        if: matrix.platform == 'darwin'
+        run: |
+          cd build
+          mv statping-darwin-10.6-${{ matrix.arch }} statping
+          chmod +x statping
+          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
+          rm -rf statping
+          echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
+
+      - name: Upload Compiled Statping Binary
+        uses: actions/upload-artifact@v1
+        with:
+          name: statping-${{ matrix.platform }}-${{ matrix.arch }}
+          path: ./build
+
+      - name: Upload Releases
+        id: upload-assets
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ env.VERSION }}
+        with:
+          tag_name: v${{ env.VERSION }}
+          draft: true
+          prerelease: true
+          files: build/${{ env.compressed }}
+
+      - name: Upload Compiled Binaries to S3
+        run: |
+          aws s3 cp build/${{ env.compressed }} s3://assets.statping.com/commit/${{ github.sha }}/
+
+  test:
+    needs: frontend
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:10.8
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password123
+          POSTGRES_DB: statping
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: password123
+          MYSQL_DATABASE: statping
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.15.x
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.18.2
+
+      - name: Install Global Dependencies
+        run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
+
+      - name: Setting ENV's
+        run: |
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
+
+      - name: Install Statping
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          make build certs
+          chmod +x statping
+          mv statping $(go env GOPATH)/bin/
+
+      - name: Go Tests
+        run: |
+          go get gotest.tools/gotestsum
+          gotestsum --no-summary=skipped --format testname -- -covermode=count -coverprofile=coverage.out -p=1 ./...
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
+          DB_CONN: sqlite3
+          STATPING_DIR: ${{ github.workspace }}
+          API_SECRET: demopassword123
+          DISABLE_LOGS: false
+          ALLOW_REPORTS: true
+          SAMPLE_DATA: true
+          COVERALLS: ${{ secrets.COVERALLS }}
+          DISCORD_URL: ${{ secrets.DISCORD_URL }}
+          EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          EMAIL_OUTGOING: ${{ secrets.EMAIL_OUTGOING }}
+          EMAIL_SEND_TO: ${{ secrets.EMAIL_SEND_TO }}
+          EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+          MOBILE_ID: ${{ secrets.MOBILE_ID }}
+          MOBILE_NUMBER: ${{ secrets.MOBILE_NUMBER }}
+          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
+          PUSHOVER_API: ${{ secrets.PUSHOVER_API }}
+          SLACK_URL: ${{ secrets.SLACK_URL }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
+          TWILIO_SID: ${{ secrets.TWILIO_SID }}
+          TWILIO_SECRET: ${{ secrets.TWILIO_SECRET }}
+          TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
+          TWILIO_TO: ${{ secrets.TWILIO_TO }}
+          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+          GOTIFY_URL: ${{ secrets.GOTIFY_URL }}
+          GOTIFY_TOKEN: ${{ secrets.GOTIFY_TOKEN }}
+          SNS_TOKEN: ${{ secrets.SNS_TOKEN }}
+          SNS_SECRET: ${{ secrets.SNS_SECRET }}
+          SNS_REGION: ${{ secrets.SNS_REGION }}
+          SNS_TOPIC: ${{ secrets.SNS_TOPIC }}
+
+      - name: Coveralls Testing Coverage
+        run: |
+          go get github.com/mattn/goveralls
+          goveralls -coverprofile=coverage.out -repotoken $COVERALLS
+        env:
+          COVERALLS: ${{ secrets.COVERALLS }}
+
+  test-postman-sqlite:
+    needs: frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.15.x
+
+      - name: Setting ENV's
+        run: |
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
+
+      - name: Install Statping
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          make build
+          chmod +x statping
+          mv statping $(go env GOPATH)/bin/
+      - name: Run Statping
+        run: |
+          API_SECRET=demosecret123 statping --port=8585 > /dev/null &
+          sleep 5
+      - name: Postman SQLite Tests
+        uses: matt-ball/newman-action@master
+        with:
+          apiKey: ${{ secrets.POSTMAN_API }}
+          collection: ./dev/postman.json
+          environment: ./dev/postman_env_sqlite.json
+          timeoutRequest: 30000
+          delayRequest: 600
+
+  test-postman-mysql:
+    needs: frontend
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: password123
+          MYSQL_DATABASE: statping
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.15.x
+
+      - name: Setting ENV's
+        run: |
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
+
+      - name: Install Statping
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
+          MJML_APP: ${{ secrets.MJML_APP }}
+          MJML_PRIVATE: ${{ secrets.MJML_PRIVATE }}
+        run: |
+          make build
+          chmod +x statping
+          mv statping $(go env GOPATH)/bin/
+      - name: Run Statping
+        run: |
+          API_SECRET=demosecret123 statping --port=8585 > /dev/null &
+          sleep 5
+      - name: Postman MySQL Tests
+        uses: matt-ball/newman-action@master
+        with:
+          apiKey: ${{ secrets.POSTMAN_API }}
+          collection: ./dev/postman.json
+          environment: ./dev/postman_env_mysql.json
+          timeoutRequest: 30000
+          delayRequest: 600
+
+  test-postman-postgres:
+    needs: frontend
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:10.8
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password123
+          POSTGRES_DB: statping
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.15.x
+
+      - name: Setting ENV's
+        run: |
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Download Compiled Frontend (rice-box.go)
+        uses: actions/download-artifact@v1
+        with:
+          name: static-rice-box
+          path: ./source
+
+      - name: Install Statping
+        env:
+          VERSION: ${{ env.VERSION }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          make build
+          chmod +x statping
+          mv statping $(go env GOPATH)/bin/
+      - name: Run Statping
+        run: |
+          API_SECRET=demosecret123 statping --port=8585 > /dev/null &
+          sleep 5
+      - name: Postman Postgres Tests
+        uses: matt-ball/newman-action@master
+        with:
+          apiKey: ${{ secrets.POSTMAN_API }}
+          collection: ./dev/postman.json
+          environment: ./dev/postman_env_postgres.json
+          timeoutRequest: 30000
+          delayRequest: 600
+
+  docker-release:
+    needs: [build, test, test-postman-sqlite, test-postman-postgres, test-postman-mysql]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Statping Repo
+        uses: actions/checkout@v2
+
+      - name: Setting ENV's
+        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        id: buildx
+        with:
+          install: true
+
+      - name: Docker Login
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        id: buildx-docker
+        with:
+          path: /tmp/.buildx-cache
+          key: buildx-docker
+          restore-keys: |
+            buildx-docker
+      - name: Docker Build :base
+        run: make buildx-base
+
+      - name: Docker Build :lastest
+        run: make buildx-latest
+
+#  sentry-release:
+#    needs: docker-release
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout Statping Repo
+#        uses: actions/checkout@v2
+#
+#      - name: Setup Sentry CLI
+#        uses: mathrix-education/setup-sentry-cli@master
+#        with:
+#          version: latest
+#          url: ${{ secrets.SENTRY_URL }}
+#          token: ${{ secrets.SENTRY_AUTH_TOKEN }}
+#          organization: statping
+#
+#      - name: Setting ENV's
+#        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+#        shell: bash
+#
+#      - name: Sentry Release
+#        run: make sentry-release
+
+  homebrew-release:
+    needs: docker-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Statping Repo
+        uses: actions/checkout@v2
+
+      - name: Setting ENV's
+        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Update Homebrew Package
+        env:
+          VERSION: ${{ env.VERSION }}
+          TRAVIS_API: ${{ secrets.TRAVIS_API }}
+        run: make publish-homebrew
+
+  slack-update:
+    needs: docker-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Statping Repo
+        uses: actions/checkout@v2
+
+      - name: Setting ENV's
+        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@master
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_URL }}
+          SLACK_CHANNEL: dev
+          SLACK_USERNAME: StatpingDev

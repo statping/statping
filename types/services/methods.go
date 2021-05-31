@@ -2,21 +2,180 @@ package services
 
 import (
 	"crypto/sha1"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/hex"
 	"fmt"
 	"github.com/statping/statping/types"
-	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/types/errors"
+	"github.com/statping/statping/types/failures"
+	"github.com/statping/statping/types/hits"
 	"github.com/statping/statping/utils"
-	"net/url"
+	"io/ioutil"
+	"sort"
 	"strconv"
-	"strings"
 	"time"
 )
 
 const limitedFailures = 25
 
-func (s *Service) Duration() time.Duration {
+func (s *Service) LoadTLSCert() (*tls.Config, error) {
+	if s.TLSCert.String == "" || s.TLSCertKey.String == "" {
+		return nil, nil
+	}
+
+	// load TLS cert and key from file path or PEM format
+	var cert tls.Certificate
+	var err error
+	tlsCertExtension := utils.FileExtension(s.TLSCert.String)
+	tlsCertKeyExtension := utils.FileExtension(s.TLSCertKey.String)
+	if tlsCertExtension == "" && tlsCertKeyExtension == "" {
+		cert, err = tls.X509KeyPair([]byte(s.TLSCert.String), []byte(s.TLSCertKey.String))
+	} else {
+		cert, err = tls.LoadX509KeyPair(s.TLSCert.String, s.TLSCertKey.String)
+	}
+	if err != nil {
+		return nil, errors.Wrap(err, "issue loading X509KeyPair")
+	}
+
+	config := &tls.Config{
+		Certificates:       []tls.Certificate{cert},
+		InsecureSkipVerify: s.TLSCertRoot.String == "",
+	}
+
+	if s.TLSCertRoot.String == "" {
+		return config, nil
+	}
+
+	// create Root CA pool or use Root CA provided
+	rootCA := s.TLSCertRoot.String
+	caCert, err := ioutil.ReadFile(rootCA)
+	if err != nil {
+		return nil, errors.Wrap(err, "issue reading root CA file: "+rootCA)
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+
+	config.RootCAs = caCertPool
+
+	return config, nil
+}
+
+func (s Service) Duration() time.Duration {
 	return time.Duration(s.Interval) * time.Second
+}
+
+// Start will create a channel for the service checking go routine
+func (s Service) UptimeData(hits []*hits.Hit, fails []*failures.Failure) (*UptimeSeries, error) {
+	if len(hits) == 0 {
+		return nil, errors.New("service does not have any successful hits")
+	}
+	// if theres no failures, then its been online 100%,
+	// return a series from created time, to current.
+	if len(fails) == 0 {
+		fistHit := hits[0]
+		duration := utils.Now().Sub(fistHit.CreatedAt).Milliseconds()
+		set := []series{
+			{
+				Start:    fistHit.CreatedAt,
+				End:      utils.Now(),
+				Duration: duration,
+				Online:   true,
+			},
+		}
+		out := &UptimeSeries{
+			Start:    fistHit.CreatedAt,
+			End:      utils.Now(),
+			Uptime:   duration,
+			Downtime: 0,
+			Series:   set,
+		}
+		return out, nil
+	}
+
+	tMap := make(map[time.Time]bool)
+
+	for _, v := range hits {
+		tMap[v.CreatedAt] = true
+	}
+	for _, v := range fails {
+		tMap[v.CreatedAt] = false
+	}
+
+	var servs []ser
+	for t, v := range tMap {
+		s := ser{
+			Time:   t,
+			Online: v,
+		}
+		servs = append(servs, s)
+	}
+	if len(servs) == 0 {
+		return nil, errors.New("error generating uptime data structure")
+	}
+	sort.Sort(ByTime(servs))
+
+	var allTimes []series
+	online := servs[0].Online
+	thisTime := servs[0].Time
+	for i := 0; i < len(servs); i++ {
+		v := servs[i]
+		if v.Online != online {
+			s := series{
+				Start:    thisTime,
+				End:      v.Time,
+				Duration: v.Time.Sub(thisTime).Milliseconds(),
+				Online:   online,
+			}
+			allTimes = append(allTimes, s)
+			thisTime = v.Time
+			online = v.Online
+		}
+	}
+	if len(allTimes) == 0 {
+		return nil, errors.New("error generating uptime series structure")
+	}
+
+	first := servs[0].Time
+	last := servs[len(servs)-1].Time
+	if !s.Online {
+		s := series{
+			Start:    allTimes[len(allTimes)-1].End,
+			End:      utils.Now(),
+			Duration: utils.Now().Sub(last).Milliseconds(),
+			Online:   s.Online,
+		}
+		allTimes = append(allTimes, s)
+	} else {
+		l := allTimes[len(allTimes)-1]
+		s := series{
+			Start:    l.Start,
+			End:      utils.Now(),
+			Duration: utils.Now().Sub(l.Start).Milliseconds(),
+			Online:   true,
+		}
+		allTimes = append(allTimes, s)
+	}
+
+	response := &UptimeSeries{
+		Start:    first,
+		End:      last,
+		Uptime:   addDurations(allTimes, true),
+		Downtime: addDurations(allTimes, false),
+		Series:   allTimes,
+	}
+
+	return response, nil
+}
+
+func addDurations(s []series, on bool) int64 {
+	var dur int64
+	for _, v := range s {
+		if v.Online == on {
+			dur += v.Duration
+		}
+	}
+	return dur
 }
 
 // Start will create a channel for the service checking go routine
@@ -67,78 +226,17 @@ func SelectAllServices(start bool) (map[int64]*Service, error) {
 	if len(allServices) > 0 {
 		return allServices, nil
 	}
-
 	for _, s := range all() {
-
+		s.Failures = s.AllFailures().LastAmount(limitedFailures)
+		s.prevOnline = true
+		// collect initial service stats
+		s.UpdateStats()
+		allServices[s.Id] = s
 		if start {
 			CheckinProcess(s)
 		}
-
-		fails := s.AllFailures().LastAmount(limitedFailures)
-		s.Failures = fails
-
-		for _, c := range s.Checkins() {
-			s.AllCheckins = append(s.AllCheckins, c)
-		}
-
-		// collect initial service stats
-		s.UpdateStats()
-
-		allServices[s.Id] = s
 	}
-
 	return allServices, nil
-}
-
-func ValidateService(line string) (*Service, error) {
-	p, err := url.Parse(line)
-	if err != nil {
-		return nil, err
-	}
-	newService := new(Service)
-
-	domain := p.Host
-	newService.Name = niceDomainName(domain, p.Path)
-	if p.Port() != "" {
-		newService.Port = int(utils.ToInt(p.Port()))
-		if p.Scheme != "http" && p.Scheme != "https" {
-			domain = strings.ReplaceAll(domain, ":"+p.Port(), "")
-		}
-	}
-	newService.Domain = domain
-
-	switch p.Scheme {
-	case "http", "https":
-		newService.Type = "http"
-		newService.Method = "get"
-		if p.Scheme == "https" {
-			newService.VerifySSL = null.NewNullBool(true)
-		}
-	default:
-		newService.Type = p.Scheme
-	}
-	return newService, nil
-}
-
-func niceDomainName(domain string, paths string) string {
-	domain = strings.ReplaceAll(domain, "www.", "")
-	splitPath := strings.Split(paths, "/")
-	if len(splitPath) == 1 {
-		return domain
-	}
-	var addedName []string
-	for k, p := range splitPath {
-		if k > 2 {
-			break
-		}
-		if len(p) > 16 {
-			addedName = append(addedName, p+"...")
-			break
-		} else {
-			addedName = append(addedName, p)
-		}
-	}
-	return domain + strings.Join(addedName, "/")
 }
 
 func (s *Service) UpdateStats() *Service {
@@ -147,15 +245,16 @@ func (s *Service) UpdateStats() *Service {
 	s.AvgResponse = s.AvgTime()
 	s.FailuresLast24Hours = s.FailuresSince(utils.Now().Add(-time.Hour * 24)).Count()
 
+	allFails := s.AllFailures()
 	if s.LastOffline.IsZero() {
-		lastFail := s.AllFailures().Last()
+		lastFail := allFails.Last()
 		if lastFail != nil {
 			s.LastOffline = lastFail.CreatedAt
 		}
 	}
 
 	s.Stats = &Stats{
-		Failures: s.AllFailures().Count(),
+		Failures: allFails.Count(),
 		Hits:     s.AllHits().Count(),
 		FirstHit: s.FirstHit().CreatedAt,
 	}
@@ -163,23 +262,20 @@ func (s *Service) UpdateStats() *Service {
 }
 
 // AvgTime will return the average amount of time for a service to response back successfully
-func (s *Service) AvgTime() int64 {
+func (s Service) AvgTime() int64 {
 	return s.AllHits().Avg()
 }
 
 // OnlineDaysPercent returns the service's uptime percent within last 24 hours
-func (s *Service) OnlineDaysPercent(days int) float32 {
+func (s Service) OnlineDaysPercent(days int) float32 {
 	ago := utils.Now().Add(-time.Duration(days) * types.Day)
 	return s.OnlineSince(ago)
 }
 
 // OnlineSince accepts a time since parameter to return the percent of a service's uptime.
 func (s *Service) OnlineSince(ago time.Time) float32 {
-	failed := s.FailuresSince(ago)
-	failsList := failed.Count()
-
-	total := s.HitsSince(ago)
-	hitsList := total.Count()
+	failsList := s.FailuresSince(ago).Count()
+	hitsList := s.HitsSince(ago).Count()
 
 	if failsList == 0 {
 		s.Online24Hours = 100.00
@@ -201,16 +297,12 @@ func (s *Service) OnlineSince(ago time.Time) float32 {
 	return s.Online24Hours
 }
 
-// Downtime returns the amount of time of a offline service
-func (s *Service) Downtime() time.Duration {
-	hit := s.LastHit()
-	fail := s.AllFailures().Last()
-	if hit == nil {
-		return time.Duration(0)
-	}
-	if fail == nil {
-		return utils.Now().Sub(hit.CreatedAt)
-	}
+// Uptime returns the duration of how long the service was online
+func (s Service) Uptime() utils.Duration {
+	return utils.Duration{Duration: utils.Now().Sub(s.LastOffline)}
+}
 
-	return fail.CreatedAt.Sub(hit.CreatedAt)
+// Downtime returns the duration of how long the service has been offline
+func (s Service) Downtime() utils.Duration {
+	return utils.Duration{Duration: utils.Now().Sub(s.LastOnline)}
 }

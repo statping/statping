@@ -1,87 +1,89 @@
 <template>
-    <div class="container col-md-7 col-sm-12 mt-md-5 bg-light">
+    <div class="container col-md-7 col-sm-12 mt-md-5">
+      <div v-if="!ready" class="row mt-5">
+        <div class="col-12 text-center">
+          <font-awesome-icon icon="circle-notch" size="3x" spin/>
+        </div>
+        <div class="col-12 text-center mt-3 mb-3">
+          <span class="text-muted">Loading Service</span>
+        </div>
+      </div>
 
-        <div class="col-12 mb-4">
-
-            <span class="mt-3 mb-3 text-white d-md-none btn d-block d-md-none" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
-                {{service.online ? "ONLINE" : "OFFLINE"}}
+        <div v-if="ready && service" class="col-12 mb-4">
+            <span class="mt-3 mb-3 text-white d-md-none btn d-block d-md-none text-uppercase" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
+                {{service.online ? $t('online') : $t('offline')}}
             </span>
 
-            <h4 class="mt-2">
+            <span class="mt-2 font-3">
                 <router-link to="/" class="text-black-50 text-decoration-none">{{core.name}}</router-link> - <span class="text-muted">{{service.name}}</span>
-                <span class="badge float-right d-none d-md-block" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
-                    {{service.online ? "ONLINE" : "OFFLINE"}}
+                <span class="badge float-right d-none d-md-block text-uppercase" :class="{'bg-success': service.online, 'bg-danger': !service.online}">
+                    {{service.online ? $t('online') : $t('offline')}}
                 </span>
-            </h4>
+            </span>
 
-            <ServiceTopStats :service="service"/>
+            <ServiceTopStats v-if="loaded" :service="service"/>
 
-            <div v-for="(message, index) in $store.getters.serviceMessages(service.id)" v-if="messageInRange(message)">
-                <MessageBlock :message="message"/>
-            </div>
+            <MessageBlock v-if="loaded" v-for="message in messagesInRange" v-bind:key="message.id" :message="message"/>
 
-            <div class="row mt-5 mb-4">
-                <span class="col-6 font-2">
-                    <flatPickr v-model="start_time" type="text" name="start_time" class="form-control form-control-plaintext" id="start_time" value="0001-01-01T00:00:00Z" required />
-                </span>
-                <span class="col-6 font-2">
-                    <flatPickr v-model="end_time" type="text" name="end_time" class="form-control form-control-plaintext" id="end_time" value="0001-01-01T00:00:00Z" required />
-                </span>
-            </div>
-
-            <div v-if="series" class="service-chart-container">
-                <apexchart width="100%" height="420" type="area" :options="chartOptions" :series="series"></apexchart>
-            </div>
-
-            <div class="service-chart-heatmap mt-5 mb-4">
-                <ServiceHeatmap :service="service"/>
-            </div>
-
-            <div v-if="load_timedata" class="col-12">
-
-                <apexchart width="100%" height="420" type="rangeBar" :options="timeRangeOptions" :series="rangeSeries"></apexchart>
-            </div>
-
-            <nav v-if="service.failures" class="nav nav-pills flex-column flex-sm-row mt-3" id="service_tabs">
-                <a @click="tab='failures'" class="flex-sm-fill text-sm-center nav-link active">Failures</a>
-                <a @click="tab='incidents'" class="flex-sm-fill text-sm-center nav-link">Incidents</a>
-                <a @click="tab='checkins'" v-if="$store.getters.token" class="flex-sm-fill text-sm-center nav-link">Checkins</a>
-                <a @click="tab='response'" v-if="$store.getters.token" class="flex-sm-fill text-sm-center nav-link">Response</a>
-            </nav>
-
-
-            <div v-if="service.failures" class="tab-content">
-                <div class="tab-pane fade active show">
-                    <ServiceFailures :service="service"/>
-                </div>
-
-                <div class="tab-pane fade" :class="{active: tab === 'incidents'}" id="incidents">
-
-                </div>
-
-                <div class="tab-pane fade" :class="{show: tab === 'checkins'}" id="checkins">
-
-                    <div class="card">
-                        <div class="card-body">
-                            <Checkin :service="service"/>
+            <div class="card text-black-50 bg-white mt-3">
+                <div class="card-header text-capitalize">Timeframe</div>
+                <div class="card-body pb-4">
+                    <div class="row">
+                        <div class="col">
+                            <flatPickr :disabled="!loaded" @on-change="reload" v-model="start_time" :config="{ wrap: true, allowInput: true, enableTime: true, dateFormat: 'Z', altInput: true, altFormat: 'Y-m-d h:i K', maxDate: this.endOf('today') }" type="text" class="form-control text-left" required />
+                            <small class="d-block">From {{this.format(new Date(start_time))}}</small>
+                        </div>
+                        <div class="col">
+                            <flatPickr :disabled="!loaded" @on-change="reload" v-model="end_time" :config="{ wrap: true, allowInput: true, enableTime: true, dateFormat: 'Z', altInput: true, altFormat: 'Y-m-d h:i K', maxDate: this.endOf('today') }" type="text" class="form-control text-left" required />
+                            <small class="d-block">To {{this.format(new Date(end_time))}}</small>
+                        </div>
+                        <div class="col">
+                            <select :disabled="!loaded" @change="chartHits(service)" v-model="group" class="form-control">
+                                <option value="1m">1 Minute</option>
+                                <option value="5m">5 Minutes</option>
+                                <option value="15m">15 Minute</option>
+                                <option value="30m">30 Minutes</option>
+                                <option value="1h">1 Hour</option>
+                                <option value="3h">3 Hours</option>
+                                <option value="6h">6 Hours</option>
+                                <option value="12h">12 Hours</option>
+                                <option value="24h">1 Day</option>
+                                <option value="168h">7 Days</option>
+                                <option value="360h">15 Days</option>
+                            </select>
+                            <small class="d-block d-md-none d-block">Increment Timeframe</small>
                         </div>
                     </div>
 
                 </div>
+            </div>
 
-                <div class="tab-pane fade" :class="{show: tab === 'response'}" id="response">
-                    <div class="col-12 mt-4">
-                        <h3>Last Response</h3>
-                        <textarea rows="8" class="form-control" readonly>invalid route</textarea>
-                        <div class="form-group row mt-2">
-                            <label for="last_status_code" class="col-sm-3 col-form-label">HTTP Status Code</label>
-                            <div class="col-sm-2">
-                                <input type="text" id="last_status_code" class="form-control" value="200" readonly>
-                            </div>
-                        </div>
+            <div class="card text-black-50 bg-white mt-3 mb-3">
+                <div class="card-header text-capitalize">Service Latency</div>
+                <div v-if="loaded" class="card-body">
+                    <div class="row">
+                      <AdvancedChart :group="group" :updated="updated_chart" :start="start_time.toString()" :end="end_time.toString()" :service="service"/>
+                    </div>
+                  <div>
+                    <FailuresBarChart :service="service" :start="start_time.toString()" :end="end_time.toString()" :group="group"/>
+                  </div>
+
+                </div>
+              <div v-else class="row mt-3 mb-3">
+                <div class="col-12 text-center">
+                  <font-awesome-icon icon="circle-notch" size="3x" spin/>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="card text-black-50 bg-white mb-3">
+                <div class="card-header text-capitalize">Service Failures</div>
+                <div class="card-body">
+                    <div class="service-chart-heatmap mt-5 mb-4">
+                        <ServiceHeatmap :service="service"/>
                     </div>
                 </div>
-
             </div>
 
         </div>
@@ -91,14 +93,17 @@
 
 <script>
   import Api from "../API"
-  import MessageBlock from '../components/Index/MessageBlock';
-  import ServiceFailures from '../components/Service/ServiceFailures';
-  import Checkin from "../forms/Checkin";
-  import ServiceHeatmap from "@/components/Service/ServiceHeatmap";
-  import ServiceTopStats from "@/components/Service/ServiceTopStats";
-  import store from '../store'
+  const MessageBlock = () => import(/* webpackChunkName: "index" */ '@/components/Index/MessageBlock')
+  const ServiceFailures = () => import(/* webpackChunkName: "service" */ '@/components/Service/ServiceFailures')
+  const Checkin = () => import(/* webpackChunkName: "dashboard" */ '@/forms/Checkin')
+  const ServiceHeatmap = () => import(/* webpackChunkName: "service" */ '@/components/Service/ServiceHeatmap')
+  const ServiceTopStats = () => import(/* webpackChunkName: "service" */ '@/components/Service/ServiceTopStats')
+  const AdvancedChart = () => import(/* webpackChunkName: "service" */ '@/components/Service/AdvancedChart')
+  const FailuresBarChart = () => import(/* webpackChunkName: "service" */ '@/components/Service/FailuresBarChart')
+
   import flatPickr from 'vue-flatpickr-component';
   import 'flatpickr/dist/flatpickr.css';
+
   const timeoptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
 
   const axisOptions = {
@@ -128,6 +133,8 @@
 export default {
     name: 'Service',
     components: {
+      FailuresBarChart,
+      AdvancedChart,
         ServiceTopStats,
         ServiceHeatmap,
         ServiceFailures,
@@ -137,16 +144,19 @@ export default {
     },
     data() {
         return {
-            id: 0,
+            id: null,
             tab: "failures",
             authenticated: false,
-            ready: true,
+            ready: false,
+            group: "15m",
             data: null,
+            uptime_data: null,
+            loaded: false,
             messages: [],
             failures: [],
-            start_time: this.nowSubtract(84600 * 30),
-            end_time: new Date(),
-            timedata: [],
+            start_time: this.beginningOf('day', this.nowSubtract(259200 * 3)),
+            end_time: this.endOf('today'),
+            timedata: null,
             load_timedata: false,
             dailyRangeOpts: {
                 chart: {
@@ -157,8 +167,22 @@ export default {
             },
           timeRangeOptions: {
             chart: {
-              height: 200,
-              type: 'rangeBar'
+              id: 'uptime',
+              height: 220,
+              width: '100%',
+              type: 'rangeBar',
+              toolbar: {
+                show: false
+              },
+              zoom: {
+                enabled: false
+              }
+            },
+            selection: {
+              enabled: true
+            },
+            zoom: {
+              enabled: true
             },
             plotOptions: {
               bar: {
@@ -170,22 +194,16 @@ export default {
               }
             },
             dataLabels: {
-              enabled: true,
-              formatter: (val, opts) => {
-                var label = opts.w.globals.labels[opts.dataPointIndex]
-                var a = this.parseISO(val[0])
-                var b = this.parseISO(val[1])
-                return label
-              },
-              style: {
-                colors: ['#f3f4f5', '#fff']
-              }
+              enabled: false
+            },
+            tooltip: {
+              enabled: false,
             },
             xaxis: {
               type: 'datetime'
             },
             yaxis: {
-              show: false
+              show: true,
             },
             grid: {
               row: {
@@ -195,12 +213,32 @@ export default {
             }
           },
             chartOptions: {
+              noData: {
+                text: "Loading...",
+                align: 'center',
+                verticalAlign: 'middle',
+                offsetX: 0,
+                offsetY: -20,
+                style: {
+                  color: "#bababa",
+                  fontSize: '27px'
+                }
+              },
                 chart: {
+                  id: 'mainchart',
                     events: {
-                        beforeZoom: async (chartContext, { xaxis }) => {
+                      dataPointSelection: (event, chartContext, config) => {
+                        window.console.log('slect')
+                        window.console.log(event)
+                      },
+                      updated: (chartContext, config) => {
+                        window.console.log('updated chart')
+                      },
+                        beforeZoom: (chartContext, { xaxis }) => {
                             const start = (xaxis.min / 1000).toFixed(0)
                             const end = (xaxis.max / 1000).toFixed(0)
-                            await this.chartHits(start, end, "10m")
+                          this.start_time = this.fromUnix(start)
+                          this.end_time = this.fromUnix(end)
                             return {
                                 xaxis: {
                                     min: this.fromUnix(start),
@@ -208,6 +246,9 @@ export default {
                                 }
                             }
                         },
+                      scrolled: (chartContext, { xaxis }) => {
+                        window.console.log(xaxis)
+                      },
                     },
                     height: 500,
                     width: "100%",
@@ -229,24 +270,32 @@ export default {
                     },
                     stroke: {
                         show: false,
-                        curve: 'smooth',
+                        curve: 'stepline',
                         lineCap: 'butt',
                     },
                 },
-                xaxis: {
-                    type: "datetime",
-                    labels: {
-                        show: true
-                    },
-                    tooltip: {
-                        enabled: true
-                    }
+              xaxis: {
+                type: "datetime",
+                labels: {
+                  format: 'MM yyyy'
                 },
-                yaxis: {
-                    labels: {
-                        show: true
-                    },
+                tooltip: {
+                  enabled: false
+                }
+              },
+              yaxis: {
+                labels: {
+                  show: true
                 },
+              },
+              markers: {
+                size: 0,
+                strokeWidth: 0,
+                hover: {
+                  size: undefined,
+                  sizeOffset: 0
+                }
+              },
                 tooltip: {
                     theme: false,
                     enabled: true,
@@ -254,12 +303,12 @@ export default {
                         let ts = w.globals.seriesX[seriesIndex][dataPointIndex];
                         const dt = new Date(ts).toLocaleDateString("en-us", timeoptions)
                         let val = series[seriesIndex][dataPointIndex];
-                        if (val >= 1000) {
-                            val = (val * 0.1).toFixed(0) + " milliseconds"
+                        if (val >= 10000) {
+                            val = Math.round(val / 1000) + " ms"
                         } else {
-                            val = (val * 0.01).toFixed(0) + " microseconds"
+                            val = val + " μs"
                         }
-                        return `<div class="chartmarker"><span>Average Response Time: </span><span class="font-3">${val}</span><span>${dt}</span></div>`
+                        return `<div class="chartmarker"><span>Response Time: </span><span class="font-3">${val}</span><span>${dt}</span></div>`
                     },
                     fixed: {
                         enabled: true,
@@ -268,9 +317,8 @@ export default {
                         offsetY: 40,
                     },
                     x: {
-                        show: false,
-                        format: 'dd MMM',
-                        formatter: undefined,
+                        show: true,
+
                     },
                     y: {
                         formatter: undefined,
@@ -313,106 +361,108 @@ export default {
             },
         }
     },
+    watch: {
+      '$route': 'fetchData'
+    },
     computed: {
-      service () {
-        return this.$store.getters.serviceByAll(this.id)
-      },
       core () {
         return this.$store.getters.core
       },
-      uptime_data() {
-          const data = this.timedata.series.filter(g => g.online)
-          const offData = this.timedata.series.filter(g => !g.online)
-          let arr = [];
-          data.forEach((d) => {
-            arr.push({
-              name: "Online", data: {
-                x: 'Online',
-                y: [
-                  new Date(d.start).getTime(),
-                  new Date(d.end).getTime()
-                ],
-                fillColor: '#0db407'
-              }
-            })
-          })
-          offData.forEach((d) => {
-            arr.push({
-              name: "offline", data: {
-                x: 'Offline',
-                y: [
-                  new Date(d.start).getTime(),
-                  new Date(d.end).getTime()
-                ],
-                fillColor: '#b40707'
-              }
-            })
-          })
-          return arr
+      service() {
+        return this.$store.getters.serviceByAll(this.$route.params.id)
       },
-      rangeSeries() {
-        return [{data: this.time_chart_data}]
+      params () {
+        return {start: this.toUnix(new Date(this.start_time)), end: this.toUnix(new Date(this.end_time))}
+      },
+      uptimeSeries () {
+        return this.timedata.series
+      },
+      mainChart () {
+        return [{
+          name: this.service.name,
+          ...this.convertToChartData(this.data)
+        }]
+      },
+      messagesInRange() {
+        return this.$store.getters.serviceMessages(this.service.id).filter(m => this.inRange(m))
       },
     },
-    watch: {
-      service: function(n, o) {
-        this.chartHits()
-        this.fetchUptime()
-      },
-      load_timedata: function(n, o) {
-        this.chartHits()
-      }
+    created() {
+      this.fetchData()
     },
-    async created() {
-        this.id = this.$route.params.id;
+    mounted() {
+      this.fetchData()
     },
     methods: {
-      async fetchUptime() {
-         this.timedata = await Api.service_uptime(this.id)
-         this.load_timedata = true
-        },
-        async get() {
-            const s = this.$store.getters.serviceByAll(this.id)
-            window.console.log("service: ", s)
-            this.getService(this.service)
-            this.messages = this.$store.getters.serviceMessages(this.service.id)
-        },
-        messageInRange(message) {
-            const start = this.isBetween(new Date(), message.start_on)
-            const end = this.isBetween(message.end_on, new Date())
-            return start && end
-        },
-        async getService() {
-            await this.chartHits()
-            await this.serviceFailures()
-        },
-        async serviceFailures() {
-            let tt = this.startEndTimes()
-            this.failures = await Api.service_failures(this.service.id, tt.start, tt.end)
-        },
-        async chartHits(start=0, end=99999999999, group="30m") {
-            let tt = {};
-            if (start === 0) {
-                tt = this.startEndTimes()
-            } else {
-                tt = {start, end}
-            }
-
-            this.data = await Api.service_hits(this.service.id, tt.start, tt.end, group, false)
-            if (this.data.length === 0 && group !== "1h") {
-                await this.chartHits("1h")
-            }
-            this.series = [{
-                name: this.service.name,
-                ...this.convertToChartData(this.data)
-            }]
-            this.ready = true
-        },
-        startEndTimes() {
-            const start = this.toUnix(this.service.stats.first_hit)
-            const end = this.toUnix(new Date())
-            return {start, end}
+      fetchData () {
+        if (!this.$route.params.id) {
+          this.ready = false
+          return
         }
+        this.reload()
+        this.ready = true
+        this.loaded = true
+      },
+      async reload() {
+        if (!this.ready || !this.service) {
+          return
+        }
+        await this.chartHits()
+        await this.chartFailures()
+        await this.fetchUptime()
+      },
+      async updated_chart(start, end) {
+        this.loaded = false
+        this.start_time = start
+        this.end_time = end
+        this.loaded = true
+      },
+      async fetchUptime() {
+        const uptime = await Api.service_uptime(this.service.id, this.params.start, this.params.end)
+        this.uptime_data = this.parse_uptime(uptime)
+      },
+      parse_uptime(timedata) {
+        if (!timedata.series) {
+          return []
+        }
+        const data = timedata.series.filter((g) => g.online) || []
+        const offData = timedata.series.filter((g) => !g.online) || []
+        let arr = [];
+        if (data) {
+          data.forEach((d) => {
+            arr.push({
+              x: 'Online',
+              y: [
+                new Date(d.start).getTime(),
+                new Date(d.end).getTime()
+              ],
+              fillColor: '#0db407'
+            })
+          })
+        }
+        if (offData) {
+          offData.forEach((d) => {
+            arr.push({
+              x: 'Offline',
+              y: [
+                new Date(d.start).getTime(),
+                new Date(d.end).getTime()
+              ],
+              fillColor: '#b40707'
+            })
+          })
+        }
+        return [{data: arr}]
+      },
+      inRange(message) {
+        return this.isBetween(this.now(), message.start_on, message.start_on === message.end_on ? this.maxDate().toISOString() : message.end_on)
+      },
+      async chartHits(start=0, end=99999999999) {
+        this.data = await Api.service_hits(this.service.id, this.params.start, this.params.end, this.group, false)
+      },
+      async chartFailures(start=0, end=99999999999) {
+        this.failures_data = await Api.service_failures_data(this.service.id, this.params.start, this.params.end, this.group, true)
+      }
     }
 }
 </script>

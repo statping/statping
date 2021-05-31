@@ -60,6 +60,9 @@ const webpackConfig = merge(commonConfig, {
     plugins: [
         new webpack.EnvironmentPlugin(environment),
         new CleanWebpackPlugin(),
+        // new webpack.optimize.LimitChunkCountPlugin({
+        //   maxChunks: 1
+        // }),
         new MiniCSSExtractPlugin({
             filename: 'css/[name].css',
             chunkFilename: 'css/[name].css'
@@ -71,7 +74,7 @@ const webpackConfig = merge(commonConfig, {
             threshold: 10240,
             minRatio: 0.8
         }),
-        new webpack.HashedModuleIdsPlugin(),
+        // new webpack.HashedModuleIdsPlugin(),
         new HtmlPlugin({
             template: 'public/base.gohtml',
             filename: 'base.gohtml',

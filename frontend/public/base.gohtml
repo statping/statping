@@ -1,28 +1,52 @@
-{{ define "base" }}
-<!DOCTYPE html>
+{{ define "base" }}<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>{{CoreApp.Name}}</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <meta name="description" content="{{CoreApp.Description}}">
+    <title>{{CoreApp.Name}} - Service Monitoring</title>
+    <meta name="title" content="{{CoreApp.Name}} - Service Monitoring">
+    <meta name="description" content="{{CoreApp.Description}} {{CoreApp.Name}}">
     <base href="{{BasePath}}">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, shrink-to-fit=no">
+    <meta name="description" content="{{CoreApp.Description}}">
+    <link rel="apple-touch-icon" sizes="57x57" href="favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="favicon/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="shortcut icon" href="favicon/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon/favicon.ico" type="image/x-icon">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{CoreApp.Domain}}">
+    <meta property="og:title" content="{{CoreApp.Name}} Service Monitoring">
+    <meta property="og:description" content="{{CoreApp.Description}} {{CoreApp.Name}}">
+    <meta property="og:image" content="favicon/social.png">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{CoreApp.Domain}}">
+    <meta property="twitter:title" content="{{CoreApp.Name}} Service Monitoring">
+    <meta property="twitter:description" content="{{CoreApp.Description}} {{CoreApp.Name}}">
+    <meta property="twitter:image" content="favicon/social.png">
+
     {{if USE_CDN}}
-    <link rel="shortcut icon" type="image/x-icon" href="https://assets.statping.com/favicon.ico">
-    <link rel="stylesheet" href="https://assets.statping.com/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://assets.statping.com/css/base.css">
-    <link rel="stylesheet" href="https://assets.statping.com/font/all.css">
-    {{else}}
-    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-    {{if USING_ASSETS}}
-    <link href="css/vendor.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-    <link href="css/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://assets.statping.com/css/vendor.css">
     {{else}}
     <% _.each(htmlWebpackPlugin.tags.headTags, function(headTag) { %>
     <%= headTag %> <% }) %>
-    {{end}}
     {{end}}
 </head>
 <body>
@@ -36,7 +60,6 @@
 <script src="https://assets.statping.com/js/bundle.js"></script>
 <script src="https://assets.statping.com/js/vendor.chunk.js"></script>
 <script src="https://assets.statping.com/js/polyfill.chunk.js"></script>
-<script src="https://assets.statping.com/js/style.chunk.js"></script>
 <script src="https://assets.statping.com/js/main.chunk.js"></script>
 {{else}}
 <% _.each(htmlWebpackPlugin.tags.bodyTags, function(bodyTag) { %>

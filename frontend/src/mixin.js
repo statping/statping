@@ -1,9 +1,11 @@
 import Vue from "vue";
-const { zonedTimeToUtc, utcToZonedTime, lastDayOfMonth, subSeconds, parse, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance } = require('date-fns')
+const { startOfDay, startOfHour, startOfWeek, endOfMonth, endOfHour, startOfToday, startOfTomorrow, startOfYesterday, endOfYesterday, endOfTomorrow, endOfToday, endOfDay, startOfMonth, lastDayOfMonth, subSeconds, getUnixTime, fromUnixTime, differenceInSeconds, formatDistance, addMonths, addSeconds, isWithinInterval } = require('date-fns')
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import format from 'date-fns/format'
 import parseISO from 'date-fns/parseISO'
-import addSeconds from 'date-fns/addSeconds'
+import isBefore from 'date-fns/isBefore'
+import isAfter from 'date-fns/isAfter'
+import { roundToNearestMinutes } from 'date-fns'
 
 export default Vue.mixin({
   methods: {
@@ -16,46 +18,129 @@ export default Vue.mixin({
     current() {
       return parseISO(new Date())
     },
-      secondsHumanize (val) {
-        const t2 = addSeconds(new Date(0), val)
-          if (val >= 60) {
-              let minword = "minute"
-              if (val >= 120) {
-                  minword = "minutes"
-              }
-              return format(t2, "m '"+minword+"' s 'seconds'")
-          }
-        return format(t2, "s 'seconds'")
-      },
+    startToday() {
+      return startOfToday()
+    },
+    secondsHumanize(val) {
+      return `${val} ${this.$t('second', val)}`
+    },
     utc(val) {
       return new Date.UTC(val)
     },
     ago(t1) {
       return formatDistanceToNow(parseISO(t1))
     },
-      daysInMonth(t1) {
-          return lastDayOfMonth(t1)
-      },
+    daysInMonth(t1) {
+      return lastDayOfMonth(t1)
+    },
     nowSubtract(seconds) {
-      return subSeconds(new Date(), seconds)
+      return subSeconds(this.now(), seconds)
+    },
+    isAfter(date, compare) {
+      return isAfter(date, parseISO(compare))
+    },
+    isBefore(date, compare) {
+      return isBefore(date, parseISO(compare))
     },
     dur(t1, t2) {
       return formatDistance(t1, t2)
     },
+    format(val, type = "EEEE, MMM do h:mma") {
+      return format(val, type)
+    },
     niceDate(val) {
       return format(parseISO(val), "EEEE, MMM do h:mma")
     },
-      parseISO(v) {
-        return parseISO(v)
-      },
+    parseISO(v) {
+      return parseISO(v)
+    },
+    round(minutes) {
+      return roundToNearestMinutes(minutes)
+    },
+    endOf(method, val) {
+      switch (method) {
+        case "hour":
+          return endOfHour(val)
+        case "day":
+          return endOfDay(val)
+        case "today":
+          return endOfToday()
+        case "tomorrow":
+          return endOfTomorrow()
+        case "yesterday":
+          return endOfYesterday()
+        case "month":
+          return endOfMonth(val)
+      }
+      return val
+    },
+    startEndParams(start, end, group) {
+      start = this.beginningOf("hour", start)
+      end = this.endOf("hour", end)
+      return {start: this.toUnix(start), end: this.toUnix(end), group: group}
+    },
+    beginningOf(method, val) {
+      switch (method) {
+        case "hour":
+          return startOfHour(val)
+        case "day":
+          return startOfDay(val)
+        case "today":
+          return startOfToday()
+        case "tomorrow":
+          return startOfTomorrow()
+        case "yesterday":
+          return startOfYesterday()
+        case "week":
+          return startOfWeek(val)
+        case "month":
+          return startOfMonth(val)
+      }
+      return val
+    },
+    isZero(val) {
+      return getUnixTime(parseISO(val)) <= 0
+    },
+    smallText(s) {
+      if (s.online) {
+        return `${this.$t('service_online_check')} ${this.ago(s.last_success)} ago`
+      } else {
+        const last = s.last_failure
+        if (last) {
+          return `Offline, last error: ${last} ${this.ago(last.created_at)}`
+        }
+        if (this.isZero(s.last_success)) {
+          return this.$t('service_never_online')
+        }
+        return `${this.$t('service_offline_time')} ${this.ago(s.last_success)}`
+      }
+    },
+    round_time(frame, val) {
+      switch(frame) {
+        case "15m":
+          return roundToNearestMinutes(val, {nearestTo: 60 * 15})
+        case "30m":
+          return roundToNearestMinutes(val, {nearestTo: 60 * 30})
+        case "1h":
+          return roundToNearestMinutes(val, {nearestTo: 3600})
+        case "3h":
+          return roundToNearestMinutes(val, {nearestTo: 3600 * 3})
+        case "6h":
+          return roundToNearestMinutes(val, {nearestTo: 3600 * 6})
+        case "12h":
+          return roundToNearestMinutes(val, {nearestTo: 3600 * 12})
+        case "24h":
+          return roundToNearestMinutes(val, {nearestTo: 3600 * 24})
+      }
+    },
     toUnix(val) {
       return getUnixTime(val)
     },
     fromUnix(val) {
       return fromUnixTime(val)
     },
-    isBetween(t1, t2) {
-      return differenceInSeconds(parseISO(t1), parseISO(t2)) >= 0
+    isBetween(t, start, end) {
+      return isWithinInterval(t, {start: parseISO(start), end: parseISO(end)})
     },
     hour() {
       return 3600
@@ -63,31 +148,32 @@ export default Vue.mixin({
     day() {
       return 3600 * 24
     },
+    maxDate() {
+      return new Date(8640000000000000)
+    },
     copy(txt) {
       this.$copyText(txt).then(function (e) {
-        alert('Copied: \n'+txt)
-        console.log(e)
+        alert('Copied: \n' + txt)
       });
     },
     serviceLink(service) {
-      if (!service) {
-        return ""
+      if (service.permalink) {
+        service = this.$store.getters.serviceById(service.permalink)
       }
-      if (!service.id) {
-        service = this.$store.getters.serviceById(service)
+      if (service === undefined || this.isEmptyObject(service)) {
+        return `/service/0`
       }
       let link = service.permalink ? service.permalink : service.id
       return `/service/${link}`
+    },
+    isEmptyObject(obj) {
+      return Object.keys(obj).length === 0 && obj.constructor === Object
     },
     isInt(n) {
       return n % 1 === 0;
     },
     isAdmin() {
       return this.$store.state.admin
-    },
-    loggedIn() {
-      const core = this.$store.getters.core
-      return core.logged_in === true
     },
     iconName(name) {
       switch (name) {
@@ -101,6 +187,10 @@ export default Vue.mixin({
           return "bell"
         case "fas fa-mobile-alt":
           return "mobile"
+        case "fa dot-circle":
+          return ["fa", "dot-circle"]
+        case "fas envelope-square":
+          return ["fas", "envelope-square"]
         case "fab fa-slack":
           return ["fab", "slack-hash"]
         case "fab fa-telegram-plane":
@@ -119,7 +209,14 @@ export default Vue.mixin({
           return "bars"
       }
     },
-    convertToChartData(data = [], multiplier=1, asInt=false) {
+    toBarData(data = []) {
+      let newSet = [];
+      data.forEach((f) => {
+        newSet.push([this.toUnix(this.parseISO(f.timeframe)), f.amount])
+      })
+      return newSet
+    },
+    convertToChartData(data = [], multiplier = 1, asInt = false) {
       if (!data) {
         return {data: []}
       }
@@ -136,17 +233,29 @@ export default Vue.mixin({
       })
       return {data: newSet}
     },
-      humanTime(val) {
-        if (val >= 10000) {
-            return Math.floor(val / 10000) + "ms"
-        }
-          return Math.floor(val / 1000) + "μs"
-      },
-    lastDayOfMonth(month) {
-      return new Date(Date.UTC(new Date().getUTCFullYear(), month + 1, 0))
+    humanTime(val) {
+      if (val >= 1000) {
+        return Math.round(val / 1000) + " ms"
+      }
+      return val + " μs"
     },
-    firstDayOfMonth(month) {
-      return new Date(Date.UTC(new Date().getUTCFullYear(), month, 1)).getUTCDate()
+    humanTimeNum(val) {
+      if (val >= 1000) {
+        return Math.round(val / 1000)
+      }
+      return val
+    },
+    firstDayOfMonth(date) {
+      return startOfMonth(date)
+    },
+    lastDayOfMonth(month) {
+      return lastDayOfMonth(month)
+    },
+    addMonths(date, amount) {
+      return addMonths(date, amount)
+    },
+    addSeconds(date, amount) {
+      return addSeconds(date, amount)
     }
   }
 });

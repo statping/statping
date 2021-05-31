@@ -3,6 +3,7 @@ package utils
 import (
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 // DeleteDirectory will attempt to delete a directory and all contents inside
@@ -24,10 +25,19 @@ func CreateDirectory(directory string) error {
 
 // FolderExists will return true if the folder exists
 func FolderExists(folder string) bool {
-	if _, err := os.Stat(folder); os.IsExist(err) {
+	if stat, err := os.Stat(folder); err == nil && stat.IsDir() {
 		return true
 	}
 	return false
+}
+
+// FileExtension returns the file extension based on a file path
+func FileExtension(path string) string {
+	s := strings.Split(path, ".")
+	if len(s) == 0 {
+		return ""
+	}
+	return s[len(s)-1]
 }
 
 // FileExists returns true if a file exists
@@ -45,20 +55,20 @@ func FileExists(name string) bool {
 // DeleteFile will attempt to delete a file
 //		DeleteFile("newfile.json")
 func DeleteFile(file string) error {
-	Log.Debugln("deleting file: " + file)
+	Log.Warn("deleting file: " + file)
 	return os.Remove(file)
 }
 
 // RenameDirectory will attempt rename a directory to a new name
 func RenameDirectory(fromDir string, toDir string) error {
-	Log.Debugln("renaming directory: " + fromDir + "to: " + toDir)
+	Log.Warn("renaming directory: " + fromDir + "to: " + toDir)
 	return os.Rename(fromDir, toDir)
 }
 
 // SaveFile will create a new file with data inside it
 //		SaveFile("newfile.json", []byte('{"data": "success"}')
 func SaveFile(filename string, data []byte) error {
-	err := ioutil.WriteFile(filename, data, os.ModePerm)
+	err := ioutil.WriteFile(filename, data, os.FileMode(0755))
 	return err
 }
 

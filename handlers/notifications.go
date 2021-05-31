@@ -1,8 +1,9 @@
 package handlers
 
 import (
-	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/statping/statping/types/errors"
+	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/services"
 	"net/http"
@@ -11,11 +12,14 @@ import (
 
 func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 	var notifs []notifications.Notification
-	notifiers := services.AllNotifiers()
-	for _, n := range notifiers {
+	for _, n := range services.AllNotifiers() {
 		notif := n.Select()
-		notifer, _ := notifications.Find(notif.Method)
-		notif.UpdateFields(notifer)
+		no, err := notifications.Find(notif.Method)
+		if err != nil {
+			log.Error(err)
+			sendErrorJson(err, w, r)
+		}
+		notif.UpdateFields(no)
 		notifs = append(notifs, *notif)
 	}
 	sort.Sort(notifications.NotificationOrder(notifs))
@@ -24,10 +28,9 @@ func apiNotifiersHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiNotifierGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	notif := services.FindNotifier(vars["notifier"])
-	notifer, err := notifications.Find(notif.Method)
-	if err != nil {
-		sendErrorJson(err, w, r)
+	notifer := services.FindNotifier(vars["notifier"])
+	if notifer == nil {
+		sendErrorJson(errors.New("could not find notifier"), w, r)
 		return
 	}
 	returnJson(notifer, w, r)
@@ -41,38 +44,60 @@ func apiNotifierUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	decoder := json.NewDecoder(r.Body)
-	err = decoder.Decode(&notifer)
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
-	err = notifer.Update()
-	if err != nil {
-		sendErrorJson(err, w, r)
-		return
-	}
-	//notifications.OnSave(notifer.Method)
-	sendJsonAction(vars["notifier"], "update", w, r)
-}
-
-func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	notifer, err := notifications.Find(vars["notifier"])
-	if err != nil {
+	if err := DecodeJSON(r, &notifer); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
 
-	decoder := json.NewDecoder(r.Body)
-	err = decoder.Decode(&notifer)
-	if err != nil {
+	log.Infof("Updating %s Notifier", notifer.Title)
+
+	if err := notifer.Update(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
 
 	notif := services.ReturnNotifier(notifer.Method)
-	out, err := notif.OnTest()
+	if err := notif.Valid(notifer.Values()); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	if _, err := notif.OnSave(); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	sendJsonAction(vars["notifier"], "update", w, r)
+}
+
+type testNotificationReq struct {
+	Method       string                     `json:"method"`
+	Notification notifications.Notification `json:"notifier"`
+}
+
+func testNotificationHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	n := services.FindNotifier(vars["notifier"])
+	if n == nil {
+		sendErrorJson(errors.New("unknown notifier"), w, r)
+		return
+	}
+
+	var req testNotificationReq
+	if err := DecodeJSON(r, &req); err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+
+	notif := services.ReturnNotifier(n.Method)
+
+	var out string
+	var err error
+	if req.Method == "success" {
+		out, err = notif.OnSuccess(services.Example(true))
+	} else {
+		out, err = notif.OnFailure(services.Example(false), failures.Example())
+	}
 
 	resp := &notifierTestResp{
 		Success:  err == nil,

@@ -12,41 +12,36 @@ import (
 )
 
 func TestCreateLog(t *testing.T) {
+	Directory = os.Getenv("STATPING_DIR")
 	err := createLog(Directory)
 	assert.Nil(t, err)
 }
 
+func TestReplaceValue(t *testing.T) {
+	assert.Equal(t, true, replaceVal(true))
+	assert.Equal(t, 42, replaceVal(42))
+	assert.Equal(t, "hello world", replaceVal("hello world"))
+	assert.Equal(t, "5s", replaceVal(5*time.Second))
+}
+
 func TestInitLogs(t *testing.T) {
 	assert.Nil(t, InitLogs())
+	require.NotEmpty(t, Params.GetString("STATPING_DIR"))
+	require.False(t, Params.GetBool("DISABLE_LOGS"))
+
 	Log.Infoln("this is a test")
 	assert.FileExists(t, Directory+"/logs/statping.log")
 }
 
 func TestDir(t *testing.T) {
-	assert.Contains(t, Directory, "github.com/statping/statping")
+	assert.Contains(t, Directory, "statping/statping")
 }
 
 func TestCommand(t *testing.T) {
-	in, out, err := Command("/bin/echo", "\"statping testing\"")
+	t.SkipNow()
+	_, out, err := Command("/bin/echo", "\"statping testing\"")
 	assert.Nil(t, err)
-	assert.Contains(t, in, "statping")
-	assert.Empty(t, out)
-}
-
-func TestReplaceTemplate(t *testing.T) {
-
-	type Object struct {
-		Id      int64
-		String  string
-		Online  bool
-		Example string
-	}
-	example := &Object{
-		1, "this is an example", true, "it should work",
-	}
-
-	result := ReplaceTemplate(`{"id": {{.Object.Id}} }`, example)
-	assert.Equal(t, "{\"id\": 1 }", result)
+	assert.Contains(t, out, "statping")
 }
 
 func TestToInt(t *testing.T) {
@@ -94,9 +89,9 @@ func TestDeleteFile(t *testing.T) {
 
 func TestFormatDuration(t *testing.T) {
 	dur, _ := time.ParseDuration("158s")
-	assert.Equal(t, "3 minutes", FormatDuration(dur))
+	assert.Equal(t, "2 minutes 38 seconds", FormatDuration(dur))
 	dur, _ = time.ParseDuration("-65s")
-	assert.Equal(t, "1 minute", FormatDuration(dur))
+	assert.Equal(t, "-1 minute 5 seconds", FormatDuration(dur))
 	dur, _ = time.ParseDuration("3s")
 	assert.Equal(t, "3 seconds", FormatDuration(dur))
 	dur, _ = time.ParseDuration("48h")
@@ -128,22 +123,28 @@ func ExampleStringInt() {
 	// Output: 42
 }
 
-func TestTimezone(t *testing.T) {
-	zone := float32(-4.0)
-	loc, _ := time.LoadLocation("America/Los_Angeles")
-	timestamp := time.Date(2018, 1, 1, 10, 0, 0, 0, loc)
-	timezone := Timezoner(timestamp, zone)
-	assert.Equal(t, "2018-01-01 10:00:00 -0800 PST", timestamp.String())
-	assert.Equal(t, "2018-01-01 18:00:00 +0000 UTC", timezone.UTC().String())
-}
-
-func TestTimestamp_Ago(t *testing.T) {
-	now := Timestamp(time.Now())
-	assert.Equal(t, "Just now", now.Ago())
-}
-
 func TestHashPassword(t *testing.T) {
-	assert.Equal(t, 60, len(HashPassword("password123")))
+	pass := HashPassword("password123")
+	assert.Equal(t, 60, len(pass))
+	assert.True(t, CheckHash("password123", pass))
+	assert.False(t, CheckHash("wrongpasswd", pass))
+}
+
+func TestHuman(t *testing.T) {
+	assert.Equal(t, "10 seconds", Duration{10 * time.Second}.Human())
+	assert.Equal(t, "1 day 12 hours", Duration{36 * time.Hour}.Human())
+	assert.Equal(t, "45 minutes", Duration{45 * time.Minute}.Human())
+}
+
+func TestSha256Hash(t *testing.T) {
+	assert.Equal(t, "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f", Sha256Hash("password123"))
+}
+
+func TestNotNumbber(t *testing.T) {
+	assert.True(t, NotNumber("notint"))
+	assert.True(t, NotNumber("1293notanint922"))
+	assert.False(t, NotNumber("0"))
+	assert.False(t, NotNumber("5"))
 }
 
 func TestNewSHA1Hash(t *testing.T) {
@@ -183,9 +184,34 @@ func TestHttpRequest(t *testing.T) {
 	// Close the server when test finishes
 	defer server.Close()
 
-	body, resp, err := HttpRequest(server.URL, "GET", "application/json", []string{"aaa=bbbb=", "ccc=ddd"}, nil, 2*time.Second, false)
+	body, resp, err := HttpRequest(server.URL, "GET", "application/json", []string{"aaa=bbbb=", "ccc=ddd"}, nil, 2*time.Second, false, nil)
 
 	assert.Nil(t, err)
 	assert.Equal(t, []byte("OK"), body)
 	assert.Equal(t, resp.StatusCode, 200)
+}
+
+func TestConfigLoad(t *testing.T) {
+	err := InitLogs()
+	require.Nil(t, err)
+	InitEnvs()
+
+	s := Params.GetString
+	b := Params.GetBool
+
+	Params.Set("DB_CONN", "sqlite")
+
+	assert.Equal(t, "sqlite", s("DB_CONN"))
+	assert.Equal(t, Directory, s("STATPING_DIR"))
+	assert.True(t, b("SAMPLE_DATA"))
+	assert.True(t, b("ALLOW_REPORTS"))
+}
+
+func TestPerlin(t *testing.T) {
+	p := NewPerlin(2, 2, 5, Now().UnixNano())
+	require.NotNil(t, p)
+
+	for hi := 1.; hi <= 100.; hi++ {
+		assert.NotZero(t, p.Noise1D(hi/500))
+	}
 }

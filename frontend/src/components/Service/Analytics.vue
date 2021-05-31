@@ -13,9 +13,8 @@
 </template>
 
 <script>
-    import Api from "../../API";
     import MiniSparkLine from './MiniSparkLine';
-    import ServiceSparkLine from './ServiceSparkLine';
+    import ServiceSparkLine from '../Dashboard/ServiceSparkLine';
 
     export default {
         name: 'Analytics',
@@ -42,21 +41,6 @@
                 this.chart = this.convertToChartData(this.func.chart);
             }
       },
-      async latencyYesterday() {
-        const todayTime = await Api.service_hits(this.service.id, this.toUnix(this.nowSubtract(86400)), this.toUnix(new Date()), this.group, false)
-        const fetched = await Api.service_hits(this.service.id, this.start, this.end, this.group, false)
-
-        let todayAmount = this.addAmounts(todayTime)
-        let yesterday = this.addAmounts(fetched)
-
-      },
-      addAmounts(data) {
-        let total = 0
-        data.forEach((f) => {
-          total += parseInt(f.amount)
-        });
-        return total
-      }
     }
 </script>
 

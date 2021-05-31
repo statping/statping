@@ -2,29 +2,33 @@ package notifiers
 
 import (
 	"github.com/statping/statping/database"
+	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/null"
+	"github.com/statping/statping/types/services"
+	"github.com/statping/statping/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"os"
 	"testing"
 	"time"
 )
 
 var (
-	DISCORD_URL    = os.Getenv("DISCORD_URL")
-	discordMessage = `{"content": "The discord notifier on Statping has been tested!"}`
+	DISCORD_URL string
 )
 
-func init() {
-	DISCORD_URL = os.Getenv("DISCORD_URL")
-}
-
 func TestDiscordNotifier(t *testing.T) {
+	t.Parallel()
+	err := utils.InitLogs()
+	require.Nil(t, err)
+	DISCORD_URL = utils.Params.GetString("DISCORD_URL")
+
 	db, err := database.OpenTester()
 	require.Nil(t, err)
 	db.AutoMigrate(&notifications.Notification{})
 	notifications.SetDB(db)
+	core.Example()
 
 	if DISCORD_URL == "" {
 		t.Log("discord notifier testing skipped, missing DISCORD_URL environment variable")
@@ -32,27 +36,32 @@ func TestDiscordNotifier(t *testing.T) {
 	}
 
 	t.Run("Load discord", func(t *testing.T) {
-		Discorder.Host = DISCORD_URL
+		Discorder.Host = null.NewNullString(DISCORD_URL)
 		Discorder.Delay = time.Duration(100 * time.Millisecond)
 		Discorder.Enabled = null.NewNullBool(true)
 
 		Add(Discorder)
 
 		assert.Equal(t, "Hunter Long", Discorder.Author)
-		assert.Equal(t, DISCORD_URL, Discorder.Host)
+		assert.Equal(t, DISCORD_URL, Discorder.Host.String)
 	})
 
 	t.Run("discord Notifier Tester", func(t *testing.T) {
 		assert.True(t, Discorder.CanSend())
 	})
 
+	t.Run("discord Notifier Tester OnSave", func(t *testing.T) {
+		_, err := Discorder.OnSave()
+		assert.Nil(t, err)
+	})
+
 	t.Run("discord OnFailure", func(t *testing.T) {
-		err := Discorder.OnFailure(exampleService, exampleFailure)
+		_, err := Discorder.OnFailure(services.Example(false), failures.Example())
 		assert.Nil(t, err)
 	})
 
 	t.Run("discord OnSuccess", func(t *testing.T) {
-		err := Discorder.OnSuccess(exampleService)
+		_, err := Discorder.OnSuccess(services.Example(true))
 		assert.Nil(t, err)
 	})
 

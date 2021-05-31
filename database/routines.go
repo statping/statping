@@ -16,24 +16,30 @@ var (
 
 // Maintenance will automatically delete old records from 'failures' and 'hits'
 // this function is currently set to delete records 7+ days old every 60 minutes
+// env: REMOVE_AFTER - golang duration parsed time for deleting records older than REMOVE_AFTER duration from now
+// env: CLEANUP_INTERVAL - golang duration parsed time for checking old records routine
 func Maintenance() {
-	dur := utils.GetenvAs("REMOVE_AFTER", "2160h").Duration()
-	interval := utils.GetenvAs("CLEANUP_INTERVAL", "1h").Duration()
+	dur := utils.Params.GetDuration("REMOVE_AFTER")
+	interval := utils.Params.GetDuration("CLEANUP_INTERVAL")
 
 	log.Infof("Database Cleanup runs every %s and will remove records older than %s", interval.String(), dur.String())
 	ticker := interval
 
-	for range time.Tick(ticker) {
-		deleteAfter := utils.Now().Add(-dur)
+	for {
+		select {
+		case <-time.After(ticker):
+			deleteAfter := utils.Now().Add(-dur)
 
-		log.Infof("Deleting failures older than %s", deleteAfter.String())
-		deleteAllSince("failures", deleteAfter)
+			log.Infof("Deleting failures older than %s", deleteAfter.String())
+			deleteAllSince("failures", deleteAfter)
 
-		log.Infof("Deleting hits older than %s", deleteAfter.String())
-		deleteAllSince("hits", deleteAfter)
+			log.Infof("Deleting hits older than %s", deleteAfter.String())
+			deleteAllSince("hits", deleteAfter)
 
-		ticker = interval
+			ticker = interval
+		}
 	}
+
 }
 
 // deleteAllSince will delete a specific table's records based on a time.

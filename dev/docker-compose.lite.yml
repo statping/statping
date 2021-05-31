@@ -4,28 +4,27 @@ services:
 
   statping_dev:
     container_name: statping_dev
-    image: hunterlong/statping:dev
+    image: statping/statping:dev
     restart: on-failure
     volumes:
-      - ./cmd:/go/src/github.com/hunterlong/statping/cmd/
-      - ./core:/go/src/github.com/hunterlong/statping/core/
-      - ./database:/go/src/github.com/hunterlong/statping/database/
-      - ./dev:/go/src/github.com/hunterlong/statping/dev/
-      - ./frontend:/go/src/github.com/hunterlong/statping/frontend/
-      - ./handlers:/go/src/github.com/hunterlong/statping/handlers/
-      - ./notifiers:/go/src/github.com/hunterlong/statping/notifiers/
-      - ./source:/go/src/github.com/hunterlong/statping/source/
-      - ./types:/go/src/github.com/hunterlong/statping/types/
-      - ./utils:/go/src/github.com/hunterlong/statping/utils/
+      - ./cmd:/go/src/github.com/statping/statping/cmd/
+      - ./core:/go/src/github.com/statping/statping/core/
+      - ./database:/go/src/github.com/statping/statping/database/
+      - ./dev:/go/src/github.com/statping/statping/dev/
+      - ./frontend:/go/src/github.com/statping/statping/frontend/
+      - ./handlers:/go/src/github.com/statping/statping/handlers/
+      - ./notifiers:/go/src/github.com/statping/statping/notifiers/
+      - ./source:/go/src/github.com/statping/statping/source/
+      - ./types:/go/src/github.com/statping/statping/types/
+      - ./utils:/go/src/github.com/statping/statping/utils/
     environment:
       DB_CONN: sqlite
-      API_KEY: exampleapikey
       API_SECRET: exampleapisecret
       NAME: Statping
       DOMAIN: http://localhost:8585
       DESCRIPTION: This is a dev environment with auto reloading!
       ADMIN_USER: admin
-      ADMIN_PASS: admin
+      ADMIN_PASSWORD: admin
       PORT: 8585
     ports:
       - 8888:8888

@@ -4,15 +4,16 @@ import (
 	"compress/gzip"
 	"crypto/subtle"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/errors"
+	"github.com/statping/statping/types/metrics"
 	"github.com/statping/statping/utils"
 	"io"
 	"net/http"
-	"net/http/httptest"
 	"strings"
-	"time"
 )
 
 var (
@@ -90,6 +91,9 @@ func sendLog(next http.Handler) http.Handler {
 	})
 }
 
+// scoped is a middleware handler that will remove private fields based on struct tags
+// this will look for the `scope:"user,admin"` tag and remove the JSON field from response
+// if user is not authenticated based on the scope.
 func scoped(handler func(r *http.Request) interface{}) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		data := handler(r)
@@ -119,7 +123,7 @@ func authenticated(handler func(w http.ResponseWriter, r *http.Request), redirec
 }
 
 // readOnly is a middleware function to check if user is a User before running original request
-func readOnly(handler func(w http.ResponseWriter, r *http.Request), redirect bool) http.Handler {
+func readOnly(handler http.Handler, redirect bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !IsReadAuthenticated(r) {
 			if redirect {
@@ -129,36 +133,26 @@ func readOnly(handler func(w http.ResponseWriter, r *http.Request), redirect boo
 			}
 			return
 		}
-		handler(w, r)
+		handler.ServeHTTP(w, r)
 	})
 }
 
-// cached is a middleware function that accepts a duration and content type and will cache the response of the original request
-func cached(duration, contentType string, handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
+// prometheusMiddleware implements mux.MiddlewareFunc.
+func prometheusMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		content := CacheStorage.Get(r.RequestURI)
-		w.Header().Set("Content-Type", contentType)
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		if !core.App.Setup {
-			handler(w, r)
-			return
-		}
-		if content != nil {
-			w.Write(content)
-		} else {
-			c := httptest.NewRecorder()
-			handler(c, r)
-			content := c.Body.Bytes()
-			result := c.Result()
-			if result.StatusCode != 200 {
-				w.WriteHeader(result.StatusCode)
-				w.Write(content)
-				return
-			}
-			w.Write(content)
-			if d, err := time.ParseDuration(duration); err == nil {
-				go CacheStorage.Set(r.RequestURI, content, d)
-			}
-		}
+		route := mux.CurrentRoute(r)
+		path, _ := route.GetPathTemplate()
+		timer := prometheus.NewTimer(metrics.Timer(path))
+		next.ServeHTTP(w, r)
+		timer.ObserveDuration()
 	})
+}
+
+func DecodeJSON(r *http.Request, obj interface{}) error {
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&obj)
+	if err != nil {
+		return errors.DecodeJSON
+	}
+	return r.Body.Close()
 }
