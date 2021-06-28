@@ -97,7 +97,7 @@ func apiCoreHandler(w http.ResponseWriter, r *http.Request) {
 	utils.Params.Set("LANGUAGE", app.Language)
 	app.UseCdn = null.NewNullBool(c.UseCdn.Bool)
 	app.AllowReports = null.NewNullBool(c.AllowReports.Bool)
-	utils.SentryInit(app.AllowReports.Bool)
+
 	if err := app.Update(); err != nil {
 		sendErrorJson(err, w, r)
 		return
@@ -114,27 +114,6 @@ type cacheJson struct {
 	URL        string    `json:"url"`
 	Expiration time.Time `json:"expiration"`
 	Size       int       `json:"size"`
-}
-
-func apiCacheHandler(w http.ResponseWriter, r *http.Request) {
-	var cacheList []cacheJson
-	for k, v := range CacheStorage.List() {
-		cacheList = append(cacheList, cacheJson{
-			URL:        k,
-			Expiration: time.Unix(0, v.Expiration).UTC(),
-			Size:       len(v.Content),
-		})
-	}
-	returnJson(cacheList, w, r)
-}
-
-func apiClearCacheHandler(w http.ResponseWriter, r *http.Request) {
-	CacheStorage.StopRoutine()
-	CacheStorage = NewStorage()
-	output := apiResponse{
-		Status: "success",
-	}
-	returnJson(output, w, r)
 }
 
 func sendErrorJson(err error, w http.ResponseWriter, r *http.Request) {

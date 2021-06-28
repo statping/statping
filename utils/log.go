@@ -26,7 +26,7 @@ var (
 
 const (
 	logFilePath   = "/logs/statping.log"
-	errorReporter = "https://ddf2784201134d51a20c3440e222cebe@sentry.statping.com/4"
+	errorReporter = "https://518d5b04a52b4130bbbbd5b9e70cb7ba@sentry.statping.com/2"
 )
 
 func SentryInit(allow bool) {
@@ -43,6 +43,7 @@ func SentryInit(allow bool) {
 			Log.Errorln(err)
 		}
 		Log.Infoln("Error Reporting initiated, thank you!")
+		sentry.CaptureMessage("sentry connected")
 	}
 }
 
