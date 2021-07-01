@@ -1,3 +1,19 @@
+# 0.90.75 (12-20-2020)
+- Removed favicons and PNG files from assets, now using base64 images
+- Cleaned up some issues with UI
+
+# 0.90.74 (12-18-2020)
+- Fixed issue with favicon/manifest.json throwing 404 errors
+- Modified language go:generate script to slowdown for 429 errors
+- Removed Sentry error logging functionality
+
+# 0.90.73 (12-15-2020)
+- Removed complexity in code for http server
+- Removed internal cache functionality (not useful, needs refactor)
+- Merged PR https://github.com/statping/statping/pull/909
+- Merged PR https://github.com/statping/statping/pull/880
+- Merged PR https://github.com/statping/statping/pull/859
+
 # 0.90.72 (10-28-2020)
 - Fixed issue with graphs becoming stuck on reload
 

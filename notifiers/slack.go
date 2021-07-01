@@ -3,14 +3,15 @@ package notifiers
 import (
 	"bytes"
 	"errors"
+	"strings"
+	"time"
+
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/types/notifier"
 	"github.com/statping/statping/types/null"
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
-	"strings"
-	"time"
 )
 
 var _ notifier.Notifier = (*slack)(nil)

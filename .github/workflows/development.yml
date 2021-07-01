@@ -21,8 +21,8 @@ jobs:
 
       - name: Set Version
         run: |
-          echo "::add-path::$(go env GOPATH)/bin"
-          echo ::set-env name=VERSION::$(cat version.txt)
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
         shell: bash
 
       - name: Install Global Dependencies
@@ -98,26 +98,26 @@ jobs:
 
       - name: Add GOBIN to PATH
         run: |
-          echo ::set-env name=VERSION::$(cat version.txt)
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
         shell: bash
 
       - name: Set Linux Build Flags
         if: matrix.platform == 'linux'
         run: |
-          echo ::set-env name=BUILD_FLAGS::'-extldflags -static'
-          echo ::set-env name=XGO_TAGS::'netgo,osusergo,linux,sqlite_omit_load_extension'
+          echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
+          echo "XGO_TAGS=netgo osusergo linux sqlite_omit_load_extension" >> $GITHUB_ENV
         shell: bash
 
       - name: Set Darwin Build Flags
         if: matrix.platform == 'darwin'
-        run: echo ::set-env name=XGO_TAGS::'netgo,osusergo,darwin,sqlite_omit_load_extension'
+        run: echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
         shell: bash
 
       - name: Set Windows Build Flags
         if: matrix.platform == 'windows'
         run: |
-          echo ::set-env name=BUILD_FLAGS::'-extldflags -static'
-          echo ::set-env name=XGO_TAGS::'netgo,osusergo,sqlite_omit_load_extension'
+          echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
+          echo "XGO_TAGS=netgo osusergo sqlite_omit_load_extension" >> $GITHUB_ENV
         shell: bash
 
       - name: Build ${{ matrix.platform }}/${{ matrix.arch }}
@@ -146,7 +146,7 @@ jobs:
           chmod +x statping
           tar -czvf statping-linux-${{ matrix.arch }}.tar.gz statping
           rm -rf statping
-          echo ::set-env name=compressed::statping-linux-${{ matrix.arch }}.tar.gz
+          echo "compressed=statping-linux-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
 
       - name: Compress Windows Builds
         if: matrix.platform == 'windows'
@@ -156,7 +156,7 @@ jobs:
           chmod +x statping.exe
           zip statping-windows-${{ matrix.arch }}.zip statping.exe
           rm -rf statping.exe
-          echo ::set-env name=compressed::statping-windows-${{ matrix.arch }}.zip
+          echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
 
       - name: Compress Darwin Builds
         if: matrix.platform == 'darwin'
@@ -166,7 +166,7 @@ jobs:
           chmod +x statping
           tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
           rm -rf statping
-          echo ::set-env name=compressed::statping-darwin-${{ matrix.arch }}.tar.gz
+          echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
 
       - name: Upload Compiled Statping Binary
         uses: actions/upload-artifact@v1
@@ -227,9 +227,9 @@ jobs:
 
       - name: Setting ENV's
         run: |
-          echo "::add-path::$(go env GOPATH)/bin"
-          echo "::add-path::/opt/hostedtoolcache/node/12.18.2/x64/bin"
-          echo ::set-env name=VERSION::$(cat version.txt)
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
         shell: bash
 
       - name: Download Compiled Frontend (rice-box.go)
@@ -305,9 +305,9 @@ jobs:
 
       - name: Setting ENV's
         run: |
-          echo "::add-path::$(go env GOPATH)/bin"
-          echo "::add-path::/opt/hostedtoolcache/node/12.18.2/x64/bin"
-          echo ::set-env name=VERSION::$(cat version.txt)
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
         shell: bash
 
       - name: Download Compiled Frontend (rice-box.go)
@@ -359,9 +359,9 @@ jobs:
 
       - name: Setting ENV's
         run: |
-          echo "::add-path::$(go env GOPATH)/bin"
-          echo "::add-path::/opt/hostedtoolcache/node/12.18.2/x64/bin"
-          echo ::set-env name=VERSION::$(cat version.txt)
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
         shell: bash
 
       - name: Download Compiled Frontend (rice-box.go)
@@ -416,9 +416,9 @@ jobs:
 
       - name: Setting ENV's
         run: |
-          echo "::add-path::$(go env GOPATH)/bin"
-          echo "::add-path::/opt/hostedtoolcache/node/12.18.2/x64/bin"
-          echo ::set-env name=VERSION::$(cat version.txt)
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
+          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
         shell: bash
 
       - name: Download Compiled Frontend (rice-box.go)
@@ -456,11 +456,17 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setting ENV's
-        run: echo ::set-env name=VERSION::$(cat version.txt)
+        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
         shell: bash
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
       - name: Set up Docker Buildx
-        uses: crazy-max/ghaction-docker-buildx@v3
+        uses: docker/setup-buildx-action@v1
+        id: buildx
+        with:
+          install: true
 
       - name: Docker Login
         env:
@@ -498,7 +504,7 @@ jobs:
 #          organization: statping
 #
 #      - name: Setting ENV's
-#        run: echo ::set-env name=VERSION::$(cat version.txt)
+#        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
 #        shell: bash
 #
 #      - name: Sentry Release

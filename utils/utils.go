@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"github.com/statping/statping/types/metrics"
 	"io"
 	"io/ioutil"
 	"net"
@@ -16,6 +15,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/statping/statping/types/metrics"
 )
 
 var (
@@ -174,6 +175,8 @@ func HttpRequest(endpoint, method string, contentType interface{}, headers []str
 	// set default headers so end user can overwrite them if needed
 	req.Header.Set("User-Agent", "Statping")
 	req.Header.Set("Statping-Version", Params.GetString("VERSION"))
+	req.Header.Set("Accept", "text/html")
+
 	if contentType != nil {
 		req.Header.Set("Content-Type", contentType.(string))
 	}
