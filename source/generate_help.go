@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-const wikiUrl = "https://github.com/adamboutcher/statping-ng.wiki"
+const wikiUrl = "https://github.com/statping-ng/statping-ng.wiki"
 
 var vue = `<template>
 <div class="col-12">
