@@ -1,5 +1,5 @@
 FROM node:12.18.2-alpine AS frontend
-LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
+LABEL maintainer="Statping-NG (https://github.com/statping-ng)"
 ARG BUILDPLATFORM
 WORKDIR /statping
 COPY ./frontend/package.json .
@@ -11,7 +11,7 @@ RUN yarn build && yarn cache clean
 # Statping Golang BACKEND building from source
 # Creates "/go/bin/statping" and "/usr/local/bin/sass" for copying
 FROM golang:1.14-alpine AS backend
-LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
+LABEL maintainer="Statping-NG (https://github.com/statping-ng)"
 ARG VERSION
 ARG COMMIT
 ARG BUILDPLATFORM
@@ -25,7 +25,7 @@ RUN git clone https://github.com/sass/sassc.git
 RUN . sassc/script/bootstrap && make -C sassc -j4
 # sassc binary: /root/sassc/bin/sassc
 
-WORKDIR /go/src/github.com/statping/statping
+WORKDIR /go/src/github.com/statping-ng/statping-ng
 ADD go.mod go.sum ./
 RUN go mod download
 ENV GO111MODULE on
