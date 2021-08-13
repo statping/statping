@@ -1,4 +1,4 @@
-name: Development Build
+name: QuickDev Build
 on:
   push:
     branches:
