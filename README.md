@@ -1,5 +1,5 @@
 <p align="center">
-<img width="60%" src="https://raw.githubusercontent.com/adamboutcher/statping-ng/dev/frontend/public/img/banner.png">
+<img width="60%" src="https://raw.githubusercontent.com/statping-ng/statping-ng/dev/frontend/public/img/banner.png">
 </p>
 <p align="center">
     <b>Statping-ng - Web and App Status Monitoring for Any Type of Project</b><br>
