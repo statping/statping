@@ -426,7 +426,7 @@ jobs:
           delayRequest: 600
 
   docker-release:
-    needs: [test, build, test-postman-sqlite, test-postman-mysql, test-postman-postgres]
+    needs: [build, test-postman-sqlite, test-postman-mysql, test-postman-postgres]
     runs-on: [self-hosted, linux, aboutcher-hosted]
     steps:
       - name: Checkout Statping Repo
