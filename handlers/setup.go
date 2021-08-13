@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"errors"
-	"github.com/statping/statping/notifiers"
-	"github.com/statping/statping/types/configs"
-	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/types/null"
-	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/utils"
+	"github.com/adamboutcher/statping-ng/notifiers"
+	"github.com/adamboutcher/statping-ng/types/configs"
+	"github.com/adamboutcher/statping-ng/types/core"
+	"github.com/adamboutcher/statping-ng/types/null"
+	"github.com/adamboutcher/statping-ng/types/services"
+	"github.com/adamboutcher/statping-ng/utils"
 	"net/http"
 	"net/url"
 	"strconv"

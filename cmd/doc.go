@@ -23,5 +23,5 @@
 //		docker pull crazy-max/xgo
 //		build-all
 //
-// More info on: https://github.com/statping/statping
+// More info on: https://github.com/adamboutcher/statping-ng
 package main

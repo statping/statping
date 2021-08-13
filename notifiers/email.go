@@ -6,12 +6,12 @@ import (
 
 	"github.com/go-mail/mail"
 	"github.com/statping/emails"
-	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/notifications"
-	"github.com/statping/statping/types/notifier"
-	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/utils"
+	"github.com/adamboutcher/statping-ng/types/core"
+	"github.com/adamboutcher/statping-ng/types/failures"
+	"github.com/adamboutcher/statping-ng/types/notifications"
+	"github.com/adamboutcher/statping-ng/types/notifier"
+	"github.com/adamboutcher/statping-ng/types/services"
+	"github.com/adamboutcher/statping-ng/utils"
 )
 
 var _ notifier.Notifier = (*emailer)(nil)

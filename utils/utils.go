@@ -17,7 +17,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/statping/statping/types/metrics"
+	"github.com/adamboutcher/statping-ng/types/metrics"
 )
 
 var (

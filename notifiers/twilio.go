@@ -9,12 +9,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/notifications"
-	"github.com/statping/statping/types/notifier"
-	"github.com/statping/statping/types/null"
-	"github.com/statping/statping/types/services"
-	"github.com/statping/statping/utils"
+	"github.com/adamboutcher/statping-ng/types/failures"
+	"github.com/adamboutcher/statping-ng/types/notifications"
+	"github.com/adamboutcher/statping-ng/types/notifier"
+	"github.com/adamboutcher/statping-ng/types/null"
+	"github.com/adamboutcher/statping-ng/types/services"
+	"github.com/adamboutcher/statping-ng/utils"
 )
 
 var _ notifier.Notifier = (*twilio)(nil)

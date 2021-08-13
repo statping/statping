@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"github.com/statping/statping/source"
-	"github.com/statping/statping/types/core"
-	"github.com/statping/statping/utils"
+	"github.com/adamboutcher/statping-ng/source"
+	"github.com/adamboutcher/statping-ng/types/core"
+	"github.com/adamboutcher/statping-ng/utils"
 	"html/template"
 	"net/http"
 	"net/url"

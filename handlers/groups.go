@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/statping/statping/types/errors"
-	"github.com/statping/statping/types/groups"
-	"github.com/statping/statping/utils"
+	"github.com/adamboutcher/statping-ng/types/errors"
+	"github.com/adamboutcher/statping-ng/types/groups"
+	"github.com/adamboutcher/statping-ng/utils"
 	"net/http"
 )
 

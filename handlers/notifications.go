@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/statping/statping/types/errors"
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/types/notifications"
-	"github.com/statping/statping/types/services"
+	"github.com/adamboutcher/statping-ng/types/errors"
+	"github.com/adamboutcher/statping-ng/types/failures"
+	"github.com/adamboutcher/statping-ng/types/notifications"
+	"github.com/adamboutcher/statping-ng/types/services"
 	"net/http"
 	"sort"
 )
