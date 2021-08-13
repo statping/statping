@@ -21,4 +21,4 @@
 //		docker run -it -p 8080:8080 statping/statping
 //
 // Enjoy Statping and tell me any issues you might be having on Github. https://github.com/adamboutcher
-package statping-ng
+package statping_ng
