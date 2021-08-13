@@ -11,7 +11,7 @@ An easy to use Status Page for your websites and applications. Statping will aut
 
 Statping-ng aims to be an updated drop-in replacement of statping after development stopped on the original fork.
 
-![GitHub last commit](https://img.shields.io/github/last-commit/statping-ng/statping-ng.svg) [![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/statping-ng/statping-ng) [![](https://images.microbadger.com/badges/image/adamboutcher/statping-ng.svg)](https://microbadger.com/images/statping-ng/statping-ng)
+![GitHub last commit](https://img.shields.io/github/last-commit/statping-ng/statping-ng.svg) [![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/statping-ng/statping-ng)  [![Docker Pulls](https://img.shields.io/docker/pulls/aboutcher/statping-ng.svg)](https://hub.docker.com/r/statpingaboutcher/statping-ng/builds/)
 
 <br><br>
 <img align="left" width="320" height="235" src="https://img.cjx.io/statupsiterun.gif">
@@ -78,9 +78,9 @@ Having a straight forward dashboard makes Statping-ng that much better. Monitor 
 <br><br><br><br>
 
 ## Run on Docker
-Use the [Statping Docker Image](https://hub.docker.com/r/statping/statping) to create a status page in seconds. Checkout the [Docker Wiki](https://github.com/statping-ng/statping-ng/wiki/Docker) to view more details on how to get started using Docker.
+Use the [Statping Docker Image](https://hub.docker.com/r/adamboutcher/statping-ng) to create a status page in seconds. Checkout the [Docker Wiki](https://github.com/statping-ng/statping-ng/wiki/Docker) to view more details on how to get started using Docker.
 ```bash
-docker run -it -p 8080:8080 statping/statping
+docker run -it -p 8080:8080 adamboutcher/statping-ng
 ```
 There are multiple ways to startup a Statping-ng server. You want to make sure Statping-ng is on it's own instance that is not on the same server as the applications you wish to monitor. It doesn't look good when your Status Page goes down.
 <br><br><br><br>
