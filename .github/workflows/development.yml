@@ -186,9 +186,9 @@ jobs:
           prerelease: true
           files: build/${{ env.compressed }}
 
-      - name: Upload Compiled Binaries to S3
-        run: |
-          aws s3 cp build/${{ env.compressed }} s3://assets.statping.com/commit/${{ github.sha }}/
+#      - name: Upload Compiled Binaries to S3
+#        run: |
+#          aws s3 cp build/${{ env.compressed }} s3://assets.statping.com/commit/${{ github.sha }}/
 
   test:
     needs: frontend
