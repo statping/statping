@@ -9,7 +9,7 @@ on:
 jobs:
 
   frontend:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, aboutcherhosted]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
@@ -69,7 +69,7 @@ jobs:
 
   build:
     needs: frontend
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     strategy:
       matrix:
         platform: [linux]
@@ -186,13 +186,13 @@ jobs:
           prerelease: true
           files: build/${{ env.compressed }}
 
-      - name: Upload Compiled Binaries to S3
-        run: |
-          aws s3 cp build/${{ env.compressed }} s3://assets.statping.com/commit/${{ github.sha }}/
+#      - name: Upload Compiled Binaries to S3
+#        run: |
+#          aws s3 cp build/${{ env.compressed }} s3://assets.statping.com/commit/${{ github.sha }}/
 
   test:
     needs: frontend
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     services:
       postgres:
         image: postgres:10.8
@@ -296,7 +296,7 @@ jobs:
 
   test-postman-sqlite:
     needs: frontend
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
@@ -339,7 +339,7 @@ jobs:
 
   test-postman-mysql:
     needs: frontend
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
 
     services:
       mysql:
@@ -395,7 +395,7 @@ jobs:
 
   test-postman-postgres:
     needs: frontend
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
 
     services:
       postgres:
@@ -450,7 +450,7 @@ jobs:
 
   docker-release:
     needs: [build, test, test-postman-sqlite, test-postman-postgres, test-postman-mysql]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     steps:
       - name: Checkout Statping Repo
         uses: actions/checkout@v2
@@ -490,7 +490,7 @@ jobs:
 
 #  sentry-release:
 #    needs: docker-release
-#    runs-on: ubuntu-latest
+#    runs-on: [self-hosted, linux]
 #    steps:
 #      - name: Checkout Statping Repo
 #        uses: actions/checkout@v2
@@ -512,7 +512,7 @@ jobs:
 
   homebrew-release:
     needs: docker-release
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     steps:
       - name: Checkout Statping Repo
         uses: actions/checkout@v2
@@ -529,7 +529,7 @@ jobs:
 
   slack-update:
     needs: docker-release
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     steps:
       - name: Checkout Statping Repo
         uses: actions/checkout@v2
