@@ -1,3 +1,7 @@
+# 0.90.76 (08-13-2021)
+- Forked statping and renamed to statping-ng
+- Branding changes
+
 # 0.90.75 (12-20-2020)
 - Removed favicons and PNG files from assets, now using base64 images
 - Cleaned up some issues with UI

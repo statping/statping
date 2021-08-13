@@ -1,4 +1,4 @@
-module github.com/statping/statping
+module github.com/adamboutcher/statping-ng
 
 // +heroku goVersion go1.14
 go 1.14
