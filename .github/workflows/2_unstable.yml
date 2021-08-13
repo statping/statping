@@ -55,7 +55,7 @@ jobs:
           path: ./source
 
   build:
-    needs: [frontend, test, test-postman-sqlite, test-postman-mysql, test-postman-postgres]
+    needs: [frontend, test-postman-sqlite, test-postman-mysql, test-postman-postgres]
     runs-on: [self-hosted, linux, aboutcher-hosted]
     strategy:
       matrix:
