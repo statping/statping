@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/adamboutcher/statping-ng/types/core"
-	"github.com/adamboutcher/statping-ng/types/groups"
+	"github.com/statping-ng/statping-ng/types/core"
+	"github.com/statping-ng/statping-ng/types/groups"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"

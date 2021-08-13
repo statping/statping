@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/adamboutcher/statping-ng/utils"
+	"github.com/statping-ng/statping-ng/utils"
 	"github.com/tdewolff/minify/v2"
 	"github.com/tdewolff/minify/v2/html"
 )

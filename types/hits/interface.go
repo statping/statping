@@ -2,7 +2,7 @@ package hits
 
 import (
 	"fmt"
-	"github.com/statping/statping/database"
+	"github.com/statping-ng/statping-ng/database"
 	"time"
 )
 

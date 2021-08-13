@@ -4,7 +4,7 @@
 // Install Statping
 //
 // Statping is available for Mac, Linux and Windows 64x. You can download the tar.gz file or use a couple other methods. Download
-// the latest release at https://github.com/adamboutcher/statping-ng/releases/latest or view below. If you're on windows, download
+// the latest release at https://github.com/statping-ng/statping-ng/releases/latest or view below. If you're on windows, download
 // the zip file from the latest releases link.
 //
 //		// MacOS using homebrew

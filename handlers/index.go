@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/adamboutcher/statping-ng/types/core"
-	"github.com/adamboutcher/statping-ng/types/services"
+	"github.com/statping-ng/statping-ng/types/core"
+	"github.com/statping-ng/statping-ng/types/services"
 	"net/http"
 )
 

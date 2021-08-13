@@ -33,7 +33,7 @@ go-build: clean
 lint:
 	go fmt ./...
 	golint ./...
-	impi --local github.com/statping/statping/ --scheme stdLocalThirdParty ./...
+	impi --local github.com/statping-ng/statping-ng/ --scheme stdLocalThirdParty ./...
 	goimports ./...
 
 up:
@@ -337,10 +337,10 @@ sentry-release:
 
 download-bins: clean
 	mkdir build || true
-	wget "https://github.com/statping/statping/releases/download/v${VERSION}/statping-linux-386.tar.gz"
-	wget "https://github.com/statping/statping/releases/download/v${VERSION}/statping-linux-amd64.tar.gz"
-	wget "https://github.com/statping/statping/releases/download/v${VERSION}/statping-linux-arm.tar.gz"
-	wget "https://github.com/statping/statping/releases/download/v${VERSION}/statping-linux-arm64.tar.gz"
+	wget "https://github.com/statping-ng/statping-ng/releases/download/v${VERSION}/statping-linux-386.tar.gz"
+	wget "https://github.com/statping-ng/statping-ng/releases/download/v${VERSION}/statping-linux-amd64.tar.gz"
+	wget "https://github.com/statping-ng/statping-ng/releases/download/v${VERSION}/statping-linux-arm.tar.gz"
+	wget "https://github.com/statping-ng/statping-ng/releases/download/v${VERSION}/statping-linux-arm64.tar.gz"
 	mv statping-linux-386.tar.gz build/
 	mv statping-linux-amd64.tar.gz build/
 	mv statping-linux-arm.tar.gz build/

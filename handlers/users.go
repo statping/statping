@@ -3,9 +3,9 @@ package handlers
 import (
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/adamboutcher/statping-ng/types/errors"
-	"github.com/adamboutcher/statping-ng/types/users"
-	"github.com/adamboutcher/statping-ng/utils"
+	"github.com/statping-ng/statping-ng/types/errors"
+	"github.com/statping-ng/statping-ng/types/users"
+	"github.com/statping-ng/statping-ng/utils"
 	"net/http"
 )
 

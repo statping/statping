@@ -3,14 +3,14 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/adamboutcher/statping-ng/types/errors"
+	"github.com/statping-ng/statping-ng/types/errors"
 	"html/template"
 	"net/http"
 	"path"
 	"time"
 
-	"github.com/adamboutcher/statping-ng/source"
-	"github.com/adamboutcher/statping-ng/utils"
+	"github.com/statping-ng/statping-ng/source"
+	"github.com/statping-ng/statping-ng/utils"
 )
 
 const (

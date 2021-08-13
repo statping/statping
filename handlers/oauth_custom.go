@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/adamboutcher/statping-ng/types/core"
-	"github.com/adamboutcher/statping-ng/types/errors"
+	"github.com/statping-ng/statping-ng/types/core"
+	"github.com/statping-ng/statping-ng/types/errors"
 	"golang.org/x/oauth2"
 	"net/http"
 	"strings"

@@ -72,7 +72,7 @@ context('Settings Tests', () => {
     cy.visit('/dashboard/settings')
     cy.get('#v-pills-style-tab').click()
     cy.get('#pills-vars-tab').click()
-    cy.get('#assets_dir').should('contain', 'github.com/statping/statping/assets')
+    cy.get('#assets_dir').should('contain', 'github.com/statping-ng/statping-ng/assets')
   })
 
   it('should save Local Assets', () => {

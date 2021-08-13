@@ -2,7 +2,7 @@ package configs
 
 import (
 	"fmt"
-	"github.com/statping/statping/utils"
+	"github.com/statping-ng/statping-ng/utils"
 	"os"
 )
 

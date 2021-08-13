@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/adamboutcher/statping-ng/types/core"
-	"github.com/adamboutcher/statping-ng/types/errors"
-	"github.com/adamboutcher/statping-ng/utils"
+	"github.com/statping-ng/statping-ng/types/core"
+	"github.com/statping-ng/statping-ng/types/errors"
+	"github.com/statping-ng/statping-ng/utils"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 	"net/http"

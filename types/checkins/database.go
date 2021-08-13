@@ -1,9 +1,9 @@
 package checkins
 
 import (
-	"github.com/statping/statping/database"
-	"github.com/statping/statping/types/metrics"
-	"github.com/statping/statping/utils"
+	"github.com/statping-ng/statping-ng/database"
+	"github.com/statping-ng/statping-ng/types/metrics"
+	"github.com/statping-ng/statping-ng/utils"
 )
 
 var db database.Database

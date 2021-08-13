@@ -5,10 +5,10 @@ import (
 	"html/template"
 	"time"
 
-	"github.com/adamboutcher/statping-ng/types/core"
-	"github.com/adamboutcher/statping-ng/types/failures"
-	"github.com/adamboutcher/statping-ng/types/services"
-	"github.com/adamboutcher/statping-ng/utils"
+	"github.com/statping-ng/statping-ng/types/core"
+	"github.com/statping-ng/statping-ng/types/failures"
+	"github.com/statping-ng/statping-ng/types/services"
+	"github.com/statping-ng/statping-ng/utils"
 )
 
 //go:generate go run generate.go

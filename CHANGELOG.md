@@ -14,9 +14,9 @@
 # 0.90.73 (12-15-2020)
 - Removed complexity in code for http server
 - Removed internal cache functionality (not useful, needs refactor)
-- Merged PR https://github.com/adamboutcher/statping-ng/pull/909
-- Merged PR https://github.com/adamboutcher/statping-ng/pull/880
-- Merged PR https://github.com/adamboutcher/statping-ng/pull/859
+- Merged PR https://github.com/statping-ng/statping-ng/pull/909
+- Merged PR https://github.com/statping-ng/statping-ng/pull/880
+- Merged PR https://github.com/statping-ng/statping-ng/pull/859
 
 # 0.90.72 (10-28-2020)
 - Fixed issue with graphs becoming stuck on reload
@@ -28,7 +28,7 @@
 - Merged PR #806 - Enhance GRPC Monitoring
 - Merged PR #692 - When login fields are autofilled the sign in button should be enabled
 - Modified multiple Vue forms to use number models for integer inputs
-- Fixed page freeze issue for incidents https://github.com/adamboutcher/statping-ng/issues/842
+- Fixed page freeze issue for incidents https://github.com/statping-ng/statping-ng/issues/842
 - Modified cache routine from 5 seconds to 60 seconds
 
 # 0.90.69 (09-18-2020)
@@ -200,12 +200,12 @@
 
 # 0.90.46 (06-04-2020)
 - Add i18n language translations for frontend
-- Added PR for heatmap https://github.com/adamboutcher/statping-ng/pull/589
+- Added PR for heatmap https://github.com/statping-ng/statping-ng/pull/589
 - Added Statping newsletter option during /setup mode
 - Fix for disabling logs with `DISABLE_LOGS` env
 
 # 0.90.45 (06-01-2020)
-- Merged PR [#612](https://github.com/adamboutcher/statping-ng/pull/612) for edit/create service issue.
+- Merged PR [#612](https://github.com/statping-ng/statping-ng/pull/612) for edit/create service issue.
 
 # 0.90.44 (05-25-2020)
 - Modified Makefile to include "netgo" tag during golang build
@@ -248,8 +248,8 @@
 - Added additional Postman API doc endpoints
 
 # 0.90.34 (04-28-2020)
-- Added missing information to Mail notification ([#472](https://github.com/adamboutcher/statping-ng/issues/472))
-- Added service.yml file to auto create services (https://github.com/adamboutcher/statping-ng/wiki/services.yml)
+- Added missing information to Mail notification ([#472](https://github.com/statping-ng/statping-ng/issues/472))
+- Added service.yml file to auto create services (https://github.com/statping-ng/statping-ng/wiki/services.yml)
 - Removed Core API_KEY, (unused code, use API_SECRET)
 
 # 0.90.33 (04-24-2020)
@@ -354,7 +354,7 @@
 - Organized utils package files
 
 # 0.90.15
-- Fixed /dashboard authentication state to show admin tabs if your an admin. [Issue #438](https://github.com/adamboutcher/statping-ng/issues/438)
+- Fixed /dashboard authentication state to show admin tabs if your an admin. [Issue #438](https://github.com/statping-ng/statping-ng/issues/438)
 - Fixed Cache JS error on Dashboard
 
 # 0.90.14
@@ -368,7 +368,7 @@
 - Updated JS function `convertToChartData` to return an empty chart data if API response was empty.
 - Updated `banner.png` to make a bit smaller, (680px)
 - Fixed method that returns `no such table: services` on startup, check table first.
-- Fixed version from not being added into Core table. [Issue #436](https://github.com/adamboutcher/statping-ng/issues/436)
+- Fixed version from not being added into Core table. [Issue #436](https://github.com/statping-ng/statping-ng/issues/436)
 
 # 0.90.12
 - Fixed MySQL timestamp formatting. (issue #432)

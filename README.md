@@ -3,7 +3,7 @@
 </p>
 <p align="center">
     <b>Statping-ng - Web and App Status Monitoring for Any Type of Project</b><br>
-<a href="https://github.com/adamboutcher/statping-ng/wiki">View Wiki</a> | <a href="https://demo.statping.com">Demo</a> | <a href="https://itunes.apple.com/us/app/apple-store/id1445513219">iPhone</a> | <a href="https://play.google.com/store/apps/details?id=com.statping">Android</a> <br> <a href="http://docs.statping.com">API</a> | <a href="https://github.com/adamboutcher/statping-ng/wiki/Docker">Docker</a> | <a href="https://github.com/adamboutcher/statping-ng/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/adamboutcher/statping-ng/wiki/Mac">Mac</a> | <a href="https://github.com/adamboutcher/statping-ng/wiki/Linux">Linux</a> | <a href="https://github.com/adamboutcher/statping-ng/wiki/Windows">Windows</a>
+<a href="https://github.com/statping-ng/statping-ng/wiki">View Wiki</a> | <a href="https://demo.statping.com">Demo</a> | <a href="https://itunes.apple.com/us/app/apple-store/id1445513219">iPhone</a> | <a href="https://play.google.com/store/apps/details?id=com.statping">Android</a> <br> <a href="http://docs.statping.com">API</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Docker">Docker</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Mac">Mac</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Linux">Linux</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Windows">Windows</a>
 </p>
 
 # Statping-ng - Status Page & Monitoring Server
@@ -25,9 +25,9 @@ Statping-ng strives to remain future-proof and remain intact if a failure is cre
 Statping-ng is built in Go Language so all you need is the precompile binary based on your operating system. You won't need to install anything extra once you have the Statping binary installed. You can even run Statping on a Raspberry Pi.
 <br><br>
 <p align="center">
-    <a href="https://github.com/adamboutcher/statping-ng/wiki/Linux"><img width="5%" src="https://img.cjx.io/linux.png"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <a href="https://github.com/adamboutcher/statping-ng/wiki/Mac"><img width="5%" src="https://img.cjx.io/apple.png"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <a href="https://github.com/adamboutcher/statping-ng/wiki/Windows"><img width="5%" src="https://img.cjx.io/windows.png"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="https://github.com/statping-ng/statping-ng/wiki/Linux"><img width="5%" src="https://img.cjx.io/linux.png"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="https://github.com/statping-ng/statping-ng/wiki/Mac"><img width="5%" src="https://img.cjx.io/apple.png"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="https://github.com/statping-ng/statping-ng/wiki/Windows"><img width="5%" src="https://img.cjx.io/windows.png"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <a href="https://play.google.com/store/apps/details?id=com.statping"><img width="5%" src="https://img.cjx.io/android.png"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <a href="https://itunes.apple.com/us/app/apple-store/id1445513219"><img width="5%" src="https://img.cjx.io/appstore.png"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <a href="https://hub.docker.com/r/statping/statping"><img width="5%" src="https://img.cjx.io/dockericon.png"></a>
@@ -65,7 +65,7 @@ Statping-ng includes email notification via SMTP and Slack integration using [In
 <br><br><br><br>
 
 <h2>User Created Notifiers</h2>
-View the [Plugin Wiki](https://github.com/adamboutcher/statping-ng/wiki/Statping-Plugins) to see detailed information about Golang Plugins. Statping-ng isn't just another Status Page for your applications, it's a framework that allows you to create your own plugins to interact with every element of your status page. [Notifier's](https://github.com/adamboutcher/statping-ng/wiki/Notifiers) can also be create with only 1 golang file.
+View the [Plugin Wiki](https://github.com/statping-ng/statping-ng/wiki/Statping-Plugins) to see detailed information about Golang Plugins. Statping-ng isn't just another Status Page for your applications, it's a framework that allows you to create your own plugins to interact with every element of your status page. [Notifier's](https://github.com/statping-ng/statping-ng/wiki/Notifiers) can also be create with only 1 golang file.
 <br><br><br><br>
 
 <img align="center" width="100%" height="250" src="https://img.cjx.io/statupsc2.png">
@@ -78,7 +78,7 @@ Having a straight forward dashboard makes Statping-ng that much better. Monitor 
 <br><br><br><br>
 
 ## Run on Docker
-Use the [Statping Docker Image](https://hub.docker.com/r/statping/statping) to create a status page in seconds. Checkout the [Docker Wiki](https://github.com/adamboutcher/statping-ng/wiki/Docker) to view more details on how to get started using Docker.
+Use the [Statping Docker Image](https://hub.docker.com/r/statping/statping) to create a status page in seconds. Checkout the [Docker Wiki](https://github.com/statping-ng/statping-ng/wiki/Docker) to view more details on how to get started using Docker.
 ```bash
 docker run -it -p 8080:8080 statping/statping
 ```
@@ -103,7 +103,7 @@ Once your instance has started, it will take a moment to get your SSL certificat
 <br><br><br><br>
 
 ## Prometheus Exporter
-Statping-ng includes a [Prometheus Exporter](https://github.com/adamboutcher/statping-ng/wiki/Prometheus-Exporter) so you can have even more monitoring power with your services. The Prometheus exporter can be seen on `/metrics`, simply create another exporter in your prometheus config. Use your Statping-ng API Secret for the Authorization Bearer header, the `/metrics` URL is dedicated for Prometheus and requires the correct API Secret has `Authorization` header.
+Statping-ng includes a [Prometheus Exporter](https://github.com/statping-ng/statping-ng/wiki/Prometheus-Exporter) so you can have even more monitoring power with your services. The Prometheus exporter can be seen on `/metrics`, simply create another exporter in your prometheus config. Use your Statping-ng API Secret for the Authorization Bearer header, the `/metrics` URL is dedicated for Prometheus and requires the correct API Secret has `Authorization` header.
 ```yaml
 scrape_configs:
   - job_name: 'statping'
@@ -114,9 +114,9 @@ scrape_configs:
 <br><br><br><br>
 
 ## Contributing
-Statping-ng accepts Push Requests to the `dev` branch! Feel free to add your own features and notifiers. You probably want to checkout the [Notifier Wiki](https://github.com/adamboutcher/statping-ng/wiki/Notifiers) to get a better understanding on how to create your own notification methods for failing/successful services. Testing on Statping-ng will test each function on MySQL, Postgres, and SQLite. I recommend running MySQL and Postgres Docker containers for testing. You can find multiple docker-compose files in the dev directory. 
+Statping-ng accepts Push Requests to the `dev` branch! Feel free to add your own features and notifiers. You probably want to checkout the [Notifier Wiki](https://github.com/statping-ng/statping-ng/wiki/Notifiers) to get a better understanding on how to create your own notification methods for failing/successful services. Testing on Statping-ng will test each function on MySQL, Postgres, and SQLite. I recommend running MySQL and Postgres Docker containers for testing. You can find multiple docker-compose files in the dev directory. 
 
-![Dev Release](https://github.com/adamboutcher/statping-ng/workflows/Dev%20Release/badge.svg?branch=dev)
+![Dev Release](https://github.com/statping-ng/statping-ng/workflows/Dev%20Release/badge.svg?branch=dev)
 [![Go Report Card](https://goreportcard.com/badge/github.com/statping/statping)](https://goreportcard.com/report/github.com/statping/statping)
 [![Build Status](https://travis-ci.com/statping/statping.svg?branch=master)](https://travis-ci.com/statping/statping) [![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://dashboard.cypress.io/#/projects/bi8mhr/runs)
 [![Docker Pulls](https://img.shields.io/docker/pulls/statping/statping.svg)](https://hub.docker.com/r/statping/statping/builds/) [![Godoc](https://godoc.org/github.com/statping/statping?status.svg)](https://godoc.org/github.com/statping/statping)[![Coverage Status](https://coveralls.io/repos/github/statping/statping/badge.svg?branch=master)](https://coveralls.io/github/statping/statping?branch=master)

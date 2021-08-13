@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "3c6a7841-0b39-4878-a3a6-1c76832b7679",
 		"name": "Statping",
-		"description": "The Statping API allows you to programmatically access data on your Statping server.\n\nThe easiest way to get started with the API is by running your own Docker or local instance of the Statping server.\n\n<img width=\"100%\" src=\"https://img.cjx.io/statuptokenbalance.gif\">\n\n# Authentication\n\nAn API Key is required to be sent as part of every request to the Statping API, by using the `Authorization` and the API Secret Key as a header.\n\n> If you do not have an API Secret Key, you can find it on the Settings page.\n\nYou can Authenticate by implementing the following...\n- Using the `Authorization` header with API Secret Key\n- Setting `GO_ENV` to `test` to bypass all authentication\n- Adding `?api=<keyhere>` URL Query along with the API Secret Key\n- Adding `?api=<userkey>` URL Query along with the API Key for a user\n- Being logged into Statping as an admin (using JWT sessions/cookies)\n\n> Authentication will create a cookie named `statping_auth`.\n\n# Environment Variables\nStatping includes many environment variables that can give you more control over your instance. Please view the [Environment Variables Wiki](https://github.com/statping/statping/wiki/Environment-Variables) page to view a complete list. Below are a couple important ones...\n- `STATPING_DIR` - Statping's working directory. By default, this will be set to the current working directory. This path will contain the `config.yml` file, `logs`, and `assets` folder. \n- `SASS` - Absolute path to the `sass` executable. By default it will attempt to find `sass` in your `$PATH`. \n\n# Demo\nYou can checkout the Statping Demo instance at [https://demo.statping.com](https://demo.statping.com). All features are available for you to experiment with. The API Secret Key is `demoapisecret123`. Since this instance is public, it will be reset with sample data **every 90 minutes**.\n",
+		"description": "The Statping API allows you to programmatically access data on your Statping server.\n\nThe easiest way to get started with the API is by running your own Docker or local instance of the Statping server.\n\n<img width=\"100%\" src=\"https://img.cjx.io/statuptokenbalance.gif\">\n\n# Authentication\n\nAn API Key is required to be sent as part of every request to the Statping API, by using the `Authorization` and the API Secret Key as a header.\n\n> If you do not have an API Secret Key, you can find it on the Settings page.\n\nYou can Authenticate by implementing the following...\n- Using the `Authorization` header with API Secret Key\n- Setting `GO_ENV` to `test` to bypass all authentication\n- Adding `?api=<keyhere>` URL Query along with the API Secret Key\n- Adding `?api=<userkey>` URL Query along with the API Key for a user\n- Being logged into Statping as an admin (using JWT sessions/cookies)\n\n> Authentication will create a cookie named `statping_auth`.\n\n# Environment Variables\nStatping includes many environment variables that can give you more control over your instance. Please view the [Environment Variables Wiki](https://github.com/statping-ng/statping-ng/wiki/Environment-Variables) page to view a complete list. Below are a couple important ones...\n- `STATPING_DIR` - Statping's working directory. By default, this will be set to the current working directory. This path will contain the `config.yml` file, `logs`, and `assets` folder. \n- `SASS` - Absolute path to the `sass` executable. By default it will attempt to find `sass` in your `$PATH`. \n\n# Demo\nYou can checkout the Statping Demo instance at [https://demo.statping.com](https://demo.statping.com). All features are available for you to experiment with. The API Secret Key is `demoapisecret123`. Since this instance is public, it will be reset with sample data **every 90 minutes**.\n",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -667,7 +667,7 @@
 								"metrics"
 							]
 						},
-						"description": "Point your Prometheus endpoint to `/metrics`, it will include most data from all elements including golang processes. View more information by checking out the [Prometheus Wiki](https://github.com/statping/statping/wiki/Prometheus-Exporter)."
+						"description": "Point your Prometheus endpoint to `/metrics`, it will include most data from all elements including golang processes. View more information by checking out the [Prometheus Wiki](https://github.com/statping-ng/statping-ng/wiki/Prometheus-Exporter)."
 					},
 					"response": [
 						{
@@ -4650,7 +4650,7 @@
 					"response": []
 				}
 			],
-			"description": "Statping contains multiple notifiers that will send you a notification whenever a service become offline, or online. You can create your own 3rd party notifier by reading more on the [Notifiers Wiki](https://github.com/statping/statping/wiki/Notifiers) on the Github repo.",
+			"description": "Statping contains multiple notifiers that will send you a notification whenever a service become offline, or online. You can create your own 3rd party notifier by reading more on the [Notifiers Wiki](https://github.com/statping-ng/statping-ng/wiki/Notifiers) on the Github repo.",
 			"auth": {
 				"type": "bearer",
 				"bearer": [

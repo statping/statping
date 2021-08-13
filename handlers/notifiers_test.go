@@ -3,9 +3,9 @@ package handlers
 import (
 	"testing"
 
-	"github.com/adamboutcher/statping-ng/notifiers"
-	"github.com/adamboutcher/statping-ng/types/services"
-	"github.com/adamboutcher/statping-ng/utils"
+	"github.com/statping-ng/statping-ng/notifiers"
+	"github.com/statping-ng/statping-ng/types/services"
+	"github.com/statping-ng/statping-ng/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/statping/statping/types/null"
-	"github.com/statping/statping/utils"
+	"github.com/statping-ng/statping-ng/types/null"
+	"github.com/statping-ng/statping-ng/utils"
 	"time"
 )
 

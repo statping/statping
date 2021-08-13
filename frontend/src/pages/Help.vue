@@ -82,19 +82,19 @@
 
 <p align="center">
 <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/statping/statping"> 
-<a href="https://github.com/statping/statping/labels/priority"><img src="https://img.shields.io/github/issues/statping/statping/priority?color=blue&label=priority"></a> <a href="https://github.com/statping/statping/labels/bug"><img src="https://img.shields.io/github/issues/statping/statping/bug?color=red&label=bugs"></a> <a href="https://github.com/statping/statping/labels/feature"><img src="https://img.shields.io/github/issues/statping/statping/feature?color=pink&label=features"></a>
+<a href="https://github.com/statping-ng/statping-ng/labels/priority"><img src="https://img.shields.io/github/issues/statping/statping/priority?color=blue&label=priority"></a> <a href="https://github.com/statping-ng/statping-ng/labels/bug"><img src="https://img.shields.io/github/issues/statping/statping/bug?color=red&label=bugs"></a> <a href="https://github.com/statping-ng/statping-ng/labels/feature"><img src="https://img.shields.io/github/issues/statping/statping/feature?color=pink&label=features"></a>
 </p>
 
 <h1>Docker</h1>
 
-<p>View the <a href="https://github.com/statping/statping/wiki/Docker" target="_blank">Docker Wiki</a> for more information and advanced usage.</p>
+<p>View the <a href="https://github.com/statping-ng/statping-ng/wiki/Docker" target="_blank">Docker Wiki</a> for more information and advanced usage.</p>
 
 <pre><code class="language-sh">docker run -it -p 8080:8080 statping/statping
 </code></pre>
 
 <h1>MacOSX</h1>
 
-<p>View the <a href="https://github.com/statping/statping/wiki/Mac" target="_blank">Mac Wiki</a> for more information and other methods.</p>
+<p>View the <a href="https://github.com/statping-ng/statping-ng/wiki/Mac" target="_blank">Mac Wiki</a> for more information and other methods.</p>
 
 <pre><code class="language-sh">brew tap statping/statping
 brew install statping
@@ -102,7 +102,7 @@ brew install statping
 
 <h1>Linux</h1>
 
-<p>View the <a href="https://github.com/statping/statping/wiki/Linux" target="_blank">Linux Wiki</a> for more information and other methods.</p>
+<p>View the <a href="https://github.com/statping-ng/statping-ng/wiki/Linux" target="_blank">Linux Wiki</a> for more information and other methods.</p>
 
 <pre><code class="language-sh">curl -o- -L https://statping.com/install.sh | bash
 </code></pre>
@@ -114,7 +114,7 @@ brew install statping
 
 <h1>Windows</h1>
 
-<p>Download the <a href="https://github.com/statping/statping/releases/latest" target="_blank">latest version</a> as an <code>.exe</code> from <a href="https://github.com/statping/statping/releases/latest" target="_blank">Releases</a>. View the <a href="https://github.com/statping/statping/wiki/Windows" target="_blank">Windows Wiki</a> for more information and other methods.</p>
+<p>Download the <a href="https://github.com/statping-ng/statping-ng/releases/latest" target="_blank">latest version</a> as an <code>.exe</code> from <a href="https://github.com/statping-ng/statping-ng/releases/latest" target="_blank">Releases</a>. View the <a href="https://github.com/statping-ng/statping-ng/wiki/Windows" target="_blank">Windows Wiki</a> for more information and other methods.</p>
 
 <h1>EC2</h1>
 
@@ -139,7 +139,7 @@ brew install statping
 
 <h1>Plugins</h1>
 
-<p>Statping is an awesome Status Page generator that allows you to create your own plugins with Golang Plugins! You don&rsquo;t need to request a PR or even tell us about your plugin. Plugin&rsquo;s are compiled and then send as a binary to the Statping <code>/plugins</code> folder. Test your plugins using the <code>statup test plugin</code> command, checkout the <a href="https://github.com/statping/statping/wiki/Statping-Plugins" target="_blank">Plugin Wiki</a> to see detailed information about creating plugins.</p>
+<p>Statping is an awesome Status Page generator that allows you to create your own plugins with Golang Plugins! You don&rsquo;t need to request a PR or even tell us about your plugin. Plugin&rsquo;s are compiled and then send as a binary to the Statping <code>/plugins</code> folder. Test your plugins using the <code>statup test plugin</code> command, checkout the <a href="https://github.com/statping-ng/statping-ng/wiki/Statping-Plugins" target="_blank">Plugin Wiki</a> to see detailed information about creating plugins.</p>
 
 <h1>No Maintenance</h1>
 
@@ -151,7 +151,7 @@ brew install statping
 
 <h1>Prometheus Exporter</h1>
 
-<p>If you want a deeper view of your applications status, you can use Grafana and Prometheus to graph all types of data about your services. Read more about the <a href="https://github.com/statping/statping/wiki/Prometheus-Exporter" target="_blank">Prometheus Exporter</a></p>
+<p>If you want a deeper view of your applications status, you can use Grafana and Prometheus to graph all types of data about your services. Read more about the <a href="https://github.com/statping-ng/statping-ng/wiki/Prometheus-Exporter" target="_blank">Prometheus Exporter</a></p>
 
 		</div>
 	</div>
@@ -211,7 +211,7 @@ brew install statping
 <p>Statping includes multiple Notifiers to alert you when your services are offline. You can also create your own notifier and send a Push Request to this repo! Creating a custom notifier is pretty easy as long as you follow the requirements. A notifier will automatically be installed into the users Statping database, and form values will save without any hassles. 💃</p>
 
 <p align="center">
-<a href="https://github.com/statping/statping/wiki/Notifier-Example">Example Code</a> | <a href="https://github.com/statping/statping/wiki/Notifier-Events">Events</a> | <a href="https://github.com/statping/statping/tree/master/notifiers">View Notifiers</a></p>
+<a href="https://github.com/statping-ng/statping-ng/wiki/Notifier-Example">Example Code</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Notifier-Events">Events</a> | <a href="https://github.com/statping-ng/statping-ng/tree/master/notifiers">View Notifiers</a></p>
 
 <h2>Notifier Requirements</h2>
 
@@ -224,7 +224,7 @@ brew install statping
 
 <h2>Notifier Interface (required)</h2>
 
-<p>Statping has the <code>Notifier</code> interface which you&rsquo;ll need to include in your notifier. Statping includes many other events/triggers for your notifier, checkout <a href="https://github.com/statping/statping/wiki/Notifier-Events">Notifier Events</a> to see all of them.</p>
+<p>Statping has the <code>Notifier</code> interface which you&rsquo;ll need to include in your notifier. Statping includes many other events/triggers for your notifier, checkout <a href="https://github.com/statping-ng/statping-ng/wiki/Notifier-Events">Notifier Events</a> to see all of them.</p>
 
 <pre><code class="language-go">// Notifier interface is required to create a new Notifier
 type Notifier interface {
@@ -305,7 +305,7 @@ type NotificationForm struct {
 
 <h1>Adding Notifiers</h1>
 
-<p>To add a notifier to the Statping application, simply append your Notifier in the <code>AttachNotifiers()</code> function inside of <a href="https://github.com/statping/statping/blob/master/core/core.go" target="_blank">core/core.go</a>.</p>
+<p>To add a notifier to the Statping application, simply append your Notifier in the <code>AttachNotifiers()</code> function inside of <a href="https://github.com/statping-ng/statping-ng/blob/master/core/core.go" target="_blank">core/core.go</a>.</p>
 
 <pre><code class="language-go">// AttachNotifiers will attach all the notifier's into the system
 func AttachNotifiers() error {
@@ -323,7 +323,7 @@ func AttachNotifiers() error {
 }
 </code></pre>
 
-<h6><a href="https://github.com/statping/statping/blob/master/core/core.go#L183" target="_blank">AttachNotifiers</a></h6>
+<h6><a href="https://github.com/statping-ng/statping-ng/blob/master/core/core.go#L183" target="_blank">AttachNotifiers</a></h6>
 
 		</div>
 	</div>
@@ -339,7 +339,7 @@ func AttachNotifiers() error {
 <p>Updating Statping is very simple, you can choose one of the options below:
 - Run command: <code>statping update</code> (you may need to run sudo depending on your server)
 - or Run command: <code>curl -o- -L https://statping.com/install.sh | bash</code>
-- or download tar.gz file from <a href="https://github.com/statping/statping/releases/latest" target="_blank">Latest Releases</a> and extract for <code>statping</code>.</p>
+- or download tar.gz file from <a href="https://github.com/statping-ng/statping-ng/releases/latest" target="_blank">Latest Releases</a> and extract for <code>statping</code>.</p>
 
 <h2>Blank/White Page</h2>
 
@@ -370,7 +370,7 @@ func AttachNotifiers() error {
 		<h1 class="h1 mt-5 mb-5 text-muted">Bulk Import Services</h1>
 		<span class="spacer"></span>
 		<div v-pre>
-				<p>You can import multiple services when Statping first loads by creating a file named <a href="https://github.com/statping/statping/wiki/services.yml" target="_blank">services.yml</a> in the working directory for Statping. It will insert the new service into the database, and will not be re-added on reboot. All services must be an array under the <code>services:</code> field.</p>
+				<p>You can import multiple services when Statping first loads by creating a file named <a href="https://github.com/statping-ng/statping-ng/wiki/services.yml" target="_blank">services.yml</a> in the working directory for Statping. It will insert the new service into the database, and will not be re-added on reboot. All services must be an array under the <code>services:</code> field.</p>
 
 <h2>Dynamic Yaml</h2>
 
@@ -428,7 +428,7 @@ services:
 		<h1 class="h1 mt-5 mb-5 text-muted">Environment Variables</h1>
 		<span class="spacer"></span>
 		<div v-pre>
-				<p>This page will list all environment variables that could be passed into Statping. You can see all default values in <a href="https://github.com/statping/statping/blob/dev/utils/env.go" target="_blank">utils/env.go</a> file under the <code>InitEnvs()</code> function.</p>
+				<p>This page will list all environment variables that could be passed into Statping. You can see all default values in <a href="https://github.com/statping-ng/statping-ng/blob/dev/utils/env.go" target="_blank">utils/env.go</a> file under the <code>InitEnvs()</code> function.</p>
 
 <h3>Statping Server</h3>
 
@@ -447,7 +447,7 @@ services:
 
 <h3>Automatic SSL Certificate</h3>
 
-<p>With LetsEncrypt enabled, Statping will run through the SSL process and create the SSL certs in the <code>certs</code> folder. Read more about the SSL Process on the <a href="https://github.com/statping/statping/wiki/SSL" target="_blank">SSL Wiki</a>.
+<p>With LetsEncrypt enabled, Statping will run through the SSL process and create the SSL certs in the <code>certs</code> folder. Read more about the SSL Process on the <a href="https://github.com/statping-ng/statping-ng/wiki/SSL" target="_blank">SSL Wiki</a>.
 - <code>LETSENCRYPT_ENABLE</code>        - Set to <strong>true</strong> to have LetsEncrypt enabled. (defaults to false)
 - <code>LETSENCRYPT_HOST</code>          - Domain to generate SSL certificate
 - <code>LETSENCRYPT_EMAIL</code>         - Email address that gets sent with the LetsEncrypt Request
@@ -476,7 +476,7 @@ services:
 <ul>
 <li><p><code>BASE_PATH</code>                 - Set the base URL prefix (set to &lsquo;monitor&rsquo; if URL is domain.com/monitor)</p></li>
 
-<li><p><code>PREFIX</code>                    - A Prefix for each value in <a href="https://github.com/statping/statping/wiki/Prometheus-Exporter" target="_blank">Prometheus /metric exporter</a></p></li>
+<li><p><code>PREFIX</code>                    - A Prefix for each value in <a href="https://github.com/statping-ng/statping-ng/wiki/Prometheus-Exporter" target="_blank">Prometheus /metric exporter</a></p></li>
 
 <li><p><code>HTTP_PROXY</code>                - Use a <a href="https://golang.org/pkg/net/http/#ProxyFromEnvironment" target="_blank">HTTP Proxy</a> for HTTP Requests</p></li>
 
@@ -666,7 +666,7 @@ auto-include many customized parameters to get everything working correctly.</p>
 <h1>Dependencies</h1>
 
 <p>Statping has a couple of required dependencies when testing and compiling the
-binary. The <a href="https://github.com/statping/statping/blob/master/Makefile" target="_blank">Makefile</a>
+binary. The <a href="https://github.com/statping-ng/statping-ng/blob/master/Makefile" target="_blank">Makefile</a>
 will make these tasks a lot easier. Take a look at the Makefile to see what
 commands are running. Run the command below to get setup right away.</p>
 
@@ -748,7 +748,7 @@ changes, and submit a Pull Request with the features/bugs you added or removed.<
 changed by using<a href="https://gitlab.com/l0nax/changelog-go" target="_blank">changelog-go</a>.</p>
 
 <p>If your PR is related to an Issue (ie. on a bug fix or when adding a new notifier)
-don&rsquo;t forget adding the related GitHub Issue ID like this: <code>[#270](https://github.com/statping/statping/issues/270)</code>
+don&rsquo;t forget adding the related GitHub Issue ID like this: <code>[#270](https://github.com/statping-ng/statping-ng/issues/270)</code>
 Check out the example below.
 Adding <em>one</em> changelog entry should be done in a separate Commit - not only
 because this is a good Committing practice, also because it&rsquo;s separated by your
@@ -759,7 +759,7 @@ where all changes of a new Version are documented.</p>
 
 <h6>Example for fixing a bug in the UI</h6>
 
-<pre><code class="language-bash">~] changelog new &quot;Fix zooming out on graph doesn't load additional data ([#270](https://github.com/statping/statping/issues/270))&quot;
+<pre><code class="language-bash">~] changelog new &quot;Fix zooming out on graph doesn't load additional data ([#270](https://github.com/statping-ng/statping-ng/issues/270))&quot;
 [0] New Feature          (Added)
 [1] Bug Fix              (Fixed)
 [2] Feature change       (Changed)
@@ -833,7 +833,7 @@ where all changes of a new Version are documented.</p>
 
 <h1>Attach a SSL Certificate</h1>
 
-<p>When you mount <code>server.crt</code> and <code>server.key</code> to the <code>/app</code> directory, Statping will run a HTTPS server on port 443. Checkout the <a href="https://github.com/statping/statping/wiki/SSL" target="_blank">SSL Wiki</a> documentation to see more information about this.</p>
+<p>When you mount <code>server.crt</code> and <code>server.key</code> to the <code>/app</code> directory, Statping will run a HTTPS server on port 443. Checkout the <a href="https://github.com/statping-ng/statping-ng/wiki/SSL" target="_blank">SSL Wiki</a> documentation to see more information about this.</p>
 
 <pre><code class="language-bash">docker run -d \
   -p 443:443 \
@@ -1043,7 +1043,7 @@ networks:
 		<h1 class="h1 mt-5 mb-5 text-muted">Docker-Compose</h1>
 		<span class="spacer"></span>
 		<div v-pre>
-				<p>This page includes multiple docker-compose.yml setups for you to run. There are many environment variables for additional settings and features, checkout the <a href="https://github.com/statping/statping/wiki/Environment-Variables" target="_blank">Environment Variables Wiki</a> to see them all.</p>
+				<p>This page includes multiple docker-compose.yml setups for you to run. There are many environment variables for additional settings and features, checkout the <a href="https://github.com/statping-ng/statping-ng/wiki/Environment-Variables" target="_blank">Environment Variables Wiki</a> to see them all.</p>
 
 <p align="center">
 <img alt="Docker Image Version (tag latest semver)" src="https://img.shields.io/docker/v/statping/statping/latest"> 
@@ -1248,7 +1248,7 @@ nginx-ssl:
 
 <h1>Grafana Dashboard with Prometheus</h1>
 
-<p>Grafana is an awesome metric visualizer that allows you to create some awesome dashboards. We&rsquo;ve already created a <a href="https://grafana.com/grafana/dashboards/6950" target="_blank">Grafana Dashboard</a> that you can easy import! Checkout the <a href="https://github.com/statping/statping/wiki/Prometheus-Exporter" target="_blank">Grafana Wiki</a> and the <a href="https://github.com/statping/statping/wiki/Prometheus-Exporter" target="_blank">Prometheus Exporter Wiki</a> for more details.</p>
+<p>Grafana is an awesome metric visualizer that allows you to create some awesome dashboards. We&rsquo;ve already created a <a href="https://grafana.com/grafana/dashboards/6950" target="_blank">Grafana Dashboard</a> that you can easy import! Checkout the <a href="https://github.com/statping-ng/statping-ng/wiki/Prometheus-Exporter" target="_blank">Grafana Wiki</a> and the <a href="https://github.com/statping-ng/statping-ng/wiki/Prometheus-Exporter" target="_blank">Prometheus Exporter Wiki</a> for more details.</p>
 
 <h5><code>prometheus.yml</code> config file</h5>
 
@@ -1399,8 +1399,8 @@ networks:
 
 <p>You can upgrade the Statping executable by running the commands below on your EC2 instance.</p>
 
-<pre><code>VERSION=$(curl -s &quot;https://github.com/statping/statping/releases/latest&quot; | grep -o 'tag/[v.0-9]*' | awk -F/ '{print $2}')
-wget https://github.com/statping/statping/releases/download/$VERSION/statping-linux-x64.tar.gz
+<pre><code>VERSION=$(curl -s &quot;https://github.com/statping-ng/statping-ng/releases/latest&quot; | grep -o 'tag/[v.0-9]*' | awk -F/ '{print $2}')
+wget https://github.com/statping-ng/statping-ng/releases/download/$VERSION/statping-linux-x64.tar.gz
 tar -xvzf statping-linux-x64.tar.gz
 chmod +x statping
 mv statping /usr/local/bin/statping
@@ -1588,10 +1588,10 @@ systemctl start statping
 
 <h2>Raspberry Pi</h2>
 
-<p>You can even run Statping on your Raspberry Pi by installing the precompiled binary from <a href="https://github.com/statping/statping/releases/latest" target="_blank">Latest Releases</a>. For the Raspberry Pi 3 you&rsquo;ll want to download the <code>statping-linux-arm7.tar.gz</code> file. Be sure to change <code>VERSION</code> to the latest version in Releases, and include the &lsquo;v&rsquo;.</p>
+<p>You can even run Statping on your Raspberry Pi by installing the precompiled binary from <a href="https://github.com/statping-ng/statping-ng/releases/latest" target="_blank">Latest Releases</a>. For the Raspberry Pi 3 you&rsquo;ll want to download the <code>statping-linux-arm7.tar.gz</code> file. Be sure to change <code>VERSION</code> to the latest version in Releases, and include the &lsquo;v&rsquo;.</p>
 
-<pre><code>VERSION=$(curl -sL &quot;https://github.com/statping/statping/releases/latest&quot; | grep -o 'tag/[v.0-9]*' | awk -F/ '{print $2}' | head -n1)
-wget https://github.com/statping/statping/releases/download/$VERSION/statping-linux-arm-7.tar.gz
+<pre><code>VERSION=$(curl -sL &quot;https://github.com/statping-ng/statping-ng/releases/latest&quot; | grep -o 'tag/[v.0-9]*' | awk -F/ '{print $2}' | head -n1)
+wget https://github.com/statping-ng/statping-ng/releases/download/$VERSION/statping-linux-arm-7.tar.gz
 tar -xvzf statping-linux-arm-7.tar.gz
 chmod +x statping
 mv statping /usr/local/bin/statping
@@ -1601,7 +1601,7 @@ statping version
 
 <h2>Alpine Linux</h2>
 
-<p>The Docker image is using the Statping Alpine binary since it&rsquo;s so incredibly small. You can run it on your own alpine image by downloading <code>statping-linux-alpine.tar.gz</code> from <a href="https://github.com/statping/statping/releases/latest" target="_blank">Latest Releases</a>.</p>
+<p>The Docker image is using the Statping Alpine binary since it&rsquo;s so incredibly small. You can run it on your own alpine image by downloading <code>statping-linux-alpine.tar.gz</code> from <a href="https://github.com/statping-ng/statping-ng/releases/latest" target="_blank">Latest Releases</a>.</p>
 
 		</div>
 	</div>
@@ -1612,7 +1612,7 @@ statping version
 		<div v-pre>
 				<h1>Installing on Windows</h1>
 
-<p>Currently, Statping only works on Windows 64-bit computers. Just download the exe file from <a href="https://github.com/statping/statping/releases/latest" target="_blank">Latest Releases</a> and run it in your command prompt. It will create a HTTP server on port 8080, so you can visit <code>http://localhost:8080</code> to see your Statping Status Page.</p>
+<p>Currently, Statping only works on Windows 64-bit computers. Just download the exe file from <a href="https://github.com/statping-ng/statping-ng/releases/latest" target="_blank">Latest Releases</a> and run it in your command prompt. It will create a HTTP server on port 8080, so you can visit <code>http://localhost:8080</code> to see your Statping Status Page.</p>
 
 <h1>Compiling SCSS for Custom Theme</h1>
 
@@ -1638,7 +1638,7 @@ statping version
 
 <h2>Known Issues with Windows</h2>
 
-<p>Unfortunately, Statping only works on Windows 64-bit processors. If you have more than 4gb of ram, there&rsquo;s a good chance you already have a 64-bit processor. Download the <a href="https://github.com/statping/statping/releases/latest" target="_blank">Latest Releases</a> of Statping, extract the ZIP file, then double click on the <code>statping.exe</code> file. You can use a SQLite database for a quick setup, or connect to a local/remote Postgres or MySQL database server.</p>
+<p>Unfortunately, Statping only works on Windows 64-bit processors. If you have more than 4gb of ram, there&rsquo;s a good chance you already have a 64-bit processor. Download the <a href="https://github.com/statping-ng/statping-ng/releases/latest" target="_blank">Latest Releases</a> of Statping, extract the ZIP file, then double click on the <code>statping.exe</code> file. You can use a SQLite database for a quick setup, or connect to a local/remote Postgres or MySQL database server.</p>
 
 		</div>
 	</div>
@@ -1656,7 +1656,7 @@ statping version
 
 <h3>Statping Yaml Config</h3>
 
-<p>You can include multiple environment variables to the configg file. If you include <code>DB_CONN</code> Statping will attempt to automatically connect to that database. View the <a href="https://github.com/statping/statping/wiki/Config-with-.env-File" target="_blank">Full List of Environment Variables</a> to fully customize this config.</p>
+<p>You can include multiple environment variables to the configg file. If you include <code>DB_CONN</code> Statping will attempt to automatically connect to that database. View the <a href="https://github.com/statping-ng/statping-ng/wiki/Config-with-.env-File" target="_blank">Full List of Environment Variables</a> to fully customize this config.</p>
 
 <pre><code class="language-yaml">applications:
 - name: statping
@@ -1701,13 +1701,13 @@ statping version
 				<h1>Useful Codebase</h1>
 
 <ul>
-<li><p><a href="https://github.com/statping/statping/blob/master/handlers/routes.go" target="_blank">handlers/routes.go</a> - Contains all the HTTP request routes</p></li>
+<li><p><a href="https://github.com/statping-ng/statping-ng/blob/master/handlers/routes.go" target="_blank">handlers/routes.go</a> - Contains all the HTTP request routes</p></li>
 
-<li><p><a href="https://github.com/statping/statping/blob/master/cmd/commands.go" target="_blank">cmd/commands.go</a> - CLI Commands</p></li>
+<li><p><a href="https://github.com/statping-ng/statping-ng/blob/master/cmd/commands.go" target="_blank">cmd/commands.go</a> - CLI Commands</p></li>
 
-<li><p><a href="https://github.com/statping/statping/blob/master/types/services/struct.go" target="_blank">types/service/struct.go</a> - Service struct</p></li>
+<li><p><a href="https://github.com/statping-ng/statping-ng/blob/master/types/services/struct.go" target="_blank">types/service/struct.go</a> - Service struct</p></li>
 
-<li><p><a href="https://github.com/statping/statping/blob/master/types/core/struct.go" target="_blank">types/core/struct.go</a> - Core struct</p></li>
+<li><p><a href="https://github.com/statping-ng/statping-ng/blob/master/types/core/struct.go" target="_blank">types/core/struct.go</a> - Core struct</p></li>
 </ul>
 
 <h1>Deployment Process</h1>
@@ -1720,11 +1720,11 @@ statping version
 <li>SASS will generate  a compiled version of the CSS.</li>
 <li>Statping Help page is generated by cloning the Wiki repo using <code>go generate</code>.</li>
 <li>Travis-CI tests the Golang application.</li>
-<li>Travis-CI tests the Statping API using <a href="https://github.com/statping/statping/blob/master/source/tmpl/postman.json" target="_blank">Postman</a>.</li>
+<li>Travis-CI tests the Statping API using <a href="https://github.com/statping-ng/statping-ng/blob/master/source/tmpl/postman.json" target="_blank">Postman</a>.</li>
 <li>If all tests are successful, Travis-CI will compile the binaries using <a href="https://github.com/karalabe/xgo" target="_blank">xgo</a>.</li>
-<li>Binaries are code signed using the official <a href="https://github.com/statping/statping/wiki/PGP-Signature" target="_blank">PGP key</a> and compressed.</li>
+<li>Binaries are code signed using the official <a href="https://github.com/statping-ng/statping-ng/wiki/PGP-Signature" target="_blank">PGP key</a> and compressed.</li>
 <li><a href="https://cloud.docker.com/repository/docker/statping/statping/builds" target="_blank">Docker</a> receives a trigger to build for the <code>latest</code> tag.</li>
-<li>Travis-CI uploads the <a href="https://github.com/statping/statping/releases" target="_blank">latest release</a> as a tagged version on Github.</li>
+<li>Travis-CI uploads the <a href="https://github.com/statping-ng/statping-ng/releases" target="_blank">latest release</a> as a tagged version on Github.</li>
 <li>Travis-CI updates the <a href="https://github.com/hunterlong/homebrew-statping" target="_blank">homebrew-statping</a> repo with the latest version.</li>
 </ol>
 
@@ -1737,10 +1737,10 @@ statping version
 		<h1 class="h1 mt-5 mb-5 text-muted">Makefile</h1>
 		<span class="spacer"></span>
 		<div v-pre>
-				<p>Here&rsquo;s a simple list of Makefile commands you can run using <code>make</code>. The <a href="https://github.com/statping/statping/blob/master/Makefile" target="_blank">Makefile</a> may change often, so i&rsquo;ll try to keep this Wiki up-to-date.</p>
+				<p>Here&rsquo;s a simple list of Makefile commands you can run using <code>make</code>. The <a href="https://github.com/statping-ng/statping-ng/blob/master/Makefile" target="_blank">Makefile</a> may change often, so i&rsquo;ll try to keep this Wiki up-to-date.</p>
 
 <p align="center">
-<a href="https://github.com/statping/statping/blob/master/Makefile">View Makefile</a>
+<a href="https://github.com/statping-ng/statping-ng/blob/master/Makefile">View Makefile</a>
 </p>
 
 <h1>Useful Commands</h1>
@@ -1797,7 +1797,7 @@ statping version
 				<p>Statping implements the <a href="https://graphql.org/" target="_blank">GraphQL</a> API interface so you can customize the exact data you need within a query. The GraphQL endpoint is at <code>/graphql</code> on your Statping instance and is only available for Authenticated users or while sending the <code>Authorization</code> API Secret.</p>
 
 <p align="center">
-<a href="https://github.com/statping/statping/blob/master/handlers/graphql/schema.graphql">View schema.graphql</a>
+<a href="https://github.com/statping-ng/statping-ng/blob/master/handlers/graphql/schema.graphql">View schema.graphql</a>
 </p>
 
 <hr>
@@ -1866,7 +1866,7 @@ statping version
 
 <hr>
 
-<p>The code for handling GraphQL requests is in <a href="https://github.com/statping/statping/tree/master/handlers/graphql" target="_blank">handlers/graphql</a> and is using <a href="https://github.com/99designs/gqlgen" target="_blank">gqlgen</a> to automatically generate the schema based on the golang structs.</p>
+<p>The code for handling GraphQL requests is in <a href="https://github.com/statping-ng/statping-ng/tree/master/handlers/graphql" target="_blank">handlers/graphql</a> and is using <a href="https://github.com/99designs/gqlgen" target="_blank">gqlgen</a> to automatically generate the schema based on the golang structs.</p>
 
 		</div>
 	</div>
@@ -2109,7 +2109,7 @@ CMD_FILE=/bin/bash
 		<h1 class="h1 mt-5 mb-5 text-muted">config.yml</h1>
 		<span class="spacer"></span>
 		<div v-pre>
-				<p>The <code>config.yml</code> file contains all of the Statping database settings and API keys/secrets. When Statping loads, it will attempt to open this file to parse it&rsquo;s core values. You can view the Go type file on <a href="https://github.com/statping/statping/blob/master/types/types.go#L40" target="_blank">types/types.go</a>.</p>
+				<p>The <code>config.yml</code> file contains all of the Statping database settings and API keys/secrets. When Statping loads, it will attempt to open this file to parse it&rsquo;s core values. You can view the Go type file on <a href="https://github.com/statping-ng/statping-ng/blob/master/types/types.go#L40" target="_blank">types/types.go</a>.</p>
 
 <h3><code>config.yml</code> Parameters</h3>
 
@@ -2129,7 +2129,7 @@ CMD_FILE=/bin/bash
 
 <h2>Using Environment Variables instead of <code>config.yml</code></h2>
 
-<p>You technically don&rsquo;t need this <code>config.yml</code> file to run Statping. You can also run the Statping server by including environment variables when you start the server. You can view all the available variables by viewing the <a href="https://github.com/statping/statping/wiki/Config-with-.env-File" target="_blank">Config with .env</a> Wiki page.</p>
+<p>You technically don&rsquo;t need this <code>config.yml</code> file to run Statping. You can also run the Statping server by including environment variables when you start the server. You can view all the available variables by viewing the <a href="https://github.com/statping-ng/statping-ng/wiki/Config-with-.env-File" target="_blank">Config with .env</a> Wiki page.</p>
 
 <p><strong>Statping will auto run with environment variables if</strong> <code>DB_CONN</code> <strong>is set!</strong></p>
 
@@ -2236,7 +2236,7 @@ statping_service_response_length{id=&quot;2&quot; name=&quot;Statping.com&quot;}
 <h3>Steps to Authenticate</h3>
 
 <ol>
-<li>Download the Statping <code>tar.gz</code> file from <a href="https://github.com/statping/statping/releases/latest" target="_blank">Latest Releases</a> and extract the <code>statping</code> binary and the <code>statup.asc</code> file.</li>
+<li>Download the Statping <code>tar.gz</code> file from <a href="https://github.com/statping-ng/statping-ng/releases/latest" target="_blank">Latest Releases</a> and extract the <code>statping</code> binary and the <code>statup.asc</code> file.</li>
 <li>Run command: <code>gpg --verify statping.asc</code></li>
 <li>You should see <code>Good signature from &quot;Hunter Long &lt;info@statping.com&gt;&quot; [ultimate]</code>.</li>
 </ol>
@@ -2314,7 +2314,7 @@ OluFxewsEO0QNDrfFb+0gnjYlnGqOFcZjUMXbDdY5oLSPtXohynuTK1qyQ==
 <div class="col-12 shadow-md mt-5">
 	<div class="text-dim" v-pre>
 		<p align="center">
-<a href="https://statping.com">Statping.com</a> | <a href="https://demo.statping.com">Demo</a> | <a href="https://hub.docker.com/r/statping/statping">Docker</a> | <a href="https://github.com/statping/statping/wiki/Notifiers">Notifiers</a> | <a href="https://documenter.getpostman.com/view/1898229/RzfiJUd6">API</a>
+<a href="https://statping.com">Statping.com</a> | <a href="https://demo.statping.com">Demo</a> | <a href="https://hub.docker.com/r/statping/statping">Docker</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Notifiers">Notifiers</a> | <a href="https://documenter.getpostman.com/view/1898229/RzfiJUd6">API</a>
 </p>
 
 	</div>

@@ -3,13 +3,13 @@ package handlers
 import (
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/adamboutcher/statping-ng/source"
-	"github.com/adamboutcher/statping-ng/types/core"
-	"github.com/adamboutcher/statping-ng/utils"
+	"github.com/statping-ng/statping-ng/source"
+	"github.com/statping-ng/statping-ng/types/core"
+	"github.com/statping-ng/statping-ng/utils"
 	"net/http"
 	"net/http/pprof"
 
-	_ "github.com/adamboutcher/statping-ng/types/metrics"
+	_ "github.com/statping-ng/statping-ng/types/metrics"
 )
 
 var (

@@ -1,9 +1,9 @@
 package checkins
 
 import (
-	"github.com/statping/statping/database"
-	"github.com/statping/statping/types/failures"
-	"github.com/statping/statping/utils"
+	"github.com/statping-ng/statping-ng/database"
+	"github.com/statping-ng/statping-ng/types/failures"
+	"github.com/statping-ng/statping-ng/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"

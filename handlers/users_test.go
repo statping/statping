@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/adamboutcher/statping-ng/utils"
+	"github.com/statping-ng/statping-ng/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"net/url"

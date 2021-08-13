@@ -1,13 +1,13 @@
 package notifiers
 
 import (
-	"github.com/adamboutcher/statping-ng/database"
-	"github.com/adamboutcher/statping-ng/types/core"
-	"github.com/adamboutcher/statping-ng/types/failures"
-	"github.com/adamboutcher/statping-ng/types/notifications"
-	"github.com/adamboutcher/statping-ng/types/null"
-	"github.com/adamboutcher/statping-ng/types/services"
-	"github.com/adamboutcher/statping-ng/utils"
+	"github.com/statping-ng/statping-ng/database"
+	"github.com/statping-ng/statping-ng/types/core"
+	"github.com/statping-ng/statping-ng/types/failures"
+	"github.com/statping-ng/statping-ng/types/notifications"
+	"github.com/statping-ng/statping-ng/types/null"
+	"github.com/statping-ng/statping-ng/types/services"
+	"github.com/statping-ng/statping-ng/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"

@@ -7,16 +7,16 @@ services:
     image: statping/statping:dev
     restart: on-failure
     volumes:
-      - ./cmd:/go/src/github.com/statping/statping/cmd/
-      - ./core:/go/src/github.com/statping/statping/core/
-      - ./database:/go/src/github.com/statping/statping/database/
-      - ./dev:/go/src/github.com/statping/statping/dev/
-      - ./frontend:/go/src/github.com/statping/statping/frontend/
-      - ./handlers:/go/src/github.com/statping/statping/handlers/
-      - ./notifiers:/go/src/github.com/statping/statping/notifiers/
-      - ./source:/go/src/github.com/statping/statping/source/
-      - ./types:/go/src/github.com/statping/statping/types/
-      - ./utils:/go/src/github.com/statping/statping/utils/
+      - ./cmd:/go/src/github.com/statping-ng/statping-ng/cmd/
+      - ./core:/go/src/github.com/statping-ng/statping-ng/core/
+      - ./database:/go/src/github.com/statping-ng/statping-ng/database/
+      - ./dev:/go/src/github.com/statping-ng/statping-ng/dev/
+      - ./frontend:/go/src/github.com/statping-ng/statping-ng/frontend/
+      - ./handlers:/go/src/github.com/statping-ng/statping-ng/handlers/
+      - ./notifiers:/go/src/github.com/statping-ng/statping-ng/notifiers/
+      - ./source:/go/src/github.com/statping-ng/statping-ng/source/
+      - ./types:/go/src/github.com/statping-ng/statping-ng/types/
+      - ./utils:/go/src/github.com/statping-ng/statping-ng/utils/
     environment:
       DB_CONN: sqlite
       API_SECRET: exampleapisecret

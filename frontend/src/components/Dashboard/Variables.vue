@@ -4,7 +4,7 @@
     You can insert dynamic fields within the notifier payloads for some notifiers.
 
     <p class="mt-2">
-        Checkout the <a href="https://github.com/statping/statping/blob/master/types/services/struct.go">Service struct</a> and the <a href="https://github.com/statping/statping/blob/master/types/failures/struct.go">Failures struct</a> and create variables in golang template format.
+        Checkout the <a href="https://github.com/statping-ng/statping-ng/blob/master/types/services/struct.go">Service struct</a> and the <a href="https://github.com/statping-ng/statping-ng/blob/master/types/failures/struct.go">Failures struct</a> and create variables in golang template format.
     </p>
 
     <p class="mt-2">
