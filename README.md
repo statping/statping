@@ -11,7 +11,7 @@ An easy to use Status Page for your websites and applications. Statping will aut
 
 Statping-ng aims to be an updated drop-in replacement of statping after development stopped on the original fork.
 
-[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/statping-ng/statping-ng) [![](https://images.microbadger.com/badges/image/adamboutcher/statping-ng.svg)](https://microbadger.com/images/statping-ng/statping-ng) [![Docker Pulls](https://img.shields.io/docker/pulls/statping/statping.svg)](https://hub.docker.com/r/statping/statping/builds/)
+![GitHub last commit](https://img.shields.io/github/last-commit/statping-ng/statping-ng.svg) [![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/statping-ng/statping-ng) [![](https://images.microbadger.com/badges/image/adamboutcher/statping-ng.svg)](https://microbadger.com/images/statping-ng/statping-ng)
 
 <br><br>
 <img align="left" width="320" height="235" src="https://img.cjx.io/statupsiterun.gif">
@@ -117,6 +117,6 @@ scrape_configs:
 Statping-ng accepts Push Requests to the `dev` branch! Feel free to add your own features and notifiers. You probably want to checkout the [Notifier Wiki](https://github.com/statping-ng/statping-ng/wiki/Notifiers) to get a better understanding on how to create your own notification methods for failing/successful services. Testing on Statping-ng will test each function on MySQL, Postgres, and SQLite. I recommend running MySQL and Postgres Docker containers for testing. You can find multiple docker-compose files in the dev directory. 
 
 ![Dev Release](https://github.com/statping-ng/statping-ng/workflows/Dev%20Release/badge.svg?branch=dev)
-[![Go Report Card](https://goreportcard.com/badge/github.com/statping/statping)](https://goreportcard.com/report/github.com/statping/statping)
+[![Go Report Card](https://goreportcard.com/badge/github.com/statping-ng/statping-ng)](https://goreportcard.com/report/github.com/statping-ng/statping-ng)
 [![Build Status](https://travis-ci.com/statping/statping.svg?branch=master)](https://travis-ci.com/statping/statping) [![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://dashboard.cypress.io/#/projects/bi8mhr/runs)
 [![Docker Pulls](https://img.shields.io/docker/pulls/statping/statping.svg)](https://hub.docker.com/r/statping/statping/builds/) [![Godoc](https://godoc.org/github.com/statping/statping?status.svg)](https://godoc.org/github.com/statping/statping)[![Coverage Status](https://coveralls.io/repos/github/statping/statping/badge.svg?branch=master)](https://coveralls.io/github/statping/statping?branch=master)
