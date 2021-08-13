@@ -269,7 +269,7 @@ jobs:
 #          go get github.com/mattn/goveralls
 #          goveralls -coverprofile=coverage.out -repotoken $COVERALLS
 #        env:
-S          COVERALLS: ${{ secrets.COVERALLS }}
+#          COVERALLS: ${{ secrets.COVERALLS }}
 
   test-postman-sqlite:
     needs: frontend
