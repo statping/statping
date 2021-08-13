@@ -1,4 +1,4 @@
-name: Unstable Build, Test and Deploy
+name: 2. Unstable Build, Test and Deploy
 on:
   push:
     branches:
@@ -64,8 +64,8 @@ jobs:
         include:
 #          - platform: darwin
 #            arch: amd64
-          - platform: windows
-            arch: amd64
+#          - platform: windows
+#            arch: amd64
 
     steps:
       - uses: actions/checkout@v2
@@ -93,12 +93,12 @@ jobs:
 #        run: echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
 #        shell: bash
 
-      - name: Set Windows Build Flags
-        if: matrix.platform == 'windows'
-        run: |
-          echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
-          echo "XGO_TAGS=netgo osusergo sqlite_omit_load_extension" >> $GITHUB_ENV
-        shell: bash
+ #     - name: Set Windows Build Flags
+ #       if: matrix.platform == 'windows'
+ #       run: |
+ #         echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
+ #         echo "XGO_TAGS=netgo osusergo sqlite_omit_load_extension" >> $GITHUB_ENV
+ #       shell: bash
 
       - name: Build ${{ matrix.platform }}/${{ matrix.arch }}
         uses: crazy-max/ghaction-xgo@v1
@@ -128,15 +128,15 @@ jobs:
           rm -rf statping
           echo "compressed=statping-linux-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
 
-      - name: Compress Windows Builds
-        if: matrix.platform == 'windows'
-        run: |
-          cd build
-          mv statping-windows-4.0-${{ matrix.arch }}.exe statping.exe
-          chmod +x statping.exe
-          zip statping-windows-${{ matrix.arch }}.zip statping.exe
-          rm -rf statping.exe
-          echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
+#      - name: Compress Windows Builds
+#        if: matrix.platform == 'windows'
+#        run: |
+#          cd build
+#          mv statping-windows-4.0-${{ matrix.arch }}.exe statping.exe
+#          chmod +x statping.exe
+#          zip statping-windows-${{ matrix.arch }}.zip statping.exe
+#          rm -rf statping.exe
+#          echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
 
 #      - name: Compress Darwin Builds
 #        if: matrix.platform == 'darwin'

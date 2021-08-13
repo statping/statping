@@ -1,4 +1,4 @@
-name: Stable Build, Test and Deploy
+name: 3. Stable Build, Test and Deploy
 on:
   push:
     branches:

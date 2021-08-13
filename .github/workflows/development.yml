@@ -1,4 +1,4 @@
-name: Development Build
+name: 1. Development Build and Testing
 on:
   push:
     branches:
@@ -90,7 +90,8 @@ jobs:
 
       - name: Set Darwin Build Flags
         if: matrix.platform == 'darwin'
-        run: echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
+        run : |
+          echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
         shell: bash
 
       - name: Set Windows Build Flags
@@ -111,8 +112,8 @@ jobs:
           dest: build
           prefix: statping
           targets: ${{ matrix.platform }}/${{ matrix.arch }}
-          v: false
-          x: false
+          v: true
+          x: true
           pkg: cmd
           buildmode: pie
           tags: ${{ env.XGO_TAGS }}
