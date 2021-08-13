@@ -1,8 +1,8 @@
-name: Master Build
+name: Stable Build, Test and Deploy
 on:
   push:
     branches:
-      - master
+      - stable
     paths-ignore:
       - '**.md'
 

@@ -1,4 +1,4 @@
-name: Development Build
+name: Unstable Build, Test and Deploy
 on:
   push:
     branches:
@@ -62,8 +62,8 @@ jobs:
         platform: [linux]
         arch: [386, amd64, arm-7, arm-6, arm64]
         include:
-          - platform: darwin
-            arch: amd64
+#          - platform: darwin
+#            arch: amd64
           - platform: windows
             arch: amd64
 
@@ -88,10 +88,10 @@ jobs:
           echo "XGO_TAGS=netgo osusergo linux sqlite_omit_load_extension" >> $GITHUB_ENV
         shell: bash
 
-      - name: Set Darwin Build Flags
-        if: matrix.platform == 'darwin'
-        run: echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
-        shell: bash
+#      - name: Set Darwin Build Flags
+#        if: matrix.platform == 'darwin'
+#        run: echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
+#        shell: bash
 
       - name: Set Windows Build Flags
         if: matrix.platform == 'windows'
@@ -138,15 +138,34 @@ jobs:
           rm -rf statping.exe
           echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
 
-      - name: Compress Darwin Builds
-        if: matrix.platform == 'darwin'
-        run: |
-          cd build
-          mv statping-darwin-10.6-${{ matrix.arch }} statping
-          chmod +x statping
-          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
-          rm -rf statping
-          echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
+#      - name: Compress Darwin Builds
+#        if: matrix.platform == 'darwin'
+#        run: |
+#          cd build
+#          mv statping-darwin-10.6-${{ matrix.arch }} statping
+#          chmod +x statping
+#          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
+#          rm -rf statping
+#          echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
+
+      - name: Upload Compiled Statping Binary
+        uses: actions/upload-artifact@v1
+        with:
+          name: statping-${{ matrix.platform }}-${{ matrix.arch }}
+          path: ./build
+
+      - name: Upload Releases
+        id: upload-assets
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ env.VERSION }}
+        with:
+          tag_name: dev-v${{ env.VERSION }}
+          draft: true
+          prerelease: true
+          files: build/${{ env.compressed }}
+
 
   test:
     needs: frontend
