@@ -167,62 +167,62 @@ jobs:
           files: build/${{ env.compressed }}
 
 
-  test:
-    needs: frontend
-    runs-on: [self-hosted, linux, aboutcher-hosted]
-    services:
-      postgres:
-        image: postgres:10.8
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: password123
-          POSTGRES_DB: statping
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+#  test:
+#    needs: frontend
+#    runs-on: [self-hosted, linux, aboutcher-hosted]
+#    services:
+#      postgres:
+#        image: postgres:10.8
+#        env:
+#          POSTGRES_USER: root
+#          POSTGRES_PASSWORD: password123
+#          POSTGRES_DB: statping
+#        ports:
+#          - 5432:5432
+#        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: password123
-          MYSQL_DATABASE: statping
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+#      mysql:
+#        image: mysql:5.7
+#        env:
+#          MYSQL_ROOT_PASSWORD: password123
+#          MYSQL_DATABASE: statping
+#        ports:
+#          - 3306:3306
+#        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: actions/setup-go@v2
         with:
-          go-version: 1.15.x
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12.18.2
+#          go-version: 1.15.x
+#      - uses: actions/setup-node@v1
+#        with:
+#          node-version: 12.18.2
 
-      - name: Install Global Dependencies
-        run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
+#      - name: Install Global Dependencies
+#        run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
 
-      - name: Setting ENV's
-        run: |
-          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
-          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
-        shell: bash
+#      - name: Setting ENV's
+#        run: |
+#          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+#          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
+#          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+#        shell: bash
 
-      - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v1
-        with:
-          name: static-rice-box
-          path: ./source
+#      - name: Download Compiled Frontend (rice-box.go)
+#        uses: actions/download-artifact@v1
+#        with:
+#          name: static-rice-box
+#          path: ./source
 
-      - name: Install Statping
-        env:
-          VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ github.sha }}
-        run: |
-          make build certs
-          chmod +x statping
-          mv statping $(go env GOPATH)/bin/
+#      - name: Install Statping
+#        env:
+#          VERSION: ${{ env.VERSION }}
+#          COMMIT: ${{ github.sha }}
+#        run: |
+#          make build certs
+#          chmod +x statping
+#          mv statping $(go env GOPATH)/bin/
 
 #      - name: Go Tests
 #        run: |
@@ -264,12 +264,12 @@ jobs:
 #          SNS_REGION: ${{ secrets.SNS_REGION }}
 #          SNS_TOPIC: ${{ secrets.SNS_TOPIC }}
 
-      - name: Coveralls Testing Coverage
-        run: |
-          go get github.com/mattn/goveralls
-          goveralls -coverprofile=coverage.out -repotoken $COVERALLS
-        env:
-          COVERALLS: ${{ secrets.COVERALLS }}
+#      - name: Coveralls Testing Coverage
+#        run: |
+#          go get github.com/mattn/goveralls
+#          goveralls -coverprofile=coverage.out -repotoken $COVERALLS
+#        env:
+S          COVERALLS: ${{ secrets.COVERALLS }}
 
   test-postman-sqlite:
     needs: frontend
