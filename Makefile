@@ -10,7 +10,7 @@ BUILDVERSION=-ldflags "-X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}"
 TRVIS_SECRET=O3/2KTOV8krv+yZ1EB/7D1RQRe6NdpFUEJNJkMS/ollYqmz3x2mCO7yIgIJKCKguLXZxjM6CxJcjlCrvUwibL+8BBp7xJe4XFIOrjkPvbbVPry4HkFZCf2GfcUK6o4AByQ+RYqsW2F17Fp9KLQ1rL3OT3eLTwCAGKx3tlY8y+an43zkmo5dN64V6sawx26fh6XTfww590ey+ltgQTjf8UPNup2wZmGvMo9Hwvh/bYR/47bR6PlBh6vhlKWyotKf2Fz1Bevbu0zc35pee5YlsrHR+oSF+/nNd/dOij34BhtqQikUR+zQVy9yty8SlmneVwD3yOENvlF+8roeKIXb6P6eZnSMHvelhWpAFTwDXq2N3d/FIgrQtLxsAFTI3nTHvZgs6OoTd6dA0wkhuIGLxaL3FOeztCdxP5J/CQ9GUcTvifh5ArGGwYxRxQU6rTgtebJcNtXFISP9CEUR6rwRtb6ax7h6f1SbjUGAdxt+r2LbEVEk4ZlwHvdJ2DtzJHT5DQtLrqq/CTUgJ8SJFMkrJMp/pPznKhzN4qvd8oQJXygSXX/gz92MvoX0xgpNeLsUdAn+PL9KketfR+QYosBz04d8k05E+aTqGaU7FUCHPTLwlOFvLD8Gbv0zsC/PWgSLXTBlcqLEz5PHwPVHTcVzspKj/IyYimXpCSbvu1YOIjyc=
 PUBLISH_BODY='{ "request": { "branch": "master", "message": "Homebrew update version v${VERSION}", "config": { "env": { "VERSION": "${VERSION}", "COMMIT": "$(TRAVIS_COMMIT)" } } } }'
 TRAVIS_BUILD_CMD='{ "request": { "branch": "master", "message": "Compile master for Statping v${VERSION}", "config": { "merge_mode": "replace", "language": "go", "go": 1.14, "install": true, "sudo": "required", "services": ["docker"], "env": { "secure": "${TRVIS_SECRET}" }, "before_deploy": ["git config --local user.name \"hunterlong\"", "git config --local user.email \"info@socialeck.com\"", "git tag v$(VERSION) --force"], "deploy": [{ "provider": "releases", "api_key": "$$GITHUB_TOKEN", "file_glob": true, "file": "build/*", "skip_cleanup": true, "on": { "branch": "master" } }], "before_script": ["rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install stable", "nvm install 10.17.0", "nvm use 10.17.0 --default", "npm install -g sass yarn cross-env", "pip install --user awscli"], "script": ["make release"], "after_success": [], "after_deploy": ["make post-release"] } } }'
-TEST_DIR=$(GOPATH)/src/github.com/statping/statping
+TEST_DIR=$(GOPATH)/src/github.com/statping-ng/statping-ng
 PATH:=$(GOPATH)/bin:$(PATH)
 OS = freebsd linux openbsd
 ARCHS = 386 arm amd64 arm64
@@ -44,7 +44,7 @@ down:
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml down --volumes --remove-orphans
 
 lite: clean
-	docker build -t statping/statping:dev -f dev/Dockerfile.dev .
+	docker build -t statping-ng/statping-ng:dev -f dev/Dockerfile.dev .
 	docker-compose -f dev/docker-compose.lite.yml down
 	docker-compose -f dev/docker-compose.lite.yml up --remove-orphans
 
@@ -115,23 +115,23 @@ compose-build-full: docker-base
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml build --parallel --build-arg VERSION=${VERSION}
 
 docker-base:
-	docker build -t statping/statping:base -f Dockerfile.base --build-arg VERSION=${VERSION} .
+	docker build -t statping-ng/statping-ng:base -f Dockerfile.base --build-arg VERSION=${VERSION} .
 
 docker-latest: docker-base
-	docker build -t statping/statping:latest --build-arg VERSION=${VERSION} .
+	docker build -t statping-ng/statping-ng:latest --build-arg VERSION=${VERSION} .
 
 docker-vue:
-	docker build -t statping/statping:vue --build-arg VERSION=${VERSION} .
+	docker build -t statping-ng/statping-ng:vue --build-arg VERSION=${VERSION} .
 
 docker-test:
 	docker-compose -f docker-compose.test.yml up --remove-orphans
 
 push-base: clean compile docker-base
-	docker push statping/statping:base
+	docker push statping-ng/statping-ng:base
 
 push-vue: clean compile docker-base docker-vue
-	docker push statping/statping:base
-	docker push statping/statping:vue
+	docker push statping-ng/statping-ng:base
+	docker push statping-ng/statping-ng:vue
 
 modd:
 	modd -f ./dev/modd.conf
@@ -287,20 +287,20 @@ download-key:
 
 # push the :dev docker tag using curl
 dockerhub-dev:
-	docker build --build-arg VERSION=${VERSION} -t statping/statping:dev --no-cache -f Dockerfile.base .
-	docker push statping/statping:dev
+	docker build --build-arg VERSION=${VERSION} -t statping-ng/statping-ng:dev --no-cache -f Dockerfile.base .
+	docker push statping-ng/statping-ng:dev
 
 dockerhub:
-	docker build --build-arg VERSION=${VERSION} -t statping/statping:base --no-cache -f Dockerfile.base .
-	docker build --build-arg VERSION=${VERSION} -t statping/statping:latest --no-cache -f Dockerfile .
-	docker tag statping/statping statping/statping:v${VERSION}
-	docker push statping/statping:base
-	docker push statping/statping:v${VERSION}
-	docker push statping/statping
+	docker build --build-arg VERSION=${VERSION} -t statping-ng/statping-ng:base --no-cache -f Dockerfile.base .
+	docker build --build-arg VERSION=${VERSION} -t statping-ng/statping-ng:latest --no-cache -f Dockerfile .
+	docker tag statping-ng/statping-ng statping-ng/statping-ng:v${VERSION}
+	docker push statping-ng/statping-ng:base
+	docker push statping-ng/statping-ng:v${VERSION}
+	docker push statping-ng/statping-ng
 
 docker-build-dev:
-	docker build --build-arg VERSION=${VERSION} -t statping/statping:latest --no-cache -f Dockerfile .
-	docker tag statping/statping:latest statping/statping:dev-v${VERSION}
+	docker build --build-arg VERSION=${VERSION} -t statping-ng/statping-ng:latest --no-cache -f Dockerfile .
+	docker tag statping-ng/statping-ng:latest statping-ng/statping-ng:dev-v${VERSION}
 
 post-release: frontend-build upload_to_s3 publish-homebrew dockerhub
 
@@ -383,19 +383,19 @@ xgo-latest:
 buildx-latest: multiarch
 	docker buildx create --name statping-latest
 	docker buildx inspect --builder statping-latest --bootstrap
-	docker buildx build --builder statping-latest --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t statping/statping:latest -t statping/statping:v${VERSION} --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
+	docker buildx build --builder statping-latest --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t statping-ng/statping-ng:latest -t statping-ng/statping-ng:v${VERSION} --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
 	docker buildx rm statping-latest
 
 buildx-dev: multiarch
 	docker buildx create --name statping-dev
 	docker buildx inspect --builder statping-dev --bootstrap
-	docker buildx build --builder statping-dev --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t statping/statping:dev --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
+	docker buildx build --builder statping-dev --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t statping-ng/statping-ng:dev --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
 	docker buildx rm statping-dev
 
 buildx-base: multiarch
 	docker buildx create --name statping-base
 	docker buildx inspect --builder statping-base --bootstrap
-	docker buildx build --builder statping-base --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile.base -t statping/statping:base --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
+	docker buildx build --builder statping-base --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile.base -t statping-ng/statping-ng:base --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
 	docker buildx rm statping-base
 
 multiarch:

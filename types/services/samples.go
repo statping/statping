@@ -83,7 +83,7 @@ func Samples() error {
 
 	s2 := &Service{
 		Name:           "Statping Github",
-		Domain:         "https://github.com/statping/statping",
+		Domain:         "https://github.com/statping-ng/statping-ng",
 		ExpectedStatus: 200,
 		Interval:       30,
 		Type:           "http",

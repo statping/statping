@@ -12,7 +12,7 @@ cyan="\033[36m"
 white="\033[37m"
 gpg_key=64B9C6AAE2D55278
 gpgurl=https://statping.com/statping.gpg
-repo=https://github.com/adamboutcher/statping-ng
+repo=https://github.com/statping-ng/statping-ng
 
 statping_get_tarball() {
   fext='tar.gz'
@@ -55,9 +55,9 @@ statping_brew_install() {
   if [[ -z "$(command -v brew --version)" ]]; then
     printf "${white}Using Brew to install!$reset\n"
     printf "${yellow}---> brew tap statping/statping$reset\n"
-    brew tap statping/statping
+    brew tap statping-ng/statping-ng
     printf "${yellow}---> brew install statping$reset\n"
-    brew install statping
+    brew install statping-ng
     printf "${green}Brew installation is complete!$reset\n"
     printf "${yellow}You can use 'brew upgrade' to upgrade Statping next time.$reset\n"
   else

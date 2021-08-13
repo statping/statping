@@ -595,7 +595,7 @@ services:
     <<: *tcpservice
 
   - name: Statping Github
-    domain: https://github.com/statping/statping
+    domain: https://github.com/statping-ng/statping-ng
     <<: *httpservice`
 
 		err := utils.SaveFile(utils.Directory+"/services.yml", []byte(file))
