@@ -9,7 +9,7 @@ on:
 jobs:
 
   frontend:
-    runs-on: [self-hosted, linux, aboutcherhosted]
+    runs-on: [self-hosted, linux, aboutcher-hosted]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
@@ -69,7 +69,7 @@ jobs:
 
   build:
     needs: frontend
-    runs-on: [self-hosted, linux, aboutcherhosted]
+    runs-on: [self-hosted, linux, aboutcher-hosted]
     strategy:
       matrix:
         platform: [linux]
@@ -192,7 +192,7 @@ jobs:
 
   test:
     needs: frontend
-    runs-on: [self-hosted, linux, aboutcherhosted]
+    runs-on: [self-hosted, linux, aboutcher-hosted]
     services:
       postgres:
         image: postgres:10.8
@@ -296,7 +296,7 @@ jobs:
 
   test-postman-sqlite:
     needs: frontend
-    runs-on: [self-hosted, linux, aboutcherhosted]
+    runs-on: [self-hosted, linux, aboutcher-hosted]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
@@ -339,7 +339,7 @@ jobs:
 
   test-postman-mysql:
     needs: frontend
-    runs-on: [self-hosted, linux, aboutcherhosted]
+    runs-on: [self-hosted, linux, aboutcher-hosted]
 
     services:
       mysql:
@@ -395,7 +395,7 @@ jobs:
 
   test-postman-postgres:
     needs: frontend
-    runs-on: [self-hosted, linux, aboutcherhosted]
+    runs-on: [self-hosted, linux, aboutcher-hosted]
 
     services:
       postgres:
@@ -450,7 +450,7 @@ jobs:
 
   docker-release:
     needs: [test, build, test-postman-sqlite, test-postman-mysql, test-postman-postgres]
-    runs-on: [self-hosted, linux, aboutcherhosted]
+    runs-on: [self-hosted, linux, aboutcher-hosted]
     steps:
       - name: Checkout Statping Repo
         uses: actions/checkout@v2
@@ -490,7 +490,7 @@ jobs:
 
 #  sentry-release:
 #    needs: [test, test-postman-sqlite, test-postman-postgres, test-postman-mysql]
-#    runs-on: [self-hosted, linux, aboutcherhosted]
+#    runs-on: [self-hosted, linux, aboutcher-hosted]
 #    steps:
 #      - name: Checkout Statping Repo
 #        uses: actions/checkout@v2

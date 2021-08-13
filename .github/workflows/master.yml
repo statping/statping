@@ -9,7 +9,7 @@ on:
 jobs:
 
   frontend:
-    runs-on: [self-hosted, linux, aboutcherhosted]
+    runs-on: [self-hosted, linux, aboutcher-hosted]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
