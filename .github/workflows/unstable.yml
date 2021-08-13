@@ -61,7 +61,7 @@ jobs:
       matrix:
         platform: [linux]
         arch: [386, amd64, arm-7, arm-6, arm64]
-        include:
+#        include:
 #          - platform: darwin
 #            arch: amd64
 #          - platform: windows
