@@ -121,6 +121,7 @@ jobs:
       - name: Compress Linux Builds
         if: matrix.platform == 'linux'
         run: |
+          mkdir build
           cd build
           mv statping-linux-${{ matrix.arch }} statping
           chmod +x statping
@@ -131,6 +132,7 @@ jobs:
       - name: Compress Windows Builds
         if: matrix.platform == 'windows'
         run: |
+          mkdir build
           cd build
           mv statping-windows-4.0-${{ matrix.arch }}.exe statping.exe
           chmod +x statping.exe
@@ -141,6 +143,7 @@ jobs:
       - name: Compress Darwin Builds
         if: matrix.platform == 'darwin'
         run: |
+          mkdir build
           cd build
           mv statping-darwin-10.6-${{ matrix.arch }} statping
           chmod +x statping
