@@ -1,4 +1,4 @@
-name: 1. Development Build and Testing
+name: 2. Unstable Build, Test and Deploy
 on:
   push:
     branches:
@@ -55,17 +55,17 @@ jobs:
           path: ./source
 
   build:
-    needs: frontend
+    needs: [frontend, test, test-postman-sqlite, test-postman-mysql, test-postman-postgres]
     runs-on: [self-hosted, linux, aboutcher-hosted]
     strategy:
       matrix:
         platform: [linux]
         arch: [386, amd64, arm-7, arm-6, arm64]
-        include:
-          - platform: darwin
-            arch: amd64
-          - platform: windows
-            arch: amd64
+#        include:
+#          - platform: darwin
+#            arch: amd64
+#          - platform: windows
+#            arch: amd64
 
     steps:
       - uses: actions/checkout@v2
@@ -88,18 +88,17 @@ jobs:
           echo "XGO_TAGS=netgo osusergo linux sqlite_omit_load_extension" >> $GITHUB_ENV
         shell: bash
 
-      - name: Set Darwin Build Flags
-        if: matrix.platform == 'darwin'
-        run : |
-          echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
-        shell: bash
+#      - name: Set Darwin Build Flags
+#        if: matrix.platform == 'darwin'
+#        run: echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
+#        shell: bash
 
-      - name: Set Windows Build Flags
-        if: matrix.platform == 'windows'
-        run: |
-          echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
-          echo "XGO_TAGS=netgo osusergo sqlite_omit_load_extension" >> $GITHUB_ENV
-        shell: bash
+ #     - name: Set Windows Build Flags
+ #       if: matrix.platform == 'windows'
+ #       run: |
+ #         echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
+ #         echo "XGO_TAGS=netgo osusergo sqlite_omit_load_extension" >> $GITHUB_ENV
+ #       shell: bash
 
       - name: Build ${{ matrix.platform }}/${{ matrix.arch }}
         uses: crazy-max/ghaction-xgo@v1
@@ -112,8 +111,8 @@ jobs:
           dest: build
           prefix: statping
           targets: ${{ matrix.platform }}/${{ matrix.arch }}
-          v: true
-          x: true
+          v: false
+          x: false
           pkg: cmd
           buildmode: pie
           tags: ${{ env.XGO_TAGS }}
@@ -129,25 +128,44 @@ jobs:
           rm -rf statping
           echo "compressed=statping-linux-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
 
-      - name: Compress Windows Builds
-        if: matrix.platform == 'windows'
-        run: |
-          cd build
-          mv statping-windows-4.0-${{ matrix.arch }}.exe statping.exe
-          chmod +x statping.exe
-          zip statping-windows-${{ matrix.arch }}.zip statping.exe
-          rm -rf statping.exe
-          echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
+#      - name: Compress Windows Builds
+#        if: matrix.platform == 'windows'
+#        run: |
+#          cd build
+#          mv statping-windows-4.0-${{ matrix.arch }}.exe statping.exe
+#          chmod +x statping.exe
+#          zip statping-windows-${{ matrix.arch }}.zip statping.exe
+#          rm -rf statping.exe
+#          echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
 
-      - name: Compress Darwin Builds
-        if: matrix.platform == 'darwin'
-        run: |
-          cd build
-          mv statping-darwin-10.6-${{ matrix.arch }} statping
-          chmod +x statping
-          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
-          rm -rf statping
-          echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
+#      - name: Compress Darwin Builds
+#        if: matrix.platform == 'darwin'
+#        run: |
+#          cd build
+#          mv statping-darwin-10.6-${{ matrix.arch }} statping
+#          chmod +x statping
+#          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
+#          rm -rf statping
+#          echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
+
+      - name: Upload Compiled Statping Binary
+        uses: actions/upload-artifact@v1
+        with:
+          name: statping-${{ matrix.platform }}-${{ matrix.arch }}
+          path: ./build
+
+      - name: Upload Releases
+        id: upload-assets
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ env.VERSION }}
+        with:
+          tag_name: dev-v${{ env.VERSION }}
+          draft: true
+          prerelease: true
+          files: build/${{ env.compressed }}
+
 
   test:
     needs: frontend
@@ -206,45 +224,45 @@ jobs:
           chmod +x statping
           mv statping $(go env GOPATH)/bin/
 
-      - name: Go Tests
-        run: |
-          go get gotest.tools/gotestsum
-          gotestsum --no-summary=skipped --format testname -- -covermode=count -coverprofile=coverage.out -p=1 ./...
-        env:
-          VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ github.sha }}
-          DB_CONN: sqlite3
-          STATPING_DIR: ${{ github.workspace }}
-          API_SECRET: demopassword123
-          DISABLE_LOGS: false
-          ALLOW_REPORTS: true
-          SAMPLE_DATA: true
-          COVERALLS: ${{ secrets.COVERALLS }}
-          DISCORD_URL: ${{ secrets.DISCORD_URL }}
-          EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
-          EMAIL_USER: ${{ secrets.EMAIL_USER }}
-          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
-          EMAIL_OUTGOING: ${{ secrets.EMAIL_OUTGOING }}
-          EMAIL_SEND_TO: ${{ secrets.EMAIL_SEND_TO }}
-          EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
-          MOBILE_ID: ${{ secrets.MOBILE_ID }}
-          MOBILE_NUMBER: ${{ secrets.MOBILE_NUMBER }}
-          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
-          PUSHOVER_API: ${{ secrets.PUSHOVER_API }}
-          SLACK_URL: ${{ secrets.SLACK_URL }}
-          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
-          TWILIO_SID: ${{ secrets.TWILIO_SID }}
-          TWILIO_SECRET: ${{ secrets.TWILIO_SECRET }}
-          TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
-          TWILIO_TO: ${{ secrets.TWILIO_TO }}
-          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
-          GOTIFY_URL: ${{ secrets.GOTIFY_URL }}
-          GOTIFY_TOKEN: ${{ secrets.GOTIFY_TOKEN }}
-          SNS_TOKEN: ${{ secrets.SNS_TOKEN }}
-          SNS_SECRET: ${{ secrets.SNS_SECRET }}
-          SNS_REGION: ${{ secrets.SNS_REGION }}
-          SNS_TOPIC: ${{ secrets.SNS_TOPIC }}
+#      - name: Go Tests
+#        run: |
+#          go get gotest.tools/gotestsum
+#          gotestsum --no-summary=skipped --format testname -- -covermode=count -coverprofile=coverage.out -p=1 ./...
+#        env:
+#          VERSION: ${{ env.VERSION }}
+#          COMMIT: ${{ github.sha }}
+#          DB_CONN: sqlite3
+#          STATPING_DIR: ${{ github.workspace }}
+#          API_SECRET: demopassword123
+#          DISABLE_LOGS: false
+#          ALLOW_REPORTS: true
+#          SAMPLE_DATA: true
+#          COVERALLS: ${{ secrets.COVERALLS }}
+#          DISCORD_URL: ${{ secrets.DISCORD_URL }}
+#          EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+#          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+#          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+#          EMAIL_OUTGOING: ${{ secrets.EMAIL_OUTGOING }}
+#          EMAIL_SEND_TO: ${{ secrets.EMAIL_SEND_TO }}
+#          EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+#          MOBILE_ID: ${{ secrets.MOBILE_ID }}
+#          MOBILE_NUMBER: ${{ secrets.MOBILE_NUMBER }}
+#          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
+#          PUSHOVER_API: ${{ secrets.PUSHOVER_API }}
+#          SLACK_URL: ${{ secrets.SLACK_URL }}
+#          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+#          TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
+#          TWILIO_SID: ${{ secrets.TWILIO_SID }}
+#          TWILIO_SECRET: ${{ secrets.TWILIO_SECRET }}
+#          TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
+#          TWILIO_TO: ${{ secrets.TWILIO_TO }}
+#          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+#          GOTIFY_URL: ${{ secrets.GOTIFY_URL }}
+#          GOTIFY_TOKEN: ${{ secrets.GOTIFY_TOKEN }}
+#          SNS_TOKEN: ${{ secrets.SNS_TOKEN }}
+#          SNS_SECRET: ${{ secrets.SNS_SECRET }}
+#          SNS_REGION: ${{ secrets.SNS_REGION }}
+#          SNS_TOPIC: ${{ secrets.SNS_TOPIC }}
 
       - name: Coveralls Testing Coverage
         run: |

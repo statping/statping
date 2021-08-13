@@ -1,4 +1,4 @@
-name: 2. Unstable Build, Test and Deploy
+name: 1. Development Build and Testing
 on:
   push:
     branches:
@@ -55,17 +55,17 @@ jobs:
           path: ./source
 
   build:
-    needs: [frontend, test, test-postman-sqlite, test-postman-mysql, test-postman-postgres]
+    needs: frontend
     runs-on: [self-hosted, linux, aboutcher-hosted]
     strategy:
       matrix:
         platform: [linux]
         arch: [386, amd64, arm-7, arm-6, arm64]
-#        include:
-#          - platform: darwin
-#            arch: amd64
-#          - platform: windows
-#            arch: amd64
+        include:
+          - platform: darwin
+            arch: amd64
+          - platform: windows
+            arch: amd64
 
     steps:
       - uses: actions/checkout@v2
@@ -88,17 +88,18 @@ jobs:
           echo "XGO_TAGS=netgo osusergo linux sqlite_omit_load_extension" >> $GITHUB_ENV
         shell: bash
 
-#      - name: Set Darwin Build Flags
-#        if: matrix.platform == 'darwin'
-#        run: echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
-#        shell: bash
+      - name: Set Darwin Build Flags
+        if: matrix.platform == 'darwin'
+        run : |
+          echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
+        shell: bash
 
- #     - name: Set Windows Build Flags
- #       if: matrix.platform == 'windows'
- #       run: |
- #         echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
- #         echo "XGO_TAGS=netgo osusergo sqlite_omit_load_extension" >> $GITHUB_ENV
- #       shell: bash
+      - name: Set Windows Build Flags
+        if: matrix.platform == 'windows'
+        run: |
+          echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
+          echo "XGO_TAGS=netgo osusergo sqlite_omit_load_extension" >> $GITHUB_ENV
+        shell: bash
 
       - name: Build ${{ matrix.platform }}/${{ matrix.arch }}
         uses: crazy-max/ghaction-xgo@v1
@@ -111,8 +112,8 @@ jobs:
           dest: build
           prefix: statping
           targets: ${{ matrix.platform }}/${{ matrix.arch }}
-          v: false
-          x: false
+          v: true
+          x: true
           pkg: cmd
           buildmode: pie
           tags: ${{ env.XGO_TAGS }}
@@ -128,44 +129,25 @@ jobs:
           rm -rf statping
           echo "compressed=statping-linux-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
 
-#      - name: Compress Windows Builds
-#        if: matrix.platform == 'windows'
-#        run: |
-#          cd build
-#          mv statping-windows-4.0-${{ matrix.arch }}.exe statping.exe
-#          chmod +x statping.exe
-#          zip statping-windows-${{ matrix.arch }}.zip statping.exe
-#          rm -rf statping.exe
-#          echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
+      - name: Compress Windows Builds
+        if: matrix.platform == 'windows'
+        run: |
+          cd build
+          mv statping-windows-4.0-${{ matrix.arch }}.exe statping.exe
+          chmod +x statping.exe
+          zip statping-windows-${{ matrix.arch }}.zip statping.exe
+          rm -rf statping.exe
+          echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
 
-#      - name: Compress Darwin Builds
-#        if: matrix.platform == 'darwin'
-#        run: |
-#          cd build
-#          mv statping-darwin-10.6-${{ matrix.arch }} statping
-#          chmod +x statping
-#          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
-#          rm -rf statping
-#          echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
-
-      - name: Upload Compiled Statping Binary
-        uses: actions/upload-artifact@v1
-        with:
-          name: statping-${{ matrix.platform }}-${{ matrix.arch }}
-          path: ./build
-
-      - name: Upload Releases
-        id: upload-assets
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ env.VERSION }}
-        with:
-          tag_name: dev-v${{ env.VERSION }}
-          draft: true
-          prerelease: true
-          files: build/${{ env.compressed }}
-
+      - name: Compress Darwin Builds
+        if: matrix.platform == 'darwin'
+        run: |
+          cd build
+          mv statping-darwin-10.6-${{ matrix.arch }} statping
+          chmod +x statping
+          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
+          rm -rf statping
+          echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
 
   test:
     needs: frontend
@@ -424,65 +406,3 @@ jobs:
           environment: ./dev/postman_env_postgres.json
           timeoutRequest: 30000
           delayRequest: 600
-
-  docker-release:
-    needs: [test, build, test-postman-sqlite, test-postman-mysql, test-postman-postgres]
-    runs-on: [self-hosted, linux, aboutcher-hosted]
-    steps:
-      - name: Checkout Statping Repo
-        uses: actions/checkout@v2
-
-      - name: Setting ENV's
-        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
-        shell: bash
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-        id: buildx
-        with:
-          install: true
-
-      - name: Docker Login
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        id: buildx-docker-master
-        with:
-          path: /tmp/.buildx-cache
-          key: buildx-docker-master
-          restore-keys: |
-            buildx-docker-master
-      - name: Docker Build :base
-        run: make buildx-base
-
-      - name: Docker Build :dev
-        run: make buildx-dev
-
-#  sentry-release:
-#    needs: [test, test-postman-sqlite, test-postman-postgres, test-postman-mysql]
-#    runs-on: [self-hosted, linux, aboutcher-hosted]
-#    steps:
-#      - name: Checkout Statping Repo
-#        uses: actions/checkout@v2
-#
-#      - name: Setup Sentry CLI
-#        uses: mathrix-education/setup-sentry-cli@master
-#        with:
-#          version: latest
-#          url: ${{ secrets.SENTRY_URL }}
-#          token: ${{ secrets.SENTRY_AUTH_TOKEN }}
-#          organization: statping
-#
-#      - name: Setting ENV's
-#        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
-#        shell: bash
-#
-#      - name: Sentry Release
-#        run: make sentry-release
