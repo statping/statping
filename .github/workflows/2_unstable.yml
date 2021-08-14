@@ -273,7 +273,7 @@ jobs:
 
   test-postman-sqlite:
     needs: frontend
-    runs-on: [self-hosted, linux, aboutcher-hosted]
+    runs-on: [self-hosted, linux, aboutcher-hosted, centos7]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
@@ -316,7 +316,7 @@ jobs:
 
   test-postman-mysql:
     needs: frontend
-    runs-on: [self-hosted, linux, aboutcher-hosted]
+    runs-on: [self-hosted, linux, aboutcher-hosted, centos7]
 
     services:
       mysql:
@@ -372,7 +372,7 @@ jobs:
 
   test-postman-postgres:
     needs: frontend
-    runs-on: [self-hosted, linux, aboutcher-hosted]
+    runs-on: [self-hosted, linux, aboutcher-hosted, centos7]
 
     services:
       postgres:
@@ -427,7 +427,7 @@ jobs:
 
   docker-release:
     needs: [build, test-postman-sqlite, test-postman-mysql, test-postman-postgres]
-    runs-on: [self-hosted, linux, aboutcher-hosted]
+    runs-on: [self-hosted, linux, aboutcher-hosted, rocky8]
     steps:
       - name: Checkout Statping Repo
         uses: actions/checkout@v2
