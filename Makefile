@@ -383,7 +383,7 @@ xgo-latest:
 buildx-latest: multiarch
 	docker buildx create --name statping-latest
 	docker buildx inspect --builder statping-latest --bootstrap
-	docker buildx build --builder statping-latest --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t adamboutcher/statping-ng:latest -t statping-ng/statping-ng:v${VERSION} --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
+	docker buildx build --builder statping-latest --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t adamboutcher/statping-ng:latest -t adamboutcher/statping-ng:v${VERSION} --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
 #	docker buildx rm statping-latest
 
 buildx-dev: multiarch
