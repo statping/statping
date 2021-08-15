@@ -9,7 +9,7 @@ on:
 jobs:
 
   frontend:
-    runs-on: [self-hosted, linux, aboutcher-hosted]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
@@ -56,7 +56,7 @@ jobs:
 
   build:
     needs: frontend
-    runs-on: [self-hosted, linux, aboutcher-hosted]
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         platform: [linux]
@@ -151,7 +151,7 @@ jobs:
 
   test:
     needs: frontend
-    runs-on: [self-hosted, linux, aboutcher-hosted]
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:10.8
@@ -255,7 +255,7 @@ jobs:
 
   test-postman-sqlite:
     needs: frontend
-    runs-on: [self-hosted, linux, aboutcher-hosted]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
@@ -298,7 +298,7 @@ jobs:
 
   test-postman-mysql:
     needs: frontend
-    runs-on: [self-hosted, linux, aboutcher-hosted]
+    runs-on: ubuntu-latest
 
     services:
       mysql:
@@ -354,7 +354,7 @@ jobs:
 
   test-postman-postgres:
     needs: frontend
-    runs-on: [self-hosted, linux, aboutcher-hosted]
+    runs-on: ubuntu-latest
 
     services:
       postgres:
