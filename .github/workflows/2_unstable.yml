@@ -445,12 +445,6 @@ jobs:
         with:
           install: true
 
-      - name: Docker Login
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-
       - name: Cache Docker layers
         uses: actions/cache@v2
         id: buildx-docker-master
@@ -459,11 +453,25 @@ jobs:
           key: buildx-docker-master
           restore-keys: |
             buildx-docker-master
+
       - name: Docker Build :base
-        run: make buildx-base
+        run: make buildx-base --cache-to=type=local,dest=cache,mode=max
 
       - name: Docker Build :dev
-        run: make buildx-dev
+        run: make buildx-dev --cache-to=type=local,dest=cache,mode=max
+
+      - name: Docker Login
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
+
+      - name: Docker Upload :base
+        run: docker buildx build --push --cache-from=type=local,src=cache
+
+      - name: Docker Upload :dev
+        run: docker buildx build --push --cache-from=type=local,src=cache
+
 
 #  sentry-release:
 #    needs: [test, test-postman-sqlite, test-postman-postgres, test-postman-mysql]
