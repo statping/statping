@@ -384,19 +384,19 @@ buildx-latest: multiarch
 	docker buildx create --name statping-latest
 	docker buildx inspect --builder statping-latest --bootstrap
 	docker buildx build --builder statping-latest --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t statping-ng/statping-ng:latest -t statping-ng/statping-ng:v${VERSION} --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
-	docker buildx rm statping-latest
+#	docker buildx rm statping-latest
 
 buildx-dev: multiarch
 	docker buildx create --name statping-dev
 	docker buildx inspect --builder statping-dev --bootstrap
 	docker buildx build --builder statping-dev --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t statping-ng/statping-ng:dev --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
-	docker buildx rm statping-dev
+#	docker buildx rm statping-dev
 
 buildx-base: multiarch
 	docker buildx create --name statping-base
 	docker buildx inspect --builder statping-base --bootstrap
 	docker buildx build --builder statping-base --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache" --pull --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile.base -t statping-ng/statping-ng:base --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
-	docker buildx rm statping-base
+#	docker buildx rm statping-base
 
 multiarch:
 	mkdir /tmp/.buildx-cache || true
