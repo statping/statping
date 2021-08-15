@@ -56,7 +56,7 @@ jobs:
 
   build:
     needs: [frontend, test-postman-sqlite, test-postman-mysql, test-postman-postgres]
-    runs-on: [self-hosted, linux, aboutcher-hosted, rocky8]
+    runs-on: [self-hosted, linux, aboutcher-hosted, centos7]
     strategy:
       matrix:
         platform: [linux]
