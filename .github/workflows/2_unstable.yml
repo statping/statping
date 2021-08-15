@@ -56,7 +56,7 @@ jobs:
 
   build:
     needs: [frontend, test-postman-sqlite, test-postman-mysql, test-postman-postgres]
-    runs-on: [self-hosted, linux, aboutcher-hosted, centos7]
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         platform: [linux]
@@ -316,7 +316,7 @@ jobs:
 
   test-postman-mysql:
     needs: frontend
-    runs-on: [self-hosted, linux, aboutcher-hosted, rocky8]
+    runs-on: ubuntu-latest
 
     services:
       mysql:
@@ -372,7 +372,7 @@ jobs:
 
   test-postman-postgres:
     needs: frontend
-    runs-on: [self-hosted, linux, aboutcher-hosted, rocky8]
+    runs-on: ubuntu-latest
 
     services:
       postgres:
