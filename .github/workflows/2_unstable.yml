@@ -453,9 +453,17 @@ jobs:
           key: buildx-docker-master
           restore-keys: |
             buildx-docker-master
-
       - name: Docker Build :base
         run: make buildx-base
+        
+      - name: Docker Login
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
+        
+      - name: Docker Upload :base
+        run: docker buildx build --push --cache-from=type=local,src=/tmp/.buildx-cache
 
       - name: Docker Build :dev
         run: make buildx-dev
@@ -465,9 +473,6 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-
-      - name: Docker Upload :base
-        run: docker buildx build --push --cache-from=type=local,src=/tmp/.buildx-cache
 
       - name: Docker Upload :dev
         run: docker buildx build --push --cache-from=type=local,src=/tmp/.buildx-cache
