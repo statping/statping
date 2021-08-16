@@ -472,7 +472,7 @@ jobs:
         run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
         
       - name: Docker Upload arm64 :base
-        run: docker buildx build --builder statping-base --push --cache-from=type=local,src=/tmp/.buildx-cache --push --cache-from=type=local,src=/tmp/.buildx-cache --platform llinux/arm64 -f Dockerfile.base -t adamboutcher/statping-ng:base .
+        run: docker buildx build --builder statping-base --push --cache-from=type=local,src=/tmp/.buildx-cache --push --cache-from=type=local,src=/tmp/.buildx-cache --platform linux/arm64 -f Dockerfile.base -t adamboutcher/statping-ng:base .
 
 
       - name: Docker Login
@@ -482,7 +482,7 @@ jobs:
         run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
         
       - name: Docker Upload arm7 :base
-        run: docker buildx build --builder statping-base --push --cache-from=type=local,src=/tmp/.buildx-cache --push --cache-from=type=local,src=/tmp/.buildx-cache --platform inux/arm/v7 -f Dockerfile.base -t adamboutcher/statping-ng:base .
+        run: docker buildx build --builder statping-base --push --cache-from=type=local,src=/tmp/.buildx-cache --push --cache-from=type=local,src=/tmp/.buildx-cache --platform linux/arm/v7 -f Dockerfile.base -t adamboutcher/statping-ng:base .
 
       - name: Docker Login
         env:
