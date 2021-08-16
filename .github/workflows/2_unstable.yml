@@ -503,7 +503,7 @@ jobs:
         run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
 
       - name: Docker Upload :dev
-        run: docker buildx build --push --cache-from=type=local,src=/tmp/.buildx-cache
+        run: docker buildx build --builder statping-dev --push --cache-from=type=local,src=/tmp/.buildx-cache --push --cache-from=type=local,src=/tmp/.buildx-cache --platform linux/amd64,linux/arm64,linux/arm/7,linux/arm/v6 -f Dockerfile.base -t adamboutcher/statping-ng:dev .
 
       - name: Clean
         run: docker buildx rm statping-base && docker buildx rm statping-dev
