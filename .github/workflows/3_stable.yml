@@ -9,7 +9,7 @@ on:
 jobs:
 
   frontend:
-    runs-on: [self-hosted, linux, aboutcher-hosted]
+    runs-on: [self-hosted, linux, aboutcher-hosted, rocky8]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
@@ -54,31 +54,31 @@ jobs:
           name: static-rice-box
           path: ./source
 
-      - name: Configure AWS credentials for Asset uploads
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
-
-      - name: Upload Static Assets to S3
-        run: |
-          tar -czvf source.tar.gz source/
-          aws s3 cp source.tar.gz s3://assets.statping.com/commit/${{ github.sha }}/
-          rm -rf source.tar.gz
+#      - name: Configure AWS credentials for Asset uploads
+#        uses: aws-actions/configure-aws-credentials@v1
+#        with:
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: us-west-2
+#
+#      - name: Upload Static Assets to S3
+#        run: |
+#          tar -czvf source.tar.gz source/
+#          aws s3 cp source.tar.gz s3://assets.statping.com/commit/${{ github.sha }}/
+#          rm -rf source.tar.gz
 
   build:
-    needs: frontend
-    runs-on: [self-hosted, linux]
+    needs: [test-postman-sqlite, test-postman-mysql, test-postman-postgres]
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         platform: [linux]
         arch: [386, amd64, arm-7, arm-6, arm64]
-        include:
-          - platform: darwin
-            arch: amd64
-          - platform: windows
-            arch: amd64
+#        include:
+#          - platform: darwin
+#            arch: amd64
+#          - platform: windows
+#            arch: amd64
 
     steps:
       - uses: actions/checkout@v2
@@ -89,12 +89,12 @@ jobs:
           name: static-rice-box
           path: ./source
 
-      - name: Configure AWS credentials for Asset uploads
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
+#      - name: Configure AWS credentials for Asset uploads
+#        uses: aws-actions/configure-aws-credentials@v1
+#        with:
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: us-west-2
 
       - name: Add GOBIN to PATH
         run: |
@@ -108,17 +108,17 @@ jobs:
           echo "XGO_TAGS=netgo osusergo linux sqlite_omit_load_extension" >> $GITHUB_ENV
         shell: bash
 
-      - name: Set Darwin Build Flags
-        if: matrix.platform == 'darwin'
-        run: echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
-        shell: bash
+#      - name: Set Darwin Build Flags
+#        if: matrix.platform == 'darwin'
+#        run: echo "XGO_TAGS=netgo osusergo darwin sqlite_omit_load_extension" >> $GITHUB_ENV
+#        shell: bash
 
-      - name: Set Windows Build Flags
-        if: matrix.platform == 'windows'
-        run: |
-          echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
-          echo "XGO_TAGS=netgo osusergo sqlite_omit_load_extension" >> $GITHUB_ENV
-        shell: bash
+#      - name: Set Windows Build Flags
+#        if: matrix.platform == 'windows'
+#        run: |
+#          echo "BUILD_FLAGS=-extldflags -static" >> $GITHUB_ENV
+#          echo "XGO_TAGS=netgo osusergo sqlite_omit_load_extension" >> $GITHUB_ENV
+#        shell: bash
 
       - name: Build ${{ matrix.platform }}/${{ matrix.arch }}
         uses: crazy-max/ghaction-xgo@v1
@@ -148,25 +148,25 @@ jobs:
           rm -rf statping
           echo "compressed=statping-linux-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
 
-      - name: Compress Windows Builds
-        if: matrix.platform == 'windows'
-        run: |
-          cd build
-          mv statping-windows-4.0-${{ matrix.arch }}.exe statping.exe
-          chmod +x statping.exe
-          zip statping-windows-${{ matrix.arch }}.zip statping.exe
-          rm -rf statping.exe
-          echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
+#      - name: Compress Windows Builds
+#        if: matrix.platform == 'windows'
+#        run: |
+#          cd build
+#          mv statping-windows-4.0-${{ matrix.arch }}.exe statping.exe
+#          chmod +x statping.exe
+#          zip statping-windows-${{ matrix.arch }}.zip statping.exe
+#          rm -rf statping.exe
+#          echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
 
-      - name: Compress Darwin Builds
-        if: matrix.platform == 'darwin'
-        run: |
-          cd build
-          mv statping-darwin-10.6-${{ matrix.arch }} statping
-          chmod +x statping
-          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
-          rm -rf statping
-          echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
+#      - name: Compress Darwin Builds
+#        if: matrix.platform == 'darwin'
+#        run: |
+#          cd build
+#          mv statping-darwin-10.6-${{ matrix.arch }} statping
+#          chmod +x statping
+#          tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
+#          rm -rf statping
+#          echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
 
       - name: Upload Compiled Statping Binary
         uses: actions/upload-artifact@v1
@@ -190,113 +190,113 @@ jobs:
 #        run: |
 #          aws s3 cp build/${{ env.compressed }} s3://assets.statping.com/commit/${{ github.sha }}/
 
-  test:
-    needs: frontend
-    runs-on: [self-hosted, linux]
-    services:
-      postgres:
-        image: postgres:10.8
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: password123
-          POSTGRES_DB: statping
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: password123
-          MYSQL_DATABASE: statping
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
-        with:
-          go-version: 1.15.x
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12.18.2
-
-      - name: Install Global Dependencies
-        run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
-
-      - name: Setting ENV's
-        run: |
-          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
-          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
-          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
-        shell: bash
-
-      - name: Download Compiled Frontend (rice-box.go)
-        uses: actions/download-artifact@v1
-        with:
-          name: static-rice-box
-          path: ./source
-
-      - name: Install Statping
-        env:
-          VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ github.sha }}
-        run: |
-          make build certs
-          chmod +x statping
-          mv statping $(go env GOPATH)/bin/
-
-      - name: Go Tests
-        run: |
-          go get gotest.tools/gotestsum
-          gotestsum --no-summary=skipped --format testname -- -covermode=count -coverprofile=coverage.out -p=1 ./...
-        env:
-          VERSION: ${{ env.VERSION }}
-          COMMIT: ${{ github.sha }}
-          DB_CONN: sqlite3
-          STATPING_DIR: ${{ github.workspace }}
-          API_SECRET: demopassword123
-          DISABLE_LOGS: false
-          ALLOW_REPORTS: true
-          SAMPLE_DATA: true
-          COVERALLS: ${{ secrets.COVERALLS }}
-          DISCORD_URL: ${{ secrets.DISCORD_URL }}
-          EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
-          EMAIL_USER: ${{ secrets.EMAIL_USER }}
-          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
-          EMAIL_OUTGOING: ${{ secrets.EMAIL_OUTGOING }}
-          EMAIL_SEND_TO: ${{ secrets.EMAIL_SEND_TO }}
-          EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
-          MOBILE_ID: ${{ secrets.MOBILE_ID }}
-          MOBILE_NUMBER: ${{ secrets.MOBILE_NUMBER }}
-          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
-          PUSHOVER_API: ${{ secrets.PUSHOVER_API }}
-          SLACK_URL: ${{ secrets.SLACK_URL }}
-          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
-          TWILIO_SID: ${{ secrets.TWILIO_SID }}
-          TWILIO_SECRET: ${{ secrets.TWILIO_SECRET }}
-          TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
-          TWILIO_TO: ${{ secrets.TWILIO_TO }}
-          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
-          GOTIFY_URL: ${{ secrets.GOTIFY_URL }}
-          GOTIFY_TOKEN: ${{ secrets.GOTIFY_TOKEN }}
-          SNS_TOKEN: ${{ secrets.SNS_TOKEN }}
-          SNS_SECRET: ${{ secrets.SNS_SECRET }}
-          SNS_REGION: ${{ secrets.SNS_REGION }}
-          SNS_TOPIC: ${{ secrets.SNS_TOPIC }}
-
-      - name: Coveralls Testing Coverage
-        run: |
-          go get github.com/mattn/goveralls
-          goveralls -coverprofile=coverage.out -repotoken $COVERALLS
-        env:
-          COVERALLS: ${{ secrets.COVERALLS }}
+#  test:
+#    needs: frontend
+#    runs-on: ubuntu-latest
+#    services:
+#      postgres:
+#        image: postgres:10.8
+#        env:
+#          POSTGRES_USER: root
+#          POSTGRES_PASSWORD: password123
+#          POSTGRES_DB: statping
+#        ports:
+#          - 5432:5432
+#        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+#
+#      mysql:
+#        image: mysql:5.7
+#        env:
+#          MYSQL_ROOT_PASSWORD: password123
+#          MYSQL_DATABASE: statping
+#        ports:
+#          - 3306:3306
+#        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: actions/setup-go@v2
+#        with:
+#          go-version: 1.15.x
+#      - uses: actions/setup-node@v1
+#        with:
+#          node-version: 12.18.2
+#
+#      - name: Install Global Dependencies
+#        run: npm install -g yarn sass newman cross-env wait-on @sentry/cli
+#
+#      - name: Setting ENV's
+#        run: |
+#          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+#          echo "/opt/hostedtoolcache/node/12.18.2/x64/bin" >> $GITHUB_PATH
+#          echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+#        shell: bash
+#
+#      - name: Download Compiled Frontend (rice-box.go)
+#        uses: actions/download-artifact@v1
+#        with:
+#          name: static-rice-box
+#          path: ./source
+#
+#      - name: Install Statping
+#        env:
+#          VERSION: ${{ env.VERSION }}
+#          COMMIT: ${{ github.sha }}
+#        run: |
+#          make build certs
+#          chmod +x statping
+#          mv statping $(go env GOPATH)/bin/
+#
+#      - name: Go Tests
+#        run: |
+#          go get gotest.tools/gotestsum
+#          gotestsum --no-summary=skipped --format testname -- -covermode=count -coverprofile=coverage.out -p=1 ./...
+#        env:
+#          VERSION: ${{ env.VERSION }}
+#          COMMIT: ${{ github.sha }}
+#          DB_CONN: sqlite3
+#          STATPING_DIR: ${{ github.workspace }}
+#          API_SECRET: demopassword123
+#          DISABLE_LOGS: false
+#          ALLOW_REPORTS: true
+#          SAMPLE_DATA: true
+#          COVERALLS: ${{ secrets.COVERALLS }}
+#          DISCORD_URL: ${{ secrets.DISCORD_URL }}
+#          EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+#          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+#          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+#          EMAIL_OUTGOING: ${{ secrets.EMAIL_OUTGOING }}
+#          EMAIL_SEND_TO: ${{ secrets.EMAIL_SEND_TO }}
+#          EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+#          MOBILE_ID: ${{ secrets.MOBILE_ID }}
+#          MOBILE_NUMBER: ${{ secrets.MOBILE_NUMBER }}
+#          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
+#          PUSHOVER_API: ${{ secrets.PUSHOVER_API }}
+#          SLACK_URL: ${{ secrets.SLACK_URL }}
+#          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+#          TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
+#          TWILIO_SID: ${{ secrets.TWILIO_SID }}
+#          TWILIO_SECRET: ${{ secrets.TWILIO_SECRET }}
+#          TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
+#          TWILIO_TO: ${{ secrets.TWILIO_TO }}
+#          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+#          GOTIFY_URL: ${{ secrets.GOTIFY_URL }}
+#          GOTIFY_TOKEN: ${{ secrets.GOTIFY_TOKEN }}
+#          SNS_TOKEN: ${{ secrets.SNS_TOKEN }}
+#          SNS_SECRET: ${{ secrets.SNS_SECRET }}
+#          SNS_REGION: ${{ secrets.SNS_REGION }}
+#          SNS_TOPIC: ${{ secrets.SNS_TOPIC }}
+#
+#      - name: Coveralls Testing Coverage
+#        run: |
+#          go get github.com/mattn/goveralls
+#          goveralls -coverprofile=coverage.out -repotoken $COVERALLS
+#        env:
+#          COVERALLS: ${{ secrets.COVERALLS }}
 
   test-postman-sqlite:
     needs: frontend
-    runs-on: [self-hosted, linux]
+    runs-on: [self-hosted, linux, aboutcher-hosted, centos7]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
@@ -339,7 +339,7 @@ jobs:
 
   test-postman-mysql:
     needs: frontend
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
 
     services:
       mysql:
@@ -395,7 +395,7 @@ jobs:
 
   test-postman-postgres:
     needs: frontend
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
 
     services:
       postgres:
@@ -449,8 +449,8 @@ jobs:
           delayRequest: 600
 
   docker-release:
-    needs: [build, test, test-postman-sqlite, test-postman-postgres, test-postman-mysql]
-    runs-on: [self-hosted, linux]
+    needs: build]
+    runs-on: [self-hosted, linux, aboutcher-hosted, rocky8]
     steps:
       - name: Checkout Statping Repo
         uses: actions/checkout@v2
@@ -468,12 +468,6 @@ jobs:
         with:
           install: true
 
-      - name: Docker Login
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-
       - name: Cache Docker layers
         uses: actions/cache@v2
         id: buildx-docker
@@ -482,15 +476,28 @@ jobs:
           key: buildx-docker
           restore-keys: |
             buildx-docker
+
+      - name: Docker Login
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
+
       - name: Docker Build :base
         run: make buildx-base
+
+      - name: Docker Login
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
 
       - name: Docker Build :lastest
         run: make buildx-latest
 
 #  sentry-release:
 #    needs: docker-release
-#    runs-on: [self-hosted, linux]
+#    runs-on: ubuntu-latest
 #    steps:
 #      - name: Checkout Statping Repo
 #        uses: actions/checkout@v2
@@ -510,37 +517,37 @@ jobs:
 #      - name: Sentry Release
 #        run: make sentry-release
 
-  homebrew-release:
-    needs: docker-release
-    runs-on: [self-hosted, linux]
-    steps:
-      - name: Checkout Statping Repo
-        uses: actions/checkout@v2
-
-      - name: Setting ENV's
-        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
-        shell: bash
-
-      - name: Update Homebrew Package
-        env:
-          VERSION: ${{ env.VERSION }}
-          TRAVIS_API: ${{ secrets.TRAVIS_API }}
-        run: make publish-homebrew
-
-  slack-update:
-    needs: docker-release
-    runs-on: [self-hosted, linux]
-    steps:
-      - name: Checkout Statping Repo
-        uses: actions/checkout@v2
-
-      - name: Setting ENV's
-        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
-        shell: bash
-
-      - name: Slack Notification
-        uses: rtCamp/action-slack-notify@master
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_URL }}
-          SLACK_CHANNEL: dev
-          SLACK_USERNAME: StatpingDev
+#  homebrew-release:
+#    needs: docker-release
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout Statping Repo
+#        uses: actions/checkout@v2
+#
+#      - name: Setting ENV's
+#        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+#        shell: bash
+#
+#      - name: Update Homebrew Package
+#        env:
+#          VERSION: ${{ env.VERSION }}
+#          TRAVIS_API: ${{ secrets.TRAVIS_API }}
+#        run: make publish-homebrew
+#
+#  slack-update:
+#    needs: docker-release
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout Statping Repo
+#        uses: actions/checkout@v2
+#
+#      - name: Setting ENV's
+#        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+#        shell: bash
+#
+#      - name: Slack Notification
+#        uses: rtCamp/action-slack-notify@master
+#        env:
+#          SLACK_WEBHOOK: ${{ secrets.SLACK_URL }}
+#          SLACK_CHANNEL: dev
+#          SLACK_USERNAME: StatpingDev
