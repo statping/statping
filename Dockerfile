@@ -1,4 +1,4 @@
-FROM aboutcher/statping-ng:base AS base
+FROM adamboutcher/statping-ng:base AS base
 ARG BUILDPLATFORM
 # Statping main Docker image that contains all required libraries
 FROM alpine:latest
