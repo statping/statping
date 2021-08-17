@@ -1,5 +1,5 @@
 FROM node:12.18.2-alpine AS frontend
-LABEL maintainer="Statping-NG (https://github.com/statping-ng)"
+LABEL maintainer="Statping-ng (https://github.com/statping-ng)"
 ARG BUILDPLATFORM
 WORKDIR /statping
 COPY ./frontend/package.json .
