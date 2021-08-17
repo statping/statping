@@ -3,7 +3,7 @@
 </p>
 <p align="center">
     <b>Statping-ng - Web and App Status Monitoring for Any Type of Project</b><br>
-<a href="https://github.com/statping-ng/statping-ng/wiki">View Wiki</a> | <a href="https://demo.statping.com">Demo</a> | <a href="https://itunes.apple.com/us/app/apple-store/id1445513219">iPhone</a> | <a href="https://play.google.com/store/apps/details?id=com.statping">Android</a> <br> <a href="http://docs.statping.com">API</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Docker">Docker</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/AWS-EC2">EC2</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Mac">Mac</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Linux">Linux</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Windows">Windows</a>
+<a href="https://statping-ng.github.io">Website</a> | <a href="https://github.com/statping-ng/statping-ng/wiki">View Wiki</a> | <a href="https://play.google.com/store/apps/details?id=com.statping">Android</a> <br> <a href="http://docs.statping.com">API</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Docker">Docker</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Mac">Mac</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Linux">Linux</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Windows">Windows</a>
 </p>
 
 # Statping-ng - Status Page & Monitoring Server
@@ -114,7 +114,7 @@ scrape_configs:
 <br><br><br><br>
 
 ## Contributing
-Statping-ng accepts Push Requests to the `dev` branch! Feel free to add your own features and notifiers. You probably want to checkout the [Notifier Wiki](https://github.com/statping-ng/statping-ng/wiki/Notifiers) to get a better understanding on how to create your own notification methods for failing/successful services. Testing on Statping-ng will test each function on MySQL, Postgres, and SQLite. I recommend running MySQL and Postgres Docker containers for testing. You can find multiple docker-compose files in the dev directory. 
+Statping-ng accepts Push Requests to the `dev` branch! Feel free to add your own features and notifiers. You probably want to checkout the [Notifier Wiki](https://github.com/statping-ng/statping-ng/wiki/Notifiers) to get a better understanding on how to create your own notification methods for failing/successful services. Testing on Statping-ng will test each function on MySQL, Postgres, and SQLite. I recommend running MySQL and Postgres Docker containers for testing. You can find multiple docker-compose files in the dev directory.
 
 ![Dev Release](https://github.com/statping-ng/statping-ng/workflows/Dev%20Release/badge.svg?branch=dev)
 [![Go Report Card](https://goreportcard.com/badge/github.com/statping-ng/statping-ng)](https://goreportcard.com/report/github.com/statping-ng/statping-ng)
