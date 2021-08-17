@@ -428,6 +428,7 @@ jobs:
   docker-release:
     needs: [build, test-postman-sqlite, test-postman-mysql, test-postman-postgres]
     runs-on: [self-hosted, linux, aboutcher-hosted, rocky8]
+
     steps:
       - name: Checkout Statping Repo
         uses: actions/checkout@v2
@@ -453,60 +454,24 @@ jobs:
           key: buildx-docker-master
           restore-keys: |
             buildx-docker-master
+
+      - name: Docker Login
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
+
       - name: Docker Build :base
         run: make buildx-base
-        
-      - name: Docker Login
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-        
-      - name: Docker Upload amd64 :base
-        run: docker buildx build --builder statping-base --push --cache-from=type=local,src=/tmp/.buildx-cache --push --cache-from=type=local,src=/tmp/.buildx-cache --platform linux/amd64 -f Dockerfile.base -t adamboutcher/statping-ng:base .
 
       - name: Docker Login
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-        
-      - name: Docker Upload arm64 :base
-        run: docker buildx build --builder statping-base --push --cache-from=type=local,src=/tmp/.buildx-cache --push --cache-from=type=local,src=/tmp/.buildx-cache --platform linux/arm64 -f Dockerfile.base -t adamboutcher/statping-ng:base .
-
-
-      - name: Docker Login
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-        
-      - name: Docker Upload arm7 :base
-        run: docker buildx build --builder statping-base --push --cache-from=type=local,src=/tmp/.buildx-cache --push --cache-from=type=local,src=/tmp/.buildx-cache --platform linux/arm/v7 -f Dockerfile.base -t adamboutcher/statping-ng:base .
-
-      - name: Docker Login
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-        
-      - name: Docker Upload arm6 :base
-        run: docker buildx build --builder statping-base --push --cache-from=type=local,src=/tmp/.buildx-cache --push --cache-from=type=local,src=/tmp/.buildx-cache --platform linux/arm/v6 -f Dockerfile.base -t adamboutcher/statping-ng:base .
 
       - name: Docker Build :dev
         run: make buildx-dev
-
-      - name: Docker Login
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-
-      - name: Docker Upload :dev
-        run: docker buildx build --builder statping-dev --push --cache-from=type=local,src=/tmp/.buildx-cache --push --cache-from=type=local,src=/tmp/.buildx-cache --platform linux/amd64,linux/arm64,linux/arm/7,linux/arm/v6 -f Dockerfile.base -t adamboutcher/statping-ng:dev .
-
-      - name: Clean
-        run: docker buildx rm statping-base && docker buildx rm statping-dev
 
 
 #  sentry-release:
