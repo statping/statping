@@ -11,7 +11,7 @@ An easy to use Status Page for your websites and applications. Statping will aut
 
 Statping-ng aims to be an updated drop-in replacement of statping after development stopped on the original fork.
 
-![GitHub last commit](https://img.shields.io/github/last-commit/statping-ng/statping-ng.svg) [![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/statping-ng/statping-ng)  [![Docker Pulls](https://img.shields.io/docker/pulls/aboutcher/statping-ng.svg)](https://hub.docker.com/r/statpingaboutcher/statping-ng/builds/)
+![GitHub last commit](https://img.shields.io/github/last-commit/statping-ng/statping-ng.svg) [![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/statping-ng/statping-ng)  [![Docker Pulls](https://img.shields.io/docker/pulls/aboutcher/statping-ng.svg)](https://hub.docker.com/r/adamboutcher/statping-ng/builds/)
 
 <br><br>
 <img align="left" width="320" height="235" src="https://img.cjx.io/statupsiterun.gif">
