@@ -1,7 +1,7 @@
-name: statping
+name: statping-ng
 version-script: cat version.txt
 version: "stable"
-summary: Statping Server Monitoring with Status Page
+summary: Statping-ng Server Monitoring with Status Page
 description: >
   An easy to use Status Page for your websites and applications.
   Statping will automatically fetch the application and render a beautiful
@@ -34,7 +34,7 @@ parts:
     override-build: |
       apt-get update
       apt-get install -y curl
-      curl -o- -L https://statping.com/install.sh | bash
+      curl -o- -L https://raw.githubusercontent.com/statping-ng/statping-ng/stable/snapcraft.yaml | bash
       mv /usr/local/bin/statping ./
     build-packages:
       - git
