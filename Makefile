@@ -383,19 +383,19 @@ xgo-latest:
 buildx-latest: multiarch
 	docker buildx create --name statping-latest --driver-opt image=moby/buildkit:master
 	docker buildx inspect --builder statping-latest --bootstrap
-	docker buildx build --builder statping-latest --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache,mode=max" --push --pull --platform linux/386,linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t adamboutcher/statping-ng:latest -t adamboutcher/statping-ng:v${VERSION} --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
+	docker buildx build --builder statping-latest --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache,mode=max" --push --pull --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t adamboutcher/statping-ng:latest -t adamboutcher/statping-ng:v${VERSION} --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
 	docker buildx rm statping-latest
 
 buildx-dev: multiarch
 	docker buildx create --name statping-dev --driver-opt image=moby/buildkit:master
 	docker buildx inspect --builder statping-dev --bootstrap
-	docker buildx build --builder statping-dev --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache,mode=max" --push --platform linux/386,linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t adamboutcher/statping-ng:dev --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
+	docker buildx build --builder statping-dev --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache,mode=max" --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t adamboutcher/statping-ng:dev --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
 	docker buildx rm statping-dev
 
 buildx-base: multiarch
 	docker buildx create --name statping-base --driver-opt image=moby/buildkit:master
 	docker buildx inspect --builder statping-base --bootstrap
-	docker buildx build --builder statping-base --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache,mode=max" --push --platform linux/386,linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile.base -t adamboutcher/statping-ng:base --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
+	docker buildx build --builder statping-base --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache,mode=max" --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile.base -t adamboutcher/statping-ng:base --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
 	docker buildx rm statping-base
 
 multiarch:
