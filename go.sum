@@ -583,8 +583,6 @@ github.com/spf13/viper v1.3.2/go.mod h1:ZiWeW+zYFKm7srdB9IoDzzZXaJaI5eL9QjNiN/DM
 github.com/spf13/viper v1.4.0/go.mod h1:PTJ7Z/lr49W6bUbkmS1V3by4uWynFiR9p7+dSq/yZzE=
 github.com/spf13/viper v1.6.3 h1:pDDu1OyEDTKzpJwdq4TiuLyMsUgRa/BT5cn5O62NoHs=
 github.com/spf13/viper v1.6.3/go.mod h1:jUMtyi0/lB5yZH/FjyGAoH7IMNrIhlBf6pXZmbMDvzw=
-github.com/statping/emails v1.0.0 h1:90hGweEhr8wIFiy34KCkiFqGJlkug2gAQLVR6oSCFNU=
-github.com/statping/emails v1.0.0/go.mod h1:xFU85jXaiWQadqHqu/jDrGsAn6WPSk1WgKyTVuFm0TI=
 github.com/statping-ng/statping-ng v0.90.64/go.mod h1:lbyNPB73IjWtnommV4wSejYfgUT1yLhhqelMjl1ZBb8=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1 h1:2vfRuCMp5sSVIDSqO8oNnWJq7mPa6KVP3iPIwFBuy8A=
