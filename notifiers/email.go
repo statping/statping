@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/go-mail/mail"
-	"github.com/statping/emails"
+	"github.com/statping-ng/emails"
 	"github.com/statping-ng/statping-ng/types/core"
 	"github.com/statping-ng/statping-ng/types/failures"
 	"github.com/statping-ng/statping-ng/types/notifications"
