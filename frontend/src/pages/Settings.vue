@@ -48,6 +48,10 @@
 
                     <h6 class="mt-4 mb-3 text-muted">Statping {{$t('links')}}</h6>
 
+                    <a href="https://statping-ng.github.io" class="mb-2 font-2 text-decoration-none text-muted">
+                        <font-awesome-icon icon="globe" class="mr-3"/> Statping-ng
+                    </a>
+
                     <a href="https://github.com/statping-ng/statping-ng/wiki" class="mb-2 font-2 text-decoration-none text-muted">
                         <font-awesome-icon icon="question" class="mr-3"/> {{$t('docs')}}
                     </a>
@@ -56,11 +60,11 @@
                         <font-awesome-icon icon="laptop" class="mr-2"/> API {{$t('docs')}}
                     </a>
 
-                    <a href="https://raw.githubusercontent.com/statping/statping/master/CHANGELOG.md" class="mb-2 font-2 text-decoration-none text-muted">
+                    <a href="https://raw.githubusercontent.com/statping-ng/statping-ng/stable/CHANGELOG.md" class="mb-2 font-2 text-decoration-none text-muted">
                         <font-awesome-icon icon="book" class="mr-3"/> {{$t('changelog')}}
                     </a>
 
-                    <a href="https://github.com/statping/statping" class="mb-2 font-2 text-decoration-none text-muted">
+                    <a href="https://github.com/statping-ng/statping-ng" class="mb-2 font-2 text-decoration-none text-muted">
                         <font-awesome-icon icon="code-branch" class="mr-3"/> {{$t('repo')}}
                     </a>
 

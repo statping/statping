@@ -7,8 +7,6 @@
 		
 			<a @click.prevent='tab="Features"' class="d-block mb-1 text-link" href="#">Features</a>
 		
-			<a @click.prevent='tab="Paid Hosting"' class="d-block mb-1 text-link" href="#">Paid Hosting</a>
-		
 			<a @click.prevent='tab="Types of Monitoring"' class="d-block mb-1 text-link" href="#">Types of Monitoring</a>
 		
 			<a @click.prevent='tab="Notifiers"' class="d-block mb-1 text-link" href="#">Notifiers</a>
@@ -75,14 +73,10 @@
 
 <div class="col-12" v-if='tab === "Home"'>
 	<div v-pre>
-		<p align="center">
-<img width="60%" src="https://s3-us-west-2.amazonaws.com/gitimgs/statping.png">
-<img width="70%" src="https://img.cjx.io/statuptokenbalance.gif">
-</p>
 
 <p align="center">
-<img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/statping/statping"> 
-<a href="https://github.com/statping-ng/statping-ng/labels/priority"><img src="https://img.shields.io/github/issues/statping/statping/priority?color=blue&label=priority"></a> <a href="https://github.com/statping-ng/statping-ng/labels/bug"><img src="https://img.shields.io/github/issues/statping/statping/bug?color=red&label=bugs"></a> <a href="https://github.com/statping-ng/statping-ng/labels/feature"><img src="https://img.shields.io/github/issues/statping/statping/feature?color=pink&label=features"></a>
+<img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/statping-ng/statping-ng"> 
+<a href="https://github.com/statping-ng/statping-ng/labels/priority"><img src="https://img.shields.io/github/issues/statping-ng/statping-ng/priority?color=blue&label=priority"></a> <a href="https://github.com/statping-ng/statping-ng/labels/bug"><img src="https://img.shields.io/github/issues/statping-ng/statping-ng/bug?color=red&label=bugs"></a> <a href="https://github.com/statping-ng/statping-ng/labels/feature"><img src="https://img.shields.io/github/issues/statping-ng/statping-ng/feature?color=pink&label=features"></a>
 </p>
 
 <h1>Docker</h1>
@@ -107,9 +101,9 @@ brew install statping
 <pre><code class="language-sh">curl -o- -L https://statping.com/install.sh | bash
 </code></pre>
 
-<p><a href="https://snapcraft.io/statping" target="_blank"><img src="https://snapcraft.io/static/images/badges/en/snap-store-white.svg" alt="Get it from the Snap Store" /></a></p>
+<p><a href="https://snapcraft.io/statping-ng" target="_blank"><img src="https://snapcraft.io/static/images/badges/en/snap-store-white.svg" alt="Get it from the Snap Store" /></a></p>
 
-<pre><code class="language-sh">snap install statping
+<pre><code class="language-sh">snap install statping-ng
 </code></pre>
 
 <h1>Windows</h1>
