@@ -2,16 +2,19 @@
 <img width="60%" src="https://raw.githubusercontent.com/statping-ng/statping-ng/dev/frontend/public/img/banner.png">
 </p>
 <p align="center">
-    <b>Statping-ng - Web and App Status Monitoring for Any Type of Project</b><br>
-<a href="https://statping-ng.github.io">Website</a> | <a href="https://github.com/statping-ng/statping-ng/wiki">View Wiki</a> | <a href="https://play.google.com/store/apps/details?id=com.statping">Android</a> <br> <a href="http://docs.statping.com">API</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Docker">Docker</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Mac">Mac</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Linux">Linux</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Windows">Windows</a>
+  <b>Statping-ng - Web and App Status Monitoring for Any Type of Project</b><br>
+  <a href="https://statping-ng.github.io">Website</a> | <a href="https://github.com/statping-ng/statping-ng/wiki">View Wiki</a> | <a href="http://docs.statping.com">API</a>
+  <br/>
+  <a href="https://github.com/statping-ng/statping-ng/wiki/Docker">Docker</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Linux">Linux</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Mac">Mac</a> | <a href="https://github.com/statping-ng/statping-ng/wiki/Windows">Windows</a>
 </p>
 
 # Statping-ng - Status Page & Monitoring Server
+
 An easy to use Status Page for your websites and applications. Statping will automatically fetch the application and render a beautiful status page with tons of features for you to build an even better status page. This Status Page generator allows you to use MySQL, Postgres, or SQLite on multiple operating systems.
 
 Statping-ng aims to be an updated drop-in replacement of statping after development stopped on the original fork.
 
-![GitHub last commit](https://img.shields.io/github/last-commit/statping-ng/statping-ng.svg) [![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://godoc.org/github.com/statping-ng/statping-ng)  [![Docker Pulls](https://img.shields.io/docker/pulls/aboutcher/statping-ng.svg)](https://hub.docker.com/r/adamboutcher/statping-ng/builds/)
+![GitHub license](https://img.shields.io/github/license/statping-ng/statping-ng?color=green&style=for-the-badge) ![GitHub last commit](https://img.shields.io/github/last-commit/statping-ng/statping-ng?style=for-the-badge) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/statping-ng/statping-ng/2.%20Unstable%20Build,%20Test%20and%20Deploy?label=Dev%20Build&style=for-the-badge) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/statping-ng/statping-ng/3.%20Stable%20Build,%20Test%20and%20Deploy?label=Stable%20Build&style=for-the-badge) ![Docker Pulls](https://img.shields.io/docker/pulls/adamboutcher/statping-ng?style=for-the-badge) ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/adamboutcher/statping-ng/latest?style=for-the-badge)
 
 <br><br>
 <img align="left" width="320" height="235" src="https://img.cjx.io/statupsiterun.gif">
@@ -116,7 +119,4 @@ scrape_configs:
 ## Contributing
 Statping-ng accepts Push Requests to the `dev` branch! Feel free to add your own features and notifiers. You probably want to checkout the [Notifier Wiki](https://github.com/statping-ng/statping-ng/wiki/Notifiers) to get a better understanding on how to create your own notification methods for failing/successful services. Testing on Statping-ng will test each function on MySQL, Postgres, and SQLite. I recommend running MySQL and Postgres Docker containers for testing. You can find multiple docker-compose files in the dev directory.
 
-![Dev Release](https://github.com/statping-ng/statping-ng/workflows/Dev%20Release/badge.svg?branch=dev)
 [![Go Report Card](https://goreportcard.com/badge/github.com/statping-ng/statping-ng)](https://goreportcard.com/report/github.com/statping-ng/statping-ng)
-[![Build Status](https://travis-ci.com/statping/statping.svg?branch=master)](https://travis-ci.com/statping/statping) [![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://dashboard.cypress.io/#/projects/bi8mhr/runs)
-[![Docker Pulls](https://img.shields.io/docker/pulls/statping/statping.svg)](https://hub.docker.com/r/statping/statping/builds/) [![Godoc](https://godoc.org/github.com/statping/statping?status.svg)](https://godoc.org/github.com/statping/statping)[![Coverage Status](https://coveralls.io/repos/github/statping/statping/badge.svg?branch=master)](https://coveralls.io/github/statping/statping?branch=master)
