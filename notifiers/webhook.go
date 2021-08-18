@@ -3,16 +3,17 @@ package notifiers
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/statping-ng/statping-ng/types/failures"
 	"github.com/statping-ng/statping-ng/types/notifications"
 	"github.com/statping-ng/statping-ng/types/notifier"
 	"github.com/statping-ng/statping-ng/types/null"
 	"github.com/statping-ng/statping-ng/types/services"
 	"github.com/statping-ng/statping-ng/utils"
-	"io/ioutil"
-	"net/http"
-	"strings"
-	"time"
 )
 
 var _ notifier.Notifier = (*webhooker)(nil)
