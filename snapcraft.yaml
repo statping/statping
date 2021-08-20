@@ -15,13 +15,13 @@ grade: stable
 
 architectures:
   - build-on: amd64
-  - build-on: armhf
-  - build-on: arm64
-  - build-on: i386
+#  - build-on: armhf
+#  - build-on: arm64
+#  - build-on: i386
 
 apps:
   statping:
-    command: statping
+    command: ./statping
     plugs:
       - home
       - network
@@ -35,7 +35,7 @@ parts:
       apt-get update
       apt-get install -y curl
       curl -o- -L https://raw.githubusercontent.com/statping-ng/statping-ng/stable/install.sh | bash
-      chmod +x /usr/local/bin/statping
+      ls /usr/local/bin/
       mv /usr/local/bin/statping ./
     build-packages:
       - git
