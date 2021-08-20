@@ -35,6 +35,7 @@ parts:
       apt-get update
       apt-get install -y curl
       curl -o- -L https://raw.githubusercontent.com/statping-ng/statping-ng/stable/install.sh | bash
+      chmod +x /usr/local/bin/statping
       mv /usr/local/bin/statping ./
     build-packages:
       - git
