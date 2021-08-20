@@ -8,20 +8,21 @@ description: >
   status page with tons of features for you to build an even better status page.
   This Status Page generator allows you to use MySQL, Postgres, or SQLite
   on multiple operating systems.
-
+base: base
 type: app
 confinement: strict
 grade: stable
+issues: https://github.com/statping-ng/statping-ng/issues
 
 architectures:
   - build-on: amd64
-#  - build-on: armhf
-#  - build-on: arm64
-#  - build-on: i386
+  - build-on: armhf
+  - build-on: arm64
+  - build-on: i386
 
 apps:
   statping:
-    command: ./statping
+    command: statping
     plugs:
       - home
       - network
@@ -33,12 +34,6 @@ parts:
     plugin: nil
     override-build: |
       apt-get update
-      apt-get install -y curl
+      apt-get install -y curl tar
       curl -o- -L https://raw.githubusercontent.com/statping-ng/statping-ng/stable/install.sh | bash
-      ls /usr/local/bin/
       mv /usr/local/bin/statping ./
-    build-packages:
-      - git
-      - gcc
-      - make
-      - sed
