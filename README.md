@@ -33,7 +33,7 @@ Statping-ng is built in Go Language so all you need is the precompile binary bas
     <a href="https://github.com/statping-ng/statping-ng/wiki/Windows"><img width="5%" src="https://img.cjx.io/windows.png"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <a href="https://play.google.com/store/apps/details?id=com.statping"><img width="5%" src="https://img.cjx.io/android.png"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <a href="https://itunes.apple.com/us/app/apple-store/id1445513219"><img width="5%" src="https://img.cjx.io/appstore.png"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <a href="https://hub.docker.com/r/statping/statping"><img width="5%" src="https://img.cjx.io/dockericon.png"></a>
+    <a href="https://hub.docker.com/r/adamboutcher/statping-ng"><img width="5%" src="https://img.cjx.io/dockericon.png"></a>
 <br><br></p>
 
 
