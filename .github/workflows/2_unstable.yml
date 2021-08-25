@@ -2,7 +2,7 @@ name: 2. Unstable Build, Test and Deploy
 on:
   push:
     branches:
-      - dev
+      - unstable
     paths-ignore:
       - '**.md'
 
