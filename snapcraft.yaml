@@ -36,4 +36,5 @@ parts:
       apt-get update
       apt-get install -y curl tar
       curl -o- -L https://raw.githubusercontent.com/statping-ng/statping-ng/stable/install.sh | bash
-      mv /usr/local/bin/statping ./
+      cp /usr/local/bin/statping statping
+      cp /usr/local/bin/statping /build/statping-ng/prime/./statping
