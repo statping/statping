@@ -133,7 +133,7 @@ jobs:
           rm -rf statping
           echo "compressed=statping-linux-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
 
-      - name: Compress Windows ${{matrix.arch}} Builds
+      - name: Compress Windows Builds
         if: matrix.platform == 'windows'
         run: |
           cd build
@@ -143,7 +143,7 @@ jobs:
           rm -rf statping.exe
           echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
 
-      - name: Compress Darwin  ${{matrix.arch}} Builds
+      - name: Compress Darwin 32bit Builds
         if: matrix.platform == 'darwin' and matrix.platform == '386'
         run: |
           cd build
@@ -152,6 +152,8 @@ jobs:
           tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
           rm -rf statping
           echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
+
+      - name: Compress Darwin 32bit Builds
         if: matrix.platform == 'darwin' and matrix.platform == 'amd64'
         run: |
           cd build
@@ -160,6 +162,8 @@ jobs:
           tar -czvf statping-darwin-${{ matrix.arch }}.tar.gz statping
           rm -rf statping
           echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
+
+#      - name: Compress Darwin arm64 Builds
 #        if: matrix.platform == 'darwin' and matrix.platform == 'arm64'
 #        run: |
 #          cd build
