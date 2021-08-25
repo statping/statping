@@ -65,6 +65,8 @@ jobs:
           - platform: darwin
             arch: amd64
           - platform: windows
+            arch: 386
+          - platform: windows
             arch: amd64
 
     steps:
