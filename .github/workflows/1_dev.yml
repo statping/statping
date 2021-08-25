@@ -144,7 +144,7 @@ jobs:
           echo "compressed=statping-windows-${{ matrix.arch }}.zip" >> $GITHUB_ENV
 
       - name: Compress Darwin 32bit Builds
-        if: matrix.platform == 'darwin' and matrix.platform == '386'
+        if: matrix.platform == 'darwin' && matrix.platform == '386'
         run: |
           cd build
           mv statping-darwin-10.6-${{ matrix.arch }} statping
@@ -154,7 +154,7 @@ jobs:
           echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
 
       - name: Compress Darwin 32bit Builds
-        if: matrix.platform == 'darwin' and matrix.platform == 'amd64'
+        if: matrix.platform == 'darwin' && matrix.platform == 'amd64'
         run: |
           cd build
           mv statping-darwin-10.12-${{ matrix.arch }} statping
@@ -164,7 +164,7 @@ jobs:
           echo "compressed=statping-darwin-${{ matrix.arch }}.tar.gz" >> $GITHUB_ENV
 
 #      - name: Compress Darwin arm64 Builds
-#        if: matrix.platform == 'darwin' and matrix.platform == 'arm64'
+#        if: matrix.platform == 'darwin' && matrix.platform == 'arm64'
 #        run: |
 #          cd build
 #          mv statping-darwin-10.15-${{ matrix.arch }} statping
