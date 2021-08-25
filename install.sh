@@ -24,7 +24,7 @@ statping_get_tarball() {
   printf "$cyan> Downloading latest version for $OS $ARCH...\n$url $reset\n"
   # Get both the tarball and its GPG signature
   tarball_tmp=`mktemp -t statping.tar.gz.XXXXXXXXXX`
-  if curl --fail -L -o "$tarball_tmp" "$url"; then
+  if curl --fail -L -s -o "$tarball_tmp" "$url"; then
     # All this dance is because `tar --strip=1` does not work everywhere
     temp=$(mktemp -d statping.XXXXXXXXXX)
     if [ ${OS} == 'windows' ]; then
@@ -32,11 +32,11 @@ statping_get_tarball() {
     else
       tar xzf $tarball_tmp -C "$temp"
     fi
-    printf "$green> Installing to $DEST/statping\n"
+    printf "$green> Installing to $DEST/statping-ng\n"
     mv "$temp"/statping "$DEST"
     rm -rf "$temp"
     rm $tarball_tmp*
-    printf "$cyan> Statping is now installed! $reset\n"
+    printf "$cyan> Statping-ng is now installed! $reset\n"
     printf "$white>   Repo:     $repo $reset\n"
     printf "$white>   Wiki:     $repo/wiki $reset\n"
     printf "$white>   Issues:   $repo/issues $reset\n"
@@ -66,7 +66,7 @@ statping_brew_install() {
 }
 
 statping_install() {
-  printf "${white}Installing Statping!$reset\n"
+  printf "${white}Installing Statping-ng!$reset\n"
   getOS
   getArch
   statping_get_tarball $OS $ARCH
