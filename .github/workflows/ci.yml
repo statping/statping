@@ -2,7 +2,7 @@ name: CI
 on: [ push ]
 jobs:
   cancel:
-    runs-on: [self-hosted]
+    runs-on: [ubuntu-latest]
     name: Cancel Previous Runs
     if: always()
     steps:
@@ -20,15 +20,15 @@ jobs:
 
   build-statping-docker-image:
     name: Docker image - statping
-    runs-on: [self-hosted]
+    runs-on: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v2
       - name: Build and push
         uses: docker/build-push-action@v1
         with:
           registry: c.rzp.io
-          username: ${{ secrets.HARBOR_DOCKER_USERNAME }}
-          password: ${{ secrets.HARBOR_DOCKER_PASSWORD }}
+          username: ${{ secrets.PUBLIC_DOCKER_USERNAME }}
+          password: ${{ secrets.PUBLIC_DOCKER_PASSWORD }}
           repository: ${{ github.repository }}
           dockerfile: ./Dockerfile
           build_args: GIT_COMMIT_HASH=${{ github.sha }},GIT_TOKEN=${{ secrets.GIT_TOKEN }}
@@ -37,7 +37,7 @@ jobs:
 
   fmt:
     name: fmt
-    runs-on: [self-hosted]
+    runs-on: [ubuntu-latest]
     continue-on-error: false
     steps:
       - name: checkout
@@ -52,7 +52,7 @@ jobs:
           args: ./scripts/run_tests.sh fmt drone
 
   workflow_status:
-    runs-on: [self-hosted]
+    runs-on: [ubuntu-latest]
     name: Update Status Check
     needs: [ build-statping-docker-image]
     if: always()
