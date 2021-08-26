@@ -1,0 +1,14 @@
+name: Semgrep
+on: [pull_request, push]
+jobs:
+  semgrep:
+    name: Scan
+    runs-on: [self-hosted]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: returntocorp/semgrep-action@v1
+        with:
+          publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
+          publishDeployment: 339
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
