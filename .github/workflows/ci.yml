@@ -2,7 +2,7 @@ name: CI
 on: [ push ]
 jobs:
   cancel:
-    runs-on: [ubuntu-latest]
+    runs-on: [self-hosted]
     name: Cancel Previous Runs
     if: always()
     steps:
@@ -20,7 +20,7 @@ jobs:
 
   build-statping-docker-image:
     name: Docker image - statping
-    runs-on: [ubuntu-latest]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v2
       - name: Build and push
@@ -37,7 +37,7 @@ jobs:
 
   fmt:
     name: fmt
-    runs-on: [ubuntu-latest]
+    runs-on: [self-hosted]
     continue-on-error: false
     steps:
       - name: checkout
@@ -52,7 +52,7 @@ jobs:
           args: ./scripts/run_tests.sh fmt drone
 
   workflow_status:
-    runs-on: [ubuntu-latest]
+    runs-on: [self-hosted]
     name: Update Status Check
     needs: [ build-statping-docker-image]
     if: always()
