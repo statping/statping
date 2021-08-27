@@ -44,10 +44,12 @@ RUN chmod a+x statping && mv statping /go/bin/statping
 # /root/sassc/bin/sassc - sass binary
 # /statping - Vue frontend (from frontend)
 
+FROM alpine:latest
+
 RUN apk --no-cache add libgcc libstdc++ ca-certificates curl jq && update-ca-certificates
 
-RUN cp /go/bin/statping /usr/local/bin/
-RUN cp /root/sassc/bin/sassc /usr/local/bin/
+COPY --from=backend /go/bin/statping /usr/local/bin/
+COPY --from=backend /root/sassc/bin/sassc /usr/local/bin/
 
 WORKDIR /app
 VOLUME /app
