@@ -26,10 +26,10 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v1
         with:
-          registry: c.rzp.io
+          registry: c.rzp.io/proxy_dockerhub
           username: ${{ secrets.PUBLIC_DOCKER_USERNAME }}
           password: ${{ secrets.PUBLIC_DOCKER_PASSWORD }}
-          repository: /proxy_dockerhub/${{ github.repository }}
+          repository: ${{ github.repository }}
           dockerfile: ./Dockerfile
           build_args: GIT_COMMIT_HASH=${{ github.sha }},GIT_TOKEN=${{ secrets.GIT_TOKEN }}
           push: true
