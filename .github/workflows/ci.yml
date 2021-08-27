@@ -18,22 +18,43 @@ jobs:
         run: |
           echo "Don't cancel old workflow"
 
+
   build-statping-docker-image:
     name: Docker image - statping
     runs-on: [ubuntu-latest]
     steps:
-      - uses: actions/checkout@v2
-      - name: Build and push
-        uses: docker/build-push-action@v1
+      - name: checkout
+        id: checkout
+        uses: actions/checkout@v2
         with:
-          registry: c.rzp.io/proxy_dockerhub
-          username: ${{ secrets.PUBLIC_DOCKER_USERNAME }}
-          password: ${{ secrets.PUBLIC_DOCKER_PASSWORD }}
-          repository: ${{ github.repository }}
-          dockerfile: ./Dockerfile
-          build_args: GIT_COMMIT_HASH=${{ github.sha }},GIT_TOKEN=${{ secrets.GIT_TOKEN }}
+          submodules: true
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      - name: docker login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: build statping image
+        uses: docker/build-push-action@v2
+        with:
+          tags: razorpay/statping:service_${{ github.sha }}
           push: true
-          tags: service_${{ github.sha }}
+          file: ./Dockerfile
+          build-args: GIT_COMMIT_HASH=${{ github.sha }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+        env:
+          GIT_COMMIT_HASH: ${{ github.sha }}
+          APP_ENV: dev_docker
+          EXEC_MODE: test
 
   fmt:
     name: fmt
