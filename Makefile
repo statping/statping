@@ -273,10 +273,10 @@ download-key:
 	gpg --import statping.gpg
 
 dockerhub:
-	docker build --build-arg VERSION=${VERSION} -t statping-ng/statping-ng:latest --no-cache -f Dockerfile .
-	docker tag statping-ng/statping-ng statping-ng/statping-ng:v${VERSION}
-	docker push statping-ng/statping-ng:v${VERSION}
-	docker push statping-ng/statping-ng
+	docker build --build-arg VERSION=${VERSION} -t adamboutcher/statping-ng:latest --no-cache -f Dockerfile .
+	docker tag adamboutcher/statping-ng adamboutcher/statping-ng:v${VERSION}
+	docker push adamboutcher/statping-ng:v${VERSION}
+	docker push adamboutcher/statping-ng
 
 docker-build-dev:
 	docker build --build-arg VERSION=${VERSION} -t statping-ng/statping-ng:latest --no-cache -f Dockerfile .
