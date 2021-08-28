@@ -2,6 +2,4 @@
 # code owners when certain files are changed.
 # Ref: https://github.com/blog/2392-introducing-de-owners
 
-*                  @razorpay/Tech
-
 ci.yml                      vivek.aggarwal@razorpay.com   sunny.aggrawal@razorpay.com   ankit.gupta@razorpay.com    amrendra.singh@razorpay.com  manikant.pandit@razorpay.com
