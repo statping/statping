@@ -117,9 +117,6 @@ compose-build-full:
 docker-latest: 
 	docker build -t statping-ng/statping-ng:latest --build-arg VERSION=${VERSION} .
 
-docker-vue:
-	docker build -t statping-ng/statping-ng:vue --build-arg VERSION=${VERSION} .
-
 docker-test:
 	docker-compose -f docker-compose.test.yml up --remove-orphans
 
