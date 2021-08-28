@@ -51,6 +51,7 @@ RUN apk --no-cache add libgcc libstdc++ ca-certificates curl jq && update-ca-cer
 
 COPY --from=backend /go/bin/statping /usr/local/bin/
 COPY --from=backend /root/sassc/bin/sassc /usr/local/bin/
+COPY --from=backend /usr/local/share/ca-certificates /usr/local/share/
 
 WORKDIR /app
 VOLUME /app
