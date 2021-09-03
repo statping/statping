@@ -25,7 +25,6 @@ architectures:
 apps:
   statping:
     command: bin/statping
-    daemon: simple
     plugs:
       - home
       - network
