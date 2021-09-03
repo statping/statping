@@ -9,7 +9,7 @@ description: |
   This Status Page generator allows you to use MySQL, Postgres, or SQLite
   on multiple operating systems.
 
-base: bare
+base: core18
 build-base: core18
 type: app
 confinement: strict
@@ -25,6 +25,7 @@ architectures:
 apps:
   statping:
     command: bin/statping
+    daemon: simple
     plugs:
       - home
       - network
