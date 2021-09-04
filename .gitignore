@@ -22,6 +22,7 @@ dart-sass
 logs
 tmp
 source/dist
+react/build
 /dev/test/node_modules
 dev/test/cypress/videos
 dev/test/cypress/screenshots
@@ -40,3 +41,4 @@ tmp
 /frontend/cypress/videos/
 services.yml
 statping.wiki
+assets/

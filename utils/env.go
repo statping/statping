@@ -74,6 +74,7 @@ func InitEnvs() {
 	Directory = Params.GetString("STATPING_DIR")
 	//Params.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	Params.SetConfigName("config")
+
 	Params.SetConfigType("yml")
 	Params.AddConfigPath(Directory)
 	Params.ReadInConfig()

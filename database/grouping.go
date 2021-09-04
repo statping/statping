@@ -87,6 +87,17 @@ func (b *GroupQuery) GraphData(by By) ([]*TimeValue, error) {
 	return caller.ToValues()
 }
 
+func (b *GroupQuery) NoFailureGraphData(by By) ([]*TimeValue, error) {
+
+	caller := &TimeVar{b, nil}
+
+	if b.FillEmpty {
+		return caller.FillMissing(b.Start, b.End)
+	}
+
+	return caller.ToValues()
+}
+
 // ToTimeValue will format the SQL rows into a JSON format for the API.
 // [{"timestamp": "2006-01-02T15:04:05Z", "amount": 468293}]
 // TODO redo this entire function, use better SQL query to group by time
@@ -169,8 +180,8 @@ func ParseRequest(r *http.Request) (*GroupQuery, error) {
 	}
 
 	query := &GroupQuery{
-		Start:     time.Unix(startField, 0).UTC(),
-		End:       time.Unix(endField, 0).UTC(),
+		Start:     time.Unix(startField, 0).Local(),
+		End:       time.Unix(endField, 0).Local(),
 		Group:     groupDur,
 		Order:     orderBy,
 		Limit:     int(limit),
@@ -213,8 +224,8 @@ func ParseQueries(r *http.Request, o isObject) (*GroupQuery, error) {
 	}
 
 	query := &GroupQuery{
-		Start:     time.Unix(startField, 0).UTC(),
-		End:       time.Unix(endField, 0).UTC(),
+		Start:     time.Unix(startField, 0).Local(),
+		End:       time.Unix(endField, 0).Local(),
 		Group:     groupDur,
 		Order:     orderBy,
 		Limit:     int(limit),

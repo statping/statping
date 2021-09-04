@@ -1,0 +1,173 @@
+@import "variables";
+@import "font";
+
+@media (max-width: 767px) {
+  html,
+  body {
+    background-color: $sm-background-color;
+  }
+
+  .service-tm-menu {
+    height: 300px;
+  }
+
+  .service-tm-menu a {
+    height: 27px;
+  }
+
+  // .index-chart {
+  //   height: 380px;
+  // }
+
+  .expanded-service {
+    height: 810px;
+  }
+
+  .sm-container {
+    margin-top: 0px !important;
+  }
+
+  .lower_canvas {
+    height: 4rem;
+    margin-top: -1px;
+  }
+
+  .container {
+    padding: 0px !important;
+    padding-top: 0vh !important;
+    min-height: 960pt;
+  }
+
+  .group_header {
+    margin-left: 15px;
+  }
+
+  .navbar {
+    margin-left: 0px;
+    margin-top: 0px;
+    width: 100%;
+    box-shadow: 1px 10px 20px 0px;
+    height: 55pt;
+    color: rgba(0, 0, 0, 0.2);
+    margin-bottom: 20pt;
+  }
+
+  .navbar-collapse {
+    z-index: 999999;
+    background-color: #f9f9f9;
+    width: 100%;
+    padding: 10pt 15pt;
+    left: 0px;
+    top: 75px;
+    position: absolute;
+  }
+
+  .btn-sm {
+    line-height: 1.3;
+    font-size: 0.75rem;
+  }
+
+  .badge {
+    padding-top: 2px;
+    padding-bottom: 3px;
+  }
+
+  .switch LABEL {
+    font-size: 10pt;
+  }
+
+  .full-col-12 {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+
+  .card {
+    border: 0;
+    border-radius: $sm-border-radius;
+    padding: $sm-padding;
+    background-color: $sm-service-background;
+    box-shadow: $mobile-card-shadow;
+  }
+
+  .card-body {
+    font-size: 10pt;
+    padding: 10px 10px;
+  }
+
+  .lg_number {
+    font-size: 7vw;
+  }
+
+  .stats_area {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .stats_area .col-4 {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .navbar-item {
+    border-bottom: 1px solid #eaeaea;
+  }
+
+  // .service-card {
+  //   border-top: 1px solid #e4e4e4;
+  //   border: 0px;
+  // }
+
+  // .service-card:first-child {
+  //   border-top-left-radius: 0;
+  //   border-top-right-radius: 0;
+  // }
+
+  // .service-card:last-child {
+  //   border-bottom-right-radius: 0;
+  //   border-bottom-left-radius: 0;
+  // }
+
+  .service-card h5 {
+    font-size: 0.9rem;
+  }
+
+  .service-card p {
+    font-size: 0.7rem;
+  }
+
+  .service-chart-container {
+    height: 200px;
+  }
+
+  .font-1 {
+    font-size: 0.65rem;
+  }
+
+  .font-2 {
+    font-size: 0.8rem;
+  }
+
+  .font-3 {
+    font-size: 1rem;
+  }
+
+  .font-4 {
+    font-size: 1.2rem;
+  }
+
+  .font-5 {
+    font-size: 1.5rem;
+  }
+
+  .font-6 {
+    font-size: 1.9rem;
+  }
+
+  .font-7 {
+    font-size: 2.2rem;
+  }
+
+  .font-8 {
+    font-size: 2.5rem;
+  }
+}

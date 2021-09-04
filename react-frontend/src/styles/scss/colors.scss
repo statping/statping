@@ -1,0 +1,65 @@
+@import "font";
+
+.title {
+  color: rgba($base-color, 0.87);
+}
+
+.description {
+  color: rgba($base-color, 0.54);
+}
+
+.subtitle {
+  color: rgba($base-color, 0.87);
+}
+
+.text-muted {
+  color: lighten($text-color, 30%) !important;
+}
+
+.bg-white {
+  background-color: $white;
+}
+
+.text-white {
+  color: $white;
+}
+
+.card-bg {
+  background-color: $group-list-background;
+}
+
+.status-green {
+  background: $green;
+}
+
+.status-degraded {
+  background: $yellow;
+}
+
+.status-red {
+  background: $red;
+}
+
+.uptime {
+  background-color: rgba($green, 0.74);
+}
+
+.uptime:hover {
+  background-color: rgba($green, 0.84);
+}
+
+.degraded {
+  background-color: rgba($yellow, 0.74);
+}
+
+.degraded:hover {
+  background-color: rgba($yellow, 0.84);
+}
+
+.downtime {
+  background: rgba($red, 0.84);
+}
+
+.downtime:hover {
+  background: rgba($red, 0.94);
+}

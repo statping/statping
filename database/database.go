@@ -211,7 +211,7 @@ func OpenTester() (Database, error) {
 			utils.Params.GetString("DB_DATABASE"),
 		)
 	case "postgres":
-		dbString = fmt.Sprintf("host=%s port=%v user=%s dbname=%s password=%s sslmode=disable timezone=UTC",
+		dbString = fmt.Sprintf("host=%s port=%v user=%s dbname=%s password=%s sslmode=disable",
 			utils.Params.GetString("DB_HOST"),
 			utils.Params.GetInt("DB_PORT"),
 			utils.Params.GetString("DB_USER"),

@@ -7,7 +7,7 @@ import (
 
 // Now returns the UTC timestamp
 func Now() time.Time {
-	return time.Now().UTC()
+	return time.Now()
 }
 
 type Duration struct {

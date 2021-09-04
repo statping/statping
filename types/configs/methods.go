@@ -53,6 +53,8 @@ func (d *DbConfig) ConnectionString() string {
 	var conn string
 	postgresSSL := utils.Params.GetString("POSTGRES_SSLMODE")
 
+	log.Infof("ConnectionString:: postgressSSL: %s, d.dbConn: %s ", postgresSSL, d.DbConn)
+
 	switch d.DbConn {
 	case "memory", ":memory:":
 		conn = "sqlite3"
@@ -72,7 +74,7 @@ func (d *DbConfig) ConnectionString() string {
 		conn = fmt.Sprintf("%v:%v@tcp(%v)/%v?charset=utf8&parseTime=True&loc=UTC&time_zone=%%27UTC%%27", d.DbUser, d.DbPass, host, d.DbData)
 		return conn
 	case "postgres":
-		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v timezone=UTC sslmode=%v", d.DbHost, d.DbPort, d.DbUser, d.DbData, d.DbPass, postgresSSL)
+		conn = fmt.Sprintf("host=%v port=%v user=%v dbname=%v password=%v sslmode=%v", d.DbHost, d.DbPort, d.DbUser, d.DbData, d.DbPass, postgresSSL)
 		return conn
 	}
 	return conn

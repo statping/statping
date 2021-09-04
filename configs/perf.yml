@@ -1,0 +1,30 @@
+admin_email: ankit.gupta@razorpay.com
+admin_password: admin
+admin_user: admin
+allow_reports: false
+base_path: ""
+cleanup_interval: 0h30m0s
+cmd_file: /bin/bash
+db_conn: postgres
+db_database: ${DATABASE_NAME}
+db_host: ${DATABASE_URL}
+db_port: 5432
+db_user: ${DATABASE_USERNAME}
+db_pass: ${DATABASE_PASSWORD}
+description: Razorpay Status Page
+disable_logs: false
+domain: statping.stage.razorpay.in
+go_env: ""
+is_aws: false
+is_docker: false
+max_idle_conn: 100
+max_life_conn: 180
+max_open_conn: 100
+name: Razorpay Status Page
+postgres_sslmode: disable
+remove_after: 24h0m0s
+sample_data: true
+sass: /usr/local/bin/sass
+use_assets: true
+use_cdn: false
+version: ""

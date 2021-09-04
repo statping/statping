@@ -1,11 +1,21 @@
 FROM node:12.18.2-alpine AS frontend
 LABEL maintainer="Hunter Long (https://github.com/hunterlong)"
 ARG BUILDPLATFORM
+
+# Build vue frontent
 WORKDIR /statping
 COPY ./frontend/package.json .
 COPY ./frontend/yarn.lock .
 RUN yarn install --pure-lockfile --network-timeout 1000000
-COPY ./frontend .
+COPY ./frontend/ .
+RUN yarn build && yarn cache clean
+
+# Build react frontent
+WORKDIR /statping-react
+COPY ./react-frontend/package.json .
+COPY ./react-frontend/yarn.lock .
+RUN yarn install --pure-lockfile --network-timeout 1000000
+COPY ./react-frontend/ .
 RUN yarn build && yarn cache clean
 
 # Statping Golang BACKEND building from source
@@ -37,7 +47,9 @@ RUN go get github.com/stretchr/testify/assert && \
 	go get github.com/crazy-max/xgo
 COPY . .
 COPY --from=frontend /statping/dist/ ./source/dist/
+COPY --from=frontend /statping-react/build/ ./react/build/
 RUN make clean generate embed
+
 RUN go build -a -ldflags "-s -w -extldflags -static -X main.VERSION=${VERSION} -X main.COMMIT=${COMMIT}" -o statping --tags "netgo linux" ./cmd
 RUN chmod a+x statping && mv statping /go/bin/statping
 # /go/bin/statping - statping binary

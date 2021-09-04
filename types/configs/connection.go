@@ -7,6 +7,7 @@ import (
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/downtimes"
 	"github.com/statping/statping/types/failures"
 	"github.com/statping/statping/types/groups"
 	"github.com/statping/statping/types/hits"
@@ -27,6 +28,7 @@ func initModels(db database.Database) {
 	hits.SetDB(db)
 	failures.SetDB(db)
 	checkins.SetDB(db)
+	downtimes.SetDB(db)
 	notifications.SetDB(db)
 	incidents.SetDB(db)
 	users.SetDB(db)
@@ -36,8 +38,9 @@ func initModels(db database.Database) {
 
 // Connect will attempt to connect to the sqlite, postgres, or mysql database
 func Connect(configs *DbConfig, retry bool) error {
+	log.Infof("Started: Connect")
 	conn := configs.ConnectionString()
-
+	log.Infof("Attempting to connect to database")
 	log.WithFields(utils.ToFields(configs, conn)).Debugln("attempting to connect to database")
 
 	dbSession, err := database.Openw(configs.DbConn, conn)
@@ -52,6 +55,8 @@ func Connect(configs *DbConfig, retry bool) error {
 		}
 	}
 
+	log.Infof("Connected to databsae")
+
 	configs.ApiSecret = utils.Params.GetString("API_SECRET")
 
 	log.WithFields(utils.ToFields(dbSession)).Debugln("connected to database")
@@ -59,7 +64,9 @@ func Connect(configs *DbConfig, retry bool) error {
 	db := dbSession.DB()
 	db.SetMaxOpenConns(utils.Params.GetInt("MAX_OPEN_CONN"))
 	db.SetMaxIdleConns(utils.Params.GetInt("MAX_IDLE_CONN"))
-	db.SetConnMaxLifetime(utils.Params.GetDuration("MAX_LIFE_CONN"))
+	db.SetConnMaxLifetime(utils.Params.GetDuration("MAX_LIFE_CONN") * time.Second)
+
+	log.Infof("Database env vars set")
 
 	if db.Ping() == nil {
 		if utils.VerboseMode >= 4 {
@@ -67,6 +74,8 @@ func Connect(configs *DbConfig, retry bool) error {
 		}
 		log.Infoln(fmt.Sprintf("Database %s connection was successful.", configs.DbConn))
 	}
+
+	log.Infof("Database %s connection was successful.", configs.DbConn)
 
 	if utils.Params.GetBool("READ_ONLY") {
 		log.Warnln("Running in READ ONLY MODE")

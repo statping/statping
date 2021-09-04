@@ -122,6 +122,23 @@ func authenticated(handler func(w http.ResponseWriter, r *http.Request), redirec
 	})
 }
 
+func authenticatedV2(handler func(r *http.Request) interface{}) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !IsFullAuthenticated(r) {
+			sendUnauthorizedJson(w, r)
+			return
+		}
+		data := handler(r)
+		err, ok := data.(error)
+		if ok {
+			sendErrorJson(err, w, r)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(scope{data: data, scope: ScopeName(r)})
+	})
+}
+
 // readOnly is a middleware function to check if user is a User before running original request
 func readOnly(handler http.Handler, redirect bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

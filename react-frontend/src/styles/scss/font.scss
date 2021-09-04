@@ -1,0 +1,10 @@
+$font-path: "/static/fonts" !default;
+
+@font-face {
+  font-family: "Lato";
+  src: url("#{$font-path}/lato.woff2") format("woff2"),
+    url("#{$font-path}/lato.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
