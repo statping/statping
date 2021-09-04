@@ -6,11 +6,11 @@ const SqliteFilename = "statping.db"
 
 // DbConfig struct is used for the Db connection and creates the 'config.yml' file
 type DbConfig struct {
-	DbConn            string `yaml:"connection,omitempty" json:"connection"`
-	DbHost            string `yaml:"host,omitempty" json:"-"`
-	DbUser            string `yaml:"user,omitempty" json:"-"`
-	DbPass            string `yaml:"password,omitempty" json:"-"`
-	DbData            string `yaml:"database,omitempty" json:"-"`
+	DbConn            string `yaml:"db_conn,omitempty" json:"connection"`
+	DbHost            string `yaml:"db_host,omitempty" json:"-"`
+	DbUser            string `yaml:"db_user,omitempty" json:"-"`
+	DbPass            string `yaml:"db_pass,omitempty" json:"-"`
+	DbData            string `yaml:"db_database,omitempty" json:"-"`
 	DbPort            int    `yaml:"port,omitempty" json:"-"`
 	ApiSecret         string `yaml:"api_secret,omitempty" json:"-"`
 	Language          string `yaml:"language,omitempty" json:"language"`
@@ -39,15 +39,15 @@ type DbConfig struct {
 	AdminPassword string `yaml:"admin_password,omitempty" json:"admin_password"`
 	AdminEmail    string `yaml:"admin_email,omitempty" json:"admin_email"`
 
-	MaxOpenConnections int `yaml:"db_open_connections,omitempty" json:"db_open_connections"`
-	MaxIdleConnections int `yaml:"db_idle_connections,omitempty" json:"db_idle_connections"`
-	MaxLifeConnections int `yaml:"db_max_life_connections,omitempty" json:"db_max_life_connections"`
+	MaxOpenConnections int `yaml:"max_open_conn,omitempty" json:"max_open_conn"`
+	MaxIdleConnections int `yaml:"max_idle_conn,omitempty" json:"max_idle_conn"`
+	MaxLifeConnections int `yaml:"max_life_conn,omitempty" json:"max_life_conn"`
 
 	SampleData    bool `yaml:"sample_data" json:"sample_data"`
 	UseCDN        bool `yaml:"use_cdn" json:"use_cdn"`
 	DisableColors bool `yaml:"disable_colors" json:"disable_colors"`
 
-	PostgresSSLMode string `yaml:"postgres_ssl,omitempty" json:"postgres_ssl"`
+	PostgresSSLMode string `yaml:"postgres_sslmode,omitempty" json:"postgres_ssl"`
 
 	Db database.Database `yaml:"-" json:"-"`
 }

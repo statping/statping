@@ -1,5 +1,5 @@
 name: CI
-on: [ push ]
+on: [push]
 jobs:
   cancel:
     runs-on: [ubuntu-latest]
@@ -17,7 +17,6 @@ jobs:
         id: dont_cancel
         run: |
           echo "Don't cancel old workflow"
-
 
   build-statping-docker-image:
     name: Docker image - statping
@@ -42,6 +41,19 @@ jobs:
         with:
           username: ${{ secrets.PUBLIC_DOCKER_USERNAME }}
           password: ${{ secrets.PUBLIC_DOCKER_PASSWORD }}
+      - name: build statping base_image
+        uses: docker/build-push-action@v2
+        with:
+          tags: razorpay/statping:base_${{ github.sha }}
+          push: true
+          file: ./Dockerfile.base
+          build-args: GIT_COMMIT_HASH=${{ github.sha }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+        env:
+          GIT_COMMIT_HASH: ${{ github.sha }}
+          APP_ENV: dev_docker
+          EXEC_MODE: test
       - name: build statping image
         uses: docker/build-push-action@v2
         with:
@@ -75,7 +87,7 @@ jobs:
   workflow_status:
     runs-on: [ubuntu-latest]
     name: Update Status Check
-    needs: [ build-statping-docker-image]
+    needs: [build-statping-docker-image]
     if: always()
     steps:
       - name: Failed

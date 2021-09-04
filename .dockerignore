@@ -20,6 +20,7 @@ config.yml
 *.db
 tmp
 frontend/node_modules
+react-frontend/node_modules
 .next
 node_modules
 Dockerfile

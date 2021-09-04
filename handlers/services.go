@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/statping/statping/database"
 	"github.com/statping/statping/types/errors"
@@ -9,6 +10,8 @@ import (
 	"github.com/statping/statping/types/services"
 	"github.com/statping/statping/utils"
 	"net/http"
+	"sort"
+	"time"
 )
 
 type serviceOrder struct {
@@ -19,7 +22,7 @@ type serviceOrder struct {
 func findService(r *http.Request) (*services.Service, error) {
 	vars := mux.Vars(r)
 	id := utils.ToInt(vars["id"])
-	servicer, err := services.Find(id)
+	servicer, err := services.FindOne(id)
 	if err != nil {
 		return nil, err
 	}
@@ -27,6 +30,19 @@ func findService(r *http.Request) (*services.Service, error) {
 		return nil, errors.NotAuthenticated
 	}
 	return servicer, nil
+}
+
+func findPublicSubService(r *http.Request, service *services.Service) (*services.Service, error) {
+	vars := mux.Vars(r)
+	id := utils.ToInt(vars["sub_id"])
+	if val, ok := service.SubServicesDetails[id]; ok && val.Public {
+		sub, err := services.FindOne(id)
+		if err != nil {
+			return nil, err
+		}
+		return sub, nil
+	}
+	return nil, fmt.Errorf("Public sub service not mapped to parent")
 }
 
 func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
@@ -38,13 +54,13 @@ func reorderServiceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, s := range newOrder {
-		service, err := services.Find(s.Id)
+		service, err := services.FindOne(s.Id)
 		if err != nil {
 			sendErrorJson(err, w, r)
 			return
 		}
 		service.Order = s.Order
-		service.Update()
+		service.UpdateOrder()
 	}
 	returnJson(newOrder, w, r)
 }
@@ -92,7 +108,7 @@ func apiServicePatchHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	service.Online = req.Online
+	//service.Online = req.Online
 	service.Latency = req.Latency
 
 	issueDefault := "Service was triggered to be offline"
@@ -154,25 +170,29 @@ func apiServiceDataHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceFailureDataHandler(w http.ResponseWriter, r *http.Request) {
+	if objs, err := apiServiceFailureDataHandlerCore(r); err != nil {
+		sendErrorJson(err, w, r)
+	} else {
+		returnJson(objs, w, r)
+	}
+}
+
+func apiServiceFailureDataHandlerCore(r *http.Request) ([]*database.TimeValue, error) {
 	service, err := findService(r)
 	if err != nil {
-		sendErrorJson(err, w, r)
-		return
+		return nil, err
 	}
 
 	groupQuery, err := database.ParseQueries(r, service.AllFailures())
 	if err != nil {
-		sendErrorJson(err, w, r)
-		return
+		return nil, err
 	}
 
 	objs, err := groupQuery.GraphData(database.ByCount)
 	if err != nil {
-		sendErrorJson(err, w, r)
-		return
+		return nil, err
 	}
-
-	returnJson(objs, w, r)
+	return objs, nil
 }
 
 func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
@@ -198,44 +218,246 @@ func apiServicePingDataHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func apiServiceTimeDataHandler(w http.ResponseWriter, r *http.Request) {
+	if objs, err := apiServiceTimeDataHandlerCore(r); err != nil {
+		sendErrorJson(err, w, r)
+	} else {
+		returnJson(objs, w, r)
+	}
+}
+
+func apiServiceTimeDataHandlerCore(r *http.Request) (*services.UptimeSeries, error) {
 	service, err := findService(r)
 	if err != nil {
-		sendErrorJson(err, w, r)
-		return
+		return nil, err
 	}
 
 	groupHits, err := database.ParseQueries(r, service.AllHits())
 	if err != nil {
-		sendErrorJson(err, w, r)
-		return
+		return nil, err
 	}
 
 	groupFailures, err := database.ParseQueries(r, service.AllFailures())
 	if err != nil {
-		sendErrorJson(err, w, r)
-		return
+		return nil, err
 	}
 
 	var allFailures []*failures.Failure
 	var allHits []*hits.Hit
 
 	if err := groupHits.Find(&allHits); err != nil {
-		sendErrorJson(err, w, r)
-		return
+		return nil, err
 	}
 
 	if err := groupFailures.Find(&allFailures); err != nil {
-		sendErrorJson(err, w, r)
-		return
+		return nil, err
 	}
 
 	uptimeData, err := service.UptimeData(allHits, allFailures)
 	if err != nil {
+		return nil, err
+	}
+	return uptimeData, err
+}
+
+func apiSubServiceBlockSeriesHandler(w http.ResponseWriter, r *http.Request) {
+	service, err := findService(r)
+	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
+	subService, err := findPublicSubService(r, service)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	if objs, err := apiServiceBlockSeriesHandlerCoreV2(r, subService); err != nil {
+		sendErrorJson(err, w, r)
+	} else {
+		returnJson(objs, w, r)
+	}
+}
 
-	returnJson(uptimeData, w, r)
+func apiServiceBlockSeriesHandler(w http.ResponseWriter, r *http.Request) {
+	service, err := findService(r)
+	if err != nil {
+		sendErrorJson(err, w, r)
+		return
+	}
+	if objs, err := apiServiceBlockSeriesHandlerCoreV2(r, service); err != nil {
+		sendErrorJson(err, w, r)
+	} else {
+		returnJson(objs, w, r)
+	}
+}
+
+func apiServiceBlockSeriesHandlerCore(r *http.Request, service *services.Service) (*services.BlockSeries, error) {
+
+	groupHits, err := database.ParseQueries(r, service.AllHits())
+	if err != nil {
+		return nil, err
+	}
+
+	groupFailures, err := database.ParseQueries(r, service.AllFailures())
+	if err != nil {
+		return nil, err
+	}
+
+	failuresData, err := database.ParseQueries(r, service.AllFailures())
+	if err != nil {
+		return nil, err
+	}
+
+	objs, err := failuresData.GraphData(database.ByCount)
+	if err != nil {
+		return nil, err
+	}
+
+	var blockSeries services.BlockSeries = services.BlockSeries{}
+
+	if len(objs) == 0 {
+		return &blockSeries, nil
+	}
+
+	var allFailures []*failures.Failure
+	var allHits []*hits.Hit
+
+	if err := groupHits.Find(&allHits); err != nil {
+		return nil, err
+	}
+
+	if err := groupFailures.Find(&allFailures); err != nil {
+		return nil, err
+	}
+
+	uptimeData, err := service.UptimeData(allHits, allFailures)
+	if err != nil {
+		return nil, err
+	}
+
+	blockSeries.Start = uptimeData.Start
+	blockSeries.End = uptimeData.End
+	blockSeries.Downtime = uptimeData.Downtime
+	blockSeries.Uptime = uptimeData.Uptime
+	blockSeries.Series = &[]services.Block{}
+
+	var nextFrameTime time.Time
+
+	for c := 0; c < len(objs); c++ {
+
+		currentFrame := objs[c]
+		currentFrameTime, _ := time.Parse("2006-01-02T15:04:05Z", currentFrame.Timeframe)
+		if c+1 < len(objs) {
+			nextFrameTime, _ = time.Parse("2006-01-02T15:04:05Z", objs[c+1].Timeframe)
+		} else {
+			nextFrameTime = uptimeData.End
+		}
+
+		block := services.Block{
+			Timeframe: currentFrame.Timeframe,
+			Status:    services.STATUS_UP,
+			Downtimes: &[]services.Downtime{}}
+
+		for _, data := range uptimeData.Series {
+
+			if !data.Online && currentFrameTime.Before(data.Start) && nextFrameTime.After(data.Start) {
+
+				*block.Downtimes = append(*block.Downtimes, services.Downtime{
+					Start:     data.Start,
+					End:       data.End,
+					Duration:  data.Duration,
+					SubStatus: services.HandleEmptyStatus(data.SubStatus),
+				})
+
+				if block.Status != services.STATUS_DOWN {
+					block.Status = services.HandleEmptyStatus(data.SubStatus)
+				}
+			}
+		}
+		*blockSeries.Series = append(*blockSeries.Series, block)
+	}
+
+	return &blockSeries, nil
+}
+
+func apiServiceBlockSeriesHandlerCoreV2(r *http.Request, service *services.Service) (*services.BlockSeries, error) {
+
+	failuresData, err := database.ParseQueries(r, service.AllFailures())
+	if err != nil {
+		return nil, err
+	}
+
+	objs, err := failuresData.NoFailureGraphData(database.ByCount)
+	if err != nil {
+		return nil, err
+	}
+
+	var blockSeries services.BlockSeries = services.BlockSeries{}
+
+	if len(objs) == 0 {
+		return &blockSeries, nil
+	}
+
+	uptimeData, downtimesList, err := service.DowntimeData(failuresData.Start, failuresData.End)
+	if err != nil {
+		return nil, err
+	}
+
+	blockSeries.Start = uptimeData.Start
+	blockSeries.End = uptimeData.End
+	blockSeries.Downtime = uptimeData.Downtime
+	blockSeries.Uptime = uptimeData.Uptime
+	blockSeries.Series = &[]services.Block{}
+
+	var nextFrameTime time.Time
+
+	for c := 0; c < len(objs); c++ {
+
+		currentFrame := objs[c]
+		currentFrameTime, _ := time.ParseInLocation("2006-01-02T15:04:05Z", currentFrame.Timeframe, time.Local)
+		if c+1 < len(objs) {
+			nextFrameTime, _ = time.ParseInLocation("2006-01-02T15:04:05Z", objs[c+1].Timeframe, time.Local)
+		} else {
+			nextFrameTime = uptimeData.End
+		}
+
+		block := services.Block{
+			Timeframe: currentFrame.Timeframe,
+			Status:    services.STATUS_UP,
+			Downtimes: &[]services.Downtime{}}
+
+		for _, data := range *downtimesList {
+
+			if (currentFrameTime.Before(data.Start) && nextFrameTime.After(data.Start)) ||
+				(currentFrameTime.Before(data.End) && nextFrameTime.After(data.End)) ||
+				(currentFrameTime.After(data.Start) && nextFrameTime.Before(data.End)) {
+
+				start := data.Start
+				end := data.End
+
+				if currentFrameTime.After(data.Start) {
+					start = currentFrameTime
+				}
+
+				if nextFrameTime.Before(data.End) {
+					end = nextFrameTime
+				}
+
+				*block.Downtimes = append(*block.Downtimes, services.Downtime{
+					Start:     start,
+					End:       end,
+					Duration:  end.Sub(start).Milliseconds(),
+					SubStatus: services.HandleEmptyStatus(data.SubStatus),
+				})
+
+				if block.Status != services.STATUS_DOWN {
+					block.Status = services.HandleEmptyStatus(data.SubStatus)
+				}
+			}
+		}
+		*blockSeries.Series = append(*blockSeries.Series, block)
+	}
+
+	return &blockSeries, nil
 }
 
 func apiServiceHitsDeleteHandler(w http.ResponseWriter, r *http.Request) {
@@ -274,6 +496,29 @@ func apiAllServicesHandler(r *http.Request) interface{} {
 		}
 		srvs = append(srvs, v)
 	}
+	return srvs
+}
+
+func apiAllSubServicesHandler(r *http.Request) interface{} {
+	var srvs []services.Service
+	service, err := findService(r)
+	if err != nil {
+		return err
+	}
+	if service.Type != "collection" {
+		return fmt.Errorf("Not a supported operation")
+	}
+	for id, config := range service.SubServicesDetails {
+		if config.Public {
+			if sub, err := services.FindOne(id); err == nil {
+				subClone := *sub
+				subClone.DisplayName = config.DisplayName
+				srvs = append(srvs, subClone)
+			}
+		}
+	}
+	sort.Sort(services.ServiceOrder(srvs))
+
 	return srvs
 }
 

@@ -7,6 +7,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
 	"github.com/statping/statping/source"
+	"github.com/statping/statping/types/downtimes"
 	"github.com/statping/statping/types/notifications"
 	"github.com/statping/statping/utils"
 
@@ -23,6 +24,9 @@ import (
 
 func (d *DbConfig) ResetCore() error {
 	if d.Db.HasTable("core") {
+		if d.Db.Error() != nil {
+			return errors.New("Unable to connect to database in RestCore")
+		}
 		return nil
 	}
 	var srvs int64
@@ -32,25 +36,20 @@ func (d *DbConfig) ResetCore() error {
 			return errors.New("there are already services setup.")
 		}
 	}
-	if err := d.DropDatabase(); err != nil {
-		return errors.Wrap(err, "error dropping database")
+
+	if d.Db.Error() != nil {
+		return errors.New("Unable to connect to database to fetch services in RestCore")
 	}
+	//if err := d.DropDatabase(); err != nil {
+	//	return errors.Wrap(err, "error dropping database")
+	//}
 	if err := d.CreateDatabase(); err != nil {
 		return errors.Wrap(err, "error creating database")
 	}
 	if err := CreateAdminUser(); err != nil {
 		return errors.Wrap(err, "error creating default admin user")
 	}
-	if utils.Params.GetBool("SAMPLE_DATA") {
-		log.Infoln("Adding Sample Data")
-		if err := TriggerSamples(); err != nil {
-			return errors.Wrap(err, "error adding sample data")
-		}
-	} else {
-		if err := core.Samples(); err != nil {
-			return errors.Wrap(err, "error added core details")
-		}
-	}
+
 	return nil
 }
 
@@ -104,7 +103,7 @@ func (d *DbConfig) BackupAssets() error {
 //This function will NOT remove previous records, tables or columns from the database.
 //If this function has an issue, it will ROLLBACK to the previous state.
 func (d *DbConfig) MigrateDatabase() error {
-	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
+	var DbModels = []interface{}{&services.Service{}, &users.User{}, &hits.Hit{}, &failures.Failure{}, &messages.Message{}, &groups.Group{}, &downtimes.Downtime{}, &checkins.Checkin{}, &checkins.CheckinHit{}, &notifications.Notification{}, &incidents.Incident{}, &incidents.IncidentUpdate{}}
 
 	log.Infoln("Migrating Database Tables...")
 	tx := d.Db.Begin()
@@ -134,28 +133,9 @@ func (d *DbConfig) MigrateDatabase() error {
 
 	d.Db.Table("core").Model(&core.Core{}).Update("version", utils.Params.GetString("VERSION"))
 
+	CreateAdminUser()
+
 	log.Infoln("Statping Database Tables Migrated")
-
-	if err := d.Db.Model(&hits.Hit{}).AddIndex("idx_service_hit", "service").Error(); err != nil {
-		log.Errorln(err)
-	}
-
-	if err := d.Db.Model(&hits.Hit{}).AddIndex("hit_created_at", "created_at").Error(); err != nil {
-		log.Errorln(err)
-	}
-
-	if err := d.Db.Model(&failures.Failure{}).AddIndex("fail_created_at", "created_at").Error(); err != nil {
-		log.Errorln(err)
-	}
-
-	if err := d.Db.Model(&failures.Failure{}).AddIndex("idx_service_fail", "service").Error(); err != nil {
-		log.Errorln(err)
-	}
-
-	if err := d.Db.Model(&failures.Failure{}).AddIndex("idx_checkin_fail", "checkin").Error(); err != nil {
-		log.Errorln(err)
-	}
-	log.Infoln("Database Indexes Created")
 
 	return nil
 }

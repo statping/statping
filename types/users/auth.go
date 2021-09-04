@@ -15,7 +15,7 @@ func AuthUser(username, passwordHash string) (*User, bool) {
 		return nil, false
 	}
 	if utils.CheckHash(passwordHash, user.Password) {
-		user.UpdatedAt = time.Now().UTC()
+		user.UpdatedAt = time.Now()
 		user.Update()
 		return user, true
 	}

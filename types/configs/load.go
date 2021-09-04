@@ -39,6 +39,13 @@ func Save() error {
 }
 
 func LoadConfigs(cfgFile string) (*DbConfig, error) {
+	fileName := "/config.yml"
+
+	if env, ok := os.LookupEnv("APP_ENV"); ok {
+		fileName = "/configs/" + env + ".yml"
+	}
+
+	cfgFile = utils.Directory + fileName
 	writeAble, err := utils.DirWritable(utils.Directory)
 	if err != nil {
 		return nil, err
@@ -50,14 +57,34 @@ func LoadConfigs(cfgFile string) (*DbConfig, error) {
 	log.Infof("Attempting to read config file at: %s", cfgFile)
 	p.SetConfigFile(cfgFile)
 	p.SetConfigType("yaml")
-	p.ReadInConfig()
+	res := p.ReadInConfig()
+
+	if res != nil {
+		log.Errorf("Error reading config: %s", res.Error())
+	}
 
 	db := new(DbConfig)
 	content, err := utils.OpenFile(cfgFile)
+
+	if err != nil {
+		log.Errorf("Unable to open config file %s", err.Error())
+	} else {
+		log.Infof("Opened the config fie")
+	}
+
+	content = os.ExpandEnv(string(content))
 	if err == nil {
 		if err := yaml.Unmarshal([]byte(content), &db); err != nil {
 			return nil, err
+		} else {
+			log.Infof("Unmarshalled config file successfully")
 		}
+	}
+
+	if content == "" {
+		log.Errorf("No content read fron cnfig file")
+	} else {
+		log.Infof("Read the config fie")
 	}
 
 	if os.Getenv("DB_CONN") == "sqlite" || os.Getenv("DB_CONN") == "sqlite3" {
@@ -103,29 +130,46 @@ func LoadConfigs(cfgFile string) (*DbConfig, error) {
 		p.Set("LETSENCRYPT_ENABLE", db.LetsEncryptEnable)
 	}
 
-	configs := &DbConfig{
-		DbConn:            p.GetString("DB_CONN"),
-		DbHost:            p.GetString("DB_HOST"),
-		DbUser:            p.GetString("DB_USER"),
-		DbPass:            p.GetString("DB_PASS"),
-		DbData:            p.GetString("DB_DATABASE"),
-		DbPort:            p.GetInt("DB_PORT"),
-		Project:           p.GetString("NAME"),
-		Description:       p.GetString("DESCRIPTION"),
-		Domain:            p.GetString("DOMAIN"),
-		Email:             p.GetString("EMAIL"),
-		Username:          p.GetString("ADMIN_USER"),
-		Password:          p.GetString("ADMIN_PASSWORD"),
-		Location:          utils.Directory,
-		SqlFile:           p.GetString("SQL_FILE"),
-		Language:          p.GetString("LANGUAGE"),
-		AllowReports:      p.GetBool("ALLOW_REPORTS"),
-		LetsEncryptEnable: p.GetBool("LETSENCRYPT_ENABLE"),
-		LetsEncryptHost:   p.GetString("LETSENCRYPT_HOST"),
-		LetsEncryptEmail:  p.GetString("LETSENCRYPT_EMAIL"),
-		ApiSecret:         p.GetString("API_SECRET"),
-		SampleData:        p.GetBool("SAMPLE_DATA"),
+	if db.MaxOpenConnections != 0 {
+		p.Set("MAX_OPEN_CONN", db.MaxOpenConnections)
 	}
+	if db.MaxIdleConnections != 0 {
+		p.Set("MAX_IDLE_CONN", db.MaxIdleConnections)
+	}
+	if db.MaxLifeConnections != 0 {
+		p.Set("MAX_LIFE_CONN", db.MaxLifeConnections)
+	}
+
+	log.Infof("Set db env vars")
+
+	configs := &DbConfig{
+		DbConn:             p.GetString("DB_CONN"),
+		DbHost:             p.GetString("DB_HOST"),
+		DbUser:             p.GetString("DB_USER"),
+		DbPass:             p.GetString("DB_PASS"),
+		DbData:             p.GetString("DB_DATABASE"),
+		DbPort:             p.GetInt("DB_PORT"),
+		Project:            p.GetString("NAME"),
+		Description:        p.GetString("DESCRIPTION"),
+		Domain:             p.GetString("DOMAIN"),
+		Email:              p.GetString("EMAIL"),
+		Username:           p.GetString("ADMIN_USER"),
+		Password:           p.GetString("ADMIN_PASSWORD"),
+		Location:           utils.Directory,
+		SqlFile:            p.GetString("SQL_FILE"),
+		Language:           p.GetString("LANGUAGE"),
+		AllowReports:       p.GetBool("ALLOW_REPORTS"),
+		LetsEncryptEnable:  p.GetBool("LETSENCRYPT_ENABLE"),
+		LetsEncryptHost:    p.GetString("LETSENCRYPT_HOST"),
+		LetsEncryptEmail:   p.GetString("LETSENCRYPT_EMAIL"),
+		ApiSecret:          p.GetString("API_SECRET"),
+		SampleData:         p.GetBool("SAMPLE_DATA"),
+		MaxLifeConnections: p.GetInt("MAX_LIFE_CONN"),
+		MaxOpenConnections: p.GetInt("MAX_OPEN_CONN"),
+		MaxIdleConnections: p.GetInt("MAX_IDLE_CONN"),
+	}
+	log.Infof("Set db env vars into config struct")
+
 	log.WithFields(utils.ToFields(configs)).Debugln("read config file: " + cfgFile)
 
 	if configs.DbConn == "" {

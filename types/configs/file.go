@@ -12,6 +12,7 @@ var log = utils.Log.WithField("type", "configs")
 
 // ConnectConfigs will connect to the database and save the config.yml file
 func ConnectConfigs(configs *DbConfig, retry bool) error {
+	log.Infof("Trying to initiate ConnectConfigs")
 	err := Connect(configs, retry)
 	if err != nil {
 		return errors.Wrap(err, "error connecting to database")
@@ -19,6 +20,7 @@ func ConnectConfigs(configs *DbConfig, retry bool) error {
 	if err := configs.Save(utils.Directory); err != nil {
 		return errors.Wrap(err, "error saving configuration")
 	}
+	log.Infof("Saved configs in ConnectConfigs")
 	return nil
 }
 

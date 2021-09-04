@@ -7,6 +7,7 @@ import (
 	"github.com/statping/statping/types/metrics"
 	"github.com/statping/statping/utils"
 	"sort"
+	"time"
 )
 
 var (
@@ -37,12 +38,14 @@ func (s *Service) BeforeUpdate() error {
 }
 
 func (s *Service) AfterFind() {
-	db.Model(s).Related(&s.Incidents).Related(&s.Messages).Related(&s.Checkins).Related(&s.Incidents)
+	//db.Model(s).Related(&s.Incidents).Related(&s.Messages).Related(&s.Checkins).Related(&s.Incidents)
 	metrics.Query("service", "find")
 }
 
 func (s *Service) AfterCreate() error {
 	s.prevOnline = true
+	s.LastProcessingTime = time.Now()
+	db.Update(s)
 	allServices[s.Id] = s
 	metrics.Query("service", "create")
 	return nil
@@ -73,8 +76,18 @@ func Find(id int64) (*Service, error) {
 	if srv == nil {
 		return nil, errors.Missing(&Service{}, id)
 	}
-	db.First(&srv, id)
-	return srv, nil
+	res := db.First(&srv, id)
+	return srv, res.Error()
+}
+
+func FindOne(id int64) (*Service, error) {
+	srv := allServices[id]
+	if srv == nil {
+		return nil, errors.Missing(&Service{}, id)
+	}
+	service := &Service{}
+	db.First(&service, id)
+	return service, nil
 }
 
 func all() []*Service {
@@ -90,7 +103,7 @@ func All() map[int64]*Service {
 func AllInOrder() []Service {
 	var services []Service
 	for _, service := range allServices {
-		service.UpdateStats()
+		//service.UpdateStats()
 		services = append(services, *service)
 	}
 	sort.Sort(ServiceOrder(services))
@@ -107,16 +120,33 @@ func (s *Service) Create() error {
 }
 
 func (s *Service) Update() error {
-	q := db.Update(s)
 	s.Close()
-	allServices[s.Id] = s
-	s.SleepDuration = s.Duration()
-	go ServiceCheckQueue(allServices[s.Id], true)
+	q := db.Update(s)
+	delete(allServices, s.Id)
+	//s.SleepDuration = s.Duration()
+	//go ServiceCheckQueue(allServices[s.Id], true)
 	return q.Error()
 }
 
+func (s *Service) UpdateOrder() (err error) {
+	updateFields := map[string]interface{}{
+		"order_id": s.Order,
+	}
+
+	d := db.Model(s).Where(" id = ? ", s.Id).Updates(updateFields)
+	if err = d.Error(); d.Error() != nil {
+		log.Errorf("[DB ERROR]Failed toservice order : %s %s %s %s", s.Id, s.Name, updateFields, d.Error())
+	}
+	if d.RowsAffected() == 0 {
+		err = fmt.Errorf("[Zero]Failed to update service order : %s %s %s %s", s.Id, s.Name, updateFields, d.Error())
+		log.Errorf("[Zero]Failed to update service order : %s %s %s %s", s.Id, s.Name, updateFields, d.Error())
+	}
+	log.Infof("Service Order updates Saved : %s %s %s", s.Id, s.Name, updateFields)
+	return
+}
+
 func (s *Service) Delete() error {
-	s.Close()
+
 	if err := s.AllFailures().DeleteAll(); err != nil {
 		return err
 	}
@@ -136,6 +166,7 @@ func (s *Service) Delete() error {
 	}
 	db.Model(s).Association("Messages").Clear()
 
+	s.Close()
 	delete(allServices, s.Id)
 	q := db.Model(&Service{}).Delete(s)
 	return q.Error()
@@ -159,4 +190,34 @@ func (s *Service) DeleteCheckins() error {
 	}
 	db.Model(s).Association("checkins").Clear()
 	return nil
+}
+
+func (s *Service) acquireServiceRun() error {
+
+	rows := db.Model(s).Where("last_processing_time + (check_interval * interval '1 second') < ?", time.Now()).Update("last_processing_time", time.Now())
+
+	if rows.RowsAffected() == 0 {
+		return errors.New("Service already acquired")
+	}
+	return nil
+}
+
+func (s *Service) markServiceRunProcessed() {
+	updateFields := map[string]interface{}{
+		"online":           s.Online,
+		"last_check":       s.LastCheck,
+		"last_success":     s.LastOnline,
+		"last_error":       s.LastOffline,
+		"failure_counter":  s.FailureCounter,
+		"current_downtime": s.CurrentDowntime,
+	}
+
+	d := db.Model(s).Where(" id = ? ", s.Id).Updates(updateFields)
+	if d.Error() != nil {
+		log.Errorf("[DB ERROR]Failed to update service run : %s %s %s %s", s.Id, s.Name, updateFields, d.Error())
+	}
+	if d.RowsAffected() == 0 {
+		log.Errorf("[Zero]Failed to update service run : %s %s %s %s", s.Id, s.Name, updateFields, d.Error())
+	}
+	log.Infof("Service Run Updates Saved : %s %s %s", s.Id, s.Name, updateFields)
 }

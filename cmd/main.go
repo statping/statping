@@ -15,6 +15,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 var (
@@ -28,6 +29,13 @@ var (
 )
 
 func init() {
+
+	os.Setenv("TZ", "Asia/Kolkata")
+	if loc, err := time.LoadLocation("Asia/Kolkata"); err != nil {
+		log.Errorf("setting timezone globally : %s", loc)
+		time.Local = loc
+	}
+
 	stopped = make(chan bool, 1)
 	core.New(VERSION, COMMIT)
 	utils.InitEnvs()
@@ -96,21 +104,30 @@ func start() {
 		}
 	}
 
+	log.Infof("Done: LoadConfigs")
+
 	if err = configs.ConnectConfigs(confgs, true); err != nil {
 		exit(err)
 	}
+	log.Infof("Done: ConnectConfigs")
 
 	if err = confgs.ResetCore(); err != nil {
 		exit(err)
 	}
 
+	log.Infof("Done: ResetCore")
+
 	if err = confgs.DatabaseChanges(); err != nil {
 		exit(err)
 	}
 
+	log.Infof("Done: DatabaseChanges")
+
 	if err := confgs.MigrateDatabase(); err != nil {
 		exit(err)
 	}
+
+	log.Infof("Done: MigrateDatabase")
 
 	if err := mainProcess(); err != nil {
 		exit(err)
