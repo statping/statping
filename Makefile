@@ -111,27 +111,14 @@ db-down:
 console:
 	docker exec -t -i statping /bin/sh
 
-compose-build-full: docker-base
+compose-build-full: 
 	docker-compose -f docker-compose.yml -f dev/docker-compose.full.yml build --parallel --build-arg VERSION=${VERSION}
 
-docker-base:
-	docker build -t statping-ng/statping-ng:base -f Dockerfile.base --build-arg VERSION=${VERSION} .
-
-docker-latest: docker-base
+docker-latest: 
 	docker build -t statping-ng/statping-ng:latest --build-arg VERSION=${VERSION} .
-
-docker-vue:
-	docker build -t statping-ng/statping-ng:vue --build-arg VERSION=${VERSION} .
 
 docker-test:
 	docker-compose -f docker-compose.test.yml up --remove-orphans
-
-push-base: clean compile docker-base
-	docker push statping-ng/statping-ng:base
-
-push-vue: clean compile docker-base docker-vue
-	docker push statping-ng/statping-ng:base
-	docker push statping-ng/statping-ng:vue
 
 modd:
 	modd -f ./dev/modd.conf
@@ -285,18 +272,11 @@ download-key:
 	wget -O statping.gpg $(SIGN_URL)
 	gpg --import statping.gpg
 
-# push the :dev docker tag using curl
-dockerhub-dev:
-	docker build --build-arg VERSION=${VERSION} -t statping-ng/statping-ng:dev --no-cache -f Dockerfile.base .
-	docker push statping-ng/statping-ng:dev
-
 dockerhub:
-	docker build --build-arg VERSION=${VERSION} -t statping-ng/statping-ng:base --no-cache -f Dockerfile.base .
-	docker build --build-arg VERSION=${VERSION} -t statping-ng/statping-ng:latest --no-cache -f Dockerfile .
-	docker tag statping-ng/statping-ng statping-ng/statping-ng:v${VERSION}
-	docker push statping-ng/statping-ng:base
-	docker push statping-ng/statping-ng:v${VERSION}
-	docker push statping-ng/statping-ng
+	docker build --build-arg VERSION=${VERSION} -t adamboutcher/statping-ng:latest --no-cache -f Dockerfile .
+	docker tag adamboutcher/statping-ng adamboutcher/statping-ng:v${VERSION}
+	docker push adamboutcher/statping-ng:v${VERSION}
+	docker push adamboutcher/statping-ng
 
 docker-build-dev:
 	docker build --build-arg VERSION=${VERSION} -t statping-ng/statping-ng:latest --no-cache -f Dockerfile .
@@ -392,12 +372,6 @@ buildx-dev: multiarch
 	docker buildx build --builder statping-dev --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache,mode=max" --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile -t adamboutcher/statping-ng:dev --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
 	docker buildx rm statping-dev
 
-buildx-base: multiarch
-	docker buildx create --name statping-base --driver-opt image=moby/buildkit:master
-	docker buildx inspect --builder statping-base --bootstrap
-	docker buildx build --builder statping-base --cache-from "type=local,src=/tmp/.buildx-cache" --cache-to "type=local,dest=/tmp/.buildx-cache,mode=max" --push --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 -f Dockerfile.base -t adamboutcher/statping-ng:base --build-arg=VERSION=${VERSION} --build-arg=COMMIT=${COMMIT} .
-	docker buildx rm statping-base
-
 multiarch:
 	mkdir /tmp/.buildx-cache || true
 	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
@@ -426,5 +400,5 @@ gen_help:
 		marked -o html/$file.html $file --gfm
 	done
 
-.PHONY: all check build certs multiarch install-darwin go-build build-all buildx-base buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
+.PHONY: all check build certs multiarch install-darwin go-build build-all buildx-dev buildx-latest build-alpine test-all test test-api docker frontend up down print_details lite sentry-release snapcraft build-linux build-mac build-win build-all postman
 .SILENT: travis_s3_creds
