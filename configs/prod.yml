@@ -3,7 +3,7 @@ admin_password: admin
 admin_user: superadmin
 allow_reports: false
 base_path: ""
-cleanup_interval: 12h0m0s
+cleanup_interval: 24h0m0s
 cmd_file: /bin/bash
 db_conn: postgres
 db_database: ${DATABASE_NAME}
@@ -22,7 +22,7 @@ max_life_conn: 180
 max_open_conn: 25
 name: Razorpay Status Page
 postgres_sslmode: require
-remove_after: 2160h0m0s
+remove_after: 720h0m0s
 sample_data: true
 sass: /usr/local/bin/sass
 use_assets: true

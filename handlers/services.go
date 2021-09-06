@@ -19,6 +19,13 @@ type serviceOrder struct {
 	Order int   `json:"order"`
 }
 
+var (
+	zeroTime  time.Time
+	zeroBool  bool
+	zeroInt   int
+	zeroInt64 int64
+)
+
 func findService(r *http.Request) (*services.Service, error) {
 	vars := mux.Vars(r)
 	id := utils.ToInt(vars["id"])
@@ -132,19 +139,31 @@ func apiServicePatchHandler(w http.ResponseWriter, r *http.Request) {
 
 func apiServiceUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	service, err := findService(r)
+
 	if err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	if err := DecodeJSON(r, &service); err != nil {
+
+	s2 := *service
+
+	s2.SubServicesDetails = map[int64]services.SubService{}
+
+	if err := DecodeJSON(r, &s2); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	if err := service.Update(); err != nil {
+
+	s2.LastProcessingTime = zeroTime
+	s2.Online = zeroBool
+	s2.FailureCounter = zeroInt
+	s2.CurrentDowntime = zeroInt64
+
+	if err := s2.Update(); err != nil {
 		sendErrorJson(err, w, r)
 		return
 	}
-	go service.CheckService(true)
+	go s2.CheckService(true)
 	sendJsonAction(service, "update", w, r)
 }
 
