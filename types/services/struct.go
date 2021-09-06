@@ -67,7 +67,7 @@ type Service struct {
 	Incidents           []*incidents.Incident `gorm:"foreignkey:service;association_foreignkey:id" json:"incidents,omitempty" yaml:"incidents"`
 	Checkins            []*checkins.Checkin   `gorm:"foreignkey:service;association_foreignkey:id" json:"checkins,omitempty" yaml:"-" scope:"user,admin"`
 	Failures            []*failures.Failure   `gorm:"-" json:"failures,omitempty" yaml:"-" scope:"user,admin"`
-	LastProcessingTime  time.Time             `gorm:"column:last_processing_time" json:"last_processing_time"`
+	LastProcessingTime  time.Time             `gorm:"column:last_processing_time" json:"-"`
 
 	notifyAfterCount int64 `gorm:"column:notify_after_count" yaml:"-"`
 	prevOnline       bool  `gorm:"column:prev_online" yaml:"-"`

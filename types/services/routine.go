@@ -434,36 +434,40 @@ func CheckCollection(s *Service, record bool) (*Service, error) {
 	timer := prometheus.NewTimer(metrics.ServiceTimer(s.Name))
 	defer timer.ObserveDuration()
 
+	hcStartTime := time.Now()
+
 	combinedStatus := STATUS_UP
 	var impactedSubService SubService
-	var latency, pingtime int64
 	downCount := 0
 
 	for id, subServiceDetail := range s.SubServicesDetails {
-		if subService, err := FindOne(id); err != nil {
+		if subService, err := FindFirstFromDB(id); err != nil {
 			log.Errorf("[Ignored]Failed to find Sub Service : %s %s %s %s", s.Id, s.Name, id, subServiceDetail.DisplayName)
 			continue
 		} else {
-			hit := subService.LastHit()
-			failure := subService.LastFailure()
-			pingtime = hit.PingTime
-			if failure.CreatedAt.After(hit.CreatedAt) {
-				pingtime = failure.PingTime
+			if !subService.Online && subService.CurrentDowntime > 0 {
+				downtimeType := STATUS_DOWN
+				if d, de := downtimes.Find(subService.CurrentDowntime); de != nil {
+					log.Errorf("[Ignored]Failed to find Sub Service Downtime : %s %s %s %s", s.Id, s.Name, id, subServiceDetail.DisplayName)
+					continue
+				} else {
+					downtimeType = d.SubStatus
+				}
+
 				if combinedStatus != STATUS_DOWN {
 					switch subServiceDetail.DependencyType {
 					case CRITICAL:
-						combinedStatus = HandleEmptyStatus(failure.Type)
+						combinedStatus = HandleEmptyStatus(downtimeType)
 						impactedSubService = subServiceDetail
 					case DELAYED, PARTIAL:
 						combinedStatus = STATUS_DEGRADED
-						if failure.Type == STATUS_DOWN {
+						if downtimeType == STATUS_DOWN {
 							downCount++
 						}
 						impactedSubService = subServiceDetail
 					}
 				}
 			}
-			latency += pingtime
 		}
 	}
 
@@ -471,8 +475,8 @@ func CheckCollection(s *Service, record bool) (*Service, error) {
 		combinedStatus = STATUS_DOWN
 	}
 
-	s.Latency = latency
-	s.PingTime = latency
+	s.Latency = time.Now().Sub(hcStartTime).Milliseconds()
+	s.PingTime = time.Now().Sub(hcStartTime).Milliseconds()
 	s.LastFailureType = combinedStatus
 	if combinedStatus == STATUS_DOWN || combinedStatus == STATUS_DEGRADED {
 		if record {
@@ -571,7 +575,7 @@ func (s *Service) CheckService(record bool) (err error) {
 func (s *Service) HandleDowntime(err error, record bool) {
 	if err != nil {
 		s.FailureCounter++
-		if s.FailureCounter >= s.GetFtc() {
+		if s.FailureCounter >= s.GetFtc() || s.Type == "collection" {
 
 			s.Online = false
 
@@ -591,7 +595,15 @@ func (s *Service) HandleDowntime(err error, record bool) {
 			}
 
 			downtime.End = time.Now()
-			downtime.SubStatus = ApplyStatus(downtime.SubStatus, HandleEmptyStatus(s.LastFailureType), STATUS_DEGRADED)
+			newStatus := HandleEmptyStatus(s.LastFailureType)
+
+			if downtime.SubStatus != "" && downtime.SubStatus != newStatus {
+				downtime.Id = 0
+				downtime.Start = time.Now().Add(time.Duration(-s.Interval) * (time.Second))
+			}
+
+			downtime.SubStatus = newStatus
+
 			downtime.Failures = s.FailureCounter
 
 			if downtime.Id > 0 {
