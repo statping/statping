@@ -6,6 +6,9 @@ import (
 	"time"
 )
 
+var (
+	zeroInt64 int64
+)
 var db database.Database
 var dbHits database.Database
 
@@ -23,6 +26,29 @@ func Find(id int64) (*Downtime, error) {
 		return nil, fmt.Errorf(" Downtime record not found : %s", id)
 	}
 	return &downtime, q.Error()
+}
+
+func (c *Downtime) Validate() error {
+	if c.Type == "manual" {
+		if c.End != nil && c.End.After(time.Now()) || c.Start.After(time.Now()) {
+			return fmt.Errorf("Downtime cannot be in future")
+		}
+		if c.ServiceId == zeroInt64 {
+			return fmt.Errorf("Service ID cannot be null")
+		}
+		if c.SubStatus != "down" && c.SubStatus != "degraded" {
+			return fmt.Errorf("SubStatus can only be 'down' or 'degraded'")
+		}
+	}
+	return nil
+}
+
+func (c *Downtime) BeforeCreate() error {
+	return c.Validate()
+}
+
+func (c *Downtime) BeforeUpdate() error {
+	return c.Validate()
 }
 
 func FindByService(service int64, start time.Time, end time.Time) (*[]Downtime, error) {
@@ -43,10 +69,6 @@ func (c *Downtime) Update() error {
 }
 
 func (c *Downtime) Delete() error {
-	q := dbHits.Where("id = ?", c.Id).Delete(&Downtime{})
-	if err := q.Error(); err != nil {
-		return err
-	}
-	q = db.Model(&Downtime{}).Delete(c)
+	q := db.Model(&Downtime{}).Delete(c)
 	return q.Error()
 }

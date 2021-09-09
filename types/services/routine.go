@@ -36,7 +36,7 @@ func CheckServices() {
 
 func refreshAllServices() {
 	for {
-		time.Sleep(time.Duration(time.Second * 60))
+		time.Sleep(time.Duration(time.Second * 20))
 
 		newList := all()
 
@@ -71,7 +71,7 @@ CheckLoop:
 			s, er := Find(s.Id)
 
 			if er == nil {
-				if err == nil {
+				if err == nil && !s.ManualDowntime {
 
 					log.Infof("Service Run Started : %s %s", s.Id, s.Name)
 
@@ -579,8 +579,10 @@ func (s *Service) HandleDowntime(err error, record bool) {
 
 			s.Online = false
 
+			t := time.Now().Add(time.Duration(-s.FailureCounter*s.Interval) * (time.Second))
+
 			downtime := &downtimes.Downtime{
-				Start:     time.Now().Add(time.Duration(-s.FailureCounter*s.Interval) * (time.Second)),
+				Start:     &t,
 				ServiceId: s.Id,
 			}
 
@@ -594,12 +596,16 @@ func (s *Service) HandleDowntime(err error, record bool) {
 				}
 			}
 
-			downtime.End = time.Now()
+			now := time.Now()
+
+			downtime.End = &now
 			newStatus := HandleEmptyStatus(s.LastFailureType)
+
+			start := time.Now().Add(time.Duration(-s.Interval) * (time.Second))
 
 			if downtime.SubStatus != "" && downtime.SubStatus != newStatus {
 				downtime.Id = 0
-				downtime.Start = time.Now().Add(time.Duration(-s.Interval) * (time.Second))
+				downtime.Start = &start
 			}
 
 			downtime.SubStatus = newStatus

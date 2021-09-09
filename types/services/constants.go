@@ -15,18 +15,6 @@ const (
 	STATUS_DEGRADED = "degraded"
 )
 
-const (
-	FAILURE_TYPE_COMPLETE = "complete"
-	FAILURE_TYPE_DEGRADED = "degraded"
-	FAILURE_TYPE_DEFAULT  = ""
-)
-
-var FailureTypeStatusMap = map[string]string{
-	FAILURE_TYPE_DEFAULT:  STATUS_DOWN,
-	FAILURE_TYPE_COMPLETE: STATUS_DOWN,
-	FAILURE_TYPE_DEGRADED: STATUS_DEGRADED,
-}
-
 func ApplyStatus(current string, apply string, defaultStatus string) string {
 	switch current {
 	case STATUS_DOWN:

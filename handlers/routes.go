@@ -192,6 +192,13 @@ func Router() *mux.Router {
 	api.Handle("/api/checkins/{api}", authenticated(checkinDeleteHandler, false)).Methods("DELETE")
 	//r.Handle("/checkin/{api}", http.HandlerFunc(checkinHitHandler))
 
+	// API DOWNTIME Routes
+	api.Handle("/api/service/{service_id}/downtimes", authenticated(apiAllDowntimesForServiceHandler, false)).Methods("GET")
+	api.Handle("/api/downtimes", authenticated(apiCreateDowntimeHandler, false)).Methods("POST")
+	api.Handle("/api/downtimes/{id}", authenticated(apiDowntimeHandler, false)).Methods("GET")
+	api.Handle("/api/downtimes/{id}", authenticated(apiPatchDowntimeHandler, false)).Methods("PATCH")
+	api.Handle("/api/downtimes/{id}", authenticated(apiDeleteDowntimeHandler, false)).Methods("DELETE")
+
 	// API Generic Routes
 
 	r.Handle("/health", http.HandlerFunc(healthCheckHandler))
