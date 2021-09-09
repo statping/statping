@@ -5,6 +5,7 @@ import (
 	"github.com/statping/statping/types/checkins"
 	"github.com/statping/statping/types/configs"
 	"github.com/statping/statping/types/core"
+	"github.com/statping/statping/types/downtimes"
 	"github.com/statping/statping/types/errors"
 	"github.com/statping/statping/types/groups"
 	"github.com/statping/statping/types/incidents"
@@ -163,6 +164,10 @@ func sendJsonAction(obj interface{}, method string, w http.ResponseWriter, r *ht
 	case *incidents.IncidentUpdate:
 		objName = "incident_update"
 		objId = v.Id
+	case *downtimes.Downtime:
+		objName = "downtime"
+		objId = v.Id
+
 	default:
 		objName = fmt.Sprintf("%T", v)
 	}

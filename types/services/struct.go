@@ -75,6 +75,7 @@ type Service struct {
 	FailureCounter  int    `gorm:"column:failure_counter" json:"-" yaml:"-"`
 	CurrentDowntime int64  `gorm:"column:current_downtime" json:"-" yaml:"-"`
 	LastFailureType string `gorm:"-" json:"-" yaml:"-"`
+	ManualDowntime  bool   `gorm:"default:false;column:manual_downtime" json:"manual_downtime"`
 }
 
 // ServiceOrder will reorder the services based on 'order_id' (Order)

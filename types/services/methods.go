@@ -218,8 +218,12 @@ func addDurations(s []series, on bool) int64 {
 
 func addDowntimeDurations(d *[]downtimes.Downtime) int64 {
 	var dur int64
+	now := time.Now()
 	for _, v := range *d {
-		dur += v.End.Sub(v.Start).Milliseconds()
+		if v.End == nil {
+			v.End = &now
+		}
+		dur += v.End.Sub(*v.Start).Milliseconds()
 	}
 	return dur
 }
