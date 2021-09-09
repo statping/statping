@@ -191,6 +191,15 @@
     line-height: 1rem;
     padding: 0 4.65rem;
     color: rgba($white, 0.8);
+
+    a {
+      text-decoration: underline;
+
+      &:hover,
+      &:focus {
+        color: rgba($white, 0.8);
+      }
+    }
   }
 }
 
