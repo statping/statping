@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
 // import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCheckCircle,
-  faExclamationCircle,
-} from "@fortawesome/free-solid-svg-icons";
 import DateUtils from "../utils/DateUtils";
 import Group from "./Group";
 import ContentHeader from "./ContentHeader";
@@ -14,13 +10,13 @@ import ServiceLoader from "./ServiceLoader";
 // import ServiceBlock from "./ServiceBlock";
 // import ServicesList from "./ServicesList";
 import API from "../config/API";
-import { STATUS_COLOR, STATUS_TEXT } from "../utils/constants";
+import { STATUS_COLOR, STATUS_ICON, STATUS_TEXT } from "../utils/constants";
 import { findStatus } from "../utils/helper";
 
 const ServicesPage = () => {
   // const data = messages.filter((m) => inRange(m) && m.service === 0);
   const [services, setServices] = useState([]);
-  const [status, setStatus] = useState(true);
+  const [status, setStatus] = useState("uptime");
   const [loading, setLoading] = useState(true);
   const [poll, setPolling] = useState(1);
   const today = DateUtils.format(new Date(), "d MMMM yyyy, hh:mm aaa");
@@ -57,14 +53,16 @@ const ServicesPage = () => {
           <h2 className="title font-20 fw-700">Razorpay Payments</h2>
           <div className="d-flex align-items-center subtitle font-12 mt-2">
             <FontAwesomeIcon
-              icon={status === "up" ? faCheckCircle : faExclamationCircle}
+              icon={STATUS_ICON[status]}
               style={{
                 fontSize: "16px",
                 color: STATUS_COLOR[status],
               }}
             />
             <span className="mx-1">{STATUS_TEXT[status]}</span>
-            <span className="date">{today}</span>
+          </div>
+          <div>
+            <span className="date font-12">{today}</span>
           </div>
         </div>
 

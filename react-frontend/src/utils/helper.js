@@ -1,7 +1,5 @@
 // import DateUtils from "./DateUtils";
 
-import DateUtils from "./DateUtils";
-
 export function findStatus(data) {
   if (!Array.isArray(data)) return null;
   if (data.length === 0) return null;
@@ -11,7 +9,7 @@ export function findStatus(data) {
   if (uptime) return "uptime";
   if (downtime) return "downtime";
   if (degraded) return "degraded";
-  return "none";
+  return "";
 }
 
 // export function inRange(message) {

@@ -103,7 +103,10 @@ const GroupServiceFailures = ({ group = null, service, collapse }) => {
   const handleTooltip = (d) => {
     let txt = "";
     if (d.status === "up") {
-      txt = `${d.timeframe} - No Downtime`;
+      txt = `<div style="text-align:center;">
+      <div>${d.timeframe}</div>
+      <div>No Downtime</div>
+      </div>`;
     } else if (d.status === "down" && !isObjectEmpty(d.downtimes)) {
       txt = `<div style="text-align:center;">
       <div>${d.timeframe}</div>
