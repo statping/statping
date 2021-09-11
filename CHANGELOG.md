@@ -1,4 +1,9 @@
 # 0.90.78 (xx-xx-2021)
+- Updated German Language - Thanks Flofeld
+- Czech Language - Thanks Fjuro
+- Some minor branding Changes
+- Moved some asset dependancies from assets.statping.com
+- Fixed the (Ubuntu) Snap Store build script
 - Retrospectively updated the Changelog
 - [GITHUB] Fixed Windows/Mac autobuilds
 - [GITHUB] Triggers SNAP builds
