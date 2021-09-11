@@ -25,7 +25,7 @@
     <meta property="twitter:description" content="{{CoreApp.Description}} {{CoreApp.Name}}">
 
     {{if USE_CDN}}
-    <link rel="stylesheet" href="https://assets.statping.com/css/vendor.css">
+    <link rel="stylesheet" href="https://statping-ng.github.io/assets/hosted/vendor.css" />
     {{else}}
     <% _.each(htmlWebpackPlugin.tags.headTags, function(headTag) { %>
     <%= headTag %> <% }) %>
@@ -39,10 +39,10 @@
 <div id="app" class="statping_container"></div>
 
 {{if USE_CDN}}
-<script src="https://assets.statping.com/js/bundle.js"></script>
-<script src="https://assets.statping.com/js/vendor.chunk.js"></script>
-<script src="https://assets.statping.com/js/polyfill.chunk.js"></script>
-<script src="https://assets.statping.com/js/main.chunk.js"></script>
+<script src="https://statping-ng.github.io/assets/hosted/bundle.js"></script>
+<script src="https://statping-ng.github.io/assets/hosted/vendor.chunk.js"></script>
+<script src="https://statping-ng.github.io/assets/hosted/polyfill.chunk.js"></script>
+<script src="https://statping-ng.github.io/assets/hosted/main.chunk.js"></script>
 {{else}}
 <% _.each(htmlWebpackPlugin.tags.bodyTags, function(bodyTag) { %>
 <%= bodyTag %> <% }) %>
