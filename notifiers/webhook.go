@@ -3,16 +3,17 @@ package notifiers
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/statping-ng/statping-ng/types/failures"
 	"github.com/statping-ng/statping-ng/types/notifications"
 	"github.com/statping-ng/statping-ng/types/notifier"
 	"github.com/statping-ng/statping-ng/types/null"
 	"github.com/statping-ng/statping-ng/types/services"
 	"github.com/statping-ng/statping-ng/utils"
-	"io/ioutil"
-	"net/http"
-	"strings"
-	"time"
 )
 
 var _ notifier.Notifier = (*webhooker)(nil)
@@ -85,15 +86,30 @@ func (w *webhooker) Valid(values notifications.Values) error {
 }
 
 func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
-	utils.Log.Infoln(fmt.Sprintf("sending body: '%v' to %v as a %v request", body, w.Host.String, w.Var1.String))
 	client := new(http.Client)
 	client.Timeout = 10 * time.Second
 	req, err := http.NewRequest(w.Var1.String, w.Host.String, bytes.NewBufferString(body))
 	if err != nil {
 		return nil, err
 	}
+	if w.ApiKey.String != "" {
+		req.Header.Add("Content-Type", w.ApiKey.String)
+	} else {
+		req.Header.Add("Content-Type", "application/json")
+	}
+	req.Header.Set("User-Agent", "Statping-ng")
+	req.Header.Set("Statping-Version", utils.Params.GetString("VERSION"))
+
+	var customHeaders []string
+
 	if w.ApiSecret.String != "" {
-		keyVal := strings.SplitN(w.ApiSecret.String, "=", 2)
+		customHeaders = strings.Split(w.ApiSecret.String, ",")
+	} else {
+		customHeaders = nil
+	}
+
+	for _, h := range customHeaders {
+		keyVal := strings.SplitN(h, "=", 2)
 		if len(keyVal) == 2 {
 			if keyVal[0] != "" && keyVal[1] != "" {
 				if strings.ToLower(keyVal[0]) == "host" {
@@ -104,13 +120,7 @@ func (w *webhooker) sendHttpWebhook(body string) (*http.Response, error) {
 			}
 		}
 	}
-	if w.ApiKey.String != "" {
-		req.Header.Add("Content-Type", w.ApiKey.String)
-	} else {
-		req.Header.Add("Content-Type", "application/json")
-	}
-	req.Header.Set("User-Agent", "Statping")
-	req.Header.Set("Statping-Version", utils.Params.GetString("VERSION"))
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
