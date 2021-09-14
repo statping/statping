@@ -28,7 +28,7 @@ func (s *mattermost) Select() *notifications.Notification {
 	return s.Notification
 }
 
-var mattermost = &mattermost{&notifications.Notification{
+var mattermoster = &mattermost{&notifications.Notification{
 	Method:      mattermostMethod,
 	Title:       "Mattermost",
 	Description: "Send notifications to your mattermost channel when a service is offline. Insert your Incoming webhook URL for your channel to receive notifications. Based on the <a href=\"https://docs.mattermost.com/developer/webhooks-incoming.html\">Mattermost API</a>.",
